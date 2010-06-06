@@ -1,56 +1,38 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [PATCH] accept all supported values for
- dir_mode
-Date: Sun, 6 Jun 2010 07:33:03 -0400
-Message-ID: <20100606073303.365579f5@tlielax.poochiereds.net>
-References: <1275547159-30008-1-git-send-email-scott.lovenberg@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, linux-cifs-client@lists.samba.org
-To: Scott Lovenberg <scott.lovenberg@gmail.com>
-Return-path: <linux-cifs-client-bounces@lists.samba.org>
-In-Reply-To: <1275547159-30008-1-git-send-email-scott.lovenberg@gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/linux-cifs-client>,
-	<mailto:linux-cifs-client-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/linux-cifs-client>
-List-Post: <mailto:linux-cifs-client@lists.samba.org>
-List-Help: <mailto:linux-cifs-client-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/linux-cifs-client>,
-	<mailto:linux-cifs-client-request@lists.samba.org?subject=subscribe>
-Sender: linux-cifs-client-bounces@lists.samba.org
-Errors-To: linux-cifs-client-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] MAINTAINERS: change mailing list address for CIFS
+Date: Sun,  6 Jun 2010 08:05:58 -0400
+Message-ID: <1275825958-20974-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu,  3 Jun 2010 02:39:19 -0400
-Scott Lovenberg <scott.lovenberg@gmail.com> wrote:
+We're moving the mailing list to linux-cifs-u79uwXL29TaiAVqoAR/hOA@public.gmane.org
 
-> The option parsing function now accepts all values for 'dir_mode' that are supported by the kernel side code.
-> 
-> Signed-off-by: Scott Lovenberg <scott.lovenberg@gmail.com>
-> ---
->  mount.cifs.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 65754c0..21ce532 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -812,7 +812,7 @@ static int parse_opt_token(const char *token)
->  		return OPT_FILE_MODE;
->  	if (strncmp(token, "dmask", 5) == 0)
->  		return OPT_DMASK;
-> -	if (strncmp(token, "dir_mode", 8) == 0)
-> +	if (strncmp(token, "dir_mode", 4) == 0 || strncmp(token, "dirm", 4) == 0)
-				      ^^^^
-Sigh. But I can confirm that this is similarly broken in the kernel
-so we have little choice but to live with it here.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ MAINTAINERS |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
->  		return OPT_DIR_MODE;
->  	if (strncmp(token, "nosuid", 6) == 0)
->  		return OPT_NO_SUID;
-
-
-Committed...
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 67accd7..5ddf896 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1581,7 +1581,7 @@ F:	include/linux/coda*.h
+ 
+ COMMON INTERNET FILE SYSTEM (CIFS)
+ M:	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+-L:	linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org (moderated for non-subscribers)
++L:	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+ L:	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org (moderated for non-subscribers)
+ W:	http://linux-cifs.samba.org/
+ Q:	http://patchwork.ozlabs.org/project/linux-cifs-client/list/
 -- 
-Jeff Layton <jlayton@samba.org>
+1.6.6.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
