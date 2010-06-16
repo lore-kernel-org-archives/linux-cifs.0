@@ -1,63 +1,37 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH] cifs: remove bogus first_time check in
-	NTLMv2 session setup code
-Date: Wed, 16 Jun 2010 09:38:13 -0400
-Message-ID: <1276695493-6340-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-client@lists.samba.org, gdeschner@redhat.com,
-	linux-cifs@vger.kernel.org
-To: smfrench@gmail.com
-Return-path: <linux-cifs-client-bounces@lists.samba.org>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/linux-cifs-client>,
-	<mailto:linux-cifs-client-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/linux-cifs-client>
-List-Post: <mailto:linux-cifs-client@lists.samba.org>
-List-Help: <mailto:linux-cifs-client-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/linux-cifs-client>,
-	<mailto:linux-cifs-client-request@lists.samba.org?subject=subscribe>
-Sender: linux-cifs-client-bounces@lists.samba.org
-Errors-To: linux-cifs-client-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: use original device name as-is for mtab
+Date: Wed, 16 Jun 2010 15:44:33 -0400
+Message-ID: <1276717473-12198-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-This bug appears to be the result of a cut-and-paste mistake from the
-NTLMv1 code. The function to generate the MAC key was commented out, but
-not the conditional above it. The conditional then ended up causing the
-session setup key not to be copied to the buffer unless this was the
-first session on the socket, and that made all but the first NTLMv2
-session setup fail.
+We don't want to alter the device name in any way for the mtab as
+/bin/umount depends on the string being identical for user mounts.
 
-Fix this by removing the conditional and all of the commented clutter
-that made it difficult to see.
-
-Cc: Stable <stable@kernel.org>
-Reported-by: Gunther Deschner <gdeschne@redhat.com>
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/sess.c |   10 +---------
- 1 files changed, 1 insertions(+), 9 deletions(-)
+ mount.cifs.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 7707389..0a57cb7 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -730,15 +730,7 @@ ssetup_ntlmssp_authenticate:
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 21ce532..51fc1a8 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1953,7 +1953,7 @@ mount_retry:
+ 	}
  
- 		/* calculate session key */
- 		setup_ntlmv2_rsp(ses, v2_sess_key, nls_cp);
--		if (first_time) /* should this be moved into common code
--				   with similar ntlmv2 path? */
--		/*   cifs_calculate_ntlmv2_mac_key(ses->server->mac_signing_key,
--				response BB FIXME, v2_sess_key); */
--
--		/* copy session key */
--
--	/*	memcpy(bcc_ptr, (char *)ntlm_session_key,LM2_SESS_KEY_SIZE);
--		bcc_ptr += LM2_SESS_KEY_SIZE; */
-+		/* FIXME: calculate MAC key */
- 		memcpy(bcc_ptr, (char *)v2_sess_key,
- 		       sizeof(struct ntlmv2_resp));
- 		bcc_ptr += sizeof(struct ntlmv2_resp);
+ 	if (!parsed_info->nomtab)
+-		rc = add_mtab(dev_name, mountpoint, parsed_info->flags, fstype);
++		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
+ 
+ mount_exit:
+ 	if (parsed_info) {
 -- 
 1.6.6.1
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
