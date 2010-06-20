@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 6/6] cifs: add separate cred_uid field to sesInfo
-Date: Sun, 20 Jun 2010 17:10:51 -0400
-Message-ID: <1277068251-16344-7-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 1/6] cifs: have cifs_convert_address set port
+Date: Sun, 20 Jun 2010 17:10:46 -0400
+Message-ID: <1277068251-16344-2-git-send-email-jlayton@redhat.com>
 References: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,95 +10,142 @@ In-Reply-To: <1277068251-16344-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Right now, there's no clear separation between the uid that owns the
-credentials used to do the mount and the overriding owner of the files
-on that mount.
+Currently we set this in cifs_find_tcp_session, but that's more of a
+side effect than anything. Set it in cifs_convert_address instead as
+that's a better fit.
 
-Add a separate cred_uid field that is set to the real uid
-of the mount user. Unlike the linux_uid, the uid= option does not
-override this parameter. The parm is sent to cifs.upcall, which can then
-preferentially use the creduid= parm instead of the uid= parm for
-finding credentials.
+This also allows us to skip passing in the port as a separate parm to
+cifs_find_tcp_session.
 
-This is not the only way to solve this. We could try to do all of this
-in kernel instead by having a module parameter that affects what gets
-passed in the uid= field of the upcall. That said, we have a lot more
-flexibility to change things in userspace so I think it probably makes
-sense to do it this way.
+Also, pass in a struct sockaddr * rather than void * to make it
+clearer how this function should be called.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifs_spnego.c |    3 +++
- fs/cifs/cifsglob.h    |    3 ++-
- fs/cifs/connect.c     |    7 +++++--
- 3 files changed, 10 insertions(+), 3 deletions(-)
+ fs/cifs/cifsproto.h   |    3 ++-
+ fs/cifs/connect.c     |   12 +++++-------
+ fs/cifs/dns_resolve.c |    2 +-
+ fs/cifs/netmisc.c     |    5 ++++-
+ 4 files changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
-index 379bd7d..6effccf 100644
---- a/fs/cifs/cifs_spnego.c
-+++ b/fs/cifs/cifs_spnego.c
-@@ -144,6 +144,9 @@ cifs_get_spnego_key(struct cifsSesInfo *sesInfo)
- 	sprintf(dp, ";uid=0x%x", sesInfo->linux_uid);
- 
- 	dp = description + strlen(description);
-+	sprintf(dp, ";creduid=0x%x", sesInfo->cred_uid);
-+
-+	dp = description + strlen(description);
- 	sprintf(dp, ";user=%s", sesInfo->userName);
- 
- 	dp = description + strlen(description);
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 415703b..e15d7a5 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -209,7 +209,8 @@ struct cifsSesInfo {
- 	char *serverNOS;	/* name of network operating system of server */
- 	char *serverDomain;	/* security realm of server */
- 	int Suid;		/* remote smb uid  */
--	uid_t linux_uid;        /* local Linux uid */
-+	uid_t linux_uid;        /* overriding owner of files on the mount */
-+	uid_t cred_uid;		/* owner of credentials */
- 	int capabilities;
- 	char serverName[SERVER_NAME_LEN_WITH_NULL * 2];	/* BB make bigger for
- 				TCP names - will ipv6 and sctp addresses fit? */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index fb6318b..fe26f09 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -86,7 +86,8 @@ extern unsigned int smbCalcSize(struct smb_hdr *ptr);
+ extern unsigned int smbCalcSize_LE(struct smb_hdr *ptr);
+ extern int decode_negTokenInit(unsigned char *security_blob, int length,
+ 			struct TCP_Server_Info *server);
+-extern int cifs_convert_address(char *src, void *dst);
++extern int cifs_convert_address(struct sockaddr *dst, char *src,
++				unsigned short int port);
+ extern int map_smb_to_linux_error(struct smb_hdr *smb, int logErr);
+ extern void header_assemble(struct smb_hdr *, char /* command */ ,
+ 			    const struct cifsTconInfo *, int /* length of
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 58e0217..920d94e 100644
+index 2208f06..640c7d5 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -66,6 +66,7 @@ struct smb_vol {
- 	char *iocharset;  /* local code page for mapping to and from Unicode */
- 	char source_rfc1001_name[16]; /* netbios name of client */
- 	char target_rfc1001_name[16]; /* netbios name of server for Win9x/ME */
-+	uid_t cred_uid;
- 	uid_t linux_uid;
- 	gid_t linux_gid;
- 	mode_t file_mode;
-@@ -830,7 +831,8 @@ cifs_parse_mount_options(char *options, const char *devname,
- 	/* null target name indicates to use *SMBSERVR default called name
- 	   if we end up sending RFC1001 session initialize */
- 	vol->target_rfc1001_name[0] = 0;
--	vol->linux_uid = current_uid();  /* use current_euid() instead? */
-+	vol->cred_uid = current_uid();
-+	vol->linux_uid = current_uid();
- 	vol->linux_gid = current_gid();
+@@ -1381,7 +1381,7 @@ cifs_parse_mount_options(char *options, const char *devname,
+ }
  
- 	/* default to only allowing write access to owner of the mount */
-@@ -1647,7 +1649,7 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
- 	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
- 		switch (server->secType) {
- 		case Kerberos:
--			if (vol->linux_uid != ses->linux_uid)
-+			if (vol->cred_uid != ses->cred_uid)
- 				continue;
- 			break;
- 		default:
-@@ -1764,6 +1766,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- 		if (ses->domainName)
- 			strcpy(ses->domainName, volume_info->domainname);
+ static struct TCP_Server_Info *
+-cifs_find_tcp_session(struct sockaddr_storage *addr, unsigned short int port)
++cifs_find_tcp_session(struct sockaddr_storage *addr)
+ {
+ 	struct list_head *tmp;
+ 	struct TCP_Server_Info *server;
+@@ -1405,7 +1405,6 @@ cifs_find_tcp_session(struct sockaddr_storage *addr, unsigned short int port)
+ 		case AF_INET:
+ 			if (addr4->sin_addr.s_addr ==
+ 			    server->addr.sockAddr.sin_addr.s_addr) {
+-				addr4->sin_port = htons(port);
+ 				/* user overrode default port? */
+ 				if (addr4->sin_port) {
+ 					if (addr4->sin_port !=
+@@ -1421,7 +1420,6 @@ cifs_find_tcp_session(struct sockaddr_storage *addr, unsigned short int port)
+ 			    &server->addr.sockAddr6.sin6_addr) &&
+ 			    (addr6->sin6_scope_id ==
+ 			    server->addr.sockAddr6.sin6_scope_id)) {
+-				addr6->sin6_port = htons(port);
+ 				/* user overrode default port? */
+ 				if (addr6->sin6_port) {
+ 					if (addr6->sin6_port !=
+@@ -1479,7 +1477,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	cFYI(1, "UNC: %s ip: %s", volume_info->UNC, volume_info->UNCip);
+ 
+ 	if (volume_info->UNCip && volume_info->UNC) {
+-		rc = cifs_convert_address(volume_info->UNCip, &addr);
++		rc = cifs_convert_address((struct sockaddr *)&addr,
++					  volume_info->UNCip,
++					  volume_info->port);
+ 		if (!rc) {
+ 			/* we failed translating address */
+ 			rc = -EINVAL;
+@@ -1499,7 +1499,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  	}
-+	ses->cred_uid = volume_info->cred_uid;
- 	ses->linux_uid = volume_info->linux_uid;
- 	ses->overrideSecFlg = volume_info->secFlg;
  
+ 	/* see if we already have a matching tcp_ses */
+-	tcp_ses = cifs_find_tcp_session(&addr, volume_info->port);
++	tcp_ses = cifs_find_tcp_session(&addr);
+ 	if (tcp_ses)
+ 		return tcp_ses;
+ 
+@@ -1543,12 +1543,10 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		cFYI(1, "attempting ipv6 connect");
+ 		/* BB should we allow ipv6 on port 139? */
+ 		/* other OS never observed in Wild doing 139 with v6 */
+-		sin_server6->sin6_port = htons(volume_info->port);
+ 		memcpy(&tcp_ses->addr.sockAddr6, sin_server6,
+ 			sizeof(struct sockaddr_in6));
+ 		rc = ipv6_connect(tcp_ses);
+ 	} else {
+-		sin_server->sin_port = htons(volume_info->port);
+ 		memcpy(&tcp_ses->addr.sockAddr, sin_server,
+ 			sizeof(struct sockaddr_in));
+ 		rc = ipv4_connect(tcp_ses);
+diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
+index 4db2c5e..b6f8e34 100644
+--- a/fs/cifs/dns_resolve.c
++++ b/fs/cifs/dns_resolve.c
+@@ -40,7 +40,7 @@ is_ip(char *name)
+ {
+ 	struct sockaddr_storage ss;
+ 
+-	return cifs_convert_address(name, &ss);
++	return cifs_convert_address((struct sockaddr *)&ss, name, 0);
+ }
+ 
+ static int
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index d35d528..33b7929 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -164,7 +164,8 @@ cifs_inet_pton(const int address_family, const char *cp, void *dst)
+  * Returns 0 on failure.
+  */
+ int
+-cifs_convert_address(char *src, void *dst)
++cifs_convert_address(struct sockaddr *dst, char *src,
++		     const unsigned short int port)
+ {
+ 	int rc;
+ 	char *pct, *endp;
+@@ -174,6 +175,7 @@ cifs_convert_address(char *src, void *dst)
+ 	/* IPv4 address */
+ 	if (cifs_inet_pton(AF_INET, src, &s4->sin_addr.s_addr)) {
+ 		s4->sin_family = AF_INET;
++		s4->sin_port = htons(port);
+ 		return 1;
+ 	}
+ 
+@@ -192,6 +194,7 @@ cifs_convert_address(char *src, void *dst)
+ 		return rc;
+ 
+ 	s6->sin6_family = AF_INET6;
++	s6->sin6_port = htons(port);
+ 	if (pct) {
+ 		s6->sin6_scope_id = (u32) simple_strtoul(pct, &endp, 0);
+ 		if (!*pct || *endp)
 -- 
 1.6.6.1
