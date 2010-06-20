@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/6] cifs: match secType when searching for existing tcp session
-Date: Sun, 20 Jun 2010 17:10:48 -0400
-Message-ID: <1277068251-16344-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 6/6] cifs: add separate cred_uid field to sesInfo
+Date: Sun, 20 Jun 2010 17:10:51 -0400
+Message-ID: <1277068251-16344-7-git-send-email-jlayton@redhat.com>
 References: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,110 +10,95 @@ In-Reply-To: <1277068251-16344-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The secType is a per-tcp session entity, but the current routine doesn't
-verify that it is acceptible when attempting to match an existing TCP
-session.
+Right now, there's no clear separation between the uid that owns the
+credentials used to do the mount and the overriding owner of the files
+on that mount.
+
+Add a separate cred_uid field that is set to the real uid
+of the mount user. Unlike the linux_uid, the uid= option does not
+override this parameter. The parm is sent to cifs.upcall, which can then
+preferentially use the creduid= parm instead of the uid= parm for
+finding credentials.
+
+This is not the only way to solve this. We could try to do all of this
+in kernel instead by having a module parameter that affects what gets
+passed in the uid= field of the upcall. That said, we have a lot more
+flexibility to change things in userspace so I think it probably makes
+sense to do it this way.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    3 +-
- fs/cifs/connect.c  |   55 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 54 insertions(+), 4 deletions(-)
+ fs/cifs/cifs_spnego.c |    3 +++
+ fs/cifs/cifsglob.h    |    3 ++-
+ fs/cifs/connect.c     |    7 +++++--
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
+diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
+index 379bd7d..6effccf 100644
+--- a/fs/cifs/cifs_spnego.c
++++ b/fs/cifs/cifs_spnego.c
+@@ -144,6 +144,9 @@ cifs_get_spnego_key(struct cifsSesInfo *sesInfo)
+ 	sprintf(dp, ";uid=0x%x", sesInfo->linux_uid);
+ 
+ 	dp = description + strlen(description);
++	sprintf(dp, ";creduid=0x%x", sesInfo->cred_uid);
++
++	dp = description + strlen(description);
+ 	sprintf(dp, ";user=%s", sesInfo->userName);
+ 
+ 	dp = description + strlen(description);
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a88479c..1cb7c32 100644
+index 415703b..e15d7a5 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -80,8 +80,7 @@ enum statusEnum {
- };
- 
- enum securityEnum {
--	PLAINTXT = 0, 		/* Legacy with Plaintext passwords */
--	LANMAN,			/* Legacy LANMAN auth */
-+	LANMAN = 0,			/* Legacy LANMAN auth */
- 	NTLM,			/* Legacy NTLM012 auth with NTLM hash */
- 	NTLMv2,			/* Legacy NTLM auth with NTLMv2 hash */
- 	RawNTLMSSP,		/* NTLMSSP without SPNEGO, NTLMv2 hash */
+@@ -209,7 +209,8 @@ struct cifsSesInfo {
+ 	char *serverNOS;	/* name of network operating system of server */
+ 	char *serverDomain;	/* security realm of server */
+ 	int Suid;		/* remote smb uid  */
+-	uid_t linux_uid;        /* local Linux uid */
++	uid_t linux_uid;        /* overriding owner of files on the mount */
++	uid_t cred_uid;		/* owner of credentials */
+ 	int capabilities;
+ 	char serverName[SERVER_NAME_LEN_WITH_NULL * 2];	/* BB make bigger for
+ 				TCP names - will ipv6 and sctp addresses fit? */
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 665ee37..6440b79 100644
+index 58e0217..920d94e 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -1411,8 +1411,56 @@ match_address(struct TCP_Server_Info *server, struct sockaddr *addr)
- 	return true;
- }
+@@ -66,6 +66,7 @@ struct smb_vol {
+ 	char *iocharset;  /* local code page for mapping to and from Unicode */
+ 	char source_rfc1001_name[16]; /* netbios name of client */
+ 	char target_rfc1001_name[16]; /* netbios name of server for Win9x/ME */
++	uid_t cred_uid;
+ 	uid_t linux_uid;
+ 	gid_t linux_gid;
+ 	mode_t file_mode;
+@@ -830,7 +831,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 	/* null target name indicates to use *SMBSERVR default called name
+ 	   if we end up sending RFC1001 session initialize */
+ 	vol->target_rfc1001_name[0] = 0;
+-	vol->linux_uid = current_uid();  /* use current_euid() instead? */
++	vol->cred_uid = current_uid();
++	vol->linux_uid = current_uid();
+ 	vol->linux_gid = current_gid();
  
-+static bool
-+match_security(struct TCP_Server_Info *server, struct smb_vol *vol)
-+{
-+	unsigned int secFlags;
-+
-+	if (vol->secFlg & (~(CIFSSEC_MUST_SIGN | CIFSSEC_MUST_SEAL)))
-+		secFlags = vol->secFlg;
-+	else
-+		secFlags = global_secflags | vol->secFlg;
-+
-+	switch (server->secType) {
-+	case LANMAN:
-+		if (!(secFlags & (CIFSSEC_MAY_LANMAN|CIFSSEC_MAY_PLNTXT)))
-+			return false;
-+		break;
-+	case NTLMv2:
-+		if (!(secFlags & CIFSSEC_MAY_NTLMV2))
-+			return false;
-+		break;
-+	case NTLM:
-+		if (!(secFlags & CIFSSEC_MAY_NTLM))
-+			return false;
-+		break;
-+	case Kerberos:
-+		if (!(secFlags & CIFSSEC_MAY_KRB5))
-+			return false;
-+		break;
-+	case RawNTLMSSP:
-+		if (!(secFlags & CIFSSEC_MAY_NTLMSSP))
-+			return false;
-+		break;
-+	default:
-+		/* shouldn't happen */
-+		return false;
-+	}
-+
-+	/* now check if signing mode is acceptible */
-+	if ((secFlags & CIFSSEC_MAY_SIGN) == 0 &&
-+	    (server->secMode & SECMODE_SIGN_REQUIRED))
-+			return false;
-+	else if (((secFlags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) &&
-+		 (server->secMode &
-+		  (SECMODE_SIGN_ENABLED|SECMODE_SIGN_REQUIRED)) == 0)
-+			return false;
-+
-+	return true;
-+}
-+
- static struct TCP_Server_Info *
--cifs_find_tcp_session(struct sockaddr *addr)
-+cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
- {
- 	struct TCP_Server_Info *server;
- 
-@@ -1430,6 +1478,9 @@ cifs_find_tcp_session(struct sockaddr *addr)
- 		if (!match_address(server, addr))
- 			continue;
- 
-+		if (!match_security(server, vol))
-+			continue;
-+
- 		++server->srv_count;
- 		write_unlock(&cifs_tcp_ses_lock);
- 		cFYI(1, "Existing tcp session with server found");
-@@ -1498,7 +1549,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	/* default to only allowing write access to owner of the mount */
+@@ -1647,7 +1649,7 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ 	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+ 		switch (server->secType) {
+ 		case Kerberos:
+-			if (vol->linux_uid != ses->linux_uid)
++			if (vol->cred_uid != ses->cred_uid)
+ 				continue;
+ 			break;
+ 		default:
+@@ -1764,6 +1766,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 		if (ses->domainName)
+ 			strcpy(ses->domainName, volume_info->domainname);
  	}
- 
- 	/* see if we already have a matching tcp_ses */
--	tcp_ses = cifs_find_tcp_session((struct sockaddr *)&addr);
-+	tcp_ses = cifs_find_tcp_session((struct sockaddr *)&addr, volume_info);
- 	if (tcp_ses)
- 		return tcp_ses;
++	ses->cred_uid = volume_info->cred_uid;
+ 	ses->linux_uid = volume_info->linux_uid;
+ 	ses->overrideSecFlg = volume_info->secFlg;
  
 -- 
 1.6.6.1
