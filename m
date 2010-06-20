@@ -1,49 +1,92 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/6] cifs: session matching and authentication fixes and cleanups
-Date: Sun, 20 Jun 2010 17:10:45 -0400
-Message-ID: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 4/6] cifs: clean up cifs_find_smb_ses
+Date: Sun, 20 Jun 2010 17:10:49 -0400
+Message-ID: <1277068251-16344-5-git-send-email-jlayton@redhat.com>
+References: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1277068251-16344-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset does some cleanup and fixes a number of bugs related to
-the handling of the TCP_Server_Info->secType. It also adds a bit of code
-to allow the userspace mount helper to use the krb5 credcache for the
-real user doing the mount instead of the one given by the uid= option.
+Do a better job of matching sessions by authtype. Matching by username
+for a Kerberos session is incorrect, and anonymous sessions need
+special handling.
 
-This is a more incremental change from the previous patchsets that I
-proposed for this. In most of those, I moved the secType field to the
-cifsSesInfo struct. While I still think that's a better approach, it's
-very difficult to do for a couple of reasons:
+Also, in the case where we do match by username, we also need to match
+by password. That ensures that someone else doesn't "borrow" an existing
+session without needing to know the password.
 
-- the NTLMSSP auth code is broken, so we can't unconditionally set the
-  extended security bit in the session setup code yet.
+Finally, passwords can be longer than 16 bytes. Bump MAX_PASSWORD_SIZE
+to 128 to match the size that the userspace mount helper allows.
 
-- there is apparent need to allow for multiple sec= mount options.
-  Unfortunately, the rules for how that's supposed to work are not at
-  all clear to me. I decided it was safer to leave the existing code
-  that sets the secType as untouched as possible.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |    2 +-
+ fs/cifs/connect.c  |   26 ++++++++++++++++++--------
+ 2 files changed, 19 insertions(+), 9 deletions(-)
 
-I see these patches as 2.6.36 material. They are also required for the
-multisession mount patchset. They're also in the cifs-2.6.36 branch of
-my kernel.org git tree as well if it's easier to pull from there.
-
-Comments and suggestions welcome.
-
-Jeff Layton (6):
-  cifs: have cifs_convert_address set port
-  cifs: move address comparison into separate function
-  cifs: match secType when searching for existing tcp session
-  cifs: clean up cifs_find_smb_ses
-  cifs: remove unused cifsUidInfo struct
-  cifs: add separate cred_uid field to sesInfo
-
- fs/cifs/cifs_spnego.c |    3 +
- fs/cifs/cifsglob.h    |   24 +------
- fs/cifs/cifsproto.h   |    3 +-
- fs/cifs/connect.c     |  161 ++++++++++++++++++++++++++++++++++---------------
- fs/cifs/dns_resolve.c |    2 +-
- fs/cifs/netmisc.c     |    5 +-
- 6 files changed, 125 insertions(+), 73 deletions(-)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 1cb7c32..b24dc98 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -34,7 +34,7 @@
+ #define MAX_SHARE_SIZE  64	/* used to be 20, this should still be enough */
+ #define MAX_USERNAME_SIZE 32	/* 32 is to allow for 15 char names + null
+ 				   termination then *2 for unicode versions */
+-#define MAX_PASSWORD_SIZE 16
++#define MAX_PASSWORD_SIZE 128
+ 
+ #define CIFS_MIN_RCV_POOL 4
+ 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 6440b79..58e0217 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1639,17 +1639,27 @@ out_err:
+ }
+ 
+ static struct cifsSesInfo *
+-cifs_find_smb_ses(struct TCP_Server_Info *server, char *username)
++cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ {
+-	struct list_head *tmp;
+ 	struct cifsSesInfo *ses;
+ 
+ 	write_lock(&cifs_tcp_ses_lock);
+-	list_for_each(tmp, &server->smb_ses_list) {
+-		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
+-		if (strncmp(ses->userName, username, MAX_USERNAME_SIZE))
+-			continue;
+-
++	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++		switch (server->secType) {
++		case Kerberos:
++			if (vol->linux_uid != ses->linux_uid)
++				continue;
++			break;
++		default:
++			/* anything else takes username/password */
++			if (strncmp(ses->userName, vol->username,
++				    MAX_USERNAME_SIZE))
++				continue;
++			if (strlen(vol->username) != 0 &&
++			    strncmp(ses->password, vol->password,
++				    MAX_PASSWORD_SIZE))
++				continue;
++		}
+ 		++ses->ses_count;
+ 		write_unlock(&cifs_tcp_ses_lock);
+ 		return ses;
+@@ -1691,7 +1701,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 
+ 	xid = GetXid();
+ 
+-	ses = cifs_find_smb_ses(server, volume_info->username);
++	ses = cifs_find_smb_ses(server, volume_info);
+ 	if (ses) {
+ 		cFYI(1, "Existing smb sess found (status=%d)", ses->status);
+ 
+-- 
+1.6.6.1
