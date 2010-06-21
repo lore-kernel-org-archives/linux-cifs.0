@@ -1,91 +1,155 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 3/6 v3]cifs Fix warnings variables set but not used
-Date: Sun, 20 Jun 2010 21:42:25 -0400
-Message-ID: <20100620214225.2cd9fc65@corrin.poochiereds.net>
-References: <1277083401-6459-1-git-send-email-justinmattock@gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Slow CIFS navigation due to excessive use of QUERY_PATH_INFO
+Date: Mon, 21 Jun 2010 11:34:11 -0400
+Message-ID: <20100621113411.01cb5e41@corrin.poochiereds.net>
+References: <38a6d6051003081231q5fcec8ebi7bb49a8f3761649a@mail.gmail.com>
+	<4BD5E7E8.3090508@clediere.net>
+	<20100426153232.6eb907c7@tlielax.poochiereds.net>
+	<4BD7F20C.4060901@clediere.net>
+	<20100428062708.7e78cd2b@tlielax.poochiereds.net>
+	<4C1F27E8.2010609@clediere.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Justin P. Mattock" <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: seb-XN6Y3A9Iwz7k1uMJSBkQmQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1277083401-6459-1-git-send-email-justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <4C1F27E8.2010609-XN6Y3A9Iwz7k1uMJSBkQmQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 20 Jun 2010 18:23:21 -0700
-"Justin P. Mattock" <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Mon, 21 Jun 2010 10:50:48 +0200
+Sebastien Clediere <Seb-XN6Y3A9Iwz7k1uMJSBkQmQ@public.gmane.org> wrote:
 
-> Below is a redu from the original(or similar) fixing
-> gcc warningds generated while compiling:
 > 
->   CC [M]  fs/cifs/cifssmb.o
-> fs/cifs/cifssmb.c: In function 'CIFSSMBSetFileSize':
-> fs/cifs/cifssmb.c:4855:8: warning: variable 'data_offset' set but not used
->  
->   CC [M]  fs/cifs/file.o
-> fs/cifs/file.c: In function 'cifs_partialpagewrite':
-> fs/cifs/file.c:1315:23: warning: variable 'pTcon' set but not used
+> > On Wed, 28 Apr 2010 10:30:04 +0200
+> > Seb <Seb-XN6Y3A9Iwz7k1uMJSBkQmQ@public.gmane.org> wrote:
+> >
+> >   
+> >> Jeff Layton wrote:
+> >>     
+> >>> On Mon, 26 Apr 2010 21:22:16 +0200
+> >>> Seb <Seb-XN6Y3A9Iwz7k1uMJSBkQmQ@public.gmane.org> wrote:
+> >>>
+> >>>   
+> >>>       
+> >>>> Hi Jeff,
+> >>>>
+> >>>> Sorry to contact you direct. I tried to send this email to the cifs
+> >>>> client mailing list a number of times without luck. I registered 2
+> >>>> different accounts, but my email is always rejected now! I think the
+> >>>> setting for spam of the list is a bit too aggressive. Anyway, that is
+> >>>> the message:
+> >>>>
+> >>>> Seb.
+> >>>>
+> >>>>
+> >>>> =======
+> >>>> Going from kernel (x86) 2.6.27-8 (I am not sure which version of
+> >>>> mount.cifs) to 2.6.31-19 with mount.cifs version: 1.12-3.4.0, I
+> >>>> noticed an important decrease of performance while navigating CIFS
+> >>>> shares on a Windows 2003 server. Navigating means here either using
+> >>>> midnight commander, ls -l (with ls unaliased first...), rsync, etc..
+> >>>>
+> >>>> I added noserverino,nolinux to the mount command, but it does not make
+> >>>> much difference.
+> >>>>
+> >>>> The kind of performance degradation I am talking about is in the order
+> >>>> of times ten or so. An rsync which takes less that 2 minutes on old
+> >>>> hardware, now takes over 15 minutes on newer hardware!
+> >>>>
+> >>>> Doing a bit of investigation with tcpdump, we can see a lot
+> >>>> QUERY_PATH_INFO requests happening which are not necessary as all the
+> >>>> information is already returned by FIND_FIRST2 requests. A trivial
+> >>>> example will illustrate it. Lets have a directory with 3 files inside.
+> >>>>
+> >>>> ls -l with my old machine, it gives:
+> >>>> Protocol Info
+> >>>> SMB      Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path: \Temp
+> >>>> SMB      Trans2 Response, QUERY_PATH_INFO
+> >>>> SMB      Trans2 Request, FIND_FIRST2, Pattern: \Temp\*
+> >>>> SMB      Trans2 Response, FIND_FIRST2, Files: . .. file1 file2 file3
+> >>>>
+> >>>>
+> >>>> With the new one, it gives:
+> >>>> Protocol Info
+> >>>> SMB      Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path: \Temp
+> >>>> SMB      Trans2 Response, QUERY_PATH_INFO
+> >>>> SMB      Trans2 Request, FIND_FIRST2, Pattern: \Temp\*
+> >>>> SMB      Trans2 Response, FIND_FIRST2, Files: . .. file1 file2 file3
+> >>>> SMB      Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
+> >>>> \Temp\file1
+> >>>> SMB      Trans2 Response, QUERY_PATH_INFO
+> >>>> SMB      Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
+> >>>> \Temp\file2
+> >>>> SMB      Trans2 Response, QUERY_PATH_INFO
+> >>>> SMB      Trans2 Request, QUERY_PATH_INFO, Query File All Info, Path:
+> >>>> \Temp\file3
+> >>>> SMB      Trans2 Response, QUERY_PATH_INFO
+> >>>>
+> >>>> So for every file in the directory, as returned by the FIRST_FIND2
+> >>>> response, it does a QUERY_PATH_INFO, which does not bring any new
+> >>>> information, all the attributes were already returned by FIRST_FIND2.
+> >>>> I attached to the email the tcpdump so you can really double check by
+> >>>> yourself that the QUERY_PATH info does not bring anything new.
+> >>>>
+> >>>> That is the cause of the slowness I notice.
+> >>>> Is that a known issue?
+> >>>>
+> >>>> Thanks,
+> >>>>
+> >>>> Seb.
+> >>>>
+> >>>>     
+> >>>>         
+> >>> Does your kernel have this commit?
+> >>>
+> >>> commit f12f98dba6ea1517cd7fbb912208893b9c014c15
+> >>> Author: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >>> Date:   Fri Feb 5 13:14:00 2010 -0500
+> >>>
+> >>>     cifs: fix length calculation for converted unicode readdir names
+> >>>     
+> >>> ...that's most likely the cause of the problem.
+> >>>
+> >>>   
+> >>>       
+> >> Thanks a lot for answering my email Jeff.
+> >> I don't think the kernel I use has this commit as I am on Ubuntu Karmic
+> >> and it was based on "v2.6.31 final".
+> >>
+> >> Seb.
+> >>
+> >>     
+> > On 04/28/2010 12:27 PM, Jeff Layton wrote
+> > Ok, then you'll probably want to apply that patch and test it out, or
+> > ask your distro to include it. That patch fixes a bug that can cause
+> > the symptoms you're seeing.
+> >
+> >   
+> Hi Jeff,
 > 
-> (the warning below is funky i.g. removing pTcon generates the warning below
-> but if I use the __unused option there is no warning at all).
+> Sorry to bother you again. It took me a while to try out as I moved and
+> did not have a fast internet connexion. However, I have just upgraded my
+> system, and this kernel has this commit you mentioned. However, I still
+> see the exact same problem.
+> What can I do to help identify that bug?
 > 
->  CC [M]  fs/cifs/file.o
-> fs/cifs/file.c: In function 'cifs_partialpagewrite':
-> fs/cifs/file.c:1314:23: warning: variable 'cifs_sb' set but not used
-> 
->  Signed-off-by: Justin P. Mattock <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> ---
->  fs/cifs/cifssmb.c |    3 ---
->  fs/cifs/file.c    |    4 ----
->  2 files changed, 0 insertions(+), 7 deletions(-)
-> 
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index c65c341..4653aaa 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -4852,7 +4852,6 @@ CIFSSMBSetFileSize(const int xid, struct cifsTconInfo *tcon, __u64 size,
->  		   __u16 fid, __u32 pid_of_opener, bool SetAllocation)
->  {
->  	struct smb_com_transaction2_sfi_req *pSMB  = NULL;
-> -	char *data_offset;
->  	struct file_end_of_file_info *parm_data;
->  	int rc = 0;
->  	__u16 params, param_offset, offset, byte_count, count;
-> @@ -4876,8 +4875,6 @@ CIFSSMBSetFileSize(const int xid, struct cifsTconInfo *tcon, __u64 size,
->  	param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
->  	offset = param_offset + params;
->  
-> -	data_offset = (char *) (&pSMB->hdr.Protocol) + offset;
-> -
->  	count = sizeof(struct file_end_of_file_info);
->  	pSMB->MaxParameterCount = cpu_to_le16(2);
->  	/* BB find exact max SMB PDU from sess structure BB */
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 75541af..661f868 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1311,8 +1311,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
->  	char *write_data;
->  	int rc = -EFAULT;
->  	int bytes_written = 0;
-> -	struct cifs_sb_info *cifs_sb;
-> -	struct cifsTconInfo *pTcon;
->  	struct inode *inode;
->  	struct cifsFileInfo *open_file;
->  
-> @@ -1320,8 +1318,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
->  		return -EFAULT;
->  
->  	inode = page->mapping->host;
-> -	cifs_sb = CIFS_SB(inode->i_sb);
-> -	pTcon = cifs_sb->tcon;
->  
->  	offset += (loff_t)from;
->  	write_data = kmap(page);
 
-Looks good to me.
+(re-cc'ing linux-cifs mailing list)
 
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+First, please cc the list rather than emailing me directly. I generally
+don't do personal one-on-one support unless you're paying me ;)
+
+You don't say what your upgraded kernel actually is, but you should
+probably start with testing a recent upstream kernel. I don't see this
+behavior with a quick test on a 2.6.34-ish kernel.
+
+If you see this problem with a 2.6.34-ish kernel, then I'd say to open
+a bug at bugzilla.samba.org and one of us will have a look when we have
+time. If you can't reproduce it on a more recent kernel, then you'll
+probably want to open a bug with your distro vendor, and see whether
+they can track down what fixed it then they can put the patches in the
+kernels they're shipping.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
