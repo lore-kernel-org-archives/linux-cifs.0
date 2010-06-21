@@ -1,128 +1,82 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/6] cifs: move address comparison into separate function
-Date: Sun, 20 Jun 2010 17:10:47 -0400
-Message-ID: <1277068251-16344-3-git-send-email-jlayton@redhat.com>
-References: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: "Justin P. Mattock" <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 3/6 v3]cifs Fix warnings variables set but not used
+Date: Sun, 20 Jun 2010 18:23:21 -0700
+Message-ID: <1277083401-6459-1-git-send-email-justinmattock@gmail.com>
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Justin P. Mattock" <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1277068251-16344-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Move the address comparator out of cifs_find_tcp_session and into a
-separate function for cleanliness. Also change the argument to
-that function to a "struct sockaddr" pointer. Passing pointers to
-sockaddr_storage is a little odd since that struct is generally for
-declaring static storage.
+Below is a redu from the original(or similar) fixing
+gcc warningds generated while compiling:
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+  CC [M]  fs/cifs/cifssmb.o
+fs/cifs/cifssmb.c: In function 'CIFSSMBSetFileSize':
+fs/cifs/cifssmb.c:4855:8: warning: variable 'data_offset' set but not used
+ 
+  CC [M]  fs/cifs/file.o
+fs/cifs/file.c: In function 'cifs_partialpagewrite':
+fs/cifs/file.c:1315:23: warning: variable 'pTcon' set but not used
+
+(the warning below is funky i.g. removing pTcon generates the warning below
+but if I use the __unused option there is no warning at all).
+
+ CC [M]  fs/cifs/file.o
+fs/cifs/file.c: In function 'cifs_partialpagewrite':
+fs/cifs/file.c:1314:23: warning: variable 'cifs_sb' set but not used
+
+ Signed-off-by: Justin P. Mattock <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
 ---
- fs/cifs/connect.c |   73 ++++++++++++++++++++++++++---------------------------
- 1 files changed, 36 insertions(+), 37 deletions(-)
+ fs/cifs/cifssmb.c |    3 ---
+ fs/cifs/file.c    |    4 ----
+ 2 files changed, 0 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 640c7d5..665ee37 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1380,18 +1380,44 @@ cifs_parse_mount_options(char *options, const char *devname,
- 	return 0;
- }
- 
-+static bool
-+match_address(struct TCP_Server_Info *server, struct sockaddr *addr)
-+{
-+	struct sockaddr_in *addr4 = (struct sockaddr_in *)addr;
-+	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)addr;
-+
-+	switch (addr->sa_family) {
-+	case AF_INET:
-+		if (addr4->sin_addr.s_addr !=
-+		    server->addr.sockAddr.sin_addr.s_addr)
-+			return false;
-+		if (addr4->sin_port &&
-+		    addr4->sin_port != server->addr.sockAddr.sin_port)
-+			return false;
-+		break;
-+	case AF_INET6:
-+		if (!ipv6_addr_equal(&addr6->sin6_addr,
-+				     &server->addr.sockAddr6.sin6_addr))
-+			return false;
-+		if (addr6->sin6_scope_id !=
-+		    server->addr.sockAddr6.sin6_scope_id)
-+			return false;
-+		if (addr6->sin6_port &&
-+		    addr6->sin6_port != server->addr.sockAddr6.sin6_port)
-+			return false;
-+		break;
-+	}
-+
-+	return true;
-+}
-+
- static struct TCP_Server_Info *
--cifs_find_tcp_session(struct sockaddr_storage *addr)
-+cifs_find_tcp_session(struct sockaddr *addr)
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index c65c341..4653aaa 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4852,7 +4852,6 @@ CIFSSMBSetFileSize(const int xid, struct cifsTconInfo *tcon, __u64 size,
+ 		   __u16 fid, __u32 pid_of_opener, bool SetAllocation)
  {
--	struct list_head *tmp;
- 	struct TCP_Server_Info *server;
--	struct sockaddr_in *addr4 = (struct sockaddr_in *) addr;
--	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *) addr;
+ 	struct smb_com_transaction2_sfi_req *pSMB  = NULL;
+-	char *data_offset;
+ 	struct file_end_of_file_info *parm_data;
+ 	int rc = 0;
+ 	__u16 params, param_offset, offset, byte_count, count;
+@@ -4876,8 +4875,6 @@ CIFSSMBSetFileSize(const int xid, struct cifsTconInfo *tcon, __u64 size,
+ 	param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
+ 	offset = param_offset + params;
  
- 	write_lock(&cifs_tcp_ses_lock);
--	list_for_each(tmp, &cifs_tcp_ses_list) {
--		server = list_entry(tmp, struct TCP_Server_Info,
--				    tcp_ses_list);
-+	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
- 		/*
- 		 * the demux thread can exit on its own while still in CifsNew
- 		 * so don't accept any sockets in that state. Since the
-@@ -1401,35 +1427,8 @@ cifs_find_tcp_session(struct sockaddr_storage *addr)
- 		if (server->tcpStatus == CifsNew)
- 			continue;
- 
--		switch (addr->ss_family) {
--		case AF_INET:
--			if (addr4->sin_addr.s_addr ==
--			    server->addr.sockAddr.sin_addr.s_addr) {
--				/* user overrode default port? */
--				if (addr4->sin_port) {
--					if (addr4->sin_port !=
--					    server->addr.sockAddr.sin_port)
--						continue;
--				}
--				break;
--			} else
--				continue;
+-	data_offset = (char *) (&pSMB->hdr.Protocol) + offset;
 -
--		case AF_INET6:
--			if (ipv6_addr_equal(&addr6->sin6_addr,
--			    &server->addr.sockAddr6.sin6_addr) &&
--			    (addr6->sin6_scope_id ==
--			    server->addr.sockAddr6.sin6_scope_id)) {
--				/* user overrode default port? */
--				if (addr6->sin6_port) {
--					if (addr6->sin6_port !=
--					   server->addr.sockAddr6.sin6_port)
--						continue;
--				}
--				break;
--			} else
--				continue;
--		}
-+		if (!match_address(server, addr))
-+			continue;
+ 	count = sizeof(struct file_end_of_file_info);
+ 	pSMB->MaxParameterCount = cpu_to_le16(2);
+ 	/* BB find exact max SMB PDU from sess structure BB */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 75541af..661f868 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1311,8 +1311,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 	char *write_data;
+ 	int rc = -EFAULT;
+ 	int bytes_written = 0;
+-	struct cifs_sb_info *cifs_sb;
+-	struct cifsTconInfo *pTcon;
+ 	struct inode *inode;
+ 	struct cifsFileInfo *open_file;
  
- 		++server->srv_count;
- 		write_unlock(&cifs_tcp_ses_lock);
-@@ -1499,7 +1498,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	}
+@@ -1320,8 +1318,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 		return -EFAULT;
  
- 	/* see if we already have a matching tcp_ses */
--	tcp_ses = cifs_find_tcp_session(&addr);
-+	tcp_ses = cifs_find_tcp_session((struct sockaddr *)&addr);
- 	if (tcp_ses)
- 		return tcp_ses;
+ 	inode = page->mapping->host;
+-	cifs_sb = CIFS_SB(inode->i_sb);
+-	pTcon = cifs_sb->tcon;
  
+ 	offset += (loff_t)from;
+ 	write_data = kmap(page);
 -- 
-1.6.6.1
+1.7.1.rc1.21.gf3bd6
