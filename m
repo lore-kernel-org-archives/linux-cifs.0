@@ -1,199 +1,187 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [RFC][PATCH 04/10] cifs: define server-level cache index objects and register them with FS-Cache
-Date: Tue, 22 Jun 2010 20:53:18 +0530
-Message-ID: <1277220198-3522-1-git-send-email-sjayaraman@suse.de>
+From: Suresh Jayaraman <sjayaraman@suse.de>
+Subject: [RFC][PATCH 07/10] cifs: FS-Cache page management
+Date: Tue, 22 Jun 2010 20:53:48 +0530
+Message-ID: <1277220228-3635-1-git-send-email-sjayaraman@suse.de>
 References: <yes>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <yes>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Define server-level cache index objects (as managed by TCP_ServerInfo structs).
-Each server object is created in the CIFS top-level index object and is itself
-an index into which superblock-level objects are inserted.
+Takes care of invalidation and release of FS-Cache marked pages and also
+invalidation of the FsCache page flag when the inode is removed.
 
-Currently, the server objects are keyed by hostname.
-
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman@suse.de>
 ---
- fs/cifs/Makefile   |    2 +-
- fs/cifs/cache.c    |   25 +++++++++++++++++++++++++
- fs/cifs/cifsglob.h |    3 +++
- fs/cifs/connect.c  |    4 ++++
- fs/cifs/fscache.c  |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/fscache.h  |   12 ++++++++++++
- 6 files changed, 92 insertions(+), 1 deletion(-)
- create mode 100644 fs/cifs/fscache.c
+ fs/cifs/cache.c   |   31 +++++++++++++++++++++++++++++++
+ fs/cifs/file.c    |   20 ++++++++++++++++++++
+ fs/cifs/fscache.c |   26 ++++++++++++++++++++++++++
+ fs/cifs/fscache.h |   16 ++++++++++++++++
+ 4 files changed, 93 insertions(+), 0 deletions(-)
 
-Index: cifs-2.6/fs/cifs/Makefile
-===================================================================
---- cifs-2.6.orig/fs/cifs/Makefile
-+++ cifs-2.6/fs/cifs/Makefile
-@@ -12,4 +12,4 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spneg
- 
- cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
- 
--cifs-$(CONFIG_CIFS_FSCACHE) += cache.o
-+cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
-Index: cifs-2.6/fs/cifs/cache.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/cache.c
-+++ cifs-2.6/fs/cifs/cache.c
-@@ -51,3 +51,28 @@ void cifs_fscache_unregister(void)
- 	fscache_unregister_netfs(&cifs_fscache_netfs);
+diff --git a/fs/cifs/cache.c b/fs/cifs/cache.c
+index b205424..3a733c1 100644
+--- a/fs/cifs/cache.c
++++ b/fs/cifs/cache.c
+@@ -210,6 +210,36 @@ fscache_checkaux cifs_fscache_inode_check_aux(void *cookie_netfs_data,
+ 	return FSCACHE_CHECKAUX_OKAY;
  }
  
-+/*
-+ * Server object currently keyed by hostname
-+ */
-+static uint16_t cifs_server_get_key(const void *cookie_netfs_data,
-+				   void *buffer, uint16_t maxbuf)
++static void cifs_fscache_inode_now_uncached(void *cookie_netfs_data)
 +{
-+	const struct TCP_Server_Info *server = cookie_netfs_data;
-+	uint16_t len = strnlen(server->hostname, sizeof(server->hostname));
++	struct cifsInodeInfo *cifsi = cookie_netfs_data;
++	struct pagevec pvec;
++	pgoff_t first;
++	int loop, nr_pages;
 +
-+	if (len > maxbuf)
++	pagevec_init(&pvec, 0);
++	first = 0;
++
++	cFYI(1, "cifs inode 0x%p now uncached\n", cifsi);
++
++	for (;;) {
++		nr_pages = pagevec_lookup(&pvec,
++					  cifsi->vfs_inode.i_mapping, first,
++					  PAGEVEC_SIZE - pagevec_count(&pvec));
++		if (!nr_pages)
++			break;
++
++		for (loop = 0; loop < nr_pages; loop++)
++			ClearPageFsCache(pvec.pages[loop]);
++
++		first = pvec.pages[nr_pages - 1]->index + 1;
++
++		pvec.nr = nr_pages;
++		pagevec_release(&pvec);
++		cond_resched();
++	}
++}
++
+ const struct fscache_cookie_def cifs_fscache_inode_object_def = {
+ 	.name		= "CIFS.uniqueid",
+ 	.type		= FSCACHE_COOKIE_TYPE_DATAFILE,
+@@ -217,4 +247,5 @@ const struct fscache_cookie_def cifs_fscache_inode_object_def = {
+ 	.get_attr	= cifs_fscache_inode_get_attr,
+ 	.get_aux	= cifs_fscache_inode_get_aux,
+ 	.check_aux	= cifs_fscache_inode_check_aux,
++	.now_uncached	= cifs_fscache_inode_now_uncached,
+ };
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 55ecb55..786ec04 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2271,6 +2271,22 @@ out:
+ 	return rc;
+ }
+ 
++static int cifs_release_page(struct page *page, gfp_t gfp)
++{
++	if (PagePrivate(page))
 +		return 0;
 +
-+	memcpy(buffer, server->hostname, len);
-+
-+	return len;
++	return cifs_fscache_release_page(page, gfp);
 +}
 +
-+/*
-+ * Server object for FS-Cache
-+ */
-+const struct fscache_cookie_def cifs_fscache_server_index_def = {
-+	.name = "CIFS.server",
-+	.type = FSCACHE_COOKIE_TYPE_INDEX,
-+	.get_key = cifs_server_get_key,
-+};
-Index: cifs-2.6/fs/cifs/cifsglob.h
-===================================================================
---- cifs-2.6.orig/fs/cifs/cifsglob.h
-+++ cifs-2.6/fs/cifs/cifsglob.h
-@@ -193,6 +193,9 @@ struct TCP_Server_Info {
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
- 	bool	sec_ntlmssp;		/* supports NTLMSSP */
-+#ifdef CONFIG_CIFS_FSCACHE
-+	struct fscache_cookie   *fscache; /* client index cache cookie */
-+#endif
++static void cifs_invalidate_page(struct page *page, unsigned long offset)
++{
++	struct cifsInodeInfo *cifsi = CIFS_I(page->mapping->host);
++
++	if (offset == 0)
++		cifs_fscache_invalidate_page(page, &cifsi->vfs_inode);
++}
++
+ static void
+ cifs_oplock_break(struct slow_work *work)
+ {
+@@ -2344,6 +2360,8 @@ const struct address_space_operations cifs_addr_ops = {
+ 	.write_begin = cifs_write_begin,
+ 	.write_end = cifs_write_end,
+ 	.set_page_dirty = __set_page_dirty_nobuffers,
++	.releasepage = cifs_release_page,
++	.invalidatepage = cifs_invalidate_page,
+ 	/* .sync_page = cifs_sync_page, */
+ 	/* .direct_IO = */
  };
- 
- /*
-Index: cifs-2.6/fs/cifs/connect.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/connect.c
-+++ cifs-2.6/fs/cifs/connect.c
-@@ -48,6 +48,7 @@
- #include "nterr.h"
- #include "rfc1002pdu.h"
- #include "cn_cifs.h"
-+#include "fscache.h"
- 
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
-@@ -1453,6 +1454,8 @@ cifs_put_tcp_session(struct TCP_Server_I
- 		return;
+@@ -2360,6 +2378,8 @@ const struct address_space_operations cifs_addr_ops_smallbuf = {
+ 	.write_begin = cifs_write_begin,
+ 	.write_end = cifs_write_end,
+ 	.set_page_dirty = __set_page_dirty_nobuffers,
++	.releasepage = cifs_release_page,
++	.invalidatepage = cifs_invalidate_page,
+ 	/* .sync_page = cifs_sync_page, */
+ 	/* .direct_IO = */
+ };
+diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
+index ddfd355..c09d3b8 100644
+--- a/fs/cifs/fscache.c
++++ b/fs/cifs/fscache.c
+@@ -130,3 +130,29 @@ void cifs_fscache_reset_inode_cookie(struct inode *inode)
  	}
+ }
  
-+	cifs_fscache_release_client_cookie(server);
-+
- 	list_del_init(&server->tcp_ses_list);
- 	write_unlock(&cifs_tcp_ses_lock);
- 
-@@ -1572,6 +1575,7 @@ cifs_get_tcp_session(struct smb_vol *vol
- 		goto out_err;
- 	}
- 
-+	cifs_fscache_get_client_cookie(tcp_ses);
- 	/* thread spawned, put it on the list */
- 	write_lock(&cifs_tcp_ses_lock);
- 	list_add(&tcp_ses->tcp_ses_list, &cifs_tcp_ses_list);
-Index: cifs-2.6/fs/cifs/fscache.c
-===================================================================
---- /dev/null
-+++ cifs-2.6/fs/cifs/fscache.c
-@@ -0,0 +1,47 @@
-+/*
-+ *   fs/cifs/fscache.c - CIFS filesystem cache interface
-+ *
-+ *   Copyright (c) 2010 Novell, Inc.
-+ *   Authors(s): Suresh Jayaraman (sjayaraman-l3A5Bk7waGM@public.gmane.org>
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/sched.h>
-+#include <linux/mm.h>
-+#include <linux/in6.h>
-+
-+#include "fscache.h"
-+#include "cifsglob.h"
-+#include "cifs_debug.h"
-+
-+void cifs_fscache_get_client_cookie(struct TCP_Server_Info *server)
++int cifs_fscache_release_page(struct page *page, gfp_t gfp)
 +{
-+	server->fscache =
-+		fscache_acquire_cookie(cifs_fscache_netfs.primary_index,
-+				&cifs_fscache_server_index_def, server);
-+	cFYI(1, "CIFS: get client cookie (0x%p/0x%p)\n",
-+				server, server->fscache);
++	if (PageFsCache(page)) {
++		struct inode *inode = page->mapping->host;
++		struct cifsInodeInfo *cifsi = CIFS_I(inode);
++
++		cFYI(1, "CIFS: fscache release page (0x%p/0x%p)\n",
++				cifsi->fscache, page);
++		if (!fscache_maybe_release_page(cifsi->fscache, page, gfp))
++			return 0;
++	}
++
++	return 1;
 +}
 +
-+void cifs_fscache_release_client_cookie(struct TCP_Server_Info *server)
++void __cifs_fscache_invalidate_page(struct page *page, struct inode *inode)
 +{
-+	cFYI(1, "CIFS: release client cookie (0x%p/0x%p)\n",
-+				server, server->fscache);
-+	fscache_relinquish_cookie(server->fscache, 0);
-+	server->fscache = NULL;
++	struct cifsInodeInfo *cifsi = CIFS_I(inode);
++	struct fscache_cookie *cookie = cifsi->fscache;
++
++	cFYI(1, "CIFS: fscache invalidatepage (0x%p/0x%p/0x%p)\n",
++			cookie, page, cifsi);
++	fscache_wait_on_page_write(cookie, page);
++	fscache_uncache_page(cookie, page);
 +}
 +
-Index: cifs-2.6/fs/cifs/fscache.h
-===================================================================
---- cifs-2.6.orig/fs/cifs/fscache.h
-+++ cifs-2.6/fs/cifs/fscache.h
-@@ -27,14 +27,26 @@
- #ifdef CONFIG_CIFS_FSCACHE
+diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
+index 836bb02..127cb0a 100644
+--- a/fs/cifs/fscache.h
++++ b/fs/cifs/fscache.h
+@@ -47,6 +47,16 @@ extern void cifs_fscache_release_inode_cookie(struct inode *);
+ extern void cifs_fscache_set_inode_cookie(struct inode *, struct file *);
+ extern void cifs_fscache_reset_inode_cookie(struct inode *);
  
- extern struct fscache_netfs cifs_fscache_netfs;
-+extern const struct fscache_cookie_def cifs_fscache_server_index_def;
- 
- extern int cifs_fscache_register(void);
- extern void cifs_fscache_unregister(void);
- 
-+/*
-+ * fscache.c
-+ */
-+extern void cifs_fscache_get_client_cookie(struct TCP_Server_Info *);
-+extern void cifs_fscache_release_client_cookie(struct TCP_Server_Info *);
++extern void __cifs_fscache_invalidate_page(struct page *, struct inode *);
++extern int cifs_fscache_release_page(struct page *page, gfp_t gfp);
++
++static inline void cifs_fscache_invalidate_page(struct page *page,
++					       struct inode *inode)
++{
++	if (PageFsCache(page))
++		__cifs_fscache_invalidate_page(page, inode);
++}
 +
  #else /* CONFIG_CIFS_FSCACHE */
  static inline int cifs_fscache_register(void) { return 0; }
  static inline void cifs_fscache_unregister(void) {}
+@@ -63,7 +73,13 @@ static inline void cifs_fscache_release_inode_cookie(struct inode *inode) {}
+ static inline void cifs_fscache_set_inode_cookie(struct inode *inode,
+ 			struct file *filp) {}
+ static inline void cifs_fscache_reset_inode_cookie(struct inode *inode) {}
++static inline void cifs_fscache_release_page(struct page *page, gfp_t gfp)
++{
++	return 1; /* May release page */
++}
  
-+static inline void
-+cifs_fscache_get_client_cookie(struct TCP_Server_Info *server) {}
-+static inline void
-+cifs_fscache_get_client_cookie(struct TCP_Server_Info *server); {}
-+
++static inline int cifs_fscache_invalidate_page(struct page *page,
++			struct inode *) {}
+ 
  #endif /* CONFIG_CIFS_FSCACHE */
  
- #endif /* _CIFS_FSCACHE_H */
+-- 
+1.6.4.2
