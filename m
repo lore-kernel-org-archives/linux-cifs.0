@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [RFC][PATCH 03/10] cifs: register CIFS for caching
-Date: Tue, 22 Jun 2010 20:53:09 +0530
-Message-ID: <1277220189-3485-1-git-send-email-sjayaraman@suse.de>
+Subject: [RFC][PATCH 04/10] cifs: define server-level cache index objects and register them with FS-Cache
+Date: Tue, 22 Jun 2010 20:53:18 +0530
+Message-ID: <1277220198-3522-1-git-send-email-sjayaraman@suse.de>
 References: <yes>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
@@ -11,38 +11,116 @@ In-Reply-To: <yes>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Define CIFS for FS-Cache and register for caching. Upon registration the
-top-level index object cookie will be stuck to the netfs definition by
-FS-Cache.
+Define server-level cache index objects (as managed by TCP_ServerInfo structs).
+Each server object is created in the CIFS top-level index object and is itself
+an index into which superblock-level objects are inserted.
+
+Currently, the server objects are keyed by hostname.
 
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- fs/cifs/Makefile  |    2 ++
- fs/cifs/cache.c   |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsfs.c  |    8 ++++++++
- fs/cifs/fscache.h |   40 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 103 insertions(+), 0 deletions(-)
- create mode 100644 fs/cifs/cache.c
- create mode 100644 fs/cifs/fscache.h
+ fs/cifs/Makefile   |    2 +-
+ fs/cifs/cache.c    |   25 +++++++++++++++++++++++++
+ fs/cifs/cifsglob.h |    3 +++
+ fs/cifs/connect.c  |    4 ++++
+ fs/cifs/fscache.c  |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/fscache.h  |   12 ++++++++++++
+ 6 files changed, 92 insertions(+), 1 deletion(-)
+ create mode 100644 fs/cifs/fscache.c
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index 9948c00..e2de709 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -11,3 +11,5 @@ cifs-y := cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o inode.o \
- cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
+Index: cifs-2.6/fs/cifs/Makefile
+===================================================================
+--- cifs-2.6.orig/fs/cifs/Makefile
++++ cifs-2.6/fs/cifs/Makefile
+@@ -12,4 +12,4 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spneg
  
  cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
-+
-+cifs-$(CONFIG_CIFS_FSCACHE) += cache.o
-diff --git a/fs/cifs/cache.c b/fs/cifs/cache.c
-new file mode 100644
-index 0000000..1080b96
---- /dev/null
-+++ b/fs/cifs/cache.c
-@@ -0,0 +1,53 @@
+ 
+-cifs-$(CONFIG_CIFS_FSCACHE) += cache.o
++cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+Index: cifs-2.6/fs/cifs/cache.c
+===================================================================
+--- cifs-2.6.orig/fs/cifs/cache.c
++++ cifs-2.6/fs/cifs/cache.c
+@@ -51,3 +51,28 @@ void cifs_fscache_unregister(void)
+ 	fscache_unregister_netfs(&cifs_fscache_netfs);
+ }
+ 
 +/*
-+ *   fs/cifs/cache.c - CIFS filesystem cache index structure definitions
++ * Server object currently keyed by hostname
++ */
++static uint16_t cifs_server_get_key(const void *cookie_netfs_data,
++				   void *buffer, uint16_t maxbuf)
++{
++	const struct TCP_Server_Info *server = cookie_netfs_data;
++	uint16_t len = strnlen(server->hostname, sizeof(server->hostname));
++
++	if (len > maxbuf)
++		return 0;
++
++	memcpy(buffer, server->hostname, len);
++
++	return len;
++}
++
++/*
++ * Server object for FS-Cache
++ */
++const struct fscache_cookie_def cifs_fscache_server_index_def = {
++	.name = "CIFS.server",
++	.type = FSCACHE_COOKIE_TYPE_INDEX,
++	.get_key = cifs_server_get_key,
++};
+Index: cifs-2.6/fs/cifs/cifsglob.h
+===================================================================
+--- cifs-2.6.orig/fs/cifs/cifsglob.h
++++ cifs-2.6/fs/cifs/cifsglob.h
+@@ -193,6 +193,9 @@ struct TCP_Server_Info {
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_ntlmssp;		/* supports NTLMSSP */
++#ifdef CONFIG_CIFS_FSCACHE
++	struct fscache_cookie   *fscache; /* client index cache cookie */
++#endif
+ };
+ 
+ /*
+Index: cifs-2.6/fs/cifs/connect.c
+===================================================================
+--- cifs-2.6.orig/fs/cifs/connect.c
++++ cifs-2.6/fs/cifs/connect.c
+@@ -48,6 +48,7 @@
+ #include "nterr.h"
+ #include "rfc1002pdu.h"
+ #include "cn_cifs.h"
++#include "fscache.h"
+ 
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
+@@ -1453,6 +1454,8 @@ cifs_put_tcp_session(struct TCP_Server_I
+ 		return;
+ 	}
+ 
++	cifs_fscache_release_client_cookie(server);
++
+ 	list_del_init(&server->tcp_ses_list);
+ 	write_unlock(&cifs_tcp_ses_lock);
+ 
+@@ -1572,6 +1575,7 @@ cifs_get_tcp_session(struct smb_vol *vol
+ 		goto out_err;
+ 	}
+ 
++	cifs_fscache_get_client_cookie(tcp_ses);
+ 	/* thread spawned, put it on the list */
+ 	write_lock(&cifs_tcp_ses_lock);
+ 	list_add(&tcp_ses->tcp_ses_list, &cifs_tcp_ses_list);
+Index: cifs-2.6/fs/cifs/fscache.c
+===================================================================
+--- /dev/null
++++ cifs-2.6/fs/cifs/fscache.c
+@@ -0,0 +1,47 @@
++/*
++ *   fs/cifs/fscache.c - CIFS filesystem cache interface
 + *
 + *   Copyright (c) 2010 Novell, Inc.
 + *   Authors(s): Suresh Jayaraman (sjayaraman-l3A5Bk7waGM@public.gmane.org>
@@ -65,122 +143,57 @@ index 0000000..1080b96
 +#include <linux/kernel.h>
 +#include <linux/sched.h>
 +#include <linux/mm.h>
++#include <linux/in6.h>
 +
 +#include "fscache.h"
 +#include "cifsglob.h"
 +#include "cifs_debug.h"
 +
-+/*
-+ * CIFS filesystem definition for FS-Cache
-+ */
-+struct fscache_netfs cifs_fscache_netfs = {
-+	.name = "cifs",
-+	.version = 0,
-+};
-+
-+/*
-+ * Register CIFS for caching with FS-Cache
-+ */
-+int cifs_fscache_register(void)
++void cifs_fscache_get_client_cookie(struct TCP_Server_Info *server)
 +{
-+	return fscache_register_netfs(&cifs_fscache_netfs);
++	server->fscache =
++		fscache_acquire_cookie(cifs_fscache_netfs.primary_index,
++				&cifs_fscache_server_index_def, server);
++	cFYI(1, "CIFS: get client cookie (0x%p/0x%p)\n",
++				server, server->fscache);
 +}
 +
-+/*
-+ * Unregister CIFS for caching
-+ */
-+void cifs_fscache_unregister(void)
++void cifs_fscache_release_client_cookie(struct TCP_Server_Info *server)
 +{
-+	fscache_unregister_netfs(&cifs_fscache_netfs);
++	cFYI(1, "CIFS: release client cookie (0x%p/0x%p)\n",
++				server, server->fscache);
++	fscache_relinquish_cookie(server->fscache, 0);
++	server->fscache = NULL;
 +}
 +
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 484e52b..c2a7aa9 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -47,6 +47,7 @@
- #include <linux/key-type.h>
- #include "dns_resolve.h"
- #include "cifs_spnego.h"
-+#include "fscache.h"
- #define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
+Index: cifs-2.6/fs/cifs/fscache.h
+===================================================================
+--- cifs-2.6.orig/fs/cifs/fscache.h
++++ cifs-2.6/fs/cifs/fscache.h
+@@ -27,14 +27,26 @@
+ #ifdef CONFIG_CIFS_FSCACHE
  
- int cifsFYI = 0;
-@@ -902,6 +903,10 @@ init_cifs(void)
- 		cFYI(1, "cifs_max_pending set to max of 256");
- 	}
+ extern struct fscache_netfs cifs_fscache_netfs;
++extern const struct fscache_cookie_def cifs_fscache_server_index_def;
  
-+	rc = cifs_fscache_register();
-+	if (rc)
-+		goto out;
-+
- 	rc = cifs_init_inodecache();
- 	if (rc)
- 		goto out_clean_proc;
-@@ -949,8 +954,10 @@ init_cifs(void)
- 	cifs_destroy_mids();
-  out_destroy_inodecache:
- 	cifs_destroy_inodecache();
-+	cifs_fscache_unregister();
-  out_clean_proc:
- 	cifs_proc_clean();
-+ out:
- 	return rc;
- }
+ extern int cifs_fscache_register(void);
+ extern void cifs_fscache_unregister(void);
  
-@@ -959,6 +966,7 @@ exit_cifs(void)
- {
- 	cFYI(DBG2, "exit_cifs");
- 	cifs_proc_clean();
-+	cifs_fscache_unregister();
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	cifs_dfs_release_automount_timer();
- 	unregister_key_type(&key_type_dns_resolver);
-diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-new file mode 100644
-index 0000000..cec9e2b
---- /dev/null
-+++ b/fs/cifs/fscache.h
-@@ -0,0 +1,40 @@
 +/*
-+ *   fs/cifs/fscache.h - CIFS filesystem cache interface definitions
-+ *
-+ *   Copyright (c) 2010 Novell, Inc.
-+ *   Authors(s): Suresh Jayaraman (sjayaraman-l3A5Bk7waGM@public.gmane.org>
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ * fscache.c
 + */
-+#ifndef _CIFS_FSCACHE_H
-+#define _CIFS_FSCACHE_H
++extern void cifs_fscache_get_client_cookie(struct TCP_Server_Info *);
++extern void cifs_fscache_release_client_cookie(struct TCP_Server_Info *);
 +
-+#include <linux/fscache.h>
-+#include "cifsglob.h"
+ #else /* CONFIG_CIFS_FSCACHE */
+ static inline int cifs_fscache_register(void) { return 0; }
+ static inline void cifs_fscache_unregister(void) {}
+ 
++static inline void
++cifs_fscache_get_client_cookie(struct TCP_Server_Info *server) {}
++static inline void
++cifs_fscache_get_client_cookie(struct TCP_Server_Info *server); {}
 +
-+#ifdef CONFIG_CIFS_FSCACHE
-+
-+extern struct fscache_netfs cifs_fscache_netfs;
-+
-+extern int cifs_fscache_register(void);
-+extern void cifs_fscache_unregister(void);
-+
-+#else /* CONFIG_CIFS_FSCACHE */
-+static inline int cifs_fscache_register(void) { return 0; }
-+static inline void cifs_fscache_unregister(void) {}
-+
-+#endif /* CONFIG_CIFS_FSCACHE */
-+
-+#endif /* _CIFS_FSCACHE_H */
--- 
-1.6.4.2
+ #endif /* CONFIG_CIFS_FSCACHE */
+ 
+ #endif /* _CIFS_FSCACHE_H */
