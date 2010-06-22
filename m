@@ -1,231 +1,110 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [RFC][PATCH 09/10] cifs: read pages from FS-Cache
-Date: Tue, 22 Jun 2010 20:54:21 +0530
-Message-ID: <1277220261-3717-1-git-send-email-sjayaraman@suse.de>
+From: Suresh Jayaraman <sjayaraman@suse.de>
+Subject: [RFC][PATCH 08/10] cifs: store pages into local cache
+Date: Tue, 22 Jun 2010 20:54:00 +0530
+Message-ID: <1277220240-3674-1-git-send-email-sjayaraman@suse.de>
 References: <yes>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
 In-Reply-To: <yes>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Read pages from a FS-Cache data storage object into a CIFS inode.
+Store pages from an CIFS inode into the data storage object associated with
+that inode.
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman@suse.de>
 ---
- fs/cifs/file.c    |   19 ++++++++++++++
- fs/cifs/fscache.c |   73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/fscache.h |   40 ++++++++++++++++++++++++++++-
- 3 files changed, 131 insertions(+), 1 deletions(-)
+ fs/cifs/file.c    |    6 ++++++
+ fs/cifs/fscache.c |   13 +++++++++++++
+ fs/cifs/fscache.h |   11 +++++++++++
+ 3 files changed, 30 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 39c1ce0..42d2f25 100644
+index 786ec04..39c1ce0 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1978,6 +1978,16 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
- 	pTcon = cifs_sb->tcon;
+@@ -2060,6 +2060,8 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 				   we will hit it on next read */
  
-+	/*
-+	 * Reads as many pages as possible from fscache. Returns -ENOBUFS
-+	 * immediately if the cookie is negative
-+	 */
-+	rc = cifs_readpages_from_fscache(mapping->host, mapping, page_list,
-+					 &num_pages);
-+	cFYI(1, "CIFS: readpages_from_fscache returned %d\n", rc);
-+	if (rc == 0)
-+		goto read_complete;
+ 				/* break; */
++				/* send this page to FS-Cache */
++				cifs_readpage_to_fscache(mapping->host, page);
+ 			}
+ 		} else {
+ 			cFYI(1, "No bytes read (%d) at offset %lld . "
+@@ -2117,6 +2119,10 @@ static int cifs_readpage_worker(struct file *file, struct page *page,
+ 
+ 	flush_dcache_page(page);
+ 	SetPageUptodate(page);
 +
- 	cFYI(DBG2, "rpages: num pages %d", num_pages);
- 	for (i = 0; i < num_pages; ) {
- 		unsigned contig_pages;
-@@ -2090,6 +2100,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 		smb_read_data = NULL;
- 	}
- 
-+read_complete:
- 	FreeXid(xid);
- 	return rc;
- }
-@@ -2100,6 +2111,12 @@ static int cifs_readpage_worker(struct file *file, struct page *page,
- 	char *read_data;
- 	int rc;
- 
-+	/* Is the page cached? */
-+	rc = cifs_readpage_from_fscache(file->f_path.dentry->d_inode, page);
-+	cFYI(1, "CIFS: cifs_readpage_from_fscache returned %d\n", rc);
-+	if (rc == 0)
-+		goto read_complete;
++	/* send this page to the cache */
++	cifs_readpage_to_fscache(file->f_path.dentry->d_inode, page);
 +
- 	page_cache_get(page);
- 	read_data = kmap(page);
- 	/* for reads over a certain size could initiate async read ahead */
-@@ -2128,6 +2145,8 @@ static int cifs_readpage_worker(struct file *file, struct page *page,
+ 	rc = 0;
+ 
  io_error:
- 	kunmap(page);
- 	page_cache_release(page);
-+
-+read_complete:
- 	return rc;
- }
- 
 diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index 13e47d5..6813737 100644
+index c09d3b8..13e47d5 100644
 --- a/fs/cifs/fscache.c
 +++ b/fs/cifs/fscache.c
-@@ -145,6 +145,79 @@ int cifs_fscache_release_page(struct page *page, gfp_t gfp)
+@@ -145,6 +145,19 @@ int cifs_fscache_release_page(struct page *page, gfp_t gfp)
  	return 1;
  }
  
-+static void cifs_readpage_from_fscache_complete(struct page *page, void *ctx,
-+						int error)
-+{
-+	cFYI(1, "CFS: readpage_from_fscache_complete (0x%p/%d)\n",
-+			page, error);
-+	if (!error)
-+		SetPageUptodate(page);
-+	unlock_page(page);
-+}
-+
-+/*
-+ * Retrieve a page from FS-Cache
-+ */
-+int __cifs_readpage_from_fscache(struct inode *inode, struct page *page)
++void __cifs_readpage_to_fscache(struct inode *inode, struct page *page)
 +{
 +	int ret;
 +
-+	cFYI(1, "CIFS: readpage_from_fscache(fsc:%p, p:%p, i:0x%p\n",
++	cFYI(1, "CIFS: readpage_to_fscache(fsc: %p, p: %p, i: %p\n",
 +			CIFS_I(inode)->fscache, page, inode);
-+	ret = fscache_read_or_alloc_page(CIFS_I(inode)->fscache, page,
-+					 cifs_readpage_from_fscache_complete,
-+					 NULL,
-+					 GFP_KERNEL);
-+	switch (ret) {
++	ret = fscache_write_page(CIFS_I(inode)->fscache, page, GFP_KERNEL);
++	cFYI(1, "CIFS: fscache_write_page returned %d\n", ret);
 +
-+	case 0: /* page found in fscache, read submitted */
-+		cFYI(1, "CIFS: readpage_from_fscache: submitted\n");
-+		return ret;
-+	case -ENOBUFS:	/* page won't be cached */
-+	case -ENODATA:	/* page not in cache */
-+		cFYI(1, "CIFS: readpage_from_fscache %d\n", ret);
-+		return 1;
-+
-+	default:
-+		cFYI(1, "unknown error ret = %d", ret);
-+	}
-+	return ret;
++	if (ret != 0)
++		fscache_uncache_page(CIFS_I(inode)->fscache, page);
 +}
 +
-+/*
-+ * Retrieve a set of pages from FS-Cache
-+ */
-+int __cifs_readpages_from_fscache(struct inode *inode,
-+				struct address_space *mapping,
-+				struct list_head *pages,
-+				unsigned *nr_pages)
-+{
-+	int ret;
-+
-+	cFYI(1, "CIFS: __cifs_readpages_from_fscache (0x%p/%u/0x%p)\n",
-+			CIFS_I(inode)->fscache, *nr_pages, inode);
-+	ret = fscache_read_or_alloc_pages(CIFS_I(inode)->fscache, mapping,
-+					  pages, nr_pages,
-+					  cifs_readpage_from_fscache_complete,
-+					  NULL,
-+					  mapping_gfp_mask(mapping));
-+	switch (ret) {
-+	case 0:	/* read submitted to the cache for all pages */
-+		cFYI(1, "CIFS: readpages_from_fscache\n");
-+		return ret;
-+
-+	case -ENOBUFS:	/* some pages are not cached and can't be */
-+	case -ENODATA:	/* some pages are not cached */
-+		cFYI(1, "CIFS: readpages_from_fscache: no page\n");
-+		return 1;
-+
-+	default:
-+		cFYI(1, "unknown error ret = %d", ret);
-+	}
-+
-+	return ret;
-+}
-+
- void __cifs_readpage_to_fscache(struct inode *inode, struct page *page)
+ void __cifs_fscache_invalidate_page(struct page *page, struct inode *inode)
  {
- 	int ret;
+ 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
 diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-index e34d8ab..03bd3fe 100644
+index 127cb0a..e34d8ab 100644
 --- a/fs/cifs/fscache.h
 +++ b/fs/cifs/fscache.h
-@@ -31,7 +31,6 @@ extern const struct fscache_cookie_def cifs_fscache_server_index_def;
- extern const struct fscache_cookie_def cifs_fscache_super_index_def;
- extern const struct fscache_cookie_def cifs_fscache_inode_object_def;
- 
--
- extern int cifs_fscache_register(void);
- extern void cifs_fscache_unregister(void);
- 
-@@ -49,6 +48,11 @@ extern void cifs_fscache_reset_inode_cookie(struct inode *);
- 
+@@ -50,6 +50,8 @@ extern void cifs_fscache_reset_inode_cookie(struct inode *);
  extern void __cifs_fscache_invalidate_page(struct page *, struct inode *);
  extern int cifs_fscache_release_page(struct page *page, gfp_t gfp);
-+extern int __cifs_readpage_from_fscache(struct inode *, struct page *);
-+extern int __cifs_readpages_from_fscache(struct inode *,
-+					 struct address_space *,
-+					 struct list_head *,
-+					 unsigned *);
  
- extern void __cifs_readpage_to_fscache(struct inode *, struct page *);
- 
-@@ -59,6 +63,26 @@ static inline void cifs_fscache_invalidate_page(struct page *page,
++extern void __cifs_readpage_to_fscache(struct inode *, struct page *);
++
+ static inline void cifs_fscache_invalidate_page(struct page *page,
+ 					       struct inode *inode)
+ {
+@@ -57,6 +59,13 @@ static inline void cifs_fscache_invalidate_page(struct page *page,
  		__cifs_fscache_invalidate_page(page, inode);
  }
  
-+static inline int cifs_readpage_from_fscache(struct inode *inode,
-+					     struct page *page)
++static inline void cifs_readpage_to_fscache(struct inode *inode,
++					    struct page *page)
 +{
-+	if (CIFS_I(inode)->fscache)
-+		return __cifs_readpage_from_fscache(inode, page);
-+
-+	return -ENOBUFS;
++	if (PageFsCache(page))
++		__cifs_readpage_to_fscache(inode, page);
 +}
 +
-+static inline int cifs_readpages_from_fscache(struct inode *inode,
-+					      struct address_space *mapping,
-+					      struct list_head *pages,
-+					      unsigned *nr_pages)
-+{
-+	if (CIFS_I(inode)->fscache)
-+		return __cifs_readpages_from_fscache(inode, mapping, pages,
-+						     nr_pages);
-+	return -ENOBUFS;
-+}
-+
- static inline void cifs_readpage_to_fscache(struct inode *inode,
- 					    struct page *page)
- {
-@@ -89,6 +113,20 @@ static inline void cifs_fscache_release_page(struct page *page, gfp_t gfp)
+ #else /* CONFIG_CIFS_FSCACHE */
+ static inline int cifs_fscache_register(void) { return 0; }
+ static inline void cifs_fscache_unregister(void) {}
+@@ -80,6 +89,8 @@ static inline void cifs_fscache_release_page(struct page *page, gfp_t gfp)
  
  static inline int cifs_fscache_invalidate_page(struct page *page,
  			struct inode *) {}
-+static inline int
-+cifs_readpage_from_fscache(struct inode *inode, struct page *page)
-+{
-+	return -ENOBUFS;
-+}
-+
-+static inline int cifs_readpages_from_fscache(struct inode *inode,
-+					      struct address_space *mapping,
-+					      struct list_head *pages,
-+					      unsigned *nr_pages)
-+{
-+	return -ENOBUFS;
-+}
-+
- static inline void cifs_readpage_to_fscache(struct inode *inode,
- 			struct page *page) {}
++static inline void cifs_readpage_to_fscache(struct inode *inode,
++			struct page *page) {}
+ 
+ #endif /* CONFIG_CIFS_FSCACHE */
  
 -- 
 1.6.4.2
+
