@@ -1,48 +1,78 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: your mount.cifs patch
-Date: Mon, 21 Jun 2010 20:52:08 -0400
-Message-ID: <20100621205208.61327751@corrin.poochiereds.net>
-References: <AANLkTil8VYcSFyOFKa7vALHc60K0njtNCeZ7YwYJuKuE@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: John M Rulnick <john-euQKGi/78XpBDgjK7y7TUQ@public.gmane.org>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [RFC][PATCH 10/10] cifs: add mount option to enable local caching
+Date: Tue, 22 Jun 2010 20:55:09 +0530
+Message-ID: <1277220309-3757-1-git-send-email-sjayaraman@suse.de>
+References: <yes>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTil8VYcSFyOFKa7vALHc60K0njtNCeZ7YwYJuKuE-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <yes>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 21 Jun 2010 20:12:33 -0400
-John M Rulnick <john-euQKGi/78XpBDgjK7y7TUQ@public.gmane.org> wrote:
+Add a mount option 'fsc' to enable local caching on CIFS.
 
-> Jeff,
-> 
-> I'm trying to understand your patch posted Mar. 26.  I'm using mount.cifs
-> (smbmount) and getting "Unable to find suitable address" intermittently.
->  What would cause this error when trying to mount a guest share y on host x
-> via 'smbmount //x/y /my/mountpoint'.  I always use the exact same command;
-> sometimes I'm able to mount the remote share, and sometimes I get the
-> aforementioned error -- no apparent pattern.
-> 
-> Debian *testing* client and samba server, small local network.  Cifs-utils
-> package 2:4.5-2, kernel 2.6.32-5 on client; kernel 2.6.32-15 on server.
-> 
-> Thank you for any insight you can provide.
-> 
-> John
+As the cifs-utils (userspace) changes are not done yet, this patch enables
+'fsc' by default to assist testing.
 
-(cc'ing linux-cifs mailing list)
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/connect.c    |    8 ++++++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
 
-mount.cifs will first resolve the hostname to a list of addresses and
-then hand each off to the kernel in turn until the mount succeeds. If
-none of them work, you'll get that error.
-
-You may want to turn up client side debugging:
-
-http://wiki.samba.org/index.php?title=LinuxCIFS_troubleshooting&redirect=no
-
-...and see why the mounts are failing.
-
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 246a167..9e77145 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -35,6 +35,7 @@
+ #define CIFS_MOUNT_DYNPERM      0x1000 /* allow in-memory only mode setting   */
+ #define CIFS_MOUNT_NOPOSIXBRL   0x2000 /* mandatory not posix byte range lock */
+ #define CIFS_MOUNT_NOSSYNC      0x4000 /* don't do slow SMBflush on every sync*/
++#define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+ 
+ struct cifs_sb_info {
+ 	struct cifsTconInfo *tcon;	/* primary mount */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 4844dbd..6c6ff3c 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -98,6 +98,7 @@ struct smb_vol {
+ 	bool noblocksnd:1;
+ 	bool noautotune:1;
+ 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
++	bool fsc:1;	/* enable fscache */
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -843,6 +844,9 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 	/* default to using server inode numbers where available */
+ 	vol->server_ino = 1;
+ 
++	/* XXX: default to fsc for testing until mount.cifs pieces are done */
++	vol->fsc = 1;
++
+ 	if (!options)
+ 		return 1;
+ 
+@@ -1332,6 +1336,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 			printk(KERN_WARNING "CIFS: Mount option noac not "
+ 				"supported. Instead set "
+ 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
++		} else if (strnicmp(data, "fsc", 3) == 0) {
++			vol->fsc = true;
+ 		} else
+ 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
+ 						data);
+@@ -2405,6 +2411,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_GID;
+ 	if (pvolume_info->dynperm)
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DYNPERM;
++	if (pvolume_info->fsc)
++		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_FSCACHE;
+ 	if (pvolume_info->direct_io) {
+ 		cFYI(1, "mounting share using direct i/o");
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.6.4.2
