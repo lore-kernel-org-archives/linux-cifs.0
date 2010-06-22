@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [RFC][PATCH 10/10] cifs: add mount option to enable local caching
-Date: Tue, 22 Jun 2010 20:55:09 +0530
-Message-ID: <1277220309-3757-1-git-send-email-sjayaraman@suse.de>
+Subject: [RFC][PATCH 00/10] cifs: local caching support using FS-Cache
+Date: Tue, 22 Jun 2010 20:50:05 +0530
+Message-ID: <1277220005-3322-1-git-send-email-sjayaraman@suse.de>
 References: <yes>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
@@ -11,68 +11,68 @@ In-Reply-To: <yes>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add a mount option 'fsc' to enable local caching on CIFS.
+This patchset is a first stab at adding persistent, local caching facility for
+CIFS using the FS-Cache interface.
 
-As the cifs-utils (userspace) changes are not done yet, this patch enables
-'fsc' by default to assist testing.
+The index hierarchy which is mainly used to locate a file object or discard
+a certain subset of the files cached, currently has three levels:
+	- Server
+	- Share 
+	- File
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/cifs_fs_sb.h |    1 +
- fs/cifs/connect.c    |    8 ++++++++
- 2 files changed, 9 insertions(+), 0 deletions(-)
+The server index object is keyed by hostname of the server. The superblock
+index object is keyed by the sharename and the inode object is keyed by the
+UniqueId. The cache coherency is ensured by checking the 'LastWriteTime' and
+size of file.
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 246a167..9e77145 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -35,6 +35,7 @@
- #define CIFS_MOUNT_DYNPERM      0x1000 /* allow in-memory only mode setting   */
- #define CIFS_MOUNT_NOPOSIXBRL   0x2000 /* mandatory not posix byte range lock */
- #define CIFS_MOUNT_NOSSYNC      0x4000 /* don't do slow SMBflush on every sync*/
-+#define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
- 
- struct cifs_sb_info {
- 	struct cifsTconInfo *tcon;	/* primary mount */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4844dbd..6c6ff3c 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -98,6 +98,7 @@ struct smb_vol {
- 	bool noblocksnd:1;
- 	bool noautotune:1;
- 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
-+	bool fsc:1;	/* enable fscache */
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
-@@ -843,6 +844,9 @@ cifs_parse_mount_options(char *options, const char *devname,
- 	/* default to using server inode numbers where available */
- 	vol->server_ino = 1;
- 
-+	/* XXX: default to fsc for testing until mount.cifs pieces are done */
-+	vol->fsc = 1;
-+
- 	if (!options)
- 		return 1;
- 
-@@ -1332,6 +1336,8 @@ cifs_parse_mount_options(char *options, const char *devname,
- 			printk(KERN_WARNING "CIFS: Mount option noac not "
- 				"supported. Instead set "
- 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
-+		} else if (strnicmp(data, "fsc", 3) == 0) {
-+			vol->fsc = true;
- 		} else
- 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
- 						data);
-@@ -2405,6 +2411,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_GID;
- 	if (pvolume_info->dynperm)
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DYNPERM;
-+	if (pvolume_info->fsc)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_FSCACHE;
- 	if (pvolume_info->direct_io) {
- 		cFYI(1, "mounting share using direct i/o");
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
--- 
-1.6.4.2
+To use this, apply this patchset in order, mount the share with rsize=4096 and
+try copying a huge file (say few hundred MBs) from mount point to local
+filesystem. During the first time, the cache will be initialized. When you copy
+the second time, it should read from the local cache.
+
+To reduce the impact of page cache and see the local caching in action
+readily, try doing a sync and drop the caches by doing:
+	sync; echo 3 > /proc/sys/vm/drop_caches
+
+Known issues
+-------------
+	- the cache coherency check may not be reliable always as some
+	  CIFS servers are known not to update mtime until the filehandle is
+	  closed.
+	- not all the Servers under all circumstances provide a unique
+	  'UniqueId'.
+
+Todo's
+-------
+	- improvements to avoid potential key collisions
+	- address the above known issues
+
+This set is lightly tested and all the bugs seen during my testing have been
+fixed. However, this can be considered as an RFC for now.
+
+Any Comments or Suggestions are welcome.
+
+Suresh Jayaraman (10)
+  cifs: add kernel config option for CIFS Client caching support
+  cifs: guard cifsglob.h against multiple inclusion
+  cifs: register CIFS for caching
+  cifs: define server-level cache index objects and register them with FS-Cache
+  cifs: define superblock-level cache index objects and register them
+  cifs: define inode-level cache object and register them
+  cifs: FS-Cache page management
+  cifs: store pages into local cache
+  cifs: read pages from FS-Cache
+  cifs: add mount option to enable local caching
+
+ Kconfig      |    9 ++
+ Makefile     |    2 
+ cache.c      |  251 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ cifs_fs_sb.h |    1 
+ cifsfs.c     |   15 +++
+ cifsglob.h   |   14 +++
+ connect.c    |   16 +++
+ file.c       |   51 +++++++++++
+ fscache.c    |  244 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fscache.h    |  135 +++++++++++++++++++++++++++++++
+ inode.c      |    4 
+ 11 files changed, 742 insertions(+)
