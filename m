@@ -1,190 +1,54 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [RFC][PATCH 05/10] cifs: define superblock-level cache index objects and register them
-Date: Tue, 22 Jun 2010 20:53:26 +0530
-Message-ID: <1277220206-3559-1-git-send-email-sjayaraman@suse.de>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [RFC][PATCH 02/10] cifs: guard cifsglob.h against multiple
+ inclusion
+Date: Tue, 22 Jun 2010 17:37:42 -0400
+Message-ID: <20100622173742.448e1e94@corrin.poochiereds.net>
 References: <yes>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+	<1277220170-3442-1-git-send-email-sjayaraman@suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <yes>
+In-Reply-To: <1277220170-3442-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Define superblock-level cache index objects (managed by cifsTconInfo structs).
-Each superblock object is created in a server-level index object and in itself
-an index into which inode-level objects are inserted.
+On Tue, 22 Jun 2010 20:52:50 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-Currently, the superblock objects are keyed by sharename.
+> Add conditional compile macros to guard the header file against multiple
+> inclusion.
+> 
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |    5 +++++
+>  1 files changed, 5 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index a88479c..6b2c39d 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -16,6 +16,9 @@
+>   *   the GNU Lesser General Public License for more details.
+>   *
+>   */
+> +#ifndef _CIFS_GLOB_H
+> +#define _CIFS_GLOB_H
+> +
+>  #include <linux/in.h>
+>  #include <linux/in6.h>
+>  #include <linux/slab.h>
+> @@ -733,3 +736,5 @@ GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
+>  GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
+>  
+>  extern const struct slow_work_ops cifs_oplock_break_ops;
+> +
+> +#endif	/* _CIFS_GLOB_H */
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/cache.c    |   62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsglob.h |    3 ++
- fs/cifs/connect.c  |    4 +++
- fs/cifs/fscache.c  |   17 ++++++++++++++
- fs/cifs/fscache.h  |    6 +++++
- 5 files changed, 92 insertions(+)
+Strong ACK
 
-Index: cifs-2.6/fs/cifs/cache.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/cache.c
-+++ cifs-2.6/fs/cifs/cache.c
-@@ -76,3 +76,65 @@ const struct fscache_cookie_def cifs_fsc
- 	.type = FSCACHE_COOKIE_TYPE_INDEX,
- 	.get_key = cifs_server_get_key,
- };
-+
-+static char *extract_sharename(const char *treename)
-+{
-+	const char *src;
-+	char *delim, *dst;
-+	int len;
-+
-+	/* skip double chars at the beginning */
-+	src = treename + 2;
-+
-+	/* share name is always preceded by '\\' now */
-+	delim = strchr(src, '\\');
-+	if (!delim)
-+		return ERR_PTR(-EINVAL);
-+	delim++;
-+	len = strlen(delim);
-+
-+	/* caller has to free the memory */
-+	dst = kstrndup(delim, len, GFP_KERNEL);
-+	if (!dst)
-+		return ERR_PTR(-ENOMEM);
-+
-+	return dst;
-+}
-+
-+/*
-+ * Superblock object currently keyed by share name
-+ */
-+static uint16_t cifs_super_get_key(const void *cookie_netfs_data, void *buffer,
-+				   uint16_t maxbuf)
-+{
-+	const struct cifsTconInfo *tcon = cookie_netfs_data;
-+	char *sharename;
-+	uint16_t len;
-+
-+	sharename = extract_sharename(tcon->treeName);
-+	if (IS_ERR(sharename)) {
-+		cFYI(1, "CIFS: couldn't extract sharename\n");
-+		sharename = NULL;
-+		return 0;
-+	}
-+
-+	len = strlen(sharename);
-+	if (len > maxbuf)
-+		return 0;
-+
-+	memcpy(buffer, sharename, len);
-+
-+	kfree(sharename);
-+
-+	return len;
-+}
-+
-+/*
-+ * Superblock object for FS-Cache
-+ */
-+const struct fscache_cookie_def cifs_fscache_super_index_def = {
-+	.name = "CIFS.super",
-+	.type = FSCACHE_COOKIE_TYPE_INDEX,
-+	.get_key = cifs_super_get_key,
-+};
-+
-Index: cifs-2.6/fs/cifs/cifsglob.h
-===================================================================
---- cifs-2.6.orig/fs/cifs/cifsglob.h
-+++ cifs-2.6/fs/cifs/cifsglob.h
-@@ -317,6 +317,9 @@ struct cifsTconInfo {
- 	bool local_lease:1; /* check leases (only) on local system not remote */
- 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
- 	bool need_reconnect:1; /* connection reset, tid now invalid */
-+#ifdef CONFIG_CIFS_FSCACHE
-+	struct fscache_cookie *fscache; /* cookie for share */
-+#endif
- 	/* BB add field for back pointer to sb struct(s)? */
- };
- 
-Index: cifs-2.6/fs/cifs/connect.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/connect.c
-+++ cifs-2.6/fs/cifs/connect.c
-@@ -1773,6 +1773,8 @@ cifs_put_tcon(struct cifsTconInfo *tcon)
- 	list_del_init(&tcon->tcon_list);
- 	write_unlock(&cifs_tcp_ses_lock);
- 
-+	cifs_fscache_release_super_cookie(tcon);
-+
- 	xid = GetXid();
- 	CIFSSMBTDis(xid, tcon);
- 	_FreeXid(xid);
-@@ -1843,6 +1845,8 @@ cifs_get_tcon(struct cifsSesInfo *ses, s
- 	tcon->nocase = volume_info->nocase;
- 	tcon->local_lease = volume_info->local_lease;
- 
-+	cifs_fscache_get_super_cookie(tcon);
-+
- 	write_lock(&cifs_tcp_ses_lock);
- 	list_add(&tcon->tcon_list, &ses->tcon_list);
- 	write_unlock(&cifs_tcp_ses_lock);
-Index: cifs-2.6/fs/cifs/fscache.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/fscache.c
-+++ cifs-2.6/fs/cifs/fscache.c
-@@ -45,3 +45,20 @@ void cifs_fscache_release_client_cookie(
- 	server->fscache = NULL;
- }
- 
-+void cifs_fscache_get_super_cookie(struct cifsTconInfo *tcon)
-+{
-+	tcon->fscache =
-+		fscache_acquire_cookie(tcon->ses->server->fscache,
-+				&cifs_fscache_super_index_def, tcon);
-+	cFYI(1, "CIFS: get superblock cookie (0x%p/0x%p)\n",
-+				tcon, tcon->fscache);
-+}
-+
-+void cifs_fscache_release_super_cookie(struct cifsTconInfo *tcon)
-+{
-+	cFYI(1, "CIFS: releasing superblock cookie (0x%p/0x%p)\n",
-+			tcon, tcon->fscache);
-+	fscache_relinquish_cookie(tcon->fscache, 0);
-+	tcon->fscache = NULL;
-+}
-+
-Index: cifs-2.6/fs/cifs/fscache.h
-===================================================================
---- cifs-2.6.orig/fs/cifs/fscache.h
-+++ cifs-2.6/fs/cifs/fscache.h
-@@ -28,6 +28,7 @@
- 
- extern struct fscache_netfs cifs_fscache_netfs;
- extern const struct fscache_cookie_def cifs_fscache_server_index_def;
-+extern const struct fscache_cookie_def cifs_fscache_super_index_def;
- 
- extern int cifs_fscache_register(void);
- extern void cifs_fscache_unregister(void);
-@@ -37,6 +38,8 @@ extern void cifs_fscache_unregister(void
-  */
- extern void cifs_fscache_get_client_cookie(struct TCP_Server_Info *);
- extern void cifs_fscache_release_client_cookie(struct TCP_Server_Info *);
-+extern void cifs_fscache_get_super_cookie(struct cifsTconInfo *);
-+extern void cifs_fscache_release_super_cookie(struct cifsTconInfo *);
- 
- #else /* CONFIG_CIFS_FSCACHE */
- static inline int cifs_fscache_register(void) { return 0; }
-@@ -46,6 +49,9 @@ static inline void
- cifs_fscache_get_client_cookie(struct TCP_Server_Info *server) {}
- static inline void
- cifs_fscache_get_client_cookie(struct TCP_Server_Info *server); {}
-+static inline void cifs_fscache_get_super_cookie(struct cifsTconInfo *tcon) {}
-+static inline void
-+cifs_fscache_release_super_cookie(struct cifsTconInfo *tcon) {}
- 
- #endif /* CONFIG_CIFS_FSCACHE */
- 
+Acked-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
