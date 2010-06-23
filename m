@@ -1,22 +1,22 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [RFC][PATCH 07/10] cifs: FS-Cache page management
-Date: Wed, 23 Jun 2010 18:05:01 +0100
-Message-ID: <9866.1277312701@redhat.com>
-References: <1277220228-3635-1-git-send-email-sjayaraman@suse.de> <yes>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Suresh Jayaraman <sjayaraman@suse.de>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1277220228-3635-1-git-send-email-sjayaraman@suse.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC][PATCH 08/10] cifs: store pages into local cache
+Date: Wed, 23 Jun 2010 18:06:12 +0100
+Message-ID: <9890.1277312772@redhat.com>
+References: <1277220240-3674-1-git-send-email-sjayaraman@suse.de> <yes>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1277220240-3674-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Suresh Jayaraman <sjayaraman@suse.de> wrote:
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> Takes care of invalidation and release of FS-Cache marked pages and also
-> invalidation of the FsCache page flag when the inode is removed.
+> Store pages from an CIFS inode into the data storage object associated with
+> that inode.
 > 
-> Signed-off-by: Suresh Jayaraman <sjayaraman@suse.de>
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 
-Acked-by: David Howells <dhowells@redhat.com>
+Acked-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
