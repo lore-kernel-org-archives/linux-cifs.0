@@ -1,28 +1,27 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [RFC][PATCH 04/10] cifs: define server-level cache index objects and register them with FS-Cache
-Date: Wed, 23 Jun 2010 17:54:52 +0100
-Message-ID: <9658.1277312092@redhat.com>
-References: <1277220198-3522-1-git-send-email-sjayaraman@suse.de> <yes>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Suresh Jayaraman <sjayaraman@suse.de>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1277220198-3522-1-git-send-email-sjayaraman@suse.de>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC][PATCH 05/10] cifs: define superblock-level cache index objects and register them
+Date: Wed, 23 Jun 2010 17:58:10 +0100
+Message-ID: <9720.1277312290@redhat.com>
+References: <1277220206-3559-1-git-send-email-sjayaraman@suse.de> <yes>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1277220206-3559-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Suresh Jayaraman <sjayaraman@suse.de> wrote:
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> Define server-level cache index objects (as managed by TCP_ServerInfo
-> structs).  Each server object is created in the CIFS top-level index object
-> and is itself an index into which superblock-level objects are inserted.
+> Define superblock-level cache index objects (managed by cifsTconInfo
+> structs).  Each superblock object is created in a server-level index object
+> and in itself an index into which inode-level objects are inserted.
 > 
-> Currently, the server objects are keyed by hostname.
-> 
-> Signed-off-by: Suresh Jayaraman <sjayaraman@suse.de>
+> Currently, the superblock objects are keyed by sharename.
 
-Looks reasonable, apart from the index key.  I agree with Jeff that you
-probably want {address,port,family} rather than a hostname.
+Seems reasonable.  Is there any way you can check that the share you are
+looking at on a server is the same as the last time you looked?  Can you
+validate the root directory of the share in some way?
 
 David
