@@ -1,29 +1,22 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC][PATCH 06/10] cifs: define inode-level cache object and register them
-Date: Wed, 23 Jun 2010 18:02:53 +0100
-Message-ID: <9822.1277312573@redhat.com>
-References: <1277220214-3597-1-git-send-email-sjayaraman@suse.de> <yes>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1277220214-3597-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [RFC][PATCH 07/10] cifs: FS-Cache page management
+Date: Wed, 23 Jun 2010 18:05:01 +0100
+Message-ID: <9866.1277312701@redhat.com>
+References: <1277220228-3635-1-git-send-email-sjayaraman@suse.de> <yes>
+Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: Suresh Jayaraman <sjayaraman@suse.de>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1277220228-3635-1-git-send-email-sjayaraman@suse.de>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+Suresh Jayaraman <sjayaraman@suse.de> wrote:
 
-> Define inode-level data storage objects (managed by cifsInodeInfo structs).
-> Each inode-level object is created in a super-block level object and is
-> itself a data storage object in to which pages from the inode are stored.
+> Takes care of invalidation and release of FS-Cache marked pages and also
+> invalidation of the FsCache page flag when the inode is removed.
 > 
-> The inode object is keyed by UniqueId. The coherency data being used is
-> LastWriteTime and the file size.
+> Signed-off-by: Suresh Jayaraman <sjayaraman@suse.de>
 
-Isn't there a file creation time too?
-
-I take it you don't support caching on files that are open for writing at this
-time?
-
-David
+Acked-by: David Howells <dhowells@redhat.com>
