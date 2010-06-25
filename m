@@ -1,49 +1,59 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC][PATCH 05/10] cifs: define superblock-level cache index objects and register them
-Date: Fri, 25 Jun 2010 14:26:52 +0100
-Message-ID: <23204.1277472412@redhat.com>
-References: <22746.1277470713@redhat.com> <4C24A4A0.90408@suse.de> <1277220206-3559-1-git-send-email-sjayaraman@suse.de> <yes> <9720.1277312290@redhat.com>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [RFC][PATCH 06/10] cifs: define inode-level cache object and
+ register them
+Date: Fri, 25 Jun 2010 12:53:06 -0400
+Message-ID: <20100625125306.7f9b1966@tlielax.poochiereds.net>
+References: <4C24A606.5040001@suse.de>
+	<1277220214-3597-1-git-send-email-sjayaraman@suse.de>
+	<yes>
+	<9822.1277312573@redhat.com>
+	<22697.1277470549@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
 	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: unlisted-recipients:; (no To-header on input)
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <22746.1277470713-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <22697.1277470549-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Fri, 25 Jun 2010 13:55:49 +0100
 David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> > > validate the root directory of the share in some way?
-> >
-> > I don't know if there is a way to do this.
+> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 > 
-> Is there an inode number or something?  Even the creation time might do.
+> > I think the creation time is currently being ignored as we won't be able
+> > to accomodate in POSIX stat struct.
+> 
+> The FS-Cache interface doesn't use the POSIX stat struct, but it could be
+> really useful to save it and use it for cache coherency inside the kernel.
+> 
+> Out of interest, what does Samba do when it comes to generating a creation time
+> for UNIX where one does not exist?
+> 
 
-Looking in cifspdu.h, there are a number of things that it might be possible
-to use.
+(cc'ing samba-technical since we're talking about the create time)
 
- (1) FILE_ALL_INFO: CreationTime, IndexNumber, IndexNumber1, FileName
-     (assuming this isn't flattened to '\' or something for the root of a
-     share.
+Looks like it mostly uses the ctime. IMO, the mtime would be a better
+choice since it changes less frequently, but I don't guess that it
+matters very much.
 
- (2) FILE_UNIX_BASIC_INFO: DevMajor, DevMinor, UniqueId.
+I have a few patches that make the cifs_iget code do more stringent
+checks. One of those makes it use the create time like an i_generation
+field to guard against matching inodes that have the same number but
+that have undergone a delete/create cycle. They need a bit more testing
+but I'm planning to post them in time for 2.6.36.
 
- (3) FILE_INFO_STANDARD: CreationDate, CreationTime.
+Because of how samba generates this number, it could be somewhat
+problematic to do this. What may save us though is that Linux<->Samba
+mostly uses unix extensions unless someone has specifically disabled
+them on either end. The unix extension calls don't generally send any
+sort of create time field, so we can't rely on it in those codepaths
+anyway.
 
- (4) FILE_INFO_BASIC: CreationTime.
-
- (5) FILE_DIRECTORY_INFO: FileIndex, CreationTime, FileName.
-
- (6) SEARCH_ID_FULL_DIR_INFO: FileIndex, CreationTime, UniqueId, FileName.
-
- (7) FILE_BOTH_DIRECTORY_INFO: FileIndex, CreationTime, ShortName, FileName.
-
- (8) OPEN_RSP_EXT: Fid, CreationTime, VolumeGUID, FileId.
-
-You may have to choose different sets of things, depending on what the server
-has on offer.  Also, don't forget, if you can't work out whether a share is
-coherent or not from the above, you can always use LastWriteTime, ChangeTime
-and EndOfFile and just discard the whole subtree if they differ.
-
-David
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
