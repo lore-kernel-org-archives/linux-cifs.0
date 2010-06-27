@@ -1,121 +1,40 @@
-From: "Aneesh Kumar K. V" <aneesh.kumar@linux.vnet.ibm.com>
-Subject: Re: [RFC][PATCH 06/10] cifs: define inode-level cache object and register them
-Date: Sun, 27 Jun 2010 23:47:21 +0530
-Message-ID: <871vbscpce.fsf@linux.vnet.ibm.com>
-References: <20100625125306.7f9b1966@tlielax.poochiereds.net> <4C24A606.5040001@suse.de> <1277220214-3597-1-git-send-email-sjayaraman@suse.de> <9822.1277312573@redhat.com> <22697.1277470549@redhat.com> <18628.1277502398@redhat.com> <20100625182651.36800d06@tlielax.poochiereds.net> <AANLkTilOTrHLvLv4XWYZO6xCnYZgYT7gO2M-oKZ6VvqM@mail.gmail.com> <OFB55E8EC7.E8DD23D5-ON8725774E.0004921E-8825774E.0004CC31@us.ibm.com>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: Re: [RFC][PATCH 06/10] cifs: define inode-level cache object and
+ register them
+Date: Sun, 27 Jun 2010 14:22:29 -0400
+Message-ID: <20100627182229.GA492@infradead.org>
+References: <20100625125306.7f9b1966@tlielax.poochiereds.net>
+ <4C24A606.5040001@suse.de>
+ <1277220214-3597-1-git-send-email-sjayaraman@suse.de>
+ <9822.1277312573@redhat.com>
+ <22697.1277470549@redhat.com>
+ <18628.1277502398@redhat.com>
+ <20100625182651.36800d06@tlielax.poochiereds.net>
+ <AANLkTilOTrHLvLv4XWYZO6xCnYZgYT7gO2M-oKZ6VvqM@mail.gmail.com>
+ <OFB55E8EC7.E8DD23D5-ON8725774E.0004921E-8825774E.0004CC31@us.ibm.com>
+ <871vbscpce.fsf@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: David Howells <dhowells@redhat.com>,
-	Jeff Layton <jlayton@redhat.com>,
-	Jeff Layton <jlayton@samba.org>, linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Suresh Jayaraman <sjayaraman@suse.de>
-To: Mingming Cao <mcao@us.ibm.com>, Steve French <smfrench@gmail.com>,
-	"DENIEL Philippe" <philippe.deniel@cea.fr>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <OFB55E8EC7.E8DD23D5-ON8725774E.0004921E-8825774E.0004CC31@us.ibm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Mingming Cao <mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	DENIEL Philippe <philippe.deniel-KCE40YydGKI@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+To: "Aneesh Kumar K. V" <aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <871vbscpce.fsf-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 25 Jun 2010 17:52:24 -0700, Mingming Cao <mcao@us.ibm.com> wrot=
-e:
->=20
->=20
-> Steve French <smfrench@gmail.com> wrote on 06/25/2010 04:05:30 PM:
->=20
-> > Steve French <smfrench@gmail.com>
-> > 06/25/2010 04:05 PM
-> >
-> > To
-> >
-> > Jeff Layton <jlayton@samba.org>, "Aneesh Kumar K.V"
-> > <aneesh.kumar@linux.vnet.ibm.com>, Mingming Cao/Beaverton/IBM@IBMUS
-> >
-> > cc
-> >
-> > David Howells <dhowells@redhat.com>, Suresh Jayaraman
-> > <sjayaraman@suse.de>, linux-cifs@vger.kernel.org, linux-
-> > fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, samba-
-> > technical@lists.samba.org, Jeff Layton <jlayton@redhat.com>
-> >
-> > Subject
-> >
-> > Re: [RFC][PATCH 06/10] cifs: define inode-level cache object and
-> > register them
-> >
-> > On Fri, Jun 25, 2010 at 5:26 PM, Jeff Layton <jlayton@samba.org> wr=
-ote:
-> > >
-> > > On Fri, 25 Jun 2010 22:46:38 +0100
-> > > David Howells <dhowells@redhat.com> wrote:
-> > >
-> > > > Jeff Layton <jlayton@samba.org> wrote:
-> > > >
-> > > > > Looks like it mostly uses the ctime. IMO, the mtime would be =
-a
-> better
-> > > > > choice since it changes less frequently, but I don't guess th=
-at it
-> > > > > matters very much.
-> > > >
-> > > > I'd've thought mtime changes more frequently since that's
-> > altered when data is
-> > > > written. =C2=A0ctime is changed when attributes are changed.
-> > > >
-> > >
-> > > IIUC, updating mtime for a write is also an attribute change, and=
- that
-> > > affects ctime. According to the stat(2) manpage:
-> > >
-> > > =C2=A0 =C2=A0 =C2=A0 The field st_ctime is changed by writing or =
-by setting
-> > =C2=A0inode =C2=A0informa-
-> > > =C2=A0 =C2=A0 =C2=A0 tion (i.e., owner, group, link count, mode, =
-etc.).
-> > >
-> > > > Note that Ext4 appears to have a file creation time field in it=
-s
-> inode
-> > > > (struct ext4_inode::i_crtime[_extra]). =C2=A0Can Samba be made =
-to use
-> that?
-> > > >
-> > >
-> > > Is it exposed to userspace in any (standard) way? It would be han=
-dy to
-> > > have that. While we're wishing...it might also be nice to have a
-> > > standard way to get at the i_generation from userspace too.
-> > >
-> >
-> > Yes - I have talked with MingMing and Aneesh about those (NFS may
-> > someday be able to use those too).=C2=A0 An obstacle in the past ha=
-d been
-> > that samba server stores its own fake creation time in an ndr encod=
-ed
-> > xattr which complicates things.
-> >
-> > MingMing/Annesh -
-> > Xattr or other way to get at birth time?
-> >
-> >
->=20
-> Not yet,
->  The ext4 file creation time only accesable from the kernel at the mo=
-ment.
-> There were discussion
-> to make this information avaliable via xattr before, but was rejected=
-,
-> since most people
-> agree that making this info avalibele via stat() is more standard. Ho=
-wever
-> modifying stat() would imply
-> big interface change. thus no action has been taken yet.
+On Sun, Jun 27, 2010 at 11:47:21PM +0530, Aneesh Kumar K. V wrote:
+> NFS ganesha pNFS also had a requirement for getting i_generation and
+> inode number in userspace. So may be we should now look at updating
+> stat or add a variant syscall that include i_generation and create time
+> in the return value
 
-NFS ganesha pNFS also had a requirement for getting i_generation and
-inode number in userspace. So may be we should now look at updating
-stat or add a variant syscall that include i_generation and create time
-in the return value
-
--aneesh
+What's missing in knfsd that you feel the sudden urge to move backwards
+to a userspace nfsd (one with a horribly crappy codebase, too).
