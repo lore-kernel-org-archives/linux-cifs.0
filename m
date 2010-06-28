@@ -1,42 +1,65 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH 1/3] cifs: don't allow cifs_iget to match inodes of the wrong type
-Date: Mon, 28 Jun 2010 07:10:11 -0400
-Message-ID: <1277723413-23769-2-git-send-email-jlayton@redhat.com>
-References: <1277723413-23769-1-git-send-email-jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org
-To: linux-cifs@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1277723413-23769-1-git-send-email-jlayton@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [RFC][PATCH 05/10] cifs: define superblock-level cache index
+ objects and register them
+Date: Mon, 28 Jun 2010 18:23:13 +0530
+Message-ID: <4C289B39.4060901@suse.de>
+References: <22746.1277470713@redhat.com> <4C24A4A0.90408@suse.de> <1277220206-3559-1-git-send-email-sjayaraman@suse.de> <yes> <9720.1277312290@redhat.com> <23204.1277472412@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <23204.1277472412-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-If the type is different from what we think it should be, then don't
-match the existing inode.
+On 06/25/2010 06:56 PM, David Howells wrote:
+> David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> 
+>>>> validate the root directory of the share in some way?
+>>>
+>>> I don't know if there is a way to do this.
+>>
+>> Is there an inode number or something?  Even the creation time might do.
+> 
+> Looking in cifspdu.h, there are a number of things that it might be possible
+> to use.
+> 
+>  (1) FILE_ALL_INFO: CreationTime, IndexNumber, IndexNumber1, FileName
+>      (assuming this isn't flattened to '\' or something for the root of a
+>      share.
+> 
+>  (2) FILE_UNIX_BASIC_INFO: DevMajor, DevMinor, UniqueId.
+> 
+>  (3) FILE_INFO_STANDARD: CreationDate, CreationTime.
+> 
+>  (4) FILE_INFO_BASIC: CreationTime.
+> 
+>  (5) FILE_DIRECTORY_INFO: FileIndex, CreationTime, FileName.
+> 
+>  (6) SEARCH_ID_FULL_DIR_INFO: FileIndex, CreationTime, UniqueId, FileName.
+> 
+>  (7) FILE_BOTH_DIRECTORY_INFO: FileIndex, CreationTime, ShortName, FileName.
+> 
+>  (8) OPEN_RSP_EXT: Fid, CreationTime, VolumeGUID, FileId.
+> 
+> You may have to choose different sets of things, depending on what the server
+> has on offer.  Also, don't forget, if you can't work out whether a share is
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/cifs/inode.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+Did you mean we need to validate differently for different servers?
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 6f0683c..f64b95f 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -723,9 +723,14 @@ cifs_find_inode(struct inode *inode, void *opaque)
- {
- 	struct cifs_fattr *fattr = (struct cifs_fattr *) opaque;
- 
-+	/* don't match inode with different uniqueid */
- 	if (CIFS_I(inode)->uniqueid != fattr->cf_uniqueid)
- 		return 0;
- 
-+	/* don't match inode of different type */
-+	if ((inode->i_mode & S_IFMT) != (fattr->cf_mode & S_IFMT))
-+		return 0;
-+
- 	/*
- 	 * uh oh -- it's a directory. We can't use it since hardlinked dirs are
- 	 * verboten. Disable serverino and return it as if it were found, the
+I just did some testing and it looks like we could rely on CreationTime,
+IndexNumber for validating with Windows servers (FileName is relative to
+the mapped drive) and UniqueId for validating with Samba servers. I did
+not test all possibilities (there could be more).
+
+> coherent or not from the above, you can always use LastWriteTime, ChangeTime
+> and EndOfFile and just discard the whole subtree if they differ.
+> 
+
+Thanks,
+
 -- 
-1.6.6.1
-
+Suresh Jayaraman
