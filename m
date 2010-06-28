@@ -1,64 +1,56 @@
-From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] Ext4: Make file creation time, i_version and
-	i_generation available by xattrs
-Date: Mon, 28 Jun 2010 10:14:44 -0700
-Message-ID: <20100628171444.GB9979@samba1>
-References: <20100628162626.6026.26679.stgit@warthog.procyon.org.uk> <AANLkTikkaRYyUfHILDCKYzXdLi9ORuQs05Rf9TScF_Tz@mail.gmail.com> <20100628164854.GA9979@samba1> <AANLkTilkfPkvyuQvN9zKrrY3DhJZ5iUfa5RXfErFwTiA@mail.gmail.com>
-Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org,
-	jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org,
-	aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, sjayaraman-l3A5Bk7waGM@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <AANLkTilkfPkvyuQvN9zKrrY3DhJZ5iUfa5RXfErFwTiA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Andreas Dilger <adilger@dilger.ca>
+Subject: Re: [PATCH] Ext4: Make file creation time, i_version and i_generation available by xattrs
+Date: Mon, 28 Jun 2010 13:08:41 -0600
+Message-ID: <19AAF9AA-2445-4C73-808B-4AD9C5C7E769@dilger.ca>
+References: <20100628162626.6026.26679.stgit@warthog.procyon.org.uk>
+Mime-Version: 1.0 (Apple Message framework v1078)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Cc: viro@ZenIV.linux.org.uk, smfrench@gmail.com, jlayton@redhat.com,
+	mcao@us.ibm.com, aneesh.kumar@linux.vnet.ibm.com,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, samba-technical@lists.samba.org,
+	sjayaraman@suse.de, linux-ext4@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+In-Reply-To: <20100628162626.6026.26679.stgit@warthog.procyon.org.uk>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Jun 28, 2010 at 12:04:09PM -0500, Steve French wrote:
-> On Mon, Jun 28, 2010 at 11:48 AM, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
-e:
-> > On Mon, Jun 28, 2010 at 11:33:10AM -0500, Steve French wrote:
-> >>
-> >> It would be easy enough to do something similar for crtime for cif=
-s
-> >> (it may also be possible to do something similar to
-> >> i_generation and i_version at least for smb2 but haven't
-> >> experimented to see which servers could return something
-> >> similar to version and generation). =A0I did have a request for
-> >> someone doing a backup application over cifs to return creation
-> >> time so at least this would make sense.
-> >
-> > We already have code in Samba to detect "birthtime"
-> > (st_btime) as a returned member of a stat struct.
-> >
-> > This already works on many other platforms, so I'd
-> > rather just have Linux stat fixed to work with
-> > btime.
->=20
-> That sounds better but it hits the fs, vfs and libc
-> and seems like libc is near impossible to get changes into.
+On 2010-06-28, at 10:26, David Howells wrote:
+> Make the file creation time, inode data version number and inode generation
+> number available on Ext4 by as xattrs named:
+> 
+> 	file.crtime
+> 	file.i_generation
+> 	file.i_version (directories only for ext4)
 
-It's a software project, it gets new features. This
-is a new feature that is necessary to support new
-file system features.
+Some minor nits:
+- I'd prefer calling these "file.generation" and "file.version".
+  I don't think there is value in the "i_" prefix adds anything,
+  and it seems more like an internal detail to me
+- why not expose the ".version" field for regular files?  It seems
+  that all of them are applicable for all file types.
+- it would be good to not introduce a new xattr namespace, since
+  tools like tar (even the RHEL-patched one) will not backup and
+  restore these namespaces.  Using "trusted." would allow them to
+  be backed up and restored using existing xattr-patched GNU tar
+  by root, but wouldn't allow them to be modified by regular users.
+  I think this is important for proper backup/restore of a filesystem,
+  but can have correctness implications and shouldn't be accessible
+  to regular users.
 
-> Seems like in the short term adding xattrs is harmless, and
-> doesn't hurt in the longrun
+> file.crtime=0x53ba244c000000000000000000000000
 
-Yes it does. It's trying to do an end-run around
-adding this into the entire stack where it'll be
-useful for all applications. Samba releases live
-forever. Do you want to be still maintaining the
-"btime as xattr" stuff in 20 years ?
+Is this a binary (host-endian) struct timespec?
 
-=46ix it once, fix it right.
+> file.i_generation=0x0000000000000000
 
-Jeremy.
+This seems odd, i_generation should never be zero, AFAIK.
+
+Cheers, Andreas
+
+
+
+
+
