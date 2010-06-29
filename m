@@ -1,38 +1,34 @@
-From: David Howells <dhowells@redhat.com>
+From: Bernd Schubert <bernd.schubert@fastmail.fm>
 Subject: Re: [PATCH 0/3] Extended file stat functions
-Date: Tue, 29 Jun 2010 21:50:40 +0100
-Message-ID: <24172.1277844640@redhat.com>
-References: <1277843319.4500.17.camel@heimdal.trondhjem.org> <20100629200259.23196.81509.stgit@warthog.procyon.org.uk>
-Cc: dhowells@redhat.com, viro@ZenIV.linux.org.uk, smfrench@gmail.com,
-	jlayton@redhat.com, mcao@us.ibm.com,
-	aneesh.kumar@linux.vnet.ibm.com, linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	samba-technical@lists.samba.org, sjayaraman@suse.de,
-	linux-ext4@vger.kernel.org
-To: Trond Myklebust <trond.myklebust@fys.uio.no>
+Date: Tue, 29 Jun 2010 23:07:41 +0200
+Message-ID: <201006292307.42440.bernd.schubert@fastmail.fm>
+References: <20100629200259.23196.81509.stgit@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: viro@zeniv.linux.org.uk, smfrench@gmail.com, jlayton@redhat.com,
+	mcao@us.ibm.com, aneesh.kumar@linux.vnet.ibm.com,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, samba-technical@lists.samba.org,
+	sjayaraman@suse.de, linux-ext4@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
 Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <1277843319.4500.17.camel@heimdal.trondhjem.org>
+In-Reply-To: <20100629200259.23196.81509.stgit@warthog.procyon.org.uk>
 Sender: linux-ext4-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Trond Myklebust <trond.myklebust@fys.uio.no> wrote:
+On Tuesday, June 29, 2010, David Howells wrote:
+> Implement a pair of new system calls to provide extended and further
+> extensible stat functions.
 
-> There has been a lot of interest in allowing the user to specify exactly
-> which fields they want the filesystem to return, and whether or not the
-> kernel can use cached data or not. The main use is to allow
-> specification of a 'stat light' that could help speed up
-> "readdir()+multiple stat()" type queries. At last year's Filesystem and
-> Storage Workshop, Mark Fasheh actually came up with an initial design:
-> 
->    http://www.kerneltrap.com/mailarchive/linux-fsdevel/2009/4/7/5427274
-> 
-> If we're going to add in a whole new syscall for stat, should we perhaps
-> revisit this discussion?
+Is there any chance we can use that chance and also add a field 
 
-I could certainly absorb that patch.
+unsigned long long st_gen
 
-One further consideration following on from what you said: Is it worth having
-an extended getdents() that can return stat data too?  That might be useful
-for NFS.
+to struct_ xstat? Inode generation numbers really would be useful for 
+userspace NFS servers and some fuse filesystems.
 
-David
+
+Thanks,
+Bernd
