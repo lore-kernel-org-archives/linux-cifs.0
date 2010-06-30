@@ -1,28 +1,127 @@
 From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] Ext4: Make file creation time, i_version and i_generation available by xattrs
-Date: Wed, 30 Jun 2010 00:31:35 +0100
-Message-ID: <32373.1277854295@redhat.com>
-References: <20100629225944.GA22924@samba1> <20100628164854.GA9979@samba1> <20100628162626.6026.26679.stgit@warthog.procyon.org.uk> <AANLkTikkaRYyUfHILDCKYzXdLi9ORuQs05Rf9TScF_Tz@mail.gmail.com> <26197.1277851477@redhat.com>
-Cc: dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-	viro@zeniv.linux.org.uk, jlayton@redhat.com, mcao@us.ibm.com,
-	aneesh.kumar@linux.vnet.ibm.com, linux-cifs@vger.kernel.org,
+Subject: [PATCH 2/3] AFS: Use i_generation not i_version for the vnode
+	uniquifier [ver #2]
+Date: Wed, 30 Jun 2010 02:17:07 +0100
+Message-ID: <20100630011707.18960.43471.stgit@warthog.procyon.org.uk>
+References: <20100630011656.18960.4255.stgit@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
 	samba-technical@lists.samba.org, sjayaraman@suse.de,
 	linux-ext4@vger.kernel.org
-To: Jeremy Allison <jra@samba.org>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <20100629225944.GA22924@samba1>
-Sender: linux-ext4-owner@vger.kernel.org
+To: viro@ZenIV.linux.org.uk, smfrench@gmail.com, jlayton@redhat.com,
+	mcao@us.ibm.com, aneesh.kumar@linux.vnet.ibm.com
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100630011656.18960.4255.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Jeremy Allison <jra@samba.org> wrote:
+Store the AFS vnode uniquifier in the i_generation field, not the i_version
+field of the inode struct.  i_version can then be given the AFS data version
+number.
 
-> > Googling for st_btime suggests it could also be taken as the time last
-> > archived.  That may just be a NetWareism though.
-> 
-> It's a *BSD'ism.
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
 
-I meant that st_btime meaning "last archive time" may be a NetWareism.  That
-seems to get more hits than anything else.
+ fs/afs/dir.c      |    8 ++++----
+ fs/afs/fsclient.c |    3 ++-
+ fs/afs/inode.c    |   10 +++++-----
+ 3 files changed, 11 insertions(+), 10 deletions(-)
 
-David
+diff --git a/fs/afs/dir.c b/fs/afs/dir.c
+index b42d5cc..afb9ff8 100644
+--- a/fs/afs/dir.c
++++ b/fs/afs/dir.c
+@@ -542,11 +542,11 @@ static struct dentry *afs_lookup(struct inode *dir, struct dentry *dentry,
+ 	dentry->d_op = &afs_fs_dentry_operations;
+ 
+ 	d_add(dentry, inode);
+-	_leave(" = 0 { vn=%u u=%u } -> { ino=%lu v=%llu }",
++	_leave(" = 0 { vn=%u u=%u } -> { ino=%lu v=%u }",
+ 	       fid.vnode,
+ 	       fid.unique,
+ 	       dentry->d_inode->i_ino,
+-	       (unsigned long long)dentry->d_inode->i_version);
++	       dentry->d_inode->i_generation);
+ 
+ 	return NULL;
+ }
+@@ -626,10 +626,10 @@ static int afs_d_revalidate(struct dentry *dentry, struct nameidata *nd)
+ 		 * been deleted and replaced, and the original vnode ID has
+ 		 * been reused */
+ 		if (fid.unique != vnode->fid.unique) {
+-			_debug("%s: file deleted (uq %u -> %u I:%llu)",
++			_debug("%s: file deleted (uq %u -> %u I:%u)",
+ 			       dentry->d_name.name, fid.unique,
+ 			       vnode->fid.unique,
+-			       (unsigned long long)dentry->d_inode->i_version);
++			       dentry->d_inode->i_generation);
+ 			spin_lock(&vnode->lock);
+ 			set_bit(AFS_VNODE_DELETED, &vnode->flags);
+ 			spin_unlock(&vnode->lock);
+diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
+index 4bd0218..346e328 100644
+--- a/fs/afs/fsclient.c
++++ b/fs/afs/fsclient.c
+@@ -89,7 +89,7 @@ static void xdr_decode_AFSFetchStatus(const __be32 **_bp,
+ 			i_size_write(&vnode->vfs_inode, size);
+ 			vnode->vfs_inode.i_uid = status->owner;
+ 			vnode->vfs_inode.i_gid = status->group;
+-			vnode->vfs_inode.i_version = vnode->fid.unique;
++			vnode->vfs_inode.i_generation = vnode->fid.unique;
+ 			vnode->vfs_inode.i_nlink = status->nlink;
+ 
+ 			mode = vnode->vfs_inode.i_mode;
+@@ -102,6 +102,7 @@ static void xdr_decode_AFSFetchStatus(const __be32 **_bp,
+ 		vnode->vfs_inode.i_ctime.tv_sec	= status->mtime_server;
+ 		vnode->vfs_inode.i_mtime	= vnode->vfs_inode.i_ctime;
+ 		vnode->vfs_inode.i_atime	= vnode->vfs_inode.i_ctime;
++		vnode->vfs_inode.i_version	= data_version;
+ 	}
+ 
+ 	expected_version = status->data_version;
+diff --git a/fs/afs/inode.c b/fs/afs/inode.c
+index d00b312..ee3190a 100644
+--- a/fs/afs/inode.c
++++ b/fs/afs/inode.c
+@@ -73,7 +73,8 @@ static int afs_inode_map_status(struct afs_vnode *vnode, struct key *key)
+ 	inode->i_ctime.tv_nsec	= 0;
+ 	inode->i_atime		= inode->i_mtime = inode->i_ctime;
+ 	inode->i_blocks		= 0;
+-	inode->i_version	= vnode->fid.unique;
++	inode->i_generation	= vnode->fid.unique;
++	inode->i_version	= vnode->status.data_version;
+ 	inode->i_mapping->a_ops	= &afs_fs_aops;
+ 
+ 	/* check to see whether a symbolic link is really a mountpoint */
+@@ -98,7 +99,7 @@ static int afs_iget5_test(struct inode *inode, void *opaque)
+ 	struct afs_iget_data *data = opaque;
+ 
+ 	return inode->i_ino == data->fid.vnode &&
+-		inode->i_version == data->fid.unique;
++		inode->i_generation == data->fid.unique;
+ }
+ 
+ /*
+@@ -110,7 +111,7 @@ static int afs_iget5_set(struct inode *inode, void *opaque)
+ 	struct afs_vnode *vnode = AFS_FS_I(inode);
+ 
+ 	inode->i_ino = data->fid.vnode;
+-	inode->i_version = data->fid.unique;
++	inode->i_generation = data->fid.unique;
+ 	vnode->fid = data->fid;
+ 	vnode->volume = data->volume;
+ 
+@@ -306,8 +307,7 @@ int afs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+ 
+ 	inode = dentry->d_inode;
+ 
+-	_enter("{ ino=%lu v=%llu }", inode->i_ino,
+-		(unsigned long long)inode->i_version);
++	_enter("{ ino=%lu v=%u }", inode->i_ino, inode->i_generation);
+ 
+ 	generic_fillattr(inode, stat);
+ 	return 0;
+
