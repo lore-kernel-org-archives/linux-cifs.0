@@ -1,84 +1,99 @@
-From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Subject: Re: [PATCH 3/3] Add a pair of system calls to make extended file stats available [ver #2]
-Date: Wed, 30 Jun 2010 13:46:41 +0200
-Message-ID: <201006301346.41902.arnd@arndb.de>
-References: <201006301131.37241.arnd@arndb.de> <25470.1277888151@redhat.com> <29346.1277892068@redhat.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Linux CIFS NTLMSSP mount failing against win2k8
+Date: Wed, 30 Jun 2010 07:55:30 -0400
+Message-ID: <20100630075530.4d5263c1@corrin.poochiereds.net>
+References: <20100410181730.7fa0af32@tlielax.poochiereds.net>
+	<j2n4a4634331004102109k49cfb3f0gdaafcd712a972c01@mail.gmail.com>
+	<1277853910.2423.5.camel@ruth>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org, aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	sjayaraman-l3A5Bk7waGM@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT"; protocol="application/pgp-signature"
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <29346.1277892068-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1277853910.2423.5.camel@ruth>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wednesday 30 June 2010, David Howells wrote:
-> Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
-> > No, I think that would be worse than the current version. But if you remove
-> > the structure version in favor of the flags, you only need six arguments
-> > anyway.
-> 
-> I want to keep the structure version, just in case we need to expand fields in
-> the stat struct in future.  Otherwise we may need to create yet another stat
-> syscall.
+--Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-How many versions do you expect we need in the next 10 years, not counting
-those where you just add a new field to the structure?
+On Wed, 30 Jun 2010 09:25:10 +1000
+Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-Given a 64 bit flag word, you can start using bits for the version from
-the top and bits from the bottom for fields:
+> On Sat, 2010-04-10 at 23:09 -0500, Shirish Pargaonkar wrote:
+> > On Sat, Apr 10, 2010 at 5:17 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> > > I've been playing with NTLMSSP today in CIFS, and have run across a
+> > > problem. The Session Setup using Raw NTLMSSP succeeds, but then after=
+ward
+> > > the tree connect fails with STATUS_ACCESS_DENIED. The odd thing is th=
+at
+> > > if authenticate as the same user using krb5, then it works fine.
+> > > smbclient does SPNEGO encapsulated NTLMSSP and the tree connect it do=
+es
+> > > works fine as well.
+> > >
+> > > Attached is a capture that shows two "mount attempts". The first one
+> > > fails (that the Linux CIFS one). The second succeeds -- that's the
+> > > Linux CIFS one.
+> > >
+> > > The code I'm using is slightly modified so that the tree connect is
+> > > closer to identical to what smbclient does. That doesn't get around t=
+he
+> > > problem though. I assume that there must be something wrong with the
+> > > session setup, but since it succeeds it seems like it ought to work...
+> > >
+> > > Does anyone have any clue as to what the problem is? Or does anyone
+> > > know how to make win2k8 tell me why it's refusing the tree connect? T=
+he
+> > > event viewer seems to be pretty useless for this, but maybe I'm just
+> > > not looking in the right place?
+> > >
+> > > --
+> > > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > >
+> >=20
+> > Jeff,
+> >=20
+> > You can see if this code change,
+> >   cifs_MD5_update(&context, (char *)&key->data, 16);
+> > insetead of
+> >  cifs_MD5_update(&context, (char *)&key->data, key->len);
+> > in function cifs_calculate_signature() works.
+>=20
+> If I had some context, I would be able to advise if this is correct.  If
+> this is the application of the 'session key' to the SMB singing (the MD5
+> with the actual packet), then this is important, but only for Kerberos,
+> not NTLMSSP, which for all versions returns a 16 byte key.=20
+>=20
 
-#define XSTAT_DEV  0x00000001
-#define XSTAT_INO  0x00000002
-#define XSTAT_MODE 0x00000004
-...
-#define XSTAT_LAYOUT_VERSION_2 0x8000000000000000
-#define XSTAT_LAYOUT_VERSION_1 0x0000000000000000
+(dropping old linux-cifs-client list and adding new one to cc list)
 
-> > You can also go further and fold the structure length into flags, because
-> > the length is just a function of the data you are passing.
-> 
-> The potential problem with passing the flags as a syscall argument is that
-> we're then limited to a single 32-bit integer.  It might be enough, but if I
-> do as at least one person has suggested and assign each field in the struct
-> its own bit, that uses up half right there, plus I'd like to add at least one
-> operational flag (to force synchronisation with the server).
+Unfortunately, I haven't had time to spend on this in a while so I
+haven't really given it the time it deserves.  My gut feeling is that
+there are enough questionable portions of this code in CIFS that it
+really needs an overhaul from "first principles" -- starting by making
+the encryption algorithms use the standard kernel crypto libs and a
+review of what NTLMSSP flags are being set in the negotation. Some of
+that may just be my lack of familiarity with the code, but a lot of the
+unicode conversion in smbencrypt.c looks questionable.
 
-I'd imagine that there would be some reasonable way to group some of the
-fields so that 32 bits last long enough. Alternatively, you can also make
-it a 64 bit argument everywhere, which has some other small disadvantages.
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-> > Having a system call with flags, size and version is like wearing a belt,
-> > braces and suspenders. An unsigned long flags argument should be enough to
-> > hold up your pants[1].
-> 
-> I would like the size argument for two reasons: firstly, to prevent buffer
-> overruns and, secondly, because I can see some scope for variable-size fields
-> (such as for volume IDs or security labels), though the latter might be better
-> handled through getxattr() (which would mean extra overhead).
+--Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
 
-The idea of a syscall API with multiple fixed-length and variable-length
-fields in the same structure scares me. If you want to go this far,
-it may be better to base the interface on netlink and allow querying
-multiple files at once.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
 
-For a classic syscall interface, I'd just stay away from variable-length
-data and use either fixed-length fields or spend the extra overhead for
-the getxattr values.
+iEYEARECAAYFAkwrMLcACgkQyP0gxQMdzICQ/wCdEU2qtTJI4vfH4gck1gfHqTAt
+9gwAn3lkOKwSzdrvZZECsw58SGmxavI7
+=MMwv
+-----END PGP SIGNATURE-----
 
-When all members of struct xstat are fixed length, you can simply add
-new members at the end and add the associated flags at the same time.
-Any code built against a given header file can only ask for the fields
-that are part of the struct definition it uses. The kernel should
-obviously only write the fields that the user asked for, in case the
-user was built against an older header file. You can also maintain
-forward compatibility if the kernel sets a bitmask in the struct with
-the fields it has returned.
-
-	Arnd
+--Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT--
