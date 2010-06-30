@@ -1,99 +1,111 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Linux CIFS NTLMSSP mount failing against win2k8
-Date: Wed, 30 Jun 2010 07:55:30 -0400
-Message-ID: <20100630075530.4d5263c1@corrin.poochiereds.net>
-References: <20100410181730.7fa0af32@tlielax.poochiereds.net>
-	<j2n4a4634331004102109k49cfb3f0gdaafcd712a972c01@mail.gmail.com>
-	<1277853910.2423.5.camel@ruth>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=PGP-SHA1;
- boundary="Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT"; protocol="application/pgp-signature"
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1277853910.2423.5.camel@ruth>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 0/3] Extended file stat functions [ver #2]
+Date: Wed, 30 Jun 2010 13:05:44 +0100
+Message-ID: <26505.1277899544@redhat.com>
+References: <52423201-3DF9-4045-8E8B-FAA915053D56@dilger.ca> <20100630011656.18960.4255.stgit@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, viro@ZenIV.linux.org.uk, smfrench@gmail.com,
+	jlayton@redhat.com, mcao@us.ibm.com,
+	aneesh.kumar@linux.vnet.ibm.com, linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+	samba-technical@lists.samba.org, sjayaraman@suse.de,
+	linux-ext4@vger.kernel.org
+To: Andreas Dilger <adilger@dilger.ca>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+In-Reply-To: <52423201-3DF9-4045-8E8B-FAA915053D56@dilger.ca>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
---Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Andreas Dilger <adilger@dilger.ca> wrote:
 
-On Wed, 30 Jun 2010 09:25:10 +1000
-Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> Doesn't glibc use two 64-bit values for devices?
 
-> On Sat, 2010-04-10 at 23:09 -0500, Shirish Pargaonkar wrote:
-> > On Sat, Apr 10, 2010 at 5:17 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > > I've been playing with NTLMSSP today in CIFS, and have run across a
-> > > problem. The Session Setup using Raw NTLMSSP succeeds, but then after=
-ward
-> > > the tree connect fails with STATUS_ACCESS_DENIED. The odd thing is th=
-at
-> > > if authenticate as the same user using krb5, then it works fine.
-> > > smbclient does SPNEGO encapsulated NTLMSSP and the tree connect it do=
-es
-> > > works fine as well.
-> > >
-> > > Attached is a capture that shows two "mount attempts". The first one
-> > > fails (that the Linux CIFS one). The second succeeds -- that's the
-> > > Linux CIFS one.
-> > >
-> > > The code I'm using is slightly modified so that the tree connect is
-> > > closer to identical to what smbclient does. That doesn't get around t=
-he
-> > > problem though. I assume that there must be something wrong with the
-> > > session setup, but since it succeeds it seems like it ought to work...
-> > >
-> > > Does anyone have any clue as to what the problem is? Or does anyone
-> > > know how to make win2k8 tell me why it's refusing the tree connect? T=
-he
-> > > event viewer seems to be pretty useless for this, but maybe I'm just
-> > > not looking in the right place?
-> > >
-> > > --
-> > > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > >
-> >=20
-> > Jeff,
-> >=20
-> > You can see if this code change,
-> >   cifs_MD5_update(&context, (char *)&key->data, 16);
-> > insetead of
-> >  cifs_MD5_update(&context, (char *)&key->data, key->len);
-> > in function cifs_calculate_signature() works.
->=20
-> If I had some context, I would be able to advise if this is correct.  If
-> this is the application of the 'session key' to the SMB singing (the MD5
-> with the actual packet), then this is important, but only for Kerberos,
-> not NTLMSSP, which for all versions returns a 16 byte key.=20
->=20
+So it would seem.  Does Linux need to, though?
 
-(dropping old linux-cifs-client list and adding new one to cc list)
+> I dislike sequential "version" fields (which are "all or nothing"), and
+> prefer the ext2/3/4-like "feature flags" that allow the caller to state what
+> features and fields it expects and/or understands.  This allows
+> extensibility without unduly breaking compatibility.
 
-Unfortunately, I haven't had time to spend on this in a while so I
-haven't really given it the time it deserves.  My gut feeling is that
-there are enough questionable portions of this code in CIFS that it
-really needs an overhaul from "first principles" -- starting by making
-the encryption algorithms use the standard kernel crypto libs and a
-review of what NTLMSSP flags are being set in the negotation. Some of
-that may just be my lack of familiarity with the code, but a lot of the
-unicode conversion in smbencrypt.c looks questionable.
+My aim was to avoid the need to create new stat syscalls in the future by
+making it possible to increment the version number you're asking for.
 
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > 		unsigned int		st_uid;
+> > 		unsigned int		st_gid;
+> 
+> In struct stat64 it uses "unsigned long" for both st_uid and st_gid.  Having
+> a 64-bit value here is useful for CIFS servers to be able to remap different
+> UID domains into a 32-bit domain and a 32-bit UID.  If you change this,
+> please remember to reorder the fields for proper 64-bit alignment.
 
---Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
+glibc, on the other hand, only supports 32-bits for these.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
+My thought was that I could add extension fields to provide access to the
+remote username/UID/GID values as well as the local UID/GID (since the latter
+are used by the permission checking routines in the local VFS).
 
-iEYEARECAAYFAkwrMLcACgkQyP0gxQMdzICQ/wCdEU2qtTJI4vfH4gck1gfHqTAt
-9gwAn3lkOKwSzdrvZZECsw58SGmxavI7
-=MMwv
------END PGP SIGNATURE-----
+> I wouldn't object to having a 128-bit st_ino field, since this is what
+> Lustre will be using internally in the next release.
 
---Sig_/=Zc.3B4Dg/ulPfGfWxeT9oT--
+I wonder how best to represent 128-bit numbers.
+
+	unsigned long long long
+
+gives:
+
+	include/linux/stat.h:151: error: 'long long long' is too long for GCC
+
+so perhaps something like:
+
+	struct xstat_u128 { unsigned long long lsw, msw; };
+
+however, I suspect the kernel will require a bit of reengineering to handle a
+pgoff_t and loff_t of 128-bits.
+
+> What is also very convenient that I learned Solaris stat() does is it
+> returns the device size in st_size for a block device file.  This is very
+> convenient, and avoids the morass of ioctls and "binary llseek guessing"
+> used by libext2fs and libblkid to determine the size of a block device.  Any
+> reason not to add this into this new syscall?
+
+That's a separate problem.  That can be implemented now by overriding getattr
+on blockdev files.  You could also set st_blocks and st_blksize to indicate
+parameters of the blockdev - though that may upset df, I suppose.
+
+> It is inconsistent to have all the other fields use the "st_" prefix, but
+> "query_flags" and "struct_version" do not have this prefix.
+
+They are a different sort of field (metametadata, I suppose).  But I can add
+that on if you'd prefer.
+
+> It wouldn't be a bad idea to interleave these flags with each of the fields
+> that they represent, to make it more clear what is included in each.
+
+Or comments could be used for that.
+
+> > 	#define XSTAT_QUERY__ORDINARY_SET	0x00000017ULL
+> > 	#define XSTAT_QUERY__GET_ANYWAY		0x0000007fULL
+> 
+> Could you provide some information what the semantic distinction between
+> these is?  It might be useful to have an "XSTAT_QUERY_LEGACY_STAT" mask that
+> returns only the fields that are in the previous struct stat, unless that is
+> what "ORDINARY_SET" means, in which case it should be renamed I think.
+
+XSTAT_QUERY_LEGACY_STAT is XSTAT_QUERY__ORDINARY_SET.  Is "legacy" an
+appropriate appellation, though?  They're the set most people expect to see
+and want to use.
+
+> > 	#define XSTAT_QUERY__DEFINED_SET	0x0000007fULL
+> 
+> It is smart to have a "DEFINED_SET" mask that maps to the
+> currently-understood fields.  This ensures that applications compiled
+> against a specific set of headers/struct will not request fields which they
+> don't understand.  It might be better to call this "XSTAT_QUERY_ALL" so that
+> it is more easily understood and used by callers, instead of the incorrect
+> "-1" or "~0" that some may be tempted to use if they don't understand what
+> "__DEFINED_SET" means.
+
+Passing -1 (or ULONGLONG_MAX) to get everything would be reasonable.
+
+This should probably be an internal kernel constant.
+
+David
