@@ -1,40 +1,81 @@
-From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Subject: Re: [PATCH 0/3] Extended file stat functions [ver #2]
-Date: Thu, 1 Jul 2010 10:09:32 +0200
-Message-ID: <201007011009.33197.arnd@arndb.de>
-References: <FB78A152-53D3-4000-ABDB-9D6051ECB887@dilger.ca> <30875.1277939713@redhat.com> <84225B35-7365-4DE2-8920-5741011B347C@dilger.ca>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [linux-cifs-client] Linux CIFS NTLMSSP mount failing against
+	win2k8
+Date: Thu, 1 Jul 2010 12:22:35 -0500
+Message-ID: <AANLkTil7d6jny1qklx16KtopjjwpCPAw6jECBxmnCfKF@mail.gmail.com>
+References: <20100410181730.7fa0af32@tlielax.poochiereds.net>
+	<20100411064103.3ec408a1@tlielax.poochiereds.net>
+	<m2u4a4634331004111242u2954f28fh4bd703922c9aa534@mail.gmail.com>
+	<20100411194008.77aad10c@corrin.poochiereds.net>
+	<1271199692.2518.19.camel@naomi.s4.naomi.abartlet.net>
+	<20100414082944.3fc80df9@tlielax.poochiereds.net>
+	<20100414113453.6a523b21@tlielax.poochiereds.net>
+	<20100416224413.60b4566a@tlielax.poochiereds.net>
+	<1271483903.28751.4.camel@naomi.s4.naomi.abartlet.net>
+	<20100417062900.75e94f36@tlielax.poochiereds.net>
+	<n2m4a4634331004210729u77f95ed6m329464437b5c3eeb@mail.gmail.com>
+	<20100421161950.20fb979a@tlielax.poochiereds.net>
+	<AANLkTime8fdm-Wbu2PT1rXw0edjzE1-4pTVJpHWcYUd0@mail.gmail.com>
+	<1277767520.2276.41.camel@ruth>
 Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org,
-	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org,
-	aneesh.kumar-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, sjayaraman-l3A5Bk7waGM@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <84225B35-7365-4DE2-8920-5741011B347C-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+In-Reply-To: <1277767520.2276.41.camel@ruth>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thursday 01 July 2010 06:57:07 Andreas Dilger wrote:
-> If a future kernel gets a new static field at st_extra_results (say
-> unsigned long long st_ino_high) with a new flag XSTAT_REQUEST_INO_HIGH
-> 0x000040000ULL the kernel will think that the old app is requesting 
-> this field, and will fill in the 64-bit field at st_extra_results[1]
-> (which the old app didn't allocate space for, nor does it understand)
-> and may get a segfault, or stack smashing, or random heap corruption.
+On Mon, Jun 28, 2010 at 6:25 PM, Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> w=
+rote:
+> On Mon, 2010-06-28 at 17:47 -0500, Shirish Pargaonkar wrote:
+>
+>> When I look at Windows - Windows smb2 traces, the (16 bytes) signatu=
+re
+>> looks nothing like
+>> version (which is 1), ciphertext of 8 bytes of hmac-md5, sequence nu=
+mber
+>
+> SMB2 SMB Signing does not use the NTLMSSP packet signing algorithm.
+> Instead, like SMB, it takes the session key already calculated and
+> applies a unique-to-SMB2 algorithm to it. =A0This involves sha256 I
+> think.
+>
+> Andrew Bartlett
+>
+> --
+> Andrew Bartlett =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0http://samba.org/~abartlet/
+> Authentication Developer, Samba Team =A0 =A0 =A0 =A0 =A0 http://samba=
+=2Eorg
+> Samba Developer, Cisco Inc.
+>
 
-That depends on whether the struct contains a 'buflen' field or not
-(it may be part of the struct, as a syscall argument, or in a second struct).
-I argue that it should not contain a buflen field and that users should
-consequently not set bits that they don't know about to prevent the
-scenario you describe.
 
-If the buflen stays in, it will prevent the stack smashing part,
-but add extra complexity in the interface, which can cause other
-problems.
+I have had luck with some kernel crypto apis while working on this code=
+=2E
+I have been able to use arc4 and md5 hash apis successfully while
+not being able to figure out hmac-md5 apis and I had not even
+looked at sha, which I will.
 
-	Arnd
+What is confusing to me is, current cifs code using ntlmv2 within
+ntlmssp authenticates and signs against Windows 2003 server
+successfully/
+
+But it does not against Windows 7 and Windows 2008 (I do not have
+a Windows Vista installation). I am currently changing to code and
+I am sure I would be able to authenticate using ntlmv2 within ntlmssp.
+singing is what is confusing.
+
+With smb2 client also, I can authenticate against Windows 7 and
+Windows 2008 but signing fails.
+
+So I am confused about what algorithm to use for cifs to sign
+against Windows 7 and Windows 2008 server for ntlmv2 within ntlmssp
+and what algorithm to use for smb2 to sign against a Windows 7
+and Windows 2008 server for ntlmv2 within ntlmssp.
+
+I have been reading and following MS-NLMP and
+http://davenport.sourceforge.net/ntlm.html
