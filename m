@@ -1,37 +1,46 @@
-From: =?iso-8859-1?Q?=22Gr=F6tzner=2C_Frank=22?= <Frank.Groetzner-R0rMR074xlY@public.gmane.org>
-Subject: cifs mount with krb5 and keytab
-Date: Mon, 5 Jul 2010 09:21:52 +0200
-Message-ID: <56FD80EC8AC18D4285D6A4C76A79529F08D755E8@srv-os01-12.buw.local>
+From: Kulikov Vasiliy <segooon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: silence compiler warning
+Date: Mon,  5 Jul 2010 12:01:09 +0400
+Message-ID: <1278316870-29112-1-git-send-email-segooon@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Kernel Janitors <kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-class: urn:content-classes:message
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+If buf is NULL then ppdata is unitialized after exit from validate_ntra=
+nsact().
+In this case we do not use ppdata, but compiler warns us. Make it happy=
+=2E
 
-I hope I'm on the right list for this question. I'm using debian lenny and have to mount
-a W2k3 share with kerberos and read the user credentials from a keytab.
-I found this patch for the old cifs.spnego, but it doesn't seem to be implemented in any
-version of cifs.upcall: http://fixunix.com/samba/374582-keytab-support-cifs-spnego-helper.html
+This patch silences a compiler warning:
+fs/cifs/cifssmb.c: In function =E2=80=98CIFSSMBGetCIFSACL=E2=80=99:
+fs/cifs/cifssmb.c:3082: warning: =E2=80=98pdata=E2=80=99 may be used un=
+initialized in this function
 
-If I get my credentials with "kinit foo" and mount the share afterwards using
-"mount -t cifs -o sec=krb5,guest ..." it works fine. But if I try something like
-"mount -t cifs -o username=foo,password=fake,sec=krb5 ..." I get "mount error 126 = Required
-key not available"
+Signed-off-by: Kulikov Vasiliy <segooon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifssmb.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-My /etc/request-keys.conf looks like this:
-#OP		TYPE			DESCRIPTION		CALLOUT INFO	PROGRAM ARG1 ARG2 ARG3 ...
-#======	===============	===============	===============	===============================
-create	cifs.spnego		*			*			/usr/sbin/cifs.upcall -c %k
-create	dns_resolver	*			*			/usr/sbin/cifs.upcall %k
-
-So what's the right way to to this? If there is no possibility, will it be sufficient to
-have the credentials only at mount-time or do I have to renew them all the time the mount
-exists?
-
-Regards,
- Frank
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index c65c341..22805e2 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -2506,6 +2506,7 @@ validate_ntransact(char *buf, char **ppparm, char=
+ **ppdata,
+=20
+ 	*pdatalen =3D 0;
+ 	*pparmlen =3D 0;
++	*ppdata =3D 0;
+=20
+ 	if (buf =3D=3D NULL)
+ 		return -EINVAL;
+--=20
+1.7.0.4
