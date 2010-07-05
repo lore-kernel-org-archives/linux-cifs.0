@@ -1,172 +1,99 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 02/09] cifs: register CIFS for caching
-Date: Mon,  5 Jul 2010 18:11:50 +0530
-Message-ID: <1278333710-30557-1-git-send-email-sjayaraman@suse.de>
+From: Suresh Jayaraman <sjayaraman@suse.de>
+Subject: [PATCH 00/09] cifs: local caching support using
+	FS-Cache
+Date: Mon,  5 Jul 2010 18:11:03 +0530
+Message-ID: <1278333663-30464-1-git-send-email-sjayaraman@suse.de>
 References: <Yes>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Reply-To: Linux filesystem caching discussion list <linux-cachefs@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-cachefs@redhat.com
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-cachefs-bounces@redhat.com>
 In-Reply-To: <Yes>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/linux-cachefs>,
+	<mailto:linux-cachefs-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/linux-cachefs>
+List-Post: <mailto:linux-cachefs@redhat.com>
+List-Help: <mailto:linux-cachefs-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/linux-cachefs>,
+	<mailto:linux-cachefs-request@redhat.com?subject=subscribe>
+Sender: linux-cachefs-bounces@redhat.com
+Errors-To: linux-cachefs-bounces@redhat.com
+List-Id: linux-cifs.vger.kernel.org
 
-Define CIFS for FS-Cache and register for caching. Upon registration the
-top-level index object cookie will be stuck to the netfs definition by
-FS-Cache.
+This patchset is a second try at adding persistent, local caching facility for
+CIFS using the FS-Cache interface.
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/Makefile  |    2 ++
- fs/cifs/cache.c   |   46 ++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsfs.c  |    8 ++++++++
- fs/cifs/fscache.h |   39 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 95 insertions(+)
- create mode 100644 fs/cifs/cache.c
- create mode 100644 fs/cifs/fscache.h
+The cache index hierarchy which is mainly used to locate a file object or
+discard a certain subset of the files cached, currently has three levels:
+	- Server
+	- Share 
+	- File
 
-Index: cifs-2.6/fs/cifs/Makefile
-===================================================================
---- cifs-2.6.orig/fs/cifs/Makefile
-+++ cifs-2.6/fs/cifs/Makefile
-@@ -11,3 +11,5 @@ cifs-y := cifsfs.o cifssmb.o cifs_debug.
- cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
- 
- cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
-+
-+cifs-$(CONFIG_CIFS_FSCACHE) += cache.o
-Index: cifs-2.6/fs/cifs/cache.c
-===================================================================
---- /dev/null
-+++ cifs-2.6/fs/cifs/cache.c
-@@ -0,0 +1,46 @@
-+/*
-+ *   fs/cifs/cache.c - CIFS filesystem cache index structure definitions
-+ *
-+ *   Copyright (c) 2010 Novell, Inc.
-+ *   Authors(s): Suresh Jayaraman (sjayaraman-l3A5Bk7waGM@public.gmane.org>
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+#include "fscache.h"
-+
-+/*
-+ * CIFS filesystem definition for FS-Cache
-+ */
-+struct fscache_netfs cifs_fscache_netfs = {
-+	.name = "cifs",
-+	.version = 0,
-+};
-+
-+/*
-+ * Register CIFS for caching with FS-Cache
-+ */
-+int cifs_fscache_register(void)
-+{
-+	return fscache_register_netfs(&cifs_fscache_netfs);
-+}
-+
-+/*
-+ * Unregister CIFS for caching
-+ */
-+void cifs_fscache_unregister(void)
-+{
-+	fscache_unregister_netfs(&cifs_fscache_netfs);
-+}
-+
-Index: cifs-2.6/fs/cifs/cifsfs.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/cifsfs.c
-+++ cifs-2.6/fs/cifs/cifsfs.c
-@@ -47,6 +47,7 @@
- #include <linux/key-type.h>
- #include "dns_resolve.h"
- #include "cifs_spnego.h"
-+#include "fscache.h"
- #define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
- 
- int cifsFYI = 0;
-@@ -902,6 +903,10 @@ init_cifs(void)
- 		cFYI(1, "cifs_max_pending set to max of 256");
- 	}
- 
-+	rc = cifs_fscache_register();
-+	if (rc)
-+		goto out;
-+
- 	rc = cifs_init_inodecache();
- 	if (rc)
- 		goto out_clean_proc;
-@@ -951,6 +956,8 @@ init_cifs(void)
- 	cifs_destroy_inodecache();
-  out_clean_proc:
- 	cifs_proc_clean();
-+	cifs_fscache_unregister();
-+ out:
- 	return rc;
- }
- 
-@@ -959,6 +966,7 @@ exit_cifs(void)
- {
- 	cFYI(DBG2, "exit_cifs");
- 	cifs_proc_clean();
-+	cifs_fscache_unregister();
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	cifs_dfs_release_automount_timer();
- 	unregister_key_type(&key_type_dns_resolver);
-Index: cifs-2.6/fs/cifs/fscache.h
-===================================================================
---- /dev/null
-+++ cifs-2.6/fs/cifs/fscache.h
-@@ -0,0 +1,39 @@
-+/*
-+ *   fs/cifs/fscache.h - CIFS filesystem cache interface definitions
-+ *
-+ *   Copyright (c) 2010 Novell, Inc.
-+ *   Authors(s): Suresh Jayaraman (sjayaraman-l3A5Bk7waGM@public.gmane.org>
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+#ifndef _CIFS_FSCACHE_H
-+#define _CIFS_FSCACHE_H
-+
-+#include <linux/fscache.h>
-+
-+#ifdef CONFIG_CIFS_FSCACHE
-+
-+extern struct fscache_netfs cifs_fscache_netfs;
-+
-+extern int cifs_fscache_register(void);
-+extern void cifs_fscache_unregister(void);
-+
-+#else /* CONFIG_CIFS_FSCACHE */
-+static inline int cifs_fscache_register(void) { return 0; }
-+static inline void cifs_fscache_unregister(void) {}
-+
-+#endif /* CONFIG_CIFS_FSCACHE */
-+
-+#endif /* _CIFS_FSCACHE_H */
+The server index object is keyed by IPaddress of the server, socket family
+and the port. The superblock index object is keyed by the sharename and the
+inode object is keyed by the UniqueId. The cache coherency is ensured by
+checking the LastWriteTime, LastChangeTime and end of file (eof) reported by
+the server.
+
+Changes since last post:
+-------------------------
+   - fix a bug during registration with FS-Cache
+   - fix a bug while storing pages to the cache. The earlier set needed an rsize
+     of 4096 to make caching working properly due to this bug.
+   - server index key uses {IPaddress,family,port} tuple instead of servername
+   - root dir of the share is validated by UniqueId/IndexNumber. Almost all
+     servers seem to provide one of them and it's unique.
+   - we now check LastWriteTime, LastChangeTime and eof of server for data
+     coherency. CreateTime could be considered once some of related development
+     effort advances
+   - dropped the patch to guard cifsglob.h against multiple inclusion as it
+     has been included in Jeff Layton's tree
+   - some cleanups
+
+To try these patches:
+
+   - apply this patchset in order
+   - mount the share, for e.g. mount -t cifs //server/share -o user=guest
+   - try copying a huge file (say few hundred MBs) from mount point to local
+     filesystem (during the first time, the cache will be initialized)
+   - when you copy the second time, it should be read from the local cache (you
+     could unmount and remount to reduce the page cache impact).
+
+
+Known issues
+--------------
+   - when the 'noserverino' mount option is used, the client generates
+     UniqueId itself rather than using the UniqueId from the server. As
+     we use UniqueId to ensure that the root directory did not change
+     under the hood, we won't be able to benefit from the cache.
+   - the cache coherency check may not be reliable always as some
+     CIFS servers are known not to update mtime until the filehandle is closed.
+
+Suresh Jayaraman (09):
+  cifs: add kernel config option for CIFS Client caching support
+  cifs: register CIFS for caching
+  cifs: define server-level cache index objects and register them with FS-Cache
+  cifs: define superblock-level cache index objects and register them
+  cifs: define inode-level cache object and register them
+  cifs: FS-Cache page management
+  cifs: store pages into local cache
+  cifs: read pages from FS-Cache
+  cifs: add mount option to enable local caching
+
+
+ Kconfig      |    9 +
+ Makefile     |    2 
+ cache.c      |  331 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ cifs_fs_sb.h |    1 
+ cifsfs.c     |   15 ++
+ cifsglob.h   |   10 +
+ connect.c    |   16 ++
+ file.c       |   50 ++++++++
+ fscache.c    |  236 ++++++++++++++++++++++++++++++++++++++++++
+ fscache.h    |  136 ++++++++++++++++++++++++
+ inode.c      |    7 +
+ 11 files changed, 813 insertions(+)
