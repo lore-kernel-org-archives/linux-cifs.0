@@ -1,99 +1,244 @@
 From: Suresh Jayaraman <sjayaraman@suse.de>
-Subject: [PATCH 00/09] cifs: local caching support using
-	FS-Cache
-Date: Mon,  5 Jul 2010 18:11:03 +0530
-Message-ID: <1278333663-30464-1-git-send-email-sjayaraman@suse.de>
+Subject: [PATCH 03/09] cifs: define server-level cache index objects and register them
+Date: Mon,  5 Jul 2010 18:12:15 +0530
+Message-ID: <1278333735-30604-1-git-send-email-sjayaraman@suse.de>
 References: <Yes>
-Reply-To: Linux filesystem caching discussion list <linux-cachefs@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-cachefs@redhat.com
+Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-cachefs@redhat.com, David Howells <dhowells@redhat.com>
 To: Steve French <smfrench@gmail.com>
-Return-path: <linux-cachefs-bounces@redhat.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
 In-Reply-To: <Yes>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/linux-cachefs>,
-	<mailto:linux-cachefs-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/linux-cachefs>
-List-Post: <mailto:linux-cachefs@redhat.com>
-List-Help: <mailto:linux-cachefs-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/linux-cachefs>,
-	<mailto:linux-cachefs-request@redhat.com?subject=subscribe>
-Sender: linux-cachefs-bounces@redhat.com
-Errors-To: linux-cachefs-bounces@redhat.com
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-This patchset is a second try at adding persistent, local caching facility for
-CIFS using the FS-Cache interface.
+Define server-level cache index objects (as managed by TCP_ServerInfo structs)
+and register then with FS-Cache. Each server object is created in the CIFS
+top-level index object and is itself an index into which superblock-level
+objects are inserted.
 
-The cache index hierarchy which is mainly used to locate a file object or
-discard a certain subset of the files cached, currently has three levels:
-	- Server
-	- Share 
-	- File
+The server objects are now keyed by {IPaddress,family,port} tuple.
 
-The server index object is keyed by IPaddress of the server, socket family
-and the port. The superblock index object is keyed by the sharename and the
-inode object is keyed by the UniqueId. The cache coherency is ensured by
-checking the LastWriteTime, LastChangeTime and end of file (eof) reported by
-the server.
+Signed-off-by: Suresh Jayaraman <sjayaraman@suse.de>
+---
+ fs/cifs/Makefile   |    2 -
+ fs/cifs/cache.c    |   62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsglob.h |    3 ++
+ fs/cifs/connect.c  |    5 ++++
+ fs/cifs/fscache.c  |   41 +++++++++++++++++++++++++++++++++++
+ fs/cifs/fscache.h  |   14 +++++++++++
+ 6 files changed, 126 insertions(+), 1 deletion(-)
+ create mode 100644 fs/cifs/fscache.c
 
-Changes since last post:
--------------------------
-   - fix a bug during registration with FS-Cache
-   - fix a bug while storing pages to the cache. The earlier set needed an rsize
-     of 4096 to make caching working properly due to this bug.
-   - server index key uses {IPaddress,family,port} tuple instead of servername
-   - root dir of the share is validated by UniqueId/IndexNumber. Almost all
-     servers seem to provide one of them and it's unique.
-   - we now check LastWriteTime, LastChangeTime and eof of server for data
-     coherency. CreateTime could be considered once some of related development
-     effort advances
-   - dropped the patch to guard cifsglob.h against multiple inclusion as it
-     has been included in Jeff Layton's tree
-   - some cleanups
-
-To try these patches:
-
-   - apply this patchset in order
-   - mount the share, for e.g. mount -t cifs //server/share -o user=guest
-   - try copying a huge file (say few hundred MBs) from mount point to local
-     filesystem (during the first time, the cache will be initialized)
-   - when you copy the second time, it should be read from the local cache (you
-     could unmount and remount to reduce the page cache impact).
-
-
-Known issues
---------------
-   - when the 'noserverino' mount option is used, the client generates
-     UniqueId itself rather than using the UniqueId from the server. As
-     we use UniqueId to ensure that the root directory did not change
-     under the hood, we won't be able to benefit from the cache.
-   - the cache coherency check may not be reliable always as some
-     CIFS servers are known not to update mtime until the filehandle is closed.
-
-Suresh Jayaraman (09):
-  cifs: add kernel config option for CIFS Client caching support
-  cifs: register CIFS for caching
-  cifs: define server-level cache index objects and register them with FS-Cache
-  cifs: define superblock-level cache index objects and register them
-  cifs: define inode-level cache object and register them
-  cifs: FS-Cache page management
-  cifs: store pages into local cache
-  cifs: read pages from FS-Cache
-  cifs: add mount option to enable local caching
-
-
- Kconfig      |    9 +
- Makefile     |    2 
- cache.c      |  331 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- cifs_fs_sb.h |    1 
- cifsfs.c     |   15 ++
- cifsglob.h   |   10 +
- connect.c    |   16 ++
- file.c       |   50 ++++++++
- fscache.c    |  236 ++++++++++++++++++++++++++++++++++++++++++
- fscache.h    |  136 ++++++++++++++++++++++++
- inode.c      |    7 +
- 11 files changed, 813 insertions(+)
+Index: cifs-2.6/fs/cifs/Makefile
+===================================================================
+--- cifs-2.6.orig/fs/cifs/Makefile
++++ cifs-2.6/fs/cifs/Makefile
+@@ -12,4 +12,4 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spneg
+ 
+ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+ 
+-cifs-$(CONFIG_CIFS_FSCACHE) += cache.o
++cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+Index: cifs-2.6/fs/cifs/cache.c
+===================================================================
+--- cifs-2.6.orig/fs/cifs/cache.c
++++ cifs-2.6/fs/cifs/cache.c
+@@ -19,6 +19,7 @@
+  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  */
+ #include "fscache.h"
++#include "cifs_debug.h"
+ 
+ /*
+  * CIFS filesystem definition for FS-Cache
+@@ -44,3 +45,64 @@ void cifs_fscache_unregister(void)
+ 	fscache_unregister_netfs(&cifs_fscache_netfs);
+ }
+ 
++/*
++ * Key layout of CIFS server cache index object
++ */
++struct cifs_server_key {
++	uint16_t	family;		/* address family */
++	uint16_t	port;		/* IP port */
++	union {
++		struct in_addr	ipv4_addr;
++		struct in6_addr	ipv6_addr;
++	} addr[0];
++};
++
++/*
++ * Server object keyed by {IPaddress,port,family} tuple
++ */
++static uint16_t cifs_server_get_key(const void *cookie_netfs_data,
++				   void *buffer, uint16_t maxbuf)
++{
++	const struct TCP_Server_Info *server = cookie_netfs_data;
++	const struct sockaddr *sa = (struct sockaddr *) &server->addr.sockAddr;
++	struct cifs_server_key *key = buffer;
++	uint16_t key_len = sizeof(struct cifs_server_key);
++
++	memset(key, 0, key_len);
++
++	/*
++	 * Should not be a problem as sin_family/sin6_family overlays
++	 * sa_family field
++	 */
++	switch (sa->sa_family) {
++	case AF_INET:
++		key->family = server->addr.sockAddr.sin_family;
++		key->port = server->addr.sockAddr.sin_port;
++		key->addr[0].ipv4_addr = server->addr.sockAddr.sin_addr;
++		key_len += sizeof(key->addr[0].ipv4_addr);
++		break;
++
++	case AF_INET6:
++		key->family = server->addr.sockAddr6.sin6_family;
++		key->port = server->addr.sockAddr6.sin6_port;
++		key->addr[0].ipv6_addr = server->addr.sockAddr6.sin6_addr;
++		key_len += sizeof(key->addr[0].ipv6_addr);
++		break;
++
++	default:
++		cERROR(1, "CIFS: Unknown network family '%d'", sa->sa_family);
++		key_len = 0;
++		break;
++	}
++
++	return key_len;
++}
++
++/*
++ * Server object for FS-Cache
++ */
++const struct fscache_cookie_def cifs_fscache_server_index_def = {
++	.name = "CIFS.server",
++	.type = FSCACHE_COOKIE_TYPE_INDEX,
++	.get_key = cifs_server_get_key,
++};
+Index: cifs-2.6/fs/cifs/cifsglob.h
+===================================================================
+--- cifs-2.6.orig/fs/cifs/cifsglob.h
++++ cifs-2.6/fs/cifs/cifsglob.h
+@@ -190,6 +190,9 @@ struct TCP_Server_Info {
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_ntlmssp;		/* supports NTLMSSP */
++#ifdef CONFIG_CIFS_FSCACHE
++	struct fscache_cookie   *fscache; /* client index cache cookie */
++#endif
+ };
+ 
+ /*
+Index: cifs-2.6/fs/cifs/connect.c
+===================================================================
+--- cifs-2.6.orig/fs/cifs/connect.c
++++ cifs-2.6/fs/cifs/connect.c
+@@ -48,6 +48,7 @@
+ #include "nterr.h"
+ #include "rfc1002pdu.h"
+ #include "cn_cifs.h"
++#include "fscache.h"
+ 
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
+@@ -1460,6 +1461,8 @@ cifs_put_tcp_session(struct TCP_Server_I
+ 	server->tcpStatus = CifsExiting;
+ 	spin_unlock(&GlobalMid_Lock);
+ 
++	cifs_fscache_release_client_cookie(server);
++
+ 	task = xchg(&server->tsk, NULL);
+ 	if (task)
+ 		force_sig(SIGKILL, task);
+@@ -1577,6 +1580,8 @@ cifs_get_tcp_session(struct smb_vol *vol
+ 	list_add(&tcp_ses->tcp_ses_list, &cifs_tcp_ses_list);
+ 	write_unlock(&cifs_tcp_ses_lock);
+ 
++	cifs_fscache_get_client_cookie(tcp_ses);
++
+ 	return tcp_ses;
+ 
+ out_err:
+Index: cifs-2.6/fs/cifs/fscache.c
+===================================================================
+--- /dev/null
++++ cifs-2.6/fs/cifs/fscache.c
+@@ -0,0 +1,41 @@
++/*
++ *   fs/cifs/fscache.c - CIFS filesystem cache interface
++ *
++ *   Copyright (c) 2010 Novell, Inc.
++ *   Author(s): Suresh Jayaraman (sjayaraman@suse.de>
++ *
++ *   This library is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU Lesser General Public License as published
++ *   by the Free Software Foundation; either version 2.1 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This library is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU Lesser General Public License for more details.
++ *
++ *   You should have received a copy of the GNU Lesser General Public License
++ *   along with this library; if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#include "fscache.h"
++#include "cifsglob.h"
++#include "cifs_debug.h"
++
++void cifs_fscache_get_client_cookie(struct TCP_Server_Info *server)
++{
++	server->fscache =
++		fscache_acquire_cookie(cifs_fscache_netfs.primary_index,
++				&cifs_fscache_server_index_def, server);
++	cFYI(1, "CIFS: get client cookie (0x%p/0x%p)", server,
++				server->fscache);
++}
++
++void cifs_fscache_release_client_cookie(struct TCP_Server_Info *server)
++{
++	cFYI(1, "CIFS: release client cookie (0x%p/0x%p)", server,
++				server->fscache);
++	fscache_relinquish_cookie(server->fscache, 0);
++	server->fscache = NULL;
++}
++
+Index: cifs-2.6/fs/cifs/fscache.h
+===================================================================
+--- cifs-2.6.orig/fs/cifs/fscache.h
++++ cifs-2.6/fs/cifs/fscache.h
+@@ -23,17 +23,31 @@
+ 
+ #include <linux/fscache.h>
+ 
++#include "cifsglob.h"
++
+ #ifdef CONFIG_CIFS_FSCACHE
+ 
+ extern struct fscache_netfs cifs_fscache_netfs;
++extern const struct fscache_cookie_def cifs_fscache_server_index_def;
+ 
+ extern int cifs_fscache_register(void);
+ extern void cifs_fscache_unregister(void);
+ 
++/*
++ * fscache.c
++ */
++extern void cifs_fscache_get_client_cookie(struct TCP_Server_Info *);
++extern void cifs_fscache_release_client_cookie(struct TCP_Server_Info *);
++
+ #else /* CONFIG_CIFS_FSCACHE */
+ static inline int cifs_fscache_register(void) { return 0; }
+ static inline void cifs_fscache_unregister(void) {}
+ 
++static inline void
++cifs_fscache_get_client_cookie(struct TCP_Server_Info *server) {}
++static inline void
++cifs_fscache_get_client_cookie(struct TCP_Server_Info *server); {}
++
+ #endif /* CONFIG_CIFS_FSCACHE */
+ 
+ #endif /* _CIFS_FSCACHE_H */
