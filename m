@@ -1,80 +1,91 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 09/09] cifs: add mount option to enable local caching
-Date: Mon,  5 Jul 2010 18:13:36 +0530
-Message-ID: <1278333816-30885-1-git-send-email-sjayaraman@suse.de>
-References: <Yes>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Severe performance issue (Ubuntu 10.04 mounting an XP share)
+Date: Mon, 5 Jul 2010 09:04:25 -0400
+Message-ID: <20100705090425.05c3f568@corrin.poochiereds.net>
+References: <AANLkTilXnPMMoY-54RbO4CUeqP9b-zaM7NZQZQpHH5Gk@mail.gmail.com>
+	<20100702141617.46ec65a6@corrin.poochiereds.net>
+	<AANLkTim4xY4n2y-jE0FzCAKc6NWK6DZcHx15d2owR-wV@mail.gmail.com>
+	<AANLkTimdE4q2q3w0DccJUv_steLH-0kIhgK7_jv6-IMi@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: James Green <james.mk.green-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <Yes>
+In-Reply-To: <AANLkTimdE4q2q3w0DccJUv_steLH-0kIhgK7_jv6-IMi-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add a mount option 'fsc' to enable local caching on CIFS.
+On Mon, 5 Jul 2010 10:14:29 +0100
+James Green <james.mk.green-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-I considered adding a separate debug bit for caching, but it appears that
-debugging would be relatively easier with the normal CIFS_INFO level.
+> Sorry I meant this to go to the list rather than solely to Jeff perso=
+nally.
+>=20
+> On 2 July 2010 19:16, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> > On Fri, 2 Jul 2010 16:39:06 +0100
+> > James Green <james.mk.green-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> Jul =A02 16:14:58 ubuntu kernel: [ 1378.833956] CIFS VFS: No respo=
+nse
+> >> for cmd 50 mid 11112
+> >
+> > The client is sending a SMB_COM_TRANSACTION2 and isn't getting a
+> > response. You might want to sniff traffic and identify calls that
+> > aren't getting responses. If there is some commonality between them
+> > then that may point to where the problem is.
+>=20
+> Jeff,
+>=20
+> I fear I'm looking for a needle in a haystack, and I've no idea what
+> the needle looks like.
+>=20
+> I ran Wireshark on my XP host and repeatedly ran the phpunit tests ob=
+serving:
+>=20
+> 1. There really is an awful lot of FIND_FIRST2, Pattern: <blah>,
+> followed immediately by FIND_FIRST2, Files: <blank>. I assume this to
+> be normal.
+>=20
+> 2. Occassionally and on a random Pattern argumen, a FIND_FIRST2 or
+> QUERY_PATH_INFO is followed immediately not by an SMB level response
+> but by a TCP "microsoft-ds" ACK. The Len is 0 and all other arguments
+> have values.
 
-As the cifs-utils (userspace) changes are not done yet, this patch enables
-'fsc' by default to enable testing.
+Can't be certain without seeing the capture, but it sounds like a
+"normal" TCP ACK. That means that the server has acknowledged that it
+received the packet.
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Acked-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifs_fs_sb.h |    1 +
- fs/cifs/connect.c    |    8 ++++++++
- 2 files changed, 9 insertions(+)
+> At this point there may be several seconds of delay
+> before SMB re-establishes with a Session Set AndX Request, User:
+> \jgreen then a Tree Connect AndX Request for the mount point being
+> used.
+>=20
+> It feels as though the XP host itself is simply not returning a
+> response some of the time. Other than changing my password and
+> rebooting the whole lot I can't think of anything I might have done.
+>=20
+> If you have any further tests you'd like me to perform I'll try to
+> oblige as this is killing my workflow.
+>=20
 
-Index: cifs-2.6/fs/cifs/cifs_fs_sb.h
-===================================================================
---- cifs-2.6.orig/fs/cifs/cifs_fs_sb.h
-+++ cifs-2.6/fs/cifs/cifs_fs_sb.h
-@@ -35,6 +35,7 @@
- #define CIFS_MOUNT_DYNPERM      0x1000 /* allow in-memory only mode setting   */
- #define CIFS_MOUNT_NOPOSIXBRL   0x2000 /* mandatory not posix byte range lock */
- #define CIFS_MOUNT_NOSSYNC      0x4000 /* don't do slow SMBflush on every sync*/
-+#define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
- 
- struct cifs_sb_info {
- 	struct cifsTconInfo *tcon;	/* primary mount */
-Index: cifs-2.6/fs/cifs/connect.c
-===================================================================
---- cifs-2.6.orig/fs/cifs/connect.c
-+++ cifs-2.6/fs/cifs/connect.c
-@@ -98,6 +98,7 @@ struct smb_vol {
- 	bool noblocksnd:1;
- 	bool noautotune:1;
- 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
-+	bool fsc:1;	/* enable fscache */
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
-@@ -843,6 +844,9 @@ cifs_parse_mount_options(char *options,
- 	/* default to using server inode numbers where available */
- 	vol->server_ino = 1;
- 
-+	/* XXX: default to fsc for testing until mount.cifs pieces are done */
-+	vol->fsc = 1;
-+
- 	if (!options)
- 		return 1;
- 
-@@ -1332,6 +1336,8 @@ cifs_parse_mount_options(char *options,
- 			printk(KERN_WARNING "CIFS: Mount option noac not "
- 				"supported. Instead set "
- 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
-+		} else if (strnicmp(data, "fsc", 3) == 0) {
-+			vol->fsc = true;
- 		} else
- 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
- 						data);
-@@ -2405,6 +2411,8 @@ static void setup_cifs_sb(struct smb_vol
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_GID;
- 	if (pvolume_info->dynperm)
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DYNPERM;
-+	if (pvolume_info->fsc)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_FSCACHE;
- 	if (pvolume_info->direct_io) {
- 		cFYI(1, "mounting share using direct i/o");
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
+Yep, sounds like the server just isn't responding here. When that
+happens, cifs currently forces a reconnect after the call times out.
+Ugly and I believe unnecessary...when the server ACKs the response we
+shouldn't force a reconnect just because the server is taking a while
+to respond. Right now though we don't change the mid state to show that
+the call was successfully sent, so that probably ought to be fixed so
+we can deal with that differently.
+
+It's possible that by making the client wait indefinitely, the server
+will eventually respond. It's also possible however that the server is
+just dropping these calls on the floor for some reason and will never
+respond. Hard to say which it is.
+
+Shirish was working recently on fixing the "hard" mount option for
+cifs. It might be worth trying out his patches.
+
+Shirish, any thoughts?
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
