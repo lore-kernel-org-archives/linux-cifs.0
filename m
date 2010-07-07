@@ -1,65 +1,79 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/4] Generalise dns_resolver
-Date: Wed, 07 Jul 2010 10:14:00 +0100
-Message-ID: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 1/4] KEYS: Authorise keyctl_set_timeout() on a key if we have
+	its authorisation key
+Date: Wed, 07 Jul 2010 10:14:06 +0100
+Message-ID: <20100707091406.16573.40070.stgit@warthog.procyon.org.uk>
+References: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: smfrench@gmail.com
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi Steve,
+Authorise a process to perform keyctl_set_timeout() on an uninstantiated key if
+that process has the authorisation key for it.
 
-The associated patches extract the dns_resolver key type from the CIFS
-filesystem and make it useful by AFS too.  Can you check at least the second
-patch which actually modifies CIFS?
+This allows the instantiator to set the timeout on a key it is instantiating -
+provided it does it before instantiating the key.
 
-Thanks,
-David
+For instance, the test upcall script provided with the keyutils package could
+be modified to set the expiry to an hour hence before instantiating the key:
+
+	[/usr/share/keyutils/request-key-debug.sh]
+	 if [ "$3" != "neg" ]
+	 then
+	+    keyctl timeout $1 3600
+	     keyctl instantiate $1 "Debug $3" $4 || exit 1
+	 else
+
+Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
-David Howells (1):
-      KEYS: Authorise keyctl_set_timeout() on a key if we have its authorisation key
+ security/keys/keyctl.c |   17 ++++++++++++++++-
+ 1 files changed, 16 insertions(+), 1 deletions(-)
 
-Wang Lei (3):
-      Add DNS support for AFS
-      Provide generic DNS query function
-      Implement a DNS Resolver Module
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index 6261745..639226a 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -1091,7 +1091,7 @@ error:
+ long keyctl_set_timeout(key_serial_t id, unsigned timeout)
+ {
+ 	struct timespec now;
+-	struct key *key;
++	struct key *key, *instkey;
+ 	key_ref_t key_ref;
+ 	time_t expiry;
+ 	long ret;
+@@ -1099,10 +1099,25 @@ long keyctl_set_timeout(key_serial_t id, unsigned timeout)
+ 	key_ref = lookup_user_key(id, KEY_LOOKUP_CREATE | KEY_LOOKUP_PARTIAL,
+ 				  KEY_SETATTR);
+ 	if (IS_ERR(key_ref)) {
++		/* setting the timeout on a key under construction is permitted
++		 * if we have the authorisation token handy */
++		if (PTR_ERR(key_ref) == -EACCES) {
++			instkey = key_get_instantiation_authkey(id);
++			if (!IS_ERR(instkey)) {
++				key_put(instkey);
++				key_ref = lookup_user_key(id,
++							  KEY_LOOKUP_PARTIAL,
++							  0);
++				if (!IS_ERR(key_ref))
++					goto okay;
++			}
++		}
++
+ 		ret = PTR_ERR(key_ref);
+ 		goto error;
+ 	}
+ 
++okay:
+ 	key = key_ref_to_ptr(key_ref);
+ 
+ 	/* make the changes with the locks held to prevent races */
 
-
- Documentation/networking/dnsresolver.txt |  150 +++++++++++++++
- fs/afs/Kconfig                           |    1 
- fs/afs/cell.c                            |   40 +++-
- fs/cifs/Kconfig                          |   17 +-
- fs/cifs/Makefile                         |    2 
- fs/cifs/cifs_dfs_ref.c                   |    4 
- fs/cifs/cifsfs.c                         |   13 -
- fs/cifs/dns_resolve.c                    |  168 -----------------
- fs/cifs/dns_resolve.h                    |   32 ---
- include/keys/dnsresolver-type.h          |   23 ++
- include/linux/dns_resolver.h             |   37 ++++
- net/Kconfig                              |    1 
- net/Makefile                             |    1 
- net/dnsresolver/Kconfig                  |   27 +++
- net/dnsresolver/Makefile                 |    7 +
- net/dnsresolver/dns_query.c              |  130 +++++++++++++
- net/dnsresolver/dns_resolver.c           |  293 ++++++++++++++++++++++++++++++
- net/dnsresolver/internal.h               |   39 ++++
- net/dnsresolver/resolv_unc_to_ip.c       |  111 +++++++++++
- security/keys/keyctl.c                   |   17 ++
- 20 files changed, 879 insertions(+), 234 deletions(-)
- create mode 100644 Documentation/networking/dnsresolver.txt
- delete mode 100644 fs/cifs/dns_resolve.c
- delete mode 100644 fs/cifs/dns_resolve.h
- create mode 100644 include/keys/dnsresolver-type.h
- create mode 100644 include/linux/dns_resolver.h
- create mode 100644 net/dnsresolver/Kconfig
- create mode 100644 net/dnsresolver/Makefile
- create mode 100644 net/dnsresolver/dns_query.c
- create mode 100644 net/dnsresolver/dns_resolver.c
- create mode 100644 net/dnsresolver/internal.h
- create mode 100644 net/dnsresolver/resolv_unc_to_ip.c
