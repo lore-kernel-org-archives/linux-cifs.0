@@ -1,7 +1,7 @@
 From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/4] Provide generic DNS query function
-Date: Wed, 07 Jul 2010 10:14:16 +0100
-Message-ID: <20100707091416.16573.62091.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 4/4] Add DNS support for AFS
+Date: Wed, 07 Jul 2010 10:14:21 +0100
+Message-ID: <20100707091421.16573.71822.stgit@warthog.procyon.org.uk>
 References: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -17,181 +17,133 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Provide a way of making generic DNS queries.  Note that the upcall service
-program may process the result before returning it.
+Add DNS query support for AFS so that it can get the IP addresses of Volume
+Location servers from the DNS using an AFSDB record.
 
-For example, if an AFSDB query is requested to find a list of Volume Location
-servers for a cell, that would only get a list of server names.  That, however,
-is not what the kernel needs, so the upcall program makes secondary lookups to
-turn those into IP addresses and then instantiates the key with a string
-consisting of a comma-separated list of IP addresses.
+This requires userspace support.  /etc/request-key.conf must be configured to
+invoke a helper for dns_resolver type keys with a subtype of "afsdb:" in the
+description.
 
 Signed-off-by: Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
 
- include/linux/dns_resolver.h |    2 +
- net/dnsresolver/Makefile     |    2 -
- net/dnsresolver/dns_query.c  |  130 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 133 insertions(+), 1 deletions(-)
- create mode 100644 net/dnsresolver/dns_query.c
+ fs/afs/Kconfig |    1 +
+ fs/afs/cell.c  |   40 ++++++++++++++++++++++++++++++----------
+ 2 files changed, 31 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/dns_resolver.h b/include/linux/dns_resolver.h
-index 72b9edf..328cc05 100644
---- a/include/linux/dns_resolver.h
-+++ b/include/linux/dns_resolver.h
-@@ -29,6 +29,8 @@
- extern int request_dns_resolution(const char *description, const char *options,
- 				  char **result);
- extern int dns_resolve_unc_to_ip(const char *unc, char **ip_addr);
-+extern int dns_query(const char *type, const char *name, const char *inetf,
-+		     char **_result, time_t *_expiry);
- 
- #endif /* KERNEL */
- 
-diff --git a/net/dnsresolver/Makefile b/net/dnsresolver/Makefile
-index 260ccc4..aa7e422 100644
---- a/net/dnsresolver/Makefile
-+++ b/net/dnsresolver/Makefile
-@@ -4,4 +4,4 @@
- 
- obj-$(CONFIG_DNS_RESOLVER) += dnsresolver.o
- 
--dnsresolver-objs :=  dns_resolver.o resolv_unc_to_ip.o
-+dnsresolver-objs :=  dns_resolver.o resolv_unc_to_ip.o dns_query.o
-diff --git a/net/dnsresolver/dns_query.c b/net/dnsresolver/dns_query.c
-new file mode 100644
-index 0000000..61ef026
---- /dev/null
-+++ b/net/dnsresolver/dns_query.c
-@@ -0,0 +1,130 @@
-+/*
-+ *   Copyright (c) 2010 Wang Lei
-+ *   Author(s): Wang Lei (wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org)
-+ *		David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-+ *
-+ *   The upcall wrapper used to make an arbitrary DNS query.
-+ *
-+ *   This function requires the appropriate userspace tool dns.upcall to be
-+ *   installed and something like the following lines should be added to the
-+ *   /etc/request-key.conf file:
-+ *
-+ *	create dns_resolver * * /sbin/dns.upcall %k
-+ *
-+ *   For example to use this module to query AFSDB RR:
-+ *
-+ *	create dns_resolver afsdb:* * /sbin/dns.afsdb %k
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/slab.h>
+diff --git a/fs/afs/Kconfig b/fs/afs/Kconfig
+index 5c4e61d..8f975f2 100644
+--- a/fs/afs/Kconfig
++++ b/fs/afs/Kconfig
+@@ -2,6 +2,7 @@ config AFS_FS
+ 	tristate "Andrew File System support (AFS) (EXPERIMENTAL)"
+ 	depends on INET && EXPERIMENTAL
+ 	select AF_RXRPC
++	select DNS_RESOLVER
+ 	help
+ 	  If you say Y here, you will get an experimental Andrew File System
+ 	  driver. It currently only supports unsecured read-only AFS access.
+diff --git a/fs/afs/cell.c b/fs/afs/cell.c
+index e19c13f..9eeea5f 100644
+--- a/fs/afs/cell.c
++++ b/fs/afs/cell.c
+@@ -13,6 +13,7 @@
+ #include <linux/slab.h>
+ #include <linux/key.h>
+ #include <linux/ctype.h>
 +#include <linux/dns_resolver.h>
-+#include <keys/dnsresolver-type.h>
-+#include <keys/user-type.h>
+ #include <linux/sched.h>
+ #include <keys/rxrpc-type.h>
+ #include "internal.h"
+@@ -36,6 +37,8 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 	struct key *key;
+ 	size_t namelen;
+ 	char keyname[4 + AFS_MAXCELLNAME + 1], *cp, *dp, *next;
++	char  *dvllist = NULL, *_vllist = NULL;
++	char  delimiter = ':';
+ 	int ret;
+ 
+ 	_enter("%s,%s", name, vllist);
+@@ -43,8 +46,10 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 	BUG_ON(!name); /* TODO: want to look up "this cell" in the cache */
+ 
+ 	namelen = strlen(name);
+-	if (namelen > AFS_MAXCELLNAME)
++	if (namelen > AFS_MAXCELLNAME) {
++		_leave(" = -ENAMETOOLONG");
+ 		return ERR_PTR(-ENAMETOOLONG);
++	}
+ 
+ 	/* allocate and initialise a cell record */
+ 	cell = kzalloc(sizeof(struct afs_cell) + namelen + 1, GFP_KERNEL);
+@@ -64,15 +69,31 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 	INIT_LIST_HEAD(&cell->vl_list);
+ 	spin_lock_init(&cell->vl_lock);
+ 
++	/* if the ip address is invalid, try dns query */
++	if (!vllist || strlen(vllist) < 7) {
++		ret = dns_query("afsdb", name, "ipv4", &dvllist, NULL);
++		if (ret < 0) {
++			_leave(" = %d", ret);
++			return ERR_PTR(ret);
++		}
++		_vllist = dvllist;
 +
-+#include "internal.h"
++		/* change the delimiter for user-space reply */
++		delimiter = ',';
 +
-+/**
-+ * dns_query - Query DNS
-+ * @type: Query type
-+ * @name: Name to look up
-+ * @options: Space-separated options appropriate to the query type
-+ * @_result: Where to return the result
-+ * @_expiry: Where to store the result expiry time (or NULL)
-+ *
-+ * The result is copied into a buffer and returned in *_result.  The caller is
-+ * responsible for freeing this buffer.  The result is NUL-terminated, though
-+ * the termination is not included in the result size.  Optionally, the time at
-+ * which the result expires is stored in *_expiry.
-+ *
-+ * Note that the upcall program may have edited the result from what the DNS
-+ * server returned, for example to turn hostnames obtained by the lookup into
-+ * IP addresses for the AFSDB query type.
-+ *
-+ * The options may include such things as IP address family ("ipv4" or "ipv6")
-+ *
-+ * Returns the size of the result on success, -ve error code otherwise.
-+ */
-+int dns_query(const char *type, const char *name, const char *options,
-+	      char **_result, time_t *_expiry)
-+{
-+	struct key *rkey;
-+	size_t typelen, namelen;
-+	struct user_key_payload *upayload;
-+	char *desc;
-+	int ret, len;
-+
-+	kenter("%s,%s,%s,,,", type, name, options);
-+
-+	ret =  -EINVAL;
-+	if (!type || !name || !_result)
-+		goto err;
-+
-+	typelen = strlen(type);
-+	namelen = strlen(name);
-+	if (typelen < 1 || namelen < 3)
-+		goto err;
-+
-+	ret = -ENOMEM;
-+	/* construct the query key description as "<type>:<name>" */
-+	desc = kmalloc(typelen + 1 + namelen + 1, GFP_KERNEL);
-+	if (!desc)
-+		goto err;
-+
-+	memcpy(desc, type, typelen);
-+	desc[typelen] = ':';
-+	memcpy(desc + typelen + 1, name, namelen + 1);
-+
-+	if (!options)
-+		options = "";
-+	kdebug("call request_key(,%s,%s)", desc, options);
-+
-+	/* make the upcall */
-+	rkey = request_key(&key_type_dns_resolver, desc, options);
-+	kfree(desc);
-+
-+	if (IS_ERR(rkey)) {
-+		ret = PTR_ERR(rkey);
-+		goto err;
++	} else {
++		_vllist = vllist;
 +	}
 +
-+	down_read(&rkey->sem);
-+
-+	upayload = rcu_dereference_check(rkey->payload.data,
-+					 lockdep_is_held(&rkey->sem));
-+	len = upayload->datalen;
-+	*_result = kmalloc(len + 1, GFP_KERNEL);
-+	if (!*_result) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	memcpy(*_result, upayload->data, len + 1);
-+	if (_expiry)
-+		*_expiry = rkey->expiry;
-+	ret = len;
-+
-+
-+out:
-+	up_read(&rkey->sem);
-+	key_put(rkey);
-+
-+err:
-+	kleave(" = %d [r=%s]", ret, *_result);
-+	return ret;
-+}
-+EXPORT_SYMBOL(dns_query);
+ 	/* fill in the VL server list from the rest of the string */
+ 	do {
+ 		unsigned a, b, c, d;
+ 
+-		next = strchr(vllist, ':');
++		next = strchr(_vllist, delimiter);
+ 		if (next)
+ 			*next++ = 0;
+ 
+-		if (sscanf(vllist, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
++		if (sscanf(_vllist, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+ 			goto bad_address;
+ 
+ 		if (a > 255 || b > 255 || c > 255 || d > 255)
+@@ -81,7 +102,7 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 		cell->vl_addrs[cell->vl_naddrs++].s_addr =
+ 			htonl((a << 24) | (b << 16) | (c << 8) | d);
+ 
+-	} while (cell->vl_naddrs < AFS_CELL_MAX_ADDRS && (vllist = next));
++	} while (cell->vl_naddrs < AFS_CELL_MAX_ADDRS && (_vllist = next));
+ 
+ 	/* create a key to represent an anonymous user */
+ 	memcpy(keyname, "afs@", 4);
+@@ -110,6 +131,7 @@ bad_address:
+ 	ret = -EINVAL;
+ error:
+ 	key_put(cell->anonymous_key);
++	kfree(dvllist);
+ 	kfree(cell);
+ 	_leave(" = %d", ret);
+ 	return ERR_PTR(ret);
+@@ -201,14 +223,12 @@ int afs_cell_init(char *rootcell)
+ 	}
+ 
+ 	cp = strchr(rootcell, ':');
+-	if (!cp) {
+-		printk(KERN_ERR "kAFS: no VL server IP addresses specified\n");
+-		_leave(" = -EINVAL");
+-		return -EINVAL;
+-	}
++	if (!cp)
++		_debug("kAFS: no VL server IP addresses specified");
++	else
++		*cp++ = 0;
+ 
+ 	/* allocate a cell record for the root cell */
+-	*cp++ = 0;
+ 	new_root = afs_cell_create(rootcell, cp);
+ 	if (IS_ERR(new_root)) {
+ 		_leave(" = %ld", PTR_ERR(new_root));
