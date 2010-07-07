@@ -1,149 +1,251 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/4] Add DNS support for AFS
-Date: Wed, 07 Jul 2010 10:14:21 +0100
-Message-ID: <20100707091421.16573.71822.stgit@warthog.procyon.org.uk>
-References: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: allow ntlmv2 ntlmssp authentication
+Date: Wed, 7 Jul 2010 07:25:17 -0400
+Message-ID: <20100707072517.1446d70e@corrin.poochiereds.net>
+References: <1278126963-16111-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-N0cyB0Tf/z2923ynj/IuLw@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100707091400.16573.2817.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+In-Reply-To: <1278126963-16111-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Fri,  2 Jul 2010 22:16:03 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-Add DNS query support for AFS so that it can get the IP addresses of Volume
-Location servers from the DNS using an AFSDB record.
+> Have kept ntlmv1 ntlmssp as a default, ntlmv2 ntlmssp can
+> be made default only by making code change.
+> 
+> 
+> From 3d8a8960a6d164e2bacd2a4fc96456453042e049 Mon Sep 17 00:00:00 2001
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Date: Fri, 2 Jul 2010 21:54:51 -0500
+> Subject: [PATCH] add ntlvm2 ntlmssp authentication
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsencrypt.c |   48 ++++++++++++++++++++++++++++++++++++++++++++----
+>  fs/cifs/cifsglob.h    |    2 ++
+>  fs/cifs/cifspdu.h     |    1 -
+>  fs/cifs/sess.c        |   39 +++++++++++++++++++++++++++++++++++++--
+>  4 files changed, 83 insertions(+), 7 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 847628d..ebfafec 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -378,6 +378,44 @@ calc_exit_2:
+>  	return rc;
+>  }
+>  
+> +static void
+> +find_domain_name(struct cifsSesInfo *ses)
+> +{
+> +	unsigned int attrsize;
+> +	unsigned int type;
+> +	unsigned char *blobptr;
+> +	struct ntlmssp2_name *attrptr;
+> +
+> +	if (ses->server->tiblob) {
+> +		blobptr = ses->server->tiblob;
+> +		attrptr = (struct ntlmssp2_name *) blobptr;
+> +
+> +		while ((type = attrptr->type) != 0) {
+> +			blobptr += 2; /* advance attr type */
+> +			attrsize = attrptr->length;
+> +			blobptr += 2; /* advance attr size */
+> +			if (type == 0x2) {
+				    ^^^
+		Magic numbers like this should be turned into names.
 
-This requires userspace support.  /etc/request-key.conf must be configured to
-invoke a helper for dns_resolver type keys with a subtype of "afsdb:" in the
-description.
+> +				if (!ses->domainName) {
+> +					ses->domainName =
+> +						kmalloc(attrptr->length + 1,
+> +								GFP_KERNEL);
+> +					if (!ses->domainName)
+> +						return;
+> +					cifs_from_ucs2(ses->domainName,
+> +						(__le16 *)blobptr,
+> +						attrptr->length,
+> +						attrptr->length,
+> +						load_nls_default(), false);
+> +				}
+> +			}
+> +			blobptr += attrsize; /* advance attr  value */
+> +			attrptr = (struct ntlmssp2_name *) blobptr;
+> +		}
+> +	}
+> +
+> +	return;
+> +}
+> +
 
-Signed-off-by: Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
+Is it possible that you'll need to pick other UCS2 fields than the
+domain out of a NTLMSSP blob? If so, it might be better to turn the
+above function into a "copy the field of type X out of the blob"
+function.
 
- fs/afs/Kconfig |    1 +
- fs/afs/cell.c  |   40 ++++++++++++++++++++++++++++++----------
- 2 files changed, 31 insertions(+), 10 deletions(-)
+>  void setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+>  		      const struct nls_table *nls_cp)
+>  {
+> @@ -390,10 +428,9 @@ void setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+>  	buf->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+>  	get_random_bytes(&buf->client_chal, sizeof(buf->client_chal));
+>  	buf->reserved2 = 0;
+> -	buf->names[0].type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
+> -	buf->names[0].length = 0;
+> -	buf->names[1].type = 0;
+> -	buf->names[1].length = 0;
+> +
+> +	if (!ses->domainName)
+> +		find_domain_name(ses);
+>  
+>  	/* calculate buf->ntlmv2_hash */
+>  	rc = calc_ntlmv2_hash(ses, nls_cp);
+> @@ -421,6 +458,9 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
+>  
+>  	hmac_md5_update(v2_session_response+8,
+>  			sizeof(struct ntlmv2_resp) - 8, &context);
+> +	if (ses->server->tilen)
+> +		hmac_md5_update(ses->server->tiblob,
+> +			ses->server->tilen, &context);
+>  
+>  	hmac_md5_final(v2_session_response, &context);
+>  /*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 3c55e10..db6c5da 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -188,6 +188,8 @@ struct TCP_Server_Info {
+>  	unsigned long lstrp; /* when we got last response from this server */
+>  	u16 dialect; /* dialect index that server chose */
+>  	/* extended security flavors that server supports */
+> +	unsigned int tilen; /* length of the target info blob */
+> +	unsigned char *tiblob; /* target info blob in challenge response */
 
-diff --git a/fs/afs/Kconfig b/fs/afs/Kconfig
-index 5c4e61d..8f975f2 100644
---- a/fs/afs/Kconfig
-+++ b/fs/afs/Kconfig
-@@ -2,6 +2,7 @@ config AFS_FS
- 	tristate "Andrew File System support (AFS) (EXPERIMENTAL)"
- 	depends on INET && EXPERIMENTAL
- 	select AF_RXRPC
-+	select DNS_RESOLVER
- 	help
- 	  If you say Y here, you will get an experimental Andrew File System
- 	  driver. It currently only supports unsecured read-only AFS access.
-diff --git a/fs/afs/cell.c b/fs/afs/cell.c
-index e19c13f..9eeea5f 100644
---- a/fs/afs/cell.c
-+++ b/fs/afs/cell.c
-@@ -13,6 +13,7 @@
- #include <linux/slab.h>
- #include <linux/key.h>
- #include <linux/ctype.h>
-+#include <linux/dns_resolver.h>
- #include <linux/sched.h>
- #include <keys/rxrpc-type.h>
- #include "internal.h"
-@@ -36,6 +37,8 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
- 	struct key *key;
- 	size_t namelen;
- 	char keyname[4 + AFS_MAXCELLNAME + 1], *cp, *dp, *next;
-+	char  *dvllist = NULL, *_vllist = NULL;
-+	char  delimiter = ':';
- 	int ret;
- 
- 	_enter("%s,%s", name, vllist);
-@@ -43,8 +46,10 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
- 	BUG_ON(!name); /* TODO: want to look up "this cell" in the cache */
- 
- 	namelen = strlen(name);
--	if (namelen > AFS_MAXCELLNAME)
-+	if (namelen > AFS_MAXCELLNAME) {
-+		_leave(" = -ENAMETOOLONG");
- 		return ERR_PTR(-ENAMETOOLONG);
-+	}
- 
- 	/* allocate and initialise a cell record */
- 	cell = kzalloc(sizeof(struct afs_cell) + namelen + 1, GFP_KERNEL);
-@@ -64,15 +69,31 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
- 	INIT_LIST_HEAD(&cell->vl_list);
- 	spin_lock_init(&cell->vl_lock);
- 
-+	/* if the ip address is invalid, try dns query */
-+	if (!vllist || strlen(vllist) < 7) {
-+		ret = dns_query("afsdb", name, "ipv4", &dvllist, NULL);
-+		if (ret < 0) {
-+			_leave(" = %d", ret);
-+			return ERR_PTR(ret);
-+		}
-+		_vllist = dvllist;
-+
-+		/* change the delimiter for user-space reply */
-+		delimiter = ',';
-+
-+	} else {
-+		_vllist = vllist;
-+	}
-+
- 	/* fill in the VL server list from the rest of the string */
- 	do {
- 		unsigned a, b, c, d;
- 
--		next = strchr(vllist, ':');
-+		next = strchr(_vllist, delimiter);
- 		if (next)
- 			*next++ = 0;
- 
--		if (sscanf(vllist, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
-+		if (sscanf(_vllist, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
- 			goto bad_address;
- 
- 		if (a > 255 || b > 255 || c > 255 || d > 255)
-@@ -81,7 +102,7 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
- 		cell->vl_addrs[cell->vl_naddrs++].s_addr =
- 			htonl((a << 24) | (b << 16) | (c << 8) | d);
- 
--	} while (cell->vl_naddrs < AFS_CELL_MAX_ADDRS && (vllist = next));
-+	} while (cell->vl_naddrs < AFS_CELL_MAX_ADDRS && (_vllist = next));
- 
- 	/* create a key to represent an anonymous user */
- 	memcpy(keyname, "afs@", 4);
-@@ -110,6 +131,7 @@ bad_address:
- 	ret = -EINVAL;
- error:
- 	key_put(cell->anonymous_key);
-+	kfree(dvllist);
- 	kfree(cell);
- 	_leave(" = %d", ret);
- 	return ERR_PTR(ret);
-@@ -201,14 +223,12 @@ int afs_cell_init(char *rootcell)
- 	}
- 
- 	cp = strchr(rootcell, ':');
--	if (!cp) {
--		printk(KERN_ERR "kAFS: no VL server IP addresses specified\n");
--		_leave(" = -EINVAL");
--		return -EINVAL;
--	}
-+	if (!cp)
-+		_debug("kAFS: no VL server IP addresses specified");
-+	else
-+		*cp++ = 0;
- 
- 	/* allocate a cell record for the root cell */
--	*cp++ = 0;
- 	new_root = afs_cell_create(rootcell, cp);
- 	if (IS_ERR(new_root)) {
- 		_leave(" = %ld", PTR_ERR(new_root));
+All of this is for NTLMSSP session setup, correct? If so, is the
+TCP_Server_Info really the right place for this? Will this break if I
+have more than one session on the same socket?
+
+>  	bool	sec_kerberos;		/* supports plain Kerberos */
+>  	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+>  	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index 14d036d..b0f4b56 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -663,7 +663,6 @@ struct ntlmv2_resp {
+>  	__le64  time;
+>  	__u64  client_chal; /* random */
+>  	__u32  reserved2;
+> -	struct ntlmssp2_name names[2];
+>  	/* array of name entries could follow ending in minimum 4 byte struct */
+>  } __attribute__((packed));
+>  
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 0a57cb7..d1ec053 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -383,6 +383,9 @@ static int decode_ascii_ssetup(char **pbcc_area, int bleft,
+>  static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+>  				    struct cifsSesInfo *ses)
+>  {
+> +	unsigned int tioffset; /* challeng message target info area */
+> +	unsigned int tilen; /* challeng message target info area length  */
+> +
+>  	CHALLENGE_MESSAGE *pblob = (CHALLENGE_MESSAGE *)bcc_ptr;
+>  
+>  	if (blob_len < sizeof(CHALLENGE_MESSAGE)) {
+> @@ -405,6 +408,18 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+>  	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
+>  		we must set the MIC field of the AUTHENTICATE_MESSAGE */
+>  
+> +	tioffset = cpu_to_le16(pblob->TargetInfoArray.BufferOffset);
+> +	tilen = cpu_to_le16(pblob->TargetInfoArray.Length);
+> +	ses->server->tilen = tilen;
+> +	if (tilen) {
+> +		ses->server->tiblob = kmalloc(tilen, GFP_KERNEL);
+> +		if (!ses->server->tiblob) {
+> +			cERROR(1, "Challenge target info allocation failure");
+> +			return -ENOMEM;
+> +		}
+> +		memcpy(ses->server->tiblob,  bcc_ptr + tioffset, tilen);
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -451,10 +466,12 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  				   struct cifsSesInfo *ses,
+>  				   const struct nls_table *nls_cp, bool first)
+>  {
+> +	unsigned int size;
+>  	AUTHENTICATE_MESSAGE *sec_blob = (AUTHENTICATE_MESSAGE *)pbuffer;
+>  	__u32 flags;
+>  	unsigned char *tmp;
+>  	char ntlm_session_key[CIFS_SESS_KEY_SIZE];
+> +	struct ntlmv2_resp ntlmv2_response = {};
+>  
+>  	memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
+>  	sec_blob->MessageType = NtLmAuthenticate;
+> @@ -477,6 +494,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  	sec_blob->LmChallengeResponse.Length = 0;
+>  	sec_blob->LmChallengeResponse.MaximumLength = 0;
+>  
+> +#if 1
+  ^^^^^^^
+Why are you adding code that's always compiled out?
+
+>  	/* calculate session key,  BB what about adding similar ntlmv2 path? */
+>  	SMBNTencrypt(ses->password, ses->server->cryptKey, ntlm_session_key);
+>  	if (first)
+> @@ -491,6 +509,25 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  
+>  	tmp += CIFS_SESS_KEY_SIZE;
+>  
+> +#else
+> +	sec_blob->NtChallengeResponse.BufferOffset = cpu_to_le32(tmp - pbuffer);
+> +	setup_ntlmv2_rsp(ses, (char *)&ntlmv2_response, nls_cp);
+> +	size =  sizeof(struct ntlmv2_resp);
+> +	memcpy(tmp, (char *)&ntlmv2_response, size);
+> +	tmp += size;
+> +	if (ses->server->tilen > 0) {
+> +		memcpy(tmp, ses->server->tiblob, ses->server->tilen);
+> +		kfree(ses->server->tiblob);
+> +		tmp += ses->server->tilen;
+> +	} else
+> +		ses->server->tilen = 0;
+> +
+> +	sec_blob->NtChallengeResponse.Length = cpu_to_le16(size +
+> +				ses->server->tilen);
+> +	sec_blob->NtChallengeResponse.MaximumLength =
+> +		cpu_to_le16(size + ses->server->tilen);
+> +#endif
+> +
+>  	if (ses->domainName == NULL) {
+>  		sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>  		sec_blob->DomainName.Length = 0;
+> @@ -501,7 +538,6 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  		len = cifs_strtoUCS((__le16 *)tmp, ses->domainName,
+>  				    MAX_USERNAME_SIZE, nls_cp);
+>  		len *= 2; /* unicode is 2 bytes each */
+> -		len += 2; /* trailing null */
+>  		sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>  		sec_blob->DomainName.Length = cpu_to_le16(len);
+>  		sec_blob->DomainName.MaximumLength = cpu_to_le16(len);
+> @@ -518,7 +554,6 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  		len = cifs_strtoUCS((__le16 *)tmp, ses->userName,
+>  				    MAX_USERNAME_SIZE, nls_cp);
+>  		len *= 2; /* unicode is 2 bytes each */
+> -		len += 2; /* trailing null */
+>  		sec_blob->UserName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>  		sec_blob->UserName.Length = cpu_to_le16(len);
+>  		sec_blob->UserName.MaximumLength = cpu_to_le16(len);
+
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
