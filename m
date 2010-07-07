@@ -1,94 +1,65 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: clean up cifs_find_smb_ses (try #2)
-Date: Tue,  6 Jul 2010 16:37:36 -0400
-Message-ID: <1278448656-13323-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/4] Generalise dns_resolver
+Date: Wed, 07 Jul 2010 10:14:00 +0100
+Message-ID: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch replaces the earlier patch by the same name. The only
-difference is that MAX_PASSWORD_SIZE has been increased to attempt to
-match the limits that windows enforces.
+Hi Steve,
 
-Do a better job of matching sessions by authtype. Matching by username
-for a Kerberos session is incorrect, and anonymous sessions need special
-handling.
+The associated patches extract the dns_resolver key type from the CIFS
+filesystem and make it useful by AFS too.  Can you check at least the second
+patch which actually modifies CIFS?
 
-Also, in the case where we do match by username, we also need to match
-by password. That ensures that someone else doesn't "borrow" an existing
-session without needing to know the password.
-
-Finally, passwords can be longer than 16 bytes. Bump MAX_PASSWORD_SIZE
-to 512 to match the size that the userspace mount helper allows.
-
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+David
 ---
- fs/cifs/cifsglob.h |    2 +-
- fs/cifs/connect.c  |   26 ++++++++++++++++++--------
- 2 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 8f5d54d..3eaf601 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -37,7 +37,7 @@
- #define MAX_SHARE_SIZE  64	/* used to be 20, this should still be enough */
- #define MAX_USERNAME_SIZE 32	/* 32 is to allow for 15 char names + null
- 				   termination then *2 for unicode versions */
--#define MAX_PASSWORD_SIZE 16
-+#define MAX_PASSWORD_SIZE 512  /* max for windows seems to be 256 wide chars */
- 
- #define CIFS_MIN_RCV_POOL 4
- 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 022f32d..37d85d3 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1639,17 +1639,27 @@ out_err:
- }
- 
- static struct cifsSesInfo *
--cifs_find_smb_ses(struct TCP_Server_Info *server, char *username)
-+cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
- {
--	struct list_head *tmp;
- 	struct cifsSesInfo *ses;
- 
- 	write_lock(&cifs_tcp_ses_lock);
--	list_for_each(tmp, &server->smb_ses_list) {
--		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
--		if (strncmp(ses->userName, username, MAX_USERNAME_SIZE))
--			continue;
--
-+	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+		switch (server->secType) {
-+		case Kerberos:
-+			if (vol->linux_uid != ses->linux_uid)
-+				continue;
-+			break;
-+		default:
-+			/* anything else takes username/password */
-+			if (strncmp(ses->userName, vol->username,
-+				    MAX_USERNAME_SIZE))
-+				continue;
-+			if (strlen(vol->username) != 0 &&
-+			    strncmp(ses->password, vol->password,
-+				    MAX_PASSWORD_SIZE))
-+				continue;
-+		}
- 		++ses->ses_count;
- 		write_unlock(&cifs_tcp_ses_lock);
- 		return ses;
-@@ -1691,7 +1701,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- 
- 	xid = GetXid();
- 
--	ses = cifs_find_smb_ses(server, volume_info->username);
-+	ses = cifs_find_smb_ses(server, volume_info);
- 	if (ses) {
- 		cFYI(1, "Existing smb sess found (status=%d)", ses->status);
- 
--- 
-1.7.1
+David Howells (1):
+      KEYS: Authorise keyctl_set_timeout() on a key if we have its authorisation key
+
+Wang Lei (3):
+      Add DNS support for AFS
+      Provide generic DNS query function
+      Implement a DNS Resolver Module
+
+
+ Documentation/networking/dnsresolver.txt |  150 +++++++++++++++
+ fs/afs/Kconfig                           |    1 
+ fs/afs/cell.c                            |   40 +++-
+ fs/cifs/Kconfig                          |   17 +-
+ fs/cifs/Makefile                         |    2 
+ fs/cifs/cifs_dfs_ref.c                   |    4 
+ fs/cifs/cifsfs.c                         |   13 -
+ fs/cifs/dns_resolve.c                    |  168 -----------------
+ fs/cifs/dns_resolve.h                    |   32 ---
+ include/keys/dnsresolver-type.h          |   23 ++
+ include/linux/dns_resolver.h             |   37 ++++
+ net/Kconfig                              |    1 
+ net/Makefile                             |    1 
+ net/dnsresolver/Kconfig                  |   27 +++
+ net/dnsresolver/Makefile                 |    7 +
+ net/dnsresolver/dns_query.c              |  130 +++++++++++++
+ net/dnsresolver/dns_resolver.c           |  293 ++++++++++++++++++++++++++++++
+ net/dnsresolver/internal.h               |   39 ++++
+ net/dnsresolver/resolv_unc_to_ip.c       |  111 +++++++++++
+ security/keys/keyctl.c                   |   17 ++
+ 20 files changed, 879 insertions(+), 234 deletions(-)
+ create mode 100644 Documentation/networking/dnsresolver.txt
+ delete mode 100644 fs/cifs/dns_resolve.c
+ delete mode 100644 fs/cifs/dns_resolve.h
+ create mode 100644 include/keys/dnsresolver-type.h
+ create mode 100644 include/linux/dns_resolver.h
+ create mode 100644 net/dnsresolver/Kconfig
+ create mode 100644 net/dnsresolver/Makefile
+ create mode 100644 net/dnsresolver/dns_query.c
+ create mode 100644 net/dnsresolver/dns_resolver.c
+ create mode 100644 net/dnsresolver/internal.h
+ create mode 100644 net/dnsresolver/resolv_unc_to_ip.c
