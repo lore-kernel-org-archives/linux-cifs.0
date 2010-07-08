@@ -1,101 +1,78 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/4] Generalise dns_resolver
-Date: Wed, 7 Jul 2010 14:08:12 -0500
-Message-ID: <AANLkTik3NOauuQNsaUbdMj-jTjIT6AKUN8PpZrOpoDqK@mail.gmail.com>
-References: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
+From: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
+Date: Thu, 8 Jul 2010 20:14:23 +0400
+Message-ID: <469B064927F7461992FFB15852A3B90F@lan.jax.org.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain;
+	format=flowed;
+	charset="koi8-r";
+	reply-type=original
+Content-Transfer-Encoding: 7bit
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100707091400.16573.2817.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-ok - sounds fine at first glance to me, but I will look. thx (this
-will help smb2 too - to have dns code separated out)
+Hello,
+After small research I was defined with a key format. It is a "user" key
+type with the description in next format
+ntlminit:host_ip_addr:username:domain for everyone host_ip_addr returned by
+getaddrinfo() from host entered by the user. The domain field can be empty
+and payload consists of plain password.
 
-On Wed, Jul 7, 2010 at 4:14 AM, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
-> Hi Steve,
->
-> The associated patches extract the dns_resolver key type from the CIF=
-S
-> filesystem and make it useful by AFS too. =A0Can you check at least t=
-he second
-> patch which actually modifies CIFS?
->
-> Thanks,
-> David
-> ---
->
-> David Howells (1):
-> =A0 =A0 =A0KEYS: Authorise keyctl_set_timeout() on a key if we have i=
-ts authorisation key
->
-> Wang Lei (3):
-> =A0 =A0 =A0Add DNS support for AFS
-> =A0 =A0 =A0Provide generic DNS query function
-> =A0 =A0 =A0Implement a DNS Resolver Module
->
->
-> =A0Documentation/networking/dnsresolver.txt | =A0150 +++++++++++++++
-> =A0fs/afs/Kconfig =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- | =A0 =A01
-> =A0fs/afs/cell.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0| =A0 40 +++-
-> =A0fs/cifs/Kconfig =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
-| =A0 17 +-
-> =A0fs/cifs/Makefile =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=
- =A0 =A02
-> =A0fs/cifs/cifs_dfs_ref.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 =A0=
-4
-> =A0fs/cifs/cifsfs.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=
- =A0 13 -
-> =A0fs/cifs/dns_resolve.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0| =A0=
-168 -----------------
-> =A0fs/cifs/dns_resolve.h =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0| =A0=
- 32 ---
-> =A0include/keys/dnsresolver-type.h =A0 =A0 =A0 =A0 =A0| =A0 23 ++
-> =A0include/linux/dns_resolver.h =A0 =A0 =A0 =A0 =A0 =A0 | =A0 37 ++++
-> =A0net/Kconfig =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0| =A0 =A01
-> =A0net/Makefile =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- | =A0 =A01
-> =A0net/dnsresolver/Kconfig =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0| =A0 2=
-7 +++
-> =A0net/dnsresolver/Makefile =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 =A0=
-7 +
-> =A0net/dnsresolver/dns_query.c =A0 =A0 =A0 =A0 =A0 =A0 =A0| =A0130 ++=
-+++++++++++
-> =A0net/dnsresolver/dns_resolver.c =A0 =A0 =A0 =A0 =A0 | =A0293 ++++++=
-++++++++++++++++++++++++
-> =A0net/dnsresolver/internal.h =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 39 ++=
-++
-> =A0net/dnsresolver/resolv_unc_to_ip.c =A0 =A0 =A0 | =A0111 ++++++++++=
-+
-> =A0security/keys/keyctl.c =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 | =A0 1=
-7 ++
-> =A020 files changed, 879 insertions(+), 234 deletions(-)
-> =A0create mode 100644 Documentation/networking/dnsresolver.txt
-> =A0delete mode 100644 fs/cifs/dns_resolve.c
-> =A0delete mode 100644 fs/cifs/dns_resolve.h
-> =A0create mode 100644 include/keys/dnsresolver-type.h
-> =A0create mode 100644 include/linux/dns_resolver.h
-> =A0create mode 100644 net/dnsresolver/Kconfig
-> =A0create mode 100644 net/dnsresolver/Makefile
-> =A0create mode 100644 net/dnsresolver/dns_query.c
-> =A0create mode 100644 net/dnsresolver/dns_resolver.c
-> =A0create mode 100644 net/dnsresolver/internal.h
-> =A0create mode 100644 net/dnsresolver/resolv_unc_to_ip.c
->
->
+Now I am puting my keys directly in the session keyring. Whether it is
+necessary to create separate keyring or it is possible to do without it?
+
+Also I have thought over algorithm of addition of a key in session keyring.
+If at least for one of the host's IP addresses there is a key with it in the
+description (with the same username and domain name of course) new keys are
+not will be added. Whether it is correct?
+
+Regards,
+Igor Druzhinin
+
+----- Original Message ----- 
+From: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>; <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sent: Tuesday, July 06, 2010 3:09 PM
+Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
 
 
-
---
-Thanks,
-
-Steve
+> On Tue, 6 Jul 2010 07:00:56 -0400
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>
+>> On Tue, 6 Jul 2010 14:04:44 +0400
+>> "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>
+>> > As I saw current kernel code had no method for checking from userspace
+>> > is
+>> > the entered credentials are wrong without mount. Is it's right?
+>>
+>> Correct. You really can't check without connecting to the server.
+>
+> We certainly could have this tool use libsmbclient to connect to the
+> server and authenticate to test the creds. I wouldn't bother with that
+> for the initial implementation though -- keep it simple. Still it's
+> something to keep in mind while you're coding this up.
+>
+>>
+>> > But if user want to update them there are should be a mechanism for
+>> > clearing
+>> > old or wrong creds. As my opinion it may be something like --clear
+>> > option.
+>>
+>> Sounds good. You will want to be able to update or clear invalid creds.
+>>
+>> > Besides, is it right to store multiple identical creds in keyring or
+>> > creds
+>> > with the same user and domain_host name?
+>>
+>> Not sure that I see any point in multiple creds per user@host or
+>> user@domain. Only one will ever be valid for each combination. Why
+>> would you want multiple sets? How would you know which ones to use?
+>>
+>
+>
+> -- 
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> 
