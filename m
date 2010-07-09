@@ -1,95 +1,71 @@
-From: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
-Date: Fri, 9 Jul 2010 12:54:22 +0400
-Message-ID: <EB4A037CBCED471ABEBDA9BE9D090654@lan.jax.org.ru>
-References: <469B064927F7461992FFB15852A3B90F@lan.jax.org.ru> <20100708125915.5e4eb643@corrin.poochiereds.net>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] Add a pair of system calls to make extended file stats available [ver #3]
+Date: Fri, 09 Jul 2010 14:59:06 +0100
+Message-ID: <21105.1278683946@redhat.com>
+References: <AANLkTikP-u1adVItGDgUZdee14Z13k8MLRC5V7UN-gpV@mail.gmail.com> <20100630233614.32422.97038.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="ISO-8859-1";
-	reply-type=original
-Content-Transfer-Encoding: 7bit
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
+	linux-api@vger.kernel.org
+To: Michael Kerrisk <mtk.manpages@gmail.com>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+In-Reply-To: <AANLkTikP-u1adVItGDgUZdee14Z13k8MLRC5V7UN-gpV@mail.gmail.com>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-About password disclosure. Now I see two ways to solution a problem of 
-password disclosure.
-The first is to put precalculated NT Session key in a key. But then it 
-becomes impossible to use a cache for other methods of authorisation as LM 
-and Plain Password.
-The second is to remove from a key all privileges except View and Write. 
-With "user" type of key Search privilege as I have clarified influences on 
-reading from a key, and the Read flag does not influence on it. Strange 
-behaviour. But then it is necessary to search in the keyring manually both 
-in userspace and in the kernel.
+Michael Kerrisk <mtk.manpages@gmail.com> wrote:
 
------ Original Message ----- 
-From: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sent: Thursday, July 08, 2010 8:59 PM
-Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
+> > =A0 =A0 =A0 =A0struct xstat_parameters {
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned long long =A0 =A0 =A0reques=
+t_mask;
+>=20
+> Poor name, since it's a value-result arg? Better maybe something like
+> "field_mask"?
 
+No.  The contents of xstat_parameters aren't changed.  request_mask is =
+what
+you're asking for, result_mask in the xstat struct is what you actually=
+ got.
 
-> On Thu, 8 Jul 2010 20:14:23 +0400
-> "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> Hello,
->> After small research I was defined with a key format. It is a "user" key
->> type with the description in next format
->> ntlminit:host_ip_addr:username:domain for everyone host_ip_addr returned 
->> by
->> getaddrinfo() from host entered by the user. The domain field can be 
->> empty
->> and payload consists of plain password.
->>
->
-> Sounds reasonable. user keys are probably the best thing since they
-> won't depend on having the cifs kmod loaded. The tricky part though is
-> how to prevent password disclosure. We wouldn't want anyone to walk up
-> to someone's machine after they've entered these creds and then be able
-> to see what their passwords are.
->
->> Now I am puting my keys directly in the session keyring. Whether it is
->> necessary to create separate keyring or it is possible to do without it?
->>
->
-> I don't think you need a separate keyring. The session keyring is
-> probably fine, but maybe that would help the disclosure problem.
->
->> Also I have thought over algorithm of addition of a key in session 
->> keyring.
->> If at least for one of the host's IP addresses there is a key with it in 
->> the
->> description (with the same username and domain name of course) new keys 
->> are
->> not will be added. Whether it is correct?
->>
->
-> Hmm, well...I was going on the assumption that a username will only
-> have one password per host. There is a situation though where that
-> wouldn't necessarily be the case -- if the server is running multiple
-> SMB servers on different ports.
->
-> Also, we probably need to consider the case of someone that has
-> multiple mounts that use the same domain-level credentials, potentially
-> to multiple servers. In that situation, you don't necessarily want to
-> have to reenter the same creds for each IP address. It would be nice to
-> be able to say "this username/password combo is for hosts in domain 
-> EXAMPLE",
-> and then tell the kernel at mount time "this host is in domain EXAMPLE" 
-> and
-> let the kernel use those credentials.
->
-> The kernel already takes a domain= mount option, but it doesn't really
-> do much now and could be used for this.
->
-> For now, I'd probably recommend getting something working with just
-> host-level credentials, and maybe add support for domain-level creds
-> once you have that working.
->
-> -- 
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> 
+result_mask may be more or less than request_mask as the filesystem isn=
+'t
+obliged to supply anything you didn't ask for, and may not be able to s=
+upply
+something you did ask for, and may give you stuff anyway that you didn'=
+t ask
+for if it's trivial to do so.
+
+> There is no XSTAT_REQUEST__GET_ANYWAY, AFAICS. I guess here you meant
+> XSTAT_REQUEST__EXTENDED_STATS? Or?
+
+Yep.  I forgot to change that in the patch description.
+
+> This case is almost certainly a user error, so why not simply return
+> an error (-1 and ERANGE or E2BIG)? The above approach invites
+> userspace errors of the form:
+>=20
+> if (xtat(...) < 0) { /* How users often check for error */
+>     /* I'll handle the error */
+> } else {
+>     /* The call succeeded; I'm fine */
+> }
+
+I suppose.
+
+> If you are looking for a way to inform the user about the required
+> buffer size, I think it would be better to take a leaf from the
+> getxattr(2) book: if 'buflen' is zero, then do nothing with the outpu=
+t
+> arg, but return the size that would be required.
+
+That's reasonable.
+
+David
+--
+To unsubscribe from this list: send the line "unsubscribe linux-ext4" i=
+n
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
