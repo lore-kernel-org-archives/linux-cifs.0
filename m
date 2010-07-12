@@ -1,71 +1,156 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH] Add a pair of system calls to make extended file stats available [ver #3]
-Date: Fri, 09 Jul 2010 14:59:06 +0100
-Message-ID: <21105.1278683946@redhat.com>
-References: <AANLkTikP-u1adVItGDgUZdee14Z13k8MLRC5V7UN-gpV@mail.gmail.com> <20100630233614.32422.97038.stgit@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
-	linux-api@vger.kernel.org
-To: Michael Kerrisk <mtk.manpages@gmail.com>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <AANLkTikP-u1adVItGDgUZdee14Z13k8MLRC5V7UN-gpV@mail.gmail.com>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Subject: [PATCH 22/36] fs/cifs: Remove unnecessary casts of private_data
+Date: Mon, 12 Jul 2010 13:50:14 -0700
+Message-ID: <50f719e6afc5504af06be41c057062f625615a0b.1278967121.git.joe@perches.com>
+References: <cover.1278967120.git.joe@perches.com>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Jiri Kosina <trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <cover.1278967120.git.joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Michael Kerrisk <mtk.manpages@gmail.com> wrote:
+Signed-off-by: Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org>
+---
+ fs/cifs/file.c  |   24 ++++++++++--------------
+ fs/cifs/inode.c |    4 ++--
+ fs/cifs/ioctl.c |    3 +--
+ 3 files changed, 13 insertions(+), 18 deletions(-)
 
-> > =A0 =A0 =A0 =A0struct xstat_parameters {
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned long long =A0 =A0 =A0reques=
-t_mask;
->=20
-> Poor name, since it's a value-result arg? Better maybe something like
-> "field_mask"?
-
-No.  The contents of xstat_parameters aren't changed.  request_mask is =
-what
-you're asking for, result_mask in the xstat struct is what you actually=
- got.
-
-result_mask may be more or less than request_mask as the filesystem isn=
-'t
-obliged to supply anything you didn't ask for, and may not be able to s=
-upply
-something you did ask for, and may give you stuff anyway that you didn'=
-t ask
-for if it's trivial to do so.
-
-> There is no XSTAT_REQUEST__GET_ANYWAY, AFAICS. I guess here you meant
-> XSTAT_REQUEST__EXTENDED_STATS? Or?
-
-Yep.  I forgot to change that in the patch description.
-
-> This case is almost certainly a user error, so why not simply return
-> an error (-1 and ERANGE or E2BIG)? The above approach invites
-> userspace errors of the form:
->=20
-> if (xtat(...) < 0) { /* How users often check for error */
->     /* I'll handle the error */
-> } else {
->     /* The call succeeded; I'm fine */
-> }
-
-I suppose.
-
-> If you are looking for a way to inform the user about the required
-> buffer size, I think it would be better to take a leaf from the
-> getxattr(2) book: if 'buflen' is zero, then do nothing with the outpu=
-t
-> arg, but return the size that would be required.
-
-That's reasonable.
-
-David
---
-To unsubscribe from this list: send the line "unsubscribe linux-ext4" i=
-n
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 409e4f5..b5fb2a0 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -427,7 +427,7 @@ static int cifs_reopen_file(struct file *file, bool can_flush)
+ 	__u16 netfid;
+ 
+ 	if (file->private_data)
+-		pCifsFile = (struct cifsFileInfo *)file->private_data;
++		pCifsFile = file->private_data;
+ 	else
+ 		return -EBADF;
+ 
+@@ -565,8 +565,7 @@ int cifs_close(struct inode *inode, struct file *file)
+ 	int xid, timeout;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifsTconInfo *pTcon;
+-	struct cifsFileInfo *pSMBFile =
+-		(struct cifsFileInfo *)file->private_data;
++	struct cifsFileInfo *pSMBFile = file->private_data;
+ 
+ 	xid = GetXid();
+ 
+@@ -641,8 +640,7 @@ int cifs_closedir(struct inode *inode, struct file *file)
+ {
+ 	int rc = 0;
+ 	int xid;
+-	struct cifsFileInfo *pCFileStruct =
+-	    (struct cifsFileInfo *)file->private_data;
++	struct cifsFileInfo *pCFileStruct = file->private_data;
+ 	char *ptmp;
+ 
+ 	cFYI(1, "Closedir inode = 0x%p", inode);
+@@ -863,8 +861,7 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
+ 				      length, pfLock,
+ 				      posix_lock_type, wait_flag);
+ 	} else {
+-		struct cifsFileInfo *fid =
+-			(struct cifsFileInfo *)file->private_data;
++		struct cifsFileInfo *fid = file->private_data;
+ 
+ 		if (numLock) {
+ 			rc = CIFSSMBLock(xid, tcon, netfid, length,
+@@ -965,7 +962,7 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
+ 
+ 	if (file->private_data == NULL)
+ 		return -EBADF;
+-	open_file = (struct cifsFileInfo *) file->private_data;
++	open_file = file->private_data;
+ 
+ 	rc = generic_write_checks(file, poffset, &write_size, 0);
+ 	if (rc)
+@@ -1067,7 +1064,7 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
+ 
+ 	if (file->private_data == NULL)
+ 		return -EBADF;
+-	open_file = (struct cifsFileInfo *)file->private_data;
++	open_file = file->private_data;
+ 
+ 	xid = GetXid();
+ 
+@@ -1651,8 +1648,7 @@ int cifs_fsync(struct file *file, int datasync)
+ 	int xid;
+ 	int rc = 0;
+ 	struct cifsTconInfo *tcon;
+-	struct cifsFileInfo *smbfile =
+-		(struct cifsFileInfo *)file->private_data;
++	struct cifsFileInfo *smbfile = file->private_data;
+ 	struct inode *inode = file->f_path.dentry->d_inode;
+ 
+ 	xid = GetXid();
+@@ -1756,7 +1752,7 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
+ 		FreeXid(xid);
+ 		return rc;
+ 	}
+-	open_file = (struct cifsFileInfo *)file->private_data;
++	open_file = file->private_data;
+ 
+ 	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
+ 		cFYI(1, "attempting read on write only file instance");
+@@ -1837,7 +1833,7 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 		FreeXid(xid);
+ 		return rc;
+ 	}
+-	open_file = (struct cifsFileInfo *)file->private_data;
++	open_file = file->private_data;
+ 
+ 	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
+ 		cFYI(1, "attempting read on write only file instance");
+@@ -1968,7 +1964,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 		FreeXid(xid);
+ 		return rc;
+ 	}
+-	open_file = (struct cifsFileInfo *)file->private_data;
++	open_file = file->private_data;
+ 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+ 	pTcon = cifs_sb->tcon;
+ 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 107c84d..ee08248 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -288,7 +288,7 @@ int cifs_get_file_info_unix(struct file *filp)
+ 	struct inode *inode = filp->f_path.dentry->d_inode;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifsTconInfo *tcon = cifs_sb->tcon;
+-	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
++	struct cifsFileInfo *cfile = filp->private_data;
+ 
+ 	xid = GetXid();
+ 	rc = CIFSSMBUnixQFileInfo(xid, tcon, cfile->netfid, &find_data);
+@@ -515,7 +515,7 @@ int cifs_get_file_info(struct file *filp)
+ 	struct inode *inode = filp->f_path.dentry->d_inode;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifsTconInfo *tcon = cifs_sb->tcon;
+-	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
++	struct cifsFileInfo *cfile = filp->private_data;
+ 
+ 	xid = GetXid();
+ 	rc = CIFSSMBQFileInfo(xid, tcon, cfile->netfid, &find_data);
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 505926f..9d38a71 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -41,8 +41,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 	__u64	ExtAttrMask = 0;
+ 	__u64   caps;
+ 	struct cifsTconInfo *tcon;
+-	struct cifsFileInfo *pSMBFile =
+-		(struct cifsFileInfo *)filep->private_data;
++	struct cifsFileInfo *pSMBFile = filep->private_data;
+ #endif /* CONFIG_CIFS_POSIX */
+ 
+ 	xid = GetXid();
+-- 
+1.7.1.337.g6068.dirty
