@@ -1,44 +1,55 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 6/6] cifs: add separate cred_uid field to sesInfo
-Date: Thu, 15 Jul 2010 17:19:36 -0400
-Message-ID: <20100715171936.4252a16d@corrin.poochiereds.net>
-References: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
-	<1277068251-16344-7-git-send-email-jlayton@redhat.com>
-	<AANLkTik7vm4iYcRH2oGxuINyL2VxY_h9Y03sFhQWR19d@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTik7vm4iYcRH2oGxuINyL2VxY_h9Y03sFhQWR19d-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended file stats available [ver #6]
+Date: Thu, 15 Jul 2010 22:53:27 +0100
+Message-ID: <30646.1279230807@redhat.com>
+References: <201007152235.22373.arnd@arndb.de> <20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <201007152235.22373.arnd-r2nGTMty4D4@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 15 Jul 2010 15:24:46 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
 
-> I merged the first 5 of this series, but wanted to understand what
-> behavior this changes first (it is probably ok).  With current
-> userspace code - what changes would a user see with this?
+> > This was initially proposed as a set of xattrs, but the general preferance
+> > is for an extended stat structure.
 > 
+> I don't think I'd call this general preference. Three of the four
+> are fixed length and could easily be done inside the structure if you
+> leave a bit of space instead of a variable-length field at the end.
 
-With this and the accompanying userspace patch, this makes it so that
-the credentials cache used when mounting with sec=krb5 is unaffected by
-the uid= option. The credcache will be determined using the real uid of
-the user performing the mount. There will be a cifs.upcall option that
-will make it use the legacy behavior for those that require it for some
-reason. 
+?
 
-I consider the current situation a bad design decision on my part as
-the ownership of files on the mount has no direct relationship to the
-owner of the mount credentials. The mount credentials should always be
-under the ownership of the user performing the mount. The existing
-scheme allows someone to use the credcache of another user to perform
-a mount.
+Maybe I wasn't clear: I meant having an extended stat() syscall rather than
+using a bunch of getxattr()'s was the general preference.
 
-I'll resend the userspace patch in another day or two when I get back
-from vacation.
+> For the volume id, I could not find any file system that requires more
+> than 32 bytes here, which is also reasonable to put into the structure.
+> Make it 36 if you want to cover ascii encoded UUIDs.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+You should also include a length.  Volume IDs may be binary rather than
+NUL-terminated strings.
+
+> That's at most 60 bytes for the extensions you're considering already,
+> plus the 152
+
+160, I think.
+
+> you have already is still less than a cache line on
+> some machines. Padding it to 256 bytes would make it nice and round,
+> if you want to be really sure, make it 384 bytes.
+
+Which we currently allocate on the kernel stack, plus up to a couple of kstat
+structs if something like eCryptFS is used.  Admittedly, the base xstat struct
+could be kmalloc()'d instead, but why use up all that space if you don't need
+it?
+
+David
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
