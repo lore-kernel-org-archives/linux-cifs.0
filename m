@@ -1,7 +1,7 @@
 From: "Angela" <angelgeorg-KK0ffGbhmjU@public.gmane.org>
 Subject: Hello.
-Date: Wed, 14 Jul 2010 23:15:17 +0100
-Message-ID: <SERVEURHYDROSUD9uV50001421d@buleo.net>
+Date: Thu, 15 Jul 2010 02:46:22 +0100
+Message-ID: <SERVEURHYDROSUDVYUQ0001598c@buleo.net>
 Reply-To: <angelageorg-KK0ffGbhmjU@public.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
