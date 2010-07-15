@@ -1,150 +1,85 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 6/6] cifs: add separate cred_uid field to sesInfo
-Date: Thu, 15 Jul 2010 15:24:46 -0500
-Message-ID: <AANLkTik7vm4iYcRH2oGxuINyL2VxY_h9Y03sFhQWR19d@mail.gmail.com>
-References: <1277068251-16344-1-git-send-email-jlayton@redhat.com>
-	<1277068251-16344-7-git-send-email-jlayton@redhat.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended
+	file stats available [ver #6]
+Date: Thu, 15 Jul 2010 22:35:22 +0200
+Message-ID: <201007152235.22373.arnd@arndb.de>
+References: <20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
+	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1277068251-16344-7-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-I merged the first 5 of this series, but wanted to understand what
-behavior this changes first (it is probably ok).  With current
-userspace code - what changes would a user see with this?
+On Thursday 15 July 2010 04:17:12 David Howells wrote:
+> (10) Can be extended by using more request flags and tagging further data after
+>      the end of the standard return data.  Such things as the following could
+>      be returned:
+> 
+>         - BSD st_flags or FS_IOC_GETFLAGS.
+>         - Volume ID / Remote Device ID [Steve French].
+>         - Time granularity (NFSv4 time_delta) [Steve French].
+>         - Mask of features available on file (eg: ACLs, seclabel) [Brad Boyer,
+>           Michael Kerrisk].
+> 
+> This was initially proposed as a set of xattrs, but the general preferance is
+> for an extended stat structure.
 
-On Sun, Jun 20, 2010 at 4:10 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> Right now, there's no clear separation between the uid that owns the
-> credentials used to do the mount and the overriding owner of the file=
-s
-> on that mount.
->
-> Add a separate cred_uid field that is set to the real uid
-> of the mount user. Unlike the linux_uid, the uid=3D option does not
-> override this parameter. The parm is sent to cifs.upcall, which can t=
-hen
-> preferentially use the creduid=3D parm instead of the uid=3D parm for
-> finding credentials.
->
-> This is not the only way to solve this. We could try to do all of thi=
-s
-> in kernel instead by having a module parameter that affects what gets
-> passed in the uid=3D field of the upcall. That said, we have a lot mo=
-re
-> flexibility to change things in userspace so I think it probably make=
-s
-> sense to do it this way.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/cifs_spnego.c | =A0 =A03 +++
-> =A0fs/cifs/cifsglob.h =A0 =A0| =A0 =A03 ++-
-> =A0fs/cifs/connect.c =A0 =A0 | =A0 =A07 +++++--
-> =A03 files changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
-> index 379bd7d..6effccf 100644
-> --- a/fs/cifs/cifs_spnego.c
-> +++ b/fs/cifs/cifs_spnego.c
-> @@ -144,6 +144,9 @@ cifs_get_spnego_key(struct cifsSesInfo *sesInfo)
-> =A0 =A0 =A0 =A0sprintf(dp, ";uid=3D0x%x", sesInfo->linux_uid);
->
-> =A0 =A0 =A0 =A0dp =3D description + strlen(description);
-> + =A0 =A0 =A0 sprintf(dp, ";creduid=3D0x%x", sesInfo->cred_uid);
-> +
-> + =A0 =A0 =A0 dp =3D description + strlen(description);
-> =A0 =A0 =A0 =A0sprintf(dp, ";user=3D%s", sesInfo->userName);
->
-> =A0 =A0 =A0 =A0dp =3D description + strlen(description);
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 415703b..e15d7a5 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -209,7 +209,8 @@ struct cifsSesInfo {
-> =A0 =A0 =A0 =A0char *serverNOS; =A0 =A0 =A0 =A0/* name of network ope=
-rating system of server */
-> =A0 =A0 =A0 =A0char *serverDomain; =A0 =A0 /* security realm of serve=
-r */
-> =A0 =A0 =A0 =A0int Suid; =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* remote smb ui=
-d =A0*/
-> - =A0 =A0 =A0 uid_t linux_uid; =A0 =A0 =A0 =A0/* local Linux uid */
-> + =A0 =A0 =A0 uid_t linux_uid; =A0 =A0 =A0 =A0/* overriding owner of =
-files on the mount */
-> + =A0 =A0 =A0 uid_t cred_uid; =A0 =A0 =A0 =A0 /* owner of credentials=
- */
-> =A0 =A0 =A0 =A0int capabilities;
-> =A0 =A0 =A0 =A0char serverName[SERVER_NAME_LEN_WITH_NULL * 2]; /* BB =
-make bigger for
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0TCP na=
-mes - will ipv6 and sctp addresses fit? */
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 58e0217..920d94e 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -66,6 +66,7 @@ struct smb_vol {
-> =A0 =A0 =A0 =A0char *iocharset; =A0/* local code page for mapping to =
-and from Unicode */
-> =A0 =A0 =A0 =A0char source_rfc1001_name[16]; /* netbios name of clien=
-t */
-> =A0 =A0 =A0 =A0char target_rfc1001_name[16]; /* netbios name of serve=
-r for Win9x/ME */
-> + =A0 =A0 =A0 uid_t cred_uid;
-> =A0 =A0 =A0 =A0uid_t linux_uid;
-> =A0 =A0 =A0 =A0gid_t linux_gid;
-> =A0 =A0 =A0 =A0mode_t file_mode;
-> @@ -830,7 +831,8 @@ cifs_parse_mount_options(char *options, const cha=
-r *devname,
-> =A0 =A0 =A0 =A0/* null target name indicates to use *SMBSERVR default=
- called name
-> =A0 =A0 =A0 =A0 =A0 if we end up sending RFC1001 session initialize *=
-/
-> =A0 =A0 =A0 =A0vol->target_rfc1001_name[0] =3D 0;
-> - =A0 =A0 =A0 vol->linux_uid =3D current_uid(); =A0/* use current_eui=
-d() instead? */
-> + =A0 =A0 =A0 vol->cred_uid =3D current_uid();
-> + =A0 =A0 =A0 vol->linux_uid =3D current_uid();
-> =A0 =A0 =A0 =A0vol->linux_gid =3D current_gid();
->
-> =A0 =A0 =A0 =A0/* default to only allowing write access to owner of t=
-he mount */
-> @@ -1647,7 +1649,7 @@ cifs_find_smb_ses(struct TCP_Server_Info *serve=
-r, struct smb_vol *vol)
-> =A0 =A0 =A0 =A0list_for_each_entry(ses, &server->smb_ses_list, smb_se=
-s_list) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0switch (server->secType) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case Kerberos:
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (vol->linux_uid !=3D=
- ses->linux_uid)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (vol->cred_uid !=3D =
-ses->cred_uid)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0contin=
-ue;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0default:
-> @@ -1764,6 +1766,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server=
-, struct smb_vol *volume_info)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (ses->domainName)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0strcpy(ses->domainName=
-, volume_info->domainname);
-> =A0 =A0 =A0 =A0}
-> + =A0 =A0 =A0 ses->cred_uid =3D volume_info->cred_uid;
-> =A0 =A0 =A0 =A0ses->linux_uid =3D volume_info->linux_uid;
-> =A0 =A0 =A0 =A0ses->overrideSecFlg =3D volume_info->secFlg;
->
-> --
-> 1.6.6.1
->
->
+I don't think I'd call this general preference. Three of the four
+are fixed length and could easily be done inside the structure if you
+leave a bit of space instead of a variable-length field at the end.
 
+For the volume id, I could not find any file system that requires more
+than 32 bytes here, which is also reasonable to put into the structure.
+Make it 36 if you want to cover ascii encoded UUIDs.
 
+That's at most 60 bytes for the extensions you're considering already,
+plus the 152 you have already is still less than a cache line on
+some machines. Padding it to 256 bytes would make it nice and round,
+if you want to be really sure, make it 384 bytes.
 
---=20
-Thanks,
+> The following structures are defined for the use of these new system calls:
+> 
+>         struct xstat_parameters {
+>                 unsigned long long      request_mask;
+>         };
 
-Steve
+I'd also still argue that 32 bits would be better since you can
+put them into the argument list instead of having to use a pointer
+to xstat_parameters. You only use 15 bits so far, so the remaining
+17 bits should go a long way. It's not as important to me as the
+previous point though.
+
+> The system calls are:
+> 
+>         ssize_t ret = xstat(int dfd,
+>                             const char *filename,
+>                             unsigned flags,
+>                             const struct xstat_parameters *params,
+>                             struct xstat *buffer,
+>                             size_t buflen);
+
+The resulting syscall I'd hope for would be
+
+int xstat(dfd, const char *filename, unsigned flags,
+	  unsigned mask, struct xstat *buf);
+
+Everything else in your patch looks very good and has my full support.
+
+	Arnd
