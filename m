@@ -1,55 +1,25 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended file stats available [ver #6]
-Date: Thu, 15 Jul 2010 22:53:27 +0100
-Message-ID: <30646.1279230807@redhat.com>
-References: <201007152235.22373.arnd@arndb.de> <20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201007152235.22373.arnd-r2nGTMty4D4@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+From: Mark Harris <mhlk-gcwzot8L0og@public.gmane.org>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
+	extended file stats available [ver #6]
+Date: Thu, 15 Jul 2010 23:22:51 -0700
+Message-ID: <20100716062251.GA9318@zoia.osj.us>
+References: <201007152235.22373.arnd@arndb.de> <20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021712.5544.44845.stgit@warthog.procyon.org.uk> <30646.1279230807@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20100715021712.5544.44845.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
+> struct xstat_time {
+> 	unsigned long long	tv_sec, tv_nsec;
+> };
 
-> > This was initially proposed as a set of xattrs, but the general preferance
-> > is for an extended stat structure.
-> 
-> I don't think I'd call this general preference. Three of the four
-> are fixed length and could easily be done inside the structure if you
-> leave a bit of space instead of a variable-length field at the end.
-
-?
-
-Maybe I wasn't clear: I meant having an extended stat() syscall rather than
-using a bunch of getxattr()'s was the general preference.
-
-> For the volume id, I could not find any file system that requires more
-> than 32 bytes here, which is also reasonable to put into the structure.
-> Make it 36 if you want to cover ascii encoded UUIDs.
-
-You should also include a length.  Volume IDs may be binary rather than
-NUL-terminated strings.
-
-> That's at most 60 bytes for the extensions you're considering already,
-> plus the 152
-
-160, I think.
-
-> you have already is still less than a cache line on
-> some machines. Padding it to 256 bytes would make it nice and round,
-> if you want to be really sure, make it 384 bytes.
-
-Which we currently allocate on the kernel stack, plus up to a couple of kstat
-structs if something like eCryptFS is used.  Admittedly, the base xstat struct
-could be kmalloc()'d instead, but why use up all that space if you don't need
-it?
-
-David
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+unsigned?  Existing filesystems support on-disk timestamps
+representing times prior to the epoch.
