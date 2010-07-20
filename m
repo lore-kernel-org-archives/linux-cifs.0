@@ -1,54 +1,123 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 04/09] cifs: define superblock-level cache index objects
- and register them
-Date: Tue, 20 Jul 2010 09:37:22 -0400
-Message-ID: <20100720093722.4f734f03@tlielax.poochiereds.net>
-References: <Yes>
-	<1278333747-30651-1-git-send-email-sjayaraman@suse.de>
-	<20100720085327.4d1bf9d7@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 2/4] Implement a DNS Resolver Module
+Date: Tue, 20 Jul 2010 11:25:06 -0400
+Message-ID: <20100720112506.7f7cfe1d@tlielax.poochiereds.net>
+References: <20100707091400.16573.2817.stgit@warthog.procyon.org.uk>
+	<20100707091411.16573.81747.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100720085327.4d1bf9d7-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20100707091411.16573.81747.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 20 Jul 2010 08:53:27 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Wed, 07 Jul 2010 10:14:11 +0100
+David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> On Mon,  5 Jul 2010 18:12:27 +0530
-> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
-> 
-> > Define superblock-level cache index objects (managed by cifsTconInfo structs).
-> > Each superblock object is created in a server-level index object and in itself
-> > an index into which inode-level objects are inserted.
-> > 
-> > The superblock object is keyed by sharename. The UniqueId/IndexNumber is used to
-> > validate that the exported share is the same since we accessed it last time.
-> > 
-> > Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> 
-> Hmm...Steve started merging these already but I've just now had the
-> chance to review them.
-> 
-> This approach may be a problem. It seems to make the assumption that
-> there is only a single tcon per superblock. How exactly will this work
-> when there are multiple tcons per superblock as will be the case with
-> multisession mounts?
-> 
-> By having a cache cookie per tcon, will that mean that you'll
-> potentially have multiple versions of cached inodes (one for each tcon)?
+> From: Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
 
-Ahh nm. This shouldn't be a problem since this key is based on the
-sharename only and that will be the same between the multiple tcons.
+----------------[snip]------------------
 
-Please disregard!
+> +/**
+> + * dns_resolve_unc_to_ip - Resolve UNC server name to ip address.
+> + * @unc: UNC path specifying the server
+> + * @ip_addr: Where to return the IP address.
+> + *
+> + * The IP address will be returned in string form, and the caller is
+> + * responsible for freeing it.
+> + *
+> + * Returns 0 on success, -ve on error.
+> + */
+> +int
+> +dns_resolve_unc_to_ip(const char *unc, char **ip_addr)
+> +{
+> +	struct in_addr s4;
+> +	struct in6_addr	s6;
+> +	char *name, *sep;
+> +	int len, rc;
+> +
+> +	kenter("%s,", unc);
+> +
+> +	rc = -EINVAL;
+> +	if (!ip_addr || !unc)
+> +		goto out;
+> +
+> +	len = strlen(unc);
+> +	if (len < 3)
+> +		goto out;
+> +
+> +	/* discount leading slashes for cifs */
+> +	len -= 2;
+> +	unc += 2;
+> +
+> +	/* search for server name delimiter */
+> +	sep = memchr(unc, '\\', len);
+> +	if (sep)
+> +		len = sep - unc;
+> +	kdebug("server name:%*.*s", len, len, unc);
+> +
+> +	rc = -ENOMEM;
+> +	name = kmalloc(len + 1, GFP_KERNEL);
+> +	if (!name)
+> +		goto out;
+> +
+> +	memcpy(name, unc, len);
+> +	name[len] = 0;
+> +	kdebug("name to resolve '%s'", name);
+> +
+> +	/* Try to convert a string to an IPv4 address */
+> +	rc = in4_pton(name, len, (void *)&s4.s_addr, '\\', NULL);
+> +	if (rc > 0) {
+> +		*ip_addr = name;
+> +		kleave(" = 0 [UNC is IPv4]");
+> +		return 0;
+> +	}
+> +
+> +	/* Try to convert a string to an IPv6 address */
+> +	rc = in6_pton(name, len, (void *)&s6.s6_addr, '\\', NULL);
+> +	if (rc > 0) {
+> +		*ip_addr = name;
+> +		kleave(" = 0 [UNC is IPv6]");
+> +		return 0;
+> +	}
+> +
+
+Another (somewhat minor) nit that Steve F pointed out. The function
+that this replaces in cifs can deal with numeric scopeid's as part of
+the address. For instance:
+
+    fea1::1%2
+
+...where the scopeid here is "2". For linux machines, the scopeid
+essentially equates to an interface index and really has no meaning
+outside of the machine.
+
+It's not clear to me that we'd ever see one of those in a hostname that
+we want to parse here, but it might not hurt to plan for it and deal
+with it appropriately.
+
+> +	/* perform the upcall */
+> +	rc = request_dns_resolution(name, NULL, ip_addr);
+> +	kfree(name);
+> +
+> +out:
+> +	kleave(" = %d", rc);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL(dns_resolve_unc_to_ip);
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+
+
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
