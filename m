@@ -1,75 +1,267 @@
-From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended
-	file stats available [ver #6]
-Date: Thu, 22 Jul 2010 10:24:17 -0700
-Message-ID: <AANLkTilmVdyVdO4EmVtTYi_cvMmPqNEPEnzUkJdk1XyR@mail.gmail.com>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
-	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
-	<30448.1279800887@redhat.com> <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
-	<AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
-	<E1Obxpd-00CRIo-SF@intern.SerNet.DE> <AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
-	<20100722162712.GB10352@jeremy-laptop> <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
-	<alpine.LSU.2.01.1007221859180.27496@obet.zrqbmnf.qr>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 1/6] Add a dentry op to handle automounting rather than
+	abusing follow_link()
+Date: Thu, 22 Jul 2010 18:58:47 +0100
+Message-ID: <20100722175847.5552.11520.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.LSU.2.01.1007221859180.27496-SHaQjdQMGhDmsUXKMKRlFA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jul 22, 2010 at 10:03 AM, Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org> wrote:
->
-> I beg to differ. ctime is not completely useless. It reflects changes on
-> the inode for when you don't you change the content.
+Add a dentry op (d_automount) to handle automounting directories rather than
+abusing the follow_link() inode operation.  The operation is keyed off a new
+inode flag (S_AUTOMOUNT).
 
-Uh. Yes. Except that why is file metadata really different from file
-data? Most people really don't care. And a lot of people have asked
-for creation dates - and I seriously doubt that Windows people
-complain a lot about the fact that there you have mtime for metadata
-changes too.
+This makes it easier to add an AT_ flag to suppress terminal segment automount
+during pathwalk.  It should also remove the need for the kludge code in the
+pathwalk algorithm to handle directories with follow_link() semantics.
 
-The point being that Unix ctime semantics certainly have well-defined
-semantics, but they are in no way "better" than having a real creation
-time, and are often worse.
+I've only changed __follow_mount() to handle automount points, but it might be
+necessary to change follow_mount() too.  The latter is only used from
+follow_dotdot(), but any automounts on ".." should be pinned whilst we're using
+a child of it.
 
-Just imagine what you could do as an MIS person if you actually had a
-creation time you could somewhat trust? You talk about seeing somebody
-change the permissions of /etc/passwd, but realistically, absent
-preexisting semantics, who would really ask for that? The only reason
-you mention that as an example of what you can do with ctime is that
-that is indeed pretty much the _only_ thing you can do with ctime, and
-it really isn't that useful.
+Note that autofs4's use of follow_mount() will need examining if this patch is
+committed.
 
-In contrast, with a creation date, you see the difference between
-people overwriting files by writing to them, or overwriting files by
-creating a new one and moving it over the old one. At a guess, that
-would be quite as useful to a sysadmin as ctime is now (my gut feel is
-that it would be more so, but whatever).
+Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
 
-IOW, there really isn't anything magically good about UNIX ctime
-semantics, and in fact they are totally broken in the presence of
-extended attributes (that's file data, but it only changes ctime? WTF
-is up with that? Yes, I know why it happens, and it makes sense within
-the insane unix ctime rules, but no way does it make sense in a bigger
-picture unless you are in total denial and try to claim that xattrs
-are just metadata despite having contents).
+ Documentation/filesystems/Locking |    2 +
+ Documentation/filesystems/vfs.txt |   13 ++++++
+ fs/namei.c                        |   85 +++++++++++++++++++++++++++++--------
+ include/linux/dcache.h            |    5 ++
+ include/linux/fs.h                |    2 +
+ 5 files changed, 89 insertions(+), 18 deletions(-)
 
-And yes, I am also sure that there are applications that do depend on
-ctime semantics. Trond mentioned NFS serving, and that's unfortunate.
-I bet there are others. That's inevitable when you have 40 years of
-history. So I'm not claiming that re-using ctime is painfree, but for
-somebody that cares about samba a lot, I bet it's a _lot_ better than
-adding a new time that almost nobody actually supports as things stand
-now.
-
-Of people can just use xattrs and do it all entirely in user space. I
-assume that's what samba does now, even outside of birthtime.
-
-                     Linus
+diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/Locking
+index 96d4293..ccbfa98 100644
+--- a/Documentation/filesystems/Locking
++++ b/Documentation/filesystems/Locking
+@@ -16,6 +16,7 @@ prototypes:
+ 	void (*d_release)(struct dentry *);
+ 	void (*d_iput)(struct dentry *, struct inode *);
+ 	char *(*d_dname)((struct dentry *dentry, char *buffer, int buflen);
++	struct vfsmount *(*d_automount)(struct path *path);
+ 
+ locking rules:
+ 	none have BKL
+@@ -27,6 +28,7 @@ d_delete:	yes		no		yes		no
+ d_release:	no		no		no		yes
+ d_iput:		no		no		no		yes
+ d_dname:	no		no		no		no
++d_automount:	no		no		no		yes
+ 
+ --------------------------- inode_operations --------------------------- 
+ prototypes:
+diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
+index 94677e7..31a9e8f 100644
+--- a/Documentation/filesystems/vfs.txt
++++ b/Documentation/filesystems/vfs.txt
+@@ -851,6 +851,7 @@ struct dentry_operations {
+ 	void (*d_release)(struct dentry *);
+ 	void (*d_iput)(struct dentry *, struct inode *);
+ 	char *(*d_dname)(struct dentry *, char *, int);
++	struct vfsmount *(*d_automount)(struct path *);
+ };
+ 
+   d_revalidate: called when the VFS needs to revalidate a dentry. This
+@@ -885,6 +886,18 @@ struct dentry_operations {
+ 	at the end of the buffer, and returns a pointer to the first char.
+ 	dynamic_dname() helper function is provided to take care of this.
+ 
++  d_automount: called when an automount dentry is to be traversed (optional).
++	This should create a new VFS mount record, mount it on the directory
++	and return the record to the caller.  The caller is supplied with a
++	path parameter giving the automount directory to describe the automount
++	target and the parent VFS mount record to provide inheritable mount
++	parameters.  NULL should be returned if someone else managed to make
++	the automount first.  If the automount failed, then an error code
++	should be returned.
++
++	This function is only used if S_AUTOMOUNT is set on the inode to which
++	the dentry refers.
++
+ Example :
+ 
+ static char *pipefs_dname(struct dentry *dent, char *buffer, int buflen)
+diff --git a/fs/namei.c b/fs/namei.c
+index 868d0cb..fcec3c6 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -617,24 +617,71 @@ int follow_up(struct path *path)
+ 	return 1;
+ }
+ 
++/*
++ * Perform an automount
++ */
++static int follow_automount(struct path *path, int res)
++{
++	struct vfsmount *mnt;
++
++	if (!path->dentry->d_op || !path->dentry->d_op->d_automount)
++		return -EREMOTE;
++
++	current->total_link_count++;
++	if (current->total_link_count >= 40)
++		return -ELOOP;
++
++	mnt = path->dentry->d_op->d_automount(path);
++	if (IS_ERR(mnt))
++		return PTR_ERR(mnt);
++	if (!mnt) /* mount collision */
++		return 0;
++
++	if (mnt->mnt_sb == path->mnt->mnt_sb &&
++	    mnt->mnt_root == path->dentry) {
++		mntput(mnt);
++		return -ELOOP;
++	}
++
++	dput(path->dentry);
++	if (res)
++		mntput(path->mnt);
++	path->mnt = mnt;
++	path->dentry = dget(mnt->mnt_root);
++	return 0;
++}
++
+ /* no need for dcache_lock, as serialization is taken care in
+  * namespace.c
+  */
+-static int __follow_mount(struct path *path)
++static int __follow_mount(struct path *path, unsigned nofollow)
+ {
+-	int res = 0;
+-	while (d_mountpoint(path->dentry)) {
+-		struct vfsmount *mounted = lookup_mnt(path);
+-		if (!mounted)
++	struct vfsmount *mounted;
++	int ret, res = 0;
++	for (;;) {
++		while (d_mountpoint(path->dentry)) {
++			if (nofollow)
++				return -ELOOP;
++			mounted = lookup_mnt(path);
++			if (!mounted)
++				break;
++			dput(path->dentry);
++			if (res)
++				mntput(path->mnt);
++			path->mnt = mounted;
++			path->dentry = dget(mounted->mnt_root);
++			res = 1;
++		}
++		if (!d_automount_point(path->dentry))
+ 			break;
+-		dput(path->dentry);
+-		if (res)
+-			mntput(path->mnt);
+-		path->mnt = mounted;
+-		path->dentry = dget(mounted->mnt_root);
++		if (nofollow)
++			return -ELOOP;
++		ret = follow_automount(path, res);
++		if (ret < 0)
++			return ret;
+ 		res = 1;
+ 	}
+-	return res;
++	return 0;
+ }
+ 
+ static void follow_mount(struct path *path)
+@@ -702,6 +749,8 @@ static int do_lookup(struct nameidata *nd, struct qstr *name,
+ 	struct vfsmount *mnt = nd->path.mnt;
+ 	struct dentry *dentry, *parent;
+ 	struct inode *dir;
++	int ret;
++
+ 	/*
+ 	 * See if the low-level filesystem might want
+ 	 * to use its own hash..
+@@ -720,8 +769,10 @@ static int do_lookup(struct nameidata *nd, struct qstr *name,
+ done:
+ 	path->mnt = mnt;
+ 	path->dentry = dentry;
+-	__follow_mount(path);
+-	return 0;
++	ret = __follow_mount(path, 0);
++	if (unlikely(ret < 0))
++		path_put(path);
++	return ret;
+ 
+ need_lookup:
+ 	parent = nd->path.dentry;
+@@ -1721,11 +1772,9 @@ static struct file *do_last(struct nameidata *nd, struct path *path,
+ 	if (open_flag & O_EXCL)
+ 		goto exit_dput;
+ 
+-	if (__follow_mount(path)) {
+-		error = -ELOOP;
+-		if (open_flag & O_NOFOLLOW)
+-			goto exit_dput;
+-	}
++	error = __follow_mount(path, open_flag & O_NOFOLLOW);
++	if (error < 0)
++		goto exit_dput;
+ 
+ 	error = -ENOENT;
+ 	if (!path->dentry->d_inode)
+diff --git a/include/linux/dcache.h b/include/linux/dcache.h
+index eebb617..5380bff 100644
+--- a/include/linux/dcache.h
++++ b/include/linux/dcache.h
+@@ -139,6 +139,7 @@ struct dentry_operations {
+ 	void (*d_release)(struct dentry *);
+ 	void (*d_iput)(struct dentry *, struct inode *);
+ 	char *(*d_dname)(struct dentry *, char *, int);
++	struct vfsmount *(*d_automount)(struct path *);
+ };
+ 
+ /* the dentry parameter passed to d_hash and d_compare is the parent
+@@ -157,6 +158,7 @@ d_compare:	no		yes		yes      no
+ d_delete:	no		yes		no       no
+ d_release:	no		no		no       yes
+ d_iput:		no		no		no       yes
++d_automount:	no		no		no	 yes
+  */
+ 
+ /* d_flags entries */
+@@ -389,6 +391,9 @@ static inline int d_mountpoint(struct dentry *dentry)
+ 	return dentry->d_mounted;
+ }
+ 
++#define d_automount_point(dentry) \
++	(dentry->d_inode && IS_AUTOMOUNT(dentry->d_inode))
++
+ extern struct vfsmount *lookup_mnt(struct path *);
+ extern struct dentry *lookup_create(struct nameidata *nd, int is_dir);
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 68ca1b0..a83fc81 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -235,6 +235,7 @@ struct inodes_stat_t {
+ #define S_NOCMTIME	128	/* Do not update file c/mtime */
+ #define S_SWAPFILE	256	/* Do not truncate: swapon got its bmaps */
+ #define S_PRIVATE	512	/* Inode is fs-internal */
++#define S_AUTOMOUNT	1024	/* Automount/referral quasi-directory */
+ 
+ /*
+  * Note that nosuid etc flags are inode-specific: setting some file-system
+@@ -269,6 +270,7 @@ struct inodes_stat_t {
+ #define IS_NOCMTIME(inode)	((inode)->i_flags & S_NOCMTIME)
+ #define IS_SWAPFILE(inode)	((inode)->i_flags & S_SWAPFILE)
+ #define IS_PRIVATE(inode)	((inode)->i_flags & S_PRIVATE)
++#define IS_AUTOMOUNT(inode)	((inode)->i_flags & S_AUTOMOUNT)
+ 
+ /* the read-only stuff doesn't really belong here, but any other place is
+    probably as bad and I don't want to create yet another include file. */
