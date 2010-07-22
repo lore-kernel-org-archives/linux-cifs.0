@@ -1,53 +1,151 @@
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended
-	file stats available [ver #6]
-Date: Thu, 22 Jul 2010 10:32:31 -0700
-Message-ID: <AANLkTinmV7YuRof7dZGDmbXR_7J2hz2Z_DtsDu54dUGo@mail.gmail.com>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
-	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
-	<30448.1279800887@redhat.com> <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
-	<AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
-	<E1Obxpd-00CRIo-SF@intern.SerNet.DE> <AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
-	<20100722162712.GB10352@jeremy-laptop> <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
-	<20100722171224.GA8630@merit.edu>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 6/6] DNS: Make AFS go to the DNS for AFSDB records for unknown
+	cells
+Date: Thu, 22 Jul 2010 18:33:16 +0100
+Message-ID: <20100722173316.1512.77204.stgit@warthog.procyon.org.uk>
+References: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeremy Allison <jra@samba.org>, Volker.Lendecke@sernet.de,
-	David Howells <dhowells@redhat.com>,
-	Jan Engelhardt <jengelh@medozas.de>,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-To: Jim Rees <rees@umich.edu>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <20100722171224.GA8630@merit.edu>
-Sender: linux-ext4-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Wang Lei <wang840925@gmail.com>,
+	David Howells <dhowells@redhat.com>
+To: smfrench@gmail.com, jlayton@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Jul 22, 2010 at 10:12 AM, Jim Rees <rees@umich.edu> wrote:
->
-> I believe it was done that way so "dump" could backup just the inode =
-and not
-> the data if only the inode had changed. =A0Full history here:
->
-> http://blog.plover.com/Unix/ctime.html
+From: Wang Lei <wang840925@gmail.com>
 
-Yes, the dump reasoning makes sense, and that history also shows that
-originally chmod just changed mtime (since that's the _sane_ thing to
-do). So if it wasn't for dump - that nobody uses any more and that was
-considered a hack even back when and never supported things like
-xattrs etc - unix probably wouldn't have a ctime at all (or would have
-implemented a "creation time" because people would have asked for it).
+Add DNS query support for AFS so that it can get the IP addresses of Volume
+Location servers from the DNS using an AFSDB record.
 
-So I'm sure there are reasons for ctime. That just doesn't mean that
-it's really "good", the same way there were reasons to name "creat()"
-without the "e".
+This requires userspace support.  /etc/request-key.conf must be configured to
+invoke a helper for dns_resolver type keys with a subtype of "afsdb:" in the
+description.
 
-                                  Linus
---
-To unsubscribe from this list: send the line "unsubscribe linux-ext4" i=
-n
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Wang Lei <wang840925@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
+
+ fs/afs/Kconfig |    1 +
+ fs/afs/cell.c  |   40 ++++++++++++++++++++++++++++++----------
+ 2 files changed, 31 insertions(+), 10 deletions(-)
+
+diff --git a/fs/afs/Kconfig b/fs/afs/Kconfig
+index 5c4e61d..8f975f2 100644
+--- a/fs/afs/Kconfig
++++ b/fs/afs/Kconfig
+@@ -2,6 +2,7 @@ config AFS_FS
+ 	tristate "Andrew File System support (AFS) (EXPERIMENTAL)"
+ 	depends on INET && EXPERIMENTAL
+ 	select AF_RXRPC
++	select DNS_RESOLVER
+ 	help
+ 	  If you say Y here, you will get an experimental Andrew File System
+ 	  driver. It currently only supports unsecured read-only AFS access.
+diff --git a/fs/afs/cell.c b/fs/afs/cell.c
+index e19c13f..ffea35c 100644
+--- a/fs/afs/cell.c
++++ b/fs/afs/cell.c
+@@ -13,6 +13,7 @@
+ #include <linux/slab.h>
+ #include <linux/key.h>
+ #include <linux/ctype.h>
++#include <linux/dns_resolver.h>
+ #include <linux/sched.h>
+ #include <keys/rxrpc-type.h>
+ #include "internal.h"
+@@ -36,6 +37,8 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 	struct key *key;
+ 	size_t namelen;
+ 	char keyname[4 + AFS_MAXCELLNAME + 1], *cp, *dp, *next;
++	char  *dvllist = NULL, *_vllist = NULL;
++	char  delimiter = ':';
+ 	int ret;
+ 
+ 	_enter("%s,%s", name, vllist);
+@@ -43,8 +46,10 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 	BUG_ON(!name); /* TODO: want to look up "this cell" in the cache */
+ 
+ 	namelen = strlen(name);
+-	if (namelen > AFS_MAXCELLNAME)
++	if (namelen > AFS_MAXCELLNAME) {
++		_leave(" = -ENAMETOOLONG");
+ 		return ERR_PTR(-ENAMETOOLONG);
++	}
+ 
+ 	/* allocate and initialise a cell record */
+ 	cell = kzalloc(sizeof(struct afs_cell) + namelen + 1, GFP_KERNEL);
+@@ -64,15 +69,31 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 	INIT_LIST_HEAD(&cell->vl_list);
+ 	spin_lock_init(&cell->vl_lock);
+ 
++	/* if the ip address is invalid, try dns query */
++	if (!vllist || strlen(vllist) < 7) {
++		ret = dns_query("afsdb", name, namelen, "ipv4", &dvllist, NULL);
++		if (ret < 0) {
++			_leave(" = %d", ret);
++			return ERR_PTR(ret);
++		}
++		_vllist = dvllist;
++
++		/* change the delimiter for user-space reply */
++		delimiter = ',';
++
++	} else {
++		_vllist = vllist;
++	}
++
+ 	/* fill in the VL server list from the rest of the string */
+ 	do {
+ 		unsigned a, b, c, d;
+ 
+-		next = strchr(vllist, ':');
++		next = strchr(_vllist, delimiter);
+ 		if (next)
+ 			*next++ = 0;
+ 
+-		if (sscanf(vllist, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
++		if (sscanf(_vllist, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+ 			goto bad_address;
+ 
+ 		if (a > 255 || b > 255 || c > 255 || d > 255)
+@@ -81,7 +102,7 @@ static struct afs_cell *afs_cell_alloc(const char *name, char *vllist)
+ 		cell->vl_addrs[cell->vl_naddrs++].s_addr =
+ 			htonl((a << 24) | (b << 16) | (c << 8) | d);
+ 
+-	} while (cell->vl_naddrs < AFS_CELL_MAX_ADDRS && (vllist = next));
++	} while (cell->vl_naddrs < AFS_CELL_MAX_ADDRS && (_vllist = next));
+ 
+ 	/* create a key to represent an anonymous user */
+ 	memcpy(keyname, "afs@", 4);
+@@ -110,6 +131,7 @@ bad_address:
+ 	ret = -EINVAL;
+ error:
+ 	key_put(cell->anonymous_key);
++	kfree(dvllist);
+ 	kfree(cell);
+ 	_leave(" = %d", ret);
+ 	return ERR_PTR(ret);
+@@ -201,14 +223,12 @@ int afs_cell_init(char *rootcell)
+ 	}
+ 
+ 	cp = strchr(rootcell, ':');
+-	if (!cp) {
+-		printk(KERN_ERR "kAFS: no VL server IP addresses specified\n");
+-		_leave(" = -EINVAL");
+-		return -EINVAL;
+-	}
++	if (!cp)
++		_debug("kAFS: no VL server IP addresses specified");
++	else
++		*cp++ = 0;
+ 
+ 	/* allocate a cell record for the root cell */
+-	*cp++ = 0;
+ 	new_root = afs_cell_create(rootcell, cp);
+ 	if (IS_ERR(new_root)) {
+ 		_leave(" = %ld", PTR_ERR(new_root));
