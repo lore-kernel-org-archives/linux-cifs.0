@@ -1,254 +1,129 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/6] NFS: Use d_automount() rather than abusing follow_link()
-Date: Thu, 22 Jul 2010 18:58:57 +0100
-Message-ID: <20100722175857.5552.99050.stgit@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 6/6] Add an AT_NO_AUTOMOUNT flag to suppress terminal automount
+Date: Thu, 22 Jul 2010 18:59:13 +0100
+Message-ID: <20100722175913.5552.3905.stgit@warthog.procyon.org.uk>
 References: <20100722175847.5552.11520.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-To: viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100722175847.5552.11520.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: viro@ZenIV.linux.org.uk
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100722175847.5552.11520.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Make NFS use the new d_automount() dentry operation rather than abusing
-follow_link() on directories.
+Add an AT_NO_AUTOMOUNT flag to suppress terminal automounting of directories
+with follow_link semantics.  This can be used by fstatat()/xstat() users to
+permit the gathering of attributes on an automount point and also prevent
+mass-automounting of a directory of automount points by ls.
 
-Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Acked-by: Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/nfs/dir.c           |    4 ++
- fs/nfs/inode.c         |    4 +-
- fs/nfs/internal.h      |    1 +
- fs/nfs/namespace.c     |   87 ++++++++++++++++++++++--------------------------
- include/linux/nfs_fs.h |    1 -
- 5 files changed, 46 insertions(+), 51 deletions(-)
+ fs/namei.c            |   15 ++++++++++-----
+ fs/stat.c             |    4 +++-
+ include/linux/fcntl.h |    1 +
+ include/linux/namei.h |    2 ++
+ 4 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
-index e60416d..9ce04af 100644
---- a/fs/nfs/dir.c
-+++ b/fs/nfs/dir.c
-@@ -727,7 +727,7 @@ int nfs_lookup_verify_inode(struct inode *inode, struct nameidata *nd)
- {
- 	struct nfs_server *server = NFS_SERVER(inode);
- 
--	if (test_bit(NFS_INO_MOUNTPOINT, &NFS_I(inode)->flags))
-+	if (IS_AUTOMOUNT(inode))
- 		return 0;
- 	if (nd != NULL) {
- 		/* VFS wants an on-the-wire revalidation */
-@@ -927,6 +927,7 @@ const struct dentry_operations nfs_dentry_operations = {
- 	.d_revalidate	= nfs_lookup_revalidate,
- 	.d_delete	= nfs_dentry_delete,
- 	.d_iput		= nfs_dentry_iput,
-+	.d_automount	= nfs_d_automount,
- };
- 
- static struct dentry *nfs_lookup(struct inode *dir, struct dentry * dentry, struct nameidata *nd)
-@@ -1002,6 +1003,7 @@ const struct dentry_operations nfs4_dentry_operations = {
- 	.d_revalidate	= nfs_open_revalidate,
- 	.d_delete	= nfs_dentry_delete,
- 	.d_iput		= nfs_dentry_iput,
-+	.d_automount	= nfs_d_automount,
- };
- 
- /*
-diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
-index 099b351..848abe8 100644
---- a/fs/nfs/inode.c
-+++ b/fs/nfs/inode.c
-@@ -295,7 +295,7 @@ nfs_fhget(struct super_block *sb, struct nfs_fh *fh, struct nfs_fattr *fattr)
- 				else
- 					inode->i_op = &nfs_mountpoint_inode_operations;
- 				inode->i_fop = NULL;
--				set_bit(NFS_INO_MOUNTPOINT, &nfsi->flags);
-+				inode->i_flags |= S_AUTOMOUNT;
- 			}
- 		} else if (S_ISLNK(inode->i_mode))
- 			inode->i_op = &nfs_symlink_inode_operations;
-@@ -1138,7 +1138,7 @@ static int nfs_update_inode(struct inode *inode, struct nfs_fattr *fattr)
- 	/* Update the fsid? */
- 	if (S_ISDIR(inode->i_mode) && (fattr->valid & NFS_ATTR_FATTR_FSID) &&
- 			!nfs_fsid_equal(&server->fsid, &fattr->fsid) &&
--			!test_bit(NFS_INO_MOUNTPOINT, &nfsi->flags))
-+			!IS_AUTOMOUNT(inode))
- 		server->fsid = fattr->fsid;
- 
- 	/*
-diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
-index e70f44b..f597aac 100644
---- a/fs/nfs/internal.h
-+++ b/fs/nfs/internal.h
-@@ -239,6 +239,7 @@ extern char *nfs_path(const char *base,
- 		      const struct dentry *droot,
- 		      const struct dentry *dentry,
- 		      char *buffer, ssize_t buflen);
-+extern struct vfsmount *nfs_d_automount(struct path *path);
- 
- /* getroot.c */
- extern struct dentry *nfs_get_root(struct super_block *, struct nfs_fh *);
-diff --git a/fs/nfs/namespace.c b/fs/nfs/namespace.c
-index db6aa36..bf80079 100644
---- a/fs/nfs/namespace.c
-+++ b/fs/nfs/namespace.c
-@@ -88,9 +88,8 @@ Elong:
- }
- 
- /*
-- * nfs_follow_mountpoint - handle crossing a mountpoint on the server
-- * @dentry - dentry of mountpoint
-- * @nd - nameidata info
-+ * nfs_d_automount - Handle crossing a mountpoint on the server
-+ * @path - The mountpoint
-  *
-  * When we encounter a mountpoint on the server, we want to set up
-  * a mountpoint on the client too, to prevent inode numbers from
-@@ -100,87 +99,81 @@ Elong:
-  * situation, and that different filesystems may want to use
-  * different security flavours.
+diff --git a/fs/namei.c b/fs/namei.c
+index 86068a2..056427e 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -654,7 +654,8 @@ static int follow_automount(struct path *path, int res)
+ /* no need for dcache_lock, as serialization is taken care in
+  * namespace.c
   */
--static void * nfs_follow_mountpoint(struct dentry *dentry, struct nameidata *nd)
-+struct vfsmount *nfs_d_automount(struct path *path)
+-static int __follow_mount(struct path *path, unsigned nofollow)
++static int __follow_mount(struct path *path, unsigned nofollow,
++			  struct nameidata *nd)
  {
- 	struct vfsmount *mnt;
--	struct nfs_server *server = NFS_SERVER(dentry->d_inode);
-+	struct nfs_server *server = NFS_SERVER(path->dentry->d_inode);
- 	struct dentry *parent;
- 	struct nfs_fh *fh = NULL;
- 	struct nfs_fattr *fattr = NULL;
- 	int err;
+ 	struct vfsmount *mounted;
+ 	int ret, res = 0;
+@@ -674,8 +675,12 @@ static int __follow_mount(struct path *path, unsigned nofollow)
+ 		}
+ 		if (!d_automount_point(path->dentry))
+ 			break;
+-		if (nofollow)
+-			return -ELOOP;
++		if (!(nd->flags & LOOKUP_CONTINUE)) {
++			if (nofollow)
++				return -ELOOP;
++			if (nd->flags & LOOKUP_NO_AUTOMOUNT)
++				break;
++		}
+ 		ret = follow_automount(path, res);
+ 		if (ret < 0)
+ 			return ret;
+@@ -769,7 +774,7 @@ static int do_lookup(struct nameidata *nd, struct qstr *name,
+ done:
+ 	path->mnt = mnt;
+ 	path->dentry = dentry;
+-	ret = __follow_mount(path, 0);
++	ret = __follow_mount(path, 0, nd);
+ 	if (unlikely(ret < 0))
+ 		path_put(path);
+ 	return ret;
+@@ -1762,7 +1767,7 @@ static struct file *do_last(struct nameidata *nd, struct path *path,
+ 	if (open_flag & O_EXCL)
+ 		goto exit_dput;
  
--	dprintk("--> nfs_follow_mountpoint()\n");
-+	dprintk("--> nfs_d_automount()\n");
+-	error = __follow_mount(path, open_flag & O_NOFOLLOW);
++	error = __follow_mount(path, open_flag & O_NOFOLLOW, nd);
+ 	if (error < 0)
+ 		goto exit_dput;
  
--	err = -ESTALE;
--	if (IS_ROOT(dentry))
--		goto out_err;
-+	mnt = ERR_PTR(-ESTALE);
-+	if (IS_ROOT(path->dentry))
-+		goto out_nofree;
+diff --git a/fs/stat.c b/fs/stat.c
+index c4ecd52..e4662de 100644
+--- a/fs/stat.c
++++ b/fs/stat.c
+@@ -74,11 +74,13 @@ int vfs_fstatat(int dfd, char __user *filename, struct kstat *stat, int flag)
+ 	int error = -EINVAL;
+ 	int lookup_flags = 0;
  
--	err = -ENOMEM;
-+	mnt = ERR_PTR(-ENOMEM);
- 	fh = nfs_alloc_fhandle();
- 	fattr = nfs_alloc_fattr();
- 	if (fh == NULL || fattr == NULL)
--		goto out_err;
-+		goto out;
+-	if ((flag & ~AT_SYMLINK_NOFOLLOW) != 0)
++	if ((flag & ~AT_SYMLINK_NOFOLLOW | AT_NO_AUTOMOUNT) != 0)
+ 		goto out;
  
- 	dprintk("%s: enter\n", __func__);
--	dput(nd->path.dentry);
--	nd->path.dentry = dget(dentry);
+ 	if (!(flag & AT_SYMLINK_NOFOLLOW))
+ 		lookup_flags |= LOOKUP_FOLLOW;
++	if (flag & AT_NO_AUTOMOUNT)
++		lookup_flags |= LOOKUP_NO_AUTOMOUNT;
  
--	/* Look it up again */
--	parent = dget_parent(nd->path.dentry);
-+	/* Look it up again to get its attributes */
-+	parent = dget_parent(path->dentry);
- 	err = server->nfs_client->rpc_ops->lookup(parent->d_inode,
--						  &nd->path.dentry->d_name,
-+						  &path->dentry->d_name,
- 						  fh, fattr);
- 	dput(parent);
--	if (err != 0)
--		goto out_err;
-+	if (err != 0) {
-+		mnt = ERR_PTR(err);
-+		goto out;
-+	}
+ 	error = user_path_at(dfd, filename, lookup_flags, &path);
+ 	if (error)
+diff --git a/include/linux/fcntl.h b/include/linux/fcntl.h
+index afc00af..a562fa5 100644
+--- a/include/linux/fcntl.h
++++ b/include/linux/fcntl.h
+@@ -45,6 +45,7 @@
+ #define AT_REMOVEDIR		0x200   /* Remove directory instead of
+                                            unlinking file.  */
+ #define AT_SYMLINK_FOLLOW	0x400   /* Follow symbolic links.  */
++#define AT_NO_AUTOMOUNT		0x800	/* Suppress terminal automount traversal */
  
- 	if (fattr->valid & NFS_ATTR_FATTR_V4_REFERRAL)
--		mnt = nfs_do_refmount(nd->path.mnt, nd->path.dentry);
-+		mnt = nfs_do_refmount(path->mnt, path->dentry);
- 	else
--		mnt = nfs_do_submount(nd->path.mnt, nd->path.dentry, fh,
--				      fattr);
--	err = PTR_ERR(mnt);
-+		mnt = nfs_do_submount(path->mnt, path->dentry, fh, fattr);
- 	if (IS_ERR(mnt))
--		goto out_err;
-+		goto out;
+ #ifdef __KERNEL__
  
- 	mntget(mnt);
--	err = do_add_mount(mnt, &nd->path, nd->path.mnt->mnt_flags|MNT_SHRINKABLE,
-+	err = do_add_mount(mnt, path, path->mnt->mnt_flags | MNT_SHRINKABLE,
- 			   &nfs_automount_list);
--	if (err < 0) {
-+	switch (err) {
-+	case 0:
-+		dprintk("%s: done, success\n", __func__);
-+		schedule_delayed_work(&nfs_automount_task, nfs_mountpoint_expiry_timeout);
-+		break;
-+	case -EBUSY:
-+		/* someone else made a mount here whilst we were busy */
- 		mntput(mnt);
--		if (err == -EBUSY)
--			goto out_follow;
--		goto out_err;
-+		dprintk("%s: done, collision\n", __func__);
-+		mnt = NULL;
-+		break;
-+	default:
-+		mntput(mnt);
-+		dprintk("%s: done, error %d\n", __func__, err);
-+		mnt = ERR_PTR(err);
-+		break;
- 	}
--	path_put(&nd->path);
--	nd->path.mnt = mnt;
--	nd->path.dentry = dget(mnt->mnt_root);
--	schedule_delayed_work(&nfs_automount_task, nfs_mountpoint_expiry_timeout);
-+
- out:
- 	nfs_free_fattr(fattr);
- 	nfs_free_fhandle(fh);
--	dprintk("%s: done, returned %d\n", __func__, err);
--
--	dprintk("<-- nfs_follow_mountpoint() = %d\n", err);
--	return ERR_PTR(err);
--out_err:
--	path_put(&nd->path);
--	goto out;
--out_follow:
--	while (d_mountpoint(nd->path.dentry) &&
--	       follow_down(&nd->path))
--		;
--	err = 0;
--	goto out;
-+out_nofree:
-+	dprintk("<-- nfs_follow_mountpoint() = %p\n", mnt);
-+	return mnt;
- }
- 
- const struct inode_operations nfs_mountpoint_inode_operations = {
--	.follow_link	= nfs_follow_mountpoint,
- 	.getattr	= nfs_getattr,
- };
- 
- const struct inode_operations nfs_referral_inode_operations = {
--	.follow_link	= nfs_follow_mountpoint,
- };
- 
- static void nfs_expire_automounts(struct work_struct *work)
-diff --git a/include/linux/nfs_fs.h b/include/linux/nfs_fs.h
-index 77c2ae5..4511220 100644
---- a/include/linux/nfs_fs.h
-+++ b/include/linux/nfs_fs.h
-@@ -205,7 +205,6 @@ struct nfs_inode {
- #define NFS_INO_ADVISE_RDPLUS	(0)		/* advise readdirplus */
- #define NFS_INO_STALE		(1)		/* possible stale inode */
- #define NFS_INO_ACL_LRU_SET	(2)		/* Inode is on the LRU list */
--#define NFS_INO_MOUNTPOINT	(3)		/* inode is remote mountpoint */
- #define NFS_INO_FLUSHING	(4)		/* inode is flushing out data */
- #define NFS_INO_FSCACHE		(5)		/* inode can be cached by FS-Cache */
- #define NFS_INO_FSCACHE_LOCK	(6)		/* FS-Cache cookie management lock */
+diff --git a/include/linux/namei.h b/include/linux/namei.h
+index 05b441d..1e1febf 100644
+--- a/include/linux/namei.h
++++ b/include/linux/namei.h
+@@ -43,12 +43,14 @@ enum {LAST_NORM, LAST_ROOT, LAST_DOT, LAST_DOTDOT, LAST_BIND};
+  *  - internal "there are more path components" flag
+  *  - locked when lookup done with dcache_lock held
+  *  - dentry cache is untrusted; force a real lookup
++ *  - suppress terminal automount
+  */
+ #define LOOKUP_FOLLOW		 1
+ #define LOOKUP_DIRECTORY	 2
+ #define LOOKUP_CONTINUE		 4
+ #define LOOKUP_PARENT		16
+ #define LOOKUP_REVAL		64
++#define LOOKUP_NO_AUTOMOUNT	128
+ /*
+  * Intent data
+  */
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
