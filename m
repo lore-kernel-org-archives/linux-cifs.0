@@ -1,216 +1,249 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 2/6] CIFS: Fix a malicious redirect problem in the DNS lookup
-	code
-Date: Thu, 22 Jul 2010 18:32:56 +0100
-Message-ID: <20100722173256.1512.57802.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 3/6] CIFS: Make cifs_convert_address() take a const src
+	pointer and a length
+Date: Thu, 22 Jul 2010 18:33:01 +0100
+Message-ID: <20100722173301.1512.52037.stgit@warthog.procyon.org.uk>
 References: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
 	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	Steve French <smfrench@gmail.com>
+	David Howells <dhowells@redhat.com>
 To: smfrench@gmail.com, jlayton@redhat.com
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Fix the security problem in the CIFS filesystem DNS lookup code in which a
-malicious redirect could be installed by a random user by simply adding a
-result record into one of their keyrings with add_key() and then invoking a
-CIFS CFS lookup [CVE-2010-2524].
+Make cifs_convert_address() take a const src pointer and a length so that all
+the strlen() calls in their can be cut out and to make it unnecessary to modify
+the src string.
 
-This is done by creating an internal keyring specifically for the caching of
-DNS lookups.  To enforce the use of this keyring, the module init routine
-creates a set of override credentials with the keyring installed as the thread
-keyring and instructs request_key() to only install lookup result keys in that
-keyring.
-
-The override is then applied around the call to request_key().
-
-This has some additional benefits when a kernel service uses this module to
-request a key:
-
- (1) The result keys are owned by root, not the user that caused the lookup.
-
- (2) The result keys don't pop up in the user's keyrings.
-
- (3) The result keys don't come out of the quota of the user that caused the
-     lookup.
-
-The keyring can be viewed as root by doing cat /proc/keys:
-
-2a0ca6c3 I-----     1 perm 1f030000     0     0 keyring   .dns_resolver: 1/4
-
-It can then be listed with 'keyctl list' by root.
-
-	# keyctl list 0x2a0ca6c3
-	1 key in keyring:
-	726766307: --alswrv     0     0 dns_resolver: foo.bar.com
+Also return the data length from dns_resolve_server_name_to_ip() so that a
+strlen() can be cut out of cifs_compose_mount_options() too.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-and-Tested-by: Jeff Layton <jlayton@redhat.com>
-Acked-by: Steve French <smfrench@gmail.com>
 ---
 
- fs/cifs/cifsfs.c      |    6 ++--
- fs/cifs/dns_resolve.c |   69 +++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/dns_resolve.h |    4 +--
- 3 files changed, 74 insertions(+), 5 deletions(-)
+ fs/cifs/cifs_dfs_ref.c |    5 ++---
+ fs/cifs/cifsproto.h    |    4 ++--
+ fs/cifs/connect.c      |    1 +
+ fs/cifs/dns_resolve.c  |   20 +++++++++-----------
+ fs/cifs/netmisc.c      |   45 ++++++++++++++++++++++++---------------------
+ 5 files changed, 38 insertions(+), 37 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index c78d219..8a2cf12 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -935,7 +935,7 @@ init_cifs(void)
- 		goto out_unregister_filesystem;
- #endif
- #ifdef CONFIG_CIFS_DFS_UPCALL
--	rc = register_key_type(&key_type_dns_resolver);
-+	rc = cifs_init_dns_resolver();
- 	if (rc)
- 		goto out_unregister_key_type;
- #endif
-@@ -947,7 +947,7 @@ init_cifs(void)
- 
-  out_unregister_resolver_key:
- #ifdef CONFIG_CIFS_DFS_UPCALL
--	unregister_key_type(&key_type_dns_resolver);
-+	cifs_exit_dns_resolver();
-  out_unregister_key_type:
- #endif
- #ifdef CONFIG_CIFS_UPCALL
-@@ -976,7 +976,7 @@ exit_cifs(void)
- 	cifs_fscache_unregister();
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	cifs_dfs_release_automount_timer();
--	unregister_key_type(&key_type_dns_resolver);
-+	cifs_exit_dns_resolver();
- #endif
- #ifdef CONFIG_CIFS_UPCALL
- 	unregister_key_type(&cifs_spnego_key_type);
-diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
-index 22afe38..ff6fa2f 100644
---- a/fs/cifs/dns_resolve.c
-+++ b/fs/cifs/dns_resolve.c
-@@ -24,12 +24,16 @@
-  */
- 
- #include <linux/slab.h>
-+#include <linux/keyctl.h>
-+#include <linux/key-type.h>
- #include <keys/user-type.h>
- #include "dns_resolve.h"
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
- 
-+static const struct cred *dns_resolver_cache;
-+
- /* Checks if supplied name is IP address
-  * returns:
-  * 		1 - name is IP
-@@ -94,6 +98,7 @@ struct key_type key_type_dns_resolver = {
- int
- dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
- {
-+	const struct cred *saved_cred;
- 	int rc = -EAGAIN;
- 	struct key *rkey = ERR_PTR(-EAGAIN);
- 	char *name;
-@@ -133,8 +138,15 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
- 		goto skip_upcall;
+diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+index ac19a6f..37543e8 100644
+--- a/fs/cifs/cifs_dfs_ref.c
++++ b/fs/cifs/cifs_dfs_ref.c
+@@ -141,7 +141,7 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
  	}
  
-+	saved_cred = override_creds(dns_resolver_cache);
- 	rkey = request_key(&key_type_dns_resolver, name, "");
-+	revert_creds(saved_cred);
- 	if (!IS_ERR(rkey)) {
-+		if (!(rkey->perm & KEY_USR_VIEW)) {
-+			down_read(&rkey->sem);
-+			rkey->perm |= KEY_USR_VIEW;
-+			up_read(&rkey->sem);
-+		}
- 		len = rkey->type_data.x[0];
- 		data = rkey->payload.data;
- 	} else {
-@@ -165,4 +177,61 @@ out:
- 	return rc;
+ 	rc = dns_resolve_server_name_to_ip(*devname, &srvIP);
+-	if (rc != 0) {
++	if (rc < 0) {
+ 		cERROR(1, "%s: Failed to resolve server part of %s to IP: %d",
+ 			  __func__, *devname, rc);
+ 		goto compose_mount_options_err;
+@@ -150,8 +150,7 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
+ 	 * assuming that we have 'unc=' and 'ip=' in
+ 	 * the original sb_mountdata
+ 	 */
+-	md_len = strlen(sb_mountdata) + strlen(srvIP) +
+-		strlen(ref->node_name) + 12;
++	md_len = strlen(sb_mountdata) + rc + strlen(ref->node_name) + 12;
+ 	mountdata = kzalloc(md_len+1, GFP_KERNEL);
+ 	if (mountdata == NULL) {
+ 		rc = -ENOMEM;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 2eaebbd..1f54508 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -86,8 +86,8 @@ extern unsigned int smbCalcSize(struct smb_hdr *ptr);
+ extern unsigned int smbCalcSize_LE(struct smb_hdr *ptr);
+ extern int decode_negTokenInit(unsigned char *security_blob, int length,
+ 			struct TCP_Server_Info *server);
+-extern int cifs_convert_address(struct sockaddr *dst, char *src);
+-extern int cifs_fill_sockaddr(struct sockaddr *dst, char *src,
++extern int cifs_convert_address(struct sockaddr *dst, const char *src, int len);
++extern int cifs_fill_sockaddr(struct sockaddr *dst, const char *src, int len,
+ 				unsigned short int port);
+ extern int map_smb_to_linux_error(struct smb_hdr *smb, int logErr);
+ extern void header_assemble(struct smb_hdr *, char /* command */ ,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 399b601..7a78b49 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1538,6 +1538,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	if (volume_info->UNCip && volume_info->UNC) {
+ 		rc = cifs_fill_sockaddr((struct sockaddr *)&addr,
+ 					volume_info->UNCip,
++					strlen(volume_info->UNCip),
+ 					volume_info->port);
+ 		if (!rc) {
+ 			/* we failed translating address */
+diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
+index ff6fa2f..8de3b98 100644
+--- a/fs/cifs/dns_resolve.c
++++ b/fs/cifs/dns_resolve.c
+@@ -40,11 +40,11 @@ static const struct cred *dns_resolver_cache;
+  * 		0 - name is not IP
+  */
+ static int
+-is_ip(char *name)
++is_ip(const char *name, int len)
+ {
+ 	struct sockaddr_storage ss;
+ 
+-	return cifs_convert_address((struct sockaddr *)&ss, name);
++	return cifs_convert_address((struct sockaddr *)&ss, name, len);
  }
  
-+int __init cifs_init_dns_resolver(void)
-+{
-+	struct cred *cred;
-+	struct key *keyring;
-+	int ret;
-+
-+	printk(KERN_NOTICE "Registering the %s key type\n",
-+	       key_type_dns_resolver.name);
-+
-+	/* create an override credential set with a special thread keyring in
-+	 * which DNS requests are cached
-+	 *
-+	 * this is used to prevent malicious redirections from being installed
-+	 * with add_key().
-+	 */
-+	cred = prepare_kernel_cred(NULL);
-+	if (!cred)
-+		return -ENOMEM;
-+
-+	keyring = key_alloc(&key_type_keyring, ".dns_resolver", 0, 0, cred,
-+			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
-+			    KEY_USR_VIEW | KEY_USR_READ,
-+			    KEY_ALLOC_NOT_IN_QUOTA);
-+	if (IS_ERR(keyring)) {
-+		ret = PTR_ERR(keyring);
-+		goto failed_put_cred;
-+	}
-+
-+	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
-+	if (ret < 0)
-+		goto failed_put_key;
-+
-+	ret = register_key_type(&key_type_dns_resolver);
-+	if (ret < 0)
-+		goto failed_put_key;
-+
-+	/* instruct request_key() to use this special keyring as a cache for
-+	 * the results it looks up */
-+	cred->thread_keyring = keyring;
-+	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
-+	dns_resolver_cache = cred;
-+	return 0;
-+
-+failed_put_key:
-+	key_put(keyring);
-+failed_put_cred:
-+	put_cred(cred);
-+	return ret;
-+}
+ static int
+@@ -54,6 +54,10 @@ dns_resolver_instantiate(struct key *key, const void *data,
+ 	int rc = 0;
+ 	char *ip;
  
-+void __exit cifs_exit_dns_resolver(void)
-+{
-+	key_revoke(dns_resolver_cache->thread_keyring);
-+	unregister_key_type(&key_type_dns_resolver);
-+	put_cred(dns_resolver_cache);
-+	printk(KERN_NOTICE "Unregistered %s key type\n",
-+	       key_type_dns_resolver.name);
-+}
-diff --git a/fs/cifs/dns_resolve.h b/fs/cifs/dns_resolve.h
-index 966e928..26b9eaa 100644
---- a/fs/cifs/dns_resolve.h
-+++ b/fs/cifs/dns_resolve.h
-@@ -24,8 +24,8 @@
- #define _DNS_RESOLVE_H
++	/* make sure this looks like an address */
++	if (!is_ip(data, datalen))
++		return -EINVAL;
++
+ 	ip = kmalloc(datalen + 1, GFP_KERNEL);
+ 	if (!ip)
+ 		return -ENOMEM;
+@@ -61,12 +65,6 @@ dns_resolver_instantiate(struct key *key, const void *data,
+ 	memcpy(ip, data, datalen);
+ 	ip[datalen] = '\0';
  
- #ifdef __KERNEL__
--#include <linux/key-type.h>
--extern struct key_type key_type_dns_resolver;
-+extern int __init cifs_init_dns_resolver(void);
-+extern void __exit cifs_exit_dns_resolver(void);
- extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
- #endif /* KERNEL */
+-	/* make sure this looks like an address */
+-	if (!is_ip(ip)) {
+-		kfree(ip);
+-		return -EINVAL;
+-	}
+-
+ 	key->type_data.x[0] = datalen;
+ 	key->payload.data = ip;
  
-
+@@ -93,7 +91,7 @@ struct key_type key_type_dns_resolver = {
+  * 	unc - server UNC
+  * output:
+  * 	*ip_addr - pointer to server ip, caller responcible for freeing it.
+- * return 0 on success
++ * return the length of the returned string on success
+  */
+ int
+ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
+@@ -131,7 +129,7 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
+ 	memcpy(name, unc+2, len);
+ 	name[len] = 0;
+ 
+-	if (is_ip(name)) {
++	if (is_ip(name, len)) {
+ 		cFYI(1, "%s: it is IP, skipping dns upcall: %s",
+ 					__func__, name);
+ 		data = name;
+@@ -164,7 +162,7 @@ skip_upcall:
+ 							name,
+ 							*ip_addr
+ 					);
+-			rc = 0;
++			rc = len;
+ 		} else {
+ 			rc = -ENOMEM;
+ 		}
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index 3489468..b7f5975 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -139,17 +139,18 @@ static const struct smb_to_posix_error mapping_table_ERRHRD[] = {
+  * Returns 0 on failure.
+  */
+ static int
+-cifs_inet_pton(const int address_family, const char *cp, void *dst)
++cifs_inet_pton(const int address_family, const char *cp, int len, void *dst)
+ {
+ 	int ret = 0;
+ 
+ 	/* calculate length by finding first slash or NULL */
+ 	if (address_family == AF_INET)
+-		ret = in4_pton(cp, -1 /* len */, dst, '\\', NULL);
++		ret = in4_pton(cp, len, dst, '\\', NULL);
+ 	else if (address_family == AF_INET6)
+-		ret = in6_pton(cp, -1 /* len */, dst , '\\', NULL);
++		ret = in6_pton(cp, len, dst , '\\', NULL);
+ 
+-	cFYI(DBG2, "address conversion returned %d for %s", ret, cp);
++	cFYI(DBG2, "address conversion returned %d for %*.*s",
++	     ret, len, len, cp);
+ 	if (ret > 0)
+ 		ret = 1;
+ 	return ret;
+@@ -164,37 +165,39 @@ cifs_inet_pton(const int address_family, const char *cp, void *dst)
+  * Returns 0 on failure.
+  */
+ int
+-cifs_convert_address(struct sockaddr *dst, char *src)
++cifs_convert_address(struct sockaddr *dst, const char *src, int len)
+ {
+-	int rc;
+-	char *pct, *endp;
++	int rc, alen, slen;
++	const char *pct;
++	char *endp, scope_id[13];
+ 	struct sockaddr_in *s4 = (struct sockaddr_in *) dst;
+ 	struct sockaddr_in6 *s6 = (struct sockaddr_in6 *) dst;
+ 
+ 	/* IPv4 address */
+-	if (cifs_inet_pton(AF_INET, src, &s4->sin_addr.s_addr)) {
++	if (cifs_inet_pton(AF_INET, src, len, &s4->sin_addr.s_addr)) {
+ 		s4->sin_family = AF_INET;
+ 		return 1;
+ 	}
+ 
+-	/* temporarily terminate string */
+-	pct = strchr(src, '%');
+-	if (pct)
+-		*pct = '\0';
+-
+-	rc = cifs_inet_pton(AF_INET6, src, &s6->sin6_addr.s6_addr);
+-
+-	/* repair temp termination (if any) and make pct point to scopeid */
+-	if (pct)
+-		*pct++ = '%';
++	/* attempt to exclude the scope ID from the address part */
++	pct = memchr(src, '%', len);
++	alen = pct ? pct - src : len;
+ 
++	rc = cifs_inet_pton(AF_INET6, src, alen, &s6->sin6_addr.s6_addr);
+ 	if (!rc)
+ 		return rc;
+ 
+ 	s6->sin6_family = AF_INET6;
+ 	if (pct) {
++		/* grab the scope ID */
++		slen = len - (alen + 1);
++		if (slen <= 0 || slen > 12)
++			return 0;
++		memcpy(scope_id, pct + 1, slen);
++		scope_id[slen] = '\0';
++
+ 		s6->sin6_scope_id = (u32) simple_strtoul(pct, &endp, 0);
+-		if (!*pct || *endp)
++		if (endp != scope_id + slen)
+ 			return 0;
+ 	}
+ 
+@@ -202,10 +205,10 @@ cifs_convert_address(struct sockaddr *dst, char *src)
+ }
+ 
+ int
+-cifs_fill_sockaddr(struct sockaddr *dst, char *src,
++cifs_fill_sockaddr(struct sockaddr *dst, const char *src, int len,
+ 		   const unsigned short int port)
+ {
+-	if (!cifs_convert_address(dst, src))
++	if (!cifs_convert_address(dst, src, len))
+ 		return 0;
+ 
+ 	switch (dst->sa_family) {
