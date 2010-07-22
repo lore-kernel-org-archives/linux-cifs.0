@@ -1,7 +1,7 @@
 From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/6] CIFS: Use d_automount() rather than abusing follow_link()
-Date: Thu, 22 Jul 2010 18:59:02 +0100
-Message-ID: <20100722175902.5552.16278.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 3/6] NFS: Use d_automount() rather than abusing follow_link()
+Date: Thu, 22 Jul 2010 18:58:57 +0100
+Message-ID: <20100722175857.5552.99050.stgit@warthog.procyon.org.uk>
 References: <20100722175847.5552.11520.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -9,323 +9,244 @@ Content-Transfer-Encoding: 7bit
 Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
 	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
 To: viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <20100722175847.5552.11520.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-Make CIFS use the new d_automount() dentry operation rather than abusing
+Make NFS use the new d_automount() dentry operation rather than abusing
 follow_link() on directories.
 
-[NOTE: THIS IS UNTESTED!]
-
-[Question:  Why does cifs_dfs_do_refmount() when the caller has already done
-	    that and could pass the result through?]
-
 Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Acked-by: Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
 ---
 
- fs/cifs/cifs_dfs_ref.c |  145 +++++++++++++++++++++++-------------------------
- fs/cifs/cifsfs.h       |    6 ++
- fs/cifs/dir.c          |    2 +
- fs/cifs/inode.c        |    8 ++-
- 4 files changed, 83 insertions(+), 78 deletions(-)
+ fs/nfs/dir.c           |    4 ++
+ fs/nfs/inode.c         |    4 +-
+ fs/nfs/internal.h      |    1 +
+ fs/nfs/namespace.c     |   87 ++++++++++++++++++++++--------------------------
+ include/linux/nfs_fs.h |    1 -
+ 5 files changed, 46 insertions(+), 51 deletions(-)
 
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index 37543e8..bc094f4 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -230,8 +230,8 @@ compose_mount_options_err:
- }
- 
- 
--static struct vfsmount *cifs_dfs_do_refmount(const struct vfsmount *mnt_parent,
--		struct dentry *dentry, const struct dfs_info3_param *ref)
-+static struct vfsmount *cifs_dfs_do_refmount(struct dentry *mntpt,
-+					     const struct dfs_info3_param *ref)
+diff --git a/fs/nfs/dir.c b/fs/nfs/dir.c
+index e60416d..9ce04af 100644
+--- a/fs/nfs/dir.c
++++ b/fs/nfs/dir.c
+@@ -727,7 +727,7 @@ int nfs_lookup_verify_inode(struct inode *inode, struct nameidata *nd)
  {
- 	struct cifs_sb_info *cifs_sb;
- 	struct vfsmount *mnt;
-@@ -239,12 +239,12 @@ static struct vfsmount *cifs_dfs_do_refmount(const struct vfsmount *mnt_parent,
- 	char *devname = NULL;
- 	char *fullpath;
+ 	struct nfs_server *server = NFS_SERVER(inode);
  
--	cifs_sb = CIFS_SB(dentry->d_inode->i_sb);
-+	cifs_sb = CIFS_SB(mntpt->d_inode->i_sb);
+-	if (test_bit(NFS_INO_MOUNTPOINT, &NFS_I(inode)->flags))
++	if (IS_AUTOMOUNT(inode))
+ 		return 0;
+ 	if (nd != NULL) {
+ 		/* VFS wants an on-the-wire revalidation */
+@@ -927,6 +927,7 @@ const struct dentry_operations nfs_dentry_operations = {
+ 	.d_revalidate	= nfs_lookup_revalidate,
+ 	.d_delete	= nfs_dentry_delete,
+ 	.d_iput		= nfs_dentry_iput,
++	.d_automount	= nfs_d_automount,
+ };
+ 
+ static struct dentry *nfs_lookup(struct inode *dir, struct dentry * dentry, struct nameidata *nd)
+@@ -1002,6 +1003,7 @@ const struct dentry_operations nfs4_dentry_operations = {
+ 	.d_revalidate	= nfs_open_revalidate,
+ 	.d_delete	= nfs_dentry_delete,
+ 	.d_iput		= nfs_dentry_iput,
++	.d_automount	= nfs_d_automount,
+ };
+ 
+ /*
+diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
+index 099b351..848abe8 100644
+--- a/fs/nfs/inode.c
++++ b/fs/nfs/inode.c
+@@ -295,7 +295,7 @@ nfs_fhget(struct super_block *sb, struct nfs_fh *fh, struct nfs_fattr *fattr)
+ 				else
+ 					inode->i_op = &nfs_mountpoint_inode_operations;
+ 				inode->i_fop = NULL;
+-				set_bit(NFS_INO_MOUNTPOINT, &nfsi->flags);
++				inode->i_flags |= S_AUTOMOUNT;
+ 			}
+ 		} else if (S_ISLNK(inode->i_mode))
+ 			inode->i_op = &nfs_symlink_inode_operations;
+@@ -1138,7 +1138,7 @@ static int nfs_update_inode(struct inode *inode, struct nfs_fattr *fattr)
+ 	/* Update the fsid? */
+ 	if (S_ISDIR(inode->i_mode) && (fattr->valid & NFS_ATTR_FATTR_FSID) &&
+ 			!nfs_fsid_equal(&server->fsid, &fattr->fsid) &&
+-			!test_bit(NFS_INO_MOUNTPOINT, &nfsi->flags))
++			!IS_AUTOMOUNT(inode))
+ 		server->fsid = fattr->fsid;
+ 
  	/*
- 	 * this function gives us a path with a double backslash prefix. We
- 	 * require a single backslash for DFS.
- 	 */
--	fullpath = build_path_from_dentry(dentry);
-+	fullpath = build_path_from_dentry(mntpt);
- 	if (!fullpath)
- 		return ERR_PTR(-ENOMEM);
+diff --git a/fs/nfs/internal.h b/fs/nfs/internal.h
+index e70f44b..f597aac 100644
+--- a/fs/nfs/internal.h
++++ b/fs/nfs/internal.h
+@@ -239,6 +239,7 @@ extern char *nfs_path(const char *base,
+ 		      const struct dentry *droot,
+ 		      const struct dentry *dentry,
+ 		      char *buffer, ssize_t buflen);
++extern struct vfsmount *nfs_d_automount(struct path *path);
  
-@@ -262,35 +262,6 @@ static struct vfsmount *cifs_dfs_do_refmount(const struct vfsmount *mnt_parent,
- 
+ /* getroot.c */
+ extern struct dentry *nfs_get_root(struct super_block *, struct nfs_fh *);
+diff --git a/fs/nfs/namespace.c b/fs/nfs/namespace.c
+index db6aa36..bf80079 100644
+--- a/fs/nfs/namespace.c
++++ b/fs/nfs/namespace.c
+@@ -88,9 +88,8 @@ Elong:
  }
  
--static int add_mount_helper(struct vfsmount *newmnt, struct nameidata *nd,
--				struct list_head *mntlist)
--{
--	/* stolen from afs code */
--	int err;
--
--	mntget(newmnt);
--	err = do_add_mount(newmnt, &nd->path, nd->path.mnt->mnt_flags | MNT_SHRINKABLE, mntlist);
--	switch (err) {
--	case 0:
--		path_put(&nd->path);
--		nd->path.mnt = newmnt;
--		nd->path.dentry = dget(newmnt->mnt_root);
--		schedule_delayed_work(&cifs_dfs_automount_task,
--				      cifs_dfs_mountpoint_expiry_timeout);
--		break;
--	case -EBUSY:
--		/* someone else made a mount here whilst we were busy */
--		while (d_mountpoint(nd->path.dentry) &&
--		       follow_down(&nd->path))
--			;
--		err = 0;
--	default:
--		mntput(newmnt);
--		break;
--	}
--	return err;
--}
--
- static void dump_referral(const struct dfs_info3_param *ref)
+ /*
+- * nfs_follow_mountpoint - handle crossing a mountpoint on the server
+- * @dentry - dentry of mountpoint
+- * @nd - nameidata info
++ * nfs_d_automount - Handle crossing a mountpoint on the server
++ * @path - The mountpoint
+  *
+  * When we encounter a mountpoint on the server, we want to set up
+  * a mountpoint on the client too, to prevent inode numbers from
+@@ -100,87 +99,81 @@ Elong:
+  * situation, and that different filesystems may want to use
+  * different security flavours.
+  */
+-static void * nfs_follow_mountpoint(struct dentry *dentry, struct nameidata *nd)
++struct vfsmount *nfs_d_automount(struct path *path)
  {
- 	cFYI(1, "DFS: ref path: %s", ref->path_name);
-@@ -300,34 +271,30 @@ static void dump_referral(const struct dfs_info3_param *ref)
- 				ref->path_consumed);
- }
+ 	struct vfsmount *mnt;
+-	struct nfs_server *server = NFS_SERVER(dentry->d_inode);
++	struct nfs_server *server = NFS_SERVER(path->dentry->d_inode);
+ 	struct dentry *parent;
+ 	struct nfs_fh *fh = NULL;
+ 	struct nfs_fattr *fattr = NULL;
+ 	int err;
  
--
--static void*
--cifs_dfs_follow_mountpoint(struct dentry *dentry, struct nameidata *nd)
-+/*
-+ * Create a vfsmount that we can automount
-+ */
-+static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
- {
- 	struct dfs_info3_param *referrals = NULL;
- 	unsigned int num_referrals = 0;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsSesInfo *ses;
--	char *full_path = NULL;
-+	char *full_path;
- 	int xid, i;
--	int rc = 0;
--	struct vfsmount *mnt = ERR_PTR(-ENOENT);
-+	int rc;
-+	struct vfsmount *mnt;
+-	dprintk("--> nfs_follow_mountpoint()\n");
++	dprintk("--> nfs_d_automount()\n");
  
- 	cFYI(1, "in %s", __func__);
--	BUG_ON(IS_ROOT(dentry));
-+	BUG_ON(IS_ROOT(mntpt));
+-	err = -ESTALE;
+-	if (IS_ROOT(dentry))
+-		goto out_err;
++	mnt = ERR_PTR(-ESTALE);
++	if (IS_ROOT(path->dentry))
++		goto out_nofree;
  
- 	xid = GetXid();
+-	err = -ENOMEM;
++	mnt = ERR_PTR(-ENOMEM);
+ 	fh = nfs_alloc_fhandle();
+ 	fattr = nfs_alloc_fattr();
+ 	if (fh == NULL || fattr == NULL)
+-		goto out_err;
++		goto out;
  
+ 	dprintk("%s: enter\n", __func__);
 -	dput(nd->path.dentry);
 -	nd->path.dentry = dget(dentry);
--
--	cifs_sb = CIFS_SB(dentry->d_inode->i_sb);
-+	cifs_sb = CIFS_SB(mntpt->d_inode->i_sb);
-+	mnt = ERR_PTR(-EINVAL);
- 	ses = cifs_sb->tcon->ses;
--
--	if (!ses) {
--		rc = -EINVAL;
+ 
+-	/* Look it up again */
+-	parent = dget_parent(nd->path.dentry);
++	/* Look it up again to get its attributes */
++	parent = dget_parent(path->dentry);
+ 	err = server->nfs_client->rpc_ops->lookup(parent->d_inode,
+-						  &nd->path.dentry->d_name,
++						  &path->dentry->d_name,
+ 						  fh, fattr);
+ 	dput(parent);
+-	if (err != 0)
 -		goto out_err;
--	}
-+	if (!ses)
-+		goto free_xid;
++	if (err != 0) {
++		mnt = ERR_PTR(err);
++		goto out;
++	}
  
- 	/*
- 	 * The MSDFS spec states that paths in DFS referral requests and
-@@ -335,56 +302,84 @@ cifs_dfs_follow_mountpoint(struct dentry *dentry, struct nameidata *nd)
- 	 * the double backslashes usually used in the UNC. This function
- 	 * gives us the latter, so we must adjust the result.
- 	 */
--	full_path = build_path_from_dentry(dentry);
--	if (full_path == NULL) {
--		rc = -ENOMEM;
+ 	if (fattr->valid & NFS_ATTR_FATTR_V4_REFERRAL)
+-		mnt = nfs_do_refmount(nd->path.mnt, nd->path.dentry);
++		mnt = nfs_do_refmount(path->mnt, path->dentry);
+ 	else
+-		mnt = nfs_do_submount(nd->path.mnt, nd->path.dentry, fh,
+-				      fattr);
+-	err = PTR_ERR(mnt);
++		mnt = nfs_do_submount(path->mnt, path->dentry, fh, fattr);
+ 	if (IS_ERR(mnt))
 -		goto out_err;
--	}
-+	mnt = ERR_PTR(-ENOMEM);
-+	full_path = build_path_from_dentry(mntpt);
-+	if (full_path == NULL)
-+		goto free_xid;
++		goto out;
  
- 	rc = get_dfs_path(xid, ses , full_path + 1, cifs_sb->local_nls,
- 		&num_referrals, &referrals,
- 		cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
- 
-+	mnt = ERR_PTR(-ENOENT);
- 	for (i = 0; i < num_referrals; i++) {
- 		int len;
--		dump_referral(referrals+i);
-+		dump_referral(referrals + i);
- 		/* connect to a node */
- 		len = strlen(referrals[i].node_name);
- 		if (len < 2) {
- 			cERROR(1, "%s: Net Address path too short: %s",
- 					__func__, referrals[i].node_name);
--			rc = -EINVAL;
--			goto out_err;
-+			mnt = ERR_PTR(-EINVAL);
-+			break;
- 		}
--		mnt = cifs_dfs_do_refmount(nd->path.mnt,
--				nd->path.dentry, referrals + i);
-+		mnt = cifs_dfs_do_refmount(mntpt, referrals + i);
- 		cFYI(1, "%s: cifs_dfs_do_refmount:%s , mnt:%p", __func__,
- 					referrals[i].node_name, mnt);
--
--		/* complete mount procedure if we accured submount */
- 		if (!IS_ERR(mnt))
--			break;
-+			goto success;
+ 	mntget(mnt);
+-	err = do_add_mount(mnt, &nd->path, nd->path.mnt->mnt_flags|MNT_SHRINKABLE,
++	err = do_add_mount(mnt, path, path->mnt->mnt_flags | MNT_SHRINKABLE,
+ 			   &nfs_automount_list);
+-	if (err < 0) {
++	switch (err) {
++	case 0:
++		dprintk("%s: done, success\n", __func__);
++		schedule_delayed_work(&nfs_automount_task, nfs_mountpoint_expiry_timeout);
++		break;
++	case -EBUSY:
++		/* someone else made a mount here whilst we were busy */
+ 		mntput(mnt);
+-		if (err == -EBUSY)
+-			goto out_follow;
+-		goto out_err;
++		dprintk("%s: done, collision\n", __func__);
++		mnt = NULL;
++		break;
++	default:
++		mntput(mnt);
++		dprintk("%s: done, error %d\n", __func__, err);
++		mnt = ERR_PTR(err);
++		break;
  	}
- 
--	/* we need it cause for() above could exit without valid submount */
--	rc = PTR_ERR(mnt);
--	if (IS_ERR(mnt))
--		goto out_err;
+-	path_put(&nd->path);
+-	nd->path.mnt = mnt;
+-	nd->path.dentry = dget(mnt->mnt_root);
+-	schedule_delayed_work(&nfs_automount_task, nfs_mountpoint_expiry_timeout);
++
+ out:
+ 	nfs_free_fattr(fattr);
+ 	nfs_free_fhandle(fh);
+-	dprintk("%s: done, returned %d\n", __func__, err);
 -
--	rc = add_mount_helper(mnt, nd, &cifs_dfs_automount_list);
-+	/* no valid submounts were found; return error from get_dfs_path() by
-+	 * preference */
-+	if (rc != 0)
-+		mnt = ERR_PTR(rc);
- 
--out:
--	FreeXid(xid);
-+success:
- 	free_dfs_info_array(referrals, num_referrals);
- 	kfree(full_path);
-+free_xid:
-+	FreeXid(xid);
- 	cFYI(1, "leaving %s" , __func__);
- 	return ERR_PTR(rc);
+-	dprintk("<-- nfs_follow_mountpoint() = %d\n", err);
+-	return ERR_PTR(err);
 -out_err:
 -	path_put(&nd->path);
 -	goto out;
-+}
-+
-+/*
-+ * Attempt to automount the referral
-+ */
-+struct vfsmount *cifs_dfs_d_automount(struct path *path)
-+{
-+	struct vfsmount *newmnt;
-+	int err;
-+
-+	cFYI(1, "in %s", __func__);
-+
-+	newmnt = cifs_dfs_do_automount(path->dentry);
-+	if (IS_ERR(newmnt)) {
-+		cFYI(1, "leaving %s [automount failed]" , __func__);
-+		return newmnt;
-+	}
-+
-+	mntget(newmnt);
-+	err = do_add_mount(newmnt, path, MNT_SHRINKABLE,
-+			   &cifs_dfs_automount_list);
-+	switch (err) {
-+	case 0:
-+		schedule_delayed_work(&cifs_dfs_automount_task,
-+				      cifs_dfs_mountpoint_expiry_timeout);
-+		cFYI(1, "leaving %s [ok]" , __func__);
-+		return newmnt;
-+	case -EBUSY:
-+		/* someone else made a mount here whilst we were busy */
-+		mntput(newmnt);
-+		cFYI(1, "leaving %s [EBUSY]" , __func__);
-+		return NULL;
-+	default:
-+		mntput(newmnt);
-+		cFYI(1, "leaving %s [error %d]" , __func__, err);
-+		return ERR_PTR(err);
-+	}
+-out_follow:
+-	while (d_mountpoint(nd->path.dentry) &&
+-	       follow_down(&nd->path))
+-		;
+-	err = 0;
+-	goto out;
++out_nofree:
++	dprintk("<-- nfs_follow_mountpoint() = %p\n", mnt);
++	return mnt;
  }
  
- const struct inode_operations cifs_dfs_referral_inode_operations = {
--	.follow_link = cifs_dfs_follow_mountpoint,
- };
--
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index a7eb65c..d74bda0 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -95,6 +95,12 @@ extern int cifs_readdir(struct file *file, void *direntry, filldir_t filldir);
- extern const struct dentry_operations cifs_dentry_ops;
- extern const struct dentry_operations cifs_ci_dentry_ops;
- 
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+extern struct vfsmount *cifs_dfs_d_automount(struct path *path);
-+#else
-+#define cifs_dfs_d_automount NULL
-+#endif
-+
- /* Functions related to symlinks */
- extern void *cifs_follow_link(struct dentry *direntry, struct nameidata *nd);
- extern void cifs_put_link(struct dentry *direntry,
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index e7ae78b..b147905 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -804,6 +804,7 @@ cifs_d_revalidate(struct dentry *direntry, struct nameidata *nd)
- 
- const struct dentry_operations cifs_dentry_ops = {
- 	.d_revalidate = cifs_d_revalidate,
-+	.d_automount = cifs_dfs_d_automount,
- /* d_delete:       cifs_d_delete,      */ /* not needed except for debugging */
+ const struct inode_operations nfs_mountpoint_inode_operations = {
+-	.follow_link	= nfs_follow_mountpoint,
+ 	.getattr	= nfs_getattr,
  };
  
-@@ -844,4 +845,5 @@ const struct dentry_operations cifs_ci_dentry_ops = {
- 	.d_revalidate = cifs_d_revalidate,
- 	.d_hash = cifs_ci_hash,
- 	.d_compare = cifs_ci_compare,
-+	.d_automount = cifs_dfs_d_automount,
+ const struct inode_operations nfs_referral_inode_operations = {
+-	.follow_link	= nfs_follow_mountpoint,
  };
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 6f0683c..011100f 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -31,7 +31,7 @@
- #include "cifs_fs_sb.h"
  
- 
--static void cifs_set_ops(struct inode *inode, const bool is_dfs_referral)
-+static void cifs_set_ops(struct inode *inode)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 
-@@ -59,7 +59,7 @@ static void cifs_set_ops(struct inode *inode, const bool is_dfs_referral)
- 		break;
- 	case S_IFDIR:
- #ifdef CONFIG_CIFS_DFS_UPCALL
--		if (is_dfs_referral) {
-+		if (IS_AUTOMOUNT(inode)) {
- 			inode->i_op = &cifs_dfs_referral_inode_operations;
- 		} else {
- #else /* NO DFS support, treat as a directory */
-@@ -166,7 +166,9 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
- 	}
- 	spin_unlock(&inode->i_lock);
- 
--	cifs_set_ops(inode, fattr->cf_flags & CIFS_FATTR_DFS_REFERRAL);
-+	if (fattr->cf_flags & CIFS_FATTR_DFS_REFERRAL)
-+		inode->i_flags |= S_AUTOMOUNT;
-+	cifs_set_ops(inode);
- }
- 
- void
+ static void nfs_expire_automounts(struct work_struct *work)
+diff --git a/include/linux/nfs_fs.h b/include/linux/nfs_fs.h
+index 77c2ae5..4511220 100644
+--- a/include/linux/nfs_fs.h
++++ b/include/linux/nfs_fs.h
+@@ -205,7 +205,6 @@ struct nfs_inode {
+ #define NFS_INO_ADVISE_RDPLUS	(0)		/* advise readdirplus */
+ #define NFS_INO_STALE		(1)		/* possible stale inode */
+ #define NFS_INO_ACL_LRU_SET	(2)		/* Inode is on the LRU list */
+-#define NFS_INO_MOUNTPOINT	(3)		/* inode is remote mountpoint */
+ #define NFS_INO_FLUSHING	(4)		/* inode is flushing out data */
+ #define NFS_INO_FSCACHE		(5)		/* inode can be cached by FS-Cache */
+ #define NFS_INO_FSCACHE_LOCK	(6)		/* FS-Cache cookie management lock */
 
 --
 To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
