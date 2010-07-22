@@ -1,67 +1,33 @@
-From: Benny Halevy <bhalevy@panasas.com>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended
- 	file stats available [ver #6]
-Date: Thu, 22 Jul 2010 22:53:34 +0300
-Message-ID: <4C48A1BE.8010503@panasas.com>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk>	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>	<30448.1279800887@redhat.com>	<E1Obuiy-00C9jr-Al@intern.SerNet.DE>	<AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>	<E1Obxpd-00CRIo-SF@intern.SerNet.DE>	<AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>	<20100722162712.GB10352@jeremy-laptop>	<AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>	<alpine.LSU.2.01.1007221859180.27496@obet.zrqbmnf.qr>	<AANLkTilmVdyVdO4EmVtTYi_cvMmPqNEPEnzUkJdk1XyR@mail.gmail.com>	<4C488C41.60002@panasas.com> <AANLkTilU5QLBzOgwpmYRP5aZglOMta2iMCaNk62tiUIB@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Jan Engelhardt <jengelh@medozas.de>,
-	Jeremy Allison <jra@samba.org>, Volker.Lendecke@sernet.de,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-To: Greg Freemyer <greg.freemyer@gmail.com>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <AANLkTilU5QLBzOgwpmYRP5aZglOMta2iMCaNk62tiUIB@mail.gmail.com>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+Subject: Re: [PATCH 00/09] cifs: local caching support using FS-Cache
+Date: Thu, 22 Jul 2010 16:49:20 -0600
+Message-ID: <A55FDF07-DC44-4A5D-BDC4-ACC7D76CC753@dilger.ca>
+References: <4C480F51.8070204@suse.de> <1278333663-30464-1-git-send-email-sjayaraman@suse.de> <4C3DF6BF.3070001@gmail.com> <AANLkTin2tKtkWTflrrzBMYBEd6SFr35uYUl1SmfYlj9W@mail.gmail.com> <4C3F35F7.8060408@suse.de> <1892.1279820400@redhat.com>
+Mime-Version: 1.0 (Apple Message framework v1078)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1892.1279820400-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Jul. 22, 2010, 21:45 +0300, Greg Freemyer <greg.freemyer@gmail.com> wrote:
-> On Thu, Jul 22, 2010 at 2:21 PM, Benny Halevy <bhalevy@panasas.com> wrote:
->> On Jul. 22, 2010, 20:24 +0300, Linus Torvalds <torvalds@linux-foundation.org> wrote:
->>> On Thu, Jul 22, 2010 at 10:03 AM, Jan Engelhardt <jengelh@medozas.de> wrote:
->>>>
->>>> I beg to differ. ctime is not completely useless. It reflects changes on
->>>> the inode for when you don't you change the content.
->>>
->>> Uh. Yes. Except that why is file metadata really different from file
->>> data? Most people really don't care. And a lot of people have asked
->>> for creation dates - and I seriously doubt that Windows people
->>> complain a lot about the fact that there you have mtime for metadata
->>> changes too.
->>>
->>> The point being that Unix ctime semantics certainly have well-defined
->>> semantics, but they are in no way "better" than having a real creation
->>> time, and are often worse.
->>
->> Yeah, having create time would be important.
->> That said, having a non user-settable modify timestamp is crucial
->> for quickly determining whether a file has changed.
+On 2010-07-22, at 11:40, David Howells wrote:
+> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+>> As it can been seen, the performance while reading when data is cache
+>> hot (disk) is not great as the network link is a Gigabit ethernet (with
+>> server having working set in memory) which is mostly expected.
 > 
-> How would "cp --archive" and a host of backup/restore tools work
-> without user-settable modify timestamps?
+> That's what I see with NFS and AFS too.
 > 
-> Or are you proposing another timestamp?  I do computer forensics, I
-> like timestamps, but enough is enough.
+>> (I could not get access to a slower network (say 100 Mb/s) where the real
+>> performance boost could be evident).
 
-mtime and atime are already user settable and archive programs use
-this on the destination, but ctime would be different after
-copy/restore.
+More interesting than a slow network is testing with more clients.  10 clients should be able to get 10x the read performance from the client-local cache, probably more than the server's peak disk/network bandwidth.
 
-When updating the archive, just comparing mtime to determine if the source
-changed is problematic as it can be set to any value after the change,
-but src.ctime would be greater than dest.ctime in this case.
-
-With posix semantics (http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap04.html#tag_04_07)
-this is not perfect either as there can be false-positives when the file stat changed but
-the file has not, e.g. when st_nlink changed.
-
-Benny
-
-> 
-> Greg
+Cheers, Andreas
