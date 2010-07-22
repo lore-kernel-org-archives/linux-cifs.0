@@ -1,42 +1,213 @@
-From: Jan Engelhardt <jengelh@medozas.de>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended
- file stats available [ver #6]
-Date: Thu, 22 Jul 2010 12:52:36 +0200 (CEST)
-Message-ID: <alpine.LSU.2.01.1007221248050.9353@obet.zrqbmnf.qr>
-References: <20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021712.5544.44845.stgit@warthog.procyon.org.uk> <20100718084824.GA27794@infradead.org>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH] CIFS: Fix a malicious redirect problem in the DNS lookup code
+Date: Thu, 22 Jul 2010 12:53:18 +0100
+Message-ID: <20100722115318.28766.33578.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: David Howells <dhowells@redhat.com>, viro@ZenIV.linux.org.uk,
-	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
-	drepper@redhat.com, torvalds@linux-foundation.org
-To: Christoph Hellwig <hch@infradead.org>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <20100718084824.GA27794@infradead.org>
-Sender: linux-ext4-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-kernel@vger.kernel.org, security@kernel.org,
+	pmatouse@redhat.com, eugene@redhat.com, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	David Howells <dhowells@redhat.com>,
+	Steve French <smfrench@gmail.com>
+To: torvalds@osdl.org, akpm@linux-foundation.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Sunday 2010-07-18 10:48, Christoph Hellwig wrote:
+Fix the security problem in the CIFS filesystem DNS lookup code in which a
+malicious redirect could be installed by a random user by simply adding a
+result record into one of their keyrings with add_key() and then invoking a
+CIFS CFS lookup [CVE-2010-2524].
 
->Adding Uli to the Cc list to make sure this system call is useful
->for glibc / can be exported by it.  Otherwise it's rather pointless
->to add it.
->
->>  (6) BSD stat compatibility: Including more fields from the BSD stat such as
->>      creation time (st_btime) and inode generation number (st_gen) [Jeremy
->>      Allison, Bernd Schubert]
->
->How is this different from (1) and (4)?
+This is done by creating an internal keyring specifically for the caching of
+DNS lookups.  To enforce the use of this keyring, the module init routine
+creates a set of override credentials with the keyring installed as the thread
+keyring and instructs request_key() to only install lookup result keys in that
+keyring.
 
-(4), the inode generation number, need not be related to time.
+The override is then applied around the call to request_key().
 
->>  (8) Allow the filesystem to indicate what it can/cannot provide: A filesystem
->>      can now say it doesn't support a standard stat feature if that isn't
->>      available.
->
->What for?
+This has some additional benefits when a kernel service uses this module to
+request a key:
 
-Given xstat.otime=0, how would you determine whether the file is really 
-tagged with a date of 1970, or whether it's just the fs which didnot 
-store this kind of information.
+ (1) The result keys are owned by root, not the user that caused the lookup.
+
+ (2) The result keys don't pop up in the user's keyrings.
+
+ (3) The result keys don't come out of the quota of the user that caused the
+     lookup.
+
+The keyring can be viewed as root by doing cat /proc/keys:
+
+2a0ca6c3 I-----     1 perm 1f030000     0     0 keyring   .dns_resolver: 1/4
+
+It can then be listed with 'keyctl list' by root.
+
+	# keyctl list 0x2a0ca6c3
+	1 key in keyring:
+	726766307: --alswrv     0     0 dns_resolver: foo.bar.com
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-and-Tested-by: Jeff Layton <jlayton@redhat.com>
+Acked-by: Steve French <smfrench@gmail.com>
+---
+
+ fs/cifs/cifsfs.c      |    6 ++--
+ fs/cifs/dns_resolve.c |   69 +++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/dns_resolve.h |    4 +--
+ 3 files changed, 74 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 484e52b..2cb1a70 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -923,7 +923,7 @@ init_cifs(void)
+ 		goto out_unregister_filesystem;
+ #endif
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	rc = register_key_type(&key_type_dns_resolver);
++	rc = cifs_init_dns_resolver();
+ 	if (rc)
+ 		goto out_unregister_key_type;
+ #endif
+@@ -935,7 +935,7 @@ init_cifs(void)
+ 
+  out_unregister_resolver_key:
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	unregister_key_type(&key_type_dns_resolver);
++	cifs_exit_dns_resolver();
+  out_unregister_key_type:
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+@@ -961,7 +961,7 @@ exit_cifs(void)
+ 	cifs_proc_clean();
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	cifs_dfs_release_automount_timer();
+-	unregister_key_type(&key_type_dns_resolver);
++	cifs_exit_dns_resolver();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+ 	unregister_key_type(&cifs_spnego_key_type);
+diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
+index 4db2c5e..49315cb 100644
+--- a/fs/cifs/dns_resolve.c
++++ b/fs/cifs/dns_resolve.c
+@@ -24,12 +24,16 @@
+  */
+ 
+ #include <linux/slab.h>
++#include <linux/keyctl.h>
++#include <linux/key-type.h>
+ #include <keys/user-type.h>
+ #include "dns_resolve.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ 
++static const struct cred *dns_resolver_cache;
++
+ /* Checks if supplied name is IP address
+  * returns:
+  * 		1 - name is IP
+@@ -94,6 +98,7 @@ struct key_type key_type_dns_resolver = {
+ int
+ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
+ {
++	const struct cred *saved_cred;
+ 	int rc = -EAGAIN;
+ 	struct key *rkey = ERR_PTR(-EAGAIN);
+ 	char *name;
+@@ -133,8 +138,15 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
+ 		goto skip_upcall;
+ 	}
+ 
++	saved_cred = override_creds(dns_resolver_cache);
+ 	rkey = request_key(&key_type_dns_resolver, name, "");
++	revert_creds(saved_cred);
+ 	if (!IS_ERR(rkey)) {
++		if (!(rkey->perm & KEY_USR_VIEW)) {
++			down_read(&rkey->sem);
++			rkey->perm |= KEY_USR_VIEW;
++			up_read(&rkey->sem);
++		}
+ 		len = rkey->type_data.x[0];
+ 		data = rkey->payload.data;
+ 	} else {
+@@ -165,4 +177,61 @@ out:
+ 	return rc;
+ }
+ 
++int __init cifs_init_dns_resolver(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	printk(KERN_NOTICE "Registering the %s key type\n",
++	       key_type_dns_resolver.name);
++
++	/* create an override credential set with a special thread keyring in
++	 * which DNS requests are cached
++	 *
++	 * this is used to prevent malicious redirections from being installed
++	 * with add_key().
++	 */
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = key_alloc(&key_type_keyring, ".dns_resolver", 0, 0, cred,
++			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
++			    KEY_USR_VIEW | KEY_USR_READ,
++			    KEY_ALLOC_NOT_IN_QUOTA);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
++	if (ret < 0)
++		goto failed_put_key;
++
++	ret = register_key_type(&key_type_dns_resolver);
++	if (ret < 0)
++		goto failed_put_key;
++
++	/* instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up */
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	dns_resolver_cache = cred;
++	return 0;
++
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
+ 
++void __exit cifs_exit_dns_resolver(void)
++{
++	key_revoke(dns_resolver_cache->thread_keyring);
++	unregister_key_type(&key_type_dns_resolver);
++	put_cred(dns_resolver_cache);
++	printk(KERN_NOTICE "Unregistered %s key type\n",
++	       key_type_dns_resolver.name);
++}
+diff --git a/fs/cifs/dns_resolve.h b/fs/cifs/dns_resolve.h
+index 966e928..26b9eaa 100644
+--- a/fs/cifs/dns_resolve.h
++++ b/fs/cifs/dns_resolve.h
+@@ -24,8 +24,8 @@
+ #define _DNS_RESOLVE_H
+ 
+ #ifdef __KERNEL__
+-#include <linux/key-type.h>
+-extern struct key_type key_type_dns_resolver;
++extern int __init cifs_init_dns_resolver(void);
++extern void __exit cifs_exit_dns_resolver(void);
+ extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
+ #endif /* KERNEL */
+ 
