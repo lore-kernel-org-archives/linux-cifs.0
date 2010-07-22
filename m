@@ -1,65 +1,77 @@
-From: Trond Myklebust <trond.myklebust@fys.uio.no>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
- extended file stats available [ver #6]
-Date: Thu, 22 Jul 2010 13:16:07 -0400
-Message-ID: <1279818967.3621.23.camel@heimdal.trondhjem.org>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
-	 <20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
-	 <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
-	 <30448.1279800887@redhat.com> <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
-	 <AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
-	 <E1Obxpd-00CRIo-SF@intern.SerNet.DE>
-	 <AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
-	 <20100722162712.GB10352@jeremy-laptop>
-	 <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
-	 <alpine.LSU.2.01.1007221859180.27496@obet.zrqbmnf.qr>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 1/6] KEYS: Authorise keyctl_set_timeout() on a key if we have
+	its authorisation key
+Date: Thu, 22 Jul 2010 18:32:51 +0100
+Message-ID: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Jeremy Allison <jra@samba.org>, Volker.Lendecke@sernet.de,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-	linux-ext4@vger.kernel.org
-To: Jan Engelhardt <jengelh@medozas.de>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <alpine.LSU.2.01.1007221859180.27496@obet.zrqbmnf.qr>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2010-07-22 at 19:03 +0200, Jan Engelhardt wrote:
-> On Thursday 2010-07-22 18:40, Linus Torvalds wrote:
-> 
-> >On Thu, Jul 22, 2010 at 9:27 AM, Jeremy Allison <jra@samba.org> wrote:
-> >> On Thu, Jul 22, 2010 at 08:47:46AM -0700, Linus Torvalds wrote:
-> >>> Tell me why we shouldn't just do this right?
-> >>
-> >> No, ctime isn't the same as Windows "create time".
-> >
-> >Umm. What kind of reading problems do you guys have?
-> >
-> >I know effin well that ctime isn't the same as Windows create time.
-> >THAT WAS MY POINT.
-> >
-> >But the fact is, th Unix ctime semantics are insane and largely
-> >useless. There's a damn good reason almost nobody uses ctime under
-> >unix.
-> 
-> I beg to differ. ctime is not completely useless. It reflects changes on 
-> the inode for when you don't you change the content. It's like an mtime 
-> for the metadata. It comes useful when you go around in your filesystem 
-> trying to figure out who of your co-admins screwed up the permissions on 
-> /etc/passwd... and if the mtime is the same as that of the last backup, 
-> I can at least have a reasonable assurance that it was /only/ the 
-> metadata that was tampered with. (SHA1 check, yeah yeah, costly on large 
-> files.)
+Authorise a process to perform keyctl_set_timeout() on an uninstantiated key if
+that process has the authorisation key for it.
 
-Errr... Only if you eliminate utimes() from your syscall table.
-Otherwise it is trivial to reset the mtime after changing the file
-contents.
+This allows the instantiator to set the timeout on a key it is instantiating -
+provided it does it before instantiating the key.
 
-Cheers
-  Trond
+For instance, the test upcall script provided with the keyutils package could
+be modified to set the expiry to an hour hence before instantiating the key:
 
+	[/usr/share/keyutils/request-key-debug.sh]
+	 if [ "$3" != "neg" ]
+	 then
+	+    keyctl timeout $1 3600
+	     keyctl instantiate $1 "Debug $3" $4 || exit 1
+	 else
+
+Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+
+ security/keys/keyctl.c |   17 ++++++++++++++++-
+ 1 files changed, 16 insertions(+), 1 deletions(-)
+
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index 6261745..639226a 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -1091,7 +1091,7 @@ error:
+ long keyctl_set_timeout(key_serial_t id, unsigned timeout)
+ {
+ 	struct timespec now;
+-	struct key *key;
++	struct key *key, *instkey;
+ 	key_ref_t key_ref;
+ 	time_t expiry;
+ 	long ret;
+@@ -1099,10 +1099,25 @@ long keyctl_set_timeout(key_serial_t id, unsigned timeout)
+ 	key_ref = lookup_user_key(id, KEY_LOOKUP_CREATE | KEY_LOOKUP_PARTIAL,
+ 				  KEY_SETATTR);
+ 	if (IS_ERR(key_ref)) {
++		/* setting the timeout on a key under construction is permitted
++		 * if we have the authorisation token handy */
++		if (PTR_ERR(key_ref) == -EACCES) {
++			instkey = key_get_instantiation_authkey(id);
++			if (!IS_ERR(instkey)) {
++				key_put(instkey);
++				key_ref = lookup_user_key(id,
++							  KEY_LOOKUP_PARTIAL,
++							  0);
++				if (!IS_ERR(key_ref))
++					goto okay;
++			}
++		}
++
+ 		ret = PTR_ERR(key_ref);
+ 		goto error;
+ 	}
+ 
++okay:
+ 	key = key_ref_to_ptr(key_ref);
+ 
+ 	/* make the changes with the locks held to prevent races */
