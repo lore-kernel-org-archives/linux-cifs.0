@@ -1,77 +1,216 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/6] KEYS: Authorise keyctl_set_timeout() on a key if we have
-	its authorisation key
-Date: Thu, 22 Jul 2010 18:32:51 +0100
-Message-ID: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 2/6] CIFS: Fix a malicious redirect problem in the DNS lookup
+	code
+Date: Thu, 22 Jul 2010 18:32:56 +0100
+Message-ID: <20100722173256.1512.57802.stgit@warthog.procyon.org.uk>
+References: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	Steve French <smfrench@gmail.com>
+To: smfrench@gmail.com, jlayton@redhat.com
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100722173251.1512.29858.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Authorise a process to perform keyctl_set_timeout() on an uninstantiated key if
-that process has the authorisation key for it.
+Fix the security problem in the CIFS filesystem DNS lookup code in which a
+malicious redirect could be installed by a random user by simply adding a
+result record into one of their keyrings with add_key() and then invoking a
+CIFS CFS lookup [CVE-2010-2524].
 
-This allows the instantiator to set the timeout on a key it is instantiating -
-provided it does it before instantiating the key.
+This is done by creating an internal keyring specifically for the caching of
+DNS lookups.  To enforce the use of this keyring, the module init routine
+creates a set of override credentials with the keyring installed as the thread
+keyring and instructs request_key() to only install lookup result keys in that
+keyring.
 
-For instance, the test upcall script provided with the keyutils package could
-be modified to set the expiry to an hour hence before instantiating the key:
+The override is then applied around the call to request_key().
 
-	[/usr/share/keyutils/request-key-debug.sh]
-	 if [ "$3" != "neg" ]
-	 then
-	+    keyctl timeout $1 3600
-	     keyctl instantiate $1 "Debug $3" $4 || exit 1
-	 else
+This has some additional benefits when a kernel service uses this module to
+request a key:
 
-Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+ (1) The result keys are owned by root, not the user that caused the lookup.
+
+ (2) The result keys don't pop up in the user's keyrings.
+
+ (3) The result keys don't come out of the quota of the user that caused the
+     lookup.
+
+The keyring can be viewed as root by doing cat /proc/keys:
+
+2a0ca6c3 I-----     1 perm 1f030000     0     0 keyring   .dns_resolver: 1/4
+
+It can then be listed with 'keyctl list' by root.
+
+	# keyctl list 0x2a0ca6c3
+	1 key in keyring:
+	726766307: --alswrv     0     0 dns_resolver: foo.bar.com
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-and-Tested-by: Jeff Layton <jlayton@redhat.com>
+Acked-by: Steve French <smfrench@gmail.com>
 ---
 
- security/keys/keyctl.c |   17 ++++++++++++++++-
- 1 files changed, 16 insertions(+), 1 deletions(-)
+ fs/cifs/cifsfs.c      |    6 ++--
+ fs/cifs/dns_resolve.c |   69 +++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/dns_resolve.h |    4 +--
+ 3 files changed, 74 insertions(+), 5 deletions(-)
 
-diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-index 6261745..639226a 100644
---- a/security/keys/keyctl.c
-+++ b/security/keys/keyctl.c
-@@ -1091,7 +1091,7 @@ error:
- long keyctl_set_timeout(key_serial_t id, unsigned timeout)
- {
- 	struct timespec now;
--	struct key *key;
-+	struct key *key, *instkey;
- 	key_ref_t key_ref;
- 	time_t expiry;
- 	long ret;
-@@ -1099,10 +1099,25 @@ long keyctl_set_timeout(key_serial_t id, unsigned timeout)
- 	key_ref = lookup_user_key(id, KEY_LOOKUP_CREATE | KEY_LOOKUP_PARTIAL,
- 				  KEY_SETATTR);
- 	if (IS_ERR(key_ref)) {
-+		/* setting the timeout on a key under construction is permitted
-+		 * if we have the authorisation token handy */
-+		if (PTR_ERR(key_ref) == -EACCES) {
-+			instkey = key_get_instantiation_authkey(id);
-+			if (!IS_ERR(instkey)) {
-+				key_put(instkey);
-+				key_ref = lookup_user_key(id,
-+							  KEY_LOOKUP_PARTIAL,
-+							  0);
-+				if (!IS_ERR(key_ref))
-+					goto okay;
-+			}
-+		}
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index c78d219..8a2cf12 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -935,7 +935,7 @@ init_cifs(void)
+ 		goto out_unregister_filesystem;
+ #endif
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	rc = register_key_type(&key_type_dns_resolver);
++	rc = cifs_init_dns_resolver();
+ 	if (rc)
+ 		goto out_unregister_key_type;
+ #endif
+@@ -947,7 +947,7 @@ init_cifs(void)
+ 
+  out_unregister_resolver_key:
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	unregister_key_type(&key_type_dns_resolver);
++	cifs_exit_dns_resolver();
+  out_unregister_key_type:
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+@@ -976,7 +976,7 @@ exit_cifs(void)
+ 	cifs_fscache_unregister();
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ 	cifs_dfs_release_automount_timer();
+-	unregister_key_type(&key_type_dns_resolver);
++	cifs_exit_dns_resolver();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+ 	unregister_key_type(&cifs_spnego_key_type);
+diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
+index 22afe38..ff6fa2f 100644
+--- a/fs/cifs/dns_resolve.c
++++ b/fs/cifs/dns_resolve.c
+@@ -24,12 +24,16 @@
+  */
+ 
+ #include <linux/slab.h>
++#include <linux/keyctl.h>
++#include <linux/key-type.h>
+ #include <keys/user-type.h>
+ #include "dns_resolve.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ 
++static const struct cred *dns_resolver_cache;
 +
- 		ret = PTR_ERR(key_ref);
- 		goto error;
+ /* Checks if supplied name is IP address
+  * returns:
+  * 		1 - name is IP
+@@ -94,6 +98,7 @@ struct key_type key_type_dns_resolver = {
+ int
+ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
+ {
++	const struct cred *saved_cred;
+ 	int rc = -EAGAIN;
+ 	struct key *rkey = ERR_PTR(-EAGAIN);
+ 	char *name;
+@@ -133,8 +138,15 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
+ 		goto skip_upcall;
  	}
  
-+okay:
- 	key = key_ref_to_ptr(key_ref);
++	saved_cred = override_creds(dns_resolver_cache);
+ 	rkey = request_key(&key_type_dns_resolver, name, "");
++	revert_creds(saved_cred);
+ 	if (!IS_ERR(rkey)) {
++		if (!(rkey->perm & KEY_USR_VIEW)) {
++			down_read(&rkey->sem);
++			rkey->perm |= KEY_USR_VIEW;
++			up_read(&rkey->sem);
++		}
+ 		len = rkey->type_data.x[0];
+ 		data = rkey->payload.data;
+ 	} else {
+@@ -165,4 +177,61 @@ out:
+ 	return rc;
+ }
  
- 	/* make the changes with the locks held to prevent races */
++int __init cifs_init_dns_resolver(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	printk(KERN_NOTICE "Registering the %s key type\n",
++	       key_type_dns_resolver.name);
++
++	/* create an override credential set with a special thread keyring in
++	 * which DNS requests are cached
++	 *
++	 * this is used to prevent malicious redirections from being installed
++	 * with add_key().
++	 */
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = key_alloc(&key_type_keyring, ".dns_resolver", 0, 0, cred,
++			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
++			    KEY_USR_VIEW | KEY_USR_READ,
++			    KEY_ALLOC_NOT_IN_QUOTA);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
++	if (ret < 0)
++		goto failed_put_key;
++
++	ret = register_key_type(&key_type_dns_resolver);
++	if (ret < 0)
++		goto failed_put_key;
++
++	/* instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up */
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	dns_resolver_cache = cred;
++	return 0;
++
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
+ 
++void __exit cifs_exit_dns_resolver(void)
++{
++	key_revoke(dns_resolver_cache->thread_keyring);
++	unregister_key_type(&key_type_dns_resolver);
++	put_cred(dns_resolver_cache);
++	printk(KERN_NOTICE "Unregistered %s key type\n",
++	       key_type_dns_resolver.name);
++}
+diff --git a/fs/cifs/dns_resolve.h b/fs/cifs/dns_resolve.h
+index 966e928..26b9eaa 100644
+--- a/fs/cifs/dns_resolve.h
++++ b/fs/cifs/dns_resolve.h
+@@ -24,8 +24,8 @@
+ #define _DNS_RESOLVE_H
+ 
+ #ifdef __KERNEL__
+-#include <linux/key-type.h>
+-extern struct key_type key_type_dns_resolver;
++extern int __init cifs_init_dns_resolver(void);
++extern void __exit cifs_exit_dns_resolver(void);
+ extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
+ #endif /* KERNEL */
+ 
+
