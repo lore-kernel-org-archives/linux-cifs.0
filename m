@@ -1,44 +1,72 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: manual merge of the workqueues tree with the cifs tree
-Date: Fri, 23 Jul 2010 14:46:04 +1000
-Message-ID: <20100723144604.fe57e4bd.sfr@canb.auug.org.au>
+From: Stef Bon <stefbon@gmail.com>
+Subject: Re: [PATCH 00/09] cifs: local caching support using FS-Cache
+Date: Fri, 23 Jul 2010 10:35:55 +0200
+Message-ID: <AANLkTikF5Oz5pobaPUJebUg+yPuoVy_B5PBz+nuUTSii@mail.gmail.com>
+References: <4C480F51.8070204@suse.de>
+	<1278333663-30464-1-git-send-email-sjayaraman@suse.de>
+	<4C3DF6BF.3070001@gmail.com>
+	<AANLkTin2tKtkWTflrrzBMYBEd6SFr35uYUl1SmfYlj9W@mail.gmail.com>
+	<4C3F35F7.8060408@suse.de>
+	<1892.1279820400@redhat.com>
+	<A55FDF07-DC44-4A5D-BDC4-ACC7D76CC753@dilger.ca>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: David Howells <dhowells@redhat.com>,
 	Suresh Jayaraman <sjayaraman@suse.de>,
-	Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
-To: Tejun Heo <tj@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+	Steve French <smfrench@gmail.com>,
+	Scott Lovenberg <scott.lovenberg@gmail.com>,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-cachefs@redhat.com
+To: Andreas Dilger <adilger@dilger.ca>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <A55FDF07-DC44-4A5D-BDC4-ACC7D76CC753@dilger.ca>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Hi Tejun,
+In my opinion there should be article published about this, describing
+fs-cache generally, and these kinds of benchmarks!
 
-Today's linux-next merge of the workqueues tree got a conflict in
-fs/cifs/cifsglob.h between commit
-1626bccfc79b354aa47cbfc5c8d39f7be8823eb4 ("cifs: guard cifsglob.h against
-multiple inclusion") from the cifs tree and commit
-9b646972467fb5fdc677f9e4251875db20bdbb64 ("cifs: use workqueue instead of
-slow-work") from the workqueues tree.
+Using fs-cache for network filesystem is an important issue, and
+should get "exposure".
 
-Just context changes.  I fixed it up (see below) and can carry the fix as
-necessary.
--- 
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+Stef Bon
 
-diff --cc fs/cifs/cifsglob.h
-index 9b7cf9a,f5a1f9b..0000000
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@@ -727,6 -732,6 +727,8 @@@ GLOBAL_EXTERN unsigned int cifs_min_rcv
-  GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
-  GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
-  
-- extern const struct slow_work_ops cifs_oplock_break_ops;
-+ void cifs_oplock_break(struct work_struct *work);
-+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
-+ void cifs_oplock_break_put(struct cifsFileInfo *cfile);
- +
- +#endif	/* _CIFS_GLOB_H */
+2010/7/23 Andreas Dilger <adilger@dilger.ca>:
+> On 2010-07-22, at 11:40, David Howells wrote:
+>> Suresh Jayaraman <sjayaraman@suse.de> wrote:
+>>> As it can been seen, the performance while reading when data is cac=
+he
+>>> hot (disk) is not great as the network link is a Gigabit ethernet (=
+with
+>>> server having working set in memory) which is mostly expected.
+>>
+>> That's what I see with NFS and AFS too.
+>>
+>>> (I could not get access to a slower network (say 100 Mb/s) where th=
+e real
+>>> performance boost could be evident).
+>
+> More interesting than a slow network is testing with more clients. =C2=
+=A010 clients should be able to get 10x the read performance from the c=
+lient-local cache, probably more than the server's peak disk/network ba=
+ndwidth.
+>
+> Cheers, Andreas
+>
+>
+>
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.ht=
+ml
+>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
+" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
