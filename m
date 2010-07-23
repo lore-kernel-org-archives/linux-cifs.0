@@ -1,74 +1,58 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: panic at umount in fscache code
-Date: Fri, 23 Jul 2010 11:29:00 -0400
-Message-ID: <20100723112900.2960b742@tlielax.poochiereds.net>
-References: <20100723095229.2c5bd562@tlielax.poochiereds.net>
-	<4C49B48D.9040302@suse.de>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH 00/09] cifs: local caching support using FS-Cache
+Date: Fri, 23 Jul 2010 21:46:31 +0530
+Message-ID: <4C49C05F.8000003@suse.de>
+References: <4C480F51.8070204@suse.de>	<1278333663-30464-1-git-send-email-sjayaraman@suse.de>	<4C3DF6BF.3070001@gmail.com>	<AANLkTin2tKtkWTflrrzBMYBEd6SFr35uYUl1SmfYlj9W@mail.gmail.com>	<4C3F35F7.8060408@suse.de>	<1892.1279820400@redhat.com>	<A55FDF07-DC44-4A5D-BDC4-ACC7D76CC753@dilger.ca> <AANLkTikF5Oz5pobaPUJebUg+yPuoVy_B5PBz+nuUTSii@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Cc: Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4C49B48D.9040302-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <AANLkTikF5Oz5pobaPUJebUg+yPuoVy_B5PBz+nuUTSii-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 23 Jul 2010 20:56:05 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+On 07/23/2010 02:05 PM, Stef Bon wrote:
+> In my opinion there should be article published about this, describing
+> fs-cache generally, and these kinds of benchmarks!
 
-> On 07/23/2010 07:22 PM, Jeff Layton wrote:
-> > I built a kernel based on Steve's tree, enabled the fscache option and
-> > got the following panic at umount. I didn't mount with -o fsc or
-> > anything. I have some other patches on top of Steve's tree, but I'm
-> > fairly certain they wouldn't affect this.
-> > 
-> > For the record, here's the fstab entry (with anonymized names):
-> > 
-> > //server.example.com/scratch	/mnt/anonymous		cifs	sec=none,user,noperm,noauto 0 0
-> > 
-> > Disabling the fscache stuff at build time makes the problem go away.
-> > 
-> > ------------------------------[snip]------------------------------
-> > 
-> > general protection fault: 0000 [#1] SMP 
-> > last sysfs file: /sys/devices/system/cpu/cpu1/cache/index2/shared_cpu_map
-> 
-> Could you please check whether the below patch fixes the problem?
-> 
-> Thanks,
-> 
-> 
-> From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> Subject: [PATCH] cifs: relinquish fscache cookie before freeing CIFSTconInfo
-> 
-> Doh, fix a use after free bug. 
-> 
-> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 399b601..5480025 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1842,8 +1842,8 @@ cifs_put_tcon(struct cifsTconInfo *tcon)
->  	CIFSSMBTDis(xid, tcon);
->  	_FreeXid(xid);
->  
-> -	tconInfoFree(tcon);
->  	cifs_fscache_release_super_cookie(tcon);
-> +	tconInfoFree(tcon);
->  	cifs_put_smb_ses(ses);
->  }
->  
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+FS-Cache is nicely documented on
+Documentation/filesystems/caching/fscache.txt present in the kernel
+source. IIRC, LWN - http://lwn.net/ had published a couple of articles
+about FS-Cache. I agree that there is little information available about
+the use-cases and benchmarks.
 
-Yes. That seems to fix it and looks obviously correct.
+What do you mean exactly by article? More blog entries or article in
+magazines or whitepaper sort? Which one do you think has a good chance
+of reaching the target audience?
 
-Reviewed-and-Tested-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+> Using fs-cache for network filesystem is an important issue, and
+> should get "exposure".
+> 
+> Stef Bon
+> 
+> 2010/7/23 Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>:
+>> On 2010-07-22, at 11:40, David Howells wrote:
+>>> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+>>>> As it can been seen, the performance while reading when data is cache
+>>>> hot (disk) is not great as the network link is a Gigabit ethernet (with
+>>>> server having working set in memory) which is mostly expected.
+>>>
+>>> That's what I see with NFS and AFS too.
+>>>
+>>>> (I could not get access to a slower network (say 100 Mb/s) where the real
+>>>> performance boost could be evident).
+>>
+>> More interesting than a slow network is testing with more clients.  10 clients should be able to get 10x the read performance from the client-local cache, probably more than the server's peak disk/network bandwidth.
+>>
+
+-- 
+Suresh Jayaraman
