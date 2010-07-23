@@ -1,72 +1,64 @@
-From: Stef Bon <stefbon@gmail.com>
-Subject: Re: [PATCH 00/09] cifs: local caching support using FS-Cache
-Date: Fri, 23 Jul 2010 10:35:55 +0200
-Message-ID: <AANLkTikF5Oz5pobaPUJebUg+yPuoVy_B5PBz+nuUTSii@mail.gmail.com>
-References: <4C480F51.8070204@suse.de>
-	<1278333663-30464-1-git-send-email-sjayaraman@suse.de>
-	<4C3DF6BF.3070001@gmail.com>
-	<AANLkTin2tKtkWTflrrzBMYBEd6SFr35uYUl1SmfYlj9W@mail.gmail.com>
-	<4C3F35F7.8060408@suse.de>
-	<1892.1279820400@redhat.com>
-	<A55FDF07-DC44-4A5D-BDC4-ACC7D76CC753@dilger.ca>
+From: =?iso-8859-1?Q?Bj=F6rn?= Jacke <bj-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
+ extended file stats available [ver #6]
+Date: Fri, 23 Jul 2010 11:14:53 +0200
+Message-ID: <E1OcEL8-00DP7W-V3@intern.SerNet.DE>
+References: <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+ <30448.1279800887@redhat.com>
+ <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
+ <AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
+ <E1Obxpd-00CRIo-SF@intern.SerNet.DE>
+ <AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
+ <20100722162712.GB10352@jeremy-laptop>
+ <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+ <19528.60019.28495.655512@samba.org>
+ <20100723012130.GD16373@thunk.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: David Howells <dhowells@redhat.com>,
-	Suresh Jayaraman <sjayaraman@suse.de>,
-	Steve French <smfrench@gmail.com>,
-	Scott Lovenberg <scott.lovenberg@gmail.com>,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-cachefs@redhat.com
-To: Andreas Dilger <adilger@dilger.ca>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <A55FDF07-DC44-4A5D-BDC4-ACC7D76CC753@dilger.ca>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+To: Ted Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, tridge-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Volk
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20100723012130.GD16373-AKGzg7BKzIDYtjvyW6yDsg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-In my opinion there should be article published about this, describing
-fs-cache generally, and these kinds of benchmarks!
+On 2010-07-22 at 21:21 -0400 Ted Ts'o sent off:
+> Well, not POSIX, because POSIX doesn't have CreationTime at all.
+> BSD's birthtime doesn't allow it to be set, and the question here is
+> largely philosophical.
 
-Using fs-cache for network filesystem is an important issue, and
-should get "exposure".
+actually, it can (partly :). But the way it can be done is an insane ha=
+ck:
 
-Stef Bon
+<quote "http://ace.delos.com/kirk/">
+To provide a sensible birth time for applications that are unaware of t=
+he birth
+time attribute, we changed the semantics of the "utimes" system call so=
+ that if
+the birth time was newer than the value of the modification time that i=
+t was
+setting, it sets the birth time to the same time as the modification ti=
+me. An
+application that is aware of the birth time attribute can set both the =
+birth
+time and the modification time by doing two calls to "utimes". First it=
+ calls
+"utimes" with a modification time equal to the saved birth time, then i=
+t calls
+"utimes" a second time with a modification time equal to the (presumabl=
+y newer)
+saved modification time.
+</quote>
 
-2010/7/23 Andreas Dilger <adilger@dilger.ca>:
-> On 2010-07-22, at 11:40, David Howells wrote:
->> Suresh Jayaraman <sjayaraman@suse.de> wrote:
->>> As it can been seen, the performance while reading when data is cac=
-he
->>> hot (disk) is not great as the network link is a Gigabit ethernet (=
-with
->>> server having working set in memory) which is mostly expected.
->>
->> That's what I see with NFS and AFS too.
->>
->>> (I could not get access to a slower network (say 100 Mb/s) where th=
-e real
->>> performance boost could be evident).
->
-> More interesting than a slow network is testing with more clients. =C2=
-=A010 clients should be able to get 10x the read performance from the c=
-lient-local cache, probably more than the server's peak disk/network ba=
-ndwidth.
->
-> Cheers, Andreas
->
->
->
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.ht=
-ml
->
---
-To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
-" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Thus it can also be only be set more in the past.
+
+Cheers
+Bj=F6rn
+--=20
+SerNet GmbH, Bahnhofsallee 1b, 37081 G=F6ttingen
+phone: +49-551-370000-0, fax: +49-551-370000-9
+AG G=F6ttingen, HRB 2816, GF: Dr. Johannes Loxen
