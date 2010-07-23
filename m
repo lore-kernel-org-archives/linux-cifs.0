@@ -1,64 +1,38 @@
-From: =?iso-8859-1?Q?Bj=F6rn?= Jacke <bj-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
- extended file stats available [ver #6]
-Date: Fri, 23 Jul 2010 11:14:53 +0200
-Message-ID: <E1OcEL8-00DP7W-V3@intern.SerNet.DE>
-References: <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
- <30448.1279800887@redhat.com>
- <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
- <AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
- <E1Obxpd-00CRIo-SF@intern.SerNet.DE>
- <AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
- <20100722162712.GB10352@jeremy-laptop>
- <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
- <19528.60019.28495.655512@samba.org>
- <20100723012130.GD16373@thunk.org>
+From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: linux-next: manual merge of the workqueues tree with the Linus'
+ tree
+Date: Fri, 23 Jul 2010 13:28:21 +0200
+Message-ID: <4C497CD5.5010908@kernel.org>
+References: <20100723144600.dd4da992.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Ted Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, tridge-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Volk
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20100723012130.GD16373-AKGzg7BKzIDYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20100723144600.dd4da992.sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 2010-07-22 at 21:21 -0400 Ted Ts'o sent off:
-> Well, not POSIX, because POSIX doesn't have CreationTime at all.
-> BSD's birthtime doesn't allow it to be set, and the question here is
-> largely philosophical.
+Hello, Stephen.
 
-actually, it can (partly :). But the way it can be done is an insane ha=
-ck:
+On 07/23/2010 06:46 AM, Stephen Rothwell wrote:
+> Hi Tejun,
+> 
+> Today's linux-next merge of the workqueues tree got a conflict in
+> fs/cifs/cifsfs.c between commit 4c0c03ca54f72fdd5912516ad0a23ec5cf01bda7
+> ("CIFS: Fix a malicious redirect problem in the DNS lookup code") from
+> Linus' tree and commit 9b646972467fb5fdc677f9e4251875db20bdbb64 ("cifs:
+> use workqueue instead of slow-work") from the workqueues tree.
+> 
+> I fixed it up (I think - I removed the call to cifs_exit_dns_resolver()
+> as there is no way to get to that code any more) and can carry the fix
+> for a while.
 
-<quote "http://ace.delos.com/kirk/">
-To provide a sensible birth time for applications that are unaware of t=
-he birth
-time attribute, we changed the semantics of the "utimes" system call so=
- that if
-the birth time was newer than the value of the modification time that i=
-t was
-setting, it sets the birth time to the same time as the modification ti=
-me. An
-application that is aware of the birth time attribute can set both the =
-birth
-time and the modification time by doing two calls to "utimes". First it=
- calls
-"utimes" with a modification time equal to the saved birth time, then i=
-t calls
-"utimes" a second time with a modification time equal to the (presumabl=
-y newer)
-saved modification time.
-</quote>
+Yes, one failure case is removed, so that would be correct.  Thank you
+very much for taking care of the conflict.
 
-Thus it can also be only be set more in the past.
-
-Cheers
-Bj=F6rn
---=20
-SerNet GmbH, Bahnhofsallee 1b, 37081 G=F6ttingen
-phone: +49-551-370000-0, fax: +49-551-370000-9
-AG G=F6ttingen, HRB 2816, GF: Dr. Johannes Loxen
+-- 
+tejun
