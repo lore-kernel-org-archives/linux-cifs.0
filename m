@@ -1,37 +1,59 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs.upcall: require a uid= or creduid= parm
-Date: Mon, 26 Jul 2010 13:05:28 -0400
-Message-ID: <1280163930-983-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH] mount.cifs: handle the "mand" and "nomand" mount options
+Date: Mon, 26 Jul 2010 13:05:29 -0400
+Message-ID: <1280163930-983-2-git-send-email-jlayton@samba.org>
+References: <1280163930-983-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1280163930-983-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Even though all known kernels send the uid= parm to userspace,
-cifs.upcall doesn't technically require it. It should though. If one
-wasn't sent for some reason, then the setuid wouldn't occur. Error out
-if there is no uid= or creduid= parm.
+These are filesystem-independent mount options that get passed to
+mount.cifs too. Handle them appropriately by enabling and disabling
+MS_MANDLOCK and not handing them off to the kernel.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifs.upcall.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ mount.cifs.c |   12 ++++++++++++
+ 1 files changed, 12 insertions(+), 0 deletions(-)
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 1f4341d..8f7850a 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -707,6 +707,11 @@ int main(const int argc, char *const argv[])
- 			goto out;
- 		}
- 		ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, arg.uid);
-+	} else {
-+		/* no uid= or creduid= parm -- something is wrong */
-+		syslog(LOG_ERR, "No uid= or creduid= parm specified");
-+		rc = 1;
-+		goto out;
- 	}
+diff --git a/mount.cifs.c b/mount.cifs.c
+index c84e72d..1ca9507 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -159,6 +159,8 @@
+ #define OPT_RO         24
+ #define OPT_RW         25
+ #define OPT_REMOUNT    26
++#define OPT_MAND       27
++#define OPT_NOMAND     28
  
- 	host = arg.hostname;
+ 
+ /* struct for holding parsed mount info for use by privleged process */
+@@ -822,6 +824,10 @@ static int parse_opt_token(const char *token)
+ 		return OPT_NO_DEV;
+ 	if (strncmp(token, "nobrl", 5) == 0 || strncmp(token, "nolock", 6) == 0)
+ 		return OPT_NO_LOCK;
++	if (strncmp(token, "mand", 4) == 0)
++		return OPT_MAND;
++	if (strncmp(token, "nomand", 6) == 0)
++		return OPT_NOMAND;
+ 	if (strncmp(token, "dev", 3) == 0)
+ 		return OPT_DEV;
+ 	if (strncmp(token, "noexec", 6) == 0)
+@@ -1106,6 +1112,12 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 		case OPT_NO_LOCK:
+ 			*filesys_flags &= ~MS_MANDLOCK;
+ 			break;
++		case OPT_MAND:
++			*filesys_flags |= MS_MANDLOCK;
++			goto nocopy;
++		case OPT_NOMAND:
++			*filesys_flags &= ~MS_MANDLOCK;
++			goto nocopy;
+ 		case OPT_DEV:
+ 			*filesys_flags &= ~MS_NODEV;
+ 			break;
 -- 
 1.7.1.1
