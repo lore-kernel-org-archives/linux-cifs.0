@@ -1,38 +1,31 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH] cifs: fsc should not default to "on"
-Date: Tue, 27 Jul 2010 19:10:54 +0530
-Message-ID: <4C4EE1E6.3030200@suse.de>
-References: <1280168708-2943-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 09/18] xstat: Make special system filesystems return FS_SPECIAL_FL [ver #6]
+Date: Tue, 27 Jul 2010 14:41:24 +0100
+Message-ID: <17717.1280238084@redhat.com>
+References: <8426.1279548573@redhat.com> <20100718084955.GB27794@infradead.org> <20100715021709.5544.64506.stgit@warthog.procyon.org.uk> <20100715021720.5544.19973.stgit@warthog.procyon.org.uk>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280168708-2943-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <8426.1279548573-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 07/26/2010 11:55 PM, Jeff Layton wrote:
-> I'm not sure why this was merged with this flag hardcoded on, but it
-> seems quite dangerous. Turn it off.
+David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Mea culpa.. I forgot to remove this during the second post.
+> Also, not all the flags are per-filesystem.  The following are:
+> 
+> 	FS_SPECIAL_FL		/* Special file as found in procfs/sysfs */
+> 	FS_REMOTE_FL		/* File is remote */
 
-> Also, mount.cifs hands unrecognized options off to the kernel so there
-> should be no need for changes there in order to support this.
+Actually, that last is not true; FS_REMOTE_FL is per-file, not per-fs.  You
+can have a filesystem that has fabricated files and remote files.  For
+instance, with kAFS at some point you will be go into /afs, do a lookup for a
+directory that doesn't exist, but whose name represents a cell+volume, the
+filesystem will fabricate a local directory and then attempt to mount a remote
+directory on to it.
 
-Yeah, it does not seem to require any handling - I had misunderstood.
-
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    3 ---
->  1 files changed, 0 insertions(+), 3 deletions(-)
-
-Reviewed-and-Tested-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-
-
-Thanks,
-
--- 
-Suresh Jayaraman
+David
