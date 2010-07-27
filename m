@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH] cifs: document 'fsc' mount option
-Date: Tue, 27 Jul 2010 19:20:00 +0530
-Message-ID: <4C4EE408.7070109@suse.de>
+Subject: [PATCH] cifs: add 'fsc' mount option to the usage help text
+Date: Tue, 27 Jul 2010 19:26:46 +0530
+Message-ID: <4C4EE59E.7050800@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
@@ -11,40 +11,25 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Document the newly added local caching feature using FS-Cache. This patch
-could be queued and considered once the local caching patches gets merged
-upstream.
+Add 'fsc' mount option to the 'Less commonly used options' section of
+mount.cifs usage help text. As with the previous patch, this one too could be
+queued and considered once the local caching patches gets merged upstream.
 
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- doc/mount.cifs.8.xml |   17 +++++++++++++++++
- 1 files changed, 17 insertions(+), 0 deletions(-)
+ mount.cifs.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/doc/mount.cifs.8.xml b/doc/mount.cifs.8.xml
-index 4937550..2200746 100644
---- a/doc/mount.cifs.8.xml
-+++ b/doc/mount.cifs.8.xml
-@@ -534,6 +534,23 @@ permissions in memory that can't be stored on the server. This information can d
-                 maximum wsize currently allowed by CIFS is 57344 (fourteen
-                 4096 byte pages)</para></listitem>
- 	</varlistentry>
-+	<varlistentry>
-+		<term>fsc</term>
-+
-+		<listitem><para>Enable local disk caching using FS-Cache
-+		for cifs. This option could be useful to improve performance
-+		on a slow link, heavily loaded server and/or network
-+		where reading from the disk is faster than reading from the
-+		server (over the network). This could also impact the
-+		scalability positively as the number of calls to the server
-+		are reduced. But, be warned that local caching is not suitable
-+		for all workloads, for e.g., read-once type workloads. So
-+		you need to consider carefully the situation/workload before
-+		using this option.
-+		NOTE: You also need to have cachefilesd daemon installed and
-+		running to make the cache operational.
-+                </para></listitem>
-+	</varlistentry>
- 	 <varlistentry>
-                 <term>--verbose</term>
-                 <listitem><para>Print additional debugging information for the mount. Note that this parameter must be specified before the -o. For example:</para><para>mount -t cifs //server/share /mnt --verbose -o user=username</para></listitem>
+diff --git a/mount.cifs.c b/mount.cifs.c
+index c84e72d..2065f46 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -265,7 +265,7 @@ static int mount_cifs_usage(FILE * stream)
+ 	fprintf(stream,
+ 		"\n\tmapchars,nomapchars,nolock,servernetbiosname=<SRV_RFC1001NAME>");
+ 	fprintf(stream,
+-		"\n\tdirectio,nounix,cifsacl,sec=<authentication mechanism>,sign");
++		"\n\tdirectio,nounix,cifsacl,sec=<authentication mechanism>,sign,fsc");
+ 	fprintf(stream,
+ 		"\n\nOptions not needed for servers supporting CIFS Unix extensions");
+ 	fprintf(stream,
