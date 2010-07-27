@@ -1,70 +1,58 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: handle the "mand" and "nomand" mount
- options
-Date: Tue, 27 Jul 2010 12:42:11 -0400
-Message-ID: <20100727124211.6e9e6a20@tlielax.poochiereds.net>
-References: <1280163930-983-1-git-send-email-jlayton@samba.org>
-	<1280163930-983-2-git-send-email-jlayton@samba.org>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH] mount.cifs: document 'fsc' mount option
+Date: Tue, 27 Jul 2010 22:18:10 +0530
+Message-ID: <4C4F0DCA.2010604@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280163930-983-2-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 26 Jul 2010 13:05:29 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+Changes since last post:
+	- added the information about the kernel CONFIG option
+	- also added the information that caching is currently enabled for files opened as read-only
 
-> These are filesystem-independent mount options that get passed to
-> mount.cifs too. Handle them appropriately by enabling and disabling
-> MS_MANDLOCK and not handing them off to the kernel.
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  mount.cifs.c |   12 ++++++++++++
->  1 files changed, 12 insertions(+), 0 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index c84e72d..1ca9507 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -159,6 +159,8 @@
->  #define OPT_RO         24
->  #define OPT_RW         25
->  #define OPT_REMOUNT    26
-> +#define OPT_MAND       27
-> +#define OPT_NOMAND     28
->  
->  
->  /* struct for holding parsed mount info for use by privleged process */
-> @@ -822,6 +824,10 @@ static int parse_opt_token(const char *token)
->  		return OPT_NO_DEV;
->  	if (strncmp(token, "nobrl", 5) == 0 || strncmp(token, "nolock", 6) == 0)
->  		return OPT_NO_LOCK;
-> +	if (strncmp(token, "mand", 4) == 0)
-> +		return OPT_MAND;
-> +	if (strncmp(token, "nomand", 6) == 0)
-> +		return OPT_NOMAND;
->  	if (strncmp(token, "dev", 3) == 0)
->  		return OPT_DEV;
->  	if (strncmp(token, "noexec", 6) == 0)
-> @@ -1106,6 +1112,12 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  		case OPT_NO_LOCK:
->  			*filesys_flags &= ~MS_MANDLOCK;
->  			break;
-> +		case OPT_MAND:
-> +			*filesys_flags |= MS_MANDLOCK;
-> +			goto nocopy;
-> +		case OPT_NOMAND:
-> +			*filesys_flags &= ~MS_MANDLOCK;
-> +			goto nocopy;
->  		case OPT_DEV:
->  			*filesys_flags &= ~MS_NODEV;
->  			break;
+Document the newly added local caching feature using FS-Cache. This patch
+could be queued and considered once the local caching patches gets merged
+upstream.
 
-merged
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+
+ doc/mount.cifs.8.xml |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
+
+diff --git a/doc/mount.cifs.8.xml b/doc/mount.cifs.8.xml
+index 4937550..af20c10 100644
+--- a/doc/mount.cifs.8.xml
++++ b/doc/mount.cifs.8.xml
+@@ -534,6 +534,26 @@ permissions in memory that can't be stored on the server. This information can d
+                 maximum wsize currently allowed by CIFS is 57344 (fourteen
+                 4096 byte pages)</para></listitem>
+ 	</varlistentry>
++	<varlistentry>
++		<term>fsc</term>
++
++		<listitem><para>Enable local disk caching using FS-Cache
++		for cifs. This option could be useful to improve performance
++		on a slow link, heavily loaded server and/or network
++		where reading from the disk is faster than reading from the
++		server (over the network). This could also impact the
++		scalability positively as the number of calls to the server
++		are reduced. But, be warned that local caching is not suitable
++		for all workloads, for e.g., read-once type workloads. So
++		you need to consider carefully the situation/workload before
++		using this option. Currently, local disk caching is enabled
++		for CIFS files opened as read-only.
++		NOTE: This feature is available only in the recent kernels
++		that have been built with the kernel config option
++		CONFIG_CIFS_FSCACHE. You also need to have cachefilesd daemon
++		installed and running to make the cache operational.
++                </para></listitem>
++	</varlistentry>
+ 	 <varlistentry>
+                 <term>--verbose</term>
+                 <listitem><para>Print additional debugging information for the mount. Note that this parameter must be specified before the -o. For example:</para><para>mount -t cifs //server/share /mnt --verbose -o user=username</para></listitem>
