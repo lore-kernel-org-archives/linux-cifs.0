@@ -1,48 +1,49 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs.upcall: require a uid= or creduid= parm
-Date: Tue, 27 Jul 2010 12:42:00 -0400
-Message-ID: <20100727124200.094e80ca@tlielax.poochiereds.net>
-References: <1280163930-983-1-git-send-email-jlayton@samba.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: add 'fsc' mount option to the usage help text
+Date: Tue, 27 Jul 2010 12:43:02 -0400
+Message-ID: <20100727124302.0f179975@tlielax.poochiereds.net>
+References: <4C4EE59E.7050800@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280163930-983-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <4C4EE59E.7050800-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 26 Jul 2010 13:05:28 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Tue, 27 Jul 2010 19:26:46 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> Even though all known kernels send the uid= parm to userspace,
-> cifs.upcall doesn't technically require it. It should though. If one
-> wasn't sent for some reason, then the setuid wouldn't occur. Error out
-> if there is no uid= or creduid= parm.
+> Add 'fsc' mount option to the 'Less commonly used options' section of
+> mount.cifs usage help text. As with the previous patch, this one too could be
+> queued and considered once the local caching patches gets merged upstream.
 > 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 > ---
->  cifs.upcall.c |    5 +++++
->  1 files changed, 5 insertions(+), 0 deletions(-)
+>  mount.cifs.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index 1f4341d..8f7850a 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -707,6 +707,11 @@ int main(const int argc, char *const argv[])
->  			goto out;
->  		}
->  		ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, arg.uid);
-> +	} else {
-> +		/* no uid= or creduid= parm -- something is wrong */
-> +		syslog(LOG_ERR, "No uid= or creduid= parm specified");
-> +		rc = 1;
-> +		goto out;
->  	}
->  
->  	host = arg.hostname;
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index c84e72d..2065f46 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -265,7 +265,7 @@ static int mount_cifs_usage(FILE * stream)
+>  	fprintf(stream,
+>  		"\n\tmapchars,nomapchars,nolock,servernetbiosname=<SRV_RFC1001NAME>");
+>  	fprintf(stream,
+> -		"\n\tdirectio,nounix,cifsacl,sec=<authentication mechanism>,sign");
+> +		"\n\tdirectio,nounix,cifsacl,sec=<authentication mechanism>,sign,fsc");
+>  	fprintf(stream,
+>  		"\n\nOptions not needed for servers supporting CIFS Unix extensions");
+>  	fprintf(stream,
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
 merged
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
