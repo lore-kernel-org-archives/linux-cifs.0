@@ -1,44 +1,70 @@
-From: David Howells <dhowells@redhat.com>
-Subject: Re: [PATCH 1/6] Add a dentry op to handle automounting rather than abusing follow_link() [ver #2]
-Date: Tue, 27 Jul 2010 09:48:41 +0100
-Message-ID: <12883.1280220521@redhat.com>
-References: <1280202225.2944.20.camel@localhost> <1280157768.3569.14.camel@localhost> <1279944664.2944.8.camel@localhost> <20100722175847.5552.11520.stgit@warthog.procyon.org.uk> <17723.1279897759@redhat.com> <9168.1280153997@redhat.com> <30118.1280159695@redhat.com>
-Cc: dhowells@redhat.com, viro@ZenIV.linux.org.uk,
-	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Ian Kent <raven@themaw.net>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1280202225.2944.20.camel@localhost>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: handle the "mand" and "nomand" mount options (try #2)
+Date: Tue, 27 Jul 2010 07:42:14 -0400
+Message-ID: <1280230934-20830-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Ian Kent <raven@themaw.net> wrote:
+These are filesystem-independent mount options that get passed to
+mount.cifs too. Handle them appropriately by enabling and disabling
+MS_MANDLOCK and not handing them off to the kernel.
 
-> Is this something others need?
+Also, don't set MS_MANDLOCK by default. There's no reason to ask the
+kernel to enforce mandatory locking by default. This also matches
+up better with the way that "mand" is set in the mtab.
 
-Not as far as I know...  I think autofs is the only one doing out-of-kernel
-automounting.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.c |   14 ++++++++++++--
+ 1 files changed, 12 insertions(+), 2 deletions(-)
 
-That doesn't mean it shouldn't be provided, though...
-
-> Again, the exists vs not yet exists case for paths within indirect
-> autofs mounts. At the moment I can just set the flag on all dentrys in
-> the autofs fs and return EXDEV for non-empty directories in order to
-> return the dentry as a path component. OTOH if the dentry is a mount
-> embeded in the path and the mount fails we get a error return.
-
-Seems redundant, but I'd say go with it for now.  Maybe we can offload
-S_AUTOMOUNT to the dentry.
-
-> I could clear the flag on non-root parent dentrys during mkdir if this
-> is needed by others.
-
-I'm not sure that would actually matter, since it would come to
-follow_automount() at the same place.
-
-Note that someone who tries to stat() with AT_NO_AUTOMOUNT will cause the call
-to d_automount() to be suppressed and will see the negative or non-mounted
-directory.  That might be okay for you.
-
-David
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 27d267c..5a05caa 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -160,6 +160,8 @@
+ #define OPT_RO         24
+ #define OPT_RW         25
+ #define OPT_REMOUNT    26
++#define OPT_MAND       27
++#define OPT_NOMAND     28
+ 
+ 
+ /* struct for holding parsed mount info for use by privleged process */
+@@ -823,6 +825,10 @@ static int parse_opt_token(const char *token)
+ 		return OPT_NO_DEV;
+ 	if (strncmp(token, "nobrl", 5) == 0 || strncmp(token, "nolock", 6) == 0)
+ 		return OPT_NO_LOCK;
++	if (strncmp(token, "mand", 4) == 0)
++		return OPT_MAND;
++	if (strncmp(token, "nomand", 6) == 0)
++		return OPT_NOMAND;
+ 	if (strncmp(token, "dev", 3) == 0)
+ 		return OPT_DEV;
+ 	if (strncmp(token, "noexec", 6) == 0)
+@@ -1109,6 +1115,12 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 		case OPT_NO_LOCK:
+ 			*filesys_flags &= ~MS_MANDLOCK;
+ 			break;
++		case OPT_MAND:
++			*filesys_flags |= MS_MANDLOCK;
++			goto nocopy;
++		case OPT_NOMAND:
++			*filesys_flags &= ~MS_MANDLOCK;
++			goto nocopy;
+ 		case OPT_DEV:
+ 			*filesys_flags &= ~MS_NODEV;
+ 			break;
+@@ -1735,8 +1747,6 @@ int main(int argc, char **argv)
+ 		return EX_SYSERR;
+ 	}
+ 
+-	parsed_info->flags = MS_MANDLOCK;
+-
+ 	/* add sharename in opts string as unc= parm */
+ 	while ((c = getopt_long(argc, argv, "?fhno:rvVw",
+ 				longopts, NULL)) != -1) {
+-- 
+1.7.1.1
