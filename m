@@ -1,40 +1,87 @@
-From: utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
- extended  file stats available [ver #6]
-Date: Fri, 30 Jul 2010 23:22:58 +0200
-Message-ID: <1280524978.2452.9.camel@segv.aura.of.mankind>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
-	 <20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
-	 <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
-	 <30448.1279800887@redhat.com> <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
-	 <AANLkTikBCXK6uEw  <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 00/09] cifs: local caching support using FS-Cache
+Date: Fri, 30 Jul 2010 19:08:39 -0400
+Message-ID: <4C535B77.4040604@gmail.com>
+References: <1278333663-30464-1-git-send-email-sjayaraman@suse.de>	<4C3DF6BF.3070001@gmail.com> <AANLkTin2tKtkWTflrrzBMYBEd6SFr35uYUl1SmfYlj9W@mail.gmail.com> <4C3F35F7.8060408@suse.de> <4C480F51.8070204@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cachefs-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <4C480F51.8070204-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2010-07-22 at 09:40 -0700, Linus Torvalds wrote:
-> But the fact is, th Unix ctime semantics are insane and largely
-> useless. There's a damn good reason almost nobody uses ctime under
-> unix.
-> 
-> So what I'm suggesting is that we have a flag - either per-process or
-> per-mount - that just says "use windows semantics for ctime".
+On 7/22/2010 5:28 AM, Suresh Jayaraman wrote:
+> Here are some results from my benchmarking:
+>
+> Environment
+> ------------
+>
+> I'm using my T60p laptop as the CIFS server (running Samba) and one of
+> my test machines as CIFS client, connected over an ethernet of reported
+> speed 1000 Mb/s. The TCP bandwidth as seen by a pair of netcats between
+> the client and the server is about 786.24 Mb/s.
+>
+> Client has a 2.8 GHz Pentium D CPU with 2GB RAM
+> Server has a 2.33GHz Core2 CPU (T7600) with 2GB RAM
+>
+>
+> Test
+> -----
+> The benchmark involves pulling a 200 MB file over CIFS to the client
+> using cat to /dev/zero under `time'. The wall clock time reported was
+> recorded.
+>
+> Note
+> ----
+>     - The client was rebooted after each test, but the server was not.
+>     - The entire file was loaded into RAM on the server before each test
+>       to eliminate disk I/O latencies on that end.
+>     - A seperate partition of size 4GB has been dedicated for the cache.
+>     - There were no other CIFS client that was accessing the Server when
+>       the tests were performed.
+>
+>
+> First, the test was run on the server twice and the second result was
+> recorded (noted as Server below).
+>
+> Secondly, the client was rebooted and the test was run with cachefiled
+> not running and was recorded (noted as None below).
+>
+> Next, the client was rebooted, the cache contents (if any) were erased
+> with mkfs.ext3 and test was run again with cachefilesd running (noted as
+> COLD)
+>
+> Next the client was rebooted, tests were run with cachefilesd running
+> this time with a populated cache (noted as HOT).
+>
+> Finally, the test was run again without unmounting, stopping cachefiled
+> or rebooting to ensure pagecache is valid (noted as PGCACHE).
+>
+> The benchmark was repeated twice:
+>
+> Cache (state)	Run #1		Run#2
+> =============  =======		=======
+> Server		0.107 s		0.090 s
+> None		6.497 s		6.440 s
+> COLD		6.707 s		6.635 s
+> HOT		5.286 s		5.078 s
+> PGCACHE		0.090 s		0.091 s
+>
+> As it can been seen, the performance while reading when data is cache
+> hot (disk) is not great as the network link is a Gigabit ethernet (with
+> server having working set in memory) which is mostly expected. (I could
+> not get access to a slower network (say 100 Mb/s) where the real
+> performance boost could be evident).
+>
+>
+> Thanks,
+>
+>
+>    
 
-When abusing an existing time stamp use atime not ctime please.
-ctime has it's uses. atime was just a mistake and is nearly useless.
-
-And with noatime we already have creation time semantics for atime.
-
-
-utz
+Suresh, thanks for taking the time to run these bench marks. :)
