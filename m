@@ -1,73 +1,41 @@
 From: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/2] cifs: show features compiled in as part of DebugData
-Date: Fri, 30 Jul 2010 17:57:22 +0530
-Message-ID: <1280492842.19538.1.camel@jay-t60p>
+Subject: [PATCH 2/2] cifs: update README
+Date: Fri, 30 Jul 2010 18:01:17 +0530
+Message-ID: <1280493077.19538.5.camel@jay-t60p>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 1/2] cifs: show features compiled in as part of DebugData
+Subject: [PATCH 2/2] cifs: update README
 
-This patch adds the features that are compiled in to the CIFS debugging data
-as shown below:
-
-	$cat /proc/fs/cifs/DebugData 
-	Display Internal CIFS Data Structures for Debugging
-	---------------------------------------------------
-	CIFS Version 1.64
-	Features: dfs fscache posix spnego xattr 
-	Active VFS Requests: 0
-	...
-
-This patch provides a definitive way to tell what features are currently
-enabled in the running kernel. This could also help debugging.
+Update the README file to reflect that now DebugData shows all
+the features enabled.
 
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifs_debug.c |   26 ++++++++++++++++++++++++++
- 1 files changed, 26 insertions(+), 0 deletions(-)
+--
+ fs/cifs/README |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 4fce6e6..fdb2db5 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -119,6 +119,32 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 		    "Display Internal CIFS Data Structures for Debugging\n"
- 		    "---------------------------------------------------\n");
- 	seq_printf(m, "CIFS Version %s\n", CIFS_VERSION);
-+	seq_printf(m, "Features: ");
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+	seq_printf(m, "dfs");
-+	seq_putc(m, ' ');
-+#endif
-+#ifdef CONFIG_CIFS_FSCACHE
-+	seq_printf(m, "fscache");
-+	seq_putc(m, ' ');
-+#endif
-+#ifdef CONFIG_CIFS_WEAK_PW_HASH
-+	seq_printf(m, "lanman");
-+	seq_putc(m, ' ');
-+#endif
-+#ifdef CONFIG_CIFS_POSIX
-+	seq_printf(m, "posix");
-+	seq_putc(m, ' ');
-+#endif
-+#ifdef CONFIG_CIFS_UPCALL
-+	seq_printf(m, "spnego");
-+	seq_putc(m, ' ');
-+#endif
-+#ifdef CONFIG_CIFS_XATTR
-+	seq_printf(m, "xattr");
-+	seq_putc(m, ' ');
-+#endif
-+	seq_putc(m, '\n');
- 	seq_printf(m, "Active VFS Requests: %d\n", GlobalTotalActiveXid);
- 	seq_printf(m, "Servers:");
- 
+diff --git a/fs/cifs/README b/fs/cifs/README
+index a727b7c..a7081ee 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -568,8 +568,9 @@ module can be displayed via modinfo.
+ Misc /proc/fs/cifs Flags and Debug Info
+ =======================================
+ Informational pseudo-files:
+-DebugData		Displays information about active CIFS sessions
+-			and shares, as well as the cifs.ko version.
++DebugData		Displays information about active CIFS sessions and
++			shares, features enabled as well as the cifs.ko
++			version.
+ Stats			Lists summary resource usage information as well as per
+ 			share statistics, if CONFIG_CIFS_STATS in enabled
+ 			in the kernel configuration.
