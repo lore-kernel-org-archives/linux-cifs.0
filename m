@@ -1,61 +1,70 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: What are the uid=0 and gid=0 doing?
-Date: Thu, 29 Jul 2010 22:08:43 +0200
-Message-ID: <AANLkTikKnjtspk6TAYJ9cNKJRWpqmrqH_S8QNONk=MdQ@mail.gmail.com>
-References: <AANLkTi=UW31iMuqEX9NRspTBwE4X5_4vr3+LE1-sEPjA@mail.gmail.com>
-	<20100729133844.410529c6@barsoom.rdu.redhat.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH] cifs: document 'fsc' mount option
+Date: Fri, 30 Jul 2010 15:19:14 +0530
+Message-ID: <4C52A01A.4090408@suse.de>
+References: <4C4EE408.7070109@suse.de>	<20100727103313.4b730ea8@tlielax.poochiereds.net>	<AANLkTina2EyHkrgNAcrY8ZRK=fXQS71dekWc+kOA0+mz@mail.gmail.com>	<20100727111517.4fe0859e@tlielax.poochiereds.net>	<AANLkTik9JqtqAtKJQsaQR8aC8s0kwmrcU=_=QQei7U07@mail.gmail.com>	<4C4F0A71.8020908@suse.de> <AANLkTi=+Y1XdFCT1UfWZW==qusXfs6t-vxa_CYo03TTT@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100729133844.410529c6-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
+In-Reply-To: <AANLkTi=+Y1XdFCT1UfWZW==qusXfs6t-vxa_CYo03TTT-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Well, yes I know. Thanks for the answer still.
-I'm getting weird errors when creating a file.
+On 07/27/2010 10:08 PM, Steve French wrote:
+> On Tue, Jul 27, 2010 at 11:33 AM, Suresh Jayaraman <sjayaraman@suse.d=
+e> wrote:
+>> On 07/27/2010 08:51 PM, Steve French wrote:
+>>> scripts/extract-ikconfig could be run against the image (or look at
+>>> /proc/config.gz) - but unless there is an easier way to view kernel
+>>> config options on particular distros via distro specific tools -
+>>> probably easier just to note that CONFIG_FSCACHE must be selected i=
+n
+>>> the kernel build (since it forces dependencies on the other kernel
+>>> options being set)
+>>
+>> Does something like
+>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD$zcat /proc/config.gz | grep =
+CONFIG_CIFS_FSCACHE
+>>
+>> might work on all distros?
+>>
+>> But, Jeff's idea of having a features file in /proc sounds good. Apa=
+rt
+>> from using them as a reference to check in documentation, it could b=
+e a
+>> useful information while collecting debugging output as well..?
+>=20
+> Seems reasonable - but wondering if other file systems have run into =
+the same
+> problem - how to view their build/config options - and how they have
+> solved it (if at all) so ccing fsdevel
+>=20
 
-My fs is running as root, and tries to - when creating a file -
-to take the uid and the gid of the requesting user in account.
+I just checked some of the other filesystems. Most of them just mention
+the CONFIG_XXX option has to be set/enabled.
 
-Someone suggested the use of setfsuid and setfsgid. I'm still looking for an
-answer. Do you maybe know something about the use of these commands?
+=46or e.g.
 
-Stef Bon
+(1) Mount options for jfs
+
+iocharset=3Dname
+	...
+	This requires CONFIG_NLS_UTF8 to be set in the kernel .config
+file.
+
+(2) Mount options for tmpfs
+
+mpol=3D[default|prefer:Node|bind:NodeList|interleave|interleave:NodeLis=
+t]
+	Set the NUMA  memory  allocation  policy  for  all  files  in  that
+instance  (if  the  kernel  CONFIG_NUMA  is enabled) ...
 
 
-2010/7/29 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> On Thu, 29 Jul 2010 09:28:17 +0200
-> Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> Hello,
->>
->> I'm working on a construction to offer the user easy access to all
->> kinds of resources, local like USB sticks, CDroms and harddrives,
->>
->> Two major apps make that possible, fuse-workspace-ll, a fuse fs to
->> create userfriendly paths to the resource, and redirect the
->> user/process to the share mounted by the automounter.
->>
->> Look for more information on:
->>
->> http://linux.bononline.nl/linux/mount.md5key.new/
->>
->> Now looking at how a shar is mounted, I see the following:
->>
->> //SCLFS20091030/sbon
->> /mnt/mount.md5key/sbon/mount/601d329b6fd5c9d801e620ed7ac41606 cifs
->> rw,mand,relatime,unc=\\SCLFS20091030\sbon,username=sbon,uid=0,noforceuid,gid=0,noforcegid,addr=192.168.0.2,posixpaths,setuids,serverino,acl,rsize=16384,wsize=57344
->> 0 0
->>
->> username=sbon, of course because of the use of a credentials file. But
->> why are the uid and the gid not set to this value?
->>
->
-> The real uid/gid of the user doing the mounting is 0. You can of
-> course override those values with whatever you wish if you're root.
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->
+Thanks,
+
+--=20
+Suresh Jayaraman
