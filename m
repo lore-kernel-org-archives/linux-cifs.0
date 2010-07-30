@@ -1,53 +1,34 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] CIFS: Remove __exit mark from cifs_exit_dns_resolver()
-Date: Fri, 30 Jul 2010 15:25:19 +0100
-Message-ID: <20100730142519.18287.22053.stgit@warthog.procyon.org.uk>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/2] cifs: show features compiled in as part of DebugData
+Date: Fri, 30 Jul 2010 09:39:04 -0500
+Message-ID: <AANLkTikgA8mXTcX-i3avjuQygrekicntcy3P2NBW5QuB@mail.gmail.com>
+References: <1280494556.19538.7.camel@jay-t60p>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: torvalds-3NddpPZAyC0@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1280494556.19538.7.camel@jay-t60p>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Remove the __exit mark from cifs_exit_dns_resolver() as it's called by the
-module init routine in case of error, and so may have been discarded during
-linkage.
+If someone ever wants a script to parse this - seems like your
+(original?) idea of putting this in /proc/fs/cifs/features instead of
+/proc/fs/cifs/DebugData (which has various other pieces of debug
+information) could be easier.
 
-Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
+On Fri, Jul 30, 2010 at 7:55 AM, Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org> wrote:
+> Fixed the nit pointed out by Jeff.
+>
+> From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> Subject: [PATCH 1/2] cifs: show features compiled in as part of DebugData
+>
+> This patch adds the features that are compiled in to the CIFS debugging data
+> as shown below:
 
- fs/cifs/dns_resolve.c |    2 +-
- fs/cifs/dns_resolve.h |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
-index 49315cb..853a968 100644
---- a/fs/cifs/dns_resolve.c
-+++ b/fs/cifs/dns_resolve.c
-@@ -227,7 +227,7 @@ failed_put_cred:
- 	return ret;
- }
- 
--void __exit cifs_exit_dns_resolver(void)
-+void cifs_exit_dns_resolver(void)
- {
- 	key_revoke(dns_resolver_cache->thread_keyring);
- 	unregister_key_type(&key_type_dns_resolver);
-diff --git a/fs/cifs/dns_resolve.h b/fs/cifs/dns_resolve.h
-index 26b9eaa..5d7f291 100644
---- a/fs/cifs/dns_resolve.h
-+++ b/fs/cifs/dns_resolve.h
-@@ -25,7 +25,7 @@
- 
- #ifdef __KERNEL__
- extern int __init cifs_init_dns_resolver(void);
--extern void __exit cifs_exit_dns_resolver(void);
-+extern void cifs_exit_dns_resolver(void);
- extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
- #endif /* KERNEL */
- 
+
+-- 
+Thanks,
+
+Steve
