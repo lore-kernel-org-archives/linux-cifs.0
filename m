@@ -1,51 +1,57 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/2] cifs: show features compiled in as part of DebugData
-Date: Fri, 30 Jul 2010 12:53:17 -0500
-Message-ID: <AANLkTinyH4qiEBwtULoen8xSypaWxWCr3MQhDWf-Ftz4@mail.gmail.com>
-References: <1280494556.19538.7.camel@jay-t60p>
-	<AANLkTikgA8mXTcX-i3avjuQygrekicntcy3P2NBW5QuB@mail.gmail.com>
-	<20100730105734.0827c057@corrin.poochiereds.net>
+From: Trond Myklebust <trond.myklebust@fys.uio.no>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
+ extended file stats available [ver #6]
+Date: Fri, 30 Jul 2010 14:11:46 -0400
+Message-ID: <1280513506.12852.22.camel@heimdal.trondhjem.org>
+References: <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+	 <30448.1279800887@redhat.com> <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
+	 <AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
+	 <E1Obxpd-00CRIo-SF@intern.SerNet.DE>
+	 <AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
+	 <20100722162712.GB10352@jeremy-laptop>
+	 <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+	 <1279817930.3621.14.camel@heimdal.trondhjem.org>
+	 <20100722180204.GA32008@samba1>  <E1Oc08W-00CZuz-Ns@intern.SerNet.DE>
+	 <1279825160.3621.71.camel@heimdal.trondhjem.org> <4C5311F4.2050100@psu.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100730105734.0827c057-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Volker.Lendecke@SerNet.DE, Jeremy Allison <jra@samba.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	David Howells <dhowells@redhat.com>,
+	Jan Engelhardt <jengelh@medozas.de>,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org
+To: Phil Pishioneri <pgp@psu.edu>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4C5311F4.2050100@psu.edu>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Jul 30, 2010 at 9:57 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Fri, 30 Jul 2010 09:39:04 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> If someone ever wants a script to parse this - seems like your
->> (original?) idea of putting this in /proc/fs/cifs/features instead of
->> /proc/fs/cifs/DebugData (which has various other pieces of debug
->> information) could be easier.
->>
->> On Fri, Jul 30, 2010 at 7:55 AM, Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org> wrote:
->> > Fixed the nit pointed out by Jeff.
->> >
->> > From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
->> > Subject: [PATCH 1/2] cifs: show features compiled in as part of DebugData
->> >
->> > This patch adds the features that are compiled in to the CIFS debugging data
->> > as shown below:
->>
->>
->>
->
-> Meh, it's just a matter of adding an extra "grep '^Features: '" to the
-> script.
->
-> I like it DebugData better personally...but this is mainly bikeshed paint
-> preferences :)
+On Fri, 2010-07-30 at 13:55 -0400, Phil Pishioneri wrote:
+> On 7/22/10 2:59 PM, Trond Myklebust wrote:
+> > The fact remains that most of us would be hard pressed to name an
+> > application
+> 
+> Microsoft Office?
+> 
+> > that requires you to share the same dataset to both
+> > Windows/CIFS and posix NFS clients.
+> 
+> NFS client: Mac OS X (NFSv3, since v4 on it is still alpha *cough*).
+> 
+> > tends to discourage mixing the two environments.
+> 
+> Or is "discourage" not strong enough term to describe that we shouldn't 
+> be doing this?
+> 
+> -Phil
 
-Yes, agree, probably not terribly important - will leave it in DebugData
+Your Mac has a perfectly functional CIFS client, as do your Linux boxes.
+They both interoperate just fine with Samba, and would presumably
+continue to do so if someone were to decide to reuse the ctime field on
+your Samba box as storage for a create time.
 
-
--- 
-Thanks,
-
-Steve
+  Trond
