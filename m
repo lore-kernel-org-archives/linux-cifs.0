@@ -1,78 +1,60 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
- extended file stats available [ver #6]
-Date: Sun, 1 Aug 2010 09:17:32 -0400
-Message-ID: <20100801091732.25023580@corrin.poochiereds.net>
-References: <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+ extended  file stats available [ver #6]
+Date: Sun, 1 Aug 2010 09:25:29 -0400
+Message-ID: <20100801092529.5e6ba0e0@corrin.poochiereds.net>
+References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
+	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
+	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
 	<30448.1279800887@redhat.com>
 	<E1Obuiy-00C9jr-Al@intern.SerNet.DE>
-	<AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
-	<E1Obxpd-00CRIo-SF@intern.SerNet.DE>
-	<AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
-	<20100722162712.GB10352@jeremy-laptop>
-	<AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
-	<1279817930.3621.14.camel@heimdal.trondhjem.org>
-	<20100722180204.GA32008@samba1>
-	<E1Oc08W-00CZuz-Ns@intern.SerNet.DE>
-	<1279825160.3621.71.camel@heimdal.trondhjem.org>
-	<4C5311F4.2050100@psu.edu>
-	<1280513506.12852.22.camel@heimdal.trondhjem.org>
+	<AANLkTikBCXK6uEw  <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+	<1280524978.2452.9.camel@segv.aura.of.mankind>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Phil Pishioneri <pgp-8DAjSxpRXgY@public.gmane.org>, Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org,
-	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+Cc: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
 	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
 	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Trond Myklebust <trond.myklebust-41N18TsMXrtuMpJDpNschA@public.gmane.org>
+	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
+To: utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org>
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280513506.12852.22.camel-rJ7iovZKK19ZJLDQqaL3InhyD016LWXt@public.gmane.org>
+In-Reply-To: <1280524978.2452.9.camel-mrvVnycP54q9CgvvYfeeSAlEImK53Lvc@public.gmane.org>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 30 Jul 2010 14:11:46 -0400
-Trond Myklebust <trond.myklebust-41N18TsMXrtuMpJDpNschA@public.gmane.org> wrote:
+On Fri, 30 Jul 2010 23:22:58 +0200
+utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org> wrote:
 
-> On Fri, 2010-07-30 at 13:55 -0400, Phil Pishioneri wrote:
-> > On 7/22/10 2:59 PM, Trond Myklebust wrote:
-> > > The fact remains that most of us would be hard pressed to name an
-> > > application
+> On Thu, 2010-07-22 at 09:40 -0700, Linus Torvalds wrote:
+> > But the fact is, th Unix ctime semantics are insane and largely
+> > useless. There's a damn good reason almost nobody uses ctime under
+> > unix.
 > > 
-> > Microsoft Office?
-> > 
-> > > that requires you to share the same dataset to both
-> > > Windows/CIFS and posix NFS clients.
-> > 
-> > NFS client: Mac OS X (NFSv3, since v4 on it is still alpha *cough*).
-> > 
-> > > tends to discourage mixing the two environments.
-> > 
-> > Or is "discourage" not strong enough term to describe that we shouldn't 
-> > be doing this?
-> > 
-> > -Phil
+> > So what I'm suggesting is that we have a flag - either per-process or
+> > per-mount - that just says "use windows semantics for ctime".
 > 
-> Your Mac has a perfectly functional CIFS client, as do your Linux boxes.
-> They both interoperate just fine with Samba, and would presumably
-> continue to do so if someone were to decide to reuse the ctime field on
-> your Samba box as storage for a create time.
+> When abusing an existing time stamp use atime not ctime please.
+> ctime has it's uses. atime was just a mistake and is nearly useless.
 > 
->   Trond
+> And with noatime we already have creation time semantics for atime.
 > 
 
-It's not so much particular applications that require access to the
-same data via NFS and CIFS. There is, however a common desire to share
-the same data to different client OS'.
+Ugh. Honestly all of this talk of abusing different time fields seems
+like craziness to me. It's going to be very hard to do that without
+breaking *something*. There's also very little reason to do this when
+xattrs are a much cleaner approach.
 
-All of the unix CIFS clients that I know of (including Linux's) trail
-NFS in several areas. For instance, if you need to have the same data
-accessible by multiple users using their own credentials then you need
-multiple mounts.
+Neil Brown has put forth a very reasoned justification for putting the
+birthtime in an xattr. After reading it, I think that makes more sense
+than anything. It's also something that can be done without any extra
+infrastructure. If at some point in the future we get an xstat-like
+syscall then we can always add birthtime to that as well.
+
+Ditto for the other fields under discussion (i_generation and the like).
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
