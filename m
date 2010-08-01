@@ -1,39 +1,82 @@
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig-bIcnvbaLZ9MEGnE8C9+IrQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Remove __exit mark from cifs_exit_dns_resolver()
-Date: Sun, 1 Aug 2010 14:40:59 +0200
-Message-ID: <20100801124059.GA7977@pengutronix.de>
-References: <20100730142519.18287.22053.stgit@warthog.procyon.org.uk>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
+ extended file stats available [ver #6]
+Date: Sun, 1 Aug 2010 09:17:32 -0400
+Message-ID: <20100801091732.25023580@corrin.poochiereds.net>
+References: <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+	<30448.1279800887@redhat.com>
+	<E1Obuiy-00C9jr-Al@intern.SerNet.DE>
+	<AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
+	<E1Obxpd-00CRIo-SF@intern.SerNet.DE>
+	<AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
+	<20100722162712.GB10352@jeremy-laptop>
+	<AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+	<1279817930.3621.14.camel@heimdal.trondhjem.org>
+	<20100722180204.GA32008@samba1>
+	<E1Oc08W-00CZuz-Ns@intern.SerNet.DE>
+	<1279825160.3621.71.camel@heimdal.trondhjem.org>
+	<4C5311F4.2050100@psu.edu>
+	<1280513506.12852.22.camel@heimdal.trondhjem.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20100730142519.18287.22053.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Phil Pishioneri <pgp-8DAjSxpRXgY@public.gmane.org>, Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Trond Myklebust <trond.myklebust-41N18TsMXrtuMpJDpNschA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1280513506.12852.22.camel-rJ7iovZKK19ZJLDQqaL3InhyD016LWXt@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hello,
+On Fri, 30 Jul 2010 14:11:46 -0400
+Trond Myklebust <trond.myklebust-41N18TsMXrtuMpJDpNschA@public.gmane.org> wrote:
 
-On Fri, Jul 30, 2010 at 03:25:19PM +0100, David Howells wrote:
-> Remove the __exit mark from cifs_exit_dns_resolver() as it's called b=
-y the
-> module init routine in case of error, and so may have been discarded =
-during
-> linkage.
-=46rom time to time I think about introducing something like
-__init_or_exit that puts a function into .init.text if .exit.text is
-discarded.  Is it worth the effort?
+> On Fri, 2010-07-30 at 13:55 -0400, Phil Pishioneri wrote:
+> > On 7/22/10 2:59 PM, Trond Myklebust wrote:
+> > > The fact remains that most of us would be hard pressed to name an
+> > > application
+> > 
+> > Microsoft Office?
+> > 
+> > > that requires you to share the same dataset to both
+> > > Windows/CIFS and posix NFS clients.
+> > 
+> > NFS client: Mac OS X (NFSv3, since v4 on it is still alpha *cough*).
+> > 
+> > > tends to discourage mixing the two environments.
+> > 
+> > Or is "discourage" not strong enough term to describe that we shouldn't 
+> > be doing this?
+> > 
+> > -Phil
+> 
+> Your Mac has a perfectly functional CIFS client, as do your Linux boxes.
+> They both interoperate just fine with Samba, and would presumably
+> continue to do so if someone were to decide to reuse the ctime field on
+> your Samba box as storage for a create time.
+> 
+>   Trond
+> 
 
-Best regards
-Uwe
+It's not so much particular applications that require access to the
+same data via NFS and CIFS. There is, however a common desire to share
+the same data to different client OS'.
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig        =
-    |
-Industrial Linux Solutions                 | http://www.pengutronix.de/=
-  |
+All of the unix CIFS clients that I know of (including Linux's) trail
+NFS in several areas. For instance, if you need to have the same data
+accessible by multiple users using their own credentials then you need
+multiple mounts.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
