@@ -1,60 +1,57 @@
-From: Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Problems with CVS on CIFS since kernel 2.6.30
-Date: Mon, 2 Aug 2010 14:58:00 +0100
-Message-ID: <AANLkTingdjU-KKW3=KboAnR0pNeiE7aEje0nXhM6bYbe@mail.gmail.com>
+From: Greg Freemyer <greg.freemyer@gmail.com>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make extended
+	file stats available [ver #6]
+Date: Mon, 2 Aug 2010 10:09:49 -0400
+Message-ID: <AANLkTi=JvwrwpmteFcXW1f5s95+_w_iCT+04Sy7bbTtR@mail.gmail.com>
+References: <20100728111525.355a2bd3@notabene>
+	<alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
+	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
+	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+	<30448.1279800887@redhat.com>
+	<E1Obuiy-00C9jr-Al@intern.SerNet.DE>
+	<AANLkTikBCXK6uEwWq4f0LvpdoKCPs3jvyFa4Zw4e2J_7@mail.gmail.com>
+	<E1Obxpd-00CRIo-SF@intern.SerNet.DE>
+	<AANLkTimwIq0pBhCeOjOVjB0yeM3JHOvzVoj9M4ui6al9@mail.gmail.com>
+	<20100722162712.GB10352@jeremy-laptop>
+	<AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+	<alpine.LSU.2.01.1007221859180.27496@obet.zrqbmnf.qr>
+	<AANLkTilmVdyVdO4EmVtTYi_cvMmPqNEPEnzUkJdk1XyR@mail.gmail.com>
+	<13591.1280338082@redhat.com>
+	<20100729090401.4b0a21f8@notabene>
+	<20100801094018.522e2f53@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Neil Brown <neilb@suse.de>, David Howells <dhowells@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jan Engelhardt <jengelh@medozas.de>,
+	Jeremy Allison <jra@samba.org>, Volker.Lendecke@sernet.de,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+	viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+	linux-ext4@vger.kernel.org
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <linux-ext4-owner@vger.kernel.org>
+In-Reply-To: <20100801094018.522e2f53@corrin.poochiereds.net>
+Sender: linux-ext4-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi all,
-I'm experiencing a problem with the linux CIFS client which is
-preventing me from using any kernel past 2.6.29, I've been=A0banging=A0=
-my
-head against this one for some months now, so thought it about time to
-ask some experts. I'm running Gentoo linux on a 32 bit machine.
+> Furthermore, I'll go ahead and propose the following (simple) semantics:
+>
+> 1) birthtime is initialized to the current time when a new inode is
+> created
+>
+> 2) it's settable via the xattr to an arbitrary value
+>
+> Either way, the xattr for this ought to be named the same on all
+> filesystems. Samba shouldn't need to know or care what the underlying
+> filesystem is, as long as it presents the correct xattr.
+>
+> That should make samba happy, and be reasonably simple to implement.
 
-When connecting to our cifs share on any kernel I've tried since
-2.6.29 (30, 31, 32, 33 and 34) I cannot use CVS on the share, as I get
-the following error:
+Is there any reason to allow birthtime to be set in advance of the
+current birthtime?
 
-515 14:41 $ cvs update
-cvs [update aborted]: cannot get working directory: No such file or dir=
-ectory
+ie restore / copy tools clearly need to backdate it, but I'd prefer to
+see it not advance-able.
 
-Here is the bottom part of=A0an strace of the above command:
-http://paste.org/pastebin/view/21095
-
-dmesg always seems to report the following, upon mount, on all kernels
-past 2.6.29, which I'm guessing is related:
-
-=A0CIFS VFS: server 10.194.0.106 of type Samba 3.0.28a returned
-unexpected error on SMB posix open, disabling posix open support.
-Check if server update available.
-=A0CIFS VFS: Autodisabling the use of server inode numbers on
-\\shared.orbis\shared. This server doesn't seem to support them
-properly. Hardlinks will not be recognized on this mount. Consider
-mounting with the "noserverino" option to silence this message.
-
-I've tried mounting the share using the noserverino option, which
-indeed does get rid of the second of those lines in dmesg, but doesn't
-fix the problem. Updating the server is not really an option (unless I
-can prove very good reason) since this is my work server. One slightly
-strange thing, is that some of my colleagues run Ubuntu 10.04, which
-uses the 2.6.32 kernel, and they can use the share without problem.
-
-I thought my problem could be related to the one=A0described=A0here:
-https://bugzilla.kernel.org/show_bug.cgi?id=3D15088=A0but I think this =
-was
-fixed in 2.6.34, and that kernel is still not working for me (nor does
-it with noserverino).
-
-Are there any steps I could take to debug this issue further, or does
-anyone know what the problem might be?
-
-Thanks in advance,
-
-Jon
+Greg
