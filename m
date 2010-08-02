@@ -1,62 +1,58 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: Problems with CVS on CIFS since kernel 2.6.30
-Date: Mon, 02 Aug 2010 22:10:20 +0530
-Message-ID: <4C56F4F4.5010903@suse.de>
-References: <AANLkTingdjU-KKW3=KboAnR0pNeiE7aEje0nXhM6bYbe@mail.gmail.com>	<4C56DBDD.4070501@suse.de>	<AANLkTin9uwwDaw+nvAiDKnPxPbbBXycVS3rLvhCaoJxQ@mail.gmail.com>	<4C56E564.3020508@suse.de> <AANLkTikqgFHX=9quJmJyQvkX-3ZreLGoF0k5YKCFq+WW@mail.gmail.com>
+Date: Mon, 2 Aug 2010 13:14:40 -0400
+Message-ID: <20100802131440.5b16a86b@tlielax.poochiereds.net>
+References: <AANLkTingdjU-KKW3=KboAnR0pNeiE7aEje0nXhM6bYbe@mail.gmail.com>
+	<4C56DBDD.4070501@suse.de>
+	<AANLkTin9uwwDaw+nvAiDKnPxPbbBXycVS3rLvhCaoJxQ@mail.gmail.com>
+	<4C56E564.3020508@suse.de>
+	<AANLkTikqgFHX=9quJmJyQvkX-3ZreLGoF0k5YKCFq+WW@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <AANLkTikqgFHX=9quJmJyQvkX-3ZreLGoF0k5YKCFq+WW-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 08/02/2010 09:26 PM, Jon Bramley wrote:
-> On 2 August 2010 16:33, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
->> If upgrading is not feasible, could you try patching Samba server wi=
-th
->> this patch (relatively very less risk):
->> =EF=BF=BD =EF=BF=BDhttp://www.mail-archive.com/samba-cvs-w/Ol4EcudpnDHl7Qnj/AWg@public.gmane.org=
-=2Eorg/msg55843.html
->>
->> I think that should help resolving the bug with posix opens against
->> older server.
->>
->>>>> strange thing, is that some of my colleagues run Ubuntu 10.04, wh=
-ich
->>>>> uses the 2.6.32 kernel, and they can use the share without proble=
-m.
->>>
->>>> What is the server version in this case?
->>>
->>> Exactly the same server that I'm connecting to (3.0.28a).
->>
->> Strange.. Any idea whether the Ubuntu kernel is the released 2.6.32
->> kernel or any -rc version of 2.6.32?
->=20
-> Just checked on a colleagues machine, and uname -r reports 2.6.32-24-=
-generic
->=20
+On Mon, 2 Aug 2010 16:56:10 +0100
+Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+
+> Just checked on a colleagues machine, and uname -r reports 2.6.32-24-generic
+> 
 > Also checked the dmesg on the Ubuntu 10.04 box:
->=20
+> 
+> [  964.362027]  CIFS VFS: Autodisabling the use of server inode
+> numbers on \\shared.openbet\shared. This server doesn't seem to
+> support them properly. Hardlinks will not be recognized on this mount.
+> Consider mounting with the "noserverino" option to silence this
+> message.
+> [  964.368470]  CIFS VFS: server 10.194.0.105 of type Samba 3.0.28a
+> returned unexpected error on SMB posix open, disabling posix open
+> support. Check if server update available.
+> 
 > The exact same errors that I get appear, which leads me to believe
 > that this in itself is not the cause of my issue.
->=20
+> 
 > Any other ideas to debug further?
->=20
+> 
 
-Perhaps, try enabling debugging as mentioned in the url below before yo=
-u
-do the operation (for both the clients) and post
+Yes, I agree that the above warnings may have nothing to do with the
+problem. We need to understand what the problem is. The strace shows
+this:
 
-   http://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+write(2, "cvs [update aborted]: cannot get"..., 78cvs [update aborted]: cannot get working directory: No such file or directory) = 78
 
-But, I still think the real problem is the server-side one and perhaps
-the Ubuntu client has just got lucky in this case..
+...but I don't see any system calls that returned -ENOENT. Maybe it
+occurred in another thread or something?
 
-Thanks,
+So I'm a little unclear as to what cvs is complaining about. It's quite
+possible that it's ultimately a bug in cifs, but without more info I
+really can't guess as to what the problem is. What we really need is a
+description of the problem couched in terms of the system call
+interface.
 
---=20
-Suresh Jayaraman
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
