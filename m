@@ -1,63 +1,82 @@
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [linux-cifs-client][PATCH] Enable signing for ntlmv2 within
-	NTLMSSP using kernel crypto APIs
-Date: Tue, 3 Aug 2010 16:33:30 +0800
-Message-ID: <20100803083330.GA15074@gondor.apana.org.au>
-References: <1280604866-9505-1-git-send-email-shirishpargaonkar@gmail.com> <20100802065508.GA8431@gondor.apana.org.au> <AANLkTimtgejfxW8P_GvGqD3muu2Wh6BfC-xPTpNtJb9+@mail.gmail.com>
+From: Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Problems with CVS on CIFS since kernel 2.6.30
+Date: Tue, 3 Aug 2010 13:24:47 +0100
+Message-ID: <AANLkTin-KOqanow9Xa32AU0kXQK9hDQ_5Bxjjbugk7Jj@mail.gmail.com>
+References: <AANLkTingdjU-KKW3=KboAnR0pNeiE7aEje0nXhM6bYbe@mail.gmail.com>
+	<4C56DBDD.4070501@suse.de>
+	<AANLkTin9uwwDaw+nvAiDKnPxPbbBXycVS3rLvhCaoJxQ@mail.gmail.com>
+	<4C56E564.3020508@suse.de>
+	<AANLkTikqgFHX=9quJmJyQvkX-3ZreLGoF0k5YKCFq+WW@mail.gmail.com>
+	<20100802131440.5b16a86b@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org,
-	samba-technical@samba.org, linux-crypto@vger.kernel.org
-To: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <AANLkTimtgejfxW8P_GvGqD3muu2Wh6BfC-xPTpNtJb9+@mail.gmail.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20100802131440.5b16a86b-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Aug 02, 2010 at 11:46:07PM -0500, Shirish Pargaonkar wrote:
+On 2 August 2010 18:14, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 >
-> I have compile issues with crypto_shash interfaces, no such issues
-> with crypto_hash_ APIs,
-> everything works fine.
-> 
-> When I have code like this, I have errors and warning and when I cast
-> them as (char *),  module
-> oopses.
-> 
-> struct session_key {
->         unsigned int len;
->         union {
->                 char ntlm[CIFS_SESS_KEY_SIZE + 16];
->                 char krb5[CIFS_SESS_KEY_SIZE + 16]; /* BB: length correct? */
->                 struct {
->                         char key[16];
->                         struct ntlmv2_resp resp;
->                 } ntlmv2;
->         } data;
-> };
->         if (server->secType == RawNTLMSSP)
->                 crypto_shash_update(&desc, server->session_key.data.ntlmv2.key,
->                                 CIFS_NTLMV2_SESSKEY_SIZE);
->         else
->                 crypto_shash_update(&desc, server->session_key.data,
->           <----
->                                 server->session_key.len);
-> 
-> 
-> And
->         len = cifs_strtoUCS((__le16 *)user, ses->userName, len, nls_cp);
->         UniStrupr(user);
-> 
->         crypto_shash_update(&desc, user, 2 * len);
->                          <----
-> 
-> No such issues and oops with crypto_hash_APIs.
+> On Mon, 2 Aug 2010 16:56:10 +0100
+> Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+> > Just checked on a colleagues machine, and uname -r reports 2.6.32-2=
+4-generic
+> >
+> > Also checked the dmesg on the Ubuntu 10.04 box:
+> >
+> > [ =A0964.362027] =A0CIFS VFS: Autodisabling the use of server inode
+> > numbers on \\shared.openbet\shared. This server doesn't seem to
+> > support them properly. Hardlinks will not be recognized on this mou=
+nt.
+> > Consider mounting with the "noserverino" option to silence this
+> > message.
+> > [ =A0964.368470] =A0CIFS VFS: server 10.194.0.105 of type Samba 3.0=
+=2E28a
+> > returned unexpected error on SMB posix open, disabling posix open
+> > support. Check if server update available.
+> >
+> > The exact same errors that I get appear, which leads me to believe
+> > that this in itself is not the cause of my issue.
+> >
+> > Any other ideas to debug further?
+> >
+>
+> Yes, I agree that the above warnings may have nothing to do with the
+> problem. We need to understand what the problem is. The strace shows
+> this:
+>
+> write(2, "cvs [update aborted]: cannot get"..., 78cvs [update aborted=
+]: cannot get working directory: No such file or directory) =3D 78
+>
+> ...but I don't see any system calls that returned -ENOENT. Maybe it
+> occurred in another thread or something?
+>
+> So I'm a little unclear as to what cvs is complaining about. It's qui=
+te
+> possible that it's ultimately a bug in cifs, but without more info I
+> really can't guess as to what the problem is. What we really need is =
+a
+> description of the problem couched in terms of the system call
+> interface.
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-Please post your entire patch with shash and the oops.
+I've posted the dmesg output with cifsFYI set to 7, for the failed cvs
+update command here:
+
+http://paste.org/pastebin/view/21123
+
+One strange thing I noticed, is that at one point it seems to be doing
+something with /home/jbramley/cvs_src/appserv/lib/ix86, but that
+folder is not in any of my env vars (PATH, LD_LIBRARY_PATH etc.) so I
+can see no reason for it to be looking there. Could this be some kind
+of inode confusion on the cifs share?
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Jon
