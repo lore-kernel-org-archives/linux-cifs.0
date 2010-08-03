@@ -1,7 +1,7 @@
 From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 7/8] cifs: implement CIFSFormatMFSymlink()
-Date: Tue,  3 Aug 2010 17:05:59 +0200
-Message-ID: <1280847960-16371-8-git-send-email-metze@samba.org>
+Subject: [PATCH 6/8] cifs: implement CIFSQueryMFSymLink()
+Date: Tue,  3 Aug 2010 17:05:58 +0200
+Message-ID: <1280847960-16371-7-git-send-email-metze@samba.org>
 References: <1280847960-16371-1-git-send-email-metze@samba.org>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,61 +12,73 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/link.c |   42 ++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 42 insertions(+), 0 deletions(-)
+ fs/cifs/link.c |   46 ++++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 42 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 77f5a40..b281d26 100644
+index f7636f9..77f5a40 100644
 --- a/fs/cifs/link.c
 +++ b/fs/cifs/link.c
-@@ -91,6 +91,48 @@ CIFSParseMFSymlink(const u8 *buf,
- }
- 
+@@ -102,10 +102,46 @@ CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
  static int
-+CIFSFormatMFSymlink(u8 *buf, unsigned int buf_len, const char *link_str)
-+{
-+	unsigned int link_len;
-+	unsigned int ofs;
-+	struct MD5Context md5_ctx;
-+	u8 md5_hash[16];
+ CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
+ 		   const unsigned char *searchName, char **symlinkinfo,
+-		   const struct nls_table *nls_codepage)
++		   const struct nls_table *nls_codepage, int remap)
+ {
+-	int rc = -EOPNOTSUPP;
+-	return rc;
++	int rc;
++	int oplock = 0;
++	__u16 netfid = 0;
++	u8 buf[CIFS_MF_SYMLINK_FILE_SIZE];
++	char *pbuf = buf;
++	unsigned int bytes_read = 0;
++	int buf_type = CIFS_NO_BUFFER;
++	unsigned int link_len = 0;
++	FILE_ALL_INFO file_info;
 +
-+	if (buf_len != CIFS_MF_SYMLINK_FILE_SIZE)
-+		return -EINVAL;
-+
-+	link_len = strlen(link_str);
-+
-+	if (link_len > CIFS_MF_SYMLINK_LINK_MAXLEN)
-+		return -ENAMETOOLONG;
-+
-+	cifs_MD5_init(&md5_ctx);
-+	cifs_MD5_update(&md5_ctx, (const u8 *)link_str, link_len);
-+	cifs_MD5_final(md5_hash, &md5_ctx);
-+
-+	snprintf(buf, buf_len,
-+		 CIFS_MF_SYMLINK_LEN_FORMAT CIFS_MF_SYMLINK_MD5_FORMAT,
-+		 link_len,
-+		 CIFS_MF_SYMLINK_MD5_ARGS(md5_hash));
-+
-+	ofs = CIFS_MF_SYMLINK_LINK_OFFSET;
-+	memcpy(buf + ofs, link_str, link_len);
-+
-+	ofs += link_len;
-+	if (ofs < CIFS_MF_SYMLINK_FILE_SIZE) {
-+		buf[ofs] = '\n';
-+		ofs++;
++	rc = CIFSSMBOpen(xid, tcon, searchName, FILE_OPEN, GENERIC_READ,
++			 CREATE_NOT_DIR, &netfid, &oplock, &file_info,
++			 nls_codepage, remap);
++	if (rc != 0) {
++		return rc;
 +	}
 +
-+	while (ofs < CIFS_MF_SYMLINK_FILE_SIZE) {
-+		buf[ofs] = ' ';
-+		ofs++;
++	if (file_info.EndOfFile != CIFS_MF_SYMLINK_FILE_SIZE) {
++		CIFSSMBClose(xid, tcon, netfid);
++		/* it's not a symlink */
++		return -EINVAL;
++	}
++
++	rc = CIFSSMBRead(xid, tcon, netfid,
++			 CIFS_MF_SYMLINK_FILE_SIZE /* length */,
++			 0 /* offset */,
++			 &bytes_read, &pbuf, &buf_type);
++	CIFSSMBClose(xid, tcon, netfid);
++	if (rc != 0) {
++		return rc;
++	}
++
++	rc = CIFSParseMFSymlink(buf, bytes_read, &link_len, symlinkinfo);
++	if (rc != 0) {
++		return rc;
 +	}
 +
 +	return 0;
-+}
-+
-+static int
- CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
- 		    const char *fromName, const char *toName,
- 		    const struct nls_table *nls_codepage)
+ }
+ 
+ int
+@@ -291,7 +327,9 @@ cifs_follow_link(struct dentry *direntry, struct nameidata *nd)
+ 
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
+ 		rc = CIFSQueryMFSymLink(xid, tcon, full_path, &target_path,
+-					cifs_sb->local_nls);
++					cifs_sb->local_nls,
++					cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	else
+ 		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, &target_path,
+ 					     cifs_sb->local_nls);
 -- 
 1.7.0.4
