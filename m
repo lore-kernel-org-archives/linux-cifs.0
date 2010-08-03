@@ -1,66 +1,102 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: account for new creduid=0x%x parameter in spnego
-	upcall string
-Date: Tue, 3 Aug 2010 09:32:40 -0500
-Message-ID: <AANLkTi=aKR9xwOL5cgATZW3h4r0gO3dr+nNG=a+6vtcM@mail.gmail.com>
-References: <1280845241-12305-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/8] cifs: add "mfsymlinks" mount option
+Date: Tue,  3 Aug 2010 17:05:53 +0200
+Message-ID: <1280847960-16371-2-git-send-email-metze@samba.org>
+References: <1280847960-16371-1-git-send-email-metze@samba.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280845241-12305-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1280847960-16371-1-git-send-email-metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-looks fine
+This is the start for an implementation of "Minshall+French Symlinks"
+(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks).
 
-On Tue, Aug 3, 2010 at 9:20 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> The commit that added the creduid=3D0x%x parameter failed to increase=
- the
-> buffer allocation to account for it.
->
-> Reported-by: J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/cifs_spnego.c | =A0 =A04 ++++
-> =A01 files changed, 4 insertions(+), 0 deletions(-)
->
-> diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
-> index 6effccf..8704490 100644
-> --- a/fs/cifs/cifs_spnego.c
-> +++ b/fs/cifs/cifs_spnego.c
-> @@ -84,6 +84,9 @@ struct key_type cifs_spnego_key_type =3D {
-> =A0/* strlen of ";uid=3D0x" */
-> =A0#define UID_KEY_LEN =A0 =A0 =A0 =A0 =A0 =A07
->
-> +/* strlen of ";creduid=3D0x" */
-> +#define CREDUID_KEY_LEN =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A011
-> +
-> =A0/* strlen of ";user=3D" */
-> =A0#define USER_KEY_LEN =A0 =A0 =A0 =A0 =A0 6
->
-> @@ -107,6 +110,7 @@ cifs_get_spnego_key(struct cifsSesInfo *sesInfo)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 IP_KEY_LEN + INET6_ADDRSTRLEN +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 MAX_MECH_STR_LEN +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 UID_KEY_LEN + (sizeof(uid_t) * 2)=
- +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CREDUID_KEY_LEN + (sizeof(uid_t)=
- * 2) +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 USER_KEY_LEN + strlen(sesInfo->us=
-erName) +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 PID_KEY_LEN + (sizeof(pid_t) * 2)=
- + 1;
->
-> --
-> 1.7.2
->
->
+Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/README       |    5 +++++
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/cifsfs.c     |    2 ++
+ fs/cifs/connect.c    |   11 +++++++++++
+ 4 files changed, 19 insertions(+), 0 deletions(-)
 
-
-
---=20
-Thanks,
-
-Steve
+diff --git a/fs/cifs/README b/fs/cifs/README
+index a727b7c..228c239 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -517,6 +517,11 @@ A partial list of the supported mount options follows:
+ 		SFU does).  In the future the bottom 9 bits of the
+ 		mode also will be emulated using queries of the security
+ 		descriptor (ACL).
++ mfsymlinks     Enable support for Minshall+French symlinks
++		(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks)
++		This option is ignored when specified together with the
++		'sfu' option. Minshall+French symlinks are used event if
++		the server supports the CIFS Unix Extensions.
+  sign           Must use packet signing (helps avoid unwanted data modification
+ 		by intermediate systems in the route).  Note that signing
+ 		does not work with lanman or plaintext authentication.
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 9e77145..7fde529 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -36,6 +36,7 @@
+ #define CIFS_MOUNT_NOPOSIXBRL   0x2000 /* mandatory not posix byte range lock */
+ #define CIFS_MOUNT_NOSSYNC      0x4000 /* don't do slow SMBflush on every sync*/
+ #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
++#define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+ 
+ struct cifs_sb_info {
+ 	struct cifsTconInfo *tcon;	/* primary mount */
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 8a2cf12..ec48c96 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -421,6 +421,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 		seq_printf(s, ",dynperm");
+ 	if (m->mnt_sb->s_flags & MS_POSIXACL)
+ 		seq_printf(s, ",acl");
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
++		seq_printf(s, ",mfsymlinks");
+ 
+ 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+ 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 2a43a0a..b3b8752 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -100,6 +100,7 @@ struct smb_vol {
+ 	bool noautotune:1;
+ 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
+ 	bool fsc:1;	/* enable fscache */
++	bool mfsymlinks:1; /* use Minshall+French Symlinks */
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -1343,6 +1344,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
+ 		} else if (strnicmp(data, "fsc", 3) == 0) {
+ 			vol->fsc = true;
++		} else if (strnicmp(data, "mfsymlinks", 22) == 0) {
++			vol->mfsymlinks = true;
+ 		} else
+ 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
+ 						data);
+@@ -2481,6 +2484,14 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 		cFYI(1, "mounting share using direct i/o");
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
+ 	}
++	if (pvolume_info->mfsymlinks) {
++		if (pvolume_info->sfu_emul) {
++			cERROR(1,  "mount option mfsymlinks ignored if sfu "
++				   "mount option is used");
++		} else {
++			cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MF_SYMLINKS;
++		}
++	}
+ 
+ 	if ((pvolume_info->cifs_acl) && (pvolume_info->dynperm))
+ 		cERROR(1, "mount option dynperm ignored if cifsacl "
+-- 
+1.7.0.4
