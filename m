@@ -1,36 +1,32 @@
-From: Bill Pemberton <wfp5p-4Ng6DfrEGID2fBVCVOL8/A@public.gmane.org>
-Subject: [PATCH] cifs: fix uninitialized variable warning
-Date: Tue,  3 Aug 2010 15:18:10 -0400
-Message-ID: <1280863090-636-1-git-send-email-wfp5p@virginia.edu>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 2.6.32/stable] CIFS: Remove __exit mark from cifs_init_dns_resolver() header
+Date: Tue, 03 Aug 2010 22:40:25 +0100
+Message-ID: <12482.1280871625@redhat.com>
+References: <19826.1280811821@neuling.org> <19789.1280811783@neuling.org>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <19826.1280811821-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-quiet the warning:
-fs/cifs/cifssmb.c:3082: warning: 'pdata' may be used uninitialized in
-this function
+Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org> wrote:
 
-pdata is set by validate_ntransact()
+> An allmodconfig compile on ppc64 with 2.6.32.17 currently gives this error
+> 
+> fs/cifs/dns_resolve.h:27: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'cifs_init_dns_resolver'
+> 
+> This removes the __init from cifs_init_dns_resolver()
 
-Signed-off-by: Bill Pemberton <wfp5p-4Ng6DfrEGID2fBVCVOL8/A@public.gmane.org>
----
- fs/cifs/cifssmb.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+That's not really a good idea as the assembler may choose different pieces of
+assembly to do variable references and jumps, depending on the section
+information.
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c65c341..56fac6c 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -3079,7 +3079,7 @@ CIFSSMBGetCIFSACL(const int xid, struct cifsTconInfo *tcon, __u16 fid,
- 		__u32 parm_len;
- 		__u32 acl_len;
- 		struct smb_com_ntransact_rsp *pSMBr;
--		char *pdata;
-+		char *uninitialized_var(pdata);
- 
- /* validate_nttransact */
- 		rc = validate_ntransact(iov[0].iov_base, (char **)&parm,
--- 
-1.7.2
+A better fix is to add:
+
+	#include <linux/module.h>
+
+to the header file.
+
+David
