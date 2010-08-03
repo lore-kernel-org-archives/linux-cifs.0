@@ -1,50 +1,41 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Problems with CVS on CIFS since kernel 2.6.30
-Date: Tue, 3 Aug 2010 08:35:14 -0400
-Message-ID: <20100803083514.1179c92c@corrin.poochiereds.net>
-References: <AANLkTingdjU-KKW3=KboAnR0pNeiE7aEje0nXhM6bYbe@mail.gmail.com>
-	<4C56DBDD.4070501@suse.de>
-	<AANLkTin9uwwDaw+nvAiDKnPxPbbBXycVS3rLvhCaoJxQ@mail.gmail.com>
-	<4C56E564.3020508@suse.de>
-	<AANLkTikqgFHX=9quJmJyQvkX-3ZreLGoF0k5YKCFq+WW@mail.gmail.com>
-	<20100802131440.5b16a86b@tlielax.poochiereds.net>
-	<AANLkTim=gnAh4G_JeRCEcCkfXb5pQwTTKh6+-7yAyyHu@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: 2.6.36 merge plans
+Date: Tue, 3 Aug 2010 09:02:47 -0500
+Message-ID: <AANLkTi=ew0C0WS9Vzf=9eT_jFSeYbYXtNZLTkOVJNn3K@mail.gmail.com>
+References: <AANLkTim2UcxAXuR0K8JexGAIq3UoEj1KMH4JMGLnJ72D@mail.gmail.com>
+	<20100630141755.4ac97143@tlielax.poochiereds.net>
+	<4C2CDD02.2090403@suse.de>
+	<AANLkTilEg0zG1DD9fF9T890nFhaqNNeLta1-RAo9iKpM@mail.gmail.com>
+	<AANLkTimTjDJeR7ktNcJpPSc-zioHrndPwPxb98HAYgpY@mail.gmail.com>
+	<20100701195247.71c3f572@tlielax.poochiereds.net>
+	<AANLkTi=X5PyZLdaJj_ikSv7HUNtfmQYhPc50mecx_mMj@mail.gmail.com>
+	<20100802134654.3ac129e7@tlielax.poochiereds.net>
+	<AANLkTim-fb4obi7KBxpUsyeYi4eAQmTuSAx+14jOE3kr@mail.gmail.com>
+	<4C57A12A.1030404@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTim=gnAh4G_JeRCEcCkfXb5pQwTTKh6+-7yAyyHu-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <4C57A12A.1030404-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 3 Aug 2010 13:23:30 +0100
-Jon Bramley <brammers-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Mon, Aug 2, 2010 at 11:55 PM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+>
+> Steve, are you considering the following patches as well..?
+>
+> cifs: show features compiled in as part of DebugData
+> cifs: update README
+>
+> (I think there are no outstanding issues left unaddressed).
 
-> I've posted the dmesg output with cifsFYI set to 7, for the failed cvs
-> update command here:
-> 
-> http://paste.org/pastebin/view/21123
-> 
-> One strange thing I notice, is that at one point it seems to be doing
-> something with /home/jbramley/cvs_src/appserv/lib/ix86, but that folder is
-> not in any of my env vars (PATH, LD_LIBRARY_PATH etc.) so I can see no
-> reason for it to be looking there. Could this be some kind of inode
-> confusion on the cifs share?
-> 
+Yes - those are fine, and I will put in as soon as the big series goes upstream.
 
-
-*shrug* -- maybe...
-
-Without a clear description of what the actual problem is it's
-anybody's guess. All you've really told us so far is that cvs doesn't
-work right. We need to understand what's wrong at the system call level
-before we can really do much to help you.
-
-I'd not bother with debugging output and such at this point. You need
-to focus on the application. What's going wrong with it? Once you
-understand that, then we can look at what's happening in the kernel.
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Thanks,
+
+Steve
