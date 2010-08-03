@@ -1,58 +1,36 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [CIFS] Support for Minshall+French symlinks
-Date: Tue, 3 Aug 2010 13:00:00 -0500
-Message-ID: <AANLkTinJ1WRBT_Q3TqOZdMQExV66LSUAPG4c01yK-XRK@mail.gmail.com>
-References: <1280847960-16371-1-git-send-email-metze@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Bill Pemberton <wfp5p-4Ng6DfrEGID2fBVCVOL8/A@public.gmane.org>
+Subject: [PATCH] cifs: fix uninitialized variable warning
+Date: Tue,  3 Aug 2010 15:18:10 -0400
+Message-ID: <1280863090-636-1-git-send-email-wfp5p@virginia.edu>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280847960-16371-1-git-send-email-metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Interesting.
+quiet the warning:
+fs/cifs/cifssmb.c:3082: warning: 'pdata' may be used uninitialized in
+this function
 
-Generally seems like a good idea.
+pdata is set by validate_ntransact()
 
-Jeff made two valid review comments already (on the kmalloc vs. stack,
-and the kernel coding style) but note that scripts/checkpatch.pl will
-catch additional minor coding style things:
+Signed-off-by: Bill Pemberton <wfp5p-4Ng6DfrEGID2fBVCVOL8/A@public.gmane.org>
+---
+ fs/cifs/cifssmb.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-stevef@stevef-laptop:~/smb2$ scripts/checkpatch.pl ~/sm1.patch
-WARNING: braces {} are not necessary for single statement blocks
-#62: FILE: fs/cifs/link.c:120:
-+	if (rc != 0) {
-+		return rc;
-+	}
-
-Could you clean up the things scripts/checkpatch.pl (and sparse
-issues, ie "make modules C=1"  -- if any)
-
-On Tue, Aug 3, 2010 at 10:05 AM, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Hi Steve,
->
-> The following patchset adds support Minshall+French symlinks for Linux.
-> See http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks
->
-> I've added a new mount option 'mfsymlinks', which is off by default.
->
-> If the option is pass to a mount, Minshall+French symlinks will be used
-> to support symlinks for the local client.
->
-> This is compatible with the Darwin implementation.
->
-> Can you review this patches? It would be wonderful if they would endup
-> in Linux 2.6.36.
->
-> metze
->
->
-
-
-
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index c65c341..56fac6c 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -3079,7 +3079,7 @@ CIFSSMBGetCIFSACL(const int xid, struct cifsTconInfo *tcon, __u16 fid,
+ 		__u32 parm_len;
+ 		__u32 acl_len;
+ 		struct smb_com_ntransact_rsp *pSMBr;
+-		char *pdata;
++		char *uninitialized_var(pdata);
+ 
+ /* validate_nttransact */
+ 		rc = validate_ntransact(iov[0].iov_base, (char **)&parm,
 -- 
-Thanks,
-
-Steve
+1.7.2
