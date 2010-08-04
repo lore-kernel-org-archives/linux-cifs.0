@@ -1,7 +1,7 @@
 From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 6/8] cifs: implement CIFSQueryMFSymLink()
-Date: Wed,  4 Aug 2010 16:11:47 +0200
-Message-ID: <1280931109-22380-7-git-send-email-metze@samba.org>
+Subject: [PATCH 3/8] cifs: add CIFSCheckMFSymlink() as stub
+Date: Wed,  4 Aug 2010 16:11:44 +0200
+Message-ID: <1280931109-22380-4-git-send-email-metze@samba.org>
 References: <AANLkTinJ1WRBT_Q3TqOZdMQExV66LSUAPG4c01yK-XRK@mail.gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,81 +12,59 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/link.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 50 insertions(+), 4 deletions(-)
+ fs/cifs/cifsproto.h |    3 +++
+ fs/cifs/inode.c     |    7 +++++++
+ fs/cifs/link.c      |    8 ++++++++
+ 3 files changed, 18 insertions(+), 0 deletions(-)
 
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 2eaebbd..e94e095 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -409,4 +409,7 @@ extern int CIFSSMBSetPosixACL(const int xid, struct cifsTconInfo *tcon,
+ extern int CIFSGetExtAttr(const int xid, struct cifsTconInfo *tcon,
+ 			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+ extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
++extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
++		const unsigned char *path,
++		struct cifs_sb_info *cifs_sb, int xid);
+ #endif			/* _CIFSPROTO_H */
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index a15b3a9..c4121de 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -661,6 +661,13 @@ int cifs_get_inode_info(struct inode **pinode,
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
+ 		cifs_sfu_mode(&fattr, full_path, cifs_sb, xid);
+ 
++	/* query for SFU type info if supported and needed */
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
++		tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
++		if (tmprc)
++			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
++	}
++
+ 	if (!*pinode) {
+ 		*pinode = cifs_iget(sb, &fattr);
+ 		if (!*pinode)
 diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 6cd0879..6d00712 100644
+index 2358a5f..985373c 100644
 --- a/fs/cifs/link.c
 +++ b/fs/cifs/link.c
-@@ -103,10 +103,54 @@ CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
- static int
- CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
- 		   const unsigned char *searchName, char **symlinkinfo,
--		   const struct nls_table *nls_codepage)
-+		   const struct nls_table *nls_codepage, int remap)
- {
--	int rc = -EOPNOTSUPP;
--	return rc;
-+	int rc;
-+	int oplock = 0;
-+	__u16 netfid = 0;
-+	u8 *buf;
-+	char *pbuf;
-+	unsigned int bytes_read = 0;
-+	int buf_type = CIFS_NO_BUFFER;
-+	unsigned int link_len = 0;
-+	FILE_ALL_INFO file_info;
-+
-+	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+	pbuf = buf;
-+
-+	rc = CIFSSMBOpen(xid, tcon, searchName, FILE_OPEN, GENERIC_READ,
-+			 CREATE_NOT_DIR, &netfid, &oplock, &file_info,
-+			 nls_codepage, remap);
-+	if (rc != 0) {
-+		kfree(buf);
-+		return rc;
-+	}
-+
-+	if (file_info.EndOfFile != CIFS_MF_SYMLINK_FILE_SIZE) {
-+		CIFSSMBClose(xid, tcon, netfid);
-+		kfree(buf);
-+		/* it's not a symlink */
-+		return -EINVAL;
-+	}
-+
-+	rc = CIFSSMBRead(xid, tcon, netfid,
-+			 CIFS_MF_SYMLINK_FILE_SIZE /* length */,
-+			 0 /* offset */,
-+			 &bytes_read, &pbuf, &buf_type);
-+	CIFSSMBClose(xid, tcon, netfid);
-+	if (rc != 0) {
-+		kfree(buf);
-+		return rc;
-+	}
-+
-+	rc = CIFSParseMFSymlink(buf, bytes_read, &link_len, symlinkinfo);
-+	kfree(buf);
-+	if (rc != 0)
-+		return rc;
-+
-+	return 0;
+@@ -48,6 +48,14 @@ CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
  }
  
  int
-@@ -297,7 +341,9 @@ cifs_follow_link(struct dentry *direntry, struct nameidata *nd)
- 
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
- 		rc = CIFSQueryMFSymLink(xid, tcon, full_path, &target_path,
--					cifs_sb->local_nls);
-+					cifs_sb->local_nls,
-+					cifs_sb->mnt_cifs_flags &
-+						CIFS_MOUNT_MAP_SPECIAL_CHR);
- 	else
- 		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, &target_path,
- 					     cifs_sb->local_nls);
++CIFSCheckMFSymlink(struct cifs_fattr *fattr,
++		   const unsigned char *path,
++		   struct cifs_sb_info *cifs_sb, int xid)
++{
++	return 0;
++}
++
++int
+ cifs_hardlink(struct dentry *old_file, struct inode *inode,
+ 	      struct dentry *direntry)
+ {
 -- 
 1.7.0.4
