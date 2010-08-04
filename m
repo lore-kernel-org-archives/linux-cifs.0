@@ -1,88 +1,37 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 3/8] cifs: add CIFSCheckMFSymlink() as stub
-Date: Wed, 4 Aug 2010 10:37:48 -0400
-Message-ID: <20100804103748.521163e6@tlielax.poochiereds.net>
-References: <AANLkTinJ1WRBT_Q3TqOZdMQExV66LSUAPG4c01yK-XRK@mail.gmail.com>
-	<1280931109-22380-4-git-send-email-metze@samba.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 1/2] DNS: Separate out CIFS DNS Resolver code
+Date: Wed, 4 Aug 2010 14:01:58 -0500
+Message-ID: <AANLkTikhKSWKO5L6GBGSWhCHRbicUs4ZNVxA_Y0Qnj-h@mail.gmail.com>
+References: <20100804141633.23934.15025.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1280931109-22380-4-git-send-email-metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-afs@lists.infradead.org, Wang Lei <wang840925@gmail.com>,
+	Jeff Layton <jlayton@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100804141633.23934.15025.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed,  4 Aug 2010 16:11:44 +0200
-Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Wed, Aug 4, 2010 at 9:16 AM, David Howells <dhowells@redhat.com> wrote:
+> From: Wang Lei <wang840925@gmail.com>
+>
+> Separate out the DNS resolver key type from the CIFS filesystem into its own
+> module so that it can be made available for general use, including the AFS
+> filesystem module.
 
-> Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/cifsproto.h |    3 +++
->  fs/cifs/inode.c     |    7 +++++++
->  fs/cifs/link.c      |    8 ++++++++
->  3 files changed, 18 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 2eaebbd..e94e095 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -409,4 +409,7 @@ extern int CIFSSMBSetPosixACL(const int xid, struct cifsTconInfo *tcon,
->  extern int CIFSGetExtAttr(const int xid, struct cifsTconInfo *tcon,
->  			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
->  extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
-> +extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-> +		const unsigned char *path,
-> +		struct cifs_sb_info *cifs_sb, int xid);
->  #endif			/* _CIFSPROTO_H */
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index a15b3a9..c4121de 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -661,6 +661,13 @@ int cifs_get_inode_info(struct inode **pinode,
->  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
->  		cifs_sfu_mode(&fattr, full_path, cifs_sb, xid);
->  
-> +	/* query for SFU type info if supported and needed */
-> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
-> +		tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
-> +		if (tmprc)
-> +			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
-> +	}
-> +
+Merged, after addressing trivial checkpatch error:
 
-		^^^^^^^^^^^^^^
+[sfrench@hera cifs-2.6]$ scripts/checkpatch.pl ~/dh1a.patch
+ERROR: "(foo*)" should be "(foo *)"
+#523: FILE: fs/cifs/dns_resolve.c:75:
++	rc = cifs_convert_address((struct sockaddr*)&ss, hostname, len);
 
-This only seems to touch the codepath without posix extensions. What
-about when unix extensions are enabled? The previous patch seems to
-indicate that the behavior is that mfsymlinks are always used when that
-mount option is used even if unix extensions are enabled. If so, then I
-think you'll need a similar change in cifs_get_inode_info_unix.
-
->  	if (!*pinode) {
->  		*pinode = cifs_iget(sb, &fattr);
->  		if (!*pinode)
-> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-> index 2358a5f..985373c 100644
-> --- a/fs/cifs/link.c
-> +++ b/fs/cifs/link.c
-> @@ -48,6 +48,14 @@ CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
->  }
->  
->  int
-> +CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-> +		   const unsigned char *path,
-> +		   struct cifs_sb_info *cifs_sb, int xid)
-> +{
-> +	return 0;
-> +}
-> +
-> +int
->  cifs_hardlink(struct dentry *old_file, struct inode *inode,
->  	      struct dentry *direntry)
->  {
+total: 1 errors, 0 warnings, 999 lines checked
 
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Thanks,
+
+Steve
