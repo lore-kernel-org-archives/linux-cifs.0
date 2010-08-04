@@ -1,7 +1,7 @@
 From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 3/8] cifs: add CIFSCheckMFSymlink() as stub
-Date: Wed,  4 Aug 2010 16:11:44 +0200
-Message-ID: <1280931109-22380-4-git-send-email-metze@samba.org>
+Subject: [PATCH 8/8] cifs: implement CIFSCreateMFSymLink()
+Date: Wed,  4 Aug 2010 16:11:49 +0200
+Message-ID: <1280931109-22380-9-git-send-email-metze@samba.org>
 References: <AANLkTinJ1WRBT_Q3TqOZdMQExV66LSUAPG4c01yK-XRK@mail.gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,59 +12,72 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    3 +++
- fs/cifs/inode.c     |    7 +++++++
- fs/cifs/link.c      |    8 ++++++++
- 3 files changed, 18 insertions(+), 0 deletions(-)
+ fs/cifs/link.c |   45 +++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 41 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 2eaebbd..e94e095 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -409,4 +409,7 @@ extern int CIFSSMBSetPosixACL(const int xid, struct cifsTconInfo *tcon,
- extern int CIFSGetExtAttr(const int xid, struct cifsTconInfo *tcon,
- 			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
- extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
-+extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-+		const unsigned char *path,
-+		struct cifs_sb_info *cifs_sb, int xid);
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index a15b3a9..c4121de 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -661,6 +661,13 @@ int cifs_get_inode_info(struct inode **pinode,
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
- 		cifs_sfu_mode(&fattr, full_path, cifs_sb, xid);
- 
-+	/* query for SFU type info if supported and needed */
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
-+		tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
-+		if (tmprc)
-+			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
-+	}
-+
- 	if (!*pinode) {
- 		*pinode = cifs_iget(sb, &fattr);
- 		if (!*pinode)
 diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 2358a5f..985373c 100644
+index 89e09da..7fecd4f 100644
 --- a/fs/cifs/link.c
 +++ b/fs/cifs/link.c
-@@ -48,6 +48,14 @@ CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
+@@ -136,10 +136,45 @@ CIFSFormatMFSymlink(u8 *buf, unsigned int buf_len, const char *link_str)
+ static int
+ CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
+ 		    const char *fromName, const char *toName,
+-		    const struct nls_table *nls_codepage)
++		    const struct nls_table *nls_codepage, int remap)
+ {
+-	int rc = -EOPNOTSUPP;
+-	return rc;
++	int rc;
++	int oplock = 0;
++	__u16 netfid = 0;
++	u8 *buf;
++	unsigned int bytes_written = 0;
++
++	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	rc = CIFSFormatMFSymlink(buf, CIFS_MF_SYMLINK_FILE_SIZE, toName);
++	if (rc != 0) {
++		kfree(buf);
++		return rc;
++	}
++
++	rc = CIFSSMBOpen(xid, tcon, fromName, FILE_CREATE, GENERIC_WRITE,
++			 CREATE_NOT_DIR, &netfid, &oplock, NULL,
++			 nls_codepage, remap);
++	if (rc != 0) {
++		kfree(buf);
++		return rc;
++	}
++
++	rc = CIFSSMBWrite(xid, tcon, netfid,
++			  CIFS_MF_SYMLINK_FILE_SIZE /* length */,
++			  0 /* offset */,
++			  &bytes_written, buf, NULL, 0);
++	CIFSSMBClose(xid, tcon, netfid);
++	kfree(buf);
++	if (rc != 0)
++		return rc;
++
++	if (bytes_written != CIFS_MF_SYMLINK_FILE_SIZE)
++		return -EIO;
++
++	return 0;
  }
  
- int
-+CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-+		   const unsigned char *path,
-+		   struct cifs_sb_info *cifs_sb, int xid)
-+{
-+	return 0;
-+}
-+
-+int
- cifs_hardlink(struct dentry *old_file, struct inode *inode,
- 	      struct dentry *direntry)
- {
+ static int
+@@ -430,7 +465,9 @@ cifs_symlink(struct inode *inode, struct dentry *direntry, const char *symname)
+ 	/* BB what if DFS and this volume is on different share? BB */
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
+ 		rc = CIFSCreateMFSymLink(xid, pTcon, full_path, symname,
+-					 cifs_sb->local_nls);
++					 cifs_sb->local_nls,
++					 cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	else if (pTcon->unix_ext)
+ 		rc = CIFSUnixCreateSymLink(xid, pTcon, full_path, symname,
+ 					   cifs_sb->local_nls);
 -- 
 1.7.0.4
