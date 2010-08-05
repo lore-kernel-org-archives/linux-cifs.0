@@ -1,89 +1,74 @@
-From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 7/7] cifs: add "mfsymlinks" mount option
-Date: Thu,  5 Aug 2010 21:50:21 +0200
-Message-ID: <1281037821-11479-8-git-send-email-metze@samba.org>
-References: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp@mail.gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
+Date: Thu, 5 Aug 2010 16:12:53 -0400
+Message-ID: <20100805161253.51ca6f97@tlielax.poochiereds.net>
+References: <CC75E34383A8445493DD41AF4F7E7857@lan.jax.org.ru>
+	<20100721100503.672a735e@tlielax.poochiereds.net>
+	<9DFCDE0105DF4B70AEA82A8A2B2A2A94@lan.jax.org.ru>
+	<20100722093121.4c64b102@barsoom.rdu.redhat.com>
+	<54DA210795E649C1A62B5E10BF366BB3@lan.jax.org.ru>
+	<20100804073140.5734d1bb@tlielax.poochiereds.net>
+	<9EE2EFBFF2304A849754EEE0F1C1CE29@lan.jax.org.ru>
+	<20100805140329.069baa41@barsoom.rdu.redhat.com>
+	<583072918FF1484C9380D991E5A4E83C@lan.jax.org.ru>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <583072918FF1484C9380D991E5A4E83C-PUkIMHyhFB22ZuJnPpCLiw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the start for an implementation of "Minshall+French Symlinks"
-(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks).
+On Thu, 5 Aug 2010 22:48:21 +0400
+"Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/README    |    5 +++++
- fs/cifs/cifsfs.c  |    2 ++
- fs/cifs/connect.c |   11 +++++++++++
- 3 files changed, 18 insertions(+), 0 deletions(-)
+> > I pulled down your latest code and it doesn't appear to be patched. Am
+> > I missing something?
+> 
+> ----------------[snip]---------------
+> struct command {
+>  int (*action)(int argc, char *argv[]);
+>  const char name[MAX_COMMAND_SIZE];
+>  const char *format;
+> };
+> ----------------[snip]---------------
+> 
+> Now, under each field we will allocate exactly MAX_COMMAND_SIZE bytes.
+> During the comparison we will not walk outside the allocated area.
+> 
+> ----------------[snip]---------------
+>  n = strnlen(argv[1], MAX_COMMAND_SIZE);
+> 
+>  for (cmd = commands; cmd->action; cmd++) {
+>   if (memcmp(cmd->name, argv[1], n) != 0)
+>    continue;
+> ----------------[snip]---------------
 
-diff --git a/fs/cifs/README b/fs/cifs/README
-index a7081ee..6baf1b4 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -517,6 +517,11 @@ A partial list of the supported mount options follows:
- 		SFU does).  In the future the bottom 9 bits of the
- 		mode also will be emulated using queries of the security
- 		descriptor (ACL).
-+ mfsymlinks     Enable support for Minshall+French symlinks
-+		(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks)
-+		This option is ignored when specified together with the
-+		'sfu' option. Minshall+French symlinks are used even if
-+		the server supports the CIFS Unix Extensions.
-  sign           Must use packet signing (helps avoid unwanted data modification
- 		by intermediate systems in the route).  Note that signing
- 		does not work with lanman or plaintext authentication.
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 2a0c892..a9ee553 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -420,6 +420,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
- 		seq_printf(s, ",dynperm");
- 	if (m->mnt_sb->s_flags & MS_POSIXACL)
- 		seq_printf(s, ",acl");
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
-+		seq_printf(s, ",mfsymlinks");
- 
- 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
- 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 95c2ea6..1a8472d 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -100,6 +100,7 @@ struct smb_vol {
- 	bool noautotune:1;
- 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
- 	bool fsc:1;	/* enable fscache */
-+	bool mfsymlinks:1; /* use Minshall+French Symlinks */
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
-@@ -1343,6 +1344,8 @@ cifs_parse_mount_options(char *options, const char *devname,
- 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
- 		} else if (strnicmp(data, "fsc", 3) == 0) {
- 			vol->fsc = true;
-+		} else if (strnicmp(data, "mfsymlinks", 10) == 0) {
-+			vol->mfsymlinks = true;
- 		} else
- 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
- 						data);
-@@ -2482,6 +2485,14 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 		cFYI(1, "mounting share using direct i/o");
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
- 	}
-+	if (pvolume_info->mfsymlinks) {
-+		if (pvolume_info->sfu_emul) {
-+			cERROR(1,  "mount option mfsymlinks ignored if sfu "
-+				   "mount option is used");
-+		} else {
-+			cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MF_SYMLINKS;
-+		}
-+	}
- 
- 	if ((pvolume_info->cifs_acl) && (pvolume_info->dynperm))
- 		cERROR(1, "mount option dynperm ignored if cifsacl "
--- 
-1.7.0.4
+Ahh ok, thanks for clarifying. I had envisioned fixing this another
+way, but this should be fine.
+
+Now that that's fixed, I think this piece is pretty much done. When you
+get time, please post it as a patch to cifs-utils to the linux-cifs
+mailing list so that others can comment. If no one has objections, I'll
+plan to merge it soon.
+
+> Yes, I have developed an algorithm and wrote some code samples.
+> This will require some changes in mount.cifs. The kernel will look for the 
+> key during parsing of pass= option in cifs_parse_mount_options routine. As 
+> an option pass= follows the options ip=, user= and dom= problems shouldn't 
+> arise. If successful, password will be used from the key, otherwise from the 
+> pass= option. mount.cifs can independently verify the presence of the key 
+> and does not require a password from the user.
+
+Cool -- I look forward to seeing that part.
+
+I don't think however that you should assume that mount options come in
+any particular order. We do occasionally get people who use cifs
+without a mount helper at all or who pass in options that the mount
+helper would ordinarily fill out itself (ip=, for instance).
+
+Nice work!
+--
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
