@@ -1,7 +1,7 @@
 From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 6/7] cifs: use Minshall+French symlink functions
-Date: Thu,  5 Aug 2010 21:50:20 +0200
-Message-ID: <1281037821-11479-7-git-send-email-metze@samba.org>
+Subject: [PATCH 7/7] cifs: add "mfsymlinks" mount option
+Date: Thu,  5 Aug 2010 21:50:21 +0200
+Message-ID: <1281037821-11479-8-git-send-email-metze@samba.org>
 References: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp@mail.gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,99 +10,80 @@ In-Reply-To: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp-JsoAwUIsXosN+BqQ9rBE
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If configured, Minshall+French Symlinks are used against
-all servers. If the server supports UNIX Extensions,
-we still create Minshall+French Symlinks on write,
-but on read we fallback to UNIX Extension symlinks.
+This is the start for an implementation of "Minshall+French Symlinks"
+(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks).
 
 Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifs_fs_sb.h |    1 +
- fs/cifs/inode.c      |    7 +++++++
- fs/cifs/link.c       |   27 +++++++++++++++++++++++----
- 3 files changed, 31 insertions(+), 4 deletions(-)
+ fs/cifs/README    |    5 +++++
+ fs/cifs/cifsfs.c  |    2 ++
+ fs/cifs/connect.c |   11 +++++++++++
+ 3 files changed, 18 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 9e77145..7fde529 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -36,6 +36,7 @@
- #define CIFS_MOUNT_NOPOSIXBRL   0x2000 /* mandatory not posix byte range lock */
- #define CIFS_MOUNT_NOSSYNC      0x4000 /* don't do slow SMBflush on every sync*/
- #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
-+#define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+diff --git a/fs/cifs/README b/fs/cifs/README
+index a7081ee..6baf1b4 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -517,6 +517,11 @@ A partial list of the supported mount options follows:
+ 		SFU does).  In the future the bottom 9 bits of the
+ 		mode also will be emulated using queries of the security
+ 		descriptor (ACL).
++ mfsymlinks     Enable support for Minshall+French symlinks
++		(see http://wiki.samba.org/index.php/UNIX_Extensions#Minshall.2BFrench_symlinks)
++		This option is ignored when specified together with the
++		'sfu' option. Minshall+French symlinks are used even if
++		the server supports the CIFS Unix Extensions.
+  sign           Must use packet signing (helps avoid unwanted data modification
+ 		by intermediate systems in the route).  Note that signing
+ 		does not work with lanman or plaintext authentication.
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 2a0c892..a9ee553 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -420,6 +420,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 		seq_printf(s, ",dynperm");
+ 	if (m->mnt_sb->s_flags & MS_POSIXACL)
+ 		seq_printf(s, ",acl");
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
++		seq_printf(s, ",mfsymlinks");
  
- struct cifs_sb_info {
- 	struct cifsTconInfo *tcon;	/* primary mount */
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index dc4c47a..f4b0207 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -661,6 +661,13 @@ int cifs_get_inode_info(struct inode **pinode,
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
- 		cifs_sfu_mode(&fattr, full_path, cifs_sb, xid);
- 
-+	/* check for Minshall+French symlinks */
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
-+		tmprc = CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
-+		if (tmprc)
-+			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
-+	}
-+
- 	if (!*pinode) {
- 		*pinode = cifs_iget(sb, &fattr);
- 		if (!*pinode)
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 4237901..74660b7 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -397,7 +397,8 @@ cifs_follow_link(struct dentry *direntry, struct nameidata *nd)
- 	 * but there doesn't seem to be any harm in allowing the client to
- 	 * read them.
- 	 */
--	if (!(tcon->ses->capabilities & CAP_UNIX)) {
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
-+	    && !(tcon->ses->capabilities & CAP_UNIX)) {
- 		rc = -EACCES;
- 		goto out;
+ 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+ 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 95c2ea6..1a8472d 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -100,6 +100,7 @@ struct smb_vol {
+ 	bool noautotune:1;
+ 	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
+ 	bool fsc:1;	/* enable fscache */
++	bool mfsymlinks:1; /* use Minshall+French Symlinks */
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -1343,6 +1344,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
+ 		} else if (strnicmp(data, "fsc", 3) == 0) {
+ 			vol->fsc = true;
++		} else if (strnicmp(data, "mfsymlinks", 10) == 0) {
++			vol->mfsymlinks = true;
+ 		} else
+ 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
+ 						data);
+@@ -2482,6 +2485,14 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 		cFYI(1, "mounting share using direct i/o");
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
  	}
-@@ -408,8 +409,21 @@ cifs_follow_link(struct dentry *direntry, struct nameidata *nd)
++	if (pvolume_info->mfsymlinks) {
++		if (pvolume_info->sfu_emul) {
++			cERROR(1,  "mount option mfsymlinks ignored if sfu "
++				   "mount option is used");
++		} else {
++			cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MF_SYMLINKS;
++		}
++	}
  
- 	cFYI(1, "Full path: %s inode = 0x%p", full_path, inode);
- 
--	rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, &target_path,
--				     cifs_sb->local_nls);
-+	rc = -EACCES;
-+	/*
-+	 * First try Minshall+French Symlinks, if configured
-+	 * and fallback to UNIX Extensions Symlinks.
-+	 */
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
-+		rc = CIFSQueryMFSymLink(xid, tcon, full_path, &target_path,
-+					cifs_sb->local_nls,
-+					cifs_sb->mnt_cifs_flags &
-+						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+
-+	if (rc != 0)
-+		rc = CIFSSMBUnixQuerySymLink(xid, tcon, full_path, &target_path,
-+					     cifs_sb->local_nls);
-+
- 	kfree(full_path);
- out:
- 	if (rc != 0) {
-@@ -449,7 +463,12 @@ cifs_symlink(struct inode *inode, struct dentry *direntry, const char *symname)
- 	cFYI(1, "symname is %s", symname);
- 
- 	/* BB what if DFS and this volume is on different share? BB */
--	if (pTcon->unix_ext)
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
-+		rc = CIFSCreateMFSymLink(xid, pTcon, full_path, symname,
-+					 cifs_sb->local_nls,
-+					 cifs_sb->mnt_cifs_flags &
-+						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	else if (pTcon->unix_ext)
- 		rc = CIFSUnixCreateSymLink(xid, pTcon, full_path, symname,
- 					   cifs_sb->local_nls);
- 	/* else
+ 	if ((pvolume_info->cifs_acl) && (pvolume_info->dynperm))
+ 		cERROR(1, "mount option dynperm ignored if cifsacl "
 -- 
 1.7.0.4
