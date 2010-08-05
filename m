@@ -1,81 +1,85 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: linux-next: manual merge of the workqueues tree with the Linus'
- tree
-Date: Thu, 5 Aug 2010 13:45:45 +1000
-Message-ID: <20100805134545.93ccb1b4.sfr@canb.auug.org.au>
-References: <20100723144600.dd4da992.sfr@canb.auug.org.au>
-	<4C497CD5.5010908@kernel.org>
-	<20100723213148.3d2193a3.sfr@canb.auug.org.au>
-	<4C497E5F.80301@kernel.org>
-	<20100723214233.7cb7de8d.sfr@canb.auug.org.au>
-	<20100805130459.f62468cd.sfr@canb.auug.org.au>
+From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Subject: linux-next: build failure after merge of the final tree (cifs tree
+ related)
+Date: Thu, 5 Aug 2010 13:51:49 +1000
+Message-ID: <20100805135149.98b2001b.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Thu__5_Aug_2010_13_45_45_+1000_u819=hHGuf89bSBC"
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
-To: Tejun Heo <tj@kernel.org>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20100805130459.f62468cd.sfr@canb.auug.org.au>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
-
---Signature=_Thu__5_Aug_2010_13_45_45_+1000_u819=hHGuf89bSBC
 Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Tejun,
+Hi Steve,
 
-On Thu, 5 Aug 2010 13:04:59 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> On Fri, 23 Jul 2010 21:42:33 +1000 Stephen Rothwell <sfr@canb.auug.org.au=
-> wrote:
-> >
-> > On Fri, 23 Jul 2010 13:34:55 +0200 Tejun Heo <tj@kernel.org> wrote:
-> > >
-> > > I was thinking about sending pull request w/ a note describing how to
-> > > resolve the conflict.  Would pulling in master before requesting pull
-> > > be better?
-> >=20
-> > Either would work.  Linus is fine with doing merge fixups and, after al=
-l,
-> > I figured it out. :-)
-> >=20
-> > A description always helps, of course.
->=20
-> Linus has merged the cifs tree, so you could fix these conflicts in your
-> tree by merging the cifs tree that Linus' merged (rather than merging
-> against all of Linus' tree).   That would be commit
-> cb76d5e25008b76fb8e348c861d32659430ac3fa ("cifs: fsc should not default
-> to "on"") in Linus' tree.
->=20
-> Or you could leave it all to Linus if you want to.
+After merging the final tree, today's linux-next build (powerpc
+allyesconfig) failed like this:
 
-Actually there is some more stuff in the cifs tree that has not gone to
-Linus, yet.  Sorry about that.
+net/dns_resolver/dns_key.c: In function 'init_dns_resolver':
+net/dns_resolver/dns_key.c:170: error: implicit declaration of function 'IS_ERR'
+net/dns_resolver/dns_key.c:171: error: implicit declaration of function 'PTR_ERR'
+net/dns_resolver/dns_query.c: In function 'dns_query':
+net/dns_resolver/dns_query.c:126: error: implicit declaration of function 'IS_ERR'
+net/dns_resolver/dns_query.c:127: error: implicit declaration of function 'PTR_ERR'
 
---=20
+Caused by commit bae8da144bd6254d1e9cec2a7d6da7cade84e00e ("DNS: Separate
+out CIFS DNS Resolver code").
+
+See Rule 1 in Documentation/SubmitChecklist.
+
+I have added this patch for today:
+
+From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Date: Thu, 5 Aug 2010 13:49:29 +1000
+Subject: [PATCH] cifs: include linux/err.h for IS_ERR and PTR_ERR
+
+Fixes build errors:
+
+net/dns_resolver/dns_key.c: In function 'init_dns_resolver':
+net/dns_resolver/dns_key.c:170: error: implicit declaration of function 'IS_ERR'
+net/dns_resolver/dns_key.c:171: error: implicit declaration of function 'PTR_ERR'
+net/dns_resolver/dns_query.c: In function 'dns_query':
+net/dns_resolver/dns_query.c:126: error: implicit declaration of function 'IS_ERR'
+net/dns_resolver/dns_query.c:127: error: implicit declaration of function 'PTR_ERR'
+
+Signed-off-by: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+---
+ net/dns_resolver/dns_key.c   |    1 +
+ net/dns_resolver/dns_query.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 1b1b411..400a04d 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -28,6 +28,7 @@
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+ #include <linux/keyctl.h>
++#include <linux/err.h>
+ #include <keys/dns_resolver-type.h>
+ #include <keys/user-type.h>
+ #include "internal.h"
+diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+index 6c0cf31..b33e1f7 100644
+--- a/net/dns_resolver/dns_query.c
++++ b/net/dns_resolver/dns_query.c
+@@ -39,6 +39,7 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/dns_resolver.h>
++#include <linux/err.h>
+ #include <keys/dns_resolver-type.h>
+ #include <keys/user-type.h>
+ 
+-- 
+1.7.1
+
+-- 
 Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
 http://www.canb.auug.org.au/~sfr/
-
---Signature=_Thu__5_Aug_2010_13_45_45_+1000_u819=hHGuf89bSBC
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iQEcBAEBAgAGBQJMWjPpAAoJEDMEi1NhKgbsG3QH/3JSjfxsFgHtA9V85DxJ078c
-VLQFoIdzdvyNgm+MraWk+bfzU4rqBwwDLOCr0O5EsUpVs6xd1BN9Cc5j3oO3rNIb
-daOkYH0Q+OGyHoZuXdFQi2nxqQtYlucNxDfrbKtbehBGmkDLY3QDriPCXlxT5Whv
-70n0Kqi34XP+43urXCKwgGuXP6cwtBBDSPriu/IYXSa9p4l+PfZ0ymqhA9T7oaW9
-JlyiTwiktnuQcxKfbV34BM0zEhPy6z3Oo1Rb0XHR5G3Rb0CLBSHYivxxImfEx4RC
-D0FTA5jvUe3H6SVeXE6quqAvYWs2qCqXhNuQPV07Ub44PwzD2vHZV4Klo8NuZ54=
-=J3gW
------END PGP SIGNATURE-----
-
---Signature=_Thu__5_Aug_2010_13_45_45_+1000_u819=hHGuf89bSBC--
