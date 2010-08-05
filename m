@@ -1,7 +1,7 @@
 From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 4/7] cifs: implement CIFSFormatMFSymlink()
-Date: Thu,  5 Aug 2010 21:50:18 +0200
-Message-ID: <1281037821-11479-5-git-send-email-metze@samba.org>
+Subject: [PATCH 5/7] cifs: implement CIFSCreateMFSymLink()
+Date: Thu,  5 Aug 2010 21:50:19 +0200
+Message-ID: <1281037821-11479-6-git-send-email-metze@samba.org>
 References: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp@mail.gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,58 +12,62 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/link.c |   41 +++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 41 insertions(+), 0 deletions(-)
+ fs/cifs/link.c |   45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 45 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index a8dcc27..500d912 100644
+index 500d912..4237901 100644
 --- a/fs/cifs/link.c
 +++ b/fs/cifs/link.c
-@@ -92,6 +92,47 @@ CIFSParseMFSymlink(const u8 *buf,
+@@ -133,6 +133,51 @@ CIFSFormatMFSymlink(u8 *buf, unsigned int buf_len, const char *link_str)
+ 	return 0;
  }
  
- static int
-+CIFSFormatMFSymlink(u8 *buf, unsigned int buf_len, const char *link_str)
++static int
++CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
++		    const char *fromName, const char *toName,
++		    const struct nls_table *nls_codepage, int remap)
 +{
-+	unsigned int link_len;
-+	unsigned int ofs;
-+	struct MD5Context md5_ctx;
-+	u8 md5_hash[16];
++	int rc;
++	int oplock = 0;
++	__u16 netfid = 0;
++	u8 *buf;
++	unsigned int bytes_written = 0;
 +
-+	if (buf_len != CIFS_MF_SYMLINK_FILE_SIZE)
-+		return -EINVAL;
++	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
 +
-+	link_len = strlen(link_str);
-+
-+	if (link_len > CIFS_MF_SYMLINK_LINK_MAXLEN)
-+		return -ENAMETOOLONG;
-+
-+	cifs_MD5_init(&md5_ctx);
-+	cifs_MD5_update(&md5_ctx, (const u8 *)link_str, link_len);
-+	cifs_MD5_final(md5_hash, &md5_ctx);
-+
-+	snprintf(buf, buf_len,
-+		 CIFS_MF_SYMLINK_LEN_FORMAT CIFS_MF_SYMLINK_MD5_FORMAT,
-+		 link_len,
-+		 CIFS_MF_SYMLINK_MD5_ARGS(md5_hash));
-+
-+	ofs = CIFS_MF_SYMLINK_LINK_OFFSET;
-+	memcpy(buf + ofs, link_str, link_len);
-+
-+	ofs += link_len;
-+	if (ofs < CIFS_MF_SYMLINK_FILE_SIZE) {
-+		buf[ofs] = '\n';
-+		ofs++;
++	rc = CIFSFormatMFSymlink(buf, CIFS_MF_SYMLINK_FILE_SIZE, toName);
++	if (rc != 0) {
++		kfree(buf);
++		return rc;
 +	}
 +
-+	while (ofs < CIFS_MF_SYMLINK_FILE_SIZE) {
-+		buf[ofs] = ' ';
-+		ofs++;
++	rc = CIFSSMBOpen(xid, tcon, fromName, FILE_CREATE, GENERIC_WRITE,
++			 CREATE_NOT_DIR, &netfid, &oplock, NULL,
++			 nls_codepage, remap);
++	if (rc != 0) {
++		kfree(buf);
++		return rc;
 +	}
++
++	rc = CIFSSMBWrite(xid, tcon, netfid,
++			  CIFS_MF_SYMLINK_FILE_SIZE /* length */,
++			  0 /* offset */,
++			  &bytes_written, buf, NULL, 0);
++	CIFSSMBClose(xid, tcon, netfid);
++	kfree(buf);
++	if (rc != 0)
++		return rc;
++
++	if (bytes_written != CIFS_MF_SYMLINK_FILE_SIZE)
++		return -EIO;
 +
 +	return 0;
 +}
 +
++static int
  CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
  		   const unsigned char *searchName, char **symlinkinfo,
  		   const struct nls_table *nls_codepage, int remap)
