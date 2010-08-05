@@ -1,7 +1,7 @@
 From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 1/7] cifs: implement CIFSParseMFSymlink()
-Date: Thu,  5 Aug 2010 21:50:15 +0200
-Message-ID: <1281037821-11479-2-git-send-email-metze@samba.org>
+Subject: [PATCH 2/7] cifs: implement CIFSCheckMFSymlink()
+Date: Thu,  5 Aug 2010 21:50:16 +0200
+Message-ID: <1281037821-11479-3-git-send-email-metze@samba.org>
 References: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp@mail.gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,81 +12,101 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/link.c |   62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 62 insertions(+), 0 deletions(-)
+ fs/cifs/cifsproto.h |    3 ++
+ fs/cifs/link.c      |   69 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+), 0 deletions(-)
 
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 1f54508..d88dc61 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -409,4 +409,7 @@ extern int CIFSSMBSetPosixACL(const int xid, struct cifsTconInfo *tcon,
+ extern int CIFSGetExtAttr(const int xid, struct cifsTconInfo *tcon,
+ 			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+ extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
++extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
++		const unsigned char *path,
++		struct cifs_sb_info *cifs_sb, int xid);
+ #endif			/* _CIFSPROTO_H */
 diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 473ca80..12eb491 100644
+index 12eb491..c0aebdb 100644
 --- a/fs/cifs/link.c
 +++ b/fs/cifs/link.c
-@@ -28,6 +28,68 @@
- #include "cifsproto.h"
- #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
-+#include "md5.h"
-+
-+#define CIFS_MF_SYMLINK_LEN_OFFSET (4+1)
-+#define CIFS_MF_SYMLINK_MD5_OFFSET (CIFS_MF_SYMLINK_LEN_OFFSET+(4+1))
-+#define CIFS_MF_SYMLINK_LINK_OFFSET (CIFS_MF_SYMLINK_MD5_OFFSET+(32+1))
-+#define CIFS_MF_SYMLINK_LINK_MAXLEN (1024)
-+#define CIFS_MF_SYMLINK_FILE_SIZE \
-+	(CIFS_MF_SYMLINK_LINK_OFFSET + CIFS_MF_SYMLINK_LINK_MAXLEN)
-+
-+#define CIFS_MF_SYMLINK_LEN_FORMAT "XSym\n%04u\n"
-+#define CIFS_MF_SYMLINK_MD5_FORMAT \
-+	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n"
-+#define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) \
-+	md5_hash[0],  md5_hash[1],  md5_hash[2],  md5_hash[3], \
-+	md5_hash[4],  md5_hash[5],  md5_hash[6],  md5_hash[7], \
-+	md5_hash[8],  md5_hash[9],  md5_hash[10], md5_hash[11],\
-+	md5_hash[12], md5_hash[13], md5_hash[14], md5_hash[15]
-+
-+static int
-+CIFSParseMFSymlink(const u8 *buf,
-+		   unsigned int buf_len,
-+		   unsigned int *_link_len,
-+		   char **_link_str)
-+{
-+	int rc;
-+	unsigned int link_len;
-+	const char *md5_str1;
-+	const char *link_str;
-+	struct MD5Context md5_ctx;
-+	u8 md5_hash[16];
-+	char md5_str2[34];
-+
-+	if (buf_len != CIFS_MF_SYMLINK_FILE_SIZE)
-+		return -EINVAL;
-+
-+	md5_str1 = (const char *)&buf[CIFS_MF_SYMLINK_MD5_OFFSET];
-+	link_str = (const char *)&buf[CIFS_MF_SYMLINK_LINK_OFFSET];
-+
-+	rc = sscanf(buf, CIFS_MF_SYMLINK_LEN_FORMAT, &link_len);
-+	if (rc != 1)
-+		return -EINVAL;
-+
-+	cifs_MD5_init(&md5_ctx);
-+	cifs_MD5_update(&md5_ctx, (const u8 *)link_str, link_len);
-+	cifs_MD5_final(md5_hash, &md5_ctx);
-+
-+	snprintf(md5_str2, sizeof(md5_str2),
-+		 CIFS_MF_SYMLINK_MD5_FORMAT,
-+		 CIFS_MF_SYMLINK_MD5_ARGS(md5_hash));
-+
-+	if (strncmp(md5_str1, md5_str2, 17) != 0)
-+		return -EINVAL;
-+
-+	if (_link_str) {
-+		*_link_str = kstrndup(link_str, link_len, GFP_KERNEL);
-+		if (!*_link_str)
-+			return -ENOMEM;
-+	}
-+
-+	*_link_len = link_len;
-+	return 0;
-+}
+@@ -92,6 +92,75 @@ CIFSParseMFSymlink(const u8 *buf,
+ }
  
  int
++CIFSCheckMFSymlink(struct cifs_fattr *fattr,
++		   const unsigned char *path,
++		   struct cifs_sb_info *cifs_sb, int xid)
++{
++	int rc;
++	int oplock = 0;
++	__u16 netfid = 0;
++	struct cifsTconInfo *pTcon = cifs_sb->tcon;
++	u8 *buf;
++	char *pbuf;
++	unsigned int bytes_read = 0;
++	int buf_type = CIFS_NO_BUFFER;
++	unsigned int link_len = 0;
++	FILE_ALL_INFO file_info;
++
++	if (!(fattr->cf_mode & S_IFREG))
++		/* it's not a symlink */
++		return 0;
++
++	if (fattr->cf_eof != CIFS_MF_SYMLINK_FILE_SIZE)
++		/* it's not a symlink */
++		return 0;
++
++	rc = CIFSSMBOpen(xid, pTcon, path, FILE_OPEN, GENERIC_READ,
++			 CREATE_NOT_DIR, &netfid, &oplock, &file_info,
++			 cifs_sb->local_nls,
++			 cifs_sb->mnt_cifs_flags &
++				CIFS_MOUNT_MAP_SPECIAL_CHR);
++	if (rc != 0)
++		return rc;
++
++	if (file_info.EndOfFile != CIFS_MF_SYMLINK_FILE_SIZE) {
++		CIFSSMBClose(xid, pTcon, netfid);
++		/* it's not a symlink */
++		return 0;
++	}
++
++	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++	pbuf = buf;
++
++	rc = CIFSSMBRead(xid, pTcon, netfid,
++			 CIFS_MF_SYMLINK_FILE_SIZE /* length */,
++			 0 /* offset */,
++			 &bytes_read, &pbuf, &buf_type);
++	CIFSSMBClose(xid, pTcon, netfid);
++	if (rc != 0) {
++		kfree(buf);
++		return rc;
++	}
++
++	rc = CIFSParseMFSymlink(buf, bytes_read, &link_len, NULL);
++	kfree(buf);
++	if (rc == -EINVAL)
++		/* it's not a symlink */
++		return 0;
++	if (rc != 0)
++		return rc;
++
++	/* it is a symlink */
++	fattr->cf_eof = link_len;
++	fattr->cf_mode &= ~S_IFMT;
++	fattr->cf_mode |= S_IFLNK;
++	fattr->cf_dtype = DT_LNK;
++	return 0;
++}
++
++int
  cifs_hardlink(struct dentry *old_file, struct inode *inode,
+ 	      struct dentry *direntry)
+ {
 -- 
 1.7.0.4
