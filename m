@@ -1,204 +1,161 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/3] cifs: clean up error handling in cifs_mknod
-Date: Thu,  5 Aug 2010 10:18:34 -0400
-Message-ID: <1281017916-31380-2-git-send-email-jlayton@redhat.com>
-References: <1281017916-31380-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
+Date: Thu, 5 Aug 2010 19:43:57 +0400
+Message-ID: <9EE2EFBFF2304A849754EEE0F1C1CE29@lan.jax.org.ru>
+References: <CC75E34383A8445493DD41AF4F7E7857@lan.jax.org.ru><20100721100503.672a735e@tlielax.poochiereds.net><9DFCDE0105DF4B70AEA82A8A2B2A2A94@lan.jax.org.ru><20100722093121.4c64b102@barsoom.rdu.redhat.com><54DA210795E649C1A62B5E10BF366BB3@lan.jax.org.ru> <20100804073140.5734d1bb@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="ISO-8859-1";
+	reply-type=original
+Content-Transfer-Encoding: 7bit
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1281017916-31380-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Get rid of some nesting and add a label we can goto on error.
+> First, it looks like there are some problems with newlines. The new
+> files that were added seem to have CR+LF line terminators. There are
+> also quite a few whitespace problems in there -- spaces leading tabs,
+> etc. In general, we follow kernel coding style with cifs-utils, so
+> running your patches through checkpatch.pl in the kernel sources is a
+> good idea.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/dir.c |  153 ++++++++++++++++++++++++++++-----------------------------
- 1 files changed, 76 insertions(+), 77 deletions(-)
+Checked and patched.
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index a7de5e9..f8d02f0 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -496,6 +496,11 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
- 	struct cifsTconInfo *pTcon;
- 	char *full_path = NULL;
- 	struct inode *newinode = NULL;
-+	int oplock = 0;
-+	u16 fileHandle;
-+	FILE_ALL_INFO *buf = NULL;
-+	unsigned int bytes_written;
-+	struct win_dev *pdev;
- 
- 	if (!old_valid_dev(device_number))
- 		return -EINVAL;
-@@ -506,9 +511,12 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
- 	pTcon = cifs_sb->tcon;
- 
- 	full_path = build_path_from_dentry(direntry);
--	if (full_path == NULL)
-+	if (full_path == NULL) {
- 		rc = -ENOMEM;
--	else if (pTcon->unix_ext) {
-+		goto mknod_out;
-+	}
-+
-+	if (pTcon->unix_ext) {
- 		struct cifs_unix_set_info_args args = {
- 			.mode	= mode & ~current_umask(),
- 			.ctime	= NO_CHANGE_64,
-@@ -527,87 +535,78 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
- 					    cifs_sb->local_nls,
- 					    cifs_sb->mnt_cifs_flags &
- 						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		if (rc)
-+			goto mknod_out;
- 
--		if (!rc) {
--			rc = cifs_get_inode_info_unix(&newinode, full_path,
-+		rc = cifs_get_inode_info_unix(&newinode, full_path,
- 						inode->i_sb, xid);
--			if (pTcon->nocase)
--				direntry->d_op = &cifs_ci_dentry_ops;
--			else
--				direntry->d_op = &cifs_dentry_ops;
--			if (rc == 0)
--				d_instantiate(direntry, newinode);
--		}
--	} else {
--		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL) {
--			int oplock = 0;
--			u16 fileHandle;
--			FILE_ALL_INFO *buf;
-+		if (pTcon->nocase)
-+			direntry->d_op = &cifs_ci_dentry_ops;
-+		else
-+			direntry->d_op = &cifs_dentry_ops;
- 
--			cFYI(1, "sfu compat create special file");
-+		if (rc == 0)
-+			d_instantiate(direntry, newinode);
-+		goto mknod_out;
-+	}
- 
--			buf = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
--			if (buf == NULL) {
--				kfree(full_path);
--				rc = -ENOMEM;
--				FreeXid(xid);
--				return rc;
--			}
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL))
-+		goto mknod_out;
- 
--			rc = CIFSSMBOpen(xid, pTcon, full_path,
--					 FILE_CREATE, /* fail if exists */
--					 GENERIC_WRITE /* BB would
--					  WRITE_OWNER | WRITE_DAC be better? */,
--					 /* Create a file and set the
--					    file attribute to SYSTEM */
--					 CREATE_NOT_DIR | CREATE_OPTION_SPECIAL,
--					 &fileHandle, &oplock, buf,
--					 cifs_sb->local_nls,
--					 cifs_sb->mnt_cifs_flags &
--					    CIFS_MOUNT_MAP_SPECIAL_CHR);
--
--			/* BB FIXME - add handling for backlevel servers
--			   which need legacy open and check for all
--			   calls to SMBOpen for fallback to SMBLeagcyOpen */
--			if (!rc) {
--				/* BB Do not bother to decode buf since no
--				   local inode yet to put timestamps in,
--				   but we can reuse it safely */
--				unsigned int bytes_written;
--				struct win_dev *pdev;
--				pdev = (struct win_dev *)buf;
--				if (S_ISCHR(mode)) {
--					memcpy(pdev->type, "IntxCHR", 8);
--					pdev->major =
--					      cpu_to_le64(MAJOR(device_number));
--					pdev->minor =
--					      cpu_to_le64(MINOR(device_number));
--					rc = CIFSSMBWrite(xid, pTcon,
--						fileHandle,
--						sizeof(struct win_dev),
--						0, &bytes_written, (char *)pdev,
--						NULL, 0);
--				} else if (S_ISBLK(mode)) {
--					memcpy(pdev->type, "IntxBLK", 8);
--					pdev->major =
--					      cpu_to_le64(MAJOR(device_number));
--					pdev->minor =
--					      cpu_to_le64(MINOR(device_number));
--					rc = CIFSSMBWrite(xid, pTcon,
--						fileHandle,
--						sizeof(struct win_dev),
--						0, &bytes_written, (char *)pdev,
--						NULL, 0);
--				} /* else if(S_ISFIFO */
--				CIFSSMBClose(xid, pTcon, fileHandle);
--				d_drop(direntry);
--			}
--			kfree(buf);
--			/* add code here to set EAs */
--		}
-+
-+	cFYI(1, "sfu compat create special file");
-+
-+	buf = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
-+	if (buf == NULL) {
-+		kfree(full_path);
-+		rc = -ENOMEM;
-+		FreeXid(xid);
-+		return rc;
- 	}
- 
-+	/* FIXME: would WRITE_OWNER | WRITE_DAC be better? */
-+	rc = CIFSSMBOpen(xid, pTcon, full_path, FILE_CREATE,
-+			 GENERIC_WRITE, CREATE_NOT_DIR | CREATE_OPTION_SPECIAL,
-+			 &fileHandle, &oplock, buf, cifs_sb->local_nls,
-+			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	if (rc)
-+		goto mknod_out;
-+
-+	/* BB Do not bother to decode buf since no local inode yet to put
-+	 * timestamps in, but we can reuse it safely */
-+
-+	pdev = (struct win_dev *)buf;
-+	if (S_ISCHR(mode)) {
-+		memcpy(pdev->type, "IntxCHR", 8);
-+		pdev->major =
-+		      cpu_to_le64(MAJOR(device_number));
-+		pdev->minor =
-+		      cpu_to_le64(MINOR(device_number));
-+		rc = CIFSSMBWrite(xid, pTcon,
-+			fileHandle,
-+			sizeof(struct win_dev),
-+			0, &bytes_written, (char *)pdev,
-+			NULL, 0);
-+	} else if (S_ISBLK(mode)) {
-+		memcpy(pdev->type, "IntxBLK", 8);
-+		pdev->major =
-+		      cpu_to_le64(MAJOR(device_number));
-+		pdev->minor =
-+		      cpu_to_le64(MINOR(device_number));
-+		rc = CIFSSMBWrite(xid, pTcon,
-+			fileHandle,
-+			sizeof(struct win_dev),
-+			0, &bytes_written, (char *)pdev,
-+			NULL, 0);
-+	} /* else if (S_ISFIFO) */
-+	CIFSSMBClose(xid, pTcon, fileHandle);
-+	d_drop(direntry);
-+
-+	/* FIXME: add code here to set EAs */
-+
-+mknod_out:
- 	kfree(full_path);
-+	kfree(buf);
- 	FreeXid(xid);
- 	return rc;
- }
--- 
-1.7.2
+> Also, I don't see much need for the MULTI_LANG ifdef's. Is there any
+> reason not to make it always use MULTI_LANG? If so, I'd remove the code
+> that's ifdef'ed out.
+
+Now I am still not sure of the correctness of my strategy of 
+internationalization. MULTI_LANG ifdef's will help me to correct necessary 
+sites in case of its change.
+
+> There are also several routines that seem to already be in libc. For
+> instance, wstrtolower seems to do the same thing as towlower. I'd
+> suggest using libc routines rather than rolling your own where possible.
+
+As I saw in the GNU libc documentation there is no routines for conversion 
+string to lowercase.
+
+> That memcmp is going to walk off the end of "add". Depending on how the
+> memory is allocated, it could segfault.
+
+Patched.
+
+> In cifscreds_add:
+>
+>                        if (keyctl(KEYCTL_SETPERM, key, KEY_POS_VIEW | 
+> KEY_POS_WRITE | \
+>                                   KEY_USR_VIEW | KEY_USR_WRITE) < 0)
+>                                fprintf(stderr, "error: Setting permissons 
+> on key\n");
+>
+> ...would it be safer to attempt to remove the key if we can't set perms
+> on it?
+
+Yes, already fixed.
+
+> That's all I've got time to review at the moment. Have you made any
+> progress with the kernel piece for this?
+
+Yes, I have developed an algorithm and wrote some code samples.
+This will require some changes in mount.cifs. The kernel will look for the 
+key during parsing of pass= option in cifs_parse_mount_options routine. As 
+an option pass= follows the options ip=, user= and dom= problems shouldn't 
+arise. If successful, password will be used from the key, otherwise from the 
+pass= option. mount.cifs can independently verify the presence of the key 
+and does not require a password from the user.
+
+Regards,
+Igor Druzhinin
+
+----- Original Message ----- 
+From: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>; <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sent: Wednesday, August 04, 2010 3:31 PM
+Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
+
+
+> On Thu, 29 Jul 2010 17:52:35 +0400
+> "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> Hello,
+>> I've created a mirror cifs-utils repository where is embedded cifscreds
+>> utility. I've fixed a few bugs and added multilanguage support for it. 
+>> Now
+>> it is locale-dependent, but then I plan to use the UCS-2 encoding. You 
+>> can
+>> use the option --enable-cifscreds=yes of configure script to build
+>> cifscreds. I've also moved resolve_host routine in a separate file and 
+>> made
+>> appropriate patches.
+>>
+>> git://gitorious.org/cifs-utils/cifs-utils.git
+>>
+>> Regards,
+>> Igor Druzhinin
+>>
+>
+> (cc'ing David Howells since he wrote most of the keyctl stuff and may be 
+> interested)
+>
+> Sorry that it has taken me a while to review this, I've been a bit
+> swamped with work.
+>
+> First, it looks like there are some problems with newlines. The new
+> files that were added seem to have CR+LF line terminators. There are
+> also quite a few whitespace problems in there -- spaces leading tabs,
+> etc. In general, we follow kernel coding style with cifs-utils, so
+> running your patches through checkpatch.pl in the kernel sources is a
+> good idea.
+>
+> Also, I don't see much need for the MULTI_LANG ifdef's. Is there any
+> reason not to make it always use MULTI_LANG? If so, I'd remove the code
+> that's ifdef'ed out.
+>
+> There are also several routines that seem to already be in libc. For
+> instance, wstrtolower seems to do the same thing as towlower. I'd
+> suggest using libc routines rather than rolling your own where possible.
+>
+> On to the code...
+>
+> ----------------[snip]---------------
+>        /* find the best fit command */
+>        best = NULL;
+>        n = strnlen(argv[1], MAX_COMMAND_SIZE);
+>
+>        for (cmd = commands; cmd->action; cmd++) {
+>                if (memcmp(cmd->name, argv[1], n) != 0)
+>                        continue;
+> ----------------[snip]---------------
+>
+> This looks a little dangerous. Sure, you're bounds checking the
+> strnlen, but think about what happens if someone passes in a long
+> string as the command:
+>
+> memcmp("add", "reallylongcommandstring", 
+> strlen("reallylongcommandstring"));
+>
+> That memcmp is going to walk off the end of "add". Depending on how the
+> memory is allocated, it could segfault.
+>
+> In cifscreds_add:
+>
+>                        if (keyctl(KEYCTL_SETPERM, key, KEY_POS_VIEW | 
+> KEY_POS_WRITE | \
+>                                   KEY_USR_VIEW | KEY_USR_WRITE) < 0)
+>                                fprintf(stderr, "error: Setting permissons 
+> on key\n");
+>
+> ...would it be safer to attempt to remove the key if we can't set perms
+> on it?
+>
+> That's all I've got time to review at the moment. Have you made any
+> progress with the kernel piece for this?
+>
+> Nice work so far!
+> -- 
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> 
