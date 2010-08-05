@@ -1,74 +1,73 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
-Date: Thu, 5 Aug 2010 16:12:53 -0400
-Message-ID: <20100805161253.51ca6f97@tlielax.poochiereds.net>
-References: <CC75E34383A8445493DD41AF4F7E7857@lan.jax.org.ru>
-	<20100721100503.672a735e@tlielax.poochiereds.net>
-	<9DFCDE0105DF4B70AEA82A8A2B2A2A94@lan.jax.org.ru>
-	<20100722093121.4c64b102@barsoom.rdu.redhat.com>
-	<54DA210795E649C1A62B5E10BF366BB3@lan.jax.org.ru>
-	<20100804073140.5734d1bb@tlielax.poochiereds.net>
-	<9EE2EFBFF2304A849754EEE0F1C1CE29@lan.jax.org.ru>
-	<20100805140329.069baa41@barsoom.rdu.redhat.com>
-	<583072918FF1484C9380D991E5A4E83C@lan.jax.org.ru>
+From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
+ extended  file stats available [ver #6]
+Date: Thu, 5 Aug 2010 16:52:18 -0700
+Message-ID: <20100805235218.GB31233@jeremy-laptop>
+References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
+ <20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
+ <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+ <30448.1279800887@redhat.com>
+ <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
+ <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+ <1280524978.2452.9.camel@segv.aura.of.mankind>
+ <20100801092529.5e6ba0e0@corrin.poochiereds.net>
+Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <583072918FF1484C9380D991E5A4E83C-PUkIMHyhFB22ZuJnPpCLiw@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20100801092529.5e6ba0e0-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 5 Aug 2010 22:48:21 +0400
-"Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> > I pulled down your latest code and it doesn't appear to be patched. Am
-> > I missing something?
+On Sun, Aug 01, 2010 at 09:25:29AM -0400, Jeff Layton wrote:
+> On Fri, 30 Jul 2010 23:22:58 +0200
+> utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org> wrote:
 > 
-> ----------------[snip]---------------
-> struct command {
->  int (*action)(int argc, char *argv[]);
->  const char name[MAX_COMMAND_SIZE];
->  const char *format;
-> };
-> ----------------[snip]---------------
+> > On Thu, 2010-07-22 at 09:40 -0700, Linus Torvalds wrote:
+> > > But the fact is, th Unix ctime semantics are insane and largely
+> > > useless. There's a damn good reason almost nobody uses ctime under
+> > > unix.
+> > > 
+> > > So what I'm suggesting is that we have a flag - either per-process or
+> > > per-mount - that just says "use windows semantics for ctime".
+> > 
+> > When abusing an existing time stamp use atime not ctime please.
+> > ctime has it's uses. atime was just a mistake and is nearly useless.
+> > 
+> > And with noatime we already have creation time semantics for atime.
+> > 
 > 
-> Now, under each field we will allocate exactly MAX_COMMAND_SIZE bytes.
-> During the comparison we will not walk outside the allocated area.
+> Ugh. Honestly all of this talk of abusing different time fields seems
+> like craziness to me. It's going to be very hard to do that without
+> breaking *something*. There's also very little reason to do this when
+> xattrs are a much cleaner approach.
 > 
-> ----------------[snip]---------------
->  n = strnlen(argv[1], MAX_COMMAND_SIZE);
-> 
->  for (cmd = commands; cmd->action; cmd++) {
->   if (memcmp(cmd->name, argv[1], n) != 0)
->    continue;
-> ----------------[snip]---------------
+> Neil Brown has put forth a very reasoned justification for putting the
+> birthtime in an xattr. After reading it, I think that makes more sense
+> than anything. It's also something that can be done without any extra
+> infrastructure. If at some point in the future we get an xstat-like
+> syscall then we can always add birthtime to that as well.
 
-Ahh ok, thanks for clarifying. I had envisioned fixing this another
-way, but this should be fine.
+Just my 2 cents (as a Samba server implementor). I *hate* the idea
+of adding a "virtual" EA for birthtime. If you're going to add it,
+just add it to the stat struct like *BSD does. Don't abuse the other
+time fields, it's a new one.
 
-Now that that's fixed, I think this piece is pretty much done. When you
-get time, please post it as a patch to cifs-utils to the linux-cifs
-mailing list so that others can comment. If no one has objections, I'll
-plan to merge it soon.
+Jeff, please don't advocate for an EA for the Samba server to use.
+Don't add it as an EA. It's *not* an EA, it's a timestamp.
 
-> Yes, I have developed an algorithm and wrote some code samples.
-> This will require some changes in mount.cifs. The kernel will look for the 
-> key during parsing of pass= option in cifs_parse_mount_options routine. As 
-> an option pass= follows the options ip=, user= and dom= problems shouldn't 
-> arise. If successful, password will be used from the key, otherwise from the 
-> pass= option. mount.cifs can independently verify the presence of the key 
-> and does not require a password from the user.
-
-Cool -- I look forward to seeing that part.
-
-I don't think however that you should assume that mount options come in
-any particular order. We do occasionally get people who use cifs
-without a mount helper at all or who pass in options that the mount
-helper would ordinarily fill out itself (ip=, for instance).
-
-Nice work!
+Jeremy.
 --
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
