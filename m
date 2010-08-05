@@ -1,97 +1,92 @@
-From: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
-Date: Thu, 5 Aug 2010 22:48:21 +0400
-Message-ID: <583072918FF1484C9380D991E5A4E83C@lan.jax.org.ru>
-References: <CC75E34383A8445493DD41AF4F7E7857@lan.jax.org.ru><20100721100503.672a735e@tlielax.poochiereds.net><9DFCDE0105DF4B70AEA82A8A2B2A2A94@lan.jax.org.ru><20100722093121.4c64b102@barsoom.rdu.redhat.com><54DA210795E649C1A62B5E10BF366BB3@lan.jax.org.ru><20100804073140.5734d1bb@tlielax.poochiereds.net><9EE2EFBFF2304A849754EEE0F1C1CE29@lan.jax.org.ru> <20100805140329.069baa41@barsoom.rdu.redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="ISO-8859-1";
-	reply-type=original
-Content-Transfer-Encoding: 7bit
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/7] cifs: implement CIFSParseMFSymlink()
+Date: Thu,  5 Aug 2010 21:50:15 +0200
+Message-ID: <1281037821-11479-2-git-send-email-metze@samba.org>
+References: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp@mail.gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTimU=0P=qrPeu1KFTPriLfRLo94xHZ5Dy2x0JFrp-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-> I pulled down your latest code and it doesn't appear to be patched. Am
-> I missing something?
+Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/link.c |   62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 62 insertions(+), 0 deletions(-)
 
-----------------[snip]---------------
-struct command {
- int (*action)(int argc, char *argv[]);
- const char name[MAX_COMMAND_SIZE];
- const char *format;
-};
-----------------[snip]---------------
-
-Now, under each field we will allocate exactly MAX_COMMAND_SIZE bytes.
-During the comparison we will not walk outside the allocated area.
-
-----------------[snip]---------------
- n = strnlen(argv[1], MAX_COMMAND_SIZE);
-
- for (cmd = commands; cmd->action; cmd++) {
-  if (memcmp(cmd->name, argv[1], n) != 0)
-   continue;
-----------------[snip]---------------
-
-Regards,
-Igor Druzhinin
-
------ Original Message ----- 
-From: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>; <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sent: Thursday, August 05, 2010 10:03 PM
-Subject: Re: Build infrastructure for storing NTLM creds in kernel keyring
-
-
-> On Thu, 5 Aug 2010 19:43:57 +0400
-> "Igor Druzhinin" <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> > First, it looks like there are some problems with newlines. The new
->> > files that were added seem to have CR+LF line terminators. There are
->> > also quite a few whitespace problems in there -- spaces leading tabs,
->> > etc. In general, we follow kernel coding style with cifs-utils, so
->> > running your patches through checkpatch.pl in the kernel sources is a
->> > good idea.
->>
->> Checked and patched.
->>
->> > Also, I don't see much need for the MULTI_LANG ifdef's. Is there any
->> > reason not to make it always use MULTI_LANG? If so, I'd remove the code
->> > that's ifdef'ed out.
->>
->> Now I am still not sure of the correctness of my strategy of
->> internationalization. MULTI_LANG ifdef's will help me to correct 
->> necessary
->> sites in case of its change.
->>
->
-> Fair enough then...
->
->> > There are also several routines that seem to already be in libc. For
->> > instance, wstrtolower seems to do the same thing as towlower. I'd
->> > suggest using libc routines rather than rolling your own where 
->> > possible.
->>
->> As I saw in the GNU libc documentation there is no routines for 
->> conversion
->> string to lowercase.
->>
->
-> Ahh you're correct -- towlower only operates on a single character.
->
->> > That memcmp is going to walk off the end of "add". Depending on how the
->> > memory is allocated, it could segfault.
->>
->> Patched.
->>
->
-> I pulled down your latest code and it doesn't appear to be patched. Am
-> I missing something?
->
-> -- 
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> 
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index 473ca80..12eb491 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -28,6 +28,68 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
++#include "md5.h"
++
++#define CIFS_MF_SYMLINK_LEN_OFFSET (4+1)
++#define CIFS_MF_SYMLINK_MD5_OFFSET (CIFS_MF_SYMLINK_LEN_OFFSET+(4+1))
++#define CIFS_MF_SYMLINK_LINK_OFFSET (CIFS_MF_SYMLINK_MD5_OFFSET+(32+1))
++#define CIFS_MF_SYMLINK_LINK_MAXLEN (1024)
++#define CIFS_MF_SYMLINK_FILE_SIZE \
++	(CIFS_MF_SYMLINK_LINK_OFFSET + CIFS_MF_SYMLINK_LINK_MAXLEN)
++
++#define CIFS_MF_SYMLINK_LEN_FORMAT "XSym\n%04u\n"
++#define CIFS_MF_SYMLINK_MD5_FORMAT \
++	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n"
++#define CIFS_MF_SYMLINK_MD5_ARGS(md5_hash) \
++	md5_hash[0],  md5_hash[1],  md5_hash[2],  md5_hash[3], \
++	md5_hash[4],  md5_hash[5],  md5_hash[6],  md5_hash[7], \
++	md5_hash[8],  md5_hash[9],  md5_hash[10], md5_hash[11],\
++	md5_hash[12], md5_hash[13], md5_hash[14], md5_hash[15]
++
++static int
++CIFSParseMFSymlink(const u8 *buf,
++		   unsigned int buf_len,
++		   unsigned int *_link_len,
++		   char **_link_str)
++{
++	int rc;
++	unsigned int link_len;
++	const char *md5_str1;
++	const char *link_str;
++	struct MD5Context md5_ctx;
++	u8 md5_hash[16];
++	char md5_str2[34];
++
++	if (buf_len != CIFS_MF_SYMLINK_FILE_SIZE)
++		return -EINVAL;
++
++	md5_str1 = (const char *)&buf[CIFS_MF_SYMLINK_MD5_OFFSET];
++	link_str = (const char *)&buf[CIFS_MF_SYMLINK_LINK_OFFSET];
++
++	rc = sscanf(buf, CIFS_MF_SYMLINK_LEN_FORMAT, &link_len);
++	if (rc != 1)
++		return -EINVAL;
++
++	cifs_MD5_init(&md5_ctx);
++	cifs_MD5_update(&md5_ctx, (const u8 *)link_str, link_len);
++	cifs_MD5_final(md5_hash, &md5_ctx);
++
++	snprintf(md5_str2, sizeof(md5_str2),
++		 CIFS_MF_SYMLINK_MD5_FORMAT,
++		 CIFS_MF_SYMLINK_MD5_ARGS(md5_hash));
++
++	if (strncmp(md5_str1, md5_str2, 17) != 0)
++		return -EINVAL;
++
++	if (_link_str) {
++		*_link_str = kstrndup(link_str, link_len, GFP_KERNEL);
++		if (!*_link_str)
++			return -ENOMEM;
++	}
++
++	*_link_len = link_len;
++	return 0;
++}
+ 
+ int
+ cifs_hardlink(struct dentry *old_file, struct inode *inode,
+-- 
+1.7.0.4
