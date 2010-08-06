@@ -1,48 +1,81 @@
-From: Greg KH <gregkh-l3A5Bk7waGM@public.gmane.org>
-Subject: [26/34] CIFS: Fix compile error with __init in cifs_init_dns_resolver() definition
-Date: Fri, 06 Aug 2010 11:57:21 -0700
-Message-ID: <20100806185836.185076461@clark.site>
-References: <20100806185853.GA28270@kroah.com>
-Cc: stable-review-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100806185853.GA28270-U8xfFu+wG4EAvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: [PATCH 2/2] DNS: Fixes for the DNS query module
+Date: Fri, 6 Aug 2010 09:29:02 -0700
+Message-ID: <20100806092902.6555a644.randy.dunlap@oracle.com>
+References: <20100806021347.29873.87087.stgit@warthog.procyon.org.uk>
+	<20100806021352.29873.16452.stgit@warthog.procyon.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench@gmail.com, jlayton@redhat.com,
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100806021352.29873.16452.stgit@warthog.procyon.org.uk>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-2.6.32-stable review patch.  If anyone has any objections, please let us know.
+On Fri, 06 Aug 2010 03:13:52 +0100 David Howells wrote:
 
-------------------
- [stable] [PATCH 2.6.32/stable] CIFS: Fix compile error with __init in cifs_init_dns_resolver() definition
+> Fixes for the DNS query module, including:
+> 
+>  (1) Use 'negative' instead of '-ve' in the documentation.
+> 
+>  (2) Mark the kdoc comment with '/**' on dns_query().
+> 
+> Reported-by: Randy Dunlap <randy.dunlap@oracle.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-From: Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
+Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
 
-An allmodconfig compile on ppc64 with 2.6.32.17 currently gives this error
+Thanks, David.
 
-fs/cifs/dns_resolve.h:27: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'cifs_init_dns_resolver'
 
-This adds the correct header file to fix this.
+> ---
+> 
+>  Documentation/networking/dns_resolver.txt |    6 +++---
+>  net/dns_resolver/dns_query.c              |    2 +-
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/networking/dns_resolver.txt b/Documentation/networking/dns_resolver.txt
+> index d8e0ce1..aefd1e6 100644
+> --- a/Documentation/networking/dns_resolver.txt
+> +++ b/Documentation/networking/dns_resolver.txt
+> @@ -96,9 +96,9 @@ implemented in the module can be called after doing:
+>       for the default query type it is just a list of comma-separated IPv4 and
+>       IPv6 addresses.  The caller must free the result.
+>  
+> -     The length of the result string is returned on success, and a -ve error
+> -     code is returned otherwise.  -EKEYREJECTED will be returned if the DNS
+> -     lookup failed.
+> +     The length of the result string is returned on success, and a negative
+> +     error code is returned otherwise.  -EKEYREJECTED will be returned if the
+> +     DNS lookup failed.
+>  
+>       If _expiry is non-NULL, the expiry time (TTL) of the result will be
+>       returned also.
+> diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+> index b33e1f7..03d5255 100644
+> --- a/net/dns_resolver/dns_query.c
+> +++ b/net/dns_resolver/dns_query.c
+> @@ -45,7 +45,7 @@
+>  
+>  #include "internal.h"
+>  
+> -/*
+> +/**
+>   * dns_query - Query the DNS
+>   * @type: Query type (or NULL for straight host->IP lookup)
+>   * @name: Name to look up
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
 
-Signed-off-by: Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh-l3A5Bk7waGM@public.gmane.org>
 
 ---
- fs/cifs/dns_resolve.h |    2 ++
- 1 file changed, 2 insertions(+)
-
---- a/fs/cifs/dns_resolve.h
-+++ b/fs/cifs/dns_resolve.h
-@@ -24,6 +24,8 @@
- #define _DNS_RESOLVE_H
- 
- #ifdef __KERNEL__
-+#include <linux/module.h>
-+
- extern int __init cifs_init_dns_resolver(void);
- extern void cifs_exit_dns_resolver(void);
- extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
