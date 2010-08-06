@@ -1,61 +1,60 @@
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 2/2] DNS: Fixes for the DNS query module
-Date: Fri, 06 Aug 2010 03:13:52 +0100
-Message-ID: <20100806021352.29873.16452.stgit@warthog.procyon.org.uk>
-References: <20100806021347.29873.87087.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 1/2] cifs: Include linux/err.h for IS_ERR and PTR_ERR
+Date: Fri, 06 Aug 2010 03:13:47 +0100
+Message-ID: <20100806021347.29873.87087.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Cc: jlayton@redhat.com, linux-fsdevel@vger.kernel.org,
 	linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
+	linux-kernel@vger.kernel.org,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	David Howells <dhowells@redhat.com>
 To: smfrench@gmail.com
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20100806021347.29873.87087.stgit@warthog.procyon.org.uk>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-Fixes for the DNS query module, including:
+From: Stephen Rothwell <sfr@canb.auug.org.au>
 
- (1) Use 'negative' instead of '-ve' in the documentation.
+Fixes build errors:
 
- (2) Mark the kdoc comment with '/**' on dns_query().
+net/dns_resolver/dns_key.c: In function 'init_dns_resolver':
+net/dns_resolver/dns_key.c:170: error: implicit declaration of function 'IS_ERR'
+net/dns_resolver/dns_key.c:171: error: implicit declaration of function 'PTR_ERR'
+net/dns_resolver/dns_query.c: In function 'dns_query':
+net/dns_resolver/dns_query.c:126: error: implicit declaration of function 'IS_ERR'
+net/dns_resolver/dns_query.c:127: error: implicit declaration of function 'PTR_ERR'
 
-Reported-by: Randy Dunlap <randy.dunlap@oracle.com>
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- Documentation/networking/dns_resolver.txt |    6 +++---
- net/dns_resolver/dns_query.c              |    2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ net/dns_resolver/dns_key.c   |    1 +
+ net/dns_resolver/dns_query.c |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/Documentation/networking/dns_resolver.txt b/Documentation/networking/dns_resolver.txt
-index d8e0ce1..aefd1e6 100644
---- a/Documentation/networking/dns_resolver.txt
-+++ b/Documentation/networking/dns_resolver.txt
-@@ -96,9 +96,9 @@ implemented in the module can be called after doing:
-      for the default query type it is just a list of comma-separated IPv4 and
-      IPv6 addresses.  The caller must free the result.
- 
--     The length of the result string is returned on success, and a -ve error
--     code is returned otherwise.  -EKEYREJECTED will be returned if the DNS
--     lookup failed.
-+     The length of the result string is returned on success, and a negative
-+     error code is returned otherwise.  -EKEYREJECTED will be returned if the
-+     DNS lookup failed.
- 
-      If _expiry is non-NULL, the expiry time (TTL) of the result will be
-      returned also.
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 1b1b411..400a04d 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -28,6 +28,7 @@
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+ #include <linux/keyctl.h>
++#include <linux/err.h>
+ #include <keys/dns_resolver-type.h>
+ #include <keys/user-type.h>
+ #include "internal.h"
 diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
-index b33e1f7..03d5255 100644
+index 6c0cf31..b33e1f7 100644
 --- a/net/dns_resolver/dns_query.c
 +++ b/net/dns_resolver/dns_query.c
-@@ -45,7 +45,7 @@
+@@ -39,6 +39,7 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
+ #include <linux/dns_resolver.h>
++#include <linux/err.h>
+ #include <keys/dns_resolver-type.h>
+ #include <keys/user-type.h>
  
- #include "internal.h"
- 
--/*
-+/**
-  * dns_query - Query the DNS
-  * @type: Query type (or NULL for straight host->IP lookup)
-  * @name: Name to look up
