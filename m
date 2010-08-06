@@ -1,41 +1,61 @@
-From: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
-Subject: [PATCH] CIFS: Include <linux/init.h> in dns_resolve.h
-Date: Fri, 06 Aug 2010 01:53:02 +0100
-Message-ID: <1281055982.2902.14.camel@localhost>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 2/2] DNS: Fixes for the DNS query module
+Date: Fri, 06 Aug 2010 03:13:52 +0100
+Message-ID: <20100806021352.29873.16452.stgit@warthog.procyon.org.uk>
+References: <20100806021347.29873.87087.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: jlayton@redhat.com, linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: smfrench@gmail.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20100806021347.29873.87087.stgit@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-fs/cifs/dns_resolve.c fails to build on some architectures:
+Fixes for the DNS query module, including:
 
-In file included from fs/cifs/dns_resolve.c:30:
-fs/cifs/dns_resolve.h:27: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'cifs_init_dns_resolver'
+ (1) Use 'negative' instead of '-ve' in the documentation.
 
-We need to include <linux/init.h> to ensure that __init is defined.
+ (2) Mark the kdoc comment with '/**' on dns_query().
 
-Signed-off-by: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org [after 51c20fc]
+Reported-by: Randy Dunlap <randy.dunlap@oracle.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
 ---
- fs/cifs/dns_resolve.h |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/dns_resolve.h b/fs/cifs/dns_resolve.h
-index 5d7f291..71c4769 100644
---- a/fs/cifs/dns_resolve.h
-+++ b/fs/cifs/dns_resolve.h
-@@ -24,6 +24,7 @@
- #define _DNS_RESOLVE_H
+ Documentation/networking/dns_resolver.txt |    6 +++---
+ net/dns_resolver/dns_query.c              |    2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/networking/dns_resolver.txt b/Documentation/networking/dns_resolver.txt
+index d8e0ce1..aefd1e6 100644
+--- a/Documentation/networking/dns_resolver.txt
++++ b/Documentation/networking/dns_resolver.txt
+@@ -96,9 +96,9 @@ implemented in the module can be called after doing:
+      for the default query type it is just a list of comma-separated IPv4 and
+      IPv6 addresses.  The caller must free the result.
  
- #ifdef __KERNEL__
-+#include <linux/init.h>
- extern int __init cifs_init_dns_resolver(void);
- extern void cifs_exit_dns_resolver(void);
- extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
--- 
-1.7.1
+-     The length of the result string is returned on success, and a -ve error
+-     code is returned otherwise.  -EKEYREJECTED will be returned if the DNS
+-     lookup failed.
++     The length of the result string is returned on success, and a negative
++     error code is returned otherwise.  -EKEYREJECTED will be returned if the
++     DNS lookup failed.
+ 
+      If _expiry is non-NULL, the expiry time (TTL) of the result will be
+      returned also.
+diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+index b33e1f7..03d5255 100644
+--- a/net/dns_resolver/dns_query.c
++++ b/net/dns_resolver/dns_query.c
+@@ -45,7 +45,7 @@
+ 
+ #include "internal.h"
+ 
+-/*
++/**
+  * dns_query - Query the DNS
+  * @type: Query type (or NULL for straight host->IP lookup)
+  * @name: Name to look up
