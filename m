@@ -1,73 +1,41 @@
-From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
- extended  file stats available [ver #6]
-Date: Thu, 5 Aug 2010 16:52:18 -0700
-Message-ID: <20100805235218.GB31233@jeremy-laptop>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
- <20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
- <20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
- <30448.1279800887@redhat.com>
- <E1Obuiy-00C9jr-Al@intern.SerNet.DE>
- <AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
- <1280524978.2452.9.camel@segv.aura.of.mankind>
- <20100801092529.5e6ba0e0@corrin.poochiereds.net>
-Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+Subject: [PATCH] CIFS: Include <linux/init.h> in dns_resolve.h
+Date: Fri, 06 Aug 2010 01:53:02 +0100
+Message-ID: <1281055982.2902.14.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org>,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20100801092529.5e6ba0e0-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Aug 01, 2010 at 09:25:29AM -0400, Jeff Layton wrote:
-> On Fri, 30 Jul 2010 23:22:58 +0200
-> utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org> wrote:
-> 
-> > On Thu, 2010-07-22 at 09:40 -0700, Linus Torvalds wrote:
-> > > But the fact is, th Unix ctime semantics are insane and largely
-> > > useless. There's a damn good reason almost nobody uses ctime under
-> > > unix.
-> > > 
-> > > So what I'm suggesting is that we have a flag - either per-process or
-> > > per-mount - that just says "use windows semantics for ctime".
-> > 
-> > When abusing an existing time stamp use atime not ctime please.
-> > ctime has it's uses. atime was just a mistake and is nearly useless.
-> > 
-> > And with noatime we already have creation time semantics for atime.
-> > 
-> 
-> Ugh. Honestly all of this talk of abusing different time fields seems
-> like craziness to me. It's going to be very hard to do that without
-> breaking *something*. There's also very little reason to do this when
-> xattrs are a much cleaner approach.
-> 
-> Neil Brown has put forth a very reasoned justification for putting the
-> birthtime in an xattr. After reading it, I think that makes more sense
-> than anything. It's also something that can be done without any extra
-> infrastructure. If at some point in the future we get an xstat-like
-> syscall then we can always add birthtime to that as well.
+fs/cifs/dns_resolve.c fails to build on some architectures:
 
-Just my 2 cents (as a Samba server implementor). I *hate* the idea
-of adding a "virtual" EA for birthtime. If you're going to add it,
-just add it to the stat struct like *BSD does. Don't abuse the other
-time fields, it's a new one.
+In file included from fs/cifs/dns_resolve.c:30:
+fs/cifs/dns_resolve.h:27: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'cifs_init_dns_resolver'
 
-Jeff, please don't advocate for an EA for the Samba server to use.
-Don't add it as an EA. It's *not* an EA, it's a timestamp.
+We need to include <linux/init.h> to ensure that __init is defined.
 
-Jeremy.
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org [after 51c20fc]
+---
+ fs/cifs/dns_resolve.h |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/dns_resolve.h b/fs/cifs/dns_resolve.h
+index 5d7f291..71c4769 100644
+--- a/fs/cifs/dns_resolve.h
++++ b/fs/cifs/dns_resolve.h
+@@ -24,6 +24,7 @@
+ #define _DNS_RESOLVE_H
+ 
+ #ifdef __KERNEL__
++#include <linux/init.h>
+ extern int __init cifs_init_dns_resolver(void);
+ extern void cifs_exit_dns_resolver(void);
+ extern int dns_resolve_server_name_to_ip(const char *unc, char **ip_addr);
+-- 
+1.7.1
