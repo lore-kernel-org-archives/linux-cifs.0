@@ -1,68 +1,92 @@
-From: Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
-Subject: Re: [Stable-review] [26/34] CIFS: Fix compile error with __init in cifs_init_dns_resolver() definition
-Date: Sat, 07 Aug 2010 13:38:53 +1000
-Message-ID: <17422.1281152333@neuling.org>
-References: <20100806185836.185076461@clark.site> <1281127997.7543.0.camel@localhost> <20100806210619.GA5863@suse.de>
-Cc: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	stable-review-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org
-To: Greg KH <gregkh-l3A5Bk7waGM@public.gmane.org>
+From: Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
+ extended  file stats available [ver #6]
+Date: Sat, 7 Aug 2010 21:04:22 +1000
+Message-ID: <20100807210422.0b8ce265@notabene>
+References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
+	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
+	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
+	<30448.1279800887@redhat.com>
+	<E1Obuiy-00C9jr-Al@intern.SerNet.DE>
+	<AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
+	<1280524978.2452.9.camel@segv.aura.of.mankind>
+	<20100801092529.5e6ba0e0@corrin.poochiereds.net>
+	<20100805235218.GB31233@jeremy-laptop>
+	<20100806133836.49757af9@notabene>
+	<AANLkTinVCLVpqLtA2X=1mOkxX7Re61_ZYsUix_XTvZ5D@mail.gmail.com>
+	<20100807093057.7683bedd@notabene>
+	<AANLkTikDBg5Brt=55Tsu8ozk0aVx=srpxP=U-sFqeBYL@mail.gmail.com>
+	<20100807102901.6a0b53e7@notabene>
+	<AANLkTinEFFAWMu62j2sCPy=ArExZNm2miJOGoXbG65jC@mail.gmail.com>
+	<AANLkTik7KhgF=pkpdEcsYM75NVXNmU4ynzdh3KWknTEL@mail.gmail.com>
+	<20100807133240.02883b83@notabene>
+	<20100807063400.6bd1776f@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-reply-to: <20100806210619.GA5863-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <20100807063400.6bd1776f-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Sat, 7 Aug 2010 06:34:00 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-
-In message <20100806210619.GA5863-l3A5Bk7waGM@public.gmane.org> you wrote:
-> On Fri, Aug 06, 2010 at 09:53:17PM +0100, Ben Hutchings wrote:
-> > On Fri, 2010-08-06 at 11:57 -0700, Greg KH wrote:
-> > > 2.6.32-stable review patch.  If anyone has any objections, please let us 
-know.
-> > > 
-> > > ------------------
-> > >  [stable] [PATCH 2.6.32/stable] CIFS: Fix compile error with __init in ci
-fs_init_dns_resolver() definition
-> > > 
-> > > From: Michael Neuling <mikey-/owAOxkjmzZAfugRpC6u6w@public.gmane.org>
-> > > 
-> > > An allmodconfig compile on ppc64 with 2.6.32.17 currently gives this erro
-r
-> > > 
-> > > fs/cifs/dns_resolve.h:27: error: expected '=', ',', ';', 'asm' or '__attr
-ibute__' before 'cifs_init_dns_resolver'
-> > > 
-> > > This adds the correct header file to fix this.
-> > [...]
+> On Sat, 7 Aug 2010 13:32:40 +1000
+> Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org> wrote:
+> 
+> > So we are left with an attribute that is needed for windows compatibility,
+> > and so just needs to be understood by samba and wine.  Some filesystems might
+> > support it efficiently, others might require the use of generic
+> > extended-attributes, still others might not support it at all (I guess you
+> > store it in some 'tdb' and hope it works well enough).
 > > 
-> > Why <linux/module.h> and not <linux/init.h>?
+> > Core-linux doesn't really need to know about this - there just needs to be a
+> > channel to pass it between samba/wine and the filesystem. xattr still seems
+> > the best mechanism to pass this stuff around.  Team-samba can negotiate with
+> > fs developers to optimise/accelerate certain attributes, and linux-VFS
+> > doesn't need to know or care (except maybe to provide generic non-blocking or
+> > multiple-access interfaces).
+> > 
 > 
-> Heh, it works :)
+> IIUC, you're saying that we should basically just have samba stuff the
+> current time into an xattr when it creates the file and leave the
+> filesystems alone. If so, I disagree here.
+
+I'm not quite saying that (though there is a temptation).  Some attributes
+are initialised by the filesystem rather than by common code.  i_uid is a
+simple example.  I have no problem with the filesystem initialising the
+storage that is used for this well-known-EA to the current time at creation.
+This would be part of what team-samba negotiated with FS developers.
+
 > 
-> Michael?
+> The problem with treating this as *just* an xattr is that it doesn't
+> account for files that are created outside of samba but are then shared
+> out by it.
 
-It's what David Howells wanted.....
+If something is created in a different universe, then brought into this one -
+when is its date of birth?  The moment of creation, or the moment of entry
+into this universe?   If both universes have a common time line (altough
+with a 10 year offset) then I guess the former, though I think it is a bit of
+a philosophical point.... :-)
 
-http://linux.derkeiler.com/Mailing-Lists/Kernel/2010-08/msg01316.html
-(below as well)
-
-
-> An allmodconfig compile on ppc64 with 2.6.32.17 currently gives this error
 > 
-> fs/cifs/dns_resolve.h:27: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'cifs_init_dns_resolver'
+> To handle this correctly, I believe it needs to be initialized by the
+> kernel to the current time whenever an inode is created, even if samba
+> doesn't create it. After that, it can be treated as just another xattr.
 > 
-> This removes the __init from cifs_init_dns_resolver()
+Yes, I suspect that would be ideal, and trivial for the fs to implement (it
+has to initialise it to something after all).
 
-That's not really a good idea as the assembler may choose different pieces of
-assembly to do variable references and jumps, depending on the section
-information.
+i.e. I agree.
 
-A better fix is to add:
-
-	#include <linux/module.h>
-
-to the header file.
-
-David
+NeilBrown
