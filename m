@@ -1,8 +1,8 @@
-From: Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
  extended  file stats available [ver #6]
-Date: Sat, 7 Aug 2010 21:04:22 +1000
-Message-ID: <20100807210422.0b8ce265@notabene>
+Date: Sat, 7 Aug 2010 06:34:00 -0400
+Message-ID: <20100807063400.6bd1776f@tlielax.poochiereds.net>
 References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
 	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
 	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
@@ -20,7 +20,6 @@ References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
 	<AANLkTinEFFAWMu62j2sCPy=ArExZNm2miJOGoXbG65jC@mail.gmail.com>
 	<AANLkTik7KhgF=pkpdEcsYM75NVXNmU4ynzdh3KWknTEL@mail.gmail.com>
 	<20100807133240.02883b83@notabene>
-	<20100807063400.6bd1776f@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -32,61 +31,40 @@ Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeremy Alli
 	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100807063400.6bd1776f-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20100807133240.02883b83@notabene>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 7 Aug 2010 06:34:00 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Sat, 7 Aug 2010 13:32:40 +1000
+Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> On Sat, 7 Aug 2010 13:32:40 +1000
-> Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org> wrote:
+> So we are left with an attribute that is needed for windows compatibility,
+> and so just needs to be understood by samba and wine.  Some filesystems might
+> support it efficiently, others might require the use of generic
+> extended-attributes, still others might not support it at all (I guess you
+> store it in some 'tdb' and hope it works well enough).
 > 
-> > So we are left with an attribute that is needed for windows compatibility,
-> > and so just needs to be understood by samba and wine.  Some filesystems might
-> > support it efficiently, others might require the use of generic
-> > extended-attributes, still others might not support it at all (I guess you
-> > store it in some 'tdb' and hope it works well enough).
-> > 
-> > Core-linux doesn't really need to know about this - there just needs to be a
-> > channel to pass it between samba/wine and the filesystem. xattr still seems
-> > the best mechanism to pass this stuff around.  Team-samba can negotiate with
-> > fs developers to optimise/accelerate certain attributes, and linux-VFS
-> > doesn't need to know or care (except maybe to provide generic non-blocking or
-> > multiple-access interfaces).
-> > 
+> Core-linux doesn't really need to know about this - there just needs to be a
+> channel to pass it between samba/wine and the filesystem. xattr still seems
+> the best mechanism to pass this stuff around.  Team-samba can negotiate with
+> fs developers to optimise/accelerate certain attributes, and linux-VFS
+> doesn't need to know or care (except maybe to provide generic non-blocking or
+> multiple-access interfaces).
 > 
-> IIUC, you're saying that we should basically just have samba stuff the
-> current time into an xattr when it creates the file and leave the
-> filesystems alone. If so, I disagree here.
 
-I'm not quite saying that (though there is a temptation).  Some attributes
-are initialised by the filesystem rather than by common code.  i_uid is a
-simple example.  I have no problem with the filesystem initialising the
-storage that is used for this well-known-EA to the current time at creation.
-This would be part of what team-samba negotiated with FS developers.
+IIUC, you're saying that we should basically just have samba stuff the
+current time into an xattr when it creates the file and leave the
+filesystems alone. If so, I disagree here.
 
-> 
-> The problem with treating this as *just* an xattr is that it doesn't
-> account for files that are created outside of samba but are then shared
-> out by it.
+The problem with treating this as *just* an xattr is that it doesn't
+account for files that are created outside of samba but are then shared
+out by it.
 
-If something is created in a different universe, then brought into this one -
-when is its date of birth?  The moment of creation, or the moment of entry
-into this universe?   If both universes have a common time line (altough
-with a 10 year offset) then I guess the former, though I think it is a bit of
-a philosophical point.... :-)
+To handle this correctly, I believe it needs to be initialized by the
+kernel to the current time whenever an inode is created, even if samba
+doesn't create it. After that, it can be treated as just another xattr.
 
-> 
-> To handle this correctly, I believe it needs to be initialized by the
-> kernel to the current time whenever an inode is created, even if samba
-> doesn't create it. After that, it can be treated as just another xattr.
-> 
-Yes, I suspect that would be ideal, and trivial for the fs to implement (it
-has to initialise it to something after all).
-
-i.e. I agree.
-
-NeilBrown
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
