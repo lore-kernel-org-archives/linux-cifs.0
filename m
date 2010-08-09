@@ -1,86 +1,171 @@
-From: Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH 02/18] xstat: Add a pair of system calls to make
- extended  file stats available [ver #6]
-Date: Mon, 9 Aug 2010 09:07:03 +1000
-Message-ID: <20100809090703.304d21c7@notabene>
-References: <alpine.LSU.2.01.1007221228260.6115@obet.zrqbmnf.qr>
-	<20100715021709.5544.64506.stgit@warthog.procyon.org.uk>
-	<20100715021712.5544.44845.stgit@warthog.procyon.org.uk>
-	<30448.1279800887@redhat.com>
-	<E1Obuiy-00C9jr-Al@intern.SerNet.DE>
-	<AANLkTimdFCGSKLn7aGMpBMIauHTsHY7hpAAmpo6uTcnD@mail.gmail.com>
-	<1280524978.2452.9.camel@segv.aura.of.mankind>
-	<20100801092529.5e6ba0e0@corrin.poochiereds.net>
-	<20100805235218.GB31233@jeremy-laptop>
-	<20100806133836.49757af9@notabene>
-	<20100808121208.GA7329@jeremy-laptop>
+From: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 3/8] cifs: add CIFSCheckMFSymlink() as stub
+Date: Mon, 09 Aug 2010 16:04:26 +0200
+Message-ID: <4C600AEA.607@samba.org>
+References: <AANLkTinJ1WRBT_Q3TqOZdMQExV66LSUAPG4c01yK-XRK@mail.gmail.com>	<1280931109-22380-4-git-send-email-metze@samba.org>	<20100804103748.521163e6@tlielax.poochiereds.net>	<4C5AAA3C.1000304@suse.de> <20100805083113.2e7bfbb9@barsoom.rdu.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, utz lehmann <lkml123-4es5y7D8suKELgA04lAiVw@public.gmane.org>,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Jan Engelhardt <jengelh-nopoi9nDyk+ELgA04lAiVw@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsde-kxMDh+IBDuj1P9xLtpHBDw@public.gmane.org
-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100808121208.GA7329@jeremy-laptop>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig737EDAD8209ADFB63DE1BEEC"
+Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20100805083113.2e7bfbb9-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 8 Aug 2010 05:12:09 -0700
-Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig737EDAD8209ADFB63DE1BEEC
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, Aug 06, 2010 at 01:38:36PM +1000, Neil Brown wrote:
-> > I'm curious.  Why do you particularly care what interface the kernel uses to
-> > provide you with access to this attribute?
-> 
-> It's a matter of taste. The *BSD's have this right IMHO. It
-> should be part of the stat information. A file timestamp is not
-> an EA. Making it available that way just feels like an appalingly
-> tasteless kludge. It offends the artist in me :-).
+Hi,
 
-Unfortunately whenever you work on a collaborative project someone has to make
-concessions to taste, as we all taste different.. (or have different taste..
-or something).
+I noticed that I also need to hook the cifs_readdir() path.
 
-So I think it is very important to clearly differentiate the practical issues
-from the aesthetic issues as I think we can hope for unity on the former, but
-never on the latter.
+Can someone tell me how I can construct the file name
+relative to the mount point. The TODO in this change.
 
-> 
-> > Or do you really want something like BSD's 'btime' which as I understand it
-> > cannot be set.  Would that be really useful to you?
-> 
-> It is *already* useful to us, and is widely used in
-> existing code. The occasions when btime is set are
-> relatively rare, and at that point we store it in a
-> separate EA for Windows reporting purposes.
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -679,7 +679,7 @@ static int cifs_get_name_from_search_buf(struct qstr
+*pqst,
+        return rc;
+ }
 
-I'm probably sounding like a scratched record, but when you say "is widely
-used" do you mean "is used in samba which is widely used" or do you mean "is
-used in a wide variety of applications"?
+-static int cifs_filldir(char *pfindEntry, struct file *file, filldir_t
+filldir,
++static int cifs_filldir(int xid, char *pfindEntry, struct file *file,
+filldir_t filldir,
+                        void *direntry, char *scratch_buf, unsigned int
+max_len)
+ {
+        int rc =3D 0;
+@@ -731,6 +731,15 @@ static int cifs_filldir(char *pfindEntry, struct
+file *file, filldir_t filldir,
+                cifs_dir_info_to_fattr(&fattr, (FILE_DIRECTORY_INFO *)
+                                        pfindEntry, cifs_sb);
 
-Because if you are only saying the former, then I don't think we should copy
-BSD, but rather I think we should provide exactly the semantics that are most
-useful to samba - and that would seem to be creation-time and DOS flags which
-the filesystem can store directly in the inode and which samba can access
-cheaply.
-(and I would prefer to use xattrs, but that is a taste thing and as I'm not
-writing the code, I don't get to choose the taste).
++       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
++               int tmprc;
++               const char *full_path =3D qstring.name;
++               /* TODO: build full path relative to the mount point */
++               tmprc =3D CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, =
+xid);
++               if (tmprc)
++                       cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
++       }
++
+        if (inum && (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {=
 
-But if you are saying the later, then sharing those details might help us see
-that copying bsd is actually the best thing to do, or maybe that something
-else is better.
+                fattr.cf_uniqueid =3D inum;
+        } else {
+@@ -856,7 +865,7 @@ int cifs_readdir(struct file *file, void *direntry,
+filldir_t filldir)
+                        }
+                        /* if buggy server returns . and .. late do
+                        we want to check for that here? */
+-                       rc =3D cifs_filldir(current_entry, file,
++                       rc =3D cifs_filldir(xid, current_entry, file,
+                                        filldir, direntry, tmp_buf,
+max_len);
+                        if (rc =3D=3D -EOVERFLOW) {
+                                rc =3D 0;
 
-I'm just afraid that if some new interface is added without clear,
-comprehensive and up-front justification then we will end up getting a
-sub-optimal interface.
+metze
 
-NeilBrown
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Am 05.08.2010 14:31, schrieb Jeff Layton:
+> On Thu, 05 Aug 2010 17:40:36 +0530
+> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+>=20
+>> On 08/04/2010 08:07 PM, Jeff Layton wrote:
+>>> On Wed,  4 Aug 2010 16:11:44 +0200
+>>> Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>>>
+>>>> Signed-off-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>>>> ---
+>>>>  fs/cifs/cifsproto.h |    3 +++
+>>>>  fs/cifs/inode.c     |    7 +++++++
+>>>>  fs/cifs/link.c      |    8 ++++++++
+>>>>  3 files changed, 18 insertions(+), 0 deletions(-)
+>>>>
+>>>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>>>> index 2eaebbd..e94e095 100644
+>>>> --- a/fs/cifs/cifsproto.h
+>>>> +++ b/fs/cifs/cifsproto.h
+>>>> @@ -409,4 +409,7 @@ extern int CIFSSMBSetPosixACL(const int xid, str=
+uct cifsTconInfo *tcon,
+>>>>  extern int CIFSGetExtAttr(const int xid, struct cifsTconInfo *tcon,=
+
+>>>>  			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+>>>>  extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb=
+);
+>>>> +extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
+>>>> +		const unsigned char *path,
+>>>> +		struct cifs_sb_info *cifs_sb, int xid);
+>>>>  #endif			/* _CIFSPROTO_H */
+>>>> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+>>>> index a15b3a9..c4121de 100644
+>>>> --- a/fs/cifs/inode.c
+>>>> +++ b/fs/cifs/inode.c
+>>>> @@ -661,6 +661,13 @@ int cifs_get_inode_info(struct inode **pinode,
+>>>>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
+>>>>  		cifs_sfu_mode(&fattr, full_path, cifs_sb, xid);
+>>>> =20
+>>>> +	/* query for SFU type info if supported and needed */
+>>>> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS) {
+>>>> +		tmprc =3D CIFSCheckMFSymlink(&fattr, full_path, cifs_sb, xid);
+>>>> +		if (tmprc)
+>>>> +			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
+>>>> +	}
+>>>> +
+>>>
+>>> 		^^^^^^^^^^^^^^
+>>>
+>>> This only seems to touch the codepath without posix extensions. What
+>>> about when unix extensions are enabled? The previous patch seems to
+>>> indicate that the behavior is that mfsymlinks are always used when th=
+at
+>>> mount option is used even if unix extensions are enabled. If so, then=
+ I
+>>> think you'll need a similar change in cifs_get_inode_info_unix.
+>>>
+>>
+>> I initially thought so. But, looking again - there is no point in
+>> querying for SFU type info if unix extensions are enabled..?
+>>
+>> Thanks,
+>>
+>=20
+> I'm not sure that addresses the concern. It's very confusing, but:
+>=20
+>     SFU !=3D POSIX extensions
+>=20
+> The SFU codepath goes through the "normal" cifs code
+> (cifs_get_inode_info). The POSIX extensions codepath goes through a
+> different codepath (cifs_get_inode_info_unix). Yes, all of this is
+> sorely in need of being cleaned up, but that's the way it works today..=
+=2E
+>=20
+> Metze's patches seem to indicate that mfsymlinks and unix extensions
+> aren't mutually exclusive. The unix codepaths that determine inode
+> type and fill out inode data should be using the mfsymlink stuff too.
+>=20
+
+
+--------------enig737EDAD8209ADFB63DE1BEEC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAkxgCuoACgkQm70gjA5TCD+GxACeLrbGF52cRPlYvEMcJpA5h7wV
+g9kAn1FfHH299CdWvpcJz1cEQa2qkHRH
+=jszS
+-----END PGP SIGNATURE-----
+
+--------------enig737EDAD8209ADFB63DE1BEEC--
