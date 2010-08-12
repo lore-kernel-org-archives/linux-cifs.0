@@ -1,143 +1,186 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/3] NFS: Use kernel DNS resolver [ver #2]
-Date: Wed, 11 Aug 2010 11:01:19 -0500
-Message-ID: <AANLkTinFOhtSe8nXu1pHbD+vbyFzgsgOqqz7SJ_70bT9@mail.gmail.com>
-References: <20100811083753.19001.28878.stgit@warthog.procyon.org.uk>
+From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Subject: linux-next: build failure after merge of the cifs tree
+Date: Thu, 12 Aug 2010 13:17:41 +1000
+Message-ID: <20100812131741.f3a800d7.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: torvalds-3NddpPZAyC0@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Bryan Schumaker <bjschuma-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__12_Aug_2010_13_17_41_+1000_M6GjAkqiw7jO5yX."
+Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Wang Lei <wang840925-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Bryan Schumaker <bjschuma-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100811083753.19001.28878.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Patches 1 - 3 of this series now in cifs-2.6.git
+--Signature=_Thu__12_Aug_2010_13_17_41_+1000_M6GjAkqiw7jO5yX.
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 11, 2010 at 3:37 AM, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wr=
-ote:
-> From: Bryan Schumaker <bjschuma-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
->
-> Use the kernel DNS resolver to translate hostnames to IP addresses. =A0=
-Create a
-> new config option to choose between the legacy DNS resolver and the n=
-ew
-> resolver.
->
-> Signed-off-by: Bryan Schumaker <bjschuma-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-> Acked-by: Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->
-> =A0fs/nfs/Kconfig =A0 =A0 =A0 | =A0 16 ++++++++++++++++
-> =A0fs/nfs/dns_resolve.c | =A0 24 ++++++++++++++++++++++++
-> =A0fs/nfs/dns_resolve.h | =A0 12 ++++++++++++
-> =A03 files changed, 52 insertions(+), 0 deletions(-)
->
-> diff --git a/fs/nfs/Kconfig b/fs/nfs/Kconfig
-> index cc1bb33..c5bbdca 100644
-> --- a/fs/nfs/Kconfig
-> +++ b/fs/nfs/Kconfig
-> @@ -100,3 +100,19 @@ config NFS_FSCACHE
-> =A0 =A0 =A0 =A0help
-> =A0 =A0 =A0 =A0 =A0Say Y here if you want NFS data to be cached local=
-ly on disc through
-> =A0 =A0 =A0 =A0 =A0the general filesystem cache manager
-> +
-> +config NFS_USE_LEGACY_DNS
-> + =A0 =A0 =A0 bool "Use the legacy NFS DNS resolver"
-> + =A0 =A0 =A0 depends on NFS_V4
-> + =A0 =A0 =A0 help
-> + =A0 =A0 =A0 =A0 The kernel now provides a method for translating a =
-host name into an
-> + =A0 =A0 =A0 =A0 IP address. =A0Select Y here if you would rather us=
-e your own DNS
-> + =A0 =A0 =A0 =A0 resolver script.
-> +
-> + =A0 =A0 =A0 =A0 If unsure, say N
-> +
-> +config NFS_USE_KERNEL_DNS
-> + =A0 =A0 =A0 bool
-> + =A0 =A0 =A0 depends on NFS_V4 && !NFS_USE_LEGACY_DNS
-> + =A0 =A0 =A0 select DNS_RESOLVER
-> + =A0 =A0 =A0 default y
-> diff --git a/fs/nfs/dns_resolve.c b/fs/nfs/dns_resolve.c
-> index 76fd235..dba50a5 100644
-> --- a/fs/nfs/dns_resolve.c
-> +++ b/fs/nfs/dns_resolve.c
-> @@ -6,6 +6,29 @@
-> =A0* Resolves DNS hostnames into valid ip addresses
-> =A0*/
->
-> +#ifdef CONFIG_NFS_USE_KERNEL_DNS
-> +
-> +#include <linux/sunrpc/clnt.h>
-> +#include <linux/dns_resolver.h>
-> +
-> +ssize_t nfs_dns_resolve_name(char *name, size_t namelen,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct sockaddr *sa, size_t salen)
-> +{
-> + =A0 =A0 =A0 ssize_t ret;
-> + =A0 =A0 =A0 char *ip_addr =3D NULL;
-> + =A0 =A0 =A0 int ip_len;
-> +
-> + =A0 =A0 =A0 ip_len =3D dns_query(NULL, name, namelen, NULL, &ip_add=
-r, NULL);
-> + =A0 =A0 =A0 if (ip_len > 0)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 ret =3D rpc_pton(ip_addr, ip_len, sa, s=
-alen);
-> + =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 ret =3D -ESRCH;
-> + =A0 =A0 =A0 kfree(ip_addr);
-> + =A0 =A0 =A0 return ret;
-> +}
-> +
-> +#else
-> +
-> =A0#include <linux/hash.h>
-> =A0#include <linux/string.h>
-> =A0#include <linux/kmod.h>
-> @@ -346,3 +369,4 @@ void nfs_dns_resolver_destroy(void)
-> =A0 =A0 =A0 =A0nfs_cache_unregister(&nfs_dns_resolve);
-> =A0}
->
-> +#endif
-> diff --git a/fs/nfs/dns_resolve.h b/fs/nfs/dns_resolve.h
-> index a3f0938..199bb55 100644
-> --- a/fs/nfs/dns_resolve.h
-> +++ b/fs/nfs/dns_resolve.h
-> @@ -6,8 +6,20 @@
->
-> =A0#define NFS_DNS_HOSTNAME_MAXLEN =A0 =A0 =A0 =A0(128)
->
-> +
-> +#ifdef CONFIG_NFS_USE_KERNEL_DNS
-> +static inline int nfs_dns_resolver_init(void)
-> +{
-> + =A0 =A0 =A0 return 0;
-> +}
-> +
-> +static inline void nfs_dns_resolver_destroy(void)
-> +{}
-> +#else
-> =A0extern int nfs_dns_resolver_init(void);
-> =A0extern void nfs_dns_resolver_destroy(void);
-> +#endif
-> +
-> =A0extern ssize_t nfs_dns_resolve_name(char *name, size_t namelen,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct sockaddr *sa, size_t salen);
->
->
->
+Hi all,
 
+After merging the cifs tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
 
+net/dns_resolver/dns_key.c: In function 'dns_resolver_instantiate':
+net/dns_resolver/dns_key.c:70: error: dereferencing pointer to incomplete t=
+ype
+net/dns_resolver/dns_key.c:70: error: dereferencing pointer to incomplete t=
+ype
+net/dns_resolver/dns_key.c:99: error: dereferencing pointer to incomplete t=
+ype
+net/dns_resolver/dns_key.c:128: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c:136: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c:143: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c:144: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c:149: error: implicit declaration of function 'ke=
+y_payload_reserve'
+net/dns_resolver/dns_key.c:162: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c: In function 'dns_resolver_match':
+net/dns_resolver/dns_key.c:178: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c: In function 'dns_resolver_describe':
+net/dns_resolver/dns_key.c:211: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c:213: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c:217: error: dereferencing pointer to incomplete =
+type
+net/dns_resolver/dns_key.c: At top level:
+net/dns_resolver/dns_key.c:220: error: variable 'key_type_dns_resolver' has=
+ initializer but incomplete type
+net/dns_resolver/dns_key.c:221: error: unknown field 'name' specified in in=
+itializer
+net/dns_resolver/dns_key.c:221: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:221: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c:222: error: unknown field 'instantiate' specifie=
+d in initializer
+net/dns_resolver/dns_key.c:222: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:222: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c:223: error: unknown field 'match' specified in i=
+nitializer
+net/dns_resolver/dns_key.c:223: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:223: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c:224: error: unknown field 'revoke' specified in =
+initializer
+net/dns_resolver/dns_key.c:224: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:224: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c:225: error: unknown field 'destroy' specified in=
+ initializer
+net/dns_resolver/dns_key.c:225: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:225: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c:226: error: unknown field 'describe' specified i=
+n initializer
+net/dns_resolver/dns_key.c:226: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:226: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c:227: error: unknown field 'read' specified in in=
+itializer
+net/dns_resolver/dns_key.c:227: warning: excess elements in struct initiali=
+zer
+net/dns_resolver/dns_key.c:227: warning: (near initialization for 'key_type=
+_dns_resolver')
+net/dns_resolver/dns_key.c: In function 'init_dns_resolver':
+net/dns_resolver/dns_key.c:237: error: invalid use of undefined type 'struc=
+t key_type'
+net/dns_resolver/dns_key.c:249: error: implicit declaration of function 'ke=
+y_alloc'
+net/dns_resolver/dns_key.c:249: error: 'key_type_keyring' undeclared (first=
+ use in this function)
+net/dns_resolver/dns_key.c:249: error: (Each undeclared identifier is repor=
+ted only once
+net/dns_resolver/dns_key.c:249: error: for each function it appears in.)
+net/dns_resolver/dns_key.c:250: error: 'KEY_POS_ALL' undeclared (first use =
+in this function)
+net/dns_resolver/dns_key.c:250: error: 'KEY_POS_SETATTR' undeclared (first =
+use in this function)
+net/dns_resolver/dns_key.c:251: error: 'KEY_USR_VIEW' undeclared (first use=
+ in this function)
+net/dns_resolver/dns_key.c:251: error: 'KEY_USR_READ' undeclared (first use=
+ in this function)
+net/dns_resolver/dns_key.c:252: error: 'KEY_ALLOC_NOT_IN_QUOTA' undeclared =
+(first use in this function)
+net/dns_resolver/dns_key.c:258: error: implicit declaration of function 'ke=
+y_instantiate_and_link'
+net/dns_resolver/dns_key.c:262: error: implicit declaration of function 're=
+gister_key_type'
+net/dns_resolver/dns_key.c:268: error: 'struct cred' has no member named 't=
+hread_keyring'
+net/dns_resolver/dns_key.c:269: error: 'struct cred' has no member named 'j=
+it_keyring'
+net/dns_resolver/dns_key.c: In function 'exit_dns_resolver':
+net/dns_resolver/dns_key.c:285: error: implicit declaration of function 'un=
+register_key_type'
+net/dns_resolver/dns_key.c:288: error: invalid use of undefined type 'struc=
+t key_type'
+net/dns_resolver/dns_query.c: In function 'dns_query':
+net/dns_resolver/dns_query.c:124: error: implicit declaration of function '=
+request_key'
+net/dns_resolver/dns_query.c:124: warning: assignment makes pointer from in=
+teger without a cast
+net/dns_resolver/dns_query.c:132: error: dereferencing pointer to incomplet=
+e type
+net/dns_resolver/dns_query.c:133: error: dereferencing pointer to incomplet=
+e type
+net/dns_resolver/dns_query.c:133: error: 'KEY_USR_VIEW' undeclared (first u=
+se in this function)
+net/dns_resolver/dns_query.c:133: error: (Each undeclared identifier is rep=
+orted only once
+net/dns_resolver/dns_query.c:133: error: for each function it appears in.)
+net/dns_resolver/dns_query.c:140: error: dereferencing pointer to incomplet=
+e type
+net/dns_resolver/dns_query.c:144: error: dereferencing pointer to incomplet=
+e type
+net/dns_resolver/dns_query.c:155: error: dereferencing pointer to incomplet=
+e type
+net/dns_resolver/dns_query.c:159: error: dereferencing pointer to incomplet=
+e type
 
+Presumably this code has not been built on powerpc before.  Casued by
+commit 1a4240f4764ac78adbf4b0ebb49b3bd8c72ffa11 ("DNS: Separate out CIFS
+DNS Resolver code") (and the build was probably enabled by commit
+c2e8139c9f797baa46515af6d350c51823736cbb ("NFS: Use kernel DNS resolver
+[ver #2]").
+
+I can only imagine that linux/key.h is included indirectly on x86.
+
+I have used the version of cifs tree from next-20100811 for today.
 --=20
-Thanks,
+Cheers,
+Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
+http://www.canb.auug.org.au/~sfr/
 
-Steve
+--Signature=_Thu__12_Aug_2010_13_17_41_+1000_M6GjAkqiw7jO5yX.
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQEcBAEBAgAGBQJMY2fVAAoJEDMEi1NhKgbshz8H/3m6+hYkiPGg8OjlzRJgupHp
+FmDNLNA+E0LZlVT4JblNMaS+LrgRKdaC4MYOHt8pbkMtfN2n9Rfx1qKv82uIgvuh
+XbSGPwKxhgYUDQyPaRPu9+6oHPbLwJ5Hd1ayrNDmsLnyJG0M+AD8QniPkEeQU3XM
+yk9bA4x7ZoUJKSUC/QZ/fkNB+xs2drNHRlinf/PdiaJqb83KZ9fYt+J7ukwZXA1T
+ofS5UUKJghn5uQGDPn+LbWmt25sskibDbdUvm3HurRSDbCossr4AC4dlh+eVCk1j
+tjwavAVFnF+p3YxwumT2TlYrMP+Pf+xtMEL4vCqAKOtBcCxbIPdXtDi98dxQUYA=
+=GlKf
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__12_Aug_2010_13_17_41_+1000_M6GjAkqiw7jO5yX.--
