@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH 11/15] cifs: have find_readable/writable_file filter by fsuid
-Date: Fri, 20 Aug 2010 15:32:07 -0400
-Message-ID: <1282332731-17444-12-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 02/15] cifs: add tcon field to cifsFileInfo struct
+Date: Fri, 20 Aug 2010 15:31:58 -0400
+Message-ID: <1282332731-17444-3-git-send-email-jlayton@redhat.com>
 References: <1282332731-17444-1-git-send-email-jlayton@redhat.com>
 Cc: linux-fsdevel@vger.kernel.org
 To: linux-cifs@vger.kernel.org
@@ -10,206 +10,41 @@ In-Reply-To: <1282332731-17444-1-git-send-email-jlayton@redhat.com>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-When we implement multiuser mounts, we'll need to filter filehandles
-by fsuid. Add a flag for multiuser mounts and code to filter by
-fsuid when it's set.
+Eventually, we'll have more than one tcon per superblock. At that point,
+we'll need to know which one is associated with a particular fid. For
+now, this is just set from the cifs_sb->tcon pointer, but eventually
+the caller of cifs_new_fileinfo will pass a tcon pointer in.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/cifs/cifs_fs_sb.h |    3 ++-
- fs/cifs/cifsacl.c    |    4 ++--
- fs/cifs/cifsproto.h  |    4 ++--
- fs/cifs/dir.c        |    1 +
- fs/cifs/file.c       |   30 +++++++++++++++++++++++-------
- fs/cifs/inode.c      |    6 +++---
- 6 files changed, 33 insertions(+), 15 deletions(-)
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/dir.c      |    1 +
+ 2 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 6302a06..8bade43 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -36,6 +36,7 @@
- #define CIFS_MOUNT_NOPOSIXBRL   0x2000 /* mandatory not posix byte range lock */
- #define CIFS_MOUNT_NOSSYNC      0x4000 /* don't do slow SMBflush on every sync*/
- #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
-+#define CIFS_MOUNT_MULTIUSER	0x10000 /* multiuser mount */
- 
- struct cifs_sb_info {
- 	struct cifsTconInfo *ptcon;	/* primary mount */
-@@ -47,7 +48,7 @@ struct cifs_sb_info {
- 	gid_t	mnt_gid;
- 	mode_t	mnt_file_mode;
- 	mode_t	mnt_dir_mode;
--	int     mnt_cifs_flags;
-+	unsigned int mnt_cifs_flags;
- 	int	prepathlen;
- 	char   *prepath; /* relative path under the share to mount to */
- #ifdef CONFIG_CIFS_DFS_UPCALL
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 2647ea4..c9b4792 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -615,7 +615,7 @@ static struct cifs_ntsd *get_cifs_acl(struct cifs_sb_info *cifs_sb,
- 	struct cifsFileInfo *open_file = NULL;
- 
- 	if (inode)
--		open_file = find_readable_file(CIFS_I(inode));
-+		open_file = find_readable_file(CIFS_I(inode), true);
- 	if (!open_file)
- 		return get_cifs_acl_by_path(cifs_sb, path, pacllen);
- 
-@@ -685,7 +685,7 @@ static int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
- 
- 	cFYI(DBG2, "set ACL for %s from mode 0x%x", path, inode->i_mode);
- 
--	open_file = find_readable_file(CIFS_I(inode));
-+	open_file = find_readable_file(CIFS_I(inode), true);
- 	if (!open_file)
- 		return set_cifs_acl_by_path(cifs_sb, path, pnntsd, acllen);
- 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 493bca8..e0ad4ec 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -78,9 +78,9 @@ extern int checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length);
- extern bool is_valid_oplock_break(struct smb_hdr *smb,
- 				  struct TCP_Server_Info *);
- extern bool is_size_safe_to_change(struct cifsInodeInfo *, __u64 eof);
--extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *);
-+extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, bool);
- #ifdef CONFIG_CIFS_EXPERIMENTAL
--extern struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *);
-+extern struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *, bool);
- #endif
- extern unsigned int smbCalcSize(struct smb_hdr *ptr);
- extern unsigned int smbCalcSize_LE(struct smb_hdr *ptr);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ce6538a..6bd88b9 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -348,6 +348,7 @@ struct cifsFileInfo {
+ 	struct file *pfile; /* needed for writepage */
+ 	struct inode *pInode; /* needed for oplock break */
+ 	struct vfsmount *mnt;
++	struct cifsTconInfo *tcon;
+ 	struct mutex lock_mutex;
+ 	struct list_head llist; /* list of byte range locks we have. */
+ 	bool closePend:1;	/* file is marked to close */
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index bea578f..546a17c 100644
+index f9ed075..e5dc1e8 100644
 --- a/fs/cifs/dir.c
 +++ b/fs/cifs/dir.c
-@@ -148,6 +148,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
- 
- 	pCifsFile->netfid = fileHandle;
- 	pCifsFile->pid = current->tgid;
-+	pCifsFile->uid = current_fsuid();
- 	pCifsFile->pInode = igrab(newinode);
- 	pCifsFile->mnt = mnt;
+@@ -153,6 +153,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle,
  	pCifsFile->pfile = file;
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 1ac808b..9d871e3 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1168,9 +1168,15 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- }
- 
- #ifdef CONFIG_CIFS_EXPERIMENTAL
--struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode)
-+struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
-+					bool fsuid_only)
- {
- 	struct cifsFileInfo *open_file = NULL;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(cifs_inode->vfs_inode.i_sb);
-+
-+	/* only filter by fsuid on multiuser mounts */
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-+		fsuid_only = false;
- 
- 	read_lock(&GlobalSMBSeslock);
- 	/* we could simply get the first_list_entry since write-only entries
-@@ -1179,6 +1185,8 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode)
- 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
- 		if (open_file->closePend)
- 			continue;
-+		if (fsuid_only && open_file->uid != current_fsuid())
-+			continue;
- 		if (open_file->pfile && ((open_file->pfile->f_flags & O_RDWR) ||
- 		    (open_file->pfile->f_flags & O_RDONLY))) {
- 			if (!open_file->invalidHandle) {
-@@ -1198,9 +1206,11 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode)
- }
- #endif
- 
--struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode)
-+struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
-+					bool fsuid_only)
- {
- 	struct cifsFileInfo *open_file;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(cifs_inode->vfs_inode.i_sb);
- 	bool any_available = false;
- 	int rc;
- 
-@@ -1214,13 +1224,19 @@ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode)
- 		return NULL;
- 	}
- 
-+	/* only filter by fsuid on multiuser mounts */
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-+		fsuid_only = false;
-+
- 	read_lock(&GlobalSMBSeslock);
- refind_writable:
- 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
--		if (open_file->closePend ||
--		    (!any_available && open_file->pid != current->tgid))
-+		if (open_file->closePend)
-+			continue;
-+		if (!any_available && open_file->pid != current->tgid)
-+			continue;
-+		if (fsuid_only && open_file->uid != current_fsuid())
- 			continue;
--
- 		if (open_file->pfile &&
- 		    ((open_file->pfile->f_flags & O_RDWR) ||
- 		     (open_file->pfile->f_flags & O_WRONLY))) {
-@@ -1315,7 +1331,7 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 	if (mapping->host->i_size - offset < (loff_t)to)
- 		to = (unsigned)(mapping->host->i_size - offset);
- 
--	open_file = find_writable_file(CIFS_I(mapping->host));
-+	open_file = find_writable_file(CIFS_I(mapping->host), false);
- 	if (open_file) {
- 		bytes_written = cifs_write(open_file->pfile, write_data,
- 					   to-from, &offset);
-@@ -1388,7 +1404,7 @@ static int cifs_writepages(struct address_space *mapping,
- 	 * but it'll at least handle the return. Maybe it should be
- 	 * a BUG() instead?
- 	 */
--	open_file = find_writable_file(CIFS_I(mapping->host));
-+	open_file = find_writable_file(CIFS_I(mapping->host), false);
- 	if (!open_file) {
- 		kfree(iov);
- 		return generic_writepages(mapping, wbc);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index c0bf0dc..026d7dd 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -955,7 +955,7 @@ cifs_set_file_info(struct inode *inode, struct iattr *attrs, int xid,
- 	/*
- 	 * If the file is already open for write, just use that fileid
- 	 */
--	open_file = find_writable_file(cifsInode);
-+	open_file = find_writable_file(cifsInode, true);
- 	if (open_file) {
- 		netfid = open_file->netfid;
- 		netpid = open_file->pid;
-@@ -1805,7 +1805,7 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
- 	 * writebehind data than the SMB timeout for the SetPathInfo
- 	 * request would allow
- 	 */
--	open_file = find_writable_file(cifsInode);
-+	open_file = find_writable_file(cifsInode, true);
- 	if (open_file) {
- 		__u16 nfid = open_file->netfid;
- 		__u32 npid = open_file->pid;
-@@ -1970,7 +1970,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 		args->ctime = NO_CHANGE_64;
- 
- 	args->device = 0;
--	open_file = find_writable_file(cifsInode);
-+	open_file = find_writable_file(cifsInode, true);
- 	if (open_file) {
- 		u16 nfid = open_file->netfid;
- 		u32 npid = open_file->pid;
+ 	pCifsFile->invalidHandle = false;
+ 	pCifsFile->closePend = false;
++	pCifsFile->tcon = cifs_sb->tcon;
+ 	mutex_init(&pCifsFile->fh_mutex);
+ 	mutex_init(&pCifsFile->lock_mutex);
+ 	INIT_LIST_HEAD(&pCifsFile->llist);
 -- 
 1.7.2.1
 
