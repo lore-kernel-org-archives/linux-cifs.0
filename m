@@ -1,470 +1,354 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH 13/15] cifs: add routines to build sessions and tcons on the fly
-Date: Fri, 20 Aug 2010 15:32:09 -0400
-Message-ID: <1282332731-17444-14-git-send-email-jlayton@redhat.com>
-References: <1282332731-17444-1-git-send-email-jlayton@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org
-To: linux-cifs@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1282332731-17444-1-git-send-email-jlayton@redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 2/2] cifs: infrastructure for stashing passwords in
+ keyring
+Date: Sat, 21 Aug 2010 06:53:17 -0400
+Message-ID: <20100821065317.46d2d8de@tlielax.poochiereds.net>
+References: <1282249633-27756-1-git-send-email-jaxbrigs@gmail.com>
+	<1282249633-27756-2-git-send-email-jaxbrigs@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Igor Druzhinin <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1282249633-27756-2-git-send-email-jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-This patch is rather large, but it's a bit difficult to do piecemeal...
+On Fri, 20 Aug 2010 00:27:13 +0400
+Igor Druzhinin <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-For non-multiuser mounts, everything will basically work as it does
-today. A call to cifs_sb_tlink will return the "master" tcon link.
+> This is a kernel part of a new infrastructure for stashing passwords
+> in kernel keyring per user basis. Keys of "user" type with passwords
+> are protected from disclosure and stored in uid-specific keyring.
+> Search is happens according to the key description in format
+> cifscreds:ip:username:[domainname]. In a case if user has given
+> credentials otherwise search doesn't happen.
+> 
+> Signed-off-by: Igor Druzhinin  <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/Makefile    |    2 +-
+>  fs/cifs/cifscreds.c |  192 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/cifscreds.h |   34 +++++++++
+>  fs/cifs/connect.c   |   13 ++++
+>  4 files changed, 240 insertions(+), 1 deletions(-)
+>  create mode 100644 fs/cifs/cifscreds.c
+>  create mode 100644 fs/cifs/cifscreds.h
+> 
+> diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+> index adefa60..babab37 100644
+> --- a/fs/cifs/Makefile
+> +++ b/fs/cifs/Makefile
+> @@ -6,7 +6,7 @@ obj-$(CONFIG_CIFS) += cifs.o
+>  cifs-y := cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o inode.o \
+>  	  link.o misc.o netmisc.o smbdes.o smbencrypt.o transport.o asn1.o \
+>  	  md4.o md5.o cifs_unicode.o nterr.o xattr.o cifsencrypt.o \
+> -	  readdir.o ioctl.o sess.o export.o cifsacl.o
+> +	  readdir.o ioctl.o sess.o export.o cifsacl.o cifscreds.o
+>  
+>  cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
+>  
+> diff --git a/fs/cifs/cifscreds.c b/fs/cifs/cifscreds.c
+> new file mode 100644
+> index 0000000..828631f
+> --- /dev/null
+> +++ b/fs/cifs/cifscreds.c
+> @@ -0,0 +1,192 @@
+> +/*
+> + *   fs/cifs/cifscreds.c - CIFS credentinals stashing rountine
+> + *
+> + *   Copyright (c) 2010 Igor Druzhinin
+> + *   Copyright (c) 2010 Jeff Layton
+> + *   Author(s): Igor Druzhinin (jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org)
+> + *		Jeff Layton (jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
+> + *
+> + *   This library is free software; you can redistribute it and/or modify
+> + *   it under the terms of the GNU Lesser General Public License as published
+> + *   by the Free Software Foundation; either version 2.1 of the License, or
+> + *   (at your option) any later version.
+> + *
+> + *   This library is distributed in the hope that it will be useful,
+> + *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+> + *   the GNU Lesser General Public License for more details.
+> + *
+> + *   You should have received a copy of the GNU Lesser General Public License
+> + *   along with this library; if not, write to the Free Software
+> + *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+> + */
+> +#include <linux/slab.h>
+> +#include <linux/string.h>
+> +#include <linux/ctype.h>
+> +#include <linux/inet.h>
+> +#include <linux/key.h>
+> +#include <linux/keyctl.h>
+> +#include <linux/key-type.h>
+> +#include <keys/keyring-type.h>
+> +#include <keys/user-type.h>
+> +#include "cifsglob.h"
+> +#include "cifs_debug.h"
+> +#include "cifscreds.h"
+> +
+> +/* create key description from given credentials */
+> +static char *
+> +create_key_description(const char *addr, const char *user,
+> +			const char *domain, char *desc)
+> +{
+> +	char *str_end;
+> +	int str_len;
+> +
+> +	sprintf(desc, "%s:%s:%s:", CIFSCREDS_PROG_NAME, addr, user);
+> +
+> +	if (domain != NULL) {
+> +		str_end = desc + strlen(desc);
+> +		str_len = strlen(domain);
+> +		while (str_len--) {
+> +			*str_end = tolower(*domain++);
+> +			str_end++;
+> +		}
+> +		*str_end = '\0';
+> +	}
+> +
+> +	return desc;
+> +}
+> +
+> +/*
+> + * searching for requested key in the uid or session specific keyring
+> + * according to DEST_KEYRING macro. After all operations with key caller
+> + * must do key_put()
+> + */
+> +static struct key *
+> +cifs_key_search(const char *addr, const char *user, const char *domain)
+> +{
+> +	char *desc;
+> +	struct key *keyring, *key;
+> +	struct keyring_list *klist;
+> +	int loop;
+> +
+> +	switch (DEST_KEYRING) {
+> +	case KEY_SPEC_USER_KEYRING:
+> +		keyring = current_user()->uid_keyring;
+> +		break;
+> +
+> +	case KEY_SPEC_SESSION_KEYRING:
+> +		keyring = current_user()->session_keyring;
+> +		break;
+> +
+> +	default:
+> +		printk(KERN_WARNING "CIFS creds: unsupported keyring\n");
+> +		return NULL;
+> +	}
+> +	if (keyring == NULL) {
+> +		cFYI(1, "CIFS creds: keyring is not installed");
+> +		return NULL;
+> +	}
+> +
+> +	desc = kmalloc(INET6_ADDRSTRLEN + 200 + 256 + \
+> +			sizeof(CIFSCREDS_PROG_NAME) + 3, GFP_KERNEL);
 
-Turn the tcon pointer in the cifs_sb into a radix tree that uses the
-fsuid of the process as a key. The value is a new "tcon_link" struct
-that contains info about a tcon that's under construction.
+There are a lot of magic numbers in the above. I think these should be
+turned into #define'd constants. Alternately, you could declare a
+"DESC_LENGTH" near the top of the file and add a comment that describes
+what each piece of the length refers to.
 
-When a new process needs a tcon, it'll call cifs_sb_tcon. That will
-then look up the tcon_link in the radix tree. If it exists and is
-valid, it's returned.
+> +	if (desc == NULL) {
+> +		printk(KERN_WARNING "CIFS creds: no memory for description\n");
+> +		return NULL;
+> +	}
+> +
+> +	create_key_description(addr, user, domain, desc);
+> +	cFYI(1, "CIFS creds: key description: %s for uid:%d",
+> +		desc, current_uid());
+> +
+> +	klist = rcu_dereference_protected(keyring->payload.subscriptions,
+> +		rwsem_is_locked((struct rw_semaphore *)&keyring->sem));
+> +	if (klist) {
+> +		for (loop = 0; loop < klist->nkeys; loop++) {
+> +			key = klist->keys[loop];
+> +
+> +			if (key->type == &key_type_user &&
+> +				(!key->type->match ||
+> +				key->type->match(key, desc)) &&
+> +				!test_bit(KEY_FLAG_REVOKED, &key->flags)
+> +			)
+> +				goto key_search_found;
+> +		}
+> +	}
 
-If it doesn't exist, then we stuff a new tcon_link into the tree and
-mark it as pending and then go and try to build the session/tcon.
-If that works, the tcon pointer in the tcon_link is updated and the
-pending flag is cleared.
+I'm not clear on the need for the above loop -- is there some reason
+to not just use request_key() here? If you're concerned about limiting
+the search to specific keyrings, then there may be interfaces that
+handle that already or they can be added to the keyring code. I'm not
+convinced that we need to worry about that however.
 
-If the construction fails, then we set the tcon pointer to an ERR_PTR
-and clear the pending flag.
+> +	kfree(desc);
+> +	return NULL;
+> +
+> +key_search_found:
+> +	atomic_inc(&key->usage);
+> +	kfree(desc);
+> +	return key;
+> +}
+> +
+> +/* read and copy key data to kernel buffer */
+> +static long cifs_key_read(const struct key *key, char *buffer, size_t buflen)
+> +{
+> +	struct user_key_payload *upayload;
+> +	long ret;
+> +
+> +	upayload = rcu_dereference_protected(key->payload.data,
+> +		rwsem_is_locked(&((struct key *)key)->sem));
+> +	ret = upayload->datalen;
+> +
 
-If the radix tree is searched and the tcon_link is marked pending
-then we go to sleep and wait for the pending flag to be cleared.
+You have a reference to the key here, right? Is there any need for the
+rcu stuff above?
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/cifs/cifs_fs_sb.h |    7 +-
- fs/cifs/cifsglob.h   |   31 ++----
- fs/cifs/connect.c    |  272 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 282 insertions(+), 28 deletions(-)
+> +	/* we can return the data as is */
+> +	if (buffer && buflen > 0) {
+> +		if (buflen > upayload->datalen)
+> +			buflen = upayload->datalen;
+> +
+> +		if (memcpy(buffer, upayload->data, buflen) == NULL)
+> +			ret = -EFAULT;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +/**
+> + * cifs_get_key_password - Reading password from the keyring
+> + *		according to provided description.
+> + * @addr: IP address of target server.
+> + * @user: Name of the intrested user.
+> + * @domain: Possible domain name. Can be NULL.
+> + *
+> + * Returns the pointer to password or NULL, and the caller is
+> + * responsible for freeing it.
+> + */
+> +char *
+> +cifs_get_key_password(const char *addr, const char *user, const char *domain)
+> +{
+> +	struct key *pass_key;
+> +	char *key_password = NULL;
+> +	long pass_len;
+> +
+> +	pass_key = cifs_key_search(addr, user, domain);
+> +	if (pass_key == NULL) {
+> +		cFYI(1, "CIFS creds: Appropriate key for %s not found",	addr);
+> +		return NULL;
+> +	}
+> +
+> +	pass_len = cifs_key_read(pass_key, NULL, 0);
+> +	if (pass_len == 0) {
+> +		cFYI(1, "CIFS creds: Password key for %s is empty", addr);
+> +		goto no_key_password;
+> +	}
+> +
+> +	key_password = kzalloc(pass_len, GFP_KERNEL);
+> +	if (key_password == NULL) {
+> +		printk(KERN_WARNING "CIFS creds: no memory for password\n");
+> +		goto no_key_password;
+> +	}
+> +
+> +	pass_len = cifs_key_read(pass_key, key_password, pass_len);
+> +	if (pass_len < 0) {
+> +		printk(KERN_WARNING "CIFS creds: unable to read key's "
+> +			"payload for %s\n", addr);
+> +		kzfree(key_password);
+> +		key_password = NULL;
+> +	}
+> +
+> +no_key_password:
+> +	key_put(pass_key);
+> +	return key_password;
+> +}
+> diff --git a/fs/cifs/cifscreds.h b/fs/cifs/cifscreds.h
+> new file mode 100644
+> index 0000000..466ecf9
+> --- /dev/null
+> +++ b/fs/cifs/cifscreds.h
+> @@ -0,0 +1,34 @@
+> +/*
+> + *   fs/cifs/cifscreds.c - CIFS credentinals stashing rountine definition
+> + *
+> + *   Copyright (c) 2010 Igor Druzhinin
+> + *   Copyright (c) 2010 Jeff Layton
+> + *   Author(s): Igor Druzhinin (jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org)
+> + *		Jeff Layton (jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
+> + *
+> + *   This library is free software; you can redistribute it and/or modify
+> + *   it under the terms of the GNU Lesser General Public License as published
+> + *   by the Free Software Foundation; either version 2.1 of the License, or
+> + *   (at your option) any later version.
+> + *
+> + *   This library is distributed in the hope that it will be useful,
+> + *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+> + *   the GNU Lesser General Public License for more details.
+> + *
+> + *   You should have received a copy of the GNU Lesser General Public License
+> + *   along with this library; if not, write to the Free Software
+> + *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+> + */
+> +#ifndef _CIFSCREDS_H
+> +#define _CIFSCREDS_H
+> +
+> +#include <linux/keyctl.h>
+> +
+> +#define CIFSCREDS_PROG_NAME "cifscreds"
+> +#define DEST_KEYRING KEY_SPEC_USER_KEYRING
+> +
+> +extern char *
+> +cifs_get_key_password(const char *addr,	const char *user, const char *domain);
+> +
+> +#endif /* _CIFSCREDS_H */
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 95c2ea6..ef4371e 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -49,6 +49,7 @@
+>  #include "rfc1002pdu.h"
+>  #include "cn_cifs.h"
+>  #include "fscache.h"
+> +#include "cifscreds.h"
+>  
+>  #define CIFS_PORT 445
+>  #define RFC1001_PORT 139
+> @@ -2568,6 +2569,7 @@ cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
+>  	struct TCP_Server_Info *srvTcp;
+>  	char   *full_path;
+>  	char *mount_data = mount_data_global;
+> +	char *key_password;
+>  #ifdef CONFIG_CIFS_DFS_UPCALL
+>  	struct dfs_info3_param *referrals = NULL;
+>  	unsigned int num_referrals = 0;
+> @@ -2622,6 +2624,17 @@ try_mount_again:
+>  	}
+>  	cifs_sb->local_nls = volume_info->local_nls;
+>  
+> +	/* search for key with password and read its payload */
+> +	if (volume_info->password == NULL &&
+> +		!(volume_info->secFlg & CIFSSEC_MAY_KRB5)
+> +	) {
+> +		key_password = cifs_get_key_password(volume_info->UNCip,
+> +						volume_info->username,
+> +						volume_info->domainname);
+> +		if (key_password != NULL)
+> +			volume_info->password = key_password;
+> +	}
+> +
+>  	/* get a reference to a tcp session */
+>  	srvTcp = cifs_get_tcp_session(volume_info);
+>  	if (IS_ERR(srvTcp)) {
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 8bade43..6b3f6a3 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -15,6 +15,8 @@
-  *   the GNU Lesser General Public License for more details.
-  *
-  */
-+#include <linux/radix-tree.h>
-+
- #ifndef _CIFS_FS_SB_H
- #define _CIFS_FS_SB_H
- 
-@@ -39,8 +41,9 @@
- #define CIFS_MOUNT_MULTIUSER	0x10000 /* multiuser mount */
- 
- struct cifs_sb_info {
--	struct cifsTconInfo *ptcon;	/* primary mount */
--	struct list_head nested_tcon_q;
-+	struct radix_tree_root tlink_tree;
-+#define CIFS_TLINK_MASTER_TAG		0	/* tcon is "master" (mount) tcon */
-+	spinlock_t tlink_tree_lock;
- 	struct nls_table *local_nls;
- 	unsigned int rsize;
- 	unsigned int wsize;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index cdd3d7a..08f1b73 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -314,33 +314,30 @@ struct cifsTconInfo {
-  * "get" on the container.
-  */
- struct tcon_link {
--	spinlock_t		tl_lock;
--	u32			tl_count;
--	u64			tl_time;
-+	unsigned long		tl_index;
-+	unsigned long		tl_flags;
-+#define TCON_LINK_PENDING	0
-+#define TCON_LINK_IN_TREE	1
-+	unsigned long		tl_time;
-+	atomic_t		tl_count;
- 	struct cifsTconInfo	*tl_tcon;
- };
- 
--static inline struct tcon_link *
--cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
--{
--	return (struct tcon_link *)cifs_sb->ptcon;
--}
-+extern struct tcon_link *cifs_sb_tlink(struct cifs_sb_info *cifs_sb);
- 
- static inline struct cifsTconInfo *
- tlink_tcon(struct tcon_link *tlink)
- {
--	return (struct cifsTconInfo *)tlink;
-+	return tlink->tl_tcon;
- }
- 
--static inline void
--cifs_put_tlink(struct tcon_link *tlink)
--{
--	return;
--}
-+extern void cifs_put_tlink(struct tcon_link *tlink); 
- 
- static inline struct tcon_link *
- cifs_get_tlink(struct tcon_link *tlink)
- {
-+	if (tlink && !IS_ERR(tlink))
-+		atomic_inc(&tlink->tl_count);
- 	return tlink;
- }
- 
-@@ -450,11 +447,7 @@ CIFS_SB(struct super_block *sb)
- }
- 
- /* This function is always expected to succeed */
--static inline struct cifsTconInfo *
--cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb)
--{
--	return cifs_sb->ptcon;
--}
-+extern struct cifsTconInfo *cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb);
- 
- static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
- {
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 2fd2fe9..da861c1 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -108,6 +108,9 @@ struct smb_vol {
- 	struct nls_table *local_nls;
- };
- 
-+#define TLINK_ERROR_EXPIRE	(1 * HZ)
-+
-+
- static int ipv4_connect(struct TCP_Server_Info *server);
- static int ipv6_connect(struct TCP_Server_Info *server);
- 
-@@ -1930,6 +1933,23 @@ out_fail:
- 	return ERR_PTR(rc);
- }
- 
-+void
-+cifs_put_tlink(struct tcon_link *tlink)
-+{
-+	if (!tlink || IS_ERR(tlink))
-+		return;
-+
-+	if (!atomic_dec_and_test(&tlink->tl_count) ||
-+	    test_bit(TCON_LINK_IN_TREE, &tlink->tl_flags)) {
-+		tlink->tl_time = jiffies;
-+		return;
-+	}
-+
-+	if (!IS_ERR(tlink_tcon(tlink)))
-+		cifs_put_tcon(tlink_tcon(tlink));
-+	kfree(tlink);
-+	return;
-+}
- 
- int
- get_dfs_path(int xid, struct cifsSesInfo *pSesInfo, const char *old_path,
-@@ -2569,6 +2589,7 @@ cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
- 	struct TCP_Server_Info *srvTcp;
- 	char   *full_path;
- 	char *mount_data = mount_data_global;
-+	struct tcon_link *tlink;
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	struct dfs_info3_param *referrals = NULL;
- 	unsigned int num_referrals = 0;
-@@ -2580,6 +2601,7 @@ try_mount_again:
- 	pSesInfo = NULL;
- 	srvTcp = NULL;
- 	full_path = NULL;
-+	tlink = NULL;
- 
- 	xid = GetXid();
- 
-@@ -2655,8 +2677,6 @@ try_mount_again:
- 		goto remote_path_check;
- 	}
- 
--	cifs_sb->ptcon = tcon;
--
- 	/* do not care if following two calls succeed - informational */
- 	if (!tcon->ipc) {
- 		CIFSSMBQFSDeviceInfo(xid, tcon);
-@@ -2765,6 +2785,34 @@ remote_path_check:
- #endif
- 	}
- 
-+	if (rc)
-+		goto mount_fail_check;
-+
-+	/* now, hang the tcon off of the superblock */
-+	tlink = kzalloc(sizeof *tlink, GFP_KERNEL);
-+	if (tlink == NULL) {
-+		rc = -ENOMEM;
-+		goto mount_fail_check;
-+	}
-+
-+	tlink->tl_index = pSesInfo->linux_uid;
-+	tlink->tl_tcon = tcon;
-+	tlink->tl_time = jiffies;
-+	set_bit(TCON_LINK_IN_TREE, &tlink->tl_flags);
-+
-+	rc = radix_tree_preload(GFP_KERNEL);
-+	if (rc == -ENOMEM) {
-+		kfree(tlink);
-+		goto mount_fail_check;
-+	}
-+
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	radix_tree_insert(&cifs_sb->tlink_tree, pSesInfo->linux_uid, tlink);
-+	radix_tree_tag_set(&cifs_sb->tlink_tree, pSesInfo->linux_uid,
-+			   CIFS_TLINK_MASTER_TAG);
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
-+	radix_tree_preload_end();
-+
- mount_fail_check:
- 	/* on error free sesinfo and tcon struct if needed */
- 	if (rc) {
-@@ -2951,19 +2999,37 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
- int
- cifs_umount(struct super_block *sb, struct cifs_sb_info *cifs_sb)
- {
--	int rc = 0;
-+	int i, ret;
- 	char *tmp;
--	struct cifsTconInfo *tcon = cifs_sb_master_tcon(cifs_sb);
-+	struct tcon_link *tlink[8];
-+	unsigned long index = 0;
-+
-+	while (1) {
-+		spin_lock(&cifs_sb->tlink_tree_lock);
-+		ret = radix_tree_gang_lookup(&cifs_sb->tlink_tree,
-+					     (void **)tlink, index,
-+					     ARRAY_SIZE(tlink));
-+		for (i = 0; i < ret; i++) {
-+			cifs_get_tlink(tlink[i]);
-+			clear_bit(TCON_LINK_IN_TREE, &tlink[i]->tl_flags);
-+			radix_tree_delete(&cifs_sb->tlink_tree,
-+							tlink[i]->tl_index);
-+		}
-+		spin_unlock(&cifs_sb->tlink_tree_lock);
-+
-+		for (i = 0; i < ret; i++)
-+			cifs_put_tlink(tlink[i]);
- 
--	cifs_put_tcon(tcon);
-+		if (!ret)
-+			break;
-+	}
- 
--	cifs_sb->ptcon = NULL;
- 	tmp = cifs_sb->prepath;
- 	cifs_sb->prepathlen = 0;
- 	cifs_sb->prepath = NULL;
- 	kfree(tmp);
- 
--	return rc;
-+	return 0;
- }
- 
- int cifs_negotiate_protocol(unsigned int xid, struct cifsSesInfo *ses)
-@@ -3024,3 +3090,195 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
- 	return rc;
- }
- 
-+struct cifsTconInfo *
-+cifs_construct_tcon(struct cifs_sb_info *cifs_sb, uid_t fsuid)
-+{
-+	struct cifsTconInfo *master_tcon = cifs_sb_master_tcon(cifs_sb);
-+	struct cifsSesInfo *ses;
-+	struct cifsTconInfo *tcon = NULL;
-+	struct smb_vol *vol_info;
-+
-+	vol_info = kzalloc(sizeof(*vol_info), GFP_KERNEL);
-+	if (vol_info == NULL) {
-+		tcon = ERR_PTR(-ENOMEM);
-+		goto out;
-+	}
-+
-+	vol_info->username = kzalloc(MAX_USERNAME_SIZE + 1, GFP_KERNEL);
-+	if (vol_info->username == NULL) {
-+		tcon = ERR_PTR(-ENOMEM);
-+		goto out;
-+	}
-+
-+	snprintf(vol_info->username, MAX_USERNAME_SIZE, "krb50x%x", fsuid);
-+	vol_info->local_nls = cifs_sb->local_nls;
-+	vol_info->linux_uid = fsuid;
-+	vol_info->cred_uid = fsuid;
-+	vol_info->UNC = master_tcon->treeName;
-+	vol_info->retry = master_tcon->retry;
-+	vol_info->nocase = master_tcon->nocase;
-+	vol_info->local_lease = master_tcon->local_lease;
-+	vol_info->no_linux_ext = !master_tcon->unix_ext;
-+
-+	/* FIXME: allow for other secFlg settings */
-+	vol_info->secFlg = CIFSSEC_MUST_KRB5;
-+
-+	/* get a reference for the same TCP session */
-+	write_lock(&cifs_tcp_ses_lock);
-+	++master_tcon->ses->server->srv_count;
-+	write_unlock(&cifs_tcp_ses_lock);
-+
-+	ses = cifs_get_smb_ses(master_tcon->ses->server, vol_info);
-+	if (IS_ERR(ses)) {
-+		tcon = (struct cifsTconInfo *) ses;
-+		cifs_put_tcp_session(master_tcon->ses->server);
-+		goto out;
-+	}
-+
-+	tcon = cifs_get_tcon(ses, vol_info);
-+	if (IS_ERR(tcon)) {
-+		cifs_put_smb_ses(ses);
-+		goto out;
-+	}
-+
-+	if (ses->capabilities & CAP_UNIX)
-+		reset_cifs_unix_caps(0, tcon, NULL, vol_info);
-+out:
-+	kfree(vol_info->username);
-+	kfree(vol_info);
-+
-+	return tcon;
-+}
-+
-+static struct tcon_link *
-+cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb)
-+{
-+	struct tcon_link *tlink;
-+	unsigned int ret;
-+
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	ret = radix_tree_gang_lookup_tag(&cifs_sb->tlink_tree, (void **)&tlink,
-+					0, 1, CIFS_TLINK_MASTER_TAG);
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
-+
-+	/* the master tcon should always be present */
-+	if (ret == 0)
-+		BUG();
-+
-+	return tlink;
-+}
-+
-+struct cifsTconInfo *
-+cifs_sb_master_tcon(struct cifs_sb_info *cifs_sb)
-+{
-+	return tlink_tcon(cifs_sb_master_tlink(cifs_sb));
-+}
-+
-+static int
-+cifs_sb_tcon_pending_wait(void *unused)
-+{
-+	schedule();
-+	return signal_pending(current) ? -ERESTARTSYS : 0;
-+}
-+
-+/*
-+ * Find or construct an appropriate tcon given a cifs_sb and the fsuid of the
-+ * current task.
-+ *
-+ * If the superblock doesn't refer to a multiuser mount, then just return
-+ * the master tcon for the mount.
-+ *
-+ * First, search the radix tree for an existing tcon for this fsuid. If one
-+ * exists, then check to see if it's pending construction. If it is then wait
-+ * for construction to complete. Once it's no longer pending, check to see if
-+ * it failed and either return an error or retry construction, depending on
-+ * the timeout.
-+ *
-+ * If one doesn't exist then insert a new tcon_link struct into the tree and
-+ * try to construct a new one.
-+ */
-+struct tcon_link *
-+cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
-+{
-+	int ret;
-+	unsigned long fsuid = (unsigned long) current_fsuid();
-+	struct tcon_link *tlink, *newtlink;
-+
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-+		return cifs_get_tlink(cifs_sb_master_tlink(cifs_sb));
-+
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	tlink = radix_tree_lookup(&cifs_sb->tlink_tree, fsuid);
-+	if (tlink)
-+		cifs_get_tlink(tlink);
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
-+
-+	if (tlink == NULL) {
-+		newtlink = kzalloc(sizeof(*tlink), GFP_KERNEL);
-+		if (newtlink == NULL)
-+			return ERR_PTR(-ENOMEM);
-+		newtlink->tl_index = fsuid;
-+		newtlink->tl_tcon = ERR_PTR(-EACCES);
-+		set_bit(TCON_LINK_PENDING, &newtlink->tl_flags);
-+		set_bit(TCON_LINK_IN_TREE, &newtlink->tl_flags);
-+		cifs_get_tlink(newtlink);
-+
-+		ret = radix_tree_preload(GFP_KERNEL);
-+		if (ret != 0) {
-+			kfree(newtlink);
-+			return ERR_PTR(ret);
-+		}
-+
-+		spin_lock(&cifs_sb->tlink_tree_lock);
-+		/* was one inserted after previous search? */
-+		tlink = radix_tree_lookup(&cifs_sb->tlink_tree, fsuid);
-+		if (tlink) {
-+			cifs_get_tlink(tlink);
-+			spin_unlock(&cifs_sb->tlink_tree_lock);
-+			radix_tree_preload_end();
-+			kfree(newtlink);
-+			goto wait_for_construction;
-+		}
-+		ret = radix_tree_insert(&cifs_sb->tlink_tree, fsuid, newtlink);
-+		spin_unlock(&cifs_sb->tlink_tree_lock);
-+		radix_tree_preload_end();
-+		if (ret) {
-+			kfree(newtlink);
-+			return ERR_PTR(ret);
-+		}
-+		tlink = newtlink;
-+	} else {
-+wait_for_construction:
-+		ret = wait_on_bit(&tlink->tl_flags, TCON_LINK_PENDING,
-+				  cifs_sb_tcon_pending_wait,
-+				  TASK_INTERRUPTIBLE);
-+		if (ret) {
-+			cifs_put_tlink(tlink);
-+			return ERR_PTR(ret);
-+		}
-+
-+		/* if it's good, return it */
-+		if (!IS_ERR(tlink->tl_tcon))
-+			return tlink;
-+
-+		/* return error if we tried this already recently */
-+		if (time_before(jiffies, tlink->tl_time + TLINK_ERROR_EXPIRE)) {
-+			cifs_put_tlink(tlink);
-+			return ERR_PTR(-EACCES);
-+		}
-+
-+		if (test_and_set_bit(TCON_LINK_PENDING, &tlink->tl_flags))
-+			goto wait_for_construction;
-+	}
-+
-+	tlink->tl_tcon = cifs_construct_tcon(cifs_sb, fsuid);
-+	clear_bit(TCON_LINK_PENDING, &tlink->tl_flags);
-+	wake_up_bit(&tlink->tl_flags, TCON_LINK_PENDING);
-+
-+	if (IS_ERR(tlink->tl_tcon)) {
-+		cifs_put_tlink(tlink);
-+		return ERR_PTR(-EACCES);
-+	}
-+
-+	return tlink;
-+}
+Would it be better to put the above into CIFS_SessSetup() instead? Maybe
+add a static helper function does all of the above in sess.c and have
+each authtype that would need a password call that function to set the
+smb session password?
+
+That may make it easier to integrate this into the multiuser mount code
+later too.
+
 -- 
-1.7.2.1
-
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
