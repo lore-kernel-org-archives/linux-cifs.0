@@ -1,45 +1,35 @@
-From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-Subject: Re: crypto apis in cifs module allocating storage for character array
- during run-time vs. dynamic allocation
-Date: Tue, 24 Aug 2010 10:03:55 -0500
-Message-ID: <AANLkTik-ng--TupuTXT0Xu98zPR2S4+fJ3Q7-4nKchV7@mail.gmail.com>
-References: <AANLkTikyVs+8-=v0--i7tQDCqFzk=r5DrCvx+UZkjaiA@mail.gmail.com>
-	<363759039.1172081282603157268.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
+From: Sandro Mathys <sm-PQ/Ufos56eeUrPNsD1utVw@public.gmane.org>
+Subject: Re: Minshall+French symlink Patch Set #05
+Date: Tue, 24 Aug 2010 15:04:03 +0000 (UTC)
+Message-ID: <loom.20100824T165847-259@post.gmane.org>
+References: <1281373115-14913-1-git-send-email-metze@samba.org> <AANLkTimC6ybKsAZh9B1CAY2RS5u4zvtW86eSrDv5DTcQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-crypto@vger.kernel.org, linux-cifs@vger.kernel.org
-To: Miloslav Trmac <mitr@redhat.com>
-Return-path: <linux-crypto-owner@vger.kernel.org>
-In-Reply-To: <363759039.1172081282603157268.JavaMail.root@zmail07.collab.prod.int.phx2.redhat.com>
-Sender: linux-crypto-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Aug 23, 2010 at 5:39 PM, Miloslav Trmac <mitr@redhat.com> wrote=
-:
-> ----- "Shirish Pargaonkar" <shirishpargaonkar@gmail.com> wrote:
->> Instead of determining and allocating a char array for use during us=
-age of
->> crypto_shash_* calls, would like to instead dynamically
->> allocate (and free) storage for the duration of crypto calculation
->> (crypto_shash_init,
->> crypto_shash_update, and crypto_shash_final)
->> But everytime I try, it results in some sort of oops in the cifs mod=
-ule.
-> Let me just suggest something, without trying it...
->
->> +struct sdesc {
->> + =A0 =A0 =A0 struct shash_desc shash;
->> + =A0 =A0 =A0 char *ctx;
-> =A0 =A0 =A0 =A0char ctx[];
-> would be correct here.
->> +};
-> And you need to allocate both shash_desc and "ctx" together as a sing=
-le piece of memory - exactly mirror the memory layout of the original "=
-sdesc" variable.
-> =A0 =A0Mirek
->
+Hi Steve,
 
-Mirek,
+Steve French <smfrench@...> writes:
+> 
+> OK - will take a look.
+> 
+> Please let me know if anyone wants to add tested-by/reviewed-by
 
-Thanks, that worked.
+I've tested this patchset on a Fedora 13 with a kernel 2.6.33.6 on multiple (but
+very similar) systems and found it to be working and stable.
+
+-- Sandro
+
+> On Mon, Aug 9, 2010 at 11:58 AM, Stefan Metzmacher <metze@...> wrote:
+> > Hi Steve,
+> >
+> > here's the next patch set for Minshall+French symlink support.
+> >
+> > metze
+> >
+> >
+> 
