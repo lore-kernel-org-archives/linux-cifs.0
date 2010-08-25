@@ -1,24 +1,21 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 01/15] cifs: eliminate redundant xdev check in
- cifs_rename
-Date: Wed, 25 Aug 2010 13:55:14 -0400
-Message-ID: <20100825135514.7234ab6a@corrin.poochiereds.net>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: Re: [PATCH 01/15] cifs: eliminate redundant xdev check in cifs_rename
+Date: Wed, 25 Aug 2010 13:59:52 -0400
+Message-ID: <20100825175952.GA27774@infradead.org>
 References: <1282332731-17444-1-git-send-email-jlayton@redhat.com>
-	<1282332731-17444-2-git-send-email-jlayton@redhat.com>
-	<AANLkTikVRKBA-sv3F8cJMFV3nfqfu4AYXXJ9E4Ja+Qv+@mail.gmail.com>
+ <1282332731-17444-2-git-send-email-jlayton@redhat.com>
+ <AANLkTikVRKBA-sv3F8cJMFV3nfqfu4AYXXJ9E4Ja+Qv+@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 In-Reply-To: <AANLkTikVRKBA-sv3F8cJMFV3nfqfu4AYXXJ9E4Ja+Qv+-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 25 Aug 2010 11:34:07 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
+On Wed, Aug 25, 2010 at 11:34:07AM -0500, Steve French wrote:
 > On Fri, Aug 20, 2010 at 2:31 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > > The VFS always checks that the source and target of a rename are on the
 > > same vfsmount, and hence have the same superblock. So, this check is
@@ -29,23 +26,11 @@ Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > (nfs server and cachefiles for example call vfs_rename directly)
 > which do not check this, so it looks like the cifs EXDEV check
 > is not redundant and should be kept.
-> 
-> 
-> 
 
-(cc'ing linux-fsdevel)
+If ->rename evers gets called with dentries on different superblocks
+hell would break lose.  nfsd also explicitly checks for it,
+and in cachefiles it can't happen because we do a lookup_one_len
+on the local fs for the target.  Note that these cases matter for
+cifs anyway given that it doesn't provide export ops.
 
-The nfs server checks for it. In nfsd_rename:
-
-        host_err = -EXDEV;
-        if (ffhp->fh_export->ex_path.mnt != tfhp->fh_export->ex_path.mnt)
-                goto out_dput_new;
-
-
-I don't think cachefiles would work if you split the cache directory
-across multiple filesystems. Most filesystems don't check for this on
-their own, so I'm not sure why we need to have cifs do this in a
-special fashion.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+There is no need to keep this junk around.
