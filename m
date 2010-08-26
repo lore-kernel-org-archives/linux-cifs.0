@@ -1,34 +1,51 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [cifs] cifs: Allow binding to local IP address.
-Date: Wed, 25 Aug 2010 19:35:34 -0500
-Message-ID: <AANLkTi=m800LPdE47tiPGPT3qfQG7YXC0Q6nh+EXhnx=@mail.gmail.com>
-References: <1282777235-20218-1-git-send-email-greearb@candelatech.com>
+From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Subject: linux-next: build warning after merge of the cifs tree
+Date: Thu, 26 Aug 2010 11:02:29 +1000
+Message-ID: <20100826110229.931ab5bf.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__26_Aug_2010_11_02_29_+1000_AciCO.adYFhdrfXG"
+Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1282777235-20218-1-git-send-email-greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Aug 25, 2010 at 6:00 PM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> w=
-rote:
-> When using multi-homed machines, it's nice to be able to specify
-> the local IP to use for outbound connections. =A0This patch gives
-> cifs the ability to bind to a particular IP address.
->
-> Usage: =A0mount -t cifs -o bindaddr=3D192.168.1.50,user=3Dfoo, ...
+--Signature=_Thu__26_Aug_2010_11_02_29_+1000_AciCO.adYFhdrfXG
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Seems like a reasonable idea, but I have a few questions.
-Is there a similar named mount option for other network
-file systems on other operating systems?
+Hi all,
 
-Also don't IPv6 address strings already allow you to specify the local
-interface to use?
+After merging the cifs tree, today's linux-next build (powerpc
+ppc64_defconfig) produced this warning:
+
+fs/cifs/sess.c: In function 'CIFS_SessSetup':
+fs/cifs/sess.c:623: warning: unused variable 'ntlmsspblob'
+
+Introduced by commit 9fbc590860e75785bdaf8b83e48fabfe4d4f7d58 ("[CIFS]
+Fix ntlmv2 auth with ntlmssp").
 
 --=20
-Thanks,
+Cheers,
+Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
+http://www.canb.auug.org.au/~sfr/
 
-Steve
+--Signature=_Thu__26_Aug_2010_11_02_29_+1000_AciCO.adYFhdrfXG
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQEcBAEBAgAGBQJMdb0lAAoJEDMEi1NhKgbs18kH/15opIEe5erl4cfcnq0ltBZr
+P2tWui20d1QUCpswswWOjQmtlrO3er7hTUkXVEQixG75Gj4iRQ7kagDNrb3RzALM
+TcnMfM3jvm3fxPw4AuNF5auc+d23phQ1yRmlhWhb+iUdg4PACylJ64657lxOmFTq
+BqojFhmHDNyeKppp1fObzlgn776V07/6+b937+qjBzSGzD2F8GakZ4SDJMw0VmY4
+82RnFXMIReZbCQ5CukBhQjLF9ylBsHPbL/Hi6YjlxlNguT7tVLBZO02J3IYF4kb6
+LVU0la/fYDUbi0rZok2j8JOZvEuX3LEMZmB4Cw8JdU73st81h7YR0TYxQzduWvo=
+=o8Se
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__26_Aug_2010_11_02_29_+1000_AciCO.adYFhdrfXG--
