@@ -1,86 +1,121 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [cifs bindaddr v2] cifs: Allow binding to local IP address.
-Date: Fri, 27 Aug 2010 12:59:07 -0500
-Message-ID: <AANLkTikDjbWv0F18WevNbsfJyutEu28RCCgtmp1=ZBd4@mail.gmail.com>
-References: <1282844096-13295-1-git-send-email-greearb@candelatech.com>
-	<AANLkTik4Cffnr0ciYAVXz_jb_=EG5kBaKNE3V3cNVtwf@mail.gmail.com>
-	<4C777615.2080109@erion.co.uk>
-	<AANLkTi=9xBr2gABJSUSk2DMJEYho+jA3rbCk1PSfuQQ5@mail.gmail.com>
-	<20100827095433.26bb3c3e@corrin.poochiereds.net>
-	<4C77D9ED.4050101@candelatech.com>
-	<20100827125242.0798ffe9@tlielax.poochiereds.net>
-	<AANLkTim-Hsn77fJUR1TrM_szVaJ3_vYzw61j0GYMt+Rr@mail.gmail.com>
-	<4C77F1F0.4070800@candelatech.com>
-	<20100827133401.75eb7f7f@tlielax.poochiereds.net>
+From: Vijai Baskar <cristalmaze@gmail.com>
+Subject: Re: smbd blocks for 120 secs and then hangs in D state
+Date: Sat, 28 Aug 2010 09:48:50 +0530
+Message-ID: <AANLkTi=+FYRzX=yy67tOF+pmNnW8Rr3zcRK3pnOS3ts6@mail.gmail.com>
+References: <AANLkTik=70UfQue+WL=NWLtni7NiajZiXqUZ-4xg2rPs@mail.gmail.com>
+	<20100823071702.2437b523@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100827133401.75eb7f7f-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-cifs@vger.kernel.org
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20100823071702.2437b523@tlielax.poochiereds.net>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Aug 27, 2010 at 12:34 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrot=
-e:
-> On Fri, 27 Aug 2010 10:12:16 -0700
-> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wrote:
->
->> On 08/27/2010 10:08 AM, Steve French wrote:
->> > On Fri, Aug 27, 2010 at 11:52 AM, Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =
-=A0wrote:
->> >> On Fri, 27 Aug 2010 08:29:49 -0700
->> >> Ben Greear<greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> =A0wrote:
->> >>
->> >>> On 08/27/2010 06:54 AM, Jeff Layton wrote:
->> >>>
->> >>>>> Also, I think bindaddr might not be the best name for the opti=
-on. How
->> >>>>> about sourceaddr or srcaddr?
->> >>>>>
->> >>>>
->> >>>> Sounds reasonable.
->> >>>
->> >>> It doesn't matter to me. =A0Please tell me which one you want me=
- to use
->> >>> and I'll work on re-spinning this patch with ipv6 support.
->> >>>
->> >>> Thanks,
->> >>> Ben
->> >>>
->> >>
->> >> My preference would be "srcaddr=3D".
->> >
->> > Shorter is good ...
->> > srcaddr wins unless we have a particular compatibility objective w=
-ith
->> > other fs mounts (ie an existing mount option - which so far I have=
- not
->> > been able to find).
->> >
->> > For completeness we should consider, at least briefly, one alterna=
-tive name.
->> > Note that smb.conf (and thus smbclient indirectly uses this) can
->> > override the local interface using the optional smb.conf parm
->> > "interfaces" - we could shorten this to "interface" =A0 If anyone =
-feels
->> > strongly about this being better ...
->>
->> I don't like that, as we're binding to IPs, not interfaces.
->>
->> If we ever need to support SO_BINDTODEV logic, then could
->> use interface=3D for that.
->>
->> srcaddr=3D sounds fine to me.
->>
->
->
-> Agreed.
+The server and the client are different.. Server is the board and
+client is my PC.
 
-OK - srcaddr it is ...
+vijai
+
+On Mon, Aug 23, 2010 at 4:47 PM, Jeff Layton <jlayton@redhat.com> wrote=
+:
+> On Mon, 23 Aug 2010 10:40:34 +0530
+> Vijai Baskar <cristalmaze@gmail.com> wrote:
+>
+>> Hi all,
+>>
+>> I am running a samba copy of a 4GB file from my local hard disk to a
+>> remote hard disk and then find md5sum of the same file in the remote
+>> hard disk through samba read. I do the following to accomplish this:
+>>
+>> 1. mount -t cifs //ip-addr/data /mnt
+>> 2. cp /home/4g /mnt
+>> 3. md5sum /mnt/4g
+>>
+>> After a few iterations of the above operation I get the following
+>> warning on the board:
+>>
+>> echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this mess=
+age.
+>> [ 6122.450000] smbd =A0 =A0 =A0 =A0 =A0D c0204908 =A0 =A0 0 =A09712 =
+=A0 =A0372 0x00000000
+>> [ 6122.480000] [<c0204908>] (schedule+0x2dc/0x328) from [<c0204980>]
+>> (io_schedule+0x2c/0x48)
+>> [ 6122.500000] [<c0204980>] (io_schedule+0x2c/0x48) from [<c0072064>=
+]
+>> (sync_page+0x44/0x50)
+>> [ 6122.530000] [<c0072064>] (sync_page+0x44/0x50) from [<c0204dd4>]
+>> (__wait_on_bit_lock+0x5c/0xa8)
+>> [ 6122.560000] [<c0204dd4>] (__wait_on_bit_lock+0x5c/0xa8) from
+>> [<c0071ff0>] (__lock_page+0x88/0xa0)
+>> [ 6122.590000] [<c0071ff0>] (__lock_page+0x88/0xa0) from [<c007b530>=
+]
+>> (truncate_inode_pages_range+0x2e4/0x38c)
+>> [ 6122.620000] [<c007b530>] (truncate_inode_pages_range+0x2e4/0x38c)
+>> from [<c007b5f0>] (truncate_inode_pages+0x18/0x20)
+>> [ 6122.640000] [<c007b5f0>] (truncate_inode_pages+0x18/0x20) from
+>> [<c0085acc>] (vmtruncate+0xe4/0x14c)
+>> [ 6122.670000] [<c0085acc>] (vmtruncate+0xe4/0x14c) from [<c00a43a8>=
+]
+>> (inode_setattr+0x48/0x148)
+>> [ 6122.700000] [<c00a43a8>] (inode_setattr+0x48/0x148) from
+>> [<c00a4630>] (notify_change+0x188/0x1dc)
+>> [ 6122.730000] [<c00a4630>] (notify_change+0x188/0x1dc) from
+>> [<c0091440>] (do_truncate+0x6c/0x88)
+>> [ 6122.760000] [<c0091440>] (do_truncate+0x6c/0x88) from [<c00915c0>=
+]
+>> (do_sys_ftruncate+0x164/0x170)
+>> [ 6122.800000] [<c00915c0>] (do_sys_ftruncate+0x164/0x170) from
+>> [<c00915e0>] (sys_ftruncate64+0x14/0x1c)
+>> [ 6122.830000] [<c00915e0>] (sys_ftruncate64+0x14/0x1c) from
+>> [<c0027fa0>] (ret_fast_syscall+0x0/0x2c)
+>>
+>> After this samba daemon hangs in the D state. I changed the values o=
+f
+>> /proc/sys/vm/dirty_writeback_centisecs to 250 (default 500) and
+>> /proc/sys/vm/dirty_expire_centisecs to 1000 (default 3000). But this
+>> only delays the problem. ps-ax shows smbd in D state. This problem
+>> seems to occur only during samba read.
+>>
+>> Can someone please provide me a solution for the above problem?
+>>
+>> regards,
+>> vijai
+>>
+>
+> (cc'ing linux-fsdevel and samba-technical as this problem is probably
+> better reported there)
+>
+> The stack trace above is for smbd, so I doubt this has much to do wit=
+h
+> cifs per-se. Just to make sure though -- are the server and client th=
+e
+> same host? Hint: if so, that configuration is prone to deadlock under
+> heavy I/O.
+>
+> When reporting kernel bugs, it's also a good idea to mention the kern=
+el
+> version. It might also be helpful to know what the underlying
+> filesystem is that's being served out.
+>
+> It looks like the process is hung trying to lock a page. Most likely
+> that means that something else is holding that lock and not releasing
+> it for some reason. Debugging this will probably mean figuring out
+> what's holding that lock and why it's not releasing it.
+>
+> --
+> Jeff Layton <jlayton@redhat.com>
+>
+
+
 
 --=20
-Thanks,
-
-Steve
+The prizes in life u fail to win only if u doubt the power within
+--
+To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
+" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
