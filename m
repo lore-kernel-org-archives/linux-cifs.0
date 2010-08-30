@@ -1,56 +1,54 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Randy Dunlap <randy.dunlap@oracle.com>
 Subject: Re: Linux 2.6.36-rc3
-Date: Mon, 30 Aug 2010 12:14:53 -0500
-Message-ID: <AANLkTi=S3E80edLwAAAOwehrakYVgeKzC+yKptwJJZLc@mail.gmail.com>
+Date: Mon, 30 Aug 2010 10:25:27 -0700
+Message-ID: <20100830102527.17d5e1f1.randy.dunlap@oracle.com>
 References: <AANLkTinRRiW1VUzS+3T82=q8PsoRn78Cgn_X8gSduM0U@mail.gmail.com>
 	<i5fr6h$ih6$1@dough.gmane.org>
 	<4C7BE3AE.8020204@suse.de>
+	<AANLkTi=S3E80edLwAAAOwehrakYVgeKzC+yKptwJJZLc@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Miguel Calleja <mcalleja1-bK70e7QAd3DmLYrVJihF6Q@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish S Pargaonkar <shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4C7BE3AE.8020204-l3A5Bk7waGM@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Suresh Jayaraman <sjayaraman@suse.de>,
+	Miguel Calleja <mcalleja1@telecable.es>,
+	LKML <linux-kernel@vger.kernel.org>, linux-cifs@vger.kernel.org,
+	Shirish S Pargaonkar <shirishp@us.ibm.com>
+To: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <AANLkTi=S3E80edLwAAAOwehrakYVgeKzC+yKptwJJZLc@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Aug 30, 2010 at 12:00 PM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>=
- wrote:
-> (Cc linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org)
->
-> Couldn't get a chance to check this, but I guess this is perhaps due =
+On Mon, 30 Aug 2010 12:14:53 -0500 Shirish Pargaonkar wrote:
+
+> On Mon, Aug 30, 2010 at 12:00 PM, Suresh Jayaraman <sjayaraman@suse.de> wrote:
+> > (Cc linux-cifs@vger.kernel.org)
+> >
+> > Couldn't get a chance to check this, but I guess this is perhaps due to
+> > the recent crypto patches..
+> 
+> Suresh, yes, cifs auth and signing code using kernel crypto (shash) apis.
+> 
+> fs/cifs/Kconfig
+> 
+>         select CRYPTO_MD5
+>         select CRYPTO_ARC4
+> 
+
+Either CIFS should depend on CRYPTO:
+change
+	depends on INET
 to
-> the recent crypto patches..
+	depends on INET && CRYPTO
 
-Suresh, yes, cifs auth and signing code using kernel crypto (shash) api=
-s.
+or it can also select CRYPTO.
 
-fs/cifs/Kconfig
+> 
+> >
+> > On 08/30/2010 02:17 PM, Miguel Calleja wrote:
+> >> CIFS does not build without CRYPTO selected.
 
-        select CRYPTO_MD5
-        select CRYPTO_ARC4
 
-
->
-> On 08/30/2010 02:17 PM, Miguel Calleja wrote:
->> CIFS does not build without CRYPTO selected.
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kern=
-el" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->> Please read the FAQ at =A0http://www.tux.org/lkml/
->
->
-> --
-> Suresh Jayaraman
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
