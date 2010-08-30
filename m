@@ -1,30 +1,75 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: cifs mount errors
-Date: Mon, 30 Aug 2010 16:00:53 -0400
-Message-ID: <20100830160053.3cbe631d@tlielax.poochiereds.net>
-References: <545700.65464.qm@web56901.mail.re3.yahoo.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Linux 2.6.36-rc3
+Date: Mon, 30 Aug 2010 16:27:34 -0500
+Message-ID: <AANLkTikqKG0Fp=BzXcBW9JCuLF07X6sbD8HVxWxqkRnD@mail.gmail.com>
+References: <AANLkTinRRiW1VUzS+3T82=q8PsoRn78Cgn_X8gSduM0U@mail.gmail.com>
+	<i5fr6h$ih6$1@dough.gmane.org>
+	<4C7BE3AE.8020204@suse.de>
+	<AANLkTi=S3E80edLwAAAOwehrakYVgeKzC+yKptwJJZLc@mail.gmail.com>
+	<20100830102527.17d5e1f1.randy.dunlap@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: joe hefner <joehef06-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	Miguel Calleja <mcalleja1-bK70e7QAd3DmLYrVJihF6Q@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish S Pargaonkar <shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Randy Dunlap <randy.dunlap-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Sage Weil <sage-BnTBU8nroG7k1uMJSBkQmQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <545700.65464.qm-RVHwM+Z+5pGB9c0Qi4KiSs0jms80CZx+QQ4Iyu8u01E@public.gmane.org>
+In-Reply-To: <20100830102527.17d5e1f1.randy.dunlap-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 30 Aug 2010 11:41:56 -0700 (PDT)
-joe hefner <joehef06-/E1597aS9LQAvxtiuMwx3w@public.gmane.org> wrote:
+On Mon, Aug 30, 2010 at 12:25 PM, Randy Dunlap <randy.dunlap-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org=
+> wrote:
+> On Mon, 30 Aug 2010 12:14:53 -0500 Shirish Pargaonkar wrote:
+>
+>> On Mon, Aug 30, 2010 at 12:00 PM, Suresh Jayaraman <sjayaraman@suse.=
+de> wrote:
+>> > (Cc linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org)
+>> >
+>> > Couldn't get a chance to check this, but I guess this is perhaps d=
+ue to
+>> > the recent crypto patches..
+>>
+>> Suresh, yes, cifs auth and signing code using kernel crypto (shash) =
+apis.
+>>
+>> fs/cifs/Kconfig
+>>
+>> =A0 =A0 =A0 =A0 select CRYPTO_MD5
+>> =A0 =A0 =A0 =A0 select CRYPTO_ARC4
+>>
+>
+> Either CIFS should depend on CRYPTO:
+> change
+> =A0 =A0 =A0 =A0depends on INET
+> to
+> =A0 =A0 =A0 =A0depends on INET && CRYPTO
+>
+> or it can also select CRYPTO.
+>
+>>
+>> >
+>> > On 08/30/2010 02:17 PM, Miguel Calleja wrote:
+>> >> CIFS does not build without CRYPTO selected.
 
-> CIFS VFS: No response to cmd 115 mid 2
-> fs/cifs/transport.c: marking request for retry
-> fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-> fs/cifs/sess.c: ssetup rc from sendrecv2 is -11
-> CIFS VFS: Send error in SessSetup = -11
+OK - will fix this for cifs.   Looks like ecryptfs chose "depends on CR=
+YPTO"
+and ubifs chose "select CRYPTO" - but for network file system seems lik=
+e
+"select CRYPTO" (rather than depends on) makes more sense.
 
-Looks like the server is just not sending a response to the session
-setup request here. I'd check the server logs -- maybe they have
-something?
+The ceph file system seems like it has the same type of problem.
+fs/ceph/Kconfig
+has "select CRYPTO_AES" but not "select CRYPTO"
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+
+
+--=20
+Thanks,
+
+Steve
