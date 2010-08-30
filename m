@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: cifs: panic in crypto_shash_init
-Date: Mon, 30 Aug 2010 11:42:27 -0500
-Message-ID: <AANLkTik0zGn5T-p6BUhzaPEUDqvMj5tmj5fMvek0cm6Y@mail.gmail.com>
+Date: Mon, 30 Aug 2010 11:49:04 -0500
+Message-ID: <AANLkTimmdCrMsYxB3tUa6MiLZ4sMmv_3hEn5Er2tpiw+@mail.gmail.com>
 References: <20100830123510.30ed304f@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -98,8 +98,6 @@ c2.git4.fc15.x86_64 #1
 > =A0[<ffffffffa02e758d>] SendReceive2+0x11f/0x438 [cifs]
 > =A0[<ffffffffa02e78d9>] SendReceiveNoRsp+0x33/0x35 [cifs]
 > =A0[<ffffffffa02cda85>] CIFSSMBTDis+0x90/0xd2 [cifs]
-
-
 > =A0[<ffffffffa02d6562>] cifs_put_tcon+0xda/0x102 [cifs]
 > =A0[<ffffffffa02d7ee6>] cifs_put_tlink+0x4f/0x5c [cifs]
 > =A0[<ffffffffa02d8b59>] cifs_umount+0xa0/0xdc [cifs]
@@ -119,21 +117,7 @@ c2.git4.fc15.x86_64 #1
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
 
-Jeff,
 
-I do not have multiuser patchset but I think a panic in
-crypto_shash_init means sdescmd5->tfm is empty.
-so this did not happen i.e. function cifs_crypto_shash_allocate did
-not get called.
-
-        size =3D sizeof(struct shash_desc) +
-                        crypto_shash_descsize(server->ntlmssp.md5);
-        server->ntlmssp.sdescmd5 =3D kmalloc(size, GFP_KERNEL);
-        if (!server->ntlmssp.sdescmd5) {
-                cERROR(1, "cifs_crypto_shash_allocate: can't alloc md5\=
-n");
-                rc =3D -ENOMEM;
-                goto cifs_crypto_shash_allocate_ret3;
-        }
-        server->ntlmssp.sdescmd5->shash.tfm =3D server->ntlmssp.md5;
-        server->ntlmssp.sdescmd5->shash.flags =3D 0x0;
+Jeff, never saw this oops while unmounting a share but I do nothave
+multiuser mount code.
+It is possible that sdescmd5 was freed.
