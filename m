@@ -1,55 +1,49 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/6] cifs: revert recent NTLMSSP changes
-Date: Wed,  1 Sep 2010 21:37:29 -0400
-Message-ID: <1283391455-6848-1-git-send-email-jlayton@redhat.com>
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Subject: Re: [cifs srcaddr-v4] cifs:  Allow binding to local IP address.
+Date: Wed, 01 Sep 2010 22:07:29 -0700
+Message-ID: <4C7F3111.80808@candelatech.com>
+References: <1283367606-14030-1-git-send-email-greearb@candelatech.com>	<20100901171418.44685b74@tlielax.poochiereds.net>	<4C7EC614.6020505@candelatech.com> <20100901203836.2628ce57@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20100901203836.2628ce57-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The NTLMSSP patches that were merged recently were never reviewed. It
-was originally posted as a single enormous patch. By the time that I was
-able to request that the patch be re-posted as a series of smaller
-patches, so that I could review it, the giant patch had already been
-merged.
+On 09/01/2010 05:38 PM, Jeff Layton wrote:
 
-This patch has already created at least one fairly serious regression
--- an oops when more than one session is used on a single socket. This
-regression was due to a fundamental design flaw in the original patch --
-something that would likely have been caught in review if this had been
-proposed as a series of sanely-sized patches.
+>> No warning, it always returns something since the default case catches
+>> all others.  If I did put the return at the end, then the compiler wouldn't
+>> catch a case where I forgot to return from one of the case statements,
+>> but it's not overly complex code, so I don't care so much either way.
+>> Plz let me know if you still want it at the end.
+>>
+>> I also think the WARN_ON is valid, because it can only be a coding bug
+>> that hits that state, and I'd like it to be as loud as possible while
+>> still allowing the user to continue.  There are automated tools that
+>> catch WARN_ON output and post to kernel bug trackers, for instance.
+>>
+>> If you still want a cERROR, I can do that..but I prefer to not waste
+>> the space.
+>>
+>
+> It's definitely a coding bug if that fires, but a WARN_ON will mean
+> nothing to users. It looks scary and is virtually indistinguishable
+> from an oops. We'll get a stack trace, but it's unlikely to tell us
+> much.
+>
+> At that point, you might as well make it a BUG(). At least that way,
+> we might get a core dump if it fires.
 
-While it's possible to fix that problem, there's no way to know what
-other bugs are lurking in here since this wasn't reviewed before being
-merged.
+I'd like to wrap this up.  Please let me know exactly what you want there
+and I'll make it so.
 
-At this point, I'd like to see them reverted and have Shirish re-post
-them to the list as a series of discrete changes that we can review. To
-that end, here is a series of patches that reverts the original patch
-and the others that fixed problems with it. I'll be happy to help
-review the patches when they're posted in sanely-sized pieces.
-
-Jeff Layton (6):
-  Revert "[CIFS] CIFS requires CRYPTO, not just CRYPTO_MD5 selected in
-    Kconfig"
-  Revert "cifs: revert needless change in decode_negTokenInit"
-  Revert "[CIFS] Eliminate unused variable warning"
-  Revert "Eliminate sparse warning - bad constant expression"
-  Revert "missing changes during ntlmv2/ntlmssp auth and sign"
-  Revert "[CIFS] Fix ntlmv2 auth with ntlmssp"
-
- fs/cifs/Kconfig       |    3 -
- fs/cifs/cifsencrypt.c |  475 +++++++++++++------------------------------------
- fs/cifs/cifsglob.h    |   25 +---
- fs/cifs/cifspdu.h     |    7 +-
- fs/cifs/cifsproto.h   |   12 +-
- fs/cifs/cifssmb.c     |   13 +-
- fs/cifs/connect.c     |   13 +--
- fs/cifs/ntlmssp.h     |   13 --
- fs/cifs/sess.c        |  132 ++++----------
- fs/cifs/transport.c   |    6 +-
- 10 files changed, 178 insertions(+), 521 deletions(-)
+Thanks,
+Ben
 
 -- 
-1.7.2.2
+Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Candela Technologies Inc  http://www.candelatech.com
