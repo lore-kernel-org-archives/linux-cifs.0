@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/6] Revert "cifs: revert needless change in decode_negTokenInit"
-Date: Wed,  1 Sep 2010 21:37:31 -0400
-Message-ID: <1283391455-6848-3-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 3/6] Revert "[CIFS] Eliminate unused variable warning"
+Date: Wed,  1 Sep 2010 21:37:32 -0400
+Message-ID: <1283391455-6848-4-git-send-email-jlayton@redhat.com>
 References: <1283391455-6848-1-git-send-email-jlayton@redhat.com>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,31 +10,31 @@ In-Reply-To: <1283391455-6848-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This reverts commit 49999b7cbf16777a5ec284b5b12bf5888f780c01.
+This reverts commit c89e5198b26a869ce2842bad8519264f3394dee9.
 ---
- fs/cifs/asn1.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/sess.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
-index cfd1ce3..21f0fbd 100644
---- a/fs/cifs/asn1.c
-+++ b/fs/cifs/asn1.c
-@@ -597,13 +597,13 @@ decode_negTokenInit(unsigned char *security_blob, int length,
- 				if (compare_oid(oid, oidlen, MSKRB5_OID,
- 						MSKRB5_OID_LEN))
- 					server->sec_mskerberos = true;
--				else if (compare_oid(oid, oidlen, KRB5U2U_OID,
-+				if (compare_oid(oid, oidlen, KRB5U2U_OID,
- 						     KRB5U2U_OID_LEN))
- 					server->sec_kerberosu2u = true;
--				else if (compare_oid(oid, oidlen, KRB5_OID,
-+				if (compare_oid(oid, oidlen, KRB5_OID,
- 						     KRB5_OID_LEN))
- 					server->sec_kerberos = true;
--				else if (compare_oid(oid, oidlen, NTLMSSP_OID,
-+				if (compare_oid(oid, oidlen, NTLMSSP_OID,
- 						     NTLMSSP_OID_LEN))
- 					server->sec_ntlmssp = true;
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 795095f..4788e16 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -620,6 +620,7 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
+ 	struct key *spnego_key = NULL;
+ 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+ 	bool first_time;
++	char *ntlmsspblob;
  
+ 	if (ses == NULL)
+ 		return -EINVAL;
+@@ -867,8 +868,6 @@ ssetup_ntlmssp_authenticate:
+ 				iov[1].iov_base = &pSMB->req.SecurityBlob[0];
+ 			} else if (phase == NtLmAuthenticate) {
+ 				int blob_len;
+-				char *ntlmsspblob;
+-
+ 				ntlmsspblob = kmalloc(5 *
+ 					sizeof(struct _AUTHENTICATE_MESSAGE),
+ 					GFP_KERNEL);
 -- 
 1.7.2.2
