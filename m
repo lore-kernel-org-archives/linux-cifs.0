@@ -1,39 +1,39 @@
-From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Subject: Re: [cifs srcaddr-v4] cifs: Allow binding to local IP address.
-Date: Thu, 02 Sep 2010 21:24:38 -0700
-Message-ID: <4C807886.6010908@candelatech.com>
-References: <1283367606-14030-1-git-send-email-greearb@candelatech.com>	<20100901171418.44685b74@tlielax.poochiereds.net>	<4C7EC614.6020505@candelatech.com>	<20100901203836.2628ce57@tlielax.poochiereds.net>	<4C7F3111.80808@candelatech.com>	<20100902065602.6a62825c@corrin.poochiereds.net> <AANLkTi=ezVf0b1Cu+HBKRb7Sns5+bDeFwpV649Ub_RAs@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/3] cifs: stop cifsd from exiting prematurely
+Date: Fri,  3 Sep 2010 08:25:08 -0400
+Message-ID: <1283516711-15073-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, andrew.hendry-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=ezVf0b1Cu+HBKRb7Sns5+bDeFwpV649Ub_RAs-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 09/02/2010 09:02 PM, Steve French wrote:
-> On Thu, Sep 2, 2010 at 5:56 AM, Jeff Layton<jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>  wrote:
->> On Wed, 01 Sep 2010 22:07:29 -0700
->> Fair enough. We're splitting hairs at this point. Let's just take this
->> as-is. For v5 of the patch:
->>
->> Acked-by: Jeff Layton<jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->
-> I do like this patch as well - although not for rc4 but see no problem
-> with it in the next merge window - unless there is some other feedback
-> on IPv6 related syntax that I missed.
+We've had some sporradic reports of problems recently where the
+ses->server pointers have been NULL. That pointer should only get set to
+NULL when cifs_demultiplex_thread exits. That should only happen when
+the last reference to it is put. If it gets cleaned up before then,
+other structures will hold pointers to it, and we'll get NULL pointer
+dereferences.
 
-Next merge window is fine with me.
+Unfortunately, there are some places in cifs_demuliplex_thread where
+this rule is broken. In certain error conditions, cifsd will exit even
+though the reference count hasn't gone to zero yet. This patchset is
+intended to close these holes. With it, cifsd should only exit when the
+last reference to it is put.
 
-Thanks for all the reviews and suggestions!
+Exiting from the loop early is a serious error that's likely to cause an
+oops. I think we ought to consider this patchset for 2.6.36 and maybe
+for stable.
 
-I should have the nfs version posted (to the nfs
-list) tomorrow.
+Thoughts?
 
-Ben
+Jeff Layton (3):
+  cifs: prevent cifsd from exiting prematurely
+  cifs: eliminate some more premature cifsd exits
+  cifs: prevent possible memory corruption in cifs_demultiplex_thread
 
--- 
-Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Candela Technologies Inc  http://www.candelatech.com
+ fs/cifs/cifsproto.h |    3 +-
+ fs/cifs/connect.c   |   58 +++++++++++++++++---------------------------------
+ fs/cifs/netmisc.c   |   22 +++++++++++--------
+ 3 files changed, 35 insertions(+), 48 deletions(-)
