@@ -1,23 +1,23 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] extract or create av pair blob and free it - during first
  session setup
-Date: Tue, 7 Sep 2010 08:13:04 -0500
-Message-ID: <AANLkTinsaVwNZ8ViY4vYKo8AhY5P6pgS3BMFY=3qfGKt@mail.gmail.com>
+Date: Tue, 7 Sep 2010 08:14:57 -0500
+Message-ID: <AANLkTinEx+JX-Y49w_S9ZhH73R4ecpQdqCHDE7tNV08f@mail.gmail.com>
 References: <1283830497-25086-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20100907075648.007c4e1e@corrin.poochiereds.net>
 	<AANLkTi=FMm-fYhBcZbCxwWQ=LejdYahDM=E5RUWg62sy@mail.gmail.com>
-	<20100907090008.74ad80a6@corrin.poochiereds.net>
+	<20100907091604.305c65f7@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100907090008.74ad80a6-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20100907091604.305c65f7-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Sep 7, 2010 at 8:00 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Tue, Sep 7, 2010 at 8:16 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 > On Tue, 7 Sep 2010 07:52:09 -0500
 > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
@@ -176,236 +176,31 @@ mp etc.
 e of security
 >> mech options.
 >>
->> >
->> >> =A0static int calc_ntlmv2_hash(struct cifsSesInfo *ses,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const struct =
-nls_table *nls_cp)
->> >> =A0{
->> >> @@ -322,7 +373,8 @@ calc_exit_2:
->> >> =A0 =A0 =A0 return rc;
->> >> =A0}
->> >>
->> >> -void setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
->> >> +int
->> >> +setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const struct nls_table *n=
-ls_cp)
->> >> =A0{
->> >> =A0 =A0 =A0 int rc;
->> >> @@ -334,10 +386,14 @@ void setup_ntlmv2_rsp(struct cifsSesInfo *s=
-es, char *resp_buf,
->> >> =A0 =A0 =A0 buf->time =3D cpu_to_le64(cifs_UnixTimeToNT(CURRENT_T=
-IME));
->> >> =A0 =A0 =A0 get_random_bytes(&buf->client_chal, sizeof(buf->clien=
-t_chal));
->> >> =A0 =A0 =A0 buf->reserved2 =3D 0;
->> >> - =A0 =A0 buf->names[0].type =3D cpu_to_le16(NTLMSSP_DOMAIN_TYPE)=
-;
->> >> - =A0 =A0 buf->names[0].length =3D 0;
->> >> - =A0 =A0 buf->names[1].type =3D 0;
->> >> - =A0 =A0 buf->names[1].length =3D 0;
->> >> +
->> >> + =A0 =A0 if (!ses->domainName) {
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D find_domain_name(ses);
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc) {
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "could not ge=
-t domain/server name rc %d", rc);
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
->> >> + =A0 =A0 }
->> >>
->> >> =A0 =A0 =A0 /* calculate buf->ntlmv2_hash */
->> >> =A0 =A0 =A0 rc =3D calc_ntlmv2_hash(ses, nls_cp);
->> >> @@ -353,6 +409,8 @@ void setup_ntlmv2_rsp(struct cifsSesInfo *ses=
-, char *resp_buf,
->> >> =A0 =A0 =A0 memcpy(&ses->server->mac_signing_key.data.ntlmv2.resp=
-, resp_buf,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0sizeof(struct ntlmv2_resp));
->> >> =A0 =A0 =A0 ses->server->mac_signing_key.len =3D 16 + sizeof(stru=
-ct ntlmv2_resp);
->> >> +
->> >> + =A0 =A0 return rc;
->> >> =A0}
->> >>
->> >> =A0void CalcNTLMv2_response(const struct cifsSesInfo *ses,
->> >> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
->> >> index f5c78fb..dc90a36 100644
->> >> --- a/fs/cifs/cifspdu.h
->> >> +++ b/fs/cifs/cifspdu.h
->> >> @@ -670,7 +670,6 @@ struct ntlmv2_resp {
->> >> =A0 =A0 =A0 __le64 =A0time;
->> >> =A0 =A0 =A0 __u64 =A0client_chal; /* random */
->> >> =A0 =A0 =A0 __u32 =A0reserved2;
->> >> - =A0 =A0 struct ntlmssp2_name names[2];
->> >> =A0 =A0 =A0 /* array of name entries could follow ending in minim=
-um 4 byte struct */
->> >> =A0} __attribute__((packed));
->> >>
->> >> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->> >> index f3ffa69..ccc6d57 100644
->> >> --- a/fs/cifs/cifsproto.h
->> >> +++ b/fs/cifs/cifsproto.h
->> >> @@ -368,7 +368,7 @@ extern int cifs_calculate_mac_key(struct sess=
-ion_key *key, const char *rn,
->> >> =A0extern int CalcNTLMv2_partial_mac_key(struct cifsSesInfo *,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const struct nls_tabl=
-e *);
->> >> =A0extern void CalcNTLMv2_response(const struct cifsSesInfo *, ch=
-ar *);
->> >> -extern void setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
->> >> +extern int setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const stru=
-ct nls_table *);
->> >> =A0extern int cifs_crypto_shash_allocate(struct TCP_Server_Info *=
-);
->> >> =A0extern void cifs_crypto_shash_release(struct TCP_Server_Info *=
-);
->> >> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> >> index f5369e7..47b51eb 100644
->> >> --- a/fs/cifs/connect.c
->> >> +++ b/fs/cifs/connect.c
->> >> @@ -1580,6 +1580,8 @@ cifs_get_tcp_session(struct smb_vol *volume=
-_info)
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "could not setup hash struc=
-tures rc %d", rc);
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out_err;
->> >> =A0 =A0 =A0 }
->> >> + =A0 =A0 tcp_ses->tilen =3D 0;
->> >> + =A0 =A0 tcp_ses->tiblob =3D NULL;
->> >>
->> >> =A0 =A0 =A0 tcp_ses->hostname =3D extract_hostname(volume_info->U=
-NC);
->> >> =A0 =A0 =A0 if (IS_ERR(tcp_ses->hostname)) {
->> >> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
->> >> index 0a57cb7..6551b17 100644
->> >> --- a/fs/cifs/sess.c
->> >> +++ b/fs/cifs/sess.c
->> >> @@ -383,6 +383,9 @@ static int decode_ascii_ssetup(char **pbcc_ar=
-ea, int bleft,
->> >> =A0static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_le=
-n,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- struct cifsSesInfo *ses)
->> >> =A0{
->> >> + =A0 =A0 unsigned int tioffset; /* challenge message target info=
- area */
->> >> + =A0 =A0 unsigned int tilen; /* challenge message target info ar=
-ea length =A0*/
->> >> +
->> >> =A0 =A0 =A0 CHALLENGE_MESSAGE *pblob =3D (CHALLENGE_MESSAGE *)bcc=
-_ptr;
->> >>
->> >> =A0 =A0 =A0 if (blob_len < sizeof(CHALLENGE_MESSAGE)) {
->> >> @@ -405,6 +408,20 @@ static int decode_ntlmssp_challenge(char *bc=
-c_ptr, int blob_len,
->> >> =A0 =A0 =A0 /* BB spec says that if AvId field of MsvAvTimestamp =
-is populated then
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 we must set the MIC field of the AUTH=
-ENTICATE_MESSAGE */
->> >>
->> >> + =A0 =A0 ses->server->ntlmssp.server_flags =3D le32_to_cpu(pblob=
-->NegotiateFlags);
->> >> +
->> >> + =A0 =A0 tioffset =3D cpu_to_le16(pblob->TargetInfoArray.BufferO=
-ffset);
->> >> + =A0 =A0 tilen =3D cpu_to_le16(pblob->TargetInfoArray.Length);
->> >> + =A0 =A0 ses->server->tilen =3D tilen;
->> >> + =A0 =A0 if (tilen) {
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 ses->server->tiblob =3D kmalloc(tilen, =
-GFP_KERNEL);
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (!ses->server->tiblob) {
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "Challenge ta=
-rget info allocation failure");
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ses->server->tiblob, =A0bcc_ptr =
-+ tioffset, tilen);
->> >> + =A0 =A0 }
->> >> +
->> >> =A0 =A0 =A0 return 0;
->> >> =A0}
->> >>
->> >> @@ -533,6 +550,10 @@ static int build_ntlmssp_auth_blob(unsigned =
-char *pbuffer,
->> >> =A0 =A0 =A0 sec_blob->SessionKey.BufferOffset =3D cpu_to_le32(tmp=
- - pbuffer);
->> >> =A0 =A0 =A0 sec_blob->SessionKey.Length =3D 0;
->> >> =A0 =A0 =A0 sec_blob->SessionKey.MaximumLength =3D 0;
->> >> +
->> >> + =A0 =A0 if (ses->server->tilen > 0)
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 kfree(ses->server->tiblob);
->> >> +
->> >
->> > I'm not sure I get this...why are you freeing the blob if tilen is=
- 0?
->> > That seems like you could end up with a leak in corner cases. Why =
-not
->> > just unconditionally kfree it and make sure it's set to NULL if th=
-ere
->> > is no buffer?
->>
->> Not ure I get it, freeing it only if tilen is greater than 0 i.e. we
->> did allocate
->> the blob.
->>
 >
-> Is it possible for tilen to end up being set to 0, and the tiblob to =
-be
-> a valid pointer? If so, then this buffer will be leaked here. Right?
+> This seems like a red flag for the design of this whole thing. This
+> buffer ought not be allocated in find_domain_name(). One reason is th=
+at
+> it's not at all obvious why a function like find_domain_name ought to
+> be responsible for allocating something unrelated to the domain name.
+> These built-in "side effects" for some functions make CIFS really har=
+d
+> to understand and maintain.
+>
+> The lifecycle of this the tibuf is very difficult to follow with this
+> design. As soon as you know the secType and whether signing is enable=
+d,
+> you'll know whether you need this buffer, right? So why not allocate =
+it
+> then in a single, well-defined spot?
+>
 
-That would not be possible. In decode_ntlmssp_challenge, blob is
-not allocated unless tilen is greater than 0.
-In find_domain_name if blob allocation (tilen long) failure is
-handled.
+yes, will change the code to do that.
 
->
->> >
->> >> =A0 =A0 =A0 return tmp - pbuffer;
->> >> =A0}
->> >>
->> >> @@ -729,8 +750,7 @@ ssetup_ntlmssp_authenticate:
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cpu_to_le16(sizeof(st=
-ruct ntlmv2_resp));
->> >>
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* calculate session key */
->> >> - =A0 =A0 =A0 =A0 =A0 =A0 setup_ntlmv2_rsp(ses, v2_sess_key, nls_=
-cp);
->> >> - =A0 =A0 =A0 =A0 =A0 =A0 /* FIXME: calculate MAC key */
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D setup_ntlmv2_rsp(ses, v2_sess_ke=
-y, nls_cp);
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0^^^^^^^^^^^
->> > You're getting the return code from this function now, but it'll j=
-ust
->> > get clobbered when SendReceive2 is called. What's the point? Shoul=
-dn't
->> > you do something different if it comes back with an error? What's =
-going
->> > to happen if find_domain_name fails and the session setup call pro=
-ceeds?
->>
->> In that case, authentication would fail.
->>
->
-> So why not return with a valid error code instead of leaving us
-> wondering what the heck went wrong?
-
-Could loging a meaningful error suffice?
-
->
->> >
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(bcc_ptr, (char *)v2_sess_key,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sizeof(struct ntlmv2_r=
-esp));
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 bcc_ptr +=3D sizeof(struct ntlmv2_res=
-p);
->> >
->> >
->> > --
->> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> >
->>
->
->
 > --
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
