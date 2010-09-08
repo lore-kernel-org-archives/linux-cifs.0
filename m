@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 2/8] ntlmv2/ntlmssp remove-unused-function CalcNTLMv2_partial_mac_key
-Date: Tue,  7 Sep 2010 23:44:42 -0500
-Message-ID: <1283921082-13019-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 3/8] ntlmv2/ntlmssp do not assume kerberos as default auth mech
+Date: Tue,  7 Sep 2010 23:45:18 -0500
+Message-ID: <1283921118-13066-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -11,94 +11,41 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-This function is not used, so remove the definition and declaration.
+
+kerberos gets selected as a default mechanism if server supports it, over
+the other security mechanisms.
+
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |   57 -------------------------------------------------
- fs/cifs/cifsproto.h   |    2 -
- 2 files changed, 0 insertions(+), 59 deletions(-)
+ fs/cifs/cifssmb.c |   15 +++++++++------
+ 1 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 796ebc7..4bdcf13 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -224,63 +224,6 @@ int cifs_calculate_mac_key(struct session_key *key, const char *rn,
- 	return 0;
- }
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index c65c341..1f1b097 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -604,12 +604,15 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 			else
+ 				rc = -EINVAL;
  
--int CalcNTLMv2_partial_mac_key(struct cifsSesInfo *ses,
--			       const struct nls_table *nls_info)
--{
--	char temp_hash[16];
--	struct HMACMD5Context ctx;
--	char *ucase_buf;
--	__le16 *unicode_buf;
--	unsigned int i, user_name_len, dom_name_len;
--
--	if (ses == NULL)
--		return -EINVAL;
--
--	E_md4hash(ses->password, temp_hash);
--
--	hmac_md5_init_limK_to_64(temp_hash, 16, &ctx);
--	user_name_len = strlen(ses->userName);
--	if (user_name_len > MAX_USERNAME_SIZE)
--		return -EINVAL;
--	if (ses->domainName == NULL)
--		return -EINVAL; /* BB should we use CIFS_LINUX_DOM */
--	dom_name_len = strlen(ses->domainName);
--	if (dom_name_len > MAX_USERNAME_SIZE)
--		return -EINVAL;
--
--	ucase_buf = kmalloc((MAX_USERNAME_SIZE+1), GFP_KERNEL);
--	if (ucase_buf == NULL)
--		return -ENOMEM;
--	unicode_buf = kmalloc((MAX_USERNAME_SIZE+1)*4, GFP_KERNEL);
--	if (unicode_buf == NULL) {
--		kfree(ucase_buf);
--		return -ENOMEM;
--	}
--
--	for (i = 0; i < user_name_len; i++)
--		ucase_buf[i] = nls_info->charset2upper[(int)ses->userName[i]];
--	ucase_buf[i] = 0;
--	user_name_len = cifs_strtoUCS(unicode_buf, ucase_buf,
--				      MAX_USERNAME_SIZE*2, nls_info);
--	unicode_buf[user_name_len] = 0;
--	user_name_len++;
--
--	for (i = 0; i < dom_name_len; i++)
--		ucase_buf[i] = nls_info->charset2upper[(int)ses->domainName[i]];
--	ucase_buf[i] = 0;
--	dom_name_len = cifs_strtoUCS(unicode_buf+user_name_len, ucase_buf,
--				     MAX_USERNAME_SIZE*2, nls_info);
--
--	unicode_buf[user_name_len + dom_name_len] = 0;
--	hmac_md5_update((const unsigned char *) unicode_buf,
--		(user_name_len+dom_name_len)*2, &ctx);
--
--	hmac_md5_final(ses->server->ntlmv2_hash, &ctx);
--	kfree(ucase_buf);
--	kfree(unicode_buf);
--	return 0;
--}
--
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- 			char *lnm_session_key)
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8d63406..eadf78c 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -365,8 +365,6 @@ extern int cifs_verify_signature(struct smb_hdr *,
- 				__u32 expected_sequence_number);
- extern int cifs_calculate_mac_key(struct session_key *key, const char *rn,
- 				 const char *pass);
--extern int CalcNTLMv2_partial_mac_key(struct cifsSesInfo *,
--			const struct nls_table *);
- extern void CalcNTLMv2_response(const struct cifsSesInfo *, char *);
- extern void setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
- 			     const struct nls_table *);
+-			if (server->sec_kerberos || server->sec_mskerberos)
+-				server->secType = Kerberos;
+-			else if (server->sec_ntlmssp)
+-				server->secType = RawNTLMSSP;
+-			else
+-				rc = -EOPNOTSUPP;
++			if (server->secType == Kerberos) {
++				if (!server->sec_kerberos &&
++						!server->sec_mskerberos)
++					rc = -EOPNOTSUPP;
++			} else if (server->secType == RawNTLMSSP) {
++				if (!server->sec_ntlmssp)
++					rc = -EOPNOTSUPP;
++			} else
++					rc = -EOPNOTSUPP;
+ 		}
+ 	} else
+ 		server->capabilities &= ~CAP_EXTENDED_SECURITY;
 -- 
 1.6.0.2
