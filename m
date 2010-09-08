@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 4/8] ntlmv2/ntlmssp  define, declare, and use crypto hash functions
-Date: Tue,  7 Sep 2010 23:45:51 -0500
-Message-ID: <1283921151-13090-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 5/8] ntlmv2/ntlmssp  functions to either extract or create av pair/ti info blob
+Date: Tue,  7 Sep 2010 23:46:25 -0500
+Message-ID: <1283921185-13114-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,171 +12,206 @@ List-ID: <linux-cifs.vger.kernel.org>
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
-Allocate crypto hashing functions, ecurity descriptiors, and respective
-contexts when a smb/tcp connection is established.
-Release them when a tcp/smb connection is taken down.
+Attribue Value (AV) pairs or Target Info (TI) pairs are part of 
+ntlmv2 authentication.
+Structure ntlmv2_resp had only definition for two av pairs.
+So removed it, and now allocation of av pairs is dynamic.
+For servers like Windows 7/2008, av pairs sent by server in 
+challege packet (type 2 in the ntlmssp exchange/negotiation) can
+vary.
+ 
+Server sends them during ntlmssp negotiation. So when ntlmssp is used
+as an authentication mechanism, type 2 challenge packet from server
+has this information.  Pluck it and use the entire blob for 
+authenticaiton purpose.  If user has not specified, extract 
+(netbios) domain name from the av pairs which is used to calculate 
+ntlmv2 hash.  Servers like Windows 7 are particular about the AV pair
+blob.
 
-md5 and hmac-md5 are two crypto hashing functions that are used
-throught the life of an smb/tcp connection by various functions that
-calcualte signagure and ntlmv2 hash, HMAC etc.
+Servers like Windows 2003, are not very strict about the contents
+of av pair blob used during ntlmv2 authentication.
+So when security mechanism such as ntlmv2 is used (not ntlmv2 in ntlmssp),
+there is no negotiation and so genereate a minimal blob that gets
+used in ntlmv2 authentication as well as gets sent.
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |   71 +++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsproto.h   |    2 +
- fs/cifs/connect.c     |   16 +++++++++--
- 3 files changed, 86 insertions(+), 3 deletions(-)
+ fs/cifs/cifsencrypt.c |   77 ++++++++++++++++++++++++++++++++++++++++++++++--
+ fs/cifs/cifspdu.h     |    1 -
+ fs/cifs/connect.c     |    2 +
+ fs/cifs/sess.c        |   18 +++++++++++
+ 4 files changed, 93 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 4bdcf13..4772c4d 100644
+index 4772c4d..e53fbeb 100644
 --- a/fs/cifs/cifsencrypt.c
 +++ b/fs/cifs/cifsencrypt.c
-@@ -369,3 +369,74 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
- 	hmac_md5_final(v2_session_response, &context);
- /*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
+@@ -27,6 +27,7 @@
+ #include "md5.h"
+ #include "cifs_unicode.h"
+ #include "cifsproto.h"
++#include "ntlmssp.h"
+ #include <linux/ctype.h>
+ #include <linux/random.h>
+ 
+@@ -263,6 +264,78 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
  }
+ #endif /* CIFS_WEAK_PW_HASH */
+ 
++/* This is just a filler for ntlmv2 type of security mechanisms.
++ * Older servers are not very particular about the contents of av pairs
++ * in the blob and for sec mechs like ntlmv2, there is no negotiation
++ * as in ntlmssp, so unless domain and server  netbios and dns names
++ * are specified, there is no way to obtain name.  In case of ntlmssp,
++ * server provides that info in type 2 challenge packet
++ */
 +
-+void
-+cifs_crypto_shash_release(struct TCP_Server_Info *server)
++static int
++build_avpair_blob(struct cifsSesInfo *ses)
 +{
-+	if (server->secmech.md5)
-+		crypto_free_shash(server->secmech.md5);
++	struct ntlmssp2_name *attrptr;
 +
-+	if (server->secmech.hmacmd5)
-+		crypto_free_shash(server->secmech.hmacmd5);
-+
-+	kfree(server->secmech.sdeschmacmd5);
-+
-+	kfree(server->secmech.sdescmd5);
-+}
-+
-+int
-+cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
-+{
-+	int rc;
-+	unsigned int size;
-+
-+	server->secmech.hmacmd5 = crypto_alloc_shash("hmac(md5)", 0, 0);
-+	if (!server->secmech.hmacmd5 ||
-+			IS_ERR(server->secmech.hmacmd5)) {
-+		cERROR(1, "could not allocate crypto hmacmd5\n");
-+		return 1;
++	ses->tilen = 2 * sizeof(struct ntlmssp2_name);
++	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
++	if (!ses->tiblob) {
++		ses->tilen = 0;
++		cERROR(1, "Challenge target info allocation failure");
++		return -ENOMEM;
 +	}
-+
-+	server->secmech.md5 = crypto_alloc_shash("md5", 0, 0);
-+	if (!server->secmech.md5 || IS_ERR(server->secmech.md5)) {
-+		cERROR(1, "could not allocate crypto md5\n");
-+		rc = 1;
-+		goto cifs_crypto_shash_allocate_ret1;
-+	}
-+
-+	size = sizeof(struct shash_desc) +
-+			crypto_shash_descsize(server->secmech.hmacmd5);
-+	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
-+	if (!server->secmech.sdeschmacmd5) {
-+		cERROR(1, "cifs_crypto_shash_allocate: can't alloc hmacmd5\n");
-+		rc = -ENOMEM;
-+		goto cifs_crypto_shash_allocate_ret2;
-+	}
-+	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
-+	server->secmech.sdeschmacmd5->shash.flags = 0x0;
-+
-+
-+	size = sizeof(struct shash_desc) +
-+			crypto_shash_descsize(server->secmech.md5);
-+	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
-+	if (!server->secmech.sdescmd5) {
-+		cERROR(1, "cifs_crypto_shash_allocate: can't alloc md5\n");
-+		rc = -ENOMEM;
-+		goto cifs_crypto_shash_allocate_ret3;
-+	}
-+	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
-+	server->secmech.sdescmd5->shash.flags = 0x0;
++	attrptr = (struct ntlmssp2_name *) ses->tiblob;
++	attrptr->type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
 +
 +	return 0;
++}
 +
-+cifs_crypto_shash_allocate_ret3:
-+	kfree(server->secmech.sdeschmacmd5);
++/* Server has provided av pairs/target info in the type 2 challenge
++ * packet and we have plucked it and stored within smb connection.
++ * We parse that blob here to find netbios domain name to be used
++ * as part of ntlmv2 authentication, if not already specified on
++ * the command line
++ */
 +
-+cifs_crypto_shash_allocate_ret2:
-+	crypto_free_shash(server->secmech.md5);
++static int
++find_domain_name(struct cifsSesInfo *ses)
++{
++	int rc = 0;
++	unsigned int attrsize;
++	unsigned int type;
++	unsigned char *blobptr;
++	struct ntlmssp2_name *attrptr;
 +
-+cifs_crypto_shash_allocate_ret1:
-+	crypto_free_shash(server->secmech.hmacmd5);
++	if (ses->tiblob) {
++		blobptr = ses->tiblob;
++		attrptr = (struct ntlmssp2_name *) blobptr;
++
++		while ((type = attrptr->type) != 0) {
++			blobptr += 2; /* advance attr type */
++			attrsize = attrptr->length;
++			blobptr += 2; /* advance attr size */
++			if (type == NTLMSSP_AV_NB_DOMAIN_NAME) {
++				if (!ses->domainName) {
++					ses->domainName =
++						kmalloc(attrptr->length + 1,
++								GFP_KERNEL);
++					if (!ses->domainName)
++							return -ENOMEM;
++					cifs_from_ucs2(ses->domainName,
++						(__le16 *)blobptr,
++						attrptr->length,
++						attrptr->length,
++						load_nls_default(), false);
++				}
++			}
++			blobptr += attrsize; /* advance attr  value */
++			attrptr = (struct ntlmssp2_name *) blobptr;
++		}
++	}
 +
 +	return rc;
 +}
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index eadf78c..fa3716c 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -368,6 +368,8 @@ extern int cifs_calculate_mac_key(struct session_key *key, const char *rn,
- extern void CalcNTLMv2_response(const struct cifsSesInfo *, char *);
- extern void setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
- 			     const struct nls_table *);
-+extern int cifs_crypto_shash_allocate(struct TCP_Server_Info *);
-+extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- extern void calc_lanman_hash(const char *password, const char *cryptkey,
- 				bool encrypt, char *lnm_session_key);
++
+ static int calc_ntlmv2_hash(struct cifsSesInfo *ses,
+ 			    const struct nls_table *nls_cp)
+ {
+@@ -334,10 +407,6 @@ void setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 	buf->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+ 	get_random_bytes(&buf->client_chal, sizeof(buf->client_chal));
+ 	buf->reserved2 = 0;
+-	buf->names[0].type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
+-	buf->names[0].length = 0;
+-	buf->names[1].type = 0;
+-	buf->names[1].length = 0;
+ 
+ 	/* calculate buf->ntlmv2_hash */
+ 	rc = calc_ntlmv2_hash(ses, nls_cp);
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index f5c78fb..dc90a36 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -670,7 +670,6 @@ struct ntlmv2_resp {
+ 	__le64  time;
+ 	__u64  client_chal; /* random */
+ 	__u32  reserved2;
+-	struct ntlmssp2_name names[2];
+ 	/* array of name entries could follow ending in minimum 4 byte struct */
+ } __attribute__((packed));
+ 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0ea52e9..f5369e7 100644
+index f5369e7..0621a72 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -1520,6 +1520,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
- 	server->tcpStatus = CifsExiting;
- 	spin_unlock(&GlobalMid_Lock);
+@@ -1768,6 +1768,8 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 	if (ses == NULL)
+ 		goto get_ses_fail;
  
-+	cifs_crypto_shash_release(server);
- 	cifs_fscache_release_client_cookie(server);
++	ses->tilen = 0;
++	ses->tiblob = NULL;
+ 	/* new SMB session uses our server ref */
+ 	ses->server = server;
+ 	if (server->addr.sockAddr6.sin6_family == AF_INET6)
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 0a57cb7..756f410 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -383,6 +383,9 @@ static int decode_ascii_ssetup(char **pbcc_area, int bleft,
+ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 				    struct cifsSesInfo *ses)
+ {
++	unsigned int tioffset; /* challenge message target info area */
++	unsigned int tilen; /* challenge message target info area length  */
++
+ 	CHALLENGE_MESSAGE *pblob = (CHALLENGE_MESSAGE *)bcc_ptr;
  
- 	task = xchg(&server->tsk, NULL);
-@@ -1574,10 +1575,16 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		goto out_err;
- 	}
+ 	if (blob_len < sizeof(CHALLENGE_MESSAGE)) {
+@@ -405,6 +408,20 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
+ 		we must set the MIC field of the AUTHENTICATE_MESSAGE */
  
-+	rc = cifs_crypto_shash_allocate(tcp_ses);
-+	if (rc) {
-+		cERROR(1, "could not setup hash structures rc %d", rc);
-+		goto out_err;
++	ses->server->ntlmssp.server_flags = le32_to_cpu(pblob->NegotiateFlags);
++
++	tioffset = cpu_to_le16(pblob->TargetInfoArray.BufferOffset);
++	tilen = cpu_to_le16(pblob->TargetInfoArray.Length);
++	ses->tilen = tilen;
++	if (ses->tilen) {
++		ses->tiblob = kmalloc(tilen, GFP_KERNEL);
++		if (!ses->tiblob) {
++			cERROR(1, "Challenge target info allocation failure");
++			return -ENOMEM;
++		}
++		memcpy(ses->tiblob,  bcc_ptr + tioffset, ses->tilen);
 +	}
 +
- 	tcp_ses->hostname = extract_hostname(volume_info->UNC);
- 	if (IS_ERR(tcp_ses->hostname)) {
- 		rc = PTR_ERR(tcp_ses->hostname);
--		goto out_err;
-+		goto out_err2;
- 	}
+ 	return 0;
+ }
  
- 	tcp_ses->noblocksnd = volume_info->noblocksnd;
-@@ -1618,7 +1625,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	}
- 	if (rc < 0) {
- 		cERROR(1, "Error connecting to socket. Aborting operation");
--		goto out_err;
-+		goto out_err2;
- 	}
- 
- 	/*
-@@ -1632,7 +1639,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		rc = PTR_ERR(tcp_ses->tsk);
- 		cERROR(1, "error %d create cifsd thread", rc);
- 		module_put(THIS_MODULE);
--		goto out_err;
-+		goto out_err2;
- 	}
- 
- 	/* thread spawned, put it on the list */
-@@ -1644,6 +1651,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 
- 	return tcp_ses;
- 
-+out_err2:
-+	cifs_crypto_shash_release(tcp_ses);
+@@ -533,6 +550,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+ 	sec_blob->SessionKey.Length = 0;
+ 	sec_blob->SessionKey.MaximumLength = 0;
 +
- out_err:
- 	if (tcp_ses) {
- 		if (!IS_ERR(tcp_ses->hostname))
+ 	return tmp - pbuffer;
+ }
+ 
 -- 
 1.6.0.2
