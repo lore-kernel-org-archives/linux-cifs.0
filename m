@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Subject: Re: [PATCH 1/8] ntlmv2/ntlmssp  defines, data structures
-Date: Thu, 09 Sep 2010 16:20:41 +0530
-Message-ID: <4C88BC01.30503@suse.de>
+Date: Thu, 09 Sep 2010 16:28:35 +0530
+Message-ID: <4C88BDDB.6060604@suse.de>
 References: <1283921040-12994-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -50,10 +50,35 @@ On 09/08/2010 10:14 AM, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.or
 > message authentication code, it holds the session key (for ntlmv2, ntlmv1 etc.).
 > mac is generated as a signature in cifs_calc* functions.
 > 
+> Mark dependency on crypto modules in Kconfig.
+> 
 
-wondering whether making mac_key => session_key change a separate patch
-would help/make it simpler..?
+>  			const struct nls_table *);
+> diff --git a/fs/cifs/ntlmssp.h b/fs/cifs/ntlmssp.h
+> index 49c9a4e..3c8c6c1 100644
+> --- a/fs/cifs/ntlmssp.h
+> +++ b/fs/cifs/ntlmssp.h
+> @@ -61,6 +61,19 @@
+>  #define NTLMSSP_NEGOTIATE_KEY_XCH   0x40000000
+>  #define NTLMSSP_NEGOTIATE_56        0x80000000
+>  
+> +/* Define AV Pair Field IDs */
+> +#define NTLMSSP_AV_EOL                 0
+> +#define NTLMSSP_AV_NB_COMPUTER_NAME    1
+> +#define NTLMSSP_AV_NB_DOMAIN_NAME      2
+> +#define NTLMSSP_AV_DNS_COMPUTER_NAME   3
+> +#define NTLMSSP_AV_DNS_DOMAIN_NAME     4
+> +#define NTLMSSP_AV_DNS_TREE_NAME       5
+> +#define NTLMSSP_AV_FLAGS               6
+> +#define NTLMSSP_AV_TIMESTAMP           7
+> +#define NTLMSSP_AV_RESTRICTION         8
+> +#define NTLMSSP_AV_TARGET_NAME         9
+> +#define NTLMSSP_AV_CHANNEL_BINDINGS    10
+> +
 
+An enum would be better?
+
+(sorry about not consolidating comments and sending multiple emails).
 
 
 -- 
