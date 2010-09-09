@@ -1,68 +1,38 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 1/8] ntlmv2/ntlmssp  defines, data structures
-Date: Thu, 9 Sep 2010 07:49:08 -0400
-Message-ID: <20100909074908.6321ab3e@barsoom.rdu.redhat.com>
-References: <1283921040-12994-1-git-send-email-shirishpargaonkar@gmail.com>
-	<4C88BC01.30503@suse.de>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: cifs tree updated to back out crypto/ntlmv2/ntlmssp change to
+ 2.6.37 - but now has the cifsd fixes
+Date: Thu, 9 Sep 2010 07:52:42 -0400
+Message-ID: <20100909075242.11d03854@barsoom.rdu.redhat.com>
+References: <AANLkTimraXF9gVC-o5qb2mfDfrq6=9-CTtyGeew27ne6@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4C88BC01.30503-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <AANLkTimraXF9gVC-o5qb2mfDfrq6=9-CTtyGeew27ne6-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 09 Sep 2010 16:20:41 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+On Wed, 8 Sep 2010 16:25:09 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> On 09/08/2010 10:14 AM, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > 
-> > 
-> > Defining per smb connection structures, sdesc, ntlmssp_auth, cifs_secmech,
-> > and cphready.
-> > 
-> > Fields tilen and tilbob are session specific.
-> > 
-> > sdesc holds security descriptor, ntlmssp_auth holds secondary key which
-> > is a nonce that gets used as a key to generate signatures,
-> > ciphertext is genereated by rc4/arc4 encryption of secondary key using
-> > ntlmv2 session key and sent in the session key field of the type 3 message
-> > sent by the client during ntlmssp negotiation/exchange
-> > These are per session structures and secondary key and cipher text 
-> > get calculated only once per smb connection, during first smb session setup
-> > for that smb connection.
-> > 
-> > Field cphready is used to mark such that once secondary keys and ciphertext
-> > are calculated during very first smb session setup for a smb connection
-> > and ciphertext is sent to the server, the same does not happen during
-> > subsequent smb session setups/establishments.
-> > 
-> > if key exchange is negotiated between client and server, hmacmd5 and md5 hold
-> > respective crypto function/algorithm.
-> > 
-> > tilen and tiblob hold the length and blob that is target info or 
-> > attribute value (av) pairs, which is part of the authentication blob.
-> > These are per smb session fields.
-> > 
-> > Various defines are defined such as values used in AV pairs/Target Info pairs.
-> > And various key and hash sizes are also defined.
-> > 
-> > The reason mac_key was changed to session key is, this structure does not hold
-> > message authentication code, it holds the session key (for ntlmv2, ntlmv1 etc.).
-> > mac is generated as a signature in cifs_calc* functions.
-> > 
+> CIFS tree updated to back out the crypto/ntlmv2/ntlmssp change
+> (included patch 2/8 because it was reviewed and independent).   Added
+> to the cifs tree the fixes to prevent premature exit to cifsd and to
+> prevent the possibly ip address memory corruption.
 > 
-> wondering whether making mac_key => session_key change a separate patch
-> would help/make it simpler..?
+> -- 
+> Thanks,
 > 
 
-+1
+Looks good to me.
 
-That would definitely help the signal to noise ratio.
+BTW, when you send the pull request to Linus, could you also cc
+linux-cifs? It's helpful to know when you send these out so that we know
+to keep a closer eye on mainline.
 
+Thanks!
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
