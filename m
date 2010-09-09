@@ -1,262 +1,58 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH -v2 4/6] generate secondary session key and ciphertext and send it if signing enabled
-Date: Thu,  9 Sep 2010 13:13:14 -0500
-Message-ID: <1284055994-843-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-crypto-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: CIFS data coherency problem
+Date: Thu, 9 Sep 2010 22:18:05 +0400
+Message-ID: <AANLkTinYFe6O-4ANt1VYcvEMukiis-11cDuMP2GSKZ7j@mail.gmail.com>
+References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
+	<AANLkTi=_eMSC99K1a2zWpgW5nc8UArzKj2MWHaRmCXzK@mail.gmail.com>
+	<20100908063224.240b0419@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20100908063224.240b0419-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+2010/9/8 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> On Wed, 8 Sep 2010 10:49:13 +0400
+>
+> What sort of server were you working with here?
 
-structure ntlmssp_auth and filed cphready is defined as per smb connection.
+Samba 3.4, Samba 4, Windows XP.
 
-ntlmssp_auth holds secondary key which is a nonce that gets used as a key
-to generate signatures, ciphertext is genereated by rc4/arc4 encryption of
-secondary key using ntlmv2 session key and sent in the session key field of
-the type 3 message sent by the client during ntlmssp negotiation/exchange
-These are per session structures and secondary key and cipher text
-get calculated only once per smb connection, during first smb session setup
-for that smb connection.
+>
+> At the very least, we should consider a "strict" caching model like you
+> describe as an option. If it has a large performance impact then we may
+> want to allow people to use the existing caching model as well. OTOH,
+> maintaining multiple caching models may be too cumbersome to support.
 
-Field cphready is used to mark such that once secondary keys and ciphertext
-are calculated during very first smb session setup for a smb connection
-and ciphertext is sent to the server, the same does not happen during
-subsequent smb session setups/establishments.
+Yes, It brings complexity. As for performance: how can we talk about
+performance if we have invalid data? In this case when we can't use
+any serious application for business on CIFS file system (because of
+wrong data coherency) why do we need such a performance? I think we at
+first should keep all the data up to date and then think about
+performance and other not so important things.
 
-A key is exchanged with the server if client indicates so in flags in
-type 1 messsage and server agrees in flag in type 2 message of ntlmssp
-negotiation.  If both client and agree, a key sent by client in
-type 3 message of ntlmssp negotiation in the session key field.
-The key is a ciphertext generated off of secondary key, a nonce, using
-ntlmv2 hash via rc4/arc4.
+>
+> If you're saying however that the spec says this, then it would
+> also be helpful to point out the place in the spec that outlines this
+> so we can go back and read over that part.
 
-If authentication is successful, the secondary key is the that client
-uses to calculate cifs/smb signature in the messages that client sends
-and to verify the messages sent by server.
-This key stays with the smb connection for its life and is the key used
-to generate (and verify) signatures for all the subsequent smb sessions
-for this smb connection.
+3.2.4.18 from [MS-CIFS].pdf states when a client should use a cache
+for reading, writing or locking. You can also look at
+http://go.microsoft.com/fwlink/?LinkID=140636 for more information
+about oplock semantic. In every case I didn't noticed any information
+for using cache if we don't have an oplock. If you have such an
+information it'll be very interesting to see it.
 
-So only for the first smb session on any smb connection, type 1 message
-of ntlmssp negotiation selects the flag NTLMSSP_NEGOTIATE_KEY_XCH.
-It is not used for subsequent smb sessions on this smb connection i.e.
-no need to generate secondary key, create ciphertext and send it etc.
+>
+> There's no need to hesitate in sending the patches however. Doing so
+> gives us a starting point for discussing the change. If you're not sure
+> about them, just declare them an "RFC".
 
-After the very first successful smb session, sequence number gets set
-to 0 and  variable cphready is used to mark that the key calculations
-are done. cphready is reset when a reconnect of the smb connection
-happens as sessions get set up again.
+Ok, I will prepare the patch and send it soon.
 
-Calculation of ciphertext and setting cphready, is done within
-mutex lock to prevent race of smb session setups on a new smb connection.
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsencrypt.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsglob.h    |   10 +++++++++
- fs/cifs/cifspdu.h     |    7 ++++++
- fs/cifs/cifsproto.h   |    1 +
- fs/cifs/connect.c     |    2 +
- fs/cifs/sess.c        |   26 ++++++++++++++++++-----
- 6 files changed, 93 insertions(+), 6 deletions(-)
-
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 857dd37..09d9f74 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -471,6 +471,59 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
- /*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
- }
- 
-+int
-+calc_seckey(struct TCP_Server_Info *server)
-+{
-+	int rc;
-+	struct crypto_blkcipher *tfm_arc4;
-+	struct scatterlist sgin, sgout;
-+	struct blkcipher_desc desc;
-+
-+	if (!server) {
-+		cERROR(1, "%s: Can't determine ciphertext key\n", __func__);
-+		return 1;
-+	}
-+
-+	mutex_lock(&server->srv_mutex);
-+	if (server->cphready) {
-+		mutex_unlock(&server->srv_mutex);
-+		return 0;
-+	}
-+
-+	get_random_bytes(server->ntlmssp.sec_key, CIFS_NTLMV2_SESSKEY_SIZE);
-+
-+	tfm_arc4 = crypto_alloc_blkcipher("ecb(arc4)",
-+						0, CRYPTO_ALG_ASYNC);
-+	if (!tfm_arc4 || IS_ERR(tfm_arc4)) {
-+		cERROR(1, "could not allocate crypto API arc4\n");
-+		mutex_unlock(&server->srv_mutex);
-+		return PTR_ERR(tfm_arc4);
-+	}
-+
-+	desc.tfm = tfm_arc4;
-+
-+	crypto_blkcipher_setkey(tfm_arc4, server->session_key.data.ntlmv2.key,
-+					CIFS_CPHTXT_SIZE);
-+
-+	sg_init_one(&sgin, server->ntlmssp.sec_key, CIFS_CPHTXT_SIZE);
-+	sg_init_one(&sgout, server->ntlmssp.ciphertext, CIFS_CPHTXT_SIZE);
-+
-+	rc = crypto_blkcipher_encrypt(&desc, &sgout, &sgin, CIFS_CPHTXT_SIZE);
-+	if (rc) {
-+		cERROR(1, "could not encrypt session key rc: %d\n", rc);
-+		mutex_unlock(&server->srv_mutex);
-+		return rc;
-+	}
-+
-+	crypto_free_blkcipher(tfm_arc4);
-+
-+	server->sequence_number = 0;
-+	server->cphready = true;
-+	mutex_unlock(&server->srv_mutex);
-+
-+	return 0;
-+}
-+
- void
- cifs_crypto_shash_release(struct TCP_Server_Info *server)
- {
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f0ec235..c7da866 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -126,6 +126,14 @@ struct cifs_secmech {
- 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
- };
- 
-+/* per smb connection structure/fields */
-+struct ntlmssp_auth {
-+	__u32 client_flags; /* sent by client in type 1 ntlmsssp exchange */
-+	__u32 server_flags; /* sent by server in type 2 ntlmssp exchange */
-+	unsigned char sec_key[CIFS_CPHTXT_SIZE]; /* a nonce client generates */
-+	unsigned char ciphertext[CIFS_CPHTXT_SIZE]; /* sent to server */
-+};
-+
- struct cifs_cred {
- 	int uid;
- 	int gid;
-@@ -205,6 +213,8 @@ struct TCP_Server_Info {
- 	u16 dialect; /* dialect index that server chose */
- 	/* extended security flavors that server supports */
- 	struct cifs_secmech secmech; /* crypto sec mech functs, descriptors */
-+	struct ntlmssp_auth ntlmssp; /* sec key, ciphertext, flags */
-+	bool    cphready;               /* ciphertext is calculated */
- 	bool	sec_kerberos;		/* supports plain Kerberos */
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
-diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-index b0f4b56..dc90a36 100644
---- a/fs/cifs/cifspdu.h
-+++ b/fs/cifs/cifspdu.h
-@@ -134,6 +134,13 @@
-  * Size of the session key (crypto key encrypted with the password
-  */
- #define CIFS_SESS_KEY_SIZE (24)
-+#define CIFS_CLIENT_CHALLENGE_SIZE (8)
-+#define CIFS_SERVER_CHALLENGE_SIZE (8)
-+#define CIFS_HMAC_MD5_HASH_SIZE (16)
-+#define CIFS_CPHTXT_SIZE (16)
-+#define CIFS_NTLMV2_SESSKEY_SIZE (16)
-+#define CIFS_NTHASH_SIZE (16)
-+
- 
- /*
-  * Maximum user name length
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8466a16..d89a87a 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -371,6 +371,7 @@ extern int setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
- 			     const struct nls_table *);
- extern int cifs_crypto_shash_allocate(struct TCP_Server_Info *);
- extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
-+extern int calc_seckey(struct TCP_Server_Info *);
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- extern void calc_lanman_hash(const char *password, const char *cryptkey,
- 				bool encrypt, char *lnm_session_key);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8789054..ffccd9f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -199,6 +199,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 			if (server->tcpStatus != CifsExiting)
- 				server->tcpStatus = CifsGood;
- 			server->sequence_number = 0;
-+			server->cphready = false;
- 			spin_unlock(&GlobalMid_Lock);
- 	/*		atomic_set(&server->inFlight,0);*/
- 			wake_up(&server->response_q);
-@@ -1569,6 +1570,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		goto out_err2;
- 	}
- 
-+	tcp_ses->cphready = false;
- 	tcp_ses->noblocksnd = volume_info->noblocksnd;
- 	tcp_ses->noautotune = volume_info->noautotune;
- 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 8f44fde..7c94d7b 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -408,6 +408,8 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
- 		we must set the MIC field of the AUTHENTICATE_MESSAGE */
- 
-+	ses->server->ntlmssp.server_flags = le32_to_cpu(pblob->NegotiateFlags);
-+
- 	tioffset = cpu_to_le16(pblob->TargetInfoArray.BufferOffset);
- 	tilen = cpu_to_le16(pblob->TargetInfoArray.Length);
- 	ses->tilen = tilen;
-@@ -442,10 +444,12 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
- 		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
- 		NTLMSSP_NEGOTIATE_NTLM;
- 	if (ses->server->secMode &
--	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-+			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
- 		flags |= NTLMSSP_NEGOTIATE_SIGN;
--	if (ses->server->secMode & SECMODE_SIGN_REQUIRED)
--		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
-+		if (!ses->server->cphready)
-+			flags |= NTLMSSP_NEGOTIATE_KEY_XCH |
-+				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
-+	}
- 
- 	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
- 
-@@ -552,9 +556,19 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
- 	sec_blob->WorkstationName.MaximumLength = 0;
- 	tmp += 2;
- 
--	sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
--	sec_blob->SessionKey.Length = 0;
--	sec_blob->SessionKey.MaximumLength = 0;
-+	if ((ses->server->ntlmssp.server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
-+			!calc_seckey(ses->server)) {
-+		memcpy(tmp, ses->server->ntlmssp.ciphertext, CIFS_CPHTXT_SIZE);
-+		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
-+		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
-+		sec_blob->SessionKey.MaximumLength =
-+			cpu_to_le16(CIFS_CPHTXT_SIZE);
-+		tmp += CIFS_CPHTXT_SIZE;
-+	} else {
-+		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
-+		sec_blob->SessionKey.Length = 0;
-+		sec_blob->SessionKey.MaximumLength = 0;
-+	}
- 
- setup_ntlmv2_ret:
- 	return tmp - pbuffer;
 -- 
-1.6.0.2
+Best regards,
+Pavel Shilovsky.
