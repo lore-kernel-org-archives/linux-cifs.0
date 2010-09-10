@@ -1,438 +1,330 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: smb2 kernel panic on module unload
-Date: Thu, 9 Sep 2010 20:05:45 -0500
-Message-ID: <AANLkTikOeUxJex2FWpUZiUtGyroSqX-BuoUpwxvYNOyO@mail.gmail.com>
-References: <4C87D7D1.806@candelatech.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: CIFS data coherency problem
+Date: Fri, 10 Sep 2010 11:50:05 +0400
+Message-ID: <AANLkTikXWGNtuOjPbG0wAdHLuVQOVuouaUaBi4HRwSR-@mail.gmail.com>
+References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
+	<AANLkTi=_eMSC99K1a2zWpgW5nc8UArzKj2MWHaRmCXzK@mail.gmail.com>
+	<20100908063224.240b0419@corrin.poochiereds.net>
+	<AANLkTinYFe6O-4ANt1VYcvEMukiis-11cDuMP2GSKZ7j@mail.gmail.com>
+	<AANLkTin+qiQsF_hOCvdBKtCh0n0bcd82RDOUz=h3K6gu@mail.gmail.com>
+	<AANLkTikOR_HU934L6FKq8q2ZwcaTTOTPfaSofimK6OFH@mail.gmail.com>
+	<AANLkTi=zc7G847VHqVjO7LRfLkzzSGsJURvJmH1C8gOQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Content-Type: multipart/mixed; boundary=0015176f0f34b845e1048fe2fedb
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4C87D7D1.806-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+In-Reply-To: <AANLkTi=zc7G847VHqVjO7LRfLkzzSGsJURvJmH1C8gOQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Sep 8, 2010 at 1:37 PM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> wr=
-ote:
-> I saw this when attempting to rmmod smb2.
->
-> Thanks,
-> Ben
->
->
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'DebugData'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Not tainted 2.6.36-rc2+ #1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab20>] smb2_proc_clean+0x20/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420c5 ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'smb2FYI'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab33>] smb2_proc_clean+0x33/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420c6 ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'traceSMB2'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab46>] smb2_proc_clean+0x46/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420c7 ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'Stats'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab59>] smb2_proc_clean+0x59/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420c8 ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'MultiuserMount'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab6c>] smb2_proc_clean+0x6c/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420c9 ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'OplockEnabled'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab7f>] smb2_proc_clean+0x7f/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420ca ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'SecurityFlags'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034ab92>] smb2_proc_clean+0x92/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420cb ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'Experimental'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034aba5>] smb2_proc_clean+0xa5/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420cc ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'LookupCacheEnabled'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034abb8>] smb2_proc_clean+0xb8/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420cd ]---
-> ------------[ cut here ]------------
-> WARNING: at fs/proc/generic.c:816 remove_proc_entry+0xf3/0x26d()
-> Hardware name: X8STi
-> name 'fs/smb2'
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1
-> Call Trace:
-> =A0[<ffffffff81043a26>] warn_slowpath_common+0x80/0x98
-> =A0[<ffffffff81043ad2>] warn_slowpath_fmt+0x41/0x43
-> =A0[<ffffffff8140744b>] ? _raw_spin_unlock+0x45/0x52
-> =A0[<ffffffff811357fe>] remove_proc_entry+0xf3/0x26d
-> =A0[<ffffffff8106a5fb>] ? mark_held_locks+0x52/0x70
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff81405a03>] ? __mutex_unlock_slowpath+0x114/0x149
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffffa034abc6>] smb2_proc_clean+0xc6/0xc8 [smb2]
-> =A0[<ffffffffa03537e3>] exit_smb2+0x27/0x86 [smb2]
-> =A0[<ffffffff8107375b>] sys_delete_module+0x1aa/0x20e
-> =A0[<ffffffff81407bf9>] ? retint_swapgs+0x13/0x1b
-> =A0[<ffffffff8106a87b>] ? trace_hardirqs_on_caller+0x111/0x135
-> =A0[<ffffffff8108e299>] ? audit_syscall_entry+0x119/0x145
-> =A0[<ffffffff81009a42>] system_call_fastpath+0x16/0x1b
-> ---[ end trace 8d1d6075190420ce ]---
-> ------------[ cut here ]------------
-> kernel BUG at mm/mempool.c:26!
-> invalid opcode: 0000 [#1] PREEMPT SMP
-> last sysfs file:
-> /sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/=
-sda/sda1/stat
-> CPU 6
-> Modules linked in: smb2(-) xt_CT iptable_raw ipt_addrtype xt_DSCP xt_=
-dscp
-> xt_string xt_owner xt_NFQUEUE xt_multiport xt_mark xt_iprange xt_hash=
-limit
-> xt_connmark 8021q garp bridge stp llc veth fuse arc4 michael_mic macv=
-lan
-> pktgen iscsi_tcp libiscsi_tcp libiscsi scsi_transport_iscsi nfs lockd
-> fscache nfs_acl auth_rpcgss sunrpc ipv6 uinput ixgbe ioatdma e1000e g=
-hes dca
-> mdio hed iTCO_wdt iTCO_vendor_support i2c_i801 pcspkr i2c_core microc=
-ode
-> i7core_edac edac_core [last unloaded: ipt_addrtype]
->
-> Pid: 12935, comm: rmmod Tainted: G =A0 =A0 =A0 =A0W =A0 2.6.36-rc2+ #=
-1 X8STi/X8STi
-> RIP: 0010:[<ffffffff810a70e9>] =A0[<ffffffff810a70e9>] free_pool+0x10=
-/0x47
-> RSP: 0018:ffff88032c9cbe98 =A0EFLAGS: 00010286
-> RAX: 00000000ffffffff RBX: ffff88031abd3600 RCX: 0000000000000000
-> RDX: ffffffff00000001 RSI: 0000000000000001 RDI: ffff88031abd3600
-> RBP: ffff88032c9cbea8 R08: 0000000000000246 R09: 0000000000000000
-> R10: ffffffff81c8a5f0 R11: 0000000000000000 R12: 0000000000000880
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
-> FS: =A000007facdcd23700(0000) GS:ffff880002580000(0000) knlGS:0000000=
-000000000
-> CS: =A00010 DS: 0000 ES: 0000 CR0: 000000008005003b
-> CR2: 00000037e2677900 CR3: 000000031024e000 CR4: 00000000000006e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-> Process rmmod (pid: 12935, threadinfo ffff88032c9ca000, task
-> ffff88032f200000)
-> Stack:
-> =A0ffff88032c9cbec8 ffffffffa036dce0 ffff88032c9cbeb8 ffffffff810a713=
-5
-> <0> ffff88032c9cbec8 ffffffffa034dc0f ffff88032c9cbed8 ffffffffa03538=
-3b
-> <0> ffff88032c9cbf78 ffffffff8107375b ffff880032626d73 ffffffff81407b=
-f9
-> Call Trace:
-> =A0[<ffffffff810a7135>] mempool_destroy+0x15/0x17
+--0015176f0f34b845e1048fe2fedb
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Just fixed an obvious bug (the move to common DNS resolver code broke
-the smb2 init code).
+2010/9/10 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Surely it is a serious bug if a server doesn't update the mtime by the
+> time the handle they used is closed. =A0 If a client 1 does open/write/cl=
+ose,
+> then client 2 does open/write/close, client 1 reopening the file should
+> see the updated mtime. =A0 If client 2 had not closed the file yet - it
+> is not clear whether its write and mtime update will be processed
+> first - but we shouldn't be using cached data in that case - client 1 sho=
+uld
+> do an invalidate_mapping when it can't get an oplock (we do that already
+> in seek and mmap via revalidate e.g.). =A0In any case writes won't be cac=
+hed
+> in that case - and the simplest change may be to invalidate the inode
+> cached pages in this reopen path - when the mtime/size matches but we
 
+I mean the situation then we have this file opened by another file handle. =
+E.g.:
+
+1) client1 opens file as f1.
+2) client1 writes 'a' into f1 from the beginning.
+3) client2 opens file as f2.
+4) client2 writes 'x' into f2 to the beginning,
+5) client1 opens file as f3.
+6) client1 reads from f3 and get 'a'!!! But it must be 'x'!
+
+I attached this test 'mtime_problem.py' and the capture
+'mtime_problem.pcap'. On the capture you can see that client1 gets
+from the server the same mtime for f3 as it was for f1 - so, the
+server didn't apply mtime after client1 and client2 wrote the data to
+the server.
+
+> failed to get a read oplock. =A0 Allowing us to turn off the 1 second tim=
+eout
+> on metadata/data caching is already possible.
+
+About LookupCacheEnabled, I turned it off when I was running my tests
+cache_problem.py and mtime_problem.py but the results were the same.
+
+>
+>>> have two opens of the same file from different clients we won't be
+>>> caching anyway.
+>
+> With no oplock we won't be caching writes - we do cache reads
+> in some cases (the intent originally was to do this for about 1 second)
+> but as you note we can cache longer
+>
+
+About writes:
+           written =3D generic_file_aio_write(iocb, iov, nr_segs, pos);
+           if (!CIFS_I(inode)->clientCanCacheAll)
+                   filemap_fdatawrite(inode->i_mapping);
+           return written;
+
+If we don't have write oplock, we always return written value (got
+after generic_file_aio_write), but there is no checks if we fails on
+filemap_fdatawrite (e.g. if another client has this file opened and
+obtains mandatory byte-range lock on it). So, a user always think that
+his write is complete successfully, but it can be wrong!
+
+There is another problem with Oplocks: The server sends Oplock break
+notification into only one tcon provided by the client. But now in
+CIFS code architecture we have no connections between several
+connections to the same share - that's why we set Oplock to None only
+on one tcon, but another leaves the same (with Oplock Level II). In
+this case when we try to read by the second tcon from the file we
+think that we have Oplock for reading and read from the cache - it
+wrong!
+
+The above situation you can see on the same capture
+'mtime_problem.pcap': the server sends Oplock break to None Oplock
+only to the FID 0x0002, but no requests for FID 0x0001!
 
 --=20
-Thanks,
+Best regards,
+Pavel Shilovsky.
 
-Steve
+--0015176f0f34b845e1048fe2fedb
+Content-Type: application/octet-stream; name="mtime_problem.py"
+Content-Disposition: attachment; filename="mtime_problem.py"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdwq9ezy0
+
+IyEvYmluL2VudiBweXRob24KIwojIFdlIGhhdmUgdG8gbW91bnQgdGhlIHNhbWUgc2hhcmUgdG8g
+dGVzdCwgdGVzdDEsIHRlc3QyIGRpcmVjdG9yaWVzIHRoYXQgbG9jYXRlIGluIHRoZSBkaXJlY3Rv
+cnkgd2UKIyBleGVjdXRlIHRoaXMgc2NyaXB0IGZyb20uCgpmcm9tIG9zIGltcG9ydCBvcGVuLCBj
+bG9zZSwgT19SRFdSLCBPX0NSRUFULCB3cml0ZSwgcmVhZCwgT19SRE9OTFksIE9fV1JPTkxZLCBP
+X1RSVU5DLCBsc2VlaywgU0VFS19FTkQsIFNFRUtfU0VUCgpmID0gb3BlbigndGVzdC9fdGVzdDQz
+MjFfJywgT19SRFdSIHwgT19DUkVBVCB8IE9fVFJVTkMpCmNsb3NlKGYpCgpmMSA9IG9wZW4oJ3Rl
+c3QxL190ZXN0NDMyMV8nLCBPX1JEV1IpCndyaXRlKGYxLCAnYScpCgpmMiA9IG9wZW4oJ3Rlc3Qy
+L190ZXN0NDMyMV8nLCBPX1dST05MWSkKd3JpdGUoZjIsICd4JykKCmYzID0gb3BlbigndGVzdDEv
+X3Rlc3Q0MzIxXycsIE9fUkRPTkxZKQpwcmludCByZWFkKGYzLCAxKQoKY2xvc2UoZjEpCmNsb3Nl
+KGYyKQpjbG9zZShmMykK
+--0015176f0f34b845e1048fe2fedb
+Content-Type: application/octet-stream; name="mtime_problem.pcap"
+Content-Disposition: attachment; filename="mtime_problem.pcap"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gdwq9nkt1
+
+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
+CAoFDJ2zBQydiw==
+--0015176f0f34b845e1048fe2fedb--
