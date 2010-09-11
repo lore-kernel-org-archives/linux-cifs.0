@@ -1,80 +1,123 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: CIFS data coherency problem
-Date: Sat, 11 Sep 2010 11:08:15 +0400
-Message-ID: <AANLkTik_=xi5Engkm4Xcrk_WUaXSsSAsWUhh=M8VYWer@mail.gmail.com>
-References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
-	<AANLkTi=_eMSC99K1a2zWpgW5nc8UArzKj2MWHaRmCXzK@mail.gmail.com>
-	<20100908063224.240b0419@corrin.poochiereds.net>
-	<AANLkTinYFe6O-4ANt1VYcvEMukiis-11cDuMP2GSKZ7j@mail.gmail.com>
-	<AANLkTin+qiQsF_hOCvdBKtCh0n0bcd82RDOUz=h3K6gu@mail.gmail.com>
-	<AANLkTikOR_HU934L6FKq8q2ZwcaTTOTPfaSofimK6OFH@mail.gmail.com>
-	<AANLkTi=zc7G847VHqVjO7LRfLkzzSGsJURvJmH1C8gOQ@mail.gmail.com>
-	<AANLkTikXWGNtuOjPbG0wAdHLuVQOVuouaUaBi4HRwSR-@mail.gmail.com>
-	<20100910081549.41de32d1@corrin.poochiereds.net>
-	<AANLkTi=5YgKzG=rXJ5MuV+R_MGkEd+2ERouUiEc8K5B8@mail.gmail.com>
-	<20100910185002.73e61b8b@tlielax.poochiereds.net>
+Subject: [PATCH] CIFS: New read/write cache mechanism
+Date: Sat, 11 Sep 2010 14:40:10 +0400
+Message-ID: <AANLkTi=VJ+eWqa0ABHJ=464yWN5jEoRVamOia2Xt3Zgm@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100910185002.73e61b8b-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/9/11 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> So what? Why should the writer know anything about whether it succeed=
-s
-> before a flush or close occurs? POSIX does not mandate that. If you a=
-re
-> able to report an error at write time, then that's fine. It's not
-> required however.
+We can do read/write ops with a cache only if we have an Exclusive Oplock
+and read from the cache if we have Oplock Level II. In other cases we do
+read/write ops with a server.
 
-We can write a data in write_end call all the time when we don't have
-an oplock for writing. If we get an error we simply returned it in
-from write_end and an application gets it.
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsfs.c |   31 +++++++++++++++++++------------
+ fs/cifs/file.c   |   11 +++++++++--
+ 2 files changed, 28 insertions(+), 14 deletions(-)
 
-> That's not how I read this:
->
-> 57: server downgrades oplock on 0x0001 to level 2
-> 60: client drops oplock altogether for 0x0001 (note that it replies
-> =A0 =A0with oplock level 0)
-> 65: server revokes oplock on 0x0002 altogether
-> 66: client "acks" the oplock break
->
-> At that point there are no more oplocks held. Why would the server ne=
-ed
-> to send another oplock break?
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index b7431af..f56e67f 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -533,16 +533,23 @@ cifs_get_sb(struct file_system_type *fs_type,
+ 	return 0;
+ }
 
-It (60) is the Oplock Break acknowledge request that's sent by the
-client on the server's Oplock Break Notification (57). According to
-the spec (page 214, section 2.2.4.32.1 of [MS-CIFS].pdf)
-NewOpLockLevel field is used by the server to indicate new oplock
-level for the FID. There no words that says that this field is used by
-the client in acknowledge. An acknowledge is only used to indicate
-that all the dirty data and byte-range locks are flushed to the server
-and doesn't bring any other information. It's my understanding of the
-spec.
+-static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+-				   unsigned long nr_segs, loff_t pos)
++static ssize_t cifs_sync_read(struct file *filp, char __user *buf,
++			      size_t len, loff_t *ppos)
+ {
+-	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
+-	ssize_t written;
++	ssize_t read;
++	struct cifsInodeInfo *cinode;
 
-Even more, CIFS client does it according to the spec (file.c, line 2341=
-):
+-	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+-	if (!CIFS_I(inode)->clientCanCacheAll)
+-		filemap_fdatawrite(inode->i_mapping);
+-	return written;
++	if (filp && filp->f_path.dentry && filp->f_path.dentry->d_inode)
++		cinode = CIFS_I(filp->f_path.dentry->d_inode);
++	else
++		return -ENOENT;
++
++	if (cinode->clientCanCacheRead)
++		read = do_sync_read(filp, buf, len, ppos);
++	else
++		read = cifs_user_read(filp, buf, len, ppos);
++
++	return read;
+ }
 
-        if (!cfile->closePend && !cfile->oplock_break_cancelled) {
-                rc =3D CIFSSMBLock(0, cifs_sb->tcon, cfile->netfid, 0, =
-0, 0, 0,
+ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+@@ -652,10 +659,10 @@ const struct inode_operations cifs_symlink_inode_ops = {
+ };
 
-LOCKING_ANDX_OPLOCK_RELEASE, false);
-                cFYI(1, "Oplock release rc =3D %d", rc);
-        }
+ const struct file_operations cifs_file_ops = {
+-	.read = do_sync_read,
++	.read = cifs_sync_read,
+ 	.write = do_sync_write,
+ 	.aio_read = generic_file_aio_read,
+-	.aio_write = cifs_file_aio_write,
++	.aio_write = generic_file_aio_write,
+ 	.open = cifs_open,
+ 	.release = cifs_close,
+ 	.lock = cifs_lock,
+@@ -689,10 +696,10 @@ const struct file_operations cifs_file_direct_ops = {
+ 	.setlease = cifs_setlease,
+ };
+ const struct file_operations cifs_file_nobrl_ops = {
+-	.read = do_sync_read,
++	.read = cifs_sync_read,
+ 	.write = do_sync_write,
+ 	.aio_read = generic_file_aio_read,
+-	.aio_write = cifs_file_aio_write,
++	.aio_write = generic_file_aio_write,
+ 	.open = cifs_open,
+ 	.release = cifs_close,
+ 	.fsync = cifs_fsync,
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index de748c6..df52282 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -211,8 +211,14 @@ client_can_cache:
+ 		pCifsInode->clientCanCacheAll = true;
+ 		pCifsInode->clientCanCacheRead = true;
+ 		cFYI(1, "Exclusive Oplock granted on inode %p", inode);
+-	} else if ((*oplock & 0xF) == OPLOCK_READ)
++	} else if ((*oplock & 0xF) == OPLOCK_READ) {
++		pCifsInode->clientCanCacheAll = false;
+ 		pCifsInode->clientCanCacheRead = true;
++		cFYI(1, "Level II Oplock franted on inode %p", inode);
++	} else {
++		pCifsInode->clientCanCacheAll = false;
++		pCifsInode->clientCanCacheRead = false;
++	}
 
-and there is no mention of OplockLevel in CIFSSMBLock call.
+ 	return rc;
+ }
+@@ -633,6 +639,7 @@ int cifs_close(struct inode *inode, struct file *file)
+ 		   on this inode, much less write behind and read ahead */
+ 		CIFS_I(inode)->clientCanCacheRead = false;
+ 		CIFS_I(inode)->clientCanCacheAll  = false;
++		invalidate_remote_inode(inode);
+ 	}
+ 	read_unlock(&GlobalSMBSeslock);
+ 	if ((rc == 0) && CIFS_I(inode)->write_behind_rc)
+@@ -1612,7 +1619,7 @@ static int cifs_write_end(struct file *file,
+struct address_space *mapping,
+ 	} else if (!PageUptodate(page) && copied == PAGE_CACHE_SIZE)
+ 		SetPageUptodate(page);
 
-So, as you can see above: there is no value that is set to OplockLevel
-field of SMB_COM_LOCKING_ANDX command.
-
-That's why I said that client1 continues keeping the level II oplock.
-
---=20
-Best regards,
-Pavel Shilovsky.
+-	if (!PageUptodate(page)) {
++	if (!PageUptodate(page) || !CIFS_I(inode)->clientCanCacheAll) {
+ 		char *page_data;
+ 		unsigned offset = pos & (PAGE_CACHE_SIZE - 1);
+ 		int xid;
+-- 
+1.7.2.1
