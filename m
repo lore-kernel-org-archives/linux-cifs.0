@@ -1,7 +1,7 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: CIFS data coherency problem
-Date: Sun, 12 Sep 2010 12:55:35 -0400
-Message-ID: <20100912125535.60c3c897@tlielax.poochiereds.net>
+Date: Sun, 12 Sep 2010 23:14:35 +0400
+Message-ID: <AANLkTi=XT_X27Cuioe_M6zMee0XQAZe+P-TLHbh6n+Yk@mail.gmail.com>
 References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
 	<AANLkTi=_eMSC99K1a2zWpgW5nc8UArzKj2MWHaRmCXzK@mail.gmail.com>
 	<20100908063224.240b0419@corrin.poochiereds.net>
@@ -18,77 +18,39 @@ References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
 	<AANLkTi=gSm+=djrj796Gfjx9FiRQ7s==6DSV=DhYOk7U@mail.gmail.com>
 	<20100912114055.55520f0c@tlielax.poochiereds.net>
 	<AANLkTi=LMy37zVnyKTX_gnf1QAqXja6vuTruVMjfRCdp@mail.gmail.com>
+	<20100912125535.60c3c897@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=LMy37zVnyKTX_gnf1QAqXja6vuTruVMjfRCdp-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20100912125535.60c3c897-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 12 Sep 2010 20:16:21 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2010/9/12 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> write_begin/write_end are called on each page in a write syscall. So if
+> your application is writing in 64k page-aligned chunks, write_end will
+> be called 16 times. When you have no oplock with this patch, for each
+> call to write_end, you're calling cifs_write which will flush each
+> single page synchronously and only that single page to the server. Your
+> 64k write will take 16 round trips to the server to complete.
+>
+> What you probably want to do instead is populate the pagecache with the
+> write contents (as is done today), flush the write and wait on the
+> result. Optionally, you could then invalidate the cache to free up the
+> pagecache pages (though you'll need to take care not to race with other
+> writers).
 
-> 2010/9/12 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> > This should probably be a set of patches that outlines each change.
-> > There are 3, AFAICT:
-> 
-> Ok, no problem with this, I will post it soon.
-> 
-> > 1) it bypasses the cache for reads when we have no oplock. Seems
-> > straightforward.
-> >
-> > 2) the cache is invalidated on close. So, no caching of data between
-> > open and close. Again ugly for performance but good for strict cache
-> > consistency.
-> >
-> > 3) write_end is doing a single page synchronous write when there is no
-> > oplock. This is going to be really ugly. Anytime you don't have an
-> > oplock, you'll be doing PAGE_SIZE writes to the server. Why not instead
-> > simply have cifs_file_aio_write do a filemap_write_and_wait or
-> > something if it there is no oplock?
-> 
-> I think I didn't understand you in this case. Let's look on the code:
-> 
-> 1622 >-------if (!PageUptodate(page) || !CIFS_I(inode)->clientCanCacheAll) {
-> 1623 >------->-------char *page_data;
-> 1624 >------->-------unsigned offset = pos & (PAGE_CACHE_SIZE - 1);
-> 1625 >------->-------int xid;
-> 1626
-> 1627 >------->-------xid = GetXid();
-> 1628 >------->-------/* this is probably better than directly calling
-> 1629 >------->-------   partialpage_write since in this function the
-> file handle is
-> 1630 >------->-------   known which we might as well>leverage */
-> 1631 >------->-------/* BB check if anything else missing out of ppw
-> 1632 >------->-------   such as updating last write time */
-> 1633 >------->-------page_data = kmap(page);
-> 1634 >------->-------rc = cifs_write(file, page_data + offset, copied, &pos);
-> 
-> We are writing 'copied' bytes from 'offset' of 'page_data'. Why do you
-> think that we are doing PAGE_SIZE write to the server?
-> 
-> 1635 >------->-------/* if (rc < 0) should we set writebehind rc? */
-> 1636 >------->-------kunmap(page);
-> 1637
-> 1638 >------->-------FreeXid(xid);
-> 1639 >-------} else {
-> 
+Ok, I understand you. What do you think about the following idea?
 
-write_begin/write_end are called on each page in a write syscall. So if
-your application is writing in 64k page-aligned chunks, write_end will
-be called 16 times. When you have no oplock with this patch, for each
-call to write_end, you're calling cifs_write which will flush each
-single page synchronously and only that single page to the server. Your
-64k write will take 16 round trips to the server to complete.
-
-What you probably want to do instead is populate the pagecache with the
-write contents (as is done today), flush the write and wait on the
-result. Optionally, you could then invalidate the cache to free up the
-pagecache pages (though you'll need to take care not to race with other
-writers).
+1) if we don't have an exclusive oplock, we write the data to the
+server before do_sync_write but in cifs_write_end we don't mark the
+page as dirty and don't write to the server;
+2) if we have an exclusive oplock, we don't write the data before
+do_sync_write and mark page as dirty in cifs_write_end (again we don't
+write anything to the server in cifs_write_end);
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
