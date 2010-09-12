@@ -1,7 +1,7 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: CIFS data coherency problem
-Date: Sun, 12 Sep 2010 09:16:59 -0400
-Message-ID: <20100912091659.73ef9cdb@tlielax.poochiereds.net>
+Date: Sun, 12 Sep 2010 18:55:05 +0400
+Message-ID: <AANLkTi=gSm+=djrj796Gfjx9FiRQ7s==6DSV=DhYOk7U@mail.gmail.com>
 References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
 	<AANLkTi=_eMSC99K1a2zWpgW5nc8UArzKj2MWHaRmCXzK@mail.gmail.com>
 	<20100908063224.240b0419@corrin.poochiereds.net>
@@ -14,94 +14,59 @@ References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
 	<AANLkTi=5YgKzG=rXJ5MuV+R_MGkEd+2ERouUiEc8K5B8@mail.gmail.com>
 	<20100910185002.73e61b8b@tlielax.poochiereds.net>
 	<AANLkTik_=xi5Engkm4Xcrk_WUaXSsSAsWUhh=M8VYWer@mail.gmail.com>
+	<20100912091659.73ef9cdb@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTik_=xi5Engkm4Xcrk_WUaXSsSAsWUhh=M8VYWer-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20100912091659.73ef9cdb-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 11 Sep 2010 11:08:15 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2010/9/12 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+>> We can write a data in write_end call all the time when we don't have
+>> an oplock for writing. If we get an error we simply returned it in
+>> from write_end and an application gets it.
+>>
+>
+> I don't understand the above statement. Can you clarify it?
 
-> 2010/9/11 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> > So what? Why should the writer know anything about whether it succe=
-eds
-> > before a flush or close occurs? POSIX does not mandate that. If you=
- are
-> > able to report an error at write time, then that's fine. It's not
-> > required however.
->=20
-> We can write a data in write_end call all the time when we don't have
-> an oplock for writing. If we get an error we simply returned it in
-> from write_end and an application gets it.
->=20
+Yesterday, I sent the patch to the list, that clarifies my idea. I
+mean we use do_file_aio_write instead of cifs_file_aio_write call but
+in cifs_write_end call (that should actually write data to the
+storage) we check for an oplock. If we have the Exclusive oplock for
+this file id, we don't write to the server and mark page as dirty. In
+other cases we write to the server in cifs_write_end call. You can
+find the code that does it in my patch.
 
-I don't understand the above statement. Can you clarify it?
+> That's just because our client is primitive in this regard. When an
+> oplock break comes in, it always drops the entire oplock rather than
+> trying to downgrade it.
+>
+> Notice that when the client sends the "reply" that it's actually a
+> request. The client never sends an actual "response" to an oplock
+> break. What it does is send a new LOCKING_ANDX request to the server
+> with a Lock Type of oplock break (0x02) and an oplock level of 0.
+>
+> My interpretation has always been that this "response" from the client
+> tells the server what new oplock level the client has elected to take.
+> In this case, it elected to drop the lock altogether so the server has
+> no need to send a new oplock break.
+>
 
-> > That's not how I read this:
-> >
-> > 57: server downgrades oplock on 0x0001 to level 2
-> > 60: client drops oplock altogether for 0x0001 (note that it replies
-> > =A0 =A0with oplock level 0)
-> > 65: server revokes oplock on 0x0002 altogether
-> > 66: client "acks" the oplock break
-> >
-> > At that point there are no more oplocks held. Why would the server =
-need
-> > to send another oplock break?
->=20
-> It (60) is the Oplock Break acknowledge request that's sent by the
-> client on the server's Oplock Break Notification (57). According to
-> the spec (page 214, section 2.2.4.32.1 of [MS-CIFS].pdf)
-> NewOpLockLevel field is used by the server to indicate new oplock
-> level for the FID. There no words that says that this field is used b=
-y
-> the client in acknowledge. An acknowledge is only used to indicate
-> that all the dirty data and byte-range locks are flushed to the serve=
-r
-> and doesn't bring any other information. It's my understanding of the
-> spec.
->=20
-> Even more, CIFS client does it according to the spec (file.c, line 23=
-41):
->=20
->         if (!cfile->closePend && !cfile->oplock_break_cancelled) {
->                 rc =3D CIFSSMBLock(0, cifs_sb->tcon, cfile->netfid, 0=
-, 0, 0, 0,
->=20
-> LOCKING_ANDX_OPLOCK_RELEASE, false);
->                 cFYI(1, "Oplock release rc =3D %d", rc);
->         }
->=20
-> and there is no mention of OplockLevel in CIFSSMBLock call.
->=20
-> So, as you can see above: there is no value that is set to OplockLeve=
-l
-> field of SMB_COM_LOCKING_ANDX command.
->=20
-> That's why I said that client1 continues keeping the level II oplock.
->=20
+You can find the code (misc.c, is_valid_oplock_break call) that
+downgrades the oplock for the client according to the field
+NewOplockLevel in Oplock Break sent by the server. But then you can
+see that in cifs_oplock_break call (file.c) the client simply sends
+acknowledge without setting any OplockLevel specific things.
 
-That's just because our client is primitive in this regard. When an
-oplock break comes in, it always drops the entire oplock rather than
-trying to downgrade it.
+> I'll concede though that the spec is nebulous here. It might be
+> worthwhile to make a dochelp request to MS on this point.
+>
 
-Notice that when the client sends the "reply" that it's actually a
-request. The client never sends an actual "response" to an oplock
-break. What it does is send a new LOCKING_ANDX request to the server
-with a Lock Type of oplock break (0x02) and an oplock level of 0.
+I agree - without special point in spec it's the open question.
 
-My interpretation has always been that this "response" from the client
-tells the server what new oplock level the client has elected to take.
-In this case, it elected to drop the lock altogether so the server has
-no need to send a new oplock break.
-
-I'll concede though that the spec is nebulous here. It might be
-worthwhile to make a dochelp request to MS on this point.=20
-
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+-- 
+Best regards,
+Pavel Shilovsky.
