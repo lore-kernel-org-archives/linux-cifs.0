@@ -1,66 +1,59 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH -v2 0/6] ntlmv2 within ntlmssp - enable and sign using
- crypto apis
-Date: Mon, 13 Sep 2010 05:27:44 -0500
-Message-ID: <AANLkTikk=yNmm9z0rPhjRc+JQPeotkPscdw9GWQ3dP+p@mail.gmail.com>
-References: <1284056215-959-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20100912202701.1cd7d8bf@corrin.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] FS: cifs: Fix compile warning
+Date: Mon, 13 Sep 2010 11:30:27 -0500
+Message-ID: <AANLkTi=q5qTNomN0VQ__9V8cbF=ygGMFkm2a3=qiaYja@mail.gmail.com>
+References: <1284165942.4009.5.camel@lenovo>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Javier Martinez Canillas <martinez.javier-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100912202701.1cd7d8bf-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1284165942.4009.5.camel@lenovo>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Sep 12, 2010 at 7:27 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Thu, =A09 Sep 2010 13:16:55 -0500
-> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Fri, Sep 10, 2010 at 7:45 PM, Javier Martinez Canillas
+<martinez.javier-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> In today linux-next I got a compile warning due a possibly uninitiali=
+zed variable
 >
->> Three major functionality changes
->>
+> This trivial patch solves the issue
 >
-> Maybe this should be 3 separate patchsets then? It would be best if
-> these major functionality changes were bisectable. Also, these patche=
-s
-> mix a lot of trivial cleanup code in with the deltas that actually ma=
-ke
-> the major changes. Those should be separated.
+> Thanks a lot
 >
-> IOW, more patches that are smaller and targeted would be ideal.
+> Signed-off-by: Javier Martinez Canillas <martinez.javier-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> =A0fs/cifs/cifssmb.c | =A0 =A02 +-
+> =A01 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index c65c341..ee1bba4 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -3079,7 +3079,7 @@ CIFSSMBGetCIFSACL(const int xid, struct cifsTco=
+nInfo *tcon, __u16 fid,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 parm_len;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 acl_len;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_com_ntransact_rsp *pSMBr;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 char *pdata;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 char *pdata =3D NULL;
 
-It is probably easier to separate ntlmv2/ntlmssp authentication patch
-but for signing, we need rc4/arcfour code which does not exist in cifs
-and so we have to use linux kernel apis and lot of data structures that
-get introduced in TCP_Server_Info structure.  Change from name
-mac_key to session key would gate some of the changes in auth and
-signing code. So I would really prefer to keep the patchset intact.
+This looks like a compiler problem - the variable is always
+initialized by validate_ntransact except when
+buf (which contains the smb) is null, when it returns -EINVAL and in
+that case pdata is not used.
+Setting it to null would not help anyway - if it were left as null it
+would oops on the memcpy (where pdata is used).
 
->
->>
->> Make NTLMv2 as a default authentication mechanism within NTLMSSP
->>
->> Enable cifs/smb signing
->>
->> Use Crypto sync hash APIs instead of cifs crypto functions to genere=
-ate
->> various hashes such as arc4/rc4, md5, and hmac-md5 used during authe=
-ntication
->> and smb/cifs signature generation
->>
->
-> It seems like this set should be a net reduction in code or at least
-> something closer to 0. This set should not be merged without an
-> accompanying patch to remove the unused crypto code after the
-> conversion to the kernel crypto APIs.
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+This area of code has not changed recently.
+
+
+--=20
+Thanks,
+
+Steve
