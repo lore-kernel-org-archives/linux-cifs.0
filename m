@@ -1,10 +1,8 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: CIFS data coherency problem
-Date: Sun, 12 Sep 2010 16:19:46 -0500
-Message-ID: <AANLkTi=x6gnS=++JtjEG6KVwq4_JPLfU+pKuCYgFd+xD@mail.gmail.com>
+Date: Sun, 12 Sep 2010 20:09:16 -0400
+Message-ID: <20100912200916.1df5d752@corrin.poochiereds.net>
 References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
-	<AANLkTi=_eMSC99K1a2zWpgW5nc8UArzKj2MWHaRmCXzK@mail.gmail.com>
-	<20100908063224.240b0419@corrin.poochiereds.net>
 	<AANLkTinYFe6O-4ANt1VYcvEMukiis-11cDuMP2GSKZ7j@mail.gmail.com>
 	<AANLkTin+qiQsF_hOCvdBKtCh0n0bcd82RDOUz=h3K6gu@mail.gmail.com>
 	<AANLkTikOR_HU934L6FKq8q2ZwcaTTOTPfaSofimK6OFH@mail.gmail.com>
@@ -16,48 +14,63 @@ References: <AANLkTin2iSc=Ob3DkhARJRV7CzwRUBJSGRMUJNJM+82k@mail.gmail.com>
 	<AANLkTik_=xi5Engkm4Xcrk_WUaXSsSAsWUhh=M8VYWer@mail.gmail.com>
 	<20100912091659.73ef9cdb@tlielax.poochiereds.net>
 	<AANLkTi=gSm+=djrj796Gfjx9FiRQ7s==6DSV=DhYOk7U@mail.gmail.com>
+	<20100912114055.55520f0c@tlielax.poochiereds.net>
+	<AANLkTi=LMy37zVnyKTX_gnf1QAqXja6vuTruVMjfRCdp@mail.gmail.com>
+	<20100912125535.60c3c897@tlielax.poochiereds.net>
+	<AANLkTi=XT_X27Cuioe_M6zMee0XQAZe+P-TLHbh6n+Yk@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=gSm+=djrj796Gfjx9FiRQ7s==6DSV=DhYOk7U-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTi=XT_X27Cuioe_M6zMee0XQAZe+P-TLHbh6n+Yk-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Sep 12, 2010 at 9:55 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Sun, 12 Sep 2010 23:14:35 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+
 > 2010/9/12 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> That's just because our client is primitive in this regard. When an
->> oplock break comes in, it always drops the entire oplock rather than
->> trying to downgrade it.
->>
->> Notice that when the client sends the "reply" that it's actually a
->> request. The client never sends an actual "response" to an oplock
->> break. What it does is send a new LOCKING_ANDX request to the server
->> with a Lock Type of oplock break (0x02) and an oplock level of 0.
->>
->> My interpretation has always been that this "response" from the client
->> tells the server what new oplock level the client has elected to take.
->> In this case, it elected to drop the lock altogether so the server has
->> no need to send a new oplock break.
+> > write_begin/write_end are called on each page in a write syscall. So if
+> > your application is writing in 64k page-aligned chunks, write_end will
+> > be called 16 times. When you have no oplock with this patch, for each
+> > call to write_end, you're calling cifs_write which will flush each
+> > single page synchronously and only that single page to the server. Your
+> > 64k write will take 16 round trips to the server to complete.
+> >
+> > What you probably want to do instead is populate the pagecache with the
+> > write contents (as is done today), flush the write and wait on the
+> > result. Optionally, you could then invalidate the cache to free up the
+> > pagecache pages (though you'll need to take care not to race with other
+> > writers).
+> 
+> Ok, I understand you. What do you think about the following idea?
+> 
+> 1) if we don't have an exclusive oplock, we write the data to the
+> server before do_sync_write but in cifs_write_end we don't mark the
+> page as dirty and don't write to the server;
 >
-> You can find the code (misc.c, is_valid_oplock_break call) that
-> downgrades the oplock for the client according to the field
-> NewOplockLevel in Oplock Break sent by the server. But then you can
-> see that in cifs_oplock_break call (file.c) the client simply sends
-> acknowledge without setting any OplockLevel specific things.
+> 2) if we have an exclusive oplock, we don't write the data before
+> do_sync_write and mark page as dirty in cifs_write_end (again we don't
+> write anything to the server in cifs_write_end);
+> 
 
-We already downgrade olocks.  I don't think we have seen problems with the
-downgrade from "cache everything" to "cache only reads" -  I don't think
-the client "response" to the oplock downgrade has to set additional flags in
-the "response" to the oplock break.
+Sorry, I'm not quite following what you mean here. I don't think you
+need to mess with cifs_write_end at all.
 
->> I'll concede though that the spec is nebulous here. It might be
->> worthwhile to make a dochelp request to MS on this point.
+What I think you basically want to do is replace the filemap_fdatawrite
+clause in cifs_file_aio_write with a filemap_write_and_wait. If you
+want to get a little more fancy, you could just have it flush the range
+of the file actually being written.
 
+After that, you could also consider invalidating the pages in the
+mapping (thereby allowing the VM to reclaim them) if you don't have an
+oplock.
 
+IOW, you want to write to the pagecache regardless of whether you have
+an oplock or not. The oplock only decides whether you flush the data to
+the server and wait on the result after writing to the pagecache.
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
