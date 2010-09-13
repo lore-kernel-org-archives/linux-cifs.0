@@ -1,55 +1,231 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix potential double put of TCP session reference
-Date: Mon, 13 Sep 2010 14:02:10 -0400
-Message-ID: <1284400930-24134-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH -v3 1/4 cifs] NTLMv2/NTLMSSP Change variable name mac_key to session key to reflect the key it holds
+Date: Mon, 13 Sep 2010 14:15:10 -0500
+Message-ID: <1284405310-31178-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-cifs_get_smb_ses must be called on a server pointer on which it holds an
-active reference. It first does a search for an existing SMB session. If
-it finds one, it'll put the server reference and then try to ensure that
-the negprot is done, etc.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-If it encounters an error at that point then it'll return an error.
-There's a potential problem here though. When cifs_get_smb_ses returns
-an error, the caller will also put the TCP server reference leading to a
-double-put.
 
-Fix this by having cifs_get_smb_ses only put the server reference if
-it found an existing session that it could use and isn't returning an
-error.
+Change name of variable mac_key to session key.
+The reason mac_key was changed to session key is, this structure does not
+hold message authentication code, it holds the session key (for ntlmv2,
+ntlmv1 etc.).  mac is generated as a signature in cifs_calc* functions.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/connect.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/cifsencrypt.c |   22 +++++++++++-----------
+ fs/cifs/cifsglob.h    |    4 ++--
+ fs/cifs/cifsproto.h   |    4 ++--
+ fs/cifs/sess.c        |   10 +++++-----
+ fs/cifs/transport.c   |    6 +++---
+ 5 files changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 67dad54..88c84a3 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1706,9 +1706,6 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- 	if (ses) {
- 		cFYI(1, "Existing smb sess found (status=%d)", ses->status);
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 35042d8..eed70ca 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -42,7 +42,7 @@ extern void SMBencrypt(unsigned char *passwd, const unsigned char *c8,
+ 		       unsigned char *p24);
  
--		/* existing SMB ses has a server reference already */
--		cifs_put_tcp_session(server);
--
- 		mutex_lock(&ses->session_mutex);
- 		rc = cifs_negotiate_protocol(xid, ses);
- 		if (rc) {
-@@ -1731,6 +1728,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- 			}
+ static int cifs_calculate_signature(const struct smb_hdr *cifs_pdu,
+-				    const struct mac_key *key, char *signature)
++				const struct session_key *key, char *signature)
+ {
+ 	struct	MD5Context context;
+ 
+@@ -78,7 +78,7 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 	server->sequence_number++;
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	rc = cifs_calculate_signature(cifs_pdu, &server->mac_signing_key,
++	rc = cifs_calculate_signature(cifs_pdu, &server->session_key,
+ 				      smb_signature);
+ 	if (rc)
+ 		memset(cifs_pdu->Signature.SecuritySignature, 0, 8);
+@@ -89,7 +89,7 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ }
+ 
+ static int cifs_calc_signature2(const struct kvec *iov, int n_vec,
+-				const struct mac_key *key, char *signature)
++				const struct session_key *key, char *signature)
+ {
+ 	struct  MD5Context context;
+ 	int i;
+@@ -145,7 +145,7 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 	server->sequence_number++;
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	rc = cifs_calc_signature2(iov, n_vec, &server->mac_signing_key,
++	rc = cifs_calc_signature2(iov, n_vec, &server->session_key,
+ 				      smb_signature);
+ 	if (rc)
+ 		memset(cifs_pdu->Signature.SecuritySignature, 0, 8);
+@@ -156,14 +156,14 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ }
+ 
+ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
+-			  const struct mac_key *mac_key,
++			  const struct session_key *session_key,
+ 			  __u32 expected_sequence_number)
+ {
+ 	unsigned int rc;
+ 	char server_response_sig[8];
+ 	char what_we_think_sig_should_be[20];
+ 
+-	if ((cifs_pdu == NULL) || (mac_key == NULL))
++	if (cifs_pdu == NULL || session_key == NULL)
+ 		return -EINVAL;
+ 
+ 	if (cifs_pdu->Command == SMB_COM_NEGOTIATE)
+@@ -192,7 +192,7 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
+ 					cpu_to_le32(expected_sequence_number);
+ 	cifs_pdu->Signature.Sequence.Reserved = 0;
+ 
+-	rc = cifs_calculate_signature(cifs_pdu, mac_key,
++	rc = cifs_calculate_signature(cifs_pdu, session_key,
+ 		what_we_think_sig_should_be);
+ 
+ 	if (rc)
+@@ -209,7 +209,7 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
+ }
+ 
+ /* We fill in key by putting in 40 byte array which was allocated by caller */
+-int cifs_calculate_mac_key(struct mac_key *key, const char *rn,
++int cifs_calculate_session_key(struct session_key *key, const char *rn,
+ 			   const char *password)
+ {
+ 	char temp_key[16];
+@@ -347,11 +347,11 @@ void setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 	/* now calculate the MAC key for NTLMv2 */
+ 	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
+ 	hmac_md5_update(resp_buf, 16, &context);
+-	hmac_md5_final(ses->server->mac_signing_key.data.ntlmv2.key, &context);
++	hmac_md5_final(ses->server->session_key.data.ntlmv2.key, &context);
+ 
+-	memcpy(&ses->server->mac_signing_key.data.ntlmv2.resp, resp_buf,
++	memcpy(&ses->server->session_key.data.ntlmv2.resp, resp_buf,
+ 	       sizeof(struct ntlmv2_resp));
+-	ses->server->mac_signing_key.len = 16 + sizeof(struct ntlmv2_resp);
++	ses->server->session_key.len = 16 + sizeof(struct ntlmv2_resp);
+ }
+ 
+ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 0cdfb8c..14dfa9a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -97,7 +97,7 @@ enum protocolEnum {
+ 	/* Netbios frames protocol not supported at this time */
+ };
+ 
+-struct mac_key {
++struct session_key {
+ 	unsigned int len;
+ 	union {
+ 		char ntlm[CIFS_SESS_KEY_SIZE + 16];
+@@ -182,7 +182,7 @@ struct TCP_Server_Info {
+ 	/* 16th byte of RFC1001 workstation name is always null */
+ 	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+ 	__u32 sequence_number; /* needed for CIFS PDU signature */
+-	struct mac_key mac_signing_key;
++	struct session_key session_key;
+ 	char ntlmv2_hash[16];
+ 	unsigned long lstrp; /* when we got last response from this server */
+ 	u16 dialect; /* dialect index that server chose */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 1d60c65..3f4fa81 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -362,9 +362,9 @@ extern int cifs_sign_smb(struct smb_hdr *, struct TCP_Server_Info *, __u32 *);
+ extern int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *,
+ 			  __u32 *);
+ extern int cifs_verify_signature(struct smb_hdr *,
+-				 const struct mac_key *mac_key,
++				 const struct session_key *session_key,
+ 				__u32 expected_sequence_number);
+-extern int cifs_calculate_mac_key(struct mac_key *key, const char *rn,
++extern int cifs_calculate_session_key(struct session_key *key, const char *rn,
+ 				 const char *pass);
+ extern void CalcNTLMv2_response(const struct cifsSesInfo *, char *);
+ extern void setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 0a57cb7..8882012 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -480,7 +480,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	/* calculate session key,  BB what about adding similar ntlmv2 path? */
+ 	SMBNTencrypt(ses->password, ses->server->cryptKey, ntlm_session_key);
+ 	if (first)
+-		cifs_calculate_mac_key(&ses->server->mac_signing_key,
++		cifs_calculate_session_key(&ses->server->session_key,
+ 				       ntlm_session_key, ses->password);
+ 
+ 	memcpy(tmp, ntlm_session_key, CIFS_SESS_KEY_SIZE);
+@@ -690,7 +690,7 @@ ssetup_ntlmssp_authenticate:
+ 
+ 		if (first_time) /* should this be moved into common code
+ 				  with similar ntlmv2 path? */
+-			cifs_calculate_mac_key(&ses->server->mac_signing_key,
++			cifs_calculate_session_key(&ses->server->session_key,
+ 				ntlm_session_key, ses->password);
+ 		/* copy session key */
+ 
+@@ -765,15 +765,15 @@ ssetup_ntlmssp_authenticate:
  		}
- 		mutex_unlock(&ses->session_mutex);
-+
-+		/* existing SMB ses has a server reference already */
-+		cifs_put_tcp_session(server);
- 		FreeXid(xid);
- 		return ses;
- 	}
+ 		/* bail out if key is too long */
+ 		if (msg->sesskey_len >
+-		    sizeof(ses->server->mac_signing_key.data.krb5)) {
++		    sizeof(ses->server->session_key.data.krb5)) {
+ 			cERROR(1, "Kerberos signing key too long (%u bytes)",
+ 				msg->sesskey_len);
+ 			rc = -EOVERFLOW;
+ 			goto ssetup_exit;
+ 		}
+ 		if (first_time) {
+-			ses->server->mac_signing_key.len = msg->sesskey_len;
+-			memcpy(ses->server->mac_signing_key.data.krb5,
++			ses->server->session_key.len = msg->sesskey_len;
++			memcpy(ses->server->session_key.data.krb5,
+ 				msg->data, msg->sesskey_len);
+ 		}
+ 		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 82f78c4..a66c91e 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -543,7 +543,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 		    (ses->server->secMode & (SECMODE_SIGN_REQUIRED |
+ 					     SECMODE_SIGN_ENABLED))) {
+ 			rc = cifs_verify_signature(midQ->resp_buf,
+-						&ses->server->mac_signing_key,
++						&ses->server->session_key,
+ 						midQ->sequence_number+1);
+ 			if (rc) {
+ 				cERROR(1, "Unexpected SMB signature");
+@@ -731,7 +731,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 		    (ses->server->secMode & (SECMODE_SIGN_REQUIRED |
+ 					     SECMODE_SIGN_ENABLED))) {
+ 			rc = cifs_verify_signature(out_buf,
+-						&ses->server->mac_signing_key,
++						&ses->server->session_key,
+ 						midQ->sequence_number+1);
+ 			if (rc) {
+ 				cERROR(1, "Unexpected SMB signature");
+@@ -981,7 +981,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 	    (ses->server->secMode & (SECMODE_SIGN_REQUIRED |
+ 				     SECMODE_SIGN_ENABLED))) {
+ 		rc = cifs_verify_signature(out_buf,
+-					   &ses->server->mac_signing_key,
++					   &ses->server->session_key,
+ 					   midQ->sequence_number+1);
+ 		if (rc) {
+ 			cERROR(1, "Unexpected SMB signature");
 -- 
-1.7.2.2
+1.6.0.2
