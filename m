@@ -1,31 +1,64 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH -v3 0/4] NTLMv2/NTLMSSP - enable and sign using crypto apis
-Date: Mon, 13 Sep 2010 14:20:03 -0500
-Message-ID: <1284405603-31282-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix potential double put of TCP session reference
+Date: Tue, 14 Sep 2010 15:18:32 +0530
+Message-ID: <4C8F44F0.30803@suse.de>
+References: <1284400930-24134-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1284400930-24134-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Three major functionality changes
+On 09/13/2010 11:32 PM, Jeff Layton wrote:
+> cifs_get_smb_ses must be called on a server pointer on which it holds an
+> active reference. It first does a search for an existing SMB session. If
+> it finds one, it'll put the server reference and then try to ensure that
+> the negprot is done, etc.
+> 
+> If it encounters an error at that point then it'll return an error.
+> There's a potential problem here though. When cifs_get_smb_ses returns
+> an error, the caller will also put the TCP server reference leading to a
+> double-put.
+> 
+> Fix this by having cifs_get_smb_ses only put the server reference if
+> it found an existing session that it could use and isn't returning an
+> error.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/connect.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 67dad54..88c84a3 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1706,9 +1706,6 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+>  	if (ses) {
+>  		cFYI(1, "Existing smb sess found (status=%d)", ses->status);
+>  
+> -		/* existing SMB ses has a server reference already */
+> -		cifs_put_tcp_session(server);
+> -
+>  		mutex_lock(&ses->session_mutex);
+>  		rc = cifs_negotiate_protocol(xid, ses);
+>  		if (rc) {
+> @@ -1731,6 +1728,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+>  			}
+>  		}
+>  		mutex_unlock(&ses->session_mutex);
+> +
+> +		/* existing SMB ses has a server reference already */
+> +		cifs_put_tcp_session(server);
+>  		FreeXid(xid);
+>  		return ses;
+>  	}
 
+Looks correct to me.
 
-Make NTLMv2 as a default authentication mechanism within NTLMSSP
-
-Enable cifs/smb signing
-
-Use Crypto sync hash APIs instead of cifs crypto functions to genereate
-various hashes such as arc4/rc4, md5, and hmac-md5 used during authentication
-and smb/cifs signature generation
-
-These patches are split into mainly three pathes, roughly per functionality
-as mentioned above.
-These are intended to fix the broken ntlmv2 functionality, enable signing
-and replace cifs crypto functions with kernel crypto fuctions.
-There is still remains some clean-up to do, especially since exising crypto 
-functions are used by auth mechs like NTLM which still get used.
-A followup patch should and would follow to do just that.
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
