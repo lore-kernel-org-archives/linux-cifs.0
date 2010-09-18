@@ -1,58 +1,86 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: question about CIFS client glitches
-Date: Sat, 18 Sep 2010 07:25:02 -0400
-Message-ID: <20100918072502.73987a62@corrin.poochiereds.net>
-References: <6.2.5.6.2.20100916171408.03a0fcd8@flumedata.com>
-	<AANLkTimDWbZF=DkmVLw96V3nZGggFfNm0Zv3FxfFX1BE@mail.gmail.com>
-	<6.2.5.6.2.20100916195402.0573dcc0@binnacle.cx>
-	<6.2.5.6.2.20100917193123.056b6f78@binnacle.cx>
+Subject: Re: [PATCH] CIFS: New read cache mechanism
+Date: Sat, 18 Sep 2010 07:32:14 -0400
+Message-ID: <20100918073214.4104b01e@corrin.poochiereds.net>
+References: <AANLkTinA+YpcYFF6YE-df7sg-thCg87_7Bn5qjC+LxYH@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: starlight-Utvwg/EOxnhfq8cQ1yknNg@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <6.2.5.6.2.20100917193123.056b6f78-Utvwg/EOxnhfq8cQ1yknNg@public.gmane.org>
+In-Reply-To: <AANLkTinA+YpcYFF6YE-df7sg-thCg87_7Bn5qjC+LxYH-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 17 Sep 2010 19:38:21 -0400
-starlight-Utvwg/EOxnhfq8cQ1yknNg@public.gmane.org wrote:
+On Sat, 18 Sep 2010 10:32:03 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> At 05:50 PM 9/16/2010 -0500, Steve French wrote:
-> >On Thu, Sep 16, 2010 at 4:39 PM,  <starlight-Utvwg/EOxnhfq8cQ1yknNg@public.gmane.org> wrote:
-> >> Trying out a CIFS mount of a W2K8 x64 file system from CentOS
-> >> 5.5 and running into problems, and trying to figure out how to
-> >> proceed.
-> ...
-> >
-> >This is quite old kernel, but perhaps it was updated to include more
-> >recent fixes - can you view the version information on the file, ie
-> >the cifs.ko module (you can do this by running modinfo on cifs.ko)
+> Add cifs_sync_read call to provide reading from the cache if we have at least
+> Level II oplock and otherwise - reading from the server.
 > 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   23 +++++++++++++++++++++--
+>  1 files changed, 21 insertions(+), 2 deletions(-)
 > 
-> Tried the RHEL6 beta 2 and it behaves the same as RHEL 5.5.
-> 'modinfo' output for both attached.  'cifs.ko' versions are
-> 1.60RH and 1.63.
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index b7431af..ba70048 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -533,6 +533,25 @@ cifs_get_sb(struct file_system_type *fs_type,
+>  	return 0;
+>  }
 > 
-> In both versions it seems like hard-links work and symbolic
-> links fail with
-> 
->    ln: creating symbolic link `zzzz': Operation not supported
-> 
+> +static ssize_t cifs_sync_read(struct file *filp, char __user *buf,
+> +			      size_t len, loff_t *ppos)
+> +{
+> +	ssize_t read;
+> +	struct cifsInodeInfo *cinode;
+> +
+> +	if (filp && filp->f_path.dentry && filp->f_path.dentry->d_inode)
 
-That's expected. The core cifs protocol as implemented in windows
-doesn't support symlinks. You need unix extensions for that, or you may
-want to play with the "mfsymlinks" patches that Metze proposed recently.
+A NULL filp or one with a negative dentry would be a serious VFS bug.
+I'd get rid of the NULL pointer checks above. I don't think they're
+necessary.
 
-> And it appears that a 'pax -r' extraction followed by 'rm' for
-> selected files has some difficulty with CIFS 1.6x rendered
-> hard link in the mix.
+> +		cinode = CIFS_I(filp->f_path.dentry->d_inode);
+> +	else
+> +		return -ENOENT;
+> +
+> +	if (cinode->clientCanCacheRead)
+> +		read = do_sync_read(filp, buf, len, ppos);
+> +	else
+> +		read = cifs_user_read(filp, buf, len, ppos);
+> +
+> +	return read;
+> +}
+> +
+>  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+>  				   unsigned long nr_segs, loff_t pos)
+>  {
+> @@ -652,7 +671,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
+>  };
 > 
-> I'm probably giving up on the idea for now, but thanks
-> for your help.
+>  const struct file_operations cifs_file_ops = {
+> -	.read = do_sync_read,
+> +	.read = cifs_sync_read,
+>  	.write = do_sync_write,
+>  	.aio_read = generic_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+> @@ -689,7 +708,7 @@ const struct file_operations cifs_file_direct_ops = {
+>  	.setlease = cifs_setlease,
+>  };
+>  const struct file_operations cifs_file_nobrl_ops = {
+> -	.read = do_sync_read,
+> +	.read = cifs_sync_read,
+>  	.write = do_sync_write,
+>  	.aio_read = generic_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
 
-What sort of difficulty is it having?
+Looks reasonable, but it would be good to know what sort of performance
+impact to expect from this. Have you done any benchmarking pre and post
+patch?
+
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
