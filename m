@@ -1,33 +1,44 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH -v6 0/4] cifs NTLMv2/NTLMSSP - Enable and sign using crypto apis
-Date: Sat, 18 Sep 2010 22:03:15 -0500
-Message-ID: <1284865395-16863-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: New read cache mechanism
+Date: Sun, 19 Sep 2010 09:52:10 -0500
+Message-ID: <AANLkTikdQTo8y-zJZ625MCgY15rpYmERGgJKtq=oJ0Wd@mail.gmail.com>
+References: <AANLkTinA+YpcYFF6YE-df7sg-thCg87_7Bn5qjC+LxYH@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTinA+YpcYFF6YE-df7sg-thCg87_7Bn5qjC+LxYH-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Three major functionality changes
+On Sat, Sep 18, 2010 at 1:32 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Add cifs_sync_read call to provide reading from the cache if we have at least
+> Level II oplock and otherwise - reading from the server.
 
---
-Make NTLMv2 as a default authentication mechanism within NTLMSSP
+This is a stricter guarantee than NFS and will slow performance
+dramatically.  If you are going to prevent all ability to reread a
+page - this should probably be optional.   This affects cases even
+when there are no 2nd clients opening the same file and cases where a
+2nd client opened a file but never wrote to it.  Note that the common
+case of multiply open files from the same client will break oplock too
+even though there is no caching issue there (much as we would like to
+change the protocol for that - we have to wait until SMB2 until we can
+reaquire or upgrade oplocks).
 
-Enable cifs/smb signing
+Currently we write through all writes when we don't have oplock.   We
+should also invalidate any cached pages when opening a non-cached file
+that has changed since we last opened it - so we will reread these
+pages although they will stay in the page cache.   We should
+invalidate these cached pages whenever mtime changes (even if some
+Windows server defer mtime updates - it will be correct file close or
+sync - which is the only place we have guarantees that data is written
+anyway).  We check mtime updates in revalidate (and this can be
+configured in /proc/fs/cifs to always be sent - rather than every
+second).
 
-Use Crypto sync hash APIs instead of cifs crypto functions to genereate
-various hashes such as arc4/rc4, md5, and hmac-md5 used during authentication
-and smb/cifs signature generation
---
 
+-- 
+Thanks,
 
-These patches are split into mainly three pathes, roughly per functionality
-as mentioned above.
-These are intended to fix the broken ntlmv2 functionality, enable signing
-and replace cifs crypto functions with kernel crypto fuctions.
-There still remains some clean-up to do, especially since exising crypto 
-functions are used by auth mechs like NTLM which still get used.
-A follow-up patch should and would follow to do just that.
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Steve
