@@ -1,51 +1,64 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Zero size and zero blocks mountpoint.
-Date: Sun, 19 Sep 2010 15:04:27 -0700
-Message-ID: <20100919150427.16ab30d9@corrin.poochiereds.net>
-References: <AANLkTi=GPOoF5bOdySz2izWTEEBShZ8LG=SWPKZVHCU8@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: New read cache mechanism
+Date: Sun, 19 Sep 2010 15:16:07 -0700
+Message-ID: <20100919151607.23a79112@corrin.poochiereds.net>
+References: <AANLkTinA+YpcYFF6YE-df7sg-thCg87_7Bn5qjC+LxYH@mail.gmail.com>
+	<AANLkTikdQTo8y-zJZ625MCgY15rpYmERGgJKtq=oJ0Wd@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=GPOoF5bOdySz2izWTEEBShZ8LG=SWPKZVHCU8-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTikdQTo8y-zJZ625MCgY15rpYmERGgJKtq=oJ0Wd-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 19 Sep 2010 21:28:41 +0200
-Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Sun, 19 Sep 2010 09:52:10 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Hello,
->=20
-> whe mounting a smb filesystem using cifs, the mountpoint gets zero
-> size and zero blocks:
->=20
->=20
-> ls -al
-> total 12
-> drwxr-xr-x =A0 2 root root =A0 =A0 4096 2010-09-19 16:53 .
-> drwxr-xr-x =A0 3 root root =A0 =A0 4096 2010-09-19 16:53 ..
-> drwxr-xr-x =A0 6 root root =A0 =A0 =A0 =A00 2010-09-03 23:41 bononlin=
-e
-> -rw-r--r-- =A0 1 root root =A0 =A0 =A0 40 2010-09-19 16:53 .directory
-> drwxr-xr-x 673 gast netgroup =A0 =A00 2010-09-12 23:40 ftp
-> drwxrwxr-x =A010 gast netgroup =A0 =A00 2010-08-06 23:28 public
-> drwxr-xr-x =A034 sbon netgroup =A0 =A00 2010-09-19 16:03 sbon
-> drwxr-xr-x =A010 root root =A0 =A0 =A0 =A00 2010-08-06 23:26 video
->=20
-> The directories bononline, ftp, public, sbon adn video are all
-> mountpoints of smb shares.
->=20
-> It's causing some unwanted behaviour.
-> How can I change that, or is this not changeable?
-> Stef
+> On Sat, Sep 18, 2010 at 1:32 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> > Add cifs_sync_read call to provide reading from the cache if we have at least
+> > Level II oplock and otherwise - reading from the server.
+> 
+> This is a stricter guarantee than NFS and will slow performance
+> dramatically.  If you are going to prevent all ability to reread a
+> page - this should probably be optional.   This affects cases even
+> when there are no 2nd clients opening the same file and cases where a
+> 2nd client opened a file but never wrote to it.  Note that the common
+> case of multiply open files from the same client will break oplock too
+> even though there is no caching issue there (much as we would like to
+> change the protocol for that - we have to wait until SMB2 until we can
+> reaquire or upgrade oplocks).
+> 
+> Currently we write through all writes when we don't have oplock.   We
+> should also invalidate any cached pages when opening a non-cached file
+> that has changed since we last opened it - so we will reread these
+> pages although they will stay in the page cache.   We should
+> invalidate these cached pages whenever mtime changes (even if some
+> Windows server defer mtime updates - it will be correct file close or
+> sync - which is the only place we have guarantees that data is written
+> anyway).  We check mtime updates in revalidate (and this can be
+> configured in /proc/fs/cifs to always be sent - rather than every
+> second).
+> 
+> 
 
-I think it's just a matter of setting the inode->i_size on the
-directory. I *think* that when you do a QPathInfo call to a directory
-via cifs the size comes back 0. Setting this to something else probably
-means an extra call to the server to get the "real" size (whatever that
-means). The question is, what should this be set to?
+I think, before any of this goes in, someone (Pavel?) needs to step back,
+and write up (in English) what the caching semantics should be when we
+have oplocks of various levels, including none at all. The
+documentation could be fairly informal -- maybe just a few paragraphs
+in the README, but it needs to be written before we can do any serious
+discussion of patches.
 
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+As Christoph pointed out, async I/O isn't covered by that patch. We
+also need to settle on semantics for mmap. The patches are fine as a
+point of reference for discussion, but please don't merge any of this
+until we have a clear, consistent goal in mind.
+
+That'll also help us to ensure that we don't cause regressions, and to
+make sure that we understand what the performance impacts of these
+changes will be.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
