@@ -1,64 +1,60 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: New read cache mechanism
-Date: Sun, 19 Sep 2010 15:16:07 -0700
-Message-ID: <20100919151607.23a79112@corrin.poochiereds.net>
-References: <AANLkTinA+YpcYFF6YE-df7sg-thCg87_7Bn5qjC+LxYH@mail.gmail.com>
-	<AANLkTikdQTo8y-zJZ625MCgY15rpYmERGgJKtq=oJ0Wd@mail.gmail.com>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Zero size and zero blocks mountpoint.
+Date: Mon, 20 Sep 2010 09:29:38 +0200
+Message-ID: <AANLkTik04e_d9HPeGsB8Adcm2tpGh-qEOwcQvu6ScP3D@mail.gmail.com>
+References: <AANLkTi=GPOoF5bOdySz2izWTEEBShZ8LG=SWPKZVHCU8@mail.gmail.com>
+	<20100919150427.16ab30d9@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikdQTo8y-zJZ625MCgY15rpYmERGgJKtq=oJ0Wd-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20100919150427.16ab30d9-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 19 Sep 2010 09:52:10 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2010/9/20 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> On Sun, 19 Sep 2010 21:28:41 +0200
+> Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> Hello,
+>>
+>>
+>> It's causing some unwanted behaviour.
+>> How can I change that, or is this not changeable?
+>> Stef
+>
+> I think it's just a matter of setting the inode->i_size on the
+> directory. I *think* that when you do a QPathInfo call to a directory
+> via cifs the size comes back 0. Setting this to something else probably
+> means an extra call to the server to get the "real" size (whatever that
+> means). The question is, what should this be set to?
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>
 
-> On Sat, Sep 18, 2010 at 1:32 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > Add cifs_sync_read call to provide reading from the cache if we have at least
-> > Level II oplock and otherwise - reading from the server.
-> 
-> This is a stricter guarantee than NFS and will slow performance
-> dramatically.  If you are going to prevent all ability to reread a
-> page - this should probably be optional.   This affects cases even
-> when there are no 2nd clients opening the same file and cases where a
-> 2nd client opened a file but never wrote to it.  Note that the common
-> case of multiply open files from the same client will break oplock too
-> even though there is no caching issue there (much as we would like to
-> change the protocol for that - we have to wait until SMB2 until we can
-> reaquire or upgrade oplocks).
-> 
-> Currently we write through all writes when we don't have oplock.   We
-> should also invalidate any cached pages when opening a non-cached file
-> that has changed since we last opened it - so we will reread these
-> pages although they will stay in the page cache.   We should
-> invalidate these cached pages whenever mtime changes (even if some
-> Windows server defer mtime updates - it will be correct file close or
-> sync - which is the only place we have guarantees that data is written
-> anyway).  We check mtime updates in revalidate (and this can be
-> configured in /proc/fs/cifs to always be sent - rather than every
-> second).
-> 
-> 
+Yes that's a good question. But a share mounted with cifs should
+behave like it is's just a local harddrive partition right? So these
+values are obligatory...
 
-I think, before any of this goes in, someone (Pavel?) needs to step back,
-and write up (in English) what the caching semantics should be when we
-have oplocks of various levels, including none at all. The
-documentation could be fairly informal -- maybe just a few paragraphs
-in the README, but it needs to be written before we can do any serious
-discussion of patches.
+ In my construction - so I'm speaking only for my own here -
+it's also set the size (and the blocks) in the FUSE fs. Remember, I'm
+using the FUSE fs fuse-workspace
+as the one which is used, and the various mounts to resources like smb
+shares (mounted with cifs of course, managed with autofs) are the
+underlying backend.
 
-As Christoph pointed out, async I/O isn't covered by that patch. We
-also need to settle on semantics for mmap. The patches are fine as a
-point of reference for discussion, but please don't merge any of this
-until we have a clear, consistent goal in mind.
+My FUSE can correct things, like this.
 
-That'll also help us to ensure that we don't cause regressions, and to
-make sure that we understand what the performance impacts of these
-changes will be.
+I wonder, it can correct things, but is it also a must?
+My fuse fs takes these values just from the underlying fs, and this
+can result in
+a size of directories of 4096 when the underlying fs is a mounted
+partition (of for example an USB disk) and zero
+when it's a cifs mounted smb share. Is it a bad thing that these
+values differ in the same fs (in my case thus fuse-workspace)??
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Maybe you know this, else I'll try at the fsdevel list.
+
+Stef
