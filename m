@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH -v6 3/4] cifs NTLMv2/NTLMSSP define crypto hash functions
  and create and send keys needed for key exchange
-Date: Tue, 21 Sep 2010 13:46:37 -0500
-Message-ID: <AANLkTikeNXvVTRz9p3-ZSyPPXj69bznJKUMSjT5pxeec@mail.gmail.com>
+Date: Tue, 21 Sep 2010 14:04:24 -0500
+Message-ID: <AANLkTikxqyK72=QcBPu1h-CmpiC+pg5AhVj=V4JRBqS-@mail.gmail.com>
 References: <1284865355-16815-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20100921105254.32574ba4@corrin.poochiereds.net>
 	<AANLkTimqjBtVyB+xvtv5F5_qs333XiFQm+S=8Gh20+x2@mail.gmail.com>
@@ -599,6 +599,12 @@ natures.
 > enough here? I see no reason why that wouldn't have worked for NTLMSS=
 P
 > too.
+
+Jeff, I will investigate but at the first glance, it looks like
+first_ses is per smb session
+and not smb connection, not sure if that would be good enough for ntlms=
+sp.
+
 >
 > Note that I'm not attached to that mechanism, but I think it should b=
 e
@@ -652,6 +658,3 @@ v2 or ntlmv1
 > --
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
-
-Jeff, you are right. session key is used by kerberos and "plain"
-ntlmv2 to calculate signatures.
