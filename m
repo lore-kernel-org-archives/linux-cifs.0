@@ -1,31 +1,42 @@
-From: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-Subject: Re: linux-next: manual merge of the bkl-vfs tree with the cifs tree
-Date: Tue, 21 Sep 2010 09:59:49 +0200
-Message-ID: <201009210959.50115.arnd@arndb.de>
-References: <20100921161031.7745150e.sfr@canb.auug.org.au> <AANLkTikbM17xs41abm+6DTa9DJLYM8XYeVg=bZr_n8M5@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>,
-	linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jan Blunck <jblunck-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: allow matching of tcp sessions in CifsNew state
+Date: Tue, 21 Sep 2010 08:14:46 -0700
+Message-ID: <1285082086-15042-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikbM17xs41abm+6DTa9DJLYM8XYeVg=bZr_n8M5-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tuesday 21 September 2010, Steve French wrote:
-> Alternatively - I could merge the trivially modified bkl cifs patch
-> into the cifs-2.6.git tree if that is easier
+With commit 7332f2a6217ee6925f83ef0e725013067ed316ba, cifsd will no
+longer exit when the socket abends and the tcpStatus is CifsNew. With
+that change, there's no reason to avoid matching an existing session in
+this state.
 
-Well, this is the most trivial sort of conflict, I guess we don't have
-to worry about it.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |    9 ---------
+ 1 files changed, 0 insertions(+), 9 deletions(-)
 
-Part of my patch reverts part of an earlier patch in the bkl-vfs series
-(by design, not by accident).
-We could sort that out, but my feeling is that it's not worth it.
-
-	Arnd
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 435b912..271038b 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1511,15 +1511,6 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
+ 
+ 	write_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+-		/*
+-		 * the demux thread can exit on its own while still in CifsNew
+-		 * so don't accept any sockets in that state. Since the
+-		 * tcpStatus never changes back to CifsNew it's safe to check
+-		 * for this without a lock.
+-		 */
+-		if (server->tcpStatus == CifsNew)
+-			continue;
+-
+ 		if (!match_address(server, addr,
+ 				   (struct sockaddr *)&vol->srcaddr))
+ 			continue;
+-- 
+1.7.3
