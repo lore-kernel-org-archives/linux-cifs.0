@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH -v6 3/4] cifs NTLMv2/NTLMSSP define crypto hash functions
  and create and send keys needed for key exchange
-Date: Tue, 21 Sep 2010 19:41:37 -0500
-Message-ID: <AANLkTin16iCdo8X7e9e0G+6dn=hq=DRwRLTTNh8P08MM@mail.gmail.com>
+Date: Tue, 21 Sep 2010 20:27:20 -0500
+Message-ID: <AANLkTi=rZim_6HrbsY-W78qZZPt3X4TheHp605X0V7Fj@mail.gmail.com>
 References: <1284865355-16815-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20100921105254.32574ba4@corrin.poochiereds.net>
 	<AANLkTimqjBtVyB+xvtv5F5_qs333XiFQm+S=8Gh20+x2@mail.gmail.com>
@@ -61,7 +61,24 @@ he
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
 
-If there is a way an smb connection would remain inspite of all set up
-sessions gone, first_time will not work.  But should is_first_ses_recon=
-nect
-traverse the list under a lock?
+I think the check where it exists today
+ first_time =3D is_first_ses_reconnect(ses);
+happens too early for ntlmssp session setup. Two session setups could s=
+till
+race to calculate secondary session key, calculate ciphertext, and over=
+write
+ntlmv2 session key.
+calc_seckey() function would probably need to check first_time once aga=
+in.
+calc_seckey() takes mutex lock while executing its code, is_first_ses_r=
+econnect
+is called by holding, session's need_reconnect is modified under Global=
+Mid_Lock
+spin lock. Have to consider all this while considering connect and
+reconnect logic.
+
+The scheme in this patch, for NTLMSSP, is simple enough to follow and t=
+here will
+not be race during all these key calculations and it works.
+
+cifs_tcp_ses_lock as read lock.
