@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH -v6 3/4] cifs NTLMv2/NTLMSSP define crypto hash functions
  and create and send keys needed for key exchange
-Date: Tue, 21 Sep 2010 20:27:20 -0500
-Message-ID: <AANLkTi=rZim_6HrbsY-W78qZZPt3X4TheHp605X0V7Fj@mail.gmail.com>
+Date: Tue, 21 Sep 2010 21:57:44 -0500
+Message-ID: <AANLkTimOJLuBxDQHPZJAUxR3ieeErzUyzXwSP=VPO-+_@mail.gmail.com>
 References: <1284865355-16815-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20100921105254.32574ba4@corrin.poochiereds.net>
 	<AANLkTimqjBtVyB+xvtv5F5_qs333XiFQm+S=8Gh20+x2@mail.gmail.com>
@@ -61,24 +61,7 @@ he
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
 
-I think the check where it exists today
- first_time =3D is_first_ses_reconnect(ses);
-happens too early for ntlmssp session setup. Two session setups could s=
-till
-race to calculate secondary session key, calculate ciphertext, and over=
-write
-ntlmv2 session key.
-calc_seckey() function would probably need to check first_time once aga=
-in.
-calc_seckey() takes mutex lock while executing its code, is_first_ses_r=
-econnect
-is called by holding, session's need_reconnect is modified under Global=
-Mid_Lock
-spin lock. Have to consider all this while considering connect and
-reconnect logic.
-
-The scheme in this patch, for NTLMSSP, is simple enough to follow and t=
-here will
-not be race during all these key calculations and it works.
-
-cifs_tcp_ses_lock as read lock.
+We probably ought to keep first_time or cphready per type of auth mech
+since it is possible to have multiple smb sessions on the same connecti=
+on using
+various kinds of authentication mechanisms.
