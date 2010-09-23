@@ -1,57 +1,54 @@
-From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
-Subject: linux-next: build failure after merge of the cifs tree
-Date: Thu, 23 Sep 2010 11:20:04 +1000
-Message-ID: <20100923112004.b47923b7.sfr@canb.auug.org.au>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: linux-next: build failure after merge of the cifs tree
+Date: Wed, 22 Sep 2010 20:32:41 -0500
+Message-ID: <AANLkTimXtigjQwpL6i46JTiuREdLnr7Yh+2ZCuPfy06G@mail.gmail.com>
+References: <20100923112004.b47923b7.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Thu__23_Sep_2010_11_20_04_+1000_VmlG_6+.M+3MrtVF"
-Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs@vger.kernel.org, linux-next@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20100923112004.b47923b7.sfr@canb.auug.org.au>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
---Signature=_Thu__23_Sep_2010_11_20_04_+1000_VmlG_6+.M+3MrtVF
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry about that - we merged one of Jeff's patches (in a series) out
+of order by three hours due to review comments.  Should be ok now -
+verifying.
 
-Hi all,
+On Wed, Sep 22, 2010 at 8:20 PM, Stephen Rothwell <sfr@canb.auug.org.au=
+> wrote:
+> Hi all,
+>
+> After merging the cifs tree, today's linux-next build (powerpc
+> ppc64_defconfig) failed like this:
+>
+> fs/cifs/file.c: In function 'cifs_writepages':
+> fs/cifs/file.c:1365: error: 'struct cifs_sb_info' has no member named=
+ 'tcon'
+> fs/cifs/file.c:1365: error: 'struct cifs_sb_info' has no member named=
+ 'tcon'
+> fs/cifs/file.c:1366: error: 'struct cifs_sb_info' has no member named=
+ 'tcon'
+>
+> Caused by commit 2eff6be391f00d606b43e60d9727b70c44917b7e ("cifs:
+> temporarily rename cifs_sb->tcon to ptcon to catch stragglers").
+>
+> Really, such testing code should not be in linux-next ...
+>
+> I have used the cifs tree fomr next-20100921 for today.
+> --
+> Cheers,
+> Stephen Rothwell =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sfr@canb.auug=
+=2Eorg.au
+> http://www.canb.auug.org.au/~sfr/
+>
 
-After merging the cifs tree, today's linux-next build (powerpc
-ppc64_defconfig) failed like this:
 
-fs/cifs/file.c: In function 'cifs_writepages':
-fs/cifs/file.c:1365: error: 'struct cifs_sb_info' has no member named 'tcon'
-fs/cifs/file.c:1365: error: 'struct cifs_sb_info' has no member named 'tcon'
-fs/cifs/file.c:1366: error: 'struct cifs_sb_info' has no member named 'tcon'
 
-Caused by commit 2eff6be391f00d606b43e60d9727b70c44917b7e ("cifs:
-temporarily rename cifs_sb->tcon to ptcon to catch stragglers").
-
-Really, such testing code should not be in linux-next ...
-
-I have used the cifs tree fomr next-20100921 for today.
 --=20
-Cheers,
-Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
-http://www.canb.auug.org.au/~sfr/
+Thanks,
 
---Signature=_Thu__23_Sep_2010_11_20_04_+1000_VmlG_6+.M+3MrtVF
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iQEcBAEBAgAGBQJMmqtEAAoJEDMEi1NhKgbslIcH+wbgmWft1bgYI1bKhVx0MYqJ
-jEJmU4qsk6b1VOHy8TeMnh7qDsZo6eh0531LEP9EWlR9qvyoZ0EisyVoQZCvVbPi
-9uaFDxEKtxOhcC4UwDyqSTk+AH82OBm75AYm40MyQZXCCLKED2NQPh1+rgkWtRHo
-o6hrHYu8Ci3+B49Knf71vgvSWEOZQIJ5hnKqe9E9KJWHtWfoRgmYwuF2lZhtVEnD
-VrXC4TKC1WdWu+6hqVnuvK/DSWDOGFcURi7nj3Dl9LPHwHMn4rgPjEQMUMVWbKKo
-l2Oa9fj39AGOG7aOs7uabMYNH0UAc20u1fG+7J/eC7u4Kl9GSsaitxg6r5yxXv4=
-=X3SY
------END PGP SIGNATURE-----
-
---Signature=_Thu__23_Sep_2010_11_20_04_+1000_VmlG_6+.M+3MrtVF--
+Steve
