@@ -1,73 +1,78 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 13/15] cifs: on multiuser mount, set ownership to current_fsuid/current_fsgid
-Date: Thu, 23 Sep 2010 01:19:23 -0500
-Message-ID: <AANLkTimg9oBb7bKYEzKNbWiwqgSXXx-DQgrMY1VPiYVy@mail.gmail.com>
-References: <1285023704-2159-1-git-send-email-jlayton@redhat.com>
-	<1285023704-2159-14-git-send-email-jlayton@redhat.com>
+From: starlight@binnacle.cx
+Subject: Re: question about CIFS client glitches
+Date: Thu, 23 Sep 2010 06:59:09 -0400
+Message-ID: <6.2.5.6.2.20100923065213.056b4a50@binnacle.cx>
+References: <6.2.5.6.2.20100916171408.03a0fcd8@flumedata.com>
+	<AANLkTimDWbZF=DkmVLw96V3nZGggFfNm0Zv3FxfFX1BE@mail.gmail.com>
+	<6.2.5.6.2.20100916195402.0573dcc0@binnacle.cx>
+	<6.2.5.6.2.20100917193123.056b6f78@binnacle.cx>
+	<20100918072502.73987a62@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1285023704-2159-14-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: samba@lists.samba.org, Steve French <smfrench@gmail.com>,
+	linux-cifs@vger.kernel.org
+To: Jeff Layton <jlayton@samba.org>
+Return-path: <samba-bounces@lists.samba.org>
+In-Reply-To: <20100918072502.73987a62@corrin.poochiereds.net>
+References: <6.2.5.6.2.20100916171408.03a0fcd8@flumedata.com>
+	<AANLkTimDWbZF=DkmVLw96V3nZGggFfNm0Zv3FxfFX1BE@mail.gmail.com>
+	<6.2.5.6.2.20100916195402.0573dcc0@binnacle.cx>
+	<6.2.5.6.2.20100917193123.056b6f78@binnacle.cx>
+	<20100918072502.73987a62@corrin.poochiereds.net>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba>,
+	<mailto:samba-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba>
+List-Post: <mailto:samba@lists.samba.org>
+List-Help: <mailto:samba-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba>,
+	<mailto:samba-request@lists.samba.org?subject=subscribe>
+Sender: samba-bounces@lists.samba.org
+Errors-To: samba-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-Won't this overwrite the effect of the "uid" mount parameter?
-
-linux_uid is set at mount time to either current uid or what is passed
-in on uid (if "uid" is specified on mount).   Your code seems to
-unconditionally change that to ignore the uid passed in or mount.
-
-On Mon, Sep 20, 2010 at 6:01 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> ...when unix extensions aren't enabled. This makes everything on
-> the mount appear to be owned by the current user.
+At 07:25 AM 9/18/2010 -0400, Jeff Layton wrote:
+>On Fri, 17 Sep 2010 19:38:21 -0400
+>starlight@binnacle.cx wrote:
+>> 
+>> In both versions it seems like hard-links work and symbolic
+>> links fail
 >
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/inode.c | =A0 =A08 ++++++++
-> =A01 files changed, 8 insertions(+), 0 deletions(-)
+>That's expected. The core cifs protocol as implemented in windows
+>doesn't support symlinks.
+
+Ah, well then it's a good thing they're not needed for the
+build tree I'm working with.  Good to know not to ever
+look for the feature for Windows shares.
+
+>You need unix extensions for that, or you may
+>want to play with the "mfsymlinks" patches that Metze proposed 
+>recently.
+
+Eeeh no.  Every time I've ever worked with a vanilla
+kernel I sank in the quicksand of bugs and crashes.
+Not fun, no time for it.
+
+>> And it appears that a 'pax -r' extraction followed by 'rm' for
+>> selected files has some difficulty with CIFS 1.6x rendered
+>> hard link in the mix.
+>> 
 >
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index dcd0886..2256124 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1761,11 +1761,19 @@ check_inval:
-> =A0int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
-> =A0 =A0 =A0 =A0struct kstat *stat)
-> =A0{
-> + =A0 =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(dentry->d_sb);
-> + =A0 =A0 =A0 struct cifsTconInfo *tcon =3D cifs_sb_master_tcon(cifs_=
-sb);
-> =A0 =A0 =A0 =A0int err =3D cifs_revalidate_dentry(dentry);
-> +
-> =A0 =A0 =A0 =A0if (!err) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0generic_fillattr(dentry->d_inode, stat=
-);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stat->blksize =3D CIFS_MAX_MSGSIZE;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stat->ino =3D CIFS_I(dentry->d_inode)-=
->uniqueid;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUN=
-T_MULTIUSER &&
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 !tcon->unix_ext) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 stat->uid =3D current_f=
-suid();
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 stat->gid =3D current_f=
-sgid();
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0return err;
-> =A0}
-> --
-> 1.7.2.3
->
->
+>What sort of difficulty is it having?
 
+As expressed in the original message, 'pax' archive with hard 
+links restored, 'rm' command executed, tree doesn't match.  
+Maybe the fact that the 'pax' archive is created with a
 
+   find tree -print | sort -r | pax -wd
 
---=20
-Thanks,
+has something to do with it, causing the 'pax -r' to
+do things that CIFS is not expecting.
 
-Steve
+I am giving up though.  Decided to build a new server and setup 
+an IB link so that Samba works acceptably from Windows and the
+files can stay on the Linux side of the fence.
+
+-- 
+To unsubscribe from this list go to the following URL and read the
+instructions:  https://lists.samba.org/mailman/options/samba
