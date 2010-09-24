@@ -1,52 +1,53 @@
-From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+From: Stephen Rothwell <sfr@canb.auug.org.au>
 Subject: linux-next: build warning after merge of the cifs tree
-Date: Fri, 24 Sep 2010 13:48:41 +1000
-Message-ID: <20100924134841.161d18d3.sfr@canb.auug.org.au>
+Date: Fri, 24 Sep 2010 13:55:31 +1000
+Message-ID: <20100924135531.96e5ac72.sfr@canb.auug.org.au>
 Mime-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pgp-signature";
  micalg="PGP-SHA1";
- boundary="Signature=_Fri__24_Sep_2010_13_48_41_+1000_NI0zFPy8anBZZZZo"
-Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+ boundary="Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps"
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+To: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
+Return-path: <linux-next-owner@vger.kernel.org>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
---Signature=_Fri__24_Sep_2010_13_48_41_+1000_NI0zFPy8anBZZZZo
+--Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps
 Content-Type: text/plain; charset=US-ASCII
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi all,
 
-After merging the cifs tree, today's linux-next build (powerpc
+After merging the irqflags tree, today's linux-next build (powerpc
 ppc64_defconfig) produced this warning:
 
-fs/cifs/dir.c: In function 'cifs_new_fileinfo':
-fs/cifs/dir.c:140: warning: unused variable 'cifs_sb'
+fs/cifs/sess.c: In function 'CIFS_SessSetup':
+fs/cifs/sess.c:595: warning: unused variable 'blob_len'
 
-Introduced by commit 9a6124e7e18fa30d8693055e6a4526afb4c3fabc ("cifs:
-have cifs_new_fileinfo take a tcon arg").
+Introduced by commit 15f6bdfb9914b0c41848f874719911ba053be931 ("cifs
+NTLMv2/NTLMSSP ntlmv2 within ntlmssp autentication code").
+CONFIG_CIFS_UPCALL is not set in this build.
 
 --=20
 Cheers,
-Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
+Stephen Rothwell                    sfr@canb.auug.org.au
 http://www.canb.auug.org.au/~sfr/
 
---Signature=_Fri__24_Sep_2010_13_48_41_+1000_NI0zFPy8anBZZZZo
+--Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.10 (GNU/Linux)
 
-iQEcBAEBAgAGBQJMnB+ZAAoJEDMEi1NhKgbszJoH/1R1TKoqSM+bGlQm4lsmtyuj
-G3oI09Npk03pXldQdrVJ0QwH0iKoiSPI98YEPV/sH4qIwJSzwHRjmeFmFcw+Wtwf
-RBdab/JEoqy+KQA6pOBSD/Be3SrZdE7R495BvmAORJQJCbY/zLyEF0921yvMKpVi
-B908Cz0lFeT+lzFy4QQcM9nRuBC0IppWvYqffi1lRxkbCVLFr0G1efx5YPR/wuD7
-g3OyziH1DUnCU/Dw12WjqiPe46uGH6B7tNI58jnu4cV1sFfIiekxdU0qxfr+6uaK
-SFbij9Go/ReXorx/5DhfnoI1dcAdzH8r269MGAzDo5J2rDhAfmkVK+RefwrICO8=
-=Wu6R
+iQEcBAEBAgAGBQJMnCEzAAoJEDMEi1NhKgbswIUH/32Piz4jPU/U+02C1zsmr1+Y
+qxR6qLiPlgs60MbbwpCoIASsDR+1rcby7n1dyVTphpHRIjAWwx6LsGvKLrITZ4Wy
+4vP4aPvL2fBxEtZPUZlkivyNgUdAU7+fzYa4pEQyIoraVmX6Xq7GvvwCQYsRJF7j
+ZYcu1Zar5DoR5IPkOG5uDbEGDa+dTFooAMisgYK9owybFIpye7QZmC12531Pm4Vu
+qmu8jzDa8FwTs4U9CQobdXveImJR1gRuCuypEQRiqOx/zvqmlAPbgJJvLpGUqrdU
+dgytTQssDyCJMfzLeYZmYcymnkkg2rqZ+DkQlZovpEwF483pzjz1SvA+uzBqWdI=
+=9jLj
 -----END PGP SIGNATURE-----
 
---Signature=_Fri__24_Sep_2010_13_48_41_+1000_NI0zFPy8anBZZZZo--
+--Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps--
