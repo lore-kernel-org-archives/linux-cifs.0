@@ -1,79 +1,54 @@
-From: Mike Tonks <fluffymike-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
-Subject: Dir List Across Network - Slow from one machine, fast from another
-Date: Fri, 24 Sep 2010 11:27:37 +0100
-Message-ID: <AANLkTi=ELucgtRA=7FW1-04DrsBN=KqvsSc81bjeYVNG@mail.gmail.com>
-References: <AANLkTim0jDLqVVsT2WropqDu30=OWmqQyUK4tmsG=x_M@mail.gmail.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: Re: linux-next: build warning after merge of the cifs tree
+Date: Fri, 24 Sep 2010 07:13:36 -0400
+Message-ID: <20100924071336.6def0437@corrin.poochiereds.net>
+References: <20100924134841.161d18d3.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTim0jDLqVVsT2WropqDu30=OWmqQyUK4tmsG=x_M-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/G9yeT8oKoqHFfj.1zLjnskP"; protocol="application/pgp-signature"
+Cc: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>,
+	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <20100924134841.161d18d3.sfr@canb.auug.org.au>
+Sender: linux-next-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi All,
+--Sig_/G9yeT8oKoqHFfj.1zLjnskP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I hope this is a suitable place to post this message. =A0I read with
-interest a previous thread with a very similar issue:
-http://lists.samba.org/archive/linux-cifs-client/2010-January/005504.ht=
-ml
+On Fri, 24 Sep 2010 13:48:41 +1000
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 
-I have several ubuntu servers here and a remote windows share across a
-slow VPN. =A0I'm trying to create a 'folder watcher' to scan
-periodically for new files, and this works pretty well using 'ls -la'
-and then processing the output in perl.
+> Hi all,
+>=20
+> After merging the cifs tree, today's linux-next build (powerpc
+> ppc64_defconfig) produced this warning:
+>=20
+> fs/cifs/dir.c: In function 'cifs_new_fileinfo':
+> fs/cifs/dir.c:140: warning: unused variable 'cifs_sb'
+>=20
+> Introduced by commit 9a6124e7e18fa30d8693055e6a4526afb4c3fabc ("cifs:
+> have cifs_new_fileinfo take a tcon arg").
+>=20
 
-In particular, a dev machine: Linux highway-dev 2.6.28-18-generic
-#60-Ubuntu SMP Fri Mar 12 04:40:52 UTC 2010 i686 GNU/Linux
+That's fixed in the next patch in the multiuser mount series. It
+probably should have been part of the patch above.
 
-and a production machine: Linux highway-www 2.6.31-19-server
-#56-Ubuntu SMP Thu Jan 28 03:40:48 UTC 2010 x86_64 GNU/Linux
+--=20
+Jeff Layton <jlayton@redhat.com>
 
-Both dev and production are in the same rack in one location, while
-the windows server is at another site. =A0I've tested against other win
-servers at other sites with similar results.
+--Sig_/G9yeT8oKoqHFfj.1zLjnskP
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
 
-The remote folder has 9000+ files in it. =A0The large number of files i=
-s
-definately part of the issue, with smaller folders the timing is more
-acceptable.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
 
-=46or a simple 'ls':
+iEYEARECAAYFAkych+kACgkQojH4PzJJfGXreQCfZ3sUwYbi/6Td8aLJivU8gn9a
+VlIAoMJEYVKnGgjVpQC+Tq+AL6pFIiZR
+=RXtu
+-----END PGP SIGNATURE-----
 
-dev: =A05 seconds
-production: 6 seconds
-
-=46or 'ls -la':
-
-dev: 6 seconds
-production: 200 seconds
-
-Sadly - I need the file size and timestamp for my program to work.
-
-My question is - can anyone explain what's going on and (hopefully)
-help me speed up the response on the production server / identify the
-network issue / etc. =A0Or is this something that's changed at a
-software level?
-
-I timed my tests like so:
-
-$ date; ls /mnt/sharename/ > temp.txt; date
-
-
-$ cat /proc/fs/cifs/DebugData
-Display Internal CIFS Data Structures for Debugging
----------------------------------------------------
-=2E..
-2) Name: x.x.x.x =A0Domain: WORKGROUP Uses: 1 OS: Windows Server 2003 R=
-2
-3790 Service Pack 2
-=A0 =A0 =A0 =A0NOS: Windows Server 2003 R2 5.2 Capability: 0x1f3fd
-=A0 =A0 =A0 =A0SMB session status: 1 =A0 TCP status: 1
-=A0 =A0 =A0 =A0Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0
-=A0 =A0 =A0 =A0Shares:
-=A0 =A0 =A0 =A01) \\x.x.x.x\Jobs Mounts: 1 Type: NTFS DevInfo: 0x20 Att=
-ributes: 0x700ff
-PathComponentMax: 255 Status: 0x1 type: DISK
-
-=A0 =A0 =A0 =A0MIDs:
+--Sig_/G9yeT8oKoqHFfj.1zLjnskP--
