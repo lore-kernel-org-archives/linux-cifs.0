@@ -1,53 +1,79 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: build warning after merge of the cifs tree
-Date: Fri, 24 Sep 2010 13:55:31 +1000
-Message-ID: <20100924135531.96e5ac72.sfr@canb.auug.org.au>
+From: Mike Tonks <fluffymike-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
+Subject: Dir List Across Network - Slow from one machine, fast from another
+Date: Fri, 24 Sep 2010 11:27:37 +0100
+Message-ID: <AANLkTi=ELucgtRA=7FW1-04DrsBN=KqvsSc81bjeYVNG@mail.gmail.com>
+References: <AANLkTim0jDLqVVsT2WropqDu30=OWmqQyUK4tmsG=x_M@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps"
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Shirish Pargaonkar <shirishpargaonkar@gmail.com>
-To: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
-Return-path: <linux-next-owner@vger.kernel.org>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTim0jDLqVVsT2WropqDu30=OWmqQyUK4tmsG=x_M-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
---Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi All,
 
-Hi all,
+I hope this is a suitable place to post this message. =A0I read with
+interest a previous thread with a very similar issue:
+http://lists.samba.org/archive/linux-cifs-client/2010-January/005504.ht=
+ml
 
-After merging the irqflags tree, today's linux-next build (powerpc
-ppc64_defconfig) produced this warning:
+I have several ubuntu servers here and a remote windows share across a
+slow VPN. =A0I'm trying to create a 'folder watcher' to scan
+periodically for new files, and this works pretty well using 'ls -la'
+and then processing the output in perl.
 
-fs/cifs/sess.c: In function 'CIFS_SessSetup':
-fs/cifs/sess.c:595: warning: unused variable 'blob_len'
+In particular, a dev machine: Linux highway-dev 2.6.28-18-generic
+#60-Ubuntu SMP Fri Mar 12 04:40:52 UTC 2010 i686 GNU/Linux
 
-Introduced by commit 15f6bdfb9914b0c41848f874719911ba053be931 ("cifs
-NTLMv2/NTLMSSP ntlmv2 within ntlmssp autentication code").
-CONFIG_CIFS_UPCALL is not set in this build.
+and a production machine: Linux highway-www 2.6.31-19-server
+#56-Ubuntu SMP Thu Jan 28 03:40:48 UTC 2010 x86_64 GNU/Linux
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
+Both dev and production are in the same rack in one location, while
+the windows server is at another site. =A0I've tested against other win
+servers at other sites with similar results.
 
---Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps
-Content-Type: application/pgp-signature
+The remote folder has 9000+ files in it. =A0The large number of files i=
+s
+definately part of the issue, with smaller folders the timing is more
+acceptable.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+=46or a simple 'ls':
 
-iQEcBAEBAgAGBQJMnCEzAAoJEDMEi1NhKgbswIUH/32Piz4jPU/U+02C1zsmr1+Y
-qxR6qLiPlgs60MbbwpCoIASsDR+1rcby7n1dyVTphpHRIjAWwx6LsGvKLrITZ4Wy
-4vP4aPvL2fBxEtZPUZlkivyNgUdAU7+fzYa4pEQyIoraVmX6Xq7GvvwCQYsRJF7j
-ZYcu1Zar5DoR5IPkOG5uDbEGDa+dTFooAMisgYK9owybFIpye7QZmC12531Pm4Vu
-qmu8jzDa8FwTs4U9CQobdXveImJR1gRuCuypEQRiqOx/zvqmlAPbgJJvLpGUqrdU
-dgytTQssDyCJMfzLeYZmYcymnkkg2rqZ+DkQlZovpEwF483pzjz1SvA+uzBqWdI=
-=9jLj
------END PGP SIGNATURE-----
+dev: =A05 seconds
+production: 6 seconds
 
---Signature=_Fri__24_Sep_2010_13_55_31_+1000_d3jqRQNbsDsMnVps--
+=46or 'ls -la':
+
+dev: 6 seconds
+production: 200 seconds
+
+Sadly - I need the file size and timestamp for my program to work.
+
+My question is - can anyone explain what's going on and (hopefully)
+help me speed up the response on the production server / identify the
+network issue / etc. =A0Or is this something that's changed at a
+software level?
+
+I timed my tests like so:
+
+$ date; ls /mnt/sharename/ > temp.txt; date
+
+
+$ cat /proc/fs/cifs/DebugData
+Display Internal CIFS Data Structures for Debugging
+---------------------------------------------------
+=2E..
+2) Name: x.x.x.x =A0Domain: WORKGROUP Uses: 1 OS: Windows Server 2003 R=
+2
+3790 Service Pack 2
+=A0 =A0 =A0 =A0NOS: Windows Server 2003 R2 5.2 Capability: 0x1f3fd
+=A0 =A0 =A0 =A0SMB session status: 1 =A0 TCP status: 1
+=A0 =A0 =A0 =A0Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0
+=A0 =A0 =A0 =A0Shares:
+=A0 =A0 =A0 =A01) \\x.x.x.x\Jobs Mounts: 1 Type: NTFS DevInfo: 0x20 Att=
+ributes: 0x700ff
+PathComponentMax: 255 Status: 0x1 type: DISK
+
+=A0 =A0 =A0 =A0MIDs:
