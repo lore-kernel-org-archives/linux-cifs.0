@@ -1,64 +1,55 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: cifs_flush should wait for writeback to complete before proceeding
-Date: Fri, 24 Sep 2010 08:59:13 -0400
-Message-ID: <1285333153-9113-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: [PATCH 2/2] cifs: fix module refcount leak in find_domain_name
+Date: Fri, 24 Sep 2010 09:00:36 -0400
+Message-ID: <20100924090036.451923a8@corrin.poochiereds.net>
+References: <1285333112-9040-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1285333112-9040-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It's possible that the kernel will call cifs_close on a filp while there
-is still dirty data attached to the inode. If it's the last writeable
-filp for an inode, then we may have no way to flush this data to the
-server.
+On Fri, 24 Sep 2010 08:58:32 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Thus, simply doing a filemap_fdatawrite in the .flush operation isn't
-sufficient. The client needs to wait for it to complete before
-returning. OTOH, there's no real need to perform a flush on a
-filehandle that's read-only.
+> find_domain_name() uses load_nls_default which takes a module reference
+> on the appropriate NLS module, but doesn't put it.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsencrypt.c |    5 ++++-
+>  1 files changed, 4 insertions(+), 1 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 388ebe3..ccb13e6 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -363,13 +363,16 @@ find_domain_name(struct cifsSesInfo *ses)
+>  			if (!attrsize)
+>  				break;
+>  			if (!ses->domainName) {
+> +				struct nls_table *default_nls;
+>  				ses->domainName =
+>  					kmalloc(attrsize + 1, GFP_KERNEL);
+>  				if (!ses->domainName)
+>  						return -ENOMEM;
+> +				default_nls = load_nls_default();
+>  				cifs_from_ucs2(ses->domainName,
+>  					(__le16 *)blobptr, attrsize, attrsize,
+> -					load_nls_default(), false);
+> +					default_nls, false);
+> +				unload_nls(default_nls);
+>  				break;
+>  			}
+>  		}
 
-What currently saves us on this is the fact that cifs_writepages is
-basically synchronous. If and when we ever switch to an async writeback
-model, this will need to be fixed, so we might as well go ahead and
-fix it now.
+My apologies for the misleading subject prefix. This patch isn't part
+of a series. It's a standalone patch. There is no patch 1/2.
 
-When flushing a writable filp, wait for the writeback to complete before
-returning to ensure that the filehandle stays around until the writeback
-is complete.
-
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/file.c |   17 +++++++----------
- 1 files changed, 7 insertions(+), 10 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 80856f1..8084a8d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1737,16 +1737,13 @@ int cifs_flush(struct file *file, fl_owner_t id)
- 	struct inode *inode = file->f_path.dentry->d_inode;
- 	int rc = 0;
- 
--	/* Rather than do the steps manually:
--	   lock the inode for writing
--	   loop through pages looking for write behind data (dirty pages)
--	   coalesce into contiguous 16K (or smaller) chunks to write to server
--	   send to server (prefer in parallel)
--	   deal with writebehind errors
--	   unlock inode for writing
--	   filemapfdatawrite appears easier for the time being */
--
--	rc = filemap_fdatawrite(inode->i_mapping);
-+	/*
-+	 * if the file is writable, then flush any dirty data to ensure that
-+	 * the filehandle isn't closed out before writeback completes.
-+	 */
-+	if (file->f_mode & FMODE_WRITE)
-+		rc = filemap_write_and_wait(inode->i_mapping);
-+
- 	/* reset wb rc if we were able to write out dirty pages */
- 	if (!rc) {
- 		rc = CIFS_I(inode)->write_behind_rc;
 -- 
-1.7.2.3
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
