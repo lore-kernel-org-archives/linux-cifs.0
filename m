@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] cifs: cifs_flush should wait for writeback to complete
  before proceeding
-Date: Sat, 25 Sep 2010 07:33:33 -0400
-Message-ID: <20100925073333.0459e653@corrin.poochiereds.net>
+Date: Sat, 25 Sep 2010 08:16:44 -0400
+Message-ID: <20100925081644.777952fe@corrin.poochiereds.net>
 References: <1285333153-9113-1-git-send-email-jlayton@redhat.com>
 	<AANLkTimdoOPyAmhWw0kTtnZan6+gudJZn=vgqTNpEL+A@mail.gmail.com>
 	<20100924141137.4cb03197@tlielax.poochiereds.net>
@@ -42,10 +42,15 @@ Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
 > filemap_write_and_wait in ->release?
 > 
 
-Good point. By doing that the right way we should be able to get rid of
-that nasty wait loop in the cifs release op too. I'll respin and
-resend...
+Hmm...there is one problem with this scheme. __fput ignores the error
+return from ->release. Only the errors from ->flush will be returned to
+userspace. So if we only filemap_fdatawait in the ->release op, then we
+have the potential to miss returning writeback-related errors on a
+close call.
 
-Thanks,
+On a side note, why does f_op->release return an int? Are there places
+in the kernel besides __fput that call it? If not, maybe we should
+consider changing it to a void function to make this more clear.
+
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
