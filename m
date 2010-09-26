@@ -1,56 +1,49 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: cifs_flush should wait for writeback to complete
- before proceeding
-Date: Sat, 25 Sep 2010 08:16:44 -0400
-Message-ID: <20100925081644.777952fe@corrin.poochiereds.net>
-References: <1285333153-9113-1-git-send-email-jlayton@redhat.com>
-	<AANLkTimdoOPyAmhWw0kTtnZan6+gudJZn=vgqTNpEL+A@mail.gmail.com>
-	<20100924141137.4cb03197@tlielax.poochiereds.net>
-	<20100925042330.GA11930@infradead.org>
+From: Poyo VL <poyo_vl-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] /fs/cifs/cifssmb.c (2.6.35.5): Simple pointer initialization
+Date: Sun, 26 Sep 2010 04:05:35 -0700 (PDT)
+Message-ID: <945403.85622.qm@web45802.mail.sp1.yahoo.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-Type: multipart/mixed; boundary="0-1897494142-1285499135=:85622"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100925042330.GA11930-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 25 Sep 2010 00:23:30 -0400
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+--0-1897494142-1285499135=:85622
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, Sep 24, 2010 at 02:11:37PM -0400, Jeff Layton wrote:
-> > On Fri, 24 Sep 2010 12:58:55 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > 
-> > > We need to see the performance impact.  As you say cifs_writepages is
-> > > synchronous so we should be ok without it.  Any test results
-> > > before/after?
-> > > 
-> > 
-> > No, I haven't tested this for performance. It is a correctness issue
-> > though. We absolutely can't put the last reference to the last open
-> > filehandle without flushing all of the data first.
-> > 
-> > My expectation here though is that this may help performance in some
-> > cases since this patch also has it skip the flush on files open
-> > read-only.
-> 
-> ->flush is called on every close call, ->release on the last close for a
-> given file pointer.  Maybe you want a filemap_flush in ->flush and
-> filemap_write_and_wait in ->release?
-> 
+When I tried to compile the kernel (make allyesconfig) I got the following =
+ugly =0Awarning:=0Afs/cifs/cifssmb.c: In function =E2=80=98CIFSSMBGetCIFSAC=
+L=E2=80=99:=0Afs/cifs/cifssmb.c:3082: warning: =E2=80=98pdata=E2=80=99 may =
+be used uninitialized in this =0Afunction=0AThe pdata pointer is prctically=
+ initialized in line 3086 and it is used in line =0A3122, but the compiler =
+can't be sure that pdata will be used initialized so it =0Athrows that ugly=
+ warning. Just initializing *pdata with NULL will get rid off =0Athat warni=
+ng.=0APatch downer. I also attached it because someone told me that there a=
+re problems =0Awith Yahoo! Mail, it trims spaces or tabs...=0A=0ASigned-off=
+-by: Ionut Gabriel Popescu <poyo_vl-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>=0A---=0A=0A--- a/fs/cifs/cif=
+ssmb.c    2010-09-20 23:59:09.000000000 +0300=0A+++ b/fs/cifs/cifssmb.c    =
+2010-09-26 13:05:45.281241095 +0300=0A@@ -3079,7 +3079,7 @@ CIFSSMBGetCIFSA=
+CL(const int xid, struct=0A         __u32 parm_len;=0A         __u32 acl_le=
+n;=0A         struct smb_com_ntransact_rsp *pSMBr;=0A-        char *pdata;=
+=0A+        char *pdata =3D NULL;=0A =0A /* validate_nttransact */=0A      =
+   rc =3D validate_ntransact(iov[0].iov_base, (char **)&parm,=0A=0A=0A     =
+ 
+--0-1897494142-1285499135=:85622
+Content-Type: application/octet-stream; name="patch.diff"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="patch.diff"
 
-Hmm...there is one problem with this scheme. __fput ignores the error
-return from ->release. Only the errors from ->flush will be returned to
-userspace. So if we only filemap_fdatawait in the ->release op, then we
-have the potential to miss returning writeback-related errors on a
-close call.
+LS0tIGEvZnMvY2lmcy9jaWZzc21iLmMJMjAxMC0wOS0yMCAyMzo1OTowOS4w
+MDAwMDAwMDAgKzAzMDAKKysrIGIvZnMvY2lmcy9jaWZzc21iLmMJMjAxMC0w
+OS0yNiAxMzowNTo0NS4yODEyNDEwOTUgKzAzMDAKQEAgLTMwNzksNyArMzA3
+OSw3IEBAIENJRlNTTUJHZXRDSUZTQUNMKGNvbnN0IGludCB4aWQsIHN0cnVj
+dAogCQlfX3UzMiBwYXJtX2xlbjsKIAkJX191MzIgYWNsX2xlbjsKIAkJc3Ry
+dWN0IHNtYl9jb21fbnRyYW5zYWN0X3JzcCAqcFNNQnI7Ci0JCWNoYXIgKnBk
+YXRhOworCQljaGFyICpwZGF0YSA9IE5VTEw7CiAKIC8qIHZhbGlkYXRlX250
+dHJhbnNhY3QgKi8KIAkJcmMgPSB2YWxpZGF0ZV9udHJhbnNhY3QoaW92WzBd
+Lmlvdl9iYXNlLCAoY2hhciAqKikmcGFybSwK
 
-On a side note, why does f_op->release return an int? Are there places
-in the kernel besides __fput that call it? If not, maybe we should
-consider changing it to a void function to make this more clear.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--0-1897494142-1285499135=:85622--
