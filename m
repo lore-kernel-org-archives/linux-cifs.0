@@ -1,67 +1,84 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] /fs/cifs/cifssmb.c (2.6.35.5): Simple pointer initialization
-Date: Sun, 26 Sep 2010 16:11:44 -0500
-Message-ID: <AANLkTikALD7KU9aiRbFWvggM3yDz4tHvjfy-KRCOMAsm@mail.gmail.com>
-References: <945403.85622.qm@web45802.mail.sp1.yahoo.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: Zero size and zero blocks mountpoint.
+Date: Mon, 27 Sep 2010 17:41:15 +0530
+Message-ID: <4CA089E3.2030808@suse.de>
+References: <AANLkTinLwfXhcsAOPEK8reNRyWeyQnzGKm7uQOpYhM_5@mail.gmail.com> <20100924073515.7b441fa3@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Poyo VL <poyo_vl-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: Alex Perez <quimicefa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <945403.85622.qm-K0ZMcrTUAwnrNpU5RS+xBlZ8N9CAUha/QQ4Iyu8u01E@public.gmane.org>
+In-Reply-To: <20100924073515.7b441fa3-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Seems that it makes it more confusing? - if null were a valid value
-for pdata we would need to check for this later in the function before
-the memcpy
-
-It didn't throw that error on my gcc version - is your gcc older or do
-you use different compile options or different arch?
-
-On Sun, Sep 26, 2010 at 6:05 AM, Poyo VL <poyo_vl-/E1597aS9LQAvxtiuMwx3w@public.gmane.org> wrote:
-> When I tried to compile the kernel (make allyesconfig) I got the foll=
-owing ugly
-> warning:
-> fs/cifs/cifssmb.c: In function =91CIFSSMBGetCIFSACL=92:
-> fs/cifs/cifssmb.c:3082: warning: =91pdata=92 may be used uninitialize=
-d in this
-> function
-> The pdata pointer is prctically initialized in line 3086 and it is us=
-ed in line
-> 3122, but the compiler can't be sure that pdata will be used initiali=
-zed so it
-> throws that ugly warning. Just initializing *pdata with NULL will get=
- rid off
-> that warning.
-> Patch downer. I also attached it because someone told me that there a=
-re problems
-> with Yahoo! Mail, it trims spaces or tabs...
->
-> Signed-off-by: Ionut Gabriel Popescu <poyo_vl-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-> ---
->
-> --- a/fs/cifs/cifssmb.c =A0 =A02010-09-20 23:59:09.000000000 +0300
-> +++ b/fs/cifs/cifssmb.c =A0 =A02010-09-26 13:05:45.281241095 +0300
-> @@ -3079,7 +3079,7 @@ CIFSSMBGetCIFSACL(const int xid, struct
-> =A0 =A0 =A0 =A0 __u32 parm_len;
-> =A0 =A0 =A0 =A0 __u32 acl_len;
-> =A0 =A0 =A0 =A0 struct smb_com_ntransact_rsp *pSMBr;
-> - =A0 =A0 =A0 =A0char *pdata;
-> + =A0 =A0 =A0 =A0char *pdata =3D NULL;
->
-> =A0/* validate_nttransact */
-> =A0 =A0 =A0 =A0 rc =3D validate_ntransact(iov[0].iov_base, (char **)&=
-parm,
->
->
->
+On 09/24/2010 05:05 PM, Jeff Layton wrote:
+> On Fri, 24 Sep 2010 13:18:45 +0200
+> Alex Perez <quimicefa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> 
+>> I've just found this thread on google, and I subscribed to the list.
+>>
+>> http://www.spinics.net/lists/linux-cifs/msg00951.html
+>>
+>> I'm experiencing the same problem. the mountpoint is showing a 4096
+>> size, but when I mount a cifs resource, it shows a 0-size. Other
+>> mountpoints that are not using cifs (nfs, ext2-3 ...) doesnt change
+>> the size.
+>>
+>> The problem is that the mount point belongs to a directory structure
+>> that is accesed by an apache service (2.0.54). The mount point is
+>> /opt/www/dir1, while the apache's directoryRoot is /opt/www. So, the
+>> problem is that when a client is trying to access to "dir1" I get a
+>> error in apache logs, like:
+>>
+>> [Fri Sep 24 10:57:26 2010] [error] [client 192.0.2.147] (75)Value too
+>> large for defined data type: access to /dir1 failed
+>>
+>> And the client gets a 403 - forbidden error. It's very tricky because
+>> if I dismount /opt/www/dir1, the client can access without any
+>> problem.
+>>
+>> Googling this error seem that is related to accessing files > 2Gb, but
+>> I think that apache doesn't know how to handle a 0-size directory or
+>> it's understanding that is a huge sized directory ...
+>>
+>> how can I fix the directory-size that apache is receiving?
+>>
+> 
+> Honestly, that sounds like an apache bug. You may want to report that
+> to them.
+> 
+> I asked Stef this question question and didn't get an answer however:
+> 
+> Does POSIX offer any guidance about what the size of a directory should
+> represent?
 
 
+The nearest I could find is:
 
---=20
-Thanks,
+"If the file is a character special or block special file, the size of
+the file may be replaced with implementation-defined information
+associated with the device in question."
 
-Steve
+   from http://www.opengroup.org/onlinepubs/9699919799/
+
+In our case it's network file object and the Server only seem to know
+the the actual size.
+
+> For a local filesystem this is simple -- it's a representation of the
+> space that the directory occupies on disk (directories are just inodes
+> like any other).
+> 
+> NFS returns a non-zero size for a directory inode because the server
+> returns one. CIFS servers however send 0 for the size of a directory.
+
++ 1
+
+I think it makes sense to report what the server returns and not fake it
+to cover up application bugs/ unwarranted checks. If there are other
+reasons, we could consider setting a reasonable size
+
+
+-- 
+Suresh Jayaraman
