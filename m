@@ -1,83 +1,84 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Subject: Re: Zero size and zero blocks mountpoint.
-Date: Mon, 27 Sep 2010 17:41:15 +0530
-Message-ID: <4CA089E3.2030808@suse.de>
-References: <AANLkTinLwfXhcsAOPEK8reNRyWeyQnzGKm7uQOpYhM_5@mail.gmail.com> <20100924073515.7b441fa3@corrin.poochiereds.net>
+Date: Mon, 27 Sep 2010 18:23:40 +0530
+Message-ID: <4CA093D4.4060708@suse.de>
+References: <AANLkTi=GPOoF5bOdySz2izWTEEBShZ8LG=SWPKZVHCU8@mail.gmail.com>	<20100919150427.16ab30d9@corrin.poochiereds.net>	<AANLkTik04e_d9HPeGsB8Adcm2tpGh-qEOwcQvu6ScP3D@mail.gmail.com> <20100920085140.4b844270@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: Alex Perez <quimicefa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100924073515.7b441fa3-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20100920085140.4b844270-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 09/24/2010 05:05 PM, Jeff Layton wrote:
-> On Fri, 24 Sep 2010 13:18:45 +0200
-> Alex Perez <quimicefa-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 
->> I've just found this thread on google, and I subscribed to the list.
+On 09/20/2010 09:21 PM, Jeff Layton wrote:
+>>>>
+>>>> It's causing some unwanted behaviour.
+>>>> How can I change that, or is this not changeable?
+>>>> Stef
+>>>
+>>> I think it's just a matter of setting the inode->i_size on the
+>>> directory. I *think* that when you do a QPathInfo call to a directory
+>>> via cifs the size comes back 0. Setting this to something else probably
+>>> means an extra call to the server to get the "real" size (whatever that
+>>> means). The question is, what should this be set to?
+>>>
 >>
->> http://www.spinics.net/lists/linux-cifs/msg00951.html
->>
->> I'm experiencing the same problem. the mountpoint is showing a 4096
->> size, but when I mount a cifs resource, it shows a 0-size. Other
->> mountpoints that are not using cifs (nfs, ext2-3 ...) doesnt change
->> the size.
->>
->> The problem is that the mount point belongs to a directory structure
->> that is accesed by an apache service (2.0.54). The mount point is
->> /opt/www/dir1, while the apache's directoryRoot is /opt/www. So, the
->> problem is that when a client is trying to access to "dir1" I get a
->> error in apache logs, like:
->>
->> [Fri Sep 24 10:57:26 2010] [error] [client 192.0.2.147] (75)Value too
->> large for defined data type: access to /dir1 failed
->>
->> And the client gets a 403 - forbidden error. It's very tricky because
->> if I dismount /opt/www/dir1, the client can access without any
->> problem.
->>
->> Googling this error seem that is related to accessing files > 2Gb, but
->> I think that apache doesn't know how to handle a 0-size directory or
->> it's understanding that is a huge sized directory ...
->>
->> how can I fix the directory-size that apache is receiving?
+>> Yes that's a good question. But a share mounted with cifs should
+>> behave like it is's just a local harddrive partition right? So these
+>> values are obligatory...
 >>
 > 
-> Honestly, that sounds like an apache bug. You may want to report that
-> to them.
+> No, not necessarily.
 > 
-> I asked Stef this question question and didn't get an answer however:
+>>  In my construction - so I'm speaking only for my own here -
+>> it's also set the size (and the blocks) in the FUSE fs. Remember, I'm
+>> using the FUSE fs fuse-workspace
+>> as the one which is used, and the various mounts to resources like smb
+>> shares (mounted with cifs of course, managed with autofs) are the
+>> underlying backend.
+>>
+>> My FUSE can correct things, like this.
+>>
+>> I wonder, it can correct things, but is it also a must?
+>> My fuse fs takes these values just from the underlying fs, and this
+>> can result in
+>> a size of directories of 4096 when the underlying fs is a mounted
+>> partition (of for example an USB disk) and zero
+>> when it's a cifs mounted smb share. Is it a bad thing that these
+>> values differ in the same fs (in my case thus fuse-workspace)??
+>>
+>> Maybe you know this, else I'll try at the fsdevel list.
+>>
 > 
-> Does POSIX offer any guidance about what the size of a directory should
-> represent?
-
-
-The nearest I could find is:
-
-"If the file is a character special or block special file, the size of
-the file may be replaced with implementation-defined information
-associated with the device in question."
-
-   from http://www.opengroup.org/onlinepubs/9699919799/
-
-In our case it's network file object and the Server only seem to know
-the the actual size.
-
-> For a local filesystem this is simple -- it's a representation of the
-> space that the directory occupies on disk (directories are just inodes
-> like any other).
+> It really comes down to this question:
 > 
-> NFS returns a non-zero size for a directory inode because the server
-> returns one. CIFS servers however send 0 for the size of a directory.
+>     What is the size on a directory supposed to signify?
+> 
 
-+ 1
+(Sorry for digging an old thread..)
 
-I think it makes sense to report what the server returns and not fake it
-to cover up application bugs/ unwarranted checks. If there are other
-reasons, we could consider setting a reasonable size
+I think it is really the space required (filesystem thinks it requires)
+for storing the metadata about the files that would be stored and it
+depends on the internal datastructures of the filesystem. It never
+shrinks but expands when the number of files increases.
+
+For e.g. On a ext3 filesystem, it looks like the default size of
+directory on creation is 4096/4k and somewhere between 325 files and 350
+files, it changes from 4k to 12k.
+
+To get the same behavior on CIFS, the client needs to be aware of the
+Server filesystem and need to have a rough idea of datastructures unless
+the Server provides the size. Also, the client needs to increase the
+size to replicate the same behavior when the number of files on the
+server increases.
+
+I think the nearest information about the Server filesystem the client
+could get is 'block size' and the client could try to do some clever
+guess, but it may not always get it correct.
 
 
 -- 
