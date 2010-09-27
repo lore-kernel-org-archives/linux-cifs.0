@@ -1,70 +1,60 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 3/3] CIFS: Invaldate remote inode on the last close
-Date: Mon, 27 Sep 2010 22:32:35 +0400
-Message-ID: <AANLkTikGiHe3JeryfV8V2PH+yAObqpd5PwGAkvZFidF9@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: SMB2 and CIFS progress at SNIA conference/plugfest
+Date: Mon, 27 Sep 2010 17:30:12 -0500
+Message-ID: <AANLkTimFqiM=bkqmPev+YJCiWfN_SyEMXyOi8YsC_CLw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When we close the last file handle of the inode we should invalidate it
-to prevent data coherency problem when we open it again but it has been
-modified by other clients.
+Lots of progress on cifs and smb2 kernel clients at the SNIA
+conference/plugfest.  Some highlights:
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/file.c |   21 ++++++++++++++++++---
- 1 files changed, 18 insertions(+), 3 deletions(-)
+- Jeff and I worked together to review various patchsets in more detail
+- Merged Metze's "Minshall-French" (MacOS) symlink patchset.  We can
+now create symlinks to servers which do not support the CIFS Unix
+Extensions
+- After various minor fixups merged the first half of Jeff's long
+series of "multiuser mount" patches.  Expect to finish the review and
+merge of the remainder this week
+- Merged two of Shirish's NTLMv2/NTLMSSP auth and crypto patches.
+- After discussions with Dr. Holder merged Ben's patch which allows
+selecting the network interface at mount time
+- Made three other minor fixes to cifs
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index de046e1..68e1789 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -153,9 +153,16 @@ psx_client_can_cache:
- 		pCifsInode->clientCanCacheAll = true;
- 		pCifsInode->clientCanCacheRead = true;
- 		cFYI(1, "Exclusive Oplock granted on inode %p",
--			 file->f_path.dentry->d_inode);
--	} else if ((oplock & 0xF) == OPLOCK_READ)
-+		     file->f_path.dentry->d_inode);
-+	} else if ((oplock & 0xF) == OPLOCK_READ) {
-+		pCifsInode->clientCanCacheAll = false;
- 		pCifsInode->clientCanCacheRead = true;
-+		cFYI(1, "Level II Oplock franted on inode %p",
-+		     file->f_path.dentry->d_inode);
-+	} else {
-+		pCifsInode->clientCanCacheAll = false;
-+		pCifsInode->clientCanCacheRead = false;
-+	}
+On SMB2 -
+- verified the huge speed improvement on writes.  Using the new smb2
+kernel module, large file writes ranged from 12% to 125% faster (than
+cifs) to very current Samba 3.6 server (and also to Windows server)
+depending on network and disk speed.  This should be even larger still
+when we use larger buffer sizes (and improved caching) which smb2
+allows.  (interestingly using posix async i/o on the Samba server side
+slows performance slightly, and we did not focus on read performance,
+in part because of the lack of sendfile support on the Samba server
+side yet).
+- many patches merged - most obviously fixed some mount/umount/rmmod
+stability issues
+- fixed readdir, at least for small/medium sized directories
+- began the improved oplock implementation
+- created a "cifs_common" subdirectory so that common routines between
+smb2.ko and cifs.ko can be placed in a new small helper module (I
+estimate that this will end up about 5000 lines of code - so making
+common code could reduce the size of the smb2 code base by 20-30%
+eventually).  This will be a gradual process, but I have already
+identified a subset of the connection establishment routines that can
+be moved to common fairly easily.
+- There were some good talks on smb2 - including ones discussing
+metadata caching and the corresponding dramatic performance
+improvements, and also on the early plans for SMB2 Unix Extensions
 
- 	/* will have to change the unlock if we reenable the
- 	   filemap_fdatawrite (which does not seem necessary */
-@@ -211,8 +218,14 @@ client_can_cache:
- 		pCifsInode->clientCanCacheAll = true;
- 		pCifsInode->clientCanCacheRead = true;
- 		cFYI(1, "Exclusive Oplock granted on inode %p", inode);
--	} else if ((oplock & 0xF) == OPLOCK_READ)
-+	} else if ((oplock & 0xF) == OPLOCK_READ) {
-+		pCifsInode->clientCanCacheAll = false;
- 		pCifsInode->clientCanCacheRead = true;
-+		cFYI(1, "Level II Oplock franted on inode %p", inode);
-+	} else {
-+		pCifsInode->clientCanCacheAll = false;
-+		pCifsInode->clientCanCacheRead = false;
-+	}
+All in all a a very successful conference and plugfest.
 
- 	return rc;
- }
-@@ -633,6 +646,8 @@ int cifs_close(struct inode *inode, struct file *file)
- 		   on this inode, much less write behind and read ahead */
- 		CIFS_I(inode)->clientCanCacheRead = false;
- 		CIFS_I(inode)->clientCanCacheAll  = false;
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-+			invalidate_remote_inode(inode);
- 	}
- 	read_unlock(&GlobalSMBSeslock);
- 	if ((rc == 0) && CIFS_I(inode)->write_behind_rc)
+
+
 -- 
-1.7.2.1
+Thanks,
+
+Steve
