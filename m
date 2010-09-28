@@ -1,54 +1,108 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Dir List Across Network - Slow from one machine, fast from
- another
-Date: Tue, 28 Sep 2010 13:24:02 -0400
-Message-ID: <20100928132402.44637254@tlielax.poochiereds.net>
-References: <AANLkTim0jDLqVVsT2WropqDu30=OWmqQyUK4tmsG=x_M@mail.gmail.com>
-	<AANLkTi=ELucgtRA=7FW1-04DrsBN=KqvsSc81bjeYVNG@mail.gmail.com>
-	<20100924094145.1f465ca0@tlielax.poochiereds.net>
-	<AANLkTik77ENc_ATkccRc-Q4NJ0gdNVCC0tT0YSSrz7kR@mail.gmail.com>
+Subject: Re: [PATCH 2/3] CIFS: New read cache mechanism
+Date: Tue, 28 Sep 2010 13:55:48 -0400
+Message-ID: <20100928135548.3c9b1f50@tlielax.poochiereds.net>
+References: <AANLkTi=U-4Go7jzMJWQ61j+2v1GXJoMFn5MLUNA4MZ-U@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Mike Tonks <fluffymike-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTik77ENc_ATkccRc-Q4NJ0gdNVCC0tT0YSSrz7kR-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTi=U-4Go7jzMJWQ61j+2v1GXJoMFn5MLUNA4MZ-U-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 28 Sep 2010 17:56:21 +0100
-Mike Tonks <fluffymike-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org> wrote:
+On Mon, 27 Sep 2010 22:31:54 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Hi Jeff,
-> 
-> Thanks for the response - you gave me an excuse to download the new
-> ubuntu 10.10 beta and fire it up.
-> 
-> So I now have a VirtualBox vm on the same network running
-> 2.6.36-19-generic.  Is that recent enough to have the fix you
-> mentioned?
-> 
+> Add cifs_sync_read call to provide reading from the cache if we have =
+at least
+> Level II oplock and otherwise - reading from the server.
+>=20
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   26 ++++++++++++++++++++++++--
+>  1 files changed, 24 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 898d2a5..a7361ee 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -549,6 +549,28 @@ cifs_get_sb(struct file_system_type *fs_type,
+>  	return 0;
+>  }
+>=20
+> +static ssize_t cifs_sync_read(struct file *filp, char __user *buf,
+> +			      size_t len, loff_t *ppos)
+> +{
+> +	ssize_t read;
+> +	struct cifsInodeInfo *cinode;
+> +	struct cifs_sb_info *cifs_sb;
+> +
+> +	cifs_sb =3D CIFS_SB(filp->f_path.dentry->d_inode->i_sb);
+> +
+> +	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
+> +		return do_sync_read(filp, buf, len, ppos);
+> +
+> +	cinode =3D CIFS_I(filp->f_path.dentry->d_inode);
+> +
+> +	if (cinode->clientCanCacheRead)
+> +		read =3D do_sync_read(filp, buf, len, ppos);
+> +	else
+> +		read =3D cifs_user_read(filp, buf, len, ppos);
+> +
+> +	return read;
+> +}
+> +
+>  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct =
+iovec *iov,
+>  				   unsigned long nr_segs, loff_t pos)
+>  {
+> @@ -668,7 +690,7 @@ const struct inode_operations cifs_symlink_inode_=
+ops =3D {
+>  };
+>=20
+>  const struct file_operations cifs_file_ops =3D {
+> -	.read =3D do_sync_read,
+> +	.read =3D cifs_sync_read,
+>  	.write =3D do_sync_write,
+>  	.aio_read =3D generic_file_aio_read,
+>  	.aio_write =3D cifs_file_aio_write,
+> @@ -705,7 +727,7 @@ const struct file_operations cifs_file_direct_ops=
+ =3D {
+>  	.setlease =3D cifs_setlease,
+>  };
+>  const struct file_operations cifs_file_nobrl_ops =3D {
+> -	.read =3D do_sync_read,
+> +	.read =3D cifs_sync_read,
+>  	.write =3D do_sync_write,
+>  	.aio_read =3D generic_file_aio_read,
+>  	.aio_write =3D cifs_file_aio_write,
 
-Yes, it went in a few releases ago.
+Ok, so suppose you make this change and don't change
+cifs_file_aio_write at all, and at some point in the future, we make
+cifs do async writes...
 
-> The result is odd / interesting.  The first time I run the 'ls -la' it
-> is quick (4 seconds) as per the older machine, but on subsequent calls
-> it slow again (4 minutes) like the production box.
-> 
-> If I umount then mount again, I get one fast lookup, then slow again
-> for any further calls.  Totally repeatable, I've been repeating on and
-> off all day and scratching my head in bewilderment.
-> 
-> I checked the 2.6.31 machine and the umount trick does not work there.
-> 
-> Any ideas?
-> 
+I go and do a buffered write to a file, cifs_file_aio_write then calls
+filemap_fdatawrite to flush out the data, but doesn't necessarily wait
+for it to complete before returning.
 
-Nothing I can think of right offhand. You'll probably have to do some
-debugging to track down the cause. Maybe look at captures in wireshark
-and see if you can discern the difference in behavior between the two
-runs.
+Now, I do I read from that file descriptor, which ends up being
+satisfied before the write I just did got flushed out. I see old
+data in the read.
 
--- 
+According to the write(2) manpage:
+
+POSIX  requires  that  a  read(2)  which can be proved to occur after a
+write() has returned returns the new data.  Note that not all file sys=E2=
+=80=90
+tems are POSIX conforming.
+
+It's arguable that CIFS isn't POSIX conforming, but we do our best with
+it. I think we ought to conform to POSIX in this regard. If you want
+to do this, you probably also need to ensure that the dirty data gets
+flushed to the server prior to returning from a write call.
+
+--=20
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
