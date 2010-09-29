@@ -1,20 +1,87 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH 2/3] CIFS: New read cache mechanism
-Date: Tue, 28 Sep 2010 19:18:54 -0400
-Message-ID: <20100928231854.GA16622@infradead.org>
-References: <AANLkTi=U-4Go7jzMJWQ61j+2v1GXJoMFn5MLUNA4MZ-U@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 3/3] CIFS: Invaldate remote inode on the last close
+Date: Wed, 29 Sep 2010 09:38:10 +0400
+Message-ID: <AANLkTimj4RB2ZJrRtHnndSrPR7a4VodLHrH8Nv_GufmN@mail.gmail.com>
+References: <AANLkTikGiHe3JeryfV8V2PH+yAObqpd5PwGAkvZFidF9@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <AANLkTi=U-4Go7jzMJWQ61j+2v1GXJoMFn5MLUNA4MZ-U-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTikGiHe3JeryfV8V2PH+yAObqpd5PwGAkvZFidF9-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Sep 27, 2010 at 10:31:54PM +0400, Pavel Shilovsky wrote:
-> Add cifs_sync_read call to provide reading from the cache if we have at least
-> Level II oplock and otherwise - reading from the server.
+The little fix of the previous version.
 
-This still gives inconsistent results for aio or vectored reads.
+When we close the last file handle of the inode we should invalidate it
+to prevent data coherency problem when we open it again but it has been
+modified by other clients.
+
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+=A0fs/cifs/file.c | =A0 21 ++++++++++++++++++---
+=A01 files changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index de046e1..68e1789 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -153,9 +153,16 @@ psx_client_can_cache:
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheAll =3D true;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheRead =3D true;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Exclusive Oplock granted on ino=
+de %p",
+- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0file->f_path.dentry->d=
+_inode);
+- =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ)
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0file->f_path.dentry->d_inode);
++ =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ) {
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheRead =3D true;
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Level II Oplock granted on inode=
+ %p",
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0file->f_path.dentry->d_inode);
++ =A0 =A0 =A0 } else {
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false;
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D false;
++ =A0 =A0 =A0 }
+
+=A0 =A0 =A0 =A0/* will have to change the unlock if we reenable the
+=A0 =A0 =A0 =A0 =A0 filemap_fdatawrite (which does not seem necessary *=
+/
+@@ -211,8 +218,14 @@ client_can_cache:
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheAll =3D true;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheRead =3D true;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Exclusive Oplock granted on ino=
+de %p", inode);
+- =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ)
++ =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ) {
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheRead =3D true;
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Level II Oplock granted on inode=
+ %p", inode);
++ =A0 =A0 =A0 } else {
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false;
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D false;
++ =A0 =A0 =A0 }
+
+=A0 =A0 =A0 =A0return rc;
+=A0}
+@@ -633,6 +646,8 @@ int cifs_close(struct inode *inode, struct file *fi=
+le)
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 on this inode, much less write behi=
+nd and read ahead */
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_I(inode)->clientCanCacheRead =3D fa=
+lse;
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_I(inode)->clientCanCacheAll =A0=3D =
+false;
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_=
+STRICT_IO)
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(i=
+node);
+=A0 =A0 =A0 =A0}
+=A0 =A0 =A0 =A0read_unlock(&GlobalSMBSeslock);
+=A0 =A0 =A0 =A0if ((rc =3D=3D 0) && CIFS_I(inode)->write_behind_rc)
+--
+1.7.2.1
