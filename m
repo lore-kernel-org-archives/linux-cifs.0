@@ -1,41 +1,58 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: set backing_dev_info on new S_ISREG inodes
-Date: Wed, 29 Sep 2010 09:49:54 -0400
-Message-ID: <1285768194-29595-1-git-send-email-jlayton@redhat.com>
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/7 cifs] ntlm authentication and signing - Correct response length for ntlmv2 authentication without extended security
+Date: Wed, 29 Sep 2010 09:38:48 -0500
+Message-ID: <1285771128-23075-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Testing on very recent kernel (2.6.36-rc6) made this warning pop:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-    WARNING: at fs/fs-writeback.c:87 inode_to_bdi+0x65/0x70()
-    Hardware name:
-    Dirtiable inode bdi default != sb bdi cifs
 
-...the following patch fixes it and seems to be the obviously correct
-thing to do for cifs.
+Fix incorrect calculation of case sensitive response length in the
+ntlmv2 (without extended security) response.
 
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+ 
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/inode.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ fs/cifs/sess.c |   11 +++++++----
+ 1 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 2256124..d6db805 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -853,6 +853,8 @@ retry_iget5_locked:
- 			inode->i_flags |= S_NOATIME | S_NOCMTIME;
- 		if (inode->i_state & I_NEW) {
- 			inode->i_ino = hash;
-+			if (S_ISREG(inode->i_mode))
-+				inode->i_data.backing_dev_info = sb->s_bdi;
- #ifdef CONFIG_CIFS_FSCACHE
- 			/* initialize per-inode cache cookie pointer */
- 			CIFS_I(inode)->fscache = NULL;
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index af18a50..9148fd8 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -739,9 +739,6 @@ ssetup_ntlmssp_authenticate:
+ 		pSMB->req_no_secext.CaseInsensitivePasswordLength = 0;
+ 		/*	cpu_to_le16(LM2_SESS_KEY_SIZE); */
+ 
+-		pSMB->req_no_secext.CaseSensitivePasswordLength =
+-			cpu_to_le16(sizeof(struct ntlmv2_resp));
+-
+ 		/* calculate session key */
+ 		rc = setup_ntlmv2_rsp(ses, v2_sess_key, nls_cp);
+ 		if (rc) {
+@@ -756,11 +753,17 @@ ssetup_ntlmssp_authenticate:
+ 		if (ses->tilen > 0) {
+ 			memcpy(bcc_ptr, ses->tiblob, ses->tilen);
+ 			bcc_ptr += ses->tilen;
++			pSMB->req_no_secext.CaseSensitivePasswordLength =
++				cpu_to_le16(sizeof(struct ntlmv2_resp) +
++						ses->tilen);
+ 			/* we never did allocate ses->domainName to free */
+ 			kfree(ses->tiblob);
+ 			ses->tiblob = NULL;
+ 			ses->tilen = 0;
+-		}
++		} else
++			pSMB->req_no_secext.CaseSensitivePasswordLength =
++				cpu_to_le16(sizeof(struct ntlmv2_resp));
++
+ 		if (ses->capabilities & CAP_UNICODE) {
+ 			if (iov[0].iov_len % 2) {
+ 				*bcc_ptr = 0;
 -- 
-1.7.2.3
+1.6.0.2
