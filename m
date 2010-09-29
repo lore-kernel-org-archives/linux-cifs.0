@@ -1,70 +1,41 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: cifs_flush should wait for writeback to complete
- before proceeding
-Date: Wed, 29 Sep 2010 07:48:20 -0400
-Message-ID: <20100929074820.4c6c260c@corrin.poochiereds.net>
-References: <1285333153-9113-1-git-send-email-jlayton@redhat.com>
-	<AANLkTimdoOPyAmhWw0kTtnZan6+gudJZn=vgqTNpEL+A@mail.gmail.com>
-	<20100924141137.4cb03197@tlielax.poochiereds.net>
-	<20100925042330.GA11930@infradead.org>
-	<20100925081644.777952fe@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: set backing_dev_info on new S_ISREG inodes
+Date: Wed, 29 Sep 2010 09:49:54 -0400
+Message-ID: <1285768194-29595-1-git-send-email-jlayton@redhat.com>
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100925081644.777952fe-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 25 Sep 2010 08:16:44 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Testing on very recent kernel (2.6.36-rc6) made this warning pop:
 
-> On Sat, 25 Sep 2010 00:23:30 -0400
-> Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
-> 
-> > On Fri, Sep 24, 2010 at 02:11:37PM -0400, Jeff Layton wrote:
-> > > On Fri, 24 Sep 2010 12:58:55 -0500
-> > > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > > 
-> > > > We need to see the performance impact.  As you say cifs_writepages is
-> > > > synchronous so we should be ok without it.  Any test results
-> > > > before/after?
-> > > > 
-> > > 
-> > > No, I haven't tested this for performance. It is a correctness issue
-> > > though. We absolutely can't put the last reference to the last open
-> > > filehandle without flushing all of the data first.
-> > > 
-> > > My expectation here though is that this may help performance in some
-> > > cases since this patch also has it skip the flush on files open
-> > > read-only.
-> > 
-> > ->flush is called on every close call, ->release on the last close for a
-> > given file pointer.  Maybe you want a filemap_flush in ->flush and
-> > filemap_write_and_wait in ->release?
-> > 
-> 
-> Hmm...there is one problem with this scheme. __fput ignores the error
-> return from ->release. Only the errors from ->flush will be returned to
-> userspace. So if we only filemap_fdatawait in the ->release op, then we
-> have the potential to miss returning writeback-related errors on a
-> close call.
-> 
-> On a side note, why does f_op->release return an int? Are there places
-> in the kernel besides __fput that call it? If not, maybe we should
-> consider changing it to a void function to make this more clear.
-> 
+    WARNING: at fs/fs-writeback.c:87 inode_to_bdi+0x65/0x70()
+    Hardware name:
+    Dirtiable inode bdi default != sb bdi cifs
 
-Now that I've had a chance to look over this code, I'm seeing some
-other problems with it. I think the patch that fixes this problem is
-going to have to be made part of a patchset to overhaul how open files
-are managed in cifs. That's work that's long overdue, but it'll probably
-take me some time to sort it all out.
+...the following patch fixes it and seems to be the obviously correct
+thing to do for cifs.
 
-Stay tuned...
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/inode.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 2256124..d6db805 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -853,6 +853,8 @@ retry_iget5_locked:
+ 			inode->i_flags |= S_NOATIME | S_NOCMTIME;
+ 		if (inode->i_state & I_NEW) {
+ 			inode->i_ino = hash;
++			if (S_ISREG(inode->i_mode))
++				inode->i_data.backing_dev_info = sb->s_bdi;
+ #ifdef CONFIG_CIFS_FSCACHE
+ 			/* initialize per-inode cache cookie pointer */
+ 			CIFS_I(inode)->fscache = NULL;
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.2.3
