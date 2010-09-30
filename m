@@ -1,88 +1,49 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 12/17] autofs4: cleanup inode operations
-Date: Thu, 30 Sep 2010 19:15:57 +0100
-Message-ID: <20100930181557.30939.78979.stgit@warthog.procyon.org.uk>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 17/17] autofs4 - bump version
+Date: Thu, 30 Sep 2010 19:16:22 +0100
+Message-ID: <20100930181622.30939.55468.stgit@warthog.procyon.org.uk>
 References: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-fs@vger.kernel.org, autofs@linux.kernel.org,
-	linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	Ian Kent <raven@themaw.net>,
-	David Howells <dhowells@redhat.com>
-To: viro@ftp.linux.org.uk, jmoyer@redhat.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
+Cc: linux-fs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>,
+	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: viro-rfM+Q5joDG/XmaaqVzeoHQ@public.gmane.org, jmoyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20100930181455.30939.53914.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Ian Kent <raven@themaw.net>
+From: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
 
-Since the use of ->follow_link() has been eliminated there is no
-need to separate the indirect and direct inode operations.
+Increase the autofs module sub-version so we can tell what kernel
+implementation is being used from user space debug logging.
 
-Signed-off-by: Ian Kent <raven@themaw.net>
-Signed-off-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
+Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
 
- fs/autofs4/autofs_i.h |    3 ---
- fs/autofs4/inode.c    |    4 +---
- fs/autofs4/root.c     |   15 ---------------
- 3 files changed, 1 insertions(+), 21 deletions(-)
+ include/linux/auto_fs4.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/fs/autofs4/autofs_i.h b/fs/autofs4/autofs_i.h
-index cb86036..8710878 100644
---- a/fs/autofs4/autofs_i.h
-+++ b/fs/autofs4/autofs_i.h
-@@ -201,9 +201,6 @@ void autofs_dev_ioctl_exit(void);
+diff --git a/include/linux/auto_fs4.h b/include/linux/auto_fs4.h
+index 8b49ac4..e02982f 100644
+--- a/include/linux/auto_fs4.h
++++ b/include/linux/auto_fs4.h
+@@ -24,7 +24,7 @@
+ #define AUTOFS_MIN_PROTO_VERSION	3
+ #define AUTOFS_MAX_PROTO_VERSION	5
  
- extern const struct inode_operations autofs4_symlink_inode_operations;
- extern const struct inode_operations autofs4_dir_inode_operations;
--extern const struct inode_operations autofs4_root_inode_operations;
--extern const struct inode_operations autofs4_indirect_root_inode_operations;
--extern const struct inode_operations autofs4_direct_root_inode_operations;
- extern const struct file_operations autofs4_dir_operations;
- extern const struct file_operations autofs4_root_operations;
+-#define AUTOFS_PROTO_SUBVERSION		1
++#define AUTOFS_PROTO_SUBVERSION		2
  
-diff --git a/fs/autofs4/inode.c b/fs/autofs4/inode.c
-index c6e75b3..80cdffd 100644
---- a/fs/autofs4/inode.c
-+++ b/fs/autofs4/inode.c
-@@ -326,9 +326,7 @@ int autofs4_fill_super(struct super_block *s, void *data, int silent)
- 		__managed_dentry_set_managed(root);
- 
- 	root_inode->i_fop = &autofs4_root_operations;
--	root_inode->i_op = autofs_type_trigger(sbi->type) ?
--			&autofs4_direct_root_inode_operations :
--			&autofs4_indirect_root_inode_operations;
-+	root_inode->i_op = &autofs4_dir_inode_operations;
- 
- 	/* Couldn't this be tested earlier? */
- 	if (sbi->max_proto < AUTOFS_MIN_PROTO_VERSION ||
-diff --git a/fs/autofs4/root.c b/fs/autofs4/root.c
-index 77257dd..2856a0c 100644
---- a/fs/autofs4/root.c
-+++ b/fs/autofs4/root.c
-@@ -52,21 +52,6 @@ const struct file_operations autofs4_dir_operations = {
- 	.llseek		= dcache_dir_lseek,
- };
- 
--const struct inode_operations autofs4_indirect_root_inode_operations = {
--	.lookup		= autofs4_lookup,
--	.unlink		= autofs4_dir_unlink,
--	.symlink	= autofs4_dir_symlink,
--	.mkdir		= autofs4_dir_mkdir,
--	.rmdir		= autofs4_dir_rmdir,
--};
--
--const struct inode_operations autofs4_direct_root_inode_operations = {
--	.lookup		= autofs4_lookup,
--	.unlink		= autofs4_dir_unlink,
--	.mkdir		= autofs4_dir_mkdir,
--	.rmdir		= autofs4_dir_rmdir,
--};
--
- const struct inode_operations autofs4_dir_inode_operations = {
- 	.lookup		= autofs4_lookup,
- 	.unlink		= autofs4_dir_unlink,
+ /* Mask for expire behaviour */
+ #define AUTOFS_EXP_IMMEDIATE		1
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
