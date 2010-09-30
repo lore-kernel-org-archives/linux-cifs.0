@@ -1,193 +1,72 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/17] autofs4: cleanup dentry operations
-Date: Thu, 30 Sep 2010 19:16:02 +0100
-Message-ID: <20100930181602.30939.21192.stgit@warthog.procyon.org.uk>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 05/17] Remove the automount through follow_link() kludge code
+	from pathwalk
+Date: Thu, 30 Sep 2010 19:15:21 +0100
+Message-ID: <20100930181521.30939.31415.stgit@warthog.procyon.org.uk>
 References: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-fs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: viro-rfM+Q5joDG/XmaaqVzeoHQ@public.gmane.org, jmoyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100930181455.30939.53914.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-fs@vger.kernel.org, autofs@linux.kernel.org,
+	linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	Ian Kent <raven@themaw.net>
+To: viro@ftp.linux.org.uk, jmoyer@redhat.com
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-From: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
+Remove the automount through follow_link() kludge code from pathwalk in favour
+of using d_automount().
 
-There are now two distinct dentry operations uses. One for dentrys
-that trigger mounts and one for dentrys that do not.
-
-Rationalize the use of these dentry operations and rename them to
-reflect their function.
-
-Signed-off-by: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
-Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Ian Kent <raven@themaw.net>
 ---
 
- fs/autofs4/autofs_i.h |    7 ++-----
- fs/autofs4/inode.c    |   12 ++++--------
- fs/autofs4/root.c     |   36 ++++++++++++++++++++----------------
- 3 files changed, 26 insertions(+), 29 deletions(-)
+ fs/namei.c |   17 +++--------------
+ 1 files changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/fs/autofs4/autofs_i.h b/fs/autofs4/autofs_i.h
-index 8710878..8b1c0bc 100644
---- a/fs/autofs4/autofs_i.h
-+++ b/fs/autofs4/autofs_i.h
-@@ -203,11 +203,8 @@ extern const struct inode_operations autofs4_symlink_inode_operations;
- extern const struct inode_operations autofs4_dir_inode_operations;
- extern const struct file_operations autofs4_dir_operations;
- extern const struct file_operations autofs4_root_operations;
--
--/* Operations methods */
--
--struct vfsmount *autofs4_d_automount(struct path *);
--int autofs4_d_manage(struct path *, bool);
-+extern const struct dentry_operations autofs4_dentry_operations;
-+extern const struct dentry_operations autofs4_mount_dentry_operations;
- 
- /* VFS automount flags management functions */
- 
-diff --git a/fs/autofs4/inode.c b/fs/autofs4/inode.c
-index 80cdffd..8eaa723 100644
---- a/fs/autofs4/inode.c
-+++ b/fs/autofs4/inode.c
-@@ -251,12 +251,6 @@ static struct autofs_info *autofs4_mkroot(struct autofs_sb_info *sbi)
- 	return ino;
+diff --git a/fs/namei.c b/fs/namei.c
+index c50b9d7..86421f9 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -861,17 +861,6 @@ fail:
  }
  
--static const struct dentry_operations autofs4_sb_dentry_operations = {
--	.d_automount	= autofs4_d_automount,
--	.d_manage	= autofs4_d_manage,
--	.d_release      = autofs4_dentry_release,
--};
+ /*
+- * This is a temporary kludge to deal with "automount" symlinks; proper
+- * solution is to trigger them on follow_mount(), so that do_lookup()
+- * would DTRT.  To be killed before 2.6.34-final.
+- */
+-static inline int follow_on_final(struct inode *inode, unsigned lookup_flags)
+-{
+-	return inode && unlikely(inode->i_op->follow_link) &&
+-		((lookup_flags & LOOKUP_FOLLOW) || S_ISDIR(inode->i_mode));
+-}
 -
- int autofs4_fill_super(struct super_block *s, void *data, int silent)
- {
- 	struct inode * root_inode;
-@@ -311,7 +305,7 @@ int autofs4_fill_super(struct super_block *s, void *data, int silent)
- 		goto fail_iput;
- 	pipe = NULL;
- 
--	root->d_op = &autofs4_sb_dentry_operations;
-+	root->d_op = &autofs4_dentry_operations;
- 	root->d_fsdata = ino;
- 
- 	/* Can this call block? */
-@@ -322,8 +316,10 @@ int autofs4_fill_super(struct super_block *s, void *data, int silent)
- 		goto fail_dput;
- 	}
- 
--	if (autofs_type_trigger(sbi->type))
-+	if (autofs_type_trigger(sbi->type)) {
-+		root->d_op = &autofs4_mount_dentry_operations;
- 		__managed_dentry_set_managed(root);
-+	}
- 
- 	root_inode->i_fop = &autofs4_root_operations;
- 	root_inode->i_op = &autofs4_dir_inode_operations;
-diff --git a/fs/autofs4/root.c b/fs/autofs4/root.c
-index 2856a0c..cb168ba 100644
---- a/fs/autofs4/root.c
-+++ b/fs/autofs4/root.c
-@@ -31,6 +31,8 @@ static long autofs4_root_ioctl(struct file *,unsigned int,unsigned long);
- static long autofs4_root_compat_ioctl(struct file *,unsigned int,unsigned long);
- static int autofs4_dir_open(struct inode *inode, struct file *file);
- static struct dentry *autofs4_lookup(struct inode *,struct dentry *, struct nameidata *);
-+static struct vfsmount *autofs4_d_automount(struct path *);
-+static int autofs4_d_manage(struct path *, bool);
- 
- const struct file_operations autofs4_root_operations = {
- 	.open		= dcache_dir_open,
-@@ -60,6 +62,18 @@ const struct inode_operations autofs4_dir_inode_operations = {
- 	.rmdir		= autofs4_dir_rmdir,
- };
- 
-+/* For dentries that don't initiate mounting */
-+const struct dentry_operations autofs4_dentry_operations = {
-+	.d_release	= autofs4_dentry_release,
-+};
-+
-+/* For dentries that do initiate mounting */
-+const struct dentry_operations autofs4_mount_dentry_operations = {
-+	.d_automount	= autofs4_d_automount,
-+	.d_manage	= autofs4_d_manage,
-+	.d_release	= autofs4_dentry_release,
-+};
-+
- static void autofs4_add_active(struct dentry *dentry)
- {
- 	struct autofs_sb_info *sbi = autofs4_sbi(dentry->d_sb);
-@@ -151,18 +165,6 @@ void autofs4_dentry_release(struct dentry *de)
- 	}
- }
- 
--/* For dentries of directories in the root dir */
--static const struct dentry_operations autofs4_root_dentry_operations = {
--	.d_release	= autofs4_dentry_release,
--};
--
--/* For other dentries */
--static const struct dentry_operations autofs4_dentry_operations = {
--	.d_automount	= autofs4_d_automount,
--	.d_manage	= autofs4_d_manage,
--	.d_release	= autofs4_dentry_release,
--};
--
- static struct dentry *autofs4_lookup_active(struct dentry *dentry)
- {
- 	struct autofs_sb_info *sbi = autofs4_sbi(dentry->d_sb);
-@@ -330,7 +332,7 @@ static struct dentry *autofs4_mountpoint_changed(struct path *path)
- 	return path->dentry;
- }
- 
--struct vfsmount *autofs4_d_automount(struct path *path)
-+static struct vfsmount *autofs4_d_automount(struct path *path)
- {
- 	struct dentry *dentry = path->dentry;
- 	struct autofs_sb_info *sbi = autofs4_sbi(dentry->d_sb);
-@@ -499,7 +501,7 @@ static struct dentry *autofs4_lookup(struct inode *dir, struct dentry *dentry, s
- 	if (active)
- 		return active;
- 	else {
--		dentry->d_op = &autofs4_root_dentry_operations;
-+		dentry->d_op = &autofs4_dentry_operations;
- 
- 		/*
- 		 * A dentry that is not within the root can never trigger
-@@ -512,7 +514,7 @@ static struct dentry *autofs4_lookup(struct inode *dir, struct dentry *dentry, s
- 
- 		/* Mark entries in the root as mount triggers */
- 		if (autofs_type_indirect(sbi->type) && IS_ROOT(dentry->d_parent)) {
--			dentry->d_op = &autofs4_dentry_operations;
-+			dentry->d_op = &autofs4_mount_dentry_operations;
- 			__managed_dentry_set_managed(dentry);
- 		}
- 
-@@ -572,6 +574,8 @@ static int autofs4_dir_symlink(struct inode *dir,
- 	}
- 	d_add(dentry, inode);
- 
-+	dentry->d_op = &autofs4_dentry_operations;
-+
- 	dentry->d_fsdata = ino;
- 	ino->dentry = dget(dentry);
- 	atomic_inc(&ino->count);
-@@ -786,7 +790,7 @@ static inline int autofs4_ask_umount(struct vfsmount *mnt, int __user *p)
- int is_autofs4_dentry(struct dentry *dentry)
- {
- 	return dentry && dentry->d_inode &&
--		(dentry->d_op == &autofs4_root_dentry_operations ||
-+		(dentry->d_op == &autofs4_mount_dentry_operations ||
- 		 dentry->d_op == &autofs4_dentry_operations) &&
- 		dentry->d_fsdata != NULL;
- }
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-/*
+  * Name resolution.
+  * This is the basic name resolution function, turning a pathname into
+  * the final dentry. We expect 'base' to be positive and a directory.
+@@ -991,7 +980,8 @@ last_component:
+ 		if (err)
+ 			break;
+ 		inode = next.dentry->d_inode;
+-		if (follow_on_final(inode, lookup_flags)) {
++		if (inode && unlikely(inode->i_op->follow_link) &&
++		    (lookup_flags & LOOKUP_FOLLOW)) {
+ 			err = do_follow_link(&next, nd);
+ 			if (err)
+ 				goto return_err;
+@@ -1882,8 +1872,7 @@ reval:
+ 		struct inode *inode = path.dentry->d_inode;
+ 		void *cookie;
+ 		error = -ELOOP;
+-		/* S_ISDIR part is a temporary automount kludge */
+-		if (!(nd.flags & LOOKUP_FOLLOW) && !S_ISDIR(inode->i_mode))
++		if (!(nd.flags & LOOKUP_FOLLOW))
+ 			goto exit_dput;
+ 		if (count++ == 32)
+ 			goto exit_dput;
