@@ -1,303 +1,184 @@
-From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 04/17] CIFS: Use d_automount() rather than abusing
-	follow_link()
-Date: Thu, 30 Sep 2010 19:15:16 +0100
-Message-ID: <20100930181515.30939.57129.stgit@warthog.procyon.org.uk>
+From: Stef Bon <stef-/E4qUF3RmbfcqV2Q6a4srg@public.gmane.org>
+Subject: Re: [autofs] [PATCH 00/17] Introduce automounter dentry ops
+Date: Fri, 01 Oct 2010 09:57:54 +0200
+Message-ID: <4CA59482.1040508@bononline.nl>
 References: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-fs@vger.kernel.org, autofs@linux.kernel.org,
-	linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>
-To: viro@ftp.linux.org.uk, jmoyer@redhat.com
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20100930181455.30939.53914.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Make CIFS use the new d_automount() dentry operation rather than abusing
-follow_link() on directories.
+  On 09/30/2010 08:14 PM, David Howells wrote:
+> The attached patches introduce a couple of new dentry operations for use by
+> automounters and make AFS, NFS, CIFS and autofs4 use them.  This means that
+> these filesystems no longer have to abuse lookup(), follow_link() and
+> d_revalidate() to achieve the desired effect.
 
-[NOTE: THIS IS UNTESTED!]
+Improvments are always welcome as I look at it, but for my understanding,
+how do these new dentry operations cooperate with cifs?
 
-[Question:  Why does cifs_dfs_do_refmount() when the caller has already done
-	    that and could pass the result through?]
+Cifs is the target filesystem, and handled by the automounter, thus the 
+automounter is the initiator, not cifs.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>
----
+As you describe it (well it looks like it, I may not understand...) cifs 
+is the initiator, and the patches to the automounter make autofs handle 
+cifs requests handle better?
 
- fs/cifs/cifs_dfs_ref.c |  134 +++++++++++++++++++++++-------------------------
- fs/cifs/cifsfs.h       |    6 ++
- fs/cifs/dir.c          |    2 +
- fs/cifs/inode.c        |    8 ++-
- 4 files changed, 78 insertions(+), 72 deletions(-)
+What is now the case here?? I cannot understand.
+Any explanation is appreciated.
 
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index d6ced7a..8fc4943 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -256,35 +256,6 @@ static struct vfsmount *cifs_dfs_do_refmount(struct cifs_sb_info *cifs_sb,
- 
- }
- 
--static int add_mount_helper(struct vfsmount *newmnt, struct nameidata *nd,
--				struct list_head *mntlist)
--{
--	/* stolen from afs code */
--	int err;
--
--	mntget(newmnt);
--	err = do_add_mount(newmnt, &nd->path, nd->path.mnt->mnt_flags | MNT_SHRINKABLE, mntlist);
--	switch (err) {
--	case 0:
--		path_put(&nd->path);
--		nd->path.mnt = newmnt;
--		nd->path.dentry = dget(newmnt->mnt_root);
--		schedule_delayed_work(&cifs_dfs_automount_task,
--				      cifs_dfs_mountpoint_expiry_timeout);
--		break;
--	case -EBUSY:
--		/* someone else made a mount here whilst we were busy */
--		while (d_mountpoint(nd->path.dentry) &&
--		       follow_down(&nd->path))
--			;
--		err = 0;
--	default:
--		mntput(newmnt);
--		break;
--	}
--	return err;
--}
--
- static void dump_referral(const struct dfs_info3_param *ref)
- {
- 	cFYI(1, "DFS: ref path: %s", ref->path_name);
-@@ -294,34 +265,30 @@ static void dump_referral(const struct dfs_info3_param *ref)
- 				ref->path_consumed);
- }
- 
--
--static void*
--cifs_dfs_follow_mountpoint(struct dentry *dentry, struct nameidata *nd)
-+/*
-+ * Create a vfsmount that we can automount
-+ */
-+static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
- {
- 	struct dfs_info3_param *referrals = NULL;
- 	unsigned int num_referrals = 0;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsSesInfo *ses;
--	char *full_path = NULL;
-+	char *full_path;
- 	int xid, i;
--	int rc = 0;
--	struct vfsmount *mnt = ERR_PTR(-ENOENT);
-+	int rc;
-+	struct vfsmount *mnt;
- 
- 	cFYI(1, "in %s", __func__);
--	BUG_ON(IS_ROOT(dentry));
-+	BUG_ON(IS_ROOT(mntpt));
- 
- 	xid = GetXid();
- 
--	dput(nd->path.dentry);
--	nd->path.dentry = dget(dentry);
--
--	cifs_sb = CIFS_SB(dentry->d_inode->i_sb);
-+	cifs_sb = CIFS_SB(mntpt->d_inode->i_sb);
-+	mnt = ERR_PTR(-EINVAL);
- 	ses = cifs_sb->tcon->ses;
--
--	if (!ses) {
--		rc = -EINVAL;
--		goto out_err;
--	}
-+	if (!ses)
-+		goto free_xid;
- 
- 	/*
- 	 * The MSDFS spec states that paths in DFS referral requests and
-@@ -329,56 +296,85 @@ cifs_dfs_follow_mountpoint(struct dentry *dentry, struct nameidata *nd)
- 	 * the double backslashes usually used in the UNC. This function
- 	 * gives us the latter, so we must adjust the result.
- 	 */
--	full_path = build_path_from_dentry(dentry);
--	if (full_path == NULL) {
--		rc = -ENOMEM;
--		goto out_err;
--	}
-+	mnt = ERR_PTR(-ENOMEM);
-+	full_path = build_path_from_dentry(mntpt);
-+	if (full_path == NULL)
-+		goto free_xid;
- 
- 	rc = get_dfs_path(xid, ses , full_path + 1, cifs_sb->local_nls,
- 		&num_referrals, &referrals,
- 		cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
- 
-+	mnt = ERR_PTR(-ENOENT);
- 	for (i = 0; i < num_referrals; i++) {
- 		int len;
--		dump_referral(referrals+i);
-+		dump_referral(referrals + i);
- 		/* connect to a node */
- 		len = strlen(referrals[i].node_name);
- 		if (len < 2) {
- 			cERROR(1, "%s: Net Address path too short: %s",
- 					__func__, referrals[i].node_name);
--			rc = -EINVAL;
--			goto out_err;
-+			mnt = ERR_PTR(-EINVAL);
-+			break;
- 		}
- 		mnt = cifs_dfs_do_refmount(cifs_sb,
- 				full_path, referrals + i);
- 		cFYI(1, "%s: cifs_dfs_do_refmount:%s , mnt:%p", __func__,
- 					referrals[i].node_name, mnt);
--
--		/* complete mount procedure if we accured submount */
- 		if (!IS_ERR(mnt))
--			break;
-+			goto success;
- 	}
- 
--	/* we need it cause for() above could exit without valid submount */
--	rc = PTR_ERR(mnt);
--	if (IS_ERR(mnt))
--		goto out_err;
--
--	rc = add_mount_helper(mnt, nd, &cifs_dfs_automount_list);
-+	/* no valid submounts were found; return error from get_dfs_path() by
-+	 * preference */
-+	if (rc != 0)
-+		mnt = ERR_PTR(rc);
- 
--out:
--	FreeXid(xid);
-+success:
- 	free_dfs_info_array(referrals, num_referrals);
- 	kfree(full_path);
-+free_xid:
-+	FreeXid(xid);
- 	cFYI(1, "leaving %s" , __func__);
- 	return ERR_PTR(rc);
--out_err:
--	path_put(&nd->path);
--	goto out;
-+}
-+
-+/*
-+ * Attempt to automount the referral
-+ */
-+struct vfsmount *cifs_dfs_d_automount(struct path *path)
-+{
-+	struct vfsmount *newmnt;
-+	int err;
-+
-+	cFYI(1, "in %s", __func__);
-+
-+	newmnt = cifs_dfs_do_automount(path->dentry);
-+	if (IS_ERR(newmnt)) {
-+		cFYI(1, "leaving %s [automount failed]" , __func__);
-+		return newmnt;
-+	}
-+
-+	mntget(newmnt);
-+	err = do_add_mount(newmnt, path, MNT_SHRINKABLE,
-+			   &cifs_dfs_automount_list);
-+	switch (err) {
-+	case 0:
-+		schedule_delayed_work(&cifs_dfs_automount_task,
-+				      cifs_dfs_mountpoint_expiry_timeout);
-+		cFYI(1, "leaving %s [ok]" , __func__);
-+		return newmnt;
-+	case -EBUSY:
-+		/* someone else made a mount here whilst we were busy */
-+		mntput(newmnt);
-+		cFYI(1, "leaving %s [EBUSY]" , __func__);
-+		return NULL;
-+	default:
-+		mntput(newmnt);
-+		cFYI(1, "leaving %s [error %d]" , __func__, err);
-+		return ERR_PTR(err);
-+	}
- }
- 
- const struct inode_operations cifs_dfs_referral_inode_operations = {
--	.follow_link = cifs_dfs_follow_mountpoint,
- };
--
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index d82f5fb..34b18a6 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -95,6 +95,12 @@ extern int cifs_readdir(struct file *file, void *direntry, filldir_t filldir);
- extern const struct dentry_operations cifs_dentry_ops;
- extern const struct dentry_operations cifs_ci_dentry_ops;
- 
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+extern struct vfsmount *cifs_dfs_d_automount(struct path *path);
-+#else
-+#define cifs_dfs_d_automount NULL
-+#endif
-+
- /* Functions related to symlinks */
- extern void *cifs_follow_link(struct dentry *direntry, struct nameidata *nd);
- extern void cifs_put_link(struct dentry *direntry,
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index f9ed075..fc97233 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -795,6 +795,7 @@ cifs_d_revalidate(struct dentry *direntry, struct nameidata *nd)
- 
- const struct dentry_operations cifs_dentry_ops = {
- 	.d_revalidate = cifs_d_revalidate,
-+	.d_automount = cifs_dfs_d_automount,
- /* d_delete:       cifs_d_delete,      */ /* not needed except for debugging */
- };
- 
-@@ -835,4 +836,5 @@ const struct dentry_operations cifs_ci_dentry_ops = {
- 	.d_revalidate = cifs_d_revalidate,
- 	.d_hash = cifs_ci_hash,
- 	.d_compare = cifs_ci_compare,
-+	.d_automount = cifs_dfs_d_automount,
- };
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 93f77d4..a1f810c 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -32,7 +32,7 @@
- #include "fscache.h"
- 
- 
--static void cifs_set_ops(struct inode *inode, const bool is_dfs_referral)
-+static void cifs_set_ops(struct inode *inode)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 
-@@ -60,7 +60,7 @@ static void cifs_set_ops(struct inode *inode, const bool is_dfs_referral)
- 		break;
- 	case S_IFDIR:
- #ifdef CONFIG_CIFS_DFS_UPCALL
--		if (is_dfs_referral) {
-+		if (IS_AUTOMOUNT(inode)) {
- 			inode->i_op = &cifs_dfs_referral_inode_operations;
- 		} else {
- #else /* NO DFS support, treat as a directory */
-@@ -167,7 +167,9 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
- 	}
- 	spin_unlock(&inode->i_lock);
- 
--	cifs_set_ops(inode, fattr->cf_flags & CIFS_FATTR_DFS_REFERRAL);
-+	if (fattr->cf_flags & CIFS_FATTR_DFS_REFERRAL)
-+		inode->i_flags |= S_AUTOMOUNT;
-+	cifs_set_ops(inode);
- }
- 
- void
+Stef Bon
+the Netherlands
+
+> There are two dentry operations provided:
+>
+>   (1) struct vfsmount *(*d_automount)(struct path *path);
+>
+>       This is used by follow_automount() in fs/namei.c to ask the filesystem
+>       that owns the dentry at the current path point to mount something on
+>       @path.
+>
+>       It is called if either the inode belonging to the given dentry is flagged
+>       S_AUTOMOUNT or the dentry is flagged DMANAGED_AUTOMOUNT, and if the dentry
+>       has nothing mounted on it in the current namespace when someone attempts
+>       to use that dentry.
+>
+>       No locks will be held when this is called.
+>
+>       d_op->d_automount() may return one of:
+>
+>       (a) The vfsmount mounted upon that dentry, in which case pathwalk will
+>       	 move to the root dentry of that vfsmount.
+>
+>       (b) NULL if something was already mounted there, in which case pathwalk
+>       	 will loop around and recheck the mountings.
+>
+>       (c) -EISDIR, in which case pathwalk will stop at this point and attempt to
+>       	 use that dentry as the object of interest.  If the current dentry is
+>       	 not terminal within the path, -EREMOTE will be returned.
+>
+>       (d) An error value, to be returned immediately.
+>
+>       Automount transits are counted as symlinks to prevent circular references
+>       from being a problem.  If one is detected, -ELOOP will be returned.
+>
+>       If stat() is given AT_NO_AUTOMOUNT then d_op->d_automount() will not be
+>       invoked on a terminal dentry; instead that dentry will be returned by
+>       pathwalk.
+>
+>       follow_automount() also does not invoke d_op->d_automount() if the caller
+>       gave AT_SYMLINK_NOFOLLOW to stat(), but rather returns the base dentry.
+>
+>
+>   (2) int (*d_manage)(struct path *path, bool mounting_here);
+>
+>       This is called by managed_dentry() or follow_down() in fs/namei.c to
+>       indicate to a filesystem that pathwalk is about to step off of the current
+>       path point and walk to another point in the path.
+>
+>       This is called if DMANAGED_TRANSIT is set on a dentry.
+>
+>       This can then be used by autofs to stop non-daemon processes from walking
+>       until it has finished constructing or expiring the tree behind the dentry.
+>       It could also be used to prevent undesirables from mounting on this
+>       dentry.
+>
+>       @mounting_here is true if called from follow_down() from mount, in which
+>       case namespace_sem is held exclusively by the caller of follow_down().
+>       Otherwise, no locks are held.
+>
+>       d_op->d_manage() may return one of:
+>
+>       (a) 0 to continue the pathwalk as normal.
+>
+>       (b) -EISDIR to prevent managed_dentry() from crossing to a mounted
+>       	 filesystem or calling d_op->d_automount(), in which case the dentry
+>       	 will be treated as an ordinary directory.
+>
+>       (c) An error to abort the pathwalk completely.
+>
+>
+> To make this work for autofs, d_mounted in struct dentry has become d_managed.
+> This used to be a count of the number of mounts on this dentry.  The bottom 28
+> bits are still that (DMANAGED_MOUNTPOINT).  The upper four bits contain a
+> couple of flags, DMANAGED_TRANSIT and DMANAGED_AUTOMOUNT.  This allows
+> managed_dentry() to test all three conditions with minimumal overhead if none
+> of them are true.
+>
+> For other filesystems, setting S_AUTOMOUNT is sufficient.  This is noted by
+> __d_instantiate() which will set DMANAGED_AUTOMOUNT automatically if it is
+> seen.  Checking S_AUTOMOUNT doesn't work for autofs, however, since the dentry
+> might not have an inode, hence why a dentry flag also.
+>
+> S_AUTOMOUNT and d_automount() are introduced in patch 1; d_manage(), d_managed
+> and DMANAGED_* are introduced in patch 7.
+>
+> David
+> ---
+>
+> David Howells (8):
+>        Make follow_down() handle d_manage()
+>        Make dentry::d_mounted into a more general field for special function dirs
+>        Add an AT_NO_AUTOMOUNT flag to suppress terminal automount
+>        Remove the automount through follow_link() kludge code from pathwalk
+>        CIFS: Use d_automount() rather than abusing follow_link()
+>        NFS: Use d_automount() rather than abusing follow_link()
+>        AFS: Use d_automount() rather than abusing follow_link()
+>        Add a dentry op to handle automounting rather than abusing follow_link()
+>
+> Ian Kent (9):
+>        autofs4 - bump version
+>        autofs4 - add v4 pseudo direct mount support
+>        autofs4 - fix wait validation
+>        autofs4: cleanup autofs4_free_ino()
+>        autofs4: cleanup dentry operations
+>        autofs4: cleanup inode operations
+>        autofs4: removed unused code
+>        autofs4: add d_manage() dentry operation
+>        autofs4: add d_automount() dentry operation
+>
+>
+>   Documentation/filesystems/Locking |    2
+>   Documentation/filesystems/vfs.txt |   22 +
+>   fs/afs/dir.c                      |    1
+>   fs/afs/inode.c                    |    3
+>   fs/afs/internal.h                 |    1
+>   fs/afs/mntpt.c                    |   47 +--
+>   fs/autofs/dirhash.c               |    5
+>   fs/autofs4/autofs_i.h             |  100 ++++--
+>   fs/autofs4/dev-ioctl.c            |    2
+>   fs/autofs4/expire.c               |   42 ++
+>   fs/autofs4/inode.c                |   28 --
+>   fs/autofs4/root.c                 |  668 ++++++++++++++++---------------------
+>   fs/autofs4/waitq.c                |   17 +
+>   fs/cifs/cifs_dfs_ref.c            |  134 ++++---
+>   fs/cifs/cifsfs.h                  |    6
+>   fs/cifs/dir.c                     |    2
+>   fs/cifs/inode.c                   |    8
+>   fs/dcache.c                       |    7
+>   fs/namei.c                        |  243 +++++++++++--
+>   fs/namespace.c                    |   20 +
+>   fs/nfs/dir.c                      |    4
+>   fs/nfs/inode.c                    |    4
+>   fs/nfs/internal.h                 |    1
+>   fs/nfs/namespace.c                |   87 ++---
+>   fs/nfsd/vfs.c                     |    5
+>   fs/stat.c                         |    4
+>   include/linux/auto_fs4.h          |    2
+>   include/linux/dcache.h            |   19 +
+>   include/linux/fcntl.h             |    1
+>   include/linux/fs.h                |    2
+>   include/linux/namei.h             |    5
+>   include/linux/nfs_fs.h            |    1
+>   32 files changed, 836 insertions(+), 657 deletions(-)
+>
+> _______________________________________________
+> autofs mailing list
+> autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org
+> http://linux.kernel.org/mailman/listinfo/autofs
+>
