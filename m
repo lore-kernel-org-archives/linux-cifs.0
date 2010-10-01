@@ -1,74 +1,56 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH] cifs: handle FindFirst failure gracefully
-Date: Fri, 01 Oct 2010 21:23:33 +0530
-Message-ID: <4CA603FD.6040308@suse.de>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [autofs] [PATCH 00/17] Introduce automounter dentry ops
+Date: Fri, 1 Oct 2010 20:01:55 +0200
+Message-ID: <AANLkTinoJCY=Fy_0UPWdasJg3GE5WQP0pQA8cLnir1BL@mail.gmail.com>
+References: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
+	<4CA59482.1040508@bononline.nl>
+	<8948.1285921904@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Stef Bon <stef-/E4qUF3RmbfcqV2Q6a4srg@public.gmane.org>, autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <8948.1285921904-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-FindFirst failure due to permission errors or any other errors are silently
-ignored by cifs_readdir(). This could cause problem to applications that depend
-on the error to do further processing.
+Thanks a lot for your answer. It's becoming more clear to me now.
 
-Reproducer:
-  - mount a cifs share
-  - mkdir tdir;touch tdir/1 tdir/2 tdir/3
-  - chmod -x tdir
-  - ls tdir
+As I understand it, it gives a framework to allow the fs (cifs, nfs
+afs) do sub-auto-mounting right?
 
-Currently, we start calling filldir() for '.' and '..' before we know we
-whether FindFirst could succeed or not. If FindFirst fails later, there is no
-way to notify VFS by setting buf.error and so VFS won't be able to catch this.
-Fix this by moving the call to initiate_cifs_search() before we start doing
-filldir().
+Stef
 
-This fixes https://bugzilla.samba.org/show_bug.cgi?id=7535
-
-Reported-by: Tom Dexter <digitalaudiorock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/readdir.c |   19 +++++++++++--------
- 1 files changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index 887a7e2..edb69a9 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -786,6 +786,17 @@ int cifs_readdir(struct file *file, void *direntry, filldir_t filldir)
- 
- 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
- 
-+	/*
-+	 * Ensure FindFirst doesn't fail before doing filldir() for '.' and
-+	 * '..'. Otherwise we won't be able to notify VFS in case of failure.
-+	 */
-+	if (file->private_data == NULL) {
-+		rc = initiate_cifs_search(xid, file);
-+		cFYI(1, "initiate cifs search rc %d", rc);
-+		if (rc)
-+			goto rddir2_exit;
-+	}
-+
- 	switch ((int) file->f_pos) {
- 	case 0:
- 		if (filldir(direntry, ".", 1, file->f_pos,
-@@ -810,14 +821,6 @@ int cifs_readdir(struct file *file, void *direntry, filldir_t filldir)
- 			if after then keep searching till find it */
- 
- 		if (file->private_data == NULL) {
--			rc = initiate_cifs_search(xid, file);
--			cFYI(1, "initiate cifs search rc %d", rc);
--			if (rc) {
--				FreeXid(xid);
--				return rc;
--			}
--		}
--		if (file->private_data == NULL) {
- 			rc = -EINVAL;
- 			FreeXid(xid);
- 			return rc;
+2010/10/1 David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Stef Bon <stef-/E4qUF3RmbfcqV2Q6a4srg@public.gmane.org> wrote:
+>
+>> Cifs is the target filesystem, and handled by the automounter, thus =
+the
+>> automounter is the initiator, not cifs.
+>>
+>> As you describe it (well it looks like it, I may not understand...) =
+cifs is
+>> the initiator, and the patches to the automounter make autofs handle=
+ cifs
+>> requests handle better?
+>
+> CIFS has DFS referrals, by which one point in a CIFS mount can refer =
+you to a
+> point in another volume, possibly on another server. =C2=A0Linux auto=
+matically
+> mounts the referred volume on the directory corresponding to the refe=
+rral when
+> you try and cross into it.
+>
+> AFS and NFS do similar things.
+>
+> David
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.ht=
+ml
+>
