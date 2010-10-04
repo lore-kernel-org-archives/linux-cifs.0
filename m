@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 07/14] cifs: cifs_write argument change and cleanup
-Date: Mon,  4 Oct 2010 13:52:54 -0400
-Message-ID: <1286214781-626-8-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/14] cifs: move cifsFileInfo_put to file.c
+Date: Mon,  4 Oct 2010 13:52:58 -0400
+Message-ID: <1286214781-626-12-git-send-email-jlayton@redhat.com>
 References: <1286214781-626-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,116 +9,56 @@ In-Reply-To: <1286214781-626-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have cifs_write take a cifsFileInfo pointer instead of a filp. Since
-cifsFileInfo holds references on the dentry, and that holds one to
-the inode, we can eliminate some unneeded NULL pointer checks.
+...and make it non-inlined in preparation for the move of most of
+cifs_close to it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c |   51 +++++++++++++++++----------------------------------
- 1 files changed, 17 insertions(+), 34 deletions(-)
+ fs/cifs/cifsglob.h |   10 +---------
+ fs/cifs/file.c     |   10 ++++++++++
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 5dc988c..522cefa 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -406,15 +406,7 @@ static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+ 	atomic_inc(&cifs_file->count);
+ }
+ 
+-/* Release a reference on the file private data */
+-static inline void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+-{
+-	if (atomic_dec_and_test(&cifs_file->count)) {
+-		cifs_put_tlink(cifs_file->tlink);
+-		dput(cifs_file->dentry);
+-		kfree(cifs_file);
+-	}
+-}
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+ 
+ /*
+  * One of these for each file inode
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0056405c..a1817ed 100644
+index c2f8fc5..c7a3e40 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -965,8 +965,9 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 	return total_written;
+@@ -207,6 +207,16 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	return pCifsFile;
  }
  
--static ssize_t cifs_write(struct file *file, const char *write_data,
--			  size_t write_size, loff_t *poffset)
-+static ssize_t cifs_write(struct cifsFileInfo *open_file,
-+			  const char *write_data, size_t write_size,
-+			  loff_t *poffset)
++/* Release a reference on the file private data */
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
++{
++	if (atomic_dec_and_test(&cifs_file->count)) {
++		cifs_put_tlink(cifs_file->tlink);
++		dput(cifs_file->dentry);
++		kfree(cifs_file);
++	}
++}
++
+ int cifs_open(struct inode *inode, struct file *file)
  {
- 	int rc = 0;
- 	unsigned int bytes_written = 0;
-@@ -974,17 +975,14 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsTconInfo *pTcon;
- 	int xid, long_op;
--	struct cifsFileInfo *open_file;
--	struct cifsInodeInfo *cifsi = CIFS_I(file->f_path.dentry->d_inode);
-+	struct dentry *dentry = open_file->dentry;
-+	struct cifsInodeInfo *cifsi = CIFS_I(dentry->d_inode);
- 
--	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
-+	cifs_sb = CIFS_SB(dentry->d_sb);
- 
- 	cFYI(1, "write %zd bytes to offset %lld of %s", write_size,
--	   *poffset, file->f_path.dentry->d_name.name);
-+	   *poffset, dentry->d_name.name);
- 
--	if (file->private_data == NULL)
--		return -EBADF;
--	open_file = file->private_data;
- 	pTcon = tlink_tcon(open_file->tlink);
- 
- 	xid = GetXid();
-@@ -994,15 +992,6 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- 	     total_written += bytes_written) {
- 		rc = -EAGAIN;
- 		while (rc == -EAGAIN) {
--			if (file->private_data == NULL) {
--				/* file has been closed on us */
--				FreeXid(xid);
--			/* if we have gotten here we have written some data
--			   and blocked, and the file has been freed on us
--			   while we blocked so return what we managed to
--			   write */
--				return total_written;
--			}
- 			if (open_file->closePend) {
- 				FreeXid(xid);
- 				if (total_written)
-@@ -1062,20 +1051,13 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- 
- 	cifs_stats_bytes_written(pTcon, total_written);
- 
--	/* since the write may have blocked check these pointers again */
--	if ((file->f_path.dentry) && (file->f_path.dentry->d_inode)) {
--/*BB We could make this contingent on superblock ATIME flag too */
--/*		file->f_path.dentry->d_inode->i_ctime =
--		file->f_path.dentry->d_inode->i_mtime = CURRENT_TIME;*/
--		if (total_written > 0) {
--			spin_lock(&file->f_path.dentry->d_inode->i_lock);
--			if (*poffset > file->f_path.dentry->d_inode->i_size)
--				i_size_write(file->f_path.dentry->d_inode,
--					     *poffset);
--			spin_unlock(&file->f_path.dentry->d_inode->i_lock);
--		}
--		mark_inode_dirty_sync(file->f_path.dentry->d_inode);
-+	if (total_written > 0) {
-+		spin_lock(&dentry->d_inode->i_lock);
-+		if (*poffset > dentry->d_inode->i_size)
-+			i_size_write(dentry->d_inode, *poffset);
-+		spin_unlock(&dentry->d_inode->i_lock);
- 	}
-+	mark_inode_dirty_sync(dentry->d_inode);
- 	FreeXid(xid);
- 	return total_written;
- }
-@@ -1246,8 +1228,8 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 
- 	open_file = find_writable_file(CIFS_I(mapping->host), false);
- 	if (open_file) {
--		bytes_written = cifs_write(open_file->pfile, write_data,
--					   to-from, &offset);
-+		bytes_written = cifs_write(open_file, write_data,
-+					   to - from, &offset);
- 		cifsFileInfo_put(open_file);
- 		/* Does mm or vfs already set times? */
- 		inode->i_atime = inode->i_mtime = current_fs_time(inode->i_sb);
-@@ -1562,7 +1544,8 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- 		/* BB check if anything else missing out of ppw
- 		   such as updating last write time */
- 		page_data = kmap(page);
--		rc = cifs_write(file, page_data + offset, copied, &pos);
-+		rc = cifs_write(file->private_data, page_data + offset,
-+				copied, &pos);
- 		/* if (rc < 0) should we set writebehind rc? */
- 		kunmap(page);
- 
+ 	int rc = -EACCES;
 -- 
 1.7.2.3
