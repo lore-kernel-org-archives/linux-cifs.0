@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/14] cifs: eliminate pfile pointer from cifsFileInfo
-Date: Mon,  4 Oct 2010 13:52:55 -0400
-Message-ID: <1286214781-626-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 04/14] cifs: eliminate oflags option from cifs_new_fileinfo
+Date: Mon,  4 Oct 2010 13:52:51 -0400
+Message-ID: <1286214781-626-5-git-send-email-jlayton@redhat.com>
 References: <1286214781-626-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,77 +9,102 @@ In-Reply-To: <1286214781-626-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-All the remaining users of cifsFileInfo->pfile just use it to get
-at the f_flags/f_mode. Now that we store that separately in the
-cifsFileInfo, there's no need to consult the pfile at all from
-a cifsFileInfo pointer.
+Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
+The callers mostly pass in the filp->f_flags here, except for one place
+that passes in the flags after they've been converted to their SMB_O_*
+equivalents.
+
+None of these are correct however since we're checking that value for
+the presence of FMODE_READ. Luckily that only affects how the f_list is
+ordered.
+
+What we really want here is the file->f_mode. Since we pass in a file
+pointer already anyway, just use the f_mode there for this purpose.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    1 -
- fs/cifs/dir.c      |    1 -
- fs/cifs/file.c     |   11 +++--------
- 3 files changed, 3 insertions(+), 10 deletions(-)
+ fs/cifs/cifsproto.h |    3 +--
+ fs/cifs/dir.c       |    9 ++++-----
+ fs/cifs/file.c      |    5 ++---
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index d0ced6e..7e2503f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -386,7 +386,6 @@ struct cifsFileInfo {
- 	__u16 netfid;		/* file id from remote */
- 	/* BB add lock scope info here if needed */ ;
- 	/* lock scope id (0 if none) */
--	struct file *pfile; /* needed for writepage */
- 	struct dentry *dentry;
- 	unsigned int f_flags;
- 	struct tcon_link *tlink;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 7f416ab..bed004c 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -107,8 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+ 
+ extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
+ 				__u16 fileHandle, struct file *file,
+-				struct tcon_link *tlink,
+-				unsigned int oflags, __u32 oplock);
++				struct tcon_link *tlink, __u32 oplock);
+ extern int cifs_posix_open(char *full_path, struct inode **pinode,
+ 				struct super_block *sb,
+ 				int mode, int oflags,
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index fc872c4..5dc8eed 100644
+index c205ec9..b399e5b 100644
 --- a/fs/cifs/dir.c
 +++ b/fs/cifs/dir.c
-@@ -148,7 +148,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	pCifsFile->uid = current_fsuid();
- 	pCifsFile->dentry = dget(dentry);
- 	pCifsFile->f_flags = file->f_flags;
--	pCifsFile->pfile = file;
- 	pCifsFile->invalidHandle = false;
- 	pCifsFile->closePend = false;
- 	pCifsFile->tlink = cifs_get_tlink(tlink);
+@@ -132,7 +132,7 @@ cifs_bp_rename_retry:
+ 
+ struct cifsFileInfo *
+ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+-		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
++		  struct tcon_link *tlink, __u32 oplock)
+ {
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	struct cifsFileInfo *pCifsFile;
+@@ -161,7 +161,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 	pCifsInode = CIFS_I(newinode);
+ 	if (pCifsInode) {
+ 		/* if readable file instance put first in list*/
+-		if (oflags & FMODE_READ)
++		if (file->f_mode & FMODE_READ)
+ 			list_add(&pCifsFile->flist, &pCifsInode->openFileList);
+ 		else
+ 			list_add_tail(&pCifsFile->flist,
+@@ -483,7 +483,7 @@ cifs_create_set_dentry:
+ 		}
+ 
+ 		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
+-						tlink, oflags, oplock);
++						tlink, oplock);
+ 		if (pfile_info == NULL) {
+ 			fput(filp);
+ 			CIFSSMBClose(xid, tcon, fileHandle);
+@@ -757,8 +757,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 			}
+ 
+ 			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
+-						  tlink, nd->intent.open.flags,
+-						  oplock);
++						  tlink, oplock);
+ 			if (cfile == NULL) {
+ 				fput(filp);
+ 				CIFSSMBClose(xid, pTcon, fileHandle);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index a1817ed..f63072c 100644
+index 944983e..08b0e25 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1082,8 +1082,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
- 			continue;
- 		if (fsuid_only && open_file->uid != current_fsuid())
- 			continue;
--		if (open_file->pfile && ((open_file->pfile->f_flags & O_RDWR) ||
--		    (open_file->pfile->f_flags & O_RDONLY))) {
-+		if (OPEN_FMODE(open_file->f_flags) & FMODE_READ) {
- 			if (!open_file->invalidHandle) {
- 				/* found a good file */
- 				/* lock it so it will not be closed on us */
-@@ -1132,9 +1131,7 @@ refind_writable:
- 			continue;
- 		if (fsuid_only && open_file->uid != current_fsuid())
- 			continue;
--		if (open_file->pfile &&
--		    ((open_file->pfile->f_flags & O_RDWR) ||
--		     (open_file->pfile->f_flags & O_WRONLY))) {
-+		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
- 			cifsFileInfo_get(open_file);
+@@ -215,7 +215,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			cFYI(1, "posix open succeeded");
  
- 			if (!open_file->invalidHandle) {
-@@ -2098,9 +2095,7 @@ static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
- 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
- 		if (open_file->closePend)
- 			continue;
--		if (open_file->pfile &&
--		    ((open_file->pfile->f_flags & O_RDWR) ||
--		     (open_file->pfile->f_flags & O_WRONLY))) {
-+		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
- 			read_unlock(&GlobalSMBSeslock);
- 			return 1;
- 		}
+ 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+-							tlink, oflags, oplock);
++							tlink, oplock);
+ 			if (pCifsFile == NULL) {
+ 				CIFSSMBClose(xid, tcon, netfid);
+ 				rc = -ENOMEM;
+@@ -307,8 +307,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	if (rc != 0)
+ 		goto out;
+ 
+-	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink,
+-					file->f_flags, oplock);
++	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
+ 	if (pCifsFile == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
 -- 
 1.7.2.3
