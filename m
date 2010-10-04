@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 04/14] cifs: eliminate oflags option from cifs_new_fileinfo
-Date: Mon,  4 Oct 2010 13:52:51 -0400
-Message-ID: <1286214781-626-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 01/14] cifs: keep dentry reference in cifsFileInfo instead of inode reference
+Date: Mon,  4 Oct 2010 13:52:48 -0400
+Message-ID: <1286214781-626-2-git-send-email-jlayton@redhat.com>
 References: <1286214781-626-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,102 +9,97 @@ In-Reply-To: <1286214781-626-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
-The callers mostly pass in the filp->f_flags here, except for one place
-that passes in the flags after they've been converted to their SMB_O_*
-equivalents.
+cifsFileInfo is a bit problematic. It contains a reference back to the
+struct file itself. This makes it difficult for a cifsFileInfo to exist
+without a corresponding struct file.
 
-None of these are correct however since we're checking that value for
-the presence of FMODE_READ. Luckily that only affects how the f_list is
-ordered.
+It would be better instead of the cifsFileInfo just held info pertaining
+to the open file on the server instead without any back refrences to the
+struct file. This would allow it to exist after the filp to which it was
+originally attached was closed.
 
-What we really want here is the file->f_mode. Since we pass in a file
-pointer already anyway, just use the f_mode there for this purpose.
+Much of the use of the file pointer in this struct is to get at the
+dentry.  Begin divorcing the cifsFileInfo from the struct file by
+keeping a reference to the dentry. Since the dentry will have a
+reference to the inode, we can eliminate the "pInode" field too and
+convert the igrab/iput to dget/dput.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    3 +--
- fs/cifs/dir.c       |    9 ++++-----
- fs/cifs/file.c      |    5 ++---
- 3 files changed, 7 insertions(+), 10 deletions(-)
+ fs/cifs/cifsglob.h |    4 ++--
+ fs/cifs/dir.c      |    3 ++-
+ fs/cifs/file.c     |    2 +-
+ fs/cifs/misc.c     |    2 +-
+ 4 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 7f416ab..bed004c 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -107,8 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
- 
- extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
- 				__u16 fileHandle, struct file *file,
--				struct tcon_link *tlink,
--				unsigned int oflags, __u32 oplock);
-+				struct tcon_link *tlink, __u32 oplock);
- extern int cifs_posix_open(char *full_path, struct inode **pinode,
- 				struct super_block *sb,
- 				int mode, int oflags,
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3c955ee..bbb6552 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -387,7 +387,7 @@ struct cifsFileInfo {
+ 	/* BB add lock scope info here if needed */ ;
+ 	/* lock scope id (0 if none) */
+ 	struct file *pfile; /* needed for writepage */
+-	struct inode *pInode; /* needed for oplock break */
++	struct dentry *dentry;
+ 	struct vfsmount *mnt;
+ 	struct tcon_link *tlink;
+ 	struct mutex lock_mutex;
+@@ -412,7 +412,7 @@ static inline void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ {
+ 	if (atomic_dec_and_test(&cifs_file->count)) {
+ 		cifs_put_tlink(cifs_file->tlink);
+-		iput(cifs_file->pInode);
++		dput(cifs_file->dentry);
+ 		kfree(cifs_file);
+ 	}
+ }
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index c205ec9..b399e5b 100644
+index e249b56..6887c41 100644
 --- a/fs/cifs/dir.c
 +++ b/fs/cifs/dir.c
-@@ -132,7 +132,7 @@ cifs_bp_rename_retry:
- 
- struct cifsFileInfo *
- cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
--		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
-+		  struct tcon_link *tlink, __u32 oplock)
+@@ -135,6 +135,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 		  struct vfsmount *mnt, struct tcon_link *tlink,
+ 		  unsigned int oflags, __u32 oplock)
  {
- 	struct dentry *dentry = file->f_path.dentry;
++	struct dentry *dentry = file->f_path.dentry;
  	struct cifsFileInfo *pCifsFile;
-@@ -161,7 +161,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
- 	pCifsInode = CIFS_I(newinode);
- 	if (pCifsInode) {
- 		/* if readable file instance put first in list*/
--		if (oflags & FMODE_READ)
-+		if (file->f_mode & FMODE_READ)
- 			list_add(&pCifsFile->flist, &pCifsInode->openFileList);
- 		else
- 			list_add_tail(&pCifsFile->flist,
-@@ -483,7 +483,7 @@ cifs_create_set_dentry:
- 		}
+ 	struct cifsInodeInfo *pCifsInode;
  
- 		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
--						tlink, oflags, oplock);
-+						tlink, oplock);
- 		if (pfile_info == NULL) {
- 			fput(filp);
- 			CIFSSMBClose(xid, tcon, fileHandle);
-@@ -757,8 +757,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 			}
- 
- 			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
--						  tlink, nd->intent.open.flags,
--						  oplock);
-+						  tlink, oplock);
- 			if (cfile == NULL) {
- 				fput(filp);
- 				CIFSSMBClose(xid, pTcon, fileHandle);
+@@ -145,7 +146,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 	pCifsFile->netfid = fileHandle;
+ 	pCifsFile->pid = current->tgid;
+ 	pCifsFile->uid = current_fsuid();
+-	pCifsFile->pInode = igrab(newinode);
++	pCifsFile->dentry = dget(dentry);
+ 	pCifsFile->mnt = mnt;
+ 	pCifsFile->pfile = file;
+ 	pCifsFile->invalidHandle = false;
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 944983e..08b0e25 100644
+index 80856f1..c302b9c 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -215,7 +215,7 @@ int cifs_open(struct inode *inode, struct file *file)
- 			cFYI(1, "posix open succeeded");
+@@ -2335,7 +2335,7 @@ void cifs_oplock_break(struct work_struct *work)
+ {
+ 	struct cifsFileInfo *cfile = container_of(work, struct cifsFileInfo,
+ 						  oplock_break);
+-	struct inode *inode = cfile->pInode;
++	struct inode *inode = cfile->dentry->d_inode;
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	int rc, waitrc = 0;
  
- 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
--							tlink, oflags, oplock);
-+							tlink, oplock);
- 			if (pCifsFile == NULL) {
- 				CIFSSMBClose(xid, tcon, netfid);
- 				rc = -ENOMEM;
-@@ -307,8 +307,7 @@ int cifs_open(struct inode *inode, struct file *file)
- 	if (rc != 0)
- 		goto out;
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 252f276..9bac3e7 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -578,7 +578,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
+ 				}
  
--	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink,
--					file->f_flags, oplock);
-+	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
- 	if (pCifsFile == NULL) {
- 		rc = -ENOMEM;
- 		goto out;
+ 				cFYI(1, "file id match, oplock break");
+-				pCifsInode = CIFS_I(netfile->pInode);
++				pCifsInode = CIFS_I(netfile->dentry->d_inode);
+ 				pCifsInode->clientCanCacheAll = false;
+ 				if (pSMB->OplockLevel == 0)
+ 					pCifsInode->clientCanCacheRead = false;
 -- 
 1.7.2.3
