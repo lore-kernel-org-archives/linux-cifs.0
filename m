@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/14] cifs: eliminate cifs_posix_open_inode_helper
-Date: Mon,  4 Oct 2010 13:52:50 -0400
-Message-ID: <1286214781-626-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 02/14] cifs: don't use vfsmount to pin superblock for oplock breaks
+Date: Mon,  4 Oct 2010 13:52:49 -0400
+Message-ID: <1286214781-626-3-git-send-email-jlayton@redhat.com>
 References: <1286214781-626-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,98 +9,200 @@ In-Reply-To: <1286214781-626-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This function is redundant. The only thing it does is set the canCache
-flags, but those get set in cifs_new_fileinfo anyway.
+Filesystems aren't really supposed to do anything with a vfsmount. It's
+considered a layering violation since vfsmounts are entirely managed at
+the VFS layer.
+
+CIFS currently keeps an active reference to a vfsmount in order to
+prevent the superblock vanishing before an oplock break has completed.
+What we really want to do instead is to keep sb->s_active high until the
+oplock break has completed. This patch borrows the scheme that NFS uses
+for handling sillyrenames.
+
+An atomic_t is added to the cifs_sb_info. When it transitions from 0 to
+1, an extra reference to the superblock is taken (by bumping the
+s_active value). When it transitions from 1 to 0, that reference is
+dropped and a the superblock teardown may proceed if there are no more
+references to it.
+
+Also, the vfsmount pointer is removed from cifsFileInfo and from
+cifs_new_fileinfo, and some bogus forward declarations are removed from
+cifsfs.h.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c |   67 --------------------------------------------------------
- 1 files changed, 0 insertions(+), 67 deletions(-)
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/cifsfs.c     |   18 ++++++++++++++++++
+ fs/cifs/cifsfs.h     |    6 ++----
+ fs/cifs/cifsglob.h   |    1 -
+ fs/cifs/cifsproto.h  |    2 +-
+ fs/cifs/dir.c        |   10 +++-------
+ fs/cifs/file.c       |    9 ++++-----
+ 7 files changed, 29 insertions(+), 18 deletions(-)
 
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 9ffe484..f68de99 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -48,6 +48,7 @@ struct cifs_sb_info {
+ 	struct nls_table *local_nls;
+ 	unsigned int rsize;
+ 	unsigned int wsize;
++	atomic_t active;
+ 	uid_t	mnt_uid;
+ 	gid_t	mnt_gid;
+ 	mode_t	mnt_file_mode;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 906b098..241f3d0 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -83,6 +83,24 @@ extern mempool_t *cifs_sm_req_poolp;
+ extern mempool_t *cifs_req_poolp;
+ extern mempool_t *cifs_mid_poolp;
+ 
++void
++cifs_sb_active(struct super_block *sb)
++{
++	struct cifs_sb_info *server = CIFS_SB(sb);
++
++	if (atomic_inc_return(&server->active) == 1)
++		atomic_inc(&sb->s_active);
++}
++
++void
++cifs_sb_deactive(struct super_block *sb)
++{
++	struct cifs_sb_info *server = CIFS_SB(sb);
++
++	if (atomic_dec_and_test(&server->active))
++		deactivate_super(sb);
++}
++
+ static int
+ cifs_read_super(struct super_block *sb, void *data,
+ 		const char *devname, int silent)
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index d82f5fb..2fb3829 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -42,10 +42,8 @@ extern const struct address_space_operations cifs_addr_ops;
+ extern const struct address_space_operations cifs_addr_ops_smallbuf;
+ 
+ /* Functions related to super block operations */
+-/* extern const struct super_operations cifs_super_ops;*/
+-extern void cifs_read_inode(struct inode *);
+-/*extern void cifs_delete_inode(struct inode *);*/  /* BB not needed yet */
+-/* extern void cifs_write_inode(struct inode *); */ /* BB not needed yet */
++extern void cifs_sb_active(struct super_block *sb);
++extern void cifs_sb_deactive(struct super_block *sb);
+ 
+ /* Functions related to inodes */
+ extern const struct inode_operations cifs_dir_inode_ops;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index bbb6552..a019820 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -388,7 +388,6 @@ struct cifsFileInfo {
+ 	/* lock scope id (0 if none) */
+ 	struct file *pfile; /* needed for writepage */
+ 	struct dentry *dentry;
+-	struct vfsmount *mnt;
+ 	struct tcon_link *tlink;
+ 	struct mutex lock_mutex;
+ 	struct list_head llist; /* list of byte range locks we have. */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 29a2ee8..7f416ab 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -107,7 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+ 
+ extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
+ 				__u16 fileHandle, struct file *file,
+-				struct vfsmount *mnt, struct tcon_link *tlink,
++				struct tcon_link *tlink,
+ 				unsigned int oflags, __u32 oplock);
+ extern int cifs_posix_open(char *full_path, struct inode **pinode,
+ 				struct super_block *sb,
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 6887c41..c205ec9 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -132,8 +132,7 @@ cifs_bp_rename_retry:
+ 
+ struct cifsFileInfo *
+ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+-		  struct vfsmount *mnt, struct tcon_link *tlink,
+-		  unsigned int oflags, __u32 oplock)
++		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
+ {
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	struct cifsFileInfo *pCifsFile;
+@@ -147,7 +146,6 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 	pCifsFile->pid = current->tgid;
+ 	pCifsFile->uid = current_fsuid();
+ 	pCifsFile->dentry = dget(dentry);
+-	pCifsFile->mnt = mnt;
+ 	pCifsFile->pfile = file;
+ 	pCifsFile->invalidHandle = false;
+ 	pCifsFile->closePend = false;
+@@ -485,8 +483,7 @@ cifs_create_set_dentry:
+ 		}
+ 
+ 		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
+-						nd->path.mnt, tlink, oflags,
+-						oplock);
++						tlink, oflags, oplock);
+ 		if (pfile_info == NULL) {
+ 			fput(filp);
+ 			CIFSSMBClose(xid, tcon, fileHandle);
+@@ -760,8 +757,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 			}
+ 
+ 			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
+-						  nd->path.mnt, tlink,
+-						  nd->intent.open.flags,
++						  tlink, nd->intent.open.flags,
+ 						  oplock);
+ 			if (cfile == NULL) {
+ 				fput(filp);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 84d1435..944983e 100644
+index c302b9c..84d1435 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -106,64 +106,6 @@ static inline int cifs_get_disposition(unsigned int flags)
- 		return FILE_OPEN;
- }
- 
--/* all arguments to this function must be checked for validity in caller */
--static inline int
--cifs_posix_open_inode_helper(struct inode *inode, struct file *file,
--			     struct cifsInodeInfo *pCifsInode, __u32 oplock,
--			     u16 netfid)
--{
--
--	write_lock(&GlobalSMBSeslock);
--
--	pCifsInode = CIFS_I(file->f_path.dentry->d_inode);
--	if (pCifsInode == NULL) {
--		write_unlock(&GlobalSMBSeslock);
--		return -EINVAL;
--	}
--
--	if (pCifsInode->clientCanCacheRead) {
--		/* we have the inode open somewhere else
--		   no need to discard cache data */
--		goto psx_client_can_cache;
--	}
--
--	/* BB FIXME need to fix this check to move it earlier into posix_open
--	   BB  fIX following section BB FIXME */
--
--	/* if not oplocked, invalidate inode pages if mtime or file
--	   size changed */
--/*	temp = cifs_NTtimeToUnix(le64_to_cpu(buf->LastWriteTime));
--	if (timespec_equal(&file->f_path.dentry->d_inode->i_mtime, &temp) &&
--			   (file->f_path.dentry->d_inode->i_size ==
--			    (loff_t)le64_to_cpu(buf->EndOfFile))) {
--		cFYI(1, "inode unchanged on server");
--	} else {
--		if (file->f_path.dentry->d_inode->i_mapping) {
--			rc = filemap_write_and_wait(file->f_path.dentry->d_inode->i_mapping);
--			if (rc != 0)
--				CIFS_I(file->f_path.dentry->d_inode)->write_behind_rc = rc;
--		}
--		cFYI(1, "invalidating remote inode since open detected it "
--			 "changed");
--		invalidate_remote_inode(file->f_path.dentry->d_inode);
--	} */
--
--psx_client_can_cache:
--	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
--		pCifsInode->clientCanCacheAll = true;
--		pCifsInode->clientCanCacheRead = true;
--		cFYI(1, "Exclusive Oplock granted on inode %p",
--			 file->f_path.dentry->d_inode);
--	} else if ((oplock & 0xF) == OPLOCK_READ)
--		pCifsInode->clientCanCacheRead = true;
--
--	/* will have to change the unlock if we reenable the
--	   filemap_fdatawrite (which does not seem necessary */
--	write_unlock(&GlobalSMBSeslock);
--	return 0;
--}
--
--/* all arguments to this function must be checked for validity in caller */
- static inline int cifs_open_inode_helper(struct inode *inode,
- 	struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO *buf,
- 	char *full_path, int xid)
-@@ -271,15 +213,6 @@ int cifs_open(struct inode *inode, struct file *file)
- 				oflags, &oplock, &netfid, xid);
- 		if (rc == 0) {
- 			cFYI(1, "posix open succeeded");
--			/* no need for special case handling of setting mode
--			   on read only files needed here */
--
--			rc = cifs_posix_open_inode_helper(inode, file,
--					pCifsInode, oplock, netfid);
--			if (rc != 0) {
--				CIFSSMBClose(xid, tcon, netfid);
--				goto out;
--			}
+@@ -282,7 +282,6 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			}
  
  			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+-							file->f_path.mnt,
  							tlink, oflags, oplock);
+ 			if (pCifsFile == NULL) {
+ 				CIFSSMBClose(xid, tcon, netfid);
+@@ -375,8 +374,8 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	if (rc != 0)
+ 		goto out;
+ 
+-	pCifsFile = cifs_new_fileinfo(inode, netfid, file, file->f_path.mnt,
+-					tlink, file->f_flags, oplock);
++	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink,
++					file->f_flags, oplock);
+ 	if (pCifsFile == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
+@@ -2381,13 +2380,13 @@ void cifs_oplock_break(struct work_struct *work)
+ 
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile)
+ {
+-	mntget(cfile->mnt);
+ 	cifsFileInfo_get(cfile);
++	cifs_sb_active(cfile->dentry->d_sb);
+ }
+ 
+ void cifs_oplock_break_put(struct cifsFileInfo *cfile)
+ {
+-	mntput(cfile->mnt);
++	cifs_sb_deactive(cfile->dentry->d_sb);
+ 	cifsFileInfo_put(cfile);
+ }
+ 
 -- 
 1.7.2.3
