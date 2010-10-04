@@ -1,652 +1,416 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] smbfs: move to drivers/staging
-Date: Mon, 4 Oct 2010 19:23:16 -0400
-Message-ID: <20101004192316.32dc6dd1@corrin.poochiereds.net>
-References: <201010042255.57843.arnd@arndb.de>
+Subject: Re: [PATCH 3/7 cifs] ntlm authentication and signing - Calculate
+ auth response per smb session
+Date: Mon, 4 Oct 2010 19:36:49 -0400
+Message-ID: <20101004193649.1a422be9@corrin.poochiereds.net>
+References: <1285771177-23146-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20101004070212.74b7968f@tlielax.poochiereds.net>
+	<AANLkTi=6gVCRSmpjDVz16qQN+CJK0VQqcy0PM0S7bDfc@mail.gmail.com>
+	<20101004085358.19dde851@tlielax.poochiereds.net>
+	<AANLkTi=h6UhkPmm6UtiERfKFm1wK9q6+zXP0Uot89OBP@mail.gmail.com>
+	<20101004091831.7bcda54e@tlielax.poochiereds.net>
+	<AANLkTin5Tg-ybfXOycYoBaCF7SGMf0LUaQ=wweoRjWuH@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: gregkh-l3A5Bk7waGM@public.gmane.org, Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <201010042255.57843.arnd-r2nGTMty4D4@public.gmane.org>
+In-Reply-To: <AANLkTin5Tg-ybfXOycYoBaCF7SGMf0LUaQ=wweoRjWuH-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 4 Oct 2010 22:55:57 +0200
-Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org> wrote:
+On Mon, 4 Oct 2010 18:13:23 -0500
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> smbfs has been scheduled for removal in 2.6.27, so
-> maybe we can now move it to drivers/staging on the
-> way out.
-> 
-> smbfs still uses the big kernel lock and nobody
-> is going to fix that, so we should be getting
-> rid of it soon.
-> 
-> This removes the 32 bit compat mount and ioctl
-> handling code, which is implemented in common fs
-> code, and moves all smbfs related files into
-> drivers/staging/smbfs.
-> 
-> Signed-off-by: Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>
-> ---
->  Documentation/filesystems/00-INDEX                 |    2 -
->  Documentation/ioctl/ioctl-number.txt               |    2 +-
->  drivers/staging/Kconfig                            |    2 +
->  drivers/staging/Makefile                           |    1 +
->  {fs => drivers/staging}/smbfs/Kconfig              |    0
->  {fs => drivers/staging}/smbfs/Makefile             |    0
->  drivers/staging/smbfs/TODO                         |    8 +++++
->  {fs => drivers/staging}/smbfs/cache.c              |    2 +-
->  {fs => drivers/staging}/smbfs/dir.c                |    6 ++--
->  {fs => drivers/staging}/smbfs/file.c               |    5 +--
->  {fs => drivers/staging}/smbfs/getopt.c             |    0
->  {fs => drivers/staging}/smbfs/getopt.h             |    0
->  {fs => drivers/staging}/smbfs/inode.c              |    8 ++--
->  {fs => drivers/staging}/smbfs/ioctl.c              |    5 +--
->  {fs => drivers/staging}/smbfs/proc.c               |    7 ++--
->  {fs => drivers/staging}/smbfs/proto.h              |    0
->  {fs => drivers/staging}/smbfs/request.c            |    7 ++--
->  {fs => drivers/staging}/smbfs/request.h            |    0
->  {include/linux => drivers/staging/smbfs}/smb.h     |    0
->  {fs => drivers/staging}/smbfs/smb_debug.h          |    0
->  {include/linux => drivers/staging/smbfs}/smb_fs.h  |    8 ++--
->  .../linux => drivers/staging/smbfs}/smb_fs_i.h     |    0
->  .../linux => drivers/staging/smbfs}/smb_fs_sb.h    |    2 +-
->  .../linux => drivers/staging/smbfs}/smb_mount.h    |    0
->  .../staging/smbfs}/smbfs.txt                       |    0
->  {fs => drivers/staging}/smbfs/smbiod.c             |    7 ++--
->  {include/linux => drivers/staging/smbfs}/smbno.h   |    0
->  {fs => drivers/staging}/smbfs/sock.c               |    7 ++--
->  {fs => drivers/staging}/smbfs/symlink.c            |    5 +--
->  fs/Kconfig                                         |    1 -
->  fs/Makefile                                        |    1 -
->  fs/compat.c                                        |   31 +-------------------
->  fs/compat_ioctl.c                                  |   26 ----------------
->  include/linux/Kbuild                               |    4 --
->  34 files changed, 44 insertions(+), 103 deletions(-)
->  rename {fs => drivers/staging}/smbfs/Kconfig (100%)
->  rename {fs => drivers/staging}/smbfs/Makefile (100%)
->  create mode 100644 drivers/staging/smbfs/TODO
->  rename {fs => drivers/staging}/smbfs/cache.c (99%)
->  rename {fs => drivers/staging}/smbfs/dir.c (99%)
->  rename {fs => drivers/staging}/smbfs/file.c (99%)
->  rename {fs => drivers/staging}/smbfs/getopt.c (100%)
->  rename {fs => drivers/staging}/smbfs/getopt.h (100%)
->  rename {fs => drivers/staging}/smbfs/inode.c (99%)
->  rename {fs => drivers/staging}/smbfs/ioctl.c (96%)
->  rename {fs => drivers/staging}/smbfs/proc.c (99%)
->  rename {fs => drivers/staging}/smbfs/proto.h (100%)
->  rename {fs => drivers/staging}/smbfs/request.c (99%)
->  rename {fs => drivers/staging}/smbfs/request.h (100%)
->  rename {include/linux => drivers/staging/smbfs}/smb.h (100%)
->  rename {fs => drivers/staging}/smbfs/smb_debug.h (100%)
->  rename {include/linux => drivers/staging/smbfs}/smb_fs.h (97%)
->  rename {include/linux => drivers/staging/smbfs}/smb_fs_i.h (100%)
->  rename {include/linux => drivers/staging/smbfs}/smb_fs_sb.h (98%)
->  rename {include/linux => drivers/staging/smbfs}/smb_mount.h (100%)
->  rename {Documentation/filesystems => drivers/staging/smbfs}/smbfs.txt (100%)
->  rename {fs => drivers/staging}/smbfs/smbiod.c (98%)
->  rename {include/linux => drivers/staging/smbfs}/smbno.h (100%)
->  rename {fs => drivers/staging}/smbfs/sock.c (99%)
->  rename {fs => drivers/staging}/smbfs/symlink.c (96%)
-> 
-> diff --git a/Documentation/filesystems/00-INDEX b/Documentation/filesystems/00-INDEX
-> index 4303614..8c624a1 100644
-> --- a/Documentation/filesystems/00-INDEX
-> +++ b/Documentation/filesystems/00-INDEX
-> @@ -96,8 +96,6 @@ seq_file.txt
->  	- how to use the seq_file API
->  sharedsubtree.txt
->  	- a description of shared subtrees for namespaces.
-> -smbfs.txt
-> -	- info on using filesystems with the SMB protocol (Win 3.11 and NT).
->  spufs.txt
->  	- info and mount options for the SPU filesystem used on Cell.
->  sysfs-pci.txt
-> diff --git a/Documentation/ioctl/ioctl-number.txt b/Documentation/ioctl/ioctl-number.txt
-> index 33223ff..d15834a 100644
-> --- a/Documentation/ioctl/ioctl-number.txt
-> +++ b/Documentation/ioctl/ioctl-number.txt
-> @@ -259,7 +259,7 @@ Code  Seq#(hex)	Include File		Comments
->  't'	00-7F	linux/if_ppp.h
->  't'	80-8F	linux/isdn_ppp.h
->  't'	90	linux/toshiba.h
-> -'u'	00-1F	linux/smb_fs.h
-> +'u'	00-1F	linux/smb_fs.h		gone
->  'v'	all	linux/videodev.h	conflict!
->  'v'	00-1F	linux/ext2_fs.h		conflict!
->  'v'	00-1F	linux/fs.h		conflict!
-> diff --git a/drivers/staging/Kconfig b/drivers/staging/Kconfig
-> index 0150353..4a91908 100644
-> --- a/drivers/staging/Kconfig
-> +++ b/drivers/staging/Kconfig
-> @@ -149,6 +149,8 @@ source "drivers/staging/msm/Kconfig"
->  
->  source "drivers/staging/lirc/Kconfig"
->  
-> +source "drivers/staging/smbfs/Kconfig"
-> +
->  source "drivers/staging/easycap/Kconfig"
->  
->  source "drivers/staging/solo6x10/Kconfig"
-> diff --git a/drivers/staging/Makefile b/drivers/staging/Makefile
-> index de5c0e5..7cb02a8 100644
-> --- a/drivers/staging/Makefile
-> +++ b/drivers/staging/Makefile
-> @@ -32,6 +32,7 @@ obj-$(CONFIG_AUTOFS_FS)		+= autofs/
->  obj-$(CONFIG_IDE_PHISON)	+= phison/
->  obj-$(CONFIG_LINE6_USB)		+= line6/
->  obj-$(CONFIG_USB_SERIAL_QUATECH2)	+= serqt_usb2/
-> +obj-$(CONFIG_SMB_FS)		+= smbfs/
->  obj-$(CONFIG_USB_SERIAL_QUATECH_USB2)	+= quatech_usb2/
->  obj-$(CONFIG_OCTEON_ETHERNET)	+= octeon/
->  obj-$(CONFIG_VT6655)		+= vt6655/
-> diff --git a/fs/smbfs/Kconfig b/drivers/staging/smbfs/Kconfig
-> similarity index 100%
-> rename from fs/smbfs/Kconfig
-> rename to drivers/staging/smbfs/Kconfig
-> diff --git a/fs/smbfs/Makefile b/drivers/staging/smbfs/Makefile
-> similarity index 100%
-> rename from fs/smbfs/Makefile
-> rename to drivers/staging/smbfs/Makefile
-> diff --git a/drivers/staging/smbfs/TODO b/drivers/staging/smbfs/TODO
-> new file mode 100644
-> index 0000000..24f4d29
-> --- /dev/null
-> +++ b/drivers/staging/smbfs/TODO
-> @@ -0,0 +1,8 @@
-> +smbfs is on its way out of the kernel, it has been replaced
-> +by cifs several years ago.
-> +
-> +The smbfs code uses the big kernel lock which
-> +is getting deprecated.
-> +
-> +Users that find smbfs to work but not cifs should contact
-> +the CIFS developers on linux-cifs-u79uwXL29TaiAVqoAR/hOA@public.gmane.org
-> diff --git a/fs/smbfs/cache.c b/drivers/staging/smbfs/cache.c
-> similarity index 99%
-> rename from fs/smbfs/cache.c
-> rename to drivers/staging/smbfs/cache.c
-> index 8c177eb..dbb9865 100644
-> --- a/fs/smbfs/cache.c
-> +++ b/drivers/staging/smbfs/cache.c
-> @@ -13,12 +13,12 @@
->  #include <linux/errno.h>
->  #include <linux/kernel.h>
->  #include <linux/mm.h>
-> -#include <linux/smb_fs.h>
->  #include <linux/pagemap.h>
->  #include <linux/net.h>
->  
->  #include <asm/page.h>
->  
-> +#include "smb_fs.h"
->  #include "smb_debug.h"
->  #include "proto.h"
->  
-> diff --git a/fs/smbfs/dir.c b/drivers/staging/smbfs/dir.c
-> similarity index 99%
-> rename from fs/smbfs/dir.c
-> rename to drivers/staging/smbfs/dir.c
-> index 00a70ca..936b3bb 100644
-> --- a/fs/smbfs/dir.c
-> +++ b/drivers/staging/smbfs/dir.c
-> @@ -15,9 +15,9 @@
->  #include <linux/net.h>
->  #include <linux/sched.h>
->  
-> -#include <linux/smb_fs.h>
-> -#include <linux/smb_mount.h>
-> -#include <linux/smbno.h>
-> +#include "smb_fs.h"
-> +#include "smb_mount.h"
-> +#include "smbno.h"
->  
->  #include "smb_debug.h"
->  #include "proto.h"
-> diff --git a/fs/smbfs/file.c b/drivers/staging/smbfs/file.c
-> similarity index 99%
-> rename from fs/smbfs/file.c
-> rename to drivers/staging/smbfs/file.c
-> index 8e187a0..5dcd19c 100644
-> --- a/fs/smbfs/file.c
-> +++ b/drivers/staging/smbfs/file.c
-> @@ -21,9 +21,8 @@
->  #include <asm/uaccess.h>
->  #include <asm/system.h>
->  
-> -#include <linux/smbno.h>
-> -#include <linux/smb_fs.h>
-> -
-> +#include "smbno.h"
-> +#include "smb_fs.h"
->  #include "smb_debug.h"
->  #include "proto.h"
->  
-> diff --git a/fs/smbfs/getopt.c b/drivers/staging/smbfs/getopt.c
-> similarity index 100%
-> rename from fs/smbfs/getopt.c
-> rename to drivers/staging/smbfs/getopt.c
-> diff --git a/fs/smbfs/getopt.h b/drivers/staging/smbfs/getopt.h
-> similarity index 100%
-> rename from fs/smbfs/getopt.h
-> rename to drivers/staging/smbfs/getopt.h
-> diff --git a/fs/smbfs/inode.c b/drivers/staging/smbfs/inode.c
-> similarity index 99%
-> rename from fs/smbfs/inode.c
-> rename to drivers/staging/smbfs/inode.c
-> index 450c919..9287599 100644
-> --- a/fs/smbfs/inode.c
-> +++ b/drivers/staging/smbfs/inode.c
-> @@ -26,13 +26,13 @@
->  #include <linux/vfs.h>
->  #include <linux/highuid.h>
->  #include <linux/sched.h>
-> -#include <linux/smb_fs.h>
-> -#include <linux/smbno.h>
-> -#include <linux/smb_mount.h>
->  
->  #include <asm/system.h>
->  #include <asm/uaccess.h>
->  
-> +#include "smb_fs.h"
-> +#include "smbno.h"
-> +#include "smb_mount.h"
->  #include "smb_debug.h"
->  #include "getopt.h"
->  #include "proto.h"
-> @@ -504,7 +504,7 @@ static int smb_fill_super(struct super_block *sb, void *raw_data, int silent)
->  	if (warn_count < 5) {
->  		warn_count++;
->  		printk(KERN_EMERG "smbfs is deprecated and will be removed"
-> -			" from the 2.6.27 kernel. Please migrate to cifs\n");
-> +			" from the 2.6.37 kernel. Please migrate to cifs\n");
->  	}
->  
->  	if (!raw_data)
-> diff --git a/fs/smbfs/ioctl.c b/drivers/staging/smbfs/ioctl.c
-> similarity index 96%
-> rename from fs/smbfs/ioctl.c
-> rename to drivers/staging/smbfs/ioctl.c
-> index 0721531..2da1692 100644
-> --- a/fs/smbfs/ioctl.c
-> +++ b/drivers/staging/smbfs/ioctl.c
-> @@ -16,11 +16,10 @@
->  #include <linux/smp_lock.h>
->  #include <linux/net.h>
->  
-> -#include <linux/smb_fs.h>
-> -#include <linux/smb_mount.h>
-> -
->  #include <asm/uaccess.h>
->  
-> +#include "smb_fs.h"
-> +#include "smb_mount.h"
->  #include "proto.h"
->  
->  long
-> diff --git a/fs/smbfs/proc.c b/drivers/staging/smbfs/proc.c
-> similarity index 99%
-> rename from fs/smbfs/proc.c
-> rename to drivers/staging/smbfs/proc.c
-> index 71c29b6..2fb079c 100644
-> --- a/fs/smbfs/proc.c
-> +++ b/drivers/staging/smbfs/proc.c
-> @@ -20,15 +20,14 @@
->  #include <linux/smp_lock.h>
->  #include <linux/net.h>
->  #include <linux/vfs.h>
-> -#include <linux/smb_fs.h>
-> -#include <linux/smbno.h>
-> -#include <linux/smb_mount.h>
-> -
->  #include <net/sock.h>
->  
->  #include <asm/string.h>
->  #include <asm/div64.h>
->  
-> +#include "smb_fs.h"
-> +#include "smbno.h"
-> +#include "smb_mount.h"
->  #include "smb_debug.h"
->  #include "proto.h"
->  #include "request.h"
-> diff --git a/fs/smbfs/proto.h b/drivers/staging/smbfs/proto.h
-> similarity index 100%
-> rename from fs/smbfs/proto.h
-> rename to drivers/staging/smbfs/proto.h
-> diff --git a/fs/smbfs/request.c b/drivers/staging/smbfs/request.c
-> similarity index 99%
-> rename from fs/smbfs/request.c
-> rename to drivers/staging/smbfs/request.c
-> index 45f4593..3e77168 100644
-> --- a/fs/smbfs/request.c
-> +++ b/drivers/staging/smbfs/request.c
-> @@ -13,10 +13,9 @@
->  #include <linux/net.h>
->  #include <linux/sched.h>
->  
-> -#include <linux/smb_fs.h>
-> -#include <linux/smbno.h>
-> -#include <linux/smb_mount.h>
-> -
-> +#include "smb_fs.h"
-> +#include "smbno.h"
-> +#include "smb_mount.h"
->  #include "smb_debug.h"
->  #include "request.h"
->  #include "proto.h"
-> diff --git a/fs/smbfs/request.h b/drivers/staging/smbfs/request.h
-> similarity index 100%
-> rename from fs/smbfs/request.h
-> rename to drivers/staging/smbfs/request.h
-> diff --git a/include/linux/smb.h b/drivers/staging/smbfs/smb.h
-> similarity index 100%
-> rename from include/linux/smb.h
-> rename to drivers/staging/smbfs/smb.h
-> diff --git a/fs/smbfs/smb_debug.h b/drivers/staging/smbfs/smb_debug.h
-> similarity index 100%
-> rename from fs/smbfs/smb_debug.h
-> rename to drivers/staging/smbfs/smb_debug.h
-> diff --git a/include/linux/smb_fs.h b/drivers/staging/smbfs/smb_fs.h
-> similarity index 97%
-> rename from include/linux/smb_fs.h
-> rename to drivers/staging/smbfs/smb_fs.h
-> index 923cd8a..20a05c1 100644
-> --- a/include/linux/smb_fs.h
-> +++ b/drivers/staging/smbfs/smb_fs.h
-> @@ -9,7 +9,7 @@
->  #ifndef _LINUX_SMB_FS_H
->  #define _LINUX_SMB_FS_H
->  
-> -#include <linux/smb.h>
-> +#include "smb.h"
->  
->  /*
->   * ioctl commands
-> @@ -22,13 +22,13 @@
->  
->  
->  #ifdef __KERNEL__
-> -#include <linux/smb_fs_i.h>
-> -#include <linux/smb_fs_sb.h>
-> +#include "smb_fs_i.h"
-> +#include "smb_fs_sb.h"
-> +#include "smb_mount.h"
->  
->  #include <linux/fs.h>
->  #include <linux/pagemap.h>
->  #include <linux/vmalloc.h>
-> -#include <linux/smb_mount.h>
->  #include <linux/jiffies.h>
->  #include <asm/unaligned.h>
->  
-> diff --git a/include/linux/smb_fs_i.h b/drivers/staging/smbfs/smb_fs_i.h
-> similarity index 100%
-> rename from include/linux/smb_fs_i.h
-> rename to drivers/staging/smbfs/smb_fs_i.h
-> diff --git a/include/linux/smb_fs_sb.h b/drivers/staging/smbfs/smb_fs_sb.h
-> similarity index 98%
-> rename from include/linux/smb_fs_sb.h
-> rename to drivers/staging/smbfs/smb_fs_sb.h
-> index bb947dd..ca058af 100644
-> --- a/include/linux/smb_fs_sb.h
-> +++ b/drivers/staging/smbfs/smb_fs_sb.h
-> @@ -11,7 +11,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/backing-dev.h>
-> -#include <linux/smb.h>
-> +#include "smb.h"
->  
->  /*
->   * Upper limit on the total number of active smb_request structs.
-> diff --git a/include/linux/smb_mount.h b/drivers/staging/smbfs/smb_mount.h
-> similarity index 100%
-> rename from include/linux/smb_mount.h
-> rename to drivers/staging/smbfs/smb_mount.h
-> diff --git a/Documentation/filesystems/smbfs.txt b/drivers/staging/smbfs/smbfs.txt
-> similarity index 100%
-> rename from Documentation/filesystems/smbfs.txt
-> rename to drivers/staging/smbfs/smbfs.txt
-> diff --git a/fs/smbfs/smbiod.c b/drivers/staging/smbfs/smbiod.c
-> similarity index 98%
-> rename from fs/smbfs/smbiod.c
-> rename to drivers/staging/smbfs/smbiod.c
-> index 0e39a92..ec99892 100644
-> --- a/fs/smbfs/smbiod.c
-> +++ b/drivers/staging/smbfs/smbiod.c
-> @@ -20,13 +20,12 @@
->  #include <linux/kthread.h>
->  #include <net/ip.h>
->  
-> -#include <linux/smb_fs.h>
-> -#include <linux/smbno.h>
-> -#include <linux/smb_mount.h>
-> -
->  #include <asm/system.h>
->  #include <asm/uaccess.h>
->  
-> +#include "smb_fs.h"
-> +#include "smbno.h"
-> +#include "smb_mount.h"
->  #include "smb_debug.h"
->  #include "request.h"
->  #include "proto.h"
-> diff --git a/include/linux/smbno.h b/drivers/staging/smbfs/smbno.h
-> similarity index 100%
-> rename from include/linux/smbno.h
-> rename to drivers/staging/smbfs/smbno.h
-> diff --git a/fs/smbfs/sock.c b/drivers/staging/smbfs/sock.c
-> similarity index 99%
-> rename from fs/smbfs/sock.c
-> rename to drivers/staging/smbfs/sock.c
-> index e37fe4d..9e26409 100644
-> --- a/fs/smbfs/sock.c
-> +++ b/drivers/staging/smbfs/sock.c
-> @@ -22,13 +22,12 @@
->  #include <net/tcp_states.h>
->  #include <net/ip.h>
->  
-> -#include <linux/smb_fs.h>
-> -#include <linux/smb.h>
-> -#include <linux/smbno.h>
-> -
->  #include <asm/uaccess.h>
->  #include <asm/ioctls.h>
->  
-> +#include "smb_fs.h"
-> +#include "smb.h"
-> +#include "smbno.h"
->  #include "smb_debug.h"
->  #include "proto.h"
->  #include "request.h"
-> diff --git a/fs/smbfs/symlink.c b/drivers/staging/smbfs/symlink.c
-> similarity index 96%
-> rename from fs/smbfs/symlink.c
-> rename to drivers/staging/smbfs/symlink.c
-> index 00b2909..632c4ac 100644
-> --- a/fs/smbfs/symlink.c
-> +++ b/drivers/staging/smbfs/symlink.c
-> @@ -19,9 +19,8 @@
->  #include <asm/uaccess.h>
->  #include <asm/system.h>
->  
-> -#include <linux/smbno.h>
-> -#include <linux/smb_fs.h>
-> -
-> +#include "smbno.h"
-> +#include "smb_fs.h"
->  #include "smb_debug.h"
->  #include "proto.h"
->  
-> diff --git a/fs/Kconfig b/fs/Kconfig
-> index 30da8ee..25ce2dc 100644
-> --- a/fs/Kconfig
-> +++ b/fs/Kconfig
-> @@ -233,7 +233,6 @@ config NFS_COMMON
->  	default y
->  
->  source "net/sunrpc/Kconfig"
-> -source "fs/smbfs/Kconfig"
->  source "fs/ceph/Kconfig"
->  source "fs/cifs/Kconfig"
->  source "fs/ncpfs/Kconfig"
-> diff --git a/fs/Makefile b/fs/Makefile
-> index e571fed..9284c74 100644
-> --- a/fs/Makefile
-> +++ b/fs/Makefile
-> @@ -91,7 +91,6 @@ obj-$(CONFIG_NFSD)		+= nfsd/
->  obj-$(CONFIG_LOCKD)		+= lockd/
->  obj-$(CONFIG_NLS)		+= nls/
->  obj-$(CONFIG_SYSV_FS)		+= sysv/
-> -obj-$(CONFIG_SMB_FS)		+= smbfs/
->  obj-$(CONFIG_CIFS)		+= cifs/
->  obj-$(CONFIG_NCP_FS)		+= ncpfs/
->  obj-$(CONFIG_HPFS_FS)		+= hpfs/
-> diff --git a/fs/compat.c b/fs/compat.c
-> index 718c706..b42f29a 100644
-> --- a/fs/compat.c
-> +++ b/fs/compat.c
-> @@ -29,8 +29,6 @@
->  #include <linux/vfs.h>
->  #include <linux/ioctl.h>
->  #include <linux/init.h>
-> -#include <linux/smb.h>
-> -#include <linux/smb_mount.h>
->  #include <linux/ncp_mount.h>
->  #include <linux/nfs4_mount.h>
->  #include <linux/syscalls.h>
-> @@ -745,30 +743,6 @@ static void *do_ncp_super_data_conv(void *raw_data)
->  	return raw_data;
->  }
->  
-> -struct compat_smb_mount_data {
-> -	compat_int_t version;
-> -	__compat_uid_t mounted_uid;
-> -	__compat_uid_t uid;
-> -	__compat_gid_t gid;
-> -	compat_mode_t file_mode;
-> -	compat_mode_t dir_mode;
-> -};
-> -
-> -static void *do_smb_super_data_conv(void *raw_data)
-> -{
-> -	struct smb_mount_data *s = raw_data;
-> -	struct compat_smb_mount_data *c_s = raw_data;
-> -
-> -	if (c_s->version != SMB_MOUNT_OLDVERSION)
-> -		goto out;
-> -	s->dir_mode = c_s->dir_mode;
-> -	s->file_mode = c_s->file_mode;
-> -	s->gid = c_s->gid;
-> -	s->uid = c_s->uid;
-> -	s->mounted_uid = c_s->mounted_uid;
-> - out:
-> -	return raw_data;
-> -}
->  
->  struct compat_nfs_string {
->  	compat_uint_t len;
-> @@ -835,7 +809,6 @@ static int do_nfs4_super_data_conv(void *raw_data)
->  	return 0;
->  }
->  
-> -#define SMBFS_NAME      "smbfs"
->  #define NCPFS_NAME      "ncpfs"
->  #define NFS4_NAME	"nfs4"
->  
-> @@ -870,9 +843,7 @@ asmlinkage long compat_sys_mount(const char __user * dev_name,
->  	retval = -EINVAL;
->  
->  	if (kernel_type && data_page) {
-> -		if (!strcmp(kernel_type, SMBFS_NAME)) {
-> -			do_smb_super_data_conv((void *)data_page);
-> -		} else if (!strcmp(kernel_type, NCPFS_NAME)) {
-> +		if (!strcmp(kernel_type, NCPFS_NAME)) {
->  			do_ncp_super_data_conv((void *)data_page);
->  		} else if (!strcmp(kernel_type, NFS4_NAME)) {
->  			if (do_nfs4_super_data_conv((void *) data_page))
-> diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
-> index 03e59aa..34cf03c 100644
-> --- a/fs/compat_ioctl.c
-> +++ b/fs/compat_ioctl.c
-> @@ -46,7 +46,6 @@
->  #include <linux/videodev.h>
->  #include <linux/netdevice.h>
->  #include <linux/raw.h>
-> -#include <linux/smb_fs.h>
->  #include <linux/blkdev.h>
->  #include <linux/elevator.h>
->  #include <linux/rtc.h>
-> @@ -558,25 +557,6 @@ static int mt_ioctl_trans(unsigned int fd, unsigned int cmd, void __user *argp)
->  
->  #endif /* CONFIG_BLOCK */
->  
-> -static int do_smb_getmountuid(unsigned int fd, unsigned int cmd,
-> -			compat_uid_t __user *argp)
-> -{
-> -	mm_segment_t old_fs = get_fs();
-> -	__kernel_uid_t kuid;
-> -	int err;
-> -
-> -	cmd = SMB_IOC_GETMOUNTUID;
-> -
-> -	set_fs(KERNEL_DS);
-> -	err = sys_ioctl(fd, cmd, (unsigned long)&kuid);
-> -	set_fs(old_fs);
-> -
-> -	if (err >= 0)
-> -		err = put_user(kuid, argp);
-> -
-> -	return err;
-> -}
-> -
->  /* Bluetooth ioctls */
->  #define HCIUARTSETPROTO		_IOW('U', 200, int)
->  #define HCIUARTGETPROTO		_IOR('U', 201, int)
-> @@ -1265,8 +1245,6 @@ COMPATIBLE_IOCTL(OSS_GETVERSION)
->  /* Raw devices */
->  COMPATIBLE_IOCTL(RAW_SETBIND)
->  COMPATIBLE_IOCTL(RAW_GETBIND)
-> -/* SMB ioctls which do not need any translations */
-> -COMPATIBLE_IOCTL(SMB_IOC_NEWCONN)
->  /* Watchdog */
->  COMPATIBLE_IOCTL(WDIOC_GETSUPPORT)
->  COMPATIBLE_IOCTL(WDIOC_GETSTATUS)
-> @@ -1528,10 +1506,6 @@ static long do_ioctl_trans(int fd, unsigned int cmd,
->  	case RAW_GETBIND:
->  		return raw_ioctl(fd, cmd, argp);
->  #endif
-> -	/* One SMB ioctl needs translations. */
-> -#define SMB_IOC_GETMOUNTUID_32 _IOR('u', 1, compat_uid_t)
-> -	case SMB_IOC_GETMOUNTUID_32:
-> -		return do_smb_getmountuid(fd, cmd, argp);
->  	/* Serial */
->  	case TIOCGSERIAL:
->  	case TIOCSSERIAL:
-> diff --git a/include/linux/Kbuild b/include/linux/Kbuild
-> index 626b629..98d520d 100644
-> --- a/include/linux/Kbuild
-> +++ b/include/linux/Kbuild
-> @@ -326,10 +326,6 @@ header-y += serio.h
->  header-y += shm.h
->  header-y += signal.h
->  header-y += signalfd.h
-> -header-y += smb.h
-> -header-y += smb_fs.h
-> -header-y += smb_mount.h
-> -header-y += smbno.h
->  header-y += snmp.h
->  header-y += socket.h
->  header-y += sockios.h
+> On Mon, Oct 4, 2010 at 8:18 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrot=
+e:
+> > On Mon, 4 Oct 2010 08:00:57 -0500
+> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> On Mon, Oct 4, 2010 at 7:53 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> w=
+rote:
+> >> > On Mon, 4 Oct 2010 07:52:08 -0500
+> >> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >> >
+> >> >> On Mon, Oct 4, 2010 at 6:02 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org=
+> wrote:
+> >> >> > On Wed, 29 Sep 2010 09:39:37 -0500
+> >> >> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+> >> >> >
+> >> >> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> >> >>
+> >> >> >>
+> >> >> >> Start calculation auth response within a session. =A0Move/Ad=
+d pertinet
+> >> >> >> data structures like session key, server challenge and ntlmv=
+2_hash in
+> >> >> >> a session structure. =A0We should do the calculations within=
+ a session
+> >> >> >> before copying session key and response over to server data
+> >> >> >> structures because a session setup can fail.
+> >> >> >>
+> >> >> >>
+> >> >> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail.c=
+om>
+> >> >> >> ---
+> >> >> >> =A0fs/cifs/cifsencrypt.c | =A0 16 ++++++++--------
+> >> >> >> =A0fs/cifs/cifsglob.h =A0 =A0| =A0 =A06 ++++--
+> >> >> >> =A0fs/cifs/cifssmb.c =A0 =A0 | =A0 =A04 ++--
+> >> >> >> =A0fs/cifs/connect.c =A0 =A0 | =A0 =A07 ++++---
+> >> >> >> =A0fs/cifs/sess.c =A0 =A0 =A0 =A0| =A0 17 ++++++++---------
+> >> >> >> =A05 files changed, 26 insertions(+), 24 deletions(-)
+> >> >> >>
+> >> >> >> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> >> >> >> index 7ca9c80..0dda565 100644
+> >> >> >> --- a/fs/cifs/cifsencrypt.c
+> >> >> >> +++ b/fs/cifs/cifsencrypt.c
+> >> >> >> @@ -458,7 +458,7 @@ calc_exit_1:
+> >> >> >> =A0calc_exit_2:
+> >> >> >> =A0 =A0 =A0 /* BB FIXME what about bytes 24 through 40 of th=
+e signing key?
+> >> >> >> =A0 =A0 =A0 =A0 =A0compare with the NTLM example */
+> >> >> >> - =A0 =A0 hmac_md5_final(ses->server->ntlmv2_hash, pctxt);
+> >> >> >> + =A0 =A0 hmac_md5_final(ses->ntlmv2_hash, pctxt);
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 kfree(pctxt);
+> >> >> >> =A0 =A0 =A0 return rc;
+> >> >> >> @@ -502,14 +502,14 @@ setup_ntlmv2_rsp(struct cifsSesInfo *s=
+es, char *resp_buf,
+> >> >> >> =A0 =A0 =A0 }
+> >> >> >> =A0 =A0 =A0 CalcNTLMv2_response(ses, resp_buf);
+> >> >> >>
+> >> >> >> - =A0 =A0 /* now calculate the MAC key for NTLMv2 */
+> >> >> >> - =A0 =A0 hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash,=
+ 16, &context);
+> >> >> >> + =A0 =A0 /* now calculate the session key for NTLMv2 */
+> >> >> >> + =A0 =A0 hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &co=
+ntext);
+> >> >> >> =A0 =A0 =A0 hmac_md5_update(resp_buf, 16, &context);
+> >> >> >> - =A0 =A0 hmac_md5_final(ses->server->session_key.data.ntlmv=
+2.key, &context);
+> >> >> >> + =A0 =A0 hmac_md5_final(ses->auth_key.data.ntlmv2.key, &con=
+text);
+> >> >> >>
+> >> >> >> - =A0 =A0 memcpy(&ses->server->session_key.data.ntlmv2.resp,=
+ resp_buf,
+> >> >> >> + =A0 =A0 memcpy(&ses->auth_key.data.ntlmv2.resp, resp_buf,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0sizeof(struct ntlmv2_resp));
+> >> >> >> - =A0 =A0 ses->server->session_key.len =3D 16 + sizeof(struc=
+t ntlmv2_resp);
+> >> >> >> + =A0 =A0 ses->auth_key.len =3D 16 + sizeof(struct ntlmv2_re=
+sp);
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 return 0;
+> >> >> >>
+> >> >> >> @@ -526,8 +526,8 @@ void CalcNTLMv2_response(const struct ci=
+fsSesInfo *ses,
+> >> >> >> =A0{
+> >> >> >> =A0 =A0 =A0 struct HMACMD5Context context;
+> >> >> >> =A0 =A0 =A0 /* rest of v2 struct already generated */
+> >> >> >> - =A0 =A0 memcpy(v2_session_response + 8, ses->server->crypt=
+Key, 8);
+> >> >> >> - =A0 =A0 hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash,=
+ 16, &context);
+> >> >> >> + =A0 =A0 memcpy(v2_session_response + 8, ses->cryptKey, 8);
+> >> >> >> + =A0 =A0 hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &co=
+ntext);
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 hmac_md5_update(v2_session_response+8,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sizeof(struct nt=
+lmv2_resp) - 8, &context);
+> >> >> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> >> >> >> index c265ebd..4ae331c 100644
+> >> >> >> --- a/fs/cifs/cifsglob.h
+> >> >> >> +++ b/fs/cifs/cifsglob.h
+> >> >> >> @@ -179,12 +179,10 @@ struct TCP_Server_Info {
+> >> >> >> =A0 =A0 =A0 int capabilities; /* allow selective disabling o=
+f caps by smb sess */
+> >> >> >> =A0 =A0 =A0 int timeAdj; =A0/* Adjust for difference in serv=
+er time zone in sec */
+> >> >> >> =A0 =A0 =A0 __u16 CurrentMid; =A0 =A0 =A0 =A0 /* multiplex i=
+d - rotating counter */
+> >> >> >> - =A0 =A0 char cryptKey[CIFS_CRYPTO_KEY_SIZE];
+> >> >> >> =A0 =A0 =A0 /* 16th byte of RFC1001 workstation name is alwa=
+ys null */
+> >> >> >> =A0 =A0 =A0 char workstation_RFC1001_name[RFC1001_NAME_LEN_W=
+ITH_NULL];
+> >> >> >> =A0 =A0 =A0 __u32 sequence_number; /* needed for CIFS PDU si=
+gnature */
+> >> >> >> =A0 =A0 =A0 struct session_key session_key;
+> >> >> >> - =A0 =A0 char ntlmv2_hash[16];
+> >> >> >> =A0 =A0 =A0 unsigned long lstrp; /* when we got last respons=
+e from this server */
+> >> >> >> =A0 =A0 =A0 u16 dialect; /* dialect index that server chose =
+*/
+> >> >> >> =A0 =A0 =A0 /* extended security flavors that server support=
+s */
+> >> >> >> @@ -192,6 +190,7 @@ struct TCP_Server_Info {
+> >> >> >> =A0 =A0 =A0 bool =A0 =A0sec_mskerberos; =A0 =A0 =A0 =A0 /* s=
+upports legacy MS Kerberos */
+> >> >> >> =A0 =A0 =A0 bool =A0 =A0sec_kerberosu2u; =A0 =A0 =A0 =A0/* s=
+upports U2U Kerberos */
+> >> >> >> =A0 =A0 =A0 bool =A0 =A0sec_ntlmssp; =A0 =A0 =A0 =A0 =A0 =A0=
+/* supports NTLMSSP */
+> >> >> >> + =A0 =A0 bool session_estab; /* mark when very first sess i=
+s established */
+> >> >> >> =A0#ifdef CONFIG_CIFS_FSCACHE
+> >> >> >> =A0 =A0 =A0 struct fscache_cookie =A0 *fscache; /* client in=
+dex cache cookie */
+> >> >> >> =A0#endif
+> >> >> >> @@ -223,6 +222,9 @@ struct cifsSesInfo {
+> >> >> >> =A0 =A0 =A0 char userName[MAX_USERNAME_SIZE + 1];
+> >> >> >> =A0 =A0 =A0 char *domainName;
+> >> >> >> =A0 =A0 =A0 char *password;
+> >> >> >> + =A0 =A0 char cryptKey[CIFS_CRYPTO_KEY_SIZE];
+> >> >> >> + =A0 =A0 struct session_key auth_key;
+> >> >> >> + =A0 =A0 char ntlmv2_hash[16];
+> >> >> >> =A0 =A0 =A0 unsigned int tilen; /* length of the target info=
+ blob */
+> >> >> >> =A0 =A0 =A0 unsigned char *tiblob; /* target info blob in ch=
+allenge response */
+> >> >> >> =A0 =A0 =A0 bool need_reconnect:1; /* connection reset, uid =
+now invalid */
+> >> >> >> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> >> >> >> index 13c854e..0dbc51c 100644
+> >> >> >> --- a/fs/cifs/cifssmb.c
+> >> >> >> +++ b/fs/cifs/cifssmb.c
+> >> >> >> @@ -486,7 +486,7 @@ CIFSSMBNegotiate(unsigned int xid, struc=
+t cifsSesInfo *ses)
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rsp->EncryptionKeyLength =3D=
+=3D
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(server->cry=
+ptKey, rsp->EncryptionKey,
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ses->cryptK=
+ey, rsp->EncryptionKey,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+CIFS_CRYPTO_KEY_SIZE);
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else if (server->secMode & SEC=
+MODE_PW_ENCRYPT) {
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO; /* =
+need cryptkey unless plain text */
+> >> >> >> @@ -557,7 +557,7 @@ CIFSSMBNegotiate(unsigned int xid, struc=
+t cifsSesInfo *ses)
+> >> >> >> =A0 =A0 =A0 server->timeAdj =3D (int)(__s16)le16_to_cpu(pSMB=
+r->ServerTimeZone);
+> >> >> >> =A0 =A0 =A0 server->timeAdj *=3D 60;
+> >> >> >> =A0 =A0 =A0 if (pSMBr->EncryptionKeyLength =3D=3D CIFS_CRYPT=
+O_KEY_SIZE) {
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 memcpy(server->cryptKey, pSMBr->u.=
+EncryptionKey,
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ses->cryptKey, pSMBr->u.Enc=
+ryptionKey,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_CRYPTO_KEY_S=
+IZE);
+> >> >> >> =A0 =A0 =A0 } else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 && (pSMBr->Encry=
+ptionKeyLength =3D=3D 0)) {
+> >> >> >> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> >> >> >> index f6a3091..12a6e20 100644
+> >> >> >> --- a/fs/cifs/connect.c
+> >> >> >> +++ b/fs/cifs/connect.c
+> >> >> >> @@ -200,6 +200,7 @@ cifs_reconnect(struct TCP_Server_Info *s=
+erver)
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpS=
+tatus !=3D CifsExiting)
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+server->tcpStatus =3D CifsGood;
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->sequence=
+_number =3D 0;
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->session_es=
+tab =3D false;
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&Glo=
+balMid_Lock);
+> >> >> >> =A0 =A0 =A0 /* =A0 =A0 =A0 =A0 =A0 =A0 =A0atomic_set(&server=
+->inFlight,0);*/
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&server-=
+>response_q);
+> >> >> >> @@ -1616,6 +1617,7 @@ cifs_get_tcp_session(struct smb_vol *v=
+olume_info)
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 volume_info->source_rfc1001_name=
+, RFC1001_NAME_LEN_WITH_NULL);
+> >> >> >> =A0 =A0 =A0 memcpy(tcp_ses->server_RFC1001_name,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 volume_info->target_rfc1001_name=
+, RFC1001_NAME_LEN_WITH_NULL);
+> >> >> >> + =A0 =A0 tcp_ses->session_estab =3D false;
+> >> >> >> =A0 =A0 =A0 tcp_ses->sequence_number =3D 0;
+> >> >> >> =A0 =A0 =A0 INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+> >> >> >> =A0 =A0 =A0 INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
+> >> >> >> @@ -2914,14 +2916,13 @@ CIFSTCon(unsigned int xid, struct ci=
+fsSesInfo *ses,
+> >> >> >> =A0#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((global_secflags & CIFSSEC_M=
+AY_LANMAN) &&
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (ses->server->secType =3D=
+=3D LANMAN))
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 calc_lanman_hash(t=
+con->password, ses->server->cryptKey,
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 calc_lanman_hash(t=
+con->password, ses->cryptKey,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0ses->server->secMode &
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 SECMODE_PW_ENCRYPT ? true : false,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0bcc_ptr);
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> >> >> >> =A0#endif /* CIFS_WEAK_PW_HASH */
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 SMBNTencrypt(tcon->password, ses->=
+server->cryptKey,
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bcc_ptr=
+);
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 SMBNTencrypt(tcon->password, ses->=
+cryptKey, bcc_ptr);
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 bcc_ptr +=3D CIFS_SESS_KEY_SIZE;
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->capabilities & CAP_UNIC=
+ODE) {
+> >> >> >> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> >> >> >> index 9148fd8..d632331 100644
+> >> >> >> --- a/fs/cifs/sess.c
+> >> >> >> +++ b/fs/cifs/sess.c
+> >> >> >> @@ -402,7 +402,7 @@ static int decode_ntlmssp_challenge(char=
+ *bcc_ptr, int blob_len,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
+> >> >> >> =A0 =A0 =A0 }
+> >> >> >>
+> >> >> >> - =A0 =A0 memcpy(ses->server->cryptKey, pblob->Challenge, CI=
+=46S_CRYPTO_KEY_SIZE);
+> >> >> >> + =A0 =A0 memcpy(ses->cryptKey, pblob->Challenge, CIFS_CRYPT=
+O_KEY_SIZE);
+> >> >> >> =A0 =A0 =A0 /* BB we could decode pblob->NegotiateFlags; som=
+e may be useful */
+> >> >> >> =A0 =A0 =A0 /* In particular we can examine sign flags */
+> >> >> >> =A0 =A0 =A0 /* BB spec says that if AvId field of MsvAvTimes=
+tamp is populated then
+> >> >> >> @@ -672,7 +672,7 @@ ssetup_ntlmssp_authenticate:
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* BB calculate hash with passwo=
+rd */
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* and copy into bcc */
+> >> >> >>
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 calc_lanman_hash(ses->password, se=
+s->server->cryptKey,
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 calc_lanman_hash(ses->password, se=
+s->cryptKey,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0ses->server->secMode & SECMODE_PW_ENCRYPT ?
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 true : false, lnm_session_key);
+> >> >> >>
+> >> >> >> @@ -699,12 +699,11 @@ ssetup_ntlmssp_authenticate:
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cpu_to_le16(CIFS=
+_SESS_KEY_SIZE);
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* calculate session key */
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 SMBNTencrypt(ses->password, ses->s=
+erver->cryptKey,
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ntlm_se=
+ssion_key);
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 SMBNTencrypt(ses->password, ses->c=
+ryptKey, ntlm_session_key);
+> >> >> >>
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (first_time) /* should this b=
+e moved into common code
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ with similar ntlmv2 path? */
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_calculate_ses=
+sion_key(&ses->server->session_key,
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0with similar ntlmv2 path? */
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_calculate_ses=
+sion_key(&ses->auth_key,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+ntlm_session_key, ses->password);
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* copy session key */
+> >> >> >>
+> >> >> >> @@ -794,15 +793,15 @@ ssetup_ntlmssp_authenticate:
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* bail out if key is too long *=
+/
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (msg->sesskey_len >
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sizeof(ses->server->sessio=
+n_key.data.krb5)) {
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sizeof(ses->auth_key.data.=
+krb5)) {
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "Kerbe=
+ros signing key too long (%u bytes)",
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+msg->sesskey_len);
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EOVERFLO=
+W;
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto ssetup_exit=
+;
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (first_time) {
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->server->sessi=
+on_key.len =3D msg->sesskey_len;
+> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ses->server=
+->session_key.data.krb5,
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->auth_key.len =
+=3D msg->sesskey_len;
+> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ses->auth_k=
+ey.data.krb5,
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+msg->data, msg->sesskey_len);
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->req.hdr.Flags2 |=3D SMBFLG=
+2_EXT_SEC;
+> >> >> >
+> >> >> > Ok, so basically this moves all of the session key data struc=
+tures from
+> >> >> > the server to session. Once you calculate the key however and=
+ have a
+> >> >> > successful session setup, don't you need to copy that key fro=
+m the
+> >> >> > session to the server? Where does that happen?
+> >> >> >
+> >> >> > --
+> >> >> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >> >> >
+> >> >>
+> >> >> Jeff, that code is in 5/7 patch.
+> >> >
+> >> > Ok, so to be clear this patchset is "all or nothing"? If you app=
+ly just
+> >> > part of them, you'll have a broken tree?
+> >> >
+> >> > --
+> >> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >> >
+> >>
+> >> Jeff, yes. There are are ifs and buts, but overall answer is, yes,
+> >> "all or nothing"
+> >
+> > That makes this far more difficult and time consuming to review tha=
+n a
+> > series of discrete changes that leave the tree in a non-broken stat=
+e.
+> > I'll try to get to it when I'm able.
+> >
+> > --
+> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >
+>=20
+> Now that I think about them more, only patches 3/7 and 5/7 are increm=
+ental and
+> qualify for non-discrete.
+> I could combine 3/7 and5/7 together to make 3/6.  I was trying to kee=
+p
+> the patches
+> smaller wherever I could.
 
-Funny, I've recently been toying with the idea of resurrecting smbfs
-and updating its transport layer. That said, staging is certainly
-appropriate at this point.
+Small patches are easier to review, but that benefit is generally lost
+when they aren't bisectable. If I have to look at multiple files to
+tell whether the patch does what it says it's going to, then there's no
+benefit to breaking it up.
 
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Change one thing at a time and strive to keep everything working after
+your patch is applied. Each patch should have a clear goal in mind and
+that should be stated in the patch description. This is preferred even
+if you're changing the same bit of code over and over again.
+
+--=20
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
