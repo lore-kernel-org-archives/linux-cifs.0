@@ -1,56 +1,86 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 10/14] cifs: convert GlobalSMBSeslock from a rwlock to
- regular spinlock
-Date: Tue, 5 Oct 2010 06:58:42 -0400
-Message-ID: <20101005065842.41124df3@tlielax.poochiereds.net>
-References: <1286214781-626-1-git-send-email-jlayton@redhat.com>
-	<1286214781-626-11-git-send-email-jlayton@redhat.com>
-	<4CAAFE45.6070803@suse.de>
+From: david.kondrad-9WVPih6vfS2cqzYg7KEe8g@public.gmane.org
+Subject: deadlock in cifs mounts when server connection goes down
+Date: Tue, 5 Oct 2010 15:18:29 -0400
+Message-ID: <OFBD4F0D26.5B603757-ON852577B3.00696669-852577B3.006A1040@grpleg.it>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Content-Type: text/plain;
+	charset="US-ASCII"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CAAFE45.6070803-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 05 Oct 2010 16:00:29 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> On 10/04/2010 11:22 PM, Jeff Layton wrote:
-> > To prevent races we need to be able to do an atomic_dec_and_lock with
-> > it, and that won't work with a rwlock.
-> 
-> It's not clear to me where a potential race window is. Could you please
-> elaborate?
-> 
-> 
-> Thanks,
-> 
+Greetings:
 
-The specific race window that I was thinking about doesn't exist today
-as such, but that's just because the way that filehandles are managed
-is so different.
+We have a product that uses cifs mounts to catalog digital music on
+cifs/smb shares on our user's network. We have noticed that while
+cataloging, if a computer leaves the network while the share is
+mounted, any processes that attempt access while be held in the 'D'
+state (which is expected); however, there doesn't appear to be any
+time-out to give up trying to reconnect to the missing server.
 
-When we do refcounting with atomic_t's though we need to take care that
-we don't act on them without taking steps to prevent races. For
-instance, suppose I had left the code using an rwlock_t and did this in
-cifsFileInfo_put:
+Upon examining the source, I believe the issue is in this loop in
+fs/cifs/connect.c:186 (inside cifs_reconnect() proc)
 
-if (atomic_dec_and_test(&open_file->count))
-	return;
-write_lock(&GlobalSMBSeslock)
+   while ((server->tcpStatus != CifsExiting) &&
+          (server->tcpStatus != CifsGood)) {
+      try_to_freeze();
+      if (server->addr.sockAddr6.sin6_family == AF_INET6)
+         rc = ipv6_connect(server);
+      else
+         rc = ipv4_connect(server);
+      if (rc) {
+         cFYI(1, "reconnect error %d", rc);
+         msleep(3000);
+      } else {
+         atomic_inc(&tcpSesReconnectCount);
+         spin_lock(&GlobalMid_Lock);
+         if (server->tcpStatus != CifsExiting)
+            server->tcpStatus = CifsGood;
+         server->sequence_number = 0;
+         spin_unlock(&GlobalMid_Lock);
+   /*    atomic_set(&server->inFlight,0);*/
+         wake_up(&server->response_q);
+      }
+   }
 
-...and then tear down the cifsFileInfo. There would always be a
-possibility that the count increased after I checked it but before
-taking the lock, which could result in a use-after-free.
+It looks like if the server leaves the network, this loop will never
+exit because the loop condition never becomes false.
 
-Now that I think about this though...it might be better to just make the
-count non-atomic, and simply move it under the protection of the lock.
-You generally need the lock anyway when you're searching for a file so
-there's little benefit to using an atomic here.
+While I was looking at the callers of cifs_reconnect, I also noticed
+that the return code is consistently ignored which points to the
+assumption that cifs_reconnect() only returns when the connection is
+again viable.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+At first glance, the most direct route would be to add a retry counter
+to the loop and then exit out if not successful within (user
+configurable?) attempts; however, I am not familiar enough with the
+cifs code-base to anticipate any regressions that might result from
+that.
+
+Any thoughts/comments/suggestions on supplying a fail-safe break out
+of this loop? I'm guessing if we can't reconnect then we should treat
+this connection as unmounted and fail out of any syscalls, right?
+
+Best regards,
+David
+
+--
+David Kondrad
+Software Design Engineer
+Home Systems Division
+Legrand, North America
+
+david.kondrad-9WVPih6vfS2cqzYg7KEe8g@public.gmane.org
+www.legrand.us/onq
+
+PS: I have no control over the forced footer appended to my emails
+
+This email, and any document attached hereto, may contain
+confidential and/or privileged information.  If you are not the
+intended recipient (or have received this email in error) please
+notify the sender immediately and destroy this email.  Any
+unauthorized, direct or indirect, copying, disclosure, distribution
+or other use of the material or parts thereof is strictly
+forbidden.
