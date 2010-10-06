@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/15] cifs: convert cifsFileInfo->count to non-atomic counter
-Date: Wed,  6 Oct 2010 15:54:15 -0400
-Message-ID: <1286394857-32541-14-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 04/15] cifs: eliminate oflags option from cifs_new_fileinfo
+Date: Wed,  6 Oct 2010 15:54:06 -0400
+Message-ID: <1286394857-32541-5-git-send-email-jlayton@redhat.com>
 References: <1286394857-32541-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,90 +10,104 @@ In-Reply-To: <1286394857-32541-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The count for cifsFileInfo is currently an atomic, but that just adds
-complexity for little value. We generally need to hold cifs_file_list_lock
-to traverse the lists anyway so we might as well make this counter
-non-atomic and simply use the cifs_file_list_lock to protect it.
+Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
+The callers mostly pass in the filp->f_flags here, except for one place
+that passes in the flags after they've been converted to their SMB_O_*
+equivalents.
+
+None of these are correct however since we're checking that value for
+the presence of FMODE_READ. Luckily that only affects how the f_list is
+ordered.
+
+What we really want here is the file->f_mode. Since we pass in a file
+pointer already anyway, just use the f_mode there for this purpose.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    9 ++++++---
- fs/cifs/file.c     |    8 +++++---
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ fs/cifs/cifsproto.h |    3 +--
+ fs/cifs/dir.c       |    9 ++++-----
+ fs/cifs/file.c      |    5 ++---
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 531a768..f3c4e00 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -393,16 +393,19 @@ struct cifsFileInfo {
- 	struct list_head llist; /* list of byte range locks we have. */
- 	bool invalidHandle:1;	/* file closed via session abend */
- 	bool oplock_break_cancelled:1;
--	atomic_t count;		/* reference count */
-+	int count;		/* refcount -- protected by cifs_file_list_lock */
- 	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
- 	struct cifs_search_info srch_inf;
- 	struct work_struct oplock_break; /* work for oplock breaks */
- };
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 7f416ab..bed004c 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -107,8 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
  
--/* Take a reference on the file private data */
-+/*
-+ * Take a reference on the file private data. Must be called with
-+ * cifs_file_list_lock held for read or write.
-+ */
- static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+ extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
+ 				__u16 fileHandle, struct file *file,
+-				struct tcon_link *tlink,
+-				unsigned int oflags, __u32 oplock);
++				struct tcon_link *tlink, __u32 oplock);
+ extern int cifs_posix_open(char *full_path, struct inode **pinode,
+ 				struct super_block *sb,
+ 				int mode, int oflags,
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index c205ec9..b399e5b 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -132,7 +132,7 @@ cifs_bp_rename_retry:
+ 
+ struct cifsFileInfo *
+ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+-		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
++		  struct tcon_link *tlink, __u32 oplock)
  {
--	atomic_inc(&cifs_file->count);
-+	++cifs_file->count;
- }
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	struct cifsFileInfo *pCifsFile;
+@@ -161,7 +161,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 	pCifsInode = CIFS_I(newinode);
+ 	if (pCifsInode) {
+ 		/* if readable file instance put first in list*/
+-		if (oflags & FMODE_READ)
++		if (file->f_mode & FMODE_READ)
+ 			list_add(&pCifsFile->flist, &pCifsInode->openFileList);
+ 		else
+ 			list_add_tail(&pCifsFile->flist,
+@@ -483,7 +483,7 @@ cifs_create_set_dentry:
+ 		}
  
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+ 		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
+-						tlink, oflags, oplock);
++						tlink, oplock);
+ 		if (pfile_info == NULL) {
+ 			fput(filp);
+ 			CIFSSMBClose(xid, tcon, fileHandle);
+@@ -757,8 +757,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 			}
+ 
+ 			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
+-						  tlink, nd->intent.open.flags,
+-						  oplock);
++						  tlink, oplock);
+ 			if (cfile == NULL) {
+ 				fput(filp);
+ 				CIFSSMBClose(xid, pTcon, fileHandle);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 157ab9d..3a917be 100644
+index c10f085..e863d80 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -172,6 +172,7 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	if (pCifsFile == NULL)
- 		return pCifsFile;
+@@ -215,7 +215,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			cFYI(1, "posix open succeeded");
  
-+	pCifsFile->count = 1;
- 	pCifsFile->netfid = fileHandle;
- 	pCifsFile->pid = current->tgid;
- 	pCifsFile->uid = current_fsuid();
-@@ -182,7 +183,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	mutex_init(&pCifsFile->fh_mutex);
- 	mutex_init(&pCifsFile->lock_mutex);
- 	INIT_LIST_HEAD(&pCifsFile->llist);
--	atomic_set(&pCifsFile->count, 1);
- 	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
+ 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+-							tlink, oflags, oplock);
++							tlink, oplock);
+ 			if (pCifsFile == NULL) {
+ 				CIFSSMBClose(xid, tcon, netfid);
+ 				rc = -ENOMEM;
+@@ -307,8 +307,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	if (rc != 0)
+ 		goto out;
  
- 	write_lock(&cifs_file_list_lock);
-@@ -208,7 +208,8 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 
- /*
-  * Release a reference on the file private data. This may involve closing
-- * the filehandle out on the server.
-+ * the filehandle out on the server. Must be called without holding
-+ * cifs_file_list_lock.
-  */
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- {
-@@ -217,7 +218,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- 	struct cifsLockInfo *li, *tmp;
- 
- 	write_lock(&cifs_file_list_lock);
--	if (!atomic_dec_and_test(&cifs_file_list_lock)) {
-+	if (--cifs_file->count > 0) {
- 		write_unlock(&cifs_file_list_lock);
- 		return;
- 	}
-@@ -2259,6 +2260,7 @@ void cifs_oplock_break(struct work_struct *work)
- 	cifs_oplock_break_put(cfile);
- }
- 
-+/* must be called while holding cifs_file_list_lock for read or write */
- void cifs_oplock_break_get(struct cifsFileInfo *cfile)
- {
- 	cifs_sb_active(cfile->dentry->d_sb);
+-	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink,
+-					file->f_flags, oplock);
++	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
+ 	if (pCifsFile == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
 -- 
 1.7.2.3
