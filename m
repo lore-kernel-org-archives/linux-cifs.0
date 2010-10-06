@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 07/15] cifs: cifs_write argument change and cleanup
-Date: Wed,  6 Oct 2010 15:54:09 -0400
-Message-ID: <1286394857-32541-8-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 15/15] cifs: eliminate cifsInodeInfo->write_behind_rc
+Date: Wed,  6 Oct 2010 15:54:17 -0400
+Message-ID: <1286394857-32541-16-git-send-email-jlayton@redhat.com>
 References: <1286394857-32541-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,118 +10,176 @@ In-Reply-To: <1286394857-32541-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have cifs_write take a cifsFileInfo pointer instead of a filp. Since
-cifsFileInfo holds references on the dentry, and that holds one to
-the inode, we can eliminate some unneeded NULL pointer checks.
+write_behind_rc is redundant and just adds complexity to the code. What
+we really want to do instead is to use mapping_set_error to reset the
+flags on the mapping when we find a writeback error and can't report it
+to userspace yet.
+
+For cifs_flush and cifs_fsync, we shouldn't reset the flags since errors
+returned there do get reported to userspace.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/file.c |   51 +++++++++++++++++----------------------------------
- 1 files changed, 17 insertions(+), 34 deletions(-)
+ fs/cifs/cifsfs.c   |    1 -
+ fs/cifs/cifsglob.h |    1 -
+ fs/cifs/file.c     |   34 ++++++++--------------------------
+ fs/cifs/inode.c    |   15 +++++----------
+ 4 files changed, 13 insertions(+), 38 deletions(-)
 
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5097179..98ed26c 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -320,7 +320,6 @@ cifs_alloc_inode(struct super_block *sb)
+ 		return NULL;
+ 	cifs_inode->cifsAttrs = 0x20;	/* default */
+ 	cifs_inode->time = 0;
+-	cifs_inode->write_behind_rc = 0;
+ 	/* Until the file is open and we have gotten oplock
+ 	info back from the server, can not assume caching of
+ 	file data or metadata */
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f3c4e00..35a6de9 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -418,7 +418,6 @@ struct cifsInodeInfo {
+ 	struct list_head lockList;
+ 	/* BB add in lists for dirty pages i.e. write caching info for oplock */
+ 	struct list_head openFileList;
+-	int write_behind_rc;
+ 	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
+ 	unsigned long time;	/* jiffies of last update/check of inode */
+ 	bool clientCanCacheRead:1;	/* read oplock */
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index db38547..57fbfad 100644
+index 74f1864..65c9120 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -963,8 +963,9 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 	return total_written;
- }
+@@ -133,8 +133,7 @@ static inline int cifs_open_inode_helper(struct inode *inode,
+ 			/* BB no need to lock inode until after invalidate
+ 			since namei code should already have it locked? */
+ 			rc = filemap_write_and_wait(inode->i_mapping);
+-			if (rc != 0)
+-				pCifsInode->write_behind_rc = rc;
++			mapping_set_error(inode->i_mapping, rc);
+ 		}
+ 		cFYI(1, "invalidating remote inode since open detected it "
+ 			 "changed");
+@@ -543,8 +542,7 @@ reopen_success:
  
--static ssize_t cifs_write(struct file *file, const char *write_data,
--			  size_t write_size, loff_t *poffset)
-+static ssize_t cifs_write(struct cifsFileInfo *open_file,
-+			  const char *write_data, size_t write_size,
-+			  loff_t *poffset)
- {
- 	int rc = 0;
- 	unsigned int bytes_written = 0;
-@@ -972,17 +973,14 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsTconInfo *pTcon;
- 	int xid, long_op;
--	struct cifsFileInfo *open_file;
--	struct cifsInodeInfo *cifsi = CIFS_I(file->f_path.dentry->d_inode);
-+	struct dentry *dentry = open_file->dentry;
-+	struct cifsInodeInfo *cifsi = CIFS_I(dentry->d_inode);
+ 	if (can_flush) {
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+-		if (rc != 0)
+-			CIFS_I(inode)->write_behind_rc = rc;
++		mapping_set_error(inode->i_mapping, rc);
  
--	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
-+	cifs_sb = CIFS_SB(dentry->d_sb);
+ 		pCifsInode->clientCanCacheAll = false;
+ 		pCifsInode->clientCanCacheRead = false;
+@@ -1426,12 +1424,7 @@ retry:
+ 			if (rc || bytes_written < bytes_to_write) {
+ 				cERROR(1, "Write2 ret %d, wrote %d",
+ 					  rc, bytes_written);
+-				/* BB what if continued retry is
+-				   requested via mount flags? */
+-				if (rc == -ENOSPC)
+-					set_bit(AS_ENOSPC, &mapping->flags);
+-				else
+-					set_bit(AS_EIO, &mapping->flags);
++				mapping_set_error(mapping, rc);
+ 			} else {
+ 				cifs_stats_bytes_written(tcon, bytes_written);
+ 			}
+@@ -1576,10 +1569,8 @@ int cifs_fsync(struct file *file, int datasync)
  
- 	cFYI(1, "write %zd bytes to offset %lld of %s", write_size,
--	   *poffset, file->f_path.dentry->d_name.name);
-+	   *poffset, dentry->d_name.name);
- 
--	if (file->private_data == NULL)
--		return -EBADF;
--	open_file = file->private_data;
- 	pTcon = tlink_tcon(open_file->tlink);
- 
- 	xid = GetXid();
-@@ -992,15 +990,6 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- 	     total_written += bytes_written) {
- 		rc = -EAGAIN;
- 		while (rc == -EAGAIN) {
--			if (file->private_data == NULL) {
--				/* file has been closed on us */
--				FreeXid(xid);
--			/* if we have gotten here we have written some data
--			   and blocked, and the file has been freed on us
--			   while we blocked so return what we managed to
--			   write */
--				return total_written;
--			}
- 			if (open_file->closePend) {
- 				FreeXid(xid);
- 				if (total_written)
-@@ -1060,20 +1049,13 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
- 
- 	cifs_stats_bytes_written(pTcon, total_written);
- 
--	/* since the write may have blocked check these pointers again */
--	if ((file->f_path.dentry) && (file->f_path.dentry->d_inode)) {
--/*BB We could make this contingent on superblock ATIME flag too */
--/*		file->f_path.dentry->d_inode->i_ctime =
--		file->f_path.dentry->d_inode->i_mtime = CURRENT_TIME;*/
--		if (total_written > 0) {
--			spin_lock(&file->f_path.dentry->d_inode->i_lock);
--			if (*poffset > file->f_path.dentry->d_inode->i_size)
--				i_size_write(file->f_path.dentry->d_inode,
--					     *poffset);
--			spin_unlock(&file->f_path.dentry->d_inode->i_lock);
--		}
--		mark_inode_dirty_sync(file->f_path.dentry->d_inode);
-+	if (total_written > 0) {
-+		spin_lock(&dentry->d_inode->i_lock);
-+		if (*poffset > dentry->d_inode->i_size)
-+			i_size_write(dentry->d_inode, *poffset);
-+		spin_unlock(&dentry->d_inode->i_lock);
+ 	rc = filemap_write_and_wait(inode->i_mapping);
+ 	if (rc == 0) {
+-		rc = CIFS_I(inode)->write_behind_rc;
+-		CIFS_I(inode)->write_behind_rc = 0;
+ 		tcon = tlink_tcon(smbfile->tlink);
+-		if (!rc && tcon && smbfile &&
++		if (rc == 0 &&
+ 		   !(CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+ 			rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
  	}
-+	mark_inode_dirty_sync(dentry->d_inode);
- 	FreeXid(xid);
- 	return total_written;
- }
-@@ -1244,8 +1226,8 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+@@ -1625,14 +1616,8 @@ int cifs_flush(struct file *file, fl_owner_t id)
+ 	struct inode *inode = file->f_path.dentry->d_inode;
+ 	int rc = 0;
  
- 	open_file = find_writable_file(CIFS_I(mapping->host), false);
- 	if (open_file) {
--		bytes_written = cifs_write(open_file->pfile, write_data,
--					   to-from, &offset);
-+		bytes_written = cifs_write(open_file, write_data,
-+					   to - from, &offset);
- 		cifsFileInfo_put(open_file);
- 		/* Does mm or vfs already set times? */
- 		inode->i_atime = inode->i_mtime = current_fs_time(inode->i_sb);
-@@ -1560,7 +1542,8 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- 		/* BB check if anything else missing out of ppw
- 		   such as updating last write time */
- 		page_data = kmap(page);
--		rc = cifs_write(file, page_data + offset, copied, &pos);
-+		rc = cifs_write(file->private_data, page_data + offset,
-+				copied, &pos);
- 		/* if (rc < 0) should we set writebehind rc? */
- 		kunmap(page);
+-	if (file->f_mode & FMODE_WRITE) {
++	if (file->f_mode & FMODE_WRITE)
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+-		/* reset wb rc if we were able to write out dirty pages */
+-		if (!rc) {
+-			rc = CIFS_I(inode)->write_behind_rc;
+-			CIFS_I(inode)->write_behind_rc = 0;
+-		}
+-	}
  
+ 	cFYI(1, "Flush inode %p file %p rc %d", inode, file, rc);
+ 
+@@ -2211,7 +2196,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 						  oplock_break);
+ 	struct inode *inode = cfile->dentry->d_inode;
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+-	int rc, waitrc = 0;
++	int rc = 0;
+ 
+ 	if (inode && S_ISREG(inode->i_mode)) {
+ 		if (cinode->clientCanCacheRead)
+@@ -2220,13 +2205,10 @@ void cifs_oplock_break(struct work_struct *work)
+ 			break_lease(inode, O_WRONLY);
+ 		rc = filemap_fdatawrite(inode->i_mapping);
+ 		if (cinode->clientCanCacheRead == 0) {
+-			waitrc = filemap_fdatawait(inode->i_mapping);
++			rc = filemap_fdatawait(inode->i_mapping);
++			mapping_set_error(inode->i_mapping, rc);
+ 			invalidate_remote_inode(inode);
+ 		}
+-		if (!rc)
+-			rc = waitrc;
+-		if (rc)
+-			cinode->write_behind_rc = rc;
+ 		cFYI(1, "Oplock flush inode %p rc %d", inode, rc);
+ 	}
+ 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index d6db805..c6aa014 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1688,8 +1688,7 @@ cifs_invalidate_mapping(struct inode *inode)
+ 	/* write back any cached data */
+ 	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+-		if (rc)
+-			cifs_i->write_behind_rc = rc;
++		mapping_set_error(inode->i_mapping, rc);
+ 	}
+ 	invalidate_remote_inode(inode);
+ 	cifs_fscache_reset_inode_cookie(inode);
+@@ -1941,10 +1940,8 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+ 	 * the flush returns error?
+ 	 */
+ 	rc = filemap_write_and_wait(inode->i_mapping);
+-	if (rc != 0) {
+-		cifsInode->write_behind_rc = rc;
+-		rc = 0;
+-	}
++	mapping_set_error(inode->i_mapping, rc);
++	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
+ 		rc = cifs_set_file_size(inode, attrs, xid, full_path);
+@@ -2085,10 +2082,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	 * the flush returns error?
+ 	 */
+ 	rc = filemap_write_and_wait(inode->i_mapping);
+-	if (rc != 0) {
+-		cifsInode->write_behind_rc = rc;
+-		rc = 0;
+-	}
++	mapping_set_error(inode->i_mapping, rc);
++	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
+ 		rc = cifs_set_file_size(inode, attrs, xid, full_path);
 -- 
 1.7.2.3
