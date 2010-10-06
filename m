@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 11/15] cifs: move cifsFileInfo_put to file.c
-Date: Wed,  6 Oct 2010 15:54:13 -0400
-Message-ID: <1286394857-32541-12-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 08/15] cifs: eliminate pfile pointer from cifsFileInfo
+Date: Wed,  6 Oct 2010 15:54:10 -0400
+Message-ID: <1286394857-32541-9-git-send-email-jlayton@redhat.com>
 References: <1286394857-32541-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,56 +10,79 @@ In-Reply-To: <1286394857-32541-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...and make it non-inlined in preparation for the move of most of
-cifs_close to it.
+All the remaining users of cifsFileInfo->pfile just use it to get
+at the f_flags/f_mode. Now that we store that separately in the
+cifsFileInfo, there's no need to consult the pfile at all from
+a cifsFileInfo pointer.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |   10 +---------
- fs/cifs/file.c     |   10 ++++++++++
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ fs/cifs/cifsglob.h |    1 -
+ fs/cifs/dir.c      |    1 -
+ fs/cifs/file.c     |   11 +++--------
+ 3 files changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 1959d92..bd57fd7 100644
+index d0ced6e..7e2503f 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -406,15 +406,7 @@ static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
- 	atomic_inc(&cifs_file->count);
- }
- 
--/* Release a reference on the file private data */
--static inline void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
--{
--	if (atomic_dec_and_test(&cifs_file->count)) {
--		cifs_put_tlink(cifs_file->tlink);
--		dput(cifs_file->dentry);
--		kfree(cifs_file);
--	}
--}
-+void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
- 
- /*
-  * One of these for each file inode
+@@ -386,7 +386,6 @@ struct cifsFileInfo {
+ 	__u16 netfid;		/* file id from remote */
+ 	/* BB add lock scope info here if needed */ ;
+ 	/* lock scope id (0 if none) */
+-	struct file *pfile; /* needed for writepage */
+ 	struct dentry *dentry;
+ 	unsigned int f_flags;
+ 	struct tcon_link *tlink;
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index fc872c4..5dc8eed 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -148,7 +148,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	pCifsFile->uid = current_fsuid();
+ 	pCifsFile->dentry = dget(dentry);
+ 	pCifsFile->f_flags = file->f_flags;
+-	pCifsFile->pfile = file;
+ 	pCifsFile->invalidHandle = false;
+ 	pCifsFile->closePend = false;
+ 	pCifsFile->tlink = cifs_get_tlink(tlink);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index faabcd4..60602e5 100644
+index 57fbfad..83e16d6 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -207,6 +207,16 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	return pCifsFile;
- }
+@@ -1080,8 +1080,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ 			continue;
+ 		if (fsuid_only && open_file->uid != current_fsuid())
+ 			continue;
+-		if (open_file->pfile && ((open_file->pfile->f_flags & O_RDWR) ||
+-		    (open_file->pfile->f_flags & O_RDONLY))) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_READ) {
+ 			if (!open_file->invalidHandle) {
+ 				/* found a good file */
+ 				/* lock it so it will not be closed on us */
+@@ -1130,9 +1129,7 @@ refind_writable:
+ 			continue;
+ 		if (fsuid_only && open_file->uid != current_fsuid())
+ 			continue;
+-		if (open_file->pfile &&
+-		    ((open_file->pfile->f_flags & O_RDWR) ||
+-		     (open_file->pfile->f_flags & O_WRONLY))) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+ 			cifsFileInfo_get(open_file);
  
-+/* Release a reference on the file private data */
-+void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
-+{
-+	if (atomic_dec_and_test(&cifs_file->count)) {
-+		cifs_put_tlink(cifs_file->tlink);
-+		dput(cifs_file->dentry);
-+		kfree(cifs_file);
-+	}
-+}
-+
- int cifs_open(struct inode *inode, struct file *file)
- {
- 	int rc = -EACCES;
+ 			if (!open_file->invalidHandle) {
+@@ -2096,9 +2093,7 @@ static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
+ 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
+ 		if (open_file->closePend)
+ 			continue;
+-		if (open_file->pfile &&
+-		    ((open_file->pfile->f_flags & O_RDWR) ||
+-		     (open_file->pfile->f_flags & O_WRONLY))) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+ 			read_unlock(&GlobalSMBSeslock);
+ 			return 1;
+ 		}
 -- 
 1.7.2.3
