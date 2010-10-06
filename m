@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/15] cifs: eliminate pfile pointer from cifsFileInfo
-Date: Wed,  6 Oct 2010 15:54:10 -0400
-Message-ID: <1286394857-32541-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 07/15] cifs: cifs_write argument change and cleanup
+Date: Wed,  6 Oct 2010 15:54:09 -0400
+Message-ID: <1286394857-32541-8-git-send-email-jlayton@redhat.com>
 References: <1286394857-32541-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,79 +10,118 @@ In-Reply-To: <1286394857-32541-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-All the remaining users of cifsFileInfo->pfile just use it to get
-at the f_flags/f_mode. Now that we store that separately in the
-cifsFileInfo, there's no need to consult the pfile at all from
-a cifsFileInfo pointer.
+Have cifs_write take a cifsFileInfo pointer instead of a filp. Since
+cifsFileInfo holds references on the dentry, and that holds one to
+the inode, we can eliminate some unneeded NULL pointer checks.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    1 -
- fs/cifs/dir.c      |    1 -
- fs/cifs/file.c     |   11 +++--------
- 3 files changed, 3 insertions(+), 10 deletions(-)
+ fs/cifs/file.c |   51 +++++++++++++++++----------------------------------
+ 1 files changed, 17 insertions(+), 34 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index d0ced6e..7e2503f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -386,7 +386,6 @@ struct cifsFileInfo {
- 	__u16 netfid;		/* file id from remote */
- 	/* BB add lock scope info here if needed */ ;
- 	/* lock scope id (0 if none) */
--	struct file *pfile; /* needed for writepage */
- 	struct dentry *dentry;
- 	unsigned int f_flags;
- 	struct tcon_link *tlink;
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index fc872c4..5dc8eed 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -148,7 +148,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	pCifsFile->uid = current_fsuid();
- 	pCifsFile->dentry = dget(dentry);
- 	pCifsFile->f_flags = file->f_flags;
--	pCifsFile->pfile = file;
- 	pCifsFile->invalidHandle = false;
- 	pCifsFile->closePend = false;
- 	pCifsFile->tlink = cifs_get_tlink(tlink);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 57fbfad..83e16d6 100644
+index db38547..57fbfad 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1080,8 +1080,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
- 			continue;
- 		if (fsuid_only && open_file->uid != current_fsuid())
- 			continue;
--		if (open_file->pfile && ((open_file->pfile->f_flags & O_RDWR) ||
--		    (open_file->pfile->f_flags & O_RDONLY))) {
-+		if (OPEN_FMODE(open_file->f_flags) & FMODE_READ) {
- 			if (!open_file->invalidHandle) {
- 				/* found a good file */
- 				/* lock it so it will not be closed on us */
-@@ -1130,9 +1129,7 @@ refind_writable:
- 			continue;
- 		if (fsuid_only && open_file->uid != current_fsuid())
- 			continue;
--		if (open_file->pfile &&
--		    ((open_file->pfile->f_flags & O_RDWR) ||
--		     (open_file->pfile->f_flags & O_WRONLY))) {
-+		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
- 			cifsFileInfo_get(open_file);
+@@ -963,8 +963,9 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
+ 	return total_written;
+ }
  
- 			if (!open_file->invalidHandle) {
-@@ -2096,9 +2093,7 @@ static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
- 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
- 		if (open_file->closePend)
- 			continue;
--		if (open_file->pfile &&
--		    ((open_file->pfile->f_flags & O_RDWR) ||
--		     (open_file->pfile->f_flags & O_WRONLY))) {
-+		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
- 			read_unlock(&GlobalSMBSeslock);
- 			return 1;
- 		}
+-static ssize_t cifs_write(struct file *file, const char *write_data,
+-			  size_t write_size, loff_t *poffset)
++static ssize_t cifs_write(struct cifsFileInfo *open_file,
++			  const char *write_data, size_t write_size,
++			  loff_t *poffset)
+ {
+ 	int rc = 0;
+ 	unsigned int bytes_written = 0;
+@@ -972,17 +973,14 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifsTconInfo *pTcon;
+ 	int xid, long_op;
+-	struct cifsFileInfo *open_file;
+-	struct cifsInodeInfo *cifsi = CIFS_I(file->f_path.dentry->d_inode);
++	struct dentry *dentry = open_file->dentry;
++	struct cifsInodeInfo *cifsi = CIFS_I(dentry->d_inode);
+ 
+-	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
++	cifs_sb = CIFS_SB(dentry->d_sb);
+ 
+ 	cFYI(1, "write %zd bytes to offset %lld of %s", write_size,
+-	   *poffset, file->f_path.dentry->d_name.name);
++	   *poffset, dentry->d_name.name);
+ 
+-	if (file->private_data == NULL)
+-		return -EBADF;
+-	open_file = file->private_data;
+ 	pTcon = tlink_tcon(open_file->tlink);
+ 
+ 	xid = GetXid();
+@@ -992,15 +990,6 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
+ 	     total_written += bytes_written) {
+ 		rc = -EAGAIN;
+ 		while (rc == -EAGAIN) {
+-			if (file->private_data == NULL) {
+-				/* file has been closed on us */
+-				FreeXid(xid);
+-			/* if we have gotten here we have written some data
+-			   and blocked, and the file has been freed on us
+-			   while we blocked so return what we managed to
+-			   write */
+-				return total_written;
+-			}
+ 			if (open_file->closePend) {
+ 				FreeXid(xid);
+ 				if (total_written)
+@@ -1060,20 +1049,13 @@ static ssize_t cifs_write(struct file *file, const char *write_data,
+ 
+ 	cifs_stats_bytes_written(pTcon, total_written);
+ 
+-	/* since the write may have blocked check these pointers again */
+-	if ((file->f_path.dentry) && (file->f_path.dentry->d_inode)) {
+-/*BB We could make this contingent on superblock ATIME flag too */
+-/*		file->f_path.dentry->d_inode->i_ctime =
+-		file->f_path.dentry->d_inode->i_mtime = CURRENT_TIME;*/
+-		if (total_written > 0) {
+-			spin_lock(&file->f_path.dentry->d_inode->i_lock);
+-			if (*poffset > file->f_path.dentry->d_inode->i_size)
+-				i_size_write(file->f_path.dentry->d_inode,
+-					     *poffset);
+-			spin_unlock(&file->f_path.dentry->d_inode->i_lock);
+-		}
+-		mark_inode_dirty_sync(file->f_path.dentry->d_inode);
++	if (total_written > 0) {
++		spin_lock(&dentry->d_inode->i_lock);
++		if (*poffset > dentry->d_inode->i_size)
++			i_size_write(dentry->d_inode, *poffset);
++		spin_unlock(&dentry->d_inode->i_lock);
+ 	}
++	mark_inode_dirty_sync(dentry->d_inode);
+ 	FreeXid(xid);
+ 	return total_written;
+ }
+@@ -1244,8 +1226,8 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 
+ 	open_file = find_writable_file(CIFS_I(mapping->host), false);
+ 	if (open_file) {
+-		bytes_written = cifs_write(open_file->pfile, write_data,
+-					   to-from, &offset);
++		bytes_written = cifs_write(open_file, write_data,
++					   to - from, &offset);
+ 		cifsFileInfo_put(open_file);
+ 		/* Does mm or vfs already set times? */
+ 		inode->i_atime = inode->i_mtime = current_fs_time(inode->i_sb);
+@@ -1560,7 +1542,8 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
+ 		/* BB check if anything else missing out of ppw
+ 		   such as updating last write time */
+ 		page_data = kmap(page);
+-		rc = cifs_write(file, page_data + offset, copied, &pos);
++		rc = cifs_write(file->private_data, page_data + offset,
++				copied, &pos);
+ 		/* if (rc < 0) should we set writebehind rc? */
+ 		kunmap(page);
+ 
 -- 
 1.7.2.3
