@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/15] cifs: eliminate cifs_posix_open_inode_helper
-Date: Wed,  6 Oct 2010 15:54:05 -0400
-Message-ID: <1286394857-32541-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/15] cifs: move cifsFileInfo_put to file.c
+Date: Wed,  6 Oct 2010 15:54:13 -0400
+Message-ID: <1286394857-32541-12-git-send-email-jlayton@redhat.com>
 References: <1286394857-32541-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,100 +10,56 @@ In-Reply-To: <1286394857-32541-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This function is redundant. The only thing it does is set the canCache
-flags, but those get set in cifs_new_fileinfo anyway.
+...and make it non-inlined in preparation for the move of most of
+cifs_close to it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/file.c |   67 --------------------------------------------------------
- 1 files changed, 0 insertions(+), 67 deletions(-)
+ fs/cifs/cifsglob.h |   10 +---------
+ fs/cifs/file.c     |   10 ++++++++++
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index fd78a35..c10f085 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -106,64 +106,6 @@ static inline int cifs_get_disposition(unsigned int flags)
- 		return FILE_OPEN;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 1959d92..bd57fd7 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -406,15 +406,7 @@ static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+ 	atomic_inc(&cifs_file->count);
  }
  
--/* all arguments to this function must be checked for validity in caller */
--static inline int
--cifs_posix_open_inode_helper(struct inode *inode, struct file *file,
--			     struct cifsInodeInfo *pCifsInode, __u32 oplock,
--			     u16 netfid)
+-/* Release a reference on the file private data */
+-static inline void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
 -{
--
--	write_lock(&GlobalSMBSeslock);
--
--	pCifsInode = CIFS_I(file->f_path.dentry->d_inode);
--	if (pCifsInode == NULL) {
--		write_unlock(&GlobalSMBSeslock);
--		return -EINVAL;
+-	if (atomic_dec_and_test(&cifs_file->count)) {
+-		cifs_put_tlink(cifs_file->tlink);
+-		dput(cifs_file->dentry);
+-		kfree(cifs_file);
 -	}
--
--	if (pCifsInode->clientCanCacheRead) {
--		/* we have the inode open somewhere else
--		   no need to discard cache data */
--		goto psx_client_can_cache;
--	}
--
--	/* BB FIXME need to fix this check to move it earlier into posix_open
--	   BB  fIX following section BB FIXME */
--
--	/* if not oplocked, invalidate inode pages if mtime or file
--	   size changed */
--/*	temp = cifs_NTtimeToUnix(le64_to_cpu(buf->LastWriteTime));
--	if (timespec_equal(&file->f_path.dentry->d_inode->i_mtime, &temp) &&
--			   (file->f_path.dentry->d_inode->i_size ==
--			    (loff_t)le64_to_cpu(buf->EndOfFile))) {
--		cFYI(1, "inode unchanged on server");
--	} else {
--		if (file->f_path.dentry->d_inode->i_mapping) {
--			rc = filemap_write_and_wait(file->f_path.dentry->d_inode->i_mapping);
--			if (rc != 0)
--				CIFS_I(file->f_path.dentry->d_inode)->write_behind_rc = rc;
--		}
--		cFYI(1, "invalidating remote inode since open detected it "
--			 "changed");
--		invalidate_remote_inode(file->f_path.dentry->d_inode);
--	} */
--
--psx_client_can_cache:
--	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
--		pCifsInode->clientCanCacheAll = true;
--		pCifsInode->clientCanCacheRead = true;
--		cFYI(1, "Exclusive Oplock granted on inode %p",
--			 file->f_path.dentry->d_inode);
--	} else if ((oplock & 0xF) == OPLOCK_READ)
--		pCifsInode->clientCanCacheRead = true;
--
--	/* will have to change the unlock if we reenable the
--	   filemap_fdatawrite (which does not seem necessary */
--	write_unlock(&GlobalSMBSeslock);
--	return 0;
 -}
--
--/* all arguments to this function must be checked for validity in caller */
- static inline int cifs_open_inode_helper(struct inode *inode,
- 	struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO *buf,
- 	char *full_path, int xid)
-@@ -271,15 +213,6 @@ int cifs_open(struct inode *inode, struct file *file)
- 				oflags, &oplock, &netfid, xid);
- 		if (rc == 0) {
- 			cFYI(1, "posix open succeeded");
--			/* no need for special case handling of setting mode
--			   on read only files needed here */
--
--			rc = cifs_posix_open_inode_helper(inode, file,
--					pCifsInode, oplock, netfid);
--			if (rc != 0) {
--				CIFSSMBClose(xid, tcon, netfid);
--				goto out;
--			}
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
  
- 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
- 							tlink, oflags, oplock);
+ /*
+  * One of these for each file inode
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index faabcd4..60602e5 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -207,6 +207,16 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	return pCifsFile;
+ }
+ 
++/* Release a reference on the file private data */
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
++{
++	if (atomic_dec_and_test(&cifs_file->count)) {
++		cifs_put_tlink(cifs_file->tlink);
++		dput(cifs_file->dentry);
++		kfree(cifs_file);
++	}
++}
++
+ int cifs_open(struct inode *inode, struct file *file)
+ {
+ 	int rc = -EACCES;
 -- 
 1.7.2.3
