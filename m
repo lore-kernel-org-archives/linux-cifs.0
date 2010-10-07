@@ -1,108 +1,131 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 13/15] cifs: convert cifsFileInfo->count to non-atomic
- counter
-Date: Thu, 7 Oct 2010 08:43:34 -0400
-Message-ID: <20101007084334.0e03f586@barsoom.rdu.redhat.com>
-References: <1286394857-32541-1-git-send-email-jlayton@redhat.com>
-	<1286394857-32541-14-git-send-email-jlayton@redhat.com>
-	<4CAD8972.9090406@suse.de>
-	<20101007071819.2446312b@barsoom.rdu.redhat.com>
-	<4CADB949.2070205@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 2/7 cifs] ntlm authentication and signing - Build a proper av/ti pair blob for ntlmv2 without extended security authentication
+Date: Thu,  7 Oct 2010 07:45:28 -0500
+Message-ID: <1286455528-3630-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CADB949.2070205-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 07 Oct 2010 17:42:57 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> On 10/07/2010 04:48 PM, Jeff Layton wrote:
-> > On Thu, 07 Oct 2010 14:18:50 +0530
-> > Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
-> > 
-> >> On 10/07/2010 01:24 AM, Jeff Layton wrote:
-> >>> The count for cifsFileInfo is currently an atomic, but that just adds
-> >>> complexity for little value. We generally need to hold cifs_file_list_lock
-> >>> to traverse the lists anyway so we might as well make this counter
-> >>> non-atomic and simply use the cifs_file_list_lock to protect it.
-> >>>
-> >>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >>> ---
-> >>>  fs/cifs/cifsglob.h |    9 ++++++---
-> >>>  fs/cifs/file.c     |    8 +++++---
-> >>>  2 files changed, 11 insertions(+), 6 deletions(-)
-> >>>
-> >>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >>> index 531a768..f3c4e00 100644
-> >>> --- a/fs/cifs/cifsglob.h
-> >>> +++ b/fs/cifs/cifsglob.h
-> >>> @@ -393,16 +393,19 @@ struct cifsFileInfo {
-> >>>  	struct list_head llist; /* list of byte range locks we have. */
-> >>>  	bool invalidHandle:1;	/* file closed via session abend */
-> >>>  	bool oplock_break_cancelled:1;
-> >>> -	atomic_t count;		/* reference count */
-> >>> +	int count;		/* refcount -- protected by cifs_file_list_lock */
-> >>>  	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
-> >>>  	struct cifs_search_info srch_inf;
-> >>>  	struct work_struct oplock_break; /* work for oplock breaks */
-> >>>  };
-> >>>  
-> >>> -/* Take a reference on the file private data */
-> >>> +/*
-> >>> + * Take a reference on the file private data. Must be called with
-> >>> + * cifs_file_list_lock held for read or write.
-> >>> + */
-> >>>  static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
-> >>>  {
-> >>> -	atomic_inc(&cifs_file->count);
-> >>> +	++cifs_file->count;
-> >>
-> >> Since we now use cifs_file_list_lock to protect cifs_file->count too,
-> >> shouldn't all the callers of cifsFileInfo_get() need to acquire a write
-> >> lock instead of read lock?
-> >>
-> > 
-> > I puzzled over that too, but it's not really necessary. The lock is
-> > really there to make sure that the list traversals are safe from
-> > removals. We do need the write lock when inserting or removing the
-> > cifsFileInfo into the lists, but for incrementing a non-zero refcount a
-> > read lock is sufficient. That will prevent cifsFileInfo_put from
-> > racing in, decrementing the refcount and modifying the list since it
-> > needs a write lock.
-> 
-> Fine, but, isn't possible to get the refcount wrong due to calls to
-> cifsFileInfo_get() from multiple callers?
-> 
+Build a av pair blob as part of ntlmv2 (without extended security) auth
+request.  Include netbios and dns names for domain and server and
+a timestamp in the blob.
 
-Argh...good point. Maybe we do need to make this a regular spinlock
-after all. The times you can use a read lock safely are pretty limited
-here.
 
-> > TBH, I think it would be far simpler (and maybe even more efficient) to
-> > use a regular spinlock here, but I figured this would be easier to get
-> > past review.
-> > 
-> 
-> I'm little worried about the overhead as I'm not sure whether all the
-> paths are low contention paths...
-> 
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c |   77 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 66 insertions(+), 11 deletions(-)
 
-I think they are generally low contention paths. Also, the lists are
-generally very short so the time the lock is held is too. Unless most
-of your accesses (like 90%) are read locked, then it's actually worse
-to use a rwlock than a regular spinlock.
-
-Even if a regular spinlock adds some overhead, it's really unlikely to
-make any real difference in performance. CIFS is almost always bound by
-network latency, not CPU time.
-
-Steve, I mostly left this as a rwlock as I figured you might have
-issues moving this to a normal spinlock. Would you?
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 730038a..6a1e50c 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -263,27 +263,82 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
+ }
+ #endif /* CIFS_WEAK_PW_HASH */
+ 
+-/* This is just a filler for ntlmv2 type of security mechanisms.
+- * Older servers are not very particular about the contents of av pairs
+- * in the blob and for sec mechs like ntlmv2, there is no negotiation
+- * as in ntlmssp, so unless domain and server  netbios and dns names
+- * are specified, there is no way to obtain name.  In case of ntlmssp,
+- * server provides that info in type 2 challenge packet
++/* Build a proper attribute value/target info pairs blob.
++ * Fill in netbios and dns domain name and workstation name
++ * and client time (total five av pairs and + one end of fields indicator.
++ * Allocate domain name which gets freed when session struct is deallocated.
+  */
+ static int
+-build_avpair_blob(struct cifsSesInfo *ses)
++build_avpair_blob(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
+ {
++	unsigned int dlen;
++	unsigned int wlen;
++	unsigned int size = 6 * sizeof(struct ntlmssp2_name);
++	__le64  curtime;
++	char *defdmname = "WORKGROUP";
++	unsigned char *blobptr;
+ 	struct ntlmssp2_name *attrptr;
+ 
+-	ses->tilen = 2 * sizeof(struct ntlmssp2_name);
++	if (!ses->domainName)
++		ses->domainName = kstrdup(defdmname, GFP_KERNEL);
++
++	dlen = strlen(ses->domainName);
++	wlen = strlen(ses->server->hostname);
++
++	/* The length of this blob is a size which is
++	 * six times the size of a structure which holds name/size +
++	 * two times the unicode length of a domain name +
++	 * two times the unicode length of a server name +
++	 * size of a timestamp (which is 8 bytes).
++	 */
++	ses->tilen = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
+ 	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
+ 	if (!ses->tiblob) {
+ 		ses->tilen = 0;
+ 		cERROR(1, "Challenge target info allocation failure");
+ 		return -ENOMEM;
+ 	}
+-	attrptr = (struct ntlmssp2_name *) ses->tiblob;
+-	attrptr->type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
++
++	blobptr = ses->tiblob;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
++	attrptr->length = cpu_to_le16(2 * dlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
++
++	blobptr += 2 * dlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_COMPUTER_NAME);
++	attrptr->length = cpu_to_le16(2 * wlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
++
++	blobptr += 2 * wlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_DOMAIN_NAME);
++	attrptr->length = cpu_to_le16(2 * dlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
++
++	blobptr += 2 * dlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_COMPUTER_NAME);
++	attrptr->length = cpu_to_le16(2 * wlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
++
++	blobptr += 2 * wlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_TIMESTAMP);
++	attrptr->length = cpu_to_le16(sizeof(__le64));
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	curtime = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	memcpy(blobptr, &curtime, sizeof(__le64));
+ 
+ 	return 0;
+ }
+@@ -426,7 +481,7 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 			}
+ 		}
+ 	} else {
+-		rc = build_avpair_blob(ses);
++		rc = build_avpair_blob(ses, nls_cp);
+ 		if (rc) {
+ 			cERROR(1, "error %d building av pair blob", rc);
+ 			return rc;
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.6.0.2
