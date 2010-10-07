@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 2/7 cifs] ntlm authentication and signing - Build a proper av/ti pair blob for ntlmv2 without extended security authentication
-Date: Thu,  7 Oct 2010 07:45:28 -0500
-Message-ID: <1286455528-3630-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH] handle extended attribute name cifsacl to generate cifs acl blob
+Date: Thu,  7 Oct 2010 09:03:27 -0500
+Message-ID: <1286460207-4024-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -11,121 +11,115 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Build a av pair blob as part of ntlmv2 (without extended security) auth
-request.  Include netbios and dns names for domain and server and
-a timestamp in the blob.
+
+Add extended attribute name system.cifsacl
+
+Get/generate cifs/ntfs acl blob and hand over to the invoker however
+it wants to parse/process it.
+
+Stop generating cifs/ntfs acl blob for xattr name system.posix_acl_access
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |   77 ++++++++++++++++++++++++++++++++++++++++++-------
- 1 files changed, 66 insertions(+), 11 deletions(-)
+ fs/cifs/xattr.c |   64 +++++++++++++++++++++++++++++++++++++------------------
+ 1 files changed, 43 insertions(+), 21 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 730038a..6a1e50c 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -263,27 +263,82 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- }
- #endif /* CIFS_WEAK_PW_HASH */
+diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+index a264b74..eaf836f 100644
+--- a/fs/cifs/xattr.c
++++ b/fs/cifs/xattr.c
+@@ -30,6 +30,7 @@
  
--/* This is just a filler for ntlmv2 type of security mechanisms.
-- * Older servers are not very particular about the contents of av pairs
-- * in the blob and for sec mechs like ntlmv2, there is no negotiation
-- * as in ntlmssp, so unless domain and server  netbios and dns names
-- * are specified, there is no way to obtain name.  In case of ntlmssp,
-- * server provides that info in type 2 challenge packet
-+/* Build a proper attribute value/target info pairs blob.
-+ * Fill in netbios and dns domain name and workstation name
-+ * and client time (total five av pairs and + one end of fields indicator.
-+ * Allocate domain name which gets freed when session struct is deallocated.
-  */
- static int
--build_avpair_blob(struct cifsSesInfo *ses)
-+build_avpair_blob(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
+ #define MAX_EA_VALUE_SIZE 65535
+ #define CIFS_XATTR_DOS_ATTRIB "user.DosAttrib"
++#define CIFS_ACL_XATTR "system.cifsacl"
+ #define CIFS_XATTR_USER_PREFIX "user."
+ #define CIFS_XATTR_SYSTEM_PREFIX "system."
+ #define CIFS_XATTR_OS2_PREFIX "os2."
+@@ -100,6 +101,42 @@ remove_ea_exit:
+ 	return rc;
+ }
+ 
++static int
++get_cifs_acl(int xid, struct cifsTconInfo *pTcon, char *full_path,
++			void *ea_value, size_t size, struct nls_table *nls_cp)
++{
++	__u16 fid;
++	int rc;
++	int oplock = 0;
++	unsigned int acllen = 0;
++	struct cifs_ntsd *pacl = NULL;
++
++	rc = CIFSSMBOpen(xid, pTcon, full_path, FILE_OPEN, GENERIC_READ,
++			0, &fid, &oplock, NULL, nls_cp, 0);
++	if (rc) {
++		cERROR(1, "%s: file open error: %d", __func__, rc);
++		return rc;
++	}
++
++	rc = CIFSSMBGetCIFSACL(xid, pTcon, fid, &pacl, &acllen);
++	CIFSSMBClose(xid, pTcon, fid);
++	if (rc) {
++		cERROR(1, "%s: get acl error: %d", __func__, rc);
++		return rc;
++	}
++
++	if (ea_value) {
++		if (acllen > size) {
++			kfree(pacl);
++			return -ERANGE;
++		}
++		memcpy(ea_value, pacl, acllen);
++		kfree(pacl);
++	}
++
++	return acllen;
++}
++
+ int cifs_setxattr(struct dentry *direntry, const char *ea_name,
+ 		  const void *ea_value, size_t value_size, int flags)
  {
-+	unsigned int dlen;
-+	unsigned int wlen;
-+	unsigned int size = 6 * sizeof(struct ntlmssp2_name);
-+	__le64  curtime;
-+	char *defdmname = "WORKGROUP";
-+	unsigned char *blobptr;
- 	struct ntlmssp2_name *attrptr;
- 
--	ses->tilen = 2 * sizeof(struct ntlmssp2_name);
-+	if (!ses->domainName)
-+		ses->domainName = kstrdup(defdmname, GFP_KERNEL);
-+
-+	dlen = strlen(ses->domainName);
-+	wlen = strlen(ses->server->hostname);
-+
-+	/* The length of this blob is a size which is
-+	 * six times the size of a structure which holds name/size +
-+	 * two times the unicode length of a domain name +
-+	 * two times the unicode length of a server name +
-+	 * size of a timestamp (which is 8 bytes).
-+	 */
-+	ses->tilen = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
- 	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
- 	if (!ses->tiblob) {
- 		ses->tilen = 0;
- 		cERROR(1, "Challenge target info allocation failure");
- 		return -ENOMEM;
- 	}
--	attrptr = (struct ntlmssp2_name *) ses->tiblob;
--	attrptr->type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
-+
-+	blobptr = ses->tiblob;
-+	attrptr = (struct ntlmssp2_name *) blobptr;
-+
-+	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
-+	attrptr->length = cpu_to_le16(2 * dlen);
-+	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
-+	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
-+
-+	blobptr += 2 * dlen;
-+	attrptr = (struct ntlmssp2_name *) blobptr;
-+
-+	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_COMPUTER_NAME);
-+	attrptr->length = cpu_to_le16(2 * wlen);
-+	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
-+	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
-+
-+	blobptr += 2 * wlen;
-+	attrptr = (struct ntlmssp2_name *) blobptr;
-+
-+	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_DOMAIN_NAME);
-+	attrptr->length = cpu_to_le16(2 * dlen);
-+	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
-+	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
-+
-+	blobptr += 2 * dlen;
-+	attrptr = (struct ntlmssp2_name *) blobptr;
-+
-+	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_COMPUTER_NAME);
-+	attrptr->length = cpu_to_le16(2 * wlen);
-+	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
-+	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
-+
-+	blobptr += 2 * wlen;
-+	attrptr = (struct ntlmssp2_name *) blobptr;
-+
-+	attrptr->type = cpu_to_le16(NTLMSSP_AV_TIMESTAMP);
-+	attrptr->length = cpu_to_le16(sizeof(__le64));
-+	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
-+	curtime = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
-+	memcpy(blobptr, &curtime, sizeof(__le64));
- 
- 	return 0;
- }
-@@ -426,7 +481,7 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
- 			}
- 		}
- 	} else {
--		rc = build_avpair_blob(ses);
-+		rc = build_avpair_blob(ses, nls_cp);
- 		if (rc) {
- 			cERROR(1, "error %d building av pair blob", rc);
- 			return rc;
+@@ -277,27 +314,6 @@ ssize_t cifs_getxattr(struct dentry *direntry, const char *ea_name,
+ 				cifs_sb->local_nls,
+ 				cifs_sb->mnt_cifs_flags &
+ 					CIFS_MOUNT_MAP_SPECIAL_CHR);
+-#ifdef CONFIG_CIFS_EXPERIMENTAL
+-		else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
+-			__u16 fid;
+-			int oplock = 0;
+-			struct cifs_ntsd *pacl = NULL;
+-			__u32 buflen = 0;
+-			if (experimEnabled)
+-				rc = CIFSSMBOpen(xid, pTcon, full_path,
+-					FILE_OPEN, GENERIC_READ, 0, &fid,
+-					&oplock, NULL, cifs_sb->local_nls,
+-					cifs_sb->mnt_cifs_flags &
+-					CIFS_MOUNT_MAP_SPECIAL_CHR);
+-			/* else rc is EOPNOTSUPP from above */
+-
+-			if (rc == 0) {
+-				rc = CIFSSMBGetCIFSACL(xid, pTcon, fid, &pacl,
+-						      &buflen);
+-				CIFSSMBClose(xid, pTcon, fid);
+-			}
+-		}
+-#endif /* EXPERIMENTAL */
+ #else
+ 		cFYI(1, "query POSIX ACL not supported yet");
+ #endif /* CONFIG_CIFS_POSIX */
+@@ -313,6 +329,12 @@ ssize_t cifs_getxattr(struct dentry *direntry, const char *ea_name,
+ #else
+ 		cFYI(1, "query POSIX default ACL not supported yet");
+ #endif
++#ifdef CONFIG_CIFS_EXPERIMENTAL
++	} else if (strncmp(ea_name, CIFS_ACL_XATTR,
++				strlen(CIFS_ACL_XATTR)) == 0) {
++			rc = get_cifs_acl(xid, pTcon, full_path, ea_value,
++					buf_size, cifs_sb->local_nls);
++#endif /* CONFIG_CIFS_EXPERIMENTAL */
+ 	} else if (strncmp(ea_name,
+ 		  CIFS_XATTR_TRUSTED_PREFIX, XATTR_TRUSTED_PREFIX_LEN) == 0) {
+ 		cFYI(1, "Trusted xattr namespace not supported yet");
 -- 
 1.6.0.2
