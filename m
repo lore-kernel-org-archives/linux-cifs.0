@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 14/15] cifs: wait for writeback to complete in cifs_flush
-Date: Fri,  8 Oct 2010 13:31:11 -0400
-Message-ID: <1286559072-29032-15-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/15] cifs: move cifsFileInfo_put to file.c
+Date: Fri,  8 Oct 2010 13:31:08 -0400
+Message-ID: <1286559072-29032-12-git-send-email-jlayton@redhat.com>
 References: <1286559072-29032-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,51 +10,57 @@ In-Reply-To: <1286559072-29032-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The f_op->flush operation is the last chance to return a writeback
-related error when closing a file. Ensure that we don't miss reporting
-any errors by waiting for writeback to complete in cifs_flush before
-proceeding.
-
-There's no reason to do this when the file isn't open for write
-however.
+...and make it non-inlined in preparation for the move of most of
+cifs_close to it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- fs/cifs/file.c |   21 +++++++--------------
- 1 files changed, 7 insertions(+), 14 deletions(-)
+ fs/cifs/cifsglob.h |   10 +---------
+ fs/cifs/file.c     |   10 ++++++++++
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index c29ef5f..01e2f56 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -406,15 +406,7 @@ static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+ 	atomic_inc(&cifs_file->count);
+ }
+ 
+-/* Release a reference on the file private data */
+-static inline void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+-{
+-	if (atomic_dec_and_test(&cifs_file->count)) {
+-		cifs_put_tlink(cifs_file->tlink);
+-		dput(cifs_file->dentry);
+-		kfree(cifs_file);
+-	}
+-}
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+ 
+ /*
+  * One of these for each file inode
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 7b8122b..ce57953 100644
+index b6b88fe..2518711 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1620,20 +1620,13 @@ int cifs_flush(struct file *file, fl_owner_t id)
- 	struct inode *inode = file->f_path.dentry->d_inode;
- 	int rc = 0;
+@@ -202,6 +202,16 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	return pCifsFile;
+ }
  
--	/* Rather than do the steps manually:
--	   lock the inode for writing
--	   loop through pages looking for write behind data (dirty pages)
--	   coalesce into contiguous 16K (or smaller) chunks to write to server
--	   send to server (prefer in parallel)
--	   deal with writebehind errors
--	   unlock inode for writing
--	   filemapfdatawrite appears easier for the time being */
--
--	rc = filemap_fdatawrite(inode->i_mapping);
--	/* reset wb rc if we were able to write out dirty pages */
--	if (!rc) {
--		rc = CIFS_I(inode)->write_behind_rc;
--		CIFS_I(inode)->write_behind_rc = 0;
-+	if (file->f_mode & FMODE_WRITE) {
-+		rc = filemap_write_and_wait(inode->i_mapping);
-+		/* reset wb rc if we were able to write out dirty pages */
-+		if (!rc) {
-+			rc = CIFS_I(inode)->write_behind_rc;
-+			CIFS_I(inode)->write_behind_rc = 0;
-+		}
- 	}
- 
- 	cFYI(1, "Flush inode %p file %p rc %d", inode, file, rc);
++/* Release a reference on the file private data */
++void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
++{
++	if (atomic_dec_and_test(&cifs_file->count)) {
++		cifs_put_tlink(cifs_file->tlink);
++		dput(cifs_file->dentry);
++		kfree(cifs_file);
++	}
++}
++
+ int cifs_open(struct inode *inode, struct file *file)
+ {
+ 	int rc = -EACCES;
 -- 
 1.7.2.3
