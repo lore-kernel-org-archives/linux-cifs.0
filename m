@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 04/15] cifs: eliminate oflags option from cifs_new_fileinfo
-Date: Fri,  8 Oct 2010 13:31:01 -0400
-Message-ID: <1286559072-29032-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 05/15] cifs: eliminate the inode argument from cifs_new_fileinfo
+Date: Fri,  8 Oct 2010 13:31:02 -0400
+Message-ID: <1286559072-29032-6-git-send-email-jlayton@redhat.com>
 References: <1286559072-29032-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,113 +10,130 @@ In-Reply-To: <1286559072-29032-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
-The callers mostly pass in the filp->f_flags here, except for one place
-that passes in the flags after they've been converted to their SMB_O_*
-equivalents.
+It already takes a file pointer. The inode associated with that had damn
+well better be the same one we're passing in anyway. Thus, there's no
+need for a separate argument here.
 
-None of these are correct however since we're checking that value for
-the presence of FMODE_READ. Luckily that only affects how the f_list is
-ordered. What it really wants here is the file->f_mode, but this check
-really makes no sense whatsoever. FMODE_READ will be set for O_RDWR or
-O_RDONLY opens. So this in effect just moves those to the front of the
-list and leaves O_WRONLY at the end.
+Also, get rid of the bogus check for a null pCifsInode pointer. The
+CIFS_I macro uses container_of(), and that will virtually never return a
+NULL pointer anyway.
 
-That might make some sense if anything actually paid attention to this
-list order, but nothing does. find_readable_file and find_writable_file
-both walk through the list in the same direction.
-
-Let's just keep this simple and just put things on the list with
-list_add.
+Finally, move the setting of the canCache* flags outside of the lock.
+Other places in the code don't hold that lock when setting it, so I
+assume it's not really needed here either.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
  fs/cifs/cifsproto.h |    3 +--
- fs/cifs/dir.c       |   15 ++++-----------
- fs/cifs/file.c      |    5 ++---
- 3 files changed, 7 insertions(+), 16 deletions(-)
+ fs/cifs/dir.c       |   30 ++++++++++++++----------------
+ fs/cifs/file.c      |    6 +++---
+ 3 files changed, 18 insertions(+), 21 deletions(-)
 
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 7f416ab..bed004c 100644
+index bed004c..a2bdfa2 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -107,8 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+@@ -105,8 +105,7 @@ extern u64 cifs_UnixTimeToNT(struct timespec);
+ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+ 				      int offset);
  
- extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
- 				__u16 fileHandle, struct file *file,
--				struct tcon_link *tlink,
--				unsigned int oflags, __u32 oplock);
-+				struct tcon_link *tlink, __u32 oplock);
+-extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
+-				__u16 fileHandle, struct file *file,
++extern struct cifsFileInfo *cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 				struct tcon_link *tlink, __u32 oplock);
  extern int cifs_posix_open(char *full_path, struct inode **pinode,
  				struct super_block *sb,
- 				int mode, int oflags,
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index c205ec9..452c9b5 100644
+index 452c9b5..6c38a41 100644
 --- a/fs/cifs/dir.c
 +++ b/fs/cifs/dir.c
-@@ -132,7 +132,7 @@ cifs_bp_rename_retry:
+@@ -131,12 +131,13 @@ cifs_bp_rename_retry:
+ }
  
  struct cifsFileInfo *
- cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
--		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
-+		  struct tcon_link *tlink, __u32 oplock)
+-cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
++cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 		  struct tcon_link *tlink, __u32 oplock)
  {
  	struct dentry *dentry = file->f_path.dentry;
++	struct inode *inode = dentry->d_inode;
++	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
  	struct cifsFileInfo *pCifsFile;
-@@ -160,13 +160,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+-	struct cifsInodeInfo *pCifsInode;
+ 
+ 	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
+ 	if (pCifsFile == NULL)
+@@ -158,18 +159,16 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 
+ 	write_lock(&GlobalSMBSeslock);
  	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
- 	pCifsInode = CIFS_I(newinode);
- 	if (pCifsInode) {
--		/* if readable file instance put first in list*/
--		if (oflags & FMODE_READ)
--			list_add(&pCifsFile->flist, &pCifsInode->openFileList);
--		else
--			list_add_tail(&pCifsFile->flist,
--				      &pCifsInode->openFileList);
--
-+		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
- 		if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
- 			pCifsInode->clientCanCacheAll = true;
- 			pCifsInode->clientCanCacheRead = true;
-@@ -483,7 +477,7 @@ cifs_create_set_dentry:
+-	pCifsInode = CIFS_I(newinode);
+-	if (pCifsInode) {
+-		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
+-		if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+-			pCifsInode->clientCanCacheAll = true;
+-			pCifsInode->clientCanCacheRead = true;
+-			cFYI(1, "Exclusive Oplock inode %p", newinode);
+-		} else if ((oplock & 0xF) == OPLOCK_READ)
+-				pCifsInode->clientCanCacheRead = true;
+-	}
++	list_add(&pCifsFile->flist, &pCifsInode->openFileList);
+ 	write_unlock(&GlobalSMBSeslock);
+ 
++	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
++		pCifsInode->clientCanCacheAll = true;
++		pCifsInode->clientCanCacheRead = true;
++		cFYI(1, "Exclusive Oplock inode %p", inode);
++	} else if ((oplock & 0xF) == OPLOCK_READ)
++		pCifsInode->clientCanCacheRead = true;
++
+ 	file->private_data = pCifsFile;
+ 
+ 	return pCifsFile;
+@@ -476,8 +475,7 @@ cifs_create_set_dentry:
+ 			goto cifs_create_out;
  		}
  
- 		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
--						tlink, oflags, oplock);
-+						tlink, oplock);
+-		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
+-						tlink, oplock);
++		pfile_info = cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
  		if (pfile_info == NULL) {
  			fput(filp);
  			CIFSSMBClose(xid, tcon, fileHandle);
-@@ -757,8 +751,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+@@ -750,8 +748,8 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 				goto lookup_out;
  			}
  
- 			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
--						  tlink, nd->intent.open.flags,
--						  oplock);
-+						  tlink, oplock);
+-			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
+-						  tlink, oplock);
++			cfile = cifs_new_fileinfo(fileHandle, filp, tlink,
++						  oplock);
  			if (cfile == NULL) {
  				fput(filp);
  				CIFSSMBClose(xid, pTcon, fileHandle);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index c10f085..e863d80 100644
+index e863d80..1edec19 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -215,7 +215,7 @@ int cifs_open(struct inode *inode, struct file *file)
+@@ -214,8 +214,8 @@ int cifs_open(struct inode *inode, struct file *file)
+ 		if (rc == 0) {
  			cFYI(1, "posix open succeeded");
  
- 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
--							tlink, oflags, oplock);
-+							tlink, oplock);
+-			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+-							tlink, oplock);
++			pCifsFile = cifs_new_fileinfo(netfid, file, tlink,
++						      oplock);
  			if (pCifsFile == NULL) {
  				CIFSSMBClose(xid, tcon, netfid);
  				rc = -ENOMEM;
-@@ -307,8 +307,7 @@ int cifs_open(struct inode *inode, struct file *file)
+@@ -307,7 +307,7 @@ int cifs_open(struct inode *inode, struct file *file)
  	if (rc != 0)
  		goto out;
  
--	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink,
--					file->f_flags, oplock);
-+	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
+-	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
++	pCifsFile = cifs_new_fileinfo(netfid, file, tlink, oplock);
  	if (pCifsFile == NULL) {
  		rc = -ENOMEM;
  		goto out;
