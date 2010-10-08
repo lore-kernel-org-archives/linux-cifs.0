@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 11/15] cifs: move cifsFileInfo_put to file.c
-Date: Fri,  8 Oct 2010 13:31:08 -0400
-Message-ID: <1286559072-29032-12-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 09/15] cifs: move cifs_new_fileinfo to file.c
+Date: Fri,  8 Oct 2010 13:31:06 -0400
+Message-ID: <1286559072-29032-10-git-send-email-jlayton@redhat.com>
 References: <1286559072-29032-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,53 +10,120 @@ In-Reply-To: <1286559072-29032-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...and make it non-inlined in preparation for the move of most of
-cifs_close to it.
+It's currently in dir.c which makes little sense...
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |   10 +---------
- fs/cifs/file.c     |   10 ++++++++++
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ fs/cifs/dir.c  |   44 --------------------------------------------
+ fs/cifs/file.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 44 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index c29ef5f..01e2f56 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -406,15 +406,7 @@ static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
- 	atomic_inc(&cifs_file->count);
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 0ad8eef..983c483 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -130,50 +130,6 @@ cifs_bp_rename_retry:
+ 	return full_path;
  }
  
--/* Release a reference on the file private data */
--static inline void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+-struct cifsFileInfo *
+-cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+-		  struct tcon_link *tlink, __u32 oplock)
 -{
--	if (atomic_dec_and_test(&cifs_file->count)) {
--		cifs_put_tlink(cifs_file->tlink);
--		dput(cifs_file->dentry);
--		kfree(cifs_file);
--	}
+-	struct dentry *dentry = file->f_path.dentry;
+-	struct inode *inode = dentry->d_inode;
+-	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
+-	struct cifsFileInfo *pCifsFile;
+-
+-	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
+-	if (pCifsFile == NULL)
+-		return pCifsFile;
+-
+-	pCifsFile->netfid = fileHandle;
+-	pCifsFile->pid = current->tgid;
+-	pCifsFile->uid = current_fsuid();
+-	pCifsFile->dentry = dget(dentry);
+-	pCifsFile->f_flags = file->f_flags;
+-	pCifsFile->invalidHandle = false;
+-	pCifsFile->closePend = false;
+-	pCifsFile->tlink = cifs_get_tlink(tlink);
+-	mutex_init(&pCifsFile->fh_mutex);
+-	mutex_init(&pCifsFile->lock_mutex);
+-	INIT_LIST_HEAD(&pCifsFile->llist);
+-	atomic_set(&pCifsFile->count, 1);
+-	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
+-
+-	write_lock(&GlobalSMBSeslock);
+-	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
+-	list_add(&pCifsFile->flist, &pCifsInode->openFileList);
+-	write_unlock(&GlobalSMBSeslock);
+-
+-	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+-		pCifsInode->clientCanCacheAll = true;
+-		pCifsInode->clientCanCacheRead = true;
+-		cFYI(1, "Exclusive Oplock inode %p", inode);
+-	} else if ((oplock & 0xF) == OPLOCK_READ)
+-		pCifsInode->clientCanCacheRead = true;
+-
+-	file->private_data = pCifsFile;
+-
+-	return pCifsFile;
 -}
-+void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
- 
- /*
-  * One of these for each file inode
+-
+ int cifs_posix_open(char *full_path, struct inode **pinode,
+ 			struct super_block *sb, int mode, int oflags,
+ 			__u32 *poplock, __u16 *pnetfid, int xid)
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index b6b88fe..2518711 100644
+index 83e16d6..86a1597 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -202,6 +202,16 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	return pCifsFile;
+@@ -159,6 +159,49 @@ client_can_cache:
+ 	return rc;
  }
  
-+/* Release a reference on the file private data */
-+void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
++struct cifsFileInfo *
++cifs_new_fileinfo(__u16 fileHandle, struct file *file,
++		  struct tcon_link *tlink, __u32 oplock)
 +{
-+	if (atomic_dec_and_test(&cifs_file->count)) {
-+		cifs_put_tlink(cifs_file->tlink);
-+		dput(cifs_file->dentry);
-+		kfree(cifs_file);
-+	}
++	struct dentry *dentry = file->f_path.dentry;
++	struct inode *inode = dentry->d_inode;
++	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
++	struct cifsFileInfo *pCifsFile;
++
++	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
++	if (pCifsFile == NULL)
++		return pCifsFile;
++
++	pCifsFile->netfid = fileHandle;
++	pCifsFile->pid = current->tgid;
++	pCifsFile->uid = current_fsuid();
++	pCifsFile->dentry = dget(dentry);
++	pCifsFile->f_flags = file->f_flags;
++	pCifsFile->invalidHandle = false;
++	pCifsFile->closePend = false;
++	pCifsFile->tlink = cifs_get_tlink(tlink);
++	mutex_init(&pCifsFile->fh_mutex);
++	mutex_init(&pCifsFile->lock_mutex);
++	INIT_LIST_HEAD(&pCifsFile->llist);
++	atomic_set(&pCifsFile->count, 1);
++	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
++
++	write_lock(&GlobalSMBSeslock);
++	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
++	list_add(&pCifsFile->flist, &pCifsInode->openFileList);
++	write_unlock(&GlobalSMBSeslock);
++
++	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
++		pCifsInode->clientCanCacheAll = true;
++		pCifsInode->clientCanCacheRead = true;
++		cFYI(1, "Exclusive Oplock inode %p", inode);
++	} else if ((oplock & 0xF) == OPLOCK_READ)
++		pCifsInode->clientCanCacheRead = true;
++
++	file->private_data = pCifsFile;
++	return pCifsFile;
 +}
 +
  int cifs_open(struct inode *inode, struct file *file)
