@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 05/15] cifs: eliminate the inode argument from cifs_new_fileinfo
-Date: Fri,  8 Oct 2010 13:31:02 -0400
-Message-ID: <1286559072-29032-6-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 03/15] cifs: eliminate cifs_posix_open_inode_helper
+Date: Fri,  8 Oct 2010 13:31:00 -0400
+Message-ID: <1286559072-29032-4-git-send-email-jlayton@redhat.com>
 References: <1286559072-29032-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,132 +10,100 @@ In-Reply-To: <1286559072-29032-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It already takes a file pointer. The inode associated with that had damn
-well better be the same one we're passing in anyway. Thus, there's no
-need for a separate argument here.
-
-Also, get rid of the bogus check for a null pCifsInode pointer. The
-CIFS_I macro uses container_of(), and that will virtually never return a
-NULL pointer anyway.
-
-Finally, move the setting of the canCache* flags outside of the lock.
-Other places in the code don't hold that lock when setting it, so I
-assume it's not really needed here either.
+This function is redundant. The only thing it does is set the canCache
+flags, but those get set in cifs_new_fileinfo anyway.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    3 +--
- fs/cifs/dir.c       |   30 ++++++++++++++----------------
- fs/cifs/file.c      |    6 +++---
- 3 files changed, 18 insertions(+), 21 deletions(-)
+ fs/cifs/file.c |   67 --------------------------------------------------------
+ 1 files changed, 0 insertions(+), 67 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index bed004c..a2bdfa2 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -105,8 +105,7 @@ extern u64 cifs_UnixTimeToNT(struct timespec);
- extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
- 				      int offset);
- 
--extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
--				__u16 fileHandle, struct file *file,
-+extern struct cifsFileInfo *cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 				struct tcon_link *tlink, __u32 oplock);
- extern int cifs_posix_open(char *full_path, struct inode **pinode,
- 				struct super_block *sb,
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 452c9b5..6c38a41 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -131,12 +131,13 @@ cifs_bp_rename_retry:
- }
- 
- struct cifsFileInfo *
--cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
-+cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 		  struct tcon_link *tlink, __u32 oplock)
- {
- 	struct dentry *dentry = file->f_path.dentry;
-+	struct inode *inode = dentry->d_inode;
-+	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
- 	struct cifsFileInfo *pCifsFile;
--	struct cifsInodeInfo *pCifsInode;
- 
- 	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
- 	if (pCifsFile == NULL)
-@@ -158,18 +159,16 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
- 
- 	write_lock(&GlobalSMBSeslock);
- 	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
--	pCifsInode = CIFS_I(newinode);
--	if (pCifsInode) {
--		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
--		if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
--			pCifsInode->clientCanCacheAll = true;
--			pCifsInode->clientCanCacheRead = true;
--			cFYI(1, "Exclusive Oplock inode %p", newinode);
--		} else if ((oplock & 0xF) == OPLOCK_READ)
--				pCifsInode->clientCanCacheRead = true;
--	}
-+	list_add(&pCifsFile->flist, &pCifsInode->openFileList);
- 	write_unlock(&GlobalSMBSeslock);
- 
-+	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
-+		pCifsInode->clientCanCacheAll = true;
-+		pCifsInode->clientCanCacheRead = true;
-+		cFYI(1, "Exclusive Oplock inode %p", inode);
-+	} else if ((oplock & 0xF) == OPLOCK_READ)
-+		pCifsInode->clientCanCacheRead = true;
-+
- 	file->private_data = pCifsFile;
- 
- 	return pCifsFile;
-@@ -476,8 +475,7 @@ cifs_create_set_dentry:
- 			goto cifs_create_out;
- 		}
- 
--		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
--						tlink, oplock);
-+		pfile_info = cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
- 		if (pfile_info == NULL) {
- 			fput(filp);
- 			CIFSSMBClose(xid, tcon, fileHandle);
-@@ -750,8 +748,8 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- 				goto lookup_out;
- 			}
- 
--			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
--						  tlink, oplock);
-+			cfile = cifs_new_fileinfo(fileHandle, filp, tlink,
-+						  oplock);
- 			if (cfile == NULL) {
- 				fput(filp);
- 				CIFSSMBClose(xid, pTcon, fileHandle);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e863d80..1edec19 100644
+index fd78a35..c10f085 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -214,8 +214,8 @@ int cifs_open(struct inode *inode, struct file *file)
+@@ -106,64 +106,6 @@ static inline int cifs_get_disposition(unsigned int flags)
+ 		return FILE_OPEN;
+ }
+ 
+-/* all arguments to this function must be checked for validity in caller */
+-static inline int
+-cifs_posix_open_inode_helper(struct inode *inode, struct file *file,
+-			     struct cifsInodeInfo *pCifsInode, __u32 oplock,
+-			     u16 netfid)
+-{
+-
+-	write_lock(&GlobalSMBSeslock);
+-
+-	pCifsInode = CIFS_I(file->f_path.dentry->d_inode);
+-	if (pCifsInode == NULL) {
+-		write_unlock(&GlobalSMBSeslock);
+-		return -EINVAL;
+-	}
+-
+-	if (pCifsInode->clientCanCacheRead) {
+-		/* we have the inode open somewhere else
+-		   no need to discard cache data */
+-		goto psx_client_can_cache;
+-	}
+-
+-	/* BB FIXME need to fix this check to move it earlier into posix_open
+-	   BB  fIX following section BB FIXME */
+-
+-	/* if not oplocked, invalidate inode pages if mtime or file
+-	   size changed */
+-/*	temp = cifs_NTtimeToUnix(le64_to_cpu(buf->LastWriteTime));
+-	if (timespec_equal(&file->f_path.dentry->d_inode->i_mtime, &temp) &&
+-			   (file->f_path.dentry->d_inode->i_size ==
+-			    (loff_t)le64_to_cpu(buf->EndOfFile))) {
+-		cFYI(1, "inode unchanged on server");
+-	} else {
+-		if (file->f_path.dentry->d_inode->i_mapping) {
+-			rc = filemap_write_and_wait(file->f_path.dentry->d_inode->i_mapping);
+-			if (rc != 0)
+-				CIFS_I(file->f_path.dentry->d_inode)->write_behind_rc = rc;
+-		}
+-		cFYI(1, "invalidating remote inode since open detected it "
+-			 "changed");
+-		invalidate_remote_inode(file->f_path.dentry->d_inode);
+-	} */
+-
+-psx_client_can_cache:
+-	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+-		pCifsInode->clientCanCacheAll = true;
+-		pCifsInode->clientCanCacheRead = true;
+-		cFYI(1, "Exclusive Oplock granted on inode %p",
+-			 file->f_path.dentry->d_inode);
+-	} else if ((oplock & 0xF) == OPLOCK_READ)
+-		pCifsInode->clientCanCacheRead = true;
+-
+-	/* will have to change the unlock if we reenable the
+-	   filemap_fdatawrite (which does not seem necessary */
+-	write_unlock(&GlobalSMBSeslock);
+-	return 0;
+-}
+-
+-/* all arguments to this function must be checked for validity in caller */
+ static inline int cifs_open_inode_helper(struct inode *inode,
+ 	struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO *buf,
+ 	char *full_path, int xid)
+@@ -271,15 +213,6 @@ int cifs_open(struct inode *inode, struct file *file)
+ 				oflags, &oplock, &netfid, xid);
  		if (rc == 0) {
  			cFYI(1, "posix open succeeded");
+-			/* no need for special case handling of setting mode
+-			   on read only files needed here */
+-
+-			rc = cifs_posix_open_inode_helper(inode, file,
+-					pCifsInode, oplock, netfid);
+-			if (rc != 0) {
+-				CIFSSMBClose(xid, tcon, netfid);
+-				goto out;
+-			}
  
--			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
--							tlink, oplock);
-+			pCifsFile = cifs_new_fileinfo(netfid, file, tlink,
-+						      oplock);
- 			if (pCifsFile == NULL) {
- 				CIFSSMBClose(xid, tcon, netfid);
- 				rc = -ENOMEM;
-@@ -307,7 +307,7 @@ int cifs_open(struct inode *inode, struct file *file)
- 	if (rc != 0)
- 		goto out;
- 
--	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
-+	pCifsFile = cifs_new_fileinfo(netfid, file, tlink, oplock);
- 	if (pCifsFile == NULL) {
- 		rc = -ENOMEM;
- 		goto out;
+ 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+ 							tlink, oflags, oplock);
 -- 
 1.7.2.3
