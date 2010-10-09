@@ -1,27 +1,148 @@
-From: Valerie Aurora <vaurora-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 08/17] Make follow_down() handle d_manage()
-Date: Fri, 8 Oct 2010 20:28:31 -0400
-Message-ID: <20101009002831.GG30846@shell>
-References: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk> <20100930181536.30939.6776.stgit@warthog.procyon.org.uk>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 2/7 cifs] ntlm authentication and signing - Build a
+ proper av/ti pair blob for ntlmv2 without extended security authentication
+Date: Sat, 9 Oct 2010 16:02:04 -0400
+Message-ID: <20101009160204.1ab1413e@corrin.poochiereds.net>
+References: <1286455528-3630-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: viro-rfM+Q5joDG/XmaaqVzeoHQ@public.gmane.org, jmoyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-fs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20100930181536.30939.6776.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+In-Reply-To: <1286455528-3630-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Sep 30, 2010 at 07:15:36PM +0100, David Howells wrote:
+On Thu,  7 Oct 2010 07:45:28 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> Build a av pair blob as part of ntlmv2 (without extended security) auth
+> request.  Include netbios and dns names for domain and server and
+> a timestamp in the blob.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsencrypt.c |   77 ++++++++++++++++++++++++++++++++++++++++++-------
+>  1 files changed, 66 insertions(+), 11 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 730038a..6a1e50c 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -263,27 +263,82 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
 >  }
+>  #endif /* CIFS_WEAK_PW_HASH */
 >  
->  /*
-> + * Follow down to the topmost point on a stack of mountpoints.  At each point,
+> -/* This is just a filler for ntlmv2 type of security mechanisms.
+> - * Older servers are not very particular about the contents of av pairs
+> - * in the blob and for sec mechs like ntlmv2, there is no negotiation
+> - * as in ntlmssp, so unless domain and server  netbios and dns names
+> - * are specified, there is no way to obtain name.  In case of ntlmssp,
+> - * server provides that info in type 2 challenge packet
+> +/* Build a proper attribute value/target info pairs blob.
+> + * Fill in netbios and dns domain name and workstation name
+> + * and client time (total five av pairs and + one end of fields indicator.
+> + * Allocate domain name which gets freed when session struct is deallocated.
+>   */
+>  static int
+> -build_avpair_blob(struct cifsSesInfo *ses)
+> +build_avpair_blob(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
+>  {
+> +	unsigned int dlen;
+> +	unsigned int wlen;
+> +	unsigned int size = 6 * sizeof(struct ntlmssp2_name);
+> +	__le64  curtime;
+> +	char *defdmname = "WORKGROUP";
+> +	unsigned char *blobptr;
+>  	struct ntlmssp2_name *attrptr;
+>  
+> -	ses->tilen = 2 * sizeof(struct ntlmssp2_name);
+> +	if (!ses->domainName)
+> +		ses->domainName = kstrdup(defdmname, GFP_KERNEL);
+> +
+	^^^^
+kstrdup can return NULL if memory can't be allocated. I think you need
+to check for that here.
 
-"Follow down to the topmost" -> "Follow down to covering mount" ?
+> +	dlen = strlen(ses->domainName);
+> +	wlen = strlen(ses->server->hostname);
+> +
+> +	/* The length of this blob is a size which is
+> +	 * six times the size of a structure which holds name/size +
+> +	 * two times the unicode length of a domain name +
+> +	 * two times the unicode length of a server name +
+> +	 * size of a timestamp (which is 8 bytes).
+> +	 */
+> +	ses->tilen = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
+>  	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
+>  	if (!ses->tiblob) {
+>  		ses->tilen = 0;
+>  		cERROR(1, "Challenge target info allocation failure");
+>  		return -ENOMEM;
+>  	}
+> -	attrptr = (struct ntlmssp2_name *) ses->tiblob;
+> -	attrptr->type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
+> +
+> +	blobptr = ses->tiblob;
+> +	attrptr = (struct ntlmssp2_name *) blobptr;
+> +
+> +	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
+> +	attrptr->length = cpu_to_le16(2 * dlen);
+> +	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
+> +	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
+> +
+> +	blobptr += 2 * dlen;
+> +	attrptr = (struct ntlmssp2_name *) blobptr;
+> +
+> +	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_COMPUTER_NAME);
+> +	attrptr->length = cpu_to_le16(2 * wlen);
+> +	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
+> +	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
+> +
+> +	blobptr += 2 * wlen;
+> +	attrptr = (struct ntlmssp2_name *) blobptr;
+> +
 
--VAL
+	^^^^^^^^^^
+Seems odd that we populate the NB and DNS AV pairs with the same
+values. Are you sure that's correct? I haven't read the spec as closely
+as you probably have, but intuitively I'd expect the NB name to be a
+shortname and the DNS name to be a FQDN....
+
+> +	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_DOMAIN_NAME);
+> +	attrptr->length = cpu_to_le16(2 * dlen);
+> +	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
+> +	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
+> +
+> +	blobptr += 2 * dlen;
+> +	attrptr = (struct ntlmssp2_name *) blobptr;
+> +
+> +	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_COMPUTER_NAME);
+> +	attrptr->length = cpu_to_le16(2 * wlen);
+> +	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
+> +	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
+> +
+> +	blobptr += 2 * wlen;
+> +	attrptr = (struct ntlmssp2_name *) blobptr;
+> +
+> +	attrptr->type = cpu_to_le16(NTLMSSP_AV_TIMESTAMP);
+> +	attrptr->length = cpu_to_le16(sizeof(__le64));
+> +	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
+> +	curtime = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+> +	memcpy(blobptr, &curtime, sizeof(__le64));
+>  
+>  	return 0;
+>  }
+> @@ -426,7 +481,7 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+>  			}
+>  		}
+>  	} else {
+> -		rc = build_avpair_blob(ses);
+> +		rc = build_avpair_blob(ses, nls_cp);
+>  		if (rc) {
+>  			cERROR(1, "error %d building av pair blob", rc);
+>  			return rc;
