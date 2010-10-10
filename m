@@ -1,108 +1,135 @@
-From: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
-Subject: Re: [PATCH 05/17] Remove the automount through follow_link()
- kludge code from pathwalk
-Date: Sun, 10 Oct 2010 09:16:12 +0800
-Message-ID: <1286673372.3691.14.camel@localhost>
-References: <20100930181455.30939.53914.stgit@warthog.procyon.org.uk>
-	 <20100930181521.30939.31415.stgit@warthog.procyon.org.uk>
-	 <20101008234130.GE30846@shell>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, viro-rfM+Q5joDG/XmaaqVzeoHQ@public.gmane.org,
-	jmoyer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-fs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Valerie Aurora <vaurora-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 2/7 -v2 ] CIFS ntlm authentication and signing - Build a proper av/ti pair blob for ntlmv2 without extended security authentication
+Date: Sun, 10 Oct 2010 13:21:05 -0500
+Message-ID: <1286734865-23973-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101008234130.GE30846@shell>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2010-10-08 at 19:41 -0400, Valerie Aurora wrote:
-> On Thu, Sep 30, 2010 at 07:15:21PM +0100, David Howells wrote:
-> > Remove the automount through follow_link() kludge code from pathwalk in favour
-> > of using d_automount().
-> > 
-> > Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > Acked-by: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
-> > ---
-> > 
-> >  fs/namei.c |   17 +++--------------
-> >  1 files changed, 3 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/fs/namei.c b/fs/namei.c
-> > index c50b9d7..86421f9 100644
-> > --- a/fs/namei.c
-> > +++ b/fs/namei.c
-> > @@ -861,17 +861,6 @@ fail:
-> >  }
-> >  
-> >  /*
-> > - * This is a temporary kludge to deal with "automount" symlinks; proper
-> > - * solution is to trigger them on follow_mount(), so that do_lookup()
-> > - * would DTRT.  To be killed before 2.6.34-final.
-> > - */
-> > -static inline int follow_on_final(struct inode *inode, unsigned lookup_flags)
-> > -{
-> > -	return inode && unlikely(inode->i_op->follow_link) &&
-> > -		((lookup_flags & LOOKUP_FOLLOW) || S_ISDIR(inode->i_mode));
-> > -}
-> > -
-> > -/*
-> >   * Name resolution.
-> >   * This is the basic name resolution function, turning a pathname into
-> >   * the final dentry. We expect 'base' to be positive and a directory.
-> > @@ -991,7 +980,8 @@ last_component:
-> >  		if (err)
-> >  			break;
-> >  		inode = next.dentry->d_inode;
-> > -		if (follow_on_final(inode, lookup_flags)) {
-> > +		if (inode && unlikely(inode->i_op->follow_link) &&
-> > +		    (lookup_flags & LOOKUP_FOLLOW)) {
-> >  			err = do_follow_link(&next, nd);
-> >  			if (err)
-> >  				goto return_err;
-> > @@ -1882,8 +1872,7 @@ reval:
-> >  		struct inode *inode = path.dentry->d_inode;
-> >  		void *cookie;
-> >  		error = -ELOOP;
-> > -		/* S_ISDIR part is a temporary automount kludge */
-> > -		if (!(nd.flags & LOOKUP_FOLLOW) && !S_ISDIR(inode->i_mode))
-> > +		if (!(nd.flags & LOOKUP_FOLLOW))
-> >  			goto exit_dput;
-> >  		if (count++ == 32)
-> >  			goto exit_dput;
-> 
-> While you're removing kludges, I bet you can also remove this from
-> __follow_link():
-> 
->        if (path->mnt != nd->mnt) {
->                path_to_nameidata(path, nd);
->                dget(dentry);
->        }
->        mntget(path->mnt);
-> 
-> And replace with:
-> 
->        if (path->mnt == nd->mnt)
->                mntget(path->mnt);
-> 
-> This reverts the non-helper-function parts of
-> 051d381259eb57d6074d02a6ba6e90e744f1a29f, which breaks union mounts.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Yeah, I was thinking of including it as a separate patch but thought it
-best to leave it until after we got feedback on the patch series.
 
-Folding it into this patch just didn't occur to me, but then that change
-was done long before the kluge this reverts so maybe including it would
-have caused some mild confusion and distracted focus away from the main
-task of the series.
+Build an av pair blob as part of ntlmv2 (without extended security) auth
+request.  Include netbios and dns names for domain and server and
+a timestamp in the blob.
 
-Clearly this change can now also be reverted without affecting autofs4,
-as an independent patch or as a patch included in the union mounts
-series.
 
-David, thoughts?
-Ian
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c |   80 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 files changed, 69 insertions(+), 11 deletions(-)
+
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 89fb94f..e3edd8a 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -263,27 +263,85 @@ void calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
+ }
+ #endif /* CIFS_WEAK_PW_HASH */
+ 
+-/* This is just a filler for ntlmv2 type of security mechanisms.
+- * Older servers are not very particular about the contents of av pairs
+- * in the blob and for sec mechs like ntlmv2, there is no negotiation
+- * as in ntlmssp, so unless domain and server  netbios and dns names
+- * are specified, there is no way to obtain name.  In case of ntlmssp,
+- * server provides that info in type 2 challenge packet
++/* Build a proper attribute value/target info pairs blob.
++ * Fill in netbios and dns domain name and workstation name
++ * and client time (total five av pairs and + one end of fields indicator.
++ * Allocate domain name which gets freed when session struct is deallocated.
+  */
+ static int
+-build_avpair_blob(struct cifsSesInfo *ses)
++build_avpair_blob(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
+ {
++	unsigned int dlen;
++	unsigned int wlen;
++	unsigned int size = 6 * sizeof(struct ntlmssp2_name);
++	__le64  curtime;
++	char *defdmname = "WORKGROUP";
++	unsigned char *blobptr;
+ 	struct ntlmssp2_name *attrptr;
+ 
+-	ses->tilen = 2 * sizeof(struct ntlmssp2_name);
++	if (!ses->domainName) {
++		ses->domainName = kstrdup(defdmname, GFP_KERNEL);
++		if (!ses->domainName)
++			return -ENOMEM;
++	}
++
++	dlen = strlen(ses->domainName);
++	wlen = strlen(ses->server->hostname);
++
++	/* The length of this blob is a size which is
++	 * six times the size of a structure which holds name/size +
++	 * two times the unicode length of a domain name +
++	 * two times the unicode length of a server name +
++	 * size of a timestamp (which is 8 bytes).
++	 */
++	ses->tilen = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
+ 	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
+ 	if (!ses->tiblob) {
+ 		ses->tilen = 0;
+ 		cERROR(1, "Challenge target info allocation failure");
+ 		return -ENOMEM;
+ 	}
+-	attrptr = (struct ntlmssp2_name *) ses->tiblob;
+-	attrptr->type = cpu_to_le16(NTLMSSP_DOMAIN_TYPE);
++
++	blobptr = ses->tiblob;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
++	attrptr->length = cpu_to_le16(2 * dlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
++
++	blobptr += 2 * dlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_COMPUTER_NAME);
++	attrptr->length = cpu_to_le16(2 * wlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
++
++	blobptr += 2 * wlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_DOMAIN_NAME);
++	attrptr->length = cpu_to_le16(2 * dlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->domainName, dlen, nls_cp);
++
++	blobptr += 2 * dlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_DNS_COMPUTER_NAME);
++	attrptr->length = cpu_to_le16(2 * wlen);
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	cifs_strtoUCS((__le16 *)blobptr, ses->server->hostname, wlen, nls_cp);
++
++	blobptr += 2 * wlen;
++	attrptr = (struct ntlmssp2_name *) blobptr;
++
++	attrptr->type = cpu_to_le16(NTLMSSP_AV_TIMESTAMP);
++	attrptr->length = cpu_to_le16(sizeof(__le64));
++	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
++	curtime = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	memcpy(blobptr, &curtime, sizeof(__le64));
+ 
+ 	return 0;
+ }
+@@ -429,7 +487,7 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 			}
+ 		}
+ 	} else {
+-		rc = build_avpair_blob(ses);
++		rc = build_avpair_blob(ses, nls_cp);
+ 		if (rc) {
+ 			cERROR(1, "error %d building av pair blob", rc);
+ 			return rc;
+-- 
+1.6.0.2
