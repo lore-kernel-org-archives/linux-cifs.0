@@ -1,46 +1,108 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 04/15] cifs: eliminate oflags option from
- cifs_new_fileinfo
-Date: Mon, 11 Oct 2010 14:52:04 -0400
-Message-ID: <20101011145204.39fc8930@corrin.poochiereds.net>
-References: <1286559072-29032-1-git-send-email-jlayton@redhat.com>
-	<1286559072-29032-5-git-send-email-jlayton@redhat.com>
-	<4CB2A392.9030400@suse.de>
-	<20101011071322.3a6e090c@corrin.poochiereds.net>
-	<AANLkTik4=achQnm=8XN+GWWKFL8QOddz4xVVaBs4X3sX@mail.gmail.com>
-	<20101011131707.646b8532@corrin.poochiereds.net>
-	<AANLkTik6tc0iJwDACT-nctOi2Ui5E31AihWN8-vCM2zo@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 03/16] cifs: eliminate cifs_posix_open_inode_helper
+Date: Mon, 11 Oct 2010 15:07:20 -0400
+Message-ID: <1286824053-12084-4-git-send-email-jlayton@redhat.com>
+References: <1286824053-12084-1-git-send-email-jlayton@redhat.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTik6tc0iJwDACT-nctOi2Ui5E31AihWN8-vCM2zo-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1286824053-12084-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 11 Oct 2010 12:27:47 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+This function is redundant. The only thing it does is set the canCache
+flags, but those get set in cifs_new_fileinfo anyway.
 
-> You are right - find_writeable_file is the common one, not
-> find_readable_file (might make sense to reverse the ordering -
-> readonly files at end instead of writeonly files at end - given
-> find_readable_file is called less often).   There are cases with a
-> file opened many times from different processes that I have seen.
-> Not sure why removing the ordering matters much - it is a possible,
-> albeit usually slight, performance benefit to keep file handles we are
-> most likely to want at the top of the list.
-> 
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
+---
+ fs/cifs/file.c |   67 --------------------------------------------------------
+ 1 files changed, 0 insertions(+), 67 deletions(-)
 
-If we were really concerned about performance here, fine-grained
-locking would get us much farther toward that goal. I'm concerned about
-people breaking the list order, which has obviously been broken for
-some time and no one has noticed.
-
-Eventually I want to overhaul all of the find_readable/writable_file
-code with a better interface. That will be simpler if I don't have
-to deal with unnecessary complexity like the list ordering here.
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index fd78a35..c10f085 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -106,64 +106,6 @@ static inline int cifs_get_disposition(unsigned int flags)
+ 		return FILE_OPEN;
+ }
+ 
+-/* all arguments to this function must be checked for validity in caller */
+-static inline int
+-cifs_posix_open_inode_helper(struct inode *inode, struct file *file,
+-			     struct cifsInodeInfo *pCifsInode, __u32 oplock,
+-			     u16 netfid)
+-{
+-
+-	write_lock(&GlobalSMBSeslock);
+-
+-	pCifsInode = CIFS_I(file->f_path.dentry->d_inode);
+-	if (pCifsInode == NULL) {
+-		write_unlock(&GlobalSMBSeslock);
+-		return -EINVAL;
+-	}
+-
+-	if (pCifsInode->clientCanCacheRead) {
+-		/* we have the inode open somewhere else
+-		   no need to discard cache data */
+-		goto psx_client_can_cache;
+-	}
+-
+-	/* BB FIXME need to fix this check to move it earlier into posix_open
+-	   BB  fIX following section BB FIXME */
+-
+-	/* if not oplocked, invalidate inode pages if mtime or file
+-	   size changed */
+-/*	temp = cifs_NTtimeToUnix(le64_to_cpu(buf->LastWriteTime));
+-	if (timespec_equal(&file->f_path.dentry->d_inode->i_mtime, &temp) &&
+-			   (file->f_path.dentry->d_inode->i_size ==
+-			    (loff_t)le64_to_cpu(buf->EndOfFile))) {
+-		cFYI(1, "inode unchanged on server");
+-	} else {
+-		if (file->f_path.dentry->d_inode->i_mapping) {
+-			rc = filemap_write_and_wait(file->f_path.dentry->d_inode->i_mapping);
+-			if (rc != 0)
+-				CIFS_I(file->f_path.dentry->d_inode)->write_behind_rc = rc;
+-		}
+-		cFYI(1, "invalidating remote inode since open detected it "
+-			 "changed");
+-		invalidate_remote_inode(file->f_path.dentry->d_inode);
+-	} */
+-
+-psx_client_can_cache:
+-	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+-		pCifsInode->clientCanCacheAll = true;
+-		pCifsInode->clientCanCacheRead = true;
+-		cFYI(1, "Exclusive Oplock granted on inode %p",
+-			 file->f_path.dentry->d_inode);
+-	} else if ((oplock & 0xF) == OPLOCK_READ)
+-		pCifsInode->clientCanCacheRead = true;
+-
+-	/* will have to change the unlock if we reenable the
+-	   filemap_fdatawrite (which does not seem necessary */
+-	write_unlock(&GlobalSMBSeslock);
+-	return 0;
+-}
+-
+-/* all arguments to this function must be checked for validity in caller */
+ static inline int cifs_open_inode_helper(struct inode *inode,
+ 	struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO *buf,
+ 	char *full_path, int xid)
+@@ -271,15 +213,6 @@ int cifs_open(struct inode *inode, struct file *file)
+ 				oflags, &oplock, &netfid, xid);
+ 		if (rc == 0) {
+ 			cFYI(1, "posix open succeeded");
+-			/* no need for special case handling of setting mode
+-			   on read only files needed here */
+-
+-			rc = cifs_posix_open_inode_helper(inode, file,
+-					pCifsInode, oplock, netfid);
+-			if (rc != 0) {
+-				CIFSSMBClose(xid, tcon, netfid);
+-				goto out;
+-			}
+ 
+ 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+ 							tlink, oflags, oplock);
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.2.3
