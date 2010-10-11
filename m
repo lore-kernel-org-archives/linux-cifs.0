@@ -1,104 +1,187 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 04/15] cifs: eliminate oflags option from
- cifs_new_fileinfo
-Date: Mon, 11 Oct 2010 07:13:22 -0400
-Message-ID: <20101011071322.3a6e090c@corrin.poochiereds.net>
-References: <1286559072-29032-1-git-send-email-jlayton@redhat.com>
-	<1286559072-29032-5-git-send-email-jlayton@redhat.com>
-	<4CB2A392.9030400@suse.de>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] handle extended attribute name cifsacl to generate cifs
+ acl blob
+Date: Mon, 11 Oct 2010 08:28:16 -0500
+Message-ID: <AANLkTin0S9uBAA9gjpBt1KtE-q+H4OX9oQXS46qiN8uz@mail.gmail.com>
+References: <1286460207-4024-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20101009164217.2c098abb@corrin.poochiereds.net>
+	<AANLkTinxQpaHdLx+Zr=caMqVW0Qz2Xiom5NOqp8DbxWE@mail.gmail.com>
+	<AANLkTinKtWpwYtMsDUUTQJM1UncazGzXb3N6VaiYmJ1N@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CB2A392.9030400-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <AANLkTinKtWpwYtMsDUUTQJM1UncazGzXb3N6VaiYmJ1N-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 11 Oct 2010 11:11:38 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+On Sun, Oct 10, 2010 at 9:15 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
+e:
+> On Sat, Oct 9, 2010 at 3:42 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
+:
+>> On Thu, =A07 Oct 2010 09:03:27 -0500
+>> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>>
+>>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>>
+>>>
+>>> Add extended attribute name system.cifsacl
+>>>
+>>> Get/generate cifs/ntfs acl blob and hand over to the invoker howeve=
+r
+>>> it wants to parse/process it.
+>>>
+>>> Stop generating cifs/ntfs acl blob for xattr name system.posix_acl_=
+access
+>>>
+>>>
+>>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>> ---
+>>> =A0fs/cifs/xattr.c | =A0 64 +++++++++++++++++++++++++++++++++++++--=
+----------------
+>>> =A01 files changed, 43 insertions(+), 21 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+>>> --- a/fs/cifs/xattr.c
+>>> +++ b/fs/cifs/xattr.c
+> <snip>
+>>> +static int
+>>> +get_cifs_acl(int xid, struct cifsTconInfo *pTcon, char *full_path,
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 void *ea_value, size_t si=
+ze, struct nls_table *nls_cp)
+>>> +{
+>>> + =A0 =A0 __u16 fid;
+>>> + =A0 =A0 int rc;
+>>> + =A0 =A0 int oplock =3D 0;
+>>> + =A0 =A0 unsigned int acllen =3D 0;
+>>> + =A0 =A0 struct cifs_ntsd *pacl =3D NULL;
+>>> +
+>>> + =A0 =A0 rc =3D CIFSSMBOpen(xid, pTcon, full_path, FILE_OPEN, GENE=
+RIC_READ,
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 0, &fid, &oplock, NULL, n=
+ls_cp, 0);
+>>> + =A0 =A0 if (rc) {
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: file open error: %d", __fu=
+nc__, rc);
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 return rc;
+>>> + =A0 =A0 }
+>>> +
+>> =A0 =A0 =A0 =A0^^^^
+>> Hmm possible oplock break. Wouldn't it be better to see if you alrea=
+dy
+>> have a readable filehandle before you do this?
+>
+> Yes - absolutely need to check for matching file handle
+>
+>>> + =A0 =A0 rc =3D CIFSSMBGetCIFSACL(xid, pTcon, fid, &pacl, &acllen)=
+;
+>>> + =A0 =A0 CIFSSMBClose(xid, pTcon, fid);
+>>> + =A0 =A0 if (rc) {
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: get acl error: %d", __func=
+__, rc);
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 return rc;
+>>> + =A0 =A0 }
+>>> +
+>>> + =A0 =A0 if (ea_value) {
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 if (acllen > size) {
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(pacl);
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ERANGE;
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ea_value, pacl, acllen);
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 kfree(pacl);
+>>> + =A0 =A0 }
+>>> +
+>>> + =A0 =A0 return acllen;
+>>> +}
+>>> +
+>>> =A0int cifs_setxattr(struct dentry *direntry, const char *ea_name,
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const void *ea_value, size_t value_=
+size, int flags)
+>>> =A0{
+>>> @@ -277,27 +314,6 @@ ssize_t cifs_getxattr(struct dentry *direntry,=
+ const char *ea_name,
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb=
+->local_nls,
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb=
+->mnt_cifs_flags &
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 CIFS_MOUNT_MAP_SPECIAL_CHR);
+>>> -#ifdef CONFIG_CIFS_EXPERIMENTAL
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 else if (cifs_sb->mnt_cifs_flags & CIFS_M=
+OUNT_CIFS_ACL) {
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u16 fid;
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int oplock =3D 0;
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_ntsd *pacl =3D=
+ NULL;
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u32 buflen =3D 0;
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (experimEnabled)
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CI=
+=46SSMBOpen(xid, pTcon, full_path,
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 FILE_OPEN, GENERIC_READ, 0, &fid,
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 &oplock, NULL, cifs_sb->local_nls,
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 cifs_sb->mnt_cifs_flags &
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 CIFS_MOUNT_MAP_SPECIAL_CHR);
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* else rc is EOPNOTSUPP =
+from above */
+>>> -
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc =3D=3D 0) {
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CI=
+=46SSMBGetCIFSACL(xid, pTcon, fid, &pacl,
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &buflen);
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFSSMBCl=
+ose(xid, pTcon, fid);
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>>> - =A0 =A0 =A0 =A0 =A0 =A0 }
+>>> -#endif /* EXPERIMENTAL */
+>>> =A0#else
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "query POSIX ACL not supported =
+yet");
+>>> =A0#endif /* CONFIG_CIFS_POSIX */
+>>> @@ -313,6 +329,12 @@ ssize_t cifs_getxattr(struct dentry *direntry,=
+ const char *ea_name,
+>>> =A0#else
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "query POSIX default ACL not su=
+pported yet");
+>>> =A0#endif
+>>> +#ifdef CONFIG_CIFS_EXPERIMENTAL
+>>> + =A0 =A0 } else if (strncmp(ea_name, CIFS_ACL_XATTR,
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strlen(CI=
+=46S_ACL_XATTR)) =3D=3D 0) {
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D get_cifs_acl(xid, =
+pTcon, full_path, ea_value,
+>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 buf_size, cifs_sb->local_nls);
+>>> +#endif /* CONFIG_CIFS_EXPERIMENTAL */
+>>> =A0 =A0 =A0 } else if (strncmp(ea_name,
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_XATTR_TRUSTED_PREFIX, XATTR_TR=
+USTED_PREFIX_LEN) =3D=3D 0) {
+>>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Trusted xattr namespace not su=
+pported yet");
+>>
+>> I'd probably prefer not to see this new code wrapped in experimental
+>> tags. I don't think that adds any real value, especially not with
+>> something as simple as this.
+>
+> I agree - seems low risk as well.
+>
+> --
+> Thanks,
+>
+> Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
+>
 
-> On 10/08/2010 11:01 PM, Jeff Layton wrote:
-> > Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
-> > The callers mostly pass in the filp->f_flags here, except for one place
-> > that passes in the flags after they've been converted to their SMB_O_*
-> > equivalents.
-> > 
-> > None of these are correct however since we're checking that value for
-> > the presence of FMODE_READ. Luckily that only affects how the f_list is
-> > ordered. What it really wants here is the file->f_mode, but this check
-> > really makes no sense whatsoever. FMODE_READ will be set for O_RDWR or
-> > O_RDONLY opens. So this in effect just moves those to the front of the
-> > list and leaves O_WRONLY at the end.
-> > 
-> > That might make some sense if anything actually paid attention to this
-> > list order, but nothing does. find_readable_file and find_writable_file
-> > both walk through the list in the same direction.
-> > 
-> > Let's just keep this simple and just put things on the list with
-> > list_add.
-> > 
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifsproto.h |    3 +--
-> >  fs/cifs/dir.c       |   15 ++++-----------
-> >  fs/cifs/file.c      |    5 ++---
-> >  3 files changed, 7 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> > index 7f416ab..bed004c 100644
-> > --- a/fs/cifs/cifsproto.h
-> > +++ b/fs/cifs/cifsproto.h
-> > @@ -107,8 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
-> >  
-> >  extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
-> >  				__u16 fileHandle, struct file *file,
-> > -				struct tcon_link *tlink,
-> > -				unsigned int oflags, __u32 oplock);
-> > +				struct tcon_link *tlink, __u32 oplock);
-> >  extern int cifs_posix_open(char *full_path, struct inode **pinode,
-> >  				struct super_block *sb,
-> >  				int mode, int oflags,
-> > diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> > index c205ec9..452c9b5 100644
-> > --- a/fs/cifs/dir.c
-> > +++ b/fs/cifs/dir.c
-> > @@ -132,7 +132,7 @@ cifs_bp_rename_retry:
-> >  
-> >  struct cifsFileInfo *
-> >  cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
-> > -		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
-> > +		  struct tcon_link *tlink, __u32 oplock)
-> >  {
-> >  	struct dentry *dentry = file->f_path.dentry;
-> >  	struct cifsFileInfo *pCifsFile;
-> > @@ -160,13 +160,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
-> >  	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
-> >  	pCifsInode = CIFS_I(newinode);
-> >  	if (pCifsInode) {
-> > -		/* if readable file instance put first in list*/
-> > -		if (oflags & FMODE_READ)
-> > -			list_add(&pCifsFile->flist, &pCifsInode->openFileList);
-> > -		else
-> > -			list_add_tail(&pCifsFile->flist,
-> > -				      &pCifsInode->openFileList);
-> > -
-> > +		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
-> 
-> find_readable_file() assumes that if it is a write-only file, it will be
-> in the tail and it can break out of the loop. That needs to be fixed as
-> well?
-> 
-
-Good catch. You're correct...
-
-So I guess my assertion that nothing cares about the list order isn't
-true. Is this optimization worth preserving?
-
-My gut feeling is "no". The operations inside of find_readable_file are
-sufficiently cheap that it's not worth the extra complexity, but I'm
-willing to listen to arguments to the contrary...
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Did resubmit the patch.
