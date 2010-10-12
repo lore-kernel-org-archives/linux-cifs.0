@@ -1,68 +1,269 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: initial stab at a design document for SMB transport layer
- overhaul
-Date: Tue, 12 Oct 2010 14:39:42 -0400
-Message-ID: <20101012143942.4370777a@corrin.poochiereds.net>
-References: <20101012134317.78a3ecea@corrin.poochiereds.net>
-	<AANLkTi=6_WKDH9uz4rCTW+BdWf=g91ygdj2N9JOYTima@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] [CIFS] [1/4] NTLM authentication and signing - Calculate auth response per smb session
+Date: Tue, 12 Oct 2010 14:45:03 -0500
+Message-ID: <1286912703-22661-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=6_WKDH9uz4rCTW+BdWf=g91ygdj2N9JOYTima-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 12 Oct 2010 22:11:35 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> 2010/10/12 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> >
-> > The code will use a state machine to manage the socket's receive path,
-> > and will overload the sk_* functions to handle the socket without
-> > needing a dedicated thread for this. When the sk_data_ready callback
-> > fires, data will be recevied off the socket in interrupt context until
-> > we can get down to the MID in the header. At that point, we'll be able
-> > to wake up whatever thread is waiting for the reply to do the rest. If
-> 
-> Should we read a whole request by state machine and then wake up
-> awaiting thread?
-> 
-> > it's an async request, a workqueue task will be queued to a smbiod
-> > workqueue to handle it.
-> 
-> So, do you mean that there will be another thread that awaits all
-> async requests on smbiod workqueue and then calls callback for
-> handling?
-> 
+Start calculation auth response within a session.  Move/Add pertinet
+data structures like session key, server challenge and ntlmv2_hash in
+a session structure.  We should do the calculations within a session
+before copying session key and response over to server data
+structures because a session setup can fail.
 
-In interrupt context, we'll read the header down to the MID and look up
-the request in a table (similar to how we do today in CIFS). For sync
-requests, we'll wake up the waiting thread which would copy the header
-info read so far into the buffer, and read the rest of the reply off
-the socket. The smb layer will provide functions that the upper layers
-can use to read in the rest of the reply (not 100% sure of the best way
-to do that yet).
+Only after a very first smb session succeeds, it copies/makes its
+session key, session key of smb connection.  This key stays with
+the smb connection throughout its life.
 
-async requests will require the caller to set up a callback function to
-handle the reply. That callback function will be queued to the
-workqueue. It'll need to read in the rest of the reply off the socket
-and then process the result.
 
-I think this is a cleaner and more efficient approach than having more
-threads.
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c |   16 ++++++++--------
+ fs/cifs/cifsglob.h    |    6 ++++--
+ fs/cifs/cifssmb.c     |    4 ++--
+ fs/cifs/connect.c     |   16 +++++++++++++---
+ fs/cifs/sess.c        |   28 ++++++++--------------------
+ 5 files changed, 35 insertions(+), 35 deletions(-)
 
-> 
-> In general, the doc looks very good to me. May be you move it to Google Docs?
-> 
-
-Thanks for looking. I'm trying to make sure I have the design at least
-somewhat finalized before I start coding.
-
-I may move it to the samba wiki once it's a bit more finalized. I'm not
-a huge fan of google docs ;).
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index e3edd8a..7ac0056 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -458,7 +458,7 @@ calc_exit_1:
+ calc_exit_2:
+ 	/* BB FIXME what about bytes 24 through 40 of the signing key?
+ 	   compare with the NTLM example */
+-	hmac_md5_final(ses->server->ntlmv2_hash, pctxt);
++	hmac_md5_final(ses->ntlmv2_hash, pctxt);
+ 
+ 	kfree(pctxt);
+ 	return rc;
+@@ -502,14 +502,14 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 	}
+ 	CalcNTLMv2_response(ses, resp_buf);
+ 
+-	/* now calculate the MAC key for NTLMv2 */
+-	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
++	/* now calculate the session key for NTLMv2 */
++	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
+ 	hmac_md5_update(resp_buf, 16, &context);
+-	hmac_md5_final(ses->server->session_key.data.ntlmv2.key, &context);
++	hmac_md5_final(ses->auth_key.data.ntlmv2.key, &context);
+ 
+-	memcpy(&ses->server->session_key.data.ntlmv2.resp, resp_buf,
++	memcpy(&ses->auth_key.data.ntlmv2.resp, resp_buf,
+ 	       sizeof(struct ntlmv2_resp));
+-	ses->server->session_key.len = 16 + sizeof(struct ntlmv2_resp);
++	ses->auth_key.len = 16 + sizeof(struct ntlmv2_resp);
+ 
+ 	return 0;
+ 
+@@ -526,8 +526,8 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
+ {
+ 	struct HMACMD5Context context;
+ 	/* rest of v2 struct already generated */
+-	memcpy(v2_session_response + 8, ses->server->cryptKey, 8);
+-	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
++	memcpy(v2_session_response + 8, ses->cryptKey, 8);
++	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
+ 
+ 	hmac_md5_update(v2_session_response+8,
+ 			sizeof(struct ntlmv2_resp) - 8, &context);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 4f85dfd..7d834b1 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -179,12 +179,10 @@ struct TCP_Server_Info {
+ 	int capabilities; /* allow selective disabling of caps by smb sess */
+ 	int timeAdj;  /* Adjust for difference in server time zone in sec */
+ 	__u16 CurrentMid;         /* multiplex id - rotating counter */
+-	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
+ 	/* 16th byte of RFC1001 workstation name is always null */
+ 	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+ 	__u32 sequence_number; /* needed for CIFS PDU signature */
+ 	struct session_key session_key;
+-	char ntlmv2_hash[16];
+ 	unsigned long lstrp; /* when we got last response from this server */
+ 	u16 dialect; /* dialect index that server chose */
+ 	/* extended security flavors that server supports */
+@@ -192,6 +190,7 @@ struct TCP_Server_Info {
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_ntlmssp;		/* supports NTLMSSP */
++	bool session_estab; /* mark when very first sess is established */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
+ #endif
+@@ -223,6 +222,9 @@ struct cifsSesInfo {
+ 	char userName[MAX_USERNAME_SIZE + 1];
+ 	char *domainName;
+ 	char *password;
++	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
++	struct session_key auth_key;
++	char ntlmv2_hash[16];
+ 	unsigned int tilen; /* length of the target info blob */
+ 	unsigned char *tiblob; /* target info blob in challenge response */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 54bd83a..a420c7b 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -503,7 +503,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 
+ 		if (rsp->EncryptionKeyLength ==
+ 				cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
+-			memcpy(server->cryptKey, rsp->EncryptionKey,
++			memcpy(ses->cryptKey, rsp->EncryptionKey,
+ 				CIFS_CRYPTO_KEY_SIZE);
+ 		} else if (server->secMode & SECMODE_PW_ENCRYPT) {
+ 			rc = -EIO; /* need cryptkey unless plain text */
+@@ -574,7 +574,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 	server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
+ 	server->timeAdj *= 60;
+ 	if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
+-		memcpy(server->cryptKey, pSMBr->u.EncryptionKey,
++		memcpy(ses->cryptKey, pSMBr->u.EncryptionKey,
+ 		       CIFS_CRYPTO_KEY_SIZE);
+ 	} else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
+ 			&& (pSMBr->EncryptionKeyLength == 0)) {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 4944fc8..3606ba8 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -206,6 +206,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 			if (server->tcpStatus != CifsExiting)
+ 				server->tcpStatus = CifsGood;
+ 			server->sequence_number = 0;
++			server->session_estab = false;
+ 			spin_unlock(&GlobalMid_Lock);
+ 	/*		atomic_set(&server->inFlight,0);*/
+ 			wake_up(&server->response_q);
+@@ -1631,6 +1632,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		volume_info->source_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
+ 	memcpy(tcp_ses->server_RFC1001_name,
+ 		volume_info->target_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
++	tcp_ses->session_estab = false;
+ 	tcp_ses->sequence_number = 0;
+ 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+ 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
+@@ -2983,14 +2985,13 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
+ #ifdef CONFIG_CIFS_WEAK_PW_HASH
+ 		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
+ 		    (ses->server->secType == LANMAN))
+-			calc_lanman_hash(tcon->password, ses->server->cryptKey,
++			calc_lanman_hash(tcon->password, ses->cryptKey,
+ 					 ses->server->secMode &
+ 					    SECMODE_PW_ENCRYPT ? true : false,
+ 					 bcc_ptr);
+ 		else
+ #endif /* CIFS_WEAK_PW_HASH */
+-		SMBNTencrypt(tcon->password, ses->server->cryptKey,
+-			     bcc_ptr);
++		SMBNTencrypt(tcon->password, ses->cryptKey, bcc_ptr);
+ 
+ 		bcc_ptr += CIFS_SESS_KEY_SIZE;
+ 		if (ses->capabilities & CAP_UNICODE) {
+@@ -3175,6 +3176,15 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
+ 	if (rc) {
+ 		cERROR(1, "Send error in SessSetup = %d", rc);
+ 	} else {
++		mutex_lock(&ses->server->srv_mutex);
++		if (!server->session_estab) {
++			memcpy(&server->session_key.data,
++				&ses->auth_key.data, ses->auth_key.len);
++			server->session_key.len = ses->auth_key.len;
++			ses->server->session_estab = true;
++		}
++		mutex_unlock(&server->srv_mutex);
++
+ 		cFYI(1, "CIFS Session Established successfully");
+ 		spin_lock(&GlobalMid_Lock);
+ 		ses->status = CifsGood;
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index c926e6c..2111bed 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -402,7 +402,7 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 		return -EINVAL;
+ 	}
+ 
+-	memcpy(ses->server->cryptKey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
++	memcpy(ses->cryptKey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
+ 	/* BB we could decode pblob->NegotiateFlags; some may be useful */
+ 	/* In particular we can examine sign flags */
+ 	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
+@@ -591,17 +591,12 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
+ 	int bytes_remaining;
+ 	struct key *spnego_key = NULL;
+ 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+-	bool first_time;
+ 	int blob_len;
+ 	char *ntlmsspblob = NULL;
+ 
+ 	if (ses == NULL)
+ 		return -EINVAL;
+ 
+-	read_lock(&cifs_tcp_ses_lock);
+-	first_time = is_first_ses_reconnect(ses);
+-	read_unlock(&cifs_tcp_ses_lock);
+-
+ 	type = ses->server->secType;
+ 
+ 	cFYI(1, "sess setup type %d", type);
+@@ -672,7 +667,7 @@ ssetup_ntlmssp_authenticate:
+ 		/* BB calculate hash with password */
+ 		/* and copy into bcc */
+ 
+-		calc_lanman_hash(ses->password, ses->server->cryptKey,
++		calc_lanman_hash(ses->password, ses->cryptKey,
+ 				 ses->server->secMode & SECMODE_PW_ENCRYPT ?
+ 					true : false, lnm_session_key);
+ 
+@@ -699,15 +694,11 @@ ssetup_ntlmssp_authenticate:
+ 			cpu_to_le16(CIFS_SESS_KEY_SIZE);
+ 
+ 		/* calculate session key */
+-		SMBNTencrypt(ses->password, ses->server->cryptKey,
+-			     ntlm_session_key);
++		SMBNTencrypt(ses->password, ses->cryptKey, ntlm_session_key);
+ 
+-		if (first_time) /* should this be moved into common code
+-				  with similar ntlmv2 path? */
+-			cifs_calculate_session_key(&ses->server->session_key,
+-				ntlm_session_key, ses->password);
++		cifs_calculate_session_key(&ses->auth_key,
++					ntlm_session_key, ses->password);
+ 		/* copy session key */
+-
+ 		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
+ 		bcc_ptr += CIFS_SESS_KEY_SIZE;
+ 		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
+@@ -794,17 +785,14 @@ ssetup_ntlmssp_authenticate:
+ 		}
+ 		/* bail out if key is too long */
+ 		if (msg->sesskey_len >
+-		    sizeof(ses->server->session_key.data.krb5)) {
++		    sizeof(ses->auth_key.data.krb5)) {
+ 			cERROR(1, "Kerberos signing key too long (%u bytes)",
+ 				msg->sesskey_len);
+ 			rc = -EOVERFLOW;
+ 			goto ssetup_exit;
+ 		}
+-		if (first_time) {
+-			ses->server->session_key.len = msg->sesskey_len;
+-			memcpy(ses->server->session_key.data.krb5,
+-				msg->data, msg->sesskey_len);
+-		}
++		ses->auth_key.len = msg->sesskey_len;
++		memcpy(ses->auth_key.data.krb5, msg->data, msg->sesskey_len);
+ 		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+ 		capabilities |= CAP_EXTENDED_SECURITY;
+ 		pSMB->req.Capabilities = cpu_to_le32(capabilities);
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.6.0.2
