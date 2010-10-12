@@ -1,53 +1,73 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 05/16] cifs: eliminate oflags option from
- cifs_new_fileinfo
-Date: Mon, 11 Oct 2010 15:25:08 -0400
-Message-ID: <20101011152508.452f6599@corrin.poochiereds.net>
-References: <1286824053-12084-1-git-send-email-jlayton@redhat.com>
-	<1286824053-12084-6-git-send-email-jlayton@redhat.com>
-	<AANLkTik4nwj6W+Pp08+dRPMZw=w-8Z8OXdiutLVS5+v8@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: reinstate ip= as an override for address
+ resolution
+Date: Tue, 12 Oct 2010 08:53:10 -0400
+Message-ID: <20101012085310.12644123@corrin.poochiereds.net>
+References: <1286565306-32035-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTik4nwj6W+Pp08+dRPMZw=w-8Z8OXdiutLVS5+v8-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1286565306-32035-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 11 Oct 2010 14:14:36 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Fri,  8 Oct 2010 15:15:05 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> On Mon, Oct 11, 2010 at 2:07 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
-> > The callers mostly pass in the filp->f_flags here.
-> >
-> > That's not correct however since we're checking that value for
-> > the presence of FMODE_READ. Luckily that only affects how the f_list is
-> > ordered. What it really wants here is the file->f_mode, but this check
-> > really makes no sense whatsoever. FMODE_READ will be set for O_RDWR or
-> > O_RDONLY opens. So this in effect just moves those to the front of the
-> > list and leaves O_WRONLY at the end.
-> >
-> > That might make some sense if more things paid attention to the list
-> > order, but the only thing that does is find_readable_file, which uses
-> > it to stop scanning the list when it hits a write-only one.
+> The manpage says:
 > 
-> Removing a small optimization for small simplification of code seems
-> less useful type of patch.   Not sure how often the acl calls get hit
-> - but it is remotely possible that this could affect performance.
+>        ip=arg
+>            sets the destination IP address. This option is set automatically
+>            if the server name portion of the requested UNC name can be
+>            resolved so rarely needs to be specified by the user.
 > 
+> ...but recent changes have made it not work anymore as an override if
+> someone specifies an ip= option as part of the mount options. Reinstate
+> that behavior by copying the ip= option verbatim into the addrlist of
+> the parsed options struct and then skipping the name resolution. That
+> should allow the ip= option to pass unadulterated to the kernel.
+> 
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  mount.cifs.c |    6 +++++-
+>  1 files changed, 5 insertions(+), 1 deletions(-)
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index ed27bba..df92d79 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -958,10 +958,12 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+>  					"target ip address argument missing\n");
+>  			} else if (strnlen(value, MAX_ADDRESS_LEN) <=
+>  				MAX_ADDRESS_LEN) {
+> +				strcpy(parsed_info->addrlist, value);
+>  				if (parsed_info->verboseflag)
+>  					fprintf(stderr,
+>  						"ip address %s override specified\n",
+>  						value);
+> +				goto nocopy;
+>  			} else {
+>  				fprintf(stderr, "ip address too long\n");
+>  				return EX_USAGE;
+> @@ -1556,7 +1558,9 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+>  	if (rc)
+>  		goto assemble_exit;
+>  
+> -	rc = resolve_host(parsed_info->host, parsed_info->addrlist);
+> +	if (parsed_info->addrlist[0] == '\0')
+> +		rc = resolve_host(parsed_info->host, parsed_info->addrlist);
+> +
+>  	switch (rc) {
+>  	case EX_USAGE:
+>  		fprintf(stderr, "mount error: could not resolve address for "
 
-Emphasis on _remotely_ :)
+Committed...
 
-They don't get hit at all unless you're mounting with -o cifsacl. If
-you're doing that, performance is already going to suck and this won't
-make the least bit of difference.
-
-It's really hard to see how this would have any measurable performance
-impact. I think we'll all be better off with clear, defensive code for
-this sort of stuff rather than questionable optimizations.
+I'll probably wait a few days to see if any more patches turn up and
+then do a new release later this week or next. Post 'em if you've got
+'em.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
