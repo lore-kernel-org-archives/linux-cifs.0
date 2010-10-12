@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] [CIFS] [1/4] NTLM authentication and signing - Calculate auth response per smb session
-Date: Tue, 12 Oct 2010 14:45:03 -0500
-Message-ID: <1286912703-22661-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH] [CIFS] [2/4] NTLM authentication and signing - Make tiblob as part of session key (response)
+Date: Tue, 12 Oct 2010 14:45:19 -0500
+Message-ID: <1286912719-22686-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -11,259 +11,187 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Start calculation auth response within a session.  Move/Add pertinet
-data structures like session key, server challenge and ntlmv2_hash in
-a session structure.  We should do the calculations within a session
-before copying session key and response over to server data
-structures because a session setup can fail.
 
-Only after a very first smb session succeeds, it copies/makes its
-session key, session key of smb connection.  This key stays with
-the smb connection throughout its life.
+Have to move av_pair/ti blob to session key as part of ntlmv2 response.
+This entire blob is part of the response and is use to calculate
+signature for cases like ntlmv2 (without extended security) authentication.
+The size of the blob is hard coded to 1024 byte which should be
+sufficient to accomodate all 11 types of av pair types and their
+lenghts/values.
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |   16 ++++++++--------
- fs/cifs/cifsglob.h    |    6 ++++--
- fs/cifs/cifssmb.c     |    4 ++--
- fs/cifs/connect.c     |   16 +++++++++++++---
- fs/cifs/sess.c        |   28 ++++++++--------------------
- 5 files changed, 35 insertions(+), 35 deletions(-)
+ fs/cifs/cifsencrypt.c |   22 ++++++++--------------
+ fs/cifs/cifsglob.h    |    2 +-
+ fs/cifs/cifspdu.h     |    5 +++++
+ fs/cifs/connect.c     |    1 -
+ fs/cifs/sess.c        |   24 ++++++------------------
+ 5 files changed, 20 insertions(+), 34 deletions(-)
 
 diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index e3edd8a..7ac0056 100644
+index 7ac0056..83a17d7 100644
 --- a/fs/cifs/cifsencrypt.c
 +++ b/fs/cifs/cifsencrypt.c
-@@ -458,7 +458,7 @@ calc_exit_1:
- calc_exit_2:
- 	/* BB FIXME what about bytes 24 through 40 of the signing key?
- 	   compare with the NTLM example */
--	hmac_md5_final(ses->server->ntlmv2_hash, pctxt);
-+	hmac_md5_final(ses->ntlmv2_hash, pctxt);
+@@ -295,14 +295,7 @@ build_avpair_blob(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
+ 	 * size of a timestamp (which is 8 bytes).
+ 	 */
+ 	ses->tilen = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
+-	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
+-	if (!ses->tiblob) {
+-		ses->tilen = 0;
+-		cERROR(1, "Challenge target info allocation failure");
+-		return -ENOMEM;
+-	}
+-
+-	blobptr = ses->tiblob;
++	blobptr = ses->auth_key.data.ntlmv2.tiblob;
+ 	attrptr = (struct ntlmssp2_name *) blobptr;
  
- 	kfree(pctxt);
- 	return rc;
-@@ -502,14 +502,14 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
- 	}
- 	CalcNTLMv2_response(ses, resp_buf);
+ 	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
+@@ -366,11 +359,11 @@ find_domain_name(struct cifsSesInfo *ses)
+ 	unsigned char *blobend;
+ 	struct ntlmssp2_name *attrptr;
  
--	/* now calculate the MAC key for NTLMv2 */
--	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
-+	/* now calculate the session key for NTLMv2 */
-+	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
- 	hmac_md5_update(resp_buf, 16, &context);
--	hmac_md5_final(ses->server->session_key.data.ntlmv2.key, &context);
-+	hmac_md5_final(ses->auth_key.data.ntlmv2.key, &context);
+-	if (!ses->tilen || !ses->tiblob)
++	if (!ses->tilen)
+ 		return 0;
  
--	memcpy(&ses->server->session_key.data.ntlmv2.resp, resp_buf,
-+	memcpy(&ses->auth_key.data.ntlmv2.resp, resp_buf,
+-	blobptr = ses->tiblob;
+-	blobend = ses->tiblob + ses->tilen;
++	blobptr = ses->auth_key.data.ntlmv2.tiblob;
++	blobend = blobptr + ses->tilen;
+ 
+ 	while (blobptr + onesize < blobend) {
+ 		attrptr = (struct ntlmssp2_name *) blobptr;
+@@ -510,12 +503,12 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 	memcpy(&ses->auth_key.data.ntlmv2.resp, resp_buf,
  	       sizeof(struct ntlmv2_resp));
--	ses->server->session_key.len = 16 + sizeof(struct ntlmv2_resp);
-+	ses->auth_key.len = 16 + sizeof(struct ntlmv2_resp);
+ 	ses->auth_key.len = 16 + sizeof(struct ntlmv2_resp);
++	if (ses->tilen)
++		ses->auth_key.len += ses->tilen;
  
  	return 0;
  
-@@ -526,8 +526,8 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
- {
- 	struct HMACMD5Context context;
- 	/* rest of v2 struct already generated */
--	memcpy(v2_session_response + 8, ses->server->cryptKey, 8);
--	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
-+	memcpy(v2_session_response + 8, ses->cryptKey, 8);
-+	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
+ setup_ntlmv2_rsp_ret:
+-	kfree(ses->tiblob);
+-	ses->tiblob = NULL;
+ 	ses->tilen = 0;
  
- 	hmac_md5_update(v2_session_response+8,
+ 	return rc;
+@@ -533,7 +526,8 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
  			sizeof(struct ntlmv2_resp) - 8, &context);
+ 
+ 	if (ses->tilen)
+-		hmac_md5_update(ses->tiblob, ses->tilen, &context);
++		hmac_md5_update(ses->auth_key.data.ntlmv2.tiblob, ses->tilen,
++					&context);
+ 
+ 	hmac_md5_final(v2_session_response, &context);
+ /*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 4f85dfd..7d834b1 100644
+index 7d834b1..5dd5659 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -179,12 +179,10 @@ struct TCP_Server_Info {
- 	int capabilities; /* allow selective disabling of caps by smb sess */
- 	int timeAdj;  /* Adjust for difference in server time zone in sec */
- 	__u16 CurrentMid;         /* multiplex id - rotating counter */
--	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
- 	/* 16th byte of RFC1001 workstation name is always null */
- 	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
- 	__u32 sequence_number; /* needed for CIFS PDU signature */
- 	struct session_key session_key;
--	char ntlmv2_hash[16];
- 	unsigned long lstrp; /* when we got last response from this server */
- 	u16 dialect; /* dialect index that server chose */
- 	/* extended security flavors that server supports */
-@@ -192,6 +190,7 @@ struct TCP_Server_Info {
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
- 	bool	sec_ntlmssp;		/* supports NTLMSSP */
-+	bool session_estab; /* mark when very first sess is established */
- #ifdef CONFIG_CIFS_FSCACHE
- 	struct fscache_cookie   *fscache; /* client index cache cookie */
- #endif
-@@ -223,6 +222,9 @@ struct cifsSesInfo {
- 	char userName[MAX_USERNAME_SIZE + 1];
- 	char *domainName;
- 	char *password;
-+	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
-+	struct session_key auth_key;
-+	char ntlmv2_hash[16];
+@@ -105,6 +105,7 @@ struct session_key {
+ 		struct {
+ 			char key[16];
+ 			struct ntlmv2_resp resp;
++			unsigned char tiblob[CIFS_MAX_NTLMV2_AVPAIR_SIZE];
+ 		} ntlmv2;
+ 	} data;
+ };
+@@ -226,7 +227,6 @@ struct cifsSesInfo {
+ 	struct session_key auth_key;
+ 	char ntlmv2_hash[16];
  	unsigned int tilen; /* length of the target info blob */
- 	unsigned char *tiblob; /* target info blob in challenge response */
+-	unsigned char *tiblob; /* target info blob in challenge response */
  	bool need_reconnect:1; /* connection reset, uid now invalid */
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 54bd83a..a420c7b 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -503,7 +503,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ };
+ /* no more than one of the following three session flags may be set */
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index b0f4b56..e778165 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -136,6 +136,11 @@
+ #define CIFS_SESS_KEY_SIZE (24)
  
- 		if (rsp->EncryptionKeyLength ==
- 				cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
--			memcpy(server->cryptKey, rsp->EncryptionKey,
-+			memcpy(ses->cryptKey, rsp->EncryptionKey,
- 				CIFS_CRYPTO_KEY_SIZE);
- 		} else if (server->secMode & SECMODE_PW_ENCRYPT) {
- 			rc = -EIO; /* need cryptkey unless plain text */
-@@ -574,7 +574,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
- 	server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
- 	server->timeAdj *= 60;
- 	if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
--		memcpy(server->cryptKey, pSMBr->u.EncryptionKey,
-+		memcpy(ses->cryptKey, pSMBr->u.EncryptionKey,
- 		       CIFS_CRYPTO_KEY_SIZE);
- 	} else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
- 			&& (pSMBr->EncryptionKeyLength == 0)) {
+ /*
++ * Max expected size of an av pair blob in ntlmv2 auth exchange
++ */
++#define CIFS_MAX_NTLMV2_AVPAIR_SIZE (1024)
++
++/*
+  * Maximum user name length
+  */
+ #define CIFS_UNLEN (20)
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4944fc8..3606ba8 100644
+index 3606ba8..ca207e8 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -206,6 +206,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 			if (server->tcpStatus != CifsExiting)
- 				server->tcpStatus = CifsGood;
- 			server->sequence_number = 0;
-+			server->session_estab = false;
- 			spin_unlock(&GlobalMid_Lock);
- 	/*		atomic_set(&server->inFlight,0);*/
- 			wake_up(&server->response_q);
-@@ -1631,6 +1632,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		volume_info->source_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
- 	memcpy(tcp_ses->server_RFC1001_name,
- 		volume_info->target_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
-+	tcp_ses->session_estab = false;
- 	tcp_ses->sequence_number = 0;
- 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
- 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
-@@ -2983,14 +2985,13 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- 		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
- 		    (ses->server->secType == LANMAN))
--			calc_lanman_hash(tcon->password, ses->server->cryptKey,
-+			calc_lanman_hash(tcon->password, ses->cryptKey,
- 					 ses->server->secMode &
- 					    SECMODE_PW_ENCRYPT ? true : false,
- 					 bcc_ptr);
- 		else
- #endif /* CIFS_WEAK_PW_HASH */
--		SMBNTencrypt(tcon->password, ses->server->cryptKey,
--			     bcc_ptr);
-+		SMBNTencrypt(tcon->password, ses->cryptKey, bcc_ptr);
+@@ -1802,7 +1802,6 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 		goto get_ses_fail;
  
- 		bcc_ptr += CIFS_SESS_KEY_SIZE;
- 		if (ses->capabilities & CAP_UNICODE) {
-@@ -3175,6 +3176,15 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
- 	if (rc) {
- 		cERROR(1, "Send error in SessSetup = %d", rc);
- 	} else {
-+		mutex_lock(&ses->server->srv_mutex);
-+		if (!server->session_estab) {
-+			memcpy(&server->session_key.data,
-+				&ses->auth_key.data, ses->auth_key.len);
-+			server->session_key.len = ses->auth_key.len;
-+			ses->server->session_estab = true;
-+		}
-+		mutex_unlock(&server->srv_mutex);
-+
- 		cFYI(1, "CIFS Session Established successfully");
- 		spin_lock(&GlobalMid_Lock);
- 		ses->status = CifsGood;
+ 	ses->tilen = 0;
+-	ses->tiblob = NULL;
+ 	/* new SMB session uses our server ref */
+ 	ses->server = server;
+ 	if (server->addr.sockAddr6.sin6_family == AF_INET6)
 diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index c926e6c..2111bed 100644
+index 2111bed..28aedae 100644
 --- a/fs/cifs/sess.c
 +++ b/fs/cifs/sess.c
-@@ -402,7 +402,7 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 		return -EINVAL;
+@@ -411,15 +411,9 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 	tioffset = cpu_to_le16(pblob->TargetInfoArray.BufferOffset);
+ 	tilen = cpu_to_le16(pblob->TargetInfoArray.Length);
+ 	ses->tilen = tilen;
+-	if (ses->tilen) {
+-		ses->tiblob = kmalloc(tilen, GFP_KERNEL);
+-		if (!ses->tiblob) {
+-			cERROR(1, "Challenge target info allocation failure");
+-			ses->tilen = 0;
+-			return -ENOMEM;
+-		}
+-		memcpy(ses->tiblob,  bcc_ptr + tioffset, ses->tilen);
+-	}
++	if (ses->tilen && ses->tilen <= CIFS_MAX_NTLMV2_AVPAIR_SIZE)
++		memcpy(ses->auth_key.data.ntlmv2.tiblob,  bcc_ptr + tioffset,
++				ses->tilen);
+ 
+ 	return 0;
+ }
+@@ -505,16 +499,13 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	memcpy(tmp, (char *)&ntlmv2_response, size);
+ 	tmp += size;
+ 	if (ses->tilen > 0) {
+-		memcpy(tmp, ses->tiblob, ses->tilen);
++		memcpy(tmp, ses->auth_key.data.ntlmv2.tiblob, ses->tilen);
+ 		tmp += ses->tilen;
  	}
  
--	memcpy(ses->server->cryptKey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
-+	memcpy(ses->cryptKey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
- 	/* BB we could decode pblob->NegotiateFlags; some may be useful */
- 	/* In particular we can examine sign flags */
- 	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
-@@ -591,17 +591,12 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
- 	int bytes_remaining;
- 	struct key *spnego_key = NULL;
- 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
--	bool first_time;
- 	int blob_len;
- 	char *ntlmsspblob = NULL;
+ 	sec_blob->NtChallengeResponse.Length = cpu_to_le16(size + ses->tilen);
+ 	sec_blob->NtChallengeResponse.MaximumLength =
+ 				cpu_to_le16(size + ses->tilen);
+-	kfree(ses->tiblob);
+-	ses->tiblob = NULL;
+-	ses->tilen = 0;
  
- 	if (ses == NULL)
- 		return -EINVAL;
- 
--	read_lock(&cifs_tcp_ses_lock);
--	first_time = is_first_ses_reconnect(ses);
--	read_unlock(&cifs_tcp_ses_lock);
--
- 	type = ses->server->secType;
- 
- 	cFYI(1, "sess setup type %d", type);
-@@ -672,7 +667,7 @@ ssetup_ntlmssp_authenticate:
- 		/* BB calculate hash with password */
- 		/* and copy into bcc */
- 
--		calc_lanman_hash(ses->password, ses->server->cryptKey,
-+		calc_lanman_hash(ses->password, ses->cryptKey,
- 				 ses->server->secMode & SECMODE_PW_ENCRYPT ?
- 					true : false, lnm_session_key);
- 
-@@ -699,15 +694,11 @@ ssetup_ntlmssp_authenticate:
- 			cpu_to_le16(CIFS_SESS_KEY_SIZE);
- 
- 		/* calculate session key */
--		SMBNTencrypt(ses->password, ses->server->cryptKey,
--			     ntlm_session_key);
-+		SMBNTencrypt(ses->password, ses->cryptKey, ntlm_session_key);
- 
--		if (first_time) /* should this be moved into common code
--				  with similar ntlmv2 path? */
--			cifs_calculate_session_key(&ses->server->session_key,
--				ntlm_session_key, ses->password);
-+		cifs_calculate_session_key(&ses->auth_key,
-+					ntlm_session_key, ses->password);
- 		/* copy session key */
--
- 		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
- 		bcc_ptr += CIFS_SESS_KEY_SIZE;
- 		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
-@@ -794,17 +785,14 @@ ssetup_ntlmssp_authenticate:
+ 	if (ses->domainName == NULL) {
+ 		sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+@@ -747,12 +738,9 @@ ssetup_ntlmssp_authenticate:
+ 		pSMB->req_no_secext.CaseSensitivePasswordLength =
+ 			cpu_to_le16(sizeof(struct ntlmv2_resp) + ses->tilen);
+ 		if (ses->tilen > 0) {
+-			memcpy(bcc_ptr, ses->tiblob, ses->tilen);
++			memcpy(bcc_ptr, ses->auth_key.data.ntlmv2.tiblob,
++					ses->tilen);
+ 			bcc_ptr += ses->tilen;
+-			/* we never did allocate ses->domainName to free */
+-			kfree(ses->tiblob);
+-			ses->tiblob = NULL;
+-			ses->tilen = 0;
  		}
- 		/* bail out if key is too long */
- 		if (msg->sesskey_len >
--		    sizeof(ses->server->session_key.data.krb5)) {
-+		    sizeof(ses->auth_key.data.krb5)) {
- 			cERROR(1, "Kerberos signing key too long (%u bytes)",
- 				msg->sesskey_len);
- 			rc = -EOVERFLOW;
- 			goto ssetup_exit;
- 		}
--		if (first_time) {
--			ses->server->session_key.len = msg->sesskey_len;
--			memcpy(ses->server->session_key.data.krb5,
--				msg->data, msg->sesskey_len);
--		}
-+		ses->auth_key.len = msg->sesskey_len;
-+		memcpy(ses->auth_key.data.krb5, msg->data, msg->sesskey_len);
- 		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
- 		capabilities |= CAP_EXTENDED_SECURITY;
- 		pSMB->req.Capabilities = cpu_to_le32(capabilities);
+ 
+ 		if (ses->capabilities & CAP_UNICODE) {
 -- 
 1.6.0.2
