@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] [CIFS] [1/4] NTLM authentication and signing - Calculate
  auth response per smb session
-Date: Wed, 13 Oct 2010 13:08:51 -0500
-Message-ID: <AANLkTi=16ZJhQPZr90+cSrdZW1O0tCzQo0qm+e+TTMLd@mail.gmail.com>
+Date: Wed, 13 Oct 2010 13:42:24 -0500
+Message-ID: <AANLkTikLp9BH6_vgkebkKWDJrwLSo4X=u08xTEoAnAuR@mail.gmail.com>
 References: <1286912703-22661-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20101013083642.74d9b8a9@corrin.poochiereds.net>
 	<AANLkTik_bqHOsOn1UpgWECu-x=cZgVKUt4HAgWRi-z7W@mail.gmail.com>
@@ -123,20 +123,23 @@ n
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
 
-I think this change should take care of that
+Or we could move them earlier
+
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 848e458..613741b 100644
+index 848e458..d7e0651 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -203,10 +203,12 @@ cifs_reconnect(struct TCP_Server_Info *server)
-                } else {
-                        atomic_inc(&tcpSesReconnectCount);
+@@ -173,6 +173,8 @@ cifs_reconnect(struct TCP_Server_Info *server)
+                sock_release(server->ssocket);
+                server->ssocket =3D NULL;
+        }
++       server->sequence_number =3D 0;
++       server->session_estab =3D false;
+
+        spin_lock(&GlobalMid_Lock);
+        list_for_each(tmp, &server->pending_mid_q) {
+@@ -205,8 +207,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
                         spin_lock(&GlobalMid_Lock);
-+                       if (server->tcpStatus =3D=3D CifsNeedReconnect)=
- {
-+                               server->sequence_number =3D 0;
-+                               server->session_estab =3D false;
-+                       }
                         if (server->tcpStatus !=3D CifsExiting)
                                 server->tcpStatus =3D CifsGood;
 -                       server->sequence_number =3D 0;
@@ -144,3 +147,7 @@ index 848e458..613741b 100644
                         spin_unlock(&GlobalMid_Lock);
         /*              atomic_set(&server->inFlight,0);*/
                         wake_up(&server->response_q);
+
+
+There is no smb connection at this point and (certainly) sessions are
+not established at this point.
