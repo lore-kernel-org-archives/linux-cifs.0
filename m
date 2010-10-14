@@ -1,289 +1,122 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] [CIFS] [1/4 Try #2] NTLM authentication and signing -
- Calculate auth response per smb session
-Date: Thu, 14 Oct 2010 13:21:01 -0400
-Message-ID: <20101014132101.298ec5d2@barsoom.rdu.redhat.com>
-References: <1287011700-29790-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: getcifsacl/setcifsacl, SID to/fro uid,gid mapping - First attempt at
+ a design
+Date: Thu, 14 Oct 2010 15:28:42 -0500
+Message-ID: <AANLkTinYBhr6-7uWWsRfnaBPU+S2+LqQfQ_DJkTj1nVm@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1287011700-29790-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 13 Oct 2010 18:15:00 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+The goal is to implement tools/utilities named such as getcifsacl and
+setcifsacl,
+similar to getfacl and setfacl respectively.
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> Start calculation auth response within a session.  Move/Add pertinet
-> data structures like session key, server challenge and ntlmv2_hash in
-> a session structure.  We should do the calculations within a session
-> before copying session key and response over to server data
-> structures because a session setup can fail.
-> 
-> Only after a very first smb session succeeds, it copies/makes its
-> session key, session key of smb connection.  This key stays with
-> the smb connection throughout its life.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/cifsencrypt.c |   16 ++++++++--------
->  fs/cifs/cifsglob.h    |    6 ++++--
->  fs/cifs/cifssmb.c     |    4 ++--
->  fs/cifs/connect.c     |   18 ++++++++++++++----
->  fs/cifs/sess.c        |   28 ++++++++--------------------
->  5 files changed, 36 insertions(+), 36 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index e3edd8a..7ac0056 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -458,7 +458,7 @@ calc_exit_1:
->  calc_exit_2:
->  	/* BB FIXME what about bytes 24 through 40 of the signing key?
->  	   compare with the NTLM example */
-> -	hmac_md5_final(ses->server->ntlmv2_hash, pctxt);
-> +	hmac_md5_final(ses->ntlmv2_hash, pctxt);
->  
->  	kfree(pctxt);
->  	return rc;
-> @@ -502,14 +502,14 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
->  	}
->  	CalcNTLMv2_response(ses, resp_buf);
->  
-> -	/* now calculate the MAC key for NTLMv2 */
-> -	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
-> +	/* now calculate the session key for NTLMv2 */
-> +	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
->  	hmac_md5_update(resp_buf, 16, &context);
-> -	hmac_md5_final(ses->server->session_key.data.ntlmv2.key, &context);
-> +	hmac_md5_final(ses->auth_key.data.ntlmv2.key, &context);
->  
-> -	memcpy(&ses->server->session_key.data.ntlmv2.resp, resp_buf,
-> +	memcpy(&ses->auth_key.data.ntlmv2.resp, resp_buf,
->  	       sizeof(struct ntlmv2_resp));
-> -	ses->server->session_key.len = 16 + sizeof(struct ntlmv2_resp);
-> +	ses->auth_key.len = 16 + sizeof(struct ntlmv2_resp);
->  
->  	return 0;
->  
-> @@ -526,8 +526,8 @@ void CalcNTLMv2_response(const struct cifsSesInfo *ses,
->  {
->  	struct HMACMD5Context context;
->  	/* rest of v2 struct already generated */
-> -	memcpy(v2_session_response + 8, ses->server->cryptKey, 8);
-> -	hmac_md5_init_limK_to_64(ses->server->ntlmv2_hash, 16, &context);
-> +	memcpy(v2_session_response + 8, ses->cryptKey, 8);
-> +	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
->  
->  	hmac_md5_update(v2_session_response+8,
->  			sizeof(struct ntlmv2_resp) - 8, &context);
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index e2b760e..6c69bd7 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -179,12 +179,10 @@ struct TCP_Server_Info {
->  	int capabilities; /* allow selective disabling of caps by smb sess */
->  	int timeAdj;  /* Adjust for difference in server time zone in sec */
->  	__u16 CurrentMid;         /* multiplex id - rotating counter */
-> -	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
->  	/* 16th byte of RFC1001 workstation name is always null */
->  	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
->  	__u32 sequence_number; /* needed for CIFS PDU signature */
->  	struct session_key session_key;
-> -	char ntlmv2_hash[16];
->  	unsigned long lstrp; /* when we got last response from this server */
->  	u16 dialect; /* dialect index that server chose */
->  	/* extended security flavors that server supports */
-> @@ -192,6 +190,7 @@ struct TCP_Server_Info {
->  	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
->  	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
->  	bool	sec_ntlmssp;		/* supports NTLMSSP */
-> +	bool session_estab; /* mark when very first sess is established */
->  #ifdef CONFIG_CIFS_FSCACHE
->  	struct fscache_cookie   *fscache; /* client index cache cookie */
->  #endif
-> @@ -223,6 +222,9 @@ struct cifsSesInfo {
->  	char userName[MAX_USERNAME_SIZE + 1];
->  	char *domainName;
->  	char *password;
-> +	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
-> +	struct session_key auth_key;
-> +	char ntlmv2_hash[16];
->  	unsigned int tilen; /* length of the target info blob */
->  	unsigned char *tiblob; /* target info blob in challenge response */
->  	bool need_reconnect:1; /* connection reset, uid now invalid */
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 54bd83a..a420c7b 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -503,7 +503,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
->  
->  		if (rsp->EncryptionKeyLength ==
->  				cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
-> -			memcpy(server->cryptKey, rsp->EncryptionKey,
-> +			memcpy(ses->cryptKey, rsp->EncryptionKey,
->  				CIFS_CRYPTO_KEY_SIZE);
->  		} else if (server->secMode & SECMODE_PW_ENCRYPT) {
->  			rc = -EIO; /* need cryptkey unless plain text */
-> @@ -574,7 +574,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
->  	server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
->  	server->timeAdj *= 60;
->  	if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
-> -		memcpy(server->cryptKey, pSMBr->u.EncryptionKey,
-> +		memcpy(ses->cryptKey, pSMBr->u.EncryptionKey,
->  		       CIFS_CRYPTO_KEY_SIZE);
->  	} else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
->  			&& (pSMBr->EncryptionKeyLength == 0)) {
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 4944fc8..019f003 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -173,6 +173,8 @@ cifs_reconnect(struct TCP_Server_Info *server)
->  		sock_release(server->ssocket);
->  		server->ssocket = NULL;
->  	}
-> +	server->sequence_number = 0;
-> +	server->session_estab = false;
->  
->  	spin_lock(&GlobalMid_Lock);
->  	list_for_each(tmp, &server->pending_mid_q) {
-> @@ -205,7 +207,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
->  			spin_lock(&GlobalMid_Lock);
->  			if (server->tcpStatus != CifsExiting)
->  				server->tcpStatus = CifsGood;
-> -			server->sequence_number = 0;
->  			spin_unlock(&GlobalMid_Lock);
->  	/*		atomic_set(&server->inFlight,0);*/
->  			wake_up(&server->response_q);
-> @@ -1631,6 +1632,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->  		volume_info->source_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
->  	memcpy(tcp_ses->server_RFC1001_name,
->  		volume_info->target_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
-> +	tcp_ses->session_estab = false;
->  	tcp_ses->sequence_number = 0;
->  	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
->  	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
-> @@ -2983,14 +2985,13 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
->  #ifdef CONFIG_CIFS_WEAK_PW_HASH
->  		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
->  		    (ses->server->secType == LANMAN))
-> -			calc_lanman_hash(tcon->password, ses->server->cryptKey,
-> +			calc_lanman_hash(tcon->password, ses->cryptKey,
->  					 ses->server->secMode &
->  					    SECMODE_PW_ENCRYPT ? true : false,
->  					 bcc_ptr);
->  		else
->  #endif /* CIFS_WEAK_PW_HASH */
-> -		SMBNTencrypt(tcon->password, ses->server->cryptKey,
-> -			     bcc_ptr);
-> +		SMBNTencrypt(tcon->password, ses->cryptKey, bcc_ptr);
->  
->  		bcc_ptr += CIFS_SESS_KEY_SIZE;
->  		if (ses->capabilities & CAP_UNICODE) {
-> @@ -3175,6 +3176,15 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
->  	if (rc) {
->  		cERROR(1, "Send error in SessSetup = %d", rc);
->  	} else {
-> +		mutex_lock(&ses->server->srv_mutex);
-> +		if (!server->session_estab) {
-> +			memcpy(&server->session_key.data,
-> +				&ses->auth_key.data, ses->auth_key.len);
-> +			server->session_key.len = ses->auth_key.len;
-> +			ses->server->session_estab = true;
-> +		}
-> +		mutex_unlock(&server->srv_mutex);
-> +
->  		cFYI(1, "CIFS Session Established successfully");
->  		spin_lock(&GlobalMid_Lock);
->  		ses->status = CifsGood;
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index c926e6c..2111bed 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -402,7 +402,7 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
->  		return -EINVAL;
->  	}
->  
-> -	memcpy(ses->server->cryptKey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
-> +	memcpy(ses->cryptKey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
->  	/* BB we could decode pblob->NegotiateFlags; some may be useful */
->  	/* In particular we can examine sign flags */
->  	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
-> @@ -591,17 +591,12 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
->  	int bytes_remaining;
->  	struct key *spnego_key = NULL;
->  	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
-> -	bool first_time;
->  	int blob_len;
->  	char *ntlmsspblob = NULL;
->  
->  	if (ses == NULL)
->  		return -EINVAL;
->  
-> -	read_lock(&cifs_tcp_ses_lock);
-> -	first_time = is_first_ses_reconnect(ses);
-> -	read_unlock(&cifs_tcp_ses_lock);
-> -
->  	type = ses->server->secType;
->  
->  	cFYI(1, "sess setup type %d", type);
-> @@ -672,7 +667,7 @@ ssetup_ntlmssp_authenticate:
->  		/* BB calculate hash with password */
->  		/* and copy into bcc */
->  
-> -		calc_lanman_hash(ses->password, ses->server->cryptKey,
-> +		calc_lanman_hash(ses->password, ses->cryptKey,
->  				 ses->server->secMode & SECMODE_PW_ENCRYPT ?
->  					true : false, lnm_session_key);
->  
-> @@ -699,15 +694,11 @@ ssetup_ntlmssp_authenticate:
->  			cpu_to_le16(CIFS_SESS_KEY_SIZE);
->  
->  		/* calculate session key */
-> -		SMBNTencrypt(ses->password, ses->server->cryptKey,
-> -			     ntlm_session_key);
-> +		SMBNTencrypt(ses->password, ses->cryptKey, ntlm_session_key);
->  
-> -		if (first_time) /* should this be moved into common code
-> -				  with similar ntlmv2 path? */
-> -			cifs_calculate_session_key(&ses->server->session_key,
-> -				ntlm_session_key, ses->password);
-> +		cifs_calculate_session_key(&ses->auth_key,
-> +					ntlm_session_key, ses->password);
->  		/* copy session key */
-> -
->  		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
->  		bcc_ptr += CIFS_SESS_KEY_SIZE;
->  		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
-> @@ -794,17 +785,14 @@ ssetup_ntlmssp_authenticate:
->  		}
->  		/* bail out if key is too long */
->  		if (msg->sesskey_len >
-> -		    sizeof(ses->server->session_key.data.krb5)) {
-> +		    sizeof(ses->auth_key.data.krb5)) {
->  			cERROR(1, "Kerberos signing key too long (%u bytes)",
->  				msg->sesskey_len);
->  			rc = -EOVERFLOW;
->  			goto ssetup_exit;
->  		}
-> -		if (first_time) {
-> -			ses->server->session_key.len = msg->sesskey_len;
-> -			memcpy(ses->server->session_key.data.krb5,
-> -				msg->data, msg->sesskey_len);
-> -		}
-> +		ses->auth_key.len = msg->sesskey_len;
-> +		memcpy(ses->auth_key.data.krb5, msg->data, msg->sesskey_len);
->  		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
->  		capabilities |= CAP_EXTENDED_SECURITY;
->  		pSMB->req.Capabilities = cpu_to_le32(capabilities);
-> -- 
-> 1.6.0.2
-> 
+getcifsacl would be used to display ACL for a file system object which belongs
+to a mapped remote share supporting CIFS/NTFS ACL.
+getcifsacl should be supplied with just the file object path and not
+with details such
+as server name/address and share name, user id and password either
+explicitly (as can
+be done for smbcacls command or implicitly e.g. via a configuration file)
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+cifs vfs client has almost working code to tree connect/disconnect to
+an IPC$ share on
+the server.  Cifs vfs client will need an additional functionality to send a
+Trans command which implements a transaction, to implement named pipe API
+TransactNamedPipe (that is the only API that is needed) and a means to
+invoke this
+Trans command i.e. via an ioctl or an xattr.
+
+When a very first tree connection for a very first smb session for an
+smb connection
+succeeds, a tree connection to IPC$ share should occurr, which should succeed.
+Before the last smb session on an smb connection is removed, the tree connection
+to IPC$ share should be disconnected.
+After reconnect of an smb connection, above should repeat.
+
+When an user issues a command like getcifsacl, getcifsacl invokes getxattr with
+attribute name system.cifsacl which results in cifs client getting
+security descriptor
+from the server which is returned as a blob as attribute value, to the caller.
+
+Caller parses the blob and for every SID it encounters, makes a
+winbind call, passing
+the SID and expecting a (looked-up) name for that SID.  Winbind maps the sid and
+associates that SID with an id.
+
+If winbind can't resolve the name of that SID and returns an error,
+getcifsacl will
+attempt to resolve it by talking to the named pipe lsarpc on the
+server.  This would
+involve a sequence of calls such as opening the named pipe, writing to the
+named pipe (e.g. bind rpc), a series of named pipe lsarpc specific
+function calls
+via SMB Trans command to resolve the SID to a name, and finally close
+of that named pipe.
+The RPC calls to the named pipe lsarpc could be part of a newly
+created library or an
+existing library such as librpc.  If this name lookup succeeds, the
+SID is mapped to an
+id using winbind. If the name lookup fails, getcifsacl displays the SID.
+
+For the command setcifsacl, either an SID or a name can be provided.
+If an SID is
+provided, there is no name look-up involved. setcifsacl will construct
+an appropriate
+security descriptor and send it as a blob to the cifs vfs client to
+send it to the
+server using set security descriptor to be set which could either succeed or
+fail and caller of the setcifsacl command is notified of the result.
+If a name is specified instead of a SID, setcifsacl shall first asks
+winbind for a SID
+and if it fails, can lookup directly by asking the named pipe lsarpc
+on the server
+for the SID.  Once a SID is obtained, a security descriptor is constructed by
+setcifsacl and sent to cifs vfs client. If the SID can't be obtained, setcifsacl
+tool/utility fails.
+
+-------------------------------------------------------------------------------------
+
+For commands such as ls, cifs client will make an upcall to look up
+SID name and if
+needed map that SID to an id. The mapped id of the Owner SID becomes
+uid and mapped id
+of the Group SID becomes gid of the file system object.
+
+For commands such as chmod or chgrp, the id is looked up for a SID
+from the winbind
+and if winbind fails to provide, the name associated with the id is
+looked up for
+an SID on the named pipe lsarpc on the server.  If either the windbind
+or the SID
+lookup  (in that order) succeeds, chmod or chgrp command should construct an
+appropriate security descriptor and send it to the server to set and to either
+succeed or fail, the results of which are notified to the calling command.
+If the SID lookup fails, the chmod/chgrp command should fail at the client.
+
+--------------------------------------------------------------------------------------
+
+If winbind rpm is not installed or winbind deamon is not running or if
+/etc/nsswitch.conf does not specify winbind for passwd and group, id mapping
+will not work.  (How) Can/should cifs-utils or getcifsacl and setcifsacl tools
+specify dependency on all three conditions? Or is there any alternative?
+
+I am not sure if there could be a security descriptor which does not contain a
+Group SID and if that is the case, what should group id be/default_to?
+
+Should all the SIDs mapped during the life of an smb connection should
+purged from
+winbind when the smb connection is coming down (including when
+reconnect happens)?
+I am not sure if there are any SIDs that should not be purged which
+are universal
+amongst every server, and once mapped, should stay with the winbind
+and should not
+be purged.
+I am not sure whether windbind allows a any qualifier at all or a
+qualifier such as
+server name/address, for id mapping.
