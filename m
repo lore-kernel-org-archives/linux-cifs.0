@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 12/13] cifs: wait for writeback to complete in cifs_flush
-Date: Fri, 15 Oct 2010 15:34:07 -0400
-Message-ID: <1287171248-464-13-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/13] cifs: convert cifsFileInfo->count to non-atomic counter
+Date: Fri, 15 Oct 2010 15:34:06 -0400
+Message-ID: <1287171248-464-12-git-send-email-jlayton@redhat.com>
 References: <1287171248-464-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,51 +10,91 @@ In-Reply-To: <1287171248-464-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The f_op->flush operation is the last chance to return a writeback
-related error when closing a file. Ensure that we don't miss reporting
-any errors by waiting for writeback to complete in cifs_flush before
-proceeding.
-
-There's no reason to do this when the file isn't open for write
-however.
+The count for cifsFileInfo is currently an atomic, but that just adds
+complexity for little value. We generally need to hold cifs_file_list_lock
+to traverse the lists anyway so we might as well make this counter
+non-atomic and simply use the cifs_file_list_lock to protect it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- fs/cifs/file.c |   21 +++++++--------------
- 1 files changed, 7 insertions(+), 14 deletions(-)
+ fs/cifs/cifsglob.h |    9 ++++++---
+ fs/cifs/file.c     |    8 +++++---
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index df4629e..a97e0e5 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -395,16 +395,19 @@ struct cifsFileInfo {
+ 	struct list_head llist; /* list of byte range locks we have. */
+ 	bool invalidHandle:1;	/* file closed via session abend */
+ 	bool oplock_break_cancelled:1;
+-	atomic_t count;		/* reference count */
++	int count;		/* refcount -- protected by cifs_file_list_lock */
+ 	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
+ 	struct cifs_search_info srch_inf;
+ 	struct work_struct oplock_break; /* work for oplock breaks */
+ };
+ 
+-/* Take a reference on the file private data */
++/*
++ * Take a reference on the file private data. Must be called with
++ * cifs_file_list_lock held.
++ */
+ static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+ {
+-	atomic_inc(&cifs_file->count);
++	++cifs_file->count;
+ }
+ 
+ void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index baf4b50..128e07b 100644
+index 8c81e7b..baf4b50 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1688,20 +1688,13 @@ int cifs_flush(struct file *file, fl_owner_t id)
- 	struct inode *inode = file->f_path.dentry->d_inode;
- 	int rc = 0;
+@@ -232,6 +232,7 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	if (pCifsFile == NULL)
+ 		return pCifsFile;
  
--	/* Rather than do the steps manually:
--	   lock the inode for writing
--	   loop through pages looking for write behind data (dirty pages)
--	   coalesce into contiguous 16K (or smaller) chunks to write to server
--	   send to server (prefer in parallel)
--	   deal with writebehind errors
--	   unlock inode for writing
--	   filemapfdatawrite appears easier for the time being */
--
--	rc = filemap_fdatawrite(inode->i_mapping);
--	/* reset wb rc if we were able to write out dirty pages */
--	if (!rc) {
--		rc = CIFS_I(inode)->write_behind_rc;
--		CIFS_I(inode)->write_behind_rc = 0;
-+	if (file->f_mode & FMODE_WRITE) {
-+		rc = filemap_write_and_wait(inode->i_mapping);
-+		/* reset wb rc if we were able to write out dirty pages */
-+		if (!rc) {
-+			rc = CIFS_I(inode)->write_behind_rc;
-+			CIFS_I(inode)->write_behind_rc = 0;
-+		}
++	pCifsFile->count = 1;
+ 	pCifsFile->netfid = fileHandle;
+ 	pCifsFile->pid = current->tgid;
+ 	pCifsFile->uid = current_fsuid();
+@@ -242,7 +243,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	mutex_init(&pCifsFile->fh_mutex);
+ 	mutex_init(&pCifsFile->lock_mutex);
+ 	INIT_LIST_HEAD(&pCifsFile->llist);
+-	atomic_set(&pCifsFile->count, 1);
+ 	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
+ 
+ 	spin_lock(&cifs_file_list_lock);
+@@ -267,7 +267,8 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 
+ /*
+  * Release a reference on the file private data. This may involve closing
+- * the filehandle out on the server.
++ * the filehandle out on the server. Must be called without holding
++ * cifs_file_list_lock.
+  */
+ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ {
+@@ -276,7 +277,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	struct cifsLockInfo *li, *tmp;
+ 
+ 	spin_lock(&cifs_file_list_lock);
+-	if (!atomic_dec_and_test(&cifs_file->count)) {
++	if (--cifs_file->count > 0) {
+ 		spin_unlock(&cifs_file_list_lock);
+ 		return;
  	}
+@@ -2322,6 +2323,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 	cifs_oplock_break_put(cfile);
+ }
  
- 	cFYI(1, "Flush inode %p file %p rc %d", inode, file, rc);
++/* must be called while holding cifs_file_list_lock */
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile)
+ {
+ 	cifs_sb_active(cfile->dentry->d_sb);
 -- 
 1.7.2.3
