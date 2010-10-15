@@ -1,122 +1,84 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: getcifsacl/setcifsacl, SID to/fro uid,gid mapping - First attempt at
- a design
-Date: Thu, 14 Oct 2010 15:28:42 -0500
-Message-ID: <AANLkTinYBhr6-7uWWsRfnaBPU+S2+LqQfQ_DJkTj1nVm@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] [CIFS] [2/4] NTLM authentication and signing - Make
+ tiblob as part of session key (response)
+Date: Fri, 15 Oct 2010 10:02:52 -0400
+Message-ID: <20101015100252.3960b34d@tlielax.poochiereds.net>
+References: <1286912719-22686-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1286912719-22686-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The goal is to implement tools/utilities named such as getcifsacl and
-setcifsacl,
-similar to getfacl and setfacl respectively.
+On Tue, 12 Oct 2010 14:45:19 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-getcifsacl would be used to display ACL for a file system object which belongs
-to a mapped remote share supporting CIFS/NTFS ACL.
-getcifsacl should be supplied with just the file object path and not
-with details such
-as server name/address and share name, user id and password either
-explicitly (as can
-be done for smbcacls command or implicitly e.g. via a configuration file)
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Have to move av_pair/ti blob to session key as part of ntlmv2 response.
+> This entire blob is part of the response and is use to calculate
+> signature for cases like ntlmv2 (without extended security) authentication.
+> The size of the blob is hard coded to 1024 byte which should be
+> sufficient to accomodate all 11 types of av pair types and their
+> lenghts/values.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-cifs vfs client has almost working code to tree connect/disconnect to
-an IPC$ share on
-the server.  Cifs vfs client will need an additional functionality to send a
-Trans command which implements a transaction, to implement named pipe API
-TransactNamedPipe (that is the only API that is needed) and a means to
-invoke this
-Trans command i.e. via an ioctl or an xattr.
+[...]
 
-When a very first tree connection for a very first smb session for an
-smb connection
-succeeds, a tree connection to IPC$ share should occurr, which should succeed.
-Before the last smb session on an smb connection is removed, the tree connection
-to IPC$ share should be disconnected.
-After reconnect of an smb connection, above should repeat.
+>  	hmac_md5_final(v2_session_response, &context);
+>  /*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 7d834b1..5dd5659 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -105,6 +105,7 @@ struct session_key {
+>  		struct {
+>  			char key[16];
+>  			struct ntlmv2_resp resp;
+> +			unsigned char tiblob[CIFS_MAX_NTLMV2_AVPAIR_SIZE];
 
-When an user issues a command like getcifsacl, getcifsacl invokes getxattr with
-attribute name system.cifsacl which results in cifs client getting
-security descriptor
-from the server which is returned as a blob as attribute value, to the caller.
+			^^^^^
+Is this really the best way to do this? We're increasing the size of
+this struct substantially, thereby increasing the size of every
+TCP_Server_Info and cifsSesInfo struct by 1k.
 
-Caller parses the blob and for every SID it encounters, makes a
-winbind call, passing
-the SID and expecting a (looked-up) name for that SID.  Winbind maps the sid and
-associates that SID with an id.
+Would it be better to keep the tiblob dynamically allocated, and hand
+off the pointer to it? If it really is necessary to add this field to
+the session_key struct in this way, would it be better to change how
+session keys are managed? i.e. not embed them inside of TCP_Server_Info
+and cifsSesInfo?
 
-If winbind can't resolve the name of that SID and returns an error,
-getcifsacl will
-attempt to resolve it by talking to the named pipe lsarpc on the
-server.  This would
-involve a sequence of calls such as opening the named pipe, writing to the
-named pipe (e.g. bind rpc), a series of named pipe lsarpc specific
-function calls
-via SMB Trans command to resolve the SID to a name, and finally close
-of that named pipe.
-The RPC calls to the named pipe lsarpc could be part of a newly
-created library or an
-existing library such as librpc.  If this name lookup succeeds, the
-SID is mapped to an
-id using winbind. If the name lookup fails, getcifsacl displays the SID.
+>  		} ntlmv2;
+>  	} data;
+>  };
+> @@ -226,7 +227,6 @@ struct cifsSesInfo {
+>  	struct session_key auth_key;
+>  	char ntlmv2_hash[16];
+>  	unsigned int tilen; /* length of the target info blob */
+> -	unsigned char *tiblob; /* target info blob in challenge response */
+>  	bool need_reconnect:1; /* connection reset, uid now invalid */
+>  };
+>  /* no more than one of the following three session flags may be set */
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index b0f4b56..e778165 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -136,6 +136,11 @@
+>  #define CIFS_SESS_KEY_SIZE (24)
+>  
+>  /*
+> + * Max expected size of an av pair blob in ntlmv2 auth exchange
+> + */
+> +#define CIFS_MAX_NTLMV2_AVPAIR_SIZE (1024)
+> +
+> +/*
 
-For the command setcifsacl, either an SID or a name can be provided.
-If an SID is
-provided, there is no name look-up involved. setcifsacl will construct
-an appropriate
-security descriptor and send it as a blob to the cifs vfs client to
-send it to the
-server using set security descriptor to be set which could either succeed or
-fail and caller of the setcifsacl command is notified of the result.
-If a name is specified instead of a SID, setcifsacl shall first asks
-winbind for a SID
-and if it fails, can lookup directly by asking the named pipe lsarpc
-on the server
-for the SID.  Once a SID is obtained, a security descriptor is constructed by
-setcifsacl and sent to cifs vfs client. If the SID can't be obtained, setcifsacl
-tool/utility fails.
-
--------------------------------------------------------------------------------------
-
-For commands such as ls, cifs client will make an upcall to look up
-SID name and if
-needed map that SID to an id. The mapped id of the Owner SID becomes
-uid and mapped id
-of the Group SID becomes gid of the file system object.
-
-For commands such as chmod or chgrp, the id is looked up for a SID
-from the winbind
-and if winbind fails to provide, the name associated with the id is
-looked up for
-an SID on the named pipe lsarpc on the server.  If either the windbind
-or the SID
-lookup  (in that order) succeeds, chmod or chgrp command should construct an
-appropriate security descriptor and send it to the server to set and to either
-succeed or fail, the results of which are notified to the calling command.
-If the SID lookup fails, the chmod/chgrp command should fail at the client.
-
---------------------------------------------------------------------------------------
-
-If winbind rpm is not installed or winbind deamon is not running or if
-/etc/nsswitch.conf does not specify winbind for passwd and group, id mapping
-will not work.  (How) Can/should cifs-utils or getcifsacl and setcifsacl tools
-specify dependency on all three conditions? Or is there any alternative?
-
-I am not sure if there could be a security descriptor which does not contain a
-Group SID and if that is the case, what should group id be/default_to?
-
-Should all the SIDs mapped during the life of an smb connection should
-purged from
-winbind when the smb connection is coming down (including when
-reconnect happens)?
-I am not sure if there are any SIDs that should not be purged which
-are universal
-amongst every server, and once mapped, should stay with the winbind
-and should not
-be purged.
-I am not sure whether windbind allows a any qualifier at all or a
-qualifier such as
-server name/address, for id mapping.
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
