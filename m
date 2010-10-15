@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 07/13] cifs: move cifs_new_fileinfo to file.c
-Date: Fri, 15 Oct 2010 15:34:02 -0400
-Message-ID: <1287171248-464-8-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 06/13] cifs: eliminate pfile pointer from cifsFileInfo
+Date: Fri, 15 Oct 2010 15:34:01 -0400
+Message-ID: <1287171248-464-7-git-send-email-jlayton@redhat.com>
 References: <1287171248-464-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,132 +10,79 @@ In-Reply-To: <1287171248-464-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It's currently in dir.c which makes little sense...
+All the remaining users of cifsFileInfo->pfile just use it to get
+at the f_flags/f_mode. Now that we store that separately in the
+cifsFileInfo, there's no need to consult the pfile at all from
+a cifsFileInfo pointer.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Acked-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
 ---
- fs/cifs/dir.c  |   48 ------------------------------------------------
- fs/cifs/file.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+), 48 deletions(-)
+ fs/cifs/cifsglob.h |    1 -
+ fs/cifs/dir.c      |    1 -
+ fs/cifs/file.c     |   11 +++--------
+ 3 files changed, 3 insertions(+), 10 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 2eb054b..2ecf675 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -388,7 +388,6 @@ struct cifsFileInfo {
+ 	__u16 netfid;		/* file id from remote */
+ 	/* BB add lock scope info here if needed */ ;
+ 	/* lock scope id (0 if none) */
+-	struct file *pfile; /* needed for writepage */
+ 	struct dentry *dentry;
+ 	unsigned int f_flags;
+ 	struct tcon_link *tlink;
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 600eac1..3840edd 100644
+index 3c23d88..600eac1 100644
 --- a/fs/cifs/dir.c
 +++ b/fs/cifs/dir.c
-@@ -130,54 +130,6 @@ cifs_bp_rename_retry:
- 	return full_path;
- }
- 
--struct cifsFileInfo *
--cifs_new_fileinfo(__u16 fileHandle, struct file *file,
--		  struct tcon_link *tlink, __u32 oplock)
--{
--	struct dentry *dentry = file->f_path.dentry;
--	struct inode *inode = dentry->d_inode;
--	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
--	struct cifsFileInfo *pCifsFile;
--
--	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
--	if (pCifsFile == NULL)
--		return pCifsFile;
--
--	pCifsFile->netfid = fileHandle;
--	pCifsFile->pid = current->tgid;
--	pCifsFile->uid = current_fsuid();
--	pCifsFile->dentry = dget(dentry);
--	pCifsFile->f_flags = file->f_flags;
--	pCifsFile->invalidHandle = false;
--	pCifsFile->closePend = false;
--	pCifsFile->tlink = cifs_get_tlink(tlink);
--	mutex_init(&pCifsFile->fh_mutex);
--	mutex_init(&pCifsFile->lock_mutex);
--	INIT_LIST_HEAD(&pCifsFile->llist);
--	atomic_set(&pCifsFile->count, 1);
--	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
--
--	write_lock(&GlobalSMBSeslock);
--	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
--	/* if readable file instance put first in list*/
--	if (file->f_mode & FMODE_READ)
--		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
--	else
--		list_add_tail(&pCifsFile->flist, &pCifsInode->openFileList);
--	write_unlock(&GlobalSMBSeslock);
--
--	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
--		pCifsInode->clientCanCacheAll = true;
--		pCifsInode->clientCanCacheRead = true;
--		cFYI(1, "Exclusive Oplock inode %p", inode);
--	} else if ((oplock & 0xF) == OPLOCK_READ)
--		pCifsInode->clientCanCacheRead = true;
--
--	file->private_data = pCifsFile;
--
--	return pCifsFile;
--}
--
- static void setup_cifs_dentry(struct cifsTconInfo *tcon,
- 			      struct dentry *direntry,
- 			      struct inode *newinode)
+@@ -148,7 +148,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+ 	pCifsFile->uid = current_fsuid();
+ 	pCifsFile->dentry = dget(dentry);
+ 	pCifsFile->f_flags = file->f_flags;
+-	pCifsFile->pfile = file;
+ 	pCifsFile->invalidHandle = false;
+ 	pCifsFile->closePend = false;
+ 	pCifsFile->tlink = cifs_get_tlink(tlink);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 7935816..293e9b7 100644
+index d5f3007..7935816 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -219,6 +219,53 @@ posix_open_ret:
- 	return rc;
- }
+@@ -1144,8 +1144,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ 			continue;
+ 		if (fsuid_only && open_file->uid != current_fsuid())
+ 			continue;
+-		if (open_file->pfile && ((open_file->pfile->f_flags & O_RDWR) ||
+-		    (open_file->pfile->f_flags & O_RDONLY))) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_READ) {
+ 			if (!open_file->invalidHandle) {
+ 				/* found a good file */
+ 				/* lock it so it will not be closed on us */
+@@ -1194,9 +1193,7 @@ refind_writable:
+ 			continue;
+ 		if (fsuid_only && open_file->uid != current_fsuid())
+ 			continue;
+-		if (open_file->pfile &&
+-		    ((open_file->pfile->f_flags & O_RDWR) ||
+-		     (open_file->pfile->f_flags & O_WRONLY))) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+ 			cifsFileInfo_get(open_file);
  
-+struct cifsFileInfo *
-+cifs_new_fileinfo(__u16 fileHandle, struct file *file,
-+		  struct tcon_link *tlink, __u32 oplock)
-+{
-+	struct dentry *dentry = file->f_path.dentry;
-+	struct inode *inode = dentry->d_inode;
-+	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
-+	struct cifsFileInfo *pCifsFile;
-+
-+	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
-+	if (pCifsFile == NULL)
-+		return pCifsFile;
-+
-+	pCifsFile->netfid = fileHandle;
-+	pCifsFile->pid = current->tgid;
-+	pCifsFile->uid = current_fsuid();
-+	pCifsFile->dentry = dget(dentry);
-+	pCifsFile->f_flags = file->f_flags;
-+	pCifsFile->invalidHandle = false;
-+	pCifsFile->closePend = false;
-+	pCifsFile->tlink = cifs_get_tlink(tlink);
-+	mutex_init(&pCifsFile->fh_mutex);
-+	mutex_init(&pCifsFile->lock_mutex);
-+	INIT_LIST_HEAD(&pCifsFile->llist);
-+	atomic_set(&pCifsFile->count, 1);
-+	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
-+
-+	write_lock(&GlobalSMBSeslock);
-+	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
-+	/* if readable file instance put first in list*/
-+	if (file->f_mode & FMODE_READ)
-+		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
-+	else
-+		list_add_tail(&pCifsFile->flist, &pCifsInode->openFileList);
-+	write_unlock(&GlobalSMBSeslock);
-+
-+	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
-+		pCifsInode->clientCanCacheAll = true;
-+		pCifsInode->clientCanCacheRead = true;
-+		cFYI(1, "Exclusive Oplock inode %p", inode);
-+	} else if ((oplock & 0xF) == OPLOCK_READ)
-+		pCifsInode->clientCanCacheRead = true;
-+
-+	file->private_data = pCifsFile;
-+	return pCifsFile;
-+}
-+
- int cifs_open(struct inode *inode, struct file *file)
- {
- 	int rc = -EACCES;
+ 			if (!open_file->invalidHandle) {
+@@ -2160,9 +2157,7 @@ static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
+ 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
+ 		if (open_file->closePend)
+ 			continue;
+-		if (open_file->pfile &&
+-		    ((open_file->pfile->f_flags & O_RDWR) ||
+-		     (open_file->pfile->f_flags & O_WRONLY))) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+ 			read_unlock(&GlobalSMBSeslock);
+ 			return 1;
+ 		}
 -- 
 1.7.2.3
