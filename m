@@ -1,52 +1,107 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 00/13] cifs: clean up management of open filehandles (try #5)
-Date: Fri, 15 Oct 2010 15:33:55 -0400
-Message-ID: <1287171248-464-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 02/13] cifs: eliminate oflags option from cifs_new_fileinfo
+Date: Fri, 15 Oct 2010 15:33:57 -0400
+Message-ID: <1287171248-464-3-git-send-email-jlayton@redhat.com>
+References: <1287171248-464-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1287171248-464-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Fifth attempt at a cleanup of the filehandle management code in CIFS.
-The changes from the last set are pretty minimal.
+Eliminate the poor, misunderstood "oflags" option from cifs_new_fileinfo.
+The callers mostly pass in the filp->f_flags here.
 
-Steve has committed the first three patches in the set, so they've been
-dropped from this patchbomb.
+That's not correct however since we're checking that value for
+the presence of FMODE_READ. Luckily that only affects how the f_list is
+ordered. What it really wants here is the file->f_mode. Just use that
+field from the filp to determine it.
 
-Also, I've put the list ordering back in for the flist. I still think
-it's a worthless optimization and just makes the code more confusing and
-fragile, but Steve feels strongly that it should stay as an ordered
-list.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsproto.h |    3 +--
+ fs/cifs/dir.c       |    9 ++++-----
+ fs/cifs/file.c      |    5 ++---
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
-I'd like to see this merged before the 2.6.37 merge window opens.
-Comments and suggestions welcome...
-
-Jeff Layton (13):
-  cifs: fix flags handling in cifs_posix_open
-  cifs: eliminate oflags option from cifs_new_fileinfo
-  cifs: eliminate the inode argument from cifs_new_fileinfo
-  cifs: clean up cifs_reopen_file
-  cifs: cifs_write argument change and cleanup
-  cifs: eliminate pfile pointer from cifsFileInfo
-  cifs: move cifs_new_fileinfo to file.c
-  cifs: convert GlobalSMBSeslock from a rwlock to regular spinlock
-  cifs: move cifsFileInfo_put to file.c
-  cifs: move close processing from cifs_close to cifsFileInfo_put
-  cifs: convert cifsFileInfo->count to non-atomic counter
-  cifs: wait for writeback to complete in cifs_flush
-  cifs: eliminate cifsInodeInfo->write_behind_rc
-
- fs/cifs/cifsfs.c    |    3 +-
- fs/cifs/cifsglob.h  |   25 +--
- fs/cifs/cifsproto.h |    8 +-
- fs/cifs/cifssmb.c   |    4 +-
- fs/cifs/dir.c       |  156 +-------------
- fs/cifs/file.c      |  612 +++++++++++++++++++++++++--------------------------
- fs/cifs/inode.c     |   15 +-
- fs/cifs/misc.c      |   16 +-
- fs/cifs/readdir.c   |    6 +-
- 9 files changed, 334 insertions(+), 511 deletions(-)
-
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 4f7edba..781676e 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -107,8 +107,7 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+ 
+ extern struct cifsFileInfo *cifs_new_fileinfo(struct inode *newinode,
+ 				__u16 fileHandle, struct file *file,
+-				struct tcon_link *tlink,
+-				unsigned int oflags, __u32 oplock);
++				struct tcon_link *tlink, __u32 oplock);
+ extern int cifs_posix_open(char *full_path, struct inode **pinode,
+ 				struct super_block *sb,
+ 				int mode, unsigned int f_flags,
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 8c1af71..ce1fa30 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -132,7 +132,7 @@ cifs_bp_rename_retry:
+ 
+ struct cifsFileInfo *
+ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+-		  struct tcon_link *tlink, unsigned int oflags, __u32 oplock)
++		  struct tcon_link *tlink, __u32 oplock)
+ {
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	struct cifsFileInfo *pCifsFile;
+@@ -161,7 +161,7 @@ cifs_new_fileinfo(struct inode *newinode, __u16 fileHandle, struct file *file,
+ 	pCifsInode = CIFS_I(newinode);
+ 	if (pCifsInode) {
+ 		/* if readable file instance put first in list*/
+-		if (oflags & FMODE_READ)
++		if (file->f_mode & FMODE_READ)
+ 			list_add(&pCifsFile->flist, &pCifsInode->openFileList);
+ 		else
+ 			list_add_tail(&pCifsFile->flist,
+@@ -396,7 +396,7 @@ cifs_create_set_dentry:
+ 		}
+ 
+ 		pfile_info = cifs_new_fileinfo(newinode, fileHandle, filp,
+-						tlink, oflags, oplock);
++						tlink, oplock);
+ 		if (pfile_info == NULL) {
+ 			fput(filp);
+ 			CIFSSMBClose(xid, tcon, fileHandle);
+@@ -670,8 +670,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 			}
+ 
+ 			cfile = cifs_new_fileinfo(newInode, fileHandle, filp,
+-						  tlink, nd->intent.open.flags,
+-						  oplock);
++						  tlink, oplock);
+ 			if (cfile == NULL) {
+ 				fput(filp);
+ 				CIFSSMBClose(xid, pTcon, fileHandle);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b1ca6a4..774e3ac 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -273,7 +273,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			cFYI(1, "posix open succeeded");
+ 
+ 			pCifsFile = cifs_new_fileinfo(inode, netfid, file,
+-							tlink, oflags, oplock);
++							tlink, oplock);
+ 			if (pCifsFile == NULL) {
+ 				CIFSSMBClose(xid, tcon, netfid);
+ 				rc = -ENOMEM;
+@@ -365,8 +365,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	if (rc != 0)
+ 		goto out;
+ 
+-	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink,
+-					file->f_flags, oplock);
++	pCifsFile = cifs_new_fileinfo(inode, netfid, file, tlink, oplock);
+ 	if (pCifsFile == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
 -- 
 1.7.2.3
