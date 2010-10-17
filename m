@@ -1,100 +1,40 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 11/13] cifs: convert cifsFileInfo->count to non-atomic counter
-Date: Fri, 15 Oct 2010 15:34:06 -0400
-Message-ID: <1287171248-464-12-git-send-email-jlayton@redhat.com>
-References: <1287171248-464-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH 01/13] cifs: fix flags handling in cifs_posix_open
+Date: Sun, 17 Oct 2010 20:38:04 +0530
+Message-ID: <4CBB1154.1020101@suse.de>
+References: <1287171248-464-1-git-send-email-jlayton@redhat.com> <1287171248-464-2-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1287171248-464-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1287171248-464-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The count for cifsFileInfo is currently an atomic, but that just adds
-complexity for little value. We generally need to hold cifs_file_list_lock
-to traverse the lists anyway so we might as well make this counter
-non-atomic and simply use the cifs_file_list_lock to protect it.
+On 10/16/2010 01:03 AM, Jeff Layton wrote:
+> The way flags are passed and converted for cifs_posix_open is rather
+> non-sensical. Some callers call cifs_posix_convert_flags on the flags
+> before they pass them to cifs_posix_open, whereas some don't. Two flag
+> conversion steps is just confusing though.
+> 
+> Change the function instead to clearly expect input in f_flags format,
+> and fix the callers to pass that in. Then, have cifs_posix_open call
+> cifs_convert_posix_flags to do the conversion. Move cifs_posix_open to
+> file.c as well so we can keep cifs_convert_posix_flags as a static
+> function.
+> 
+> Fix it also to not ignore O_CREAT, O_EXCL and O_TRUNC, and instead have
+> cifs_reopen_file mask those bits off before calling cifs_posix_open.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsproto.h |    2 +-
+>  fs/cifs/dir.c       |   99 +++------------------------------------------
+>  fs/cifs/file.c      |  113 +++++++++++++++++++++++++++++++++++++++-----------
+>  3 files changed, 95 insertions(+), 119 deletions(-)
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Nice cleanup. Looks good to me.
+
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/cifsglob.h |    9 ++++++---
- fs/cifs/file.c     |    8 +++++---
- 2 files changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index df4629e..a97e0e5 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -395,16 +395,19 @@ struct cifsFileInfo {
- 	struct list_head llist; /* list of byte range locks we have. */
- 	bool invalidHandle:1;	/* file closed via session abend */
- 	bool oplock_break_cancelled:1;
--	atomic_t count;		/* reference count */
-+	int count;		/* refcount -- protected by cifs_file_list_lock */
- 	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
- 	struct cifs_search_info srch_inf;
- 	struct work_struct oplock_break; /* work for oplock breaks */
- };
- 
--/* Take a reference on the file private data */
-+/*
-+ * Take a reference on the file private data. Must be called with
-+ * cifs_file_list_lock held.
-+ */
- static inline void cifsFileInfo_get(struct cifsFileInfo *cifs_file)
- {
--	atomic_inc(&cifs_file->count);
-+	++cifs_file->count;
- }
- 
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 8c81e7b..baf4b50 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -232,6 +232,7 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	if (pCifsFile == NULL)
- 		return pCifsFile;
- 
-+	pCifsFile->count = 1;
- 	pCifsFile->netfid = fileHandle;
- 	pCifsFile->pid = current->tgid;
- 	pCifsFile->uid = current_fsuid();
-@@ -242,7 +243,6 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 	mutex_init(&pCifsFile->fh_mutex);
- 	mutex_init(&pCifsFile->lock_mutex);
- 	INIT_LIST_HEAD(&pCifsFile->llist);
--	atomic_set(&pCifsFile->count, 1);
- 	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
- 
- 	spin_lock(&cifs_file_list_lock);
-@@ -267,7 +267,8 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
- 
- /*
-  * Release a reference on the file private data. This may involve closing
-- * the filehandle out on the server.
-+ * the filehandle out on the server. Must be called without holding
-+ * cifs_file_list_lock.
-  */
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- {
-@@ -276,7 +277,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- 	struct cifsLockInfo *li, *tmp;
- 
- 	spin_lock(&cifs_file_list_lock);
--	if (!atomic_dec_and_test(&cifs_file->count)) {
-+	if (--cifs_file->count > 0) {
- 		spin_unlock(&cifs_file_list_lock);
- 		return;
- 	}
-@@ -2322,6 +2323,7 @@ void cifs_oplock_break(struct work_struct *work)
- 	cifs_oplock_break_put(cfile);
- }
- 
-+/* must be called while holding cifs_file_list_lock */
- void cifs_oplock_break_get(struct cifsFileInfo *cfile)
- {
- 	cifs_sb_active(cfile->dentry->d_sb);
--- 
-1.7.2.3
