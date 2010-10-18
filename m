@@ -1,519 +1,489 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 08/13] cifs: convert GlobalSMBSeslock from a rwlock to
- regular spinlock
-Date: Sun, 17 Oct 2010 20:34:18 -0500
-Message-ID: <AANLkTi=6buvrfN_pnY_JZ6MHLaMqxu3WqBcD9xk9k4n0@mail.gmail.com>
-References: <1287171248-464-1-git-send-email-jlayton@redhat.com>
-	<1287171248-464-9-git-send-email-jlayton@redhat.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [RFC][PATCH] cifs: convert cifs_tcp_ses_lock from a rwlock to a spinlock
+Date: Mon, 18 Oct 2010 23:29:37 +0530
+Message-ID: <4CBC8B09.2050702@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1287171248-464-9-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Nice writeup on lwn with the more detailed explanation of the topic of =
-rwlocks
+cifs_tcp_ses_lock is a rwlock with protects the cifs_tcp_ses_list,
+server->smb_ses_list and the ses->tcon_list. It also protects a few
+ref counters in server, ses and tcon. In most cases the critical section
+doesn't seem to be large, in a few cases where it is slightly large, there
+seem to be really no benefit from concurrent access. I briefly considered RCU
+mechanism but it appears to me that there is no real need.
 
-http://lwn.net/Articles/364583/
+Replace it with a spinlock and get rid of the last rwlock in the cifs code.
 
-This patch and patch 9 reviewed/merged now as well.
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/cifs_debug.c |   12 ++++----
+ fs/cifs/cifsfs.c     |    8 +++---
+ fs/cifs/cifsglob.h   |    2 +-
+ fs/cifs/cifssmb.c    |    6 ++--
+ fs/cifs/connect.c    |   70 +++++++++++++++++++++++++-------------------------
+ fs/cifs/misc.c       |   14 +++++-----
+ fs/cifs/sess.c       |    4 +-
+ 7 files changed, 58 insertions(+), 58 deletions(-)
 
-Also FYI - I fixed a checkpatch warning on patch 2
-
-On Fri, Oct 15, 2010 at 2:34 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> Convert this lock to a regular spinlock
->
-> A rwlock_t offers little value here. It's more expensive than a regul=
-ar
-> spinlock unless you have a fairly large section of code that runs und=
-er
-> the read lock and can benefit from the concurrency.
->
-> Additionally, we need to ensure that the refcounting for files isn't
-> racy and to do that we need to lock areas that can increment it for
-> write. That means that the areas that can actually use a read_lock ar=
-e
-> very few and relatively infrequently used.
->
-> While we're at it, change the name to something easier to type, and f=
-ix
-> a bug in find_writable_file. cifsFileInfo_put can sleep and shouldn't=
- be
-> called while holding the lock.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> ---
-> =A0fs/cifs/cifsfs.c =A0 | =A0 =A02 +-
-> =A0fs/cifs/cifsglob.h | =A0 =A02 +-
-> =A0fs/cifs/cifssmb.c =A0| =A0 =A04 +-
-> =A0fs/cifs/file.c =A0 =A0 | =A0 54 ++++++++++++++++++++++++++--------=
-------------------
-> =A0fs/cifs/misc.c =A0 =A0 | =A0 =A08 +++---
-> =A0fs/cifs/readdir.c =A0| =A0 =A06 ++--
-> =A06 files changed, 38 insertions(+), 38 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 3facf25..c25e928 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -942,8 +942,8 @@ init_cifs(void)
-> =A0 =A0 =A0 =A0GlobalTotalActiveXid =3D 0;
-> =A0 =A0 =A0 =A0GlobalMaxActiveXid =3D 0;
-> =A0 =A0 =A0 =A0memset(Local_System_Name, 0, 15);
-> - =A0 =A0 =A0 rwlock_init(&GlobalSMBSeslock);
-> =A0 =A0 =A0 =A0rwlock_init(&cifs_tcp_ses_lock);
-> + =A0 =A0 =A0 spin_lock_init(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0spin_lock_init(&GlobalMid_Lock);
->
-> =A0 =A0 =A0 =A0if (cifs_max_pending < 2) {
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 2ecf675..087bc4b 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -722,7 +722,7 @@ GLOBAL_EXTERN rwlock_t =A0 =A0 =A0 =A0 =A0 =A0 =A0=
-cifs_tcp_ses_lock;
-> =A0* If cifs_tcp_ses_lock and the lock below are both needed to be he=
-ld, then
-> =A0* the cifs_tcp_ses_lock must be grabbed first and released last.
-> =A0*/
-> -GLOBAL_EXTERN rwlock_t GlobalSMBSeslock;
-> +GLOBAL_EXTERN spinlock_t =A0 =A0 =A0 cifs_file_list_lock;
->
-> =A0/* Outstanding dir notify requests */
-> =A0GLOBAL_EXTERN struct list_head GlobalDnotifyReqList;
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index a420c7b..bfb59a6 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -91,13 +91,13 @@ static void mark_open_files_invalid(struct cifsTc=
-onInfo *pTcon)
-> =A0 =A0 =A0 =A0struct list_head *tmp1;
->
-> =A0/* list all files open on tree connection and mark them invalid */
-> - =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0list_for_each_safe(tmp, tmp1, &pTcon->openFileList) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0open_file =3D list_entry(tmp, struct c=
-ifsFileInfo, tlist);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0open_file->invalidHandle =3D true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0open_file->oplock_break_cancelled =3D =
-true;
-> =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 write_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0/* BB Add call to invalidate_inodes(sb) for all superb=
-locks mounted
-> =A0 =A0 =A0 =A0 =A0 to this tcon */
-> =A0}
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 293e9b7..26048dc 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -246,14 +246,14 @@ cifs_new_fileinfo(__u16 fileHandle, struct file=
- *file,
-> =A0 =A0 =A0 =A0atomic_set(&pCifsFile->count, 1);
-> =A0 =A0 =A0 =A0INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break)=
-;
->
-> - =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openF=
-ileList));
-> =A0 =A0 =A0 =A0/* if readable file instance put first in list*/
-> =A0 =A0 =A0 =A0if (file->f_mode & FMODE_READ)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_add(&pCifsFile->flist, &pCifsInod=
-e->openFileList);
-> =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_add_tail(&pCifsFile->flist, &pCif=
-sInode->openFileList);
-> - =A0 =A0 =A0 write_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
->
-> =A0 =A0 =A0 =A0if ((oplock & 0xF) =3D=3D OPLOCK_EXCLUSIVE) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsInode->clientCanCacheAll =3D true=
-;
-> @@ -607,13 +607,13 @@ int cifs_close(struct inode *inode, struct file=
- *file)
-> =A0 =A0 =A0 =A0pTcon =3D tlink_tcon(pSMBFile->tlink);
-> =A0 =A0 =A0 =A0if (pSMBFile) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct cifsLockInfo *li, *tmp;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pSMBFile->closePend =3D true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (pTcon) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* no sense reconnecti=
-ng to close a file that is
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 already closed */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!pTcon->need_recon=
-nect) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_u=
-nlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0timeou=
-t =3D 2;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0while =
-((atomic_read(&pSMBFile->count) !=3D 1)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0&& (timeout <=3D 2048)) {
-> @@ -633,9 +633,9 @@ int cifs_close(struct inode *inode, struct file *=
-file)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0rc =3D CIFSSMBClose(xid, pTcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0pSMBFile->netfid);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_u=
-nlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_unlock(&GlobalSMB=
-Seslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Delete any outstanding lock records=
-=2E
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 We'll lose them when the file is =
-closed anyway. */
-> @@ -646,16 +646,16 @@ int cifs_close(struct inode *inode, struct file=
- *file)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&pSMBFile->lock_mutex);
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del(&pSMBFile->flist);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del(&pSMBFile->tlist);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifsFileInfo_put(file->private_data);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0file->private_data =3D NULL;
-> =A0 =A0 =A0 =A0} else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EBADF;
->
-> - =A0 =A0 =A0 read_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0if (list_empty(&(CIFS_I(inode)->openFileList))) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "closing last open instance fo=
-r inode %p", inode);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* if the file is not open we do not k=
-now if we can cache info
-> @@ -663,7 +663,7 @@ int cifs_close(struct inode *inode, struct file *=
-file)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_I(inode)->clientCanCacheRead =3D =
-false;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_I(inode)->clientCanCacheAll =A0=3D=
- false;
-> =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 read_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0if ((rc =3D=3D 0) && CIFS_I(inode)->write_behind_rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D CIFS_I(inode)->write_behind_rc;
-> =A0 =A0 =A0 =A0FreeXid(xid);
-> @@ -685,18 +685,18 @@ int cifs_closedir(struct inode *inode, struct f=
-ile *file)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct cifsTconInfo *pTcon =3D tlink_t=
-con(pCFileStruct->tlink);
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Freeing private data in close=
- dir");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!pCFileStruct->srch_inf.endOfSearc=
-h &&
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0!pCFileStruct->invalidHandle) =
-{
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCFileStruct->invalidH=
-andle =3D true;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_unlock(&GlobalSMB=
-Seslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D CIFSFindClose(x=
-id, pTcon, pCFileStruct->netfid);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Closing uncom=
-pleted readdir with rc %d",
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* not much we can do =
-if it fails anyway, ignore rc */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D 0;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_unlock(&GlobalSMB=
-Seslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ptmp =3D pCFileStruct->srch_inf.ntwrk_=
-buf_start;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (ptmp) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "closedir free=
- smb buf in srch struct");
-> @@ -1182,7 +1182,7 @@ struct cifsFileInfo *find_readable_file(struct =
-cifsInodeInfo *cifs_inode,
-> =A0 =A0 =A0 =A0if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0fsuid_only =3D false;
->
-> - =A0 =A0 =A0 read_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0/* we could simply get the first_list_entry since writ=
-e-only entries
-> =A0 =A0 =A0 =A0 =A0 are always at the end of the list but since the f=
-irst entry might
-> =A0 =A0 =A0 =A0 =A0 have a close pending, we go through the whole lis=
-t */
-> @@ -1196,7 +1196,7 @@ struct cifsFileInfo *find_readable_file(struct =
-cifsInodeInfo *cifs_inode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* fou=
-nd a good file */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* loc=
-k it so it will not be closed on us */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifsFi=
-leInfo_get(open_file);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_un=
-lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- open_file;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} /* else might as wel=
-l continue, and look for
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 another, or s=
-imply have the caller reopen it
-> @@ -1204,7 +1204,7 @@ struct cifsFileInfo *find_readable_file(struct =
-cifsInodeInfo *cifs_inode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else /* write only file */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break; /* write only f=
-iles are last so must be done */
-> =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 read_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0return NULL;
-> =A0}
-> =A0#endif
-> @@ -1231,7 +1231,7 @@ struct cifsFileInfo *find_writable_file(struct =
-cifsInodeInfo *cifs_inode,
-> =A0 =A0 =A0 =A0if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0fsuid_only =3D false;
->
-> - =A0 =A0 =A0 read_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0refind_writable:
-> =A0 =A0 =A0 =A0list_for_each_entry(open_file, &cifs_inode->openFileLi=
-st, flist) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (open_file->closePend)
-> @@ -1245,11 +1245,11 @@ refind_writable:
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!open_file->invali=
-dHandle) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* fou=
-nd a good writable file */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_un=
-lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- open_file;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_unlock(&GlobalSMBS=
-eslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Had to unlock since=
- following call can block */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D cifs_reopen_fil=
-e(open_file, false);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!rc) {
-> @@ -1257,7 +1257,7 @@ refind_writable:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0return open_file;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else {=
- /* start over in case this was deleted */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 /* since the list could be modified */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 read_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0cifsFileInfo_put(open_file);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0goto refind_writable;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -1271,7 +1271,7 @@ refind_writable:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0to hold up writepages =
-here (rather than
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0in caller) with contin=
-uous retries */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "wp failed on =
-reopen file");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_lock(&GlobalSMBSes=
-lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_li=
-st_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* can not use this ha=
-ndle, no write
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pending on this o=
-ne after all */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifsFileInfo_put(open_=
-file);
-> @@ -1292,7 +1292,7 @@ refind_writable:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0any_available =3D true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto refind_writable;
-> =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 read_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0return NULL;
-> =A0}
->
-> @@ -2200,16 +2200,16 @@ static int is_inode_writable(struct cifsInode=
-Info *cifs_inode)
-> =A0{
-> =A0 =A0 =A0 =A0struct cifsFileInfo *open_file;
->
-> - =A0 =A0 =A0 read_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0list_for_each_entry(open_file, &cifs_inode->openFileLi=
-st, flist) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (open_file->closePend)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0continue;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (OPEN_FMODE(open_file->f_flags) & F=
-MODE_WRITE) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_unlock(&GlobalSMBS=
-eslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 1;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 read_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0return 0;
-> =A0}
->
-> @@ -2373,8 +2373,8 @@ void cifs_oplock_break(struct work_struct *work=
-)
-> =A0 =A0 =A0 =A0 * finished grabbing reference for us. =A0Make sure it=
-'s done by
-> =A0 =A0 =A0 =A0 * waiting for GlobalSMSSeslock.
-> =A0 =A0 =A0 =A0 */
-> - =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> - =A0 =A0 =A0 write_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
->
-> =A0 =A0 =A0 =A0cifs_oplock_break_put(cfile);
-> =A0}
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 9bac3e7..de6073c 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -560,7 +560,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct=
- TCP_Server_Info *srv)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0contin=
-ue;
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_stats_inc(&tcon->=
-num_oplock_brks);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_lock(&GlobalSMBSes=
-lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_li=
-st_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_for_each(tmp2, &t=
-con->openFileList) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0netfil=
-e =3D list_entry(tmp2, struct cifsFileInfo,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 tlist);
-> @@ -572,7 +572,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct=
- TCP_Server_Info *srv)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * clo=
-sed anyway.
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (ne=
-tfile->closePend) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 read_unlock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0read_unlock(&cifs_tcp_ses_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0return true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -594,11 +594,11 @@ is_valid_oplock_break(struct smb_hdr *buf, stru=
-ct TCP_Server_Info *srv)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0cifs_oplock_break_get(netfile);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0netfil=
-e->oplock_break_cancelled =3D false;
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_un=
-lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0read_u=
-nlock(&cifs_tcp_ses_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 read_unlock(&GlobalSMBS=
-eslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0read_unlock(&cifs_tcp_=
-ses_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "No matching f=
-ile for oplock break");
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return true;
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index 7bdcb35..c8961c5 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -529,14 +529,14 @@ static int find_cifs_entry(const int xid, struc=
-t cifsTconInfo *pTcon,
-> =A0 =A0 =A0 =A0 =A0 (index_to_find < first_entry_in_buffer)) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* close and restart search */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "search backing up - close and=
- restart search");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_lock(&GlobalSMBSeslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!cifsFile->srch_inf.endOfSearch &&
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0!cifsFile->invalidHandle) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifsFile->invalidHandl=
-e =3D true;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_unlock(&GlobalSMB=
-Seslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFSFindClose(xid, pTc=
-on, cifsFile->netfid);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 write_unlock(&GlobalSMB=
-Seslock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_=
-list_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifsFile->srch_inf.ntwrk_buf_start=
-) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "freeing SMB f=
-f cache buf on search rewind");
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifsFile->srch_inf=
-=2EsmallBuf)
-> --
-> 1.7.2.3
->
->
-
-
-
---=20
-Thanks,
-
-Steve
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index eb1ba49..103ab8b 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -148,7 +148,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	seq_printf(m, "Servers:");
+ 
+ 	i = 0;
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp1, &cifs_tcp_ses_list) {
+ 		server = list_entry(tmp1, struct TCP_Server_Info,
+ 				    tcp_ses_list);
+@@ -230,7 +230,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 			spin_unlock(&GlobalMid_Lock);
+ 		}
+ 	}
+-	read_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	seq_putc(m, '\n');
+ 
+ 	/* BB add code to dump additional info such as TCP session info now */
+@@ -270,7 +270,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+ 		atomic_set(&totBufAllocCount, 0);
+ 		atomic_set(&totSmBufAllocCount, 0);
+ #endif /* CONFIG_CIFS_STATS2 */
+-		read_lock(&cifs_tcp_ses_lock);
++		spin_lock(&cifs_tcp_ses_lock);
+ 		list_for_each(tmp1, &cifs_tcp_ses_list) {
+ 			server = list_entry(tmp1, struct TCP_Server_Info,
+ 					    tcp_ses_list);
+@@ -303,7 +303,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+ 				}
+ 			}
+ 		}
+-		read_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 	}
+ 
+ 	return count;
+@@ -343,7 +343,7 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
+ 		GlobalCurrentXid, GlobalMaxActiveXid);
+ 
+ 	i = 0;
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp1, &cifs_tcp_ses_list) {
+ 		server = list_entry(tmp1, struct TCP_Server_Info,
+ 				    tcp_ses_list);
+@@ -397,7 +397,7 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
+ 			}
+ 		}
+ 	}
+-	read_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	seq_putc(m, '\n');
+ 	return 0;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index f1d9c71..cb77915 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -482,16 +482,16 @@ static void cifs_umount_begin(struct super_block *sb)
+ 
+ 	tcon = cifs_sb_master_tcon(cifs_sb);
+ 
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	if ((tcon->tc_count > 1) || (tcon->tidStatus == CifsExiting)) {
+ 		/* we have other mounts to same share or we have
+ 		   already tried to force umount this and woken up
+ 		   all waiting network requests, nothing to do */
+-		read_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return;
+ 	} else if (tcon->tc_count == 1)
+ 		tcon->tidStatus = CifsExiting;
+-	read_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	/* cancel_brl_requests(tcon); */ /* BB mark all brl mids as exiting */
+ 	/* cancel_notify_requests(tcon); */
+@@ -940,7 +940,7 @@ init_cifs(void)
+ 	GlobalTotalActiveXid = 0;
+ 	GlobalMaxActiveXid = 0;
+ 	memset(Local_System_Name, 0, 15);
+-	rwlock_init(&cifs_tcp_ses_lock);
++	spin_lock_init(&cifs_tcp_ses_lock);
+ 	spin_lock_init(&cifs_file_list_lock);
+ 	spin_lock_init(&GlobalMid_Lock);
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 18ee0ad..28337cb 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -703,7 +703,7 @@ GLOBAL_EXTERN struct list_head		cifs_tcp_ses_list;
+  * the reference counters for the server, smb session, and tcon. Finally,
+  * changes to the tcon->tidStatus should be done while holding this lock.
+  */
+-GLOBAL_EXTERN rwlock_t		cifs_tcp_ses_lock;
++GLOBAL_EXTERN spinlock_t		cifs_tcp_ses_lock;
+ 
+ /*
+  * This lock protects the cifs_file->llist and cifs_file->flist
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index bfb59a6..e98f1f3 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -593,9 +593,9 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 			rc = -EIO;
+ 			goto neg_err_exit;
+ 		}
+-		read_lock(&cifs_tcp_ses_lock);
++		spin_lock(&cifs_tcp_ses_lock);
+ 		if (server->srv_count > 1) {
+-			read_unlock(&cifs_tcp_ses_lock);
++			spin_unlock(&cifs_tcp_ses_lock);
+ 			if (memcmp(server->server_GUID,
+ 				   pSMBr->u.extended_response.
+ 				   GUID, 16) != 0) {
+@@ -605,7 +605,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 					16);
+ 			}
+ 		} else {
+-			read_unlock(&cifs_tcp_ses_lock);
++			spin_unlock(&cifs_tcp_ses_lock);
+ 			memcpy(server->server_GUID,
+ 			       pSMBr->u.extended_response.GUID, 16);
+ 		}
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 019f003..7e73176 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -150,7 +150,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 
+ 	/* before reconnecting the tcp session, mark the smb session (uid)
+ 		and the tid bad so they are not used until reconnected */
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp, &server->smb_ses_list) {
+ 		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
+ 		ses->need_reconnect = true;
+@@ -160,7 +160,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 			tcon->need_reconnect = true;
+ 		}
+ 	}
+-	read_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	/* do not want to be sending data on a socket we are freeing */
+ 	mutex_lock(&server->srv_mutex);
+ 	if (server->ssocket) {
+@@ -637,9 +637,9 @@ multi_t2_fnd:
+ 	} /* end while !EXITING */
+ 
+ 	/* take it off the list, if it's not already */
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_del_init(&server->tcp_ses_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	spin_lock(&GlobalMid_Lock);
+ 	server->tcpStatus = CifsExiting;
+@@ -677,7 +677,7 @@ multi_t2_fnd:
+ 	 * BB: we shouldn't have to do any of this. It shouldn't be
+ 	 * possible to exit from the thread with active SMB sessions
+ 	 */
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	if (list_empty(&server->pending_mid_q)) {
+ 		/* loop through server session structures attached to this and
+ 		    mark them dead */
+@@ -687,7 +687,7 @@ multi_t2_fnd:
+ 			ses->status = CifsExiting;
+ 			ses->server = NULL;
+ 		}
+-		read_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 	} else {
+ 		/* although we can not zero the server struct pointer yet,
+ 		since there are active requests which may depnd on them,
+@@ -710,7 +710,7 @@ multi_t2_fnd:
+ 			}
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+-		read_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		/* 1/8th of sec is more than enough time for them to exit */
+ 		msleep(125);
+ 	}
+@@ -733,12 +733,12 @@ multi_t2_fnd:
+ 	if a crazy root user tried to kill cifsd
+ 	kernel thread explicitly this might happen) */
+ 	/* BB: This shouldn't be necessary, see above */
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp, &server->smb_ses_list) {
+ 		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
+ 		ses->server = NULL;
+ 	}
+-	read_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	kfree(server->hostname);
+ 	task_to_wake = xchg(&server->tsk, NULL);
+@@ -1524,7 +1524,7 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
+ {
+ 	struct TCP_Server_Info *server;
+ 
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+ 		if (!match_address(server, addr,
+ 				   (struct sockaddr *)&vol->srcaddr))
+@@ -1534,11 +1534,11 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
+ 			continue;
+ 
+ 		++server->srv_count;
+-		write_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		cFYI(1, "Existing tcp session with server found");
+ 		return server;
+ 	}
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	return NULL;
+ }
+ 
+@@ -1547,14 +1547,14 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ {
+ 	struct task_struct *task;
+ 
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	if (--server->srv_count > 0) {
+-		write_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return;
+ 	}
+ 
+ 	list_del_init(&server->tcp_ses_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	spin_lock(&GlobalMid_Lock);
+ 	server->tcpStatus = CifsExiting;
+@@ -1679,9 +1679,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	}
+ 
+ 	/* thread spawned, put it on the list */
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_add(&tcp_ses->tcp_ses_list, &cifs_tcp_ses_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	cifs_fscache_get_client_cookie(tcp_ses);
+ 
+@@ -1703,7 +1703,7 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ {
+ 	struct cifsSesInfo *ses;
+ 
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+ 		switch (server->secType) {
+ 		case Kerberos:
+@@ -1723,10 +1723,10 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+ 				continue;
+ 		}
+ 		++ses->ses_count;
+-		write_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return ses;
+ 	}
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	return NULL;
+ }
+ 
+@@ -1737,14 +1737,14 @@ cifs_put_smb_ses(struct cifsSesInfo *ses)
+ 	struct TCP_Server_Info *server = ses->server;
+ 
+ 	cFYI(1, "%s: ses_count=%d\n", __func__, ses->ses_count);
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	if (--ses->ses_count > 0) {
+-		write_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return;
+ 	}
+ 
+ 	list_del_init(&ses->smb_ses_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	if (ses->status == CifsGood) {
+ 		xid = GetXid();
+@@ -1841,9 +1841,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 		goto get_ses_fail;
+ 
+ 	/* success, put it on the list */
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_add(&ses->smb_ses_list, &server->smb_ses_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	FreeXid(xid);
+ 	return ses;
+@@ -1860,7 +1860,7 @@ cifs_find_tcon(struct cifsSesInfo *ses, const char *unc)
+ 	struct list_head *tmp;
+ 	struct cifsTconInfo *tcon;
+ 
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp, &ses->tcon_list) {
+ 		tcon = list_entry(tmp, struct cifsTconInfo, tcon_list);
+ 		if (tcon->tidStatus == CifsExiting)
+@@ -1869,10 +1869,10 @@ cifs_find_tcon(struct cifsSesInfo *ses, const char *unc)
+ 			continue;
+ 
+ 		++tcon->tc_count;
+-		write_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return tcon;
+ 	}
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	return NULL;
+ }
+ 
+@@ -1883,14 +1883,14 @@ cifs_put_tcon(struct cifsTconInfo *tcon)
+ 	struct cifsSesInfo *ses = tcon->ses;
+ 
+ 	cFYI(1, "%s: tc_count=%d\n", __func__, tcon->tc_count);
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	if (--tcon->tc_count > 0) {
+-		write_unlock(&cifs_tcp_ses_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return;
+ 	}
+ 
+ 	list_del_init(&tcon->tcon_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	xid = GetXid();
+ 	CIFSSMBTDis(xid, tcon);
+@@ -1963,9 +1963,9 @@ cifs_get_tcon(struct cifsSesInfo *ses, struct smb_vol *volume_info)
+ 	tcon->nocase = volume_info->nocase;
+ 	tcon->local_lease = volume_info->local_lease;
+ 
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_add(&tcon->tcon_list, &ses->tcon_list);
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	cifs_fscache_get_super_cookie(tcon);
+ 
+@@ -3225,9 +3225,9 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, uid_t fsuid)
+ 	vol_info->secFlg = CIFSSEC_MUST_KRB5;
+ 
+ 	/* get a reference for the same TCP session */
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	++master_tcon->ses->server->srv_count;
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	ses = cifs_get_smb_ses(master_tcon->ses->server, vol_info);
+ 	if (IS_ERR(ses)) {
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index de6073c..a7b492c 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -347,7 +347,7 @@ header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
+ 				if (current_fsuid() != treeCon->ses->linux_uid) {
+ 					cFYI(1, "Multiuser mode and UID "
+ 						 "did not match tcon uid");
+-					read_lock(&cifs_tcp_ses_lock);
++					spin_lock(&cifs_tcp_ses_lock);
+ 					list_for_each(temp_item, &treeCon->ses->server->smb_ses_list) {
+ 						ses = list_entry(temp_item, struct cifsSesInfo, smb_ses_list);
+ 						if (ses->linux_uid == current_fsuid()) {
+@@ -361,7 +361,7 @@ header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
+ 							}
+ 						}
+ 					}
+-					read_unlock(&cifs_tcp_ses_lock);
++					spin_unlock(&cifs_tcp_ses_lock);
+ 				}
+ 			}
+ 		}
+@@ -551,7 +551,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
+ 		return false;
+ 
+ 	/* look up tcon based on tid & uid */
+-	read_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each(tmp, &srv->smb_ses_list) {
+ 		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
+ 		list_for_each(tmp1, &ses->tcon_list) {
+@@ -573,7 +573,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
+ 				 */
+ 				if (netfile->closePend) {
+ 					spin_unlock(&cifs_file_list_lock);
+-					read_unlock(&cifs_tcp_ses_lock);
++					spin_unlock(&cifs_tcp_ses_lock);
+ 					return true;
+ 				}
+ 
+@@ -595,16 +595,16 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
+ 				netfile->oplock_break_cancelled = false;
+ 
+ 				spin_unlock(&cifs_file_list_lock);
+-				read_unlock(&cifs_tcp_ses_lock);
++				spin_unlock(&cifs_tcp_ses_lock);
+ 				return true;
+ 			}
+ 			spin_unlock(&cifs_file_list_lock);
+-			read_unlock(&cifs_tcp_ses_lock);
++			spin_unlock(&cifs_tcp_ses_lock);
+ 			cFYI(1, "No matching file for oplock break");
+ 			return true;
+ 		}
+ 	}
+-	read_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	cFYI(1, "Can not process oplock break for non-existent connection");
+ 	return true;
+ }
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 2111bed..933ed26 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -80,7 +80,7 @@ static __le16 get_next_vcnum(struct cifsSesInfo *ses)
+ 	if (max_vcs < 2)
+ 		max_vcs = 0xFFFF;
+ 
+-	write_lock(&cifs_tcp_ses_lock);
++	spin_lock(&cifs_tcp_ses_lock);
+ 	if ((ses->need_reconnect) && is_first_ses_reconnect(ses))
+ 			goto get_vc_num_exit;  /* vcnum will be zero */
+ 	for (i = ses->server->srv_count - 1; i < max_vcs; i++) {
+@@ -112,7 +112,7 @@ static __le16 get_next_vcnum(struct cifsSesInfo *ses)
+ 		vcnum = i;
+ 	ses->vcnum = vcnum;
+ get_vc_num_exit:
+-	write_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	return cpu_to_le16(vcnum);
+ }
