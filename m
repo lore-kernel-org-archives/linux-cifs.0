@@ -1,60 +1,41 @@
-From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
-Subject: Re: linux-next: build warning after merge of the cifs tree
-Date: Tue, 19 Oct 2010 16:21:20 +1100
-Message-ID: <20101019162120.76e03b4b.sfr@canb.auug.org.au>
-References: <20100924135531.96e5ac72.sfr@canb.auug.org.au>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: Strange hardlink behavior with CIFS
+Date: Tue, 19 Oct 2010 15:13:31 +0530
+Message-ID: <4CBD6843.3060702@suse.de>
+References: <1287428685.16450.282.camel@calx>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Tue__19_Oct_2010_16_21_20_+1100_Iha3b_u2=2EIQviC"
-Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20100924135531.96e5ac72.sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+In-Reply-To: <1287428685.16450.282.camel@calx>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---Signature=_Tue__19_Oct_2010_16_21_20_+1100_Iha3b_u2=2EIQviC
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 10/19/2010 12:34 AM, Matt Mackall wrote:
+> With Linux 2.6.32-35 and either Windows or Samba in nounix mode,
+> hardlink counts can mysteriously disappear:
+> 
+> - create hardlink pair foo,bar
+> - stat foo -> nlink = 2
+> - open foo
+> - stat foo -> nlink = 1
+> - close
+> - wait or sync
+> - ls -l -> nlink = 2
+> 
+> Original report is here:
+> 
+> http://mercurial.selenic.com/bts/issue1866
+> 
 
-Hi Steve,
+A quick test on 2.6.36-rc4 kernel reveals that the problem is no longer
+reproducible. Could you try a more recent kernel and see whether the
+problem is reproducible?
 
-On Fri, 24 Sep 2010 13:55:31 +1000 Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org> =
-wrote:
->
-> After merging the irqflags tree, today's linux-next build (powerpc
-> ppc64_defconfig) produced this warning:
->=20
-> fs/cifs/sess.c: In function 'CIFS_SessSetup':
-> fs/cifs/sess.c:595: warning: unused variable 'blob_len'
->=20
-> Introduced by commit 15f6bdfb9914b0c41848f874719911ba053be931 ("cifs
-> NTLMv2/NTLMSSP ntlmv2 within ntlmssp autentication code").
-> CONFIG_CIFS_UPCALL is not set in this build.
 
-I am still getting this ...
+Thanks,
 
---=20
-Cheers,
-Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
-http://www.canb.auug.org.au/~sfr/
-
---Signature=_Tue__19_Oct_2010_16_21_20_+1100_Iha3b_u2=2EIQviC
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iQEcBAEBAgAGBQJMvSrQAAoJEDMEi1NhKgbstscH/1ge2UoyXCskX3ZfNwndQg9m
-fp6oM9LZueFo7n+Ew876WlCMDEVuvEFcjI2vwir2orCUpighnWImuMNDHX8nINkA
-cp1UF6PfvoBSQ86+Z/F0HtAOyGqovzQtzs2qkd+av+C8OkvNuhzUE1L2t+RiJ0pi
-C7+LlyTzpGFzr7NU9c4suPnZP98W7X8SOp0Sz2/QZsuc0HJ2HJUp3Q9bz5sjdtEj
-NsuExebqQ+n1dzKjj+uPo6oPLIuiFviavys9hAGO7mXPzaJi1dw9ucYr92+7hLWq
-2L9M7EyHibA9BC/4YTnHpvc/eSxPTzFKzIlHRl0AtonB2sWryJa91wgmxSp0cyE=
-=CBWz
------END PGP SIGNATURE-----
-
---Signature=_Tue__19_Oct_2010_16_21_20_+1100_Iha3b_u2=2EIQviC--
+-- 
+Suresh Jayaraman
