@@ -1,76 +1,97 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2.6.36-rc7] cifs: cancel_delayed_work() +
- flush_scheduled_work() -> cancel_delayed_work_sync()
-Date: Tue, 19 Oct 2010 13:22:56 -0500
-Message-ID: <AANLkTi=mxgr2v3n8ZQYNtcBqK78LRUE6nF5Y20=VQDjz@mail.gmail.com>
-References: <4CBDBF8A.8010106@kernel.org>
-	<20101019121319.16f06b76@corrin.poochiereds.net>
-	<4CBDC419.8060909@kernel.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: ANNOUNCE: cifs-utils release 4.7 available for download
+Date: Tue, 19 Oct 2010 15:30:26 -0400
+Message-ID: <20101019153026.46d64db8@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Content-Transfer-Encoding: base64
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	samba-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CBDC419.8060909-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-OK - will add this to the cifs tree this afternoon.
-
-On Tue, Oct 19, 2010 at 11:15 AM, Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
-> Hello,
->
-> On 10/19/2010 06:13 PM, Jeff Layton wrote:
->> On Tue, 19 Oct 2010 17:55:54 +0200
->> Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
->>
->>> flush_scheduled_work() is going away.
->>>
->>> Signed-off-by: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
->>> ---
->>> =A0fs/cifs/cifs_dfs_ref.c | =A0 =A03 +--
->>> =A01 file changed, 1 insertion(+), 2 deletions(-)
->>>
->>> Index: work/fs/cifs/cifs_dfs_ref.c
->>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> --- work.orig/fs/cifs/cifs_dfs_ref.c
->>> +++ work/fs/cifs/cifs_dfs_ref.c
->>> @@ -44,8 +44,7 @@ static void cifs_dfs_expire_automounts(s
->>> =A0void cifs_dfs_release_automount_timer(void)
->>> =A0{
->>> =A0 =A0 =A0BUG_ON(!list_empty(&cifs_dfs_automount_list));
->>> - =A0 =A0cancel_delayed_work(&cifs_dfs_automount_task);
->>> - =A0 =A0flush_scheduled_work();
->>> + =A0 =A0cancel_delayed_work_sync(&cifs_dfs_automount_task);
->>> =A0}
->>>
->>> =A0/**
->>
->> Looks like a better way to do this anyhow.
->>
->> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
-> Yeah, way faster too. =A0It would be best to route this patch through
-> cifs tree but I can push it through wq tree too. =A0Just let me know.
->
-> Thanks.
->
-> --
-> tejun
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
-
-
-
---=20
-Thanks,
-
-Steve
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpUaGUgbGFz
+dCBjaWZzLXV0aWxzIHJlbGVhc2UgKDQuNikgd2FzIG9uIEp1bHkgMzB0aCwgc28gaXQncyBwcm9i
+YWJseSBhDQpnb29kIHRpbWUgdG8gZ28gYWhlYWQgYW5kIHJlbGVhc2UgYSBuZXcgb25lIHdpdGgg
+a2VybmVsIDIuNi4zNiBzaGlwcGluZw0Kc29vbi4gTWFqb3IgaGlnaGxpZ2h0czoNCg0KLSAtIG5l
+dyBjaWZzY3JlZHMgcHJvZ3JhbSBoYXMgYmVlbiBhZGRlZC4gVGhpcyB3aWxsIGV2ZW50dWFsbHkg
+YWxsb3cgZm9yDQogIHN0YXNoaW5nIG9mIHVzZXJuYW1lL3Bhc3N3b3JkIGluIHRoZSBrZXJuZWwn
+cyBrZXlyaW5nIGZvciB1c2UgYnkNCiAgY2lmcy4gS2VybmVsIGNvZGUgZm9yIHRoaXMgaXMgbm90
+IGluIHBsYWNlIHlldCwgYW5kIHRoZSBwcm9ncmFtIGlzDQogIG5vdCB5ZXQgYnVpbHQgYnkgZGVm
+YXVsdC4gQ29uZmlndXJpbmcgd2l0aCAtLWVuYWJsZS1jaWZzY3JlZHM9eWVzDQogIHdpbGwgZW5h
+YmxlIGl0Lg0KDQotIC0gdGltZW91dHMgZm9yIHRoaW5ncyBsaWtlIG10YWIgbG9ja2luZyBub3cg
+dXNlIG1vbm90b25pYyB0aW1lIGFuZA0KICBzaG91bGQgbm8gbG9uZ2VyIGhhdmUgcHJvYmxlbXMg
+aWYgdGhlIGNsb2NrIGp1bXBzDQoNCi4uLnBsdXMgdGhlIHVzdWFsIGFzc29ydG1lbnQgb2YgbWlu
+b3IgYnVnZml4ZXMgYW5kIG1hbnBhZ2UgdXBkYXRlcy4NCg0Kd2VicGFnZTogICAgaHR0cDovL2xp
+bnV4LWNpZnMuc2FtYmEub3JnL2NpZnMtdXRpbHMvDQp0YXJiYWxsOiAgICBmdHA6Ly9mdHAuc2Ft
+YmEub3JnL3B1Yi9saW51eC1jaWZzL2NpZnMtdXRpbHMvDQpnaXQ6ICAgICAgICBnaXQ6Ly9naXQu
+c2FtYmEub3JnL2NpZnMtdXRpbHMuZ2l0DQpnaXR3ZWI6ICAgICBodHRwOi8vZ2l0LnNhbWJhLm9y
+Zy8/cD1jaWZzLXV0aWxzLmdpdDthPXN1bW1hcnkNCg0KRGV0YWlsZWQgY2hhbmdlbG9nOg0KDQpj
+b21taXQgNjczOWI2Njc2NzdiMjg3NDBiODdlZGU5NGU1M2RmYzUwMDcxOGFjYg0KQXV0aG9yOiBK
+ZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFR1ZSBPY3QgMTkgMTQ6NTk6
+NDkgMjAxMCAtMDQwMA0KDQogICAgYXV0b2NvbmY6IGJ1bXAgcmVsZWFzZSB0byA0LjcNCiAgICAN
+CiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNv
+bW1pdCAyMDJmNGI0MzIwOWRhMzJhZmM3Y2U1NDQ1YThmNTYxYzM1NGM4ZjgyDQpBdXRob3I6IEpl
+ZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgRnJpIE9jdCA4IDE1OjExOjU4
+IDIwMTAgLTA0MDANCg0KICAgIG1hbnBhZ2U6IGFkZCBtb3VudC5jaWZzIG1hbnBhZ2UgZW50cnkg
+Zm9yICJtdWx0aXVzZXIiIG9wdGlvbg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5
+dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KY29tbWl0IGQ5MDY5MWEyODNkMGYyZWQ5Mjg0NzZm
+Yzk2OTcwYjFlZjJhMjg2NjINCkF1dGhvcjogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3Jn
+Pg0KRGF0ZTogICBGcmkgT2N0IDggMTU6MTE6NTcgMjAxMCAtMDQwMA0KDQogICAgbW91bnQuY2lm
+czogcmVpbnN0YXRlIGlwPSBhcyBhbiBvdmVycmlkZSBmb3IgYWRkcmVzcyByZXNvbHV0aW9uDQog
+ICAgDQogICAgVGhlIG1hbnBhZ2Ugc2F5czoNCiAgICANCiAgICAgICAgICAgaXA9YXJnDQogICAg
+ICAgICAgICAgICBzZXRzIHRoZSBkZXN0aW5hdGlvbiBJUCBhZGRyZXNzLiBUaGlzIG9wdGlvbiBp
+cyBzZXQgYXV0b21hdGljYWxseQ0KICAgICAgICAgICAgICAgaWYgdGhlIHNlcnZlciBuYW1lIHBv
+cnRpb24gb2YgdGhlIHJlcXVlc3RlZCBVTkMgbmFtZSBjYW4gYmUNCiAgICAgICAgICAgICAgIHJl
+c29sdmVkIHNvIHJhcmVseSBuZWVkcyB0byBiZSBzcGVjaWZpZWQgYnkgdGhlIHVzZXIuDQogICAg
+DQogICAgLi4uYnV0IHJlY2VudCBjaGFuZ2VzIGhhdmUgbWFkZSBpdCBub3Qgd29yayBhbnltb3Jl
+IGFzIGFuIG92ZXJyaWRlIGlmDQogICAgc29tZW9uZSBzcGVjaWZpZXMgYW4gaXA9IG9wdGlvbiBh
+cyBwYXJ0IG9mIHRoZSBtb3VudCBvcHRpb25zLiBSZWluc3RhdGUNCiAgICB0aGF0IGJlaGF2aW9y
+IGJ5IGNvcHlpbmcgdGhlIGlwPSBvcHRpb24gdmVyYmF0aW0gaW50byB0aGUgYWRkcmxpc3Qgb2YN
+CiAgICB0aGUgcGFyc2VkIG9wdGlvbnMgc3RydWN0IGFuZCB0aGVuIHNraXBwaW5nIHRoZSBuYW1l
+IHJlc29sdXRpb24uIFRoYXQNCiAgICBzaG91bGQgYWxsb3cgdGhlIGlwPSBvcHRpb24gdG8gcGFz
+cyB1bmFkdWx0ZXJhdGVkIHRvIHRoZSBrZXJuZWwuDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTog
+SmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgZjJkYWEyYTA4YmY4NzA2
+ZjkwZTExNTQyNzJjNWJmZTYyNzk4OTVjZA0KQXV0aG9yOiBCavZybiBKYWNrZSA8YmpAc2VybmV0
+LmRlPg0KRGF0ZTogICBUdWUgQXVnIDI0IDEzOjMwOjA1IDIwMTAgLTA0MDANCg0KICAgIG1vdW50
+LmNpZnM6IHVzZSBtb25vdG9uaWMgdGltZSBmb3IgdGltZW91dHMNCiAgICANCiAgICB0aGlzIGlz
+IGVzcGVjaWFsbHkgaW1wb3J0YW50IGR1cmluZyB0aGUgYm9vdCBwcm9jZXNzLCB3aGVyZSB0aGUg
+Y2xvY2sgaXMgb2Z0ZW4NCiAgICBiZWluZyBzZXQgaW5pdGlhbGx5IGFuZCBjbG9jayBqdW1wcyBh
+cmUgbW9yZSBjb21tb24uDQoNCmNvbW1pdCA3OTc3NDQ4ODgxNGIwZjUyNjc2NDQ2MjhlMzFjMDdj
+N2FjMzgwYTY1DQpBdXRob3I6IEJq9nJuIEphY2tlIDxiakBzZXJuZXQuZGU+DQpEYXRlOiAgIFR1
+ZSBBdWcgMjQgMTM6Mjk6NTkgMjAxMCAtMDQwMA0KDQogICAgYXV0b2NvbmY6IGFkZCBjaGVja3Mg
+Zm9yIGNsb2NrX2dldHRpbWUNCg0KY29tbWl0IDkwOWMxYmFjNWViM2IxZmM2NzdlZjBkNGRlMDEx
+Y2I2OGU5OTlkMTUNCkF1dGhvcjogSWdvciBEcnV6aGluaW4gPGpheGJyaWdzQGdtYWlsLmNvbT4N
+CkRhdGU6ICAgRnJpIEF1ZyAyMCAxNDo1MzozOCAyMDEwIC0wNDAwDQoNCiAgICBjaWZzLXV0aWxz
+OiBpbmZyYXN0cnVjdHVyZSBmb3Igc3Rhc2hpbmcgcGFzc3dvcmRzIGluIGtleXJpbmcNCiAgICAN
+CiAgICBJdCBpcyBhIHVzZXJzcGFjZSBwYXJ0IG9mIGEgbmV3IGluZnJhc3RydWN0dXJlIGZvciBz
+dGFzaGluZyBwYXNzd29yZHMNCiAgICBpbiBrZXJuZWwga2V5cmluZyBwZXIgdXNlciBiYXNpcy4g
+VGhlIHBhdGNoIGFkZHMgdGhlICJjaWZzY3JlZHMiDQogICAgdXRpbGl0eSBmb3IgbWFuYWdlbWVu
+dCBrZXlzIHdpdGggY3JlZGVudGlhbHMuIEFzc2VtYmxpbmcgb2YgdGhlIHV0aWxpdHkNCiAgICBm
+cm9tIHRoZSBkaXN0cmlidXRpb24gaXMgcG9zc2libGUgd2l0aCAtLWVuYWJsZS1jaWZzY3JlZHM9
+eWVzIG9wdGlvbiBvZg0KICAgIGNvbmZpZ3VyZSBzY3JpcHQuDQogICAgDQogICAgU2lnbmVkLW9m
+Zi1ieTogSWdvciBEcnV6aGluaW4gPGpheGJyaWdzQGdtYWlsLmNvbT4NCg0KY29tbWl0IGM1NDZk
+OGQ3ODZmNzAyMDQ5NjhmYmM3OGQyNzZiYzJjOGQyZWI2NzANCkF1dGhvcjogSWdvciBEcnV6aGlu
+aW4gPGpheGJyaWdzQGdtYWlsLmNvbT4NCkRhdGU6ICAgRnJpIEF1ZyAyMCAxNDo1MzowNSAyMDEw
+IC0wNDAwDQoNCiAgICBjaWZzLXV0aWxzOiBtb3ZpbmcgcmVzb2x2ZV9ob3N0IGludG8gc2VwYXJh
+dGUgZmlsZQ0KICAgIA0KICAgIFRoZSByZXNvbHZlX2hvc3Qgcm91dGluZSBmcm9tIG1vdW50LmNp
+ZnMgaXMgY2FycmllZCBvdXQgaW4NCiAgICBzZXBhcmF0ZSBmaWxlIGFuZCBhcHByb3ByaWF0ZSBj
+b3JyZWN0aW9ucyBhcmUgbWFkZS4NCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBJZ29yIERydXpo
+aW5pbiA8amF4YnJpZ3NAZ21haWwuY29tPg0KDQpjb21taXQgMmIyY2U1ODMwZmVjNDMxN2UwYzI2
+NDExNWNmOTNlNjQzNDRiMTQxNw0KQXV0aG9yOiBTdXJlc2ggSmF5YXJhbWFuIDxzamF5YXJhbWFu
+QHN1c2UuZGU+DQpEYXRlOiAgIFdlZCBBdWcgNCAwNzo1NTo1NCAyMDEwIC0wNDAwDQoNCiAgICBt
+b3VudC5jaWZzOiByZW1vdmUgcmVkdW5kYW50IGVycm9yIGFzc2lnbm1lbnQNCiAgICANCiAgICBB
+dm9pZCBzZXR0aW5nIGVycm9yIGNvZGUgdHdpY2UgYnkgbW92aW5nIGVycm9yIGhhbmRsaW5nIG91
+dCBvZiBhZGRfbXRhYl9leGl0DQogICAgYmxvY2suIFdlIGFscmVhZHkgc2V0IGVycm9yIGNvZGUg
+YW5kIHJlcG9ydCBlcnJvciBpbiBvdGhlciBwbGFjZXMuDQogICAgDQogICAgU2lnbmVkLW9mZi1i
+eTogU3VyZXNoIEpheWFyYW1hbiA8c2pheWFyYW1hbkBzdXNlLmRlPg0KDQpjb21taXQgNzk2Yzcx
+NDU2OWY1YTJkMTU2M2YyODRkOTQzMzNmMjk3MTIxNzQxNw0KQXV0aG9yOiBKZWZmIExheXRvbiA8
+amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFdlZCBBdWcgNCAwNjozNToyNCAyMDEwIC0wNDAw
+DQoNCiAgICBhdXRvY29uZjogYnVtcCB2ZXJzaW9uIG51bWJlciB0byA0LjYuMSBmb3Igbm9uLXJl
+bGVhc2UgYnVpbGRzDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0
+b25Ac2FtYmEub3JnPg0KDQotIC0tIA0KSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0K
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYyLjAuMTYgKEdO
+VS9MaW51eCkNCg0KaUVZRUFSRUNBQVlGQWt5OThkWUFDZ2tReVAwZ3hRTWR6SURpRlFDZmNsZ3Y1
+TmdvelpVRVlzZEtIRlNUVU5aSQ0Kd20wQW9Lc3FIazFGVDFXenozMktxU3hyM1BzcjlaRXENCj1R
+M3lxDQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0NCg==
