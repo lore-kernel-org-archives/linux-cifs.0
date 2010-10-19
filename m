@@ -1,86 +1,76 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] [CIFS] Clean up two declarations of blob_len
-Date: Tue, 19 Oct 2010 13:25:00 -0400
-Message-ID: <20101019132500.079fdb0c@corrin.poochiereds.net>
-References: <1287506872-5700-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2.6.36-rc7] cifs: cancel_delayed_work() +
+ flush_scheduled_work() -> cancel_delayed_work_sync()
+Date: Tue, 19 Oct 2010 13:22:56 -0500
+Message-ID: <AANLkTi=mxgr2v3n8ZQYNtcBqK78LRUE6nF5Y20=VQDjz@mail.gmail.com>
+References: <4CBDBF8A.8010106@kernel.org>
+	<20101019121319.16f06b76@corrin.poochiereds.net>
+	<4CBDC419.8060909@kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, lkml <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1287506872-5700-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <4CBDC419.8060909-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 19 Oct 2010 11:47:52 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+OK - will add this to the cifs tree this afternoon.
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> - Eliminate double declaration of variable blob_len
-> - Modify function build_ntlmssp_auth_blob to return error code
->   as well as length of the blob.
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/sess.c |   13 ++++++++-----
->  1 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 2111bed..e35dc60 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -464,6 +464,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
->     maximum possible size is fixed and small, making this approach cleaner.
->     This function returns the length of the data in the blob */
->  static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
-> +					u16 *buflen,
->  				   struct cifsSesInfo *ses,
->  				   const struct nls_table *nls_cp)
->  {
-> @@ -558,7 +559,8 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->  	sec_blob->SessionKey.MaximumLength = 0;
->  
->  setup_ntlmv2_ret:
-> -	return tmp - pbuffer;
-> +	*buflen = tmp - pbuffer;
-> +	return rc;
->  }
->  
->  
-> @@ -591,7 +593,7 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
->  	int bytes_remaining;
->  	struct key *spnego_key = NULL;
->  	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
-> -	int blob_len;
-> +	u16 blob_len;
->  	char *ntlmsspblob = NULL;
->  
->  	if (ses == NULL)
-> @@ -848,8 +850,10 @@ ssetup_ntlmssp_authenticate:
->  					goto ssetup_exit;
->  				}
->  
-> -				blob_len = build_ntlmssp_auth_blob(ntlmsspblob,
-> -							ses, nls_cp);
-> +				rc = build_ntlmssp_auth_blob(ntlmsspblob,
-> +							&blob_len, ses, nls_cp);
-> +				if (rc)
-> +					goto ssetup_exit;
->  				iov[1].iov_len = blob_len;
->  				iov[1].iov_base = ntlmsspblob;
->  				pSMB->req.SecurityBlobLength =
-> @@ -927,7 +931,6 @@ ssetup_ntlmssp_authenticate:
->  	bcc_ptr = pByteArea(smb_buf);
->  
->  	if (smb_buf->WordCount == 4) {
-> -		__u16 blob_len;
->  		blob_len = le16_to_cpu(pSMB->resp.SecurityBlobLength);
->  		if (blob_len > bytes_remaining) {
->  			cERROR(1, "bad security blob length %d", blob_len);
+On Tue, Oct 19, 2010 at 11:15 AM, Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
+> Hello,
+>
+> On 10/19/2010 06:13 PM, Jeff Layton wrote:
+>> On Tue, 19 Oct 2010 17:55:54 +0200
+>> Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
+>>
+>>> flush_scheduled_work() is going away.
+>>>
+>>> Signed-off-by: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+>>> ---
+>>> =A0fs/cifs/cifs_dfs_ref.c | =A0 =A03 +--
+>>> =A01 file changed, 1 insertion(+), 2 deletions(-)
+>>>
+>>> Index: work/fs/cifs/cifs_dfs_ref.c
+>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>> --- work.orig/fs/cifs/cifs_dfs_ref.c
+>>> +++ work/fs/cifs/cifs_dfs_ref.c
+>>> @@ -44,8 +44,7 @@ static void cifs_dfs_expire_automounts(s
+>>> =A0void cifs_dfs_release_automount_timer(void)
+>>> =A0{
+>>> =A0 =A0 =A0BUG_ON(!list_empty(&cifs_dfs_automount_list));
+>>> - =A0 =A0cancel_delayed_work(&cifs_dfs_automount_task);
+>>> - =A0 =A0flush_scheduled_work();
+>>> + =A0 =A0cancel_delayed_work_sync(&cifs_dfs_automount_task);
+>>> =A0}
+>>>
+>>> =A0/**
+>>
+>> Looks like a better way to do this anyhow.
+>>
+>> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
+> Yeah, way faster too. =A0It would be best to route this patch through
+> cifs tree but I can push it through wq tree too. =A0Just let me know.
+>
+> Thanks.
+>
+> --
+> tejun
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
-Looks good.
 
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+
+--=20
+Thanks,
+
+Steve
