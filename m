@@ -1,97 +1,629 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: ANNOUNCE: cifs-utils release 4.7 available for download
-Date: Tue, 19 Oct 2010 15:30:26 -0400
-Message-ID: <20101019153026.46d64db8@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: base64
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	samba-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] [CIFS} [1/3] NTLM auth & signing - Allocate session key/client response dynamically
+Date: Tue, 19 Oct 2010 19:13:57 -0500
+Message-ID: <1287533637-22367-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpUaGUgbGFz
-dCBjaWZzLXV0aWxzIHJlbGVhc2UgKDQuNikgd2FzIG9uIEp1bHkgMzB0aCwgc28gaXQncyBwcm9i
-YWJseSBhDQpnb29kIHRpbWUgdG8gZ28gYWhlYWQgYW5kIHJlbGVhc2UgYSBuZXcgb25lIHdpdGgg
-a2VybmVsIDIuNi4zNiBzaGlwcGluZw0Kc29vbi4gTWFqb3IgaGlnaGxpZ2h0czoNCg0KLSAtIG5l
-dyBjaWZzY3JlZHMgcHJvZ3JhbSBoYXMgYmVlbiBhZGRlZC4gVGhpcyB3aWxsIGV2ZW50dWFsbHkg
-YWxsb3cgZm9yDQogIHN0YXNoaW5nIG9mIHVzZXJuYW1lL3Bhc3N3b3JkIGluIHRoZSBrZXJuZWwn
-cyBrZXlyaW5nIGZvciB1c2UgYnkNCiAgY2lmcy4gS2VybmVsIGNvZGUgZm9yIHRoaXMgaXMgbm90
-IGluIHBsYWNlIHlldCwgYW5kIHRoZSBwcm9ncmFtIGlzDQogIG5vdCB5ZXQgYnVpbHQgYnkgZGVm
-YXVsdC4gQ29uZmlndXJpbmcgd2l0aCAtLWVuYWJsZS1jaWZzY3JlZHM9eWVzDQogIHdpbGwgZW5h
-YmxlIGl0Lg0KDQotIC0gdGltZW91dHMgZm9yIHRoaW5ncyBsaWtlIG10YWIgbG9ja2luZyBub3cg
-dXNlIG1vbm90b25pYyB0aW1lIGFuZA0KICBzaG91bGQgbm8gbG9uZ2VyIGhhdmUgcHJvYmxlbXMg
-aWYgdGhlIGNsb2NrIGp1bXBzDQoNCi4uLnBsdXMgdGhlIHVzdWFsIGFzc29ydG1lbnQgb2YgbWlu
-b3IgYnVnZml4ZXMgYW5kIG1hbnBhZ2UgdXBkYXRlcy4NCg0Kd2VicGFnZTogICAgaHR0cDovL2xp
-bnV4LWNpZnMuc2FtYmEub3JnL2NpZnMtdXRpbHMvDQp0YXJiYWxsOiAgICBmdHA6Ly9mdHAuc2Ft
-YmEub3JnL3B1Yi9saW51eC1jaWZzL2NpZnMtdXRpbHMvDQpnaXQ6ICAgICAgICBnaXQ6Ly9naXQu
-c2FtYmEub3JnL2NpZnMtdXRpbHMuZ2l0DQpnaXR3ZWI6ICAgICBodHRwOi8vZ2l0LnNhbWJhLm9y
-Zy8/cD1jaWZzLXV0aWxzLmdpdDthPXN1bW1hcnkNCg0KRGV0YWlsZWQgY2hhbmdlbG9nOg0KDQpj
-b21taXQgNjczOWI2Njc2NzdiMjg3NDBiODdlZGU5NGU1M2RmYzUwMDcxOGFjYg0KQXV0aG9yOiBK
-ZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFR1ZSBPY3QgMTkgMTQ6NTk6
-NDkgMjAxMCAtMDQwMA0KDQogICAgYXV0b2NvbmY6IGJ1bXAgcmVsZWFzZSB0byA0LjcNCiAgICAN
-CiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNv
-bW1pdCAyMDJmNGI0MzIwOWRhMzJhZmM3Y2U1NDQ1YThmNTYxYzM1NGM4ZjgyDQpBdXRob3I6IEpl
-ZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgRnJpIE9jdCA4IDE1OjExOjU4
-IDIwMTAgLTA0MDANCg0KICAgIG1hbnBhZ2U6IGFkZCBtb3VudC5jaWZzIG1hbnBhZ2UgZW50cnkg
-Zm9yICJtdWx0aXVzZXIiIG9wdGlvbg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5
-dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KY29tbWl0IGQ5MDY5MWEyODNkMGYyZWQ5Mjg0NzZm
-Yzk2OTcwYjFlZjJhMjg2NjINCkF1dGhvcjogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3Jn
-Pg0KRGF0ZTogICBGcmkgT2N0IDggMTU6MTE6NTcgMjAxMCAtMDQwMA0KDQogICAgbW91bnQuY2lm
-czogcmVpbnN0YXRlIGlwPSBhcyBhbiBvdmVycmlkZSBmb3IgYWRkcmVzcyByZXNvbHV0aW9uDQog
-ICAgDQogICAgVGhlIG1hbnBhZ2Ugc2F5czoNCiAgICANCiAgICAgICAgICAgaXA9YXJnDQogICAg
-ICAgICAgICAgICBzZXRzIHRoZSBkZXN0aW5hdGlvbiBJUCBhZGRyZXNzLiBUaGlzIG9wdGlvbiBp
-cyBzZXQgYXV0b21hdGljYWxseQ0KICAgICAgICAgICAgICAgaWYgdGhlIHNlcnZlciBuYW1lIHBv
-cnRpb24gb2YgdGhlIHJlcXVlc3RlZCBVTkMgbmFtZSBjYW4gYmUNCiAgICAgICAgICAgICAgIHJl
-c29sdmVkIHNvIHJhcmVseSBuZWVkcyB0byBiZSBzcGVjaWZpZWQgYnkgdGhlIHVzZXIuDQogICAg
-DQogICAgLi4uYnV0IHJlY2VudCBjaGFuZ2VzIGhhdmUgbWFkZSBpdCBub3Qgd29yayBhbnltb3Jl
-IGFzIGFuIG92ZXJyaWRlIGlmDQogICAgc29tZW9uZSBzcGVjaWZpZXMgYW4gaXA9IG9wdGlvbiBh
-cyBwYXJ0IG9mIHRoZSBtb3VudCBvcHRpb25zLiBSZWluc3RhdGUNCiAgICB0aGF0IGJlaGF2aW9y
-IGJ5IGNvcHlpbmcgdGhlIGlwPSBvcHRpb24gdmVyYmF0aW0gaW50byB0aGUgYWRkcmxpc3Qgb2YN
-CiAgICB0aGUgcGFyc2VkIG9wdGlvbnMgc3RydWN0IGFuZCB0aGVuIHNraXBwaW5nIHRoZSBuYW1l
-IHJlc29sdXRpb24uIFRoYXQNCiAgICBzaG91bGQgYWxsb3cgdGhlIGlwPSBvcHRpb24gdG8gcGFz
-cyB1bmFkdWx0ZXJhdGVkIHRvIHRoZSBrZXJuZWwuDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTog
-SmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgZjJkYWEyYTA4YmY4NzA2
-ZjkwZTExNTQyNzJjNWJmZTYyNzk4OTVjZA0KQXV0aG9yOiBCavZybiBKYWNrZSA8YmpAc2VybmV0
-LmRlPg0KRGF0ZTogICBUdWUgQXVnIDI0IDEzOjMwOjA1IDIwMTAgLTA0MDANCg0KICAgIG1vdW50
-LmNpZnM6IHVzZSBtb25vdG9uaWMgdGltZSBmb3IgdGltZW91dHMNCiAgICANCiAgICB0aGlzIGlz
-IGVzcGVjaWFsbHkgaW1wb3J0YW50IGR1cmluZyB0aGUgYm9vdCBwcm9jZXNzLCB3aGVyZSB0aGUg
-Y2xvY2sgaXMgb2Z0ZW4NCiAgICBiZWluZyBzZXQgaW5pdGlhbGx5IGFuZCBjbG9jayBqdW1wcyBh
-cmUgbW9yZSBjb21tb24uDQoNCmNvbW1pdCA3OTc3NDQ4ODgxNGIwZjUyNjc2NDQ2MjhlMzFjMDdj
-N2FjMzgwYTY1DQpBdXRob3I6IEJq9nJuIEphY2tlIDxiakBzZXJuZXQuZGU+DQpEYXRlOiAgIFR1
-ZSBBdWcgMjQgMTM6Mjk6NTkgMjAxMCAtMDQwMA0KDQogICAgYXV0b2NvbmY6IGFkZCBjaGVja3Mg
-Zm9yIGNsb2NrX2dldHRpbWUNCg0KY29tbWl0IDkwOWMxYmFjNWViM2IxZmM2NzdlZjBkNGRlMDEx
-Y2I2OGU5OTlkMTUNCkF1dGhvcjogSWdvciBEcnV6aGluaW4gPGpheGJyaWdzQGdtYWlsLmNvbT4N
-CkRhdGU6ICAgRnJpIEF1ZyAyMCAxNDo1MzozOCAyMDEwIC0wNDAwDQoNCiAgICBjaWZzLXV0aWxz
-OiBpbmZyYXN0cnVjdHVyZSBmb3Igc3Rhc2hpbmcgcGFzc3dvcmRzIGluIGtleXJpbmcNCiAgICAN
-CiAgICBJdCBpcyBhIHVzZXJzcGFjZSBwYXJ0IG9mIGEgbmV3IGluZnJhc3RydWN0dXJlIGZvciBz
-dGFzaGluZyBwYXNzd29yZHMNCiAgICBpbiBrZXJuZWwga2V5cmluZyBwZXIgdXNlciBiYXNpcy4g
-VGhlIHBhdGNoIGFkZHMgdGhlICJjaWZzY3JlZHMiDQogICAgdXRpbGl0eSBmb3IgbWFuYWdlbWVu
-dCBrZXlzIHdpdGggY3JlZGVudGlhbHMuIEFzc2VtYmxpbmcgb2YgdGhlIHV0aWxpdHkNCiAgICBm
-cm9tIHRoZSBkaXN0cmlidXRpb24gaXMgcG9zc2libGUgd2l0aCAtLWVuYWJsZS1jaWZzY3JlZHM9
-eWVzIG9wdGlvbiBvZg0KICAgIGNvbmZpZ3VyZSBzY3JpcHQuDQogICAgDQogICAgU2lnbmVkLW9m
-Zi1ieTogSWdvciBEcnV6aGluaW4gPGpheGJyaWdzQGdtYWlsLmNvbT4NCg0KY29tbWl0IGM1NDZk
-OGQ3ODZmNzAyMDQ5NjhmYmM3OGQyNzZiYzJjOGQyZWI2NzANCkF1dGhvcjogSWdvciBEcnV6aGlu
-aW4gPGpheGJyaWdzQGdtYWlsLmNvbT4NCkRhdGU6ICAgRnJpIEF1ZyAyMCAxNDo1MzowNSAyMDEw
-IC0wNDAwDQoNCiAgICBjaWZzLXV0aWxzOiBtb3ZpbmcgcmVzb2x2ZV9ob3N0IGludG8gc2VwYXJh
-dGUgZmlsZQ0KICAgIA0KICAgIFRoZSByZXNvbHZlX2hvc3Qgcm91dGluZSBmcm9tIG1vdW50LmNp
-ZnMgaXMgY2FycmllZCBvdXQgaW4NCiAgICBzZXBhcmF0ZSBmaWxlIGFuZCBhcHByb3ByaWF0ZSBj
-b3JyZWN0aW9ucyBhcmUgbWFkZS4NCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBJZ29yIERydXpo
-aW5pbiA8amF4YnJpZ3NAZ21haWwuY29tPg0KDQpjb21taXQgMmIyY2U1ODMwZmVjNDMxN2UwYzI2
-NDExNWNmOTNlNjQzNDRiMTQxNw0KQXV0aG9yOiBTdXJlc2ggSmF5YXJhbWFuIDxzamF5YXJhbWFu
-QHN1c2UuZGU+DQpEYXRlOiAgIFdlZCBBdWcgNCAwNzo1NTo1NCAyMDEwIC0wNDAwDQoNCiAgICBt
-b3VudC5jaWZzOiByZW1vdmUgcmVkdW5kYW50IGVycm9yIGFzc2lnbm1lbnQNCiAgICANCiAgICBB
-dm9pZCBzZXR0aW5nIGVycm9yIGNvZGUgdHdpY2UgYnkgbW92aW5nIGVycm9yIGhhbmRsaW5nIG91
-dCBvZiBhZGRfbXRhYl9leGl0DQogICAgYmxvY2suIFdlIGFscmVhZHkgc2V0IGVycm9yIGNvZGUg
-YW5kIHJlcG9ydCBlcnJvciBpbiBvdGhlciBwbGFjZXMuDQogICAgDQogICAgU2lnbmVkLW9mZi1i
-eTogU3VyZXNoIEpheWFyYW1hbiA8c2pheWFyYW1hbkBzdXNlLmRlPg0KDQpjb21taXQgNzk2Yzcx
-NDU2OWY1YTJkMTU2M2YyODRkOTQzMzNmMjk3MTIxNzQxNw0KQXV0aG9yOiBKZWZmIExheXRvbiA8
-amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFdlZCBBdWcgNCAwNjozNToyNCAyMDEwIC0wNDAw
-DQoNCiAgICBhdXRvY29uZjogYnVtcCB2ZXJzaW9uIG51bWJlciB0byA0LjYuMSBmb3Igbm9uLXJl
-bGVhc2UgYnVpbGRzDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0
-b25Ac2FtYmEub3JnPg0KDQotIC0tIA0KSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0K
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYyLjAuMTYgKEdO
-VS9MaW51eCkNCg0KaUVZRUFSRUNBQVlGQWt5OThkWUFDZ2tReVAwZ3hRTWR6SURpRlFDZmNsZ3Y1
-TmdvelpVRVlzZEtIRlNUVU5aSQ0Kd20wQW9Lc3FIazFGVDFXenozMktxU3hyM1BzcjlaRXENCj1R
-M3lxDQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0NCg==
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+
+Start calculation auth response within a session.  Move/Add pertinet
+data structures like session key, server challenge and ntlmv2_hash in
+a session structure.  We should do the calculations within a session
+before copying session key and response over to server data
+structures because a session setup can fail.
+
+Only after a very first smb session succeeds, it copy/make its
+session key, session key of smb connection.  This key stays with
+the smb connection throughout its life.
+
+The authentication response field within structure session_key
+is now dynamic.  Every authentication type allocates the response sized
+memory within its session structure and later frees it once the
+client response is sent and if session's session key becomes 
+connetion's session key.
+
+ntlm/ntlmi authentication functions are rearranged.  A function
+named setup_ntlm_resp(), similar to setup_ntlmv2_resp(), replaces
+function cifs_calculate_session_key().
+
+size of CIFS_SESS_KEY_SIZE is changed to 16, to reflect the byte size
+of the key it holds.
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c |   99 +++++++++++++++++++++++++----------------------
+ fs/cifs/cifsglob.h    |   10 +----
+ fs/cifs/cifspdu.h     |    7 +++-
+ fs/cifs/cifsproto.h   |   11 ++---
+ fs/cifs/connect.c     |   33 ++++++++++++++--
+ fs/cifs/sess.c        |  103 +++++++++++++++++++------------------------------
+ fs/cifs/transport.c   |    6 +-
+ 7 files changed, 137 insertions(+), 132 deletions(-)
+
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 7ac0056..05e052c 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -43,15 +43,17 @@ extern void SMBencrypt(unsigned char *passwd, const unsigned char *c8,
+ 		       unsigned char *p24);
+ 
+ static int cifs_calculate_signature(const struct smb_hdr *cifs_pdu,
+-				const struct session_key *key, char *signature)
++				struct TCP_Server_Info *server, char *signature)
+ {
+ 	struct	MD5Context context;
+ 
+-	if ((cifs_pdu == NULL) || (signature == NULL) || (key == NULL))
++	if (cifs_pdu == NULL || signature == NULL || server == NULL)
+ 		return -EINVAL;
+ 
+ 	cifs_MD5_init(&context);
+-	cifs_MD5_update(&context, (char *)&key->data, key->len);
++	cifs_MD5_update(&context, server->session_key.key, 16);
++	cifs_MD5_update(&context, server->session_key.response,
++				server->session_key.len);
+ 	cifs_MD5_update(&context, cifs_pdu->Protocol, cifs_pdu->smb_buf_length);
+ 
+ 	cifs_MD5_final(signature, &context);
+@@ -79,8 +81,7 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 	server->sequence_number++;
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	rc = cifs_calculate_signature(cifs_pdu, &server->session_key,
+-				      smb_signature);
++	rc = cifs_calculate_signature(cifs_pdu, server, smb_signature);
+ 	if (rc)
+ 		memset(cifs_pdu->Signature.SecuritySignature, 0, 8);
+ 	else
+@@ -90,16 +91,18 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ }
+ 
+ static int cifs_calc_signature2(const struct kvec *iov, int n_vec,
+-				const struct session_key *key, char *signature)
++				struct TCP_Server_Info *server, char *signature)
+ {
+ 	struct  MD5Context context;
+ 	int i;
+ 
+-	if ((iov == NULL) || (signature == NULL) || (key == NULL))
++	if (iov == NULL || signature == NULL || server == NULL)
+ 		return -EINVAL;
+ 
+ 	cifs_MD5_init(&context);
+-	cifs_MD5_update(&context, (char *)&key->data, key->len);
++	cifs_MD5_update(&context, server->session_key.key, 16);
++	cifs_MD5_update(&context, server->session_key.response,
++				server->session_key.len);
+ 	for (i = 0; i < n_vec; i++) {
+ 		if (iov[i].iov_len == 0)
+ 			continue;
+@@ -146,8 +149,7 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 	server->sequence_number++;
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	rc = cifs_calc_signature2(iov, n_vec, &server->session_key,
+-				      smb_signature);
++	rc = cifs_calc_signature2(iov, n_vec, server, smb_signature);
+ 	if (rc)
+ 		memset(cifs_pdu->Signature.SecuritySignature, 0, 8);
+ 	else
+@@ -157,14 +159,14 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ }
+ 
+ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
+-			  const struct session_key *session_key,
++			  struct TCP_Server_Info *server,
+ 			  __u32 expected_sequence_number)
+ {
+ 	unsigned int rc;
+ 	char server_response_sig[8];
+ 	char what_we_think_sig_should_be[20];
+ 
+-	if (cifs_pdu == NULL || session_key == NULL)
++	if (cifs_pdu == NULL || server == NULL)
+ 		return -EINVAL;
+ 
+ 	if (cifs_pdu->Command == SMB_COM_NEGOTIATE)
+@@ -193,7 +195,7 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
+ 					cpu_to_le32(expected_sequence_number);
+ 	cifs_pdu->Signature.Sequence.Reserved = 0;
+ 
+-	rc = cifs_calculate_signature(cifs_pdu, session_key,
++	rc = cifs_calculate_signature(cifs_pdu, server,
+ 		what_we_think_sig_should_be);
+ 
+ 	if (rc)
+@@ -209,18 +211,18 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
+ 
+ }
+ 
+-/* We fill in key by putting in 40 byte array which was allocated by caller */
+-int cifs_calculate_session_key(struct session_key *key, const char *rn,
+-			   const char *password)
++/* first calculate 24 bytes ntlm response and then 16 byte session key */
++int setup_ntlm_response(struct cifsSesInfo *ses)
+ {
+ 	char temp_key[16];
+-	if ((key == NULL) || (rn == NULL))
++
++	if (!ses)
+ 		return -EINVAL;
+ 
+-	E_md4hash(password, temp_key);
+-	mdfour(key->data.ntlm, temp_key, 16);
+-	memcpy(key->data.ntlm+16, rn, CIFS_SESS_KEY_SIZE);
+-	key->len = 40;
++	SMBNTencrypt(ses->password, ses->cryptKey, ses->auth_key.response);
++
++	E_md4hash(ses->password, temp_key);
++	mdfour(ses->auth_key.key, temp_key, 16);
+ 	return 0;
+ }
+ 
+@@ -465,19 +467,13 @@ calc_exit_2:
+ }
+ 
+ int
+-setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+-		      const struct nls_table *nls_cp)
++setup_ntlmv2_rsp(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
+ {
+ 	int rc;
+-	struct ntlmv2_resp *buf = (struct ntlmv2_resp *)resp_buf;
++	int baselen;
++	struct ntlmv2_resp *buf;
+ 	struct HMACMD5Context context;
+ 
+-	buf->blob_signature = cpu_to_le32(0x00000101);
+-	buf->reserved = 0;
+-	buf->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
+-	get_random_bytes(&buf->client_chal, sizeof(buf->client_chal));
+-	buf->reserved2 = 0;
+-
+ 	if (ses->server->secType == RawNTLMSSP) {
+ 		if (!ses->domainName) {
+ 			rc = find_domain_name(ses);
+@@ -494,22 +490,36 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, char *resp_buf,
+ 		}
+ 	}
+ 
++	baselen = sizeof(struct ntlmv2_resp);
++	ses->auth_key.len = baselen + ses->tilen;
++	ses->auth_key.response = kmalloc(ses->auth_key.len, GFP_KERNEL);
++	if (!ses->auth_key.response) {
++		rc = ENOMEM;
++		cERROR(1, "%s: Can't allocate auth blob", __func__);
++		goto setup_ntlmv2_rsp_ret;
++	}
++
++	buf = (struct ntlmv2_resp *)ses->auth_key.response;
++	buf->blob_signature = cpu_to_le32(0x00000101);
++	buf->reserved = 0;
++	buf->time = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
++	get_random_bytes(&buf->client_chal, sizeof(buf->client_chal));
++	buf->reserved2 = 0;
++
++	memcpy(ses->auth_key.response + baselen, ses->tiblob, ses->tilen);
++
+ 	/* calculate buf->ntlmv2_hash */
+ 	rc = calc_ntlmv2_hash(ses, nls_cp);
+ 	if (rc) {
+ 		cERROR(1, "could not get v2 hash rc %d", rc);
+ 		goto setup_ntlmv2_rsp_ret;
+ 	}
+-	CalcNTLMv2_response(ses, resp_buf);
++	CalcNTLMv2_response(ses);
+ 
+ 	/* now calculate the session key for NTLMv2 */
+ 	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
+-	hmac_md5_update(resp_buf, 16, &context);
+-	hmac_md5_final(ses->auth_key.data.ntlmv2.key, &context);
+-
+-	memcpy(&ses->auth_key.data.ntlmv2.resp, resp_buf,
+-	       sizeof(struct ntlmv2_resp));
+-	ses->auth_key.len = 16 + sizeof(struct ntlmv2_resp);
++	hmac_md5_update(ses->auth_key.response, 16, &context);
++	hmac_md5_final(ses->auth_key.key, &context);
+ 
+ 	return 0;
+ 
+@@ -521,20 +531,15 @@ setup_ntlmv2_rsp_ret:
+ 	return rc;
+ }
+ 
+-void CalcNTLMv2_response(const struct cifsSesInfo *ses,
+-			 char *v2_session_response)
++void CalcNTLMv2_response(const struct cifsSesInfo *ses)
+ {
+ 	struct HMACMD5Context context;
+ 	/* rest of v2 struct already generated */
+-	memcpy(v2_session_response + 8, ses->cryptKey, 8);
++	memcpy(ses->auth_key.response + 8, ses->cryptKey, 8);
+ 	hmac_md5_init_limK_to_64(ses->ntlmv2_hash, 16, &context);
+ 
+-	hmac_md5_update(v2_session_response+8,
+-			sizeof(struct ntlmv2_resp) - 8, &context);
+-
+-	if (ses->tilen)
+-		hmac_md5_update(ses->tiblob, ses->tilen, &context);
++	hmac_md5_update(ses->auth_key.response + 8,
++			ses->auth_key.len - 8, &context);
+ 
+-	hmac_md5_final(v2_session_response, &context);
+-/*	cifs_dump_mem("v2_sess_rsp: ", v2_session_response, 32); */
++	hmac_md5_final(ses->auth_key.response, &context);
+ }
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 18ee0ad..c374859 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -98,15 +98,9 @@ enum protocolEnum {
+ };
+ 
+ struct session_key {
++	char key[16];
++	char *response;
+ 	unsigned int len;
+-	union {
+-		char ntlm[CIFS_SESS_KEY_SIZE + 16];
+-		char krb5[CIFS_SESS_KEY_SIZE + 16]; /* BB: length correct? */
+-		struct {
+-			char key[16];
+-			struct ntlmv2_resp resp;
+-		} ntlmv2;
+-	} data;
+ };
+ 
+ struct cifs_cred {
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index b0f4b56..a152cd6 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -131,9 +131,14 @@
+ #define CIFS_CRYPTO_KEY_SIZE (8)
+ 
+ /*
++ * Size of the ntlm client response
++ */
++#define CIFS_AUTH_RESP_SIZE (24)
++
++/*
+  * Size of the session key (crypto key encrypted with the password
+  */
+-#define CIFS_SESS_KEY_SIZE (24)
++#define CIFS_SESS_KEY_SIZE (16)
+ 
+ /*
+  * Maximum user name length
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e593c40..8c2d0cf 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -362,13 +362,12 @@ extern int cifs_sign_smb(struct smb_hdr *, struct TCP_Server_Info *, __u32 *);
+ extern int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *,
+ 			  __u32 *);
+ extern int cifs_verify_signature(struct smb_hdr *,
+-				 const struct session_key *session_key,
++				 struct TCP_Server_Info *server,
+ 				__u32 expected_sequence_number);
+-extern int cifs_calculate_session_key(struct session_key *key, const char *rn,
+-				 const char *pass);
+-extern void CalcNTLMv2_response(const struct cifsSesInfo *, char *);
+-extern int setup_ntlmv2_rsp(struct cifsSesInfo *, char *,
+-			     const struct nls_table *);
++extern void SMBNTencrypt(unsigned char *, unsigned char *, unsigned char *);
++extern int setup_ntlm_response(struct cifsSesInfo *);
++extern void CalcNTLMv2_response(const struct cifsSesInfo *);
++extern int setup_ntlmv2_rsp(struct cifsSesInfo *, const struct nls_table *);
+ #ifdef CONFIG_CIFS_WEAK_PW_HASH
+ extern void calc_lanman_hash(const char *password, const char *cryptkey,
+ 				bool encrypt, char *lnm_session_key);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 019f003..1006dec 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -175,6 +175,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	}
+ 	server->sequence_number = 0;
+ 	server->session_estab = false;
++	kfree(server->session_key.response);
++	server->session_key.response = NULL;
++	server->session_key.len = 0;
+ 
+ 	spin_lock(&GlobalMid_Lock);
+ 	list_for_each(tmp, &server->pending_mid_q) {
+@@ -1562,6 +1565,10 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ 
+ 	cifs_fscache_release_client_cookie(server);
+ 
++	kfree(server->session_key.response);
++	server->session_key.response = NULL;
++	server->session_key.len = 0;
++
+ 	task = xchg(&server->tsk, NULL);
+ 	if (task)
+ 		force_sig(SIGKILL, task);
+@@ -3162,6 +3169,7 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
+ 			struct nls_table *nls_info)
+ {
+ 	int rc = 0;
++	unsigned int len;
+ 	struct TCP_Server_Info *server = ses->server;
+ 
+ 	ses->flags = 0;
+@@ -3178,10 +3186,22 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
+ 	} else {
+ 		mutex_lock(&ses->server->srv_mutex);
+ 		if (!server->session_estab) {
+-			memcpy(&server->session_key.data,
+-				&ses->auth_key.data, ses->auth_key.len);
+-			server->session_key.len = ses->auth_key.len;
+-			ses->server->session_estab = true;
++			if (server->secType == RawNTLMSSP)
++				len = 16;
++			else
++				len = ses->auth_key.len;
++			server->session_key.response = kmalloc(len, GFP_KERNEL);
++			if (!server->session_key.response) {
++				rc = -ENOMEM;
++				mutex_unlock(&server->srv_mutex);
++				goto cifs_setup_session_ret;
++			}
++			memcpy(server->session_key.response,
++				ses->auth_key.response, len);
++			memcpy(server->session_key.key,
++				ses->auth_key.key, 16);
++			server->session_key.len = len;
++			server->session_estab = true;
+ 		}
+ 		mutex_unlock(&server->srv_mutex);
+ 
+@@ -3192,6 +3212,11 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
+ 		spin_unlock(&GlobalMid_Lock);
+ 	}
+ 
++cifs_setup_session_ret:
++	kfree(ses->auth_key.response);
++	ses->auth_key.response = NULL;
++	ses->auth_key.len = 0;
++
+ 	return rc;
+ }
+ 
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index e35dc60..8bb4518 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -32,9 +32,6 @@
+ #include <linux/slab.h>
+ #include "cifs_spnego.h"
+ 
+-extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
+-			 unsigned char *p24);
+-
+ /*
+  * Checks if this is the first smb session to be reconnected after
+  * the socket has been reestablished (so we know whether to use vc 0).
+@@ -469,11 +466,9 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 				   const struct nls_table *nls_cp)
+ {
+ 	int rc;
+-	unsigned int size;
+ 	AUTHENTICATE_MESSAGE *sec_blob = (AUTHENTICATE_MESSAGE *)pbuffer;
+ 	__u32 flags;
+ 	unsigned char *tmp;
+-	struct ntlmv2_resp ntlmv2_response = {};
+ 
+ 	memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
+ 	sec_blob->MessageType = NtLmAuthenticate;
+@@ -497,25 +492,17 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	sec_blob->LmChallengeResponse.MaximumLength = 0;
+ 
+ 	sec_blob->NtChallengeResponse.BufferOffset = cpu_to_le32(tmp - pbuffer);
+-	rc = setup_ntlmv2_rsp(ses, (char *)&ntlmv2_response, nls_cp);
++	rc = setup_ntlmv2_rsp(ses, nls_cp);
+ 	if (rc) {
+ 		cERROR(1, "Error %d during NTLMSSP authentication", rc);
+ 		goto setup_ntlmv2_ret;
+ 	}
+-	size =  sizeof(struct ntlmv2_resp);
+-	memcpy(tmp, (char *)&ntlmv2_response, size);
+-	tmp += size;
+-	if (ses->tilen > 0) {
+-		memcpy(tmp, ses->tiblob, ses->tilen);
+-		tmp += ses->tilen;
+-	}
++	memcpy(tmp, ses->auth_key.response, ses->auth_key.len);
++	tmp += ses->auth_key.len;
+ 
+-	sec_blob->NtChallengeResponse.Length = cpu_to_le16(size + ses->tilen);
++	sec_blob->NtChallengeResponse.Length = cpu_to_le16(ses->auth_key.len);
+ 	sec_blob->NtChallengeResponse.MaximumLength =
+-				cpu_to_le16(size + ses->tilen);
+-	kfree(ses->tiblob);
+-	ses->tiblob = NULL;
+-	ses->tilen = 0;
++				cpu_to_le16(ses->auth_key.len);
+ 
+ 	if (ses->domainName == NULL) {
+ 		sec_blob->DomainName.BufferOffset = cpu_to_le32(tmp - pbuffer);
+@@ -595,6 +582,7 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
+ 	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
+ 	u16 blob_len;
+ 	char *ntlmsspblob = NULL;
++	unsigned int resplen;
+ 
+ 	if (ses == NULL)
+ 		return -EINVAL;
+@@ -687,24 +675,29 @@ ssetup_ntlmssp_authenticate:
+ 		ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
+ #endif
+ 	} else if (type == NTLM) {
+-		char ntlm_session_key[CIFS_SESS_KEY_SIZE];
+-
++		ses->auth_key.len = CIFS_AUTH_RESP_SIZE;
++		ses->auth_key.response = kmalloc(ses->auth_key.len, GFP_KERNEL);
++		if (!ses->auth_key.response) {
++			cERROR(1, "NTLM can't allocate (%u bytes) memory",
++				resplen);
++			rc = -ENOMEM;
++			goto ssetup_exit;
++		}
+ 		pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
+ 		pSMB->req_no_secext.CaseInsensitivePasswordLength =
+-			cpu_to_le16(CIFS_SESS_KEY_SIZE);
++			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+ 		pSMB->req_no_secext.CaseSensitivePasswordLength =
+-			cpu_to_le16(CIFS_SESS_KEY_SIZE);
++			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+ 
+-		/* calculate session key */
+-		SMBNTencrypt(ses->password, ses->cryptKey, ntlm_session_key);
++		/* calculate ntlm response and session key */
++		setup_ntlm_response(ses);
++
++		/* copy ntlm response */
++		memcpy(bcc_ptr, ses->auth_key.response, CIFS_AUTH_RESP_SIZE);
++		bcc_ptr += CIFS_AUTH_RESP_SIZE;
++		memcpy(bcc_ptr, ses->auth_key.response, CIFS_AUTH_RESP_SIZE);
++		bcc_ptr += CIFS_AUTH_RESP_SIZE;
+ 
+-		cifs_calculate_session_key(&ses->auth_key,
+-					ntlm_session_key, ses->password);
+-		/* copy session key */
+-		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
+-		bcc_ptr += CIFS_SESS_KEY_SIZE;
+-		memcpy(bcc_ptr, (char *)ntlm_session_key, CIFS_SESS_KEY_SIZE);
+-		bcc_ptr += CIFS_SESS_KEY_SIZE;
+ 		if (ses->capabilities & CAP_UNICODE) {
+ 			/* unicode strings must be word aligned */
+ 			if (iov[0].iov_len % 2) {
+@@ -715,47 +708,25 @@ ssetup_ntlmssp_authenticate:
+ 		} else
+ 			ascii_ssetup_strings(&bcc_ptr, ses, nls_cp);
+ 	} else if (type == NTLMv2) {
+-		char *v2_sess_key =
+-			kmalloc(sizeof(struct ntlmv2_resp), GFP_KERNEL);
+-
+-		/* BB FIXME change all users of v2_sess_key to
+-		   struct ntlmv2_resp */
+-
+-		if (v2_sess_key == NULL) {
+-			rc = -ENOMEM;
+-			goto ssetup_exit;
+-		}
+-
+ 		pSMB->req_no_secext.Capabilities = cpu_to_le32(capabilities);
+ 
+ 		/* LM2 password would be here if we supported it */
+ 		pSMB->req_no_secext.CaseInsensitivePasswordLength = 0;
+ 		/*	cpu_to_le16(LM2_SESS_KEY_SIZE); */
+ 
+-		/* calculate session key */
+-		rc = setup_ntlmv2_rsp(ses, v2_sess_key, nls_cp);
++		/* calculate nlmv2 response and session key */
++		rc = setup_ntlmv2_rsp(ses, nls_cp);
+ 		if (rc) {
+ 			cERROR(1, "Error %d during NTLMv2 authentication", rc);
+-			kfree(v2_sess_key);
+ 			goto ssetup_exit;
+ 		}
+-		memcpy(bcc_ptr, (char *)v2_sess_key,
+-				sizeof(struct ntlmv2_resp));
+-		bcc_ptr += sizeof(struct ntlmv2_resp);
+-		kfree(v2_sess_key);
++		memcpy(bcc_ptr, ses->auth_key.response, ses->auth_key.len);
++		bcc_ptr += ses->auth_key.len;
+ 		/* set case sensitive password length after tilen may get
+ 		 * assigned, tilen is 0 otherwise.
+ 		 */
+ 		pSMB->req_no_secext.CaseSensitivePasswordLength =
+-			cpu_to_le16(sizeof(struct ntlmv2_resp) + ses->tilen);
+-		if (ses->tilen > 0) {
+-			memcpy(bcc_ptr, ses->tiblob, ses->tilen);
+-			bcc_ptr += ses->tilen;
+-			/* we never did allocate ses->domainName to free */
+-			kfree(ses->tiblob);
+-			ses->tiblob = NULL;
+-			ses->tilen = 0;
+-		}
++			cpu_to_le16(ses->auth_key.len);
+ 
+ 		if (ses->capabilities & CAP_UNICODE) {
+ 			if (iov[0].iov_len % 2) {
+@@ -785,16 +756,24 @@ ssetup_ntlmssp_authenticate:
+ 			rc = -EKEYREJECTED;
+ 			goto ssetup_exit;
+ 		}
++
++		resplen = CIFS_SESS_KEY_SIZE + CIFS_AUTH_RESP_SIZE;
+ 		/* bail out if key is too long */
+-		if (msg->sesskey_len >
+-		    sizeof(ses->auth_key.data.krb5)) {
++		if (msg->sesskey_len > resplen) {
+ 			cERROR(1, "Kerberos signing key too long (%u bytes)",
+ 				msg->sesskey_len);
+ 			rc = -EOVERFLOW;
+ 			goto ssetup_exit;
+ 		}
++		ses->auth_key.response = kmalloc(resplen, GFP_KERNEL);
++		if (!ses->auth_key.response) {
++			cERROR(1, "Kerberos can't allocate (%u bytes) memory",
++				resplen);
++			rc = -ENOMEM;
++			goto ssetup_exit;
++		}
+ 		ses->auth_key.len = msg->sesskey_len;
+-		memcpy(ses->auth_key.data.krb5, msg->data, msg->sesskey_len);
++		memcpy(ses->auth_key.response, msg->data, msg->sesskey_len);
+ 		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+ 		capabilities |= CAP_EXTENDED_SECURITY;
+ 		pSMB->req.Capabilities = cpu_to_le32(capabilities);
+@@ -897,8 +876,6 @@ ssetup_ntlmssp_authenticate:
+ 			  CIFS_STD_OP /* not long */ | CIFS_LOG_ERROR);
+ 	/* SMB request buf freed in SendReceive2 */
+ 
+-	cFYI(1, "ssetup rc from sendrecv2 is %d", rc);
+-
+ 	pSMB = (SESSION_SETUP_ANDX *)iov[0].iov_base;
+ 	smb_buf = (struct smb_hdr *)iov[0].iov_base;
+ 
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index a66c91e..e0588cd 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -543,7 +543,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 		    (ses->server->secMode & (SECMODE_SIGN_REQUIRED |
+ 					     SECMODE_SIGN_ENABLED))) {
+ 			rc = cifs_verify_signature(midQ->resp_buf,
+-						&ses->server->session_key,
++						ses->server,
+ 						midQ->sequence_number+1);
+ 			if (rc) {
+ 				cERROR(1, "Unexpected SMB signature");
+@@ -731,7 +731,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 		    (ses->server->secMode & (SECMODE_SIGN_REQUIRED |
+ 					     SECMODE_SIGN_ENABLED))) {
+ 			rc = cifs_verify_signature(out_buf,
+-						&ses->server->session_key,
++						ses->server,
+ 						midQ->sequence_number+1);
+ 			if (rc) {
+ 				cERROR(1, "Unexpected SMB signature");
+@@ -981,7 +981,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 	    (ses->server->secMode & (SECMODE_SIGN_REQUIRED |
+ 				     SECMODE_SIGN_ENABLED))) {
+ 		rc = cifs_verify_signature(out_buf,
+-					   &ses->server->session_key,
++					   ses->server,
+ 					   midQ->sequence_number+1);
+ 		if (rc) {
+ 			cERROR(1, "Unexpected SMB signature");
+-- 
+1.6.0.2
