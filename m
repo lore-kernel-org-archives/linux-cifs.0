@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] [CIFS} [1/3] NTLM auth & signing - Allocate session
  key/client response dynamically
-Date: Wed, 20 Oct 2010 10:15:27 -0500
-Message-ID: <AANLkTin-t_=GKc3FNUZP_iiLFC-uK=608o8DOM8yRkvu@mail.gmail.com>
+Date: Wed, 20 Oct 2010 10:20:39 -0500
+Message-ID: <AANLkTinFjLwoFsVkKfYuBR0fseQ4=BLWC+bXfoYXh8j3@mail.gmail.com>
 References: <1287533637-22367-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20101020104539.5a17a03e@tlielax.poochiereds.net>
 Mime-Version: 1.0
@@ -83,11 +83,6 @@ response?
 nse, why
 > =A0 =A0 =A0 =A0not allocate the key too as part of the same allocatio=
 n?
-
-The key (session key) is different than response.  We need both when
-generating signature.  The key is always fixed in size, 16 byte whereas
-response can vary, 24 bytes long for ntlm, variable length for ntlmv2.
-
 >
 >> =A0 =A0 =A0 unsigned int len;
 >> - =A0 =A0 union {
@@ -219,12 +214,6 @@ sed here? Does the
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0auth_key have an incor=
 rect len field in the
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0RawNTLMSSP case?
-
-I could take this out.  But for NTLMv2 within NTLMSSP, only key gets us=
-ed
-in the signature, so for NTLMv2 in NTLMSSP (RawNTLMSSP), I do not even
-need to copy the response.
-
 >
 >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
 >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D se=
@@ -264,12 +253,6 @@ e;
  len;
 >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->session_estab =3D =
 true;
-
-Only for the first session do we do this copy. For rest of the sessions=
-,
-the auth_key response is freed.  So when we go to free response down he=
-re,
-
 >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
 >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 mutex_unlock(&server->srv_mutex);
 >>
@@ -280,10 +263,6 @@ ct cifsSesInfo *ses,
 >>
 >> +cifs_setup_session_ret:
 >> + =A0 =A0 kfree(ses->auth_key.response);
-
-we have to do a check whether this respose for a that has become part
-of smb connection.
-
 >> + =A0 =A0 ses->auth_key.response =3D NULL;
 >> + =A0 =A0 ses->auth_key.len =3D 0;
 >> +
@@ -362,11 +341,6 @@ esponse, just
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cast that pointer to a struct that has=
  the fields you
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0need.
-
-As I stated above, response and key can't be mixed.  At least for
-ntlm and ntlmv2 authentications.  For Kerberos signing, we would
-just use response and not the key.
-
 >
 >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->req.hdr.Flags2 |=3D SMBFLG2_EXT_SE=
 C;
@@ -387,3 +361,15 @@ ong */ | CIFS_LOG_ERROR);
 > --
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
+
+So we can say
+
+=46or ntlm and ntlmv2 - both key (16 bytes) and response (24 bytes in
+case of ntlm and variable bytes in case of ntlmv2) are needed for
+signing
+
+=46or ntlmv2 within ntlmssp (RawNTLMSSP) - only key (16 bytes) is neede=
+d
+for signing
+
+=46or Kerberos - only response (40 bytes) is needed for signing.
