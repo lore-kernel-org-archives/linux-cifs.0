@@ -1,70 +1,189 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: git send-email [options] <file | directory | rev-list options >
-Date: Fri, 22 Oct 2010 14:51:59 -0400
-Message-ID: <20101022145159.12c401ae@tlielax.poochiereds.net>
-References: <1287772348-29858-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 13/13] cifs: eliminate cifsInodeInfo->write_behind_rc (try #6)
+Date: Fri, 22 Oct 2010 14:52:29 -0400
+Message-ID: <1287773549-30173-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org,
 	sjayaraman-l3A5Bk7waGM@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1287772348-29858-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 22 Oct 2010 14:32:28 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+write_behind_rc is redundant and just adds complexity to the code. What
+we really want to do instead is to use mapping_set_error to reset the
+flags on the mapping when we find a writeback error and can't report it
+to userspace yet.
 
->   Composing:
->     --from                  <str>  * Email From:
->     --[no-]to               <str>  * Email To:
->     --[no-]cc               <str>  * Email Cc:
->     --[no-]bcc              <str>  * Email Bcc:
->     --subject               <str>  * Email "Subject:"
->     --in-reply-to           <str>  * Email "In-Reply-To:"
->     --annotate                     * Review each patch that will be sent in an editor.
->     --compose                      * Open an editor for introduction.
->     --8bit-encoding         <str>  * Encoding to assume 8bit mails if undeclared
-> 
->   Sending:
->     --envelope-sender       <str>  * Email envelope sender.
->     --smtp-server       <str:int>  * Outgoing SMTP server to use. The port
->                                      is optional. Default 'localhost'.
->     --smtp-server-port      <int>  * Outgoing SMTP server port.
->     --smtp-user             <str>  * Username for SMTP-AUTH.
->     --smtp-pass             <str>  * Password for SMTP-AUTH; not necessary.
->     --smtp-encryption       <str>  * tls or ssl; anything else disables.
->     --smtp-ssl                     * Deprecated. Use '--smtp-encryption ssl'.
->     --smtp-domain           <str>  * The domain name sent to HELO/EHLO handshake
->     --smtp-debug            <0|1>  * Disable, enable Net::SMTP debug.
-> 
->   Automating:
->     --identity              <str>  * Use the sendemail.<id> options.
->     --cc-cmd                <str>  * Email Cc: via `<str> $patch_path`
->     --suppress-cc           <str>  * author, self, sob, cc, cccmd, body, bodycc, all.
->     --[no-]signed-off-by-cc        * Send to Signed-off-by: addresses. Default on.
->     --[no-]suppress-from           * Send to self. Default off.
->     --[no-]chain-reply-to          * Chain In-Reply-To: fields. Default off.
->     --[no-]thread                  * Use In-Reply-To: field. Default on.
-> 
->   Administering:
->     --confirm               <str>  * Confirm recipients before sending;
->                                      auto, cc, compose, always, or never.
->     --quiet                        * Output one line of info per email.
->     --dry-run                      * Don't actually send the emails.
->     --[no-]validate                * Perform patch sanity checks. Default on.
->     --[no-]format-patch            * understand any non optional arguments as
->                                      `git format-patch` ones.
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+For cifs_flush and cifs_fsync, we shouldn't reset the flags since errors
+returned there do get reported to userspace.
 
-Oops, sorry about that... git-send-email goof.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Reviewed-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |    1 -
+ fs/cifs/cifsglob.h |    1 -
+ fs/cifs/file.c     |   37 ++++++++++---------------------------
+ fs/cifs/inode.c    |   15 +++++----------
+ 4 files changed, 15 insertions(+), 39 deletions(-)
 
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index abe2c10..dff65fe 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -323,7 +323,6 @@ cifs_alloc_inode(struct super_block *sb)
+ 		return NULL;
+ 	cifs_inode->cifsAttrs = 0x20;	/* default */
+ 	cifs_inode->time = 0;
+-	cifs_inode->write_behind_rc = 0;
+ 	/* Until the file is open and we have gotten oplock
+ 	info back from the server, can not assume caching of
+ 	file data or metadata */
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b22ea9a..c77ed74 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -420,7 +420,6 @@ struct cifsInodeInfo {
+ 	struct list_head lockList;
+ 	/* BB add in lists for dirty pages i.e. write caching info for oplock */
+ 	struct list_head openFileList;
+-	int write_behind_rc;
+ 	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
+ 	unsigned long time;	/* jiffies of last update/check of inode */
+ 	bool clientCanCacheRead:1;	/* read oplock */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 128e07b..ad47820 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -131,8 +131,7 @@ static inline int cifs_open_inode_helper(struct inode *inode,
+ 			/* BB no need to lock inode until after invalidate
+ 			since namei code should already have it locked? */
+ 			rc = filemap_write_and_wait(inode->i_mapping);
+-			if (rc != 0)
+-				pCifsInode->write_behind_rc = rc;
++			mapping_set_error(inode->i_mapping, rc);
+ 		}
+ 		cFYI(1, "invalidating remote inode since open detected it "
+ 			 "changed");
+@@ -606,8 +605,7 @@ reopen_success:
+ 
+ 	if (can_flush) {
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+-		if (rc != 0)
+-			CIFS_I(inode)->write_behind_rc = rc;
++		mapping_set_error(inode->i_mapping, rc);
+ 
+ 		pCifsInode->clientCanCacheAll = false;
+ 		pCifsInode->clientCanCacheRead = false;
+@@ -1489,12 +1487,7 @@ retry:
+ 			if (rc || bytes_written < bytes_to_write) {
+ 				cERROR(1, "Write2 ret %d, wrote %d",
+ 					  rc, bytes_written);
+-				/* BB what if continued retry is
+-				   requested via mount flags? */
+-				if (rc == -ENOSPC)
+-					set_bit(AS_ENOSPC, &mapping->flags);
+-				else
+-					set_bit(AS_EIO, &mapping->flags);
++				mapping_set_error(mapping, rc);
+ 			} else {
+ 				cifs_stats_bytes_written(tcon, bytes_written);
+ 			}
+@@ -1639,11 +1632,10 @@ int cifs_fsync(struct file *file, int datasync)
+ 
+ 	rc = filemap_write_and_wait(inode->i_mapping);
+ 	if (rc == 0) {
+-		rc = CIFS_I(inode)->write_behind_rc;
+-		CIFS_I(inode)->write_behind_rc = 0;
++		struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++
+ 		tcon = tlink_tcon(smbfile->tlink);
+-		if (!rc && tcon && smbfile &&
+-		   !(CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+ 			rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
+ 	}
+ 
+@@ -1688,14 +1680,8 @@ int cifs_flush(struct file *file, fl_owner_t id)
+ 	struct inode *inode = file->f_path.dentry->d_inode;
+ 	int rc = 0;
+ 
+-	if (file->f_mode & FMODE_WRITE) {
++	if (file->f_mode & FMODE_WRITE)
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+-		/* reset wb rc if we were able to write out dirty pages */
+-		if (!rc) {
+-			rc = CIFS_I(inode)->write_behind_rc;
+-			CIFS_I(inode)->write_behind_rc = 0;
+-		}
+-	}
+ 
+ 	cFYI(1, "Flush inode %p file %p rc %d", inode, file, rc);
+ 
+@@ -2274,7 +2260,7 @@ void cifs_oplock_break(struct work_struct *work)
+ 						  oplock_break);
+ 	struct inode *inode = cfile->dentry->d_inode;
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+-	int rc, waitrc = 0;
++	int rc = 0;
+ 
+ 	if (inode && S_ISREG(inode->i_mode)) {
+ 		if (cinode->clientCanCacheRead)
+@@ -2283,13 +2269,10 @@ void cifs_oplock_break(struct work_struct *work)
+ 			break_lease(inode, O_WRONLY);
+ 		rc = filemap_fdatawrite(inode->i_mapping);
+ 		if (cinode->clientCanCacheRead == 0) {
+-			waitrc = filemap_fdatawait(inode->i_mapping);
++			rc = filemap_fdatawait(inode->i_mapping);
++			mapping_set_error(inode->i_mapping, rc);
+ 			invalidate_remote_inode(inode);
+ 		}
+-		if (!rc)
+-			rc = waitrc;
+-		if (rc)
+-			cinode->write_behind_rc = rc;
+ 		cFYI(1, "Oplock flush inode %p rc %d", inode, rc);
+ 	}
+ 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index cfe2339..ed5558b 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1688,8 +1688,7 @@ cifs_invalidate_mapping(struct inode *inode)
+ 	/* write back any cached data */
+ 	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+-		if (rc)
+-			cifs_i->write_behind_rc = rc;
++		mapping_set_error(inode->i_mapping, rc);
+ 	}
+ 	invalidate_remote_inode(inode);
+ 	cifs_fscache_reset_inode_cookie(inode);
+@@ -1949,10 +1948,8 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+ 	 * the flush returns error?
+ 	 */
+ 	rc = filemap_write_and_wait(inode->i_mapping);
+-	if (rc != 0) {
+-		cifsInode->write_behind_rc = rc;
+-		rc = 0;
+-	}
++	mapping_set_error(inode->i_mapping, rc);
++	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
+ 		rc = cifs_set_file_size(inode, attrs, xid, full_path);
+@@ -2093,10 +2090,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	 * the flush returns error?
+ 	 */
+ 	rc = filemap_write_and_wait(inode->i_mapping);
+-	if (rc != 0) {
+-		cifsInode->write_behind_rc = rc;
+-		rc = 0;
+-	}
++	mapping_set_error(inode->i_mapping, rc);
++	rc = 0;
+ 
+ 	if (attrs->ia_valid & ATTR_SIZE) {
+ 		rc = cifs_set_file_size(inode, attrs, xid, full_path);
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.2.3
