@@ -1,189 +1,74 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/13] cifs: eliminate cifsInodeInfo->write_behind_rc (try #6)
-Date: Fri, 22 Oct 2010 14:52:29 -0400
-Message-ID: <1287773549-30173-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org,
-	sjayaraman-l3A5Bk7waGM@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: "J.A. =?ISO-8859-1?B?TWFnYWxs824=?=" <jamagallon@ono.com>
+Subject: Re: CIFS is slooow, gvfs is fast
+Date: Sat, 23 Oct 2010 00:46:36 +0200
+Message-ID: <20101023004636.1acdd81c@werewolf.home>
+References: <20101022013544.0fdab0e0@werewolf.home>
+ <4CC16B1E.4060709@suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Linux Kernel <linux-kernel@vger.kernel.org>,
+	linux-cifs@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <4CC16B1E.4060709@suse.de>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-write_behind_rc is redundant and just adds complexity to the code. What
-we really want to do instead is to use mapping_set_error to reset the
-flags on the mapping when we find a writeback error and can't report it
-to userspace yet.
+On Fri, 22 Oct 2010 16:14:46 +0530, Suresh Jayaraman <sjayaraman@suse.d=
+e> wrote:
 
-For cifs_flush and cifs_fsync, we shouldn't reset the flags since errors
-returned there do get reported to userspace.
+> (Cc linux-cifs@vger.kernel.org)
+>=20
+> On 10/22/2010 05:05 AM, J.A. Magall=F3n wrote:
+>=20
+> > I have a very strange behaviour with windows networking.
+> > I have an HTPC, which I access from my Linux desktop. It runs Windo=
+ws 7.
+> > Network is GigaBit, routed by a Linksys WRT320N running latest DD-W=
+RT.
+> > I setup an automount path under /net/htpc with CIFS filesystem.
+> > I can also access the drives in HTPC via gvfs from Gnome DE.
+> >=20
+> > Problem: speed is _VERY_ different.
+> > R/W through the automount point (CIFS fs), is roughly 7-8 MB/s (rid=
+iculous
+> > for gigabit speeds).
+> > R/W through Gnome/gvfs (kind of fuse) goes around 35 - 40 MB/s (400=
+ Mbits/s),
+> > that look much better.
+>=20
+> What is the kernel version In which you are seeing the problem? I'm n=
+ot
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Reviewed-by: Dave Kleikamp <shaggy-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>
----
- fs/cifs/cifsfs.c   |    1 -
- fs/cifs/cifsglob.h |    1 -
- fs/cifs/file.c     |   37 ++++++++++---------------------------
- fs/cifs/inode.c    |   15 +++++----------
- 4 files changed, 15 insertions(+), 39 deletions(-)
+Its just new 2.6.36 final, mandriva distro kernel.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index abe2c10..dff65fe 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -323,7 +323,6 @@ cifs_alloc_inode(struct super_block *sb)
- 		return NULL;
- 	cifs_inode->cifsAttrs = 0x20;	/* default */
- 	cifs_inode->time = 0;
--	cifs_inode->write_behind_rc = 0;
- 	/* Until the file is open and we have gotten oplock
- 	info back from the server, can not assume caching of
- 	file data or metadata */
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b22ea9a..c77ed74 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -420,7 +420,6 @@ struct cifsInodeInfo {
- 	struct list_head lockList;
- 	/* BB add in lists for dirty pages i.e. write caching info for oplock */
- 	struct list_head openFileList;
--	int write_behind_rc;
- 	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
- 	unsigned long time;	/* jiffies of last update/check of inode */
- 	bool clientCanCacheRead:1;	/* read oplock */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 128e07b..ad47820 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -131,8 +131,7 @@ static inline int cifs_open_inode_helper(struct inode *inode,
- 			/* BB no need to lock inode until after invalidate
- 			since namei code should already have it locked? */
- 			rc = filemap_write_and_wait(inode->i_mapping);
--			if (rc != 0)
--				pCifsInode->write_behind_rc = rc;
-+			mapping_set_error(inode->i_mapping, rc);
- 		}
- 		cFYI(1, "invalidating remote inode since open detected it "
- 			 "changed");
-@@ -606,8 +605,7 @@ reopen_success:
- 
- 	if (can_flush) {
- 		rc = filemap_write_and_wait(inode->i_mapping);
--		if (rc != 0)
--			CIFS_I(inode)->write_behind_rc = rc;
-+		mapping_set_error(inode->i_mapping, rc);
- 
- 		pCifsInode->clientCanCacheAll = false;
- 		pCifsInode->clientCanCacheRead = false;
-@@ -1489,12 +1487,7 @@ retry:
- 			if (rc || bytes_written < bytes_to_write) {
- 				cERROR(1, "Write2 ret %d, wrote %d",
- 					  rc, bytes_written);
--				/* BB what if continued retry is
--				   requested via mount flags? */
--				if (rc == -ENOSPC)
--					set_bit(AS_ENOSPC, &mapping->flags);
--				else
--					set_bit(AS_EIO, &mapping->flags);
-+				mapping_set_error(mapping, rc);
- 			} else {
- 				cifs_stats_bytes_written(tcon, bytes_written);
- 			}
-@@ -1639,11 +1632,10 @@ int cifs_fsync(struct file *file, int datasync)
- 
- 	rc = filemap_write_and_wait(inode->i_mapping);
- 	if (rc == 0) {
--		rc = CIFS_I(inode)->write_behind_rc;
--		CIFS_I(inode)->write_behind_rc = 0;
-+		struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+
- 		tcon = tlink_tcon(smbfile->tlink);
--		if (!rc && tcon && smbfile &&
--		   !(CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
-+		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
- 			rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
- 	}
- 
-@@ -1688,14 +1680,8 @@ int cifs_flush(struct file *file, fl_owner_t id)
- 	struct inode *inode = file->f_path.dentry->d_inode;
- 	int rc = 0;
- 
--	if (file->f_mode & FMODE_WRITE) {
-+	if (file->f_mode & FMODE_WRITE)
- 		rc = filemap_write_and_wait(inode->i_mapping);
--		/* reset wb rc if we were able to write out dirty pages */
--		if (!rc) {
--			rc = CIFS_I(inode)->write_behind_rc;
--			CIFS_I(inode)->write_behind_rc = 0;
--		}
--	}
- 
- 	cFYI(1, "Flush inode %p file %p rc %d", inode, file, rc);
- 
-@@ -2274,7 +2260,7 @@ void cifs_oplock_break(struct work_struct *work)
- 						  oplock_break);
- 	struct inode *inode = cfile->dentry->d_inode;
- 	struct cifsInodeInfo *cinode = CIFS_I(inode);
--	int rc, waitrc = 0;
-+	int rc = 0;
- 
- 	if (inode && S_ISREG(inode->i_mode)) {
- 		if (cinode->clientCanCacheRead)
-@@ -2283,13 +2269,10 @@ void cifs_oplock_break(struct work_struct *work)
- 			break_lease(inode, O_WRONLY);
- 		rc = filemap_fdatawrite(inode->i_mapping);
- 		if (cinode->clientCanCacheRead == 0) {
--			waitrc = filemap_fdatawait(inode->i_mapping);
-+			rc = filemap_fdatawait(inode->i_mapping);
-+			mapping_set_error(inode->i_mapping, rc);
- 			invalidate_remote_inode(inode);
- 		}
--		if (!rc)
--			rc = waitrc;
--		if (rc)
--			cinode->write_behind_rc = rc;
- 		cFYI(1, "Oplock flush inode %p rc %d", inode, rc);
- 	}
- 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index cfe2339..ed5558b 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1688,8 +1688,7 @@ cifs_invalidate_mapping(struct inode *inode)
- 	/* write back any cached data */
- 	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
- 		rc = filemap_write_and_wait(inode->i_mapping);
--		if (rc)
--			cifs_i->write_behind_rc = rc;
-+		mapping_set_error(inode->i_mapping, rc);
- 	}
- 	invalidate_remote_inode(inode);
- 	cifs_fscache_reset_inode_cookie(inode);
-@@ -1949,10 +1948,8 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	 * the flush returns error?
- 	 */
- 	rc = filemap_write_and_wait(inode->i_mapping);
--	if (rc != 0) {
--		cifsInode->write_behind_rc = rc;
--		rc = 0;
--	}
-+	mapping_set_error(inode->i_mapping, rc);
-+	rc = 0;
- 
- 	if (attrs->ia_valid & ATTR_SIZE) {
- 		rc = cifs_set_file_size(inode, attrs, xid, full_path);
-@@ -2093,10 +2090,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	 * the flush returns error?
- 	 */
- 	rc = filemap_write_and_wait(inode->i_mapping);
--	if (rc != 0) {
--		cifsInode->write_behind_rc = rc;
--		rc = 0;
--	}
-+	mapping_set_error(inode->i_mapping, rc);
-+	rc = 0;
- 
- 	if (attrs->ia_valid & ATTR_SIZE) {
- 		rc = cifs_set_file_size(inode, attrs, xid, full_path);
--- 
-1.7.2.3
+> seeing this on 2.6.36-rc4. Do you have a wired interface as well? Are
+
+Yes, boxes are all wired to the 320N router, at gigabit speeds.
+Just to double check, I also probed with my netbook with 100Mb ehternet=
+=2E
+The effect is less obvious, but writing to the Win7 box through the
+cifs automount path goes at 3.5-4.0 Mb/s, and with gvfs it reaches
+7.5 Mb/s.
+
+> you sure that both are using the same network path?
+>=20
+
+If you mean hardware network path (cabling, router), yes.
+=46or file paths, CIFS fs is under /net/htpc/media, and gvfs uses a mou=
+nt
+point on '~/.gvfs/media on htpc'.
+
+And here comes the weird part. To rule out the desktop environment fact=
+or,
+I tried a dd in both paths. On /net, I get 16.6 MB/s, and on
+~/.gvfs/xxx, I just get 5.5 MB/s. I really don't understand anything...
+things get reversed depending if you use a gui or commandline.
+
+Weird, really weird...
+
+--=20
+J.A. Magallon <jamagallon()ono!com>     \               Software is lik=
+e sex:
+                                         \         It's better when it'=
+s free
