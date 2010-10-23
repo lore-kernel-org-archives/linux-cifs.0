@@ -1,74 +1,37 @@
-From: "J.A. =?ISO-8859-1?B?TWFnYWxs824=?=" <jamagallon@ono.com>
-Subject: Re: CIFS is slooow, gvfs is fast
-Date: Sat, 23 Oct 2010 00:46:36 +0200
-Message-ID: <20101023004636.1acdd81c@werewolf.home>
-References: <20101022013544.0fdab0e0@werewolf.home>
- <4CC16B1E.4060709@suse.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 11/13] cifs: convert cifsFileInfo->count to non-atomic counter
+Date: Sat, 23 Oct 2010 11:57:52 -0500
+Message-ID: <AANLkTimfSq1vrGjcdLRh5+p=t0oF9ouEOzaVsE5vcZBq@mail.gmail.com>
+References: <1287171248-464-1-git-send-email-jlayton@redhat.com>
+	<1287171248-464-12-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: Linux Kernel <linux-kernel@vger.kernel.org>,
-	linux-cifs@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4CC16B1E.4060709@suse.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1287171248-464-12-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 22 Oct 2010 16:14:46 +0530, Suresh Jayaraman <sjayaraman@suse.d=
-e> wrote:
+Merged.  Made trivial checkpatch cleanup.
 
-> (Cc linux-cifs@vger.kernel.org)
->=20
-> On 10/22/2010 05:05 AM, J.A. Magall=F3n wrote:
->=20
-> > I have a very strange behaviour with windows networking.
-> > I have an HTPC, which I access from my Linux desktop. It runs Windo=
-ws 7.
-> > Network is GigaBit, routed by a Linksys WRT320N running latest DD-W=
-RT.
-> > I setup an automount path under /net/htpc with CIFS filesystem.
-> > I can also access the drives in HTPC via gvfs from Gnome DE.
-> >=20
-> > Problem: speed is _VERY_ different.
-> > R/W through the automount point (CIFS fs), is roughly 7-8 MB/s (rid=
-iculous
-> > for gigabit speeds).
-> > R/W through Gnome/gvfs (kind of fuse) goes around 35 - 40 MB/s (400=
- Mbits/s),
-> > that look much better.
->=20
-> What is the kernel version In which you are seeing the problem? I'm n=
-ot
+As mentioned earlier, I don't think that this patch helps (atomic_t
+type is small
+on most arch and the atomic operations are single instructions), but is harmless
+and don't won't to create merge conflicts with the next patch so merging this.
 
-Its just new 2.6.36 final, mandriva distro kernel.
+On Fri, Oct 15, 2010 at 2:34 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> The count for cifsFileInfo is currently an atomic, but that just adds
+> complexity for little value. We generally need to hold cifs_file_list_lock
+> to traverse the lists anyway so we might as well make this counter
+> non-atomic and simply use the cifs_file_list_lock to protect it.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 
-> seeing this on 2.6.36-rc4. Do you have a wired interface as well? Are
 
-Yes, boxes are all wired to the 320N router, at gigabit speeds.
-Just to double check, I also probed with my netbook with 100Mb ehternet=
-=2E
-The effect is less obvious, but writing to the Win7 box through the
-cifs automount path goes at 3.5-4.0 Mb/s, and with gvfs it reaches
-7.5 Mb/s.
 
-> you sure that both are using the same network path?
->=20
+-- 
+Thanks,
 
-If you mean hardware network path (cabling, router), yes.
-=46or file paths, CIFS fs is under /net/htpc/media, and gvfs uses a mou=
-nt
-point on '~/.gvfs/media on htpc'.
-
-And here comes the weird part. To rule out the desktop environment fact=
-or,
-I tried a dd in both paths. On /net, I get 16.6 MB/s, and on
-~/.gvfs/xxx, I just get 5.5 MB/s. I really don't understand anything...
-things get reversed depending if you use a gui or commandline.
-
-Weird, really weird...
-
---=20
-J.A. Magallon <jamagallon()ono!com>     \               Software is lik=
-e sex:
-                                         \         It's better when it'=
-s free
+Steve
