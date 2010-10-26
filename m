@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 2/4] CIFS: Invalidate inode pages on the last close
-Date: Tue, 26 Oct 2010 17:01:26 +0400
-Message-ID: <AANLkTimEwyZkxat-yq8pg3-MCVsnURowe-di2D2YBZhR@mail.gmail.com>
+Subject: [PATCH 3/4] CIFS: New read logic
+Date: Tue, 26 Oct 2010 17:03:10 +0400
+Message-ID: <AANLkTiktmJRzwqC0iX6a8wZXZoKmab6g=CWtfbYgEw1G@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -9,55 +9,71 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When we close the last file handle of the inode we should invalidate it
-to prevent data coherency problem when we open it again but it has been
-modified by other clients.
+Add cifs_file_aio_read to let the client works with strict cache mode.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/file.c |   14 ++++++++++++--
- 1 files changed, 12 insertions(+), 2 deletions(-)
+ fs/cifs/cifsfs.c |   34 ++++++++++++++++++++++++++++++++--
+ 1 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index d7c212a..02a045e 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -150,8 +150,14 @@ client_can_cache:
- 		pCifsInode->clientCanCacheAll = true;
- 		pCifsInode->clientCanCacheRead = true;
- 		cFYI(1, "Exclusive Oplock granted on inode %p", inode);
--	} else if ((oplock & 0xF) == OPLOCK_READ)
-+	} else if ((oplock & 0xF) == OPLOCK_READ) {
-+		pCifsInode->clientCanCacheAll = false;
- 		pCifsInode->clientCanCacheRead = true;
-+		cFYI(1, "Level II Oplock franted on inode %p", inode);
-+	} else {
-+		pCifsInode->clientCanCacheAll = false;
-+		pCifsInode->clientCanCacheRead = false;
-+	}
-
- 	return rc;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index e8b9523..21e0f47 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -570,6 +570,36 @@ cifs_get_sb(struct file_system_type *fs_type,
+ 	return 0;
  }
-@@ -271,8 +277,10 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
-  */
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+
++static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
++				   unsigned long nr_segs, loff_t pos)
++{
++	struct inode *inode;
++	struct cifs_sb_info *cifs_sb;
++	ssize_t read;
++
++	inode = iocb->ki_filp->f_path.dentry->d_inode;
++	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
++
++	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0) {
++		int retval;
++
++		retval = cifs_revalidate_file(iocb->ki_filp);
++		if (retval < 0)
++			return (loff_t)retval;
++
++		return generic_file_aio_read(iocb, iov, nr_segs, pos);
++	}
++
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		read = cifs_user_read(iocb->ki_filp, iov->iov_base,
++				      iov->iov_len, &pos);
++		iocb->ki_pos = pos;
++	} else
++		read = generic_file_aio_read(iocb, iov, nr_segs, pos);
++
++	return read;
++}
++
+ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+ 				   unsigned long nr_segs, loff_t pos)
  {
-+	struct inode *inode = cifs_file->dentry->d_inode;
- 	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
--	struct cifsInodeInfo *cifsi = CIFS_I(cifs_file->dentry->d_inode);
-+	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifsLockInfo *li, *tmp;
-
- 	spin_lock(&cifs_file_list_lock);
-@@ -290,6 +298,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- 			cifs_file->dentry->d_inode);
- 		cifsi->clientCanCacheRead = false;
- 		cifsi->clientCanCacheAll  = false;
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-+			invalidate_remote_inode(inode);
- 	}
- 	spin_unlock(&cifs_file_list_lock);
-
+@@ -692,7 +722,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
+ const struct file_operations cifs_file_ops = {
+ 	.read = do_sync_read,
+ 	.write = do_sync_write,
+-	.aio_read = generic_file_aio_read,
++	.aio_read = cifs_file_aio_read,
+ 	.aio_write = cifs_file_aio_write,
+ 	.open = cifs_open,
+ 	.release = cifs_close,
+@@ -729,7 +759,7 @@ const struct file_operations cifs_file_direct_ops = {
+ const struct file_operations cifs_file_nobrl_ops = {
+ 	.read = do_sync_read,
+ 	.write = do_sync_write,
+-	.aio_read = generic_file_aio_read,
++	.aio_read = cifs_file_aio_read,
+ 	.aio_write = cifs_file_aio_write,
+ 	.open = cifs_open,
+ 	.release = cifs_close,
 -- 
 1.6.3.3
