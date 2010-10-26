@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 1/4] CIFS: Add strictcache mount option
-Date: Tue, 26 Oct 2010 17:00:10 +0400
-Message-ID: <AANLkTikY81n8NemTv5aEjekB5M+ymifT8j1JC6JpH+i1@mail.gmail.com>
+Subject: [PATCH 2/4] CIFS: Invalidate inode pages on the last close
+Date: Tue, 26 Oct 2010 17:01:26 +0400
+Message-ID: <AANLkTimEwyZkxat-yq8pg3-MCVsnURowe-di2D2YBZhR@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -9,77 +9,55 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Use for switching on strict cache mode. In this mode the
-client read from the cache all the time it has Oplock Level II,
-otherwise - read from the server. All written data are stored
-in the cache, but if the client doesn't have Exclusive Oplock,
-it writes the data to the server.
+When we close the last file handle of the inode we should invalidate it
+to prevent data coherency problem when we open it again but it has been
+modified by other clients.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/README       |    5 +++++
- fs/cifs/cifs_fs_sb.h |    1 +
- fs/cifs/connect.c    |    5 +++++
- 3 files changed, 11 insertions(+), 0 deletions(-)
+ fs/cifs/file.c |   14 ++++++++++++--
+ 1 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/README b/fs/cifs/README
-index ee68d10..8fb6192 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -443,6 +443,11 @@ A partial list of the supported mount options follows:
- 		if oplock (caching token) is granted and held. Note that
- 		direct allows write operations larger than page size
- 		to be sent to the server.
-+  strictcache   Use for switching on strict cache mode. In this mode the
-+		client read from the cache all the time it has Oplock Level II,
-+		otherwise - read from the server. All written data are stored
-+		in the cache, but if the client doesn't have Exclusive Oplock,
-+		it writes the data to the server.
-   acl   	Allow setfacl and getfacl to manage posix ACLs if server
- 		supports them.  (default)
-   noacl 	Do not allow setfacl and getfacl calls on this mount
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 525ba59..b7b8b45 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -40,6 +40,7 @@
- #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
- #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
- #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
-+#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache behavior */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index d7c212a..02a045e 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -150,8 +150,14 @@ client_can_cache:
+ 		pCifsInode->clientCanCacheAll = true;
+ 		pCifsInode->clientCanCacheRead = true;
+ 		cFYI(1, "Exclusive Oplock granted on inode %p", inode);
+-	} else if ((oplock & 0xF) == OPLOCK_READ)
++	} else if ((oplock & 0xF) == OPLOCK_READ) {
++		pCifsInode->clientCanCacheAll = false;
+ 		pCifsInode->clientCanCacheRead = true;
++		cFYI(1, "Level II Oplock franted on inode %p", inode);
++	} else {
++		pCifsInode->clientCanCacheAll = false;
++		pCifsInode->clientCanCacheRead = false;
++	}
 
- struct cifs_sb_info {
- 	struct radix_tree_root tlink_tree;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7e73176..11125fb 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -84,6 +84,7 @@ struct smb_vol {
- 	bool no_xattr:1;   /* set if xattr (EA) support should be disabled*/
- 	bool server_ino:1; /* use inode numbers from server ie UniqueId */
- 	bool direct_io:1;
-+	bool strict_io:1; /* strict cache behavior */
- 	bool remap:1;      /* set to remap seven reserved chars in filenames */
- 	bool posix_paths:1; /* unset to not ask for posix pathnames. */
- 	bool no_linux_ext:1;
-@@ -1343,6 +1344,8 @@ cifs_parse_mount_options(char *options, const
-char *devname,
- 			vol->direct_io = 1;
- 		} else if (strnicmp(data, "forcedirectio", 13) == 0) {
- 			vol->direct_io = 1;
-+		} else if (strnicmp(data, "strictcache", 11) == 0) {
-+			vol->strict_io = 1;
- 		} else if (strnicmp(data, "noac", 4) == 0) {
- 			printk(KERN_WARNING "CIFS: Mount option noac not "
- 				"supported. Instead set "
-@@ -2582,6 +2585,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 	if (pvolume_info->multiuser)
- 		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
- 					    CIFS_MOUNT_NO_PERM);
-+	if (pvolume_info->strict_io)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
- 	if (pvolume_info->direct_io) {
- 		cFYI(1, "mounting share using direct i/o");
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
+ 	return rc;
+ }
+@@ -271,8 +277,10 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+  */
+ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ {
++	struct inode *inode = cifs_file->dentry->d_inode;
+ 	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+-	struct cifsInodeInfo *cifsi = CIFS_I(cifs_file->dentry->d_inode);
++	struct cifsInodeInfo *cifsi = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifsLockInfo *li, *tmp;
+
+ 	spin_lock(&cifs_file_list_lock);
+@@ -290,6 +298,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 			cifs_file->dentry->d_inode);
+ 		cifsi->clientCanCacheRead = false;
+ 		cifsi->clientCanCacheAll  = false;
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
++			invalidate_remote_inode(inode);
+ 	}
+ 	spin_unlock(&cifs_file_list_lock);
+
 -- 
 1.6.3.3
