@@ -1,123 +1,76 @@
-From: Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>
-Subject: Re: Strange hardlink behavior with CIFS
-Date: Wed, 27 Oct 2010 15:49:10 -0500
-Message-ID: <1288212550.3764.59.camel@calx>
-References: <1287428685.16450.282.camel@calx> <4CBD6843.3060702@suse.de>
-	 <1288200686.3764.55.camel@calx>
-	 <20101027163230.28591971@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] NTLM auth and sign - Use appropriate server challenge
+Date: Wed, 27 Oct 2010 16:56:19 -0400
+Message-ID: <20101027165619.512b50e8@tlielax.poochiereds.net>
+References: <1288210836-12380-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101027163230.28591971-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1288210836-12380-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2010-10-27 at 16:32 -0400, Jeff Layton wrote:
-> On Wed, 27 Oct 2010 12:31:26 -0500
-> Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org> wrote:
-> 
-> > On Tue, 2010-10-19 at 15:13 +0530, Suresh Jayaraman wrote:
-> > > On 10/19/2010 12:34 AM, Matt Mackall wrote:
-> > > > With Linux 2.6.32-35 and either Windows or Samba in nounix mode,
-> > > > hardlink counts can mysteriously disappear:
-> > > > 
-> > > > - create hardlink pair foo,bar
-> > > > - stat foo -> nlink = 2
-> > > > - open foo
-> > > > - stat foo -> nlink = 1
-> > > > - close
-> > > > - wait or sync
-> > > > - ls -l -> nlink = 2
-> > > > 
-> > > > Original report is here:
-> > > > 
-> > > > http://mercurial.selenic.com/bts/issue1866
-> > > > 
-> > > 
-> > > A quick test on 2.6.36-rc4 kernel reveals that the problem is no longer
-> > > reproducible. Could you try a more recent kernel and see whether the
-> > > problem is reproducible?
-> > 
-> > Test continues to fail with 2.6.36.
-> > 
-> > # uname -a
-> > Linux calx 2.6.36 #71 SMP Tue Oct 26 02:23:34 CDT 2010 x86_64 GNU/Linux
-> > # mount -o nounix //localhost/stuff cifs
-> >            ^^^^^^
-> > # cd cifs
-> > # touch foo
-> > # ln foo bar
-> > # ./h
-> > file: foo nlinks 2
-> > file: foo nlinks 1
-> > file: foo nlinks 1
-> > 
-> > # cat h.c
-> > #include <sys/types.h>
-> > #include <sys/stat.h>
-> > #include <unistd.h>
-> > #include <fcntl.h>
-> > #include <stdio.h>
-> > 
-> > #define FPATH "foo"
-> > 
-> > int main(void)
-> > {
-> > 	int rc, fh;
-> > 	struct stat st;
-> > 
-> > 	rc = lstat(FPATH, &st);
-> > 	printf("file: %s nlinks %d\n", FPATH, st.st_nlink);
-> > 
-> > 	fh = open(FPATH, 0, O_RDONLY);
-> > 
-> > 	rc = lstat(FPATH, &st);
-> > 	printf("file: %s nlinks %d\n", FPATH, st.st_nlink);
-> > 
-> > 	close(fh);
-> > 
-> > 	rc = lstat(FPATH, &st);
-> > 	printf("file: %s nlinks %d\n", FPATH, st.st_nlink);
-> > 
-> > 	return 0;
-> > }
-> > 
-> > 
-> > 
-> > 
-> 
-> Ok, I can reproduce this too. The problem is this nastiness in CIFSSMBOpen:
-> 
->         if (rc) {
->                 cFYI(1, "Error in Open = %d", rc);
->         } else {
->                 *pOplock = pSMBr->OplockLevel; /* 1 byte no need to le_to_cpu */
->                 *netfid = pSMBr->Fid;   /* cifs fid stays in le */
->                 /* Let caller know file was created so we can set the mode. */
->                 /* Do we care about the CreateAction in any other cases? */
->                 if (cpu_to_le32(FILE_CREATE) == pSMBr->CreateAction)
->                         *pOplock |= CIFS_CREATE_ACTION;
->                 if (pfile_info) {
->                         memcpy((char *)pfile_info, (char *)&pSMBr->CreationTime,
->                                 36 /* CreationTime to Attributes */);
->                         /* the file_info buf is endian converted by caller */
->                         pfile_info->AllocationSize = pSMBr->AllocationSize;
->                         pfile_info->EndOfFile = pSMBr->EndOfFile;
->                         pfile_info->NumberOfLinks = cpu_to_le32(1);
->                         pfile_info->DeletePending = 0;
->                 }
->         }
-> 
-> In particular, the NumberOfLinks being set to 1 there. That probably
-> just needs to go. I'll look over it when I have time.
+On Wed, 27 Oct 2010 15:20:36 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-I should have noted that the behavior is* different be .35 and .36 - the
-link count reappears quite quickly after the test in .36 so a manual
-test is unlikely to show the problem now. But back-to-back close/stat
-still shows the problem.
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Need to have cryptkey or server challenge in smb connection
+> (struct TCP_Server_Info) for ntlm and ntlmv2 auth types for which
+> cryptkey (Encryption Key) is supplied just once in Negotiate Protocol
+> response during an smb connection setup for all the smb sessions over
+> that smb connection.
+> 
+> For ntlmssp, cryptkey or server challenge is provided for every
+> smb session in type 2 packet of ntlmssp negotiation, the cryptkey
+> provided during Negotiation Protocol response before smb connection
+> does not count.
+> 
+> Rename cryptKey to cryptkey and related changes.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsencrypt.c |   10 +++++++---
+>  fs/cifs/cifsglob.h    |    3 ++-
+>  fs/cifs/cifssmb.c     |    4 ++--
+>  fs/cifs/connect.c     |    4 ++--
+>  fs/cifs/sess.c        |   12 ++++++++----
+>  5 files changed, 21 insertions(+), 12 deletions(-)
+> 
+
+[...]
+
+>  
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 67d6a22..b736951 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -196,6 +196,7 @@ struct TCP_Server_Info {
+>  	int capabilities; /* allow selective disabling of caps by smb sess */
+>  	int timeAdj;  /* Adjust for difference in server time zone in sec */
+>  	__u16 CurrentMid;         /* multiplex id - rotating counter */
+> +	char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+>  	/* 16th byte of RFC1001 workstation name is always null */
+>  	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+>  	__u32 sequence_number; /* needed for CIFS PDU signature */
+> @@ -240,7 +241,7 @@ struct cifsSesInfo {
+>  	char userName[MAX_USERNAME_SIZE + 1];
+>  	char *domainName;
+>  	char *password;
+> -	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
+> +	char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlmssp */
+
+I'm trying to understand why we need ses->cryptkey at all. It holds the
+cryptkey provided by the server only if we're using ntlmssp. It's
+only used once, and essentially it just holds the key until we have a
+auth_key.response field that we can stuff this in. Is that correct? If
+so, wouldn't it make more sense to just allocate the auth_key.response
+field earlier and put this directly in there?
 
 -- 
-Mathematics is the supreme nostalgia of our time.
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
