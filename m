@@ -1,37 +1,62 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: SMB2 delete problem
-Date: Tue, 26 Oct 2010 23:22:48 -0500
-Message-ID: <AANLkTikAQ8ma82ewk4nU4UtKeHX4JUT_=HwX7t5thbj=@mail.gmail.com>
-References: <AANLkTimbdp0zJHp4AiryteCmYhz6mvJVWm2yp4NZoKrH@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+From: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
+Subject: [PATCH 2/4] FS: cifs, remove unneeded NULL tests
+Date: Wed, 27 Oct 2010 13:50:20 +0200
+Message-ID: <1288180220-19869-1-git-send-email-jslaby@suse.cz>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jirislaby-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
 	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimbdp0zJHp4AiryteCmYhz6mvJVWm2yp4NZoKrH-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into smb2.git - but it looks like it is missing a d_drop for
-the case where the file was deleted on the server by another client
-between the lookup and delete (where we get ENOENT).
+Stanse found that pSMBFile in cifs_ioctl and file->f_path.dentry in
+cifs_user_write are dereferenced prior their test to NULL.
 
-On Tue, Oct 26, 2010 at 12:54 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Hi!
->
-> I faced with the problem that the client decrements dentry's d_count
-> more that increments and it causes the error ''dentry still in use" on
-> umount. I created the patch that solves this.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
->
+The alternative is not to dereference them before the tests. The patch is
+to point out the problem, you have to decide.
 
+Signed-off-by: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+---
+ fs/cifs/file.c  |    2 +-
+ fs/cifs/ioctl.c |    4 ----
+ 2 files changed, 1 insertions(+), 5 deletions(-)
 
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 45af003..db7eaf7 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1031,7 +1031,7 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
+ 	cifs_stats_bytes_written(pTcon, total_written);
+ 
+ 	/* since the write may have blocked check these pointers again */
+-	if ((file->f_path.dentry) && (file->f_path.dentry->d_inode)) {
++	if (file->f_path.dentry->d_inode) {
+ 		struct inode *inode = file->f_path.dentry->d_inode;
+ /* Do not update local mtime - server will set its actual value on write
+  *		inode->i_ctime = inode->i_mtime =
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 077bf75..2fa22f2 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -63,8 +63,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ #ifdef CONFIG_CIFS_POSIX
+ 		case FS_IOC_GETFLAGS:
+ 			if (CIFS_UNIX_EXTATTR_CAP & caps) {
+-				if (pSMBFile == NULL)
+-					break;
+ 				rc = CIFSGetExtAttr(xid, tcon, pSMBFile->netfid,
+ 					&ExtAttrBits, &ExtAttrMask);
+ 				if (rc == 0)
+@@ -80,8 +78,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 					rc = -EFAULT;
+ 					break;
+ 				}
+-				if (pSMBFile == NULL)
+-					break;
+ 				/* rc= CIFSGetExtAttr(xid,tcon,pSMBFile->netfid,
+ 					extAttrBits, &ExtAttrMask);*/
+ 			}
 -- 
-Thanks,
-
-Steve
+1.7.3.1
