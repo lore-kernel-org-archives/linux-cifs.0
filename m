@@ -1,62 +1,141 @@
-From: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
-Subject: [PATCH 2/4] FS: cifs, remove unneeded NULL tests
-Date: Wed, 27 Oct 2010 13:50:20 +0200
-Message-ID: <1288180220-19869-1-git-send-email-jslaby@suse.cz>
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jirislaby-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] [CIFS} NTLM auth and sign - Use appropriate server challenge
+Date: Wed, 27 Oct 2010 10:21:30 -0500
+Message-ID: <1288192890-7400-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Stanse found that pSMBFile in cifs_ioctl and file->f_path.dentry in
-cifs_user_write are dereferenced prior their test to NULL.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-The alternative is not to dereference them before the tests. The patch is
-to point out the problem, you have to decide.
 
-Signed-off-by: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Need to have cryptKey or server challenge in smb connection
+(struct TCP_Server_Info) for ntlm and ntlmv2 auth types for which
+cryptKey (Encryption Key) is supplied just once in Negotiate Protocol
+response during an smb connection setup for all the smb sessions over
+that smb connection.
+
+For ntlmssp, cryptKey or server challenge is provided for every
+smb session in type 2 packet of ntlmssp negotiation, the cryptKey
+provided during Negotiation Protocol response before smb connection
+does not count. 
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/file.c  |    2 +-
- fs/cifs/ioctl.c |    4 ----
- 2 files changed, 1 insertions(+), 5 deletions(-)
+ fs/cifs/cifsencrypt.c |   10 +++++++---
+ fs/cifs/cifsglob.h    |    3 ++-
+ fs/cifs/cifssmb.c     |    4 ++--
+ fs/cifs/connect.c     |    4 ++--
+ fs/cifs/sess.c        |    2 +-
+ 5 files changed, 14 insertions(+), 9 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 45af003..db7eaf7 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1031,7 +1031,7 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 	cifs_stats_bytes_written(pTcon, total_written);
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 17d603a..10d3d0f 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -249,7 +249,7 @@ int setup_ntlm_response(struct cifsSesInfo *ses)
+ 	}
+ 	ses->auth_key.len = temp_len;
  
- 	/* since the write may have blocked check these pointers again */
--	if ((file->f_path.dentry) && (file->f_path.dentry->d_inode)) {
-+	if (file->f_path.dentry->d_inode) {
- 		struct inode *inode = file->f_path.dentry->d_inode;
- /* Do not update local mtime - server will set its actual value on write
-  *		inode->i_ctime = inode->i_mtime =
-diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-index 077bf75..2fa22f2 100644
---- a/fs/cifs/ioctl.c
-+++ b/fs/cifs/ioctl.c
-@@ -63,8 +63,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- #ifdef CONFIG_CIFS_POSIX
- 		case FS_IOC_GETFLAGS:
- 			if (CIFS_UNIX_EXTATTR_CAP & caps) {
--				if (pSMBFile == NULL)
--					break;
- 				rc = CIFSGetExtAttr(xid, tcon, pSMBFile->netfid,
- 					&ExtAttrBits, &ExtAttrMask);
- 				if (rc == 0)
-@@ -80,8 +78,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 					rc = -EFAULT;
- 					break;
- 				}
--				if (pSMBFile == NULL)
--					break;
- 				/* rc= CIFSGetExtAttr(xid,tcon,pSMBFile->netfid,
- 					extAttrBits, &ExtAttrMask);*/
- 			}
+-	SMBNTencrypt(ses->password, ses->cryptKey,
++	SMBNTencrypt(ses->password, ses->server->cryptKey,
+ 			ses->auth_key.response + CIFS_SESS_KEY_SIZE);
+ 
+ 	E_md4hash(ses->password, temp_key);
+@@ -537,8 +537,12 @@ CalcNTLMv2_response(const struct cifsSesInfo *ses)
+ 		return rc;
+ 	}
+ 
+-	memcpy(ses->auth_key.response + offset,
+-		ses->cryptKey, CIFS_SERVER_CHALLENGE_SIZE);
++	if (ses->server->secType == RawNTLMSSP)
++		memcpy(ses->auth_key.response + offset,
++			ses->cryptKey, CIFS_SERVER_CHALLENGE_SIZE);
++	else
++		memcpy(ses->auth_key.response + offset,
++			ses->server->cryptKey, CIFS_SERVER_CHALLENGE_SIZE);
+ 	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
+ 		ses->auth_key.response + offset, ses->auth_key.len - offset);
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 67d6a22..badb0b3 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -196,6 +196,7 @@ struct TCP_Server_Info {
+ 	int capabilities; /* allow selective disabling of caps by smb sess */
+ 	int timeAdj;  /* Adjust for difference in server time zone in sec */
+ 	__u16 CurrentMid;         /* multiplex id - rotating counter */
++	char cryptKey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+ 	/* 16th byte of RFC1001 workstation name is always null */
+ 	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+ 	__u32 sequence_number; /* needed for CIFS PDU signature */
+@@ -240,7 +241,7 @@ struct cifsSesInfo {
+ 	char userName[MAX_USERNAME_SIZE + 1];
+ 	char *domainName;
+ 	char *password;
+-	char cryptKey[CIFS_CRYPTO_KEY_SIZE];
++	char cryptKey[CIFS_CRYPTO_KEY_SIZE]; /* userd by ntlmssp */
+ 	struct session_key auth_key;
+ 	char ntlmv2_hash[16];
+ 	unsigned int tilen; /* length of the target info blob */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index e98f1f3..a32a42e 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -503,7 +503,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 
+ 		if (rsp->EncryptionKeyLength ==
+ 				cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
+-			memcpy(ses->cryptKey, rsp->EncryptionKey,
++			memcpy(ses->server->cryptKey, rsp->EncryptionKey,
+ 				CIFS_CRYPTO_KEY_SIZE);
+ 		} else if (server->secMode & SECMODE_PW_ENCRYPT) {
+ 			rc = -EIO; /* need cryptkey unless plain text */
+@@ -574,7 +574,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 	server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
+ 	server->timeAdj *= 60;
+ 	if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
+-		memcpy(ses->cryptKey, pSMBr->u.EncryptionKey,
++		memcpy(ses->server->cryptKey, pSMBr->u.EncryptionKey,
+ 		       CIFS_CRYPTO_KEY_SIZE);
+ 	} else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
+ 			&& (pSMBr->EncryptionKeyLength == 0)) {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 469c3dd..f8f1ec6 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3002,13 +3002,13 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
+ #ifdef CONFIG_CIFS_WEAK_PW_HASH
+ 		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
+ 		    (ses->server->secType == LANMAN))
+-			calc_lanman_hash(tcon->password, ses->cryptKey,
++			calc_lanman_hash(tcon->password, ses->server->cryptKey,
+ 					 ses->server->secMode &
+ 					    SECMODE_PW_ENCRYPT ? true : false,
+ 					 bcc_ptr);
+ 		else
+ #endif /* CIFS_WEAK_PW_HASH */
+-		SMBNTencrypt(tcon->password, ses->cryptKey, bcc_ptr);
++		SMBNTencrypt(tcon->password, ses->server->cryptKey, bcc_ptr);
+ 
+ 		bcc_ptr += CIFS_SESS_KEY_SIZE;
+ 		if (ses->capabilities & CAP_UNICODE) {
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index e0515a6..9c7ca2b 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -670,7 +670,7 @@ ssetup_ntlmssp_authenticate:
+ 		/* BB calculate hash with password */
+ 		/* and copy into bcc */
+ 
+-		calc_lanman_hash(ses->password, ses->cryptKey,
++		calc_lanman_hash(ses->password, ses->server->cryptKey,
+ 				 ses->server->secMode & SECMODE_PW_ENCRYPT ?
+ 					true : false, lnm_session_key);
+ 
 -- 
-1.7.3.1
+1.6.0.2
