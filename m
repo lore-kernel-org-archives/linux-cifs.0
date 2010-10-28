@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] cifs: Cleanup and thus reduce smb session structure and
  fields used during authentication
-Date: Thu, 28 Oct 2010 15:56:41 -0400
-Message-ID: <20101028155641.67996dc2@tlielax.poochiereds.net>
+Date: Thu, 28 Oct 2010 15:58:10 -0400
+Message-ID: <20101028155810.5fb3ccdf@tlielax.poochiereds.net>
 References: <1288277587-9262-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -37,7 +37,7 @@ shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 > 
 > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
+Ack, assuming that this is needed for the later NTLMSSP cleanup patch
+to merge.
 
-Nice cleanup. Looks good.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
