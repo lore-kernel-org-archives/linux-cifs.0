@@ -1,344 +1,104 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: Cleanup and thus reduce smb session structure and fields used during authentication
-Date: Thu, 28 Oct 2010 09:53:07 -0500
-Message-ID: <1288277587-9262-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/2] cifs: store pointer to master tlink in superblock
+Date: Thu, 28 Oct 2010 10:06:05 -0500
+Message-ID: <AANLkTik1mS3hH75GH6cW4Zz8FNv6P1brqvh1ggNG--xw@mail.gmail.com>
+References: <1288265619-20616-1-git-send-email-jlayton@redhat.com>
+	<1288265619-20616-2-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1288265619-20616-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Thu, Oct 28, 2010 at 6:33 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> Instead of keeping a tag on the master tlink in the tree, just keep a
+> pointer to the master in the superblock. That eliminates the need for
+> using the radix tree to look up a tagged entry.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/cifs_fs_sb.h | =A0 =A02 +-
+> =A0fs/cifs/connect.c =A0 =A0| =A0 18 +++---------------
+> =A02 files changed, 4 insertions(+), 16 deletions(-)
+>
+> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> index 525ba59..79576da 100644
+> --- a/fs/cifs/cifs_fs_sb.h
+> +++ b/fs/cifs/cifs_fs_sb.h
+> @@ -43,8 +43,8 @@
+>
+> =A0struct cifs_sb_info {
+> =A0 =A0 =A0 =A0struct radix_tree_root tlink_tree;
+> -#define CIFS_TLINK_MASTER_TAG =A0 =A0 =A0 =A0 =A00 =A0 =A0 =A0 /* is=
+ "master" (mount) tcon */
+> =A0 =A0 =A0 =A0spinlock_t tlink_tree_lock;
+> + =A0 =A0 =A0 struct tcon_link *master_tlink;
+> =A0 =A0 =A0 =A0struct nls_table *local_nls;
+> =A0 =A0 =A0 =A0unsigned int rsize;
+> =A0 =A0 =A0 =A0unsigned int wsize;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 469c3dd..364eb96 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2917,11 +2917,11 @@ remote_path_check:
+>
+> =A0 =A0 =A0 =A0spin_lock(&cifs_sb->tlink_tree_lock);
+> =A0 =A0 =A0 =A0radix_tree_insert(&cifs_sb->tlink_tree, pSesInfo->linu=
+x_uid, tlink);
+> - =A0 =A0 =A0 radix_tree_tag_set(&cifs_sb->tlink_tree, pSesInfo->linu=
+x_uid,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_TLINK_MASTE=
+R_TAG);
+> =A0 =A0 =A0 =A0spin_unlock(&cifs_sb->tlink_tree_lock);
+> =A0 =A0 =A0 =A0radix_tree_preload_end();
+>
+> + =A0 =A0 =A0 cifs_sb->master_tlink =3D tlink;
+> +
+> =A0 =A0 =A0 =A0queue_delayed_work(system_nrt_wq, &cifs_sb->prune_tlin=
+ks,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0TLINK_=
+IDLE_EXPIRE);
+>
+> @@ -3275,19 +3275,7 @@ out:
+> =A0static struct tcon_link *
+> =A0cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb)
+> =A0{
+> - =A0 =A0 =A0 struct tcon_link *tlink;
+> - =A0 =A0 =A0 unsigned int ret;
+> -
+> - =A0 =A0 =A0 spin_lock(&cifs_sb->tlink_tree_lock);
+> - =A0 =A0 =A0 ret =3D radix_tree_gang_lookup_tag(&cifs_sb->tlink_tree=
+, (void **)&tlink,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 0, 1, CIFS_TLINK_MASTER_TAG);
+> - =A0 =A0 =A0 spin_unlock(&cifs_sb->tlink_tree_lock);
+> -
+> - =A0 =A0 =A0 /* the master tcon should always be present */
+> - =A0 =A0 =A0 if (ret =3D=3D 0)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 BUG();
+> -
+> - =A0 =A0 =A0 return tlink;
+> + =A0 =A0 =A0 return cifs_sb->master_tlink;
 
+Wondering whether we need a function just to return master_tlink
+within a cifs_sb.
+Could the caller(s) of cifs_sb_master_tlink() access master_tlink direc=
+tly?
 
-Removed following fields from smb session structure
- cryptkey, ntlmv2_hash, tilen, tiblob
-and ntlmssp_auth structure is allocated dynamically only if the auth mech
-in NTLMSSP.
-
-response field within a session_key structure is used to initially store the
-target info (either plucked from type 2 challenge packet in case of NTLMSSP
-or fabricated in case of NTLMv2 without extended security) and then to store
-Message Authentication Key (mak) (session key + client response).
-
-Server challenge or cryptkey needed during a NTLMSSP authentication
-is now part of ntlmssp_auth structure which gets allocated and freed
-once authenticaiton process is done.
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsencrypt.c |   53 ++++++++++++++++++++++++++----------------------
- fs/cifs/cifsglob.h    |    9 ++-----
- fs/cifs/connect.c     |   11 ++++-----
- fs/cifs/sess.c        |   29 ++++++++++++++++----------
- 4 files changed, 55 insertions(+), 47 deletions(-)
-
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index ef95a27..f856732 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -328,15 +328,15 @@ build_avpair_blob(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 	 * two times the unicode length of a server name +
- 	 * size of a timestamp (which is 8 bytes).
- 	 */
--	ses->tilen = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
--	ses->tiblob = kzalloc(ses->tilen, GFP_KERNEL);
--	if (!ses->tiblob) {
--		ses->tilen = 0;
-+	ses->auth_key.len = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
-+	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
-+	if (!ses->auth_key.response) {
-+		ses->auth_key.len = 0;
- 		cERROR(1, "Challenge target info allocation failure");
- 		return -ENOMEM;
- 	}
- 
--	blobptr = ses->tiblob;
-+	blobptr = ses->auth_key.response;
- 	attrptr = (struct ntlmssp2_name *) blobptr;
- 
- 	attrptr->type = cpu_to_le16(NTLMSSP_AV_NB_DOMAIN_NAME);
-@@ -400,11 +400,11 @@ find_domain_name(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 	unsigned char *blobend;
- 	struct ntlmssp2_name *attrptr;
- 
--	if (!ses->tilen || !ses->tiblob)
-+	if (!ses->auth_key.len || !ses->auth_key.response)
- 		return 0;
- 
--	blobptr = ses->tiblob;
--	blobend = ses->tiblob + ses->tilen;
-+	blobptr = ses->auth_key.response;
-+	blobend = blobptr + ses->auth_key.len;
- 
- 	while (blobptr + onesize < blobend) {
- 		attrptr = (struct ntlmssp2_name *) blobptr;
-@@ -436,7 +436,7 @@ find_domain_name(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 	return 0;
- }
- 
--static int calc_ntlmv2_hash(struct cifsSesInfo *ses,
-+static int calc_ntlmv2_hash(struct cifsSesInfo *ses, char *ntlmv2_hash,
- 			    const struct nls_table *nls_cp)
- {
- 	int rc = 0;
-@@ -509,7 +509,7 @@ static int calc_ntlmv2_hash(struct cifsSesInfo *ses,
- 	}
- 
- 	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
--					ses->ntlmv2_hash);
-+					ntlmv2_hash);
- 
- calc_exit_1:
- 	kfree(user);
-@@ -518,7 +518,7 @@ calc_exit_2:
- }
- 
- static int
--CalcNTLMv2_response(const struct cifsSesInfo *ses)
-+CalcNTLMv2_response(const struct cifsSesInfo *ses, char *ntlmv2_hash)
- {
- 	int rc;
- 	unsigned int offset = CIFS_SESS_KEY_SIZE + 8;
-@@ -529,7 +529,7 @@ CalcNTLMv2_response(const struct cifsSesInfo *ses)
- 	}
- 
- 	crypto_shash_setkey(ses->server->secmech.hmacmd5,
--				ses->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
-+				ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
- 
- 	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
- 	if (rc) {
-@@ -539,7 +539,7 @@ CalcNTLMv2_response(const struct cifsSesInfo *ses)
- 
- 	if (ses->server->secType == RawNTLMSSP)
- 		memcpy(ses->auth_key.response + offset,
--			ses->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
-+			ses->ntlmssp->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
- 	else
- 		memcpy(ses->auth_key.response + offset,
- 			ses->server->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
-@@ -558,7 +558,10 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- {
- 	int rc;
- 	int baselen;
-+	unsigned int tilen;
- 	struct ntlmv2_resp *buf;
-+	char ntlmv2_hash[16];
-+	unsigned char *tiblob = NULL; /* target info blob */
- 
- 	if (ses->server->secType == RawNTLMSSP) {
- 		if (!ses->domainName) {
-@@ -572,18 +575,22 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 		rc = build_avpair_blob(ses, nls_cp);
- 		if (rc) {
- 			cERROR(1, "error %d building av pair blob", rc);
--			return rc;
-+			goto setup_ntlmv2_rsp_ret;
- 		}
- 	}
- 
- 	baselen = CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp);
--	ses->auth_key.len = baselen + ses->tilen;
--	ses->auth_key.response = kmalloc(ses->auth_key.len, GFP_KERNEL);
-+	tilen = ses->auth_key.len;
-+	tiblob = ses->auth_key.response;
-+
-+	ses->auth_key.response = kmalloc(baselen + tilen, GFP_KERNEL);
- 	if (!ses->auth_key.response) {
- 		rc = ENOMEM;
-+		ses->auth_key.len = 0;
- 		cERROR(1, "%s: Can't allocate auth blob", __func__);
- 		goto setup_ntlmv2_rsp_ret;
- 	}
-+	ses->auth_key.len += baselen;
- 
- 	buf = (struct ntlmv2_resp *)
- 			(ses->auth_key.response + CIFS_SESS_KEY_SIZE);
-@@ -593,17 +600,17 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 	get_random_bytes(&buf->client_chal, sizeof(buf->client_chal));
- 	buf->reserved2 = 0;
- 
--	memcpy(ses->auth_key.response + baselen, ses->tiblob, ses->tilen);
-+	memcpy(ses->auth_key.response + baselen, tiblob, tilen);
- 
- 	/* calculate ntlmv2_hash */
--	rc = calc_ntlmv2_hash(ses, nls_cp);
-+	rc = calc_ntlmv2_hash(ses, ntlmv2_hash, nls_cp);
- 	if (rc) {
- 		cERROR(1, "could not get v2 hash rc %d", rc);
- 		goto setup_ntlmv2_rsp_ret;
- 	}
- 
- 	/* calculate first part of the client response (CR1) */
--	rc = CalcNTLMv2_response(ses);
-+	rc = CalcNTLMv2_response(ses, ntlmv2_hash);
- 	if (rc) {
- 		cERROR(1, "Could not calculate CR1  rc: %d", rc);
- 		goto setup_ntlmv2_rsp_ret;
-@@ -611,7 +618,7 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 
- 	/* now calculate the session key for NTLMv2 */
- 	crypto_shash_setkey(ses->server->secmech.hmacmd5,
--		ses->ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
-+		ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
- 
- 	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
- 	if (rc) {
-@@ -627,9 +634,7 @@ setup_ntlmv2_rsp(struct cifsSesInfo *ses, const struct nls_table *nls_cp)
- 		ses->auth_key.response);
- 
- setup_ntlmv2_rsp_ret:
--	kfree(ses->tiblob);
--	ses->tiblob = NULL;
--	ses->tilen = 0;
-+	kfree(tiblob);
- 
- 	return rc;
- }
-@@ -657,7 +662,7 @@ calc_seckey(struct cifsSesInfo *ses)
- 					CIFS_SESS_KEY_SIZE);
- 
- 	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
--	sg_init_one(&sgout, ses->ntlmssp.ciphertext, CIFS_CPHTXT_SIZE);
-+	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
- 
- 	rc = crypto_blkcipher_encrypt(&desc, &sgout, &sgin, CIFS_CPHTXT_SIZE);
- 	if (rc) {
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b736951..f259e4d 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -119,11 +119,12 @@ struct cifs_secmech {
- 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
- };
- 
--/* per smb connection structure/fields */
-+/* per smb session structure/fields */
- struct ntlmssp_auth {
- 	__u32 client_flags; /* sent by client in type 1 ntlmsssp exchange */
- 	__u32 server_flags; /* sent by server in type 2 ntlmssp exchange */
- 	unsigned char ciphertext[CIFS_CPHTXT_SIZE]; /* sent to server */
-+	char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlmssp */
- };
- 
- struct cifs_cred {
-@@ -241,12 +242,8 @@ struct cifsSesInfo {
- 	char userName[MAX_USERNAME_SIZE + 1];
- 	char *domainName;
- 	char *password;
--	char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlmssp */
- 	struct session_key auth_key;
--	char ntlmv2_hash[16];
--	unsigned int tilen; /* length of the target info blob */
--	unsigned char *tiblob; /* target info blob in challenge response */
--	struct ntlmssp_auth ntlmssp; /* ciphertext, flags */
-+	struct ntlmssp_auth *ntlmssp; /* ciphertext, flags, server challenge */
- 	bool need_reconnect:1; /* connection reset, uid now invalid */
- };
- /* no more than one of the following three session flags may be set */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4d8004c..9eb327d 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1818,8 +1818,6 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- 	if (ses == NULL)
- 		goto get_ses_fail;
- 
--	ses->tilen = 0;
--	ses->tiblob = NULL;
- 	/* new SMB session uses our server ref */
- 	ses->server = server;
- 	if (server->addr.sockAddr6.sin6_family == AF_INET6)
-@@ -1840,10 +1838,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- 			goto get_ses_fail;
- 	}
- 	if (volume_info->domainname) {
--		int len = strlen(volume_info->domainname);
--		ses->domainName = kmalloc(len + 1, GFP_KERNEL);
--		if (ses->domainName)
--			strcpy(ses->domainName, volume_info->domainname);
-+		ses->domainName = kstrdup(volume_info->domainname, GFP_KERNEL);
-+		if (!ses->domainName)
-+			goto get_ses_fail;
- 	}
- 	ses->cred_uid = volume_info->cred_uid;
- 	ses->linux_uid = volume_info->linux_uid;
-@@ -3213,6 +3210,8 @@ int cifs_setup_session(unsigned int xid, struct cifsSesInfo *ses,
- 	kfree(ses->auth_key.response);
- 	ses->auth_key.response = NULL;
- 	ses->auth_key.len = 0;
-+	kfree(ses->ntlmssp);
-+	ses->ntlmssp = NULL;
- 
- 	return rc;
- }
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index f74c5a8..7b01d3f 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -399,23 +399,22 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 		return -EINVAL;
- 	}
- 
--	memcpy(ses->cryptkey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
-+	memcpy(ses->ntlmssp->cryptkey, pblob->Challenge, CIFS_CRYPTO_KEY_SIZE);
- 	/* BB we could decode pblob->NegotiateFlags; some may be useful */
- 	/* In particular we can examine sign flags */
- 	/* BB spec says that if AvId field of MsvAvTimestamp is populated then
- 		we must set the MIC field of the AUTHENTICATE_MESSAGE */
--	ses->ntlmssp.server_flags = le32_to_cpu(pblob->NegotiateFlags);
-+	ses->ntlmssp->server_flags = le32_to_cpu(pblob->NegotiateFlags);
- 	tioffset = cpu_to_le16(pblob->TargetInfoArray.BufferOffset);
- 	tilen = cpu_to_le16(pblob->TargetInfoArray.Length);
--	ses->tilen = tilen;
--	if (ses->tilen) {
--		ses->tiblob = kmalloc(tilen, GFP_KERNEL);
--		if (!ses->tiblob) {
-+	if (tilen) {
-+		ses->auth_key.response = kmalloc(tilen, GFP_KERNEL);
-+		if (!ses->auth_key.response) {
- 			cERROR(1, "Challenge target info allocation failure");
--			ses->tilen = 0;
- 			return -ENOMEM;
- 		}
--		memcpy(ses->tiblob,  bcc_ptr + tioffset, ses->tilen);
-+		memcpy(ses->auth_key.response, bcc_ptr + tioffset, tilen);
-+		ses->auth_key.len = tilen;
- 	}
- 
- 	return 0;
-@@ -545,9 +544,9 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
- 	sec_blob->WorkstationName.MaximumLength = 0;
- 	tmp += 2;
- 
--	if ((ses->ntlmssp.server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
-+	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
- 			!calc_seckey(ses)) {
--		memcpy(tmp, ses->ntlmssp.ciphertext, CIFS_CPHTXT_SIZE);
-+		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
- 		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
- 		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
- 		sec_blob->SessionKey.MaximumLength =
-@@ -601,8 +600,16 @@ CIFS_SessSetup(unsigned int xid, struct cifsSesInfo *ses,
- 		return -EINVAL;
- 
- 	type = ses->server->secType;
--
- 	cFYI(1, "sess setup type %d", type);
-+	if (type == RawNTLMSSP) {
-+		/* if memory allocation is successful, caller of this function
-+		 * frees it.
-+		 */
-+		ses->ntlmssp = kmalloc(sizeof(struct ntlmssp_auth), GFP_KERNEL);
-+		if (!ses->ntlmssp)
-+			return -ENOMEM;
-+	}
-+
- ssetup_ntlmssp_authenticate:
- 	if (phase == NtLmChallenge)
- 		phase = NtLmAuthenticate; /* if ntlmssp, now final phase */
--- 
-1.6.0.2
+> =A0}
+>
+> =A0struct cifsTconInfo *
+> --
+> 1.7.2.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
