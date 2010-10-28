@@ -1,167 +1,179 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] NTLM auth and sign - Use appropriate server challenge
-Date: Thu, 28 Oct 2010 10:10:51 -0500
-Message-ID: <AANLkTi=UdFFv3xO_wPGyDH+g08Acqy+BPn7uqMrPhthq@mail.gmail.com>
-References: <1288210836-12380-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101027165619.512b50e8@tlielax.poochiereds.net>
-	<AANLkTikx7cPwtbHP=pe4nYqS2EGz-CMa2wNPjZoqgLFg@mail.gmail.com>
-	<AANLkTikseELkqD2_ztH0KF5qQL_95W+T+xq+Pe5Sbj-3@mail.gmail.com>
-	<20101027193854.78c1b500@tlielax.poochiereds.net>
+Subject: Re: [PATCH] cifs: remove "legacy" parm from CIFSSMBQPathInfo
+Date: Thu, 28 Oct 2010 10:34:47 -0500
+Message-ID: <AANLkTi=Cc1RYZHGEiZ13cCzNkqJzytjJRZ1vGM60vZH7@mail.gmail.com>
+References: <4CC921E7.9020403@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101027193854.78c1b500-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <4CC921E7.9020403-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Oct 27, 2010 at 6:38 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> On Wed, 27 Oct 2010 16:20:48 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Wed, Oct 27, 2010 at 4:18 PM, Shirish Pargaonkar
->> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> > On Wed, Oct 27, 2010 at 3:56 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =
+On Thu, Oct 28, 2010 at 2:10 AM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> =
 wrote:
->> >> On Wed, 27 Oct 2010 15:20:36 -0500
->> >> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->> >>
->> >>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >>>
->> >>>
->> >>> Need to have cryptkey or server challenge in smb connection
->> >>> (struct TCP_Server_Info) for ntlm and ntlmv2 auth types for whic=
-h
->> >>> cryptkey (Encryption Key) is supplied just once in Negotiate Pro=
-tocol
->> >>> response during an smb connection setup for all the smb sessions=
- over
->> >>> that smb connection.
->> >>>
->> >>> For ntlmssp, cryptkey or server challenge is provided for every
->> >>> smb session in type 2 packet of ntlmssp negotiation, the cryptke=
-y
->> >>> provided during Negotiation Protocol response before smb connect=
-ion
->> >>> does not count.
->> >>>
->> >>> Rename cryptKey to cryptkey and related changes.
->> >>>
->> >>>
->> >>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >>> ---
->> >>> =A0fs/cifs/cifsencrypt.c | =A0 10 +++++++---
->> >>> =A0fs/cifs/cifsglob.h =A0 =A0| =A0 =A03 ++-
->> >>> =A0fs/cifs/cifssmb.c =A0 =A0 | =A0 =A04 ++--
->> >>> =A0fs/cifs/connect.c =A0 =A0 | =A0 =A04 ++--
->> >>> =A0fs/cifs/sess.c =A0 =A0 =A0 =A0| =A0 12 ++++++++----
->> >>> =A05 files changed, 21 insertions(+), 12 deletions(-)
->> >>>
->> >>
->> >> [...]
->> >>
->> >>>
->> >>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> >>> index 67d6a22..b736951 100644
->> >>> --- a/fs/cifs/cifsglob.h
->> >>> +++ b/fs/cifs/cifsglob.h
->> >>> @@ -196,6 +196,7 @@ struct TCP_Server_Info {
->> >>> =A0 =A0 =A0 int capabilities; /* allow selective disabling of ca=
-ps by smb sess */
->> >>> =A0 =A0 =A0 int timeAdj; =A0/* Adjust for difference in server t=
-ime zone in sec */
->> >>> =A0 =A0 =A0 __u16 CurrentMid; =A0 =A0 =A0 =A0 /* multiplex id - =
-rotating counter */
->> >>> + =A0 =A0 char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, =
-ntlmv2 etc */
->> >>> =A0 =A0 =A0 /* 16th byte of RFC1001 workstation name is always n=
-ull */
->> >>> =A0 =A0 =A0 char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_=
-NULL];
->> >>> =A0 =A0 =A0 __u32 sequence_number; /* needed for CIFS PDU signat=
-ure */
->> >>> @@ -240,7 +241,7 @@ struct cifsSesInfo {
->> >>> =A0 =A0 =A0 char userName[MAX_USERNAME_SIZE + 1];
->> >>> =A0 =A0 =A0 char *domainName;
->> >>> =A0 =A0 =A0 char *password;
->> >>> - =A0 =A0 char cryptKey[CIFS_CRYPTO_KEY_SIZE];
->> >>> + =A0 =A0 char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlmss=
-p */
->> >>
->> >> I'm trying to understand why we need ses->cryptkey at all. It hol=
-ds the
->> >> cryptkey provided by the server only if we're using ntlmssp. It's
->> >> only used once, and essentially it just holds the key until we ha=
-ve a
->> >> auth_key.response field that we can stuff this in. Is that correc=
-t? If
->> >> so, wouldn't it make more sense to just allocate the auth_key.res=
-ponse
->> >> field earlier and put this directly in there?
->> >>
->> >> --
->> >> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> >>
->> >
->> > Jeff, we could do that. =A0We then have to allocate .response in f=
-unction
->> > decode_ntlmssp_challenge(). =A0We have to worry about freeing it i=
-f there
->> > are any errors between decode_ntlmssp_challenge() and setup_ntlmv2=
-_response().
->> > In function setup_ntlmv2_rsp(), we have to allocate .response only=
- if called
->> > in case of ntlmv2 without extended security, so an extra if statem=
-ent in there.
->> >
->> > I think current code is simpler for the price of 16 bytes of crypt=
-key storage?
->> >
->>
->> Not 16, 8 bytes. =A0 CIFS_CRYPTO_KEY_SIZE is 8 bytes, I thought it w=
-as 16 bytes.
+> as all the callers are setting it to 0 anyway.
 >
-> I don't think that's simpler. I'm becoming concerned about the
-> proliferation of fields in cifsSesInfo. All of these are recent
-> additions by your patches to fix NTLMSSP support.
+> I stumbled upon this code when I was looking at the strange hardlink
+> behavior reported in the mailing list. But it seems this patch was
+> originally posted by Jeff Layton on Feb:
+> =A0http://lists.samba.org/archive/linux-cifs-client/2010-February/005=
+557.html
 >
-> =A0 =A0 =A0 =A0char cryptKey[CIFS_CRYPTO_KEY_SIZE];
-> =A0 =A0 =A0 =A0struct session_key auth_key;
-> =A0 =A0 =A0 =A0char ntlmv2_hash[16];
-> =A0 =A0 =A0 =A0unsigned int tilen; /* length of the target info blob =
-*/
-> =A0 =A0 =A0 =A0unsigned char *tiblob; /* target info blob in challeng=
-e response */
-> =A0 =A0 =A0 =A0struct ntlmssp_auth ntlmssp; /* ciphertext, flags */
+> I didn't see any discussions, ACK/NACK on this patch.
 >
-> ...it's not so much the space that they take up, even though that's n=
-ot
-> exactly trivial. A lot of these fields have no use at all after
-> authentication is done. There's a lot of memcpy'ing going on here too
-> which is a red flag.
 >
-> It's not clear to me why you need so many fields for this. It would
-> seem to me that it would be a good idea to think about each of these
-> fields and determine which ones need to stick around after
-> authentication is done (i.e. for signing), and store the rest of them
-> in a structure that can be freed after authentication is done.
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> ---
+> =A0fs/cifs/cifsproto.h | =A0 =A01 -
+> =A0fs/cifs/cifssmb.c =A0 | =A0 22 +++-------------------
+> =A0fs/cifs/connect.c =A0 | =A0 =A02 +-
+> =A0fs/cifs/inode.c =A0 =A0 | =A0 =A01 -
+> =A04 files changed, 4 insertions(+), 22 deletions(-)
 >
-> My main concern here is debugging this later. One of the main
-> techniques I use when tracking down bugs is to follow the lifecycle o=
-f
-> the data. Whenever you add a new field, it makes it a lot more
-> difficult for myself and others to follow the code.
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index edb6d90..fa7e8d1 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -167,7 +167,6 @@ extern int CIFSSMBQFileInfo(const int xid, struct=
+ cifsTconInfo *tcon,
+> =A0extern int CIFSSMBQPathInfo(const int xid, struct cifsTconInfo *tc=
+on,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const unsigned char *s=
+earchName,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0FILE_ALL_INFO *findDat=
+a,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int legacy /* whether t=
+o use old info level */,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const struct nls_table=
+ *nls_codepage, int remap);
+> =A0extern int SMBQueryInformation(const int xid, struct cifsTconInfo =
+*tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const unsigned char *s=
+earchName,
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index e98f1f3..392c01b 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -3356,7 +3356,6 @@ int
+> =A0CIFSSMBQPathInfo(const int xid, struct cifsTconInfo *tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const unsigned char *searchName,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_ALL_INFO *pFindData,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int legacy /* old style infolevel */=
+,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const struct nls_table *nls_codepage,=
+ int remap)
+> =A0{
+> =A0/* level 263 SMB_QUERY_FILE_ALL_INFO */
+> @@ -3406,10 +3405,7 @@ QPathInfoRetry:
+> =A0 =A0 =A0 =A0byte_count =3D params + 1 /* pad */ ;
+> =A0 =A0 =A0 =A0pSMB->TotalParameterCount =3D cpu_to_le16(params);
+> =A0 =A0 =A0 =A0pSMB->ParameterCount =3D pSMB->TotalParameterCount;
+> - =A0 =A0 =A0 if (legacy)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->InformationLevel =3D cpu_to_le16(=
+SMB_INFO_STANDARD);
+> - =A0 =A0 =A0 else
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->InformationLevel =3D cpu_to_le16(=
+SMB_QUERY_FILE_ALL_INFO);
+> + =A0 =A0 =A0 pSMB->InformationLevel =3D cpu_to_le16(SMB_QUERY_FILE_A=
+LL_INFO);
+> =A0 =A0 =A0 =A0pSMB->Reserved4 =3D 0;
+> =A0 =A0 =A0 =A0pSMB->hdr.smb_buf_length +=3D byte_count;
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D cpu_to_le16(byte_count);
+> @@ -3423,26 +3419,14 @@ QPathInfoRetry:
 >
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc) /* BB add auto retry on EOPNOT=
+SUPP? */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (!legacy && (pSMBr->ByteCount <=
+ 40))
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (pSMBr->ByteCount < 40)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO; =A0 =A0 =A0=
+/* bad smb */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (legacy && (pSMBr->ByteCount < =
+24))
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO; =A0/* 24 o=
+r 26 expected but we do not read
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 last field */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else if (pFindData) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int size;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u16 data_offset =3D =
+le16_to_cpu(pSMBr->t2.DataOffset);
+>
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* On legacy responses =
+we do not read the last field,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 EAsize, fortunately sin=
+ce it varies by subdialect and
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 also note it differs on=
+ Set vs. Get, ie two bytes or 4
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bytes depending but we =
+don't care here */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (legacy)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 size =3D=
+ sizeof(FILE_INFO_STANDARD);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 size =3D=
+ sizeof(FILE_ALL_INFO);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0memcpy((char *) pFindD=
+ata,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (char *) =
+&pSMBr->hdr.Protocol +
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0data_off=
+set, size);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0data_off=
+set, sizeof(FILE_ALL_INFO));
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -ENOMEM;
+> =A0 =A0 =A0 =A0}
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 469c3dd..b44bfd5 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2629,7 +2629,7 @@ is_path_accessible(int xid, struct cifsTconInfo=
+ *tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOMEM;
+>
+> =A0 =A0 =A0 =A0rc =3D CIFSSMBQPathInfo(xid, tcon, full_path, pfile_in=
+fo,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 0 /* not le=
+gacy */, cifs_sb->local_nls,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->lo=
+cal_nls,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->m=
+nt_cifs_flags &
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_M=
+OUNT_MAP_SPECIAL_CHR);
+> =A0 =A0 =A0 =A0kfree(pfile_info);
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 39869c3..2448ad1 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -615,7 +615,6 @@ int cifs_get_inode_info(struct inode **pinode,
+>
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* could do find first instead but thi=
+s returns more info */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D CIFSSMBQPathInfo(xid, pTcon, fu=
+ll_path, pfindData,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 0 /* not le=
+gacy */,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->l=
+ocal_nls, cifs_sb->mnt_cifs_flags &
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_M=
+OUNT_MAP_SPECIAL_CHR);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* BB optimize code so we do not make =
+the above call
 > --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-Posted a follow up patch that addresses the concerns.  If that patch
-is agreeable in
-some or no additional variations, it should follow this patch if this
-patch is good enough
-because the functionality in this patch is needed for multiple smb
-sessions per smb connection.
+Looks correct to me.
