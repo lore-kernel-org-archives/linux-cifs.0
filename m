@@ -1,19 +1,23 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: remove "legacy" parm from CIFSSMBQPathInfo
-Date: Thu, 28 Oct 2010 10:34:47 -0500
-Message-ID: <AANLkTi=Cc1RYZHGEiZ13cCzNkqJzytjJRZ1vGM60vZH7@mail.gmail.com>
+Date: Thu, 28 Oct 2010 10:42:57 -0500
+Message-ID: <AANLkTikpemR3PVzXSimbu-b1zn4QwQj+0VAEM9xwgYqt@mail.gmail.com>
 References: <4CC921E7.9020403@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <4CC921E7.9020403-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+What is the code flow then on Windows9x, OS/2 or in the EOPNOSUPP
+case?  Seems strange that we don't retry with legacy or in the case
+where the dialect (or previous call) shows that we don't support the
+infolevel.
 
 On Thu, Oct 28, 2010 at 2:10 AM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> =
 wrote:
@@ -169,11 +173,11 @@ ocal_nls, cifs_sb->mnt_cifs_flags &
 OUNT_MAP_SPECIAL_CHR);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* BB optimize code so we do not make =
 the above call
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-Looks correct to me.
+
+
+--=20
+Thanks,
+
+Steve
