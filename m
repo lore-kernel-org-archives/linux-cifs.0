@@ -1,83 +1,97 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/2] cifs: store pointer to master tlink in superblock (try #2)
-Date: Thu, 28 Oct 2010 13:33:38 -0400
-Message-ID: <1288287218-25100-1-git-send-email-jlayton@redhat.com>
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: remove "legacy" parm from CIFSSMBQPathInfo
+Date: Thu, 28 Oct 2010 12:47:22 -0500
+Message-ID: <AANLkTimoCvWFbYj+TfCFA-nqd6H=8DTN_e-dw8Hoo_7g@mail.gmail.com>
+References: <4CC921E7.9020403@suse.de>
+	<AANLkTikpemR3PVzXSimbu-b1zn4QwQj+0VAEM9xwgYqt@mail.gmail.com>
+	<4CC9A2AB.8090208@suse.de>
+	<AANLkTinOsN05m0qM56poq2Q5d6Jss6b3ZnpEXc9Z_4cV@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTinOsN05m0qM56poq2Q5d6Jss6b3ZnpEXc9Z_4cV-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the second version of this patch, the only difference between
-it and the first one is that this explicitly makes cifs_sb_master_tlink
-a static inline.
+On Thu, Oct 28, 2010 at 11:41 AM, Shirish Pargaonkar
+<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On Thu, Oct 28, 2010 at 11:19 AM, Suresh Jayaraman <sjayaraman@suse.d=
+e> wrote:
+>> On 10/28/2010 09:12 PM, Steve French wrote:
+>>> What is the code flow then on Windows9x, OS/2 or in the EOPNOSUPP
+>>> case? =A0Seems strange that we don't retry with legacy or in the ca=
+se
+>>> where the dialect (or previous call) shows that we don't support th=
+e
+>>> infolevel.
+>>>
+>>
+>> If CIFSSMBOpen fails, the callers seem to be fall back to legacy ope=
+n using
+>> SMBLegacyOpen().
+>>
+>> cifs_open()
+>>
+>> =A0 =A0 =A0 ...
+>> =A0 =A0 =A0 =A0if (tcon->ses->capabilities & CAP_NT_SMBS)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D CIFSSMBOpen(xid, tcon, full_pa=
+th, disposition,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 desiredAccess, CREAT=
+E_NOT_DIR, &netfid, &oplock, buf,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->local_nls, =
+cifs_sb->mnt_cifs_flags
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 & CI=
+=46S_MOUNT_MAP_SPECIAL_CHR);
+>> =A0 =A0 =A0 =A0else
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO; /* no NT SMB support fal=
+l into legacy open below */
+>>
+>> =A0 =A0 =A0 =A0if (rc =3D=3D -EIO) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Old server, try legacy style OpenX=
+ */
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D SMBLegacyOpen(xid, tcon, full_=
+path, disposition,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0desiredAccess, CREATE=
+_NOT_DIR, &netfid, &oplock, buf,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->local_nls, c=
+ifs_sb->mnt_cifs_flags
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0& CIF=
+S_MOUNT_MAP_SPECIAL_CHR);
+>> =A0 =A0 =A0 =A0}
+>>
+>>
+>>
+>> --
+>> Suresh Jayaraman
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
+" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>>
+>
+> This is a general comment but should cifs client be using (server)
+> dialect specific set of smb commands
+> and those smb commands specific info levels instead of sending a
+> command and trying downlevel / legacy
+> if that command failed with "operation not supported"?
 
-Instead of keeping a tag on the master tlink in the tree, just keep a
-pointer to the master in the superblock. That eliminates the need for
-using the radix tree to look up a tagged entry.
+We can do the former for smb2, but not for cifs unfortunately.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifs_fs_sb.h |    2 +-
- fs/cifs/connect.c    |   20 ++++----------------
- 2 files changed, 5 insertions(+), 17 deletions(-)
+=46or cifs there are lots of cases where a dialect doesn't support an
+infolevel it should (or even viceversa).   Part of this difficulty
+mapping levels to dialects is presumably due to lack of authoritative
+documentation for cifs when some of the server developers were doing
+initial cifs development years ago - even so there are cases where we
+can make assumptions (based on feedback from 7 years of test events)
+but it depends on the operation.
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 525ba59..79576da 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -43,8 +43,8 @@
- 
- struct cifs_sb_info {
- 	struct radix_tree_root tlink_tree;
--#define CIFS_TLINK_MASTER_TAG		0	/* is "master" (mount) tcon */
- 	spinlock_t tlink_tree_lock;
-+	struct tcon_link *master_tlink;
- 	struct nls_table *local_nls;
- 	unsigned int rsize;
- 	unsigned int wsize;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 469c3dd..cd644ce 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2917,11 +2917,11 @@ remote_path_check:
- 
- 	spin_lock(&cifs_sb->tlink_tree_lock);
- 	radix_tree_insert(&cifs_sb->tlink_tree, pSesInfo->linux_uid, tlink);
--	radix_tree_tag_set(&cifs_sb->tlink_tree, pSesInfo->linux_uid,
--			   CIFS_TLINK_MASTER_TAG);
- 	spin_unlock(&cifs_sb->tlink_tree_lock);
- 	radix_tree_preload_end();
- 
-+	cifs_sb->master_tlink = tlink;
-+
- 	queue_delayed_work(system_nrt_wq, &cifs_sb->prune_tlinks,
- 				TLINK_IDLE_EXPIRE);
- 
-@@ -3272,22 +3272,10 @@ out:
- 	return tcon;
- }
- 
--static struct tcon_link *
-+static inline struct tcon_link *
- cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb)
- {
--	struct tcon_link *tlink;
--	unsigned int ret;
--
--	spin_lock(&cifs_sb->tlink_tree_lock);
--	ret = radix_tree_gang_lookup_tag(&cifs_sb->tlink_tree, (void **)&tlink,
--					0, 1, CIFS_TLINK_MASTER_TAG);
--	spin_unlock(&cifs_sb->tlink_tree_lock);
--
--	/* the master tcon should always be present */
--	if (ret == 0)
--		BUG();
--
--	return tlink;
-+	return cifs_sb->master_tlink;
- }
- 
- struct cifsTconInfo *
--- 
-1.7.2.3
+--=20
+Thanks,
+
+Steve
