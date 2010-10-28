@@ -1,122 +1,133 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH] cifs: remove "legacy" parm from CIFSSMBQPathInfo
-Date: Thu, 28 Oct 2010 12:40:31 +0530
-Message-ID: <4CC921E7.9020403@suse.de>
+Subject: Re: Strange hardlink behavior with CIFS
+Date: Thu, 28 Oct 2010 16:38:28 +0530
+Message-ID: <4CC959AC.10301@suse.de>
+References: <1287428685.16450.282.camel@calx>	<4CBD6843.3060702@suse.de>	<1288200686.3764.55.camel@calx> <20101027163230.28591971@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20101027163230.28591971-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-as all the callers are setting it to 0 anyway.
+On 10/28/2010 02:02 AM, Jeff Layton wrote:
+> On Wed, 27 Oct 2010 12:31:26 -0500
+> Matt Mackall <mpm-VDJrAJ4Gl5ZBDgjK7y7TUQ@public.gmane.org> wrote:
+> 
+>> On Tue, 2010-10-19 at 15:13 +0530, Suresh Jayaraman wrote:
+>>> On 10/19/2010 12:34 AM, Matt Mackall wrote:
+>>>> With Linux 2.6.32-35 and either Windows or Samba in nounix mode,
+>>>> hardlink counts can mysteriously disappear:
+>>>>
+>>>> - create hardlink pair foo,bar
+>>>> - stat foo -> nlink = 2
+>>>> - open foo
+>>>> - stat foo -> nlink = 1
+>>>> - close
+>>>> - wait or sync
+>>>> - ls -l -> nlink = 2
+>>>>
+>>>> Original report is here:
+>>>>
+>>>> http://mercurial.selenic.com/bts/issue1866
+>>>>
+>>>
+>>> A quick test on 2.6.36-rc4 kernel reveals that the problem is no longer
+>>> reproducible. Could you try a more recent kernel and see whether the
+>>> problem is reproducible?
+>>
+>> Test continues to fail with 2.6.36.
+>>
+>> # uname -a
+>> Linux calx 2.6.36 #71 SMP Tue Oct 26 02:23:34 CDT 2010 x86_64 GNU/Linux
+>> # mount -o nounix //localhost/stuff cifs
+>>            ^^^^^^
+>> # cd cifs
+>> # touch foo
+>> # ln foo bar
+>> # ./h
+>> file: foo nlinks 2
+>> file: foo nlinks 1
+>> file: foo nlinks 1
+>>
+>> # cat h.c
+>> #include <sys/types.h>
+>> #include <sys/stat.h>
+>> #include <unistd.h>
+>> #include <fcntl.h>
+>> #include <stdio.h>
+>>
+>> #define FPATH "foo"
+>>
+>> int main(void)
+>> {
+>> 	int rc, fh;
+>> 	struct stat st;
+>>
+>> 	rc = lstat(FPATH, &st);
+>> 	printf("file: %s nlinks %d\n", FPATH, st.st_nlink);
+>>
+>> 	fh = open(FPATH, 0, O_RDONLY);
+>>
+>> 	rc = lstat(FPATH, &st);
+>> 	printf("file: %s nlinks %d\n", FPATH, st.st_nlink);
+>>
+>> 	close(fh);
+>>
+>> 	rc = lstat(FPATH, &st);
+>> 	printf("file: %s nlinks %d\n", FPATH, st.st_nlink);
+>>
+>> 	return 0;
+>> }
+>>
+>>
+>>
+>>
+> 
+> Ok, I can reproduce this too. The problem is this nastiness in CIFSSMBOpen:
+> 
+>         if (rc) {
+>                 cFYI(1, "Error in Open = %d", rc);
+>         } else {
+>                 *pOplock = pSMBr->OplockLevel; /* 1 byte no need to le_to_cpu */
+>                 *netfid = pSMBr->Fid;   /* cifs fid stays in le */
+>                 /* Let caller know file was created so we can set the mode. */
+>                 /* Do we care about the CreateAction in any other cases? */
+>                 if (cpu_to_le32(FILE_CREATE) == pSMBr->CreateAction)
+>                         *pOplock |= CIFS_CREATE_ACTION;
+>                 if (pfile_info) {
+>                         memcpy((char *)pfile_info, (char *)&pSMBr->CreationTime,
+>                                 36 /* CreationTime to Attributes */);
+>                         /* the file_info buf is endian converted by caller */
+>                         pfile_info->AllocationSize = pSMBr->AllocationSize;
+>                         pfile_info->EndOfFile = pSMBr->EndOfFile;
+>                         pfile_info->NumberOfLinks = cpu_to_le32(1);
+>                         pfile_info->DeletePending = 0;
+>                 }
+>         }
+> 
+> In particular, the NumberOfLinks being set to 1 there. That probably
+> just needs to go. I'll look over it when I have time.
+> 
 
-I stumbled upon this code when I was looking at the strange hardlink
-behavior reported in the mailing list. But it seems this patch was
-originally posted by Jeff Layton on Feb:
-  http://lists.samba.org/archive/linux-cifs-client/2010-February/005557.html
+Looks like bogus value is being set temporarily here. The only call I
+see that gets us nlink is SMBQpathInfo.
 
-I didn't see any discussions, ACK/NACK on this patch.
+One way of addressing this is to pass NULL FILE_ALL_INFO buffer to
+CIFSSMBOpen from cifs_create()/cifs_open()/cifs_mknod() so that
+cifs_get_file_info will call SMBQPathInfo to populate FILE_ALL_INFO, but
+it means additional QPATHINFO call. Another way is to get nlink value
+from CIFSSMBQPathInfo response by adding nlink to cifsInodeInfo struct..
+Neither sounds quite convincing to me..
+
+Any thoughts, other possible approaches?
 
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/cifsproto.h |    1 -
- fs/cifs/cifssmb.c   |   22 +++-------------------
- fs/cifs/connect.c   |    2 +-
- fs/cifs/inode.c     |    1 -
- 4 files changed, 4 insertions(+), 22 deletions(-)
+Thanks,
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index edb6d90..fa7e8d1 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -167,7 +167,6 @@ extern int CIFSSMBQFileInfo(const int xid, struct cifsTconInfo *tcon,
- extern int CIFSSMBQPathInfo(const int xid, struct cifsTconInfo *tcon,
- 			const unsigned char *searchName,
- 			FILE_ALL_INFO *findData,
--			int legacy /* whether to use old info level */,
- 			const struct nls_table *nls_codepage, int remap);
- extern int SMBQueryInformation(const int xid, struct cifsTconInfo *tcon,
- 			const unsigned char *searchName,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index e98f1f3..392c01b 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -3356,7 +3356,6 @@ int
- CIFSSMBQPathInfo(const int xid, struct cifsTconInfo *tcon,
- 		 const unsigned char *searchName,
- 		 FILE_ALL_INFO *pFindData,
--		 int legacy /* old style infolevel */,
- 		 const struct nls_table *nls_codepage, int remap)
- {
- /* level 263 SMB_QUERY_FILE_ALL_INFO */
-@@ -3406,10 +3405,7 @@ QPathInfoRetry:
- 	byte_count = params + 1 /* pad */ ;
- 	pSMB->TotalParameterCount = cpu_to_le16(params);
- 	pSMB->ParameterCount = pSMB->TotalParameterCount;
--	if (legacy)
--		pSMB->InformationLevel = cpu_to_le16(SMB_INFO_STANDARD);
--	else
--		pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_FILE_ALL_INFO);
-+	pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_FILE_ALL_INFO);
- 	pSMB->Reserved4 = 0;
- 	pSMB->hdr.smb_buf_length += byte_count;
- 	pSMB->ByteCount = cpu_to_le16(byte_count);
-@@ -3423,26 +3419,14 @@ QPathInfoRetry:
- 
- 		if (rc) /* BB add auto retry on EOPNOTSUPP? */
- 			rc = -EIO;
--		else if (!legacy && (pSMBr->ByteCount < 40))
-+		else if (pSMBr->ByteCount < 40)
- 			rc = -EIO;	/* bad smb */
--		else if (legacy && (pSMBr->ByteCount < 24))
--			rc = -EIO;  /* 24 or 26 expected but we do not read
--					last field */
- 		else if (pFindData) {
--			int size;
- 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
- 
--			/* On legacy responses we do not read the last field,
--			EAsize, fortunately since it varies by subdialect and
--			also note it differs on Set vs. Get, ie two bytes or 4
--			bytes depending but we don't care here */
--			if (legacy)
--				size = sizeof(FILE_INFO_STANDARD);
--			else
--				size = sizeof(FILE_ALL_INFO);
- 			memcpy((char *) pFindData,
- 			       (char *) &pSMBr->hdr.Protocol +
--			       data_offset, size);
-+			       data_offset, sizeof(FILE_ALL_INFO));
- 		} else
- 		    rc = -ENOMEM;
- 	}
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 469c3dd..b44bfd5 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2629,7 +2629,7 @@ is_path_accessible(int xid, struct cifsTconInfo *tcon,
- 		return -ENOMEM;
- 
- 	rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
--			      0 /* not legacy */, cifs_sb->local_nls,
-+			      cifs_sb->local_nls,
- 			      cifs_sb->mnt_cifs_flags &
- 				CIFS_MOUNT_MAP_SPECIAL_CHR);
- 	kfree(pfile_info);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 39869c3..2448ad1 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -615,7 +615,6 @@ int cifs_get_inode_info(struct inode **pinode,
- 
- 		/* could do find first instead but this returns more info */
- 		rc = CIFSSMBQPathInfo(xid, pTcon, full_path, pfindData,
--			      0 /* not legacy */,
- 			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 				CIFS_MOUNT_MAP_SPECIAL_CHR);
- 		/* BB optimize code so we do not make the above call
+
+-- 
+Suresh Jayaraman
