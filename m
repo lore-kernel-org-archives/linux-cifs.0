@@ -1,121 +1,83 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/2] cifs: store pointer to master tlink in superblock
-Date: Thu, 28 Oct 2010 11:54:57 -0500
-Message-ID: <AANLkTinTRxf8upTLABH0HHtVStkcL=8MJPWfr73UCE7P@mail.gmail.com>
-References: <1288265619-20616-1-git-send-email-jlayton@redhat.com>
-	<1288265619-20616-2-git-send-email-jlayton@redhat.com>
-	<AANLkTik1mS3hH75GH6cW4Zz8FNv6P1brqvh1ggNG--xw@mail.gmail.com>
-	<20101028122325.31997c58@tlielax.poochiereds.net>
-	<20101028125007.734e0b27@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 1/2] cifs: store pointer to master tlink in superblock (try #2)
+Date: Thu, 28 Oct 2010 13:33:38 -0400
+Message-ID: <1288287218-25100-1-git-send-email-jlayton@redhat.com>
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101028125007.734e0b27-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Oct 28, 2010 at 11:50 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrot=
-e:
-> On Thu, 28 Oct 2010 12:23:25 -0400
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->
->> On Thu, 28 Oct 2010 10:06:05 -0500
->> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>
->> > On Thu, Oct 28, 2010 at 6:33 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =
-wrote:
->> > > Instead of keeping a tag on the master tlink in the tree, just k=
-eep a
->> > > pointer to the master in the superblock. That eliminates the nee=
-d for
->> > > using the radix tree to look up a tagged entry.
->> > >
->> > > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> > > ---
->> > > =A0fs/cifs/cifs_fs_sb.h | =A0 =A02 +-
->> > > =A0fs/cifs/connect.c =A0 =A0| =A0 18 +++---------------
->> > > =A02 files changed, 4 insertions(+), 16 deletions(-)
->> > >
->> > > diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
->> > > index 525ba59..79576da 100644
->> > > --- a/fs/cifs/cifs_fs_sb.h
->> > > +++ b/fs/cifs/cifs_fs_sb.h
->> > > @@ -43,8 +43,8 @@
->> > >
->> > > =A0struct cifs_sb_info {
->> > > =A0 =A0 =A0 =A0struct radix_tree_root tlink_tree;
->> > > -#define CIFS_TLINK_MASTER_TAG =A0 =A0 =A0 =A0 =A00 =A0 =A0 =A0 =
-/* is "master" (mount) tcon */
->> > > =A0 =A0 =A0 =A0spinlock_t tlink_tree_lock;
->> > > + =A0 =A0 =A0 struct tcon_link *master_tlink;
->> > > =A0 =A0 =A0 =A0struct nls_table *local_nls;
->> > > =A0 =A0 =A0 =A0unsigned int rsize;
->> > > =A0 =A0 =A0 =A0unsigned int wsize;
->> > > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> > > index 469c3dd..364eb96 100644
->> > > --- a/fs/cifs/connect.c
->> > > +++ b/fs/cifs/connect.c
->> > > @@ -2917,11 +2917,11 @@ remote_path_check:
->> > >
->> > > =A0 =A0 =A0 =A0spin_lock(&cifs_sb->tlink_tree_lock);
->> > > =A0 =A0 =A0 =A0radix_tree_insert(&cifs_sb->tlink_tree, pSesInfo-=
->linux_uid, tlink);
->> > > - =A0 =A0 =A0 radix_tree_tag_set(&cifs_sb->tlink_tree, pSesInfo-=
->linux_uid,
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_TLINK_=
-MASTER_TAG);
->> > > =A0 =A0 =A0 =A0spin_unlock(&cifs_sb->tlink_tree_lock);
->> > > =A0 =A0 =A0 =A0radix_tree_preload_end();
->> > >
->> > > + =A0 =A0 =A0 cifs_sb->master_tlink =3D tlink;
->> > > +
->> > > =A0 =A0 =A0 =A0queue_delayed_work(system_nrt_wq, &cifs_sb->prune=
-_tlinks,
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0T=
-LINK_IDLE_EXPIRE);
->> > >
->> > > @@ -3275,19 +3275,7 @@ out:
->> > > =A0static struct tcon_link *
->> > > =A0cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb)
->> > > =A0{
->> > > - =A0 =A0 =A0 struct tcon_link *tlink;
->> > > - =A0 =A0 =A0 unsigned int ret;
->> > > -
->> > > - =A0 =A0 =A0 spin_lock(&cifs_sb->tlink_tree_lock);
->> > > - =A0 =A0 =A0 ret =3D radix_tree_gang_lookup_tag(&cifs_sb->tlink=
-_tree, (void **)&tlink,
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 0, 1, CIFS_TLINK_MASTER_TAG);
->> > > - =A0 =A0 =A0 spin_unlock(&cifs_sb->tlink_tree_lock);
->> > > -
->> > > - =A0 =A0 =A0 /* the master tcon should always be present */
->> > > - =A0 =A0 =A0 if (ret =3D=3D 0)
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 BUG();
->> > > -
->> > > - =A0 =A0 =A0 return tlink;
->> > > + =A0 =A0 =A0 return cifs_sb->master_tlink;
->> >
->> > Wondering whether we need a function just to return master_tlink
->> > within a cifs_sb.
->> > Could the caller(s) of cifs_sb_master_tlink() access master_tlink =
-directly?
->> >
->>
->> Sure, but accessor functions are generally a good thing. It insulate=
-s
->> the callers from needing to know anything about the underlying data
->> structure.
->>
->
-> What may make some sense however is turning this function into a stat=
-ic
-> inline or macro. Thoughts?
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
+This is the second version of this patch, the only difference between
+it and the first one is that this explicitly makes cifs_sb_master_tlink
+a static inline.
 
-I think inline function would be my preferred choice.
+Instead of keeping a tag on the master tlink in the tree, just keep a
+pointer to the master in the superblock. That eliminates the need for
+using the radix tree to look up a tagged entry.
+
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_fs_sb.h |    2 +-
+ fs/cifs/connect.c    |   20 ++++----------------
+ 2 files changed, 5 insertions(+), 17 deletions(-)
+
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 525ba59..79576da 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -43,8 +43,8 @@
+ 
+ struct cifs_sb_info {
+ 	struct radix_tree_root tlink_tree;
+-#define CIFS_TLINK_MASTER_TAG		0	/* is "master" (mount) tcon */
+ 	spinlock_t tlink_tree_lock;
++	struct tcon_link *master_tlink;
+ 	struct nls_table *local_nls;
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 469c3dd..cd644ce 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2917,11 +2917,11 @@ remote_path_check:
+ 
+ 	spin_lock(&cifs_sb->tlink_tree_lock);
+ 	radix_tree_insert(&cifs_sb->tlink_tree, pSesInfo->linux_uid, tlink);
+-	radix_tree_tag_set(&cifs_sb->tlink_tree, pSesInfo->linux_uid,
+-			   CIFS_TLINK_MASTER_TAG);
+ 	spin_unlock(&cifs_sb->tlink_tree_lock);
+ 	radix_tree_preload_end();
+ 
++	cifs_sb->master_tlink = tlink;
++
+ 	queue_delayed_work(system_nrt_wq, &cifs_sb->prune_tlinks,
+ 				TLINK_IDLE_EXPIRE);
+ 
+@@ -3272,22 +3272,10 @@ out:
+ 	return tcon;
+ }
+ 
+-static struct tcon_link *
++static inline struct tcon_link *
+ cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb)
+ {
+-	struct tcon_link *tlink;
+-	unsigned int ret;
+-
+-	spin_lock(&cifs_sb->tlink_tree_lock);
+-	ret = radix_tree_gang_lookup_tag(&cifs_sb->tlink_tree, (void **)&tlink,
+-					0, 1, CIFS_TLINK_MASTER_TAG);
+-	spin_unlock(&cifs_sb->tlink_tree_lock);
+-
+-	/* the master tcon should always be present */
+-	if (ret == 0)
+-		BUG();
+-
+-	return tlink;
++	return cifs_sb->master_tlink;
+ }
+ 
+ struct cifsTconInfo *
+-- 
+1.7.2.3
