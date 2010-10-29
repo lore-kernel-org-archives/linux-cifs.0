@@ -1,68 +1,76 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 29 Oct 2010 12:26:13 -0500
-Message-ID: <AANLkTi=+OLU1LDFfcFKMAnfYksaguPVCNmTJrM+TN3hg@mail.gmail.com>
+From: "J.A. =?ISO-8859-1?B?TWFnYWxs824=?=" <jamagallon-sh/6fXdz2Rs@public.gmane.org>
+Subject: Re: CIFS is slooow, gvfs is fast
+Date: Sat, 30 Oct 2010 00:33:57 +0200
+Message-ID: <20101030003357.029b4e02@werewolf.home>
+References: <20101022013544.0fdab0e0@werewolf.home>
+ <4CC16B1E.4060709@suse.de>
+ <20101023004636.1acdd81c@werewolf.home>
+ <20101024013038.057442c0@werewolf.home>
+ <4CC55894.5040509@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Linux Kernel <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux CIFS <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4CC55894.5040509-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit 229aebb873e29726b91e076161649cf45154b0bf:
+On Mon, 25 Oct 2010 15:44:44 +0530, Suresh Jayaraman <sjayaraman@suse.d=
+e> wrote:
 
-  Merge branch 'for-next' of
-git://git.kernel.org/pub/scm/linux/kernel/git/jikos/trivial
-(2010-10-24 13:41:39 -0700)
+> On 10/24/2010 05:00 AM, J.A. Magall=C3=B3n wrote:
+> > On Sat, 23 Oct 2010 00:46:36 +0200, "J.A. Magall=EF=BF=BDn" <jamaga=
+llon-sh/6fXdz2Rs@public.gmane.org> wrote:
+> >=20
+> >>
+> >> If you mean hardware network path (cabling, router), yes.
+> >> For file paths, CIFS fs is under /net/htpc/media, and gvfs uses a =
+mount
+> >> point on '~/.gvfs/media on htpc'.
+> >>
+> >> And here comes the weird part. To rule out the desktop environment=
+ factor,
+> >> I tried a dd in both paths. On /net, I get 16.6 MB/s, and on
+> >> ~/.gvfs/xxx, I just get 5.5 MB/s. I really don't understand anythi=
+ng...
+> >> things get reversed depending if you use a gui or commandline.
+> >>update
+> >> Weird, really weird...
+> >>
+> >=20
+> > Well, to sort things out, I did some more tests (this does not mean=
+ things
+> > get any closer to be clear for me at least...).
+> >=20
+> > Can anybody tell me whats going here...??
+> > It looks just like gui tools behave just in reverse of cli, and tha=
+t a plain
+> > smbclient is faster that cifs. I'm really confused...
+> >=20
+>=20
+> Could you try mounting from commandline with something like
+>   `mount -t cifs //server/share /mnt/point -o user=3Duser1`
+> (commenting out the fstab entry) and try copying the file?
+>=20
+>=20
 
-are available in the git repository at:
+Same results, cli copy takes about 7.5 seconds (thats around 40MB/s), a=
+nd
+gui copy says it runs at 7.8 MB/s.
+This could be the normal behaviour I could expect, gui is slower as it =
+has to
+update progress bars, move flying sheets, or even does a sync from time=
+ to
+time.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
+The misbehaviour I see is the other way aroung, FUSE/GVFS is fast from =
+GUI
+and slow from CLI. And, the best, why are there any difference ???
 
-Dan Carpenter (2):
-      cifs: cifs_convert_address() returns zero on error
-      cifs: add kfree() on error path
-
-Jeff Layton (3):
-      cifs: convert cifsFileInfo->count to non-atomic counter
-      cifs: wait for writeback to complete in cifs_flush
-      cifs: eliminate cifsInodeInfo->write_behind_rc (try #6)
-
-Shirish Pargaonkar (6):
-      NTLM auth and sign - Allocate session key/client response dynamically
-      NTLM auth and sign - Define crypto hash functions and create and
-send keys needed for key exchange
-      NTLM auth and sign - Use kernel crypto apis to calculate hashes
-and smb signatures
-      NTLM auth and sign - minor error corrections and cleanup
-      NTLM auth and sign - Use appropriate server challenge
-      cifs: Cleanup and thus reduce smb session structure and fields
-used during authentication
-
-Steve French (1):
-      [CIFS] Fix checkpatch warnings and bump cifs version number
-
-Suresh Jayaraman (1):
-      cifs: update comments - [s/GlobalSMBSesLock/cifs_file_list_lock/g]
-
- fs/cifs/Kconfig       |    3 +
- fs/cifs/cifsencrypt.c |  427 ++++++++++++++++++++++++++++++++++++------------
- fs/cifs/cifsfs.c      |    1 -
- fs/cifs/cifsfs.h      |    2 +-
- fs/cifs/cifsglob.h    |   55 +++++--
- fs/cifs/cifspdu.h     |   13 ++-
- fs/cifs/cifsproto.h   |   14 +-
- fs/cifs/cifssmb.c     |    4 +-
- fs/cifs/connect.c     |   51 ++++--
- fs/cifs/file.c        |   57 ++-----
- fs/cifs/inode.c       |   15 +--
- fs/cifs/misc.c        |    2 +-
- fs/cifs/sess.c        |  166 +++++++++----------
- fs/cifs/transport.c   |    6 +-
- 14 files changed, 526 insertions(+), 290 deletions(-)
-
-
---
-Thanks,
-
-Steve
+--=20
+J.A. Magallon <jamagallon()ono!com>     \               Software is lik=
+e sex:
+                                         \         It's better when it'=
+s free
