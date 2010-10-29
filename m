@@ -1,81 +1,87 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Cleanup and thus reduce smb session structure and
- fields used during authentication
-Date: Thu, 28 Oct 2010 19:25:40 -0400
-Message-ID: <20101028192540.5043db4c@tlielax.poochiereds.net>
-References: <1288277587-9262-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101028155810.5fb3ccdf@tlielax.poochiereds.net>
-	<AANLkTin=q8YHjETGzoFy=GWM1U=N-F_NbbC4ePpojoZB@mail.gmail.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH] cifs: remove "legacy" parm from CIFSSMBQPathInfo
+Date: Fri, 29 Oct 2010 09:25:16 +0530
+Message-ID: <4CCA45A4.8030600@suse.de>
+References: <4CC921E7.9020403@suse.de>	<AANLkTikpemR3PVzXSimbu-b1zn4QwQj+0VAEM9xwgYqt@mail.gmail.com>	<4CC9A2AB.8090208@suse.de>	<AANLkTinOsN05m0qM56poq2Q5d6Jss6b3ZnpEXc9Z_4cV@mail.gmail.com> <AANLkTimoCvWFbYj+TfCFA-nqd6H=8DTN_e-dw8Hoo_7g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTin=q8YHjETGzoFy=GWM1U=N-F_NbbC4ePpojoZB-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTimoCvWFbYj+TfCFA-nqd6H=8DTN_e-dw8Hoo_7g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 28 Oct 2010 15:07:09 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On 10/28/2010 11:17 PM, Steve French wrote:
+> On Thu, Oct 28, 2010 at 11:41 AM, Shirish Pargaonkar
+> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> On Thu, Oct 28, 2010 at 11:19 AM, Suresh Jayaraman <sjayaraman@suse.=
+de> wrote:
+>>> On 10/28/2010 09:12 PM, Steve French wrote:
+>>>> What is the code flow then on Windows9x, OS/2 or in the EOPNOSUPP
+>>>> case? =EF=BF=BDSeems strange that we don't retry with legacy or in=
+ the case
+>>>> where the dialect (or previous call) shows that we don't support t=
+he
+>>>> infolevel.
+>>>
+>>> If CIFSSMBOpen fails, the callers seem to be fall back to legacy op=
+en using
+>>> SMBLegacyOpen().
+>>>
+>>> cifs_open()
+>>>
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD ...
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDif (tcon->ses->capabilities =
+& CAP_NT_SMBS)
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BDrc =3D CIFSSMBOpen(xid, tcon, full_path, disposition,
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD desiredAccess, CREAT=
+E_NOT_DIR, &netfid, &oplock, buf,
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD cifs_sb->local_nls, =
+cifs_sb->mnt_cifs_flags
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =
+=EF=BF=BD =EF=BF=BD & CIFS_MOUNT_MAP_SPECIAL_CHR);
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDelse
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BDrc =3D -EIO; /* no NT SMB support fall into legacy open below=
+ */
+>>>
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDif (rc =3D=3D -EIO) {
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD/* Old server, try legacy style OpenX */
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BDrc =3D SMBLegacyOpen(xid, tcon, full_path, disposition,
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDdesiredAccess, CREATE=
+_NOT_DIR, &netfid, &oplock, buf,
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDcifs_sb->local_nls, c=
+ifs_sb->mnt_cifs_flags
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =
+=EF=BF=BD =EF=BF=BD& CIFS_MOUNT_MAP_SPECIAL_CHR);
+>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD}
+>>>
+>> This is a general comment but should cifs client be using (server)
+>> dialect specific set of smb commands
+>> and those smb commands specific info levels instead of sending a
+>> command and trying downlevel / legacy
+>> if that command failed with "operation not supported"?
+>=20
+> We can do the former for smb2, but not for cifs unfortunately.
+>=20
+> For cifs there are lots of cases where a dialect doesn't support an
+> infolevel it should (or even viceversa).
 
-> On Thu, Oct 28, 2010 at 2:58 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
-> > On Thu, 28 Oct 2010 09:53:07 -0500
-> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-> >
-> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >>
-> >>
-> >> Removed following fields from smb session structure
-> >> =A0cryptkey, ntlmv2_hash, tilen, tiblob
-> >> and ntlmssp_auth structure is allocated dynamically only if the au=
-th mech
-> >> in NTLMSSP.
-> >>
-> >> response field within a session_key structure is used to initially=
- store the
-> >> target info (either plucked from type 2 challenge packet in case o=
-f NTLMSSP
-> >> or fabricated in case of NTLMv2 without extended security) and the=
-n to store
-> >> Message Authentication Key (mak) (session key + client response).
-> >>
-> >> Server challenge or cryptkey needed during a NTLMSSP authenticatio=
-n
-> >> is now part of ntlmssp_auth structure which gets allocated and fre=
-ed
-> >> once authenticaiton process is done.
-> >>
-> >>
-> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >
-> > Ack, assuming that this is needed for the later NTLMSSP cleanup pat=
-ch
-> > to merge.
-> >
-> > Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >
->=20
-> Jeff, Thanks.  Do you mean prior instead of later?
->=20
-> [PATCH] NTLM auth and sign - Use appropriate server challenge
->=20
-> should go in first. But it is not marked as either ack'ed or review'e=
-d yet.
->=20
-> Regards,
->=20
-> Shirish
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+So that means this patch is applicable to CIFS as is, right?
 
-Whoops. Must have hit "reply" on the wrong email. Yes...I just sent a
-corrected ack on that patch.=20
 
-Thanks,
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Suresh Jayaraman
