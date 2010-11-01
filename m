@@ -1,100 +1,105 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/5] CIFS: Add strictcache mount option
-Date: Mon, 1 Nov 2010 13:09:39 -0400
-Message-ID: <20101101130939.4ada6d84@tlielax.poochiereds.net>
-References: <AANLkTi=04ko7zXRaXvgEBzXFfhhL3QU64gnZOXMPoNOD@mail.gmail.com>
+Subject: Re: [PATCH 4/5] CIFS: New read logic
+Date: Mon, 1 Nov 2010 13:19:30 -0400
+Message-ID: <20101101131930.18d35c34@tlielax.poochiereds.net>
+References: <AANLkTimbGk9zKbVBU+Fd-d4XwQdFyEJFzcxi84dVEjQx@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=04ko7zXRaXvgEBzXFfhhL3QU64gnZOXMPoNOD-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTimbGk9zKbVBU+Fd-d4XwQdFyEJFzcxi84dVEjQx-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 31 Oct 2010 22:42:12 +0300
+On Sun, 31 Oct 2010 22:44:13 +0300
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Use for switching on strict cache mode. In this mode the
-> client read from the cache all the time it has Oplock Level II,
-> otherwise - read from the server. All written data are stored
-> in the cache, but if the client doesn't have Exclusive Oplock,
-> it writes the data to the server.
+> Add cifs_file_aio_read to let the client works with strict cache mode.
 > 
 > Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/README       |    5 +++++
->  fs/cifs/cifs_fs_sb.h |    1 +
->  fs/cifs/connect.c    |    5 +++++
->  3 files changed, 11 insertions(+), 0 deletions(-)
+>  fs/cifs/cifsfs.c |   34 ++++++++++++++++++++++++++++++++--
+>  1 files changed, 32 insertions(+), 2 deletions(-)
 > 
-> diff --git a/fs/cifs/README b/fs/cifs/README
-> index ee68d10..8fb6192 100644
-> --- a/fs/cifs/README
-> +++ b/fs/cifs/README
-> @@ -443,6 +443,11 @@ A partial list of the supported mount options follows:
->  		if oplock (caching token) is granted and held. Note that
->  		direct allows write operations larger than page size
->  		to be sent to the server.
-> +  strictcache   Use for switching on strict cache mode. In this mode the
-> +		client read from the cache all the time it has Oplock Level II,
-> +		otherwise - read from the server. All written data are stored
-> +		in the cache, but if the client doesn't have Exclusive Oplock,
-> +		it writes the data to the server.
->    acl   	Allow setfacl and getfacl to manage posix ACLs if server
->  		supports them.  (default)
->    noacl 	Do not allow setfacl and getfacl calls on this mount
-> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-> index 525ba59..b7b8b45 100644
-> --- a/fs/cifs/cifs_fs_sb.h
-> +++ b/fs/cifs/cifs_fs_sb.h
-> @@ -40,6 +40,7 @@
->  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
->  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
->  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
-> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache behavior */
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index e8b9523..21e0f47 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -570,6 +570,36 @@ cifs_get_sb(struct file_system_type *fs_type,
+>  	return 0;
+>  }
 > 
->  struct cifs_sb_info {
->  	struct radix_tree_root tlink_tree;
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 7e73176..11125fb 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -84,6 +84,7 @@ struct smb_vol {
->  	bool no_xattr:1;   /* set if xattr (EA) support should be disabled*/
->  	bool server_ino:1; /* use inode numbers from server ie UniqueId */
->  	bool direct_io:1;
-> +	bool strict_io:1; /* strict cache behavior */
->  	bool remap:1;      /* set to remap seven reserved chars in filenames */
->  	bool posix_paths:1; /* unset to not ask for posix pathnames. */
->  	bool no_linux_ext:1;
-> @@ -1343,6 +1344,8 @@ cifs_parse_mount_options(char *options, const
-> char *devname,
->  			vol->direct_io = 1;
->  		} else if (strnicmp(data, "forcedirectio", 13) == 0) {
->  			vol->direct_io = 1;
-> +		} else if (strnicmp(data, "strictcache", 11) == 0) {
-> +			vol->strict_io = 1;
->  		} else if (strnicmp(data, "noac", 4) == 0) {
->  			printk(KERN_WARNING "CIFS: Mount option noac not "
->  				"supported. Instead set "
-> @@ -2582,6 +2585,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
->  	if (pvolume_info->multiuser)
->  		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
->  					    CIFS_MOUNT_NO_PERM);
-> +	if (pvolume_info->strict_io)
-> +		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
->  	if (pvolume_info->direct_io) {
->  		cFYI(1, "mounting share using direct i/o");
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
+> +static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
+> +				   unsigned long nr_segs, loff_t pos)
+> +{
+> +	struct inode *inode;
+> +	struct cifs_sb_info *cifs_sb;
+> +	ssize_t read;
+> +
+> +	inode = iocb->ki_filp->f_path.dentry->d_inode;
+> +	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
+> +
+> +	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0) {
+> +		int retval;
+> +
+> +		retval = cifs_revalidate_file(iocb->ki_filp);
+> +		if (retval < 0)
+> +			return (loff_t)retval;
+> +
+		^^^^^^^^^^^^^^
+I don't think we can reasonably do the above without some discussion of
+increasing the attribute cache timeout. It's currently hardcoded to 1s
+in cifs_inode_needs_reval.
 
+Doing a QFileInfo every second in order to see if the file has changed
+seems prohibitively expensive. OTOH, streaming reads without ever
+checking to see whether it has changed is dangerous. We'll have to try
+and strike a balance here.
 
-It might be better to add the mount flag when you first need to use it and
-then add the option last (after the rest of the series).
+What may be best is to add a actimeo mount option that sets that value
+to something sane (60s?) and allows people to set to whatever they
+like. Even better might be a sliding scale like NFS uses -- set the
+value to something low (and user-settable) initially and every time we
+check it and it hasn't changed, double the timeout up to a maximum
+(also settable by user).
 
-Consider that git-bisect might cause someone to build a kernel with
-only part of the set applied.
+> +		return generic_file_aio_read(iocb, iov, nr_segs, pos);
+> +	}
+> +
+> +	if (!CIFS_I(inode)->clientCanCacheRead) {
+> +		read = cifs_user_read(iocb->ki_filp, iov->iov_base,
+> +				      iov->iov_len, &pos);
+> +		iocb->ki_pos = pos;
+> +	} else
+> +		read = generic_file_aio_read(iocb, iov, nr_segs, pos);
+> +
+> +	return read;
+> +}
+> +
+>  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+>  				   unsigned long nr_segs, loff_t pos)
+>  {
+> @@ -692,7 +722,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
+>  const struct file_operations cifs_file_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+> @@ -729,7 +759,7 @@ const struct file_operations cifs_file_direct_ops = {
+>  const struct file_operations cifs_file_nobrl_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
