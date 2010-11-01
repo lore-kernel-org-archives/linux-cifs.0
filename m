@@ -1,51 +1,46 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: CIFS in 2.6.32.24 kernel
-Date: Mon, 1 Nov 2010 09:16:55 -0400
-Message-ID: <20101101091655.02f0b9d1@tlielax.poochiereds.net>
-References: <20101028075119.687aaef2@tlielax.poochiereds.net>
-	<274617.31831.qm@web38103.mail.mud.yahoo.com>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH 2/5] CIFS: Invalidate inode pages on the last close
+Date: Mon, 1 Nov 2010 09:41:55 -0400
+Message-ID: <20101101094155.13d43eea@tlielax.poochiereds.net>
+References: <AANLkTi=ZzzjuH-yzgkCWCpm3g7UoBXM8rLgWdUVzj2VO@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Matt <mbedynek-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <274617.31831.qm-wLybadgZ6zavuULXzWHTWIglqE1Y4D90QQ4Iyu8u01E@public.gmane.org>
+In-Reply-To: <AANLkTi=ZzzjuH-yzgkCWCpm3g7UoBXM8rLgWdUVzj2VO-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 28 Oct 2010 10:17:10 -0700 (PDT)
-Matt <mbedynek-/E1597aS9LQAvxtiuMwx3w@public.gmane.org> wrote:
+On Sun, 31 Oct 2010 22:42:40 +0300
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-(re-cc'ing linux-cifs) 
+> When we close the last file handle of the inode we should invalidate it
+> to prevent data coherency problem when we open it again but it has been
+> modified by other clients.
+> 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/file.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index d7c212a..6edeb5b 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -290,6 +290,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  			cifs_file->dentry->d_inode);
+>  		cifsi->clientCanCacheRead = false;
+>  		cifsi->clientCanCacheAll  = false;
+> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
+> +			invalidate_remote_inode(inode);
+>  	}
+>  	spin_unlock(&cifs_file_list_lock);
+> 
 
-> > It's very odd to have a single set of quotes around the
-> > "device" and
-> > "target" strings like that. Does this work any better if
-> > you do quote
-> > them separately. For instance?
-> 
-> My apologies.  That is my mistake error in reformatting for e-mail.  In the actual usage it is :
-> 
-
-Ok, that may be part of the problem. Does this work any better if you
-supply an 'ip=' mount option with the ip address of the server?
-
-> 
-> Few additional pieces of information:
-> 
-> I have tested this on Debian Lenny and Debian Etch.  In both cases, I am using the same kernel (2.6.32.24) because I had even more crashes in kernels older than 2.6.32. 
-> 
-> Debian etch uses samba 3.0.24 whereas Lenny uses 3.2.5.
-> 
-> In both cases, I have tested with mount.cifs installed and with it not.
-> 
-
-
-The problem is likely to be in the kernel. My suspicion is a
-refcounting bug of some sort. I fixed up some problems recently that
-might have these sorts of symptoms, does this fare any better with a
-more recent kernel (2.6.36 or so) ?
+NAK. I don't think it's safe to call invalidate_remote_inode under a
+spinlock like this.
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
