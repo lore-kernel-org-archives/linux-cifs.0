@@ -1,178 +1,232 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 4/5] CIFS: New write logic
-Date: Tue, 2 Nov 2010 20:59:00 +0300
-Message-ID: <AANLkTi=HMTsqLXoVPkE=0CitmyXTV110KPDNSZ6fOp=w@mail.gmail.com>
-References: <AANLkTinegdugrKiMn4rErSyfp-t7HK6pYxumAS5DDiya@mail.gmail.com>
-	<20101102114350.59f41db2@tlielax.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/5] CIFS: Add cifs_set_oplock_level
+Date: Tue, 2 Nov 2010 13:41:49 -0500
+Message-ID: <AANLkTimpaVMTPm_kmqCby2rV-ytxh_7+qK1N=QiOJkPL@mail.gmail.com>
+References: <AANLkTin1ZFcZoC3A4iRrWaFpHghdG2hkbyEopQnJpA2f@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101102114350.59f41db2-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <AANLkTin1ZFcZoC3A4iRrWaFpHghdG2hkbyEopQnJpA2f-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/11/2 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Tue, 2 Nov 2010 12:02:24 +0300
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+The below patch looked fine - but showed up line wrapped in two places
+so had to hand edit a few lines to get it to merge.
+
+On Tue, Nov 2, 2010 at 4:00 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
+rote:
+> Simplify many places when we need to set oplock level on an inode.
 >
->> Modify cifs_file_aio_write and cifs_write_end to let the client work=
-s with
->> strict cache mode.
->>
->> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->> =A0fs/cifs/cifsfs.c | =A0 35 ++++++++++++++++++++++++++++++-----
->> =A0fs/cifs/file.c =A0 | =A0 14 ++++++++++++--
->> =A02 files changed, 42 insertions(+), 7 deletions(-)
->>
->> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
->> index 1b44a92..e1ecd35 100644
->> --- a/fs/cifs/cifsfs.c
->> +++ b/fs/cifs/cifsfs.c
->> @@ -602,12 +602,37 @@ static ssize_t cifs_file_aio_read(struct kiocb
->> *iocb, const struct iovec *iov,
->> =A0static ssize_t cifs_file_aio_write(struct kiocb *iocb, const stru=
-ct iovec *iov,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0u=
-nsigned long nr_segs, loff_t pos)
->> =A0{
->> - =A0 =A0 struct inode *inode =3D iocb->ki_filp->f_path.dentry->d_in=
-ode;
->> - =A0 =A0 ssize_t written;
->> + =A0 =A0 struct inode *inode;
->> + =A0 =A0 struct cifs_sb_info *cifs_sb;
->> + =A0 =A0 ssize_t written, cache_written;
->> + =A0 =A0 loff_t saved_pos;
->> +
->> + =A0 =A0 inode =3D iocb->ki_filp->f_path.dentry->d_inode;
->> +
->> + =A0 =A0 if (CIFS_I(inode)->clientCanCacheAll)
->> + =A0 =A0 =A0 =A0 =A0 =A0 return generic_file_aio_write(iocb, iov, n=
-r_segs, pos);
->> +
->> + =A0 =A0 cifs_sb =3D CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
->> +
->> + =A0 =A0 if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) =3D=3D=
- 0) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 written =3D generic_file_aio_write(iocb, i=
-ov, nr_segs, pos);
->> + =A0 =A0 =A0 =A0 =A0 =A0 filemap_write_and_wait(inode->i_mapping);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0^^^^^^^^^^^^^^^^^^
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0You can't ignore the return code from =
-this. That function
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0may return an error if writeback fails=
-=2E Also, I don't
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0see any need to wait on the result in =
-this case. Why
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0not just kick off the I/O and return (=
-do a
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0filemap_fdatawrite, IOW).
-
-I don't change non-strict variant for writing - we have this code now
-in the git tree. But I agree - we should think about return value in
-this case.
-
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> =A0fs/cifs/cifsproto.h | =A0 =A01 +
+> =A0fs/cifs/file.c =A0 =A0 =A0| =A0 38 +++++++++----------------------=
+-------
+> =A0fs/cifs/misc.c =A0 =A0 =A0| =A0 23 ++++++++++++++++++++---
+> =A03 files changed, 30 insertions(+), 32 deletions(-)
 >
->> + =A0 =A0 =A0 =A0 =A0 =A0 return written;
->> + =A0 =A0 }
->> +
->> + =A0 =A0 saved_pos =3D pos;
->> + =A0 =A0 written =3D cifs_user_write(iocb->ki_filp, iov->iov_base,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov->i=
-ov_len, &pos);
->> +
->> + =A0 =A0 if (written > 0) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 cache_written =3D generic_file_aio_write(i=
-ocb, iov,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0nr_segs, saved_pos);
->> + =A0 =A0 =A0 =A0 =A0 =A0 if (cache_written !=3D written)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "Cache written a=
-nd server written data "
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"lengths ar=
-e different");
->> + =A0 =A0 } else
->> + =A0 =A0 =A0 =A0 =A0 =A0 iocb->ki_pos =3D pos;
->>
-> =A0 =A0 =A0 =A0^^^^^
-> This seems awfully complicated. Why not just do a
-> generic_file_aio_write to get this into the cache and then just do a
-> filemap_write_and_wait and deal with the result?
-
-The main reason of doing this is mandatory byte-range locks. If we
-simply do generic_file_aio_write and then filemap_write_and_wait we
-can fail in the following situation:
-1) process1 opens file and sets a mandatory lock from 0 to 1.
-2) process2 opens file and writes a data from 1 to 2.
-
-If we do like you suggest we fail on page writing (on
-filemap_write_and_wait which writes whole page - from 0 to 2). That's
-why I do cifs_user_write which writes the data from 1 to 2 (it's what
-we need) and then store it in the cache by generic_file_aio_write
-(with the little change in cifs_write_end that doesn't write the same
-data twice to the server). So, right working of write and read ops
-with mandatory locks is one of the reasons to provide srict cache
-semantic.
-
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index edb6d90..7f050f4 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -104,6 +104,7 @@ extern struct timespec cifs_NTtimeToUnix(__le64
+> utc_nanoseconds_since_1601);
+> =A0extern u64 cifs_UnixTimeToNT(struct timespec);
+> =A0extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_ti=
+me,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0int offset);
+> +extern void cifs_set_oplock_level(struct inode *inode, __u32 oplock)=
+;
 >
->> - =A0 =A0 written =3D generic_file_aio_write(iocb, iov, nr_segs, pos=
+> =A0extern struct cifsFileInfo *cifs_new_fileinfo(__u16 fileHandle,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct=
+ file *file, struct tcon_link *tlink,
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 5d06eb3..a566f15 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -146,12 +146,7 @@ client_can_cache:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D cifs_get_inode_info(&inode, ful=
+l_path, buf, inode->i_sb,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 xid, NULL);
+>
+> - =A0 =A0 =A0 if ((oplock & 0xF) =3D=3D OPLOCK_EXCLUSIVE) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D true;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D true=
+;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Exclusive Oplock granted on in=
+ode %p", inode);
+> - =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D true=
+;
+> + =A0 =A0 =A0 cifs_set_oplock_level(inode, oplock);
+>
+> =A0 =A0 =A0 =A0return rc;
+> =A0}
+> @@ -253,12 +248,7 @@ cifs_new_fileinfo(__u16 fileHandle, struct file =
+*file,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_add_tail(&pCifsFile->flist, &pCif=
+sInode->openFileList);
+> =A0 =A0 =A0 =A0spin_unlock(&cifs_file_list_lock);
+>
+> - =A0 =A0 =A0 if ((oplock & 0xF) =3D=3D OPLOCK_EXCLUSIVE) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D true;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D true=
+;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Exclusive Oplock inode %p", in=
+ode);
+> - =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D true=
+;
+> + =A0 =A0 =A0 cifs_set_oplock_level(inode, oplock);
+>
+> =A0 =A0 =A0 =A0file->private_data =3D pCifsFile;
+> =A0 =A0 =A0 =A0return pCifsFile;
+> @@ -271,8 +261,10 @@ cifs_new_fileinfo(__u16 fileHandle, struct file =
+*file,
+> =A0*/
+> =A0void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+> =A0{
+> + =A0 =A0 =A0 struct inode *inode =3D cifs_file->dentry->d_inode;
+> =A0 =A0 =A0 =A0struct cifsTconInfo *tcon =3D tlink_tcon(cifs_file->tl=
+ink);
+> - =A0 =A0 =A0 struct cifsInodeInfo *cifsi =3D CIFS_I(cifs_file->dentr=
+y->d_inode);
+> + =A0 =A0 =A0 struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
+> + =A0 =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
+> =A0 =A0 =A0 =A0struct cifsLockInfo *li, *tmp;
+>
+> =A0 =A0 =A0 =A0spin_lock(&cifs_file_list_lock);
+> @@ -288,8 +280,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_f=
+ile)
+> =A0 =A0 =A0 =A0if (list_empty(&cifsi->openFileList)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "closing last open instance fo=
+r inode %p",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_file->dentry->d_i=
+node);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsi->clientCanCacheRead =3D false;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsi->clientCanCacheAll =A0=3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_set_oplock_level(inode, 0);
+> =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0spin_unlock(&cifs_file_list_lock);
+>
+> @@ -607,8 +598,6 @@ reopen_success:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D filemap_write_and_wait(inode->i=
+_mapping);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mapping_set_error(inode->i_mapping, rc=
 );
->> - =A0 =A0 if (!CIFS_I(inode)->clientCanCacheAll)
->> - =A0 =A0 =A0 =A0 =A0 =A0 filemap_fdatawrite(inode->i_mapping);
->> =A0 =A0 =A0 return written;
->> =A0}
->>
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 3970e68..4796748 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -1539,7 +1539,11 @@ static int cifs_write_end(struct file *file,
->> struct address_space *mapping,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct page *page, void =
-*fsdata)
->> =A0{
->> =A0 =A0 =A0 int rc;
->> - =A0 =A0 struct inode *inode =3D mapping->host;
->> + =A0 =A0 struct inode *inode;
->> + =A0 =A0 struct cifs_sb_info *cifs_sb;
->> +
->> + =A0 =A0 inode =3D mapping->host;
->> + =A0 =A0 cifs_sb =3D CIFS_SB(inode->i_sb);
->>
->> =A0 =A0 =A0 cFYI(1, "write_end for page %p from pos %lld with %d byt=
-es",
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0page, pos, copied);
->> @@ -1572,7 +1576,13 @@ static int cifs_write_end(struct file *file,
->> struct address_space *mapping,
->> =A0 =A0 =A0 } else {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D copied;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 pos +=3D copied;
->> - =A0 =A0 =A0 =A0 =A0 =A0 set_page_dirty(page);
->> + =A0 =A0 =A0 =A0 =A0 =A0 /* if we have strict cache switched on and=
- don't have Exclusive
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0oplock for the inode, we don't have=
- to set_page_dirty
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0because we flushed the data to the =
-server in
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_file_aio_write before */
->> + =A0 =A0 =A0 =A0 =A0 =A0 if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_=
-STRICT_IO) =3D=3D 0 ||
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_I(inode)->clientCanCacheAll)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 set_page_dirty(page);
->> =A0 =A0 =A0 }
->>
->> =A0 =A0 =A0 if (rc > 0) {
 >
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false=
+;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D fals=
+e;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (tcon->unix_ext)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D cifs_get_inode_=
+info_unix(&inode,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0full_p=
+ath, inode->i_sb, xid);
+> @@ -622,18 +611,9 @@ reopen_success:
+> =A0 =A0 =A0 =A0 =A0 =A0 invalidate the current end of file on the ser=
+ver
+> =A0 =A0 =A0 =A0 =A0 =A0 we can not go to the server to get the new in=
+od
+> =A0 =A0 =A0 =A0 =A0 =A0 info */
+> - =A0 =A0 =A0 if ((oplock & 0xF) =3D=3D OPLOCK_EXCLUSIVE) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D true;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D true=
+;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Exclusive Oplock granted on in=
+ode %p",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsFile->dentry->d=
+_inode);
+> - =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D true=
+;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false=
+;
+> - =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheRead =3D fals=
+e;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsInode->clientCanCacheAll =3D false=
+;
+> - =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 cifs_set_oplock_level(inode, oplock);
+> +
+> =A0 =A0 =A0 =A0cifs_relock_file(pCifsFile);
 >
+> =A0reopen_error_exit:
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index c4e296f..d3b9dde 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -569,10 +569,9 @@ is_valid_oplock_break(struct smb_hdr *buf, struc=
+t
+> TCP_Server_Info *srv)
+>
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1=
+, "file id match, oplock break");
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pCifsI=
+node =3D CIFS_I(netfile->dentry->d_inode);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pCifsIn=
+ode->clientCanCacheAll =3D false;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pSM=
+B->OplockLevel =3D=3D 0)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 pCifsInode->clientCanCacheRead =3D false;
+>
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_se=
+t_oplock_level(netfile->dentry->d_inode,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->OplockLevel);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/*
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * cif=
+s_oplock_break_put() can't be called
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * fro=
+m here. =A0Get reference after queueing
+> @@ -722,3 +721,21 @@ cifs_autodisable_serverino(struct cifs_sb_info *=
+cifs_sb)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb_master_tc=
+on(cifs_sb)->treeName);
+> =A0 =A0 =A0 =A0}
+> =A0}
+> +
+> +void cifs_set_oplock_level(struct inode *inode, __u32 oplock)
+> +{
+> + =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(inode);
+> +
+> + =A0 =A0 =A0 if ((oplock & 0xF) =3D=3D OPLOCK_EXCLUSIVE) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cinode->clientCanCacheAll =3D true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cinode->clientCanCacheRead =3D true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Exclusive Oplock granted on in=
+ode %p", inode);
+> + =A0 =A0 =A0 } else if ((oplock & 0xF) =3D=3D OPLOCK_READ) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cinode->clientCanCacheAll =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cinode->clientCanCacheRead =3D true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Level II Oplock granted on ino=
+de %p", inode);
+> + =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cinode->clientCanCacheAll =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cinode->clientCanCacheRead =3D false;
+> + =A0 =A0 =A0 }
+> +}
 > --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> 1.7.2.3
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
 
 
 --=20
-Best regards,
-Pavel Shilovsky.
+Thanks,
+
+Steve
