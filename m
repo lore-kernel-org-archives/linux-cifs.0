@@ -1,57 +1,32 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: Source code of SMB2 Kernel module
-Date: Wed, 03 Nov 2010 14:32:25 +0530
-Message-ID: <4CD12521.2020708@suse.de>
-References: <4CC65859.7040100@nttcom.co.jp> <4CC6642F.2040401@suse.de> <4CCA6FD3.4060907@nttcom.co.jp> <4CCA7177.40303@suse.de> <4CCF5DF8.9030809@nttcom.co.jp>
+From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Subject: Re: [PATCH v2 1/1] FS: cifs, remove unneeded NULL tests
+Date: Wed, 3 Nov 2010 10:00:12 +0000
+Message-ID: <20101103100012.GA19804@ZenIV.linux.org.uk>
+References: <1288624135-24170-1-git-send-email-jslaby@suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Shinnosuke Yagi <yagi.shinnosuke-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jirislaby-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+To: Jiri Slaby <jslaby-AlSwsSmVLrQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CCF5DF8.9030809-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1288624135-24170-1-git-send-email-jslaby-AlSwsSmVLrQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 11/02/2010 06:10 AM, Shinnosuke Yagi wrote:
-> Thank you, Suresh.
-> 
-> I succeeded in building kernel and mount SAMBA share with mount.smb2.
-> 
-> However, it seems that mount.smb2 works as cifs client
-> (NOT works as SMB2 client).
-> 
-> Mount.smb2 doesn't offer to use SMB2 in it's SMB Negotiation Request.
-> (Payload is the same as that of mount.cifs .)
-> 
-> From Windows Vista client, SMB2 works well, so server setting is valid.
-> 
-> 
-> Are there any mandatory settings (such as environment variables)
->  to run mount.smb2 as SMB2 client?
-> 
-> 
-> 
-> "cifs" is displayed in File system type field of mount output.
-> ===================================================================
->  # mount.smb2 //server/share /mnt/smb2/ -o user=xxxx,pass=yyyy
->  # mount
->  ...
->  //server/share on /mnt/smb2 type cifs (rw,mand)
-> ===================================================================
-> 
+On Mon, Nov 01, 2010 at 04:08:55PM +0100, Jiri Slaby wrote:
+> Stanse found that pSMBFile in cifs_ioctl and file->f_path.dentry in
+> cifs_user_write are dereferenced prior their test to NULL.
 
-I'm assuming you are using the recent cifs-utils package which supports
-smb2.
+file->f_path.dentry is never NULL for an opened file, neither is
+file->f_path.dentry->d_inode (which cannot change for the entire
+lifetime of dentry, BTW).  IOW,
 
->From where did you get mount.smb2? Is it a symlink to mount.cifs by any
-chance?
+> -	/* since the write may have blocked check these pointers again */
+> -	if ((file->f_path.dentry) && (file->f_path.dentry->d_inode)) {
+> -		struct inode *inode = file->f_path.dentry->d_inode;
 
-Could you try
-
-mount -t smb2 //server/share /mnt/point -o user=user1
-
-
-
---
-Suresh Jayaraman
+in there had always been junk.  So yes, losing these tests is the right
+thing to do.
