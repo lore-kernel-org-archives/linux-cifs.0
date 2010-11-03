@@ -1,71 +1,172 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/5] CIFS: Add strictcache mount option
-Date: Wed, 3 Nov 2010 08:57:15 +0300
-Message-ID: <AANLkTinaePkX-MC-QcAfW=F7+qTO6vqV0z+cexH5oyp2@mail.gmail.com>
-References: <AANLkTi=04ko7zXRaXvgEBzXFfhhL3QU64gnZOXMPoNOD@mail.gmail.com>
-	<4CD0F60E.9040901@suse.de>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH 1/5] CIFS: Add cifs_set_oplock_level
+Date: Wed, 03 Nov 2010 12:57:30 +0530
+Message-ID: <4CD10EE2.6090609@suse.de>
+References: <AANLkTin1ZFcZoC3A4iRrWaFpHghdG2hkbyEopQnJpA2f@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CD0F60E.9040901-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <AANLkTin1ZFcZoC3A4iRrWaFpHghdG2hkbyEopQnJpA2f-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/11/3 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
-> On 11/01/2010 01:12 AM, Pavel Shilovsky wrote:
->> Use for switching on strict cache mode. In this mode the
->> client read from the cache all the time it has Oplock Level II,
->> otherwise - read from the server. All written data are stored
->> in the cache, but if the client doesn't have Exclusive Oplock,
->> it writes the data to the server.
->>
->> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->> =A0fs/cifs/README =A0 =A0 =A0 | =A0 =A05 +++++
->> =A0fs/cifs/cifs_fs_sb.h | =A0 =A01 +
->> =A0fs/cifs/connect.c =A0 =A0| =A0 =A05 +++++
->> =A03 files changed, 11 insertions(+), 0 deletions(-)
->>
->> diff --git a/fs/cifs/README b/fs/cifs/README
->> index ee68d10..8fb6192 100644
->> --- a/fs/cifs/README
->> +++ b/fs/cifs/README
->> @@ -443,6 +443,11 @@ A partial list of the supported mount options f=
-ollows:
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if oplock (caching token) is granted and=
- held. Note that
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 direct allows write operations larger th=
-an page size
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 to be sent to the server.
->> + =A0strictcache =A0 Use for switching on strict cache mode. In this=
- mode the
->> + =A0 =A0 =A0 =A0 =A0 =A0 client read from the cache all the time it=
- has Oplock Level II,
->> + =A0 =A0 =A0 =A0 =A0 =A0 otherwise - read from the server. All writ=
-ten data are stored
->> + =A0 =A0 =A0 =A0 =A0 =A0 in the cache, but if the client doesn't ha=
-ve Exclusive Oplock,
->> + =A0 =A0 =A0 =A0 =A0 =A0 it writes the data to the server.
->
-> Could you remind me where this will be useful? Also, providing the sa=
-me
-> information in README and mount.cifs man page is useful as well.
->
+On 11/02/2010 02:30 PM, Pavel Shilovsky wrote:
+> Simplify many places when we need to set oplock level on an inode.
+> 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsproto.h |    1 +
+>  fs/cifs/file.c      |   38 +++++++++-----------------------------
+>  fs/cifs/misc.c      |   23 ++++++++++++++++++++---
+>  3 files changed, 30 insertions(+), 32 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index edb6d90..7f050f4 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -104,6 +104,7 @@ extern struct timespec cifs_NTtimeToUnix(__le64
+> utc_nanoseconds_since_1601);
+>  extern u64 cifs_UnixTimeToNT(struct timespec);
+>  extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+>  				      int offset);
+> +extern void cifs_set_oplock_level(struct inode *inode, __u32 oplock);
+> 
+>  extern struct cifsFileInfo *cifs_new_fileinfo(__u16 fileHandle,
+>  				struct file *file, struct tcon_link *tlink,
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 5d06eb3..a566f15 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -146,12 +146,7 @@ client_can_cache:
+>  		rc = cifs_get_inode_info(&inode, full_path, buf, inode->i_sb,
+>  					 xid, NULL);
+> 
+> -	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+> -		pCifsInode->clientCanCacheAll = true;
+> -		pCifsInode->clientCanCacheRead = true;
+> -		cFYI(1, "Exclusive Oplock granted on inode %p", inode);
+> -	} else if ((oplock & 0xF) == OPLOCK_READ)
+> -		pCifsInode->clientCanCacheRead = true;
+> +	cifs_set_oplock_level(inode, oplock);
+> 
+>  	return rc;
+>  }
+> @@ -253,12 +248,7 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+>  		list_add_tail(&pCifsFile->flist, &pCifsInode->openFileList);
+>  	spin_unlock(&cifs_file_list_lock);
+> 
+> -	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+> -		pCifsInode->clientCanCacheAll = true;
+> -		pCifsInode->clientCanCacheRead = true;
+> -		cFYI(1, "Exclusive Oplock inode %p", inode);
+> -	} else if ((oplock & 0xF) == OPLOCK_READ)
+> -		pCifsInode->clientCanCacheRead = true;
+> +	cifs_set_oplock_level(inode, oplock);
+> 
+>  	file->private_data = pCifsFile;
+>  	return pCifsFile;
+> @@ -271,8 +261,10 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+>   */
+>  void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  {
+> +	struct inode *inode = cifs_file->dentry->d_inode;
+>  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+> -	struct cifsInodeInfo *cifsi = CIFS_I(cifs_file->dentry->d_inode);
+> +	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>  	struct cifsLockInfo *li, *tmp;
+> 
+>  	spin_lock(&cifs_file_list_lock);
+> @@ -288,8 +280,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	if (list_empty(&cifsi->openFileList)) {
+>  		cFYI(1, "closing last open instance for inode %p",
+>  			cifs_file->dentry->d_inode);
+> -		cifsi->clientCanCacheRead = false;
+> -		cifsi->clientCanCacheAll  = false;
+> +		cifs_set_oplock_level(inode, 0);
+>  	}
+>  	spin_unlock(&cifs_file_list_lock);
+> 
+> @@ -607,8 +598,6 @@ reopen_success:
+>  		rc = filemap_write_and_wait(inode->i_mapping);
+>  		mapping_set_error(inode->i_mapping, rc);
+> 
+> -		pCifsInode->clientCanCacheAll = false;
+> -		pCifsInode->clientCanCacheRead = false;
+>  		if (tcon->unix_ext)
+>  			rc = cifs_get_inode_info_unix(&inode,
+>  				full_path, inode->i_sb, xid);
+> @@ -622,18 +611,9 @@ reopen_success:
+>  	     invalidate the current end of file on the server
+>  	     we can not go to the server to get the new inod
+>  	     info */
+> -	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+> -		pCifsInode->clientCanCacheAll = true;
+> -		pCifsInode->clientCanCacheRead = true;
+> -		cFYI(1, "Exclusive Oplock granted on inode %p",
+> -			 pCifsFile->dentry->d_inode);
+> -	} else if ((oplock & 0xF) == OPLOCK_READ) {
+> -		pCifsInode->clientCanCacheRead = true;
+> -		pCifsInode->clientCanCacheAll = false;
+> -	} else {
+> -		pCifsInode->clientCanCacheRead = false;
+> -		pCifsInode->clientCanCacheAll = false;
+> -	}
+> +
+> +	cifs_set_oplock_level(inode, oplock);
+> +
+>  	cifs_relock_file(pCifsFile);
+> 
+>  reopen_error_exit:
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index c4e296f..d3b9dde 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -569,10 +569,9 @@ is_valid_oplock_break(struct smb_hdr *buf, struct
+> TCP_Server_Info *srv)
+> 
+>  				cFYI(1, "file id match, oplock break");
+>  				pCifsInode = CIFS_I(netfile->dentry->d_inode);
+> -				pCifsInode->clientCanCacheAll = false;
+> -				if (pSMB->OplockLevel == 0)
+> -					pCifsInode->clientCanCacheRead = false;
+> 
+> +				cifs_set_oplock_level(netfile->dentry->d_inode,
+> +						      pSMB->OplockLevel);
+>  				/*
+>  				 * cifs_oplock_break_put() can't be called
+>  				 * from here.  Get reference after queueing
+> @@ -722,3 +721,21 @@ cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
+>  			   cifs_sb_master_tcon(cifs_sb)->treeName);
+>  	}
+>  }
+> +
+> +void cifs_set_oplock_level(struct inode *inode, __u32 oplock)
+> +{
+> +	struct cifsInodeInfo *cinode = CIFS_I(inode);
 
-It is useful when we need to get the only the valida data from the
-server. Ex. when the first process writes to the server and the second
-reads this in the same time. Due to Samba server can delay mtime
-change after writing, we can't trust to mtime and oef checkings and
-have to process it according to oplock level we have.
+Looks like all the callers already have cifsInodeInfo pointer.
+Why not pass a cifsInodeInfo pointer directly instead of inode?
+I'll whip up a quick patch..
 
-It also works with the mandatory byte-range locking style which
-Windows supports - that can let us to make Wine application work
-togather with Windows ones on CIFS share where byte-range locks play
-sinchronization role.
+> +	if ((oplock & 0xF) == OPLOCK_EXCLUSIVE) {
+> +		cinode->clientCanCacheAll = true;
+> +		cinode->clientCanCacheRead = true;
+> +		cFYI(1, "Exclusive Oplock granted on inode %p", inode);
+> +	} else if ((oplock & 0xF) == OPLOCK_READ) {
+> +		cinode->clientCanCacheAll = false;
+> +		cinode->clientCanCacheRead = true;
+> +		cFYI(1, "Level II Oplock granted on inode %p", inode);
+> +	} else {
+> +		cinode->clientCanCacheAll = false;
+> +		cinode->clientCanCacheRead = false;
+> +	}
+> +}
 
---=20
-Best regards,
-Pavel Shilovsky.
+
+
+-- 
+Suresh Jayaraman
