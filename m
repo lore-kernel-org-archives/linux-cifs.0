@@ -1,34 +1,49 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH] cifs: trivial comment fix: tlink_tree is now a rbtree
-Date: Wed, 03 Nov 2010 10:53:49 +0530
-Message-ID: <4CD0F1E5.70107@suse.de>
+Subject: Re: [PATCH 1/5] CIFS: Add strictcache mount option
+Date: Wed, 03 Nov 2010 11:11:34 +0530
+Message-ID: <4CD0F60E.9040901@suse.de>
+References: <AANLkTi=04ko7zXRaXvgEBzXFfhhL3QU64gnZOXMPoNOD@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTi=04ko7zXRaXvgEBzXFfhhL3QU64gnZOXMPoNOD-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Noticed while reviewing (late) the rbtree conversion patchset (which has been merged
-already).
+On 11/01/2010 01:12 AM, Pavel Shilovsky wrote:
+> Use for switching on strict cache mode. In this mode the
+> client read from the cache all the time it has Oplock Level II,
+> otherwise - read from the server. All written data are stored
+> in the cache, but if the client doesn't have Exclusive Oplock,
+> it writes the data to the server.
+> 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/README       |    5 +++++
+>  fs/cifs/cifs_fs_sb.h |    1 +
+>  fs/cifs/connect.c    |    5 +++++
+>  3 files changed, 11 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/README b/fs/cifs/README
+> index ee68d10..8fb6192 100644
+> --- a/fs/cifs/README
+> +++ b/fs/cifs/README
+> @@ -443,6 +443,11 @@ A partial list of the supported mount options follows:
+>  		if oplock (caching token) is granted and held. Note that
+>  		direct allows write operations larger than page size
+>  		to be sent to the server.
+> +  strictcache   Use for switching on strict cache mode. In this mode the
+> +		client read from the cache all the time it has Oplock Level II,
+> +		otherwise - read from the server. All written data are stored
+> +		in the cache, but if the client doesn't have Exclusive Oplock,
+> +		it writes the data to the server.
 
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
+Could you remind me where this will be useful? Also, providing the same
+information in README and mount.cifs man page is useful as well.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c9699ce..251a17c 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3324,7 +3324,7 @@ tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink)
-  * If the superblock doesn't refer to a multiuser mount, then just return
-  * the master tcon for the mount.
-  *
-- * First, search the radix tree for an existing tcon for this fsuid. If one
-+ * First, search the rbtree for an existing tcon for this fsuid. If one
-  * exists, then check to see if it's pending construction. If it is then wait
-  * for construction to complete. Once it's no longer pending, check to see if
-  * it failed and either return an error or retry construction, depending on
+
+-- 
+Suresh Jayaraman
