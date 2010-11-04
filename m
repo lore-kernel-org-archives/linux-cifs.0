@@ -1,33 +1,52 @@
-From: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [patch 2/2] cifs: dereferencing first then checking
-Date: Wed, 3 Nov 2010 18:40:59 +0200
-Message-ID: <20101103164059.GH14069@bicker>
-References: <20101027212253.GL6062@bicker> <20101027195123.0a712a53@tlielax.poochiereds.net> <20101028034434.GR6062@bicker> <20101102162250.3a2aa670@tlielax.poochiereds.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 4/5] CIFS: New write logic
+Date: Thu, 4 Nov 2010 14:08:48 +0300
+Message-ID: <AANLkTikp5fvgvo+AM-jgqP7q_sfkjdPVKzNdRv5tDpNN@mail.gmail.com>
+References: <AANLkTinegdugrKiMn4rErSyfp-t7HK6pYxumAS5DDiya@mail.gmail.com>
+	<20101102114350.59f41db2@tlielax.poochiereds.net>
+	<AANLkTi=HMTsqLXoVPkE=0CitmyXTV110KPDNSZ6fOp=w@mail.gmail.com>
+	<20101103071456.27ed871b@tlielax.poochiereds.net>
+	<20101103073403.04e8fc02@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20101102162250.3a2aa670-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20101103073403.04e8fc02-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Nov 02, 2010 at 04:22:50PM -0400, Jeff Layton wrote:
-> Here's a respun patch that should fix these problems. I chickened out
-> on removing the check in find_writable_file.
-> 
-> It still seems like a bogus cargo-cult sort of thing. It should
-> probably be a BUG() if you call that function with a NULL pointer, but
-> I don't feel like tackling that just yet.
-> 
-> Dan, does this look ok to you? If so, I'll resend to Steve as an
-> "official" patch.
-> 
+2010/11/3 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> To elaborate...
+>
+> Rather than calling down into generic_file_aio_write, I think you'd be
+> better served by simply invalidating the pages in the range that the
+> write touched, or possibly just invalidating the entire cached inode.
 
-Looks fine to me.  Obviously, I've already said that I don't know if the
-checks are needed or not.  I defer to your greater knowledge.  ;)
+This can make sense only if we don't have oplock for reading. If we
+have it - why do wee need to read from the server the data that we can
+store and read from the cache? I don't think it's good for oplock
+level II situation.
 
-regards,
-dan carpenter
+So, in this case we can check if we have oplock level II and call
+generic_file_aio_write only in this case - otherwise simply invalidate
+the region of the file write call affects. What do you think about
+this idea?
+
+> Also, I still haven't seen a description of what the semantics for mmap
+> will be in this case. If I'm using strict caching and mmap a file, it
+> obviously isn't going to read/write through every time userspace
+> touches the memory. What can I expect to happen when I read or write to
+> that mmap? How can I ensure that new data will be faulted in or data
+> that I write will be synced out?
+
+Good point about mmap. Thanks!
+
+In mmap call we can invalidate inode pages if we don't have an oplock
+for reading. As for mandatory locks problem - I don't think we can
+deal with this problem without large code changes. So, I suggest to
+leave it the same. Do you have any other ideas?
+
+-- 
+Best regards,
+Pavel Shilovsky.
