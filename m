@@ -1,52 +1,87 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 4/5] CIFS: New write logic
-Date: Thu, 4 Nov 2010 14:08:48 +0300
-Message-ID: <AANLkTikp5fvgvo+AM-jgqP7q_sfkjdPVKzNdRv5tDpNN@mail.gmail.com>
-References: <AANLkTinegdugrKiMn4rErSyfp-t7HK6pYxumAS5DDiya@mail.gmail.com>
-	<20101102114350.59f41db2@tlielax.poochiereds.net>
-	<AANLkTi=HMTsqLXoVPkE=0CitmyXTV110KPDNSZ6fOp=w@mail.gmail.com>
-	<20101103071456.27ed871b@tlielax.poochiereds.net>
-	<20101103073403.04e8fc02@tlielax.poochiereds.net>
+Subject: Re: [PATCH 1/4] CIFS: Invalidate inode pages on the last close
+Date: Thu, 4 Nov 2010 14:23:19 +0300
+Message-ID: <AANLkTingEbr0K=1TMTUXYS2uFeS2QmYP3HLdnrj9o-0i@mail.gmail.com>
+References: <1288727061-18759-1-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101103073403.04e8fc02-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1288727061-18759-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/11/3 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> To elaborate...
+2010/11/2 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> On strict cache mode when we close the last file handle of the inode =
+we
+> should invalidate itt o prevent data coherency problem when we open i=
+t
+> again but it has been modified by other clients.
 >
-> Rather than calling down into generic_file_aio_write, I think you'd be
-> better served by simply invalidating the pages in the range that the
-> write touched, or possibly just invalidating the entire cached inode.
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> =A0fs/cifs/cifs_fs_sb.h | =A0 =A01 +
+> =A0fs/cifs/file.c =A0 =A0 =A0 | =A0 =A06 ++++++
+> =A02 files changed, 7 insertions(+), 0 deletions(-)
+>
+> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> index e9a393c..be7b159 100644
+> --- a/fs/cifs/cifs_fs_sb.h
+> +++ b/fs/cifs/cifs_fs_sb.h
+> @@ -40,6 +40,7 @@
+> =A0#define CIFS_MOUNT_FSCACHE =A0 =A0 0x8000 /* local caching enabled=
+ */
+> =A0#define CIFS_MOUNT_MF_SYMLINKS 0x10000 /* Minshall+French Symlinks=
+ enabled */
+> =A0#define CIFS_MOUNT_MULTIUSER =A0 0x20000 /* multiuser mount */
+> +#define CIFS_MOUNT_STRICT_IO =A0 0x40000 /* strict cache mode */
+>
+> =A0struct cifs_sb_info {
+> =A0 =A0 =A0 =A0struct rb_root tlink_tree;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 71185d1..81ec50e 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -264,7 +264,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_f=
+ile)
+> =A0 =A0 =A0 =A0struct inode *inode =3D cifs_file->dentry->d_inode;
+> =A0 =A0 =A0 =A0struct cifsTconInfo *tcon =3D tlink_tcon(cifs_file->tl=
+ink);
+> =A0 =A0 =A0 =A0struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
+> + =A0 =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
+> =A0 =A0 =A0 =A0struct cifsLockInfo *li, *tmp;
+> + =A0 =A0 =A0 bool last_open_file =3D false;
+>
+> =A0 =A0 =A0 =A0spin_lock(&cifs_file_list_lock);
+> =A0 =A0 =A0 =A0if (--cifs_file->count > 0) {
+> @@ -279,10 +281,14 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs=
+_file)
+> =A0 =A0 =A0 =A0if (list_empty(&cifsi->openFileList)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "closing last open instance fo=
+r inode %p",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_file->dentry->d_i=
+node);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 last_open_file =3D true;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_set_oplock_level(inode, 0);
+> =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0spin_unlock(&cifs_file_list_lock);
+>
+> + =A0 =A0 =A0 if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) &&=
+ last_open_file)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(inode);
+> +
+> =A0 =A0 =A0 =A0if (!tcon->need_reconnect && !cifs_file->invalidHandle=
+) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int xid, rc;
+>
+> --
+> 1.7.2.3
+>
+>
 
-This can make sense only if we don't have oplock for reading. If we
-have it - why do wee need to read from the server the data that we can
-store and read from the cache? I don't think it's good for oplock
-level II situation.
+What's about this and patch number 2 (New read logic)?
 
-So, in this case we can check if we have oplock level II and call
-generic_file_aio_write only in this case - otherwise simply invalidate
-the region of the file write call affects. What do you think about
-this idea?
-
-> Also, I still haven't seen a description of what the semantics for mmap
-> will be in this case. If I'm using strict caching and mmap a file, it
-> obviously isn't going to read/write through every time userspace
-> touches the memory. What can I expect to happen when I read or write to
-> that mmap? How can I ensure that new data will be faulted in or data
-> that I write will be synced out?
-
-Good point about mmap. Thanks!
-
-In mmap call we can invalidate inode pages if we don't have an oplock
-for reading. As for mandatory locks problem - I don't think we can
-deal with this problem without large code changes. So, I suggest to
-leave it the same. Do you have any other ideas?
-
--- 
+--=20
 Best regards,
 Pavel Shilovsky.
