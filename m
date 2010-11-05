@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 6/6] CIFS: Add strictcache mount option
-Date: Fri,  5 Nov 2010 11:29:37 +0300
-Message-ID: <1288945777-9197-7-git-send-email-piastryyy@gmail.com>
+Subject: [PATCH 5/6] CIFS: Make cifs_file_map work with strict cache mode
+Date: Fri,  5 Nov 2010 11:29:36 +0300
+Message-ID: <1288945777-9197-6-git-send-email-piastryyy@gmail.com>
 References: <1288945777-9197-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,63 +9,47 @@ In-Reply-To: <1288945777-9197-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Use for switching on strict cache mode. In this mode the
-client read from the cache all the time it has Oplock Level II,
-otherwise - read from the server. All written data are stored
-in the cache, but if the client doesn't have Exclusive Oplock,
-it writes the data to the server.
+Invalidate inode if we don't have at least Level II oplock and strict
+cache mode switched on.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/README    |    5 +++++
- fs/cifs/connect.c |    5 +++++
- 2 files changed, 10 insertions(+), 0 deletions(-)
+ fs/cifs/file.c |   20 +++++++++++++++-----
+ 1 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/README b/fs/cifs/README
-index ee68d10..8fb6192 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -443,6 +443,11 @@ A partial list of the supported mount options follows:
- 		if oplock (caching token) is granted and held. Note that
- 		direct allows write operations larger than page size
- 		to be sent to the server.
-+  strictcache   Use for switching on strict cache mode. In this mode the
-+		client read from the cache all the time it has Oplock Level II,
-+		otherwise - read from the server. All written data are stored
-+		in the cache, but if the client doesn't have Exclusive Oplock,
-+		it writes the data to the server.
-   acl   	Allow setfacl and getfacl to manage posix ACLs if server
- 		supports them.  (default)
-   noacl 	Do not allow setfacl and getfacl calls on this mount
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 251a17c..97286c7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -84,6 +84,7 @@ struct smb_vol {
- 	bool no_xattr:1;   /* set if xattr (EA) support should be disabled*/
- 	bool server_ino:1; /* use inode numbers from server ie UniqueId */
- 	bool direct_io:1;
-+	bool strict_io:1; /* strict cache behavior */
- 	bool remap:1;      /* set to remap seven reserved chars in filenames */
- 	bool posix_paths:1; /* unset to not ask for posix pathnames. */
- 	bool no_linux_ext:1;
-@@ -1347,6 +1348,8 @@ cifs_parse_mount_options(char *options, const char *devname,
- 			vol->direct_io = 1;
- 		} else if (strnicmp(data, "forcedirectio", 13) == 0) {
- 			vol->direct_io = 1;
-+		} else if (strnicmp(data, "strictcache", 11) == 0) {
-+			vol->strict_io = 1;
- 		} else if (strnicmp(data, "noac", 4) == 0) {
- 			printk(KERN_WARNING "CIFS: Mount option noac not "
- 				"supported. Instead set "
-@@ -2597,6 +2600,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 	if (pvolume_info->multiuser)
- 		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
- 					    CIFS_MOUNT_NO_PERM);
-+	if (pvolume_info->strict_io)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
- 	if (pvolume_info->direct_io) {
- 		cFYI(1, "mounting share using direct i/o");
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index e8ca2d6..81eb840 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1820,14 +1820,24 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
+ {
+ 	int rc, xid;
++	struct inode *inode = file->f_path.dentry->d_inode;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 
+ 	xid = GetXid();
+-	rc = cifs_revalidate_file(file);
+-	if (rc) {
+-		cFYI(1, "Validation prior to mmap failed, error=%d", rc);
+-		FreeXid(xid);
+-		return rc;
++
++	if (!CIFS_I(inode)->clientCanCacheRead &&
++	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0))
++		invalidate_remote_inode(inode);
++	else {
++		rc = cifs_revalidate_file(file);
++		if (rc) {
++			cFYI(1, "Validation prior to mmap failed, error=%d",
++			     rc);
++			FreeXid(xid);
++			return rc;
++		}
+ 	}
++
+ 	rc = generic_file_mmap(file, vma);
+ 	FreeXid(xid);
+ 	return rc;
 -- 
 1.7.2.3
