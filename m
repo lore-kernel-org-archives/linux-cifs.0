@@ -1,105 +1,200 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: make cifs_ioctl handle NULL filp->private_data correctly
-Date: Mon, 8 Nov 2010 09:02:13 -0600
-Message-ID: <AANLkTimLmY2exgUU-tKNENu4SGwR0cCGifu-eYK_=0EO@mail.gmail.com>
-References: <1289219312-21396-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: sjayaraman-l3A5Bk7waGM@public.gmane.org, kjella79-eZNTXLQAfP4@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Percolate errors up to the caller during get/set acls
+Date: Mon,  8 Nov 2010 09:47:18 -0600
+Message-ID: <1289231238-15203-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289219312-21396-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Makes sense - will do some tests today and merge
-
-On Mon, Nov 8, 2010 at 6:28 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Commit 13cfb7334e made cifs_ioctl use the tlink attached to the
-> cifsFileInfo for a filp. This ignores the case of an open directory
-> however, which in CIFS can have a NULL private_data until a readdir
-> is done on it.
->
-> This patch re-adds the NULL pointer checks that were removed in commi=
-t
-> 50ae28f01 and moves the setting of tcon and "caps" variables lower.
->
-> Long term, a better fix would be to establish a f_op->open routine fo=
-r
-> directories that populates that field at open time, but that requires
-> some other changes to how readdir calls are handled.
->
-> Reported-by: Kjell Rune Skaaraas <kjella79-eZNTXLQAfP4@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/ioctl.c | =A0 12 ++++++++++--
-> =A01 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-> index 2fa22f2..0c98672 100644
-> --- a/fs/cifs/ioctl.c
-> +++ b/fs/cifs/ioctl.c
-> @@ -38,10 +38,10 @@ long cifs_ioctl(struct file *filep, unsigned int =
-command, unsigned long arg)
-> =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb;
-> =A0#ifdef CONFIG_CIFS_POSIX
-> =A0 =A0 =A0 =A0struct cifsFileInfo *pSMBFile =3D filep->private_data;
-> - =A0 =A0 =A0 struct cifsTconInfo *tcon =3D tlink_tcon(pSMBFile->tlin=
-k);
-> + =A0 =A0 =A0 struct cifsTconInfo *tcon;
-> =A0 =A0 =A0 =A0__u64 =A0 ExtAttrBits =3D 0;
-> =A0 =A0 =A0 =A0__u64 =A0 ExtAttrMask =3D 0;
-> - =A0 =A0 =A0 __u64 =A0 caps =3D le64_to_cpu(tcon->fsUnixInfo.Capabil=
-ity);
-> + =A0 =A0 =A0 __u64 =A0 caps;
-> =A0#endif /* CONFIG_CIFS_POSIX */
->
-> =A0 =A0 =A0 =A0xid =3D GetXid();
-> @@ -62,6 +62,10 @@ long cifs_ioctl(struct file *filep, unsigned int c=
-ommand, unsigned long arg)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0#ifdef CONFIG_CIFS_POSIX
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case FS_IOC_GETFLAGS:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pSMBFile =3D=3D NUL=
-L)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon =3D tlink_tcon(pSM=
-BFile->tlink);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 caps =3D le64_to_cpu(tc=
-on->fsUnixInfo.Capability);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (CIFS_UNIX_EXTATTR_=
-CAP & caps) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D=
- CIFSGetExtAttr(xid, tcon, pSMBFile->netfid,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0&ExtAttrBits, &ExtAttrMask);
-> @@ -73,6 +77,10 @@ long cifs_ioctl(struct file *filep, unsigned int c=
-ommand, unsigned long arg)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case FS_IOC_SETFLAGS:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pSMBFile =3D=3D NUL=
-L)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon =3D tlink_tcon(pSM=
-BFile->tlink);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 caps =3D le64_to_cpu(tc=
-on->fsUnixInfo.Capability);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (CIFS_UNIX_EXTATTR_=
-CAP & caps) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (ge=
-t_user(ExtAttrBits, (int __user *)arg)) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0rc =3D -EFAULT;
-> --
-> 1.7.2.3
->
->
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
+Modify get/set_cifs_acl* calls to reutrn error code and percolate the
+error code up to the caller.
 
---=20
-Thanks,
 
-Steve
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsacl.c |   84 ++++++++++++++++++++++++++++++----------------------
+ 1 files changed, 48 insertions(+), 36 deletions(-)
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index c9b4792..8c260b9 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -552,38 +552,40 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 	return rc;
+ }
+ 
+-static struct cifs_ntsd *get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
+-		__u16 fid, u32 *pacllen)
++static int
++get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
++		__u16 fid, u32 *pacllen, struct cifs_ntsd **pntsd)
+ {
+-	struct cifs_ntsd *pntsd = NULL;
+-	int xid, rc;
++	int xid;
++	int rc = 0;
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+ 
+ 	if (IS_ERR(tlink))
+-		return NULL;
++		PTR_ERR(tlink);
+ 
+ 	xid = GetXid();
+-	rc = CIFSSMBGetCIFSACL(xid, tlink_tcon(tlink), fid, &pntsd, pacllen);
++	rc = CIFSSMBGetCIFSACL(xid, tlink_tcon(tlink), fid, pntsd, pacllen);
+ 	FreeXid(xid);
+ 
+ 	cifs_put_tlink(tlink);
+ 
+ 	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+-	return pntsd;
++	return rc;
+ }
+ 
+-static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+-		const char *path, u32 *pacllen)
++static int
++get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb, const char *path,
++			u32 *pacllen, struct cifs_ntsd **pntsd)
+ {
+-	struct cifs_ntsd *pntsd = NULL;
+ 	int oplock = 0;
+-	int xid, rc;
++	int xid;
++	int rc = 0;
+ 	__u16 fid;
+ 	struct cifsTconInfo *tcon;
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+ 
+ 	if (IS_ERR(tlink))
+-		return NULL;
++		return PTR_ERR(tlink);
+ 
+ 	tcon = tlink_tcon(tlink);
+ 	xid = GetXid();
+@@ -596,32 +598,34 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 		goto out;
+ 	}
+ 
+-	rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
++	rc = CIFSSMBGetCIFSACL(xid, tcon, fid, pntsd, pacllen);
+ 	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+ 
+ 	CIFSSMBClose(xid, tcon, fid);
+  out:
+ 	cifs_put_tlink(tlink);
+ 	FreeXid(xid);
+-	return pntsd;
++	return rc;
+ }
+ 
+ /* Retrieve an ACL from the server */
+-static struct cifs_ntsd *get_cifs_acl(struct cifs_sb_info *cifs_sb,
+-				      struct inode *inode, const char *path,
+-				      u32 *pacllen)
++static int
++get_cifs_acl(struct cifs_sb_info *cifs_sb, struct inode *inode,
++		const char *path, u32 *pacllen, struct cifs_ntsd **pntsd)
+ {
+-	struct cifs_ntsd *pntsd = NULL;
++	int rc = 0;
+ 	struct cifsFileInfo *open_file = NULL;
+ 
+ 	if (inode)
+ 		open_file = find_readable_file(CIFS_I(inode), true);
+-	if (!open_file)
+-		return get_cifs_acl_by_path(cifs_sb, path, pacllen);
++	if (open_file) {
++		rc = get_cifs_acl_by_fid(cifs_sb, open_file->netfid, pacllen,
++						pntsd);
++		cifsFileInfo_put(open_file);
++	} else
++		rc = get_cifs_acl_by_path(cifs_sb, path, pacllen, pntsd);
+ 
+-	pntsd = get_cifs_acl_by_fid(cifs_sb, open_file->netfid, pacllen);
+-	cifsFileInfo_put(open_file);
+-	return pntsd;
++	return rc;
+ }
+ 
+ static int set_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb, __u16 fid,
+@@ -686,11 +690,13 @@ static int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 	cFYI(DBG2, "set ACL for %s from mode 0x%x", path, inode->i_mode);
+ 
+ 	open_file = find_readable_file(CIFS_I(inode), true);
+-	if (!open_file)
+-		return set_cifs_acl_by_path(cifs_sb, path, pnntsd, acllen);
++	if (open_file) {
++		rc = set_cifs_acl_by_fid(cifs_sb, open_file->netfid, pnntsd,
++						acllen);
++		cifsFileInfo_put(open_file);
++	} else
++		rc = set_cifs_acl_by_path(cifs_sb, path, pnntsd, acllen);
+ 
+-	rc = set_cifs_acl_by_fid(cifs_sb, open_file->netfid, pnntsd, acllen);
+-	cifsFileInfo_put(open_file);
+ 	return rc;
+ }
+ 
+@@ -706,15 +712,18 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+ 	cFYI(DBG2, "converting ACL to mode for %s", path);
+ 
+ 	if (pfid)
+-		pntsd = get_cifs_acl_by_fid(cifs_sb, *pfid, &acllen);
++		rc = get_cifs_acl_by_fid(cifs_sb, *pfid, &acllen, &pntsd);
+ 	else
+-		pntsd = get_cifs_acl(cifs_sb, inode, path, &acllen);
++		rc = get_cifs_acl(cifs_sb, inode, path, &acllen, &pntsd);
+ 
+ 	/* if we can retrieve the ACL, now parse Access Control Entries, ACEs */
+-	if (pntsd)
+-		rc = parse_sec_desc(pntsd, acllen, fattr);
+ 	if (rc)
+-		cFYI(1, "parse sec desc failed rc = %d", rc);
++		cFYI(1, "%s: get acl failed rc: %d", __func__, rc);
++	else {
++		rc = parse_sec_desc(pntsd, acllen, fattr);
++		if (rc)
++			cFYI(1, "%s: parse sec desc fail rc: %d", __func__, rc);
++	}
+ 
+ 	kfree(pntsd);
+ 	return;
+@@ -731,12 +740,15 @@ int mode_to_acl(struct inode *inode, const char *path, __u64 nmode)
+ 	cFYI(DBG2, "set ACL from mode for %s", path);
+ 
+ 	/* Get the security descriptor */
+-	pntsd = get_cifs_acl(CIFS_SB(inode->i_sb), inode, path, &secdesclen);
++	rc = get_cifs_acl(CIFS_SB(inode->i_sb), inode, path, &secdesclen,
++				&pntsd);
+ 
+ 	/* Add three ACEs for owner, group, everyone getting rid of
+ 	   other ACEs as chmod disables ACEs and set the security descriptor */
+ 
+-	if (pntsd) {
++	if (rc)
++		cFYI(DBG2, "%s: get cifs acl failed rc: %d", __func__, rc);
++	else {
+ 		/* allocate memory for the smb header,
+ 		   set security descriptor request security descriptor
+ 		   parameters, and secuirty descriptor itself */
+@@ -760,10 +772,10 @@ int mode_to_acl(struct inode *inode, const char *path, __u64 nmode)
+ 			cFYI(DBG2, "set_cifs_acl rc: %d", rc);
+ 		}
+ 
+-		kfree(pnntsd);
+-		kfree(pntsd);
+ 	}
+ 
++	kfree(pnntsd);
++	kfree(pntsd);
+ 	return rc;
+ }
+ #endif /* CONFIG_CIFS_EXPERIMENTAL */
+-- 
+1.6.0.2
