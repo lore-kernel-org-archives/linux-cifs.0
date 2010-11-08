@@ -1,9 +1,9 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: [PATCH] cifs: make cifs_ioctl handle NULL filp->private_data correctly
-Date: Mon,  8 Nov 2010 06:45:21 -0500
-Message-ID: <1289216721-20320-1-git-send-email-jlayton@redhat.com>
-Cc: kjella79-eZNTXLQAfP4@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: sjayaraman-l3A5Bk7waGM@public.gmane.org
+Date: Mon,  8 Nov 2010 07:28:32 -0500
+Message-ID: <1289219312-21396-1-git-send-email-jlayton@redhat.com>
+Cc: sjayaraman-l3A5Bk7waGM@public.gmane.org, kjella79-eZNTXLQAfP4@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
@@ -20,6 +20,7 @@ Long term, a better fix would be to establish a f_op->open routine for
 directories that populates that field at open time, but that requires
 some other changes to how readdir calls are handled.
 
+Reported-by: Kjell Rune Skaaraas <kjella79-eZNTXLQAfP4@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
  fs/cifs/ioctl.c |   12 ++++++++++--
