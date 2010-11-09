@@ -1,80 +1,102 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
- mode
-Date: Tue, 9 Nov 2010 13:00:58 -0500
-Message-ID: <20101109130058.1ba3c435@corrin.poochiereds.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache mode
+Date: Tue, 9 Nov 2010 21:02:19 +0300
+Message-ID: <AANLkTi=BZ_ozRd01VEjDAZ4YWou-Ng6vPnOvAwRWGRxC@mail.gmail.com>
 References: <1288945777-9197-1-git-send-email-piastryyy@gmail.com>
 	<1288945777-9197-2-git-send-email-piastryyy@gmail.com>
+	<20101109130058.1ba3c435@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1288945777-9197-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <20101109130058.1ba3c435-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri,  5 Nov 2010 11:29:32 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2010/11/9 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
+> On Fri, =A05 Nov 2010 11:29:32 +0300
+> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On strict cache mode when we close the last file handle of the inode=
+ we
+>> should invalidate it to prevent data coherency problem when we open =
+it
+>> again but it has been modified by other clients.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>> =A0fs/cifs/cifs_fs_sb.h | =A0 =A01 +
+>> =A0fs/cifs/file.c =A0 =A0 =A0 | =A0 =A06 ++++++
+>> =A02 files changed, 7 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+>> index e9a393c..be7b159 100644
+>> --- a/fs/cifs/cifs_fs_sb.h
+>> +++ b/fs/cifs/cifs_fs_sb.h
+>> @@ -40,6 +40,7 @@
+>> =A0#define CIFS_MOUNT_FSCACHE =A0 0x8000 /* local caching enabled */
+>> =A0#define CIFS_MOUNT_MF_SYMLINKS =A0 =A0 =A0 0x10000 /* Minshall+Fr=
+ench Symlinks enabled */
+>> =A0#define CIFS_MOUNT_MULTIUSER 0x20000 /* multiuser mount */
+>> +#define CIFS_MOUNT_STRICT_IO 0x40000 /* strict cache mode */
+>>
+>> =A0struct cifs_sb_info {
+>> =A0 =A0 =A0 struct rb_root tlink_tree;
+>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>> index 777e7f4..b36de2e 100644
+>> --- a/fs/cifs/file.c
+>> +++ b/fs/cifs/file.c
+>> @@ -264,7 +264,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_=
+file)
+>> =A0 =A0 =A0 struct inode *inode =3D cifs_file->dentry->d_inode;
+>> =A0 =A0 =A0 struct cifsTconInfo *tcon =3D tlink_tcon(cifs_file->tlin=
+k);
+>> =A0 =A0 =A0 struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
+>> + =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
+>> =A0 =A0 =A0 struct cifsLockInfo *li, *tmp;
+>> + =A0 =A0 bool last_open_file =3D false;
+>>
+>> =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
+>> =A0 =A0 =A0 if (--cifs_file->count > 0) {
+>> @@ -279,10 +281,14 @@ void cifsFileInfo_put(struct cifsFileInfo *cif=
+s_file)
+>> =A0 =A0 =A0 if (list_empty(&cifsi->openFileList)) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "closing last open instance for =
+inode %p",
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_file->dentry->d_ino=
+de);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 last_open_file =3D true;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_set_oplock_level(inode, 0);
+>> =A0 =A0 =A0 }
+>> =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
+>>
+>> + =A0 =A0 if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) && la=
+st_open_file)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(inode);
+>> +
+>
+> Now that I think about it...this looks racy. Suppose someone races in
+> after you set last_open_file, opens the file and does a write....
 
-> On strict cache mode when we close the last file handle of the inode we
-> should invalidate it to prevent data coherency problem when we open it
-> again but it has been modified by other clients.
-> 
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/cifs_fs_sb.h |    1 +
->  fs/cifs/file.c       |    6 ++++++
->  2 files changed, 7 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-> index e9a393c..be7b159 100644
-> --- a/fs/cifs/cifs_fs_sb.h
-> +++ b/fs/cifs/cifs_fs_sb.h
-> @@ -40,6 +40,7 @@
->  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
->  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
->  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
-> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
->  
->  struct cifs_sb_info {
->  	struct rb_root tlink_tree;
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 777e7f4..b36de2e 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -264,7 +264,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	struct inode *inode = cifs_file->dentry->d_inode;
->  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
->  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct cifsLockInfo *li, *tmp;
-> +	bool last_open_file = false;
->  
->  	spin_lock(&cifs_file_list_lock);
->  	if (--cifs_file->count > 0) {
-> @@ -279,10 +281,14 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	if (list_empty(&cifsi->openFileList)) {
->  		cFYI(1, "closing last open instance for inode %p",
->  			cifs_file->dentry->d_inode);
-> +		last_open_file = true;
->  		cifs_set_oplock_level(inode, 0);
->  	}
->  	spin_unlock(&cifs_file_list_lock);
->  
-> +	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) && last_open_file)
-> +		invalidate_remote_inode(inode);
-> +
+Can you explain what bad happens in this case?
 
-Now that I think about it...this looks racy. Suppose someone races in
-after you set last_open_file, opens the file and does a write....
+>
+> I think you'd be better served by setting the invalid_mapping flag on
+> the cifs_i instead and letting the normal revalidation codepath handl=
+e
+> this. The cache will then be invalidated the next time
+> cifs_revalidate_file/dentry is run.
+>
+>> =A0 =A0 =A0 if (!tcon->need_reconnect && !cifs_file->invalidHandle) =
+{
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 int xid, rc;
+>>
+>
 
-I think you'd be better served by setting the invalid_mapping flag on
-the cifs_i instead and letting the normal revalidation codepath handle
-this. The cache will then be invalidated the next time
-cifs_revalidate_file/dentry is run.
 
->  	if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
->  		int xid, rc;
->  
+
+--=20
+Best regards,
+Pavel Shilovsky.
