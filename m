@@ -1,67 +1,108 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix a memleak in cifs_setattr_nounix()
-Date: Tue, 9 Nov 2010 06:20:24 -0500
-Message-ID: <20101109062024.010ab599@tlielax.poochiereds.net>
-References: <1289285861-12033-1-git-send-email-sjayaraman@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Percolate error up to the caller during get/set acls
+Date: Tue,  9 Nov 2010 08:35:02 -0600
+Message-ID: <1289313302-31064-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289285861-12033-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue,  9 Nov 2010 12:27:41 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> Andrew Hendry reported a kmemleak warning in 2.6.37-rc1 while editing a
-> text file with gedit over cifs.
-> 
-> unreferenced object 0xffff88022ee08b40 (size 32):
->   comm "gedit", pid 2524, jiffies 4300160388 (age 2633.655s)
->   hex dump (first 32 bytes):
->     5c 2e 67 6f 75 74 70 75 74 73 74 72 65 61 6d 2d  \.goutputstream-
->     35 42 41 53 4c 56 00 de 09 00 00 00 2c 26 78 ee  5BASLV......,&x.
->   backtrace:
->     [<ffffffff81504a4d>] kmemleak_alloc+0x2d/0x60
->     [<ffffffff81136e13>] __kmalloc+0xe3/0x1d0
->     [<ffffffffa0313db0>] build_path_from_dentry+0xf0/0x230 [cifs]
->     [<ffffffffa031ae1e>] cifs_setattr+0x9e/0x770 [cifs]
->     [<ffffffff8115fe90>] notify_change+0x170/0x2e0
->     [<ffffffff81145ceb>] sys_fchmod+0x10b/0x140
->     [<ffffffff8100c172>] system_call_fastpath+0x16/0x1b
->     [<ffffffffffffffff>] 0xffffffffffffffff
-> 
-> The commit 1025774c that removed inode_setattr() seems to have introduced this
-> memleak by returning early without freeing 'full_path'.
-> 
-> Reported-by: Andrew Hendry <andrew.hendry-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Cc: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
-> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> ---
->  fs/cifs/inode.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 39869c3..ef3a55b 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -2177,7 +2177,6 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
->  
->  	setattr_copy(inode, attrs);
->  	mark_inode_dirty(inode);
-> -	return 0;
->  
->  cifs_setattr_exit:
->  	kfree(full_path);
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-That's almost certainly the bug.
+Modify get/set_cifs_acl* calls to reutrn error code and percolate the
+error code up to the caller.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsacl.c |   46 ++++++++++++++++++++++++++++++----------------
+ 1 files changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index c9b4792..003588a 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -568,8 +568,11 @@ static struct cifs_ntsd *get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
+ 
+ 	cifs_put_tlink(tlink);
+ 
+-	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+-	return pntsd;
++	cFYI(1, "%s: rc = %d ACL len %d", __func__, rc, *pacllen);
++	if (rc)
++		return ERR_PTR(rc);
++	else
++		return pntsd;
+ }
+ 
+ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+@@ -591,19 +594,19 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, READ_CONTROL, 0,
+ 			 &fid, &oplock, NULL, cifs_sb->local_nls,
+ 			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+-	if (rc) {
+-		cERROR(1, "Unable to open file to get ACL");
+-		goto out;
++	if (!rc) {
++		rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
++		CIFSSMBClose(xid, tcon, fid);
+ 	}
+ 
+-	rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
+-	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+-
+-	CIFSSMBClose(xid, tcon, fid);
+- out:
+ 	cifs_put_tlink(tlink);
+ 	FreeXid(xid);
+-	return pntsd;
++
++	cFYI(1, "%s: rc = %d ACL len %d", __func__, rc, *pacllen);
++	if (rc)
++		return ERR_PTR(rc);
++	else
++		return pntsd;
+ }
+ 
+ /* Retrieve an ACL from the server */
+@@ -711,12 +714,18 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+ 		pntsd = get_cifs_acl(cifs_sb, inode, path, &acllen);
+ 
+ 	/* if we can retrieve the ACL, now parse Access Control Entries, ACEs */
+-	if (pntsd)
++	if (!pntsd)
++		cERROR(1, "%s: NULL sec desc", __func__);
++	else if (IS_ERR(pntsd)) {
++		rc = PTR_ERR(pntsd);
++		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
++	} else {
+ 		rc = parse_sec_desc(pntsd, acllen, fattr);
+-	if (rc)
+-		cFYI(1, "parse sec desc failed rc = %d", rc);
++		kfree(pntsd);
++		if (rc)
++			cERROR(1, "parse sec desc failed rc = %d", rc);
++	}
+ 
+-	kfree(pntsd);
+ 	return;
+ }
+ 
+@@ -736,7 +745,12 @@ int mode_to_acl(struct inode *inode, const char *path, __u64 nmode)
+ 	/* Add three ACEs for owner, group, everyone getting rid of
+ 	   other ACEs as chmod disables ACEs and set the security descriptor */
+ 
+-	if (pntsd) {
++	if (!pntsd)
++		cERROR(1, "%s: NULL sec desc", __func__);
++	else if (IS_ERR(pntsd)) {
++		rc = PTR_ERR(pntsd);
++		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
++	} else {
+ 		/* allocate memory for the smb header,
+ 		   set security descriptor request security descriptor
+ 		   parameters, and secuirty descriptor itself */
+-- 
+1.6.0.2
