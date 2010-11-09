@@ -1,60 +1,45 @@
-From: Andrew Hendry <andrew.hendry-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: 2.6.37-rc1 kmemleak warnings when saving a file over cifs.
-Date: Tue, 9 Nov 2010 11:13:38 +1100
-Message-ID: <AANLkTikCnK7YN9F3JOv0rVZt65iQ=v=YJ_ONOuwj_=9D@mail.gmail.com>
+From: Shinnosuke Yagi <yagi.shinnosuke-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
+Subject: Re: Source code of SMB2 Kernel module
+Date: Tue, 09 Nov 2010 12:49:58 +0900
+Message-ID: <4CD8C4E6.5080603@nttcom.co.jp>
+References: <4CC65859.7040100@nttcom.co.jp>	<4CC6642F.2040401@suse.de>	<4CCA6FD3.4060907@nttcom.co.jp>	<4CCA7177.40303@suse.de>	<4CCF5DF8.9030809@nttcom.co.jp>	<4CD12521.2020708@suse.de>	<4CD35A27.4050605@nttcom.co.jp>	<AANLkTinm718oZX2Qc4++W_CYkv0+RZRwr09Uzu4zcDn0@mail.gmail.com>	<4CD76751.8010700@nttcom.co.jp> <AANLkTimx3ukvAjmuf5KQ3dSLVhpaF51pXcOfS1E_iFhY@mail.gmail.com> <4CD784AB.3040805@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-kernel <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4CD784AB.3040805-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have just noticed these in the past few days, now running 2.6.37-rc1+
-Seems to be 1 logged per file save when using a text file with gedit over cifs.
+Thank you, Suresh and Steve.
 
-unreferenced object 0xffff88022ee08b40 (size 32):
-  comm "gedit", pid 2524, jiffies 4300160388 (age 2633.655s)
-  hex dump (first 32 bytes):
-    5c 2e 67 6f 75 74 70 75 74 73 74 72 65 61 6d 2d  \.goutputstream-
-    35 42 41 53 4c 56 00 de 09 00 00 00 2c 26 78 ee  5BASLV......,&x.
-  backtrace:
-    [<ffffffff81504a4d>] kmemleak_alloc+0x2d/0x60
-    [<ffffffff81136e13>] __kmalloc+0xe3/0x1d0
-    [<ffffffffa0313db0>] build_path_from_dentry+0xf0/0x230 [cifs]
-    [<ffffffffa031ae1e>] cifs_setattr+0x9e/0x770 [cifs]
-    [<ffffffff8115fe90>] notify_change+0x170/0x2e0
-    [<ffffffff81145ceb>] sys_fchmod+0x10b/0x140
-    [<ffffffff8100c172>] system_call_fastpath+0x16/0x1b
-    [<ffffffffffffffff>] 0xffffffffffffffff
 
-unreferenced object 0xffff88022b469ca0 (size 32):
-  comm "gedit", pid 2543, jiffies 4300529624 (age 2264.419s)
-  hex dump (first 32 bytes):
-    5c 2e 67 6f 75 74 70 75 74 73 74 72 65 61 6d 2d  \.goutputstream-
-    30 38 53 59 4c 56 00 de 01 00 00 00 00 00 00 00  08SYLV..........
-  backtrace:
-    [<ffffffff81504a4d>] kmemleak_alloc+0x2d/0x60
-    [<ffffffff81136e13>] __kmalloc+0xe3/0x1d0
-    [<ffffffffa0313db0>] build_path_from_dentry+0xf0/0x230 [cifs]
-    [<ffffffffa031ae1e>] cifs_setattr+0x9e/0x770 [cifs]
-    [<ffffffff8115fe90>] notify_change+0x170/0x2e0
-    [<ffffffff811457cf>] chown_common+0x9f/0xc0
-    [<ffffffff8114588e>] sys_fchown+0x9e/0xc0
-    [<ffffffff8100c172>] system_call_fastpath+0x16/0x1b
-    [<ffffffffffffffff>] 0xffffffffffffffff
+Fscache was loaded, but smb2 module was not loaded successfully.
+Nothing was displayed when I did
+>    lsmod | grep smb2
 
-unreferenced object 0xffff88022b5f8d20 (size 32):
-  comm "gedit", pid 1885, jiffies 4294979706 (age 1221.634s)
-  hex dump (first 32 bytes):
-    5c 2e 67 6f 75 74 70 75 74 73 74 72 65 61 6d 2d  \.goutputstream-
-    34 38 38 59 4c 56 00 de 02 00 00 00 00 00 00 00  488YLV..........
-  backtrace:
-    [<ffffffff81505bad>] kmemleak_alloc+0x2d/0x60
-    [<ffffffff81136e23>] __kmalloc+0xe3/0x1d0
-    [<ffffffffa0329b90>] build_path_from_dentry+0xf0/0x230 [cifs]
-    [<ffffffffa0330abe>] cifs_setattr+0x9e/0x770 [cifs]
-    [<ffffffff8115fea0>] notify_change+0x170/0x2e0
-    [<ffffffff81145cfb>] sys_fchmod+0x10b/0x140
-    [<ffffffff8100c172>] system_call_fastpath+0x16/0x1b
-    [<ffffffffffffffff>] 0xffffffffffffffff
+ From Dmesg, following messages were displayed.
+====================================================
+FS-Cache: Netfs 'smb2' registered for caching
+FS-Cache: Netfs 'smb2' unregistered from caching
+====================================================
+
+Does this means FS-Cache on this kernel doesn't support smb2?
+
+
+
+>
+> I guess absence of fscache would result in a different error than this
+> (perhaps invalid module format or something) and you won't be able to
+> successfully load smb2 module itself..
+>
+> But, you could verify whether the smb2 module is loaded successfully by
+> doing
+>    lsmod | grep smb2
+>
+> Also check dmesg output for possible errors..
+>
+>
+>
