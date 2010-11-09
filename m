@@ -1,107 +1,145 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Percolate error up to the caller during get/set
- acls [try #2]
-Date: Tue, 9 Nov 2010 16:06:48 -0600
-Message-ID: <AANLkTimf=L1TsqWNRoDJ9VzCGwYWBKT8xU6bAob9yHpo@mail.gmail.com>
-References: <1289330107-2273-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101109143542.72fa1f63@corrin.poochiereds.net>
-	<AANLkTi=9N7H7MkBbx83TzG4s=X_oP=Pu_VknEgP=UPir@mail.gmail.com>
-	<AANLkTin6YTaxaXP=8H19qYi6gg9sRj9Vf2CUEpqM3taW@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Percolate error up to the caller during get/set acls [try #3]
+Date: Tue,  9 Nov 2010 16:25:28 -0600
+Message-ID: <1289341528-3675-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTin6YTaxaXP=8H19qYi6gg9sRj9Vf2CUEpqM3taW-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Nov 9, 2010 at 2:13 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Tue, Nov 9, 2010 at 1:38 PM, Shirish Pargaonkar
-> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> On Tue, Nov 9, 2010 at 1:35 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
->>> On Tue, =A09 Nov 2010 13:15:07 -0600
->>> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->>>
->>>> --- a/fs/cifs/inode.c
->>>> +++ b/fs/cifs/inode.c
->>>> @@ -688,10 +688,9 @@ int cifs_get_inode_info(struct inode **pinode=
-,
->>>>
->>>> =A0#ifdef CONFIG_CIFS_EXPERIMENTAL
->>>> =A0 =A0 =A0 /* fill in 0777 bits from ACL */
->>>> - =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
->>>> - =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Getting mode bits from ACL");
->>>> - =A0 =A0 =A0 =A0 =A0 =A0 cifs_acl_to_fattr(cifs_sb, &fattr, *pino=
-de, full_path, pfid);
->>>> - =A0 =A0 }
->>>> + =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL)
->>>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_acl_to_fattr(cifs_sb, &fattr=
-, *pinode, full_path,
->>>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 =A0 =A0 pfid);
->>>
->>> Do you want to return an error from cifs_get_inode_info when fetchi=
-ng
->>> the ACL fails? I think you either need to goto cgii_exit if rc !=3D=
- 0, or
->>> keep ignoring the error code like you do today. If the function is
->>> going to return an error, then there's no real point in doing the l=
-ater
->>> stuff (the iget, etc).
->>>
->>>
->>> --
->>> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>>
->>
->> Jeff, I thought about that. I think we should handle the error in bo=
-th
->> cifs_get_inode_info and mode_to_acl. =A0Both the functions are in ex=
-perimental
->> mode. And mode_to_acl does not log any error on rc, so I removed fro=
-m
->> cifs_get_inode_info also although cifs_acl_to_fattr does.
->>
->
-> I do not think this patch has caused this condition but investigating=
-=2E
->
->
-> cifstest6:/usr/src/cthon04 # mount
-> /dev/sda2 on / type ext3 (rw,acl,user_xattr)
-> /proc on /proc type proc (rw)
-> sysfs on /sys type sysfs (rw)
-> debugfs on /sys/kernel/debug type debugfs (rw)
-> udev on /dev type tmpfs (rw)
-> devpts on /dev/pts type devpts (rw,mode=3D0620,gid=3D5)
-> fusectl on /sys/fs/fuse/connections type fusectl (rw)
-> securityfs on /sys/kernel/security type securityfs (rw)
->
-> cifstest6:/usr/src/cthon04 # rmmod cifs
-> ERROR: Module cifs is in use
->
-> cifstest6:/usr/src/cthon04 # dmesg
-> CIFS VFS: Unexpected SMB signature
-> CIFS VFS: Unexpected SMB signature
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
-> CIFS VFS: cifs_acl_to_fattr: error -26 getting sec desc
->
->
-> #define ETXTBSY =A0 =A0 =A0 =A0 26 =A0 =A0 =A0/* Text file busy */
->
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-yes, this happens even without the patch, with cifsacl
-mount option except that with this patch, exact error
-code (ETXTBSY) gets logged.
+
+Modify get/set_cifs_acl* calls to reutrn error code and percolate the
+error code up to the caller.
+
+Even though, function cifs_acl_to_fattr() now returns a return code,
+it is not yet handled by the caller of cifs_acl_to_fattr().
+I would suggest to make that change, a part of another patch.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsacl.c   |   44 ++++++++++++++++++++++++++------------------
+ fs/cifs/cifsproto.h |    2 +-
+ 2 files changed, 27 insertions(+), 19 deletions(-)
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index c9b4792..cf53f7d 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -560,7 +560,7 @@ static struct cifs_ntsd *get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+ 
+ 	if (IS_ERR(tlink))
+-		return NULL;
++		ERR_CAST(tlink);
+ 
+ 	xid = GetXid();
+ 	rc = CIFSSMBGetCIFSACL(xid, tlink_tcon(tlink), fid, &pntsd, pacllen);
+@@ -568,7 +568,9 @@ static struct cifs_ntsd *get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
+ 
+ 	cifs_put_tlink(tlink);
+ 
+-	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
++	cFYI(1, "%s: rc = %d ACL len %d", __func__, rc, *pacllen);
++	if (rc)
++		return ERR_PTR(rc);
+ 	return pntsd;
+ }
+ 
+@@ -583,7 +585,7 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+ 
+ 	if (IS_ERR(tlink))
+-		return NULL;
++		ERR_CAST(tlink);
+ 
+ 	tcon = tlink_tcon(tlink);
+ 	xid = GetXid();
+@@ -591,18 +593,17 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, READ_CONTROL, 0,
+ 			 &fid, &oplock, NULL, cifs_sb->local_nls,
+ 			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+-	if (rc) {
+-		cERROR(1, "Unable to open file to get ACL");
+-		goto out;
++	if (!rc) {
++		rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
++		CIFSSMBClose(xid, tcon, fid);
+ 	}
+ 
+-	rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
+-	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+-
+-	CIFSSMBClose(xid, tcon, fid);
+- out:
+ 	cifs_put_tlink(tlink);
+ 	FreeXid(xid);
++
++	cFYI(1, "%s: rc = %d ACL len %d", __func__, rc, *pacllen);
++	if (rc)
++		return ERR_PTR(rc);
+ 	return pntsd;
+ }
+ 
+@@ -695,7 +696,7 @@ static int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ }
+ 
+ /* Translate the CIFS ACL (simlar to NTFS ACL) for a file into mode bits */
+-void
++int
+ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+ 		  struct inode *inode, const char *path, const __u16 *pfid)
+ {
+@@ -711,13 +712,17 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+ 		pntsd = get_cifs_acl(cifs_sb, inode, path, &acllen);
+ 
+ 	/* if we can retrieve the ACL, now parse Access Control Entries, ACEs */
+-	if (pntsd)
++	if (IS_ERR(pntsd)) {
++		rc = PTR_ERR(pntsd);
++		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
++	} else {
+ 		rc = parse_sec_desc(pntsd, acllen, fattr);
+-	if (rc)
+-		cFYI(1, "parse sec desc failed rc = %d", rc);
++		kfree(pntsd);
++		if (rc)
++			cERROR(1, "parse sec desc failed rc = %d", rc);
++	}
+ 
+-	kfree(pntsd);
+-	return;
++	return rc;
+ }
+ 
+ /* Convert mode bits to an ACL so we can update the ACL on the server */
+@@ -736,7 +741,10 @@ int mode_to_acl(struct inode *inode, const char *path, __u64 nmode)
+ 	/* Add three ACEs for owner, group, everyone getting rid of
+ 	   other ACEs as chmod disables ACEs and set the security descriptor */
+ 
+-	if (pntsd) {
++	if (IS_ERR(pntsd)) {
++		rc = PTR_ERR(pntsd);
++		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
++	} else {
+ 		/* allocate memory for the smb header,
+ 		   set security descriptor request security descriptor
+ 		   parameters, and secuirty descriptor itself */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 7ed69b6..6ed59af 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -130,7 +130,7 @@ extern int cifs_get_file_info_unix(struct file *filp);
+ extern int cifs_get_inode_info_unix(struct inode **pinode,
+ 			const unsigned char *search_path,
+ 			struct super_block *sb, int xid);
+-extern void cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb,
++extern int cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb,
+ 			      struct cifs_fattr *fattr, struct inode *inode,
+ 			      const char *path, const __u16 *pfid);
+ extern int mode_to_acl(struct inode *inode, const char *path, __u64);
+-- 
+1.6.0.2
