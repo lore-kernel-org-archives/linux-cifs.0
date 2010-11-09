@@ -1,102 +1,92 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache mode
-Date: Tue, 9 Nov 2010 21:02:19 +0300
-Message-ID: <AANLkTi=BZ_ozRd01VEjDAZ4YWou-Ng6vPnOvAwRWGRxC@mail.gmail.com>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH 2/6] CIFS: Make read call work with strict cache mode
+Date: Tue, 9 Nov 2010 13:04:10 -0500
+Message-ID: <20101109130410.2f02e4cc@corrin.poochiereds.net>
 References: <1288945777-9197-1-git-send-email-piastryyy@gmail.com>
-	<1288945777-9197-2-git-send-email-piastryyy@gmail.com>
-	<20101109130058.1ba3c435@corrin.poochiereds.net>
+	<1288945777-9197-3-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101109130058.1ba3c435-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1288945777-9197-3-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/11/9 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
-> On Fri, =A05 Nov 2010 11:29:32 +0300
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On strict cache mode when we close the last file handle of the inode=
- we
->> should invalidate it to prevent data coherency problem when we open =
-it
->> again but it has been modified by other clients.
->>
->> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->> =A0fs/cifs/cifs_fs_sb.h | =A0 =A01 +
->> =A0fs/cifs/file.c =A0 =A0 =A0 | =A0 =A06 ++++++
->> =A02 files changed, 7 insertions(+), 0 deletions(-)
->>
->> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
->> index e9a393c..be7b159 100644
->> --- a/fs/cifs/cifs_fs_sb.h
->> +++ b/fs/cifs/cifs_fs_sb.h
->> @@ -40,6 +40,7 @@
->> =A0#define CIFS_MOUNT_FSCACHE =A0 0x8000 /* local caching enabled */
->> =A0#define CIFS_MOUNT_MF_SYMLINKS =A0 =A0 =A0 0x10000 /* Minshall+Fr=
-ench Symlinks enabled */
->> =A0#define CIFS_MOUNT_MULTIUSER 0x20000 /* multiuser mount */
->> +#define CIFS_MOUNT_STRICT_IO 0x40000 /* strict cache mode */
->>
->> =A0struct cifs_sb_info {
->> =A0 =A0 =A0 struct rb_root tlink_tree;
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 777e7f4..b36de2e 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -264,7 +264,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_=
-file)
->> =A0 =A0 =A0 struct inode *inode =3D cifs_file->dentry->d_inode;
->> =A0 =A0 =A0 struct cifsTconInfo *tcon =3D tlink_tcon(cifs_file->tlin=
-k);
->> =A0 =A0 =A0 struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
->> + =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
->> =A0 =A0 =A0 struct cifsLockInfo *li, *tmp;
->> + =A0 =A0 bool last_open_file =3D false;
->>
->> =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
->> =A0 =A0 =A0 if (--cifs_file->count > 0) {
->> @@ -279,10 +281,14 @@ void cifsFileInfo_put(struct cifsFileInfo *cif=
-s_file)
->> =A0 =A0 =A0 if (list_empty(&cifsi->openFileList)) {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "closing last open instance for =
-inode %p",
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_file->dentry->d_ino=
-de);
->> + =A0 =A0 =A0 =A0 =A0 =A0 last_open_file =3D true;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_set_oplock_level(inode, 0);
->> =A0 =A0 =A0 }
->> =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
->>
->> + =A0 =A0 if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) && la=
-st_open_file)
->> + =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(inode);
->> +
->
-> Now that I think about it...this looks racy. Suppose someone races in
-> after you set last_open_file, opens the file and does a write....
+On Fri,  5 Nov 2010 11:29:33 +0300
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Can you explain what bad happens in this case?
+> Add cifs_file_aio_read where we read from the cache if we have at least
+> Level II oplock - otherwise read from the server.
+> 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   28 ++++++++++++++++++++++++++--
+>  1 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 38526a6..bb7f36e 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -569,6 +569,30 @@ cifs_do_mount(struct file_system_type *fs_type,
+>  	return dget(sb->s_root);
+>  }
+>  
+> +static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
+> +				   unsigned long nr_segs, loff_t pos)
+> +{
+> +	struct inode *inode;
+> +	struct cifs_sb_info *cifs_sb;
+> +	ssize_t read;
+> +
+> +	inode = iocb->ki_filp->f_path.dentry->d_inode;
+> +	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
+> +
+> +	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0)
+> +		/* BB call cifs_revalidate_file before generic_file_aio_read */
+> +		return generic_file_aio_read(iocb, iov, nr_segs, pos);
+> +
+> +	if (!CIFS_I(inode)->clientCanCacheRead) {
+> +		read = cifs_user_read(iocb->ki_filp, iov->iov_base,
+> +				      iov->iov_len, &pos);
+> +		iocb->ki_pos = pos;
+> +	} else
+> +		read = generic_file_aio_read(iocb, iov, nr_segs, pos);
+> +
+> +	return read;
+> +}
+> +
 
->
-> I think you'd be better served by setting the invalid_mapping flag on
-> the cifs_i instead and letting the normal revalidation codepath handl=
-e
-> this. The cache will then be invalidated the next time
-> cifs_revalidate_file/dentry is run.
->
->> =A0 =A0 =A0 if (!tcon->need_reconnect && !cifs_file->invalidHandle) =
-{
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 int xid, rc;
->>
->
+This looks more convoluted than it really ought to be. Something like
+this would be better:
+
+if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0 ||
+    CIFS_I(inode)->clientCanCacheRead)
+	return generic_file_aio_read(iocb, iov, nr_segs, pos);
+
+read = cifs_user_read(iocb->ki_filp, iov->iov_base, ...
 
 
 
---=20
-Best regards,
-Pavel Shilovsky.
+>  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+>  				   unsigned long nr_segs, loff_t pos)
+>  {
+> @@ -691,7 +715,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
+>  const struct file_operations cifs_file_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+> @@ -728,7 +752,7 @@ const struct file_operations cifs_file_direct_ops = {
+>  const struct file_operations cifs_file_nobrl_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
