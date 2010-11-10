@@ -1,73 +1,151 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 3/6] CIFS: Make write call work with strict cache mode
-Date: Wed, 10 Nov 2010 18:55:54 +0300
-Message-ID: <1289404554-13748-1-git-send-email-piastryyy@gmail.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Percolate error up to the caller during get/set
+ acls [try #4]
+Date: Wed, 10 Nov 2010 13:46:45 -0500
+Message-ID: <20101110134645.0c3cf7cb@tlielax.poochiereds.net>
+References: <1289397035-3709-1-git-send-email-shirishpargaonkar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1289397035-3709-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On strict cache mode if we don't have Exclusive oplock we write a data to
-the server through cifs_user_write. Then if we Level II oplock store it in
-the cache, otherwise - invalidate inode pages affected by this writing.
+On Wed, 10 Nov 2010 07:50:35 -0600
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsfs.c |   40 ++++++++++++++++++++++++++++++++++++----
- 1 files changed, 36 insertions(+), 4 deletions(-)
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> Modify get/set_cifs_acl* calls to reutrn error code and percolate the
+> error code up to the caller.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsacl.c   |   44 ++++++++++++++++++++++++++------------------
+>  fs/cifs/cifsproto.h |    2 +-
+>  2 files changed, 27 insertions(+), 19 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index c9b4792..91992ab 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -560,7 +560,7 @@ static struct cifs_ntsd *get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
+>  	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+>  
+>  	if (IS_ERR(tlink))
+> -		return NULL;
+> +		return ERR_CAST(tlink);
+>  
+>  	xid = GetXid();
+>  	rc = CIFSSMBGetCIFSACL(xid, tlink_tcon(tlink), fid, &pntsd, pacllen);
+> @@ -568,7 +568,9 @@ static struct cifs_ntsd *get_cifs_acl_by_fid(struct cifs_sb_info *cifs_sb,
+>  
+>  	cifs_put_tlink(tlink);
+>  
+> -	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+> +	cFYI(1, "%s: rc = %d ACL len %d", __func__, rc, *pacllen);
+> +	if (rc)
+> +		return ERR_PTR(rc);
+>  	return pntsd;
+>  }
+>  
+> @@ -583,7 +585,7 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+>  	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+>  
+>  	if (IS_ERR(tlink))
+> -		return NULL;
+> +		return ERR_CAST(tlink);
+>  
+>  	tcon = tlink_tcon(tlink);
+>  	xid = GetXid();
+> @@ -591,18 +593,17 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+>  	rc = CIFSSMBOpen(xid, tcon, path, FILE_OPEN, READ_CONTROL, 0,
+>  			 &fid, &oplock, NULL, cifs_sb->local_nls,
+>  			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -	if (rc) {
+> -		cERROR(1, "Unable to open file to get ACL");
+> -		goto out;
+> +	if (!rc) {
+> +		rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
+> +		CIFSSMBClose(xid, tcon, fid);
+>  	}
+>  
+> -	rc = CIFSSMBGetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
+> -	cFYI(1, "GetCIFSACL rc = %d ACL len %d", rc, *pacllen);
+> -
+> -	CIFSSMBClose(xid, tcon, fid);
+> - out:
+>  	cifs_put_tlink(tlink);
+>  	FreeXid(xid);
+> +
+> +	cFYI(1, "%s: rc = %d ACL len %d", __func__, rc, *pacllen);
+> +	if (rc)
+> +		return ERR_PTR(rc);
+>  	return pntsd;
+>  }
+>  
+> @@ -695,7 +696,7 @@ static int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+>  }
+>  
+>  /* Translate the CIFS ACL (simlar to NTFS ACL) for a file into mode bits */
+> -void
+> +int
+>  cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+>  		  struct inode *inode, const char *path, const __u16 *pfid)
+>  {
+> @@ -711,13 +712,17 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+>  		pntsd = get_cifs_acl(cifs_sb, inode, path, &acllen);
+>  
+>  	/* if we can retrieve the ACL, now parse Access Control Entries, ACEs */
+> -	if (pntsd)
+> +	if (IS_ERR(pntsd)) {
+> +		rc = PTR_ERR(pntsd);
+> +		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
+> +	} else {
+>  		rc = parse_sec_desc(pntsd, acllen, fattr);
+> -	if (rc)
+> -		cFYI(1, "parse sec desc failed rc = %d", rc);
+> +		kfree(pntsd);
+> +		if (rc)
+> +			cERROR(1, "parse sec desc failed rc = %d", rc);
+> +	}
+>  
+> -	kfree(pntsd);
+> -	return;
+> +	return rc;
+>  }
+>  
+>  /* Convert mode bits to an ACL so we can update the ACL on the server */
+> @@ -736,7 +741,10 @@ int mode_to_acl(struct inode *inode, const char *path, __u64 nmode)
+>  	/* Add three ACEs for owner, group, everyone getting rid of
+>  	   other ACEs as chmod disables ACEs and set the security descriptor */
+>  
+> -	if (pntsd) {
+> +	if (IS_ERR(pntsd)) {
+> +		rc = PTR_ERR(pntsd);
+> +		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
+> +	} else {
+>  		/* allocate memory for the smb header,
+>  		   set security descriptor request security descriptor
+>  		   parameters, and secuirty descriptor itself */
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 7ed69b6..6ed59af 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -130,7 +130,7 @@ extern int cifs_get_file_info_unix(struct file *filp);
+>  extern int cifs_get_inode_info_unix(struct inode **pinode,
+>  			const unsigned char *search_path,
+>  			struct super_block *sb, int xid);
+> -extern void cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb,
+> +extern int cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb,
+>  			      struct cifs_fattr *fattr, struct inode *inode,
+>  			      const char *path, const __u16 *pfid);
+>  extern int mode_to_acl(struct inode *inode, const char *path, __u64);
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index bbb5294..901c82b 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -598,12 +598,44 @@ static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
- static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
- 				   unsigned long nr_segs, loff_t pos)
- {
--	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
-+	struct inode *inode;
-+	struct cifs_sb_info *cifs_sb;
- 	ssize_t written;
- 
--	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
--	if (!CIFS_I(inode)->clientCanCacheAll)
--		filemap_fdatawrite(inode->i_mapping);
-+	inode = iocb->ki_filp->f_path.dentry->d_inode;
-+
-+	if (CIFS_I(inode)->clientCanCacheAll)
-+		return generic_file_aio_write(iocb, iov, nr_segs, pos);
-+
-+	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
-+
-+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0) {
-+		int rc;
-+
-+		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
-+
-+		rc = filemap_fdatawrite(inode->i_mapping);
-+		if (rc)
-+			cFYI(1, "cifs_file_aio_write: %d rc on %p inode",
-+			     rc, inode);
-+		return written;
-+	}
-+
-+	/* in strict cache mode we need to write the data to the server exactly
-+	   from the pos to pos+len-1 rather than flush all affected pages
-+	   because it may cause a error with mandatory locks on these pages but
-+	   not on the region from pos to ppos+len-1 */
-+	written = cifs_user_write(iocb->ki_filp, iov->iov_base,
-+				  iov->iov_len, &pos);
-+
-+	iocb->ki_pos = pos;
-+
-+	/* if we were successful - invalidate inode pages the write affected */
-+	if (written > 0)
-+		invalidate_mapping_pages(inode->i_mapping,
-+					      (pos-written) >> PAGE_CACHE_SHIFT,
-+					      (pos-1) >> PAGE_CACHE_SHIFT);
-+
- 	return written;
- }
- 
--- 
-1.7.2.3
+Looks good.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
