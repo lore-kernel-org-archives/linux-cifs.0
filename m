@@ -1,114 +1,119 @@
-From: Shinnosuke Yagi <yagi.shinnosuke-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
-Subject: Re: Source code of SMB2 Kernel module
-Date: Wed, 10 Nov 2010 17:35:33 +0900
-Message-ID: <4CDA5955.50409@nttcom.co.jp>
-References: <4CC65859.7040100@nttcom.co.jp>	<4CC6642F.2040401@suse.de>	<4CCA6FD3.4060907@nttcom.co.jp>	<4CCA7177.40303@suse.de>	<4CCF5DF8.9030809@nttcom.co.jp>	<4CD12521.2020708@suse.de>	<4CD35A27.4050605@nttcom.co.jp>	<AANLkTinm718oZX2Qc4++W_CYkv0+RZRwr09Uzu4zcDn0@mail.gmail.com>	<4CD76751.8010700@nttcom.co.jp>	<AANLkTimx3ukvAjmuf5KQ3dSLVhpaF51pXcOfS1E_iFhY@mail.gmail.com>	<4CD784AB.3040805@suse.de>	<4CD8C4E6.5080603@nttcom.co.jp> <AANLkTikeNCCoMTsnaMMs6jqivgbke9hTUx_25hosM=-9@mail.gmail.com> <4CDA4E5C.90004@nttcom.co.jp> <4CDA5225.8000309@suse.de>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
+ mode
+Date: Wed, 10 Nov 2010 06:36:12 -0500
+Message-ID: <20101110063612.535cf79a@tlielax.poochiereds.net>
+References: <1288945777-9197-1-git-send-email-piastryyy@gmail.com>
+	<1288945777-9197-2-git-send-email-piastryyy@gmail.com>
+	<20101109130058.1ba3c435@corrin.poochiereds.net>
+	<AANLkTi=BZ_ozRd01VEjDAZ4YWou-Ng6vPnOvAwRWGRxC@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
-	format=flowed
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CDA5225.8000309-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <AANLkTi=BZ_ozRd01VEjDAZ4YWou-Ng6vPnOvAwRWGRxC-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Tue, 9 Nov 2010 21:02:19 +0300
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-I patched and tried to mount again.
+> 2010/11/9 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
+> > On Fri, =A05 Nov 2010 11:29:32 +0300
+> > Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> On strict cache mode when we close the last file handle of the ino=
+de we
+> >> should invalidate it to prevent data coherency problem when we ope=
+n it
+> >> again but it has been modified by other clients.
+> >>
+> >> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> ---
+> >> =A0fs/cifs/cifs_fs_sb.h | =A0 =A01 +
+> >> =A0fs/cifs/file.c =A0 =A0 =A0 | =A0 =A06 ++++++
+> >> =A02 files changed, 7 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> >> index e9a393c..be7b159 100644
+> >> --- a/fs/cifs/cifs_fs_sb.h
+> >> +++ b/fs/cifs/cifs_fs_sb.h
+> >> @@ -40,6 +40,7 @@
+> >> =A0#define CIFS_MOUNT_FSCACHE =A0 0x8000 /* local caching enabled =
+*/
+> >> =A0#define CIFS_MOUNT_MF_SYMLINKS =A0 =A0 =A0 0x10000 /* Minshall+=
+=46rench Symlinks enabled */
+> >> =A0#define CIFS_MOUNT_MULTIUSER 0x20000 /* multiuser mount */
+> >> +#define CIFS_MOUNT_STRICT_IO 0x40000 /* strict cache mode */
+> >>
+> >> =A0struct cifs_sb_info {
+> >> =A0 =A0 =A0 struct rb_root tlink_tree;
+> >> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> >> index 777e7f4..b36de2e 100644
+> >> --- a/fs/cifs/file.c
+> >> +++ b/fs/cifs/file.c
+> >> @@ -264,7 +264,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cif=
+s_file)
+> >> =A0 =A0 =A0 struct inode *inode =3D cifs_file->dentry->d_inode;
+> >> =A0 =A0 =A0 struct cifsTconInfo *tcon =3D tlink_tcon(cifs_file->tl=
+ink);
+> >> =A0 =A0 =A0 struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
+> >> + =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
+> >> =A0 =A0 =A0 struct cifsLockInfo *li, *tmp;
+> >> + =A0 =A0 bool last_open_file =3D false;
+> >>
+> >> =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
+> >> =A0 =A0 =A0 if (--cifs_file->count > 0) {
+> >> @@ -279,10 +281,14 @@ void cifsFileInfo_put(struct cifsFileInfo *c=
+ifs_file)
+> >> =A0 =A0 =A0 if (list_empty(&cifsi->openFileList)) {
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "closing last open instance fo=
+r inode %p",
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_file->dentry->d_i=
+node);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 last_open_file =3D true;
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_set_oplock_level(inode, 0);
+> >> =A0 =A0 =A0 }
+> >> =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
+> >>
+> >> + =A0 =A0 if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) && =
+last_open_file)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(inode);
+> >> +
+> >
+> > Now that I think about it...this looks racy. Suppose someone races =
+in
+> > after you set last_open_file, opens the file and does a write....
+>=20
+> Can you explain what bad happens in this case?
+>=20
 
-I mount successfully by smb2.
-However, Kernel clashed when I accessed to mounted FS.
+It looks like you'll be invalidating potentially up-to-date data.
+Either way...I've been steadily trying to move the code to a more
+well-defined codepath for invalidating dirty data. Zapping the cached
+pages here is unnecessary. It would be better to just mark the inode as
+having an invalid mapping and move on, unless you see some other reason
+why we must zap all of the pages here.
 
-I couldn't got any logs, because I did not set kdump.
-
-I will try to get a clashed kernel dump.
-
-Please wait.
-
-
-Thanks.
-
-
-(2010/11/10 17:04), Suresh Jayaraman wrote:
-> On 11/10/2010 01:18 PM, Shinnosuke Yagi wrote:
->>
->> I added some logging messages.
->>
->> # git diff fs/smb2/smb2fs.c
->> diff --git a/fs/smb2/smb2fs.c b/fs/smb2/smb2fs.c
->> index aa550a3..52c9f35 100644
->> --- a/fs/smb2/smb2fs.c
->> +++ b/fs/smb2/smb2fs.c
->> @@ -57,7 +57,7 @@ static struct quotactl_ops smb2_quotactl_ops;
->>
->>   /* Definitions of various global variables follow */
->>
->> -int smb2FYI;
->> +int smb2FYI =3D 1;
->>   int smb2ERROR =3D 1;
->>   int trace_SMB2;
->>
->> I got following logs on dmesg.
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
->> FS-Cache: Netfs 'smb2' registered for caching
->> fs/smb2/smb2fs.c: SMB2_max_buf_size 0x4000
->> fs/smb2/smb2fs.c: smb2_init_request_bufs 0
->> fs/smb2/smb2fs.c: register_filesystem 0
->> fs/smb2/smb2fs.c: register_key_type -17
->
-> -17 is -EEXIST which means ket type with the name is already present.
-> The below patch should fix the problem I think. Could you try and
-> report back?
->
->
-> From: Suresh Jayaraman<sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> Subject: [PATCH] smb2: rename smb2 spnego key type
->
-> .. to avoid key registration failure. register_key_type() doesn't all=
-ow key
-> types with same names.
->
-> Reported-by: Shinnosuke Yagi<yagi.shinnosuke-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org>
-> Signed-off-by: Suresh Jayaraman<sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> ---
->   fs/smb2/smb2_spnego.c |    2 +-
->   1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/fs/smb2/smb2_spnego.c b/fs/smb2/smb2_spnego.c
-> index 6551002..24df95a 100644
-> --- a/fs/smb2/smb2_spnego.c
-> +++ b/fs/smb2/smb2_spnego.c
-> @@ -61,7 +61,7 @@ smb2_spnego_key_destroy(struct key *key)
->    * keytype for SMB2 spnego keys
->    */
->   struct key_type smb2_spnego_key_type =3D {
-> -	.name		=3D "cifs.spnego",
-> +	.name		=3D "smb2.spnego",
->   	.instantiate	=3D smb2_spnego_key_instantiate,
->   	.match		=3D user_match,
->   	.destroy	=3D smb2_spnego_key_destroy,
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
+> >
+> > I think you'd be better served by setting the invalid_mapping flag =
+on
+> > the cifs_i instead and letting the normal revalidation codepath han=
+dle
+> > this. The cache will then be invalidated the next time
+> > cifs_revalidate_file/dentry is run.
+> >
+> >> =A0 =A0 =A0 if (!tcon->need_reconnect && !cifs_file->invalidHandle=
+) {
+> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 int xid, rc;
+> >>
+> >
+>=20
+>=20
+>=20
 
 
 --=20
--------------------------------------
-=E5=85=AB=E6=9C=A8 =E6=B8=85=E4=B9=8B=E4=BB=8B =EF=BC=88=E3=83=A4=E3=82=
-=AE=E3=80=80=E3=82=B7=E3=83=B3=E3=83=8E=E3=82=B9=E3=82=B1=EF=BC=89
-NTT=E3=82=B3=E3=83=A0=E3=82=A6=E3=82=A7=E3=82=A2=E6=A0=AA=E5=BC=8F=E4=BC=
-=9A=E7=A4=BE
-=E3=83=8D=E3=83=83=E3=83=88=E3=83=AF=E3=83=BC=E3=82=AF=E3=83=BB=E3=82=BD=
-=E3=83=AA=E3=83=A5=E3=83=BC=E3=82=B7=E3=83=A7=E3=83=B3=E4=BA=8B=E6=A5=AD=
-=E6=9C=AC=E9=83=A8
-yagi.shinnosuke-o7dWnD6vFTHqq2nvvmkE/A@public.gmane.org
--------------------------------------
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
