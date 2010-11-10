@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 3/6] CIFS: Make write call work with strict cache mode
-Date: Wed, 10 Nov 2010 18:41:48 +0300
-Message-ID: <1289403711-12965-4-git-send-email-piastryyy@gmail.com>
+Subject: [PATCH 6/6] CIFS: Add strictcache mount option
+Date: Wed, 10 Nov 2010 18:41:51 +0300
+Message-ID: <1289403711-12965-7-git-send-email-piastryyy@gmail.com>
 References: <1289403711-12965-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,100 +9,63 @@ In-Reply-To: <1289403711-12965-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On strict cache mode if we don't have Exclusive oplock we write a data to
-the server through cifs_user_write. Then if we Level II oplock store it in
-the cache, otherwise - invalidate inode pages affected by this writing.
+Use for switching on strict cache mode. In this mode the
+client read from the cache all the time it has Oplock Level II,
+otherwise - read from the server. All written data are stored
+in the cache, but if the client doesn't have Exclusive Oplock,
+it writes the data to the server.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsfs.c |   40 ++++++++++++++++++++++++++++++++++++----
- fs/cifs/file.c   |   14 ++++++++++++--
- 2 files changed, 48 insertions(+), 6 deletions(-)
+ fs/cifs/README    |    5 +++++
+ fs/cifs/connect.c |    5 +++++
+ 2 files changed, 10 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index bbb5294..901c82b 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -598,12 +598,44 @@ static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
- static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
- 				   unsigned long nr_segs, loff_t pos)
- {
--	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
-+	struct inode *inode;
-+	struct cifs_sb_info *cifs_sb;
- 	ssize_t written;
- 
--	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
--	if (!CIFS_I(inode)->clientCanCacheAll)
--		filemap_fdatawrite(inode->i_mapping);
-+	inode = iocb->ki_filp->f_path.dentry->d_inode;
-+
-+	if (CIFS_I(inode)->clientCanCacheAll)
-+		return generic_file_aio_write(iocb, iov, nr_segs, pos);
-+
-+	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
-+
-+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0) {
-+		int rc;
-+
-+		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
-+
-+		rc = filemap_fdatawrite(inode->i_mapping);
-+		if (rc)
-+			cFYI(1, "cifs_file_aio_write: %d rc on %p inode",
-+			     rc, inode);
-+		return written;
-+	}
-+
-+	/* in strict cache mode we need to write the data to the server exactly
-+	   from the pos to pos+len-1 rather than flush all affected pages
-+	   because it may cause a error with mandatory locks on these pages but
-+	   not on the region from pos to ppos+len-1 */
-+	written = cifs_user_write(iocb->ki_filp, iov->iov_base,
-+				  iov->iov_len, &pos);
-+
-+	iocb->ki_pos = pos;
-+
-+	/* if we were successful - invalidate inode pages the write affected */
-+	if (written > 0)
-+		invalidate_mapping_pages(inode->i_mapping,
-+					      (pos-written) >> PAGE_CACHE_SHIFT,
-+					      (pos-1) >> PAGE_CACHE_SHIFT);
-+
- 	return written;
- }
- 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 88bb366..568e93f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1545,7 +1545,11 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- 			struct page *page, void *fsdata)
- {
- 	int rc;
--	struct inode *inode = mapping->host;
-+	struct inode *inode;
-+	struct cifs_sb_info *cifs_sb;
-+
-+	inode = mapping->host;
-+	cifs_sb = CIFS_SB(inode->i_sb);
- 
- 	cFYI(1, "write_end for page %p from pos %lld with %d bytes",
- 		 page, pos, copied);
-@@ -1578,7 +1582,13 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- 	} else {
- 		rc = copied;
- 		pos += copied;
--		set_page_dirty(page);
-+		/* if we have strict cache switched on and don't have Exclusive
-+		   oplock for the inode, we don't have to set_page_dirty
-+		   because we flushed the data to the server in
-+		   cifs_file_aio_write before */
-+		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0 ||
-+		    CIFS_I(inode)->clientCanCacheAll)
-+			set_page_dirty(page);
- 	}
- 
- 	if (rc > 0) {
+diff --git a/fs/cifs/README b/fs/cifs/README
+index ee68d10..8fb6192 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -443,6 +443,11 @@ A partial list of the supported mount options follows:
+ 		if oplock (caching token) is granted and held. Note that
+ 		direct allows write operations larger than page size
+ 		to be sent to the server.
++  strictcache   Use for switching on strict cache mode. In this mode the
++		client read from the cache all the time it has Oplock Level II,
++		otherwise - read from the server. All written data are stored
++		in the cache, but if the client doesn't have Exclusive Oplock,
++		it writes the data to the server.
+   acl   	Allow setfacl and getfacl to manage posix ACLs if server
+ 		supports them.  (default)
+   noacl 	Do not allow setfacl and getfacl calls on this mount
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 251a17c..97286c7 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -84,6 +84,7 @@ struct smb_vol {
+ 	bool no_xattr:1;   /* set if xattr (EA) support should be disabled*/
+ 	bool server_ino:1; /* use inode numbers from server ie UniqueId */
+ 	bool direct_io:1;
++	bool strict_io:1; /* strict cache behavior */
+ 	bool remap:1;      /* set to remap seven reserved chars in filenames */
+ 	bool posix_paths:1; /* unset to not ask for posix pathnames. */
+ 	bool no_linux_ext:1;
+@@ -1347,6 +1348,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 			vol->direct_io = 1;
+ 		} else if (strnicmp(data, "forcedirectio", 13) == 0) {
+ 			vol->direct_io = 1;
++		} else if (strnicmp(data, "strictcache", 11) == 0) {
++			vol->strict_io = 1;
+ 		} else if (strnicmp(data, "noac", 4) == 0) {
+ 			printk(KERN_WARNING "CIFS: Mount option noac not "
+ 				"supported. Instead set "
+@@ -2597,6 +2600,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 	if (pvolume_info->multiuser)
+ 		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
+ 					    CIFS_MOUNT_NO_PERM);
++	if (pvolume_info->strict_io)
++		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
+ 	if (pvolume_info->direct_io) {
+ 		cFYI(1, "mounting share using direct i/o");
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
 -- 
 1.7.2.3
