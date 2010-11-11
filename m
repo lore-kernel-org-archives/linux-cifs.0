@@ -1,43 +1,100 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix potential use-after-free in cifs_oplock_break_put
-Date: Thu, 11 Nov 2010 14:08:16 +0530
-Message-ID: <4CDBAB78.2020005@suse.de>
-References: <1289402350-14218-1-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: Re: [patch] cifs: don't overwrite dentry name in d_revalidate
+Date: Thu, 11 Nov 2010 10:28:06 -0500
+Message-ID: <20101111102806.7f4293fc@barsoom.rdu.redhat.com>
+References: <20101111074216.GA10159@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289402350-14218-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+To: Nick Piggin <npiggin@kernel.dk>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20101111074216.GA10159@amd>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On 11/10/2010 08:49 PM, Jeff Layton wrote:
-> cfile may very well be freed after the cifsFileInfo_put. Make sure we
-> have a valid pointer to the superblock for cifs_sb_deactive.
+On Thu, 11 Nov 2010 18:42:16 +1100
+Nick Piggin <npiggin@kernel.dk> wrote:
+
+> Instead, use fatfs's method for dealing with negative dentries to
+> preserve case, rather than overwrite dentry name in d_revalidate, which
+> is a bit ugly and also gets in the way of doing lock-free path walking.
 > 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/file.c |    4 +++-
->  1 files changed, 3 insertions(+), 1 deletions(-)
+> Signed-off-by: Nick Piggin <npiggin@kernel.dk>
 > 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 06c3e83..b857ce5 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2271,8 +2271,10 @@ void cifs_oplock_break_get(struct cifsFileInfo *cfile)
->  
->  void cifs_oplock_break_put(struct cifsFileInfo *cfile)
+> Index: linux-2.6/fs/cifs/dir.c
+> ===================================================================
+> --- linux-2.6.orig/fs/cifs/dir.c	2010-11-11 18:05:55.000000000 +1100
+> +++ linux-2.6/fs/cifs/dir.c	2010-11-11 18:06:49.000000000 +1100
+> @@ -656,22 +656,34 @@ cifs_lookup(struct inode *parent_dir_ino
+>  static int
+>  cifs_d_revalidate(struct dentry *direntry, struct nameidata *nd)
 >  {
-> +	struct super_block *sb = cfile->dentry->d_sb;
+> -	int isValid = 1;
+> -
+>  	if (direntry->d_inode) {
+>  		if (cifs_revalidate_dentry(direntry))
+>  			return 0;
+> -	} else {
+> -		cFYI(1, "neg dentry 0x%p name = %s",
+> -			 direntry, direntry->d_name.name);
+> -		if (time_after(jiffies, direntry->d_time + HZ) ||
+> -			!lookupCacheEnabled) {
+> -			d_drop(direntry);
+> -			isValid = 0;
+> -		}
+> +		else
+> +			return 1;
+> +	}
 > +
->  	cifsFileInfo_put(cfile);
-> -	cifs_sb_deactive(cfile->dentry->d_sb);
-> +	cifs_sb_deactive(sb);
+> +	/*
+> +	 * This may be nfsd (or something), anyway, we can't see the
+> +	 * intent of this. So, since this can be for creation, drop it.
+> +	 */
+> +	if (!nd)
+> +		return 0;
+> +
+> +	/*
+> +	 * Drop the negative dentry, in order to make sure to use the
+> +	 * case sensitive name which is specified by user if this is
+> +	 * for creation.
+> +	 */
+> +	if (!(nd->flags & (LOOKUP_CONTINUE | LOOKUP_PARENT))) {
+> +		if (nd->flags & (LOOKUP_CREATE | LOOKUP_RENAME_TARGET))
+> +			return 0;
+>  	}
+>  
+> -	return isValid;
+> +	if (time_after(jiffies, direntry->d_time + HZ) || !lookupCacheEnabled)
+> +		return 0;
+> +
+> +	return 1;
 >  }
 >  
+>  /* static int cifs_d_delete(struct dentry *direntry)
+> @@ -709,15 +721,8 @@ static int cifs_ci_compare(struct dentry
+>  	struct nls_table *codepage = CIFS_SB(dentry->d_inode->i_sb)->local_nls;
+>  
+>  	if ((a->len == b->len) &&
+> -	    (nls_strnicmp(codepage, a->name, b->name, a->len) == 0)) {
+> -		/*
+> -		 * To preserve case, don't let an existing negative dentry's
+> -		 * case take precedence.  If a is not a negative dentry, this
+> -		 * should have no side effects
+> -		 */
+> -		memcpy((void *)a->name, b->name, a->len);
+> +	    (nls_strnicmp(codepage, a->name, b->name, a->len) == 0))
+>  		return 0;
+> -	}
+>  	return 1;
+>  }
+>  
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Looks correct to me.
+Looks good to me.
 
-Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Acked-by: Jeff Layton <jlayton@redhat.com>
