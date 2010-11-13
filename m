@@ -1,229 +1,105 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix mounting share on non-standard ports
-Date: Sat, 13 Nov 2010 07:00:12 -0500
-Message-ID: <20101113070012.760cf09d@tlielax.poochiereds.net>
-References: <1289321425-7860-1-git-send-email-piastryyy@gmail.com>
+Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
+ mode
+Date: Sat, 13 Nov 2010 07:07:35 -0500
+Message-ID: <20101113070735.060ac5ca@tlielax.poochiereds.net>
+References: <1289403711-12965-1-git-send-email-piastryyy@gmail.com>
+	<1289403711-12965-2-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289321425-7860-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1289403711-12965-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue,  9 Nov 2010 19:50:25 +0300
+On Wed, 10 Nov 2010 18:41:46 +0300
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> This patch fixes the following situation: we have the share (1) mounted
-> with a non-standard port and try to mount another share (2) with the standard
-> one (not specifying the port), the client doesn't connect to the new share (2)
-> and returns with existing connection (1). The patch also makes the client
-> prevent connecting to a wrong share on a reconnect if the client fails during
-> the re-establishing connection to a lost share.
+> On strict cache mode when we close the last file handle of the inode we
+> should set invalidate flag on the inode and check it during open to prevent
+> data coherency problem when we open it again but it has been modified by
+> other clients.
 > 
 > Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/connect.c |   86 ++++++++++++++++++++++++++---------------------------
->  1 files changed, 42 insertions(+), 44 deletions(-)
+>  fs/cifs/cifs_fs_sb.h |    1 +
+>  fs/cifs/file.c       |   14 ++++++++++++++
+>  2 files changed, 15 insertions(+), 0 deletions(-)
 > 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 251a17c..6edf5ed 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1446,25 +1446,32 @@ match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
->  {
->  	struct sockaddr_in *addr4 = (struct sockaddr_in *)addr;
->  	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)addr;
-> +	unsigned short int port;
+> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> index e9a393c..be7b159 100644
+> --- a/fs/cifs/cifs_fs_sb.h
+> +++ b/fs/cifs/cifs_fs_sb.h
+> @@ -40,6 +40,7 @@
+>  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+>  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+>  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
+> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
+>  
+>  struct cifs_sb_info {
+>  	struct rb_root tlink_tree;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 06c3e83..88bb366 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -148,6 +148,9 @@ client_can_cache:
+>  
+>  	cifs_set_oplock_level(pCifsInode, oplock);
+>  
+> +	if (pCifsInode->invalid_mapping)
+> +		invalidate_remote_inode(inode);
 > +
-> +	/* search for a connection with the default port if user doesn't
-> +	   specify the port manually */
-> +	port = htons(CIFS_PORT);
+>  	return rc;
+>  }
 >  
-
-I don't think this patch deals correctly with servers that are
-listening on RFC1001_PORT but not CIFS_PORT. With two mounts to the
-same server that don't specify a port, you'll end up with two sockets,
-right?
-
-Also, the logic in match_address is getting to be rather convoluted. It
-might be good to break that out into a match_port function.
-
->  	switch (addr->sa_family) {
->  	case AF_INET:
-> +		if (addr4->sin_port)
-> +			port = addr4->sin_port;
->  		if (addr4->sin_addr.s_addr !=
->  		    server->addr.sockAddr.sin_addr.s_addr)
->  			return false;
-> -		if (addr4->sin_port &&
-> -		    addr4->sin_port != server->addr.sockAddr.sin_port)
-> +		if (port != server->addr.sockAddr.sin_port)
->  			return false;
->  		break;
->  	case AF_INET6:
-> +		if (addr6->sin6_port)
-> +			port = addr6->sin6_port;
->  		if (!ipv6_addr_equal(&addr6->sin6_addr,
->  				     &server->addr.sockAddr6.sin6_addr))
->  			return false;
->  		if (addr6->sin6_scope_id !=
->  		    server->addr.sockAddr6.sin6_scope_id)
->  			return false;
-> -		if (addr6->sin6_port &&
-> -		    addr6->sin6_port != server->addr.sockAddr6.sin6_port)
-> +		if (port != server->addr.sockAddr6.sin6_port)
->  			return false;
->  		break;
->  	}
-> @@ -2126,7 +2133,7 @@ ipv4_connect(struct TCP_Server_Info *server)
->  	int rc = 0;
->  	int val;
->  	bool connected = false;
-> -	__be16 orig_port = 0;
-> +	bool orig_port_error = false;
->  	struct socket *socket = server->ssocket;
+> @@ -250,6 +253,9 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
 >  
->  	if (socket == NULL) {
-> @@ -2148,32 +2155,30 @@ ipv4_connect(struct TCP_Server_Info *server)
->  	if (rc < 0)
->  		return rc;
+>  	cifs_set_oplock_level(pCifsInode, oplock);
 >  
-> -	/* user overrode default port */
-> +	/* user overrode default port or we perform reconnect */
->  	if (server->addr.sockAddr.sin_port) {
->  		rc = socket->ops->connect(socket, (struct sockaddr *)
->  					  &server->addr.sockAddr,
->  					  sizeof(struct sockaddr_in), 0);
->  		if (rc >= 0)
->  			connected = true;
-> +		else
-> +			orig_port_error = true;
-> +		/* in this case we don't have to try other port
-> +		   because we can mount another share */
->  	}
->  
-> -	if (!connected) {
-> -		/* save original port so we can retry user specified port
-> -			later if fall back ports fail this time  */
-> -		orig_port = server->addr.sockAddr.sin_port;
-> -
-> -		/* do not retry on the same port we just failed on */
-> -		if (server->addr.sockAddr.sin_port != htons(CIFS_PORT)) {
-> -			server->addr.sockAddr.sin_port = htons(CIFS_PORT);
-> -			rc = socket->ops->connect(socket,
-> -						(struct sockaddr *)
-> -						&server->addr.sockAddr,
-> -						sizeof(struct sockaddr_in), 0);
-> -			if (rc >= 0)
-> -				connected = true;
-> -		}
-> +	if (!orig_port_error && !connected) {
-> +		server->addr.sockAddr.sin_port = htons(CIFS_PORT);
-> +		rc = socket->ops->connect(socket,
-> +					(struct sockaddr *)
-> +					&server->addr.sockAddr,
-> +					sizeof(struct sockaddr_in), 0);
-> +		if (rc >= 0)
-> +			connected = true;
->  	}
-> -	if (!connected) {
+> +	if (pCifsInode->invalid_mapping)
+> +		invalidate_remote_inode(inode);
 > +
-> +	if (!orig_port_error && !connected) {
->  		server->addr.sockAddr.sin_port = htons(RFC1001_PORT);
->  		rc = socket->ops->connect(socket, (struct sockaddr *)
->  					      &server->addr.sockAddr,
-> @@ -2185,15 +2190,12 @@ ipv4_connect(struct TCP_Server_Info *server)
->  	/* give up here - unless we want to retry on different
->  		protocol families some day */
->  	if (!connected) {
-> -		if (orig_port)
-> -			server->addr.sockAddr.sin_port = orig_port;
->  		cFYI(1, "Error %d connecting to server via ipv4", rc);
->  		sock_release(socket);
->  		server->ssocket = NULL;
->  		return rc;
->  	}
+>  	file->private_data = pCifsFile;
+>  	return pCifsFile;
+>  }
+
+I don't see why the above is necessary. cifs_revalidate_dentry should
+have taken care of invalidating the mapping when it revalidated the
+dentry.
+
+Also, you're leaving invalid_mapping set so you're almost certainly
+going to end up invalidating the mapping unnecessarily again.
+
+Finally, you're not considering the fscache case here. I think you need
+to look closely at how dentry/inode revalidation is handled -- in
+particular cifs_revalidate_dentry and cifs_invalidate_mapping.
+
+> @@ -264,6 +270,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	struct inode *inode = cifs_file->dentry->d_inode;
+>  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+>  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>  	struct cifsLockInfo *li, *tmp;
 >  
-> -
->  	/*
->  	 * Eventually check for other socket options to change from
->  	 *  the default. sock_setsockopt not used because it expects
-> @@ -2291,7 +2293,7 @@ ipv6_connect(struct TCP_Server_Info *server)
->  	int rc = 0;
->  	int val;
->  	bool connected = false;
-> -	__be16 orig_port = 0;
-> +	bool orig_port_error = false;
->  	struct socket *socket = server->ssocket;
->  
->  	if (socket == NULL) {
-> @@ -2314,31 +2316,29 @@ ipv6_connect(struct TCP_Server_Info *server)
->  	if (rc < 0)
->  		return rc;
->  
-> -	/* user overrode default port */
-> +	/* user overrode default port or we perform reconnect */
->  	if (server->addr.sockAddr6.sin6_port) {
->  		rc = socket->ops->connect(socket,
->  				(struct sockaddr *) &server->addr.sockAddr6,
->  				sizeof(struct sockaddr_in6), 0);
->  		if (rc >= 0)
->  			connected = true;
-> +		else
-> +			orig_port_error = true;
-> +		/* in this case we don't have to try other port
-> +		   because we can mount another share */
->  	}
->  
-> -	if (!connected) {
-> -		/* save original port so we can retry user specified port
-> -			later if fall back ports fail this time  */
-> -
-> -		orig_port = server->addr.sockAddr6.sin6_port;
-> -		/* do not retry on the same port we just failed on */
-> -		if (server->addr.sockAddr6.sin6_port != htons(CIFS_PORT)) {
-> -			server->addr.sockAddr6.sin6_port = htons(CIFS_PORT);
-> -			rc = socket->ops->connect(socket, (struct sockaddr *)
-> -					&server->addr.sockAddr6,
-> -					sizeof(struct sockaddr_in6), 0);
-> -			if (rc >= 0)
-> -				connected = true;
-> -		}
-> +	if (!orig_port_error && !connected) {
-> +		server->addr.sockAddr6.sin6_port = htons(CIFS_PORT);
-> +		rc = socket->ops->connect(socket, (struct sockaddr *)
-> +				&server->addr.sockAddr6,
-> +				sizeof(struct sockaddr_in6), 0);
-> +		if (rc >= 0)
-> +			connected = true;
->  	}
-> -	if (!connected) {
+>  	spin_lock(&cifs_file_list_lock);
+> @@ -279,6 +286,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	if (list_empty(&cifsi->openFileList)) {
+>  		cFYI(1, "closing last open instance for inode %p",
+>  			cifs_file->dentry->d_inode);
 > +
-> +	if (!orig_port_error && !connected) {
->  		server->addr.sockAddr6.sin6_port = htons(RFC1001_PORT);
->  		rc = socket->ops->connect(socket, (struct sockaddr *)
->  				&server->addr.sockAddr6,
-> @@ -2350,8 +2350,6 @@ ipv6_connect(struct TCP_Server_Info *server)
->  	/* give up here - unless we want to retry on different
->  		protocol families some day */
->  	if (!connected) {
-> -		if (orig_port)
-> -			server->addr.sockAddr6.sin6_port = orig_port;
->  		cFYI(1, "Error %d connecting to server via ipv6", rc);
->  		sock_release(socket);
->  		server->ssocket = NULL;
+> +		/* in strict cache mode we need invalidate mapping on the last
+> +		   close  because it may cause a error when we open this file
+> +		   again and get at least level II oplock */
+> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
+> +			CIFS_I(inode)->invalid_mapping = true;
+> +
+>  		cifs_set_oplock_level(cifsi, 0);
+>  	}
+>  	spin_unlock(&cifs_file_list_lock);
 
-
-ipv4_connect and ipv6_connect ought to be sharing a lot of code. It
-would be good to do some cleanup here and try to consolidate these
-functions more than they are today.
-
-I envision a function that just handles setting up the socket and
-leaves the caller to determine the port to use. Also, breaking out the
-RFC1001 stuff into a separate function would be good too.
 
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
