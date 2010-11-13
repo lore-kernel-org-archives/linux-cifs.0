@@ -1,105 +1,141 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
- mode
-Date: Sat, 13 Nov 2010 07:07:35 -0500
-Message-ID: <20101113070735.060ac5ca@tlielax.poochiereds.net>
-References: <1289403711-12965-1-git-send-email-piastryyy@gmail.com>
-	<1289403711-12965-2-git-send-email-piastryyy@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Misc. cleanup in cifsacl handling
+Date: Sat, 13 Nov 2010 10:02:18 -0600
+Message-ID: <1289664138-16108-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289403711-12965-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 10 Nov 2010 18:41:46 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> On strict cache mode when we close the last file handle of the inode we
-> should set invalidate flag on the inode and check it during open to prevent
-> data coherency problem when we open it again but it has been modified by
-> other clients.
-> 
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/cifs_fs_sb.h |    1 +
->  fs/cifs/file.c       |   14 ++++++++++++++
->  2 files changed, 15 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-> index e9a393c..be7b159 100644
-> --- a/fs/cifs/cifs_fs_sb.h
-> +++ b/fs/cifs/cifs_fs_sb.h
-> @@ -40,6 +40,7 @@
->  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
->  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
->  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
-> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
->  
->  struct cifs_sb_info {
->  	struct rb_root tlink_tree;
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 06c3e83..88bb366 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -148,6 +148,9 @@ client_can_cache:
->  
->  	cifs_set_oplock_level(pCifsInode, oplock);
->  
-> +	if (pCifsInode->invalid_mapping)
-> +		invalidate_remote_inode(inode);
-> +
->  	return rc;
->  }
->  
-> @@ -250,6 +253,9 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
->  
->  	cifs_set_oplock_level(pCifsInode, oplock);
->  
-> +	if (pCifsInode->invalid_mapping)
-> +		invalidate_remote_inode(inode);
-> +
->  	file->private_data = pCifsFile;
->  	return pCifsFile;
->  }
-
-I don't see why the above is necessary. cifs_revalidate_dentry should
-have taken care of invalidating the mapping when it revalidated the
-dentry.
-
-Also, you're leaving invalid_mapping set so you're almost certainly
-going to end up invalidating the mapping unnecessarily again.
-
-Finally, you're not considering the fscache case here. I think you need
-to look closely at how dentry/inode revalidation is handled -- in
-particular cifs_revalidate_dentry and cifs_invalidate_mapping.
-
-> @@ -264,6 +270,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	struct inode *inode = cifs_file->dentry->d_inode;
->  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
->  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct cifsLockInfo *li, *tmp;
->  
->  	spin_lock(&cifs_file_list_lock);
-> @@ -279,6 +286,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	if (list_empty(&cifsi->openFileList)) {
->  		cFYI(1, "closing last open instance for inode %p",
->  			cifs_file->dentry->d_inode);
-> +
-> +		/* in strict cache mode we need invalidate mapping on the last
-> +		   close  because it may cause a error when we open this file
-> +		   again and get at least level II oplock */
-> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-> +			CIFS_I(inode)->invalid_mapping = true;
-> +
->  		cifs_set_oplock_level(cifsi, 0);
->  	}
->  	spin_unlock(&cifs_file_list_lock);
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
+Change the name of function mode_to_acl to mode_to_cifs_acl.
+
+Handle return code in functions mode_to_cifs_acl and 
+cifs_acl_to_fattr.
+
+Pass fid to inode helper function which passes it on to
+get inode info function so we do not end up opening the
+opened file again thus breaking oplocks.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsacl.c   |    2 +-
+ fs/cifs/cifsproto.h |    2 +-
+ fs/cifs/file.c      |    7 ++++---
+ fs/cifs/inode.c     |   23 ++++++++++++++++-------
+ 4 files changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index b54fec0..c6ebea0 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -726,7 +726,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+ }
+ 
+ /* Convert mode bits to an ACL so we can update the ACL on the server */
+-int mode_to_acl(struct inode *inode, const char *path, __u64 nmode)
++int mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode)
+ {
+ 	int rc = 0;
+ 	__u32 secdesclen = 0;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index a47ffc2..db961dc 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -133,7 +133,7 @@ extern int cifs_get_inode_info_unix(struct inode **pinode,
+ extern int cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb,
+ 			      struct cifs_fattr *fattr, struct inode *inode,
+ 			      const char *path, const __u16 *pfid);
+-extern int mode_to_acl(struct inode *inode, const char *path, __u64);
++extern int mode_to_cifs_acl(struct inode *inode, const char *path, __u64);
+ extern struct cifs_ntsd *get_cifs_acl(struct cifs_sb_info *, struct inode *,
+ 					const char *, u32 *);
+ 
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b857ce5..6e8477e 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -106,7 +106,7 @@ static inline int cifs_get_disposition(unsigned int flags)
+ 
+ static inline int cifs_open_inode_helper(struct inode *inode,
+ 	struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO *buf,
+-	char *full_path, int xid)
++	char *full_path, int xid, const __u16 *pfid)
+ {
+ 	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
+ 	struct timespec temp;
+@@ -144,7 +144,7 @@ client_can_cache:
+ 					      xid);
+ 	else
+ 		rc = cifs_get_inode_info(&inode, full_path, buf, inode->i_sb,
+-					 xid, NULL);
++					 xid, pfid);
+ 
+ 	cifs_set_oplock_level(pCifsInode, oplock);
+ 
+@@ -448,7 +448,8 @@ int cifs_open(struct inode *inode, struct file *file)
+ 		goto out;
+ 	}
+ 
+-	rc = cifs_open_inode_helper(inode, tcon, oplock, buf, full_path, xid);
++	rc = cifs_open_inode_helper(inode, tcon, oplock, buf, full_path, xid,
++					&netfid);
+ 	if (rc != 0)
+ 		goto out;
+ 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index ff7d299..35014dc 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -689,8 +689,13 @@ int cifs_get_inode_info(struct inode **pinode,
+ #ifdef CONFIG_CIFS_EXPERIMENTAL
+ 	/* fill in 0777 bits from ACL */
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
+-		cFYI(1, "Getting mode bits from ACL");
+-		cifs_acl_to_fattr(cifs_sb, &fattr, *pinode, full_path, pfid);
++		rc = cifs_acl_to_fattr(cifs_sb, &fattr, *pinode, full_path,
++						pfid);
++		if (rc) {
++			cFYI(1, "%s: Getting ACL failed with error: %d",
++				__func__, rc);
++			goto cgii_exit;
++		}
+ 	}
+ #endif
+ 
+@@ -2047,7 +2052,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
+ 	char *full_path = NULL;
+-	int rc = -EACCES;
++	int rc;
+ 	__u32 dosattr = 0;
+ 	__u64 mode = NO_CHANGE_64;
+ 
+@@ -2113,11 +2118,15 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	}
+ 
+ 	if (attrs->ia_valid & ATTR_MODE) {
+-		rc = 0;
+ #ifdef CONFIG_CIFS_EXPERIMENTAL
+-		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL)
+-			rc = mode_to_acl(inode, full_path, mode);
+-		else
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
++			rc = mode_to_cifs_acl(inode, full_path, mode);
++			if (rc) {
++				cFYI(1, "%s: Setting ACL failed with error: %d",
++					__func__, rc);
++				goto cifs_setattr_exit;
++			}
++		}
+ #endif
+ 		if (((mode & S_IWUGO) == 0) &&
+ 		    (cifsInode->cifsAttrs & ATTR_READONLY) == 0) {
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.6.0.2
