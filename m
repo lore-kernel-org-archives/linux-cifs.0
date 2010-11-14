@@ -1,36 +1,393 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix mounting share on non-standard ports
-Date: Sun, 14 Nov 2010 12:38:18 +0300
-Message-ID: <AANLkTim+SO4TfTJnXHnvaSjbPaoHt4k63hbVbs0gtbn9@mail.gmail.com>
-References: <1289321425-7860-1-git-send-email-piastryyy@gmail.com>
-	<20101113070012.760cf09d@tlielax.poochiereds.net>
-	<AANLkTinb-A4kdumURzhkVb9oNojtfW94LPL99GwOr9MU@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/2] CIFS: Simplify ipv*_connect functions into one
+Date: Sun, 14 Nov 2010 14:29:14 +0300
+Message-ID: <1289734155-3613-1-git-send-email-piastryyy@gmail.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinb-A4kdumURzhkVb9oNojtfW94LPL99GwOr9MU-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/11/13 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> 2010/11/13 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->>
->> I don't think this patch deals correctly with servers that are
->> listening on RFC1001_PORT but not CIFS_PORT. With two mounts to the
->> same server that don't specify a port, you'll end up with two sockets,
->> right?
->
+Make connect logic more ip-protocol independent. Also move RFC1001 stuff into
+separate function.
 
-And from another hand: If user doesn't specify the port we should
-think that it means the 445 port. If user wants to mount 139 port, he
-should specify this port manually. So, there is no error with the
-patch in this case.
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/connect.c |  303 ++++++++++++++++++-----------------------------------
+ 1 files changed, 100 insertions(+), 203 deletions(-)
 
->From this point of view we should remove trying with 139 port if we
-failed with 445 port. What do you think about it?
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 88c84a3..f0d0c1a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -108,8 +108,7 @@ struct smb_vol {
+ 	struct nls_table *local_nls;
+ };
+ 
+-static int ipv4_connect(struct TCP_Server_Info *server);
+-static int ipv6_connect(struct TCP_Server_Info *server);
++static int ip_connect(struct TCP_Server_Info *server);
+ 
+ /*
+  * cifs tcp session reconnection
+@@ -186,10 +185,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	while ((server->tcpStatus != CifsExiting) &&
+ 	       (server->tcpStatus != CifsGood)) {
+ 		try_to_freeze();
+-		if (server->addr.sockAddr6.sin6_family == AF_INET6)
+-			rc = ipv6_connect(server);
+-		else
+-			rc = ipv4_connect(server);
++		rc = ip_connect(server);
+ 		if (rc) {
+ 			cFYI(1, "reconnect error %d", rc);
+ 			msleep(3000);
+@@ -1592,12 +1588,11 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		/* other OS never observed in Wild doing 139 with v6 */
+ 		memcpy(&tcp_ses->addr.sockAddr6, sin_server6,
+ 			sizeof(struct sockaddr_in6));
+-		rc = ipv6_connect(tcp_ses);
+-	} else {
++	} else
+ 		memcpy(&tcp_ses->addr.sockAddr, sin_server,
+ 			sizeof(struct sockaddr_in));
+-		rc = ipv4_connect(tcp_ses);
+-	}
++
++	rc = ip_connect(tcp_ses);
+ 	if (rc < 0) {
+ 		cERROR(1, "Error connecting to socket. Aborting operation");
+ 		goto out_err;
+@@ -1997,15 +1992,91 @@ static void rfc1002mangle(char *target, char *source, unsigned int length)
+ 
+ }
+ 
++static int
++ip_rfc1001_connect(struct TCP_Server_Info *server)
++{
++	int rc = 0;
++	/* some servers require RFC1001 sessinit before sending
++	negprot - BB check reconnection in case where second
++	sessinit is sent but no second negprot */
++	struct rfc1002_session_packet *ses_init_buf;
++	struct smb_hdr *smb_buf;
++	ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
++			       GFP_KERNEL);
++	if (ses_init_buf) {
++		ses_init_buf->trailer.session_req.called_len = 32;
++
++		if (server->server_RFC1001_name &&
++		    server->server_RFC1001_name[0] != 0)
++			rfc1002mangle(ses_init_buf->trailer.
++				      session_req.called_name,
++				      server->server_RFC1001_name,
++				      RFC1001_NAME_LEN_WITH_NULL);
++		else
++			rfc1002mangle(ses_init_buf->trailer.
++				      session_req.called_name,
++				      DEFAULT_CIFS_CALLED_NAME,
++				      RFC1001_NAME_LEN_WITH_NULL);
++
++		ses_init_buf->trailer.session_req.calling_len = 32;
++
++		/* calling name ends in null (byte 16) from old smb
++		convention. */
++		if (server->workstation_RFC1001_name &&
++		    server->workstation_RFC1001_name[0] != 0)
++			rfc1002mangle(ses_init_buf->trailer.
++				      session_req.calling_name,
++				      server->workstation_RFC1001_name,
++				      RFC1001_NAME_LEN_WITH_NULL);
++		else
++			rfc1002mangle(ses_init_buf->trailer.
++				      session_req.calling_name,
++				      "LINUX_CIFS_CLNT",
++				      RFC1001_NAME_LEN_WITH_NULL);
++
++		ses_init_buf->trailer.session_req.scope1 = 0;
++		ses_init_buf->trailer.session_req.scope2 = 0;
++		smb_buf = (struct smb_hdr *)ses_init_buf;
++
++		/* sizeof RFC1002_SESSION_REQUEST with no scope */
++		smb_buf->smb_buf_length = 0x81000044;
++		rc = smb_send(server, smb_buf, 0x44);
++		kfree(ses_init_buf);
++		msleep(1); /* RFC1001 layer in at least one server
++			      requires very short break before negprot
++			      presumably because not expecting negprot
++			      to follow so fast.  This is a simple
++			      solution that works without
++			      complicating the code and causes no
++			      significant slowing down on mount
++			      for everyone else */
++	}
++	/* else the negprot may still work without this
++	even though malloc failed */
++
++	return rc;
++}
+ 
+ static int
+-ipv4_connect(struct TCP_Server_Info *server)
++ip_connect(struct TCP_Server_Info *server)
+ {
+ 	int rc = 0;
+-	int val;
+-	bool connected = false;
+-	__be16 orig_port = 0;
++	bool using_ipv6 = false;
++	unsigned short int *sport;
++	int slen;
+ 	struct socket *socket = server->ssocket;
++	struct sockaddr *saddr;
++
++	if (server->addr.sockAddr6.sin6_family == AF_INET6) {
++		sport = &server->addr.sockAddr6.sin6_port;
++		using_ipv6 = true;
++		slen = sizeof(struct sockaddr_in6);
++		saddr = (struct sockaddr *) &server->addr.sockAddr6;
++	} else {
++		sport = &server->addr.sockAddr.sin_port;
++		slen = sizeof(struct sockaddr_in);
++		saddr = (struct sockaddr *) &server->addr.sockAddr;
++	}
+ 
+ 	if (socket == NULL) {
+ 		rc = sock_create_kern(PF_INET, SOCK_STREAM,
+@@ -2019,54 +2090,30 @@ ipv4_connect(struct TCP_Server_Info *server)
+ 		cFYI(1, "Socket created");
+ 		server->ssocket = socket;
+ 		socket->sk->sk_allocation = GFP_NOFS;
+-		cifs_reclassify_socket4(socket);
+-	}
+-
+-	/* user overrode default port */
+-	if (server->addr.sockAddr.sin_port) {
+-		rc = socket->ops->connect(socket, (struct sockaddr *)
+-					  &server->addr.sockAddr,
+-					  sizeof(struct sockaddr_in), 0);
+-		if (rc >= 0)
+-			connected = true;
+-	}
+-
+-	if (!connected) {
+-		/* save original port so we can retry user specified port
+-			later if fall back ports fail this time  */
+-		orig_port = server->addr.sockAddr.sin_port;
+-
+-		/* do not retry on the same port we just failed on */
+-		if (server->addr.sockAddr.sin_port != htons(CIFS_PORT)) {
+-			server->addr.sockAddr.sin_port = htons(CIFS_PORT);
+-			rc = socket->ops->connect(socket,
+-						(struct sockaddr *)
+-						&server->addr.sockAddr,
+-						sizeof(struct sockaddr_in), 0);
+-			if (rc >= 0)
+-				connected = true;
+-		}
++		if (using_ipv6)
++			cifs_reclassify_socket4(socket);
++		else
++			cifs_reclassify_socket6(socket);
+ 	}
+-	if (!connected) {
+-		server->addr.sockAddr.sin_port = htons(RFC1001_PORT);
+-		rc = socket->ops->connect(socket, (struct sockaddr *)
+-					      &server->addr.sockAddr,
+-					      sizeof(struct sockaddr_in), 0);
+-		if (rc >= 0)
+-			connected = true;
++
++	if (*sport)
++		/* user specify port manually */
++		rc = socket->ops->connect(socket, saddr, slen, 0);
++	else {
++		/* try with 445 port at first */
++		*sport = htons(CIFS_PORT);
++		rc = socket->ops->connect(socket, saddr, slen, 0);
+ 	}
+ 
+-	/* give up here - unless we want to retry on different
+-		protocol families some day */
+-	if (!connected) {
+-		if (orig_port)
+-			server->addr.sockAddr.sin_port = orig_port;
++	if (rc < 0) {
+ 		cFYI(1, "Error %d connecting to server via ipv4", rc);
+ 		sock_release(socket);
+ 		server->ssocket = NULL;
+ 		return rc;
+ 	}
+ 
++	if (*sport == htons(RFC1001_PORT))
++		rc = ip_rfc1001_connect(server);
+ 
+ 	/*
+ 	 * Eventually check for other socket options to change from
+@@ -2085,7 +2132,7 @@ ipv4_connect(struct TCP_Server_Info *server)
+ 	}
+ 
+ 	if (server->tcp_nodelay) {
+-		val = 1;
++		int val = 1;
+ 		rc = kernel_setsockopt(socket, SOL_TCP, TCP_NODELAY,
+ 				(char *)&val, sizeof(val));
+ 		if (rc)
+@@ -2096,156 +2143,6 @@ ipv4_connect(struct TCP_Server_Info *server)
+ 		 socket->sk->sk_sndbuf,
+ 		 socket->sk->sk_rcvbuf, socket->sk->sk_rcvtimeo);
+ 
+-	/* send RFC1001 sessinit */
+-	if (server->addr.sockAddr.sin_port == htons(RFC1001_PORT)) {
+-		/* some servers require RFC1001 sessinit before sending
+-		negprot - BB check reconnection in case where second
+-		sessinit is sent but no second negprot */
+-		struct rfc1002_session_packet *ses_init_buf;
+-		struct smb_hdr *smb_buf;
+-		ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
+-				       GFP_KERNEL);
+-		if (ses_init_buf) {
+-			ses_init_buf->trailer.session_req.called_len = 32;
+-			if (server->server_RFC1001_name &&
+-			    server->server_RFC1001_name[0] != 0)
+-				rfc1002mangle(ses_init_buf->trailer.
+-						session_req.called_name,
+-					      server->server_RFC1001_name,
+-					      RFC1001_NAME_LEN_WITH_NULL);
+-			else
+-				rfc1002mangle(ses_init_buf->trailer.
+-						session_req.called_name,
+-					      DEFAULT_CIFS_CALLED_NAME,
+-					      RFC1001_NAME_LEN_WITH_NULL);
+-
+-			ses_init_buf->trailer.session_req.calling_len = 32;
+-
+-			/* calling name ends in null (byte 16) from old smb
+-			convention. */
+-			if (server->workstation_RFC1001_name &&
+-			    server->workstation_RFC1001_name[0] != 0)
+-				rfc1002mangle(ses_init_buf->trailer.
+-						session_req.calling_name,
+-					      server->workstation_RFC1001_name,
+-					      RFC1001_NAME_LEN_WITH_NULL);
+-			else
+-				rfc1002mangle(ses_init_buf->trailer.
+-						session_req.calling_name,
+-					      "LINUX_CIFS_CLNT",
+-					      RFC1001_NAME_LEN_WITH_NULL);
+-
+-			ses_init_buf->trailer.session_req.scope1 = 0;
+-			ses_init_buf->trailer.session_req.scope2 = 0;
+-			smb_buf = (struct smb_hdr *)ses_init_buf;
+-			/* sizeof RFC1002_SESSION_REQUEST with no scope */
+-			smb_buf->smb_buf_length = 0x81000044;
+-			rc = smb_send(server, smb_buf, 0x44);
+-			kfree(ses_init_buf);
+-			msleep(1); /* RFC1001 layer in at least one server
+-				      requires very short break before negprot
+-				      presumably because not expecting negprot
+-				      to follow so fast.  This is a simple
+-				      solution that works without
+-				      complicating the code and causes no
+-				      significant slowing down on mount
+-				      for everyone else */
+-		}
+-		/* else the negprot may still work without this
+-		even though malloc failed */
+-
+-	}
+-
+-	return rc;
+-}
+-
+-static int
+-ipv6_connect(struct TCP_Server_Info *server)
+-{
+-	int rc = 0;
+-	int val;
+-	bool connected = false;
+-	__be16 orig_port = 0;
+-	struct socket *socket = server->ssocket;
+-
+-	if (socket == NULL) {
+-		rc = sock_create_kern(PF_INET6, SOCK_STREAM,
+-				      IPPROTO_TCP, &socket);
+-		if (rc < 0) {
+-			cERROR(1, "Error %d creating ipv6 socket", rc);
+-			socket = NULL;
+-			return rc;
+-		}
+-
+-		/* BB other socket options to set KEEPALIVE, NODELAY? */
+-		cFYI(1, "ipv6 Socket created");
+-		server->ssocket = socket;
+-		socket->sk->sk_allocation = GFP_NOFS;
+-		cifs_reclassify_socket6(socket);
+-	}
+-
+-	/* user overrode default port */
+-	if (server->addr.sockAddr6.sin6_port) {
+-		rc = socket->ops->connect(socket,
+-				(struct sockaddr *) &server->addr.sockAddr6,
+-				sizeof(struct sockaddr_in6), 0);
+-		if (rc >= 0)
+-			connected = true;
+-	}
+-
+-	if (!connected) {
+-		/* save original port so we can retry user specified port
+-			later if fall back ports fail this time  */
+-
+-		orig_port = server->addr.sockAddr6.sin6_port;
+-		/* do not retry on the same port we just failed on */
+-		if (server->addr.sockAddr6.sin6_port != htons(CIFS_PORT)) {
+-			server->addr.sockAddr6.sin6_port = htons(CIFS_PORT);
+-			rc = socket->ops->connect(socket, (struct sockaddr *)
+-					&server->addr.sockAddr6,
+-					sizeof(struct sockaddr_in6), 0);
+-			if (rc >= 0)
+-				connected = true;
+-		}
+-	}
+-	if (!connected) {
+-		server->addr.sockAddr6.sin6_port = htons(RFC1001_PORT);
+-		rc = socket->ops->connect(socket, (struct sockaddr *)
+-				&server->addr.sockAddr6,
+-				sizeof(struct sockaddr_in6), 0);
+-		if (rc >= 0)
+-			connected = true;
+-	}
+-
+-	/* give up here - unless we want to retry on different
+-		protocol families some day */
+-	if (!connected) {
+-		if (orig_port)
+-			server->addr.sockAddr6.sin6_port = orig_port;
+-		cFYI(1, "Error %d connecting to server via ipv6", rc);
+-		sock_release(socket);
+-		server->ssocket = NULL;
+-		return rc;
+-	}
+-
+-	/*
+-	 * Eventually check for other socket options to change from
+-	 * the default. sock_setsockopt not used because it expects
+-	 * user space buffer
+-	 */
+-	socket->sk->sk_rcvtimeo = 7 * HZ;
+-	socket->sk->sk_sndtimeo = 5 * HZ;
+-
+-	if (server->tcp_nodelay) {
+-		val = 1;
+-		rc = kernel_setsockopt(socket, SOL_TCP, TCP_NODELAY,
+-				(char *)&val, sizeof(val));
+-		if (rc)
+-			cFYI(1, "set TCP_NODELAY socket option error %d", rc);
+-	}
+-
+-	server->ssocket = socket;
+-
+ 	return rc;
+ }
+ 
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.2.3
