@@ -1,54 +1,36 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 4/6] CIFS: Make cifs_fsync work with strict cache mode
-Date: Sun, 14 Nov 2010 12:02:56 +0300
-Message-ID: <1289725376-3376-1-git-send-email-piastryyy@gmail.com>
-References: <1289715224-2517-1-git-send-email-piastryyy@gmail.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: [PATCH] CIFS: Fix mounting share on non-standard ports
+Date: Sun, 14 Nov 2010 12:38:18 +0300
+Message-ID: <AANLkTim+SO4TfTJnXHnvaSjbPaoHt4k63hbVbs0gtbn9@mail.gmail.com>
+References: <1289321425-7860-1-git-send-email-piastryyy@gmail.com>
+	<20101113070012.760cf09d@tlielax.poochiereds.net>
+	<AANLkTinb-A4kdumURzhkVb9oNojtfW94LPL99GwOr9MU@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289715224-2517-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <AANLkTinb-A4kdumURzhkVb9oNojtfW94LPL99GwOr9MU-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Remove filemap_write_and_wait call because it is previously called from
-vfs_sync_range and invalidate inode if we don't have at least Level II
-oplock and strict cache mode switched on.
+2010/11/13 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> 2010/11/13 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+>>
+>> I don't think this patch deals correctly with servers that are
+>> listening on RFC1001_PORT but not CIFS_PORT. With two mounts to the
+>> same server that don't specify a port, you'll end up with two sockets,
+>> right?
+>
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/file.c |   14 +++++++-------
- 1 files changed, 7 insertions(+), 7 deletions(-)
+And from another hand: If user doesn't specify the port we should
+think that it means the 445 port. If user wants to mount 139 port, he
+should specify this port manually. So, there is no error with the
+patch in this case.
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 85824c0..e8ca2d6 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1603,20 +1603,20 @@ int cifs_fsync(struct file *file, int datasync)
- 	struct cifsTconInfo *tcon;
- 	struct cifsFileInfo *smbfile = file->private_data;
- 	struct inode *inode = file->f_path.dentry->d_inode;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 
- 	xid = GetXid();
- 
- 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
- 		file->f_path.dentry->d_name.name, datasync);
- 
--	rc = filemap_write_and_wait(inode->i_mapping);
--	if (rc == 0) {
--		struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	if (!CIFS_I(inode)->clientCanCacheRead &&
-+	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
-+		invalidate_remote_inode(inode);
- 
--		tcon = tlink_tcon(smbfile->tlink);
--		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
--			rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
--	}
-+	tcon = tlink_tcon(smbfile->tlink);
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
-+		rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
- 
- 	FreeXid(xid);
- 	return rc;
+>From this point of view we should remove trying with 139 port if we
+failed with 445 port. What do you think about it?
+
 -- 
-1.7.2.3
+Best regards,
+Pavel Shilovsky.
