@@ -1,11 +1,11 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: [PATCH 4/6] CIFS: Make cifs_fsync work with strict cache mode
-Date: Sun, 14 Nov 2010 09:13:44 +0300
-Message-ID: <1289715224-2517-1-git-send-email-piastryyy@gmail.com>
-References: <1289403711-12965-5-git-send-email-piastryyy@gmail.com>
+Date: Sun, 14 Nov 2010 12:02:56 +0300
+Message-ID: <1289725376-3376-1-git-send-email-piastryyy@gmail.com>
+References: <1289715224-2517-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289403711-12965-5-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1289715224-2517-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
@@ -37,7 +37,7 @@ index 85824c0..e8ca2d6 100644
 -	if (rc == 0) {
 -		struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
 +	if (!CIFS_I(inode)->clientCanCacheRead &&
-+	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0))
++	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
 +		invalidate_remote_inode(inode);
  
 -		tcon = tlink_tcon(smbfile->tlink);
