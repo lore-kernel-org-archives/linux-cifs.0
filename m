@@ -1,445 +1,152 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/2] CIFS: Simplify ipv*_connect functions into one
-Date: Mon, 15 Nov 2010 07:18:24 -0500
-Message-ID: <20101115071824.15eac25d@tlielax.poochiereds.net>
-References: <1289734155-3613-1-git-send-email-piastryyy@gmail.com>
-	<1289760378-8715-1-git-send-email-piastryyy@gmail.com>
+Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
+ mode
+Date: Mon, 15 Nov 2010 07:34:30 -0500
+Message-ID: <20101115073430.2254b19c@tlielax.poochiereds.net>
+References: <1289459222-8210-1-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289760378-8715-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1289459222-8210-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 14 Nov 2010 21:46:18 +0300
+On Thu, 11 Nov 2010 10:07:02 +0300
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Make connect logic more ip-protocol independent. Also move RFC1001 stuff into
-> separate function.
+> On strict cache mode when we close the last file handle of the inode we
+> should set invalidate flag on the inode and check it during open to prevent
+> data coherency problem when we open it again but it has been modified by
+> other clients.
 > 
 > Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Nice cleanup so far. Some comments below:
+
+When I send multiple versions of the same patch, I usually add "(try
+#X)" to the subject. That makes it easier for reviewers to tell which
+patch is the latest version.
 
 > ---
->  fs/cifs/connect.c |  311 ++++++++++++++++++-----------------------------------
->  1 files changed, 103 insertions(+), 208 deletions(-)
+>  fs/cifs/cifs_fs_sb.h |    1 +
+>  fs/cifs/cifsfs.h     |    1 +
+>  fs/cifs/file.c       |   27 +++++++++++++++------------
+>  fs/cifs/inode.c      |    3 +--
+>  4 files changed, 18 insertions(+), 14 deletions(-)
 > 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 251a17c..01ebcc4 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -114,8 +114,7 @@ struct smb_vol {
->  #define TLINK_ERROR_EXPIRE	(1 * HZ)
->  #define TLINK_IDLE_EXPIRE	(600 * HZ)
+> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> index e9a393c..be7b159 100644
+> --- a/fs/cifs/cifs_fs_sb.h
+> +++ b/fs/cifs/cifs_fs_sb.h
+> @@ -40,6 +40,7 @@
+>  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+>  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+>  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
+> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
 >  
-> -static int ipv4_connect(struct TCP_Server_Info *server);
-> -static int ipv6_connect(struct TCP_Server_Info *server);
-> +static int ip_connect(struct TCP_Server_Info *server);
->  static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink);
->  static void cifs_prune_tlinks(struct work_struct *work);
+>  struct cifs_sb_info {
+>  	struct rb_root tlink_tree;
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index 897b2b2..b8d783c 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -61,6 +61,7 @@ extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
+>  		       struct dentry *);
+>  extern int cifs_revalidate_file(struct file *filp);
+>  extern int cifs_revalidate_dentry(struct dentry *);
+> +extern void cifs_invalidate_mapping(struct inode *inode);
+>  extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+>  extern int cifs_setattr(struct dentry *, struct iattr *);
 >  
-> @@ -199,10 +198,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
->  	while ((server->tcpStatus != CifsExiting) &&
->  	       (server->tcpStatus != CifsGood)) {
->  		try_to_freeze();
-> -		if (server->addr.sockAddr6.sin6_family == AF_INET6)
-> -			rc = ipv6_connect(server);
-> -		else
-> -			rc = ipv4_connect(server);
-> +		rc = ip_connect(server);
->  		if (rc) {
->  			cFYI(1, "reconnect error %d", rc);
->  			msleep(3000);
-> @@ -1668,12 +1664,11 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->  		/* other OS never observed in Wild doing 139 with v6 */
->  		memcpy(&tcp_ses->addr.sockAddr6, sin_server6,
->  			sizeof(struct sockaddr_in6));
-> -		rc = ipv6_connect(tcp_ses);
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 06c3e83..d604e09 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -124,19 +124,11 @@ static inline int cifs_open_inode_helper(struct inode *inode,
+>  	temp = cifs_NTtimeToUnix(buf->LastWriteTime);
+>  	if (timespec_equal(&inode->i_mtime, &temp) &&
+>  			   (inode->i_size ==
+> -			    (loff_t)le64_to_cpu(buf->EndOfFile))) {
+> +			    (loff_t)le64_to_cpu(buf->EndOfFile)) &&
+> +			    !pCifsInode->invalid_mapping) {
+>  		cFYI(1, "inode unchanged on server");
 > -	} else {
+> -		if (inode->i_mapping) {
+> -			/* BB no need to lock inode until after invalidate
+> -			since namei code should already have it locked? */
+> -			rc = filemap_write_and_wait(inode->i_mapping);
+> -			mapping_set_error(inode->i_mapping, rc);
+> -		}
+> -		cFYI(1, "invalidating remote inode since open detected it "
+> -			 "changed");
+> -		invalidate_remote_inode(inode);
+> -	}
 > +	} else
->  		memcpy(&tcp_ses->addr.sockAddr, sin_server,
->  			sizeof(struct sockaddr_in));
-> -		rc = ipv4_connect(tcp_ses);
-> -	}
+> +		cifs_invalidate_mapping(inode);
+>  
+
+Not directly related to your patch, but what exactly is the purpose of
+the "open_inode_helper"? It looks like "pile o' random junk that we do
+for non-posix opens". Maybe it would be best to eliminate that function
+altogether and further unify the posix and non-posix open code. Steve,
+care to comment?
+
+Now that I'm done ranting, I don't think the invalidate mapping call
+here is unnecessary. We will likely have already invalidated the cache
+during the d_revalidate phase, and you're going to do it again below in
+cifs_new_fileinfo.
+
+>  client_can_cache:
+>  	if (pTcon->unix_ext)
+> @@ -250,6 +242,9 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+>  
+>  	cifs_set_oplock_level(pCifsInode, oplock);
+>  
+> +	if (pCifsInode->invalid_mapping)
+> +		cifs_invalidate_mapping(inode);
 > +
-> +	rc = ip_connect(tcp_ses);
->  	if (rc < 0) {
->  		cERROR(1, "Error connecting to socket. Aborting operation");
->  		goto out_err_crypto_release;
-> @@ -2121,19 +2116,97 @@ bind_socket(struct TCP_Server_Info *server)
+>  	file->private_data = pCifsFile;
+>  	return pCifsFile;
+>  }
+> @@ -264,6 +259,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	struct inode *inode = cifs_file->dentry->d_inode;
+>  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+>  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>  	struct cifsLockInfo *li, *tmp;
+>  
+>  	spin_lock(&cifs_file_list_lock);
+> @@ -279,6 +275,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	if (list_empty(&cifsi->openFileList)) {
+>  		cFYI(1, "closing last open instance for inode %p",
+>  			cifs_file->dentry->d_inode);
+> +
+> +		/* in strict cache mode we need invalidate mapping on the last
+> +		   close  because it may cause a error when we open this file
+> +		   again and get at least level II oplock */
+> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
+> +			CIFS_I(inode)->invalid_mapping = true;
+> +
+>  		cifs_set_oplock_level(cifsi, 0);
+>  	}
+>  	spin_unlock(&cifs_file_list_lock);
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index ef3a55b..518514e 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1671,8 +1671,7 @@ cifs_inode_needs_reval(struct inode *inode)
 >  }
 >  
->  static int
-> -ipv4_connect(struct TCP_Server_Info *server)
-> +ip_rfc1001_connect(struct TCP_Server_Info *server)
-> +{
-> +	int rc = 0;
-> +	/* some servers require RFC1001 sessinit before sending
-> +	negprot - BB check reconnection in case where second
-> +	sessinit is sent but no second negprot */
-> +	struct rfc1002_session_packet *ses_init_buf;
-> +	struct smb_hdr *smb_buf;
-> +	ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
-> +			       GFP_KERNEL);
-> +	if (ses_init_buf) {
-> +		ses_init_buf->trailer.session_req.called_len = 32;
-> +
-> +		if (server->server_RFC1001_name &&
-> +		    server->server_RFC1001_name[0] != 0)
-> +			rfc1002mangle(ses_init_buf->trailer.
-> +				      session_req.called_name,
-> +				      server->server_RFC1001_name,
-> +				      RFC1001_NAME_LEN_WITH_NULL);
-> +		else
-> +			rfc1002mangle(ses_init_buf->trailer.
-> +				      session_req.called_name,
-> +				      DEFAULT_CIFS_CALLED_NAME,
-> +				      RFC1001_NAME_LEN_WITH_NULL);
-> +
-> +		ses_init_buf->trailer.session_req.calling_len = 32;
-> +
-> +		/* calling name ends in null (byte 16) from old smb
-> +		convention. */
-> +		if (server->workstation_RFC1001_name &&
-> +		    server->workstation_RFC1001_name[0] != 0)
-> +			rfc1002mangle(ses_init_buf->trailer.
-> +				      session_req.calling_name,
-> +				      server->workstation_RFC1001_name,
-> +				      RFC1001_NAME_LEN_WITH_NULL);
-> +		else
-> +			rfc1002mangle(ses_init_buf->trailer.
-> +				      session_req.calling_name,
-> +				      "LINUX_CIFS_CLNT",
-> +				      RFC1001_NAME_LEN_WITH_NULL);
-> +
-> +		ses_init_buf->trailer.session_req.scope1 = 0;
-> +		ses_init_buf->trailer.session_req.scope2 = 0;
-> +		smb_buf = (struct smb_hdr *)ses_init_buf;
-> +
-> +		/* sizeof RFC1002_SESSION_REQUEST with no scope */
-> +		smb_buf->smb_buf_length = 0x81000044;
-> +		rc = smb_send(server, smb_buf, 0x44);
-> +		kfree(ses_init_buf);
-> +		msleep(1); /* RFC1001 layer in at least one server
-> +			      requires very short break before negprot
-> +			      presumably because not expecting negprot
-> +			      to follow so fast.  This is a simple
-> +			      solution that works without
-> +			      complicating the code and causes no
-> +			      significant slowing down on mount
-> +			      for everyone else */
-> +	}
-> +	/* else the negprot may still work without this
-> +	even though malloc failed */
-> +
-> +	return rc;
-> +}
-> +
-> +static int
-> +ip_connect(struct TCP_Server_Info *server)
+>  /* check invalid_mapping flag and zap the cache if it's set */
+> -static void
+> -cifs_invalidate_mapping(struct inode *inode)
+> +void cifs_invalidate_mapping(struct inode *inode)
 >  {
->  	int rc = 0;
-> -	int val;
-> -	bool connected = false;
-> -	__be16 orig_port = 0;
-> +	bool using_ipv6 = false;
-> +	unsigned short int *sport;
-> +	int slen;
->  	struct socket *socket = server->ssocket;
-> +	struct sockaddr *saddr;
-> +
-> +	if (server->addr.sockAddr6.sin6_family == AF_INET6) {
-> +		sport = &server->addr.sockAddr6.sin6_port;
-> +		using_ipv6 = true;
-> +		slen = sizeof(struct sockaddr_in6);
-> +		saddr = (struct sockaddr *) &server->addr.sockAddr6;
-> +	} else {
-> +		sport = &server->addr.sockAddr.sin_port;
-> +		slen = sizeof(struct sockaddr_in);
-> +		saddr = (struct sockaddr *) &server->addr.sockAddr;
-> +	}
->  
->  	if (socket == NULL) {
->  		rc = sock_create_kern(PF_INET, SOCK_STREAM,
->  				      IPPROTO_TCP, &socket);
->  		if (rc < 0) {
->  			cERROR(1, "Error %d creating socket", rc);
-> +			server->ssocket = NULL;
->  			return rc;
->  		}
->  
-> @@ -2141,59 +2214,32 @@ ipv4_connect(struct TCP_Server_Info *server)
->  		cFYI(1, "Socket created");
->  		server->ssocket = socket;
->  		socket->sk->sk_allocation = GFP_NOFS;
-> -		cifs_reclassify_socket4(socket);
-> +		if (using_ipv6)
-> +			cifs_reclassify_socket4(socket);
-> +		else
-> +			cifs_reclassify_socket6(socket);
-		^^^^^^^^
-		Isn't that backwards?
->  	}
->  
->  	rc = bind_socket(server);
->  	if (rc < 0)
->  		return rc;
->  
-> -	/* user overrode default port */
-> -	if (server->addr.sockAddr.sin_port) {
-> -		rc = socket->ops->connect(socket, (struct sockaddr *)
-> -					  &server->addr.sockAddr,
-> -					  sizeof(struct sockaddr_in), 0);
-> -		if (rc >= 0)
-> -			connected = true;
-> -	}
-> -
-> -	if (!connected) {
-> -		/* save original port so we can retry user specified port
-> -			later if fall back ports fail this time  */
-> -		orig_port = server->addr.sockAddr.sin_port;
-> -
-> -		/* do not retry on the same port we just failed on */
-> -		if (server->addr.sockAddr.sin_port != htons(CIFS_PORT)) {
-> -			server->addr.sockAddr.sin_port = htons(CIFS_PORT);
-> -			rc = socket->ops->connect(socket,
-> -						(struct sockaddr *)
-> -						&server->addr.sockAddr,
-> -						sizeof(struct sockaddr_in), 0);
-> -			if (rc >= 0)
-> -				connected = true;
-> -		}
-> +	if (*sport)
-> +		/* user specify port manually */
-> +		rc = socket->ops->connect(socket, saddr, slen, 0);
-> +	else {
-> +		/* try with 445 port at first */
-> +		*sport = htons(CIFS_PORT);
-> +		rc = socket->ops->connect(socket, saddr, slen, 0);
-	^^^^^^^^^
-	You could collapse that down to:
+>  	int rc;
+>  	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
 
-	if (*sport = 0)
-		*sport = htons(CIFS_PORT);
-	rc = socket->ops->connect(socket, saddr, slen, 0);
-
-	Eliminating unnecessary conditional code makes for a smaller
-	resulting binary and makes the code easier to read.
-
->  	}
-> -	if (!connected) {
-> -		server->addr.sockAddr.sin_port = htons(RFC1001_PORT);
-> -		rc = socket->ops->connect(socket, (struct sockaddr *)
-> -					      &server->addr.sockAddr,
-> -					      sizeof(struct sockaddr_in), 0);
-> -		if (rc >= 0)
-> -			connected = true;
-> -	}
-> -
-> -	/* give up here - unless we want to retry on different
-> -		protocol families some day */
-> -	if (!connected) {
-> -		if (orig_port)
-> -			server->addr.sockAddr.sin_port = orig_port;
-> -		cFYI(1, "Error %d connecting to server via ipv4", rc);
-> +
-> +	if (rc < 0) {
-> +		cFYI(1, "Error %d connecting to server", rc);
->  		sock_release(socket);
->  		server->ssocket = NULL;
->  		return rc;
->  	}
->  
-> -
->  	/*
->  	 * Eventually check for other socket options to change from
->  	 *  the default. sock_setsockopt not used because it expects
-> @@ -2211,7 +2257,7 @@ ipv4_connect(struct TCP_Server_Info *server)
->  	}
->  
->  	if (server->tcp_nodelay) {
-> -		val = 1;
-> +		int val = 1;
->  		rc = kernel_setsockopt(socket, SOL_TCP, TCP_NODELAY,
->  				(char *)&val, sizeof(val));
->  		if (rc)
-> @@ -2222,159 +2268,8 @@ ipv4_connect(struct TCP_Server_Info *server)
->  		 socket->sk->sk_sndbuf,
->  		 socket->sk->sk_rcvbuf, socket->sk->sk_rcvtimeo);
->  
-> -	/* send RFC1001 sessinit */
-> -	if (server->addr.sockAddr.sin_port == htons(RFC1001_PORT)) {
-> -		/* some servers require RFC1001 sessinit before sending
-> -		negprot - BB check reconnection in case where second
-> -		sessinit is sent but no second negprot */
-> -		struct rfc1002_session_packet *ses_init_buf;
-> -		struct smb_hdr *smb_buf;
-> -		ses_init_buf = kzalloc(sizeof(struct rfc1002_session_packet),
-> -				       GFP_KERNEL);
-> -		if (ses_init_buf) {
-> -			ses_init_buf->trailer.session_req.called_len = 32;
-> -			if (server->server_RFC1001_name &&
-> -			    server->server_RFC1001_name[0] != 0)
-> -				rfc1002mangle(ses_init_buf->trailer.
-> -						session_req.called_name,
-> -					      server->server_RFC1001_name,
-> -					      RFC1001_NAME_LEN_WITH_NULL);
-> -			else
-> -				rfc1002mangle(ses_init_buf->trailer.
-> -						session_req.called_name,
-> -					      DEFAULT_CIFS_CALLED_NAME,
-> -					      RFC1001_NAME_LEN_WITH_NULL);
-> -
-> -			ses_init_buf->trailer.session_req.calling_len = 32;
-> -
-> -			/* calling name ends in null (byte 16) from old smb
-> -			convention. */
-> -			if (server->workstation_RFC1001_name &&
-> -			    server->workstation_RFC1001_name[0] != 0)
-> -				rfc1002mangle(ses_init_buf->trailer.
-> -						session_req.calling_name,
-> -					      server->workstation_RFC1001_name,
-> -					      RFC1001_NAME_LEN_WITH_NULL);
-> -			else
-> -				rfc1002mangle(ses_init_buf->trailer.
-> -						session_req.calling_name,
-> -					      "LINUX_CIFS_CLNT",
-> -					      RFC1001_NAME_LEN_WITH_NULL);
-> -
-> -			ses_init_buf->trailer.session_req.scope1 = 0;
-> -			ses_init_buf->trailer.session_req.scope2 = 0;
-> -			smb_buf = (struct smb_hdr *)ses_init_buf;
-> -			/* sizeof RFC1002_SESSION_REQUEST with no scope */
-> -			smb_buf->smb_buf_length = 0x81000044;
-> -			rc = smb_send(server, smb_buf, 0x44);
-> -			kfree(ses_init_buf);
-> -			msleep(1); /* RFC1001 layer in at least one server
-> -				      requires very short break before negprot
-> -				      presumably because not expecting negprot
-> -				      to follow so fast.  This is a simple
-> -				      solution that works without
-> -				      complicating the code and causes no
-> -				      significant slowing down on mount
-> -				      for everyone else */
-> -		}
-> -		/* else the negprot may still work without this
-> -		even though malloc failed */
-> -
-> -	}
-> -
-> -	return rc;
-> -}
-> -
-> -static int
-> -ipv6_connect(struct TCP_Server_Info *server)
-> -{
-> -	int rc = 0;
-> -	int val;
-> -	bool connected = false;
-> -	__be16 orig_port = 0;
-> -	struct socket *socket = server->ssocket;
-> -
-> -	if (socket == NULL) {
-> -		rc = sock_create_kern(PF_INET6, SOCK_STREAM,
-> -				      IPPROTO_TCP, &socket);
-> -		if (rc < 0) {
-> -			cERROR(1, "Error %d creating ipv6 socket", rc);
-> -			socket = NULL;
-> -			return rc;
-> -		}
-> -
-> -		/* BB other socket options to set KEEPALIVE, NODELAY? */
-> -		cFYI(1, "ipv6 Socket created");
-> -		server->ssocket = socket;
-> -		socket->sk->sk_allocation = GFP_NOFS;
-> -		cifs_reclassify_socket6(socket);
-> -	}
-> -
-> -	rc = bind_socket(server);
-> -	if (rc < 0)
-> -		return rc;
-> -
-> -	/* user overrode default port */
-> -	if (server->addr.sockAddr6.sin6_port) {
-> -		rc = socket->ops->connect(socket,
-> -				(struct sockaddr *) &server->addr.sockAddr6,
-> -				sizeof(struct sockaddr_in6), 0);
-> -		if (rc >= 0)
-> -			connected = true;
-> -	}
-> -
-> -	if (!connected) {
-> -		/* save original port so we can retry user specified port
-> -			later if fall back ports fail this time  */
-> -
-> -		orig_port = server->addr.sockAddr6.sin6_port;
-> -		/* do not retry on the same port we just failed on */
-> -		if (server->addr.sockAddr6.sin6_port != htons(CIFS_PORT)) {
-> -			server->addr.sockAddr6.sin6_port = htons(CIFS_PORT);
-> -			rc = socket->ops->connect(socket, (struct sockaddr *)
-> -					&server->addr.sockAddr6,
-> -					sizeof(struct sockaddr_in6), 0);
-> -			if (rc >= 0)
-> -				connected = true;
-> -		}
-> -	}
-> -	if (!connected) {
-> -		server->addr.sockAddr6.sin6_port = htons(RFC1001_PORT);
-> -		rc = socket->ops->connect(socket, (struct sockaddr *)
-> -				&server->addr.sockAddr6,
-> -				sizeof(struct sockaddr_in6), 0);
-> -		if (rc >= 0)
-> -			connected = true;
-> -	}
-> -
-> -	/* give up here - unless we want to retry on different
-> -		protocol families some day */
-> -	if (!connected) {
-> -		if (orig_port)
-> -			server->addr.sockAddr6.sin6_port = orig_port;
-> -		cFYI(1, "Error %d connecting to server via ipv6", rc);
-> -		sock_release(socket);
-> -		server->ssocket = NULL;
-> -		return rc;
-> -	}
-> -
-> -	/*
-> -	 * Eventually check for other socket options to change from
-> -	 * the default. sock_setsockopt not used because it expects
-> -	 * user space buffer
-> -	 */
-> -	socket->sk->sk_rcvtimeo = 7 * HZ;
-> -	socket->sk->sk_sndtimeo = 5 * HZ;
-> -
-> -	if (server->tcp_nodelay) {
-> -		val = 1;
-> -		rc = kernel_setsockopt(socket, SOL_TCP, TCP_NODELAY,
-> -				(char *)&val, sizeof(val));
-> -		if (rc)
-> -			cFYI(1, "set TCP_NODELAY socket option error %d", rc);
-> -	}
-> -
-> -	server->ssocket = socket;
-> +	if (*sport == htons(RFC1001_PORT))
-> +		rc = ip_rfc1001_connect(server);
->  
->  	return rc;
->  }
-
-With these changes, where does the port get automatically set to
-RFC1001_PORT if the CIFS_PORT connect fails? It looks like that part
-got ripped out, but not replaced.
-
-That said, it seems like it might be better to separate policy
-from function here. The socket connect code really has no
-business deciding what port to use. Might it be better to
-instead have a generic function that takes a fully filled-out sockaddr,
-and then have another function that calls it and decides what ports
-to try?
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
