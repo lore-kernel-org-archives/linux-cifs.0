@@ -1,91 +1,53 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 2/2] CIFS: Add match_port check during looking for an existing connection
-Date: Sun, 14 Nov 2010 21:49:09 +0300
-Message-ID: <1289760549-8760-1-git-send-email-piastryyy@gmail.com>
-References: <1289734155-3613-2-git-send-email-piastryyy@gmail.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix mounting share on non-standard ports
+Date: Sun, 14 Nov 2010 20:31:12 -0500
+Message-ID: <20101114203112.5d901619@corrin.poochiereds.net>
+References: <1289321425-7860-1-git-send-email-piastryyy@gmail.com>
+	<20101113070012.760cf09d@tlielax.poochiereds.net>
+	<AANLkTinb-A4kdumURzhkVb9oNojtfW94LPL99GwOr9MU@mail.gmail.com>
+	<AANLkTim+SO4TfTJnXHnvaSjbPaoHt4k63hbVbs0gtbn9@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289734155-3613-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <AANLkTim+SO4TfTJnXHnvaSjbPaoHt4k63hbVbs0gtbn9-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we have a share mounted by non-standard port and try to mount another share
-on the same host with standard port, we connect to the first share again -
-that's wrong. This patch fixes this bug.
+On Sun, 14 Nov 2010 12:38:18 +0300
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/connect.c |   37 +++++++++++++++++++++++++++++++------
- 1 files changed, 31 insertions(+), 6 deletions(-)
+> 2010/11/13 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> > 2010/11/13 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> >>
+> >> I don't think this patch deals correctly with servers that are
+> >> listening on RFC1001_PORT but not CIFS_PORT. With two mounts to the
+> >> same server that don't specify a port, you'll end up with two sockets,
+> >> right?
+> >
+> 
+> And from another hand: If user doesn't specify the port we should
+> think that it means the 445 port. If user wants to mount 139 port, he
+> should specify this port manually. So, there is no error with the
+> patch in this case.
+> 
+> From this point of view we should remove trying with 139 port if we
+> failed with 445 port. What do you think about it?
+> 
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 01ebcc4..7130dd7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1435,6 +1435,34 @@ srcip_matches(struct sockaddr *srcaddr, struct sockaddr *rhs)
- 	}
- }
- 
-+static bool
-+match_port(struct TCP_Server_Info *server, struct sockaddr *addr)
-+{
-+	struct sockaddr_in *addr4 = (struct sockaddr_in *)addr;
-+	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)addr;
-+	unsigned short int port;
-+
-+	/* search for a connection with the default port if user doesn't
-+	   specify the port manually */
-+	port = htons(CIFS_PORT);
-+
-+	switch (addr->sa_family) {
-+	case AF_INET:
-+		if (addr4->sin_port)
-+			port = addr4->sin_port;
-+		if (port != server->addr.sockAddr.sin_port)
-+			return false;
-+		break;
-+	case AF_INET6:
-+		if (addr6->sin6_port)
-+			port = addr6->sin6_port;
-+		if (port != server->addr.sockAddr6.sin6_port)
-+			return false;
-+		break;
-+	}
-+
-+	return true;
-+}
- 
- static bool
- match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
-@@ -1448,9 +1476,6 @@ match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
- 		if (addr4->sin_addr.s_addr !=
- 		    server->addr.sockAddr.sin_addr.s_addr)
- 			return false;
--		if (addr4->sin_port &&
--		    addr4->sin_port != server->addr.sockAddr.sin_port)
--			return false;
- 		break;
- 	case AF_INET6:
- 		if (!ipv6_addr_equal(&addr6->sin6_addr,
-@@ -1459,9 +1484,6 @@ match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
- 		if (addr6->sin6_scope_id !=
- 		    server->addr.sockAddr6.sin6_scope_id)
- 			return false;
--		if (addr6->sin6_port &&
--		    addr6->sin6_port != server->addr.sockAddr6.sin6_port)
--			return false;
- 		break;
- 	}
- 
-@@ -1530,6 +1552,9 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
- 				   (struct sockaddr *)&vol->srcaddr))
- 			continue;
- 
-+		if (!match_port(server, addr))
-+			continue;
-+
- 		if (!match_security(server, vol))
- 			continue;
- 
+That sounds like a regression. The mount.cifs manpage says:
+
+       port=arg
+           sets the port number on the server to attempt to contact to
+           negotiate CIFS support. If the CIFS server is not listening on this
+           port or if it is not specified, the default ports will be tried
+           i.e. port 445 is tried and if no response then port 139 is tried.
+
+
+I think we ought to preserve that behavior. Perhaps if no port is
+specified then match any TCP session that is on port 445 or port 139?
+
 -- 
-1.7.3.2
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
