@@ -1,148 +1,92 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC][PATCH] cifs: add attribute cache timeout (actimeo)
- tunable
-Date: Tue, 16 Nov 2010 14:03:02 -0500
-Message-ID: <20101116140302.6efd2e3d@corrin.poochiereds.net>
-References: <1289902177-12963-1-git-send-email-sjayaraman@suse.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 2/2] CIFS: Add match_port check during looking for an
+ existing connection (try #2)
+Date: Tue, 16 Nov 2010 13:02:10 -0600
+Message-ID: <AANLkTimUVphDeWti-mid5jS2g-sF1jDVU7rMuyaPExUg@mail.gmail.com>
+References: <1289893710-7352-1-git-send-email-piastryyy@gmail.com>
+	<1289893710-7352-2-git-send-email-piastryyy@gmail.com>
+	<AANLkTinX6o59YD2EAL4ahJoD1PBLNUCF-MXUss9yhZnd@mail.gmail.com>
+	<20101116135714.358d6b10@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1289902177-12963-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <20101116135714.358d6b10-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 16 Nov 2010 15:39:37 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+On Tue, Nov 16, 2010 at 12:57 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrot=
+e:
+> On Tue, 16 Nov 2010 12:47:07 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Tue, Nov 16, 2010 at 1:48 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8@public.gmane.org=
+m> wrote:
+>> > If we have a share mounted by non-standard port and try to mount a=
+nother share
+>> > on the same host with standard port, we connect to the first share=
+ again -
+>> > that's wrong. This patch fixes this bug.
+>>
+>> The description seems a little strange - can you clarify?
+>>
+>> If we have an existing session with a server (using whatever port), =
+by
+>> default we want to use it (unless the user forces a different port
+>> than the existing connection was made with). =A0If we have a firewal=
+l
+>> issue and therefore go through a non-standard port (port=3Dsomething=
+ on
+>> mount), we usually wouldn't want to fork a new connection on a secon=
+d
+>> connection to the same server.
+>>
+>> So if we specify port=3D5000 on a mount and we already have a mount =
+on
+>> port 139, it makes sense that we would want to create a new session.
+>> But if you already have a mount on port 5000, and did a mount with n=
+o
+>> port specified - why wouldn't you use the existing port? =A0It saves
+>> server, client and network resources.
+>>
+>
+> That doesn't match what the manpage says. It says:
+>
+> =A0 =A0 =A0 port=3Darg
+> =A0 =A0 =A0 =A0 =A0 sets the port number on the server to attempt to =
+contact to
+> =A0 =A0 =A0 =A0 =A0 negotiate CIFS support. If the CIFS server is not=
+ listening on this
+> =A0 =A0 =A0 =A0 =A0 port or if it is not specified, the default ports=
+ will be tried
+> =A0 =A0 =A0 =A0 =A0 i.e. port 445 is tried and if no response then po=
+rt 139 is tried.
+>
+>
+> ...which to me says that if you want the new mount to share the socke=
+t
+> already on port 5000, you need to specify port=3D5000 in the mount
+> options. The code doesn't do this today, but I think it probably ough=
+t
+> to conform to the above description, or more accurately, with the
+> manpage update that Pavel proposed.
+>
+> Now, to be pedantic...the code that Pavel proposed still isn't 100%
+> compliant with the description.
 
-> Currently, the attribute cache timeout for CIFS is 1 sec. This means that the
-> client might have to issue a QPATHINFO/QFILEINFO call every 1 sec to verify if
-> something has changed, which seems too expensive. On the otherhand, increasing
-> this value further may not work well for all the users.
-> 
-> This patch introduces a tunable mount option 'actimeo' that can be used to tune
-> the attribute cache timeout. This patch takes a conservative approach and sets
-> the default timeout is set to 3 seconds while limiting maximum timeout to 60
-> seconds. Ideally, it is preferred to set attribute cache timeouts separately
-> for files and directories like how NFS does. However, I think it is better to
-> keep it simple without too many options, introduce the option to users, get
-> feedback from them and then decide what is working better for CIFS.
-> 
-> This patch has been tested lightly and no adverse effects were seen.
-> 
-> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> ---
->  fs/cifs/cifs_fs_sb.h |    1 +
->  fs/cifs/cifsglob.h   |    3 +++
->  fs/cifs/connect.c    |   16 ++++++++++++++++
->  fs/cifs/inode.c      |    6 +++---
->  4 files changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-> index e9a393c..efd2d73 100644
-> --- a/fs/cifs/cifs_fs_sb.h
-> +++ b/fs/cifs/cifs_fs_sb.h
-> @@ -48,6 +48,7 @@ struct cifs_sb_info {
->  	struct nls_table *local_nls;
->  	unsigned int rsize;
->  	unsigned int wsize;
-> +	unsigned int actimeo;
->  	atomic_t active;
->  	uid_t	mnt_uid;
->  	gid_t	mnt_gid;
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index b577bf0..eb22130 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -44,6 +44,9 @@
->  
->  #define CIFS_MIN_RCV_POOL 4
->  
-> +#define CIFS_DEF_ACTIMEO (3)	/* default attribute cache timeout (seconds) */
-> +#define CIFS_MAX_ACTIMEO (60)	/* max allowed attribute cache timeout */
-> +
->  /*
->   * MAX_REQ is the maximum number of requests that WE will send
->   * on one socket concurrently. It also matches the most common
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 251a17c..39edc54 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -103,6 +103,7 @@ struct smb_vol {
->  	bool multiuser:1;
->  	unsigned int rsize;
->  	unsigned int wsize;
-> +	unsigned int actimeo; /* attribute cache timeout */
->  	bool sockopt_tcp_nodelay:1;
->  	unsigned short int port;
->  	char *prepath;
-> @@ -1214,6 +1215,10 @@ cifs_parse_mount_options(char *options, const char *devname,
->  					printk(KERN_WARNING "CIFS: server net"
->  					"biosname longer than 15 truncated.\n");
->  			}
-> +		} else if (strnicmp(data, "actimeo", 7) == 0) {
-> +			if (value && *value)
-> +				vol->actimeo =
-> +					simple_strtoul(value, &value, 0);
->  		} else if (strnicmp(data, "credentials", 4) == 0) {
->  			/* ignore */
->  		} else if (strnicmp(data, "version", 3) == 0) {
-> @@ -2566,6 +2571,17 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
->  	cFYI(1, "file mode: 0x%x  dir mode: 0x%x",
->  		cifs_sb->mnt_file_mode, cifs_sb->mnt_dir_mode);
->  
-> +	if ((pvolume_info->actimeo) &&
-> +			(pvolume_info->actimeo < CIFS_MAX_ACTIMEO))
-> +		cifs_sb->actimeo = pvolume_info->actimeo;
-> +	else if ((pvolume_info->actimeo) &&
-> +			(pvolume_info->actimeo >= CIFS_MAX_ACTIMEO)) {
-> +		cifs_sb->actimeo = CIFS_MAX_ACTIMEO;
-> +		cERROR(1, "actimeo %d too large, using %d instead",
-> +				pvolume_info->actimeo, CIFS_MAX_ACTIMEO);
-> +	} else /* default */
-> +		cifs_sb->actimeo = CIFS_DEF_ACTIMEO;
-> +
->  	if (pvolume_info->noperm)
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
->  	if (pvolume_info->setuids)
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index ff7d299..f30700d 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1648,6 +1648,7 @@ static bool
->  cifs_inode_needs_reval(struct inode *inode)
->  {
->  	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  
->  	if (cifs_i->clientCanCacheRead)
->  		return false;
-> @@ -1658,12 +1659,11 @@ cifs_inode_needs_reval(struct inode *inode)
->  	if (cifs_i->time == 0)
->  		return true;
->  
-> -	/* FIXME: the actimeo should be tunable */
-> -	if (time_after_eq(jiffies, cifs_i->time + HZ))
-> +	if (time_after_eq(jiffies, cifs_i->time + (cifs_sb->actimeo * HZ)))
->  		return true;
->  
->  	/* hardlinked files w/ noserverino get "special" treatment */
-> -	if (!(CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
-> +	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
->  	    S_ISREG(inode->i_mode) && inode->i_nlink != 1)
->  		return true;
->  
+But I think that the more important question is what the use case is -
+ie which is easier and more natural for the user.   The man page needs
+update either way.
 
-I too think that the 1s actimeo is too aggressive in general, but I'm a
-little leery that changing the default here might mean subtle
-regressions. Cache consistency is really hard to get right, so we need
-to take great care when we change its behavior.
+Seems like we want to always use the existing connection if possible.
+The man page comment about using the user specified port (if any) then
+port 445 then port 139 is only for "negotiate" - ie when we haven't
+already negotiated a session with the server.
 
-What do you think about respinning this patch and leaving the default
-at 1s? We could consider increasing it later if we can prove to
-ourselves that it won't cause problems.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--=20
+Thanks,
+
+Steve
