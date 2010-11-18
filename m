@@ -1,31 +1,166 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] manpage: change port option description
-Date: Thu, 18 Nov 2010 10:48:05 +0300
-Message-ID: <1290066485-2618-1-git-send-email-piastryyy@gmail.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH -v2] cifs: add attribute cache timeout (actimeo) tunable
+Date: Thu, 18 Nov 2010 18:00:23 +0530
+Message-ID: <1290083423-14912-1-git-send-email-sjayaraman@suse.de>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Provide changes according to new ip/port connection logic in CIFS.
+Currently, the attribute cache timeout for CIFS is hardcoded to 1 second. This
+means that the client might have to issue a QPATHINFO/QFILEINFO call every 1
+second to verify if something has changes, which seems too expensive. On the
+other hand, if the timeout is hardcoded to a higher value, workloads that
+expect strict cache coherency might see unexpected results.
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Making attribute cache timeout as a tunable will allow us to make a tradeoff
+between performance and cache metadata correctness depending on the
+application/workload needs.
+
+Add 'actimeo' tunable that can be used to tune the attribute cache timeout.
+The default timeout is set to 1 second. Also, display actimeo option value in
+/proc/mounts.
+
+Changes since last post:
+
+	- fix an issue with signed overflow when using time_after()
+	- cache timeout stored internally in terms of jiffies for easier
+	  handling
+	- update README about 'actimeo' option  
+
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- mount.cifs.8 |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ fs/cifs/README       |    9 +++++++++
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/cifsfs.c     |    2 ++
+ fs/cifs/cifsglob.h   |    5 +++++
+ fs/cifs/connect.c    |   10 ++++++++++
+ fs/cifs/inode.c      |    7 ++++---
+ 6 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index 7d2bf69..b7fe2ad 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -132,7 +132,7 @@ instructs the client to ignore any gid provided by the server for files and dire
- .PP
- port=\fIarg\fR
- .RS 4
--sets the port number on the server to attempt to contact to negotiate CIFS support\&. If the CIFS server is not listening on this port or if it is not specified, the default ports will be tried i\&.e\&. port 445 is tried and if no response then port 139 is tried\&.
-+sets the port number on the server to attempt to contact to negotiate CIFS support\&. If this value is specified, looking for an existing connection with this port and try to connect if no such a connection\&. Return an error if it fails\&. If this value isn't specified, looking for an existing connection with 445 or 139 port\&. If no such a connection, try to connect with 445 port and if it fails - with 139 port\&. Return an error if both fail\&.
- .RE
- .PP
- servern=\fIarg\fR
--- 
-1.7.3.2
+diff --git a/fs/cifs/README b/fs/cifs/README
+index ee68d10..46af99a 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -337,6 +337,15 @@ A partial list of the supported mount options follows:
+   wsize		default write size (default 57344)
+ 		maximum wsize currently allowed by CIFS is 57344 (fourteen
+ 		4096 byte pages)
++  actimeo=n	attribute cache timeout in seconds (default 1 second).
++		After this timeout, the cifs client requests fresh attribute
++		information from the server. This option allows to tune the
++		attribute cache timeout to suit the workload needs. Shorter
++		timeouts mean better the cache coherency, but increased number
++		of calls to the server. Longer timeouts mean reduced number
++		of calls to the server at the expense of less stricter cache
++		coherency checks (i.e. incorrect attribute cache for a short
++		period of time).
+   rw		mount the network share read-write (note that the
+ 		server may still consider the share read-only)
+   ro		mount network share read-only
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index e9a393c..7852cd6 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -48,6 +48,7 @@ struct cifs_sb_info {
+ 	struct nls_table *local_nls;
+ 	unsigned int rsize;
+ 	unsigned int wsize;
++	unsigned long actimeo; /* attribute cache timeout (jiffies) */
+ 	atomic_t active;
+ 	uid_t	mnt_uid;
+ 	gid_t	mnt_gid;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 9c37897..80fc16a 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -461,6 +461,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 
+ 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+ 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
++	/* convert actimeo and display it in seconds */
++	seq_printf(s, ",actimeo=%lu", cifs_sb->actimeo / HZ);
+ 
+ 	return 0;
+ }
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b577bf0..037f793 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -45,6 +45,11 @@
+ #define CIFS_MIN_RCV_POOL 4
+ 
+ /*
++ * default attribute cache timeout (seconds)
++ */
++#define CIFS_DEF_ACTIMEO (1)
++
++/*
+  * MAX_REQ is the maximum number of requests that WE will send
+  * on one socket concurrently. It also matches the most common
+  * value of max multiplex returned by servers.  We may
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 251a17c..dfe1279 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -105,6 +105,7 @@ struct smb_vol {
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+ 	unsigned short int port;
++	unsigned long actimeo; /* attribute cache timeout (jiffies) */
+ 	char *prepath;
+ 	struct sockaddr_storage srcaddr; /* allow binding to a local IP */
+ 	struct nls_table *local_nls;
+@@ -1214,6 +1215,10 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 					printk(KERN_WARNING "CIFS: server net"
+ 					"biosname longer than 15 truncated.\n");
+ 			}
++		} else if (strnicmp(data, "actimeo", 7) == 0) {
++			if (value && *value)
++				vol->actimeo =
++					simple_strtoul(value, &value, 0) * HZ;
+ 		} else if (strnicmp(data, "credentials", 4) == 0) {
+ 			/* ignore */
+ 		} else if (strnicmp(data, "version", 3) == 0) {
+@@ -2566,6 +2571,11 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 	cFYI(1, "file mode: 0x%x  dir mode: 0x%x",
+ 		cifs_sb->mnt_file_mode, cifs_sb->mnt_dir_mode);
+ 
++	if (pvolume_info->actimeo)
++		cifs_sb->actimeo = pvolume_info->actimeo;
++	else /* default */
++		cifs_sb->actimeo = CIFS_DEF_ACTIMEO * HZ;
++
+ 	if (pvolume_info->noperm)
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
+ 	if (pvolume_info->setuids)
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index ff7d299..7571fbd 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1648,6 +1648,7 @@ static bool
+ cifs_inode_needs_reval(struct inode *inode)
+ {
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 
+ 	if (cifs_i->clientCanCacheRead)
+ 		return false;
+@@ -1658,12 +1659,12 @@ cifs_inode_needs_reval(struct inode *inode)
+ 	if (cifs_i->time == 0)
+ 		return true;
+ 
+-	/* FIXME: the actimeo should be tunable */
+-	if (time_after_eq(jiffies, cifs_i->time + HZ))
++	if (!time_in_range_open(jiffies, cifs_i->time,
++			       cifs_i->time + cifs_sb->actimeo))
+ 		return true;
+ 
+ 	/* hardlinked files w/ noserverino get "special" treatment */
+-	if (!(CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
+ 	    S_ISREG(inode->i_mode) && inode->i_nlink != 1)
+ 		return true;
+ 
