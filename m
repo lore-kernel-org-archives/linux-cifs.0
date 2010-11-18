@@ -1,75 +1,41 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] manpage: change port option description
-Date: Thu, 18 Nov 2010 08:54:44 -0500
-Message-ID: <20101118085444.2801721a@barsoom.rdu.redhat.com>
-References: <1290066485-2618-1-git-send-email-piastryyy@gmail.com>
+From: =?ISO-8859-1?Q?Andr=E9_Sintzoff?= <andre.sintzoff-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: cifs-utils 4.5-2: mount error(11): Resource temporarily unavailable
+Date: Thu, 18 Nov 2010 16:26:51 +0100
+Message-ID: <AANLkTikXyAVP8fpCSi_RmzCAnvM95QkR4=dycLEWeOui@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1290066485-2618-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 18 Nov 2010 10:48:05 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Hello,
 
-> Provide changes according to new ip/port connection logic in CIFS.
-> 
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  mount.cifs.8 |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 7d2bf69..b7fe2ad 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -132,7 +132,7 @@ instructs the client to ignore any gid provided by the server for files and dire
->  .PP
->  port=\fIarg\fR
->  .RS 4
-> -sets the port number on the server to attempt to contact to negotiate CIFS support\&. If the CIFS server is not listening on this port or if it is not specified, the default ports will be tried i\&.e\&. port 445 is tried and if no response then port 139 is tried\&.
-> +sets the port number on the server to attempt to contact to negotiate CIFS support\&.
+After upgrading Ubuntu from 10.04 to 10.10, mount.cifs does no more
+work as expected on my environment.
 
-The sentence above is rather awkward. Maybe:
+The command is:
+sudo mount.cifs //servername/somehow/deep/path /mnt/servername -o
+nounix,user=3Djohndoe,domain=3DCORRECT_WORKGROUP,password=3Djdpasswd
 
-	"sets the port number on which the client will attempt to
-	contact the CIFS server".
+On Ubuntu 10.04, the mount works well.
+According to dpkg, the exact version for smbfs is 2:3.4.7~dfsg-1ubuntu3=
+=2E2
 
-If this value is specified, looking for an existing connection with
-this port and try to connect if no such a connection\&. If this value is
-specified, looking for an existing connection with this port and try to
-connect if no such a connection\&. Return an error if it fails\&. I
+On Ubuntu 10.10, the mount fails with the following error message:
+mount error(11): Resource temporarily unavailable
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
-	"If this value is specified, look for an existing connection
-	with this port, and use that if one exists. If one doesn't
-	exist, try to create a new connection on that port. If that
-	connection fails, return an error."
+According to dpkg, the exact version for cifs-utils and smbfs is 2:4.5-=
+2
 
-If this value isn't specified, looking for an existing connection
-with 445 or 139 port\&. If no such a connection, try to connect
-with 445 port and if it fails - with 139 port\&. Return an
-error if both fail\&.
+I try to use gvfs-mount on Ubuntu 10.10 and it works with:
+gvfs-mount smb://servername
 
-	"If this value isn't specified, look for an existing connection
-	on port 445 or 139. If no such connection exists, try
-	to connect on port 445 first and then port 139 if that fails.
-	Return an error if both fail.
+If someone has any idea why mount.cifs fails, I will be glad to read it=
+=2E
 
+Thank you
 
->  .RE
->  .PP
->  servern=\fIarg\fR
-> -- 
-> 1.7.3.2
-> 
-
-If my edits look good to you, I'll plan to merge them after Steve
-merges the kernel patches.
-
-Thanks,
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Andr=E9
