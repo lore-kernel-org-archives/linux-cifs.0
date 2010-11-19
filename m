@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache mode
-Date: Fri, 19 Nov 2010 13:08:13 +0300
-Message-ID: <AANLkTi=6QdZJPF_RsMyRduB=hgELYwRbKnRCU3KG2hc2@mail.gmail.com>
+Date: Fri, 19 Nov 2010 14:55:57 +0300
+Message-ID: <AANLkTi=WzPB6o_f0KL2Sxgdv0Ve4jqK22w8qzdSUTfOj@mail.gmail.com>
 References: <1289459222-8210-1-git-send-email-piastryyy@gmail.com>
 	<20101115073430.2254b19c@tlielax.poochiereds.net>
 	<AANLkTi=SDMQfw4+rZSA_nvW-bq8hsH4ycVa6MXU+vSz=@mail.gmail.com>
@@ -83,11 +83,38 @@ g);
 > =A0}
 >
 
-I have just noticed that Linux kernel NFS client also uses
-invalidate_inode_pages2 in nfs_revalidate_mapping:
-http://git.kernel.org/?p=3Dlinux/kernel/git/sfrench/cifs-2.6.git;a=3Dbl=
-ob;f=3Dfs/nfs/inode.c;h=3D314f57164602eda0762c0a226db44aa19be461f5;hb=3D=
-362d31297fafb150676f4d564ecc7f7f3e3b7fd4#l839
+Sorry, "invalidate" patch above was based on v2.6.36 git tree. Here
+are the version from cifs master branch:
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index ff7d299..66d3ba3 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1679,12 +1679,16 @@ cifs_invalidate_mapping(struct inode *inode)
+
+        cifs_i->invalid_mapping =3D false;
+
+-       /* write back any cached data */
+-       if (inode->i_mapping && inode->i_mapping->nrpages !=3D 0) {
+-               rc =3D filemap_write_and_wait(inode->i_mapping);
+-               mapping_set_error(inode->i_mapping, rc);
++       if (inode->i_mapping) {
++               /* write back any cached data */
++               if (inode->i_mapping->nrpages !=3D 0) {
++                       rc =3D filemap_write_and_wait(inode->i_mapping)=
+;
++                       mapping_set_error(inode->i_mapping, rc);
++               }
++
++               invalidate_inode_pages2(inode->i_mapping);
+        }
+-       invalidate_remote_inode(inode);
++
+        cifs_fscache_reset_inode_cookie(inode);
+ }
+
+
+If everything is ok with it I will post it as a separate patch in right=
+ format.
 
 --=20
 Best regards,
