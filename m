@@ -1,140 +1,78 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
- mode
-Date: Fri, 19 Nov 2010 11:33:50 -0500
-Message-ID: <20101119113350.606a4598@tlielax.poochiereds.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache mode
+Date: Fri, 19 Nov 2010 22:31:29 +0300
+Message-ID: <AANLkTinR1--V7KL=7nb0VAyjEm=nJDk5n+xU7NcaaxXD@mail.gmail.com>
 References: <1289459222-8210-1-git-send-email-piastryyy@gmail.com>
 	<20101115073430.2254b19c@tlielax.poochiereds.net>
 	<AANLkTi=SDMQfw4+rZSA_nvW-bq8hsH4ycVa6MXU+vSz=@mail.gmail.com>
 	<AANLkTi=e=ExtiYwkWm0tNFVFJWT9nv7HZZB_7PphFKLS@mail.gmail.com>
 	<AANLkTi=WzPB6o_f0KL2Sxgdv0Ve4jqK22w8qzdSUTfOj@mail.gmail.com>
+	<20101119113350.606a4598@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=WzPB6o_f0KL2Sxgdv0Ve4jqK22w8qzdSUTfOj-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20101119113350.606a4598-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 19 Nov 2010 14:55:57 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2010/11/19 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Fri, 19 Nov 2010 14:55:57 +0300
+> I don't think we should apply any patches to fix a problem that we
+> don't really understand. If it mostly goes away with cifsFYI turned on
+> then it sounds like a race condition of some sort. It looks like
+> invalidate_inode_pages2 invalidates locked pages whereas
+> invalidate_remote_inode doesn't, so that may be a hint, or it could
+> just change the timing of the race.
+>
+> You'll need to ascertain the nature of the race to ensure that the fix
+> is really fixing the problem and not just papering over the bug.
+>
 
-> 2010/11/19 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> > 2010/11/19 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> >> 2010/11/15 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> >>>
-> >>> Not directly related to your patch, but what exactly is the purpo=
-se of
-> >>> the "open_inode_helper"? It looks like "pile o' random junk that =
-we do
-> >>
-> >> I agree that we can replace it with simply calling get_query_info =
-from
-> >> cifs_open.
-> >>
-> >>> for non-posix opens". Maybe it would be best to eliminate that fu=
-nction
-> >>> altogether and further unify the posix and non-posix open code. S=
-teve,
-> >>> care to comment?
-> >>>
-> >>> Now that I'm done ranting, I don't think the invalidate mapping c=
-all
-> >>> here is unnecessary. We will likely have already invalidated the =
-cache
-> >>> during the d_revalidate phase, and you're going to do it again be=
-low in
-> >>> cifs_new_fileinfo.
-> >>>
-> >>
-> >> I investigated it - you was right about unnecessary calling
-> >> cifs_invalidate_mapping from open_inode_helper and cifs_new_filein=
-fo.
-> >> But I found the following problem:
-> >>
-> >> When we execute script close2_problem.py (see in attachment) sever=
-al
-> >> times (e.x. for i in `seq 1 20`; do ./close2_problem.py; done) wit=
-h
-> >> (!) cifsFYI switched off it shows 'a' instead of 'x' (about 1-2 ti=
-mes
-> >> for 20 runs). If we switch cifsFYI on it is almost always 'x' (tru=
-e) -
-> >> I have caught 'a' in this case one or two times for many-many runs=
-=2E
-> >> What do you think about it?
-> >
-> > I continued the investigation and discovered that if we use
-> > invalidate_inode_pages2 instead of invalidate_remote_inode - the
-> > problem disappears! So, this is the patch we should apply to solve =
-it
-> > (I don't post it as a separate patch? because I think it needs more
-> > discussing):
-> >
-> > diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> > index 53cce8c..f20f200 100644
-> > --- a/fs/cifs/inode.c
-> > +++ b/fs/cifs/inode.c
-> > @@ -1591,7 +1591,10 @@ cifs_invalidate_mapping(struct inode *inode)
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc)
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_i->write_behind=
-_rc =3D rc;
-> > =A0 =A0 =A0 =A0}
-> > - =A0 =A0 =A0 invalidate_remote_inode(inode);
-> > +
-> > + =A0 =A0 =A0 if (inode->i_mapping)
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 invalidate_inode_pages2(inode->i_mapp=
-ing);
-> > +
-> > =A0 =A0 =A0 =A0cifs_fscache_reset_inode_cookie(inode);
-> > =A0}
-> >
->=20
-> Sorry, "invalidate" patch above was based on v2.6.36 git tree. Here
-> are the version from cifs master branch:
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index ff7d299..66d3ba3 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1679,12 +1679,16 @@ cifs_invalidate_mapping(struct inode *inode)
->=20
->         cifs_i->invalid_mapping =3D false;
->=20
-> -       /* write back any cached data */
-> -       if (inode->i_mapping && inode->i_mapping->nrpages !=3D 0) {
-> -               rc =3D filemap_write_and_wait(inode->i_mapping);
-> -               mapping_set_error(inode->i_mapping, rc);
-> +       if (inode->i_mapping) {
-> +               /* write back any cached data */
-> +               if (inode->i_mapping->nrpages !=3D 0) {
-> +                       rc =3D filemap_write_and_wait(inode->i_mappin=
-g);
-> +                       mapping_set_error(inode->i_mapping, rc);
-> +               }
-> +
-> +               invalidate_inode_pages2(inode->i_mapping);
->         }
-> -       invalidate_remote_inode(inode);
-> +
->         cifs_fscache_reset_inode_cookie(inode);
->  }
->=20
->=20
-> If everything is ok with it I will post it as a separate patch in rig=
-ht format.
->=20
+I checked all the lock/unlock calls for pages in CIFS code and didn't
+find any problem places. I added debug message that shows how many
+pages invalidate_remote_inode invalidates and for wrong case it is 0:
 
-I don't think we should apply any patches to fix a problem that we
-don't really understand. If it mostly goes away with cifsFYI turned on
-then it sounds like a race condition of some sort. It looks like
-invalidate_inode_pages2 invalidates locked pages whereas
-invalidate_remote_inode doesn't, so that may be a hint, or it could
-just change the timing of the race.
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: CIFS VFS: in cifs_close as
+Xid: 1922 with uid: 500
+ /home/piastry/git/cifs-2.6/fs/cifs/cifssmb.c: In CIFSSMBClose
+ /home/piastry/git/cifs-2.6/fs/cifs/transport.c: For smb_command 4
+ /home/piastry/git/cifs-2.6/fs/cifs/transport.c: Sending smb:  total_len 45
+ /home/piastry/git/cifs-2.6/fs/cifs/connect.c: rfc1002 length 0x27
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: closing last open instance
+for inode e2402828
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: CIFS VFS: leaving
+cifs_close (xid = 1922) rc = 0
+ /home/piastry/git/cifs-2.6/fs/cifs/inode.c: CIFS VFS: in
+cifs_revalidate as Xid: 1923 with uid: 500
+ /home/piastry/git/cifs-2.6/fs/cifs/inode.c: Revalidate: /_test4321_
+inode 0xe2402690 count 1 dentry: 0xf6f0b550 d_time 1962130 jiffies
+2313421
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: CIFS VFS: in
+cifs_writepages as Xid: 1924 with uid: 500
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: CIFS VFS: leaving
+cifs_writepages (xid = 1924) rc = 0
+ /home/piastry/git/cifs-2.6/fs/cifs/inode.c: invalidating remote inode
+since open detected it changed
+ /home/piastry/git/cifs-2.6/fs/cifs/inode.c: invalidate returned: 0
+ ^^^
+ /home/piastry/git/cifs-2.6/fs/cifs/inode.c: CIFS VFS: leaving
+cifs_revalidate (xid = 1923) rc = 0
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: CIFS VFS: in cifs_open as
+Xid: 1925 with uid: 500
+ /home/piastry/git/cifs-2.6/fs/cifs/file.c: inode = 0xe2402690 file
+flags are 0x8000 for /_test4321_
 
-You'll need to ascertain the nature of the race to ensure that the fix
-is really fixing the problem and not just papering over the bug.
+For right cases it is "invalidate returned: 1". This message was taken
+from dmesg after a run of my python script I posted before.
 
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+So, the page can be locked and then successfully unlocked by VFS
+(because invalidate_inode_pages2 locks a page before processing it).
+Anyway I think we shouldn't use invalidate_remote_inode at all - we
+can miss pages that are under some VFS process. In this case
+invalidate_inode_pages2 is ok - I don't think it can break any things.
+
+-- 
+Best regards,
+Pavel Shilovsky.
