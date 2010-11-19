@@ -1,71 +1,107 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache mode
-Date: Fri, 19 Nov 2010 11:03:45 +0300
-Message-ID: <AANLkTi=e=ExtiYwkWm0tNFVFJWT9nv7HZZB_7PphFKLS@mail.gmail.com>
-References: <1289459222-8210-1-git-send-email-piastryyy@gmail.com>
-	<20101115073430.2254b19c@tlielax.poochiereds.net>
-	<AANLkTi=SDMQfw4+rZSA_nvW-bq8hsH4ycVa6MXU+vSz=@mail.gmail.com>
+From: =?ISO-8859-1?Q?Andr=E9_Sintzoff?= <andre.sintzoff-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs-utils 4.5-2: mount error(11): Resource temporarily unavailable
+Date: Fri, 19 Nov 2010 09:36:28 +0100
+Message-ID: <AANLkTinK0xXfz-fxTJDM+eFtjOdFCR5Ye3RRDKs7Za_1@mail.gmail.com>
+References: <AANLkTikXyAVP8fpCSi_RmzCAnvM95QkR4=dycLEWeOui@mail.gmail.com>
+ <AANLkTimABqWV7ofAe_iWYOrEYa1aGoZZus_eyhAT0CWv@mail.gmail.com>
+ <AANLkTinLU6XF5HU6CtpuXv5hJe+_OXrX4NzJPyDFhq0y@mail.gmail.com>
+ <20101118131549.306e7a12@barsoom.rdu.redhat.com> <AANLkTi=pp059-Deb-KwOGY2XpbXfeLRd-sP_8461JdGX@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=SDMQfw4+rZSA_nvW-bq8hsH4ycVa6MXU+vSz=@mail.gmail.com>
+In-Reply-To: <AANLkTi=pp059-Deb-KwOGY2XpbXfeLRd-sP_8461JdGX-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/11/19 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> 2010/11/15 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+2010/11/18 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> On Thu, Nov 18, 2010 at 12:15 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wr=
+ote:
+>> On Thu, 18 Nov 2010 17:13:26 +0100
+>> Andr=E9 Sintzoff <andre.sintzoff-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >>
->> Not directly related to your patch, but what exactly is the purpose of
->> the "open_inode_helper"? It looks like "pile o' random junk that we do
->
-> I agree that we can replace it with simply calling get_query_info from
-> cifs_open.
->
->> for non-posix opens". Maybe it would be best to eliminate that function
->> altogether and further unify the posix and non-posix open code. Steve,
->> care to comment?
+>>> 2010/11/18 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>>> > On Thu, Nov 18, 2010 at 9:26 AM, Andr=E9 Sintzoff
+>>> > <andre.sintzoff-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>> >> Hello,
+>>> >>
+>>> >> After upgrading Ubuntu from 10.04 to 10.10, mount.cifs does no m=
+ore
+>>> >> work as expected on my environment.
+>>> >>
+>>> >> The command is:
+>>> >> sudo mount.cifs //servername/somehow/deep/path /mnt/servername -=
+o
+>>> >> nounix,user=3Djohndoe,domain=3DCORRECT_WORKGROUP,password=3Djdpa=
+sswd
+>>> >>
+>>> >> On Ubuntu 10.04, the mount works well.
+>>> >> According to dpkg, the exact version for smbfs is 2:3.4.7~dfsg-1=
+ubuntu3.2
+>>> >>
+>>> >> On Ubuntu 10.10, the mount fails with the following error messag=
+e:
+>>> >> mount error(11): Resource temporarily unavailable
+>>> >> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>>> >
+>>> > Is there anything related to cifs logged in kernel message log (d=
+mesg)?
+>>>
+>>> Yes. The following lines should give the failure cause.
+>>>
+>>> [28899.254869] CIFS VFS: dns_resolve_server_name_to_ip: unable to
+>>> resolve: server2.domain.com
+>>> [28899.254879] CIFS VFS: cifs_compose_mount_options: Failed to reso=
+lve
+>>> server part of \\server2.domain.com\path to IP: -11
+>>>
+>>> It seems that the mounting point //servername/somehow/deep/path is =
+not
+>>> physically on "servername" machine but already mounted from "server=
+2"
+>>> on "servername" filesystem. Therefore, cifs has to perform a second
+>>> name resolution which fails.
+>>> I don't understand why cifs is unable to resolve =A0server2.domain.=
+com.
+>>> ping server2.domain.com and host server2.domain.com are OK.
+>>>
+>>> On Ubuntu 10.04, the name resolution is correctly managed.
+>>> The corresponding line in dmesg:
+>>> [ 1396.567721] =A0/build/buildd/linux-2.6.32/fs/cifs/dns_resolve.c:
+>>> dns_resolve_server_name_to_ip: resolved: server2.domain.com to
+>>> 10.10.193.26
+>>>
+>>> I just change the mount command to use directly the server2 machine
+>>> and it works.
+>>>
+>>> Thanks for giving me enough information to find a workaround.
+>>>
 >>
->> Now that I'm done ranting, I don't think the invalidate mapping call
->> here is unnecessary. We will likely have already invalidated the cache
->> during the d_revalidate phase, and you're going to do it again below in
->> cifs_new_fileinfo.
->>
+>> It sounds like /etc/request-key.conf isn't set up to do DNS resoluti=
+on
+>> on the broken host. See the cifs.upcall manpage for details.
 >
-> I investigated it - you was right about unnecessary calling
-> cifs_invalidate_mapping from open_inode_helper and cifs_new_fileinfo.
-> But I found the following problem:
->
-> When we execute script close2_problem.py (see in attachment) several
-> times (e.x. for i in `seq 1 20`; do ./close2_problem.py; done) with
-> (!) cifsFYI switched off it shows 'a' instead of 'x' (about 1-2 times
-> for 20 runs). If we switch cifsFYI on it is almost always 'x' (true) -
-> I have caught 'a' in this case one or two times for many-many runs.
-> What do you think about it?
+> Presumably this is a DFS redirection from some path on servername to
+> \\server2\some-share - which requires that request-key be setup
+> properly (to resolve the host name in kernel - when you directly moun=
+t
+> to \\server2 - mount.cifs can use gethostbyname library call - which
+> is not available for kernel code to call, thus the reason for the
+> upcall helper Jeff mentions). =A0If this is misconfigured in current
+> Ubuntu (note that the kernel moved to using cifs's host name
+> resolution mechanism recently - ~in the last five months). =A0Probabl=
+y
+> need to log the bug against Ubuntu so they can fix their default
+> configuration.
 
-I continued the investigation and discovered that if we use
-invalidate_inode_pages2 instead of invalidate_remote_inode - the
-problem disappears! So, this is the patch we should apply to solve it
-(I don't post it as a separate patch? because I think it needs more
-discussing):
+As suggested by Jeff, I check the request-key.conf file.
+The file is missing because Ubuntu does not automagically install
+keyutils package during installation of smbfs.
+It seems that there is a missing dependency on Ubuntu 10.10.
+Once keyutils package is installed, the DFS redirection is OK.
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 53cce8c..f20f200 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1591,7 +1591,10 @@ cifs_invalidate_mapping(struct inode *inode)
-                if (rc)
-                        cifs_i->write_behind_rc = rc;
-        }
--       invalidate_remote_inode(inode);
-+
-+       if (inode->i_mapping)
-+               invalidate_inode_pages2(inode->i_mapping);
-+
-        cifs_fscache_reset_inode_cookie(inode);
- }
+Thanks again for your support
 
--- 
-Best regards,
-Pavel Shilovsky.
+Andr=E9
