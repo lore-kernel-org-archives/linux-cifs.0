@@ -1,86 +1,84 @@
 From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: [PATCH] cifs: remove Local_System_Name
-Date: Mon, 22 Nov 2010 15:31:03 -0500
-Message-ID: <1290457863-10804-3-git-send-email-jlayton@redhat.com>
-References: <1290457863-10804-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH] cifs: remove unnecessary locking around sequence_number
+Date: Mon, 22 Nov 2010 15:31:01 -0500
+Message-ID: <1290457863-10804-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1290457863-10804-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...this string is zeroed out and nothing ever changes it.
+The server->sequence_number is already protected by the srv_mutex. The
+GlobalMid_lock is unneeded here.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsfs.c   |    1 -
- fs/cifs/cifsglob.h |    2 --
- fs/cifs/connect.c  |   23 ++++++++++-------------
- 3 files changed, 10 insertions(+), 16 deletions(-)
+ fs/cifs/cifsencrypt.c |    6 ++----
+ fs/cifs/cifsglob.h    |    2 +-
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 041d7c3..57a7386 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -931,7 +931,6 @@ init_cifs(void)
- 	GlobalCurrentXid = 0;
- 	GlobalTotalActiveXid = 0;
- 	GlobalMaxActiveXid = 0;
--	memset(Local_System_Name, 0, 15);
- 	spin_lock_init(&cifs_tcp_ses_lock);
- 	spin_lock_init(&cifs_file_list_lock);
- 	spin_lock_init(&GlobalMid_Lock);
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index f856732..66f3d50 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -72,6 +72,7 @@ static int cifs_calculate_signature(const struct smb_hdr *cifs_pdu,
+ 	return 0;
+ }
+ 
++/* must be called with server->srv_mutex held */
+ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 		  __u32 *pexpected_response_sequence_number)
+ {
+@@ -84,14 +85,12 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 	if ((cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) == 0)
+ 		return rc;
+ 
+-	spin_lock(&GlobalMid_Lock);
+ 	cifs_pdu->Signature.Sequence.SequenceNumber =
+ 			cpu_to_le32(server->sequence_number);
+ 	cifs_pdu->Signature.Sequence.Reserved = 0;
+ 
+ 	*pexpected_response_sequence_number = server->sequence_number++;
+ 	server->sequence_number++;
+-	spin_unlock(&GlobalMid_Lock);
+ 
+ 	rc = cifs_calculate_signature(cifs_pdu, server, smb_signature);
+ 	if (rc)
+@@ -149,6 +148,7 @@ static int cifs_calc_signature2(const struct kvec *iov, int n_vec,
+ 	return rc;
+ }
+ 
++/* must be called with server->srv_mutex held */
+ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 		   __u32 *pexpected_response_sequence_number)
+ {
+@@ -162,14 +162,12 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 	if ((cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) == 0)
+ 		return rc;
+ 
+-	spin_lock(&GlobalMid_Lock);
+ 	cifs_pdu->Signature.Sequence.SequenceNumber =
+ 				cpu_to_le32(server->sequence_number);
+ 	cifs_pdu->Signature.Sequence.Reserved = 0;
+ 
+ 	*pexpected_response_sequence_number = server->sequence_number++;
+ 	server->sequence_number++;
+-	spin_unlock(&GlobalMid_Lock);
+ 
+ 	rc = cifs_calc_signature2(iov, n_vec, server, smb_signature);
+ 	if (rc)
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b4c2524..2ffa029 100644
+index a8d9f32..bba731c 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -743,8 +743,6 @@ GLOBAL_EXTERN unsigned int GlobalTotalActiveXid; /* prot by GlobalMid_Sem */
- GLOBAL_EXTERN unsigned int GlobalMaxActiveXid;	/* prot by GlobalMid_Sem */
- GLOBAL_EXTERN spinlock_t GlobalMid_Lock;  /* protects above & list operations */
- 					  /* on midQ entries */
--GLOBAL_EXTERN char Local_System_Name[15];
--
- /*
-  *  Global counters, updated atomically
-  */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 251a17c..7758120 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -806,23 +806,20 @@ cifs_parse_mount_options(char *options, const char *devname,
- 	short int override_gid = -1;
- 	bool uid_specified = false;
- 	bool gid_specified = false;
-+	char *nodename = utsname()->nodename;
- 
- 	separator[0] = ',';
- 	separator[1] = 0;
- 
--	if (Local_System_Name[0] != 0)
--		memcpy(vol->source_rfc1001_name, Local_System_Name, 15);
--	else {
--		char *nodename = utsname()->nodename;
--		int n = strnlen(nodename, 15);
--		memset(vol->source_rfc1001_name, 0x20, 15);
--		for (i = 0; i < n; i++) {
--			/* does not have to be perfect mapping since field is
--			informational, only used for servers that do not support
--			port 445 and it can be overridden at mount time */
--			vol->source_rfc1001_name[i] = toupper(nodename[i]);
--		}
--	}
-+	/*
-+	 * does not have to be perfect mapping since field is
-+	 * informational, only used for servers that do not support
-+	 * port 445 and it can be overridden at mount time
-+	 */
-+	memset(vol->source_rfc1001_name, 0x20, 15);
-+	for (i = 0; i < strnlen(nodename, 15); i++)
-+		vol->source_rfc1001_name[i] = toupper(nodename[i]);
-+
- 	vol->source_rfc1001_name[15] = 0;
- 	/* null target name indicates to use *SMBSERVR default called name
- 	   if we end up sending RFC1001 session initialize */
+@@ -200,7 +200,7 @@ struct TCP_Server_Info {
+ 	char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+ 	/* 16th byte of RFC1001 workstation name is always null */
+ 	char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+-	__u32 sequence_number; /* needed for CIFS PDU signature */
++	__u32 sequence_number; /* for signing, protected by srv_mutex */
+ 	struct session_key session_key;
+ 	unsigned long lstrp; /* when we got last response from this server */
+ 	u16 dialect; /* dialect index that server chose */
 -- 
 1.7.3.2
