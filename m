@@ -1,50 +1,86 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/3] cifs: use CreationTime like an i_generation field
-Date: Mon, 22 Nov 2010 15:31:25 -0500
-Message-ID: <20101122153125.68ee4ee6@corrin.poochiereds.net>
-References: <1277723413-23769-1-git-send-email-jlayton@redhat.com>
-	<1277723413-23769-3-git-send-email-jlayton@redhat.com>
-	<20101122145541.2ab3536f@corrin.poochiereds.net>
-	<AANLkTimtg0vFVQ5HGo+nq7rE=Z4Sob=z7LuVCMFgWdnv@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: [PATCH] cifs: remove Local_System_Name
+Date: Mon, 22 Nov 2010 15:31:03 -0500
+Message-ID: <1290457863-10804-3-git-send-email-jlayton@redhat.com>
+References: <1290457863-10804-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimtg0vFVQ5HGo+nq7rE=Z4Sob=z7LuVCMFgWdnv-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1290457863-10804-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 22 Nov 2010 14:22:50 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+...this string is zeroed out and nothing ever changes it.
 
-> On Mon, Nov 22, 2010 at 1:55 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> 
-> > On Mon, 28 Jun 2010 07:10:12 -0400
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> >
-> >
-> > Steve, can you clarify where we are with this patch? I originally sent
-> > this back in June. You and I discussed this at the CIFS plugfest and I
-> > had thought you had decided to merge it. It's still not in your tree
-> > however. Can you give a verdict on whether you're going to merge it and
-> > let me know when I can expect to see it in your tree if so?
-> >
-> >
-> Thanks for reminding me.  I had forgotten to ask JRA about a question
-> on legacy Samba behavior.   I remembered that older Samba
-> had problems with creation time - and was trying to remember what
-> the implication of using this patch with older Samba was.
-> 
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |    1 -
+ fs/cifs/cifsglob.h |    2 --
+ fs/cifs/connect.c  |   23 ++++++++++-------------
+ 3 files changed, 10 insertions(+), 16 deletions(-)
 
-All samba versions have issues with create times (at least on Linux
-anyway). They fake them, by using the ctime (which seems like an odd
-choice to me) in most cases.
-
-Either way, let me know when you decide or if you have a question on
-this.
-
-Thanks,
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 041d7c3..57a7386 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -931,7 +931,6 @@ init_cifs(void)
+ 	GlobalCurrentXid = 0;
+ 	GlobalTotalActiveXid = 0;
+ 	GlobalMaxActiveXid = 0;
+-	memset(Local_System_Name, 0, 15);
+ 	spin_lock_init(&cifs_tcp_ses_lock);
+ 	spin_lock_init(&cifs_file_list_lock);
+ 	spin_lock_init(&GlobalMid_Lock);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b4c2524..2ffa029 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -743,8 +743,6 @@ GLOBAL_EXTERN unsigned int GlobalTotalActiveXid; /* prot by GlobalMid_Sem */
+ GLOBAL_EXTERN unsigned int GlobalMaxActiveXid;	/* prot by GlobalMid_Sem */
+ GLOBAL_EXTERN spinlock_t GlobalMid_Lock;  /* protects above & list operations */
+ 					  /* on midQ entries */
+-GLOBAL_EXTERN char Local_System_Name[15];
+-
+ /*
+  *  Global counters, updated atomically
+  */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 251a17c..7758120 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -806,23 +806,20 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 	short int override_gid = -1;
+ 	bool uid_specified = false;
+ 	bool gid_specified = false;
++	char *nodename = utsname()->nodename;
+ 
+ 	separator[0] = ',';
+ 	separator[1] = 0;
+ 
+-	if (Local_System_Name[0] != 0)
+-		memcpy(vol->source_rfc1001_name, Local_System_Name, 15);
+-	else {
+-		char *nodename = utsname()->nodename;
+-		int n = strnlen(nodename, 15);
+-		memset(vol->source_rfc1001_name, 0x20, 15);
+-		for (i = 0; i < n; i++) {
+-			/* does not have to be perfect mapping since field is
+-			informational, only used for servers that do not support
+-			port 445 and it can be overridden at mount time */
+-			vol->source_rfc1001_name[i] = toupper(nodename[i]);
+-		}
+-	}
++	/*
++	 * does not have to be perfect mapping since field is
++	 * informational, only used for servers that do not support
++	 * port 445 and it can be overridden at mount time
++	 */
++	memset(vol->source_rfc1001_name, 0x20, 15);
++	for (i = 0; i < strnlen(nodename, 15); i++)
++		vol->source_rfc1001_name[i] = toupper(nodename[i]);
++
+ 	vol->source_rfc1001_name[15] = 0;
+ 	/* null target name indicates to use *SMBSERVR default called name
+ 	   if we end up sending RFC1001 session initialize */
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.3.2
