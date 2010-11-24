@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 1/3] cifs: allow fsc mount option only if CONFIG_CIFS_FSCACHE is set
-Date: Wed, 24 Nov 2010 17:49:05 +0530
-Message-ID: <1290601147-11392-2-git-send-email-sjayaraman@suse.de>
+Subject: [PATCH 3/3] cifs: display fsc in /proc/mounts
+Date: Wed, 24 Nov 2010 17:49:07 +0530
+Message-ID: <1290601147-11392-4-git-send-email-sjayaraman@suse.de>
 References: <1290601147-11392-1-git-send-email-sjayaraman@suse.de>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
@@ -10,31 +10,22 @@ In-Reply-To: <1290601147-11392-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gm
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently, it is possible to specify 'fsc' mount option even if
-CONFIG_CIFS_FSCACHE has not been set. The option is being ignored silently
-while the user fscache functionality to work. Fix this by raising error when
-the CONFIG option is not set.
 
-
-Reported-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- fs/cifs/connect.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ fs/cifs/cifsfs.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 251a17c..32fa4d9 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1352,6 +1352,11 @@ cifs_parse_mount_options(char *options, const char *devname,
- 				"supported. Instead set "
- 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
- 		} else if (strnicmp(data, "fsc", 3) == 0) {
-+#ifndef CONFIG_CIFS_FSCACHE
-+			cERROR(1, "FS-Cache support needs CONFIG_CIFS_FSCACHE"
-+				  "kernel config option set");
-+			return 1;
-+#endif
- 			vol->fsc = true;
- 		} else if (strnicmp(data, "mfsymlinks", 10) == 0) {
- 			vol->mfsymlinks = true;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 9c37897..76c8a90 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -458,6 +458,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 		seq_printf(s, ",acl");
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MF_SYMLINKS)
+ 		seq_printf(s, ",mfsymlinks");
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)
++		seq_printf(s, ",fsc");
+ 
+ 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+ 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
