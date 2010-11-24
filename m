@@ -1,23 +1,40 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 0/3] cifs: fix a few fscache issues
-Date: Wed, 24 Nov 2010 17:49:04 +0530
-Message-ID: <1290601147-11392-1-git-send-email-sjayaraman@suse.de>
+Subject: [PATCH 1/3] cifs: allow fsc mount option only if CONFIG_CIFS_FSCACHE is set
+Date: Wed, 24 Nov 2010 17:49:05 +0530
+Message-ID: <1290601147-11392-2-git-send-email-sjayaraman@suse.de>
+References: <1290601147-11392-1-git-send-email-sjayaraman@suse.de>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1290601147-11392-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset fixes a couple of issues with fscache found by Jeff Layton. I
-think these are straight-forward fixes and can be considered for next -rc.
-
-Suresh Jayaraman (3):
-   cifs: allow fsc mount option only if CONFIG_CIFS_FSCACHE is set
-   cifs: enable fscache iff fsc mount option is used explicitly
-   cifs: display fsc in /proc/mounts
+Currently, it is possible to specify 'fsc' mount option even if
+CONFIG_CIFS_FSCACHE has not been set. The option is being ignored silently
+while the user fscache functionality to work. Fix this by raising error when
+the CONFIG option is not set.
 
 
- cifsfs.c  |    2 ++
- connect.c |    5 +++++
- fscache.c |   12 ++++++------
- 3 files changed, 13 insertions(+), 6 deletions(-)
+Reported-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/connect.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 251a17c..32fa4d9 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1352,6 +1352,11 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 				"supported. Instead set "
+ 				"/proc/fs/cifs/LookupCacheEnabled to 0\n");
+ 		} else if (strnicmp(data, "fsc", 3) == 0) {
++#ifndef CONFIG_CIFS_FSCACHE
++			cERROR(1, "FS-Cache support needs CONFIG_CIFS_FSCACHE"
++				  "kernel config option set");
++			return 1;
++#endif
+ 			vol->fsc = true;
+ 		} else if (strnicmp(data, "mfsymlinks", 10) == 0) {
+ 			vol->mfsymlinks = true;
