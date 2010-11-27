@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: [PATCH 12/14] cifs: reconnect unresponsive servers
-Date: Sat, 27 Nov 2010 08:01:24 -0500
-Message-ID: <1290862886-2914-13-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/14] cifs: set up recurring workqueue job to do SMB echo requests
+Date: Sat, 27 Nov 2010 08:01:23 -0500
+Message-ID: <1290862886-2914-12-git-send-email-jlayton@redhat.com>
 References: <1290862886-2914-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,86 +10,91 @@ In-Reply-To: <1290862886-2914-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-MS-CIFS says:
-
-    "The server MUST NOT disconnect clients that have been inactive less
-     than 5 minutes."
-
-Using that guideline, perform a reconnect to any server that hasn't
-responded in the last 5 minutes. Eventually, we may want to make this
-tunable, but it seems like a reasonable default.
-
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   21 +++++++++++++++++----
- 1 files changed, 17 insertions(+), 4 deletions(-)
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/connect.c  |   29 +++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 0 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 62d3aa2..9639c3d 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -211,6 +211,7 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_ntlmssp;		/* supports NTLMSSP */
+ 	bool session_estab; /* mark when very first sess is established */
++	struct delayed_work	echo; /* echo ping workqueue job */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
+ #endif
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 9c90f1d..ece7275 100644
+index 8c4c39f..9c90f1d 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -55,6 +55,9 @@
- /* SMB echo every 60s -- FIXME: tunable? */
- #define SMB_ECHO_INTERVAL (60 * HZ)
+@@ -52,6 +52,9 @@
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
  
-+/* reconnect if no response from server in this time period */
-+#define UNRESPONSIVE_SERVER_TIMEOUT (5 * 60 * HZ)
++/* SMB echo every 60s -- FIXME: tunable? */
++#define SMB_ECHO_INTERVAL (60 * HZ)
 +
  extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
  			 unsigned char *p24);
  
-@@ -183,6 +186,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 	kfree(server->session_key.response);
- 	server->session_key.response = NULL;
- 	server->session_key.len = 0;
-+	server->lstrp = jiffies;
+@@ -348,6 +351,26 @@ static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
  
- 	INIT_LIST_HEAD(&dispose);
+ }
+ 
++static void
++cifs_echo_request(struct work_struct *work)
++{
++	int rc;
++	struct TCP_Server_Info *server = container_of(work,
++					struct TCP_Server_Info, echo.work);
++
++	/* no need to ping if we got a response recently */
++	if (time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
++		goto requeue_echo;
++
++	rc = CIFSSMBEcho(server);
++	if (rc)
++		cFYI(1, "Unable to send echo request to server: %s",
++			server->hostname);
++
++requeue_echo:
++	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
++}
++
+ static int
+ cifs_demultiplex_thread(struct TCP_Server_Info *server)
+ {
+@@ -1590,6 +1613,8 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ 	list_del_init(&server->tcp_ses_list);
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
++	cancel_delayed_work_sync(&server->echo);
++
  	spin_lock(&GlobalMid_Lock);
-@@ -436,6 +440,16 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
- 		smb_msg.msg_control = NULL;
- 		smb_msg.msg_controllen = 0;
- 		pdu_length = 4; /* enough to get RFC1001 header */
-+
-+		if (time_after(jiffies,
-+			       server->lstrp + UNRESPONSIVE_SERVER_TIMEOUT)) {
-+			cFYI(1, "Reconnecting unresponsive server %s",
-+				server->hostname);
-+			cifs_reconnect(server);
-+			csocket = server->ssocket;
-+			wake_up(&server->response_q);
-+			continue;
-+		}
- incomplete_rcv:
- 		length =
- 		    kernel_recvmsg(csocket, &smb_msg,
-@@ -597,6 +611,8 @@ incomplete_rcv:
- 		}
- 
- 		mid_entry = NULL;
-+		server->lstrp = jiffies;
-+
- 		spin_lock(&GlobalMid_Lock);
- 		list_for_each(tmp, &server->pending_mid_q) {
- 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-@@ -647,10 +663,6 @@ multi_t2_fnd:
- #ifdef CONFIG_CIFS_STATS2
- 				mid_entry->when_received = jiffies;
- #endif
--				/* so we do not time out requests to  server
--				which is still responding (since server could
--				be busy but not dead) */
--				server->lstrp = jiffies;
- 				break;
- 			}
- next_mid:
-@@ -1704,6 +1716,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		volume_info->target_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
- 	tcp_ses->session_estab = false;
+ 	server->tcpStatus = CifsExiting;
+ 	spin_unlock(&GlobalMid_Lock);
+@@ -1681,6 +1706,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  	tcp_ses->sequence_number = 0;
-+	tcp_ses->lstrp = jiffies;
  	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
  	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
- 	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
++	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+ 
+ 	/*
+ 	 * at this point we are the only ones with the pointer
+@@ -1730,6 +1756,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 
+ 	cifs_fscache_get_client_cookie(tcp_ses);
+ 
++	/* queue echo request delayed work */
++	queue_delayed_work(system_nrt_wq, &tcp_ses->echo, SMB_ECHO_INTERVAL);
++
+ 	return tcp_ses;
+ 
+ out_err_crypto_release:
 -- 
 1.7.3.2
