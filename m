@@ -1,348 +1,103 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/2] CIFS: Simplify non-posix open stuff
-Date: Sat, 27 Nov 2010 08:49:09 -0600
-Message-ID: <AANLkTimd-f-X4Y6QZOOKZyg4mDhYezyRuyW_1j6ffZbP@mail.gmail.com>
-References: <1290696298-5204-1-git-send-email-piastryyy@gmail.com>
+Subject: Re: [PATCH 00/14] cifs: overhaul request timeout behavior in CIFS
+ (try #1)
+Date: Sat, 27 Nov 2010 09:08:01 -0600
+Message-ID: <AANLkTik67ugsfTapXHoRu-c7Rpra-wofdku2xioOQi6-@mail.gmail.com>
+References: <1290862886-2914-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1290696298-5204-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1290862886-2914-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Nov 25, 2010 at 8:44 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =
+On Sat, Nov 27, 2010 at 7:01 AM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org> =
 wrote:
-> Delete cifs_open_inode_helper and move non-posix open related things
-> to cifs_nt_open function.
+> This patchset is intended to fix the unreliable behavior in CIFS in t=
+he
+> face of a server that's taking a long time to process requests.
 >
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
-> =A0fs/cifs/cifsproto.h | =A0 =A04 +
-> =A0fs/cifs/file.c =A0 =A0 =A0| =A0184 +++++++++++++++++++------------=
---------------------
-> =A02 files changed, 72 insertions(+), 116 deletions(-)
+> In general, the current code sets a timeout for all requests that are
+> sent on the wire. If the server doesn't respond to the request within
+> that timeout, the client performs a reconnect and retries the request=
+=2E
 >
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 6ed59af..09d048c 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -113,6 +113,10 @@ extern int cifs_posix_open(char *full_path, stru=
-ct inode **pinode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct=
- super_block *sb,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int mo=
-de, unsigned int f_flags,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 =
-*poplock, __u16 *pnetfid, int xid);
-> +extern int cifs_nt_open(char *full_path, struct inode **pinode,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_sb_info *ci=
-fs_sb, struct cifsTconInfo *tcon,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int f_flags, _=
-_u32 *poplock, __u16 *pnetfid,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 int xid);
-> =A0void cifs_fill_uniqueid(struct super_block *sb, struct cifs_fattr =
-*fattr);
-> =A0extern void cifs_unix_basic_to_fattr(struct cifs_fattr *fattr,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- FILE_UNIX_BASIC_INFO *info,
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index b857ce5..c7d642f 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -104,53 +104,6 @@ static inline int cifs_get_disposition(unsigned =
-int flags)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return FILE_OPEN;
-> =A0}
+> This is dangerous and wasteful behavior for the client. Much of the
+> state of a CIFS mount is bound to the socket connection. Break the
+> socket connection and state is lost.
 >
-> -static inline int cifs_open_inode_helper(struct inode *inode,
-> - =A0 =A0 =A0 struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO=
- *buf,
-> - =A0 =A0 =A0 char *full_path, int xid)
-> -{
-> - =A0 =A0 =A0 struct cifsInodeInfo *pCifsInode =3D CIFS_I(inode);
-> - =A0 =A0 =A0 struct timespec temp;
-> - =A0 =A0 =A0 int rc;
-> -
-> - =A0 =A0 =A0 if (pCifsInode->clientCanCacheRead) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* we have the inode open somewhere els=
+> I believe this the root cause of some data corruption issues that hav=
 e
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0no need to discard cache data */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto client_can_cache;
-> - =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 /* BB need same check in cifs_create too? */
-> - =A0 =A0 =A0 /* if not oplocked, invalidate inode pages if mtime or =
-file
-> - =A0 =A0 =A0 =A0 =A0size changed */
-> - =A0 =A0 =A0 temp =3D cifs_NTtimeToUnix(buf->LastWriteTime);
-> - =A0 =A0 =A0 if (timespec_equal(&inode->i_mtime, &temp) &&
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(inode->i_size =3D=
-=3D
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (loff_t)le64_to=
-_cpu(buf->EndOfFile))) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "inode unchanged on server");
-> - =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (inode->i_mapping) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* BB no need to lock i=
-node until after invalidate
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 since namei code should=
- already have it locked? */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D filemap_write_an=
-d_wait(inode->i_mapping);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapping_set_error(inode=
-->i_mapping, rc);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "invalidating remote inode sinc=
-e open detected it "
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"changed");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(inode);
-> - =A0 =A0 =A0 }
-> -
-> -client_can_cache:
-> - =A0 =A0 =A0 if (pTcon->unix_ext)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info_unix(&inode,=
- full_path, inode->i_sb,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 xid);
-> - =A0 =A0 =A0 else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info(&inode, full=
-_path, buf, inode->i_sb,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0xid, NULL);
-> -
-> - =A0 =A0 =A0 cifs_set_oplock_level(pCifsInode, oplock);
-> -
-> - =A0 =A0 =A0 return rc;
-> -}
-> -
-> =A0int cifs_posix_open(char *full_path, struct inode **pinode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct super_block *sb=
-, int mode, unsigned int f_flags,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 *poplock, __u16 =
-*pnetfid, int xid)
-> @@ -213,6 +166,71 @@ posix_open_ret:
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
+> been reported to me. We had a partner report that when they copied a
+> large file to a CIFS server and then compare the result to the origin=
+al,
+> there is sometimes a mismatch. The problem is highly correlated to
+> messages in the ring buffer that indicate that the client reconnected
+> the socket during the test run.
 >
-> +int cifs_nt_open(char *full_path, struct inode **pinode,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb, struct=
- cifsTconInfo *tcon,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int f_flags, __u32 *poplock=
-, __u16 *pnetfid, int xid)
-> +{
-> + =A0 =A0 =A0 int rc;
-> + =A0 =A0 =A0 int desiredAccess;
-> + =A0 =A0 =A0 int disposition;
-> + =A0 =A0 =A0 FILE_ALL_INFO *buf;
-> +
-> + =A0 =A0 =A0 desiredAccess =3D cifs_convert_flags(f_flags);
-> +
-> +/*******************************************************************=
-**
-> + * =A0open flag mapping table:
-> + *
-> + * =A0 =A0 POSIX Flag =A0 =A0 =A0 =A0 =A0 =A0CIFS Disposition
-> + * =A0 =A0 ---------- =A0 =A0 =A0 =A0 =A0 =A0----------------
-> + * =A0 =A0 O_CREAT =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OPEN_IF
-> + * =A0 =A0 O_CREAT | O_EXCL =A0 =A0 =A0FILE_CREATE
-> + * =A0 =A0 O_CREAT | O_TRUNC =A0 =A0 FILE_OVERWRITE_IF
-> + * =A0 =A0 O_TRUNC =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OVERWRITE
-> + * =A0 =A0 none of the above =A0 =A0 FILE_OPEN
-> + *
-> + * =A0 =A0 Note that there is not a direct match between disposition
-> + * =A0 =A0 FILE_SUPERSEDE (ie create whether or not file exists alth=
-ough
-> + * =A0 =A0 O_CREAT | O_TRUNC is similar but truncates the existing
-> + * =A0 =A0 file rather than creating a new file as FILE_SUPERSEDE do=
-es
-> + * =A0 =A0 (which uses the attributes / metadata passed in on open c=
-all)
-> + *?
-> + *? =A0O_SYNC is a reasonable match to CIFS writethrough flag
-> + *? =A0and the read write flags match reasonably. =A0O_LARGEFILE
-> + *? =A0is irrelevant because largefile support is always used
-> + *? =A0by this client. Flags O_APPEND, O_DIRECT, O_DIRECTORY,
-> + * =A0 =A0 =A0O_FASYNC, O_NOFOLLOW, O_NONBLOCK need further investig=
-ation
-> + *******************************************************************=
-**/
-> +
-> + =A0 =A0 =A0 disposition =3D cifs_get_disposition(f_flags);
-> +
-> + =A0 =A0 =A0 /* BB pass O_SYNC flag through on file attributes .. BB=
- */
-> +
-> + =A0 =A0 =A0 buf =3D kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
-> + =A0 =A0 =A0 if (!buf)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
-> +
-> + =A0 =A0 =A0 if (tcon->ses->capabilities & CAP_NT_SMBS)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSSMBOpen(xid, tcon, full_path=
-, disposition,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0desiredAccess, CREAT=
-E_NOT_DIR, pnetfid, poplock, buf,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->local_nls, =
-cifs_sb->mnt_cifs_flags
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0& CI=
-=46S_MOUNT_MAP_SPECIAL_CHR);
-> + =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D SMBLegacyOpen(xid, tcon, full_pa=
-th, disposition,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 desiredAccess, CREATE_N=
-OT_DIR, pnetfid, poplock, buf,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->local_nls, cif=
-s_sb->mnt_cifs_flags
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 & CIFS_=
-MOUNT_MAP_SPECIAL_CHR);
-> +
-> + =A0 =A0 =A0 if (rc)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
-> +
-> + =A0 =A0 =A0 rc =3D cifs_get_inode_info(pinode, full_path, buf, (*pi=
-node)->i_sb,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0xid,=
- NULL);
-
-I think netfid should be passed to cifs_get_inode_info.
-
-> +
-> +out:
-> + =A0 =A0 =A0 kfree(buf);
-> + =A0 =A0 =A0 return rc;
-> +}
-> +
-> =A0struct cifsFileInfo *
-> =A0cifs_new_fileinfo(__u16 fileHandle, struct file *file,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct tcon_link *tlink, __u32 opl=
-ock)
-> @@ -317,10 +335,7 @@ int cifs_open(struct inode *inode, struct file *=
-file)
-> =A0 =A0 =A0 =A0struct cifsFileInfo *pCifsFile =3D NULL;
-> =A0 =A0 =A0 =A0struct cifsInodeInfo *pCifsInode;
-> =A0 =A0 =A0 =A0char *full_path =3D NULL;
-> - =A0 =A0 =A0 int desiredAccess;
-> - =A0 =A0 =A0 int disposition;
-> =A0 =A0 =A0 =A0__u16 netfid;
-> - =A0 =A0 =A0 FILE_ALL_INFO *buf =3D NULL;
+> Another problem that I can reliably reproduce -- I have win2k8
+> installed as a VM guest. When I run connectathon tests to that server=
+,
+> it frequently fails on the test that writes 4GB past the EOF. The
+> storage on this server is slow, and it can take longer than 180s for
+> it to zero-fill the output file.
 >
-> =A0 =A0 =A0 =A0xid =3D GetXid();
+> The intent of this patchset is to fundamentally change when the clien=
+t
+> decides to reconnect the socket. Instead of the old behavior, this
+> patchset makes the client wait indefinitely for a response. Rather th=
+an
+> waiting in TASK_UNINTERRUPTIBLE sleep however, the client waits in
+> TASK_KILLABLE sleep so that fatal signals will end the sleep and
+> return -ERESTARTSYS to the caller.
 >
-> @@ -385,71 +400,9 @@ int cifs_open(struct inode *inode, struct file *=
-file)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 or DFS errors */
-> =A0 =A0 =A0 =A0}
+> In order to determine whether the server is completely dead or just
+> taking a long time to process requests, this patchset has the client
+> do an asynchronous SMB echo request every 60s when the client hasn't
+> gotten a reponse. If the server doesn't respond after 5 mins, the
+> client will attempt to reconnect the socket.
 >
-> - =A0 =A0 =A0 desiredAccess =3D cifs_convert_flags(file->f_flags);
-> -
-> -/*******************************************************************=
-**
-> - * =A0open flag mapping table:
-> - *
-> - * =A0 =A0 POSIX Flag =A0 =A0 =A0 =A0 =A0 =A0CIFS Disposition
-> - * =A0 =A0 ---------- =A0 =A0 =A0 =A0 =A0 =A0----------------
-> - * =A0 =A0 O_CREAT =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OPEN_IF
-> - * =A0 =A0 O_CREAT | O_EXCL =A0 =A0 =A0FILE_CREATE
-> - * =A0 =A0 O_CREAT | O_TRUNC =A0 =A0 FILE_OVERWRITE_IF
-> - * =A0 =A0 O_TRUNC =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OVERWRITE
-> - * =A0 =A0 none of the above =A0 =A0 FILE_OPEN
-> - *
-> - * =A0 =A0 Note that there is not a direct match between disposition
-> - * =A0 =A0 FILE_SUPERSEDE (ie create whether or not file exists alth=
-ough
-> - * =A0 =A0 O_CREAT | O_TRUNC is similar but truncates the existing
-> - * =A0 =A0 file rather than creating a new file as FILE_SUPERSEDE do=
-es
-> - * =A0 =A0 (which uses the attributes / metadata passed in on open c=
-all)
-> - *?
-> - *? =A0O_SYNC is a reasonable match to CIFS writethrough flag
-> - *? =A0and the read write flags match reasonably. =A0O_LARGEFILE
-> - *? =A0is irrelevant because largefile support is always used
-> - *? =A0by this client. Flags O_APPEND, O_DIRECT, O_DIRECTORY,
-> - * =A0 =A0 =A0O_FASYNC, O_NOFOLLOW, O_NONBLOCK need further investig=
-ation
-> - *******************************************************************=
-**/
-> -
-> - =A0 =A0 =A0 disposition =3D cifs_get_disposition(file->f_flags);
-> -
-> - =A0 =A0 =A0 /* BB pass O_SYNC flag through on file attributes .. BB=
- */
-> -
-> - =A0 =A0 =A0 /* Also refresh inode by passing in file_info buf retur=
-ned by SMBOpen
-> - =A0 =A0 =A0 =A0 =A0and calling get_inode_info with returned buf (at=
- least helps
-> - =A0 =A0 =A0 =A0 =A0non-Unix server case) */
-> -
-> - =A0 =A0 =A0 /* BB we can not do this if this is the second open of =
-a file
-> - =A0 =A0 =A0 =A0 =A0and the first handle has writebehind data, we mi=
-ght be
-> - =A0 =A0 =A0 =A0 =A0able to simply do a filemap_fdatawrite/filemap_f=
-datawait first */
-> - =A0 =A0 =A0 buf =3D kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
-> - =A0 =A0 =A0 if (!buf) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
-> - =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 if (tcon->ses->capabilities & CAP_NT_SMBS)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSSMBOpen(xid, tcon, full_path=
-, disposition,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0desiredAccess, CREAT=
-E_NOT_DIR, &netfid, &oplock, buf,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->local_nls, =
-cifs_sb->mnt_cifs_flags
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0& CI=
-=46S_MOUNT_MAP_SPECIAL_CHR);
-> - =A0 =A0 =A0 else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO; /* no NT SMB support fall =
-into legacy open below */
-> -
-> - =A0 =A0 =A0 if (rc =3D=3D -EIO) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Old server, try legacy style OpenX *=
-/
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D SMBLegacyOpen(xid, tcon, full_pa=
-th, disposition,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 desiredAccess, CREATE_N=
-OT_DIR, &netfid, &oplock, buf,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->local_nls, cif=
-s_sb->mnt_cifs_flags
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 & CIFS_=
-MOUNT_MAP_SPECIAL_CHR);
-> - =A0 =A0 =A0 }
-> - =A0 =A0 =A0 if (rc) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "cifs_open returned 0x%x", rc);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
-> - =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 rc =3D cifs_open_inode_helper(inode, tcon, oplock, buf,=
- full_path, xid);
-> - =A0 =A0 =A0 if (rc !=3D 0)
-> + =A0 =A0 =A0 rc =3D cifs_nt_open(full_path, &inode, cifs_sb, tcon, f=
-ile->f_flags,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &oplock, &netfid, x=
-id);
-> + =A0 =A0 =A0 if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
+> With this patchset, I can reliably run the connectathon tests against
+> my slow server. Preliminary results using the proprietary test that
+> was seeing data corruption have also been promising.
 >
-> =A0 =A0 =A0 =A0pCifsFile =3D cifs_new_fileinfo(netfid, file, tlink, o=
-plock);
-> @@ -481,7 +434,6 @@ int cifs_open(struct inode *inode, struct file *f=
-ile)
-> =A0 =A0 =A0 =A0}
+> I'd like to see this set considered for inclusion into 2.6.38.
 >
-> =A0out:
-> - =A0 =A0 =A0 kfree(buf);
-> =A0 =A0 =A0 =A0kfree(full_path);
-> =A0 =A0 =A0 =A0FreeXid(xid);
-> =A0 =A0 =A0 =A0cifs_put_tlink(tlink);
+> Comments and suggestions welcome.
+>
+> Jeff Layton (14):
+> =A0cifs: move mid result processing into common function
+> =A0cifs: wait indefinitely for responses
+> =A0cifs: don't reconnect server when we don't get a response
+> =A0cifs: clean up handle_mid_response
+> =A0cifs: allow for different handling of received response
+> =A0cifs: don't fail writepages on -EAGAIN errors
+> =A0cifs: handle cancelled requests better
+> =A0cifs: make wait_for_free_request take a TCP_Server_Info pointer
+> =A0cifs: add cifs_call_async
+> =A0cifs: add ability to send an echo request
+> =A0cifs: set up recurring workqueue job to do SMB echo requests
+> =A0cifs: reconnect unresponsive servers
+> =A0cifs: make hard mounts the default
+> =A0cifs: remove code for setting timeouts on requests
+>
+> =A0fs/cifs/cifs_debug.c | =A0 =A08 +-
+> =A0fs/cifs/cifsglob.h =A0 | =A0 19 ++--
+> =A0fs/cifs/cifspdu.h =A0 =A0| =A0 15 +++
+> =A0fs/cifs/cifsproto.h =A0| =A0 =A07 +
+> =A0fs/cifs/cifssmb.c =A0 =A0| =A0 55 ++++++++-
+> =A0fs/cifs/connect.c =A0 =A0| =A0128 +++++++++++++++----
+> =A0fs/cifs/file.c =A0 =A0 =A0 | =A0 48 ++------
+> =A0fs/cifs/sess.c =A0 =A0 =A0 | =A0 =A02 +-
+> =A0fs/cifs/transport.c =A0| =A0344 ++++++++++++++++++++++------------=
+----------------
+> =A09 files changed, 355 insertions(+), 271 deletions(-)
+>
 > --
-> 1.7.0.4
+> 1.7.3.2
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
@@ -350,3 +105,9 @@ ile)
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
+
+General question, during all this process and wait, does user know
+in any way (ideally without setting any debug flags/options) that a ser=
+ver is
+unresponsive, perhaps everytime an echo does not come back within
+expected time, and then when it is back to normal i.e. responding?
