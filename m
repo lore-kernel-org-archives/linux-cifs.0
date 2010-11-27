@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: [PATCH 06/14] cifs: don't fail writepages on -EAGAIN errors
-Date: Sat, 27 Nov 2010 08:01:18 -0500
-Message-ID: <1290862886-2914-7-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 08/14] cifs: make wait_for_free_request take a TCP_Server_Info pointer
+Date: Sat, 27 Nov 2010 08:01:20 -0500
+Message-ID: <1290862886-2914-9-git-send-email-jlayton@redhat.com>
 References: <1290862886-2914-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,42 +10,93 @@ In-Reply-To: <1290862886-2914-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If CIFSSMBWrite2 returns -EAGAIN, then we should retry the write instead
-of setting an error on the mapping and returning.
-
-Note that I'm not 100% thrilled with this patch. If we have an
-unresponsive server then we'll block in cifs_writepages for quite some
-time, even in the WB_SYNC_NONE case. That said, we already block in this
-function in the WB_SYNC_NONE case since CIFSSMBWrite2 is always
-synchronous anyway, so I don't see this as causing any more harm than is
-already done.
+The cifsSesInfo pointer is only used to get at the server.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ fs/cifs/transport.c |   26 +++++++++++++-------------
+ 1 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index b857ce5..cde1591 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1432,6 +1432,7 @@ retry:
- 				break;
- 		}
- 		if (n_iov) {
-+retry_write:
- 			open_file = find_writable_file(CIFS_I(mapping->host),
- 							false);
- 			if (!open_file) {
-@@ -1447,6 +1448,9 @@ retry:
- 				cifs_update_eof(cifsi, offset, bytes_written);
- 			}
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 1ed8f6b..cb84201 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -256,31 +256,31 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
+ }
  
-+			if (rc == -EAGAIN)
-+				goto retry_write;
-+
- 			if (rc || bytes_written < bytes_to_write) {
- 				cERROR(1, "Write2 ret %d, wrote %d",
- 					  rc, bytes_written);
+-static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
++static int wait_for_free_request(struct TCP_Server_Info *server,
++				 const int long_op)
+ {
+ 	if (long_op == CIFS_ASYNC_OP) {
+ 		/* oplock breaks must not be held up */
+-		atomic_inc(&ses->server->inFlight);
++		atomic_inc(&server->inFlight);
+ 		return 0;
+ 	}
+ 
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&ses->server->inFlight) >=
+-				cifs_max_pending){
++		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
+ 			spin_unlock(&GlobalMid_Lock);
+ #ifdef CONFIG_CIFS_STATS2
+-			atomic_inc(&ses->server->num_waiters);
++			atomic_inc(&server->num_waiters);
+ #endif
+-			wait_event(ses->server->request_q,
+-				   atomic_read(&ses->server->inFlight)
++			wait_event(server->request_q,
++				   atomic_read(&server->inFlight)
+ 				     < cifs_max_pending);
+ #ifdef CONFIG_CIFS_STATS2
+-			atomic_dec(&ses->server->num_waiters);
++			atomic_dec(&server->num_waiters);
+ #endif
+ 			spin_lock(&GlobalMid_Lock);
+ 		} else {
+-			if (ses->server->tcpStatus == CifsExiting) {
++			if (server->tcpStatus == CifsExiting) {
+ 				spin_unlock(&GlobalMid_Lock);
+ 				return -ENOENT;
+ 			}
+@@ -290,7 +290,7 @@ static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
+ 
+ 			/* update # of requests on the wire to server */
+ 			if (long_op != CIFS_BLOCKING_OP)
+-				atomic_inc(&ses->server->inFlight);
++				atomic_inc(&server->inFlight);
+ 			spin_unlock(&GlobalMid_Lock);
+ 			break;
+ 		}
+@@ -431,7 +431,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 	   to the same server. We may make this configurable later or
+ 	   use ses->maxReq */
+ 
+-	rc = wait_for_free_request(ses, long_op);
++	rc = wait_for_free_request(ses->server, long_op);
+ 	if (rc) {
+ 		cifs_small_buf_release(in_buf);
+ 		return rc;
+@@ -584,7 +584,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 		return -EIO;
+ 	}
+ 
+-	rc = wait_for_free_request(ses, long_op);
++	rc = wait_for_free_request(ses->server, long_op);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -777,7 +777,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 		return -EIO;
+ 	}
+ 
+-	rc = wait_for_free_request(ses, CIFS_BLOCKING_OP);
++	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
+ 	if (rc)
+ 		return rc;
+ 
 -- 
 1.7.3.2
