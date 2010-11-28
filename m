@@ -1,72 +1,94 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
- mode (try #4)
-Date: Sun, 28 Nov 2010 06:23:12 -0500
-Message-ID: <20101128062312.550bb436@tlielax.poochiereds.net>
+Subject: Re: [PATCH 2/6] CIFS: Make read call work with strict cache mode
+ (try #2)
+Date: Sun, 28 Nov 2010 06:28:04 -0500
+Message-ID: <20101128062804.017689c9@tlielax.poochiereds.net>
 References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>
-	<1290931972-2770-2-git-send-email-piastryyy@gmail.com>
+	<1290931972-2770-3-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1290931972-2770-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1290931972-2770-3-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 28 Nov 2010 11:12:47 +0300
+On Sun, 28 Nov 2010 11:12:48 +0300
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> On strict cache mode when we close the last file handle of the inode we
-> should set invalid_mapping flag on this inode to prevent data coherency
-> problem when we open it again but it has been modified by other clients.
+> Add cifs_file_aio_read where we read from the cache if we have at least
+> Level II oplock - otherwise read from the server.
 > 
 > Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/cifs_fs_sb.h |    1 +
->  fs/cifs/file.c       |    8 ++++++++
->  2 files changed, 9 insertions(+), 0 deletions(-)
+>  fs/cifs/cifsfs.c |   31 +++++++++++++++++++++++++++++--
+>  1 files changed, 29 insertions(+), 2 deletions(-)
 > 
-> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-> index e9a393c..be7b159 100644
-> --- a/fs/cifs/cifs_fs_sb.h
-> +++ b/fs/cifs/cifs_fs_sb.h
-> @@ -40,6 +40,7 @@
->  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
->  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
->  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
-> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 9c37897..bbb5294 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -568,6 +568,33 @@ cifs_do_mount(struct file_system_type *fs_type,
+>  	return dget(sb->s_root);
+>  }
 >  
->  struct cifs_sb_info {
->  	struct rb_root tlink_tree;
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index b857ce5..f853bf0 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -264,6 +264,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	struct inode *inode = cifs_file->dentry->d_inode;
->  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
->  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct cifsLockInfo *li, *tmp;
->  
->  	spin_lock(&cifs_file_list_lock);
-> @@ -279,6 +280,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	if (list_empty(&cifsi->openFileList)) {
->  		cFYI(1, "closing last open instance for inode %p",
->  			cifs_file->dentry->d_inode);
+> +static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
+> +				  unsigned long nr_segs, loff_t pos)
+> +{
+> +	struct inode *inode;
+> +	struct cifs_sb_info *cifs_sb;
+> +	ssize_t read;
 > +
-> +		/* in strict cache mode we need invalidate mapping on the last
-> +		   close  because it may cause a error when we open this file
-> +		   again and get at least level II oplock */
-> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-> +			CIFS_I(inode)->invalid_mapping = true;
+> +	inode = iocb->ki_filp->f_path.dentry->d_inode;
+> +	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
 > +
->  		cifs_set_oplock_level(cifsi, 0);
->  	}
->  	spin_unlock(&cifs_file_list_lock);
+> +	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0 ||
+> +	    CIFS_I(inode)->clientCanCacheRead)
+> +		return generic_file_aio_read(iocb, iov, nr_segs, pos);
+> +
+> +	/* in strict cache mode we need to read from the server all the time
+> +	   if we don't have level II oplock because the server can delay mtime
+> +	   change - so we can't make a decision about inode invalidating.
+> +	   And we can also fail with pagereading if there are mandatory locks
+> +	   on pages affected by this read but not on the region from pos to
+> +	   pos+len-1 */
+	^^^^^^^^^^^
+	Nit: while much of the existing cifs code doesn't, it's best to
+	follow kernel coding style when you're adding code. The above
+	comment doesn't do this however. You may want to have a look at
+	Documentation/CodingStyle in the kernel sources.
 
-Looks reasonable.
+> +	read = cifs_user_read(iocb->ki_filp, iov->iov_base,
+> +			      iov->iov_len, &pos);
+> +	iocb->ki_pos = pos;
+> +
+> +	return read;
+> +}
+> +
+>  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+>  				   unsigned long nr_segs, loff_t pos)
+>  {
+> @@ -690,7 +717,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
+>  const struct file_operations cifs_file_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+> @@ -727,7 +754,7 @@ const struct file_operations cifs_file_direct_ops = {
+>  const struct file_operations cifs_file_nobrl_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_file_aio_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+
+Looks reasonable:
 
 Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
