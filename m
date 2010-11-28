@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 2/6] CIFS: Make read call work with strict cache mode (try #2)
-Date: Sun, 28 Nov 2010 11:12:48 +0300
-Message-ID: <1290931972-2770-3-git-send-email-piastryyy@gmail.com>
+Subject: [PATCH 4/6] CIFS: Make cifs_fsync work with strict cache mode (try #2)
+Date: Sun, 28 Nov 2010 11:12:50 +0300
+Message-ID: <1290931972-2770-5-git-send-email-piastryyy@gmail.com>
 References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,69 +9,46 @@ In-Reply-To: <1290931972-2770-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add cifs_file_aio_read where we read from the cache if we have at least
-Level II oplock - otherwise read from the server.
+Remove filemap_write_and_wait call because it is previously called from
+vfs_sync_range and invalidate inode if we don't have at least Level II
+oplock and strcit cache mode switched on.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsfs.c |   31 +++++++++++++++++++++++++++++--
- 1 files changed, 29 insertions(+), 2 deletions(-)
+ fs/cifs/file.c |   14 +++++++-------
+ 1 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 9c37897..bbb5294 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -568,6 +568,33 @@ cifs_do_mount(struct file_system_type *fs_type,
- 	return dget(sb->s_root);
- }
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index f853bf0..22d0421 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1595,20 +1595,20 @@ int cifs_fsync(struct file *file, int datasync)
+ 	struct cifsTconInfo *tcon;
+ 	struct cifsFileInfo *smbfile = file->private_data;
+ 	struct inode *inode = file->f_path.dentry->d_inode;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
  
-+static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
-+				  unsigned long nr_segs, loff_t pos)
-+{
-+	struct inode *inode;
-+	struct cifs_sb_info *cifs_sb;
-+	ssize_t read;
-+
-+	inode = iocb->ki_filp->f_path.dentry->d_inode;
-+	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
-+
-+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0 ||
-+	    CIFS_I(inode)->clientCanCacheRead)
-+		return generic_file_aio_read(iocb, iov, nr_segs, pos);
-+
-+	/* in strict cache mode we need to read from the server all the time
-+	   if we don't have level II oplock because the server can delay mtime
-+	   change - so we can't make a decision about inode invalidating.
-+	   And we can also fail with pagereading if there are mandatory locks
-+	   on pages affected by this read but not on the region from pos to
-+	   pos+len-1 */
-+	read = cifs_user_read(iocb->ki_filp, iov->iov_base,
-+			      iov->iov_len, &pos);
-+	iocb->ki_pos = pos;
-+
-+	return read;
-+}
-+
- static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
- 				   unsigned long nr_segs, loff_t pos)
- {
-@@ -690,7 +717,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
- const struct file_operations cifs_file_ops = {
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = generic_file_aio_read,
-+	.aio_read = cifs_file_aio_read,
- 	.aio_write = cifs_file_aio_write,
- 	.open = cifs_open,
- 	.release = cifs_close,
-@@ -727,7 +754,7 @@ const struct file_operations cifs_file_direct_ops = {
- const struct file_operations cifs_file_nobrl_ops = {
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = generic_file_aio_read,
-+	.aio_read = cifs_file_aio_read,
- 	.aio_write = cifs_file_aio_write,
- 	.open = cifs_open,
- 	.release = cifs_close,
+ 	xid = GetXid();
+ 
+ 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+ 		file->f_path.dentry->d_name.name, datasync);
+ 
+-	rc = filemap_write_and_wait(inode->i_mapping);
+-	if (rc == 0) {
+-		struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	if (!CIFS_I(inode)->clientCanCacheRead &&
++	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
++		invalidate_remote_inode(inode);
+ 
+-		tcon = tlink_tcon(smbfile->tlink);
+-		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+-			rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
+-	}
++	tcon = tlink_tcon(smbfile->tlink);
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
++		rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
+ 
+ 	FreeXid(xid);
+ 	return rc;
 -- 
 1.7.3.2
