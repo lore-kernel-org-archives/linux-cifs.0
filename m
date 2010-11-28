@@ -1,71 +1,72 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Make cifsFileInfo_put work with strict cache mode
- (try #3)
-Date: Sun, 28 Nov 2010 06:22:20 -0500
-Message-ID: <20101128062220.6bbebf9e@tlielax.poochiereds.net>
-References: <1290368618-12918-1-git-send-email-piastryyy@gmail.com>
-	<AANLkTikhDHcSK2p6UJKtTS4rNq-bMWDarYd=PTHg-TUN@mail.gmail.com>
-	<20101127073116.20f3a064@tlielax.poochiereds.net>
-	<AANLkTimCW5_=0LGCds9-0whUyMcjZ5ZRSjTHaXRW9sjN@mail.gmail.com>
+Subject: Re: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache
+ mode (try #4)
+Date: Sun, 28 Nov 2010 06:23:12 -0500
+Message-ID: <20101128062312.550bb436@tlielax.poochiereds.net>
+References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>
+	<1290931972-2770-2-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimCW5_=0LGCds9-0whUyMcjZ5ZRSjTHaXRW9sjN-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1290931972-2770-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 28 Nov 2010 11:11:28 +0300
+On Sun, 28 Nov 2010 11:12:47 +0300
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> 2010/11/27 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > On Thu, 25 Nov 2010 13:51:29 +0300
-> > Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> 2010/11/21 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> >> > On strict cache mode when we close the last file handle of the inode we
-> >> > should set invalid_mapping flag on this inode to prevent data coherency
-> >> > problem when we open it again but it has been modified by other clients.
-> >> >
-> >>
-> >> What's about this patch and other strictcache mode related things?
-> >>
-> >
-> > I'm not sure which ones need review at this point. Perhaps it would be
-> > best to re-post the set? If you do, make sure to attach
-> > Reviewed-by/Acked-by tags on patches that have already been reviewed.
-> >
+> On strict cache mode when we close the last file handle of the inode we
+> should set invalid_mapping flag on this inode to prevent data coherency
+> problem when we open it again but it has been modified by other clients.
 > 
-> Ok, it isn't a problem. Another problem that no one from the series
-> got Reviewed-by/Acked-by tags :)
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifs_fs_sb.h |    1 +
+>  fs/cifs/file.c       |    8 ++++++++
+>  2 files changed, 9 insertions(+), 0 deletions(-)
 > 
-> So, I have several separate set of patches (strict cache,
-> ip_connect/port, cifs_open) - let's finised with them in the order,
-> because I am a bit confused about it. May be I shouldn't post second
-> and third rewritten set until we deal with the first successfully?
-> 
+> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> index e9a393c..be7b159 100644
+> --- a/fs/cifs/cifs_fs_sb.h
+> +++ b/fs/cifs/cifs_fs_sb.h
+> @@ -40,6 +40,7 @@
+>  #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+>  #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+>  #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
+> +#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
+>  
+>  struct cifs_sb_info {
+>  	struct rb_root tlink_tree;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index b857ce5..f853bf0 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -264,6 +264,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	struct inode *inode = cifs_file->dentry->d_inode;
+>  	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+>  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>  	struct cifsLockInfo *li, *tmp;
+>  
+>  	spin_lock(&cifs_file_list_lock);
+> @@ -279,6 +280,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+>  	if (list_empty(&cifsi->openFileList)) {
+>  		cFYI(1, "closing last open instance for inode %p",
+>  			cifs_file->dentry->d_inode);
+> +
+> +		/* in strict cache mode we need invalidate mapping on the last
+> +		   close  because it may cause a error when we open this file
+> +		   again and get at least level II oplock */
+> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
+> +			CIFS_I(inode)->invalid_mapping = true;
+> +
+>  		cifs_set_oplock_level(cifsi, 0);
+>  	}
+>  	spin_unlock(&cifs_file_list_lock);
 
-Your call. In general, I find that trying to marshal more than one or
-two sets of patches at a time is too confusing and labor-intensive.
+Looks reasonable.
 
-Other people manage it just fine though, so it's really your
-preference.
-
-> In general, I am not think that I understand correctly all the process
-> of linux kernel cifs client contributing, can you explain the main
-> points or point to a appropriate link, please?
-> 
-
-It's not a very formalized process. Basically, contributing to CIFS
-means getting patches into Steve's tree and having him push them to
-mainline.
-
-I (and others) try to help out by reviewing the patches as they go
-across the list. Review is done by volunteers however and our time to
-spend on it is limited, so it's generally a good idea to make that job
-as painless as you can.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
