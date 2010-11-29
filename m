@@ -1,234 +1,219 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Can't mount Windows DFS root using NTLMv2
-Date: Mon, 29 Nov 2010 09:05:49 -0600
-Message-ID: <AANLkTimaLdKa5OVEjQEbkS+TWVsF1cKRHPaBTaooYCdp@mail.gmail.com>
-References: <alpine.DEB.2.00.1011291143280.21269@awakenings.cable.ziggo.nl>
-	<AANLkTi=MqT4Fkw2FJZJHvXmwGn1MtB_Gq=aMXwj6Q7Fg@mail.gmail.com>
-	<alpine.DEB.2.00.1011291513080.21269@awakenings.cable.ziggo.nl>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH 3/6] CIFS: Make write call work with strict cache mode
+ (try #2)
+Date: Mon, 29 Nov 2010 21:54:57 +0530
+Message-ID: <4CF3D3D9.3060500@suse.de>
+References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>	<1290931972-2770-4-git-send-email-piastryyy@gmail.com>	<20101128063604.7d9cdded@tlielax.poochiereds.net>	<20101128065100.51c8a404@tlielax.poochiereds.net>	<AANLkTimO9t_wXPZRWXx856-wkG-EwRWTizrCKSo4e2SY@mail.gmail.com>	<20101129063713.0b71ac09@tlielax.poochiereds.net>	<4CF39901.3010108@suse.de> <AANLkTimvA08MT5gcy=h_w6UtcTgyvos4X4x+KUTVbM8u@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.DEB.2.00.1011291513080.21269-56sTcPfcKMhJlCS1zhbguEjk2N/pv5CcZkel5v8DVj8@public.gmane.org>
+In-Reply-To: <AANLkTimvA08MT5gcy=h_w6UtcTgyvos4X4x+KUTVbM8u-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Nov 29, 2010 at 8:20 AM, Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org> wrote=
-:
-> Hi Shirish,
->
-> Thanks for your reply.
->
-> The DFS root is on 3 domain controllers, one 2003SP2 (10.0.0.11), one=
- 2008
-> (10.0.0.12) and one 2008R2 (10.0.0.13).
->
-> sec=3Dntlmssp gives me STATUS_NOT_SUPPORTED:
->
-> =A0fs/cifs/cifsfs.c: Devname: //sox.local/company/ flags: 64
-> =A0fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 215 with uid: 0
-> =A0fs/cifs/connect.c: Domain name set
-> =A0fs/cifs/connect.c: Username: kouprie
-> =A0fs/cifs/connect.c: UNC: \\sox.local\company ip: 10.0.0.11
-> =A0fs/cifs/connect.c: Socket created
-> =A0fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
-> =A0fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xid: 216 with =
-uid: 0
-> =A0fs/cifs/connect.c: Existing smb sess not found
-> =A0fs/cifs/cifssmb.c: secFlags 0x80
-> =A0fs/cifs/cifssmb.c: NTLMSSP only mechanism, enable extended securit=
-y
-> =A0fs/cifs/transport.c: For smb_command 114
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 82
-> =A0fs/cifs/connect.c: Demultiplex PID: 1860
-> =A0fs/cifs/connect.c: rfc1002 length 0xb4
-> =A0fs/cifs/cifssmb.c: Dialect: 2
-> =A0fs/cifs/asn1.c: OID len =3D 7 oid =3D 0x1 0x2 0x348 0xbb92
-> =A0fs/cifs/asn1.c: OID len =3D 7 oid =3D 0x1 0x2 0x348 0x1bb92
-> =A0fs/cifs/asn1.c: OID len =3D 8 oid =3D 0x1 0x2 0x348 0x1bb92
-> =A0fs/cifs/asn1.c: OID len =3D 10 oid =3D 0x1 0x3 0x6 0x1
-> =A0fs/cifs/asn1.c: Need to call asn1_octets_decode() function for
-> soxdft01$@SOX.LOCAL
-> =A0fs/cifs/cifssmb.c: Signing disabled
-> =A0fs/cifs/cifssmb.c: negprot rc 0
-> =A0fs/cifs/connect.c: Security Mode: 0x3 Capabilities: 0x8001f3fd Tim=
-eAdjust:
-> -3600
-> =A0fs/cifs/sess.c: sess setup type 3
-> =A0fs/cifs/sess.c: ntlmssp session setup phase 1
-> =A0fs/cifs/transport.c: For smb_command 115
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 198
-> =A0fs/cifs/connect.c: rfc1002 length 0x27
-> =A0Status code returned 0xc00000bb NT_STATUS_NOT_SUPPORTED
-> =A0fs/cifs/netmisc.c: Mapping smb error code 50 to POSIX err -22
-> =A0fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-> =A0fs/cifs/sess.c: ssetup freeing small buf f0d05500
-> =A0CIFS VFS: Send error in SessSetup =3D -22
-> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses (xid =3D 216=
-) rc =3D -22
-> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid =3D 215) rc =3D=
- -22
-> =A0CIFS VFS: cifs_mount failed w/return code =3D -22
->
-> By the way:
->
-> # cat /proc/fs/cifs/Experimental
-> 2
->
-> Regards,
->
-> --
-> Robbert
->
-> On Mon, 29 Nov 2010, Shirish Pargaonkar wrote:
->
->> On Mon, Nov 29, 2010 at 6:33 AM, Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org> wr=
-ote:
+On 11/29/2010 05:56 PM, Pavel Shilovsky wrote:
+> 2010/11/29 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
+>> On 11/29/2010 05:07 PM, Jeff Layton wrote:
+>>> On Mon, 29 Nov 2010 13:58:05 +0300
+>>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >>>
->>> Hi all,
+>>>> 2010/11/28 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+>>>>> On Sun, 28 Nov 2010 06:36:04 -0500
+>>>>> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>>>>>
+>>>>>> On Sun, 28 Nov 2010 11:12:49 +0300
+>>>>>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>>>>>
+>>>>>>> On strict cache mode if we don't have Exclusive oplock we write=
+ a data to
+>>>>>>> the server through cifs_user_write. Then if we Level II oplock =
+store it in
+>>>>>>> the cache, otherwise - invalidate inode pages affected by this =
+writing.
+>>>>>>>
+>>>>>>> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>>>>>> ---
+>>>>>>> =EF=BF=BDfs/cifs/cifsfs.c | =EF=BF=BD 40 ++++++++++++++++++++++=
+++++++++++++++----
+>>>>>>> =EF=BF=BD1 files changed, 36 insertions(+), 4 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+>>>>>>> index bbb5294..901c82b 100644
+>>>>>>> --- a/fs/cifs/cifsfs.c
+>>>>>>> +++ b/fs/cifs/cifsfs.c
+>>>>>>> @@ -598,12 +598,44 @@ static ssize_t cifs_file_aio_read(struct =
+kiocb *iocb, const struct iovec *iov,
+>>>>>>> =EF=BF=BDstatic ssize_t cifs_file_aio_write(struct kiocb *iocb,=
+ const struct iovec *iov,
+>>>>>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BDunsigned long nr_segs, loff_t pos)
+>>>>>>> =EF=BF=BD{
+>>>>>>> - =EF=BF=BD struct inode *inode =3D iocb->ki_filp->f_path.dentr=
+y->d_inode;
+>>>>>>> + =EF=BF=BD struct inode *inode;
+>>>>>>> + =EF=BF=BD struct cifs_sb_info *cifs_sb;
+>>>>>>> =EF=BF=BD =EF=BF=BD ssize_t written;
+>>>>>>>
+>>>>>>> - =EF=BF=BD written =3D generic_file_aio_write(iocb, iov, nr_se=
+gs, pos);
+>>>>>>> - =EF=BF=BD if (!CIFS_I(inode)->clientCanCacheAll)
+>>>>>>> - =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD filemap_fda=
+tawrite(inode->i_mapping);
+>>>>>>> + =EF=BF=BD inode =3D iocb->ki_filp->f_path.dentry->d_inode;
+>>>>>>> +
+>>>>>>> + =EF=BF=BD if (CIFS_I(inode)->clientCanCacheAll)
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return gene=
+ric_file_aio_write(iocb, iov, nr_segs, pos);
+>>>>>>> +
+>>>>>>> + =EF=BF=BD cifs_sb =3D CIFS_SB(iocb->ki_filp->f_path.dentry->d=
+_sb);
+>>>>>>> +
+>>>>>>> + =EF=BF=BD if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO=
+) =3D=3D 0) {
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD int rc;
+>>>>>>> +
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD written =3D=
+ generic_file_aio_write(iocb, iov, nr_segs, pos);
+>>>>>>> +
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD rc =3D file=
+map_fdatawrite(inode->i_mapping);
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD if (rc)
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD cFYI(1, "cifs_file_aio_write: %d rc on %p in=
+ode",
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDrc, inode);
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return writ=
+ten;
+>>>>>>> + =EF=BF=BD }
+>>>>>>> +
+>>>>>>> + =EF=BF=BD /* in strict cache mode we need to write the data t=
+o the server exactly
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDfrom the pos to pos+len-1 rather=
+ than flush all affected pages
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDbecause it may cause a error wit=
+h mandatory locks on these pages but
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDnot on the region from pos to pp=
+os+len-1 */
+>>>>>>
+>>>>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD Again, please fix the comment styl=
+e. Here: ^^^^
+>>>>>>
+>>>>>>> + =EF=BF=BD written =3D cifs_user_write(iocb->ki_filp, iov->iov=
+_base,
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD iov->iov_len, &pos);
+>>>>>>> +
+>>>>>>> + =EF=BF=BD iocb->ki_pos =3D pos;
+>>>>>>> +
+>>>>>>> + =EF=BF=BD /* if we were successful - invalidate inode pages t=
+he write affected */
+>>>>>>> + =EF=BF=BD if (written > 0)
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD invalidate_=
+mapping_pages(inode->i_mapping,
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD (pos-wr=
+itten) >> PAGE_CACHE_SHIFT,
+>>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD (pos-1)=
+ >> PAGE_CACHE_SHIFT);
+>>>>>>> +
+>>>>>>> =EF=BF=BD =EF=BF=BD return written;
+>>>>>>> =EF=BF=BD}
+>>>>>>>
+>>>>>>
+>>>>>> May god have mercy on anyone who tries to mix strictcache and mm=
+ap.
+>>>>>>
+>>>>>> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>>>>>
+>>>>> (cc'ing Suresh so he can comment)
+>>>>>
+>>>>> Actually...I'm going to withdraw my Reviewed-by tag here for now.=
+ This
+>>>>> bare invalidate_mapping_pages doesn't deal with fscache.
+>>>>>
+>>>>> I think I need to understand what's intended when someone specifi=
+es
+>>>>> strictcache and fsc before I can ack this. The simple answer woul=
+d be
+>>>>> that they are mutually exclusive, but if that's the case then the=
+ patch
+>>>>> that adds the mount option needs to deal with that appropriately.
+>>>>
+>>>>
+>>>> I don't think they can live together. I think we should do smth li=
+ke a
+>>>> following in mount options parsing:
+>>>>
+>>>> ...
+>>>> if (opt =3D=3D fscache) {
+>>>>    vol->fscahe =3D 1;
+>>>>    vol->strictcache =3D 0;
+>>>> }
+>>>> ...
+>>>> if (opt =3D=3D strictcache) {
+>>>>   vol->strictcache =3D 1;
+>>>>   vol->fscache =3D 0;
+>>>> }
+>>>>
+>>>> So, if user specify both only the last will affect the client
+>>>> behavior. Also we should add this information into cifs manpage.
+>>>> Thoughts?
+>>>>
 >>>
->>> I am trying to mount our DFS root using NTLMv2, but this fails when
->>> resolving the DFS target. Surprisingly, when I use NTLM, it does wo=
-rk.
+>>> That would one way to deal with it.
 >>>
->>> This fails:
+>>> On the other hand though...fscache allows you to keep more data cac=
+hed
+>>> than you have RAM. This could be useful in a strictcache situation =
+as
+>>> well. Consider the case of an application on a client that has a lo=
+t of
+>>> large files open for read. The server may grant oplocks on all of t=
+hem.
+>>> fscache would allow for fewer round trips to the server in such a c=
+ase.
 >>>
->>> # mount -t cifs //sox.local/company /mnt/bla/ -o
->>> username=3Dkouprie,dom=3Dsox,sec=3Dntlmv2
->>>
->>> This works:
->>>
->>> # mount -t cifs //sox.local/company /mnt/bla/ -o
->>> username=3Dkouprie,dom=3Dsox,sec=3Dntlm
->>>
->>> I am using linux kernel 2.6.37-rc3 and cifs-utils 4.5-2.
->>> I have keyutils 1.4 =A0installed and configured correctly (obviousl=
-y, since
->>> it
->>> works when using sec=3Dntlm).
->>> The domain is configured to "Send NTLMv2 response only. Refuse LM".
->>>
->>> # cat /proc/fs/cifs/DebugData
->>> Display Internal CIFS Data Structures for Debugging
->>> ---------------------------------------------------
->>> CIFS Version 1.68
->>> Features: dfs lanman posix spnego xattr
->>> Active VFS Requests: 0
->>> Servers:
->>>
->>> Log exempt:
->>>
->>> =A0fs/cifs/cifsfs.c: Devname: //sox.local/company/ flags: 64
->>> =A0fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 6 with uid: 0
->>> =A0fs/cifs/connect.c: Domain name set
->>> =A0fs/cifs/connect.c: Username: kouprie
->>> =A0fs/cifs/connect.c: UNC: \\sox.local\company ip: 10.0.0.11
->>> =A0fs/cifs/connect.c: Socket created
->>> =A0fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
->>> =A0fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xid: 7 with =
-uid: 0
->>> =A0fs/cifs/connect.c: Existing smb sess not found
->>> =A0fs/cifs/cifssmb.c: secFlags 0x4
->>> =A0fs/cifs/connect.c: Demultiplex PID: 1395
->>> =A0fs/cifs/transport.c: For smb_command 114
->>> =A0fs/cifs/transport.c: Sending smb: =A0total_len 82
->>> =A0fs/cifs/connect.c: rfc1002 length 0x6b
->>> =A0fs/cifs/cifssmb.c: Dialect: 2
->>> =A0fs/cifs/cifssmb.c: Signing disabled
->>> =A0fs/cifs/cifssmb.c: negprot rc 0
->>> =A0fs/cifs/connect.c: Security Mode: 0x3 Capabilities: 0x1f3fd Time=
-Adjust:
->>> -3600
->>> =A0fs/cifs/sess.c: sess setup type 2
->>> =A0fs/cifs/transport.c: For smb_command 115
->>> =A0fs/cifs/transport.c: Sending smb: =A0total_len 316
->>> =A0fs/cifs/connect.c: rfc1002 length 0xb5
->>> =A0fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
->>> =A0fs/cifs/sess.c: UID =3D 8192
->>> =A0fs/cifs/sess.c: bleft 135
->>> =A0fs/cifs/sess.c: serverOS=3DWindows Server 2003 3790 Service Pack=
- 2
->>> =A0fs/cifs/sess.c: serverNOS=3DWindows Server 2003 5.2
->>> =A0fs/cifs/sess.c: serverDomain=3DSOX
->>> =A0fs/cifs/sess.c: ssetup freeing small buf f0c40000
->>> =A0fs/cifs/connect.c: CIFS Session Established successfully
->>> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses (xid =3D 7=
-) rc =3D 0
->>> =A0fs/cifs/connect.c: file mode: 0x1ed =A0dir mode: 0x1ed
->>> =A0fs/cifs/connect.c: CIFS VFS: in cifs_get_tcon as Xid: 8 with uid=
-: 0
->>> =A0fs/cifs/transport.c: For smb_command 117
->>> =A0fs/cifs/transport.c: Sending smb: =A0total_len 94
->>> =A0fs/cifs/connect.c: rfc1002 length 0x27
->>> =A0Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED
->>> =A0fs/cifs/netmisc.c: Mapping smb error code 3 to POSIX err -66
->>> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_get_tcon (xid =3D 8) r=
-c =3D -66
->>> =A0fs/cifs/connect.c: CIFS Tcon rc =3D -66
->>> =A0fs/cifs/connect.c: Getting referral for: \\sox.local\company
->>> =A0fs/cifs/transport.c: For smb_command 117
->>> =A0fs/cifs/transport.c: Sending smb: =A0total_len 88
->>> =A0fs/cifs/connect.c: rfc1002 length 0x3c
->>> =A0fs/cifs/connect.c: CIFS Tcon rc =3D 0 ipc_tid =3D 4100
->>> =A0fs/cifs/cifssmb.c: In GetDFSRefer the path \sox.local\company
->>> =A0fs/cifs/transport.c: For smb_command 50
->>> =A0fs/cifs/transport.c: Sending smb: =A0total_len 112
->>> =A0fs/cifs/connect.c: rfc1002 length 0x11c
->>> =A0fs/cifs/cifssmb.c: Decoding GetDFSRefer response BCC: 225 =A0Off=
-set 56
->>> =A0fs/cifs/cifssmb.c: num_referrals: 2 dfs flags: 0x3 ...
->>>
->>> =A0cifs.upcall: key description: dns_resolver;0;0;3f000000;SOXSRV03=
-\C
->>> =A0cifs.upcall: unable to resolve hostname: SOXSRV03\C [Name or ser=
-vice not
->>> known]
->>>
->>> =A0CIFS VFS: dns_resolve_server_name_to_ip: unable to resolve: SOXS=
-RV03\C
->>> =A0CIFS VFS: cifs_compose_mount_options: Failed to resolve server p=
-art of
->>> \\SOXSRV03\Company to IP: -126
->>> =A0fs/cifs/connect.c: cifs_put_smb_ses: ses_count=3D1
->>>
->>> =A0fs/cifs/connect.c: CIFS VFS: in cifs_put_smb_ses as Xid: 9 with =
-uid: 0
->>> =A0fs/cifs/cifssmb.c: In SMBLogoff for session disconnect
->>> =A0fs/cifs/transport.c: For smb_command 116
->>> =A0fs/cifs/transport.c: Sending smb: =A0total_len 43
->>> =A0fs/cifs/connect.c: rfc1002 length 0x2b
->>> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid =3D 6) rc =3D=
- -126
->>> =A0CIFS VFS: cifs_mount failed w/return code =3D -126
->>>
->>> As you can see above, upcall tries to resolve "SOXSRV03\C", which i=
-s
->>> obviously the hostname including the first letter of the share.
->>>
->>> Does anyone know how I can fix this?
->>>
->>> Best regards,
->>>
->>> --
->>> Robbert
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cif=
-s" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.htm=
-l
+>>> So, another way to deal with it would be to simply invalidate the
+>>> fscache whenever you'd invalidate the in-ram cache. I'm not sure wh=
+at
+>>> to do for the cifs_file_aio_write case where you're invalidating ju=
+st a
+>>> small range however.
 >>>
 >>
->> You can try sec=3Dntlmssp. =A0What kind of Windows box is this?
+>> Yes, we seem to have those two options while the later has the advan=
+tage
+>> that Jeff mentioned. I think we could do the later without much of a
+>> problme. We just need to retire the cookies and get new ones
+>> (relinquishing with retire set to 1) i.e. by calling
+>> cifs_fscache_reset_inode_cookie(). FS-Cache does not provide data
+>> invalidation by itself. For the cifs_file_aio_write case too we coul=
+d
+>> set invalid_mapping and get fresh cookies.
 >>
 >>
->
+>=20
+> What's about mmap and fsync patch? How do you think they mix with fsc=
+ache?
+>=20
 
-Robert, does sec=3Dntlmssp without  dom=3Dsox helps?
-A wireshark trace when you issue mount command would be useful.
+Basically, relinquishing cookie when you are invalidating inode should
+make them work without issues I think. But, I would also test your
+patches (once you post the patchset that includes fscache handling as
+well) to be sure.
 
-Regards,
 
-Shirish
+Thanks,
+
+
+--=20
+Suresh Jayaraman
