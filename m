@@ -1,212 +1,120 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 3/6] CIFS: Make write call work with strict cache mode
- (try #2)
-Date: Mon, 29 Nov 2010 15:16:15 +0300
-Message-ID: <AANLkTim48MNa0D6be78DD8PPT7gBpqC1QK3YD6fJBMv3@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Add strict cache mode (try #4)
+Date: Mon, 29 Nov 2010 15:22:44 +0300
+Message-ID: <AANLkTikKVrV2046nmZWFH4puHPmD66cmGOm0d5aYAX4T@mail.gmail.com>
 References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>
-	<1290931972-2770-4-git-send-email-piastryyy@gmail.com>
-	<20101128063604.7d9cdded@tlielax.poochiereds.net>
-	<20101128065100.51c8a404@tlielax.poochiereds.net>
-	<AANLkTimO9t_wXPZRWXx856-wkG-EwRWTizrCKSo4e2SY@mail.gmail.com>
-	<20101129063713.0b71ac09@tlielax.poochiereds.net>
-	<4CF39901.3010108@suse.de>
+	<4CF3864E.50901@suse.de>
+	<AANLkTinLbS7V=Ok_Eje=mnrBOkZEJJo9iQ9SYwHsbsag@mail.gmail.com>
+	<4CF3995C.4080709@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: multipart/mixed; boundary=0016364c7556112ec504963021d3
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CF39901.3010108-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <4CF3995C.4080709-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+--0016364c7556112ec504963021d3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
 2010/11/29 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
-> On 11/29/2010 05:07 PM, Jeff Layton wrote:
->> On Mon, 29 Nov 2010 13:58:05 +0300
->> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On 11/29/2010 04:30 PM, Pavel Shilovsky wrote:
+>> 2010/11/29 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
+>>> On 11/28/2010 01:42 PM, Pavel Shilovsky wrote:
+>>>> Re-posting the whole set of strict cache patches.
+>>>
+>>> I try to explain here the "strict cache" semantics as I'm not sure
+>>> whether I understand it clearly. Please correct me if I'm wrong.
+>>>
+>>> Strict cache semantics
+>>>
+>>> =EF=BF=BDo provides stricter cache coherency among cifs clients that ac=
+cess
+>>> =EF=BF=BD =EF=BF=BDthe same files.
+>>> =EF=BF=BDo The clients will read data from the Server always, except wh=
+en they
+>>> =EF=BF=BD =EF=BF=BDhold read oplock or Level II oplock on the file.
+>>> =EF=BF=BDo The clients will write data to the Server always, except whe=
+n they
+>>> =EF=BF=BD =EF=BF=BDhold exclusive oplock on the file.
+>>> =EF=BF=BDo When we close the last filehandle of the inode, file should =
+be
+>>> =EF=BF=BD =EF=BF=BDmarked for revalidation as it is possible for the cl=
+ient to access
+>>> =EF=BF=BD =EF=BF=BDstale data from the cache when we open it again with=
+ a read
+>>> =EF=BF=BD =EF=BF=BDoplock.
+>>> =EF=BF=BDo On fsync/mmap, invalidate inode if read oplock has not been =
+set.
+>>>
+>>>
+>>> Is this the semantics being proposed? Did I miss anything?
 >>
->>> 2010/11/28 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->>>> On Sun, 28 Nov 2010 06:36:04 -0500
->>>> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>>>
->>>>> On Sun, 28 Nov 2010 11:12:49 +0300
->>>>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>>>
->>>>>> On strict cache mode if we don't have Exclusive oplock we write =
-a data to
->>>>>> the server through cifs_user_write. Then if we Level II oplock s=
-tore it in
->>>>>> the cache, otherwise - invalidate inode pages affected by this w=
-riting.
->>>>>>
->>>>>> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>>>> ---
->>>>>> =EF=BF=BDfs/cifs/cifsfs.c | =EF=BF=BD 40 +++++++++++++++++++++++=
-+++++++++++++----
->>>>>> =EF=BF=BD1 files changed, 36 insertions(+), 4 deletions(-)
->>>>>>
->>>>>> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
->>>>>> index bbb5294..901c82b 100644
->>>>>> --- a/fs/cifs/cifsfs.c
->>>>>> +++ b/fs/cifs/cifsfs.c
->>>>>> @@ -598,12 +598,44 @@ static ssize_t cifs_file_aio_read(struct k=
-iocb *iocb, const struct iovec *iov,
->>>>>> =EF=BF=BDstatic ssize_t cifs_file_aio_write(struct kiocb *iocb, =
-const struct iovec *iov,
->>>>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
- =EF=BF=BD =EF=BF=BDunsigned long nr_segs, loff_t pos)
->>>>>> =EF=BF=BD{
->>>>>> - =EF=BF=BD struct inode *inode =3D iocb->ki_filp->f_path.dentry=
-->d_inode;
->>>>>> + =EF=BF=BD struct inode *inode;
->>>>>> + =EF=BF=BD struct cifs_sb_info *cifs_sb;
->>>>>> =EF=BF=BD =EF=BF=BD ssize_t written;
->>>>>>
->>>>>> - =EF=BF=BD written =3D generic_file_aio_write(iocb, iov, nr_seg=
-s, pos);
->>>>>> - =EF=BF=BD if (!CIFS_I(inode)->clientCanCacheAll)
->>>>>> - =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD filemap_fdat=
-awrite(inode->i_mapping);
->>>>>> + =EF=BF=BD inode =3D iocb->ki_filp->f_path.dentry->d_inode;
->>>>>> +
->>>>>> + =EF=BF=BD if (CIFS_I(inode)->clientCanCacheAll)
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return gener=
-ic_file_aio_write(iocb, iov, nr_segs, pos);
->>>>>> +
->>>>>> + =EF=BF=BD cifs_sb =3D CIFS_SB(iocb->ki_filp->f_path.dentry->d_=
-sb);
->>>>>> +
->>>>>> + =EF=BF=BD if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)=
- =3D=3D 0) {
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD int rc;
->>>>>> +
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD written =3D =
-generic_file_aio_write(iocb, iov, nr_segs, pos);
->>>>>> +
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD rc =3D filem=
-ap_fdatawrite(inode->i_mapping);
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD if (rc)
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD cFYI(1, "cifs_file_aio_write: %d rc on %p in=
-ode",
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDrc, inode);
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return writt=
-en;
->>>>>> + =EF=BF=BD }
->>>>>> +
->>>>>> + =EF=BF=BD /* in strict cache mode we need to write the data to=
- the server exactly
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDfrom the pos to pos+len-1 rather =
-than flush all affected pages
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDbecause it may cause a error with=
- mandatory locks on these pages but
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDnot on the region from pos to ppo=
-s+len-1 */
->>>>>
->>>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD Again, please fix the comment style=
-=2E Here: ^^^^
->>>>>
->>>>>> + =EF=BF=BD written =3D cifs_user_write(iocb->ki_filp, iov->iov_=
-base,
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD iov->iov_len, &pos);
->>>>>> +
->>>>>> + =EF=BF=BD iocb->ki_pos =3D pos;
->>>>>> +
->>>>>> + =EF=BF=BD /* if we were successful - invalidate inode pages th=
-e write affected */
->>>>>> + =EF=BF=BD if (written > 0)
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD invalidate_m=
-apping_pages(inode->i_mapping,
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD (pos-wr=
-itten) >> PAGE_CACHE_SHIFT,
->>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD (pos-1)=
- >> PAGE_CACHE_SHIFT);
->>>>>> +
->>>>>> =EF=BF=BD =EF=BF=BD return written;
->>>>>> =EF=BF=BD}
->>>>>>
->>>>>
->>>>> May god have mercy on anyone who tries to mix strictcache and mma=
-p.
->>>>>
->>>>> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>>>
->>>> (cc'ing Suresh so he can comment)
->>>>
->>>> Actually...I'm going to withdraw my Reviewed-by tag here for now. =
-This
->>>> bare invalidate_mapping_pages doesn't deal with fscache.
->>>>
->>>> I think I need to understand what's intended when someone specifie=
-s
->>>> strictcache and fsc before I can ack this. The simple answer would=
- be
->>>> that they are mutually exclusive, but if that's the case then the =
-patch
->>>> that adds the mount option needs to deal with that appropriately.
->>>
->>>
->>> I don't think they can live together. I think we should do smth lik=
-e a
->>> following in mount options parsing:
->>>
->>> ...
->>> if (opt =3D=3D fscache) {
->>> =C2=A0 =C2=A0vol->fscahe =3D 1;
->>> =C2=A0 =C2=A0vol->strictcache =3D 0;
->>> }
->>> ...
->>> if (opt =3D=3D strictcache) {
->>> =C2=A0 vol->strictcache =3D 1;
->>> =C2=A0 vol->fscache =3D 0;
->>> }
->>>
->>> So, if user specify both only the last will affect the client
->>> behavior. Also we should add this information into cifs manpage.
->>> Thoughts?
->>>
->>
->> That would one way to deal with it.
->>
->> On the other hand though...fscache allows you to keep more data cach=
-ed
->> than you have RAM. This could be useful in a strictcache situation a=
-s
->> well. Consider the case of an application on a client that has a lot=
- of
->> large files open for read. The server may grant oplocks on all of th=
-em.
->> fscache would allow for fewer round trips to the server in such a ca=
-se.
->>
->> So, another way to deal with it would be to simply invalidate the
->> fscache whenever you'd invalidate the in-ram cache. I'm not sure wha=
-t
->> to do for the cifs_file_aio_write case where you're invalidating jus=
-t a
->> small range however.
+>> Yes, you are right - it is exactly what I mean.
 >>
 >
-> Yes, we seem to have those two options while the later has the advant=
-age
-> that Jeff mentioned. I think we could do the later without much of a
-> problme. We just need to retire the cookies and get new ones
-> (relinquishing with retire set to 1) i.e. by calling
-> cifs_fscache_reset_inode_cookie(). FS-Cache does not provide data
-> invalidation by itself. For the cifs_file_aio_write case too we could
-> set invalid_mapping and get fresh cookies.
+> Also, would be good to know what level of testing these patches have
+> undergone. Could you share the test results as well?
 >
 
-Ok, I am going to provide these changes.
+I don't run big stress tests over it but I have tree small tests that
+shows the problem this mode is going to fix.
 
 --=20
 Best regards,
 Pavel Shilovsky.
+
+--0016364c7556112ec504963021d3
+Content-Type: text/x-python; charset=US-ASCII; name="close_problem.py"
+Content-Disposition: attachment; filename="close_problem.py"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gh3bwtfg0
+
+IyEvYmluL2VudiBweXRob24KIwojIFdlIGhhdmUgdG8gbW91bnQgdGhlIHNhbWUgc2hhcmUgdG8g
+dGVzdCwgdGVzdDEsIHRlc3QyIGRpcmVjdG9yaWVzIHRoYXQgbG9jYXRlIGluIHRoZSBkaXJlY3Rv
+cnkgd2UKIyBleGVjdXRlIHRoaXMgc2NyaXB0IGZyb20uCgpmcm9tIG9zIGltcG9ydCBvcGVuLCBj
+bG9zZSwgT19SRFdSLCBPX0NSRUFULCB3cml0ZSwgcmVhZCwgT19SRE9OTFksIE9fV1JPTkxZLCBP
+X1RSVU5DLCBsc2VlaywgU0VFS19FTkQsIFNFRUtfU0VUCgpmID0gb3BlbigndGVzdC9fdGVzdDQz
+MjFfJywgT19SRFdSIHwgT19DUkVBVCB8IE9fVFJVTkMpCmNsb3NlKGYpCgpmMSA9IG9wZW4oJ3Rl
+c3QxL190ZXN0NDMyMV8nLCBPX1JEV1IpCndyaXRlKGYxLCAnYScpCmNsb3NlKGYxKQoKZjIgPSBv
+cGVuKCd0ZXN0Mi9fdGVzdDQzMjFfJywgT19XUk9OTFkpCndyaXRlKGYyLCAneCcpCmNsb3NlKGYy
+KQoKZjMgPSBvcGVuKCd0ZXN0MS9fdGVzdDQzMjFfJywgT19SRE9OTFkpCnByaW50ICdtdXN0IGJl
+IHg6JywgcmVhZChmMywgMSkKCmNsb3NlKGYzKQo=
+--0016364c7556112ec504963021d3
+Content-Type: text/x-python; charset=US-ASCII; name="mtime_problem.py"
+Content-Disposition: attachment; filename="mtime_problem.py"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gh3bxoj81
+
+IyEvYmluL2VudiBweXRob24KIwojIFdlIGhhdmUgdG8gbW91bnQgdGhlIHNhbWUgc2hhcmUgdG8g
+dGVzdCwgdGVzdDEsIHRlc3QyIGRpcmVjdG9yaWVzIHRoYXQgbG9jYXRlIGluIHRoZSBkaXJlY3Rv
+cnkgd2UKIyBleGVjdXRlIHRoaXMgc2NyaXB0IGZyb20uCgpmcm9tIG9zIGltcG9ydCBvcGVuLCBj
+bG9zZSwgT19SRFdSLCBPX0NSRUFULCB3cml0ZSwgcmVhZCwgT19SRE9OTFksIE9fV1JPTkxZLCBP
+X1RSVU5DLCBsc2VlaywgU0VFS19FTkQsIFNFRUtfU0VUCgpmID0gb3BlbigndGVzdC9fdGVzdDQz
+MjFfJywgT19SRFdSIHwgT19DUkVBVCB8IE9fVFJVTkMpCmNsb3NlKGYpCgpmMSA9IG9wZW4oJ3Rl
+c3QxL190ZXN0NDMyMV8nLCBPX1JEV1IpCndyaXRlKGYxLCAnYScpCgpmMiA9IG9wZW4oJ3Rlc3Qy
+L190ZXN0NDMyMV8nLCBPX1dST05MWSkKd3JpdGUoZjIsICd4JykKCmYzID0gb3BlbigndGVzdDEv
+X3Rlc3Q0MzIxXycsIE9fUkRPTkxZKQpwcmludCAnbXVzdCBiZSB4OicsIHJlYWQoZjMsIDEpCgpj
+bG9zZShmMSkKY2xvc2UoZjIpCmNsb3NlKGYzKQo=
+--0016364c7556112ec504963021d3
+Content-Type: text/x-python; charset=US-ASCII; name="cache_problem.py"
+Content-Disposition: attachment; filename="cache_problem.py"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gh3bxtv12
+
+IyEvYmluL2VudiBweXRob24KIwojIFdlIGhhdmUgdG8gbW91bnQgdGhlIHNhbWUgc2hhcmUgdG8g
+dGVzdCwgdGVzdDEsIHRlc3QyIGRpcmVjdG9yaWVzIHRoYXQgbG9jYXRlIGluIHRoZSBkaXJlY3Rv
+cnkgd2UKIyBleGVjdXRlIHRoaXMgc2NyaXB0IGZyb20uCgpmcm9tIG9zIGltcG9ydCBvcGVuLCBj
+bG9zZSwgT19SRFdSLCBPX0NSRUFULCB3cml0ZSwgcmVhZCwgT19SRE9OTFksIE9fV1JPTkxZLCBP
+X1RSVU5DLCBsc2VlawoKZiA9IG9wZW4oJ3Rlc3QvX3Rlc3Q0MzIxXycsIE9fUkRXUiB8IE9fQ1JF
+QVQgfCBPX1RSVU5DKQp3cml0ZShmLCAnJy5qb2luKCdhJyBmb3IgXyBpbiByYW5nZSg0MDk2KSkp
+CmNsb3NlKGYpCgpmMSA9IG9wZW4oJ3Rlc3QxL190ZXN0NDMyMV8nLCBPX1JEV1IpCmYyID0gb3Bl
+bigndGVzdDIvX3Rlc3Q0MzIxXycsIE9fUkRXUikKCndyaXRlKGYxLCAneCcpCnByaW50ICd4IGlz
+IHdyaXR0ZW4gdGhyb3VnaCBmMScKcHJpbnQgJyVjIGlzIHJlYWQgZnJvbSBmMicgJSByZWFkKGYy
+LCAxKQoKd3JpdGUoZjEsICd5JykKcHJpbnQgJ3kgaXMgd3JpdHRlbiB0aHJvdWdoIGYxJwpwcmlu
+dCAnJWMgaXMgcmVhZCBmcm9tIGYyJyAlIHJlYWQoZjIsIDEpCgp3cml0ZShmMSwgJ3onKQpwcmlu
+dCAneiBpcyB3cml0dGVuIHRocm91Z2ggZjEnCnByaW50ICclYyBpcyByZWFkIGZyb20gZjInICUg
+cmVhZChmMiwgMSkKCmNsb3NlKGYxKQpjbG9zZShmMikK
+--0016364c7556112ec504963021d3--
