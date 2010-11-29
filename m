@@ -1,218 +1,119 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH 3/6] CIFS: Make write call work with strict cache mode
- (try #2)
-Date: Mon, 29 Nov 2010 21:54:57 +0530
-Message-ID: <4CF3D3D9.3060500@suse.de>
-References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>	<1290931972-2770-4-git-send-email-piastryyy@gmail.com>	<20101128063604.7d9cdded@tlielax.poochiereds.net>	<20101128065100.51c8a404@tlielax.poochiereds.net>	<AANLkTimO9t_wXPZRWXx856-wkG-EwRWTizrCKSo4e2SY@mail.gmail.com>	<20101129063713.0b71ac09@tlielax.poochiereds.net>	<4CF39901.3010108@suse.de> <AANLkTimvA08MT5gcy=h_w6UtcTgyvos4X4x+KUTVbM8u@mail.gmail.com>
+Subject: Re: [PATCH 1/3] cifs: allow fsc mount option only if CONFIG_CIFS_FSCACHE
+ is set
+Date: Mon, 29 Nov 2010 22:05:58 +0530
+Message-ID: <4CF3D66E.4060505@suse.de>
+References: <1290601147-11392-1-git-send-email-sjayaraman@suse.de>	<1290601147-11392-2-git-send-email-sjayaraman@suse.de>	<AANLkTinysSbT-p=_btJ4YGORDiY5Tz2aT=VagDieUGhY@mail.gmail.com> <AANLkTimWZYcUFRu1JAzdX2u5POL6UGDq=ESXqMPsc+Ly@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimvA08MT5gcy=h_w6UtcTgyvos4X4x+KUTVbM8u-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTimWZYcUFRu1JAzdX2u5POL6UGDq=ESXqMPsc+Ly-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 11/29/2010 05:56 PM, Pavel Shilovsky wrote:
-> 2010/11/29 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
->> On 11/29/2010 05:07 PM, Jeff Layton wrote:
->>> On Mon, 29 Nov 2010 13:58:05 +0300
->>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>
->>>> 2010/11/28 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->>>>> On Sun, 28 Nov 2010 06:36:04 -0500
->>>>> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->>>>>
->>>>>> On Sun, 28 Nov 2010 11:12:49 +0300
->>>>>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>>>>
->>>>>>> On strict cache mode if we don't have Exclusive oplock we write=
- a data to
->>>>>>> the server through cifs_user_write. Then if we Level II oplock =
-store it in
->>>>>>> the cache, otherwise - invalidate inode pages affected by this =
-writing.
->>>>>>>
->>>>>>> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>>>>> ---
->>>>>>> =EF=BF=BDfs/cifs/cifsfs.c | =EF=BF=BD 40 ++++++++++++++++++++++=
-++++++++++++++----
->>>>>>> =EF=BF=BD1 files changed, 36 insertions(+), 4 deletions(-)
->>>>>>>
->>>>>>> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
->>>>>>> index bbb5294..901c82b 100644
->>>>>>> --- a/fs/cifs/cifsfs.c
->>>>>>> +++ b/fs/cifs/cifsfs.c
->>>>>>> @@ -598,12 +598,44 @@ static ssize_t cifs_file_aio_read(struct =
-kiocb *iocb, const struct iovec *iov,
->>>>>>> =EF=BF=BDstatic ssize_t cifs_file_aio_write(struct kiocb *iocb,=
- const struct iovec *iov,
->>>>>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BDunsigned long nr_segs, loff_t pos)
->>>>>>> =EF=BF=BD{
->>>>>>> - =EF=BF=BD struct inode *inode =3D iocb->ki_filp->f_path.dentr=
-y->d_inode;
->>>>>>> + =EF=BF=BD struct inode *inode;
->>>>>>> + =EF=BF=BD struct cifs_sb_info *cifs_sb;
->>>>>>> =EF=BF=BD =EF=BF=BD ssize_t written;
->>>>>>>
->>>>>>> - =EF=BF=BD written =3D generic_file_aio_write(iocb, iov, nr_se=
-gs, pos);
->>>>>>> - =EF=BF=BD if (!CIFS_I(inode)->clientCanCacheAll)
->>>>>>> - =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD filemap_fda=
-tawrite(inode->i_mapping);
->>>>>>> + =EF=BF=BD inode =3D iocb->ki_filp->f_path.dentry->d_inode;
->>>>>>> +
->>>>>>> + =EF=BF=BD if (CIFS_I(inode)->clientCanCacheAll)
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return gene=
-ric_file_aio_write(iocb, iov, nr_segs, pos);
->>>>>>> +
->>>>>>> + =EF=BF=BD cifs_sb =3D CIFS_SB(iocb->ki_filp->f_path.dentry->d=
-_sb);
->>>>>>> +
->>>>>>> + =EF=BF=BD if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO=
-) =3D=3D 0) {
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD int rc;
->>>>>>> +
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD written =3D=
- generic_file_aio_write(iocb, iov, nr_segs, pos);
->>>>>>> +
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD rc =3D file=
-map_fdatawrite(inode->i_mapping);
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD if (rc)
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD cFYI(1, "cifs_file_aio_write: %d rc on %p in=
-ode",
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDrc, inode);
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return writ=
-ten;
->>>>>>> + =EF=BF=BD }
->>>>>>> +
->>>>>>> + =EF=BF=BD /* in strict cache mode we need to write the data t=
-o the server exactly
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDfrom the pos to pos+len-1 rather=
- than flush all affected pages
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDbecause it may cause a error wit=
-h mandatory locks on these pages but
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BDnot on the region from pos to pp=
-os+len-1 */
->>>>>>
->>>>>> =EF=BF=BD =EF=BF=BD =EF=BF=BD Again, please fix the comment styl=
-e. Here: ^^^^
->>>>>>
->>>>>>> + =EF=BF=BD written =3D cifs_user_write(iocb->ki_filp, iov->iov=
-_base,
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD iov->iov_len, &pos);
->>>>>>> +
->>>>>>> + =EF=BF=BD iocb->ki_pos =3D pos;
->>>>>>> +
->>>>>>> + =EF=BF=BD /* if we were successful - invalidate inode pages t=
-he write affected */
->>>>>>> + =EF=BF=BD if (written > 0)
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD invalidate_=
-mapping_pages(inode->i_mapping,
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD (pos-wr=
-itten) >> PAGE_CACHE_SHIFT,
->>>>>>> + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
-=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
-=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD (pos-1)=
- >> PAGE_CACHE_SHIFT);
->>>>>>> +
->>>>>>> =EF=BF=BD =EF=BF=BD return written;
->>>>>>> =EF=BF=BD}
->>>>>>>
->>>>>>
->>>>>> May god have mercy on anyone who tries to mix strictcache and mm=
-ap.
->>>>>>
->>>>>> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>>>>
->>>>> (cc'ing Suresh so he can comment)
->>>>>
->>>>> Actually...I'm going to withdraw my Reviewed-by tag here for now.=
- This
->>>>> bare invalidate_mapping_pages doesn't deal with fscache.
->>>>>
->>>>> I think I need to understand what's intended when someone specifi=
-es
->>>>> strictcache and fsc before I can ack this. The simple answer woul=
-d be
->>>>> that they are mutually exclusive, but if that's the case then the=
- patch
->>>>> that adds the mount option needs to deal with that appropriately.
->>>>
->>>>
->>>> I don't think they can live together. I think we should do smth li=
-ke a
->>>> following in mount options parsing:
->>>>
->>>> ...
->>>> if (opt =3D=3D fscache) {
->>>>    vol->fscahe =3D 1;
->>>>    vol->strictcache =3D 0;
->>>> }
->>>> ...
->>>> if (opt =3D=3D strictcache) {
->>>>   vol->strictcache =3D 1;
->>>>   vol->fscache =3D 0;
->>>> }
->>>>
->>>> So, if user specify both only the last will affect the client
->>>> behavior. Also we should add this information into cifs manpage.
->>>> Thoughts?
->>>>
->>>
->>> That would one way to deal with it.
->>>
->>> On the other hand though...fscache allows you to keep more data cac=
-hed
->>> than you have RAM. This could be useful in a strictcache situation =
-as
->>> well. Consider the case of an application on a client that has a lo=
-t of
->>> large files open for read. The server may grant oplocks on all of t=
-hem.
->>> fscache would allow for fewer round trips to the server in such a c=
-ase.
->>>
->>> So, another way to deal with it would be to simply invalidate the
->>> fscache whenever you'd invalidate the in-ram cache. I'm not sure wh=
-at
->>> to do for the cifs_file_aio_write case where you're invalidating ju=
-st a
->>> small range however.
->>>
->>
->> Yes, we seem to have those two options while the later has the advan=
-tage
->> that Jeff mentioned. I think we could do the later without much of a
->> problme. We just need to retire the cookies and get new ones
->> (relinquishing with retire set to 1) i.e. by calling
->> cifs_fscache_reset_inode_cookie(). FS-Cache does not provide data
->> invalidation by itself. For the cifs_file_aio_write case too we coul=
-d
->> set invalid_mapping and get fresh cookies.
->>
->>
+On 11/27/2010 09:21 AM, Steve French wrote:
 >=20
-> What's about mmap and fsync patch? How do you think they mix with fsc=
-ache?
 >=20
+> On Fri, Nov 26, 2010 at 9:50 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+> <mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>> wrote:
+>=20
+>     As an alternative - if fsc is stable and no defects and doesn't
+>     increase the code size appreciably ... what are the drawbacks of
+>     turning it on unconditionally?
+>=20
+>=20
+> ie always configure it, we still only enable it on a mount when fsc i=
+s
+> specified on mount
+> =EF=BF=BD
 
-Basically, relinquishing cookie when you are invalidating inode should
-make them work without issues I think. But, I would also test your
-patches (once you post the patchset that includes fscache handling as
-well) to be sure.
+I'm not aware of any open issues w.r.t cifs FS-Cache (except the
+problems this patchset addresses) but I'm not sure how much testing it
+has undergone really (except for me running all my tests with fsc on fo=
+r
+sometime and a few openSUSE users). The code size is not really much of
+a problem.
 
+The strict cache patches accounting for fscache might also provide more
+testing ground. So, I think keeping it as non-default atleast for one
+more release would be good before we make it as a config default.
 
 Thanks,
+
+>     On Wed, Nov 24, 2010 at 6:19 AM, Suresh Jayaraman
+>     <sjayaraman-l3A5Bk7waGM@public.gmane.org <mailto:sjayaraman-l3A5Bk7waGM@public.gmane.org>> wrote:
+>=20
+>         Currently, it is possible to specify 'fsc' mount option even =
+if
+>         CONFIG_CIFS_FSCACHE has not been set. The option is being
+>         ignored silently
+>         while the user fscache functionality to work. Fix this by
+>         raising error when
+>         the CONFIG option is not set.
+>=20
+>=20
+>         Reported-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+>         <mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>>
+>         Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org
+>         <mailto:sjayaraman-l3A5Bk7waGM@public.gmane.org>>
+>         ---
+>         =EF=BF=BDfs/cifs/connect.c | =EF=BF=BD =EF=BF=BD5 +++++
+>         =EF=BF=BD1 files changed, 5 insertions(+), 0 deletions(-)
+>=20
+>         diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>         index 251a17c..32fa4d9 100644
+>         --- a/fs/cifs/connect.c
+>         +++ b/fs/cifs/connect.c
+>         @@ -1352,6 +1352,11 @@ cifs_parse_mount_options(char *options=
+,
+>         const char *devname,
+>         =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD"supported. Instead set "
+>         =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=
+=BD =EF=BF=BD =EF=BF=BD"/proc/fs/cifs/LookupCacheEnabled
+>         to 0\n");
+>         =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD} else if (strnicmp(data, "fsc", 3) =3D=3D 0) {
+>         +#ifndef CONFIG_CIFS_FSCACHE
+>         + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD cERROR(1, "FS-Cache =
+support needs
+>         CONFIG_CIFS_FSCACHE"
+>         + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =
+=EF=BF=BD =EF=BF=BD =EF=BF=BD "kernel config option set");
+>         + =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD=
+ =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD return 1;
+>         +#endif
+>         =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDvol->fsc =3D tr=
+ue;
+>         =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD} else if (strnicmp(data, "mfsymlinks", 10) =3D=3D 0) {
+>         =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=
+=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BD =EF=BF=BDvol->mfsymlinks=
+ =3D true;
+>=20
+>=20
+>=20
+>=20
+>     --=20
+>     Thanks,
+>=20
+>     Steve
+>=20
+>=20
+>=20
+>=20
+> --=20
+> Thanks,
+>=20
+> Steve
 
 
 --=20
