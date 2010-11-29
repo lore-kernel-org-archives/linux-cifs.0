@@ -1,147 +1,86 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Can't mount Windows DFS root using NTLMv2
-Date: Mon, 29 Nov 2010 07:14:13 -0600
-Message-ID: <AANLkTi=MqT4Fkw2FJZJHvXmwGn1MtB_Gq=aMXwj6Q7Fg@mail.gmail.com>
-References: <alpine.DEB.2.00.1011291143280.21269@awakenings.cable.ziggo.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 2/6] CIFS: Make read call work with strict cache mode (try #3)
+Date: Mon, 29 Nov 2010 16:36:41 +0300
+Message-ID: <1291037804-4000-1-git-send-email-piastryyy@gmail.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.DEB.2.00.1011291143280.21269-56sTcPfcKMhJlCS1zhbguEjk2N/pv5CcZkel5v8DVj8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Nov 29, 2010 at 6:33 AM, Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org> wrote=
-:
-> Hi all,
->
-> I am trying to mount our DFS root using NTLMv2, but this fails when
-> resolving the DFS target. Surprisingly, when I use NTLM, it does work=
-=2E
->
-> This fails:
->
-> # mount -t cifs //sox.local/company /mnt/bla/ -o
-> username=3Dkouprie,dom=3Dsox,sec=3Dntlmv2
->
-> This works:
->
-> # mount -t cifs //sox.local/company /mnt/bla/ -o
-> username=3Dkouprie,dom=3Dsox,sec=3Dntlm
->
-> I am using linux kernel 2.6.37-rc3 and cifs-utils 4.5-2.
-> I have keyutils 1.4 =A0installed and configured correctly (obviously,=
- since it
-> works when using sec=3Dntlm).
-> The domain is configured to "Send NTLMv2 response only. Refuse LM".
->
-> # cat /proc/fs/cifs/DebugData
-> Display Internal CIFS Data Structures for Debugging
-> ---------------------------------------------------
-> CIFS Version 1.68
-> Features: dfs lanman posix spnego xattr
-> Active VFS Requests: 0
-> Servers:
->
-> Log exempt:
->
-> =A0fs/cifs/cifsfs.c: Devname: //sox.local/company/ flags: 64
-> =A0fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 6 with uid: 0
-> =A0fs/cifs/connect.c: Domain name set
-> =A0fs/cifs/connect.c: Username: kouprie
-> =A0fs/cifs/connect.c: UNC: \\sox.local\company ip: 10.0.0.11
-> =A0fs/cifs/connect.c: Socket created
-> =A0fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
-> =A0fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xid: 7 with ui=
-d: 0
-> =A0fs/cifs/connect.c: Existing smb sess not found
-> =A0fs/cifs/cifssmb.c: secFlags 0x4
-> =A0fs/cifs/connect.c: Demultiplex PID: 1395
-> =A0fs/cifs/transport.c: For smb_command 114
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 82
-> =A0fs/cifs/connect.c: rfc1002 length 0x6b
-> =A0fs/cifs/cifssmb.c: Dialect: 2
-> =A0fs/cifs/cifssmb.c: Signing disabled
-> =A0fs/cifs/cifssmb.c: negprot rc 0
-> =A0fs/cifs/connect.c: Security Mode: 0x3 Capabilities: 0x1f3fd TimeAd=
-just:
-> -3600
-> =A0fs/cifs/sess.c: sess setup type 2
-> =A0fs/cifs/transport.c: For smb_command 115
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 316
-> =A0fs/cifs/connect.c: rfc1002 length 0xb5
-> =A0fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
-> =A0fs/cifs/sess.c: UID =3D 8192
-> =A0fs/cifs/sess.c: bleft 135
-> =A0fs/cifs/sess.c: serverOS=3DWindows Server 2003 3790 Service Pack 2
-> =A0fs/cifs/sess.c: serverNOS=3DWindows Server 2003 5.2
-> =A0fs/cifs/sess.c: serverDomain=3DSOX
-> =A0fs/cifs/sess.c: ssetup freeing small buf f0c40000
-> =A0fs/cifs/connect.c: CIFS Session Established successfully
-> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses (xid =3D 7) =
-rc =3D 0
-> =A0fs/cifs/connect.c: file mode: 0x1ed =A0dir mode: 0x1ed
-> =A0fs/cifs/connect.c: CIFS VFS: in cifs_get_tcon as Xid: 8 with uid: =
-0
-> =A0fs/cifs/transport.c: For smb_command 117
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 94
-> =A0fs/cifs/connect.c: rfc1002 length 0x27
-> =A0Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED
-> =A0fs/cifs/netmisc.c: Mapping smb error code 3 to POSIX err -66
-> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_get_tcon (xid =3D 8) rc =
-=3D -66
-> =A0fs/cifs/connect.c: CIFS Tcon rc =3D -66
-> =A0fs/cifs/connect.c: Getting referral for: \\sox.local\company
-> =A0fs/cifs/transport.c: For smb_command 117
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 88
-> =A0fs/cifs/connect.c: rfc1002 length 0x3c
-> =A0fs/cifs/connect.c: CIFS Tcon rc =3D 0 ipc_tid =3D 4100
-> =A0fs/cifs/cifssmb.c: In GetDFSRefer the path \sox.local\company
-> =A0fs/cifs/transport.c: For smb_command 50
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 112
-> =A0fs/cifs/connect.c: rfc1002 length 0x11c
-> =A0fs/cifs/cifssmb.c: Decoding GetDFSRefer response BCC: 225 =A0Offse=
-t 56
-> =A0fs/cifs/cifssmb.c: num_referrals: 2 dfs flags: 0x3 ...
->
-> =A0cifs.upcall: key description: dns_resolver;0;0;3f000000;SOXSRV03\C
-> =A0cifs.upcall: unable to resolve hostname: SOXSRV03\C [Name or servi=
-ce not
-> known]
->
-> =A0CIFS VFS: dns_resolve_server_name_to_ip: unable to resolve: SOXSRV=
-03\C
-> =A0CIFS VFS: cifs_compose_mount_options: Failed to resolve server par=
-t of
-> \\SOXSRV03\Company to IP: -126
-> =A0fs/cifs/connect.c: cifs_put_smb_ses: ses_count=3D1
->
-> =A0fs/cifs/connect.c: CIFS VFS: in cifs_put_smb_ses as Xid: 9 with ui=
-d: 0
-> =A0fs/cifs/cifssmb.c: In SMBLogoff for session disconnect
-> =A0fs/cifs/transport.c: For smb_command 116
-> =A0fs/cifs/transport.c: Sending smb: =A0total_len 43
-> =A0fs/cifs/connect.c: rfc1002 length 0x2b
-> =A0fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid =3D 6) rc =3D=
- -126
-> =A0CIFS VFS: cifs_mount failed w/return code =3D -126
->
-> As you can see above, upcall tries to resolve "SOXSRV03\C", which is
-> obviously the hostname including the first letter of the share.
->
-> Does anyone know how I can fix this?
->
-> Best regards,
->
-> --
-> Robbert
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+Add cifs_file_aio_read where we read from the cache if we have at least
+Level II oplock - otherwise read from the server.
 
-You can try sec=3Dntlmssp.  What kind of Windows box is this?
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsfs.c |   42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 9c37897..431c46e 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -568,6 +568,44 @@ cifs_do_mount(struct file_system_type *fs_type,
+ 	return dget(sb->s_root);
+ }
+ 
++static ssize_t cifs_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
++				  unsigned long nr_segs, loff_t pos)
++{
++	struct inode *inode;
++	struct cifs_sb_info *cifs_sb;
++	ssize_t read = 0, retval;
++	unsigned long i;
++
++	inode = iocb->ki_filp->f_path.dentry->d_inode;
++	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
++
++	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) == 0 ||
++	    CIFS_I(inode)->clientCanCacheRead)
++		return generic_file_aio_read(iocb, iov, nr_segs, pos);
++
++	/* In strict cache mode we need to read from the server all the time
++	 * if we don't have level II oplock because the server can delay mtime
++	 * change - so we can't make a decision about inode invalidating.
++	 * And we can also fail with pagereading if there are mandatory locks
++	 * on pages affected by this read but not on the region from pos to
++	 * pos+len-1. */
++
++	for (i = 0; i < nr_segs; i++) {
++		retval = cifs_user_read(iocb->ki_filp, iov[i].iov_base,
++					iov[i].iov_len, &pos);
++		if (retval < 0) {
++			read = read ? read : retval;
++			break;
++		}
++
++		read += retval;
++	}
++
++	iocb->ki_pos = pos;
++
++	return read;
++}
++
+ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+ 				   unsigned long nr_segs, loff_t pos)
+ {
+@@ -690,7 +728,7 @@ const struct inode_operations cifs_symlink_inode_ops = {
+ const struct file_operations cifs_file_ops = {
+ 	.read = do_sync_read,
+ 	.write = do_sync_write,
+-	.aio_read = generic_file_aio_read,
++	.aio_read = cifs_file_aio_read,
+ 	.aio_write = cifs_file_aio_write,
+ 	.open = cifs_open,
+ 	.release = cifs_close,
+@@ -727,7 +765,7 @@ const struct file_operations cifs_file_direct_ops = {
+ const struct file_operations cifs_file_nobrl_ops = {
+ 	.read = do_sync_read,
+ 	.write = do_sync_write,
+-	.aio_read = generic_file_aio_read,
++	.aio_read = cifs_file_aio_read,
+ 	.aio_write = cifs_file_aio_write,
+ 	.open = cifs_open,
+ 	.release = cifs_close,
+-- 
+1.7.3.2
