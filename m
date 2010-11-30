@@ -1,41 +1,47 @@
-From: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
-Subject: Re: Can't mount Windows DFS root using NTLMv2 (fwd)
-Date: Tue, 30 Nov 2010 18:56:49 +0100 (CET)
-Message-ID: <alpine.DEB.2.00.1011301852040.31075@awakenings.cable.ziggo.nl>
-References: <alpine.DEB.2.00.1011301428530.15277@awakenings.cable.ziggo.nl> <AANLkTinHDfxNhKLSEwHtH7oM+EUCj_HB97Ch-9RQXjTj@mail.gmail.com> <alpine.DEB.2.00.1011301739010.31075@awakenings.cable.ziggo.nl> <AANLkTinwtjkL_Exr57wDjRiKQTzVFwjuv=kBOw7s5mgS@mail.gmail.com>
- <alpine.DEB.2.00.1011301809050.31075@awakenings.cable.ziggo.nl> <AANLkTin3-k4AJRYvL4p8VQqvnnL5mLJJZXNf5mC1RBKg@mail.gmail.com> <alpine.DEB.2.00.1011301827580.31075@awakenings.cable.ziggo.nl> <AANLkTinneo5HQxeOoCKVXyBZ2_i0AYWj9gqauBWoVAhn@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH -v3] cifs: add attribute cache timeout (actimeo) tunable
+Date: Tue, 30 Nov 2010 13:29:38 -0500
+Message-ID: <20101130132938.7c72ae62@corrin.poochiereds.net>
+References: <1291125010-12772-1-git-send-email-sjayaraman@suse.de>
+	<20101130090825.78865825@tlielax.poochiereds.net>
+	<4CF5302A.7030200@suse.de>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinneo5HQxeOoCKVXyBZ2_i0AYWj9gqauBWoVAhn-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <4CF5302A.7030200-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 30 Nov 2010, Shirish Pargaonkar wrote:
+On Tue, 30 Nov 2010 22:41:06 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> Wondering why the very same cifs client does not encounter this error against
-> a Windows 2008 server but does against a Windows 2003 server!
-> Perhaps a Windows client also runs into this error against a Windows 2003 server
-> but does handle/resolve it.
+> >> +/*
+> >>   * MAX_REQ is the maximum number of requests that WE will send
+> >>   * on one socket concurrently. It also matches the most common
+> >>   * value of max multiplex returned by servers.  We may
+> >> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> >> index 32fa4d9..ee7cb11 100644
+> >> --- a/fs/cifs/connect.c
+> >> +++ b/fs/cifs/connect.c
+> >> @@ -105,6 +105,7 @@ struct smb_vol {
+> >>  	unsigned int wsize;
+> >>  	bool sockopt_tcp_nodelay:1;
+> >>  	unsigned short int port;
+> >> +	unsigned long actimeo; /* attribute cache timeout (jiffies) */
+> > 
+> > 	^^^ unused variable?
+> 
+> We use this to store the actimeo value in jiffies as we parse the mount
+> options in cifs_parse_mount_options() below in this patch.
+> 
+> Did you mean this could be avoided?
+> 
 
-Well from the kernel logs, it looks like the kernel does try to handle 
-it, but fails when trying to resolve a servername that still has part of 
-the share name attached to it.
+Sorry, I misread the patch and thought it was a local variable in
+cifs_parse_mount_options. Please disregard that comment.
 
-Look:
-
-  fs/cifs/cifssmb.c: Decoding GetDFSRefer response BCC: 261  Offset 56
-  fs/cifs/cifssmb.c: num_referrals: 2 dfs flags: 0x3 ...
-  cifs.upcall: key description: dns_resolver;0;0;3f000000;FOXDFT13\C
-  cifs.upcall: unable to resolve hostname: FOXDFT13\C [Name or service not known]
-  kernel: [94358.873289] CIFS VFS: dns_resolve_server_name_to_ip: unable to resolve: FOXDFT13\C
-  CIFS VFS: cifs_compose_mount_options: Failed to resolve server part of 
-\\FOXDFT13\Company to IP: -126
-
-The full server + share name is "FOXDFT13\Company". It should just resolve 
-the server name "FOXDFT13", and not leave the "\C" attached to it.
-
-Regards,
-Robbert
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
