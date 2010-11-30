@@ -1,19 +1,21 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH -v3] cifs: add attribute cache timeout (actimeo) tunable
-Date: Tue, 30 Nov 2010 19:25:36 +0530
-Message-ID: <4CF50258.3080100@suse.de>
+Date: Tue, 30 Nov 2010 09:08:25 -0500
+Message-ID: <20101130090825.78865825@tlielax.poochiereds.net>
 References: <1291125010-12772-1-git-send-email-sjayaraman@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1291125010-12772-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 11/30/2010 07:20 PM, Suresh Jayaraman wrote:
+On Tue, 30 Nov 2010 19:20:10 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+
 > Currently, the attribute cache timeout for CIFS is hardcoded to 1 second. This
 > means that the client might have to issue a QPATHINFO/QFILEINFO call every 1
 > second to verify if something has changes, which seems too expensive. On the
@@ -34,13 +36,6 @@ On 11/30/2010 07:20 PM, Suresh Jayaraman wrote:
 > 
 > Changes since last post:
 >    - guard against wraparound issues with a max timeout value (25 days)
-
-Forgot to mention: The rationale behind choosing 25 days instead of
-using a jiffie equivalent is that the jiffie value calculated might
-change based on HZ value. Suppose, in a setup where there are clients
-with different HZ values, the same actimeo setting might lead to
-different timeout.
-
 >    - handle actimeo=0 condition correctly
 > 
 > Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
@@ -118,6 +113,15 @@ different timeout.
 > + */
 > +#define CIFS_MAX_ACTIMEO (SECS_PER_DAY * 25 * HZ)
 > +
+
+You're making an assumption here that HZ is not going to be bigger than
+~1000. This is probably correct in most cases, but it's hard to be
+certain without knowing for sure. What if someone makes an arch in a
+year or so that generally uses HZ == 10000? This will still go wrong in
+that case. My recommendation would be to just check that the actimeo
+doesn't go over 2^30 or so after it has been converted to jiffies. That
+will be simplest, I think...
+
 > +/*
 >   * MAX_REQ is the maximum number of requests that WE will send
 >   * on one socket concurrently. It also matches the most common
@@ -131,6 +135,9 @@ different timeout.
 >  	bool sockopt_tcp_nodelay:1;
 >  	unsigned short int port;
 > +	unsigned long actimeo; /* attribute cache timeout (jiffies) */
+
+	^^^ unused variable?
+
 >  	char *prepath;
 >  	struct sockaddr_storage srcaddr; /* allow binding to a local IP */
 >  	struct nls_table *local_nls;
@@ -162,6 +169,14 @@ different timeout.
 > +	} else /* default */
 > +		cifs_sb->actimeo = CIFS_DEF_ACTIMEO;
 > +
+
+On NFS, actimeo=0 means to never cache attributes. Here, actime=0 will
+be equivalent to the default (actimeo=1). I think it would be best to
+treat actimeo=0 in a similar way to how NFS does.
+
+Also, I wouldn't cap the actimeo to the max if someone goes over it. It
+would be better to return an error instead I think.
+
 >  	if (pvolume_info->noperm)
 >  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
 >  	if (pvolume_info->setuids)
@@ -185,6 +200,10 @@ different timeout.
 > -	if (time_after_eq(jiffies, cifs_i->time + HZ))
 > +	if (!time_in_range_open(jiffies, cifs_i->time,
 > +			       cifs_i->time + cifs_sb->actimeo))
+
+Good idea to use time_in_range_open for this. Might as well bound both
+sides of the check.
+
 >  		return true;
 >  
 >  	/* hardlinked files w/ noserverino get "special" treatment */
@@ -193,11 +212,6 @@ different timeout.
 >  	    S_ISREG(inode->i_mode) && inode->i_nlink != 1)
 >  		return true;
 >  
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
 
 -- 
-Suresh Jayaraman
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
