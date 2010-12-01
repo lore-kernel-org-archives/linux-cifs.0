@@ -1,241 +1,183 @@
-From: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
-Subject: Unable to access (remote) DFS links in DFS root
-Date: Tue, 30 Nov 2010 22:06:02 +0100
-Message-ID: <4CF5673A.9010200@exx.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH -v5] cifs: add attribute cache timeout (actimeo) tunable
+Date: Wed,  1 Dec 2010 14:42:28 +0530
+Message-ID: <1291194748-9455-1-git-send-email-sjayaraman@suse.de>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi again,
+Currently, the attribute cache timeout for CIFS is hardcoded to 1 second. This
+means that the client might have to issue a QPATHINFO/QFILEINFO call every 1
+second to verify if something has changes, which seems too expensive. On the
+other hand, if the timeout is hardcoded to a higher value, workloads that
+expect strict cache coherency might see unexpected results.
 
-I'm having problems accessing remote DFS links on our DFS root, using
-mount.cifs.
+Making attribute cache timeout as a tunable will allow us to make a tradeoff
+between performance and cache metadata correctness depending on the
+application/workload needs.
 
-We have a DFS root that has links pointing to a variety of shares on
-different file servers.
+Add 'actimeo' tunable that can be used to tune the attribute cache timeout.
+The default timeout is set to 1 second. Also, display actimeo option value in
+/proc/mounts.
 
->From MS Windows clients and using smbclient the shares are accessible
-perfectly. Using mount.cifs however I am not able to see the contents of
-the remote shares.
+It appears to me that 'actimeo' and the proposed (but not yet merged)
+'strictcache' option cannot coexist, so care must be taken that we reset the
+other option if one of them is set.
 
-Surprisingly, I get a different error when mounting the DFS root with
-sec=ntlm, than I get when mounting with sec=ntlmv2.
+Changes since last post:
+   - fix option parsing and handle possible values correcly
 
-# mount -t cifs //foxdft13.fox.local/company /mnt/bla/ -o
-credentials=/creds,sec=ntlm
-# ls -la /mnt/bla/Global/
-ls: cannot access /mnt/bla/Global/: Input/output error
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/README       |    9 +++++++++
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/cifsfs.c     |    2 ++
+ fs/cifs/cifsglob.h   |   10 ++++++++++
+ fs/cifs/connect.c    |   15 +++++++++++++++
+ fs/cifs/inode.c      |    7 ++++---
+ 6 files changed, 41 insertions(+), 3 deletions(-)
 
-# mount -t cifs //foxdft13.fox.local/company /mnt/bla/ -o
-credentials=/creds,sec=ntlmv2
-# ls -la /mnt/bla/Global/
-ls: cannot access /mnt/bla/Global/: Permission denied
-
-Kernel is 2.6.37-rc3. mount.cifs is 4.5. keyutils are installed and
-working. DFS root is on foxdft13. The "Global" share is on foxdft08.
-Note that the foxdft08 server is configured to accept NTLMv2 only (not
-sure if that is relevant when using DFS links), while the DFS root
-server will allow both NTLM and NTLMv2.
-
-pcap's are available on request.
-
-Debug log of "ls -la /mnt/bla/Global/", on sec=ntlm:
-
- fs/cifs/dir.c: CIFS VFS: in cifs_lookup as Xid: 553 with uid: 0
- fs/cifs/dir.c: parent inode = 0xe289a62c name is: Global and dentry =
-0xdfe25330
- fs/cifs/dir.c: NULL inode in lookup
- fs/cifs/dir.c: Full path: \\foxdft13.fox.local\company\Global inode =
-0x  (null)
- fs/cifs/inode.c: Getting info on \\foxdft13.fox.local\company\Global
- fs/cifs/transport.c: For smb_command 50
- fs/cifs/transport.c: Sending smb:  total_len 148
- fs/cifs/connect.c: rfc1002 length 0x27
- fs/cifs/connect.c: invalid transact2 word count
- Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED
- fs/cifs/netmisc.c: Mapping smb error code 3 to POSIX err -66
- fs/cifs/cifssmb.c: Send error in QPathInfo = -66
- fs/cifs/inode.c: creating fake fattr for DFS referral
- fs/cifs/cifssmb.c: In GetSrvInodeNum for
-\\foxdft13.fox.local\company\Global
- fs/cifs/transport.c: For smb_command 50
- fs/cifs/transport.c: Sending smb:  total_len 148
- fs/cifs/connect.c: rfc1002 length 0x27
- fs/cifs/connect.c: invalid transact2 word count
- Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED
- fs/cifs/netmisc.c: Mapping smb error code 3 to POSIX err -66
- fs/cifs/cifssmb.c: error -66 in QueryInternalInfo
- fs/cifs/inode.c: GetSrvInodeNum rc -66
- CIFS VFS: Autodisabling the use of server inode numbers on
-\\foxdft13.fox.local\company. This server doesn't seem to support them
-properly. Hardlinks will not be recognized on this mount. Consider
-mounting with the "noserverino" option to silence this message.
- fs/cifs/inode.c: looking for uniqueid=58
- fs/cifs/inode.c: cifs_revalidate_cache: revalidating inode 58
- fs/cifs/inode.c: cifs_revalidate_cache: inode 58 is new
- fs/cifs/inode.c: inode 0xc63d492c old_time=0 new_time=30762153
- fs/cifs/dir.c: CIFS VFS: leaving cifs_lookup (xid = 553) rc = 0
- fs/cifs/cifs_dfs_ref.c: in cifs_dfs_follow_mountpoint
- fs/cifs/cifs_dfs_ref.c: CIFS VFS: in cifs_dfs_follow_mountpoint as Xid:
-554 with uid: 0
- fs/cifs/transport.c: For smb_command 117
- fs/cifs/transport.c: Sending smb:  total_len 88
- fs/cifs/connect.c: rfc1002 length 0x3c
- fs/cifs/connect.c: CIFS Tcon rc = 0 ipc_tid = 14339
- fs/cifs/cifssmb.c: In GetDFSRefer the path
-\foxdft13.fox.local\company\Global
- fs/cifs/transport.c: For smb_command 50
- fs/cifs/transport.c: Sending smb:  total_len 144
- fs/cifs/connect.c: rfc1002 length 0x124
- fs/cifs/cifssmb.c: Decoding GetDFSRefer response BCC: 233  Offset 56
- fs/cifs/cifssmb.c: num_referrals: 1 dfs flags: 0x2 ...
-
- fs/cifs/cifs_dfs_ref.c: DFS: ref path: \foxdft13.fox.local\company\Global
- fs/cifs/cifs_dfs_ref.c: DFS: node path: \foxdft08\company\Global
- fs/cifs/cifs_dfs_ref.c: DFS: fl: 2, srv_type: 0
- fs/cifs/cifs_dfs_ref.c: DFS: ref_flags: 0, path_consumed: 34
- fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip: resolved:
-foxdft08 to 10.0.0.72
- fs/cifs/cifsfs.c: Devname: \\foxdft08\company flags: 0
- fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 555 with uid: 0
- fs/cifs/connect.c: prefix path /Global
- fs/cifs/connect.c: Username: vmtest
- fs/cifs/connect.c: UNC: \\foxdft08\company ip: 10.0.0.72
- fs/cifs/connect.c: Socket created
- fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
- fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xid: 556 with uid: 0
- fs/cifs/connect.c: Existing smb sess not found
- fs/cifs/cifssmb.c: secFlags 0x2
- fs/cifs/connect.c: Demultiplex PID: 18750
- fs/cifs/transport.c: For smb_command 114
- fs/cifs/transport.c: Sending smb:  total_len 82
- fs/cifs/connect.c: rfc1002 length 0x6b
- fs/cifs/cifssmb.c: Dialect: 2
- fs/cifs/cifssmb.c: Signing disabled
- fs/cifs/cifssmb.c: negprot rc 0
- fs/cifs/connect.c: Security Mode: 0x3 Capabilities: 0xf3fd TimeAdjust: 3600
- fs/cifs/sess.c: sess setup type 1
- fs/cifs/transport.c: For smb_command 115
- fs/cifs/transport.c: Sending smb:  total_len 232
- fs/cifs/connect.c: rfc1002 length 0x27
- fs/cifs/connect.c: Reconnect after unexpected peek error 0
- fs/cifs/connect.c: Reconnecting tcp session
- fs/cifs/connect.c: State: 0x3 Flags: 0x0
- fs/cifs/connect.c: Post shutdown state: 0x3 Flags: 0x0
- fs/cifs/connect.c: Socket created
- fs/cifs/netmisc.c: Mapping smb error code 31 to POSIX err -5
- fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
- fs/cifs/sess.c: ssetup freeing small buf f71edc00
- CIFS VFS: Send error in SessSetup = -5
- fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses (xid = 556) rc = -5
- fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid = 555) rc = -5
- CIFS VFS: cifs_mount failed w/return code = -5
- fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
- fs/cifs/transport.c: Sending smb:  total_len 72
- fs/cifs/cifs_dfs_ref.c: cifs_dfs_follow_mountpoint:
-cifs_dfs_do_refmount:\foxdft08\company\Global , mnt:fffffffb
- fs/cifs/cifs_dfs_ref.c: CIFS VFS: leaving cifs_dfs_follow_mountpoint
-(xid = 554) rc = -5
- fs/cifs/cifs_dfs_ref.c: leaving cifs_dfs_follow_mountpoint
-
-Debug log of "ls -la /mnt/bla/Global/", on sec=ntlmv2:
-
-fs/cifs/dir.c: CIFS VFS: in cifs_lookup as Xid: 563 with uid: 0
- fs/cifs/dir.c: parent inode = 0xc394a1ac name is: Global and dentry =
-0xd1e0aa18
- fs/cifs/dir.c: NULL inode in lookup
- fs/cifs/dir.c: Full path: \\foxdft13.fox.local\company\Global inode =
-0x  (null)
- fs/cifs/inode.c: Getting info on \\foxdft13.fox.local\company\Global
- fs/cifs/transport.c: For smb_command 50
- fs/cifs/transport.c: Sending smb:  total_len 148
- fs/cifs/connect.c: rfc1002 length 0x27
- fs/cifs/connect.c: invalid transact2 word count
- Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED
- fs/cifs/netmisc.c: Mapping smb error code 3 to POSIX err -66
- fs/cifs/cifssmb.c: Send error in QPathInfo = -66
- fs/cifs/inode.c: creating fake fattr for DFS referral
- fs/cifs/cifssmb.c: In GetSrvInodeNum for
-\\foxdft13.fox.local\company\Global
- fs/cifs/transport.c: For smb_command 50
- fs/cifs/transport.c: Sending smb:  total_len 148
- fs/cifs/connect.c: rfc1002 length 0x27
- fs/cifs/connect.c: invalid transact2 word count
- Status code returned 0xc0000257 NT_STATUS_PATH_NOT_COVERED
- fs/cifs/netmisc.c: Mapping smb error code 3 to POSIX err -66
- fs/cifs/cifssmb.c: error -66 in QueryInternalInfo
- fs/cifs/inode.c: GetSrvInodeNum rc -66
- CIFS VFS: Autodisabling the use of server inode numbers on
-\\foxdft13.fox.local\company. This server doesn't seem to support them
-properly. Hardlinks will not be recognized on this mount. Consider
-mounting with the "noserverino" option to silence this message.
- fs/cifs/inode.c: looking for uniqueid=59
- fs/cifs/inode.c: cifs_revalidate_cache: revalidating inode 59
- fs/cifs/inode.c: cifs_revalidate_cache: inode 59 is new
- fs/cifs/inode.c: inode 0xe289a7ac old_time=0 new_time=30796734
- fs/cifs/dir.c: CIFS VFS: leaving cifs_lookup (xid = 563) rc = 0
- fs/cifs/cifs_dfs_ref.c: in cifs_dfs_follow_mountpoint
- fs/cifs/cifs_dfs_ref.c: CIFS VFS: in cifs_dfs_follow_mountpoint as Xid:
-564 with uid: 0
- fs/cifs/transport.c: For smb_command 117
- fs/cifs/transport.c: Sending smb:  total_len 88
- fs/cifs/connect.c: rfc1002 length 0x3c
- fs/cifs/connect.c: CIFS Tcon rc = 0 ipc_tid = 20487
- fs/cifs/cifssmb.c: In GetDFSRefer the path
-\foxdft13.fox.local\company\Global
- fs/cifs/transport.c: For smb_command 50
- fs/cifs/transport.c: Sending smb:  total_len 144
- fs/cifs/connect.c: rfc1002 length 0x124
- fs/cifs/cifssmb.c: Decoding GetDFSRefer response BCC: 233  Offset 56
- fs/cifs/cifssmb.c: num_referrals: 1 dfs flags: 0x2 ...
-
- fs/cifs/cifs_dfs_ref.c: DFS: ref path: \foxdft13.fox.local\company\Global
- fs/cifs/cifs_dfs_ref.c: DFS: node path: \foxdft08\company\Global
- fs/cifs/cifs_dfs_ref.c: DFS: fl: 2, srv_type: 0
- fs/cifs/cifs_dfs_ref.c: DFS: ref_flags: 0, path_consumed: 34
- fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip: resolved:
-foxdft08 to 10.0.0.72
- fs/cifs/cifsfs.c: Devname: \\foxdft08\company flags: 0
- fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 565 with uid: 0
- fs/cifs/connect.c: prefix path /Global
- fs/cifs/connect.c: Username: vmtest
- fs/cifs/connect.c: UNC: \\foxdft08\company ip: 10.0.0.72
- fs/cifs/connect.c: Socket created
- fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
- fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xid: 566 with uid: 0
- fs/cifs/connect.c: Existing smb sess not found
- fs/cifs/cifssmb.c: secFlags 0x4
- fs/cifs/transport.c: For smb_command 114
- fs/cifs/transport.c: Sending smb:  total_len 82
- fs/cifs/connect.c: Demultiplex PID: 18760
- fs/cifs/connect.c: rfc1002 length 0x6b
- fs/cifs/cifssmb.c: Dialect: 2
- fs/cifs/cifssmb.c: Signing disabled
- fs/cifs/cifssmb.c: negprot rc 0
- fs/cifs/connect.c: Security Mode: 0x3 Capabilities: 0xf3fd TimeAdjust: 3600
- fs/cifs/sess.c: sess setup type 2
- fs/cifs/transport.c: For smb_command 115
- fs/cifs/transport.c: Sending smb:  total_len 346
- fs/cifs/connect.c: rfc1002 length 0x27
- Status code returned 0xc000006d NT_STATUS_LOGON_FAILURE
- fs/cifs/netmisc.c: Mapping smb error code 5 to POSIX err -13
- fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
- fs/cifs/sess.c: ssetup freeing small buf f71ecfc0
- CIFS VFS: Send error in SessSetup = -13
- fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses (xid = 566) rc = -13
- fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid = 565) rc = -13
- CIFS VFS: cifs_mount failed w/return code = -13
- fs/cifs/cifs_dfs_ref.c: cifs_dfs_follow_mountpoint:
-cifs_dfs_do_refmount:\foxdft08\company\Global , mnt:fffffff3
- fs/cifs/cifs_dfs_ref.c: CIFS VFS: leaving cifs_dfs_follow_mountpoint
-(xid = 564) rc = -13
- fs/cifs/cifs_dfs_ref.c: leaving cifs_dfs_follow_mountpoint
-
-Any ideas on how to troubleshoot this further?
-
-Best regards,
-Robbert
+diff --git a/fs/cifs/README b/fs/cifs/README
+index ee68d10..46af99a 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -337,6 +337,15 @@ A partial list of the supported mount options follows:
+   wsize		default write size (default 57344)
+ 		maximum wsize currently allowed by CIFS is 57344 (fourteen
+ 		4096 byte pages)
++  actimeo=n	attribute cache timeout in seconds (default 1 second).
++		After this timeout, the cifs client requests fresh attribute
++		information from the server. This option allows to tune the
++		attribute cache timeout to suit the workload needs. Shorter
++		timeouts mean better the cache coherency, but increased number
++		of calls to the server. Longer timeouts mean reduced number
++		of calls to the server at the expense of less stricter cache
++		coherency checks (i.e. incorrect attribute cache for a short
++		period of time).
+   rw		mount the network share read-write (note that the
+ 		server may still consider the share read-only)
+   ro		mount network share read-only
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index e9a393c..7852cd6 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -48,6 +48,7 @@ struct cifs_sb_info {
+ 	struct nls_table *local_nls;
+ 	unsigned int rsize;
+ 	unsigned int wsize;
++	unsigned long actimeo; /* attribute cache timeout (jiffies) */
+ 	atomic_t active;
+ 	uid_t	mnt_uid;
+ 	gid_t	mnt_gid;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 76c8a90..56a4b75 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -463,6 +463,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 
+ 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+ 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
++	/* convert actimeo and display it in seconds */
++		seq_printf(s, ",actimeo=%lu", cifs_sb->actimeo / HZ);
+ 
+ 	return 0;
+ }
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b577bf0..94ccfac 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -45,6 +45,16 @@
+ #define CIFS_MIN_RCV_POOL 4
+ 
+ /*
++ * default attribute cache timeout (jiffies)
++ */
++#define CIFS_DEF_ACTIMEO (1 * HZ)
++
++/*
++ * max attribute cache timeout (jiffies) - 2^30
++ */
++#define CIFS_MAX_ACTIMEO (1 << 30)
++
++/*
+  * MAX_REQ is the maximum number of requests that WE will send
+  * on one socket concurrently. It also matches the most common
+  * value of max multiplex returned by servers.  We may
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 32fa4d9..bb17ee2 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -105,6 +105,7 @@ struct smb_vol {
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+ 	unsigned short int port;
++	unsigned long actimeo; /* attribute cache timeout (jiffies) */
+ 	char *prepath;
+ 	struct sockaddr_storage srcaddr; /* allow binding to a local IP */
+ 	struct nls_table *local_nls;
+@@ -840,6 +841,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 	/* default to using server inode numbers where available */
+ 	vol->server_ino = 1;
+ 
++	vol->actimeo = CIFS_DEF_ACTIMEO;
++
+ 	if (!options)
+ 		return 1;
+ 
+@@ -1214,6 +1217,16 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 					printk(KERN_WARNING "CIFS: server net"
+ 					"biosname longer than 15 truncated.\n");
+ 			}
++		} else if (strnicmp(data, "actimeo", 7) == 0) {
++			if (value && *value) {
++				vol->actimeo = HZ * simple_strtoul(value,
++								   &value, 0);
++				if (vol->actimeo > CIFS_MAX_ACTIMEO) {
++					cERROR(1, "CIFS: attribute cache"
++							"timeout too large");
++					return 1;
++				}
++			}
+ 		} else if (strnicmp(data, "credentials", 4) == 0) {
+ 			/* ignore */
+ 		} else if (strnicmp(data, "version", 3) == 0) {
+@@ -2571,6 +2584,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 	cFYI(1, "file mode: 0x%x  dir mode: 0x%x",
+ 		cifs_sb->mnt_file_mode, cifs_sb->mnt_dir_mode);
+ 
++	cifs_sb->actimeo = pvolume_info->actimeo;
++
+ 	if (pvolume_info->noperm)
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
+ 	if (pvolume_info->setuids)
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 28cb6e7..bb5ca48 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1653,6 +1653,7 @@ static bool
+ cifs_inode_needs_reval(struct inode *inode)
+ {
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 
+ 	if (cifs_i->clientCanCacheRead)
+ 		return false;
+@@ -1663,12 +1664,12 @@ cifs_inode_needs_reval(struct inode *inode)
+ 	if (cifs_i->time == 0)
+ 		return true;
+ 
+-	/* FIXME: the actimeo should be tunable */
+-	if (time_after_eq(jiffies, cifs_i->time + HZ))
++	if (!time_in_range(jiffies, cifs_i->time,
++				cifs_i->time + cifs_sb->actimeo))
+ 		return true;
+ 
+ 	/* hardlinked files w/ noserverino get "special" treatment */
+-	if (!(CIFS_SB(inode->i_sb)->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) &&
+ 	    S_ISREG(inode->i_mode) && inode->i_nlink != 1)
+ 		return true;
+ 
