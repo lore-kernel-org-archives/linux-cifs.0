@@ -1,125 +1,139 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove unnecessary locking around sequence_number
-Date: Wed, 1 Dec 2010 08:35:31 -0600
-Message-ID: <AANLkTimn=L-9puM058T6mBwTtOhzRbK2SdqEXn2WQKYY@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove Local_System_Name
+Date: Wed, 1 Dec 2010 08:39:09 -0600
+Message-ID: <AANLkTik1BazmLP0r2VsGqK4P2yjASVdASmwCtPSHAhaR@mail.gmail.com>
 References: <1290457863-10804-1-git-send-email-jlayton@redhat.com>
+	<1290457863-10804-3-git-send-email-jlayton@redhat.com>
+	<AANLkTinNLbq1c57TvejaR8hvBxJTD62T6kP1hLOpGegX@mail.gmail.com>
+	<20101201092731.7aeded31@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1290457863-10804-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20101201092731.7aeded31-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Nov 22, 2010 at 2:31 PM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org> =
-wrote:
-> The server->sequence_number is already protected by the srv_mutex. Th=
-e
-> GlobalMid_lock is unneeded here.
+On Wed, Dec 1, 2010 at 8:27 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Wed, 1 Dec 2010 08:10:03 -0600
+> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/cifsencrypt.c | =A0 =A06 ++----
-> =A0fs/cifs/cifsglob.h =A0 =A0| =A0 =A02 +-
-> =A02 files changed, 3 insertions(+), 5 deletions(-)
+>> On Mon, Nov 22, 2010 at 2:31 PM, Jeff Layton <jlayton-vpEMnDpepFvY2uhgrK1nQg@public.gmane.org=
+t> wrote:
+>> > ...this string is zeroed out and nothing ever changes it.
+>> >
+>> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> > ---
+>> > =A0fs/cifs/cifsfs.c =A0 | =A0 =A01 -
+>> > =A0fs/cifs/cifsglob.h | =A0 =A02 --
+>> > =A0fs/cifs/connect.c =A0| =A0 23 ++++++++++-------------
+>> > =A03 files changed, 10 insertions(+), 16 deletions(-)
+>> >
+>> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+>> > index 041d7c3..57a7386 100644
+>> > --- a/fs/cifs/cifsfs.c
+>> > +++ b/fs/cifs/cifsfs.c
+>> > @@ -931,7 +931,6 @@ init_cifs(void)
+>> > =A0 =A0 =A0 =A0GlobalCurrentXid =3D 0;
+>> > =A0 =A0 =A0 =A0GlobalTotalActiveXid =3D 0;
+>> > =A0 =A0 =A0 =A0GlobalMaxActiveXid =3D 0;
+>> > - =A0 =A0 =A0 memset(Local_System_Name, 0, 15);
+>> > =A0 =A0 =A0 =A0spin_lock_init(&cifs_tcp_ses_lock);
+>> > =A0 =A0 =A0 =A0spin_lock_init(&cifs_file_list_lock);
+>> > =A0 =A0 =A0 =A0spin_lock_init(&GlobalMid_Lock);
+>> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> > index b4c2524..2ffa029 100644
+>> > --- a/fs/cifs/cifsglob.h
+>> > +++ b/fs/cifs/cifsglob.h
+>> > @@ -743,8 +743,6 @@ GLOBAL_EXTERN unsigned int GlobalTotalActiveXi=
+d; /* prot by GlobalMid_Sem */
+>> > =A0GLOBAL_EXTERN unsigned int GlobalMaxActiveXid; /* prot by Globa=
+lMid_Sem */
+>> > =A0GLOBAL_EXTERN spinlock_t GlobalMid_Lock; =A0/* protects above &=
+ list operations */
+>> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0/* on midQ entries */
+>> > -GLOBAL_EXTERN char Local_System_Name[15];
+>> > -
+>> > =A0/*
+>> > =A0* =A0Global counters, updated atomically
+>> > =A0*/
+>> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> > index 251a17c..7758120 100644
+>> > --- a/fs/cifs/connect.c
+>> > +++ b/fs/cifs/connect.c
+>> > @@ -806,23 +806,20 @@ cifs_parse_mount_options(char *options, cons=
+t char *devname,
+>> > =A0 =A0 =A0 =A0short int override_gid =3D -1;
+>> > =A0 =A0 =A0 =A0bool uid_specified =3D false;
+>> > =A0 =A0 =A0 =A0bool gid_specified =3D false;
+>> > + =A0 =A0 =A0 char *nodename =3D utsname()->nodename;
+>> >
+>> > =A0 =A0 =A0 =A0separator[0] =3D ',';
+>> > =A0 =A0 =A0 =A0separator[1] =3D 0;
+>> >
+>> > - =A0 =A0 =A0 if (Local_System_Name[0] !=3D 0)
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(vol->source_rfc1001_name, Loc=
+al_System_Name, 15);
+>> > - =A0 =A0 =A0 else {
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 char *nodename =3D utsname()->nodena=
+me;
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 int n =3D strnlen(nodename, 15);
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 memset(vol->source_rfc1001_name, 0x2=
+0, 15);
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 for (i =3D 0; i < n; i++) {
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* does not have to =
+be perfect mapping since field is
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 informational, only =
+used for servers that do not support
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 port 445 and it can =
+be overridden at mount time */
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->source_rfc1001_=
+name[i] =3D toupper(nodename[i]);
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> > - =A0 =A0 =A0 }
+>> > + =A0 =A0 =A0 /*
+>> > + =A0 =A0 =A0 =A0* does not have to be perfect mapping since field=
+ is
+>> > + =A0 =A0 =A0 =A0* informational, only used for servers that do no=
+t support
+>> > + =A0 =A0 =A0 =A0* port 445 and it can be overridden at mount time
+>> > + =A0 =A0 =A0 =A0*/
+>> > + =A0 =A0 =A0 memset(vol->source_rfc1001_name, 0x20, 15);
+>> > + =A0 =A0 =A0 for (i =3D 0; i < strnlen(nodename, 15); i++)
+>> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->source_rfc1001_name[i] =3D toup=
+per(nodename[i]);
+>> > +
+>> > =A0 =A0 =A0 =A0vol->source_rfc1001_name[15] =3D 0;
+>> > =A0 =A0 =A0 =A0/* null target name indicates to use *SMBSERVR defa=
+ult called name
+>> > =A0 =A0 =A0 =A0 =A0 if we end up sending RFC1001 session initializ=
+e */
+>> > --
+>> > 1.7.3.2
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe linux-ci=
+fs" in
+>> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.ht=
+ml
+>> >
+>>
+>> We probably should define 15 or add an explanation for 15.
 >
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index f856732..66f3d50 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -72,6 +72,7 @@ static int cifs_calculate_signature(const struct sm=
-b_hdr *cifs_pdu,
-> =A0 =A0 =A0 =A0return 0;
-> =A0}
+> Good point. I guess that should probably be RFC1001_NAME_LEN ? There
+> are a number of other places that use hardcoded "15" or "16" values
+> around this as well. Any objection to me fixing that in a separate
+> cleanup patch?
 >
-> +/* must be called with server->srv_mutex held */
-> =A0int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info=
- *server,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 *pexpected_response_sequence=
-_number)
-> =A0{
-> @@ -84,14 +85,12 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struc=
-t TCP_Server_Info *server,
-> =A0 =A0 =A0 =A0if ((cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) =3D=
-=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
->
-> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0cifs_pdu->Signature.Sequence.SequenceNumber =3D
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cpu_to_le32(server->se=
-quence_number);
-> =A0 =A0 =A0 =A0cifs_pdu->Signature.Sequence.Reserved =3D 0;
->
-> =A0 =A0 =A0 =A0*pexpected_response_sequence_number =3D server->sequen=
-ce_number++;
-> =A0 =A0 =A0 =A0server->sequence_number++;
-> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
->
-> =A0 =A0 =A0 =A0rc =3D cifs_calculate_signature(cifs_pdu, server, smb_=
-signature);
-> =A0 =A0 =A0 =A0if (rc)
-> @@ -149,6 +148,7 @@ static int cifs_calc_signature2(const struct kvec=
- *iov, int n_vec,
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> +/* must be called with server->srv_mutex held */
-> =A0int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_=
-Info *server,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u32 *pexpected_response_sequenc=
-e_number)
-> =A0{
-> @@ -162,14 +162,12 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec,=
- struct TCP_Server_Info *server,
-> =A0 =A0 =A0 =A0if ((cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) =3D=
-=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
->
-> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0cifs_pdu->Signature.Sequence.SequenceNumber =3D
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cpu_to=
-_le32(server->sequence_number);
-> =A0 =A0 =A0 =A0cifs_pdu->Signature.Sequence.Reserved =3D 0;
->
-> =A0 =A0 =A0 =A0*pexpected_response_sequence_number =3D server->sequen=
-ce_number++;
-> =A0 =A0 =A0 =A0server->sequence_number++;
-> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
->
-> =A0 =A0 =A0 =A0rc =3D cifs_calc_signature2(iov, n_vec, server, smb_si=
-gnature);
-> =A0 =A0 =A0 =A0if (rc)
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index a8d9f32..bba731c 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -200,7 +200,7 @@ struct TCP_Server_Info {
-> =A0 =A0 =A0 =A0char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, =
-ntlmv2 etc */
-> =A0 =A0 =A0 =A0/* 16th byte of RFC1001 workstation name is always nul=
-l */
-> =A0 =A0 =A0 =A0char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NU=
-LL];
-> - =A0 =A0 =A0 __u32 sequence_number; /* needed for CIFS PDU signature=
- */
-> + =A0 =A0 =A0 __u32 sequence_number; /* for signing, protected by srv=
-_mutex */
-> =A0 =A0 =A0 =A0struct session_key session_key;
-> =A0 =A0 =A0 =A0unsigned long lstrp; /* when we got last response from=
- this server */
-> =A0 =A0 =A0 =A0u16 dialect; /* dialect index that server chose */
 > --
-> 1.7.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
 
-Looks correct. Two less contenders for global mid lock.
+RFC1001_NAME_LEN  sounds apt.
+No objection.
 
 Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
