@@ -1,17 +1,17 @@
 From: "Christopher R. Hertel" <crh@samba.org>
 Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
-Date: Sat, 04 Dec 2010 13:46:39 -0600
-Message-ID: <4CFA9A9F.1080208@samba.org>
-References: <20101203212811.17594274@tlielax.poochiereds.net>
-	<4CF9BB65.2010307@samba.org> <E1POnFL-00BKg9-JW@intern.SerNet.DE>
+Date: Sat, 04 Dec 2010 13:49:18 -0600
+Message-ID: <4CFA9B3E.8050603@samba.org>
+References: <20101203212811.17594274@tlielax.poochiereds.net>	<4CF9BB65.2010307@samba.org>
+	<20101204062837.55cb13a2@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs@vger.kernel.org, cifs-protocol@samba.org,
 	samba-technical@lists.samba.org
-To: Volker.Lendecke@SerNet.DE
+To: Jeff Layton <jlayton@samba.org>
 Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <E1POnFL-00BKg9-JW@intern.SerNet.DE>
+In-Reply-To: <20101204062837.55cb13a2@tlielax.poochiereds.net>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
 	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
 List-Archive: <http://lists.samba.org/pipermail/samba-technical>
@@ -23,33 +23,51 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
-Volker Lendecke wrote:
-> On Fri, Dec 03, 2010 at 09:54:13PM -0600, Christopher R. Hertel wrote:
+Jeff Layton wrote:
+> On Fri, 03 Dec 2010 21:54:13 -0600
+> "Christopher R. Hertel" <crh@samba.org> wrote:
+> 
+>> Jeff Layton wrote:
+>> :
+>> :
+>>> Timeouts:
+>>> =========
+>>> It's tempting to think of SMB as being very similar to NFS/RPC, but
+>>> when it comes to low-level transport, there are significant
+>>> differences. ONC-RPC was designed for connectionless transports and has
+>>> the concept of a retransmission. SMB however does not -- it was
+>>> originally layered on NetBIOS sessions and so has always been assumed
+>>> to run on a connection-based transport.
+>> ...with the exception of the Direct Hosted IPX transport.  IPX is
+>> connectionless.  In order to accommodate this connectionless transport, SMB
+>> was actually modified (slightly).
+>>
 >> That may seem to be in the "who cares" category, since those old transports
 >> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
 >> the code to handle the old transports is still there in Windows, so there
 >> are behaviors -- things like the timeouts you're talking about and the weird
 >> VC=0 shutdown behvior -- that exist because of these old disused transports.
+>>
+>> Ugh.  Eh?
+>>
 > 
-> VC=0, how does Windows treat this facing NAT (masquerading)
-> networks? I've done tests in the past where Windows killed
-> valid connections from behind a NAT box when a new client
-> came in.
+> Yeah, Direct Hosted IPX is a lot more like NFS/RPC. MS essentially
+> shoehorned in a way to do request retransmissions. It's a pretty
+> impressive kludge! I suppose we could theorize that that legacy is why
+> Windows times out individual requests so aggressively, but maybe there
+> are other design concerns behind that behavior.
 
-I put a lot of info into [MS-CIFS] about how *and why* this works the way it
-does.  See [MS-CIFS] 2.1.3.  Unfortunately, since [MS-CIFS] applies only to
-W98, NT4, and earlier it doesn't tell you much about W2K and newer
-implementations.  There's a KB article that talks about the problem a
-little:  KB301673.
+I've seen the source code.  [Aiigh!  Bleach the eyes!]
 
-I thought that there was a registry setting that would allow you to tell the
-Windows server NOT to close existing connections if it received a VC=0 from
-the same IP.  Even when working with Microsoft I wasn't able to find
-anything like that, beyond what's in that KB article.
+I think that this is the primary reason for the timeout, but yeah... there
+are other factors that are likely involved.
 
-Basically, they should give up on the VC=0 thing, since it's a throw-back to
-the days when OS/2 could run SMB over connectionless IPX transport over
-multiple modems in parallel.
+> In this case however it really is a "don't care" for us in Linux CIFS
+> land since we have never implemented it on top of IPX or any other
+> non-connected transport and have no plans to do so.
+
+Yep!  I agree with Volker's vote that this is a case in which third-party
+implementations should do "the right thing" rather than "what Windows does".
 
 Chris -)-----
 
