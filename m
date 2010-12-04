@@ -1,73 +1,55 @@
-From: "Christopher R. Hertel" <crh@samba.org>
+From: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
-Date: Sat, 04 Dec 2010 13:49:18 -0600
-Message-ID: <4CFA9B3E.8050603@samba.org>
-References: <20101203212811.17594274@tlielax.poochiereds.net>	<4CF9BB65.2010307@samba.org>
-	<20101204062837.55cb13a2@tlielax.poochiereds.net>
+Date: Sat, 04 Dec 2010 14:04:13 -0600
+Message-ID: <4CFA9EBD.8090708@samba.org>
+References: <20101203212811.17594274@tlielax.poochiereds.net>	<4CF9BB65.2010307@samba.org>	<E1POnFL-00BKg9-JW@intern.SerNet.DE> <20101204064452.46ac24c7@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, cifs-protocol@samba.org,
-	samba-technical@lists.samba.org
-To: Jeff Layton <jlayton@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20101204062837.55cb13a2@tlielax.poochiereds.net>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20101204064452.46ac24c7-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 Jeff Layton wrote:
-> On Fri, 03 Dec 2010 21:54:13 -0600
-> "Christopher R. Hertel" <crh@samba.org> wrote:
+> On Sat, 4 Dec 2010 09:13:21 +0100
+> Volker Lendecke <Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org> wrote:
 > 
->> Jeff Layton wrote:
->> :
->> :
->>> Timeouts:
->>> =========
->>> It's tempting to think of SMB as being very similar to NFS/RPC, but
->>> when it comes to low-level transport, there are significant
->>> differences. ONC-RPC was designed for connectionless transports and has
->>> the concept of a retransmission. SMB however does not -- it was
->>> originally layered on NetBIOS sessions and so has always been assumed
->>> to run on a connection-based transport.
->> ...with the exception of the Direct Hosted IPX transport.  IPX is
->> connectionless.  In order to accommodate this connectionless transport, SMB
->> was actually modified (slightly).
+>> On Fri, Dec 03, 2010 at 09:54:13PM -0600, Christopher R. Hertel wrote:
+>>> That may seem to be in the "who cares" category, since those old transports
+>>> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
+>>> the code to handle the old transports is still there in Windows, so there
+>>> are behaviors -- things like the timeouts you're talking about and the weird
+>>> VC=0 shutdown behvior -- that exist because of these old disused transports.
+>> VC=0, how does Windows treat this facing NAT (masquerading)
+>> networks? I've done tests in the past where Windows killed
+>> valid connections from behind a NAT box when a new client
+>> came in.
 >>
->> That may seem to be in the "who cares" category, since those old transports
->> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
->> the code to handle the old transports is still there in Windows, so there
->> are behaviors -- things like the timeouts you're talking about and the weird
->> VC=0 shutdown behvior -- that exist because of these old disused transports.
->>
->> Ugh.  Eh?
->>
+>> Volker
 > 
-> Yeah, Direct Hosted IPX is a lot more like NFS/RPC. MS essentially
-> shoehorned in a way to do request retransmissions. It's a pretty
-> impressive kludge! I suppose we could theorize that that legacy is why
-> Windows times out individual requests so aggressively, but maybe there
-> are other design concerns behind that behavior.
+> It seems like the best way to deal with this on the server side with
+> direct hosted TCP would be to treat VC=0 like any other VC number
+> (MS-CIFS says that this is allowed).
 
-I've seen the source code.  [Aiigh!  Bleach the eyes!]
+The reasoning behind the VC=0 behavior does not apply to any contemporary
+transport, so there is no reason to enforce that behavior.
 
-I think that this is the primary reason for the timeout, but yeah... there
-are other factors that are likely involved.
+> Ideally any new connection event from a host however should make the
+> server check the validity of any other connection from the same host.
+> That way you could release resources held by dead connections in case
+> the new one is a reconnect and needs to reclaim state.
 
-> In this case however it really is a "don't care" for us in Linux CIFS
-> land since we have never implemented it on top of IPX or any other
-> non-connected transport and have no plans to do so.
+That's overkill, I think.  The transport, as you mention below, will take
+care of dropped connections in due time.
 
-Yep!  I agree with Volker's vote that this is a case in which third-party
-implementations should do "the right thing" rather than "what Windows does".
+> The question is how to check that validity. Unfortunately, the best you
+> can probably do is rely on TCP keepalives.
+
+...and that's probably the best you want to do.
 
 Chris -)-----
 
@@ -75,5 +57,5 @@ Chris -)-----
 "Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
 Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
 jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, uninq.
-ubiqx Team -- http://www.ubiqx.org/     -)-----   crh@ubiqx.mn.org
-OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh@ubiqx.org
+ubiqx Team -- http://www.ubiqx.org/     -)-----   crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org
+OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh-zuGDro9SezXYtjvyW6yDsg@public.gmane.org
