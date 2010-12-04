@@ -1,55 +1,46 @@
 From: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
-Date: Sat, 04 Dec 2010 14:04:13 -0600
-Message-ID: <4CFA9EBD.8090708@samba.org>
-References: <20101203212811.17594274@tlielax.poochiereds.net>	<4CF9BB65.2010307@samba.org>	<E1POnFL-00BKg9-JW@intern.SerNet.DE> <20101204064452.46ac24c7@tlielax.poochiereds.net>
+Date: Sat, 04 Dec 2010 14:17:41 -0600
+Message-ID: <4CFAA1E5.5010306@samba.org>
+References: <20101203212811.17594274@tlielax.poochiereds.net>	<4CF9BB65.2010307@samba.org>	<E1POnFL-00BKg9-JW@intern.SerNet.DE>	<20101204064452.46ac24c7@tlielax.poochiereds.net> <AANLkTinsm=b5Pezzo4m6Jbmq96EcYas4Hsw0nhxfb4m6@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101204064452.46ac24c7-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <AANLkTinsm=b5Pezzo4m6Jbmq96EcYas4Hsw0nhxfb4m6-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jeff Layton wrote:
-> On Sat, 4 Dec 2010 09:13:21 +0100
-> Volker Lendecke <Volker.Lendecke-PS7XAnAlDA+VvDNblw4Uiw@public.gmane.org> wrote:
-> 
->> On Fri, Dec 03, 2010 at 09:54:13PM -0600, Christopher R. Hertel wrote:
->>> That may seem to be in the "who cares" category, since those old transports
->>> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
->>> the code to handle the old transports is still there in Windows, so there
->>> are behaviors -- things like the timeouts you're talking about and the weird
->>> VC=0 shutdown behvior -- that exist because of these old disused transports.
->> VC=0, how does Windows treat this facing NAT (masquerading)
->> networks? I've done tests in the past where Windows killed
->> valid connections from behind a NAT box when a new client
->> came in.
->>
->> Volker
-> 
-> It seems like the best way to deal with this on the server side with
-> direct hosted TCP would be to treat VC=0 like any other VC number
-> (MS-CIFS says that this is allowed).
+Shirish Pargaonkar wrote:
+:
+> Is SMB Echo command the only way to determine whether to reconnect or not?
 
-The reasoning behind the VC=0 behavior does not apply to any contemporary
-transport, so there is no reason to enforce that behavior.
+The SMB Echo can only be sent from the client to the server.  The server has
+no mechanism, within the SMB protocol, to "ping" the client.
 
-> Ideally any new connection event from a host however should make the
-> server check the validity of any other connection from the same host.
-> That way you could release resources held by dead connections in case
-> the new one is a reconnect and needs to reclaim state.
+The Echo is used by the client as a way to test whether it is the connection
+that has failed or if the server is simply taking a very long time to
+respond to a particular request.
 
-That's overkill, I think.  The transport, as you mention below, will take
-care of dropped connections in due time.
+> The assumption here is SMB server is unresponsive.
+> There could be other circumstances on the server box (or even client
+> box) that are slowing down the SMB server responses such as slow
+> network, slow network stack, memory pressure etc.
 
-> The question is how to check that validity. Unfortunately, the best you
-> can probably do is rely on TCP keepalives.
+Right.  So how do you know whether it is the transport connection or the SMB
+server that is having trouble?  In theory, the SMB server should answer the
+Echo right away, even if it is having other problems.
 
-...and that's probably the best you want to do.
+> So server could be fine all along and yet client would ask for reconnection!
+
+If the network is slow, that's a transport problem.  It's also why the 45
+second timeout value is adaptable.  See the earlier message in which I
+pointed to the sections in [MS-CIFS] that explain the 45 second timeout and
+point at the related KB articles.
 
 Chris -)-----
 
