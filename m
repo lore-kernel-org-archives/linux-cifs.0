@@ -1,48 +1,40 @@
-From: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Volker Lendecke <Volker.Lendecke@SerNet.DE>
 Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
-Date: Fri, 03 Dec 2010 21:54:13 -0600
-Message-ID: <4CF9BB65.2010307@samba.org>
+Date: Sat, 4 Dec 2010 09:13:21 +0100
+Message-ID: <E1POnFL-00BKg9-JW@intern.SerNet.DE>
 References: <20101203212811.17594274@tlielax.poochiereds.net>
+	<4CF9BB65.2010307@samba.org>
+Reply-To: Volker.Lendecke@SerNet.DE
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101203212811.17594274-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-cifs@vger.kernel.org, cifs-protocol@samba.org,
+	samba-technical@lists.samba.org
+To: "Christopher R. Hertel" <crh@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+Date: Sat, 4 Dec 2010 09:13:21 +0100
+Content-Disposition: inline
+In-Reply-To: <4CF9BB65.2010307@samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-Jeff Layton wrote:
-:
-:
-> Timeouts:
-> =========
-> It's tempting to think of SMB as being very similar to NFS/RPC, but
-> when it comes to low-level transport, there are significant
-> differences. ONC-RPC was designed for connectionless transports and has
-> the concept of a retransmission. SMB however does not -- it was
-> originally layered on NetBIOS sessions and so has always been assumed
-> to run on a connection-based transport.
+On Fri, Dec 03, 2010 at 09:54:13PM -0600, Christopher R. Hertel wrote:
+> That may seem to be in the "who cares" category, since those old transports
+> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
+> the code to handle the old transports is still there in Windows, so there
+> are behaviors -- things like the timeouts you're talking about and the weird
+> VC=0 shutdown behvior -- that exist because of these old disused transports.
 
-...with the exception of the Direct Hosted IPX transport.  IPX is
-connectionless.  In order to accommodate this connectionless transport, SMB
-was actually modified (slightly).
+VC=0, how does Windows treat this facing NAT (masquerading)
+networks? I've done tests in the past where Windows killed
+valid connections from behind a NAT box when a new client
+came in.
 
-That may seem to be in the "who cares" category, since those old transports
-are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
-the code to handle the old transports is still there in Windows, so there
-are behaviors -- things like the timeouts you're talking about and the weird
-VC=0 shutdown behvior -- that exist because of these old disused transports.
-
-Ugh.  Eh?
-
-Chris -)-----
-
--- 
-"Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
-Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
-jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, uninq.
-ubiqx Team -- http://www.ubiqx.org/     -)-----   crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org
-OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh-zuGDro9SezXYtjvyW6yDsg@public.gmane.org
+Volker
