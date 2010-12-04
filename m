@@ -1,34 +1,58 @@
-From: Volker Lendecke <Volker.Lendecke@SerNet.DE>
-Subject: Re: cifs client timeouts and hard/soft mounts
-Date: Sat, 4 Dec 2010 09:12:04 +0100
-Message-ID: <E1POnFL-00BKfp-6h@intern.SerNet.DE>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
+Date: Sat, 4 Dec 2010 06:28:37 -0500
+Message-ID: <20101204062837.55cb13a2@tlielax.poochiereds.net>
 References: <20101203212811.17594274@tlielax.poochiereds.net>
-Reply-To: Volker.Lendecke@SerNet.DE
+	<4CF9BB65.2010307@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, cifs-protocol@samba.org,
-	samba-technical@lists.samba.org
-To: Jeff Layton <jlayton@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-Date: Sat, 4 Dec 2010 09:12:04 +0100
-Content-Disposition: inline
-In-Reply-To: <20101203212811.17594274@tlielax.poochiereds.net>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4CF9BB65.2010307-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Dec 03, 2010 at 09:28:11PM -0500, Jeff Layton wrote:
-> So, what does this mean for CIFS clients? I believe that the best
-> behavior for the client is to *never* time out an individual request,
-> aside from SMB echoes.
+On Fri, 03 Dec 2010 21:54:13 -0600
+"Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-I like this concept.
+> Jeff Layton wrote:
+> :
+> :
+> > Timeouts:
+> > =========
+> > It's tempting to think of SMB as being very similar to NFS/RPC, but
+> > when it comes to low-level transport, there are significant
+> > differences. ONC-RPC was designed for connectionless transports and has
+> > the concept of a retransmission. SMB however does not -- it was
+> > originally layered on NetBIOS sessions and so has always been assumed
+> > to run on a connection-based transport.
+> 
+> ...with the exception of the Direct Hosted IPX transport.  IPX is
+> connectionless.  In order to accommodate this connectionless transport, SMB
+> was actually modified (slightly).
+> 
+> That may seem to be in the "who cares" category, since those old transports
+> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
+> the code to handle the old transports is still there in Windows, so there
+> are behaviors -- things like the timeouts you're talking about and the weird
+> VC=0 shutdown behvior -- that exist because of these old disused transports.
+> 
+> Ugh.  Eh?
+> 
 
-Volker
+Yeah, Direct Hosted IPX is a lot more like NFS/RPC. MS essentially
+shoehorned in a way to do request retransmissions. It's a pretty
+impressive kludge! I suppose we could theorize that that legacy is why
+Windows times out individual requests so aggressively, but maybe there
+are other design concerns behind that behavior.
+
+In this case however it really is a "don't care" for us in Linux CIFS
+land since we have never implemented it on top of IPX or any other
+non-connected transport and have no plans to do so.
+
+Thanks,
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
