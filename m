@@ -1,78 +1,61 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: "Christopher R. Hertel" <crh@samba.org>
 Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
-Date: Sat, 4 Dec 2010 11:55:08 -0500
-Message-ID: <20101204115508.1c0038fd@corrin.poochiereds.net>
+Date: Sat, 04 Dec 2010 13:46:39 -0600
+Message-ID: <4CFA9A9F.1080208@samba.org>
 References: <20101203212811.17594274@tlielax.poochiereds.net>
-	<4CF9BB65.2010307@samba.org>
-	<E1POnFL-00BKg9-JW@intern.SerNet.DE>
-	<20101204064452.46ac24c7@tlielax.poochiereds.net>
-	<AANLkTinsm=b5Pezzo4m6Jbmq96EcYas4Hsw0nhxfb4m6@mail.gmail.com>
-	<20101204080942.42be63da@tlielax.poochiereds.net>
-	<AANLkTim45G=pLwznde8S_b=FGCnYyO29Tnokghs0qZ-y@mail.gmail.com>
-	<20101204092240.4724e1ff@corrin.poochiereds.net>
-	<AANLkTimN0F5KyM7r1+k3Y3Ki+kwQukAr4uXzRJuMVZtX@mail.gmail.com>
+	<4CF9BB65.2010307@samba.org> <E1POnFL-00BKg9-JW@intern.SerNet.DE>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org, "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimN0F5KyM7r1+k3Y3Ki+kwQukAr4uXzRJuMVZtX-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-cifs@vger.kernel.org, cifs-protocol@samba.org,
+	samba-technical@lists.samba.org
+To: Volker.Lendecke@SerNet.DE
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <E1POnFL-00BKg9-JW@intern.SerNet.DE>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sat, 4 Dec 2010 08:46:53 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
+Volker Lendecke wrote:
+> On Fri, Dec 03, 2010 at 09:54:13PM -0600, Christopher R. Hertel wrote:
+>> That may seem to be in the "who cares" category, since those old transports
+>> are essentially dead (much more dead than NBT, or even NBF).  Unfortunately,
+>> the code to handle the old transports is still there in Windows, so there
+>> are behaviors -- things like the timeouts you're talking about and the weird
+>> VC=0 shutdown behvior -- that exist because of these old disused transports.
 > 
-> Jeff, I am not sure.  Basically I am coming from here:
-> 
-> I have a bug open, where an SMB server when slow to respond
-> (for a cifs client), if cifs client reconnects, causes data corruption
-> on the server. If left to its own, responses from server eventually
-> make through (without any intervention) and tests pass.
-> 
+> VC=0, how does Windows treat this facing NAT (masquerading)
+> networks? I've done tests in the past where Windows killed
+> valid connections from behind a NAT box when a new client
+> came in.
 
-I have a very similar bug open and that's what prompted me to go down
-this road. You may want to test the patchset I proposed for cifs
-against your reproducer.
+I put a lot of info into [MS-CIFS] about how *and why* this works the way it
+does.  See [MS-CIFS] 2.1.3.  Unfortunately, since [MS-CIFS] applies only to
+W98, NT4, and earlier it doesn't tell you much about W2K and newer
+implementations.  There's a KB article that talks about the problem a
+little:  KB301673.
 
-> If an SMB server is unresponsive, how do we know it will respond to
-> a reconnect or a reconnect will help? 
->
-> I do not know enough about
-> SMB servers to describe an unresponsive server i.e. how and when
-> it came to be unresponsive, how it handles transport layer then,
-> whether it corrects itself or how to correct it, how it handles
-> underlying physical file sytem etc..
+I thought that there was a registry setting that would allow you to tell the
+Windows server NOT to close existing connections if it received a VC=0 from
+the same IP.  Even when working with Microsoft I wasn't able to find
+anything like that, beyond what's in that KB article.
 
-A reconnect may not help. The problem we have today however is that
-Linux CIFS client is too cavalier with reconnects. It reconnects
-the socket any time that a call has taken longer than an arbitrary
-timeout. It tries to deal with that by varying timeouts with the
-type of call, but I think that's a broken model that fails in many
-situations.
+Basically, they should give up on the VC=0 thing, since it's a throw-back to
+the days when OS/2 could run SMB over connectionless IPX transport over
+multiple modems in parallel.
 
-It's impossible to predict how long it'll take the server to service a
-particular call, as we can never be sure what the load on the
-server and underlying storage is. A QPathInfo call may take just as
-long as a write past EOF if the storage is being hammered.
-
-The scheme I'm proposing makes the assumption that even when the server
-is loaded, it'll still be able to respond to an echo. That may also
-fail in certain situations, but empirical evidence has shown that
-that it's generally true. This scheme won't fix every failure scenario,
-but it should help the vast majority of situations where the server is
-simply being slow to respond to a particular call.
-
-I'm not opposed to what you're proposing, but it seems like a more
-radical step than what I have proposed. We'd need to understand what
-recourse the user would have in practice and what the behavior will be
-in various failure scenarios. Leaving the processes hung and logging a
-message when the server isn't responding isn't going to be very helpful
-if there's nothing that can be done about it.
+Chris -)-----
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+"Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
+Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
+jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, uninq.
+ubiqx Team -- http://www.ubiqx.org/     -)-----   crh@ubiqx.mn.org
+OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh@ubiqx.org
