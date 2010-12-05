@@ -1,52 +1,106 @@
-From: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
-Date: Sat, 04 Dec 2010 14:17:41 -0600
-Message-ID: <4CFAA1E5.5010306@samba.org>
-References: <20101203212811.17594274@tlielax.poochiereds.net>	<4CF9BB65.2010307@samba.org>	<E1POnFL-00BKg9-JW@intern.SerNet.DE>	<20101204064452.46ac24c7@tlielax.poochiereds.net> <AANLkTinsm=b5Pezzo4m6Jbmq96EcYas4Hsw0nhxfb4m6@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Bernhard Walle <bernhard-X9USDgGjgfuzQB+pC5nmwQ@public.gmane.org>
+Subject: [PATCH] cifs: Add information about noserverino
+Date: Sun,  5 Dec 2010 18:07:35 +0100
+Message-ID: <1291568855-22604-1-git-send-email-bernhard@bwalle.de>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinsm=b5Pezzo4m6Jbmq96EcYas4Hsw0nhxfb4m6-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Shirish Pargaonkar wrote:
-:
-> Is SMB Echo command the only way to determine whether to reconnect or not?
+In my case I had the problem that 32 bit userspace applications in an
+amd64 environment was not able to list the directories of a CIFS-mounted
+share. The simple userspace code
 
-The SMB Echo can only be sent from the client to the server.  The server has
-no mechanism, within the SMB protocol, to "ping" the client.
+    int main(int argc, char *argv[])
+    {
+        DIR *dir;
+        struct dirent *dirent;
 
-The Echo is used by the client as a way to test whether it is the connection
-that has failed or if the server is simply taking a very long time to
-respond to a particular request.
+        if (!argv[1]) {
+            fprintf(stderr, "Usage: %s <directory>\n", argv[0]);
+            return -1;
+        }
 
-> The assumption here is SMB server is unresponsive.
-> There could be other circumstances on the server box (or even client
-> box) that are slowing down the SMB server responses such as slow
-> network, slow network stack, memory pressure etc.
+        dir = opendir(argv[1]);
+        if (!dir) {
+            perror("Unable to open directory");
+            return -1;
+        }
 
-Right.  So how do you know whether it is the transport connection or the SMB
-server that is having trouble?  In theory, the SMB server should answer the
-Echo right away, even if it is having other problems.
+        while ((dirent = readdir(dir)) != NULL)
+            puts(dirent->d_name);
 
-> So server could be fine all along and yet client would ask for reconnection!
+        closedir(dir);
 
-If the network is slow, that's a transport problem.  It's also why the 45
-second timeout value is adaptable.  See the earlier message in which I
-pointed to the sections in [MS-CIFS] that explain the 45 second timeout and
-point at the related KB articles.
+        return 0;
+    }
 
-Chris -)-----
+was sufficient to trigger the problem.
 
+I discovered that the problem was that the inodes were too large to fit
+in a 32 bit (unsigned long) integer, so the compat_filldir() function
+returned -EOVERFLOW.
+
+While that is okay it would have saved me a some hours of debugging if
+the message below would have appeared in my kernel log.
+
+The target was a Samba server (I guess) of a Buffalo LinkStation Duo
+with the unmodified vendor firmware 1.34.
+
+Signed-off-by: Bernhard Walle <bernhard-X9USDgGjgfuzQB+pC5nmwQ@public.gmane.org>
+---
+ fs/cifs/readdir.c |   23 +++++++++++++++++++----
+ 1 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index d5e591f..d979826 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -773,6 +773,7 @@ int cifs_readdir(struct file *file, void *direntry, filldir_t filldir)
+ 	char *tmp_buf = NULL;
+ 	char *end_of_smb;
+ 	unsigned int max_len;
++	int err;
+ 
+ 	xid = GetXid();
+ 
+@@ -783,17 +784,31 @@ int cifs_readdir(struct file *file, void *direntry, filldir_t filldir)
+ 
+ 	switch ((int) file->f_pos) {
+ 	case 0:
+-		if (filldir(direntry, ".", 1, file->f_pos,
+-		     file->f_path.dentry->d_inode->i_ino, DT_DIR) < 0) {
++		err = filldir(direntry, ".", 1, file->f_pos,
++		     file->f_path.dentry->d_inode->i_ino, DT_DIR);
++		if (err < 0) {
+ 			cERROR(1, "Filldir for current dir failed");
++			if (err == -EOVERFLOW) {
++				cERROR(1, "Server inodes are too large for 32 "
++						"bit userspace. You might "
++						"consider using 'noserverino' "
++						"mount option for this mount.");
++			}
+ 			rc = -ENOMEM;
+ 			break;
+ 		}
+ 		file->f_pos++;
+ 	case 1:
+-		if (filldir(direntry, "..", 2, file->f_pos,
+-		     file->f_path.dentry->d_parent->d_inode->i_ino, DT_DIR) < 0) {
++		err = filldir(direntry, "..", 2, file->f_pos,
++		     file->f_path.dentry->d_parent->d_inode->i_ino, DT_DIR);
++		if (err < 0) {
+ 			cERROR(1, "Filldir for parent dir failed");
++			if (err == -EOVERFLOW) {
++				cERROR(1, "Server inodes are too large for 32 "
++						"bit userspace. You might "
++						"consider using 'noserverino' "
++						"mount option for this mount.");
++			}
+ 			rc = -ENOMEM;
+ 			break;
+ 		}
 -- 
-"Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
-Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
-jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, uninq.
-ubiqx Team -- http://www.ubiqx.org/     -)-----   crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org
-OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh-zuGDro9SezXYtjvyW6yDsg@public.gmane.org
+1.7.3.2
