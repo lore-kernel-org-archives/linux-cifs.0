@@ -1,564 +1,65 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: linux-next: Tree for December 3 (cifs)
-Date: Mon, 6 Dec 2010 10:22:58 -0600
-Message-ID: <AANLkTinNnCONaFbcwdpVDkTrOkCf_C3tDUez7pazi3aX@mail.gmail.com>
-References: <20101203130440.9f89dd31.sfr@canb.auug.org.au>
-	<20101203094844.68f2bc40.randy.dunlap@oracle.com>
-	<20101206070956.GA5570@elte.hu>
-	<20101206073513.54ca2c71@tlielax.poochiereds.net>
-	<AANLkTimTFi6jji5wmnBTT25XYAXAhJYNY+YmqhW5McEC@mail.gmail.com>
-	<20101206105021.2b6bfc96@tlielax.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: remove bogus remapping of error in cifs_filldir()
+Date: Mon, 6 Dec 2010 10:26:08 -0600
+Message-ID: <AANLkTimT4HbYuaFUTtQup9PNka6XQzBoXmZytYjSk2Hj@mail.gmail.com>
+References: <1291623350-11347-1-git-send-email-sjayaraman@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101206105021.2b6bfc96-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1291623350-11347-1-git-send-email-sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Dec 6, 2010 at 9:50 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Mon, 6 Dec 2010 09:40:33 -0600
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Mon, Dec 6, 2010 at 2:15 AM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> w=
+rote:
 >
->> On Mon, Dec 6, 2010 at 6:35 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
->> > On Mon, 6 Dec 2010 08:09:56 +0100
->> > Ingo Molnar <mingo-X9Un+BFzKDI@public.gmane.org> wrote:
->> >
->> >>
->> >> * Randy Dunlap <randy.dunlap-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
->> >>
->> >> > On Fri, 3 Dec 2010 13:04:40 +1100 Stephen Rothwell wrote:
->> >> >
->> >> > > Hi all,
->> >> > >
->> >> > > Changes since 20101202:
->> >> >
->> >> >
->> >> > When CIFS_EXPERIMENTAL is not enabled:
->> >> >
->> >> > (.text+0xdf6c9): undefined reference to `get_cifs_acl'
->> >> >
->> >> > from fs/cifs/xattr.c:cifs_getxattr()
->> >> >
->> >> >
->> >> > CONFIG_CIFS=3Dy
->> >> > # CONFIG_CIFS_STATS is not set
->> >> > CONFIG_CIFS_WEAK_PW_HASH=3Dy
->> >> > # CONFIG_CIFS_UPCALL is not set
->> >> > CONFIG_CIFS_XATTR=3Dy
->> >> > CONFIG_CIFS_POSIX=3Dy
->> >> > # CONFIG_CIFS_DEBUG2 is not set
->> >> > # CONFIG_CIFS_DFS_UPCALL is not set
->> >> > CONFIG_CIFS_FSCACHE=3Dy
->> >> > CONFIG_CIFS_ACL=3Dy
->> >> > # CONFIG_CIFS_EXPERIMENTAL is not set
->> >>
->> >> And this build regression has been pushed upstream now, as of:
->> >>
->> >> =A0 =A08520eeaa1235: Merge git://git.kernel.org/pub/scm/linux/ker=
-nel/git/sfrench/cifs-2.6
->> >>
->> >> and it is triggering for me too:
->> >>
->> >> =A0 =A0fs/built-in.o: In function `cifs_getxattr':
->> >> =A0 =A0(.text+0xc518e): undefined reference to `get_cifs_acl'
->> >>
->> >> The regression got introduced by:
->> >>
->> >> =A0 =A0fbeba8bb16d7: cifs: Handle extended attribute name cifs_ac=
-l to generate cifs acl blob (try #4)
->> >>
->> >> Which introduced the new CIFS_ACL option.
->> >>
->> >> Thanks,
->> >>
->> >> =A0 =A0 =A0 Ingo
->> >
->> > Yeah, looks like this new Kconfig option depends on some code that=
-'s
->> > under the (much-overloaded) CIFS_EXPERIMENTAL Kconfig option. I th=
-ink
->> > this patch needs some rework. The simple fix would be to make it
->> > dependent on CIFS_EXPERIMENTAL, but that's rather icky since
->>
->> Making CONFIG_CIFS_ACL dependent on CONFIG_CIFS_EXPERIMENTAL
->> works
->>
->> =A0config CIFS_ACL
->> =A0 =A0 =A0 =A0 =A0 bool "Provide CIFS ACL support (EXPERIMENTAL)"
->> - =A0 =A0 =A0 =A0 depends on EXPERIMENTAL && CIFS_XATTR
->> + =A0 =A0 =A0 =A0 depends on CIFS_EXPERIMENTAL && CIFS_XATTR
->> =A0 =A0 =A0 =A0 =A0 help
->> =A0 =A0 =A0 =A0 =A0 =A0 Allows to fetch CIFS/NTFS ACL from the serve=
-r. =A0The DACL blob
->> =A0 =A0 =A0 =A0 =A0 =A0 is handed over to the application/caller.
->>
->> At the minimum function find_readable_file() and three functions
->> in cifssmb.c would not have to be in CIFS_EXPERIMENTAL.
->> And we would need to move some other cifs acl related functions
->> from under CIFS_ACL from CIFS_EXPERIMENTAL.
->>
+> As the FIXME points out correctly, now filldir() itself returns -EOVE=
+RFLOW if
+> it not possible to represent the inode number supplied by the filesys=
+tem in
+> the field provided by userspace.
 >
-> Ugh, let's not do that. CONFIG_CIFS_EXPERIMENTAL is like a box of
-> chocolates...when you enable it you just never know what you're going
-> to get...
->
-> I think the patch below is a better way to deal with this. It's large=
-r
-> than I would like to see at this point in the release cycle, but we
-> might as well fix it the right way.
->
-> I also have some other patches to clean up CONFIG_CIFS_EXPERIMENTAL,
-> but I'll send those along separately for 2.6.38.
->
-> Steve, if this looks good, I'll send it along to you as a "formal"
-> patch for inclusion via your tree.
->
-> -------------------[snip]---------------------
->
-> cifs: fix use of CONFIG_CIFS_ACL
->
-> Some of the code under CONFIG_CIFS_ACL is dependent upon code under
-> CONFIG_CIFS_EXPERIMENTAL, but the Kconfig options don't reflect that
-> dependency. Move more of the ACL code out from under
-> CONFIG_CIFS_EXPERIMENTAL and under CONFIG_CIFS_ACL.
->
-> Also move find_readable_file out from other any sort of Kconfig
-> option and make it a function normally compiled in.
->
-> Reported-by: Randy Dunlap <randy.dunlap-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 > ---
-> =A0fs/cifs/Makefile =A0 =A0| =A0 =A04 +-
-> =A0fs/cifs/cifsacl.c =A0 | =A0 =A03 -
-> =A0fs/cifs/cifsacl.h =A0 | =A0 =A04 -
-> =A0fs/cifs/cifsproto.h | =A0 =A02 -
-> =A0fs/cifs/cifssmb.c =A0 | =A0183 ++++++++++++++++++++++++++---------=
-----------------
-> =A0fs/cifs/file.c =A0 =A0 =A0| =A0 =A02 -
-> =A0fs/cifs/inode.c =A0 =A0 | =A0 =A08 +-
-> =A07 files changed, 99 insertions(+), 107 deletions(-)
+> =A0fs/cifs/readdir.c | =A0 12 ------------
+> =A01 files changed, 0 insertions(+), 12 deletions(-)
 >
-> diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-> index adefa60..43b19dd 100644
-> --- a/fs/cifs/Makefile
-> +++ b/fs/cifs/Makefile
-> @@ -6,7 +6,9 @@ obj-$(CONFIG_CIFS) +=3D cifs.o
-> =A0cifs-y :=3D cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o=
- inode.o \
-> =A0 =A0 =A0 =A0 =A0link.o misc.o netmisc.o smbdes.o smbencrypt.o tran=
-sport.o asn1.o \
-> =A0 =A0 =A0 =A0 =A0md4.o md5.o cifs_unicode.o nterr.o xattr.o cifsenc=
-rypt.o \
-> - =A0 =A0 =A0 =A0 readdir.o ioctl.o sess.o export.o cifsacl.o
-> + =A0 =A0 =A0 =A0 readdir.o ioctl.o sess.o export.o
-> +
-> +cifs-$(CONFIG_CIFS_ACL) +=3D cifsacl.o
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index 32d300e..a73eb9f 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -759,18 +759,6 @@ static int cifs_filldir(char *pfindEntry, struct=
+ file *file, filldir_t filldir,
+> =A0 =A0 =A0 =A0rc =3D filldir(direntry, qstring.name, qstring.len, fi=
+le->f_pos,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ino, fattr.cf_dtype);
 >
-> =A0cifs-$(CONFIG_CIFS_UPCALL) +=3D cifs_spnego.o
->
-> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> index c6ebea0..a437ec3 100644
-> --- a/fs/cifs/cifsacl.c
-> +++ b/fs/cifs/cifsacl.c
-> @@ -30,8 +30,6 @@
-> =A0#include "cifs_debug.h"
->
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> -
-> =A0static struct cifs_wksid wksidarr[NUM_WK_SIDS] =3D {
-> =A0 =A0 =A0 =A0{{1, 0, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0} }, "null u=
-ser"},
-> =A0 =A0 =A0 =A0{{1, 1, {0, 0, 0, 0, 0, 1}, {0, 0, 0, 0, 0} }, "nobody=
-"},
-> @@ -774,4 +772,3 @@ int mode_to_cifs_acl(struct inode *inode, const c=
-har *path, __u64 nmode)
->
+> - =A0 =A0 =A0 /*
+> - =A0 =A0 =A0 =A0* we can not return filldir errors to the caller sin=
+ce they are
+> - =A0 =A0 =A0 =A0* "normal" when the stat blocksize is too small - we=
+ return remapped
+> - =A0 =A0 =A0 =A0* error instead
+> - =A0 =A0 =A0 =A0*
+> - =A0 =A0 =A0 =A0* FIXME: This looks bogus. filldir returns -EOVERFLO=
+W in the above
+> - =A0 =A0 =A0 =A0* case already. Why should we be clobbering other er=
+rors from it?
+> - =A0 =A0 =A0 =A0*/
+> - =A0 =A0 =A0 if (rc) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "filldir rc =3D %d", rc);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EOVERFLOW;
+> - =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0dput(tmp_dentry);
 > =A0 =A0 =A0 =A0return rc;
 > =A0}
-> -#endif /* CONFIG_CIFS_EXPERIMENTAL */
-> diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
-> index 6c8096c..c4ae7d0 100644
-> --- a/fs/cifs/cifsacl.h
-> +++ b/fs/cifs/cifsacl.h
-> @@ -74,11 +74,7 @@ struct cifs_wksid {
-> =A0 =A0 =A0 =A0char sidname[SIDNAMELENGTH];
-> =A0} __attribute__((packed));
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> -
-> =A0extern int match_sid(struct cifs_sid *);
-> =A0extern int compare_sids(const struct cifs_sid *, const struct cifs=
-_sid *);
->
-> -#endif /* =A0CONFIG_CIFS_EXPERIMENTAL */
-> -
-> =A0#endif /* _CIFSACL_H */
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 38cdec9..cb65499 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -80,9 +80,7 @@ extern bool is_valid_oplock_break(struct smb_hdr *s=
-mb,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0st=
-ruct TCP_Server_Info *);
-> =A0extern bool is_size_safe_to_change(struct cifsInodeInfo *, __u64 e=
-of);
-> =A0extern struct cifsFileInfo *find_writable_file(struct cifsInodeInf=
-o *, bool);
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> =A0extern struct cifsFileInfo *find_readable_file(struct cifsInodeInf=
-o *, bool);
-> -#endif
-> =A0extern unsigned int smbCalcSize(struct smb_hdr *ptr);
-> =A0extern unsigned int smbCalcSize_LE(struct smb_hdr *ptr);
-> =A0extern int decode_negTokenInit(unsigned char *security_blob, int l=
-ength,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 0ef7c3a..d7957a3 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -2478,95 +2478,6 @@ querySymLinkRetry:
-> =A0}
->
-> =A0#ifdef CONFIG_CIFS_EXPERIMENTAL
-> -/* Initialize NT TRANSACT SMB into small smb request buffer.
-> - =A0 This assumes that all NT TRANSACTS that we init here have
-> - =A0 total parm and data under about 400 bytes (to fit in small cifs
-> - =A0 buffer size), which is the case so far, it easily fits. NB:
-> - =A0 =A0 =A0 Setup words themselves and ByteCount
-> - =A0 =A0 =A0 MaxSetupCount (size of returned setup area) and
-> - =A0 =A0 =A0 MaxParameterCount (returned parms size) must be set by =
-caller */
-> -static int
-> -smb_init_nttransact(const __u16 sub_command, const int setup_count,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const int parm_len, struct cifsT=
-conInfo *tcon,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0void **ret_buf)
-> -{
-> - =A0 =A0 =A0 int rc;
-> - =A0 =A0 =A0 __u32 temp_offset;
-> - =A0 =A0 =A0 struct smb_com_ntransact_req *pSMB;
-> -
-> - =A0 =A0 =A0 rc =3D small_smb_init(SMB_COM_NT_TRANSACT, 19 + setup_c=
-ount, tcon,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (void *=
-*)&pSMB);
-> - =A0 =A0 =A0 if (rc)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
-> - =A0 =A0 =A0 *ret_buf =3D (void *)pSMB;
-> - =A0 =A0 =A0 pSMB->Reserved =3D 0;
-> - =A0 =A0 =A0 pSMB->TotalParameterCount =3D cpu_to_le32(parm_len);
-> - =A0 =A0 =A0 pSMB->TotalDataCount =A0=3D 0;
-> - =A0 =A0 =A0 pSMB->MaxDataCount =3D cpu_to_le32((tcon->ses->server->=
-maxBuf -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 MAX_CIFS_HDR_SIZE) & 0xFFFFFF00);
-> - =A0 =A0 =A0 pSMB->ParameterCount =3D pSMB->TotalParameterCount;
-> - =A0 =A0 =A0 pSMB->DataCount =A0=3D pSMB->TotalDataCount;
-> - =A0 =A0 =A0 temp_offset =3D offsetof(struct smb_com_ntransact_req, =
-Parms) +
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (setup_count * 2) - 4 /=
-* for rfc1001 length itself */;
-> - =A0 =A0 =A0 pSMB->ParameterOffset =3D cpu_to_le32(temp_offset);
-> - =A0 =A0 =A0 pSMB->DataOffset =3D cpu_to_le32(temp_offset + parm_len=
-);
-> - =A0 =A0 =A0 pSMB->SetupCount =3D setup_count; /* no need to le conv=
-ert byte fields */
-> - =A0 =A0 =A0 pSMB->SubCommand =3D cpu_to_le16(sub_command);
-> - =A0 =A0 =A0 return 0;
-> -}
-> -
-> -static int
-> -validate_ntransact(char *buf, char **ppparm, char **ppdata,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 *pparmlen, __u32 *pdatalen=
-)
-> -{
-> - =A0 =A0 =A0 char *end_of_smb;
-> - =A0 =A0 =A0 __u32 data_count, data_offset, parm_count, parm_offset;
-> - =A0 =A0 =A0 struct smb_com_ntransact_rsp *pSMBr;
-> -
-> - =A0 =A0 =A0 *pdatalen =3D 0;
-> - =A0 =A0 =A0 *pparmlen =3D 0;
-> -
-> - =A0 =A0 =A0 if (buf =3D=3D NULL)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> -
-> - =A0 =A0 =A0 pSMBr =3D (struct smb_com_ntransact_rsp *)buf;
-> -
-> - =A0 =A0 =A0 /* ByteCount was converted from little endian in SendRe=
-ceive */
-> - =A0 =A0 =A0 end_of_smb =3D 2 /* sizeof byte count */ + pSMBr->ByteC=
-ount +
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (char *)&pSMBr->ByteCou=
-nt;
-> -
-> - =A0 =A0 =A0 data_offset =3D le32_to_cpu(pSMBr->DataOffset);
-> - =A0 =A0 =A0 data_count =3D le32_to_cpu(pSMBr->DataCount);
-> - =A0 =A0 =A0 parm_offset =3D le32_to_cpu(pSMBr->ParameterOffset);
-> - =A0 =A0 =A0 parm_count =3D le32_to_cpu(pSMBr->ParameterCount);
-> -
-> - =A0 =A0 =A0 *ppparm =3D (char *)&pSMBr->hdr.Protocol + parm_offset;
-> - =A0 =A0 =A0 *ppdata =3D (char *)&pSMBr->hdr.Protocol + data_offset;
-> -
-> - =A0 =A0 =A0 /* should we also check that parm and data areas do not=
- overlap? */
-> - =A0 =A0 =A0 if (*ppparm > end_of_smb) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parms start after end of smb")=
-;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> - =A0 =A0 =A0 } else if (parm_count + *ppparm > end_of_smb) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parm end after end of smb");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> - =A0 =A0 =A0 } else if (*ppdata > end_of_smb) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "data starts after end of smb")=
-;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> - =A0 =A0 =A0 } else if (data_count + *ppdata > end_of_smb) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "data %p + count %d (%p) past s=
-mb end %p start %p",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 *ppdata, data_count, (d=
-ata_count + *ppdata),
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 end_of_smb, pSMBr);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> - =A0 =A0 =A0 } else if (parm_count + data_count > pSMBr->ByteCount) =
-{
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parm count and data count larg=
-er than SMB");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> - =A0 =A0 =A0 }
-> - =A0 =A0 =A0 *pdatalen =3D data_count;
-> - =A0 =A0 =A0 *pparmlen =3D parm_count;
-> - =A0 =A0 =A0 return 0;
-> -}
-> -
-> =A0int
-> =A0CIFSSMBQueryReparseLinkInfo(const int xid, struct cifsTconInfo *tc=
-on,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const unsigned char *s=
-earchName,
-> @@ -3056,7 +2967,97 @@ GetExtAttrOut:
->
-> =A0#endif /* CONFIG_POSIX */
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> +#ifdef CONFIG_CIFS_ACL
-> +/*
-> + * Initialize NT TRANSACT SMB into small smb request buffer. =A0This=
- assumes that
-> + * all NT TRANSACTS that we init here have total parm and data under=
- about 400
-> + * bytes (to fit in small cifs buffer size), which is the case so fa=
-r, it
-> + * easily fits. NB: Setup words themselves and ByteCount MaxSetupCou=
-nt (size of
-> + * returned setup area) and MaxParameterCount (returned parms size) =
-must be set
-> + * by caller
-> + */
-> +static int
-> +smb_init_nttransact(const __u16 sub_command, const int setup_count,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const int parm_len, struct cifsT=
-conInfo *tcon,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0void **ret_buf)
-> +{
-> + =A0 =A0 =A0 int rc;
-> + =A0 =A0 =A0 __u32 temp_offset;
-> + =A0 =A0 =A0 struct smb_com_ntransact_req *pSMB;
-> +
-> + =A0 =A0 =A0 rc =3D small_smb_init(SMB_COM_NT_TRANSACT, 19 + setup_c=
-ount, tcon,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (void *=
-*)&pSMB);
-> + =A0 =A0 =A0 if (rc)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
-> + =A0 =A0 =A0 *ret_buf =3D (void *)pSMB;
-> + =A0 =A0 =A0 pSMB->Reserved =3D 0;
-> + =A0 =A0 =A0 pSMB->TotalParameterCount =3D cpu_to_le32(parm_len);
-> + =A0 =A0 =A0 pSMB->TotalDataCount =A0=3D 0;
-> + =A0 =A0 =A0 pSMB->MaxDataCount =3D cpu_to_le32((tcon->ses->server->=
-maxBuf -
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 MAX_CIFS_HDR_SIZE) & 0xFFFFFF00);
-> + =A0 =A0 =A0 pSMB->ParameterCount =3D pSMB->TotalParameterCount;
-> + =A0 =A0 =A0 pSMB->DataCount =A0=3D pSMB->TotalDataCount;
-> + =A0 =A0 =A0 temp_offset =3D offsetof(struct smb_com_ntransact_req, =
-Parms) +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (setup_count * 2) - 4 /=
-* for rfc1001 length itself */;
-> + =A0 =A0 =A0 pSMB->ParameterOffset =3D cpu_to_le32(temp_offset);
-> + =A0 =A0 =A0 pSMB->DataOffset =3D cpu_to_le32(temp_offset + parm_len=
-);
-> + =A0 =A0 =A0 pSMB->SetupCount =3D setup_count; /* no need to le conv=
-ert byte fields */
-> + =A0 =A0 =A0 pSMB->SubCommand =3D cpu_to_le16(sub_command);
-> + =A0 =A0 =A0 return 0;
-> +}
-> +
-> +static int
-> +validate_ntransact(char *buf, char **ppparm, char **ppdata,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 *pparmlen, __u32 *pdatalen=
-)
-> +{
-> + =A0 =A0 =A0 char *end_of_smb;
-> + =A0 =A0 =A0 __u32 data_count, data_offset, parm_count, parm_offset;
-> + =A0 =A0 =A0 struct smb_com_ntransact_rsp *pSMBr;
-> +
-> + =A0 =A0 =A0 *pdatalen =3D 0;
-> + =A0 =A0 =A0 *pparmlen =3D 0;
-> +
-> + =A0 =A0 =A0 if (buf =3D=3D NULL)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> +
-> + =A0 =A0 =A0 pSMBr =3D (struct smb_com_ntransact_rsp *)buf;
-> +
-> + =A0 =A0 =A0 /* ByteCount was converted from little endian in SendRe=
-ceive */
-> + =A0 =A0 =A0 end_of_smb =3D 2 /* sizeof byte count */ + pSMBr->ByteC=
-ount +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (char *)&pSMBr->ByteCou=
-nt;
-> +
-> + =A0 =A0 =A0 data_offset =3D le32_to_cpu(pSMBr->DataOffset);
-> + =A0 =A0 =A0 data_count =3D le32_to_cpu(pSMBr->DataCount);
-> + =A0 =A0 =A0 parm_offset =3D le32_to_cpu(pSMBr->ParameterOffset);
-> + =A0 =A0 =A0 parm_count =3D le32_to_cpu(pSMBr->ParameterCount);
-> +
-> + =A0 =A0 =A0 *ppparm =3D (char *)&pSMBr->hdr.Protocol + parm_offset;
-> + =A0 =A0 =A0 *ppdata =3D (char *)&pSMBr->hdr.Protocol + data_offset;
-> +
-> + =A0 =A0 =A0 /* should we also check that parm and data areas do not=
- overlap? */
-> + =A0 =A0 =A0 if (*ppparm > end_of_smb) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parms start after end of smb")=
-;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> + =A0 =A0 =A0 } else if (parm_count + *ppparm > end_of_smb) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parm end after end of smb");
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> + =A0 =A0 =A0 } else if (*ppdata > end_of_smb) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "data starts after end of smb")=
-;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> + =A0 =A0 =A0 } else if (data_count + *ppdata > end_of_smb) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "data %p + count %d (%p) past s=
-mb end %p start %p",
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 *ppdata, data_count, (d=
-ata_count + *ppdata),
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 end_of_smb, pSMBr);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> + =A0 =A0 =A0 } else if (parm_count + data_count > pSMBr->ByteCount) =
-{
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parm count and data count larg=
-er than SMB");
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> + =A0 =A0 =A0 }
-> + =A0 =A0 =A0 *pdatalen =3D data_count;
-> + =A0 =A0 =A0 *pparmlen =3D parm_count;
-> + =A0 =A0 =A0 return 0;
-> +}
-> +
 
-Jeff, comment being, functions smb_nt_transact and validate_nttransact
-although used by only cifs acl related functions, probably were not mea=
-nt
-to be limited to CIFS_ACL config option code, I think they existed even
-before cifs acl code came into existence, not 100% sure.
+Makes sense - Any objections to pushing this upstream now.
 
-> =A0/* Get Security Descriptor (by handle) from remote server for a fi=
-le or dir */
-> =A0int
-> =A0CIFSSMBGetCIFSACL(const int xid, struct cifsTconInfo *tcon, __u16 =
-fid,
-> @@ -3214,7 +3215,7 @@ setCifsAclRetry:
-> =A0 =A0 =A0 =A0return (rc);
-> =A0}
->
-> -#endif /* CONFIG_CIFS_EXPERIMENTAL */
-> +#endif /* CONFIG_CIFS_ACL */
->
-> =A0/* Legacy Query Path Information call for lookup to old servers su=
-ch
-> =A0 =A0as Win9x/WinME */
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index b857ce5..5a28660 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1108,7 +1108,6 @@ static ssize_t cifs_write(struct cifsFileInfo *=
-open_file,
-> =A0 =A0 =A0 =A0return total_written;
-> =A0}
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> =A0struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs=
-_inode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0bool fsuid_only)
-> =A0{
-> @@ -1142,7 +1141,6 @@ struct cifsFileInfo *find_readable_file(struct =
-cifsInodeInfo *cifs_inode,
-> =A0 =A0 =A0 =A0spin_unlock(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0return NULL;
-> =A0}
-> -#endif
->
-> =A0struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs=
-_inode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0bool fsuid_only)
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 0023146..10d1cab 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -687,7 +687,7 @@ int cifs_get_inode_info(struct inode **pinode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "cifs_sfu_type=
- failed: %d", tmprc);
-> =A0 =A0 =A0 =A0}
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> +#ifdef CONFIG_CIFS_ACL
-> =A0 =A0 =A0 =A0/* fill in 0777 bits from ACL */
-> =A0 =A0 =A0 =A0if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D cifs_acl_to_fattr(cifs_sb, &fat=
-tr, *pinode, full_path,
-> @@ -698,7 +698,7 @@ int cifs_get_inode_info(struct inode **pinode,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto cgii_exit;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0}
-> -#endif
-> +#endif /* CONFIG_CIFS_ACL */
->
-> =A0 =A0 =A0 =A0/* fill in remaining high mode bits e.g. SUID, VTX */
-> =A0 =A0 =A0 =A0if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL)
-> @@ -2128,7 +2128,7 @@ cifs_setattr_nounix(struct dentry *direntry, st=
-ruct iattr *attrs)
->
-> =A0 =A0 =A0 =A0if (attrs->ia_valid & ATTR_MODE) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D 0;
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> +#ifdef CONFIG_CIFS_ACL
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifs_sb->mnt_cifs_flags & CIFS_MOU=
-NT_CIFS_ACL) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D mode_to_cifs_ac=
-l(inode, full_path, mode);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc) {
-> @@ -2137,7 +2137,7 @@ cifs_setattr_nounix(struct dentry *direntry, st=
-ruct iattr *attrs)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto c=
-ifs_setattr_exit;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
-> -#endif
-> +#endif /* CONFIG_CIFS_ACL */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (((mode & S_IWUGO) =3D=3D 0) &&
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(cifsInode->cifsAttrs & ATTR_R=
-EADONLY) =3D=3D 0) {
->
-> --
-> 1.7.3.2
->
->
+--
+Thanks,
+
+Steve
