@@ -1,84 +1,60 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove bogus remapping of error in cifs_filldir()
-Date: Mon, 6 Dec 2010 11:54:01 -0600
-Message-ID: <AANLkTin5DhDxxKq8RC2zc7pFTDjFdSzEyE4K=T1NPvQM@mail.gmail.com>
-References: <1291623350-11347-1-git-send-email-sjayaraman@suse.de>
-	<AANLkTimT4HbYuaFUTtQup9PNka6XQzBoXmZytYjSk2Hj@mail.gmail.com>
-	<20101206124823.33522ed9@tlielax.poochiereds.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 3/6] CIFS: Make write call work with strict cache mode
+ (try #2)
+Date: Mon, 6 Dec 2010 20:55:13 +0300
+Message-ID: <AANLkTimO8NdAjEREnW49Pk_0bRHQMKX52ou6B045JXcY@mail.gmail.com>
+References: <1290931972-2770-1-git-send-email-piastryyy@gmail.com>
+	<1290931972-2770-4-git-send-email-piastryyy@gmail.com>
+	<20101128063604.7d9cdded@tlielax.poochiereds.net>
+	<20101128065100.51c8a404@tlielax.poochiereds.net>
+	<AANLkTimO9t_wXPZRWXx856-wkG-EwRWTizrCKSo4e2SY@mail.gmail.com>
+	<20101129063713.0b71ac09@tlielax.poochiereds.net>
+	<4CF39901.3010108@suse.de>
+	<AANLkTimvA08MT5gcy=h_w6UtcTgyvos4X4x+KUTVbM8u@mail.gmail.com>
+	<4CF3D3D9.3060500@suse.de>
+	<AANLkTikB6_nwg+G+pYv9NNeohHPwymjUkv3r-mJkZBxW@mail.gmail.com>
+	<4CF61979.5080505@suse.de>
+	<AANLkTik1AC5YJV_CtihSobE1mgj1-7tuiBLf7_nDsiv2@mail.gmail.com>
+	<4CFCCE17.2010108@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101206124823.33522ed9-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <4CFCCE17.2010108-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Dec 6, 2010 at 11:48 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Mon, 6 Dec 2010 10:26:08 -0600
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Mon, Dec 6, 2010 at 2:15 AM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org=
-> wrote:
->> >
->> > As the FIXME points out correctly, now filldir() itself returns -E=
-OVERFLOW if
->> > it not possible to represent the inode number supplied by the file=
-system in
->> > the field provided by userspace.
->> >
->> > Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
->> > ---
->> > =A0fs/cifs/readdir.c | =A0 12 ------------
->> > =A01 files changed, 0 insertions(+), 12 deletions(-)
->> >
->> > diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
->> > index 32d300e..a73eb9f 100644
->> > --- a/fs/cifs/readdir.c
->> > +++ b/fs/cifs/readdir.c
->> > @@ -759,18 +759,6 @@ static int cifs_filldir(char *pfindEntry, str=
-uct file *file, filldir_t filldir,
->> > =A0 =A0 =A0 =A0rc =3D filldir(direntry, qstring.name, qstring.len,=
- file->f_pos,
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ino, fattr.cf_dtype);
->> >
->> > - =A0 =A0 =A0 /*
->> > - =A0 =A0 =A0 =A0* we can not return filldir errors to the caller =
-since they are
->> > - =A0 =A0 =A0 =A0* "normal" when the stat blocksize is too small -=
- we return remapped
->> > - =A0 =A0 =A0 =A0* error instead
->> > - =A0 =A0 =A0 =A0*
->> > - =A0 =A0 =A0 =A0* FIXME: This looks bogus. filldir returns -EOVER=
-=46LOW in the above
->> > - =A0 =A0 =A0 =A0* case already. Why should we be clobbering other=
- errors from it?
->> > - =A0 =A0 =A0 =A0*/
->> > - =A0 =A0 =A0 if (rc) {
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "filldir rc =3D %d", rc);
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EOVERFLOW;
->> > - =A0 =A0 =A0 }
->> > =A0 =A0 =A0 =A0dput(tmp_dentry);
->> > =A0 =A0 =A0 =A0return rc;
->> > =A0}
+2010/12/6 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
+> On 12/01/2010 10:09 PM, Pavel Shilovsky wrote:
+>> 2010/12/1 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
+>>>
+>>> I just applied your patches on my test box, but I see that the fscache
+>>> integration is not done, yet. Am I seeing older version of patches?
 >>
->> Makes sense - Any objections to pushing this upstream now.
+>> What do you mean for "fscache integration"? I changed all
+>> invalidate_inode_* calls to cifs_invalidate_mapping or setting
+>> invalid_mapping flag - so, it seems to me that I don't miss places
+>> where I affect cache but don't aware of fscache
+>> (cifs_invalidate_mapping process fscache as well). Of course, it can
+>> be - so, could you point me to such places, please?
 >>
 >
-> No objection, but if you're going to take this, then please also take
-> the three patches I sent on 11/22.
+> Sorry about the delay in getting back. You're right the patches are
+> taking care of relinquishing the cookies wherever appropriate.
+> I have done some testing with both 'strictcache' and 'fsc' enabled and
+> so far they work as expected. The tests involve doing file operations
+> with fsc enabled always but strict cache enabled/disabled and watching
+> fscache statistics via /proc/fs/fscache/stats). I didn't encounter any
+> unexpected results.
 
-(and perhaps the fourth one, the RFC1001 name clean-up patch also?)
+Thank you very much for this testing!
 
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+Jeff, Suresh, as we have the good results on strict cache + fscache
+and reviewed patch number 1 (cifsFileInfo_put part), could you review
+other patches: 2) read (try #4), 3) write (try #4), 4) fsync (try #3),
+5) mmap (try #3) and 6) mount option (try #2) please?
+
+-- 
+Best regards,
+Pavel Shilovsky.
