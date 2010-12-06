@@ -1,73 +1,56 @@
-From: "Christopher R. Hertel" <crh@samba.org>
-Subject: Re: cifs client timeouts and hard/soft mounts
-Date: Mon, 06 Dec 2010 11:01:12 -0600
-Message-ID: <4CFD16D8.4090207@samba.org>
-References: <20101203212811.17594274@tlielax.poochiereds.net>	<E1POnFL-00BKfp-6h@intern.SerNet.DE>	<AANLkTi=MCgZb=we2OEtxJ4DZ==sVmRLd8aQKeMU7vvKt@mail.gmail.com>	<20101205210634.602b076b@corrin.poochiereds.net>	<AANLkTik4Vh5hqWwVngjCC7v1ST1YxAP9LvQbcqKDhWHp@mail.gmail.com>	<E1PPSnw-00DDbs-Va@intern.SerNet.DE>
-	<AANLkTinPw8M6XaMvMQ_VMxdk7j8PDqdpjzKLgDMxPf1n@mail.gmail.com>
+From: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
+Date: Mon, 06 Dec 2010 11:06:42 -0600
+Message-ID: <4CFD1822.70703@samba.org>
+References: <20101203212811.17594274@tlielax.poochiereds.net>	<E1POnFL-00BKfp-6h@intern.SerNet.DE>	<AANLkTi=MCgZb=we2OEtxJ4DZ==sVmRLd8aQKeMU7vvKt@mail.gmail.com>	<20101205210634.602b076b@corrin.poochiereds.net>	<AANLkTik4Vh5hqWwVngjCC7v1ST1YxAP9LvQbcqKDhWHp@mail.gmail.com>	<E1PPSnw-00DDbs-Va@intern.SerNet.DE>	<AANLkTinPw8M6XaMvMQ_VMxdk7j8PDqdpjzKLgDMxPf1n@mail.gmail.com> <1291654155.3167.6.camel@pico.li.ssimo.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, Volker.Lendecke@sernet.de,
-	cifs-protocol@samba.org, samba-technical@lists.samba.org
-To: Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <AANLkTinPw8M6XaMvMQ_VMxdk7j8PDqdpjzKLgDMxPf1n@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org, cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1291654155.3167.6.camel-akOVU7JyYd8WIfilqQrPtNi2O/JbrIOy@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Steve,
+simo wrote:
+> On Mon, 2010-12-06 at 10:28 -0600, Steve French wrote:
+>> On Sun, Dec 5, 2010 at 10:34 PM, Volker Lendecke
+>> <Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org> wrote:
+>>> Hi!
+>>>
+>>> On Sun, Dec 05, 2010 at 08:16:46PM -0600, Steve French wrote:
+>>>> I am more worried about firewall rule changes and similar events
+>>>> than about broken servers - but the idea of waiting forever on stat
+>>>> to a server that is never going to respond seems odd.
+>>> That would be a strange fw rule that allows SMBEcho but not
+>>> other SMB requests. I think if someone puts up such a silly
+>>> rule, some pain is deserved :-)
+>> Aaah - remember the proxies that cut out "chatty" smb traffic by
+>> responding on behalf of remote servers in the interest of optimizing
+>> traffic over slow links :)
+> 
+> They better send their own smb echos to remote servers then ...
 
-I've done a lot of consulting work for companies that create this sort of
-proxy.  Companies like Peribit (now part of Juniper), FineGround (now part
-of Cisco), and Certeon (now part of history, I think).
+The client-end proxy node is only interested in whether or not its peer node
+is up and running.  The peer node, at the server end of the link, should be
+responsible for knowing when the actual server is down.
 
-You are correct.  A WAN accelerator that does proxy caching might very well
-respond to an SMB Echo and various meta-data requests without actually
-sending those requests to the "real" server.  If the link is down, or if the
-real server is down, the proxy may still respond to some SMB messages.
+...but this goes back to my question.  How much responsibility does the
+Linux CIFS client have to ensure that the connection and server are both
+working properly, and how much responsibility falls to the WAN accelerator?
 
-To some extent, that is a problem inherent in the use of WAN accleration
-systems.
-
-Question (for which I do not have an answer):  How much work do you want to
-do to make their intentionally broken model work?
-
-WAN accelerators are actually cool technology.  I like them, but I also know
-(and most of the companies that make them know) that there are inherent
-problems when proxying SMB servers.
+I think it makes sense to do a little to mitigate WAN accelerator problems,
+but the CIFS client needs to be as generic as possible so that it works well
+in all environments.
 
 Chris -)-----
-
-Steve French wrote:
-> On Sun, Dec 5, 2010 at 10:34 PM, Volker Lendecke
-> <Volker.Lendecke@sernet.de> wrote:
->> Hi!
->>
->> On Sun, Dec 05, 2010 at 08:16:46PM -0600, Steve French wrote:
->>> I am more worried about firewall rule changes and similar events
->>> than about broken servers - but the idea of waiting forever on stat
->>> to a server that is never going to respond seems odd.
->> That would be a strange fw rule that allows SMBEcho but not
->> other SMB requests. I think if someone puts up such a silly
->> rule, some pain is deserved :-)
-> 
-> Aaah - remember the proxies that cut out "chatty" smb traffic by
-> responding on behalf of remote servers in the interest of optimizing
-> traffic over slow links :)
-> 
-> 
 
 -- 
 "Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
 Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
 jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, uninq.
-ubiqx Team -- http://www.ubiqx.org/     -)-----   crh@ubiqx.mn.org
-OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh@ubiqx.org
+ubiqx Team -- http://www.ubiqx.org/     -)-----   crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org
+OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh-zuGDro9SezXYtjvyW6yDsg@public.gmane.org
