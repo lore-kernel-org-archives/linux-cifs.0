@@ -1,57 +1,111 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Add information about noserverino
-Date: Mon, 6 Dec 2010 10:38:36 -0500
-Message-ID: <20101206103836.0714369a@tlielax.poochiereds.net>
-References: <1291568855-22604-1-git-send-email-bernhard@bwalle.de>
-	<20101206095725.78422138@tlielax.poochiereds.net>
-	<20101206101214.52a24415@tlielax.poochiereds.net>
-	<20101206163506.56232lqqhc5c3co4@webmail.df.eu>
+From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Subject: Re: linux-next: Tree for December 3 (cifs)
+Date: Mon, 6 Dec 2010 09:40:33 -0600
+Message-ID: <AANLkTimTFi6jji5wmnBTT25XYAXAhJYNY+YmqhW5McEC@mail.gmail.com>
+References: <20101203130440.9f89dd31.sfr@canb.auug.org.au>
+	<20101203094844.68f2bc40.randy.dunlap@oracle.com>
+	<20101206070956.GA5570@elte.hu>
+	<20101206073513.54ca2c71@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Bernhard Walle <bernhard-X9USDgGjgfuzQB+pC5nmwQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101206163506.56232lqqhc5c3co4-2RFepEojUI1937y/D5i71g@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Ingo Molnar <mingo@elte.hu>,
+	Randy Dunlap <randy.dunlap@oracle.com>,
+	Steve French <sfrench@samba.org>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+	linux-cifs@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20101206073513.54ca2c71@tlielax.poochiereds.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, 06 Dec 2010 16:35:06 +0100
-Bernhard Walle <bernhard-X9USDgGjgfuzQB+pC5nmwQ@public.gmane.org> wrote:
+On Mon, Dec 6, 2010 at 6:35 AM, Jeff Layton <jlayton@redhat.com> wrote:
+> On Mon, 6 Dec 2010 08:09:56 +0100
+> Ingo Molnar <mingo@elte.hu> wrote:
+>
+>>
+>> * Randy Dunlap <randy.dunlap@oracle.com> wrote:
+>>
+>> > On Fri, 3 Dec 2010 13:04:40 +1100 Stephen Rothwell wrote:
+>> >
+>> > > Hi all,
+>> > >
+>> > > Changes since 20101202:
+>> >
+>> >
+>> > When CIFS_EXPERIMENTAL is not enabled:
+>> >
+>> > (.text+0xdf6c9): undefined reference to `get_cifs_acl'
+>> >
+>> > from fs/cifs/xattr.c:cifs_getxattr()
+>> >
+>> >
+>> > CONFIG_CIFS=3Dy
+>> > # CONFIG_CIFS_STATS is not set
+>> > CONFIG_CIFS_WEAK_PW_HASH=3Dy
+>> > # CONFIG_CIFS_UPCALL is not set
+>> > CONFIG_CIFS_XATTR=3Dy
+>> > CONFIG_CIFS_POSIX=3Dy
+>> > # CONFIG_CIFS_DEBUG2 is not set
+>> > # CONFIG_CIFS_DFS_UPCALL is not set
+>> > CONFIG_CIFS_FSCACHE=3Dy
+>> > CONFIG_CIFS_ACL=3Dy
+>> > # CONFIG_CIFS_EXPERIMENTAL is not set
+>>
+>> And this build regression has been pushed upstream now, as of:
+>>
+>> =A0 =A08520eeaa1235: Merge git://git.kernel.org/pub/scm/linux/kernel=
+/git/sfrench/cifs-2.6
+>>
+>> and it is triggering for me too:
+>>
+>> =A0 =A0fs/built-in.o: In function `cifs_getxattr':
+>> =A0 =A0(.text+0xc518e): undefined reference to `get_cifs_acl'
+>>
+>> The regression got introduced by:
+>>
+>> =A0 =A0fbeba8bb16d7: cifs: Handle extended attribute name cifs_acl t=
+o generate cifs acl blob (try #4)
+>>
+>> Which introduced the new CIFS_ACL option.
+>>
+>> Thanks,
+>>
+>> =A0 =A0 =A0 Ingo
+>
+> Yeah, looks like this new Kconfig option depends on some code that's
+> under the (much-overloaded) CIFS_EXPERIMENTAL Kconfig option. I think
+> this patch needs some rework. The simple fix would be to make it
+> dependent on CIFS_EXPERIMENTAL, but that's rather icky since
 
-> 
-> Zitat von Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> 
-> >
-> > I'm still not sure I like this patch however. It potentially means a
-> > lot of printk spam since these things have no ratelimiting. It also
-> > doesn't tell me anything about which server might be giving me grief.
-> >
-> > Maybe this should be turned into a cFYI?
-> 
-> Well, if I see it in the kernel log, it doesn't matter if it's info or
-> something else.
-> 
-> > The bottom line though is that running 32-bit applications that were
-> > built without -D_FILE_OFFSET_BITS=64 on a 64-bit kernel is a very bad
-> > idea. It would be nice to be able to alert users that things aren't
-> > working the way they expect, but I'm not sure this is the right place
-> > to do that.
-> 
-> Well, but there *are* such application (in my case it was Softmaker Office
-> which is a proprietary word processor) and it's quite nice if you know
-> how you can workaround it when you encounter such a problem. That's all.
-> 
+Making CONFIG_CIFS_ACL dependent on CONFIG_CIFS_EXPERIMENTAL
+works
 
-Sure...but this problem is not limited to CIFS. Many modern filesystems
-use 64-bit inodes. Running this application on XFS or NFS for instance
-is likely to give you the same trouble. You just hit it on CIFS because
-the server happened to give you a very large inode number.
+ config CIFS_ACL
+          bool "Provide CIFS ACL support (EXPERIMENTAL)"
+-         depends on EXPERIMENTAL && CIFS_XATTR
++         depends on CIFS_EXPERIMENTAL && CIFS_XATTR
+          help
+            Allows to fetch CIFS/NTFS ACL from the server.  The DACL bl=
+ob
+            is handed over to the application/caller.
 
-If we're going to add printk's for this situation, it probably ought to
-be in a more generic place.
+At the minimum function find_readable_file() and three functions
+in cifssmb.c would not have to be in CIFS_EXPERIMENTAL.
+And we would need to move some other cifs acl related functions
+from under CIFS_ACL from CIFS_EXPERIMENTAL.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> CIFS_EXPERIMENTAL pulls in some rather broken stuff...
+>
+> --
+> Jeff Layton <jlayton@redhat.com>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
