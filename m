@@ -1,125 +1,133 @@
-From: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
-Subject: Re: [PATCH] cifs: allow calling cifs_build_path_to_root on incomplete
- cifs_sb
-Date: Mon, 06 Dec 2010 22:39:37 +0100
-Message-ID: <4CFD5819.60609@exx.nl>
-References: <20101206070846.1f2c35d4@tlielax.poochiereds.net>	<1291637703-10989-1-git-send-email-jlayton@redhat.com>	<4CFD35A2.7080407@exx.nl> <20101206143423.74d8e236@tlielax.poochiereds.net>
+From: "Carter, Joel" <JoelC-RAygmcqizRRkKYb1c3iuxNBPR1lH4CV8@public.gmane.org>
+Subject: Autofs cifs mounts via Kerberos
+Date: Mon, 6 Dec 2010 14:00:28 -0800
+Message-ID: <7A014DE1422A694A89BA2CE1F5692DF503831D00@niihau.lionsgate.ca>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101206143423.74d8e236-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Content-class: urn:content-classes:message
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hey Jeff,
+Hi there.
 
-This patch fixes the oops, and the remote DFS link is readable. Great!
+Note - cross-posted to autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org
 
-Thanks!
-Robbert
+I am putting the finishing touches on our AD/LDAP using autofs to mount
+home directories on a Red Hat 5 box. I have login authentication working
+great, using both traditional SSH authentication (Linux does
+authentication) and GSSAPI (passes Kerberos tickets directly) for
+single-sign-on. The problem is mounting the home directories. If this is
+the wrong list for this integration stuff let me know if you know of a
+better candidate.
 
-Op 6-12-2010 20:34, Jeff Layton schreef:
-> On Mon, 06 Dec 2010 20:12:34 +0100
-> Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org> wrote:
-> 
->> Hi Jeff,
->>
->> Op 6-12-2010 13:15, Jeff Layton schreef:
->>> It's possible that cifs_mount will call cifs_build_path_to_root on a
->>> newly instantiated cifs_sb. In that case, it's likely that the
->>> master_tlink pointer has not yet been instantiated.
->>>
->>> Fix this by having cifs_build_path_to_root take a cifsTconInfo pointer
->>> as well, and have the caller pass that in.
->>
->> I still get an oops on 2.6.37-rc4-git5 with the patch applied:
->>
->>  BUG: unable to handle kernel NULL pointer dereference at 0000001c
->>  IP: [<f8fd533b>] cifs_sb_master_tcon+0x3/0x7 [cifs]
->>  *pde = 00000000
->>  Oops: 0000 [#1] SMP
->>  last sysfs file: /sys/devices/virtual/bdi/cifs-2/uevent
->>  Modules linked in: hmac nls_utf8 cifs nls_base xfs exportfs loop
->> snd_pcm parport_pc parport tpm_tis tpm tpm_bios snd_timer snd soundcore
->> snd_page_alloc psmouse evdev pcspkr serio_raw i2c_piix4 i2c_core shpchp
->> container pci_hotplug processor thermal_sys ac button ext3 jbd mbcache
->> sd_mod crc_t10dif ide_cd_mod cdrom ata_generic ata_piix libata floppy
->> e1000 mptspi mptscsih mptbase scsi_transport_spi scsi_mod piix ide_core
->> [last unloaded: scsi_wait_scan]
->>
->>  Pid: 1362, comm: ls Not tainted 2.6.37-rc4-git5 #2 440BX Desktop
->> Reference Platform/VMware Virtual Platform
->>  EIP: 0060:[<f8fd533b>] EFLAGS: 00010286 CPU: 0
->>  EIP is at cifs_sb_master_tcon+0x3/0x7 [cifs]
->>  EAX: 00000000 EBX: f7156800 ECX: 40000040 EDX: 00000002
->>  ESI: f7156800 EDI: f7156a00 EBP: 00000000 ESP: f72fddb0
->>   DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
->>  Process ls (pid: 1362, ti=f72fc000 task=f71379e0 task.ti=f72fc000)
->>  Stack:
->>   f8fe14f3 002c80d0 00000000 f7156a00 f7156800 00000000 00000000 f8fcc96b
->>   0000007f f7156838 f5073d80 f50ac840 f8ff9f30 f8fcc7fd f522b000 c10b8301
->>   f50ac900 f5073d80 00000000 f50ac900 f50ac900 f72fded4 00000000 f8febc6f
->>  Call Trace:
->>   [<f8fe14f3>] ? cifs_root_iget+0x1e/0x13f [cifs]
->>   [<f8fcc96b>] ? cifs_do_mount+0x16e/0x247 [cifs]
->>   [<f8fcc7fd>] ? cifs_do_mount+0x0/0x247 [cifs]
->>   [<c10b8301>] ? vfs_kern_mount+0x9f/0x185
->>   [<f8febc6f>] ? cifs_dfs_follow_mountpoint+0x233/0x3cc [cifs]
->>   [<c10bec73>] ? do_follow_link+0xb6/0x1b1
->>   [<c10bf000>] ? link_path_walk+0x292/0x372
->>   [<c10bf1a2>] ? path_walk+0x4f/0xae
->>   [<c10bf2d3>] ? do_path_lookup+0x1f/0x69
->>   [<c10bfb70>] ? user_path_at+0x37/0x5f
->>   [<c1098af9>] ? vma_prio_tree_insert+0x17/0x2d
->>   [<c10b9981>] ? vfs_fstatat+0x2a/0x50
->>   [<c10b99e8>] ? vfs_lstat+0x13/0x15
->>   [<c10b99f9>] ? sys_lstat64+0xf/0x23
->>   [<c1052a04>] ? sys_futex+0xfe/0x112
->>   [<c10b500c>] ? filp_close+0x4e/0x54
->>   [<c127f54f>] ? do_page_fault+0x0/0x36b
->>   [<c1002f9f>] ? sysenter_do_call+0x12/0x28
->>  Code: c8 59 5f 39 ee 0f 8c 49 ff ff ff 8b 44 24 60 65 33 05 14 00 00 00
->> 74 05 e8 ef 9b 05 c8 83 c4 64 5b 5e 5f 5d c3 90 90 90 8b 40 08 <8b> 40
->> 1c c3 55 89 c5 83 3d a4 47 3b c1 00 57 89 d7 56 89 ce 53
->>  EIP: [<f8fd533b>] cifs_sb_master_tcon+0x3/0x7 [cifs] SS:ESP 0068:f72fddb0
->>  CR2: 000000000000001c
->>  ---[ end trace 61b6103d05293c43 ]---
->>
->> Regards,
->> Robbert
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Interesting...does this (untested) patch fix it? It may have to be "wiggled" into
-> place depending on your tree. If so, I'm surprised no one has tripped
-> over this before...
-> 
-> ----------------[snip]--------------------
-> 
-> cifs: fix check of error return from is_path_accessable
-> 
-> This function will return 0 if everything went ok.
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index bee397f..9fbe7c5 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2836,7 +2836,7 @@ remote_path_check:
->  			goto mount_fail_check;
->  		}
->  		rc = is_path_accessible(xid, tcon, cifs_sb, full_path);
-> -		if (rc != -EREMOTE) {
-> +		if (rc != 0 && rc != -EREMOTE) {
->  			kfree(full_path);
->  			goto mount_fail_check;
->  		}
+Here's my configuration:
+
+auto.master:
+/home_cifs /etc/auto.cifs --timeout=5
+
+auto.cifs:
+*
+-fstype=cifs,sec=krb5,user=&,uid=&,gid=lgtr,file_mode=0644,dir_mode=0755
+://smb.domain.local/userdata/&
+
+/etc/request-key.conf:
+...
+create  cifs.spnego * * /usr/sbin/cifs.upcall %k create  dns_resolver *
+* /usr/sbin/cifs.upcall %k
+
+/etc/pam.d/system-auth-ac:
+#%PAM-1.0
+# This file is auto-generated.
+# User changes will be destroyed the next time authconfig is run.
+auth        required      pam_env.so
+auth        sufficient    pam_unix.so nullok try_first_pass
+auth        sufficient    pam_krb5.so
+auth        requisite     pam_succeed_if.so uid >= 500 quiet
+auth        required      pam_deny.so
+
+account     required      pam_unix.so
+account     sufficient    pam_succeed_if.so uid < 500 quiet
+account     sufficient    pam_krb5.so
+account     required      pam_permit.so
+
+password    requisite     pam_cracklib.so try_first_pass retry=3
+password    sufficient    pam_unix.so md5 shadow nullok try_first_pass
+use_authtok
+password    required      pam_deny.so
+
+session     optional      pam_keyinit.so revoke
+session     required      pam_limits.so
+session     [success=1 default=ignore] pam_succeed_if.so service in
+crond quiet use_uid
+session     required      pam_unix.so
+
+/etc/pam.d/sshd
+#%PAM-1.0
+auth       include      system-auth
+account    required     pam_nologin.so
+account    include      system-auth
+password   include      system-auth
+session    optional     pam_keyinit.so force revoke
+session    include      system-auth
+session    required     pam_loginuid.so
+
+Every user has their unixHomeDirectory set to /home_cifs/<username>
+
+The mount doesn't seem to work on login but autofs is working. It works
+fine once logged in (most of the time but does fail sometimes as well)
+and I change the directory to the home:
+
+Dec  6 11:57:37 bilbo-rh5 cifs.upcall: key description:
+cifs.spnego;0;0;3f000000;ver=0x2;host=smb.domain.local;ip4=192.168.1.58;
+sec=mskrb5;uid=0x4e20;user=lguser
+Dec  6 11:57:37 bilbo-rh5 cifs.upcall: find_krb5_cc: considering
+/tmp/krb5cc_20000_BfIUPW5852 Dec  6 11:57:37 bilbo-rh5 cifs.upcall:
+find_krb5_cc: FILE:/tmp/krb5cc_20000_BfIUPW5852 is valid ccache Dec  6
+11:57:37 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service ticket
+for cifs/smb.domain.local Dec  6 11:57:37 bilbo-rh5 cifs.upcall:
+handle_krb5_mech: obtained service ticket Dec  6 11:57:37 bilbo-rh5
+automount[5642]: mount(generic): mounted
+//smb.domain.local/userdata/lguser type cifs on /home_cifs/lguser Dec  6
+11:57:37 bilbo-rh5 automount[5642]: mounted /home_cifs/lguser
+
+Klist shows this:
+12/06/10 12:06:55  12/06/10 21:17:32  cifs/smb.domain.local-Cx6ELD3zwl23NexWsGEg3A@public.gmane.org
+        renew until 12/06/10 22:06:55
+
+Then I can login without problem until automount expires the mount. When
+it doesn't work this is what is shown:
+
+Dec  6 11:59:09 bilbo-rh5 cifs.upcall: key description:
+cifs.spnego;0;0;3f000000;ver=0x2;host=smb.domain.local;ip4=192.168.1.58;
+sec=mskrb5;uid=0x4e20;user=lguser
+Dec  6 11:59:09 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service
+ticket for cifs/smb.domain.local Dec  6 11:59:09 bilbo-rh5 cifs.upcall:
+handle_krb5_mech: failed to obtain service ticket (-1765328189) Dec  6
+11:59:09 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service ticket
+for host/smb.domain.local Dec  6 11:59:09 bilbo-rh5 cifs.upcall:
+handle_krb5_mech: failed to obtain service ticket (-1765328189) Dec  6
+11:59:09 bilbo-rh5 kernel:  CIFS VFS: cifs_mount failed w/return code =
+-126 Dec  6 11:59:09 bilbo-rh5 automount[5642]: >> Refer to the
+mount.cifs(8) manual page (e.g. man mount.cifs) Dec  6 11:59:09
+bilbo-rh5 automount[5642]: mount(generic): failed to mount
+//smb.domain.local/userdata/lguser (type cifs) on /home_cifs/lguser Dec
+6 11:59:09 bilbo-rh5 automount[5642]: failed to mount /home_cifs/lguser
+
+I have wireshark traces as well for success and non-success.
+
+Any help is much appreciated, I'm almost there!
+
+Joel.
+
+
+ 
+Joel Carter 
+Senior Systems Administrator
+, , 
+Direct: (604) 320-7624   Cell: (604) 328-0672   Branch: (604) 320-7624
+Toll Free:    Fax:   
+trailerwizards.com
