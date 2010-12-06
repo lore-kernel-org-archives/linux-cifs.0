@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: linux-next: Tree for December 3 (cifs)
-Date: Mon, 6 Dec 2010 10:13:29 -0600
-Message-ID: <AANLkTi=25aSmAia3ADbi+Pmu4eNOLiRuYnhbBHnqZQgV@mail.gmail.com>
+Date: Mon, 6 Dec 2010 10:22:58 -0600
+Message-ID: <AANLkTinNnCONaFbcwdpVDkTrOkCf_C3tDUez7pazi3aX@mail.gmail.com>
 References: <20101203130440.9f89dd31.sfr@canb.auug.org.au>
 	<20101203094844.68f2bc40.randy.dunlap@oracle.com>
 	<20101206070956.GA5570@elte.hu>
@@ -11,14 +11,7 @@ References: <20101203130440.9f89dd31.sfr@canb.auug.org.au>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Ingo Molnar <mingo-X9Un+BFzKDI@public.gmane.org>,
-	Randy Dunlap <randy.dunlap-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>,
-	linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <20101206105021.2b6bfc96-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
@@ -469,6 +462,13 @@ er than SMB");
 > + =A0 =A0 =A0 return 0;
 > +}
 > +
+
+Jeff, comment being, functions smb_nt_transact and validate_nttransact
+although used by only cifs acl related functions, probably were not mea=
+nt
+to be limited to CIFS_ACL config option code, I think they existed even
+before cifs acl code came into existence, not 100% sure.
+
 > =A0/* Get Security Descriptor (by handle) from remote server for a fi=
 le or dir */
 > =A0int
@@ -562,6 +562,3 @@ EADONLY) =3D=3D 0) {
 > 1.7.3.2
 >
 >
-
-Jeff, patch looks good except I have one comment, I will state it
-that when the patch is posted on cifs mailing list.
