@@ -1,133 +1,60 @@
-From: "Carter, Joel" <JoelC-RAygmcqizRRkKYb1c3iuxNBPR1lH4CV8@public.gmane.org>
-Subject: Autofs cifs mounts via Kerberos
-Date: Mon, 6 Dec 2010 14:00:28 -0800
-Message-ID: <7A014DE1422A694A89BA2CE1F5692DF503831D00@niihau.lionsgate.ca>
+From: "Christopher R. Hertel" <crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [cifs-protocol] cifs client timeouts and hard/soft mounts
+Date: Mon, 06 Dec 2010 16:45:29 -0600
+Message-ID: <4CFD6789.10000@samba.org>
+References: <20101203212811.17594274@tlielax.poochiereds.net>	<E1POnFL-00BKfp-6h@intern.SerNet.DE>	<AANLkTi=MCgZb=we2OEtxJ4DZ==sVmRLd8aQKeMU7vvKt@mail.gmail.com>	<20101205210634.602b076b@corrin.poochiereds.net>	<AANLkTik4Vh5hqWwVngjCC7v1ST1YxAP9LvQbcqKDhWHp@mail.gmail.com>	<E1PPSnw-00DDbs-Va@intern.SerNet.DE>	<AANLkTinPw8M6XaMvMQ_VMxdk7j8PDqdpjzKLgDMxPf1n@mail.gmail.com>	<4CFD16D8.4090207@samba.org>	<20101206124255.7ea8a8a9@tlielax.poochiereds.net>	<4CFD3166.4000800@samba.org>	<E1PPhWb-00EZX7-6F@intern.SerNet.DE>	<4CFD49CD.5010002@samba.org>	<AANLkTim1-m=d-A6yp4bWpYrEeqN_t49aHnAGPQEjrob_@mail.gmail.com> <4CFD4D15.60103@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: cifs-protocol-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, Volker.Lendecke-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-class: urn:content-classes:message
+In-Reply-To: <4CFD4D15.60103-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi there.
+Christopher R. Hertel wrote:
+> Steve French wrote:
+> :
+>> Now that I have experimented with smb2,  it does seem better (and th=
+e
+>> alternatives are worse)
+>=20
+> Yeah... but they're already headed down the same road that they took =
+with
+> SMB.  Let's see where SMB2 is in 5, 10, 20 years.
 
-Note - cross-posted to autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org
+I want to apologize for the above comment.  It is much more negative
+sounding than I had intended when I sent it off without double-checking=
+ it.
 
-I am putting the finishing touches on our AD/LDAP using autofs to mount
-home directories on a Red Hat 5 box. I have login authentication working
-great, using both traditional SSH authentication (Linux does
-authentication) and GSSAPI (passes Kerberos tickets directly) for
-single-sign-on. The problem is mounting the home directories. If this is
-the wrong list for this integration stuff let me know if you know of a
-better candidate.
+I agree with Steve that SMB2 is much better than SMB, and better than m=
+any
+other alternatives.  The improved communication with Microsoft that
+third-party developers have seen over the past three years or so will, =
+I
+hope, go a long way toward keeping it clean and avoiding the build-up o=
+f
+obsolescent commands and subcommands that SMB experienced.
 
-Here's my configuration:
+Now, if we could just get a little momentum behind the UNIXSMB2 effort.=
+=2E.
 
-auto.master:
-/home_cifs /etc/auto.cifs --timeout=5
+> I'll see what I can do to get Jos=E9 ready to take over for us when w=
+e're
+> shipped off to the home.
 
-auto.cifs:
-*
--fstype=cifs,sec=krb5,user=&,uid=&,gid=lgtr,file_mode=0644,dir_mode=0755
-://smb.domain.local/userdata/&
+I'll still do this.  We have a fresh generation coming up, and I think
+that's something to encourage.
 
-/etc/request-key.conf:
-...
-create  cifs.spnego * * /usr/sbin/cifs.upcall %k create  dns_resolver *
-* /usr/sbin/cifs.upcall %k
+Chrudz -)-----
 
-/etc/pam.d/system-auth-ac:
-#%PAM-1.0
-# This file is auto-generated.
-# User changes will be destroyed the next time authconfig is run.
-auth        required      pam_env.so
-auth        sufficient    pam_unix.so nullok try_first_pass
-auth        sufficient    pam_krb5.so
-auth        requisite     pam_succeed_if.so uid >= 500 quiet
-auth        required      pam_deny.so
-
-account     required      pam_unix.so
-account     sufficient    pam_succeed_if.so uid < 500 quiet
-account     sufficient    pam_krb5.so
-account     required      pam_permit.so
-
-password    requisite     pam_cracklib.so try_first_pass retry=3
-password    sufficient    pam_unix.so md5 shadow nullok try_first_pass
-use_authtok
-password    required      pam_deny.so
-
-session     optional      pam_keyinit.so revoke
-session     required      pam_limits.so
-session     [success=1 default=ignore] pam_succeed_if.so service in
-crond quiet use_uid
-session     required      pam_unix.so
-
-/etc/pam.d/sshd
-#%PAM-1.0
-auth       include      system-auth
-account    required     pam_nologin.so
-account    include      system-auth
-password   include      system-auth
-session    optional     pam_keyinit.so force revoke
-session    include      system-auth
-session    required     pam_loginuid.so
-
-Every user has their unixHomeDirectory set to /home_cifs/<username>
-
-The mount doesn't seem to work on login but autofs is working. It works
-fine once logged in (most of the time but does fail sometimes as well)
-and I change the directory to the home:
-
-Dec  6 11:57:37 bilbo-rh5 cifs.upcall: key description:
-cifs.spnego;0;0;3f000000;ver=0x2;host=smb.domain.local;ip4=192.168.1.58;
-sec=mskrb5;uid=0x4e20;user=lguser
-Dec  6 11:57:37 bilbo-rh5 cifs.upcall: find_krb5_cc: considering
-/tmp/krb5cc_20000_BfIUPW5852 Dec  6 11:57:37 bilbo-rh5 cifs.upcall:
-find_krb5_cc: FILE:/tmp/krb5cc_20000_BfIUPW5852 is valid ccache Dec  6
-11:57:37 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service ticket
-for cifs/smb.domain.local Dec  6 11:57:37 bilbo-rh5 cifs.upcall:
-handle_krb5_mech: obtained service ticket Dec  6 11:57:37 bilbo-rh5
-automount[5642]: mount(generic): mounted
-//smb.domain.local/userdata/lguser type cifs on /home_cifs/lguser Dec  6
-11:57:37 bilbo-rh5 automount[5642]: mounted /home_cifs/lguser
-
-Klist shows this:
-12/06/10 12:06:55  12/06/10 21:17:32  cifs/smb.domain.local-Cx6ELD3zwl23NexWsGEg3A@public.gmane.org
-        renew until 12/06/10 22:06:55
-
-Then I can login without problem until automount expires the mount. When
-it doesn't work this is what is shown:
-
-Dec  6 11:59:09 bilbo-rh5 cifs.upcall: key description:
-cifs.spnego;0;0;3f000000;ver=0x2;host=smb.domain.local;ip4=192.168.1.58;
-sec=mskrb5;uid=0x4e20;user=lguser
-Dec  6 11:59:09 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service
-ticket for cifs/smb.domain.local Dec  6 11:59:09 bilbo-rh5 cifs.upcall:
-handle_krb5_mech: failed to obtain service ticket (-1765328189) Dec  6
-11:59:09 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service ticket
-for host/smb.domain.local Dec  6 11:59:09 bilbo-rh5 cifs.upcall:
-handle_krb5_mech: failed to obtain service ticket (-1765328189) Dec  6
-11:59:09 bilbo-rh5 kernel:  CIFS VFS: cifs_mount failed w/return code =
--126 Dec  6 11:59:09 bilbo-rh5 automount[5642]: >> Refer to the
-mount.cifs(8) manual page (e.g. man mount.cifs) Dec  6 11:59:09
-bilbo-rh5 automount[5642]: mount(generic): failed to mount
-//smb.domain.local/userdata/lguser (type cifs) on /home_cifs/lguser Dec
-6 11:59:09 bilbo-rh5 automount[5642]: failed to mount /home_cifs/lguser
-
-I have wireshark traces as well for success and non-success.
-
-Any help is much appreciated, I'm almost there!
-
-Joel.
-
-
- 
-Joel Carter 
-Senior Systems Administrator
-, , 
-Direct: (604) 320-7624   Cell: (604) 328-0672   Branch: (604) 320-7624
-Toll Free:    Fax:   
-trailerwizards.com
+--=20
+"Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
+Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
+jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, un=
+inq.
+ubiqx Team -- http://www.ubiqx.org/     -)-----   crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org
+OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh-zuGDro9SezXYtjvyW6yDsg@public.gmane.org
