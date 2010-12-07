@@ -1,65 +1,70 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP authentication
-Date: Wed, 8 Dec 2010 12:53:15 -0600
-Message-ID: <AANLkTikU1OhcT8FmyrOZfrLtgK-8NKnRnFNnczFvz2C_@mail.gmail.com>
-References: <1291822865-26472-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101208110608.607a23e2@tlielax.poochiereds.net>
-	<AANLkTi=WVaCDRHf5=DgnZr7crJByhH5r6F6S+_PVGY0F@mail.gmail.com>
-	<AANLkTinehfVNbrC2gNnDEi5OHDtgjYYimUqYO=+y4Dy6@mail.gmail.com>
-	<4CFFCB61.4090807@exx.nl>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 5/6] CIFS: Make cifs_file_map work with strict cache
+ mode (try #3)
+Date: Tue, 7 Dec 2010 07:56:35 -0500
+Message-ID: <20101207075635.6f9c1c5f@tlielax.poochiereds.net>
+References: <1291037804-4000-1-git-send-email-piastryyy@gmail.com>
+	<1291037804-4000-4-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4CFFCB61.4090807-C1IQQP51G3M@public.gmane.org>
+In-Reply-To: <1291037804-4000-4-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Dec 8, 2010 at 12:16 PM, Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org> wrote=
-:
-> Also,
->
-> Op 8-12-2010 18:28, Shirish Pargaonkar schreef:
->> On Wed, Dec 8, 2010 at 10:33 AM, Shirish Pargaonkar
->
->>>>> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
->>>>> index 7b01d3f..122ad31 100644
->>>>> --- a/fs/cifs/sess.c
->>>>> +++ b/fs/cifs/sess.c
->>>>> @@ -437,7 +437,7 @@ static void build_ntlmssp_negotiate_blob(unsi=
-gned char *pbuffer,
->
-> (...)
->
->>>>> @@ -544,8 +544,9 @@ static int build_ntlmssp_auth_blob(unsigned c=
-har *pbuffer,
->
-> The patch you sent me (and which I tested successfully) had an extra
-> hunk in it:
->
-> @@ -477,7 +477,7 @@ static int build_ntlmssp_auth_blob(unsigned char
-> *pbuffer,
-> =A0 =A0 =A0 =A0flags =3D NTLMSSP_NEGOTIATE_56 |
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0NTLMSSP_REQUEST_TARGET | NTLMSSP_NEGOT=
-IATE_TARGET_INFO |
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTI=
-ATE_UNICODE |
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTI=
-ATE_EXTENDED_SEC;
-> =A0 =A0 =A0 =A0if (ses->server->secMode &
-> =A0 =A0 =A0 =A0 =A0 (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0flags |=3D NTLMSSP_NEGOTIATE_SIGN;
->
-> Is it your intent to leave out this hunk?
+On Mon, 29 Nov 2010 16:36:44 +0300
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Yes, it does not matter whether that flag bit exists or not in ntlmssp
-auth packet (type 3).
+> Invalidate inode if we don't have at least Level II oplock and strict
+> cache mode switched on.
+> 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/file.c |   20 +++++++++++++++-----
+>  1 files changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index d216879..e9f2fae 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1812,14 +1812,24 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+>  int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
+>  {
+>  	int rc, xid;
+> +	struct inode *inode = file->f_path.dentry->d_inode;
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+>  
+>  	xid = GetXid();
+> -	rc = cifs_revalidate_file(file);
+> -	if (rc) {
+> -		cFYI(1, "Validation prior to mmap failed, error=%d", rc);
+> -		FreeXid(xid);
+> -		return rc;
+> +
+> +	if (!CIFS_I(inode)->clientCanCacheRead &&
+> +	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
+> +		cifs_invalidate_mapping(inode);
+> +	else {
+> +		rc = cifs_revalidate_file(file);
+> +		if (rc) {
+> +			cFYI(1, "Validation prior to mmap failed, error=%d",
+> +			     rc);
+> +			FreeXid(xid);
+> +			return rc;
+> +		}
+>  	}
+> +
+>  	rc = generic_file_mmap(file, vma);
+>  	FreeXid(xid);
+>  	return rc;
 
->
-> Regards,
-> Robbert
->
+Looks reasonable, though all of this special-casing sure is gross...
+
+Might it be better to have a set of cifs_strict_file/inode_ops and use
+those rather than all of these if/else conditions?
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
