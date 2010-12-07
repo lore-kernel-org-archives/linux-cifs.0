@@ -1,130 +1,55 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils: handle cifs_acl type of key to map a SID to either an uid or gid and return it
-Date: Tue,  7 Dec 2010 11:11:16 -0600
-Message-ID: <1291741876-22770-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Autofs cifs mounts via Kerberos
+Date: Tue, 7 Dec 2010 13:52:40 -0500
+Message-ID: <20101207135240.171cb2df@tlielax.poochiereds.net>
+References: <7A014DE1422A694A89BA2CE1F5692DF503831D00@niihau.lionsgate.ca>
+	<20101207081239.73227aec@tlielax.poochiereds.net>
+	<7A014DE1422A694A89BA2CE1F5692DF503831D02@niihau.lionsgate.ca>
+	<AANLkTinKhXQh0+nY-MwDrs+FoxEkNV1opXzzymgiKyKW@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "Carter, Joel" <JoelC-RAygmcqizRRkKYb1c3iuxNBPR1lH4CV8@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTinKhXQh0+nY-MwDrs+FoxEkNV1opXzzymgiKyKW-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Tue, 7 Dec 2010 11:11:08 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Handle cifs_acl type of key. Extract a SID string from the description
-and map it to either an uid or gid using winbind APIs and return that id.
-If an SID can't be mapped, id stays 0 i.e. that of the root.
+> On Tue, Dec 7, 2010 at 11:03 AM, Carter, Joel <JoelC-RAygmcqizRRkKYb1c3iuxNBPR1lH4CV8@public.gmane.org> wrote:
+> > Hi Jeff.
+> >
+> > Yes I think you are right that it's race condition between the Kerberos
+> > ticket being stored and the automounter attempting to use that ticket.
+> >
+> > Thanks for the reminder of sec=krb5 maturity status, I wasn't aware of
+> > that. This is for a production system so I should probably stay away
+> > from it. That said, do you know if this is possible with RHEL5 using
+> > smbfs (sorry - off topic) or should I push this off until we move to
+> > RHEL6? It's not a must have, just trying to make our AD/RHEL integration
+> > as tight as possible. I found your bugzilla entry as well, I'll keep my
+> > eyes on it.
+> 
+> smbfs doesn't support krb5.
+> 
 
+Actually, I think it does. Socket creation and setup in smbfs was
+essentially offloaded to userspace so as long as libsmbclient supported
+it, it did too. I never really messed with it though so I can't vouch
+for its robustness.
 
-An entry such as this
+The point is moot though since RHEL5 didn't ship with smbfs enabled.
 
-create  cifs.cifs_acl   *       *               /usr/sbin/cifs.upcall %k
+> I did get the impression that Jeff did a good job of the Kerberos
+> backport for RHEL5 though.
+> 
 
-is needed in the file /etc/request-key.conf.
+Thanks, it basically works. There are some differences between how
+RHEL5 and RHEL6/mainline handle the uid= option however.
 
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- cifs.upcall.c |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 72 insertions(+), 0 deletions(-)
-
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 9b1436e..17ef57e 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -45,6 +45,13 @@
- #include <time.h>
- #include <netdb.h>
- #include <arpa/inet.h>
-+#include <stdint.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <limits.h>
-+#include <wbclient.h>
- 
- #include "util.h"
- #include "replace.h"
-@@ -544,6 +551,66 @@ static int cifs_resolver(const key_serial_t key, const char *key_descr)
- 	return 0;
- }
- 
-+static int
-+cifs_sid_resolver(const key_serial_t key, const char *key_descr)
-+{
-+	int i;
-+	uid_t uid = 0;
-+	gid_t gid = 0;;
-+	wbcErr rc;
-+	const char *keyend = key_descr;
-+	struct wbcDomainSid sid;
-+
-+	/* skip next 4 ';' delimiters to get to description */
-+	for (i = 1; i <= 4; ++i) {
-+		keyend = index(keyend + 1, ';');
-+		if (!keyend) {
-+			syslog(LOG_ERR, "invalid key description: %s",
-+			       key_descr);
-+			return 1;
-+		}
-+	}
-+	keyend++;
-+
-+	if (strncmp(keyend, "os", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		keyend++;
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (!rc) {
-+			rc = wbcSidToUid(&sid, &uid);
-+			if (!rc) {
-+				rc = keyctl_instantiate(key, &uid,
-+							sizeof(uid_t), 0);
-+				if (rc)
-+					syslog(LOG_ERR, "%s: key inst: %s",
-+						__func__, strerror(errno));
-+			} else
-+				syslog(LOG_DEBUG, "OwnerSID to uid: %s, rc: %d",
-+						keyend, rc);
-+		} else
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+	} else if (strncmp(keyend, "gs", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		keyend++;
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (!rc) {
-+			rc = wbcSidToGid(&sid, &gid);
-+			if (!rc) {
-+				rc = keyctl_instantiate(key, &gid,
-+							sizeof(gid_t), 0);
-+				if (rc)
-+					syslog(LOG_ERR, "%s: key inst: %s",
-+						__func__, strerror(errno));
-+			} else
-+				syslog(LOG_DEBUG, "GroupSID to gid: %s, rc: %d",
-+						keyend, rc);
-+		} else
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+	} else
-+		syslog(LOG_DEBUG, "Invalid SID");
-+	return 0;
-+}
-+
- /*
-  * Older kernels sent IPv6 addresses without colons. Well, at least
-  * they're fixed-length strings. Convert these addresses to have colon
-@@ -679,6 +746,11 @@ int main(const int argc, char *const argv[])
- 		goto out;
- 	}
- 
-+	if ((strncmp(buf, "cifs.cifs_acl", sizeof("cifs.cifs_acl") - 1) == 0)) {
-+		rc = cifs_sid_resolver(key, buf);
-+		goto out;
-+	}
-+
- 	memset(&arg, 0, sizeof(arg));
- 
- 	have = decode_key_description(buf, &arg);
 -- 
-1.6.0.2
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
