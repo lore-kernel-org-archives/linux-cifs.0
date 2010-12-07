@@ -1,153 +1,59 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Autofs cifs mounts via Kerberos
-Date: Tue, 7 Dec 2010 08:12:39 -0500
-Message-ID: <20101207081239.73227aec@tlielax.poochiereds.net>
-References: <7A014DE1422A694A89BA2CE1F5692DF503831D00@niihau.lionsgate.ca>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "Carter, Joel" <JoelC-RAygmcqizRRkKYb1c3iuxNBPR1lH4CV8@public.gmane.org>
+Subject: [PATCH 0/4] cifs: CONFIG_CIFS_EXPERIMENTAL removal
+Date: Tue,  7 Dec 2010 09:23:51 -0500
+Message-ID: <1291731835-1120-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <7A014DE1422A694A89BA2CE1F5692DF503831D00-Xb8fhGBsZ0XkezyJQHggdywD8/FfD2ys@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 6 Dec 2010 14:00:28 -0800
-"Carter, Joel" <JoelC-RAygmcqizRRkKYb1c3iuxNBPR1lH4CV8@public.gmane.org> wrote:
+The CONFIG_CIFS_EXPERIMENTAL KConfig option is the sort of thing that
+gives distro packagers nightmares. The things that live under it are
+impossible to predict for someone who isn't following development
+upstream.
 
-> Hi there.
-> 
-> Note - cross-posted to autofs-CPWUtch7KCBzeIdxy0IIJw@public.gmane.org
-> 
-> I am putting the finishing touches on our AD/LDAP using autofs to mount
-> home directories on a Red Hat 5 box. I have login authentication working
-> great, using both traditional SSH authentication (Linux does
-> authentication) and GSSAPI (passes Kerberos tickets directly) for
-> single-sign-on. The problem is mounting the home directories. If this is
-> the wrong list for this integration stuff let me know if you know of a
-> better candidate.
-> 
-> Here's my configuration:
-> 
-> auto.master:
-> /home_cifs /etc/auto.cifs --timeout=5
-> 
-> auto.cifs:
-> *
-> -fstype=cifs,sec=krb5,user=&,uid=&,gid=lgtr,file_mode=0644,dir_mode=0755
-> ://smb.domain.local/userdata/&
-> 
-> /etc/request-key.conf:
-> ...
-> create  cifs.spnego * * /usr/sbin/cifs.upcall %k create  dns_resolver *
-> * /usr/sbin/cifs.upcall %k
-> 
-> /etc/pam.d/system-auth-ac:
-> #%PAM-1.0
-> # This file is auto-generated.
-> # User changes will be destroyed the next time authconfig is run.
-> auth        required      pam_env.so
-> auth        sufficient    pam_unix.so nullok try_first_pass
-> auth        sufficient    pam_krb5.so
-> auth        requisite     pam_succeed_if.so uid >= 500 quiet
-> auth        required      pam_deny.so
-> 
-> account     required      pam_unix.so
-> account     sufficient    pam_succeed_if.so uid < 500 quiet
-> account     sufficient    pam_krb5.so
-> account     required      pam_permit.so
-> 
-> password    requisite     pam_cracklib.so try_first_pass retry=3
-> password    sufficient    pam_unix.so md5 shadow nullok try_first_pass
-> use_authtok
-> password    required      pam_deny.so
-> 
-> session     optional      pam_keyinit.so revoke
-> session     required      pam_limits.so
-> session     [success=1 default=ignore] pam_succeed_if.so service in
-> crond quiet use_uid
-> session     required      pam_unix.so
-> 
-> /etc/pam.d/sshd
-> #%PAM-1.0
-> auth       include      system-auth
-> account    required     pam_nologin.so
-> account    include      system-auth
-> password   include      system-auth
-> session    optional     pam_keyinit.so force revoke
-> session    include      system-auth
-> session    required     pam_loginuid.so
-> 
-> Every user has their unixHomeDirectory set to /home_cifs/<username>
-> 
-> The mount doesn't seem to work on login but autofs is working. It works
-> fine once logged in (most of the time but does fail sometimes as well)
-> and I change the directory to the home:
-> 
-> Dec  6 11:57:37 bilbo-rh5 cifs.upcall: key description:
-> cifs.spnego;0;0;3f000000;ver=0x2;host=smb.domain.local;ip4=192.168.1.58;
-> sec=mskrb5;uid=0x4e20;user=lguser
-> Dec  6 11:57:37 bilbo-rh5 cifs.upcall: find_krb5_cc: considering
-> /tmp/krb5cc_20000_BfIUPW5852 Dec  6 11:57:37 bilbo-rh5 cifs.upcall:
-> find_krb5_cc: FILE:/tmp/krb5cc_20000_BfIUPW5852 is valid ccache Dec  6
-> 11:57:37 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service ticket
-> for cifs/smb.domain.local Dec  6 11:57:37 bilbo-rh5 cifs.upcall:
-> handle_krb5_mech: obtained service ticket Dec  6 11:57:37 bilbo-rh5
-> automount[5642]: mount(generic): mounted
-> //smb.domain.local/userdata/lguser type cifs on /home_cifs/lguser Dec  6
-> 11:57:37 bilbo-rh5 automount[5642]: mounted /home_cifs/lguser
-> 
-> Klist shows this:
-> 12/06/10 12:06:55  12/06/10 21:17:32  cifs/smb.domain.local-Cx6ELD3zwl23NexWsGEg3A@public.gmane.org
->         renew until 12/06/10 22:06:55
-> 
-> Then I can login without problem until automount expires the mount. When
-> it doesn't work this is what is shown:
-> 
-> Dec  6 11:59:09 bilbo-rh5 cifs.upcall: key description:
-> cifs.spnego;0;0;3f000000;ver=0x2;host=smb.domain.local;ip4=192.168.1.58;
-> sec=mskrb5;uid=0x4e20;user=lguser
-> Dec  6 11:59:09 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service
-> ticket for cifs/smb.domain.local Dec  6 11:59:09 bilbo-rh5 cifs.upcall:
-> handle_krb5_mech: failed to obtain service ticket (-1765328189) Dec  6
-> 11:59:09 bilbo-rh5 cifs.upcall: handle_krb5_mech: getting service ticket
-> for host/smb.domain.local Dec  6 11:59:09 bilbo-rh5 cifs.upcall:
-> handle_krb5_mech: failed to obtain service ticket (-1765328189) Dec  6
+We usually want bleeding-edge distros like Fedora to turn on these sorts
+of bleeding edge features, but it's difficult for them to do so with any
+confidence because so much of the code under this option is just plain
+broken. If we have code that needs to be conditionally compiled in,
+then it generally ought to be given its own KConfig option.
 
-$ grep 1765328189 /usr/include/krb5/krb5.h 
-#define KRB5_FCC_NOFILE                          (-1765328189L)
+This patchset eliminates the CONFIG_CIFS_EXPERIMENTAL Kconfig option.
+Code that currently resides under this option is either moved to being
+built in by default or is removed from the kernel altogether.
 
-...which means that cifs.upcall couldn't find the credential cache for
-that UID (20000).
+The last patch in the series also removes /proc/fs/cifs/Experimental --
+a knob that's purpose has been unclear since I've been working on CIFS.
 
-Yes, it would be nice to pretty-print that error, but I'm not sure
-what kerberos function does that.
+I've tested this by building cifs.ko with a variety of different Kconfig
+combinations and it seems to be OK.
 
-> 11:59:09 bilbo-rh5 kernel:  CIFS VFS: cifs_mount failed w/return code =
-> -126 Dec  6 11:59:09 bilbo-rh5 automount[5642]: >> Refer to the
-> mount.cifs(8) manual page (e.g. man mount.cifs) Dec  6 11:59:09
-> bilbo-rh5 automount[5642]: mount(generic): failed to mount
-> //smb.domain.local/userdata/lguser (type cifs) on /home_cifs/lguser Dec
-> 6 11:59:09 bilbo-rh5 automount[5642]: failed to mount /home_cifs/lguser
-> 
-> I have wireshark traces as well for success and non-success.
-> 
+I think this patchset is appropriate for 2.6.38, though I won't object
+if you want to merge it sooner.
 
-I doubt that'll tell you much. I think the problem is with kerberos.
-Maybe you have a race condition between the creation of the credential
-cache and the automount being triggered? That's probably where I'd
-focus my efforts...
+Jeff Layton (4):
+  cifs: remove export_ops code
+  cifs: move "ntlmssp" and "local_leases" options out of experimental
+    code
+  cifs: remove CIFSSMBQueryReparseLinkInfo and CONFIG_CIFS_EXPERIMENTAL
+  cifs: remove /proc/fs/cifs/Experimental
 
-For an FYI, the sec=krb5 code is still "tech-preview" in RHEL5. There
-are some differences between the implementation there and the one in
-RHEL6.
-
-I'm hoping to get multiuser mounts into RHEL6.1, which will mean that
-you can do away with autofs here and just mount "userdata" on
-"/home_cifs" in this configuration. Each user will be able to use their
-own credentials when accessing the mount. That should be a lot simpler
-and less "fiddly" than autofs for this configuration.
+ fs/cifs/Kconfig      |   13 ------
+ fs/cifs/Makefile     |    2 +-
+ fs/cifs/README       |   12 -----
+ fs/cifs/cifs_debug.c |   42 -------------------
+ fs/cifs/cifsfs.c     |    8 ----
+ fs/cifs/cifsfs.h     |    4 --
+ fs/cifs/cifsglob.h   |    1 -
+ fs/cifs/cifsproto.h  |    6 ---
+ fs/cifs/cifssmb.c    |  109 +-------------------------------------------------
+ fs/cifs/connect.c    |    4 --
+ fs/cifs/export.c     |   67 ------------------------------
+ fs/cifs/file.c       |    6 +-
+ fs/cifs/sess.c       |  103 +++++++++++++++++++++-------------------------
+ 13 files changed, 52 insertions(+), 325 deletions(-)
+ delete mode 100644 fs/cifs/export.c
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.3.2
