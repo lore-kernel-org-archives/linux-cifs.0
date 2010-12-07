@@ -1,62 +1,82 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/3] cifs: use CreationTime like an i_generation field
-Date: Mon, 6 Dec 2010 20:55:49 -0500
-Message-ID: <20101206205549.0c72e0a3@corrin.poochiereds.net>
-References: <1277723413-23769-1-git-send-email-jlayton@redhat.com>
-	<1277723413-23769-3-git-send-email-jlayton@redhat.com>
-	<20101122145541.2ab3536f@corrin.poochiereds.net>
-	<AANLkTimtg0vFVQ5HGo+nq7rE=Z4Sob=z7LuVCMFgWdnv@mail.gmail.com>
-	<20101122153125.68ee4ee6@corrin.poochiereds.net>
-	<20101122205917.GC7071@samba2>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: allow calling cifs_build_path_to_root on incomplete cifs_sb
+Date: Mon,  6 Dec 2010 21:07:32 -0500
+Message-ID: <1291687653-23824-1-git-send-email-jlayton@redhat.com>
+Cc: robbert-C1IQQP51G3M@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101122205917.GC7071@samba2>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 22 Nov 2010 12:59:17 -0800
-Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+It's possible that cifs_mount will call cifs_build_path_to_root on a
+newly instantiated cifs_sb. In that case, it's likely that the
+master_tlink pointer has not yet been instantiated.
 
-> On Mon, Nov 22, 2010 at 03:31:25PM -0500, Jeff Layton wrote:
-> > On Mon, 22 Nov 2010 14:22:50 -0600
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > 
-> > > On Mon, Nov 22, 2010 at 1:55 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > > 
-> > > > On Mon, 28 Jun 2010 07:10:12 -0400
-> > > > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > > >
-> > > >
-> > > > Steve, can you clarify where we are with this patch? I originally sent
-> > > > this back in June. You and I discussed this at the CIFS plugfest and I
-> > > > had thought you had decided to merge it. It's still not in your tree
-> > > > however. Can you give a verdict on whether you're going to merge it and
-> > > > let me know when I can expect to see it in your tree if so?
-> > > >
-> > > >
-> > > Thanks for reminding me.  I had forgotten to ask JRA about a question
-> > > on legacy Samba behavior.   I remembered that older Samba
-> > > had problems with creation time - and was trying to remember what
-> > > the implication of using this patch with older Samba was.
-> > > 
-> > 
-> > All samba versions have issues with create times (at least on Linux
-> > anyway). They fake them, by using the ctime (which seems like an odd
-> > choice to me) in most cases.
-> 
-> New Samba's store create time in an xattr, so they can
-> return a reasonably valid create time value.
-> 
+Fix this by having cifs_build_path_to_root take a cifsTconInfo pointer
+as well, and have the caller pass that in.
 
-Steve, we're approaching the 6 month mark since I originally sent this
-patch. Could you make a decision on it soon so that I know what should
-be done with it?
+Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsproto.h |    3 ++-
+ fs/cifs/connect.c   |    2 +-
+ fs/cifs/inode.c     |    6 +++---
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-Thanks,
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 5523047..e6d1481 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -54,7 +54,8 @@ do {								\
+ 	     __func__, curr_xid, (int)rc);			\
+ } while (0)
+ extern char *build_path_from_dentry(struct dentry *);
+-extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb);
++extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
++					struct cifsTconInfo *tcon);
+ extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
+ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ 		const char *fullpath, const struct dfs_info3_param *ref,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 53f9c31..0a203ec 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2833,7 +2833,7 @@ remote_path_check:
+ 	/* check if a whole path (including prepath) is not remote */
+ 	if (!rc && cifs_sb->prepathlen && tcon) {
+ 		/* build_path_to_root works only when we have a valid tcon */
+-		full_path = cifs_build_path_to_root(cifs_sb);
++		full_path = cifs_build_path_to_root(cifs_sb, tcon);
+ 		if (full_path == NULL) {
+ 			rc = -ENOMEM;
+ 			goto mount_fail_check;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index aa48521..589f3e3 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -728,12 +728,12 @@ static const struct inode_operations cifs_ipc_inode_ops = {
+ 	.lookup = cifs_lookup,
+ };
+ 
+-char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb)
++char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
++				struct cifsTconInfo *tcon)
+ {
+ 	int pplen = cifs_sb->prepathlen;
+ 	int dfsplen;
+ 	char *full_path = NULL;
+-	struct cifsTconInfo *tcon = cifs_sb_master_tcon(cifs_sb);
+ 
+ 	/* if no prefix path, simply set path to the root of share to "" */
+ 	if (pplen == 0) {
+@@ -875,7 +875,7 @@ struct inode *cifs_root_iget(struct super_block *sb, unsigned long ino)
+ 	char *full_path;
+ 	struct cifsTconInfo *tcon = cifs_sb_master_tcon(cifs_sb);
+ 
+-	full_path = cifs_build_path_to_root(cifs_sb);
++	full_path = cifs_build_path_to_root(cifs_sb, tcon);
+ 	if (full_path == NULL)
+ 		return ERR_PTR(-ENOMEM);
+ 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.3.2
