@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/4] cifs: remove CIFSSMBQueryReparseLinkInfo and CONFIG_CIFS_EXPERIMENTAL
-Date: Tue,  7 Dec 2010 09:23:54 -0500
-Message-ID: <1291731835-1120-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 4/4] cifs: remove /proc/fs/cifs/Experimental
+Date: Tue,  7 Dec 2010 09:23:55 -0500
+Message-ID: <1291731835-1120-5-git-send-email-jlayton@redhat.com>
 References: <1291731835-1120-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,194 +10,134 @@ In-Reply-To: <1291731835-1120-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Nothing calls this function. Remove it.
-
-With this, the last user of CONFIG_CIFS_EXPERIMENTAL has been
-removed. Also, update the README.
+This flag only affects a couple of places in the write codepath, and
+it's not entirely clear to me what the purpose of it is. I've never
+known anyone (even developers) to use this knob, so let's remove it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/Kconfig     |   13 ------
- fs/cifs/README      |   12 ------
- fs/cifs/cifsproto.h |    6 ---
- fs/cifs/cifssmb.c   |  104 ---------------------------------------------------
- 4 files changed, 0 insertions(+), 135 deletions(-)
+ fs/cifs/cifs_debug.c |   42 ------------------------------------------
+ fs/cifs/cifsfs.c     |    1 -
+ fs/cifs/cifsglob.h   |    1 -
+ fs/cifs/file.c       |    6 +++---
+ 4 files changed, 3 insertions(+), 47 deletions(-)
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index ee45648..27917a5 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -151,16 +151,3 @@ config CIFS_ACL
- 	    Allows to fetch CIFS/NTFS ACL from the server.  The DACL blob
- 	    is handed over to the application/caller.
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 103ab8b..04eecb2 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -425,7 +425,6 @@ static const struct file_operations cifs_lookup_cache_proc_fops;
+ static const struct file_operations traceSMB_proc_fops;
+ static const struct file_operations cifs_multiuser_mount_proc_fops;
+ static const struct file_operations cifs_security_flags_proc_fops;
+-static const struct file_operations cifs_experimental_proc_fops;
+ static const struct file_operations cifs_linux_ext_proc_fops;
  
--config CIFS_EXPERIMENTAL
--	  bool "CIFS Experimental Features (EXPERIMENTAL)"
--	  depends on CIFS && EXPERIMENTAL
--	  help
--	    Enables cifs features under testing. These features are
--	    experimental and currently include DFS support and directory
--	    change notification ie fcntl(F_DNOTIFY), as well as the upcall
--	    mechanism which will be used for Kerberos session negotiation
--	    and uid remapping.  Some of these features also may depend on
--	    setting a value of 1 to the pseudo-file /proc/fs/cifs/Experimental
--	    (which is disabled by default). See the file fs/cifs/README
--	    for more details.  If unsure, say N.
--
-diff --git a/fs/cifs/README b/fs/cifs/README
-index 46af99a..60a8ba5 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -715,18 +715,6 @@ the start of smb requests and responses can be enabled via:
+ void
+@@ -443,8 +442,6 @@ cifs_proc_init(void)
+ 	proc_create("cifsFYI", 0, proc_fs_cifs, &cifsFYI_proc_fops);
+ 	proc_create("traceSMB", 0, proc_fs_cifs, &traceSMB_proc_fops);
+ 	proc_create("OplockEnabled", 0, proc_fs_cifs, &cifs_oplock_proc_fops);
+-	proc_create("Experimental", 0, proc_fs_cifs,
+-		    &cifs_experimental_proc_fops);
+ 	proc_create("LinuxExtensionsEnabled", 0, proc_fs_cifs,
+ 		    &cifs_linux_ext_proc_fops);
+ 	proc_create("MultiuserMount", 0, proc_fs_cifs,
+@@ -552,45 +549,6 @@ static const struct file_operations cifs_oplock_proc_fops = {
+ 	.write		= cifs_oplock_proc_write,
+ };
  
- 	echo 1 > /proc/fs/cifs/traceSMB
- 
--Two other experimental features are under development. To test these
--requires enabling CONFIG_CIFS_EXPERIMENTAL
--
--	cifsacl support needed to retrieve approximated mode bits based on
--		the contents on the CIFS ACL.
--
--	lease support: cifs will check the oplock state before calling into
--	the vfs to see if we can grant a lease on a file.
--
--	DNOTIFY fcntl: needed for support of directory change 
--			    notification and perhaps later for file leases)
--
- Per share (per client mount) statistics are available in /proc/fs/cifs/Stats
- if the kernel was configured with cifs statistics enabled.  The statistics
- represent the number of successful (ie non-zero return code from the server) 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index cb65499..fe77e69 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -296,12 +296,6 @@ extern int CIFSSMBUnixQuerySymLink(const int xid,
- 			struct cifsTconInfo *tcon,
- 			const unsigned char *searchName, char **syminfo,
- 			const struct nls_table *nls_codepage);
--extern int CIFSSMBQueryReparseLinkInfo(const int xid,
--			struct cifsTconInfo *tcon,
--			const unsigned char *searchName,
--			char *symlinkinfo, const int buflen, __u16 fid,
--			const struct nls_table *nls_codepage);
--
- extern int CIFSSMBOpen(const int xid, struct cifsTconInfo *tcon,
- 			const char *fileName, const int disposition,
- 			const int access_flags, const int omode,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 4df1d10..9af98f6 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -2474,110 +2474,6 @@ querySymLinkRetry:
- 	return rc;
- }
- 
--#ifdef CONFIG_CIFS_EXPERIMENTAL
--int
--CIFSSMBQueryReparseLinkInfo(const int xid, struct cifsTconInfo *tcon,
--			const unsigned char *searchName,
--			char *symlinkinfo, const int buflen, __u16 fid,
--			const struct nls_table *nls_codepage)
+-static int cifs_experimental_proc_show(struct seq_file *m, void *v)
 -{
--	int rc = 0;
--	int bytes_returned;
--	struct smb_com_transaction_ioctl_req *pSMB;
--	struct smb_com_transaction_ioctl_rsp *pSMBr;
+-	seq_printf(m, "%d\n", experimEnabled);
+-	return 0;
+-}
 -
--	cFYI(1, "In Windows reparse style QueryLink for path %s", searchName);
--	rc = smb_init(SMB_COM_NT_TRANSACT, 23, tcon, (void **) &pSMB,
--		      (void **) &pSMBr);
+-static int cifs_experimental_proc_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, cifs_experimental_proc_show, NULL);
+-}
+-
+-static ssize_t cifs_experimental_proc_write(struct file *file,
+-		const char __user *buffer, size_t count, loff_t *ppos)
+-{
+-	char c;
+-	int rc;
+-
+-	rc = get_user(c, buffer);
 -	if (rc)
 -		return rc;
+-	if (c == '0' || c == 'n' || c == 'N')
+-		experimEnabled = 0;
+-	else if (c == '1' || c == 'y' || c == 'Y')
+-		experimEnabled = 1;
+-	else if (c == '2')
+-		experimEnabled = 2;
 -
--	pSMB->TotalParameterCount = 0 ;
--	pSMB->TotalDataCount = 0;
--	pSMB->MaxParameterCount = cpu_to_le32(2);
--	/* BB find exact data count max from sess structure BB */
--	pSMB->MaxDataCount = cpu_to_le32((tcon->ses->server->maxBuf -
--					  MAX_CIFS_HDR_SIZE) & 0xFFFFFF00);
--	pSMB->MaxSetupCount = 4;
--	pSMB->Reserved = 0;
--	pSMB->ParameterOffset = 0;
--	pSMB->DataCount = 0;
--	pSMB->DataOffset = 0;
--	pSMB->SetupCount = 4;
--	pSMB->SubCommand = cpu_to_le16(NT_TRANSACT_IOCTL);
--	pSMB->ParameterCount = pSMB->TotalParameterCount;
--	pSMB->FunctionCode = cpu_to_le32(FSCTL_GET_REPARSE_POINT);
--	pSMB->IsFsctl = 1; /* FSCTL */
--	pSMB->IsRootFlag = 0;
--	pSMB->Fid = fid; /* file handle always le */
--	pSMB->ByteCount = 0;
--
--	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
--			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	if (rc) {
--		cFYI(1, "Send error in QueryReparseLinkInfo = %d", rc);
--	} else {		/* decode response */
--		__u32 data_offset = le32_to_cpu(pSMBr->DataOffset);
--		__u32 data_count = le32_to_cpu(pSMBr->DataCount);
--		if ((pSMBr->ByteCount < 2) || (data_offset > 512)) {
--		/* BB also check enough total bytes returned */
--			rc = -EIO;	/* bad smb */
--			goto qreparse_out;
--		}
--		if (data_count && (data_count < 2048)) {
--			char *end_of_smb = 2 /* sizeof byte count */ +
--				pSMBr->ByteCount + (char *)&pSMBr->ByteCount;
--
--			struct reparse_data *reparse_buf =
--						(struct reparse_data *)
--						((char *)&pSMBr->hdr.Protocol
--								 + data_offset);
--			if ((char *)reparse_buf >= end_of_smb) {
--				rc = -EIO;
--				goto qreparse_out;
--			}
--			if ((reparse_buf->LinkNamesBuf +
--				reparse_buf->TargetNameOffset +
--				reparse_buf->TargetNameLen) > end_of_smb) {
--				cFYI(1, "reparse buf beyond SMB");
--				rc = -EIO;
--				goto qreparse_out;
--			}
--
--			if (pSMBr->hdr.Flags2 & SMBFLG2_UNICODE) {
--				cifs_from_ucs2(symlinkinfo, (__le16 *)
--						(reparse_buf->LinkNamesBuf +
--						reparse_buf->TargetNameOffset),
--						buflen,
--						reparse_buf->TargetNameLen,
--						nls_codepage, 0);
--			} else { /* ASCII names */
--				strncpy(symlinkinfo,
--					reparse_buf->LinkNamesBuf +
--					reparse_buf->TargetNameOffset,
--					min_t(const int, buflen,
--					   reparse_buf->TargetNameLen));
--			}
--		} else {
--			rc = -EIO;
--			cFYI(1, "Invalid return data count on "
--				 "get reparse info ioctl");
--		}
--		symlinkinfo[buflen] = 0; /* just in case so the caller
--					does not go off the end of the buffer */
--		cFYI(1, "readlink result - %s", symlinkinfo);
--	}
--
--qreparse_out:
--	cifs_buf_release(pSMB);
--
--	/* Note: On -EAGAIN error only caller can retry on handle based calls
--		since file handle passed in no longer valid */
--
--	return rc;
+-	return count;
 -}
--#endif /* CIFS_EXPERIMENTAL */
 -
- #ifdef CONFIG_CIFS_POSIX
+-static const struct file_operations cifs_experimental_proc_fops = {
+-	.owner		= THIS_MODULE,
+-	.open		= cifs_experimental_proc_open,
+-	.read		= seq_read,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-	.write		= cifs_experimental_proc_write,
+-};
+-
+ static int cifs_linux_ext_proc_show(struct seq_file *m, void *v)
+ {
+ 	seq_printf(m, "%d\n", linuxExtEnabled);
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 48582b7..932a347 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -53,7 +53,6 @@ int cifsFYI = 0;
+ int cifsERROR = 1;
+ int traceSMB = 0;
+ unsigned int oplockEnabled = 1;
+-unsigned int experimEnabled = 0;
+ unsigned int linuxExtEnabled = 1;
+ unsigned int lookupCacheEnabled = 1;
+ unsigned int multiuser_mount = 0;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 37fb246..5ab6701 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -777,7 +777,6 @@ GLOBAL_EXTERN unsigned int multiuser_mount; /* if enabled allows new sessions
+ 				have the uid/password or Kerberos credential
+ 				or equivalent for current user */
+ GLOBAL_EXTERN unsigned int oplockEnabled;
+-GLOBAL_EXTERN unsigned int experimEnabled;
+ GLOBAL_EXTERN unsigned int lookupCacheEnabled;
+ GLOBAL_EXTERN unsigned int global_secflags;	/* if on, session setup sent
+ 				with more secure ntlmssp2 challenge/resp */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 5a28660..5f6907e 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1054,10 +1054,10 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
+ 				if (rc != 0)
+ 					break;
+ 			}
+-			if (experimEnabled || (pTcon->ses->server &&
++			if (pTcon->ses->server &&
+ 				((pTcon->ses->server->secMode &
+ 				(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+-				== 0))) {
++				== 0)) {
+ 				struct kvec iov[2];
+ 				unsigned int len;
  
- /*Convert an Access Control Entry from wire format to local POSIX xattr format*/
+@@ -1319,7 +1319,7 @@ static int cifs_writepages(struct address_space *mapping,
+ 	}
+ 
+ 	tcon = tlink_tcon(open_file->tlink);
+-	if (!experimEnabled && tcon->ses->server->secMode &
++	if (tcon->ses->server->secMode &
+ 			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+ 		cifsFileInfo_put(open_file);
+ 		kfree(iov);
 -- 
 1.7.3.2
