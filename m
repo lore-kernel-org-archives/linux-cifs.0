@@ -1,127 +1,336 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP authentication
-Date: Wed, 8 Dec 2010 11:28:53 -0600
-Message-ID: <AANLkTinehfVNbrC2gNnDEi5OHDtgjYYimUqYO=+y4Dy6@mail.gmail.com>
-References: <1291822865-26472-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101208110608.607a23e2@tlielax.poochiereds.net>
-	<AANLkTi=WVaCDRHf5=DgnZr7crJByhH5r6F6S+_PVGY0F@mail.gmail.com>
+Subject: Re: [PATCH 1/2] CIFS: Simplify non-posix open stuff (try #2)
+Date: Wed, 8 Dec 2010 11:39:26 -0600
+Message-ID: <AANLkTi=yZ28Be5HvdrgNcmdTRQ1MKoVyOhMtQiZ9R8WX@mail.gmail.com>
+References: <1291818480-3681-1-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, robbert-C1IQQP51G3M@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=WVaCDRHf5=DgnZr7crJByhH5r6F6S+_PVGY0F-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1291818480-3681-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Dec 8, 2010 at 10:33 AM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Wed, Dec 8, 2010 at 10:06 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
-e:
->> On Wed, =A08 Dec 2010 09:41:05 -0600
->> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->>
->>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>
->>>
->>> Indicate to the server a capability of NTLM2 session security (NTLM=
-2 Key)
->>> during ntlmssp protocol exchange in one of the bits of the flags fi=
-eld.
->>> If server supports this capability, send NTLM2 key even if signing =
-is not
->>> required on the server.
->>> If the server requires signing, the sesison keys exchanged for NTLM=
-v2
->>> and NTLM2 session security in auth packet of the nlmssp exchange ar=
-e same.
->>>
->>>
->>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>> ---
->>> =A0fs/cifs/sess.c | =A0 =A07 ++++---
->>> =A01 files changed, 4 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
->>> index 7b01d3f..122ad31 100644
->>> --- a/fs/cifs/sess.c
->>> +++ b/fs/cifs/sess.c
->>> @@ -437,7 +437,7 @@ static void build_ntlmssp_negotiate_blob(unsign=
-ed char *pbuffer,
->>> =A0 =A0 =A0 /* BB is NTLMV2 session security format easier to use h=
-ere? */
->>> =A0 =A0 =A0 flags =3D NTLMSSP_NEGOTIATE_56 | =A0NTLMSSP_REQUEST_TAR=
-GET |
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIA=
-TE_UNICODE |
->>> - =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM;
->>> + =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIAT=
-E_EXTENDED_SEC;
->>> =A0 =A0 =A0 if (ses->server->secMode &
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (SECMODE_SIGN_REQUIRED =
-| SECMODE_SIGN_ENABLED)) {
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 flags |=3D NTLMSSP_NEGOTIATE_SIGN;
->>> @@ -544,8 +544,9 @@ static int build_ntlmssp_auth_blob(unsigned cha=
-r *pbuffer,
->>> =A0 =A0 =A0 sec_blob->WorkstationName.MaximumLength =3D 0;
->>> =A0 =A0 =A0 tmp +=3D 2;
->>>
->>> - =A0 =A0 if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_X=
-CH) &&
->>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 !calc_seckey(ses)) {
->>> + =A0 =A0 if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_=
-XCH) ||
->>> + =A0 =A0 =A0 =A0 =A0 =A0 ((ses->ntlmssp->server_flags & NTLMSSP_NE=
-GOTIATE_EXTENDED_SEC)))
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0^^^
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0You can (and should) eliminate a set =
-of parenthesis here.
+On Wed, Dec 8, 2010 at 8:28 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
+rote:
+> Delete cifs_open_inode_helper and move non-posix open related things
+> to cifs_nt_open function.
 >
-> Sure.
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> =A0fs/cifs/file.c | =A0189 ++++++++++++++++++++++--------------------=
+--------------
+> =A01 files changed, 73 insertions(+), 116 deletions(-)
 >
->>
->>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 && !calc_seckey(ses)) {
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(tmp, ses->ntlmssp->ciphertext, C=
-IFS_CPHTXT_SIZE);
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 sec_blob->SessionKey.BufferOffset =3D c=
-pu_to_le32(tmp - pbuffer);
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 sec_blob->SessionKey.Length =3D cpu_to_=
-le16(CIFS_CPHTXT_SIZE);
->>
->> Other than that, it looks reasonable to me. I'll have to take your
->> word for it that this is the right thing to do as I find the NTLMSSP
->> spec really difficult to comprehend.
->>
-
-Yes. It is very confusing.  One of these days, I am planning to go thro=
-ugh
-all the flags that cifs client sends during ntlmssp negotiation stage (=
-type 1).
-I think flags do not matter when client sends authentication request (t=
-ype 3).
-To verify, I set flags field to 0x0 in type 3 packet and both sec=3Dntl=
-mssp and
-sec=3Dntlmsspi, were successful on a Windows 2003 Server Windows 7, and
-Windows 2008 Server.
-
-So we just have to get flags right in ntlmssp negotiate packet (type 1)=
- that
-client sends and send things according to capabilities that server retu=
-rned in
-flags in ntlmssp challenge packet (type 2), in ntlmssp authentication p=
-acket
-(type 3).
-
->> It also might be nice to add:
->>
->> =A0 =A0Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
->>
->> ...since he did help track this down.
->>
->> --
->> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index b857ce5..8f6a084 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -104,53 +104,6 @@ static inline int cifs_get_disposition(unsigned =
+int flags)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return FILE_OPEN;
+> =A0}
 >
-> Sure, I will respin it. Sorry for the omission Robbert.
+> -static inline int cifs_open_inode_helper(struct inode *inode,
+> - =A0 =A0 =A0 struct cifsTconInfo *pTcon, __u32 oplock, FILE_ALL_INFO=
+ *buf,
+> - =A0 =A0 =A0 char *full_path, int xid)
+> -{
+> - =A0 =A0 =A0 struct cifsInodeInfo *pCifsInode =3D CIFS_I(inode);
+> - =A0 =A0 =A0 struct timespec temp;
+> - =A0 =A0 =A0 int rc;
+> -
+> - =A0 =A0 =A0 if (pCifsInode->clientCanCacheRead) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* we have the inode open somewhere els=
+e
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0no need to discard cache data */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto client_can_cache;
+> - =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 /* BB need same check in cifs_create too? */
+> - =A0 =A0 =A0 /* if not oplocked, invalidate inode pages if mtime or =
+file
+> - =A0 =A0 =A0 =A0 =A0size changed */
+> - =A0 =A0 =A0 temp =3D cifs_NTtimeToUnix(buf->LastWriteTime);
+> - =A0 =A0 =A0 if (timespec_equal(&inode->i_mtime, &temp) &&
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(inode->i_size =3D=
+=3D
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (loff_t)le64_to=
+_cpu(buf->EndOfFile))) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "inode unchanged on server");
+> - =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (inode->i_mapping) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* BB no need to lock i=
+node until after invalidate
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 since namei code should=
+ already have it locked? */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D filemap_write_an=
+d_wait(inode->i_mapping);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapping_set_error(inode=
+->i_mapping, rc);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "invalidating remote inode sinc=
+e open detected it "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"changed");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 invalidate_remote_inode(inode);
+> - =A0 =A0 =A0 }
+> -
+> -client_can_cache:
+> - =A0 =A0 =A0 if (pTcon->unix_ext)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info_unix(&inode,=
+ full_path, inode->i_sb,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 xid);
+> - =A0 =A0 =A0 else
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info(&inode, full=
+_path, buf, inode->i_sb,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0xid, NULL);
+> -
+> - =A0 =A0 =A0 cifs_set_oplock_level(pCifsInode, oplock);
+> -
+> - =A0 =A0 =A0 return rc;
+> -}
+> -
+> =A0int cifs_posix_open(char *full_path, struct inode **pinode,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct super_block *sb=
+, int mode, unsigned int f_flags,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 *poplock, __u16 =
+*pnetfid, int xid)
+> @@ -213,6 +166,76 @@ posix_open_ret:
+> =A0 =A0 =A0 =A0return rc;
+> =A0}
+>
+> +static int
+> +cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_in=
+fo *cifs_sb,
+> + =A0 =A0 =A0 =A0 =A0 =A0struct cifsTconInfo *tcon, unsigned int f_fl=
+ags, __u32 *poplock,
+> + =A0 =A0 =A0 =A0 =A0 =A0__u16 *pnetfid, int xid)
+> +{
+> + =A0 =A0 =A0 int rc;
+> + =A0 =A0 =A0 int desiredAccess;
+> + =A0 =A0 =A0 int disposition;
+> + =A0 =A0 =A0 FILE_ALL_INFO *buf;
+> +
+> + =A0 =A0 =A0 desiredAccess =3D cifs_convert_flags(f_flags);
+> +
+> +/*******************************************************************=
+**
+> + * =A0open flag mapping table:
+> + *
+> + * =A0 =A0 POSIX Flag =A0 =A0 =A0 =A0 =A0 =A0CIFS Disposition
+> + * =A0 =A0 ---------- =A0 =A0 =A0 =A0 =A0 =A0----------------
+> + * =A0 =A0 O_CREAT =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OPEN_IF
+> + * =A0 =A0 O_CREAT | O_EXCL =A0 =A0 =A0FILE_CREATE
+> + * =A0 =A0 O_CREAT | O_TRUNC =A0 =A0 FILE_OVERWRITE_IF
+> + * =A0 =A0 O_TRUNC =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OVERWRITE
+> + * =A0 =A0 none of the above =A0 =A0 FILE_OPEN
+> + *
+> + * =A0 =A0 Note that there is not a direct match between disposition
+> + * =A0 =A0 FILE_SUPERSEDE (ie create whether or not file exists alth=
+ough
+> + * =A0 =A0 O_CREAT | O_TRUNC is similar but truncates the existing
+> + * =A0 =A0 file rather than creating a new file as FILE_SUPERSEDE do=
+es
+> + * =A0 =A0 (which uses the attributes / metadata passed in on open c=
+all)
+> + *?
+> + *? =A0O_SYNC is a reasonable match to CIFS writethrough flag
+> + *? =A0and the read write flags match reasonably. =A0O_LARGEFILE
+> + *? =A0is irrelevant because largefile support is always used
+> + *? =A0by this client. Flags O_APPEND, O_DIRECT, O_DIRECTORY,
+> + * =A0 =A0 =A0O_FASYNC, O_NOFOLLOW, O_NONBLOCK need further investig=
+ation
+> + *******************************************************************=
+**/
+> +
+> + =A0 =A0 =A0 disposition =3D cifs_get_disposition(f_flags);
+> +
+> + =A0 =A0 =A0 /* BB pass O_SYNC flag through on file attributes .. BB=
+ */
+> +
+> + =A0 =A0 =A0 buf =3D kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
+> + =A0 =A0 =A0 if (!buf)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
+> +
+> + =A0 =A0 =A0 if (tcon->ses->capabilities & CAP_NT_SMBS)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSSMBOpen(xid, tcon, full_path=
+, disposition,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0desiredAccess, CREAT=
+E_NOT_DIR, pnetfid, poplock, buf,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->local_nls, =
+cifs_sb->mnt_cifs_flags
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0& CI=
+=46S_MOUNT_MAP_SPECIAL_CHR);
+> + =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D SMBLegacyOpen(xid, tcon, full_pa=
+th, disposition,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 desiredAccess, CREATE_N=
+OT_DIR, pnetfid, poplock, buf,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->local_nls, cif=
+s_sb->mnt_cifs_flags
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 & CIFS_=
+MOUNT_MAP_SPECIAL_CHR);
+> +
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+> +
+> + =A0 =A0 =A0 if (tcon->unix_ext)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info_unix(&inode,=
+ full_path, inode->i_sb,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 xid);
+> + =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info(&inode, full=
+_path, buf, inode->i_sb,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0xid, pnetfid);
+> +
+
+Just a nit-picking, we probably do not expect a non-posix function
+calling a function for unix!
+
+> +out:
+> + =A0 =A0 =A0 kfree(buf);
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> =A0struct cifsFileInfo *
+> =A0cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct tcon_link *tlink, __u32 opl=
+ock)
+> @@ -317,10 +340,7 @@ int cifs_open(struct inode *inode, struct file *=
+file)
+> =A0 =A0 =A0 =A0struct cifsFileInfo *pCifsFile =3D NULL;
+> =A0 =A0 =A0 =A0struct cifsInodeInfo *pCifsInode;
+> =A0 =A0 =A0 =A0char *full_path =3D NULL;
+> - =A0 =A0 =A0 int desiredAccess;
+> - =A0 =A0 =A0 int disposition;
+> =A0 =A0 =A0 =A0__u16 netfid;
+> - =A0 =A0 =A0 FILE_ALL_INFO *buf =3D NULL;
+>
+> =A0 =A0 =A0 =A0xid =3D GetXid();
+>
+> @@ -385,71 +405,9 @@ int cifs_open(struct inode *inode, struct file *=
+file)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 or DFS errors */
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 desiredAccess =3D cifs_convert_flags(file->f_flags);
+> -
+> -/*******************************************************************=
+**
+> - * =A0open flag mapping table:
+> - *
+> - * =A0 =A0 POSIX Flag =A0 =A0 =A0 =A0 =A0 =A0CIFS Disposition
+> - * =A0 =A0 ---------- =A0 =A0 =A0 =A0 =A0 =A0----------------
+> - * =A0 =A0 O_CREAT =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OPEN_IF
+> - * =A0 =A0 O_CREAT | O_EXCL =A0 =A0 =A0FILE_CREATE
+> - * =A0 =A0 O_CREAT | O_TRUNC =A0 =A0 FILE_OVERWRITE_IF
+> - * =A0 =A0 O_TRUNC =A0 =A0 =A0 =A0 =A0 =A0 =A0 FILE_OVERWRITE
+> - * =A0 =A0 none of the above =A0 =A0 FILE_OPEN
+> - *
+> - * =A0 =A0 Note that there is not a direct match between disposition
+> - * =A0 =A0 FILE_SUPERSEDE (ie create whether or not file exists alth=
+ough
+> - * =A0 =A0 O_CREAT | O_TRUNC is similar but truncates the existing
+> - * =A0 =A0 file rather than creating a new file as FILE_SUPERSEDE do=
+es
+> - * =A0 =A0 (which uses the attributes / metadata passed in on open c=
+all)
+> - *?
+> - *? =A0O_SYNC is a reasonable match to CIFS writethrough flag
+> - *? =A0and the read write flags match reasonably. =A0O_LARGEFILE
+> - *? =A0is irrelevant because largefile support is always used
+> - *? =A0by this client. Flags O_APPEND, O_DIRECT, O_DIRECTORY,
+> - * =A0 =A0 =A0O_FASYNC, O_NOFOLLOW, O_NONBLOCK need further investig=
+ation
+> - *******************************************************************=
+**/
+> -
+> - =A0 =A0 =A0 disposition =3D cifs_get_disposition(file->f_flags);
+> -
+> - =A0 =A0 =A0 /* BB pass O_SYNC flag through on file attributes .. BB=
+ */
+> -
+> - =A0 =A0 =A0 /* Also refresh inode by passing in file_info buf retur=
+ned by SMBOpen
+> - =A0 =A0 =A0 =A0 =A0and calling get_inode_info with returned buf (at=
+ least helps
+> - =A0 =A0 =A0 =A0 =A0non-Unix server case) */
+> -
+> - =A0 =A0 =A0 /* BB we can not do this if this is the second open of =
+a file
+> - =A0 =A0 =A0 =A0 =A0and the first handle has writebehind data, we mi=
+ght be
+> - =A0 =A0 =A0 =A0 =A0able to simply do a filemap_fdatawrite/filemap_f=
+datawait first */
+> - =A0 =A0 =A0 buf =3D kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
+> - =A0 =A0 =A0 if (!buf) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+> - =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 if (tcon->ses->capabilities & CAP_NT_SMBS)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSSMBOpen(xid, tcon, full_path=
+, disposition,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0desiredAccess, CREAT=
+E_NOT_DIR, &netfid, &oplock, buf,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->local_nls, =
+cifs_sb->mnt_cifs_flags
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0& CI=
+=46S_MOUNT_MAP_SPECIAL_CHR);
+> - =A0 =A0 =A0 else
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO; /* no NT SMB support fall =
+into legacy open below */
+> -
+> - =A0 =A0 =A0 if (rc =3D=3D -EIO) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Old server, try legacy style OpenX *=
+/
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D SMBLegacyOpen(xid, tcon, full_pa=
+th, disposition,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 desiredAccess, CREATE_N=
+OT_DIR, &netfid, &oplock, buf,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->local_nls, cif=
+s_sb->mnt_cifs_flags
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 & CIFS_=
+MOUNT_MAP_SPECIAL_CHR);
+> - =A0 =A0 =A0 }
+> - =A0 =A0 =A0 if (rc) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "cifs_open returned 0x%x", rc);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+> - =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 rc =3D cifs_open_inode_helper(inode, tcon, oplock, buf,=
+ full_path, xid);
+> - =A0 =A0 =A0 if (rc !=3D 0)
+> + =A0 =A0 =A0 rc =3D cifs_nt_open(full_path, inode, cifs_sb, tcon, fi=
+le->f_flags,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &oplock, &netfid, x=
+id);
+> + =A0 =A0 =A0 if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
+>
+> =A0 =A0 =A0 =A0pCifsFile =3D cifs_new_fileinfo(netfid, file, tlink, o=
+plock);
+> @@ -481,7 +439,6 @@ int cifs_open(struct inode *inode, struct file *f=
+ile)
+> =A0 =A0 =A0 =A0}
+>
+> =A0out:
+> - =A0 =A0 =A0 kfree(buf);
+> =A0 =A0 =A0 =A0kfree(full_path);
+> =A0 =A0 =A0 =A0FreeXid(xid);
+> =A0 =A0 =A0 =A0cifs_put_tlink(tlink);
+> --
+> 1.7.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
