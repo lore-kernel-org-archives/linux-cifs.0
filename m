@@ -1,39 +1,26 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 5/6] CIFS: Make cifs_file_map work with strict cache
- mode (try #3)
-Date: Wed, 8 Dec 2010 15:59:57 -0500
-Message-ID: <20101208155957.486451a4@tlielax.poochiereds.net>
-References: <1291037804-4000-1-git-send-email-piastryyy@gmail.com>
-	<1291037804-4000-4-git-send-email-piastryyy@gmail.com>
-	<20101207075635.6f9c1c5f@tlielax.poochiereds.net>
-	<AANLkTineJVVgK6aihGBLWJfEnEOuz67CcHncwBUpdvt0@mail.gmail.com>
+From: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP authentication
+Date: Wed, 08 Dec 2010 22:07:09 +0100
+Message-ID: <4CFFF37D.5010004@exx.nl>
+References: <1291822865-26472-1-git-send-email-shirishpargaonkar@gmail.com>	<20101208110608.607a23e2@tlielax.poochiereds.net>	<AANLkTi=WVaCDRHf5=DgnZr7crJByhH5r6F6S+_PVGY0F@mail.gmail.com>	<AANLkTinehfVNbrC2gNnDEi5OHDtgjYYimUqYO=+y4Dy6@mail.gmail.com>	<4CFFCB61.4090807@exx.nl> <AANLkTikU1OhcT8FmyrOZfrLtgK-8NKnRnFNnczFvz2C_@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTineJVVgK6aihGBLWJfEnEOuz67CcHncwBUpdvt0-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTikU1OhcT8FmyrOZfrLtgK-8NKnRnFNnczFvz2C_-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 8 Dec 2010 23:53:12 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> 2010/12/7 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > Looks reasonable, though all of this special-casing sure is gross...
-> >
-> > Might it be better to have a set of cifs_strict_file/inode_ops and use
-> > those rather than all of these if/else conditions?
-> >
+Op 8-12-2010 19:53, Shirish Pargaonkar schreef:
+>> Is it your intent to leave out this hunk?
 > 
-> Good idea. So, do you mean to split all these aio_read, aio_write,
-> fsync and mmap into strict and non-strict calls as we have in direct
-> i/o case?
-> 
+> Yes, it does not matter whether that flag bit exists or not in ntlmssp
+> auth packet (type 3).
 
-Right. Once a mount is declared "strictcache" it won't ever change, so
-you might as well set the ops appropriately.
+FWIW, I just verified this on my side. It still works without this hunk.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Regards,
+Robbert
