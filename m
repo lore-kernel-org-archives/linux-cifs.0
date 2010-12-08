@@ -1,30 +1,26 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 5/6] CIFS: Make cifs_file_map work with strict cache mode
- (try #3)
-Date: Wed, 8 Dec 2010 23:53:12 +0300
-Message-ID: <AANLkTineJVVgK6aihGBLWJfEnEOuz67CcHncwBUpdvt0@mail.gmail.com>
-References: <1291037804-4000-1-git-send-email-piastryyy@gmail.com>
-	<1291037804-4000-4-git-send-email-piastryyy@gmail.com>
-	<20101207075635.6f9c1c5f@tlielax.poochiereds.net>
+Subject: Re: [PATCH 2/2] CIFS: Simplify cifs_open code
+Date: Wed, 8 Dec 2010 23:49:01 +0300
+Message-ID: <AANLkTinBPCP_GOPKQeZPMEiTEcsMOORzdbBGpnzQFHHG@mail.gmail.com>
+References: <1290696298-5204-1-git-send-email-piastryyy@gmail.com>
+	<1290696298-5204-2-git-send-email-piastryyy@gmail.com>
+	<AANLkTi=5Fixa9piVpqWc5ZmNA0ZeTwRRXsUZQwU=b-9h@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101207075635.6f9c1c5f-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <AANLkTi=5Fixa9piVpqWc5ZmNA0ZeTwRRXsUZQwU=b-9h-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/12/7 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Looks reasonable, though all of this special-casing sure is gross...
+2010/12/8 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
 >
-> Might it be better to have a set of cifs_strict_file/inode_ops and use
-> those rather than all of these if/else conditions?
+> Since I have reviewed patch number 1 ([PATCH 1/2] CIFS: Simplify
+Since I have patch number 1 reviewed (sorry for typying mistake here)
+> non-posix open stuff (try #2)) could you review this one, please?
 >
 
-Good idea. So, do you mean to split all these aio_read, aio_write,
-fsync and mmap into strict and non-strict calls as we have in direct
-i/o case?
+
 
 -- 
 Best regards,
