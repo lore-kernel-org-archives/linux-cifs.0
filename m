@@ -1,26 +1,125 @@
-From: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP authentication
-Date: Wed, 08 Dec 2010 22:07:09 +0100
-Message-ID: <4CFFF37D.5010004@exx.nl>
-References: <1291822865-26472-1-git-send-email-shirishpargaonkar@gmail.com>	<20101208110608.607a23e2@tlielax.poochiereds.net>	<AANLkTi=WVaCDRHf5=DgnZr7crJByhH5r6F6S+_PVGY0F@mail.gmail.com>	<AANLkTinehfVNbrC2gNnDEi5OHDtgjYYimUqYO=+y4Dy6@mail.gmail.com>	<4CFFCB61.4090807@exx.nl> <AANLkTikU1OhcT8FmyrOZfrLtgK-8NKnRnFNnczFvz2C_@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 2/2] CIFS: Simplify cifs_open code
+Date: Wed, 8 Dec 2010 16:07:32 -0500
+Message-ID: <20101208160732.51b375da@tlielax.poochiereds.net>
+References: <1290696298-5204-1-git-send-email-piastryyy@gmail.com>
+	<1290696298-5204-2-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikU1OhcT8FmyrOZfrLtgK-8NKnRnFNnczFvz2C_-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1290696298-5204-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Op 8-12-2010 19:53, Shirish Pargaonkar schreef:
->> Is it your intent to leave out this hunk?
+On Thu, 25 Nov 2010 17:44:58 +0300
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+
+> Make the code more general for use in posix and non-posix open.
 > 
-> Yes, it does not matter whether that flag bit exists or not in ntlmssp
-> auth packet (type 3).
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/file.c |   54 +++++++++++++++++++++++-------------------------------
+>  1 files changed, 23 insertions(+), 31 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index c7d642f..2e21cd1 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -335,6 +335,7 @@ int cifs_open(struct inode *inode, struct file *file)
+>  	struct cifsFileInfo *pCifsFile = NULL;
+>  	struct cifsInodeInfo *pCifsInode;
+>  	char *full_path = NULL;
+> +	bool posix_open_ok = false;
+>  	__u16 netfid;
+>  
+>  	xid = GetXid();
+> @@ -373,17 +374,7 @@ int cifs_open(struct inode *inode, struct file *file)
+>  				file->f_flags, &oplock, &netfid, xid);
+>  		if (rc == 0) {
+>  			cFYI(1, "posix open succeeded");
+> -
+> -			pCifsFile = cifs_new_fileinfo(netfid, file, tlink,
+> -						      oplock);
+> -			if (pCifsFile == NULL) {
+> -				CIFSSMBClose(xid, tcon, netfid);
+> -				rc = -ENOMEM;
+> -			}
+> -
+> -			cifs_fscache_set_inode_cookie(inode, file);
+> -
+> -			goto out;
+> +			posix_open_ok = true;
+>  		} else if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
+>  			if (tcon->ses->serverNOS)
+>  				cERROR(1, "server %s of type %s returned"
+> @@ -400,37 +391,38 @@ int cifs_open(struct inode *inode, struct file *file)
+>  		   or DFS errors */
+>  	}
+>  
+> -	rc = cifs_nt_open(full_path, &inode, cifs_sb, tcon, file->f_flags,
+> -			  &oplock, &netfid, xid);
+> -	if (rc)
+> -		goto out;
+> +	if (!posix_open_ok) {
+> +		rc = cifs_nt_open(full_path, &inode, cifs_sb, tcon,
+> +				  file->f_flags, &oplock, &netfid, xid);
+> +		if (rc)
+> +			goto out;
+> +	}
+>  
+>  	pCifsFile = cifs_new_fileinfo(netfid, file, tlink, oplock);
+>  	if (pCifsFile == NULL) {
+> +		CIFSSMBClose(xid, tcon, netfid);
+>  		rc = -ENOMEM;
+>  		goto out;
+>  	}
+>  
+>  	cifs_fscache_set_inode_cookie(inode, file);
+>  
+> -	if (oplock & CIFS_CREATE_ACTION) {
+> +	if ((oplock & CIFS_CREATE_ACTION) && !posix_open_ok && tcon->unix_ext) {
+>  		/* time to set mode which we can not set earlier due to
+>  		   problems creating new read-only files */
+> -		if (tcon->unix_ext) {
+> -			struct cifs_unix_set_info_args args = {
+> -				.mode	= inode->i_mode,
+> -				.uid	= NO_CHANGE_64,
+> -				.gid	= NO_CHANGE_64,
+> -				.ctime	= NO_CHANGE_64,
+> -				.atime	= NO_CHANGE_64,
+> -				.mtime	= NO_CHANGE_64,
+> -				.device	= 0,
+> -			};
+> -			CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
+> -					       cifs_sb->local_nls,
+> -					       cifs_sb->mnt_cifs_flags &
+> -						CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -		}
+> +		struct cifs_unix_set_info_args args = {
+> +			.mode	= inode->i_mode,
+> +			.uid	= NO_CHANGE_64,
+> +			.gid	= NO_CHANGE_64,
+> +			.ctime	= NO_CHANGE_64,
+> +			.atime	= NO_CHANGE_64,
+> +			.mtime	= NO_CHANGE_64,
+> +			.device	= 0,
+> +		};
+> +		CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
+> +				       cifs_sb->local_nls,
+> +				       cifs_sb->mnt_cifs_flags &
+> +					CIFS_MOUNT_MAP_SPECIAL_CHR);
 
-FWIW, I just verified this on my side. It still works without this hunk.
+Hmm...we have a fid so we probably ought to switch the above call to a
+SetFileInfo call. That's outside the scope of this patch though.
 
-Regards,
-Robbert
+
+>  	}
+>  
+>  out:
+
+Looks good to me. Nice cleanup.
+
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
