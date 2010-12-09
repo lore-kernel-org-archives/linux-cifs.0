@@ -1,88 +1,63 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: manpage: add entry for "actimeo" option
-Date: Thu, 9 Dec 2010 09:42:56 -0500
-Message-ID: <20101209094256.4e485d60@barsoom.rdu.redhat.com>
-References: <1291208436-12371-1-git-send-email-sjayaraman@suse.de>
-	<20101201080932.24f4386e@tlielax.poochiereds.net>
+From: "Yasumori Ihara" <toyota2010-rXBAjjdwZU8@public.gmane.org>
+Subject: WINNING PRIZE NOTIFICATION 2010 NEW CARS PROMOTION .
+Date: Fri, 10 Dec 2010 00:28:45 +0700
+Message-ID: <201012091728.oB9HSHxg010158@mail.nstek.com>
+Reply-To: <toyota.prize2010-rXBAjjdwZU8@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101201080932.24f4386e-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+To: <liph-tJFINi7a1DQAvxtiuMwx3w@public.gmane.org>
+To: <lirenjia-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <lion36pc-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <lion2005e_king-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <lion_king259-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <lion_heart00700-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <lion_hard31-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <lio119-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <linkindiagcc-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <linjo_j-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: <linn.kierkegaard-eMwfRAhOooo@public.gmane.org>
+To: <lion73-hqQeZYnghRZeoWH0uzbU5w@public.gmane.org>
+To: <lisa.franklin-RJ1i67VoxBg@public.gmane.org>
+To: <lintonm-GguqRaewnIvSzoUhkEQhLg@public.gmane.org>
+To: <links-4rMJSBDZHiksupnzZ1P/ER6SZaWxuSEbQH7oEaQurus@public.gmane.org>
+To: <link-nOmEkfejQIR5LCfJIXAkkA@public.gmane.org>
+To: <lisa.doll-bruno-5wztrtD2PvZBDgjK7y7TUQ@public.gmane.org>
+To: <liran_r-KndQ6Ac43bDc3gOQVGmKjw@public.gmane.org>
+To: <lipidomics-F/0MNWz/qG3QT0dZR+AlfA@public.gmane.org>
+To: <liorbd-AxqhEAMtG4v6gbPvEgmw2w@public.gmane.org>
+To: <lirlr-qwN91j2joAJ+PJISYzyFaQ@public.gmane.org>
+To: <linnavalitsus-g/JMA/7wFZquvFJfX82//w@public.gmane.org>
+To: <links-ruxPE6CSw9DQT0dZR+AlfA@public.gmane.org>
+To: <linkjuice-AEEa6dgXaDsAvxtiuMwx3w@public.gmane.org>
+To: <lion_blanc-PkbjNfxxIARGWvitb5QawA@public.gmane.org>
+To: <linkinpark20001-PkbjNfxxIARGWvitb5QawA@public.gmane.org>
+To: <lis_cafe-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <liontony77-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <lions19-87-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <lionfaycal-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <lion101_a-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <lion_heart00700-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <lion_a6-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <lioaaldeen-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <linux_kb3-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <linshukun-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <linkin_punk_bz-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+To: <linzi05-PkbjNfxxIAQqdlJmJB21zg@public.gmane.org>
+To: <liquid-fkgGaHOPV89B3e5yZ5y1z4dd74u8MsAO@public.gmane.org>
+To: <links-Y0pbcourc9SI2xUbZzX/NA@public.gmane.org>
+To: <lion202020-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+To: <linuxusersgroup-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
+To: <liosama-Re5JQEeQqe+vJTJVH1l5fw@public.gmane.org>
+To: <lirpaskoorb-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: <liosama-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: <linlifeng-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: <lininhasantana-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: <linhxu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: <linuxawy-OmLHg5ZB6IHYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 1 Dec 2010 08:09:32 -0500
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-
-> On Wed,  1 Dec 2010 18:30:36 +0530
-> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
-> 
-> > 
-> > Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> > ---
-> >  mount.cifs.8 |   18 ++++++++++++++++++
-> >  1 files changed, 18 insertions(+), 0 deletions(-)
-> > 
-> > diff --git a/mount.cifs.8 b/mount.cifs.8
-> > index 7d2bf69..15dc2dc 100644
-> > --- a/mount.cifs.8
-> > +++ b/mount.cifs.8
-> > @@ -403,6 +403,24 @@ Map user accesses to individual credentials when accessing the server\&. By defa
-> >  With this change, it's feasible for the server to handle permissions enforcement, so this option also implies "noperm"\&. Furthermore, when unix extensions aren't in use and the administrator has not overriden ownership using the uid= or gid= options, ownership of files is presented as the current user accessing the share\&.
-> >  .RE
-> >  .PP
-> > +actimeo=\fIarg\fR
-> > +.RS 4
-> > +The time (in seconds) that the CIFS client caches attributes of a file or
-> > +directory before it requests attribute information from a server. During this
-> > +period the changes that occur on the server remain undetected until the client
-> > +checks the server again.
-> > +.sp
-> > +By default, the attribute cache timeout is set to 1 second. This means more
-> > +frequent on-the-wire calls to the server to check whether attributes have
-> > +changed which could impact performance. With this option the users can make
-> 
-> "With this option, users can make a"
-> 
-> > +tradeoff between performance and cache metadata correctness depending on the
-> 						"correctness, depending"
-> 
-> > +workload needs. Shorter timeouts mean better the cache coherency, but frequent
-> 
-> 		"Shorter timeouts mean better cache coherency, but an"
-> 
-> > +increased number of calls to the server. Longer timeouts mean reduced number
-> > +of calls to the server at the expense of stricter cache coherency\&. The
-> 
-> A little unclear...maybe "Longer timeouts mean a reduced number of calls to the server but looser cache coherency."
-> 
-> > +actimeo value is a positive integral that can hold values between 0 and a
-> 
-> 				"integer"
-> 
-> > +maximum value of 2^30 * HZ (frequency of timer interrupt) setting\&. 
-> > +.RE
-> > +.PP
-> >  \-\-verbose
-> >  .RS 4
-> >  Print additional debugging information for the mount\&. Note that this parameter must be specified before the \-o\&. For example:
-> 
-> If those edits look ok, I'll add them in when I merge the patch, which
-> should be soon after Steve merges the kernel patch. No need to resend.
-> 
-> Thanks,
-> -- 
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Modified patch pushed to cifs-utils repo.
-
-Thanks,
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
