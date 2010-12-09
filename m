@@ -1,47 +1,71 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP authentication
-Date: Thu, 9 Dec 2010 08:35:43 -0600
-Message-ID: <AANLkTimDyW_woYdyFFYhWqRayCgHPe0VgG2MtOSoqFQo@mail.gmail.com>
-References: <1291822865-26472-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101208110608.607a23e2@tlielax.poochiereds.net>
-	<AANLkTi=WVaCDRHf5=DgnZr7crJByhH5r6F6S+_PVGY0F@mail.gmail.com>
-	<AANLkTinehfVNbrC2gNnDEi5OHDtgjYYimUqYO=+y4Dy6@mail.gmail.com>
-	<4CFFCB61.4090807@exx.nl>
-	<AANLkTikU1OhcT8FmyrOZfrLtgK-8NKnRnFNnczFvz2C_@mail.gmail.com>
-	<4CFFF37D.5010004@exx.nl>
-	<alpine.DEB.2.00.1012091351180.9919@awakenings.cable.ziggo.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] cifs-utils: rewrite hardcoded paths in manpages
+Date: Thu,  9 Dec 2010 09:37:20 -0500
+Message-ID: <1291905440-12866-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.DEB.2.00.1012091351180.9919-56sTcPfcKMhJlCS1zhbguEjk2N/pv5CcZkel5v8DVj8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Dec 9, 2010 at 6:56 AM, Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org> wrote:
-> Ahem,
->
->>> Yes, it does not matter whether that flag bit exists or not in ntlmssp
->>> auth packet (type 3).
->>
->> FWIW, I just verified this on my side. It still works without this hunk.
->
-> Not sure what I smoked yesterday, but yesterday's conclusion is NOT correct.
->
-> I actually do need the NTLM2 flag in the AUTH packet as well as the
-> NEGOTIATE packet, so I do need the extra hunk of the patch that you left out
-> when you submitted it to the list.
->
-> Regards,
-> Robbert
->
+Currently the manpages (particularly cifs.upcall.8) have hardcoded
+paths in them that need to be manually adjusted. Replace those
+paths with @sbindir@ and add a makefile target that will use sed
+to replace those paths with the ones set by autoconf.
 
-Robbert, can you send me the wireshark trace of the failing session setup
-(auth failure)?  I will go through MS-NLMP document also to see what it says
-about the flags in all three types of packets in ntlmssp exchange.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ Makefile.am                       |    6 ++++++
+ cifs.upcall.8 => cifs.upcall.8.in |    4 ++--
+ configure.ac                      |    1 +
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+ rename cifs.upcall.8 => cifs.upcall.8.in (97%)
 
-Regards,
-
-Shirish
+diff --git a/Makefile.am b/Makefile.am
+index 38a16fe..cbfa846 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -13,6 +13,12 @@ sbin_PROGRAMS = cifs.upcall
+ cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
+ cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
+ man_MANS += cifs.upcall.8
++
++cifs.upcall.8: cifs.upcall.8.in
++	sed 's,\@sbindir\@,$(sbindir),' < $(srcdir)/cifs.upcall.8.in > cifs.upcall.8
++
++clean-local:
++	rm -f cifs.upcall.8
+ endif
+ 
+ if CONFIG_CIFSCREDS
+diff --git a/cifs.upcall.8 b/cifs.upcall.8.in
+similarity index 97%
+rename from cifs.upcall.8
+rename to cifs.upcall.8.in
+index 3207f6f..bef1ee6 100644
+--- a/cifs.upcall.8
++++ b/cifs.upcall.8.in
+@@ -78,8 +78,8 @@ To make this program useful for CIFS, you\'ll need to set up entries for them in
+ .nf
+ #OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
+ #=========  =============  = = ================================
+-create      cifs\&.spnego    * * /usr/local/sbin/cifs\&.upcall %k
+-create      dns_resolver   * * /usr/local/sbin/cifs\&.upcall %k
++create      cifs\&.spnego    * * @sbindir@/cifs\&.upcall %k
++create      dns_resolver   * * @sbindir@/cifs\&.upcall %k
+ .fi
+ .if n \{\
+ .RE
+diff --git a/configure.ac b/configure.ac
+index a04596c..093b48d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -24,6 +24,7 @@ AC_ARG_ENABLE(cifscreds,
+ 
+ # Checks for programs.
+ AC_PROG_CC
++AC_PROG_SED
+ AC_GNU_SOURCE
+ 
+ # Checks for header files.
+-- 
+1.7.3.2
