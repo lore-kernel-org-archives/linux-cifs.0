@@ -1,71 +1,88 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs-utils: rewrite hardcoded paths in manpages
-Date: Thu,  9 Dec 2010 09:37:20 -0500
-Message-ID: <1291905440-12866-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: manpage: add entry for "actimeo" option
+Date: Thu, 9 Dec 2010 09:42:56 -0500
+Message-ID: <20101209094256.4e485d60@barsoom.rdu.redhat.com>
+References: <1291208436-12371-1-git-send-email-sjayaraman@suse.de>
+	<20101201080932.24f4386e@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20101201080932.24f4386e-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently the manpages (particularly cifs.upcall.8) have hardcoded
-paths in them that need to be manually adjusted. Replace those
-paths with @sbindir@ and add a makefile target that will use sed
-to replace those paths with the ones set by autoconf.
+On Wed, 1 Dec 2010 08:09:32 -0500
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- Makefile.am                       |    6 ++++++
- cifs.upcall.8 => cifs.upcall.8.in |    4 ++--
- configure.ac                      |    1 +
- 3 files changed, 9 insertions(+), 2 deletions(-)
- rename cifs.upcall.8 => cifs.upcall.8.in (97%)
+> On Wed,  1 Dec 2010 18:30:36 +0530
+> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+> 
+> > 
+> > Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> > ---
+> >  mount.cifs.8 |   18 ++++++++++++++++++
+> >  1 files changed, 18 insertions(+), 0 deletions(-)
+> > 
+> > diff --git a/mount.cifs.8 b/mount.cifs.8
+> > index 7d2bf69..15dc2dc 100644
+> > --- a/mount.cifs.8
+> > +++ b/mount.cifs.8
+> > @@ -403,6 +403,24 @@ Map user accesses to individual credentials when accessing the server\&. By defa
+> >  With this change, it's feasible for the server to handle permissions enforcement, so this option also implies "noperm"\&. Furthermore, when unix extensions aren't in use and the administrator has not overriden ownership using the uid= or gid= options, ownership of files is presented as the current user accessing the share\&.
+> >  .RE
+> >  .PP
+> > +actimeo=\fIarg\fR
+> > +.RS 4
+> > +The time (in seconds) that the CIFS client caches attributes of a file or
+> > +directory before it requests attribute information from a server. During this
+> > +period the changes that occur on the server remain undetected until the client
+> > +checks the server again.
+> > +.sp
+> > +By default, the attribute cache timeout is set to 1 second. This means more
+> > +frequent on-the-wire calls to the server to check whether attributes have
+> > +changed which could impact performance. With this option the users can make
+> 
+> "With this option, users can make a"
+> 
+> > +tradeoff between performance and cache metadata correctness depending on the
+> 						"correctness, depending"
+> 
+> > +workload needs. Shorter timeouts mean better the cache coherency, but frequent
+> 
+> 		"Shorter timeouts mean better cache coherency, but an"
+> 
+> > +increased number of calls to the server. Longer timeouts mean reduced number
+> > +of calls to the server at the expense of stricter cache coherency\&. The
+> 
+> A little unclear...maybe "Longer timeouts mean a reduced number of calls to the server but looser cache coherency."
+> 
+> > +actimeo value is a positive integral that can hold values between 0 and a
+> 
+> 				"integer"
+> 
+> > +maximum value of 2^30 * HZ (frequency of timer interrupt) setting\&. 
+> > +.RE
+> > +.PP
+> >  \-\-verbose
+> >  .RS 4
+> >  Print additional debugging information for the mount\&. Note that this parameter must be specified before the \-o\&. For example:
+> 
+> If those edits look ok, I'll add them in when I merge the patch, which
+> should be soon after Steve merges the kernel patch. No need to resend.
+> 
+> Thanks,
+> -- 
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-diff --git a/Makefile.am b/Makefile.am
-index 38a16fe..cbfa846 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -13,6 +13,12 @@ sbin_PROGRAMS = cifs.upcall
- cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
- cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
- man_MANS += cifs.upcall.8
-+
-+cifs.upcall.8: cifs.upcall.8.in
-+	sed 's,\@sbindir\@,$(sbindir),' < $(srcdir)/cifs.upcall.8.in > cifs.upcall.8
-+
-+clean-local:
-+	rm -f cifs.upcall.8
- endif
- 
- if CONFIG_CIFSCREDS
-diff --git a/cifs.upcall.8 b/cifs.upcall.8.in
-similarity index 97%
-rename from cifs.upcall.8
-rename to cifs.upcall.8.in
-index 3207f6f..bef1ee6 100644
---- a/cifs.upcall.8
-+++ b/cifs.upcall.8.in
-@@ -78,8 +78,8 @@ To make this program useful for CIFS, you\'ll need to set up entries for them in
- .nf
- #OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
- #=========  =============  = = ================================
--create      cifs\&.spnego    * * /usr/local/sbin/cifs\&.upcall %k
--create      dns_resolver   * * /usr/local/sbin/cifs\&.upcall %k
-+create      cifs\&.spnego    * * @sbindir@/cifs\&.upcall %k
-+create      dns_resolver   * * @sbindir@/cifs\&.upcall %k
- .fi
- .if n \{\
- .RE
-diff --git a/configure.ac b/configure.ac
-index a04596c..093b48d 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -24,6 +24,7 @@ AC_ARG_ENABLE(cifscreds,
- 
- # Checks for programs.
- AC_PROG_CC
-+AC_PROG_SED
- AC_GNU_SOURCE
- 
- # Checks for header files.
+Modified patch pushed to cifs-utils repo.
+
+Thanks,
 -- 
-1.7.3.2
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
