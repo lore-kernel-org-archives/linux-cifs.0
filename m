@@ -1,63 +1,86 @@
-From: "Yasumori Ihara" <toyota2010-rXBAjjdwZU8@public.gmane.org>
-Subject: WINNING PRIZE NOTIFICATION 2010 NEW CARS PROMOTION .
-Date: Fri, 10 Dec 2010 00:28:45 +0700
-Message-ID: <201012091728.oB9HSHxg010158@mail.nstek.com>
-Reply-To: <toyota.prize2010-rXBAjjdwZU8@public.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Support NTLM2 session security during NTLMSSP authentication [try #3]
+Date: Thu,  9 Dec 2010 11:58:11 -0600
+Message-ID: <1291917491-5924-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: <liph-tJFINi7a1DQAvxtiuMwx3w@public.gmane.org>
-To: <lirenjia-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <lion36pc-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <lion2005e_king-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <lion_king259-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <lion_heart00700-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <lion_hard31-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <lio119-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <linkindiagcc-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <linjo_j-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: <linn.kierkegaard-eMwfRAhOooo@public.gmane.org>
-To: <lion73-hqQeZYnghRZeoWH0uzbU5w@public.gmane.org>
-To: <lisa.franklin-RJ1i67VoxBg@public.gmane.org>
-To: <lintonm-GguqRaewnIvSzoUhkEQhLg@public.gmane.org>
-To: <links-4rMJSBDZHiksupnzZ1P/ER6SZaWxuSEbQH7oEaQurus@public.gmane.org>
-To: <link-nOmEkfejQIR5LCfJIXAkkA@public.gmane.org>
-To: <lisa.doll-bruno-5wztrtD2PvZBDgjK7y7TUQ@public.gmane.org>
-To: <liran_r-KndQ6Ac43bDc3gOQVGmKjw@public.gmane.org>
-To: <lipidomics-F/0MNWz/qG3QT0dZR+AlfA@public.gmane.org>
-To: <liorbd-AxqhEAMtG4v6gbPvEgmw2w@public.gmane.org>
-To: <lirlr-qwN91j2joAJ+PJISYzyFaQ@public.gmane.org>
-To: <linnavalitsus-g/JMA/7wFZquvFJfX82//w@public.gmane.org>
-To: <links-ruxPE6CSw9DQT0dZR+AlfA@public.gmane.org>
-To: <linkjuice-AEEa6dgXaDsAvxtiuMwx3w@public.gmane.org>
-To: <lion_blanc-PkbjNfxxIARGWvitb5QawA@public.gmane.org>
-To: <linkinpark20001-PkbjNfxxIARGWvitb5QawA@public.gmane.org>
-To: <lis_cafe-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <liontony77-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <lions19-87-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <lionfaycal-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <lion101_a-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <lion_heart00700-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <lion_a6-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <lioaaldeen-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <linux_kb3-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <linshukun-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <linkin_punk_bz-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
-To: <linzi05-PkbjNfxxIAQqdlJmJB21zg@public.gmane.org>
-To: <liquid-fkgGaHOPV89B3e5yZ5y1z4dd74u8MsAO@public.gmane.org>
-To: <links-Y0pbcourc9SI2xUbZzX/NA@public.gmane.org>
-To: <lion202020-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-To: <linuxusersgroup-/JYPxA39Uh5TLH3MbocFFw@public.gmane.org>
-To: <liosama-Re5JQEeQqe+vJTJVH1l5fw@public.gmane.org>
-To: <lirpaskoorb-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: <liosama-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: <linlifeng-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: <lininhasantana-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: <linhxu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: <linuxawy-OmLHg5ZB6IHYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+
+Indicate to the server a capability of NTLM2 session security (NTLM2 Key)
+during ntlmssp protocol exchange in one of the bits of the flags field.
+If server supports this capability, send NTLM2 key even if signing is not
+required on the server.
+
+If the server requires signing, the session keys exchanged for NTLMv2
+and NTLM2 session security in auth packet of the nlmssp exchange are same.
+
+Send the same flags in authenticate message (type 3) that client sent in
+negotiate message (type 1).
+
+
+Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/sess.c |   13 +++++++------
+ 1 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 7b01d3f..ea39f3f 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -437,7 +437,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 	/* BB is NTLMV2 session security format easier to use here? */
+ 	flags = NTLMSSP_NEGOTIATE_56 |	NTLMSSP_REQUEST_TARGET |
+ 		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+-		NTLMSSP_NEGOTIATE_NTLM;
++		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+ 	if (ses->server->secMode &
+ 			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
+@@ -446,7 +446,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+ 	}
+ 
+-	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
++	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+ 
+ 	sec_blob->WorkstationName.BufferOffset = 0;
+ 	sec_blob->WorkstationName.Length = 0;
+@@ -477,7 +477,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	flags = NTLMSSP_NEGOTIATE_56 |
+ 		NTLMSSP_REQUEST_TARGET | NTLMSSP_NEGOTIATE_TARGET_INFO |
+ 		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+-		NTLMSSP_NEGOTIATE_NTLM;
++		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+ 	if (ses->server->secMode &
+ 	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
+@@ -485,7 +485,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
+ 
+ 	tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+-	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
++	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+ 
+ 	sec_blob->LmChallengeResponse.BufferOffset =
+ 				cpu_to_le32(sizeof(AUTHENTICATE_MESSAGE));
+@@ -544,8 +544,9 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 	sec_blob->WorkstationName.MaximumLength = 0;
+ 	tmp += 2;
+ 
+-	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
+-			!calc_seckey(ses)) {
++	if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
++		(ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
++			&& !calc_seckey(ses)) {
+ 		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+ 		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+ 		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
+-- 
+1.6.0.2
