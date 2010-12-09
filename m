@@ -1,125 +1,64 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/2] CIFS: Simplify cifs_open code
-Date: Wed, 8 Dec 2010 16:07:32 -0500
-Message-ID: <20101208160732.51b375da@tlielax.poochiereds.net>
-References: <1290696298-5204-1-git-send-email-piastryyy@gmail.com>
-	<1290696298-5204-2-git-send-email-piastryyy@gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP
+ authentication [try #2]
+Date: Wed, 8 Dec 2010 20:55:14 -0500
+Message-ID: <20101208205514.1e0ca7d7@corrin.poochiereds.net>
+References: <1291828398-27336-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1290696298-5204-2-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1291828398-27336-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 25 Nov 2010 17:44:58 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Wed,  8 Dec 2010 11:13:18 -0600
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> Make the code more general for use in posix and non-posix open.
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Indicate to the server a capability of NTLM2 session security (NTLM2 Key)
+> during ntlmssp protocol exchange in one of the bits of the flags field.
+> If server supports this capability, send NTLM2 key even if signing is not
+> required on the server.
+> If the server requires signing, the session keys exchanged for NTLMv2
+> and NTLM2 session security in auth packet of the nlmssp exchange are same.
+> 
+> 
+> Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/file.c |   54 +++++++++++++++++++++++-------------------------------
->  1 files changed, 23 insertions(+), 31 deletions(-)
+>  fs/cifs/sess.c |    7 ++++---
+>  1 files changed, 4 insertions(+), 3 deletions(-)
 > 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index c7d642f..2e21cd1 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -335,6 +335,7 @@ int cifs_open(struct inode *inode, struct file *file)
->  	struct cifsFileInfo *pCifsFile = NULL;
->  	struct cifsInodeInfo *pCifsInode;
->  	char *full_path = NULL;
-> +	bool posix_open_ok = false;
->  	__u16 netfid;
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 7b01d3f..44c2989 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -437,7 +437,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+>  	/* BB is NTLMV2 session security format easier to use here? */
+>  	flags = NTLMSSP_NEGOTIATE_56 |	NTLMSSP_REQUEST_TARGET |
+>  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+> -		NTLMSSP_NEGOTIATE_NTLM;
+> +		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>  	if (ses->server->secMode &
+>  			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+>  		flags |= NTLMSSP_NEGOTIATE_SIGN;
+> @@ -544,8 +544,9 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  	sec_blob->WorkstationName.MaximumLength = 0;
+>  	tmp += 2;
 >  
->  	xid = GetXid();
-> @@ -373,17 +374,7 @@ int cifs_open(struct inode *inode, struct file *file)
->  				file->f_flags, &oplock, &netfid, xid);
->  		if (rc == 0) {
->  			cFYI(1, "posix open succeeded");
-> -
-> -			pCifsFile = cifs_new_fileinfo(netfid, file, tlink,
-> -						      oplock);
-> -			if (pCifsFile == NULL) {
-> -				CIFSSMBClose(xid, tcon, netfid);
-> -				rc = -ENOMEM;
-> -			}
-> -
-> -			cifs_fscache_set_inode_cookie(inode, file);
-> -
-> -			goto out;
-> +			posix_open_ok = true;
->  		} else if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
->  			if (tcon->ses->serverNOS)
->  				cERROR(1, "server %s of type %s returned"
-> @@ -400,37 +391,38 @@ int cifs_open(struct inode *inode, struct file *file)
->  		   or DFS errors */
->  	}
->  
-> -	rc = cifs_nt_open(full_path, &inode, cifs_sb, tcon, file->f_flags,
-> -			  &oplock, &netfid, xid);
-> -	if (rc)
-> -		goto out;
-> +	if (!posix_open_ok) {
-> +		rc = cifs_nt_open(full_path, &inode, cifs_sb, tcon,
-> +				  file->f_flags, &oplock, &netfid, xid);
-> +		if (rc)
-> +			goto out;
-> +	}
->  
->  	pCifsFile = cifs_new_fileinfo(netfid, file, tlink, oplock);
->  	if (pCifsFile == NULL) {
-> +		CIFSSMBClose(xid, tcon, netfid);
->  		rc = -ENOMEM;
->  		goto out;
->  	}
->  
->  	cifs_fscache_set_inode_cookie(inode, file);
->  
-> -	if (oplock & CIFS_CREATE_ACTION) {
-> +	if ((oplock & CIFS_CREATE_ACTION) && !posix_open_ok && tcon->unix_ext) {
->  		/* time to set mode which we can not set earlier due to
->  		   problems creating new read-only files */
-> -		if (tcon->unix_ext) {
-> -			struct cifs_unix_set_info_args args = {
-> -				.mode	= inode->i_mode,
-> -				.uid	= NO_CHANGE_64,
-> -				.gid	= NO_CHANGE_64,
-> -				.ctime	= NO_CHANGE_64,
-> -				.atime	= NO_CHANGE_64,
-> -				.mtime	= NO_CHANGE_64,
-> -				.device	= 0,
-> -			};
-> -			CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
-> -					       cifs_sb->local_nls,
-> -					       cifs_sb->mnt_cifs_flags &
-> -						CIFS_MOUNT_MAP_SPECIAL_CHR);
-> -		}
-> +		struct cifs_unix_set_info_args args = {
-> +			.mode	= inode->i_mode,
-> +			.uid	= NO_CHANGE_64,
-> +			.gid	= NO_CHANGE_64,
-> +			.ctime	= NO_CHANGE_64,
-> +			.atime	= NO_CHANGE_64,
-> +			.mtime	= NO_CHANGE_64,
-> +			.device	= 0,
-> +		};
-> +		CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
-> +				       cifs_sb->local_nls,
-> +				       cifs_sb->mnt_cifs_flags &
-> +					CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
+> -			!calc_seckey(ses)) {
+> +	if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
+> +		(ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
+> +			&& !calc_seckey(ses)) {
+>  		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+>  		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>  		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
 
-Hmm...we have a fid so we probably ought to switch the above call to a
-SetFileInfo call. That's outside the scope of this patch though.
+Looks reasonable.
 
-
->  	}
->  
->  out:
-
-Looks good to me. Nice cleanup.
-
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
