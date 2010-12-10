@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 11/13] cifs: set up recurring workqueue job to do SMB echo requests
-Date: Fri, 10 Dec 2010 10:44:35 -0500
-Message-ID: <1291995877-2276-12-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 08/13] cifs: handle cancelled requests better
+Date: Fri, 10 Dec 2010 10:44:32 -0500
+Message-ID: <1291995877-2276-9-git-send-email-jlayton@redhat.com>
 References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,91 +10,234 @@ In-Reply-To: <1291995877-2276-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Currently, when a request is cancelled via signal, we delete the mid
+immediately. If the request was already transmitted however, the client
+is still likely to receive a response. When it does, it won't recognize
+it however and will pop a printk.
+
+It's also a little dangerous to just delete the mid entry like this. We
+may end up reusing that mid. If we do then we could potentially get the
+response from the first request confused with the later one.
+
+Prevent the reuse of mids by marking them as cancelled and keeping them
+on the pending_mid_q list. If the reply comes in, we'll delete it from
+the list then. If it never comes, then we'll delete it at reconnect
+or when cifsd comes down.
+
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    1 +
- fs/cifs/connect.c  |   29 +++++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 0 deletions(-)
+ fs/cifs/cifsglob.h  |    2 +-
+ fs/cifs/cifsproto.h |    1 +
+ fs/cifs/connect.c   |   44 +++++++++++++++++++++++++++++++++++++-------
+ fs/cifs/transport.c |   30 ++++++++++++++++++++++--------
+ 4 files changed, 61 insertions(+), 16 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index fb75f04..d924f3c 100644
+index cc43ada..fb75f04 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -221,6 +221,7 @@ struct TCP_Server_Info {
- 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
- 	bool	sec_ntlmssp;		/* supports NTLMSSP */
- 	bool session_estab; /* mark when very first sess is established */
-+	struct delayed_work	echo; /* echo ping workqueue job */
- #ifdef CONFIG_CIFS_FSCACHE
- 	struct fscache_cookie   *fscache; /* client index cache cookie */
- #endif
+@@ -621,7 +621,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
+ #define   MID_REQUEST_SUBMITTED 2
+ #define   MID_RESPONSE_RECEIVED 4
+ #define   MID_RETRY_NEEDED      8 /* session closed while this request out */
+-#define   MID_NO_RESP_NEEDED 0x10
++#define   MID_REQUEST_CANCELLED 0x10 /* discard any reply */
+ 
+ /* Types of response buffer returned from SendReceive2 */
+ #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index fe77e69..a8fc606 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -61,6 +61,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ 		const char *fullpath, const struct dfs_info3_param *ref,
+ 		char **devname);
+ /* extern void renew_parental_timestamps(struct dentry *direntry);*/
++extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern int SendReceive(const unsigned int /* xid */ , struct cifsSesInfo *,
+ 			struct smb_hdr * /* input */ ,
+ 			struct smb_hdr * /* out */ ,
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0feb592..98e1d38 100644
+index 7e20ece..0feb592 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -52,6 +52,9 @@
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
+@@ -133,7 +133,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ {
+ 	int rc = 0;
+ 	struct list_head *tmp, *tmp2;
+-	struct list_head retry;
++	struct list_head retry, dispose;
+ 	struct cifsSesInfo *ses;
+ 	struct cifsTconInfo *tcon;
+ 	struct mid_q_entry *mid_entry;
+@@ -192,14 +192,23 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	 */
+ 	cFYI(1, "%s: moving mids to retry list", __func__);
+ 	INIT_LIST_HEAD(&retry);
++	INIT_LIST_HEAD(&dispose);
+ 	spin_lock(&GlobalMid_Lock);
+ 	list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+ 		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+ 		if (mid_entry->midState == MID_REQUEST_SUBMITTED)
+ 			list_move(tmp, &retry);
++		else if (mid_entry->midState == MID_REQUEST_CANCELLED)
++			list_move(tmp, &dispose);
+ 	}
+ 	spin_unlock(&GlobalMid_Lock);
  
-+/* SMB echo "timeout" -- FIXME: tunable? */
-+#define SMB_ECHO_INTERVAL (30 * HZ)
++	/* now walk private dispose list and delete entries */
++	list_for_each_safe(tmp, tmp2, &dispose) {
++		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
++		DeleteMidQEntry(mid_entry);
++	}
 +
- extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
- 			 unsigned char *p24);
+ 	while ((server->tcpStatus != CifsExiting) &&
+ 	       (server->tcpStatus != CifsGood)) {
+ 		try_to_freeze();
+@@ -219,7 +228,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		}
+ 	}
  
-@@ -354,6 +357,26 @@ static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
+-	/* now, issue callback for all mids in flight */
++	/* issue callback for all mids in flight */
+ 	list_for_each_safe(tmp, tmp2, &retry) {
+ 		list_del_init(tmp);
+ 		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+@@ -575,9 +584,13 @@ incomplete_rcv:
+ 		list_for_each(tmp, &server->pending_mid_q) {
+ 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
  
+-			if ((mid_entry->mid == smb_buffer->Mid) &&
+-			    (mid_entry->midState == MID_REQUEST_SUBMITTED) &&
+-			    (mid_entry->command == smb_buffer->Command)) {
++			if (mid_entry->mid != smb_buffer->Mid)
++				goto next_mid;
++			if (mid_entry->command != smb_buffer->Command)
++				goto next_mid;
++			if (mid_entry->midState == MID_REQUEST_CANCELLED)
++				break;
++			if (mid_entry->midState == MID_REQUEST_SUBMITTED) {
+ 				if (check2ndT2(smb_buffer,server->maxBuf) > 0) {
+ 					/* We have a multipart transact2 resp */
+ 					isMultiRsp = true;
+@@ -623,11 +636,16 @@ multi_t2_fnd:
+ 				server->lstrp = jiffies;
+ 				break;
+ 			}
++next_mid:
+ 			mid_entry = NULL;
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+ 
+ 		if (mid_entry != NULL) {
++			if (mid_entry->midState == MID_REQUEST_CANCELLED) {
++				DeleteMidQEntry(mid_entry);
++				continue;
++			}
+ 			mid_entry->callback(mid_entry);
+ 			/* Was previous buf put in mpx struct for multi-rsp? */
+ 			if (!isMultiRsp) {
+@@ -704,6 +722,9 @@ multi_t2_fnd:
+ 		}
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 	} else {
++		struct mid_q_entry *tmp_mid;
++		struct list_head dispose;
++
+ 		/* although we can not zero the server struct pointer yet,
+ 		since there are active requests which may depnd on them,
+ 		mark the corresponding SMB sessions as exiting too */
+@@ -713,17 +734,26 @@ multi_t2_fnd:
+ 			ses->status = CifsExiting;
+ 		}
+ 
++		INIT_LIST_HEAD(&dispose);
+ 		spin_lock(&GlobalMid_Lock);
+-		list_for_each(tmp, &server->pending_mid_q) {
+-		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
++		list_for_each_entry_safe(mid_entry, tmp_mid,
++					 &server->pending_mid_q, qhead) {
+ 			if (mid_entry->midState == MID_REQUEST_SUBMITTED) {
+ 				cFYI(1, "Clearing Mid 0x%x - issuing callback",
+ 					 mid_entry->mid);
+ 				mid_entry->callback(mid_entry);
++			} else if (mid_entry->midState == MID_REQUEST_CANCELLED) {
++				cFYI(1, "Clearing Mid 0x%x - Cancelled",
++					mid_entry->mid);
++				list_move(&mid_entry->qhead, &dispose);
+ 			}
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+ 		spin_unlock(&cifs_tcp_ses_lock);
++
++		/* now delete all of the cancelled mids */
++		list_for_each_entry_safe(mid_entry, tmp_mid, &dispose, qhead)
++			DeleteMidQEntry(mid_entry);
+ 		/* 1/8th of sec is more than enough time for them to exit */
+ 		msleep(125);
+ 	}
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 79647db..97a1170 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -81,7 +81,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 	return temp;
  }
  
-+static void
-+cifs_echo_request(struct work_struct *work)
-+{
-+	int rc;
-+	struct TCP_Server_Info *server = container_of(work,
-+					struct TCP_Server_Info, echo.work);
-+
-+	/* no need to ping if we got a response recently */
-+	if (time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
-+		goto requeue_echo;
-+
-+	rc = CIFSSMBEcho(server);
-+	if (rc)
-+		cFYI(1, "Unable to send echo request to server: %s",
-+			server->hostname);
-+
-+requeue_echo:
-+	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
-+}
-+
- static int
- cifs_demultiplex_thread(struct TCP_Server_Info *server)
+-static void
++void
+ DeleteMidQEntry(struct mid_q_entry *midEntry)
  {
-@@ -1610,6 +1633,8 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
- 	list_del_init(&server->tcp_ses_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
+ #ifdef CONFIG_CIFS_STATS2
+@@ -480,8 +480,13 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 		goto out;
  
-+	cancel_delayed_work_sync(&server->echo);
+ 	rc = wait_for_response(ses->server, midQ);
+-	if (rc != 0)
+-		goto out;
++	if (rc != 0) {
++		/* no longer considered to be "in-flight" */
++		midQ->midState = MID_REQUEST_CANCELLED;
++	        atomic_dec(&ses->server->inFlight);
++		wake_up(&ses->server->request_q);
++		return rc;
++	}
+ 
+ 	rc = handle_mid_result(midQ, ses->server);
+ 	if (rc != 0)
+@@ -623,8 +628,13 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 		goto out;
+ 
+ 	rc = wait_for_response(ses->server, midQ);
+-	if (rc != 0)
+-		goto out;
++	if (rc != 0) {
++		/* no longer considered to be "in-flight" */
++		midQ->midState = MID_REQUEST_CANCELLED;
++	        atomic_dec(&ses->server->inFlight);
++		wake_up(&ses->server->request_q);
++		return rc;
++	}
+ 
+ 	rc = handle_mid_result(midQ, ses->server);
+ 	if (rc != 0)
+@@ -842,10 +852,14 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 			}
+ 		}
+ 
+-		if (wait_for_response(ses->server, midQ) == 0) {
+-			/* We got the response - restart system call. */
+-			rstart = 1;
++		rc = wait_for_response(ses->server, midQ);
++		if (rc) {
++			midQ->midState = MID_REQUEST_CANCELLED;
++			return rc;
+ 		}
 +
- 	spin_lock(&GlobalMid_Lock);
- 	server->tcpStatus = CifsExiting;
- 	spin_unlock(&GlobalMid_Lock);
-@@ -1701,6 +1726,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	tcp_ses->sequence_number = 0;
- 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
- 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
-+	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
++		/* We got the response - restart system call. */
++		rstart = 1;
+ 	}
  
- 	/*
- 	 * at this point we are the only ones with the pointer
-@@ -1750,6 +1776,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 
- 	cifs_fscache_get_client_cookie(tcp_ses);
- 
-+	/* queue echo request delayed work */
-+	queue_delayed_work(system_nrt_wq, &tcp_ses->echo, SMB_ECHO_INTERVAL);
-+
- 	return tcp_ses;
- 
- out_err_crypto_release:
+ 	rc = handle_mid_result(midQ, ses->server);
 -- 
 1.7.3.2
