@@ -1,167 +1,149 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP
- authentication [try #3]
-Date: Fri, 10 Dec 2010 08:39:13 -0500
-Message-ID: <20101210083913.284eb5f7@tlielax.poochiereds.net>
-References: <1291917491-5924-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101209162709.57cc5019@tlielax.poochiereds.net>
-	<AANLkTikasjUoVLk_vGKB=or7LvMkCf+AOa0QQzR=EEuo@mail.gmail.com>
+From: Marcus <lists@localguru.de>
+Subject: Re: cifs and Netapp DFS-shares problems
+Date: Fri, 10 Dec 2010 16:00:34 +0100
+Message-ID: <1291993234.20912.8.camel@kramer>
+References: <1291855039.11237.49.camel@kramer>
+	<1291976746.8971.24.camel@kramer>
+	<20101210063449.5ab06c5f@tlielax.poochiereds.net>
+Reply-To: lists@localguru.de
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikasjUoVLk_vGKB=or7LvMkCf+AOa0QQzR=EEuo-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-15"
+Content-Transfer-Encoding: quoted-printable
+Cc: samba@lists.samba.org, linux-cifs@vger.kernel.org
+To: Jeff Layton <jlayton@samba.org>
+Return-path: <samba-bounces@lists.samba.org>
+In-Reply-To: <20101210063449.5ab06c5f@tlielax.poochiereds.net>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba>,
+	<mailto:samba-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba>
+List-Post: <mailto:samba@lists.samba.org>
+List-Help: <mailto:samba-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba>,
+	<mailto:samba-request@lists.samba.org?subject=subscribe>
+Sender: samba-bounces@lists.samba.org
+Errors-To: samba-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 10 Dec 2010 07:07:23 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Hi Jeff,
 
-> On Thu, Dec 9, 2010 at 3:27 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
-:
-> > On Thu, =A09 Dec 2010 11:58:11 -0600
-> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-> >
-> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >>
-> >>
-> >> Indicate to the server a capability of NTLM2 session security (NTL=
-M2 Key)
-> >> during ntlmssp protocol exchange in one of the bits of the flags f=
-ield.
-> >> If server supports this capability, send NTLM2 key even if signing=
- is not
-> >> required on the server.
-> >>
-> >> If the server requires signing, the session keys exchanged for NTL=
-Mv2
-> >> and NTLM2 session security in auth packet of the nlmssp exchange a=
-re same.
-> >>
-> >> Send the same flags in authenticate message (type 3) that client s=
-ent in
-> >> negotiate message (type 1).
-> >>
-> >>
-> >> Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
-> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >> ---
-> >> =A0fs/cifs/sess.c | =A0 13 +++++++------
-> >> =A01 files changed, 7 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> >> index 7b01d3f..ea39f3f 100644
-> >> --- a/fs/cifs/sess.c
-> >> +++ b/fs/cifs/sess.c
-> >> @@ -437,7 +437,7 @@ static void build_ntlmssp_negotiate_blob(unsig=
-ned char *pbuffer,
-> >> =A0 =A0 =A0 /* BB is NTLMV2 session security format easier to use =
-here? */
-> >> =A0 =A0 =A0 flags =3D NTLMSSP_NEGOTIATE_56 | =A0NTLMSSP_REQUEST_TA=
-RGET |
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTI=
-ATE_UNICODE |
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM;
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIA=
-TE_EXTENDED_SEC;
-> >> =A0 =A0 =A0 if (ses->server->secMode &
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (SECMODE_SIGN_REQUIRED=
- | SECMODE_SIGN_ENABLED)) {
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 flags |=3D NTLMSSP_NEGOTIATE_SIGN;
-> >> @@ -446,7 +446,7 @@ static void build_ntlmssp_negotiate_blob(unsig=
-ned char *pbuffer,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSS=
-P_NEGOTIATE_EXTENDED_SEC;
-> >> =A0 =A0 =A0 }
-> >>
-> >> - =A0 =A0 sec_blob->NegotiateFlags |=3D cpu_to_le32(flags);
-> >> + =A0 =A0 sec_blob->NegotiateFlags =3D cpu_to_le32(flags);
-> >>
-> >
-> > Your earlier emails about seeing the POISON_INUSE value in this str=
-uct
-> > worry me a bit. Maybe we ought to zero out the sec_blob before use?
-> >
-> > These aren't exactly hot codepaths so we can afford to do a little
-> > defensive coding here. Ditto for this buffer in the other phases of
-> > NTLMSSP negotiation too.
-> >
-> > Thoughts?
-> >
-> >> =A0 =A0 =A0 sec_blob->WorkstationName.BufferOffset =3D 0;
-> >> =A0 =A0 =A0 sec_blob->WorkstationName.Length =3D 0;
-> >> @@ -477,7 +477,7 @@ static int build_ntlmssp_auth_blob(unsigned ch=
-ar *pbuffer,
-> >> =A0 =A0 =A0 flags =3D NTLMSSP_NEGOTIATE_56 |
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_REQUEST_TARGET | NTLMSSP_NEGOT=
-IATE_TARGET_INFO |
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTI=
-ATE_UNICODE |
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM;
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIA=
-TE_EXTENDED_SEC;
-> >> =A0 =A0 =A0 if (ses->server->secMode &
-> >> =A0 =A0 =A0 =A0 =A0(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 flags |=3D NTLMSSP_NEGOTIATE_SIGN;
-> >> @@ -485,7 +485,7 @@ static int build_ntlmssp_auth_blob(unsigned ch=
-ar *pbuffer,
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 flags |=3D NTLMSSP_NEGOTIATE_ALWAYS_SI=
-GN;
-> >>
-> >> =A0 =A0 =A0 tmp =3D pbuffer + sizeof(AUTHENTICATE_MESSAGE);
-> >> - =A0 =A0 sec_blob->NegotiateFlags |=3D cpu_to_le32(flags);
-> >> + =A0 =A0 sec_blob->NegotiateFlags =3D cpu_to_le32(flags);
-> >>
-> >> =A0 =A0 =A0 sec_blob->LmChallengeResponse.BufferOffset =3D
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cpu_to=
-_le32(sizeof(AUTHENTICATE_MESSAGE));
-> >> @@ -544,8 +544,9 @@ static int build_ntlmssp_auth_blob(unsigned ch=
-ar *pbuffer,
-> >> =A0 =A0 =A0 sec_blob->WorkstationName.MaximumLength =3D 0;
-> >> =A0 =A0 =A0 tmp +=3D 2;
-> >>
-> >> - =A0 =A0 if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_=
-XCH) &&
-> >> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 !calc_seckey(ses)) {
-> >> + =A0 =A0 if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY=
-_XCH) ||
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 (ses->ntlmssp->server_flags & NTLMSSP_NE=
-GOTIATE_EXTENDED_SEC))
-> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 && !calc_seckey(ses)) {
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(tmp, ses->ntlmssp->ciphertext, =
-CIFS_CPHTXT_SIZE);
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 sec_blob->SessionKey.BufferOffset =3D =
-cpu_to_le32(tmp - pbuffer);
-> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 sec_blob->SessionKey.Length =3D cpu_to=
-_le16(CIFS_CPHTXT_SIZE);
-> >
-> >
-> >
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> >
->=20
-> Yes. I think that would be safe thing to do.  I will look into
-> wireshark trace again
-> just to see what other fields contained POISON_INUSE  besides flags f=
-ield
-> when either of the requests (type 1 and type 3 of ntlmssp exchange) w=
-ere
-> sent (such as session key) and resubmit this patch as well.
-> This  code gets called may be once per smb connection so it does not
-> get exercised often, as you stated.
->=20
+Am Freitag, den 10.12.2010, 06:34 -0500 schrieb Jeff Layton:
+> On Fri, 10 Dec 2010 11:25:46 +0100
+> Marcus <lists@localguru.de> wrote:
+> =
 
-We have to consider that wherever you see POISON_INUSE, it could just
-as easily be leftover data from earlier use of the page. We really need
-to take great care not to stick unintialized data out on the wire.
-There's no telling what it might contain.
+> > Hi,
+> > =
 
-It may even be best to just to memset all buffers to zero in smb_init
-and small_smb_init. Those functions look like they do part of the
-buffer now, but it seems a little dangerous to leave the rest unset.
+> > Am Donnerstag, den 09.12.2010, 01:37 +0100 schrieb Marcus:
+> > > =
 
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > > are there any known issues with cifs and DFS-shares on Netapp file
+> > > servers? We have a Netapp file sever with DFS on the user's home shar=
+es.
+> > > The home shares can successfully mounted with
+> > > =
+
+> > >   mount -t cifs //sever/home/username /mnt/ -o user=3Dusername,domain=
+=3DAD
+> > > =
+
+> > > but the connection hangs in the moment a directory listing is started.
+> > > The strange thing is that only shares with activated DFS show this
+> > > problem. I'm not maintaining the Netapp file server therefore a can't
+> > > post more information about that system. On client side I'm using Ubu=
+ntu
+> > > LTS 10.04.1.
+> > =
+
+> > This error only comes up, if DFS is activated on a share on the NetApp
+> > Server. Here is a kernel log:
+> > =
+
+> > Dec 10 11:10:37 lebowski kernel: [ 3586.471662] Bad SMB: : dump of 48
+> > bytes of data at 0xe44e5c00
+> > Dec 10 11:10:37 lebowski kernel: [ 3586.471675]  0000009a 424d53ff
+> > 00000032 80018800 . . . . =FF S M B 2 . . . . . . .
+> > Dec 10 11:10:37 lebowski kernel: [ 3586.471688]  00000000 00000000
+> > 00000000 26420040 . . . . . . . . . . . . @ . B &
+> > Dec 10 11:10:37 lebowski kernel: [ 3586.471701]  001a0800 7000020a
+> > 02000000 00003800 . . . . . . . p . . . . . 8 . .
+> > Dec 10 11:11:03 lebowski kernel: [ 3612.832108]  CIFS VFS: server not
+> > responding
+> > Dec 10 11:11:03 lebowski kernel: [ 3612.832125]  CIFS VFS: No response
+> > for cmd 50 mid 26
+> > Dec 10 11:11:05 lebowski kernel: [ 3614.656937]  CIFS VFS: RFC1001 size
+> > 154 bigger than SMB for Mid=3D30
+> > Dec 10 11:11:05 lebowski kernel: [ 3614.656953] Bad SMB: : dump of 48
+> > bytes of data at 0xe44e5c00
+> > Dec 10 11:11:05 lebowski kernel: [ 3614.656967]  0000009a 424d53ff
+> > 00000032 80018800 . . . . =FF S M B 2 . . . . . . .
+> > Dec 10 11:11:05 lebowski kernel: [ 3614.656979]  00000000 00000000
+> > 00000000 26420040 . . . . . . . . . . . . @ . B &
+> > Dec 10 11:11:05 lebowski kernel: [ 3614.656994]  001e0800 7000020a
+> > 02000000 00003800 . . . . . . . p . . . . . 8 . .
+> > Dec 10 11:11:33 lebowski kernel: [ 3642.832284]  CIFS VFS: server not
+> > responding
+> > Dec 10 11:11:33 lebowski kernel: [ 3642.832299]  CIFS VFS: No response
+> > for cmd 50 mid 30
+> > Dec 10 11:11:40 lebowski kernel: [ 3649.895000]  CIFS VFS: RFC1001 size
+> > 154 bigger than SMB for Mid=3D34
+> > Dec 10 11:11:40 lebowski kernel: [ 3649.895017] Bad SMB: : dump of 48
+> > bytes of data at 0xe44e5c00
+> > Dec 10 11:11:40 lebowski kernel: [ 3649.895030]  0000009a 424d53ff
+> > 00000032 80018800 . . . . =FF S M B 2 . . . . . . .
+> > Dec 10 11:11:40 lebowski kernel: [ 3649.895043]  00000000 00000000
+> > 00000000 26420040 . . . . . . . . . . . . @ . B &
+> > Dec 10 11:11:40 lebowski kernel: [ 3649.895056]  00220800 7000020a
+> > 02000000 00003800 . . " . . . . p . . . . . 8 . .
+> > --------------------------
+> > =
+
+> > umounting is impossible and gives the following error:
+> > =
+
+> > --------------------------
+> > unmount error 16 =3D Device or resource busy
+> > Refer to the umount.cifs(8) manual page (man 8 umount.cifs)
+> > unmount error 16 =3D Device or resource busy
+> > Refer to the umount.cifs(8) manual page (man 8 umount.cifs)
+> > --------------------------
+> > =
+
+> > Any ideas? Seems to be an error of the NetApp Fileserver acting not RFC
+> > conform.
+> > =
+
+> > Is this the right list to discuss or should I post on linux-cifs-client
+> > list?
+> > =
+
+> (cc'ing linux-cifs mailing list)
+> =
+
+> Probably because the ls is hung and is holding references to the mount...
+> =
+
+> I've successfully tested against netapp's CIFS implementation in the
+> past, but there are significant bugs in it. The errors you're seeing
+> look like an alignment problem of some sort -- i.e. the server is
+> sending packets that have incorrect length fields in them. This isn't
+> the first such problem I've seen with OnTap.
+> =
+
+> You're welcome to open a bug at bugzilla.samba.org, cc me, and I'll
+> take a look when I have time. Gathering wire captures during one of
+> these events and attaching them to the bug would help to track down the
+> problem. It's likely to be Netapp's bug however...
+
+Thanks for helping. I've posted a bug [1] with a tcpdump.
+
+Have a nice weekend,
+Marcus
+
+[1] https://bugzilla.samba.org/show_bug.cgi?id=3D7860
+
+
+-- =
+
+To unsubscribe from this list go to the following URL and read the
+instructions:  https://lists.samba.org/mailman/options/samba
