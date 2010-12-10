@@ -1,51 +1,64 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Samba] cifs and Netapp DFS-shares problems
-Date: Fri, 10 Dec 2010 09:17:08 -0600
-Message-ID: <AANLkTinvV_0t7n_Vc1sm5mh-JLha0_vKtR3pxUk892OC@mail.gmail.com>
-References: <1291855039.11237.49.camel@kramer>
-	<1291976746.8971.24.camel@kramer>
-	<20101210063449.5ab06c5f@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: lists-dLPT46B32WUjnolme5KbmQ@public.gmane.org, samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: show "acl" in DebugData Features when it's compiled in
+Date: Fri, 10 Dec 2010 10:26:44 -0500
+Message-ID: <1291994804-1634-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101210063449.5ab06c5f-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Dec 10, 2010 at 5:34 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Fri, 10 Dec 2010 11:25:46 +0100
-> Marcus <lists-dLPT46B32WUjnolme5KbmQ@public.gmane.org> wrote:
->> Any ideas? Seems to be an error of the NetApp Fileserver acting not RFC
->> conform.
->>
->> Is this the right list to discuss or should I post on linux-cifs-client
->> list?
->>
-> (cc'ing linux-cifs mailing list)
->
-> Probably because the ls is hung and is holding references to the mount...
->
-> I've successfully tested against netapp's CIFS implementation in the
-> past, but there are significant bugs in it. The errors you're seeing
-> look like an alignment problem of some sort -- i.e. the server is
-> sending packets that have incorrect length fields in them. This isn't
-> the first such problem I've seen with OnTap.
->
-> You're welcome to open a bug at bugzilla.samba.org, cc me, and I'll
-> take a look when I have time. Gathering wire captures during one of
-> these events and attaching them to the bug would help to track down the
-> problem. It's likely to be Netapp's bug however...
+...and while we're at it, reduce the number of calls into the seq_*
+functions by prepending spaces to strings.
 
-We have worked around a few similar sounding server bugs in the past,
-but have to be careful that we don't introduce potential
-buffer overruns or security problems (the Linux cifs client parses
-frames more carefully than some other clients to reduce
-the chance of going beyond the end of frames).
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_debug.c |   22 ++++++++++------------
+ 1 files changed, 10 insertions(+), 12 deletions(-)
 
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 37f7534..bd76527 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -119,29 +119,27 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 		    "Display Internal CIFS Data Structures for Debugging\n"
+ 		    "---------------------------------------------------\n");
+ 	seq_printf(m, "CIFS Version %s\n", CIFS_VERSION);
+-	seq_printf(m, "Features: ");
++	seq_printf(m, "Features:");
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-	seq_printf(m, "dfs");
+-	seq_putc(m, ' ');
++	seq_printf(m, " dfs");
+ #endif
+ #ifdef CONFIG_CIFS_FSCACHE
+-	seq_printf(m, "fscache");
+-	seq_putc(m, ' ');
++	seq_printf(m, " fscache");
+ #endif
+ #ifdef CONFIG_CIFS_WEAK_PW_HASH
+-	seq_printf(m, "lanman");
+-	seq_putc(m, ' ');
++	seq_printf(m, " lanman");
+ #endif
+ #ifdef CONFIG_CIFS_POSIX
+-	seq_printf(m, "posix");
+-	seq_putc(m, ' ');
++	seq_printf(m, " posix");
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+-	seq_printf(m, "spnego");
+-	seq_putc(m, ' ');
++	seq_printf(m, " spnego");
+ #endif
+ #ifdef CONFIG_CIFS_XATTR
+-	seq_printf(m, "xattr");
++	seq_printf(m, " xattr");
++#endif
++#ifdef CONFIG_CIFS_ACL
++	seq_printf(m, " acl");
+ #endif
+ 	seq_putc(m, '\n');
+ 	seq_printf(m, "Active VFS Requests: %d\n", GlobalTotalActiveXid);
 -- 
-Thanks,
-
-Steve
+1.7.3.2
