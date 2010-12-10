@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/13] cifs: remove code for setting timeouts on requests
-Date: Fri, 10 Dec 2010 10:44:37 -0500
-Message-ID: <1291995877-2276-14-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/13] cifs: set up recurring workqueue job to do SMB echo requests
+Date: Fri, 10 Dec 2010 10:44:35 -0500
+Message-ID: <1291995877-2276-12-git-send-email-jlayton@redhat.com>
 References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,252 +10,91 @@ In-Reply-To: <1291995877-2276-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Since we don't time out individual requests anymore, remove the code
-that we used to use for setting timeouts on different requests.
-
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    9 +++------
- fs/cifs/cifssmb.c   |    8 ++++----
- fs/cifs/connect.c   |    2 +-
- fs/cifs/file.c      |   44 +++++++-------------------------------------
- fs/cifs/sess.c      |    2 +-
- fs/cifs/transport.c |    2 +-
- 6 files changed, 17 insertions(+), 50 deletions(-)
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/connect.c  |   29 +++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index d924f3c..1e290fa 100644
+index fb75f04..d924f3c 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -631,12 +631,9 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- #define   CIFS_IOVEC            4    /* array of response buffers */
- 
- /* Type of Request to SendReceive2 */
--#define   CIFS_STD_OP	        0    /* normal request timeout */
--#define   CIFS_LONG_OP          1    /* long op (up to 45 sec, oplock time) */
--#define   CIFS_VLONG_OP         2    /* sloow op - can take up to 180 seconds */
--#define   CIFS_BLOCKING_OP      4    /* operation can block */
--#define   CIFS_ASYNC_OP         8    /* do not wait for response */
--#define   CIFS_TIMEOUT_MASK 0x00F    /* only one of 5 above set in req */
-+#define   CIFS_BLOCKING_OP      1    /* operation can block */
-+#define   CIFS_ASYNC_OP         2    /* do not wait for response */
-+#define   CIFS_TIMEOUT_MASK 0x003    /* only one of above set in req */
- #define   CIFS_LOG_ERROR    0x010    /* log NT STATUS if non-zero */
- #define   CIFS_LARGE_BUF_OP 0x020    /* large request buffer */
- #define   CIFS_NO_RESP      0x040    /* no response buffer required */
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index fc8145f..606deba 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1240,7 +1240,7 @@ OldOpenRetry:
- 	pSMB->ByteCount = cpu_to_le16(count);
- 	/* long_op set to 1 to allow for oplock break timeouts */
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
--			(struct smb_hdr *)pSMBr, &bytes_returned, CIFS_LONG_OP);
-+			(struct smb_hdr *)pSMBr, &bytes_returned, 0);
- 	cifs_stats_inc(&tcon->num_opens);
- 	if (rc) {
- 		cFYI(1, "Error in Open = %d", rc);
-@@ -1353,7 +1353,7 @@ openRetry:
- 	pSMB->ByteCount = cpu_to_le16(count);
- 	/* long_op set to 1 to allow for oplock break timeouts */
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
--			(struct smb_hdr *)pSMBr, &bytes_returned, CIFS_LONG_OP);
-+			(struct smb_hdr *)pSMBr, &bytes_returned, 0);
- 	cifs_stats_inc(&tcon->num_opens);
- 	if (rc) {
- 		cFYI(1, "Error in Open = %d", rc);
-@@ -1435,7 +1435,7 @@ CIFSSMBRead(const int xid, struct cifsTconInfo *tcon, const int netfid,
- 	iov[0].iov_base = (char *)pSMB;
- 	iov[0].iov_len = pSMB->hdr.smb_buf_length + 4;
- 	rc = SendReceive2(xid, tcon->ses, iov, 1 /* num iovecs */,
--			 &resp_buf_type, CIFS_STD_OP | CIFS_LOG_ERROR);
-+			 &resp_buf_type, CIFS_LOG_ERROR);
- 	cifs_stats_inc(&tcon->num_reads);
- 	pSMBr = (READ_RSP *)iov[0].iov_base;
- 	if (rc) {
-@@ -3030,7 +3030,7 @@ CIFSSMBGetCIFSACL(const int xid, struct cifsTconInfo *tcon, __u16 fid,
- 	iov[0].iov_len = pSMB->hdr.smb_buf_length + 4;
- 
- 	rc = SendReceive2(xid, tcon->ses, iov, 1 /* num iovec */, &buf_type,
--			 CIFS_STD_OP);
-+			 0);
- 	cifs_stats_inc(&tcon->num_acl_get);
- 	if (rc) {
- 		cFYI(1, "Send error in QuerySecDesc = %d", rc);
+@@ -221,6 +221,7 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_ntlmssp;		/* supports NTLMSSP */
+ 	bool session_estab; /* mark when very first sess is established */
++	struct delayed_work	echo; /* echo ping workqueue job */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
+ #endif
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c596515..b8fb112 100644
+index 0feb592..98e1d38 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -3134,7 +3134,7 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *ses,
- 	pSMB->ByteCount = cpu_to_le16(count);
+@@ -52,6 +52,9 @@
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
  
- 	rc = SendReceive(xid, ses, smb_buffer, smb_buffer_response, &length,
--			 CIFS_STD_OP);
-+			 0);
++/* SMB echo "timeout" -- FIXME: tunable? */
++#define SMB_ECHO_INTERVAL (30 * HZ)
++
+ extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
+ 			 unsigned char *p24);
  
- 	/* above now done in SendReceive */
- 	if ((rc == 0) && (tcon != NULL)) {
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 8e57370..5c7b4f0 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -892,29 +892,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
- 	return rc;
+@@ -354,6 +357,26 @@ static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
+ 
  }
  
--/*
-- * Set the timeout on write requests past EOF. For some servers (Windows)
-- * these calls can be very long.
-- *
-- * If we're writing >10M past the EOF we give a 180s timeout. Anything less
-- * than that gets a 45s timeout. Writes not past EOF get 15s timeouts.
-- * The 10M cutoff is totally arbitrary. A better scheme for this would be
-- * welcome if someone wants to suggest one.
-- *
-- * We may be able to do a better job with this if there were some way to
-- * declare that a file should be sparse.
-- */
--static int
--cifs_write_timeout(struct cifsInodeInfo *cifsi, loff_t offset)
--{
--	if (offset <= cifsi->server_eof)
--		return CIFS_STD_OP;
--	else if (offset > (cifsi->server_eof + (10 * 1024 * 1024)))
--		return CIFS_VLONG_OP;
--	else
--		return CIFS_LONG_OP;
--}
--
- /* update the file size (if needed) after a write */
- static void
- cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
-@@ -935,7 +912,7 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 	unsigned int total_written;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsTconInfo *pTcon;
--	int xid, long_op;
-+	int xid;
- 	struct cifsFileInfo *open_file;
- 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
++static void
++cifs_echo_request(struct work_struct *work)
++{
++	int rc;
++	struct TCP_Server_Info *server = container_of(work,
++					struct TCP_Server_Info, echo.work);
++
++	/* no need to ping if we got a response recently */
++	if (time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
++		goto requeue_echo;
++
++	rc = CIFSSMBEcho(server);
++	if (rc)
++		cFYI(1, "Unable to send echo request to server: %s",
++			server->hostname);
++
++requeue_echo:
++	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
++}
++
+ static int
+ cifs_demultiplex_thread(struct TCP_Server_Info *server)
+ {
+@@ -1610,6 +1633,8 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ 	list_del_init(&server->tcp_ses_list);
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
-@@ -956,7 +933,6 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
++	cancel_delayed_work_sync(&server->echo);
++
+ 	spin_lock(&GlobalMid_Lock);
+ 	server->tcpStatus = CifsExiting;
+ 	spin_unlock(&GlobalMid_Lock);
+@@ -1701,6 +1726,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	tcp_ses->sequence_number = 0;
+ 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+ 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
++	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
  
- 	xid = GetXid();
+ 	/*
+ 	 * at this point we are the only ones with the pointer
+@@ -1750,6 +1776,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
  
--	long_op = cifs_write_timeout(cifsi, *poffset);
- 	for (total_written = 0; write_size > total_written;
- 	     total_written += bytes_written) {
- 		rc = -EAGAIN;
-@@ -984,7 +960,7 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 				min_t(const int, cifs_sb->wsize,
- 				      write_size - total_written),
- 				*poffset, &bytes_written,
--				NULL, write_data + total_written, long_op);
-+				NULL, write_data + total_written, 0);
- 		}
- 		if (rc || (bytes_written == 0)) {
- 			if (total_written)
-@@ -997,8 +973,6 @@ ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 			cifs_update_eof(cifsi, *poffset, bytes_written);
- 			*poffset += bytes_written;
- 		}
--		long_op = CIFS_STD_OP; /* subsequent writes fast -
--				    15 seconds is plenty */
- 	}
+ 	cifs_fscache_get_client_cookie(tcp_ses);
  
- 	cifs_stats_bytes_written(pTcon, total_written);
-@@ -1027,7 +1001,7 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
- 	unsigned int total_written;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsTconInfo *pTcon;
--	int xid, long_op;
-+	int xid;
- 	struct dentry *dentry = open_file->dentry;
- 	struct cifsInodeInfo *cifsi = CIFS_I(dentry->d_inode);
++	/* queue echo request delayed work */
++	queue_delayed_work(system_nrt_wq, &tcp_ses->echo, SMB_ECHO_INTERVAL);
++
+ 	return tcp_ses;
  
-@@ -1040,7 +1014,6 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
- 
- 	xid = GetXid();
- 
--	long_op = cifs_write_timeout(cifsi, *poffset);
- 	for (total_written = 0; write_size > total_written;
- 	     total_written += bytes_written) {
- 		rc = -EAGAIN;
-@@ -1070,7 +1043,7 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
- 				rc = CIFSSMBWrite2(xid, pTcon,
- 						open_file->netfid, len,
- 						*poffset, &bytes_written,
--						iov, 1, long_op);
-+						iov, 1, 0);
- 			} else
- 				rc = CIFSSMBWrite(xid, pTcon,
- 					 open_file->netfid,
-@@ -1078,7 +1051,7 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
- 					       write_size - total_written),
- 					 *poffset, &bytes_written,
- 					 write_data + total_written,
--					 NULL, long_op);
-+					 NULL, 0);
- 		}
- 		if (rc || (bytes_written == 0)) {
- 			if (total_written)
-@@ -1091,8 +1064,6 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
- 			cifs_update_eof(cifsi, *poffset, bytes_written);
- 			*poffset += bytes_written;
- 		}
--		long_op = CIFS_STD_OP; /* subsequent writes fast -
--				    15 seconds is plenty */
- 	}
- 
- 	cifs_stats_bytes_written(pTcon, total_written);
-@@ -1292,7 +1263,7 @@ static int cifs_writepages(struct address_space *mapping,
- 	struct pagevec pvec;
- 	int rc = 0;
- 	int scanned = 0;
--	int xid, long_op;
-+	int xid;
- 
- 	cifs_sb = CIFS_SB(mapping->host->i_sb);
- 
-@@ -1437,11 +1408,10 @@ retry_write:
- 				cERROR(1, "No writable handles for inode");
- 				rc = -EBADF;
- 			} else {
--				long_op = cifs_write_timeout(cifsi, offset);
- 				rc = CIFSSMBWrite2(xid, tcon, open_file->netfid,
- 						   bytes_to_write, offset,
- 						   &bytes_written, iov, n_iov,
--						   long_op);
-+						   0);
- 				cifsFileInfo_put(open_file);
- 				cifs_update_eof(cifsi, offset, bytes_written);
- 			}
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 2997533..50b74a5 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -881,7 +881,7 @@ ssetup_ntlmssp_authenticate:
- 	BCC_LE(smb_buf) = cpu_to_le16(count);
- 
- 	rc = SendReceive2(xid, ses, iov, 3 /* num_iovecs */, &resp_buf_type,
--			  CIFS_STD_OP /* not long */ | CIFS_LOG_ERROR);
-+			  CIFS_LOG_ERROR);
- 	/* SMB request buf freed in SendReceive2 */
- 
- 	pSMB = (SESSION_SETUP_ANDX *)iov[0].iov_base;
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 2a0b14d..70873ab 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -791,7 +791,7 @@ send_lock_cancel(const unsigned int xid, struct cifsTconInfo *tcon,
- 	pSMB->hdr.Mid = GetNextMid(ses->server);
- 
- 	return SendReceive(xid, ses, in_buf, out_buf,
--			&bytes_returned, CIFS_STD_OP);
-+			&bytes_returned, 0);
- }
- 
- int
+ out_err_crypto_release:
 -- 
 1.7.3.2
