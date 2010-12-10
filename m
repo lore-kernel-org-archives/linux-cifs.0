@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 04/13] cifs: wait indefinitely for responses
-Date: Fri, 10 Dec 2010 10:44:28 -0500
-Message-ID: <1291995877-2276-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 12/13] cifs: reconnect unresponsive servers
+Date: Fri, 10 Dec 2010 10:44:36 -0500
+Message-ID: <1291995877-2276-13-git-send-email-jlayton@redhat.com>
 References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,186 +10,87 @@ In-Reply-To: <1291995877-2276-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The client should not be timing out on individual SMB requests. Too much
-of the state between client and server is tied to the state of the
-socket. If we time out requests and issue spurious disconnects then that
-comprimises data integrity.
+If the server isn't responding to echoes, we don't want to leave tasks
+hung waiting for it to reply. At that point, we'll want to reconnect
+so that soft mounts can return an error to userspace quickly.
 
-Instead of doing this complicated dance where we try to decide how long
-to wait for a response for particular requests, have the client instead
-wait indefinitely for a response. Also, use a TASK_KILLABLE sleep here
-so that fatal signals will break out of this waiting.
-
-Later patches will add support for detecting dead peers and forcing
-reconnects based on that.
+If the client hasn't received a reply after 3 echo intervals, assume
+that the transport is down and attempt to reconnect the socket.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/transport.c |  110 ++++++++-------------------------------------------
- 1 files changed, 17 insertions(+), 93 deletions(-)
+ fs/cifs/connect.c |   23 +++++++++++++++++++----
+ 1 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 2d21bbd..989674c 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -311,48 +311,17 @@ static int allocate_mid(struct cifsSesInfo *ses, struct smb_hdr *in_buf,
- 	return 0;
- }
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 98e1d38..c596515 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -55,6 +55,9 @@
+ /* SMB echo "timeout" -- FIXME: tunable? */
+ #define SMB_ECHO_INTERVAL (30 * HZ)
  
--static int wait_for_response(struct cifsSesInfo *ses,
--			struct mid_q_entry *midQ,
--			unsigned long timeout,
--			unsigned long time_to_wait)
-+static int
-+wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- {
--	unsigned long curr_timeout;
--
--	for (;;) {
--		curr_timeout = timeout + jiffies;
--		wait_event_timeout(ses->server->response_q,
--			midQ->midState != MID_REQUEST_SUBMITTED, timeout);
--
--		if (time_after(jiffies, curr_timeout) &&
--			(midQ->midState == MID_REQUEST_SUBMITTED) &&
--			((ses->server->tcpStatus == CifsGood) ||
--			 (ses->server->tcpStatus == CifsNew))) {
--
--			unsigned long lrt;
-+	int error;
++/* reconnect if no response from server in this time period */
++#define UNRESPONSIVE_SERVER_TIMEOUT (3 * SMB_ECHO_INTERVAL)
++
+ extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
+ 			 unsigned char *p24);
  
--			/* We timed out. Is the server still
--			   sending replies ? */
--			spin_lock(&GlobalMid_Lock);
--			lrt = ses->server->lstrp;
--			spin_unlock(&GlobalMid_Lock);
-+	error = wait_event_killable(server->response_q,
-+				    midQ->midState != MID_REQUEST_SUBMITTED);
-+	if (error < 0)
-+		return -ERESTARTSYS;
+@@ -187,6 +190,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	kfree(server->session_key.response);
+ 	server->session_key.response = NULL;
+ 	server->session_key.len = 0;
++	server->lstrp = jiffies;
+ 	mutex_unlock(&server->srv_mutex);
  
--			/* Calculate time_to_wait past last receive time.
--			 Although we prefer not to time out if the
--			 server is still responding - we will time
--			 out if the server takes more than 15 (or 45
--			 or 180) seconds to respond to this request
--			 and has not responded to any request from
--			 other threads on the client within 10 seconds */
--			lrt += time_to_wait;
--			if (time_after(jiffies, lrt)) {
--				/* No replies for time_to_wait. */
--				cERROR(1, "server not responding");
--				return -1;
--			}
--		} else {
--			return 0;
--		}
--	}
-+	return 0;
- }
+ 	/*
+@@ -442,7 +446,19 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
+ 		smb_msg.msg_control = NULL;
+ 		smb_msg.msg_controllen = 0;
+ 		pdu_length = 4; /* enough to get RFC1001 header */
++
+ incomplete_rcv:
++		if (time_after(jiffies,
++			       server->lstrp + UNRESPONSIVE_SERVER_TIMEOUT)) {
++			cERROR(1, "Server %s has not responded in %d seconds. "
++				  "Reconnecting...", server->hostname,
++				  UNRESPONSIVE_SERVER_TIMEOUT / HZ);
++			cifs_reconnect(server);
++			csocket = server->ssocket;
++			wake_up(&server->response_q);
++			continue;
++		}
++
+ 		length =
+ 		    kernel_recvmsg(csocket, &smb_msg,
+ 				&iov, 1, pdu_length, 0 /* BB other flags? */);
+@@ -603,6 +619,8 @@ incomplete_rcv:
+ 		}
  
- 
-@@ -430,7 +399,6 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
- 	int rc = 0;
- 	int long_op;
- 	unsigned int receive_len;
--	unsigned long timeout;
- 	struct mid_q_entry *midQ;
- 	struct smb_hdr *in_buf = iov[0].iov_base;
- 
-@@ -497,33 +465,12 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
- 	if (rc < 0)
- 		goto out;
- 
--	if (long_op == CIFS_STD_OP)
--		timeout = 15 * HZ;
--	else if (long_op == CIFS_VLONG_OP) /* e.g. slow writes past EOF */
--		timeout = 180 * HZ;
--	else if (long_op == CIFS_LONG_OP)
--		timeout = 45 * HZ; /* should be greater than
--			servers oplock break timeout (about 43 seconds) */
--	else if (long_op == CIFS_ASYNC_OP)
--		goto out;
--	else if (long_op == CIFS_BLOCKING_OP)
--		timeout = 0x7FFFFFFF; /*  large, but not so large as to wrap */
--	else {
--		cERROR(1, "unknown timeout flag %d", long_op);
--		rc = -EIO;
-+	if (long_op == CIFS_ASYNC_OP)
- 		goto out;
--	}
--
--	/* wait for 15 seconds or until woken up due to response arriving or
--	   due to last connection to this server being unmounted */
--	if (signal_pending(current)) {
--		/* if signal pending do not hold up user for full smb timeout
--		but we still give response a chance to complete */
--		timeout = 2 * HZ;
--	}
- 
--	/* No user interrupts in wait - wreaks havoc with performance */
--	wait_for_response(ses, midQ, timeout, 10 * HZ);
-+	rc = wait_for_response(ses->server, midQ);
-+	if (rc != 0)
-+		goto out;
- 
- 	rc = handle_mid_result(midQ, ses->server);
- 	if (rc != 0)
-@@ -598,7 +545,6 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
- {
- 	int rc = 0;
- 	unsigned int receive_len;
--	unsigned long timeout;
- 	struct mid_q_entry *midQ;
- 
- 	if (ses == NULL) {
-@@ -662,33 +608,12 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
- 	if (rc < 0)
- 		goto out;
- 
--	if (long_op == CIFS_STD_OP)
--		timeout = 15 * HZ;
--	/* wait for 15 seconds or until woken up due to response arriving or
--	   due to last connection to this server being unmounted */
--	else if (long_op == CIFS_ASYNC_OP)
--		goto out;
--	else if (long_op == CIFS_VLONG_OP) /* writes past EOF can be slow */
--		timeout = 180 * HZ;
--	else if (long_op == CIFS_LONG_OP)
--		timeout = 45 * HZ; /* should be greater than
--			servers oplock break timeout (about 43 seconds) */
--	else if (long_op == CIFS_BLOCKING_OP)
--		timeout = 0x7FFFFFFF; /* large but no so large as to wrap */
--	else {
--		cERROR(1, "unknown timeout flag %d", long_op);
--		rc = -EIO;
-+	if (long_op == CIFS_ASYNC_OP)
- 		goto out;
--	}
- 
--	if (signal_pending(current)) {
--		/* if signal pending do not hold up user for full smb timeout
--		but we still give response a chance to complete */
--		timeout = 2 * HZ;
--	}
--
--	/* No user interrupts in wait - wreaks havoc with performance */
--	wait_for_response(ses, midQ, timeout, 10 * HZ);
-+	rc = wait_for_response(ses->server, midQ);
-+	if (rc != 0)
-+		goto out;
- 
- 	rc = handle_mid_result(midQ, ses->server);
- 	if (rc != 0)
-@@ -906,8 +831,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 		mid_entry = NULL;
++		server->lstrp = jiffies;
++
+ 		spin_lock(&GlobalMid_Lock);
+ 		list_for_each(tmp, &server->pending_mid_q) {
+ 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+@@ -653,10 +671,6 @@ multi_t2_fnd:
+ #ifdef CONFIG_CIFS_STATS2
+ 				mid_entry->when_received = jiffies;
+ #endif
+-				/* so we do not time out requests to  server
+-				which is still responding (since server could
+-				be busy but not dead) */
+-				server->lstrp = jiffies;
+ 				break;
  			}
- 		}
- 
--		/* Wait 5 seconds for the response. */
--		if (wait_for_response(ses, midQ, 5 * HZ, 5 * HZ) == 0) {
-+		if (wait_for_response(ses->server, midQ) == 0) {
- 			/* We got the response - restart system call. */
- 			rstart = 1;
- 		}
+ next_mid:
+@@ -1724,6 +1738,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 		volume_info->target_rfc1001_name, RFC1001_NAME_LEN_WITH_NULL);
+ 	tcp_ses->session_estab = false;
+ 	tcp_ses->sequence_number = 0;
++	tcp_ses->lstrp = jiffies;
+ 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+ 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
+ 	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
 -- 
 1.7.3.2
