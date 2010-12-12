@@ -1,53 +1,268 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/6] CIFS: Make read call work with strict cache mode
- (try #4)
-Date: Sat, 11 Dec 2010 18:21:38 -0500
-Message-ID: <20101211182138.1a3302ab@corrin.poochiereds.net>
-References: <1291103671-2983-1-git-send-email-piastryyy@gmail.com>
-	<20101207072610.50c5810a@tlielax.poochiereds.net>
-	<AANLkTikrDA_NnK_unas1FABStcre2MPCbV0iJoV2HcYG@mail.gmail.com>
+From: Jeff Layton <jlayton@samba.org>
+Subject: Re: [PATCH] cifs: Support for an upcall to map SID to an uid and a gid
+Date: Sat, 11 Dec 2010 19:30:03 -0500
+Message-ID: <20101211193003.4a11fc7f@corrin.poochiereds.net>
+References: <1291741872-22747-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20101211111716.1e21be41@corrin.poochiereds.net>
+	<AANLkTimiD_iAJveTFpsANQsJC_cUfRwHM=jO5FSoj4x_@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikrDA_NnK_unas1FABStcre2MPCbV0iJoV2HcYG-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Cc: dhowells@redhat.com, linux-cifs@vger.kernel.org,
+	samba-technical <samba-technical@lists.samba.org>
+To: Shirish Pargaonkar <shirishpargaonkar@gmail.com>, smfrench@gmail.com
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <AANLkTimiD_iAJveTFpsANQsJC_cUfRwHM=jO5FSoj4x_@mail.gmail.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sat, 11 Dec 2010 22:47:42 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Sat, 11 Dec 2010 15:47:12 -0600
+Shirish Pargaonkar <shirishpargaonkar@gmail.com> wrote:
 
-> 2010/12/7 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> > Hmmm...that looks a little ugly. There is no batching here, so if the
-> > application sends you an array of very small iovecs, then that becomes
-> > a set of very small reads on the wire. I don't think that's what you
-> > want.
-> 
-> Jeff, I investigated this a little and found out a problem with
-> mandatory byte-range locks:
-> 
-> For example, the first user locks file from 11 to 12, the second user
-> specifies two buffers with 10 and 20 lengths and wants to fill them
-> with readv call. In your case we merge these buffers into one request,
-> sends it and got error. As the result we don't have any data returned
-> from the server. So the second user thinks that the file is locked on
-> both regions (from 0 to 10 and from 10 to 30) but it is not true!
-> Almost the same things we can see in write case. So, what's why I
-> think we shouldn't do it in strict cache case.
-> 
-> Thoughts?
-> 
+> On Sat, Dec 11, 2010 at 10:17 AM, Jeff Layton <jlayton@samba.org> wrote:
+> > On Tue, =A07 Dec 2010 11:11:12 -0600
+> > shirishpargaonkar@gmail.com wrote:
+> >
+> >> From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+> >>
+> >>
+> >> Use a cifs upcall to map a SID to either an uid or a gid using
+> >> winbind.
+> >>
+> >> There is a corrosponding patch for the cifs.upcall binary in cifs-util=
+s rpm
+> >> that is being posted also.
+> >>
+> >> A new type of key, cifs_acl_key_type, is used.
+> >> To map a SID, which can be either a Onwer SID or a Group SID, key
+> >> description starts with the string "os" or "gs" followed by SID conver=
+ted
+> >> to a string. Without "os" or "gs", cifs.upcall does not know whether
+> >> SID needs to be mapped to either an uid or a gid.
+> >>
+> >> Once a key is instantiated, get rid of it since cifs does not need to
+> >> use in any way.
+> >> winbind does the id mapping and looks up name for the newly mapped
+> >> SID/uid or SID/gid combination.
+> >>
+> >> For now, cifs.upcall is only used to map a SID to an id (uid or gid) b=
+ut
+> >> it would be used to obtain an SID (string) for an id.
+> >>
+> >> An entry such as this
+> >>
+> >> create =A0cifs.cifs_acl =A0 * =A0 =A0 =A0 * =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 /usr/sbin/cifs.upcall %k
+> >>
+> >> is needed in the file /etc/request-key.conf.
+> >>
+> >>
+> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+> >> ---
+> >> =A0fs/cifs/cifsacl.c | =A0117 ++++++++++++++++++++++++++++++++++++++++=
+++++++++-----
+> >> =A0fs/cifs/cifsacl.h | =A0 =A08 ++++
+> >> =A0fs/cifs/cifsfs.c =A0| =A0 =A07 +++
+> >> =A03 files changed, 122 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> >> index a520091..d3ac6c8 100644
+> >> --- a/fs/cifs/cifsacl.c
+> >> +++ b/fs/cifs/cifsacl.c
+> >> @@ -23,6 +23,9 @@
+> >>
+> >> =A0#include <linux/fs.h>
+> >> =A0#include <linux/slab.h>
+> >> +#include <linux/string.h>
+> >> +#include <keys/user-type.h>
+> >> +#include <linux/key-type.h>
+> >> =A0#include "cifspdu.h"
+> >> =A0#include "cifsglob.h"
+> >> =A0#include "cifsacl.h"
+> >> @@ -52,6 +55,102 @@ static const struct cifs_sid sid_authusers =3D {
+> >> =A0/* group users */
+> >> =A0static const struct cifs_sid sid_user =3D {1, 2 , {0, 0, 0, 0, 0, 5=
+}, {} };
+> >>
+> >> +static int
+> >> +cifs_acl_key_instantiate(struct key *key, const void *data, size_t da=
+talen)
+> >> +{
+> >> + =A0 =A0 char *payload;
+> >> +
+> >> + =A0 =A0 payload =3D kmalloc(datalen, GFP_KERNEL);
+> >> + =A0 =A0 if (!payload)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
+> >> +
+> >> + =A0 =A0 memcpy(payload, data, datalen);
+> >> + =A0 =A0 key->payload.data =3D payload;
+> >> + =A0 =A0 return 0;
+> >> +}
+> >> +
+> >> +static void
+> >> +cifs_acl_key_destroy(struct key *key)
+> >> +{
+> >> + =A0 =A0 kfree(key->payload.data);
+> >> +}
+> >> +
+> >> +struct key_type cifs_acl_key_type =3D {
+> >> + =A0 =A0 .name =A0 =A0 =A0 =A0=3D "cifs.cifs_acl",
+> >> + =A0 =A0 .instantiate =3D cifs_acl_key_instantiate,
+> >> + =A0 =A0 .destroy =A0 =A0 =3D cifs_acl_key_destroy,
+> >> + =A0 =A0 .describe =A0 =A0=3D user_describe,
+> >> + =A0 =A0 .match =A0 =A0 =A0 =3D user_match,
+> >> +};
+> >> +
+> >
+> > Nit: these don't have so much to do with ACL's per-se, as much as
+> > idmapping. Maybe these functions and the key type should be called
+> > "cifs_idmap_*" and "cifs.idmap" ? It might be clearer to admins what
+> > this is for.
+>=20
+> Yes, will change the name as you suggested, that sounds right, rather
+> that acl.
+>=20
+> >
+> >> +static void
+> >> +sid_to_str(struct cifs_sid *sidptr, char *sidstr)
+> >> +{
+> >> + =A0 =A0 int i;
+> >> + =A0 =A0 unsigned long saval;
+> >> + =A0 =A0 char *strptr;
+> >> +
+> >> + =A0 =A0 strptr =3D sidstr;
+> >> +
+> >> + =A0 =A0 sprintf(strptr, "%s", "S");
+> >> + =A0 =A0 strptr =3D sidstr + strlen(sidstr);
+> >> +
+> >> + =A0 =A0 sprintf(strptr, "-%d", sidptr->revision);
+> >> + =A0 =A0 strptr =3D sidstr + strlen(sidstr);
+> >> +
+> >> + =A0 =A0 for (i =3D 0; i < 6; ++i) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (sidptr->authority[i]) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sprintf(strptr, "-%d", sidpt=
+r->authority[i]);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strptr =3D sidstr + strlen(s=
+idstr);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> + =A0 =A0 }
+> >> +
+> >> + =A0 =A0 for (i =3D 0; i < sidptr->num_subauth; ++i) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 saval =3D le32_to_cpu(sidptr->sub_auth[i]);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 sprintf(strptr, "-%ld", saval);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 strptr =3D sidstr + strlen(sidstr);
+> >> + =A0 =A0 }
+> >> +}
+> >> +
+> >> +static int
+> >> +sid_to_id(struct cifs_sid *psid, struct cifs_fattr *fattr, uint sidty=
+pe)
+> >> +{
+> >> + =A0 =A0 int rc =3D 0;
+> >> + =A0 =A0 char *sidstr, *strptr;
+> >> + =A0 =A0 struct key *idkey;
+> >> +
+> >> + =A0 =A0 sidstr =3D kzalloc(SIDLEN, GFP_KERNEL);
+> >> + =A0 =A0 if (!sidstr)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
+> >> + =A0 =A0 strptr =3D sidstr;
+> >> +
+> >> + =A0 =A0 if (sidtype =3D=3D SIDOWNER)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 sprintf(strptr, "%s", "os:");
+> >> + =A0 =A0 else if (sidtype =3D=3D SIDGROUP)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 sprintf(strptr, "%s", "gs:");
+> >> + =A0 =A0 else {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EINVAL;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 goto idresolve_err;
+> >> + =A0 =A0 }
+> >> + =A0 =A0 strptr =3D sidstr + strlen(sidstr);
+> >> +
+> >> + =A0 =A0 sid_to_str(psid, strptr);
+> >> +
+> >> + =A0 =A0 idkey =3D request_key(&cifs_acl_key_type, sidstr, "");
+> >> + =A0 =A0 if (IS_ERR(idkey))
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: idkey error: %d\n", __func__, -=
+ENOKEY);
+> >> + =A0 =A0 else {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (sidtype =3D=3D SIDOWNER)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_uid =3D *(unsigned=
+ long *)idkey->payload.value;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 else if (sidtype =3D=3D SIDGROUP)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_gid =3D *(unsigned=
+ long *)idkey->payload.value;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 key_put(idkey);
+> >> + =A0 =A0 }
+> >> +
+> >> +idresolve_err:
+> >> + =A0 =A0 kfree(sidstr);
+> >> + =A0 =A0 return rc;
+> >> +}
+> >>
+> >
+> > What about security? With this code, it'll be possible for a user to
+> > "stuff" the cache with idmapping. In the situation where the kernel is
+> > trying to enforce permissions on the client, it'll be possible to
+> > trick it into mapping a sid to a uid of your choosing. I think you need
+> > to guard against that.
+>=20
+> That means cifs module will have to know what was the range of ids for
+> uids and gids to be allocated by winbind as dictated by entries in
+> smb.conf and if a returned id happens not to be in that range, discard it
+> and assign default id of 0 (root).
+> winbind know the range from smb.conf, it could be any smb.conf file,
+> not necessarily under /etc/samba/smb.conf.
+> How would cifs module know that range.
+> Not sure if winbind has an API to query the ranges.  And even if it had,
+> it is possible that winbind deamon itself is not running.
+>=20
 
-I think that the number of buffers to be filled shouldn't affect the
-behavior of the client on the wire. If someone happens to trip over a
-BRL here, then tough luck for them.
+Maybe I wasn't clear... The danger here is that I have the ability to
+put info of my own choosing into my keyring via an add_key() syscall
+from userspace.
 
-The multiple buffer case is really no different than the case of a
-single buffer, other than the fact that you're stuffing the result into
-multiple buffers rather than a single one. We're certainly under no
-obligation to partially satisfy a read or write in such a case.
+You need to do something like the override_creds trick that dns_query
+does.
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> >
+> > You'll also be doing an upcall every time a different user needs to map
+> > a SID to a UID/GID.
+> >
+> > Finally, calling into the keys API every time you want to map an ID
+> > sounds rather inefficient. This might take quite some time if you were
+> > doing "ls -l" on a large directory.
+> >
+> > Would it be better to consider taking the info in the key and
+> > populating a different cache? You could register it with a shrinker and
+> > prune off LRU entries if memory gets tight.
+> >
+>=20
+> Will look into this.  One thing that concerns me is if a cached etnry
+> for a SID with its name and an id (either an uid or a gid), if that SID
+> now represents a different object and has differernt name, would
+> not cached info be incorrect?  Not sure if this can ever happen
+> or how would it happen and if it does, what would be a trigger
+> for a cache revalidation and purges!
+>=20
+
+Sure, mappings can change. But, you still have the same problem with
+what you're proposing in these patches. The userspace program isn't
+setting a timeout on the key. Once a mapping is put in the keyring,
+it's there until it's revoked. You probably want to set a max TTL for
+the entries in the cache regardless of what scheme is used.
+
+idmap lookups need to be pretty fast as you'll be calling them a lot.
+Consider the case of "ls -l" on a large directory. Some slowness for
+the upcall to populate the entry in the cache is probably acceptable.
+Slowness on subsequent cached lookups of that same entry will be
+painful.
+
+--=20
+Jeff Layton <jlayton@samba.org>
