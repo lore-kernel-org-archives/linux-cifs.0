@@ -1,94 +1,260 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support for an upcall to map SID to an uid and a
- gid
-Date: Sun, 12 Dec 2010 06:39:29 -0500
-Message-ID: <20101212063929.77a619e4@tlielax.poochiereds.net>
-References: <1291741872-22747-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20101211111716.1e21be41@corrin.poochiereds.net>
-	<AANLkTimiD_iAJveTFpsANQsJC_cUfRwHM=jO5FSoj4x_@mail.gmail.com>
-	<20101211193003.4a11fc7f@corrin.poochiereds.net>
-	<AANLkTiniGp28dxZuoTcjyp0OMEoQ-7E0yE6T8B+VHOLj@mail.gmail.com>
-	<20101211221159.36e6c814@corrin.poochiereds.net>
-	<1292125684.7313.4.camel@ruth>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 03/13] cifs: move mid result processing into common function
+Date: Sun, 12 Dec 2010 17:29:58 -0600
+Message-ID: <AANLkTimGiESxGU4qnQ2fX+xTJw94BR5PspMp981VKKe-@mail.gmail.com>
+References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
+	<1291995877-2276-4-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=PGP-SHA1;
- boundary="Sig_/OV3oJj566Fr0jF7xDmyM.JH"; protocol="application/pgp-signature"
-Cc: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1292125684.7313.4.camel@ruth>
+In-Reply-To: <1291995877-2276-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---Sig_/OV3oJj566Fr0jF7xDmyM.JH
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, Dec 10, 2010 at 9:44 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/transport.c | =A0131 ++++++++++++++++++-------------------=
+-------------
+> =A01 files changed, 47 insertions(+), 84 deletions(-)
+>
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 9763f89..2d21bbd 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -382,6 +382,46 @@ SendReceiveNoRsp(const unsigned int xid, struct =
+cifsSesInfo *ses,
+> =A0 =A0 =A0 =A0return rc;
+> =A0}
+>
+> +static int
+> +handle_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *s=
+erver)
+> +{
+> + =A0 =A0 =A0 int rc =3D 0;
+> +
+> + =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> +
+> + =A0 =A0 =A0 if (mid->resp_buf) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 cERROR(1, "No response to cmd %d mid %d", mid->command,=
+ mid->mid);
+> + =A0 =A0 =A0 if (mid->midState =3D=3D MID_REQUEST_SUBMITTED) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExitin=
+g)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->tcpStatus =3D C=
+ifsNeedReconnect;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->midState =3D MID_R=
+ETRY_NEEDED;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (mid->midState =3D=3D MID_RETRY_NEED=
+ED) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EAGAIN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "marking reques=
+t for retry");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO;
 
-On Sun, 12 Dec 2010 14:48:04 +1100
-Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+I think this else part is redundant.  If rc is not EHOSTDOWN,
+which means it is 0, midState will always be MID_RETRY_NEEDED.
 
-> On Sat, 2010-12-11 at 22:11 -0500, Jeff Layton wrote:
-> > On Sat, 11 Dec 2010 19:57:11 -0500
-> > Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >=20
-> > > On Sat, Dec 11, 2010 at 7:30 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
-e:
-> > > >>
-> > > >> Will look into this.  One thing that concerns me is if a cached et=
-nry
-> > > >> for a SID with its name and an id (either an uid or a gid), if tha=
-t SID
-> > > >> now represents a different object and has differernt name, would
-> > > >> not cached info be incorrect?  Not sure if this can ever happen
-> > > >> or how would it happen and if it does, what would be a trigger
-> > > >> for a cache revalidation and purges!
-> > > >>
-> > > >
-> > > > Sure, mappings can change. But, you still have the same problem with
-> > > > what you're proposing in these patches. The userspace program isn't
-> > > > setting a timeout on the key. Once a mapping is put in the keyring,
-> > > > it's there until it's revoked. You probably want to set a max TTL f=
-or
-> > > > the entries in the cache regardless of what scheme is used.
-> > >=20
-> > > I was under the impression that SIDs are never reused. Perhaps I am m=
-istaken.
-> > >=20
-> >=20
-> > That may be, but the mapping of a SID is dependent upon settings in
-> > config files that could change. It seems reasonable to me to only cache
-> > these mappings for a period of time in the event that they do. That
-> > period of time could default to being rather long and be tunable.
->=20
-> I think that instead some explicit signal should be made to indicate
-> that a mapping has changed, so you don't have to worry about cache
-> times.  It should change *very* rarely and only on specific
-> administrator intervention.  We do a lot of things to avoid this
-> happening in the normal course of events.=20
->=20
-
-What would provide this signal? winbindd? I suppose we could add a knob
-or something under /sys that tells cifs to dump the idmap cache.
-
-We would also have to consider however how to deal with someone running
-an old winbindd that doesn't signal the kernel properly.
-
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-
---Sig_/OV3oJj566Fr0jF7xDmyM.JH
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-
-iEYEARECAAYFAk0EtHYACgkQyP0gxQMdzICd9gCdHrxLJKS5SI/95LsTIwQFTeH+
-FrEAnAhlpVTCCe1/KGj7RhnkHKQl0yk4
-=3bwE
------END PGP SIGNATURE-----
-
---Sig_/OV3oJj566Fr0jF7xDmyM.JH--
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> +
+> + =A0 =A0 =A0 DeleteMidQEntry(mid);
+> + =A0 =A0 =A0 /* Update # of requests on wire to server */
+> + =A0 =A0 =A0 atomic_dec(&server->inFlight);
+> + =A0 =A0 =A0 wake_up(&server->request_q);
+> +
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> =A0int
+> =A0SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+> =A0 =A0 =A0 =A0 =A0 =A0 struct kvec *iov, int n_vec, int *pRespBufTyp=
+e /* ret */,
+> @@ -485,37 +525,10 @@ SendReceive2(const unsigned int xid, struct cif=
+sSesInfo *ses,
+> =A0 =A0 =A0 =A0/* No user interrupts in wait - wreaks havoc with perf=
+ormance */
+> =A0 =A0 =A0 =A0wait_for_response(ses, midQ, timeout, 10 * HZ);
+>
+> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> -
+> - =A0 =A0 =A0 if (midQ->resp_buf =3D=3D NULL) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "No response to cmd %d mid %d=
+",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->command, midQ->mi=
+d);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D MID_REQUEST_S=
+UBMITTED) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->server->tcpSta=
+tus =3D=3D CifsExiting)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EHOSTDOWN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
+rver->tcpStatus =3D CifsNeedReconnect;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->m=
+idState =3D MID_RETRY_NEEDED;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D=
+ MID_RETRY_NEEDED) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EAGAIN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1,=
+ "marking request for retry");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EIO;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 DeleteMidQEntry(midQ);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Update # of requests on wire to serv=
+er */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_dec(&ses->server->inFlight);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
+> + =A0 =A0 =A0 rc =3D handle_mid_result(midQ, ses->server);
+> + =A0 =A0 =A0 if (rc !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> - =A0 =A0 =A0 }
+>
+> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0receive_len =3D midQ->resp_buf->smb_buf_length;
+>
+> =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) =
+{
+> @@ -677,36 +690,10 @@ SendReceive(const unsigned int xid, struct cifs=
+SesInfo *ses,
+> =A0 =A0 =A0 =A0/* No user interrupts in wait - wreaks havoc with perf=
+ormance */
+> =A0 =A0 =A0 =A0wait_for_response(ses, midQ, timeout, 10 * HZ);
+>
+> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 if (midQ->resp_buf =3D=3D NULL) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "No response for cmd %d mid %=
+d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->command, midQ=
+->mid);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D MID_REQUEST_S=
+UBMITTED) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->server->tcpSta=
+tus =3D=3D CifsExiting)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EHOSTDOWN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
+rver->tcpStatus =3D CifsNeedReconnect;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->m=
+idState =3D MID_RETRY_NEEDED;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D=
+ MID_RETRY_NEEDED) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EAGAIN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1,=
+ "marking request for retry");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EIO;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 DeleteMidQEntry(midQ);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Update # of requests on wire to serv=
+er */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_dec(&ses->server->inFlight);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
+> + =A0 =A0 =A0 rc =3D handle_mid_result(midQ, ses->server);
+> + =A0 =A0 =A0 if (rc !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> - =A0 =A0 =A0 }
+>
+> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0receive_len =3D midQ->resp_buf->smb_buf_length;
+>
+> =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) =
+{
+> @@ -926,35 +913,11 @@ SendReceiveBlockingLock(const unsigned int xid,=
+ struct cifsTconInfo *tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 if (midQ->resp_buf) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 receive_len =3D midQ->resp_buf->smb_buf=
+_length;
+> - =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "No response for cmd %d mid %=
+d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->command, midQ=
+->mid);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D MID_REQUEST_S=
+UBMITTED) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->server->tcpSta=
+tus =3D=3D CifsExiting)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EHOSTDOWN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
+rver->tcpStatus =3D CifsNeedReconnect;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->m=
+idState =3D MID_RETRY_NEEDED;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D=
+ MID_RETRY_NEEDED) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EAGAIN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1,=
+ "marking request for retry");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+-EIO;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 DeleteMidQEntry(midQ);
+> + =A0 =A0 =A0 rc =3D handle_mid_result(midQ, ses->server);
+> + =A0 =A0 =A0 if (rc !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> - =A0 =A0 =A0 }
+>
+> + =A0 =A0 =A0 receive_len =3D midQ->resp_buf->smb_buf_length;
+> =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) =
+{
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Frame too large received. =A0=
+Length: %d =A0Xid: %d",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0receive_len, xid);
+> --
+> 1.7.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
