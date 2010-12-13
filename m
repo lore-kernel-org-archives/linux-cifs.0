@@ -1,135 +1,107 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 01/13] cifs: don't fail writepages on -EAGAIN errors
-Date: Mon, 13 Dec 2010 23:10:04 +0300
-Message-ID: <AANLkTin3yBQ1VWT9-nQjs-c3-=BghqKi4hSgVcxo27AX@mail.gmail.com>
-References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
-	<1291995877-2276-2-git-send-email-jlayton@redhat.com>
-	<AANLkTinzyPMq79aXmzARLpm1+X_GZho38AYR=zuyXKCi@mail.gmail.com>
-	<20101213150556.7f0cf2f1@tlielax.poochiereds.net>
+Subject: Re: [PATCH 00/13] cifs: don't fail writepages on -EAGAIN errors (try #2)
+Date: Mon, 13 Dec 2010 23:17:13 +0300
+Message-ID: <AANLkTikXGRNuYChauANah6T9qjTdo1u7L=YcT-O=uPRa@mail.gmail.com>
+References: <1291995877-2276-2-git-send-email-jlayton@redhat.com>
+	<1292019275-7248-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Transfer-Encoding: base64
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101213150556.7f0cf2f1-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1292019275-7248-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/12/13 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Mon, 13 Dec 2010 23:01:41 +0300
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> 2010/12/10 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> > If CIFSSMBWrite2 returns -EAGAIN, then the error should be conside=
-red
->> > temporary. CIFS should retry the write instead of setting an error=
- on
->> > the mapping and returning.
->> >
->> > For WB_SYNC_ALL, just retry the write immediately.
->> >
->> > In the WB_SYNC_NONE case, call redirty_page_for_writeback on all o=
-f the
->> > pages that didn't get written out and then move on.
->> >
->> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> > ---
->> > =A0fs/cifs/file.c | =A0 23 +++++++++++------------
->> > =A01 files changed, 11 insertions(+), 12 deletions(-)
->> >
->> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> > index fe16f6d..8e57370 100644
->> > --- a/fs/cifs/file.c
->> > +++ b/fs/cifs/file.c
->> > @@ -1430,6 +1430,7 @@ retry:
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bre=
-ak;
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (n_iov) {
->> > +retry_write:
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0open_file =3D find_=
-writable_file(CIFS_I(mapping->host),
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0false);
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!open_file) {
->> > @@ -1445,22 +1446,20 @@ retry:
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cif=
-s_update_eof(cifsi, offset, bytes_written);
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
->> >
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc || bytes_writ=
-ten < bytes_to_write) {
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERR=
-OR(1, "Write2 ret %d, wrote %d",
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 rc, bytes_written);
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapp=
-ing_set_error(mapping, rc);
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* retry on data-int=
-egrity flush */
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc =3D=3D -EAGAI=
-N && wbc->sync_mode =3D=3D WB_SYNC_ALL)
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto=
- retry_write;
->> > +
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!rc)
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cif=
-s_stats_bytes_written(tcon, bytes_written);
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (rc !=3D -EA=
-GAIN)
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapp=
-ing_set_error(mapping, rc);
->> >
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0for (i =3D 0; i < n=
-_iov; i++) {
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pag=
-e =3D pvec.pages[first + i];
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* S=
-hould we also set page error on
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 succ=
-ess rc but too little data written? */
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* B=
-B investigate retry logic on temporary
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 serv=
-er crash cases and how recovery works
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 when=
- page marked as error */
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (=
-rc)
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (=
-rc =3D=3D -EAGAIN)
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 redirty_page_for_writepage(wbc, page);
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else=
- if (rc !=3D 0)
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0SetPageError(page);
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kun=
-map(page);
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unl=
-ock_page(page);
->> > --
->> > 1.7.3.2
->> >
->>
->> Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->
-> I actually sent a later version of this patch with the unfortunate
-> subject of:
->
-> [PATCH 00/13] cifs: don't fail writepages on -EAGAIN errors (try #2)
->
-> Mind reviewing that one instead? I think it fixes some cases that thi=
-s
-> one doesn't...
->
-
-Yes, I missed that one :) No problem - will look it new version as well=
-=2E
-
---=20
-Best regards,
-Pavel Shilovsky.
+MjAxMC8xMi8xMSBKZWZmIExheXRvbiA8amxheXRvbkByZWRoYXQuY29tPjoKPiBJZiBDSUZTU01C
+V3JpdGUyIHJldHVybnMgLUVBR0FJTiwgdGhlbiB0aGUgZXJyb3Igc2hvdWxkIGJlIGNvbnNpZGVy
+ZWQKPiB0ZW1wb3JhcnkuIENJRlMgc2hvdWxkIHJldHJ5IHRoZSB3cml0ZSBpbnN0ZWFkIG9mIHNl
+dHRpbmcgYW4gZXJyb3Igb24KPiB0aGUgbWFwcGluZyBhbmQgcmV0dXJuaW5nLgo+Cj4gRm9yIFdC
+X1NZTkNfQUxMLCBqdXN0IHJldHJ5IHRoZSB3cml0ZSBpbW1lZGlhdGVseS4gSW4gdGhlIFdCX1NZ
+TkNfTk9ORQo+IGNhc2UsIGNhbGwgcmVkaXJ0eV9wYWdlX2Zvcl93cml0ZWJhY2sgb24gYWxsIG9m
+IHRoZSBwYWdlcyB0aGF0IGRpZG4ndAo+IGdldCB3cml0dGVuIG91dCBhbmQgdGhlbiBtb3ZlIG9u
+Lgo+Cj4gQWxzbywgZml4IHVwIHRoZSBoYW5kbGluZyBvZiBhIHNob3J0IHdyaXRlIHdpdGggYSBz
+dWNjZXNzZnVsIHJldHVybgo+IGNvZGUuIE1TLUNJRlMgc2F5cyB0aGF0IDAgYnl0ZXNfd3JpdHRl
+biBtZWFucyBFTk9TUEMgb3IgRUZCSUcuIEl0Cj4gZG9lc24ndCBtZW50aW9uIHdoYXQgYSBzaG9y
+dCwgYnV0IG5vbi16ZXJvIHdyaXRlIG1lYW5zLCBzbyBmb3Igbm93Cj4gdHJlYXQgaXQgYXMgd2Ug
+d291bGQgYW4gLUVBR0FJTiByZXR1cm4uCj4KPiBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8
+amxheXRvbkByZWRoYXQuY29tPgo+IC0tLQo+IKBmcy9jaWZzL2ZpbGUuYyB8IKAgNDggKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tCj4goDEgZmlsZXMgY2hh
+bmdlZCwgMzYgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEv
+ZnMvY2lmcy9maWxlLmMgYi9mcy9jaWZzL2ZpbGUuYwo+IGluZGV4IGZlMTZmNmQuLjhiZWY2MTEg
+MTAwNjQ0Cj4gLS0tIGEvZnMvY2lmcy9maWxlLmMKPiArKysgYi9mcy9jaWZzL2ZpbGUuYwo+IEBA
+IC0xNDMwLDYgKzE0MzAsNyBAQCByZXRyeToKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgYnJlYWs7Cj4goCCgIKAgoCCgIKAgoCCgfQo+IKAgoCCgIKAgoCCgIKAgoGlmIChuX2lvdikg
+ewo+ICtyZXRyeV93cml0ZToKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoG9wZW5fZmlsZSA9IGZp
+bmRfd3JpdGFibGVfZmlsZShDSUZTX0kobWFwcGluZy0+aG9zdCksCj4goCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoGZhbHNlKTsKPiCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoGlmICghb3Blbl9maWxlKSB7Cj4gQEAgLTE0NDIsMzEgKzE0NDMsNTQg
+QEAgcmV0cnk6Cj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCAmYnl0ZXNfd3JpdHRlbiwgaW92LCBuX2lvdiwKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGxvbmdfb3ApOwo+IKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKBjaWZzRmlsZUluZm9fcHV0KG9wZW5fZmlsZSk7Cj4gLSCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCBjaWZzX3VwZGF0ZV9lb2YoY2lmc2ksIG9mZnNldCwgYnl0ZXNf
+d3JpdHRlbik7Cj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKB9Cj4KPiAtIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCBpZiAocmMgfHwgYnl0ZXNfd3JpdHRlbiA8IGJ5dGVzX3RvX3dyaXRlKSB7Cj4gLSCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBjRVJST1IoMSwgIldyaXRlMiByZXQgJWQsIHdy
+b3RlICVkIiwKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCByYywg
+Ynl0ZXNfd3JpdHRlbik7Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBtYXBwaW5n
+X3NldF9lcnJvcihtYXBwaW5nLCByYyk7Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgfSBlbHNl
+IHsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBjRllJKDEsICJXcml0ZTIgcmM9JWQsIHdyb3Rl
+PSV1IiwgcmMsIGJ5dGVzX3dyaXR0ZW4pOwo+ICsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCAv
+Kgo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAqIEZvciBub3csIHRyZWF0IGEgc2hvcnQgd3Jp
+dGUgYXMgaWYgbm90aGluZyBnb3QKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgKiB3cml0dGVu
+LiBBIHplcm8gbGVuZ3RoIHdyaXRlIGhvd2V2ZXIgaW5kaWNhdGVzCj4gKyCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCogRU5PU1BDIG9yIEVGQklHLiBXZSBoYXZlIG5vIHdheSB0byBrbm93IHdoaWNo
+Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCogdGhvdWdoLCBzbyBjYWxsIGl0IEVOT1NQQyBm
+b3Igbm93LiBFRkJJRyB3b3VsZAo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAqIGdldCB0cmFu
+c2xhdGVkIHRvIEFTX0VJTyBhbnl3YXkuCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCoKPiAr
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgKiBGSVhNRTogbWFrZSBpdCB0YWtlIGludG8gYWNjb3Vu
+dCB0aGUgZGF0YSB0aGF0IGRpZAo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAqIKAgoCCgIKBn
+ZXQgd3JpdHRlbgo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAqLwo+ICsgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIGlmIChyYyA9PSAwKSB7Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCBpZiAoYnl0ZXNfd3JpdHRlbiA9PSAwKQo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCByYyA9IC1FTk9TUEM7Cj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCBlbHNlIGlmIChieXRlc193cml0dGVuIDwgYnl0ZXNfdG9fd3JpdGUpCj4gKyCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIHJjID0gLUVBR0FJTjsKPiArIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCB9Cj4gKwo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIC8qIHJldHJ5IG9uIGRh
+dGEtaW50ZWdyaXR5IGZsdXNoICovCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKHdiYy0+
+c3luY19tb2RlID09IFdCX1NZTkNfQUxMICYmCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IChyYyA9PSAtRUFHQUlOIHx8IGJ5dGVzX3dyaXR0ZW4gPCBieXRlc190b193cml0ZSkpCj4gKyCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBnb3RvIHJldHJ5X3dyaXRlOwo+ICsKPiArIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCAvKiBmaXggdGhlIHN0YXRzIGFuZCBFT0YgKi8KPiArIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCBpZiAoYnl0ZXNfd3JpdHRlbiA+IDApIHsKPiCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgY2lmc19zdGF0c19ieXRlc193cml0dGVuKHRjb24sIGJ5dGVzX3dy
+aXR0ZW4pOwo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgY2lmc191cGRhdGVfZW9m
+KGNpZnNpLCBvZmZzZXQsIGJ5dGVzX3dyaXR0ZW4pOwo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+fQo+Cj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKBmb3IgKGkgPSAwOyBpIDwgbl9pb3Y7IGkrKykg
+ewo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKBwYWdlID0gcHZlYy5wYWdlc1tmaXJz
+dCArIGldOwo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgLyogU2hvdWxkIHdlIGFs
+c28gc2V0IHBhZ2UgZXJyb3Igb24KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIHN1
+Y2Nlc3MgcmMgYnV0IHRvbyBsaXR0bGUgZGF0YSB3cml0dGVuPyAqLwo+IC0goCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgLyogQkIgaW52ZXN0aWdhdGUgcmV0cnkgbG9naWMgb24gdGVtcG9y
+YXJ5Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzZXJ2ZXIgY3Jhc2ggY2FzZXMg
+YW5kIGhvdyByZWNvdmVyeSB3b3Jrcwo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+d2hlbiBwYWdlIG1hcmtlZCBhcyBlcnJvciAqLwo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgaWYgKHJjKQo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgLyogb24gcmV0
+cnlhYmxlIHdyaXRlIGVycm9yLCByZWRpcnR5IHBhZ2UgKi8KPiArIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIGlmIChyYyA9PSAtRUFHQUlOKQo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCByZWRpcnR5X3BhZ2VfZm9yX3dyaXRlcGFnZSh3YmMsIHBhZ2UpOwo+
+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZWxzZSBpZiAocmMgIT0gMCkKPiCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKBTZXRQYWdlRXJyb3IocGFnZSk7Cj4g
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoGt1bm1hcChwYWdlKTsKPiCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgdW5sb2NrX3BhZ2UocGFnZSk7Cj4goCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoGVuZF9wYWdlX3dyaXRlYmFjayhwYWdlKTsKPiCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgcGFnZV9jYWNoZV9yZWxlYXNlKHBhZ2UpOwo+IKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgfQo+ICsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAocmMgIT0gLUVB
+R0FJTikKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIG1hcHBpbmdfc2V0X2Vycm9y
+KG1hcHBpbmcsIHJjKTsKPiArCj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKBpZiAoKHdiYy0+bnJf
+dG9fd3JpdGUgLT0gbl9pb3YpIDw9IDApCj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oGRvbmUgPSAxOwo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgaW5kZXggPSBuZXh0Owo+IC0tCj4g
+MS43LjMuMgoKCkxvb2tzIGdvb2QuCgpSZXZpZXdlZC1ieTogIFBhdmVsIFNoaWxvdnNreSA8cGlh
+c3RyeXl5QGdtYWlsLmNvbT4KCkkgYWxzbyB0aGluayB0aGF0IG5vdCByZXRyeWluZyBvbiBFQUdB
+SU4gaGVyZSBjYW4gY2F1c2UgYSBlcnJvciBvbgpzbWIyIGNvZGUgKHNvbWV0aW1lcyAtb25lIG9y
+IHR3byB0aW1lcyBmb3IgdGVuIHJ1bnMgLSBJIGdvdCBmaWxlIHdpdGgKYSBzaXplIHRoYXQgd2Fz
+IGxlc3MgdGhhbiA0MDBNQiB3aGlsZSBJIHdyb3RlIGV4YWN0bHkgNDAwTUIgZHVyaW5nIG15CnRl
+c3QpLgoKLS0gCkJlc3QgcmVnYXJkcywKUGF2ZWwgU2hpbG92c2t5Lgo=
