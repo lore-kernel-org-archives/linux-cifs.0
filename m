@@ -1,129 +1,112 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 06/13] cifs: clean up handle_mid_response
-Date: Sun, 12 Dec 2010 19:21:52 -0500
-Message-ID: <20101212192152.0c75c5ce@corrin.poochiereds.net>
-References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
-	<1291995877-2276-7-git-send-email-jlayton@redhat.com>
-	<AANLkTi=j8j=OxUxJcwn4h6EqvHSH2vrhQkzRxYjAerzi@mail.gmail.com>
+From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs: Support for an upcall to map SID to an uid and a
+ gid
+Date: Mon, 13 Dec 2010 14:22:09 +1100
+Message-ID: <1292210529.15637.10.camel@obed>
+References: <1291741872-22747-1-git-send-email-shirishpargaonkar@gmail.com>
+	 <20101211111716.1e21be41@corrin.poochiereds.net>
+	 <AANLkTimiD_iAJveTFpsANQsJC_cUfRwHM=jO5FSoj4x_@mail.gmail.com>
+	 <20101211193003.4a11fc7f@corrin.poochiereds.net>
+	 <AANLkTiniGp28dxZuoTcjyp0OMEoQ-7E0yE6T8B+VHOLj@mail.gmail.com>
+	 <20101211221159.36e6c814@corrin.poochiereds.net>
+	 <1292125684.7313.4.camel@ruth>
+	 <20101212063929.77a619e4@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-goAPltOX9PjYO0/ACuH3"
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=j8j=OxUxJcwn4h6EqvHSH2vrhQkzRxYjAerzi-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20101212063929.77a619e4-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 12 Dec 2010 17:52:26 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> On Fri, Dec 10, 2010 at 9:44 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
-> > Make it use a switch statement based on the value of the midStatus.=
- If
-> > the resp_buf is set, then MID_RESPONSE_RECEIVED is too.
-> >
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> > =A0fs/cifs/transport.c | =A0 36 ++++++++++++++++++-----------------=
--
-> > =A01 files changed, 18 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index 0c0dadd..05ced17 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -356,33 +356,33 @@ handle_mid_result(struct mid_q_entry *mid, st=
-ruct TCP_Server_Info *server)
-> > =A0{
-> > =A0 =A0 =A0 =A0int rc =3D 0;
-> >
-> > - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> > + =A0 =A0 =A0 cFYI(1, "%s: cmd=3D%d mid=3D%d state=3D%d", __func__,=
- mid->command,
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->mid, mid->midState);
-> >
-> > - =A0 =A0 =A0 if (mid->resp_buf) {
-> > + =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> > + =A0 =A0 =A0 switch (mid->midState) {
-> > + =A0 =A0 =A0 case MID_RESPONSE_RECEIVED:
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> > - =A0 =A0 =A0 }
-> > -
-> > - =A0 =A0 =A0 cERROR(1, "No response to cmd %d mid %d", mid->comman=
-d, mid->mid);
-> > - =A0 =A0 =A0 if (mid->midState =3D=3D MID_REQUEST_SUBMITTED) {
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExit=
-ing)
-> > + =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* socket is going down, reject all c=
-alls */
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExit=
-ing) {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: cancel=
-ing mid=3D%d cmd=3D0x%x state=3D%d",
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__func=
-__, mid->mid, mid->command, mid->midState);
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EHOSTDOWN;
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->midState =3D MID=
-_RETRY_NEEDED;
-> > - =A0 =A0 =A0 }
-> > -
-> > - =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (mid->midState =3D=3D MID_RETRY_NE=
-EDED) {
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EAGAIN;
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "marking requ=
-est for retry");
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO;
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->midState =3D MID_RETRY_NEEDED;
+--=-goAPltOX9PjYO0/ACuH3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, 2010-12-12 at 06:39 -0500, Jeff Layton wrote:
+> On Sun, 12 Dec 2010 14:48:04 +1100
+> Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 >=20
-> Would it be cleaner to set rc to -EAGAIN instead of setting state her=
-e
-> to fall down and then setting rc as -EAGAIN?
+> > On Sat, 2010-12-11 at 22:11 -0500, Jeff Layton wrote:
+> > > On Sat, 11 Dec 2010 19:57:11 -0500
+> > > Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> > >=20
+> > > > On Sat, Dec 11, 2010 at 7:30 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wr=
+ote:
+> > > > >>
+> > > > >> Will look into this.  One thing that concerns me is if a cached =
+etnry
+> > > > >> for a SID with its name and an id (either an uid or a gid), if t=
+hat SID
+> > > > >> now represents a different object and has differernt name, would
+> > > > >> not cached info be incorrect?  Not sure if this can ever happen
+> > > > >> or how would it happen and if it does, what would be a trigger
+> > > > >> for a cache revalidation and purges!
+> > > > >>
+> > > > >
+> > > > > Sure, mappings can change. But, you still have the same problem w=
+ith
+> > > > > what you're proposing in these patches. The userspace program isn=
+'t
+> > > > > setting a timeout on the key. Once a mapping is put in the keyrin=
+g,
+> > > > > it's there until it's revoked. You probably want to set a max TTL=
+ for
+> > > > > the entries in the cache regardless of what scheme is used.
+> > > >=20
+> > > > I was under the impression that SIDs are never reused. Perhaps I am=
+ mistaken.
+> > > >=20
+> > >=20
+> > > That may be, but the mapping of a SID is dependent upon settings in
+> > > config files that could change. It seems reasonable to me to only cac=
+he
+> > > these mappings for a period of time in the event that they do. That
+> > > period of time could default to being rather long and be tunable.
+> >=20
+> > I think that instead some explicit signal should be made to indicate
+> > that a mapping has changed, so you don't have to worry about cache
+> > times.  It should change *very* rarely and only on specific
+> > administrator intervention.  We do a lot of things to avoid this
+> > happening in the normal course of events.=20
+> >=20
 >=20
+> What would provide this signal? winbindd? I suppose we could add a knob
+> or something under /sys that tells cifs to dump the idmap cache.
 
-I'm not sure it'll be any more clear. It seems clear enough to me -- if
-it's still SUBMITTED, then we want to treat it if it were
-"RETRY_NEEDED".
+I think a /sys knob seems appropriate, perhaps easily sent a command
+option on the same utility used for the upcall?
 
-Honestly, this really shouldn't happen. With this patchset, you should
-never reach this function if the state is still 'SUBMITTED'. I left it
-there for completeness sake and future-proofness.
+> We would also have to consider however how to deal with someone running
+> an old winbindd that doesn't signal the kernel properly.
 
-> > + =A0 =A0 =A0 case MID_RETRY_NEEDED:
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EAGAIN;
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> > + =A0 =A0 =A0 default:
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: invalid mid state mid=3D=
-%d state=3D%d", __func__,
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->mid, mid->midSta=
-te);
-> > =A0 =A0 =A0 =A0}
-> > =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
-> >
-> > =A0 =A0 =A0 =A0DeleteMidQEntry(mid);
-> > - =A0 =A0 =A0 /* Update # of requests on wire to server */
-> > =A0 =A0 =A0 =A0atomic_dec(&server->inFlight);
-> > =A0 =A0 =A0 =A0wake_up(&server->request_q);
-> >
-> > --
-> > 1.7.3.2
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
-s" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.htm=
-l
-> >
+That's a very interesting question, as after a manual reconfiguration
+perhaps even winbind might not know it changed.  It depends how deeply
+the administrator changed things (changing the idmap_rid config settings
+might matter for example).  I'll let others who deal with idmap more
+often comment.=20
 
+Andrew Bartlett
 
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Andrew Bartlett                                http://samba.org/~abartlet/
+Authentication Developer, Samba Team           http://samba.org
+Samba Developer, Cisco Inc.
+
+--=-goAPltOX9PjYO0/ACuH3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iD8DBQBNBZFhz4A8Wyi0NrsRAhcMAJsG1+IvFjmtWRu99eqMZa0ZtIU2ywCfUeuE
+Sn1ycAqWtPUEYqh10zym1ec=
+=wfae
+-----END PGP SIGNATURE-----
+
+--=-goAPltOX9PjYO0/ACuH3--
