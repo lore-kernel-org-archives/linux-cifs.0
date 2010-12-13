@@ -1,83 +1,146 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: rewrite hardcoded paths in manpages
-Date: Mon, 13 Dec 2010 06:44:27 -0500
-Message-ID: <20101213064427.7d85df5f@tlielax.poochiereds.net>
-References: <1291905440-12866-1-git-send-email-jlayton@samba.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP
+ authentication [try #5]
+Date: Mon, 13 Dec 2010 06:58:42 -0500
+Message-ID: <20101213065842.4b29c140@tlielax.poochiereds.net>
+References: <1292098762-16076-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1291905440-12866-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1292098762-16076-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu,  9 Dec 2010 09:37:20 -0500
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Sat, 11 Dec 2010 14:19:22 -0600
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> Currently the manpages (particularly cifs.upcall.8) have hardcoded
-> paths in them that need to be manually adjusted. Replace those
-> paths with @sbindir@ and add a makefile target that will use sed
-> to replace those paths with the ones set by autoconf.
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> 
+> Indicate to the server a capability of NTLM2 session security (NTLM2 Key)
+> during ntlmssp protocol exchange in one of the bits of the flags field.
+> If server supports this capability, send NTLM2 key even if signing is not
+> required on the server.
+> 
+> If the server requires signing, the session keys exchanged for NTLMv2
+> and NTLM2 session security in auth packet of the nlmssp exchange are same.
+> 
+> Send the same flags in authenticate message (type 3) that client sent in
+> negotiate message (type 1).
+> 
+> Remove function setup_ntlmssp_neg_req
+> 
+> Make sure ntlmssp negotiate and authenticate messages are zero'ed
+> before they are built.
+> 
+> 
+> Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  Makefile.am                       |    6 ++++++
->  cifs.upcall.8 => cifs.upcall.8.in |    4 ++--
->  configure.ac                      |    1 +
->  3 files changed, 9 insertions(+), 2 deletions(-)
->  rename cifs.upcall.8 => cifs.upcall.8.in (97%)
+>  fs/cifs/sess.c |   33 ++++++++++++++-------------------
+>  1 files changed, 14 insertions(+), 19 deletions(-)
 > 
-> diff --git a/Makefile.am b/Makefile.am
-> index 38a16fe..cbfa846 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -13,6 +13,12 @@ sbin_PROGRAMS = cifs.upcall
->  cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
->  cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
->  man_MANS += cifs.upcall.8
-> +
-> +cifs.upcall.8: cifs.upcall.8.in
-> +	sed 's,\@sbindir\@,$(sbindir),' < $(srcdir)/cifs.upcall.8.in > cifs.upcall.8
-> +
-> +clean-local:
-> +	rm -f cifs.upcall.8
->  endif
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 7b01d3f..54d9f76 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -431,13 +431,14 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+>  	NEGOTIATE_MESSAGE *sec_blob = (NEGOTIATE_MESSAGE *)pbuffer;
+>  	__u32 flags;
 >  
->  if CONFIG_CIFSCREDS
-> diff --git a/cifs.upcall.8 b/cifs.upcall.8.in
-> similarity index 97%
-> rename from cifs.upcall.8
-> rename to cifs.upcall.8.in
-> index 3207f6f..bef1ee6 100644
-> --- a/cifs.upcall.8
-> +++ b/cifs.upcall.8.in
-> @@ -78,8 +78,8 @@ To make this program useful for CIFS, you\'ll need to set up entries for them in
->  .nf
->  #OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
->  #=========  =============  = = ================================
-> -create      cifs\&.spnego    * * /usr/local/sbin/cifs\&.upcall %k
-> -create      dns_resolver   * * /usr/local/sbin/cifs\&.upcall %k
-> +create      cifs\&.spnego    * * @sbindir@/cifs\&.upcall %k
-> +create      dns_resolver   * * @sbindir@/cifs\&.upcall %k
->  .fi
->  .if n \{\
->  .RE
-> diff --git a/configure.ac b/configure.ac
-> index a04596c..093b48d 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -24,6 +24,7 @@ AC_ARG_ENABLE(cifscreds,
+> +	memset(pbuffer, 0, sizeof(NEGOTIATE_MESSAGE));
+>  	memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
+>  	sec_blob->MessageType = NtLmNegotiate;
 >  
->  # Checks for programs.
->  AC_PROG_CC
-> +AC_PROG_SED
->  AC_GNU_SOURCE
+>  	/* BB is NTLMV2 session security format easier to use here? */
+>  	flags = NTLMSSP_NEGOTIATE_56 |	NTLMSSP_REQUEST_TARGET |
+>  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+> -		NTLMSSP_NEGOTIATE_NTLM;
+> +		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>  	if (ses->server->secMode &
+>  			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+>  		flags |= NTLMSSP_NEGOTIATE_SIGN;
+> @@ -446,7 +447,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+>  				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>  	}
 >  
->  # Checks for header files.
+> -	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
+> +	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+>  
+>  	sec_blob->WorkstationName.BufferOffset = 0;
+>  	sec_blob->WorkstationName.Length = 0;
+> @@ -477,7 +478,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  	flags = NTLMSSP_NEGOTIATE_56 |
+>  		NTLMSSP_REQUEST_TARGET | NTLMSSP_NEGOTIATE_TARGET_INFO |
+>  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+> -		NTLMSSP_NEGOTIATE_NTLM;
+> +		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>  	if (ses->server->secMode &
+>  	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+>  		flags |= NTLMSSP_NEGOTIATE_SIGN;
+> @@ -485,7 +486,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
+>  
+>  	tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+> -	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
+> +	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+>  
+>  	sec_blob->LmChallengeResponse.BufferOffset =
+>  				cpu_to_le32(sizeof(AUTHENTICATE_MESSAGE));
+> @@ -544,8 +545,9 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  	sec_blob->WorkstationName.MaximumLength = 0;
+>  	tmp += 2;
+>  
+> -	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
+> -			!calc_seckey(ses)) {
+> +	if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
+> +		(ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
+> +			&& !calc_seckey(ses)) {
+>  		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
+>  		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
+>  		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
+> @@ -562,16 +564,6 @@ setup_ntlmv2_ret:
+>  	*buflen = tmp - pbuffer;
+>  	return rc;
+>  }
+> -
+> -
+> -static void setup_ntlmssp_neg_req(SESSION_SETUP_ANDX *pSMB,
+> -				 struct cifsSesInfo *ses)
+> -{
+> -	build_ntlmssp_negotiate_blob(&pSMB->req.SecurityBlob[0], ses);
+> -	pSMB->req.SecurityBlobLength = cpu_to_le16(sizeof(NEGOTIATE_MESSAGE));
+> -
+> -	return;
+> -}
+>  #endif
+>  
+>  int
+> @@ -828,16 +820,19 @@ ssetup_ntlmssp_authenticate:
+>  			capabilities |= CAP_EXTENDED_SECURITY;
+>  			pSMB->req.Capabilities |= cpu_to_le32(capabilities);
+>  			if (phase == NtLmNegotiate) {
+> -				setup_ntlmssp_neg_req(pSMB, ses);
+> +				build_ntlmssp_negotiate_blob(
+> +					pSMB->req.SecurityBlob, ses);
+>  				iov[1].iov_len = sizeof(NEGOTIATE_MESSAGE);
+> -				iov[1].iov_base = &pSMB->req.SecurityBlob[0];
+> +				iov[1].iov_base = pSMB->req.SecurityBlob;
+> +				pSMB->req.SecurityBlobLength =
+> +					cpu_to_le16(sizeof(NEGOTIATE_MESSAGE));
+>  			} else if (phase == NtLmAuthenticate) {
+>  				/* 5 is an empirical value, large enought to
+>  				 * hold authenticate message, max 10 of
+>  				 * av paris, doamin,user,workstation mames,
+>  				 * flags etc..
+>  				 */
+> -				ntlmsspblob = kmalloc(
+> +				ntlmsspblob = kzalloc(
+>  					5*sizeof(struct _AUTHENTICATE_MESSAGE),
+>  					GFP_KERNEL);
+>  				if (!ntlmsspblob) {
 
-Pushed to cifs-utils master branch.
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
