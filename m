@@ -1,94 +1,111 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 2/2] CIFS: Add match_port check during looking for an existing connection (try #4)
-Date: Mon, 13 Dec 2010 22:32:53 +0300
-Message-ID: <1292268773-2918-1-git-send-email-piastryyy@gmail.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH 01/13] cifs: don't fail writepages on -EAGAIN errors
+Date: Mon, 13 Dec 2010 23:01:41 +0300
+Message-ID: <AANLkTinzyPMq79aXmzARLpm1+X_GZho38AYR=zuyXKCi@mail.gmail.com>
+References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
+	<1291995877-2276-2-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1291995877-2276-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we have a share mounted by non-standard port and try to mount another share
-on the same host with standard port, we connect to the first share again -
-that's wrong. This patch fixes this bug.
+2010/12/10 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> If CIFSSMBWrite2 returns -EAGAIN, then the error should be considered
+> temporary. CIFS should retry the write instead of setting an error on
+> the mapping and returning.
+>
+> For WB_SYNC_ALL, just retry the write immediately.
+>
+> In the WB_SYNC_NONE case, call redirty_page_for_writeback on all of t=
+he
+> pages that didn't get written out and then move on.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/file.c | =A0 23 +++++++++++------------
+> =A01 files changed, 11 insertions(+), 12 deletions(-)
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index fe16f6d..8e57370 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1430,6 +1430,7 @@ retry:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (n_iov) {
+> +retry_write:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0open_file =3D find_wri=
+table_file(CIFS_I(mapping->host),
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0false);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!open_file) {
+> @@ -1445,22 +1446,20 @@ retry:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_u=
+pdate_eof(cifsi, offset, bytes_written);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc || bytes_written=
+ < bytes_to_write) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(=
+1, "Write2 ret %d, wrote %d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 rc, bytes_written);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapping=
+_set_error(mapping, rc);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* retry on data-integr=
+ity flush */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc =3D=3D -EAGAIN &=
+& wbc->sync_mode =3D=3D WB_SYNC_ALL)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto re=
+try_write;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_s=
+tats_bytes_written(tcon, bytes_written);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (rc !=3D -EAGAI=
+N)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapping=
+_set_error(mapping, rc);
+>
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0for (i =3D 0; i < n_io=
+v; i++) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0page =3D=
+ pvec.pages[first + i];
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Shou=
+ld we also set page error on
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 success=
+ rc but too little data written? */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* BB i=
+nvestigate retry logic on temporary
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server =
+crash cases and how recovery works
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 when pa=
+ge marked as error */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc =
+=3D=3D -EAGAIN)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 redirty_page_for_writepage(wbc, page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if=
+ (rc !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0SetPageError(page);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kunmap=
+(page);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unlock=
+_page(page);
+> --
+> 1.7.3.2
+>
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/connect.c |   42 +++++++++++++++++++++++++++++++++++++-----
- 1 files changed, 37 insertions(+), 5 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b90c741..41f002f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1453,6 +1453,40 @@ srcip_matches(struct sockaddr *srcaddr, struct sockaddr *rhs)
- 	}
- }
- 
-+/*
-+ * If no port is specified in addr structure, we try to match with 445 port
-+ * and if it fails - with 139 ports. It should be called only if address
-+ * families of server and addr are equal.
-+ */
-+static bool
-+match_port(struct TCP_Server_Info *server, struct sockaddr *addr)
-+{
-+	unsigned short int port, *sport;
-+
-+	switch (addr->sa_family) {
-+	case AF_INET:
-+		sport = &((struct sockaddr_in *) &server->dstaddr)->sin_port;
-+		port = ((struct sockaddr_in *) addr)->sin_port;
-+		break;
-+	case AF_INET6:
-+		sport = &((struct sockaddr_in6 *) &server->dstaddr)->sin6_port;
-+		port = ((struct sockaddr_in6 *) addr)->sin6_port;
-+		break;
-+	default:
-+		WARN_ON(1);
-+		return false;
-+	}
-+
-+	if (!port) {
-+		port = htons(CIFS_PORT);
-+		if (port == *sport)
-+			return true;
-+
-+		port = htons(RFC1001_PORT);
-+	}
-+
-+	return port == *sport;
-+}
- 
- static bool
- match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
-@@ -1466,8 +1500,6 @@ match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
- 
- 		if (addr4->sin_addr.s_addr != srv_addr4->sin_addr.s_addr)
- 			return false;
--		if (addr4->sin_port && addr4->sin_port != srv_addr4->sin_port)
--			return false;
- 		break;
- 	}
- 	case AF_INET6: {
-@@ -1480,9 +1512,6 @@ match_address(struct TCP_Server_Info *server, struct sockaddr *addr,
- 			return false;
- 		if (addr6->sin6_scope_id != srv_addr6->sin6_scope_id)
- 			return false;
--		if (addr6->sin6_port &&
--		    addr6->sin6_port != srv_addr6->sin6_port)
--			return false;
- 		break;
- 	}
- 	default:
-@@ -1555,6 +1584,9 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
- 				   (struct sockaddr *)&vol->srcaddr))
- 			continue;
- 
-+		if (!match_port(server, addr))
-+			continue;
-+
- 		if (!match_security(server, vol))
- 			continue;
- 
--- 
-1.7.3.2
+Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+--=20
+Best regards,
+Pavel Shilovsky.
