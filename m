@@ -1,146 +1,60 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support NTLM2 session security during NTLMSSP
- authentication [try #5]
-Date: Mon, 13 Dec 2010 06:58:42 -0500
-Message-ID: <20101213065842.4b29c140@tlielax.poochiereds.net>
-References: <1292098762-16076-1-git-send-email-shirishpargaonkar@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 1/7] CIFS: Make cifsFileInfo_put work with strict cache mode (try #4)
+Date: Mon, 13 Dec 2010 18:00:49 +0300
+Message-ID: <1292252455-4025-1-git-send-email-piastryyy@gmail.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1292098762-16076-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 11 Dec 2010 14:19:22 -0600
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On strict cache mode when we close the last file handle of the inode we
+should set invalid_mapping flag on this inode to prevent data coherency
+problem when we open it again but it has been modified by other clients.
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> Indicate to the server a capability of NTLM2 session security (NTLM2 Key)
-> during ntlmssp protocol exchange in one of the bits of the flags field.
-> If server supports this capability, send NTLM2 key even if signing is not
-> required on the server.
-> 
-> If the server requires signing, the session keys exchanged for NTLMv2
-> and NTLM2 session security in auth packet of the nlmssp exchange are same.
-> 
-> Send the same flags in authenticate message (type 3) that client sent in
-> negotiate message (type 1).
-> 
-> Remove function setup_ntlmssp_neg_req
-> 
-> Make sure ntlmssp negotiate and authenticate messages are zero'ed
-> before they are built.
-> 
-> 
-> Reported-and-Tested-by: Robbert Kouprie <robbert-C1IQQP51G3M@public.gmane.org>
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/sess.c |   33 ++++++++++++++-------------------
->  1 files changed, 14 insertions(+), 19 deletions(-)
-> 
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 7b01d3f..54d9f76 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -431,13 +431,14 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
->  	NEGOTIATE_MESSAGE *sec_blob = (NEGOTIATE_MESSAGE *)pbuffer;
->  	__u32 flags;
->  
-> +	memset(pbuffer, 0, sizeof(NEGOTIATE_MESSAGE));
->  	memcpy(sec_blob->Signature, NTLMSSP_SIGNATURE, 8);
->  	sec_blob->MessageType = NtLmNegotiate;
->  
->  	/* BB is NTLMV2 session security format easier to use here? */
->  	flags = NTLMSSP_NEGOTIATE_56 |	NTLMSSP_REQUEST_TARGET |
->  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
-> -		NTLMSSP_NEGOTIATE_NTLM;
-> +		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
->  	if (ses->server->secMode &
->  			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
->  		flags |= NTLMSSP_NEGOTIATE_SIGN;
-> @@ -446,7 +447,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
->  				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
->  	}
->  
-> -	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
-> +	sec_blob->NegotiateFlags = cpu_to_le32(flags);
->  
->  	sec_blob->WorkstationName.BufferOffset = 0;
->  	sec_blob->WorkstationName.Length = 0;
-> @@ -477,7 +478,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->  	flags = NTLMSSP_NEGOTIATE_56 |
->  		NTLMSSP_REQUEST_TARGET | NTLMSSP_NEGOTIATE_TARGET_INFO |
->  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
-> -		NTLMSSP_NEGOTIATE_NTLM;
-> +		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
->  	if (ses->server->secMode &
->  	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
->  		flags |= NTLMSSP_NEGOTIATE_SIGN;
-> @@ -485,7 +486,7 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->  		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
->  
->  	tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
-> -	sec_blob->NegotiateFlags |= cpu_to_le32(flags);
-> +	sec_blob->NegotiateFlags = cpu_to_le32(flags);
->  
->  	sec_blob->LmChallengeResponse.BufferOffset =
->  				cpu_to_le32(sizeof(AUTHENTICATE_MESSAGE));
-> @@ -544,8 +545,9 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
->  	sec_blob->WorkstationName.MaximumLength = 0;
->  	tmp += 2;
->  
-> -	if ((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) &&
-> -			!calc_seckey(ses)) {
-> +	if (((ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_KEY_XCH) ||
-> +		(ses->ntlmssp->server_flags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
-> +			&& !calc_seckey(ses)) {
->  		memcpy(tmp, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
->  		sec_blob->SessionKey.BufferOffset = cpu_to_le32(tmp - pbuffer);
->  		sec_blob->SessionKey.Length = cpu_to_le16(CIFS_CPHTXT_SIZE);
-> @@ -562,16 +564,6 @@ setup_ntlmv2_ret:
->  	*buflen = tmp - pbuffer;
->  	return rc;
->  }
-> -
-> -
-> -static void setup_ntlmssp_neg_req(SESSION_SETUP_ANDX *pSMB,
-> -				 struct cifsSesInfo *ses)
-> -{
-> -	build_ntlmssp_negotiate_blob(&pSMB->req.SecurityBlob[0], ses);
-> -	pSMB->req.SecurityBlobLength = cpu_to_le16(sizeof(NEGOTIATE_MESSAGE));
-> -
-> -	return;
-> -}
->  #endif
->  
->  int
-> @@ -828,16 +820,19 @@ ssetup_ntlmssp_authenticate:
->  			capabilities |= CAP_EXTENDED_SECURITY;
->  			pSMB->req.Capabilities |= cpu_to_le32(capabilities);
->  			if (phase == NtLmNegotiate) {
-> -				setup_ntlmssp_neg_req(pSMB, ses);
-> +				build_ntlmssp_negotiate_blob(
-> +					pSMB->req.SecurityBlob, ses);
->  				iov[1].iov_len = sizeof(NEGOTIATE_MESSAGE);
-> -				iov[1].iov_base = &pSMB->req.SecurityBlob[0];
-> +				iov[1].iov_base = pSMB->req.SecurityBlob;
-> +				pSMB->req.SecurityBlobLength =
-> +					cpu_to_le16(sizeof(NEGOTIATE_MESSAGE));
->  			} else if (phase == NtLmAuthenticate) {
->  				/* 5 is an empirical value, large enought to
->  				 * hold authenticate message, max 10 of
->  				 * av paris, doamin,user,workstation mames,
->  				 * flags etc..
->  				 */
-> -				ntlmsspblob = kmalloc(
-> +				ntlmsspblob = kzalloc(
->  					5*sizeof(struct _AUTHENTICATE_MESSAGE),
->  					GFP_KERNEL);
->  				if (!ntlmsspblob) {
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/file.c       |    8 ++++++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
 
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 7852cd6..ac51cd2 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -40,6 +40,7 @@
+ #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+ #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+ #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
++#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
+ 
+ struct cifs_sb_info {
+ 	struct rb_root tlink_tree;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 5a28660..60c3f84 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -264,6 +264,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	struct inode *inode = cifs_file->dentry->d_inode;
+ 	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+ 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifsLockInfo *li, *tmp;
+ 
+ 	spin_lock(&cifs_file_list_lock);
+@@ -279,6 +280,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	if (list_empty(&cifsi->openFileList)) {
+ 		cFYI(1, "closing last open instance for inode %p",
+ 			cifs_file->dentry->d_inode);
++
++		/* in strict cache mode we need invalidate mapping on the last
++		   close  because it may cause a error when we open this file
++		   again and get at least level II oplock */
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
++			CIFS_I(inode)->invalid_mapping = true;
++
+ 		cifs_set_oplock_level(cifsi, 0);
+ 	}
+ 	spin_unlock(&cifs_file_list_lock);
+-- 
+1.7.3.2
