@@ -1,256 +1,82 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 03/13] cifs: move mid result processing into common function
-Date: Tue, 14 Dec 2010 10:34:51 +0300
-Message-ID: <AANLkTinvZTuaLo124Xvb9vkfsXnFoTCvRQsGaNZiWe9V@mail.gmail.com>
-References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
-	<1291995877-2276-4-git-send-email-jlayton@redhat.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH 01/13] cifs: don't fail writepages on -EAGAIN errors
+Date: Tue, 14 Dec 2010 14:56:18 +0530
+Message-ID: <4D07383A.6000400@suse.de>
+References: <1291995877-2276-1-git-send-email-jlayton@redhat.com> <1291995877-2276-2-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1291995877-2276-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1291995877-2276-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2010/12/10 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+On 12/10/2010 09:14 PM, Jeff Layton wrote:
+> If CIFSSMBWrite2 returns -EAGAIN, then the error should be considered
+> temporary. CIFS should retry the write instead of setting an error on
+> the mapping and returning.
+> 
+> For WB_SYNC_ALL, just retry the write immediately.
+> 
+> In the WB_SYNC_NONE case, call redirty_page_for_writeback on all of the
+> pages that didn't get written out and then move on.
+> 
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> =A0fs/cifs/transport.c | =A0131 ++++++++++++++++++-------------------=
--------------
-> =A01 files changed, 47 insertions(+), 84 deletions(-)
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 9763f89..2d21bbd 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -382,6 +382,46 @@ SendReceiveNoRsp(const unsigned int xid, struct =
-cifsSesInfo *ses,
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> +static int
-> +handle_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *s=
-erver)
-> +{
-> + =A0 =A0 =A0 int rc =3D 0;
+>  fs/cifs/file.c |   23 +++++++++++------------
+>  1 files changed, 11 insertions(+), 12 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index fe16f6d..8e57370 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1430,6 +1430,7 @@ retry:
+>  				break;
+>  		}
+>  		if (n_iov) {
+> +retry_write:
+>  			open_file = find_writable_file(CIFS_I(mapping->host),
+>  							false);
+>  			if (!open_file) {
+> @@ -1445,22 +1446,20 @@ retry:
+>  				cifs_update_eof(cifsi, offset, bytes_written);
+>  			}
+>  
+> -			if (rc || bytes_written < bytes_to_write) {
+> -				cERROR(1, "Write2 ret %d, wrote %d",
+> -					  rc, bytes_written);
+> -				mapping_set_error(mapping, rc);
+> -			} else {
+> +			/* retry on data-integrity flush */
+> +			if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL)
+> +				goto retry_write;
 > +
-> + =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> +
-> + =A0 =A0 =A0 if (mid->resp_buf) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
-> + =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 cERROR(1, "No response to cmd %d mid %d", mid->command,=
- mid->mid);
-> + =A0 =A0 =A0 if (mid->midState =3D=3D MID_REQUEST_SUBMITTED) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExitin=
-g)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->tcpStatus =3D C=
-ifsNeedReconnect;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->midState =3D MID_R=
-ETRY_NEEDED;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (mid->midState =3D=3D MID_RETRY_NEED=
-ED) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EAGAIN;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "marking reques=
-t for retry");
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 }
-> + =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> +
-> + =A0 =A0 =A0 DeleteMidQEntry(mid);
-> + =A0 =A0 =A0 /* Update # of requests on wire to server */
-> + =A0 =A0 =A0 atomic_dec(&server->inFlight);
-> + =A0 =A0 =A0 wake_up(&server->request_q);
-> +
-> + =A0 =A0 =A0 return rc;
-> +}
-> +
-> =A0int
-> =A0SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 struct kvec *iov, int n_vec, int *pRespBufTyp=
-e /* ret */,
-> @@ -485,37 +525,10 @@ SendReceive2(const unsigned int xid, struct cif=
-sSesInfo *ses,
-> =A0 =A0 =A0 =A0/* No user interrupts in wait - wreaks havoc with perf=
-ormance */
-> =A0 =A0 =A0 =A0wait_for_response(ses, midQ, timeout, 10 * HZ);
->
-> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> -
-> - =A0 =A0 =A0 if (midQ->resp_buf =3D=3D NULL) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "No response to cmd %d mid %d=
-",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->command, midQ->mi=
-d);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D MID_REQUEST_S=
-UBMITTED) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->server->tcpSta=
-tus =3D=3D CifsExiting)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EHOSTDOWN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
-rver->tcpStatus =3D CifsNeedReconnect;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->m=
-idState =3D MID_RETRY_NEEDED;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D=
- MID_RETRY_NEEDED) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EAGAIN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1,=
- "marking request for retry");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EIO;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 DeleteMidQEntry(midQ);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Update # of requests on wire to serv=
-er */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_dec(&ses->server->inFlight);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> + =A0 =A0 =A0 rc =3D handle_mid_result(midQ, ses->server);
-> + =A0 =A0 =A0 if (rc !=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> - =A0 =A0 =A0 }
->
-> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0receive_len =3D midQ->resp_buf->smb_buf_length;
->
-> =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) =
-{
-> @@ -677,36 +690,10 @@ SendReceive(const unsigned int xid, struct cifs=
-SesInfo *ses,
-> =A0 =A0 =A0 =A0/* No user interrupts in wait - wreaks havoc with perf=
-ormance */
-> =A0 =A0 =A0 =A0wait_for_response(ses, midQ, timeout, 10 * HZ);
->
-> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 if (midQ->resp_buf =3D=3D NULL) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "No response for cmd %d mid %=
-d",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->command, midQ=
-->mid);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D MID_REQUEST_S=
-UBMITTED) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->server->tcpSta=
-tus =3D=3D CifsExiting)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EHOSTDOWN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
-rver->tcpStatus =3D CifsNeedReconnect;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->m=
-idState =3D MID_RETRY_NEEDED;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D=
- MID_RETRY_NEEDED) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EAGAIN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1,=
- "marking request for retry");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EIO;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 DeleteMidQEntry(midQ);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Update # of requests on wire to serv=
-er */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_dec(&ses->server->inFlight);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> + =A0 =A0 =A0 rc =3D handle_mid_result(midQ, ses->server);
-> + =A0 =A0 =A0 if (rc !=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> - =A0 =A0 =A0 }
->
-> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0receive_len =3D midQ->resp_buf->smb_buf_length;
->
-> =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) =
-{
-> @@ -926,35 +913,11 @@ SendReceiveBlockingLock(const unsigned int xid,=
- struct cifsTconInfo *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 if (midQ->resp_buf) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 receive_len =3D midQ->resp_buf->smb_buf=
-_length;
-> - =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "No response for cmd %d mid %=
-d",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->command, midQ=
-->mid);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D MID_REQUEST_S=
-UBMITTED) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (ses->server->tcpSta=
-tus =3D=3D CifsExiting)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EHOSTDOWN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
-rver->tcpStatus =3D CifsNeedReconnect;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 midQ->m=
-idState =3D MID_RETRY_NEEDED;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D -EHOSTDOWN) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (midQ->midState =3D=3D=
- MID_RETRY_NEEDED) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EAGAIN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1,=
- "marking request for retry");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
--EIO;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 DeleteMidQEntry(midQ);
-> + =A0 =A0 =A0 rc =3D handle_mid_result(midQ, ses->server);
-> + =A0 =A0 =A0 if (rc !=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> - =A0 =A0 =A0 }
->
-> + =A0 =A0 =A0 receive_len =3D midQ->resp_buf->smb_buf_length;
-> =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) =
-{
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Frame too large received. =A0=
-Length: %d =A0Xid: %d",
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0receive_len, xid);
-> --
-> 1.7.3.2
->
+> +			if (!rc)
+>  				cifs_stats_bytes_written(tcon, bytes_written);
+> -			}
+> +			else if (rc != -EAGAIN)
+> +				mapping_set_error(mapping, rc);
+>  
+>  			for (i = 0; i < n_iov; i++) {
+>  				page = pvec.pages[first + i];
+> -				/* Should we also set page error on
+> -				success rc but too little data written? */
+> -				/* BB investigate retry logic on temporary
+> -				server crash cases and how recovery works
+> -				when page marked as error */
+> -				if (rc)
+> +				if (rc == -EAGAIN)
+> +					redirty_page_for_writepage(wbc, page);
+> +				else if (rc != 0)
+>  					SetPageError(page);
+>  				kunmap(page);
+>  				unlock_page(page);
+
+Documentation/filesystems/Locking suggests that rc should be set to 0
+after redirtying?
 
 
-Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
---=20
-Best regards,
-Pavel Shilovsky.
+-- 
+Suresh Jayaraman
