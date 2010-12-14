@@ -1,60 +1,82 @@
-From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: Support for an upcall to map SID to an uid and a
- gid
-Date: Wed, 15 Dec 2010 09:42:23 +1100
-Message-ID: <1292366543.22252.313.camel@obed>
-References: <1291741872-22747-1-git-send-email-shirishpargaonkar@gmail.com>
-	 <20101211111716.1e21be41@corrin.poochiereds.net>
-	 <AANLkTimiD_iAJveTFpsANQsJC_cUfRwHM=jO5FSoj4x_@mail.gmail.com>
-	 <20101211193003.4a11fc7f@corrin.poochiereds.net>
-	 <AANLkTiniGp28dxZuoTcjyp0OMEoQ-7E0yE6T8B+VHOLj@mail.gmail.com>
-	 <20101211221159.36e6c814@corrin.poochiereds.net>
-	 <1292125684.7313.4.camel@ruth>
-	 <20101212063929.77a619e4@tlielax.poochiereds.net>
-	 <1292210529.15637.10.camel@obed>
-	 <20101213061622.7e78e475@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 08/13] cifs: handle cancelled requests better
+Date: Tue, 14 Dec 2010 18:18:29 -0500
+Message-ID: <20101214181829.0075c6c6@tlielax.poochiereds.net>
+References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
+	<1291995877-2276-9-git-send-email-jlayton@redhat.com>
+	<AANLkTinU19tUL-6uwYN64dfE1Rsa+uSiC2fkeBHV+XOS@mail.gmail.com>
+	<20101214065935.50a0bdf0@tlielax.poochiereds.net>
+	<AANLkTi=mFXsJd55CzebrKO24ALnwmduBnFLyYZCRVdP4@mail.gmail.com>
+	<AANLkTinSC4WKa4ZBeEOWkSQmy6wBhU8=cO09EKy2Qda2@mail.gmail.com>
+	<20101214164407.377304e0@tlielax.poochiereds.net>
+	<AANLkTimFQSeMk8ZCbAud+RdU5WQcGrDnKz+dAC_UFzNM@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="=-H5gAeXM+vaVXFw0btP2q"
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101213061622.7e78e475-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <AANLkTimFQSeMk8ZCbAud+RdU5WQcGrDnKz+dAC_UFzNM-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Tue, 14 Dec 2010 16:22:01 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
---=-H5gAeXM+vaVXFw0btP2q
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 2010-12-13 at 06:16 -0500, Jeff Layton wrote:
-
+> On Tue, Dec 14, 2010 at 3:44 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
+te:
+> > On Tue, 14 Dec 2010 15:33:48 -0600
+> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> Why wouldn't we issue SMB NTCancel on these? =A0That way we only h=
+ave to
+> >> wait until the timeout for the NTCancel (at worst) and can't leak =
+midq
+> >> entries.
+> >>
+> >
+> > I suppose we could, but...
+> >
+> > a) windows doesn't do it
 >=20
-> The other option is just to have a manual knob that flushes the cache,
-> and add something like this to the cifs.upcall manpage: "If you change
-> your idmapping configuration, then you'll probably also want to flush
-> the idmap cache." Maybe it's a rare enough thing that we shouldn't
-> sweat trying to make it too automatic.
+> Windows does issue cancel requests ... even if not for exactly the sa=
+me case
+>=20
 
-I think that's a reasonable approach.=20
+Hmm...maybe, but when I asked MS about timeout behavior, Edgar said thi=
+s:
+
+2) If it returns an error to the application, does the client send a
+SMB_COM_NT_CANCEL to cancel the outstanding request?
+
+Answer:
+The client will not send a CANCEL request on any outstanding request;
+it simply tears down the connection after the session times out.
+
+=2E..he may have been talking about timeouts specifically however and n=
+ot
+about NT cancel commands in general.
+
+Still, I'm a little leery of doing this. It adds complexity to an
+already very complex codepath. It's also not going to be necessary in
+most cases. Well behaved servers eventually send a reply of some sort. =
+A
+server that doesn't is broken. A MID that hangs around until reconnect
+or unmount is probably the least of your worries in that situation.
+
+But in principle, we could do it. There is a send_nt_cancel() command
+in the code already and we could call it from this codepath. It'll be
+tricky however as we'll have a signal pending and that affects
+kernel_sendmsg behavior.
+
+There's also the problem that we'll potentially block while trying to
+send the cancel, which could make it so that you stall userspace out
+while trying to kill off the process. Not ideal. Maybe we'll need to
+send the cancel from another context entirely?
+
+In any case, I'd really prefer to not do that in the context of
+this set. It requires some careful thought about how to do it right,
+and adds complexity that I don't think is needed at this point in time.
 
 --=20
-Andrew Bartlett                                http://samba.org/~abartlet/
-Authentication Developer, Samba Team           http://samba.org
-Samba Developer, Cisco Inc.
-
---=-H5gAeXM+vaVXFw0btP2q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iD8DBQBNB/LPz4A8Wyi0NrsRAiZpAJ4+p7gs400akXoCKGFTNLuIZL63MQCfZA6H
-tmSILB38njGgPsjmYXlGCcQ=
-=Pa7L
------END PGP SIGNATURE-----
-
---=-H5gAeXM+vaVXFw0btP2q--
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
