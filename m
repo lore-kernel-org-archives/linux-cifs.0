@@ -1,82 +1,60 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH 01/13] cifs: don't fail writepages on -EAGAIN errors
-Date: Tue, 14 Dec 2010 14:56:18 +0530
-Message-ID: <4D07383A.6000400@suse.de>
-References: <1291995877-2276-1-git-send-email-jlayton@redhat.com> <1291995877-2276-2-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 1/6] CIFS: Make cifsFileInfo_put work with strict cache mode
+Date: Tue, 14 Dec 2010 14:10:55 +0300
+Message-ID: <1292325060-8828-1-git-send-email-piastryyy@gmail.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1291995877-2276-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 12/10/2010 09:14 PM, Jeff Layton wrote:
-> If CIFSSMBWrite2 returns -EAGAIN, then the error should be considered
-> temporary. CIFS should retry the write instead of setting an error on
-> the mapping and returning.
-> 
-> For WB_SYNC_ALL, just retry the write immediately.
-> 
-> In the WB_SYNC_NONE case, call redirty_page_for_writeback on all of the
-> pages that didn't get written out and then move on.
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/file.c |   23 +++++++++++------------
->  1 files changed, 11 insertions(+), 12 deletions(-)
-> 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index fe16f6d..8e57370 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1430,6 +1430,7 @@ retry:
->  				break;
->  		}
->  		if (n_iov) {
-> +retry_write:
->  			open_file = find_writable_file(CIFS_I(mapping->host),
->  							false);
->  			if (!open_file) {
-> @@ -1445,22 +1446,20 @@ retry:
->  				cifs_update_eof(cifsi, offset, bytes_written);
->  			}
->  
-> -			if (rc || bytes_written < bytes_to_write) {
-> -				cERROR(1, "Write2 ret %d, wrote %d",
-> -					  rc, bytes_written);
-> -				mapping_set_error(mapping, rc);
-> -			} else {
-> +			/* retry on data-integrity flush */
-> +			if (rc == -EAGAIN && wbc->sync_mode == WB_SYNC_ALL)
-> +				goto retry_write;
-> +
-> +			if (!rc)
->  				cifs_stats_bytes_written(tcon, bytes_written);
-> -			}
-> +			else if (rc != -EAGAIN)
-> +				mapping_set_error(mapping, rc);
->  
->  			for (i = 0; i < n_iov; i++) {
->  				page = pvec.pages[first + i];
-> -				/* Should we also set page error on
-> -				success rc but too little data written? */
-> -				/* BB investigate retry logic on temporary
-> -				server crash cases and how recovery works
-> -				when page marked as error */
-> -				if (rc)
-> +				if (rc == -EAGAIN)
-> +					redirty_page_for_writepage(wbc, page);
-> +				else if (rc != 0)
->  					SetPageError(page);
->  				kunmap(page);
->  				unlock_page(page);
+On strict cache mode when we close the last file handle of the inode we
+should set invalid_mapping flag on this inode to prevent data coherency
+problem when we open it again but it has been modified by other clients.
 
-Documentation/filesystems/Locking suggests that rc should be set to 0
-after redirtying?
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/file.c       |    8 ++++++++
+ 2 files changed, 9 insertions(+), 0 deletions(-)
 
-
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 7852cd6..ac51cd2 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -40,6 +40,7 @@
+ #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+ #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+ #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
++#define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
+ 
+ struct cifs_sb_info {
+ 	struct rb_root tlink_tree;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 5a28660..60c3f84 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -264,6 +264,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	struct inode *inode = cifs_file->dentry->d_inode;
+ 	struct cifsTconInfo *tcon = tlink_tcon(cifs_file->tlink);
+ 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifsLockInfo *li, *tmp;
+ 
+ 	spin_lock(&cifs_file_list_lock);
+@@ -279,6 +280,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	if (list_empty(&cifsi->openFileList)) {
+ 		cFYI(1, "closing last open instance for inode %p",
+ 			cifs_file->dentry->d_inode);
++
++		/* in strict cache mode we need invalidate mapping on the last
++		   close  because it may cause a error when we open this file
++		   again and get at least level II oplock */
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
++			CIFS_I(inode)->invalid_mapping = true;
++
+ 		cifs_set_oplock_level(cifsi, 0);
+ 	}
+ 	spin_unlock(&cifs_file_list_lock);
 -- 
-Suresh Jayaraman
+1.7.3.2
