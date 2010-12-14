@@ -1,127 +1,150 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 12/13] cifs: reconnect unresponsive servers
-Date: Tue, 14 Dec 2010 09:57:51 +0300
-Message-ID: <AANLkTinFnqueDfCKiKKVH8FxLFuhJJkCPcLLdCPf5HxV@mail.gmail.com>
+Subject: Re: [PATCH 10/13] cifs: add ability to send an echo request
+Date: Tue, 14 Dec 2010 10:15:48 +0300
+Message-ID: <AANLkTiko2sy5MBxeuzT2vyhSzY-NiyE4wbynrA0dSCK_@mail.gmail.com>
 References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
-	<1291995877-2276-13-git-send-email-jlayton@redhat.com>
+	<1291995877-2276-11-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1291995877-2276-13-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1291995877-2276-11-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2010/12/10 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> If the server isn't responding to echoes, we don't want to leave task=
-s
-> hung waiting for it to reply. At that point, we'll want to reconnect
-> so that soft mounts can return an error to userspace quickly.
->
-> If the client hasn't received a reply after 3 echo intervals, assume
-> that the transport is down and attempt to reconnect the socket.
->
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> =A0fs/cifs/connect.c | =A0 23 +++++++++++++++++++----
-> =A01 files changed, 19 insertions(+), 4 deletions(-)
+> =A0fs/cifs/cifspdu.h =A0 | =A0 15 +++++++++++++++
+> =A0fs/cifs/cifsproto.h | =A0 =A01 +
+> =A0fs/cifs/cifssmb.c =A0 | =A0 47 +++++++++++++++++++++++++++++++++++=
+++++++++++++
+> =A03 files changed, 63 insertions(+), 0 deletions(-)
 >
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 98e1d38..c596515 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -55,6 +55,9 @@
-> =A0/* SMB echo "timeout" -- FIXME: tunable? */
-> =A0#define SMB_ECHO_INTERVAL (30 * HZ)
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index de36b09..ea205b4 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -50,6 +50,7 @@
+> =A0#define SMB_COM_SETATTR =A0 =A0 =A0 =A0 =A0 =A0 =A0 0x09 /* trivia=
+l response */
+> =A0#define SMB_COM_LOCKING_ANDX =A0 =A0 =A0 =A0 =A00x24 /* trivial re=
+sponse */
+> =A0#define SMB_COM_COPY =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00x29 /* tr=
+ivial rsp, fail filename ignrd*/
+> +#define SMB_COM_ECHO =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00x2B /* echo=
+ request */
+> =A0#define SMB_COM_OPEN_ANDX =A0 =A0 =A0 =A0 =A0 =A0 0x2D /* Legacy o=
+pen for old servers */
+> =A0#define SMB_COM_READ_ANDX =A0 =A0 =A0 =A0 =A0 =A0 0x2E
+> =A0#define SMB_COM_WRITE_ANDX =A0 =A0 =A0 =A0 =A0 =A00x2F
+> @@ -760,6 +761,20 @@ typedef struct smb_com_tconx_rsp_ext {
+> =A0*
+> =A0*/
 >
-> +/* reconnect if no response from server in this time period */
-> +#define UNRESPONSIVE_SERVER_TIMEOUT (3 * SMB_ECHO_INTERVAL)
+> +typedef struct smb_com_echo_req {
+> + =A0 =A0 =A0 struct =A0smb_hdr hdr;
+> + =A0 =A0 =A0 __le16 =A0EchoCount;
+> + =A0 =A0 =A0 __le16 =A0ByteCount;
+> + =A0 =A0 =A0 char =A0 =A0Data[1];
+> +} __attribute__((packed)) ECHO_REQ;
 > +
-> =A0extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned char *p24);
->
-> @@ -187,6 +190,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0kfree(server->session_key.response);
-> =A0 =A0 =A0 =A0server->session_key.response =3D NULL;
-> =A0 =A0 =A0 =A0server->session_key.len =3D 0;
-> + =A0 =A0 =A0 server->lstrp =3D jiffies;
-> =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
->
-> =A0 =A0 =A0 =A0/*
-> @@ -442,7 +446,19 @@ cifs_demultiplex_thread(struct TCP_Server_Info *=
-server)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0smb_msg.msg_control =3D NULL;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0smb_msg.msg_controllen =3D 0;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pdu_length =3D 4; /* enough to get RFC=
-1001 header */
+> +typedef struct smb_com_echo_rsp {
+> + =A0 =A0 =A0 struct =A0smb_hdr hdr;
+> + =A0 =A0 =A0 __le16 =A0SequenceNumber;
+> + =A0 =A0 =A0 __le16 =A0ByteCount;
+> + =A0 =A0 =A0 char =A0 =A0Data[1];
+> +} __attribute__((packed)) ECHO_RSP;
 > +
-> =A0incomplete_rcv:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (time_after(jiffies,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->=
-lstrp + UNRESPONSIVE_SERVER_TIMEOUT)) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "Server %s ha=
-s not responded in %d seconds. "
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "Re=
-connecting...", server->hostname,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 UNR=
-ESPONSIVE_SERVER_TIMEOUT / HZ);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_reconnect(server);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 csocket =3D server->sso=
-cket;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&server->respon=
-se_q);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continue;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0length =3D
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kernel_recvmsg(csocket, &smb_m=
-sg,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&iov, =
-1, pdu_length, 0 /* BB other flags? */);
-> @@ -603,6 +619,8 @@ incomplete_rcv:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0typedef struct smb_com_logoff_andx_req {
+> =A0 =A0 =A0 =A0struct smb_hdr hdr; =A0 =A0 /* wct =3D 2 */
+> =A0 =A0 =A0 =A0__u8 AndXCommand;
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 6131c1b..3cd6474 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -353,6 +353,7 @@ extern int CIFSSMBPosixLock(const int xid, struct=
+ cifsTconInfo *tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const __u64 len, struc=
+t file_lock *,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const __u16 lock_type,=
+ const bool waitFlag);
+> =A0extern int CIFSSMBTDis(const int xid, struct cifsTconInfo *tcon);
+> +extern int CIFSSMBEcho(struct TCP_Server_Info *server);
+> =A0extern int CIFSSMBLogoff(const int xid, struct cifsSesInfo *ses);
 >
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D NULL;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->lstrp =3D jiffies;
+> =A0extern struct cifsSesInfo *sesInfoAlloc(void);
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 9af98f6..fc8145f 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -706,6 +706,53 @@ CIFSSMBTDis(const int xid, struct cifsTconInfo *=
+tcon)
+> =A0 =A0 =A0 =A0return rc;
+> =A0}
+>
+> +/*
+> + * This is a no-op for now. We're not really interested in the reply=
+, but
+> + * rather in the fact that the server sent one and that server->lstr=
+p
+> + * gets updated.
+> + *
+> + * FIXME: maybe we should consider checking that the reply matches r=
+equest?
+> + */
+> +static void
+> +cifs_echo_callback(struct mid_q_entry *mid)
+> +{
+> + =A0 =A0 =A0 struct TCP_Server_Info *server =3D mid->callback_data;
 > +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_for_each(tmp, &server->pending_mi=
-d_q) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D list_ent=
-ry(tmp, struct mid_q_entry, qhead);
-> @@ -653,10 +671,6 @@ multi_t2_fnd:
-> =A0#ifdef CONFIG_CIFS_STATS2
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_en=
-try->when_received =3D jiffies;
-> =A0#endif
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* so w=
-e do not time out requests to =A0server
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 which i=
-s still responding (since server could
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 be busy=
- but not dead) */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server-=
->lstrp =3D jiffies;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0next_mid:
-> @@ -1724,6 +1738,7 @@ cifs_get_tcp_session(struct smb_vol *volume_inf=
-o)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0volume_info->target_rfc1001_name, RFC1=
-001_NAME_LEN_WITH_NULL);
-> =A0 =A0 =A0 =A0tcp_ses->session_estab =3D false;
-> =A0 =A0 =A0 =A0tcp_ses->sequence_number =3D 0;
-> + =A0 =A0 =A0 tcp_ses->lstrp =3D jiffies;
-> =A0 =A0 =A0 =A0INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
-> =A0 =A0 =A0 =A0INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
-> =A0 =A0 =A0 =A0INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+> + =A0 =A0 =A0 DeleteMidQEntry(mid);
+> + =A0 =A0 =A0 atomic_dec(&server->inFlight);
+> + =A0 =A0 =A0 wake_up(&server->request_q);
+> +}
+> +
+> +int
+> +CIFSSMBEcho(struct TCP_Server_Info *server)
+> +{
+> + =A0 =A0 =A0 ECHO_REQ *smb;
+> + =A0 =A0 =A0 int rc =3D 0;
+> +
+> + =A0 =A0 =A0 cFYI(1, "In echo request");
+> +
+> + =A0 =A0 =A0 rc =3D small_smb_init(SMB_COM_ECHO, 0, NULL, (void **)&=
+smb);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
+> +
+> + =A0 =A0 =A0 /* set up echo request */
+> + =A0 =A0 =A0 smb->hdr.Tid =3D cpu_to_le16(0xffff);
+> + =A0 =A0 =A0 smb->hdr.WordCount =3D cpu_to_le16(1);
+> + =A0 =A0 =A0 smb->EchoCount =3D cpu_to_le16(1);
+> + =A0 =A0 =A0 smb->ByteCount =3D cpu_to_le16(1);
+> + =A0 =A0 =A0 smb->Data[0] =3D 'a';
+> + =A0 =A0 =A0 smb->hdr.smb_buf_length +=3D 3;
+> +
+> + =A0 =A0 =A0 rc =3D cifs_call_async(server, (struct smb_hdr *)smb,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_ec=
+ho_callback, server);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Echo request failed: %d", rc);
+> +
+> + =A0 =A0 =A0 cifs_small_buf_release(smb);
+> +
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> =A0int
+> =A0CIFSSMBLogoff(const int xid, struct cifsSesInfo *ses)
+> =A0{
 > --
 > 1.7.3.2
+>
 
 Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
 --=20
 Best regards,
 Pavel Shilovsky.
