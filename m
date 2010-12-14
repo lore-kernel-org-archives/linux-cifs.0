@@ -1,56 +1,45 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs-utils: fixes for manpage pathname replacement scheme
-Date: Tue, 14 Dec 2010 12:05:29 -0500
-Message-ID: <1292346329-31009-1-git-send-email-jlayton@samba.org>
+From: Cristian <naitso-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: mount.cifs with EMC share
+Date: Tue, 14 Dec 2010 19:49:45 +0000 (UTC)
+Message-ID: <ie8hop$k75$1@dough.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Fix up some small problems with pathname replacement:
+Hi there! 
 
-1) replace the bare 'sed' with $(SED)
+I'm experiencing an issue with mount.cifs command (maybe in cifs module) 
+on recent kernel 2.6.36.2 (mount.cifs version: 1.14-3.5.5). The same 
+happens with kernel 2.6.33.4 too.
 
-2) '\@' is apparently not portable, so we need to use a different scheme
-   in case we end up using a non-typical sed binary.
+If i mount a EMC-SNAS (Celerra) Share (on windows is seen as simple 
+share) with
+mount -t cifs //IP-ADDRESS/Share /mnt/ -o user=myuser,pass=mypassword,ro
+and I try the "ls" command I see the following output:
 
-3) do the sed conversion to a new file and then move it into place. If
-   sed falls down halfway through the conversion we could end up with
-   a half-baked manpage.
+ls /mnt/
+V/  V~1/  ???????/  ???????/  ???????/  ??/
 
-4) use the $@ construct for brevity and maintainability
+With an older kernel like 2.6.27.31 (mount.cifs version: 1.12-3.2.15, 
+samba-3.2.15) all works fine.
 
-5) add a comment so that the rationale behind this is explained
+With smbclient command (on samba 3.5.5) all works fine, too.
 
-Many thanks to several folks inside Red Hat who pointed out these
-issues.
+What puzzles me is that if i type on the shell:
+"ls /mnt"
+and i press [TAB] key for 4, 5 times for autocompletion, the output is 
+updated, the files and the directory names are showed correctly, 
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- Makefile.am |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+ls /mnt/
+Irfanview/ Outlook/   Windows/   Zetafax/
 
-diff --git a/Makefile.am b/Makefile.am
-index cbfa846..67a0190 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -14,11 +14,15 @@ cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
- cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
- man_MANS += cifs.upcall.8
- 
-+#
-+# Fix the pathnames in manpages. To prevent @label@ being replaced by m4, we
-+# need to obfuscate the LHS of the regex (hence the trivial one character set).
-+#
- cifs.upcall.8: cifs.upcall.8.in
--	sed 's,\@sbindir\@,$(sbindir),' < $(srcdir)/cifs.upcall.8.in > cifs.upcall.8
-+	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
- 
- clean-local:
--	rm -f cifs.upcall.8
-+	rm -f cifs.upcall.8 cifs.upcall.8-t
- endif
- 
- if CONFIG_CIFSCREDS
--- 
-1.7.3.2
+but the problem persists at the next mount.
+
+With Windows share or smb share all works fine with recent kernel/samba;
+the problem is only with EMC Hardware
+
+Thanks in advance
