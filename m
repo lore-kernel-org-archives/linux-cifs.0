@@ -1,78 +1,96 @@
-From: varad gupta <postfix.vbg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: cifs mount port issue
-Date: Wed, 15 Dec 2010 09:33:05 +0530
-Message-ID: <AANLkTinv12_2k0J91f1Ub9HC1E34PA+FjLACuUmxSYts@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 08/13] cifs: handle cancelled requests better
+Date: Tue, 14 Dec 2010 22:05:53 -0600
+Message-ID: <AANLkTi=bLQcTiE-r_jDqZR8v9T_5TO+Lo8q9Sq2ytg=N@mail.gmail.com>
+References: <1291995877-2276-1-git-send-email-jlayton@redhat.com>
+	<1291995877-2276-9-git-send-email-jlayton@redhat.com>
+	<AANLkTinU19tUL-6uwYN64dfE1Rsa+uSiC2fkeBHV+XOS@mail.gmail.com>
+	<20101214065935.50a0bdf0@tlielax.poochiereds.net>
+	<AANLkTi=mFXsJd55CzebrKO24ALnwmduBnFLyYZCRVdP4@mail.gmail.com>
+	<AANLkTinSC4WKa4ZBeEOWkSQmy6wBhU8=cO09EKy2Qda2@mail.gmail.com>
+	<20101214164407.377304e0@tlielax.poochiereds.net>
+	<AANLkTimFQSeMk8ZCbAud+RdU5WQcGrDnKz+dAC_UFzNM@mail.gmail.com>
+	<20101214181829.0075c6c6@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20101214181829.0075c6c6-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi
+On Tue, Dec 14, 2010 at 5:18 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> On Tue, 14 Dec 2010 16:22:01 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Tue, Dec 14, 2010 at 3:44 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wr=
+ote:
+>> > On Tue, 14 Dec 2010 15:33:48 -0600
+>> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> >
+>> >> Why wouldn't we issue SMB NTCancel on these? =A0That way we only =
+have to
+>> >> wait until the timeout for the NTCancel (at worst) and can't leak=
+ midq
+>> >> entries.
+>> >>
+>> >
+>> > I suppose we could, but...
+>> >
+>> > a) windows doesn't do it
+>>
+>> Windows does issue cancel requests ... even if not for exactly the s=
+ame case
+>>
+>
+> Hmm...maybe, but when I asked MS about timeout behavior, Edgar said t=
+his:
+>
+> 2) If it returns an error to the application, does the client send a
+> SMB_COM_NT_CANCEL to cancel the outstanding request?
+>
+> Answer:
+> The client will not send a CANCEL request on any outstanding request;
+> it simply tears down the connection after the session times out.
+>
+> ...he may have been talking about timeouts specifically however and n=
+ot
+> about NT cancel commands in general.
+>
+> Still, I'm a little leery of doing this. It adds complexity to an
+> already very complex codepath. It's also not going to be necessary in
+> most cases. Well behaved servers eventually send a reply of some sort=
+=2E A
+> server that doesn't is broken. A MID that hangs around until reconnec=
+t
+> or unmount is probably the least of your worries in that situation.
+>
+> But in principle, we could do it. There is a send_nt_cancel() command
+> in the code already and we could call it from this codepath. It'll be
+> tricky however as we'll have a signal pending and that affects
+> kernel_sendmsg behavior.
+>
+> There's also the problem that we'll potentially block while trying to
+> send the cancel, which could make it so that you stall userspace out
+> while trying to kill off the process. Not ideal. Maybe we'll need to
+> send the cancel from another context entirely?
+>
+> In any case, I'd really prefer to not do that in the context of
+> this set. It requires some careful thought about how to do it right,
+> and adds complexity that I don't think is needed at this point in tim=
+e.
 
-I need to mount various smb exported shares (ssh forwarded on
-different ports) on a RHEL 5.4 host. Details of the host are =>
-==========================================================================================================
-[vbg@mail ~]$ uname -r
-2.6.18-164.el5
-
-[vbg@mail ~]$ rpm -qa | grep samba
-samba-common-3.0.33-3.14.el5
-samba-client-3.0.33-3.14.el5
-
-[vbg@mail ~]$ cat /etc/redhat-release
-Red Hat Enterprise Linux Server release 5.4 (Tikanga)
-
-[root@mail ~]# modinfo cifs
-filename:       /lib/modules/2.6.18-164.el5/kernel/fs/cifs/cifs.ko
-version:        1.57RH
-description:    VFS to access servers complying with the SNIA CIFS
-Specification e.g. Samba and Windows
-license:        GPL
-author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-srcversion:     7850E473E371E5343DDEC5B
-depends:
-vermagic:       2.6.18-164.el5 SMP mod_unload 686 REGPARM 4KSTACKS gcc-4.1
-parm:           CIFSMaxBufSize:Network buffer size (not including
-header). Default: 16384 Range: 8192 to 130048 (int)
-parm:           cifs_min_rcv:Network buffers in pool. Default: 4
-Range: 1 to 64 (int)
-parm:           cifs_min_small:Small network buffers in pool. Default:
-30 Range: 2 to 256 (int)
-parm:           cifs_max_pending:Simultaneous requests to server.
-Default: 50 Range: 2 to 256 (int)
-module_sig:    883f3504a8b7a0d18758d6145e112399509e3d81c22fa0b2255eabf4fbaa9ab07acd3899236f0a0b8e362c9a2d5c76e95982b9197944e40d7a4a6
-
-==========================================================================================================
-
-Problem =>
-
-When a different port is specified, mount.cifs does not contact that port =>
-
-======================================================================================
-[root@mail ~]# mount -t cifs //localhost/public /home/vbg/MyShares -o
-"username=vbg,ip=127.0.0.1,port=4033"
-Password:
-mount error 111 = Connection refused
-Refer to the mount.cifs(8) manual page (e.g.man mount.cifs)
-=========================================================================================
-
-Problem for a single mount has been solved by using iptables =>
-
-iptables -t nat -A OUTPUT -d 127.0.0.1 -p tcp --dport 445 -j REDIRECT
---to-ports 4033
-===========================================================================================
-
-But I have various shares at various ssh forwarded ports that
-mount.cifs needs to mount.
-
-Is is a problem with "mount.cifs.c" (samba-client-3.0.33-3.14.el5) or
-with cifs.ko (kernel-2.6.18-164.el5)
-
-Any help and relevant patches, pointers would be deeply appreciated.
+The logical problem is that certain operations can take many minutes
+or hours (and those are precisely those which might be ctl-c) so there
+is a very real possibility that without issuing cancels we could
+exhaust resources (ctl-c, reissue, ctl-c reissue etc.)
 
 
-Regards
 
-Varad Gupta
+--=20
+Thanks,
+
+Steve
