@@ -1,86 +1,120 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: cifs mount port issue
-Date: Wed, 15 Dec 2010 06:54:42 -0500
-Message-ID: <20101215065442.5d33774b@tlielax.poochiereds.net>
-References: <AANLkTinv12_2k0J91f1Ub9HC1E34PA+FjLACuUmxSYts@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [patch] cifs: don't overwrite dentry name in d_revalidate
+Date: Wed, 15 Dec 2010 22:48:54 -0600
+Message-ID: <AANLkTik4MFK70pP3bmW5epZvki9gH+tAr+RDVbMLH38x@mail.gmail.com>
+References: <20101111074216.GA10159@amd>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: varad gupta <postfix.vbg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinv12_2k0J91f1Ub9HC1E34PA+FjLACuUmxSYts-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20101111074216.GA10159@amd>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 15 Dec 2010 09:33:05 +0530
-varad gupta <postfix.vbg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Merged into cifs-2.6.git
 
-> Hi
-> 
-> I need to mount various smb exported shares (ssh forwarded on
-> different ports) on a RHEL 5.4 host. Details of the host are =>
-> ==========================================================================================================
-> [vbg@mail ~]$ uname -r
-> 2.6.18-164.el5
-> 
-> [vbg@mail ~]$ rpm -qa | grep samba
-> samba-common-3.0.33-3.14.el5
-> samba-client-3.0.33-3.14.el5
-> 
-> [vbg@mail ~]$ cat /etc/redhat-release
-> Red Hat Enterprise Linux Server release 5.4 (Tikanga)
-> 
-> [root@mail ~]# modinfo cifs
-> filename:       /lib/modules/2.6.18-164.el5/kernel/fs/cifs/cifs.ko
-> version:        1.57RH
-> description:    VFS to access servers complying with the SNIA CIFS
-> Specification e.g. Samba and Windows
-> license:        GPL
-> author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> srcversion:     7850E473E371E5343DDEC5B
-> depends:
-> vermagic:       2.6.18-164.el5 SMP mod_unload 686 REGPARM 4KSTACKS gcc-4.1
-> parm:           CIFSMaxBufSize:Network buffer size (not including
-> header). Default: 16384 Range: 8192 to 130048 (int)
-> parm:           cifs_min_rcv:Network buffers in pool. Default: 4
-> Range: 1 to 64 (int)
-> parm:           cifs_min_small:Small network buffers in pool. Default:
-> 30 Range: 2 to 256 (int)
-> parm:           cifs_max_pending:Simultaneous requests to server.
-> Default: 50 Range: 2 to 256 (int)
-> module_sig:    883f3504a8b7a0d18758d6145e112399509e3d81c22fa0b2255eabf4fbaa9ab07acd3899236f0a0b8e362c9a2d5c76e95982b9197944e40d7a4a6
-> 
-> ==========================================================================================================
-> 
-> Problem =>
-> 
-> When a different port is specified, mount.cifs does not contact that port =>
-> 
-> ======================================================================================
-> [root@mail ~]# mount -t cifs //localhost/public /home/vbg/MyShares -o
-> "username=vbg,ip=127.0.0.1,port=4033"
-> Password:
-> mount error 111 = Connection refused
-> Refer to the mount.cifs(8) manual page (e.g.man mount.cifs)
-> =========================================================================================
-> 
-> Problem for a single mount has been solved by using iptables =>
-> 
-> iptables -t nat -A OUTPUT -d 127.0.0.1 -p tcp --dport 445 -j REDIRECT
-> --to-ports 4033
-> ===========================================================================================
-> 
-> But I have various shares at various ssh forwarded ports that
-> mount.cifs needs to mount.
-> 
-> Is is a problem with "mount.cifs.c" (samba-client-3.0.33-3.14.el5) or
-> with cifs.ko (kernel-2.6.18-164.el5)
-> 
-> Any help and relevant patches, pointers would be deeply appreciated.
-> 
+On Thu, Nov 11, 2010 at 1:42 AM, Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org> wrote:
+>
+> Instead, use fatfs's method for dealing with negative dentries to
+> preserve case, rather than overwrite dentry name in d_revalidate, whi=
+ch
+> is a bit ugly and also gets in the way of doing lock-free path walkin=
+g.
+>
+> Signed-off-by: Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>
+>
+> Index: linux-2.6/fs/cifs/dir.c
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- linux-2.6.orig/fs/cifs/dir.c =A0 =A0 =A0 =A02010-11-11 18:05:55.0=
+00000000 +1100
+> +++ linux-2.6/fs/cifs/dir.c =A0 =A0 2010-11-11 18:06:49.000000000 +11=
+00
+> @@ -656,22 +656,34 @@ cifs_lookup(struct inode *parent_dir_ino
+> =A0static int
+> =A0cifs_d_revalidate(struct dentry *direntry, struct nameidata *nd)
+> =A0{
+> - =A0 =A0 =A0 int isValid =3D 1;
+> -
+> =A0 =A0 =A0 =A0if (direntry->d_inode) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifs_revalidate_dentry(direntry))
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> - =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "neg dentry 0x%p name =3D %s",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0direntry, direntry->=
+d_name.name);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (time_after(jiffies, direntry->d_tim=
+e + HZ) ||
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 !lookupCacheEnabled) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 d_drop(direntry);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 isValid =3D 0;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 1;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0* This may be nfsd (or something), anyway, we can't =
+see the
+> + =A0 =A0 =A0 =A0* intent of this. So, since this can be for creation=
+, drop it.
+> + =A0 =A0 =A0 =A0*/
+> + =A0 =A0 =A0 if (!nd)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+> +
+> + =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0* Drop the negative dentry, in order to make sure to=
+ use the
+> + =A0 =A0 =A0 =A0* case sensitive name which is specified by user if =
+this is
+> + =A0 =A0 =A0 =A0* for creation.
+> + =A0 =A0 =A0 =A0*/
+> + =A0 =A0 =A0 if (!(nd->flags & (LOOKUP_CONTINUE | LOOKUP_PARENT))) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (nd->flags & (LOOKUP_CREATE | LOOKUP=
+_RENAME_TARGET))
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 return isValid;
+> + =A0 =A0 =A0 if (time_after(jiffies, direntry->d_time + HZ) || !look=
+upCacheEnabled)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+> +
+> + =A0 =A0 =A0 return 1;
+> =A0}
+>
+> =A0/* static int cifs_d_delete(struct dentry *direntry)
+> @@ -709,15 +721,8 @@ static int cifs_ci_compare(struct dentry
+> =A0 =A0 =A0 =A0struct nls_table *codepage =3D CIFS_SB(dentry->d_inode=
+->i_sb)->local_nls;
+>
+> =A0 =A0 =A0 =A0if ((a->len =3D=3D b->len) &&
+> - =A0 =A0 =A0 =A0 =A0 (nls_strnicmp(codepage, a->name, b->name, a->le=
+n) =3D=3D 0)) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* To preserve case, don't let an exi=
+sting negative dentry's
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* case take precedence. =A0If a is n=
+ot a negative dentry, this
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* should have no side effects
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy((void *)a->name, b->name, a->len=
+);
+> + =A0 =A0 =A0 =A0 =A0 (nls_strnicmp(codepage, a->name, b->name, a->le=
+n) =3D=3D 0))
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> - =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0return 1;
+> =A0}
+>
 
-That would be a kernel bug, and it should be fixed in RHEL5.5.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+--
+Thanks,
+
+Steve
