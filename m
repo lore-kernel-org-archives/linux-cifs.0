@@ -1,120 +1,80 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [patch] cifs: don't overwrite dentry name in d_revalidate
-Date: Wed, 15 Dec 2010 22:48:54 -0600
-Message-ID: <AANLkTik4MFK70pP3bmW5epZvki9gH+tAr+RDVbMLH38x@mail.gmail.com>
-References: <20101111074216.GA10159@amd>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 3/6] CIFS: Implement cifs_file_strict_mmap (try #2)
+Date: Thu, 16 Dec 2010 10:53:31 +0300
+Message-ID: <1292486012-9641-1-git-send-email-piastryyy@gmail.com>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20101111074216.GA10159@amd>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into cifs-2.6.git
+Invalidate inode mapping if we don't have at least Level II oplock.
 
-On Thu, Nov 11, 2010 at 1:42 AM, Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org> wrote:
->
-> Instead, use fatfs's method for dealing with negative dentries to
-> preserve case, rather than overwrite dentry name in d_revalidate, whi=
-ch
-> is a bit ugly and also gets in the way of doing lock-free path walkin=
-g.
->
-> Signed-off-by: Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>
->
-> Index: linux-2.6/fs/cifs/dir.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-2.6.orig/fs/cifs/dir.c =A0 =A0 =A0 =A02010-11-11 18:05:55.0=
-00000000 +1100
-> +++ linux-2.6/fs/cifs/dir.c =A0 =A0 2010-11-11 18:06:49.000000000 +11=
-00
-> @@ -656,22 +656,34 @@ cifs_lookup(struct inode *parent_dir_ino
-> =A0static int
-> =A0cifs_d_revalidate(struct dentry *direntry, struct nameidata *nd)
-> =A0{
-> - =A0 =A0 =A0 int isValid =3D 1;
-> -
-> =A0 =A0 =A0 =A0if (direntry->d_inode) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifs_revalidate_dentry(direntry))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
-> - =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "neg dentry 0x%p name =3D %s",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0direntry, direntry->=
-d_name.name);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (time_after(jiffies, direntry->d_tim=
-e + HZ) ||
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 !lookupCacheEnabled) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 d_drop(direntry);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 isValid =3D 0;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 1;
-> + =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 /*
-> + =A0 =A0 =A0 =A0* This may be nfsd (or something), anyway, we can't =
-see the
-> + =A0 =A0 =A0 =A0* intent of this. So, since this can be for creation=
-, drop it.
-> + =A0 =A0 =A0 =A0*/
-> + =A0 =A0 =A0 if (!nd)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> +
-> + =A0 =A0 =A0 /*
-> + =A0 =A0 =A0 =A0* Drop the negative dentry, in order to make sure to=
- use the
-> + =A0 =A0 =A0 =A0* case sensitive name which is specified by user if =
-this is
-> + =A0 =A0 =A0 =A0* for creation.
-> + =A0 =A0 =A0 =A0*/
-> + =A0 =A0 =A0 if (!(nd->flags & (LOOKUP_CONTINUE | LOOKUP_PARENT))) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (nd->flags & (LOOKUP_CREATE | LOOKUP=
-_RENAME_TARGET))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 return isValid;
-> + =A0 =A0 =A0 if (time_after(jiffies, direntry->d_time + HZ) || !look=
-upCacheEnabled)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> +
-> + =A0 =A0 =A0 return 1;
-> =A0}
->
-> =A0/* static int cifs_d_delete(struct dentry *direntry)
-> @@ -709,15 +721,8 @@ static int cifs_ci_compare(struct dentry
-> =A0 =A0 =A0 =A0struct nls_table *codepage =3D CIFS_SB(dentry->d_inode=
-->i_sb)->local_nls;
->
-> =A0 =A0 =A0 =A0if ((a->len =3D=3D b->len) &&
-> - =A0 =A0 =A0 =A0 =A0 (nls_strnicmp(codepage, a->name, b->name, a->le=
-n) =3D=3D 0)) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* To preserve case, don't let an exi=
-sting negative dentry's
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* case take precedence. =A0If a is n=
-ot a negative dentry, this
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* should have no side effects
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy((void *)a->name, b->name, a->len=
-);
-> + =A0 =A0 =A0 =A0 =A0 (nls_strnicmp(codepage, a->name, b->name, a->le=
-n) =3D=3D 0))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
-> - =A0 =A0 =A0 }
-> =A0 =A0 =A0 =A0return 1;
-> =A0}
->
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsfs.c |    4 ++--
+ fs/cifs/cifsfs.h |    1 +
+ fs/cifs/file.c   |   15 +++++++++++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
-
-
---
-Thanks,
-
-Steve
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 7660133..a218afe 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -720,7 +720,7 @@ const struct file_operations cifs_file_strict_ops = {
+ 	.lock = cifs_lock,
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+-	.mmap = cifs_file_mmap,
++	.mmap = cifs_file_strict_mmap,
+ 	.splice_read = generic_file_splice_read,
+ 	.llseek = cifs_llseek,
+ #ifdef CONFIG_CIFS_POSIX
+@@ -775,7 +775,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
+ 	.release = cifs_close,
+ 	.fsync = cifs_strict_fsync,
+ 	.flush = cifs_flush,
+-	.mmap = cifs_file_mmap,
++	.mmap = cifs_file_strict_mmap,
+ 	.splice_read = generic_file_splice_read,
+ 	.llseek = cifs_llseek,
+ #ifdef CONFIG_CIFS_POSIX
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 8584829..657738f 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -89,6 +89,7 @@ extern int cifs_fsync(struct file *, int);
+ extern int cifs_strict_fsync(struct file *, int);
+ extern int cifs_flush(struct file *, fl_owner_t id);
+ extern int cifs_file_mmap(struct file * , struct vm_area_struct *);
++extern int cifs_file_strict_mmap(struct file * , struct vm_area_struct *);
+ extern const struct file_operations cifs_dir_ops;
+ extern int cifs_dir_open(struct inode *inode, struct file *file);
+ extern int cifs_readdir(struct file *file, void *direntry, filldir_t filldir);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 4e37cb8..d48723c 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1827,6 +1827,21 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	return total_read;
+ }
+ 
++int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
++{
++	int rc, xid;
++	struct inode *inode = file->f_path.dentry->d_inode;
++
++	xid = GetXid();
++
++	if (!CIFS_I(inode)->clientCanCacheRead)
++		cifs_invalidate_mapping(inode);
++
++	rc = generic_file_mmap(file, vma);
++	FreeXid(xid);
++	return rc;
++}
++
+ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
+ {
+ 	int rc, xid;
+-- 
+1.7.3.2
