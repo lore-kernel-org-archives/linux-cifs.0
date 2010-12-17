@@ -1,41 +1,46 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH 1/4] cifs: remove export_ops code
-Date: Fri, 17 Dec 2010 20:58:42 +0530
-Message-ID: <4D0B81AA.9060805@suse.de>
-References: <1291820625-20907-1-git-send-email-jlayton@redhat.com> <1291820625-20907-2-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH 2/4] cifs: move "ntlmssp" and "local_leases" options out
+ of experimental code
+Date: Fri, 17 Dec 2010 20:58:56 +0530
+Message-ID: <4D0B81B8.6090603@suse.de>
+References: <1291820625-20907-1-git-send-email-jlayton@redhat.com> <1291820625-20907-3-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1291820625-20907-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1291820625-20907-3-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 On 12/08/2010 08:33 PM, Jeff Layton wrote:
-> Stubs for this code were added under the CONFIG_CIFS_EXPERIMENTAL tag in
-> 2007, but were never completed. The upshot -- anyone who turns on
-> CONFIG_CIFS_EXPERIMENTAL gets a filesystem that pretends to allow exporting
-> via nfsd. Trying to actually use it will just get you an error once
-> nfsd tries to walk into the directory.
+> I see no real need to leave these sorts of options under an
+> EXPERIMENTAL ifdef. Since you need a mount option to turn this code
+> on, that only blows out the testing matrix.
 > 
-> Remove this code since it's unfinished. We can reintroduce it once someone
-> spends time on it and makes it usable.
+> local_leases has been under the EXPERIMENTAL tag for some time, but
+> it's only the mount option that's under this label. Move it out
+> from under this tag.
+> 
+> The NTLMSSP code is also under EXPERIMENTAL, but it needs a mount
+> option to turn it on, and in the future any distro will reasonably
+> want this enabled. Go ahead and move it out from under the
+> EXPERIMENTAL tag.
 > 
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/Makefile |    2 +-
->  fs/cifs/cifsfs.c |    7 -----
->  fs/cifs/cifsfs.h |    4 ---
->  fs/cifs/export.c |   67 ------------------------------------------------------
->  4 files changed, 1 insertions(+), 79 deletions(-)
->  delete mode 100644 fs/cifs/export.c
+>  fs/cifs/cifssmb.c |    5 +--
+>  fs/cifs/connect.c |    4 --
+>  fs/cifs/sess.c    |  103 ++++++++++++++++++++++++-----------------------------
+>  3 files changed, 48 insertions(+), 64 deletions(-)
 
-Looks good to me.
+Moving local_leases out sounds fine to me. While I agree that NTLMSSP is
+something everyone wants moving ahead, I'm not sure whether there are
+currently any known/open issues with specific Servers.
+Shirish?
 
-Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Assuming there are none,
 
-Perhaps it would be a good idea to briefly document expected behavior,
-what is working, problems etc (in Samba wiki) so that someone can pick
-up this later?
+Acked-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
