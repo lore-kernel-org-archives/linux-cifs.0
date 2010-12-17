@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 01/18] cifs: don't fail writepages on -EAGAIN errors
-Date: Fri, 17 Dec 2010 10:08:00 -0500
-Message-ID: <1292598497-29796-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 05/18] cifs: move locked sections out of DeleteMidQEntry and AllocMidQEntry
+Date: Fri, 17 Dec 2010 10:08:04 -0500
+Message-ID: <1292598497-29796-6-git-send-email-jlayton@redhat.com>
 References: <1292598497-29796-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,103 +10,167 @@ In-Reply-To: <1292598497-29796-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If CIFSSMBWrite2 returns -EAGAIN, then the error should be considered
-temporary. CIFS should retry the write instead of setting an error on
-the mapping and returning.
-
-For WB_SYNC_ALL, just retry the write immediately. In the WB_SYNC_NONE
-case, call redirty_page_for_writeback on all of the pages that didn't
-get written out and then move on.
-
-Also, fix up the handling of a short write with a successful return
-code. MS-CIFS says that 0 bytes_written means ENOSPC or EFBIG. It
-doesn't mention what a short, but non-zero write means, so for now
-treat it as we would an -EAGAIN return.
+In later patches, we're going to need to have finer-grained control
+over the addition and removal of these structs from the pending_mid_q
+and we'll need to be able to call the destructor while holding the
+spinlock. Move the locked sections out of both routines and into
+the callers. Fix up current callers of DeleteMidQEntry to call a new
+routine that dequeues the entry and then destroys it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c |   49 +++++++++++++++++++++++++++++++++++++------------
- 1 files changed, 37 insertions(+), 12 deletions(-)
+ fs/cifs/transport.c |   41 ++++++++++++++++++++++++-----------------
+ 1 files changed, 24 insertions(+), 17 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4007e60..400c948 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1377,6 +1377,7 @@ retry:
- 				break;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index b9eb0cf..801726b 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -63,9 +63,6 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 
+ 	atomic_inc(&midCount);
+ 	temp->midState = MID_REQUEST_ALLOCATED;
+-	spin_lock(&GlobalMid_Lock);
+-	list_add_tail(&temp->qhead, &server->pending_mid_q);
+-	spin_unlock(&GlobalMid_Lock);
+ 	return temp;
+ }
+ 
+@@ -75,10 +72,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ #ifdef CONFIG_CIFS_STATS2
+ 	unsigned long now;
+ #endif
+-	spin_lock(&GlobalMid_Lock);
+ 	midEntry->midState = MID_FREE;
+-	list_del(&midEntry->qhead);
+-	spin_unlock(&GlobalMid_Lock);
+ 	atomic_dec(&midCount);
+ 	if (midEntry->largeBuf)
+ 		cifs_buf_release(midEntry->resp_buf);
+@@ -103,6 +97,16 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ 	mempool_free(midEntry, cifs_mid_poolp);
+ }
+ 
++static void
++delete_mid(struct mid_q_entry *mid)
++{
++	spin_lock(&GlobalMid_Lock);
++	list_del(&mid->qhead);
++	spin_unlock(&GlobalMid_Lock);
++
++	DeleteMidQEntry(mid);
++}
++
+ static int
+ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
+ {
+@@ -308,6 +312,9 @@ static int allocate_mid(struct cifsSesInfo *ses, struct smb_hdr *in_buf,
+ 	*ppmidQ = AllocMidQEntry(in_buf, ses->server);
+ 	if (*ppmidQ == NULL)
+ 		return -ENOMEM;
++	spin_lock(&GlobalMid_Lock);
++	list_add_tail(&(*ppmidQ)->qhead, &ses->server->pending_mid_q);
++	spin_unlock(&GlobalMid_Lock);
+ 	return 0;
+ }
+ 
+@@ -508,7 +515,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 			}
  		}
- 		if (n_iov) {
-+retry_write:
- 			open_file = find_writable_file(CIFS_I(mapping->host),
- 							false);
- 			if (!open_file) {
-@@ -1389,31 +1390,55 @@ retry:
- 						   &bytes_written, iov, n_iov,
- 						   long_op);
- 				cifsFileInfo_put(open_file);
--				cifs_update_eof(cifsi, offset, bytes_written);
- 			}
+ 		spin_unlock(&GlobalMid_Lock);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		/* Update # of requests on wire to server */
+ 		atomic_dec(&ses->server->inFlight);
+ 		wake_up(&ses->server->request_q);
+@@ -564,14 +571,14 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 		if ((flags & CIFS_NO_RESP) == 0)
+ 			midQ->resp_buf = NULL;  /* mark it so buf will
+ 						   not be freed by
+-						   DeleteMidQEntry */
++						   delete_mid */
+ 	} else {
+ 		rc = -EIO;
+ 		cFYI(1, "Bad MID state?");
+ 	}
  
--			if (rc || bytes_written < bytes_to_write) {
--				cERROR(1, "Write2 ret %d, wrote %d",
--					  rc, bytes_written);
--				mapping_set_error(mapping, rc);
--			} else {
-+			cFYI(1, "Write2 rc=%d, wrote=%u", rc, bytes_written);
-+
-+			/*
-+			 * For now, treat a short write as if nothing got
-+			 * written. A zero length write however indicates
-+			 * ENOSPC or EFBIG. We have no way to know which
-+			 * though, so call it ENOSPC for now. EFBIG would
-+			 * get translated to AS_EIO anyway.
-+			 *
-+			 * FIXME: make it take into account the data that did
-+			 *	  get written
-+			 */
-+			if (rc == 0) {
-+				if (bytes_written == 0)
-+					rc = -ENOSPC;
-+				else if (bytes_written < bytes_to_write)
-+					rc = -EAGAIN;
-+			}
-+
-+			/* retry on data-integrity flush */
-+			if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN)
-+				goto retry_write;
-+
-+			/* fix the stats and EOF */
-+			if (bytes_written > 0) {
- 				cifs_stats_bytes_written(tcon, bytes_written);
-+				cifs_update_eof(cifsi, offset, bytes_written);
- 			}
+ out:
+-	DeleteMidQEntry(midQ);
++	delete_mid(midQ);
+ 	atomic_dec(&ses->server->inFlight);
+ 	wake_up(&ses->server->request_q);
  
- 			for (i = 0; i < n_iov; i++) {
- 				page = pvec.pages[first + i];
--				/* Should we also set page error on
--				success rc but too little data written? */
--				/* BB investigate retry logic on temporary
--				server crash cases and how recovery works
--				when page marked as error */
--				if (rc)
-+				/* on retryable write error, redirty page */
-+				if (rc == -EAGAIN)
-+					redirty_page_for_writepage(wbc, page);
-+				else if (rc != 0)
- 					SetPageError(page);
- 				kunmap(page);
- 				unlock_page(page);
- 				end_page_writeback(page);
- 				page_cache_release(page);
+@@ -699,7 +706,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
  			}
-+
-+			if (rc != -EAGAIN)
-+				mapping_set_error(mapping, rc);
-+			else
-+				rc = 0;
-+
- 			if ((wbc->nr_to_write -= n_iov) <= 0)
- 				done = 1;
- 			index = next;
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		/* Update # of requests on wire to server */
+ 		atomic_dec(&ses->server->inFlight);
+ 		wake_up(&ses->server->request_q);
+@@ -755,7 +762,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 	}
+ 
+ out:
+-	DeleteMidQEntry(midQ);
++	delete_mid(midQ);
+ 	atomic_dec(&ses->server->inFlight);
+ 	wake_up(&ses->server->request_q);
+ 
+@@ -863,7 +870,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 
+ 	rc = cifs_sign_smb(in_buf, ses->server, &midQ->sequence_number);
+ 	if (rc) {
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		return rc;
+ 	}
+@@ -880,7 +887,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 	mutex_unlock(&ses->server->srv_mutex);
+ 
+ 	if (rc < 0) {
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		return rc;
+ 	}
+ 
+@@ -902,7 +909,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 
+ 			rc = send_nt_cancel(tcon, in_buf, midQ);
+ 			if (rc) {
+-				DeleteMidQEntry(midQ);
++				delete_mid(midQ);
+ 				return rc;
+ 			}
+ 		} else {
+@@ -914,7 +921,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 			/* If we get -ENOLCK back the lock may have
+ 			   already been removed. Don't exit in this case. */
+ 			if (rc && rc != -ENOLCK) {
+-				DeleteMidQEntry(midQ);
++				delete_mid(midQ);
+ 				return rc;
+ 			}
+ 		}
+@@ -951,7 +958,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 			}
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		return rc;
+ 	}
+ 
+@@ -1001,7 +1008,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 		BCC(out_buf) = le16_to_cpu(BCC_LE(out_buf));
+ 
+ out:
+-	DeleteMidQEntry(midQ);
++	delete_mid(midQ);
+ 	if (rstart && rc == -EACCES)
+ 		return -ERESTARTSYS;
+ 	return rc;
 -- 
 1.7.3.3
