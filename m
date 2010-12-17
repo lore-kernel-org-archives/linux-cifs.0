@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 14/18] cifs: set up recurring workqueue job to do SMB echo requests
-Date: Fri, 17 Dec 2010 10:08:13 -0500
-Message-ID: <1292598497-29796-15-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 09/18] cifs: clean up sync_mid_result
+Date: Fri, 17 Dec 2010 10:08:08 -0500
+Message-ID: <1292598497-29796-10-git-send-email-jlayton@redhat.com>
 References: <1292598497-29796-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,91 +10,64 @@ In-Reply-To: <1292598497-29796-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Make it use a switch statement based on the value of the midStatus. If
+the resp_buf is set, then MID_RESPONSE_RECEIVED is too.
+
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    1 +
- fs/cifs/connect.c  |   29 +++++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 0 deletions(-)
+ fs/cifs/transport.c |   35 ++++++++++++++++++-----------------
+ 1 files changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index db90fe0..64d69f9 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -218,6 +218,7 @@ struct TCP_Server_Info {
- 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
- 	bool	sec_ntlmssp;		/* supports NTLMSSP */
- 	bool session_estab; /* mark when very first sess is established */
-+	struct delayed_work	echo; /* echo ping workqueue job */
- #ifdef CONFIG_CIFS_FSCACHE
- 	struct fscache_cookie   *fscache; /* client index cache cookie */
- #endif
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 734fb09..20f6eda 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -52,6 +52,9 @@
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
- 
-+/* SMB echo "timeout" -- FIXME: tunable? */
-+#define SMB_ECHO_INTERVAL (60 * HZ)
-+
- extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
- 			 unsigned char *p24);
- 
-@@ -336,6 +339,26 @@ static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
- 
- }
- 
-+static void
-+cifs_echo_request(struct work_struct *work)
-+{
-+	int rc;
-+	struct TCP_Server_Info *server = container_of(work,
-+					struct TCP_Server_Info, echo.work);
-+
-+	/* no need to ping if we got a response recently */
-+	if (time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
-+		goto requeue_echo;
-+
-+	rc = CIFSSMBEcho(server);
-+	if (rc)
-+		cFYI(1, "Unable to send echo request to server: %s",
-+			server->hostname);
-+
-+requeue_echo:
-+	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
-+}
-+
- static int
- cifs_demultiplex_thread(struct TCP_Server_Info *server)
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index f65cdec..6abd144 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -363,28 +363,29 @@ sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
  {
-@@ -1571,6 +1594,8 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
- 	list_del_init(&server->tcp_ses_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
+ 	int rc = 0;
  
-+	cancel_delayed_work_sync(&server->echo);
-+
- 	spin_lock(&GlobalMid_Lock);
- 	server->tcpStatus = CifsExiting;
+-	spin_lock(&GlobalMid_Lock);
++	cFYI(1, "%s: cmd=%d mid=%d state=%d", __func__, mid->command,
++		mid->mid, mid->midState);
+ 
+-	if (mid->resp_buf) {
++	spin_lock(&GlobalMid_Lock);
++	switch (mid->midState) {
++	case MID_RESPONSE_RECEIVED:
+ 		spin_unlock(&GlobalMid_Lock);
+ 		return rc;
+-	}
+-
+-	cERROR(1, "No response to cmd %d mid %d", mid->command, mid->mid);
+-	if (mid->midState == MID_REQUEST_SUBMITTED) {
+-		if (server->tcpStatus == CifsExiting)
++	case MID_REQUEST_SUBMITTED:
++		/* socket is going down, reject all calls */
++		if (server->tcpStatus == CifsExiting) {
++			cERROR(1, "%s: canceling mid=%d cmd=0x%x state=%d",
++			       __func__, mid->mid, mid->command, mid->midState);
+ 			rc = -EHOSTDOWN;
+-		else
+-			mid->midState = MID_RETRY_NEEDED;
+-	}
+-
+-	if (rc != -EHOSTDOWN) {
+-		if (mid->midState == MID_RETRY_NEEDED) {
+-			rc = -EAGAIN;
+-			cFYI(1, "marking request for retry");
+-		} else {
+-			rc = -EIO;
++			break;
+ 		}
++	case MID_RETRY_NEEDED:
++		rc = -EAGAIN;
++		break;
++	default:
++		cERROR(1, "%s: invalid mid state mid=%d state=%d", __func__,
++			mid->mid, mid->midState);
++		rc = -EIO;
+ 	}
  	spin_unlock(&GlobalMid_Lock);
-@@ -1662,6 +1687,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	tcp_ses->sequence_number = 0;
- 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
- 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
-+	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
  
- 	/*
- 	 * at this point we are the only ones with the pointer
-@@ -1710,6 +1736,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 
- 	cifs_fscache_get_client_cookie(tcp_ses);
- 
-+	/* queue echo request delayed work */
-+	queue_delayed_work(system_nrt_wq, &tcp_ses->echo, SMB_ECHO_INTERVAL);
-+
- 	return tcp_ses;
- 
- out_err_crypto_release:
 -- 
 1.7.3.3
