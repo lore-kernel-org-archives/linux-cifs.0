@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/18] cifs: make wait_for_free_request take a TCP_Server_Info pointer
-Date: Fri, 17 Dec 2010 10:08:02 -0500
-Message-ID: <1292598497-29796-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 02/18] cifs: no need to mark smb_ses_list as cifs_demultiplex_thread is exiting
+Date: Fri, 17 Dec 2010 10:08:01 -0500
+Message-ID: <1292598497-29796-3-git-send-email-jlayton@redhat.com>
 References: <1292598497-29796-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,93 +10,93 @@ In-Reply-To: <1292598497-29796-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The cifsSesInfo pointer is only used to get at the server.
+The TCP_Server_Info is refcounted and every SMB session holds a
+reference to it. Thus, smb_ses_list is always going to be empty when
+cifsd is coming down. This is dead code.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/transport.c |   26 +++++++++++++-------------
- 1 files changed, 13 insertions(+), 13 deletions(-)
+ fs/cifs/connect.c |   44 +++-----------------------------------------
+ 1 files changed, 3 insertions(+), 41 deletions(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 59ca81b..9a14f77 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -244,31 +244,31 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
- 	return smb_sendv(server, &iov, 1);
- }
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 9fe620e2..67d3d0d 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -346,7 +346,6 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
+ 	struct kvec iov;
+ 	struct socket *csocket = server->ssocket;
+ 	struct list_head *tmp;
+-	struct cifsSesInfo *ses;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+ 	char temp;
+@@ -677,44 +676,19 @@ multi_t2_fnd:
+ 	if (smallbuf) /* no sense logging a debug message if NULL */
+ 		cifs_small_buf_release(smallbuf);
  
--static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
-+static int wait_for_free_request(struct TCP_Server_Info *server,
-+				 const int long_op)
- {
- 	if (long_op == CIFS_ASYNC_OP) {
- 		/* oplock breaks must not be held up */
--		atomic_inc(&ses->server->inFlight);
-+		atomic_inc(&server->inFlight);
- 		return 0;
- 	}
- 
- 	spin_lock(&GlobalMid_Lock);
- 	while (1) {
--		if (atomic_read(&ses->server->inFlight) >=
--				cifs_max_pending){
-+		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
- 			spin_unlock(&GlobalMid_Lock);
- #ifdef CONFIG_CIFS_STATS2
--			atomic_inc(&ses->server->num_waiters);
-+			atomic_inc(&server->num_waiters);
- #endif
--			wait_event(ses->server->request_q,
--				   atomic_read(&ses->server->inFlight)
-+			wait_event(server->request_q,
-+				   atomic_read(&server->inFlight)
- 				     < cifs_max_pending);
- #ifdef CONFIG_CIFS_STATS2
--			atomic_dec(&ses->server->num_waiters);
-+			atomic_dec(&server->num_waiters);
- #endif
- 			spin_lock(&GlobalMid_Lock);
- 		} else {
--			if (ses->server->tcpStatus == CifsExiting) {
-+			if (server->tcpStatus == CifsExiting) {
- 				spin_unlock(&GlobalMid_Lock);
- 				return -ENOENT;
+-	/*
+-	 * BB: we shouldn't have to do any of this. It shouldn't be
+-	 * possible to exit from the thread with active SMB sessions
+-	 */
+-	spin_lock(&cifs_tcp_ses_lock);
+-	if (list_empty(&server->pending_mid_q)) {
+-		/* loop through server session structures attached to this and
+-		    mark them dead */
+-		list_for_each(tmp, &server->smb_ses_list) {
+-			ses = list_entry(tmp, struct cifsSesInfo,
+-					 smb_ses_list);
+-			ses->status = CifsExiting;
+-			ses->server = NULL;
+-		}
+-		spin_unlock(&cifs_tcp_ses_lock);
+-	} else {
+-		/* although we can not zero the server struct pointer yet,
+-		since there are active requests which may depnd on them,
+-		mark the corresponding SMB sessions as exiting too */
+-		list_for_each(tmp, &server->smb_ses_list) {
+-			ses = list_entry(tmp, struct cifsSesInfo,
+-					 smb_ses_list);
+-			ses->status = CifsExiting;
+-		}
+-
++	if (!list_empty(&server->pending_mid_q)) {
+ 		spin_lock(&GlobalMid_Lock);
+ 		list_for_each(tmp, &server->pending_mid_q) {
+-		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
++			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+ 			if (mid_entry->midState == MID_REQUEST_SUBMITTED) {
+ 				cFYI(1, "Clearing Mid 0x%x - waking up ",
+-					 mid_entry->mid);
++					mid_entry->mid);
+ 				task_to_wake = mid_entry->tsk;
+ 				if (task_to_wake)
+ 					wake_up_process(task_to_wake);
  			}
-@@ -278,7 +278,7 @@ static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
- 
- 			/* update # of requests on the wire to server */
- 			if (long_op != CIFS_BLOCKING_OP)
--				atomic_inc(&ses->server->inFlight);
-+				atomic_inc(&server->inFlight);
- 			spin_unlock(&GlobalMid_Lock);
- 			break;
  		}
-@@ -413,7 +413,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
- 
--	rc = wait_for_free_request(ses, long_op);
-+	rc = wait_for_free_request(ses->server, long_op);
- 	if (rc) {
- 		cifs_small_buf_release(in_buf);
- 		return rc;
-@@ -610,7 +610,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
- 		return -EIO;
+ 		spin_unlock(&GlobalMid_Lock);
+-		spin_unlock(&cifs_tcp_ses_lock);
+ 		/* 1/8th of sec is more than enough time for them to exit */
+ 		msleep(125);
+ 	}
+@@ -732,18 +706,6 @@ multi_t2_fnd:
+ 		coming home not much else we can do but free the memory */
  	}
  
--	rc = wait_for_free_request(ses, long_op);
-+	rc = wait_for_free_request(ses->server, long_op);
- 	if (rc)
- 		return rc;
- 
-@@ -845,7 +845,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
- 		return -EIO;
- 	}
- 
--	rc = wait_for_free_request(ses, CIFS_BLOCKING_OP);
-+	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
- 	if (rc)
- 		return rc;
- 
+-	/* last chance to mark ses pointers invalid
+-	if there are any pointing to this (e.g
+-	if a crazy root user tried to kill cifsd
+-	kernel thread explicitly this might happen) */
+-	/* BB: This shouldn't be necessary, see above */
+-	spin_lock(&cifs_tcp_ses_lock);
+-	list_for_each(tmp, &server->smb_ses_list) {
+-		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
+-		ses->server = NULL;
+-	}
+-	spin_unlock(&cifs_tcp_ses_lock);
+-
+ 	kfree(server->hostname);
+ 	task_to_wake = xchg(&server->tsk, NULL);
+ 	kfree(server);
 -- 
 1.7.3.3
