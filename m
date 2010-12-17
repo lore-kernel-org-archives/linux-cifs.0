@@ -1,89 +1,102 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 00/18] cifs: overhaul request timeout behavior in CIFS (try #3)
-Date: Fri, 17 Dec 2010 10:07:59 -0500
-Message-ID: <1292598497-29796-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 03/18] cifs: make wait_for_free_request take a TCP_Server_Info pointer
+Date: Fri, 17 Dec 2010 10:08:02 -0500
+Message-ID: <1292598497-29796-4-git-send-email-jlayton@redhat.com>
+References: <1292598497-29796-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1292598497-29796-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the third patchset to clean up request timeout behavior in cifs.
-There are some siginficant and subtle changes since the last set, so
-I've left off any "Reviewed-by" tags on the previous patches. Here's
-an overview of what has changed:
+The cifsSesInfo pointer is only used to get at the server.
 
-- small bugfix in the writepages patch to make it return 0 when there
-  we're redirtying the pages for the write
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/transport.c |   26 +++++++++++++-------------
+ 1 files changed, 13 insertions(+), 13 deletions(-)
 
-- addition of a cleanup patch for dead code in cifs_demultiplex_thread
-
-- DeleteMidQEntry and AllocMidQEntry no longer take the GlobalMid_Lock.
-  This allows them to be called with that lock held.
-
-- clarification of the locking and state of the mid when the
-  mid->callback function is called. It's now assumed to be called with
-  the GlobalMid_Lock held and with it no longer on the pending_mid_q.
-  Comments were added to clarify this.
-
-- canceled mids are handled by setting the callback function instead
-  of setting the state and handling them in a special way
-
-- send_nt_cancel creates the cancel request in a different way so that
-  it doesn't need to be called with the tcon
-
-- NT_CANCEL requests are sent when a process waiting on a synchronous
-  response catches a fatal signal.
-
-The main impetus of this patchset is to change the way CIFS handles SMB
-requests that are taking a long time. I won't rewrite all of that
-information, but the description is available here:
-
-    http://marc.info/?l=linux-cifs&m=129199588315592&w=2
-
-Another discussion thread surrounding this change is also available
-here:
-
-    http://marc.info/?l=linux-cifs&m=129142970724511&w=2
-
-I think there is some further work needed in this area, but this is a
-good stopping point for 2.6.38 and it seems to fix the most glaring
-problems. I'd like to see this merged during the next merge window if
-possible.
-
-Comments and suggestions welcome...
-
-Jeff Layton (18):
-  cifs: don't fail writepages on -EAGAIN errors
-  cifs: no need to mark smb_ses_list as cifs_demultiplex_thread is
-    exiting
-  cifs: make wait_for_free_request take a TCP_Server_Info pointer
-  cifs: clean up accesses to midCount
-  cifs: move locked sections out of DeleteMidQEntry and AllocMidQEntry
-  cifs: move mid result processing into common function
-  cifs: wait indefinitely for responses
-  cifs: don't reconnect server when we don't get a response
-  cifs: clean up sync_mid_result
-  cifs: allow for different handling of received response
-  cifs: handle cancelled requests better
-  cifs: add cifs_call_async
-  cifs: add ability to send an echo request
-  cifs: set up recurring workqueue job to do SMB echo requests
-  cifs: reconnect unresponsive servers
-  cifs: remove code for setting timeouts on requests
-  cifs: mangle existing header for SMB_COM_NT_CANCEL
-  cifs: send an NT_CANCEL request when a process is signalled
-
- fs/cifs/cifs_debug.c |   10 +-
- fs/cifs/cifsglob.h   |   25 ++-
- fs/cifs/cifspdu.h    |   15 ++
- fs/cifs/cifsproto.h  |    7 +
- fs/cifs/cifssmb.c    |   55 ++++++-
- fs/cifs/connect.c    |  150 +++++++++--------
- fs/cifs/file.c       |   93 +++++------
- fs/cifs/sess.c       |    2 +-
- fs/cifs/transport.c  |  463 ++++++++++++++++++++++++++------------------------
- 9 files changed, 459 insertions(+), 361 deletions(-)
-
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 59ca81b..9a14f77 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -244,31 +244,31 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
+ }
+ 
+-static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
++static int wait_for_free_request(struct TCP_Server_Info *server,
++				 const int long_op)
+ {
+ 	if (long_op == CIFS_ASYNC_OP) {
+ 		/* oplock breaks must not be held up */
+-		atomic_inc(&ses->server->inFlight);
++		atomic_inc(&server->inFlight);
+ 		return 0;
+ 	}
+ 
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&ses->server->inFlight) >=
+-				cifs_max_pending){
++		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
+ 			spin_unlock(&GlobalMid_Lock);
+ #ifdef CONFIG_CIFS_STATS2
+-			atomic_inc(&ses->server->num_waiters);
++			atomic_inc(&server->num_waiters);
+ #endif
+-			wait_event(ses->server->request_q,
+-				   atomic_read(&ses->server->inFlight)
++			wait_event(server->request_q,
++				   atomic_read(&server->inFlight)
+ 				     < cifs_max_pending);
+ #ifdef CONFIG_CIFS_STATS2
+-			atomic_dec(&ses->server->num_waiters);
++			atomic_dec(&server->num_waiters);
+ #endif
+ 			spin_lock(&GlobalMid_Lock);
+ 		} else {
+-			if (ses->server->tcpStatus == CifsExiting) {
++			if (server->tcpStatus == CifsExiting) {
+ 				spin_unlock(&GlobalMid_Lock);
+ 				return -ENOENT;
+ 			}
+@@ -278,7 +278,7 @@ static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
+ 
+ 			/* update # of requests on the wire to server */
+ 			if (long_op != CIFS_BLOCKING_OP)
+-				atomic_inc(&ses->server->inFlight);
++				atomic_inc(&server->inFlight);
+ 			spin_unlock(&GlobalMid_Lock);
+ 			break;
+ 		}
+@@ -413,7 +413,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 	   to the same server. We may make this configurable later or
+ 	   use ses->maxReq */
+ 
+-	rc = wait_for_free_request(ses, long_op);
++	rc = wait_for_free_request(ses->server, long_op);
+ 	if (rc) {
+ 		cifs_small_buf_release(in_buf);
+ 		return rc;
+@@ -610,7 +610,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 		return -EIO;
+ 	}
+ 
+-	rc = wait_for_free_request(ses, long_op);
++	rc = wait_for_free_request(ses->server, long_op);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -845,7 +845,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 		return -EIO;
+ 	}
+ 
+-	rc = wait_for_free_request(ses, CIFS_BLOCKING_OP);
++	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
+ 	if (rc)
+ 		return rc;
+ 
 -- 
 1.7.3.3
