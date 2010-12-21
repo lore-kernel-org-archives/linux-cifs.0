@@ -1,154 +1,287 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 10/18] cifs: allow for different handling of received
- response
-Date: Tue, 21 Dec 2010 11:48:17 -0500
-Message-ID: <20101221114817.582b44df@tlielax.poochiereds.net>
-References: <1292598497-29796-1-git-send-email-jlayton@redhat.com>
-	<1292598497-29796-11-git-send-email-jlayton@redhat.com>
-	<4D10CCD3.1040502@suse.de>
+Subject: Re: [PATCH 4/6] CIFS: Implement cifs_strict_read (try #2)
+Date: Tue, 21 Dec 2010 13:29:31 -0500
+Message-ID: <20101221132931.2e2e2a6f@tlielax.poochiereds.net>
+References: <1292521052-5388-1-git-send-email-piastry@etersoft.ru>
+	<1292521052-5388-2-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D10CCD3.1040502-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <1292521052-5388-2-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 21 Dec 2010 21:20:43 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+On Thu, 16 Dec 2010 20:37:32 +0300
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> On 12/17/2010 08:38 PM, Jeff Layton wrote:
-> > In order to incorporate async requests, we need to allow for a more
-> > general way to do things on receive, rather than just waking up a
-> > process.
-> > 
-> > Turn the task pointer in the mid_q_entry into a callback function and a
-> > generic data pointer. When a response comes in, or the socket is
-> > reconnected, cifsd can call the callback function in order to wake up
-> > the process.
-> > 
-> > The default is to just wake up the current process which should mean no
-> > change in behavior for existing code.
-> > 
-> > Also, clean up the locking in cifs_reconnect. There doesn't seem to be
-> > any need to hold both the srv_mutex and GlobalMid_Lock when walking the
-> > list of mids.
-> > 
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifs_debug.c |    8 +++---
-> >  fs/cifs/cifsglob.h   |   15 ++++++++++++-
-> >  fs/cifs/connect.c    |   56 +++++++++++++++++++++++++-------------------------
-> >  fs/cifs/transport.c  |   19 +++++++++++++++-
-> >  4 files changed, 63 insertions(+), 35 deletions(-)
-> > 
-> > diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> > index ac7a38f..30d01bc 100644
-> > --- a/fs/cifs/cifs_debug.c
-> > +++ b/fs/cifs/cifs_debug.c
-> > @@ -79,11 +79,11 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
-> >  	spin_lock(&GlobalMid_Lock);
-> >  	list_for_each(tmp, &server->pending_mid_q) {
-> >  		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-> > -		cERROR(1, "State: %d Cmd: %d Pid: %d Tsk: %p Mid %d",
-> > +		cERROR(1, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %d",
-> >  			mid_entry->midState,
-> >  			(int)mid_entry->command,
-> >  			mid_entry->pid,
-> > -			mid_entry->tsk,
-> > +			mid_entry->callback_data,
-> >  			mid_entry->mid);
-> >  #ifdef CONFIG_CIFS_STATS2
-> >  		cERROR(1, "IsLarge: %d buf: %p time rcv: %ld now: %ld",
-> > @@ -218,11 +218,11 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-> >  				mid_entry = list_entry(tmp3, struct mid_q_entry,
-> >  					qhead);
-> >  				seq_printf(m, "\tState: %d com: %d pid:"
-> > -						" %d tsk: %p mid %d\n",
-> > +						" %d cbdata: %p mid %d\n",
-> >  						mid_entry->midState,
-> >  						(int)mid_entry->command,
-> >  						mid_entry->pid,
-> > -						mid_entry->tsk,
-> > +						mid_entry->callback_data,
-> >  						mid_entry->mid);
-> >  			}
-> >  			spin_unlock(&GlobalMid_Lock);
-> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > index 8c3c165..db90fe0 100644
-> > --- a/fs/cifs/cifsglob.h
-> > +++ b/fs/cifs/cifsglob.h
-> > @@ -508,6 +508,18 @@ static inline void cifs_stats_bytes_read(struct cifsTconInfo *tcon,
-> >  
-> >  #endif
-> >  
-> > +struct mid_q_entry;
-> > +
-> > +/*
-> > + * This is the prototype for the mid callback function. When creating one,
-> > + * take special care to avoid deadlocks. Things to bear in mind:
-> > + *
-> > + * - it will be called by cifsd
-> > + * - the GlobalMid_Lock will be held
-> > + * - the mid will be removed from the pending_mid_q list
-> > + */
-> > +typedef void (mid_callback_t)(struct mid_q_entry *mid);
-> > +
-> >  /* one of these for every pending CIFS request to the server */
-> >  struct mid_q_entry {
-> >  	struct list_head qhead;	/* mids waiting on reply from this server */
-> > @@ -519,7 +531,8 @@ struct mid_q_entry {
-> >  	unsigned long when_sent; /* time when smb send finished */
-> >  	unsigned long when_received; /* when demux complete (taken off wire) */
-> >  #endif
-> > -	struct task_struct *tsk;	/* task waiting for response */
-> > +	mid_callback_t *callback; /* call completion callback */
-> > +	void *callback_data;	  /* general purpose pointer for callback */
-> >  	struct smb_hdr *resp_buf;	/* response buffer */
-> >  	int midState;	/* wish this were enum but can not pass to wait_event */
-> >  	__u8 command;	/* smb command code */
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 515cafa..734fb09 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -152,6 +152,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
-> >  
-> >  	/* before reconnecting the tcp session, mark the smb session (uid)
-> >  		and the tid bad so they are not used until reconnected */
-> > +	cFYI(1, "%s: marking sessions and tcons for reconnect", __func__);
-> >  	spin_lock(&cifs_tcp_ses_lock);
-> >  	list_for_each(tmp, &server->smb_ses_list) {
-> >  		ses = list_entry(tmp, struct cifsSesInfo, smb_ses_list);
-> > @@ -163,7 +164,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
-> >  		}
-> >  	}
-> >  	spin_unlock(&cifs_tcp_ses_lock);
-> > +
-> >  	/* do not want to be sending data on a socket we are freeing */
-> > +	cFYI(1, "%s: tearing down socket", __func__);
-> >  	mutex_lock(&server->srv_mutex);
-> >  	if (server->ssocket) {
-> >  		cFYI(1, "State: 0x%x Flags: 0x%lx", server->ssocket->state,
-> > @@ -180,22 +183,22 @@ cifs_reconnect(struct TCP_Server_Info *server)
-> >  	kfree(server->session_key.response);
-> >  	server->session_key.response = NULL;
-> >  	server->session_key.len = 0;
-> > +	mutex_unlock(&server->srv_mutex);
-> >  
-> > +	/*
-> > +	 * move in-progress mids to a private list so that we can walk it later
-> > +	 * without needing a lock. We'll mark them for retry after reconnect.
-> > +	 */
-> > +	cFYI(1, "%s: issuing mid callbacks", __func__);
+> From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
-> Is the above comment valid? This patchset doesn't use a separate list IIUC?
+> Read from the cache if we have at least Level II oplock - otherwise
+> read from the server. Add cifs_user_readv to let the client read into
+> several buffers.
 > 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   38 ++++++++++++++++++-
+>  fs/cifs/cifsfs.h |    4 +-
+>  fs/cifs/file.c   |  108 +++++++++++++++++++++++++++++++++++++++---------------
+>  3 files changed, 117 insertions(+), 33 deletions(-)
 > 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index a218afe..bcb4d2c 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -572,6 +572,40 @@ cifs_do_mount(struct file_system_type *fs_type,
+>  	return dget(sb->s_root);
+>  }
+>  
+> +static ssize_t cifs_strict_read(struct kiocb *iocb, const struct iovec *iov,
+> +				unsigned long nr_segs, loff_t pos)
+> +{
+> +	struct inode *inode;
+> +	struct cifs_sb_info *cifs_sb;
+> +	ssize_t read = 0;
+> +
+> +	if (!nr_segs)
+> +		return read;
+> +
+> +	inode = iocb->ki_filp->f_path.dentry->d_inode;
+> +	cifs_sb = CIFS_SB(iocb->ki_filp->f_path.dentry->d_sb);
+> +
+> +	if (CIFS_I(inode)->clientCanCacheRead)
+> +		return generic_file_aio_read(iocb, iov, nr_segs, pos);
+> +
+> +	/*
+> +	 * In strict cache mode we need to read from the server all the time
+> +	 * if we don't have level II oplock because the server can delay mtime
+> +	 * change - so we can't make a decision about inode invalidating.
+> +	 * And we can also fail with pagereading if there are mandatory locks
+> +	 * on pages affected by this read but not on the region from pos to
+> +	 * pos+len-1.
+> +	 */
+> +
+> +	read = cifs_user_readv(iocb->ki_filp, iov, nr_segs, &pos);
+> +	if (read < 0)
+> +		return read;
+> +
+> +	iocb->ki_pos = pos;
+> +
+> +	return read;
+> +}
+> +
+>  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+>  				   unsigned long nr_segs, loff_t pos)
+>  {
+> @@ -713,7 +747,7 @@ const struct file_operations cifs_file_ops = {
+>  const struct file_operations cifs_file_strict_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_strict_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+> @@ -769,7 +803,7 @@ const struct file_operations cifs_file_nobrl_ops = {
+>  const struct file_operations cifs_file_strict_nobrl_ops = {
+>  	.read = do_sync_read,
+>  	.write = do_sync_write,
+> -	.aio_read = generic_file_aio_read,
+> +	.aio_read = cifs_strict_read,
+>  	.aio_write = cifs_file_aio_write,
+>  	.open = cifs_open,
+>  	.release = cifs_close,
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index 657738f..f690d1c 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -81,7 +81,9 @@ extern int cifs_open(struct inode *inode, struct file *file);
+>  extern int cifs_close(struct inode *inode, struct file *file);
+>  extern int cifs_closedir(struct inode *inode, struct file *file);
+>  extern ssize_t cifs_user_read(struct file *file, char __user *read_data,
+> -			 size_t read_size, loff_t *poffset);
+> +			      size_t read_size, loff_t *poffset);
+> +extern ssize_t cifs_user_readv(struct file *file, const struct iovec *iov,
+> +			       unsigned long nr_segs, loff_t *poffset);
+>  extern ssize_t cifs_user_write(struct file *file, const char __user *write_data,
+>  			 size_t write_size, loff_t *poffset);
+>  extern int cifs_lock(struct file *, int, struct file_lock *);
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index d48723c..bc53e9e 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1677,20 +1677,60 @@ int cifs_flush(struct file *file, fl_owner_t id)
+>  	return rc;
+>  }
+>  
+> -ssize_t cifs_user_read(struct file *file, char __user *read_data,
+> -	size_t read_size, loff_t *poffset)
+> +static int
+> +cifs_fill_iov(const struct iovec *iov, unsigned long nr_segs,
+> +	      unsigned long *last_len, unsigned long *last_ind, char *data,
+> +	      size_t datalen)
+>  {
 
-You're correct. I'll fix and resend.
+I have to wonder if we already have generic helpers for this sort of thing?
 
-Thanks,
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> -	int rc = -EACCES;
+> -	unsigned int bytes_read = 0;
+> -	unsigned int total_read = 0;
+> -	unsigned int current_read_size;
+> +	const struct iovec *ciov;
+> +	unsigned long cur_len;
+> +
+> +	while (datalen) {
+> +		cur_len = min_t(unsigned long, datalen,
+> +					      *last_len);
+		^^^^^
+		This can be on a single line...
+
+> +		ciov = &iov[*last_ind];
+> +
+> +		if (copy_to_user(ciov->iov_base + (ciov->iov_len - *last_len),
+> +				 data, cur_len))
+> +			return -EFAULT;
+> +
+> +		datalen -= cur_len;
+> +		data += cur_len;
+> +
+> +		*last_len -= cur_len;
+> +		if (*last_len == 0) {
+> +			(*last_ind)++;
+> +			*last_len = iov[*last_ind].iov_len;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +ssize_t cifs_user_readv(struct file *file, const struct iovec *iov,
+> +			unsigned long nr_segs, loff_t *poffset)
+> +{
+> +	int rc;
+> +	int xid;
+> +	unsigned int bytes_read = 0, total_read = 0;
+> +	unsigned long last_len = 0, len = 0, last_ind = 0;
+> +	unsigned long cur_len, i;
+>  	struct cifs_sb_info *cifs_sb;
+>  	struct cifsTconInfo *pTcon;
+> -	int xid;
+>  	struct cifsFileInfo *open_file;
+> -	char *smb_read_data;
+> -	char __user *current_offset;
+>  	struct smb_com_read_rsp *pSMBr;
+> +	char *read_data;
+> +
+> +	if (!nr_segs)
+> +		return 0;
+> +
+> +	last_len = iov->iov_len;
+> +
+> +	for (i = 0; i < nr_segs; i++)
+> +		len += iov[i].iov_len;
+> +
+> +	if (!len)
+> +		return 0;
+>  
+>  	xid = GetXid();
+>  	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+> @@ -1700,19 +1740,19 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
+>  		FreeXid(xid);
+>  		return rc;
+>  	}
+> +
+>  	open_file = file->private_data;
+>  	pTcon = tlink_tcon(open_file->tlink);
+>  
+>  	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
+>  		cFYI(1, "attempting read on write only file instance");
+>  
+> -	for (total_read = 0, current_offset = read_data;
+> -	     read_size > total_read;
+> -	     total_read += bytes_read, current_offset += bytes_read) {
+> -		current_read_size = min_t(const int, read_size - total_read,
+> +	for (total_read = 0; total_read < len; total_read += bytes_read) {
+> +		cur_len = min_t(const int, len - total_read,
+>  					  cifs_sb->rsize);
+>  		rc = -EAGAIN;
+> -		smb_read_data = NULL;
+> +		read_data = NULL;
+> +
+>  		while (rc == -EAGAIN) {
+>  			int buf_type = CIFS_NO_BUFFER;
+>  			if (open_file->invalidHandle) {
+> @@ -1721,26 +1761,24 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
+>  					break;
+>  			}
+>  			rc = CIFSSMBRead(xid, pTcon,
+> -					 open_file->netfid,
+> -					 current_read_size, *poffset,
+> -					 &bytes_read, &smb_read_data,
+> -					 &buf_type);
+> -			pSMBr = (struct smb_com_read_rsp *)smb_read_data;
+> -			if (smb_read_data) {
+> -				if (copy_to_user(current_offset,
+> -						smb_read_data +
+> -						4 /* RFC1001 length field */ +
+> -						le16_to_cpu(pSMBr->DataOffset),
+> -						bytes_read))
+> +					 open_file->netfid, cur_len, *poffset,
+> +					 &bytes_read, &read_data, &buf_type);
+> +			pSMBr = (struct smb_com_read_rsp *)read_data;
+> +			if (read_data) {
+> +				char *data_offset = read_data + 4 +
+> +						le16_to_cpu(pSMBr->DataOffset);
+> +				if (cifs_fill_iov(iov, nr_segs,
+> +					&last_len, &last_ind,
+> +					data_offset, bytes_read))
+>  					rc = -EFAULT;
+					^^^^^^^^^^^^^
+			nit: it's generally better not to indent the inside of a block along with the conditions.
+> -
+>  				if (buf_type == CIFS_SMALL_BUFFER)
+> -					cifs_small_buf_release(smb_read_data);
+> +					cifs_small_buf_release(read_data);
+>  				else if (buf_type == CIFS_LARGE_BUFFER)
+> -					cifs_buf_release(smb_read_data);
+> -				smb_read_data = NULL;
+> +					cifs_buf_release(read_data);
+> +				read_data = NULL;
+>  			}
+>  		}
+> +
+>  		if (rc || (bytes_read == 0)) {
+>  			if (total_read) {
+>  				break;
+> @@ -1753,13 +1791,23 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
+>  			*poffset += bytes_read;
+>  		}
+>  	}
+> +
+>  	FreeXid(xid);
+>  	return total_read;
+>  }
+>  
+> +ssize_t cifs_user_read(struct file *file, char __user *read_data,
+> +		       size_t read_size, loff_t *poffset)
+> +{
+> +	struct iovec iov;
+> +	iov.iov_base = read_data;
+> +	iov.iov_len = read_size;
+> +
+> +	return cifs_user_readv(file, &iov, 1, poffset);
+> +}
+>  
+>  static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+> -	loff_t *poffset)
+> +			 loff_t *poffset)
+>  {
+>  	int rc = -EACCES;
+>  	unsigned int bytes_read = 0;
+
+
+Other than the minor nits above, it looks good to me.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
