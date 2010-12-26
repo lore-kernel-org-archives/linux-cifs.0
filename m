@@ -1,228 +1,309 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 4/6] CIFS: Implement cifs_strict_readv (try #3)
-Date: Sun, 26 Dec 2010 13:04:17 +0300
-Message-ID: <1293357858-10006-1-git-send-email-piastryyy@gmail.com>
+Subject: [PATCH 5/6] CIFS: Implement cifs_strict_writev (try #3)
+Date: Sun, 26 Dec 2010 13:04:18 +0300
+Message-ID: <1293357858-10006-2-git-send-email-piastryyy@gmail.com>
+References: <1293357858-10006-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1293357858-10006-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Read from the cache if we have at least Level II oplock - otherwise
-read from the server. Add cifs_user_readv to let the client read into
-iovec buffers.
+If we don't have Exclusive oplock we write a data to the server.
+Also set invalidate_mapping flag on the inode if we wrote something
+to the server. Add cifs_iovec_write to let the client write iovec
+buffers through CIFSSMBWrite2.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsfs.c |    4 +-
- fs/cifs/cifsfs.h |    6 ++-
- fs/cifs/file.c   |  112 ++++++++++++++++++++++++++++++++++++++---------------
- 3 files changed, 87 insertions(+), 35 deletions(-)
+ fs/cifs/cifsfs.c    |   15 +++-
+ fs/cifs/cifsfs.h    |    6 ++-
+ fs/cifs/cifsproto.h |    2 +
+ fs/cifs/file.c      |  193 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 210 insertions(+), 6 deletions(-)
 
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 2b52020..0d6b005 100644
+index 0d6b005..76ba04e 100644
 --- a/fs/cifs/cifsfs.c
 +++ b/fs/cifs/cifsfs.c
-@@ -714,7 +714,7 @@ const struct file_operations cifs_file_ops = {
- const struct file_operations cifs_file_strict_ops = {
+@@ -578,10 +578,17 @@ static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+ {
+ 	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
+ 	ssize_t written;
++	int rc;
+ 
+ 	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+-	if (!CIFS_I(inode)->clientCanCacheAll)
+-		filemap_fdatawrite(inode->i_mapping);
++
++	if (CIFS_I(inode)->clientCanCacheAll)
++		return written;
++
++	rc = filemap_fdatawrite(inode->i_mapping);
++	if (rc)
++		cFYI(1, "cifs_file_aio_write: %d rc on %p inode", rc, inode);
++
+ 	return written;
+ }
+ 
+@@ -715,7 +722,7 @@ const struct file_operations cifs_file_strict_ops = {
  	.read = do_sync_read,
  	.write = do_sync_write,
--	.aio_read = generic_file_aio_read,
-+	.aio_read = cifs_strict_readv,
- 	.aio_write = cifs_file_aio_write,
+ 	.aio_read = cifs_strict_readv,
+-	.aio_write = cifs_file_aio_write,
++	.aio_write = cifs_strict_writev,
  	.open = cifs_open,
  	.release = cifs_close,
-@@ -770,7 +770,7 @@ const struct file_operations cifs_file_nobrl_ops = {
- const struct file_operations cifs_file_strict_nobrl_ops = {
+ 	.lock = cifs_lock,
+@@ -771,7 +778,7 @@ const struct file_operations cifs_file_strict_nobrl_ops = {
  	.read = do_sync_read,
  	.write = do_sync_write,
--	.aio_read = generic_file_aio_read,
-+	.aio_read = cifs_strict_readv,
- 	.aio_write = cifs_file_aio_write,
+ 	.aio_read = cifs_strict_readv,
+-	.aio_write = cifs_file_aio_write,
++	.aio_write = cifs_strict_writev,
  	.open = cifs_open,
  	.release = cifs_close,
+ 	.fsync = cifs_strict_fsync,
 diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 657738f..6ff3ca2 100644
+index 6ff3ca2..2302a81 100644
 --- a/fs/cifs/cifsfs.h
 +++ b/fs/cifs/cifsfs.h
-@@ -81,7 +81,11 @@ extern int cifs_open(struct inode *inode, struct file *file);
- extern int cifs_close(struct inode *inode, struct file *file);
- extern int cifs_closedir(struct inode *inode, struct file *file);
- extern ssize_t cifs_user_read(struct file *file, char __user *read_data,
--			 size_t read_size, loff_t *poffset);
-+			      size_t read_size, loff_t *poffset);
-+extern ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
-+			       unsigned long nr_segs, loff_t pos);
-+extern ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
-+				 unsigned long nr_segs, loff_t pos);
+@@ -87,7 +87,11 @@ extern ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
+ extern ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
+ 				 unsigned long nr_segs, loff_t pos);
  extern ssize_t cifs_user_write(struct file *file, const char __user *write_data,
- 			 size_t write_size, loff_t *poffset);
+-			 size_t write_size, loff_t *poffset);
++			       size_t write_size, loff_t *poffset);
++extern ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
++				unsigned long nr_segs, loff_t pos);
++extern ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
++				  unsigned long nr_segs, loff_t pos);
  extern int cifs_lock(struct file *, int, struct file_lock *);
+ extern int cifs_fsync(struct file *, int);
+ extern int cifs_strict_fsync(struct file *, int);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e6d1481..e7d6c24 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -79,6 +79,8 @@ extern int checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length);
+ extern bool is_valid_oplock_break(struct smb_hdr *smb,
+ 				  struct TCP_Server_Info *);
+ extern bool is_size_safe_to_change(struct cifsInodeInfo *, __u64 eof);
++extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
++			    unsigned int bytes_written);
+ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, bool);
+ extern struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *, bool);
+ extern unsigned int smbCalcSize(struct smb_hdr *ptr);
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index d48723c..c3bc65c 100644
+index c3bc65c..9a23a58 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1677,20 +1677,27 @@ int cifs_flush(struct file *file, fl_owner_t id)
+@@ -924,7 +924,7 @@ cifs_write_timeout(struct cifsInodeInfo *cifsi, loff_t offset)
+ }
+ 
+ /* update the file size (if needed) after a write */
+-static void
++void
+ cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+ 		      unsigned int bytes_written)
+ {
+@@ -1677,6 +1677,197 @@ int cifs_flush(struct file *file, fl_owner_t id)
  	return rc;
  }
  
--ssize_t cifs_user_read(struct file *file, char __user *read_data,
--	size_t read_size, loff_t *poffset)
-+static ssize_t
-+cifs_iovec_read(struct file *file, const struct iovec *iov,
-+		 unsigned long nr_segs, loff_t *poffset)
- {
--	int rc = -EACCES;
--	unsigned int bytes_read = 0;
--	unsigned int total_read = 0;
--	unsigned int current_read_size;
-+	int rc;
-+	int xid;
-+	unsigned int total_read, bytes_read = 0;
-+	size_t len, cur_len;
-+	int iov_offset = 0;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifsTconInfo *pTcon;
--	int xid;
- 	struct cifsFileInfo *open_file;
--	char *smb_read_data;
--	char __user *current_offset;
- 	struct smb_com_read_rsp *pSMBr;
-+	char *read_data;
++static int
++cifs_write_allocate_pages(struct page **pages, unsigned long num_pages)
++{
++	int rc = 0;
++	unsigned long i;
 +
-+	if (!nr_segs)
-+		return 0;
++	for (i = 0; i < num_pages; i++) {
++		pages[i] = alloc_page(__GFP_HIGHMEM);
++		if (!pages[i]) {
++			/*
++			 * save number of pages we have already allocated and
++			 * return with ENOMEM error
++			 */
++			num_pages = i;
++			rc = -ENOMEM;
++			goto error;
++		}
++	}
++
++	return rc;
++
++error:
++	for (i = 0; i < num_pages; i++)
++		put_page(pages[i]);
++	return rc;
++}
++
++static inline
++size_t get_numpages(const size_t wsize, const size_t len, size_t *cur_len)
++{
++	size_t num_pages;
++	size_t clen;
++
++	clen = min_t(const size_t, len, wsize);
++	num_pages = clen / PAGE_CACHE_SIZE;
++	if (clen % PAGE_CACHE_SIZE)
++		num_pages++;
++
++	if (cur_len)
++		*cur_len = clen;
++
++	return num_pages;
++}
++
++static ssize_t
++cifs_iovec_write(struct file *file, const struct iovec *iov,
++		 unsigned long nr_segs, loff_t *poffset)
++{
++	size_t total_written = 0, written = 0;
++	unsigned long num_pages, npages;
++	size_t copied, len, cur_len, i;
++	struct kvec *to_send;
++	struct page **pages;
++	struct iov_iter it;
++	struct inode *inode;
++	struct cifsFileInfo *open_file;
++	struct cifsTconInfo *pTcon;
++	struct cifs_sb_info *cifs_sb;
++	int xid, rc;
 +
 +	len = iov_length(iov, nr_segs);
 +	if (!len)
 +		return 0;
- 
- 	xid = GetXid();
- 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
-@@ -1700,19 +1707,18 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
- 		FreeXid(xid);
- 		return rc;
- 	}
 +
- 	open_file = file->private_data;
- 	pTcon = tlink_tcon(open_file->tlink);
- 
- 	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
- 		cFYI(1, "attempting read on write only file instance");
- 
--	for (total_read = 0, current_offset = read_data;
--	     read_size > total_read;
--	     total_read += bytes_read, current_offset += bytes_read) {
--		current_read_size = min_t(const int, read_size - total_read,
--					  cifs_sb->rsize);
-+	for (total_read = 0; total_read < len; total_read += bytes_read) {
-+		cur_len = min_t(const size_t, len - total_read, cifs_sb->rsize);
- 		rc = -EAGAIN;
--		smb_read_data = NULL;
-+		read_data = NULL;
++	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
++	num_pages = get_numpages(cifs_sb->wsize, len, &cur_len);
 +
- 		while (rc == -EAGAIN) {
- 			int buf_type = CIFS_NO_BUFFER;
- 			if (open_file->invalidHandle) {
-@@ -1720,27 +1726,25 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
- 				if (rc != 0)
- 					break;
- 			}
--			rc = CIFSSMBRead(xid, pTcon,
--					 open_file->netfid,
--					 current_read_size, *poffset,
--					 &bytes_read, &smb_read_data,
--					 &buf_type);
--			pSMBr = (struct smb_com_read_rsp *)smb_read_data;
--			if (smb_read_data) {
--				if (copy_to_user(current_offset,
--						smb_read_data +
--						4 /* RFC1001 length field */ +
--						le16_to_cpu(pSMBr->DataOffset),
--						bytes_read))
-+			rc = CIFSSMBRead(xid, pTcon, open_file->netfid,
-+					 cur_len, *poffset, &bytes_read,
-+					 &read_data, &buf_type);
-+			pSMBr = (struct smb_com_read_rsp *)read_data;
-+			if (read_data) {
-+				char *data_offset = read_data + 4 +
-+						le16_to_cpu(pSMBr->DataOffset);
-+				if (memcpy_toiovecend(iov, data_offset,
-+						      iov_offset, bytes_read))
- 					rc = -EFAULT;
--
- 				if (buf_type == CIFS_SMALL_BUFFER)
--					cifs_small_buf_release(smb_read_data);
-+					cifs_small_buf_release(read_data);
- 				else if (buf_type == CIFS_LARGE_BUFFER)
--					cifs_buf_release(smb_read_data);
--				smb_read_data = NULL;
-+					cifs_buf_release(read_data);
-+				read_data = NULL;
-+				iov_offset += bytes_read;
- 			}
- 		}
++	pages = kmalloc(sizeof(struct pages *)*num_pages, GFP_KERNEL);
++	if (!pages)
++		return -ENOMEM;
 +
- 		if (rc || (bytes_read == 0)) {
- 			if (total_read) {
- 				break;
-@@ -1753,13 +1757,57 @@ ssize_t cifs_user_read(struct file *file, char __user *read_data,
- 			*poffset += bytes_read;
- 		}
- 	}
++	to_send = kmalloc(sizeof(struct kvec)*(num_pages + 1), GFP_KERNEL);
++	if (!to_send) {
++		kfree(pages);
++		return -ENOMEM;
++	}
 +
- 	FreeXid(xid);
- 	return total_read;
- }
- 
-+ssize_t cifs_user_read(struct file *file, char __user *read_data,
-+		       size_t read_size, loff_t *poffset)
-+{
-+	struct iovec iov;
-+	iov.iov_base = read_data;
-+	iov.iov_len = read_size;
++	rc = cifs_write_allocate_pages(pages, num_pages);
++	if (rc) {
++		kfree(pages);
++		kfree(to_send);
++		return rc;
++	}
 +
-+	return cifs_iovec_read(file, &iov, 1, poffset);
++	xid = GetXid();
++	open_file = file->private_data;
++	pTcon = tlink_tcon(open_file->tlink);
++	inode = file->f_path.dentry->d_inode;
++
++	iov_iter_init(&it, iov, nr_segs, len, 0);
++	npages = num_pages;
++
++	do {
++		size_t save_len = cur_len;
++		for (i = 0; i < npages; i++) {
++			copied = min_t(const size_t, cur_len, PAGE_CACHE_SIZE);
++			copied = iov_iter_copy_from_user(pages[i], &it, 0,
++							 copied);
++			cur_len -= copied;
++			iov_iter_advance(&it, copied);
++			to_send[i+1].iov_base = kmap(pages[i]);
++			to_send[i+1].iov_len = copied;
++		}
++
++		cur_len = save_len - cur_len;
++
++		do {
++			rc = CIFSSMBWrite2(xid, pTcon, open_file->netfid,
++					   cur_len, *poffset, &written,
++					   to_send, npages, 0);
++		} while (rc == -EAGAIN);
++
++		for (i = 0; i < npages; i++)
++			kunmap(pages[i]);
++
++		if (written) {
++			len -= written;
++			total_written += written;
++			cifs_update_eof(CIFS_I(inode), *poffset, written);
++			*poffset += written;
++		} else if (rc < 0) {
++			if (!total_written)
++				total_written = rc;
++			break;
++		}
++
++		/* get length and number of kvecs of the next write */
++		npages = get_numpages(cifs_sb->wsize, len, &cur_len);
++	} while (len > 0);
++
++	if (total_written > 0) {
++		spin_lock(&inode->i_lock);
++		if (*poffset > inode->i_size)
++			i_size_write(inode, *poffset);
++		spin_unlock(&inode->i_lock);
++	}
++
++	cifs_stats_bytes_written(pTcon, total_written);
++	mark_inode_dirty_sync(inode);
++
++	for (i = 0; i < num_pages; i++)
++		put_page(pages[i]);
++	kfree(to_send);
++	kfree(pages);
++	FreeXid(xid);
++	return total_written;
 +}
 +
-+ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
-+			unsigned long nr_segs, loff_t pos)
++ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
++			 unsigned long nr_segs, loff_t pos)
 +{
-+	ssize_t read;
++	ssize_t written;
++	struct inode *inode;
 +
-+	read = cifs_iovec_read(iocb->ki_filp, iov, nr_segs, &pos);
-+	if (read > 0)
++	inode = iocb->ki_filp->f_path.dentry->d_inode;
++
++	/*
++	 * BB - optimize the way when signing is disabled. We can drop this
++	 * extra memory-to-memory copying and use iovec buffers for constructing
++	 * write request.
++	 */
++
++	written = cifs_iovec_write(iocb->ki_filp, iov, nr_segs, &pos);
++	if (written > 0) {
++		CIFS_I(inode)->invalid_mapping = true;
 +		iocb->ki_pos = pos;
++	}
 +
-+	return read;
++	return written;
 +}
 +
-+ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
-+			  unsigned long nr_segs, loff_t pos)
++ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
++			   unsigned long nr_segs, loff_t pos)
 +{
 +	struct inode *inode;
 +
 +	inode = iocb->ki_filp->f_path.dentry->d_inode;
 +
-+	if (CIFS_I(inode)->clientCanCacheRead)
-+		return generic_file_aio_read(iocb, iov, nr_segs, pos);
++	if (CIFS_I(inode)->clientCanCacheAll)
++		return generic_file_aio_write(iocb, iov, nr_segs, pos);
 +
 +	/*
-+	 * In strict cache mode we need to read from the server all the time
-+	 * if we don't have level II oplock because the server can delay mtime
-+	 * change - so we can't make a decision about inode invalidating.
-+	 * And we can also fail with pagereading if there are mandatory locks
-+	 * on pages affected by this read but not on the region from pos to
-+	 * pos+len-1.
++	 * In strict cache mode we need to write the data to the server exactly
++	 * from the pos to pos+len-1 rather than flush all affected pages
++	 * because it may cause a error with mandatory locks on these pages but
++	 * not on the region from pos to ppos+len-1.
 +	 */
 +
-+	return cifs_user_readv(iocb, iov, nr_segs, pos);
++	return cifs_user_writev(iocb, iov, nr_segs, pos);
 +}
- 
- static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
--	loff_t *poffset)
-+			 loff_t *poffset)
- {
- 	int rc = -EACCES;
- 	unsigned int bytes_read = 0;
++
+ static ssize_t
+ cifs_iovec_read(struct file *file, const struct iovec *iov,
+ 		 unsigned long nr_segs, loff_t *poffset)
 -- 
 1.7.3.4
