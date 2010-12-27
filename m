@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 04/18] cifs: clean up accesses to midCount
-Date: Sun, 26 Dec 2010 21:29:52 -0500
-Message-ID: <1293417006-6417-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 03/18] cifs: make wait_for_free_request take a TCP_Server_Info pointer
+Date: Sun, 26 Dec 2010 21:29:51 -0500
+Message-ID: <1293417006-6417-4-git-send-email-jlayton@redhat.com>
 References: <1293417006-6417-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,72 +10,95 @@ In-Reply-To: <1293417006-6417-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It's an atomic_t and the code accesses the "counter" field in it directly
-instead of using atomic_read(). It also is sometimes accessed under a
-spinlock and sometimes not. Move it out of the spinlock since we don't need
-belt-and-suspenders for something that's just informational.
+The cifsSesInfo pointer is only used to get at the server.
 
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by:  Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifs_debug.c |    2 +-
- fs/cifs/connect.c    |    2 +-
- fs/cifs/transport.c  |    6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ fs/cifs/transport.c |   26 +++++++++++++-------------
+ 1 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index bd76527..ac7a38f 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -331,7 +331,7 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 				atomic_read(&totSmBufAllocCount));
- #endif /* CONFIG_CIFS_STATS2 */
- 
--	seq_printf(m, "Operations (MIDs): %d\n", midCount.counter);
-+	seq_printf(m, "Operations (MIDs): %d\n", atomic_read(&midCount));
- 	seq_printf(m,
- 		"\n%d session %d share reconnects\n",
- 		tcpSesReconnectCount.counter, tconInfoReconnectCount.counter);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index d77e488..db25ea3 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -628,7 +628,7 @@ multi_t2_fnd:
- 		} else if (!is_valid_oplock_break(smb_buffer, server) &&
- 			   !isMultiRsp) {
- 			cERROR(1, "No task to wake, unknown frame received! "
--				   "NumMids %d", midCount.counter);
-+				   "NumMids %d", atomic_read(&midCount));
- 			cifs_dump_mem("Received Data is: ", (char *)smb_buffer,
- 				      sizeof(struct smb_hdr));
- #ifdef CONFIG_CIFS_DEBUG2
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 9a14f77..b9eb0cf 100644
+index 59ca81b..9a14f77 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -61,10 +61,10 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 		temp->tsk = current;
+@@ -244,31 +244,31 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
+ }
+ 
+-static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
++static int wait_for_free_request(struct TCP_Server_Info *server,
++				 const int long_op)
+ {
+ 	if (long_op == CIFS_ASYNC_OP) {
+ 		/* oplock breaks must not be held up */
+-		atomic_inc(&ses->server->inFlight);
++		atomic_inc(&server->inFlight);
+ 		return 0;
  	}
  
--	spin_lock(&GlobalMid_Lock);
--	list_add_tail(&temp->qhead, &server->pending_mid_q);
- 	atomic_inc(&midCount);
- 	temp->midState = MID_REQUEST_ALLOCATED;
-+	spin_lock(&GlobalMid_Lock);
-+	list_add_tail(&temp->qhead, &server->pending_mid_q);
- 	spin_unlock(&GlobalMid_Lock);
- 	return temp;
- }
-@@ -78,8 +78,8 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
  	spin_lock(&GlobalMid_Lock);
- 	midEntry->midState = MID_FREE;
- 	list_del(&midEntry->qhead);
--	atomic_dec(&midCount);
- 	spin_unlock(&GlobalMid_Lock);
-+	atomic_dec(&midCount);
- 	if (midEntry->largeBuf)
- 		cifs_buf_release(midEntry->resp_buf);
- 	else
+ 	while (1) {
+-		if (atomic_read(&ses->server->inFlight) >=
+-				cifs_max_pending){
++		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
+ 			spin_unlock(&GlobalMid_Lock);
+ #ifdef CONFIG_CIFS_STATS2
+-			atomic_inc(&ses->server->num_waiters);
++			atomic_inc(&server->num_waiters);
+ #endif
+-			wait_event(ses->server->request_q,
+-				   atomic_read(&ses->server->inFlight)
++			wait_event(server->request_q,
++				   atomic_read(&server->inFlight)
+ 				     < cifs_max_pending);
+ #ifdef CONFIG_CIFS_STATS2
+-			atomic_dec(&ses->server->num_waiters);
++			atomic_dec(&server->num_waiters);
+ #endif
+ 			spin_lock(&GlobalMid_Lock);
+ 		} else {
+-			if (ses->server->tcpStatus == CifsExiting) {
++			if (server->tcpStatus == CifsExiting) {
+ 				spin_unlock(&GlobalMid_Lock);
+ 				return -ENOENT;
+ 			}
+@@ -278,7 +278,7 @@ static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
+ 
+ 			/* update # of requests on the wire to server */
+ 			if (long_op != CIFS_BLOCKING_OP)
+-				atomic_inc(&ses->server->inFlight);
++				atomic_inc(&server->inFlight);
+ 			spin_unlock(&GlobalMid_Lock);
+ 			break;
+ 		}
+@@ -413,7 +413,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 	   to the same server. We may make this configurable later or
+ 	   use ses->maxReq */
+ 
+-	rc = wait_for_free_request(ses, long_op);
++	rc = wait_for_free_request(ses->server, long_op);
+ 	if (rc) {
+ 		cifs_small_buf_release(in_buf);
+ 		return rc;
+@@ -610,7 +610,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 		return -EIO;
+ 	}
+ 
+-	rc = wait_for_free_request(ses, long_op);
++	rc = wait_for_free_request(ses->server, long_op);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -845,7 +845,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 		return -EIO;
+ 	}
+ 
+-	rc = wait_for_free_request(ses, CIFS_BLOCKING_OP);
++	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
+ 	if (rc)
+ 		return rc;
+ 
 -- 
 1.7.3.4
