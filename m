@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 12/18] cifs: add cifs_call_async
-Date: Sun, 26 Dec 2010 21:30:00 -0500
-Message-ID: <1293417006-6417-13-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 13/18] cifs: add ability to send an echo request
+Date: Sun, 26 Dec 2010 21:30:01 -0500
+Message-ID: <1293417006-6417-14-git-send-email-jlayton@redhat.com>
 References: <1293417006-6417-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,107 +10,138 @@ In-Reply-To: <1293417006-6417-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add a function that will send a request, and set up the mid for an
-async reply.
-
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    5 ++++
- fs/cifs/transport.c |   58 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 62 insertions(+), 1 deletions(-)
+ fs/cifs/cifspdu.h   |   15 +++++++++++++++
+ fs/cifs/cifsproto.h |    2 ++
+ fs/cifs/cifssmb.c   |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/transport.c |    2 +-
+ 4 files changed, 65 insertions(+), 1 deletions(-)
 
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index de36b09..ea205b4 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -50,6 +50,7 @@
+ #define SMB_COM_SETATTR               0x09 /* trivial response */
+ #define SMB_COM_LOCKING_ANDX          0x24 /* trivial response */
+ #define SMB_COM_COPY                  0x29 /* trivial rsp, fail filename ignrd*/
++#define SMB_COM_ECHO                  0x2B /* echo request */
+ #define SMB_COM_OPEN_ANDX             0x2D /* Legacy open for old servers */
+ #define SMB_COM_READ_ANDX             0x2E
+ #define SMB_COM_WRITE_ANDX            0x2F
+@@ -760,6 +761,20 @@ typedef struct smb_com_tconx_rsp_ext {
+  *
+  */
+ 
++typedef struct smb_com_echo_req {
++	struct	smb_hdr hdr;
++	__le16	EchoCount;
++	__le16	ByteCount;
++	char	Data[1];
++} __attribute__((packed)) ECHO_REQ;
++
++typedef struct smb_com_echo_rsp {
++	struct	smb_hdr hdr;
++	__le16	SequenceNumber;
++	__le16	ByteCount;
++	char	Data[1];
++} __attribute__((packed)) ECHO_RSP;
++
+ typedef struct smb_com_logoff_andx_req {
+ 	struct smb_hdr hdr;	/* wct = 2 */
+ 	__u8 AndXCommand;
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index fe77e69..4d81f0e 100644
+index 4d81f0e..3cd6474 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -61,6 +61,11 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
- 		const char *fullpath, const struct dfs_info3_param *ref,
- 		char **devname);
+@@ -63,6 +63,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
  /* extern void renew_parental_timestamps(struct dentry *direntry);*/
-+extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
-+					struct TCP_Server_Info *server);
-+extern int cifs_call_async(struct TCP_Server_Info *server,
-+			   struct smb_hdr *in_buf, mid_callback_t *callback,
-+			   void *cbdata);
- extern int SendReceive(const unsigned int /* xid */ , struct cifsSesInfo *,
- 			struct smb_hdr * /* input */ ,
- 			struct smb_hdr * /* out */ ,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index ad78cbd..cf8c64d 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -42,7 +42,7 @@ wake_up_task(struct mid_q_entry *mid)
- 	wake_up_process(mid->callback_data);
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
++extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern int cifs_call_async(struct TCP_Server_Info *server,
+ 			   struct smb_hdr *in_buf, mid_callback_t *callback,
+ 			   void *cbdata);
+@@ -352,6 +353,7 @@ extern int CIFSSMBPosixLock(const int xid, struct cifsTconInfo *tcon,
+ 			const __u64 len, struct file_lock *,
+ 			const __u16 lock_type, const bool waitFlag);
+ extern int CIFSSMBTDis(const int xid, struct cifsTconInfo *tcon);
++extern int CIFSSMBEcho(struct TCP_Server_Info *server);
+ extern int CIFSSMBLogoff(const int xid, struct cifsSesInfo *ses);
+ 
+ extern struct cifsSesInfo *sesInfoAlloc(void);
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 9af98f6..fc8145f 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -706,6 +706,53 @@ CIFSSMBTDis(const int xid, struct cifsTconInfo *tcon)
+ 	return rc;
  }
  
--static struct mid_q_entry *
-+struct mid_q_entry *
- AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- {
- 	struct mid_q_entry *temp;
-@@ -345,6 +345,62 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- 
- 
- /*
-+ * Send a SMB request and set the callback function in the mid to handle
-+ * the result. Caller is responsible for dealing with timeouts.
++/*
++ * This is a no-op for now. We're not really interested in the reply, but
++ * rather in the fact that the server sent one and that server->lstrp
++ * gets updated.
++ *
++ * FIXME: maybe we should consider checking that the reply matches request?
 + */
-+int
-+cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
-+		mid_callback_t *callback, void *cbdata)
++static void
++cifs_echo_callback(struct mid_q_entry *mid)
 +{
-+	int rc;
-+	struct mid_q_entry *mid;
++	struct TCP_Server_Info *server = mid->callback_data;
 +
-+	rc = wait_for_free_request(server, CIFS_ASYNC_OP);
++	DeleteMidQEntry(mid);
++	atomic_dec(&server->inFlight);
++	wake_up(&server->request_q);
++}
++
++int
++CIFSSMBEcho(struct TCP_Server_Info *server)
++{
++	ECHO_REQ *smb;
++	int rc = 0;
++
++	cFYI(1, "In echo request");
++
++	rc = small_smb_init(SMB_COM_ECHO, 0, NULL, (void **)&smb);
 +	if (rc)
 +		return rc;
 +
-+	mutex_lock(&server->srv_mutex);
-+	mid = AllocMidQEntry(in_buf, server);
-+	if (mid == NULL) {
-+		mutex_unlock(&server->srv_mutex);
-+		return -ENOMEM;
-+	}
++	/* set up echo request */
++	smb->hdr.Tid = cpu_to_le16(0xffff);
++	smb->hdr.WordCount = cpu_to_le16(1);
++	smb->EchoCount = cpu_to_le16(1);
++	smb->ByteCount = cpu_to_le16(1);
++	smb->Data[0] = 'a';
++	smb->hdr.smb_buf_length += 3;
 +
-+	/* put it on the pending_mid_q */
-+	spin_lock(&GlobalMid_Lock);
-+	list_add_tail(&mid->qhead, &server->pending_mid_q);
-+	spin_unlock(&GlobalMid_Lock);
-+
-+	rc = cifs_sign_smb(in_buf, server, &mid->sequence_number);
-+	if (rc) {
-+		mutex_unlock(&server->srv_mutex);
-+		goto out_err;
-+	}
-+
-+	mid->callback = callback;
-+	mid->callback_data = cbdata;
-+	mid->midState = MID_REQUEST_SUBMITTED;
-+#ifdef CONFIG_CIFS_STATS2
-+	atomic_inc(&server->inSend);
-+#endif
-+	rc = smb_send(server, in_buf, in_buf->smb_buf_length);
-+#ifdef CONFIG_CIFS_STATS2
-+	atomic_dec(&server->inSend);
-+	mid->when_sent = jiffies;
-+#endif
-+	mutex_unlock(&server->srv_mutex);
++	rc = cifs_call_async(server, (struct smb_hdr *)smb,
++				cifs_echo_callback, server);
 +	if (rc)
-+		goto out_err;
++		cFYI(1, "Echo request failed: %d", rc);
 +
-+	return rc;
-+out_err:
-+	delete_mid(mid);
-+	atomic_dec(&server->inFlight);
-+	wake_up(&server->request_q);
++	cifs_small_buf_release(smb);
++
 +	return rc;
 +}
 +
-+/*
-  *
-  * Send an SMB Request.  No response info (other than return code)
-  * needs to be parsed.
+ int
+ CIFSSMBLogoff(const int xid, struct cifsSesInfo *ses)
+ {
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index cf8c64d..db29f80 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -78,7 +78,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 	return temp;
+ }
+ 
+-static void
++void
+ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ {
+ #ifdef CONFIG_CIFS_STATS2
 -- 
 1.7.3.4
