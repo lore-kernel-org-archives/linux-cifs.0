@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 06/18] cifs: move mid result processing into common function
-Date: Sun, 26 Dec 2010 21:29:54 -0500
-Message-ID: <1293417006-6417-7-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 08/18] cifs: don't reconnect server when we don't get a response
+Date: Sun, 26 Dec 2010 21:29:56 -0500
+Message-ID: <1293417006-6417-9-git-send-email-jlayton@redhat.com>
 References: <1293417006-6417-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,177 +10,34 @@ In-Reply-To: <1293417006-6417-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+We only want to force a reconnect to the server under very limited and
+specific circumstances. Now that we have processes waiting indefinitely
+for responses, we shouldn't reach this point unless a reconnect is
+already in process. Thus, there's no reason to re-mark the server for
+reconnect here.
+
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by:  Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/transport.c |  121 ++++++++++++++++++---------------------------------
- 1 files changed, 43 insertions(+), 78 deletions(-)
+ fs/cifs/transport.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 801726b..15059c7 100644
+index c41c9c4..f65cdec 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -389,6 +389,42 @@ SendReceiveNoRsp(const unsigned int xid, struct cifsSesInfo *ses,
- 	return rc;
- }
- 
-+static int
-+sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
-+{
-+	int rc = 0;
-+
-+	spin_lock(&GlobalMid_Lock);
-+
-+	if (mid->resp_buf) {
-+		spin_unlock(&GlobalMid_Lock);
-+		return rc;
-+	}
-+
-+	cERROR(1, "No response to cmd %d mid %d", mid->command, mid->mid);
-+	if (mid->midState == MID_REQUEST_SUBMITTED) {
-+		if (server->tcpStatus == CifsExiting)
-+			rc = -EHOSTDOWN;
-+		else {
-+			server->tcpStatus = CifsNeedReconnect;
-+			mid->midState = MID_RETRY_NEEDED;
-+		}
-+	}
-+
-+	if (rc != -EHOSTDOWN) {
-+		if (mid->midState == MID_RETRY_NEEDED) {
-+			rc = -EAGAIN;
-+			cFYI(1, "marking request for retry");
-+		} else {
-+			rc = -EIO;
-+		}
-+	}
-+	spin_unlock(&GlobalMid_Lock);
-+
-+	delete_mid(mid);
-+	return rc;
-+}
-+
- int
- SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
- 	     struct kvec *iov, int n_vec, int *pRespBufType /* ret */,
-@@ -492,37 +528,13 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
- 	/* No user interrupts in wait - wreaks havoc with performance */
- 	wait_for_response(ses, midQ, timeout, 10 * HZ);
- 
--	spin_lock(&GlobalMid_Lock);
--
--	if (midQ->resp_buf == NULL) {
--		cERROR(1, "No response to cmd %d mid %d",
--			midQ->command, midQ->mid);
--		if (midQ->midState == MID_REQUEST_SUBMITTED) {
--			if (ses->server->tcpStatus == CifsExiting)
--				rc = -EHOSTDOWN;
--			else {
--				ses->server->tcpStatus = CifsNeedReconnect;
--				midQ->midState = MID_RETRY_NEEDED;
--			}
+@@ -374,10 +374,8 @@ sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+ 	if (mid->midState == MID_REQUEST_SUBMITTED) {
+ 		if (server->tcpStatus == CifsExiting)
+ 			rc = -EHOSTDOWN;
+-		else {
+-			server->tcpStatus = CifsNeedReconnect;
++		else
+ 			mid->midState = MID_RETRY_NEEDED;
 -		}
--
--		if (rc != -EHOSTDOWN) {
--			if (midQ->midState == MID_RETRY_NEEDED) {
--				rc = -EAGAIN;
--				cFYI(1, "marking request for retry");
--			} else {
--				rc = -EIO;
--			}
--		}
--		spin_unlock(&GlobalMid_Lock);
--		delete_mid(midQ);
--		/* Update # of requests on wire to server */
-+	rc = sync_mid_result(midQ, ses->server);
-+	if (rc != 0) {
- 		atomic_dec(&ses->server->inFlight);
- 		wake_up(&ses->server->request_q);
- 		return rc;
  	}
  
--	spin_unlock(&GlobalMid_Lock);
- 	receive_len = midQ->resp_buf->smb_buf_length;
- 
- 	if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
-@@ -684,36 +696,13 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
- 	/* No user interrupts in wait - wreaks havoc with performance */
- 	wait_for_response(ses, midQ, timeout, 10 * HZ);
- 
--	spin_lock(&GlobalMid_Lock);
--	if (midQ->resp_buf == NULL) {
--		cERROR(1, "No response for cmd %d mid %d",
--			  midQ->command, midQ->mid);
--		if (midQ->midState == MID_REQUEST_SUBMITTED) {
--			if (ses->server->tcpStatus == CifsExiting)
--				rc = -EHOSTDOWN;
--			else {
--				ses->server->tcpStatus = CifsNeedReconnect;
--				midQ->midState = MID_RETRY_NEEDED;
--			}
--		}
--
--		if (rc != -EHOSTDOWN) {
--			if (midQ->midState == MID_RETRY_NEEDED) {
--				rc = -EAGAIN;
--				cFYI(1, "marking request for retry");
--			} else {
--				rc = -EIO;
--			}
--		}
--		spin_unlock(&GlobalMid_Lock);
--		delete_mid(midQ);
--		/* Update # of requests on wire to server */
-+	rc = sync_mid_result(midQ, ses->server);
-+	if (rc != 0) {
- 		atomic_dec(&ses->server->inFlight);
- 		wake_up(&ses->server->request_q);
- 		return rc;
- 	}
- 
--	spin_unlock(&GlobalMid_Lock);
- 	receive_len = midQ->resp_buf->smb_buf_length;
- 
- 	if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
-@@ -933,35 +922,11 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
- 		}
- 	}
- 
--	spin_lock(&GlobalMid_Lock);
--	if (midQ->resp_buf) {
--		spin_unlock(&GlobalMid_Lock);
--		receive_len = midQ->resp_buf->smb_buf_length;
--	} else {
--		cERROR(1, "No response for cmd %d mid %d",
--			  midQ->command, midQ->mid);
--		if (midQ->midState == MID_REQUEST_SUBMITTED) {
--			if (ses->server->tcpStatus == CifsExiting)
--				rc = -EHOSTDOWN;
--			else {
--				ses->server->tcpStatus = CifsNeedReconnect;
--				midQ->midState = MID_RETRY_NEEDED;
--			}
--		}
--
--		if (rc != -EHOSTDOWN) {
--			if (midQ->midState == MID_RETRY_NEEDED) {
--				rc = -EAGAIN;
--				cFYI(1, "marking request for retry");
--			} else {
--				rc = -EIO;
--			}
--		}
--		spin_unlock(&GlobalMid_Lock);
--		delete_mid(midQ);
-+	rc = sync_mid_result(midQ, ses->server);
-+	if (rc != 0)
- 		return rc;
--	}
- 
-+	receive_len = midQ->resp_buf->smb_buf_length;
- 	if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
- 		cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
- 			receive_len, xid);
+ 	if (rc != -EHOSTDOWN) {
 -- 
 1.7.3.4
