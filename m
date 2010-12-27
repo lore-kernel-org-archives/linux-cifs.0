@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 13/18] cifs: add ability to send an echo request
-Date: Sun, 26 Dec 2010 21:30:01 -0500
-Message-ID: <1293417006-6417-14-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 14/18] cifs: set up recurring workqueue job to do SMB echo requests
+Date: Sun, 26 Dec 2010 21:30:02 -0500
+Message-ID: <1293417006-6417-15-git-send-email-jlayton@redhat.com>
 References: <1293417006-6417-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -13,135 +13,89 @@ List-ID: <linux-cifs.vger.kernel.org>
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifspdu.h   |   15 +++++++++++++++
- fs/cifs/cifsproto.h |    2 ++
- fs/cifs/cifssmb.c   |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/transport.c |    2 +-
- 4 files changed, 65 insertions(+), 1 deletions(-)
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/connect.c  |   29 +++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-index de36b09..ea205b4 100644
---- a/fs/cifs/cifspdu.h
-+++ b/fs/cifs/cifspdu.h
-@@ -50,6 +50,7 @@
- #define SMB_COM_SETATTR               0x09 /* trivial response */
- #define SMB_COM_LOCKING_ANDX          0x24 /* trivial response */
- #define SMB_COM_COPY                  0x29 /* trivial rsp, fail filename ignrd*/
-+#define SMB_COM_ECHO                  0x2B /* echo request */
- #define SMB_COM_OPEN_ANDX             0x2D /* Legacy open for old servers */
- #define SMB_COM_READ_ANDX             0x2E
- #define SMB_COM_WRITE_ANDX            0x2F
-@@ -760,6 +761,20 @@ typedef struct smb_com_tconx_rsp_ext {
-  *
-  */
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index db90fe0..64d69f9 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -218,6 +218,7 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_ntlmssp;		/* supports NTLMSSP */
+ 	bool session_estab; /* mark when very first sess is established */
++	struct delayed_work	echo; /* echo ping workqueue job */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
+ #endif
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 7890bc1..57187c6 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -52,6 +52,9 @@
+ #define CIFS_PORT 445
+ #define RFC1001_PORT 139
  
-+typedef struct smb_com_echo_req {
-+	struct	smb_hdr hdr;
-+	__le16	EchoCount;
-+	__le16	ByteCount;
-+	char	Data[1];
-+} __attribute__((packed)) ECHO_REQ;
++/* SMB echo "timeout" -- FIXME: tunable? */
++#define SMB_ECHO_INTERVAL (60 * HZ)
 +
-+typedef struct smb_com_echo_rsp {
-+	struct	smb_hdr hdr;
-+	__le16	SequenceNumber;
-+	__le16	ByteCount;
-+	char	Data[1];
-+} __attribute__((packed)) ECHO_RSP;
-+
- typedef struct smb_com_logoff_andx_req {
- 	struct smb_hdr hdr;	/* wct = 2 */
- 	__u8 AndXCommand;
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 4d81f0e..3cd6474 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -63,6 +63,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
- /* extern void renew_parental_timestamps(struct dentry *direntry);*/
- extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
-+extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
- extern int cifs_call_async(struct TCP_Server_Info *server,
- 			   struct smb_hdr *in_buf, mid_callback_t *callback,
- 			   void *cbdata);
-@@ -352,6 +353,7 @@ extern int CIFSSMBPosixLock(const int xid, struct cifsTconInfo *tcon,
- 			const __u64 len, struct file_lock *,
- 			const __u16 lock_type, const bool waitFlag);
- extern int CIFSSMBTDis(const int xid, struct cifsTconInfo *tcon);
-+extern int CIFSSMBEcho(struct TCP_Server_Info *server);
- extern int CIFSSMBLogoff(const int xid, struct cifsSesInfo *ses);
+ extern void SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
+ 			 unsigned char *p24);
  
- extern struct cifsSesInfo *sesInfoAlloc(void);
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 9af98f6..fc8145f 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -706,6 +706,53 @@ CIFSSMBTDis(const int xid, struct cifsTconInfo *tcon)
- 	return rc;
+@@ -333,6 +336,26 @@ static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
+ 
  }
  
-+/*
-+ * This is a no-op for now. We're not really interested in the reply, but
-+ * rather in the fact that the server sent one and that server->lstrp
-+ * gets updated.
-+ *
-+ * FIXME: maybe we should consider checking that the reply matches request?
-+ */
 +static void
-+cifs_echo_callback(struct mid_q_entry *mid)
++cifs_echo_request(struct work_struct *work)
 +{
-+	struct TCP_Server_Info *server = mid->callback_data;
++	int rc;
++	struct TCP_Server_Info *server = container_of(work,
++					struct TCP_Server_Info, echo.work);
 +
-+	DeleteMidQEntry(mid);
-+	atomic_dec(&server->inFlight);
-+	wake_up(&server->request_q);
++	/* no need to ping if we got a response recently */
++	if (time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
++		goto requeue_echo;
++
++	rc = CIFSSMBEcho(server);
++	if (rc)
++		cFYI(1, "Unable to send echo request to server: %s",
++			server->hostname);
++
++requeue_echo:
++	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
 +}
 +
-+int
-+CIFSSMBEcho(struct TCP_Server_Info *server)
-+{
-+	ECHO_REQ *smb;
-+	int rc = 0;
-+
-+	cFYI(1, "In echo request");
-+
-+	rc = small_smb_init(SMB_COM_ECHO, 0, NULL, (void **)&smb);
-+	if (rc)
-+		return rc;
-+
-+	/* set up echo request */
-+	smb->hdr.Tid = cpu_to_le16(0xffff);
-+	smb->hdr.WordCount = cpu_to_le16(1);
-+	smb->EchoCount = cpu_to_le16(1);
-+	smb->ByteCount = cpu_to_le16(1);
-+	smb->Data[0] = 'a';
-+	smb->hdr.smb_buf_length += 3;
-+
-+	rc = cifs_call_async(server, (struct smb_hdr *)smb,
-+				cifs_echo_callback, server);
-+	if (rc)
-+		cFYI(1, "Echo request failed: %d", rc);
-+
-+	cifs_small_buf_release(smb);
-+
-+	return rc;
-+}
-+
- int
- CIFSSMBLogoff(const int xid, struct cifsSesInfo *ses)
+ static int
+ cifs_demultiplex_thread(struct TCP_Server_Info *server)
  {
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index cf8c64d..db29f80 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -78,7 +78,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 	return temp;
- }
+@@ -1569,6 +1592,8 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ 	list_del_init(&server->tcp_ses_list);
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
--static void
-+void
- DeleteMidQEntry(struct mid_q_entry *midEntry)
- {
- #ifdef CONFIG_CIFS_STATS2
++	cancel_delayed_work_sync(&server->echo);
++
+ 	spin_lock(&GlobalMid_Lock);
+ 	server->tcpStatus = CifsExiting;
+ 	spin_unlock(&GlobalMid_Lock);
+@@ -1660,6 +1685,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	tcp_ses->sequence_number = 0;
+ 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+ 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
++	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+ 
+ 	/*
+ 	 * at this point we are the only ones with the pointer
+@@ -1708,6 +1734,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 
+ 	cifs_fscache_get_client_cookie(tcp_ses);
+ 
++	/* queue echo request delayed work */
++	queue_delayed_work(system_nrt_wq, &tcp_ses->echo, SMB_ECHO_INTERVAL);
++
+ 	return tcp_ses;
+ 
+ out_err_crypto_release:
 -- 
 1.7.3.4
