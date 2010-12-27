@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 03/18] cifs: make wait_for_free_request take a TCP_Server_Info pointer
-Date: Sun, 26 Dec 2010 21:29:51 -0500
-Message-ID: <1293417006-6417-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 05/18] cifs: move locked sections out of DeleteMidQEntry and AllocMidQEntry
+Date: Sun, 26 Dec 2010 21:29:53 -0500
+Message-ID: <1293417006-6417-6-git-send-email-jlayton@redhat.com>
 References: <1293417006-6417-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,95 +10,169 @@ In-Reply-To: <1293417006-6417-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The cifsSesInfo pointer is only used to get at the server.
+In later patches, we're going to need to have finer-grained control
+over the addition and removal of these structs from the pending_mid_q
+and we'll need to be able to call the destructor while holding the
+spinlock. Move the locked sections out of both routines and into
+the callers. Fix up current callers of DeleteMidQEntry to call a new
+routine that dequeues the entry and then destroys it.
 
 Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Reviewed-by:  Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/transport.c |   26 +++++++++++++-------------
- 1 files changed, 13 insertions(+), 13 deletions(-)
+ fs/cifs/transport.c |   41 ++++++++++++++++++++++++-----------------
+ 1 files changed, 24 insertions(+), 17 deletions(-)
 
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 59ca81b..9a14f77 100644
+index b9eb0cf..801726b 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -244,31 +244,31 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
- 	return smb_sendv(server, &iov, 1);
+@@ -63,9 +63,6 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 
+ 	atomic_inc(&midCount);
+ 	temp->midState = MID_REQUEST_ALLOCATED;
+-	spin_lock(&GlobalMid_Lock);
+-	list_add_tail(&temp->qhead, &server->pending_mid_q);
+-	spin_unlock(&GlobalMid_Lock);
+ 	return temp;
  }
  
--static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
-+static int wait_for_free_request(struct TCP_Server_Info *server,
-+				 const int long_op)
+@@ -75,10 +72,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ #ifdef CONFIG_CIFS_STATS2
+ 	unsigned long now;
+ #endif
+-	spin_lock(&GlobalMid_Lock);
+ 	midEntry->midState = MID_FREE;
+-	list_del(&midEntry->qhead);
+-	spin_unlock(&GlobalMid_Lock);
+ 	atomic_dec(&midCount);
+ 	if (midEntry->largeBuf)
+ 		cifs_buf_release(midEntry->resp_buf);
+@@ -103,6 +97,16 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ 	mempool_free(midEntry, cifs_mid_poolp);
+ }
+ 
++static void
++delete_mid(struct mid_q_entry *mid)
++{
++	spin_lock(&GlobalMid_Lock);
++	list_del(&mid->qhead);
++	spin_unlock(&GlobalMid_Lock);
++
++	DeleteMidQEntry(mid);
++}
++
+ static int
+ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
  {
- 	if (long_op == CIFS_ASYNC_OP) {
- 		/* oplock breaks must not be held up */
--		atomic_inc(&ses->server->inFlight);
-+		atomic_inc(&server->inFlight);
- 		return 0;
- 	}
+@@ -308,6 +312,9 @@ static int allocate_mid(struct cifsSesInfo *ses, struct smb_hdr *in_buf,
+ 	*ppmidQ = AllocMidQEntry(in_buf, ses->server);
+ 	if (*ppmidQ == NULL)
+ 		return -ENOMEM;
++	spin_lock(&GlobalMid_Lock);
++	list_add_tail(&(*ppmidQ)->qhead, &ses->server->pending_mid_q);
++	spin_unlock(&GlobalMid_Lock);
+ 	return 0;
+ }
  
- 	spin_lock(&GlobalMid_Lock);
- 	while (1) {
--		if (atomic_read(&ses->server->inFlight) >=
--				cifs_max_pending){
-+		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
- 			spin_unlock(&GlobalMid_Lock);
- #ifdef CONFIG_CIFS_STATS2
--			atomic_inc(&ses->server->num_waiters);
-+			atomic_inc(&server->num_waiters);
- #endif
--			wait_event(ses->server->request_q,
--				   atomic_read(&ses->server->inFlight)
-+			wait_event(server->request_q,
-+				   atomic_read(&server->inFlight)
- 				     < cifs_max_pending);
- #ifdef CONFIG_CIFS_STATS2
--			atomic_dec(&ses->server->num_waiters);
-+			atomic_dec(&server->num_waiters);
- #endif
- 			spin_lock(&GlobalMid_Lock);
- 		} else {
--			if (ses->server->tcpStatus == CifsExiting) {
-+			if (server->tcpStatus == CifsExiting) {
- 				spin_unlock(&GlobalMid_Lock);
- 				return -ENOENT;
+@@ -508,7 +515,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
  			}
-@@ -278,7 +278,7 @@ static int wait_for_free_request(struct cifsSesInfo *ses, const int long_op)
- 
- 			/* update # of requests on the wire to server */
- 			if (long_op != CIFS_BLOCKING_OP)
--				atomic_inc(&ses->server->inFlight);
-+				atomic_inc(&server->inFlight);
- 			spin_unlock(&GlobalMid_Lock);
- 			break;
  		}
-@@ -413,7 +413,7 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
+ 		spin_unlock(&GlobalMid_Lock);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		/* Update # of requests on wire to server */
+ 		atomic_dec(&ses->server->inFlight);
+ 		wake_up(&ses->server->request_q);
+@@ -564,14 +571,14 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 		if ((flags & CIFS_NO_RESP) == 0)
+ 			midQ->resp_buf = NULL;  /* mark it so buf will
+ 						   not be freed by
+-						   DeleteMidQEntry */
++						   delete_mid */
+ 	} else {
+ 		rc = -EIO;
+ 		cFYI(1, "Bad MID state?");
+ 	}
  
--	rc = wait_for_free_request(ses, long_op);
-+	rc = wait_for_free_request(ses->server, long_op);
+ out:
+-	DeleteMidQEntry(midQ);
++	delete_mid(midQ);
+ 	atomic_dec(&ses->server->inFlight);
+ 	wake_up(&ses->server->request_q);
+ 
+@@ -699,7 +706,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 			}
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		/* Update # of requests on wire to server */
+ 		atomic_dec(&ses->server->inFlight);
+ 		wake_up(&ses->server->request_q);
+@@ -755,7 +762,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 	}
+ 
+ out:
+-	DeleteMidQEntry(midQ);
++	delete_mid(midQ);
+ 	atomic_dec(&ses->server->inFlight);
+ 	wake_up(&ses->server->request_q);
+ 
+@@ -863,7 +870,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 
+ 	rc = cifs_sign_smb(in_buf, ses->server, &midQ->sequence_number);
  	if (rc) {
- 		cifs_small_buf_release(in_buf);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		mutex_unlock(&ses->server->srv_mutex);
  		return rc;
-@@ -610,7 +610,7 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
- 		return -EIO;
+ 	}
+@@ -880,7 +887,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 	mutex_unlock(&ses->server->srv_mutex);
+ 
+ 	if (rc < 0) {
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		return rc;
  	}
  
--	rc = wait_for_free_request(ses, long_op);
-+	rc = wait_for_free_request(ses->server, long_op);
- 	if (rc)
- 		return rc;
+@@ -902,7 +909,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
  
-@@ -845,7 +845,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
- 		return -EIO;
+ 			rc = send_nt_cancel(tcon, in_buf, midQ);
+ 			if (rc) {
+-				DeleteMidQEntry(midQ);
++				delete_mid(midQ);
+ 				return rc;
+ 			}
+ 		} else {
+@@ -914,7 +921,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 			/* If we get -ENOLCK back the lock may have
+ 			   already been removed. Don't exit in this case. */
+ 			if (rc && rc != -ENOLCK) {
+-				DeleteMidQEntry(midQ);
++				delete_mid(midQ);
+ 				return rc;
+ 			}
+ 		}
+@@ -951,7 +958,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 			}
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+-		DeleteMidQEntry(midQ);
++		delete_mid(midQ);
+ 		return rc;
  	}
  
--	rc = wait_for_free_request(ses, CIFS_BLOCKING_OP);
-+	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
- 	if (rc)
- 		return rc;
+@@ -1001,7 +1008,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 		BCC(out_buf) = le16_to_cpu(BCC_LE(out_buf));
  
+ out:
+-	DeleteMidQEntry(midQ);
++	delete_mid(midQ);
+ 	if (rstart && rc == -EACCES)
+ 		return -ERESTARTSYS;
+ 	return rc;
 -- 
 1.7.3.4
