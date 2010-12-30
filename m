@@ -1,37 +1,83 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Connection problems using kerberos against EMC Celerra servers
-Date: Thu, 30 Dec 2010 08:25:39 -0500
-Message-ID: <20101230082539.70bd0ae5@tlielax.poochiereds.net>
-References: <1293525693-11562-1-git-send-email-metze@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: simplify SMB header check routine
+Date: Thu, 30 Dec 2010 08:36:34 -0500
+Message-ID: <1293716194-23140-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1293525693-11562-1-git-send-email-metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 28 Dec 2010 09:41:30 +0100
-Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/misc.c |   46 ++++++++++++++++++++++++----------------------
+ 1 files changed, 24 insertions(+), 22 deletions(-)
 
-> EMC Celerra server reject session setups with
-> RPC_NT_INVALID_BINDING (0xc0020003) if the authenticator checksum
-> uses CKSUMTYPE_HMAC_MD5(-138).
-> 
-> The correct fix for this is to use the GSSAPI checksum,
-> see http://tools.ietf.org/html/rfc4121.
-> 
-> See also https://bugzilla.samba.org/show_bug.cgi?id=7890
-> 
-> metze
-> 
-
-These tested out fine for me. All 3 patches pushed to cifs-utils master
-branch. They should make the 4.8 release, which I'll plan to put out
-once I coordinate some manpage updates with Steve's plans for 2.6.38.
-
-Thanks!
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index b3df037..c1f2a51 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -381,29 +381,31 @@ header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
+ }
+ 
+ static int
+-checkSMBhdr(struct smb_hdr *smb, __u16 mid)
++check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+ {
+-	/* Make sure that this really is an SMB, that it is a response,
+-	   and that the message ids match */
+-	if ((*(__le32 *) smb->Protocol == cpu_to_le32(0x424d53ff)) &&
+-		(mid == smb->Mid)) {
+-		if (smb->Flags & SMBFLG_RESPONSE)
+-			return 0;
+-		else {
+-		/* only one valid case where server sends us request */
+-			if (smb->Command == SMB_COM_LOCKING_ANDX)
+-				return 0;
+-			else
+-				cERROR(1, "Received Request not response");
+-		}
+-	} else { /* bad signature or mid */
+-		if (*(__le32 *) smb->Protocol != cpu_to_le32(0x424d53ff))
+-			cERROR(1, "Bad protocol string signature header %x",
+-				*(unsigned int *) smb->Protocol);
+-		if (mid != smb->Mid)
+-			cERROR(1, "Mids do not match");
++	/* does it have the right SMB "signature" ? */
++	if (*(__le32 *) smb->Protocol != cpu_to_le32(0x424d53ff)) {
++		cERROR(1, "Bad protocol string signature header 0x%x",
++			*(unsigned int *)smb->Protocol);
++		return 1;
++	}
++
++	/* Make sure that message ids match */
++	if (mid != smb->Mid) {
++		cERROR(1, "Mids do not match. received=%u expected=%u",
++			smb->Mid, mid);
++		return 1;
+ 	}
+-	cERROR(1, "bad smb detected. The Mid=%d", smb->Mid);
++
++	/* if it's a response then accept */
++	if (smb->Flags & SMBFLG_RESPONSE)
++		return 0;
++
++	/* only one valid case where server sends us request */
++	if (smb->Command == SMB_COM_LOCKING_ANDX)
++		return 0;
++
++	cERROR(1, "Server sent request, not response. mid=%u", smb->Mid);
+ 	return 1;
+ }
+ 
+@@ -448,7 +450,7 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 		return 1;
+ 	}
+ 
+-	if (checkSMBhdr(smb, mid))
++	if (check_smb_hdr(smb, mid))
+ 		return 1;
+ 	clc_len = smbCalcSize_LE(smb);
+ 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.3.4
