@@ -1,58 +1,94 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: switch cifs_open and cifs_create to use CIFSSMBUnixSetFileInfo
-Date: Tue,  4 Jan 2011 08:16:36 -0500
-Message-ID: <1294146996-25591-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: switch cifs_open and cifs_create to use CIFSSMBUnixSetFileInfo
+Date: Tue, 4 Jan 2011 09:17:26 -0600
+Message-ID: <AANLkTimQwrJzF_pQLPdT24kb4R=eGNKBn7D2kM3S0xht@mail.gmail.com>
+References: <1294146996-25591-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1294146996-25591-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We call CIFSSMBUnixSetPathInfo in these functions, but we have a
-filehandle since an open was just done. Switch these functions to
-use CIFSSMBUnixSetFileInfo instead.
+On Tue, Jan 4, 2011 at 7:16 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> We call CIFSSMBUnixSetPathInfo in these functions, but we have a
+> filehandle since an open was just done. Switch these functions to
+> use CIFSSMBUnixSetFileInfo instead.
+>
+> In practice, these codepaths are only used if posix opens are broken.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/dir.c =A0| =A0 =A06 ++----
+> =A0fs/cifs/file.c | =A0 =A06 ++----
+> =A02 files changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 521d841..d9b46bf 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -293,10 +293,8 @@ cifs_create(struct inode *inode, struct dentry *=
+direntry, int mode,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0args.uid =3D NO_CHANGE=
+_64;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0args.gid =3D NO_CHANGE=
+_64;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFSSMBUnixSetPathInfo(xid, tcon, full_=
+path, &args,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 cifs_sb->local_nls,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 cifs_sb->mnt_cifs_flags &
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 CIFS_MOUNT_MAP_SPECIAL_CHR);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFSSMBUnixSetFileInfo(xid, tcon, &args=
+, fileHandle,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 current->tgid);
+> =A0 =A0 =A0 =A0} else {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* BB implement mode setting via Windo=
+ws security
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 descriptors e.g. */
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index a7b8a37..4007e60 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -424,10 +424,8 @@ int cifs_open(struct inode *inode, struct file *=
+file)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0.mtime =A0=3D NO_CHANG=
+E_64,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0.device =3D 0,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0};
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFSSMBUnixSetPathInfo(xid, tcon, full_=
+path, &args,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0cifs_sb->local_nls,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0cifs_sb->mnt_cifs_flags &
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 CIFS_MOUNT_MAP_SPECIAL_CHR);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFSSMBUnixSetFileInfo(xid, tcon, &args=
+, netfid,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 pCifsFile->pid);
+> =A0 =A0 =A0 =A0}
+>
+> =A0out:
+> --
+> 1.7.3.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
-In practice, these codepaths are only used if posix opens are broken.
-
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/dir.c  |    6 ++----
- fs/cifs/file.c |    6 ++----
- 2 files changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 521d841..d9b46bf 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -293,10 +293,8 @@ cifs_create(struct inode *inode, struct dentry *direntry, int mode,
- 			args.uid = NO_CHANGE_64;
- 			args.gid = NO_CHANGE_64;
- 		}
--		CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
--					cifs_sb->local_nls,
--					cifs_sb->mnt_cifs_flags &
--						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		CIFSSMBUnixSetFileInfo(xid, tcon, &args, fileHandle,
-+					current->tgid);
- 	} else {
- 		/* BB implement mode setting via Windows security
- 		   descriptors e.g. */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index a7b8a37..4007e60 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -424,10 +424,8 @@ int cifs_open(struct inode *inode, struct file *file)
- 			.mtime	= NO_CHANGE_64,
- 			.device	= 0,
- 		};
--		CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
--				       cifs_sb->local_nls,
--				       cifs_sb->mnt_cifs_flags &
--					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		CIFSSMBUnixSetFileInfo(xid, tcon, &args, netfid,
-+					pCifsFile->pid);
- 	}
- 
- out:
--- 
-1.7.3.4
+Would a filehandle always remain valid between open and set?
+Could there be a reconnect in between these calls thus making
+a filehandle invalid and failing a setfileinfo which otherwise would
+succeed with setpathinfo?
