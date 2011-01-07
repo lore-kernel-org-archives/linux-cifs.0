@@ -1,92 +1,39 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: just ignore extra junk at the end of the SMB
-Date: Fri, 7 Jan 2011 08:34:29 -0500
-Message-ID: <20110107083429.7f52b14d@tlielax.poochiereds.net>
-References: <1293025147-11338-1-git-send-email-jlayton@redhat.com>
-	<4D26AA23.9040603@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 0/5] cifs.upcall: add keytab support for unattended mounts
+Date: Fri,  7 Jan 2011 09:11:40 -0500
+Message-ID: <1294409505-2999-1-git-send-email-jlayton@samba.org>
+Cc: niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D26AA23.9040603-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 07 Jan 2011 11:22:35 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+This patchset is based on one originally proposed by Igor Mammedov back
+in 2008. For some reason (maybe my fault?) his patch was never committed
+and cifs.upcall has been unable to use keytabs for mounting since then.
 
-> On 12/22/2010 07:09 PM, Jeff Layton wrote:
-> > If the server sends us a RFC1001 length that's larger than the SMB,
-> > then there's no reason to get our panties in a bunch and spew printk's,
-> > and there's certainly no reason just ignore the response completely like
-> > we do today. Just ignore the extra stuff on the end.
-> > 
-> > This fixes:
-> > 
-> >     https://bugzilla.samba.org/show_bug.cgi?id=7860
-> > 
-> > Reported-by: Marcus Schopen <marcus-dLPT46B32WUjnolme5KbmQ@public.gmane.org>
-> > Tested-by: Burkhard Obergoeker <burkhard.obergoeker-VYBfkVvgaNUmRHQWxfeBDQ@public.gmane.org>
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/misc.c |   25 ++++++-------------------
-> >  1 files changed, 6 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> > index 43f1028..b3df037 100644
-> > --- a/fs/cifs/misc.c
-> > +++ b/fs/cifs/misc.c
-> > @@ -465,26 +465,13 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
-> >  			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
-> >  				return 0; /* bcc wrapped */
-> >  		}
-> > -		cFYI(1, "Calculated size %d vs length %d mismatch for mid %d",
-> > +
-> > +		/*
-> > +		 * We allow the server to send us an arbitrary amount of junk
-> > +		 * at the end of the SMB. Just ignore it.
-> > +		 */
-> > +		cFYI(1, "Calculated size %u vs length %u mismatch for mid %u",
-> >  				clc_len, 4 + len, smb->Mid);
-> > -		/* Windows XP can return a few bytes too much, presumably
-> > -		an illegal pad, at the end of byte range lock responses
-> > -		so we allow for that three byte pad, as long as actual
-> > -		received length is as long or longer than calculated length */
-> > -		/* We have now had to extend this more, since there is a
-> > -		case in which it needs to be bigger still to handle a
-> > -		malformed response to transact2 findfirst from WinXP when
-> > -		access denied is returned and thus bcc and wct are zero
-> > -		but server says length is 0x21 bytes too long as if the server
-> > -		forget to reset the smb rfc1001 length when it reset the
-> > -		wct and bcc to minimum size and drop the t2 parms and data */
-> > -		if ((4+len > clc_len) && (len <= clc_len + 512))
-> > -			return 0;
-> > -		else {
-> > -			cERROR(1, "RFC1001 size %d bigger than SMB for Mid=%d",
-> > -					len, smb->Mid);
-> > -			return 1;
-> > -		}
-> >  	}
-> >  	return 0;
-> >  }
-> 
-> Where do we stand w.r.t this patch? Though it looks OK to me, IIRC,
-> Steve had some concerns in make the checks less stricter. Steve?
-> 
-> 
+The first few patches in the series clean up the key description parser
+and some of the other code. The last patch adds the actual keytab
+support. For now, the code is only able to use the systemwide default
+keytab. Eventually, we could extend that to point to other keytabs, but
+we need to think about the right way to pass that location to the upcall
+program.
 
-Ahh, I haven't see where Steve commented on this patch...
+Also, I've only tested this against MIT kerberos. If Heimdal or other
+krb5 implementations need special casing, I'd appreciate review that
+points that out.
 
-I think this is safe though. The SMB packet sits inside of a RFC1001
-"container". All this patch is saying is that if the RFC1001 container
-is larger than the SMB then just ignore any remaining data after it.
+Lightly tested on my own test rig and it seems to work correctly.
 
-Apparently, Netapps send some extra junk at the end of some SMBs and
-that runs afoul of the above checks. The server is clearly broken in
-this regard, but I see no reason for us to reject such packets outright
-since we can easily deal with them.
+Jeff Layton (5):
+  cifs.upcall: consolidate find_krb5_cc calls
+  cifs.upcall: clean up key description decoding routine
+  cifs.upcall: save off username field from key description
+  cifs.upcall: debug logging for the key description parser
+  cifs.upcall: add keytab support for unattended mounts
+
+ cifs.upcall.c |  161 ++++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 files changed, 132 insertions(+), 29 deletions(-)
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.3.4
