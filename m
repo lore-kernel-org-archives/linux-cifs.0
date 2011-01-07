@@ -1,78 +1,76 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Fix regression during share-level security mounts
-Date: Thu, 6 Jan 2011 14:03:29 -0600
-Message-ID: <AANLkTikjyaCsg+9mv2yPoS5=aB-SmM-rXnk5wfALpxRC@mail.gmail.com>
-References: <1294327443-24293-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH] cifs: just ignore extra junk at the end of the SMB
+Date: Fri, 07 Jan 2011 11:22:35 +0530
+Message-ID: <4D26AA23.9040603@suse.de>
+References: <1293025147-11338-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Transfer-Encoding: 7bit
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1294327443-24293-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1293025147-11338-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Once this is tested, make sure to add the cc: stable
-
-On Thu, Jan 6, 2011 at 9:24 AM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->
->
-> NTLM response length was changed during to 16 bytes instead of 24 byt=
-es
-> that get sent in Tree Connection Request during share-level security
-> share mounts. =A0Revert it back to 24 bytes.
->
->
-> Reported-by: Grzegorz Ozanski <grzegorz.ozanski-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On 12/22/2010 07:09 PM, Jeff Layton wrote:
+> If the server sends us a RFC1001 length that's larger than the SMB,
+> then there's no reason to get our panties in a bunch and spew printk's,
+> and there's certainly no reason just ignore the response completely like
+> we do today. Just ignore the extra stuff on the end.
+> 
+> This fixes:
+> 
+>     https://bugzilla.samba.org/show_bug.cgi?id=7860
+> 
+> Reported-by: Marcus Schopen <marcus-dLPT46B32WUjnolme5KbmQ@public.gmane.org>
+> Tested-by: Burkhard Obergoeker <burkhard.obergoeker-VYBfkVvgaNUmRHQWxfeBDQ@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> =A0fs/cifs/connect.c | =A0 =A04 ++--
-> =A01 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 41f002f..cdba196 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2966,7 +2966,7 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *=
-ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bcc_ptr++; =A0 =A0 =A0 =A0 =A0 =A0 =A0=
-/* skip password */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* already aligned so no need to do it=
- below */
-> =A0 =A0 =A0 =A0} else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->PasswordLength =3D cpu_to_le16(CI=
-=46S_SESS_KEY_SIZE);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 pSMB->PasswordLength =3D cpu_to_le16(CI=
-=46S_AUTH_RESP_SIZE);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* BB FIXME add code to fail this if N=
-TLMv2 or Kerberos
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 specified as required (when that =
-support is added to
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 the vfs in the future) as only NT=
-LM or the much
-> @@ -2984,7 +2984,7 @@ CIFSTCon(unsigned int xid, struct cifsSesInfo *=
-ses,
-> =A0#endif /* CIFS_WEAK_PW_HASH */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0SMBNTencrypt(tcon->password, ses->serv=
-er->cryptkey, bcc_ptr);
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 bcc_ptr +=3D CIFS_SESS_KEY_SIZE;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 bcc_ptr +=3D CIFS_AUTH_RESP_SIZE;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (ses->capabilities & CAP_UNICODE) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* must align unicode =
-strings */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*bcc_ptr =3D 0; /* nul=
-l byte password */
-> --
-> 1.6.0.2
->
->
+>  fs/cifs/misc.c |   25 ++++++-------------------
+>  1 files changed, 6 insertions(+), 19 deletions(-)
+> 
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index 43f1028..b3df037 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -465,26 +465,13 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+>  			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
+>  				return 0; /* bcc wrapped */
+>  		}
+> -		cFYI(1, "Calculated size %d vs length %d mismatch for mid %d",
+> +
+> +		/*
+> +		 * We allow the server to send us an arbitrary amount of junk
+> +		 * at the end of the SMB. Just ignore it.
+> +		 */
+> +		cFYI(1, "Calculated size %u vs length %u mismatch for mid %u",
+>  				clc_len, 4 + len, smb->Mid);
+> -		/* Windows XP can return a few bytes too much, presumably
+> -		an illegal pad, at the end of byte range lock responses
+> -		so we allow for that three byte pad, as long as actual
+> -		received length is as long or longer than calculated length */
+> -		/* We have now had to extend this more, since there is a
+> -		case in which it needs to be bigger still to handle a
+> -		malformed response to transact2 findfirst from WinXP when
+> -		access denied is returned and thus bcc and wct are zero
+> -		but server says length is 0x21 bytes too long as if the server
+> -		forget to reset the smb rfc1001 length when it reset the
+> -		wct and bcc to minimum size and drop the t2 parms and data */
+> -		if ((4+len > clc_len) && (len <= clc_len + 512))
+> -			return 0;
+> -		else {
+> -			cERROR(1, "RFC1001 size %d bigger than SMB for Mid=%d",
+> -					len, smb->Mid);
+> -			return 1;
+> -		}
+>  	}
+>  	return 0;
+>  }
+
+Where do we stand w.r.t this patch? Though it looks OK to me, IIRC,
+Steve had some concerns in make the checks less stricter. Steve?
 
 
-
---=20
-Thanks,
-
-Steve
+-- 
+Suresh Jayaraman
