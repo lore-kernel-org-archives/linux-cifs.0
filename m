@@ -1,207 +1,219 @@
-From: Matt Helsley <matthltc-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Teach cifs about network namespaces.
-Date: Mon, 10 Jan 2011 23:12:39 -0800
-Message-ID: <20110111071239.GL29064@count0.beaverton.ibm.com>
-References: <4D2BDE07.40202@parallels.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH] cifs: add mount option to handle stat() failures by 32-bit
+ apps
+Date: Tue, 11 Jan 2011 16:10:37 +0530
+Message-ID: <4D2C33A5.9000801@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Pavel Emelyanov <xemul-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>, kir-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org,
-	containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <4D2BDE07.40202-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Jan 10, 2011 at 10:35:19PM -0600, Rob Landley wrote:
-> From: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-> 
-> Teach cifs about network namespaces, so mounting uses adresses and
-> routing visible from a container rather than from init context.
-> 
-> For a long drawn out test reproduction sequence, see:
-> 
->   http://landley.livejournal.com/47024.html
->   http://landley.livejournal.com/47205.html
->   http://landley.livejournal.com/47476.html
-> 
-> Signed-off-by: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-> ---
-> 
->  fs/cifs/cifsglob.h |   32 ++++++++++++++++++++++++++++++++
->  fs/cifs/connect.c  |   22 +++++++++++++++++-----
->  2 files changed, 49 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 7136c0c..86f31bb 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -168,6 +168,9 @@ struct TCP_Server_Info {
->  		struct sockaddr_in6 sockAddr6;
->  	} addr;
->  	struct sockaddr_storage srcaddr; /* locally bind to this IP */
-> +#ifdef CONFIG_NET_NS
-> +	struct net *net;
-> +#endif
+..compiled without LFS support, but running on 64-bit kernel.
 
-I'm assuming this bit is correct -- don't know enough about CIFS to be
-sure...
+Currently, when a broken (compiled without LFS support) 32-bit application on
+a 64-bit kernel tries to do a stat(), it fails with -EOVERFLOW error. This
+problem happens because the 32-bit application is unable to fit the huge
+64-bit inode number in its target structure field.
 
->  	wait_queue_head_t response_q;
->  	wait_queue_head_t request_q; /* if more than maxmpx to srvr must block*/
->  	struct list_head pending_mid_q;
-> @@ -227,6 +230,35 @@ struct TCP_Server_Info {
->  };
-> 
->  /*
-> + * Macros to allow the TCP_Server_Info->net field and related code to drop out
-> + * when CONFIG_NET_NS isn't set.
-> + */
-> +
-> +static inline struct net *
-> +cifs_net_ns(struct TCP_Server_Info *srv)
-> +{
-> +#ifdef CONFIG_NET_NS
-> +	return srv->net;
-> +#else
-> +	return &init_net;
-> +#endif
-> +}
+This problem could be reproduced by mounting a filesystem that supports 64-bit
+inodes (in my case it is a Windows 2003 Server with NTFS) and using the below
+reproducer to stat files/dir in the mounted filesystem.
 
-I thought style dictated we do this a different way:
+Reproducer
+----------
 
-#ifdef CONFIG_NET_NS
-static inline struct net * cifs_net_ns(struct TCP_Server_Info *srv)
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+main(int argc, char *argv[])
 {
-	return srv->net;
+        struct stat sb;
+        if (argc != 2) {
+                fprintf(stderr, "Usage: %s <pathname>\n", argv[0]);
+                exit(EXIT_FAILURE);
+        }
+
+        if (stat(argv[1], &sb) == -1) {
+                perror("stat");
+                exit(EXIT_FAILURE);
+        }
+
+        printf("File type: ");
+        switch (sb.st_mode & S_IFMT) {
+
+        case S_IFDIR:   printf("directory\n"); break;
+        case S_IFLNK:   printf("link\n"); break;
+        case S_IFREG:   printf("regular file\n"); break;
+        default:        printf("not a regular file or directory or symlink\n");
+        }
+
+        printf("inode number: %ld\n", (long) sb.st_ino);
+
+        exit(EXIT_SUCCESS);
 }
-<other CONFIG_NET_NS cases>
-#else
-static inline struct net * cifs_net_ns(struct TCP_Server_Info *srv)
-{
-	return &init_net;
-}
-<other no-ops>
-#endif /* CONFIG_NET_NS */
 
-> +
-> +static inline void
-> +cifs_set_net_ns(struct TCP_Server_Info *srv, struct net *net)
-> +{
-> +#ifdef CONFIG_NET_NS
-> +	srv->net = net;
-> +#endif
-> +}
-> +
-> +#ifdef CONFIG_NET_NS
-> +#define cifs_use_net_ns() (1)
-> +#else
-> +#define cifs_use_net_ns() (0)
-> +#endif
+Ideally, these 32-bit applications should be built with -D_FILE_OFFSET_BITS=64
+if they are running on a 64-bit kernel and they should be considered broken if
+they are not.i However, there are quite a few applications that are not doing
+so.
 
-This looks wrong -- we shouldn't need this at all. The #ifdef bits in
-your patch already make all the cases below become empty/no-ops when
-CONFIG_NET_NS=n.
+To workaround this issue, this patch introduces a mount option:
+   -o noinode64	- squashes 64-bit inode number to 32-bits for such applications
+   -o inode64	- supports 64-bit inodes (default behavior)
 
-> +
-> +/*
->   * Session structure.  One of these for each uid session with a particular host
->   */
->  struct cifsSesInfo {
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index cc1a860..b4faef0 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1545,6 +1545,10 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
-> 
->  	spin_lock(&cifs_tcp_ses_lock);
->  	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-> +		if (cifs_use_net_ns()
-> +		    && cifs_net_ns(server) == current->nsproxy->net_ns)
-> +			continue;
+Testing: This patch has been tested using the above mentioned reproducer. Also,
+verified that the hardlinks are seen properly.
 
-This looks wrong -- you want to invert part of this I think (and drop the
-unnecessary cifs_use_net_ns()):
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/cifs_fs_sb.h |    1 +
+ fs/cifs/cifsfs.c     |    4 ++++
+ fs/cifs/cifsfs.h     |   16 ++++++++++++++++
+ fs/cifs/connect.c    |   10 ++++++++++
+ fs/cifs/inode.c      |    4 ++++
+ fs/cifs/readdir.c    |    5 ++++-
+ 6 files changed, 39 insertions(+), 1 deletions(-)
 
-	if (cifs_net_ns(server) != current->nsproxy->net_ns)
-		continue;
-
-This is obvious when you note that the context below shows that we
-'continue' to the next entry when the addresses don't match:
-
-> +
->  		if (!match_address(server, addr,
->  				   (struct sockaddr *)&vol->srcaddr))
->  			continue;
-> @@ -1572,6 +1576,9 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
->  		return;
->  	}
-> 
-> +	if (cifs_use_net_ns())
-> +		put_net(cifs_net_ns(server));
-> +
-
-I think this should just be:
-
-	put_net(cifs_net_ns(server));
-
->  	list_del_init(&server->tcp_ses_list);
->  	spin_unlock(&cifs_tcp_ses_lock);
-> 
-> @@ -1677,6 +1684,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->  	       sizeof(tcp_ses->srcaddr));
->  	++tcp_ses->srv_count;
-> 
-> +	if (cifs_use_net_ns())
-> +		cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
-> +
-
-Just use cifs_set_net_ns() because it already turns into a no-op when
-CONFIG_NET_NS=n
-
->  	if (addr.ss_family == AF_INET6) {
->  		cFYI(1, "attempting ipv6 connect");
->  		/* BB should we allow ipv6 on port 139? */
-> @@ -1720,6 +1730,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->  out_err_crypto_release:
->  	cifs_crypto_shash_release(tcp_ses);
-> 
-> +	if (cifs_use_net_ns())
-> +		put_net(cifs_net_ns(tcp_ses));
-
-etc.
-
-> +
->  out_err:
->  	if (tcp_ses) {
->  		if (!IS_ERR(tcp_ses->hostname))
-> @@ -2145,8 +2158,8 @@ ipv4_connect(struct TCP_Server_Info *server)
->  	struct socket *socket = server->ssocket;
-> 
->  	if (socket == NULL) {
-> -		rc = sock_create_kern(PF_INET, SOCK_STREAM,
-> -				      IPPROTO_TCP, &socket);
-> +		rc = __sock_create(cifs_net_ns(server), PF_INET,
-> +				   SOCK_STREAM, IPPROTO_TCP, &socket, 1);
->  		if (rc < 0) {
->  			cERROR(1, "Error %d creating socket", rc);
->  			return rc;
-> @@ -2310,11 +2323,10 @@ ipv6_connect(struct TCP_Server_Info *server)
->  	struct socket *socket = server->ssocket;
-> 
->  	if (socket == NULL) {
-> -		rc = sock_create_kern(PF_INET6, SOCK_STREAM,
-> -				      IPPROTO_TCP, &socket);
-> +		rc = __sock_create(cifs_net_ns(server), PF_INET6,
-> +				   SOCK_STREAM, IPPROTO_TCP, &socket, 1);
->  		if (rc < 0) {
->  			cERROR(1, "Error %d creating ipv6 socket", rc);
-> -			socket = NULL;
->  			return rc;
->  		}
-> 
-> _______________________________________________
-> Containers mailing list
-> Containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-> https://lists.linux-foundation.org/mailman/listinfo/containers
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 7852cd6..2563d26 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -40,6 +40,7 @@
+ #define CIFS_MOUNT_FSCACHE	0x8000 /* local caching enabled */
+ #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+ #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
++#define CIFS_MOUNT_32BIT_INODES	0x40000 /* squash to 32-bits */
+ 
+ struct cifs_sb_info {
+ 	struct rb_root tlink_tree;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5e7075d..6b370e8 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -473,6 +473,10 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 		seq_printf(s, ",mfsymlinks");
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)
+ 		seq_printf(s, ",fsc");
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_32BIT_INODES)
++		seq_printf(s, ",noinode64");
++	else
++		seq_printf(s, ",inode64");
+ 
+ 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+ 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 897b2b2..e01d9e3 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -22,6 +22,8 @@
+ #ifndef _CIFSFS_H
+ #define _CIFSFS_H
+ 
++#include <linux/compat.h>
++
+ #define ROOT_I 2
+ 
+ /*
+@@ -37,6 +39,20 @@ cifs_uniqueid_to_ino_t(u64 fileid)
+ 	return ino;
+ }
+ 
++static inline u64
++cifs_compat_user_ino64(u64 fileid)
++{
++#ifdef CONFIG_COMPAT
++	compat_ulong_t ino;
++#else
++	unsigned long ino;
++#endif
++	ino = fileid;
++	if (sizeof(ino) < sizeof(u64))
++		ino ^= fileid >> (sizeof(u64)-sizeof(ino)) * 8;
++	return ino;
++}
++
+ extern struct file_system_type cifs_fs_type;
+ extern const struct address_space_operations cifs_addr_ops;
+ extern const struct address_space_operations cifs_addr_ops_smallbuf;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index a65d311..7fdb361 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -101,6 +101,7 @@ struct smb_vol {
+ 	bool fsc:1;	/* enable fscache */
+ 	bool mfsymlinks:1; /* use Minshall+French Symlinks */
+ 	bool multiuser:1;
++	bool inode64:1;
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -836,6 +837,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 	vol->posix_paths = 1;
+ 	/* default to using server inode numbers where available */
+ 	vol->server_ino = 1;
++	/* default to support 64-bit inode numbers */
++	vol->inode64 = 1;
+ 
+ 	vol->actimeo = CIFS_DEF_ACTIMEO;
+ 
+@@ -1368,6 +1371,10 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 			vol->mfsymlinks = true;
+ 		} else if (strnicmp(data, "multiuser", 8) == 0) {
+ 			vol->multiuser = true;
++		} else if (strnicmp(data, "inode64", 7) == 0) {
++			vol->inode64 = 1;
++		} else if (strnicmp(data, "noinode64", 9) == 0) {
++			vol->inode64 = 0;
+ 		} else
+ 			printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
+ 						data);
+@@ -2578,6 +2585,9 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+ 	if (pvolume_info->multiuser)
+ 		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
+ 					    CIFS_MOUNT_NO_PERM);
++	if (!pvolume_info->inode64)
++		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_32BIT_INODES;
++
+ 	if (pvolume_info->direct_io) {
+ 		cFYI(1, "mounting share using direct i/o");
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 0c7e369..b31c8d9 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1791,6 +1791,10 @@ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+ 			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
+ 				stat->gid = current_fsgid();
+ 		}
++
++		/* squash to 32-bits if 'noinode64' option is enabled */
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_32BIT_INODES)
++			stat->ino = cifs_uniqueid_to_ino_t(stat->ino);
+ 	}
+ 	return err;
+ }
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 76b1b37..b902fd0 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -754,7 +754,10 @@ static int cifs_filldir(char *pfindEntry, struct file *file, filldir_t filldir,
+ 		 */
+ 		fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
+ 
+-	ino = cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_32BIT_INODES)
++		ino = cifs_compat_user_ino64(fattr.cf_uniqueid);
++	else
++		ino = cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
+ 	tmp_dentry = cifs_readdir_lookup(file->f_dentry, &qstring, &fattr);
+ 
+ 	rc = filldir(direntry, qstring.name, qstring.len, file->f_pos,
