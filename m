@@ -1,87 +1,158 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: Re: [PATCH] cifs: just ignore extra junk at the end of the SMB
-Date: Mon, 10 Jan 2011 10:13:34 +0530
-Message-ID: <4D2A8E76.2090405@suse.de>
-References: <1293025147-11338-1-git-send-email-jlayton@redhat.com>	<4D26AA23.9040603@suse.de> <20110107083429.7f52b14d@tlielax.poochiereds.net>
+From: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+Subject: [PATCH] Teach cifs about network namespaces.
+Date: Mon, 10 Jan 2011 22:35:19 -0600
+Message-ID: <4D2BDE07.40202@parallels.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110107083429.7f52b14d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+To: Pavel Emelyanov <xemul-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>, <kir-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>,
+        <containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <containers-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Unsubscribe: <https://lists.linux-foundation.org/mailman/listinfo/containers>,
+	<mailto:containers-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linux-foundation.org/pipermail/containers>
+List-Post: <mailto:containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:containers-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linux-foundation.org/mailman/listinfo/containers>,
+	<mailto:containers-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: containers-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: containers-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On 01/07/2011 07:04 PM, Jeff Layton wrote:
-> On Fri, 07 Jan 2011 11:22:35 +0530
-> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
-> 
->> On 12/22/2010 07:09 PM, Jeff Layton wrote:
->>> If the server sends us a RFC1001 length that's larger than the SMB,
->>> then there's no reason to get our panties in a bunch and spew printk's,
->>> and there's certainly no reason just ignore the response completely like
->>> we do today. Just ignore the extra stuff on the end.
->>>
->>> This fixes:
->>>
->>>     https://bugzilla.samba.org/show_bug.cgi?id=7860
->>>
->>> Reported-by: Marcus Schopen <marcus-dLPT46B32WUjnolme5KbmQ@public.gmane.org>
->>> Tested-by: Burkhard Obergoeker <burkhard.obergoeker-VYBfkVvgaNUmRHQWxfeBDQ@public.gmane.org>
->>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>> ---
->>>  fs/cifs/misc.c |   25 ++++++-------------------
->>>  1 files changed, 6 insertions(+), 19 deletions(-)
->>>
->>> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
->>> index 43f1028..b3df037 100644
->>> --- a/fs/cifs/misc.c
->>> +++ b/fs/cifs/misc.c
->>> @@ -465,26 +465,13 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
->>>  			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
->>>  				return 0; /* bcc wrapped */
->>>  		}
->>> -		cFYI(1, "Calculated size %d vs length %d mismatch for mid %d",
->>> +
->>> +		/*
->>> +		 * We allow the server to send us an arbitrary amount of junk
->>> +		 * at the end of the SMB. Just ignore it.
->>> +		 */
->>> +		cFYI(1, "Calculated size %u vs length %u mismatch for mid %u",
->>>  				clc_len, 4 + len, smb->Mid);
->>> -		/* Windows XP can return a few bytes too much, presumably
->>> -		an illegal pad, at the end of byte range lock responses
->>> -		so we allow for that three byte pad, as long as actual
->>> -		received length is as long or longer than calculated length */
->>> -		/* We have now had to extend this more, since there is a
->>> -		case in which it needs to be bigger still to handle a
->>> -		malformed response to transact2 findfirst from WinXP when
->>> -		access denied is returned and thus bcc and wct are zero
->>> -		but server says length is 0x21 bytes too long as if the server
->>> -		forget to reset the smb rfc1001 length when it reset the
->>> -		wct and bcc to minimum size and drop the t2 parms and data */
->>> -		if ((4+len > clc_len) && (len <= clc_len + 512))
->>> -			return 0;
->>> -		else {
->>> -			cERROR(1, "RFC1001 size %d bigger than SMB for Mid=%d",
->>> -					len, smb->Mid);
->>> -			return 1;
->>> -		}
->>>  	}
->>>  	return 0;
->>>  }
->>
->> Where do we stand w.r.t this patch? Though it looks OK to me, IIRC,
->> Steve had some concerns in make the checks less stricter. Steve?
->>
->>
-> 
-> Ahh, I haven't see where Steve commented on this patch...
+From: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
 
-Not on this patch, but elsewhere while discussing an identical issue -
-http://thread.gmane.org/gmane.network.samba.general/117198/focus=1986
+Teach cifs about network namespaces, so mounting uses adresses and
+routing visible from a container rather than from init context.
 
+For a long drawn out test reproduction sequence, see:
 
--- 
-Suresh Jayaraman
+  http://landley.livejournal.com/47024.html
+  http://landley.livejournal.com/47205.html
+  http://landley.livejournal.com/47476.html
+
+Signed-off-by: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+---
+
+ fs/cifs/cifsglob.h |   32 ++++++++++++++++++++++++++++++++
+ fs/cifs/connect.c  |   22 +++++++++++++++++-----
+ 2 files changed, 49 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 7136c0c..86f31bb 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -168,6 +168,9 @@ struct TCP_Server_Info {
+ 		struct sockaddr_in6 sockAddr6;
+ 	} addr;
+ 	struct sockaddr_storage srcaddr; /* locally bind to this IP */
++#ifdef CONFIG_NET_NS
++	struct net *net;
++#endif
+ 	wait_queue_head_t response_q;
+ 	wait_queue_head_t request_q; /* if more than maxmpx to srvr must block*/
+ 	struct list_head pending_mid_q;
+@@ -227,6 +230,35 @@ struct TCP_Server_Info {
+ };
+ 
+ /*
++ * Macros to allow the TCP_Server_Info->net field and related code to drop out
++ * when CONFIG_NET_NS isn't set.
++ */
++
++static inline struct net *
++cifs_net_ns(struct TCP_Server_Info *srv)
++{
++#ifdef CONFIG_NET_NS
++	return srv->net;
++#else
++	return &init_net;
++#endif
++}
++
++static inline void
++cifs_set_net_ns(struct TCP_Server_Info *srv, struct net *net)
++{
++#ifdef CONFIG_NET_NS
++	srv->net = net;
++#endif
++}
++
++#ifdef CONFIG_NET_NS
++#define cifs_use_net_ns() (1)
++#else
++#define cifs_use_net_ns() (0)
++#endif
++
++/*
+  * Session structure.  One of these for each uid session with a particular host
+  */
+ struct cifsSesInfo {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index cc1a860..b4faef0 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1545,6 +1545,10 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
++		if (cifs_use_net_ns()
++		    && cifs_net_ns(server) == current->nsproxy->net_ns)
++			continue;
++
+ 		if (!match_address(server, addr,
+ 				   (struct sockaddr *)&vol->srcaddr))
+ 			continue;
+@@ -1572,6 +1576,9 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
+ 		return;
+ 	}
+ 
++	if (cifs_use_net_ns())
++		put_net(cifs_net_ns(server));
++
+ 	list_del_init(&server->tcp_ses_list);
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+@@ -1677,6 +1684,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	       sizeof(tcp_ses->srcaddr));
+ 	++tcp_ses->srv_count;
+ 
++	if (cifs_use_net_ns())
++		cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
++
+ 	if (addr.ss_family == AF_INET6) {
+ 		cFYI(1, "attempting ipv6 connect");
+ 		/* BB should we allow ipv6 on port 139? */
+@@ -1720,6 +1730,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ out_err_crypto_release:
+ 	cifs_crypto_shash_release(tcp_ses);
+ 
++	if (cifs_use_net_ns())
++		put_net(cifs_net_ns(tcp_ses));
++
+ out_err:
+ 	if (tcp_ses) {
+ 		if (!IS_ERR(tcp_ses->hostname))
+@@ -2145,8 +2158,8 @@ ipv4_connect(struct TCP_Server_Info *server)
+ 	struct socket *socket = server->ssocket;
+ 
+ 	if (socket == NULL) {
+-		rc = sock_create_kern(PF_INET, SOCK_STREAM,
+-				      IPPROTO_TCP, &socket);
++		rc = __sock_create(cifs_net_ns(server), PF_INET,
++				   SOCK_STREAM, IPPROTO_TCP, &socket, 1);
+ 		if (rc < 0) {
+ 			cERROR(1, "Error %d creating socket", rc);
+ 			return rc;
+@@ -2310,11 +2323,10 @@ ipv6_connect(struct TCP_Server_Info *server)
+ 	struct socket *socket = server->ssocket;
+ 
+ 	if (socket == NULL) {
+-		rc = sock_create_kern(PF_INET6, SOCK_STREAM,
+-				      IPPROTO_TCP, &socket);
++		rc = __sock_create(cifs_net_ns(server), PF_INET6,
++				   SOCK_STREAM, IPPROTO_TCP, &socket, 1);
+ 		if (rc < 0) {
+ 			cERROR(1, "Error %d creating ipv6 socket", rc);
+-			socket = NULL;
+ 			return rc;
+ 		}
