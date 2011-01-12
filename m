@@ -1,172 +1,97 @@
 From: "Q (Igor Mammedov)" <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 5/5] cifs.upcall: add keytab support for unattended mounts
-Date: Wed, 12 Jan 2011 09:56:34 +0300
-Message-ID: <AANLkTimxsXh5LgVD690=xjfiqgnELNMQObVUa5Yjkote@mail.gmail.com>
+Subject: Re: [PATCH 4/5] cifs.upcall: debug logging for the key description parser
+Date: Wed, 12 Jan 2011 09:57:08 +0300
+Message-ID: <AANLkTimh5pvhtgoWk5+uVc0JTWpzeKiUfBkKh+3vnV6O@mail.gmail.com>
 References: <1294409505-2999-1-git-send-email-jlayton@samba.org>
-	<1294409505-2999-6-git-send-email-jlayton@samba.org>
+	<1294409505-2999-5-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Transfer-Encoding: base64
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1294409505-2999-6-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1294409505-2999-5-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Acked-by: Igor Mammedov <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-On Fri, Jan 7, 2011 at 5:11 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Based on a patch from a few years ago by Igor Mammedov. This patch
-> adds the ability for cifs.upcall to establish a TGT using the
-> system-default keytab.
->
-> Cc: Igor Mammedov <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
-> =C2=A0cifs.upcall.c | =C2=A0 78 +++++++++++++++++++++++++++++++++++++=
-++++++++++++++++++++
-> =C2=A01 files changed, 78 insertions(+), 0 deletions(-)
->
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index 3dbcd6e..479517c 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -54,6 +54,7 @@
->
-> =C2=A0#define =C2=A0 =C2=A0 =C2=A0 =C2=A0CIFS_DEFAULT_KRB5_DIR =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 "/tmp"
-> =C2=A0#define =C2=A0 =C2=A0 =C2=A0 =C2=A0CIFS_DEFAULT_KRB5_PREFIX =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0"krb5cc_"
-> +#define CIFS_DEFAULT_KRB5_KEYTAB =C2=A0 =C2=A0 =C2=A0 "/etc/krb5.key=
-tab"
->
-> =C2=A0#define =C2=A0 =C2=A0 =C2=A0 =C2=A0MAX_CCNAME_LEN =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0PATH_MAX + 5
->
-> @@ -185,6 +186,78 @@ static int krb5cc_filter(const struct dirent *di=
-rent)
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;
-> =C2=A0}
->
-> +static char *
-> +init_cc_from_keytab(const char *keytab_name, const char *user)
-> +{
-> + =C2=A0 =C2=A0 =C2=A0 krb5_context context =3D NULL;
-> + =C2=A0 =C2=A0 =C2=A0 krb5_error_code ret;
-> + =C2=A0 =C2=A0 =C2=A0 krb5_creds my_creds;
-> + =C2=A0 =C2=A0 =C2=A0 krb5_keytab keytab =3D NULL;
-> + =C2=A0 =C2=A0 =C2=A0 krb5_principal me =3D NULL;
-> + =C2=A0 =C2=A0 =C2=A0 krb5_ccache cc =3D NULL;
-> + =C2=A0 =C2=A0 =C2=A0 char *ccname =3D NULL;
-> +
-> + =C2=A0 =C2=A0 =C2=A0 memset((char *) &my_creds, 0, sizeof(my_creds)=
-);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_init_context(&context);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_init_context: %d", (int)ret);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_kt_resolve(context, keytab_name, =
-&keytab);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_kt_resolve: %d", (int)ret);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_parse_name(context, user, &me);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_parse_name: %d", (int)ret);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_get_init_creds_keytab(context, &m=
-y_creds, me,
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 keytab, 0, NULL, NULL);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_get_init_creds_keytab: %d", (int)ret);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_cc_default(context, &cc);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_cc_default: %d", (int)ret);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_cc_initialize(context, cc, me);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_cc_initialize: %d", (int)ret);
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
-> + =C2=A0 =C2=A0 =C2=A0 }
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_cc_store_cred(context, cc, &my_cr=
-eds);
-> + =C2=A0 =C2=A0 =C2=A0 if (ret)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
-"krb5_cc_store_cred: %d", (int)ret);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 ccname =3D strdup(krb5_cc_default_name(context=
-));
-> + =C2=A0 =C2=A0 =C2=A0 if (ccname =3D=3D NULL)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_ERR, "U=
-nable to allocate memory");
-> +icfk_cleanup:
-> + =C2=A0 =C2=A0 =C2=A0 my_creds.client =3D 0;
-> + =C2=A0 =C2=A0 =C2=A0 krb5_free_cred_contents(context, &my_creds);
-> +
-> + =C2=A0 =C2=A0 =C2=A0 if (me)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_free_principa=
-l(context, me);
-> + =C2=A0 =C2=A0 =C2=A0 if (cc)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_cc_close(cont=
-ext, cc);
-> + =C2=A0 =C2=A0 =C2=A0 if (keytab)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_kt_close(cont=
-ext, keytab);
-> + =C2=A0 =C2=A0 =C2=A0 if (context)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_free_context(=
-context);
-> + =C2=A0 =C2=A0 =C2=A0 return ccname;
-> +}
-> +
-> =C2=A0/* search for a credcache that looks like a likely candidate */
-> =C2=A0static char *find_krb5_cc(const char *dirname, uid_t uid)
-> =C2=A0{
-> @@ -702,6 +775,7 @@ int main(const int argc, char *const argv[])
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0struct decoded_args arg;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0const char *oid;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0uid_t uid;
-> + =C2=A0 =C2=A0 =C2=A0 char *keytab_name =3D CIFS_DEFAULT_KRB5_KEYTAB=
-;
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0hostbuf[0] =3D '\0';
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0memset(&arg, 0, sizeof(arg));
-> @@ -793,6 +867,10 @@ int main(const int argc, char *const argv[])
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0ccname =3D find_krb5_cc(CIFS_DEFAULT_KRB5_=
-DIR, uid);
->
-> + =C2=A0 =C2=A0 =C2=A0 /* Couldn't find credcache? Try to use keytab =
-*/
-> + =C2=A0 =C2=A0 =C2=A0 if (ccname =3D=3D NULL && arg.username !=3D NU=
-LL)
-> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ccname =3D init_cc=
-_from_keytab(keytab_name, arg.username);
-> +
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0host =3D arg.hostname;
->
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0// do mech specific authorization
-> --
-> 1.7.3.4
->
->
+QWNrZWQtYnk6IElnb3IgTWFtbWVkb3YgPG5pYWxsYWluQGdtYWlsLmNvbT4KCk9uIEZyaSwgSmFu
+IDcsIDIwMTEgYXQgNToxMSBQTSwgSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPiB3cm90
+ZToKPiBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+Cj4gLS0t
+Cj4gwqBjaWZzLnVwY2FsbC5jIHwgwqAgwqA4ICsrKysrKysrCj4gwqAxIGZpbGVzIGNoYW5nZWQs
+IDggaW5zZXJ0aW9ucygrKSwgMCBkZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQgYS9jaWZzLnVw
+Y2FsbC5jIGIvY2lmcy51cGNhbGwuYwo+IGluZGV4IDEyZGY4Y2MuLjNkYmNkNmUgMTAwNjQ0Cj4g
+LS0tIGEvY2lmcy51cGNhbGwuYwo+ICsrKyBiL2NpZnMudXBjYWxsLmMKPiBAQCAtNDgzLDYgKzQ4
+Myw3IEBAIGRlY29kZV9rZXlfZGVzY3JpcHRpb24oY29uc3QgY2hhciAqZGVzYywgc3RydWN0IGRl
+Y29kZWRfYXJncyAqYXJnKQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgcmV0dXJuIDE7Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB9
+Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqByZXR2YWwgfD0gREtEX0hBVkVf
+SE9TVE5BTUU7Cj4gKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBzeXNsb2coTE9H
+X0RFQlVHLCAiaG9zdD0lcyIsIGFyZy0+aG9zdG5hbWUpOwo+IMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgfSBlbHNlIGlmICghc3RybmNtcCh0a24sICJpcDQ9IiwgNCkgfHwgIXN0cm5jbXAodGtuLCAi
+aXA2PSIsIDQpKSB7Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBpZiAocG9z
+ID09IE5VTEwpCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqBsZW4gPSBzdHJsZW4odGtuKTsKPiBAQCAtNDk3LDYgKzQ5OCw3IEBAIGRlY29kZV9rZXlfZGVz
+Y3JpcHRpb24oY29uc3QgY2hhciAqZGVzYywgc3RydWN0IGRlY29kZWRfYXJncyAqYXJnKQo+IMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcmV0dXJuIDE7Cj4g
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB9Cj4gwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqByZXR2YWwgfD0gREtEX0hBVkVfSVA7Cj4gKyDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCBzeXNsb2coTE9HX0RFQlVHLCAiaXA9JXMiLCBhcmctPmlwKTsK
+PiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0gZWxzZSBpZiAoc3RybmNtcCh0a24sICJ1c2VyPSIs
+IDUpID09IDApIHsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGlmIChwb3Mg
+PT0gTlVMTCkKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oGxlbiA9IHN0cmxlbih0a24pOwo+IEBAIC01MTEsNiArNTEzLDcgQEAgZGVjb2RlX2tleV9kZXNj
+cmlwdGlvbihjb25zdCBjaGFyICpkZXNjLCBzdHJ1Y3QgZGVjb2RlZF9hcmdzICphcmcpCj4gwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqByZXR1cm4gMTsKPiDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0KPiDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoHJldHZhbCB8PSBES0RfSEFWRV9VU0VSTkFNRTsKPiArIMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHN5c2xvZyhMT0dfREVCVUcsICJ1c2VyPSVzIiwgYXJn
+LT51c2VybmFtZSk7Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB9IGVsc2UgaWYgKHN0cm5jbXAo
+dGtuLCAicGlkPSIsIDQpID09IDApIHsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoGVycm5vID0gMDsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGFyZy0+
+cGlkID0gc3RydG9sKHRrbiArIDQsIE5VTEwsIDApOwo+IEBAIC01MTksNiArNTIyLDcgQEAgZGVj
+b2RlX2tleV9kZXNjcmlwdGlvbihjb25zdCBjaGFyICpkZXNjLCBzdHJ1Y3QgZGVjb2RlZF9hcmdz
+ICphcmcpCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgc3RyZXJyb3IoZXJybm8pKTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoHJldHVybiAxOwo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgfQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc3lzbG9nKExP
+R19ERUJVRywgInBpZD0ldSIsIGFyZy0+cGlkKTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoHJldHZhbCB8PSBES0RfSEFWRV9QSUQ7Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqB9IGVsc2UgaWYgKHN0cm5jbXAodGtuLCAic2VjPSIsIDQpID09IDApIHsKPiDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGlmIChzdHJuY21wKHRrbiArIDQsICJrcmI1IiwgNCkg
+PT0gMCkgewo+IEBAIC01MjgsNiArNTMyLDcgQEAgZGVjb2RlX2tleV9kZXNjcmlwdGlvbihjb25z
+dCBjaGFyICpkZXNjLCBzdHJ1Y3QgZGVjb2RlZF9hcmdzICphcmcpCj4gwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqByZXR2YWwgfD0gREtEX0hBVkVfU0VDOwo+
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgYXJnLT5zZWMg
+PSBNU19LUkI1Owo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgfQo+ICsgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc3lzbG9nKExPR19ERUJVRywgInNlYz0lZCIs
+IGFyZy0+c2VjKTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0gZWxzZSBpZiAoc3RybmNtcCh0
+a24sICJ1aWQ9IiwgNCkgPT0gMCkgewo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgZXJybm8gPSAwOwo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgYXJnLT51
+aWQgPSBzdHJ0b2wodGtuICsgNCwgTlVMTCwgMTYpOwo+IEBAIC01MzcsNiArNTQyLDcgQEAgZGVj
+b2RlX2tleV9kZXNjcmlwdGlvbihjb25zdCBjaGFyICpkZXNjLCBzdHJ1Y3QgZGVjb2RlZF9hcmdz
+ICphcmcpCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBy
+ZXR1cm4gMTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoH0KPiDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoHJldHZhbCB8PSBES0RfSEFWRV9VSUQ7Cj4gKyDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBzeXNsb2coTE9HX0RFQlVHLCAidWlkPSV1
+IiwgYXJnLT51aWQpOwo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgfSBlbHNlIGlmIChzdHJuY21w
+KHRrbiwgImNyZWR1aWQ9IiwgOCkgPT0gMCkgewo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgZXJybm8gPSAwOwo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+YXJnLT5jcmVkdWlkID0gc3RydG9sKHRrbiArIDgsIE5VTEwsIDE2KTsKPiBAQCAtNTQ2LDYgKzU1
+Miw3IEBAIGRlY29kZV9rZXlfZGVzY3JpcHRpb24oY29uc3QgY2hhciAqZGVzYywgc3RydWN0IGRl
+Y29kZWRfYXJncyAqYXJnKQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIMKgIMKgcmV0dXJuIDE7Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB9
+Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqByZXR2YWwgfD0gREtEX0hBVkVf
+Q1JFRFVJRDsKPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHN5c2xvZyhMT0df
+REVCVUcsICJjcmVkdWlkPSV1IiwgYXJnLT5jcmVkdWlkKTsKPiDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoH0gZWxzZSBpZiAoc3RybmNtcCh0a24sICJ2ZXI9IiwgNCkgPT0gMCkgeyDCoCDCoCDCoC8q
+IGlmIHZlcnNpb24gKi8KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGVycm5v
+ID0gMDsKPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoGFyZy0+dmVyID0gc3Ry
+dG9sKHRrbiArIDQsIE5VTEwsIDE2KTsKPiBAQCAtNTU1LDYgKzU2Miw3IEBAIGRlY29kZV9rZXlf
+ZGVzY3JpcHRpb24oY29uc3QgY2hhciAqZGVzYywgc3RydWN0IGRlY29kZWRfYXJncyAqYXJnKQo+
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgcmV0dXJuIDE7
+Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB9Cj4gwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAgwqByZXR2YWwgfD0gREtEX0hBVkVfVkVSU0lPTjsKPiArIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHN5c2xvZyhMT0dfREVCVUcsICJ2ZXI9JWQiLCBh
+cmctPnZlcik7Cj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqB9Cj4gwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqBpZiAocG9zID09IE5VTEwpCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqBicmVhazsKPiAtLQo+IDEuNy4zLjQKPgo+Cg==
