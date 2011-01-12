@@ -1,138 +1,172 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/2] mount.cifs: clean up handling of uid= and gid=
-Date: Wed, 12 Jan 2011 15:42:35 -0600
-Message-ID: <AANLkTin6ccN_qBD32eo0dMXCLpEQXscX_sjOzNwvMtRO@mail.gmail.com>
+Subject: Re: [PATCH 2/2] mount.cifs: add cruid= mount option
+Date: Wed, 12 Jan 2011 15:43:41 -0600
+Message-ID: <AANLkTims8r8uKd=+5C7opd7ykgQ4BHfh8LEMT=dyEthj@mail.gmail.com>
 References: <1294863996-7678-1-git-send-email-jlayton@samba.org>
+	<1294863996-7678-2-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1294863996-7678-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1294863996-7678-2-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-T24gV2VkLCBKYW4gMTIsIDIwMTEgYXQgMjoyNiBQTSwgSmVmZiBMYXl0b24gPGpsYXl0b25Ac2Ft
-YmEub3JnPiB3cm90ZToKPiBUaGUgaGFuZGxpbmcgb2YgdGhlc2Ugb3B0aW9ucyBpcyBxdWl0ZSBj
-b252b2x1dGVkLiBDaGFuZ2UgaXQgc28gdGhhdAo+IHRoZXNlIG9wdGlvbnMgYXJlIHN0b3JlZCBh
-cyBudW1iZXJzIGFuZCB0aGVuIGFwcGVuZGVkIHRvIHRoZSBvcHRpb24KPiBzdHJpbmdzLgo+Cj4g
-U2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPgo+IC0tLQo+IKBt
-b3VudC5jaWZzLmMgfCCgIDk0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQo+IKAxIGZpbGVzIGNoYW5nZWQsIDQ4IGluc2VydGlvbnMoKyks
-IDQ2IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL21vdW50LmNpZnMuYyBiL21vdW50LmNp
-ZnMuYwo+IGluZGV4IGRmOTJkNzkuLjhmY2NmNDQgMTAwNjQ0Cj4gLS0tIGEvbW91bnQuY2lmcy5j
-Cj4gKysrIGIvbW91bnQuY2lmcy5jCj4gQEAgLTg1NywxOSArODU3LDI0IEBAIHBhcnNlX29wdGlv
-bnMoY29uc3QgY2hhciAqZGF0YSwgc3RydWN0IHBhcnNlZF9tb3VudF9pbmZvICpwYXJzZWRfaW5m
-bykKPiCgIKAgoCCgaW50IHJjID0gMDsKPiCgIKAgoCCgaW50IGdvdF91aWQgPSAwOwo+IKAgoCCg
-IKBpbnQgZ290X2dpZCA9IDA7Cj4gLSCgIKAgoCBjaGFyIHVzZXJbMzJdOwo+IC0goCCgIKAgY2hh
-ciBncm91cFszMl07Cj4gKyCgIKAgoCB1aWRfdCB1aWQ7Cj4gKyCgIKAgoCBnaWRfdCBnaWQ7Cj4g
-KyCgIKAgoCBjaGFyIHR4dGJ1ZlsxMl07CgpMb29rcyBjb3JyZWN0IGV4Y2VwdCBwZXJoYXBzIGEg
-Y29tbWVudCBhYm91dCB0aGUgdmFsdWUgb2YgMTIgd291bGQgYmUgbmljZS4KClJldmlld2VkLWJ5
-OiBTaGlyaXNoIFBhcmdhb25rYXIgPHNoaXJpc2hwYXJnYW9ua2FyQGdtYWlsLmNvbT4KCj4gKyCg
-IKAgoCBjaGFyICplcDsKPiArIKAgoCCgIHN0cnVjdCBwYXNzd2QgKnB3Owo+ICsgoCCgIKAgc3Ry
-dWN0IGdyb3VwICpncjsKPgo+IKAgoCCgIKAvKiBtYWtlIHN1cmUgd2UncmUgc3RhcnRpbmcgZnJv
-bSBiZWdpbm5pbmcgKi8KPiCgIKAgoCCgb3V0WzBdID0gJ1wwJzsKPgo+IKAgoCCgIKAvKiBCQiBm
-aXhtZSBjaGVjayBmb3Igc2VwYXJhdG9yIG92ZXJyaWRlIEJCICovCj4gLSCgIKAgoCBpZiAoZ2V0
-dWlkKCkpIHsKPiArIKAgoCCgIHVpZCA9IGdldHVpZCgpOwo+ICsgoCCgIKAgaWYgKHVpZCAhPSAw
-KQo+IKAgoCCgIKAgoCCgIKAgoGdvdF91aWQgPSAxOwo+IC0goCCgIKAgoCCgIKAgoCBzbnByaW50
-Zih1c2VyLCBzaXplb2YodXNlciksICIldSIsIGdldHVpZCgpKTsKPiArCj4gKyCgIKAgoCBnaWQg
-PSBnZXRnaWQoKTsKPiArIKAgoCCgIGlmIChnaWQgIT0gMCkKPiCgIKAgoCCgIKAgoCCgIKBnb3Rf
-Z2lkID0gMTsKPiAtIKAgoCCgIKAgoCCgIKAgc25wcmludGYoZ3JvdXAsIHNpemVvZihncm91cCks
-ICIldSIsIGdldGdpZCgpKTsKPiAtIKAgoCCgIH0KPgo+IKAgoCCgIKBpZiAoIWRhdGEpCj4goCCg
-IKAgoCCgIKAgoCCgcmV0dXJuIEVYX1VTQUdFOwo+IEBAIC0xMDE0LDQzICsxMDE5LDM5IEBAIHBh
-cnNlX29wdGlvbnMoY29uc3QgY2hhciAqZGF0YSwgc3RydWN0IHBhcnNlZF9tb3VudF9pbmZvICpw
-YXJzZWRfaW5mbykKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoGJyZWFrOwo+Cj4goCCgIKAgoCCg
-IKAgoCCgY2FzZSBPUFRfVUlEOgo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIGlmICh2YWx1ZSAm
-JiAqdmFsdWUpIHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGdvdF91aWQgPSAx
-Owo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKCFpc2RpZ2l0KCp2YWx1ZSkp
-IHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgc3RydWN0IHBhc3N3
-ZCAqcHc7Cj4gLQo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAo
-IShwdyA9IGdldHB3bmFtKHZhbHVlKSkpIHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCBmcHJpbnRmKHN0ZGVyciwKPiAtIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgICJiYWQgdXNlciBuYW1lIFwiJXNc
-IlxuIiwKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIHZhbHVlKTsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCByZXR1cm4gRVhfVVNBR0U7Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIH0KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgc25w
-cmludGYodXNlciwgc2l6ZW9mKHVzZXIpLCAiJXUiLAo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKBwdy0+cHdfdWlkKTsKPiAtIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIH0KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGVsc2UK
-PiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgc3RybGNweSh1c2VyLCB2
-YWx1ZSwgc2l6ZW9mKHVzZXIpKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoIXZhbHVl
-IHx8ICEqdmFsdWUpCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBnb3RvIG5vY29w
-eTsKPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ290X3VpZCA9IDE7Cj4gKyCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgdWlkID0gc3RydG91bCh2YWx1ZSwgJmVwLCAxMCk7Cj4gKyCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgaWYgKGVycm5vICE9IEVJTlZBTCAmJiAqZXAgPT0gJ1wwJykKPiArIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGdvdG8gbm9jb3B5Owo+ICsKPiArIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCBwdyA9IGdldHB3bmFtKHZhbHVlKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCBpZiAocHcgPT0gTlVMTCkgewo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-ZnByaW50ZihzdGRlcnIsICJiYWQgdXNlciBuYW1lIFwiJXNcIlxuIiwgdmFsdWUpOwo+ICsgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgcmV0dXJuIEVYX1VTQUdFOwo+IKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgfQo+ICsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCB1aWQgPSBwdy0+cHdf
-dWlkOwo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgZ290byBub2NvcHk7Cj4KPiCgIKAgoCCgIKAg
-oCCgIKBjYXNlIE9QVF9HSUQ6Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKHZhbHVlICYm
-ICp2YWx1ZSkgewo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ290X2dpZCA9IDE7
-Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoIWlzZGlnaXQoKnZhbHVlKSkg
-ewo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzdHJ1Y3QgZ3JvdXAg
-KmdyOwo+IC0KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKCEo
-Z3IgPSBnZXRncm5hbSh2YWx1ZSkpKSB7Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgZnByaW50ZihzdGRlcnIsCj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCAiYmFkIGdyb3VwIG5hbWUgXCIlc1wi
-XG4iLAo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgdmFsdWUpOwo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIHJldHVybiBFWF9VU0FHRTsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgfQo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzbnBy
-aW50Zihncm91cCwgc2l6ZW9mKGdyb3VwKSwgIiV1IiwKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgZ3ItPmdyX2dpZCk7Cj4gLSCgIKAgoCCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCB9Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBlbHNl
-Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIHN0cmxjcHkoZ3JvdXAs
-IHZhbHVlLCBzaXplb2YoZ3JvdXApKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoIXZh
-bHVlIHx8ICEqdmFsdWUpCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBnb3RvIG5v
-Y29weTsKPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ290X2dpZCA9IDE7Cj4gKyCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgZ2lkID0gc3RydG91bCh2YWx1ZSwgJmVwLCAxMCk7Cj4gKyCgIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgaWYgKGVycm5vICE9IEVJTlZBTCAmJiAqZXAgPT0gJ1wwJykKPiAr
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGdvdG8gbm9jb3B5Owo+ICsKPiArIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCBnciA9IGdldGdybmFtKHZhbHVlKTsKPiArIKAgoCCgIKAgoCCgIKAg
-oCCgIKAgoCBpZiAoZ3IgPT0gTlVMTCkgewo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
-IKAgZnByaW50ZihzdGRlcnIsICJiYWQgZ3JvdXAgbmFtZSBcIiVzXCJcbiIsIHZhbHVlKTsKPiAr
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIHJldHVybiBFWF9VU0FHRTsKPiCgIKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoH0KPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ2lkID0gZ3It
-PmdyX2dpZDsKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoGdvdG8gbm9jb3B5Owo+Cj4goCCgIKAg
-oCCgIKAgoCCgLyogZm1hc2sgZmFsbCB0aHJvdWdoIHRvIGZpbGVfbW9kZSAqLwo+IEBAIC0xMTcx
-LDM0ICsxMTcyLDM1IEBAIG5vY29weToKPgo+IKAgoCCgIKAvKiBzcGVjaWFsLWNhc2UgdGhlIHVp
-ZCBhbmQgZ2lkICovCj4goCCgIKAgoGlmIChnb3RfdWlkKSB7Cj4gLSCgIKAgoCCgIKAgoCCgIHdv
-cmRfbGVuID0gc3RybGVuKHVzZXIpOwo+ICsgoCCgIKAgoCCgIKAgoCB3b3JkX2xlbiA9IHNucHJp
-bnRmKHR4dGJ1Ziwgc2l6ZW9mKHR4dGJ1ZiksICIldSIsIHVpZCk7Cj4KPiArIKAgoCCgIKAgoCCg
-IKAgLyogY29tbWEgKyAidWlkPSIgKyB0ZXJtaW5hdGluZyBOVUxMID09IDYgKi8KPiCgIKAgoCCg
-IKAgoCCgIKBpZiAob3V0X2xlbiArIHdvcmRfbGVuICsgNiA+IE1BWF9PUFRJT05TX0xFTikgewo+
-IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgZnByaW50ZihzdGRlcnIsICJPcHRpb25zIHN0cmluZyB0
-b28gbG9uZ1xuIik7Cj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKByZXR1cm4gRVhfVVNBR0U7Cj4g
-oCCgIKAgoCCgIKAgoCCgfQo+Cj4goCCgIKAgoCCgIKAgoCCgaWYgKG91dF9sZW4pIHsKPiAtIKAg
-oCCgIKAgoCCgIKAgoCCgIKAgoCBzdHJsY2F0KG91dCwgIiwiLCBvdXRfbGVuICsgd29yZF9sZW4g
-KyA2KTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzdHJsY2F0KG91dCwgIiwiLCBNQVhfT1BU
-SU9OU19MRU4pOwo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgb3V0X2xlbisrOwo+IKAgoCCgIKAg
-oCCgIKAgoH0KPiAtIKAgoCCgIKAgoCCgIKAgc25wcmludGYob3V0ICsgb3V0X2xlbiwgd29yZF9s
-ZW4gKyA1LCAidWlkPSVzIiwgdXNlcik7Cj4gKyCgIKAgoCCgIKAgoCCgIHNucHJpbnRmKG91dCAr
-IG91dF9sZW4sIHdvcmRfbGVuICsgNSwgInVpZD0lcyIsIHR4dGJ1Zik7Cj4goCCgIKAgoCCgIKAg
-oCCgb3V0X2xlbiA9IHN0cmxlbihvdXQpOwo+IKAgoCCgIKB9Cj4goCCgIKAgoGlmIChnb3RfZ2lk
-KSB7Cj4gLSCgIKAgoCCgIKAgoCCgIHdvcmRfbGVuID0gc3RybGVuKGdyb3VwKTsKPiArIKAgoCCg
-IKAgoCCgIKAgd29yZF9sZW4gPSBzbnByaW50Zih0eHRidWYsIHNpemVvZih0eHRidWYpLCAiJXUi
-LCBnaWQpOwo+Cj4gLSCgIKAgoCCgIKAgoCCgIGlmIChvdXRfbGVuICsgMSArIHdvcmRfbGVuICsg
-NiA+IE1BWF9PUFRJT05TX0xFTikgewo+ICsgoCCgIKAgoCCgIKAgoCAvKiBjb21tYSArICJnaWQ9
-IiArIHRlcm1pbmF0aW5nIE5VTEwgPT0gNiAqLwo+ICsgoCCgIKAgoCCgIKAgoCBpZiAob3V0X2xl
-biArIHdvcmRfbGVuICsgNiA+IE1BWF9PUFRJT05TX0xFTikgewo+IKAgoCCgIKAgoCCgIKAgoCCg
-IKAgoCCgZnByaW50ZihzdGRlcnIsICJPcHRpb25zIHN0cmluZyB0b28gbG9uZ1xuIik7Cj4goCCg
-IKAgoCCgIKAgoCCgIKAgoCCgIKByZXR1cm4gRVhfVVNBR0U7Cj4goCCgIKAgoCCgIKAgoCCgfQo+
-Cj4goCCgIKAgoCCgIKAgoCCgaWYgKG91dF9sZW4pIHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAg
-oCBzdHJsY2F0KG91dCwgIiwiLCBvdXRfbGVuICsgd29yZF9sZW4gKyA2KTsKPiArIKAgoCCgIKAg
-oCCgIKAgoCCgIKAgoCBzdHJsY2F0KG91dCwgIiwiLCBNQVhfT1BUSU9OU19MRU4pOwo+IKAgoCCg
-IKAgoCCgIKAgoCCgIKAgoCCgb3V0X2xlbisrOwo+IKAgoCCgIKAgoCCgIKAgoH0KPiAtIKAgoCCg
-IKAgoCCgIKAgc25wcmludGYob3V0ICsgb3V0X2xlbiwgd29yZF9sZW4gKyA1LCAiZ2lkPSVzIiwg
-Z3JvdXApOwo+IC0goCCgIKAgoCCgIKAgoCBvdXRfbGVuID0gc3RybGVuKG91dCk7Cj4gKyCgIKAg
-oCCgIKAgoCCgIHNucHJpbnRmKG91dCArIG91dF9sZW4sIHdvcmRfbGVuICsgNSwgImdpZD0lcyIs
-IHR4dGJ1Zik7Cj4goCCgIKAgoH0KPgo+IKAgoCCgIKByZXR1cm4gMDsKPiAtLQo+IDEuNy4zLjQK
-Pgo+IC0tCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVu
-c3Vic2NyaWJlIGxpbnV4LWNpZnMiIGluCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9y
-ZG9tb0B2Z2VyLmtlcm5lbC5vcmcKPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0IKBodHRwOi8vdmdl
-ci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwKPgo=
+On Wed, Jan 12, 2011 at 2:26 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> Allow admins to pass in a username for the cruid=3D mount option.
+>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+> =A0mount.cifs.8 | =A0 =A05 +++++
+> =A0mount.cifs.c | =A0 40 ++++++++++++++++++++++++++++++++++++++--
+> =A02 files changed, 43 insertions(+), 2 deletions(-)
+>
+> diff --git a/mount.cifs.8 b/mount.cifs.8
+> index 5f82ac9..469440d 100644
+> --- a/mount.cifs.8
+> +++ b/mount.cifs.8
+> @@ -120,6 +120,11 @@ forceuid
+> =A0instructs the client to ignore any uid provided by the server for =
+files and directories and to always assign the owner to be the value of=
+ the uid=3D option\&. See the section on FILE AND DIRECTORY OWNERSHIP A=
+ND PERMISSIONS below for more information\&.
+> =A0.RE
+> =A0.PP
+> +cruid=3D\fIarg\fR
+> +.RS 4
+> +sets the uid of the owner of the credentials cache\&. This is primar=
+ily useful with sec=3Dkrb5\&. The default is the real uid of the proces=
+s performing the mount\&. Setting this parameter directs the upcall to =
+look for a credentials cache owned by that user\&.
+> +.RE
+> +.PP
+> =A0gid=3D\fIarg\fR
+> =A0.RS 4
+> =A0sets the gid that will own all files or directories on the mounted=
+ filesystem when the server does not provide ownership information\&. I=
+t may be specified as either a groupname or a numeric gid\&. When not s=
+pecified, the default is gid 0\&. The mount\&.cifs helper must be at ve=
+rsion 1\&.10 or higher to support specifying the gid in non\-numeric fo=
+rm\&. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS b=
+elow for more information\&.
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 8fccf44..41da67e 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -157,6 +157,7 @@
+> =A0#define OPT_REMOUNT =A0 =A026
+> =A0#define OPT_MAND =A0 =A0 =A0 27
+> =A0#define OPT_NOMAND =A0 =A0 28
+> +#define OPT_CRUID =A0 =A0 =A029
+>
+>
+> =A0/* struct for holding parsed mount info for use by privleged proce=
+ss */
+> @@ -802,6 +803,8 @@ static int parse_opt_token(const char *token)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return OPT_CRED;
+> =A0 =A0 =A0 =A0if (strncmp(token, "uid", 3) =3D=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return OPT_UID;
+> + =A0 =A0 =A0 if (strncmp(token, "cruid", 5) =3D=3D 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return OPT_CRUID;
+> =A0 =A0 =A0 =A0if (strncmp(token, "gid", 3) =3D=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return OPT_GID;
+> =A0 =A0 =A0 =A0if (strncmp(token, "fmask", 5) =3D=3D 0)
+> @@ -856,8 +859,9 @@ parse_options(const char *data, struct parsed_mou=
+nt_info *parsed_info)
+> =A0 =A0 =A0 =A0int word_len;
+> =A0 =A0 =A0 =A0int rc =3D 0;
+> =A0 =A0 =A0 =A0int got_uid =3D 0;
+> + =A0 =A0 =A0 int got_cruid =3D 0;
+> =A0 =A0 =A0 =A0int got_gid =3D 0;
+> - =A0 =A0 =A0 uid_t uid;
+> + =A0 =A0 =A0 uid_t uid, cruid;
+> =A0 =A0 =A0 =A0gid_t gid;
+> =A0 =A0 =A0 =A0char txtbuf[12];
+> =A0 =A0 =A0 =A0char *ep;
+> @@ -1036,6 +1040,23 @@ parse_options(const char *data, struct parsed_=
+mount_info *parsed_info)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0uid =3D pw->pw_uid;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto nocopy;
+>
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 case OPT_CRUID:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!value || !*value)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto no=
+copy;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 got_cruid =3D 1;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cruid =3D strtoul(value=
+, &ep, 10);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (errno !=3D EINVAL &=
+& *ep =3D=3D '\0')
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto no=
+copy;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pw =3D getpwnam(value);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pw =3D=3D NULL) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf=
+(stderr, "bad user name \"%s\"\n", value);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return =
+EX_USAGE;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cruid =3D pw->pw_uid;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocopy;
+> +
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case OPT_GID:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!value || !*value)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto n=
+ocopy;
+> @@ -1187,6 +1208,22 @@ nocopy:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0snprintf(out + out_len, word_len + 5, =
+"uid=3D%s", txtbuf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0out_len =3D strlen(out);
+> =A0 =A0 =A0 =A0}
+> + =A0 =A0 =A0 if (got_cruid) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 word_len =3D snprintf(txtbuf, sizeof(tx=
+tbuf), "%u", cruid);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* comma + "cruid=3D" + terminating NUL=
+L =3D=3D 6 */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (out_len + word_len + 8 > MAX_OPTION=
+S_LEN) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf(stderr, "Option=
+s string too long\n");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return EX_USAGE;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (out_len) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strlcat(out, ",", MAX_O=
+PTIONS_LEN);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 out_len++;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 snprintf(out + out_len, word_len + 7, "=
+cruid=3D%s", txtbuf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 out_len =3D strlen(out);
+> + =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0if (got_gid) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0word_len =3D snprintf(txtbuf, sizeof(t=
+xtbuf), "%u", gid);
+>
+> @@ -1202,7 +1239,6 @@ nocopy:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0snprintf(out + out_len, word_len + 5, =
+"gid=3D%s", txtbuf);
+> =A0 =A0 =A0 =A0}
+> -
+> =A0 =A0 =A0 =A0return 0;
+> =A0}
+>
+> --
+> 1.7.3.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
+
+Looks correct.
+
+Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
