@@ -1,118 +1,51 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Teach cifs about network namespaces (take 2)
-Date: Wed, 12 Jan 2011 09:22:06 -0500
-Message-ID: <20110112092206.3c82b8c3@tlielax.poochiereds.net>
-References: <4D2BDE07.40202@parallels.com>
-	<20110111071239.GL29064@count0.beaverton.ibm.com>
-	<4D2C63B2.6090109@parallels.com>
-	<4D2C9BC6.7000402@parallels.com>
-	<20110111163000.04d02a7f@tlielax.poochiereds.net>
-	<4D2DB350.1010509@parallels.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Matt Helsley <matthltc-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	<kir-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>, <containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
-	Pavel Emelyanov <xemul-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-To: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+Subject: [PATCH] cifs: add cruid= mount option
+Date: Wed, 12 Jan 2011 11:21:39 -0500
+Message-ID: <1294849299-3548-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D2DB350.1010509-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 12 Jan 2011 07:57:36 -0600
-Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org> wrote:
+In commit 3e4b3e1f we separated the "uid" mount option such that it
+no longer determined the owner of the credential cache by default. When
+we did this, we added a new option to cifs.upcall (--legacy-uid) to
+try to make it so that it would behave the same was as it did before.
 
-> On 01/11/2011 03:30 PM, Jeff Layton wrote:
-> > I've got a patch queued that rearranges some fields in TCP_Server_Info
-> > according to pahole's recommendations. You may want to base this patch
-> > on that.
-> 
-> Queued where?
-> 
+This ignored a rather important point -- the kernel has no way to know
+what options are being passed to cifs.upcall, so it doesn't know what
+uid it should use to determine whether to match an existing krb5 session.
 
-It was sent to the list a week or so ago:
+The simplest solution is to simply add a new "cruid=" mount option that
+only governs the uid owner of the credential cache for the mount.
 
-http://article.gmane.org/gmane.linux.kernel.cifs/2205
+Unfortunately, this means that the --legacy-uid option in cifs.upcall was
+ill-considered and is now useless, but I don't see a better way to deal
+with this.
 
-...not sure if/when Steve is going to merge it though.
+A patch for the mount.cifs manpage will follow when/if this patch has
+been accepted.
 
-> > It might also be good to run pahole on this after your patch to see if
-> > it might be better placed...
-> 
-> I put it right after the network address fields affected by it.  I can
-> stick it between:
-> 
->         char *hostname; /* hostname portion of UNC string */
->         struct socket *ssocket;
-> 
-> So that two consecutive pointers become three consecutive pointers.  But
-> again, I haven't seen what you did to the structure yet...
-> 
+Reported-by: Stefan Walter <walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+---
+ fs/cifs/connect.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Your placement may be fine, but you might consider using pahole
-afterward to see whether it might be better placed elsewhere.
-
-> >>  	spin_lock(&cifs_tcp_ses_lock);
-> >>  	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-> >> +		if (HAVE_NET_NS &&
-> >> +		    cifs_net_ns(server) != current->nsproxy->net_ns)
-> >> +			continue;
-> >> +
-> > 
-> > This HAVE_NET_NS thing is pretty ugly.
-> 
-> It's a compile time constant optimized away by the compiler, and cleanly
-> taking out the entire dependent clause with it when it's false (because
-> && only evaluates the right side when the left side is true, meaning the
-> if can never trigger, thus dead code elimination).
-> 
-> How is that ugly?  It does exactly what it says.  I'm not sure what the
-> criteria are here.  (Was it better when it looked like a function rather
-> than a constant?  I'd use the CONFIG_NET_NS symbol directly if it was 0
-> or 1 rather than undefined or 1, but it isn't.  It's designed for use
-> with #ifdefs only, not from C code.)
-> 
-
-It's ugly because it makes the code difficult to read, and readability
-trumps these sorts of micro-optimizations. If this were a high traffic
-codepath, I might feel differently but this is generally only touched
-once per mount.
-
-> > This is not a high-performance
-> > codepath. My vote would be to get rid of this and just have the useless
-> > test when CONFIG_NET_NS isn't set.
-> > 
-> > Alternately, you could turn the comparison into a static inline or
-> > macro, and simply have that compile down to nothing when CONFIG_NET_NS
-> > isn't set.
-> 
-> I tried returning a constant from a static inline, it doesn't propogate
-> the constant far enough to do compile time dead code elimination based
-> on the return value under gcc 4.4.3.
-> 
-> As for a macro, the constant already is a macro.  So adding more #ifdefs
-> to the headers to make the code in the function look like it's doing
-> something other than it actually is somehow improves matters?  (I'm not
-> understanding the aesthetic criteria here at all.)
-> 
-> I think I'll just ignore the bloat.  Make allnoconfig is already 800k
-> compressed, what's a few more bytes...
-> 
-> >> @@ -1754,6 +1762,8 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
-> >>  out_err_crypto_release:
-> >>  	cifs_crypto_shash_release(tcp_ses);
-> >>  
-> >> +	put_net(cifs_net_ns(tcp_ses));
-> >> +
-> > 	^^^^
-> > This looks like it will oops if you end up doing the "goto
-> > out_err_crypto_release" after the extract_hostname call.
-> 
-> Hmmm...  Yup, failure case when CONFIG_NET_NS enabled will dereference
-> the null pointer.  I need to move the initialization up a few lines.
-
-That seems like the simplest fix.
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 60d4826..99a5f18 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1107,6 +1107,8 @@ cifs_parse_mount_options(char *options, const char *devname,
+ 		} else if (!strnicmp(data, "uid", 3) && value && *value) {
+ 			vol->linux_uid = simple_strtoul(value, &value, 0);
+ 			uid_specified = true;
++		} else if (!strnicmp(data, "cruid", 5) && value && *value) {
++			vol->cred_uid = simple_strtoul(value, &value, 0);
+ 		} else if (!strnicmp(data, "forceuid", 8)) {
+ 			override_uid = 1;
+ 		} else if (!strnicmp(data, "noforceuid", 10)) {
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.3.4
