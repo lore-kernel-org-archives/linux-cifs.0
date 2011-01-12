@@ -1,172 +1,219 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/2] mount.cifs: add cruid= mount option
-Date: Wed, 12 Jan 2011 15:43:41 -0600
-Message-ID: <AANLkTims8r8uKd=+5C7opd7ykgQ4BHfh8LEMT=dyEthj@mail.gmail.com>
-References: <1294863996-7678-1-git-send-email-jlayton@samba.org>
-	<1294863996-7678-2-git-send-email-jlayton@samba.org>
+Subject: Re: [PATCH] cifs: Use mask of ACEs for SID Everyone to calculate all
+ three permissions user, group, and other
+Date: Wed, 12 Jan 2011 16:03:21 -0600
+Message-ID: <AANLkTi=59X+bSzQTOsT3rBuQRb-SyOMSxRdf=fZOOBah@mail.gmail.com>
+References: <1291669006-12102-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20110104141130.2cec2a74@tlielax.poochiereds.net>
+	<AANLkTikhkFnU0B+0JbUXwZvOfVdY_XB67oEaiyaajT0H@mail.gmail.com>
+	<20110104143122.46627c31@tlielax.poochiereds.net>
+	<AANLkTimT4AKX0HYCMcZiMXvXV-N0r23yGQ+oU=CDdi-w@mail.gmail.com>
+	<20110104150934.3ba10652@tlielax.poochiereds.net>
+	<AANLkTimoA4ZZuqtKGFEMgDs7No-LRxfV3MN_P6tYL1u6@mail.gmail.com>
+	<20110104171045.55cf3fd2@tlielax.poochiereds.net>
+	<AANLkTik2_e7+-ZQqxMHWi5x0Sk99Z_EMY=fRWX=oB9un@mail.gmail.com>
+	<20110105071916.386336a2@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1294863996-7678-2-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20110105071916.386336a2-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jan 12, 2011 at 2:26 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Allow admins to pass in a username for the cruid=3D mount option.
+On Wed, Jan 5, 2011 at 6:19 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Tue, 4 Jan 2011 16:19:26 -0600
+> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
-> =A0mount.cifs.8 | =A0 =A05 +++++
-> =A0mount.cifs.c | =A0 40 ++++++++++++++++++++++++++++++++++++++--
-> =A02 files changed, 43 insertions(+), 2 deletions(-)
+>> On Tue, Jan 4, 2011 at 4:10 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
+te:
+>> > On Tue, 4 Jan 2011 14:27:45 -0600
+>> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> >
+>> >> On Tue, Jan 4, 2011 at 2:09 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =
+wrote:
+>> >> > On Tue, 4 Jan 2011 13:51:41 -0600
+>> >> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> >> >
+>> >> >> On Tue, Jan 4, 2011 at 1:31 PM, Jeff Layton <jlayton-H+wXaHxf7aJhl2p70BpVqQ@public.gmane.org=
+m> wrote:
+>> >> >> > On Tue, 4 Jan 2011 13:20:38 -0600
+>> >> >> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> >> >> >
+>> >> >> >> On Tue, Jan 4, 2011 at 1:11 PM, Jeff Layton <jlayton@redhat=
+=2Ecom> wrote:
+>> >> >> >> > On Mon, =A06 Dec 2010 14:56:46 -0600
+>> >> >> >> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>> >> >> >> >
+>> >> >> >> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >> >> >> >>
+>> >> >> >> >>
+>> >> >> >> >> If a DACL has entries for ACEs for SID Everyone and Auth=
+enticated Users,
+>> >> >> >> >> factor in mask in respective entries during calculation =
+of permissions
+>> >> >> >> >> for all three, user, group, and other.
+>> >> >> >> >>
+>> >> >> >> >> http://technet.microsoft.com/en-us/library/bb463216.aspx
+>> >> >> >> >>
+>> >> >> >> >>
+>> >> >> >> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gma=
+il.com>
+>> >> >> >> >> ---
+>> >> >> >> >> =A0fs/cifs/cifsacl.c | =A0 13 +++++++++++--
+>> >> >> >> >> =A01 files changed, 11 insertions(+), 2 deletions(-)
+>> >> >> >> >>
+>> >> >> >> >> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+>> >> >> >> >> index c6ebea0..a520091 100644
+>> >> >> >> >> --- a/fs/cifs/cifsacl.c
+>> >> >> >> >> +++ b/fs/cifs/cifsacl.c
+>> >> >> >> >> @@ -43,9 +43,12 @@ static struct cifs_wksid wksidarr[NUM=
+_WK_SIDS] =3D {
+>> >> >> >> >> =A0;
+>> >> >> >> >>
+>> >> >> >> >>
+>> >> >> >> >> -/* security id for everyone */
+>> >> >> >> >> +/* security id for everyone/world system group */
+>> >> >> >> >> =A0static const struct cifs_sid sid_everyone =3D {
+>> >> >> >> >> =A0 =A0 =A0 1, 1, {0, 0, 0, 0, 0, 1}, {0} };
+>> >> >> >> >> +/* security id for Authenticated Users system group */
+>> >> >> >> >> +static const struct cifs_sid sid_authusers =3D {
+>> >> >> >> >> + =A0 =A0 1, 1, {0, 0, 0, 0, 0, 5}, {11} };
+>> >> >> >> >> =A0/* group users */
+>> >> >> >> >> =A0static const struct cifs_sid sid_user =3D {1, 2 , {0,=
+ 0, 0, 0, 0, 5}, {} };
+>> >> >> >> >>
+>> >> >> >> >> @@ -367,7 +370,7 @@ static void parse_dacl(struct cifs_a=
+cl *pdacl, char *end_of_acl,
+>> >> >> >> >> =A0 =A0 =A0 if (num_aces =A0> 0) {
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 umode_t user_mask =3D S_IRWX=
+U;
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 umode_t group_mask =3D S_IRW=
+XG;
+>> >> >> >> >> - =A0 =A0 =A0 =A0 =A0 =A0 umode_t other_mask =3D S_IRWXO=
+;
+>> >> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 umode_t other_mask =3D S_IRWXU=
+ | S_IRWXG | S_IRWXO;
+>> >> >> >> >>
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 ppace =3D kmalloc(num_aces *=
+ sizeof(struct cifs_ace *),
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 GFP_KERNEL);
+>> >> >> >> >> @@ -392,6 +395,12 @@ static void parse_dacl(struct cifs_=
+acl *pdacl, char *end_of_acl,
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ppace[i]->type,
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&fattr->cf_mode,
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&other_mask);
+>> >> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (compare_si=
+ds(&(ppace[i]->sid), &sid_authusers))
+>> >> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ access_flags_to_mode(ppace[i]->access_req,
+>> >> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ppace[i]->type,
+>> >> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&fattr->cf_mode,
+>> >> >> >> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&other_mask);
+>> >> >> >> >> +
+>> >> >> >> >>
+>> >> >> >> >> =A0/* =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy((void *=
+)(&(cifscred->aces[i])),
+>> >> >> >> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 (void *)ppace[i],
+>> >> >> >> >
+>> >> >> >> > This looks like a harmless change...
+>> >> >> >> >
+>> >> >> >> > =A0 =A0Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> >> >> >> >
+>> >> >> >>
+>> >> >> >> Jeff, Thanks.
+>> >> >> >>
+>> >> >> >> > I have real doubts however about the owner/group parts of=
+ the cifsacl
+>> >> >> >> > scheme. It sets the user and group mode bits without sett=
+ing the user
+>> >> >> >> > and group owners to meaningful values. So, those permissi=
+ons have no
+>> >> >> >> > basis in reality.
+>> >> >> >>
+>> >> >> >> With the sid to uid and gid mapping code using winbind in t=
+he works,
+>> >> >> >> would that address these concerns?
+>> >> >> >>
+>> >> >> >
+>> >> >> > Yes, that would help some.
+>> >> >> >
+>> >> >> > That would give you the ability to present permissions that =
+have some
+>> >> >> > basis in reality. You'll still have to figure out what to do=
+ when you
+>> >> >> > get a SID that can't be mapped for some reason.
+>> >> >>
+>> >> >> If we are using winbind, I do not see how this can happen.
+>> >> >> A SID perhaps could not be looked up but winbind, when asked,
+>> >> >> can/will always map a Owner SID to an uid and Group SID to a g=
+id.
+>> >> >>
+>> >> >
+>> >> > Ahh ok. Good to know. Still, we need a meaningful owner to set =
+it to
+>> >> > when the upcall fails. For instance, if the upcall isn't set up=
+ at
+>> >> > all...
+>> >> >
+>> >>
+>> >> I think at least two things can go against, either upcall is not =
+setup at all
+>> >> so an upcall fails or we run out of idmap range as specified in s=
+mb.conf
+>> >> file for either uid or gid or both and so upcall fails.
+>> >>
+>> >
+>> > Yep. The reason for the failure doesn't matter much. What matters =
+is
+>> > what you do if it does. You'll need to set the uid or gid to somet=
+hing.
+>> >
+>> > What will you set it to?
+>> >
+>>
+>> I think it should default to 0 (superuser).
+>>
 >
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 5f82ac9..469440d 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -120,6 +120,11 @@ forceuid
-> =A0instructs the client to ignore any uid provided by the server for =
-files and directories and to always assign the owner to be the value of=
- the uid=3D option\&. See the section on FILE AND DIRECTORY OWNERSHIP A=
-ND PERMISSIONS below for more information\&.
-> =A0.RE
-> =A0.PP
-> +cruid=3D\fIarg\fR
-> +.RS 4
-> +sets the uid of the owner of the credentials cache\&. This is primar=
-ily useful with sec=3Dkrb5\&. The default is the real uid of the proces=
-s performing the mount\&. Setting this parameter directs the upcall to =
-look for a credentials cache owned by that user\&.
-> +.RE
-> +.PP
-> =A0gid=3D\fIarg\fR
-> =A0.RS 4
-> =A0sets the gid that will own all files or directories on the mounted=
- filesystem when the server does not provide ownership information\&. I=
-t may be specified as either a groupname or a numeric gid\&. When not s=
-pecified, the default is gid 0\&. The mount\&.cifs helper must be at ve=
-rsion 1\&.10 or higher to support specifying the gid in non\-numeric fo=
-rm\&. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS b=
-elow for more information\&.
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 8fccf44..41da67e 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -157,6 +157,7 @@
-> =A0#define OPT_REMOUNT =A0 =A026
-> =A0#define OPT_MAND =A0 =A0 =A0 27
-> =A0#define OPT_NOMAND =A0 =A0 28
-> +#define OPT_CRUID =A0 =A0 =A029
+> That sounds a little dangerous. What if the mode bits indicate setuid=
+?
 >
->
-> =A0/* struct for holding parsed mount info for use by privleged proce=
-ss */
-> @@ -802,6 +803,8 @@ static int parse_opt_token(const char *token)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return OPT_CRED;
-> =A0 =A0 =A0 =A0if (strncmp(token, "uid", 3) =3D=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return OPT_UID;
-> + =A0 =A0 =A0 if (strncmp(token, "cruid", 5) =3D=3D 0)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return OPT_CRUID;
-> =A0 =A0 =A0 =A0if (strncmp(token, "gid", 3) =3D=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return OPT_GID;
-> =A0 =A0 =A0 =A0if (strncmp(token, "fmask", 5) =3D=3D 0)
-> @@ -856,8 +859,9 @@ parse_options(const char *data, struct parsed_mou=
-nt_info *parsed_info)
-> =A0 =A0 =A0 =A0int word_len;
-> =A0 =A0 =A0 =A0int rc =3D 0;
-> =A0 =A0 =A0 =A0int got_uid =3D 0;
-> + =A0 =A0 =A0 int got_cruid =3D 0;
-> =A0 =A0 =A0 =A0int got_gid =3D 0;
-> - =A0 =A0 =A0 uid_t uid;
-> + =A0 =A0 =A0 uid_t uid, cruid;
-> =A0 =A0 =A0 =A0gid_t gid;
-> =A0 =A0 =A0 =A0char txtbuf[12];
-> =A0 =A0 =A0 =A0char *ep;
-> @@ -1036,6 +1040,23 @@ parse_options(const char *data, struct parsed_=
-mount_info *parsed_info)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0uid =3D pw->pw_uid;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto nocopy;
->
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 case OPT_CRUID:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!value || !*value)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto no=
-copy;
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 got_cruid =3D 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cruid =3D strtoul(value=
-, &ep, 10);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (errno !=3D EINVAL &=
-& *ep =3D=3D '\0')
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto no=
-copy;
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pw =3D getpwnam(value);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pw =3D=3D NULL) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf=
-(stderr, "bad user name \"%s\"\n", value);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return =
-EX_USAGE;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cruid =3D pw->pw_uid;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocopy;
-> +
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case OPT_GID:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!value || !*value)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto n=
-ocopy;
-> @@ -1187,6 +1208,22 @@ nocopy:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0snprintf(out + out_len, word_len + 5, =
-"uid=3D%s", txtbuf);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0out_len =3D strlen(out);
-> =A0 =A0 =A0 =A0}
-> + =A0 =A0 =A0 if (got_cruid) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 word_len =3D snprintf(txtbuf, sizeof(tx=
-tbuf), "%u", cruid);
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* comma + "cruid=3D" + terminating NUL=
-L =3D=3D 6 */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (out_len + word_len + 8 > MAX_OPTION=
-S_LEN) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf(stderr, "Option=
-s string too long\n");
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return EX_USAGE;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (out_len) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strlcat(out, ",", MAX_O=
-PTIONS_LEN);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 out_len++;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 snprintf(out + out_len, word_len + 7, "=
-cruid=3D%s", txtbuf);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 out_len =3D strlen(out);
-> + =A0 =A0 =A0 }
-> =A0 =A0 =A0 =A0if (got_gid) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0word_len =3D snprintf(txtbuf, sizeof(t=
-xtbuf), "%u", gid);
->
-> @@ -1202,7 +1239,6 @@ nocopy:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0snprintf(out + out_len, word_len + 5, =
-"gid=3D%s", txtbuf);
-> =A0 =A0 =A0 =A0}
-> -
-> =A0 =A0 =A0 =A0return 0;
-> =A0}
+> rpc.idmapd generally maps users to "nobody" if no mapping can be foun=
+d.
+> Something like that might be a safer default. It should probably be a
+> tunable setting too.
 >
 > --
-> 1.7.3.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >
 
-Looks correct.
+It really should not matter what the owner and group name/id of an
+object within such mapped share look like since permission checking
+is going to happen as per server.
 
-Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+--
+If a process is checking permissions, an attempt is made to map
+the uid of the process to a SID. If it does not map, then
+-EACCESS error is returned.
+If it maps to a SID, verify whether that SID exists as one of
+the ACEs in the fetched DACL, if it does not, return -EACCESS error
+and if it does, map the mask value in that ACE to the permissions
+requested/being_ascertained and return the result like
+generic_permissions() would.
+--
+
+If a user mounts a share using uid and gid mount options, should
+all the objects within such share appear with uname and gname
+respectively, winbind mapping should not be even attempted
+when listing/stat'ing a file and winbind should be employed only
+during permission_checking/chmod/chroup/chmod?
