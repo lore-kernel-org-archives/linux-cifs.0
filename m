@@ -1,125 +1,138 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 2/2] mount.cifs: add cruid= mount option
-Date: Wed, 12 Jan 2011 15:26:36 -0500
-Message-ID: <1294863996-7678-2-git-send-email-jlayton@samba.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/2] mount.cifs: clean up handling of uid= and gid=
+Date: Wed, 12 Jan 2011 15:42:35 -0600
+Message-ID: <AANLkTin6ccN_qBD32eo0dMXCLpEQXscX_sjOzNwvMtRO@mail.gmail.com>
 References: <1294863996-7678-1-git-send-email-jlayton@samba.org>
-Cc: walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: base64
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1294863996-7678-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Allow admins to pass in a username for the cruid= mount option.
-
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.8 |    5 +++++
- mount.cifs.c |   40 ++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 43 insertions(+), 2 deletions(-)
-
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index 5f82ac9..469440d 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -120,6 +120,11 @@ forceuid
- instructs the client to ignore any uid provided by the server for files and directories and to always assign the owner to be the value of the uid= option\&. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more information\&.
- .RE
- .PP
-+cruid=\fIarg\fR
-+.RS 4
-+sets the uid of the owner of the credentials cache\&. This is primarily useful with sec=krb5\&. The default is the real uid of the process performing the mount\&. Setting this parameter directs the upcall to look for a credentials cache owned by that user\&.
-+.RE
-+.PP
- gid=\fIarg\fR
- .RS 4
- sets the gid that will own all files or directories on the mounted filesystem when the server does not provide ownership information\&. It may be specified as either a groupname or a numeric gid\&. When not specified, the default is gid 0\&. The mount\&.cifs helper must be at version 1\&.10 or higher to support specifying the gid in non\-numeric form\&. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more information\&.
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 8fccf44..41da67e 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -157,6 +157,7 @@
- #define OPT_REMOUNT    26
- #define OPT_MAND       27
- #define OPT_NOMAND     28
-+#define OPT_CRUID      29
- 
- 
- /* struct for holding parsed mount info for use by privleged process */
-@@ -802,6 +803,8 @@ static int parse_opt_token(const char *token)
- 		return OPT_CRED;
- 	if (strncmp(token, "uid", 3) == 0)
- 		return OPT_UID;
-+	if (strncmp(token, "cruid", 5) == 0)
-+		return OPT_CRUID;
- 	if (strncmp(token, "gid", 3) == 0)
- 		return OPT_GID;
- 	if (strncmp(token, "fmask", 5) == 0)
-@@ -856,8 +859,9 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 	int word_len;
- 	int rc = 0;
- 	int got_uid = 0;
-+	int got_cruid = 0;
- 	int got_gid = 0;
--	uid_t uid;
-+	uid_t uid, cruid;
- 	gid_t gid;
- 	char txtbuf[12];
- 	char *ep;
-@@ -1036,6 +1040,23 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			uid = pw->pw_uid;
- 			goto nocopy;
- 
-+		case OPT_CRUID:
-+			if (!value || !*value)
-+				goto nocopy;
-+
-+			got_cruid = 1;
-+			cruid = strtoul(value, &ep, 10);
-+			if (errno != EINVAL && *ep == '\0')
-+				goto nocopy;
-+
-+			pw = getpwnam(value);
-+			if (pw == NULL) {
-+				fprintf(stderr, "bad user name \"%s\"\n", value);
-+				return EX_USAGE;
-+			}
-+			cruid = pw->pw_uid;
-+			goto nocopy;
-+
- 		case OPT_GID:
- 			if (!value || !*value)
- 				goto nocopy;
-@@ -1187,6 +1208,22 @@ nocopy:
- 		snprintf(out + out_len, word_len + 5, "uid=%s", txtbuf);
- 		out_len = strlen(out);
- 	}
-+	if (got_cruid) {
-+		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", cruid);
-+
-+		/* comma + "cruid=" + terminating NULL == 6 */
-+		if (out_len + word_len + 8 > MAX_OPTIONS_LEN) {
-+			fprintf(stderr, "Options string too long\n");
-+			return EX_USAGE;
-+		}
-+
-+		if (out_len) {
-+			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			out_len++;
-+		}
-+		snprintf(out + out_len, word_len + 7, "cruid=%s", txtbuf);
-+		out_len = strlen(out);
-+	}
- 	if (got_gid) {
- 		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", gid);
- 
-@@ -1202,7 +1239,6 @@ nocopy:
- 		}
- 		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
- 	}
--
- 	return 0;
- }
- 
--- 
-1.7.3.4
+T24gV2VkLCBKYW4gMTIsIDIwMTEgYXQgMjoyNiBQTSwgSmVmZiBMYXl0b24gPGpsYXl0b25Ac2Ft
+YmEub3JnPiB3cm90ZToKPiBUaGUgaGFuZGxpbmcgb2YgdGhlc2Ugb3B0aW9ucyBpcyBxdWl0ZSBj
+b252b2x1dGVkLiBDaGFuZ2UgaXQgc28gdGhhdAo+IHRoZXNlIG9wdGlvbnMgYXJlIHN0b3JlZCBh
+cyBudW1iZXJzIGFuZCB0aGVuIGFwcGVuZGVkIHRvIHRoZSBvcHRpb24KPiBzdHJpbmdzLgo+Cj4g
+U2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPgo+IC0tLQo+IKBt
+b3VudC5jaWZzLmMgfCCgIDk0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLQo+IKAxIGZpbGVzIGNoYW5nZWQsIDQ4IGluc2VydGlvbnMoKyks
+IDQ2IGRlbGV0aW9ucygtKQo+Cj4gZGlmZiAtLWdpdCBhL21vdW50LmNpZnMuYyBiL21vdW50LmNp
+ZnMuYwo+IGluZGV4IGRmOTJkNzkuLjhmY2NmNDQgMTAwNjQ0Cj4gLS0tIGEvbW91bnQuY2lmcy5j
+Cj4gKysrIGIvbW91bnQuY2lmcy5jCj4gQEAgLTg1NywxOSArODU3LDI0IEBAIHBhcnNlX29wdGlv
+bnMoY29uc3QgY2hhciAqZGF0YSwgc3RydWN0IHBhcnNlZF9tb3VudF9pbmZvICpwYXJzZWRfaW5m
+bykKPiCgIKAgoCCgaW50IHJjID0gMDsKPiCgIKAgoCCgaW50IGdvdF91aWQgPSAwOwo+IKAgoCCg
+IKBpbnQgZ290X2dpZCA9IDA7Cj4gLSCgIKAgoCBjaGFyIHVzZXJbMzJdOwo+IC0goCCgIKAgY2hh
+ciBncm91cFszMl07Cj4gKyCgIKAgoCB1aWRfdCB1aWQ7Cj4gKyCgIKAgoCBnaWRfdCBnaWQ7Cj4g
+KyCgIKAgoCBjaGFyIHR4dGJ1ZlsxMl07CgpMb29rcyBjb3JyZWN0IGV4Y2VwdCBwZXJoYXBzIGEg
+Y29tbWVudCBhYm91dCB0aGUgdmFsdWUgb2YgMTIgd291bGQgYmUgbmljZS4KClJldmlld2VkLWJ5
+OiBTaGlyaXNoIFBhcmdhb25rYXIgPHNoaXJpc2hwYXJnYW9ua2FyQGdtYWlsLmNvbT4KCj4gKyCg
+IKAgoCBjaGFyICplcDsKPiArIKAgoCCgIHN0cnVjdCBwYXNzd2QgKnB3Owo+ICsgoCCgIKAgc3Ry
+dWN0IGdyb3VwICpncjsKPgo+IKAgoCCgIKAvKiBtYWtlIHN1cmUgd2UncmUgc3RhcnRpbmcgZnJv
+bSBiZWdpbm5pbmcgKi8KPiCgIKAgoCCgb3V0WzBdID0gJ1wwJzsKPgo+IKAgoCCgIKAvKiBCQiBm
+aXhtZSBjaGVjayBmb3Igc2VwYXJhdG9yIG92ZXJyaWRlIEJCICovCj4gLSCgIKAgoCBpZiAoZ2V0
+dWlkKCkpIHsKPiArIKAgoCCgIHVpZCA9IGdldHVpZCgpOwo+ICsgoCCgIKAgaWYgKHVpZCAhPSAw
+KQo+IKAgoCCgIKAgoCCgIKAgoGdvdF91aWQgPSAxOwo+IC0goCCgIKAgoCCgIKAgoCBzbnByaW50
+Zih1c2VyLCBzaXplb2YodXNlciksICIldSIsIGdldHVpZCgpKTsKPiArCj4gKyCgIKAgoCBnaWQg
+PSBnZXRnaWQoKTsKPiArIKAgoCCgIGlmIChnaWQgIT0gMCkKPiCgIKAgoCCgIKAgoCCgIKBnb3Rf
+Z2lkID0gMTsKPiAtIKAgoCCgIKAgoCCgIKAgc25wcmludGYoZ3JvdXAsIHNpemVvZihncm91cCks
+ICIldSIsIGdldGdpZCgpKTsKPiAtIKAgoCCgIH0KPgo+IKAgoCCgIKBpZiAoIWRhdGEpCj4goCCg
+IKAgoCCgIKAgoCCgcmV0dXJuIEVYX1VTQUdFOwo+IEBAIC0xMDE0LDQzICsxMDE5LDM5IEBAIHBh
+cnNlX29wdGlvbnMoY29uc3QgY2hhciAqZGF0YSwgc3RydWN0IHBhcnNlZF9tb3VudF9pbmZvICpw
+YXJzZWRfaW5mbykKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoGJyZWFrOwo+Cj4goCCgIKAgoCCg
+IKAgoCCgY2FzZSBPUFRfVUlEOgo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIGlmICh2YWx1ZSAm
+JiAqdmFsdWUpIHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGdvdF91aWQgPSAx
+Owo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKCFpc2RpZ2l0KCp2YWx1ZSkp
+IHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgc3RydWN0IHBhc3N3
+ZCAqcHc7Cj4gLQo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAo
+IShwdyA9IGdldHB3bmFtKHZhbHVlKSkpIHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCBmcHJpbnRmKHN0ZGVyciwKPiAtIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgICJiYWQgdXNlciBuYW1lIFwiJXNc
+IlxuIiwKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIHZhbHVlKTsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCByZXR1cm4gRVhfVVNBR0U7Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIH0KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgc25w
+cmludGYodXNlciwgc2l6ZW9mKHVzZXIpLCAiJXUiLAo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKBwdy0+cHdfdWlkKTsKPiAtIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIH0KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGVsc2UK
+PiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgc3RybGNweSh1c2VyLCB2
+YWx1ZSwgc2l6ZW9mKHVzZXIpKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoIXZhbHVl
+IHx8ICEqdmFsdWUpCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBnb3RvIG5vY29w
+eTsKPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ290X3VpZCA9IDE7Cj4gKyCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgdWlkID0gc3RydG91bCh2YWx1ZSwgJmVwLCAxMCk7Cj4gKyCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgaWYgKGVycm5vICE9IEVJTlZBTCAmJiAqZXAgPT0gJ1wwJykKPiArIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGdvdG8gbm9jb3B5Owo+ICsKPiArIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCBwdyA9IGdldHB3bmFtKHZhbHVlKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCBpZiAocHcgPT0gTlVMTCkgewo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+ZnByaW50ZihzdGRlcnIsICJiYWQgdXNlciBuYW1lIFwiJXNcIlxuIiwgdmFsdWUpOwo+ICsgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgcmV0dXJuIEVYX1VTQUdFOwo+IKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgfQo+ICsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCB1aWQgPSBwdy0+cHdf
+dWlkOwo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgZ290byBub2NvcHk7Cj4KPiCgIKAgoCCgIKAg
+oCCgIKBjYXNlIE9QVF9HSUQ6Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKHZhbHVlICYm
+ICp2YWx1ZSkgewo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ290X2dpZCA9IDE7
+Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoIWlzZGlnaXQoKnZhbHVlKSkg
+ewo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzdHJ1Y3QgZ3JvdXAg
+KmdyOwo+IC0KPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgaWYgKCEo
+Z3IgPSBnZXRncm5hbSh2YWx1ZSkpKSB7Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgZnByaW50ZihzdGRlcnIsCj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCAiYmFkIGdyb3VwIG5hbWUgXCIlc1wi
+XG4iLAo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgdmFsdWUpOwo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIHJldHVybiBFWF9VU0FHRTsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgfQo+IC0goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzbnBy
+aW50Zihncm91cCwgc2l6ZW9mKGdyb3VwKSwgIiV1IiwKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgZ3ItPmdyX2dpZCk7Cj4gLSCgIKAgoCCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCB9Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBlbHNl
+Cj4gLSCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIHN0cmxjcHkoZ3JvdXAs
+IHZhbHVlLCBzaXplb2YoZ3JvdXApKTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBpZiAoIXZh
+bHVlIHx8ICEqdmFsdWUpCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBnb3RvIG5v
+Y29weTsKPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ290X2dpZCA9IDE7Cj4gKyCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgZ2lkID0gc3RydG91bCh2YWx1ZSwgJmVwLCAxMCk7Cj4gKyCgIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgaWYgKGVycm5vICE9IEVJTlZBTCAmJiAqZXAgPT0gJ1wwJykKPiAr
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIGdvdG8gbm9jb3B5Owo+ICsKPiArIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCBnciA9IGdldGdybmFtKHZhbHVlKTsKPiArIKAgoCCgIKAgoCCgIKAg
+oCCgIKAgoCBpZiAoZ3IgPT0gTlVMTCkgewo+ICsgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCg
+IKAgZnByaW50ZihzdGRlcnIsICJiYWQgZ3JvdXAgbmFtZSBcIiVzXCJcbiIsIHZhbHVlKTsKPiAr
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgIHJldHVybiBFWF9VU0FHRTsKPiCgIKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoH0KPiArCj4gKyCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgZ2lkID0gZ3It
+PmdyX2dpZDsKPiCgIKAgoCCgIKAgoCCgIKAgoCCgIKAgoGdvdG8gbm9jb3B5Owo+Cj4goCCgIKAg
+oCCgIKAgoCCgLyogZm1hc2sgZmFsbCB0aHJvdWdoIHRvIGZpbGVfbW9kZSAqLwo+IEBAIC0xMTcx
+LDM0ICsxMTcyLDM1IEBAIG5vY29weToKPgo+IKAgoCCgIKAvKiBzcGVjaWFsLWNhc2UgdGhlIHVp
+ZCBhbmQgZ2lkICovCj4goCCgIKAgoGlmIChnb3RfdWlkKSB7Cj4gLSCgIKAgoCCgIKAgoCCgIHdv
+cmRfbGVuID0gc3RybGVuKHVzZXIpOwo+ICsgoCCgIKAgoCCgIKAgoCB3b3JkX2xlbiA9IHNucHJp
+bnRmKHR4dGJ1Ziwgc2l6ZW9mKHR4dGJ1ZiksICIldSIsIHVpZCk7Cj4KPiArIKAgoCCgIKAgoCCg
+IKAgLyogY29tbWEgKyAidWlkPSIgKyB0ZXJtaW5hdGluZyBOVUxMID09IDYgKi8KPiCgIKAgoCCg
+IKAgoCCgIKBpZiAob3V0X2xlbiArIHdvcmRfbGVuICsgNiA+IE1BWF9PUFRJT05TX0xFTikgewo+
+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgZnByaW50ZihzdGRlcnIsICJPcHRpb25zIHN0cmluZyB0
+b28gbG9uZ1xuIik7Cj4goCCgIKAgoCCgIKAgoCCgIKAgoCCgIKByZXR1cm4gRVhfVVNBR0U7Cj4g
+oCCgIKAgoCCgIKAgoCCgfQo+Cj4goCCgIKAgoCCgIKAgoCCgaWYgKG91dF9sZW4pIHsKPiAtIKAg
+oCCgIKAgoCCgIKAgoCCgIKAgoCBzdHJsY2F0KG91dCwgIiwiLCBvdXRfbGVuICsgd29yZF9sZW4g
+KyA2KTsKPiArIKAgoCCgIKAgoCCgIKAgoCCgIKAgoCBzdHJsY2F0KG91dCwgIiwiLCBNQVhfT1BU
+SU9OU19MRU4pOwo+IKAgoCCgIKAgoCCgIKAgoCCgIKAgoCCgb3V0X2xlbisrOwo+IKAgoCCgIKAg
+oCCgIKAgoH0KPiAtIKAgoCCgIKAgoCCgIKAgc25wcmludGYob3V0ICsgb3V0X2xlbiwgd29yZF9s
+ZW4gKyA1LCAidWlkPSVzIiwgdXNlcik7Cj4gKyCgIKAgoCCgIKAgoCCgIHNucHJpbnRmKG91dCAr
+IG91dF9sZW4sIHdvcmRfbGVuICsgNSwgInVpZD0lcyIsIHR4dGJ1Zik7Cj4goCCgIKAgoCCgIKAg
+oCCgb3V0X2xlbiA9IHN0cmxlbihvdXQpOwo+IKAgoCCgIKB9Cj4goCCgIKAgoGlmIChnb3RfZ2lk
+KSB7Cj4gLSCgIKAgoCCgIKAgoCCgIHdvcmRfbGVuID0gc3RybGVuKGdyb3VwKTsKPiArIKAgoCCg
+IKAgoCCgIKAgd29yZF9sZW4gPSBzbnByaW50Zih0eHRidWYsIHNpemVvZih0eHRidWYpLCAiJXUi
+LCBnaWQpOwo+Cj4gLSCgIKAgoCCgIKAgoCCgIGlmIChvdXRfbGVuICsgMSArIHdvcmRfbGVuICsg
+NiA+IE1BWF9PUFRJT05TX0xFTikgewo+ICsgoCCgIKAgoCCgIKAgoCAvKiBjb21tYSArICJnaWQ9
+IiArIHRlcm1pbmF0aW5nIE5VTEwgPT0gNiAqLwo+ICsgoCCgIKAgoCCgIKAgoCBpZiAob3V0X2xl
+biArIHdvcmRfbGVuICsgNiA+IE1BWF9PUFRJT05TX0xFTikgewo+IKAgoCCgIKAgoCCgIKAgoCCg
+IKAgoCCgZnByaW50ZihzdGRlcnIsICJPcHRpb25zIHN0cmluZyB0b28gbG9uZ1xuIik7Cj4goCCg
+IKAgoCCgIKAgoCCgIKAgoCCgIKByZXR1cm4gRVhfVVNBR0U7Cj4goCCgIKAgoCCgIKAgoCCgfQo+
+Cj4goCCgIKAgoCCgIKAgoCCgaWYgKG91dF9sZW4pIHsKPiAtIKAgoCCgIKAgoCCgIKAgoCCgIKAg
+oCBzdHJsY2F0KG91dCwgIiwiLCBvdXRfbGVuICsgd29yZF9sZW4gKyA2KTsKPiArIKAgoCCgIKAg
+oCCgIKAgoCCgIKAgoCBzdHJsY2F0KG91dCwgIiwiLCBNQVhfT1BUSU9OU19MRU4pOwo+IKAgoCCg
+IKAgoCCgIKAgoCCgIKAgoCCgb3V0X2xlbisrOwo+IKAgoCCgIKAgoCCgIKAgoH0KPiAtIKAgoCCg
+IKAgoCCgIKAgc25wcmludGYob3V0ICsgb3V0X2xlbiwgd29yZF9sZW4gKyA1LCAiZ2lkPSVzIiwg
+Z3JvdXApOwo+IC0goCCgIKAgoCCgIKAgoCBvdXRfbGVuID0gc3RybGVuKG91dCk7Cj4gKyCgIKAg
+oCCgIKAgoCCgIHNucHJpbnRmKG91dCArIG91dF9sZW4sIHdvcmRfbGVuICsgNSwgImdpZD0lcyIs
+IHR4dGJ1Zik7Cj4goCCgIKAgoH0KPgo+IKAgoCCgIKByZXR1cm4gMDsKPiAtLQo+IDEuNy4zLjQK
+Pgo+IC0tCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVu
+c3Vic2NyaWJlIGxpbnV4LWNpZnMiIGluCj4gdGhlIGJvZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9y
+ZG9tb0B2Z2VyLmtlcm5lbC5vcmcKPiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0IKBodHRwOi8vdmdl
+ci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwKPgo=
