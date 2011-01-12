@@ -1,207 +1,172 @@
-From: Matt Helsley <matthltc-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Teach cifs about network namespaces.
-Date: Tue, 11 Jan 2011 14:03:23 -0800
-Message-ID: <20110111220323.GM29064@count0.beaverton.ibm.com>
-References: <4D2BDE07.40202@parallels.com>
- <20110111071239.GL29064@count0.beaverton.ibm.com>
- <4D2C63B2.6090109@parallels.com>
+From: "Q (Igor Mammedov)" <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 5/5] cifs.upcall: add keytab support for unattended mounts
+Date: Wed, 12 Jan 2011 09:56:34 +0300
+Message-ID: <AANLkTimxsXh5LgVD690=xjfiqgnELNMQObVUa5Yjkote@mail.gmail.com>
+References: <1294409505-2999-1-git-send-email-jlayton@samba.org>
+	<1294409505-2999-6-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Matt Helsley <matthltc-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>,
-	Pavel Emelyanov <xemul-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>, kir-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org,
-	containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <4D2C63B2.6090109-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+In-Reply-To: <1294409505-2999-6-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jan 11, 2011 at 08:05:38AM -0600, Rob Landley wrote:
-> On 01/11/2011 01:12 AM, Matt Helsley wrote:
-> > On Mon, Jan 10, 2011 at 10:35:19PM -0600, Rob Landley wrote:
-> >> From: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-> >>
-> >> Teach cifs about network namespaces, so mounting uses adresses and
-> >> routing visible from a container rather than from init context.
-> >>
-> >> For a long drawn out test reproduction sequence, see:
-> >>
-> >>   http://landley.livejournal.com/47024.html
-> >>   http://landley.livejournal.com/47205.html
-> >>   http://landley.livejournal.com/47476.html
-> >>
-> >> Signed-off-by: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-> >> ---
-> >>
-> >>  fs/cifs/cifsglob.h |   32 ++++++++++++++++++++++++++++++++
-> >>  fs/cifs/connect.c  |   22 +++++++++++++++++-----
-> >>  2 files changed, 49 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >> index 7136c0c..86f31bb 100644
-> >> --- a/fs/cifs/cifsglob.h
-> >> +++ b/fs/cifs/cifsglob.h
+Acked-by: Igor Mammedov <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-<snip>
-
-> >> +#ifdef CONFIG_NET_NS
-> >> +#define cifs_use_net_ns() (1)
-> >> +#else
-> >> +#define cifs_use_net_ns() (0)
-> >> +#endif
-> > 
-> > This looks wrong -- we shouldn't need this at all. The #ifdef bits in
-> > your patch already make all the cases below become empty/no-ops when
-> > CONFIG_NET_NS=n.
-> 
-> Except that bloat-o-meter said they were still generating code and
-> making the kernel bigger.  (Things like calling get() and put() on
-> init_net to twiddle its reference count.)
-
-I think the only code that would be generated is the test discussed
-below. And we're probably talking a few instructions -- an insignificant
-amount. There are probably much better places to make a substantial
-impact on kernel bloat.
-
-> 
-> I'm a long-time embedded programmer, I try not to make the code bigger
-> than necessary, especially when we have a config symbol to remove stuff.
->  I did ponder turning those into HAVE_NET_HS so the if was more
-> obviously against a constant.
-
-My recollection is that method of doing things is often frowned upon in
-kernel code. There are exceptions of course, but most use the CONFIG_FOO
-patterns you've already employed (or that I already suggested).
-
-> 
-> >> +
-> >> +/*
-> >>   * Session structure.  One of these for each uid session with a particular host
-> >>   */
-> >>  struct cifsSesInfo {
-> >> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> >> index cc1a860..b4faef0 100644
-> >> --- a/fs/cifs/connect.c
-> >> +++ b/fs/cifs/connect.c
-> >> @@ -1545,6 +1545,10 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
-> >>
-> >>  	spin_lock(&cifs_tcp_ses_lock);
-> >>  	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-> >> +		if (cifs_use_net_ns()
-> >> +		    && cifs_net_ns(server) == current->nsproxy->net_ns)
-> >> +			continue;
-> > 
-> > This looks wrong -- you want to invert part of this I think (and drop the
-> > unnecessary cifs_use_net_ns()):
-> 
-> You're right, I got the test backwards.  Thanks.
-> 
-> The reason for the guards is that compiler couldn't tell that
-> current->nsproxy->net_ns always contains the same value, so without a
-> test against a constant allowing it to do dead code elimination, it will
-> generate code to perform the useless test.
-
-I think we're better off with simpler source code than trying to eliminate
-a few instructions.
-
-> 
-> > 	if (cifs_net_ns(server) != current->nsproxy->net_ns)
-> > 		continue;
-> > 
-> > This is obvious when you note that the context below shows that we
-> > 'continue' to the next entry when the addresses don't match:
-> > 
-> >> +
-> >>  		if (!match_address(server, addr,
-> >>  				   (struct sockaddr *)&vol->srcaddr))
-> >>  			continue;
-> >> @@ -1572,6 +1576,9 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
-> >>  		return;
-> >>  	}
-> >>
-> >> +	if (cifs_use_net_ns())
-> >> +		put_net(cifs_net_ns(server));
-> >> +
-> > 
-> > I think this should just be:
-> > 
-> > 	put_net(cifs_net_ns(server));
-> 
-> Hmmm...  that one you're probably right, because
-> include/net/net_namespace.h makes put_net() an empty inline, so as long
-> as cifs_net_ns() has no side effects the compiler should be able to drop
-> the whole thing out.  (Whether or not it will, I have to test...)
-> 
-> >>  	list_del_init(&server->tcp_ses_list);
-> >>  	spin_unlock(&cifs_tcp_ses_lock);
-> >>
-> >> @@ -1677,6 +1684,9 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
-> >>  	       sizeof(tcp_ses->srcaddr));
-> >>  	++tcp_ses->srv_count;
-> >>
-> >> +	if (cifs_use_net_ns())
-> >> +		cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
-> >> +
-> > 
-> > Just use cifs_set_net_ns() because it already turns into a no-op when
-> > CONFIG_NET_NS=n
-> 
-> no-op yes.  no-code, I want to make sure.  (I tried it with just the
-> macros the first time through, and scripts/bloat-o-meter kept saying
-> code was being generated.  I'll fire up objdump and see if the
-> disassembly tells me anything...)
-
-Yup, thanks for making sure.
-
-<snip>
-
-> >> @@ -2145,8 +2158,8 @@ ipv4_connect(struct TCP_Server_Info *server)
-> >>  	struct socket *socket = server->ssocket;
-> >>
-> >>  	if (socket == NULL) {
-> >> -		rc = sock_create_kern(PF_INET, SOCK_STREAM,
-> >> -				      IPPROTO_TCP, &socket);
-> >> +		rc = __sock_create(cifs_net_ns(server), PF_INET,
-> >> +				   SOCK_STREAM, IPPROTO_TCP, &socket, 1);
-> >>  		if (rc < 0) {
-> >>  			cERROR(1, "Error %d creating socket", rc);
-> >>  			return rc;
-> >> @@ -2310,11 +2323,10 @@ ipv6_connect(struct TCP_Server_Info *server)
-> >>  	struct socket *socket = server->ssocket;
-> >>
-> >>  	if (socket == NULL) {
-> >> -		rc = sock_create_kern(PF_INET6, SOCK_STREAM,
-> >> -				      IPPROTO_TCP, &socket);
-> >> +		rc = __sock_create(cifs_net_ns(server), PF_INET6,
-> >> +				   SOCK_STREAM, IPPROTO_TCP, &socket, 1);
-> >>  		if (rc < 0) {
-> >>  			cERROR(1, "Error %d creating ipv6 socket", rc);
-> >> -			socket = NULL;
-> >>  			return rc;
-> >>  		}
-> 
-> Note, those two add 16 bytes each on x86-64 (two extra 8-byte
-> arguments), but that I couldn't easily stop.  I might try to merge the
-> ipv4/ipv6 functions, but that's a separate patch.
-
-If anything I think you're saving more space with your patched code:
-
-int sock_create_kern(int family, int type, int protocol, struct socket
-**res)
-{
-        return __sock_create(&init_net, family, type, protocol, res, 1);
-}
-EXPORT_SYMBOL(sock_create_kern);
-
-It's not an inline function so I expect using sock_create_kern() will take up
-more stack space than calling __sock_create() directly. On some archs
-the instructions to make the extra function call might also take up
-'significant' space. And you're passing an 8-byte pointer *anyway* so no size
-difference there unless the compiler is more clever than I expect.
-
-In my humble opinion you don't need to spend so much time counting bytes
-:). 
-
-Cheers,
-	-Matt
+On Fri, Jan 7, 2011 at 5:11 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> Based on a patch from a few years ago by Igor Mammedov. This patch
+> adds the ability for cifs.upcall to establish a TGT using the
+> system-default keytab.
+>
+> Cc: Igor Mammedov <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+> =C2=A0cifs.upcall.c | =C2=A0 78 +++++++++++++++++++++++++++++++++++++=
+++++++++++++++++++++
+> =C2=A01 files changed, 78 insertions(+), 0 deletions(-)
+>
+> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> index 3dbcd6e..479517c 100644
+> --- a/cifs.upcall.c
+> +++ b/cifs.upcall.c
+> @@ -54,6 +54,7 @@
+>
+> =C2=A0#define =C2=A0 =C2=A0 =C2=A0 =C2=A0CIFS_DEFAULT_KRB5_DIR =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 "/tmp"
+> =C2=A0#define =C2=A0 =C2=A0 =C2=A0 =C2=A0CIFS_DEFAULT_KRB5_PREFIX =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0"krb5cc_"
+> +#define CIFS_DEFAULT_KRB5_KEYTAB =C2=A0 =C2=A0 =C2=A0 "/etc/krb5.key=
+tab"
+>
+> =C2=A0#define =C2=A0 =C2=A0 =C2=A0 =C2=A0MAX_CCNAME_LEN =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0PATH_MAX + 5
+>
+> @@ -185,6 +186,78 @@ static int krb5cc_filter(const struct dirent *di=
+rent)
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;
+> =C2=A0}
+>
+> +static char *
+> +init_cc_from_keytab(const char *keytab_name, const char *user)
+> +{
+> + =C2=A0 =C2=A0 =C2=A0 krb5_context context =3D NULL;
+> + =C2=A0 =C2=A0 =C2=A0 krb5_error_code ret;
+> + =C2=A0 =C2=A0 =C2=A0 krb5_creds my_creds;
+> + =C2=A0 =C2=A0 =C2=A0 krb5_keytab keytab =3D NULL;
+> + =C2=A0 =C2=A0 =C2=A0 krb5_principal me =3D NULL;
+> + =C2=A0 =C2=A0 =C2=A0 krb5_ccache cc =3D NULL;
+> + =C2=A0 =C2=A0 =C2=A0 char *ccname =3D NULL;
+> +
+> + =C2=A0 =C2=A0 =C2=A0 memset((char *) &my_creds, 0, sizeof(my_creds)=
+);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_init_context(&context);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_init_context: %d", (int)ret);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_kt_resolve(context, keytab_name, =
+&keytab);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_kt_resolve: %d", (int)ret);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_parse_name(context, user, &me);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_parse_name: %d", (int)ret);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_get_init_creds_keytab(context, &m=
+y_creds, me,
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 keytab, 0, NULL, NULL);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_get_init_creds_keytab: %d", (int)ret);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_cc_default(context, &cc);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_cc_default: %d", (int)ret);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_cc_initialize(context, cc, me);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret) {
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_cc_initialize: %d", (int)ret);
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto icfk_cleanup;
+> + =C2=A0 =C2=A0 =C2=A0 }
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ret =3D krb5_cc_store_cred(context, cc, &my_cr=
+eds);
+> + =C2=A0 =C2=A0 =C2=A0 if (ret)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG, =
+"krb5_cc_store_cred: %d", (int)ret);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 ccname =3D strdup(krb5_cc_default_name(context=
+));
+> + =C2=A0 =C2=A0 =C2=A0 if (ccname =3D=3D NULL)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_ERR, "U=
+nable to allocate memory");
+> +icfk_cleanup:
+> + =C2=A0 =C2=A0 =C2=A0 my_creds.client =3D 0;
+> + =C2=A0 =C2=A0 =C2=A0 krb5_free_cred_contents(context, &my_creds);
+> +
+> + =C2=A0 =C2=A0 =C2=A0 if (me)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_free_principa=
+l(context, me);
+> + =C2=A0 =C2=A0 =C2=A0 if (cc)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_cc_close(cont=
+ext, cc);
+> + =C2=A0 =C2=A0 =C2=A0 if (keytab)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_kt_close(cont=
+ext, keytab);
+> + =C2=A0 =C2=A0 =C2=A0 if (context)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 krb5_free_context(=
+context);
+> + =C2=A0 =C2=A0 =C2=A0 return ccname;
+> +}
+> +
+> =C2=A0/* search for a credcache that looks like a likely candidate */
+> =C2=A0static char *find_krb5_cc(const char *dirname, uid_t uid)
+> =C2=A0{
+> @@ -702,6 +775,7 @@ int main(const int argc, char *const argv[])
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0struct decoded_args arg;
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0const char *oid;
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0uid_t uid;
+> + =C2=A0 =C2=A0 =C2=A0 char *keytab_name =3D CIFS_DEFAULT_KRB5_KEYTAB=
+;
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0hostbuf[0] =3D '\0';
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0memset(&arg, 0, sizeof(arg));
+> @@ -793,6 +867,10 @@ int main(const int argc, char *const argv[])
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0ccname =3D find_krb5_cc(CIFS_DEFAULT_KRB5_=
+DIR, uid);
+>
+> + =C2=A0 =C2=A0 =C2=A0 /* Couldn't find credcache? Try to use keytab =
+*/
+> + =C2=A0 =C2=A0 =C2=A0 if (ccname =3D=3D NULL && arg.username !=3D NU=
+LL)
+> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ccname =3D init_cc=
+_from_keytab(keytab_name, arg.username);
+> +
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0host =3D arg.hostname;
+>
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0// do mech specific authorization
+> --
+> 1.7.3.4
+>
+>
