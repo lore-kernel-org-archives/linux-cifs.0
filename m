@@ -1,134 +1,53 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/2] mount.cifs: add cruid= mount option
-Date: Fri, 14 Jan 2011 15:39:02 -0500
-Message-ID: <20110114153902.690c11f2@tlielax.poochiereds.net>
-References: <1294863996-7678-1-git-send-email-jlayton@samba.org>
-	<1294863996-7678-2-git-send-email-jlayton@samba.org>
+Subject: Re: [PATCH 0/5] cifs.upcall: add keytab support for unattended
+ mounts
+Date: Fri, 14 Jan 2011 15:43:02 -0500
+Message-ID: <20110114154302.31aab5e2@tlielax.poochiereds.net>
+References: <1294409505-2999-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+Cc: niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1294863996-7678-2-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1294409505-2999-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 12 Jan 2011 15:26:36 -0500
+On Fri,  7 Jan 2011 09:11:40 -0500
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> Allow admins to pass in a username for the cruid= mount option.
+> This patchset is based on one originally proposed by Igor Mammedov back
+> in 2008. For some reason (maybe my fault?) his patch was never committed
+> and cifs.upcall has been unable to use keytabs for mounting since then.
 > 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  mount.cifs.8 |    5 +++++
->  mount.cifs.c |   40 ++++++++++++++++++++++++++++++++++++++--
->  2 files changed, 43 insertions(+), 2 deletions(-)
+> The first few patches in the series clean up the key description parser
+> and some of the other code. The last patch adds the actual keytab
+> support. For now, the code is only able to use the systemwide default
+> keytab. Eventually, we could extend that to point to other keytabs, but
+> we need to think about the right way to pass that location to the upcall
+> program.
 > 
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 5f82ac9..469440d 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -120,6 +120,11 @@ forceuid
->  instructs the client to ignore any uid provided by the server for files and directories and to always assign the owner to be the value of the uid= option\&. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more information\&.
->  .RE
->  .PP
-> +cruid=\fIarg\fR
-> +.RS 4
-> +sets the uid of the owner of the credentials cache\&. This is primarily useful with sec=krb5\&. The default is the real uid of the process performing the mount\&. Setting this parameter directs the upcall to look for a credentials cache owned by that user\&.
-> +.RE
-> +.PP
->  gid=\fIarg\fR
->  .RS 4
->  sets the gid that will own all files or directories on the mounted filesystem when the server does not provide ownership information\&. It may be specified as either a groupname or a numeric gid\&. When not specified, the default is gid 0\&. The mount\&.cifs helper must be at version 1\&.10 or higher to support specifying the gid in non\-numeric form\&. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more information\&.
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 8fccf44..41da67e 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -157,6 +157,7 @@
->  #define OPT_REMOUNT    26
->  #define OPT_MAND       27
->  #define OPT_NOMAND     28
-> +#define OPT_CRUID      29
->  
->  
->  /* struct for holding parsed mount info for use by privleged process */
-> @@ -802,6 +803,8 @@ static int parse_opt_token(const char *token)
->  		return OPT_CRED;
->  	if (strncmp(token, "uid", 3) == 0)
->  		return OPT_UID;
-> +	if (strncmp(token, "cruid", 5) == 0)
-> +		return OPT_CRUID;
->  	if (strncmp(token, "gid", 3) == 0)
->  		return OPT_GID;
->  	if (strncmp(token, "fmask", 5) == 0)
-> @@ -856,8 +859,9 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  	int word_len;
->  	int rc = 0;
->  	int got_uid = 0;
-> +	int got_cruid = 0;
->  	int got_gid = 0;
-> -	uid_t uid;
-> +	uid_t uid, cruid;
->  	gid_t gid;
->  	char txtbuf[12];
->  	char *ep;
-> @@ -1036,6 +1040,23 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  			uid = pw->pw_uid;
->  			goto nocopy;
->  
-> +		case OPT_CRUID:
-> +			if (!value || !*value)
-> +				goto nocopy;
-> +
-> +			got_cruid = 1;
-> +			cruid = strtoul(value, &ep, 10);
-> +			if (errno != EINVAL && *ep == '\0')
-> +				goto nocopy;
-> +
-> +			pw = getpwnam(value);
-> +			if (pw == NULL) {
-> +				fprintf(stderr, "bad user name \"%s\"\n", value);
-> +				return EX_USAGE;
-> +			}
-> +			cruid = pw->pw_uid;
-> +			goto nocopy;
-> +
->  		case OPT_GID:
->  			if (!value || !*value)
->  				goto nocopy;
-> @@ -1187,6 +1208,22 @@ nocopy:
->  		snprintf(out + out_len, word_len + 5, "uid=%s", txtbuf);
->  		out_len = strlen(out);
->  	}
-> +	if (got_cruid) {
-> +		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", cruid);
-> +
-> +		/* comma + "cruid=" + terminating NULL == 6 */
-> +		if (out_len + word_len + 8 > MAX_OPTIONS_LEN) {
-> +			fprintf(stderr, "Options string too long\n");
-> +			return EX_USAGE;
-> +		}
-> +
-> +		if (out_len) {
-> +			strlcat(out, ",", MAX_OPTIONS_LEN);
-> +			out_len++;
-> +		}
-> +		snprintf(out + out_len, word_len + 7, "cruid=%s", txtbuf);
-> +		out_len = strlen(out);
-> +	}
->  	if (got_gid) {
->  		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", gid);
->  
-> @@ -1202,7 +1239,6 @@ nocopy:
->  		}
->  		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
->  	}
-> -
->  	return 0;
->  }
->  
+> Also, I've only tested this against MIT kerberos. If Heimdal or other
+> krb5 implementations need special casing, I'd appreciate review that
+> points that out.
+> 
+> Lightly tested on my own test rig and it seems to work correctly.
+> 
+> Jeff Layton (5):
+>   cifs.upcall: consolidate find_krb5_cc calls
+>   cifs.upcall: clean up key description decoding routine
+>   cifs.upcall: save off username field from key description
+>   cifs.upcall: debug logging for the key description parser
+>   cifs.upcall: add keytab support for unattended mounts
+> 
+>  cifs.upcall.c |  161 ++++++++++++++++++++++++++++++++++++++++++++++----------
+>  1 files changed, 132 insertions(+), 29 deletions(-)
+> 
 
-Committed...
+Entire set committed. I had hoped to get someone with knowledge of
+heimdal to review this, but I guess if it breaks something they'll let
+us know... ;)
+
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
