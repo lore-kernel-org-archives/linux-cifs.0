@@ -1,108 +1,147 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Use mask of ACEs for SID Everyone to calculate
- all three permissions user, group, and other
-Date: Fri, 14 Jan 2011 10:08:43 -0500
-Message-ID: <20110114100843.2d6b5dbb@tlielax.poochiereds.net>
-References: <1291669006-12102-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20110104141130.2cec2a74@tlielax.poochiereds.net>
-	<AANLkTikhkFnU0B+0JbUXwZvOfVdY_XB67oEaiyaajT0H@mail.gmail.com>
-	<20110104143122.46627c31@tlielax.poochiereds.net>
-	<AANLkTimT4AKX0HYCMcZiMXvXV-N0r23yGQ+oU=CDdi-w@mail.gmail.com>
-	<20110104150934.3ba10652@tlielax.poochiereds.net>
-	<AANLkTik38rcit3PJc1d0WU7+kS4a39UTaQ6TuRN+H_if@mail.gmail.com>
-	<20110113104834.1583ec39@barsoom.rdu.redhat.com>
-	<AANLkTin6t6qoQe7weUkKwNHBPvXkSEbQ9-b16+5A_HpE@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: Fix oplock break handling
+Date: Fri, 14 Jan 2011 20:52:41 +0300
+Message-ID: <1295027561-24077-1-git-send-email-piastryyy@gmail.com>
+Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTin6t6qoQe7weUkKwNHBPvXkSEbQ9-b16+5A_HpE-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 13 Jan 2011 14:45:59 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+When we get oplock break notification we should set the appropriate
+value of OplockLevel field in oplock break acknowledge according to
+the oplock level held by the client in this time. As we only can have
+level II oplock or no oplock in the case of oplock break, we should be
+aware only about clientCanCacheRead field in cifsInodeInfo structure.
 
-> >
-> > What exactly do you intend to protect with client-side enforcement?
-> 
-> Jeff, with client side permission checking/enforcment, as I understand,
-> we are checking for accesses (read, write, etc.). Is that correct or
-> is there more to that?
-> 
+Also fix bug connected with wrong interpretation of OplockLevel field
+during oplock break notification processing.
 
-There's (far) more to it than that. As I said, the server is going to
-enforce permissions based on the user in the SMB session. So, if you
-enforce permissions on the client, then what you end up with is a
-permissions set comprised of the permissions you're enforcing on the
-client logically AND'ed with those that the server enforces.
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+---
+ fs/cifs/cifsproto.h |    2 +-
+ fs/cifs/cifssmb.c   |    4 +++-
+ fs/cifs/file.c      |   21 +++++++++++----------
+ fs/cifs/misc.c      |    2 +-
+ 4 files changed, 16 insertions(+), 13 deletions(-)
 
-Even if you were able to present that somehow, there are significant
-problems with trying to enforce permissions on the client, particularly
-in the face of file and directory creation. Look at it this way:
-
-Suppose that you get idmapping working and find a way to perfectly map
-ACLs to modes on the client. At that point, you'll have file ownership
-and mode that reflects the permissions on file. So, the situation at
-that point is very similar to the situation where unix extensions are
-enabled and the uid/gid are identically mapped on client and server.
-
-This is a simple configuration to set up, so let me give you a simple
-"exercise" in such a configuration:
-
-Mount up a share using a set of credentials that map to "alice" on
-the server. On the client, become user "bob". cd into a world-writeable
-directory on the cifs mount and "touch" a file that does not yet exist:
-
-[bob@client]$ touch bob
-touch: cannot touch `bob': Permission denied
-[bob@client]$ ls -l bob
--rw-r--r--. 1 alice alice 0 Jan 14 09:31 bob
-
-...so what happened here? The file was created, but because the
-credentials don't map to "bob", it's owned by "alice". The utimes() call
-then failed due to client side permissions enforcement (bob doesn't
-have write access) and "touch" returned an error.
-
-There are similar problems with directory creation (can't create new
-entries in a directory that you just created), and with file/directory
-removal (can't remove a file or directory that you just created). It's
-easy to run afoul of this.
-
-The lesson here is that inode creates matter, and you can't work around
-this fact if you're enforcing permissions on the client. This is horribly
-confusing to users. There are many examples over the years of cifs
-users complaining about this when unix extensions are enabled.
-
-There's another problem too...you can only enforce the permissions that
-you *have*. Even if you can perfectly map/enforce permissions on the
-client, it's easily possible for them to change after you fetch them.
-
-Even if you were to fetch the ACL prior to every access (which would be
-horrible for performance), you still have a race window between
-fetching the ACL and enforcing it.
-
-These problems with permissions are the primary reason why I did the
-multiuser mount code. After working on this problem and answering
-questions from confused users for a couple of years, I came to the
-conclusion that the only sensible fix is to avoid permissions
-enforcement on the client altogether.
-
-But...cifs mounts are single-user by default. People often use the inode
-permissions to restrict access to the mount. What we probably ought to
-consider doing there is setting the i_mode according to the
-file_mode/dir_mode options and enforce them on the client using that.
-If unix extensions or cifsacl are enabled, then store the mode in a
-separate place in the cifsInodeInfo and present that in the getattr
-call. It's still confusing but that makes a heck of a lot more sense than
-what we have now.
-
-In any case, I'm not keen on the idea of adding yet another way to set
-the mode on files until we have a sane way of dealing with some of the
-existing problems. If you want to first sort out the mess with
-permissions and unix extensions, then I might be more interested.
-
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e6d1481..95d5dbb 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -347,7 +347,7 @@ extern int CIFSSMBLock(const int xid, struct cifsTconInfo *tcon,
+ 			const __u16 netfid, const __u64 len,
+ 			const __u64 offset, const __u32 numUnlock,
+ 			const __u32 numLock, const __u8 lockType,
+-			const bool waitFlag);
++			const bool waitFlag, const __u8 oplock_level);
+ extern int CIFSSMBPosixLock(const int xid, struct cifsTconInfo *tcon,
+ 			const __u16 smb_file_id, const int get_flag,
+ 			const __u64 len, struct file_lock *,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 2f6795e..3652cc6 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1663,7 +1663,8 @@ int
+ CIFSSMBLock(const int xid, struct cifsTconInfo *tcon,
+ 	    const __u16 smb_file_id, const __u64 len,
+ 	    const __u64 offset, const __u32 numUnlock,
+-	    const __u32 numLock, const __u8 lockType, const bool waitFlag)
++	    const __u32 numLock, const __u8 lockType,
++	    const bool waitFlag, const __u8 oplock_level)
+ {
+ 	int rc = 0;
+ 	LOCK_REQ *pSMB = NULL;
+@@ -1691,6 +1692,7 @@ CIFSSMBLock(const int xid, struct cifsTconInfo *tcon,
+ 	pSMB->NumberOfLocks = cpu_to_le16(numLock);
+ 	pSMB->NumberOfUnlocks = cpu_to_le16(numUnlock);
+ 	pSMB->LockType = lockType;
++	pSMB->OplockLevel = oplock_level;
+ 	pSMB->AndXCommand = 0xFF;	/* none */
+ 	pSMB->Fid = smb_file_id; /* netfid stays le */
+ 
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index d843631..7e83cdb 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -726,12 +726,12 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
+ 
+ 		/* BB we could chain these into one lock request BB */
+ 		rc = CIFSSMBLock(xid, tcon, netfid, length, pfLock->fl_start,
+-				 0, 1, lockType, 0 /* wait flag */ );
++				 0, 1, lockType, 0 /* wait flag */, 0);
+ 		if (rc == 0) {
+ 			rc = CIFSSMBLock(xid, tcon, netfid, length,
+ 					 pfLock->fl_start, 1 /* numUnlock */ ,
+ 					 0 /* numLock */ , lockType,
+-					 0 /* wait flag */ );
++					 0 /* wait flag */, 0);
+ 			pfLock->fl_type = F_UNLCK;
+ 			if (rc != 0)
+ 				cERROR(1, "Error unlocking previously locked "
+@@ -748,13 +748,13 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
+ 				rc = CIFSSMBLock(xid, tcon, netfid, length,
+ 					pfLock->fl_start, 0, 1,
+ 					lockType | LOCKING_ANDX_SHARED_LOCK,
+-					0 /* wait flag */);
++					0 /* wait flag */, 0);
+ 				if (rc == 0) {
+ 					rc = CIFSSMBLock(xid, tcon, netfid,
+ 						length, pfLock->fl_start, 1, 0,
+ 						lockType |
+ 						LOCKING_ANDX_SHARED_LOCK,
+-						0 /* wait flag */);
++						0 /* wait flag */, 0);
+ 					pfLock->fl_type = F_RDLCK;
+ 					if (rc != 0)
+ 						cERROR(1, "Error unlocking "
+@@ -797,8 +797,8 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
+ 
+ 		if (numLock) {
+ 			rc = CIFSSMBLock(xid, tcon, netfid, length,
+-					pfLock->fl_start,
+-					0, numLock, lockType, wait_flag);
++					 pfLock->fl_start, 0, numLock, lockType,
++					 wait_flag, 0);
+ 
+ 			if (rc == 0) {
+ 				/* For Windows locks we must store them. */
+@@ -818,9 +818,9 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
+ 						(pfLock->fl_start + length) >=
+ 						(li->offset + li->length)) {
+ 					stored_rc = CIFSSMBLock(xid, tcon,
+-							netfid,
+-							li->length, li->offset,
+-							1, 0, li->type, false);
++							netfid, li->length,
++							li->offset, 1, 0,
++							li->type, false, 0);
+ 					if (stored_rc)
+ 						rc = stored_rc;
+ 					else {
+@@ -2192,7 +2192,8 @@ void cifs_oplock_break(struct work_struct *work)
+ 	 */
+ 	if (!cfile->oplock_break_cancelled) {
+ 		rc = CIFSSMBLock(0, tlink_tcon(cfile->tlink), cfile->netfid, 0,
+-				 0, 0, 0, LOCKING_ANDX_OPLOCK_RELEASE, false);
++				 0, 0, 0, LOCKING_ANDX_OPLOCK_RELEASE, false,
++				 cinode->clientCanCacheRead);
+ 		cFYI(1, "Oplock release rc = %d", rc);
+ 	}
+ 
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 43f1028..09bfcf0 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -571,7 +571,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
+ 				pCifsInode = CIFS_I(netfile->dentry->d_inode);
+ 
+ 				cifs_set_oplock_level(pCifsInode,
+-						      pSMB->OplockLevel);
++					pSMB->OplockLevel ? OPLOCK_READ : 0);
+ 				/*
+ 				 * cifs_oplock_break_put() can't be called
+ 				 * from here.  Get reference after queueing
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.1
