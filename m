@@ -1,182 +1,119 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 1/2] mount.cifs: clean up handling of uid= and gid=
-Date: Fri, 14 Jan 2011 15:38:32 -0500
-Message-ID: <20110114153832.244bd413@tlielax.poochiereds.net>
-References: <1294863996-7678-1-git-send-email-jlayton@samba.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Use mask of ACEs for SID Everyone to calculate all
+ three permissions user, group, and other
+Date: Fri, 14 Jan 2011 23:01:12 -0600
+Message-ID: <AANLkTim+=AuC3XabiFpGUKsVyFug4PtP-LhXyysSwp7_@mail.gmail.com>
+References: <1291669006-12102-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20110104141130.2cec2a74@tlielax.poochiereds.net>
+	<AANLkTikhkFnU0B+0JbUXwZvOfVdY_XB67oEaiyaajT0H@mail.gmail.com>
+	<20110104143122.46627c31@tlielax.poochiereds.net>
+	<AANLkTimT4AKX0HYCMcZiMXvXV-N0r23yGQ+oU=CDdi-w@mail.gmail.com>
+	<20110104150934.3ba10652@tlielax.poochiereds.net>
+	<AANLkTik38rcit3PJc1d0WU7+kS4a39UTaQ6TuRN+H_if@mail.gmail.com>
+	<20110113104834.1583ec39@barsoom.rdu.redhat.com>
+	<AANLkTin6t6qoQe7weUkKwNHBPvXkSEbQ9-b16+5A_HpE@mail.gmail.com>
+	<20110114100843.2d6b5dbb@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1294863996-7678-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20110114100843.2d6b5dbb-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 12 Jan 2011 15:26:35 -0500
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Fri, Jan 14, 2011 at 9:08 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Thu, 13 Jan 2011 14:45:59 -0600
+> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> >
+>> > What exactly do you intend to protect with client-side enforcement?
+>>
+>> Jeff, with client side permission checking/enforcment, as I understand,
+>> we are checking for accesses (read, write, etc.). Is that correct or
+>> is there more to that?
+>>
+>
+> There's (far) more to it than that. As I said, the server is going to
+> enforce permissions based on the user in the SMB session. So, if you
+> enforce permissions on the client, then what you end up with is a
+> permissions set comprised of the permissions you're enforcing on the
+> client logically AND'ed with those that the server enforces.
+>
+> Even if you were able to present that somehow, there are significant
+> problems with trying to enforce permissions on the client, particularly
+> in the face of file and directory creation. Look at it this way:
+>
+> Suppose that you get idmapping working and find a way to perfectly map
+> ACLs to modes on the client. At that point, you'll have file ownership
+> and mode that reflects the permissions on file. So, the situation at
+> that point is very similar to the situation where unix extensions are
+> enabled and the uid/gid are identically mapped on client and server.
+>
+> This is a simple configuration to set up, so let me give you a simple
+> "exercise" in such a configuration:
+>
+> Mount up a share using a set of credentials that map to "alice" on
+> the server. On the client, become user "bob". cd into a world-writeable
+> directory on the cifs mount and "touch" a file that does not yet exist:
+>
+> [bob@client]$ touch bob
+> touch: cannot touch `bob': Permission denied
+> [bob@client]$ ls -l bob
+> -rw-r--r--. 1 alice alice 0 Jan 14 09:31 bob
+>
+> ...so what happened here? The file was created, but because the
+> credentials don't map to "bob", it's owned by "alice". The utimes() call
+> then failed due to client side permissions enforcement (bob doesn't
+> have write access) and "touch" returned an error.
+>
+> There are similar problems with directory creation (can't create new
+> entries in a directory that you just created), and with file/directory
+> removal (can't remove a file or directory that you just created). It's
+> easy to run afoul of this.
+>
+> The lesson here is that inode creates matter, and you can't work around
+> this fact if you're enforcing permissions on the client. This is horribly
+> confusing to users. There are many examples over the years of cifs
+> users complaining about this when unix extensions are enabled.
+>
+> There's another problem too...you can only enforce the permissions that
+> you *have*. Even if you can perfectly map/enforce permissions on the
+> client, it's easily possible for them to change after you fetch them.
+>
+> Even if you were to fetch the ACL prior to every access (which would be
+> horrible for performance), you still have a race window between
+> fetching the ACL and enforcing it.
+>
+> These problems with permissions are the primary reason why I did the
+> multiuser mount code. After working on this problem and answering
+> questions from confused users for a couple of years, I came to the
+> conclusion that the only sensible fix is to avoid permissions
+> enforcement on the client altogether.
+>
+> But...cifs mounts are single-user by default. People often use the inode
+> permissions to restrict access to the mount. What we probably ought to
+> consider doing there is setting the i_mode according to the
+> file_mode/dir_mode options and enforce them on the client using that.
+> If unix extensions or cifsacl are enabled, then store the mode in a
+> separate place in the cifsInodeInfo and present that in the getattr
+> call. It's still confusing but that makes a heck of a lot more sense than
+> what we have now.
+>
+> In any case, I'm not keen on the idea of adding yet another way to set
+> the mode on files until we have a sane way of dealing with some of the
+> existing problems. If you want to first sort out the mess with
+> permissions and unix extensions, then I might be more interested.
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
 
-> The handling of these options is quite convoluted. Change it so that
-> these options are stored as numbers and then appended to the option
-> strings.
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  mount.cifs.c |   94 +++++++++++++++++++++++++++++----------------------------
->  1 files changed, 48 insertions(+), 46 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index df92d79..8fccf44 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -857,19 +857,24 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  	int rc = 0;
->  	int got_uid = 0;
->  	int got_gid = 0;
-> -	char user[32];
-> -	char group[32];
-> +	uid_t uid;
-> +	gid_t gid;
-> +	char txtbuf[12];
-> +	char *ep;
-> +	struct passwd *pw;
-> +	struct group *gr;
->  
->  	/* make sure we're starting from beginning */
->  	out[0] = '\0';
->  
->  	/* BB fixme check for separator override BB */
-> -	if (getuid()) {
-> +	uid = getuid();
-> +	if (uid != 0)
->  		got_uid = 1;
-> -		snprintf(user, sizeof(user), "%u", getuid());
-> +
-> +	gid = getgid();
-> +	if (gid != 0)
->  		got_gid = 1;
-> -		snprintf(group, sizeof(group), "%u", getgid());
-> -	}
->  
->  	if (!data)
->  		return EX_USAGE;
-> @@ -1014,43 +1019,39 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  			break;
->  
->  		case OPT_UID:
-> -			if (value && *value) {
-> -				got_uid = 1;
-> -				if (!isdigit(*value)) {
-> -					struct passwd *pw;
-> -
-> -					if (!(pw = getpwnam(value))) {
-> -						fprintf(stderr,
-> -							"bad user name \"%s\"\n",
-> -							value);
-> -						return EX_USAGE;
-> -					}
-> -					snprintf(user, sizeof(user), "%u",
-> -						 pw->pw_uid);
-> -				}
-> -				else
-> -					strlcpy(user, value, sizeof(user));
-> +			if (!value || !*value)
-> +				goto nocopy;
-> +
-> +			got_uid = 1;
-> +			uid = strtoul(value, &ep, 10);
-> +			if (errno != EINVAL && *ep == '\0')
-> +				goto nocopy;
-> +
-> +			pw = getpwnam(value);
-> +			if (pw == NULL) {
-> +				fprintf(stderr, "bad user name \"%s\"\n", value);
-> +				return EX_USAGE;
->  			}
-> +
-> +			uid = pw->pw_uid;
->  			goto nocopy;
->  
->  		case OPT_GID:
-> -			if (value && *value) {
-> -				got_gid = 1;
-> -				if (!isdigit(*value)) {
-> -					struct group *gr;
-> -
-> -					if (!(gr = getgrnam(value))) {
-> -						fprintf(stderr,
-> -							"bad group name \"%s\"\n",
-> -							value);
-> -						return EX_USAGE;
-> -					}
-> -					snprintf(group, sizeof(group), "%u",
-> -						 gr->gr_gid);
-> -				}
-> -				else
-> -					strlcpy(group, value, sizeof(group));
-> +			if (!value || !*value)
-> +				goto nocopy;
-> +
-> +			got_gid = 1;
-> +			gid = strtoul(value, &ep, 10);
-> +			if (errno != EINVAL && *ep == '\0')
-> +				goto nocopy;
-> +
-> +			gr = getgrnam(value);
-> +			if (gr == NULL) {
-> +				fprintf(stderr, "bad group name \"%s\"\n", value);
-> +				return EX_USAGE;
->  			}
-> +
-> +			gid = gr->gr_gid;
->  			goto nocopy;
->  
->  		/* fmask fall through to file_mode */
-> @@ -1171,34 +1172,35 @@ nocopy:
->  
->  	/* special-case the uid and gid */
->  	if (got_uid) {
-> -		word_len = strlen(user);
-> +		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", uid);
->  
-> +		/* comma + "uid=" + terminating NULL == 6 */
->  		if (out_len + word_len + 6 > MAX_OPTIONS_LEN) {
->  			fprintf(stderr, "Options string too long\n");
->  			return EX_USAGE;
->  		}
->  
->  		if (out_len) {
-> -			strlcat(out, ",", out_len + word_len + 6);
-> +			strlcat(out, ",", MAX_OPTIONS_LEN);
->  			out_len++;
->  		}
-> -		snprintf(out + out_len, word_len + 5, "uid=%s", user);
-> +		snprintf(out + out_len, word_len + 5, "uid=%s", txtbuf);
->  		out_len = strlen(out);
->  	}
->  	if (got_gid) {
-> -		word_len = strlen(group);
-> +		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", gid);
->  
-> -		if (out_len + 1 + word_len + 6 > MAX_OPTIONS_LEN) {
-> +		/* comma + "gid=" + terminating NULL == 6 */
-> +		if (out_len + word_len + 6 > MAX_OPTIONS_LEN) {
->  			fprintf(stderr, "Options string too long\n");
->  			return EX_USAGE;
->  		}
->  
->  		if (out_len) {
-> -			strlcat(out, ",", out_len + word_len + 6);
-> +			strlcat(out, ",", MAX_OPTIONS_LEN);
->  			out_len++;
->  		}
-> -		snprintf(out + out_len, word_len + 5, "gid=%s", group);
-> -		out_len = strlen(out);
-> +		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
->  	}
->  
->  	return 0;
+Jeff, Thanks. Need to think this over.
 
-Committed...
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Wish there were a commands/subcommands like getpathinfo
+and gethandleinfo with infolevels to determine what functions
+GetEffectiveRightsFromAcl and AccessCheckByType provide.
+
+Perhaps these are Windows APIs providing these type of services
+and there is a named pipe providing these services.
