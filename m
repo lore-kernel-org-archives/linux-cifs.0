@@ -1,161 +1,80 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix oplock break handling (try #2)
-Date: Tue, 18 Jan 2011 15:25:35 -0500
-Message-ID: <20110118152535.59001768@tlielax.poochiereds.net>
-References: <1295284544-29557-1-git-send-email-piastryyy@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 2/5] cifs: clean up unaligned accesses in validate_t2
+Date: Tue, 18 Jan 2011 15:33:16 -0500
+Message-ID: <1295382799-7902-3-git-send-email-jlayton@redhat.com>
+References: <1295382799-7902-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1295284544-29557-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1295382799-7902-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 17 Jan 2011 20:15:44 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+...and clean up function to reduce indentation.
 
-> When we get oplock break notification we should set the appropriate
-> value of OplockLevel field in oplock break acknowledge according to
-> the oplock level held by the client in this time. As we only can have
-> level II oplock or no oplock in the case of oplock break, we should be
-> aware only about clientCanCacheRead field in cifsInodeInfo structure.
-> 
-> Also fix bug connected with wrong interpretation of OplockLevel field
-> during oplock break notification processing.
-> 
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-> ---
->  fs/cifs/cifsproto.h |    2 +-
->  fs/cifs/cifssmb.c   |    4 +++-
->  fs/cifs/file.c      |   21 +++++++++++----------
->  fs/cifs/misc.c      |    2 +-
->  4 files changed, 16 insertions(+), 13 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index e6d1481..95d5dbb 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -347,7 +347,7 @@ extern int CIFSSMBLock(const int xid, struct cifsTconInfo *tcon,
->  			const __u16 netfid, const __u64 len,
->  			const __u64 offset, const __u32 numUnlock,
->  			const __u32 numLock, const __u8 lockType,
-> -			const bool waitFlag);
-> +			const bool waitFlag, const __u8 oplock_level);
->  extern int CIFSSMBPosixLock(const int xid, struct cifsTconInfo *tcon,
->  			const __u16 smb_file_id, const int get_flag,
->  			const __u64 len, struct file_lock *,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 2f6795e..3652cc6 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1663,7 +1663,8 @@ int
->  CIFSSMBLock(const int xid, struct cifsTconInfo *tcon,
->  	    const __u16 smb_file_id, const __u64 len,
->  	    const __u64 offset, const __u32 numUnlock,
-> -	    const __u32 numLock, const __u8 lockType, const bool waitFlag)
-> +	    const __u32 numLock, const __u8 lockType,
-> +	    const bool waitFlag, const __u8 oplock_level)
->  {
->  	int rc = 0;
->  	LOCK_REQ *pSMB = NULL;
-> @@ -1691,6 +1692,7 @@ CIFSSMBLock(const int xid, struct cifsTconInfo *tcon,
->  	pSMB->NumberOfLocks = cpu_to_le16(numLock);
->  	pSMB->NumberOfUnlocks = cpu_to_le16(numUnlock);
->  	pSMB->LockType = lockType;
-> +	pSMB->OplockLevel = oplock_level;
->  	pSMB->AndXCommand = 0xFF;	/* none */
->  	pSMB->Fid = smb_file_id; /* netfid stays le */
->  
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index d843631..af37191 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -726,12 +726,12 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
->  
->  		/* BB we could chain these into one lock request BB */
->  		rc = CIFSSMBLock(xid, tcon, netfid, length, pfLock->fl_start,
-> -				 0, 1, lockType, 0 /* wait flag */ );
-> +				 0, 1, lockType, 0 /* wait flag */, 0);
->  		if (rc == 0) {
->  			rc = CIFSSMBLock(xid, tcon, netfid, length,
->  					 pfLock->fl_start, 1 /* numUnlock */ ,
->  					 0 /* numLock */ , lockType,
-> -					 0 /* wait flag */ );
-> +					 0 /* wait flag */, 0);
->  			pfLock->fl_type = F_UNLCK;
->  			if (rc != 0)
->  				cERROR(1, "Error unlocking previously locked "
-> @@ -748,13 +748,13 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
->  				rc = CIFSSMBLock(xid, tcon, netfid, length,
->  					pfLock->fl_start, 0, 1,
->  					lockType | LOCKING_ANDX_SHARED_LOCK,
-> -					0 /* wait flag */);
-> +					0 /* wait flag */, 0);
->  				if (rc == 0) {
->  					rc = CIFSSMBLock(xid, tcon, netfid,
->  						length, pfLock->fl_start, 1, 0,
->  						lockType |
->  						LOCKING_ANDX_SHARED_LOCK,
-> -						0 /* wait flag */);
-> +						0 /* wait flag */, 0);
->  					pfLock->fl_type = F_RDLCK;
->  					if (rc != 0)
->  						cERROR(1, "Error unlocking "
-> @@ -797,8 +797,8 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
->  
->  		if (numLock) {
->  			rc = CIFSSMBLock(xid, tcon, netfid, length,
-> -					pfLock->fl_start,
-> -					0, numLock, lockType, wait_flag);
-> +					 pfLock->fl_start, 0, numLock, lockType,
-> +					 wait_flag, 0);
->  
->  			if (rc == 0) {
->  				/* For Windows locks we must store them. */
-> @@ -818,9 +818,9 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
->  						(pfLock->fl_start + length) >=
->  						(li->offset + li->length)) {
->  					stored_rc = CIFSSMBLock(xid, tcon,
-> -							netfid,
-> -							li->length, li->offset,
-> -							1, 0, li->type, false);
-> +							netfid, li->length,
-> +							li->offset, 1, 0,
-> +							li->type, false, 0);
->  					if (stored_rc)
->  						rc = stored_rc;
->  					else {
-> @@ -2192,7 +2192,8 @@ void cifs_oplock_break(struct work_struct *work)
->  	 */
->  	if (!cfile->oplock_break_cancelled) {
->  		rc = CIFSSMBLock(0, tlink_tcon(cfile->tlink), cfile->netfid, 0,
-> -				 0, 0, 0, LOCKING_ANDX_OPLOCK_RELEASE, false);
-> +				 0, 0, 0, LOCKING_ANDX_OPLOCK_RELEASE, false,
-> +				 cinode->clientCanCacheRead ? 1 : 0);
->  		cFYI(1, "Oplock release rc = %d", rc);
->  	}
->  
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 43f1028..09bfcf0 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -571,7 +571,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
->  				pCifsInode = CIFS_I(netfile->dentry->d_inode);
->  
->  				cifs_set_oplock_level(pCifsInode,
-> -						      pSMB->OplockLevel);
-> +					pSMB->OplockLevel ? OPLOCK_READ : 0);
->  				/*
->  				 * cifs_oplock_break_put() can't be called
->  				 * from here.  Get reference after queueing
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifssmb.c |   44 +++++++++++++++++++++++---------------------
+ 1 files changed, 23 insertions(+), 21 deletions(-)
 
-Looks fine...
-
-It might be nice to eventually package up the args to CIFSSMBLock in a
-struct as the argument list is becoming quite long. That's probably best
-suited to a later cleanup patch though.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 3b3072c..75a1559 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -331,31 +331,33 @@ smb_init_no_reconnect(int smb_command, int wct, struct cifsTconInfo *tcon,
+ 
+ static int validate_t2(struct smb_t2_rsp *pSMB)
+ {
+-	int rc = -EINVAL;
+-	int total_size;
++	unsigned int total_size;
++
++	/* check for plausible wct */
++	if (pSMB->hdr.WordCount < 10)
++		goto vt2_err;
+ 
+-	/* check for plausible wct, bcc and t2 data and parm sizes */
+ 	/* check for parm and data offset going beyond end of smb */
+-	if (pSMB->hdr.WordCount >= 10) {
+-		if ((le16_to_cpu(pSMB->t2_rsp.ParameterOffset) <= 1024) &&
+-		   (le16_to_cpu(pSMB->t2_rsp.DataOffset) <= 1024)) {
+-			/* check that bcc is at least as big as parms + data */
+-			/* check that bcc is less than negotiated smb buffer */
+-			total_size = le16_to_cpu(pSMB->t2_rsp.ParameterCount);
+-			if (total_size < 512) {
+-				total_size +=
+-					le16_to_cpu(pSMB->t2_rsp.DataCount);
+-				if (total_size <= get_bcc(&pSMB->hdr) &&
+-				    total_size <
+-					CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
+-					return 0;
+-				}
+-			}
+-		}
+-	}
++	if (get_unaligned_le16(&pSMB->t2_rsp.ParameterOffset) > 1024 ||
++	    get_unaligned_le16(&pSMB->t2_rsp.DataOffset) > 1024)
++		goto vt2_err;
++
++	/* check that bcc is at least as big as parms + data */
++	/* check that bcc is less than negotiated smb buffer */
++	total_size = get_unaligned_le16(&pSMB->t2_rsp.ParameterCount);
++	if (total_size >= 512)
++		goto vt2_err;
++
++	total_size += get_unaligned_le16(&pSMB->t2_rsp.DataCount);
++	if (total_size > get_bcc(&pSMB->hdr) ||
++	    total_size >= CIFSMaxBufSize + MAX_CIFS_HDR_SIZE)
++		goto vt2_err;
++
++	return 0;
++vt2_err:
+ 	cifs_dump_mem("Invalid transact2 SMB: ", (char *)pSMB,
+ 		sizeof(struct smb_t2_rsp) + 16);
+-	return rc;
++	return -EINVAL;
+ }
+ 
+ int
+-- 
+1.7.3.4
