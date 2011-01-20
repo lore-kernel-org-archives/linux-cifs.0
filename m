@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Subject: Re: CIFS related seg fault (v2.6.37)
-Date: Thu, 20 Jan 2011 10:26:06 +0530
-Message-ID: <4D37C066.6070905@suse.de>
+Date: Thu, 20 Jan 2011 10:31:34 +0530
+Message-ID: <4D37C1AE.7040100@suse.de>
 References: <AANLkTikp0=w7k+PsUCQVQwxnZMLsp3F7a3rEDQAas20G@mail.gmail.com>	<4D37BDE4.1000104@suse.de> <AANLkTin7jRk6S2XWcRineCtazQb3rgYsBPakV513Ph9n@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -42,8 +42,15 @@ On 01/20/2011 10:25 AM, Steve French wrote:
 > to a vfs change?
 > 
 
-Yes. He asked to ignore his patch here:
-	http://thread.gmane.org/gmane.linux.kernel.cifs/2284
+Sorry it was not a VFS fix but a fix from Al Viro that fixed this
+problem. IIUC, the commit has made it to cifs-2.6.git but not upstream.
+
+commit 1c929cfe6d8f2087a337a868fbf6c38d56bb4889
+Author: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Date:   Sat Dec 18 11:43:51 2010 -0500
+
+    switch cifs
+
 
 
 -- 
