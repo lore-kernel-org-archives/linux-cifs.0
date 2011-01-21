@@ -1,59 +1,45 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: linux-next: build warning after merge of the cifs tree
-Date: Thu, 20 Jan 2011 20:20:50 -0500
-Message-ID: <20110120202050.0bc68484@corrin.poochiereds.net>
-References: <20110121120524.23dcf86d.sfr@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=PGP-SHA1;
- boundary="Sig_/uqCs2g1h2CJkLD0mcJt57XJ"; protocol="application/pgp-signature"
-Cc: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>,
-	linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Suresh Jayaraman <sjayaraman@suse.de>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <20110121120524.23dcf86d.sfr@canb.auug.org.au>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix up CIFSSMBEcho for unaligned access
+Date: Thu, 20 Jan 2011 21:19:25 -0500
+Message-ID: <1295576365-11810-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
---Sig_/uqCs2g1h2CJkLD0mcJt57XJ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Make sure that CIFSSMBEcho can handle unaligned fields. Also fix a minor
+bug that causes this warning:
 
-On Fri, 21 Jan 2011 12:05:24 +1100
-Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+fs/cifs/cifssmb.c: In function 'CIFSSMBEcho':
+fs/cifs/cifssmb.c:740: warning: large integer implicitly truncated to unsigned type
 
-> Hi all,
->=20
-> After merging the cifs tree, today's linux-next build (powerpc
-> ppc64_defconfig) produced this warning:
->=20
-> fs/cifs/cifssmb.c: In function 'CIFSSMBEcho':
-> fs/cifs/cifssmb.c:740: warning: large integer implicitly truncated to uns=
-igned type
->=20
-> Introduced by commit 766fdbb57fdb1e53bc34c431103e95383d7f13ba ("cifs: add
-> ability to send an echo request").
->=20
+...WordCount is u8, not __le16, so no need to convert it.
 
-Oh duh -- <forehead slap>...
+This patch should apply cleanly on top of the rest of the patchset to
+clean up unaligned access.
 
-        smb->hdr.WordCount =3D cpu_to_le16(1);
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifssmb.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-...and WordCount is u8. I'll send Steve a fix tomorrow...
-
---=20
-Jeff Layton <jlayton@redhat.com>
-
---Sig_/uqCs2g1h2CJkLD0mcJt57XJ
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-
-iEYEARECAAYFAk0433YACgkQojH4PzJJfGU1DwCgh4gQcKxKEaR0IJtG1ta1K6T9
-G/oAnRmNToo9dyeev285r08Fc3kLEdBm
-=qnSQ
------END PGP SIGNATURE-----
-
---Sig_/uqCs2g1h2CJkLD0mcJt57XJ--
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 1e43e61..32378f2 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -733,9 +733,9 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 
+ 	/* set up echo request */
+ 	smb->hdr.Tid = cpu_to_le16(0xffff);
+-	smb->hdr.WordCount = cpu_to_le16(1);
+-	smb->EchoCount = cpu_to_le16(1);
+-	smb->ByteCount = cpu_to_le16(1);
++	smb->hdr.WordCount = 1;
++	put_unaligned_le16(1, &smb->EchoCount);
++	put_bcc_le(1, &smb->hdr);
+ 	smb->Data[0] = 'a';
+ 	smb->hdr.smb_buf_length += 3;
+ 
+-- 
+1.7.3.4
