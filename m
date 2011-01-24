@@ -1,145 +1,94 @@
-From: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-Subject: [PATCH] Make CIFS mount work in a container.
-Date: Sat, 22 Jan 2011 15:44:05 -0600
-Message-ID: <4D3B4FA5.2040702@parallels.com>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] CIFS: Remove pointless variable assignment in
+	cifs_dfs_do_automount()
+Date: Sun, 23 Jan 2011 22:31:08 -0600
+Message-ID: <AANLkTinjC74qUzuTc7xjgD7uvMN7q2tqkJt_SOqNO73-@mail.gmail.com>
+References: <alpine.LNX.2.00.1101222101070.7746@swampdragon.chaosbits.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-To: <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	<containers-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
-	<linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	<samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Jesper Juhl <jj@chaosbits.net>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <alpine.LNX.2.00.1101222101070.7746@swampdragon.chaosbits.net>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
+merged - thx
 
-Teach cifs about network namespaces, so mounting uses adresses/routing
-visible from the container rather than from init context.
+On Sat, Jan 22, 2011 at 2:07 PM, Jesper Juhl <jj@chaosbits.net> wrote:
+> In fs/cifs/cifs_dfs_ref.c::cifs_dfs_do_automount() we have this code:
+>
+> =A0 =A0 =A0 =A0...
+> =A0 =A0 =A0 =A0mnt =3D ERR_PTR(-EINVAL);
+> =A0 =A0 =A0 =A0if (IS_ERR(tlink)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mnt =3D ERR_CAST(tlink);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto free_full_path;
+> =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0ses =3D tlink_tcon(tlink)->ses;
+>
+> =A0 =A0 =A0 =A0rc =3D get_dfs_path(xid, ses, full_path + 1, cifs_sb->loca=
+l_nls,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&num_referrals, &referrals,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_S=
+PECIAL_CHR);
+>
+> =A0 =A0 =A0 =A0cifs_put_tlink(tlink);
+>
+> =A0 =A0 =A0 =A0mnt =3D ERR_PTR(-ENOENT);
+> =A0 =A0 =A0 =A0...
+>
+> The assignment of 'mnt =3D ERR_PTR(-EINVAL);' is completely pointless. If=
+ we
+> take the 'if (IS_ERR(tlink))' branch we'll set 'mnt' again and we'll also
+> do so if we do not take the branch. There is no way we'll ever use 'mnt'
+> with the assigned 'ERR_PTR(-EINVAL)' value, so we may as well just remove
+> the pointless assignment.
+>
+> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+> ---
+> =A0cifs_dfs_ref.c | =A0 =A01 -
+> =A01 file changed, 1 deletion(-)
+>
+> diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+> index 7ed3653..f1c6862 100644
+> --- a/fs/cifs/cifs_dfs_ref.c
+> +++ b/fs/cifs/cifs_dfs_ref.c
+> @@ -297,7 +297,6 @@ static struct vfsmount *cifs_dfs_do_automount(struct =
+dentry *mntpt)
+>
+> =A0 =A0 =A0 =A0cifs_sb =3D CIFS_SB(mntpt->d_inode->i_sb);
+> =A0 =A0 =A0 =A0tlink =3D cifs_sb_tlink(cifs_sb);
+> - =A0 =A0 =A0 mnt =3D ERR_PTR(-EINVAL);
+> =A0 =A0 =A0 =A0if (IS_ERR(tlink)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mnt =3D ERR_CAST(tlink);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto free_full_path;
+>
+>
+> --
+> Jesper Juhl <jj@chaosbits.net> =A0 =A0 =A0 =A0 =A0 =A0http://www.chaosbit=
+s.net/
+> Don't top-post http://www.catb.org/~esr/jargon/html/T/top-post.html
+> Plain text mails only, please.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
-For a long drawn out test reproduction sequence, see:
 
-  http://landley.livejournal.com/47024.html
-  http://landley.livejournal.com/47205.html
-  http://landley.livejournal.com/47476.html
 
-Signed-off-by: Rob Landley <rlandley-bzQdu9zFT3WakBO8gow8eQ@public.gmane.org>
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
-Several other people commented on the patch without giving a formal byline, see:
-https://lists.linux-foundation.org/pipermail/containers/2011-January/026250.html
+--=20
+Thanks,
 
-This is version three of the patch.  Discussion on the other lists
-seems to have died down, and it Works For Me (tm).
-
-The patch is almost size neutral when CONFIG_NET_NS is disabled,
-everything but the switch from sock_create_kern() to __sock_create()
-(which has two more function arguments) drops out.
-
- fs/cifs/cifsglob.h |   33 +++++++++++++++++++++++++++++++++
- fs/cifs/connect.c  |   12 ++++++++++--
- 2 files changed, 43 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 606ca8b..54cd4ab 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -165,6 +165,9 @@ struct TCP_Server_Info {
- 	struct socket *ssocket;
- 	struct sockaddr_storage dstaddr;
- 	struct sockaddr_storage srcaddr; /* locally bind to this IP */
-+#ifdef CONFIG_NET_NS
-+	struct net *net;
-+#endif
- 	wait_queue_head_t response_q;
- 	wait_queue_head_t request_q; /* if more than maxmpx to srvr must block*/
- 	struct list_head pending_mid_q;
-@@ -224,6 +227,36 @@ struct TCP_Server_Info {
- };
- 
- /*
-+ * Macros to allow the TCP_Server_Info->net field and related code to drop out
-+ * when CONFIG_NET_NS isn't set.
-+ */
-+
-+#ifdef CONFIG_NET_NS
-+
-+static inline struct net *cifs_net_ns(struct TCP_Server_Info *srv)
-+{
-+	return srv->net;
-+}
-+
-+static inline void cifs_set_net_ns(struct TCP_Server_Info *srv, struct net *net)
-+{
-+	srv->net = net;
-+}
-+
-+#else
-+
-+static inline struct net *cifs_net_ns(struct TCP_Server_Info *srv)
-+{
-+	return &init_net;
-+}
-+
-+static inline void cifs_set_net_ns(struct TCP_Server_Info *srv, struct net *net)
-+{
-+}
-+
-+#endif
-+
-+/*
-  * Session structure.  One of these for each uid session with a particular host
-  */
- struct cifsSesInfo {
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a65d311..53679f6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1577,6 +1577,9 @@ cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
- 
- 	spin_lock(&cifs_tcp_ses_lock);
- 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-+		if (!net_eq(cifs_net_ns(server), current->nsproxy->net_ns))
-+			continue;
-+
- 		if (!match_address(server, addr,
- 				   (struct sockaddr *)&vol->srcaddr))
- 			continue;
-@@ -1607,6 +1610,8 @@ cifs_put_tcp_session(struct TCP_Server_Info *server)
- 		return;
- 	}
- 
-+	put_net(cifs_net_ns(server));
-+
- 	list_del_init(&server->tcp_ses_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -1679,6 +1684,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		goto out_err;
- 	}
- 
-+	cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
- 	tcp_ses->hostname = extract_hostname(volume_info->UNC);
- 	if (IS_ERR(tcp_ses->hostname)) {
- 		rc = PTR_ERR(tcp_ses->hostname);
-@@ -1754,6 +1760,8 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- out_err_crypto_release:
- 	cifs_crypto_shash_release(tcp_ses);
- 
-+	put_net(cifs_net_ns(tcp_ses));
-+
- out_err:
- 	if (tcp_ses) {
- 		if (!IS_ERR(tcp_ses->hostname))
-@@ -2265,8 +2273,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 	}
- 
- 	if (socket == NULL) {
--		rc = sock_create_kern(sfamily, SOCK_STREAM,
--				      IPPROTO_TCP, &socket);
-+		rc = __sock_create(cifs_net_ns(server), sfamily, SOCK_STREAM,
-+				   IPPROTO_TCP, &socket, 1);
- 		if (rc < 0) {
- 			cERROR(1, "Error %d creating socket", rc);
- 			server->ssocket = NULL;
+Steve
