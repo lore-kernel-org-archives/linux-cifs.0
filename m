@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 1/2] cifs: Add idmap key and related data structures and functions (try #4)
-Date: Tue, 25 Jan 2011 16:36:20 -0600
-Message-ID: <1295994980-8718-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH] cifs: Invoke id mapping functions
+Date: Tue, 25 Jan 2011 16:36:29 -0600
+Message-ID: <1295994989-8741-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,246 +12,355 @@ List-ID: <linux-cifs.vger.kernel.org>
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
-Define (global) data structures to store ids, uids and gids, to which a
-SID maps.  There are two separate trees, one for SID/uid and another one
-for SID/gid.
+rb tree search and insertion routines.
 
-A new type of key, cifs_idmap_key_type, is used.
+A SID which needs to be mapped, is looked up in one of the rb trees
+depending whether SID is either owner or group SID.
+If found in a tree, a (mapped) id from that node is assigned to
+uid or gid as appropriated.
 
-Keys are instantiated and searched using credential of the root by
-overriding and restoring the credentials of the caller requesting the key.
-Once a SID is mapped, it is stored along with the mapped id, in one
-of the rb trees and key is released.
+Otherwise, the SID is mapped and looked-up with the help of
+Winbind via upcall mechanism and a node with mapping is inserted
+in one of the caches while again making sure that the node does not exist.
 
-Register a pruning function with the shrinker that prunes the rb trees
-when memory pressure warrants freeing up cache.  The function is more like
-cleaning entire cache than pruning since it would be cleaner and easier
-to start over again (id mapping).  winbind is likely to have the
-mappings stored as well, thus not needing to send make calls to the
-domain controller.
+To map a SID, which can be either a Owner SID or a Group SID, key
+description starts with the string "os" or "gs" followed by SID converted
+to a string. Without "os" or "gs", cifs.upcall does not know whether
+SID needs to be mapped to either an uid or a gid.
+
+For now, cifs.upcall is only used to map a SID to an id (uid or gid) but
+it would be used to obtain an SID (string) for an id.
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsacl.c   |  136 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifsfs.c    |    7 +++
- fs/cifs/cifsglob.h  |    5 ++
- fs/cifs/cifsproto.h |    3 +
- 4 files changed, 151 insertions(+), 0 deletions(-)
+ fs/cifs/cifsacl.c |  213 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ fs/cifs/cifsacl.h |   15 ++++
+ 2 files changed, 211 insertions(+), 17 deletions(-)
 
 diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 1e7636b..b165496 100644
+index b165496..2b5294d 100644
 --- a/fs/cifs/cifsacl.c
 +++ b/fs/cifs/cifsacl.c
-@@ -23,6 +23,10 @@
+@@ -99,6 +99,159 @@ struct key_type cifs_idmap_key_type = {
+ 	.match       = user_match,
+ };
  
- #include <linux/fs.h>
- #include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/keyctl.h>
-+#include <linux/key-type.h>
-+#include <keys/user-type.h>
- #include "cifspdu.h"
- #include "cifsglob.h"
- #include "cifsacl.h"
-@@ -50,6 +54,138 @@ static const struct cifs_sid sid_authusers = {
- /* group users */
- static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
- 
-+const struct cred *root_cred;
-+
-+/*
-+ * Run idmap cache shrinker.
-+ */
-+static int
-+cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
++static unsigned long
++id_rb_search(struct rb_root *root, struct cifs_sid *sidptr)
 +{
-+	cifs_destroy_idmaptrees();
-+	return 0;
-+}
++	unsigned int nds = 0;
++	int rc;
++	unsigned long id = 0;
++	struct rb_node *node = root->rb_node;
++	struct cifs_sid_id *sididptr;
 +
-+static struct shrinker cifs_shrinker = {
-+        .shrink = cifs_idmap_shrinker,
-+        .seeks = DEFAULT_SEEKS,
-+};
-+
-+static int
-+cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
-+{
-+	char *payload;
-+
-+	payload = kmalloc(datalen, GFP_KERNEL);
-+	if (!payload)
-+		return -ENOMEM;
-+
-+	memcpy(payload, data, datalen);
-+	key->payload.data = payload;
-+	return 0;
-+}
-+
-+static inline void
-+cifs_idmap_key_destroy(struct key *key)
-+{
-+	kfree(key->payload.data);
-+}
-+
-+struct key_type cifs_idmap_key_type = {
-+	.name        = "cifs.cifs_idmap",
-+	.instantiate = cifs_idmap_key_instantiate,
-+	.destroy     = cifs_idmap_key_destroy,
-+	.describe    = user_describe,
-+	.match       = user_match,
-+};
-+
-+int
-+init_cifs_idmap(void)
-+{
-+	struct cred *cred;
-+	struct key *keyring;
-+	int ret;
-+
-+	cFYI(1, "Registering the %s key type\n", cifs_idmap_key_type.name);
-+
-+	/* create an override credential set with a special thread keyring in
-+	 * which requests are cached
-+	 *
-+	 * this is used to prevent malicious redirections from being installed
-+	 * with add_key().
-+	 */
-+	cred = prepare_kernel_cred(NULL);
-+	if (!cred)
-+		return -ENOMEM;
-+
-+	keyring = key_alloc(&key_type_keyring, ".cifs_idmap", 0, 0, cred,
-+			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
-+			    KEY_USR_VIEW | KEY_USR_READ,
-+			    KEY_ALLOC_NOT_IN_QUOTA);
-+	if (IS_ERR(keyring)) {
-+		ret = PTR_ERR(keyring);
-+		goto failed_put_cred;
++	while (node) {
++		++nds;
++		sididptr = rb_entry(node, struct cifs_sid_id, rbnode);
++		rc = compare_sids(sidptr, &sididptr->sid);
++		if (rc > 0)
++			node = node->rb_left;
++		else if (rc < 0)
++			node = node->rb_right;
++		else {
++			id = sididptr->id;
++			break;
++		}
 +	}
 +
-+	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
-+	if (ret < 0)
-+		goto failed_put_key;
-+
-+	ret = register_key_type(&cifs_idmap_key_type);
-+	if (ret < 0)
-+		goto failed_put_key;
-+
-+	/* instruct request_key() to use this special keyring as a cache for
-+	 * the results it looks up */
-+	cred->thread_keyring = keyring;
-+	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
-+	root_cred = cred;
-+
-+	spin_lock_init(&siduidlock);
-+	uidtree = RB_ROOT;
-+	spin_lock_init(&sidgidlock);
-+	gidtree = RB_ROOT;
-+
-+	register_shrinker(&cifs_shrinker);
-+
-+	cFYI(1, "DNS resolver keyring: %d\n", key_serial(keyring));
-+	return 0;
-+
-+failed_put_key:
-+	key_put(keyring);
-+failed_put_cred:
-+	put_cred(cred);
-+	return ret;
++	return id;
 +}
 +
-+void
-+exit_cifs_idmap(void)
++static void
++id_rb_insert(struct rb_root *root, struct cifs_sid_id *new_sididptr,
++		unsigned long id)
 +{
-+	key_revoke(root_cred->thread_keyring);
-+	unregister_key_type(&cifs_idmap_key_type);
-+	put_cred(root_cred);
-+	unregister_shrinker(&cifs_shrinker);
-+	cFYI(1, "Unregistered %s key type\n", cifs_idmap_key_type.name);
++	int rc;
++	struct rb_node **new = &(root->rb_node), *parent = NULL;
++	struct cifs_sid_id *sididptr;
++
++	while (*new) {
++		sididptr = rb_entry(*new, struct cifs_sid_id, rbnode);
++		parent = *new;
++
++		rc = compare_sids(&sididptr->sid, &new_sididptr->sid);
++		if (rc < 0)
++			new = &((*new)->rb_left);
++		if (rc > 0)
++			new = &((*new)->rb_right);
++		else {
++			kfree(new_sididptr);
++			return;
++		}
++	}
++
++	rb_link_node(&new_sididptr->rbnode, parent, new);
++	rb_insert_color(&new_sididptr->rbnode, root);
 +}
 +
-+void
-+cifs_destroy_idmaptrees(void)
++static void
++sid_to_str(struct cifs_sid *sidptr, char *sidstr)
 +{
-+	struct rb_root *root;
-+	struct rb_node *node;
++	int i;
++	unsigned long saval;
++	char *strptr;
 +
-+	root = &uidtree;
-+	spin_lock(&siduidlock);
-+	while ((node = rb_first(root)))
-+		rb_erase(node, root);
-+	spin_unlock(&siduidlock);
++	strptr = sidstr;
 +
-+	root = &gidtree;
-+	spin_lock(&sidgidlock);
-+	while ((node = rb_first(root)))
-+		rb_erase(node, root);
-+	spin_unlock(&sidgidlock);
++	sprintf(strptr, "%s", "S");
++	strptr = sidstr + strlen(sidstr);
++
++	sprintf(strptr, "-%d", sidptr->revision);
++	strptr = sidstr + strlen(sidstr);
++
++	for (i = 0; i < 6; ++i) {
++		if (sidptr->authority[i]) {
++			sprintf(strptr, "-%d", sidptr->authority[i]);
++			strptr = sidstr + strlen(sidstr);
++		}
++	}
++
++	for (i = 0; i < sidptr->num_subauth; ++i) {
++		saval = le32_to_cpu(sidptr->sub_auth[i]);
++		sprintf(strptr, "-%ld", saval);
++		strptr = sidstr + strlen(sidstr);
++	}
 +}
- 
- int match_sid(struct cifs_sid *ctsid)
++
++static int
++sid_to_id(struct cifs_sid *psid, struct cifs_fattr *fattr, uint sidtype)
++{
++	int rc = 0;
++	unsigned long id;
++	char *sidstr, *strptr;
++	struct key *idkey;
++	const struct cred *saved_cred;
++	struct cifs_sid_id *sididptr;
++
++	if (sidtype == SIDOWNER) {
++		spin_lock(&siduidlock);
++		id = id_rb_search(&uidtree, psid);
++		spin_unlock(&siduidlock);
++	} else if (sidtype == SIDGROUP) {
++		spin_lock(&sidgidlock);
++		id = id_rb_search(&gidtree, psid);
++		spin_unlock(&sidgidlock);
++	} else
++		return -ENOENT;
++
++	if (!id) {
++		sidstr = kzalloc(SIDLEN, GFP_KERNEL);
++		if (!sidstr)
++			return -ENOMEM;
++
++		sididptr = kzalloc(sizeof(struct cifs_sid_id), GFP_KERNEL);
++		if (!sididptr) {
++			kfree(sidstr);
++			return -ENOMEM;
++		}
++
++		if (sidtype == SIDOWNER)
++			sprintf(sidstr, "%s", "os:");
++		else if (sidtype == SIDGROUP)
++			sprintf(sidstr, "%s", "gs:");
++
++		strptr = sidstr + strlen(sidstr);
++		sid_to_str(psid, strptr);
++
++		saved_cred = override_creds(root_cred);
++		idkey = request_key(&cifs_idmap_key_type, sidstr, "");
++		if (IS_ERR(idkey))
++			cFYI(1, "%s: Can't resolve SID to an uid", __func__);
++		else {
++			id = *(unsigned long *)idkey->payload.value;
++			key_put(idkey);
++			memcpy(&sididptr->sid, psid, sizeof(struct cifs_sid));
++			sididptr->id = id;
++			if (sidtype == SIDOWNER) {
++				spin_lock(&siduidlock);
++				id_rb_insert(&uidtree, sididptr, id);
++				spin_unlock(&siduidlock);
++			} else {
++				spin_lock(&sidgidlock);
++				id_rb_insert(&gidtree, sididptr, id);
++				spin_unlock(&sidgidlock);
++			}
++		}
++		revert_creds(saved_cred);
++		kfree(sidstr);
++	}
++
++	if (sidtype == SIDOWNER)
++		fattr->cf_uid = id;
++	else
++		fattr->cf_gid = id;
++
++	return rc;
++}
++
+ int
+ init_cifs_idmap(void)
  {
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f297013..e255dc7 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1040,11 +1040,16 @@ init_cifs(void)
- 	rc = register_key_type(&cifs_spnego_key_type);
- 	if (rc)
- 		goto out_unregister_filesystem;
-+	rc = init_cifs_idmap();
-+	if (rc)
-+		goto out_unregister_keytype;
- #endif
+@@ -240,16 +393,24 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+ 	int num_subauth, num_sat, num_saw;
  
- 	return 0;
+ 	if ((!ctsid) || (!cwsid))
+-		return 0;
++		return 1;
  
- #ifdef CONFIG_CIFS_UPCALL
-+out_unregister_keytype:
-+	unregister_key_type(&cifs_spnego_key_type);
- out_unregister_filesystem:
- 	unregister_filesystem(&cifs_fs_type);
- #endif
-@@ -1071,6 +1076,8 @@ exit_cifs(void)
- 	cifs_dfs_release_automount_timer();
- #endif
- #ifdef CONFIG_CIFS_UPCALL
-+	cifs_destroy_idmaptrees();
-+	exit_cifs_idmap();
- 	unregister_key_type(&cifs_spnego_key_type);
- #endif
- 	unregister_filesystem(&cifs_fs_type);
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index edd5b29..d996a51 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -829,6 +829,11 @@ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
- /* reconnect after this many failed echo attempts */
- GLOBAL_EXTERN unsigned short echo_retries;
+ 	/* compare the revision */
+-	if (ctsid->revision != cwsid->revision)
+-		return 0;
++	if (ctsid->revision != cwsid->revision) {
++		if (ctsid->revision > cwsid->revision)
++			return 1;
++		else
++			return -1;
++	}
  
-+GLOBAL_EXTERN struct rb_root uidtree;
-+GLOBAL_EXTERN struct rb_root gidtree;
-+GLOBAL_EXTERN spinlock_t siduidlock;
-+GLOBAL_EXTERN spinlock_t sidgidlock;
+ 	/* compare all of the six auth values */
+ 	for (i = 0; i < 6; ++i) {
+-		if (ctsid->authority[i] != cwsid->authority[i])
+-			return 0;
++		if (ctsid->authority[i] != cwsid->authority[i]) {
++			if (ctsid->authority[i] > cwsid->authority[i])
++				return 1;
++			else
++				return -1;
++		}
+ 	}
+ 
+ 	/* compare all of the subauth values if any */
+@@ -258,12 +419,16 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+ 	num_subauth = num_sat < num_saw ? num_sat : num_saw;
+ 	if (num_subauth) {
+ 		for (i = 0; i < num_subauth; ++i) {
+-			if (ctsid->sub_auth[i] != cwsid->sub_auth[i])
+-				return 0;
++			if (ctsid->sub_auth[i] != cwsid->sub_auth[i]) {
++				if (ctsid->sub_auth[i] > cwsid->sub_auth[i])
++					return 1;
++				else
++					return -1;
++			}
+ 		}
+ 	}
+ 
+-	return 1; /* sids compare/match */
++	return 0; /* sids compare/match */
+ }
+ 
+ 
+@@ -514,22 +679,22 @@ static void parse_dacl(struct cifs_acl *pdacl, char *end_of_acl,
+ #ifdef CONFIG_CIFS_DEBUG2
+ 			dump_ace(ppace[i], end_of_acl);
+ #endif
+-			if (compare_sids(&(ppace[i]->sid), pownersid))
++			if (compare_sids(&(ppace[i]->sid), pownersid) == 0)
+ 				access_flags_to_mode(ppace[i]->access_req,
+ 						     ppace[i]->type,
+ 						     &fattr->cf_mode,
+ 						     &user_mask);
+-			if (compare_sids(&(ppace[i]->sid), pgrpsid))
++			if (compare_sids(&(ppace[i]->sid), pgrpsid) == 0)
+ 				access_flags_to_mode(ppace[i]->access_req,
+ 						     ppace[i]->type,
+ 						     &fattr->cf_mode,
+ 						     &group_mask);
+-			if (compare_sids(&(ppace[i]->sid), &sid_everyone))
++			if (compare_sids(&(ppace[i]->sid), &sid_everyone) == 0)
+ 				access_flags_to_mode(ppace[i]->access_req,
+ 						     ppace[i]->type,
+ 						     &fattr->cf_mode,
+ 						     &other_mask);
+-			if (compare_sids(&(ppace[i]->sid), &sid_authusers))
++			if (compare_sids(&(ppace[i]->sid), &sid_authusers) == 0)
+ 				access_flags_to_mode(ppace[i]->access_req,
+ 						     ppace[i]->type,
+ 						     &fattr->cf_mode,
+@@ -608,9 +773,9 @@ static int parse_sid(struct cifs_sid *psid, char *end_of_acl)
+ 
+ /* Convert CIFS ACL to POSIX form */
+ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
+-			  struct cifs_fattr *fattr)
++			struct cifs_fattr *fattr)
+ {
+-	int rc;
++	int rc = 0;
+ 	struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
+ 	struct cifs_acl *dacl_ptr; /* no need for SACL ptr */
+ 	char *end_of_acl = ((char *)pntsd) + acl_len;
+@@ -632,12 +797,26 @@ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
+ 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
+ /*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
+ 	rc = parse_sid(owner_sid_ptr, end_of_acl);
+-	if (rc)
++	if (rc) {
++		cFYI(1, "%s: Error %d parsing Owner SID", __func__, rc);
++		return rc;
++	}
++	rc = sid_to_id(owner_sid_ptr, fattr, SIDOWNER);
++	if (rc) {
++		cFYI(1, "%s: Error %d mapping Owner SID to uid", __func__, rc);
+ 		return rc;
++	}
+ 
+ 	rc = parse_sid(group_sid_ptr, end_of_acl);
+-	if (rc)
++	if (rc) {
++		cFYI(1, "%s: Error %d mapping Owner SID to uid", __func__, rc);
++		return rc;
++	}
++	rc = sid_to_id(group_sid_ptr, fattr, SIDGROUP);
++	if (rc) {
++		cFYI(1, "%s: Error %d mapping Group SID to uid", __func__, rc);
+ 		return rc;
++	}
+ 
+ 	if (dacloffset)
+ 		parse_dacl(dacl_ptr, end_of_acl, owner_sid_ptr,
+@@ -652,7 +831,7 @@ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
+ 	memcpy((void *)(&(cifscred->gsid)), (void *)group_sid_ptr,
+ 			sizeof(struct cifs_sid)); */
+ 
+-	return 0;
++	return rc;
+ }
+ 
+ 
+diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+index c4ae7d0..d103ad3 100644
+--- a/fs/cifs/cifsacl.h
++++ b/fs/cifs/cifsacl.h
+@@ -39,6 +39,10 @@
+ #define ACCESS_ALLOWED	0
+ #define ACCESS_DENIED	1
+ 
++#define SIDOWNER 1
++#define SIDGROUP 2
++#define SIDLEN 150 /* S- 1 revision- 6 authorities- max 5 sub authorities */
 +
- void cifs_oplock_break(struct work_struct *work);
- void cifs_oplock_break_get(struct cifsFileInfo *cfile);
- void cifs_oplock_break_put(struct cifsFileInfo *cfile);
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 35c989f..e03a8c3 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -53,6 +53,9 @@ do {								\
- 	cFYI(1, "CIFS VFS: leaving %s (xid = %d) rc = %d",	\
- 	     __func__, curr_xid, (int)rc);			\
- } while (0)
-+extern int init_cifs_idmap(void);
-+extern void exit_cifs_idmap(void);
-+extern void cifs_destroy_idmaptrees(void);
- extern char *build_path_from_dentry(struct dentry *);
- extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
- 					struct cifsTconInfo *tcon);
+ struct cifs_ntsd {
+ 	__le16 revision; /* revision level */
+ 	__le16 type;
+@@ -74,6 +78,17 @@ struct cifs_wksid {
+ 	char sidname[SIDNAMELENGTH];
+ } __attribute__((packed));
+ 
++struct cifs_sid_id {
++	struct rb_node rbnode;
++	struct cifs_sid sid;
++	unsigned long id;
++} __attribute__((packed));
++
++#ifdef __KERNEL__
++extern struct key_type cifs_idmap_key_type;
++extern const struct cred *root_cred;
++#endif /* KERNEL */
++
+ extern int match_sid(struct cifs_sid *);
+ extern int compare_sids(const struct cifs_sid *, const struct cifs_sid *);
+ 
 -- 
 1.6.0.2
