@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: Invoke id mapping functions
-Date: Tue, 25 Jan 2011 16:36:29 -0600
-Message-ID: <1295994989-8741-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 2/2] cifs: Invoke id mapping functions
+Date: Tue, 25 Jan 2011 16:37:14 -0600
+Message-ID: <1295995034-8771-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
