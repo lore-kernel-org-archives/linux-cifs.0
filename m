@@ -1,74 +1,125 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [linux-cifs-client] can someone please explain the performance
- difference between mount.cifs and smbclient?
-Date: Thu, 27 Jan 2011 13:25:04 -0600
-Message-ID: <AANLkTik29fUn=SXG-R8qpgVfjCsZ7BGB-S1n+UxGTmyJ@mail.gmail.com>
-References: <20110127190719.72653d38@harpe.intellique.com>
-	<20110127135410.6046a8cd@barsoom.rdu.redhat.com>
+Subject: Re: [PATCH] cifs: fix length checks in checkSMB
+Date: Thu, 27 Jan 2011 14:41:14 -0600
+Message-ID: <AANLkTi=2A5VUOz7aTCm_EbeRZdD=e7tq=sd3AAPbzTiR@mail.gmail.com>
+References: <1296132305-21872-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Emmanuel Florac <eflorac-PuSHN2nxisHn0MxWRTiXmQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110127135410.6046a8cd-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
+In-Reply-To: <1296132305-21872-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jan 27, 2011 at 12:54 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Thu, 27 Jan 2011 19:07:19 +0100
-> Emmanuel Florac <eflorac-PuSHN2nxisHn0MxWRTiXmQ@public.gmane.org> wrote:
+If a server has a bug and sends an SMB which is more than just "round u=
+p" off
+in length - I can imagine a case for making exceptions depending on the
+details of the type of malformed frame, but since we
+already allow 512 bytes (for "incorrect server rounding of frame size" =
+bugs)
+we should be careful.  If the length is more than 512 bytes off - this =
+is
+a server bug and the probability that the rest of the frame is incorrec=
+t
+is very high.  How off is the frame you want to allow.
+
+No objection to fixing the error message - not clear on the other part.
+Generally my intuition is that allowing a badly malformed response
+without a clear server bug to workaround unnecessarily weakens
+our validity checking.   The better/stricter the validity checking the =
+more
+likely we are to throw away attack frames (intentionally illegal respon=
+ses
+designed to mess up the kernel).
+
+On Thu, Jan 27, 2011 at 6:45 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> The cERROR message in checkSMB when the calculated length doesn't mat=
+ch
+> the RFC1001 length is incorrect in many cases. It always says that th=
+e
+> RFC1001 length is bigger than the SMB, even when it's actually the
+> reverse.
 >
->>
->> Using mount -t cifs //server/share /mnt/share between two big servers
->> connected with 10GigE, I've got : 115 MB/s reading, 132 MB/s writing.
->> Using smbclient, I've got 450 MB/s reading, 132 MB/s writing (NFS gives
->> ~ 260 MB/s write, 550 MB/s read on the same setup, with absolutely zero
->> optimisation).
->>
->> Why this huge difference? BTW, why such a discrepancy between read and
->> write speed?
+> Fix the error message to say the reverse of what it does now and remo=
+ve
+> the arbitrary check when an RFC1001 length is larger than the SMB.
+> There's no reason to reject those packets since we can just ignore th=
+e
+> junk that's hanging off the end.
 >
-> FWIW, linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org is deprecated.
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/misc.c | =A0 19 +++----------------
+> =A01 files changed, 3 insertions(+), 16 deletions(-)
 >
-> cc'ing linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org which is the new mailing list...
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index 72e99ec..959d629 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -467,23 +467,10 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsign=
+ed int length)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (((4 + len) & 0xFFF=
+=46) =3D=3D (clc_len & 0xFFFF))
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
+ 0; /* bcc wrapped */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Calculated size %d vs length %=
+d mismatch for mid %d",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Calculated size %u vs length %=
+u mismatch for mid=3D%u",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0clc_le=
+n, 4 + len, smb->Mid);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Windows XP can return a few bytes to=
+o much, presumably
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 an illegal pad, at the end of byte rang=
+e lock responses
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 so we allow for that three byte pad, as=
+ long as actual
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 received length is as long or longer th=
+an calculated length */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* We have now had to extend this more,=
+ since there is a
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 case in which it needs to be bigger sti=
+ll to handle a
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 malformed response to transact2 findfir=
+st from WinXP when
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 access denied is returned and thus bcc =
+and wct are zero
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 but server says length is 0x21 bytes to=
+o long as if the server
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 forget to reset the smb rfc1001 length =
+when it reset the
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 wct and bcc to minimum size and drop th=
+e t2 parms and data */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((4+len > clc_len) && (len <=3D clc_=
+len + 512))
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "RFC1001 size=
+ %d bigger than SMB for Mid=3D%d",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (4+len < clc_len) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "RFC1001 size=
+ %d smaller than SMB for mid=3D%u",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0len, smb->Mid);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 1;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> --
+> 1.7.3.4
 >
-> Most likely you're seeing the result of a lack of parallelism in the
-> Linux kernel cifs client. It does not do async writes (yet), which
-> really hinders throughput.
-
-The Linux cifs client does a good job of sending requests for
-different files in parallel, and there are typically not "big kernel lock"
-type problems - but for i/o to the same inode ... cifs_writepages and
-cifs_readpages are serialized so you have "dead time" on the network
-while the server (and later the client) is processing the request and
-no request is in flight for part of the time.
-
-The reason that cifs read performance is relatively worse - is that the
-default cifs read size is only 4 pages (16K, one cifs buffer) where with
-write we can sent 14 pages at a time (and more like zerocopy we
-use iovecs so we don't have an extra copy operation).  We can still
-only send one write or read to the same file at a time where nfs
-frequently sends three or four reads (or writes) at one time gaining
-more parallelism.   As you increase the number of processes
-cifs gets better.   Also note that large file read for cifs can get better
-in many cases when mounting with "forcedirectio."
-
-To beat nfs performance for sequential read or write, with cifs
-IIRC you typically need at least 4 processes
-reading and/or writing from different files to beat nfs.
-
-> I'm hoping to get to work on that in the next few months unless someone
-> else beats me to it...
-
-The similar async read/write feature in the SMB2 kernel client prototype
-showed at least 30% improvement (SMB2 has some other performance
-improvements that are not prototyped as well - but for dispatch of
-reads/writes of
-similar size to cifs the async dispatch helps keep the network more busy)
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
 
--- 
+
+--=20
 Thanks,
 
 Steve
