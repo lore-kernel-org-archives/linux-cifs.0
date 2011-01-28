@@ -1,46 +1,77 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [linux-cifs-client] can someone please explain the performance
- difference between mount.cifs and smbclient?
-Date: Thu, 27 Jan 2011 21:19:24 -0600
-Message-ID: <AANLkTin-9bGiWC-J52PEYJ1vrYrZ3Q4g8MBZB2eEbAYw@mail.gmail.com>
-References: <20110127190719.72653d38@harpe.intellique.com>
-	<20110127135410.6046a8cd@barsoom.rdu.redhat.com>
-	<20110127230351.76e4940c@galadriel2.home>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Emmanuel Florac <eflorac-PuSHN2nxisHn0MxWRTiXmQ@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix length checks in checkSMB (try #2)
+Date: Fri, 28 Jan 2011 07:24:23 -0500
+Message-ID: <1296217463-4584-1-git-send-email-jlayton@redhat.com>
+References: <AANLkTimbuWJWAwbmCVVhFub4Y_Yg-QVXoqr96rGhqHd+@mail.gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110127230351.76e4940c-CYgxBI+Q+g4ovfEj1NHgRQ@public.gmane.org>
+In-Reply-To: <AANLkTimbuWJWAwbmCVVhFub4Y_Yg-QVXoqr96rGhqHd+-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jan 27, 2011 at 4:03 PM, Emmanuel Florac <eflorac-PuSHN2nxisHfrJ4lp8Ex6g@public.gmane.org=
-m> wrote:
-> Le Thu, 27 Jan 2011 13:54:10 -0500 vous =E9criviez:
->
->> cc'ing linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org which is the new mailing list...
->
-> Damn, that's why I wasn't receiving messages from the list for a few
-> months :)
->
->> Most likely you're seeing the result of a lack of parallelism in the
->> Linux kernel cifs client. It does not do async writes (yet), which
->> really hinders throughput.
->>
->> I'm hoping to get to work on that in the next few months unless
->> someone else beats me to it...
->
-> Thank you. In the meanwhile I'll probably stick to NFS :)
->
+The cERROR message in checkSMB when the calculated length doesn't match
+the RFC1001 length is incorrect in many cases. It always says that the
+RFC1001 length is bigger than the SMB, even when it's actually the
+reverse.
 
-With NFSv4 you get similar caching to cifs, but there are
-cases where our testing shows CIFS faster - but not for
-single process, single file i/o.
+Fix the error message to say the reverse of what it does now when the
+SMB length goes beyond the end of the received data. Also, clarify the
+error message when the RFC length is too big. Finally, clarify the
+comments to show that the 512 byte limit on extra data at the end of
+the packet is arbitrary.
 
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/misc.c |   33 +++++++++++++++++----------------
+ 1 files changed, 17 insertions(+), 16 deletions(-)
 
---=20
-Thanks,
-
-Steve
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 72e99ec..77dc732 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -467,25 +467,26 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
+ 				return 0; /* bcc wrapped */
+ 		}
+-		cFYI(1, "Calculated size %d vs length %d mismatch for mid %d",
++		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
+ 				clc_len, 4 + len, smb->Mid);
+-		/* Windows XP can return a few bytes too much, presumably
+-		an illegal pad, at the end of byte range lock responses
+-		so we allow for that three byte pad, as long as actual
+-		received length is as long or longer than calculated length */
+-		/* We have now had to extend this more, since there is a
+-		case in which it needs to be bigger still to handle a
+-		malformed response to transact2 findfirst from WinXP when
+-		access denied is returned and thus bcc and wct are zero
+-		but server says length is 0x21 bytes too long as if the server
+-		forget to reset the smb rfc1001 length when it reset the
+-		wct and bcc to minimum size and drop the t2 parms and data */
+-		if ((4+len > clc_len) && (len <= clc_len + 512))
+-			return 0;
+-		else {
+-			cERROR(1, "RFC1001 size %d bigger than SMB for Mid=%d",
++
++		if (4 + len < clc_len) {
++			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
+ 					len, smb->Mid);
+ 			return 1;
++		} else if (len > clc_len + 512) {
++			/*
++			 * Some servers (Windows XP in particular) send more
++			 * data than the lengths in the SMB packet would
++			 * indicate on certain calls (byte range locks and
++			 * trans2 find first calls in particular). While the
++			 * client can handle such a frame by ignoring the
++			 * trailing data, we choose limit the amount of extra
++			 * data to 512 bytes.
++			 */
++			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
++				  "than SMB for mid=%u", len, smb->Mid);
++			return 1;
+ 		}
+ 	}
+ 	return 0;
+-- 
+1.7.3.4
