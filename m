@@ -1,77 +1,72 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix length checks in checkSMB (try #2)
-Date: Fri, 28 Jan 2011 07:24:23 -0500
-Message-ID: <1296217463-4584-1-git-send-email-jlayton@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix length checks in checkSMB (try #2)
+Date: Fri, 28 Jan 2011 12:53:52 -0600
+Message-ID: <AANLkTimaH5hRX3HyHBrbXf-wP3ZaPQ2378-qsh7fi6Am@mail.gmail.com>
 References: <AANLkTimbuWJWAwbmCVVhFub4Y_Yg-QVXoqr96rGhqHd+@mail.gmail.com>
+	<1296217463-4584-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimbuWJWAwbmCVVhFub4Y_Yg-QVXoqr96rGhqHd+-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1296217463-4584-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The cERROR message in checkSMB when the calculated length doesn't match
-the RFC1001 length is incorrect in many cases. It always says that the
-RFC1001 length is bigger than the SMB, even when it's actually the
-reverse.
+On Fri, Jan 28, 2011 at 6:24 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> The cERROR message in checkSMB when the calculated length doesn't match
+> the RFC1001 length is incorrect in many cases. It always says that the
+> RFC1001 length is bigger than the SMB, even when it's actually the
+> reverse.
+>
+> Fix the error message to say the reverse of what it does now when the
+> SMB length goes beyond the end of the received data. Also, clarify the
+> error message when the RFC length is too big. Finally, clarify the
+> comments to show that the 512 byte limit on extra data at the end of
+> the packet is arbitrary.
 
-Fix the error message to say the reverse of what it does now when the
-SMB length goes beyond the end of the received data. Also, clarify the
-error message when the RFC length is too big. Finally, clarify the
-comments to show that the 512 byte limit on extra data at the end of
-the packet is arbitrary.
+Do we have any data to indicate that other servers send incorrect
+rfc1001 lengths larger than 512 bytes?  In eight years of test events, I
+have seen only a few responses (from Windows and NetApp IIRC) where the
+length was slightly too long.  The 512 byte was chosen because it
+was large enough to pass testing to all servers we had seen,
+allowing us to workaround problematic responses from real servers
+while still limiting the probability that "randomly generated" frames
+with incorrect lengths would pass validation checks and be
+processed.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/misc.c |   33 +++++++++++++++++----------------
- 1 files changed, 17 insertions(+), 16 deletions(-)
+If we have data on a byte range lock or find first response from Windows
+generating more than 512 bytes of junk then we should remove the
+check.
 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 72e99ec..77dc732 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -467,25 +467,26 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
- 			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
- 				return 0; /* bcc wrapped */
- 		}
--		cFYI(1, "Calculated size %d vs length %d mismatch for mid %d",
-+		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
- 				clc_len, 4 + len, smb->Mid);
--		/* Windows XP can return a few bytes too much, presumably
--		an illegal pad, at the end of byte range lock responses
--		so we allow for that three byte pad, as long as actual
--		received length is as long or longer than calculated length */
--		/* We have now had to extend this more, since there is a
--		case in which it needs to be bigger still to handle a
--		malformed response to transact2 findfirst from WinXP when
--		access denied is returned and thus bcc and wct are zero
--		but server says length is 0x21 bytes too long as if the server
--		forget to reset the smb rfc1001 length when it reset the
--		wct and bcc to minimum size and drop the t2 parms and data */
--		if ((4+len > clc_len) && (len <= clc_len + 512))
--			return 0;
--		else {
--			cERROR(1, "RFC1001 size %d bigger than SMB for Mid=%d",
-+
-+		if (4 + len < clc_len) {
-+			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
- 					len, smb->Mid);
- 			return 1;
-+		} else if (len > clc_len + 512) {
-+			/*
-+			 * Some servers (Windows XP in particular) send more
-+			 * data than the lengths in the SMB packet would
-+			 * indicate on certain calls (byte range locks and
-+			 * trans2 find first calls in particular). While the
-+			 * client can handle such a frame by ignoring the
-+			 * trailing data, we choose limit the amount of extra
-+			 * data to 512 bytes.
-+			 */
-+			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
-+				  "than SMB for mid=%u", len, smb->Mid);
-+			return 1;
- 		}
- 	}
- 	return 0;
+The theory proposed to explain why we see incorrect frame lengths
+from some servers was that due to rounding or due to RFC1001 length
+being calculated before it was determined whether the frame would return
+an smb error (e.g. access control error) error - the length could be off
+by up to sizeof of one t2 infolevel  Length could be off up to the sizeof of
+the fixed portion of one transact2 infolevel (all of which are less
+than 512 bytes)
+if the server e.g. decides to include one fewer findfirst entry in a response,
+or if a server fills in  t2 query file info data, then gets an access error,
+leaving the data, but adjusting the smb length, leaving the incorrect
+rfc1001 len.
+In all of the theorized and observed (at test events)
+cases, the server would never be off by more than sizeof largest transact2
+infolevel.
+
+Also note that removing this check makes it harder for new server
+manufacturers to catch serious bugs in their products as the client
+no longer will do validity checking for them.  Speaking from past experience
+it is more painful to debug a server mixing up the wrong type of response
+for a request if validity checking is overly relaxed.
+
+Does anyone have data on an existing server in the field that sends
+anything off by more than
+512 bytes (the most I remember a server being off was about 100 or so bytes)
+in frame length?
+
+
 -- 
-1.7.3.4
+Thanks,
+
+Steve
