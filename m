@@ -1,96 +1,64 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/2] cifs: force a reconnect if there are too many MIDs in flight
-Date: Sat, 29 Jan 2011 07:02:28 -0500
-Message-ID: <1296302548-18913-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: [PATCH 2/2] cifs: fix two compiler warning about uninitialized vars
+Date: Sat, 29 Jan 2011 07:03:02 -0500
+Message-ID: <1296302582-18953-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently, we allow the pending_mid_q to grow without bound with
-SIGKILL'ed processes. This could eventually be a DoS'able problem. An
-unprivileged user could a process that does a long-running call and then
-SIGKILL it.
+fs/cifs/link.c: In function =E2=80=98symlink_hash=E2=80=99:
+fs/cifs/link.c:58:3: warning: =E2=80=98rc=E2=80=99 may be used uninitia=
+lized in this
+function [-Wuninitialized]
 
-If he can also intercept the NT_CANCEL calls or the replies from the
-server, then the pending_mid_q could grow very large, possibly even to
-2^16 entries which might leave GetNextMid in an infinite loop. Fix this
-by imposing a hard limit of 32k calls per server. If we cross that
-limit, set the tcpStatus to CifsNeedReconnect to force cifsd to
-eventually reconnect the socket and clean out the pending_mid_q.
+fs/cifs/smbencrypt.c: In function =E2=80=98mdfour=E2=80=99:
+fs/cifs/smbencrypt.c:61:3: warning: =E2=80=98rc=E2=80=99 may be used un=
+initialized in this
+function [-Wuninitialized]
 
-While we're at it, clean up the function a bit and eliminate an
-unnecessary NULL pointer check.
-
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/misc.c |   37 ++++++++++++++++++++++++-------------
- 1 files changed, 24 insertions(+), 13 deletions(-)
+ fs/cifs/link.c       |    3 ++-
+ fs/cifs/smbencrypt.c |    3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 77dc732..2a930a7 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -236,10 +236,7 @@ __u16 GetNextMid(struct TCP_Server_Info *server)
- {
- 	__u16 mid = 0;
- 	__u16 last_mid;
--	int   collision;
--
--	if (server == NULL)
--		return mid;
-+	bool collision;
- 
- 	spin_lock(&GlobalMid_Lock);
- 	last_mid = server->CurrentMid; /* we do not want to loop forever */
-@@ -252,24 +249,38 @@ __u16 GetNextMid(struct TCP_Server_Info *server)
- 	(and it would also have to have been a request that
- 	 did not time out) */
- 	while (server->CurrentMid != last_mid) {
--		struct list_head *tmp;
- 		struct mid_q_entry *mid_entry;
-+		unsigned int num_mids;
- 
--		collision = 0;
-+		collision = false;
- 		if (server->CurrentMid == 0)
- 			server->CurrentMid++;
- 
--		list_for_each(tmp, &server->pending_mid_q) {
--			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
--
--			if ((mid_entry->mid == server->CurrentMid) &&
--			    (mid_entry->midState == MID_REQUEST_SUBMITTED)) {
-+		num_mids = 0;
-+		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
-+			++num_mids;
-+			if (mid_entry->mid == server->CurrentMid &&
-+			    mid_entry->midState == MID_REQUEST_SUBMITTED) {
- 				/* This mid is in use, try a different one */
--				collision = 1;
-+				collision = true;
- 				break;
- 			}
- 		}
--		if (collision == 0) {
-+
-+		/*
-+		 * if we have more than 32k mids in the list, then something
-+		 * is very wrong. Possibly a local user is trying to DoS the
-+		 * box by issuing long-running calls and SIGKILL'ing them. If
-+		 * we get to 2^16 mids then we're in big trouble as this
-+		 * function could loop forever.
-+		 *
-+		 * Go ahead and assign out the mid in this situation, but force
-+		 * an eventual reconnect to clean out the pending_mid_q.
-+		 */
-+		if (num_mids > 32768)
-+			server->tcpStatus = CifsNeedReconnect;
-+
-+		if (!collision) {
- 			mid = server->CurrentMid;
- 			break;
- 		}
--- 
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index 02cd60a..e8804d3 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -55,8 +55,9 @@ symlink_hash(unsigned int link_len, const char *link_=
+str, u8 *md5_hash)
+=20
+ 	md5 =3D crypto_alloc_shash("md5", 0, 0);
+ 	if (IS_ERR(md5)) {
++		rc =3D PTR_ERR(md5);
+ 		cERROR(1, "%s: Crypto md5 allocation error %d\n", __func__, rc);
+-		return PTR_ERR(md5);
++		return rc;
+ 	}
+ 	size =3D sizeof(struct shash_desc) + crypto_shash_descsize(md5);
+ 	sdescmd5 =3D kmalloc(size, GFP_KERNEL);
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index b5450e9..b5041c8 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -58,8 +58,9 @@ mdfour(unsigned char *md4_hash, unsigned char *link_s=
+tr, int link_len)
+=20
+ 	md4 =3D crypto_alloc_shash("md4", 0, 0);
+ 	if (IS_ERR(md4)) {
++		rc =3D PTR_ERR(md4);
+ 		cERROR(1, "%s: Crypto md4 allocation error %d\n", __func__, rc);
+-		return PTR_ERR(md4);
++		return rc;
+ 	}
+ 	size =3D sizeof(struct shash_desc) + crypto_shash_descsize(md4);
+ 	sdescmd4 =3D kmalloc(size, GFP_KERNEL);
+--=20
 1.7.3.4
