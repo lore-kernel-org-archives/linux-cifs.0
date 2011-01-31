@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] cifs: fix compiler warning about incompatible pointer type (try #2)
-Date: Mon, 31 Jan 2011 14:41:23 +0300
-Message-ID: <1296474083-18350-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH] cifs: fix compiler warning about incompatible pointer type (try #3)
+Date: Mon, 31 Jan 2011 15:09:39 +0300
+Message-ID: <1296475779-19357-1-git-send-email-piastry@etersoft.ru>
 References: <4D4693CF.9090903@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -25,25 +25,37 @@ fs/cifs/cifsproto.h:343:12: note: expected =E2=80=98unsigned int *=E2=80=
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/file.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/file.c |   10 ++++++----
+ 1 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0de17c1..4940bac 100644
+index 0de17c1..d8338e7 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1667,9 +1667,9 @@ static ssize_t
+@@ -1667,9 +1667,10 @@ static ssize_t
  cifs_iovec_write(struct file *file, const struct iovec *iov,
  		 unsigned long nr_segs, loff_t *poffset)
  {
 -	size_t total_written =3D 0, written =3D 0;
 -	unsigned long num_pages, npages;
 -	size_t copied, len, cur_len, i;
-+	unsigned int written =3D 0;
++	unsigned int written;
++	ssize_t total_written =3D 0;
 +	unsigned long num_pages, npages, i;
-+	size_t copied, len, cur_len, total_written =3D 0;
++	size_t copied, len, cur_len;
  	struct kvec *to_send;
  	struct page **pages;
  	struct iov_iter it;
+@@ -1825,7 +1826,8 @@ cifs_iovec_read(struct file *file, const struct i=
+ovec *iov,
+ {
+ 	int rc;
+ 	int xid;
+-	unsigned int total_read, bytes_read =3D 0;
++	ssize_t total_read;
++	unsigned int bytes_read =3D 0;
+ 	size_t len, cur_len;
+ 	int iov_offset =3D 0;
+ 	struct cifs_sb_info *cifs_sb;
 --=20
 1.7.1
