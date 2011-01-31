@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Fix variable types in cifs_iovec_read/write
-Date: Mon, 31 Jan 2011 15:57:51 +0300
-Message-ID: <1296478671-22224-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH] CIFS: Fix variable types in cifs_iovec_read/write (try #2)
+Date: Mon, 31 Jan 2011 16:03:08 +0300
+Message-ID: <1296478988-22307-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,24 +12,25 @@ and bytes_read/total_written should be ssize_t according to return value.
 
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/file.c |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
+ fs/cifs/file.c |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 74c0a28..1b5e01f 100644
+index 74c0a28..e964b1c 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
 @@ -1662,10 +1662,10 @@ static ssize_t
  cifs_iovec_write(struct file *file, const struct iovec *iov,
  		 unsigned long nr_segs, loff_t *poffset)
  {
-+	unsigned int written;
-+	unsigned long num_pages, npages, i;
-+	size_t copied, len, cur_len;
- 	size_t total_written = 0;
+-	size_t total_written = 0;
 -	unsigned int written = 0;
 -	unsigned long num_pages, npages;
 -	size_t copied, len, cur_len, i;
++	unsigned int written;
++	unsigned long num_pages, npages, i;
++	size_t copied, len, cur_len;
++	ssize_t total_written = 0;
  	struct kvec *to_send;
  	struct page **pages;
  	struct iov_iter it;
