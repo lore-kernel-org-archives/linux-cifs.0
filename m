@@ -1,56 +1,50 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: build warning after merge of the cifs tree
-Date: Mon, 31 Jan 2011 13:30:38 +1100
-Message-ID: <20110131133038.ab3aa826.sfr@canb.auug.org.au>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: linux-next: build warning after merge of the cifs tree
+Date: Sun, 30 Jan 2011 21:25:08 -0600
+Message-ID: <AANLkTineJds4VXmYP7q68C5mk_KD_TyMT7Fj=KE0BupJ@mail.gmail.com>
+References: <20110131132743.4ae5d4ae.sfr@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Mon__31_Jan_2011_13_30_38_+1100_wMrsxPXLX2zOCCbd"
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pavel Shilovsky <piastryyy@gmail.com>,
-	Jeff Layton <jlayton@redhat.com>
-To: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
-Return-path: <linux-next-owner@vger.kernel.org>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110131132743.4ae5d4ae.sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
---Signature=_Mon__31_Jan_2011_13_30_38_+1100_wMrsxPXLX2zOCCbd
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Noticed this Friday but had a pending merge request (upstream) in so
+was holding off.  I now have merged the fix for this crypto cleanup
+warning.
 
-Hi all,
+On Sun, Jan 30, 2011 at 8:27 PM, Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org=
+> wrote:
+> Hi all,
+>
+> After merging the cifs tree, today's linux-next build (powerpc
+> ppc64_defconfig) produced this warning:
+>
+> fs/cifs/link.c: In function 'symlink_hash':
+> fs/cifs/link.c:58: warning: 'rc' may be used uninitialized in this fu=
+nction
+>
+> and, indeed, it may be ...
+>
+> Introduced by commit ee2c9258501f83d3ed0fd09ce5df1cec53312cf0 ("cifs:
+> More crypto cleanup (try #2)").
+> --
+> Cheers,
+> Stephen Rothwell =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sfr-3FnU+UHB4dPYtjvyW6yDsg@public.gmane.org=
+=2Eorg.au
+> http://www.canb.auug.org.au/~sfr/
+>
 
-After merging the cifs tree, today's linux-next build (powerpc
-ppc64_defconfig) produced this warning:
 
-fs/cifs/file.c: In function 'cifs_iovec_write':
-fs/cifs/file.c:1740: warning: passing argument 6 of 'CIFSSMBWrite2' from in=
-compatible pointer type
-fs/cifs/cifsproto.h:343: note: expected 'unsigned int *' but argument is of=
- type 'size_t *'
-
-Introduced by commit 72432ffcf555decbbae47f1be338e1d2f210aa69 ("CIFS:
-Implement cifs_strict_writev (try #4)").
 
 --=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
+Thanks,
 
---Signature=_Mon__31_Jan_2011_13_30_38_+1100_wMrsxPXLX2zOCCbd
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iQEcBAEBAgAGBQJNRh7OAAoJEDMEi1NhKgbsMuMH/A+TL4smYknOI+lPlnPhyFLV
-aec6PCTwWhqQMoAiDILTju4fzHJC8t/ZXdc9pVItcF5sCnX8R90XzWdpQCyJdw4p
-BUEkxOo4izbrNSYGpVUWfhcpnuGVMoz97d5U6GqTcjjt9GoMA/euOH2ZR+gzNrDa
-tVJsKhYgZ5X5R0jinTXESZ82VHuwTY2SivmEknFuRWGgZPnbuZwgrUUTJDENL/zD
-qjETWDr2eE6BbamnhfZb9i6oTu5V4qA2lYq5sTkus1YzY0jxdabLqqHWQ1v5qE8W
-TkcNN0HebbbVtluwJu2mf6dwRAti8E0dWa333FvTLZtKG1KoCBFc1g4YovI/50I=
-=LJtI
------END PGP SIGNATURE-----
-
---Signature=_Mon__31_Jan_2011_13_30_38_+1100_wMrsxPXLX2zOCCbd--
+Steve
