@@ -1,67 +1,103 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix variable types in cifs_iovec_read/write
-Date: Mon, 31 Jan 2011 16:03:40 +0300
-Message-ID: <AANLkTi=XXsT8m8atYiBpSv9us-oWWnL2sbihVQciN1ax@mail.gmail.com>
-References: <1296478671-22224-1-git-send-email-piastry@etersoft.ru>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Unable to mount CIFS shares
+Date: Mon, 31 Jan 2011 07:35:40 -0600
+Message-ID: <AANLkTimZXHzm04htXOPXuUySxzEBofiyP5ZxN=5aqj2m@mail.gmail.com>
+References: <4D469AA6.7060401@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1296478671-22224-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <4D469AA6.7060401-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-let's drop this one.
-
-2011/1/31 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> Variable 'i' should be unsigned long as it's used in circle with num_=
-pages,
-> and bytes_read/total_written should be ssize_t according to return va=
-lue.
+On Mon, Jan 31, 2011 at 5:19 AM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> =
+wrote:
+> After updating my tree to HEAD^1, I'm unable to mount CIFS Shares.
 >
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
-> =A0fs/cifs/file.c | =A0 =A09 +++++----
-> =A01 files changed, 5 insertions(+), 4 deletions(-)
+> The topmost commit is:
 >
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 74c0a28..1b5e01f 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1662,10 +1662,10 @@ static ssize_t
-> =A0cifs_iovec_write(struct file *file, const struct iovec *iov,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned long nr_segs, loff_t *poffse=
-t)
-> =A0{
-> + =A0 =A0 =A0 unsigned int written;
-> + =A0 =A0 =A0 unsigned long num_pages, npages, i;
-> + =A0 =A0 =A0 size_t copied, len, cur_len;
-> =A0 =A0 =A0 =A0size_t total_written =3D 0;
-> - =A0 =A0 =A0 unsigned int written =3D 0;
-> - =A0 =A0 =A0 unsigned long num_pages, npages;
-> - =A0 =A0 =A0 size_t copied, len, cur_len, i;
-> =A0 =A0 =A0 =A0struct kvec *to_send;
-> =A0 =A0 =A0 =A0struct page **pages;
-> =A0 =A0 =A0 =A0struct iov_iter it;
-> @@ -1821,7 +1821,8 @@ cifs_iovec_read(struct file *file, const struct=
- iovec *iov,
-> =A0{
-> =A0 =A0 =A0 =A0int rc;
-> =A0 =A0 =A0 =A0int xid;
-> - =A0 =A0 =A0 unsigned int total_read, bytes_read =3D 0;
-> + =A0 =A0 =A0 ssize_t total_read;
-> + =A0 =A0 =A0 unsigned int bytes_read =3D 0;
-> =A0 =A0 =A0 =A0size_t len, cur_len;
-> =A0 =A0 =A0 =A0int iov_offset =3D 0;
-> =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb;
+> commit d804d41d163c0975d2890c82d7135ada7a2f23a4
+> Author: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Date: =A0 Fri Jan 28 15:05:43 2011 -0500
+>
+> =A0 =A0cifs: don't pop a printk when sending on a socket is interrupt=
+ed
+>
+> mount -t cifs //164.99.140.8/share /mnt/cifs/ -o user=3Dvguest
+> Password:
+> mount error(2): No such file or directory
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>
+> Looks like an error caused due to recent crypto changes.
+> Shirish: any clues?
+>
+> dmesg o/p
+> ----------
+>
+> [ 1079.934780] CIFS VFS: mdfour: Crypto md4 allocation error -2
+> [ 1079.934781]
+> [ 1079.934783] CIFS VFS: Error -2 during NTLM authentication
+> [ 1079.934785] CIFS VFS: Send error in SessSetup =3D -2
+> [ 1079.934802] CIFS VFS: cifs_mount failed w/return code =3D -2
+>
+> dmesg with cFYI
+> ----------------
+>
+> [ 1121.620509] fs/cifs/cifsfs.c: Devname: //164.99.140.8/share/ flags=
+: 0
+> [ 1121.620637] fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 24 =
+with uid: 0
+> [ 1121.620649] fs/cifs/connect.c: Username: vguest
+> [ 1121.623357] fs/cifs/connect.c: UNC: \\164.99.140.8\share ip: 164.9=
+9.140.8
+> [ 1121.623382] fs/cifs/connect.c: Socket created
+> [ 1121.623770] fs/cifs/connect.c: sndbuf 16384 rcvbuf 87380 rcvtimeo =
+0x6d6
+> [ 1121.623804] fs/cifs/fscache.c: CIFS: get client cookie (0xffff8800=
+1a202800/0xffff88001ceb6588)
+> [ 1121.623809] fs/cifs/connect.c: CIFS VFS: in cifs_get_smb_ses as Xi=
+d: 25 with uid: 0
+> [ 1121.623811] fs/cifs/connect.c: Existing smb sess not found
+> [ 1121.623819] fs/cifs/cifssmb.c: secFlags 0x7
+> [ 1121.623824] fs/cifs/transport.c: For smb_command 114
+> [ 1121.623826] fs/cifs/transport.c: Sending smb: =A0total_len 82
+> [ 1121.623961] fs/cifs/connect.c: Demultiplex PID: 2768
+> [ 1121.625001] fs/cifs/connect.c: rfc1002 length 0x65
+> [ 1121.625007] fs/cifs/misc.c: Calculated size 81 vs length 101 misma=
+tch for mid 1
+> [ 1121.625015] fs/cifs/transport.c: sync_mid_result: cmd=3D114 mid=3D=
+1 state=3D4
+> [ 1121.625018] fs/cifs/cifssmb.c: Dialect: 2
+> [ 1121.625020] fs/cifs/cifssmb.c: negprot rc 0
+> [ 1121.625022] fs/cifs/connect.c: Security Mode: 0x3 Capabilities: 0x=
+80f3fd TimeAdjust: -19800
+> [ 1121.625024] fs/cifs/sess.c: sess setup type 1
+> [ 1121.627043] CIFS VFS: mdfour: Crypto md4 allocation error -2
+> [ 1121.627044]
+> [ 1121.627046] fs/cifs/smbencrypt.c: SMBNTencrypt Can't generate NT h=
+ash, error: -2
+> [ 1121.627048] fs/cifs/cifsencrypt.c: setup_ntlm_response Can't gener=
+ate NTLM response, error: -2
+> [ 1121.627049] CIFS VFS: Error -2 during NTLM authentication
+> [ 1121.627051] fs/cifs/sess.c: ssetup freeing small buf ffff88001d348=
+140
+> [ 1121.627052] CIFS VFS: Send error in SessSetup =3D -2
+> [ 1121.627055] fs/cifs/connect.c: CIFS VFS: leaving cifs_get_smb_ses =
+(xid =3D 25) rc =3D -2
+> [ 1121.627060] fs/cifs/fscache.c: CIFS: release client cookie (0xffff=
+88001a202800/0xffff88001ceb6588)
+> [ 1121.627066] fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid =3D=
+ 24) rc =3D -2
+> [ 1121.627068] CIFS VFS: cifs_mount failed w/return code =3D -2
+>
+>
 > --
-> 1.7.1
+> Suresh Jayaraman
 >
->
 
-
-
---=20
-Best regards,
-Pavel Shilovsky.
+Suresh, looks like plaintext authentication is failing?
+Does the mount succeed with any of sec options such as
+sec=3Dntlm or sec=3Dntlmv2 or sec=3Dntlmssp?
