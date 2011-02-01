@@ -1,76 +1,57 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] mount.cifs: don't try to alter mtab if it's a symlink
-Date: Mon, 31 Jan 2011 15:05:17 -0500
-Message-ID: <1296504317-20472-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Mon, 31 Jan 2011 20:43:05 -0600
+Message-ID: <AANLkTik1a6rNm8OseakKoesCUNqLR+5jr1qwujSkAbaS@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Some distros replace /etc/mtab with a symlink to /proc/mounts. In that
-situation, mount.cifs will hang for a while trying to lock the mtab.
-/bin/mount checks to see if the mtab is a symlink. If it is or if a
-stat() call on it fails, it doesn't try to to update the mtab. Have
-mount.cifs do the same.
+The following changes since commit 70d1f365568e0cdbc9f4ab92428e1830fdb09ab0:
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.c |    2 +-
- mount.h      |    1 +
- mtab.c       |   16 ++++++++++++++++
- 3 files changed, 18 insertions(+), 1 deletions(-)
+  Merge branch 'for-linus' of git://git.infradead.org/ubi-2.6
+(2011-01-31 13:04:51 +1000)
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index f537a07..5f29761 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1934,7 +1934,7 @@ mount_retry:
- 		goto mount_exit;
- 	}
- 
--	if (!parsed_info->nomtab)
-+	if (!parsed_info->nomtab && !mtab_unusable())
- 		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
- 
- mount_exit:
-diff --git a/mount.h b/mount.h
-index 23ea4f0..d49c2ea 100644
---- a/mount.h
-+++ b/mount.h
-@@ -32,6 +32,7 @@
- #define _PATH_MOUNTED_LOCK	_PATH_MOUNTED "~"
- #define _PATH_MOUNTED_TMP	_PATH_MOUNTED ".tmp"
- 
-+extern int mtab_unusable(void);
- extern int lock_mtab(void);
- extern void unlock_mtab(void);
- 
-diff --git a/mtab.c b/mtab.c
-index 64e7250..9cd50d8 100644
---- a/mtab.c
-+++ b/mtab.c
-@@ -77,6 +77,22 @@ mono_time(void) {
- 	return ret;
- }
- 
-+/*
-+ * See if mtab is present and whether it's a symlink. Returns errno from stat()
-+ * call or EMLINK if it's a symlink.
-+ */
-+int
-+mtab_unusable(void)
-+{
-+	struct stat mstat;
-+
-+	if(lstat(_PATH_MOUNTED, &mstat))
-+		return errno;
-+	else if (S_ISLNK(mstat.st_mode))
-+		return EMLINK;
-+	return 0;
-+}
-+
- /* Remove lock file.  */
- void
- unlock_mtab (void) {
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
+
+Jeff Layton (9):
+      cifs: fix two compiler warning about uninitialized vars
+      cifs: handle cancelled requests better
+      cifs: send an NT_CANCEL request when a process is signalled
+      cifs: simplify SMB header check routine
+      cifs: don't pop a printk when sending on a socket is interrupted
+      cifs: force a reconnect if there are too many MIDs in flight
+      cifs: make CIFS depend on CRYPTO_MD4
+      cifs: clean up some compiler warnings
+      cifs: fix length checks in checkSMB
+
+Shirish Pargaonkar (1):
+      cifs: No need to check crypto blockcipher allocation
+
+Steve French (2):
+      Merge branch 'master' of /.../torvalds/linux-2.6
+      [CIFS] Update cifs minor version
+
+ fs/cifs/Kconfig        |    1 +
+ fs/cifs/cifs_dfs_ref.c |    9 ++--
+ fs/cifs/cifsencrypt.c  |    5 +-
+ fs/cifs/cifsfs.h       |    2 +-
+ fs/cifs/cifssmb.c      |    3 -
+ fs/cifs/file.c         |    8 +---
+ fs/cifs/link.c         |    3 +-
+ fs/cifs/misc.c         |  116 +++++++++++++++++++++++++++---------------------
+ fs/cifs/readdir.c      |    3 -
+ fs/cifs/smbencrypt.c   |    3 +-
+ fs/cifs/transport.c    |   62 +++++++++++++++++++++-----
+ 11 files changed, 130 insertions(+), 85 deletions(-)
+
+
 -- 
-1.7.3.4
+Thanks,
+
+Steve
