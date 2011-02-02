@@ -1,111 +1,88 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions
-Date: Wed, 2 Feb 2011 08:29:37 -0500
-Message-ID: <20110202082937.3b3b68d7@corrin.poochiereds.net>
-References: <1295995034-8771-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: Re: [PATCH 1/2] cifs: Add idmap key and related data structures and
+ functions (try #4)
+Date: Wed, 2 Feb 2011 08:31:07 -0500
+Message-ID: <20110202083107.557499fb@corrin.poochiereds.net>
+References: <1295994980-8718-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1295995034-8771-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1295994980-8718-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 25 Jan 2011 16:37:14 -0600
+On Tue, 25 Jan 2011 16:36:20 -0600
 shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
 > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
 > 
-> rb tree search and insertion routines.
+> Define (global) data structures to store ids, uids and gids, to which a
+> SID maps.  There are two separate trees, one for SID/uid and another one
+> for SID/gid.
 > 
-> A SID which needs to be mapped, is looked up in one of the rb trees
-> depending whether SID is either owner or group SID.
-> If found in a tree, a (mapped) id from that node is assigned to
-> uid or gid as appropriated.
+> A new type of key, cifs_idmap_key_type, is used.
 > 
-> Otherwise, the SID is mapped and looked-up with the help of
-> Winbind via upcall mechanism and a node with mapping is inserted
-> in one of the caches while again making sure that the node does not exist.
+> Keys are instantiated and searched using credential of the root by
+> overriding and restoring the credentials of the caller requesting the key.
+> Once a SID is mapped, it is stored along with the mapped id, in one
+> of the rb trees and key is released.
 > 
-> To map a SID, which can be either a Owner SID or a Group SID, key
-> description starts with the string "os" or "gs" followed by SID converted
-> to a string. Without "os" or "gs", cifs.upcall does not know whether
-> SID needs to be mapped to either an uid or a gid.
+> Register a pruning function with the shrinker that prunes the rb trees
+> when memory pressure warrants freeing up cache.  The function is more like
+> cleaning entire cache than pruning since it would be cleaner and easier
+> to start over again (id mapping).  winbind is likely to have the
+> mappings stored as well, thus not needing to send make calls to the
+> domain controller.
 > 
-> For now, cifs.upcall is only used to map a SID to an id (uid or gid) but
-> it would be used to obtain an SID (string) for an id.
 > 
-
-[...]
-
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsacl.c   |  136 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/cifsfs.c    |    7 +++
+>  fs/cifs/cifsglob.h  |    5 ++
+>  fs/cifs/cifsproto.h |    3 +
+>  4 files changed, 151 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index 1e7636b..b165496 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -23,6 +23,10 @@
+>  
+>  #include <linux/fs.h>
+>  #include <linux/slab.h>
+> +#include <linux/string.h>
+> +#include <linux/keyctl.h>
+> +#include <linux/key-type.h>
+> +#include <keys/user-type.h>
+>  #include "cifspdu.h"
+>  #include "cifsglob.h"
+>  #include "cifsacl.h"
+> @@ -50,6 +54,138 @@ static const struct cifs_sid sid_authusers = {
+>  /* group users */
+>  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+>  
+> +const struct cred *root_cred;
 > +
+> +/*
+> + * Run idmap cache shrinker.
+> + */
 > +static int
-> +sid_to_id(struct cifs_sid *psid, struct cifs_fattr *fattr, uint sidtype)
+> +cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
 > +{
-> +	int rc = 0;
-> +	unsigned long id;
-> +	char *sidstr, *strptr;
-> +	struct key *idkey;
-> +	const struct cred *saved_cred;
-> +	struct cifs_sid_id *sididptr;
+> +	cifs_destroy_idmaptrees();
+> +	return 0;
+> +}
 > +
-> +	if (sidtype == SIDOWNER) {
-> +		spin_lock(&siduidlock);
-> +		id = id_rb_search(&uidtree, psid);
-> +		spin_unlock(&siduidlock);
-> +	} else if (sidtype == SIDGROUP) {
-> +		spin_lock(&sidgidlock);
-> +		id = id_rb_search(&gidtree, psid);
-> +		spin_unlock(&sidgidlock);
-> +	} else
-> +		return -ENOENT;
-> +
-> +	if (!id) {
-> +		sidstr = kzalloc(SIDLEN, GFP_KERNEL);
-> +		if (!sidstr)
-> +			return -ENOMEM;
-> +
-> +		sididptr = kzalloc(sizeof(struct cifs_sid_id), GFP_KERNEL);
-> +		if (!sididptr) {
-> +			kfree(sidstr);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		if (sidtype == SIDOWNER)
-> +			sprintf(sidstr, "%s", "os:");
-> +		else if (sidtype == SIDGROUP)
-> +			sprintf(sidstr, "%s", "gs:");
-> +
-> +		strptr = sidstr + strlen(sidstr);
-> +		sid_to_str(psid, strptr);
-> +
-> +		saved_cred = override_creds(root_cred);
-> +		idkey = request_key(&cifs_idmap_key_type, sidstr, "");
-> +		if (IS_ERR(idkey))
-> +			cFYI(1, "%s: Can't resolve SID to an uid", __func__);
-> +		else {
-> +			id = *(unsigned long *)idkey->payload.value;
-> +			key_put(idkey);
-> +			memcpy(&sididptr->sid, psid, sizeof(struct cifs_sid));
-> +			sididptr->id = id;
-> +			if (sidtype == SIDOWNER) {
-> +				spin_lock(&siduidlock);
-> +				id_rb_insert(&uidtree, sididptr, id);
-> +				spin_unlock(&siduidlock);
-> +			} else {
-> +				spin_lock(&sidgidlock);
-> +				id_rb_insert(&gidtree, sididptr, id);
-> +				spin_unlock(&sidgidlock);
-> +			}
-> +		}
 
-		^^^^^^^^^^
-Please go back and read my comments on your earlier attempt. This one
-has not fixed the problems that will occur when two threads race to
-insert into the same spot in the tree.
+All or nothing? Is it really so difficult to implement some sort of LRU
+scheme? Remember that this code is likely to be called quite
+frequently if someone turns it on. It really is important to make this
+very efficient.
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
