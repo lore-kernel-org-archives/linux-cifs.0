@@ -1,75 +1,67 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions
-Date: Wed, 2 Feb 2011 11:00:47 -0500
-Message-ID: <20110202110047.4a3e2b26@corrin.poochiereds.net>
-References: <1295995034-8771-1-git-send-email-shirishpargaonkar@gmail.com>
-	<AANLkTim9EEC7P8z1xNB176N+R++N7OSBE4GKAbtzg795@mail.gmail.com>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix variable types in cifs_iovec_read/write (try #2)
+Date: Thu, 3 Feb 2011 22:00:47 +0300
+Message-ID: <AANLkTi=+uqOt0bNOq3_+nTmzHC2jj0xTd7h7hFZHxnb7@mail.gmail.com>
+References: <1296478988-22307-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTim9EEC7P8z1xNB176N+R++N7OSBE4GKAbtzg795-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1296478988-22307-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2 Feb 2011 09:40:36 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2011/1/31 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
+> Variable 'i' should be unsigned long as it's used in circle with num_=
+pages,
+> and bytes_read/total_written should be ssize_t according to return va=
+lue.
+>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+> =A0fs/cifs/file.c | =A0 11 ++++++-----
+> =A01 files changed, 6 insertions(+), 5 deletions(-)
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 74c0a28..e964b1c 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1662,10 +1662,10 @@ static ssize_t
+> =A0cifs_iovec_write(struct file *file, const struct iovec *iov,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned long nr_segs, loff_t *poffse=
+t)
+> =A0{
+> - =A0 =A0 =A0 size_t total_written =3D 0;
+> - =A0 =A0 =A0 unsigned int written =3D 0;
+> - =A0 =A0 =A0 unsigned long num_pages, npages;
+> - =A0 =A0 =A0 size_t copied, len, cur_len, i;
+> + =A0 =A0 =A0 unsigned int written;
+> + =A0 =A0 =A0 unsigned long num_pages, npages, i;
+> + =A0 =A0 =A0 size_t copied, len, cur_len;
+> + =A0 =A0 =A0 ssize_t total_written =3D 0;
+> =A0 =A0 =A0 =A0struct kvec *to_send;
+> =A0 =A0 =A0 =A0struct page **pages;
+> =A0 =A0 =A0 =A0struct iov_iter it;
+> @@ -1821,7 +1821,8 @@ cifs_iovec_read(struct file *file, const struct=
+ iovec *iov,
+> =A0{
+> =A0 =A0 =A0 =A0int rc;
+> =A0 =A0 =A0 =A0int xid;
+> - =A0 =A0 =A0 unsigned int total_read, bytes_read =3D 0;
+> + =A0 =A0 =A0 ssize_t total_read;
+> + =A0 =A0 =A0 unsigned int bytes_read =3D 0;
+> =A0 =A0 =A0 =A0size_t len, cur_len;
+> =A0 =A0 =A0 =A0int iov_offset =3D 0;
+> =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb;
+> --
+> 1.7.1
+>
+>
 
-> +
-> > +static void
-> > +id_rb_insert(struct rb_root *root, struct cifs_sid_id *new_sididpt=
-r,
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned long id)
-> > +{
-> > + =A0 =A0 =A0 int rc;
-> > + =A0 =A0 =A0 struct rb_node **new =3D &(root->rb_node), *parent =3D=
- NULL;
-> > + =A0 =A0 =A0 struct cifs_sid_id *sididptr;
-> > +
-> > + =A0 =A0 =A0 while (*new) {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 sididptr =3D rb_entry(*new, struct ci=
-fs_sid_id, rbnode);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 parent =3D *new;
-> > +
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D compare_sids(&sididptr->sid, &=
-new_sididptr->sid);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc < 0)
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 new =3D &((*new)->rb_=
-left);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc > 0)
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 new =3D &((*new)->rb_=
-right);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(new_sididptr);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return;
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->=20
-> Jeff, this change is not sufficient to avoid the race in id_rb_insert=
-()?
-> If compare_sids returns 0, that means the node/mapping already exists
-> i.e. the first racing thread grabbed the lock and inserted the mappin=
-g,
-> so the second racing thread discovers that and returns without insert=
-ing
-> that node?  All of this happening within spin lock?
->=20
-
-Ahh ok, I missed that -- perhaps some comments in the id_rb_insert
-function would be helpful? It seems a little odd to just make it a
-no-op in that case, but if you're certain that the idmapping will never
-change then I suppose it will work.
-
-That said, I'm still not fond of this scheme. Why do you feel it's
-better to make both threads do an upcall in this situation instead of
-sticking an entry in the tree and having the second thread block until
-construction is complete?
-
-Bear in mind that keys upcalls are _expensive_. It's basically a
-fork-and-exec every time. Minimizing the number of upcalls seems
-like it ought to be a design goal here particularly since this is
-likely to happen quite a lot...
+What's about this?
 
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
