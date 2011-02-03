@@ -1,19 +1,20 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] CIFS: Fix variable types in cifs_iovec_read/write (try #2)
-Date: Thu, 3 Feb 2011 22:00:47 +0300
-Message-ID: <AANLkTi=+uqOt0bNOq3_+nTmzHC2jj0xTd7h7hFZHxnb7@mail.gmail.com>
+Date: Thu, 3 Feb 2011 13:49:00 -0600
+Message-ID: <AANLkTingtQ=U9abGN9OBfzRsnqo6ZMctGaiesqAa4MWz@mail.gmail.com>
 References: <1296478988-22307-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1296478988-22307-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/1/31 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
+On Mon, Jan 31, 2011 at 7:03 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
+wrote:
 > Variable 'i' should be unsigned long as it's used in circle with num_=
 pages,
 > and bytes_read/total_written should be ssize_t according to return va=
@@ -58,10 +59,15 @@ t)
 > --
 > 1.7.1
 >
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-What's about this?
+Should written be initialized to 0 at the top of the outer do loop in
+function cifs_iovec_write() in case CIFSSMBWrite2 returns with
+an error other than EAGAIN without writing anything?
 
---=20
-Best regards,
-Pavel Shilovsky.
+Other than the above query, other things look correct.
