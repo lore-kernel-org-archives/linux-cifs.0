@@ -1,83 +1,63 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Possible slab memory corruption while updating
- extended stats (repost)
-Date: Fri, 4 Feb 2011 07:39:25 -0500
-Message-ID: <20110204073925.3a21a048@tlielax.poochiereds.net>
-References: <1296765078-25531-1-git-send-email-shirishpargaonkar@gmail.com>
-	<AANLkTi=_HAQfH2oGvBrd2gBLa05EFndnpFGOny0NGCgW@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs: don't always drop malformed replies on the floor
+Date: Fri, 4 Feb 2011 09:22:52 -0600
+Message-ID: <AANLkTiniSV+ys2nnTjiBtncr3QccppbFVXEHWiiUxpXX@mail.gmail.com>
+References: <AANLkTim4p3fT4Sa6aoqqr1sBAFv8a6_7RLYOi2j2fP8s@mail.gmail.com>
+	<20110204071659.448565ba@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=_HAQfH2oGvBrd2gBLa05EFndnpFGOny0NGCgW-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20110204071659.448565ba-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 3 Feb 2011 21:18:18 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Fri, Feb 4, 2011 at 6:16 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Thu, 3 Feb 2011 23:01:45 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> Looking at this comment in the patch:
+>>
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* FIXME: why 48 bytes?
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+>> + =A0 =A0 =A0 =A0 =A0 =A0 length =3D checkSMB(smb_buffer, smb_buffer=
+->Mid, total_read);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (length !=3D 0)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_dump_mem("Bad SMB: =
+", smb_buffer,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 total_read < 48 ? total_read : 48);
+>>
+>>
+>> got me thinking, if you prefer a longer length that is fine. =A0 To
+>> avoid huge log entries, while still dumping the most useful info, th=
+e
+>> original length dumped was limited. =A048 bytes was chosen because i=
+t
+>> printed 3 lines of 16 to log and thus would include the most importa=
+nt
+>> parts of the SMB (past wct). =A0It is large enough to fit a close
+>> request and response, although about 10 bytes to small for getting a=
+ll
+>> of a SMB ReadX request. =A0 It would probably be fine to make that 6=
+4
+>> bytes if you prefer. =A0 If we made it smaller (e.g. 32 instead of 4=
+8)
+>> IIRC we wouldn't get wct.
+>
+> The length doesn't much matter to me. What does matter is that this
+> would do a cifs_dump_mem for 48 bytes even when the client received
+> less than 48 bytes. Granted, the buffers are larger than that so I
+> don't think there's any danger of a buffer overrun or anything, but t=
+he
+> stuff at the end could just be garbage or zeroed out.
 
-> Good catch.
->=20
-> But doesn't this belong in stable?
->=20
-
-No, it's a recent regression from the call timeout patches.
-
-> On Thu, Feb 3, 2011 at 2:31 PM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >
-> >
-> > Updating extended statistics here can cause slab memory corruption
-> > if a callback function frees slab memory (mid_entry).
-> >
-> >
-> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > ---
-> > =A0fs/cifs/connect.c | =A0 =A04 ++--
-> > =A01 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 945b220..1f32a28 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -633,11 +633,11 @@ incomplete_rcv:
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_=
-entry->largeBuf =3D isLargeBuf;
-> > =A0multi_t2_fnd:
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_=
-entry->midState =3D MID_RESPONSE_RECEIVED;
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_=
-del_init(&mid_entry->qhead);
-> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_e=
-ntry->callback(mid_entry);
-> > =A0#ifdef CONFIG_CIFS_STATS2
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_=
-entry->when_received =3D jiffies;
-> > =A0#endif
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_=
-del_init(&mid_entry->qhead);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_e=
-ntry->callback(mid_entry);
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0brea=
-k;
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D NULL;
-> > --
-> > 1.6.0.2
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
-s" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.htm=
-l
-> >
->=20
->=20
->=20
-
+Yes, agreed.  I liked that change.  It improves
+readability of debug info.
 
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
