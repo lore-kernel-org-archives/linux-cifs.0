@@ -1,41 +1,83 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: enable signing flag in SMB header when server has it on
-Date: Fri,  4 Feb 2011 07:21:26 -0500
-Message-ID: <1296822086-6377-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re: [PATCH] cifs: Possible slab memory corruption while updating
+ extended stats (repost)
+Date: Fri, 4 Feb 2011 07:39:25 -0500
+Message-ID: <20110204073925.3a21a048@tlielax.poochiereds.net>
+References: <1296765078-25531-1-git-send-email-shirishpargaonkar@gmail.com>
+	<AANLkTi=_HAQfH2oGvBrd2gBLa05EFndnpFGOny0NGCgW@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AANLkTi=_HAQfH2oGvBrd2gBLa05EFndnpFGOny0NGCgW-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-cifs_sign_smb only generates a signature if the correct Flags2 bit is
-set. Make sure that it gets set correctly if we're sending an async
-call.
+On Thu, 3 Feb 2011 21:18:18 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-This patch fixes:
+> Good catch.
+>=20
+> But doesn't this belong in stable?
+>=20
 
-    https://bugzilla.kernel.org/show_bug.cgi?id=28142
+No, it's a recent regression from the call timeout patches.
 
-Reported-and-Tested-by: JG <jg-9fI4heB6ewM@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/transport.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+> On Thu, Feb 3, 2011 at 2:31 PM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >
+> >
+> > Updating extended statistics here can cause slab memory corruption
+> > if a callback function frees slab memory (mid_entry).
+> >
+> >
+> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > ---
+> > =A0fs/cifs/connect.c | =A0 =A04 ++--
+> > =A01 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index 945b220..1f32a28 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -633,11 +633,11 @@ incomplete_rcv:
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_=
+entry->largeBuf =3D isLargeBuf;
+> > =A0multi_t2_fnd:
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_=
+entry->midState =3D MID_RESPONSE_RECEIVED;
+> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_=
+del_init(&mid_entry->qhead);
+> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_e=
+ntry->callback(mid_entry);
+> > =A0#ifdef CONFIG_CIFS_STATS2
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_=
+entry->when_received =3D jiffies;
+> > =A0#endif
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_=
+del_init(&mid_entry->qhead);
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_e=
+ntry->callback(mid_entry);
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0brea=
+k;
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D NULL;
+> > --
+> > 1.6.0.2
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
+s" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.htm=
+l
+> >
+>=20
+>=20
+>=20
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index b8c5e2e..fbc5aac 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -359,6 +359,10 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
- 	if (rc)
- 		return rc;
- 
-+	/* enable signing if server requires it */
-+	if (server->secMode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-+		in_buf->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
-+
- 	mutex_lock(&server->srv_mutex);
- 	mid = AllocMidQEntry(in_buf, server);
- 	if (mid == NULL) {
--- 
-1.7.3.4
+
+--=20
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
