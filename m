@@ -1,35 +1,59 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Possible slab memory corruption while updating
- extended stats (repost)
-Date: Fri, 4 Feb 2011 14:21:04 -0600
-Message-ID: <AANLkTinSsV9wk3Sy_XOnxzkQJPPBaWL6FaWi1yQ9Nc=f@mail.gmail.com>
-References: <1296765078-25531-1-git-send-email-shirishpargaonkar@gmail.com>
-	<AANLkTi=_HAQfH2oGvBrd2gBLa05EFndnpFGOny0NGCgW@mail.gmail.com>
-	<20110204073925.3a21a048@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [LSF/MM TOPIC] Unified keys for NFS, CIFS and AFS for security
+ data
+Date: Sat, 5 Feb 2011 08:03:32 -0500
+Message-ID: <20110205080332.4899b352@corrin.poochiereds.net>
+References: <3599.1295624067@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: lsf-pc-cunTk1MwBs98uUxBSJOaYoYkZiVZrdSR2LY78lusg7I@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110204073925.3a21a048-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <3599.1295624067-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Feb 4, 2011 at 6:39 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Thu, 3 Feb 2011 21:18:18 -0600
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> Good catch.
->>
->> But doesn't this belong in stable?
->>
->
-> No, it's a recent regression from the call timeout patches.
+On Fri, 21 Jan 2011 15:34:27 +0000
+David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Yes, you are right.  It shows up in rc1, but not 2.6.37
+> 
+> I'd like to propose a discussion topic for the LSF: how best to implement a
+> common key type for use by NFS, CIFS and AFS such that, say, a kerberos key
+> can be encapsulated within one and then be pulled out by various filesystems.
+> 
+> Furthermore, it would be necessary to allow the request_key() upcall mechanism
+> to perform GSSAPI queries.
+> 
 
+I would be interested in discussing this as well. Currently CIFS
+"punts" to some degree and offloads almost all of the SPNEGO blob
+construction to userspace. So, for CIFS this would involve moving more
+of this code into the kernel. I think that's a good thing since it will
+make it easier to do mutual-authentication, etc...
+
+This would make it more plausible to store krb5 credcaches in the
+kernel keyring too. Modern MIT krb5 libs can do this today (I think),
+but most of the kernel upcalls rely on FILE: credcaches. Breaking that
+dependency would be nice.
+
+The difficulty here is that request_key() is "stateless", so we need to
+think about how to manage GSSAPI contexts across multiple upcalls...or
+plan to implement large swaths of the GSSAPI in-kernel.
+
+It might also be helpful to couple this with some consolidation and
+cleanup of the ASN.1 parsing code in the kernel. There are at least 3
+separate implementations in the kernel today (one in cifs, one in
+sunrpc, and one in iptables).
+
+Since Trond's original email asked what I expertise I would bring to
+the table:
+
+I currently maintain the cifs-utils package which contains the
+cifs.upcall program, and wrote most of the in-kernel pieces of the
+current SPNEGO/krb5 upcall for CIFS. I've also done a some work on
+the GSSAPI upcall pieces in the RPC layer and in nfs-utils.
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
