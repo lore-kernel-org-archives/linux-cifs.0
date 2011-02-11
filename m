@@ -1,33 +1,28 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: reacquire CAP_DAC_READ_SEARCH before
- calling mount(2)
-Date: Fri, 11 Feb 2011 07:22:46 -0500
-Message-ID: <20110211072246.51db8f03@tlielax.poochiereds.net>
-References: <1297195344-4460-1-git-send-email-jlayton@samba.org>
+From: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Howto test a server is up.
+Date: Fri, 11 Feb 2011 18:18:04 +0530
+Message-ID: <4D553004.9000606@novell.com>
+References: <AANLkTikZO_S+CFcAw_7FA3r5xG49CVT8f_XfVNBavajK@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, erik-nLcryBYLV+bMkAkIaI5Geg@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1297195344-4460-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <AANLkTikZO_S+CFcAw_7FA3r5xG49CVT8f_XfVNBavajK-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUdWUs
-ICA4IEZlYiAyMDExIDE1OjAyOjI0IC0wNTAwDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
-cmc+IHdyb3RlOg0KDQo+IEl0J3MgcG9zc2libGUgdGhhdCB0aGUgdXNlciBpcyB0cnlpbmcgdG8g
-bW91bnQgb250byBhIGRpcmVjdG9yeSB0byB3aGljaA0KPiBoZSBkb2Vzbid0IGhhdmUgZXhlY3V0
-ZSBwZXJtcy4gSWYgdGhhdCdzIHRoZSBjYXNlIHRoZW4gdGhlIG1vdW50IHdpbGwNCj4gY3VycmVu
-dGx5IGZhaWwuIEZpeCB0aGlzIGJ5IHJlZW5hYmxpbmcgQ0FQX0RBQ19SRUFEX1NFQVJDSCBiZWZv
-cmUNCj4gY2FsbGluZyBtb3VudCgyKS4gVGhhdCB3aWxsIGVuc3VyZSB0aGF0IHRoZSBrZXJuZWwn
-cyBwZXJtaXNzaW9ucyBjaGVjaw0KPiBmb3IgdGhpcyBpcyBieXBhc3NlZC4NCj4gDQo+IFJlcG9y
-dGVkLWJ5OiBFcmlrIExvZ3RlbmJlcmcgPGVyaWtAbG9ndGVuYmVyZy5ldT4NCj4gU2lnbmVkLW9m
-Zi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KPiAtLS0NCj4gIG1vdW50LmNp
-ZnMuYyB8ICAgMTAgKysrKysrKystLQ0KPiAgMSBmaWxlcyBjaGFuZ2VkLCA4IGluc2VydGlvbnMo
-KyksIDIgZGVsZXRpb25zKC0pDQo+IA0KDQpNZXJnZWQgYW5kIHNob3VsZCBtYWtlIDQuOSByZWxl
-YXNlLg0KDQotIC0tIA0KSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KLS0tLS1CRUdJ
-TiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYyLjAuMTYgKEdOVS9MaW51eCkN
-Cg0KaUVZRUFSRUNBQVlGQWsxVktpQUFDZ2tReVAwZ3hRTWR6SUFLZUFDZlVOR0c4UVl3UWp6cHJ6
-NExMU0dwZFppbQ0KTElBQW5BeDEyYWljWEh2c2pYNHk3ZExNSndGTXV5Zi8NCj10MTd5DQotLS0t
-LUVORCBQR1AgU0lHTkFUVVJFLS0tLS0NCg==
+On 02/11/2011 03:36 PM, Stef Bon wrote:
+> Hi,
+> 
+> I've been searching for the way to test a smb server is ok.
+> What is the way to do this??
+> 
+
+Sending an SMB echo? Look for patches from Jeff that recently added ECHO
+call..
+
+
+-- 
+Suresh Jayaraman
