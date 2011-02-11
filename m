@@ -1,28 +1,48 @@
-From: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Howto test a server is up.
-Date: Fri, 11 Feb 2011 18:18:04 +0530
-Message-ID: <4D553004.9000606@novell.com>
-References: <AANLkTikZO_S+CFcAw_7FA3r5xG49CVT8f_XfVNBavajK@mail.gmail.com>
+From: Wayne Walker <wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org>
+Subject: Re: Data corruption problem
+Date: Fri, 11 Feb 2011 08:35:20 -0600
+Message-ID: <20110211143520.GI27051@solid-constructs.com>
+References: <20110211051458.GD27051@solid-constructs.com>
+ <20110211065318.62f91a5b@tlielax.poochiereds.net>
+Reply-To: Wayne Walker <wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikZO_S+CFcAw_7FA3r5xG49CVT8f_XfVNBavajK-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20110211065318.62f91a5b-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 02/11/2011 03:36 PM, Stef Bon wrote:
-> Hi,
+On Fri, Feb 11, 2011 at 06:53:18AM -0500, Jeff Layton wrote:
+> On Thu, 10 Feb 2011 23:14:59 -0600
+> Wayne Walker <wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org> wrote:
 > 
-> I've been searching for the way to test a smb server is ok.
-> What is the way to do this??
+> > First, I'm not certain whether this is samba, the linux cifs driver, or
+> > something else.
+> > 
+> > He got me involved.  I found no useful messages (cifs, IO, kernel mem,
+> > network, or samba) in any logs on client or server anywhere near the
+> > times of the file creations.
 > 
+> Did the close() or fsync() call return an error?
 
-Sending an SMB echo? Look for patches from Jeff that recently added ECHO
-call..
-
+No, Jeff.  Nothing in the logs and from the user space side there are
+no errors.  All debug levels are at the system defaults.  After 12
+attempts last night I've still not reproduced.  I will work with my QA
+guy this morning (CST here) to see if we can reproduce.  What can I do
+to gather the best data for you guys?
 
 -- 
-Suresh Jayaraman
+
+Wayne Walker
+wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org
+(512) 633-8076
+Senior Consultant
+Solid Constructs, LLC
+
+> A: Because it messes up the order in which people normally read text.
+> > Q: Why is top-posting such a bad thing?
+> > > A: Top-posting.
+> > > > Q: What is the most annoying thing in e-mail?
