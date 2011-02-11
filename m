@@ -1,56 +1,42 @@
-From: Wayne Walker <wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org>
-Subject: Re: UNS: Re: Data corruption problem
-Date: Fri, 11 Feb 2011 09:00:51 -0600
-Message-ID: <20110211150051.GL27051@solid-constructs.com>
-References: <20110211051458.GD27051@solid-constructs.com>
- <20110211065318.62f91a5b@tlielax.poochiereds.net>
- <20110211143520.GI27051@solid-constructs.com>
- <20110211094117.1f012cae@tlielax.poochiereds.net>
-Reply-To: Wayne Walker <wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Howto test a server is up.
+Date: Fri, 11 Feb 2011 17:23:14 +0100
+Message-ID: <AANLkTikm1K041Z6E7j3MR5eZNVjAwAfkB9OspC8o0qBr@mail.gmail.com>
+References: <AANLkTikZO_S+CFcAw_7FA3r5xG49CVT8f_XfVNBavajK@mail.gmail.com>
+	<4D553004.9000606@novell.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20110211094117.1f012cae-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <4D553004.9000606-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Feb 11, 2011 at 09:41:17AM -0500, Jeff Layton wrote:
-> > No, Jeff.  Nothing in the logs and from the user space side there are
-> > no errors.  All debug levels are at the system defaults.  After 12
-> > attempts last night I've still not reproduced.  I will work with my QA
-> > guy this morning (CST here) to see if we can reproduce.  What can I do
-> > to gather the best data for you guys?
-> > 
-> 
-> To be clear...are you sure that the close(2) or fsync(2) syscalls did
-> not return an error? It's a common bug for programs to ignore the return
-> code from close(2), and that's where errors during writeback get
-> reported.
+Hi,
 
-Gotcha, I will grab a java dev and code review the test app.  My java-fu
-is weak, but I think java will throw an exception on either failure,
-just have to make sure some dev didn't put in a wide open catch.
+which patches do you mean exactly??
+I've been looking at:
 
-> The reason I ask is that there were some issues that were fixed
-> recently in mainline with cifs writeback. The CIFS code treated
-> timeouts during writeback as hard errors instead of retrying them, but
-> in those cases the client should have returned an error during fsync or
-> close.
+http://git.samba.org/?p=cifs-utils.git;a=log
 
-Good to know.  Thank you.
+No echo smb server found yet.
 
--- 
+Stef
 
-Wayne Walker
-wwalker-7+hyfkrzchDWTcdHvfGLfFaTQe2KTcn/@public.gmane.org
-(512) 633-8076
-Senior Consultant
-Solid Constructs, LLC
 
-> A: Because it messes up the order in which people normally read text.
-> > Q: Why is top-posting such a bad thing?
-> > > A: Top-posting.
-> > > > Q: What is the most annoying thing in e-mail?
+2011/2/11 Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>:
+> On 02/11/2011 03:36 PM, Stef Bon wrote:
+>> Hi,
+>>
+>> I've been searching for the way to test a smb server is ok.
+>> What is the way to do this??
+>>
+>
+> Sending an SMB echo? Look for patches from Jeff that recently added ECHO
+> call..
+>
+>
+> --
+> Suresh Jayaraman
+>
