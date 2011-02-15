@@ -1,59 +1,88 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix handling of scopeid in cifs_convert_address
-Date: Tue, 15 Feb 2011 13:54:56 -0500
-Message-ID: <1297796096-5162-1-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH 1/2] cifs: Add idmap key and related data structures and
+ functions (try #5)
+Date: Tue, 15 Feb 2011 15:16:38 -0500
+Message-ID: <20110215151638.62a96a14@tlielax.poochiereds.net>
+References: <1297450136-31586-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, bj-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1297450136-31586-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The code finds, the '%' sign in an ipv6 address and copies that to a
-buffer allocated on the stack. It then ignores that buffer, and passes
-'pct' to simple_strtoul(), which doesn't work right because we're
-comparing 'endp' against a completely different string.
+On Fri, 11 Feb 2011 12:48:56 -0600
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-=46ix it by passing the correct pointer. While we're at it, this is a
-good candidate for conversion to strict_strtoul as well.
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Define (global) data structures to store ids, uids and gids, to which a
+> SID maps.  There are two separate trees, one for SID/uid and another one
+> for SID/gid.
+> 
+> A new type of key, cifs_idmap_key_type, is used.
+> 
+> Keys are instantiated and searched using credential of the root by
+> overriding and restoring the credentials of the caller requesting the key.
+> Once a SID is mapped, it is stored along with the mapped id, in one
+> of the rb trees and key is released.
+> 
+> Register a pruning function with the shrinker that prunes the rb trees
+> when memory pressure warrants freeing up cache.  Just for now, it is
+> more like cleaning entire cache than pruning.  The subsequent patch has
+> this function defined.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsacl.c   |  138 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/cifsfs.c    |    7 +++
+>  fs/cifs/cifsglob.h  |    5 ++
+>  fs/cifs/cifsproto.h |    3 +
+>  4 files changed, 153 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index beeebf1..388b34c 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -23,6 +23,10 @@
+>  
+>  #include <linux/fs.h>
+>  #include <linux/slab.h>
+> +#include <linux/string.h>
+> +#include <linux/keyctl.h>
+> +#include <linux/key-type.h>
+> +#include <keys/user-type.h>
+>  #include "cifspdu.h"
+>  #include "cifsglob.h"
+>  #include "cifsacl.h"
+> @@ -50,6 +54,140 @@ static const struct cifs_sid sid_authusers = {
+>  /* group users */
+>  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+>  
+> +static const struct cred *root_cred;
+> +
+> +/*
+> + * Run idmap cache shrinker.
+> + */
+> +static int
+> +cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
+> +{
+> +	/* Use a pruning scheme in a subsequent patch instead */
+		^^^^
+	maybe add the standard "FIXME:" prefix? to the comment above?
 
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reported-by: Bj=C3=B6rn JACKE <bj-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/netmisc.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+> +	cifs_destroy_idmaptrees();
+> +	return 0;
+> +}
+> +
 
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index 8d9189f..79f641e 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -170,7 +170,7 @@ cifs_convert_address(struct sockaddr *dst, const ch=
-ar *src, int len)
- {
- 	int rc, alen, slen;
- 	const char *pct;
--	char *endp, scope_id[13];
-+	char scope_id[13];
- 	struct sockaddr_in *s4 =3D (struct sockaddr_in *) dst;
- 	struct sockaddr_in6 *s6 =3D (struct sockaddr_in6 *) dst;
-=20
-@@ -197,9 +197,9 @@ cifs_convert_address(struct sockaddr *dst, const ch=
-ar *src, int len)
- 		memcpy(scope_id, pct + 1, slen);
- 		scope_id[slen] =3D '\0';
-=20
--		s6->sin6_scope_id =3D (u32) simple_strtoul(pct, &endp, 0);
--		if (endp !=3D scope_id + slen)
--			return 0;
-+		rc =3D strict_strtoul(scope_id, 0,
-+					(unsigned long *)&s6->sin6_scope_id);
-+		rc =3D (rc =3D=3D 0) ? 1 : 0;
- 	}
-=20
- 	return rc;
---=20
-1.7.4
+Aside from the trivial comment fix, this looks OK, I guess. Eventually
+it would be good to have a more selective pruning scheme than just
+dropping the entire idmap cache.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
