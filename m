@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs-utils: handle cifs_idmap type of key to map a SID to
  either an uid or gid (try #5)
-Date: Wed, 16 Feb 2011 10:53:34 -0600
-Message-ID: <AANLkTimow9QWAVTHebYKR29bmkfixGoHpdheQ4joVvME@mail.gmail.com>
+Date: Wed, 16 Feb 2011 12:05:34 -0600
+Message-ID: <AANLkTin4fidAT_osBUKV9TC+X-j66Gr7qteQpcX0kMOJ@mail.gmail.com>
 References: <1297450149-31632-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20110215154559.56ce5169@tlielax.poochiereds.net>
 Mime-Version: 1.0
@@ -156,12 +156,18 @@ the logic
 > =A0 =A0 =A0 =A0error cases or just did a return when it hits an error=
 =2E
 
-We should not outrightly return when some of these functions
-would return error but instead fallback on the default (e.g. if strtosi=
-d fails,
-we want to get nobody/nogroup). goto out may not look pretty as well.
-It is is probably  better to (preserve and) log every failing return co=
-de .
+Will comments help?  I thought of using function calls and goto calls
+but none of them will make readability and logic any easier.
+There are five different calls, and if either of first two fail, insete=
+ad of
+returning, third one gets called and all calls are different
+(e.g. if either of wbcStringToSid or wbcSidToUid, getpwnam should
+be called and if either of  wbcStringToSid or wbcSidToGid fail,
+getgrnam should be called.
+keyctl_instantiate should be called if either  wbcSidToUid or getpwnam
+succeed (in that order) or  if either wbcSidToGid or getgrnam succeed
+(in that order).
+It would not be any clearer to follow this with goto statements.
 
 >
 >> + =A0 =A0 } else if (strncmp(keyend, "gs", 2) =3D=3D 0) {
@@ -210,6 +216,9 @@ _ERR, "%s: key inst: %s",
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Might be helpful to know what that SID=
  is, don't you
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0think?
+
+yes, will fix this.
+
 >> +
 >> + =A0 =A0 return rc;
 >> +}
