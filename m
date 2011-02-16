@@ -1,130 +1,187 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix broken lanman (lm) auth code (try #2)
-Date: Wed, 16 Feb 2011 14:31:02 -0500
-Message-ID: <20110216143102.37d2119e@corrin.poochiereds.net>
-References: <1297871414-11560-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: Re: [PATCH] cifs-utils: handle cifs_idmap type of key to map a SID
+ to either an uid or gid (try #5)
+Date: Wed, 16 Feb 2011 14:44:29 -0500
+Message-ID: <20110216144429.7ff05c0a@corrin.poochiereds.net>
+References: <1297450149-31632-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20110215154559.56ce5169@tlielax.poochiereds.net>
+	<AANLkTin4fidAT_osBUKV9TC+X-j66Gr7qteQpcX0kMOJ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1297871414-11560-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <AANLkTin4fidAT_osBUKV9TC+X-j66Gr7qteQpcX0kMOJ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 16 Feb 2011 09:50:14 -0600
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Wed, 16 Feb 2011 12:05:34 -0600
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> Fix lanman (lm) authentication code.
-> 
-> Change lm response length back to 24 from 16.
-> Parse lanmani mount option.
-> Add code to add odd parity bit to each of the eight bytes of a DES key.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    3 +++
->  fs/cifs/sess.c    |    8 ++++----
->  fs/cifs/smbdes.c  |   19 ++++++++++++++++++-
->  3 files changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 8d6c17a..e3494df 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1014,6 +1014,9 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				/* BB is there a better way to do this? */
->  				vol->secFlg |= CIFSSEC_MAY_NTLMV2;
->  #ifdef CONFIG_CIFS_WEAK_PW_HASH
-> +			} else if (strnicmp(value, "lanmani", 7) == 0) {
-> +				vol->secFlg |= CIFSSEC_MAY_LANMAN |
-> +					CIFSSEC_MUST_SIGN;
->  			} else if (strnicmp(value, "lanman", 6) == 0) {
->  				vol->secFlg |= CIFSSEC_MAY_LANMAN;
->  #endif
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index 1adc962..1676570 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -656,13 +656,13 @@ ssetup_ntlmssp_authenticate:
->  
->  	if (type == LANMAN) {
->  #ifdef CONFIG_CIFS_WEAK_PW_HASH
-> -		char lnm_session_key[CIFS_SESS_KEY_SIZE];
-> +		char lnm_session_key[CIFS_AUTH_RESP_SIZE];
->  
->  		pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
->  
->  		/* no capabilities flags in old lanman negotiation */
->  
-> -		pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_SESS_KEY_SIZE);
-> +		pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
->  
->  		/* Calculate hash with password and copy into bcc_ptr.
->  		 * Encryption Key (stored as in cryptkey) gets used if the
-> @@ -675,8 +675,8 @@ ssetup_ntlmssp_authenticate:
->  					true : false, lnm_session_key);
->  
->  		ses->flags |= CIFS_SES_LANMAN;
-> -		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_SESS_KEY_SIZE);
-> -		bcc_ptr += CIFS_SESS_KEY_SIZE;
-> +		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
-> +		bcc_ptr += CIFS_AUTH_RESP_SIZE;
->  
->  		/* can not sign if LANMAN negotiated so no need
->  		to calculate signing key? but what if server
-> diff --git a/fs/cifs/smbdes.c b/fs/cifs/smbdes.c
-> index 0472148..7bdf42c 100644
-> --- a/fs/cifs/smbdes.c
-> +++ b/fs/cifs/smbdes.c
-> @@ -299,6 +299,20 @@ dohash(char *out, char *in, char *key, int forw)
->  	kfree(ki);
->  }
->  
-> +static int
-> +odd_parity(unsigned char c)
-> +{
-> +	int i;
-> +	int val = 0x80;
-> +	int count = 0;
-> +
-> +	for (i = 0; i < 7; ++i)
-> +		if (c & (val >> i))
-> +			++count;
-> +
-> +	return count % 2;
-> +}
-> +
+> On Tue, Feb 15, 2011 at 2:45 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
+te:
+> > On Fri, 11 Feb 2011 12:49:09 -0600
+> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+> >
+> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >>
+> >>
+> >> Handle cifs_idmap type of key. Extract a SID string from the descr=
+iption
+> >> and map it to either an uid or gid using winbind APIs.
+> >> If that fails (e.g. because winbind is not installed/running or wi=
+nbind returns
+> >> an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
+> >> And if that fails, kernel assigns uid and gid (from mount superblo=
+ck).
+> >>
+> >> An entry such as this
+> >>
+> >> create =A0cifs.cifs_idmap =A0 * =A0 =A0 =A0 * =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 /usr/sbin/cifs.upcall %k
+> >>
+> >> is needed in the file /etc/request-key.conf.
+> >>
+> >>
+> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> ---
+> >> =A0Makefile.am =A0 | =A0 =A02 +-
+> >> =A0cifs.upcall.c | =A0 98 ++++++++++++++++++++++++++++++++++++++++=
++++++++++++++++++
+> >> =A02 files changed, 99 insertions(+), 1 deletions(-)
+> >>
+> >> diff --git a/Makefile.am b/Makefile.am
+> >> index 67a0190..c9018ae 100644
+> >> --- a/Makefile.am
+> >> +++ b/Makefile.am
+> >> @@ -11,7 +11,7 @@ man_MANS =3D mount.cifs.8
+> >> =A0if CONFIG_CIFSUPCALL
+> >> =A0sbin_PROGRAMS =3D cifs.upcall
+> >> =A0cifs_upcall_SOURCES =3D cifs.upcall.c data_blob.c asn1.c spnego=
+=2Ec util.c
+> >> -cifs_upcall_LDADD =3D -ltalloc -lkeyutils $(KRB5_LDADD)
+> >> +cifs_upcall_LDADD =3D -ltalloc -lwbclient -lkeyutils $(KRB5_LDADD=
+)
+> >> =A0man_MANS +=3D cifs.upcall.8
+> >>
+> >> =A0#
+> >> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> >> index 479517c..fe8a6ad 100644
+> >> --- a/cifs.upcall.c
+> >> +++ b/cifs.upcall.c
+> >> @@ -45,6 +45,13 @@
+> >> =A0#include <time.h>
+> >> =A0#include <netdb.h>
+> >> =A0#include <arpa/inet.h>
+> >> +#include <stdint.h>
+> >> +#include <stdbool.h>
+> >> +#include <stdio.h>
+> >> +#include <stdlib.h>
+> >> +#include <errno.h>
+> >> +#include <limits.h>
+> >> +#include <wbclient.h>
+> >>
+> >> =A0#include "util.h"
+> >> =A0#include "replace.h"
+> >> @@ -695,6 +702,91 @@ static int cifs_resolver(const key_serial_t k=
+ey, const char *key_descr)
+> >> =A0 =A0 =A0 return 0;
+> >> =A0}
+> >>
+> >> +static int
+> >> +cifs_sid_resolver(const key_serial_t key, const char *key_descr)
+> >> +{
+> >> + =A0 =A0 int i;
+> >> + =A0 =A0 uid_t uid =3D 0;
+> >> + =A0 =A0 gid_t gid =3D 0;;
+> >> + =A0 =A0 wbcErr rc =3D 1;
+> >> + =A0 =A0 const char *keyend =3D key_descr;
+> >> + =A0 =A0 struct wbcDomainSid sid;
+> >> + =A0 =A0 struct passwd *pw;
+> >> + =A0 =A0 struct group *gr;
+> >> +
+> >> + =A0 =A0 /* skip next 4 ';' delimiters to get to description */
+> >> + =A0 =A0 for (i =3D 1; i <=3D 4; ++i) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D index(keyend + 1, ';');
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (!keyend) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_ERR, "invalid=
+ key description: %s",
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0key_descr=
+);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 1;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> + =A0 =A0 }
+> >> + =A0 =A0 keyend++;
+> >> +
+> >> + =A0 =A0 if (strncmp(keyend, "os", 2) =3D=3D 0) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D index(keyend + 1, ':');
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 keyend++;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcStringToSid(keyend, &sid);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "O str=
+tosid: %s, rc: %d", keyend, rc);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 else {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcSidToUid(&sid,=
+ &uid);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(L=
+OG_DEBUG, "SID %s to uid wbc error: %d",
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 keyend, rc);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pw =3D getpwnam("nobody"=
+);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!pw)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(L=
+OG_DEBUG, "SID %s to uid pw error: %d",
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 keyend, rc);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 uid =3D =
+pw->pw_uid;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D 0=
+;
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 if (!rc) {
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D keyctl_instantiat=
+e(key, &uid, sizeof(uid_t), 0);
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(L=
+OG_ERR, "%s: key inst: %s",
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 __func__, strerror(errno));
+> >> + =A0 =A0 =A0 =A0 =A0 =A0 }
+> >
+> > =A0 =A0 =A0 =A0Instead of all this if then nesting and continual ch=
+ecking for
+> > =A0 =A0 =A0 =A0the value of rc, I think it would be easier to follo=
+w the logic
+> > =A0 =A0 =A0 =A0and maintain this if it instead either did a "goto o=
+ut" in the
+> > =A0 =A0 =A0 =A0error cases or just did a return when it hits an err=
+or.
+>=20
+> Will comments help?  I thought of using function calls and goto calls
+> but none of them will make readability and logic any easier.
+> There are five different calls, and if either of first two fail, inse=
+tead of
+> returning, third one gets called and all calls are different
+> (e.g. if either of wbcStringToSid or wbcSidToUid, getpwnam should
+> be called and if either of  wbcStringToSid or wbcSidToGid fail,
+> getgrnam should be called.
+> keyctl_instantiate should be called if either  wbcSidToUid or getpwna=
+m
+> succeed (in that order) or  if either wbcSidToGid or getgrnam succeed
+> (in that order).
+> It would not be any clearer to follow this with goto statements.
+>=20
 
-I think the above can be replaced by:
+Ok, I see your point. Comments probably would be helpful. At least
+some that lay out the overall idea behind this code and why and how it
+falls back when things fail.
 
-    ~(hweight8(c) & 1)
-
-...which would likely be a lot more efficient and would make use of
-specialized hardware on CPUs that support it.
-
->  static void
->  str_to_key(unsigned char *str, unsigned char *key)
->  {
-> @@ -312,8 +326,11 @@ str_to_key(unsigned char *str, unsigned char *key)
->  	key[5] = ((str[4] & 0x1F) << 2) | (str[5] >> 6);
->  	key[6] = ((str[5] & 0x3F) << 1) | (str[6] >> 7);
->  	key[7] = str[6] & 0x7F;
-> -	for (i = 0; i < 8; i++)
-> +	for (i = 0; i < 8; i++) {
->  		key[i] = (key[i] << 1);
-> +		if (!odd_parity(key[i]))
-> +			key[i] |= 0x1; /* add odd parity bit */
-> +	}
->  }
->  
->  static void
-
-
--- 
+--=20
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
