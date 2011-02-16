@@ -1,125 +1,141 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: allow calling	cifs_build_path_to_root on
- incomplete cifs_sb
-Date: Wed, 16 Feb 2011 07:25:07 -0500
-Message-ID: <20110216072507.49b65c9d@tlielax.poochiereds.net>
-References: <20101206070846.1f2c35d4@tlielax.poochiereds.net>
-	<1291637583-10934-1-git-send-email-jlayton@redhat.com>
-	<4D5B8941.8040800@computer.org>
+Subject: Re: [PATCH] cifs: fix broken lanman (lm) auth code
+Date: Wed, 16 Feb 2011 07:53:46 -0500
+Message-ID: <20110216075346.2b69c431@tlielax.poochiereds.net>
+References: <1297811443-4848-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"robbert-C1IQQP51G3M@public.gmane.org" <robbert-C1IQQP51G3M@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Darren Williams <darren.w-bdq14YP6qtRg9hUCZPvPmw@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D5B8941.8040800-bdq14YP6qtRg9hUCZPvPmw@public.gmane.org>
+In-Reply-To: <1297811443-4848-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 16 Feb 2011 19:22:25 +1100
-Darren Williams <darren.w-bdq14YP6qtRg9hUCZPvPmw@public.gmane.org> wrote:
+On Tue, 15 Feb 2011 17:10:43 -0600
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> Hi All
-> 
-> Robert and Jeff thanks for working on and fixing this, I can confirm 
-> that we now have;
-> - Remote DFS mounts working, using
-> - both sec=krb5 and sec=ntlm.
-> 
-> I'm just looking for clarification on the following feature or bug:
-> 
-> we have a SAMBA server, samba1, serving a DFS root as follows
-> 
-> [dfs]
->     path = /export/samba/dfs
->     msdfs root = yes
-> 
-> configured as:
-> 
-> ls -l /export/samba/dfs
-> total 8
-> lrwxrwxrwx 1 root root 79 2010-03-10 07:53 home -> 
-> msdfs:samba1\dfshome,samba2\dfshome
-> 
-> and SAMBA servers, samba1 and samba2 with shares:
-> 
-> [dfshome]
->     comment = DFS Linux Home Directories
->     path = /export/home/1/%u
->     create mask = 0700
->     force create mode = 0700
->     directory mask = 0700
->     force directory mode = 0700
->     read only = No
->     browseable = No
->     valid users = %U
->     map acl inherit = yes
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
 > 
+> Fix lanman (lm) authentication code.
 > 
-> If I cifs mount the DFS root using
-> mount.cifs //samba1/dfs /tmp/dfs -o <options as required>
-> then list the directory I get the following errors:
+> Change lm response length back to 24 from 16.
+> Parse lanmani mount option.
+> Add code to add odd parity bit to each of the eight bytes of a DES key.
 > 
 > 
-> root@atp-h5gcn1s:~# mount.cifs //samba1/dfs /tmp/dfs/ -o <options>
-> Password:
-> root@atp-h5gcn1s:~# ls -l /tmp/dfs/
-> ls: cannot read symbolic link /tmp/dfs/home: Object is remote
-> ls: cannot read symbolic link /tmp/dfs/test-home: Object is remote
-> ls: cannot read symbolic link /tmp/dfs/projects: Object is remote
-> total 8
-> lrwxrwxrwx 1 root root 79 Mar 10  2010 home
-> lrwxrwxrwx 1 root root 46 Mar 10  2010 projects
-> lrwxrwxrwx 1 root root 79 Mar 25  2010 test-home
-> root@atp-h5gcn1s:~# ls -l /tmp/dfs/home/
-> ls: cannot access /tmp/dfs/home/: Not a directory
-> root@atp-h5gcn1s:~# umount /tmp/dfs
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |    3 ++-
+>  fs/cifs/connect.c  |    3 +++
+>  fs/cifs/sess.c     |    8 ++++----
+>  fs/cifs/smbdes.c   |   19 ++++++++++++++++++-
+>  4 files changed, 27 insertions(+), 6 deletions(-)
 > 
-> I then remount and access a file in 'home' directly, which then allows 
-> the directory listing to succeed.
-> 
-> root@atp-h5gcn1s:~# mount.cifs //samba1/dfs /tmp/dfs/ -o 
-> user=dwilliams,dom=NICTA
-> Password:
-> root@atp-h5gcn1s:~# ls -l /tmp/dfs/home/.bashrc
-> -rw-r--r-- 1 <user> <group> 2450 Jun  8  2008 /tmp/dfs/home/.bashrc
-> root@atp-h5gcn1s:~# ls  /tmp/dfs/
-> home  projects    test-home
-> root@atp-h5gcn1s:~# ls -l /tmp/dfs/home/
-> -rw-r--r--  1 <user> <group>     3078 Aug 17  2007 2007-08-17-P.....
-> ....
-> 
-> also access is OK if you mount 'home' directly via dfs
-> 
-> root@atp-h5gcn1s:~# mount.cifs //samba1/dfs/home /tmp/dfs/ -o <options>
-> 
-> I'm looking for clarification on what the correct operation should be 
-> since our Windows clients can access the root the traverse the directory 
-> tree without error, not that this is evidence for correct operation.
-> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 17afb0f..0b5c950 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -710,7 +710,8 @@ require use of the stronger protocol */
+>  #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
+>  #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+>  
+> -#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
+> +#define   CIFSSEC_DEF (CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_SIGN | \
+> +			CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
+			^^^^^^^^^^^
+	Won't this change enable lanman auth by default? Is that
+	intended?
 
-I believe that's a bug...
+>  #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
+>  #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
+>  /*
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 8d6c17a..e3494df 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1014,6 +1014,9 @@ cifs_parse_mount_options(char *options, const char *devname,
+>  				/* BB is there a better way to do this? */
+>  				vol->secFlg |= CIFSSEC_MAY_NTLMV2;
+>  #ifdef CONFIG_CIFS_WEAK_PW_HASH
+> +			} else if (strnicmp(value, "lanmani", 7) == 0) {
+> +				vol->secFlg |= CIFSSEC_MAY_LANMAN |
+> +					CIFSSEC_MUST_SIGN;
+>  			} else if (strnicmp(value, "lanman", 6) == 0) {
+>  				vol->secFlg |= CIFSSEC_MAY_LANMAN;
+>  #endif
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 1adc962..1676570 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -656,13 +656,13 @@ ssetup_ntlmssp_authenticate:
+>  
+>  	if (type == LANMAN) {
+>  #ifdef CONFIG_CIFS_WEAK_PW_HASH
+> -		char lnm_session_key[CIFS_SESS_KEY_SIZE];
+> +		char lnm_session_key[CIFS_AUTH_RESP_SIZE];
+>  
+>  		pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+>  
+>  		/* no capabilities flags in old lanman negotiation */
+>  
+> -		pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_SESS_KEY_SIZE);
+> +		pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+>  
+>  		/* Calculate hash with password and copy into bcc_ptr.
+>  		 * Encryption Key (stored as in cryptkey) gets used if the
+> @@ -675,8 +675,8 @@ ssetup_ntlmssp_authenticate:
+>  					true : false, lnm_session_key);
+>  
+>  		ses->flags |= CIFS_SES_LANMAN;
+> -		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_SESS_KEY_SIZE);
+> -		bcc_ptr += CIFS_SESS_KEY_SIZE;
+> +		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
+> +		bcc_ptr += CIFS_AUTH_RESP_SIZE;
+>  
+>  		/* can not sign if LANMAN negotiated so no need
+>  		to calculate signing key? but what if server
+> diff --git a/fs/cifs/smbdes.c b/fs/cifs/smbdes.c
+> index 0472148..dcfc379 100644
+> --- a/fs/cifs/smbdes.c
+> +++ b/fs/cifs/smbdes.c
+> @@ -299,6 +299,20 @@ dohash(char *out, char *in, char *key, int forw)
+>  	kfree(ki);
+>  }
+>  
+> +static int
+> +odd_parity(unsigned char c)
+> +{
+> +	int i;
+> +	int val = 0x80;
+> +	int count = 0;
+> +
+> +	for (i = 0; i < 7; ++i)
+> +		if (c & (val >> i))
+> +			++count;
+> +
+> +	return count % 2;
+> +}
+> +
+>  static void
+>  str_to_key(unsigned char *str, unsigned char *key)
+>  {
+> @@ -312,8 +326,11 @@ str_to_key(unsigned char *str, unsigned char *key)
+>  	key[5] = ((str[4] & 0x1F) << 2) | (str[5] >> 6);
+>  	key[6] = ((str[5] & 0x3F) << 1) | (str[6] >> 7);
+>  	key[7] = str[6] & 0x7F;
+> -	for (i = 0; i < 8; i++)
+> +	for (i = 0; i < 8; i++) {
+>  		key[i] = (key[i] << 1);
+> +		if (!odd_parity(key[i]))
+> +			key[i] |= 0x1;
+> +	}
+>  }
+>  
+>  static void
 
-The way things like autofs, DFS referrals and NFS used to work is by
-pretending these mountpoints are symlinks and then abusing the
-->follow_link operation on them in the kernel. Not all operations on
-that inode trigger the follow_link op however, so sometimes -EREMOTE
-errors bubble up when they shouldn't. Either that or we just have some
-straightforward bad handling of -EREMOTE errors in the readdir codepath
--- I'm not sure yet :)
-
-What may be best is to open a bug at bugzilla.samba.org and we'll chase
-it down when we get a chance. If you do that, please cc me on it. FWIW,
-I opened this bug a while back which is probably related, but haven't
-had time to work on it:
-
-    https://bugzilla.redhat.com/show_bug.cgi?id=616765
-
-This may also be helped by the d_automount patches that dhowells did
-recently and that are going into 2.6.38, but I haven't had time to look
-yet.
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
