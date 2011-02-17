@@ -1,79 +1,76 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Fix broken lanman (lm) auth code (try #3)
-Date: Wed, 16 Feb 2011 17:51:55 -0600
-Message-ID: <AANLkTi=YchF+yE6fhNnHwCSoac13SErOZ_wp6keB3vSV@mail.gmail.com>
-References: <1297888050-15736-1-git-send-email-shirishpargaonkar@gmail.com>
-	<AANLkTimu6hEEVgDq9qwpivJR3mZEAwHuKxbzaTCGESM+@mail.gmail.com>
-	<AANLkTikMtKgzUuPUvqdmR0dJz-6N2JSyVsE1-PCfA7QC@mail.gmail.com>
-	<AANLkTikd+kkzHsOQw=EZGSx7SqqMX49sa1wi_DCBYtn6@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Fix broken lanman (lm) auth code (try #4)
+Date: Wed, 16 Feb 2011 18:05:28 -0600
+Message-ID: <1297901128-23418-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikd+kkzHsOQw=EZGSx7SqqMX49sa1wi_DCBYtn6-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Feb 16, 2011 at 3:15 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
-e:
-> On Wed, Feb 16, 2011 at 3:05 PM, Shirish Pargaonkar
-> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> On Wed, Feb 16, 2011 at 2:53 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
-rote:
->>> On Wed, Feb 16, 2011 at 2:27 PM, =A0<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
-rote:
->>>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>>
->>>>
->>>> Fix lanman (lm) authentication code.
->>>>
->>>> Change lm response length back to 24 from 16.
->>>> Parse lanmani mount option.
->>>
->>> lanman21 (and earlier dialects) did not support packet signing
->>> (requires NTLM12 or later dialect. =A0I don't know what happens if
->>> you try to set sec=3Dlanmani with your patch
->>> but I would not expect it to ever force signing and work.
->>>
->>>
->>> We note this in our readme e.g.
->>> =A0sign =A0 =A0 =A0 =A0 =A0 Must use packet signing (helps avoid un=
-wanted data modification
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0by intermediate systems in the route=
-). =A0Note that signing
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0does not work with lanman or plainte=
-xt authentication.
->>
->> Steve, is that a limitation within cifs client or protocol limitatio=
-n?
->> I think there is a session key calculation associated with lanman
->> authentication.
->
-> The protocol first defined packet signing in NTLM12 dialect. =A0The f=
-lag
-> was undefined before then, and the fields for the signature itself
-> in the header were reserved.
->
-> Remember that LANMAN dialect uses an older format of SMB SessionSetup=
-X
-> as well.
->
-> I am not opposed to adding the new mount option lanmani if you can
-> demonstrate it working to Windows or Samba, but it is likely signing
-> won't work if you force the older dialect and try the new sec=3Dlamna=
-mi
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-yes, it is not working on either. Will remove adding parsing for
-lanmani mount option
-and resubmit the patch.
 
->
->
->
-> --
-> Thanks,
->
-> Steve
->
+Fix lanman (lm) authentication code.
+
+Change lm response length back to 24 from 16.
+Add code to add odd parity bit to each of the eight bytes of a DES key.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/sess.c   |    8 ++++----
+ fs/cifs/smbdes.c |    5 ++++-
+ 2 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 1adc962..1676570 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -656,13 +656,13 @@ ssetup_ntlmssp_authenticate:
+ 
+ 	if (type == LANMAN) {
+ #ifdef CONFIG_CIFS_WEAK_PW_HASH
+-		char lnm_session_key[CIFS_SESS_KEY_SIZE];
++		char lnm_session_key[CIFS_AUTH_RESP_SIZE];
+ 
+ 		pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+ 
+ 		/* no capabilities flags in old lanman negotiation */
+ 
+-		pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_SESS_KEY_SIZE);
++		pSMB->old_req.PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
+ 
+ 		/* Calculate hash with password and copy into bcc_ptr.
+ 		 * Encryption Key (stored as in cryptkey) gets used if the
+@@ -675,8 +675,8 @@ ssetup_ntlmssp_authenticate:
+ 					true : false, lnm_session_key);
+ 
+ 		ses->flags |= CIFS_SES_LANMAN;
+-		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_SESS_KEY_SIZE);
+-		bcc_ptr += CIFS_SESS_KEY_SIZE;
++		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
++		bcc_ptr += CIFS_AUTH_RESP_SIZE;
+ 
+ 		/* can not sign if LANMAN negotiated so no need
+ 		to calculate signing key? but what if server
+diff --git a/fs/cifs/smbdes.c b/fs/cifs/smbdes.c
+index 0472148..0ab5def 100644
+--- a/fs/cifs/smbdes.c
++++ b/fs/cifs/smbdes.c
+@@ -312,8 +312,11 @@ str_to_key(unsigned char *str, unsigned char *key)
+ 	key[5] = ((str[4] & 0x1F) << 2) | (str[5] >> 6);
+ 	key[6] = ((str[5] & 0x3F) << 1) | (str[6] >> 7);
+ 	key[7] = str[6] & 0x7F;
+-	for (i = 0; i < 8; i++)
++	for (i = 0; i < 8; i++) {
+ 		key[i] = (key[i] << 1);
++		if (~(hweight8(key[i]) & 1))
++			key[i] |= 0x1; /* add odd parity bit */
++	}
+ }
+ 
+ static void
+-- 
+1.6.0.2
