@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: Fix broken lanman (lm) auth code (try #4)
-Date: Wed, 16 Feb 2011 20:41:33 -0600
-Message-ID: <AANLkTimxS5zTLrXzcYD_+jYf-GstarjxU=5KRt84jW0u@mail.gmail.com>
+Date: Wed, 16 Feb 2011 23:23:43 -0600
+Message-ID: <AANLkTi=ZVzbtfhfOk7W8nrDo7z+r1-sEnBrm_K5onWyA@mail.gmail.com>
 References: <1297901128-23418-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20110216205215.40c6b7c3@corrin.poochiereds.net>
 Mime-Version: 1.0
@@ -116,6 +116,10 @@ or
 > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >
 
-OK but auth is working, I did print the char, hweight8 of the char,
-its comlement and everything looked right, that is why I replaced it.
-But will go through the code/logic again.
+I think this code determines whether a number is even or not, it does
+not check whether a character has even or odd parity, e.g. 0x52
+is even but has odd parity and so an odd parity bit need not be added
+at the 0th bit.
+I think I should go back to the function odd_parity that for sure retur=
+ns
+false if a character does not have odd parity.
