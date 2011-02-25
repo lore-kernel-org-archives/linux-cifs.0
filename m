@@ -1,35 +1,48 @@
-From: "Justin P. Mattock" <justinmattock@gmail.com>
-Subject: [PATCH 17/21]fs:cifs:connect.c remove one to many l's in the word.
-Date: Thu, 24 Feb 2011 22:15:02 -0800
-Message-ID: <1298614502-4114-1-git-send-email-justinmattock@gmail.com>
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Justin P. Mattock" <justinmattock@gmail.com>
-To: trivial@kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH] CIFS: Use invalidate_inode_pages2 instead of invalidate_remote_inode (try #2)
+Date: Fri, 25 Feb 2011 13:21:50 +0300
+Message-ID: <1298629310-4618-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-The patch below removes an extra "l" in the word.
+Use invalidate_inode_pages2 that don't leave pages even if shrink_page_list()
+has a temp ref on them. It prevents a data coherency problem on exclusive
+oplocks opens.
 
-Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
-
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/connect.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ fs/cifs/inode.c |   16 +++++++++++-----
+ 1 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8d6c17a..ea4a146 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -722,7 +722,7 @@ multi_t2_fnd:
- 		sock_release(csocket);
- 		server->ssocket = NULL;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 589f3e3..0011e95 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1687,12 +1687,18 @@ cifs_invalidate_mapping(struct inode *inode)
+ 
+ 	cifs_i->invalid_mapping = false;
+ 
+-	/* write back any cached data */
+-	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+-		rc = filemap_write_and_wait(inode->i_mapping);
+-		mapping_set_error(inode->i_mapping, rc);
++	if (inode->i_mapping) {
++		/* write back any cached data */
++		if (inode->i_mapping->nrpages != 0) {
++			rc = filemap_write_and_wait(inode->i_mapping);
++			mapping_set_error(inode->i_mapping, rc);
++		}
++		rc = invalidate_inode_pages2(inode->i_mapping);
++		if (rc)
++			cERROR(1, "%s: could not invalidate inode %p", __func__,
++			       inode);
  	}
--	/* buffer usuallly freed in free_mid - need to free it here on exit */
-+	/* buffer usually freed in free_mid - need to free it here on exit */
- 	cifs_buf_release(bigbuf);
- 	if (smallbuf) /* no sense logging a debug message if NULL */
- 		cifs_small_buf_release(smallbuf);
+-	invalidate_remote_inode(inode);
++
+ 	cifs_fscache_reset_inode_cookie(inode);
+ }
+ 
 -- 
-1.7.4.1
+1.7.1
