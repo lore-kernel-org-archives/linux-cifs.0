@@ -1,138 +1,177 @@
-From: <a.sluik-HVpl4/oQiP/z+pZb47iToQ@public.gmane.org>
-Subject: FW: kernel:  CIFS VFS: Filldir for current dir failed
-Date: Tue, 1 Mar 2011 16:25:26 +0100
-Message-ID: <4DF45E2A2AD923468B6688F16447BDE90508DB91@EX04.service.utwente.nl>
+From: "Q (Igor Mammedov)" <niallain-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Mounting DFS
+Date: Fri, 25 Feb 2011 21:46:07 +0300
+Message-ID: <AANLkTinYz7xA4C677Q8z8Of6ZrLkgWXqu7WGqYc5LVse@mail.gmail.com>
+References: <4D654BE7.11698.1C98C6C7@Heinrich.Mislik.univie.ac.at>
+	<AANLkTinrUrKZ0e26vOGF5RZvTR1BfEXfR8biuE6FeQNK@mail.gmail.com>
+	<4D67C586.23676.2643DA29@Heinrich.Mislik.univie.ac.at>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----_=_NextPart_001_01CBD824.E41C70A6"
-To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Heinrich Mislik <Heinrich.Mislik-4JhlDu4IDl0juwv8T7myQQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-class: urn:content-classes:message
+In-Reply-To: <4D67C586.23676.2643DA29-g/LCwZFXqzxQP/zxiyEj5OCYZQ7uCA5dI7sL/E+5skE@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a multi-part message in MIME format.
+Hi Heinrich,
 
-------_=_NextPart_001_01CBD824.E41C70A6
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+I guess you are out of luck with msdfs proxy option.
+If we look at samba code, it fails here:
+[samba.git] / source3 / smbd / service.c
 
+       /* Handle non-Dfs clients attempting connections to msdfs proxy =
+*/
+         if (lp_host_msdfs() && (*lp_msdfs_proxy(snum) !=3D '\0'))  {
+                 DEBUG(3, ("refusing connection to dfs proxy share '%s'=
+ "
+                           "(pointing to %s)\n",
+                         service, lp_msdfs_proxy(snum)));
+                 *status =3D NT_STATUS_BAD_NETWORK_NAME;
+                 return NULL;
+         }
 
+where lp_msdfs_proxy(snum) returns pointer to value of "msdfs proxy",
+which obviously isn't empty. And logs message like:
+      'refusing connection to dfs proxy share 'dfs' (pointing to
+\\127.0.0.1\tmp)'
+I don't see how it could work with this code anyway.
 
------Original Message-----
-From: linux-cifs-client-bounces-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-[mailto:linux-cifs-client-bounces-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org] On Behalf Of
-linux-cifs-client-owner-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-Sent: Tuesday, March 01, 2011 4:15 PM
-To: Sluik, A. (Arjan, ICTS)
-Subject: kernel: CIFS VFS: Filldir for current dir failed
+As far as I remember it is possible to mount remote DFS root (i.e. virt=
+ual root
+that returns error STATUS_PATH_NOT_COVERED) and even a chain of them
+with your kernel. But server must reply on tree connect to a such share=
+ with
+error STATUS_PATH_NOT_COVERED and samba don't do it in this case.
 
-This list is now deprecated. Please post to linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-instead:
+sbmclient works because of it dumbly tries to get referrals for every s=
+hare it
+connects to, and after that it simply connects to a referral if
+available or to the
+share it was requested to connect.
 
-http://vger.kernel.org/vger-lists.html#linux-cifs
+Workarounds:
+1. the easy way to solve issue is use conventional symlink based dfs wh=
+ich
+works as expected.
+2 Or for suicidal ones, hack the kernel and force it to accept
+STATUS_BAD_NETWORK_NAME as STATUS_PATH_NOT_COVERED.
+It can be done here fs/cifs/connect.c, look for keyword EREMOTE for
+places to 'enhance'.
 
+Of cause the right way is to fix samba, but you should probably ask the
+author of those lines of code on samba list. I believe it is samba's is=
+sue.
 
-------_=_NextPart_001_01CBD824.E41C70A6
-Content-Type: message/rfc822
-Content-Transfer-Encoding: 7bit
+--
+Regards,
+ Igor
 
-X-MimeOLE: Produced By Microsoft Exchange V6.5
-Content-class: urn:content-classes:message
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: kernel:  CIFS VFS: Filldir for current dir failed
-Date: Tue, 1 Mar 2011 15:59:31 +0100
-Message-ID: <4DF45E2A2AD923468B6688F16447BDE90508DB3A-S4MjG6e2EGO+mPTwocfnKj0g50+Wg8sO@public.gmane.org>
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Thread-Topic: kernel:  CIFS VFS: Filldir for current dir failed
-Thread-Index: AcvYIUT6YWeQNmW5Rquo69PdA45cmw==
-From: <a.sluik-HVpl4/oQiP/z+pZb47iToQ@public.gmane.org>
-To: <linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-
-Dear members,
-
-=20
-
-We did find an issue in mount.cifs on Linux.=20
-
-=20
-
-With modinfo cifs : version 1.60 it runs ok, but with version 1.61 we =
-get the message:
-
-=20
-
-kernel:  CIFS VFS: Filldir for current dir failed
-
-=20
-
-some strace of the program:
-
-=20
-
-pid 18120] close(5)                    =3D 0
-
-[pid 18120] munmap(0xf7766000, 4096)    =3D 0
-
-[pid 18120] =
-open("../stage/Components/oracle.jdk/1.5.0.11.0/1/DataFiles/", =
-O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY) =3D 5
-
-[pid 18120] fcntl64(5, F_SETFD, FD_CLOEXEC) =3D 0
-
-[pid 18120] getdents(5, 0x80975c4, 32768) =3D -1 ENOMEM (Cannot allocate =
-memory)
-
-[pid 18120] close(5)                    =3D 0
-
-[pid 18120] =
-stat64("../stage/Components/oracle.jdk/1.5.0.11.0/1/DataFiles/*.jar", =
-0xff8a2eec) =3D -1 ENOENT (No such file or directory)
-
-[pid 18120] =
-stat64("../stage/Components/oracle.jdk/1.5.0.11.0/1/DataFiles/*.jar.zip",=
- 0xff8a2eec) =3D -1 ENOENT (No such file or directory)
-
-[pid 18120] =
-stat64("../stage/Components/oracle.jdk/1.5.0.11.0/1/DataFiles/*.jar.ZIP",=
- 0xff8a2eec) =3D -1 ENOENT (No such file or directory)
-
-[pid 18120] exit_group(9)               =3D ?
-
-Process 18111 resumed
-
-=20
-
-This was the result of an Oracle Client installation from a CIFS =
-filesystem.
-
-If the files are locally copied then there is no issue.
-
-If the mount.cifs is version 1.60 there is no issue either.
-
-Seems to be an Filldir type of error.
-
-=20
-
-=20
-
-Arjan Sluik
-
-ICT-Servicecentrum
-
-Universiteit Twente, Postbus 217, 7500 AE Enschede
-
-Telefoon 053 489 4730
-
- <mailto:a.sluik-HVpl4/oQiP/z+pZb47iToQ@public.gmane.org> a.sluik-HVpl4/oQiP/z+pZb47iToQ@public.gmane.org,  =
-<http://www.utwente.nl/icts> http://www.utwente.nl/icts
-
-=20
-
-
-------_=_NextPart_001_01CBD824.E41C70A6--
+On Fri, Feb 25, 2011 at 5:06 PM, Heinrich Mislik
+<Heinrich.Mislik-4JhlDu4IDl0juwv8T7myQQ@public.gmane.org> wrote:
+> On 25 Feb 2011 at 14:25, Q (Igor Mammedov) wrote:
+>
+>> > mount -t cifs //someserver/share2 -ouser=3Dsomeuser /mnt
+>> Hi Heinrich,
+>>
+>> Network packets dump of mount attempt would be helpful,
+>> so that I can see what exactly going on.
+>
+> Four Files
+>
+> smbclient.share1.pcap
+> smbclient.share2.pcap
+> mount.share1.pcap
+> mount.share2.pcap
+>
+> attached for the following commands:
+>
+> smbclient -U mi //share99.univie.ac.at/dfs/share1
+> smbclient -U mi //share99.univie.ac.at/share2
+> mount -t cifs -o user=3Dmi //share99.univie.ac.at/dfs/share1 /mnt cce=
+ss
+> mount -t cifs -o user=3Dmi //share99.univie.ac.at/share2 /mnt
+>
+> the last command failed with:
+>
+> Retrying with upper case share name
+> mount error(6): No such device or address
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>
+> Relevant part of smb.conf on share99.univie.ac.at:
+>
+> [dfs]
+> =C2=A0 msdfs root =3D yes
+> # symlink exists: /home/dfs/share1 -> msdfs://share.univie.ac.at/zid
+> =C2=A0 path =3D /home/dfs
+> [share2]
+> =C2=A0 msdfs root =3D yes
+> =C2=A0 msdfs proxy =3D \share.univie.ac.at\zid
+>
+> The IP-Adresses are:
+>
+> 131.130.1.215 ... Server holding dfs-referrals
+> 131.130.1.217 ... Server holding actual share
+> 131.130.1.80 =C2=A0... client
+>
+> Hope this helps
+>
+> Cheers
+>
+> Heinrich
+> --
+> Heinrich Mislik
+> Zentraler Informatikdienst der Universitaet Wien
+> A-1010 Wien, Universitaetsstrasse 7
+> Tel.: (+43 1) 4277-14056, Fax: (+43 1) 4277-9140
+>
+>
+> The following section of this message contains a file attachment
+> prepared for transmission using the Internet MIME message format.
+> If you are using Pegasus Mail, or any other MIME-compliant system,
+> you should be able to save it or view it from within your mailer.
+> If you cannot, please ask your system administrator for assistance.
+>
+> =C2=A0 ---- File information -----------
+> =C2=A0 =C2=A0 File: =C2=A0smbclient.share1.pcap
+> =C2=A0 =C2=A0 Date: =C2=A025 Feb 2011, 14:15
+> =C2=A0 =C2=A0 Size: =C2=A07009 bytes.
+> =C2=A0 =C2=A0 Type: =C2=A0Unknown
+>
+> The following section of this message contains a file attachment
+> prepared for transmission using the Internet MIME message format.
+> If you are using Pegasus Mail, or any other MIME-compliant system,
+> you should be able to save it or view it from within your mailer.
+> If you cannot, please ask your system administrator for assistance.
+>
+> =C2=A0 ---- File information -----------
+> =C2=A0 =C2=A0 File: =C2=A0smbclient.share2.pcap
+> =C2=A0 =C2=A0 Date: =C2=A025 Feb 2011, 14:15
+> =C2=A0 =C2=A0 Size: =C2=A06757 bytes.
+> =C2=A0 =C2=A0 Type: =C2=A0Unknown
+>
+> The following section of this message contains a file attachment
+> prepared for transmission using the Internet MIME message format.
+> If you are using Pegasus Mail, or any other MIME-compliant system,
+> you should be able to save it or view it from within your mailer.
+> If you cannot, please ask your system administrator for assistance.
+>
+> =C2=A0 ---- File information -----------
+> =C2=A0 =C2=A0 File: =C2=A0mount.share1.pcap
+> =C2=A0 =C2=A0 Date: =C2=A025 Feb 2011, 14:15
+> =C2=A0 =C2=A0 Size: =C2=A06724 bytes.
+> =C2=A0 =C2=A0 Type: =C2=A0Unknown
+>
+> The following section of this message contains a file attachment
+> prepared for transmission using the Internet MIME message format.
+> If you are using Pegasus Mail, or any other MIME-compliant system,
+> you should be able to save it or view it from within your mailer.
+> If you cannot, please ask your system administrator for assistance.
+>
+> =C2=A0 ---- File information -----------
+> =C2=A0 =C2=A0 File: =C2=A0mount.share2.pcap
+> =C2=A0 =C2=A0 Date: =C2=A025 Feb 2011, 14:15
+> =C2=A0 =C2=A0 Size: =C2=A04692 bytes.
+> =C2=A0 =C2=A0 Type: =C2=A0Unknown
+>
+>
