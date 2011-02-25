@@ -1,123 +1,55 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: cleanup: Rename and remove config flags
-Date: Fri, 25 Feb 2011 10:48:55 -0600
-Message-ID: <1298652535-14628-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 17/21]fs:cifs:connect.c remove one to many l's in the word.
+Date: Fri, 25 Feb 2011 12:19:11 -0600
+Message-ID: <AANLkTimneD0d=qpTq2CMpfvjYuQC2kx1mf2ZnORG32KK@mail.gmail.com>
+References: <1298614502-4114-1-git-send-email-justinmattock@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Justin P. Mattock" <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1298614502-4114-1-git-send-email-justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+merged into cifs-2.6.git
+
+On Fri, Feb 25, 2011 at 12:15 AM, Justin P. Mattock
+<justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> The patch below removes an extra "l" in the word.
+>
+> Signed-off-by: Justin P. Mattock <justinmattock-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+> ---
+> =A0fs/cifs/connect.c | =A0 =A02 +-
+> =A01 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 8d6c17a..ea4a146 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -722,7 +722,7 @@ multi_t2_fnd:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sock_release(csocket);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->ssocket =3D NULL;
+> =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 /* buffer usuallly freed in free_mid - need to free it =
+here on exit */
+> + =A0 =A0 =A0 /* buffer usually freed in free_mid - need to free it h=
+ere on exit */
+> =A0 =A0 =A0 =A0cifs_buf_release(bigbuf);
+> =A0 =A0 =A0 =A0if (smallbuf) /* no sense logging a debug message if N=
+ULL */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(smallbuf);
+> --
+> 1.7.4.1
+>
+>
 
 
-Remove config flag CIFS_EXPERIMENTAL.
-Do export operations under new config flag CIFS_NFSD_EXPORT
 
- 
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/Kconfig   |   14 +++-----------
- fs/cifs/cifsfs.c  |    4 ++--
- fs/cifs/cifsfs.h  |    4 ++--
- fs/cifs/cifssmb.c |    4 ----
- fs/cifs/export.c  |    4 ++--
- 5 files changed, 9 insertions(+), 21 deletions(-)
+--=20
+Thanks,
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index 2a492aa..7c584be 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -172,16 +172,8 @@ config CIFS_SMB2
- 
- 	  Unless you are a developer or tester, say N.
- 
--config CIFS_EXPERIMENTAL
--	  bool "CIFS Experimental Features (EXPERIMENTAL)"
-+config CIFS_NFSD_EXPORT
-+	  bool "Allow nfsd to export CIFS file system (EXPERIMENTAL)"
- 	  depends on CIFS && EXPERIMENTAL
- 	  help
--	    Enables cifs features under testing. These features are
--	    experimental and currently include DFS support and directory
--	    change notification ie fcntl(F_DNOTIFY), as well as the upcall
--	    mechanism which will be used for Kerberos session negotiation
--	    and uid remapping.  Some of these features also may depend on
--	    setting a value of 1 to the pseudo-file /proc/fs/cifs/Experimental
--	    (which is disabled by default). See the file fs/cifs/README
--	    for more details.  If unsure, say N.
--
-+	   Allows NFS server to export a CIFS mounted share (nfsd over cifs)
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 191ef2f..f593036 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -187,12 +187,12 @@ cifs_read_super(struct super_block *sb, void *data,
- 	else
- 		sb->s_d_op = &cifs_dentry_ops;
- 
--#ifdef CONFIG_CIFS_EXPERIMENTAL
-+#ifdef CIFS_NFSD_EXPORT
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
- 		cFYI(1, "export ops supported");
- 		sb->s_export_op = &cifs_export_ops;
- 	}
--#endif /* EXPERIMENTAL */
-+#endif /* CIFS_NFSD_EXPORT */
- 
- 	return 0;
- 
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index f191244..371d021 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -123,9 +123,9 @@ extern ssize_t	cifs_getxattr(struct dentry *, const char *, void *, size_t);
- extern ssize_t	cifs_listxattr(struct dentry *, char *, size_t);
- extern long cifs_ioctl(struct file *filep, unsigned int cmd, unsigned long arg);
- 
--#ifdef CONFIG_CIFS_EXPERIMENTAL
-+#ifdef CIFS_NFSD_EXPORT
- extern const struct export_operations cifs_export_ops;
--#endif /* EXPERIMENTAL */
-+#endif /* CIFS_NFSD_EXPORT */
- 
- #define CIFS_VERSION   "1.71"
- #endif				/* _CIFSFS_H */
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 4b0ac27..7a454fb 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -541,10 +541,6 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
- 		server->secType = RawNTLMSSP;
- 	else if (secFlags & CIFSSEC_MAY_LANMAN)
- 		server->secType = LANMAN;
--/* #ifdef CONFIG_CIFS_EXPERIMENTAL
--	else if (secFlags & CIFSSEC_MAY_PLNTXT)
--		server->secType = ??
--#endif */
- 	else {
- 		rc = -EOPNOTSUPP;
- 		cERROR(1, "Invalid security type");
-diff --git a/fs/cifs/export.c b/fs/cifs/export.c
-index 993f820..55d87ac 100644
---- a/fs/cifs/export.c
-+++ b/fs/cifs/export.c
-@@ -45,7 +45,7 @@
- #include "cifs_debug.h"
- #include "cifsfs.h"
- 
--#ifdef CONFIG_CIFS_EXPERIMENTAL
-+#ifdef CIFS_NFSD_EXPORT
- static struct dentry *cifs_get_parent(struct dentry *dentry)
- {
- 	/* BB need to add code here eventually to enable export via NFSD */
-@@ -63,5 +63,5 @@ const struct export_operations cifs_export_ops = {
- 	.encode_fs =  */
- };
- 
--#endif /* EXPERIMENTAL */
-+#endif /* CIFS_NFSD_EXPORT */
- 
--- 
-1.6.0.2
+Steve
