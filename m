@@ -1,74 +1,35 @@
-From: "Heinrich Mislik" <Heinrich.Mislik-4JhlDu4IDl0juwv8T7myQQ@public.gmane.org>
-Subject: Mounting DFS
-Date: Wed, 23 Feb 2011 18:03:19 +0100
-Message-ID: <4D654BE7.11698.1C98C6C7@Heinrich.Mislik.univie.ac.at>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-description: Mail message body
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: "Justin P. Mattock" <justinmattock@gmail.com>
+Subject: [PATCH 17/21]fs:cifs:connect.c remove one to many l's in the word.
+Date: Thu, 24 Feb 2011 22:15:02 -0800
+Message-ID: <1298614502-4114-1-git-send-email-justinmattock@gmail.com>
+Cc: sfrench@samba.org, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Justin P. Mattock" <justinmattock@gmail.com>
+To: trivial@kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi,
+The patch below removes an extra "l" in the word.
 
-I want to know the current status of support for mounting DFS shares. 
-I found this posting:
+Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
 
-http://marc.info/?l=linux-cifs-client&m=123357912319175&w=2
+---
+ fs/cifs/connect.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-which at the end says:
-
-> Problem 1 is almost solved, I just need some time to cleanup
-> patches I've written.
-
-I think, that my problem is related. Here is, what I tried:
-
-On a samba server I have two shares:
-
-[dfs]
-   msdfs root = yes
-# symlink exists: /home/dfs/share1 -> msdfs://otherserver/someshare
-   path = /home/dfs
-[share2]
-   msdfs root = yes
-   msdfs proxy = \otherserver\someshare
-
-Both Windows and smbclient can access these shares without Problems.
-
-After configuring /etc/request-key.conf I can mount with 
-
-mount -t cifs //someserver/dfs/share1 -ouser=someuser /mnt
-
-I can see the files of //otherserver/someshare under /mnt as 
-expected.
-
-But Mounting with 
-
-mount -t cifs //someserver/share2 -ouser=someuser /mnt
-
-I get
-
-retrying with upper case share name
-mount error(6): No such device or address
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
-
-The mounts were tried on:
-
-/proc/version
-
-Linux version 2.6.32-71.14.1.el6.x86_64 (mockbuild@ls20-bc2-
-14.build.redhat.com) (gcc version 4.4.4 20100726 (Red Hat 4.4.4-13) 
-(GCC) ) #1 SMP Wed Jan 5 17:01:01 EST 2011
-
-Thanks for any help
-
-Cheers
-
-Heinrich
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 8d6c17a..ea4a146 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -722,7 +722,7 @@ multi_t2_fnd:
+ 		sock_release(csocket);
+ 		server->ssocket = NULL;
+ 	}
+-	/* buffer usuallly freed in free_mid - need to free it here on exit */
++	/* buffer usually freed in free_mid - need to free it here on exit */
+ 	cifs_buf_release(bigbuf);
+ 	if (smallbuf) /* no sense logging a debug message if NULL */
+ 		cifs_small_buf_release(smallbuf);
 -- 
-Heinrich Mislik
-Zentraler Informatikdienst der Universitaet Wien
-A-1010 Wien, Universitaetsstrasse 7
-Tel.: (+43 1) 4277-14056, Fax: (+43 1) 4277-9140
+1.7.4.1
