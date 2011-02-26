@@ -1,156 +1,162 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: cleanup: Rename and remove config flags
-Date: Fri, 25 Feb 2011 12:29:09 -0600
-Message-ID: <AANLkTi=KHWVp1Y90JSt-JvFauuRSJaGuaB5h4=4e06Zb@mail.gmail.com>
-References: <1298652535-14628-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH] cifs: Cleanup cifs headers for smb2 debugging routines
+Date: Fri, 25 Feb 2011 23:21:21 -0600
+Message-ID: <AANLkTikRtx3vLWhW2M9F06m8MLUCyT0YpG4A3aoBiUzD@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1298652535-14628-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-looks fine to me
+commit e2730dd792051dad902410a3f121389239ac41fa
+Author: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Date:   Fri Feb 25 18:09:31 2011 -0600
 
-On Fri, Feb 25, 2011 at 10:48 AM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->
->
-> Remove config flag CIFS_EXPERIMENTAL.
-> Do export operations under new config flag CIFS_NFSD_EXPORT
->
->
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
-> =A0fs/cifs/Kconfig =A0 | =A0 14 +++-----------
-> =A0fs/cifs/cifsfs.c =A0| =A0 =A04 ++--
-> =A0fs/cifs/cifsfs.h =A0| =A0 =A04 ++--
-> =A0fs/cifs/cifssmb.c | =A0 =A04 ----
-> =A0fs/cifs/export.c =A0| =A0 =A04 ++--
-> =A05 files changed, 9 insertions(+), 21 deletions(-)
->
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index 2a492aa..7c584be 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -172,16 +172,8 @@ config CIFS_SMB2
->
-> =A0 =A0 =A0 =A0 =A0Unless you are a developer or tester, say N.
->
-> -config CIFS_EXPERIMENTAL
-> - =A0 =A0 =A0 =A0 bool "CIFS Experimental Features (EXPERIMENTAL)"
-> +config CIFS_NFSD_EXPORT
-> + =A0 =A0 =A0 =A0 bool "Allow nfsd to export CIFS file system (EXPERI=
-MENTAL)"
-> =A0 =A0 =A0 =A0 =A0depends on CIFS && EXPERIMENTAL
-> =A0 =A0 =A0 =A0 =A0help
-> - =A0 =A0 =A0 =A0 =A0 Enables cifs features under testing. These feat=
-ures are
-> - =A0 =A0 =A0 =A0 =A0 experimental and currently include DFS support =
-and directory
-> - =A0 =A0 =A0 =A0 =A0 change notification ie fcntl(F_DNOTIFY), as wel=
-l as the upcall
-> - =A0 =A0 =A0 =A0 =A0 mechanism which will be used for Kerberos sessi=
-on negotiation
-> - =A0 =A0 =A0 =A0 =A0 and uid remapping. =A0Some of these features al=
-so may depend on
-> - =A0 =A0 =A0 =A0 =A0 setting a value of 1 to the pseudo-file /proc/f=
-s/cifs/Experimental
-> - =A0 =A0 =A0 =A0 =A0 (which is disabled by default). See the file fs=
-/cifs/README
-> - =A0 =A0 =A0 =A0 =A0 for more details. =A0If unsure, say N.
-> -
-> + =A0 =A0 =A0 =A0 =A0Allows NFS server to export a CIFS mounted share=
- (nfsd over cifs)
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 191ef2f..f593036 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -187,12 +187,12 @@ cifs_read_super(struct super_block *sb, void *d=
-ata,
-> =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sb->s_d_op =3D &cifs_dentry_ops;
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> +#ifdef CIFS_NFSD_EXPORT
-> =A0 =A0 =A0 =A0if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) =
-{
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "export ops supported");
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sb->s_export_op =3D &cifs_export_ops;
-> =A0 =A0 =A0 =A0}
-> -#endif /* EXPERIMENTAL */
-> +#endif /* CIFS_NFSD_EXPORT */
->
-> =A0 =A0 =A0 =A0return 0;
->
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index f191244..371d021 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -123,9 +123,9 @@ extern ssize_t =A0 =A0 =A0cifs_getxattr(struct de=
-ntry *, const char *, void *, size_t);
-> =A0extern ssize_t cifs_listxattr(struct dentry *, char *, size_t);
-> =A0extern long cifs_ioctl(struct file *filep, unsigned int cmd, unsig=
-ned long arg);
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> +#ifdef CIFS_NFSD_EXPORT
-> =A0extern const struct export_operations cifs_export_ops;
-> -#endif /* EXPERIMENTAL */
-> +#endif /* CIFS_NFSD_EXPORT */
->
-> =A0#define CIFS_VERSION =A0 "1.71"
-> =A0#endif =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* _CIFSFS_=
-H */
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 4b0ac27..7a454fb 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -541,10 +541,6 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSe=
-sInfo *ses)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->secType =3D RawNTLMSSP;
-> =A0 =A0 =A0 =A0else if (secFlags & CIFSSEC_MAY_LANMAN)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->secType =3D LANMAN;
-> -/* #ifdef CONFIG_CIFS_EXPERIMENTAL
-> - =A0 =A0 =A0 else if (secFlags & CIFSSEC_MAY_PLNTXT)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->secType =3D ??
-> -#endif */
-> =A0 =A0 =A0 =A0else {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EOPNOTSUPP;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Invalid security type");
-> diff --git a/fs/cifs/export.c b/fs/cifs/export.c
-> index 993f820..55d87ac 100644
-> --- a/fs/cifs/export.c
-> +++ b/fs/cifs/export.c
-> @@ -45,7 +45,7 @@
-> =A0#include "cifs_debug.h"
-> =A0#include "cifsfs.h"
->
-> -#ifdef CONFIG_CIFS_EXPERIMENTAL
-> +#ifdef CIFS_NFSD_EXPORT
-> =A0static struct dentry *cifs_get_parent(struct dentry *dentry)
-> =A0{
-> =A0 =A0 =A0 =A0/* BB need to add code here eventually to enable expor=
-t via NFSD */
-> @@ -63,5 +63,5 @@ const struct export_operations cifs_export_ops =3D =
-{
-> =A0 =A0 =A0 =A0.encode_fs =3D =A0*/
-> =A0};
->
-> -#endif /* EXPERIMENTAL */
-> +#endif /* CIFS_NFSD_EXPORT */
->
-> --
-> 1.6.0.2
->
->
+    [CIFS] Cleanup cifs headers for smb2 debugging routines
 
+    Prepratory to merging more of the smb2 global routines
+    1) cleanup some unused structs and defines
+    2) add in externs for smb2 debugging routines
 
+    Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
---=20
+diff --git a/fs/cifs/TODO b/fs/cifs/TODO
+index 355abcd..2c68abc 100644
+--- a/fs/cifs/TODO
++++ b/fs/cifs/TODO
+@@ -1,5 +1,7 @@
+ Version 1.53 May 20, 2008
+
++PUT IN WARNING FOR NTLMV2 becoming default
++
+ A Partial List of Missing Features
+ ==================================
+
+diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+index 8942b28..fec0743 100644
+--- a/fs/cifs/cifs_debug.h
++++ b/fs/cifs/cifs_debug.h
+@@ -1,6 +1,6 @@
+ /*
+  *
+- *   Copyright (c) International Business Machines  Corp., 2000,2002
++ *   Copyright (c) International Business Machines  Corp., 2000,2011
+  *   Modified by Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *
+  *   This program is free software;  you can redistribute it and/or modify
+@@ -18,7 +18,7 @@
+  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  *
+ */
+-#define CIFS_DEBUG		/* BB temporary */
++#define CIFS_DEBUG		/* remove to disable cifserror logging */
+
+ #ifndef _H_CIFS_DEBUG
+ #define _H_CIFS_DEBUG
+@@ -28,6 +28,9 @@ void cifs_dump_mem(char *label, void *data, int length);
+ #define DBG2 2
+ void cifs_dump_detail(struct smb_hdr *);
+ void cifs_dump_mids(struct TCP_Server_Info *);
++#ifdef CONFIG_CIFS_SMB2
++void smb2_dump_detail(struct smb2_hdr *);
++#endif /* CONFIG_CIFS_SMB2 */
+ #else
+ #define DBG2 0
+ #endif
+@@ -37,12 +40,15 @@ void dump_smb(struct smb_hdr *, int);
+ #define CIFS_RC		0x02
+ #define CIFS_TIMER	0x04
+
++#ifdef CONFIG_CIFS_SMB2
++void dump_smb2(struct smb2_hdr *, int);
++#endif /* CONFIG_CIFS_SMB2 */
++
+ /*
+  *	debug ON
+  *	--------
+  */
+ #ifdef CIFS_DEBUG
+-
+ /* information message: e.g., configuration, major event */
+ extern int cifsFYI;
+ #define cifsfyi(fmt, arg...)						\
+diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+index c4ae7d0..025e943 100644
+--- a/fs/cifs/cifsacl.h
++++ b/fs/cifs/cifsacl.h
+@@ -1,7 +1,7 @@
+ /*
+  *   fs/cifs/cifsacl.h
+  *
+- *   Copyright (c) International Business Machines  Corp., 2007
++ *   Copyright (c) International Business Machines  Corp., 2007,2010
+  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *
+  *   This library is free software; you can redistribute it and/or modify
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 293b636..232b790 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1,7 +1,7 @@
+ /*
+  *   fs/cifs/cifsglob.h
+  *
+- *   Copyright (C) International Business Machines  Corp., 2002,2008
++ *   Copyright (C) International Business Machines  Corp., 2002,2011
+  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *              Jeremy Allison (jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
+  *
+@@ -595,13 +595,6 @@ struct mid_q_entry {
+ 	bool multiEnd:1;	/* both received */
+ };
+
+-struct oplock_q_entry {
+-	struct list_head qhead;
+-	struct inode *pinode;
+-	struct cifsTconInfo *tcon;
+-	__u16 netfid;
+-};
+-
+ /* for pending dnotify requests */
+ struct dir_notify_req {
+ 	struct list_head lhead;
+@@ -651,6 +644,7 @@ struct cifs_fattr {
+ 	struct timespec	cf_atime;
+ 	struct timespec	cf_mtime;
+ 	struct timespec	cf_ctime;
++	u32 		ea_size;
+ };
+
+ static inline void free_dfs_info_param(struct dfs_info3_param *param)
+@@ -681,6 +675,7 @@ static inline void free_dfs_info_array(struct
+dfs_info3_param *param,
+ #define   MID_RESPONSE_RECEIVED 4
+ #define   MID_RETRY_NEEDED      8 /* session closed while this request out */
+ #define   MID_RESPONSE_MALFORMED 0x10
++#define   MID_NO_RESPONSE_NEEDED 0x20
+
+ /* Types of response buffer returned from SendReceive2 */
+ #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
+@@ -739,13 +734,6 @@ require use of the stronger protocol */
+ #define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM |
+CIFSSEC_MAY_NTLMV2)
+ #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
+ #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 |
+CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 |
+CIFSSEC_MAY_NTLMSSP)
+-/*
+- *****************************************************************
+- * All constants go here
+- *****************************************************************
+- */
+-
+-#define UID_HASH (16)
+
+ /*
+  * Note that ONE module should define _DECLARE_GLOBALS_HERE to cause the
+
+-- 
 Thanks,
 
 Steve
