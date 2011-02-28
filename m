@@ -1,67 +1,55 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Use invalidate_inode_pages2 instead of
- invalidate_remote_inode (try #2)
-Date: Mon, 28 Feb 2011 13:41:11 -0500
-Message-ID: <20110228134111.20c9dffd@corrin.poochiereds.net>
-References: <1298629310-4618-1-git-send-email-piastry@etersoft.ru>
+Subject: Re: Parsing for obsolete mount options
+Date: Mon, 28 Feb 2011 13:45:06 -0500
+Message-ID: <20110228134506.71e840b1@corrin.poochiereds.net>
+References: <AANLkTikpA7=G=5y075-jWfMUfKDj=w6URfi_hyYVnbp2@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1298629310-4618-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <AANLkTikpA7=G=5y075-jWfMUfKDj=w6URfi_hyYVnbp2-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 25 Feb 2011 13:21:50 +0300
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Sat, 26 Feb 2011 12:08:23 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Use invalidate_inode_pages2 that don't leave pages even if shrink_page_list()
-> has a temp ref on them. It prevents a data coherency problem on exclusive
-> oplocks opens.
+> I was trying to figure out a way to parse for mount options which are
+> obsolete for smb2 (but valid for cifs), but without an "-t smb2" fs
+> type it is harder.    Jeff had preferred (rather than a "-t smb2" file
+> type) that we call smb2 a "version" of cifs, and by analogy with nfs
+> ("nfsvers=2",  "nfsvers=4" etc.) specify a "vers=smb2" or "vers=2" to
+> indicate mounting with experimental smb2 is desired ... but to be able
+> to parse mount options which are now obsolete (for smb2) we have to
+> scan the whole mount option string, looking for "vers=2" (or
+> equivalent) first, then either call a (new) smb2_parse_mount_options
+> function, or flag them in the current cifs_parse_mount_options when we
+> detect a "vers=2"  - by the time we get out of
+> cifs_parse_mount_options it is too late because we don't know which
+> mount options the user specified explicitly (and which we got from
+> defaults).
 > 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/inode.c |   16 +++++++++++-----
->  1 files changed, 11 insertions(+), 5 deletions(-)
+> As a summary of some of the mount differences:
+> 1) sec=ntlm (and sec=lanman) is no longer going to be valid (ntlmv2
+> and krb5 only)
+> 2) noblocksend and noautotune probably no longer needed
+> 3) posixpaths/noposixpaths no longer needed
+> 4) noserverino not valid
+> 5) sockopt may not be needed (nodelay can be defaulted)
 > 
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 589f3e3..0011e95 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1687,12 +1687,18 @@ cifs_invalidate_mapping(struct inode *inode)
->  
->  	cifs_i->invalid_mapping = false;
->  
-> -	/* write back any cached data */
-> -	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
-> -		rc = filemap_write_and_wait(inode->i_mapping);
-> -		mapping_set_error(inode->i_mapping, rc);
-> +	if (inode->i_mapping) {
-> +		/* write back any cached data */
-> +		if (inode->i_mapping->nrpages != 0) {
-> +			rc = filemap_write_and_wait(inode->i_mapping);
-> +			mapping_set_error(inode->i_mapping, rc);
-> +		}
-> +		rc = invalidate_inode_pages2(inode->i_mapping);
-> +		if (rc)
-> +			cERROR(1, "%s: could not invalidate inode %p", __func__,
-> +			       inode);
->  	}
-> -	invalidate_remote_inode(inode);
-> +
->  	cifs_fscache_reset_inode_cookie(inode);
->  }
->  
 
-Looks like a correct change overall. I wonder too whether we need to
-make cifs_invalidate_mapping return the error from
-invalidate_inode_pages2 and have the callers deal with that
-appropriately.
+Probably, the best thing is to do this in 2 phases:
 
-For now, I think we should just keep an eye out for the printk that
-you're adding to pop. If we start to see those frequently under some
-workloads we can think about what the right approach is.
+1) parse the mount options to the best of your ability
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+2) check the result and see whether they make sense
+
+Autonegotiation will make the second part interesting though since you
+might not know the version until later. In that case, you probably will
+just have to ignore options that don't have any effect on the version
+negotiated.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
