@@ -1,66 +1,51 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH] cifs: Allow nfsd over cifs
-Date: Tue, 1 Mar 2011 15:48:07 -0500
-Message-ID: <20110301204807.GF20599@fieldses.org>
-References: <20110228235910.GD14237@fieldses.org>
- <AANLkTinFwcBMmPpn0_30Bjaa+0ipoJ6qrM=u1TGQ+Q8g@mail.gmail.com>
- <20110301032808.GA17725@fieldses.org>
- <20110301180700.GC20599@fieldses.org>
- <AANLkTikNH0ujA-qram1=1JEqJ7DH6dLRR723YZgJde1+@mail.gmail.com>
- <20110301192102.GD20599@fieldses.org>
- <20110301150949.6ca5b880@tlielax.poochiereds.net>
- <AANLkTikc2GAe1+jRyuJGEJ8i5EBtoO-dayocL2yATMWQ@mail.gmail.com>
- <20110301203445.GE20599@fieldses.org>
- <AANLkTikaGd6EzNBWkYrJM3upP4fnBUx4p7c_29cLReLX@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Use ecb des kernel crypto APIs instead of local
+ cifs functions (repost)
+Date: Tue, 1 Mar 2011 16:42:30 -0500
+Message-ID: <20110301164230.7d41539e@tlielax.poochiereds.net>
+References: <1298926301-30636-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <AANLkTikaGd6EzNBWkYrJM3upP4fnBUx4p7c_29cLReLX-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1298926301-30636-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Mar 01, 2011 at 02:38:27PM -0600, Steve French wrote:
-> On Tue, Mar 1, 2011 at 2:34 PM, J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org=
-> wrote:
-> > On Tue, Mar 01, 2011 at 02:11:32PM -0600, Steve French wrote:
-> >> I vaguely remember that the same problem can occur with nfsd on a
-> >> local file system
-> >
-> > Not true; as I've said, exportable local filesystems know how to lo=
-ok up
-> > a file on disk by filehandle.
-> >
-> >> and that nfs clients have to be able to recover from
-> >> ESTALE (e.g. lookup/delete/create/lookup would fail with ESTALE
-> >> otherwise).
-> >
-> > It is true, however, that there are some *other* cases when a serve=
-r can
-> > return ESTALE. =C2=A0In those cases (such as the one Peter Staubach=
- discusses
-> > in more detail at http://lwn.net/Articles/272684/) there may be som=
-e
-> > recovery that a client might reasonably attempt.
-> >
-> > Alas, no client can be expected to recover from ESTALE errors on an
-> > opened file--those will just be passed on to the application.
->=20
-> If this is v4 (only) wouldn't we always have an open->dentry in cache=
-?
+On Mon, 28 Feb 2011 14:51:41 -0600
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-That's correct, but only as long as the server is running.  We need
-reboot recovery to work as well.
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Using kernel crypto APIs for DES encryption during LM and NT hash generation
+> instead of local functions within cifs.
+> Source file smbdes.c is deleted sans four functions, one of which
+> uses ecb des functionality provided by kernel crypto APIs.
+> 
+> Remove function SMBOWFencrypt.
+> 
+> Add return codes to various functions such as calc_lanman_hash,
+> SMBencrypt, and SMBNTencrypt.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/Kconfig       |    1 +
+>  fs/cifs/Makefile      |    2 +-
+>  fs/cifs/cifsencrypt.c |   10 +-
+>  fs/cifs/cifsproto.h   |    7 +-
+>  fs/cifs/sess.c        |    2 +-
+>  fs/cifs/smbdes.c      |  418 -------------------------------------------------
+>  fs/cifs/smbencrypt.c  |  124 ++++++++++++---
+>  7 files changed, 109 insertions(+), 455 deletions(-)
+>  delete mode 100644 fs/cifs/smbdes.c
+> 
 
-Also:
+Nice work. I'm almost always a fan of less code to maintain ;). That
+said, I'm not terribly well versed in the intricacies of lanman auth so
+I'll offer an Acked-by instead of a Reviewed-by:
 
-	- NFSv4 uptake is still rather small as far as I know, so the v3
-	  behavior is important
-	- We don't currently have any way to export cifs as v4 only.
-
---b.
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
