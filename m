@@ -1,38 +1,55 @@
-From: "cc Technical Support" <a-brito-JLgJ4XvWgiZKCtuS50fe9NuSmeH9mC04@public.gmane.org>
-Subject: Dear E-mail User
-Date: Tue, 1 Mar 2011 06:06:17 -0500 (ECT)
-Message-ID: <35787.207.28.249.82.1298977577.squirrel@mail.municipiodemejia.gov.ec>
-Reply-To: cctcsupport@w.cn
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: Re: [PATCH 17/21]fs:cifs:connect.c remove one to many l's in the
+ word.
+Date: Tue, 1 Mar 2011 15:28:24 +0100 (CET)
+Message-ID: <alpine.LNX.2.00.1103011526560.32580@pobox.suse.cz>
+References: <1298614502-4114-1-git-send-email-justinmattock@gmail.com> <AANLkTimneD0d=qpTq2CMpfvjYuQC2kx1mf2ZnORG32KK@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: unlisted-recipients:; (no To-header on input)
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "Justin P. Mattock" <justinmattock@gmail.com>, sfrench@samba.org,
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steve French <smfrench@gmail.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <AANLkTimneD0d=qpTq2CMpfvjYuQC2kx1mf2ZnORG32KK@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
+On Fri, 25 Feb 2011, Steve French wrote:
 
+> merged into cifs-2.6.git
 
+Doesn't seem to be in linux-next as of today. Is cifs tree not being=20
+merged into linux-next?
 
-Dear E-mail User,
+>=20
+> On Fri, Feb 25, 2011 at 12:15 AM, Justin P. Mattock
+> <justinmattock@gmail.com> wrote:
+> > The patch below removes an extra "l" in the word.
+> >
+> > Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
+> >
+> > ---
+> > =A0fs/cifs/connect.c | =A0 =A02 +-
+> > =A01 files changed, 1 insertions(+), 1 deletions(-)
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index 8d6c17a..ea4a146 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -722,7 +722,7 @@ multi_t2_fnd:
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sock_release(csocket);
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->ssocket =3D NULL;
+> > =A0 =A0 =A0 =A0}
+> > - =A0 =A0 =A0 /* buffer usuallly freed in free_mid - need to free i=
+t here on exit */
+> > + =A0 =A0 =A0 /* buffer usually freed in free_mid - need to free it=
+ here on exit */
+> > =A0 =A0 =A0 =A0cifs_buf_release(bigbuf);
+> > =A0 =A0 =A0 =A0if (smallbuf) /* no sense logging a debug message if=
+ NULL */
+> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(smallbuf);
 
-Due to increase in spam spreading all over the world. We are now  using
-this opportunity to inform our valuable customers that we are
-upgrading our network to avoid recieving such email spam and other
-internet activities.
-
-We are using this medium to inform you that your account information is
-needed to perform this upgrading and also to avoid  losingyour
-informations in your account. You are require to send  down the following
-details in the format below;
-
-First Name:
-Last Name:
-Username:
-Password:
-
-You will be contacted shorthly, upon receving your informations,  and you
-are to sign back in within the next 48hrs., for fresh network.
-
-Please bear with us.
-cc Technical Support
+--=20
+Jiri Kosina
+SUSE Labs, Novell Inc.
