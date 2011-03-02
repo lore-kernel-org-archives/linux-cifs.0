@@ -1,51 +1,47 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Use ecb des kernel crypto APIs instead of local
- cifs functions (repost)
-Date: Tue, 1 Mar 2011 16:42:30 -0500
-Message-ID: <20110301164230.7d41539e@tlielax.poochiereds.net>
-References: <1298926301-30636-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: Re: kernel:  CIFS VFS: Filldir for current dir failed
+Date: Wed, 2 Mar 2011 07:05:03 -0500
+Message-ID: <20110302070503.02ce990d@tlielax.poochiereds.net>
+References: <4DF45E2A2AD923468B6688F16447BDE90508DB91@EX04.service.utwente.nl>
+	<20110301113310.5eb89897@tlielax.poochiereds.net>
+	<4DF45E2A2AD923468B6688F16447BDE90508DD6E@EX04.service.utwente.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: <a.sluik-HVpl4/oQiP/z+pZb47iToQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1298926301-30636-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <4DF45E2A2AD923468B6688F16447BDE90508DD6E-S4MjG6e2EGO+mPTwocfnKj0g50+Wg8sO@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 28 Feb 2011 14:51:41 -0600
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Wed, 2 Mar 2011 10:01:44 +0100
+<a.sluik-HVpl4/oQiP/z+pZb47iToQ@public.gmane.org> wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Hi Jeff,
 > 
 > 
-> Using kernel crypto APIs for DES encryption during LM and NT hash generation
-> instead of local functions within cifs.
-> Source file smbdes.c is deleted sans four functions, one of which
-> uses ecb des functionality provided by kernel crypto APIs.
+> Yes, but maybe there was a code change from v1.60 to v1.61 in the
+> mount.cifs ?
 > 
-> Remove function SMBOWFencrypt.
+> Or do you know if the cifs kernel module in  2.6.38 is changed, has
+> another version ?
 > 
-> Add return codes to various functions such as calc_lanman_hash,
-> SMBencrypt, and SMBNTencrypt.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/Kconfig       |    1 +
->  fs/cifs/Makefile      |    2 +-
->  fs/cifs/cifsencrypt.c |   10 +-
->  fs/cifs/cifsproto.h   |    7 +-
->  fs/cifs/sess.c        |    2 +-
->  fs/cifs/smbdes.c      |  418 -------------------------------------------------
->  fs/cifs/smbencrypt.c  |  124 ++++++++++++---
->  7 files changed, 109 insertions(+), 455 deletions(-)
->  delete mode 100644 fs/cifs/smbdes.c
+> It is from the Oracle Enterprise Linux (OEL5.6), we alse reported this
+> issue to Oracle.
+> Oracle delivers also the OEL6.0, but Oracle Database is not released yet
+> for OEL6.0.
 > 
 
-Nice work. I'm almost always a fan of less code to maintain ;). That
-said, I'm not terribly well versed in the intricacies of lanman auth so
-I'll offer an Acked-by instead of a Reviewed-by:
+Re-cc'ing linux-cifs...
 
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+This is almost certainly a kernel problem. The mount.cifs version is
+unlikely to matter here. I guess you're using their 2.6.32 kernel on
+RHEL5's userland?
+
+In any case, this problem doesn't look familiar to me. You'll probably
+need to work with Oracle to get a fix unless you can reproduce it on
+something more recent.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
