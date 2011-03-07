@@ -1,107 +1,106 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH] cifs: add missing unicode handling routines needed for
- smb2
-Date: Mon, 7 Mar 2011 09:41:23 -0500
-Message-ID: <20110307094123.065e59c6@tlielax.poochiereds.net>
-References: <AANLkTinVkEHg-DOp6+0Jq+_vteYaix+nqt=QNFJ7nSML@mail.gmail.com>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 1/2] Define ENOAUTHSERVICE to indicate "Authentication service
+ unavailable"
+Date: Mon, 07 Mar 2011 15:02:08 +0000
+Message-ID: <20110307150208.28218.89348.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinVkEHg-DOp6+0Jq+_vteYaix+nqt=QNFJ7nSML-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sun, 6 Mar 2011 22:17:32 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+As the kernel has or will have filesystems (and possibly other services) that
+want to obtain authentication tokens and/or encryption data on demand (via
+GSSAPI for example), it would seem useful to provide an additional error code
+to indicate a problem with the lookup, rather than overloading some other error
+code.
 
-This patch appears to be malformed...
+We already have EKEYREJECTED, EKEYREVOKED and EKEYEXPIRED to indicate problems
+with a token that we already have, but what if the authentication server just
+isn't available?
 
->  go past this many bytes of input string
-> + * @codepage - source codepage
-> + *
-> + * Walk a string and return the number of bytes that the string will
-> + * be after being converted to the given charset, not including any null
-> + * termination required. Don't walk past maxbytes in the source buffer.
-> + */
-> +
-> +int
-> +smb2_local_to_ucs2_bytes(const char *from, int len,
-> +			  const struct nls_table *codepage)
-> +{
-> +	int charlen;
-> +	int i;
-> +	wchar_t wchar_to;
-> +
-> +	if (from == NULL)
-> +		return 0;
-> +	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
-> +		charlen = codepage->char2uni(from, len, &wchar_to);
-> +		/* Failed conversion defaults to a question mark */
-> +		if (charlen < 1)
-> +			charlen = 1;
-> +	}
-> +	return 2 * i; /* UCS characters are two bytes */
-> +}
-> +
-> +/*
-> + * smb2_strndup_to_ucs - copy a string to wire format from the local codepage
-> + * @src - source string
-> + * @maxlen - don't walk past this many bytes in the source string
-> + * @ucslen - the length of the allocated string in bytes (including null)
-> + * @codepage - source codepage
-> + *
-> + * Take a string convert it from the local codepage to UCS2 and
-> + * put it in a new buffer. Returns a pointer to the new string or NULL on
-> + * error.
-> + */
-> +__le16 *
-> +smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_len,
-> +	     const struct nls_table *codepage)
-> +{
-> +	int len;
-> +	__le16 *dst;
-> +
-> +	len = smb2_local_to_ucs2_bytes(src, maxlen, codepage);
-> +	len += 2; /* NULL */
-> +	dst = kmalloc(len, GFP_KERNEL);
-> +	if (!dst) {
-> +		*ucs_len = 0;
-> +		return NULL;
-> +	}
-> +	cifs_strtoUCS(dst, src, maxlen, codepage);
-> +	*ucs_len = len;
-> +	return dst;
-> +}
-> +#endif /* CONFIG_CIFS_SMB2 */
-> diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
-> index 7fe6b52..a56dfbc 100644
-> --- a/fs/cifs/cifs_unicode.h
-> +++ b/fs/cifs/cifs_unicode.h
-> @@ -377,4 +377,11 @@ UniStrlwr(register wchar_t *upin)
-> 
->  #endif
-> 
-> +#ifdef CONFIG_CIFS_SMB2
-> +extern int smb2_local_to_ucs2_bytes(const char *from, int len,
-> +				    const struct nls_table *codepage);
-> +extern __le16 *smb2_strndup_to_ucs(const char *src, const int maxlen,
-> +				   int *ucs_len, const struct nls_table *cp);
-> +#endif /* CONFIG_CIFS_SMB2 */
-> +
->  #endif /* _CIFS_UNICODE_H */
-> 
-> --
-> Thanks,
-> 
-> Steve
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Define ENOAUTHSERVICE to indicate "Authentication service unavailable".  This
+can be used to indicate, for example, that an attempt was made by request_key()
+to retrieve a key, but the authentication server (e.g. a KDC) it is supposed to
+contact didn't answer or that it couldn't determine the location of a suitable
+server.
 
+One way this can be used is that the user of a network filesystem can get a TGT
+from the KDC and stash it in their session keyring, then the filesystem can
+attempt to automatically get a ticket for accessing the filesystem - but if the
+server is uncontactable then the ticket can be negatively instantiated with
+KEYCTL_REJECT, giving the error to be handed to future requests as
+ENOAUTHSERVICE and a small timeout so that the key will expire from the cache
+and allow a retry after a short while to prevent thrashing.
 
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+
+ arch/alpha/include/asm/errno.h  |    1 +
+ arch/mips/include/asm/errno.h   |    1 +
+ arch/parisc/include/asm/errno.h |    1 +
+ arch/sparc/include/asm/errno.h  |    1 +
+ include/asm-generic/errno.h     |    1 +
+ 5 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/arch/alpha/include/asm/errno.h b/arch/alpha/include/asm/errno.h
+index 98099bd..519663c 100644
+--- a/arch/alpha/include/asm/errno.h
++++ b/arch/alpha/include/asm/errno.h
+@@ -121,5 +121,6 @@
+ #define	ENOTRECOVERABLE	137	/* State not recoverable */
+ 
+ #define	ERFKILL		138	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	139	/* Authentication service not available */
+ 
+ #endif
+diff --git a/arch/mips/include/asm/errno.h b/arch/mips/include/asm/errno.h
+index a0efc73..5fa7fed 100644
+--- a/arch/mips/include/asm/errno.h
++++ b/arch/mips/include/asm/errno.h
+@@ -120,6 +120,7 @@
+ #define	ENOTRECOVERABLE	166	/* State not recoverable */
+ 
+ #define	ERFKILL		167	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	168	/* Authentication service not available */
+ 
+ #define EDQUOT		1133	/* Quota exceeded */
+ 
+diff --git a/arch/parisc/include/asm/errno.h b/arch/parisc/include/asm/errno.h
+index 9992abd..6a19346 100644
+--- a/arch/parisc/include/asm/errno.h
++++ b/arch/parisc/include/asm/errno.h
+@@ -121,5 +121,6 @@
+ #define ENOTRECOVERABLE	255	/* State not recoverable */
+ 
+ #define	ERFKILL		256	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	257	/* Authentication service not available */
+ 
+ #endif
+diff --git a/arch/sparc/include/asm/errno.h b/arch/sparc/include/asm/errno.h
+index 4e2bc49..ab3a26a 100644
+--- a/arch/sparc/include/asm/errno.h
++++ b/arch/sparc/include/asm/errno.h
+@@ -111,5 +111,6 @@
+ #define	ENOTRECOVERABLE	133	/* State not recoverable */
+ 
+ #define	ERFKILL		134	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	135	/* Authentication service not available */
+ 
+ #endif
+diff --git a/include/asm-generic/errno.h b/include/asm-generic/errno.h
+index 28cc03b..bcf1908 100644
+--- a/include/asm-generic/errno.h
++++ b/include/asm-generic/errno.h
+@@ -107,5 +107,6 @@
+ #define	ENOTRECOVERABLE	131	/* State not recoverable */
+ 
+ #define ERFKILL		132	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	133	/* Authentication service not available */
+ 
+ #endif
