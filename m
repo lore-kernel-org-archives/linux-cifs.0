@@ -1,53 +1,89 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [patch] cifs: writing past the end of the array
-Date: Sun, 6 Mar 2011 18:41:02 -0600
-Message-ID: <AANLkTiksNTx5YCXfNWWfgY-6MAxE9sF2+HYpZ-hqLaZV@mail.gmail.com>
-References: <20110306132621.GN3416@bicker>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: add missing unicode handling routines needed for smb2
+Date: Sun, 6 Mar 2011 22:17:32 -0600
+Message-ID: <AANLkTinVkEHg-DOp6+0Jq+_vteYaix+nqt=QNFJ7nSML@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, samba-technical@lists.samba.org
-To: Dan Carpenter <error27@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20110306132621.GN3416@bicker>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-merged.  trivially correct.
+ go past this many bytes of input string
++ * @codepage - source codepage
++ *
++ * Walk a string and return the number of bytes that the string will
++ * be after being converted to the given charset, not including any null
++ * termination required. Don't walk past maxbytes in the source buffer.
++ */
++
++int
++smb2_local_to_ucs2_bytes(const char *from, int len,
++			  const struct nls_table *codepage)
++{
++	int charlen;
++	int i;
++	wchar_t wchar_to;
++
++	if (from == NULL)
++		return 0;
++	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
++		charlen = codepage->char2uni(from, len, &wchar_to);
++		/* Failed conversion defaults to a question mark */
++		if (charlen < 1)
++			charlen = 1;
++	}
++	return 2 * i; /* UCS characters are two bytes */
++}
++
++/*
++ * smb2_strndup_to_ucs - copy a string to wire format from the local codepage
++ * @src - source string
++ * @maxlen - don't walk past this many bytes in the source string
++ * @ucslen - the length of the allocated string in bytes (including null)
++ * @codepage - source codepage
++ *
++ * Take a string convert it from the local codepage to UCS2 and
++ * put it in a new buffer. Returns a pointer to the new string or NULL on
++ * error.
++ */
++__le16 *
++smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_len,
++	     const struct nls_table *codepage)
++{
++	int len;
++	__le16 *dst;
++
++	len = smb2_local_to_ucs2_bytes(src, maxlen, codepage);
++	len += 2; /* NULL */
++	dst = kmalloc(len, GFP_KERNEL);
++	if (!dst) {
++		*ucs_len = 0;
++		return NULL;
++	}
++	cifs_strtoUCS(dst, src, maxlen, codepage);
++	*ucs_len = len;
++	return dst;
++}
++#endif /* CONFIG_CIFS_SMB2 */
+diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+index 7fe6b52..a56dfbc 100644
+--- a/fs/cifs/cifs_unicode.h
++++ b/fs/cifs/cifs_unicode.h
+@@ -377,4 +377,11 @@ UniStrlwr(register wchar_t *upin)
 
-On Sun, Mar 6, 2011 at 7:26 AM, Dan Carpenter <error27@gmail.com> wrote:
+ #endif
 
-> This is a cut and paste error.  p16 only has 16 chars, not 21.
->
-> Signed-off-by: Dan Carpenter <error27@gmail.com>
->
-> diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-> index 3967635..1525d5e 100644
-> --- a/fs/cifs/smbencrypt.c
-> +++ b/fs/cifs/smbencrypt.c
-> @@ -353,7 +353,7 @@ SMBNTencrypt(unsigned char *passwd, unsigned char *c8,
-> unsigned char *p24)
->        int rc;
->        unsigned char p16[16], p21[21];
->
-> -       memset(p16, '\0', 21);
-> +       memset(p16, '\0', 16);
->        memset(p21, '\0', 21);
->
->        rc = E_md4hash(passwd, p16);
->
++#ifdef CONFIG_CIFS_SMB2
++extern int smb2_local_to_ucs2_bytes(const char *from, int len,
++				    const struct nls_table *codepage);
++extern __le16 *smb2_strndup_to_ucs(const char *src, const int maxlen,
++				   int *ucs_len, const struct nls_table *cp);
++#endif /* CONFIG_CIFS_SMB2 */
++
+ #endif /* _CIFS_UNICODE_H */
 
-
-
--- 
+--
 Thanks,
 
 Steve
