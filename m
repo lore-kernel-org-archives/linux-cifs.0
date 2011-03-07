@@ -1,30 +1,51 @@
-From: Alan Cox <alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
-Subject: Re: [PATCH 2/2] Define ENONAMESERVICE and ENAMEUNKNOWN to indicate
- name service errors
-Date: Mon, 7 Mar 2011 16:00:42 +0000
-Message-ID: <20110307160042.2ddc8e65@lxorguk.ukuu.org.uk>
-References: <20110307150208.28218.89348.stgit@warthog.procyon.org.uk>
-	<20110307150218.28218.84916.stgit@warthog.procyon.org.uk>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [patch] cifs: writing past the end of the array
+Date: Mon, 7 Mar 2011 11:09:59 -0500
+Message-ID: <20110307110959.71003070@tlielax.poochiereds.net>
+References: <20110306132621.GN3416@bicker>
+	<4D73C03B.1050905@bfs.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: wharms-fPG8STNUNVg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110307150218.28218.84916.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+In-Reply-To: <4D73C03B.1050905-fPG8STNUNVg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-> Define ENONAMESERVICE to indicate "Network name service unavailable".  This can
-> be used to indicate, for example, that an attempt was made by dns_query() to
-> make a query, but the name server (e.g. a DNS server) it is supposed to contact
-> didn't answer or that it couldn't determine the location of a suitable server.
+On Sun, 06 Mar 2011 18:11:23 +0100
+walter harms <wharms-fPG8STNUNVg@public.gmane.org> wrote:
 
-Are these in glibc and are there glibc patches submitted and accepted for
-this ?
+> 
+> 
+> Am 06.03.2011 14:26, schrieb Dan Carpenter:
+> > This is a cut and paste error.  p16 only has 16 chars, not 21.
+> > 
+> > Signed-off-by: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > 
+> > diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+> > index 3967635..1525d5e 100644
+> > --- a/fs/cifs/smbencrypt.c
+> > +++ b/fs/cifs/smbencrypt.c
+> > @@ -353,7 +353,7 @@ SMBNTencrypt(unsigned char *passwd, unsigned char *c8, unsigned char *p24)
+> >  	int rc;
+> >  	unsigned char p16[16], p21[21];
+> >  
+> > -	memset(p16, '\0', 21);
+> > +	memset(p16, '\0', 16);
+> >  	memset(p21, '\0', 21);
+> >  
+> >  	rc = E_md4hash(passwd, p16);
+> 
+> 
+> perhaps ARRAY_SIZE() instead of a magic number is a better choice ?
+> 
 
-(I only ask because I know its previously taken years for glibc to catch
-up with stuff)
+Agreed. Care to propose a patch? There are almost certainly other
+places in the code that could use a similar cleanup.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
