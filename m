@@ -1,51 +1,71 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [patch] cifs: writing past the end of the array
-Date: Mon, 7 Mar 2011 11:09:59 -0500
-Message-ID: <20110307110959.71003070@tlielax.poochiereds.net>
-References: <20110306132621.GN3416@bicker>
-	<4D73C03B.1050905@bfs.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: add missing unicode handling routines needed for smb2
+Date: Mon, 7 Mar 2011 11:09:06 -0600
+Message-ID: <AANLkTi=GF+b7UaKsC70BuBF7GaDNLJBGA1=2H7y3edcO@mail.gmail.com>
+References: <AANLkTinVkEHg-DOp6+0Jq+_vteYaix+nqt=QNFJ7nSML@mail.gmail.com>
+	<20110307094123.065e59c6@tlielax.poochiereds.net>
+	<AANLkTinnHSpJMMvTVU77fgcgZWum6Ovb5SfOSxPbSfSG@mail.gmail.com>
+	<20110307105338.69e862d0@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: wharms-fPG8STNUNVg@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D73C03B.1050905-fPG8STNUNVg@public.gmane.org>
+In-Reply-To: <20110307105338.69e862d0-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 06 Mar 2011 18:11:23 +0100
-walter harms <wharms-fPG8STNUNVg@public.gmane.org> wrote:
+On Mon, Mar 7, 2011 at 9:53 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Mon, 7 Mar 2011 09:07:52 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Mon, Mar 7, 2011 at 8:41 AM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org=
+> wrote:
+>> > On Sun, 6 Mar 2011 22:17:32 -0600
+>> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> >
+>> > This patch appears to be malformed...
+>>
+>> Cut-paste or mailer error.
+>>
+>> commit 11471483dbfd2f4235346acf9e181a549b3979a1
+>> Author: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+>> Date: =A0 Mon Mar 7 04:15:05 2011 +0000
+>>
+>> =A0 =A0 [CIFS] Add missing unicode handling routines needed by smb2
+>>
+>> =A0 =A0 Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+>>
+>
+> Given that there are no callers of these functions, it's hard to
+> understand the need for this. These look like cut and paste of the ci=
+fs
+> functions. Why do we need separate routines for this for smb2?
 
-> 
-> 
-> Am 06.03.2011 14:26, schrieb Dan Carpenter:
-> > This is a cut and paste error.  p16 only has 16 chars, not 21.
-> > 
-> > Signed-off-by: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > 
-> > diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-> > index 3967635..1525d5e 100644
-> > --- a/fs/cifs/smbencrypt.c
-> > +++ b/fs/cifs/smbencrypt.c
-> > @@ -353,7 +353,7 @@ SMBNTencrypt(unsigned char *passwd, unsigned char *c8, unsigned char *p24)
-> >  	int rc;
-> >  	unsigned char p16[16], p21[21];
-> >  
-> > -	memset(p16, '\0', 21);
-> > +	memset(p16, '\0', 16);
-> >  	memset(p21, '\0', 21);
-> >  
-> >  	rc = E_md4hash(passwd, p16);
-> 
-> 
-> perhaps ARRAY_SIZE() instead of a magic number is a better choice ?
-> 
+The caller of these functions will include SMB2 Tree Connect,
+but the patch for that is not ready since quite a bit of #defines
+in smb2pdu.c had to be reworked to account for the merge.
 
-Agreed. Care to propose a patch? There are almost certainly other
-places in the code that could use a similar cleanup.
+The main two reasons these two routines are needed:
+1) we needed a Unicode only string conversion routine
+(the cifs one takes an ascii parameter which is superflous
+for the case of SMB2, which only does Unicode
+and would make the smb2pdu.c code messie).
+The routine is trivial and uses the existing cifs_unicode worker.
+2) similarly with the routine to allocate a unicodestring on
+the fly  which is needed since we only use iovecs for cifs
+and similar to the above is only Unicode (no ascii).
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+The routines themselves are small.  I doubt that cifs
+would use a routine that is unicode only but they
+may be useful in the future so I put them in cifs_unicode.c
+rather than a new smb2_unicode.c
+
+
+
+
+--=20
+Thanks,
+
+Steve
