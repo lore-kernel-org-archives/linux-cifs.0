@@ -1,107 +1,236 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/2] Define ENONAMESERVICE and ENAMEUNKNOWN to indicate name
- service errors
-Date: Mon, 07 Mar 2011 15:02:18 +0000
-Message-ID: <20110307150218.28218.84916.stgit@warthog.procyon.org.uk>
-References: <20110307150208.28218.89348.stgit@warthog.procyon.org.uk>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: add missing unicode handling routines needed for smb2
+Date: Mon, 7 Mar 2011 09:07:52 -0600
+Message-ID: <AANLkTinnHSpJMMvTVU77fgcgZWum6Ovb5SfOSxPbSfSG@mail.gmail.com>
+References: <AANLkTinVkEHg-DOp6+0Jq+_vteYaix+nqt=QNFJ7nSML@mail.gmail.com>
+	<20110307094123.065e59c6@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, netdev-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110307150208.28218.89348.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+In-Reply-To: <20110307094123.065e59c6-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that the kernel has filesystems (and possibly other services) that want to
-look up internet addresses corresponding to arbitrary hostnames retrieved from
-the server, it would seem useful to provide a couple of error codes to indicate
-problems with the look up, rather than overloading some other error code.
+On Mon, Mar 7, 2011 at 8:41 AM, Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org> w=
+rote:
+> On Sun, 6 Mar 2011 22:17:32 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+> This patch appears to be malformed...
 
-Define ENONAMESERVICE to indicate "Network name service unavailable".  This can
-be used to indicate, for example, that an attempt was made by dns_query() to
-make a query, but the name server (e.g. a DNS server) it is supposed to contact
-didn't answer or that it couldn't determine the location of a suitable server.
+Cut-paste or mailer error.
 
-Define ENAMEUNKNOWN to indicate "Network name unknown".  This can be used to
-indicate, for example, that an attempt was made by dns_query() to make a query,
-but the name server (e.g. a DNS server) replied indicating that it had no
-matching records.
+commit 11471483dbfd2f4235346acf9e181a549b3979a1
+Author: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Date:   Mon Mar 7 04:15:05 2011 +0000
 
-The DNS query upcall program can report these to keyctl_reject() so that cached
-failed queries will respond with these errors until they expire.
+    [CIFS] Add missing unicode handling routines needed by smb2
 
-Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
+    Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
- arch/alpha/include/asm/errno.h  |    2 ++
- arch/mips/include/asm/errno.h   |    2 ++
- arch/parisc/include/asm/errno.h |    2 ++
- arch/sparc/include/asm/errno.h  |    2 ++
- include/asm-generic/errno.h     |    2 ++
- 5 files changed, 10 insertions(+), 0 deletions(-)
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index fc0fd4f..9dd2682 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -333,3 +333,64 @@ ctoUCS_out:
+ 	return i;
+ }
 
-diff --git a/arch/alpha/include/asm/errno.h b/arch/alpha/include/asm/errno.h
-index 519663c..ee8a3f0 100644
---- a/arch/alpha/include/asm/errno.h
-+++ b/arch/alpha/include/asm/errno.h
-@@ -122,5 +122,7 @@
- 
- #define	ERFKILL		138	/* Operation not possible due to RF-kill */
- #define	ENOAUTHSERVICE	139	/* Authentication service not available */
-+#define	ENONAMESERVICE	140	/* Network name service unavailable */
-+#define	ENAMEUNKNOWN	141	/* Network name unknown */
- 
++#ifdef CONFIG_CIFS_SMB2
++/*
++ * smb2_local_to_ucs2_bytes - how long will a string be after conversi=
+on?
++ * @from - pointer to input string
++ * @maxbytes - don't go past this many bytes of input string
++ * @codepage - source codepage
++ *
++ * Walk a string and return the number of bytes that the string will
++ * be after being converted to the given charset, not including any nu=
+ll
++ * termination required. Don't walk past maxbytes in the source buffer=
+=2E
++ */
++
++int
++smb2_local_to_ucs2_bytes(const char *from, int len,
++			  const struct nls_table *codepage)
++{
++	int charlen;
++	int i;
++	wchar_t wchar_to;
++
++	if (from =3D=3D NULL)
++		return 0;
++	for (i =3D 0; len && *from; i++, from +=3D charlen, len -=3D charlen)=
+ {
++		charlen =3D codepage->char2uni(from, len, &wchar_to);
++		/* Failed conversion defaults to a question mark */
++		if (charlen < 1)
++			charlen =3D 1;
++	}
++	return 2 * i; /* UCS characters are two bytes */
++}
++
++/*
++ * smb2_strndup_to_ucs - copy a string to wire format from the local c=
+odepage
++ * @src - source string
++ * @maxlen - don't walk past this many bytes in the source string
++ * @ucslen - the length of the allocated string in bytes (including nu=
+ll)
++ * @codepage - source codepage
++ *
++ * Take a string convert it from the local codepage to UCS2 and
++ * put it in a new buffer. Returns a pointer to the new string or NULL=
+ on
++ * error.
++ */
++__le16 *
++smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_len,
++	     const struct nls_table *codepage)
++{
++	int len;
++	__le16 *dst;
++
++	len =3D smb2_local_to_ucs2_bytes(src, maxlen, codepage);
++	len +=3D 2; /* NULL */
++	dst =3D kmalloc(len, GFP_KERNEL);
++	if (!dst) {
++		*ucs_len =3D 0;
++		return NULL;
++	}
++	cifs_strtoUCS(dst, src, maxlen, codepage);
++	*ucs_len =3D len;
++	return dst;
++}
++#endif /* CONFIG_CIFS_SMB2 */
+diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+index 7fe6b52..a56dfbc 100644
+--- a/fs/cifs/cifs_unicode.h
++++ b/fs/cifs/cifs_unicode.h
+@@ -377,4 +377,11 @@ UniStrlwr(register wchar_t *upin)
+
  #endif
-diff --git a/arch/mips/include/asm/errno.h b/arch/mips/include/asm/errno.h
-index 5fa7fed..faed965 100644
---- a/arch/mips/include/asm/errno.h
-+++ b/arch/mips/include/asm/errno.h
-@@ -121,6 +121,8 @@
- 
- #define	ERFKILL		167	/* Operation not possible due to RF-kill */
- #define	ENOAUTHSERVICE	168	/* Authentication service not available */
-+#define	ENONAMESERVICE	169	/* Network name service unavailable */
-+#define	ENAMEUNKNOWN	170	/* Network name unknown */
- 
- #define EDQUOT		1133	/* Quota exceeded */
- 
-diff --git a/arch/parisc/include/asm/errno.h b/arch/parisc/include/asm/errno.h
-index 6a19346..63ee0bc 100644
---- a/arch/parisc/include/asm/errno.h
-+++ b/arch/parisc/include/asm/errno.h
-@@ -122,5 +122,7 @@
- 
- #define	ERFKILL		256	/* Operation not possible due to RF-kill */
- #define	ENOAUTHSERVICE	257	/* Authentication service not available */
-+#define	ENONAMESERVICE	258	/* Network name service unavailable */
-+#define	ENAMEUNKNOWN	259	/* Network name unknown */
- 
- #endif
-diff --git a/arch/sparc/include/asm/errno.h b/arch/sparc/include/asm/errno.h
-index ab3a26a..f40d5ae 100644
---- a/arch/sparc/include/asm/errno.h
-+++ b/arch/sparc/include/asm/errno.h
-@@ -112,5 +112,7 @@
- 
- #define	ERFKILL		134	/* Operation not possible due to RF-kill */
- #define	ENOAUTHSERVICE	135	/* Authentication service not available */
-+#define	ENONAMESERVICE	136	/* Network name service unavailable */
-+#define	ENAMEUNKNOWN	137	/* Network name unknown */
- 
- #endif
-diff --git a/include/asm-generic/errno.h b/include/asm-generic/errno.h
-index bcf1908..25878f1 100644
---- a/include/asm-generic/errno.h
-+++ b/include/asm-generic/errno.h
-@@ -108,5 +108,7 @@
- 
- #define ERFKILL		132	/* Operation not possible due to RF-kill */
- #define	ENOAUTHSERVICE	133	/* Authentication service not available */
-+#define	ENONAMESERVICE	134	/* Network name service unavailable */
-+#define	ENAMEUNKNOWN	135	/* Network name unknown */
- 
- #endif
+
++#ifdef CONFIG_CIFS_SMB2
++extern int smb2_local_to_ucs2_bytes(const char *from, int len,
++				    const struct nls_table *codepage);
++extern __le16 *smb2_strndup_to_ucs(const char *src, const int maxlen,
++				   int *ucs_len, const struct nls_table *cp);
++#endif /* CONFIG_CIFS_SMB2 */
++
+ #endif /* _CIFS_UNICODE_H */
+
+
+>> =A0go past this many bytes of input string
+>> + * @codepage - source codepage
+>> + *
+>> + * Walk a string and return the number of bytes that the string wil=
+l
+>> + * be after being converted to the given charset, not including any=
+ null
+>> + * termination required. Don't walk past maxbytes in the source buf=
+fer.
+>> + */
+>> +
+>> +int
+>> +smb2_local_to_ucs2_bytes(const char *from, int len,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const struct nls_table=
+ *codepage)
+>> +{
+>> + =A0 =A0 int charlen;
+>> + =A0 =A0 int i;
+>> + =A0 =A0 wchar_t wchar_to;
+>> +
+>> + =A0 =A0 if (from =3D=3D NULL)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+>> + =A0 =A0 for (i =3D 0; len && *from; i++, from +=3D charlen, len -=3D=
+ charlen) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 charlen =3D codepage->char2uni(from, len, =
+&wchar_to);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 /* Failed conversion defaults to a questio=
+n mark */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (charlen < 1)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 charlen =3D 1;
+>> + =A0 =A0 }
+>> + =A0 =A0 return 2 * i; /* UCS characters are two bytes */
+>> +}
+>> +
+>> +/*
+>> + * smb2_strndup_to_ucs - copy a string to wire format from the loca=
+l codepage
+>> + * @src - source string
+>> + * @maxlen - don't walk past this many bytes in the source string
+>> + * @ucslen - the length of the allocated string in bytes (including=
+ null)
+>> + * @codepage - source codepage
+>> + *
+>> + * Take a string convert it from the local codepage to UCS2 and
+>> + * put it in a new buffer. Returns a pointer to the new string or N=
+ULL on
+>> + * error.
+>> + */
+>> +__le16 *
+>> +smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_len=
+,
+>> + =A0 =A0 =A0 =A0 =A0const struct nls_table *codepage)
+>> +{
+>> + =A0 =A0 int len;
+>> + =A0 =A0 __le16 *dst;
+>> +
+>> + =A0 =A0 len =3D smb2_local_to_ucs2_bytes(src, maxlen, codepage);
+>> + =A0 =A0 len +=3D 2; /* NULL */
+>> + =A0 =A0 dst =3D kmalloc(len, GFP_KERNEL);
+>> + =A0 =A0 if (!dst) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 *ucs_len =3D 0;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return NULL;
+>> + =A0 =A0 }
+>> + =A0 =A0 cifs_strtoUCS(dst, src, maxlen, codepage);
+>> + =A0 =A0 *ucs_len =3D len;
+>> + =A0 =A0 return dst;
+>> +}
+>> +#endif /* CONFIG_CIFS_SMB2 */
+>> diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+>> index 7fe6b52..a56dfbc 100644
+>> --- a/fs/cifs/cifs_unicode.h
+>> +++ b/fs/cifs/cifs_unicode.h
+>> @@ -377,4 +377,11 @@ UniStrlwr(register wchar_t *upin)
+>>
+>> =A0#endif
+>>
+>> +#ifdef CONFIG_CIFS_SMB2
+>> +extern int smb2_local_to_ucs2_bytes(const char *from, int len,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 co=
+nst struct nls_table *codepage);
+>> +extern __le16 *smb2_strndup_to_ucs(const char *src, const int maxle=
+n,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int=
+ *ucs_len, const struct nls_table *cp);
+>> +#endif /* CONFIG_CIFS_SMB2 */
+>> +
+>> =A0#endif /* _CIFS_UNICODE_H */
+>>
+>> --
+>> Thanks,
+>>
+>> Steve
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
+" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
+>
+> --
+> Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+>
+
+
+
+--=20
+Thanks,
+
+Steve
