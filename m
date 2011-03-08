@@ -1,46 +1,258 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] FC: cifs: Initialized an uninitialized variable
-Date: Mon, 7 Mar 2011 22:38:25 -0600
-Message-ID: <AANLkTi==7wv6mrL5OWkGKxyc7GbKPH5+kgkCBNUcj3im@mail.gmail.com>
-References: <1299556809-16194-1-git-send-email-vinaysawal@gmail.com>
-	<20110308042601.GX22723@ZenIV.linux.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Cc: sfrench@samba.org, linux-cifs@vger.kernel.org,
-	Vinay Sawal <vinaysawal@gmail.com>,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: Al Viro <viro@zeniv.linux.org.uk>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20110308042601.GX22723@ZenIV.linux.org.uk>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/2] cifs: Add idmap key and related data structures and functions (try #8)
+Date: Mon,  7 Mar 2011 22:46:58 -0600
+Message-ID: <1299559618-15531-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Mar 7, 2011 at 10:26 PM, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> On Mon, Mar 07, 2011 at 08:00:09PM -0800, Vinay Sawal wrote:
->> Removed a compile time warning by initializing an uninitialized variable=
-.
->
->> - =A0 =A0 int rc;
->> + =A0 =A0 int rc =3D -EFAULT;
->
-> Why is that the right thing to do? =A0Other than "it made the compiler to
-> STFU, therefore it is Good(tm)", please.
-
-Hard to disagree with Al's logic, although changing the scope of rc to
-within the for loop might also make both your compiler happy and more
-sense.   In any case, I prefer real bug fixes.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
---=20
-Thanks,
+Define (global) data structures to store ids, uids and gids, to which a
+SID maps.  There are two separate trees, one for SID/uid and another one
+for SID/gid.
 
-Steve
+A new type of key, cifs_idmap_key_type, is used.
+
+Keys are instantiated and searched using credential of the root by
+overriding and restoring the credentials of the caller requesting the key.
+Once a SID is mapped, it is stored along with the mapped id, in one
+of the rb trees and key is released.
+
+Register a pruning function with the shrinker that prunes the rb trees
+when memory pressure warrants freeing up cache.  Just for now, it is
+more like cleaning entire cache than pruning.  The subsequent patch has
+this function defined.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsacl.c   |  138 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsfs.c    |    7 +++
+ fs/cifs/cifsglob.h  |    5 ++
+ fs/cifs/cifsproto.h |    3 +
+ 4 files changed, 153 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 555e8c5..fc1ec64 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -23,6 +23,10 @@
+ 
+ #include <linux/fs.h>
+ #include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/keyctl.h>
++#include <linux/key-type.h>
++#include <keys/user-type.h>
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsacl.h"
+@@ -50,6 +54,140 @@ static const struct cifs_sid sid_authusers = {
+ /* group users */
+ static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+ 
++static const struct cred *root_cred;
++
++/*
++ * Run idmap cache shrinker.
++ */
++static int
++cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
++{
++	/* Use a pruning scheme in a subsequent patch instead */
++	cifs_destroy_idmaptrees();
++	return 0;
++}
++
++static struct shrinker cifs_shrinker = {
++	.shrink = cifs_idmap_shrinker,
++	.seeks = DEFAULT_SEEKS,
++};
++
++static int
++cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
++{
++	char *payload;
++
++	payload = kmalloc(datalen, GFP_KERNEL);
++	if (!payload)
++		return -ENOMEM;
++
++	memcpy(payload, data, datalen);
++	key->payload.data = payload;
++	return 0;
++}
++
++static inline void
++cifs_idmap_key_destroy(struct key *key)
++{
++	kfree(key->payload.data);
++}
++
++static
++struct key_type cifs_idmap_key_type = {
++	.name        = "cifs.cifs_idmap",
++	.instantiate = cifs_idmap_key_instantiate,
++	.destroy     = cifs_idmap_key_destroy,
++	.describe    = user_describe,
++	.match       = user_match,
++};
++
++int
++init_cifs_idmap(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	cFYI(1, "Registering the %s key type\n", cifs_idmap_key_type.name);
++
++	/* create an override credential set with a special thread keyring in
++	 * which requests are cached
++	 *
++	 * this is used to prevent malicious redirections from being installed
++	 * with add_key().
++	 */
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = key_alloc(&key_type_keyring, ".cifs_idmap", 0, 0, cred,
++			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
++			    KEY_USR_VIEW | KEY_USR_READ,
++			    KEY_ALLOC_NOT_IN_QUOTA);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
++	if (ret < 0)
++		goto failed_put_key;
++
++	ret = register_key_type(&cifs_idmap_key_type);
++	if (ret < 0)
++		goto failed_put_key;
++
++	/* instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up */
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	root_cred = cred;
++
++	spin_lock_init(&siduidlock);
++	uidtree = RB_ROOT;
++	spin_lock_init(&sidgidlock);
++	gidtree = RB_ROOT;
++
++	register_shrinker(&cifs_shrinker);
++
++	cFYI(1, "DNS resolver keyring: %d\n", key_serial(keyring));
++	return 0;
++
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
++
++void
++exit_cifs_idmap(void)
++{
++	key_revoke(root_cred->thread_keyring);
++	unregister_key_type(&cifs_idmap_key_type);
++	put_cred(root_cred);
++	unregister_shrinker(&cifs_shrinker);
++	cFYI(1, "Unregistered %s key type\n", cifs_idmap_key_type.name);
++}
++
++void
++cifs_destroy_idmaptrees(void)
++{
++	struct rb_root *root;
++	struct rb_node *node;
++
++	root = &uidtree;
++	spin_lock(&siduidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&siduidlock);
++
++	root = &gidtree;
++	spin_lock(&sidgidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&sidgidlock);
++}
+ 
+ int match_sid(struct cifs_sid *ctsid)
+ {
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 120a9cf..805d6ec 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1043,11 +1043,16 @@ init_cifs(void)
+ 	rc = register_key_type(&cifs_spnego_key_type);
+ 	if (rc)
+ 		goto out_unregister_filesystem;
++	rc = init_cifs_idmap();
++	if (rc)
++		goto out_unregister_keytype;
+ #endif
+ 
+ 	return 0;
+ 
+ #ifdef CONFIG_CIFS_UPCALL
++out_unregister_keytype:
++	unregister_key_type(&cifs_spnego_key_type);
+ out_unregister_filesystem:
+ 	unregister_filesystem(&cifs_fs_type);
+ #endif
+@@ -1074,6 +1079,8 @@ exit_cifs(void)
+ 	cifs_dfs_release_automount_timer();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
++	cifs_destroy_idmaptrees();
++	exit_cifs_idmap();
+ 	unregister_key_type(&cifs_spnego_key_type);
+ #endif
+ 	unregister_filesystem(&cifs_fs_type);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 793a55a..4376e74 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -861,6 +861,11 @@ GLOBAL_EXTERN bool sign_zero_copy; /* don't copy written pages with signing */
+ /* reconnect after this many failed echo attempts */
+ GLOBAL_EXTERN unsigned short echo_retries;
+ 
++GLOBAL_EXTERN struct rb_root uidtree;
++GLOBAL_EXTERN struct rb_root gidtree;
++GLOBAL_EXTERN spinlock_t siduidlock;
++GLOBAL_EXTERN spinlock_t sidgidlock;
++
+ void cifs_oplock_break(struct work_struct *work);
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
+ void cifs_oplock_break_put(struct cifsFileInfo *cfile);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 03b9344..a3d036a 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -53,6 +53,9 @@ do {								\
+ 	cFYI(1, "CIFS VFS: leaving %s (xid = %d) rc = %d",	\
+ 	     __func__, curr_xid, (int)rc);			\
+ } while (0)
++extern int init_cifs_idmap(void);
++extern void exit_cifs_idmap(void);
++extern void cifs_destroy_idmaptrees(void);
+ extern char *build_path_from_dentry(struct dentry *);
+ extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
+ 					struct cifs_tcon *tcon);
+-- 
+1.6.0.2
