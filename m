@@ -1,93 +1,70 @@
-From: Steve French <smfrench@gmail.com>
+From: Chris Mason <chris.mason-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 Subject: Re: stable page writes: wait_on_page_writeback and packet signing
-Date: Thu, 10 Mar 2011 07:53:25 -0600
-Message-ID: <AANLkTimO6Z7hoDx3wzv7JB-Hj=yzJrADFDE5oSqooaau@mail.gmail.com>
-References: <AANLkTinFx9KGKDWSdUvFSvT4S6f9QjBzX=6Uo17oO89+@mail.gmail.com>
-	<20110309215148.GW15097@dastard>
-	<AANLkTinDmqah6pQnHugoVxh-gDq+6+MDMuh-TyVAQ7LP@mail.gmail.com>
-	<20110309185427.7858c29b@corrin.poochiereds.net>
-	<AANLkTi=pXHjE6tNMm0_nO=Cn3nGH8oZ6Xhm1STh8x1Xe@mail.gmail.com>
-	<20110309203044.4fd0498e@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Dave Chinner <david@fromorbit.com>, linux-cifs@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Mingming Cao <mcao@us.ibm.com>
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20110309203044.4fd0498e@corrin.poochiereds.net>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Date: Thu, 10 Mar 2011 08:58:04 -0500
+Message-ID: <1299764956-sup-2267@think>
+References: <AANLkTinFx9KGKDWSdUvFSvT4S6f9QjBzX=6Uo17oO89+@mail.gmail.com> <20110309215148.GW15097@dastard> <1299707686-sup-6871@think> <AANLkTikK8MOm-m9XsOA4YGRe=E9bJTDh4iEYXtZumNmv@mail.gmail.com> <1299717690-sup-2613@think> <20110310081638.0f8275d4@barsoom.rdu.redhat.com> <1299763214-sup-2862@think> <20110310084724.658fe5d7@barsoom.rdu.redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Mingming Cao <mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-reply-to: <20110310084724.658fe5d7-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Mar 9, 2011 at 7:30 PM, Jeff Layton <jlayton@redhat.com> wrote:
-> On Wed, 9 Mar 2011 18:33:20 -0600
-> Steve French <smfrench@gmail.com> wrote:
->
->> On Wed, Mar 9, 2011 at 5:54 PM, Jeff Layton <jlayton@redhat.com> wro=
-te:
->> > On Wed, 9 Mar 2011 16:01:30 -0600
->> > Steve French <smfrench@gmail.com> wrote:
->> >
->> >>
->> >> Except we don't need to wait that long with the page locked
->> >> ie for a response from the cifs server (such as Samba or Windows
->> >> or NetApp), just need to wait for it to get on the wire.
->> >> Waiting for us to get the server response would
->> >> take 10 or 100 times longer. =A0 In any case we can't resend
->> >> the same request to the server (the signature changes on the
->> >> resend since the sequence number is incremented on every
->> >> request/response so we have to recalc the checksum anyway) and
->> >> cifs requests can't get lost (as with nfs over udp). =A0Keeping
->> >> a page locked for 10milliseconds seems like a bad idea - but
->> >> it is a little more complicated to implement (for the cifs case)
->> >> so that we end page writeback (for the non-WB_SYNC)
->> >> as quickly as reasonably possible so we don't kill perf.
->> >>
->> >
->> > The problem here is that the socket layer doesn't have a mechanism
->> > to notify us of a TCP ACK. So, we have to wait for the next-best t=
-hing
->> > -- a response from the server.
->>
->> But ... we can stop writeback as soon as kernel_sendmsg returns - on=
-ce
->> we return from kernel_sendmsg the buffers can (and often will) be
->> freed so we know those pages could not still be used by tcp =A0(belo=
-w
->> cifs) once kernel_sendmsg returns. =A0We can minimize the delay furt=
-her
->> by making sure we set TCP_NODELAY on the socket (we probably ought t=
-o
->> make that the default instead of an option).
->>
->
-> That's not correct. A return from kernel_sendmsg just means that the
-> data has been buffered up, not that it has been sent and acked. We
-> shouldn't use that as an indicator to mean that the pages no longer
-> need to be stable.
+Excerpts from Jeff Layton's message of 2011-03-10 08:47:24 -0500:
+> > > > Does cifs take i_mutex before writepage? The disk based filesystems
+> > > > don't.  So, i_mutex protects file_write from other procs jumping into
+> > > > file_write, but it doesn't protect writeback from file_write jumping in
+> > > > and changing the pages while they are being sent to storage (or over the
+> > > > wire).
+> > > > 
+> > > > Basically the model needs to be:
+> > > > 
+> > > > file_write:
+> > > >     lock the page
+> > > >     wait on page writeback
+> > > > 
+> > > >     < new writeback cannot start because of the page lock >
+> > > >     copy_from_user
+> > > >     unlock the page
+> > > > 
+> > > > We also use page_mkwrite to get notified when userland wants to change
+> > > > some page it has given to mmap.  That needs to wait on page writeback as
+> > > > well.
+> > > > 
+> > > 
+> > > No, cifs doesn't take the i_mutex in writepage, but the page is locked.
+> > > cifs_write_begin calls grab_cache_page_write_begin, which returns a
+> > > locked page and it's not unlocked until cifs_write_end.
+> > 
+> > Ah ok, so you've got the page locked the whole time it is being sent
+> > over the wire?  The disk based filesystems split it and drop the page
+> > lock once the page is set writeback, which is why we need the extra
+> > waits.
+> > 
+> > So in your case you should just need a page_mkwrite that locks the page.
+> > 
+> 
+> Right, or do a wait_on_page_writeback. I think that may have a little
+> less overhead since we won't need to unlock it and it may mean less
+> serialization if there are other contenders for the page lock.
+> 
 
-We can't free the page from the cache until the server responds that
-it has written the data (otherwise if the server crashes we have no
-way to resend the dirty page), but I don't see any reason to block redi=
-rtying
-a page as long as we don't break the signing mechanism.  We can allow w=
-rites to
-a page once the page has been buffered (kernel_sendmsg is complete).
-Although cifs has stricter (stricter than open to close) guarantees tha=
-n nfs
-in some case, we could hang on to pages longer as nfs does until the se=
-rver
-returns the equivalent of fsync.
+I think you'll need the page lock too, otherwise you aren't protected
+against new IO starting.  page_mkwrite really works together with 
+clear_page_dirty_for_io(), and I don't think you get proper
+synchronization without the page lock.
 
+You also need the page lock to make sure the page really is still in
+your mapping and that truncate won't race in and take the page away.
 
+Basically, if you add a wait_on_page_writeback() to block_page_mkwrite,
+you should have what you need, +/- the prepare_write/commit_write calls,
+which we use to fill any holes for the pages that are about to change.
 
---=20
-Thanks,
-
-Steve
---
-To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
-" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-chris
