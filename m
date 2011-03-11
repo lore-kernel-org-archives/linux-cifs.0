@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: find_smb_session problem
-Date: Fri, 11 Mar 2011 06:23:15 -0500
-Message-ID: <20110311062315.34df713a@tlielax.poochiereds.net>
+Date: Fri, 11 Mar 2011 06:33:43 -0500
+Message-ID: <20110311063343.2c020b32@tlielax.poochiereds.net>
 References: <AANLkTikk0Qef1B4myQwUOnyQLOWsQbebsCkGcgUFFmcY@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -19,25 +19,31 @@ List-ID: <linux-cifs.vger.kernel.org>
 On Fri, 11 Mar 2011 12:29:17 +0300
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Hi to all!
+> Another problem with it will come with SMB2.1 leases. Let's predict
+> the situation:
+> 1) user1 mounts a remote share
+> 2) user2 mounts the same share with the same username and password.
 > 
-> I faced with such a problem:
-> 1) user1 mounts a remote share with user=guest,pass=231
-> 2) user2 mounts the same share with user=guest,pass=222(wrong
-> password) and succeed (!).
+> Both succeed on the same smb connection. Then:
+> 3) user1 opens a file and gets Lease for RWH
+> 4) user2 opens the same file and again gets Lease for RWH
 > 
-> The problem is that user2 doesn't know a true password of the share
-> but can mount it if user1 successfully mounted it with the true
-> password.
+> because a server thinks that it's the same client and the cache for it
+> is the same, but as far as we mounts if into separete directories we
+> have them as different inodes and different caches. It will be an
+> problem with a data coherency. So, in the case of SMB2.1 we should not
+> use existing smb connection (not tcp connection) at all, as I think.
 > 
-> Looking through the code I noticed that we don't have any checks in
-> find_smb_session for passwords - only username check. I think it's a
-> big security issue.
+> Your thoughts/comments, please?
 > 
 
-I think you must be looking at an old tree. See commit
-4ff67b720c02c36e54d55b88c2931879b7db1cd2.
+It's probably a bug, but it an uncommon configuration and a bit on the
+pathological side. Trying to use different SMB connections from the
+same user over the same connection will probably confuse some servers.
 
+If you want cache coherency between separate mounts of the same data,
+then you probably need to consider moving CIFS to a shared superblock
+model like NFS has.
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
