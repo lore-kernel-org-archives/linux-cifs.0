@@ -1,49 +1,56 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: find_smb_session problem
-Date: Fri, 11 Mar 2011 06:33:43 -0500
-Message-ID: <20110311063343.2c020b32@tlielax.poochiereds.net>
-References: <AANLkTikk0Qef1B4myQwUOnyQLOWsQbebsCkGcgUFFmcY@mail.gmail.com>
+Subject: Re: stable page writes: wait_on_page_writeback and packet signing
+Date: Fri, 11 Mar 2011 06:53:09 -0500
+Message-ID: <20110311065309.4e14afd6@tlielax.poochiereds.net>
+References: <AANLkTinFx9KGKDWSdUvFSvT4S6f9QjBzX=6Uo17oO89+@mail.gmail.com>
+	<20110309215148.GW15097@dastard>
+	<AANLkTinDmqah6pQnHugoVxh-gDq+6+MDMuh-TyVAQ7LP@mail.gmail.com>
+	<20110309185427.7858c29b@corrin.poochiereds.net>
+	<AANLkTi=pXHjE6tNMm0_nO=Cn3nGH8oZ6Xhm1STh8x1Xe@mail.gmail.com>
+	<20110309203044.4fd0498e@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Mingming Cao <mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTikk0Qef1B4myQwUOnyQLOWsQbebsCkGcgUFFmcY-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20110309203044.4fd0498e-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 11 Mar 2011 12:29:17 +0300
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Wed, 9 Mar 2011 20:30:44 -0500
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> Another problem with it will come with SMB2.1 leases. Let's predict
-> the situation:
-> 1) user1 mounts a remote share
-> 2) user2 mounts the same share with the same username and password.
+> > 
+> > But ... we can stop writeback as soon as kernel_sendmsg returns - once
+> > we return from kernel_sendmsg the buffers can (and often will) be
+> > freed so we know those pages could not still be used by tcp  (below
+> > cifs) once kernel_sendmsg returns.  We can minimize the delay further
+> > by making sure we set TCP_NODELAY on the socket (we probably ought to
+> > make that the default instead of an option).
+> > 
 > 
-> Both succeed on the same smb connection. Then:
-> 3) user1 opens a file and gets Lease for RWH
-> 4) user2 opens the same file and again gets Lease for RWH
-> 
-> because a server thinks that it's the same client and the cache for it
-> is the same, but as far as we mounts if into separete directories we
-> have them as different inodes and different caches. It will be an
-> problem with a data coherency. So, in the case of SMB2.1 we should not
-> use existing smb connection (not tcp connection) at all, as I think.
-> 
-> Your thoughts/comments, please?
+> That's not correct. A return from kernel_sendmsg just means that the
+> data has been buffered up, not that it has been sent and acked. We
+> shouldn't use that as an indicator to mean that the pages no longer
+> need to be stable.
 > 
 
-It's probably a bug, but it an uncommon configuration and a bit on the
-pathological side. Trying to use different SMB connections from the
-same user over the same connection will probably confuse some servers.
+Correction...
 
-If you want cache coherency between separate mounts of the same data,
-then you probably need to consider moving CIFS to a shared superblock
-model like NFS has.
+Steve is correct that we have no need to keep the page stable after
+kernel_sendmsg returns. That codepath copies the data to from the iovec
+to the send buffer. I got kernel_sendmsg mixed up with kernel_sendpages.
+NFS uses both, depending on how the xdr buffer is layed out.
+
+Eventually we should probably consider moving cifs to use ->sendpage
+for writes instead, which would allow us to do sends directly out of
+the pagecache. To do that though, we would need to keep the pages
+stable until the write is complete, or at least until it has been
+ACK'ed (if we can work out a way to do that).
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
