@@ -1,110 +1,390 @@
-From: Chris Mason <chris.mason-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Subject: Re: stable page writes: wait_on_page_writeback and packet signing
-Date: Fri, 11 Mar 2011 11:00:39 -0500
-Message-ID: <1299858514-sup-4213@think>
-References: <AANLkTinFx9KGKDWSdUvFSvT4S6f9QjBzX=6Uo17oO89+@mail.gmail.com> <20110309215148.GW15097@dastard> <1299707686-sup-6871@think> <AANLkTikK8MOm-m9XsOA4YGRe=E9bJTDh4iEYXtZumNmv@mail.gmail.com> <1299717690-sup-2613@think> <20110310081638.0f8275d4@barsoom.rdu.redhat.com> <1299763214-sup-2862@think> <20110310084724.658fe5d7@barsoom.rdu.redhat.com> <1299764956-sup-2267@think> <20110311071143.01b407b6@tlielax.poochiereds.net> <1299847396-sup-9741@think> <20110311084221.4ac6bd11@tlielax.poochiereds.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Mingming Cao <mcao-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] [CIFS] do not try to dump cifs mids from smb2 sessions
+Date: Fri, 11 Mar 2011 12:06:18 -0600
+Message-ID: <AANLkTinDbqDtkjQYR0pOjhW8qVUKOtpBZFJy4yqKqPU4@mail.gmail.com>
+References: <AANLkTikoOp4DfA1dCeRPvom=OG5i0WNpAEjBSX2U6TbK@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-reply-to: <20110311084221.4ac6bd11-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <AANLkTikoOp4DfA1dCeRPvom=OG5i0WNpAEjBSX2U6TbK-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Excerpts from Jeff Layton's message of 2011-03-11 08:42:21 -0500:
-> On Fri, 11 Mar 2011 07:56:14 -0500
-> > > This I'm a little less clear on. Why is this a concern only for
-> > > read-only pages and not for writable ones which won't pass through
-> > > page_mkwrite?
-> > 
-> > We want to make sure that we're not racing with truncate.   For us that
-> > means we don't want to insert blocks to fill a hole in the middle of
-> > truncate doing away with that range in the file.
-> > 
-> > This may or may not be a concern for cifs, but truncate is going to lock
-> > every page, so we need the page lock to really synchronize with it.
-> > 
-> 
-> Hmm...ok. I'll need to ponder this a bit more, but the comment above
-> btrfs_page_mkwrite makes this a bit more clear. Still, it seems like
-> page_mkwrite ought to not have to worry about this. IOW...
-> 
-> Why doesn't the page fault handler fix that up? And why is this not an
-> issue for filesystems that don't even implement page_mkwrite?
+On Thu, Mar 10, 2011 at 10:33 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wro=
+te:
+> [PATCH] [CIFS] do not try to dump cifs mids from smb2 sessions
+>
+> Convert the debug routines in cifs_debug.c to recognize
+> smb2 sessions and not try to dump invalid information on
+> pending requests. =A0Check the socket type to see if
+> smb2. =A0Move the printing of cifs specific debug information
+> to a helper routine to make it clearer which type
+> of information we are printing.
+>
+> cifs and smb2 both use the struct TCP_Server_Info to include informat=
+ion about
+> the tcp socket connection to the server. =A0The list of pending reque=
+sts
+> is one of the "per-socket" pieces of information. smb2 and cifs
+> "mid" queue entries (multiplexed network requests, the active request=
+s
+> on the wire) differ. smb2 has async support in the protocol,
+> as well as operation compounding and larger sizes (than cifs) for
+> various fields related to pending requests) so it is important
+> not to try to use the pending_mid_q for smb2 tcp sessions
+> as if it were a pending cifs request. =A0Most usage of the
+> pending_mid_q is safe because it is in either cifs or smb2
+> specific code, but this patch fixes the dumping of debug
+> data so we don't dump cifs debug data for an smb2 session.
+>
+> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/cifs_debug.c | =A0177 +++++++++++++++++++++++++++---------=
+--------------
+> =A01 files changed, 96 insertions(+), 81 deletions(-)
+>
+> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+> index d925cf6..c071599 100644
+> --- a/fs/cifs/cifs_debug.c
+> +++ b/fs/cifs/cifs_debug.c
+> @@ -72,7 +72,7 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
+> =A0 =A0 =A0 =A0struct list_head *tmp;
+> =A0 =A0 =A0 =A0struct mid_q_entry *mid_entry;
+>
+> - =A0 =A0 =A0 if (server =3D=3D NULL)
+> + =A0 =A0 =A0 if ((server =3D=3D NULL) || (server->is_smb2))
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return;
+>
+> =A0 =A0 =A0 =A0cERROR(1, "Dump pending requests:");
+> @@ -105,16 +105,103 @@ void cifs_dump_mids(struct TCP_Server_Info *se=
+rver)
+> =A0#endif /* CONFIG_CIFS_DEBUG2 */
+>
+> =A0#ifdef CONFIG_PROC_FS
+> -static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+> +
+> +static void dump_smb2_debug_info(int i, struct seq_file *m,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct =
+TCP_Server_Info *server)
+> =A0{
+> - =A0 =A0 =A0 struct list_head *tmp1, *tmp2, *tmp3;
+> + =A0 =A0 =A0 seq_printf("dumping debug information for smb2 not supp=
+orted yet\n");
+> +}
+> +
+> +static void dump_cifs_debug_info(int i, struct seq_file *m,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct =
+TCP_Server_Info *server)
+> +{
+> + =A0 =A0 =A0 struct list_head *tmp2, *tmp3;
+> =A0 =A0 =A0 =A0struct mid_q_entry *mid_entry;
+> - =A0 =A0 =A0 struct TCP_Server_Info *server;
+> =A0 =A0 =A0 =A0struct cifs_ses *ses;
+> =A0 =A0 =A0 =A0struct cifs_tcon *tcon;
+> - =A0 =A0 =A0 int i, j;
+> + =A0 =A0 =A0 int j;
+> =A0 =A0 =A0 =A0__u32 dev_type;
+>
+> +
+> + =A0 =A0 =A0 list_for_each(tmp2, &server->smb_ses_list) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses =3D list_entry(tmp2, struct cifs_se=
+s, smb_ses_list);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((ses->serverDomain =3D=3D NULL) || =
+(ses->serverOS =3D=3D NULL) ||
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (ses->serverNOS =3D=3D =
+NULL)) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, "\n%d) en=
+try for %s not fully "
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+"displayed\n\t", i, ses->serverName);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "\n%d) =
+Name: %s =A0Domain: %s Uses: %d OS:"
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 " %s\n\=
+tNOS: %s\tCapability: 0x%x\n\tSMB"
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 " sessi=
+on status: %d\t",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 i, ses-=
+>serverName, ses->serverDomain,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
+s_count, ses->serverOS, ses->serverNOS,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->ca=
+pabilities, ses->status);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, "TCP status: %d\n\tLocal =
+Users To "
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "Server: %d=
+ SecMode: 0x%x Req On Wire: %d",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server-=
+>tcpStatus, server->srv_count,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server-=
+>sec_mode,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_=
+read(&server->inFlight));
+> +
+> +#ifdef CONFIG_CIFS_STATS2
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, " In Send: %d In MaxReq W=
+ait: %d",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_=
+read(&server->inSend),
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_=
+read(&server->num_waiters));
+> +#endif
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_puts(m, "\n\tShares:");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 j =3D 0;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each(tmp3, &ses->tcon_list) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon =3D list_entry(tmp=
+3, struct cifs_tcon, tcon_list);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ++j;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dev_type =3D le32_to_cp=
+u(tcon->fsDevInfo.DeviceType);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, "\n\t%d) =
+%s Mounts: %d ", j,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+tcon->treeName, tcon->tc_count);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (tcon->nativeFileSys=
+tem) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m, "Type: %s ",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0tcon->nativeFileSystem);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, "DevInfo:=
+ 0x%x Attributes: 0x%x"
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "\nPath=
+ComponentMax: %d Status: 0x%d",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 le32_to=
+_cpu(tcon->fsDevInfo.DeviceCharacteristics),
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 le32_to=
+_cpu(tcon->fsAttrInfo.Attributes),
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 le32_to=
+_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength),
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon->t=
+idStatus);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (dev_type =3D=3D FIL=
+E_DEVICE_DISK)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_put=
+s(m, " type: DISK ");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (dev_type =3D=3D=
+ FILE_DEVICE_CD_ROM)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_put=
+s(m, " type: CDROM ");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m, " type: %d ", dev_type);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (tcon->need_reconnec=
+t)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_put=
+s(m, "\tDISCONNECTED ");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_putc(m, '\n');
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_puts(m, "\n\tMIDs:\n");
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each(tmp3, &server->pending_mi=
+d_q) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry =3D list_entr=
+y(tmp3, struct mid_q_entry, qhead);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, "\tState:=
+ %d com: %d pid:"
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 " %d cbdata: %p mid %d\n",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 mid_entry->midState,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 (int)mid_entry->command, mid_entry->pid,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 mid_entry->callback_data,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 mid_entry->mid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> + =A0 =A0 =A0 }
+> +}
+> +
+> +static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+> +{
+> + =A0 =A0 =A0 struct list_head *tmp1;
+> + =A0 =A0 =A0 struct TCP_Server_Info *server;
+> + =A0 =A0 =A0 int i;
+> +
+> =A0 =A0 =A0 =A0seq_puts(m,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"Display Internal CIFS Data St=
+ructures for Debugging\n"
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"-----------------------------=
+----------------------\n");
+> @@ -151,82 +238,10 @@ static int cifs_debug_data_proc_show(struct
+> seq_file *m, void *v)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server =3D list_entry(tmp1, struct TCP=
+_Server_Info,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+tcp_ses_list);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0i++;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each(tmp2, &server->smb_ses_li=
+st) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses =3D list_entry(tmp2=
+, struct cifs_ses,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0smb_ses_list);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((ses->serverDomain =
+=3D=3D NULL) ||
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (ses->s=
+erverOS =3D=3D NULL) ||
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (ses->s=
+erverNOS =3D=3D NULL)) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m, "\n%d) entry for %s not fully "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0"displayed\n\t", i, ses->serverName);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ "\n%d) Name: %s =A0Domain: %s Uses: %d OS:"
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ " %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ " session status: %d\t",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 i, ses-=
+>serverName, ses->serverDomain,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->se=
+s_count, ses->serverOS, ses->serverNOS,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->ca=
+pabilities, ses->status);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, "TCP stat=
+us: %d\n\tLocal Users To "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+"Server: %d SecMode: 0x%x Req On Wire: %d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+server->tcpStatus, server->srv_count,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+server->sec_mode,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+atomic_read(&server->inFlight));
+> -
+> -#ifdef CONFIG_CIFS_STATS2
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(m, " In Send=
+: %d In MaxReq Wait: %d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_=
+read(&server->inSend),
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 atomic_=
+read(&server->num_waiters));
+> -#endif
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_puts(m, "\n\tShares=
+:");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 j =3D 0;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each(tmp3, &se=
+s->tcon_list) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon =3D=
+ list_entry(tmp3, struct cifs_tcon,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon_list);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ++j;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dev_typ=
+e =3D le32_to_cpu(tcon->fsDevInfo.DeviceType);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m, "\n\t%d) %s Mounts: %d ", j,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0tcon->treeName, tcon->tc_count);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (tco=
+n->nativeFileSystem) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 seq_printf(m, "Type: %s ",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0tcon->nativeFileSystem);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m, "DevInfo: 0x%x Attributes: 0x%x"
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 "\nPathComponentMax: %d Status: 0x%d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 le32_to_cpu(tcon->fsDevInfo.DeviceCharacteristics),
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 le32_to_cpu(tcon->fsAttrInfo.Attributes),
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 le32_to_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength),
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 tcon->tidStatus);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (dev=
+_type =3D=3D FILE_DEVICE_DISK)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 seq_puts(m, " type: DISK ");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if=
+ (dev_type =3D=3D FILE_DEVICE_CD_ROM)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 seq_puts(m, " type: CDROM ");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 seq_printf(m, " type: %d ", dev_type);
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (tco=
+n->need_reconnect)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 seq_puts(m, "\tDISCONNECTED ");
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_put=
+c(m, '\n');
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_puts(m, "\n\tMIDs:\=
+n");
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&GlobalMid_Lo=
+ck);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each(tmp3, &se=
+rver->pending_mid_q) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_ent=
+ry =3D list_entry(tmp3, struct mid_q_entry,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 qhead);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_pri=
+ntf(m, "\tState: %d com: %d pid:"
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 " %d cbdata: %p mid %d\n",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->midState,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 (int)mid_entry->command,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->pid,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->callback_data,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->mid);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_=
+Lock);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->is_smb2)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dump_smb2_debug_info(i,=
+ m, server);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dump_cifs_debug_info(i,=
+ m, server);
+> =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0spin_unlock(&cifs_tcp_ses_lock);
 
-The page fault handler can deal with pages being dirty or clean or
-inside or outside of i_size.  But the filesystem is using page_mkwrite
-to allocate blocks in the file if the write is filling a hole, or in the
-btrfs case to satisfy COW.
+I suppose there would not be a smb2_tcp_ses_lock!
+Also, although I have not see any issues, is it ok to take a spinlock
+within a spinlock (GloablMid_Lock while holding cifs_tcp_ses_lock)?
 
-So the allocation code needs to synchronize with truncate while the page
-handling code itself is already safe.
-
-> 
-> > > 
-> > > The reason I'm reluctant to take the page lock here is that I've been
-> > > toying with the idea of having page_mkwrite copy the page to a new one
-> > > when it's under writeback. Basically, have page_mkwrite:
-> > > 
-> > > 1) allocate a new page (if that fails, just wait_on_page_writeback)
-> > > 2) copy the old page data to the new one
-> > > 3) replace the old page in the pagecache with the new one
-> > > 4) shoot down any PTE's that point to the old page (via unmap_mapping_range)
-> > > 5) return an error from page_mkwrite that tells the caller that the page
-> > >    needs to be refaulted in
-> > > 
-> > > I think that would allow us to have stable pages for the actual write,
-> > > but without blocking processes that have the pages mmapped for an
-> > > arbitrary period. If I have to take the page lock however, then that
-> > > sort of blows that whole idea out of the water.
-> > > 
-> > > I haven't worked through all of the details for this (and I'm sure
-> > > handling the locking for this will be tricky). Maybe it's a dumb
-> > > idea, but I think it's worth investigating.
-> > > 
-> > 
-> > Would it be easier to send a bounce buffer over the wire instead of
-> > the page cache page?
-> > 
-> > In general we haven't seen a big performance problem from waiting on
-> > writeback and locking the page in page_mkwrite().  Writable mmaps and
-> > high performance expectations don't often go together.
-> > 
-> 
-> That would definitely be easier. I'm just always a bit leery of doing
-> any sort of memory allocation while in writeback. The scheme I
-> described would only do them when someone writes to a mmapped page, and
-> it can just fall back to blocking if that fails.
-> 
-> My main worry is not so much with performance, but rather with making
-> sure that we're not blocking processes that are trying to write to
-> mmaps indefinitely if the server goes away. Blocking them only until
-> kernel_sendmsg returns makes this a bit less of an issue, but it can
-> still happen if the socket buffer is full.
-
-Don't we already have the risk of blocking in them in
-balance_dirty_pages for file_write?  I'm not sure how mmap is different.
-At any rate, an interruptible wait_on_page_writeback(), or
-wait_on_page_writeback_timeout() might be easier?
-
-> 
-> In principle, the above scheme would mostly avoid unnecessary memory
-> allocations, and should mostly prevent mmapped processes from
-> blocking indefinitely. It is rather complicated though, which might
-> make it too "fiddly" to really be workable.
-> 
-
-In general I'd try to avoid being special in mmap writes.  It's one of
-those things that doesn't get exercised that much in the common test
-suites, and so you'll have mysterious bug reports that very few people
-see.
-
-(Don't let my grumpiness with mmap stop you from doing cool things
-though ;)
-
--chris
+> =A0 =A0 =A0 =A0seq_putc(m, '\n');
+>
+> --
+> Thanks,
+>
+> Steve
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
