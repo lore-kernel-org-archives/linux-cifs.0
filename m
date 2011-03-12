@@ -1,7 +1,8 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] Add routines to free SMB2 mids
-Date: Fri, 11 Mar 2011 22:12:03 -0600
-Message-ID: <AANLkTi=LkuHJq_z1dngTG5xYA2TbWfeiZYNvgL80nONx@mail.gmail.com>
+Subject: [PATCH] wait_for_free_request needs to wait on credits returned by
+ server for SMB2
+Date: Sat, 12 Mar 2011 17:48:13 -0600
+Message-ID: <AANLkTimsJ+vQm7XuVk2NHneRc04CeWebuG3jsLxML4sd@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -9,85 +10,103 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-    [CIFS] Add routines to free SMB2 mids
+wait_for_free_request is called to ensure that we don't have more than
+the configured maximum of requests in flight on the wire (for cifs),
+but for SMB2, the number of requests that can be in flight varies
+dynamically (the client may request that the server grant more
+"credits" in a request, and each request uses at least one credit).
+Instead of migrating over the original smb2_wait_for_free_request,
+simply add a check in cifs's original wait_for_free_request for the
+is_smb2 case to make sure that we don't go beyond the number of
+allocated "credits" (ie those that remain from those the server has
+allocated for this tcp session).  Otherwise the logic is unchanged
+(other than to make it extern so that the next function to be added,
+smb2_sendrcv2 in  smbtransport.c can call it - smb2_sendrcv2 will be
+migrated over in the next patch).
 
-    Add smb2_mid_entry_free and free_smb2_mid.
-    These are straightforward and generally similarly
-    to cifs's DeleteMidQEntry and delete_mid but
-    handle the differences in the mids, and
-    attempt to use cleaner, non-camelCase names.
+Note that smb2 servers will typically allow many more requests in
+flight at one time than cifs servers (which usually default to only
+50) and can adjust this as needed.  This should provide significant
+performance benefit in some workloads (for smb2 over cifs and some
+other protocols which overly constrain the maximum number of
+requests).
 
-    Next patch will add the transport routine needed
-    by SMB2 Negotiate which will be the first users
-    of the get_smb2_mid/free_smb2_mid
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-    Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 9d33cd2..c62070a 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -206,5 +206,59 @@ static int get_smb2_mid(struct cifs_ses *ses,
-struct smb2_hdr *in_buf,
- 	return 0;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 095cec7..73fe746 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -64,6 +64,7 @@ extern char *cifs_compose_mount_options(const char
+*sb_mountdata,
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
++extern int wait_for_free_request(struct TCP_Server_Info *sv, const
+int long_op);
+ extern int cifs_call_async(struct TCP_Server_Info *server,
+ 			   struct smb_hdr *in_buf, mid_callback_t *callback,
+ 			   void *cbdata);
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index bce3cf9..0dd675c 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -189,7 +189,6 @@ extern int new_read_req(struct kvec *iov, struct
+cifs_tcon *tcon,
+ 			int request_type);
+ extern int smb2_sendv(struct TCP_Server_Info *server, struct kvec *iov,
+ 		      int n_vec);
+-extern int wait_for_free_request(struct cifs_ses *ses, const int long_op);
+ extern int smb2_wait_on_complex_mid(struct cifs_ses *ses,
+ 				    struct mid_q_entry *mid,
+ 				    unsigned long timeout,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 29dd7ed..1a2930d 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -260,7 +260,7 @@ smb_send(struct TCP_Server_Info *server, struct
+smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
  }
 
-+static void
-+smb2_mid_entry_free(struct smb2_mid_entry *mid_entry)
-+{
-+#ifdef CONFIG_CIFS_STATS2
-+	unsigned long now;
-+#endif
-+	mid_entry->mid_state = MID_FREE;
-+	atomic_dec(&midCount);
-+
-+	/* the large buf free will eventually use a different
-+	   pool (the cifs size is not optimal for smb2) but
-+	   it makes the initial conversion simpler to leave
-+	   it using the cifs large buf pool */
-+	if (mid_entry->large_buf)
-+		cifs_buf_release(mid_entry->resp_buf);
-+	else
-+		cifs_small_buf_release(mid_entry->resp_buf);
-+#ifdef CONFIG_CIFS_STATS2
-+	now = jiffies;
-+	/* commands taking longer than one second are indications that
-+	   something is wrong, unless it is quite a slow link or server */
-+	/* BB eventually add a mid flag to allow us to indicate other ops such
-+	   as SMB2 reads or writes to "offline" files which are ok to be slow */
-+	if ((now - mid_entry->when_alloc) > HZ) {
-+		if ((cifsFYI & CIFS_TIMER) &&
-+		   (mid_entry->command != SMB2_LOCK)) {
-+			printk(KERN_DEBUG " SMB2 slow rsp: cmd %d mid %lld",
-+			       mid_entry->command, mid_entry->mid);
-+			printk(" A: 0x%lx S: 0x%lx R: 0x%lx\n",
-+			       now - mid_entry->when_alloc,
-+			       now - mid_entry->when_sent,
-+			       now - mid_entry->when_received);
-+		}
-+	}
-+#endif
-+
-+/*	The next two lines or equivalent will be needed when pagebuf support
-+	added back in:
-+	if (mid_entry->is_kmap_buf && mid_entry->pagebuf_list)
-+		kfree(mid_entry->pagebuf_list); */
-+
-+	mempool_free(mid_entry, smb2_mid_poolp);
-+}
-+
-+static void
-+free_smb2_mid(struct smb2_mid_entry *mid)
-+{
-+	spin_lock(&GlobalMid_Lock);
-+	list_del(&mid->qhead);
-+	spin_unlock(&GlobalMid_Lock);
-+
-+	smb2_mid_entry_free(mid);
-+}
-+
+-static int wait_for_free_request(struct TCP_Server_Info *server,
++int wait_for_free_request(struct TCP_Server_Info *server,
+ 				 const int long_op)
+ {
+ 	if (long_op == CIFS_ASYNC_OP) {
+@@ -271,7 +271,8 @@ static int wait_for_free_request(struct
+TCP_Server_Info *server,
 
- /* BB add missing functions here */
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
++		if ((server->is_smb2 == false) &&
++		    atomic_read(&server->inFlight) >= cifs_max_pending) {
+ 			spin_unlock(&GlobalMid_Lock);
+ #ifdef CONFIG_CIFS_STATS2
+ 			atomic_inc(&server->num_waiters);
+@@ -283,6 +284,20 @@ static int wait_for_free_request(struct
+TCP_Server_Info *server,
+ 			atomic_dec(&server->num_waiters);
+ #endif
+ 			spin_lock(&GlobalMid_Lock);
++#ifdef CONFIG_CIFS_SMB2
++		} else if (server->is_smb2 &&
++			  (atomic_read(&server->credits) < 1)) {
++			spin_unlock(&GlobalMid_Lock);
++#ifdef CONFIG_CIFS_STATS2
++			atomic_inc(&server->num_waiters);
++#endif
++			wait_event(server->request_q,
++				   atomic_read(&server->credits) > 0);
++#ifdef CONFIG_CIFS_STATS2
++			atomic_dec(&server->num_waiters);
++#endif
++			spin_lock(&GlobalMid_Lock);
++#endif /* CONFIG_CIFS_SMB2 */
+ 		} else {
+ 			if (server->tcpStatus == CifsExiting) {
+ 				spin_unlock(&GlobalMid_Lock);
 
 -- 
 Thanks,
