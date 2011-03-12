@@ -1,35 +1,66 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: mid structures cifs vs. smb2
-Date: Fri, 11 Mar 2011 18:29:54 -0600
-Message-ID: <AANLkTi=faCm65kdBkxKkWwqFp3Zr-p+H5275Bd59M3G7@mail.gmail.com>
-References: <AANLkTi=O_D90MxzG81V6==8GDc78mPrBW=+6ERLwKmwr@mail.gmail.com>
+Subject: re: mid structures cifs vs. smb2
+Date: Fri, 11 Mar 2011 19:09:25 -0600
+Message-ID: <AANLkTimG8a_XsYKeGzfjdEF-nKZorq0HjJL9_6Chg2fq@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=O_D90MxzG81V6==8GDc78mPrBW=+6ERLwKmwr-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Mar 11, 2011 at 6:00 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Thinking over Jeff's comments I have done the following to make it easier to
-> read/review and cleanup:
-> - removed the now unneeded field that Jeff noted
+So with the rearrangement of fields to make it easier to compare the
+two structures (and fixing the size of the smb2 pid field
+to match the SMB2 protocol definition rather than pid_t,
+and removing the unneded sequence number for smb2),
+the structures now would look simpler:
 
-One more of the SMB2 mid fields is probably going
-to be removed soon.
+/* one of these for every pending CIFS request to the server */
+struct mid_q_entry {
+	struct list_head qhead;	/* mids waiting on reply from this server */
+	int midState;	/* wish this were enum but can not pass to wait_event */
+	unsigned long when_alloc;  /* when mid was created */
+#ifdef CONFIG_CIFS_STATS2
+	unsigned long when_sent; /* time when smb send finished */
+	unsigned long when_received; /* when demux complete (taken off wire) */
+#endif
+	bool largeBuf:1;	/* if valid response, is pointer to large buf */
+	mid_callback_t *callback; /* call completion callback */
+	void *callback_data;	  /* general purpose pointer for callback */
+	__u16 mid;		/* multiplex id */
+	__u32 sequence_number;  /* for CIFS signing */
+	__u8 command;		/* smb command code */
+	__u16 pid;		/* process id */
+	struct smb_hdr *resp_buf;	/* response buffer */
+	bool multiRsp:1;	/* multiple trans2 responses for one request  */
+	bool multiEnd:1;	/* both received */
+};
 
-I had forgot to mention that one of the currently common
-fields between the cifs and smb2 mid structures, the
-sequence_number (used for cifs packet signing), is
-apparently not needed for the better HMAC-SHA256
-based signing mechanism used for SMB2,
-but IIRC Shirish had not gotten
-far enough in the SMB2 signing code to verify 100%
-whether this can be removed until signing is tested.
 
-This should help shrink the structure even more.
+/* one of these for every pending SMB2 request to the server */
+struct smb2_mid_entry {
+	struct list_head qhead;	/* mids waiting on reply from this server */
+	int mid_state;	/* wish this were enum but can not pass to wait_event */
+	unsigned long when_alloc;  /* when mid was created */
+#ifdef CONFIG_CIFS_STATS2
+	unsigned long when_sent; /* time when smb send finished */
+	unsigned long when_received; /* when demux complete (taken off wire) */
+#endif
+	bool large_buf:1;	/* if valid response, is pointer to large buf */
+	smb2_mid_callback_t *callback;
+	void *callback_data;
+	__u64 mid;		/* multiplex id(s), bigger for smb2 */
+	__le16 command;		/* smb2 command code */
+	__u32 pid;		/* process id - bigger for smb2 than cifs */
+	struct smb2_hdr *resp_buf;	/* response buffer */
 
+	/* Additional fields below needed for handling async smb2 responses
+	and for asynchronous smb2_writepages support have been temporarily
+	removed from the port and will be reenabled as that gets merged in */
+
+    /* Fields needed for smb2_writepages, compound ops, async support
+       will eventually follow */
+};
 -- 
 Thanks,
 
