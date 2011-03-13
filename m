@@ -1,68 +1,89 @@
-From: Steve French <smfrench@gmail.com>
-Subject: =?windows-1252?Q?Re=3A_=5BPATCH=5D_cifssmb=3A_=5BFIX=5D_warning=3A_=91pdata=92_may_?=
-	=?windows-1252?Q?be_used_uninitialized?=
-Date: Sun, 13 Mar 2011 13:35:08 -0500
-Message-ID: <AANLkTiko9Y6z79XwkxN7dEAyikQbO=Azdiu0hhK+uiJc@mail.gmail.com>
-References: <1300033426-22404-1-git-send-email-richard.genoud@gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [CIFS] Elminate sparse __CHECK_ENDIAN__ warnings on port conversion
+Date: Sun, 13 Mar 2011 14:00:03 -0500
+Message-ID: <AANLkTikqyrPQX0_cyNA7=WP5d4OB1NX4J5R+GFPgKgvW@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-To: Richard Genoud <richard.genoud@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <1300033426-22404-1-git-send-email-richard.genoud@gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-This does look a problem with the compiler.  Which compiler version?
+[PATCH] [CIFS] Elminate sparse __CHECK_ENDIAN__ warnings on port conversion
 
-As you noted, pdata is either initialized or we return rc!=3D0 and don't us=
-e it.
+Ports are __be16 not unsigned short int
 
-On Sun, Mar 13, 2011 at 11:23 AM, Richard Genoud
-<richard.genoud@gmail.com> wrote:
-> This suppress the warning, as far as there's no way pdata is
-> uninitialized, because validate_ntransact() will initialize pdata or
-> return rc !=3D 0. In this case (goto qsec_out), pdata won't be used.
->
-> Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
-> ---
-> =A0fs/cifs/cifssmb.c | =A0 =A02 +-
-> =A01 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 904aa47..efa3f8e 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -3138,7 +3138,7 @@ CIFSSMBGetCIFSACL(const int xid, struct cifsTconInf=
-o *tcon, __u16 fid,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 parm_len;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u32 acl_len;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_com_ntransact_rsp *pSMBr;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 char *pdata;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 char *pdata =3D NULL;
->
-> =A0/* validate_nttransact */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D validate_ntransact(iov[0].iov_base,=
- (char **)&parm,
-> --
-> 1.7.1
->
->
+Eliminates the remaining fixable endian warnings:
+
+~/cifs-2.6$ make modules C=1 M=fs/cifs CF=-D__CHECK_ENDIAN__
+  CHECK   fs/cifs/connect.c
+fs/cifs/connect.c:2408:23: warning: incorrect type in assignment
+(different base types)
+fs/cifs/connect.c:2408:23:    expected unsigned short *sport
+fs/cifs/connect.c:2408:23:    got restricted __be16 *<noident>
+fs/cifs/connect.c:2410:23: warning: incorrect type in assignment
+(different base types)
+fs/cifs/connect.c:2410:23:    expected unsigned short *sport
+fs/cifs/connect.c:2410:23:    got restricted __be16 *<noident>
+fs/cifs/connect.c:2416:24: warning: incorrect type in assignment
+(different base types)
+fs/cifs/connect.c:2416:24:    expected unsigned short [unsigned]
+[short] <noident>
+fs/cifs/connect.c:2416:24:    got restricted __be16 [usertype] <noident>
+fs/cifs/connect.c:2423:24: warning: incorrect type in assignment
+(different base types)
+fs/cifs/connect.c:2423:24:    expected unsigned short [unsigned]
+[short] <noident>
+fs/cifs/connect.c:2423:24:    got restricted __be16 [usertype] <noident>
+fs/cifs/connect.c:2326:23: warning: incorrect type in assignment
+(different base types)
+fs/cifs/connect.c:2326:23:    expected unsigned short [unsigned] sport
+fs/cifs/connect.c:2326:23:    got restricted __be16 [usertype] sin6_port
+fs/cifs/connect.c:2330:23: warning: incorrect type in assignment
+(different base types)
+fs/cifs/connect.c:2330:23:    expected unsigned short [unsigned] sport
+fs/cifs/connect.c:2330:23:    got restricted __be16 [usertype] sin_port
+fs/cifs/connect.c:2394:22: warning: restricted __be16 degrades to integer
+
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 63ec77c..a98cb6f 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1493,7 +1493,7 @@ srcip_matches(struct sockaddr *srcaddr, struct
+sockaddr *rhs)
+ static bool
+ match_port(struct TCP_Server_Info *server, struct sockaddr *addr)
+ {
+-	unsigned short int port, *sport;
++	__be16 port, *sport;
+
+ 	switch (addr->sa_family) {
+ 	case AF_INET:
+@@ -2315,7 +2315,7 @@ static int
+ generic_ip_connect(struct TCP_Server_Info *server)
+ {
+ 	int rc = 0;
+-	unsigned short int sport;
++	__be16 sport;
+ 	int slen, sfamily;
+ 	struct socket *socket = server->ssocket;
+ 	struct sockaddr *saddr;
+@@ -2400,7 +2400,7 @@ generic_ip_connect(struct TCP_Server_Info *server)
+ static int
+ ip_connect(struct TCP_Server_Info *server)
+ {
+-	unsigned short int *sport;
++	__be16 *sport;
+ 	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&server->dstaddr;
+ 	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
 
 
-
---=20
+-- 
 Thanks,
 
 Steve
