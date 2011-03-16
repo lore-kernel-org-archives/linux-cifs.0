@@ -1,7 +1,7 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [CIFS] Warn on requesting default security (ntlm) on mount
-Date: Wed, 16 Mar 2011 15:19:44 -0500
-Message-ID: <AANLkTi=VmBDQm_1+6j0TzOuhrd+tkydkoJOWJbKsicsb@mail.gmail.com>
+Subject: [CIFS] Initialize number of credits to one
+Date: Wed, 16 Mar 2011 15:20:24 -0500
+Message-ID: <AANLkTinox4ot1D0r4AEOVVdnBtotXa=9RDy8Ohto6s8j@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -9,51 +9,28 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Warn once if default security (ntlm) requested. We will
-update the default to the stronger security mechanism
-(ntlmv2) in 2.6.41.  Kerberos is also stronger than
-ntlm, but more servers support ntlmv2 and ntlmv2
-does not require an upcall, so ntlmv2 is a better
-default.
+Before we send the first request, SMB2 Negotiate,
+we need to initialize number of credits to its minimum
+(one).
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-CC: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-CC: Shirish Pargaonkar <shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   11 +++++++++++
- 1 files changed, 11 insertions(+), 0 deletions(-)
+ fs/cifs/connect.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4066e3e..33e11a8 100644
+index 33e11a8..c19f00a 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -1888,6 +1888,8 @@ cifs_put_smb_ses(struct cifs_ses *ses)
- 	cifs_put_tcp_session(server);
- }
+@@ -3202,6 +3202,7 @@ int cifs_negotiate_protocol(unsigned int xid,
+struct cifs_ses *ses)
 
-+static bool warned_on_ntlm;  /* globals init to false automatically */
-+
- static struct cifs_ses *
- cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
- {
-@@ -1962,6 +1964,15 @@ cifs_get_smb_ses(struct TCP_Server_Info
-*server, struct smb_vol *volume_info)
- 	}
- 	ses->cred_uid = volume_info->cred_uid;
- 	ses->linux_uid = volume_info->linux_uid;
-+
-+	/* ntlmv2 is much stronger than ntlm security, and has been broadly
-+	supported for many years, time to update default security mechanism */
-+	if ((volume_info->secFlg == 0) && warned_on_ntlm == false) {
-+		warned_on_ntlm = true;
-+		cERROR(1, "default security mechanism requested.  The default "
-+			"security mechanism will be upgraded from ntlm to "
-+			"ntlmv2 in kernel release 2.6.41");
-+	}
- 	ses->overrideSecFlg = volume_info->secFlg;
-
- 	mutex_lock(&ses->session_mutex);
+ #ifdef CONFIG_CIFS_SMB2
+ 	if (ses->server->is_smb2) {
++		atomic_set(&server->credits, 1); /* we have one credit to start with */
+ 		rc = SMB2_negotiate(xid, ses);
+ 		/* BB we probably don't need to retry with modern servers */
+ 		if (rc == -EAGAIN)
 
 -- 
 Thanks,
