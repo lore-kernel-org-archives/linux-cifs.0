@@ -1,41 +1,36 @@
-From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Subject: Re: [PATCH] wait_for_free_request needs to wait on credits returned
- by server for SMB2
-Date: Thu, 17 Mar 2011 10:36:08 -0400
-Message-ID: <20110317143608.GC3295@infradead.org>
-References: <AANLkTimsJ+vQm7XuVk2NHneRc04CeWebuG3jsLxML4sd@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] consistently use smb_buf_length as be32 for cifs
+Date: Thu, 17 Mar 2011 09:38:22 -0500
+Message-ID: <AANLkTi=PvS9vBn1fkQPt3F8gjzB4G9xTXiWXiMczxnkp@mail.gmail.com>
+References: <AANLkTimnfO=GnKC6GK6FZ+H-hfchWhW=HzcUS+HcLH+c@mail.gmail.com>
+	<20110317142925.GA3295@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <AANLkTimsJ+vQm7XuVk2NHneRc04CeWebuG3jsLxML4sd-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20110317142925.GA3295-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
->  #ifdef CONFIG_CIFS_STATS2
->  			atomic_inc(&server->num_waiters);
-> @@ -283,6 +284,20 @@ static int wait_for_free_request(struct
-> TCP_Server_Info *server,
->  			atomic_dec(&server->num_waiters);
->  #endif
->  			spin_lock(&GlobalMid_Lock);
-> +#ifdef CONFIG_CIFS_SMB2
-> +		} else if (server->is_smb2 &&
-> +			  (atomic_read(&server->credits) < 1)) {
-> +			spin_unlock(&GlobalMid_Lock);
-> +#ifdef CONFIG_CIFS_STATS2
-> +			atomic_inc(&server->num_waiters);
-> +#endif
-> +			wait_event(server->request_q,
-> +				   atomic_read(&server->credits) > 0);
-> +#ifdef CONFIG_CIFS_STATS2
-> +			atomic_dec(&server->num_waiters);
-> +#endif
-> +			spin_lock(&GlobalMid_Lock);
-> +#endif /* CONFIG_CIFS_SMB2 */
+On Thu, Mar 17, 2011 at 9:29 AM, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> =
+wrote:
+>> - =A0 =A0 pSMB->hdr.smb_buf_length +=3D count;
+>> + =A0 =A0 update_rfc1001_len(pSMB, count);
+>
+> The helper is very confusingly named relatively to the field it updat=
+es,
+> moreover we already have nice helpers to do arithmetics on big endian
+> fields. =A0These can just become:
+>
+> =A0 =A0 =A0 =A0be32_add_cpu(&pSMB->hdr.smb_buf_length, count);
 
-This ifdef mania is madness.  Please make sure to hide the stats
-and smb2 code in properly abstracted helpers that get compiled out if
-not actually used.
+ok - will change those.
+
+
+
+--=20
+Thanks,
+
+Steve
