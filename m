@@ -1,47 +1,40 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [CIFS] [PATCH] consistently use smb_buf_length as be32 for cifs
- (try 3)
-Date: Sat, 19 Mar 2011 17:17:35 -0400
-Message-ID: <20110319171735.429915b0@corrin.poochiereds.net>
-References: <AANLkTimb8H=2hzNWUK_sQ=SMKhaQLrTQzA7ABiy_E4H5@mail.gmail.com>
-	<20110317164446.GA26600@infradead.org>
-	<AANLkTikqrGxG1RgUwFGNhoyyLc8ARiVvqQ8ULio8pz4f@mail.gmail.com>
-	<20110318185154.GA8028@infradead.org>
+From: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: smatch stuff: dereferencing first then checking in SendReceive()
+Date: Sun, 20 Mar 2011 02:28:58 +0300
+Message-ID: <20110319232857.GA28096@bicker>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110318185154.GA8028-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 18 Mar 2011 14:51:54 -0400
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+Smatch complains about this, but I don't know if it's a bug or not.
 
-> On Thu, Mar 17, 2011 at 12:17:24PM -0500, Steve French wrote:
-> > If others feel strongly about this, I don't mind changing it as
-> > Christoph suggests but
-> > - to samba people, "incrementing the rfc1001 length" would be more
-> > recognizable (than opencoding the be32_add_cpu macro), and the
-> > function name was
-> > actually Jeff's suggestion which I liked.
-> 
-> I don't mind the rfc1001 length per se.  What's totally braindead about
-> this is having an absolutely trivial wrapper for incrementing a field,
-> which has a different name than the field it increments.
-> 
-> If you feel strongly about the rfc1001 length just rename the field.
-> 
+fs/cifs/transport.c +791 SendReceive(106)
+	warn: variable dereferenced before check 'midQ->resp_buf'
 
-FWIW, the MS-SMB doc calls this value the "Stream Protocol Length". It
-also mentions that this is actually a 24 bit field and the upper 8 bits
-are supposed to be zeroed out.
+   780          receive_len = be32_to_cpu(midQ->resp_buf->smb_buf_length);
+                                          ^^^^^^^^^^^^^^^^
+	dereference
+   781
+   782          if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
+   783                  cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
+   784                          receive_len, xid);
+   785                  rc = -EIO;
+   786                  goto out;
+   787          }
+   788
+   789          /* rcvd frame is ok */
+   790
+   791          if (midQ->resp_buf && out_buf
+                    ^^^^^^^^^^^^^^
+	checking for null
 
-Should this wrapper check for values that violate that? A little
-defensive coding in this area wouldn't hurt.
+   792              && (midQ->midState == MID_RESPONSE_RECEIVED)) {
+   793                  out_buf->smb_buf_length = cpu_to_be32(receive_len);
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+regards,
+dan carpenter
