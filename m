@@ -1,69 +1,66 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [CIFS] [PATCH] consistently use smb_buf_length as be32 for cifs
- (try 3)
-Date: Sat, 19 Mar 2011 22:05:43 -0500
-Message-ID: <AANLkTi==ojddc91ruaLHJvY85_tHvNe1J+YVZi7fsj8n@mail.gmail.com>
-References: <AANLkTimb8H=2hzNWUK_sQ=SMKhaQLrTQzA7ABiy_E4H5@mail.gmail.com>
-	<20110317164446.GA26600@infradead.org>
-	<AANLkTikqrGxG1RgUwFGNhoyyLc8ARiVvqQ8ULio8pz4f@mail.gmail.com>
-	<20110318185154.GA8028@infradead.org>
-	<20110319171735.429915b0@corrin.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: smatch stuff: dereferencing first then checking in SendReceive()
+Date: Sat, 19 Mar 2011 22:20:24 -0500
+Message-ID: <AANLkTikxrdGSmgvxEzTd1c9Czu3xb1UPd3x5jfdTHYjQ@mail.gmail.com>
+References: <20110319232857.GA28096@bicker>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Christoph Hellwig <hch@infradead.org>, linux-cifs@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20110319171735.429915b0@corrin.poochiereds.net>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110319232857.GA28096@bicker>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Mar 19, 2011 at 4:17 PM, Jeff Layton <jlayton@redhat.com> wrote=
-:
-> On Fri, 18 Mar 2011 14:51:54 -0400
-> Christoph Hellwig <hch@infradead.org> wrote:
+On Sat, Mar 19, 2011 at 6:28 PM, Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
+e:
+> Smatch complains about this, but I don't know if it's a bug or not.
 >
->> On Thu, Mar 17, 2011 at 12:17:24PM -0500, Steve French wrote:
->> > If others feel strongly about this, I don't mind changing it as
->> > Christoph suggests but
->> > - to samba people, "incrementing the rfc1001 length" would be more
->> > recognizable (than opencoding the be32_add_cpu macro), and the
->> > function name was
->> > actually Jeff's suggestion which I liked.
->>
->> I don't mind the rfc1001 length per se. =A0What's totally braindead =
-about
->> this is having an absolutely trivial wrapper for incrementing a fiel=
-d,
->> which has a different name than the field it increments.
->>
->> If you feel strongly about the rfc1001 length just rename the field.
->>
+> fs/cifs/transport.c +791 SendReceive(106)
+> =A0 =A0 =A0 =A0warn: variable dereferenced before check 'midQ->resp_b=
+uf'
 >
-> FWIW, the MS-SMB doc calls this value the "Stream Protocol Length". I=
-t
-> also mentions that this is actually a 24 bit field and the upper 8 bi=
-ts
-> are supposed to be zeroed out.
+> =A0 780 =A0 =A0 =A0 =A0 =A0receive_len =3D be32_to_cpu(midQ->resp_buf=
+->smb_buf_length);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0^^^^^^^^^^^^^^^^
+> =A0 =A0 =A0 =A0dereference
+> =A0 781
+> =A0 782 =A0 =A0 =A0 =A0 =A0if (receive_len > CIFSMaxBufSize + MAX_CIF=
+S_HDR_SIZE) {
+> =A0 783 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Frame too large=
+ received. =A0Length: %d =A0Xid: %d",
+> =A0 784 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0receive_le=
+n, xid);
+> =A0 785 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
+> =A0 786 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
+> =A0 787 =A0 =A0 =A0 =A0 =A0}
+> =A0 788
+> =A0 789 =A0 =A0 =A0 =A0 =A0/* rcvd frame is ok */
+> =A0 790
+> =A0 791 =A0 =A0 =A0 =A0 =A0if (midQ->resp_buf && out_buf
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0^^^^^^^^^^^^^^
+> =A0 =A0 =A0 =A0checking for null
 >
-> Should this wrapper check for values that violate that? A little
-> defensive coding in this area wouldn't hurt.
+> =A0 792 =A0 =A0 =A0 =A0 =A0 =A0 =A0&& (midQ->midState =3D=3D MID_RESP=
+ONSE_RECEIVED)) {
+> =A0 793 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0out_buf->smb_buf_length =3D=
+ cpu_to_be32(receive_len);
+>
+> regards,
+> dan carpenter
 
-I agree, defensive code wouldn't hurt here. We do actually check IIRC
-the first byte of it (which acts as an "rfc1001" command code, where
-zero is what we want for most, in cifs_demultiplex_thread).   Of the
-next 3 bytes, which serve as a length field, old servers had a small
-maximum smb size, and thus only read two bytes, eventually some
-servers allowed you to use just over 64K, and Samba has allowed more
-than that for years.
+Older kernels had the same (midQ->resp_buf =3D=3D NULL)
+check in the same place, and I don't see a way to get there with
+midQ->resp_buf =3D=3D NULL so that check on line
+791 does look redundant check.
+
+I will double check.
+
+
 
 --=20
 Thanks,
 
 Steve
---
-To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
-" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
