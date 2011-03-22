@@ -1,32 +1,63 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Samba + GSoC: SMB2 protocol improvements
-Date: Mon, 21 Mar 2011 11:38:24 -0500
-Message-ID: <AANLkTintuLeRHvCwzUEfot2WTjUDXbvZJNwdz8jDndBN@mail.gmail.com>
-References: <1775A966-65F6-40EF-90F3-AD7C089012D5@gmail.com>
-	<AANLkTimfbfSqFTbq1MZ0Nw2eOv3-nBoBQGDrDoTxNt3B@mail.gmail.com>
-	<AANLkTi=QfLwZrGG-FNj7EMnm5hLPdcxruNOA_LK+KisL@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Use invalidate_inode_pages2 instead of
+ invalidate_remote_inode (try #4)
+Date: Tue, 22 Mar 2011 07:42:33 -0400
+Message-ID: <20110322074233.546d4553@corrin.poochiereds.net>
+References: <1300229732-4902-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: =?ISO-8859-1?Q?Jos=E9_Valent=EDn_Guti=E9rrez_Boquete?=
-	<nicote-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=QfLwZrGG-FNj7EMnm5hLPdcxruNOA_LK+KisL-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1300229732-4902-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/3/21 Jos=E9 Valent=EDn Guti=E9rrez Boquete wrote:
-> Thanks, do you keep any kind of roadmap of the development of smb2
-> implementation?
+On Wed, 16 Mar 2011 01:55:32 +0300
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-No, but this reminds me that there probably should be one.  I will
-take a look at wiki.samba.org and see if it would make sense there.
-IIRC Jeff had updated some of the cifs info there but that may also be
-out of date.
+> Use invalidate_inode_pages2 that don't leave pages even if shrink_page_list()
+> has a temp ref on them. It prevents a data coherency problem when
+> cifs_invalidate_mapping didn't invalidate pages but the client thinks that a data
+> from the cache is uptodate according to an oplock level (exclusive or II).
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/inode.c |   10 ++++++++--
+>  1 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 41e5651..adb6324 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1691,12 +1691,18 @@ cifs_invalidate_mapping(struct inode *inode)
+>  
+>  	cifs_i->invalid_mapping = false;
+>  
+> -	/* write back any cached data */
+>  	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+> +		/* write back any cached data */
+>  		rc = filemap_write_and_wait(inode->i_mapping);
+>  		mapping_set_error(inode->i_mapping, rc);
+> +		rc = invalidate_inode_pages2(inode->i_mapping);
+> +		if (rc) {
+> +			cERROR(1, "%s: could not invalidate inode %p", __func__,
+> +			       inode);
+> +			cifs_i->invalid_mapping = true;
+> +		}
+>  	}
+> -	invalidate_remote_inode(inode);
+> +
+>  	cifs_fscache_reset_inode_cookie(inode);
+>  }
+>  
 
+Hi Pavel,
 
---=20
-Thanks,
+I noticed that Steve has merged this patch, but it doesn't seem like
+you ever made the change to have EBUSY percolate up to userspace. Are
+you still planning to fix that?
 
-Steve
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
