@@ -1,84 +1,140 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] sync_smb2_mid_result
-Date: Wed, 23 Mar 2011 14:43:43 -0400
-Message-ID: <20110323144343.3704be25@corrin.poochiereds.net>
-References: <AANLkTinnLUXF3O=AOYG8PrCG1guAA8vkM18wYKSLegk2@mail.gmail.com>
-	<20110323120617.0379e0a1@corrin.poochiereds.net>
-	<AANLkTinVcBpT7X7A4XKd8+rz0XJw8ms159UnsK5aH49f@mail.gmail.com>
-	<20110323135853.69b42c03@corrin.poochiereds.net>
-	<AANLkTikTYEtgQVhFpqop658tWsQ_=wQ3Be5FK27Uuxqk@mail.gmail.com>
-	<20110323140633.0927ce82@corrin.poochiereds.net>
-	<AANLkTikkbxn527XAP1oT-U6yiE6fF-1Rb=+5KNHgQLOm@mail.gmail.com>
-	<20110323143243.17abb03c@corrin.poochiereds.net>
-	<AANLkTinaCM8mRK4LQMeXPxAsyyU9VyHADyiDXVeJfA2a@mail.gmail.com>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Use invalidate_inode_pages2 instead of
+ invalidate_remote_inode (try #4)
+Date: Wed, 23 Mar 2011 23:49:19 +0300
+Message-ID: <AANLkTi=sWraw2HDcSxzGatR3jWH3tGmM2xvZKHiAduLw@mail.gmail.com>
+References: <1300229732-4902-1-git-send-email-piastry@etersoft.ru>
+	<20110322080409.23461155@corrin.poochiereds.net>
+	<AANLkTin_dHLJLpZxnmbCM=ukg7_xBi7YHg_YRaaYUmkj@mail.gmail.com>
+	<20110322111711.55365655@corrin.poochiereds.net>
+	<AANLkTikMbyg6FK7tgcb-a9kc_2r-rToA2x0AvY_KHQUw@mail.gmail.com>
+	<20110322123549.022e590e@corrin.poochiereds.net>
+	<AANLkTim=J7Y-b07HHKypfxgXL=jpgVVaZ1hn2201Amny@mail.gmail.com>
+	<AANLkTikg4WQrguR_cvvkxXZ8XomO=3ySjPzT67yO_cvk@mail.gmail.com>
+	<20110322130334.0680b9a3@corrin.poochiereds.net>
+	<AANLkTikSUaLsEk5CNfVMXqLN4z=UGOeyYoMkTGQBLf2A@mail.gmail.com>
+	<20110322134246.4b9e497e@corrin.poochiereds.net>
+	<AANLkTi=zcYODYnx1q1bzBQtt2z7w1rkRxSTNTrK4u=7d@mail.gmail.com>
+	<AANLkTimBdrWfAXZ4Ea_K33PyFN_REfNwcH7JjW71mJnh@mail.gmail.com>
+	<AANLkTikPTVfiz4FNwu-i=1pHjE92vQgUh+eJLHY6j9nW@mail.gmail.com>
+	<20110323121428.398f4d4c@corrin.poochiereds.net>
+	<AANLkTimtOTGO6YPFwuRJGcZrxRk9VwjtA4kWOB_4RKDd@mail.gmail.com>
+	<20110323135626.1fe56d84@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinaCM8mRK4LQMeXPxAsyyU9VyHADyiDXVeJfA2a-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20110323135626.1fe56d84-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 23 Mar 2011 13:38:38 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2011/3/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Wed, 23 Mar 2011 12:32:03 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Wed, Mar 23, 2011 at 11:14 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> w=
+rote:
+>> > On Wed, 23 Mar 2011 12:27:31 +0300
+>> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>> >
+>> >> 2011/3/23 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> >> > Pavel,
+>> >> > Jeff and I talked about invalidate_mapping and its uses this
+>> >> > afternoon. =A0A few comments:
+>> >> > 1) =A0 Take a look at what happens on filemap_fdatawait call in
+>> >> > invalidate_mapping to see if it makes sense to return errors th=
+rough
+>> >> > back to some of the callers of invalidate_mapping, in particula=
+r,
+>> >> > strict_fsync. =A0If we can't write out the file data (ENOSPC, o=
+r host
+>> >> > down etc.), we want to make sure that the return code gets sent=
+ back
+>> >> > on any calls that can reasonably expect such an error.
+>> >>
+>> >> vfs_fsync_range has already done filemap_fdatawait call - so, in =
+this
+>> >> case there is no need to do it again in cifs_invalidate_mapping. =
+The
+>> >> only reason for calling this is to invalidate_inode_pages2 but an=
+y
+>> >> error there shouldn't affect fsync behavior, as I think.
+>> >>
+>> >> > 2) If invalidate_inode_pages2 fails (e.g. with EBUSY, because o=
+ne of
+>> >> > the pages couldn't be freed from the mapping because it just go=
+t
+>> >> > redirtied right after we flushed it the line before) we set the
+>> >> > mapping to invalid but don't check
+>> >> > =A0 =A0cifs_i->invalid_mapping
+>> >> > in many places. =A0Should we add checks for cifs_i->invalid_map=
+ping in
+>> >> > more places?
+>> >>
+>> >> The one place where we should add such a check is read call, but =
+it
+>> >> needs cifs_revalidate_file instead (that I am going to provide ne=
+xt)
+>> >> before generic_file_aio_read. In this case cifs_revalidate will c=
+heck
+>> >> for invalid_mapping and needs to return a error if we could not
+>> >> invalidate all inode pages in cifs_invalidate_mapping (because it
+>> >> returns wrong data to the read call). But as you noticed lseek
+>> >> shouldn't think about this error and it uses cifs_revalidate_file=
+ too.
+>> >>
+>> >> So, we may add extra check for -EBUSY error code in callers of
+>> >> cifs_revalidate_{dentry,file} and cifs_invaliadate_mapping and
+>> >> separate them into two groups:
+>> >> 1) that aware about -EBUSY error code and return a error the it's=
+ caller.
+>> >> these are: cifs_d_revalidate, cifs_file_aio_read (future
+>> >> implementation), cifs_file_strict_mmap.
+>> >> 2) that doesn't aware about it and return ok in this case.
+>> >> these are: cifs_getattrs, cifs_lseek, cifs_fsync.
+>> >>
+>> >> Thoughts?
+>> >>
+>> >
+>> > The main reason I think we need to reconsider that error is that I
+>> > spent several months tracking down a rather nasty data corruption =
+bug
+>> > relating to mmap on NFS in RHEL5 a few years ago:
+>> >
+>> > =A0 =A0https://bugzilla.redhat.com/show_bug.cgi?id=3D435291
+>> >
+>> > Part of the problem there was that the NFS client ignored the retu=
+rn
+>> > code from invalidate_inode_pages2. The other part of the problem w=
+as a
+>> > lack of synchronization between mmap calls and the page fault hand=
+ler.
+>> >
+>> > Needless to say, this was not a fun problem to track down. I think=
+ you
+>> > need to be very careful about ignoring errors from
+>> > invalidate_inode_pages2 and think carefully about what a failure t=
+here
+>> > means for all cases.
+>>
+>> I agree - need to be careful, but IIRC the NFS problem would be that
+>> it has a launder_page method which is returning an error through
+>> invalidate_inode_pages2 while in the cifs case the data is forced to
+>> be written out through filemap_fdatawrite or filemap_write_and_wait.
+>>
+>
+> No. RHEL5 at that time didn't have a launder page method (it does now=
+,
+> but that's another story).
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
 
-> On Wed, Mar 23, 2011 at 1:32 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
-> > On Wed, 23 Mar 2011 13:26:19 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> On Wed, Mar 23, 2011 at 1:06 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =
-wrote:>
-> >> > Maybe you misunderstand me.
-> >> >
-> >> > The struct is *exactly the same* aside from a few small differen=
-ces. It
-> >> > doesn't even need to be a union, IMO. That would let you use a l=
-ot of
-> >> > the same code in transport.c for smb2.
-> >>
-> >> I don't mind trying to condense it to one structure, but it is not=
- that simple:
-> >> - smb2 doesn't need or sequence number, and the two transact2
-> >> multiresponse booleans
-> >> - cifs mid will grow by at least 10 bytes by expanding the mid, pi=
-d
-> >> etc. to the required minimum sizes.
-> >> - cifs mid doesn't need "async_response_received" or (that is an s=
-mb2
-> >> only feature and that or equivalent is required). =C2=A0When we ad=
-d chained
-> >> commands (common in smb2) then complex_mid or equivalent as well a=
-s
-> >> the command list, the number of the commands received and the last
-> >> response time of entries will be useless to cifs.
-> >>
-> >
-> > Is it better to add an entirely new set of functions simply because
-> > you'll have some unused fields in this structure in either case?
->=20
-> For allocating/freeing a mid I don't think it matters - it affects a
-> small number of functions, and will likely diverge more over time (as
-> smb2 is evolving with new dialects, while cifs, the protocol, is
-> static) - but I don't feel strongly about it.  I generally would
-> prefer changing the minimal amount of cifs code, but if we want to
-> move to one function for both types of mids, then I would prefer a
-> union so it is harder to accidently use the cifs specific fields in
-> smb2 and vice versa.
->=20
->=20
->=20
-
-It does matter. It's more code to maintain and you need an entirely
-different set of functions to deal with the fact that the struct is
-different. The function in $SUBJECT is a case in point. There'd be no
-need for it if this was a common struct shared between the two.
-
-Personally, my preference is for the least amount of specialized code.
-Disruption to the existing codebase needs to be carefully managed, but
-duplicating code like this ought to be a last resort.
+But what's about these two groups of calls? Are you agree with them?
 
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
