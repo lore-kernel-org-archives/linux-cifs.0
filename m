@@ -1,8 +1,8 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Subject: Re: [PATCH] CIFS: Use invalidate_inode_pages2 instead of
  invalidate_remote_inode (try #4)
-Date: Tue, 22 Mar 2011 22:34:59 -0500
-Message-ID: <AANLkTimBdrWfAXZ4Ea_K33PyFN_REfNwcH7JjW71mJnh@mail.gmail.com>
+Date: Wed, 23 Mar 2011 12:27:31 +0300
+Message-ID: <AANLkTikPTVfiz4FNwu-i=1pHjE92vQgUh+eJLHY6j9nW@mail.gmail.com>
 References: <1300229732-4902-1-git-send-email-piastry@etersoft.ru>
 	<20110322074233.546d4553@corrin.poochiereds.net>
 	<AANLkTinGszmNsqFbf5vVstXfEsf5sh+SUZiFexjgBxjY@mail.gmail.com>
@@ -17,39 +17,62 @@ References: <1300229732-4902-1-git-send-email-piastry@etersoft.ru>
 	<AANLkTikSUaLsEk5CNfVMXqLN4z=UGOeyYoMkTGQBLf2A@mail.gmail.com>
 	<20110322134246.4b9e497e@corrin.poochiereds.net>
 	<AANLkTi=zcYODYnx1q1bzBQtt2z7w1rkRxSTNTrK4u=7d@mail.gmail.com>
+	<AANLkTimBdrWfAXZ4Ea_K33PyFN_REfNwcH7JjW71mJnh@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTi=zcYODYnx1q1bzBQtt2z7w1rkRxSTNTrK4u=7d-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTimBdrWfAXZ4Ea_K33PyFN_REfNwcH7JjW71mJnh-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel,
-Jeff and I talked about invalidate_mapping and its uses this
-afternoon.  A few comments:
-1)   Take a look at what happens on filemap_fdatawait call in
-invalidate_mapping to see if it makes sense to return errors through
-back to some of the callers of invalidate_mapping, in particular,
-strict_fsync.  If we can't write out the file data (ENOSPC, or host
-down etc.), we want to make sure that the return code gets sent back
-on any calls that can reasonably expect such an error.
-2) If invalidate_inode_pages2 fails (e.g. with EBUSY, because one of
-the pages couldn't be freed from the mapping because it just got
-redirtied right after we flushed it the line before) we set the
-mapping to invalid but don't check
-    cifs_i->invalid_mapping
-in many places.  Should we add checks for cifs_i->invalid_mapping in
-more places?
-3)   The error message below in invalidate_mapping (on EBUSY) should
-be removed or changed to an cFYI:
-           cERROR(1, "%s: could not invalidate inode %p", __func__, inode);
+2011/3/23 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Pavel,
+> Jeff and I talked about invalidate_mapping and its uses this
+> afternoon. =A0A few comments:
+> 1) =A0 Take a look at what happens on filemap_fdatawait call in
+> invalidate_mapping to see if it makes sense to return errors through
+> back to some of the callers of invalidate_mapping, in particular,
+> strict_fsync. =A0If we can't write out the file data (ENOSPC, or host
+> down etc.), we want to make sure that the return code gets sent back
+> on any calls that can reasonably expect such an error.
 
+vfs_fsync_range has already done filemap_fdatawait call - so, in this
+case there is no need to do it again in cifs_invalidate_mapping. The
+only reason for calling this is to invalidate_inode_pages2 but any
+error there shouldn't affect fsync behavior, as I think.
 
+> 2) If invalidate_inode_pages2 fails (e.g. with EBUSY, because one of
+> the pages couldn't be freed from the mapping because it just got
+> redirtied right after we flushed it the line before) we set the
+> mapping to invalid but don't check
+> =A0 =A0cifs_i->invalid_mapping
+> in many places. =A0Should we add checks for cifs_i->invalid_mapping i=
+n
+> more places?
 
+The one place where we should add such a check is read call, but it
+needs cifs_revalidate_file instead (that I am going to provide next)
+before generic_file_aio_read. In this case cifs_revalidate will check
+for invalid_mapping and needs to return a error if we could not
+invalidate all inode pages in cifs_invalidate_mapping (because it
+returns wrong data to the read call). But as you noticed lseek
+shouldn't think about this error and it uses cifs_revalidate_file too.
 
--- 
-Thanks,
+So, we may add extra check for -EBUSY error code in callers of
+cifs_revalidate_{dentry,file} and cifs_invaliadate_mapping and
+separate them into two groups:
+1) that aware about -EBUSY error code and return a error the it's calle=
+r.
+these are: cifs_d_revalidate, cifs_file_aio_read (future
+implementation), cifs_file_strict_mmap.
+2) that doesn't aware about it and return ok in this case.
+these are: cifs_getattrs, cifs_lseek, cifs_fsync.
 
-Steve
+Thoughts?
+
+--=20
+Best regards,
+Pavel Shilovsky.
