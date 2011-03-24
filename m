@@ -1,122 +1,199 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Consolidate error handling for cifs_invalidate_mapping
-Date: Thu, 24 Mar 2011 14:56:50 -0500
-Message-ID: <AANLkTikg69J4rtufrdAaFUi6S6WrTzub0Tr5HKL_VrVx@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Consolidate error handling for
+ cifs_invalidate_mapping
+Date: Thu, 24 Mar 2011 17:15:36 -0400
+Message-ID: <20110324171536.36fbc94f@tlielax.poochiereds.net>
 References: <1300977587-8218-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1300977587-8218-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Mar 24, 2011 at 9:39 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
-wrote:
-> Base of approach for splitting all calls that uses cifs_invalidate_ma=
-pping
+On Thu, 24 Mar 2011 17:39:47 +0300
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+
+> Base of approach for splitting all calls that uses cifs_invalidate_mapping
 > (or cifs_revalidate_dentry, cifs_revalidate_file) into two groups:
-> 1) aware about -EBUSY error code and report it back (cifs_d_revalidat=
-e,
+> 1) aware about -EBUSY error code and report it back (cifs_d_revalidate,
 > cifs_strict_fsync, cifs_file_strict_mmap);
 > 2) don't do it (cifs_getattrs, cifs_lseek).
->
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |    8 +++++++-
+>  fs/cifs/cifsfs.h |    2 +-
+>  fs/cifs/file.c   |   18 ++++++++++++++----
+>  fs/cifs/inode.c  |   30 ++++++++++++++++++------------
+>  4 files changed, 40 insertions(+), 18 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index de49fbb..b275d76 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -634,7 +634,13 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+>  		CIFS_I(file->f_path.dentry->d_inode)->time = 0;
+>  
+>  		retval = cifs_revalidate_file(file);
+> -		if (retval < 0)
+> +		/*
+> +		 * We only need to get right file length and don't need to
+> +		 * aware about busy pages (-EBUSY error code).
+> +		 */
+> +		if (retval == -EBUSY)
+> +			retval = 0;
+> +		else if (retval < 0)
+>  			return (loff_t)retval;
+>  	}
+>  	return generic_file_llseek_unlocked(file, offset, origin);
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index bb64313..f4391ff 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -61,7 +61,7 @@ extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
+>  		       struct dentry *);
+>  extern int cifs_revalidate_file(struct file *filp);
+>  extern int cifs_revalidate_dentry(struct dentry *);
+> -extern void cifs_invalidate_mapping(struct inode *inode);
+> +extern int cifs_invalidate_mapping(struct inode *inode);
+>  extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+>  extern int cifs_setattr(struct dentry *, struct iattr *);
+>  
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index b9731c9..d99cf48 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1448,8 +1448,13 @@ int cifs_strict_fsync(struct file *file, int datasync)
+>  	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+>  		file->f_path.dentry->d_name.name, datasync);
+>  
+> -	if (!CIFS_I(inode)->clientCanCacheRead)
+> -		cifs_invalidate_mapping(inode);
+> +	if (!CIFS_I(inode)->clientCanCacheRead) {
+> +		rc = cifs_invalidate_mapping(inode);
+> +		if (rc) {
+> +			FreeXid(xid);
+> +			return rc;
+> +		}
+> +	}
+>  
+
+Hmm...this put us in danger of reporting writeback errors twice? Note
+that cifs_invalidate_mapping resets the error on the mapping if
+writeback fails. So imagine:
+
+t1: do the regular filemap_write_and_wait in vfs_fsync
+t2: another thread dirties pages on the inode
+t1: call cifs_invalidate_mapping which does filemap_write_and_wait.
+    That fails, so fsync returns an error.
+t2: now it does an fsync and the error is reported again
+
+>  	tcon = tlink_tcon(smbfile->tlink);
+>  	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+> @@ -1916,8 +1921,13 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+>  
+>  	xid = GetXid();
+>  
+> -	if (!CIFS_I(inode)->clientCanCacheRead)
+> -		cifs_invalidate_mapping(inode);
+> +	if (!CIFS_I(inode)->clientCanCacheRead) {
+> +		rc = cifs_invalidate_mapping(inode);
+> +		if (rc) {
+> +			FreeXid(xid);
+> +			return rc;
+> +		}
+> +	}
+>  
+>  	rc = generic_file_mmap(file, vma);
+>  	FreeXid(xid);
 > diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
 > index adb6324..d3abfc5 100644
 > --- a/fs/cifs/inode.c
 > +++ b/fs/cifs/inode.c
 > @@ -1683,27 +1683,25 @@ cifs_inode_needs_reval(struct inode *inode)
-> =A0/*
-> =A0* Zap the cache. Called when invalid_mapping flag is set.
-> =A0*/
+>  /*
+>   * Zap the cache. Called when invalid_mapping flag is set.
+>   */
 > -void
 > +int
-> =A0cifs_invalidate_mapping(struct inode *inode)
-> =A0{
-> - =A0 =A0 =A0 int rc;
-> + =A0 =A0 =A0 int rc =3D 0;
-> =A0 =A0 =A0 =A0struct cifsInodeInfo *cifs_i =3D CIFS_I(inode);
->
-> - =A0 =A0 =A0 cifs_i->invalid_mapping =3D false;
+>  cifs_invalidate_mapping(struct inode *inode)
+>  {
+> -	int rc;
+> +	int rc = 0;
+>  	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+>  
+> -	cifs_i->invalid_mapping = false;
 > -
-> =A0 =A0 =A0 =A0if (inode->i_mapping && inode->i_mapping->nrpages !=3D=
- 0) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* write back any cached data */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D filemap_write_and_wait(inode->i=
-_mapping);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mapping_set_error(inode->i_mapping, rc=
-);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D invalidate_inode_pages2(inode->=
-i_mapping);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: could no=
-t invalidate inode %p", __func__,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0inode);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_i->invalid_mapping=
- =3D true;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: could not =
-invalidate inode %p", __func__,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0inode);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_i->invalid_mapping =3D (rc !=3D 0)=
- ? true : false;
-> =A0 =A0 =A0 =A0}
+>  	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+>  		/* write back any cached data */
+>  		rc = filemap_write_and_wait(inode->i_mapping);
+>  		mapping_set_error(inode->i_mapping, rc);
+>  		rc = invalidate_inode_pages2(inode->i_mapping);
+> -		if (rc) {
+> -			cERROR(1, "%s: could not invalidate inode %p", __func__,
+> -			       inode);
+> -			cifs_i->invalid_mapping = true;
+> -		}
+> +		if (rc)
+> +			cFYI(1, "%s: could not invalidate inode %p", __func__,
+> +			     inode);
+> +		cifs_i->invalid_mapping = (rc != 0) ? true : false;
 
-aren't you setting invalid_mapping twice (the first one is redundant)?
+This is racy. You could end up writing back, invalidating pages, etc.
+successfully. Another thread could come along afterward and then set
+invalid_mapping = true. Then you go and set it to false, thinking that
+everything is OK.
 
+I think what you really want to do is mapping to false first, then
+reset it to true if writeback or page invalidation fails.
 
-> =A0int cifs_revalidate_file(struct file *filp)
+>  	}
+>  
+>  	cifs_fscache_reset_inode_cookie(inode);
+> +	return rc;
+>  }
+>  
+>  int cifs_revalidate_file(struct file *filp)
 > @@ -1722,7 +1720,7 @@ int cifs_revalidate_file(struct file *filp)
->
-> =A0check_inval:
-> =A0 =A0 =A0 =A0if (CIFS_I(inode)->invalid_mapping)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_invalidate_mapping(inode);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_invalidate_mapping(inode);
->
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
-> @@ -1764,7 +1762,7 @@ int cifs_revalidate_dentry(struct dentry *dentr=
-y)
->
-> =A0check_inval:
-> =A0 =A0 =A0 =A0if (CIFS_I(inode)->invalid_mapping)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_invalidate_mapping(inode);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_invalidate_mapping(inode);
->
-> =A0 =A0 =A0 =A0kfree(full_path);
-> =A0 =A0 =A0 =A0FreeXid(xid);
-> @@ -1776,7 +1774,15 @@ int cifs_getattr(struct vfsmount *mnt, struct =
-dentry *dentry,
-> =A0{
-> =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb =3D CIFS_SB(dentry->d_sb)=
-;
-> =A0 =A0 =A0 =A0struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb=
-);
-> - =A0 =A0 =A0 int err =3D cifs_revalidate_dentry(dentry);
-> + =A0 =A0 =A0 int err;
+>  
+>  check_inval:
+>  	if (CIFS_I(inode)->invalid_mapping)
+> -		cifs_invalidate_mapping(inode);
+> +		rc = cifs_invalidate_mapping(inode);
+>  
+>  	return rc;
+>  }
+> @@ -1764,7 +1762,7 @@ int cifs_revalidate_dentry(struct dentry *dentry)
+>  
+>  check_inval:
+>  	if (CIFS_I(inode)->invalid_mapping)
+> -		cifs_invalidate_mapping(inode);
+> +		rc = cifs_invalidate_mapping(inode);
+>  
+>  	kfree(full_path);
+>  	FreeXid(xid);
+> @@ -1776,7 +1774,15 @@ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+>  {
+>  	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+>  	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+> -	int err = cifs_revalidate_dentry(dentry);
+> +	int err;
 > +
-> + =A0 =A0 =A0 err =3D cifs_revalidate_dentry(dentry);
-> + =A0 =A0 =A0 /*
-> + =A0 =A0 =A0 =A0* We only need to get file attributes and don't need=
- to
-> + =A0 =A0 =A0 =A0* aware about busy pages (-EBUSY error code).
-> + =A0 =A0 =A0 =A0*/
-> + =A0 =A0 =A0 if (err =3D=3D -EBUSY)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D 0;
->
-> =A0 =A0 =A0 =A0if (!err) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0generic_fillattr(dentry->d_inode, stat=
-);
+> +	err = cifs_revalidate_dentry(dentry);
+> +	/*
+> +	 * We only need to get file attributes and don't need to
+> +	 * aware about busy pages (-EBUSY error code).
+> +	 */
+> +	if (err == -EBUSY)
+> +		err = 0;
+>  
+>  	if (!err) {
+>  		generic_fillattr(dentry->d_inode, stat);
 
-With this change couldn't we accidently return a temporary write error
-(ENOSPC for example or EACCESS) when revalidating a file - which the
-caller is not expecting (getattr should only return errors if it can't
-get the attributes)
 
---=20
-Thanks,
-
-Steve
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
