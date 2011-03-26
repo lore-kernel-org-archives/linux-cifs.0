@@ -1,60 +1,163 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: set ra_pages in backing_dev_info
-Date: Fri, 25 Mar 2011 22:03:31 -0400
-Message-ID: <20110325220331.3801a612@corrin.poochiereds.net>
-References: <1301084757-2260-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, till2.schaefer-ka8IRLAdjMFlCbFer0i7Sg@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH] CIFS: Consolidate error handling for cifs_invalidate_mapping (try #2)
+Date: Sat, 26 Mar 2011 11:14:45 +0300
+Message-ID: <1301127285-3573-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301084757-2260-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 25 Mar 2011 16:25:57 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Base of approach for splitting all calls that uses cifs_invalidate_mapping
+(or cifs_revalidate_dentry, cifs_revalidate_file) into two groups:
+1) aware about -EBUSY error code and report it back (cifs_d_revalidate,
+cifs_strict_fsync, cifs_file_strict_mmap);
+2) don't do it (cifs_getattrs, cifs_lseek).
 
-> Commit 522440ed made cifs set backing_dev_info on the mapping attached
-> to new inodes. This change caused a fairly significant read performance
-> regression, as cifs started doing page-sized reads exclusively.
-> 
-> By virtue of the fact that they're allocated as part of cifs_sb_info by
-> kzalloc, the ra_pages on cifs BDIs get set to 0, which prevents any
-> readahead. This forces the normal read codepaths to use readpage instead
-> of readpages causing a four-fold increase in the number of read calls
-> with the default rsize.
-> 
-> Fix it by setting ra_pages in the BDI to the same value as that in the
-> default_backing_dev_info.
-> 
-> Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-> Reported-and-Tested-by: Till <till2.schaefer-ka8IRLAdjMFlCbFer0i7Sg@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 1af2470..fb6a2ad 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -131,6 +131,7 @@ cifs_read_super(struct super_block *sb, void *data,
->  		kfree(cifs_sb);
->  		return rc;
->  	}
-> +	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
->  
->  #ifdef CONFIG_CIFS_DFS_UPCALL
->  	/* copy mount params to sb for use in submounts */
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsfs.c |    8 +++++++-
+ fs/cifs/cifsfs.h |    2 +-
+ fs/cifs/file.c   |   18 ++++++++++++++----
+ fs/cifs/inode.c  |   23 ++++++++++++++++-------
+ 4 files changed, 38 insertions(+), 13 deletions(-)
 
-Forgot to mention that this fixes the following kernel.org bug:
-
-    https://bugzilla.kernel.org/show_bug.cgi?id=31662
-
-...look there if you're curious about the gory details...
-
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index de49fbb..b275d76 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -634,7 +634,13 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+ 		CIFS_I(file->f_path.dentry->d_inode)->time = 0;
+ 
+ 		retval = cifs_revalidate_file(file);
+-		if (retval < 0)
++		/*
++		 * We only need to get right file length and don't need to
++		 * aware about busy pages (-EBUSY error code).
++		 */
++		if (retval == -EBUSY)
++			retval = 0;
++		else if (retval < 0)
+ 			return (loff_t)retval;
+ 	}
+ 	return generic_file_llseek_unlocked(file, offset, origin);
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index bb64313..f4391ff 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -61,7 +61,7 @@ extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
+ 		       struct dentry *);
+ extern int cifs_revalidate_file(struct file *filp);
+ extern int cifs_revalidate_dentry(struct dentry *);
+-extern void cifs_invalidate_mapping(struct inode *inode);
++extern int cifs_invalidate_mapping(struct inode *inode);
+ extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+ extern int cifs_setattr(struct dentry *, struct iattr *);
+ 
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b9731c9..d99cf48 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1448,8 +1448,13 @@ int cifs_strict_fsync(struct file *file, int datasync)
+ 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+ 		file->f_path.dentry->d_name.name, datasync);
+ 
+-	if (!CIFS_I(inode)->clientCanCacheRead)
+-		cifs_invalidate_mapping(inode);
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc) {
++			FreeXid(xid);
++			return rc;
++		}
++	}
+ 
+ 	tcon = tlink_tcon(smbfile->tlink);
+ 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+@@ -1916,8 +1921,13 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+ 
+ 	xid = GetXid();
+ 
+-	if (!CIFS_I(inode)->clientCanCacheRead)
+-		cifs_invalidate_mapping(inode);
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc) {
++			FreeXid(xid);
++			return rc;
++		}
++	}
+ 
+ 	rc = generic_file_mmap(file, vma);
+ 	FreeXid(xid);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index adb6324..749ff70 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1683,10 +1683,10 @@ cifs_inode_needs_reval(struct inode *inode)
+ /*
+  * Zap the cache. Called when invalid_mapping flag is set.
+  */
+-void
++int
+ cifs_invalidate_mapping(struct inode *inode)
+ {
+-	int rc;
++	int rc = 0;
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+ 
+ 	cifs_i->invalid_mapping = false;
+@@ -1697,13 +1697,14 @@ cifs_invalidate_mapping(struct inode *inode)
+ 		mapping_set_error(inode->i_mapping, rc);
+ 		rc = invalidate_inode_pages2(inode->i_mapping);
+ 		if (rc) {
+-			cERROR(1, "%s: could not invalidate inode %p", __func__,
+-			       inode);
++			cFYI(1, "%s: could not invalidate inode %p", __func__,
++			     inode);
+ 			cifs_i->invalid_mapping = true;
+ 		}
+ 	}
+ 
+ 	cifs_fscache_reset_inode_cookie(inode);
++	return rc;
+ }
+ 
+ int cifs_revalidate_file(struct file *filp)
+@@ -1722,7 +1723,7 @@ int cifs_revalidate_file(struct file *filp)
+ 
+ check_inval:
+ 	if (CIFS_I(inode)->invalid_mapping)
+-		cifs_invalidate_mapping(inode);
++		rc = cifs_invalidate_mapping(inode);
+ 
+ 	return rc;
+ }
+@@ -1764,7 +1765,7 @@ int cifs_revalidate_dentry(struct dentry *dentry)
+ 
+ check_inval:
+ 	if (CIFS_I(inode)->invalid_mapping)
+-		cifs_invalidate_mapping(inode);
++		rc = cifs_invalidate_mapping(inode);
+ 
+ 	kfree(full_path);
+ 	FreeXid(xid);
+@@ -1776,7 +1777,15 @@ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+-	int err = cifs_revalidate_dentry(dentry);
++	int err;
++
++	err = cifs_revalidate_dentry(dentry);
++	/*
++	 * We only need to get file attributes and don't need to
++	 * aware about busy pages (-EBUSY error code).
++	 */
++	if (err == -EBUSY)
++		err = 0;
+ 
+ 	if (!err) {
+ 		generic_fillattr(dentry->d_inode, stat);
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.1
