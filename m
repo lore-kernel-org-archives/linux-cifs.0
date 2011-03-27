@@ -1,121 +1,250 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Consolidate error handling for cifs_invalidate_mapping
- (try #2)
-Date: Sun, 27 Mar 2011 23:10:38 +0400
-Message-ID: <AANLkTi=b7k8eCRK0eT9DwDMkGFDkX0hJjPFVjx4se5=x@mail.gmail.com>
-References: <1301127285-3573-1-git-send-email-piastry@etersoft.ru>
-	<20110327064857.6fc346f0@tlielax.poochiereds.net>
-	<AANLkTimOx-P95k-Jvg_ESiYii7bd7RzWYpjxQnkvAf7k@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 3/3] cifs: don't allow mmap'ed pages to be dirtied while
+ under writeback
+Date: Sun, 27 Mar 2011 23:13:45 +0400
+Message-ID: <AANLkTin2Kzg=g+m3j66uLyaWRx6jn8j37Kg9C0zxCWhd@mail.gmail.com>
+References: <1300302931-13830-1-git-send-email-jlayton@redhat.com>
+	<1300302931-13830-3-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTimOx-P95k-Jvg_ESiYii7bd7RzWYpjxQnkvAf7k-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1300302931-13830-3-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/3/27 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> On Sun, Mar 27, 2011 at 5:48 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
->> On Sat, 26 Mar 2011 11:14:45 +0300
->> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->>
->>> Base of approach for splitting all calls that uses cifs_invalidate_=
-mapping
->>> (or cifs_revalidate_dentry, cifs_revalidate_file) into two groups:
->>> 1) aware about -EBUSY error code and report it back (cifs_d_revalid=
-ate,
->>> cifs_strict_fsync, cifs_file_strict_mmap);
->>> 2) don't do it (cifs_getattrs, cifs_lseek).
->>>
->>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->>> ---
->>> =A0fs/cifs/cifsfs.c | =A0 =A08 +++++++-
->>> =A0fs/cifs/cifsfs.h | =A0 =A02 +-
->>> =A0fs/cifs/file.c =A0 | =A0 18 ++++++++++++++----
->>> =A0fs/cifs/inode.c =A0| =A0 23 ++++++++++++++++-------
->>> =A04 files changed, 38 insertions(+), 13 deletions(-)
->>>
->>
->> -----------------[snip]---------------------
->>
->>> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
->>> index bb64313..f4391ff 100644
->>> --- a/fs/cifs/cifsfs.h
->>> +++ b/fs/cifs/cifsfs.h
->>> @@ -61,7 +61,7 @@ extern int cifs_rename(struct inode *, struct den=
-try *, struct inode *,
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct dentry *);
->>> =A0extern int cifs_revalidate_file(struct file *filp);
->>> =A0extern int cifs_revalidate_dentry(struct dentry *);
->>> -extern void cifs_invalidate_mapping(struct inode *inode);
->>> +extern int cifs_invalidate_mapping(struct inode *inode);
->>> =A0extern int cifs_getattr(struct vfsmount *, struct dentry *, stru=
-ct kstat *);
->>> =A0extern int cifs_setattr(struct dentry *, struct iattr *);
->>>
->>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->>> index b9731c9..d99cf48 100644
->>> --- a/fs/cifs/file.c
->>> +++ b/fs/cifs/file.c
->>> @@ -1448,8 +1448,13 @@ int cifs_strict_fsync(struct file *file, int=
- datasync)
->>> =A0 =A0 =A0 cFYI(1, "Sync file - name: %s datasync: 0x%x",
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 file->f_path.dentry->d_name.name, datas=
-ync);
->>>
->>> - =A0 =A0 if (!CIFS_I(inode)->clientCanCacheRead)
->>> - =A0 =A0 =A0 =A0 =A0 =A0 cifs_invalidate_mapping(inode);
->>> + =A0 =A0 if (!CIFS_I(inode)->clientCanCacheRead) {
->>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_invalidate_mapping(inode);
->>> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc) {
->>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 FreeXid(xid);
->>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
->>> + =A0 =A0 =A0 =A0 =A0 =A0 }
->>> + =A0 =A0 }
->>>
->>
->> Now that I've had some more time to think on this patch, I don't thi=
-nk
->> this is what we want at all. The problem in a nutshell is that an -E=
-BUSY
->> return makes no sense here.
->>
->> Suppose I run fsync() on a file, and everything is written out
->> successfully, but some page is redirtied in the meantime and can't b=
-e
->> invalidated. This then returns -EBUSY, but why should the task doing=
- the
->> fsync care that the pages can't be invalidated? It shouldn't, AFAICT=
-=2E
->> The thread getting the -EBUSY ought to be the one that next attempts=
- to
->> access the page.
+2011/3/16 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> If a process has a dirty page mapped into its page tables, then it ha=
+s
+> the ability to change it while the client is trying to write the data
+> out to the server. If that happens after the signature has been
+> calculated then that signature will then be wrong, and the server wil=
+l
+> likely reset the TCP connection.
 >
-> you are right. it doesn't care about EBUSY, that the filemap_fdatawri=
-te*
-> succeeds is more important. =A0 But the next thread that
-> accesses the range may need to recognize that invalid_mapping =3D tru=
-e
-> though. =A0I thought Pavel said that the strict cache read was going
-> to be changed so it frees the mapping when the mapping is marked
-> invalid
+> This patch adds a page_mkwrite handler for CIFS that simply takes the
+> page lock. Because the page lock is held over the life of writepage a=
+nd
+> writepages, this prevents the page from becoming writeable until
+> the write call has completed.
+>
+> With this, we can also remove the "sign_zero_copy" module option and
+> always inline the pages when writing.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/cifsfs.c =A0 | =A0 =A04 ---
+> =A0fs/cifs/cifsglob.h | =A0 =A01 -
+> =A0fs/cifs/file.c =A0 =A0 | =A0 62 ++++++++++++++++++++++++++--------=
+------------------
+> =A03 files changed, 31 insertions(+), 36 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index de49fbb..1af2470 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -81,10 +81,6 @@ module_param(echo_retries, ushort, 0644);
+> =A0MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giv=
+ing up and "
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "reconnec=
+ting server. Default: 5. 0 means "
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "never re=
+connect.");
+> -bool sign_zero_copy; =A0/* globals init to false automatically */
+> -module_param(sign_zero_copy, bool, 0644);
+> -MODULE_PARM_DESC(sign_zero_copy, "Don't copy pages on write with sig=
+ning "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"ena=
+bled. Default: N");
+> =A0extern mempool_t *cifs_sm_req_poolp;
+> =A0extern mempool_t *cifs_req_poolp;
+> =A0extern mempool_t *cifs_mid_poolp;
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 62b7388..39039d0 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -858,7 +858,6 @@ GLOBAL_EXTERN unsigned int CIFSMaxBufSize; =A0/* =
+max size not including hdr */
+> =A0GLOBAL_EXTERN unsigned int cifs_min_rcv; =A0 =A0/* min size of big=
+ ntwrk buf pool */
+> =A0GLOBAL_EXTERN unsigned int cifs_min_small; =A0/* min size of small=
+ buf pool */
+> =A0GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at on=
+ce to server*/
+> -GLOBAL_EXTERN bool sign_zero_copy; /* don't copy written pages with =
+signing */
+>
+> =A0/* reconnect after this many failed echo attempts */
+> =A0GLOBAL_EXTERN unsigned short echo_retries;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index b9731c9..91b3335 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -881,6 +881,9 @@ static ssize_t cifs_write(struct cifsFileInfo *op=
+en_file,
+> =A0 =A0 =A0 =A0 =A0 =A0 total_written +=3D bytes_written) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0while (rc =3D=3D -EAGAIN) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct kvec iov[2];
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int len;
+> +
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (open_file->invalid=
+Handle) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* we =
+could deadlock if we called
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 f=
+ilemap_fdatawait from here so tell
+> @@ -890,31 +893,14 @@ static ssize_t cifs_write(struct cifsFileInfo *=
+open_file,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc=
+ !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (sign_zero_copy || (=
+pTcon->ses->server &&
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ((pTcon=
+->ses->server->sec_mode &
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (SECMOD=
+E_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =3D=3D =
+0))) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct =
+kvec iov[2];
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigne=
+d int len;
+> -
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D=
+ min((size_t)cifs_sb->wsize,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 write_size - total_written);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* iov[=
+0] is reserved for smb header */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[1].=
+iov_base =3D (char *)write_data +
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 total_written;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[1].=
+iov_len =3D len;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+CIFSSMBWrite2(xid, pTcon,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 open_file->netfid, len,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 *poffset, &bytes_written,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 iov, 1, 0);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
+CIFSSMBWrite(xid, pTcon,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0open_file->netfid,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0min_t(const int, cifs_sb->wsize,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0write_size - total_written),
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0*poffset, &bytes_written,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0write_data + total_written,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0NULL, 0);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D min((size_t)cif=
+s_sb->wsize,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wri=
+te_size - total_written);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* iov[0] is reserved f=
+or smb header */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[1].iov_base =3D (ch=
+ar *)write_data + total_written;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[1].iov_len =3D len;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSSMBWrite2(xi=
+d, pTcon, open_file->netfid, len,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 *poffset, &bytes_written, iov, 1, 0);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc || (bytes_written =3D=3D 0)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (total_written)
+> @@ -1151,12 +1137,6 @@ static int cifs_writepages(struct address_spac=
+e *mapping,
+> =A0 =A0 =A0 =A0}
+>
+> =A0 =A0 =A0 =A0tcon =3D tlink_tcon(open_file->tlink);
+> - =A0 =A0 =A0 if (!sign_zero_copy && tcon->ses->server->sec_mode &
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (SECMODE_SIGN_REQUIRED =
+| SECMODE_SIGN_ENABLED)) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFileInfo_put(open_file);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(iov);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return generic_writepages(mapping, wbc)=
+;
+> - =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0cifsFileInfo_put(open_file);
+>
+> =A0 =A0 =A0 =A0xid =3D GetXid();
+> @@ -1909,6 +1889,24 @@ static ssize_t cifs_read(struct file *file, ch=
+ar *read_data, size_t read_size,
+> =A0 =A0 =A0 =A0return total_read;
+> =A0}
+>
+> +/*
+> + * If the page is mmap'ed into a process' page tables, then we need =
+to make
+> + * sure that it doesn't change while being written back.
+> + */
+> +static int
+> +cifs_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
+> +{
+> + =A0 =A0 =A0 struct page *page =3D vmf->page;
+> +
+> + =A0 =A0 =A0 lock_page(page);
+> + =A0 =A0 =A0 return VM_FAULT_LOCKED;
+> +}
+> +
+> +static struct vm_operations_struct cifs_file_vm_ops =3D {
+> + =A0 =A0 =A0 .fault =3D filemap_fault,
+> + =A0 =A0 =A0 .page_mkwrite =3D cifs_page_mkwrite,
+> +};
+> +
+> =A0int cifs_file_strict_mmap(struct file *file, struct vm_area_struct=
+ *vma)
+> =A0{
+> =A0 =A0 =A0 =A0int rc, xid;
+> @@ -1920,6 +1918,7 @@ int cifs_file_strict_mmap(struct file *file, st=
+ruct vm_area_struct *vma)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_invalidate_mapping(inode);
+>
+> =A0 =A0 =A0 =A0rc =3D generic_file_mmap(file, vma);
+> + =A0 =A0 =A0 vma->vm_ops =3D &cifs_file_vm_ops;
+
+May be we should set this only if generic_file_mmap succeed and rc =3D=3D=
+ 0?
+
+> =A0 =A0 =A0 =A0FreeXid(xid);
+> =A0 =A0 =A0 =A0return rc;
+> =A0}
+> @@ -1936,6 +1935,7 @@ int cifs_file_mmap(struct file *file, struct vm=
+_area_struct *vma)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0rc =3D generic_file_mmap(file, vma);
+> + =A0 =A0 =A0 vma->vm_ops =3D &cifs_file_vm_ops;
+> =A0 =A0 =A0 =A0FreeXid(xid);
+> =A0 =A0 =A0 =A0return rc;
+> =A0}
+> --
+> 1.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-No, I was not going to provide such a check for cifs_strict_read -
-only cifs_revalidate for future cifs_file_aio_read (non-strictcache
-mode). There is no needs to do it for strict part because if we don't
-have an oplock for reading (like in this case) we read directly from
-the server and don't use a cache.
 
-As for fsycn logic - as I understand this call - it ought to
-synchronize data between a cache and storage device. But if we can't
-free pages, we don't successfully complete this synchronization - so,
-reporting -EBUSY error here doesn't seem wrong to me (may be we should
-set -EIO error code - according to the man page). If I am mistaken,
-please, explain your points.
 
 --=20
 Best regards,
