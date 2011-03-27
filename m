@@ -1,81 +1,47 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Consolidate error handling for
- cifs_invalidate_mapping (try #2)
-Date: Sun, 27 Mar 2011 06:48:57 -0400
-Message-ID: <20110327064857.6fc346f0@tlielax.poochiereds.net>
-References: <1301127285-3573-1-git-send-email-piastry@etersoft.ru>
+Subject: Re: [PATCH] allow cifs passwords with utf8 characters
+Date: Sun, 27 Mar 2011 06:54:02 -0400
+Message-ID: <20110327065402.4fa5685e@tlielax.poochiereds.net>
+References: <20110327070144.GA3772@osk.mine.nu>
+	<20110327075438.GA7174@osk.mine.nu>
+	<20110327081834.GA22851@osk.mine.nu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301127285-3573-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <20110327081834.GA22851-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 26 Mar 2011 11:14:45 +0300
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Sun, 27 Mar 2011 10:18:35 +0200
+Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org> wrote:
 
-> Base of approach for splitting all calls that uses cifs_invalidate_mapping
-> (or cifs_revalidate_dentry, cifs_revalidate_file) into two groups:
-> 1) aware about -EBUSY error code and report it back (cifs_d_revalidate,
-> cifs_strict_fsync, cifs_file_strict_mmap);
-> 2) don't do it (cifs_getattrs, cifs_lseek).
+> On Sunday, March 27, 2011 at 09:38, Oskar Liljeblad wrote:
+> > > I noticed that I could not mount cifs shares when the password contained
+> > > utf8-encoded latin1 characters. [..]
+> > [..]
+> > > +		len = utf8s_to_ucs2(passwd, 128, (wchar_t *) wpwd);
+> > 
+> > Looking at the code again, I wonder if not cifs_strtoUCS in cifs_unicode.c
+> > should've been used instead?
 > 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c |    8 +++++++-
->  fs/cifs/cifsfs.h |    2 +-
->  fs/cifs/file.c   |   18 ++++++++++++++----
->  fs/cifs/inode.c  |   23 ++++++++++++++++-------
->  4 files changed, 38 insertions(+), 13 deletions(-)
+> Here is a tested patch that uses cifs_strtoUCS rather than utf8s_to_ucs2.
 > 
+> Regards,
+> 
+> Oskar
 
------------------[snip]---------------------
+Looks good overall. I especially like the fact that we're removing
+those broken unicode conversion routines. You should however resend
+this patch with a proper description and "Signed-off-by:" line. Also,
+be sure to run it through scripts/checkpatch.pl and fix anything it
+complains about.
 
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index bb64313..f4391ff 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -61,7 +61,7 @@ extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
->  		       struct dentry *);
->  extern int cifs_revalidate_file(struct file *filp);
->  extern int cifs_revalidate_dentry(struct dentry *);
-> -extern void cifs_invalidate_mapping(struct inode *inode);
-> +extern int cifs_invalidate_mapping(struct inode *inode);
->  extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
->  extern int cifs_setattr(struct dentry *, struct iattr *);
->  
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index b9731c9..d99cf48 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1448,8 +1448,13 @@ int cifs_strict_fsync(struct file *file, int datasync)
->  	cFYI(1, "Sync file - name: %s datasync: 0x%x",
->  		file->f_path.dentry->d_name.name, datasync);
->  
-> -	if (!CIFS_I(inode)->clientCanCacheRead)
-> -		cifs_invalidate_mapping(inode);
-> +	if (!CIFS_I(inode)->clientCanCacheRead) {
-> +		rc = cifs_invalidate_mapping(inode);
-> +		if (rc) {
-> +			FreeXid(xid);
-> +			return rc;
-> +		}
-> +	}
->  
-
-Now that I've had some more time to think on this patch, I don't think
-this is what we want at all. The problem in a nutshell is that an -EBUSY
-return makes no sense here.
-
-Suppose I run fsync() on a file, and everything is written out
-successfully, but some page is redirtied in the meantime and can't be
-invalidated. This then returns -EBUSY, but why should the task doing the
-fsync care that the pages can't be invalidated? It shouldn't, AFAICT.
-The thread getting the -EBUSY ought to be the one that next attempts to
-access the page.
+All that said, this is not an area of the code that I know very well.
+Shirish probably ought to review this... cc'ing him.
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
