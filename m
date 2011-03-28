@@ -1,64 +1,171 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Consolidate error handling for cifs_invalidate_mapping
- (try #2)
-Date: Mon, 28 Mar 2011 16:22:36 +0400
-Message-ID: <AANLkTimWWuxYPHd7-heAdq_iMnN=eiVO8uuz4wT1d9kQ@mail.gmail.com>
-References: <1301127285-3573-1-git-send-email-piastry@etersoft.ru>
-	<20110327064857.6fc346f0@tlielax.poochiereds.net>
-	<AANLkTimOx-P95k-Jvg_ESiYii7bd7RzWYpjxQnkvAf7k@mail.gmail.com>
-	<AANLkTi=b7k8eCRK0eT9DwDMkGFDkX0hJjPFVjx4se5=x@mail.gmail.com>
-	<AANLkTikX82d36rS99JHyuG6yH0d_qki-Ak0dxuwQ6-x5@mail.gmail.com>
-	<4D901AB6.4090504@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH] CIFS: Consolidate error handling for cifs_invalidate_mapping (try #3)
+Date: Mon, 28 Mar 2011 22:15:53 +0400
+Message-ID: <1301336153-10193-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4D901AB6.4090504-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/3/28 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
-> On 03/28/2011 02:12 AM, Steve French wrote:
->>
->> On Sun, Mar 27, 2011 at 2:10 PM, Pavel Shilovsky<piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org=
->
->> =A0wrote:
->>>
->>> 2011/3/27 Steve French<smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->>> As for fsycn logic - as I understand this call - it ought to
->>> synchronize data between a cache and storage device. But if we can'=
-t
->>> free pages, we don't successfully complete this synchronization - s=
-o,
->>> reporting -EBUSY error here doesn't seem wrong to me (may be we sho=
-uld
->>> set -EIO error code - according to the man page). If I am mistaken,
->>> please, explain your points.
->>
->> To me synchronizing means that all data was written to the
->> server that was dirty at the time of the call.
->
-> Yes, I too think that fsync should make sure that pages that were dir=
-ty
-> (when fsync started) should be synched to stable storage and need not=
- worry
-> about the pages that were redirtied after the fsync call.
->
->
-> --
-> Suresh Jayaraman
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+Base of approach for splitting all calls that uses cifs_invalidate_mapping
+(or cifs_revalidate_dentry, cifs_revalidate_file) into two groups:
+1) aware about -EBUSY error code and report it back (cifs_d_revalidate,
+cifs_file_strict_mmap);
+2) don't do it (cifs_getattrs, cifs_strict_fsync, cifs_lseek).
 
-Ok, I will respin this patch.
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsfs.c |    8 +++++++-
+ fs/cifs/cifsfs.h |    2 +-
+ fs/cifs/file.c   |   24 ++++++++++++++++++++----
+ fs/cifs/inode.c  |   23 ++++++++++++++++-------
+ 4 files changed, 44 insertions(+), 13 deletions(-)
 
---=20
-Best regards,
-Pavel Shilovsky.
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index de49fbb..b76d992 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -634,7 +634,13 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+ 		CIFS_I(file->f_path.dentry->d_inode)->time = 0;
+ 
+ 		retval = cifs_revalidate_file(file);
+-		if (retval < 0)
++		/*
++		 * We only need to get right file length and should not aware
++		 * about busy pages (-EBUSY error code).
++		 */
++		if (retval == -EBUSY)
++			retval = 0;
++		else if (retval < 0)
+ 			return (loff_t)retval;
+ 	}
+ 	return generic_file_llseek_unlocked(file, offset, origin);
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index bb64313..f4391ff 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -61,7 +61,7 @@ extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
+ 		       struct dentry *);
+ extern int cifs_revalidate_file(struct file *filp);
+ extern int cifs_revalidate_dentry(struct dentry *);
+-extern void cifs_invalidate_mapping(struct inode *inode);
++extern int cifs_invalidate_mapping(struct inode *inode);
+ extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+ extern int cifs_setattr(struct dentry *, struct iattr *);
+ 
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b9731c9..329081f 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1448,8 +1448,19 @@ int cifs_strict_fsync(struct file *file, int datasync)
+ 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+ 		file->f_path.dentry->d_name.name, datasync);
+ 
+-	if (!CIFS_I(inode)->clientCanCacheRead)
+-		cifs_invalidate_mapping(inode);
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		rc = cifs_invalidate_mapping(inode);
++		/*
++		 * We only need to flush all dirty pages and should not aware
++		 * if some of them are busy (-EBUSY error code).
++		 */
++		if (rc == -EBUSY)
++			rc = 0;
++		if (rc) {
++			FreeXid(xid);
++			return rc;
++		}
++	}
+ 
+ 	tcon = tlink_tcon(smbfile->tlink);
+ 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+@@ -1916,8 +1927,13 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+ 
+ 	xid = GetXid();
+ 
+-	if (!CIFS_I(inode)->clientCanCacheRead)
+-		cifs_invalidate_mapping(inode);
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc) {
++			FreeXid(xid);
++			return rc;
++		}
++	}
+ 
+ 	rc = generic_file_mmap(file, vma);
+ 	FreeXid(xid);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index adb6324..7b3a078 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1683,10 +1683,10 @@ cifs_inode_needs_reval(struct inode *inode)
+ /*
+  * Zap the cache. Called when invalid_mapping flag is set.
+  */
+-void
++int
+ cifs_invalidate_mapping(struct inode *inode)
+ {
+-	int rc;
++	int rc = 0;
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+ 
+ 	cifs_i->invalid_mapping = false;
+@@ -1697,13 +1697,14 @@ cifs_invalidate_mapping(struct inode *inode)
+ 		mapping_set_error(inode->i_mapping, rc);
+ 		rc = invalidate_inode_pages2(inode->i_mapping);
+ 		if (rc) {
+-			cERROR(1, "%s: could not invalidate inode %p", __func__,
+-			       inode);
++			cFYI(1, "%s: could not invalidate inode %p", __func__,
++			     inode);
+ 			cifs_i->invalid_mapping = true;
+ 		}
+ 	}
+ 
+ 	cifs_fscache_reset_inode_cookie(inode);
++	return rc;
+ }
+ 
+ int cifs_revalidate_file(struct file *filp)
+@@ -1722,7 +1723,7 @@ int cifs_revalidate_file(struct file *filp)
+ 
+ check_inval:
+ 	if (CIFS_I(inode)->invalid_mapping)
+-		cifs_invalidate_mapping(inode);
++		rc = cifs_invalidate_mapping(inode);
+ 
+ 	return rc;
+ }
+@@ -1764,7 +1765,7 @@ int cifs_revalidate_dentry(struct dentry *dentry)
+ 
+ check_inval:
+ 	if (CIFS_I(inode)->invalid_mapping)
+-		cifs_invalidate_mapping(inode);
++		rc = cifs_invalidate_mapping(inode);
+ 
+ 	kfree(full_path);
+ 	FreeXid(xid);
+@@ -1776,7 +1777,15 @@ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+-	int err = cifs_revalidate_dentry(dentry);
++	int err;
++
++	err = cifs_revalidate_dentry(dentry);
++	/*
++	 * We only need to get inode attributes and should not aware about busy
++	 * pages (-EBUSY error code).
++	 */
++	if (err == -EBUSY)
++		err = 0;
+ 
+ 	if (!err) {
+ 		generic_fillattr(dentry->d_inode, stat);
+-- 
+1.7.1
