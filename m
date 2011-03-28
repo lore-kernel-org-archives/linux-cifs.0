@@ -1,139 +1,172 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: smb2 and shared superblock model
-Date: Mon, 28 Mar 2011 14:15:43 -0500
-Message-ID: <AANLkTi=nX4ZwgLY4tGgtmdxQv9s82u-PT_7GHU48fD26@mail.gmail.com>
-References: <AANLkTikvUqYG5GnOkYnrb67B1PJa7yrhzHiWT8+KxEPO@mail.gmail.com>
-	<20110326140638.77580be3@corrin.poochiereds.net>
-	<AANLkTinO885tqF2No3gb4mZA9j3n6+L_yKhNf9UNZdg0@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: don't allow mmap'ed pages to be dirtied while under writeback (try #2)
+Date: Mon, 28 Mar 2011 16:09:09 -0400
+Message-ID: <1301342949-25330-1-git-send-email-jlayton@redhat.com>
+References: <AANLkTin2Kzg=g+m3j66uLyaWRx6jn8j37Kg9C0zxCWhd@mail.gmail.com>
+Cc: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTinO885tqF2No3gb4mZA9j3n6+L_yKhNf9UNZdg0-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <AANLkTin2Kzg=g+m3j66uLyaWRx6jn8j37Kg9C0zxCWhd-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Mar 28, 2011 at 1:50 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =
-wrote:
-> 2011/3/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> On Sat, 26 Mar 2011 16:12:03 +0300
->> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>
->>> Hi!
->>>
->>> Today I investigated a bit about how to insert sharedblock model in=
-to
->>> cifs and get it work correctly with smb2.1 leases. Now we have the
->>> following archtecture:
->>> inode -> superblock -> tlink -> tcon -> sess -> srv - so we can
->>> definitely say what ses id and tree id we should use for a requeste=
-d
->>> inode. It's from the one hand.
->>>
->>> From another hand, we should share cached data between several
->>> sessions from the same client (according to SMB2 spec we should hav=
-e
->>> one global file table). And everything is good if we will share
->>> superblock between several mounts that uses the same sess id and tc=
-on
->>> id. But if these are different sessions that's brings a problem. A
->>> superblock is linked to only one tcon id and sess id but we need to
->>> share it between completely different sessions. So, it seems to me
->>> that according to nowadays situation we can't share the same data
->>> between different sessions.
->>>
->>> So, now I suggest to share a superblock only between different moun=
-ts
->>> of the same sess id and tcon id. And every time we negotiate a
->>> different session (e.x. from another username) we should change
->>> ClientGUID. It causes the server to think that these are different
->>> clients and it won't grant leases on parallel opens from these
->>> sessions. So, in this case we solve data coherency problem but, of
->>> course, miss some advantages of SMB2 protocol.
->>>
->>> Your comments/thoughts?
->>>
->>
->> That's not quite correct...
->>
->> A superblock can point to more than one tcon in the multiuser mount
->> case. That's the whole reason for the tlink structure in the first
->> place.
->>
->> The reason for a shared superblock is that you intend to mount the
->> exact same data in multiple places and don't intend to bind mount. W=
-ith
->> NFS for instance, consider the case where you do something like this=
-:
->>
->> =A0 =A0# mount server:/export /mount1
->> =A0 =A0# mount server:/export/subdir /mount2
->>
->> Suppose then that you access these files:
->>
->> =A0 =A0/mount1/subdir/file1
->> =A0 =A0/mount2/file1
->>
->> Traditionally, that would give you two different inodes connected to
->> two different superblocks. Cache consistency can easily be off, you =
-end
->> up with duplicate data in cache, and dealing with fscache is
->> problematic since you can end up with collisions in the cache.
->>
->> To fix that (mostly for the fscache problem), David Howells converte=
-d
->> NFS so that it would share superblocks in this situation. The two
->> vfsmounts point to the same superblock, but the root dentry is diffe=
-rent
->> for each.
->>
->> So...what does this mean for CIFS? We already look for an existing
->> server, session and tcon when we mount. To do this for CIFS you woul=
-d
->> simply need to go a step farther and look for an existing superblock
->> that matches your needs and deal with setting up the root dentry
->> correctly.
->>
->> I urge you to have a look at what NFS does in this case. It's
->> non-trivial but that is probably the best model for doing this in CI=
-=46S.
->>
->> Here's the catch though...you now have to deal with all of the CIFS
->> mount options and decide which settings mean that you need to create=
- a
->> new superblock instead of using an existing one on a new mount.
->>
->> --
->> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>
->
-> So, I suggest to do the following - before we get a superblock we
-> should figure out what structures we can share:
-> 1) try to share tcp_sesion;
-> 2) if succeed - try to share smb_session;
-> 3) if succeed - try to share tcon;
-> 4) if succeed - share a sb which tcon points to.
->
-> So, in this case there is no need to use sget call with 'compare' and
-> 'set' callbacks like NFS does it, I think.
->
-> As for multiuser mode - It won't bring complexity because in this cas=
-e
-> we don't touch its code.
+If a process has a dirty page mapped into its page tables, then it has
+the ability to change it while the client is trying to write the data
+out to the server. If that happens after the signature has been
+calculated then that signature will then be wrong, and the server will
+likely reset the TCP connection.
 
-At a high level, your description above makes sense, but the
-details can get tricky.  In practice some differences
-in mount options etc. are not "disqualifying" when trying to
-share a superblock or tcon but it we have to consider
-the options one by one.
+This patch adds a page_mkwrite handler for CIFS that simply takes the
+page lock. Because the page lock is held over the life of writepage and
+writepages, this prevents the page from becoming writeable until
+the write call has completed.
 
+With this, we can also remove the "sign_zero_copy" module option and
+always inline the pages when writing.
 
---=20
-Thanks,
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |    4 ---
+ fs/cifs/cifsglob.h |    1 -
+ fs/cifs/file.c     |   64 ++++++++++++++++++++++++++-------------------------
+ 3 files changed, 33 insertions(+), 36 deletions(-)
 
-Steve
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index de49fbb..1af2470 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -81,10 +81,6 @@ module_param(echo_retries, ushort, 0644);
+ MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
+ 			       "reconnecting server. Default: 5. 0 means "
+ 			       "never reconnect.");
+-bool sign_zero_copy;  /* globals init to false automatically */
+-module_param(sign_zero_copy, bool, 0644);
+-MODULE_PARM_DESC(sign_zero_copy, "Don't copy pages on write with signing "
+-				 "enabled. Default: N");
+ extern mempool_t *cifs_sm_req_poolp;
+ extern mempool_t *cifs_req_poolp;
+ extern mempool_t *cifs_mid_poolp;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 2c52c14..ccbac61 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -907,7 +907,6 @@ GLOBAL_EXTERN unsigned int CIFSMaxBufSize;  /* max size not including hdr */
+ GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
+ GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
+ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
+-GLOBAL_EXTERN bool sign_zero_copy; /* don't copy written pages with signing */
+ 
+ /* reconnect after this many failed echo attempts */
+ GLOBAL_EXTERN unsigned short echo_retries;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b9731c9..da53246 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -881,6 +881,9 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
+ 	     total_written += bytes_written) {
+ 		rc = -EAGAIN;
+ 		while (rc == -EAGAIN) {
++			struct kvec iov[2];
++			unsigned int len;
++
+ 			if (open_file->invalidHandle) {
+ 				/* we could deadlock if we called
+ 				   filemap_fdatawait from here so tell
+@@ -890,31 +893,14 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
+ 				if (rc != 0)
+ 					break;
+ 			}
+-			if (sign_zero_copy || (pTcon->ses->server &&
+-				((pTcon->ses->server->sec_mode &
+-				(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+-				== 0))) {
+-				struct kvec iov[2];
+-				unsigned int len;
+-
+-				len = min((size_t)cifs_sb->wsize,
+-					  write_size - total_written);
+-				/* iov[0] is reserved for smb header */
+-				iov[1].iov_base = (char *)write_data +
+-						  total_written;
+-				iov[1].iov_len = len;
+-				rc = CIFSSMBWrite2(xid, pTcon,
+-						open_file->netfid, len,
+-						*poffset, &bytes_written,
+-						iov, 1, 0);
+-			} else
+-				rc = CIFSSMBWrite(xid, pTcon,
+-					 open_file->netfid,
+-					 min_t(const int, cifs_sb->wsize,
+-					       write_size - total_written),
+-					 *poffset, &bytes_written,
+-					 write_data + total_written,
+-					 NULL, 0);
++
++			len = min((size_t)cifs_sb->wsize,
++				  write_size - total_written);
++			/* iov[0] is reserved for smb header */
++			iov[1].iov_base = (char *)write_data + total_written;
++			iov[1].iov_len = len;
++			rc = CIFSSMBWrite2(xid, pTcon, open_file->netfid, len,
++					*poffset, &bytes_written, iov, 1, 0);
+ 		}
+ 		if (rc || (bytes_written == 0)) {
+ 			if (total_written)
+@@ -1151,12 +1137,6 @@ static int cifs_writepages(struct address_space *mapping,
+ 	}
+ 
+ 	tcon = tlink_tcon(open_file->tlink);
+-	if (!sign_zero_copy && tcon->ses->server->sec_mode &
+-			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+-		cifsFileInfo_put(open_file);
+-		kfree(iov);
+-		return generic_writepages(mapping, wbc);
+-	}
+ 	cifsFileInfo_put(open_file);
+ 
+ 	xid = GetXid();
+@@ -1909,6 +1889,24 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	return total_read;
+ }
+ 
++/*
++ * If the page is mmap'ed into a process' page tables, then we need to make
++ * sure that it doesn't change while being written back.
++ */
++static int
++cifs_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
++{
++	struct page *page = vmf->page;
++
++	lock_page(page);
++	return VM_FAULT_LOCKED;
++}
++
++static struct vm_operations_struct cifs_file_vm_ops = {
++	.fault = filemap_fault,
++	.page_mkwrite = cifs_page_mkwrite,
++};
++
+ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+ {
+ 	int rc, xid;
+@@ -1920,6 +1918,8 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+ 		cifs_invalidate_mapping(inode);
+ 
+ 	rc = generic_file_mmap(file, vma);
++	if (rc == 0)
++		vma->vm_ops = &cifs_file_vm_ops;
+ 	FreeXid(xid);
+ 	return rc;
+ }
+@@ -1936,6 +1936,8 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
+ 		return rc;
+ 	}
+ 	rc = generic_file_mmap(file, vma);
++	if (rc == 0)
++		vma->vm_ops = &cifs_file_vm_ops;
+ 	FreeXid(xid);
+ 	return rc;
+ }
+-- 
+1.7.4
