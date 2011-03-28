@@ -1,45 +1,64 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 3/3] cifs: don't allow mmap'ed pages to be dirtied while
- under writeback
-Date: Mon, 28 Mar 2011 07:20:32 -0400
-Message-ID: <20110328072032.5864d3e2@tlielax.poochiereds.net>
-References: <1300302931-13830-1-git-send-email-jlayton@redhat.com>
-	<1300302931-13830-3-git-send-email-jlayton@redhat.com>
-	<AANLkTin2Kzg=g+m3j66uLyaWRx6jn8j37Kg9C0zxCWhd@mail.gmail.com>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Consolidate error handling for cifs_invalidate_mapping
+ (try #2)
+Date: Mon, 28 Mar 2011 16:22:36 +0400
+Message-ID: <AANLkTimWWuxYPHd7-heAdq_iMnN=eiVO8uuz4wT1d9kQ@mail.gmail.com>
+References: <1301127285-3573-1-git-send-email-piastry@etersoft.ru>
+	<20110327064857.6fc346f0@tlielax.poochiereds.net>
+	<AANLkTimOx-P95k-Jvg_ESiYii7bd7RzWYpjxQnkvAf7k@mail.gmail.com>
+	<AANLkTi=b7k8eCRK0eT9DwDMkGFDkX0hJjPFVjx4se5=x@mail.gmail.com>
+	<AANLkTikX82d36rS99JHyuG6yH0d_qki-Ak0dxuwQ6-x5@mail.gmail.com>
+	<4D901AB6.4090504@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <AANLkTin2Kzg=g+m3j66uLyaWRx6jn8j37Kg9C0zxCWhd-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <4D901AB6.4090504-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 27 Mar 2011 23:13:45 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2011/3/28 Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>:
+> On 03/28/2011 02:12 AM, Steve French wrote:
+>>
+>> On Sun, Mar 27, 2011 at 2:10 PM, Pavel Shilovsky<piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org=
+>
+>> =A0wrote:
+>>>
+>>> 2011/3/27 Steve French<smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>>> As for fsycn logic - as I understand this call - it ought to
+>>> synchronize data between a cache and storage device. But if we can'=
+t
+>>> free pages, we don't successfully complete this synchronization - s=
+o,
+>>> reporting -EBUSY error here doesn't seem wrong to me (may be we sho=
+uld
+>>> set -EIO error code - according to the man page). If I am mistaken,
+>>> please, explain your points.
+>>
+>> To me synchronizing means that all data was written to the
+>> server that was dirty at the time of the call.
+>
+> Yes, I too think that fsync should make sure that pages that were dir=
+ty
+> (when fsync started) should be synched to stable storage and need not=
+ worry
+> about the pages that were redirtied after the fsync call.
+>
+>
+> --
+> Suresh Jayaraman
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
-
-> > =C2=A0int cifs_file_strict_mmap(struct file *file, struct vm_area_s=
-truct *vma)
-> > =C2=A0{
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0int rc, xid;
-> > @@ -1920,6 +1918,7 @@ int cifs_file_strict_mmap(struct file *file, =
-struct vm_area_struct *vma)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cifs_invalid=
-ate_mapping(inode);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D generic_file_mmap(file, vma);
-> > + =C2=A0 =C2=A0 =C2=A0 vma->vm_ops =3D &cifs_file_vm_ops;
->=20
-> May be we should set this only if generic_file_mmap succeed and rc =3D=
-=3D 0?
->=20
-
-I don't think it really matters but you're probably right that it won't
-hurt to do so. All of the existing callers of generic_file_mmap that
-set the vm_ops don't do it unless generic_file_mmap succeeds. I'll
-respin it...
+Ok, I will respin this patch.
 
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
