@@ -1,186 +1,258 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: don't allow mmap'ed pages to be dirtied while
- under writeback (try #2)
-Date: Mon, 28 Mar 2011 16:15:44 -0400
-Message-ID: <20110328161544.1d2c9f04@tlielax.poochiereds.net>
-References: <AANLkTin2Kzg=g+m3j66uLyaWRx6jn8j37Kg9C0zxCWhd@mail.gmail.com>
-	<1301342949-25330-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/1] cifs: Add idmap key and related data structures and functions (try #11)
+Date: Mon, 28 Mar 2011 15:24:51 -0500
+Message-ID: <1301343891-28508-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301342949-25330-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 28 Mar 2011 16:09:09 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-
-> If a process has a dirty page mapped into its page tables, then it has
-> the ability to change it while the client is trying to write the data
-> out to the server. If that happens after the signature has been
-> calculated then that signature will then be wrong, and the server will
-> likely reset the TCP connection.
-> 
-> This patch adds a page_mkwrite handler for CIFS that simply takes the
-> page lock. Because the page lock is held over the life of writepage and
-> writepages, this prevents the page from becoming writeable until
-> the write call has completed.
-> 
-> With this, we can also remove the "sign_zero_copy" module option and
-> always inline the pages when writing.
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c   |    4 ---
->  fs/cifs/cifsglob.h |    1 -
->  fs/cifs/file.c     |   64 ++++++++++++++++++++++++++-------------------------
->  3 files changed, 33 insertions(+), 36 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index de49fbb..1af2470 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -81,10 +81,6 @@ module_param(echo_retries, ushort, 0644);
->  MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
->  			       "reconnecting server. Default: 5. 0 means "
->  			       "never reconnect.");
-> -bool sign_zero_copy;  /* globals init to false automatically */
-> -module_param(sign_zero_copy, bool, 0644);
-> -MODULE_PARM_DESC(sign_zero_copy, "Don't copy pages on write with signing "
-> -				 "enabled. Default: N");
->  extern mempool_t *cifs_sm_req_poolp;
->  extern mempool_t *cifs_req_poolp;
->  extern mempool_t *cifs_mid_poolp;
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 2c52c14..ccbac61 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -907,7 +907,6 @@ GLOBAL_EXTERN unsigned int CIFSMaxBufSize;  /* max size not including hdr */
->  GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
->  GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
->  GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
-> -GLOBAL_EXTERN bool sign_zero_copy; /* don't copy written pages with signing */
->  
->  /* reconnect after this many failed echo attempts */
->  GLOBAL_EXTERN unsigned short echo_retries;
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index b9731c9..da53246 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -881,6 +881,9 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
->  	     total_written += bytes_written) {
->  		rc = -EAGAIN;
->  		while (rc == -EAGAIN) {
-> +			struct kvec iov[2];
-> +			unsigned int len;
-> +
->  			if (open_file->invalidHandle) {
->  				/* we could deadlock if we called
->  				   filemap_fdatawait from here so tell
-> @@ -890,31 +893,14 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
->  				if (rc != 0)
->  					break;
->  			}
-> -			if (sign_zero_copy || (pTcon->ses->server &&
-> -				((pTcon->ses->server->sec_mode &
-> -				(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-> -				== 0))) {
-> -				struct kvec iov[2];
-> -				unsigned int len;
-> -
-> -				len = min((size_t)cifs_sb->wsize,
-> -					  write_size - total_written);
-> -				/* iov[0] is reserved for smb header */
-> -				iov[1].iov_base = (char *)write_data +
-> -						  total_written;
-> -				iov[1].iov_len = len;
-> -				rc = CIFSSMBWrite2(xid, pTcon,
-> -						open_file->netfid, len,
-> -						*poffset, &bytes_written,
-> -						iov, 1, 0);
-> -			} else
-> -				rc = CIFSSMBWrite(xid, pTcon,
-> -					 open_file->netfid,
-> -					 min_t(const int, cifs_sb->wsize,
-> -					       write_size - total_written),
-> -					 *poffset, &bytes_written,
-> -					 write_data + total_written,
-> -					 NULL, 0);
-> +
-> +			len = min((size_t)cifs_sb->wsize,
-> +				  write_size - total_written);
-> +			/* iov[0] is reserved for smb header */
-> +			iov[1].iov_base = (char *)write_data + total_written;
-> +			iov[1].iov_len = len;
-> +			rc = CIFSSMBWrite2(xid, pTcon, open_file->netfid, len,
-> +					*poffset, &bytes_written, iov, 1, 0);
->  		}
->  		if (rc || (bytes_written == 0)) {
->  			if (total_written)
-> @@ -1151,12 +1137,6 @@ static int cifs_writepages(struct address_space *mapping,
->  	}
->  
->  	tcon = tlink_tcon(open_file->tlink);
-> -	if (!sign_zero_copy && tcon->ses->server->sec_mode &
-> -			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
-> -		cifsFileInfo_put(open_file);
-> -		kfree(iov);
-> -		return generic_writepages(mapping, wbc);
-> -	}
->  	cifsFileInfo_put(open_file);
->  
->  	xid = GetXid();
-> @@ -1909,6 +1889,24 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
->  	return total_read;
->  }
->  
-> +/*
-> + * If the page is mmap'ed into a process' page tables, then we need to make
-> + * sure that it doesn't change while being written back.
-> + */
-> +static int
-> +cifs_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
-> +{
-> +	struct page *page = vmf->page;
-> +
-> +	lock_page(page);
-> +	return VM_FAULT_LOCKED;
-> +}
-> +
-> +static struct vm_operations_struct cifs_file_vm_ops = {
-> +	.fault = filemap_fault,
-> +	.page_mkwrite = cifs_page_mkwrite,
-> +};
-> +
->  int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
->  {
->  	int rc, xid;
-> @@ -1920,6 +1918,8 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
->  		cifs_invalidate_mapping(inode);
->  
->  	rc = generic_file_mmap(file, vma);
-> +	if (rc == 0)
-> +		vma->vm_ops = &cifs_file_vm_ops;
->  	FreeXid(xid);
->  	return rc;
->  }
-> @@ -1936,6 +1936,8 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
->  		return rc;
->  	}
->  	rc = generic_file_mmap(file, vma);
-> +	if (rc == 0)
-> +		vma->vm_ops = &cifs_file_vm_ops;
->  	FreeXid(xid);
->  	return rc;
->  }
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
-Sorry that I didn't make it clear in the patch description. The only
-difference between this patch and the previous one is the check for rc
-== 0 before setting the vm_ops.
+Define (global) data structures to store ids, uids and gids, to which a
+SID maps.  There are two separate trees, one for SID/uid and another one
+for SID/gid.
 
+A new type of key, cifs_idmap_key_type, is used.
+
+Keys are instantiated and searched using credential of the root by
+overriding and restoring the credentials of the caller requesting the key.
+Once a SID is mapped, it is stored along with the mapped id, in one
+of the rb trees and key is released.
+
+Register a pruning function with the shrinker that prunes the rb trees
+when memory pressure warrants freeing up cache.  Just for now, it is
+more like cleaning entire cache than pruning.  The subsequent patch has
+this function defined.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsacl.c   |  138 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsfs.c    |    7 +++
+ fs/cifs/cifsglob.h  |    5 ++
+ fs/cifs/cifsproto.h |    3 +
+ 4 files changed, 153 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index a14e45d..c60bb90 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -23,6 +23,10 @@
+ 
+ #include <linux/fs.h>
+ #include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/keyctl.h>
++#include <linux/key-type.h>
++#include <keys/user-type.h>
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsacl.h"
+@@ -50,6 +54,140 @@ static const struct cifs_sid sid_authusers = {
+ /* group users */
+ static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+ 
++static const struct cred *root_cred;
++
++/*
++ * Run idmap cache shrinker.
++ */
++static int
++cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
++{
++	/* Use a pruning scheme in a subsequent patch instead */
++	cifs_destroy_idmaptrees();
++	return 0;
++}
++
++static struct shrinker cifs_shrinker = {
++	.shrink = cifs_idmap_shrinker,
++	.seeks = DEFAULT_SEEKS,
++};
++
++static int
++cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
++{
++	char *payload;
++
++	payload = kmalloc(datalen, GFP_KERNEL);
++	if (!payload)
++		return -ENOMEM;
++
++	memcpy(payload, data, datalen);
++	key->payload.data = payload;
++	return 0;
++}
++
++static inline void
++cifs_idmap_key_destroy(struct key *key)
++{
++	kfree(key->payload.data);
++}
++
++static
++struct key_type cifs_idmap_key_type = {
++	.name        = "cifs.cifs_idmap",
++	.instantiate = cifs_idmap_key_instantiate,
++	.destroy     = cifs_idmap_key_destroy,
++	.describe    = user_describe,
++	.match       = user_match,
++};
++
++int
++init_cifs_idmap(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	cFYI(1, "Registering the %s key type\n", cifs_idmap_key_type.name);
++
++	/* create an override credential set with a special thread keyring in
++	 * which requests are cached
++	 *
++	 * this is used to prevent malicious redirections from being installed
++	 * with add_key().
++	 */
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = key_alloc(&key_type_keyring, ".cifs_idmap", 0, 0, cred,
++			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
++			    KEY_USR_VIEW | KEY_USR_READ,
++			    KEY_ALLOC_NOT_IN_QUOTA);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
++	if (ret < 0)
++		goto failed_put_key;
++
++	ret = register_key_type(&cifs_idmap_key_type);
++	if (ret < 0)
++		goto failed_put_key;
++
++	/* instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up */
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	root_cred = cred;
++
++	spin_lock_init(&siduidlock);
++	uidtree = RB_ROOT;
++	spin_lock_init(&sidgidlock);
++	gidtree = RB_ROOT;
++
++	register_shrinker(&cifs_shrinker);
++
++	cFYI(1, "DNS resolver keyring: %d\n", key_serial(keyring));
++	return 0;
++
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
++
++void
++exit_cifs_idmap(void)
++{
++	key_revoke(root_cred->thread_keyring);
++	unregister_key_type(&cifs_idmap_key_type);
++	put_cred(root_cred);
++	unregister_shrinker(&cifs_shrinker);
++	cFYI(1, "Unregistered %s key type\n", cifs_idmap_key_type.name);
++}
++
++void
++cifs_destroy_idmaptrees(void)
++{
++	struct rb_root *root;
++	struct rb_node *node;
++
++	root = &uidtree;
++	spin_lock(&siduidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&siduidlock);
++
++	root = &gidtree;
++	spin_lock(&sidgidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&sidgidlock);
++}
+ 
+ int match_sid(struct cifs_sid *ctsid)
+ {
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index de49fbb..4a899b1 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1069,11 +1069,16 @@ init_cifs(void)
+ 	rc = register_key_type(&cifs_spnego_key_type);
+ 	if (rc)
+ 		goto out_unregister_filesystem;
++	rc = init_cifs_idmap();
++	if (rc)
++		goto out_unregister_keytype;
+ #endif
+ 
+ 	return 0;
+ 
+ #ifdef CONFIG_CIFS_UPCALL
++out_unregister_keytype:
++	unregister_key_type(&cifs_spnego_key_type);
+ out_unregister_filesystem:
+ 	unregister_filesystem(&cifs_fs_type);
+ #endif
+@@ -1100,6 +1105,8 @@ exit_cifs(void)
+ 	cifs_dfs_release_automount_timer();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
++	cifs_destroy_idmaptrees();
++	exit_cifs_idmap();
+ 	unregister_key_type(&cifs_spnego_key_type);
+ #endif
+ 	unregister_filesystem(&cifs_fs_type);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 2c52c14..37f11dc 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -912,6 +912,11 @@ GLOBAL_EXTERN bool sign_zero_copy; /* don't copy written pages with signing */
+ /* reconnect after this many failed echo attempts */
+ GLOBAL_EXTERN unsigned short echo_retries;
+ 
++GLOBAL_EXTERN struct rb_root uidtree;
++GLOBAL_EXTERN struct rb_root gidtree;
++GLOBAL_EXTERN spinlock_t siduidlock;
++GLOBAL_EXTERN spinlock_t sidgidlock;
++
+ void cifs_oplock_break(struct work_struct *work);
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
+ void cifs_oplock_break_put(struct cifsFileInfo *cfile);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e42dc82..9517a54 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -53,6 +53,9 @@ do {								\
+ 	cFYI(1, "CIFS VFS: leaving %s (xid = %d) rc = %d",	\
+ 	     __func__, curr_xid, (int)rc);			\
+ } while (0)
++extern int init_cifs_idmap(void);
++extern void exit_cifs_idmap(void);
++extern void cifs_destroy_idmaptrees(void);
+ extern char *build_path_from_dentry(struct dentry *);
+ extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
+ 					struct cifs_tcon *tcon);
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.6.0.2
