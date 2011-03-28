@@ -1,179 +1,139 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions (try #10)
-Date: Mon, 28 Mar 2011 14:11:14 -0500
-Message-ID: <AANLkTikQPJe7oCOvyP960tyKXroPJM1jU9wbdfQCJpFC@mail.gmail.com>
-References: <1300986024-7221-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20110328150234.21613793@tlielax.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: smb2 and shared superblock model
+Date: Mon, 28 Mar 2011 14:15:43 -0500
+Message-ID: <AANLkTi=nX4ZwgLY4tGgtmdxQv9s82u-PT_7GHU48fD26@mail.gmail.com>
+References: <AANLkTikvUqYG5GnOkYnrb67B1PJa7yrhzHiWT8+KxEPO@mail.gmail.com>
+	<20110326140638.77580be3@corrin.poochiereds.net>
+	<AANLkTinO885tqF2No3gb4mZA9j3n6+L_yKhNf9UNZdg0@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110328150234.21613793-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <AANLkTinO885tqF2No3gb4mZA9j3n6+L_yKhNf9UNZdg0-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Mar 28, 2011 at 2:02 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> On Thu, 24 Mar 2011 12:00:24 -0500
-> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->
->
->> +static int
->> +sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
->> + =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_fattr *fattr, uint sidtype)
->> +{
->> + =A0 =A0 int rc;
->> + =A0 =A0 unsigned long cid;
->> + =A0 =A0 char *strptr;
->> + =A0 =A0 struct key *idkey;
->> + =A0 =A0 const struct cred *saved_cred;
->> + =A0 =A0 struct cifs_sid_id *psidid, *npsidid;
->> + =A0 =A0 struct rb_root *cidtree;
->> + =A0 =A0 spinlock_t *cidlock;
->> +
->> + =A0 =A0 if (sidtype =3D=3D SIDOWNER) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 cid =3D cifs_sb->mnt_uid; /* default uid, =
-in case upcall fails */
->> + =A0 =A0 =A0 =A0 =A0 =A0 cidlock =3D &siduidlock;
->> + =A0 =A0 =A0 =A0 =A0 =A0 cidtree =3D &uidtree;
->> + =A0 =A0 } else if (sidtype =3D=3D SIDGROUP) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 cid =3D cifs_sb->mnt_gid; /* default gid, =
-in case upcall fails */
->> + =A0 =A0 =A0 =A0 =A0 =A0 cidlock =3D &sidgidlock;
->> + =A0 =A0 =A0 =A0 =A0 =A0 cidtree =3D &gidtree;
->> + =A0 =A0 } else
->> + =A0 =A0 =A0 =A0 =A0 =A0 return -ENOENT;
->> +
->
-> That default seems reasonable, I think...
->
->> + =A0 =A0 spin_lock(cidlock);
->> + =A0 =A0 psidid =3D id_rb_search(cidtree, psid);
->> + =A0 =A0 spin_unlock(cidlock);
->> +
->> + =A0 =A0 if (!psidid) { /* node does not exist, allocate one & atte=
-mpt adding */
->> + =A0 =A0 =A0 =A0 =A0 =A0 npsidid =3D kzalloc(sizeof(struct cifs_sid=
-_id), GFP_KERNEL);
->> + =A0 =A0 =A0 =A0 =A0 =A0 if (!npsidid)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
->> +
->> + =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(cidlock);
->> + =A0 =A0 =A0 =A0 =A0 =A0 psidid =3D id_rb_search(cidtree, psid);
->> + =A0 =A0 =A0 =A0 =A0 =A0 if (psidid) { /* node happened to get inse=
-rted meanwhile */
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(cidlock);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(npsidid);
->> + =A0 =A0 =A0 =A0 =A0 =A0 } else {
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 psidid =3D npsidid;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 id_rb_insert(cidtree, psid=
-, &psidid);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(cidlock);
->> + =A0 =A0 =A0 =A0 =A0 =A0 }
->> + =A0 =A0 }
->> +
->> + =A0 =A0 if (!test_and_set_bit(SID_ID_PENDING, &psidid->state)) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 if (!test_bit(SID_ID_MAPPED, &psidid->stat=
-e)) {
->
-> Overall this looks a lot better. The above however is a bit
-> questionable. Every time you find an entry in the tree, you then mark
-> it PENDING and check to see if it's MAPPED.
->
-> These entries are never going to go from being MAPPED to not. Would i=
-t
-> instead make more sense to check whether it's MAPPED first, and only
-> then try to set the PENDING bit?
->
-> if (!test_bit(SID_ID_MAPPED, &psidid->state) &&
-> =A0 =A0!test_and_set_bit(SID_ID_PENDING, &psidid->state)) {
-> =A0 =A0 =A0 =A0/* construct the entry */
-> } else {
-> =A0 =A0/* wait on the PENDING bit */
-> }
->
-> The reason for this would be to minimize the times that you're going =
+On Mon, Mar 28, 2011 at 1:50 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =
+wrote:
+> 2011/3/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+>> On Sat, 26 Mar 2011 16:12:03 +0300
+>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>
+>>> Hi!
+>>>
+>>> Today I investigated a bit about how to insert sharedblock model in=
 to
-> set the PENDING bit, and force other threads to serialize behind it.
+>>> cifs and get it work correctly with smb2.1 leases. Now we have the
+>>> following archtecture:
+>>> inode -> superblock -> tlink -> tcon -> sess -> srv - so we can
+>>> definitely say what ses id and tree id we should use for a requeste=
+d
+>>> inode. It's from the one hand.
+>>>
+>>> From another hand, we should share cached data between several
+>>> sessions from the same client (according to SMB2 spec we should hav=
+e
+>>> one global file table). And everything is good if we will share
+>>> superblock between several mounts that uses the same sess id and tc=
+on
+>>> id. But if these are different sessions that's brings a problem. A
+>>> superblock is linked to only one tcon id and sess id but we need to
+>>> share it between completely different sessions. So, it seems to me
+>>> that according to nowadays situation we can't share the same data
+>>> between different sessions.
+>>>
+>>> So, now I suggest to share a superblock only between different moun=
+ts
+>>> of the same sess id and tcon id. And every time we negotiate a
+>>> different session (e.x. from another username) we should change
+>>> ClientGUID. It causes the server to think that these are different
+>>> clients and it won't grant leases on parallel opens from these
+>>> sessions. So, in this case we solve data coherency problem but, of
+>>> course, miss some advantages of SMB2 protocol.
+>>>
+>>> Your comments/thoughts?
+>>>
+>>
+>> That's not quite correct...
+>>
+>> A superblock can point to more than one tcon in the multiuser mount
+>> case. That's the whole reason for the tlink structure in the first
+>> place.
+>>
+>> The reason for a shared superblock is that you intend to mount the
+>> exact same data in multiple places and don't intend to bind mount. W=
+ith
+>> NFS for instance, consider the case where you do something like this=
+:
+>>
+>> =A0 =A0# mount server:/export /mount1
+>> =A0 =A0# mount server:/export/subdir /mount2
+>>
+>> Suppose then that you access these files:
+>>
+>> =A0 =A0/mount1/subdir/file1
+>> =A0 =A0/mount2/file1
+>>
+>> Traditionally, that would give you two different inodes connected to
+>> two different superblocks. Cache consistency can easily be off, you =
+end
+>> up with duplicate data in cache, and dealing with fscache is
+>> problematic since you can end up with collisions in the cache.
+>>
+>> To fix that (mostly for the fscache problem), David Howells converte=
+d
+>> NFS so that it would share superblocks in this situation. The two
+>> vfsmounts point to the same superblock, but the root dentry is diffe=
+rent
+>> for each.
+>>
+>> So...what does this mean for CIFS? We already look for an existing
+>> server, session and tcon when we mount. To do this for CIFS you woul=
+d
+>> simply need to go a step farther and look for an existing superblock
+>> that matches your needs and deal with setting up the root dentry
+>> correctly.
+>>
+>> I urge you to have a look at what NFS does in this case. It's
+>> non-trivial but that is probably the best model for doing this in CI=
+=46S.
+>>
+>> Here's the catch though...you now have to deal with all of the CIFS
+>> mount options and decide which settings mean that you need to create=
+ a
+>> new superblock instead of using an existing one on a new mount.
+>>
+>> --
+>> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>>
 >
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* node with unmapped SID =
-*/
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memset(psidid->sidstr, '\0=
-', SIDLEN);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (sidtype =3D=3D SIDOWNE=
-R)
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sprintf(ps=
-idid->sidstr, "%s", "os:");
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sprintf(ps=
-idid->sidstr, "%s", "gs:");
->> +
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strptr =3D psidid->sidstr =
-+ strlen(psidid->sidstr);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sid_to_str(psid, strptr);
->> +
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 saved_cred =3D override_cr=
-eds(root_cred);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 idkey =3D request_key(&cif=
-s_idmap_key_type,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 psidid->sidstr, "");
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (IS_ERR(idkey)) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 psidid->id=
- =3D cid;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%=
-s: Can't map SID to an id", __func__);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 psidid->id=
- =3D
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 *(unsigned long *)idkey->payload.value;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 psidid->ti=
-me =3D jiffies;
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 set_bit(SI=
-D_ID_MAPPED, &psidid->state);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 key_put(id=
-key);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 revert_creds(saved_cred);
->> + =A0 =A0 =A0 =A0 =A0 =A0 }
->> + =A0 =A0 =A0 =A0 =A0 =A0 clear_bit(SID_ID_PENDING, &psidid->state);
->> + =A0 =A0 =A0 =A0 =A0 =A0 wake_up_bit(&psidid->state, SID_ID_PENDING=
-);
->> + =A0 =A0 } else {
->> + =A0 =A0 =A0 =A0 =A0 =A0 /*
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* either an existing node with SID mapp=
-ed (in which case
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* we would not wait) or a node whose SI=
-D is being mapped by
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* somebody else (in which case, we woul=
-d end up waiting).
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
->> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wait_on_bit(&psidid->state, SID_ID_=
-PENDING,
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sidid_pend=
-ing_wait, TASK_INTERRUPTIBLE);
->> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc) {
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: sidid_pending=
-_wait interrupted %d",
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func__, =
-rc);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
->> + =A0 =A0 =A0 =A0 =A0 =A0 }
->> + =A0 =A0 }
->> +
->> +
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> So, I suggest to do the following - before we get a superblock we
+> should figure out what structures we can share:
+> 1) try to share tcp_sesion;
+> 2) if succeed - try to share smb_session;
+> 3) if succeed - try to share tcon;
+> 4) if succeed - share a sb which tcon points to.
 >
+> So, in this case there is no need to use sget call with 'compare' and
+> 'set' callbacks like NFS does it, I think.
+>
+> As for multiuser mode - It won't bring complexity because in this cas=
+e
+> we don't touch its code.
 
-Jeff, Thanks.
-yes, that is correct. Testing for a mapped id before attempting to
-do map it if not, makes sense.
-Will respin and resubmit the patch.
+At a high level, your description above makes sense, but the
+details can get tricky.  In practice some differences
+in mount options etc. are not "disqualifying" when trying to
+share a superblock or tcon but it we have to consider
+the options one by one.
 
-Regards,
 
-Shirish
+--=20
+Thanks,
+
+Steve
