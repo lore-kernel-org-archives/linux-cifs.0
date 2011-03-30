@@ -1,226 +1,55 @@
 From: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
-Subject: [PATCH 2/4] Consolidate and extract similar DFS referral expansion code in cifs_mount
-Date: Fri, 25 Mar 2011 10:20:43 +0100
-Message-ID: <9eff2210c957a5d97e75fbabe5eae39cdbcc1860.1301492580.git.seanius@seanius.net>
-References: <258c7d7b9e8dbd73829c701e6494f91bfa707cb3.1301492580.git.seanius@seanius.net>
+Subject: [PATCH] Use kstrdup instead of manual string duplication for cifs_sb->mountdata
+Date: Wed, 30 Mar 2011 15:07:11 +0200
+Message-ID: <54430755071bdb37fe46abf3fda855bf35aaf891.1301492728.git.seanius@seanius.net>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <258c7d7b9e8dbd73829c701e6494f91bfa707cb3.1301492580.git.seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The logic behind the expansion of DFS referrals is now extracted from
-cifs_mount into a new static function, expand_dfs_referral.
+A relatively minor nit, but also clarified the "consensus" from the
+preceding comments that it is in fact better to try for the kstrdup
+early and cleanup while cleaning up is still a simple thing to do.
 
 Signed-off-by: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 ---
- fs/cifs/connect.c |  155 +++++++++++++++++++++++++++--------------------------
- 1 files changed, 78 insertions(+), 77 deletions(-)
+ fs/cifs/cifsfs.c |   17 ++++++-----------
+ 1 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7e4ca38..6bf7fd6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2742,6 +2742,57 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
- 	full_path[unc_len + cifs_sb->prepathlen] = 0; /* add trailing null */
- 	return full_path;
- }
-+
-+/*
-+ * Perform a dfs referral query for a share and (optionally) prefix
-+ *
-+ * If a referral is found, mount_data will be set to point at a newly
-+ * allocated string containing updated options for the submount.
-+ * Otherwise it will be left untouched.
-+ *
-+ * Returns the rc from get_dfs_path to the caller, which can be used to
-+ * determine whether there were referrals.
-+ */
-+static int
-+expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
-+		    struct smb_vol *volume_info, struct cifs_sb_info *cifs_sb,
-+		    char **mount_data, int check_prefix)
-+{
-+	int rc;
-+	unsigned int num_referrals = 0;
-+	struct dfs_info3_param *referrals = NULL;
-+	char *full_path = NULL, *ref_path = NULL, *mdata = NULL;
-+
-+	full_path = build_unc_path_to_root(volume_info, cifs_sb);
-+	if (IS_ERR(full_path))
-+		return PTR_ERR(full_path);
-+
-+	/* For DFS paths, skip the first '\' of the UNC */
-+	ref_path = check_prefix ? full_path + 1 : volume_info->UNC + 1;
-+
-+	rc = get_dfs_path(xid, pSesInfo , ref_path, cifs_sb->local_nls,
-+			  &num_referrals, &referrals,
-+			  cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-+
-+	if (!rc && num_referrals > 0) {
-+		char *fake_devname = NULL;
-+
-+		mdata = cifs_compose_mount_options(cifs_sb->mountdata,
-+						   full_path + 1, referrals,
-+						   &fake_devname);
-+
-+		free_dfs_info_array(referrals, num_referrals);
-+		kfree(fake_devname);
-+
-+		if (IS_ERR(mdata)) {
-+			rc = PTR_ERR(mdata);
-+			mdata = NULL;
-+		}
-+		*mount_data = mdata;
-+	}
-+	kfree(full_path);
-+	return rc;
-+}
- #endif
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fb6a2ad..e938bf0 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -134,24 +134,19 @@ cifs_read_super(struct super_block *sb, void *data,
+ 	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
  
- int
-@@ -2758,10 +2809,19 @@ cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
- 	char *mount_data = mount_data_global;
- 	struct tcon_link *tlink;
  #ifdef CONFIG_CIFS_DFS_UPCALL
--	struct dfs_info3_param *referrals = NULL;
--	unsigned int num_referrals = 0;
- 	int referral_walks_count = 0;
- try_mount_again:
-+
-+	/* cleanup activities if we're chasing a referral */
-+	if (referral_walks_count) {
-+		if (tcon)
-+			cifs_put_tcon(tcon);
-+		else if (pSesInfo)
-+			cifs_put_smb_ses(pSesInfo);
-+
-+		cleanup_volume_info(&volume_info);
-+		FreeXid(xid);
-+	}
- #endif
- 	rc = 0;
- 	tcon = NULL;
-@@ -2876,49 +2936,17 @@ try_mount_again:
- remote_path_check:
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	/*
--	 * Perform an unconditional check for whether there are
--	 * DFS referrals for this path (without prefix), to provide
--	 * some limited support for domain DFS referrals on w2k8
-+	 * Perform an unconditional check for whether there are DFS
-+	 * referrals for this path without prefix, to provide support
-+	 * for DFS referrals from w2k8 servers which don't seem to respond
-+	 * with PATH_NOT_COVERED to requests that include the prefix.
-+	 * Chase the referral if found, otherwise continue normally.
- 	 */
- 	if (referral_walks_count == 0) {
--		cFYI(1, "Getting referral for: %s", volume_info->UNC);
--		rc = get_dfs_path(xid, pSesInfo , volume_info->UNC + 1,
--			cifs_sb->local_nls, &num_referrals, &referrals,
--			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
--		if (!rc && num_referrals > 0) {
--			char *fake_devname = NULL;
--
--			full_path = build_unc_path_to_root(volume_info,
--							   cifs_sb);
--			if (IS_ERR(full_path)) {
--				rc = PTR_ERR(full_path);
--				goto mount_fail_check;
--			}
--
--			if (mount_data != mount_data_global)
--				kfree(mount_data);
--
--			mount_data = cifs_compose_mount_options(
--					cifs_sb->mountdata, full_path + 1,
--					referrals, &fake_devname);
--
--			free_dfs_info_array(referrals, num_referrals);
--			kfree(fake_devname);
--
--			if (IS_ERR(mount_data)) {
--				rc = PTR_ERR(mount_data);
--				mount_data = NULL;
--				goto mount_fail_check;
--			}
--
--			if (tcon)
--				cifs_put_tcon(tcon);
--			else if (pSesInfo)
--				cifs_put_smb_ses(pSesInfo);
--
--			cleanup_volume_info(&volume_info);
-+		int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
-+						cifs_sb, &mount_data, false);
-+		if (!refrc) {
- 			referral_walks_count++;
--			FreeXid(xid);
- 			goto try_mount_again;
+-	/* copy mount params to sb for use in submounts */
+-	/* BB: should we move this after the mount so we
+-	 * do not have to do the copy on failed mounts?
+-	 * BB: May be it is better to do simple copy before
+-	 * complex operation (mount), and in case of fail
+-	 * just exit instead of doing mount and attempting
+-	 * undo it if this copy fails?*/
++	/*
++	 * Copy mount params to sb for use in submounts. Better to do
++	 * the copy here and deal with the error before cleanup gets
++	 * complicated post-mount.
++	 */
+ 	if (data) {
+-		int len = strlen(data);
+-		cifs_sb->mountdata = kzalloc(len + 1, GFP_KERNEL);
++		cifs_sb->mountdata = kstrdup(data, GFP_KERNEL);
+ 		if (cifs_sb->mountdata == NULL) {
+ 			bdi_destroy(&cifs_sb->bdi);
+ 			kfree(sb->s_fs_info);
+ 			sb->s_fs_info = NULL;
+ 			return -ENOMEM;
  		}
+-		strncpy(cifs_sb->mountdata, data, len + 1);
+-		cifs_sb->mountdata[len] = '\0';
  	}
-@@ -2957,46 +2985,19 @@ remote_path_check:
- 		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) == 0)
- 			convert_delimiter(cifs_sb->prepath,
- 					CIFS_DIR_SEP(cifs_sb));
--		full_path = build_unc_path_to_root(volume_info, cifs_sb);
--		if (IS_ERR(full_path)) {
--			rc = PTR_ERR(full_path);
--			goto mount_fail_check;
--		}
--
--		cFYI(1, "Getting referral for: %s", full_path);
--		rc = get_dfs_path(xid, pSesInfo , full_path + 1,
--			cifs_sb->local_nls, &num_referrals, &referrals,
--			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
--		if (!rc && num_referrals > 0) {
--			char *fake_devname = NULL;
--
--			if (mount_data != mount_data_global)
--				kfree(mount_data);
--
--			mount_data = cifs_compose_mount_options(
--					cifs_sb->mountdata, full_path + 1,
--					referrals, &fake_devname);
- 
--			free_dfs_info_array(referrals, num_referrals);
--			kfree(fake_devname);
--			kfree(full_path);
--
--			if (IS_ERR(mount_data)) {
--				rc = PTR_ERR(mount_data);
--				mount_data = NULL;
--				goto mount_fail_check;
--			}
-+		if (mount_data != mount_data_global)
-+			kfree(mount_data);
- 
--			if (tcon)
--				cifs_put_tcon(tcon);
--			else if (pSesInfo)
--				cifs_put_smb_ses(pSesInfo);
-+		rc = expand_dfs_referral(xid, pSesInfo, volume_info, cifs_sb,
-+					 &mount_data, true);
- 
--			cleanup_volume_info(&volume_info);
-+		if (!rc) {
- 			referral_walks_count++;
--			FreeXid(xid);
- 			goto try_mount_again;
- 		}
-+		mount_data = NULL;
-+		goto mount_fail_check;
- #else /* No DFS support, return error on mount */
- 		rc = -EOPNOTSUPP;
  #endif
-@@ -3029,7 +3030,7 @@ remote_path_check:
- mount_fail_check:
- 	/* on error free sesinfo and tcon struct if needed */
- 	if (rc) {
--		if (mount_data != mount_data_global)
-+		if (mount_data != NULL && mount_data != mount_data_global)
- 			kfree(mount_data);
- 		/* If find_unc succeeded then rc == 0 so we can not end */
- 		/* up accidently freeing someone elses tcon struct */
+ 
 -- 
 1.7.2.3
