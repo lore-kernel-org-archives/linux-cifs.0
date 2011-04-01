@@ -1,76 +1,104 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/5] cifs: clean up length checks in check2ndT2
-Date: Thu, 31 Mar 2011 17:36:44 -0400
-Message-ID: <1301607405-4379-5-git-send-email-jlayton@redhat.com>
-References: <1301607405-4379-1-git-send-email-jlayton@redhat.com>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re: [PATCH 1/4] Fix Bug#31092: Unable to mount DFS filesystems from
+ Windows 2008 servers
+Date: Fri, 1 Apr 2011 07:32:56 -0400
+Message-ID: <20110401073256.70180710@tlielax.poochiereds.net>
+References: <258c7d7b9e8dbd73829c701e6494f91bfa707cb3.1301492580.git.seanius@seanius.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301607405-4379-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <258c7d7b9e8dbd73829c701e6494f91bfa707cb3.1301492580.git.seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Thus spake David Howells:
+On Fri, 18 Mar 2011 10:02:07 +0100
+Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
 
-The code that follows this:
+> Windows 2008 CIFS servers do not always return PATH_NOT_COVERED when
+> attempting to access a DFS share.  Therefore, when checking for remote
+> shares, unconditionally ask for a DFS referral for the UNC (w/out prepath)
+> before continuing with previous behavior of attempting to access the UNC +
+> prepath and checking for PATH_NOT_COVERED.
+> 
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=31092
+> 
+> Signed-off-by: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+> ---
+>  fs/cifs/connect.c |   50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 50 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 96544a4..7e4ca38 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2874,6 +2874,56 @@ try_mount_again:
+>  			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
+>  
+>  remote_path_check:
+> +#ifdef CONFIG_CIFS_DFS_UPCALL
+> +	/*
+> +	 * Perform an unconditional check for whether there are
+> +	 * DFS referrals for this path (without prefix), to provide
+> +	 * some limited support for domain DFS referrals on w2k8
+> +	 */
+> +	if (referral_walks_count == 0) {
+> +		cFYI(1, "Getting referral for: %s", volume_info->UNC);
+> +		rc = get_dfs_path(xid, pSesInfo , volume_info->UNC + 1,
+> +			cifs_sb->local_nls, &num_referrals, &referrals,
+> +			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+> +		if (!rc && num_referrals > 0) {
+> +			char *fake_devname = NULL;
+> +
+> +			full_path = build_unc_path_to_root(volume_info,
+> +							   cifs_sb);
+> +			if (IS_ERR(full_path)) {
+> +				rc = PTR_ERR(full_path);
+> +				goto mount_fail_check;
+> +			}
+> +
+> +			if (mount_data != mount_data_global)
+> +				kfree(mount_data);
+> +
+> +			mount_data = cifs_compose_mount_options(
+> +					cifs_sb->mountdata, full_path + 1,
+> +					referrals, &fake_devname);
+> +
+> +			free_dfs_info_array(referrals, num_referrals);
+> +			kfree(fake_devname);
+> +
+> +			if (IS_ERR(mount_data)) {
+> +				rc = PTR_ERR(mount_data);
+> +				mount_data = NULL;
+> +				goto mount_fail_check;
+> +			}
+> +
+> +			if (tcon)
+> +				cifs_put_tcon(tcon);
+> +			else if (pSesInfo)
+> +				cifs_put_smb_ses(pSesInfo);
+> +
+> +			cleanup_volume_info(&volume_info);
+> +			referral_walks_count++;
+> +			FreeXid(xid);
+> +			goto try_mount_again;
+> +		}
+> +	}
+> +#endif
+> +
+>  	/* check if a whole path (including prepath) is not remote */
+>  	if (!rc && tcon) {
+>  		/* build_path_to_root works only when we have a valid tcon */
 
-  	remaining = total_data_size - data_in_this_rsp;
-	if (remaining == 0)
-		return 0;
-	else if (remaining < 0) {
+I think this patchset is backward...you're adding a bunch of complex
+code and then going back and trying to clean it and the existing code
+up. Why not do this in reverse? Clean up what's already there first and
+then go back and add in the stuff to fix the bug?
 
-generates better code if you drop the 'remaining' variable and compare
-the values directly.
+That would make this far easier to review and would be less likely to
+allow regressions to creep in.
 
-Clean it up per his recommendation...
-
-Reported-and-acked-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |   26 +++++++++++++-------------
- 1 files changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 66d8de3..94e60c5 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -251,24 +251,24 @@ static int check2ndT2(struct smb_hdr *pSMB, unsigned int maxBufSize)
- 	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
- 	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
- 
--	remaining = total_data_size - data_in_this_rsp;
--
--	if (remaining == 0)
-+	if (total_data_size == data_in_this_rsp)
- 		return 0;
--	else if (remaining < 0) {
-+	else if (total_data_size < data_in_this_rsp) {
- 		cFYI(1, "total data %d smaller than data in frame %d",
- 			total_data_size, data_in_this_rsp);
- 		return -EINVAL;
--	} else {
--		cFYI(1, "missing %d bytes from transact2, check next response",
--			remaining);
--		if (total_data_size > maxBufSize) {
--			cERROR(1, "TotalDataSize %d is over maximum buffer %d",
--				total_data_size, maxBufSize);
--			return -EINVAL;
--		}
--		return remaining;
- 	}
-+
-+	remaining = total_data_size - data_in_this_rsp;
-+
-+	cFYI(1, "missing %d bytes from transact2, check next response",
-+		remaining);
-+	if (total_data_size > maxBufSize) {
-+		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
-+			total_data_size, maxBufSize);
-+		return -EINVAL;
-+	}
-+	return remaining;
- }
- 
- static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
 -- 
-1.7.4
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
