@@ -1,314 +1,124 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 3/4] cifs_parse_mount_options: do not tokenize mount
- options in-place
-Date: Fri, 1 Apr 2011 09:14:18 -0400
-Message-ID: <20110401091418.76871d76@tlielax.poochiereds.net>
+Subject: Re: [PATCH 4/4] Simplify handling of submount options in
+ cifs_mount.
+Date: Fri, 1 Apr 2011 09:27:17 -0400
+Message-ID: <20110401092717.03b42cfe@tlielax.poochiereds.net>
 References: <20110401073256.70180710@tlielax.poochiereds.net>
-	<E1Q5dRc-0005je-TI@seldlx2151.corpusers.net>
+	<E1Q5dRd-0005jh-0Z@seldlx2151.corpusers.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <E1Q5dRc-0005je-TI-qxVOCJPMiwB8kxaRHGevo2mlIyY1fjA7@public.gmane.org>
+In-Reply-To: <E1Q5dRd-0005jh-0Z-qxVOCJPMiwB8kxaRHGevo2mlIyY1fjA7@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 30 Mar 2011 14:54:27 +0200
+On Mon, 28 Mar 2011 12:19:29 +0200
 Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
 
-> To keep strings passed to cifs_parse_mount_options re-usable (which
-> is needed to clean up the DFS referral handling), tokenize a copy
-> of the mount options instead.  Since we're not on the critical path
-> here and cleanup is relatively easy, it shouldn't be a problem (and
-> it is a bit simpler than trying to implement something smarter).
+> With CONFIG_DFS_UPCALL enabled, maintain the submount options in
+> cifs_sb->mountdata, simplifying the code just a bit as well as making
+> corner-case allocation problems less likely.
 > ---
->  fs/cifs/connect.c |   70 ++++++++++++++++++++++++++++++----------------------
->  1 files changed, 40 insertions(+), 30 deletions(-)
+>  fs/cifs/connect.c |   24 +++++++++++-------------
+>  1 files changed, 11 insertions(+), 13 deletions(-)
 > 
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 9425c7b..7d1d0e9 100644
+> index 7d1d0e9..d8e300e 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -807,11 +807,12 @@ extract_hostname(const char *unc)
->  }
->  
+> @@ -2756,9 +2756,9 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
+>  /*
+>   * Perform a dfs referral query for a share and (optionally) prefix
+>   *
+> - * If a referral is found, mount_data will be set to point at a newly
+> - * allocated string containing updated options for the submount.
+> - * Otherwise it will be left untouched.
+> + * If a referral is found, cifs_sb->mountdata will be (re-)allocated
+> + * to a string containing updated options for the submount.  Otherwise it
+> + * will be left untouched.
+>   *
+>   * Returns the rc from get_dfs_path to the caller, which can be used to
+>   * determine whether there were referrals.
+> @@ -2766,7 +2766,7 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
 >  static int
-> -cifs_parse_mount_options(char *options, const char *devname,
-> +cifs_parse_mount_options(const char *mountdata, const char *devname,
->  			 struct smb_vol *vol)
+>  expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
+>  		    struct smb_vol *volume_info, struct cifs_sb_info *cifs_sb,
+> -		    char **mount_data, int check_prefix)
+> +		    int check_prefix)
 >  {
->  	char *value;
->  	char *data;
-> +	char *mountdata_copy, *options;
->  	unsigned int  temp_len, i, j;
->  	char separator[2];
->  	short int override_uid = -1;
-> @@ -851,9 +852,14 @@ cifs_parse_mount_options(char *options, const char *devname,
+>  	int rc;
+>  	unsigned int num_referrals = 0;
+> @@ -2794,11 +2794,14 @@ expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
+>  		free_dfs_info_array(referrals, num_referrals);
+>  		kfree(fake_devname);
 >  
->  	vol->actimeo = CIFS_DEF_ACTIMEO;
->  
-> -	if (!options)
-> -		return 1;
-> +	if (!mountdata)
-> +		goto cifs_parse_mount_err;
+> +		if (cifs_sb->mountdata != NULL)
+> +			kfree(cifs_sb->mountdata);
 > +
-> +	mountdata_copy = kstrdup(mountdata, GFP_KERNEL);
-> +	if (!mountdata_copy)
-> +		goto cifs_parse_mount_err;
->  
-
-I worry (slightly) about bounds checking here. Yes, I know we do a poor
-job of that in this code, but this is probably a good time to fix that.
-I'm pretty sure that mount options are limited to a page. Maybe turn
-the above into a kstrndup() and limit it to PAGE_CACHE_SIZE?
-
-Might not hurt also to explicitly set the last byte in the allocation
-to 0.
-
-> +	options = mountdata_copy;
->  	if (strncmp(options, "sep=", 4) == 0) {
->  		if (options[4] != 0) {
->  			separator[0] = options[4];
-> @@ -878,7 +884,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			if (!value) {
->  				printk(KERN_WARNING
->  				       "CIFS: invalid or missing username\n");
-> -				return 1;	/* needs_arg; */
-> +				goto cifs_parse_mount_err;
->  			} else if (!*value) {
->  				/* null user, ie anonymous, authentication */
->  				vol->nullauth = 1;
-> @@ -888,7 +894,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				vol->username = value;
->  			} else {
->  				printk(KERN_WARNING "CIFS: username too long\n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (strnicmp(data, "pass", 4) == 0) {
->  			if (!value) {
-> @@ -951,7 +957,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				if (vol->password == NULL) {
->  					printk(KERN_WARNING "CIFS: no memory "
->  							    "for password\n");
-> -					return 1;
-> +					goto cifs_parse_mount_err;
->  				}
->  				for (i = 0, j = 0; i < temp_len; i++, j++) {
->  					vol->password[j] = value[i];
-> @@ -967,7 +973,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				if (vol->password == NULL) {
->  					printk(KERN_WARNING "CIFS: no memory "
->  							    "for password\n");
-> -					return 1;
-> +					goto cifs_parse_mount_err;
->  				}
->  				strcpy(vol->password, value);
->  			}
-> @@ -981,7 +987,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			} else {
->  				printk(KERN_WARNING "CIFS: ip address "
->  						    "too long\n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (strnicmp(data, "sec", 3) == 0) {
->  			if (!value || !*value) {
-> @@ -994,7 +1000,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				/* vol->secFlg |= CIFSSEC_MUST_SEAL |
->  					CIFSSEC_MAY_KRB5; */
->  				cERROR(1, "Krb5 cifs privacy not supported");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			} else if (strnicmp(value, "krb5", 4) == 0) {
->  				vol->secFlg |= CIFSSEC_MAY_KRB5;
->  			} else if (strnicmp(value, "ntlmsspi", 8) == 0) {
-> @@ -1024,7 +1030,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				vol->nullauth = 1;
->  			} else {
->  				cERROR(1, "bad security option: %s", value);
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (strnicmp(data, "vers", 3) == 0) {
->  			if (!value || !*value) {
-> @@ -1048,12 +1054,12 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			if (!value || !*value) {
->  				printk(KERN_WARNING "CIFS: invalid path to "
->  						    "network resource\n");
-> -				return 1;	/* needs_arg; */
-> +				goto cifs_parse_mount_err;
->  			}
->  			if ((temp_len = strnlen(value, 300)) < 300) {
->  				vol->UNC = kmalloc(temp_len+1, GFP_KERNEL);
->  				if (vol->UNC == NULL)
-> -					return 1;
-> +					goto cifs_parse_mount_err;
->  				strcpy(vol->UNC, value);
->  				if (strncmp(vol->UNC, "//", 2) == 0) {
->  					vol->UNC[0] = '\\';
-> @@ -1062,17 +1068,17 @@ cifs_parse_mount_options(char *options, const char *devname,
->  					printk(KERN_WARNING
->  					       "CIFS: UNC Path does not begin "
->  					       "with // or \\\\ \n");
-> -					return 1;
-> +					goto cifs_parse_mount_err;
->  				}
->  			} else {
->  				printk(KERN_WARNING "CIFS: UNC name too long\n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if ((strnicmp(data, "domain", 3) == 0)
->  			   || (strnicmp(data, "workgroup", 5) == 0)) {
->  			if (!value || !*value) {
->  				printk(KERN_WARNING "CIFS: invalid domain name\n");
-> -				return 1;	/* needs_arg; */
-> +				goto cifs_parse_mount_err;
->  			}
->  			/* BB are there cases in which a comma can be valid in
->  			a domain name and need special handling? */
-> @@ -1082,7 +1088,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			} else {
->  				printk(KERN_WARNING "CIFS: domain name too "
->  						    "long\n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (strnicmp(data, "srcaddr", 7) == 0) {
->  			vol->srcaddr.ss_family = AF_UNSPEC;
-> @@ -1090,7 +1096,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			if (!value || !*value) {
->  				printk(KERN_WARNING "CIFS: srcaddr value"
->  				       " not specified.\n");
-> -				return 1;	/* needs_arg; */
-> +				goto cifs_parse_mount_err;
->  			}
->  			i = cifs_convert_address((struct sockaddr *)&vol->srcaddr,
->  						 value, strlen(value));
-> @@ -1098,20 +1104,20 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				printk(KERN_WARNING "CIFS:  Could not parse"
->  				       " srcaddr: %s\n",
->  				       value);
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (strnicmp(data, "prefixpath", 10) == 0) {
->  			if (!value || !*value) {
->  				printk(KERN_WARNING
->  					"CIFS: invalid path prefix\n");
-> -				return 1;       /* needs_argument */
-> +				goto cifs_parse_mount_err;
->  			}
->  			if ((temp_len = strnlen(value, 1024)) < 1024) {
->  				if (value[0] != '/')
->  					temp_len++;  /* missing leading slash */
->  				vol->prepath = kmalloc(temp_len+1, GFP_KERNEL);
->  				if (vol->prepath == NULL)
-> -					return 1;
-> +					goto cifs_parse_mount_err;
->  				if (value[0] != '/') {
->  					vol->prepath[0] = '/';
->  					strcpy(vol->prepath+1, value);
-> @@ -1120,13 +1126,13 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				cFYI(1, "prefix path %s", vol->prepath);
->  			} else {
->  				printk(KERN_WARNING "CIFS: prefix too long\n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (strnicmp(data, "iocharset", 9) == 0) {
->  			if (!value || !*value) {
->  				printk(KERN_WARNING "CIFS: invalid iocharset "
->  						    "specified\n");
-> -				return 1;	/* needs_arg; */
-> +				goto cifs_parse_mount_err;
->  			}
->  			if (strnlen(value, 65) < 65) {
->  				if (strnicmp(value, "default", 7))
-> @@ -1137,7 +1143,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			} else {
->  				printk(KERN_WARNING "CIFS: iocharset name "
->  						    "too long.\n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  		} else if (!strnicmp(data, "uid", 3) && value && *value) {
->  			vol->linux_uid = simple_strtoul(value, &value, 0);
-> @@ -1250,7 +1256,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				if (vol->actimeo > CIFS_MAX_ACTIMEO) {
->  					cERROR(1, "CIFS: attribute cache"
->  							"timeout too large");
-> -					return 1;
-> +					goto cifs_parse_mount_err;
->  				}
->  			}
->  		} else if (strnicmp(data, "credentials", 4) == 0) {
-> @@ -1394,7 +1400,7 @@ cifs_parse_mount_options(char *options, const char *devname,
->  #ifndef CONFIG_CIFS_FSCACHE
->  			cERROR(1, "FS-Cache support needs CONFIG_CIFS_FSCACHE"
->  				  "kernel config option set");
-> -			return 1;
-> +			goto cifs_parse_mount_err;
->  #endif
->  			vol->fsc = true;
->  		} else if (strnicmp(data, "mfsymlinks", 10) == 0) {
-> @@ -1409,12 +1415,12 @@ cifs_parse_mount_options(char *options, const char *devname,
->  		if (devname == NULL) {
->  			printk(KERN_WARNING "CIFS: Missing UNC name for mount "
->  						"target\n");
-> -			return 1;
-> +			goto cifs_parse_mount_err;
+>  		if (IS_ERR(mdata)) {
+>  			rc = PTR_ERR(mdata);
+>  			mdata = NULL;
 >  		}
->  		if ((temp_len = strnlen(devname, 300)) < 300) {
->  			vol->UNC = kmalloc(temp_len+1, GFP_KERNEL);
->  			if (vol->UNC == NULL)
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			strcpy(vol->UNC, devname);
->  			if (strncmp(vol->UNC, "//", 2) == 0) {
->  				vol->UNC[0] = '\\';
-> @@ -1422,21 +1428,21 @@ cifs_parse_mount_options(char *options, const char *devname,
->  			} else if (strncmp(vol->UNC, "\\\\", 2) != 0) {
->  				printk(KERN_WARNING "CIFS: UNC Path does not "
->  						    "begin with // or \\\\ \n");
-> -				return 1;
-> +				goto cifs_parse_mount_err;
->  			}
->  			value = strpbrk(vol->UNC+2, "/\\");
->  			if (value)
->  				*value = '\\';
->  		} else {
->  			printk(KERN_WARNING "CIFS: UNC name too long\n");
-> -			return 1;
-> +			goto cifs_parse_mount_err;
+> -		*mount_data = mdata;
+> +		cifs_sb->mountdata = mdata;
+>  	}
+>  	kfree(full_path);
+>  	return rc;
+> @@ -2821,6 +2824,7 @@ cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
+>  #ifdef CONFIG_CIFS_DFS_UPCALL
+>  	int referral_walks_count = 0;
+>  try_mount_again:
+> +	mount_data = cifs_sb->mountdata;
+>  
+
+	^^^^
+With this, the mount_data_global parm to cifs_mount is vestigial. I
+think you can remove that and just plan to pass in the options via
+cifs_sb->mountdata.
+
+>  	/* cleanup activities if we're chasing a referral */
+>  	if (referral_walks_count) {
+> @@ -2954,7 +2958,7 @@ remote_path_check:
+>  	 */
+>  	if (referral_walks_count == 0) {
+>  		int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
+> -						cifs_sb, &mount_data, false);
+> +						cifs_sb, false);
+>  		if (!refrc) {
+>  			referral_walks_count++;
+>  			goto try_mount_again;
+> @@ -2996,17 +3000,13 @@ remote_path_check:
+>  			convert_delimiter(cifs_sb->prepath,
+>  					CIFS_DIR_SEP(cifs_sb));
+>  
+> -		if (mount_data != mount_data_global)
+> -			kfree(mount_data);
+> -
+>  		rc = expand_dfs_referral(xid, pSesInfo, volume_info, cifs_sb,
+> -					 &mount_data, true);
+> +					 true);
+>  
+>  		if (!rc) {
+>  			referral_walks_count++;
+>  			goto try_mount_again;
 >  		}
->  	}
->  
->  	if (vol->multiuser && !(vol->secFlg & CIFSSEC_MAY_KRB5)) {
->  		cERROR(1, "Multiuser mounts currently require krb5 "
->  			  "authentication!");
-> -		return 1;
-> +		goto cifs_parse_mount_err;
->  	}
->  
->  	if (vol->UNCip == NULL)
-> @@ -1455,6 +1461,10 @@ cifs_parse_mount_options(char *options, const char *devname,
->  				   "specified with no gid= option.\n");
->  
->  	return 0;
+> -		mount_data = NULL;
+>  		goto mount_fail_check;
+>  #else /* No DFS support, return error on mount */
+>  		rc = -EOPNOTSUPP;
+> @@ -3040,8 +3040,6 @@ remote_path_check:
+>  mount_fail_check:
+>  	/* on error free sesinfo and tcon struct if needed */
+>  	if (rc) {
+> -		if (mount_data != mount_data_global)
+> -			kfree(mount_data);
+>  		/* If find_unc succeeded then rc == 0 so we can not end */
+>  		/* up accidently freeing someone elses tcon struct */
+>  		if (tcon)
 
-	^^^^^^^^^^
-In the event that there's no error, what frees mountdata_copy here?
+Other than the above nit...nice cleanup.
 
-> +
-> +cifs_parse_mount_err:
-> +	kfree(mountdata_copy);
-> +	return 1;
->  }
->  
->  /** Returns true if srcaddr isn't specified and rhs isn't
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
