@@ -1,91 +1,127 @@
-From: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH 1/4] Extract DFS referral expansion to new function in
-	cifs_mount
-Date: Fri, 1 Apr 2011 17:32:29 +0200
-Message-ID: <20110401153229.GA9459@cobija.connexer.com>
-References: <E1Q5dRc-0005je-TI@seldlx2151.corpusers.net> <20110401091418.76871d76@tlielax.poochiereds.net> <20110401073256.70180710@tlielax.poochiereds.net> <E1Q5dRd-0005jh-0Z@seldlx2151.corpusers.net> <20110401092717.03b42cfe@tlielax.poochiereds.net> <20110401073256.70180710@tlielax.poochiereds.net> <E1Q5dRc-0005jZ-Mf@seldlx2151.corpusers.net> <20110401090829.5521384b@tlielax.poochiereds.net> <20110401142625.GA8348@cobija.connexer.com> <20110401110157.42a571e6@tlielax.poochiereds.net>
+ cifs_mount
+Date: Fri, 1 Apr 2011 11:54:12 -0400
+Message-ID: <20110401115412.46c3b6c0@tlielax.poochiereds.net>
+References: <E1Q5dRc-0005je-TI@seldlx2151.corpusers.net>
+	<20110401091418.76871d76@tlielax.poochiereds.net>
+	<20110401073256.70180710@tlielax.poochiereds.net>
+	<E1Q5dRd-0005jh-0Z@seldlx2151.corpusers.net>
+	<20110401092717.03b42cfe@tlielax.poochiereds.net>
+	<20110401073256.70180710@tlielax.poochiereds.net>
+	<E1Q5dRc-0005jZ-Mf@seldlx2151.corpusers.net>
+	<20110401090829.5521384b@tlielax.poochiereds.net>
+	<20110401142625.GA8348@cobija.connexer.com>
+	<20110401110157.42a571e6@tlielax.poochiereds.net>
+	<20110401153229.GA9459@cobija.connexer.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20110401110412.7a4f9fb6-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org> <20110401110157.42a571e6-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20110401153229.GA9459-Znhnm/lQSyjxW5zecs3cv0EOCMrvLtNR@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Jeff,
+On Fri, 1 Apr 2011 17:32:29 +0200
+sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
 
-On Fri, Apr 01, 2011 at 11:01:57AM -0400, Jeff Layton wrote:
-> On Fri, 1 Apr 2011 16:26:25 +0200
-> sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
-> > On Fri, Apr 01, 2011 at 09:09:08AM -0400, Jeff Layton wrote:
-> > > Thanks for respinning the set, this looks much easier to review. One
-> > > thing I notice right offhand is that the new code doesn't check to see
-> > > whether referral_walks_count > MAX_NESTED_LINKS (like the original call
-> > > site does).
+> Hi Jeff,
+> 
+> On Fri, Apr 01, 2011 at 11:01:57AM -0400, Jeff Layton wrote:
+> > On Fri, 1 Apr 2011 16:26:25 +0200
+> > sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
+> > > On Fri, Apr 01, 2011 at 09:09:08AM -0400, Jeff Layton wrote:
+> > > > Thanks for respinning the set, this looks much easier to review. One
+> > > > thing I notice right offhand is that the new code doesn't check to see
+> > > > whether referral_walks_count > MAX_NESTED_LINKS (like the original call
+> > > > site does).
+> > > > 
+> > > > That means the client can loop here indefinitely if there is a referral
+> > > > loop. I think we need that check in there.
 > > > 
-> > > That means the client can loop here indefinitely if there is a referral
-> > > loop. I think we need that check in there.
+> > > Oops, that wasn't intentional to be removed.  Will restore it.
+> 
+> Or... hm.. no i still see the check in place, doesn't look to me like
+> I did remove it.  The other places where we attempt to expand the
+> referral (the code added in this patch) shouldn't be affected by loops
+> either since it's only done before the referall walking has started:
+> 
+>     if (referral_walks_count == 0) {
+>         int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
+>                                         cifs_sb, false);
+>         if (!refrc) {
+>             referral_walks_count++;
+>             goto try_mount_again;
+>         }
+>     }
+> 
+> Or am I missing something?
+> 
+
+Yes, I'm saying that your new call site in patch #2 doesn't have this
+check. You're just as likely to hit referral loops there, so you need
+to check for them.
+
+> > > On Fri, Apr 01, 2011 at 09:27:17AM -0400, Jeff Layton wrote:
+> > > > On Mon, 28 Mar 2011 12:19:29 +0200
+> > > > Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
+> > > While doing this I was thinking to myself that it might make more sense
+> > > to unconditionally have cifs_sb->mountdata available, and always kstr(n)dup
+> > > it before passing it along instead of the global mountdata option, but felt
+> > > I might be overstepping the scope of what I was originally intending to do.
+> > > What do you think?
+> > > 
 > > 
-> > Oops, that wasn't intentional to be removed.  Will restore it.
-
-Or... hm.. no i still see the check in place, doesn't look to me like
-I did remove it.  The other places where we attempt to expand the
-referral (the code added in this patch) shouldn't be affected by loops
-either since it's only done before the referall walking has started:
-
-    if (referral_walks_count == 0) {
-        int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
-                                        cifs_sb, false);
-        if (!refrc) {
-            referral_walks_count++;
-            goto try_mount_again;
-        }
-    }
-
-Or am I missing something?
-
-> > On Fri, Apr 01, 2011 at 09:27:17AM -0400, Jeff Layton wrote:
-> > > On Mon, 28 Mar 2011 12:19:29 +0200
-> > > Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
-> > While doing this I was thinking to myself that it might make more sense
-> > to unconditionally have cifs_sb->mountdata available, and always kstr(n)dup
-> > it before passing it along instead of the global mountdata option, but felt
-> > I might be overstepping the scope of what I was originally intending to do.
-> > What do you think?
+> > Good point. I wasn't thinking about that case.
 > > 
+> > I think having cifs_sb->mountdata as an unconditional member would be a
+> > better option. We don't generally have *that* many superblocks and it
+> > would be nice to get rid of some #ifdef's. In most cases these strings
+> > are quite small so if someone compiles DFS support out, it won't be
+> > wasting that much memory.
 > 
-> Good point. I wasn't thinking about that case.
+> Okay, I'll fix "Simplify handling of submount options" to do this then.
 > 
-> I think having cifs_sb->mountdata as an unconditional member would be a
-> better option. We don't generally have *that* many superblocks and it
-> would be nice to get rid of some #ifdef's. In most cases these strings
-> are quite small so if someone compiles DFS support out, it won't be
-> wasting that much memory.
-
-Okay, I'll fix "Simplify handling of submount options" to do this then.
-
-On Fri, Apr 01, 2011 at 11:04:12AM -0400, Jeff Layton wrote:
-> Another argument for this solution...
+> On Fri, Apr 01, 2011 at 11:04:12AM -0400, Jeff Layton wrote:
+> > Another argument for this solution...
+> > 
+> > The CIFS code currently handles remounts poorly. If we make it a point
+> > to keep the original mount options around it may make it easier to
+> > eventually fix that.
 > 
-> The CIFS code currently handles remounts poorly. If we make it a point
-> to keep the original mount options around it may make it easier to
-> eventually fix that.
+> Additionally, from what I can tell with DFS there are two sets of
+> "options", the ones that were passed from mount() and the ones that were
+> generated by taking the previous options and overlaying them with the 
+> referral's mount data.  If we do the above, cifs_sb->mountdata will have
+> the latter, which woudl probably not do exactly the right thing when
+> the DFS share needed to be remounted (i.e. an admin takes one of the
+> servers out of the DFS pool we should probably walk the referrals all
+> over again, not just try to reconnect).  
+> 
+> But I don't think it'd be a great deal of effort to support that case
+> as well while fixing the above, at the expense of keeping both
+> of these mountdata informations in seperate members in cifs_sb (the
+> submount data could be null for non DFS shares, at least).
+> 
 
-Additionally, from what I can tell with DFS there are two sets of
-"options", the ones that were passed from mount() and the ones that were
-generated by taking the previous options and overlaying them with the 
-referral's mount data.  If we do the above, cifs_sb->mountdata will have
-the latter, which woudl probably not do exactly the right thing when
-the DFS share needed to be remounted (i.e. an admin takes one of the
-servers out of the DFS pool we should probably walk the referrals all
-over again, not just try to reconnect).  
+Well, currently on a remount we just unconditionally return success
+without actually doing anything. Obviously this isn't ideal...
 
-But I don't think it'd be a great deal of effort to support that case
-as well while fixing the above, at the expense of keeping both
-of these mountdata informations in seperate members in cifs_sb (the
-submount data could be null for non DFS shares, at least).
+In general, there are almost no mount options that we're equipped to
+handle changing on a remount. Most of the relevant data structures can
+be shared between mounts, and that makes it near impossible. The main
+reason we want to save the options is to make sure that we don't return
+success when someone tries to change an option that we can't handle.
 
+We'd also have to re-compose the mount options in case someone tried to
+remount again... As you can see the problem quickly becomes very tough
+to solve.
 
-	Sean
+In any case, I agree that you shouldn't spend too much time on this
+use-case. If it helps fix that eventually, then great...otherwise
+saving the mount options unconditionally is unlikely to hurt anything.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
