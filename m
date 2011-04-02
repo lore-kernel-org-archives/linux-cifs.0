@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/5] cifs: consolidate SendReceive response checks
-Date: Sat,  2 Apr 2011 08:23:55 -0400
-Message-ID: <1301747039-31411-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 4/5] cifs: add cifs_async_writev
+Date: Sat,  2 Apr 2011 08:23:58 -0400
+Message-ID: <1301747039-31411-5-git-send-email-jlayton@redhat.com>
 References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,286 +9,288 @@ In-Reply-To: <1301747039-31411-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Further consolidate the SendReceive code by moving the checks run over
-the packet into a separate function that all the SendReceive variants
-can call.
-
-We can also eliminate the check for a receive_len that's too big or too
-small. cifs_demultiplex_thread already checks that and disconnects the
-socket if that occurs, while setting the midStatus to MALFORMED. It'll
-never call this code if that's the case.
-
-Finally do a little cleanup. Use "goto out" on errors so that the flow
-of code in the normal case is more evident. Also switch the logErr
-variable in map_smb_to_linux_error to a bool.
+Add the ability for CIFS to do an asynchronous write. The kernel will
+set the frame up as it would for a "normal" SMBWrite2 request, and use
+cifs_call_async to send it. The mid callback will then be configured to
+handle the result.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    4 +-
- fs/cifs/netmisc.c   |    2 +-
- fs/cifs/transport.c |  158 ++++++++++++++-------------------------------------
- 3 files changed, 46 insertions(+), 118 deletions(-)
+ fs/cifs/cifsproto.h |   19 +++++
+ fs/cifs/cifssmb.c   |  219 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 238 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 76c4dc7f..4af7db8 100644
+index e255a2b..7b964df 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -74,6 +74,8 @@ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
- 			int * /* bytes returned */ , const int long_op);
- extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
- 			struct smb_hdr *in_buf, int flags);
-+extern int cifs_check_receive(struct mid_q_entry *mid,
-+			struct TCP_Server_Info *server, bool log_error);
- extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct kvec *, int /* nvec to send */,
- 			int * /* type of buf returned */ , const int flags);
-@@ -97,7 +99,7 @@ extern int cifs_convert_address(struct sockaddr *dst, const char *src, int len);
- extern int cifs_set_port(struct sockaddr *addr, const unsigned short int port);
- extern int cifs_fill_sockaddr(struct sockaddr *dst, const char *src, int len,
- 				const unsigned short int port);
--extern int map_smb_to_linux_error(struct smb_hdr *smb, int logErr);
-+extern int map_smb_to_linux_error(struct smb_hdr *smb, bool logErr);
- extern void header_assemble(struct smb_hdr *, char /* command */ ,
- 			    const struct cifs_tcon *, int /* length of
- 			    fixed section (word count) in two byte units */);
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index 79b71c2..73e47e8 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -836,7 +836,7 @@ ntstatus_to_dos(__u32 ntstatus, __u8 *eclass, __u16 *ecode)
- }
+@@ -21,6 +21,7 @@
+ #ifndef _CIFSPROTO_H
+ #define _CIFSPROTO_H
+ #include <linux/nls.h>
++#include <linux/pagevec.h>
  
- int
--map_smb_to_linux_error(struct smb_hdr *smb, int logErr)
-+map_smb_to_linux_error(struct smb_hdr *smb, bool logErr)
- {
- 	unsigned int i;
- 	int rc = -EIO;	/* if transport error smb error may not be set */
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 85063de..d9833fc 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -505,13 +505,32 @@ send_nt_cancel(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
- }
- 
- int
-+cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-+		   bool log_error)
-+{
-+	dump_smb(mid->resp_buf,
-+		 min_t(u32, 92, be32_to_cpu(mid->resp_buf->smb_buf_length)));
+ struct statfs;
+ struct smb_vol;
+@@ -433,4 +434,22 @@ extern int mdfour(unsigned char *, unsigned char *, int);
+ extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
+ extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
+ 			unsigned char *p24);
 +
-+	/* convert the length into a more usable form */
-+	if (server->sec_mode & (SECMODE_SIGN_REQUIRED |
-+				SECMODE_SIGN_ENABLED)) {
-+		/* FIXME: add code to kill session */
-+		if (cifs_verify_signature(mid->resp_buf, server,
-+					  mid->sequence_number + 1) != 0)
-+			cERROR(1, "Unexpected SMB signature");
++/* asynchronous write support */
++struct cifs_writedata {
++	struct list_head	pending;
++	struct kref		refcount;
++	struct completion	completion;
++	struct work_struct	work;
++	struct cifsFileInfo	*cfile;
++	__u64			offset;
++	unsigned int		bytes;
++	int			result;
++	struct page 		*pages[PAGEVEC_SIZE];
++};
++
++int cifs_async_writev(struct cifs_writedata *wdata);
++struct cifs_writedata *cifs_writedata_alloc(void);
++void cifs_writedata_release(struct kref *refcount);
++
+ #endif			/* _CIFSPROTO_H */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 8de7e79..b308605 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -32,6 +32,7 @@
+ #include <linux/vfs.h>
+ #include <linux/slab.h>
+ #include <linux/posix_acl_xattr.h>
++#include <linux/pagemap.h>
+ #include <asm/uaccess.h>
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+@@ -1604,6 +1605,224 @@ CIFSSMBWrite(const int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++void
++cifs_writedata_release(struct kref *refcount)
++{
++	struct cifs_writedata *wdata = container_of(refcount,
++					struct cifs_writedata, refcount);
++	struct address_space *mapping;
++
++	if (wdata->cfile) {
++		mapping = wdata->cfile->dentry->d_inode->i_mapping;
++
++		spin_lock(&mapping->private_lock);
++		list_del(&wdata->pending);
++		spin_unlock(&mapping->private_lock);
++
++		cifsFileInfo_put(wdata->cfile);
 +	}
 +
-+	/* BB special case reconnect tid and uid here? */
-+	return map_smb_to_linux_error(mid->resp_buf, log_error);
++	kfree(wdata);
 +}
 +
++static void
++cifs_writev_complete(struct work_struct *work)
++{
++	struct cifs_writedata *wdata = container_of(work,
++						struct cifs_writedata, work);
++	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
++	struct inode *inode = wdata->cfile->dentry->d_inode;
++	struct page *page;
++	int i = 0;
++
++	if (wdata->result == 0) {
++		cifs_update_eof(CIFS_I(inode), wdata->offset, wdata->bytes);
++		cifs_stats_bytes_written(tcon, wdata->bytes);
++	}
++
++	for (i = 0; i < ARRAY_SIZE(wdata->pages) && (page = wdata->pages[i]);
++			i++) {
++		if (wdata->result == -EAGAIN)
++			__set_page_dirty_nobuffers(page);
++		else if (wdata->result < 0)
++			SetPageError(page);
++		end_page_writeback(page);
++		page_cache_release(page);
++	}
++	if (wdata->result != -EAGAIN)
++		mapping_set_error(inode->i_mapping, wdata->result);
++	complete(&wdata->completion);
++	kref_put(&wdata->refcount, cifs_writedata_release);
++}
++
++struct cifs_writedata *
++cifs_writedata_alloc(void)
++{
++	struct cifs_writedata *wdata;
++
++	wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
++	if (wdata != NULL) {
++		INIT_LIST_HEAD(&wdata->pending);
++		INIT_WORK(&wdata->work, cifs_writev_complete);
++		kref_init(&wdata->refcount);
++		init_completion(&wdata->completion);
++	}
++	return wdata;
++}
++
++/*
++ * Check the midState and signature on received buffer (if any), and queue the
++ * workqueue completion task.
++ */
++static void
++cifs_writev_callback(struct mid_q_entry *mid)
++{
++	struct cifs_writedata *wdata = mid->callback_data;
++	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
++	unsigned int written;
++	WRITE_RSP *smb = (WRITE_RSP *)mid->resp_buf;
++
++	switch(mid->midState) {
++	case MID_RESPONSE_RECEIVED:
++		wdata->result = cifs_check_receive(mid, tcon->ses->server, 0);
++		if (wdata->result != 0)
++			break;
++
++		written = le16_to_cpu(smb->CountHigh);
++		written <<= 16;
++		written += le16_to_cpu(smb->Count);
++		/*
++		 * Mask off high 16 bits when bytes written as returned
++		 * by the server is greater than bytes requested by the
++		 * client. OS/2 servers are known to set incorrect
++		 * CountHigh values.
++		 */
++		if (written > wdata->bytes)
++			written &= 0xFFFF;
++
++		if (written < wdata->bytes)
++			wdata->result = -ENOSPC;
++		else
++			wdata->bytes = written;
++		break;
++	case MID_REQUEST_SUBMITTED:
++	case MID_RETRY_NEEDED:
++		wdata->result = -EAGAIN;
++		break;
++	default:
++		wdata->result = -EIO;
++		break;
++	}
++
++	queue_work(system_nrt_wq, &wdata->work);
++	DeleteMidQEntry(mid);
++	atomic_dec(&tcon->ses->server->inFlight);
++	wake_up(&tcon->ses->server->request_q);
++}
++
++/* cifs_async_writev - send an async write, and set up mid to handle result */
 +int
- SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	     struct kvec *iov, int n_vec, int *pRespBufType /* ret */,
- 	     const int flags)
- {
- 	int rc = 0;
- 	int long_op;
--	unsigned int receive_len;
- 	struct mid_q_entry *midQ;
- 	struct smb_hdr *in_buf = iov[0].iov_base;
- 
-@@ -604,54 +623,24 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 		return rc;
- 	}
- 
--	receive_len = be32_to_cpu(midQ->resp_buf->smb_buf_length);
--
--	if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
--		cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
--			receive_len, xid);
-+	if (!midQ->resp_buf || midQ->midState != MID_RESPONSE_RECEIVED) {
- 		rc = -EIO;
-+		cFYI(1, "Bad MID state?");
- 		goto out;
- 	}
- 
--	/* rcvd frame is ok */
--
--	if (midQ->resp_buf &&
--	    (midQ->midState == MID_RESPONSE_RECEIVED)) {
--
--		iov[0].iov_base = (char *)midQ->resp_buf;
--		if (midQ->largeBuf)
--			*pRespBufType = CIFS_LARGE_BUFFER;
--		else
--			*pRespBufType = CIFS_SMALL_BUFFER;
--		iov[0].iov_len = receive_len + 4;
--
--		dump_smb(midQ->resp_buf, 80);
--		/* convert the length into a more usable form */
--		if ((receive_len > 24) &&
--		    (ses->server->sec_mode & (SECMODE_SIGN_REQUIRED |
--					     SECMODE_SIGN_ENABLED))) {
--			rc = cifs_verify_signature(midQ->resp_buf,
--						ses->server,
--						midQ->sequence_number+1);
--			if (rc) {
--				cERROR(1, "Unexpected SMB signature");
--				/* BB FIXME add code to kill session */
--			}
--		}
--
--		/* BB special case reconnect tid and uid here? */
--		rc = map_smb_to_linux_error(midQ->resp_buf,
--					    flags & CIFS_LOG_ERROR);
-+	iov[0].iov_base = (char *)midQ->resp_buf;
-+	iov[0].iov_len = be32_to_cpu(midQ->resp_buf->smb_buf_length) + 4;
-+	if (midQ->largeBuf)
-+		*pRespBufType = CIFS_LARGE_BUFFER;
++cifs_async_writev(struct cifs_writedata *wdata)
++{
++	int i, rc = -EACCES;
++	WRITE_REQ *smb = NULL;
++	int wct;
++	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
++	struct inode *inode = wdata->cfile->dentry->d_inode;
++	unsigned int npages = ARRAY_SIZE(wdata->pages);
++	struct kvec *iov = NULL;
++
++	cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
++
++	if (tcon->ses->capabilities & CAP_LARGE_FILES) {
++		wct = 14;
++	} else {
++		wct = 12;
++		if (wdata->offset >> 32 > 0) {
++			/* can not handle big offset for old srv */
++			return -EIO;
++		}
++	}
++
++	rc = small_smb_init(SMB_COM_WRITE_ANDX, wct, tcon, (void **)&smb);
++	if (rc)
++		goto async_writev_out;
++
++	/* FIXME: only allocate number of kvecs we need */
++	iov = kzalloc((npages + 1) * sizeof(*iov), GFP_NOFS);
++	if (iov == NULL) {
++		rc = -ENOMEM;
++		goto async_writev_out;
++	}
++
++	smb->AndXCommand = 0xFF;	/* none */
++	smb->Fid = wdata->cfile->netfid;
++	smb->OffsetLow = cpu_to_le32(wdata->offset & 0xFFFFFFFF);
++	if (wct == 14)
++		smb->OffsetHigh = cpu_to_le32(wdata->offset >> 32);
++	smb->Reserved = 0xFFFFFFFF;
++	smb->WriteMode = 0;
++	smb->Remaining = 0;
++
++	smb->DataOffset =
++	    cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
++
++	/* 4 for RFC1001 length + 1 for BCC */
++	iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
++	iov[0].iov_base = smb;
++
++	/* marshal up the pages into iov array */
++	npages = 0;
++	wdata->bytes = 0;
++	for (i = 0; i < ARRAY_SIZE(wdata->pages) && wdata->pages[i]; i++) {
++		if (wdata->bytes + PAGE_CACHE_SIZE <=
++		    CIFS_SB(inode->i_sb)->wsize) {
++			iov[i + 1].iov_len = min(inode->i_size -
++					      page_offset(wdata->pages[i]),
++						(loff_t)PAGE_CACHE_SIZE);
++			iov[i + 1].iov_base = kmap(wdata->pages[i]);
++			wdata->bytes += iov[i + 1].iov_len;
++			npages++;
++		} else {
++			/* if we're beyond wsize, then re-mark page dirty */
++			__set_page_dirty_nobuffers(wdata->pages[i]);
++		}
++	}
++
++	smb->DataLengthLow = cpu_to_le16(wdata->bytes & 0xFFFF);
++	smb->DataLengthHigh = cpu_to_le16(wdata->bytes >> 16);
++
++	if (wct == 14) {
++		inc_rfc1001_len(&smb->hdr, wdata->bytes + 1);
++		put_bcc(wdata->bytes + 1, &smb->hdr);
++	} else {
++		/* wct == 12 */
++		struct smb_com_writex_req *smbw =
++				(struct smb_com_writex_req *)smb;
++		inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
++		put_bcc(wdata->bytes + 5, &smbw->hdr);
++		iov[0].iov_len += 4; /* pad bigger by four bytes */
++	}
++
++	kref_get(&wdata->refcount);
++	rc = cifs_call_async(tcon->ses->server, iov, npages + 1,
++			     cifs_writev_callback, wdata);
++
++	if (rc == 0)
++		cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
 +	else
-+		*pRespBufType = CIFS_SMALL_BUFFER;
- 
--		if ((flags & CIFS_NO_RESP) == 0)
--			midQ->resp_buf = NULL;  /* mark it so buf will
--						   not be freed by
--						   delete_mid */
--	} else {
--		rc = -EIO;
--		cFYI(1, "Bad MID state?");
--	}
-+	rc = cifs_check_receive(midQ, ses->server, flags & CIFS_LOG_ERROR);
- 
-+	/* mark it so buf will not be freed by delete_mid */
-+	if ((flags & CIFS_NO_RESP) == 0)
-+		midQ->resp_buf = NULL;
- out:
- 	delete_mid(midQ);
- 	atomic_dec(&ses->server->inFlight);
-@@ -666,7 +655,6 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	    int *pbytes_returned, const int long_op)
- {
- 	int rc = 0;
--	unsigned int receive_len;
- 	struct mid_q_entry *midQ;
- 
- 	if (ses == NULL) {
-@@ -753,47 +741,16 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		return rc;
- 	}
- 
--	receive_len = be32_to_cpu(midQ->resp_buf->smb_buf_length);
--
--	if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
--		cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
--			receive_len, xid);
--		rc = -EIO;
--		goto out;
--	}
--
--	/* rcvd frame is ok */
--
--	if (midQ->resp_buf && out_buf
--	    && (midQ->midState == MID_RESPONSE_RECEIVED)) {
--		out_buf->smb_buf_length = cpu_to_be32(receive_len);
--		memcpy((char *)out_buf + 4,
--		       (char *)midQ->resp_buf + 4,
--		       receive_len);
--
--		dump_smb(out_buf, 92);
--		/* convert the length into a more usable form */
--		if ((receive_len > 24) &&
--		    (ses->server->sec_mode & (SECMODE_SIGN_REQUIRED |
--					     SECMODE_SIGN_ENABLED))) {
--			rc = cifs_verify_signature(out_buf,
--						ses->server,
--						midQ->sequence_number+1);
--			if (rc) {
--				cERROR(1, "Unexpected SMB signature");
--				/* BB FIXME add code to kill session */
--			}
--		}
--
--		*pbytes_returned = be32_to_cpu(out_buf->smb_buf_length);
--
--		/* BB special case reconnect tid and uid here? */
--		rc = map_smb_to_linux_error(out_buf, 0 /* no log */ );
--	} else {
-+	if (!midQ->resp_buf || !out_buf ||
-+	    midQ->midState != MID_RESPONSE_RECEIVED) {
- 		rc = -EIO;
- 		cERROR(1, "Bad MID state?");
-+		goto out;
- 	}
- 
-+	*pbytes_returned = be32_to_cpu(midQ->resp_buf->smb_buf_length);
-+	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
-+	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
- 	delete_mid(midQ);
- 	atomic_dec(&ses->server->inFlight);
-@@ -834,7 +791,6 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- {
- 	int rc = 0;
- 	int rstart = 0;
--	unsigned int receive_len;
- 	struct mid_q_entry *midQ;
- 	struct cifs_ses *ses;
- 
-@@ -953,46 +909,16 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (rc != 0)
- 		return rc;
- 
--	receive_len = be32_to_cpu(midQ->resp_buf->smb_buf_length);
--	if (receive_len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
--		cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
--			receive_len, xid);
--		rc = -EIO;
--		goto out;
--	}
--
- 	/* rcvd frame is ok */
--
--	if ((out_buf == NULL) || (midQ->midState != MID_RESPONSE_RECEIVED)) {
-+	if (out_buf == NULL || midQ->midState != MID_RESPONSE_RECEIVED) {
- 		rc = -EIO;
- 		cERROR(1, "Bad MID state?");
- 		goto out;
- 	}
- 
--	out_buf->smb_buf_length = cpu_to_be32(receive_len);
--	memcpy((char *)out_buf + 4,
--	       (char *)midQ->resp_buf + 4,
--	       receive_len);
--
--	dump_smb(out_buf, 92);
--	/* convert the length into a more usable form */
--	if ((receive_len > 24) &&
--	    (ses->server->sec_mode & (SECMODE_SIGN_REQUIRED |
--				     SECMODE_SIGN_ENABLED))) {
--		rc = cifs_verify_signature(out_buf,
--					   ses->server,
--					   midQ->sequence_number+1);
--		if (rc) {
--			cERROR(1, "Unexpected SMB signature");
--			/* BB FIXME add code to kill session */
--		}
--	}
--
--	*pbytes_returned = be32_to_cpu(out_buf->smb_buf_length);
--
--	/* BB special case reconnect tid and uid here? */
--	rc = map_smb_to_linux_error(out_buf, 0 /* no log */ );
--
-+	*pbytes_returned = be32_to_cpu(midQ->resp_buf->smb_buf_length);
-+	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
-+	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
- 	delete_mid(midQ);
- 	if (rstart && rc == -EACCES)
++		kref_put(&wdata->refcount, cifs_writedata_release);
++
++	/* send is done, unmap pages */
++	for (i = 0; i < npages; i++)
++		kunmap(wdata->pages[i]);
++
++async_writev_out:
++	cifs_small_buf_release(smb);
++	kfree(iov);
++	return rc;
++}
++
+ int
+ CIFSSMBWrite2(const int xid, struct cifs_tcon *tcon,
+ 	     const int netfid, const unsigned int count,
 -- 
 1.7.4
