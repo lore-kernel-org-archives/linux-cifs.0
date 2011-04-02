@@ -1,59 +1,114 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/5] cifs: asynchronous writepages support (try #1)
-Date: Sat,  2 Apr 2011 08:23:54 -0400
-Message-ID: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 2/5] cifs: make cifs_send_async take a kvec array
+Date: Sat,  2 Apr 2011 08:23:56 -0400
+Message-ID: <1301747039-31411-3-git-send-email-jlayton@redhat.com>
+References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1301747039-31411-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset changes the CIFS code to do asynchronous writes in
-writepages(). It uses the asynchronous call infrastructure that was
-added to handle SMB echoes. The idea here is to have the kernel
-issue a write request and then have it handle the reply asynchronously.
+We'll need this for async writes, so convert the call to take a kvec
+array. CIFSSMBEcho is changed to put a kvec on the stack and pass
+in the SMB buffer using that.
 
-For now, this just changes the writepages codepath. Once the patchset
-has had a bit more refinement and testing, I'll see about changing some
-of the other codepaths (writepage(), for instance).
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsproto.h |    4 ++--
+ fs/cifs/cifssmb.c   |    6 ++++--
+ fs/cifs/transport.c |   13 +++++++------
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
-So far, I have *not* seen a large amount of performance increase from
-this. That may just be because my test rig sucks though. I'm planning to
-reserve some beefier machines for testing next week sometime. In the
-meantime, if anyone wants to help test this out please do so and report
-the results.
-
-I'm not 100% thrilled with this approach overall -- I think we do need
-to handle writes asynchronously, but the fact that we're using our own
-writepages routine kind of hamstrings this code.
-
-Another possible approach here would be to move to more page-based I/O
-like NFS has. Have writepage() set up the pages for writeback and
-coalesce them together as it goes, and then issue the write all at
-once. That would also allow us to handle larger write sizes than 56k.
-
-Obviously, that's a much larger project to cobble together however. Much
-of this code would still be applicable if we did decide to go that route
-eventually.
-
-Obviously, this patch is not quite ready for merge in 2.6.39, but I
-would like to have this ready to go when the 2.6.40 merge window opens.
-
-Jeff Layton (5):
-  cifs: consolidate SendReceive response checks
-  cifs: make cifs_send_async take a kvec array
-  cifs: don't call mid_q_entry->callback under the Global_MidLock
-  cifs: add cifs_async_writev
-  cifs: convert cifs_writepages to use async writes
-
- fs/cifs/cifsglob.h      |    7 +-
- fs/cifs/cifsproto.h     |   27 +++++-
- fs/cifs/cifssmb.c       |  225 +++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/connect.c       |   32 +++++--
- fs/cifs/file.c          |  256 +++++++++++++++++++++++++----------------------
- fs/cifs/netmisc.c       |    2 +-
- fs/cifs/smb2transport.c |   14 +--
- fs/cifs/transport.c     |  194 +++++++++++-------------------------
- 8 files changed, 473 insertions(+), 284 deletions(-)
-
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 4af7db8..e255a2b 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -65,8 +65,8 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern int wait_for_free_request(struct TCP_Server_Info *sv, const int long_op);
+-extern int cifs_call_async(struct TCP_Server_Info *server,
+-			   struct smb_hdr *in_buf, mid_callback_t *callback,
++extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
++			   unsigned int nvec, mid_callback_t *callback,
+ 			   void *cbdata);
+ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct smb_hdr * /* input */ ,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 655f24c..8de7e79 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -725,6 +725,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ {
+ 	ECHO_REQ *smb;
+ 	int rc = 0;
++	struct kvec iov;
+ 
+ 	cFYI(1, "In echo request");
+ 
+@@ -739,9 +740,10 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 	put_bcc(1, &smb->hdr);
+ 	smb->Data[0] = 'a';
+ 	inc_rfc1001_len(smb, 3);
++	iov.iov_base = smb;
++	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
+ 
+-	rc = cifs_call_async(server, (struct smb_hdr *)smb,
+-				cifs_echo_callback, server);
++	rc = cifs_call_async(server, &iov, 1, cifs_echo_callback, server);
+ 	if (rc)
+ 		cFYI(1, "Echo request failed: %d", rc);
+ 
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index d9833fc..7ccf292 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -349,11 +349,12 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+  * the result. Caller is responsible for dealing with timeouts.
+  */
+ int
+-cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+-		mid_callback_t *callback, void *cbdata)
++cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
++		unsigned int nvec, mid_callback_t *callback, void *cbdata)
+ {
+ 	int rc;
+ 	struct mid_q_entry *mid;
++	struct smb_hdr *hdr = (struct smb_hdr *)iov[0].iov_base;
+ 
+ 	rc = wait_for_free_request(server, CIFS_ASYNC_OP);
+ 	if (rc)
+@@ -361,10 +362,10 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ 
+ 	/* enable signing if server requires it */
+ 	if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+-		in_buf->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
++		hdr->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+ 
+ 	mutex_lock(&server->srv_mutex);
+-	mid = AllocMidQEntry(in_buf, server);
++	mid = AllocMidQEntry(hdr, server);
+ 	if (mid == NULL) {
+ 		mutex_unlock(&server->srv_mutex);
+ 		return -ENOMEM;
+@@ -375,7 +376,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ 	list_add_tail(&mid->qhead, &server->pending_mid_q);
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	rc = cifs_sign_smb(in_buf, server, &mid->sequence_number);
++	rc = cifs_sign_smb2(iov, nvec, server, &mid->sequence_number);
+ 	if (rc) {
+ 		mutex_unlock(&server->srv_mutex);
+ 		goto out_err;
+@@ -385,7 +386,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ 	mid->callback_data = cbdata;
+ 	mid->midState = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(server);
+-	rc = smb_send(server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
++	rc = smb_sendv(server, iov, nvec);
+ 	cifs_in_send_dec(server);
+ 	cifs_save_when_sent(mid);
+ 	mutex_unlock(&server->srv_mutex);
 -- 
 1.7.4
