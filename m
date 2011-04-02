@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/5] cifs: don't call mid_q_entry->callback under the Global_MidLock
-Date: Sat,  2 Apr 2011 08:23:57 -0400
-Message-ID: <1301747039-31411-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 5/5] cifs: convert cifs_writepages to use async writes
+Date: Sat,  2 Apr 2011 08:23:59 -0400
+Message-ID: <1301747039-31411-6-git-send-email-jlayton@redhat.com>
 References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,247 +9,387 @@ In-Reply-To: <1301747039-31411-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Holding the spinlock while we call this function means that it can't
-sleep, which really limits what it can do. Taking it out from under
-the spinlock also means less contention for this global lock.
+Have cifs_writepages issue asynchronous writes instead of waiting on
+each write call to complete before issuing another. This also allows us
+to return more quickly from writepages in the WB_SYNC_NONE case. It
+can just send out all of the I/Os and not wait around for the replies.
 
-Change the semantics such that the Global_MidLock is not held when
-the callback is called. To do this requires that we take extra care
-not to have sync_mid_result remove the mid from the list when the
-mid is in a state where that has already happened. This prevents
-list corruption when the mid is sitting on a private list for
-reconnect or when cifsd is coming down.
+In the WB_SYNC_ALL case, have it wait for all of the writes to complete
+after issuing them and return any errors that turn up from it. If those
+errors turn out to all be retryable (-EAGAIN), then retry the entire
+operation again.
+
+This also changes the page locking semantics a little bit. Instead of
+holding the page lock until the response is received, release it after
+doing the send. This will reduce contention for the page lock and should
+prevent processes that have the file mmap'ed from being blocked
+unnecessarily.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h      |    7 +++----
- fs/cifs/connect.c       |   32 +++++++++++++++++++++++++-------
- fs/cifs/smb2transport.c |   14 ++++----------
- fs/cifs/transport.c     |   23 ++++++++---------------
- 4 files changed, 40 insertions(+), 36 deletions(-)
+ fs/cifs/file.c |  256 ++++++++++++++++++++++++++++++--------------------------
+ 1 files changed, 136 insertions(+), 120 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index ccbac61..b3a6404 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -583,9 +583,8 @@ struct mid_q_entry;
-  * This is the prototype for the mid callback function. When creating one,
-  * take special care to avoid deadlocks. Things to bear in mind:
-  *
-- * - it will be called by cifsd
-- * - the GlobalMid_Lock will be held
-- * - the mid will be removed from the pending_mid_q list
-+ * - it will be called by cifsd, with no locks held
-+ * - the mid will be removed from any lists
-  */
- typedef void (mid_callback_t)(struct mid_q_entry *mid);
- 
-@@ -739,7 +738,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- #define   MID_RESPONSE_RECEIVED 4
- #define   MID_RETRY_NEEDED      8 /* session closed while this request out */
- #define   MID_RESPONSE_MALFORMED 0x10
--#define   MID_NO_RESPONSE_NEEDED 0x20
-+#define   MID_SHUTDOWN		 0x20
- 
- /* Types of response buffer returned from SendReceive2 */
- #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 94e60c5..2b5d248 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -141,6 +141,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
- 	struct mid_q_entry *mid_entry;
-+	struct list_head retry_list;
- 
- 	spin_lock(&GlobalMid_Lock);
- 	if (server->tcpStatus == CifsExiting) {
-@@ -192,16 +193,23 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 	mutex_unlock(&server->srv_mutex);
- 
- 	/* mark submitted MIDs for retry and issue callback */
--	cFYI(1, "%s: issuing mid callbacks", __func__);
-+	INIT_LIST_HEAD(&retry_list);
-+	cFYI(1, "%s: moving mids to private list", __func__);
- 	spin_lock(&GlobalMid_Lock);
- 	list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
- 		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
- 		if (mid_entry->midState == MID_REQUEST_SUBMITTED)
- 			mid_entry->midState = MID_RETRY_NEEDED;
-+		list_move(&mid_entry->qhead, &retry_list);
-+	}
-+	spin_unlock(&GlobalMid_Lock);
-+
-+	cFYI(1, "%s: moving mids to private list", __func__);
-+	list_for_each_safe(tmp, tmp2, &retry_list) {
-+		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
- 		list_del_init(&mid_entry->qhead);
- 		mid_entry->callback(mid_entry);
- 	}
--	spin_unlock(&GlobalMid_Lock);
- 
- 	while (server->tcpStatus == CifsNeedReconnect) {
- 		try_to_freeze();
-@@ -655,11 +663,10 @@ multi_t2_fnd:
- 				else
- 					mid_entry->midState =
- 							MID_RESPONSE_MALFORMED;
-+				list_del_init(&mid_entry->qhead);
- #ifdef CONFIG_CIFS_STATS2
- 				mid_entry->when_received = jiffies;
- #endif
--				list_del_init(&mid_entry->qhead);
--				mid_entry->callback(mid_entry);
- 				break;
- 			}
- 			mid_entry = NULL;
-@@ -667,6 +674,7 @@ multi_t2_fnd:
- 		spin_unlock(&GlobalMid_Lock);
- 
- 		if (mid_entry != NULL) {
-+			mid_entry->callback(mid_entry);
- 			/* Was previous buf put in mpx struct for multi-rsp? */
- 			if (!isMultiRsp) {
- 				/* smb buffer will be freed by user thread */
-@@ -730,15 +738,25 @@ multi_t2_fnd:
- 		cifs_small_buf_release(smallbuf);
- 
- 	if (!list_empty(&server->pending_mid_q)) {
-+		struct list_head dispose_list;
-+
-+		INIT_LIST_HEAD(&dispose_list);
- 		spin_lock(&GlobalMid_Lock);
- 		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
- 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
--			cFYI(1, "Clearing Mid 0x%x - issuing callback",
--					 mid_entry->mid);
-+			cFYI(1, "Clearing mid 0x%x", mid_entry->mid);
-+			mid_entry->midState = MID_SHUTDOWN;
-+			list_move(&mid_entry->qhead, &dispose_list);
-+		}
-+		spin_unlock(&GlobalMid_Lock);
-+
-+		/* now walk dispose list and issue callbacks */
-+		list_for_each_safe(tmp, tmp2, &dispose_list) {
-+			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-+			cFYI(1, "Callback mid 0x%x", mid_entry->mid);
- 			list_del_init(&mid_entry->qhead);
- 			mid_entry->callback(mid_entry);
- 		}
--		spin_unlock(&GlobalMid_Lock);
- 		/* 1/8th of sec is more than enough time for them to exit */
- 		msleep(125);
- 	}
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index a187587..e0fa75308 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -276,28 +276,22 @@ sync_smb2_mid_result(struct smb2_mid_entry *mid, struct TCP_Server_Info *server)
- 
- 	spin_lock(&GlobalMid_Lock);
- 	/* ensure that it's no longer on the pending_mid_q */
--	list_del_init(&mid->qhead);
- 
- 	switch (mid->mid_state) {
- 	case MID_RESPONSE_RECEIVED:
- 		spin_unlock(&GlobalMid_Lock);
- 		return rc;
--	case MID_REQUEST_SUBMITTED:
--		/* socket is going down, reject all calls */
--		if (server->tcpStatus == CifsExiting) {
--			cERROR(1, "%s: canceling mid=%lld cmd=0x%x state=%d",
--				__func__, mid->mid, le16_to_cpu(mid->command),
--				mid->mid_state);
--			rc = -EHOSTDOWN;
--			break;
--		}
- 	case MID_RETRY_NEEDED:
- 		rc = -EAGAIN;
- 		break;
- 	case MID_RESPONSE_MALFORMED:
- 		rc = -EIO;
- 		break;
-+	case MID_SHUTDOWN:
-+		rc = -EHOSTDOWN;
-+		break;
- 	default:
-+		list_del_init(&mid->qhead);
- 		cERROR(1, "%s: invalid mid state mid=%lld state=%d", __func__,
- 			mid->mid, mid->mid_state);
- 		rc = -EIO;
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 7ccf292..a31c279 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -428,7 +428,7 @@ SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index da53246..dbdbe97 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1087,32 +1087,69 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 	return rc;
  }
  
- static int
--sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
-+cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
++/*
++ * walk a list of in progress async writes and wait for them to complete.
++ * Check the result code on each one.
++ *
++ * There's a clear heirarchy: 0 < EAGAIN < other errors
++ *
++ * If we get an EAGAIN return on a WB_SYNC_ALL writeout, then we need to
++ * go back and do the whole operation again. If we get other errors then
++ * the mapping already likely has AS_EIO or AS_ENOSPC set, so we can
++ * give up and just return an error.
++ */
++static int
++cifs_wait_for_write_completion(struct address_space *mapping,
++				struct list_head *pending)
++{
++	int tmprc, rc = 0;
++	struct cifs_writedata *wdata;
++
++	/* wait for writes to complete */
++	for (;;) {
++		/* anything left on list? */
++		spin_lock(&mapping->private_lock);
++		if (list_empty(pending)) {
++			spin_unlock(&mapping->private_lock);
++			break;
++		}
++
++		/* dequeue an entry */
++		wdata = list_first_entry(pending, struct cifs_writedata,
++					 pending);
++		list_del_init(&wdata->pending);
++		spin_unlock(&mapping->private_lock);
++
++		/* wait for it to complete */
++		tmprc = wait_for_completion_killable(&wdata->completion);
++		if (tmprc)
++			rc = tmprc;
++
++		if (wdata->result == -EAGAIN)
++			rc = rc ? rc : wdata->result;
++		else if (wdata->result != 0)
++			rc = wdata->result;
++
++		kref_put(&wdata->refcount, cifs_writedata_release);
++	}
++
++	return rc;
++}
++
+ static int cifs_writepages(struct address_space *mapping,
+ 			   struct writeback_control *wbc)
  {
+-	unsigned int bytes_to_write;
+-	unsigned int bytes_written;
+-	struct cifs_sb_info *cifs_sb;
+-	int done = 0;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
++	bool done = false, scanned = false, range_whole = false;
+ 	pgoff_t end;
+ 	pgoff_t index;
+-	int range_whole = 0;
+-	struct kvec *iov;
+-	int len;
+-	int n_iov = 0;
+-	pgoff_t next;
+-	int nr_pages;
+-	__u64 offset = 0;
++	unsigned int pvec_pages;
+ 	struct cifsFileInfo *open_file;
+-	struct cifs_tcon *tcon;
+-	struct cifsInodeInfo *cifsi = CIFS_I(mapping->host);
++	struct cifs_writedata *wdata;
+ 	struct page *page;
+ 	struct pagevec pvec;
++	struct list_head pending;
  	int rc = 0;
- 
-@@ -436,28 +436,21 @@ sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- 		mid->mid, mid->midState);
- 
- 	spin_lock(&GlobalMid_Lock);
--	/* ensure that it's no longer on the pending_mid_q */
--	list_del_init(&mid->qhead);
+-	int scanned = 0;
+-	int xid;
 -
- 	switch (mid->midState) {
- 	case MID_RESPONSE_RECEIVED:
- 		spin_unlock(&GlobalMid_Lock);
- 		return rc;
--	case MID_REQUEST_SUBMITTED:
--		/* socket is going down, reject all calls */
--		if (server->tcpStatus == CifsExiting) {
--			cERROR(1, "%s: canceling mid=%d cmd=0x%x state=%d",
--			       __func__, mid->mid, mid->command, mid->midState);
--			rc = -EHOSTDOWN;
--			break;
--		}
- 	case MID_RETRY_NEEDED:
- 		rc = -EAGAIN;
- 		break;
- 	case MID_RESPONSE_MALFORMED:
- 		rc = -EIO;
- 		break;
-+	case MID_SHUTDOWN:
-+		rc = -EHOSTDOWN;
-+		break;
- 	default:
-+		list_del_init(&mid->qhead);
- 		cERROR(1, "%s: invalid mid state mid=%d state=%d", __func__,
- 			mid->mid, mid->midState);
- 		rc = -EIO;
-@@ -617,7 +610,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+-	cifs_sb = CIFS_SB(mapping->host->i_sb);
  
- 	cifs_small_buf_release(in_buf);
+ 	/*
+ 	 * If wsize is smaller that the page cache size, default to writing
+@@ -1121,27 +1158,19 @@ static int cifs_writepages(struct address_space *mapping,
+ 	if (cifs_sb->wsize < PAGE_CACHE_SIZE)
+ 		return generic_writepages(mapping, wbc);
  
--	rc = sync_mid_result(midQ, ses->server);
-+	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0) {
- 		atomic_dec(&ses->server->inFlight);
- 		wake_up(&ses->server->request_q);
-@@ -735,7 +728,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		spin_unlock(&GlobalMid_Lock);
+-	iov = kmalloc(32 * sizeof(struct kvec), GFP_KERNEL);
+-	if (iov == NULL)
+-		return generic_writepages(mapping, wbc);
+-
+ 	/*
+ 	 * if there's no open file, then this is likely to fail too,
+ 	 * but it'll at least handle the return. Maybe it should be
+ 	 * a BUG() instead?
+ 	 */
+ 	open_file = find_writable_file(CIFS_I(mapping->host), false);
+-	if (!open_file) {
+-		kfree(iov);
++	if (!open_file)
+ 		return generic_writepages(mapping, wbc);
+-	}
+-
+-	tcon = tlink_tcon(open_file->tlink);
+ 	cifsFileInfo_put(open_file);
+ 
+-	xid = GetXid();
+-
++	INIT_LIST_HEAD(&pending);
+ 	pagevec_init(&pvec, 0);
++
+ 	if (wbc->range_cyclic) {
+ 		index = mapping->writeback_index; /* Start from prev offset */
+ 		end = -1;
+@@ -1149,23 +1178,26 @@ static int cifs_writepages(struct address_space *mapping,
+ 		index = wbc->range_start >> PAGE_CACHE_SHIFT;
+ 		end = wbc->range_end >> PAGE_CACHE_SHIFT;
+ 		if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
+-			range_whole = 1;
+-		scanned = 1;
++			range_whole = true;
++		scanned = true;
  	}
+ retry:
+ 	while (!done && (index <= end) &&
+-	       (nr_pages = pagevec_lookup_tag(&pvec, mapping, &index,
++	       (pvec_pages = pagevec_lookup_tag(&pvec, mapping, &index,
+ 			PAGECACHE_TAG_DIRTY,
+ 			min(end - index, (pgoff_t)PAGEVEC_SIZE - 1) + 1))) {
+-		int first;
+ 		unsigned int i;
++		unsigned int nr_pages = 0;
++		pgoff_t next = 0;
  
--	rc = sync_mid_result(midQ, ses->server);
-+	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0) {
- 		atomic_dec(&ses->server->inFlight);
- 		wake_up(&ses->server->request_q);
-@@ -906,7 +899,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		rstart = 1;
+-		first = -1;
+-		next = 0;
+-		n_iov = 0;
+-		bytes_to_write = 0;
++		wdata = cifs_writedata_alloc();
++		if (!wdata) {
++			pagevec_release(&pvec);
++			rc = -ENOMEM;
++			break;
++		}
+ 
+-		for (i = 0; i < nr_pages; i++) {
++		for (i = 0; i < pvec_pages; i++) {
+ 			page = pvec.pages[i];
+ 			/*
+ 			 * At this point we hold neither mapping->tree_lock nor
+@@ -1175,7 +1207,7 @@ retry:
+ 			 * mapping
+ 			 */
+ 
+-			if (first < 0)
++			if (nr_pages == 0)
+ 				lock_page(page);
+ 			else if (!trylock_page(page))
+ 				break;
+@@ -1186,7 +1218,7 @@ retry:
+ 			}
+ 
+ 			if (!wbc->range_cyclic && page->index > end) {
+-				done = 1;
++				done = true;
+ 				unlock_page(page);
+ 				break;
+ 			}
+@@ -1213,119 +1245,103 @@ retry:
+ 			set_page_writeback(page);
+ 
+ 			if (page_offset(page) >= mapping->host->i_size) {
+-				done = 1;
++				done = true;
+ 				unlock_page(page);
+ 				end_page_writeback(page);
+ 				break;
+ 			}
+ 
+-			/*
+-			 * BB can we get rid of this?  pages are held by pvec
+-			 */
+ 			page_cache_get(page);
+-
+-			len = min(mapping->host->i_size - page_offset(page),
+-				  (loff_t)PAGE_CACHE_SIZE);
+-
+-			/* reserve iov[0] for the smb header */
+-			n_iov++;
+-			iov[n_iov].iov_base = kmap(page);
+-			iov[n_iov].iov_len = len;
+-			bytes_to_write += len;
+-
+-			if (first < 0) {
+-				first = i;
+-				offset = page_offset(page);
+-			}
++			wdata->pages[i] = page;
+ 			next = page->index + 1;
+-			if (bytes_to_write + PAGE_CACHE_SIZE > cifs_sb->wsize)
++			++nr_pages;
++
++			/* stop here if we have enough for a full wsize write */
++			if ((nr_pages + 1) * PAGE_CACHE_SIZE > cifs_sb->wsize)
+ 				break;
+ 		}
+-		if (n_iov) {
+-retry_write:
+-			open_file = find_writable_file(CIFS_I(mapping->host),
+-							false);
+-			if (!open_file) {
++
++		if (wdata->pages[0] == NULL) {
++			/* Need to re-find the pages we skipped */
++			index = pvec.pages[0]->index + 1;
++			pagevec_release(&pvec);
++			continue;
++		}
++
++		pagevec_release(&pvec);
++		wdata->offset = page_offset(wdata->pages[0]);
++
++		do {
++			if (wdata->cfile != NULL)
++				cifsFileInfo_put(wdata->cfile);
++			wdata->cfile = find_writable_file(CIFS_I(mapping->host),
++							  false);
++			if (!wdata->cfile) {
+ 				cERROR(1, "No writable handles for inode");
+ 				rc = -EBADF;
+-			} else {
+-				rc = CIFSSMBWrite2(xid, tcon, open_file->netfid,
+-						   bytes_to_write, offset,
+-						   &bytes_written, iov, n_iov,
+-						   0);
+-				cifsFileInfo_put(open_file);
++				break;
+ 			}
+-
+-			cFYI(1, "Write2 rc=%d, wrote=%u", rc, bytes_written);
+-
+-			/*
+-			 * For now, treat a short write as if nothing got
+-			 * written. A zero length write however indicates
+-			 * ENOSPC or EFBIG. We have no way to know which
+-			 * though, so call it ENOSPC for now. EFBIG would
+-			 * get translated to AS_EIO anyway.
+-			 *
+-			 * FIXME: make it take into account the data that did
+-			 *	  get written
+-			 */
+-			if (rc == 0) {
+-				if (bytes_written == 0)
+-					rc = -ENOSPC;
+-				else if (bytes_written < bytes_to_write)
+-					rc = -EAGAIN;
++			if (wbc->sync_mode == WB_SYNC_ALL) {
++				spin_lock(&mapping->private_lock);
++				list_move(&wdata->pending, &pending);
++				spin_unlock(&mapping->private_lock);
+ 			}
++			rc = cifs_async_writev(wdata);
++		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
+ 
+-			/* retry on data-integrity flush */
+-			if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN)
+-				goto retry_write;
+-
+-			/* fix the stats and EOF */
+-			if (bytes_written > 0) {
+-				cifs_stats_bytes_written(tcon, bytes_written);
+-				cifs_update_eof(cifsi, offset, bytes_written);
+-			}
++		for (i = 0; i < nr_pages; ++i)
++			unlock_page(wdata->pages[i]);
+ 
+-			for (i = 0; i < n_iov; i++) {
+-				page = pvec.pages[first + i];
+-				/* on retryable write error, redirty page */
++		/* send failure -- clean up the mess */
++		if (rc != 0) {
++			for (i = 0; i < nr_pages; ++i) {
+ 				if (rc == -EAGAIN)
+-					redirty_page_for_writepage(wbc, page);
+-				else if (rc != 0)
+-					SetPageError(page);
+-				kunmap(page);
+-				unlock_page(page);
+-				end_page_writeback(page);
+-				page_cache_release(page);
++					redirty_page_for_writepage(wbc,
++							   wdata->pages[i]);
++				else
++					SetPageError(wdata->pages[i]);
++				end_page_writeback(wdata->pages[i]);
++				page_cache_release(wdata->pages[i]);
+ 			}
+-
+ 			if (rc != -EAGAIN)
+ 				mapping_set_error(mapping, rc);
+-			else
+-				rc = 0;
+-
+-			if ((wbc->nr_to_write -= n_iov) <= 0)
+-				done = 1;
+-			index = next;
+-		} else
+-			/* Need to re-find the pages we skipped */
+-			index = pvec.pages[0]->index + 1;
++			kref_put(&wdata->refcount, cifs_writedata_release);
++		} else if (wbc->sync_mode == WB_SYNC_NONE) {
++			kref_put(&wdata->refcount, cifs_writedata_release);
++		}
+ 
+-		pagevec_release(&pvec);
++		if ((wbc->nr_to_write -= nr_pages) <= 0)
++			done = true;
++		index = next;
  	}
++
+ 	if (!scanned && !done) {
+ 		/*
+ 		 * We hit the last page and there is more work to be done: wrap
+ 		 * back to the start of the file
+ 		 */
+-		scanned = 1;
++		scanned = true;
+ 		index = 0;
+ 		goto retry;
+ 	}
++
++	/*
++	 * for WB_SYNC_ALL, we must wait until the writes complete. If any
++	 * return -EAGAIN however, we need to retry the whole thing again.
++	 * At that point nr_to_write will be all screwed up, but that
++	 * shouldn't really matter for WB_SYNC_ALL (right?)
++	 */
++	if (wbc->sync_mode == WB_SYNC_ALL) {
++		rc = cifs_wait_for_write_completion(mapping, &pending);
++		if (rc == -EAGAIN) {
++			index = wbc->range_start >> PAGE_CACHE_SHIFT;
++			goto retry;
++		}
++	}
++
+ 	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
+ 		mapping->writeback_index = index;
  
--	rc = sync_mid_result(midQ, ses->server);
-+	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0)
- 		return rc;
+-	FreeXid(xid);
+-	kfree(iov);
+ 	return rc;
+ }
  
 -- 
 1.7.4
