@@ -1,296 +1,258 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/5] cifs: add cifs_async_writev
-Date: Sat,  2 Apr 2011 08:23:58 -0400
-Message-ID: <1301747039-31411-5-git-send-email-jlayton@redhat.com>
-References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/2] cifs: Add idmap key and related data structures and functions (try #12)
+Date: Sat,  2 Apr 2011 13:24:37 -0500
+Message-ID: <1301768677-23844-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301747039-31411-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add the ability for CIFS to do an asynchronous write. The kernel will
-set the frame up as it would for a "normal" SMBWrite2 request, and use
-cifs_call_async to send it. The mid callback will then be configured to
-handle the result.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+Define (global) data structures to store ids, uids and gids, to which a
+SID maps.  There are two separate trees, one for SID/uid and another one
+for SID/gid.
+
+A new type of key, cifs_idmap_key_type, is used.
+
+Keys are instantiated and searched using credential of the root by
+overriding and restoring the credentials of the caller requesting the key.
+Once a SID is mapped, it is stored along with the mapped id, in one
+of the rb trees and key is released.
+
+Register a pruning function with the shrinker that prunes the rb trees
+when memory pressure warrants freeing up cache.  Just for now, it is
+more like cleaning entire cache than pruning.  The subsequent patch has
+this function defined.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |   19 +++++
- fs/cifs/cifssmb.c   |  219 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 238 insertions(+), 0 deletions(-)
+ fs/cifs/cifsacl.c   |  138 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsfs.c    |    7 +++
+ fs/cifs/cifsglob.h  |    5 ++
+ fs/cifs/cifsproto.h |    3 +
+ 4 files changed, 153 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index e255a2b..7b964df 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -21,6 +21,7 @@
- #ifndef _CIFSPROTO_H
- #define _CIFSPROTO_H
- #include <linux/nls.h>
-+#include <linux/pagevec.h>
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index a14e45d..c60bb90 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -23,6 +23,10 @@
  
- struct statfs;
- struct smb_vol;
-@@ -433,4 +434,22 @@ extern int mdfour(unsigned char *, unsigned char *, int);
- extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
- extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
- 			unsigned char *p24);
-+
-+/* asynchronous write support */
-+struct cifs_writedata {
-+	struct list_head	pending;
-+	struct kref		refcount;
-+	struct completion	completion;
-+	struct work_struct	work;
-+	struct cifsFileInfo	*cfile;
-+	__u64			offset;
-+	unsigned int		bytes;
-+	int			result;
-+	struct page 		*pages[PAGEVEC_SIZE];
-+};
-+
-+int cifs_async_writev(struct cifs_writedata *wdata);
-+struct cifs_writedata *cifs_writedata_alloc(void);
-+void cifs_writedata_release(struct kref *refcount);
-+
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 8de7e79..b308605 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -32,6 +32,7 @@
- #include <linux/vfs.h>
+ #include <linux/fs.h>
  #include <linux/slab.h>
- #include <linux/posix_acl_xattr.h>
-+#include <linux/pagemap.h>
- #include <asm/uaccess.h>
++#include <linux/string.h>
++#include <linux/keyctl.h>
++#include <linux/key-type.h>
++#include <keys/user-type.h>
  #include "cifspdu.h"
  #include "cifsglob.h"
-@@ -1604,6 +1605,224 @@ CIFSSMBWrite(const int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
+ #include "cifsacl.h"
+@@ -50,6 +54,140 @@ static const struct cifs_sid sid_authusers = {
+ /* group users */
+ static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
  
-+void
-+cifs_writedata_release(struct kref *refcount)
-+{
-+	struct cifs_writedata *wdata = container_of(refcount,
-+					struct cifs_writedata, refcount);
-+	struct address_space *mapping;
-+
-+	if (wdata->cfile) {
-+		mapping = wdata->cfile->dentry->d_inode->i_mapping;
-+
-+		spin_lock(&mapping->private_lock);
-+		list_del(&wdata->pending);
-+		spin_unlock(&mapping->private_lock);
-+
-+		cifsFileInfo_put(wdata->cfile);
-+	}
-+
-+	kfree(wdata);
-+}
-+
-+static void
-+cifs_writev_complete(struct work_struct *work)
-+{
-+	struct cifs_writedata *wdata = container_of(work,
-+						struct cifs_writedata, work);
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	struct inode *inode = wdata->cfile->dentry->d_inode;
-+	struct page *page;
-+	int i = 0;
-+
-+	if (wdata->result == 0) {
-+		cifs_update_eof(CIFS_I(inode), wdata->offset, wdata->bytes);
-+		cifs_stats_bytes_written(tcon, wdata->bytes);
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(wdata->pages) && (page = wdata->pages[i]);
-+			i++) {
-+		if (wdata->result == -EAGAIN)
-+			__set_page_dirty_nobuffers(page);
-+		else if (wdata->result < 0)
-+			SetPageError(page);
-+		end_page_writeback(page);
-+		page_cache_release(page);
-+	}
-+	if (wdata->result != -EAGAIN)
-+		mapping_set_error(inode->i_mapping, wdata->result);
-+	complete(&wdata->completion);
-+	kref_put(&wdata->refcount, cifs_writedata_release);
-+}
-+
-+struct cifs_writedata *
-+cifs_writedata_alloc(void)
-+{
-+	struct cifs_writedata *wdata;
-+
-+	wdata = kzalloc(sizeof(*wdata), GFP_NOFS);
-+	if (wdata != NULL) {
-+		INIT_LIST_HEAD(&wdata->pending);
-+		INIT_WORK(&wdata->work, cifs_writev_complete);
-+		kref_init(&wdata->refcount);
-+		init_completion(&wdata->completion);
-+	}
-+	return wdata;
-+}
++static const struct cred *root_cred;
 +
 +/*
-+ * Check the midState and signature on received buffer (if any), and queue the
-+ * workqueue completion task.
++ * Run idmap cache shrinker.
 + */
-+static void
-+cifs_writev_callback(struct mid_q_entry *mid)
++static int
++cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
 +{
-+	struct cifs_writedata *wdata = mid->callback_data;
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	unsigned int written;
-+	WRITE_RSP *smb = (WRITE_RSP *)mid->resp_buf;
-+
-+	switch(mid->midState) {
-+	case MID_RESPONSE_RECEIVED:
-+		wdata->result = cifs_check_receive(mid, tcon->ses->server, 0);
-+		if (wdata->result != 0)
-+			break;
-+
-+		written = le16_to_cpu(smb->CountHigh);
-+		written <<= 16;
-+		written += le16_to_cpu(smb->Count);
-+		/*
-+		 * Mask off high 16 bits when bytes written as returned
-+		 * by the server is greater than bytes requested by the
-+		 * client. OS/2 servers are known to set incorrect
-+		 * CountHigh values.
-+		 */
-+		if (written > wdata->bytes)
-+			written &= 0xFFFF;
-+
-+		if (written < wdata->bytes)
-+			wdata->result = -ENOSPC;
-+		else
-+			wdata->bytes = written;
-+		break;
-+	case MID_REQUEST_SUBMITTED:
-+	case MID_RETRY_NEEDED:
-+		wdata->result = -EAGAIN;
-+		break;
-+	default:
-+		wdata->result = -EIO;
-+		break;
-+	}
-+
-+	queue_work(system_nrt_wq, &wdata->work);
-+	DeleteMidQEntry(mid);
-+	atomic_dec(&tcon->ses->server->inFlight);
-+	wake_up(&tcon->ses->server->request_q);
++	/* Use a pruning scheme in a subsequent patch instead */
++	cifs_destroy_idmaptrees();
++	return 0;
 +}
 +
-+/* cifs_async_writev - send an async write, and set up mid to handle result */
++static struct shrinker cifs_shrinker = {
++	.shrink = cifs_idmap_shrinker,
++	.seeks = DEFAULT_SEEKS,
++};
++
++static int
++cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
++{
++	char *payload;
++
++	payload = kmalloc(datalen, GFP_KERNEL);
++	if (!payload)
++		return -ENOMEM;
++
++	memcpy(payload, data, datalen);
++	key->payload.data = payload;
++	return 0;
++}
++
++static inline void
++cifs_idmap_key_destroy(struct key *key)
++{
++	kfree(key->payload.data);
++}
++
++static
++struct key_type cifs_idmap_key_type = {
++	.name        = "cifs.cifs_idmap",
++	.instantiate = cifs_idmap_key_instantiate,
++	.destroy     = cifs_idmap_key_destroy,
++	.describe    = user_describe,
++	.match       = user_match,
++};
++
 +int
-+cifs_async_writev(struct cifs_writedata *wdata)
++init_cifs_idmap(void)
 +{
-+	int i, rc = -EACCES;
-+	WRITE_REQ *smb = NULL;
-+	int wct;
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	struct inode *inode = wdata->cfile->dentry->d_inode;
-+	unsigned int npages = ARRAY_SIZE(wdata->pages);
-+	struct kvec *iov = NULL;
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
 +
-+	cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
++	cFYI(1, "Registering the %s key type\n", cifs_idmap_key_type.name);
 +
-+	if (tcon->ses->capabilities & CAP_LARGE_FILES) {
-+		wct = 14;
-+	} else {
-+		wct = 12;
-+		if (wdata->offset >> 32 > 0) {
-+			/* can not handle big offset for old srv */
-+			return -EIO;
-+		}
++	/* create an override credential set with a special thread keyring in
++	 * which requests are cached
++	 *
++	 * this is used to prevent malicious redirections from being installed
++	 * with add_key().
++	 */
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = key_alloc(&key_type_keyring, ".cifs_idmap", 0, 0, cred,
++			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
++			    KEY_USR_VIEW | KEY_USR_READ,
++			    KEY_ALLOC_NOT_IN_QUOTA);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
 +	}
 +
-+	rc = small_smb_init(SMB_COM_WRITE_ANDX, wct, tcon, (void **)&smb);
-+	if (rc)
-+		goto async_writev_out;
++	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
++	if (ret < 0)
++		goto failed_put_key;
 +
-+	/* FIXME: only allocate number of kvecs we need */
-+	iov = kzalloc((npages + 1) * sizeof(*iov), GFP_NOFS);
-+	if (iov == NULL) {
-+		rc = -ENOMEM;
-+		goto async_writev_out;
-+	}
++	ret = register_key_type(&cifs_idmap_key_type);
++	if (ret < 0)
++		goto failed_put_key;
 +
-+	smb->AndXCommand = 0xFF;	/* none */
-+	smb->Fid = wdata->cfile->netfid;
-+	smb->OffsetLow = cpu_to_le32(wdata->offset & 0xFFFFFFFF);
-+	if (wct == 14)
-+		smb->OffsetHigh = cpu_to_le32(wdata->offset >> 32);
-+	smb->Reserved = 0xFFFFFFFF;
-+	smb->WriteMode = 0;
-+	smb->Remaining = 0;
++	/* instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up */
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	root_cred = cred;
 +
-+	smb->DataOffset =
-+	    cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
++	spin_lock_init(&siduidlock);
++	uidtree = RB_ROOT;
++	spin_lock_init(&sidgidlock);
++	gidtree = RB_ROOT;
 +
-+	/* 4 for RFC1001 length + 1 for BCC */
-+	iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
-+	iov[0].iov_base = smb;
++	register_shrinker(&cifs_shrinker);
 +
-+	/* marshal up the pages into iov array */
-+	npages = 0;
-+	wdata->bytes = 0;
-+	for (i = 0; i < ARRAY_SIZE(wdata->pages) && wdata->pages[i]; i++) {
-+		if (wdata->bytes + PAGE_CACHE_SIZE <=
-+		    CIFS_SB(inode->i_sb)->wsize) {
-+			iov[i + 1].iov_len = min(inode->i_size -
-+					      page_offset(wdata->pages[i]),
-+						(loff_t)PAGE_CACHE_SIZE);
-+			iov[i + 1].iov_base = kmap(wdata->pages[i]);
-+			wdata->bytes += iov[i + 1].iov_len;
-+			npages++;
-+		} else {
-+			/* if we're beyond wsize, then re-mark page dirty */
-+			__set_page_dirty_nobuffers(wdata->pages[i]);
-+		}
-+	}
++	cFYI(1, "DNS resolver keyring: %d\n", key_serial(keyring));
++	return 0;
 +
-+	smb->DataLengthLow = cpu_to_le16(wdata->bytes & 0xFFFF);
-+	smb->DataLengthHigh = cpu_to_le16(wdata->bytes >> 16);
-+
-+	if (wct == 14) {
-+		inc_rfc1001_len(&smb->hdr, wdata->bytes + 1);
-+		put_bcc(wdata->bytes + 1, &smb->hdr);
-+	} else {
-+		/* wct == 12 */
-+		struct smb_com_writex_req *smbw =
-+				(struct smb_com_writex_req *)smb;
-+		inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
-+		put_bcc(wdata->bytes + 5, &smbw->hdr);
-+		iov[0].iov_len += 4; /* pad bigger by four bytes */
-+	}
-+
-+	kref_get(&wdata->refcount);
-+	rc = cifs_call_async(tcon->ses->server, iov, npages + 1,
-+			     cifs_writev_callback, wdata);
-+
-+	if (rc == 0)
-+		cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
-+	else
-+		kref_put(&wdata->refcount, cifs_writedata_release);
-+
-+	/* send is done, unmap pages */
-+	for (i = 0; i < npages; i++)
-+		kunmap(wdata->pages[i]);
-+
-+async_writev_out:
-+	cifs_small_buf_release(smb);
-+	kfree(iov);
-+	return rc;
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
 +}
 +
- int
- CIFSSMBWrite2(const int xid, struct cifs_tcon *tcon,
- 	     const int netfid, const unsigned int count,
++void
++exit_cifs_idmap(void)
++{
++	key_revoke(root_cred->thread_keyring);
++	unregister_key_type(&cifs_idmap_key_type);
++	put_cred(root_cred);
++	unregister_shrinker(&cifs_shrinker);
++	cFYI(1, "Unregistered %s key type\n", cifs_idmap_key_type.name);
++}
++
++void
++cifs_destroy_idmaptrees(void)
++{
++	struct rb_root *root;
++	struct rb_node *node;
++
++	root = &uidtree;
++	spin_lock(&siduidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&siduidlock);
++
++	root = &gidtree;
++	spin_lock(&sidgidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&sidgidlock);
++}
+ 
+ int match_sid(struct cifs_sid *ctsid)
+ {
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fb6a2ad..100fe2f 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1066,11 +1066,16 @@ init_cifs(void)
+ 	rc = register_key_type(&cifs_spnego_key_type);
+ 	if (rc)
+ 		goto out_unregister_filesystem;
++	rc = init_cifs_idmap();
++	if (rc)
++		goto out_unregister_keytype;
+ #endif
+ 
+ 	return 0;
+ 
+ #ifdef CONFIG_CIFS_UPCALL
++out_unregister_keytype:
++	unregister_key_type(&cifs_spnego_key_type);
+ out_unregister_filesystem:
+ 	unregister_filesystem(&cifs_fs_type);
+ #endif
+@@ -1097,6 +1102,8 @@ exit_cifs(void)
+ 	cifs_dfs_release_automount_timer();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
++	cifs_destroy_idmaptrees();
++	exit_cifs_idmap();
+ 	unregister_key_type(&cifs_spnego_key_type);
+ #endif
+ 	unregister_filesystem(&cifs_fs_type);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ccbac61..20d4664 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -911,6 +911,11 @@ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
+ /* reconnect after this many failed echo attempts */
+ GLOBAL_EXTERN unsigned short echo_retries;
+ 
++GLOBAL_EXTERN struct rb_root uidtree;
++GLOBAL_EXTERN struct rb_root gidtree;
++GLOBAL_EXTERN spinlock_t siduidlock;
++GLOBAL_EXTERN spinlock_t sidgidlock;
++
+ void cifs_oplock_break(struct work_struct *work);
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
+ void cifs_oplock_break_put(struct cifsFileInfo *cfile);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e42dc82..9517a54 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -53,6 +53,9 @@ do {								\
+ 	cFYI(1, "CIFS VFS: leaving %s (xid = %d) rc = %d",	\
+ 	     __func__, curr_xid, (int)rc);			\
+ } while (0)
++extern int init_cifs_idmap(void);
++extern void exit_cifs_idmap(void);
++extern void cifs_destroy_idmaptrees(void);
+ extern char *build_path_from_dentry(struct dentry *);
+ extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
+ 					struct cifs_tcon *tcon);
 -- 
-1.7.4
+1.6.0.2
