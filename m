@@ -1,61 +1,93 @@
-From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Subject: Re: Repeatable crash in 2.6.38 related to O_DIRECT
-Date: Tue, 05 Apr 2011 16:48:13 -0700
-Message-ID: <4D9BAA3D.6010709@candelatech.com>
-References: <4D9B9BB0.3030604@candelatech.com>	<20110405162609.6776e264@corrin.poochiereds.net>	<4D9BA6F9.1050207@candelatech.com> <20110405163802.778b55b3@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH] mount.cifs: Use original device string all the way
+Date: Wed,  6 Apr 2011 10:46:55 +0200
+Message-ID: <1302079615-14411-1-git-send-email-luk@debian.org>
+References: <20110405160636.1e956ecf@corrin.poochiereds.net>
+Cc: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110405163802.778b55b3-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20110405160636.1e956ecf-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 04/05/2011 04:38 PM, Jeff Layton wrote:
-> On Tue, 05 Apr 2011 16:34:17 -0700
-> Ben Greear<greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>  wrote:
->
->> On 04/05/2011 04:26 PM, Jeff Layton wrote:
->>
->>> Does the attached patch fix it? It's probably stable material if so...
->>
->> I'll test your patch.  I verified that cifs_file is NULL in cifsFileInfo_put
->> and protecting against that also solves the problem.
->>
->
-> I'd probably prefer the patch I'm suggesting. I worry that turning
-> cifsFileInfo_put into a no-op for NULL pointers might paper over future
-> bugs.
+Don't construct a device name, but use the original device string
+to mount so the device name in /proc/mounts matches the one in
+/etc/fstab.
 
-Fine by me.  Your patch appears to work fine, though I had to apply
-it manually with patch, as 'git am' didn't understand it's format.
+Signed-off-by: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+---
+ mount.cifs.c |   27 +++------------------------
+ 1 files changed, 3 insertions(+), 24 deletions(-)
 
-I agree this should go to stable.
-
-Tested-by: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-
->
->>>
->>> FWIW, cifs doesn't handle O_DIRECT at all.
->>
->> I know..and I warn my users when the open() call fails, but I still
->> let them attempt the file open.  Seems a decent test case after all :)
->>
->
-> Definitely. It's a cifs bug for sure, just pointing out that it
-> probably isn't going to give you what you expect. As Steve points out
-> forcedirectio might give you something closer to this, but proper
-> O_DIRECT support is still on the to-do list.
-
-I was using just 'directio'.  On Fedora 13, there is no mention of
-'forcedirectio' in the mount.cifs man page.  Are they actually the
-same thing, or is the man page just missing stuff?
-
-Thanks,
-Ben
-
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 8e1e32b..29b0d4c 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1673,12 +1673,11 @@ int main(int argc, char **argv)
+ 	char *orgoptions = NULL;
+ 	char *mountpoint = NULL;
+ 	char *options = NULL;
+-	char *dev_name = NULL, *orig_dev = NULL;
++	char *orig_dev = NULL;
+ 	char *currentaddress, *nextaddress;
+ 	int rc = 0;
+ 	int already_uppercased = 0;
+ 	size_t options_size = MAX_OPTIONS_LEN;
+-	size_t dev_len;
+ 	struct parsed_mount_info *parsed_info = NULL;
+ 	pid_t pid;
+ 	const char *fstype;
+@@ -1823,25 +1822,6 @@ int main(int argc, char **argv)
+ 		goto mount_exit;
+ 	}
+ 
+-	/* lengths of different strings + slashes + trailing \0 */
+-	dev_len = strnlen(parsed_info->host, sizeof(parsed_info->host)) +
+-	    strnlen(parsed_info->share, sizeof(parsed_info->share)) +
+-	    strnlen(parsed_info->prefix, sizeof(parsed_info->prefix)) +
+-	    2 + 1 + 1 + 1;
+-	dev_name = calloc(dev_len, 1);
+-	if (!dev_name) {
+-		rc = EX_SYSERR;
+-		goto mount_exit;
+-	}
+-
+-	/* rebuild device name with forward slashes */
+-	strlcpy(dev_name, "//", dev_len);
+-	strlcat(dev_name, parsed_info->host, dev_len);
+-	strlcat(dev_name, "/", dev_len);
+-	strlcat(dev_name, parsed_info->share, dev_len);
+-	strlcat(dev_name, "/", dev_len);
+-	strlcat(dev_name, parsed_info->prefix, dev_len);
+-
+ 	currentaddress = parsed_info->addrlist;
+ 	nextaddress = strchr(currentaddress, ',');
+ 	if (nextaddress)
+@@ -1889,7 +1869,7 @@ mount_retry:
+ 	if (parsed_info->verboseflag)
+ 		fprintf(stderr, "\n");
+ 
+-	rc = check_mtab(thisprogram, dev_name, mountpoint);
++	rc = check_mtab(thisprogram, orig_dev, mountpoint);
+ 	if (rc)
+ 		goto mount_exit;
+ 
+@@ -1900,7 +1880,7 @@ mount_retry:
+ 
+ 	if (!parsed_info->fakemnt) {
+ 		toggle_dac_capability(0, 1);
+-		rc = mount(dev_name, ".", fstype, parsed_info->flags, options);
++		rc = mount(orig_dev, ".", fstype, parsed_info->flags, options);
+ 		toggle_dac_capability(0, 0);
+ 		if (rc == 0)
+ 			goto do_mtab;
+@@ -1948,7 +1928,6 @@ mount_exit:
+ 		memset(parsed_info->password, 0, sizeof(parsed_info->password));
+ 		munmap(parsed_info, sizeof(*parsed_info));
+ 	}
+-	SAFE_FREE(dev_name);
+ 	SAFE_FREE(options);
+ 	SAFE_FREE(orgoptions);
+ 	return rc;
 -- 
-Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Candela Technologies Inc  http://www.candelatech.com
+1.7.4.1
