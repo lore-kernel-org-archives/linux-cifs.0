@@ -1,93 +1,65 @@
-From: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH] mount.cifs: Use original device string all the way
-Date: Wed,  6 Apr 2011 10:46:55 +0200
-Message-ID: <1302079615-14411-1-git-send-email-luk@debian.org>
-References: <20110405160636.1e956ecf@corrin.poochiereds.net>
-Cc: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Fix extended security auth failure
+Date: Wed,  6 Apr 2011 08:46:06 -0500
+Message-ID: <1302097566-11576-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110405160636.1e956ecf-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Don't construct a device name, but use the original device string
-to mount so the device name in /proc/mounts matches the one in
-/etc/fstab.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Signed-off-by: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+
+Fix authentication failures using extended security mechanisms.
+cifs client does not take into consideration extended security bit
+in capabilities field in negotiate protocol response from the server.
+
+Please refer to Samba bugzilla 8046.
+
+
+Reported-and-tested by: Werner Maes <Werner.Maes-UiU5zyVfpuo0a//2gYcwQw@public.gmane.org>
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- mount.cifs.c |   27 +++------------------------
- 1 files changed, 3 insertions(+), 24 deletions(-)
+ fs/cifs/cifssmb.c |   17 ++++++-----------
+ 1 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 8e1e32b..29b0d4c 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1673,12 +1673,11 @@ int main(int argc, char **argv)
- 	char *orgoptions = NULL;
- 	char *mountpoint = NULL;
- 	char *options = NULL;
--	char *dev_name = NULL, *orig_dev = NULL;
-+	char *orig_dev = NULL;
- 	char *currentaddress, *nextaddress;
- 	int rc = 0;
- 	int already_uppercased = 0;
- 	size_t options_size = MAX_OPTIONS_LEN;
--	size_t dev_len;
- 	struct parsed_mount_info *parsed_info = NULL;
- 	pid_t pid;
- 	const char *fstype;
-@@ -1823,25 +1822,6 @@ int main(int argc, char **argv)
- 		goto mount_exit;
- 	}
- 
--	/* lengths of different strings + slashes + trailing \0 */
--	dev_len = strnlen(parsed_info->host, sizeof(parsed_info->host)) +
--	    strnlen(parsed_info->share, sizeof(parsed_info->share)) +
--	    strnlen(parsed_info->prefix, sizeof(parsed_info->prefix)) +
--	    2 + 1 + 1 + 1;
--	dev_name = calloc(dev_len, 1);
--	if (!dev_name) {
--		rc = EX_SYSERR;
--		goto mount_exit;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 3291770..e119d70 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -570,18 +570,10 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 	if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
+ 		memcpy(ses->server->cryptkey, pSMBr->u.EncryptionKey,
+ 		       CIFS_CRYPTO_KEY_SIZE);
+-	} else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
+-			&& (pSMBr->EncryptionKeyLength == 0)) {
++	} else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
++			server->capabilities & CAP_EXTENDED_SECURITY) &&
++				(pSMBr->EncryptionKeyLength == 0)) {
+ 		/* decode security blob */
+-	} else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
+-		rc = -EIO; /* no crypt key only if plain text pwd */
+-		goto neg_err_exit;
 -	}
 -
--	/* rebuild device name with forward slashes */
--	strlcpy(dev_name, "//", dev_len);
--	strlcat(dev_name, parsed_info->host, dev_len);
--	strlcat(dev_name, "/", dev_len);
--	strlcat(dev_name, parsed_info->share, dev_len);
--	strlcat(dev_name, "/", dev_len);
--	strlcat(dev_name, parsed_info->prefix, dev_len);
+-	/* BB might be helpful to save off the domain of server here */
 -
- 	currentaddress = parsed_info->addrlist;
- 	nextaddress = strchr(currentaddress, ',');
- 	if (nextaddress)
-@@ -1889,7 +1869,7 @@ mount_retry:
- 	if (parsed_info->verboseflag)
- 		fprintf(stderr, "\n");
+-	if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC) &&
+-		(server->capabilities & CAP_EXTENDED_SECURITY)) {
+ 		count = get_bcc(&pSMBr->hdr);
+ 		if (count < 16) {
+ 			rc = -EIO;
+@@ -624,6 +616,9 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 			} else
+ 					rc = -EOPNOTSUPP;
+ 		}
++	} else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
++		rc = -EIO; /* no crypt key only if plain text pwd */
++		goto neg_err_exit;
+ 	} else
+ 		server->capabilities &= ~CAP_EXTENDED_SECURITY;
  
--	rc = check_mtab(thisprogram, dev_name, mountpoint);
-+	rc = check_mtab(thisprogram, orig_dev, mountpoint);
- 	if (rc)
- 		goto mount_exit;
- 
-@@ -1900,7 +1880,7 @@ mount_retry:
- 
- 	if (!parsed_info->fakemnt) {
- 		toggle_dac_capability(0, 1);
--		rc = mount(dev_name, ".", fstype, parsed_info->flags, options);
-+		rc = mount(orig_dev, ".", fstype, parsed_info->flags, options);
- 		toggle_dac_capability(0, 0);
- 		if (rc == 0)
- 			goto do_mtab;
-@@ -1948,7 +1928,6 @@ mount_exit:
- 		memset(parsed_info->password, 0, sizeof(parsed_info->password));
- 		munmap(parsed_info, sizeof(*parsed_info));
- 	}
--	SAFE_FREE(dev_name);
- 	SAFE_FREE(options);
- 	SAFE_FREE(orgoptions);
- 	return rc;
 -- 
-1.7.4.1
+1.6.0.2
