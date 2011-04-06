@@ -1,7 +1,7 @@
 From: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
-Subject: [PATCH v4 4/6] cifs: Simplify handling of submount options in cifs_mount.
-Date: Wed, 6 Apr 2011 16:26:43 +0200
-Message-ID: <1302100005-1848-4-git-send-email-seanius@seanius.net>
+Subject: [PATCH v4 2/6] cifs: Add support for mounting Windows 2008 DFS shares
+Date: Wed, 6 Apr 2011 16:26:41 +0200
+Message-ID: <1302100005-1848-2-git-send-email-seanius@seanius.net>
 References: <1302100005-1848-1-git-send-email-seanius@seanius.net>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -12,101 +12,47 @@ In-Reply-To: <1302100005-1848-1-git-send-email-seanius-ADwgVSpYHhHR7s880joybQ@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-With CONFIG_DFS_UPCALL enabled, maintain the submount options in
-cifs_sb->mountdata, simplifying the code just a bit as well as making
-corner-case allocation problems less likely.
+Windows 2008 CIFS servers do not always return PATH_NOT_COVERED when
+attempting to access a DFS share.  Therefore, when checking for remote
+shares, unconditionally ask for a DFS referral for the UNC (w/out prepath)
+before continuing with previous behavior of attempting to access the UNC +
+prepath and checking for PATH_NOT_COVERED.
+
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=31092
 
 Signed-off-by: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 ---
- fs/cifs/connect.c |   24 +++++++++++-------------
- 1 files changed, 11 insertions(+), 13 deletions(-)
+ fs/cifs/connect.c |   18 ++++++++++++++++++
+ 1 files changed, 18 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 259fc64..8d2529c 100644
+index c89d871..4873bac 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2785,9 +2785,9 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
- /*
-  * Perform a dfs referral query for a share and (optionally) prefix
-  *
-- * If a referral is found, mount_data will be set to point at a newly
-- * allocated string containing updated options for the submount.
-- * Otherwise it will be left untouched.
-+ * If a referral is found, cifs_sb->mountdata will be (re-)allocated
-+ * to a string containing updated options for the submount.  Otherwise it
-+ * will be left untouched.
-  *
-  * Returns the rc from get_dfs_path to the caller, which can be used to
-  * determine whether there were referrals.
-@@ -2795,7 +2795,7 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
- static int
- expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
- 		    struct smb_vol *volume_info, struct cifs_sb_info *cifs_sb,
--		    char **mount_data, int check_prefix)
-+		    int check_prefix)
- {
- 	int rc;
- 	unsigned int num_referrals = 0;
-@@ -2823,11 +2823,14 @@ expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
- 		free_dfs_info_array(referrals, num_referrals);
- 		kfree(fake_devname);
+@@ -2934,6 +2934,24 @@ try_mount_again:
+ 			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
  
-+		if (cifs_sb->mountdata != NULL)
-+			kfree(cifs_sb->mountdata);
+ remote_path_check:
++#ifdef CONFIG_CIFS_DFS_UPCALL
++	/*
++	 * Perform an unconditional check for whether there are DFS
++	 * referrals for this path without prefix, to provide support
++	 * for DFS referrals from w2k8 servers which don't seem to respond
++	 * with PATH_NOT_COVERED to requests that include the prefix.
++	 * Chase the referral if found, otherwise continue normally.
++	 */
++	if (referral_walks_count == 0) {
++		int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
++						cifs_sb, &mount_data, false);
++		if (!refrc) {
++			referral_walks_count++;
++			goto try_mount_again;
++		}
++	}
++#endif
 +
- 		if (IS_ERR(mdata)) {
- 			rc = PTR_ERR(mdata);
- 			mdata = NULL;
- 		}
--		*mount_data = mdata;
-+		cifs_sb->mountdata = mdata;
- 	}
- 	kfree(full_path);
- 	return rc;
-@@ -2850,6 +2853,7 @@ cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	int referral_walks_count = 0;
- try_mount_again:
-+	mount_data = cifs_sb->mountdata;
- 
- 	/* cleanup activities if we're chasing a referral */
- 	if (referral_walks_count) {
-@@ -2983,7 +2987,7 @@ remote_path_check:
- 	 */
- 	if (referral_walks_count == 0) {
- 		int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
--						cifs_sb, &mount_data, false);
-+						cifs_sb, false);
- 		if (!refrc) {
- 			referral_walks_count++;
- 			goto try_mount_again;
-@@ -3025,17 +3029,13 @@ remote_path_check:
- 			convert_delimiter(cifs_sb->prepath,
- 					CIFS_DIR_SEP(cifs_sb));
- 
--		if (mount_data != mount_data_global)
--			kfree(mount_data);
--
- 		rc = expand_dfs_referral(xid, pSesInfo, volume_info, cifs_sb,
--					 &mount_data, true);
-+					 true);
- 
- 		if (!rc) {
- 			referral_walks_count++;
- 			goto try_mount_again;
- 		}
--		mount_data = NULL;
- 		goto mount_fail_check;
- #else /* No DFS support, return error on mount */
- 		rc = -EOPNOTSUPP;
-@@ -3069,8 +3069,6 @@ remote_path_check:
- mount_fail_check:
- 	/* on error free sesinfo and tcon struct if needed */
- 	if (rc) {
--		if (mount_data != mount_data_global)
--			kfree(mount_data);
- 		/* If find_unc succeeded then rc == 0 so we can not end */
- 		/* up accidently freeing someone elses tcon struct */
- 		if (tcon)
+ 	/* check if a whole path (including prepath) is not remote */
+ 	if (!rc && tcon) {
+ 		/* build_path_to_root works only when we have a valid tcon */
 -- 
 1.7.4.1
