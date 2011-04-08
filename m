@@ -1,266 +1,519 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Assume passwords are encoded according to
- iocharset
-Date: Fri, 8 Apr 2011 10:31:18 -0400
-Message-ID: <20110408103118.0f1b2e8b@corrin.poochiereds.net>
-References: <20110327125648.GA3621@osk.mine.nu>
-	<20110408093148.748eda25@corrin.poochiereds.net>
-	<20110408141112.GA20074@osk.mine.nu>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions (try #12)
+Date: Fri, 8 Apr 2011 10:58:40 -0400
+Message-ID: <20110408105840.0d31b623@corrin.poochiereds.net>
+References: <1301768688-23867-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110408141112.GA20074-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
+In-Reply-To: <1301768688-23867-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 8 Apr 2011 16:11:12 +0200
-Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org> wrote:
+On Sat,  2 Apr 2011 13:24:48 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> On Friday, April 08, 2011 at 09:48, Jeff Layton wrote:
-> > On Sun, 27 Mar 2011 14:56:48 +0200
-> > Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org> wrote:
-> > 
-> > > Modify cifs to assume that the supplied password is encoded according to
-> > > iocharset.  Before this patch passwords would be treated as raw 8-bit data,
-> > > which made authentication with Unicode passwords impossible (at least
-> > > passwords with characters > 0xFF).
-> > > 
-> > > The previous code would as a side effect accept passwords encoded with ISO
-> > > 8859-1, since Unicode < 0x100 basically is ISO 8859-1.  Software which
-> > > relies on that will no longer support password chars > 0x7F unless it also
-> > > uses iocharset=iso8859-1.  (mount.cifs does not care about the encoding so
-> > > it will work as expected.)
-> > > 
-> > > Signed-off-by: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
-> > > ---
-> > >  fs/cifs/cifsencrypt.c |    8 +++---
-> > >  fs/cifs/cifsproto.h   |    8 ++++--
-> > >  fs/cifs/connect.c     |    2 +-
-> > >  fs/cifs/sess.c        |    2 +-
-> > >  fs/cifs/smbencrypt.c  |   60 +++++++++----------------------------------------
-> > >  5 files changed, 22 insertions(+), 58 deletions(-)
-> > > 
-> > > diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> > > index 5bb4b09..3c1306d 100644
-> > > --- a/fs/cifs/cifsencrypt.c
-> > > +++ b/fs/cifs/cifsencrypt.c
-> > > @@ -226,7 +226,7 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
-> > >  }
-> > >  
-> > >  /* first calculate 24 bytes ntlm response and then 16 byte session key */
-> > > -int setup_ntlm_response(struct cifs_ses *ses)
-> > > +int setup_ntlm_response(struct cifs_ses *ses, const struct nls_table *nls_cp)
-> > >  {
-> > >  	int rc = 0;
-> > >  	unsigned int temp_len = CIFS_SESS_KEY_SIZE + CIFS_AUTH_RESP_SIZE;
-> > > @@ -243,14 +243,14 @@ int setup_ntlm_response(struct cifs_ses *ses)
-> > >  	ses->auth_key.len = temp_len;
-> > >  
-> > >  	rc = SMBNTencrypt(ses->password, ses->server->cryptkey,
-> > > -			ses->auth_key.response + CIFS_SESS_KEY_SIZE);
-> > > +			ses->auth_key.response + CIFS_SESS_KEY_SIZE, nls_cp);
-> > >  	if (rc) {
-> > >  		cFYI(1, "%s Can't generate NTLM response, error: %d",
-> > >  			__func__, rc);
-> > >  		return rc;
-> > >  	}
-> > >  
-> > > -	rc = E_md4hash(ses->password, temp_key);
-> > > +	rc = E_md4hash(ses->password, temp_key, nls_cp);
-> > >  	if (rc) {
-> > >  		cFYI(1, "%s Can't generate NT hash, error: %d", __func__, rc);
-> > >  		return rc;
-> > > @@ -458,7 +458,7 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
-> > >  	}
-> > >  
-> > >  	/* calculate md4 hash of password */
-> > > -	E_md4hash(ses->password, nt_hash);
-> > > +	E_md4hash(ses->password, nt_hash, nls_cp);
-> > >  
-> > >  	crypto_shash_setkey(ses->server->secmech.hmacmd5, nt_hash,
-> > >  				CIFS_NTHASH_SIZE);
-> > > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> > > index e42dc82..fd6d873 100644
-> > > --- a/fs/cifs/cifsproto.h
-> > > +++ b/fs/cifs/cifsproto.h
-> > > @@ -376,8 +376,9 @@ extern int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *,
-> > >  extern int cifs_verify_signature(struct smb_hdr *,
-> > >  				 struct TCP_Server_Info *server,
-> > >  				__u32 expected_sequence_number);
-> > > -extern int SMBNTencrypt(unsigned char *, unsigned char *, unsigned char *);
-> > > -extern int setup_ntlm_response(struct cifs_ses *);
-> > > +extern int SMBNTencrypt(unsigned char *, unsigned char *, unsigned char *,
-> > > +			const struct nls_table *);
-> > > +extern int setup_ntlm_response(struct cifs_ses *, const struct nls_table *);
-> > >  extern int setup_ntlmv2_rsp(struct cifs_ses *, const struct nls_table *);
-> > >  extern int cifs_crypto_shash_allocate(struct TCP_Server_Info *);
-> > >  extern void cifs_crypto_shash_release(struct TCP_Server_Info *);
-> > > @@ -429,7 +430,8 @@ extern int CIFSCheckMFSymlink(struct cifs_fattr *fattr,
-> > >  		const unsigned char *path,
-> > >  		struct cifs_sb_info *cifs_sb, int xid);
-> > >  extern int mdfour(unsigned char *, unsigned char *, int);
-> > > -extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
-> > > +extern int E_md4hash(const unsigned char *passwd, unsigned char *p16,
-> > > +		     const struct nls_table *codepage);
-> > >  extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
-> > >  			unsigned char *p24);
-> > >  #endif			/* _CIFSPROTO_H */
-> > > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > > index 96544a4..3c0190f 100644
-> > > --- a/fs/cifs/connect.c
-> > > +++ b/fs/cifs/connect.c
-> > > @@ -3060,7 +3060,7 @@ CIFSTCon(unsigned int xid, struct cifs_ses *ses,
-> > >  		else
-> > >  #endif /* CIFS_WEAK_PW_HASH */
-> > >  		rc = SMBNTencrypt(tcon->password, ses->server->cryptkey,
-> > > -					bcc_ptr);
-> > > +					bcc_ptr, nls_codepage);
-> > >  
-> > >  		bcc_ptr += CIFS_AUTH_RESP_SIZE;
-> > >  		if (ses->capabilities & CAP_UNICODE) {
-> > > diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> > > index 6b140e1..17ae0db 100644
-> > > --- a/fs/cifs/sess.c
-> > > +++ b/fs/cifs/sess.c
-> > > @@ -694,7 +694,7 @@ ssetup_ntlmssp_authenticate:
-> > >  			cpu_to_le16(CIFS_AUTH_RESP_SIZE);
-> > >  
-> > >  		/* calculate ntlm response and session key */
-> > > -		rc = setup_ntlm_response(ses);
-> > > +		rc = setup_ntlm_response(ses, nls_cp);
-> > >  		if (rc) {
-> > >  			cERROR(1, "Error %d during NTLM authentication", rc);
-> > >  			goto ssetup_exit;
-> > > diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-> > > index 1525d5e..92291c1 100644
-> > > --- a/fs/cifs/smbencrypt.c
-> > > +++ b/fs/cifs/smbencrypt.c
-> > > @@ -195,46 +195,13 @@ SMBencrypt(unsigned char *passwd, const unsigned char *c8, unsigned char *p24)
-> > >  	return rc;
-> > >  }
-> > >  
-> > > -/* Routines for Windows NT MD4 Hash functions. */
-> > > -static int
-> > > -_my_wcslen(__u16 *str)
-> > > -{
-> > > -	int len = 0;
-> > > -	while (*str++ != 0)
-> > > -		len++;
-> > > -	return len;
-> > > -}
-> > > -
-> > > -/*
-> > > - * Convert a string into an NT UNICODE string.
-> > > - * Note that regardless of processor type
-> > > - * this must be in intel (little-endian)
-> > > - * format.
-> > > - */
-> > > -
-> > > -static int
-> > > -_my_mbstowcs(__u16 *dst, const unsigned char *src, int len)
-> > > -{	/* BB not a very good conversion routine - change/fix */
-> > > -	int i;
-> > > -	__u16 val;
-> > > -
-> > > -	for (i = 0; i < len; i++) {
-> > > -		val = *src;
-> > > -		SSVAL(dst, 0, val);
-> > > -		dst++;
-> > > -		src++;
-> > > -		if (val == 0)
-> > > -			break;
-> > > -	}
-> > > -	return i;
-> > > -}
-> > > -
-> > >  /*
-> > >   * Creates the MD4 Hash of the users password in NT UNICODE.
-> > >   */
-> > >  
-> > >  int
-> > > -E_md4hash(const unsigned char *passwd, unsigned char *p16)
-> > > +E_md4hash(const unsigned char *passwd, unsigned char *p16,
-> > > +	  const struct nls_table *codepage)
-> > >  {
-> > >  	int rc;
-> > >  	int len;
-> > > @@ -242,20 +209,14 @@ E_md4hash(const unsigned char *passwd, unsigned char *p16)
-> > >  
-> > >  	/* Password cannot be longer than 128 characters */
-> > >  	if (passwd) {
-> > > -		len = strlen((char *) passwd);
-> > > -		if (len > 128)
-> > > -			len = 128;
-> > > -
-> > >  		/* Password must be converted to NT unicode */
-> > > -		_my_mbstowcs(wpwd, passwd, len);
-> > > -	} else
-> > > +		len = cifs_strtoUCS(wpwd, passwd, 128, codepage);
-> > > +	} else {
-> > >  		len = 0;
-> > > +		*wpwd = 0; /* Ensure string is null terminated */
-> > > +	}
-> > >  
-> > > -	wpwd[len] = 0;	/* Ensure string is null terminated */
-> > > -	/* Calculate length in bytes */
-> > > -	len = _my_wcslen(wpwd) * sizeof(__u16);
-> > > -
-> > > -	rc = mdfour(p16, (unsigned char *) wpwd, len);
-> > > +	rc = mdfour(p16, (unsigned char *) wpwd, len * sizeof(__u16));
-> > >  	memset(wpwd, 0, 129 * 2);
-> > >  
-> > >  	return rc;
-> > > @@ -275,7 +236,7 @@ nt_lm_owf_gen(char *pwd, unsigned char nt_p16[16], unsigned char p16[16])
-> > >  		memcpy(passwd, pwd, 512);
-> > >  	/* Calculate the MD4 hash (NT compatible) of the password */
-> > >  	memset(nt_p16, '\0', 16);
-> > > -	E_md4hash(passwd, nt_p16);
-> > > +	E_md4hash(passwd, nt_p16, /* put nls codepage here */);
-> > 			^^^^^^^^^^^^^
-> > 		Won't this fail to compile?
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
-> Yes, but it's inside a function which is commented out and not compiled. Instead
-> of adding an extra parameter to the function (which would be required) I
-> decided just to put a reminder there if that function is ever used in the
-> future.
+> rb tree search and insertion routines.
 > 
-> #if 0 /* currently unused */
-> /* Does both the NT and LM owfs of a user's password */
-> static void
-> nt_lm_owf_gen(char *pwd, unsigned char nt_p16[16], unsigned char p16[16])
-> {
->         char passwd[514];
+> A SID which needs to be mapped, is looked up in one of the rb trees
+> depending whether SID is either owner or group SID.
+> If found in the tree, a (mapped) id from that node is assigned to
+> uid or gid as appropriate.  If unmapped, an upcall is attempted to
+> map the SID to an id.  If upcall is successful, node is marked as
+> mapped.  If upcall fails, node stays marked as unmapped and a mapping
+> is attempted again only after an arbitrary time period has passed.
 > 
->         memset(passwd, '\0', 514);
->         if (strlen(pwd) < 513)
->                 strcpy(passwd, pwd);
->         else
->                 memcpy(passwd, pwd, 512);
->         /* Calculate the MD4 hash (NT compatible) of the password */
->         memset(nt_p16, '\0', 16);
->         E_md4hash(passwd, nt_p16, /* put nls codepage here */);
+> To map a SID, which can be either a Owner SID or a Group SID, key
+> description starts with the string "os" or "gs" followed by SID converted
+> to a string. Without "os" or "gs", cifs.upcall does not know whether
+> SID needs to be mapped to either an uid or a gid.
 > 
->         /* Mangle the passwords into Lanman format */
->         passwd[14] = '\0';
-> /*      strupper(passwd); */
+> Nodes in rb tree as fields to prevent multiple upcalls for
+> a SID.  Adding and removing nodes is done within global locks.
+> shrinker routine does not prune a node if mapping for that node
+> is either pending or or node was recently created (before timeout
+> period expires and node could be purged). The timeout period should
+> be long enough at least for an upcall to return back to cifs.
 > 
->         /* Calculate the SMB (lanman) hash functions of the password */
+> For now, cifs.upcall is only used to map a SID to an id (uid or gid) but
+> it would be used to obtain an SID (string) for an id.
 > 
->         memset(p16, '\0', 16);
->         E_P16((unsigned char *) passwd, (unsigned char *) p16);
 > 
->         /* clear out local copy of user's password (just being paranoid). */
->         memset(passwd, '\0', sizeof(passwd));
-> }
-> #endif
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsacl.c |  300 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  fs/cifs/cifsacl.h |   24 +++++
+>  2 files changed, 300 insertions(+), 24 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index c60bb90..b7489a0 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -54,7 +54,30 @@ static const struct cifs_sid sid_authusers = {
+>  /* group users */
+>  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+>  
+> -static const struct cred *root_cred;
+> +const struct cred *root_cred;
+> +
+> +static void
+> +shrink_idmap_tree(struct rb_root *root, int nr_to_scan, int *nr_rem,
+> +			int *nr_del)
+> +{
+> +	struct rb_node *node;
+> +	struct rb_node *tmp;
+> +	struct cifs_sid_id *psidid;
+> +
+> +	node = rb_first(root);
+> +	while (node) {
+> +		tmp = node;
+> +		node = rb_next(tmp);
+> +		psidid = rb_entry(tmp, struct cifs_sid_id, rbnode);
+> +		if (time_after(psidid->time + SID_MAP_EXPIRE, jiffies) ||
+> +				(nr_to_scan == 0) || (*nr_del == nr_to_scan))
+> +			++(*nr_rem);
+> +		else {
+> +			rb_erase(tmp, root);
+> +			++(*nr_del);
+> +		}
+> +	}
+> +}
+>  
+>  /*
+>   * Run idmap cache shrinker.
+> @@ -62,9 +85,21 @@ static const struct cred *root_cred;
+>  static int
+>  cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
+>  {
+> -	/* Use a pruning scheme in a subsequent patch instead */
+> -	cifs_destroy_idmaptrees();
+> -	return 0;
+> +	int nr_del = 0;
+> +	int nr_rem = 0;
+> +	struct rb_root *root;
+> +
+> +	root = &uidtree;
+> +	spin_lock(&siduidlock);
+> +	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
+> +	spin_unlock(&siduidlock);
+> +
+> +	root = &gidtree;
+> +	spin_lock(&sidgidlock);
+> +	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
+> +	spin_unlock(&sidgidlock);
+> +
+> +	return nr_rem;
+>  }
+>  
+>  static struct shrinker cifs_shrinker = {
+> @@ -92,7 +127,6 @@ cifs_idmap_key_destroy(struct key *key)
+>  	kfree(key->payload.data);
+>  }
+>  
+> -static
+>  struct key_type cifs_idmap_key_type = {
+>  	.name        = "cifs.cifs_idmap",
+>  	.instantiate = cifs_idmap_key_instantiate,
+> @@ -101,6 +135,198 @@ struct key_type cifs_idmap_key_type = {
+>  	.match       = user_match,
+>  };
+>  
+> +static void
+> +sid_to_str(struct cifs_sid *sidptr, char *sidstr)
+> +{
+> +	int i;
+> +	unsigned long saval;
+> +	char *strptr;
+> +
+> +	strptr = sidstr;
+> +
+> +	sprintf(strptr, "%s", "S");
+> +	strptr = sidstr + strlen(sidstr);
+> +
+> +	sprintf(strptr, "-%d", sidptr->revision);
+> +	strptr = sidstr + strlen(sidstr);
+> +
+> +	for (i = 0; i < 6; ++i) {
+> +		if (sidptr->authority[i]) {
+> +			sprintf(strptr, "-%d", sidptr->authority[i]);
+> +			strptr = sidstr + strlen(sidstr);
+> +		}
+> +	}
+> +
+> +	for (i = 0; i < sidptr->num_subauth; ++i) {
+> +		saval = le32_to_cpu(sidptr->sub_auth[i]);
+> +		sprintf(strptr, "-%ld", saval);
+> +		strptr = sidstr + strlen(sidstr);
+> +	}
+> +}
+> +
+> +static void
+> +id_rb_insert(struct rb_root *root, struct cifs_sid *sidptr,
+> +		struct cifs_sid_id **psidid, char *typestr)
+> +{
+> +	int rc;
+> +	char *strptr;
+> +	struct rb_node *node = root->rb_node;
+> +	struct rb_node *parent = NULL;
+> +	struct rb_node **linkto = &(root->rb_node);
+> +	struct cifs_sid_id *lsidid;
+> +
+> +	while (node) {
+> +		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
+> +		parent = node;
+> +		rc = compare_sids(sidptr, &((lsidid)->sid));
+> +		if (rc > 0) {
+> +			linkto = &(node->rb_left);
+> +			node = node->rb_left;
+> +		} else if (rc < 0) {
+> +			linkto = &(node->rb_right);
+> +			node = node->rb_right;
+> +		}
+> +	}
+> +
+> +	memcpy(&(*psidid)->sid, sidptr, sizeof(struct cifs_sid));
+> +	(*psidid)->time = jiffies;
+> +	(*psidid)->retry = jiffies - (SID_MAP_RETRY + 1);
+> +
+> +	sprintf((*psidid)->sidstr, "%s", typestr);
+> +	strptr = (*psidid)->sidstr + strlen((*psidid)->sidstr);
+> +	sid_to_str(&(*psidid)->sid, strptr);
+> +
+> +	clear_bit(SID_ID_PENDING, &(*psidid)->state);
+> +	clear_bit(SID_ID_MAPPED, &(*psidid)->state);
+> +
+> +	rb_link_node(&(*psidid)->rbnode, parent, linkto);
+> +	rb_insert_color(&(*psidid)->rbnode, root);
+> +}
+> +
+> +static struct cifs_sid_id *
+> +id_rb_search(struct rb_root *root, struct cifs_sid *sidptr)
+> +{
+> +	int rc;
+> +	struct rb_node *node = root->rb_node;
+> +	struct rb_node *parent = NULL;
+> +	struct rb_node **linkto = &(root->rb_node);
+> +	struct cifs_sid_id *lsidid;
+> +
+> +	while (node) {
+> +		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
+> +		parent = node;
+> +		rc = compare_sids(sidptr, &((lsidid)->sid));
+> +		if (rc > 0) {
+> +			linkto = &(node->rb_left);
+> +			node = node->rb_left;
+> +		} else if (rc < 0) {
+> +			linkto = &(node->rb_right);
+> +			node = node->rb_right;
+> +		} else /* node found */
+> +			return lsidid;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static int
+> +sidid_pending_wait(void *unused)
+> +{
+> +	schedule();
+> +	return signal_pending(current) ? -ERESTARTSYS : 0;
+> +}
+> +
+> +static int
+> +sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+> +		struct cifs_fattr *fattr, uint sidtype)
+> +{
+> +	int rc;
+> +	unsigned long cid;
+> +	struct key *idkey;
+> +	const struct cred *saved_cred;
+> +	struct cifs_sid_id *psidid, *npsidid;
+> +	struct rb_root *cidtree;
+> +	spinlock_t *cidlock;
+> +
+> +	if (sidtype == SIDOWNER) {
+> +		cid = cifs_sb->mnt_uid; /* default uid, in case upcall fails */
+> +		cidlock = &siduidlock;
+> +		cidtree = &uidtree;
+> +	} else if (sidtype == SIDGROUP) {
+> +		cid = cifs_sb->mnt_gid; /* default gid, in case upcall fails */
+> +		cidlock = &sidgidlock;
+> +		cidtree = &gidtree;
+> +	} else
+> +		return -ENOENT;
+> +
+> +	spin_lock(cidlock);
+> +	psidid = id_rb_search(cidtree, psid);
+> +	spin_unlock(cidlock);
+> +
+> +	if (!psidid) { /* node does not exist, allocate one & attempt adding */
+> +		npsidid = kzalloc(sizeof(struct cifs_sid_id), GFP_KERNEL);
+> +		if (!npsidid)
+> +			return -ENOMEM;
+> +
+> +		npsidid->sidstr = kmalloc(SIDLEN, GFP_KERNEL);
+> +		if (!npsidid->sidstr) {
+> +			kfree(npsidid);
+> +			return -ENOMEM;
+> +		}
+> +
+> +		spin_lock(cidlock);
+> +		psidid = id_rb_search(cidtree, psid);
+> +		if (psidid) { /* node happened to get inserted meanwhile */
+> +			spin_unlock(cidlock);
+> +			kfree(npsidid->sidstr);
+> +			kfree(npsidid);
+> +		} else {
+> +			psidid = npsidid;
+> +			id_rb_insert(cidtree, psid, &psidid,
+> +					sidtype == SIDOWNER ? "os:" : "gs:");
+> +			spin_unlock(cidlock);
+> +		}
+> +	}
+> +
+> +	if (test_bit(SID_ID_MAPPED, &psidid->state))
+> +		goto sid_to_id_out; /* SID mapped */
+> +	if (time_after(psidid->retry + SID_MAP_RETRY, jiffies))
+> +		goto sid_to_id_out; /* wait before re-attempting SID mapping */
+> +	if (!test_and_set_bit(SID_ID_PENDING, &psidid->state)) {
+> +		saved_cred = override_creds(root_cred);
+> +		idkey = request_key(&cifs_idmap_key_type, psidid->sidstr, "");
+> +		if (IS_ERR(idkey)) {
+> +			psidid->id = cid;
+> +			psidid->retry = jiffies;
+> +			cFYI(1, "%s: Can't map SID to an id", __func__);
+> +		} else {
+> +			psidid->id = *(unsigned long *)idkey->payload.value;
+> +			set_bit(SID_ID_MAPPED, &psidid->state);
+> +			key_put(idkey);
+> +			kfree(psidid->sidstr);
+> +		}
 
-Ahh, ok. A perfect case to demonstrate why leaving unused crap lying
-around like this is a bad idea. Perhaps a better scheme would be a
-separate patch to just remove this function and then rebase your patch
-on top of that?
+	This patch looks much better overall. One problem though...
+
+	You're passing in the cifs_sb here, primarily to get the
+	mnt_uid and mnt_gid (right?). The cache itself though is
+	global. So, if I have two mounts with different mnt_uid/mnt_gid
+	then I can end up upcalling for a uid that fails. Then I can
+	end up accessing that same cached entry from a different mount,
+	but it's mapped to the mnt_uid for the *other* superblock.
+
+	I think it would be better to not store the mnt_uid in the
+	entry in the event that the upcall fails, and instead just set
+	the fattr->cf_uid/cf_gid to the mnt_uid/mnt_gid when you end up
+	with an unmapped entry.
+
+> +		revert_creds(saved_cred);
+> +		clear_bit(SID_ID_PENDING, &psidid->state);
+> +		wake_up_bit(&psidid->state, SID_ID_PENDING);
+> +	} else {
+> +		rc = wait_on_bit(&psidid->state, SID_ID_PENDING,
+> +				sidid_pending_wait, TASK_INTERRUPTIBLE);
+> +		if (rc) {
+> +			cFYI(1, "%s: sidid_pending_wait interrupted %d",
+> +					__func__, rc);
+> +			return rc;
+> +		}
+> +	}
+> +
+> +sid_to_id_out:
+> +	if (sidtype == SIDOWNER)
+> +		fattr->cf_uid = psidid->id;
+> +	else
+> +		fattr->cf_gid = psidid->id;
+> +
+> +	return 0;
+> +}
+> +
+>  int
+>  init_cifs_idmap(void)
+>  {
+> @@ -242,16 +468,24 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+>  	int num_subauth, num_sat, num_saw;
+>  
+>  	if ((!ctsid) || (!cwsid))
+> -		return 0;
+> +		return 1;
+>  
+>  	/* compare the revision */
+> -	if (ctsid->revision != cwsid->revision)
+> -		return 0;
+> +	if (ctsid->revision != cwsid->revision) {
+> +		if (ctsid->revision > cwsid->revision)
+> +			return 1;
+> +		else
+> +			return -1;
+> +	}
+>  
+>  	/* compare all of the six auth values */
+>  	for (i = 0; i < 6; ++i) {
+> -		if (ctsid->authority[i] != cwsid->authority[i])
+> -			return 0;
+> +		if (ctsid->authority[i] != cwsid->authority[i]) {
+> +			if (ctsid->authority[i] > cwsid->authority[i])
+> +				return 1;
+> +			else
+> +				return -1;
+> +		}
+>  	}
+>  
+>  	/* compare all of the subauth values if any */
+> @@ -260,12 +494,16 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+>  	num_subauth = num_sat < num_saw ? num_sat : num_saw;
+>  	if (num_subauth) {
+>  		for (i = 0; i < num_subauth; ++i) {
+> -			if (ctsid->sub_auth[i] != cwsid->sub_auth[i])
+> -				return 0;
+> +			if (ctsid->sub_auth[i] != cwsid->sub_auth[i]) {
+> +				if (ctsid->sub_auth[i] > cwsid->sub_auth[i])
+> +					return 1;
+> +				else
+> +					return -1;
+> +			}
+>  		}
+>  	}
+>  
+> -	return 1; /* sids compare/match */
+> +	return 0; /* sids compare/match */
+>  }
+>  
+>  
+> @@ -520,22 +758,22 @@ static void parse_dacl(struct cifs_acl *pdacl, char *end_of_acl,
+>  #ifdef CONFIG_CIFS_DEBUG2
+>  			dump_ace(ppace[i], end_of_acl);
+>  #endif
+> -			if (compare_sids(&(ppace[i]->sid), pownersid))
+> +			if (compare_sids(&(ppace[i]->sid), pownersid) == 0)
+>  				access_flags_to_mode(ppace[i]->access_req,
+>  						     ppace[i]->type,
+>  						     &fattr->cf_mode,
+>  						     &user_mask);
+> -			if (compare_sids(&(ppace[i]->sid), pgrpsid))
+> +			if (compare_sids(&(ppace[i]->sid), pgrpsid) == 0)
+>  				access_flags_to_mode(ppace[i]->access_req,
+>  						     ppace[i]->type,
+>  						     &fattr->cf_mode,
+>  						     &group_mask);
+> -			if (compare_sids(&(ppace[i]->sid), &sid_everyone))
+> +			if (compare_sids(&(ppace[i]->sid), &sid_everyone) == 0)
+>  				access_flags_to_mode(ppace[i]->access_req,
+>  						     ppace[i]->type,
+>  						     &fattr->cf_mode,
+>  						     &other_mask);
+> -			if (compare_sids(&(ppace[i]->sid), &sid_authusers))
+> +			if (compare_sids(&(ppace[i]->sid), &sid_authusers) == 0)
+>  				access_flags_to_mode(ppace[i]->access_req,
+>  						     ppace[i]->type,
+>  						     &fattr->cf_mode,
+> @@ -613,10 +851,10 @@ static int parse_sid(struct cifs_sid *psid, char *end_of_acl)
+>  
+>  
+>  /* Convert CIFS ACL to POSIX form */
+> -static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
+> -			  struct cifs_fattr *fattr)
+> +static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
+> +		struct cifs_ntsd *pntsd, int acl_len, struct cifs_fattr *fattr)
+>  {
+> -	int rc;
+> +	int rc = 0;
+>  	struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
+>  	struct cifs_acl *dacl_ptr; /* no need for SACL ptr */
+>  	char *end_of_acl = ((char *)pntsd) + acl_len;
+> @@ -638,12 +876,26 @@ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
+>  		 le32_to_cpu(pntsd->sacloffset), dacloffset);
+>  /*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
+>  	rc = parse_sid(owner_sid_ptr, end_of_acl);
+> -	if (rc)
+> +	if (rc) {
+> +		cFYI(1, "%s: Error %d parsing Owner SID", __func__, rc);
+> +		return rc;
+> +	}
+> +	rc = sid_to_id(cifs_sb, owner_sid_ptr, fattr, SIDOWNER);
+> +	if (rc) {
+> +		cFYI(1, "%s: Error %d mapping Owner SID to uid", __func__, rc);
+>  		return rc;
+> +	}
+>  
+>  	rc = parse_sid(group_sid_ptr, end_of_acl);
+> -	if (rc)
+> +	if (rc) {
+> +		cFYI(1, "%s: Error %d mapping Owner SID to gid", __func__, rc);
+>  		return rc;
+> +	}
+> +	rc = sid_to_id(cifs_sb, group_sid_ptr, fattr, SIDGROUP);
+> +	if (rc) {
+> +		cFYI(1, "%s: Error %d mapping Group SID to gid", __func__, rc);
+> +		return rc;
+> +	}
+>  
+>  	if (dacloffset)
+>  		parse_dacl(dacl_ptr, end_of_acl, owner_sid_ptr,
+> @@ -658,7 +910,7 @@ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
+>  	memcpy((void *)(&(cifscred->gsid)), (void *)group_sid_ptr,
+>  			sizeof(struct cifs_sid)); */
+>  
+> -	return 0;
+> +	return rc;
+>  }
+>  
+>  
+> @@ -865,7 +1117,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
+>  		rc = PTR_ERR(pntsd);
+>  		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
+>  	} else {
+> -		rc = parse_sec_desc(pntsd, acllen, fattr);
+> +		rc = parse_sec_desc(cifs_sb, pntsd, acllen, fattr);
+>  		kfree(pntsd);
+>  		if (rc)
+>  			cERROR(1, "parse sec desc failed rc = %d", rc);
+> diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+> index 025e943..7f25b44 100644
+> --- a/fs/cifs/cifsacl.h
+> +++ b/fs/cifs/cifsacl.h
+> @@ -39,6 +39,15 @@
+>  #define ACCESS_ALLOWED	0
+>  #define ACCESS_DENIED	1
+>  
+> +#define SIDOWNER 1
+> +#define SIDGROUP 2
+> +#define SIDLEN 150 /* S- 1 revision- 6 authorities- max 5 sub authorities */
+> +
+> +#define SID_ID_MAPPED 0
+> +#define SID_ID_PENDING 1
+> +#define SID_MAP_EXPIRE 1000 /* enough for an upcall to return? */
+> +#define SID_MAP_RETRY 1000  /* wait for next attempt to map sid */
+> +
+>  struct cifs_ntsd {
+>  	__le16 revision; /* revision level */
+>  	__le16 type;
+> @@ -74,6 +83,21 @@ struct cifs_wksid {
+>  	char sidname[SIDNAMELENGTH];
+>  } __attribute__((packed));
+>  
+> +struct cifs_sid_id {
+> +	unsigned long id;
+> +	unsigned long time;
+> +	unsigned long retry;
+> +	unsigned long state;
+> +	char *sidstr;
+> +	struct rb_node rbnode;
+> +	struct cifs_sid sid;
+> +};
+> +
+> +#ifdef __KERNEL__
+> +extern struct key_type cifs_idmap_key_type;
+> +extern const struct cred *root_cred;
+> +#endif /* KERNEL */
+> +
+>  extern int match_sid(struct cifs_sid *);
+>  extern int compare_sids(const struct cifs_sid *, const struct cifs_sid *);
+>  
+
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
