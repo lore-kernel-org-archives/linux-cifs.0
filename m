@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions (try #13)
-Date: Fri, 8 Apr 2011 19:32:23 -0500
-Message-ID: <BANLkTimCzC9NRcvmsOq7jE19gRNzV9nE=g@mail.gmail.com>
+Date: Fri, 8 Apr 2011 19:47:39 -0500
+Message-ID: <BANLkTikrMzJ3qNfqT0XDRfpJ+smy5yxvQQ@mail.gmail.com>
 References: <1302283946-9350-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20110408155722.74bca9ad@corrin.poochiereds.net>
 Mime-Version: 1.0
@@ -357,12 +357,6 @@ to do an upcall.
 but now I return
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0the mnt_uid?
 >
-
-Jeff, not sure I understand. When this thread is woken up,
-it sets either cf_uid or cf_gid to cid which is now common globally
-for that SID and is stored in the node by the thread that did
-successful upcall.
-
 >> + =A0 =A0 }
 >> +
 >> +sid_to_id_out:
@@ -618,3 +612,5 @@ s_sid *);
 > --
 > Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 >
+
+No you are right. Will fix and resubmit.
