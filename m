@@ -1,183 +1,151 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils: Handle cifs_idmap type of key to map a SID to either an uid or gid (try #14)
-Date: Fri,  8 Apr 2011 20:20:25 -0500
-Message-ID: <1302312025-17464-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH 1/2] CIFS: Add launder_page operation
+Date: Sun, 10 Apr 2011 10:47:39 +0400
+Message-ID: <BANLkTikGB9YbuTDkeX6YYRaEFJZ=ZofJtg@mail.gmail.com>
+References: <1302249408-8971-1-git-send-email-piastry@etersoft.ru>
+	<20110408151730.28da8041@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110408151730.28da8041-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+2011/4/8 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
+> On Fri, =A08 Apr 2011 11:56:47 +0400
+> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>
+>> Add this let us drop filemap_write_and_wait from cifs_invalidate_map=
+ping
+>> and simplify the code to properly process invalidate logic.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>> ---
+>> =A0fs/cifs/file.c | =A0 41 ++++++++++++++++++++++++++++++++++++++---
+>> =A01 files changed, 38 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>> index 9c7f83f..20a95bb 100644
+>> --- a/fs/cifs/file.c
+>> +++ b/fs/cifs/file.c
+>> @@ -1331,7 +1331,8 @@ retry_write:
+>> =A0 =A0 =A0 return rc;
+>> =A0}
+>>
+>> -static int cifs_writepage(struct page *page, struct writeback_contr=
+ol *wbc)
+>> +static int
+>> +cifs_writepage_locked(struct page *page, struct writeback_control *=
+wbc)
+>> =A0{
+>> =A0 =A0 =A0 int rc =3D -EFAULT;
+>> =A0 =A0 =A0 int xid;
+>> @@ -1354,14 +1355,25 @@ static int cifs_writepage(struct page *page,=
+ struct writeback_control *wbc)
+>> =A0 =A0 =A0 =A0*/
+>> =A0 =A0 =A0 set_page_writeback(page);
+>> =A0 =A0 =A0 rc =3D cifs_partialpagewrite(page, 0, PAGE_CACHE_SIZE);
+>> - =A0 =A0 SetPageUptodate(page); /* BB add check for error and Clear=
+uptodate? */
+>> - =A0 =A0 unlock_page(page);
+>> + =A0 =A0 if (rc =3D=3D -EAGAIN)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 redirty_page_for_writepage(wbc, page);
+> =A0 =A0 =A0 =A0^^^^^^
+> Should we be retrying the write here in the WB_SYNC_ALL case?
+
+Yes, you are right - will post the fix next.
+
+>
+>> + =A0 =A0 else if (rc !=3D 0)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 SetPageError(page);
+>> + =A0 =A0 else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 SetPageUptodate(page);
+>> =A0 =A0 =A0 end_page_writeback(page);
+>> =A0 =A0 =A0 page_cache_release(page);
+>> =A0 =A0 =A0 FreeXid(xid);
+>> =A0 =A0 =A0 return rc;
+>> =A0}
+>>
+>> +static int cifs_writepage(struct page *page, struct writeback_contr=
+ol *wbc)
+>> +{
+>> + =A0 =A0 int rc =3D cifs_writepage_locked(page, wbc);
+>> + =A0 =A0 unlock_page(page);
+>> + =A0 =A0 return rc;
+>> +}
+>> +
+>> =A0static int cifs_write_end(struct file *file, struct address_space=
+ *mapping,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 loff_t pos, unsigned len=
+, unsigned copied,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct page *page, void =
+*fsdata)
+>> @@ -2344,6 +2356,27 @@ static void cifs_invalidate_page(struct page =
+*page, unsigned long offset)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_fscache_invalidate_page(page, &cifs=
+i->vfs_inode);
+>> =A0}
+>>
+>> +static int cifs_launder_page(struct page *page)
+>> +{
+>> + =A0 =A0 int rc =3D 0;
+>> + =A0 =A0 loff_t range_start =3D page_offset(page);
+>> + =A0 =A0 loff_t range_end =3D range_start + (loff_t)(PAGE_CACHE_SIZ=
+E - 1);
+>> + =A0 =A0 struct writeback_control wbc =3D {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 .sync_mode =3D WB_SYNC_ALL,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 .nr_to_write =3D 0,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 .range_start =3D range_start,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 .range_end =3D range_end,
+>> + =A0 =A0 };
+>> +
+>> + =A0 =A0 cFYI(1, "Launder page: %p", page);
+>> +
+>> + =A0 =A0 if (clear_page_dirty_for_io(page))
+>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_writepage_locked(page, &wbc);
+>> +
+>> + =A0 =A0 cifs_fscache_invalidate_page(page, page->mapping->host);
+>> + =A0 =A0 return rc;
+>> +}
+>> +
+>> =A0void cifs_oplock_break(struct work_struct *work)
+>> =A0{
+>> =A0 =A0 =A0 struct cifsFileInfo *cfile =3D container_of(work, struct=
+ cifsFileInfo,
+>> @@ -2415,6 +2448,7 @@ const struct address_space_operations cifs_add=
+r_ops =3D {
+>> =A0 =A0 =A0 .set_page_dirty =3D __set_page_dirty_nobuffers,
+>> =A0 =A0 =A0 .releasepage =3D cifs_release_page,
+>> =A0 =A0 =A0 .invalidatepage =3D cifs_invalidate_page,
+>> + =A0 =A0 .launder_page =3D cifs_launder_page,
+>> =A0 =A0 =A0 /* .sync_page =3D cifs_sync_page, */
+>> =A0 =A0 =A0 /* .direct_IO =3D */
+>> =A0};
+>> @@ -2433,6 +2467,7 @@ const struct address_space_operations cifs_add=
+r_ops_smallbuf =3D {
+>> =A0 =A0 =A0 .set_page_dirty =3D __set_page_dirty_nobuffers,
+>> =A0 =A0 =A0 .releasepage =3D cifs_release_page,
+>> =A0 =A0 =A0 .invalidatepage =3D cifs_invalidate_page,
+>> + =A0 =A0 .launder_page =3D cifs_launder_page,
+>> =A0 =A0 =A0 /* .sync_page =3D cifs_sync_page, */
+>> =A0 =A0 =A0 /* .direct_IO =3D */
+>> =A0};
+>
+>
+> --
+> Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
 
-Handle cifs_idmap type of key. Extract a SID string from the description
-and map it to either an uid or gid using winbind APIs.
-If that fails (e.g. because winbind is not installed/running or winbind returns
-an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
-And if that fails, kernel assigns uid and gid (from mount superblock).
 
-An entry such as this
-
-create  cifs.cifs_idmap   *       *               /usr/sbin/cifs.upcall %k
-
-is needed in the file /etc/request-key.conf.
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- Makefile.am   |    2 +-
- cifs.upcall.c |  110 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 111 insertions(+), 1 deletions(-)
-
-diff --git a/Makefile.am b/Makefile.am
-index 67a0190..c9018ae 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -11,7 +11,7 @@ man_MANS = mount.cifs.8
- if CONFIG_CIFSUPCALL
- sbin_PROGRAMS = cifs.upcall
- cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
--cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
-+cifs_upcall_LDADD = -ltalloc -lwbclient -lkeyutils $(KRB5_LDADD)
- man_MANS += cifs.upcall.8
- 
- #
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 479517c..68a8059 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -45,6 +45,13 @@
- #include <time.h>
- #include <netdb.h>
- #include <arpa/inet.h>
-+#include <stdint.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <limits.h>
-+#include <wbclient.h>
- 
- #include "util.h"
- #include "replace.h"
-@@ -695,6 +702,103 @@ static int cifs_resolver(const key_serial_t key, const char *key_descr)
- 	return 0;
- }
- 
-+static int
-+cifs_sid_resolver(const key_serial_t key, const char *key_descr)
-+{
-+	int i;
-+	uid_t uid = 0;
-+	gid_t gid = 0;;
-+	wbcErr rc = 1;
-+	const char *keyend = key_descr;
-+	struct wbcDomainSid sid;
-+	struct passwd *pw;
-+	struct group *gr;
-+
-+	/* skip next 4 ';' delimiters to get to description */
-+	for (i = 1; i <= 4; ++i) {
-+		keyend = index(keyend + 1, ';');
-+		if (!keyend) {
-+			syslog(LOG_ERR, "invalid key description: %s",
-+			       key_descr);
-+			return 1;
-+		}
-+	}
-+	keyend++;
-+
-+	/*
-+	 * Use winbind to convert received string to a SID and lookup
-+	 * name and map that SID to an uid.  If either of these
-+	 * function calls return with an error,  use system calls to obtain
-+	 * uid of user "nobody". If winbind fails to map a SID to an UID
-+	 * and there is no user named "nobody", return error to the
-+	 * upcall caller. Otherwise instanticate a key using that uid.
-+	 *
-+	 * The same applies to SID and gid mapping.  Instead of a
-+	 * user "nobody", user "nogroup" is looked up if winbind
-+	 * fails to map a SID to a gid.
-+	 */
-+	if (strncmp(keyend, "os", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		keyend++;
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (rc)
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+		else {
-+			rc = wbcSidToUid(&sid, &uid);
-+			if (rc)
-+				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
-+						keyend, rc);
-+		}
-+		if (rc) { /* either of the two wbcSid functions failed */
-+			pw = getpwnam("nobody");
-+			if (!pw)
-+				syslog(LOG_DEBUG, "SID %s to uid pw error: %d",
-+					keyend, rc);
-+			else {
-+				uid = pw->pw_uid;
-+				rc = 0;
-+			}
-+		}
-+		if (!rc) { /* SID has been mapped to a uid */
-+			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
-+			if (rc)
-+				syslog(LOG_ERR, "%s: key inst: %s",
-+					__func__, strerror(errno));
-+		}
-+	} else if (strncmp(keyend, "gs", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		keyend++;
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (rc)
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+		else {
-+			rc = wbcSidToGid(&sid, &gid);
-+			if (rc)
-+				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
-+						keyend, rc);
-+		}
-+		if (rc) { /* either of the two wbcSid functions failed */
-+			gr = getgrnam("nogroup");
-+			if (!gr)
-+				syslog(LOG_DEBUG, "SID %s to gid pw error: %d",
-+						keyend, rc);
-+			else {
-+				gid = gr->gr_gid;
-+				rc = 0;
-+			}
-+		}
-+		if (!rc) { /* SID has been mapped to a gid */
-+			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
-+			if (rc)
-+				syslog(LOG_ERR, "%s: key inst: %s",
-+						__func__, strerror(errno));
-+		}
-+	} else
-+		syslog(LOG_DEBUG, "Invalid SID: %s", keyend);
-+
-+	return rc;
-+}
-+
- /*
-  * Older kernels sent IPv6 addresses without colons. Well, at least
-  * they're fixed-length strings. Convert these addresses to have colon
-@@ -833,6 +937,12 @@ int main(const int argc, char *const argv[])
- 		goto out;
- 	}
- 
-+	if ((strncmp(buf, "cifs.cifs_idmap", sizeof("cifs.cifs_idmap") - 1)
-+			== 0)) {
-+		rc = cifs_sid_resolver(key, buf);
-+		goto out;
-+	}
-+
- 	have = decode_key_description(buf, &arg);
- 	SAFE_FREE(buf);
- 	if ((have & DKD_MUSTHAVE_SET) != DKD_MUSTHAVE_SET) {
--- 
-1.6.0.2
+--=20
+Best regards,
+Pavel Shilovsky.
