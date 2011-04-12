@@ -1,567 +1,462 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 5/5] cifs: convert cifs_writepages to use async writes
-Date: Tue, 12 Apr 2011 14:07:04 +0400
-Message-ID: <BANLkTi=HPkAC3kY3g5=XYHzfTLcde9C7ww@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 4/5] cifs: add cifs_async_writev
+Date: Tue, 12 Apr 2011 07:11:20 -0400
+Message-ID: <20110412071120.75e45b38@corrin.poochiereds.net>
 References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
-	<1301747039-31411-6-git-send-email-jlayton@redhat.com>
+	<1301747039-31411-5-git-send-email-jlayton@redhat.com>
+	<BANLkTimHi_w55+bqFstXZZdjaMzw1mw_yA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301747039-31411-6-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <BANLkTimHi_w55+bqFstXZZdjaMzw1mw_yA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/4/2 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Have cifs_writepages issue asynchronous writes instead of waiting on
-> each write call to complete before issuing another. This also allows =
-us
-> to return more quickly from writepages in the WB_SYNC_NONE case. It
-> can just send out all of the I/Os and not wait around for the replies=
-=2E
->
-> In the WB_SYNC_ALL case, have it wait for all of the writes to comple=
-te
-> after issuing them and return any errors that turn up from it. If tho=
-se
-> errors turn out to all be retryable (-EAGAIN), then retry the entire
-> operation again.
->
-> This also changes the page locking semantics a little bit. Instead of
-> holding the page lock until the response is received, release it afte=
-r
-> doing the send. This will reduce contention for the page lock and sho=
-uld
-> prevent processes that have the file mmap'ed from being blocked
-> unnecessarily.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/file.c | =A0256 ++++++++++++++++++++++++++++++------------=
---------------
-> =A01 files changed, 136 insertions(+), 120 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index da53246..dbdbe97 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1087,32 +1087,69 @@ static int cifs_partialpagewrite(struct page =
-*page, unsigned from, unsigned to)
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> +/*
-> + * walk a list of in progress async writes and wait for them to comp=
-lete.
-> + * Check the result code on each one.
-> + *
-> + * There's a clear heirarchy: 0 < EAGAIN < other errors
-> + *
-> + * If we get an EAGAIN return on a WB_SYNC_ALL writeout, then we nee=
+On Tue, 12 Apr 2011 13:43:07 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+
+> 2011/4/2 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> > Add the ability for CIFS to do an asynchronous write. The kernel wi=
+ll
+> > set the frame up as it would for a "normal" SMBWrite2 request, and =
+use
+> > cifs_call_async to send it. The mid callback will then be configure=
 d to
-> + * go back and do the whole operation again. If we get other errors =
-then
-> + * the mapping already likely has AS_EIO or AS_ENOSPC set, so we can
-> + * give up and just return an error.
-> + */
-> +static int
-> +cifs_wait_for_write_completion(struct address_space *mapping,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct =
-list_head *pending)
-> +{
-> + =A0 =A0 =A0 int tmprc, rc =3D 0;
-> + =A0 =A0 =A0 struct cifs_writedata *wdata;
-> +
-> + =A0 =A0 =A0 /* wait for writes to complete */
-> + =A0 =A0 =A0 for (;;) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* anything left on list? */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&mapping->private_lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (list_empty(pending)) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&mapping->p=
-rivate_lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* dequeue an entry */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata =3D list_first_entry(pending, str=
-uct cifs_writedata,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0pending);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&wdata->pending);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&mapping->private_lock);
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* wait for it to complete */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 tmprc =3D wait_for_completion_killable(=
+> > handle the result.
+> >
+> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> > ---
+> > =C2=A0fs/cifs/cifsproto.h | =C2=A0 19 +++++
+> > =C2=A0fs/cifs/cifssmb.c =C2=A0 | =C2=A0219 ++++++++++++++++++++++++=
++++++++++++++++++++++++++++
+> > =C2=A02 files changed, 238 insertions(+), 0 deletions(-)
+>=20
+> Looks good too, except two small notes.
+>=20
+
+Thanks for looking. I respun this yesterday actually and the new patch
+is a bit different. With the new patchset, we'll no longer be
+constrained by the current wsize limit of 14 pages. It should be able
+to handle an arbitrary wsize, which should also help performance.
+
+
+> >
+> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> > index e255a2b..7b964df 100644
+> > --- a/fs/cifs/cifsproto.h
+> > +++ b/fs/cifs/cifsproto.h
+> > @@ -21,6 +21,7 @@
+> > =C2=A0#ifndef _CIFSPROTO_H
+> > =C2=A0#define _CIFSPROTO_H
+> > =C2=A0#include <linux/nls.h>
+> > +#include <linux/pagevec.h>
+> >
+> > =C2=A0struct statfs;
+> > =C2=A0struct smb_vol;
+> > @@ -433,4 +434,22 @@ extern int mdfour(unsigned char *, unsigned ch=
+ar *, int);
+> > =C2=A0extern int E_md4hash(const unsigned char *passwd, unsigned ch=
+ar *p16);
+> > =C2=A0extern int SMBencrypt(unsigned char *passwd, const unsigned c=
+har *c8,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0unsigned char *p24);
+> > +
+> > +/* asynchronous write support */
+> > +struct cifs_writedata {
+> > + =C2=A0 =C2=A0 =C2=A0 struct list_head =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+pending;
+> > + =C2=A0 =C2=A0 =C2=A0 struct kref =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 refcount;
+> > + =C2=A0 =C2=A0 =C2=A0 struct completion =C2=A0 =C2=A0 =C2=A0 compl=
+etion;
+> > + =C2=A0 =C2=A0 =C2=A0 struct work_struct =C2=A0 =C2=A0 =C2=A0work;
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifsFileInfo =C2=A0 =C2=A0 *cfile;
+> > + =C2=A0 =C2=A0 =C2=A0 __u64 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 offset;
+> > + =C2=A0 =C2=A0 =C2=A0 unsigned int =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0bytes;
+> > + =C2=A0 =C2=A0 =C2=A0 int =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 result;
+> > + =C2=A0 =C2=A0 =C2=A0 struct page =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 *pages[PAGEVEC_SIZE];
+> > +};
+> > +
+> > +int cifs_async_writev(struct cifs_writedata *wdata);
+> > +struct cifs_writedata *cifs_writedata_alloc(void);
+> > +void cifs_writedata_release(struct kref *refcount);
+> > +
+> > =C2=A0#endif =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ /* _CIFSPROTO_H */
+> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> > index 8de7e79..b308605 100644
+> > --- a/fs/cifs/cifssmb.c
+> > +++ b/fs/cifs/cifssmb.c
+> > @@ -32,6 +32,7 @@
+> > =C2=A0#include <linux/vfs.h>
+> > =C2=A0#include <linux/slab.h>
+> > =C2=A0#include <linux/posix_acl_xattr.h>
+> > +#include <linux/pagemap.h>
+> > =C2=A0#include <asm/uaccess.h>
+> > =C2=A0#include "cifspdu.h"
+> > =C2=A0#include "cifsglob.h"
+> > @@ -1604,6 +1605,224 @@ CIFSSMBWrite(const int xid, struct cifs_tco=
+n *tcon,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0return rc;
+> > =C2=A0}
+> >
+> > +void
+> > +cifs_writedata_release(struct kref *refcount)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_writedata *wdata =3D container_o=
+f(refcount,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 stru=
+ct cifs_writedata, refcount);
+> > + =C2=A0 =C2=A0 =C2=A0 struct address_space *mapping;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 if (wdata->cfile) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mapping =3D wdat=
+a->cfile->dentry->d_inode->i_mapping;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 spin_lock(&mappi=
+ng->private_lock);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 list_del(&wdata-=
+>pending);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 spin_unlock(&map=
+ping->private_lock);
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifsFileInfo_put=
+(wdata->cfile);
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 kfree(wdata);
+> > +}
+> > +
+> > +static void
+> > +cifs_writev_complete(struct work_struct *work)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_writedata *wdata =3D container_o=
+f(work,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 struct cifs_writedata, work);
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_tcon *tcon =3D tlink_tcon(wdata-=
+>cfile->tlink);
+>                              ^^^ this variable is unused.
+>=20
+				Not exactly.
+
+> > + =C2=A0 =C2=A0 =C2=A0 struct inode *inode =3D wdata->cfile->dentry=
+->d_inode;
+> > + =C2=A0 =C2=A0 =C2=A0 struct page *page;
+> > + =C2=A0 =C2=A0 =C2=A0 int i =3D 0;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 if (wdata->result =3D=3D 0) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_update_eof(=
+CIFS_I(inode), wdata->offset, wdata->bytes);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_stats_bytes=
+_written(tcon, wdata->bytes);
+					     ^^^^^=09
+					The tcon is used here
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i < ARRAY_SIZE(wdata->pages) &=
+& (page =3D wdata->pages[i]);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 i++) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (wdata->resul=
+t =3D=3D -EAGAIN)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 __set_page_dirty_nobuffers(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (wdata->=
+result < 0)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 SetPageError(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 end_page_writeba=
+ck(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 page_cache_relea=
+se(page);
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > + =C2=A0 =C2=A0 =C2=A0 if (wdata->result !=3D -EAGAIN)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mapping_set_erro=
+r(inode->i_mapping, wdata->result);
+> > + =C2=A0 =C2=A0 =C2=A0 complete(&wdata->completion);
+> > + =C2=A0 =C2=A0 =C2=A0 kref_put(&wdata->refcount, cifs_writedata_re=
+lease);
+> > +}
+> > +
+> > +struct cifs_writedata *
+> > +cifs_writedata_alloc(void)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_writedata *wdata;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 wdata =3D kzalloc(sizeof(*wdata), GFP_NOFS);
+> > + =C2=A0 =C2=A0 =C2=A0 if (wdata !=3D NULL) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 INIT_LIST_HEAD(&=
+wdata->pending);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 INIT_WORK(&wdata=
+->work, cifs_writev_complete);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kref_init(&wdata=
+->refcount);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 init_completion(=
 &wdata->completion);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (tmprc)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D tmprc;
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->result =3D=3D -EAGAIN)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D rc ? rc : wdata-=
->result;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (wdata->result !=3D 0)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wdata->result;
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kref_put(&wdata->refcount, cifs_writeda=
-ta_release);
-> + =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 return rc;
-> +}
-> +
-> =A0static int cifs_writepages(struct address_space *mapping,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct writeback_=
-control *wbc)
-> =A0{
-> - =A0 =A0 =A0 unsigned int bytes_to_write;
-> - =A0 =A0 =A0 unsigned int bytes_written;
-> - =A0 =A0 =A0 struct cifs_sb_info *cifs_sb;
-> - =A0 =A0 =A0 int done =3D 0;
-> + =A0 =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(mapping->host-=
->i_sb);
-> + =A0 =A0 =A0 bool done =3D false, scanned =3D false, range_whole =3D=
- false;
-> =A0 =A0 =A0 =A0pgoff_t end;
-> =A0 =A0 =A0 =A0pgoff_t index;
-> - =A0 =A0 =A0 int range_whole =3D 0;
-> - =A0 =A0 =A0 struct kvec *iov;
-> - =A0 =A0 =A0 int len;
-> - =A0 =A0 =A0 int n_iov =3D 0;
-> - =A0 =A0 =A0 pgoff_t next;
-> - =A0 =A0 =A0 int nr_pages;
-> - =A0 =A0 =A0 __u64 offset =3D 0;
-> + =A0 =A0 =A0 unsigned int pvec_pages;
-> =A0 =A0 =A0 =A0struct cifsFileInfo *open_file;
-> - =A0 =A0 =A0 struct cifs_tcon *tcon;
-> - =A0 =A0 =A0 struct cifsInodeInfo *cifsi =3D CIFS_I(mapping->host);
-> + =A0 =A0 =A0 struct cifs_writedata *wdata;
-> =A0 =A0 =A0 =A0struct page *page;
-> =A0 =A0 =A0 =A0struct pagevec pvec;
-> + =A0 =A0 =A0 struct list_head pending;
-> =A0 =A0 =A0 =A0int rc =3D 0;
-> - =A0 =A0 =A0 int scanned =3D 0;
-> - =A0 =A0 =A0 int xid;
-> -
-> - =A0 =A0 =A0 cifs_sb =3D CIFS_SB(mapping->host->i_sb);
->
-> =A0 =A0 =A0 =A0/*
-> =A0 =A0 =A0 =A0 * If wsize is smaller that the page cache size, defau=
-lt to writing
-> @@ -1121,27 +1158,19 @@ static int cifs_writepages(struct address_spa=
-ce *mapping,
-> =A0 =A0 =A0 =A0if (cifs_sb->wsize < PAGE_CACHE_SIZE)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return generic_writepages(mapping, wbc=
-);
->
-> - =A0 =A0 =A0 iov =3D kmalloc(32 * sizeof(struct kvec), GFP_KERNEL);
-> - =A0 =A0 =A0 if (iov =3D=3D NULL)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return generic_writepages(mapping, wbc)=
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > + =C2=A0 =C2=A0 =C2=A0 return wdata;
+> > +}
+> > +
+> > +/*
+> > + * Check the midState and signature on received buffer (if any), a=
+nd queue the
+> > + * workqueue completion task.
+> > + */
+> > +static void
+> > +cifs_writev_callback(struct mid_q_entry *mid)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_writedata *wdata =3D mid->callba=
+ck_data;
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_tcon *tcon =3D tlink_tcon(wdata-=
+>cfile->tlink);
+> > + =C2=A0 =C2=A0 =C2=A0 unsigned int written;
+> > + =C2=A0 =C2=A0 =C2=A0 WRITE_RSP *smb =3D (WRITE_RSP *)mid->resp_bu=
+f;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 switch(mid->midState) {
+> > + =C2=A0 =C2=A0 =C2=A0 case MID_RESPONSE_RECEIVED:
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wdata->result =3D=
+ cifs_check_receive(mid, tcon->ses->server, 0);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (wdata->resul=
+t !=3D 0)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 break;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 written =3D le16=
+_to_cpu(smb->CountHigh);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 written <<=3D 16=
 ;
-> -
-> =A0 =A0 =A0 =A0/*
-> =A0 =A0 =A0 =A0 * if there's no open file, then this is likely to fai=
-l too,
-> =A0 =A0 =A0 =A0 * but it'll at least handle the return. Maybe it shou=
-ld be
-> =A0 =A0 =A0 =A0 * a BUG() instead?
-> =A0 =A0 =A0 =A0 */
-> =A0 =A0 =A0 =A0open_file =3D find_writable_file(CIFS_I(mapping->host)=
-, false);
-> - =A0 =A0 =A0 if (!open_file) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(iov);
-> + =A0 =A0 =A0 if (!open_file)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return generic_writepages(mapping, wbc=
-);
-> - =A0 =A0 =A0 }
-> -
-> - =A0 =A0 =A0 tcon =3D tlink_tcon(open_file->tlink);
-> =A0 =A0 =A0 =A0cifsFileInfo_put(open_file);
->
-> - =A0 =A0 =A0 xid =3D GetXid();
-> -
-> + =A0 =A0 =A0 INIT_LIST_HEAD(&pending);
-> =A0 =A0 =A0 =A0pagevec_init(&pvec, 0);
-> +
-> =A0 =A0 =A0 =A0if (wbc->range_cyclic) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0index =3D mapping->writeback_index; /*=
- Start from prev offset */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0end =3D -1;
-> @@ -1149,23 +1178,26 @@ static int cifs_writepages(struct address_spa=
-ce *mapping,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0index =3D wbc->range_start >> PAGE_CAC=
-HE_SHIFT;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0end =3D wbc->range_end >> PAGE_CACHE_S=
-HIFT;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (wbc->range_start =3D=3D 0 && wbc->=
-range_end =3D=3D LLONG_MAX)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 range_whole =3D 1;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 scanned =3D 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 range_whole =3D true;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 scanned =3D true;
-> =A0 =A0 =A0 =A0}
-> =A0retry:
-> =A0 =A0 =A0 =A0while (!done && (index <=3D end) &&
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0(nr_pages =3D pagevec_lookup_tag(&pvec, =
-mapping, &index,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0(pvec_pages =3D pagevec_lookup_tag(&pvec=
-, mapping, &index,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0PAGECACHE_TAG_DIRTY,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0min(end - index, (pgof=
-f_t)PAGEVEC_SIZE - 1) + 1))) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 int first;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int i;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int nr_pages =3D 0;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 pgoff_t next =3D 0;
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 first =3D -1;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 next =3D 0;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 n_iov =3D 0;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 bytes_to_write =3D 0;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata =3D cifs_writedata_alloc();
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!wdata) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pagevec_release(&pvec);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 for (i =3D 0; i < nr_pages; i++) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 for (i =3D 0; i < pvec_pages; i++) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0page =3D pvec.pages[i]=
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 written +=3D le1=
+6_to_cpu(smb->Count);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Mask off=
+ high 16 bits when bytes written as returned
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* by the s=
+erver is greater than bytes requested by the
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* client. =
+OS/2 servers are known to set incorrect
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* CountHig=
+h values.
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (written > wd=
+ata->bytes)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 written &=3D 0xFFFF;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (written < wd=
+ata->bytes)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 wdata->result =3D -ENOSPC;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 wdata->bytes =3D written;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
+> > + =C2=A0 =C2=A0 =C2=A0 case MID_REQUEST_SUBMITTED:
+> > + =C2=A0 =C2=A0 =C2=A0 case MID_RETRY_NEEDED:
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wdata->result =3D=
+ -EAGAIN;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
+> > + =C2=A0 =C2=A0 =C2=A0 default:
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wdata->result =3D=
+ -EIO;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 queue_work(system_nrt_wq, &wdata->work);
+> > + =C2=A0 =C2=A0 =C2=A0 DeleteMidQEntry(mid);
+> > + =C2=A0 =C2=A0 =C2=A0 atomic_dec(&tcon->ses->server->inFlight);
+> > + =C2=A0 =C2=A0 =C2=A0 wake_up(&tcon->ses->server->request_q);
+> > +}
+> > +
+> > +/* cifs_async_writev - send an async write, and set up mid to hand=
+le result */
+> > +int
+> > +cifs_async_writev(struct cifs_writedata *wdata)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 int i, rc =3D -EACCES;
+> > + =C2=A0 =C2=A0 =C2=A0 WRITE_REQ *smb =3D NULL;
+> > + =C2=A0 =C2=A0 =C2=A0 int wct;
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_tcon *tcon =3D tlink_tcon(wdata-=
+>cfile->tlink);
+> > + =C2=A0 =C2=A0 =C2=A0 struct inode *inode =3D wdata->cfile->dentry=
+->d_inode;
+> > + =C2=A0 =C2=A0 =C2=A0 unsigned int npages =3D ARRAY_SIZE(wdata->pa=
+ges);
+> > + =C2=A0 =C2=A0 =C2=A0 struct kvec *iov =3D NULL;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 cFYI(1, "async write at %llu %u bytes", wdat=
+a->offset, wdata->bytes);
+>                                                        ^^^^ bytes is
+> zero here. You calculate it next - I suggest to move this info messag=
+e
+> after you get right bytes value.
+>=20
+
+Good catch. Will fix.
+
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 if (tcon->ses->capabilities & CAP_LARGE_FILE=
+S) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wct =3D 14;
+> > + =C2=A0 =C2=A0 =C2=A0 } else {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 wct =3D 12;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (wdata->offse=
+t >> 32 > 0) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 /* can not handle big offset for old srv */
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 return -EIO;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 rc =3D small_smb_init(SMB_COM_WRITE_ANDX, wc=
+t, tcon, (void **)&smb);
+> > + =C2=A0 =C2=A0 =C2=A0 if (rc)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto async_write=
+v_out;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 /* FIXME: only allocate number of kvecs we n=
+eed */
+> > + =C2=A0 =C2=A0 =C2=A0 iov =3D kzalloc((npages + 1) * sizeof(*iov),=
+ GFP_NOFS);
+> > + =C2=A0 =C2=A0 =C2=A0 if (iov =3D=3D NULL) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D -ENOMEM;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto async_write=
+v_out;
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 smb->AndXCommand =3D 0xFF; =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0/* none */
+> > + =C2=A0 =C2=A0 =C2=A0 smb->Fid =3D wdata->cfile->netfid;
+> > + =C2=A0 =C2=A0 =C2=A0 smb->OffsetLow =3D cpu_to_le32(wdata->offset=
+ & 0xFFFFFFFF);
+> > + =C2=A0 =C2=A0 =C2=A0 if (wct =3D=3D 14)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 smb->OffsetHigh =
+=3D cpu_to_le32(wdata->offset >> 32);
+> > + =C2=A0 =C2=A0 =C2=A0 smb->Reserved =3D 0xFFFFFFFF;
+> > + =C2=A0 =C2=A0 =C2=A0 smb->WriteMode =3D 0;
+> > + =C2=A0 =C2=A0 =C2=A0 smb->Remaining =3D 0;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 smb->DataOffset =3D
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_to_le16(offsetof(struct sm=
+b_com_write_req, Data) - 4);
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 /* 4 for RFC1001 length + 1 for BCC */
+> > + =C2=A0 =C2=A0 =C2=A0 iov[0].iov_len =3D be32_to_cpu(smb->hdr.smb_=
+buf_length) + 4 + 1;
+> > + =C2=A0 =C2=A0 =C2=A0 iov[0].iov_base =3D smb;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 /* marshal up the pages into iov array */
+> > + =C2=A0 =C2=A0 =C2=A0 npages =3D 0;
+> > + =C2=A0 =C2=A0 =C2=A0 wdata->bytes =3D 0;
+> > + =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i < ARRAY_SIZE(wdata->pages) &=
+& wdata->pages[i]; i++) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (wdata->bytes=
+ + PAGE_CACHE_SIZE <=3D
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CI=
+=46S_SB(inode->i_sb)->wsize) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 iov[i + 1].iov_len =3D min(inode->i_size -
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 page_offset(wdata->pages[i]),
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 (loff_t)PAGE_CACHE_SIZE);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 iov[i + 1].iov_base =3D kmap(wdata->pages[i]);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 wdata->bytes +=3D iov[i + 1].iov_len;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 npages++;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 /* if we're beyond wsize, then re-mark page dirty */
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 __set_page_dirty_nobuffers(wdata->pages[i]);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 smb->DataLengthLow =3D cpu_to_le16(wdata->by=
+tes & 0xFFFF);
+> > + =C2=A0 =C2=A0 =C2=A0 smb->DataLengthHigh =3D cpu_to_le16(wdata->b=
+ytes >> 16);
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 if (wct =3D=3D 14) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 inc_rfc1001_len(=
+&smb->hdr, wdata->bytes + 1);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_bcc(wdata->b=
+ytes + 1, &smb->hdr);
+> > + =C2=A0 =C2=A0 =C2=A0 } else {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* wct =3D=3D 12=
+ */
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct smb_com_w=
+ritex_req *smbw =3D
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (struct smb_com_writex_req *)smb=
 ;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/*
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * At this point we ho=
-ld neither mapping->tree_lock nor
-> @@ -1175,7 +1207,7 @@ retry:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * mapping
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 */
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (first < 0)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (nr_pages =3D=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0lock_p=
-age(page);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else if (!trylock_page=
-(page))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> @@ -1186,7 +1218,7 @@ retry:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!wbc->range_cyclic=
- && page->index > end) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 done =3D=
- 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 done =3D=
- true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unlock=
-_page(page);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -1213,119 +1245,103 @@ retry:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0set_page_writeback(pag=
-e);
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (page_offset(page) =
->=3D mapping->host->i_size) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 done =3D=
- 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 done =3D=
- true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unlock=
-_page(page);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0end_pa=
-ge_writeback(page);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* BB can we get rid =
-of this? =A0pages are held by pvec
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0page_cache_get(page);
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D min(mapping->ho=
-st->i_size - page_offset(page),
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (lo=
-ff_t)PAGE_CACHE_SIZE);
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* reserve iov[0] for t=
-he smb header */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 n_iov++;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[n_iov].iov_base =3D=
- kmap(page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[n_iov].iov_len =3D =
-len;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bytes_to_write +=3D len=
-;
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (first < 0) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 first =3D=
- i;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 offset =
-=3D page_offset(page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->pages[i] =3D pag=
-e;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0next =3D page->index +=
- 1;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (bytes_to_write + PA=
-GE_CACHE_SIZE > cifs_sb->wsize)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ++nr_pages;
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* stop here if we have=
- enough for a full wsize write */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((nr_pages + 1) * PA=
-GE_CACHE_SIZE > cifs_sb->wsize)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (n_iov) {
-> -retry_write:
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 open_file =3D find_writ=
-able_file(CIFS_I(mapping->host),
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 false);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!open_file) {
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->pages[0] =3D=3D NULL) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Need to re-find the =
-pages we skipped */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 index =3D pvec.pages[0]=
-->index + 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pagevec_release(&pvec);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continue;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 pagevec_release(&pvec);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->offset =3D page_offset(wdata->pa=
-ges[0]);
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 do {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->cfile !=3D N=
-ULL)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFil=
-eInfo_put(wdata->cfile);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->cfile =3D find_w=
-ritable_file(CIFS_I(mapping->host),
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 false);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!wdata->cfile) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR=
-(1, "No writable handles for inode");
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D=
- -EBADF;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
-CIFSSMBWrite2(xid, tcon, open_file->netfid,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bytes_to_write, offset,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&bytes_written, iov, n_iov,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFil=
-eInfo_put(open_file);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Write2 rc=3D%d=
-, wrote=3D%u", rc, bytes_written);
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* For now, treat a s=
-hort write as if nothing got
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* written. A zero le=
-ngth write however indicates
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* ENOSPC or EFBIG. W=
-e have no way to know which
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* though, so call it=
- ENOSPC for now. EFBIG would
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* get translated to =
-AS_EIO anyway.
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* FIXME: make it tak=
-e into account the data that did
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* =A0 =A0 =A0 =A0get=
- written
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc =3D=3D 0) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (byt=
-es_written =3D=3D 0)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 rc =3D -ENOSPC;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if=
- (bytes_written < bytes_to_write)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 rc =3D -EAGAIN;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wbc->sync_mode =3D=3D=
- WB_SYNC_ALL) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lo=
-ck(&mapping->private_lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_mo=
-ve(&wdata->pending, &pending);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&mapping->private_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_async_write=
-v(wdata);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } while (wbc->sync_mode =3D=3D WB_SYNC_=
-ALL && rc =3D=3D -EAGAIN);
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* retry on data-integr=
-ity flush */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wbc->sync_mode =3D=3D=
- WB_SYNC_ALL && rc =3D=3D -EAGAIN)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto re=
-try_write;
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* fix the stats and EO=
-=46 */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (bytes_written > 0) =
-{
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_st=
-ats_bytes_written(tcon, bytes_written);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_up=
-date_eof(cifsi, offset, bytes_written);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 for (i =3D 0; i < nr_pages; ++i)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unlock_page(wdata->page=
-s[i]);
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 for (i =3D 0; i < n_iov=
-; i++) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 page =3D=
- pvec.pages[first + i];
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* on r=
-etryable write error, redirty page */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* send failure -- clean up the mess */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc !=3D 0) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 for (i =3D 0; i < nr_pa=
-ges; ++i) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc=
- =3D=3D -EAGAIN)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 redirty_page_for_writepage(wbc, page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if=
- (rc !=3D 0)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 SetPageError(page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kunmap(=
-page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unlock_=
-page(page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 end_pag=
-e_writeback(page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 page_ca=
-che_release(page);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 redirty_page_for_writepage(wbc,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wdata->pages[i]);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 SetPageError(wdata->pages[i]);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 end_pag=
-e_writeback(wdata->pages[i]);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 page_ca=
-che_release(wdata->pages[i]);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> -
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc !=3D -EAGAIN)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mappin=
-g_set_error(mapping, rc);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D =
-0;
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((wbc->nr_to_write -=
-=3D n_iov) <=3D 0)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 done =3D=
- 1;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 index =3D next;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Need to re-find the =
-pages we skipped */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 index =3D pvec.pages[0]=
-->index + 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kref_put(&wdata->refcou=
-nt, cifs_writedata_release);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else if (wbc->sync_mode =3D=3D WB_SYN=
-C_NONE) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kref_put(&wdata->refcou=
-nt, cifs_writedata_release);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 pagevec_release(&pvec);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((wbc->nr_to_write -=3D nr_pages) <=3D=
- 0)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 done =3D true;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 index =3D next;
-> =A0 =A0 =A0 =A0}
-> +
-> =A0 =A0 =A0 =A0if (!scanned && !done) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/*
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * We hit the last page and there is m=
-ore work to be done: wrap
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * back to the start of the file
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 scanned =3D 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 scanned =3D true;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0index =3D 0;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto retry;
-> =A0 =A0 =A0 =A0}
-> +
-> + =A0 =A0 =A0 /*
-> + =A0 =A0 =A0 =A0* for WB_SYNC_ALL, we must wait until the writes com=
-plete. If any
-> + =A0 =A0 =A0 =A0* return -EAGAIN however, we need to retry the whole=
- thing again.
-> + =A0 =A0 =A0 =A0* At that point nr_to_write will be all screwed up, =
-but that
-> + =A0 =A0 =A0 =A0* shouldn't really matter for WB_SYNC_ALL (right?)
-> + =A0 =A0 =A0 =A0*/
-> + =A0 =A0 =A0 if (wbc->sync_mode =3D=3D WB_SYNC_ALL) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_wait_for_write_completion(m=
-apping, &pending);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc =3D=3D -EAGAIN) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 index =3D wbc->range_st=
-art >> PAGE_CACHE_SHIFT;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto retry;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 }
-> +
-> =A0 =A0 =A0 =A0if (wbc->range_cyclic || (range_whole && wbc->nr_to_wr=
-ite > 0))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mapping->writeback_index =3D index;
->
-> - =A0 =A0 =A0 FreeXid(xid);
-> - =A0 =A0 =A0 kfree(iov);
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> --
-> 1.7.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 inc_rfc1001_len(=
+&smbw->hdr, wdata->bytes + 5);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_bcc(wdata->b=
+ytes + 5, &smbw->hdr);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 iov[0].iov_len +=
+=3D 4; /* pad bigger by four bytes */
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 kref_get(&wdata->refcount);
+> > + =C2=A0 =C2=A0 =C2=A0 rc =3D cifs_call_async(tcon->ses->server, io=
+v, npages + 1,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cifs_writev_callback, wdata);
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 if (rc =3D=3D 0)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_stats_inc(&=
+tcon->stats.cifs_stats.num_writes);
+> > + =C2=A0 =C2=A0 =C2=A0 else
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kref_put(&wdata-=
+>refcount, cifs_writedata_release);
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 /* send is done, unmap pages */
+> > + =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i < npages; i++)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kunmap(wdata->pa=
+ges[i]);
+> > +
+> > +async_writev_out:
+> > + =C2=A0 =C2=A0 =C2=A0 cifs_small_buf_release(smb);
+> > + =C2=A0 =C2=A0 =C2=A0 kfree(iov);
+> > + =C2=A0 =C2=A0 =C2=A0 return rc;
+> > +}
+> > +
+> > =C2=A0int
+> > =C2=A0CIFSSMBWrite2(const int xid, struct cifs_tcon *tcon,
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const int netfid, const u=
+nsigned int count,
+> > --
+> > 1.7.4
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
+s" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.=
+html
+> >
+>=20
+> Anyway, it's good. You can my "Reviewed-by: Pavel Shilovsky
+> <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>" tag when you fix the notes above.
+>=20
 
-Good. I tested it and found out that it is ~20% faster when I write
-~gigabyte file on LAN against Windows 7 (MaxWorkItems is set to 4096,
-otherwise - get STATUS_INSUFF_SERVER_RESOURCES after a write
-finishes).
-
-As a test I do the following (python):
-  f =3D os.open('file', os.O_RDWR)
-  str =3D ''.join('q' for _ in xrange(4096))
-  for _ in xrange(250000):
-      os.write(f, str)
-  os.close(f)
-
-Reviewed-and-Tested-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
 --=20
-Best regards,
-Pavel Shilovsky.
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
