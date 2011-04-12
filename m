@@ -1,317 +1,366 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 3/5] cifs: don't call mid_q_entry->callback under the Global_MidLock
-Date: Tue, 12 Apr 2011 13:39:53 +0400
-Message-ID: <BANLkTin4asCyzynKcQq2qo_LJ1VoFvT1nQ@mail.gmail.com>
+Subject: Re: [PATCH 4/5] cifs: add cifs_async_writev
+Date: Tue, 12 Apr 2011 13:43:07 +0400
+Message-ID: <BANLkTimHi_w55+bqFstXZZdjaMzw1mw_yA@mail.gmail.com>
 References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
-	<1301747039-31411-4-git-send-email-jlayton@redhat.com>
+	<1301747039-31411-5-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301747039-31411-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1301747039-31411-5-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2011/4/2 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Holding the spinlock while we call this function means that it can't
-> sleep, which really limits what it can do. Taking it out from under
-> the spinlock also means less contention for this global lock.
->
-> Change the semantics such that the Global_MidLock is not held when
-> the callback is called. To do this requires that we take extra care
-> not to have sync_mid_result remove the mid from the list when the
-> mid is in a state where that has already happened. This prevents
-> list corruption when the mid is sitting on a private list for
-> reconnect or when cifsd is coming down.
+> Add the ability for CIFS to do an asynchronous write. The kernel will
+> set the frame up as it would for a "normal" SMBWrite2 request, and us=
+e
+> cifs_call_async to send it. The mid callback will then be configured =
+to
+> handle the result.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> =A0fs/cifs/cifsglob.h =A0 =A0 =A0| =A0 =A07 +++----
-> =A0fs/cifs/connect.c =A0 =A0 =A0 | =A0 32 +++++++++++++++++++++++++--=
------
-> =A0fs/cifs/smb2transport.c | =A0 14 ++++----------
-> =A0fs/cifs/transport.c =A0 =A0 | =A0 23 ++++++++---------------
-> =A04 files changed, 40 insertions(+), 36 deletions(-)
+> =A0fs/cifs/cifsproto.h | =A0 19 +++++
+> =A0fs/cifs/cifssmb.c =A0 | =A0219 +++++++++++++++++++++++++++++++++++=
+++++++++++++++++
+> =A02 files changed, 238 insertions(+), 0 deletions(-)
+
+Looks good too, except two small notes.
+
 >
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index ccbac61..b3a6404 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -583,9 +583,8 @@ struct mid_q_entry;
-> =A0* This is the prototype for the mid callback function. When creati=
-ng one,
-> =A0* take special care to avoid deadlocks. Things to bear in mind:
-> =A0*
-> - * - it will be called by cifsd
-> - * - the GlobalMid_Lock will be held
-> - * - the mid will be removed from the pending_mid_q list
-> + * - it will be called by cifsd, with no locks held
-> + * - the mid will be removed from any lists
-> =A0*/
-> =A0typedef void (mid_callback_t)(struct mid_q_entry *mid);
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index e255a2b..7b964df 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -21,6 +21,7 @@
+> =A0#ifndef _CIFSPROTO_H
+> =A0#define _CIFSPROTO_H
+> =A0#include <linux/nls.h>
+> +#include <linux/pagevec.h>
 >
-> @@ -739,7 +738,7 @@ static inline void free_dfs_info_array(struct dfs=
-_info3_param *param,
-> =A0#define =A0 MID_RESPONSE_RECEIVED 4
-> =A0#define =A0 MID_RETRY_NEEDED =A0 =A0 =A08 /* session closed while =
-this request out */
-> =A0#define =A0 MID_RESPONSE_MALFORMED 0x10
-> -#define =A0 MID_NO_RESPONSE_NEEDED 0x20
-> +#define =A0 MID_SHUTDOWN =A0 =A0 =A0 =A0 =A00x20
->
-> =A0/* Types of response buffer returned from SendReceive2 */
-> =A0#define =A0 CIFS_NO_BUFFER =A0 =A0 =A0 =A00 =A0 =A0/* Response buf=
-fer not returned */
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 94e60c5..2b5d248 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -141,6 +141,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0struct cifs_ses *ses;
-> =A0 =A0 =A0 =A0struct cifs_tcon *tcon;
-> =A0 =A0 =A0 =A0struct mid_q_entry *mid_entry;
-> + =A0 =A0 =A0 struct list_head retry_list;
->
-> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0if (server->tcpStatus =3D=3D CifsExiting) {
-> @@ -192,16 +193,23 @@ cifs_reconnect(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
->
-> =A0 =A0 =A0 =A0/* mark submitted MIDs for retry and issue callback */
-> - =A0 =A0 =A0 cFYI(1, "%s: issuing mid callbacks", __func__);
-> + =A0 =A0 =A0 INIT_LIST_HEAD(&retry_list);
-> + =A0 =A0 =A0 cFYI(1, "%s: moving mids to private list", __func__);
-> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0list_for_each_safe(tmp, tmp2, &server->pending_mid_q) =
-{
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D list_entry(tmp, struct m=
-id_q_entry, qhead);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (mid_entry->midState =3D=3D MID_REQ=
-UEST_SUBMITTED)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry->midState =3D=
- MID_RETRY_NEEDED;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_move(&mid_entry->qhead, &retry_lis=
-t);
-> + =A0 =A0 =A0 }
-> + =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> =A0struct statfs;
+> =A0struct smb_vol;
+> @@ -433,4 +434,22 @@ extern int mdfour(unsigned char *, unsigned char=
+ *, int);
+> =A0extern int E_md4hash(const unsigned char *passwd, unsigned char *p=
+16);
+> =A0extern int SMBencrypt(unsigned char *passwd, const unsigned char *=
+c8,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned char *p24);
 > +
-> + =A0 =A0 =A0 cFYI(1, "%s: moving mids to private list", __func__);
-> + =A0 =A0 =A0 list_for_each_safe(tmp, tmp2, &retry_list) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry =3D list_entry(tmp, struct mi=
-d_q_entry, qhead);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del_init(&mid_entry->qhead);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry->callback(mid_entry);
-> =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
->
-> =A0 =A0 =A0 =A0while (server->tcpStatus =3D=3D CifsNeedReconnect) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0try_to_freeze();
-> @@ -655,11 +663,10 @@ multi_t2_fnd:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0mid_entry->midState =3D
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0MID_RESPONSE_MALFORMED;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_de=
-l_init(&mid_entry->qhead);
-> =A0#ifdef CONFIG_CIFS_STATS2
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_en=
-try->when_received =3D jiffies;
-> =A0#endif
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_de=
-l_init(&mid_entry->qhead);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_ent=
-ry->callback(mid_entry);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D NULL;
-> @@ -667,6 +674,7 @@ multi_t2_fnd:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (mid_entry !=3D NULL) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->callback(mid=
-_entry);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Was previous buf pu=
-t in mpx struct for multi-rsp? */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!isMultiRsp) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* smb=
- buffer will be freed by user thread */
-> @@ -730,15 +738,25 @@ multi_t2_fnd:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(smallbuf);
->
-> =A0 =A0 =A0 =A0if (!list_empty(&server->pending_mid_q)) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct list_head dispose_list;
+> +/* asynchronous write support */
+> +struct cifs_writedata {
+> + =A0 =A0 =A0 struct list_head =A0 =A0 =A0 =A0pending;
+> + =A0 =A0 =A0 struct kref =A0 =A0 =A0 =A0 =A0 =A0 refcount;
+> + =A0 =A0 =A0 struct completion =A0 =A0 =A0 completion;
+> + =A0 =A0 =A0 struct work_struct =A0 =A0 =A0work;
+> + =A0 =A0 =A0 struct cifsFileInfo =A0 =A0 *cfile;
+> + =A0 =A0 =A0 __u64 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 offset;
+> + =A0 =A0 =A0 unsigned int =A0 =A0 =A0 =A0 =A0 =A0bytes;
+> + =A0 =A0 =A0 int =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 result;
+> + =A0 =A0 =A0 struct page =A0 =A0 =A0 =A0 =A0 =A0 *pages[PAGEVEC_SIZE=
+];
+> +};
 > +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 INIT_LIST_HEAD(&dispose_list);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_for_each_safe(tmp, tmp2, &server-=
->pending_mid_q) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D list_ent=
-ry(tmp, struct mid_q_entry, qhead);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Clearing Mid 0=
-x%x - issuing callback",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0mid_entry->mid);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Clearing mid 0=
-x%x", mid_entry->mid);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->midState =3D=
- MID_SHUTDOWN;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_move(&mid_entry->q=
-head, &dispose_list);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> +int cifs_async_writev(struct cifs_writedata *wdata);
+> +struct cifs_writedata *cifs_writedata_alloc(void);
+> +void cifs_writedata_release(struct kref *refcount);
 > +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* now walk dispose list and issue call=
-backs */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each_safe(tmp, tmp2, &dispose_=
-list) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry =3D list_entr=
-y(tmp, struct mid_q_entry, qhead);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Callback mid 0=
-x%x", mid_entry->mid);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del_init(&mid_ent=
-ry->qhead);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry->callback(mi=
-d_entry);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* 1/8th of sec is more than enough ti=
-me for them to exit */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0msleep(125);
-> =A0 =A0 =A0 =A0}
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index a187587..e0fa75308 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -276,28 +276,22 @@ sync_smb2_mid_result(struct smb2_mid_entry *mid=
-, struct TCP_Server_Info *server)
->
-> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0/* ensure that it's no longer on the pending_mid_q */
-> - =A0 =A0 =A0 list_del_init(&mid->qhead);
->
-> =A0 =A0 =A0 =A0switch (mid->mid_state) {
-> =A0 =A0 =A0 =A0case MID_RESPONSE_RECEIVED:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> - =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* socket is going down, reject all cal=
-ls */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExitin=
-g) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: cancelin=
-g mid=3D%lld cmd=3D0x%x state=3D%d",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func_=
-_, mid->mid, le16_to_cpu(mid->command),
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->mi=
-d_state);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> =A0 =A0 =A0 =A0case MID_RETRY_NEEDED:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0case MID_RESPONSE_MALFORMED:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> + =A0 =A0 =A0 case MID_SHUTDOWN:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> =A0 =A0 =A0 =A0default:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&mid->qhead);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "%s: invalid mid state mid=3D=
-%lld state=3D%d", __func__,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid->mid, mid->mid_sta=
-te);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 7ccf292..a31c279 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -428,7 +428,7 @@ SendReceiveNoRsp(const unsigned int xid, struct c=
-ifs_ses *ses,
+> =A0#endif =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* _CIFSPROTO_H */
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 8de7e79..b308605 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -32,6 +32,7 @@
+> =A0#include <linux/vfs.h>
+> =A0#include <linux/slab.h>
+> =A0#include <linux/posix_acl_xattr.h>
+> +#include <linux/pagemap.h>
+> =A0#include <asm/uaccess.h>
+> =A0#include "cifspdu.h"
+> =A0#include "cifsglob.h"
+> @@ -1604,6 +1605,224 @@ CIFSSMBWrite(const int xid, struct cifs_tcon =
+*tcon,
+> =A0 =A0 =A0 =A0return rc;
 > =A0}
 >
-> =A0static int
-> -sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *ser=
-ver)
-> +cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info=
- *server)
-> =A0{
-> =A0 =A0 =A0 =A0int rc =3D 0;
->
-> @@ -436,28 +436,21 @@ sync_mid_result(struct mid_q_entry *mid, struct=
- TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid->mid, mid->midState);
->
-> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 /* ensure that it's no longer on the pending_mid_q */
-> - =A0 =A0 =A0 list_del_init(&mid->qhead);
-> -
-> =A0 =A0 =A0 =A0switch (mid->midState) {
-> =A0 =A0 =A0 =A0case MID_RESPONSE_RECEIVED:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> - =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* socket is going down, reject all cal=
-ls */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExitin=
-g) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: cancelin=
-g mid=3D%d cmd=3D0x%x state=3D%d",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__func__=
-, mid->mid, mid->command, mid->midState);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> =A0 =A0 =A0 =A0case MID_RETRY_NEEDED:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0case MID_RESPONSE_MALFORMED:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> + =A0 =A0 =A0 case MID_SHUTDOWN:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
+> +void
+> +cifs_writedata_release(struct kref *refcount)
+> +{
+> + =A0 =A0 =A0 struct cifs_writedata *wdata =3D container_of(refcount,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 struct cifs_writedata, refcount);
+> + =A0 =A0 =A0 struct address_space *mapping;
+> +
+> + =A0 =A0 =A0 if (wdata->cfile) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapping =3D wdata->cfile->dentry->d_ino=
+de->i_mapping;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&mapping->private_lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del(&wdata->pending);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&mapping->private_lock);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFileInfo_put(wdata->cfile);
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 kfree(wdata);
+> +}
+> +
+> +static void
+> +cifs_writev_complete(struct work_struct *work)
+> +{
+> + =A0 =A0 =A0 struct cifs_writedata *wdata =3D container_of(work,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_writedata, work);
+> + =A0 =A0 =A0 struct cifs_tcon *tcon =3D tlink_tcon(wdata->cfile->tli=
+nk);
+                             ^^^ this variable is unused.
+
+> + =A0 =A0 =A0 struct inode *inode =3D wdata->cfile->dentry->d_inode;
+> + =A0 =A0 =A0 struct page *page;
+> + =A0 =A0 =A0 int i =3D 0;
+> +
+> + =A0 =A0 =A0 if (wdata->result =3D=3D 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_update_eof(CIFS_I(inode), wdata->o=
+ffset, wdata->bytes);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_stats_bytes_written(tcon, wdata->b=
+ytes);
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 for (i =3D 0; i < ARRAY_SIZE(wdata->pages) && (page =3D=
+ wdata->pages[i]);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 i++) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->result =3D=3D -EAGAIN)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __set_page_dirty_nobuff=
+ers(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (wdata->result < 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 SetPageError(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 end_page_writeback(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 page_cache_release(page);
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 if (wdata->result !=3D -EAGAIN)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mapping_set_error(inode->i_mapping, wda=
+ta->result);
+> + =A0 =A0 =A0 complete(&wdata->completion);
+> + =A0 =A0 =A0 kref_put(&wdata->refcount, cifs_writedata_release);
+> +}
+> +
+> +struct cifs_writedata *
+> +cifs_writedata_alloc(void)
+> +{
+> + =A0 =A0 =A0 struct cifs_writedata *wdata;
+> +
+> + =A0 =A0 =A0 wdata =3D kzalloc(sizeof(*wdata), GFP_NOFS);
+> + =A0 =A0 =A0 if (wdata !=3D NULL) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 INIT_LIST_HEAD(&wdata->pending);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 INIT_WORK(&wdata->work, cifs_writev_com=
+plete);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kref_init(&wdata->refcount);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 init_completion(&wdata->completion);
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 return wdata;
+> +}
+> +
+> +/*
+> + * Check the midState and signature on received buffer (if any), and=
+ queue the
+> + * workqueue completion task.
+> + */
+> +static void
+> +cifs_writev_callback(struct mid_q_entry *mid)
+> +{
+> + =A0 =A0 =A0 struct cifs_writedata *wdata =3D mid->callback_data;
+> + =A0 =A0 =A0 struct cifs_tcon *tcon =3D tlink_tcon(wdata->cfile->tli=
+nk);
+> + =A0 =A0 =A0 unsigned int written;
+> + =A0 =A0 =A0 WRITE_RSP *smb =3D (WRITE_RSP *)mid->resp_buf;
+> +
+> + =A0 =A0 =A0 switch(mid->midState) {
+> + =A0 =A0 =A0 case MID_RESPONSE_RECEIVED:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->result =3D cifs_check_receive(mi=
+d, tcon->ses->server, 0);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->result !=3D 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 written =3D le16_to_cpu(smb->CountHigh)=
+;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 written <<=3D 16;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 written +=3D le16_to_cpu(smb->Count);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Mask off high 16 bits when bytes w=
+ritten as returned
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* by the server is greater than byte=
+s requested by the
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* client. OS/2 servers are known to =
+set incorrect
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* CountHigh values.
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (written > wdata->bytes)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 written &=3D 0xFFFF;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (written < wdata->bytes)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->result =3D -ENOS=
+PC;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->bytes =3D writte=
+n;
 > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> =A0 =A0 =A0 =A0default:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&mid->qhead);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "%s: invalid mid state mid=3D=
-%d state=3D%d", __func__,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid->mid, mid->midStat=
-e);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
-> @@ -617,7 +610,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
-ses *ses,
->
-> =A0 =A0 =A0 =A0cifs_small_buf_release(in_buf);
->
-> - =A0 =A0 =A0 rc =3D sync_mid_result(midQ, ses->server);
-> + =A0 =A0 =A0 rc =3D cifs_sync_mid_result(midQ, ses->server);
-> =A0 =A0 =A0 =A0if (rc !=3D 0) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0atomic_dec(&ses->server->inFlight);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> @@ -735,7 +728,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
-es *ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
-> =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 rc =3D sync_mid_result(midQ, ses->server);
-> + =A0 =A0 =A0 rc =3D cifs_sync_mid_result(midQ, ses->server);
-> =A0 =A0 =A0 =A0if (rc !=3D 0) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0atomic_dec(&ses->server->inFlight);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> @@ -906,7 +899,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rstart =3D 1;
-> =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 rc =3D sync_mid_result(midQ, ses->server);
-> + =A0 =A0 =A0 rc =3D cifs_sync_mid_result(midQ, ses->server);
-> =A0 =A0 =A0 =A0if (rc !=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
->
+> + =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
+> + =A0 =A0 =A0 case MID_RETRY_NEEDED:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->result =3D -EAGAIN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> + =A0 =A0 =A0 default:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->result =3D -EIO;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 queue_work(system_nrt_wq, &wdata->work);
+> + =A0 =A0 =A0 DeleteMidQEntry(mid);
+> + =A0 =A0 =A0 atomic_dec(&tcon->ses->server->inFlight);
+> + =A0 =A0 =A0 wake_up(&tcon->ses->server->request_q);
+> +}
+> +
+> +/* cifs_async_writev - send an async write, and set up mid to handle=
+ result */
+> +int
+> +cifs_async_writev(struct cifs_writedata *wdata)
+> +{
+> + =A0 =A0 =A0 int i, rc =3D -EACCES;
+> + =A0 =A0 =A0 WRITE_REQ *smb =3D NULL;
+> + =A0 =A0 =A0 int wct;
+> + =A0 =A0 =A0 struct cifs_tcon *tcon =3D tlink_tcon(wdata->cfile->tli=
+nk);
+> + =A0 =A0 =A0 struct inode *inode =3D wdata->cfile->dentry->d_inode;
+> + =A0 =A0 =A0 unsigned int npages =3D ARRAY_SIZE(wdata->pages);
+> + =A0 =A0 =A0 struct kvec *iov =3D NULL;
+> +
+> + =A0 =A0 =A0 cFYI(1, "async write at %llu %u bytes", wdata->offset, =
+wdata->bytes);
+                                                       ^^^^ bytes is
+zero here. You calculate it next - I suggest to move this info message
+after you get right bytes value.
+
+> +
+> + =A0 =A0 =A0 if (tcon->ses->capabilities & CAP_LARGE_FILES) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wct =3D 14;
+> + =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wct =3D 12;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->offset >> 32 > 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* can not handle big o=
+ffset for old srv */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EIO;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 rc =3D small_smb_init(SMB_COM_WRITE_ANDX, wct, tcon, (v=
+oid **)&smb);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto async_writev_out;
+> +
+> + =A0 =A0 =A0 /* FIXME: only allocate number of kvecs we need */
+> + =A0 =A0 =A0 iov =3D kzalloc((npages + 1) * sizeof(*iov), GFP_NOFS);
+> + =A0 =A0 =A0 if (iov =3D=3D NULL) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto async_writev_out;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 smb->AndXCommand =3D 0xFF; =A0 =A0 =A0 =A0/* none */
+> + =A0 =A0 =A0 smb->Fid =3D wdata->cfile->netfid;
+> + =A0 =A0 =A0 smb->OffsetLow =3D cpu_to_le32(wdata->offset & 0xFFFFFF=
+=46F);
+> + =A0 =A0 =A0 if (wct =3D=3D 14)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 smb->OffsetHigh =3D cpu_to_le32(wdata->=
+offset >> 32);
+> + =A0 =A0 =A0 smb->Reserved =3D 0xFFFFFFFF;
+> + =A0 =A0 =A0 smb->WriteMode =3D 0;
+> + =A0 =A0 =A0 smb->Remaining =3D 0;
+> +
+> + =A0 =A0 =A0 smb->DataOffset =3D
+> + =A0 =A0 =A0 =A0 =A0 cpu_to_le16(offsetof(struct smb_com_write_req, =
+Data) - 4);
+> +
+> + =A0 =A0 =A0 /* 4 for RFC1001 length + 1 for BCC */
+> + =A0 =A0 =A0 iov[0].iov_len =3D be32_to_cpu(smb->hdr.smb_buf_length)=
+ + 4 + 1;
+> + =A0 =A0 =A0 iov[0].iov_base =3D smb;
+> +
+> + =A0 =A0 =A0 /* marshal up the pages into iov array */
+> + =A0 =A0 =A0 npages =3D 0;
+> + =A0 =A0 =A0 wdata->bytes =3D 0;
+> + =A0 =A0 =A0 for (i =3D 0; i < ARRAY_SIZE(wdata->pages) && wdata->pa=
+ges[i]; i++) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (wdata->bytes + PAGE_CACHE_SIZE <=3D
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_SB(inode->i_sb)->wsize) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[i + 1].iov_len =3D =
+min(inode->i_size -
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 page_offset(wdata->pages[i]),
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 (loff_t)PAGE_CACHE_SIZE);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[i + 1].iov_base =3D=
+ kmap(wdata->pages[i]);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wdata->bytes +=3D iov[i=
+ + 1].iov_len;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 npages++;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* if we're beyond wsiz=
+e, then re-mark page dirty */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __set_page_dirty_nobuff=
+ers(wdata->pages[i]);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 smb->DataLengthLow =3D cpu_to_le16(wdata->bytes & 0xFFF=
+=46);
+> + =A0 =A0 =A0 smb->DataLengthHigh =3D cpu_to_le16(wdata->bytes >> 16)=
+;
+> +
+> + =A0 =A0 =A0 if (wct =3D=3D 14) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 inc_rfc1001_len(&smb->hdr, wdata->bytes=
+ + 1);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 put_bcc(wdata->bytes + 1, &smb->hdr);
+> + =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* wct =3D=3D 12 */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_com_writex_req *smbw =3D
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (struct=
+ smb_com_writex_req *)smb;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 inc_rfc1001_len(&smbw->hdr, wdata->byte=
+s + 5);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 put_bcc(wdata->bytes + 5, &smbw->hdr);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov[0].iov_len +=3D 4; /* pad bigger by=
+ four bytes */
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 kref_get(&wdata->refcount);
+> + =A0 =A0 =A0 rc =3D cifs_call_async(tcon->ses->server, iov, npages +=
+ 1,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_writev_=
+callback, wdata);
+> +
+> + =A0 =A0 =A0 if (rc =3D=3D 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_stats_inc(&tcon->stats.cifs_stats.=
+num_writes);
+> + =A0 =A0 =A0 else
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kref_put(&wdata->refcount, cifs_writeda=
+ta_release);
+> +
+> + =A0 =A0 =A0 /* send is done, unmap pages */
+> + =A0 =A0 =A0 for (i =3D 0; i < npages; i++)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kunmap(wdata->pages[i]);
+> +
+> +async_writev_out:
+> + =A0 =A0 =A0 cifs_small_buf_release(smb);
+> + =A0 =A0 =A0 kfree(iov);
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> =A0int
+> =A0CIFSSMBWrite2(const int xid, struct cifs_tcon *tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 const int netfid, const unsigned int count,
 > --
 > 1.7.4
 >
@@ -322,7 +371,8 @@ truct cifs_tcon *tcon,
 > More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Anyway, it's good. You can my "Reviewed-by: Pavel Shilovsky
+<piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>" tag when you fix the notes above.
 
 --=20
 Best regards,
