@@ -1,56 +1,309 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Add wine mount option (try #2)
-Date: Tue, 12 Apr 2011 22:46:05 +0400
-Message-ID: <BANLkTinvjvUV2UUyo=7B+ZCLfOY7qAabHA@mail.gmail.com>
-References: <1302435874-11073-1-git-send-email-piastry@etersoft.ru>
-	<20110412101649.0d760e94@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 2/2] CIFS: Simplify invalidate part (try #2)
+Date: Tue, 12 Apr 2011 23:10:30 +0400
+Message-ID: <1302635430-3575-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110412101649.0d760e94-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/4/12 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Sun, 10 Apr 2011 15:44:34 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> Add wine mount option that switches on WINE-capability mode - forward
->> pid of a process who opened a file to any read and write operation.
->>
->> This can prevent WINE program from failing on read or write operation
->> on a previously locked file region from the same file descriptor, because
->> while a run of WINE program two processes work on the same file descriptor:
->> 1) WINE-application does read and write on a file;
->> 2) WINE-server does open and lock.
->>
->> Also switch on strictcache and forcemand modes because WINE needs to work
->> with mandatory brlocks and does read and write operations correctly with
->> them.
->>
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->
-> As a general rule, I'm not too fond of enshrining application behavior
-> into a mount option like this. What if wine changes their
-> implementation in the future?
+Simplify many places when we call cifs_revalidate/invalidate to make
+it does what it exactly needs.
 
-I don't think that WINE will change such an architecture thing but, if
-it will happen, I don't see any problems to change 'wine' mount
-options behavior for cifs too. Anyway, it is better to support
-existing WINE than don't do it, I think.
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsfs.c |   31 ++++++++++-----
+ fs/cifs/cifsfs.h |    4 +-
+ fs/cifs/file.c   |   16 ++++++--
+ fs/cifs/inode.c  |  114 ++++++++++++++++++++++++++++++++++--------------------
+ 4 files changed, 108 insertions(+), 57 deletions(-)
 
->
-> Would it make more sense to have one mount option that enables this
-> new mode of PID handling, and keep forcemand and strictcache separate?
-
-So, I agree that having these mount options separately is more
-flexible, but I can't imagine how WINE can be correctly used without
-forcemand and strictcache mount options on cifs for applications that
-use brlocks actively. Anyway, I don't insist on it. Steve, Shirish,
-Suresh, what do you think about it?
-
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fb6a2ad..1646360 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -623,16 +623,27 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+ {
+ 	/* origin == SEEK_END => we must revalidate the cached file length */
+ 	if (origin == SEEK_END) {
+-		int retval;
+-
+-		/* some applications poll for the file length in this strange
+-		   way so we must seek to end on non-oplocked files by
+-		   setting the revalidate time to zero */
+-		CIFS_I(file->f_path.dentry->d_inode)->time = 0;
+-
+-		retval = cifs_revalidate_file(file);
+-		if (retval < 0)
+-			return (loff_t)retval;
++		int rc;
++		struct inode *inode = file->f_path.dentry->d_inode;
++
++		/* Need to flush all dirty pages to get a right file length */
++		if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
++			rc = filemap_write_and_wait(inode->i_mapping);
++			if (rc) {
++				mapping_set_error(inode->i_mapping, rc);
++				return (loff_t)rc;
++			}
++		}
++		/*
++		 * Some applications poll for the file length in this strange
++		 * way so we must seek to end on non-oplocked files by
++		 * setting the revalidate time to zero.
++		 */
++		CIFS_I(inode)->time = 0;
++
++		rc = cifs_revalidate_file_attr(file);
++		if (rc < 0)
++			return (loff_t)rc;
+ 	}
+ 	return generic_file_llseek_unlocked(file, offset, origin);
+ }
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index bb64313..d304584 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -59,9 +59,11 @@ extern int cifs_mkdir(struct inode *, struct dentry *, int);
+ extern int cifs_rmdir(struct inode *, struct dentry *);
+ extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
+ 		       struct dentry *);
++extern int cifs_revalidate_file_attr(struct file *filp);
++extern int cifs_revalidate_dentry_attr(struct dentry *);
+ extern int cifs_revalidate_file(struct file *filp);
+ extern int cifs_revalidate_dentry(struct dentry *);
+-extern void cifs_invalidate_mapping(struct inode *inode);
++extern int cifs_invalidate_mapping(struct inode *inode);
+ extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+ extern int cifs_setattr(struct dentry *, struct iattr *);
+ 
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 613f965..3ceef8a 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1445,8 +1445,13 @@ int cifs_strict_fsync(struct file *file, int datasync)
+ 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+ 		file->f_path.dentry->d_name.name, datasync);
+ 
+-	if (!CIFS_I(inode)->clientCanCacheRead)
+-		cifs_invalidate_mapping(inode);
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc) {
++			cFYI(1, "rc: %d during invalidate phase", rc);
++			rc = 0; /* don't care about it in fsync */
++		}
++	}
+ 
+ 	tcon = tlink_tcon(smbfile->tlink);
+ 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+@@ -1931,8 +1936,11 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
+ 
+ 	xid = GetXid();
+ 
+-	if (!CIFS_I(inode)->clientCanCacheRead)
+-		cifs_invalidate_mapping(inode);
++	if (!CIFS_I(inode)->clientCanCacheRead) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc)
++			return rc;
++	}
+ 
+ 	rc = generic_file_mmap(file, vma);
+ 	if (rc == 0)
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index adb6324..5f71e11 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1683,18 +1683,15 @@ cifs_inode_needs_reval(struct inode *inode)
+ /*
+  * Zap the cache. Called when invalid_mapping flag is set.
+  */
+-void
++int
+ cifs_invalidate_mapping(struct inode *inode)
+ {
+-	int rc;
++	int rc = 0;
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+ 
+ 	cifs_i->invalid_mapping = false;
+ 
+ 	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+-		/* write back any cached data */
+-		rc = filemap_write_and_wait(inode->i_mapping);
+-		mapping_set_error(inode->i_mapping, rc);
+ 		rc = invalidate_inode_pages2(inode->i_mapping);
+ 		if (rc) {
+ 			cERROR(1, "%s: could not invalidate inode %p", __func__,
+@@ -1704,56 +1701,52 @@ cifs_invalidate_mapping(struct inode *inode)
+ 	}
+ 
+ 	cifs_fscache_reset_inode_cookie(inode);
++	return rc;
+ }
+ 
+-int cifs_revalidate_file(struct file *filp)
++int cifs_revalidate_file_attr(struct file *filp)
+ {
+ 	int rc = 0;
+ 	struct inode *inode = filp->f_path.dentry->d_inode;
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
+ 
+ 	if (!cifs_inode_needs_reval(inode))
+-		goto check_inval;
++		return rc;
+ 
+ 	if (tlink_tcon(cfile->tlink)->unix_ext)
+ 		rc = cifs_get_file_info_unix(filp);
+ 	else
+ 		rc = cifs_get_file_info(filp);
+ 
+-check_inval:
+-	if (CIFS_I(inode)->invalid_mapping)
+-		cifs_invalidate_mapping(inode);
+-
+ 	return rc;
+ }
+ 
+-/* revalidate a dentry's inode attributes */
+-int cifs_revalidate_dentry(struct dentry *dentry)
++int cifs_revalidate_dentry_attr(struct dentry *dentry)
+ {
+ 	int xid;
+ 	int rc = 0;
+-	char *full_path = NULL;
+ 	struct inode *inode = dentry->d_inode;
+ 	struct super_block *sb = dentry->d_sb;
++	char *full_path = NULL;
+ 
+ 	if (inode == NULL)
+ 		return -ENOENT;
+ 
+-	xid = GetXid();
+-
+ 	if (!cifs_inode_needs_reval(inode))
+-		goto check_inval;
++		return rc;
++
++	xid = GetXid();
+ 
+ 	/* can not safely grab the rename sem here if rename calls revalidate
+ 	   since that would deadlock */
+ 	full_path = build_path_from_dentry(dentry);
+ 	if (full_path == NULL) {
+ 		rc = -ENOMEM;
+-		goto check_inval;
++		goto out;
+ 	}
+ 
+-	cFYI(1, "Revalidate: %s inode 0x%p count %d dentry: 0x%p d_time %ld "
+-		 "jiffies %ld", full_path, inode, inode->i_count.counter,
++	cFYI(1, "Update attributes: %s inode 0x%p count %d dentry: 0x%p d_time "
++		 "%ld jiffies %ld", full_path, inode, inode->i_count.counter,
+ 		 dentry, dentry->d_time, jiffies);
+ 
+ 	if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
+@@ -1762,41 +1755,78 @@ int cifs_revalidate_dentry(struct dentry *dentry)
+ 		rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
+ 					 xid, NULL);
+ 
+-check_inval:
+-	if (CIFS_I(inode)->invalid_mapping)
+-		cifs_invalidate_mapping(inode);
+-
++out:
+ 	kfree(full_path);
+ 	FreeXid(xid);
+ 	return rc;
+ }
+ 
++int cifs_revalidate_file(struct file *filp)
++{
++	int rc;
++	struct inode *inode = filp->f_path.dentry->d_inode;
++
++	rc = cifs_revalidate_file_attr(filp);
++	if (rc)
++		return rc;
++
++	if (CIFS_I(inode)->invalid_mapping)
++		rc = cifs_invalidate_mapping(inode);
++	return rc;
++}
++
++/* revalidate a dentry's inode attributes */
++int cifs_revalidate_dentry(struct dentry *dentry)
++{
++	int rc;
++	struct inode *inode = dentry->d_inode;
++
++	rc = cifs_revalidate_dentry_attr(dentry);
++	if (rc)
++		return rc;
++
++	if (CIFS_I(inode)->invalid_mapping)
++		rc = cifs_invalidate_mapping(inode);
++	return rc;
++}
++
+ int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+ 		 struct kstat *stat)
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+-	int err = cifs_revalidate_dentry(dentry);
+-
+-	if (!err) {
+-		generic_fillattr(dentry->d_inode, stat);
+-		stat->blksize = CIFS_MAX_MSGSIZE;
+-		stat->ino = CIFS_I(dentry->d_inode)->uniqueid;
++	struct inode *inode = dentry->d_inode;
++	int rc;
+ 
+-		/*
+-		 * If on a multiuser mount without unix extensions, and the
+-		 * admin hasn't overridden them, set the ownership to the
+-		 * fsuid/fsgid of the current process.
+-		 */
+-		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
+-		    !tcon->unix_ext) {
+-			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
+-				stat->uid = current_fsuid();
+-			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
+-				stat->gid = current_fsgid();
++	if (inode && inode->i_mapping && inode->i_mapping->nrpages != 0) {
++		rc = filemap_write_and_wait(inode->i_mapping);
++		if (rc) {
++			mapping_set_error(inode->i_mapping, rc);
++			return rc;
+ 		}
+ 	}
+-	return err;
++
++	rc = cifs_revalidate_dentry_attr(dentry);
++	if (rc)
++		return rc;
++
++	generic_fillattr(dentry->d_inode, stat);
++	stat->blksize = CIFS_MAX_MSGSIZE;
++	stat->ino = CIFS_I(dentry->d_inode)->uniqueid;
++
++	/*
++	 * If on a multiuser mount without unix extensions, and the admin hasn't
++	 * overridden them, set the ownership to the fsuid/fsgid of the current
++	 * process.
++	 */
++	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
++	    !tcon->unix_ext) {
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
++			stat->uid = current_fsuid();
++		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
++			stat->gid = current_fsgid();
++	}
++	return rc;
+ }
+ 
+ static int cifs_truncate_page(struct address_space *mapping, loff_t from)
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.1
