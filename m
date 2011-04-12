@@ -1,42 +1,61 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Add wine mount option (try #2)
-Date: Tue, 12 Apr 2011 10:16:49 -0400
-Message-ID: <20110412101649.0d760e94@corrin.poochiereds.net>
-References: <1302435874-11073-1-git-send-email-piastry@etersoft.ru>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Tue, 12 Apr 2011 13:26:44 -0500
+Message-ID: <BANLkTim8iTdmMjLGMYVtFhWEzdR1KQyQng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1302435874-11073-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 10 Apr 2011 15:44:34 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+The following changes since commit a6360dd37e1a144ed11e6548371bade559a1e4df:
 
-> Add wine mount option that switches on WINE-capability mode - forward
-> pid of a process who opened a file to any read and write operation.
-> 
-> This can prevent WINE program from failing on read or write operation
-> on a previously locked file region from the same file descriptor, because
-> while a run of WINE program two processes work on the same file descriptor:
-> 1) WINE-application does read and write on a file;
-> 2) WINE-server does open and lock.
-> 
-> Also switch on strictcache and forcemand modes because WINE needs to work
-> with mandatory brlocks and does read and write operations correctly with
-> them.
-> 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+  Linux 2.6.39-rc3 (2011-04-11 17:21:51 -0700)
 
-As a general rule, I'm not too fond of enshrining application behavior
-into a mount option like this. What if wine changes their
-implementation in the future?
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
 
-Would it make more sense to have one mount option that enables this
-new mode of PID handling, and keep forcemand and strictcache separate?
+Jeff Layton (9):
+      cifs: check for private_data before trying to put it
+      cifs: replace /proc/fs/cifs/Experimental with a module parm
+      cifs: always do is_path_accessible check in cifs_mount
+      cifs: fix broken BCC check in is_valid_oplock_break
+      cifs: set ra_pages in backing_dev_info
+      cifs: clean up length checks in check2ndT2
+      cifs: clean up various nits in unicode routines (try #2)
+      cifs: wrap received signature check in srv_mutex
+      cifs: don't allow mmap'ed pages to be dirtied while under
+writeback (try #3)
+
+Steve French (6):
+      Allow user names longer than 32 bytes
+      Max share size is too small
+      Elminate sparse __CHECK_ENDIAN__ warnings on port conversion
+      various endian fixes to cifs
+      [CIFS] cifs: clarify the meaning of tcpStatus == CifsGood
+      [CIFS] Warn on requesting default security (ntlm) on mount
+
+ fs/cifs/README         |   16 -----------
+ fs/cifs/cache.c        |    2 +-
+ fs/cifs/cifs_debug.c   |   43 -----------------------------
+ fs/cifs/cifs_spnego.c  |    4 +-
+ fs/cifs/cifs_unicode.c |   35 +++++++++++------------
+ fs/cifs/cifs_unicode.h |    2 +-
+ fs/cifs/cifsencrypt.c  |   21 ++++++++------
+ fs/cifs/cifsfs.c       |    6 ++--
+ fs/cifs/cifsglob.h     |   13 ++++-----
+ fs/cifs/cifssmb.c      |   14 +++++-----
+ fs/cifs/connect.c      |   68 ++++++++++++++++++++++++++++------------------
+ fs/cifs/file.c         |   70 +++++++++++++++++++++++++----------------------
+ fs/cifs/link.c         |    4 +-
+ fs/cifs/misc.c         |    3 +-
+ fs/cifs/sess.c         |   23 +++++++--------
+ 15 files changed, 143 insertions(+), 181 deletions(-)
+
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
