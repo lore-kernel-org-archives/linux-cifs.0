@@ -1,146 +1,317 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 2/5] cifs: make cifs_send_async take a kvec array
-Date: Tue, 12 Apr 2011 13:39:13 +0400
-Message-ID: <BANLkTinVzhYeLAc2+FLn=vvFH-s1o4ZQag@mail.gmail.com>
+Subject: Re: [PATCH 3/5] cifs: don't call mid_q_entry->callback under the Global_MidLock
+Date: Tue, 12 Apr 2011 13:39:53 +0400
+Message-ID: <BANLkTin4asCyzynKcQq2qo_LJ1VoFvT1nQ@mail.gmail.com>
 References: <1301747039-31411-1-git-send-email-jlayton@redhat.com>
-	<1301747039-31411-3-git-send-email-jlayton@redhat.com>
+	<1301747039-31411-4-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1301747039-31411-3-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1301747039-31411-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2011/4/2 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> We'll need this for async writes, so convert the call to take a kvec
-> array. CIFSSMBEcho is changed to put a kvec on the stack and pass
-> in the SMB buffer using that.
+> Holding the spinlock while we call this function means that it can't
+> sleep, which really limits what it can do. Taking it out from under
+> the spinlock also means less contention for this global lock.
+>
+> Change the semantics such that the Global_MidLock is not held when
+> the callback is called. To do this requires that we take extra care
+> not to have sync_mid_result remove the mid from the list when the
+> mid is in a state where that has already happened. This prevents
+> list corruption when the mid is sitting on a private list for
+> reconnect or when cifsd is coming down.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> =A0fs/cifs/cifsproto.h | =A0 =A04 ++--
-> =A0fs/cifs/cifssmb.c =A0 | =A0 =A06 ++++--
-> =A0fs/cifs/transport.c | =A0 13 +++++++------
-> =A03 files changed, 13 insertions(+), 10 deletions(-)
+> =A0fs/cifs/cifsglob.h =A0 =A0 =A0| =A0 =A07 +++----
+> =A0fs/cifs/connect.c =A0 =A0 =A0 | =A0 32 +++++++++++++++++++++++++--=
+-----
+> =A0fs/cifs/smb2transport.c | =A0 14 ++++----------
+> =A0fs/cifs/transport.c =A0 =A0 | =A0 23 ++++++++---------------
+> =A04 files changed, 40 insertions(+), 36 deletions(-)
 >
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 4af7db8..e255a2b 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -65,8 +65,8 @@ extern struct mid_q_entry *AllocMidQEntry(const str=
-uct smb_hdr *smb_buffer,
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index ccbac61..b3a6404 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -583,9 +583,8 @@ struct mid_q_entry;
+> =A0* This is the prototype for the mid callback function. When creati=
+ng one,
+> =A0* take special care to avoid deadlocks. Things to bear in mind:
+> =A0*
+> - * - it will be called by cifsd
+> - * - the GlobalMid_Lock will be held
+> - * - the mid will be removed from the pending_mid_q list
+> + * - it will be called by cifsd, with no locks held
+> + * - the mid will be removed from any lists
+> =A0*/
+> =A0typedef void (mid_callback_t)(struct mid_q_entry *mid);
+>
+> @@ -739,7 +738,7 @@ static inline void free_dfs_info_array(struct dfs=
+_info3_param *param,
+> =A0#define =A0 MID_RESPONSE_RECEIVED 4
+> =A0#define =A0 MID_RETRY_NEEDED =A0 =A0 =A08 /* session closed while =
+this request out */
+> =A0#define =A0 MID_RESPONSE_MALFORMED 0x10
+> -#define =A0 MID_NO_RESPONSE_NEEDED 0x20
+> +#define =A0 MID_SHUTDOWN =A0 =A0 =A0 =A0 =A00x20
+>
+> =A0/* Types of response buffer returned from SendReceive2 */
+> =A0#define =A0 CIFS_NO_BUFFER =A0 =A0 =A0 =A00 =A0 =A0/* Response buf=
+fer not returned */
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 94e60c5..2b5d248 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -141,6 +141,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> =A0 =A0 =A0 =A0struct cifs_ses *ses;
+> =A0 =A0 =A0 =A0struct cifs_tcon *tcon;
+> =A0 =A0 =A0 =A0struct mid_q_entry *mid_entry;
+> + =A0 =A0 =A0 struct list_head retry_list;
+>
+> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0if (server->tcpStatus =3D=3D CifsExiting) {
+> @@ -192,16 +193,23 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
+>
+> =A0 =A0 =A0 =A0/* mark submitted MIDs for retry and issue callback */
+> - =A0 =A0 =A0 cFYI(1, "%s: issuing mid callbacks", __func__);
+> + =A0 =A0 =A0 INIT_LIST_HEAD(&retry_list);
+> + =A0 =A0 =A0 cFYI(1, "%s: moving mids to private list", __func__);
+> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0list_for_each_safe(tmp, tmp2, &server->pending_mid_q) =
+{
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D list_entry(tmp, struct m=
+id_q_entry, qhead);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (mid_entry->midState =3D=3D MID_REQ=
+UEST_SUBMITTED)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry->midState =3D=
+ MID_RETRY_NEEDED;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_move(&mid_entry->qhead, &retry_lis=
+t);
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> +
+> + =A0 =A0 =A0 cFYI(1, "%s: moving mids to private list", __func__);
+> + =A0 =A0 =A0 list_for_each_safe(tmp, tmp2, &retry_list) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry =3D list_entry(tmp, struct mi=
+d_q_entry, qhead);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del_init(&mid_entry->qhead);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry->callback(mid_entry);
+> =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+>
+> =A0 =A0 =A0 =A0while (server->tcpStatus =3D=3D CifsNeedReconnect) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0try_to_freeze();
+> @@ -655,11 +663,10 @@ multi_t2_fnd:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0struct TCP_Server_Info *server);
-> =A0extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
-> =A0extern int wait_for_free_request(struct TCP_Server_Info *sv, const=
- int long_op);
-> -extern int cifs_call_async(struct TCP_Server_Info *server,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_hdr *=
-in_buf, mid_callback_t *callback,
-> +extern int cifs_call_async(struct TCP_Server_Info *server, struct kv=
-ec *iov,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int nve=
-c, mid_callback_t *callback,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 void *cbdata);
-> =A0extern int SendReceive(const unsigned int /* xid */ , struct cifs_=
-ses *,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_hdr * /* in=
-put */ ,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 655f24c..8de7e79 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -725,6 +725,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
-> =A0{
-> =A0 =A0 =A0 =A0ECHO_REQ *smb;
-> =A0 =A0 =A0 =A0int rc =3D 0;
-> + =A0 =A0 =A0 struct kvec iov;
+ =A0 =A0mid_entry->midState =3D
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0MID_RESPONSE_MALFORMED;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_de=
+l_init(&mid_entry->qhead);
+> =A0#ifdef CONFIG_CIFS_STATS2
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_en=
+try->when_received =3D jiffies;
+> =A0#endif
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_de=
+l_init(&mid_entry->qhead);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_ent=
+ry->callback(mid_entry);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D NULL;
+> @@ -667,6 +674,7 @@ multi_t2_fnd:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
 >
-> =A0 =A0 =A0 =A0cFYI(1, "In echo request");
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (mid_entry !=3D NULL) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->callback(mid=
+_entry);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Was previous buf pu=
+t in mpx struct for multi-rsp? */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!isMultiRsp) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* smb=
+ buffer will be freed by user thread */
+> @@ -730,15 +738,25 @@ multi_t2_fnd:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(smallbuf);
 >
-> @@ -739,9 +740,10 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0put_bcc(1, &smb->hdr);
-> =A0 =A0 =A0 =A0smb->Data[0] =3D 'a';
-> =A0 =A0 =A0 =A0inc_rfc1001_len(smb, 3);
-> + =A0 =A0 =A0 iov.iov_base =3D smb;
-> + =A0 =A0 =A0 iov.iov_len =3D be32_to_cpu(smb->hdr.smb_buf_length) + =
-4;
+> =A0 =A0 =A0 =A0if (!list_empty(&server->pending_mid_q)) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct list_head dispose_list;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 INIT_LIST_HEAD(&dispose_list);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_for_each_safe(tmp, tmp2, &server-=
+>pending_mid_q) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry =3D list_ent=
+ry(tmp, struct mid_q_entry, qhead);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Clearing Mid 0=
+x%x - issuing callback",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0mid_entry->mid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Clearing mid 0=
+x%x", mid_entry->mid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry->midState =3D=
+ MID_SHUTDOWN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_move(&mid_entry->q=
+head, &dispose_list);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* now walk dispose list and issue call=
+backs */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each_safe(tmp, tmp2, &dispose_=
+list) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_entry =3D list_entr=
+y(tmp, struct mid_q_entry, qhead);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Callback mid 0=
+x%x", mid_entry->mid);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del_init(&mid_ent=
+ry->qhead);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_entry->callback(mi=
+d_entry);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* 1/8th of sec is more than enough ti=
+me for them to exit */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0msleep(125);
+> =A0 =A0 =A0 =A0}
+> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+> index a187587..e0fa75308 100644
+> --- a/fs/cifs/smb2transport.c
+> +++ b/fs/cifs/smb2transport.c
+> @@ -276,28 +276,22 @@ sync_smb2_mid_result(struct smb2_mid_entry *mid=
+, struct TCP_Server_Info *server)
 >
-> - =A0 =A0 =A0 rc =3D cifs_call_async(server, (struct smb_hdr *)smb,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_ec=
-ho_callback, server);
-> + =A0 =A0 =A0 rc =3D cifs_call_async(server, &iov, 1, cifs_echo_callb=
-ack, server);
-> =A0 =A0 =A0 =A0if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Echo request failed: %d", rc)=
-;
+> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0/* ensure that it's no longer on the pending_mid_q */
+> - =A0 =A0 =A0 list_del_init(&mid->qhead);
 >
+> =A0 =A0 =A0 =A0switch (mid->mid_state) {
+> =A0 =A0 =A0 =A0case MID_RESPONSE_RECEIVED:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> - =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* socket is going down, reject all cal=
+ls */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExitin=
+g) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: cancelin=
+g mid=3D%lld cmd=3D0x%x state=3D%d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func_=
+_, mid->mid, le16_to_cpu(mid->command),
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->mi=
+d_state);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0case MID_RETRY_NEEDED:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0case MID_RESPONSE_MALFORMED:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> + =A0 =A0 =A0 case MID_SHUTDOWN:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> =A0 =A0 =A0 =A0default:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&mid->qhead);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "%s: invalid mid state mid=3D=
+%lld state=3D%d", __func__,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid->mid, mid->mid_sta=
+te);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
 > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index d9833fc..7ccf292 100644
+> index 7ccf292..a31c279 100644
 > --- a/fs/cifs/transport.c
 > +++ b/fs/cifs/transport.c
-> @@ -349,11 +349,12 @@ wait_for_response(struct TCP_Server_Info *serve=
-r, struct mid_q_entry *midQ)
-> =A0* the result. Caller is responsible for dealing with timeouts.
-> =A0*/
-> =A0int
-> -cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_b=
-uf,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_callback_t *callback, void *cbdata)
-> +cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int nvec, mid_callback_t *call=
-back, void *cbdata)
+> @@ -428,7 +428,7 @@ SendReceiveNoRsp(const unsigned int xid, struct c=
+ifs_ses *ses,
+> =A0}
+>
+> =A0static int
+> -sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *ser=
+ver)
+> +cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info=
+ *server)
 > =A0{
-> =A0 =A0 =A0 =A0int rc;
-> =A0 =A0 =A0 =A0struct mid_q_entry *mid;
-> + =A0 =A0 =A0 struct smb_hdr *hdr =3D (struct smb_hdr *)iov[0].iov_ba=
-se;
+> =A0 =A0 =A0 =A0int rc =3D 0;
 >
-> =A0 =A0 =A0 =A0rc =3D wait_for_free_request(server, CIFS_ASYNC_OP);
-> =A0 =A0 =A0 =A0if (rc)
-> @@ -361,10 +362,10 @@ cifs_call_async(struct TCP_Server_Info *server,=
- struct smb_hdr *in_buf,
+> @@ -436,28 +436,21 @@ sync_mid_result(struct mid_q_entry *mid, struct=
+ TCP_Server_Info *server)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid->mid, mid->midState);
 >
-> =A0 =A0 =A0 =A0/* enable signing if server requires it */
-> =A0 =A0 =A0 =A0if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMOD=
-E_SIGN_ENABLED))
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 in_buf->Flags2 |=3D SMBFLG2_SECURITY_SI=
-GNATURE;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 hdr->Flags2 |=3D SMBFLG2_SECURITY_SIGNA=
-TURE;
+> =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 /* ensure that it's no longer on the pending_mid_q */
+> - =A0 =A0 =A0 list_del_init(&mid->qhead);
+> -
+> =A0 =A0 =A0 =A0switch (mid->midState) {
+> =A0 =A0 =A0 =A0case MID_RESPONSE_RECEIVED:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> - =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* socket is going down, reject all cal=
+ls */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsExitin=
+g) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "%s: cancelin=
+g mid=3D%d cmd=3D0x%x state=3D%d",
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__func__=
+, mid->mid, mid->command, mid->midState);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0case MID_RETRY_NEEDED:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0case MID_RESPONSE_MALFORMED:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> + =A0 =A0 =A0 case MID_SHUTDOWN:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EHOSTDOWN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> =A0 =A0 =A0 =A0default:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&mid->qhead);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "%s: invalid mid state mid=3D=
+%d state=3D%d", __func__,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid->mid, mid->midStat=
+e);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EIO;
+> @@ -617,7 +610,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
+ses *ses,
 >
-> =A0 =A0 =A0 =A0mutex_lock(&server->srv_mutex);
-> - =A0 =A0 =A0 mid =3D AllocMidQEntry(in_buf, server);
-> + =A0 =A0 =A0 mid =3D AllocMidQEntry(hdr, server);
-> =A0 =A0 =A0 =A0if (mid =3D=3D NULL) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOMEM;
-> @@ -375,7 +376,7 @@ cifs_call_async(struct TCP_Server_Info *server, s=
-truct smb_hdr *in_buf,
-> =A0 =A0 =A0 =A0list_add_tail(&mid->qhead, &server->pending_mid_q);
-> =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0cifs_small_buf_release(in_buf);
 >
-> - =A0 =A0 =A0 rc =3D cifs_sign_smb(in_buf, server, &mid->sequence_num=
-ber);
-> + =A0 =A0 =A0 rc =3D cifs_sign_smb2(iov, nvec, server, &mid->sequence=
-_number);
-> =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out_err;
-> @@ -385,7 +386,7 @@ cifs_call_async(struct TCP_Server_Info *server, s=
-truct smb_hdr *in_buf,
-> =A0 =A0 =A0 =A0mid->callback_data =3D cbdata;
-> =A0 =A0 =A0 =A0mid->midState =3D MID_REQUEST_SUBMITTED;
-> =A0 =A0 =A0 =A0cifs_in_send_inc(server);
-> - =A0 =A0 =A0 rc =3D smb_send(server, in_buf, be32_to_cpu(in_buf->smb=
-_buf_length));
-> + =A0 =A0 =A0 rc =3D smb_sendv(server, iov, nvec);
-> =A0 =A0 =A0 =A0cifs_in_send_dec(server);
-> =A0 =A0 =A0 =A0cifs_save_when_sent(mid);
-> =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
+> - =A0 =A0 =A0 rc =3D sync_mid_result(midQ, ses->server);
+> + =A0 =A0 =A0 rc =3D cifs_sync_mid_result(midQ, ses->server);
+> =A0 =A0 =A0 =A0if (rc !=3D 0) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0atomic_dec(&ses->server->inFlight);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
+> @@ -735,7 +728,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
+es *ses,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 rc =3D sync_mid_result(midQ, ses->server);
+> + =A0 =A0 =A0 rc =3D cifs_sync_mid_result(midQ, ses->server);
+> =A0 =A0 =A0 =A0if (rc !=3D 0) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0atomic_dec(&ses->server->inFlight);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
+> @@ -906,7 +899,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
+truct cifs_tcon *tcon,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rstart =3D 1;
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 rc =3D sync_mid_result(midQ, ses->server);
+> + =A0 =A0 =A0 rc =3D cifs_sync_mid_result(midQ, ses->server);
+> =A0 =A0 =A0 =A0if (rc !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+>
 > --
 > 1.7.4
 >
