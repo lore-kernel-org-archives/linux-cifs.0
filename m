@@ -1,291 +1,139 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 5/7] cifs: add cifs_async_writev
-Date: Wed, 13 Apr 2011 07:43:12 -0400
-Message-ID: <1302694994-8303-6-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH 7/7] cifs: clean up wsize negotiation and allow for
+ larger wsize
+Date: Wed, 13 Apr 2011 08:13:01 -0400
+Message-ID: <20110413081301.15d7c902@tlielax.poochiereds.net>
 References: <1302694994-8303-1-git-send-email-jlayton@redhat.com>
+	<1302694994-8303-8-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1302694994-8303-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1302694994-8303-8-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add the ability for CIFS to do an asynchronous write. The kernel will
-set the frame up as it would for a "normal" SMBWrite2 request, and use
-cifs_call_async to send it. The mid callback will then be configured to
-handle the result.
+On Wed, 13 Apr 2011 07:43:14 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsproto.h |   20 +++++
- fs/cifs/cifssmb.c   |  212 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 232 insertions(+), 0 deletions(-)
+> Now that we can handle larger wsizes in writepages, fix up the
+> negotiation of the wsize to allow for that. Make the code default to a
+> wsize of (128k - PAGE_CACHE_SIZE). That gives us a size that goes up to
+> the max frame size specified in RFC1001.
+> 
+> If CAP_LARGE_WRITE_AND_X isn't set, then set that down to a the largest
+> size allowed by the protocol (2^16 - 1), or the specified wsize,
+> whichever is smaller.
+> 
+> If a larger wsize is specified, then check to make sure the server
+> supports the POSIX extension that allows it to ignore the 128k limit. If
+> it doesn't then set it to the default value.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/connect.c |   62 +++++++++++++++++++++++++++++++++++-----------------
+>  1 files changed, 42 insertions(+), 20 deletions(-)
+> 
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 8f737d2..dc4de86 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2600,23 +2600,6 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+>  	else /* default */
+>  		cifs_sb->rsize = CIFSMaxBufSize;
+>  
+> -	if (pvolume_info->wsize > PAGEVEC_SIZE * PAGE_CACHE_SIZE) {
+> -		cERROR(1, "wsize %d too large, using 4096 instead",
+> -			  pvolume_info->wsize);
+> -		cifs_sb->wsize = 4096;
+> -	} else if (pvolume_info->wsize)
+> -		cifs_sb->wsize = pvolume_info->wsize;
+> -	else
+> -		cifs_sb->wsize = min_t(const int,
+> -					PAGEVEC_SIZE * PAGE_CACHE_SIZE,
+> -					127*1024);
+> -		/* old default of CIFSMaxBufSize was too small now
+> -		   that SMB Write2 can send multiple pages in kvec.
+> -		   RFC1001 does not describe what happens when frame
+> -		   bigger than 128K is sent so use that as max in
+> -		   conjunction with 52K kvec constraint on arch with 4K
+> -		   page size  */
+> -
+>  	if (cifs_sb->rsize < 2048) {
+>  		cifs_sb->rsize = 2048;
+>  		/* Windows ME may prefer this */
+> @@ -2694,6 +2677,46 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
+>  			   "mount option supported");
+>  }
+>  
+> +/*
+> + * default to a wsize of 128k - PAGE_CACHE_SIZE -- one page less than the
+> + * largest frame size described in RFC1001. This allows space for the header
+> + * without going over that by default.
+> + */
+> +#define CIFS_MAX_RFC1001_WSIZE (128 * 1024 - PAGE_CACHE_SIZE)
+> +
+> +/*
+> + * It's possible to increase the wsize by setting the wsize parm directly
+> + * up to a hard limit of 2^24 - PAGE_CACHE_SIZE. That might make for
+> + * "interesting" allocation* problems during write however (as we have to
+> + * allocate an array of pointers for the pages).
+> + */
+> +#define CIFS_MAX_WSIZE ((1<<24) - PAGE_CACHE_SIZE)
+> +
+> +/* If CAP_LARGE_WRITE_AND_X isn't set, then limit the wsize to 16 bits */
+> +#define CIFS_MAX_SMALL_WRITEX_WSIZE (0xffff)
+> +
+> +static unsigned int
+> +cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+> +{
+> +	__u64 unix_cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
+> +	struct TCP_Server_Info *server = tcon->ses->server;
+> +	unsigned int wsize = pvolume_info->wsize ? pvolume_info->wsize :
+> +				CIFS_MAX_RFC1001_WSIZE;
+> +
+> +	/* no CAP_LARGE_WRITE_X? Limit it to 16 bits */
+> +	if (!(server->capabilities & CAP_LARGE_WRITE_X))
+> +		wsize = min_t(unsigned int, wsize, CIFS_MAX_SMALL_WRITEX_WSIZE);
+> +
+> +	/* can server support 24-bit write sizes? (via UNIX extensions) */
+> +	if (tcon->unix_ext && !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index c621b45..37e8c35 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -21,6 +21,7 @@
- #ifndef _CIFSPROTO_H
- #define _CIFSPROTO_H
- #include <linux/nls.h>
-+#include <linux/pagevec.h>
- 
- struct statfs;
- struct smb_vol;
-@@ -433,4 +434,23 @@ extern int mdfour(unsigned char *, unsigned char *, int);
- extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
- extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
- 			unsigned char *p24);
-+
-+/* asynchronous write support */
-+struct cifs_writedata {
-+	struct list_head	pending;
-+	struct kref		refcount;
-+	struct completion	completion;
-+	struct work_struct	work;
-+	struct cifsFileInfo	*cfile;
-+	__u64			offset;
-+	unsigned int		bytes;
-+	int			result;
-+	unsigned int		nr_pages;
-+	struct page 		*pages[1];
-+};
-+
-+int cifs_async_writev(struct cifs_writedata *wdata);
-+struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages);
-+void cifs_writedata_release(struct kref *refcount);
-+
- #endif			/* _CIFSPROTO_H */
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 33adc15..32034cf 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -32,6 +32,7 @@
- #include <linux/vfs.h>
- #include <linux/slab.h>
- #include <linux/posix_acl_xattr.h>
-+#include <linux/pagemap.h>
- #include <asm/uaccess.h>
- #include "cifspdu.h"
- #include "cifsglob.h"
-@@ -1604,6 +1605,217 @@ CIFSSMBWrite(const int xid, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+void
-+cifs_writedata_release(struct kref *refcount)
-+{
-+	struct cifs_writedata *wdata = container_of(refcount,
-+					struct cifs_writedata, refcount);
-+	struct address_space *mapping;
-+
-+	if (wdata->cfile) {
-+		mapping = wdata->cfile->dentry->d_inode->i_mapping;
-+
-+		spin_lock(&mapping->private_lock);
-+		list_del(&wdata->pending);
-+		spin_unlock(&mapping->private_lock);
-+
-+		cifsFileInfo_put(wdata->cfile);
-+	}
-+
-+	kfree(wdata);
-+}
-+
-+static void
-+cifs_writev_complete(struct work_struct *work)
-+{
-+	struct cifs_writedata *wdata = container_of(work,
-+						struct cifs_writedata, work);
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	struct inode *inode = wdata->cfile->dentry->d_inode;
-+	struct page *page;
-+	int i = 0;
-+
-+	if (wdata->result == 0) {
-+		cifs_update_eof(CIFS_I(inode), wdata->offset, wdata->bytes);
-+		cifs_stats_bytes_written(tcon, wdata->bytes);
-+	}
-+
-+	for (i = 0; i < wdata->nr_pages; i++) {
-+		page = wdata->pages[i];
-+		if (wdata->result == -EAGAIN)
-+			__set_page_dirty_nobuffers(page);
-+		else if (wdata->result < 0)
-+			SetPageError(page);
-+		end_page_writeback(page);
-+		page_cache_release(page);
-+	}
-+	if (wdata->result != -EAGAIN)
-+		mapping_set_error(inode->i_mapping, wdata->result);
-+	complete(&wdata->completion);
-+	kref_put(&wdata->refcount, cifs_writedata_release);
-+}
-+
-+struct cifs_writedata *
-+cifs_writedata_alloc(unsigned int nr_pages)
-+{
-+	struct cifs_writedata *wdata;
-+
-+	/* writedata + number of page pointers */
-+	wdata = kzalloc(sizeof(*wdata) +
-+			sizeof(struct page *) * (nr_pages - 1), GFP_NOFS);
-+	if (wdata != NULL) {
-+		INIT_LIST_HEAD(&wdata->pending);
-+		INIT_WORK(&wdata->work, cifs_writev_complete);
-+		kref_init(&wdata->refcount);
-+		init_completion(&wdata->completion);
-+	}
-+	return wdata;
-+}
-+
-+/*
-+ * Check the midState and signature on received buffer (if any), and queue the
-+ * workqueue completion task.
-+ */
-+static void
-+cifs_writev_callback(struct mid_q_entry *mid)
-+{
-+	struct cifs_writedata *wdata = mid->callback_data;
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	unsigned int written;
-+	WRITE_RSP *smb = (WRITE_RSP *)mid->resp_buf;
-+
-+	switch(mid->midState) {
-+	case MID_RESPONSE_RECEIVED:
-+		wdata->result = cifs_check_receive(mid, tcon->ses->server, 0);
-+		if (wdata->result != 0)
-+			break;
-+
-+		written = le16_to_cpu(smb->CountHigh);
-+		written <<= 16;
-+		written += le16_to_cpu(smb->Count);
-+		/*
-+		 * Mask off high 16 bits when bytes written as returned
-+		 * by the server is greater than bytes requested by the
-+		 * client. OS/2 servers are known to set incorrect
-+		 * CountHigh values.
-+		 */
-+		if (written > wdata->bytes)
-+			written &= 0xFFFF;
-+
-+		if (written < wdata->bytes)
-+			wdata->result = -ENOSPC;
-+		else
-+			wdata->bytes = written;
-+		break;
-+	case MID_REQUEST_SUBMITTED:
-+	case MID_RETRY_NEEDED:
-+		wdata->result = -EAGAIN;
-+		break;
-+	default:
-+		wdata->result = -EIO;
-+		break;
-+	}
-+
-+	queue_work(system_nrt_wq, &wdata->work);
-+	DeleteMidQEntry(mid);
-+	atomic_dec(&tcon->ses->server->inFlight);
-+	wake_up(&tcon->ses->server->request_q);
-+}
-+
-+/* cifs_async_writev - send an async write, and set up mid to handle result */
-+int
-+cifs_async_writev(struct cifs_writedata *wdata)
-+{
-+	int i, rc = -EACCES;
-+	WRITE_REQ *smb = NULL;
-+	int wct;
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	struct inode *inode = wdata->cfile->dentry->d_inode;
-+	struct kvec *iov = NULL;
-+
-+	if (tcon->ses->capabilities & CAP_LARGE_FILES) {
-+		wct = 14;
-+	} else {
-+		wct = 12;
-+		if (wdata->offset >> 32 > 0) {
-+			/* can not handle big offset for old srv */
-+			return -EIO;
-+		}
-+	}
-+
-+	rc = small_smb_init(SMB_COM_WRITE_ANDX, wct, tcon, (void **)&smb);
-+	if (rc)
-+		goto async_writev_out;
-+
-+	/* 1 iov per page + 1 for header */
-+	iov = kzalloc((wdata->nr_pages + 1) * sizeof(*iov), GFP_NOFS);
-+	if (iov == NULL) {
-+		rc = -ENOMEM;
-+		goto async_writev_out;
-+	}
-+
-+	smb->AndXCommand = 0xFF;	/* none */
-+	smb->Fid = wdata->cfile->netfid;
-+	smb->OffsetLow = cpu_to_le32(wdata->offset & 0xFFFFFFFF);
-+	if (wct == 14)
-+		smb->OffsetHigh = cpu_to_le32(wdata->offset >> 32);
-+	smb->Reserved = 0xFFFFFFFF;
-+	smb->WriteMode = 0;
-+	smb->Remaining = 0;
-+
-+	smb->DataOffset =
-+	    cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
-+
-+	/* 4 for RFC1001 length + 1 for BCC */
-+	iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
-+	iov[0].iov_base = smb;
-+
-+	/* marshal up the pages into iov array */
-+	wdata->bytes = 0;
-+	for (i = 0; i < wdata->nr_pages; i++) {
-+		iov[i + 1].iov_len = min(inode->i_size -
-+				      page_offset(wdata->pages[i]),
-+					(loff_t)PAGE_CACHE_SIZE);
-+		iov[i + 1].iov_base = kmap(wdata->pages[i]);
-+		wdata->bytes += iov[i + 1].iov_len;
-+	}
-+
-+	cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
-+
-+	smb->DataLengthLow = cpu_to_le16(wdata->bytes & 0xFFFF);
-+	smb->DataLengthHigh = cpu_to_le16(wdata->bytes >> 16);
-+
-+	if (wct == 14) {
-+		inc_rfc1001_len(&smb->hdr, wdata->bytes + 1);
-+		put_bcc(wdata->bytes + 1, &smb->hdr);
-+	} else {
-+		/* wct == 12 */
-+		struct smb_com_writex_req *smbw =
-+				(struct smb_com_writex_req *)smb;
-+		inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
-+		put_bcc(wdata->bytes + 5, &smbw->hdr);
-+		iov[0].iov_len += 4; /* pad bigger by four bytes */
-+	}
-+
-+	kref_get(&wdata->refcount);
-+	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
-+			     cifs_writev_callback, wdata, false);
-+
-+	if (rc == 0)
-+		cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
-+	else
-+		kref_put(&wdata->refcount, cifs_writedata_release);
-+
-+	/* send is done, unmap pages */
-+	for (i = 0; i < wdata->nr_pages; i++)
-+		kunmap(wdata->pages[i]);
-+
-+async_writev_out:
-+	cifs_small_buf_release(smb);
-+	kfree(iov);
-+	return rc;
-+}
-+
- int
- CIFSSMBWrite2(const int xid, struct cifs_tcon *tcon,
- 	     const int netfid, const unsigned int count,
+	oops, logic bug here -- this should be:
+
+	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
+
+	...I'll fix it in next version...
+
+> +		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1001_WSIZE);
+> +
+> +	/* hard limit of CIFS_MAX_WSIZE */
+> +	wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
+> +
+> +	return wsize;
+> +}
+> +
+>  static int
+>  is_path_accessible(int xid, struct cifs_tcon *tcon,
+>  		   struct cifs_sb_info *cifs_sb, const char *full_path)
+> @@ -2884,13 +2907,12 @@ try_mount_again:
+>  		cifs_sb->rsize = 1024 * 127;
+>  		cFYI(DBG2, "no very large read support, rsize now 127K");
+>  	}
+> -	if (!(tcon->ses->capabilities & CAP_LARGE_WRITE_X))
+> -		cifs_sb->wsize = min(cifs_sb->wsize,
+> -			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
+>  	if (!(tcon->ses->capabilities & CAP_LARGE_READ_X))
+>  		cifs_sb->rsize = min(cifs_sb->rsize,
+>  			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
+>  
+> +	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
+> +
+>  remote_path_check:
+>  	/* check if a whole path (including prepath) is not remote */
+>  	if (!rc && tcon) {
+
+
 -- 
-1.7.4.2
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
