@@ -1,107 +1,150 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Add rwpidforward mount option (try #2)
-Date: Mon, 18 Apr 2011 08:44:14 -0400
-Message-ID: <20110418084414.295ef417@tlielax.poochiereds.net>
-References: <1303129252-7006-1-git-send-email-piastry@etersoft.ru>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Fix extended security auth failure
+Date: Mon, 18 Apr 2011 07:51:46 -0500
+Message-ID: <BANLkTinWMnXKvy3Kxe0e_hPsijYimyNE2Q@mail.gmail.com>
+References: <1302097566-11576-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20110408094028.61a2f507@corrin.poochiereds.net>
+	<BANLkTik=Mgbbu7G0U6oPvELEktCFQTArDg@mail.gmail.com>
+	<BANLkTikuFDcUHuN9HeY=5KLodWo3_2dDpg@mail.gmail.com>
+	<20110418082456.36406423@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1303129252-7006-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <20110418082456.36406423-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 18 Apr 2011 16:20:52 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Mon, Apr 18, 2011 at 7:24 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Mon, 18 Apr 2011 07:16:36 -0500
+> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Fri, Apr 8, 2011 at 8:49 AM, Shirish Pargaonkar
+>> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> > On Fri, Apr 8, 2011 at 8:40 AM, Jeff Layton <jlayton@poochiereds.n=
+et> wrote:
+>> >> On Wed, =A06 Apr 2011 08:46:06 -0500
+>> >> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>> >>
+>> >>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >>>
+>> >>>
+>> >>> Fix authentication failures using extended security mechanisms.
+>> >>> cifs client does not take into consideration extended security b=
+it
+>> >>> in capabilities field in negotiate protocol response from the se=
+rver.
+>> >>>
+>> >>> Please refer to Samba bugzilla 8046.
+>> >>>
+>> >>>
+>> >>> Reported-and-tested by: Werner Maes <Werner.Maes-UiU5zyVfpuq/9j7TCjX/TQ@public.gmane.org=
+e>
+>> >>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >>> ---
+>> >>> =A0fs/cifs/cifssmb.c | =A0 17 ++++++-----------
+>> >>> =A01 files changed, 6 insertions(+), 11 deletions(-)
+>> >>>
+>> >>> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+>> >>> index 3291770..e119d70 100644
+>> >>> --- a/fs/cifs/cifssmb.c
+>> >>> +++ b/fs/cifs/cifssmb.c
+>> >>> @@ -570,18 +570,10 @@ CIFSSMBNegotiate(unsigned int xid, struct =
+cifs_ses *ses)
+>> >>> =A0 =A0 =A0 if (pSMBr->EncryptionKeyLength =3D=3D CIFS_CRYPTO_KE=
+Y_SIZE) {
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(ses->server->cryptkey, pSMBr-=
+>u.EncryptionKey,
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_CRYPTO_KEY_SIZE)=
+;
+>> >>> - =A0 =A0 } else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC)
+>> >>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 && (pSMBr->EncryptionK=
+eyLength =3D=3D 0)) {
+>> >>> + =A0 =A0 } else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
+>> >>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->capabilities &=
+ CAP_EXTENDED_SECURITY) &&
+>> >>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (pSMBr=
+->EncryptionKeyLength =3D=3D 0)) {
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* decode security blob */
+>> >>
+>> >> This looks wrong to me. CAP_EXTENDED_SECURITY just means that the
+>> >> server supports extended security, not that it's in use, right? A=
+ren't
+>> >> we just working around server brokenness here. Why isn't it setti=
+ng
+>> >> SMBFLG2_EXT_SEC if it's using extended security?
+>> >>
+>> >> Are there cases where the server might set EncryptionKeyLength to=
+ 0,
+>> >> and *not* be using extended security? If not, then why bother to =
+check
+>> >> the flags or capabilities at all?
+>> >>
+>> >>> - =A0 =A0 } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
+>> >>> - =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO; /* no crypt key only if p=
+lain text pwd */
+>> >>> - =A0 =A0 =A0 =A0 =A0 =A0 goto neg_err_exit;
+>> >>> - =A0 =A0 }
+>> >>> -
+>> >>> - =A0 =A0 /* BB might be helpful to save off the domain of serve=
+r here */
+>> >>> -
+>> >>> - =A0 =A0 if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC) &&
+>> >>> - =A0 =A0 =A0 =A0 =A0 =A0 (server->capabilities & CAP_EXTENDED_S=
+ECURITY)) {
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 count =3D get_bcc(&pSMBr->hdr);
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (count < 16) {
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO;
+>> >>> @@ -624,6 +616,9 @@ CIFSSMBNegotiate(unsigned int xid, struct ci=
+fs_ses *ses)
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 rc =3D -EOPNOTSUPP;
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> >>> + =A0 =A0 } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
+>> >>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EIO; /* no crypt key only if p=
+lain text pwd */
+>> >>> + =A0 =A0 =A0 =A0 =A0 =A0 goto neg_err_exit;
+>> >>> =A0 =A0 =A0 } else
+>> >>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->capabilities &=3D ~CAP_EXTEN=
+DED_SECURITY;
+>> >>>
+>> >>
+>> >>
+>> >> --
+>> >> Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+>> >>
+>> >
+>> > I checked in ms-cifs and ms-smb, and there is no mention of server=
+ needing
+>> > to set extended security bit in flags2 in smb header but ms-smb do=
+es mention
+>> > about server setting extended security bit in capabilities field i=
+n
+>> > negotiate protocol response (there is an example of the exchange i=
+n ms-smb).
+>> > When server is indicating it supports extended security, it should=
+ set
+>> > encryptionkeylength to 0 since the ensuing exchange will involve a=
+n
+>> > encryption key (challenge).
+>> >
+>>
+>> Jeff, any further comments on this?
+>>
+>
+> No. As long as you're fairly sure that this won't cause regressions
+> when we don't intend to use extended security then I'm ok with it.
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>
 
-> Add rwpidforward mount option that switches on a mode when we forward
-> pid of a process who opened a file to any read and write operation.
-> 
-> This can prevent applications like WINE from failing on read or write
-> operation on a previously locked file region from the same netfd from
-> another process if we use mandatory brlock style.
-> It is actual for WINE because during a run of WINE program two processes
-> work on the same netfd - share the same file struct between several VFS
-> fds:
-> 1) WINE-server does open and lock;
-> 2) WINE-application does read and write.
-> 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/README       |    3 ++
->  fs/cifs/cifs_fs_sb.h |    1 +
->  fs/cifs/cifsfs.c     |    8 ++++++
->  fs/cifs/cifsproto.h  |   21 ++++++++-------
->  fs/cifs/cifssmb.c    |   31 +++++++++++++++-------
->  fs/cifs/connect.c    |    5 +++
->  fs/cifs/dir.c        |    4 +-
->  fs/cifs/file.c       |   69 ++++++++++++++++++++++++++++++++++++++-----------
->  fs/cifs/inode.c      |   10 ++++---
->  fs/cifs/link.c       |    6 ++--
->  10 files changed, 113 insertions(+), 45 deletions(-)
-> 
-> diff --git a/fs/cifs/README b/fs/cifs/README
-> index 4a3ca0e..33f4ba0 100644
-> --- a/fs/cifs/README
-> +++ b/fs/cifs/README
-> @@ -457,6 +457,9 @@ A partial list of the supported mount options follows:
->  		otherwise - read from the server. All written data are stored
->  		in the cache, but if the client doesn't have Exclusive Oplock,
->  		it writes the data to the server.
-> +  rwpidforward  Forward pid of a process who opened a file to any read or write
-> +		operation on that file. This revent application like WINE
-					         ^^^^^^
-					    "prevents applications"
-		
-> +		from failing on read and write if we use mandatory brlock style.
->    acl   	Allow setfacl and getfacl to manage posix ACLs if server
->  		supports them.  (default)
->    noacl 	Do not allow setfacl and getfacl calls on this mount
+Yes, I did verify that auth mechs like sec=3Dntlm/i and sec=3Dntlmv2/i
+do work with this patch.
 
-[...]
+Regards,
 
-> @@ -1112,6 +1119,7 @@ static int cifs_writepages(struct address_space *mapping,
->  	struct pagevec pvec;
->  	int rc = 0;
->  	int scanned = 0;
-> +	__u32 netpid;
->  	int xid;
->  
->  	cifs_sb = CIFS_SB(mapping->host->i_sb);
-> @@ -1251,10 +1259,15 @@ retry_write:
->  				cERROR(1, "No writable handles for inode");
->  				rc = -EBADF;
->  			} else {
-> +				if (cifs_sb->mnt_cifs_flags &
-> +							CIFS_MOUNT_RWPIDFORWARD)
-> +					netpid = open_file->pid;
-> +				else
-> +					netpid = current->tgid;
->  				rc = CIFSSMBWrite2(xid, tcon, open_file->netfid,
-> -						   bytes_to_write, offset,
-> -						   &bytes_written, iov, n_iov,
-> -						   0);
-> +						   netpid, bytes_to_write,
-> +						   offset, &bytes_written,
-> +						   iov, n_iov, 0);
->  				cifsFileInfo_put(open_file);
->  			}
->  
-		^^^^^^^^^^^^^^^
-When flushing data for writeback (writepage or writepages), I don't
-think we should care if a lock is held or by whom. The kernel has
-memory that needs to be freed and it wants to perform writes to make
-that happen.
-
-I don't think these codepaths ought to care about the RWPIDFORWARD flag
-at all. I think you ought to try to make sure that writes in those
-cases use whatever pid will allow the writes to succeed.
-
-Also, we should probably get Steve to comment on which patchset he
-intends to commit first. This one or the async writepages one. One of
-them will need to be respun on top of the other.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Shirish
