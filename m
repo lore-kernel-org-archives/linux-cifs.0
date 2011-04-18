@@ -1,79 +1,50 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions (try #15)
-Date: Mon, 18 Apr 2011 09:19:21 -0400
-Message-ID: <20110418091921.57416e5f@corrin.poochiereds.net>
-References: <1302750991-18515-1-git-send-email-shirishpargaonkar@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: guard against entries being deleted from open file list
+Date: Mon, 18 Apr 2011 08:44:35 -0500
+Message-ID: <1303134275-12587-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1302750991-18515-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 13 Apr 2011 22:16:31 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> rb tree search and insertion routines.
-> 
-> A SID which needs to be mapped, is looked up in one of the rb trees
-> depending whether SID is either owner or group SID.
-> If found in the tree, a (mapped) id from that node is assigned to
-> uid or gid as appropriate.  If unmapped, an upcall is attempted to
-> map the SID to an id.  If upcall is successful, node is marked as
-> mapped.  If upcall fails, node stays marked as unmapped and a mapping
-> is attempted again only after an arbitrary time period has passed.
-> 
-> To map a SID, which can be either a Owner SID or a Group SID, key
-> description starts with the string "os" or "gs" followed by SID converted
-> to a string. Without "os" or "gs", cifs.upcall does not know whether
-> SID needs to be mapped to either an uid or a gid.
-> 
-> Nodes in rb tree have fields to prevent multiple upcalls for
-> a SID.  Adding and removing nodes is done within global locks.
-> shrinker routine does not prune a node if mapping for that node
-> is either pending or or node was recently created (before timeout
-> period expires and node could be purged). The timeout period should
-> be long enough at least for an upcall to return back to cifs.
-> Every time an existing node is accessed, its timestamp is updated
-> to prevent it from getting erased.
-> 
-> For now, cifs.upcall is only used to map a SID to an id (uid or gid) but
-> it would be used to obtain an SID (string) for an id.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/cifsacl.c |  308 ++++++++++++++++++++++++++++++++++++++++++++++++----
->  fs/cifs/cifsacl.h |   24 ++++
->  2 files changed, 308 insertions(+), 24 deletions(-)
-> 
-
-[...]
-
-> +#define SID_ID_MAPPED 0
-> +#define SID_ID_PENDING 1
-> +#define SID_MAP_EXPIRE 1000 /* enough for an upcall to return? */
-> +#define SID_MAP_RETRY 1000  /* wait for next attempt to map sid */
-> +
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
-Now that I look...
+It is possible that a close can occur while a file is
+being reopened which can result in list entry deleted
+from the list and an oops.
+Use list_for_each_entry_safe instead.
 
-Is this enough time to ensure that this entry won't disappear from the
-cache? I can forsee an upcall that takes longer than 1s to return.
-That could also be quite problematic if that upcall returns and the
-shrinker has pruned this entry out of the cache.
 
-Perhaps it would be better to refcount these objects rather than
-assuming that any time period is long enough to prevent their removal?
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/file.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-Also, shouldn't these values be based on HZ too? You're making an
-assumption about the jiffies per second here, right?
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index faf5952..aa29167 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1056,7 +1056,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
+ 					bool fsuid_only)
+ {
+-	struct cifsFileInfo *open_file;
++	struct cifsFileInfo *open_file, *tmpf;
+ 	struct cifs_sb_info *cifs_sb;
+ 	bool any_available = false;
+ 	int rc;
+@@ -1079,7 +1079,8 @@ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
+ 
+ 	spin_lock(&cifs_file_list_lock);
+ refind_writable:
+-	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
++	list_for_each_entry_safe(open_file, tmpf, &cifs_inode->openFileList,
++									flist) {
+ 		if (!any_available && open_file->pid != current->tgid)
+ 			continue;
+ 		if (fsuid_only && open_file->uid != current_fsuid())
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.6.0.2
