@@ -1,176 +1,79 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Add rwpidforward mount option (try #2)
-Date: Mon, 18 Apr 2011 09:11:06 -0400
-Message-ID: <20110418091106.386447c5@corrin.poochiereds.net>
-References: <1303129252-7006-1-git-send-email-piastry@etersoft.ru>
-	<20110418084414.295ef417@tlielax.poochiereds.net>
-	<BANLkTinFCrP=VzG6b6-WR-S6af6Jc91Tzg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions (try #15)
+Date: Mon, 18 Apr 2011 09:19:21 -0400
+Message-ID: <20110418091921.57416e5f@corrin.poochiereds.net>
+References: <1302750991-18515-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTinFCrP=VzG6b6-WR-S6af6Jc91Tzg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1302750991-18515-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 18 Apr 2011 16:58:09 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Wed, 13 Apr 2011 22:16:31 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> 2011/4/18 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > On Mon, 18 Apr 2011 16:20:52 +0400
-> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> >
-> >> Add rwpidforward mount option that switches on a mode when we forw=
-ard
-> >> pid of a process who opened a file to any read and write operation=
-=2E
-> >>
-> >> This can prevent applications like WINE from failing on read or wr=
-ite
-> >> operation on a previously locked file region from the same netfd f=
-rom
-> >> another process if we use mandatory brlock style.
-> >> It is actual for WINE because during a run of WINE program two pro=
-cesses
-> >> work on the same netfd - share the same file struct between severa=
-l VFS
-> >> fds:
-> >> 1) WINE-server does open and lock;
-> >> 2) WINE-application does read and write.
-> >>
-> >> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> >> ---
-> >> =C2=A0fs/cifs/README =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A03 ++
-> >> =C2=A0fs/cifs/cifs_fs_sb.h | =C2=A0 =C2=A01 +
-> >> =C2=A0fs/cifs/cifsfs.c =C2=A0 =C2=A0 | =C2=A0 =C2=A08 ++++++
-> >> =C2=A0fs/cifs/cifsproto.h =C2=A0| =C2=A0 21 ++++++++-------
-> >> =C2=A0fs/cifs/cifssmb.c =C2=A0 =C2=A0| =C2=A0 31 +++++++++++++++--=
------
-> >> =C2=A0fs/cifs/connect.c =C2=A0 =C2=A0| =C2=A0 =C2=A05 +++
-> >> =C2=A0fs/cifs/dir.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 =C2=A04 +-
-> >> =C2=A0fs/cifs/file.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 69 ++++++++++++=
-++++++++++++++++++++++++++-----------
-> >> =C2=A0fs/cifs/inode.c =C2=A0 =C2=A0 =C2=A0| =C2=A0 10 ++++---
-> >> =C2=A0fs/cifs/link.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A06 ++--
-> >> =C2=A010 files changed, 113 insertions(+), 45 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/README b/fs/cifs/README
-> >> index 4a3ca0e..33f4ba0 100644
-> >> --- a/fs/cifs/README
-> >> +++ b/fs/cifs/README
-> >> @@ -457,6 +457,9 @@ A partial list of the supported mount options =
-follows:
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 otherwise - read =
-from the server. All written data are stored
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in the cache, but=
- if the client doesn't have Exclusive Oplock,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 it writes the dat=
-a to the server.
-> >> + =C2=A0rwpidforward =C2=A0Forward pid of a process who opened a f=
-ile to any read or write
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 operation on that file=
-=2E This revent application like WINE
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 ^^^^^^
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0"prevents applications"
->=20
-> Ok, thanks, will fix it.
->=20
-> >
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 from failing on read a=
-nd write if we use mandatory brlock style.
-> >> =C2=A0 =C2=A0acl =C2=A0 =C2=A0 =C2=A0 =C2=A0Allow setfacl and getf=
-acl to manage posix ACLs if server
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 supports them. =C2=
-=A0(default)
-> >> =C2=A0 =C2=A0noacl =C2=A0 =C2=A0 =C2=A0Do not allow setfacl and ge=
-tfacl calls on this mount
-> >
-> > [...]
-> >
-> >> @@ -1112,6 +1119,7 @@ static int cifs_writepages(struct address_sp=
-ace *mapping,
-> >> =C2=A0 =C2=A0 =C2=A0 struct pagevec pvec;
-> >> =C2=A0 =C2=A0 =C2=A0 int rc =3D 0;
-> >> =C2=A0 =C2=A0 =C2=A0 int scanned =3D 0;
-> >> + =C2=A0 =C2=A0 __u32 netpid;
-> >> =C2=A0 =C2=A0 =C2=A0 int xid;
-> >>
-> >> =C2=A0 =C2=A0 =C2=A0 cifs_sb =3D CIFS_SB(mapping->host->i_sb);
-> >> @@ -1251,10 +1259,15 @@ retry_write:
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cERROR(1, "No writable handles f=
-or inode");
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D -EBADF;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 } else {
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags &
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CIFS_MOUNT_RWPIDFORWARD)
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 netpid =3D =
-open_file->pid;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 netpid =3D =
-current->tgid;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMBWrite2(xid, tcon, =
-open_file->netfid,
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0bytes_to_write, offset,
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0&bytes_written, iov, n_iov,
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A00);
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0netpid, bytes_to_write,
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0offset, &bytes_written,
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0iov, n_iov, 0);
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifsFileInfo_put(open_file);
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 }
-> >>
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^^^^^^^^^^=
-^^^
-> > When flushing data for writeback (writepage or writepages), I don't
-> > think we should care if a lock is held or by whom. The kernel has
-> > memory that needs to be freed and it wants to perform writes to mak=
-e
-> > that happen.
-> >
-> > I don't think these codepaths ought to care about the RWPIDFORWARD =
-flag
-> > at all. I think you ought to try to make sure that writes in those
-> > cases use whatever pid will allow the writes to succeed.
->=20
-> Ok, we have an oplock, set brlock and do write - it succeed (stored i=
-n
-> cache). Then we close a file, do flushing, and failes (because of
-> wrong pid). Why not to forward a pid in this situation?
->=20
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> rb tree search and insertion routines.
+> 
+> A SID which needs to be mapped, is looked up in one of the rb trees
+> depending whether SID is either owner or group SID.
+> If found in the tree, a (mapped) id from that node is assigned to
+> uid or gid as appropriate.  If unmapped, an upcall is attempted to
+> map the SID to an id.  If upcall is successful, node is marked as
+> mapped.  If upcall fails, node stays marked as unmapped and a mapping
+> is attempted again only after an arbitrary time period has passed.
+> 
+> To map a SID, which can be either a Owner SID or a Group SID, key
+> description starts with the string "os" or "gs" followed by SID converted
+> to a string. Without "os" or "gs", cifs.upcall does not know whether
+> SID needs to be mapped to either an uid or a gid.
+> 
+> Nodes in rb tree have fields to prevent multiple upcalls for
+> a SID.  Adding and removing nodes is done within global locks.
+> shrinker routine does not prune a node if mapping for that node
+> is either pending or or node was recently created (before timeout
+> period expires and node could be purged). The timeout period should
+> be long enough at least for an upcall to return back to cifs.
+> Every time an existing node is accessed, its timestamp is updated
+> to prevent it from getting erased.
+> 
+> For now, cifs.upcall is only used to map a SID to an id (uid or gid) but
+> it would be used to obtain an SID (string) for an id.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsacl.c |  308 ++++++++++++++++++++++++++++++++++++++++++++++++----
+>  fs/cifs/cifsacl.h |   24 ++++
+>  2 files changed, 308 insertions(+), 24 deletions(-)
+> 
 
-I think we should do whatever is necessary for that write to succeed.
-If that means forwarding the pid then that's fine. I just don't see why
-the RWPIDFORWARD flag should matter at all in that case.
+[...]
 
---=20
+> +#define SID_ID_MAPPED 0
+> +#define SID_ID_PENDING 1
+> +#define SID_MAP_EXPIRE 1000 /* enough for an upcall to return? */
+> +#define SID_MAP_RETRY 1000  /* wait for next attempt to map sid */
+> +
+
+
+Now that I look...
+
+Is this enough time to ensure that this entry won't disappear from the
+cache? I can forsee an upcall that takes longer than 1s to return.
+That could also be quite problematic if that upcall returns and the
+shrinker has pruned this entry out of the cache.
+
+Perhaps it would be better to refcount these objects rather than
+assuming that any time period is long enough to prevent their removal?
+
+Also, shouldn't these values be based on HZ too? You're making an
+assumption about the jiffies per second here, right?
+
+-- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
