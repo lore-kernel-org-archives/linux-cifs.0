@@ -1,147 +1,249 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: guard against entries being deleted from open
- file list
-Date: Tue, 19 Apr 2011 07:49:46 -0400
-Message-ID: <20110419074946.5f9458b9@corrin.poochiereds.net>
-References: <1303134275-12587-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20110418105025.2b62fa69@corrin.poochiereds.net>
-	<BANLkTimuLqbz6fj9SuV+_3KmuJ9Keh_9hg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/2] cifs: Add idmap key and related data structures and functions (try #16)
+Date: Tue, 19 Apr 2011 08:20:58 -0500
+Message-ID: <1303219258-31121-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTimuLqbz6fj9SuV+_3KmuJ9Keh_9hg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 18 Apr 2011 22:02:21 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> On Mon, Apr 18, 2011 at 9:50 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
-e:
-> > On Mon, 18 Apr 2011 08:44:35 -0500
-> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-> >
-> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >>
-> >>
-> >> It is possible that a close can occur while a file is
-> >> being reopened which can result in list entry deleted
-> >> from the list and an oops.
-> >> Use list_for_each_entry_safe instead.
-> >>
-> >>
-> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >> ---
-> >> =C2=A0fs/cifs/file.c | =C2=A0 =C2=A05 +++--
-> >> =C2=A01 files changed, 3 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> >> index faf5952..aa29167 100644
-> >> --- a/fs/cifs/file.c
-> >> +++ b/fs/cifs/file.c
-> >> @@ -1056,7 +1056,7 @@ struct cifsFileInfo *find_readable_file(stru=
-ct cifsInodeInfo *cifs_inode,
-> >> =C2=A0struct cifsFileInfo *find_writable_file(struct cifsInodeInfo=
- *cifs_inode,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bool=
- fsuid_only)
-> >> =C2=A0{
-> >> - =C2=A0 =C2=A0 struct cifsFileInfo *open_file;
-> >> + =C2=A0 =C2=A0 struct cifsFileInfo *open_file, *tmpf;
-> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_sb_info *cifs_sb;
-> >> =C2=A0 =C2=A0 =C2=A0 bool any_available =3D false;
-> >> =C2=A0 =C2=A0 =C2=A0 int rc;
-> >> @@ -1079,7 +1079,8 @@ struct cifsFileInfo *find_writable_file(stru=
-ct cifsInodeInfo *cifs_inode,
-> >>
-> >> =C2=A0 =C2=A0 =C2=A0 spin_lock(&cifs_file_list_lock);
-> >> =C2=A0refind_writable:
-> >> - =C2=A0 =C2=A0 list_for_each_entry(open_file, &cifs_inode->openFi=
-leList, flist) {
-> >> + =C2=A0 =C2=A0 list_for_each_entry_safe(open_file, tmpf, &cifs_in=
-ode->openFileList,
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 flist) {
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!any_availabl=
-e && open_file->pid !=3D current->tgid)
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 continue;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (fsuid_only &&=
- open_file->uid !=3D current_fsuid())
-> >
-> > I don't think this is a real fix for this problem, and may cause ot=
-her
-> > issues. list_for_each_entry_safe is only protects you when you are
-> > iterating over a list (usually while holding a lock) and removing t=
-hose
-> > entries. The *_safe part makes it ok to remove the entry that you'r=
-e
-> > currently dealing with from the list.
-> >
-> > Now, that can happen if you find an entry, do a cifsFileInfo_get, d=
-rop
-> > the spinlock and then calling cifsFileInfo_put and putting the last
-> > reference afterward. Here's the problem though -- once you drop the
-> > spinlock, there's nothing that says that the next entry in the list=
- is
-> > necessarily still valid once you move to that entry.
-> >
-> > What if the entry *after* the one that you're currently dealing wit=
-h is
-> > removed from the list while you're iterating over it? This patch wi=
-ll
-> > cause an oops in that situation now when it didn't before. So, I th=
-ink
-> > this patch will probably just trade one set of problems for another=
-=2E
-> >
-> > I think the real fix is overhauling how all of the reopen_file stuf=
-f
-> > works, but fixing it looks anything but straightforward.
-> >
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> >
->=20
-> Jeff, I do not mind taking a stab at it.  Do you have suggestsion/ide=
-as
-> about how to approach it?
->=20
+Define (global) data structures to store ids, uids and gids, to which a
+SID maps.  There are two separate trees, one for SID/uid and another one
+for SID/gid.
 
-One idea might be to break up the openFileList into two lists. One for
-valid handles and one for invalid ones. When you mark the file invalid,
-move it to the other list.
+A new type of key, cifs_idmap_key_type, is used.
 
-When calling find_writable_file, walk the list of valid handles first,
-and then walk the other list and start reclaiming filehandles and
-moving them back to the openFileList if you don't find one on the first
-pass.
+Keys are instantiated and searched using credential of the root by
+overriding and restoring the credentials of the caller requesting the key.
 
-Getting the locking right on all of that will be "fun", though.
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsacl.c   |  138 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsfs.c    |    7 +++
+ fs/cifs/cifsglob.h  |    5 ++
+ fs/cifs/cifsproto.h |    3 +
+ 4 files changed, 153 insertions(+), 0 deletions(-)
 
-While you're at it, it might also be a good time to get rid of some of
-these global locks. The cifs_file_list_lock for instance could probably
-stand to be more granular.
-
-Some of the callers of find_writable_file could also be eliminated --
-the ones in the setattr codepath, specifically by having them use
-iattr->ia_file field.
-
-It also wouldn't hurt to merge find_readable_file and
-find_writable_file into a single function that takes a fmode_t argument=
-=2E
-
-Or, consider something more general -- a generic filehandle acquisition
-layer that looks for open files that meet criteria that can be used by
-any opener or current caller of find_*_file.
-
-The possibilities for glory are endless here...
-
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index beeebf1..cad8d9b 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -23,6 +23,10 @@
+ 
+ #include <linux/fs.h>
+ #include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/keyctl.h>
++#include <linux/key-type.h>
++#include <keys/user-type.h>
+ #include "cifspdu.h"
+ #include "cifsglob.h"
+ #include "cifsacl.h"
+@@ -50,6 +54,140 @@ static const struct cifs_sid sid_authusers = {
+ /* group users */
+ static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+ 
++static const struct cred *root_cred;
++
++/*
++ * Run idmap cache shrinker.
++ */
++static int
++cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
++{
++	/* Use a pruning scheme in a subsequent patch instead */
++	cifs_destroy_idmaptrees();
++	return 0;
++}
++
++static struct shrinker cifs_shrinker = {
++	.shrink = cifs_idmap_shrinker,
++	.seeks = DEFAULT_SEEKS,
++};
++
++static int
++cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
++{
++	char *payload;
++
++	payload = kmalloc(datalen, GFP_KERNEL);
++	if (!payload)
++		return -ENOMEM;
++
++	memcpy(payload, data, datalen);
++	key->payload.data = payload;
++	return 0;
++}
++
++static inline void
++cifs_idmap_key_destroy(struct key *key)
++{
++	kfree(key->payload.data);
++}
++
++static
++struct key_type cifs_idmap_key_type = {
++	.name        = "cifs.cifs_idmap",
++	.instantiate = cifs_idmap_key_instantiate,
++	.destroy     = cifs_idmap_key_destroy,
++	.describe    = user_describe,
++	.match       = user_match,
++};
++
++int
++init_cifs_idmap(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	cFYI(1, "Registering the %s key type\n", cifs_idmap_key_type.name);
++
++	/* create an override credential set with a special thread keyring in
++	 * which requests are cached
++	 *
++	 * this is used to prevent malicious redirections from being installed
++	 * with add_key().
++	 */
++	cred = prepare_kernel_cred(NULL);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = key_alloc(&key_type_keyring, ".cifs_idmap", 0, 0, cred,
++			    (KEY_POS_ALL & ~KEY_POS_SETATTR) |
++			    KEY_USR_VIEW | KEY_USR_READ,
++			    KEY_ALLOC_NOT_IN_QUOTA);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	ret = key_instantiate_and_link(keyring, NULL, 0, NULL, NULL);
++	if (ret < 0)
++		goto failed_put_key;
++
++	ret = register_key_type(&cifs_idmap_key_type);
++	if (ret < 0)
++		goto failed_put_key;
++
++	/* instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up */
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	root_cred = cred;
++
++	spin_lock_init(&siduidlock);
++	uidtree = RB_ROOT;
++	spin_lock_init(&sidgidlock);
++	gidtree = RB_ROOT;
++
++	register_shrinker(&cifs_shrinker);
++
++	cFYI(1, "cifs idmap keyring: %d\n", key_serial(keyring));
++	return 0;
++
++failed_put_key:
++	key_put(keyring);
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
++
++void
++exit_cifs_idmap(void)
++{
++	key_revoke(root_cred->thread_keyring);
++	unregister_key_type(&cifs_idmap_key_type);
++	put_cred(root_cred);
++	unregister_shrinker(&cifs_shrinker);
++	cFYI(1, "Unregistered %s key type\n", cifs_idmap_key_type.name);
++}
++
++void
++cifs_destroy_idmaptrees(void)
++{
++	struct rb_root *root;
++	struct rb_node *node;
++
++	root = &uidtree;
++	spin_lock(&siduidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&siduidlock);
++
++	root = &gidtree;
++	spin_lock(&sidgidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&sidgidlock);
++}
+ 
+ int match_sid(struct cifs_sid *ctsid)
+ {
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 30fc505..665bf1d 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1040,11 +1040,16 @@ init_cifs(void)
+ 	rc = register_key_type(&cifs_spnego_key_type);
+ 	if (rc)
+ 		goto out_unregister_filesystem;
++	rc = init_cifs_idmap();
++	if (rc)
++		goto out_unregister_keytype;
+ #endif
+ 
+ 	return 0;
+ 
+ #ifdef CONFIG_CIFS_UPCALL
++out_unregister_keytype:
++	unregister_key_type(&cifs_spnego_key_type);
+ out_unregister_filesystem:
+ 	unregister_filesystem(&cifs_fs_type);
+ #endif
+@@ -1071,6 +1076,8 @@ exit_cifs(void)
+ 	cifs_dfs_release_automount_timer();
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
++	cifs_destroy_idmaptrees();
++	exit_cifs_idmap();
+ 	unregister_key_type(&cifs_spnego_key_type);
+ #endif
+ 	unregister_filesystem(&cifs_fs_type);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 108a1e9..76b4517 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -833,6 +833,11 @@ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
+ /* reconnect after this many failed echo attempts */
+ GLOBAL_EXTERN unsigned short echo_retries;
+ 
++GLOBAL_EXTERN struct rb_root uidtree;
++GLOBAL_EXTERN struct rb_root gidtree;
++GLOBAL_EXTERN spinlock_t siduidlock;
++GLOBAL_EXTERN spinlock_t sidgidlock;
++
+ void cifs_oplock_break(struct work_struct *work);
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
+ void cifs_oplock_break_put(struct cifsFileInfo *cfile);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index da7a492..b5ad2cf 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -53,6 +53,9 @@ do {								\
+ 	cFYI(1, "CIFS VFS: leaving %s (xid = %d) rc = %d",	\
+ 	     __func__, curr_xid, (int)rc);			\
+ } while (0)
++extern int init_cifs_idmap(void);
++extern void exit_cifs_idmap(void);
++extern void cifs_destroy_idmaptrees(void);
+ extern char *build_path_from_dentry(struct dentry *);
+ extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
+ 					struct cifsTconInfo *tcon);
+-- 
+1.6.0.2
