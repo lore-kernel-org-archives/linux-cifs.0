@@ -1,7 +1,7 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Subject: Re: [PATCH 2/2] CIFS: Simplify invalidate part (try #2)
-Date: Fri, 22 Apr 2011 13:13:04 -0500
-Message-ID: <BANLkTimR5QMfqui8VAahqSNNWnWWVbohDw@mail.gmail.com>
+Date: Fri, 22 Apr 2011 23:02:00 +0400
+Message-ID: <BANLkTimshAUzTSE0UE9xR5b4sZihdCrdYQ@mail.gmail.com>
 References: <1302635430-3575-1-git-send-email-piastry@etersoft.ru>
 	<BANLkTi=7eNfZXZPWYoPYY1CWsKqwvXkKNA@mail.gmail.com>
 	<BANLkTikfXi9U2A88S1_h8kXfyNhJcs9rzw@mail.gmail.com>
@@ -14,8 +14,7 @@ References: <1302635430-3575-1-git-send-email-piastry@etersoft.ru>
 	<20110422125906.622a281b@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
 	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -25,96 +24,15 @@ In-Reply-To: <20110422125906.622a281b-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gm
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Apr 22, 2011 at 11:59 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrot=
-e:
-> On Fri, 22 Apr 2011 11:28:28 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Fri, Apr 22, 2011 at 10:07 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> w=
-rote:
->> > On Fri, 22 Apr 2011 09:54:10 -0500
->> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >
->> >> On Fri, Apr 22, 2011 at 9:10 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>=
- wrote:
->> >> > On Fri, 22 Apr 2011 09:02:18 -0500
->> >> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >> >
->> >> >> On Fri, Apr 22, 2011 at 6:50 AM, Jeff Layton <jlayton@redhat.c=
-om> wrote:
->> >> >> > On Fri, 22 Apr 2011 12:09:20 +0400
->> >> >> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->> >> >> >
->> >> >> >> After conversation with Steve, we decided to drop
->> >> >> >> filemap_write_and_wait from getattr, because we already do =
-it in
->> >> >> >> cifs_file_aio_write. I also think that we should drop it fr=
-om
->> >> >> >> cifs_llseek in this case too. I will repost this patch late=
-r (launder
->> >> >> >> page operation patch was merged earlier).
->> >> >> >>
->> >> >> >
->> >> >> > I wasn't privy to this discussion, but that makes no sense t=
-o me. Just
->> >> >> > because we initiated writeout in cifs_file_aio_write, does n=
-ot mean
->> >> >> > that it's complete. If it's not complete then the size retur=
-ned by the
->> >> >> > server may be bogus.
->> >> >>
->> >> >> What would a local file system do in the case when a write is
->> >> >> racing with a getattr? =A0In the case of cifs, when we issue
->> >> >> a write, and don't have oplock, we immediately send the
->> >> >> write on the network - but AFAIK posix provides no guarantees
->> >> >> about ordering if they are issued at the same time.
->> >> >>
->> >> >
->> >> > It's not a problem for a local filesystem as there's only one s=
-et of
->> >> > metadata to deal with. Even if the writes aren't synced out to =
-disk,
->> >> > you still know how big the file is.
->> >> >
->> >> > With a client/server setup like cifs or nfs, you have to deal w=
-ith two,
->> >> > and when there are buffered writes then there will be discrepan=
-cies.
->> >> > The simplest way to deal with discrepancies there is to make su=
-re
->> >> > that there aren't any by flushing out any buffered writes befor=
-e
->> >> > fetching the attributes.
->> >>
->> >> it may sound simpler but doesn't prevent a write racing in just
->> >> before we send the QueryFileInfo on the wire, and it does
->> >> hurt performance to redundantly invoke filemap_fdatawrite.
->> >>
->> >
->> > IIUC, POSIX says that the st_size must reflect the results of all
->> > writes done up to the point that the stat() call was issued. If so=
-me
->> > race in after the fact, then that's generally ok, but we don't wan=
-t a
->> > situation where someone issues a ton of writes and then the stat()=
- call
->> > doesn't reflect the result of them.
->>
->> aio_write doesn't return until filemap_fdatawrite completes and it
->> calls cifs_writepages which is synchronous - so the st_size
->> on the server will be uptodate if the write has completed.
->>
->
+2011/4/22 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
 > Used to be synchronous. One of the goals of the async write patchset
 > I'm working on is to change that.
 
-in that case, I don't mind doing the extra fdatawriteandwait before we
-send the queryfileinfo to the server, but why not limit the performance
-overhead so we only do it when the write would update the filesize
-(also have to be careful not to do this when the file is oplocked)
+In this case, what do you think about to call filemap_fdatawait before
+update attributes in gettattr and llseek? It seems that it makes us
+sure that all dirty pages are written and we can get right file
+attributes from the server.
 
-
---=20
-Thanks,
-
-Steve
+-- 
+Best regards,
+Pavel Shilovsky.
