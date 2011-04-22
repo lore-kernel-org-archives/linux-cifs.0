@@ -1,292 +1,197 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Simplify invalidate part (try #4)
-Date: Fri, 22 Apr 2011 12:11:14 +0400
-Message-ID: <1303459874-5184-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: mids and cifs sendrcv2
+Date: Fri, 22 Apr 2011 14:26:11 +0400
+Message-ID: <BANLkTim4u+Kp90xfJAqB9BXVcQmK6Es=VA@mail.gmail.com>
+References: <BANLkTi=tUrieqB4jCo0GRX3Np10JxJUP9Q@mail.gmail.com>
+	<BANLkTikLfy=4BPESJEmOe+mBhKSRtC=W6A@mail.gmail.com>
+	<BANLkTiknBBtzjEjXK5N=SpUaU=b4GAos_A@mail.gmail.com>
+	<20110415112123.0a3c2996@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110415112123.0a3c2996-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Simplify many places when we call cifs_revalidate/invalidate to make
-it does what it exactly needs.
+2011/4/15 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Fri, 15 Apr 2011 08:38:59 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Fri, Apr 15, 2011 at 5:45 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8@public.gmane.org=
+m> wrote:
+>> > 2011/4/8 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> >> Update on cifs vs. smb2 mids, and the smb2 sendrcv2. =A0 Jeff had
+>> >> suggested more closely matching the cifs and smb2 mids, in partic=
+ular
+>> >> extending the 16 bit cifs mid (multiplex identifier for inflight
+>> >> network requests) to the 64 bit size needed for smb2 (and thus ma=
+sking
+>> >> the mid when used for cifs) and having cifs ignore the various sm=
+b2
+>> >> unique fields in the mid (which makes the mid larger for cifs).
+>> >> Since the smb2 code in cifs-2.6.git (put in February and early Ma=
+rch)
+>> >> has now been rereviewed, the next step in the smb2 merge is posti=
+ng
+>> >> and reviewing the transport routine for smb2 (smb2_sendrcv2 or re=
+using
+>> >> cifs_sendrcv2) - the latter may make more sense if we go to a com=
+mon
+>> >> mid for cifs and smb2. =A0 At the fs summit, Jeff and Jeremy and =
+I
+>> >> talked about this, but Pavel and others may have opinions on this
+>> >> topic. =A0 As soon as the cifs merge activity settles down for 2.=
+6.39, I
+>> >> plan to post sendrcv2 alternatives and then begin work with Pavel=
+ on
+>> >> the superblock, file and inode routines and seeing whether for sm=
+b2
+>> >> they should be smb2 unique (as we originally expected since smb2 =
+is
+>> >> handle based, and simpler) and look more like they did in the smb=
+2.ko
+>> >> work that Pavel did last summer or should be more common with the=
+ cifs
+>> >> routines.
+>> >>
+>> >> --
+>> >> Thanks,
+>> >>
+>> >> Steve
+>> >> --
+>> >> To unsubscribe from this list: send the line "unsubscribe linux-c=
+ifs" in
+>> >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> >> More majordomo info at =A0http://vger.kernel.org/majordomo-info.h=
+tml
+>> >>
+>> >
+>> > I suggest to make cifs and smb2 protocol mid structures use common
+>> > structure that has equals fields for both and then expand this
+>> > structure for protocol-dependent things.
+>> >
+>> > It can look like this:
+>> >
+>> > /* one of these for every pending CIFS request to the server */
+>> > struct mid_q_entry {
+>> > =A0 =A0 =A0 =A0__u8 protocol_id;
+>> > =A0 =A0 =A0 =A0struct list_head qhead; /* mids waiting on reply fr=
+om this server */
+>> > =A0 =A0 =A0 =A0int midState; =A0 /* wish this were enum but can no=
+t pass to wait_event */
+>> > =A0 =A0 =A0 =A0unsigned long when_alloc; =A0/* when mid was create=
+d */
+>> > #ifdef CONFIG_CIFS_STATS2
+>> > =A0 =A0 =A0 =A0unsigned long when_sent; /* time when smb send fini=
+shed */
+>> > =A0 =A0 =A0 =A0unsigned long when_received; /* when demux complete=
+ (taken off wire) */
+>> > #endif
+>> > =A0 =A0 =A0 =A0bool largeBuf:1; =A0 =A0 =A0 =A0/* if valid respons=
+e, is pointer to large buf */
+>> > =A0 =A0 =A0 =A0void *resp_buf; =A0 =A0 =A0 =A0 /* response buffer =
+*/
+>> > =A0 =A0 =A0 =A0mid_callback_t *callback; /* call completion callba=
+ck */
+>> > =A0 =A0 =A0 =A0void *callback_data; =A0 =A0 =A0/* general purpose =
+pointer for callback */
+>> > };
+>> >
+>> > struct cifs_mid_q_entry {
+>> > =A0 =A0 =A0 =A0struct mid_q_entry mid_q;
+>> > =A0 =A0 =A0 =A0__u16 mid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* multiplex =
+id */
+>> > =A0 =A0 =A0 =A0__u32 sequence_number; =A0/* for CIFS signing */
+>> > =A0 =A0 =A0 =A0__u8 command; =A0 =A0 =A0 =A0 =A0 /* smb command co=
+de */
+>> > =A0 =A0 =A0 =A0__u16 pid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* process id=
+ */
+>> > =A0 =A0 =A0 =A0bool multiRsp:1; =A0 =A0 =A0 =A0/* multiple trans2 =
+responses for one request =A0*/
+>> > =A0 =A0 =A0 =A0bool multiEnd:1; =A0 =A0 =A0 =A0/* both received */
+>> > };
+>> >
+>> > struct smb2_mid_q_entry {
+>> > =A0 =A0 =A0 =A0struct mid_q_entry mid_q;
+>> > =A0 =A0 =A0 =A0__u64 mid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* multiplex =
+id(s), bigger for smb2 */
+>> > =A0 =A0 =A0 =A0__le16 command; =A0 =A0 =A0 =A0 /* smb2 command cod=
+e */
+>> > =A0 =A0 =A0 =A0__u32 pid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* process id=
+ - bigger for smb2 than cifs */
+>> > };
+>>
+>> I think nested mid structures (around a base of common mid fields)
+>> like the above is going to be the easiest way to handle the differen=
+ces.
+>>
+>> I don't understand your PROTOCOL_ID #define though - we
+>> identify smb2 vs. cifs via a bool in the tcp server info struct,
+>> and presumably if we don't have access to the tcp server
+>> info struct we would have to add a field in the base mid
+>> (struct mid_q_entry) that indicates smb2 vs. cifs..
+>>
+>
+> Why do even that? Why not a common mid struct that's simply a little =
+larger? Sure it means slightly more memory consumption, but we never ha=
+ve that many in flight. Something like:
+>
+> struct mid_q_entry {
+> =A0 =A0 =A0 =A0__u8 protocol_id;
+> =A0 =A0 =A0 =A0struct list_head qhead; /* mids waiting on reply from =
+this server */
+> =A0 =A0 =A0 =A0int midState; =A0 /* wish this were enum but can not p=
+ass to wait_event */
+> =A0 =A0 =A0 =A0unsigned long when_alloc; =A0/* when mid was created *=
+/
+> #ifdef CONFIG_CIFS_STATS2
+> =A0 =A0 =A0 =A0unsigned long when_sent; /* time when smb send finishe=
+d */
+> =A0 =A0 =A0 =A0unsigned long when_received; /* when demux complete (t=
+aken off wire) */
+> #endif
+> =A0 =A0 =A0 =A0bool largeBuf:1; =A0 =A0 =A0 =A0/* if valid response, =
+is pointer to large buf */
+> =A0 =A0 =A0 =A0void *resp_buf; =A0 =A0 =A0 =A0 /* response buffer */
+> =A0 =A0 =A0 =A0mid_callback_t *callback; /* call completion callback =
+*/
+> =A0 =A0 =A0 =A0void *callback_data; =A0 =A0 =A0/* general purpose poi=
+nter for callback */
+> =A0 =A0 =A0 =A0__u64 mid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* multiplex id =
+*/
+> =A0 =A0 =A0 =A0__le16 command; =A0 =A0 =A0 =A0 /* command code */
+> =A0 =A0 =A0 =A0__u32 pid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* process id */
+> =A0 =A0 =A0 =A0__u32 sequence_number; =A0/* for CIFS signing */
+> =A0 =A0 =A0 =A0bool multiRsp:1; =A0 =A0 =A0 =A0/* multiple trans2 res=
+ponses for one request =A0*/
+> =A0 =A0 =A0 =A0bool multiEnd:1; =A0 =A0 =A0 =A0/* both received */
+> };
+>
+> Using different structs here means that you need an entirely differen=
+t
+> set of code to deal with them. IMO, the memory savings (if any) isn't
+> worth the duplicate code that'll be necessary.
+>
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/cifsfs.c |   23 +++++++-----
- fs/cifs/cifsfs.h |    4 ++-
- fs/cifs/file.c   |   16 ++++++--
- fs/cifs/inode.c  |  105 ++++++++++++++++++++++++++++++++---------------------
- 4 files changed, 91 insertions(+), 57 deletions(-)
+When we need to work only with common field we can always assign it to
+a common mid_q_entry pointer and work with it. But when we need to
+work with protocol dependent fields we will do check like (in both
+variants - yours and mine)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 30fc505..1f26727 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -618,16 +618,19 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
- {
- 	/* origin == SEEK_END => we must revalidate the cached file length */
- 	if (origin == SEEK_END) {
--		int retval;
--
--		/* some applications poll for the file length in this strange
--		   way so we must seek to end on non-oplocked files by
--		   setting the revalidate time to zero */
--		CIFS_I(file->f_path.dentry->d_inode)->time = 0;
--
--		retval = cifs_revalidate_file(file);
--		if (retval < 0)
--			return (loff_t)retval;
-+		int rc;
-+		struct inode *inode = file->f_path.dentry->d_inode;
-+
-+		/*
-+		 * Some applications poll for the file length in this strange
-+		 * way so we must seek to end on non-oplocked files by
-+		 * setting the revalidate time to zero.
-+		 */
-+		CIFS_I(inode)->time = 0;
-+
-+		rc = cifs_revalidate_file_attr(file);
-+		if (rc < 0)
-+			return (loff_t)rc;
- 	}
- 	return generic_file_llseek_unlocked(file, offset, origin);
- }
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index 371d021..e005dfd 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -59,9 +59,11 @@ extern int cifs_mkdir(struct inode *, struct dentry *, int);
- extern int cifs_rmdir(struct inode *, struct dentry *);
- extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
- 		       struct dentry *);
-+extern int cifs_revalidate_file_attr(struct file *filp);
-+extern int cifs_revalidate_dentry_attr(struct dentry *);
- extern int cifs_revalidate_file(struct file *filp);
- extern int cifs_revalidate_dentry(struct dentry *);
--extern void cifs_invalidate_mapping(struct inode *inode);
-+extern int cifs_invalidate_mapping(struct inode *inode);
- extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
- extern int cifs_setattr(struct dentry *, struct iattr *);
- 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 00b466e..3bb68c4 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1534,8 +1534,13 @@ int cifs_strict_fsync(struct file *file, int datasync)
- 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
- 		file->f_path.dentry->d_name.name, datasync);
- 
--	if (!CIFS_I(inode)->clientCanCacheRead)
--		cifs_invalidate_mapping(inode);
-+	if (!CIFS_I(inode)->clientCanCacheRead) {
-+		rc = cifs_invalidate_mapping(inode);
-+		if (rc) {
-+			cFYI(1, "rc: %d during invalidate phase", rc);
-+			rc = 0; /* don't care about it in fsync */
-+		}
-+	}
- 
- 	tcon = tlink_tcon(smbfile->tlink);
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
-@@ -2002,8 +2007,11 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
- 
- 	xid = GetXid();
- 
--	if (!CIFS_I(inode)->clientCanCacheRead)
--		cifs_invalidate_mapping(inode);
-+	if (!CIFS_I(inode)->clientCanCacheRead) {
-+		rc = cifs_invalidate_mapping(inode);
-+		if (rc)
-+			return rc;
-+	}
- 
- 	rc = generic_file_mmap(file, vma);
- 	if (rc == 0)
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index fbe7d58..68ee2f1 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1683,18 +1683,15 @@ cifs_inode_needs_reval(struct inode *inode)
- /*
-  * Zap the cache. Called when invalid_mapping flag is set.
-  */
--void
-+int
- cifs_invalidate_mapping(struct inode *inode)
- {
--	int rc;
-+	int rc = 0;
- 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
- 
- 	cifs_i->invalid_mapping = false;
- 
- 	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
--		/* write back any cached data */
--		rc = filemap_write_and_wait(inode->i_mapping);
--		mapping_set_error(inode->i_mapping, rc);
- 		rc = invalidate_inode_pages2(inode->i_mapping);
- 		if (rc) {
- 			cERROR(1, "%s: could not invalidate inode %p", __func__,
-@@ -1704,56 +1701,52 @@ cifs_invalidate_mapping(struct inode *inode)
- 	}
- 
- 	cifs_fscache_reset_inode_cookie(inode);
-+	return rc;
- }
- 
--int cifs_revalidate_file(struct file *filp)
-+int cifs_revalidate_file_attr(struct file *filp)
- {
- 	int rc = 0;
- 	struct inode *inode = filp->f_path.dentry->d_inode;
- 	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
- 
- 	if (!cifs_inode_needs_reval(inode))
--		goto check_inval;
-+		return rc;
- 
- 	if (tlink_tcon(cfile->tlink)->unix_ext)
- 		rc = cifs_get_file_info_unix(filp);
- 	else
- 		rc = cifs_get_file_info(filp);
- 
--check_inval:
--	if (CIFS_I(inode)->invalid_mapping)
--		cifs_invalidate_mapping(inode);
--
- 	return rc;
- }
- 
--/* revalidate a dentry's inode attributes */
--int cifs_revalidate_dentry(struct dentry *dentry)
-+int cifs_revalidate_dentry_attr(struct dentry *dentry)
- {
- 	int xid;
- 	int rc = 0;
--	char *full_path = NULL;
- 	struct inode *inode = dentry->d_inode;
- 	struct super_block *sb = dentry->d_sb;
-+	char *full_path = NULL;
- 
- 	if (inode == NULL)
- 		return -ENOENT;
- 
--	xid = GetXid();
--
- 	if (!cifs_inode_needs_reval(inode))
--		goto check_inval;
-+		return rc;
-+
-+	xid = GetXid();
- 
- 	/* can not safely grab the rename sem here if rename calls revalidate
- 	   since that would deadlock */
- 	full_path = build_path_from_dentry(dentry);
- 	if (full_path == NULL) {
- 		rc = -ENOMEM;
--		goto check_inval;
-+		goto out;
- 	}
- 
--	cFYI(1, "Revalidate: %s inode 0x%p count %d dentry: 0x%p d_time %ld "
--		 "jiffies %ld", full_path, inode, inode->i_count.counter,
-+	cFYI(1, "Update attributes: %s inode 0x%p count %d dentry: 0x%p d_time "
-+		 "%ld jiffies %ld", full_path, inode, inode->i_count.counter,
- 		 dentry, dentry->d_time, jiffies);
- 
- 	if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
-@@ -1762,41 +1755,69 @@ int cifs_revalidate_dentry(struct dentry *dentry)
- 		rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
- 					 xid, NULL);
- 
--check_inval:
--	if (CIFS_I(inode)->invalid_mapping)
--		cifs_invalidate_mapping(inode);
--
-+out:
- 	kfree(full_path);
- 	FreeXid(xid);
- 	return rc;
- }
- 
-+int cifs_revalidate_file(struct file *filp)
-+{
-+	int rc;
-+	struct inode *inode = filp->f_path.dentry->d_inode;
-+
-+	rc = cifs_revalidate_file_attr(filp);
-+	if (rc)
-+		return rc;
-+
-+	if (CIFS_I(inode)->invalid_mapping)
-+		rc = cifs_invalidate_mapping(inode);
-+	return rc;
-+}
-+
-+/* revalidate a dentry's inode attributes */
-+int cifs_revalidate_dentry(struct dentry *dentry)
-+{
-+	int rc;
-+	struct inode *inode = dentry->d_inode;
-+
-+	rc = cifs_revalidate_dentry_attr(dentry);
-+	if (rc)
-+		return rc;
-+
-+	if (CIFS_I(inode)->invalid_mapping)
-+		rc = cifs_invalidate_mapping(inode);
-+	return rc;
-+}
-+
- int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
- 		 struct kstat *stat)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
- 	struct cifsTconInfo *tcon = cifs_sb_master_tcon(cifs_sb);
--	int err = cifs_revalidate_dentry(dentry);
-+	int rc;
-+
-+	rc = cifs_revalidate_dentry_attr(dentry);
-+	if (rc)
-+		return rc;
- 
--	if (!err) {
--		generic_fillattr(dentry->d_inode, stat);
--		stat->blksize = CIFS_MAX_MSGSIZE;
--		stat->ino = CIFS_I(dentry->d_inode)->uniqueid;
-+	generic_fillattr(dentry->d_inode, stat);
-+	stat->blksize = CIFS_MAX_MSGSIZE;
-+	stat->ino = CIFS_I(dentry->d_inode)->uniqueid;
- 
--		/*
--		 * If on a multiuser mount without unix extensions, and the
--		 * admin hasn't overridden them, set the ownership to the
--		 * fsuid/fsgid of the current process.
--		 */
--		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
--		    !tcon->unix_ext) {
--			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
--				stat->uid = current_fsuid();
--			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
--				stat->gid = current_fsgid();
--		}
-+	/*
-+	 * If on a multiuser mount without unix extensions, and the admin hasn't
-+	 * overridden them, set the ownership to the fsuid/fsgid of the current
-+	 * process.
-+	 */
-+	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
-+	    !tcon->unix_ext) {
-+		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
-+			stat->uid = current_fsuid();
-+		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
-+			stat->gid = current_fsgid();
- 	}
--	return err;
-+	return rc;
- }
- 
- static int cifs_truncate_page(struct address_space *mapping, loff_t from)
--- 
-1.7.1
+if (protocol =3D=3D SMB2)
+    smb2_func
+else
+    cifs_func
+
+So, we don't need entirely different set of code. We will have common
+routines as well as cifs and smb2 specific ones. It seems that you
+suggest the same - I understand so. Please, sorry me, if I am
+mistaken.
+
+--=20
+Best regards,
+Pavel Shilovsky.
