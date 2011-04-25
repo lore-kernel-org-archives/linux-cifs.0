@@ -1,538 +1,325 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: Invoke id mapping functions (try #17 repost)
-Date: Mon, 25 Apr 2011 07:08:43 -0400
-Message-ID: <20110425070843.2ba5cad3@corrin.poochiereds.net>
-References: <1303492176-11679-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Simplify invalidate part (try #5)
+Date: Mon, 25 Apr 2011 07:23:53 -0400
+Message-ID: <20110425072353.760bc976@corrin.poochiereds.net>
+References: <1303565417-3653-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1303492176-11679-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1303565417-3653-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 22 Apr 2011 12:09:36 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Sat, 23 Apr 2011 17:30:17 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Simplify many places when we call cifs_revalidate/invalidate to make
+> it do what it exactly needs.
 > 
-> rb tree search and insertion routines.
-> 
-> A SID which needs to be mapped, is looked up in one of the rb trees
-> depending on whether SID is either owner or group SID.
-> If found in the tree, a (mapped) id from that node is assigned to
-> uid or gid as appropriate.  If unmapped, an upcall is attempted to
-> map the SID to an id.  If upcall is successful, node is marked as
-> mapped.  If upcall fails, node stays marked as unmapped and a mapping
-> is attempted again only after an arbitrary time period has passed.
-> 
-> To map a SID, which can be either a Owner SID or a Group SID, key
-> description starts with the string "os" or "gs" followed by SID converted
-> to a string. Without "os" or "gs", cifs.upcall does not know whether
-> SID needs to be mapped to either an uid or a gid.
-> 
-> Nodes in rb tree have fields to prevent multiple upcalls for
-> a SID.  Searching, adding, and removing nodes is done within global locks.
-> Whenever a node is either found or inserted in a tree, a reference
-> is taken on that node.
-> Shrinker routine prunes a node if it has expired but does not prune
-> an expired node if its refcount is not zero (i.e. sid/id of that node
-> is_being/will_be accessed).
-> Thus a node, if its SID needs to be mapped by making an upcall,
-> can safely stay and its fields accessed without shrinker pruning it.
-> A reference (refcount) is put on the node without holding the spinlock
-> but a reference is get on the node by holding the spinlock.
-> 
-> Every time an existing mapped node is accessed or mapping is attempted,
-> its timestamp is updated to prevent it from getting erased or a
-> to prevent multiple unnecessary repeat mapping retries respectively.
-> 
-> For now, cifs.upcall is only used to map a SID to an id (uid or gid) but
-> it would be used to obtain an SID for an id.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/cifsacl.c |  325 +++++++++++++++++++++++++++++++++++++++++++++++++----
->  fs/cifs/cifsacl.h |   24 ++++
->  2 files changed, 325 insertions(+), 24 deletions(-)
+>  fs/cifs/cifsfs.c |   33 +++++++++++-----
+>  fs/cifs/cifsfs.h |    4 +-
+>  fs/cifs/file.c   |   16 ++++++--
+>  fs/cifs/inode.c  |  117 ++++++++++++++++++++++++++++++++++-------------------
+>  4 files changed, 113 insertions(+), 57 deletions(-)
 > 
-> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> index 061fc3a..a4aa0f0 100644
-> --- a/fs/cifs/cifsacl.c
-> +++ b/fs/cifs/cifsacl.c
-> @@ -54,7 +54,33 @@ static const struct cifs_sid sid_authusers = {
->  /* group users */
->  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
->  
-> -static const struct cred *root_cred;
-> +const struct cred *root_cred;
-> +
-> +static void
-> +shrink_idmap_tree(struct rb_root *root, int nr_to_scan, int *nr_rem,
-> +			int *nr_del)
-> +{
-> +	struct rb_node *node;
-> +	struct rb_node *tmp;
-> +	struct cifs_sid_id *psidid;
-> +
-> +	node = rb_first(root);
-> +	while (node) {
-> +		tmp = node;
-> +		node = rb_next(tmp);
-> +		psidid = rb_entry(tmp, struct cifs_sid_id, rbnode);
-> +		if (nr_to_scan == 0 || *nr_del == nr_to_scan)
-> +			++(*nr_rem);
-> +		else {
-> +			if (time_after(jiffies, psidid->time + SID_MAP_EXPIRE)
-> +						&& psidid->refcount == 0) {
-> +				rb_erase(tmp, root);
-> +				++(*nr_del);
-> +			} else
-> +				++(*nr_rem);
-> +		}
-> +	}
-> +}
->  
->  /*
->   * Run idmap cache shrinker.
-> @@ -62,9 +88,21 @@ static const struct cred *root_cred;
->  static int
->  cifs_idmap_shrinker(struct shrinker *shrink, int nr_to_scan, gfp_t gfp_mask)
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 30fc505..e4185ae 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -618,16 +618,29 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
 >  {
-> -	/* Use a pruning scheme in a subsequent patch instead */
-> -	cifs_destroy_idmaptrees();
-> -	return 0;
-> +	int nr_del = 0;
-> +	int nr_rem = 0;
-> +	struct rb_root *root;
+>  	/* origin == SEEK_END => we must revalidate the cached file length */
+>  	if (origin == SEEK_END) {
+> -		int retval;
+> -
+> -		/* some applications poll for the file length in this strange
+> -		   way so we must seek to end on non-oplocked files by
+> -		   setting the revalidate time to zero */
+> -		CIFS_I(file->f_path.dentry->d_inode)->time = 0;
+> -
+> -		retval = cifs_revalidate_file(file);
+> -		if (retval < 0)
+> -			return (loff_t)retval;
+> +		int rc;
+> +		struct inode *inode = file->f_path.dentry->d_inode;
 > +
-> +	root = &uidtree;
-> +	spin_lock(&siduidlock);
-> +	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
-> +	spin_unlock(&siduidlock);
-> +
-> +	root = &gidtree;
-> +	spin_lock(&sidgidlock);
-> +	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
-> +	spin_unlock(&sidgidlock);
-> +
-> +	return nr_rem;
->  }
->  
->  static struct shrinker cifs_shrinker = {
-> @@ -92,7 +130,6 @@ cifs_idmap_key_destroy(struct key *key)
->  	kfree(key->payload.data);
->  }
->  
-> -static
->  struct key_type cifs_idmap_key_type = {
->  	.name        = "cifs.cifs_idmap",
->  	.instantiate = cifs_idmap_key_instantiate,
-> @@ -101,6 +138,220 @@ struct key_type cifs_idmap_key_type = {
->  	.match       = user_match,
->  };
->  
-> +static void
-> +sid_to_str(struct cifs_sid *sidptr, char *sidstr)
-> +{
-> +	int i;
-> +	unsigned long saval;
-> +	char *strptr;
-> +
-> +	strptr = sidstr;
-> +
-> +	sprintf(strptr, "%s", "S");
-> +	strptr = sidstr + strlen(sidstr);
-> +
-> +	sprintf(strptr, "-%d", sidptr->revision);
-> +	strptr = sidstr + strlen(sidstr);
-> +
-> +	for (i = 0; i < 6; ++i) {
-> +		if (sidptr->authority[i]) {
-> +			sprintf(strptr, "-%d", sidptr->authority[i]);
-> +			strptr = sidstr + strlen(sidstr);
-> +		}
-> +	}
-> +
-> +	for (i = 0; i < sidptr->num_subauth; ++i) {
-> +		saval = le32_to_cpu(sidptr->sub_auth[i]);
-> +		sprintf(strptr, "-%ld", saval);
-> +		strptr = sidstr + strlen(sidstr);
-> +	}
-> +}
-> +
-> +static void
-> +id_rb_insert(struct rb_root *root, struct cifs_sid *sidptr,
-> +		struct cifs_sid_id **psidid, char *typestr)
-> +{
-> +	int rc;
-> +	char *strptr;
-> +	struct rb_node *node = root->rb_node;
-> +	struct rb_node *parent = NULL;
-> +	struct rb_node **linkto = &(root->rb_node);
-> +	struct cifs_sid_id *lsidid;
-> +
-> +	while (node) {
-> +		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
-> +		parent = node;
-> +		rc = compare_sids(sidptr, &((lsidid)->sid));
-> +		if (rc > 0) {
-> +			linkto = &(node->rb_left);
-> +			node = node->rb_left;
-> +		} else if (rc < 0) {
-> +			linkto = &(node->rb_right);
-> +			node = node->rb_right;
-> +		}
-> +	}
-> +
-> +	memcpy(&(*psidid)->sid, sidptr, sizeof(struct cifs_sid));
-> +	(*psidid)->time = jiffies - (SID_MAP_RETRY + 1);
-> +	(*psidid)->refcount = 0;
-> +
-> +	sprintf((*psidid)->sidstr, "%s", typestr);
-> +	strptr = (*psidid)->sidstr + strlen((*psidid)->sidstr);
-> +	sid_to_str(&(*psidid)->sid, strptr);
-> +
-> +	clear_bit(SID_ID_PENDING, &(*psidid)->state);
-> +	clear_bit(SID_ID_MAPPED, &(*psidid)->state);
-> +
-> +	rb_link_node(&(*psidid)->rbnode, parent, linkto);
-> +	rb_insert_color(&(*psidid)->rbnode, root);
-> +}
-> +
-> +static struct cifs_sid_id *
-> +id_rb_search(struct rb_root *root, struct cifs_sid *sidptr)
-> +{
-> +	int rc;
-> +	struct rb_node *node = root->rb_node;
-> +	struct rb_node *parent = NULL;
-> +	struct rb_node **linkto = &(root->rb_node);
-> +	struct cifs_sid_id *lsidid;
-> +
-> +	while (node) {
-> +		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
-> +		parent = node;
-> +		rc = compare_sids(sidptr, &((lsidid)->sid));
-> +		if (rc > 0) {
-> +			linkto = &(node->rb_left);
-> +			node = node->rb_left;
-> +		} else if (rc < 0) {
-> +			linkto = &(node->rb_right);
-> +			node = node->rb_right;
-> +		} else /* node found */
-> +			return lsidid;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +static int
-> +sidid_pending_wait(void *unused)
-> +{
-> +	schedule();
-> +	return signal_pending(current) ? -ERESTARTSYS : 0;
-> +}
-> +
-> +static int
-> +sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
-> +		struct cifs_fattr *fattr, uint sidtype)
-> +{
-> +	int rc;
-> +	unsigned long cid;
-> +	struct key *idkey;
-> +	const struct cred *saved_cred;
-> +	struct cifs_sid_id *psidid, *npsidid;
-> +	struct rb_root *cidtree;
-> +	spinlock_t *cidlock;
-> +
-> +	if (sidtype == SIDOWNER) {
-> +		cid = cifs_sb->mnt_uid; /* default uid, in case upcall fails */
-> +		cidlock = &siduidlock;
-> +		cidtree = &uidtree;
-> +	} else if (sidtype == SIDGROUP) {
-> +		cid = cifs_sb->mnt_gid; /* default gid, in case upcall fails */
-> +		cidlock = &sidgidlock;
-> +		cidtree = &gidtree;
-> +	} else
-> +		return -ENOENT;
-> +
-> +	spin_lock(cidlock);
-> +	psidid = id_rb_search(cidtree, psid);
-> +
-> +	if (!psidid) { /* node does not exist, allocate one & attempt adding */
-> +		spin_unlock(cidlock);
-> +		npsidid = kzalloc(sizeof(struct cifs_sid_id), GFP_KERNEL);
-> +		if (!npsidid)
-> +			return -ENOMEM;
-> +
-> +		npsidid->sidstr = kmalloc(SIDLEN, GFP_KERNEL);
-> +		if (!npsidid->sidstr) {
-> +			kfree(npsidid);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		spin_lock(cidlock);
-> +		psidid = id_rb_search(cidtree, psid);
-> +		if (psidid) { /* node happened to get inserted meanwhile */
-> +			++psidid->refcount;
-> +			spin_unlock(cidlock);
-> +			kfree(npsidid->sidstr);
-> +			kfree(npsidid);
-> +		} else {
-> +			psidid = npsidid;
-> +			id_rb_insert(cidtree, psid, &psidid,
-> +					sidtype == SIDOWNER ? "os:" : "gs:");
-> +			++psidid->refcount;
-> +			spin_unlock(cidlock);
-> +		}
-> +	} else {
-> +		++psidid->refcount;
-> +		spin_unlock(cidlock);
-> +	}
-> +
-> +	/*
-> +	 * If we are here, it is safe to access psidid and its fields
-> +	 * since a reference was taken earlier while holding the spinlock.
-> +	 * A reference on the node is put without holding the spinlock
-> +	 * and it is OK to do so in this case, shrinker will not erase
-> +	 * this node until all references are put and we do not access
-> +	 * any fields of the node after a reference is put .
-> +	 */
-> +	if (test_bit(SID_ID_MAPPED, &psidid->state)) {
-> +		cid = psidid->id;
-> +		psidid->time = jiffies; /* update ts for accessing */
-> +		goto sid_to_id_out;
-> +	}
-> +
-> +	if (time_after(psidid->time + SID_MAP_RETRY, jiffies))
-> +		goto sid_to_id_out;
-> +
-> +	if (!test_and_set_bit(SID_ID_PENDING, &psidid->state)) {
-> +		saved_cred = override_creds(root_cred);
-> +		idkey = request_key(&cifs_idmap_key_type, psidid->sidstr, "");
-> +		if (IS_ERR(idkey))
-> +			cFYI(1, "%s: Can't map SID to an id", __func__);
-> +		else {
-> +			cid = *(unsigned long *)idkey->payload.value;
-> +			psidid->id = cid;
-> +			set_bit(SID_ID_MAPPED, &psidid->state);
-> +			key_put(idkey);
-> +			kfree(psidid->sidstr);
-> +		}
-> +		revert_creds(saved_cred);
-> +		psidid->time = jiffies; /* update ts for accessing */
-> +		clear_bit(SID_ID_PENDING, &psidid->state);
-> +		wake_up_bit(&psidid->state, SID_ID_PENDING);
-> +	} else {
-> +		rc = wait_on_bit(&psidid->state, SID_ID_PENDING,
-> +				sidid_pending_wait, TASK_INTERRUPTIBLE);
-> +		if (rc) {
-> +			cFYI(1, "%s: sidid_pending_wait interrupted %d",
-> +					__func__, rc);
-> +			--psidid->refcount; /* decremented without spinlock */
+> +		/*
+> +		 * We need to be sure that all dirty pages are written and the
+> +		 * server has the newest file length.
+> +		 */
+> +		if (!CIFS_I(inode)->clientCanCacheRead && inode->i_mapping &&
+> +		    inode->i_mapping->nrpages != 0) {
+> +			rc = filemap_fdatawait(inode->i_mapping);
+> +			mapping_set_error(inode->i_mapping, rc);
 > +			return rc;
 > +		}
-> +		if (test_bit(SID_ID_MAPPED, &psidid->state))
-> +			cid = psidid->id;
-> +	}
+> +		/*
+> +		 * Some applications poll for the file length in this strange
+> +		 * way so we must seek to end on non-oplocked files by
+> +		 * setting the revalidate time to zero.
+> +		 */
+> +		CIFS_I(inode)->time = 0;
 > +
-> +sid_to_id_out:
-> +	--psidid->refcount; /* decremented without spinlock */
-> +	if (sidtype == SIDOWNER)
-> +		fattr->cf_uid = cid;
-> +	else
-> +		fattr->cf_gid = cid;
-> +
-> +	return 0;
-> +}
-> +
->  int
->  init_cifs_idmap(void)
->  {
-> @@ -242,16 +493,24 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
->  	int num_subauth, num_sat, num_saw;
->  
->  	if ((!ctsid) || (!cwsid))
-> -		return 0;
-> +		return 1;
->  
->  	/* compare the revision */
-> -	if (ctsid->revision != cwsid->revision)
-> -		return 0;
-> +	if (ctsid->revision != cwsid->revision) {
-> +		if (ctsid->revision > cwsid->revision)
-> +			return 1;
-> +		else
-> +			return -1;
-> +	}
->  
->  	/* compare all of the six auth values */
->  	for (i = 0; i < 6; ++i) {
-> -		if (ctsid->authority[i] != cwsid->authority[i])
-> -			return 0;
-> +		if (ctsid->authority[i] != cwsid->authority[i]) {
-> +			if (ctsid->authority[i] > cwsid->authority[i])
-> +				return 1;
-> +			else
-> +				return -1;
-> +		}
+> +		rc = cifs_revalidate_file_attr(file);
+> +		if (rc < 0)
+> +			return (loff_t)rc;
 >  	}
->  
->  	/* compare all of the subauth values if any */
-> @@ -260,12 +519,16 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
->  	num_subauth = num_sat < num_saw ? num_sat : num_saw;
->  	if (num_subauth) {
->  		for (i = 0; i < num_subauth; ++i) {
-> -			if (ctsid->sub_auth[i] != cwsid->sub_auth[i])
-> -				return 0;
-> +			if (ctsid->sub_auth[i] != cwsid->sub_auth[i]) {
-> +				if (ctsid->sub_auth[i] > cwsid->sub_auth[i])
-> +					return 1;
-> +				else
-> +					return -1;
-> +			}
->  		}
->  	}
->  
-> -	return 1; /* sids compare/match */
-> +	return 0; /* sids compare/match */
+>  	return generic_file_llseek_unlocked(file, offset, origin);
 >  }
+> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+> index 371d021..e005dfd 100644
+> --- a/fs/cifs/cifsfs.h
+> +++ b/fs/cifs/cifsfs.h
+> @@ -59,9 +59,11 @@ extern int cifs_mkdir(struct inode *, struct dentry *, int);
+>  extern int cifs_rmdir(struct inode *, struct dentry *);
+>  extern int cifs_rename(struct inode *, struct dentry *, struct inode *,
+>  		       struct dentry *);
+> +extern int cifs_revalidate_file_attr(struct file *filp);
+> +extern int cifs_revalidate_dentry_attr(struct dentry *);
+>  extern int cifs_revalidate_file(struct file *filp);
+>  extern int cifs_revalidate_dentry(struct dentry *);
+> -extern void cifs_invalidate_mapping(struct inode *inode);
+> +extern int cifs_invalidate_mapping(struct inode *inode);
+>  extern int cifs_getattr(struct vfsmount *, struct dentry *, struct kstat *);
+>  extern int cifs_setattr(struct dentry *, struct iattr *);
 >  
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 00b466e..3bb68c4 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1534,8 +1534,13 @@ int cifs_strict_fsync(struct file *file, int datasync)
+>  	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+>  		file->f_path.dentry->d_name.name, datasync);
 >  
-> @@ -520,22 +783,22 @@ static void parse_dacl(struct cifs_acl *pdacl, char *end_of_acl,
->  #ifdef CONFIG_CIFS_DEBUG2
->  			dump_ace(ppace[i], end_of_acl);
->  #endif
-> -			if (compare_sids(&(ppace[i]->sid), pownersid))
-> +			if (compare_sids(&(ppace[i]->sid), pownersid) == 0)
->  				access_flags_to_mode(ppace[i]->access_req,
->  						     ppace[i]->type,
->  						     &fattr->cf_mode,
->  						     &user_mask);
-> -			if (compare_sids(&(ppace[i]->sid), pgrpsid))
-> +			if (compare_sids(&(ppace[i]->sid), pgrpsid) == 0)
->  				access_flags_to_mode(ppace[i]->access_req,
->  						     ppace[i]->type,
->  						     &fattr->cf_mode,
->  						     &group_mask);
-> -			if (compare_sids(&(ppace[i]->sid), &sid_everyone))
-> +			if (compare_sids(&(ppace[i]->sid), &sid_everyone) == 0)
->  				access_flags_to_mode(ppace[i]->access_req,
->  						     ppace[i]->type,
->  						     &fattr->cf_mode,
->  						     &other_mask);
-> -			if (compare_sids(&(ppace[i]->sid), &sid_authusers))
-> +			if (compare_sids(&(ppace[i]->sid), &sid_authusers) == 0)
->  				access_flags_to_mode(ppace[i]->access_req,
->  						     ppace[i]->type,
->  						     &fattr->cf_mode,
-> @@ -613,10 +876,10 @@ static int parse_sid(struct cifs_sid *psid, char *end_of_acl)
+> -	if (!CIFS_I(inode)->clientCanCacheRead)
+> -		cifs_invalidate_mapping(inode);
+> +	if (!CIFS_I(inode)->clientCanCacheRead) {
+> +		rc = cifs_invalidate_mapping(inode);
+> +		if (rc) {
+> +			cFYI(1, "rc: %d during invalidate phase", rc);
+> +			rc = 0; /* don't care about it in fsync */
+> +		}
+> +	}
 >  
+>  	tcon = tlink_tcon(smbfile->tlink);
+>  	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+> @@ -2002,8 +2007,11 @@ int cifs_file_strict_mmap(struct file *file, struct vm_area_struct *vma)
 >  
->  /* Convert CIFS ACL to POSIX form */
-> -static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
-> -			  struct cifs_fattr *fattr)
-> +static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
-> +		struct cifs_ntsd *pntsd, int acl_len, struct cifs_fattr *fattr)
+>  	xid = GetXid();
+>  
+> -	if (!CIFS_I(inode)->clientCanCacheRead)
+> -		cifs_invalidate_mapping(inode);
+> +	if (!CIFS_I(inode)->clientCanCacheRead) {
+> +		rc = cifs_invalidate_mapping(inode);
+> +		if (rc)
+> +			return rc;
+> +	}
+>  
+>  	rc = generic_file_mmap(file, vma);
+>  	if (rc == 0)
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index fbe7d58..0cc7edd 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1683,18 +1683,15 @@ cifs_inode_needs_reval(struct inode *inode)
+>  /*
+>   * Zap the cache. Called when invalid_mapping flag is set.
+>   */
+> -void
+> +int
+>  cifs_invalidate_mapping(struct inode *inode)
 >  {
 > -	int rc;
 > +	int rc = 0;
->  	struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
->  	struct cifs_acl *dacl_ptr; /* no need for SACL ptr */
->  	char *end_of_acl = ((char *)pntsd) + acl_len;
-> @@ -638,12 +901,26 @@ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
->  		 le32_to_cpu(pntsd->sacloffset), dacloffset);
->  /*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
->  	rc = parse_sid(owner_sid_ptr, end_of_acl);
-> -	if (rc)
-> +	if (rc) {
-> +		cFYI(1, "%s: Error %d parsing Owner SID", __func__, rc);
->  		return rc;
-> +	}
-> +	rc = sid_to_id(cifs_sb, owner_sid_ptr, fattr, SIDOWNER);
-> +	if (rc) {
-> +		cFYI(1, "%s: Error %d mapping Owner SID to uid", __func__, rc);
-> +		return rc;
-> +	}
+>  	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
 >  
->  	rc = parse_sid(group_sid_ptr, end_of_acl);
-> -	if (rc)
-> +	if (rc) {
-> +		cFYI(1, "%s: Error %d mapping Owner SID to gid", __func__, rc);
->  		return rc;
-> +	}
-> +	rc = sid_to_id(cifs_sb, group_sid_ptr, fattr, SIDGROUP);
-> +	if (rc) {
-> +		cFYI(1, "%s: Error %d mapping Group SID to gid", __func__, rc);
-> +		return rc;
-> +	}
+>  	cifs_i->invalid_mapping = false;
 >  
->  	if (dacloffset)
->  		parse_dacl(dacl_ptr, end_of_acl, owner_sid_ptr,
-> @@ -658,7 +935,7 @@ static int parse_sec_desc(struct cifs_ntsd *pntsd, int acl_len,
->  	memcpy((void *)(&(cifscred->gsid)), (void *)group_sid_ptr,
->  			sizeof(struct cifs_sid)); */
+>  	if (inode->i_mapping && inode->i_mapping->nrpages != 0) {
+> -		/* write back any cached data */
+> -		rc = filemap_write_and_wait(inode->i_mapping);
+> -		mapping_set_error(inode->i_mapping, rc);
+>  		rc = invalidate_inode_pages2(inode->i_mapping);
+>  		if (rc) {
+>  			cERROR(1, "%s: could not invalidate inode %p", __func__,
+> @@ -1704,56 +1701,52 @@ cifs_invalidate_mapping(struct inode *inode)
+>  	}
 >  
-> -	return 0;
+>  	cifs_fscache_reset_inode_cookie(inode);
 > +	return rc;
 >  }
 >  
+> -int cifs_revalidate_file(struct file *filp)
+> +int cifs_revalidate_file_attr(struct file *filp)
+>  {
+>  	int rc = 0;
+>  	struct inode *inode = filp->f_path.dentry->d_inode;
+>  	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
 >  
-> @@ -865,7 +1142,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
->  		rc = PTR_ERR(pntsd);
->  		cERROR(1, "%s: error %d getting sec desc", __func__, rc);
->  	} else {
-> -		rc = parse_sec_desc(pntsd, acllen, fattr);
-> +		rc = parse_sec_desc(cifs_sb, pntsd, acllen, fattr);
->  		kfree(pntsd);
->  		if (rc)
->  			cERROR(1, "parse sec desc failed rc = %d", rc);
-> diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
-> index c4ae7d0..757cf5a 100644
-> --- a/fs/cifs/cifsacl.h
-> +++ b/fs/cifs/cifsacl.h
-> @@ -39,6 +39,15 @@
->  #define ACCESS_ALLOWED	0
->  #define ACCESS_DENIED	1
+>  	if (!cifs_inode_needs_reval(inode))
+> -		goto check_inval;
+> +		return rc;
 >  
-> +#define SIDOWNER 1
-> +#define SIDGROUP 2
-> +#define SIDLEN 150 /* S- 1 revision- 6 authorities- max 5 sub authorities */
-> +
-> +#define SID_ID_MAPPED 0
-> +#define SID_ID_PENDING 1
-> +#define SID_MAP_EXPIRE (3600 * HZ) /* map entry expires after one hour */
-> +#define SID_MAP_RETRY (300 * HZ)   /* wait 5 minutes for next attempt to map */
-> +
->  struct cifs_ntsd {
->  	__le16 revision; /* revision level */
->  	__le16 type;
-> @@ -74,6 +83,21 @@ struct cifs_wksid {
->  	char sidname[SIDNAMELENGTH];
->  } __attribute__((packed));
+>  	if (tlink_tcon(cfile->tlink)->unix_ext)
+>  		rc = cifs_get_file_info_unix(filp);
+>  	else
+>  		rc = cifs_get_file_info(filp);
 >  
-> +struct cifs_sid_id {
-> +	unsigned int refcount; /* increment with spinlock, decrement without */
-> +	unsigned long id;
-> +	unsigned long time;
-> +	unsigned long state;
-> +	char *sidstr;
-> +	struct rb_node rbnode;
-> +	struct cifs_sid sid;
-> +};
-> +
-> +#ifdef __KERNEL__
-> +extern struct key_type cifs_idmap_key_type;
-> +extern const struct cred *root_cred;
-> +#endif /* KERNEL */
-> +
->  extern int match_sid(struct cifs_sid *);
->  extern int compare_sids(const struct cifs_sid *, const struct cifs_sid *);
+> -check_inval:
+> -	if (CIFS_I(inode)->invalid_mapping)
+> -		cifs_invalidate_mapping(inode);
+> -
+>  	return rc;
+>  }
 >  
+> -/* revalidate a dentry's inode attributes */
+> -int cifs_revalidate_dentry(struct dentry *dentry)
+> +int cifs_revalidate_dentry_attr(struct dentry *dentry)
+>  {
+>  	int xid;
+>  	int rc = 0;
+> -	char *full_path = NULL;
+>  	struct inode *inode = dentry->d_inode;
+>  	struct super_block *sb = dentry->d_sb;
+> +	char *full_path = NULL;
+>  
+>  	if (inode == NULL)
+>  		return -ENOENT;
+>  
+> -	xid = GetXid();
+> -
+>  	if (!cifs_inode_needs_reval(inode))
+> -		goto check_inval;
+> +		return rc;
+> +
+> +	xid = GetXid();
+>  
+>  	/* can not safely grab the rename sem here if rename calls revalidate
+>  	   since that would deadlock */
+>  	full_path = build_path_from_dentry(dentry);
+>  	if (full_path == NULL) {
+>  		rc = -ENOMEM;
+> -		goto check_inval;
+> +		goto out;
+>  	}
+>  
+> -	cFYI(1, "Revalidate: %s inode 0x%p count %d dentry: 0x%p d_time %ld "
+> -		 "jiffies %ld", full_path, inode, inode->i_count.counter,
+> +	cFYI(1, "Update attributes: %s inode 0x%p count %d dentry: 0x%p d_time "
+> +		 "%ld jiffies %ld", full_path, inode, inode->i_count.counter,
+>  		 dentry, dentry->d_time, jiffies);
+>  
+>  	if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
+> @@ -1762,41 +1755,81 @@ int cifs_revalidate_dentry(struct dentry *dentry)
+>  		rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
+>  					 xid, NULL);
+>  
+> -check_inval:
+> -	if (CIFS_I(inode)->invalid_mapping)
+> -		cifs_invalidate_mapping(inode);
+> -
+> +out:
+>  	kfree(full_path);
+>  	FreeXid(xid);
+>  	return rc;
+>  }
+>  
+> +int cifs_revalidate_file(struct file *filp)
+> +{
+> +	int rc;
+> +	struct inode *inode = filp->f_path.dentry->d_inode;
+> +
+> +	rc = cifs_revalidate_file_attr(filp);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (CIFS_I(inode)->invalid_mapping)
+> +		rc = cifs_invalidate_mapping(inode);
+> +	return rc;
+> +}
+> +
+> +/* revalidate a dentry's inode attributes */
+> +int cifs_revalidate_dentry(struct dentry *dentry)
+> +{
+> +	int rc;
+> +	struct inode *inode = dentry->d_inode;
+> +
+> +	rc = cifs_revalidate_dentry_attr(dentry);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (CIFS_I(inode)->invalid_mapping)
+> +		rc = cifs_invalidate_mapping(inode);
+> +	return rc;
+> +}
+> +
+>  int cifs_getattr(struct vfsmount *mnt, struct dentry *dentry,
+>  		 struct kstat *stat)
+>  {
+>  	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+>  	struct cifsTconInfo *tcon = cifs_sb_master_tcon(cifs_sb);
+> -	int err = cifs_revalidate_dentry(dentry);
+> +	struct inode *inode = dentry->d_inode;
+> +	int rc;
+>  
+> -	if (!err) {
+> -		generic_fillattr(dentry->d_inode, stat);
+> -		stat->blksize = CIFS_MAX_MSGSIZE;
+> -		stat->ino = CIFS_I(dentry->d_inode)->uniqueid;
+> +	/*
+> +	 * We need to be sure that all dirty pages are written and the server
+> +	 * has actual ctime, mtime and file length.
+> +	 */
+> +	if (!CIFS_I(inode)->clientCanCacheRead && inode->i_mapping &&
+> +	    inode->i_mapping->nrpages != 0) {
+> +		rc = filemap_fdatawait(inode->i_mapping);
+> +		mapping_set_error(inode->i_mapping, rc);
+> +		return rc;
+> +	}
+>  
+> -		/*
+> -		 * If on a multiuser mount without unix extensions, and the
+> -		 * admin hasn't overridden them, set the ownership to the
+> -		 * fsuid/fsgid of the current process.
+> -		 */
+> -		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
+> -		    !tcon->unix_ext) {
+> -			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
+> -				stat->uid = current_fsuid();
+> -			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
+> -				stat->gid = current_fsgid();
+> -		}
+> +	rc = cifs_revalidate_dentry_attr(dentry);
+> +	if (rc)
+> +		return rc;
+> +
+> +	generic_fillattr(inode, stat);
+> +	stat->blksize = CIFS_MAX_MSGSIZE;
+> +	stat->ino = CIFS_I(inode)->uniqueid;
+> +
+> +	/*
+> +	 * If on a multiuser mount without unix extensions, and the admin hasn't
+> +	 * overridden them, set the ownership to the fsuid/fsgid of the current
+> +	 * process.
+> +	 */
+> +	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
+> +	    !tcon->unix_ext) {
+> +		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
+> +			stat->uid = current_fsuid();
+> +		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
+> +			stat->gid = current_fsgid();
+>  	}
+> -	return err;
+> +	return rc;
+>  }
+>  
+>  static int cifs_truncate_page(struct address_space *mapping, loff_t from)
 
-Looks reasonable I think...
+Looks good to me.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
