@@ -1,30 +1,57 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fix
-Date: Mon, 25 Apr 2011 22:12:46 -0500
-Message-ID: <BANLkTimxDNAmv0iZ7918Tp=7y=pR5S6dag@mail.gmail.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: [PATCH v4 1/6] cifs: Extract DFS referral expansion logic to
+ separate function
+Date: Tue, 26 Apr 2011 11:13:16 +0530
+Message-ID: <4DB65B74.7050706@suse.de>
+References: <1302100005-1848-1-git-send-email-seanius@seanius.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+To: Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1302100005-1848-1-git-send-email-seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit f0e615c3cb72b42191b558c130409335812621d8:
+On 04/06/2011 07:56 PM, Sean Finney wrote:
+> The logic behind the expansion of DFS referrals is now extracted from
+> cifs_mount into a new static function, expand_dfs_referral.  This will
+> reduce duplicate code in upcoming commits.
+>
+> Reviewed-by: Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Sean Finney<seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+> ---
+>   fs/cifs/connect.c |  105 +++++++++++++++++++++++++++++++++++------------------
+>   1 files changed, 69 insertions(+), 36 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 94e60c5..c89d871 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2742,6 +2742,57 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
+>   	full_path[unc_len + cifs_sb->prepathlen] = 0; /* add trailing null */
+>   	return full_path;
+>   }
+> +
+> +/*
+> + * Perform a dfs referral query for a share and (optionally) prefix
+> + *
+> + * If a referral is found, mount_data will be set to point at a newly
+> + * allocated string containing updated options for the submount.
+> + * Otherwise it will be left untouched.
+> + *
+> + * Returns the rc from get_dfs_path to the caller, which can be used to
+> + * determine whether there were referrals.
+> + */
+> +static int
+> +expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
+				^^^ Did you mean struct cifsSesInfo ?
 
-  Linux 2.6.39-rc4 (2011-04-18 21:26:00 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
-
-Pavel Shilovsky (1):
-      CIFS: Fix memory over bound bug in cifs_parse_mount_options
-
- fs/cifs/connect.c |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
-
+I'm not seeing any other patch renaming cifsSesInfo to cifs_ses. Or Am I 
+missing something. Sorry about pitching in so late..
+			
+The compiler gives a warning, but nevertheless it compiles... looks odd.
 
 -- 
-Thanks,
-
-Steve
+Suresh Jayaraman
