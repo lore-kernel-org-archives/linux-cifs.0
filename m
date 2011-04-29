@@ -1,94 +1,52 @@
-From: Mike <miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>
-Subject: CIFS Not Responding Error On Working System
-Date: Thu, 28 Apr 2011 12:27:54 -0700
-Message-ID: <4DB9BFBA.3020403@softtalker.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/5] cifs: fix some bounds checking problems
+Date: Fri, 29 Apr 2011 00:05:09 -0500
+Message-ID: <BANLkTimNseyrXc9ZDz0N4tomRx1oy5P60Q@mail.gmail.com>
+References: <1303819401-14789-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1303819401-14789-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hopefully I am submitting this to the correct email list.  I have been 
-doing Google searches and haven't found anyone that has the same string 
-in their log file, so I'm looking for help on this issue.
+I merged the following 3 into cifs-2.6.git (from the versions in your
+cifs-2.6.39 branch).  Was curious why the last two weren't in that
+branch.
 
-Recently I lost my hard drive and had to reinstall Debian.  I am now 
-getting these errors in /var/log/syslog and I can't figure out why:
-Apr 28 11:57:05 rockenfield kernel: [1479867.192022] CIFS VFS: Server 
-peart has not responded in 300 seconds. Reconnecting...
+cifs: change bleft in decode_unicode_ssetup back to signed type
+cifs: check for bytes_remaining going to zero in CIFS_SessSetup
+cifs: sanitize length checking in coalesce_t2
 
-The weird thing is that there are no problems.  I can view the shares on 
-the remote Windows machine (peart is WinXP 64 SP2) with no problems 
-whatsoever.  Also my Windows machine can see my samba shares as well, so 
-both directions work fine and I'm not sure why these messages are occurring.
-
-
-Here is my /etc/fstab (samba/cifs mounts only, trimmed to applicable 
-content):
-//peart/mp3  /mnt/peart/mp3 cifs 
-defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
-//peart/software  /mnt/peart/software cifs 
-defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
-//peart/backup  /mnt/peart/backup cifs 
-defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
-//peart/dvd  /mnt/peart/dvd cifs 
-defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
-
-
-Here is my /etc/samba/smb.conf:
-[global]
-    workgroup = HOME_NETWORK
-    netbios name = ROCKENFIELD
-    server string = %h server - Debian GNU/Linux
-    dns proxy = no
-    name resolve order = lmhosts host wins bcast
-    interfaces = 192.168.123.0/24 eth1
-    bind interfaces only = yes
-    hosts allow = 192.168.123.
-    log file = /var/log/samba/log.%m
-    max log size = 1000
-    syslog = 0
-    panic action = /usr/share/samba/panic-action %d
-    security = user
-    encrypt passwords = true
-    passdb backend = tdbsam
-    obey pam restrictions = yes
-    unix password sync = yes
-    passwd program = /usr/bin/passwd %u
-    passwd chat = *Enter\snew\s*\spassword:* %n\n 
-*Retype\snew\s*\spassword:* %n\n *password\supdated\ssuccessfully* .
-    pam password change = yes
-    socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
-[homes]
-    comment = Home Directories
-    browseable = no
-    read only = no
-    create mask = 0700
-    directory mask = 0700
-    valid users = %S
-[printers]
-    comment = All Printers
-    browseable = no
-    path = /var/spool/samba
-    printable = yes
-    guest ok = no
-    read only = yes
-    create mask = 0700
-[print$]
-    comment = Printer Drivers
-    path = /var/lib/samba/printers
-    browseable = yes
-    read only = yes
-    guest ok = no
+On Tue, Apr 26, 2011 at 7:03 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> This patchset fixes a number of problems that David pointed out while
+> reviewing some backports for RHEL. I think they're appropriate for
+> 2.6.39 and probably the stable series as well.
+>
+> Jeff Layton (5):
+> =A0cifs: change bleft in decode_unicode_ssetup back to signed type
+> =A0cifs: check for bytes_remaining going to zero in CIFS_SessSetup
+> =A0cifs: sanitize length checking in coalesce_t2
+> =A0cifs: refactor mid finding loop in cifs_demultiplex_thread
+> =A0cifs: handle errors from coalesce_t2
+>
+> =A0fs/cifs/connect.c | =A0117 +++++++++++++++++++++++++++++----------=
+-------------
+> =A0fs/cifs/sess.c =A0 =A0| =A0 19 ++-------
+> =A02 files changed, 69 insertions(+), 67 deletions(-)
+>
+> --
+> 1.7.4.4
+>
+>
 
 
-I am running Debian wheezy/testing (7.0).  The kernel version is 
-2.6.38-2-amd64.  Samba version is 3.5.8~dfsg-1 (obtained from "dpkg -l | 
-grep samba").  This is just a home network, so I don't have a Domain 
-Controller or anything fancy.  It's just a Debian box and a WinXP box 
-and I'm sharing files/directories on each side.
 
-Any help is greatly appreciated.  Thanks!
--MikeD
+--=20
+Thanks,
+
+Steve
