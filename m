@@ -1,130 +1,207 @@
-From: Mike Dillinger <miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>
-Subject: Re: CIFS Not Responding Error On Working System
-Date: Fri, 29 Apr 2011 08:06:49 -0700
-Message-ID: <4DBAD409.9000300@softtalker.com>
-References: <4DB9BFBA.3020403@softtalker.com>	<BANLkTinoC1d=NBLyzXa61cB+tR-+4F50zg@mail.gmail.com> <20110429093256.3c33cd01@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 3/4] CIFS: Migrate from prefixpath logic
+Date: Fri, 29 Apr 2011 11:17:20 -0400
+Message-ID: <20110429111720.1f3a49d8@corrin.poochiereds.net>
+References: <1302850916-13947-1-git-send-email-piastry@etersoft.ru>
+	<1302850916-13947-2-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110429093256.3c33cd01-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1302850916-13947-2-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Fri, 15 Apr 2011 11:01:55 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+
+> Now we point superblock to a server share root and set a root dentry
+> appropriately. This let us share superblock between mounts like
+> //server/sharename/foo/bar and //server/sharename/foo further.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifs_fs_sb.h |    2 -
+>  fs/cifs/cifsfs.c     |   95 +++++++++++++++++++++++++++++++++++-
+>  fs/cifs/cifsglob.h   |   76 +++++++++++++++++++++++++++++
+>  fs/cifs/cifsproto.h  |    5 +-
+>  fs/cifs/connect.c    |  129 ++------------------------------------------------
+>  fs/cifs/dir.c        |    7 +--
+>  fs/cifs/inode.c      |   15 +++---
+>  7 files changed, 186 insertions(+), 143 deletions(-)
+> 
+> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> index adecd36..a18ba37 100644
+> --- a/fs/cifs/cifs_fs_sb.h
+> +++ b/fs/cifs/cifs_fs_sb.h
+> @@ -58,8 +58,6 @@ struct cifs_sb_info {
+>  	mode_t	mnt_file_mode;
+>  	mode_t	mnt_dir_mode;
+>  	unsigned int mnt_cifs_flags;
+> -	int	prepathlen;
+> -	char   *prepath; /* relative path under the share to mount to */
+>  	char   *mountdata; /* options received at mount time or via DFS refs */
+>  	struct backing_dev_info bdi;
+>  	struct delayed_work prune_tlinks;
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 3227db6..44394c8 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -434,8 +434,6 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+>  		seq_printf(s, ",nocase");
+>  	if (tcon->retry)
+>  		seq_printf(s, ",hard");
+> -	if (cifs_sb->prepath)
+> -		seq_printf(s, ",prepath=%s", cifs_sb->prepath);
+>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
+>  		seq_printf(s, ",posixpaths");
+>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)
+> @@ -549,6 +547,92 @@ static const struct super_operations cifs_super_ops = {
+>  #endif
+>  };
+>  
+> +/*
+> + * Get root dentry from superblock according to prefix path mount option.
+> + * Return dentry with refcount + 1 on success and NULL otherwise.
+> + */
+> +static struct dentry *
+> +cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+> +{
+> +	int xid, rc;
+> +	struct inode *inode;
+> +	struct qstr name;
+> +	struct dentry *dparent = NULL, *dchild = NULL;
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+> +	unsigned int i, full_len, len;
+> +	char *full_path = NULL, *pstart;
+> +	char sep;
+> +
+> +	full_path = cifs_build_path_to_root(vol, cifs_sb,
+> +					    cifs_sb_master_tcon(cifs_sb));
+> +	if (full_path == NULL)
+> +		return NULL;
+> +
+> +	cFYI(1, "Get root dentry for %s", full_path);
+> +
+> +	xid = GetXid();
+> +	sep = CIFS_DIR_SEP(cifs_sb);
+> +	dparent = dget(sb->s_root);
+> +	full_len = strlen(full_path);
+> +	full_path[full_len] = sep;
+> +	pstart = full_path + 1;
+> +
+> +	for (i = 1, len = 0; i <= full_len; i++) {
+> +		if (full_path[i] != sep || !len) {
+> +			len++;
+> +			continue;
+> +		}
+> +
+> +		full_path[i] = 0;
+> +		cFYI(1, "get dentry for %s", pstart);
+> +
+> +		name.name = pstart;
+> +		name.len = len;
+> +		name.hash = full_name_hash(pstart, len);
+> +		dchild = d_lookup(dparent, &name);
+> +		if (dchild == NULL) {
+> +			cFYI(1, "not exists");
+> +			dchild = d_alloc(dparent, &name);
+> +			if (dchild == NULL) {
+> +				dput(dparent);
+> +				dparent = NULL;
+> +				goto out;
+> +			}
+> +		}
+> +
+> +		cFYI(1, "get inode");
+> +		if (dchild->d_inode == NULL) {
+> +			cFYI(1, "not exists");
+> +			inode = NULL;
+> +			if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
+> +				rc = cifs_get_inode_info_unix(&inode, full_path,
+> +							      sb, xid);
+> +			else
+> +				rc = cifs_get_inode_info(&inode, full_path,
+> +							 NULL, sb, xid, NULL);
+> +			if (rc) {
+> +				dput(dchild);
+> +				dput(dparent);
+> +				dparent = NULL;
+> +				goto out;
+> +			}
+> +			d_add(dchild, inode);
+			^^^^^^
+			Is this racy? Could another dentry have been
+			added between the time that you did the initial
+			lookup and here? I think there are functions
+			that guard against that possibility.
+			d_materialise_unique maybe?
+
+> +		}
+> +		cFYI(1, "parent %p, child %p", dparent, dchild);
+> +
+> +		dput(dparent);
+> +		dparent = dchild;
+> +		len = 0;
+> +		pstart = full_path + i + 1;
+> +		full_path[i] = sep;
+> +	}
+> +out:
+> +	_FreeXid(xid);
+> +	full_path[full_len] = 0;
+	^^^ that's unnecessary, you free this just afterward.
+
+> +	kfree(full_path);
+> +	return dparent;
+> +}
+> +
+>  static struct dentry *
+>  cifs_do_mount(struct file_system_type *fs_type,
+>  	      int flags, const char *dev_name, void *data)
+> @@ -603,7 +687,12 @@ cifs_do_mount(struct file_system_type *fs_type,
+>  
+>  	sb->s_flags |= MS_ACTIVE;
+>  
+> -	root = dget(sb->s_root);
+> +	root = cifs_get_root(volume_info, sb);
+> +	if (root == NULL) {
+> +		kfree(copied_data);
+> +		goto err_out;
+> +	}
+> +	cFYI(1, "dentry root is: %p", root);
+>  out:
+>  	cifs_cleanup_volume_info(&volume_info);
+>  	return root;
+
+[...]
+
+> @@ -887,16 +887,17 @@ struct inode *cifs_root_iget(struct super_block *sb)
+>  	char *full_path;
+>  	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+>  
+> -	full_path = cifs_build_path_to_root(cifs_sb, tcon);
+> +	full_path = kmalloc(1, GFP_KERNEL);
+>  	if (full_path == NULL)
+>  		return ERR_PTR(-ENOMEM);
+> +	full_path[0] = 0;
+>  
+
+Don't kmalloc 1 byte, just pass "" or do it on the stack instead.
+
+>  	xid = GetXid();
+>  	if (tcon->unix_ext)
+>  		rc = cifs_get_inode_info_unix(&inode, full_path, sb, xid);
+>  	else
+> -		rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
+> -						xid, NULL);
+> +		rc = cifs_get_inode_info(&inode, full_path, NULL, sb, xid,
+> +					 NULL);
+>  
+>  	if (!inode) {
+>  		inode = ERR_PTR(rc);
 
 
-On 04/29/11 06:32 AM, Jeff Layton wrote:
-> On Fri, 29 Apr 2011 07:13:05 -0500
-> Shirish Pargaonkar<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>  wrote:
->
->> On Thu, Apr 28, 2011 at 2:27 PM, Mike<miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>  wrote:
->>> Hopefully I am submitting this to the correct email list.  I have been doing
->>> Google searches and haven't found anyone that has the same string in their
->>> log file, so I'm looking for help on this issue.
->>>
->>> Recently I lost my hard drive and had to reinstall Debian.  I am now getting
->>> these errors in /var/log/syslog and I can't figure out why:
->>> Apr 28 11:57:05 rockenfield kernel: [1479867.192022] CIFS VFS: Server peart
->>> has not responded in 300 seconds. Reconnecting...
->>>
->>> The weird thing is that there are no problems.  I can view the shares on the
->>> remote Windows machine (peart is WinXP 64 SP2) with no problems whatsoever.
->>>   Also my Windows machine can see my samba shares as well, so both directions
->>> work fine and I'm not sure why these messages are occurring.
->>>
->>>
->>> Here is my /etc/fstab (samba/cifs mounts only, trimmed to applicable
->>> content):
->>> //peart/mp3  /mnt/peart/mp3 cifs
->>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
->>> //peart/software  /mnt/peart/software cifs
->>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
->>> //peart/backup  /mnt/peart/backup cifs
->>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
->>> //peart/dvd  /mnt/peart/dvd cifs
->>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
->>>
->>>
->>> Here is my /etc/samba/smb.conf:
->>> [global]
->>>    workgroup = HOME_NETWORK
->>>    netbios name = ROCKENFIELD
->>>    server string = %h server - Debian GNU/Linux
->>>    dns proxy = no
->>>    name resolve order = lmhosts host wins bcast
->>>    interfaces = 192.168.123.0/24 eth1
->>>    bind interfaces only = yes
->>>    hosts allow = 192.168.123.
->>>    log file = /var/log/samba/log.%m
->>>    max log size = 1000
->>>    syslog = 0
->>>    panic action = /usr/share/samba/panic-action %d
->>>    security = user
->>>    encrypt passwords = true
->>>    passdb backend = tdbsam
->>>    obey pam restrictions = yes
->>>    unix password sync = yes
->>>    passwd program = /usr/bin/passwd %u
->>>    passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:*
->>> %n\n *password\supdated\ssuccessfully* .
->>>    pam password change = yes
->>>    socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
->>> [homes]
->>>    comment = Home Directories
->>>    browseable = no
->>>    read only = no
->>>    create mask = 0700
->>>    directory mask = 0700
->>>    valid users = %S
->>> [printers]
->>>    comment = All Printers
->>>    browseable = no
->>>    path = /var/spool/samba
->>>    printable = yes
->>>    guest ok = no
->>>    read only = yes
->>>    create mask = 0700
->>> [print$]
->>>    comment = Printer Drivers
->>>    path = /var/lib/samba/printers
->>>    browseable = yes
->>>    read only = yes
->>>    guest ok = no
->>>
->>>
->>> I am running Debian wheezy/testing (7.0).  The kernel version is
->>> 2.6.38-2-amd64.  Samba version is 3.5.8~dfsg-1 (obtained from "dpkg -l |
->>> grep samba").  This is just a home network, so I don't have a Domain
->>> Controller or anything fancy.  It's just a Debian box and a WinXP box and
->>> I'm sharing files/directories on each side.
->>>
->>> Any help is greatly appreciated.  Thanks!
->>> -MikeD
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>
->> May be some issues like firewall etc.?
->> Can you capture wireshark traces on either side and see if you see
->> any network in response to a mount reuqest from a cifs client?
-> To be clear...
->
-> What sort of host is "peart" here? WinXP?
-
-peart is WinXP 64 SP2, and the Linux machine is running Debian wheezy.  
-The XP firewall is off and the internet security firewall (Kaspersky 
-Internet Security) is off.
-
-The firewall thing doesn't make sense, or else it seems to me that I 
-wouldn't be able to view the remote data.  The remote side *always* 
-works when I view the file share.  I have even tried during viewing the 
-data multiple times during the 5 minute interval where syslog states the 
-host is not responding.  I will capture Wireshark traces though if there 
-aren't any other suggestions.
-
-Thanks,
--MikeD
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
