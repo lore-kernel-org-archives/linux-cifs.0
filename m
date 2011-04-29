@@ -1,65 +1,130 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 2/2] CIFS: Add rwpidforward mount option
-Date: Fri, 29 Apr 2011 18:41:54 +0400
-Message-ID: <BANLkTi=JihA=TjEo6J5o6oR7rcw4LtpSxw@mail.gmail.com>
-References: <1303392395-9217-1-git-send-email-piastry@etersoft.ru>
-	<1303392395-9217-2-git-send-email-piastry@etersoft.ru>
-	<20110429102213.3c8bdb33@corrin.poochiereds.net>
+From: Mike Dillinger <miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>
+Subject: Re: CIFS Not Responding Error On Working System
+Date: Fri, 29 Apr 2011 08:06:49 -0700
+Message-ID: <4DBAD409.9000300@softtalker.com>
+References: <4DB9BFBA.3020403@softtalker.com>	<BANLkTinoC1d=NBLyzXa61cB+tR-+4F50zg@mail.gmail.com> <20110429093256.3c33cd01@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110429102213.3c8bdb33-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20110429093256.3c33cd01-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/4/29 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
-> On Thu, 21 Apr 2011 17:26:35 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> Add rwpidforward mount option that switches on a mode when we forward
->> pid of a process who opened a file to any read and write operation.
->>
->> This can prevent applications like WINE from failing on read or write
->> operation on a previously locked file region from the same netfd from
->> another process if we use mandatory brlock style.
->> It is actual for WINE because during a run of WINE program two processes
->> work on the same netfd - share the same file struct between several VFS
->> fds:
->> 1) WINE-server does open and lock;
->> 2) WINE-application does read and write.
->>
->
-> I guess I still don't quite get it. Why not always forward the pid
-> unconditionally?
->
-> For wine, you want to forward the pid in order to emulate windows
-> locking semantics. But always forwarding the pid seems like it would
-> give you more unix-like semantics when locking unix applications,
-> right? IOW, you'd be less likely to block in a read or write operation.
->
-> Can you give an example of some use case that would break if you were
-> to do this unconditionally?
 
-Ok. Let's predict:
-1) we negotiate mandatory locking semantic.
-2) we have a file opened my process 'A'.
-3) we do fork() - process 'B' is born and inherits a file.
-4) process 'A' set an exclusive lock on a file (from start to end)
-5) process 'B' write to a file and succeed if we forward pid
-unconditionally in this case. - that's wrong according to mandatory
-locking semantic
-(http://msdn.microsoft.com/en-us/library/aa365202(v=vs.85).aspx)
 
-So, at least we don't need to forward pid if we negotiate Windows
-locking style. As for POSIX - I think that is not affect anything
-because we work with advisory locking style and don't care about such
-things at all. So, that's why we need it as separate mount option that
-switches specific behavior for application like WINE (or any other
-client/server applications that send fd though a pipe or a socket and
-use a client for i/o operations and a server - to open and lock).
+On 04/29/11 06:32 AM, Jeff Layton wrote:
+> On Fri, 29 Apr 2011 07:13:05 -0500
+> Shirish Pargaonkar<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>  wrote:
+>
+>> On Thu, Apr 28, 2011 at 2:27 PM, Mike<miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>  wrote:
+>>> Hopefully I am submitting this to the correct email list.  I have been doing
+>>> Google searches and haven't found anyone that has the same string in their
+>>> log file, so I'm looking for help on this issue.
+>>>
+>>> Recently I lost my hard drive and had to reinstall Debian.  I am now getting
+>>> these errors in /var/log/syslog and I can't figure out why:
+>>> Apr 28 11:57:05 rockenfield kernel: [1479867.192022] CIFS VFS: Server peart
+>>> has not responded in 300 seconds. Reconnecting...
+>>>
+>>> The weird thing is that there are no problems.  I can view the shares on the
+>>> remote Windows machine (peart is WinXP 64 SP2) with no problems whatsoever.
+>>>   Also my Windows machine can see my samba shares as well, so both directions
+>>> work fine and I'm not sure why these messages are occurring.
+>>>
+>>>
+>>> Here is my /etc/fstab (samba/cifs mounts only, trimmed to applicable
+>>> content):
+>>> //peart/mp3  /mnt/peart/mp3 cifs
+>>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
+>>> //peart/software  /mnt/peart/software cifs
+>>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
+>>> //peart/backup  /mnt/peart/backup cifs
+>>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
+>>> //peart/dvd  /mnt/peart/dvd cifs
+>>> defaults,credentials=/etc/samba/smbpass.peart,_netdev 0 0
+>>>
+>>>
+>>> Here is my /etc/samba/smb.conf:
+>>> [global]
+>>>    workgroup = HOME_NETWORK
+>>>    netbios name = ROCKENFIELD
+>>>    server string = %h server - Debian GNU/Linux
+>>>    dns proxy = no
+>>>    name resolve order = lmhosts host wins bcast
+>>>    interfaces = 192.168.123.0/24 eth1
+>>>    bind interfaces only = yes
+>>>    hosts allow = 192.168.123.
+>>>    log file = /var/log/samba/log.%m
+>>>    max log size = 1000
+>>>    syslog = 0
+>>>    panic action = /usr/share/samba/panic-action %d
+>>>    security = user
+>>>    encrypt passwords = true
+>>>    passdb backend = tdbsam
+>>>    obey pam restrictions = yes
+>>>    unix password sync = yes
+>>>    passwd program = /usr/bin/passwd %u
+>>>    passwd chat = *Enter\snew\s*\spassword:* %n\n *Retype\snew\s*\spassword:*
+>>> %n\n *password\supdated\ssuccessfully* .
+>>>    pam password change = yes
+>>>    socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192
+>>> [homes]
+>>>    comment = Home Directories
+>>>    browseable = no
+>>>    read only = no
+>>>    create mask = 0700
+>>>    directory mask = 0700
+>>>    valid users = %S
+>>> [printers]
+>>>    comment = All Printers
+>>>    browseable = no
+>>>    path = /var/spool/samba
+>>>    printable = yes
+>>>    guest ok = no
+>>>    read only = yes
+>>>    create mask = 0700
+>>> [print$]
+>>>    comment = Printer Drivers
+>>>    path = /var/lib/samba/printers
+>>>    browseable = yes
+>>>    read only = yes
+>>>    guest ok = no
+>>>
+>>>
+>>> I am running Debian wheezy/testing (7.0).  The kernel version is
+>>> 2.6.38-2-amd64.  Samba version is 3.5.8~dfsg-1 (obtained from "dpkg -l |
+>>> grep samba").  This is just a home network, so I don't have a Domain
+>>> Controller or anything fancy.  It's just a Debian box and a WinXP box and
+>>> I'm sharing files/directories on each side.
+>>>
+>>> Any help is greatly appreciated.  Thanks!
+>>> -MikeD
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
+>> May be some issues like firewall etc.?
+>> Can you capture wireshark traces on either side and see if you see
+>> any network in response to a mount reuqest from a cifs client?
+> To be clear...
+>
+> What sort of host is "peart" here? WinXP?
 
--- 
-Best regards,
-Pavel Shilovsky.
+peart is WinXP 64 SP2, and the Linux machine is running Debian wheezy.  
+The XP firewall is off and the internet security firewall (Kaspersky 
+Internet Security) is off.
+
+The firewall thing doesn't make sense, or else it seems to me that I 
+wouldn't be able to view the remote data.  The remote side *always* 
+works when I view the file share.  I have even tried during viewing the 
+data multiple times during the 5 minute interval where syslog states the 
+host is not responding.  I will capture Wireshark traces though if there 
+aren't any other suggestions.
+
+Thanks,
+-MikeD
