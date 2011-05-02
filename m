@@ -1,340 +1,377 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/4] CIFS: Simplify mount code for further shared sb
- capability
-Date: Mon, 2 May 2011 08:23:50 -0400
-Message-ID: <20110502082350.6d0cbc77@corrin.poochiereds.net>
-References: <1302850916-13947-1-git-send-email-piastry@etersoft.ru>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils: Handle cifs_idmap type of key to map a SID to
+ either an uid or gid (try #17 repost)
+Date: Mon, 2 May 2011 07:35:34 -0500
+Message-ID: <BANLkTinqwRT+ao2mhBohS89hTu9YgBNfnw@mail.gmail.com>
+References: <1303914990-7804-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20110502075145.7dc3e1bc@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Sean Finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1302850916-13947-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <20110502075145.7dc3e1bc-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 15 Apr 2011 11:01:54 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Mon, May 2, 2011 at 6:51 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> On Wed, 27 Apr 2011 09:36:30 -0500
+> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>
+>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>>
+>> Handle cifs_idmap type of key. Extract a SID string from the descrip=
+tion
+>> and map it to either an uid or gid using winbind APIs.
+>> If that fails (e.g. because winbind is not installed/running or winb=
+ind returns
+>> an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
+>> And if that fails, kernel assigns uid and gid (from mount superblock=
+).
+>>
+>> Enable including winbind header files and idmapping code conditional
+>> to winbind devel rpms (header and library).
+>>
+>> An entry such as this
+>>
+>> create =A0cifs.cifs_idmap =A0 * =A0 =A0 =A0 * =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 /usr/sbin/cifs.upcall %k
+>>
+>> is needed in the file /etc/request-key.conf.
+>>
+>>
+>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>> =A0Makefile.am =A0 | =A0 =A02 +-
+>> =A0cifs.upcall.c | =A0117 ++++++++++++++++++++++++++++++++++++++++++=
+++++++++++++++-
+>> =A0configure.ac =A0| =A0 35 +++++++++++++++++
+>> =A03 files changed, 152 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/Makefile.am b/Makefile.am
+>> index 67a0190..13b6c16 100644
+>> --- a/Makefile.am
+>> +++ b/Makefile.am
+>> @@ -11,7 +11,7 @@ man_MANS =3D mount.cifs.8
+>> =A0if CONFIG_CIFSUPCALL
+>> =A0sbin_PROGRAMS =3D cifs.upcall
+>> =A0cifs_upcall_SOURCES =3D cifs.upcall.c data_blob.c asn1.c spnego.c=
+ util.c
+>> -cifs_upcall_LDADD =3D -ltalloc -lkeyutils $(KRB5_LDADD)
+>> +cifs_upcall_LDADD =3D -ltalloc -lkeyutils $(KRB5_LDADD) $(WINB_LDAD=
+D)
+>> =A0man_MANS +=3D cifs.upcall.8
+>>
+>> =A0#
+>> diff --git a/cifs.upcall.c b/cifs.upcall.c
+>> index 479517c..6c2088b 100644
+>> --- a/cifs.upcall.c
+>> +++ b/cifs.upcall.c
+>> @@ -45,6 +45,15 @@
+>> =A0#include <time.h>
+>> =A0#include <netdb.h>
+>> =A0#include <arpa/inet.h>
+>> +#include <stdint.h>
+>> +#include <stdbool.h>
+>> +#include <stdio.h>
+>> +#include <stdlib.h>
+>> +#include <errno.h>
+>> +#include <limits.h>
+>> +#ifdef HAVE_WBCLIENT_H
+>> +#include <wbclient.h>
+>> +#endif /* HAVE_WBCLIENT_H */
+>>
+>> =A0#include "util.h"
+>> =A0#include "replace.h"
+>> @@ -653,7 +662,7 @@ static int cifs_resolver(const key_serial_t key,=
+ const char *key_descr)
+>> =A0 =A0 =A0 const char *keyend =3D key_descr;
+>> =A0 =A0 =A0 /* skip next 4 ';' delimiters to get to description */
+>> =A0 =A0 =A0 for (c =3D 1; c <=3D 4; c++) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D index(keyend + 1, ';');
+>> + =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D rindex(keyend + 1, ';');
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!keyend) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_ERR, "invalid=
+ key description: %s",
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0key_descr=
+);
+>> @@ -695,6 +704,105 @@ static int cifs_resolver(const key_serial_t ke=
+y, const char *key_descr)
+>> =A0 =A0 =A0 return 0;
+>> =A0}
+>>
+>> +#ifdef HAVE_LIBWBCLIENT
+>> +static int
+>> +cifs_sid_resolver(const key_serial_t key, const char *key_descr)
+>> +{
+>> + =A0 =A0 int i;
+>> + =A0 =A0 uid_t uid =3D 0;
+>> + =A0 =A0 gid_t gid =3D 0;;
+>> + =A0 =A0 wbcErr rc =3D 1;
+>> + =A0 =A0 const char *keyend =3D key_descr;
+>> + =A0 =A0 struct wbcDomainSid sid;
+>> + =A0 =A0 struct passwd *pw;
+>> + =A0 =A0 struct group *gr;
+>> +
+>> + =A0 =A0 /* skip next 4 ';' delimiters to get to description */
+>> + =A0 =A0 for (i =3D 1; i <=3D 4; ++i) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D index(keyend + 1, ';');
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (!keyend) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_ERR, "invalid k=
+ey description: %s",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0key_descr);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 1;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 }
+>> + =A0 =A0 keyend++;
+>> +
+>> + =A0 =A0 /*
+>> + =A0 =A0 =A0* Use winbind to convert received string to a SID and l=
+ookup
+>> + =A0 =A0 =A0* name and map that SID to an uid. =A0If either of thes=
+e
+>> + =A0 =A0 =A0* function calls return with an error, =A0use system ca=
+lls to obtain
+>> + =A0 =A0 =A0* uid of user "nobody". If winbind fails to map a SID t=
+o an UID
+>> + =A0 =A0 =A0* and there is no user named "nobody", return error to =
+the
+>> + =A0 =A0 =A0* upcall caller. Otherwise instanticate a key using tha=
+t uid.
+>> + =A0 =A0 =A0*
+>> + =A0 =A0 =A0* The same applies to SID and gid mapping. =A0Instead o=
+f a
+>> + =A0 =A0 =A0* user "nobody", user "nogroup" is looked up if winbind
+>> + =A0 =A0 =A0* fails to map a SID to a gid.
+>> + =A0 =A0 =A0*/
+>> + =A0 =A0 if (strncmp(keyend, "os", 2) =3D=3D 0) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D index(keyend + 1, ':');
+>> + =A0 =A0 =A0 =A0 =A0 =A0 keyend++;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcStringToSid(keyend, &sid);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "O strto=
+sid: %s, rc: %d", keyend, rc);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 else {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcSidToUid(&sid, &=
+uid);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG=
+_DEBUG, "SID %s to uid wbc error: %d",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 keyend, rc);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc) { /* either of the two wbcSid func=
+tions failed */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pw =3D getpwnam("nobody");
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!pw)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG=
+_DEBUG, "SID %s to uid pw error: %d",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 keyend, rc);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 uid =3D pw=
+->pw_uid;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D 0;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (!rc) { /* SID has been mapped to a uid=
+ */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D keyctl_instantiate(=
+key, &uid, sizeof(uid_t), 0);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG=
+_ERR, "%s: key inst: %s",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 __func__, strerror(errno));
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 } else if (strncmp(keyend, "gs", 2) =3D=3D 0) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 keyend =3D index(keyend + 1, ':');
+>> + =A0 =A0 =A0 =A0 =A0 =A0 keyend++;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcStringToSid(keyend, &sid);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "O strto=
+sid: %s, rc: %d", keyend, rc);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 else {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcSidToGid(&sid, &=
+gid);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG=
+_DEBUG, "SID %s to gid wbc error: %d",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 keyend, rc);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (rc) { /* either of the two wbcSid func=
+tions failed */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 gr =3D getgrnam("nogroup")=
+;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!gr)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG=
+_DEBUG, "SID %s to gid pw error: %d",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 keyend, rc);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 gid =3D gr=
+->gr_gid;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D 0;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (!rc) { /* SID has been mapped to a gid=
+ */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D keyctl_instantiate(=
+key, &gid, sizeof(gid_t), 0);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG=
+_ERR, "%s: key inst: %s",
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 __func__, strerror(errno));
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 } else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "Invalid SID: %s", keyen=
+d);
+>> +
+>> + =A0 =A0 return rc;
+>> +}
+>> +#endif /* HAVE_LIBWBCLIENT */
+>> +
+>> =A0/*
+>> =A0 * Older kernels sent IPv6 addresses without colons. Well, at lea=
+st
+>> =A0 * they're fixed-length strings. Convert these addresses to have =
+colon
+>> @@ -832,6 +940,13 @@ int main(const int argc, char *const argv[])
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_resolver(key, buf);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+>> =A0 =A0 =A0 }
+>> +#ifdef HAVE_LIBWBCLIENT
+>> + =A0 =A0 if ((strncmp(buf, "cifs.cifs_idmap", sizeof("cifs.cifs_idm=
+ap") - 1)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =3D=3D 0)) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_sid_resolver(key, buf);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+>> + =A0 =A0 }
+>> +#endif /* HAVE_LIBWBCLIENT */
+>>
+>> =A0 =A0 =A0 have =3D decode_key_description(buf, &arg);
+>> =A0 =A0 =A0 SAFE_FREE(buf);
+>> diff --git a/configure.ac b/configure.ac
+>> index e0e2a60..45800bd 100644
+>> --- a/configure.ac
+>> +++ b/configure.ac
+>> @@ -89,6 +89,41 @@ if test $enable_cifsupcall !=3D "no"; then
+>> =A0 =A0 =A0 AC_SUBST(KRB5_LDADD)
+>> =A0fi
+>>
+>> +if test $enable_cifsupcall !=3D "no"; then
+>> + =A0 =A0 AC_CHECK_LIB([wbclient], [wbcStringToSid],
+>> + =A0 =A0 =A0 =A0 =A0 =A0 [ WINB_LDADD=3D'-lwbclient' ] [ AC_DEFINE(=
+HAVE_LIBWBCLIENT, 1, ["define a var"]) ], AC_MSG_ERROR([no functioning =
+wbclient library found!]))
+>> + =A0 =A0 AC_SUBST(WINB_LDADD)
+>> +fi
+>> +
+>> +if test $enable_cifsupcall !=3D "no"; then
+>> + =A0 =A0 AC_CHECK_HEADERS([stdbool.h])
+>> + =A0 =A0 AC_CHECK_HEADERS([stdio.h])
+>> + =A0 =A0 AC_CHECK_HEADERS([errno.h])
+>> + =A0 =A0 AC_CHECK_HEADERS([wbclient.h], , [AC_MSG_ERROR([wbclient.h=
+ not found, consider installing libwbclient-devel.])],
+>> +[#ifdef HAVE_STDINT_H
+>> +#include <stdint.h>
+>> +#endif
+>> +]
+>> +[#ifdef HAVE_STDBOOL_H
+>> +#include <stdbool.h>
+>> +#endif
+>> +]
+>> +[#ifdef HAVE_STDIO_H
+>> +#include <stdio.h>
+>> +#endif
+>> +]
+>> +[#ifdef HAVE_STDLIB_H
+>> +#include <stdlib.h>
+>> +#endif
+>> +]
+>> +[#ifdef HAVE_ERRNO_H
+>> +#include <errno.h>
+>> +#endif
+>> +]
+>> +)
+>> +fi
+>
+> What on earth is the stuff above? configure.ac is at it's heart a she=
+ll
+> script, so I'm pretty sure the above will end up looking like a bunch
+> of comments wrapped in square brackets.
+>
 
-> Reorganize code to get mount option at first and when get a superblock.
-> This lets us use shared superblock model further for equal mounts.
-> 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c    |   88 ++++++++++++++++++++++++++++++++------------------
->  fs/cifs/cifsproto.h |    8 ++++-
->  fs/cifs/connect.c   |   89 ++++++++++++++++++++++++++++----------------------
->  3 files changed, 114 insertions(+), 71 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 9cfbfd2..3227db6 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -109,19 +109,16 @@ cifs_sb_deactive(struct super_block *sb)
->  }
->  
->  static int
-> -cifs_read_super(struct super_block *sb, void *data,
-> -		const char *devname, int silent)
-> +cifs_read_super(struct super_block *sb, struct cifs_sb_info *cifs_sb,
-> +		void *data, struct smb_vol *volume_info, const char *devname,
-> +		int silent)
->  {
->  	struct inode *inode;
-> -	struct cifs_sb_info *cifs_sb;
->  	int rc = 0;
->  
->  	/* BB should we make this contingent on mount parm? */
->  	sb->s_flags |= MS_NODIRATIME | MS_NOATIME;
-> -	sb->s_fs_info = kzalloc(sizeof(struct cifs_sb_info), GFP_KERNEL);
-> -	cifs_sb = CIFS_SB(sb);
-> -	if (cifs_sb == NULL)
-> -		return -ENOMEM;
-> +	sb->s_fs_info = cifs_sb;
->  
->  	spin_lock_init(&cifs_sb->tlink_tree_lock);
->  	cifs_sb->tlink_tree = RB_ROOT;
-> @@ -133,22 +130,10 @@ cifs_read_super(struct super_block *sb, void *data,
->  	}
->  	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
->  
-> -	/*
-> -	 * Copy mount params to sb for use in submounts. Better to do
-> -	 * the copy here and deal with the error before cleanup gets
-> -	 * complicated post-mount.
-> -	 */
-> -	if (data) {
-> -		cifs_sb->mountdata = kstrndup(data, PAGE_SIZE, GFP_KERNEL);
-> -		if (cifs_sb->mountdata == NULL) {
-> -			bdi_destroy(&cifs_sb->bdi);
-> -			kfree(sb->s_fs_info);
-> -			sb->s_fs_info = NULL;
-> -			return -ENOMEM;
-> -		}
-> -	}
-> +	if (data)
-> +		cifs_sb->mountdata = data;
->  
-> -	rc = cifs_mount(sb, cifs_sb, devname);
-> +	rc = cifs_mount(sb, cifs_sb, volume_info, devname);
->  
->  	if (rc) {
->  		if (!silent)
-> @@ -566,27 +551,68 @@ static const struct super_operations cifs_super_ops = {
->  
->  static struct dentry *
->  cifs_do_mount(struct file_system_type *fs_type,
-> -	    int flags, const char *dev_name, void *data)
-> +	      int flags, const char *dev_name, void *data)
->  {
->  	int rc;
->  	struct super_block *sb;
-> -
-> -	sb = sget(fs_type, NULL, set_anon_super, NULL);
-> +	struct cifs_sb_info *cifs_sb;
-> +	struct smb_vol *volume_info;
-> +	struct dentry *root;
-> +	char *copied_data = NULL;
->  
->  	cFYI(1, "Devname: %s flags: %d ", dev_name, flags);
->  
-> -	if (IS_ERR(sb))
-> -		return ERR_CAST(sb);
-> +	rc = cifs_setup_volume_info(&volume_info, (char *)data, dev_name);
-> +	if (rc)
-> +		return ERR_PTR(rc);
-> +
-> +	cifs_sb = kzalloc(sizeof(struct cifs_sb_info), GFP_KERNEL);
-> +	if (cifs_sb == NULL) {
-> +		root = ERR_PTR(-ENOMEM);
-> +		goto out;
-> +	}
-> +
-> +	cifs_setup_cifs_sb(volume_info, cifs_sb);
-> +
-> +	sb = sget(fs_type, NULL, set_anon_super, NULL);
-> +	if (IS_ERR(sb)) {
-> +		kfree(cifs_sb);
-> +		root = ERR_CAST(sb);
-> +		goto out;
-> +	}
->  
->  	sb->s_flags = flags;
->  
-> -	rc = cifs_read_super(sb, data, dev_name, flags & MS_SILENT ? 1 : 0);
-> +	/*
-> +	 * Copy mount params for use in submounts. Better to do
-> +	 * the copy here and deal with the error before cleanup gets
-> +	 * complicated post-mount.
-> +	 */
-> +	copied_data = kstrndup(data, PAGE_SIZE, GFP_KERNEL);
-> +	if (copied_data == NULL) {
-> +		root = ERR_PTR(-ENOMEM);
-> +		goto err_out;
-> +	}
-> +
-> +	rc = cifs_read_super(sb, cifs_sb, copied_data, volume_info, dev_name,
-> +			     flags & MS_SILENT ? 1 : 0);
->  	if (rc) {
-> -		deactivate_locked_super(sb);
-> -		return ERR_PTR(rc);
-> +		root = ERR_PTR(rc);
-> +		goto err_out;
->  	}
-> +
->  	sb->s_flags |= MS_ACTIVE;
-> -	return dget(sb->s_root);
-> +
-> +	root = dget(sb->s_root);
-> +out:
-> +	cifs_cleanup_volume_info(&volume_info);
-> +	return root;
-> +
-> +err_out:
-> +	kfree(cifs_sb);
-> +	deactivate_locked_super(sb);
-> +	cifs_cleanup_volume_info(&volume_info);
-> +	return root;
->  }
->  
->  static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 9985f99..ffd16c8 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -146,8 +146,14 @@ extern struct cifs_ntsd *get_cifs_acl(struct cifs_sb_info *, struct inode *,
->  extern int set_cifs_acl(struct cifs_ntsd *, __u32, struct inode *,
->  				const char *);
->  
-> +extern void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
-> +			       struct cifs_sb_info *cifs_sb);
-> +extern int cifs_match_super(struct super_block *, void *);
-> +extern void cifs_cleanup_volume_info(struct smb_vol **pvolume_info);
-> +extern int cifs_setup_volume_info(struct smb_vol **pvolume_info,
-> +				  char *mount_data, const char *devname);
->  extern int cifs_mount(struct super_block *, struct cifs_sb_info *,
-> -			const char *);
-> +		      struct smb_vol *, const char *);
->  extern int cifs_umount(struct super_block *, struct cifs_sb_info *);
->  extern void cifs_dfs_release_automount_timer(void);
->  void cifs_proc_init(void);
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 990c3e0..0b41f75 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2626,8 +2626,8 @@ convert_delimiter(char *path, char delim)
->  	}
->  }
->  
-> -static void setup_cifs_sb(struct smb_vol *pvolume_info,
-> -			  struct cifs_sb_info *cifs_sb)
-> +void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
-> +			struct cifs_sb_info *cifs_sb)
->  {
->  	INIT_DELAYED_WORK(&cifs_sb->prune_tlinks, cifs_prune_tlinks);
->  
-> @@ -2683,6 +2683,7 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
->  		cifs_sb->mnt_file_mode, cifs_sb->mnt_dir_mode);
->  
->  	cifs_sb->actimeo = pvolume_info->actimeo;
-> +	cifs_sb->local_nls = pvolume_info->local_nls;
->  
->  	if (pvolume_info->noperm)
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
-> @@ -2754,8 +2755,8 @@ is_path_accessible(int xid, struct cifs_tcon *tcon,
->  	return rc;
->  }
->  
-> -static void
-> -cleanup_volume_info(struct smb_vol **pvolume_info)
-> +void
-> +cifs_cleanup_volume_info(struct smb_vol **pvolume_info)
->  {
->  	struct smb_vol *volume_info;
->  
-> @@ -2861,40 +2862,13 @@ expand_dfs_referral(int xid, struct cifs_ses *pSesInfo,
->  }
->  #endif
->  
-> -int
-> -cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
-> -		const char *devname)
-> +int cifs_setup_volume_info(struct smb_vol **pvolume_info, char *mount_data,
-> +			   const char *devname)
->  {
-> -	int rc;
-> -	int xid;
->  	struct smb_vol *volume_info;
-> -	struct cifs_ses *pSesInfo;
-> -	struct cifs_tcon *tcon;
-> -	struct TCP_Server_Info *srvTcp;
-> -	char   *full_path;
-> -	struct tcon_link *tlink;
-> -#ifdef CONFIG_CIFS_DFS_UPCALL
-> -	int referral_walks_count = 0;
-> -try_mount_again:
-> -	/* cleanup activities if we're chasing a referral */
-> -	if (referral_walks_count) {
-> -		if (tcon)
-> -			cifs_put_tcon(tcon);
-> -		else if (pSesInfo)
-> -			cifs_put_smb_ses(pSesInfo);
-> -
-> -		cleanup_volume_info(&volume_info);
-> -		FreeXid(xid);
-> -	}
-> -#endif
-> -	rc = 0;
-> -	tcon = NULL;
-> -	pSesInfo = NULL;
-> -	srvTcp = NULL;
-> -	full_path = NULL;
-> -	tlink = NULL;
-> +	int rc = 0;
->  
-> -	xid = GetXid();
-> +	*pvolume_info = NULL;
->  
->  	volume_info = kzalloc(sizeof(struct smb_vol), GFP_KERNEL);
->  	if (!volume_info) {
-> @@ -2902,7 +2876,7 @@ try_mount_again:
->  		goto out;
->  	}
->  
-> -	if (cifs_parse_mount_options(cifs_sb->mountdata, devname,
-> +	if (cifs_parse_mount_options(mount_data, devname,
->  				     volume_info)) {
->  		rc = -EINVAL;
->  		goto out;
-> @@ -2935,7 +2909,46 @@ try_mount_again:
->  			goto out;
->  		}
->  	}
-> -	cifs_sb->local_nls = volume_info->local_nls;
-> +
-> +	*pvolume_info = volume_info;
-> +	return rc;
-> +out:
-> +	cifs_cleanup_volume_info(&volume_info);
-> +	return rc;
-> +}
-> +
-> +int
-> +cifs_mount(struct super_block *sb, struct cifs_sb_info *cifs_sb,
-> +	   struct smb_vol *volume_info, const char *devname)
-> +{
-> +	int rc = 0;
-> +	int xid;
-> +	struct cifs_ses *pSesInfo;
-> +	struct cifs_tcon *tcon;
-> +	struct TCP_Server_Info *srvTcp;
-> +	char   *full_path;
-> +	struct tcon_link *tlink;
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> +	int referral_walks_count = 0;
-> +try_mount_again:
-> +	/* cleanup activities if we're chasing a referral */
-> +	if (referral_walks_count) {
-> +		if (tcon)
-> +			cifs_put_tcon(tcon);
-> +		else if (pSesInfo)
-> +			cifs_put_smb_ses(pSesInfo);
-> +
-> +		cifs_cleanup_volume_info(&volume_info);
-> +		FreeXid(xid);
-> +	}
-> +#endif
-> +	tcon = NULL;
-> +	pSesInfo = NULL;
-> +	srvTcp = NULL;
-> +	full_path = NULL;
-> +	tlink = NULL;
-> +
-> +	xid = GetXid();
->  
->  	/* get a reference to a tcp session */
->  	srvTcp = cifs_get_tcp_session(volume_info);
-> @@ -2952,7 +2965,6 @@ try_mount_again:
->  		goto mount_fail_check;
->  	}
->  
-> -	setup_cifs_sb(volume_info, cifs_sb);
->  	if (pSesInfo->capabilities & CAP_LARGE_FILES)
->  		sb->s_maxbytes = MAX_LFS_FILESIZE;
->  	else
-> @@ -3108,7 +3120,6 @@ mount_fail_check:
->  	password will be freed at unmount time) */
->  out:
->  	/* zero out password before freeing */
-> -	cleanup_volume_info(&volume_info);
->  	FreeXid(xid);
->  	return rc;
->  }
+Without it, I see following in config.log
 
-Again, looks like a reasonable change, but you'll probably need to work
-with Sean or just rebase your patches on top of his since he's made
-some changes to this area recently.
+checking wbclient.h usability... no
+checking wbclient.h presence... yes
+configure: WARNING: wbclient.h: present but cannot be compiled
+configure: WARNING: wbclient.h:     check for missing prerequisite head=
+ers?
+configure: WARNING: wbclient.h: see the Autoconf documentation
+configure: WARNING: wbclient.h:     section "Present But Cannot Be Comp=
+iled"
+configure: WARNING: wbclient.h: proceeding with the preprocessor's resu=
+lt
+configure: WARNING: wbclient.h: in the future, the compiler will take p=
+recedence
+configure: WARNING:     ## ----------------------------------- ##
+configure: WARNING:     ## Report this to cifs-utils-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org ##
+configure: WARNING:     ## ----------------------------------- ##
+checking for wbclient.h... yes
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+With it, this
+
+checking for wbcStringToSid in -lwbclient... yes
+checking stdbool.h usability... yes
+checking stdbool.h presence... yes
+checking for stdbool.h... yes
+checking stdio.h usability... yes
+checking stdio.h presence... yes
+checking for stdio.h... yes
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking for wbclient.h... yes
+
+>> +
+>> +# Checks for typedefs, structures, and compiler characteristics.
+>> =A0if test $enable_cifscreds =3D "yes"; then
+>> =A0 =A0 =A0 AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils=
+=2Eh not found, consider installing keyutils-libs-devel.])])
+>> =A0fi
+>
+>
+>
+> I think this code should be a separate program. I realize that we hav=
+e
+> precedent for making this part of the same binary since the SPNEGO an=
+d
+> DNS upcalls are that way, but I don't think that was a good choice in
+> retrospect.
+>
+> These programs ought to be small and single-purpose. If you add this
+> in, then every time you do a SPENGO upcall, you'll get the wb_client
+> libs linked in. Vice versa for the idmapping upcall wrt to krb5 libs
+> (which is really a bigger problem). So, keeping them as part of the
+> same program has clear drawbacks. It also makes the code more messy.
+>
+> The DNS part of this program should (eventually) go away now that it'=
+s
+> part of a unified kernel infrastructure. At that point cifs.upcall wi=
+ll
+> be a SPNEGO upcall only again. Let's foster that by making this a
+> separate program in its own right.
+>
+> With that change too, I'd like to see a --enable-cifsidmap option or
+> something that allows the new program to be conditionally compiled.
+> That can default to "on" but should autodisable when libwbclient or
+> other needed libs aren't present.
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
