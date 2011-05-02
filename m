@@ -1,35 +1,61 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 2/2] CIFS: Add rwpidforward mount option
-Date: Mon, 2 May 2011 19:10:26 +0400
-Message-ID: <BANLkTik-+AGJ6o2LmSQGrzTp5agfDR_K0g@mail.gmail.com>
-References: <1303392395-9217-1-git-send-email-piastry@etersoft.ru>
-	<1303392395-9217-2-git-send-email-piastry@etersoft.ru>
-	<20110429102213.3c8bdb33@corrin.poochiereds.net>
-	<BANLkTi=JihA=TjEo6J5o6oR7rcw4LtpSxw@mail.gmail.com>
-	<20110502081335.6cbe8222@corrin.poochiereds.net>
-	<20110502081844.1bc9f063@corrin.poochiereds.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Add rwpidforward mount option (try #2)
+Date: Mon, 2 May 2011 19:25:39 +0400
+Message-ID: <BANLkTimC=649Mj42NBa+p0zQZL13YJM1Vg@mail.gmail.com>
+References: <1303129252-7006-1-git-send-email-piastry@etersoft.ru>
+	<loom.20110502T163337-799@post.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Kai Blin <kai-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110502081844.1bc9f063-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <loom.20110502T163337-799-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/5/2 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> One more question though...
+2011/5/2 Kai Blin <kai-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> Pavel Shilovsky <piastry@...> writes:
 >
-> If I run multiple applications under wine, then do I get multiple
-> wineserver programs? I assume not...
+> Hi Pavel,
 >
-> If that's the case, then won't this change break locking between
-> multiple wine applications that are operating on the same files?
+>>
+>> Add rwpidforward mount option that switches on a mode when we forward
+>> pid of a process who opened a file to any read and write operation.
+>>
+>> This can prevent applications like WINE from failing on read or write
+>> operation on a previously locked file region from the same netfd from
+>> another process if we use mandatory brlock style.
+>> It is actual for WINE because during a run of WINE program two processes
+>> work on the same netfd - share the same file struct between several VFS
+>> fds:
+>> 1) WINE-server does open and lock;
+>> 2) WINE-application does read and write.
+>
+> I'm not sure I fully understand what problem you're trying to solve here.
+> The Wine server should take care of all the locking-related operations and make
+> sure the application process should have access to the file. I'm not familiar
+> with exactly how this happens, but I'm not sure how this would be any different
+> for CIFS-based file systems opposed to local file systems. I'm pretty sure it
+> works fine for local file systems.
+>
+> Can you elaborate what problem you're seeing that your patches fix?
+>
+> Cheers,
+> Kai
+>
+> PS: I'm not subscribed to this list, so please CC me :)
 >
 
-Wineserver is run per combination of user and configuration directory.
-Wineserver provides mechanisms for processing such kind things(on
-local file systems). So, it seems that this change doesn't break it.
+You are right - wineserver takes care about all these things if we
+work on local filesystem. But if we work on CIFS share the situation
+changes. When we negotiate mandatory locking style CIFS server
+compares pid of process who tries to do read/write with file with pid
+of byte-range lock (if one exists) on this area of the file. If pids
+don't match it fails operation. So, that's why I did this change - to
+do read and write operations with the pid of process who sets
+byte-range locks (wineserver). As the result, with this patch (I
+splited it into two) we do lock, write and read with the same pid and
+it works good.
 
 -- 
 Best regards,
