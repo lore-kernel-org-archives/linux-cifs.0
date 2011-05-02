@@ -1,283 +1,77 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Handle cifs_idmap type of key to map a SID
- to either an uid or gid (try #17 repost)
-Date: Mon, 2 May 2011 07:51:45 -0400
-Message-ID: <20110502075145.7dc3e1bc@corrin.poochiereds.net>
-References: <1303914990-7804-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 2/2] CIFS: Add rwpidforward mount option
+Date: Mon, 2 May 2011 08:13:35 -0400
+Message-ID: <20110502081335.6cbe8222@corrin.poochiereds.net>
+References: <1303392395-9217-1-git-send-email-piastry@etersoft.ru>
+	<1303392395-9217-2-git-send-email-piastry@etersoft.ru>
+	<20110429102213.3c8bdb33@corrin.poochiereds.net>
+	<BANLkTi=JihA=TjEo6J5o6oR7rcw4LtpSxw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1303914990-7804-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <BANLkTi=JihA=TjEo6J5o6oR7rcw4LtpSxw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 27 Apr 2011 09:36:30 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Fri, 29 Apr 2011 18:41:54 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 2011/4/29 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
+> > On Thu, 21 Apr 2011 17:26:35 +0400
+> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> >
+> >> Add rwpidforward mount option that switches on a mode when we forward
+> >> pid of a process who opened a file to any read and write operation.
+> >>
+> >> This can prevent applications like WINE from failing on read or write
+> >> operation on a previously locked file region from the same netfd from
+> >> another process if we use mandatory brlock style.
+> >> It is actual for WINE because during a run of WINE program two processes
+> >> work on the same netfd - share the same file struct between several VFS
+> >> fds:
+> >> 1) WINE-server does open and lock;
+> >> 2) WINE-application does read and write.
+> >>
+> >
+> > I guess I still don't quite get it. Why not always forward the pid
+> > unconditionally?
+> >
+> > For wine, you want to forward the pid in order to emulate windows
+> > locking semantics. But always forwarding the pid seems like it would
+> > give you more unix-like semantics when locking unix applications,
+> > right? IOW, you'd be less likely to block in a read or write operation.
+> >
+> > Can you give an example of some use case that would break if you were
+> > to do this unconditionally?
 > 
-> Handle cifs_idmap type of key. Extract a SID string from the description
-> and map it to either an uid or gid using winbind APIs.
-> If that fails (e.g. because winbind is not installed/running or winbind returns
-> an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
-> And if that fails, kernel assigns uid and gid (from mount superblock).
+> Ok. Let's predict:
+> 1) we negotiate mandatory locking semantic.
+> 2) we have a file opened my process 'A'.
+> 3) we do fork() - process 'B' is born and inherits a file.
+> 4) process 'A' set an exclusive lock on a file (from start to end)
+> 5) process 'B' write to a file and succeed if we forward pid
+> unconditionally in this case. - that's wrong according to mandatory
+> locking semantic
+> (http://msdn.microsoft.com/en-us/library/aa365202(v=vs.85).aspx)
 > 
-> Enable including winbind header files and idmapping code conditional
-> to winbind devel rpms (header and library).
+> So, at least we don't need to forward pid if we negotiate Windows
+> locking style. As for POSIX - I think that is not affect anything
+> because we work with advisory locking style and don't care about such
+> things at all. So, that's why we need it as separate mount option that
+> switches specific behavior for application like WINE (or any other
+> client/server applications that send fd though a pipe or a socket and
+> use a client for i/o operations and a server - to open and lock).
 > 
-> An entry such as this
-> 
-> create  cifs.cifs_idmap   *       *               /usr/sbin/cifs.upcall %k
-> 
-> is needed in the file /etc/request-key.conf.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  Makefile.am   |    2 +-
->  cifs.upcall.c |  117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  configure.ac  |   35 +++++++++++++++++
->  3 files changed, 152 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 67a0190..13b6c16 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -11,7 +11,7 @@ man_MANS = mount.cifs.8
->  if CONFIG_CIFSUPCALL
->  sbin_PROGRAMS = cifs.upcall
->  cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
-> -cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
-> +cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD) $(WINB_LDADD)
->  man_MANS += cifs.upcall.8
->  
->  #
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index 479517c..6c2088b 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -45,6 +45,15 @@
->  #include <time.h>
->  #include <netdb.h>
->  #include <arpa/inet.h>
-> +#include <stdint.h>
-> +#include <stdbool.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <errno.h>
-> +#include <limits.h>
-> +#ifdef HAVE_WBCLIENT_H
-> +#include <wbclient.h>
-> +#endif /* HAVE_WBCLIENT_H */
->  
->  #include "util.h"
->  #include "replace.h"
-> @@ -653,7 +662,7 @@ static int cifs_resolver(const key_serial_t key, const char *key_descr)
->  	const char *keyend = key_descr;
->  	/* skip next 4 ';' delimiters to get to description */
->  	for (c = 1; c <= 4; c++) {
-> -		keyend = index(keyend + 1, ';');
-> +		keyend = rindex(keyend + 1, ';');
->  		if (!keyend) {
->  			syslog(LOG_ERR, "invalid key description: %s",
->  			       key_descr);
-> @@ -695,6 +704,105 @@ static int cifs_resolver(const key_serial_t key, const char *key_descr)
->  	return 0;
->  }
->  
-> +#ifdef HAVE_LIBWBCLIENT
-> +static int
-> +cifs_sid_resolver(const key_serial_t key, const char *key_descr)
-> +{
-> +	int i;
-> +	uid_t uid = 0;
-> +	gid_t gid = 0;;
-> +	wbcErr rc = 1;
-> +	const char *keyend = key_descr;
-> +	struct wbcDomainSid sid;
-> +	struct passwd *pw;
-> +	struct group *gr;
-> +
-> +	/* skip next 4 ';' delimiters to get to description */
-> +	for (i = 1; i <= 4; ++i) {
-> +		keyend = index(keyend + 1, ';');
-> +		if (!keyend) {
-> +			syslog(LOG_ERR, "invalid key description: %s",
-> +			       key_descr);
-> +			return 1;
-> +		}
-> +	}
-> +	keyend++;
-> +
-> +	/*
-> +	 * Use winbind to convert received string to a SID and lookup
-> +	 * name and map that SID to an uid.  If either of these
-> +	 * function calls return with an error,  use system calls to obtain
-> +	 * uid of user "nobody". If winbind fails to map a SID to an UID
-> +	 * and there is no user named "nobody", return error to the
-> +	 * upcall caller. Otherwise instanticate a key using that uid.
-> +	 *
-> +	 * The same applies to SID and gid mapping.  Instead of a
-> +	 * user "nobody", user "nogroup" is looked up if winbind
-> +	 * fails to map a SID to a gid.
-> +	 */
-> +	if (strncmp(keyend, "os", 2) == 0) {
-> +		keyend = index(keyend + 1, ':');
-> +		keyend++;
-> +		rc = wbcStringToSid(keyend, &sid);
-> +		if (rc)
-> +			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-> +		else {
-> +			rc = wbcSidToUid(&sid, &uid);
-> +			if (rc)
-> +				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
-> +						keyend, rc);
-> +		}
-> +		if (rc) { /* either of the two wbcSid functions failed */
-> +			pw = getpwnam("nobody");
-> +			if (!pw)
-> +				syslog(LOG_DEBUG, "SID %s to uid pw error: %d",
-> +					keyend, rc);
-> +			else {
-> +				uid = pw->pw_uid;
-> +				rc = 0;
-> +			}
-> +		}
-> +		if (!rc) { /* SID has been mapped to a uid */
-> +			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
-> +			if (rc)
-> +				syslog(LOG_ERR, "%s: key inst: %s",
-> +					__func__, strerror(errno));
-> +		}
-> +	} else if (strncmp(keyend, "gs", 2) == 0) {
-> +		keyend = index(keyend + 1, ':');
-> +		keyend++;
-> +		rc = wbcStringToSid(keyend, &sid);
-> +		if (rc)
-> +			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-> +		else {
-> +			rc = wbcSidToGid(&sid, &gid);
-> +			if (rc)
-> +				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
-> +						keyend, rc);
-> +		}
-> +		if (rc) { /* either of the two wbcSid functions failed */
-> +			gr = getgrnam("nogroup");
-> +			if (!gr)
-> +				syslog(LOG_DEBUG, "SID %s to gid pw error: %d",
-> +						keyend, rc);
-> +			else {
-> +				gid = gr->gr_gid;
-> +				rc = 0;
-> +			}
-> +		}
-> +		if (!rc) { /* SID has been mapped to a gid */
-> +			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
-> +			if (rc)
-> +				syslog(LOG_ERR, "%s: key inst: %s",
-> +						__func__, strerror(errno));
-> +		}
-> +	} else
-> +		syslog(LOG_DEBUG, "Invalid SID: %s", keyend);
-> +
-> +	return rc;
-> +}
-> +#endif /* HAVE_LIBWBCLIENT */
-> +
->  /*
->   * Older kernels sent IPv6 addresses without colons. Well, at least
->   * they're fixed-length strings. Convert these addresses to have colon
-> @@ -832,6 +940,13 @@ int main(const int argc, char *const argv[])
->  		rc = cifs_resolver(key, buf);
->  		goto out;
->  	}
-> +#ifdef HAVE_LIBWBCLIENT
-> +	if ((strncmp(buf, "cifs.cifs_idmap", sizeof("cifs.cifs_idmap") - 1)
-> +			== 0)) {
-> +		rc = cifs_sid_resolver(key, buf);
-> +		goto out;
-> +	}
-> +#endif /* HAVE_LIBWBCLIENT */
->  
->  	have = decode_key_description(buf, &arg);
->  	SAFE_FREE(buf);
-> diff --git a/configure.ac b/configure.ac
-> index e0e2a60..45800bd 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -89,6 +89,41 @@ if test $enable_cifsupcall != "no"; then
->  	AC_SUBST(KRB5_LDADD)
->  fi
->  
-> +if test $enable_cifsupcall != "no"; then
-> +	AC_CHECK_LIB([wbclient], [wbcStringToSid],
-> +		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["define a var"]) ], AC_MSG_ERROR([no functioning wbclient library found!]))
-> +	AC_SUBST(WINB_LDADD)
-> +fi
-> +
-> +if test $enable_cifsupcall != "no"; then
-> +	AC_CHECK_HEADERS([stdbool.h])
-> +	AC_CHECK_HEADERS([stdio.h])
-> +	AC_CHECK_HEADERS([errno.h])
-> +	AC_CHECK_HEADERS([wbclient.h], , [AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])],
-> +[#ifdef HAVE_STDINT_H
-> +#include <stdint.h>
-> +#endif
-> +]
-> +[#ifdef HAVE_STDBOOL_H
-> +#include <stdbool.h>
-> +#endif
-> +]
-> +[#ifdef HAVE_STDIO_H
-> +#include <stdio.h>
-> +#endif
-> +]
-> +[#ifdef HAVE_STDLIB_H
-> +#include <stdlib.h>
-> +#endif
-> +]
-> +[#ifdef HAVE_ERRNO_H
-> +#include <errno.h>
-> +#endif
-> +]
-> +)
-> +fi
 
-What on earth is the stuff above? configure.ac is at it's heart a shell
-script, so I'm pretty sure the above will end up looking like a bunch
-of comments wrapped in square brackets.
+Yuck. It's pretty icky that we have to have 2 separate sets of behavior
+here to work around a single application. I can't help but think that
+there must be a better way to do this.
 
-> +
-> +# Checks for typedefs, structures, and compiler characteristics.
->  if test $enable_cifscreds = "yes"; then
->  	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
->  fi
+That said, I won't stand in the way of this patch if it's really the
+only option. Also, did you want to send a patch for the mount.cifs
+manpage to document this?
 
-
-
-I think this code should be a separate program. I realize that we have
-precedent for making this part of the same binary since the SPNEGO and
-DNS upcalls are that way, but I don't think that was a good choice in
-retrospect.
-
-These programs ought to be small and single-purpose. If you add this
-in, then every time you do a SPENGO upcall, you'll get the wb_client
-libs linked in. Vice versa for the idmapping upcall wrt to krb5 libs
-(which is really a bigger problem). So, keeping them as part of the
-same program has clear drawbacks. It also makes the code more messy.
-
-The DNS part of this program should (eventually) go away now that it's
-part of a unified kernel infrastructure. At that point cifs.upcall will
-be a SPNEGO upcall only again. Let's foster that by making this a
-separate program in its own right.
-
-With that change too, I'd like to see a --enable-cifsidmap option or
-something that allows the new program to be conditionally compiled.
-That can default to "on" but should autodisable when libwbclient or
-other needed libs aren't present.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
