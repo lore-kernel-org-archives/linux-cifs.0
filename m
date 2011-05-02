@@ -1,140 +1,248 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 8/8] cifs: use the server's MaxMpxCount to determine max requests in flight
-Date: Mon,  2 May 2011 10:04:29 -0400
-Message-ID: <1304345069-2441-9-git-send-email-jlayton@redhat.com>
-References: <1304345069-2441-1-git-send-email-jlayton@redhat.com>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH 3/4] CIFS: Migrate from prefixpath logic
+Date: Mon, 2 May 2011 18:10:01 +0400
+Message-ID: <BANLkTimOSURKGNrukzNDcN0KLo3dsmyYMg@mail.gmail.com>
+References: <1302850916-13947-1-git-send-email-piastry@etersoft.ru>
+	<1302850916-13947-2-git-send-email-piastry@etersoft.ru>
+	<20110429111720.1f3a49d8@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1304345069-2441-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20110429111720.1f3a49d8-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently, we have a default cap of 50 outstanding requests and a hard
-cap of 256. However, the server sends us how many requests it can handle
-simultaneously via the MaxMapCount value in the NegProt request. Use
-that value instead and eliminate the cifs_max_pending module parm.
+2011/4/29 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Fri, 15 Apr 2011 11:01:55 +0400
+> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>
+>> Now we point superblock to a server share root and set a root dentry
+>> appropriately. This let us share superblock between mounts like
+>> //server/sharename/foo/bar and //server/sharename/foo further.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>> ---
+>> =A0fs/cifs/cifs_fs_sb.h | =A0 =A02 -
+>> =A0fs/cifs/cifsfs.c =A0 =A0 | =A0 95 +++++++++++++++++++++++++++++++=
+++++-
+>> =A0fs/cifs/cifsglob.h =A0 | =A0 76 +++++++++++++++++++++++++++++
+>> =A0fs/cifs/cifsproto.h =A0| =A0 =A05 +-
+>> =A0fs/cifs/connect.c =A0 =A0| =A0129 ++-----------------------------=
+-------------------
+>> =A0fs/cifs/dir.c =A0 =A0 =A0 =A0| =A0 =A07 +--
+>> =A0fs/cifs/inode.c =A0 =A0 =A0| =A0 15 +++---
+>> =A07 files changed, 186 insertions(+), 143 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+>> index adecd36..a18ba37 100644
+>> --- a/fs/cifs/cifs_fs_sb.h
+>> +++ b/fs/cifs/cifs_fs_sb.h
+>> @@ -58,8 +58,6 @@ struct cifs_sb_info {
+>> =A0 =A0 =A0 mode_t =A0mnt_file_mode;
+>> =A0 =A0 =A0 mode_t =A0mnt_dir_mode;
+>> =A0 =A0 =A0 unsigned int mnt_cifs_flags;
+>> - =A0 =A0 int =A0 =A0 prepathlen;
+>> - =A0 =A0 char =A0 *prepath; /* relative path under the share to mou=
+nt to */
+>> =A0 =A0 =A0 char =A0 *mountdata; /* options received at mount time o=
+r via DFS refs */
+>> =A0 =A0 =A0 struct backing_dev_info bdi;
+>> =A0 =A0 =A0 struct delayed_work prune_tlinks;
+>> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+>> index 3227db6..44394c8 100644
+>> --- a/fs/cifs/cifsfs.c
+>> +++ b/fs/cifs/cifsfs.c
+>> @@ -434,8 +434,6 @@ cifs_show_options(struct seq_file *s, struct vfs=
+mount *m)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(s, ",nocase");
+>> =A0 =A0 =A0 if (tcon->retry)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(s, ",hard");
+>> - =A0 =A0 if (cifs_sb->prepath)
+>> - =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(s, ",prepath=3D%s", cifs_sb->pr=
+epath);
+>> =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(s, ",posixpaths");
+>> =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)
+>> @@ -549,6 +547,92 @@ static const struct super_operations cifs_super=
+_ops =3D {
+>> =A0#endif
+>> =A0};
+>>
+>> +/*
+>> + * Get root dentry from superblock according to prefix path mount o=
+ption.
+>> + * Return dentry with refcount + 1 on success and NULL otherwise.
+>> + */
+>> +static struct dentry *
+>> +cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+>> +{
+>> + =A0 =A0 int xid, rc;
+>> + =A0 =A0 struct inode *inode;
+>> + =A0 =A0 struct qstr name;
+>> + =A0 =A0 struct dentry *dparent =3D NULL, *dchild =3D NULL;
+>> + =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
+>> + =A0 =A0 unsigned int i, full_len, len;
+>> + =A0 =A0 char *full_path =3D NULL, *pstart;
+>> + =A0 =A0 char sep;
+>> +
+>> + =A0 =A0 full_path =3D cifs_build_path_to_root(vol, cifs_sb,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 cifs_sb_master_tcon(cifs_sb));
+>> + =A0 =A0 if (full_path =3D=3D NULL)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return NULL;
+>> +
+>> + =A0 =A0 cFYI(1, "Get root dentry for %s", full_path);
+>> +
+>> + =A0 =A0 xid =3D GetXid();
+>> + =A0 =A0 sep =3D CIFS_DIR_SEP(cifs_sb);
+>> + =A0 =A0 dparent =3D dget(sb->s_root);
+>> + =A0 =A0 full_len =3D strlen(full_path);
+>> + =A0 =A0 full_path[full_len] =3D sep;
+>> + =A0 =A0 pstart =3D full_path + 1;
+>> +
+>> + =A0 =A0 for (i =3D 1, len =3D 0; i <=3D full_len; i++) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (full_path[i] !=3D sep || !len) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len++;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continue;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 full_path[i] =3D 0;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "get dentry for %s", pstart);
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 name.name =3D pstart;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 name.len =3D len;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 name.hash =3D full_name_hash(pstart, len);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 dchild =3D d_lookup(dparent, &name);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (dchild =3D=3D NULL) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "not exists");
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dchild =3D d_alloc(dparent=
+, &name);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (dchild =3D=3D NULL) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dput(dpare=
+nt);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dparent =3D=
+ NULL;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "get inode");
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (dchild->d_inode =3D=3D NULL) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "not exists");
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 inode =3D NULL;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_sb_master_tcon(CI=
+=46S_SB(sb))->unix_ext)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cif=
+s_get_inode_info_unix(&inode, full_path,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sb, xid);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cif=
+s_get_inode_info(&inode, full_path,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0NULL, sb, xid, NULL);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dput(dchil=
+d);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dput(dpare=
+nt);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 dparent =3D=
+ NULL;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 d_add(dchild, inode);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0^^^^^^
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Is this racy? Could an=
+other dentry have been
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0added between the time=
+ that you did the initial
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0lookup and here? I thi=
+nk there are functions
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0that guard against tha=
+t possibility.
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0d_materialise_unique m=
+aybe?
+>
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "parent %p, child %p", dparent, dc=
+hild);
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 dput(dparent);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 dparent =3D dchild;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 len =3D 0;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 pstart =3D full_path + i + 1;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 full_path[i] =3D sep;
+>> + =A0 =A0 }
+>> +out:
+>> + =A0 =A0 _FreeXid(xid);
+>> + =A0 =A0 full_path[full_len] =3D 0;
+> =A0 =A0 =A0 =A0^^^ that's unnecessary, you free this just afterward.
+>
+>> + =A0 =A0 kfree(full_path);
+>> + =A0 =A0 return dparent;
+>> +}
+>> +
+>> =A0static struct dentry *
+>> =A0cifs_do_mount(struct file_system_type *fs_type,
+>> =A0 =A0 =A0 =A0 =A0 =A0 int flags, const char *dev_name, void *data)
+>> @@ -603,7 +687,12 @@ cifs_do_mount(struct file_system_type *fs_type,
+>>
+>> =A0 =A0 =A0 sb->s_flags |=3D MS_ACTIVE;
+>>
+>> - =A0 =A0 root =3D dget(sb->s_root);
+>> + =A0 =A0 root =3D cifs_get_root(volume_info, sb);
+>> + =A0 =A0 if (root =3D=3D NULL) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 kfree(copied_data);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 goto err_out;
+>> + =A0 =A0 }
+>> + =A0 =A0 cFYI(1, "dentry root is: %p", root);
+>> =A0out:
+>> =A0 =A0 =A0 cifs_cleanup_volume_info(&volume_info);
+>> =A0 =A0 =A0 return root;
+>
+> [...]
+>
+>> @@ -887,16 +887,17 @@ struct inode *cifs_root_iget(struct super_bloc=
+k *sb)
+>> =A0 =A0 =A0 char *full_path;
+>> =A0 =A0 =A0 struct cifs_tcon *tcon =3D cifs_sb_master_tcon(cifs_sb);
+>>
+>> - =A0 =A0 full_path =3D cifs_build_path_to_root(cifs_sb, tcon);
+>> + =A0 =A0 full_path =3D kmalloc(1, GFP_KERNEL);
+>> =A0 =A0 =A0 if (full_path =3D=3D NULL)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return ERR_PTR(-ENOMEM);
+>> + =A0 =A0 full_path[0] =3D 0;
+>>
+>
+> Don't kmalloc 1 byte, just pass "" or do it on the stack instead.
+>
+>> =A0 =A0 =A0 xid =3D GetXid();
+>> =A0 =A0 =A0 if (tcon->unix_ext)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info_unix(&inode, =
+full_path, sb, xid);
+>> =A0 =A0 =A0 else
+>> - =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info(&inode, full_pa=
+th, NULL, sb,
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 xid, NULL);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_info(&inode, full_pa=
+th, NULL, sb, xid,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0NULL);
+>>
+>> =A0 =A0 =A0 if (!inode) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 inode =3D ERR_PTR(rc);
+>
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsfs.c    |   12 ------------
- fs/cifs/cifsglob.h  |   14 +-------------
- fs/cifs/connect.c   |    5 +++--
- fs/cifs/transport.c |    6 +++---
- 4 files changed, 7 insertions(+), 30 deletions(-)
+Thanks! Good points - I will respin this patch.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index fb6a2ad..22f0b1a 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -72,10 +72,6 @@ unsigned int cifs_min_small = 30;
- module_param(cifs_min_small, int, 0);
- MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. Default: 30 "
- 				 "Range: 2 to 256");
--unsigned int cifs_max_pending = CIFS_MAX_REQ;
--module_param(cifs_max_pending, int, 0);
--MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
--				   "Default: 50 Range: 2 to 256");
- unsigned short echo_retries = 5;
- module_param(echo_retries, ushort, 0644);
- MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
-@@ -1035,14 +1031,6 @@ init_cifs(void)
- 	spin_lock_init(&cifs_file_list_lock);
- 	spin_lock_init(&GlobalMid_Lock);
- 
--	if (cifs_max_pending < 2) {
--		cifs_max_pending = 2;
--		cFYI(1, "cifs_max_pending set to min of 2");
--	} else if (cifs_max_pending > 256) {
--		cifs_max_pending = 256;
--		cFYI(1, "cifs_max_pending set to max of 256");
--	}
--
- 	rc = cifs_fscache_register();
- 	if (rc)
- 		goto out_clean_proc;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b3a6404..5f7c52a 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -56,17 +56,6 @@
-  */
- #define CIFS_MAX_ACTIMEO (1 << 30)
- 
--/*
-- * MAX_REQ is the maximum number of requests that WE will send
-- * on one socket concurrently. It also matches the most common
-- * value of max multiplex returned by servers.  We may
-- * eventually want to use the negotiated value (in case
-- * future servers can handle more) when we are more confident that
-- * we will not have problems oveloading the socket with pending
-- * write data.
-- */
--#define CIFS_MAX_REQ 50
--
- #define RFC1001_NAME_LEN 15
- #define RFC1001_NAME_LEN_WITH_NULL (RFC1001_NAME_LEN + 1)
- 
-@@ -185,8 +174,8 @@ struct TCP_Server_Info {
- 	__u16 sec_mode;
- 	bool session_estab; /* mark when very first sess is established */
- 	u16 dialect; /* dialect index that server chose */
-+	u16 maxReq;  /* Clients should submit no more */
- 	enum securityEnum secType;
--	unsigned int maxReq;	/* Clients should submit no more */
- 	/* than maxReq distinct unanswered SMBs to the server when using  */
- 	/* multiplexed reads or writes */
- 	unsigned int maxBuf;	/* maxBuf specifies the maximum */
-@@ -905,7 +894,6 @@ GLOBAL_EXTERN unsigned int linuxExtEnabled;/*enable Linux/Unix CIFS extensions*/
- GLOBAL_EXTERN unsigned int CIFSMaxBufSize;  /* max size not including hdr */
- GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
- GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
--GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
- 
- /* reconnect after this many failed echo attempts */
- GLOBAL_EXTERN unsigned short echo_retries;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b5e4b75..5a636ab 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -728,8 +728,8 @@ multi_t2_fnd:
- 	/* Note that cifs_max_pending is normally 50, but
- 	can be set at module install time to as little as two */
- 	spin_lock(&GlobalMid_Lock);
--	if (atomic_read(&server->inFlight) >= cifs_max_pending)
--		atomic_set(&server->inFlight, cifs_max_pending - 1);
-+	if (atomic_read(&server->inFlight) >= server->maxReq)
-+		atomic_set(&server->inFlight, server->maxReq - 1);
- 	/* We do not want to set the max_pending too low or we
- 	could end up with the counter going negative */
- 	spin_unlock(&GlobalMid_Lock);
-@@ -1770,6 +1770,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	tcp_ses->noautotune = volume_info->noautotune;
- 	/* BB should we set this unconditionally now, especially for SMB2 */
- 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
-+	tcp_ses->maxReq = 1; /* reset after NEGOTIATE */
- 	atomic_set(&tcp_ses->inFlight, 0);
- 	init_waitqueue_head(&tcp_ses->response_q);
- 	init_waitqueue_head(&tcp_ses->request_q);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index ad32b70..89a9892 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -265,12 +265,12 @@ int wait_for_free_request(struct TCP_Server_Info *server,
- 	spin_lock(&GlobalMid_Lock);
- 	while (1) {
- 		if ((server->is_smb2 == false) && 
--		    atomic_read(&server->inFlight) >= cifs_max_pending) {
-+		    atomic_read(&server->inFlight) >= server->maxReq) {
- 			spin_unlock(&GlobalMid_Lock);
- 			cifs_num_waiters_inc(server);
- 			wait_event(server->request_q,
--				   atomic_read(&server->inFlight)
--				     < cifs_max_pending);
-+				atomic_read(&server->inFlight) <
-+						server->maxReq);
- 			cifs_num_waiters_dec(server);
- 			spin_lock(&GlobalMid_Lock);
- #ifdef CONFIG_CIFS_SMB2
--- 
-1.7.4.4
+--=20
+Best regards,
+Pavel Shilovsky.
