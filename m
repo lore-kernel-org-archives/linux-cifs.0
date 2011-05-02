@@ -1,57 +1,283 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: CIFS Not Responding Error On Working System
-Date: Mon, 2 May 2011 07:01:56 -0400
-Message-ID: <20110502070156.371ef97a@corrin.poochiereds.net>
-References: <4DB9BFBA.3020403@softtalker.com>
-	<BANLkTinoC1d=NBLyzXa61cB+tR-+4F50zg@mail.gmail.com>
-	<20110429093256.3c33cd01@corrin.poochiereds.net>
-	<4DBAD409.9000300@softtalker.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils: Handle cifs_idmap type of key to map a SID
+ to either an uid or gid (try #17 repost)
+Date: Mon, 2 May 2011 07:51:45 -0400
+Message-ID: <20110502075145.7dc3e1bc@corrin.poochiereds.net>
+References: <1303914990-7804-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Mike Dillinger <miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4DBAD409.9000300-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org>
+In-Reply-To: <1303914990-7804-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 29 Apr 2011 08:06:49 -0700
-Mike Dillinger <miked-yxPvCyoe84a+XT7JhA+gdA@public.gmane.org> wrote:
+On Wed, 27 Apr 2011 09:36:30 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> > What sort of host is "peart" here? WinXP?
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
-> peart is WinXP 64 SP2, and the Linux machine is running Debian wheezy.  
-> The XP firewall is off and the internet security firewall (Kaspersky 
-> Internet Security) is off.
+> Handle cifs_idmap type of key. Extract a SID string from the description
+> and map it to either an uid or gid using winbind APIs.
+> If that fails (e.g. because winbind is not installed/running or winbind returns
+> an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
+> And if that fails, kernel assigns uid and gid (from mount superblock).
 > 
-> The firewall thing doesn't make sense, or else it seems to me that I 
-> wouldn't be able to view the remote data.  The remote side *always* 
-> works when I view the file share.  I have even tried during viewing the 
-> data multiple times during the 5 minute interval where syslog states the 
-> host is not responding.  I will capture Wireshark traces though if there 
-> aren't any other suggestions.
+> Enable including winbind header files and idmapping code conditional
+> to winbind devel rpms (header and library).
 > 
+> An entry such as this
+> 
+> create  cifs.cifs_idmap   *       *               /usr/sbin/cifs.upcall %k
+> 
+> is needed in the file /etc/request-key.conf.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  Makefile.am   |    2 +-
+>  cifs.upcall.c |  117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  configure.ac  |   35 +++++++++++++++++
+>  3 files changed, 152 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 67a0190..13b6c16 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -11,7 +11,7 @@ man_MANS = mount.cifs.8
+>  if CONFIG_CIFSUPCALL
+>  sbin_PROGRAMS = cifs.upcall
+>  cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
+> -cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
+> +cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD) $(WINB_LDADD)
+>  man_MANS += cifs.upcall.8
+>  
+>  #
+> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> index 479517c..6c2088b 100644
+> --- a/cifs.upcall.c
+> +++ b/cifs.upcall.c
+> @@ -45,6 +45,15 @@
+>  #include <time.h>
+>  #include <netdb.h>
+>  #include <arpa/inet.h>
+> +#include <stdint.h>
+> +#include <stdbool.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <errno.h>
+> +#include <limits.h>
+> +#ifdef HAVE_WBCLIENT_H
+> +#include <wbclient.h>
+> +#endif /* HAVE_WBCLIENT_H */
+>  
+>  #include "util.h"
+>  #include "replace.h"
+> @@ -653,7 +662,7 @@ static int cifs_resolver(const key_serial_t key, const char *key_descr)
+>  	const char *keyend = key_descr;
+>  	/* skip next 4 ';' delimiters to get to description */
+>  	for (c = 1; c <= 4; c++) {
+> -		keyend = index(keyend + 1, ';');
+> +		keyend = rindex(keyend + 1, ';');
+>  		if (!keyend) {
+>  			syslog(LOG_ERR, "invalid key description: %s",
+>  			       key_descr);
+> @@ -695,6 +704,105 @@ static int cifs_resolver(const key_serial_t key, const char *key_descr)
+>  	return 0;
+>  }
+>  
+> +#ifdef HAVE_LIBWBCLIENT
+> +static int
+> +cifs_sid_resolver(const key_serial_t key, const char *key_descr)
+> +{
+> +	int i;
+> +	uid_t uid = 0;
+> +	gid_t gid = 0;;
+> +	wbcErr rc = 1;
+> +	const char *keyend = key_descr;
+> +	struct wbcDomainSid sid;
+> +	struct passwd *pw;
+> +	struct group *gr;
+> +
+> +	/* skip next 4 ';' delimiters to get to description */
+> +	for (i = 1; i <= 4; ++i) {
+> +		keyend = index(keyend + 1, ';');
+> +		if (!keyend) {
+> +			syslog(LOG_ERR, "invalid key description: %s",
+> +			       key_descr);
+> +			return 1;
+> +		}
+> +	}
+> +	keyend++;
+> +
+> +	/*
+> +	 * Use winbind to convert received string to a SID and lookup
+> +	 * name and map that SID to an uid.  If either of these
+> +	 * function calls return with an error,  use system calls to obtain
+> +	 * uid of user "nobody". If winbind fails to map a SID to an UID
+> +	 * and there is no user named "nobody", return error to the
+> +	 * upcall caller. Otherwise instanticate a key using that uid.
+> +	 *
+> +	 * The same applies to SID and gid mapping.  Instead of a
+> +	 * user "nobody", user "nogroup" is looked up if winbind
+> +	 * fails to map a SID to a gid.
+> +	 */
+> +	if (strncmp(keyend, "os", 2) == 0) {
+> +		keyend = index(keyend + 1, ':');
+> +		keyend++;
+> +		rc = wbcStringToSid(keyend, &sid);
+> +		if (rc)
+> +			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
+> +		else {
+> +			rc = wbcSidToUid(&sid, &uid);
+> +			if (rc)
+> +				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
+> +						keyend, rc);
+> +		}
+> +		if (rc) { /* either of the two wbcSid functions failed */
+> +			pw = getpwnam("nobody");
+> +			if (!pw)
+> +				syslog(LOG_DEBUG, "SID %s to uid pw error: %d",
+> +					keyend, rc);
+> +			else {
+> +				uid = pw->pw_uid;
+> +				rc = 0;
+> +			}
+> +		}
+> +		if (!rc) { /* SID has been mapped to a uid */
+> +			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
+> +			if (rc)
+> +				syslog(LOG_ERR, "%s: key inst: %s",
+> +					__func__, strerror(errno));
+> +		}
+> +	} else if (strncmp(keyend, "gs", 2) == 0) {
+> +		keyend = index(keyend + 1, ':');
+> +		keyend++;
+> +		rc = wbcStringToSid(keyend, &sid);
+> +		if (rc)
+> +			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
+> +		else {
+> +			rc = wbcSidToGid(&sid, &gid);
+> +			if (rc)
+> +				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
+> +						keyend, rc);
+> +		}
+> +		if (rc) { /* either of the two wbcSid functions failed */
+> +			gr = getgrnam("nogroup");
+> +			if (!gr)
+> +				syslog(LOG_DEBUG, "SID %s to gid pw error: %d",
+> +						keyend, rc);
+> +			else {
+> +				gid = gr->gr_gid;
+> +				rc = 0;
+> +			}
+> +		}
+> +		if (!rc) { /* SID has been mapped to a gid */
+> +			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
+> +			if (rc)
+> +				syslog(LOG_ERR, "%s: key inst: %s",
+> +						__func__, strerror(errno));
+> +		}
+> +	} else
+> +		syslog(LOG_DEBUG, "Invalid SID: %s", keyend);
+> +
+> +	return rc;
+> +}
+> +#endif /* HAVE_LIBWBCLIENT */
+> +
+>  /*
+>   * Older kernels sent IPv6 addresses without colons. Well, at least
+>   * they're fixed-length strings. Convert these addresses to have colon
+> @@ -832,6 +940,13 @@ int main(const int argc, char *const argv[])
+>  		rc = cifs_resolver(key, buf);
+>  		goto out;
+>  	}
+> +#ifdef HAVE_LIBWBCLIENT
+> +	if ((strncmp(buf, "cifs.cifs_idmap", sizeof("cifs.cifs_idmap") - 1)
+> +			== 0)) {
+> +		rc = cifs_sid_resolver(key, buf);
+> +		goto out;
+> +	}
+> +#endif /* HAVE_LIBWBCLIENT */
+>  
+>  	have = decode_key_description(buf, &arg);
+>  	SAFE_FREE(buf);
+> diff --git a/configure.ac b/configure.ac
+> index e0e2a60..45800bd 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -89,6 +89,41 @@ if test $enable_cifsupcall != "no"; then
+>  	AC_SUBST(KRB5_LDADD)
+>  fi
+>  
+> +if test $enable_cifsupcall != "no"; then
+> +	AC_CHECK_LIB([wbclient], [wbcStringToSid],
+> +		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["define a var"]) ], AC_MSG_ERROR([no functioning wbclient library found!]))
+> +	AC_SUBST(WINB_LDADD)
+> +fi
+> +
+> +if test $enable_cifsupcall != "no"; then
+> +	AC_CHECK_HEADERS([stdbool.h])
+> +	AC_CHECK_HEADERS([stdio.h])
+> +	AC_CHECK_HEADERS([errno.h])
+> +	AC_CHECK_HEADERS([wbclient.h], , [AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])],
+> +[#ifdef HAVE_STDINT_H
+> +#include <stdint.h>
+> +#endif
+> +]
+> +[#ifdef HAVE_STDBOOL_H
+> +#include <stdbool.h>
+> +#endif
+> +]
+> +[#ifdef HAVE_STDIO_H
+> +#include <stdio.h>
+> +#endif
+> +]
+> +[#ifdef HAVE_STDLIB_H
+> +#include <stdlib.h>
+> +#endif
+> +]
+> +[#ifdef HAVE_ERRNO_H
+> +#include <errno.h>
+> +#endif
+> +]
+> +)
+> +fi
 
-I might see the problem here. I think there's a bug in 2.6.38ish
-kernels that's fixed by commit fd88ce93:
+What on earth is the stuff above? configure.ac is at it's heart a shell
+script, so I'm pretty sure the above will end up looking like a bunch
+of comments wrapped in square brackets.
 
-@@ -421,7 +420,7 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
-                pdu_length = 4; /* enough to get RFC1001 header */
- 
- incomplete_rcv:
--               if (echo_retries > 0 &&
-+               if (echo_retries > 0 && server->tcpStatus == CifsGood &&
-                    time_after(jiffies, server->lstrp +
-                                        (echo_retries * SMB_ECHO_INTERVAL))) {
-                        cERROR(1, "Server %s has not responded in %d seconds. "
+> +
+> +# Checks for typedefs, structures, and compiler characteristics.
+>  if test $enable_cifscreds = "yes"; then
+>  	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
+>  fi
 
 
-...if the server decides to disconnect the client for some reason, then
-the above delta will prevent that error message from popping
-unnecessarily. Steve, I think that patch should probably go to -stable
-as well.
+
+I think this code should be a separate program. I realize that we have
+precedent for making this part of the same binary since the SPNEGO and
+DNS upcalls are that way, but I don't think that was a good choice in
+retrospect.
+
+These programs ought to be small and single-purpose. If you add this
+in, then every time you do a SPENGO upcall, you'll get the wb_client
+libs linked in. Vice versa for the idmapping upcall wrt to krb5 libs
+(which is really a bigger problem). So, keeping them as part of the
+same program has clear drawbacks. It also makes the code more messy.
+
+The DNS part of this program should (eventually) go away now that it's
+part of a unified kernel infrastructure. At that point cifs.upcall will
+be a SPNEGO upcall only again. Let's foster that by making this a
+separate program in its own right.
+
+With that change too, I'd like to see a --enable-cifsidmap option or
+something that allows the new program to be conditionally compiled.
+That can default to "on" but should autodisable when libwbclient or
+other needed libs aren't present.
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
