@@ -1,105 +1,112 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 2/2] CIFS: Add rwpidforward mount option
-Date: Mon, 2 May 2011 18:14:25 +0400
-Message-ID: <BANLkTinLSgzXxL6nAb1rvSaRZ9zt5fHG5g@mail.gmail.com>
-References: <1303392395-9217-1-git-send-email-piastry@etersoft.ru>
-	<1303392395-9217-2-git-send-email-piastry@etersoft.ru>
-	<20110429102213.3c8bdb33@corrin.poochiereds.net>
-	<BANLkTi=JihA=TjEo6J5o6oR7rcw4LtpSxw@mail.gmail.com>
-	<20110502081335.6cbe8222@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 5/8] cifs: add cifs_async_writev
+Date: Mon, 2 May 2011 10:27:36 -0400
+Message-ID: <20110502102736.4e0cd17a@corrin.poochiereds.net>
+References: <1304345069-2441-1-git-send-email-jlayton@redhat.com>
+	<1304345069-2441-6-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110502081335.6cbe8222-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1304345069-2441-6-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/5/2 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> On Fri, 29 Apr 2011 18:41:54 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> 2011/4/29 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
->> > On Thu, 21 Apr 2011 17:26:35 +0400
->> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->> >
->> >> Add rwpidforward mount option that switches on a mode when we for=
-ward
->> >> pid of a process who opened a file to any read and write operatio=
-n.
->> >>
->> >> This can prevent applications like WINE from failing on read or w=
-rite
->> >> operation on a previously locked file region from the same netfd =
-from
->> >> another process if we use mandatory brlock style.
->> >> It is actual for WINE because during a run of WINE program two pr=
-ocesses
->> >> work on the same netfd - share the same file struct between sever=
-al VFS
->> >> fds:
->> >> 1) WINE-server does open and lock;
->> >> 2) WINE-application does read and write.
->> >>
->> >
->> > I guess I still don't quite get it. Why not always forward the pid
->> > unconditionally?
->> >
->> > For wine, you want to forward the pid in order to emulate windows
->> > locking semantics. But always forwarding the pid seems like it wou=
-ld
->> > give you more unix-like semantics when locking unix applications,
->> > right? IOW, you'd be less likely to block in a read or write opera=
-tion.
->> >
->> > Can you give an example of some use case that would break if you w=
-ere
->> > to do this unconditionally?
->>
->> Ok. Let's predict:
->> 1) we negotiate mandatory locking semantic.
->> 2) we have a file opened my process 'A'.
->> 3) we do fork() - process 'B' is born and inherits a file.
->> 4) process 'A' set an exclusive lock on a file (from start to end)
->> 5) process 'B' write to a file and succeed if we forward pid
->> unconditionally in this case. - that's wrong according to mandatory
->> locking semantic
->> (http://msdn.microsoft.com/en-us/library/aa365202(v=3Dvs.85).aspx)
->>
->> So, at least we don't need to forward pid if we negotiate Windows
->> locking style. As for POSIX - I think that is not affect anything
->> because we work with advisory locking style and don't care about suc=
-h
->> things at all. So, that's why we need it as separate mount option th=
-at
->> switches specific behavior for application like WINE (or any other
->> client/server applications that send fd though a pipe or a socket an=
-d
->> use a client for i/o operations and a server - to open and lock).
->>
->
-> Yuck. It's pretty icky that we have to have 2 separate sets of behavi=
-or
-> here to work around a single application. I can't help but think that
-> there must be a better way to do this.
->
-> That said, I won't stand in the way of this patch if it's really the
-> only option. Also, did you want to send a patch for the mount.cifs
-> manpage to document this?
->
-> Acked-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+On Mon,  2 May 2011 10:04:26 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Yes, as soon as these patches are applied, I will provide a patch for m=
-anpage!
+> Add the ability for CIFS to do an asynchronous write. The kernel will
+> set the frame up as it would for a "normal" SMBWrite2 request, and use
+> cifs_call_async to send it. The mid callback will then be configured to
+> handle the result.
+> 
+> Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsproto.h |   18 ++++
+>  fs/cifs/cifssmb.c   |  238 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 256 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index c621b45..d35019b 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -433,4 +433,22 @@ extern int mdfour(unsigned char *, unsigned char *, int);
+>  extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
+>  extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
+>  			unsigned char *p24);
+> +
+> +/* asynchronous write support */
+> +struct cifs_writedata {
+> +	struct kref			refcount;
+> +	enum writeback_sync_modes	sync_mode;
+> +	struct work_struct		work;
+> +	struct cifsFileInfo		*cfile;
+> +	__u64				offset;
+> +	unsigned int			bytes;
+> +	int				result;
+> +	unsigned int			nr_pages;
+> +	struct page 			*pages[1];
+> +};
+> +
+> +int cifs_async_writev(struct cifs_writedata *wdata);
+> +struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages);
+> +void cifs_writedata_release(struct kref *refcount);
+> +
+>  #endif			/* _CIFSPROTO_H */
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index d4698b9..6ff9b0a 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -32,6 +32,7 @@
+>  #include <linux/vfs.h>
+>  #include <linux/slab.h>
+>  #include <linux/posix_acl_xattr.h>
+> +#include <linux/pagemap.h>
+>  #include <asm/uaccess.h>
+>  #include "cifspdu.h"
+>  #include "cifsglob.h"
+> @@ -1604,6 +1605,243 @@ CIFSSMBWrite(const int xid, struct cifs_tcon *tcon,
+>  	return rc;
+>  }
+>  
+> +void
+> +cifs_writedata_release(struct kref *refcount)
+> +{
+> +	struct cifs_writedata *wdata = container_of(refcount,
+> +					struct cifs_writedata, refcount);
+> +
+> +	if (wdata->cfile)
+> +		cifsFileInfo_put(wdata->cfile);
+> +
+> +	kfree(wdata);
+> +}
+> +
+> +/*
+> + * Write failed with a retryable error. Resend the write request. It's also
+> + * possible that the page was redirtied so re-clean the page.
+> + */
+> +static void
+> +cifs_writev_requeue(struct cifs_writedata *wdata)
+> +{
+> +	int i, rc;
+> +	struct inode *inode = wdata->cfile->dentry->d_inode;
+> +
+> +	for (i = 0; i < wdata->nr_pages; i++) {
+> +		lock_page(wdata->pages[i]);
+> +		clear_page_dirty_for_io(wdata->pages[i]);
+> +	}
+> +
+> +	do {
+> +		rc = cifs_async_writev(wdata);
+> +	} while(rc != -EAGAIN);
+> +
 
---=20
-Best regards,
-Pavel Shilovsky.
+<forehead slap>
+
+The above should be == -EAGAIN...
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
