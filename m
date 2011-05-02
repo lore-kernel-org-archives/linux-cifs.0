@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 6/8] cifs: convert cifs_writepages to use async writes
-Date: Mon,  2 May 2011 10:04:27 -0400
-Message-ID: <1304345069-2441-7-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 8/8] cifs: use the server's MaxMpxCount to determine max requests in flight
+Date: Mon,  2 May 2011 10:04:29 -0400
+Message-ID: <1304345069-2441-9-git-send-email-jlayton@redhat.com>
 References: <1304345069-2441-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,329 +10,131 @@ In-Reply-To: <1304345069-2441-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have cifs_writepages issue asynchronous writes instead of waiting on
-each write call to complete before issuing another. This also allows us
-to return more quickly from writepages. It can just send out all of the
-I/Os and not wait around for the replies.
-
-In the WB_SYNC_ALL case, if the write completes with a retryable error,
-then the completion workqueue job will resend the write.
-
-This also changes the page locking semantics a little bit. Instead of
-holding the page lock until the response is received, release it after
-doing the send. This will reduce contention for the page lock and should
-prevent processes that have the file mmap'ed from being blocked
-unnecessarily.
+Currently, we have a default cap of 50 outstanding requests and a hard
+cap of 256. However, the server sends us how many requests it can handle
+simultaneously via the MaxMapCount value in the NegProt request. Use
+that value instead and eliminate the cifs_max_pending module parm.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c |  224 ++++++++++++++++++++-----------------------------------
- 1 files changed, 82 insertions(+), 142 deletions(-)
+ fs/cifs/cifsfs.c    |   12 ------------
+ fs/cifs/cifsglob.h  |   14 +-------------
+ fs/cifs/connect.c   |    5 +++--
+ fs/cifs/transport.c |    6 +++---
+ 4 files changed, 7 insertions(+), 30 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index b3d2e3f..a40234f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1092,29 +1092,12 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- static int cifs_writepages(struct address_space *mapping,
- 			   struct writeback_control *wbc)
- {
--	unsigned int bytes_to_write;
--	unsigned int bytes_written;
--	struct cifs_sb_info *cifs_sb;
--	int done = 0;
--	pgoff_t end;
--	pgoff_t index;
--	int range_whole = 0;
--	struct kvec *iov;
--	int len;
--	int n_iov = 0;
--	pgoff_t next;
--	int nr_pages;
--	__u64 offset = 0;
--	struct cifsFileInfo *open_file;
--	struct cifs_tcon *tcon;
--	struct cifsInodeInfo *cifsi = CIFS_I(mapping->host);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
-+	bool done = false, scanned = false, range_whole = false;
-+	pgoff_t end, index;
-+	struct cifs_writedata *wdata;
- 	struct page *page;
--	struct pagevec pvec;
- 	int rc = 0;
--	int scanned = 0;
--	int xid;
--
--	cifs_sb = CIFS_SB(mapping->host->i_sb);
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fb6a2ad..22f0b1a 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -72,10 +72,6 @@ unsigned int cifs_min_small = 30;
+ module_param(cifs_min_small, int, 0);
+ MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. Default: 30 "
+ 				 "Range: 2 to 256");
+-unsigned int cifs_max_pending = CIFS_MAX_REQ;
+-module_param(cifs_max_pending, int, 0);
+-MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
+-				   "Default: 50 Range: 2 to 256");
+ unsigned short echo_retries = 5;
+ module_param(echo_retries, ushort, 0644);
+ MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
+@@ -1035,14 +1031,6 @@ init_cifs(void)
+ 	spin_lock_init(&cifs_file_list_lock);
+ 	spin_lock_init(&GlobalMid_Lock);
  
- 	/*
- 	 * If wsize is smaller that the page cache size, default to writing
-@@ -1123,27 +1106,6 @@ static int cifs_writepages(struct address_space *mapping,
- 	if (cifs_sb->wsize < PAGE_CACHE_SIZE)
- 		return generic_writepages(mapping, wbc);
- 
--	iov = kmalloc(32 * sizeof(struct kvec), GFP_KERNEL);
--	if (iov == NULL)
--		return generic_writepages(mapping, wbc);
--
--	/*
--	 * if there's no open file, then this is likely to fail too,
--	 * but it'll at least handle the return. Maybe it should be
--	 * a BUG() instead?
--	 */
--	open_file = find_writable_file(CIFS_I(mapping->host), false);
--	if (!open_file) {
--		kfree(iov);
--		return generic_writepages(mapping, wbc);
+-	if (cifs_max_pending < 2) {
+-		cifs_max_pending = 2;
+-		cFYI(1, "cifs_max_pending set to min of 2");
+-	} else if (cifs_max_pending > 256) {
+-		cifs_max_pending = 256;
+-		cFYI(1, "cifs_max_pending set to max of 256");
 -	}
 -
--	tcon = tlink_tcon(open_file->tlink);
--	cifsFileInfo_put(open_file);
+ 	rc = cifs_fscache_register();
+ 	if (rc)
+ 		goto out_clean_proc;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b3a6404..5f7c52a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -56,17 +56,6 @@
+  */
+ #define CIFS_MAX_ACTIMEO (1 << 30)
+ 
+-/*
+- * MAX_REQ is the maximum number of requests that WE will send
+- * on one socket concurrently. It also matches the most common
+- * value of max multiplex returned by servers.  We may
+- * eventually want to use the negotiated value (in case
+- * future servers can handle more) when we are more confident that
+- * we will not have problems oveloading the socket with pending
+- * write data.
+- */
+-#define CIFS_MAX_REQ 50
 -
--	xid = GetXid();
--
--	pagevec_init(&pvec, 0);
- 	if (wbc->range_cyclic) {
- 		index = mapping->writeback_index; /* Start from prev offset */
- 		end = -1;
-@@ -1151,24 +1113,34 @@ static int cifs_writepages(struct address_space *mapping,
- 		index = wbc->range_start >> PAGE_CACHE_SHIFT;
- 		end = wbc->range_end >> PAGE_CACHE_SHIFT;
- 		if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
--			range_whole = 1;
--		scanned = 1;
-+			range_whole = true;
-+		scanned = true;
- 	}
- retry:
--	while (!done && (index <= end) &&
--	       (nr_pages = pagevec_lookup_tag(&pvec, mapping, &index,
--			PAGECACHE_TAG_DIRTY,
--			min(end - index, (pgoff_t)PAGEVEC_SIZE - 1) + 1))) {
--		int first;
--		unsigned int i;
--
--		first = -1;
--		next = 0;
--		n_iov = 0;
--		bytes_to_write = 0;
--
--		for (i = 0; i < nr_pages; i++) {
--			page = pvec.pages[i];
-+	while (!done && index <= end) {
-+		unsigned int i, nr_pages, found_pages;
-+		pgoff_t next = 0, tofind;
-+
-+		tofind = min((cifs_sb->wsize / PAGE_CACHE_SIZE) - 1,
-+				end - index) + 1;
-+
-+		wdata = cifs_writedata_alloc((unsigned int)tofind);
-+		if (!wdata) {
-+			rc = -ENOMEM;
-+			break;
-+		}
-+
-+		found_pages = find_get_pages_tag(mapping, &index,
-+						 PAGECACHE_TAG_DIRTY,
-+						 tofind, wdata->pages);
-+		if (found_pages == 0) {
-+			kref_put(&wdata->refcount, cifs_writedata_release);
-+			break;
-+		}
-+
-+		nr_pages = 0;
-+		for (i = 0; i < found_pages; i++) {
-+			page = wdata->pages[i];
- 			/*
- 			 * At this point we hold neither mapping->tree_lock nor
- 			 * lock on the page itself: the page may be truncated or
-@@ -1177,7 +1149,7 @@ retry:
- 			 * mapping
- 			 */
+ #define RFC1001_NAME_LEN 15
+ #define RFC1001_NAME_LEN_WITH_NULL (RFC1001_NAME_LEN + 1)
  
--			if (first < 0)
-+			if (nr_pages == 0)
- 				lock_page(page);
- 			else if (!trylock_page(page))
- 				break;
-@@ -1188,7 +1160,7 @@ retry:
- 			}
+@@ -185,8 +174,8 @@ struct TCP_Server_Info {
+ 	__u16 sec_mode;
+ 	bool session_estab; /* mark when very first sess is established */
+ 	u16 dialect; /* dialect index that server chose */
++	u16 maxReq;  /* Clients should submit no more */
+ 	enum securityEnum secType;
+-	unsigned int maxReq;	/* Clients should submit no more */
+ 	/* than maxReq distinct unanswered SMBs to the server when using  */
+ 	/* multiplexed reads or writes */
+ 	unsigned int maxBuf;	/* maxBuf specifies the maximum */
+@@ -905,7 +894,6 @@ GLOBAL_EXTERN unsigned int linuxExtEnabled;/*enable Linux/Unix CIFS extensions*/
+ GLOBAL_EXTERN unsigned int CIFSMaxBufSize;  /* max size not including hdr */
+ GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
+ GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
+-GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
  
- 			if (!wbc->range_cyclic && page->index > end) {
--				done = 1;
-+				done = true;
- 				unlock_page(page);
- 				break;
- 			}
-@@ -1215,119 +1187,87 @@ retry:
- 			set_page_writeback(page);
- 
- 			if (page_offset(page) >= mapping->host->i_size) {
--				done = 1;
-+				done = true;
- 				unlock_page(page);
- 				end_page_writeback(page);
- 				break;
- 			}
- 
--			/*
--			 * BB can we get rid of this?  pages are held by pvec
--			 */
--			page_cache_get(page);
-+			wdata->pages[i] = page;
-+			next = page->index + 1;
-+			++nr_pages;
-+		}
- 
--			len = min(mapping->host->i_size - page_offset(page),
--				  (loff_t)PAGE_CACHE_SIZE);
-+		/* reset index to refind any pages skipped */
-+		if (nr_pages == 0)
-+			index = wdata->pages[0]->index + 1;
- 
--			/* reserve iov[0] for the smb header */
--			n_iov++;
--			iov[n_iov].iov_base = kmap(page);
--			iov[n_iov].iov_len = len;
--			bytes_to_write += len;
-+		/* put any pages we aren't going to use */
-+		for (i = nr_pages; i < found_pages; i++) {
-+			page_cache_release(wdata->pages[i]);
-+			wdata->pages[i] = NULL;
-+		}
- 
--			if (first < 0) {
--				first = i;
--				offset = page_offset(page);
--			}
--			next = page->index + 1;
--			if (bytes_to_write + PAGE_CACHE_SIZE > cifs_sb->wsize)
--				break;
-+		/* nothing to write? */
-+		if (nr_pages == 0) {
-+			kref_put(&wdata->refcount, cifs_writedata_release);
-+			continue;
- 		}
--		if (n_iov) {
--retry_write:
--			open_file = find_writable_file(CIFS_I(mapping->host),
--							false);
--			if (!open_file) {
--				cERROR(1, "No writable handles for inode");
--				rc = -EBADF;
--			} else {
--				rc = CIFSSMBWrite2(xid, tcon, open_file->netfid,
--						   bytes_to_write, offset,
--						   &bytes_written, iov, n_iov,
--						   0);
--				cifsFileInfo_put(open_file);
--			}
- 
--			cFYI(1, "Write2 rc=%d, wrote=%u", rc, bytes_written);
-+		wdata->sync_mode = wbc->sync_mode;
-+		wdata->nr_pages = nr_pages;
-+		wdata->offset = page_offset(wdata->pages[0]);
- 
--			/*
--			 * For now, treat a short write as if nothing got
--			 * written. A zero length write however indicates
--			 * ENOSPC or EFBIG. We have no way to know which
--			 * though, so call it ENOSPC for now. EFBIG would
--			 * get translated to AS_EIO anyway.
--			 *
--			 * FIXME: make it take into account the data that did
--			 *	  get written
--			 */
--			if (rc == 0) {
--				if (bytes_written == 0)
--					rc = -ENOSPC;
--				else if (bytes_written < bytes_to_write)
--					rc = -EAGAIN;
-+		do {
-+			if (wdata->cfile != NULL)
-+				cifsFileInfo_put(wdata->cfile);
-+			wdata->cfile = find_writable_file(CIFS_I(mapping->host),
-+							  false);
-+			if (!wdata->cfile) {
-+				cERROR(1, "No writable handles for inode");
-+				rc = -EBADF;
-+				break;
- 			}
-+			rc = cifs_async_writev(wdata);
-+		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
- 
--			/* retry on data-integrity flush */
--			if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN)
--				goto retry_write;
--
--			/* fix the stats and EOF */
--			if (bytes_written > 0) {
--				cifs_stats_bytes_written(tcon, bytes_written);
--				cifs_update_eof(cifsi, offset, bytes_written);
--			}
-+		for (i = 0; i < nr_pages; ++i)
-+			unlock_page(wdata->pages[i]);
- 
--			for (i = 0; i < n_iov; i++) {
--				page = pvec.pages[first + i];
--				/* on retryable write error, redirty page */
-+		/* send failure -- clean up the mess */
-+		if (rc != 0) {
-+			for (i = 0; i < nr_pages; ++i) {
- 				if (rc == -EAGAIN)
--					redirty_page_for_writepage(wbc, page);
--				else if (rc != 0)
--					SetPageError(page);
--				kunmap(page);
--				unlock_page(page);
--				end_page_writeback(page);
--				page_cache_release(page);
-+					redirty_page_for_writepage(wbc,
-+							   wdata->pages[i]);
-+				else
-+					SetPageError(wdata->pages[i]);
-+				end_page_writeback(wdata->pages[i]);
-+				page_cache_release(wdata->pages[i]);
- 			}
--
- 			if (rc != -EAGAIN)
- 				mapping_set_error(mapping, rc);
--			else
--				rc = 0;
--
--			if ((wbc->nr_to_write -= n_iov) <= 0)
--				done = 1;
--			index = next;
--		} else
--			/* Need to re-find the pages we skipped */
--			index = pvec.pages[0]->index + 1;
-+		}
-+		kref_put(&wdata->refcount, cifs_writedata_release);
- 
--		pagevec_release(&pvec);
-+		if ((wbc->nr_to_write -= nr_pages) <= 0)
-+			done = true;
-+		index = next;
- 	}
-+
- 	if (!scanned && !done) {
- 		/*
- 		 * We hit the last page and there is more work to be done: wrap
- 		 * back to the start of the file
- 		 */
--		scanned = 1;
-+		scanned = true;
- 		index = 0;
- 		goto retry;
- 	}
-+
- 	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
- 		mapping->writeback_index = index;
- 
--	FreeXid(xid);
--	kfree(iov);
- 	return rc;
- }
- 
+ /* reconnect after this many failed echo attempts */
+ GLOBAL_EXTERN unsigned short echo_retries;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b5e4b75..5a636ab 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -728,8 +728,8 @@ multi_t2_fnd:
+ 	/* Note that cifs_max_pending is normally 50, but
+ 	can be set at module install time to as little as two */
+ 	spin_lock(&GlobalMid_Lock);
+-	if (atomic_read(&server->inFlight) >= cifs_max_pending)
+-		atomic_set(&server->inFlight, cifs_max_pending - 1);
++	if (atomic_read(&server->inFlight) >= server->maxReq)
++		atomic_set(&server->inFlight, server->maxReq - 1);
+ 	/* We do not want to set the max_pending too low or we
+ 	could end up with the counter going negative */
+ 	spin_unlock(&GlobalMid_Lock);
+@@ -1770,6 +1770,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	tcp_ses->noautotune = volume_info->noautotune;
+ 	/* BB should we set this unconditionally now, especially for SMB2 */
+ 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
++	tcp_ses->maxReq = 1; /* reset after NEGOTIATE */
+ 	atomic_set(&tcp_ses->inFlight, 0);
+ 	init_waitqueue_head(&tcp_ses->response_q);
+ 	init_waitqueue_head(&tcp_ses->request_q);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index ad32b70..89a9892 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -265,12 +265,12 @@ int wait_for_free_request(struct TCP_Server_Info *server,
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+ 		if ((server->is_smb2 == false) && 
+-		    atomic_read(&server->inFlight) >= cifs_max_pending) {
++		    atomic_read(&server->inFlight) >= server->maxReq) {
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_num_waiters_inc(server);
+ 			wait_event(server->request_q,
+-				   atomic_read(&server->inFlight)
+-				     < cifs_max_pending);
++				atomic_read(&server->inFlight) <
++						server->maxReq);
+ 			cifs_num_waiters_dec(server);
+ 			spin_lock(&GlobalMid_Lock);
+ #ifdef CONFIG_CIFS_SMB2
 -- 
 1.7.4.4
