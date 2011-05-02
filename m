@@ -1,90 +1,185 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/2] CIFS: Add rwpidforward mount option
-Date: Mon, 2 May 2011 08:18:44 -0400
-Message-ID: <20110502081844.1bc9f063@corrin.poochiereds.net>
-References: <1303392395-9217-1-git-send-email-piastry@etersoft.ru>
-	<1303392395-9217-2-git-send-email-piastry@etersoft.ru>
-	<20110429102213.3c8bdb33@corrin.poochiereds.net>
-	<BANLkTi=JihA=TjEo6J5o6oR7rcw4LtpSxw@mail.gmail.com>
-	<20110502081335.6cbe8222@corrin.poochiereds.net>
+Subject: Re: [PATCH 1/4] CIFS: Simplify connection structure search calls
+Date: Mon, 2 May 2011 08:21:24 -0400
+Message-ID: <20110502082124.0e8fc625@corrin.poochiereds.net>
+References: <1302850725-13867-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110502081335.6cbe8222-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1302850725-13867-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 2 May 2011 08:13:35 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Fri, 15 Apr 2011 10:58:45 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> On Fri, 29 Apr 2011 18:41:54 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> Use separate functions for comparison between existing structure
+> and what we are requesting for to make server, session and tcon
+> search code easier to use on next superblock match call.
 > 
-> > 2011/4/29 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
-> > > On Thu, 21 Apr 2011 17:26:35 +0400
-> > > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> > >
-> > >> Add rwpidforward mount option that switches on a mode when we forward
-> > >> pid of a process who opened a file to any read and write operation.
-> > >>
-> > >> This can prevent applications like WINE from failing on read or write
-> > >> operation on a previously locked file region from the same netfd from
-> > >> another process if we use mandatory brlock style.
-> > >> It is actual for WINE because during a run of WINE program two processes
-> > >> work on the same netfd - share the same file struct between several VFS
-> > >> fds:
-> > >> 1) WINE-server does open and lock;
-> > >> 2) WINE-application does read and write.
-> > >>
-> > >
-> > > I guess I still don't quite get it. Why not always forward the pid
-> > > unconditionally?
-> > >
-> > > For wine, you want to forward the pid in order to emulate windows
-> > > locking semantics. But always forwarding the pid seems like it would
-> > > give you more unix-like semantics when locking unix applications,
-> > > right? IOW, you'd be less likely to block in a read or write operation.
-> > >
-> > > Can you give an example of some use case that would break if you were
-> > > to do this unconditionally?
-> > 
-> > Ok. Let's predict:
-> > 1) we negotiate mandatory locking semantic.
-> > 2) we have a file opened my process 'A'.
-> > 3) we do fork() - process 'B' is born and inherits a file.
-> > 4) process 'A' set an exclusive lock on a file (from start to end)
-> > 5) process 'B' write to a file and succeed if we forward pid
-> > unconditionally in this case. - that's wrong according to mandatory
-> > locking semantic
-> > (http://msdn.microsoft.com/en-us/library/aa365202(v=vs.85).aspx)
-> > 
-> > So, at least we don't need to forward pid if we negotiate Windows
-> > locking style. As for POSIX - I think that is not affect anything
-> > because we work with advisory locking style and don't care about such
-> > things at all. So, that's why we need it as separate mount option that
-> > switches specific behavior for application like WINE (or any other
-> > client/server applications that send fd though a pipe or a socket and
-> > use a client for i/o operations and a server - to open and lock).
-> > 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/connect.c |  104 ++++++++++++++++++++++++++++++++---------------------
+>  1 files changed, 63 insertions(+), 41 deletions(-)
 > 
-> Yuck. It's pretty icky that we have to have 2 separate sets of behavior
-> here to work around a single application. I can't help but think that
-> there must be a better way to do this.
-> 
-> That said, I won't stand in the way of this patch if it's really the
-> only option. Also, did you want to send a patch for the mount.cifs
-> manpage to document this?
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index dd9d3e9..990c3e0 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1640,32 +1640,41 @@ match_security(struct TCP_Server_Info *server, struct smb_vol *vol)
+>  	return true;
+>  }
+>  
+> -static struct TCP_Server_Info *
+> -cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
+> +static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
+> +			 struct smb_vol *vol)
+>  {
+> -	struct TCP_Server_Info *server;
+> -
+> -	spin_lock(&cifs_tcp_ses_lock);
+> -	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+> -		if (!net_eq(cifs_net_ns(server), current->nsproxy->net_ns))
+> -			continue;
+> +	if (!net_eq(cifs_net_ns(server), current->nsproxy->net_ns))
+> +		return 0;
+>  
+> -		if (!match_address(server, addr,
+> -				   (struct sockaddr *)&vol->srcaddr))
+> -			continue;
+> +	if (!match_address(server, addr,
+> +			   (struct sockaddr *)&vol->srcaddr))
+> +		return 0;
+>  
+>  #ifdef CONFIG_CIFS_SMB2
+> -		if ((server->is_smb2 == true) && (vol->use_smb2 == false))
+> -			continue;
+> +	if ((server->is_smb2 == true) && (vol->use_smb2 == false))
+> +		return 0;
+>  
+> -		if ((server->is_smb2 == false) && (vol->use_smb2 == true))
+> -			continue;
+> +	if ((server->is_smb2 == false) && (vol->use_smb2 == true))
+> +		return 0;
+>  #endif /* CONFIG_CIFS_SMB2 */
+>  
+> -		if (!match_port(server, addr))
+> -			continue;
+> +	if (!match_port(server, addr))
+> +		return 0;
+> +
+> +	if (!match_security(server, vol))
+> +		return 0;
+> +
+> +	return 1;
+> +}
+> +
+> +static struct TCP_Server_Info *
+> +cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
+> +{
+> +	struct TCP_Server_Info *server;
+>  
+> -		if (!match_security(server, vol))
+> +	spin_lock(&cifs_tcp_ses_lock);
+> +	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+> +		if (!match_server(server, addr, vol))
+>  			continue;
+>  
+>  		++server->srv_count;
+> @@ -1865,6 +1874,30 @@ out_err:
+>  	return ERR_PTR(rc);
+>  }
+>  
+> +static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
+> +{
+> +	switch (ses->server->secType) {
+> +	case Kerberos:
+> +		if (vol->cred_uid != ses->cred_uid)
+> +			return 0;
+> +		break;
+> +	default:
+> +		/* anything else takes username/password */
+> +		if (ses->user_name == NULL)
+> +			return 0;
+> +		if (strncmp(ses->user_name, vol->username,
+> +			    MAX_USERNAME_SIZE))
+> +			return 0;
+> +		if (strlen(vol->username) != 0 &&
+> +		    ses->password != NULL &&
+> +		    strncmp(ses->password,
+> +			    vol->password ? vol->password : "",
+> +			    MAX_PASSWORD_SIZE))
+> +			return 0;
+> +	}
+> +	return 1;
+> +}
+> +
+>  static struct cifs_ses *
+>  cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+>  {
+> @@ -1872,25 +1905,8 @@ cifs_find_smb_ses(struct TCP_Server_Info *server, struct smb_vol *vol)
+>  
+>  	spin_lock(&cifs_tcp_ses_lock);
+>  	list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+> -		switch (server->secType) {
+> -		case Kerberos:
+> -			if (vol->cred_uid != ses->cred_uid)
+> -				continue;
+> -			break;
+> -		default:
+> -			/* anything else takes username/password */
+> -			if (ses->user_name == NULL)
+> -				continue;
+> -			if (strncmp(ses->user_name, vol->username,
+> -				    MAX_USERNAME_SIZE))
+> -				continue;
+> -			if (strlen(vol->username) != 0 &&
+> -			    ses->password != NULL &&
+> -			    strncmp(ses->password,
+> -				    vol->password ? vol->password : "",
+> -				    MAX_PASSWORD_SIZE))
+> -				continue;
+> -		}
+> +		if (!match_session(ses, vol))
+> +			continue;
+>  		++ses->ses_count;
+>  		spin_unlock(&cifs_tcp_ses_lock);
+>  		return ses;
+> @@ -2033,6 +2049,15 @@ get_ses_fail:
+>  	return ERR_PTR(rc);
+>  }
+>  
+> +static int match_tcon(struct cifs_tcon *tcon, const char *unc)
+> +{
+> +	if (tcon->tidStatus == CifsExiting)
+> +		return 0;
+> +	if (strncmp(tcon->treeName, unc, MAX_TREE_SIZE))
+> +		return 0;
+> +	return 1;
+> +}
+> +
+>  static struct cifs_tcon *
+>  cifs_find_tcon(struct cifs_ses *ses, const char *unc)
+>  {
+> @@ -2042,11 +2067,8 @@ cifs_find_tcon(struct cifs_ses *ses, const char *unc)
+>  	spin_lock(&cifs_tcp_ses_lock);
+>  	list_for_each(tmp, &ses->tcon_list) {
+>  		tcon = list_entry(tmp, struct cifs_tcon, tcon_list);
+> -		if (tcon->tidStatus == CifsExiting)
+> -			continue;
+> -		if (strncmp(tcon->treeName, unc, MAX_TREE_SIZE))
+> +		if (!match_tcon(tcon, unc))
+>  			continue;
+> -
+>  		++tcon->tc_count;
+>  		spin_unlock(&cifs_tcp_ses_lock);
+>  		return tcon;
 
-One more question though...
+Looks reasonable, but Steve's for-2.6.40 tree appears to be out of date
+currently. I think we need to get him to update it so that we can make
+sure patches will apply to it cleanly.
 
-If I run multiple applications under wine, then do I get multiple
-wineserver programs? I assume not...
-
-If that's the case, then won't this change break locking between
-multiple wine applications that are operating on the same files?
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
