@@ -1,25 +1,21 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [v2 0/4] Introduce shared superblock model to cifs
-Date: Thu,  5 May 2011 14:00:32 +0400
-Message-ID: <1304589632-1209-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Loveth Jerry <admin-2uFy/M/JsDhBDgjK7y7TUQ@public.gmane.org>
+Subject: Hello;
+Date: Tue, 3 May 2011 09:29:56 +0200 (CEST)
+Message-ID: <10580630.8043.1304407796403.JavaMail.root@mail.jheccem.com>
+Reply-To: loveth2002jerry-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the second version of the set. It should be applied on top of current for-next branch + 6 DFS related patches from Sean Finney.
 
-Pavel Shilovsky (4):
-  CIFS: Simplify connection structure search calls
-  CIFS: Simplify mount code for further shared sb capability
-  CIFS: Migrate from prefixpath logic
-  CIFS: Migrate to shared superblock model
 
- fs/cifs/cifs_fs_sb.h |    2 -
- fs/cifs/cifsfs.c     |  205 ++++++++++++++++++++++----
- fs/cifs/cifsglob.h   |   81 ++++++++++
- fs/cifs/cifsproto.h  |   13 ++-
- fs/cifs/connect.c    |  398 +++++++++++++++++++++++++-------------------------
- fs/cifs/dir.c        |    7 +-
- fs/cifs/inode.c      |   19 +--
- 7 files changed, 472 insertions(+), 253 deletions(-)
+Hello, 
+
+My name is Loveth Niame Jerry . I got your contact email while making some research for reliable foreigner on the Internet (Remember the distance or colour does not matter but our good heart and sincerity matters allot in life ) i will be waiting to hear from you so that i will tell you more about my self and send my picture to you.I wish you all the best for your day.Always stay blessed from my deepest heart. 
+
+Yours respectfully, 
+Miss Loveth. 
