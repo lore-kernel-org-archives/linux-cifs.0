@@ -1,17 +1,19 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: fix some unused variable warnings in id_rb_search
-Date: Wed, 4 May 2011 13:02:07 -0500
-Message-ID: <BANLkTinL6SxRmngOyZmvoHpqhHk5TzBZnw@mail.gmail.com>
+Date: Wed, 4 May 2011 13:18:00 -0500
+Message-ID: <BANLkTi=r9kDWBNq5ruMtN0MHGZ7YEjDjxg@mail.gmail.com>
 References: <1304510899-30360-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1304510899-30360-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+merged.
 
 On Wed, May 4, 2011 at 7:08 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 > fs/cifs/cifsacl.c: In function =91id_rb_search=92:
@@ -64,6 +66,9 @@ t;
 >
 >
 
-Looks correct.
 
-Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+--=20
+Thanks,
+
+Steve
