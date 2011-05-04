@@ -1,794 +1,496 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: keep BCC in little-endian format (try #2)
-Date: Wed, 4 May 2011 07:11:11 -0400
-Message-ID: <20110504071111.57b82f36@tlielax.poochiereds.net>
-References: <1304087165-11427-1-git-send-email-jlayton@redhat.com>
-	<BANLkTimzhtC9ZPbXS3tpdF380V0M0+YHxw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: keep BCC in little-endian format
+Date: Wed,  4 May 2011 08:05:26 -0400
+Message-ID: <1304510726-30227-1-git-send-email-jlayton@redhat.com>
+References: <BANLkTimzhtC9ZPbXS3tpdF380V0M0+YHxw@mail.gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <BANLkTimzhtC9ZPbXS3tpdF380V0M0+YHxw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 4 May 2011 09:11:15 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+This is the same patch as originally posted, just with some merge
+conflicts fixed up...
 
-> 2011/4/29 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > This is the same patch as originally posted, just with some merge
-> > conflicts fixed up for some patches that went late into 2.6.39.
-> >
-> > Currently, the ByteCount is usually converted to host-endian on rec=
-eive.
-> > This is confusing however, as we need to keep two sets of routines =
-for
-> > accessing it, and keep track of when to use each routine. Munging
-> > received packets like this also limits when the signature can be
-> > calulated.
-> >
-> > Simplify the code by keeping the received ByteCount in little-endia=
-n
-> > format. This allows us to eliminate a set of routines for accessing=
- it
-> > and we can now drop the *_le suffixes from the accessor functions s=
-ince
-> > that's now implied.
-> >
-> > While we're at it, switch all of the places that read the ByteCount
-> > directly to use the get_bcc inline which should also clean up some
-> > unaligned accesses.
-> >
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> > ---
-> > =C2=A0fs/cifs/cifs_debug.c | =C2=A0 =C2=A02 +-
-> > =C2=A0fs/cifs/cifspdu.h =C2=A0 =C2=A0| =C2=A0 22 +----------------
-> > =C2=A0fs/cifs/cifsproto.h =C2=A0| =C2=A0 =C2=A01 -
-> > =C2=A0fs/cifs/cifssmb.c =C2=A0 =C2=A0| =C2=A0 61 ++++++++++++++++++=
-+++++++------------------------
-> > =C2=A0fs/cifs/connect.c =C2=A0 =C2=A0| =C2=A0 =C2=A04 +-
-> > =C2=A0fs/cifs/misc.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A04 +-
-> > =C2=A0fs/cifs/netmisc.c =C2=A0 =C2=A0| =C2=A0 =C2=A07 -----
-> > =C2=A0fs/cifs/sess.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A02 +-
-> > =C2=A0fs/cifs/transport.c =C2=A0| =C2=A0 19 +--------------
-> > =C2=A09 files changed, 40 insertions(+), 82 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> > index 30d01bc..18f4272 100644
-> > --- a/fs/cifs/cifs_debug.c
-> > +++ b/fs/cifs/cifs_debug.c
-> > @@ -63,7 +63,7 @@ void cifs_dump_detail(struct smb_hdr *smb)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x=
- Flgs2: 0x%x Mid: %d Pid: %d",
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0smb->=
-Command, smb->Status.CifsError,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0smb->=
-=46lags, smb->Flags2, smb->Mid, smb->Pid);
-> > - =C2=A0 =C2=A0 =C2=A0 cERROR(1, "smb buf %p len %d", smb, smbCalcS=
-ize_LE(smb));
-> > + =C2=A0 =C2=A0 =C2=A0 cERROR(1, "smb buf %p len %d", smb, smbCalcS=
-ize(smb));
-> > =C2=A0}
-> >
-> >
-> > diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> > index b5c8cc5..e53c6b3 100644
-> > --- a/fs/cifs/cifspdu.h
-> > +++ b/fs/cifs/cifspdu.h
-> > @@ -435,36 +435,18 @@ struct smb_hdr {
-> > =C2=A0/* given a pointer to an smb_hdr retrieve the pointer to the =
-byte area */
-> > =C2=A0#define pByteArea(smb_var) (BCC(smb_var) + 2)
-> >
-> > -/* get the converted ByteCount for a SMB packet and return it */
-> > -static inline __u16
-> > -get_bcc(struct smb_hdr *hdr)
-> > -{
-> > - =C2=A0 =C2=A0 =C2=A0 __u16 *bc_ptr =3D (__u16 *)BCC(hdr);
-> > -
-> > - =C2=A0 =C2=A0 =C2=A0 return get_unaligned(bc_ptr);
-> > -}
-> > -
-> > =C2=A0/* get the unconverted ByteCount for a SMB packet and return =
-it */
-> > =C2=A0static inline __u16
-> > -get_bcc_le(struct smb_hdr *hdr)
-> > +get_bcc(struct smb_hdr *hdr)
-> > =C2=A0{
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0__le16 *bc_ptr =3D (__le16 *)BCC(hdr);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0return get_unaligned_le16(bc_ptr);
-> > =C2=A0}
-> >
-> > -/* set the ByteCount for a SMB packet in host-byte order */
-> > -static inline void
-> > -put_bcc(__u16 count, struct smb_hdr *hdr)
-> > -{
-> > - =C2=A0 =C2=A0 =C2=A0 __u16 *bc_ptr =3D (__u16 *)BCC(hdr);
-> > -
-> > - =C2=A0 =C2=A0 =C2=A0 put_unaligned(count, bc_ptr);
-> > -}
-> > -
-> > =C2=A0/* set the ByteCount for a SMB packet in little-endian */
-> > =C2=A0static inline void
-> > -put_bcc_le(__u16 count, struct smb_hdr *hdr)
-> > +put_bcc(__u16 count, struct smb_hdr *hdr)
-> > =C2=A0{
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0__le16 *bc_ptr =3D (__le16 *)BCC(hdr);
-> >
-> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> > index 0e4e057..0cdf375 100644
-> > --- a/fs/cifs/cifsproto.h
-> > +++ b/fs/cifs/cifsproto.h
-> > @@ -90,7 +90,6 @@ extern void cifs_update_eof(struct cifsInodeInfo =
-*cifsi, loff_t offset,
-> > =C2=A0extern struct cifsFileInfo *find_writable_file(struct cifsIno=
-deInfo *, bool);
-> > =C2=A0extern struct cifsFileInfo *find_readable_file(struct cifsIno=
-deInfo *, bool);
-> > =C2=A0extern unsigned int smbCalcSize(struct smb_hdr *ptr);
-> > -extern unsigned int smbCalcSize_LE(struct smb_hdr *ptr);
-> > =C2=A0extern int decode_negTokenInit(unsigned char *security_blob, =
-int length,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0struct TCP_Server_Info *server);
-> > =C2=A0extern int cifs_convert_address(struct sockaddr *dst, const c=
-har *src, int len);
-> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> > index 2710f00..5ae00d5 100644
-> > --- a/fs/cifs/cifssmb.c
-> > +++ b/fs/cifs/cifssmb.c
-> > @@ -575,7 +575,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsS=
-esInfo *ses)
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC=
-) &&
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(server->cap=
-abilities & CAP_EXTENDED_SECURITY)) {
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 count =3D pSMBr-=
->ByteCount;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 count =3D get_bc=
-c(&pSMBr->hdr);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (count < =
-16) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0goto neg_err_exit;
-> > @@ -729,7 +729,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb->hdr.Tid =3D 0xffff;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb->hdr.WordCount =3D 1;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0put_unaligned_le16(1, &smb->EchoCount);
-> > - =C2=A0 =C2=A0 =C2=A0 put_bcc_le(1, &smb->hdr);
-> > + =C2=A0 =C2=A0 =C2=A0 put_bcc(1, &smb->hdr);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb->Data[0] =3D 'a';
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb->hdr.smb_buf_length +=3D 3;
-> >
-> > @@ -1072,7 +1072,7 @@ PsxCreat:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0cFYI(1, "copying inode info");
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D validate_t2((struct smb_t2_rsp *)=
-pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr->ByteCount < sizeof(OPEN_PS=
-X_RSP))) {
-> > + =C2=A0 =C2=A0 =C2=A0 if (rc || get_bcc(&pSMBr->hdr) < sizeof(OPEN=
-_PSX_RSP)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D -EIO;=
- =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto psx_cre=
-ate_err;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > @@ -1093,7 +1093,7 @@ PsxCreat:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pRetData->Ty=
-pe =3D cpu_to_le32(-1); /* unknown */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cFYI(DBG2, "=
-unknown type");
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (pSMBr->ByteC=
-ount < sizeof(OPEN_PSX_RSP)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (get_bcc(&pSM=
-Br->hdr) < sizeof(OPEN_PSX_RSP)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0+=
- sizeof(FILE_UNIX_BASIC_INFO)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0cERROR(1, "Open response data too small");
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0pRetData->Type =3D cpu_to_le32(-1);
-> > @@ -1859,7 +1859,7 @@ CIFSSMBPosixLock(const int xid, struct cifsTc=
-onInfo *tcon,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__u16 data_c=
-ount;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < sizeof(struct cifs_posix_lock))) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (get_b=
-cc(&pSMBr->hdr) < sizeof(struct cifs_posix_lock))) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0goto plk_err_exit;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > @@ -2486,7 +2486,7 @@ querySymLinkRetry:
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB also c=
-heck enough total bytes returned */
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 2))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 2)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0bool is_unicode;
-> > @@ -2568,14 +2568,14 @@ CIFSSMBQueryReparseLinkInfo(const int xid, =
-struct cifsTconInfo *tcon,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__u32 data_o=
-ffset =3D le32_to_cpu(pSMBr->DataOffset);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__u32 data_c=
-ount =3D le32_to_cpu(pSMBr->DataCount);
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((pSMBr->Byte=
-Count < 2) || (data_offset > 512)) {
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* BB also check=
- enough total bytes returned */
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (get_bcc(&pSM=
-Br->hdr) < 2 || data_offset > 512) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 /* BB also check enough total bytes returned */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0goto qreparse_out;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (data_cou=
-nt && (data_count < 2048)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0char *end_of_smb =3D 2 /* sizeof byte count */ +
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pSMBr->ByteCount + (char *)&pSMB=
-r->ByteCount;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_bcc(&pSMBr->hdr) + (char *)&=
-pSMBr->ByteCount;
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0struct reparse_data *reparse_buf =3D
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0(struct reparse_data *)
-> > @@ -2833,7 +2833,7 @@ queryAclRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* decode re=
-sponse */
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 2))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 2)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB also c=
-heck enough total bytes returned */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else {
-> > @@ -2983,7 +2983,7 @@ GetExtAttrRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* decode re=
-sponse */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 2))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 2)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB also c=
-heck enough total bytes returned */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0/* If rc should we check for EOPNOSUPP and
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 disable the srvino flag? or in caller? */
-> > @@ -3059,6 +3059,7 @@ validate_ntransact(char *buf, char **ppparm, =
-char **ppdata,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0char *end_of_smb;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0__u32 data_count, data_offset, parm_coun=
-t, parm_offset;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0struct smb_com_ntransact_rsp *pSMBr;
-> > + =C2=A0 =C2=A0 =C2=A0 u16 bcc;
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0*pdatalen =3D 0;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0*pparmlen =3D 0;
-> > @@ -3068,8 +3069,8 @@ validate_ntransact(char *buf, char **ppparm, =
-char **ppdata,
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0pSMBr =3D (struct smb_com_ntransact_rsp =
-*)buf;
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 /* ByteCount was converted from little endia=
-n in SendReceive */
-> > - =C2=A0 =C2=A0 =C2=A0 end_of_smb =3D 2 /* sizeof byte count */ + p=
-SMBr->ByteCount +
-> > + =C2=A0 =C2=A0 =C2=A0 bcc =3D get_bcc(&pSMBr->hdr);
-> > + =C2=A0 =C2=A0 =C2=A0 end_of_smb =3D 2 /* sizeof byte count */ + b=
-cc +
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0(char *)&pSMBr->ByteCount;
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0data_offset =3D le32_to_cpu(pSMBr->DataO=
-ffset);
-> > @@ -3095,7 +3096,7 @@ validate_ntransact(char *buf, char **ppparm, =
-char **ppdata,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0*ppdata, data_count, (data_count + *ppdata),
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0end_of_smb, pSMBr);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -EINV=
-AL;
-> > - =C2=A0 =C2=A0 =C2=A0 } else if (parm_count + data_count > pSMBr->=
-ByteCount) {
-> > + =C2=A0 =C2=A0 =C2=A0 } else if (parm_count + data_count > bcc) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cFYI(1, "par=
-m count and data count larger than SMB");
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -EINV=
-AL;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > @@ -3382,7 +3383,7 @@ QFileInfoRetry:
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (rc) /* B=
-B add auto retry on EOPNOTSUPP? */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO;
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (pSMBr->=
-ByteCount < 40)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (get_bcc=
-(&pSMBr->hdr) < 40)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else if (pFi=
-ndData) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0__u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataOffset);
-> > @@ -3470,9 +3471,9 @@ QPathInfoRetry:
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (rc) /* B=
-B add auto retry on EOPNOTSUPP? */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO;
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (!legacy=
- && (pSMBr->ByteCount < 40))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (!legacy=
- && get_bcc(&pSMBr->hdr) < 40)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (legacy =
-&& (pSMBr->ByteCount < 24))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else if (legacy =
-&& get_bcc(&pSMBr->hdr) < 24)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0/* 24 or 26 expected but we do not rea=
-d
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0l=
-ast field */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else if (pFi=
-ndData) {
-> > @@ -3548,7 +3549,7 @@ UnixQFileInfoRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < sizeof(FILE_UNIX_BASIC_INFO))) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < sizeof(FILE_UNIX_BASIC_INFO)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0cERROR(1, "Malformed FILE_UNIX_BASIC_INFO response.\n"
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 "Unix Extensions can =
-be disabled on mount "
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 "by specifying the no=
-sfu mount option.");
-> > @@ -3634,7 +3635,7 @@ UnixQPathInfoRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < sizeof(FILE_UNIX_BASIC_INFO))) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < sizeof(FILE_UNIX_BASIC_INFO)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0cERROR(1, "Malformed FILE_UNIX_BASIC_INFO response.\n"
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 "Unix Extensions can =
-be disabled on mount "
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 "by specifying the no=
-sfu mount option.");
-> > @@ -4039,7 +4040,7 @@ GetInodeNumberRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* decode re=
-sponse */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 2))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 2)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB also c=
-heck enough total bytes returned */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0/* If rc should we check for EOPNOSUPP and
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0disable the srvino flag? or in caller? */
-> > @@ -4265,13 +4266,13 @@ getDFSRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D validate_t2((struct smb_t2_rsp *)=
-pSMBr);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB Also check if enough total bytes r=
-eturned? */
-> > - =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr->ByteCount < 17)) {
-> > + =C2=A0 =C2=A0 =C2=A0 if (rc || get_bcc(&pSMBr->hdr) < 17) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D -EIO;=
- =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto GetDFSR=
-efExit;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0cFYI(1, "Decoding GetDFSRefer response B=
-CC: %d =C2=A0Offset %d",
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pSMBr->ByteCount,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_bcc(&pSMBr->hdr),
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0le16_to_cpu(pSMBr->t2.DataOff=
-set));
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0/* parse returned result into more usabl=
-e form */
-> > @@ -4337,12 +4338,12 @@ oldQFSInfoRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 18))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 18)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0__u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataOffset);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0cFYI(1, "qfsinf resp BCC: %d =C2=A0Offset %d",
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pSMBr->ByteCount, data_off=
-set);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0get_bcc(&pSMBr->hdr), data=
-_offset);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0response_data =3D (FILE_SYSTEM_ALLOC_INFO *)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(((char *) &pSMBr->hdr.Protoc=
-ol) + data_offset);
-> > @@ -4416,7 +4417,7 @@ QFSInfoRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 24))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 24)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0__u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataOffset);
-> > @@ -4496,7 +4497,7 @@ QFSAttributeRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 13)) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 13) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0/* BB also check if enough bytes returned */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > @@ -4567,7 +4568,7 @@ QFSDeviceRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < sizeof(FILE_SYSTEM_DEVICE_INFO)))
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < sizeof(FILE_SYSTEM_DEVICE_INFO))
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0__u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataOffset);
-> > @@ -4636,7 +4637,7 @@ QFSUnixRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 13)) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 13) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0__u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataOffset);
-> > @@ -4781,7 +4782,7 @@ QFSPosixRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else { =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0/* decode response */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D valid=
-ate_t2((struct smb_t2_rsp *)pSMBr);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr=
-->ByteCount < 13)) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc || get_bc=
-c(&pSMBr->hdr) < 13) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0rc =3D -EIO; =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0__u16 data_offset =3D le16_to_cpu(pSMBr->t2.DataOffset);
-> > @@ -5510,7 +5511,7 @@ QAllEAsRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0of these trans2 responses */
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D validate_t2((struct smb_t2_rsp *)=
-pSMBr);
-> > - =C2=A0 =C2=A0 =C2=A0 if (rc || (pSMBr->ByteCount < 4)) {
-> > + =C2=A0 =C2=A0 =C2=A0 if (rc || get_bcc(&pSMBr->hdr) < 4) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D -EIO;=
- =C2=A0 =C2=A0 =C2=A0/* bad smb */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto QAllEAs=
-Out;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 9d05d8f..68bd894 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -316,12 +316,12 @@ static int coalesce_t2(struct smb_hdr *psecon=
-d, struct smb_hdr *pTargetSMB)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0put_unaligned_le16(total_in_buf, &pSMBt-=
->t2_rsp.DataCount);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0/* fix up the BCC */
-> > - =C2=A0 =C2=A0 =C2=A0 byte_count =3D get_bcc_le(pTargetSMB);
-> > + =C2=A0 =C2=A0 =C2=A0 byte_count =3D get_bcc(pTargetSMB);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0byte_count +=3D total_in_buf2;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0/* is the result too big for the field? =
-*/
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if (byte_count > USHRT_MAX)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -EPRO=
-TO;
-> > - =C2=A0 =C2=A0 =C2=A0 put_bcc_le(byte_count, pTargetSMB);
-> > + =C2=A0 =C2=A0 =C2=A0 put_bcc(byte_count, pTargetSMB);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0byte_count =3D pTargetSMB->smb_buf_lengt=
-h;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0byte_count +=3D total_in_buf2;
-> > diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> > index 0c684ae..a0765e6 100644
-> > --- a/fs/cifs/misc.c
-> > +++ b/fs/cifs/misc.c
-> > @@ -464,7 +464,7 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsign=
-ed int length)
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if (check_smb_hdr(smb, mid))
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 1;
-> > - =C2=A0 =C2=A0 =C2=A0 clc_len =3D smbCalcSize_LE(smb);
-> > + =C2=A0 =C2=A0 =C2=A0 clc_len =3D smbCalcSize(smb);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if (4 + len !=3D length) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cERROR(1, "L=
-ength read does not match RFC1001 length %d",
-> > @@ -521,7 +521,7 @@ is_valid_oplock_break(struct smb_hdr *buf, stru=
-ct TCP_Server_Info *srv)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0(struct smb_com_transaction_change_notify_rsp *)buf;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct file_=
-notify_information *pnotify;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0__u32 data_o=
-ffset =3D 0;
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (get_bcc_le(b=
-uf) > sizeof(struct file_notify_information)) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (get_bcc(buf)=
- > sizeof(struct file_notify_information)) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0data_offset =3D le32_to_cpu(pSMBr->DataOffset);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0pnotify =3D (struct file_notify_information *)
-> > diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-> > index 79f641e..79b71c2 100644
-> > --- a/fs/cifs/netmisc.c
-> > +++ b/fs/cifs/netmisc.c
-> > @@ -919,13 +919,6 @@ smbCalcSize(struct smb_hdr *ptr)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A02 /* size of=
- the bcc field */ + get_bcc(ptr));
-> > =C2=A0}
-> >
-> > -unsigned int
-> > -smbCalcSize_LE(struct smb_hdr *ptr)
-> > -{
-> > - =C2=A0 =C2=A0 =C2=A0 return (sizeof(struct smb_hdr) + (2 * ptr->W=
-ordCount) +
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 2 /* size of the=
- bcc field */ + get_bcc_le(ptr));
-> > -}
-> > -
-> > =C2=A0/* The following are taken from fs/ntfs/util.c */
-> >
-> > =C2=A0#define NTFS_TIME_OFFSET ((u64)(369*365 + 89) * 24 * 3600 * 1=
-0000000)
-> > diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> > index b6ff84a..74344ef 100644
-> > --- a/fs/cifs/sess.c
-> > +++ b/fs/cifs/sess.c
-> > @@ -861,7 +861,7 @@ ssetup_ntlmssp_authenticate:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0count =3D iov[1].iov_len + iov[2].iov_le=
-n;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb_buf->smb_buf_length +=3D count;
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 put_bcc_le(count, smb_buf);
-> > + =C2=A0 =C2=A0 =C2=A0 put_bcc(count, smb_buf);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D SendReceive2(xid, ses, iov, 3 /* =
-num_iovecs */, &resp_buf_type,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0CIFS_LOG_ERROR);
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index 46d8756..44f4f49 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -491,7 +491,7 @@ send_nt_cancel(struct TCP_Server_Info *server, =
-struct smb_hdr *in_buf,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0in_buf->smb_buf_length =3D sizeof(struct=
- smb_hdr) - 4 =C2=A0+ 2;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0in_buf->Command =3D SMB_COM_NT_CANCEL;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0in_buf->WordCount =3D 0;
-> > - =C2=A0 =C2=A0 =C2=A0 put_bcc_le(0, in_buf);
-> > + =C2=A0 =C2=A0 =C2=A0 put_bcc(0, in_buf);
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0mutex_lock(&server->srv_mutex);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D cifs_sign_smb(in_buf, server, &mi=
-d->sequence_number);
-> > @@ -651,11 +651,6 @@ SendReceive2(const unsigned int xid, struct ci=
-fsSesInfo *ses,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D map_s=
-mb_to_linux_error(midQ->resp_buf,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0flags & CIFS_LOG_ERROR);
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* convert ByteC=
-ount if necessary */
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (receive_len =
->=3D sizeof(struct smb_hdr) - 4
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*=
- do not count RFC1001 header */ =C2=A0+
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (2=
- * midQ->resp_buf->WordCount) + 2 /* bcc */ )
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 put_bcc(get_bcc_le(midQ->resp_buf), midQ->resp_buf);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if ((flags &=
- CIFS_NO_RESP) =3D=3D 0)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0midQ->resp_buf =3D NULL; =C2=A0/* mark it so buf will
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 not be freed by
-> > @@ -804,12 +799,6 @@ SendReceive(const unsigned int xid, struct cif=
-sSesInfo *ses,
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB specia=
-l case reconnect tid and uid here? */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D map_s=
-mb_to_linux_error(out_buf, 0 /* no log */ );
-> > -
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* convert ByteC=
-ount if necessary */
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (receive_len =
->=3D sizeof(struct smb_hdr) - 4
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /*=
- do not count RFC1001 header */ =C2=A0+
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (2=
- * out_buf->WordCount) + 2 /* bcc */ )
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 put_bcc(get_bcc_le(midQ->resp_buf), midQ->resp_buf);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0} else {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D -EIO;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cERROR(1, "B=
-ad MID state?");
-> > @@ -1017,12 +1006,6 @@ SendReceiveBlockingLock(const unsigned int x=
-id, struct cifsTconInfo *tcon,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0/* BB special case reconnect tid and uid=
- here? */
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0rc =3D map_smb_to_linux_error(out_buf, 0=
- /* no log */ );
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 /* convert ByteCount if necessary */
-> > - =C2=A0 =C2=A0 =C2=A0 if (receive_len >=3D sizeof(struct smb_hdr) =
-- 4
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* do not count RFC1001 header=
- */ =C2=A0+
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (2 * out_buf->WordCount) + 2 /=
-* bcc */ )
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 put_bcc(get_bcc_=
-le(out_buf), out_buf);
-> > -
-> > =C2=A0out:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0delete_mid(midQ);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if (rstart && rc =3D=3D -EACCES)
-> > --
-> > 1.7.4.4
->=20
-> This patch has checkpatch warnings:
-> WARNING: line over 80 characters
-> #152: FILE: fs/cifs/cifssmb.c:1870:
-> +		if (rc || (get_bcc(&pSMBr->hdr) < sizeof(struct cifs_posix_lock)))=
+Currently, the ByteCount is usually converted to host-endian on receive.
+This is confusing however, as we need to keep two sets of routines for
+accessing it, and keep track of when to use each routine. Munging
+received packets like this also limits when the signature can be
+calulated.
+
+Simplify the code by keeping the received ByteCount in little-endian
+format. This allows us to eliminate a set of routines for accessing it
+and we can now drop the *_le suffixes from the accessor functions since
+that's now implied.
+
+While we're at it, switch all of the places that read the ByteCount
+directly to use the get_bcc inline which should also clean up some
+unaligned accesses.
+
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_debug.c |    2 +-
+ fs/cifs/cifspdu.h    |   22 +----------------
+ fs/cifs/cifsproto.h  |    1 -
+ fs/cifs/cifssmb.c    |   62 +++++++++++++++++++++++++------------------------
+ fs/cifs/connect.c    |    4 +-
+ fs/cifs/misc.c       |    4 +-
+ fs/cifs/netmisc.c    |    7 -----
+ fs/cifs/sess.c       |    2 +-
+ fs/cifs/transport.c  |   19 +--------------
+ 9 files changed, 41 insertions(+), 82 deletions(-)
+
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 30d01bc..18f4272 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -63,7 +63,7 @@ void cifs_dump_detail(struct smb_hdr *smb)
+ 	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d",
+ 		  smb->Command, smb->Status.CifsError,
+ 		  smb->Flags, smb->Flags2, smb->Mid, smb->Pid);
+-	cERROR(1, "smb buf %p len %d", smb, smbCalcSize_LE(smb));
++	cERROR(1, "smb buf %p len %d", smb, smbCalcSize(smb));
+ }
+ 
+ 
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index eac95e2..291d735 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -435,36 +435,18 @@ struct smb_hdr {
+ /* given a pointer to an smb_hdr retrieve the pointer to the byte area */
+ #define pByteArea(smb_var) (BCC(smb_var) + 2)
+ 
+-/* get the converted ByteCount for a SMB packet and return it */
+-static inline __u16
+-get_bcc(struct smb_hdr *hdr)
+-{
+-	__u16 *bc_ptr = (__u16 *)BCC(hdr);
+-
+-	return get_unaligned(bc_ptr);
+-}
+-
+ /* get the unconverted ByteCount for a SMB packet and return it */
+ static inline __u16
+-get_bcc_le(struct smb_hdr *hdr)
++get_bcc(struct smb_hdr *hdr)
  {
->=20
-> WARNING: line over 80 characters
-> #179: FILE: fs/cifs/cifssmb.c:2586:
-> +				get_bcc(&pSMBr->hdr) + (char *)&pSMBr->ByteCount;
->=20
-> WARNING: suspect code indent for conditional statements (16, 16)
-> #188: FILE: fs/cifs/cifssmb.c:2844:
-> +		if (rc || get_bcc(&pSMBr->hdr) < 2)
->  		/* BB also check enough total bytes returned */
->=20
-> WARNING: suspect code indent for conditional statements (16, 16)
-> #197: FILE: fs/cifs/cifssmb.c:2994:
-> +		if (rc || get_bcc(&pSMBr->hdr) < 2)
->  		/* BB also check enough total bytes returned */
->=20
-> WARNING: suspect code indent for conditional statements (16, 16)
-> #273: FILE: fs/cifs/cifssmb.c:4050:
-> +		if (rc || get_bcc(&pSMBr->hdr) < 2)
->  		/* BB also check enough total bytes returned */
->=20
-> WARNING: line over 80 characters
-> #331: FILE: fs/cifs/cifssmb.c:4578:
-> +		if (rc || get_bcc(&pSMBr->hdr) < sizeof(FILE_SYSTEM_DEVICE_INFO))
->=20
-> total: 0 errors, 6 warnings, 373 lines checked
->=20
-
-Bleh -- ok. Many of those problems preexist these changes but it's
-probably worth fixing them. I'll respin the patch.
-
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+ 	__le16 *bc_ptr = (__le16 *)BCC(hdr);
+ 
+ 	return get_unaligned_le16(bc_ptr);
+ }
+ 
+-/* set the ByteCount for a SMB packet in host-byte order */
+-static inline void
+-put_bcc(__u16 count, struct smb_hdr *hdr)
+-{
+-	__u16 *bc_ptr = (__u16 *)BCC(hdr);
+-
+-	put_unaligned(count, bc_ptr);
+-}
+-
+ /* set the ByteCount for a SMB packet in little-endian */
+ static inline void
+-put_bcc_le(__u16 count, struct smb_hdr *hdr)
++put_bcc(__u16 count, struct smb_hdr *hdr)
+ {
+ 	__le16 *bc_ptr = (__le16 *)BCC(hdr);
+ 
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 7c1ed01..136d2f2 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -93,7 +93,6 @@ extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, bool);
+ extern struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *, bool);
+ extern unsigned int smbCalcSize(struct smb_hdr *ptr);
+-extern unsigned int smbCalcSize_LE(struct smb_hdr *ptr);
+ extern int decode_negTokenInit(unsigned char *security_blob, int length,
+ 			struct TCP_Server_Info *server);
+ extern int cifs_convert_address(struct sockaddr *dst, const char *src, int len);
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index bf6fbc4..64c2c91 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -582,7 +582,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifsSesInfo *ses)
+ 
+ 	if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC) &&
+ 		(server->capabilities & CAP_EXTENDED_SECURITY)) {
+-		count = pSMBr->ByteCount;
++		count = get_bcc(&pSMBr->hdr);
+ 		if (count < 16) {
+ 			rc = -EIO;
+ 			goto neg_err_exit;
+@@ -736,7 +736,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 	smb->hdr.Tid = 0xffff;
+ 	smb->hdr.WordCount = 1;
+ 	put_unaligned_le16(1, &smb->EchoCount);
+-	put_bcc_le(1, &smb->hdr);
++	put_bcc(1, &smb->hdr);
+ 	smb->Data[0] = 'a';
+ 	inc_rfc1001_len(smb, 3);
+ 
+@@ -1079,7 +1079,7 @@ PsxCreat:
+ 	cFYI(1, "copying inode info");
+ 	rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-	if (rc || (pSMBr->ByteCount < sizeof(OPEN_PSX_RSP))) {
++	if (rc || get_bcc(&pSMBr->hdr) < sizeof(OPEN_PSX_RSP)) {
+ 		rc = -EIO;	/* bad smb */
+ 		goto psx_create_err;
+ 	}
+@@ -1100,7 +1100,7 @@ PsxCreat:
+ 		pRetData->Type = cpu_to_le32(-1); /* unknown */
+ 		cFYI(DBG2, "unknown type");
+ 	} else {
+-		if (pSMBr->ByteCount < sizeof(OPEN_PSX_RSP)
++		if (get_bcc(&pSMBr->hdr) < sizeof(OPEN_PSX_RSP)
+ 					+ sizeof(FILE_UNIX_BASIC_INFO)) {
+ 			cERROR(1, "Open response data too small");
+ 			pRetData->Type = cpu_to_le32(-1);
+@@ -1867,7 +1867,7 @@ CIFSSMBPosixLock(const int xid, struct cifsTconInfo *tcon,
+ 		__u16 data_count;
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < sizeof(struct cifs_posix_lock))) {
++		if (rc || get_bcc(&pSMBr->hdr) < sizeof(*parm_data)) {
+ 			rc = -EIO;      /* bad smb */
+ 			goto plk_err_exit;
+ 		}
+@@ -2494,7 +2494,7 @@ querySymLinkRetry:
+ 
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 		/* BB also check enough total bytes returned */
+-		if (rc || (pSMBr->ByteCount < 2))
++		if (rc || get_bcc(&pSMBr->hdr) < 2)
+ 			rc = -EIO;
+ 		else {
+ 			bool is_unicode;
+@@ -2576,14 +2576,14 @@ CIFSSMBQueryReparseLinkInfo(const int xid, struct cifsTconInfo *tcon,
+ 	} else {		/* decode response */
+ 		__u32 data_offset = le32_to_cpu(pSMBr->DataOffset);
+ 		__u32 data_count = le32_to_cpu(pSMBr->DataCount);
+-		if ((pSMBr->ByteCount < 2) || (data_offset > 512)) {
+-		/* BB also check enough total bytes returned */
++		if (get_bcc(&pSMBr->hdr) < 2 || data_offset > 512) {
++			/* BB also check enough total bytes returned */
+ 			rc = -EIO;	/* bad smb */
+ 			goto qreparse_out;
+ 		}
+ 		if (data_count && (data_count < 2048)) {
+ 			char *end_of_smb = 2 /* sizeof byte count */ +
+-				pSMBr->ByteCount + (char *)&pSMBr->ByteCount;
++			       get_bcc(&pSMBr->hdr) + (char *)&pSMBr->ByteCount;
+ 
+ 			struct reparse_data *reparse_buf =
+ 						(struct reparse_data *)
+@@ -2841,8 +2841,8 @@ queryAclRetry:
+ 		/* decode response */
+ 
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+-		if (rc || (pSMBr->ByteCount < 2))
+ 		/* BB also check enough total bytes returned */
++		if (rc || get_bcc(&pSMBr->hdr) < 2)
+ 			rc = -EIO;      /* bad smb */
+ 		else {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+@@ -2991,8 +2991,8 @@ GetExtAttrRetry:
+ 	} else {
+ 		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+-		if (rc || (pSMBr->ByteCount < 2))
+ 		/* BB also check enough total bytes returned */
++		if (rc || get_bcc(&pSMBr->hdr) < 2)
+ 			/* If rc should we check for EOPNOSUPP and
+ 			   disable the srvino flag? or in caller? */
+ 			rc = -EIO;      /* bad smb */
+@@ -3067,6 +3067,7 @@ validate_ntransact(char *buf, char **ppparm, char **ppdata,
+ 	char *end_of_smb;
+ 	__u32 data_count, data_offset, parm_count, parm_offset;
+ 	struct smb_com_ntransact_rsp *pSMBr;
++	u16 bcc;
+ 
+ 	*pdatalen = 0;
+ 	*pparmlen = 0;
+@@ -3076,8 +3077,8 @@ validate_ntransact(char *buf, char **ppparm, char **ppdata,
+ 
+ 	pSMBr = (struct smb_com_ntransact_rsp *)buf;
+ 
+-	/* ByteCount was converted from little endian in SendReceive */
+-	end_of_smb = 2 /* sizeof byte count */ + pSMBr->ByteCount +
++	bcc = get_bcc(&pSMBr->hdr);
++	end_of_smb = 2 /* sizeof byte count */ + bcc +
+ 			(char *)&pSMBr->ByteCount;
+ 
+ 	data_offset = le32_to_cpu(pSMBr->DataOffset);
+@@ -3103,7 +3104,7 @@ validate_ntransact(char *buf, char **ppparm, char **ppdata,
+ 			*ppdata, data_count, (data_count + *ppdata),
+ 			end_of_smb, pSMBr);
+ 		return -EINVAL;
+-	} else if (parm_count + data_count > pSMBr->ByteCount) {
++	} else if (parm_count + data_count > bcc) {
+ 		cFYI(1, "parm count and data count larger than SMB");
+ 		return -EINVAL;
+ 	}
+@@ -3389,7 +3390,7 @@ QFileInfoRetry:
+ 
+ 		if (rc) /* BB add auto retry on EOPNOTSUPP? */
+ 			rc = -EIO;
+-		else if (pSMBr->ByteCount < 40)
++		else if (get_bcc(&pSMBr->hdr) < 40)
+ 			rc = -EIO;	/* bad smb */
+ 		else if (pFindData) {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+@@ -3477,9 +3478,9 @@ QPathInfoRetry:
+ 
+ 		if (rc) /* BB add auto retry on EOPNOTSUPP? */
+ 			rc = -EIO;
+-		else if (!legacy && (pSMBr->ByteCount < 40))
++		else if (!legacy && get_bcc(&pSMBr->hdr) < 40)
+ 			rc = -EIO;	/* bad smb */
+-		else if (legacy && (pSMBr->ByteCount < 24))
++		else if (legacy && get_bcc(&pSMBr->hdr) < 24)
+ 			rc = -EIO;  /* 24 or 26 expected but we do not read
+ 					last field */
+ 		else if (pFindData) {
+@@ -3555,7 +3556,7 @@ UnixQFileInfoRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < sizeof(FILE_UNIX_BASIC_INFO))) {
++		if (rc || get_bcc(&pSMBr->hdr) < sizeof(FILE_UNIX_BASIC_INFO)) {
+ 			cERROR(1, "Malformed FILE_UNIX_BASIC_INFO response.\n"
+ 				   "Unix Extensions can be disabled on mount "
+ 				   "by specifying the nosfu mount option.");
+@@ -3641,7 +3642,7 @@ UnixQPathInfoRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < sizeof(FILE_UNIX_BASIC_INFO))) {
++		if (rc || get_bcc(&pSMBr->hdr) < sizeof(FILE_UNIX_BASIC_INFO)) {
+ 			cERROR(1, "Malformed FILE_UNIX_BASIC_INFO response.\n"
+ 				   "Unix Extensions can be disabled on mount "
+ 				   "by specifying the nosfu mount option.");
+@@ -4046,8 +4047,8 @@ GetInodeNumberRetry:
+ 	} else {
+ 		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+-		if (rc || (pSMBr->ByteCount < 2))
+ 		/* BB also check enough total bytes returned */
++		if (rc || get_bcc(&pSMBr->hdr) < 2)
+ 			/* If rc should we check for EOPNOSUPP and
+ 			disable the srvino flag? or in caller? */
+ 			rc = -EIO;      /* bad smb */
+@@ -4272,13 +4273,13 @@ getDFSRetry:
+ 	rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+ 	/* BB Also check if enough total bytes returned? */
+-	if (rc || (pSMBr->ByteCount < 17)) {
++	if (rc || get_bcc(&pSMBr->hdr) < 17) {
+ 		rc = -EIO;      /* bad smb */
+ 		goto GetDFSRefExit;
+ 	}
+ 
+ 	cFYI(1, "Decoding GetDFSRefer response BCC: %d  Offset %d",
+-				pSMBr->ByteCount,
++				get_bcc(&pSMBr->hdr),
+ 				le16_to_cpu(pSMBr->t2.DataOffset));
+ 
+ 	/* parse returned result into more usable form */
+@@ -4344,12 +4345,12 @@ oldQFSInfoRetry:
+ 	} else {                /* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < 18))
++		if (rc || get_bcc(&pSMBr->hdr) < 18)
+ 			rc = -EIO;      /* bad smb */
+ 		else {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+ 			cFYI(1, "qfsinf resp BCC: %d  Offset %d",
+-				 pSMBr->ByteCount, data_offset);
++				 get_bcc(&pSMBr->hdr), data_offset);
+ 
+ 			response_data = (FILE_SYSTEM_ALLOC_INFO *)
+ 				(((char *) &pSMBr->hdr.Protocol) + data_offset);
+@@ -4423,7 +4424,7 @@ QFSInfoRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < 24))
++		if (rc || get_bcc(&pSMBr->hdr) < 24)
+ 			rc = -EIO;	/* bad smb */
+ 		else {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+@@ -4503,7 +4504,7 @@ QFSAttributeRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < 13)) {
++		if (rc || get_bcc(&pSMBr->hdr) < 13) {
+ 			/* BB also check if enough bytes returned */
+ 			rc = -EIO;	/* bad smb */
+ 		} else {
+@@ -4574,7 +4575,8 @@ QFSDeviceRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < sizeof(FILE_SYSTEM_DEVICE_INFO)))
++		if (rc || get_bcc(&pSMBr->hdr) <
++			  sizeof(FILE_SYSTEM_DEVICE_INFO))
+ 			rc = -EIO;	/* bad smb */
+ 		else {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+@@ -4643,7 +4645,7 @@ QFSUnixRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < 13)) {
++		if (rc || get_bcc(&pSMBr->hdr) < 13) {
+ 			rc = -EIO;	/* bad smb */
+ 		} else {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+@@ -4788,7 +4790,7 @@ QFSPosixRetry:
+ 	} else {		/* decode response */
+ 		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+ 
+-		if (rc || (pSMBr->ByteCount < 13)) {
++		if (rc || get_bcc(&pSMBr->hdr) < 13) {
+ 			rc = -EIO;	/* bad smb */
+ 		} else {
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+@@ -5517,7 +5519,7 @@ QAllEAsRetry:
+ 	of these trans2 responses */
+ 
+ 	rc = validate_t2((struct smb_t2_rsp *)pSMBr);
+-	if (rc || (pSMBr->ByteCount < 4)) {
++	if (rc || get_bcc(&pSMBr->hdr) < 4) {
+ 		rc = -EIO;	/* bad smb */
+ 		goto QAllEAsOut;
+ 	}
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 760f9ed..814d5d2 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -317,12 +317,12 @@ static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
+ 	put_unaligned_le16(total_in_buf, &pSMBt->t2_rsp.DataCount);
+ 
+ 	/* fix up the BCC */
+-	byte_count = get_bcc_le(pTargetSMB);
++	byte_count = get_bcc(pTargetSMB);
+ 	byte_count += total_in_buf2;
+ 	/* is the result too big for the field? */
+ 	if (byte_count > USHRT_MAX)
+ 		return -EPROTO;
+-	put_bcc_le(byte_count, pTargetSMB);
++	put_bcc(byte_count, pTargetSMB);
+ 
+ 	byte_count = be32_to_cpu(pTargetSMB->smb_buf_length);
+ 	byte_count += total_in_buf2;
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 533f863..907531a 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -462,7 +462,7 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 
+ 	if (check_smb_hdr(smb, mid))
+ 		return 1;
+-	clc_len = smbCalcSize_LE(smb);
++	clc_len = smbCalcSize(smb);
+ 
+ 	if (4 + len != length) {
+ 		cERROR(1, "Length read does not match RFC1001 length %d",
+@@ -519,7 +519,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
+ 			(struct smb_com_transaction_change_notify_rsp *)buf;
+ 		struct file_notify_information *pnotify;
+ 		__u32 data_offset = 0;
+-		if (get_bcc_le(buf) > sizeof(struct file_notify_information)) {
++		if (get_bcc(buf) > sizeof(struct file_notify_information)) {
+ 			data_offset = le32_to_cpu(pSMBr->DataOffset);
+ 
+ 			pnotify = (struct file_notify_information *)
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index 79f641e..79b71c2 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -919,13 +919,6 @@ smbCalcSize(struct smb_hdr *ptr)
+ 		2 /* size of the bcc field */ + get_bcc(ptr));
+ }
+ 
+-unsigned int
+-smbCalcSize_LE(struct smb_hdr *ptr)
+-{
+-	return (sizeof(struct smb_hdr) + (2 * ptr->WordCount) +
+-		2 /* size of the bcc field */ + get_bcc_le(ptr));
+-}
+-
+ /* The following are taken from fs/ntfs/util.c */
+ 
+ #define NTFS_TIME_OFFSET ((u64)(369*365 + 89) * 24 * 3600 * 10000000)
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 1daadad..7dd4621 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -862,7 +862,7 @@ ssetup_ntlmssp_authenticate:
+ 	smb_buf->smb_buf_length =
+ 		cpu_to_be32(be32_to_cpu(smb_buf->smb_buf_length) + count);
+ 
+-	put_bcc_le(count, smb_buf);
++	put_bcc(count, smb_buf);
+ 
+ 	rc = SendReceive2(xid, ses, iov, 3 /* num_iovecs */, &resp_buf_type,
+ 			  CIFS_LOG_ERROR);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 19df0e5..f2513fb 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -484,7 +484,7 @@ send_nt_cancel(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ 	in_buf->smb_buf_length = cpu_to_be32(sizeof(struct smb_hdr) - 4  + 2);
+ 	in_buf->Command = SMB_COM_NT_CANCEL;
+ 	in_buf->WordCount = 0;
+-	put_bcc_le(0, in_buf);
++	put_bcc(0, in_buf);
+ 
+ 	mutex_lock(&server->srv_mutex);
+ 	rc = cifs_sign_smb(in_buf, server, &mid->sequence_number);
+@@ -644,11 +644,6 @@ SendReceive2(const unsigned int xid, struct cifsSesInfo *ses,
+ 		rc = map_smb_to_linux_error(midQ->resp_buf,
+ 					    flags & CIFS_LOG_ERROR);
+ 
+-		/* convert ByteCount if necessary */
+-		if (receive_len >= sizeof(struct smb_hdr) - 4
+-		    /* do not count RFC1001 header */  +
+-		    (2 * midQ->resp_buf->WordCount) + 2 /* bcc */ )
+-			put_bcc(get_bcc_le(midQ->resp_buf), midQ->resp_buf);
+ 		if ((flags & CIFS_NO_RESP) == 0)
+ 			midQ->resp_buf = NULL;  /* mark it so buf will
+ 						   not be freed by
+@@ -798,12 +793,6 @@ SendReceive(const unsigned int xid, struct cifsSesInfo *ses,
+ 
+ 		/* BB special case reconnect tid and uid here? */
+ 		rc = map_smb_to_linux_error(out_buf, 0 /* no log */ );
+-
+-		/* convert ByteCount if necessary */
+-		if (receive_len >= sizeof(struct smb_hdr) - 4
+-		    /* do not count RFC1001 header */  +
+-		    (2 * out_buf->WordCount) + 2 /* bcc */ )
+-			put_bcc(get_bcc_le(midQ->resp_buf), midQ->resp_buf);
+ 	} else {
+ 		rc = -EIO;
+ 		cERROR(1, "Bad MID state?");
+@@ -1012,12 +1001,6 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifsTconInfo *tcon,
+ 	/* BB special case reconnect tid and uid here? */
+ 	rc = map_smb_to_linux_error(out_buf, 0 /* no log */ );
+ 
+-	/* convert ByteCount if necessary */
+-	if (receive_len >= sizeof(struct smb_hdr) - 4
+-	    /* do not count RFC1001 header */  +
+-	    (2 * out_buf->WordCount) + 2 /* bcc */ )
+-		put_bcc(get_bcc_le(out_buf), out_buf);
+-
+ out:
+ 	delete_mid(midQ);
+ 	if (rstart && rc == -EACCES)
+-- 
+1.7.4.4
