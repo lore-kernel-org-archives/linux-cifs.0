@@ -1,365 +1,154 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils: Create new binary cifs.idmap for sid to uid/gid mapping
-Date: Fri,  6 May 2011 02:33:59 -0500
-Message-ID: <1304667239-29127-1-git-send-email-shirishp@linux.vnet.ibm.com>
+Subject: [PATCH] cifs: Change key name to cifs.idmap, misc. clean-up
+Date: Fri,  6 May 2011 02:35:00 -0500
+Message-ID: <1304667300-29158-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Handle cifs.idmap type of key. Extract a SID string from the description
-and map it to either an uid or gid using winbind APIs.
-If that fails (e.g. because winbind is not installed/running or winbind returns
-an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
-And if that fails, kernel assigns uid and gid (from mount superblock).
 
-Enable including winbind header files and idmapping code conditional
-to winbind devel rpms (header and library).
-
-An entry such as this
-
-create  cifs.idmap   *       *               /usr/sbin/cifs.idmap %k
-
-is needed in the file /etc/request-key.conf.
-
+Change idmap key name from cifs.cifs_idmap to cifs.idmap.
+Removed unused structure wksidarr and function match_sid().
+Handle errors correctly in function init_cifs().
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- Makefile.am  |    8 ++
- cifs.idmap.c |  215 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac |   58 +++++++++++++++-
- 3 files changed, 280 insertions(+), 1 deletions(-)
- create mode 100644 cifs.idmap.c
+ fs/cifs/cifsacl.c |   59 +----------------------------------------------------
+ fs/cifs/cifsacl.h |    1 -
+ fs/cifs/cifsfs.c  |    8 ++++--
+ 3 files changed, 6 insertions(+), 62 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 67a0190..ad33914 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -30,3 +30,11 @@ bin_PROGRAMS = cifscreds
- cifscreds_SOURCES = cifscreds.c resolve_host.c util.c
- cifscreds_LDADD = -lkeyutils
- endif
-+
-+if CONFIG_CIFSIDMAP
-+cifs_idmap_sbindir = /usr/local/sbin
-+cifs_idmap_sbin_PROGRAMS = cifs.idmap
-+cifs_idmap_SOURCES = cifs.idmap.c
-+cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
-+endif
-+
-diff --git a/cifs.idmap.c b/cifs.idmap.c
-new file mode 100644
-index 0000000..0f76873
---- /dev/null
-+++ b/cifs.idmap.c
-@@ -0,0 +1,215 @@
-+/*
-+* CIFS idmap helper.
-+* Copyright (C) Shirish Pargaonkar (shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org) 2011
-+*
-+* Used by /sbin/request-key.conf for handling
-+* cifs upcall for SID to uig/gid and uid/gid to SID mapping.
-+* You should have keyutils installed and add
-+* this lines to /etc/request-key.conf file:
-+
-+    create cifs.idmap * * /usr/local/sbin/cifs.idmap %k
-+
-+* This program is free software; you can redistribute it and/or modify
-+* it under the terms of the GNU General Public License as published by
-+* the Free Software Foundation; either version 2 of the License, or
-+* (at your option) any later version.
-+* This program is distributed in the hope that it will be useful,
-+* but WITHOUT ANY WARRANTY; without even the implied warranty of
-+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+* GNU General Public License for more details.
-+* You should have received a copy of the GNU General Public License
-+* along with this program; if not, write to the Free Software
-+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+*/
-+
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif /* HAVE_CONFIG_H */
-+
-+#include <string.h>
-+#include <getopt.h>
-+#include <syslog.h>
-+#include <dirent.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <unistd.h>
-+#ifdef HAVE_KEYUTILS_H
-+#include <keyutils.h>
-+#endif /* HAVE_KEYUTILS_H */
-+#include <stdint.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <limits.h>
-+#ifdef HAVE_WBCLIENT_H
-+#include <wbclient.h>
-+#endif /* HAVE_WBCLIENT_H */
-+
-+static const char *prog = "cifs.idmap";
-+
-+static void usage(void)
-+{
-+	syslog(LOG_INFO, "Usage: %s [-t] [-v] [-l] key_serial", prog);
-+	fprintf(stderr, "Usage: %s [-t] [-v] [-l] key_serial\n", prog);
-+}
-+
-+#ifdef HAVE_LIBWBCLIENT
-+static int
-+cifs_idmap(const key_serial_t key, const char *key_descr)
-+{
-+	int i;
-+	uid_t uid = 0;
-+	gid_t gid = 0;;
-+	wbcErr rc = 1;
-+	const char *keyend = key_descr;
-+	struct wbcDomainSid sid;
-+	struct passwd *pw;
-+	struct group *gr;
-+
-+	/* skip next 4 ';' delimiters to get to description */
-+	for (i = 1; i <= 4; ++i) {
-+		keyend = index(keyend + 1, ';');
-+		if (!keyend) {
-+			syslog(LOG_ERR, "invalid key description: %s",
-+			       key_descr);
-+			return 1;
-+		}
-+	}
-+	keyend++;
-+
-+	/*
-+	 * Use winbind to convert received string to a SID and lookup
-+	 * name and map that SID to an uid.  If either of these
-+	 * function calls return with an error,  use system calls to obtain
-+	 * uid of user "nobody". If winbind fails to map a SID to an UID
-+	 * and there is no user named "nobody", return error to the
-+	 * upcall caller. Otherwise instanticate a key using that uid.
-+	 *
-+	 * The same applies to SID and gid mapping.  Instead of a
-+	 * user "nobody", user "nogroup" is looked up if winbind
-+	 * fails to map a SID to a gid.
-+	 */
-+	if (strncmp(keyend, "os", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		keyend++;
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (rc)
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+		else {
-+			rc = wbcSidToUid(&sid, &uid);
-+			if (rc)
-+				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
-+						keyend, rc);
-+		}
-+		if (rc) { /* either of the two wbcSid functions failed */
-+			pw = getpwnam("nobody");
-+			if (!pw)
-+				syslog(LOG_DEBUG, "SID %s to uid pw error: %d",
-+					keyend, rc);
-+			else {
-+				uid = pw->pw_uid;
-+				rc = 0;
-+			}
-+		}
-+		if (!rc) { /* SID has been mapped to a uid */
-+			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
-+			if (rc)
-+				syslog(LOG_ERR, "%s: key inst: %s",
-+					__func__, strerror(errno));
-+		}
-+	} else if (strncmp(keyend, "gs", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		keyend++;
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (rc)
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+		else {
-+			rc = wbcSidToGid(&sid, &gid);
-+			if (rc)
-+				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
-+						keyend, rc);
-+		}
-+		if (rc) { /* either of the two wbcSid functions failed */
-+			gr = getgrnam("nogroup");
-+			if (!gr)
-+				syslog(LOG_DEBUG, "SID %s to gid pw error: %d",
-+						keyend, rc);
-+			else {
-+				gid = gr->gr_gid;
-+				rc = 0;
-+			}
-+		}
-+		if (!rc) { /* SID has been mapped to a gid */
-+			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
-+			if (rc)
-+				syslog(LOG_ERR, "%s: key inst: %s",
-+						__func__, strerror(errno));
-+		}
-+	} else
-+		syslog(LOG_DEBUG, "Invalid SID: %s", keyend);
-+
-+	return rc;
-+}
-+#endif /* HAVE_LIBWBCLIENT */
-+
-+int main(const int argc, char *const argv[])
-+{
-+	int c;
-+	long rc = 1;
-+	key_serial_t key = 0;
-+	char *buf;
-+
-+	openlog(prog, 0, LOG_DAEMON);
-+
-+	while ((c = getopt_long(argc, argv, "v", NULL, NULL)) != -1) {
-+		switch (c) {
-+		case 'v':
-+			printf("version: %s\n", VERSION);
-+			goto out;
-+		default:
-+			syslog(LOG_ERR, "unknown option: %c", c);
-+			goto out;
-+		}
-+	}
-+
-+	/* is there a key? */
-+	if (argc <= optind) {
-+		usage();
-+		goto out;
-+	}
-+
-+	/* get key and keyring values */
-+	errno = 0;
-+	key = strtol(argv[optind], NULL, 10);
-+	if (errno != 0) {
-+		key = 0;
-+		syslog(LOG_ERR, "Invalid key format: %s", strerror(errno));
-+		goto out;
-+	}
-+
-+	rc = keyctl_describe_alloc(key, &buf);
-+	if (rc == -1) {
-+		syslog(LOG_ERR, "keyctl_describe_alloc failed: %s",
-+		       strerror(errno));
-+		rc = 1;
-+		goto out;
-+	}
-+
-+	syslog(LOG_DEBUG, "key description: %s", buf);
-+
-+#ifdef HAVE_LIBWBCLIENT
-+	if ((strncmp(buf, "cifs.idmap", sizeof("cifs.idmap") - 1) == 0))
-+		rc = cifs_idmap(key, buf);
-+#endif /* HAVE_LIBWBCLIENT */
-+
-+out:
-+	/*
-+	 * on error, negatively instantiate the key ourselves so that we can
-+	 * make sure the kernel doesn't hang it off of a searchable keyring
-+	 * and interfere with the next attempt to instantiate the key.
-+	 */
-+	if (rc != 0 && key == 0)
-+		keyctl_negate(key, 1, KEY_REQKEY_DEFL_DEFAULT);
-+	return rc;
-+}
-diff --git a/configure.ac b/configure.ac
-index e0e2a60..d9eaead 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -22,13 +22,19 @@ AC_ARG_ENABLE(cifscreds,
- 	enable_cifscreds=$enableval,
- 	enable_cifscreds="no")
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index bfb5ba5..f3c6fb9 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -33,18 +33,6 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
  
-+AC_ARG_ENABLE(cifsidmap,
-+	[AC_HELP_STRING([--enable-cifsidmap],
-+			[Create cifs.idmap binary @<:@default=yes@:>@])],
-+	enable_cifsidmap=$enableval,
-+	enable_cifsidmap="maybe")
-+
- # Checks for programs.
- AC_PROG_CC
- AC_PROG_SED
- AC_GNU_SOURCE
+-
+-static struct cifs_wksid wksidarr[NUM_WK_SIDS] = {
+-	{{1, 0, {0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0} }, "null user"},
+-	{{1, 1, {0, 0, 0, 0, 0, 1}, {0, 0, 0, 0, 0} }, "nobody"},
+-	{{1, 1, {0, 0, 0, 0, 0, 5}, {__constant_cpu_to_le32(11), 0, 0, 0, 0} }, "net-users"},
+-	{{1, 1, {0, 0, 0, 0, 0, 5}, {__constant_cpu_to_le32(18), 0, 0, 0, 0} }, "sys"},
+-	{{1, 2, {0, 0, 0, 0, 0, 5}, {__constant_cpu_to_le32(32), __constant_cpu_to_le32(544), 0, 0, 0} }, "root"},
+-	{{1, 2, {0, 0, 0, 0, 0, 5}, {__constant_cpu_to_le32(32), __constant_cpu_to_le32(545), 0, 0, 0} }, "users"},
+-	{{1, 2, {0, 0, 0, 0, 0, 5}, {__constant_cpu_to_le32(32), __constant_cpu_to_le32(546), 0, 0, 0} }, "guest"} }
+-;
+-
+-
+ /* security id for everyone/world system group */
+ static const struct cifs_sid sid_everyone = {
+ 	1, 1, {0, 0, 0, 0, 0, 1}, {0} };
+@@ -131,7 +119,7 @@ cifs_idmap_key_destroy(struct key *key)
+ }
  
- # Checks for header files.
--AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdlib.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
-+AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
+ struct key_type cifs_idmap_key_type = {
+-	.name        = "cifs.cifs_idmap",
++	.name        = "cifs.idmap",
+ 	.instantiate = cifs_idmap_key_instantiate,
+ 	.destroy     = cifs_idmap_key_destroy,
+ 	.describe    = user_describe,
+@@ -435,51 +423,6 @@ cifs_destroy_idmaptrees(void)
+ 	spin_unlock(&sidgidlock);
+ }
  
- if test $enable_cifsupcall != "no"; then
- 	AC_CHECK_HEADERS([krb5.h krb5/krb5.h])
-@@ -89,6 +95,55 @@ if test $enable_cifsupcall != "no"; then
- 	AC_SUBST(KRB5_LDADD)
- fi
+-int match_sid(struct cifs_sid *ctsid)
+-{
+-	int i, j;
+-	int num_subauth, num_sat, num_saw;
+-	struct cifs_sid *cwsid;
+-
+-	if (!ctsid)
+-		return -1;
+-
+-	for (i = 0; i < NUM_WK_SIDS; ++i) {
+-		cwsid = &(wksidarr[i].cifssid);
+-
+-		/* compare the revision */
+-		if (ctsid->revision != cwsid->revision)
+-			continue;
+-
+-		/* compare all of the six auth values */
+-		for (j = 0; j < 6; ++j) {
+-			if (ctsid->authority[j] != cwsid->authority[j])
+-				break;
+-		}
+-		if (j < 6)
+-			continue; /* all of the auth values did not match */
+-
+-		/* compare all of the subauth values if any */
+-		num_sat = ctsid->num_subauth;
+-		num_saw = cwsid->num_subauth;
+-		num_subauth = num_sat < num_saw ? num_sat : num_saw;
+-		if (num_subauth) {
+-			for (j = 0; j < num_subauth; ++j) {
+-				if (ctsid->sub_auth[j] != cwsid->sub_auth[j])
+-					break;
+-			}
+-			if (j < num_subauth)
+-				continue; /* all sub_auth values do not match */
+-		}
+-
+-		cFYI(1, "matching sid: %s\n", wksidarr[i].sidname);
+-		return 0; /* sids compare/match */
+-	}
+-
+-	cFYI(1, "No matching sid");
+-	return -1;
+-}
+-
+ /* if the two SIDs (roughly equivalent to a UUID for a user or group) are
+    the same returns 1, if they do not match returns 0 */
+ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+index 757cf5a..5c902c7 100644
+--- a/fs/cifs/cifsacl.h
++++ b/fs/cifs/cifsacl.h
+@@ -98,7 +98,6 @@ extern struct key_type cifs_idmap_key_type;
+ extern const struct cred *root_cred;
+ #endif /* KERNEL */
  
-+if test $enable_cifsidmap != "no"; then
-+	AC_CHECK_HEADERS([keyutils.h], , [
-+				if test "$enable_cifsidmap" = "yes"; then
-+					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
-+				else
-+					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifs.idmap.])
-+					enable_cifsidmap="no"
-+				fi
-+			])
-+fi
-+
-+if test $enable_cifsidmap != "no"; then
-+	AC_CHECK_HEADERS([wbclient.h], , [
-+				if test "$enable_cifsidmap" = "yes"; then
-+					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel..])
-+				else
-+					AC_MSG_WARN([keyutils.h not found, consider installing libwbclient-devel. Disabling cifs.idmap.])
-+					enable_cifsidmap="no"
-+				fi
-+			],
-+[#ifdef HAVE_STDINT_H
-+#include <stdint.h>
-+#endif
-+]
-+[#ifdef HAVE_STDBOOL_H
-+#include <stdbool.h>
-+#endif
-+]
-+[#ifdef HAVE_STDIO_H
-+#include <stdio.h>
-+#endif
-+]
-+[#ifdef HAVE_STDLIB_H
-+#include <stdlib.h>
-+#endif
-+]
-+[#ifdef HAVE_ERRNO_H
-+#include <errno.h>
-+#endif
-+]
-+)
-+fi
-+
-+if test $enable_cifsidmap != "no"; then
-+	AC_CHECK_LIB([wbclient], [wbcStringToSid],
-+		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["define var have_libwbclient"]) ], [AC_MSG_ERROR([no functioning wbclient library found!])])
-+	AC_SUBST(WINB_LDADD)
-+fi
-+
- if test $enable_cifscreds = "yes"; then
- 	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
- fi
-@@ -140,6 +195,7 @@ LIBS=$cu_saved_libs
+-extern int match_sid(struct cifs_sid *);
+ extern int compare_sids(const struct cifs_sid *, const struct cifs_sid *);
  
- AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
- AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
-+AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
+ #endif /* _CIFSACL_H */
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 2b8e47e..ed92c7d 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1046,21 +1046,23 @@ init_cifs(void)
+ #ifdef CONFIG_CIFS_ACL
+ 	rc = init_cifs_idmap();
+ 	if (rc)
+-		goto out_destroy_request_bufs;
++		goto out_register_key_type;
+ #endif /* CONFIG_CIFS_ACL */
  
- LIBCAP_NG_PATH
+ 	rc = register_filesystem(&cifs_fs_type);
+ 	if (rc)
+-		goto out_destroy_request_bufs;
++		goto out_init_cifs_idmap;
  
+ 	return 0;
+ 
+-out_destroy_request_bufs:
++out_init_cifs_idmap:
+ #ifdef CONFIG_CIFS_ACL
+ 	exit_cifs_idmap();
++out_register_key_type:
+ #endif
+ #ifdef CONFIG_CIFS_UPCALL
+ 	unregister_key_type(&cifs_spnego_key_type);
++out_destroy_request_bufs:
+ #endif
+ 	cifs_destroy_request_bufs();
+ out_destroy_mids:
 -- 
 1.6.0.2
