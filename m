@@ -1,38 +1,49 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 6 May 2011 16:38:31 -0500
-Message-ID: <BANLkTi=RPZx0HkvRe-WC9gcDzF88MZ5vrg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Sage Weil <sage@newdream.net>
+Subject: [PATCH 18/18] cifs: remove unnecessary dentry_unhash on rmdir/rename_dir
+Date: Mon,  9 May 2011 21:43:36 -0700
+Message-ID: <1305002616-16782-19-git-send-email-sage@newdream.net>
+References: <1305002616-16782-1-git-send-email-sage@newdream.net>
+Cc: Sage Weil <sage@newdream.net>, Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org
+To: viro@ZenIV.linux.org.uk, hch@lst.de, linux-fsdevel@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1305002616-16782-1-git-send-email-sage@newdream.net>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-The following changes since commit fafc9929c668f8bae6dd1f109f33a86d2cb3c460:
+Cifs has no problems with lingering references to unlinked directory
+inodes.
 
-  Merge branch 'drm-fixes' of
-git://git.kernel.org/pub/scm/linux/kernel/git/airlied/drm-2.6
-(2011-04-28 13:14:02 -0700)
+CC: Steve French <sfrench@samba.org>
+CC: linux-cifs@vger.kernel.org
+Signed-off-by: Sage Weil <sage@newdream.net>
+---
+ fs/cifs/inode.c |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
-
-Jeff Layton (5):
-      cifs: change bleft in decode_unicode_ssetup back to signed type
-      cifs: check for bytes_remaining going to zero in CIFS_SessSetup
-      cifs: sanitize length checking in coalesce_t2 (try #3)
-      cifs: refactor mid finding loop in cifs_demultiplex_thread
-      cifs: handle errors from coalesce_t2
-
- fs/cifs/connect.c |  120 +++++++++++++++++++++++++++++-----------------------
- fs/cifs/sess.c    |   19 ++-------
- 2 files changed, 71 insertions(+), 68 deletions(-)
-
-
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 18546b7..8852470 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1461,8 +1461,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
+ 
+ 	cFYI(1, "cifs_rmdir, inode = 0x%p", inode);
+ 
+-	dentry_unhash(direntry);
+-
+ 	xid = GetXid();
+ 
+ 	full_path = build_path_from_dentry(direntry);
+@@ -1571,9 +1569,6 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
+ 	FILE_UNIX_BASIC_INFO *info_buf_target;
+ 	int xid, rc, tmprc;
+ 
+-	if (target_dentry->d_inode && S_ISDIR(target_dentry->d_inode->i_mode))
+-		dentry_unhash(target_dentry);
+-
+ 	cifs_sb = CIFS_SB(source_dir->i_sb);
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
 -- 
-Thanks,
+1.7.1
 
-Steve
