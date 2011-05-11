@@ -1,49 +1,48 @@
-From: Sage Weil <sage@newdream.net>
-Subject: [PATCH 18/18] cifs: remove unnecessary dentry_unhash on rmdir/rename_dir
-Date: Mon,  9 May 2011 21:43:36 -0700
-Message-ID: <1305002616-16782-19-git-send-email-sage@newdream.net>
-References: <1305002616-16782-1-git-send-email-sage@newdream.net>
-Cc: Sage Weil <sage@newdream.net>, Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org
-To: viro@ZenIV.linux.org.uk, hch@lst.de, linux-fsdevel@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1305002616-16782-1-git-send-email-sage@newdream.net>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: remote_path_check for dfs causes extra tconX retries when invalid
+ user or password
+Date: Wed, 11 May 2011 08:10:08 -0500
+Message-ID: <BANLkTi=7KFzN5M4M7A2wFtbYCy2d4x+1xg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Cifs has no problems with lingering references to unlinked directory
-inodes.
+When we get an access denied on SMB TConX (non existing userid will
+cause sessetup to succeed as guest but SMB tconX to fail) - we now
+unconditionally check for dfs path on any error in SMB TconX which
+results in 9 extra requests.  Perhaps we should check for rc == EACCES
+(in cifs_mount in fs/cifs/connect.c)
 
-CC: Steve French <sfrench@samba.org>
-CC: linux-cifs@vger.kernel.org
-Signed-off-by: Sage Weil <sage@newdream.net>
----
- fs/cifs/inode.c |    5 -----
- 1 files changed, 0 insertions(+), 5 deletions(-)
+	/* search for existing tcon to this server share */
+	tcon = cifs_get_tcon(pSesInfo, volume_info);
+	if (IS_ERR(tcon)) {
+		rc = PTR_ERR(tcon);
+		tcon = NULL;
+		goto remote_path_check;
+	}
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 18546b7..8852470 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1461,8 +1461,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
- 
- 	cFYI(1, "cifs_rmdir, inode = 0x%p", inode);
- 
--	dentry_unhash(direntry);
--
- 	xid = GetXid();
- 
- 	full_path = build_path_from_dentry(direntry);
-@@ -1571,9 +1569,6 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
- 	FILE_UNIX_BASIC_INFO *info_buf_target;
- 	int xid, rc, tmprc;
- 
--	if (target_dentry->d_inode && S_ISDIR(target_dentry->d_inode->i_mode))
--		dentry_unhash(target_dentry);
--
- 	cifs_sb = CIFS_SB(source_dir->i_sb);
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
+or after remote_path_check label below:
+
+	/*
+	 * Perform an unconditional check for whether there are DFS
+	 * referrals for this path without prefix, to provide support
+	 * for DFS referrals from w2k8 servers which don't seem to respond
+	 * with PATH_NOT_COVERED to requests that include the prefix.
+	 * Chase the referral if found, otherwise continue normally.
+	 */
+	if (referral_walks_count == 0) {
+		int refrc = expand_dfs_referral(xid, pSesInfo, volume_info,
+						cifs_sb, false);
+		if (!refrc) {
+			referral_walks_count++;
+			goto try_mount_again;
+		}
+	}
+
 -- 
-1.7.1
+Thanks,
 
+Steve
