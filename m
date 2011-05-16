@@ -1,42 +1,67 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [v2 0/4] Introduce shared superblock model to cifs
-Date: Mon, 16 May 2011 16:12:43 +0400
-Message-ID: <BANLkTinBXJJvc+Wz4J9qa+ZHT8KtJSF-1Q@mail.gmail.com>
-References: <1304589632-1209-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix cifsConvertToUCS() for the mapchars case
+Date: Mon, 16 May 2011 09:05:25 -0400
+Message-ID: <1305551125-5867-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1304589632-1209-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/5/5 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> This is the second version of the set. It should be applied on top of=
- current for-next branch + 6 DFS related patches from Sean Finney.
->
-> Pavel Shilovsky (4):
-> =A0CIFS: Simplify connection structure search calls
-> =A0CIFS: Simplify mount code for further shared sb capability
-> =A0CIFS: Migrate from prefixpath logic
-> =A0CIFS: Migrate to shared superblock model
->
-> =A0fs/cifs/cifs_fs_sb.h | =A0 =A02 -
-> =A0fs/cifs/cifsfs.c =A0 =A0 | =A0205 ++++++++++++++++++++++----
-> =A0fs/cifs/cifsglob.h =A0 | =A0 81 ++++++++++
-> =A0fs/cifs/cifsproto.h =A0| =A0 13 ++-
-> =A0fs/cifs/connect.c =A0 =A0| =A0398 +++++++++++++++++++++++++-------=
-------------------
-> =A0fs/cifs/dir.c =A0 =A0 =A0 =A0| =A0 =A07 +-
-> =A0fs/cifs/inode.c =A0 =A0 =A0| =A0 19 +--
-> =A07 files changed, 472 insertions(+), 253 deletions(-)
->
->
+As Metze pointed out, commit 84cdf74e broke mapchars option:
 
-Since Sean Finney's DFS series is now in master, can you comment on thi=
-s one?
+    Commit "cifs: fix unaligned accesses in cifsConvertToUCS"
+    (84cdf74e8096a10dd6acbb870dd404b92f07a756) does multiple steps
+    in just one commit (moving the function and changing it without
+    testing).
 
---=20
-Best regards,
-Pavel Shilovsky.
+    put_unaligned_le16(temp, &target[j]); is never called for any
+    codepoint the goes via the 'default' switch statement. As a result
+    we put just zero (or maybe uninitialized) bytes into the target
+    buffer.
+
+His proposed patch looks correct, but doesn't apply to the current head
+of the tree. This patch should also fix it.
+
+Reported-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_unicode.c |   14 ++++++--------
+ 1 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index 23d43cd..1b2e180 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -277,6 +277,7 @@ cifsConvertToUCS(__le16 *target, const char *source, int srclen,
+ 
+ 	for (i = 0, j = 0; i < srclen; j++) {
+ 		src_char = source[i];
++		charlen = 1;
+ 		switch (src_char) {
+ 		case 0:
+ 			put_unaligned(0, &target[j]);
+@@ -316,16 +317,13 @@ cifsConvertToUCS(__le16 *target, const char *source, int srclen,
+ 				dst_char = cpu_to_le16(0x003f);
+ 				charlen = 1;
+ 			}
+-			/*
+-			 * character may take more than one byte in the source
+-			 * string, but will take exactly two bytes in the
+-			 * target string
+-			 */
+-			i += charlen;
+-			continue;
+ 		}
++		/*
++		 * character may take more than one byte in the source string,
++		 * but will take exactly two bytes in the target string
++		 */
++		i += charlen;
+ 		put_unaligned(dst_char, &target[j]);
+-		i++; /* move to next char in source string */
+ 	}
+ 
+ ctoUCS_out:
+-- 
+1.7.4.4
