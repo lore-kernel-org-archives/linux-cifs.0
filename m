@@ -1,93 +1,68 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Create new binary cifs.idmap for sid to
- uid/gid mapping
-Date: Tue, 17 May 2011 13:56:32 -0400
-Message-ID: <20110517135632.08ca8038@tlielax.poochiereds.net>
-References: <1304667239-29127-1-git-send-email-shirishp@linux.vnet.ibm.com>
-	<20110517120946.7890152b@tlielax.poochiereds.net>
-	<BANLkTi=Xjn2AyfmtgXYja0+c3p0WhRiAdA@mail.gmail.com>
-	<20110517131437.66de1ee8@tlielax.poochiereds.net>
-	<BANLkTinrDemiA5zwm5Eq-BxADmhJq2FNPA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: fix cifsConvertToUCS() for the mapchars case
+Date: Tue, 17 May 2011 15:28:21 -0400
+Message-ID: <1305660501-23587-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTinrDemiA5zwm5Eq-BxADmhJq2FNPA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 17 May 2011 12:47:35 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+As Metze pointed out, commit 84cdf74e broke mapchars option:
 
-> On Tue, May 17, 2011 at 12:14 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wr=
-ote:
-> > On Tue, 17 May 2011 12:01:12 -0500
-> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> > [...]
-> >
-> >> >> +if test $enable_cifsidmap !=3D "no"; then
-> >> >> + =C2=A0 =C2=A0 AC_CHECK_HEADERS([keyutils.h], , [
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if test "$enable_cifsidmap" =3D "ye=
-s"; then
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 AC_MSG_=
-ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 AC_MSG_=
-WARN([keyutils.h not found, consider installing keyutils-libs-devel. Di=
-sabling cifs.idmap.])
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 enable_=
-cifsidmap=3D"no"
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 fi
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 ])
-> >> >> +fi
-> >> >> +
-> >> >
-> >> > We're already doing a AC_CHECK_HEADERS for keyutils.h -- I don't=
- think
-> >> > we want to do it again. Just use the same check for both cifs.up=
-call
-> >> > and cifs.idmap.
-> >>
-> >> =C2=A0Could someone build just cifs.idmap and not cifs.upcall?
-> >>
-> >
-> > Sure, I don't see why not.
-> >
-> > --
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >
->=20
-> Then would not we need  AC_CHECK_HEADERS for keyutils.h for cifs.idma=
-p
-> in case cifs.upcall is not being built i.e. do would not we need both
-> these checks?
->=20
-> if test  ; then
->         AC_CHECK_HEADERS([keyutils.h], , [
->=20
->=20
-> if test $enable_cifsidmap !=3D "no"; then
->         AC_CHECK_HEADERS([keyutils.h], , [
+    Commit "cifs: fix unaligned accesses in cifsConvertToUCS"
+    (84cdf74e8096a10dd6acbb870dd404b92f07a756) does multiple steps
+    in just one commit (moving the function and changing it without
+    testing).
 
-No, I think you just want to do a single AC_CHECK_HEADERS under:
+    put_unaligned_le16(temp, &target[j]); is never called for any
+    codepoint the goes via the 'default' switch statement. As a result
+    we put just zero (or maybe uninitialized) bytes into the target
+    buffer.
 
-    if test $enable_cifsupcall !=3D "no" -o $enable_cifsidmap !=3D "no"
+His proposed patch looks correct, but doesn't apply to the current head
+of the tree. This patch should also fix it.
 
-=2E..and then handle both cases correctly.
+Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # .38.x: 581ade4: cifs: clean up various nits in unicode routines (try #2)
+Reported-by: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_unicode.c |   14 ++++++--------
+ 1 files changed, 6 insertions(+), 8 deletions(-)
 
-OTOH, I think autoconf might cache the results of AC_CHECK_HEADERS and
-won't re-do the test, so you may be alright without doing that. I'd
-verify that by inspecting the log to be sure though.
-
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index 23d43cd..1b2e180 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -277,6 +277,7 @@ cifsConvertToUCS(__le16 *target, const char *source, int srclen,
+ 
+ 	for (i = 0, j = 0; i < srclen; j++) {
+ 		src_char = source[i];
++		charlen = 1;
+ 		switch (src_char) {
+ 		case 0:
+ 			put_unaligned(0, &target[j]);
+@@ -316,16 +317,13 @@ cifsConvertToUCS(__le16 *target, const char *source, int srclen,
+ 				dst_char = cpu_to_le16(0x003f);
+ 				charlen = 1;
+ 			}
+-			/*
+-			 * character may take more than one byte in the source
+-			 * string, but will take exactly two bytes in the
+-			 * target string
+-			 */
+-			i += charlen;
+-			continue;
+ 		}
++		/*
++		 * character may take more than one byte in the source string,
++		 * but will take exactly two bytes in the target string
++		 */
++		i += charlen;
+ 		put_unaligned(dst_char, &target[j]);
+-		i++; /* move to next char in source string */
+ 	}
+ 
+ ctoUCS_out:
+-- 
+1.7.4.4
