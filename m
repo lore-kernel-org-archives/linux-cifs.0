@@ -1,28 +1,39 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [v2 0/4] Introduce shared superblock model to cifs
-Date: Tue, 17 May 2011 00:29:56 +0400
-Message-ID: <BANLkTi=Q34UR_C3aLm_uEkwye_XGM8zT_g@mail.gmail.com>
-References: <1304589632-1209-1-git-send-email-piastry@etersoft.ru>
-	<BANLkTinBXJJvc+Wz4J9qa+ZHT8KtJSF-1Q@mail.gmail.com>
-	<BANLkTimLt85CWvJ0wHK0_xRL+OR52FQjdg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: add fallback in is_path_accessible for old servers
+Date: Tue, 17 May 2011 06:40:30 -0400
+Message-ID: <1305628830-17952-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sandro.bonazzola-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTimLt85CWvJ0wHK0_xRL+OR52FQjdg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/5/16 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> No objection to these - I will rereview - are they also current in
-> your git tree?
->
+The is_path_accessible check uses a QPathInfo call, which isn't
+supported by ancient win9x era servers. Fall back to an older
+SMBQueryInfo call if it fails with the magic error codes.
 
-Thanks! I've just applied them on top of your master branch - into
-for-next branch on git.etersoft.ru:
-http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Reported-and-Tested-by: Sandro Bonazzola <sandro.bonazzola-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 05f1dcf..277262a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2673,6 +2673,11 @@ is_path_accessible(int xid, struct cifsTconInfo *tcon,
+ 			      0 /* not legacy */, cifs_sb->local_nls,
+ 			      cifs_sb->mnt_cifs_flags &
+ 				CIFS_MOUNT_MAP_SPECIAL_CHR);
++
++	if (rc == -EOPNOTSUPP || rc == -EINVAL)
++		rc = SMBQueryInformation(xid, tcon, full_path, pfile_info,
++				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
++				  CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	kfree(pfile_info);
+ 	return rc;
+ }
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.4.4
