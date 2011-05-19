@@ -1,28 +1,37 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 1/2] CIFS: Use pid saved in cifsFileInfo in writepages and set_file_size
-Date: Thu, 19 May 2011 13:22:00 +0400
-Message-ID: <BANLkTi=N1wN4o4i04=pW8joC__hNq3WynA@mail.gmail.com>
-References: <linux-cifs@vger.kernel.org>
-	<1304502271-11557-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] manpage: make serverino and noserverino option descriptions clear
+Date: Thu, 19 May 2011 13:33:58 +0400
+Message-ID: <1305797638-7063-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1304502271-11557-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/5/4 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> We need it to make them work with mandatory locking style because
-> we can fail in a situation like when kernel need to flush dirty pages
-> and there is a lock held by process who opened file.
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ mount.cifs.8 |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-I put this and 2/2 Add rwpidforward mount option patch on top of
-current master branch into pidforward branch on git.etersoft.ru:
-http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/pidforward
-
-Comments?
-
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index 2ebe19d..ddecb2a 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -363,12 +363,12 @@ When the CIFS Unix Extensions are not negotiated, attempt to create device files
+ .PP
+ serverino
+ .RS 4
+-Use inode numbers (unique persistent file identifiers) returned by the server instead of automatically generating temporary inode numbers on the client\&. Although server inode numbers make it easier to spot hardlinked files (as they will have the same inode numbers) and inode numbers may be persistent (which is userful for some sofware), the server does not guarantee that the inode numbers are unique if multiple server side mounts are exported under a single share (since inode numbers on the servers might not be unique if multiple filesystems are mounted under the same shared higher level directory)\&. Note that not all servers support returning server inode numbers, although those that support the CIFS Unix Extensions, and Windows 2000 and later servers typically do support this (althou
+ gh not necessarily on every local server filesystem)\&. Parameter has no effect if the server lacks support for returning inode numbers or equivalent\&.
++Use inode numbers (unique persistent file identifiers) returned by the server instead of automatically generating temporary inode numbers on the client\&. Although server inode numbers make it easier to spot hardlinked files (as they will have the same inode numbers) and inode numbers may be persistent (which is userful for some sofware), the server does not guarantee that the inode numbers are unique if multiple server side mounts are exported under a single share (since inode numbers on the servers might not be unique if multiple filesystems are mounted under the same shared higher level directory)\&. Note that not all servers support returning server inode numbers, although those that support the CIFS Unix Extensions, and Windows 2000 and later servers typically do support this (althou
+ gh not necessarily on every local server filesystem)\&. Parameter has no effect if the server lacks support for returning inode numbers or equivalent\&. This behavior is enabled by default\&.
+ .RE
+ .PP
+ noserverino
+ .RS 4
+-Client generates inode numbers (rather than using the actual one from the server) by default\&.
++Client generates inode numbers itself rather than using the actual ones from the server\&.
+ .sp
+ See section
+ \fIINODE NUMBERS\fR
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.1
