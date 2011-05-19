@@ -1,48 +1,43 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [v2 0/4] Introduce shared superblock model to cifs
-Date: Thu, 19 May 2011 07:30:24 -0500
-Message-ID: <BANLkTin2B_aKJFwiueyPuGC-xJHciCfL9Q@mail.gmail.com>
-References: <1304589632-1209-1-git-send-email-piastry@etersoft.ru>
-	<BANLkTinBXJJvc+Wz4J9qa+ZHT8KtJSF-1Q@mail.gmail.com>
-	<BANLkTimLt85CWvJ0wHK0_xRL+OR52FQjdg@mail.gmail.com>
-	<BANLkTi=Q34UR_C3aLm_uEkwye_XGM8zT_g@mail.gmail.com>
-	<BANLkTinXt88Ag5RvcDmdhnZAGeXQDfkcDA@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Simplify invalidate part (try #5)
+Date: Thu, 19 May 2011 14:01:32 -0400
+Message-ID: <20110519140132.32850e2c@barsoom.rdu.redhat.com>
+References: <1303565417-3653-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTinXt88Ag5RvcDmdhnZAGeXQDfkcDA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1303565417-3653-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-ok - thx
+On Sat, 23 Apr 2011 17:30:17 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-I plan to merge some additional patches today
+> Simplify many places when we call cifs_revalidate/invalidate to make
+> it do what it exactly needs.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   33 +++++++++++-----
+>  fs/cifs/cifsfs.h |    4 +-
+>  fs/cifs/file.c   |   16 ++++++--
+>  fs/cifs/inode.c  |  117 ++++++++++++++++++++++++++++++++++-------------------
+>  4 files changed, 113 insertions(+), 57 deletions(-)
+> 
 
-On Thu, May 19, 2011 at 4:18 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> 2011/5/17 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
->> 2011/5/16 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->>> No objection to these - I will rereview - are they also current in
->>> your git tree?
->>>
->>
->> Thanks! I've just applied them on top of your master branch - into
->> for-next branch on git.etersoft.ru:
->> http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next
->>
->
-> I rebased my for-next branch with your master branch - put these 4
-> patches on top of it.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
->
+This patch is causing a regression in tests5:
 
+./test5: read and write
+        ./test5: (/mnt/salusa/rawhide.test) 'bigfile' has size -2130066000, should be 1048576
+basic tests failed
 
+Pavel, can you track this down?
 
+Steve, in the meantime I suggest that this patch not be pushed when
+the merge window opens.
+ 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
