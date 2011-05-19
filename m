@@ -1,40 +1,34 @@
-From: WESTERN UNION MONEY TRANSFER <winners-rHAmd51CNbjYtjvyW6yDsg@public.gmane.org>
-Subject: (unknown)
-Date: Thu, 19 May 2011 13:32:40 +1000
-Message-ID: <201105190332.p4J3WeiI002907__35135.1758618422$1305776407$gmane$org@mail06.syd.optusnet.com.au>
-Reply-To: wu.africadept12@w.cn
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [v2 0/4] Introduce shared superblock model to cifs
+Date: Thu, 19 May 2011 13:18:54 +0400
+Message-ID: <BANLkTinXt88Ag5RvcDmdhnZAGeXQDfkcDA@mail.gmail.com>
+References: <1304589632-1209-1-git-send-email-piastry@etersoft.ru>
+	<BANLkTinBXJJvc+Wz4J9qa+ZHT8KtJSF-1Q@mail.gmail.com>
+	<BANLkTimLt85CWvJ0wHK0_xRL+OR52FQjdg@mail.gmail.com>
+	<BANLkTi=Q34UR_C3aLm_uEkwye_XGM8zT_g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: binary
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
+In-Reply-To: <BANLkTi=Q34UR_C3aLm_uEkwye_XGM8zT_g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+2011/5/17 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
+> 2011/5/16 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> No objection to these - I will rereview - are they also current in
+>> your git tree?
+>>
+>
+> Thanks! I've just applied them on top of your master branch - into
+> for-next branch on git.etersoft.ru:
+> http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next
+>
 
+I rebased my for-next branch with your master branch - put these 4
+patches on top of it.
 
-Dear Western Union Customer,
-You have been awarded with the sum of 
-$50,000 USD by our office, as one of our 
-customers who use Western Union in their daily 
-business transaction.
-This award has been selected through the 
-internet, where your e-mail address was 
-indicated and notified.
-Please provide Mr. Gary Epps with the following 
-detailslisted below so that your fund will be 
-remited to you through Western Union.
-1. Name:______
-2. Address________
-3. Country:_______
-4. Phone Number____
-5. Occupation:________
-6. Sex:_________________
-7. Age___________________
-Mr. Gary Epps
-Tel: +393883557681
-E-mail: wu.africadept12@w.cn
-As soon as these details are received and 
-verified,your fund will be transferred to you. 
-Thank you, for using western union.
+-- 
+Best regards,
+Pavel Shilovsky.
