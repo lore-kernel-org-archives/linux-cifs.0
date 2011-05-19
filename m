@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 7/7] cifs: clean up wsize negotiation and allow for larger wsize
-Date: Thu, 19 May 2011 16:22:58 -0400
-Message-ID: <1305836578-26333-8-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 2/7] cifs: make cifs_send_async take a kvec array
+Date: Thu, 19 May 2011 16:22:53 -0400
+Message-ID: <1305836578-26333-3-git-send-email-jlayton@redhat.com>
 References: <1305836578-26333-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,120 +10,107 @@ In-Reply-To: <1305836578-26333-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that we can handle larger wsizes in writepages, fix up the
-negotiation of the wsize to allow for that. find_get_pages only seems to
-give out a max of 256 pages at a time, so that gives us a reasonable
-default of 1M for the wsize.
+We'll need this for async writes, so convert the call to take a kvec
+array. CIFSSMBEcho is changed to put a kvec on the stack and pass
+in the SMB buffer using that.
 
-If the server however does not support large writes via POSIX
-extensions, then we cap the wsize to (128k - PAGE_CACHE_SIZE). That
-gives us a size that goes up to the max frame size specified in RFC1001.
-
-Finally, if CAP_LARGE_WRITE_AND_X isn't set, then further cap it to the
-largest size allowed by the protocol (USHRT_MAX).
-
+Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   69 +++++++++++++++++++++++++++++++++++++---------------
- 1 files changed, 49 insertions(+), 20 deletions(-)
+ fs/cifs/cifsproto.h |    4 ++--
+ fs/cifs/cifssmb.c   |    6 ++++--
+ fs/cifs/transport.c |   13 +++++++------
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index ccb3ff8..490fb68 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2633,23 +2633,6 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 	else /* default */
- 		cifs_sb->rsize = CIFSMaxBufSize;
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index bf140c2..b5407a6 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -67,8 +67,8 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+-extern int cifs_call_async(struct TCP_Server_Info *server,
+-			   struct smb_hdr *in_buf, mid_callback_t *callback,
++extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
++			   unsigned int nvec, mid_callback_t *callback,
+ 			   void *cbdata);
+ extern int SendReceive(const unsigned int /* xid */ , struct cifsSesInfo *,
+ 			struct smb_hdr * /* input */ ,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 64c2c91..b998996 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -725,6 +725,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ {
+ 	ECHO_REQ *smb;
+ 	int rc = 0;
++	struct kvec iov;
  
--	if (pvolume_info->wsize > PAGEVEC_SIZE * PAGE_CACHE_SIZE) {
--		cERROR(1, "wsize %d too large, using 4096 instead",
--			  pvolume_info->wsize);
--		cifs_sb->wsize = 4096;
--	} else if (pvolume_info->wsize)
--		cifs_sb->wsize = pvolume_info->wsize;
--	else
--		cifs_sb->wsize = min_t(const int,
--					PAGEVEC_SIZE * PAGE_CACHE_SIZE,
--					127*1024);
--		/* old default of CIFSMaxBufSize was too small now
--		   that SMB Write2 can send multiple pages in kvec.
--		   RFC1001 does not describe what happens when frame
--		   bigger than 128K is sent so use that as max in
--		   conjunction with 52K kvec constraint on arch with 4K
--		   page size  */
--
- 	if (cifs_sb->rsize < 2048) {
- 		cifs_sb->rsize = 2048;
- 		/* Windows ME may prefer this */
-@@ -2727,6 +2710,53 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 			   "mount option supported");
- }
+ 	cFYI(1, "In echo request");
  
-+/*
-+ * When the server supports very large writes via POSIX extensions, we can
-+ * allow up to 2^24 - PAGE_CACHE_SIZE.
-+ *
-+ * Note that this might make for "interesting" allocation problems during
-+ * writeback however (as we have to allocate an array of pointers for the
-+ * pages). A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
-+ */
-+#define CIFS_MAX_WSIZE ((1<<24) - PAGE_CACHE_SIZE)
-+
-+/*
-+ * When the server doesn't allow large posix writes, default to a wsize of
-+ * 128k - PAGE_CACHE_SIZE -- one page less than the largest frame size
-+ * described in RFC1001. This allows space for the header without going over
-+ * that by default.
-+ */
-+#define CIFS_MAX_RFC1001_WSIZE (128 * 1024 - PAGE_CACHE_SIZE)
-+
-+/*
-+ * The default wsize is 1M. find_get_pages seems to return a maximum of 256
-+ * pages in a single call. With PAGE_CACHE_SIZE == 4k, this means we can fill
-+ * a single wsize request with a single call.
-+ */
-+#define CIFS_DEFAULT_WSIZE (1024 * 1024)
-+
-+static unsigned int
-+cifs_negotiate_wsize(struct cifsTconInfo *tcon, struct smb_vol *pvolume_info)
-+{
-+	__u64 unix_cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	unsigned int wsize = pvolume_info->wsize ? pvolume_info->wsize :
-+				CIFS_DEFAULT_WSIZE;
-+
-+	/* can server support 24-bit write sizes? (via UNIX extensions) */
-+	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
-+		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1001_WSIZE);
-+
-+	/* no CAP_LARGE_WRITE_X? Limit it to 16 bits */
-+	if (!(server->capabilities & CAP_LARGE_WRITE_X))
-+		wsize = min_t(unsigned int, wsize, USHRT_MAX);
-+
-+	/* hard limit of CIFS_MAX_WSIZE */
-+	wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
-+
-+	return wsize;
-+}
-+
- static int
- is_path_accessible(int xid, struct cifsTconInfo *tcon,
- 		   struct cifs_sb_info *cifs_sb, const char *full_path)
-@@ -2988,13 +3018,12 @@ try_mount_again:
- 		cifs_sb->rsize = 1024 * 127;
- 		cFYI(DBG2, "no very large read support, rsize now 127K");
- 	}
--	if (!(tcon->ses->capabilities & CAP_LARGE_WRITE_X))
--		cifs_sb->wsize = min(cifs_sb->wsize,
--			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
- 	if (!(tcon->ses->capabilities & CAP_LARGE_READ_X))
- 		cifs_sb->rsize = min(cifs_sb->rsize,
- 			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
+@@ -739,9 +740,10 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 	put_bcc(1, &smb->hdr);
+ 	smb->Data[0] = 'a';
+ 	inc_rfc1001_len(smb, 3);
++	iov.iov_base = smb;
++	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
  
-+	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
-+
- remote_path_check:
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	/*
+-	rc = cifs_call_async(server, (struct smb_hdr *)smb,
+-				cifs_echo_callback, server);
++	rc = cifs_call_async(server, &iov, 1, cifs_echo_callback, server);
+ 	if (rc)
+ 		cFYI(1, "Echo request failed: %d", rc);
+ 
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 43633a7..67f59c7 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -342,11 +342,12 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+  * the result. Caller is responsible for dealing with timeouts.
+  */
+ int
+-cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+-		mid_callback_t *callback, void *cbdata)
++cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
++		unsigned int nvec, mid_callback_t *callback, void *cbdata)
+ {
+ 	int rc;
+ 	struct mid_q_entry *mid;
++	struct smb_hdr *hdr = (struct smb_hdr *)iov[0].iov_base;
+ 
+ 	rc = wait_for_free_request(server, CIFS_ASYNC_OP);
+ 	if (rc)
+@@ -354,10 +355,10 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ 
+ 	/* enable signing if server requires it */
+ 	if (server->secMode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+-		in_buf->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
++		hdr->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+ 
+ 	mutex_lock(&server->srv_mutex);
+-	mid = AllocMidQEntry(in_buf, server);
++	mid = AllocMidQEntry(hdr, server);
+ 	if (mid == NULL) {
+ 		mutex_unlock(&server->srv_mutex);
+ 		return -ENOMEM;
+@@ -368,7 +369,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ 	list_add_tail(&mid->qhead, &server->pending_mid_q);
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	rc = cifs_sign_smb(in_buf, server, &mid->sequence_number);
++	rc = cifs_sign_smb2(iov, nvec, server, &mid->sequence_number);
+ 	if (rc) {
+ 		mutex_unlock(&server->srv_mutex);
+ 		goto out_err;
+@@ -380,7 +381,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+ #ifdef CONFIG_CIFS_STATS2
+ 	atomic_inc(&server->inSend);
+ #endif
+-	rc = smb_send(server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
++	rc = smb_sendv(server, iov, nvec);
+ #ifdef CONFIG_CIFS_STATS2
+ 	atomic_dec(&server->inSend);
+ 	mid->when_sent = jiffies;
 -- 
 1.7.4.4
