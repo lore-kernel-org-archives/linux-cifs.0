@@ -1,7 +1,7 @@
 From: WESTERN UNION MONEY TRANSFER <winners-rHAmd51CNbjYtjvyW6yDsg@public.gmane.org>
 Subject: (unknown)
-Date: Thu, 19 May 2011 13:33:45 +1000
-Message-ID: <201105190333.p4J3Xj7c003952__17317.8989127793$1305776349$gmane$org@mail06.syd.optusnet.com.au>
+Date: Thu, 19 May 2011 13:33:22 +1000
+Message-ID: <201105190333.p4J3XMKW012009__33446.7423767366$1305776367$gmane$org@mail01.syd.optusnet.com.au>
 Reply-To: wu.africadept12@w.cn
 Mime-Version: 1.0
 Content-Type: text/plain
