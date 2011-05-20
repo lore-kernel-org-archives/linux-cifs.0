@@ -1,402 +1,260 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils: Create new binary cifs.idmap for sid to uid/gid mapping (try #2)
-Date: Fri, 20 May 2011 03:49:15 -0500
-Message-ID: <1305881355-11026-1-git-send-email-shirishppargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Simplify invalidate part (try #5)
+Date: Fri, 20 May 2011 13:00:53 +0400
+Message-ID: <BANLkTinsqwMoFzP+9+qX+W+Gr+LGae0Rdw@mail.gmail.com>
+References: <1303565417-3653-1-git-send-email-piastry@etersoft.ru>
+	<20110519140132.32850e2c@barsoom.rdu.redhat.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary=20cf303a303fefd9a604a3b15b99
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110519140132.32850e2c-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+--20cf303a303fefd9a604a3b15b99
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Handle cifs.idmap type of key. Extract a SID string from the description
-and map it to either an uid or gid using winbind APIs.
-If that fails (e.g. because winbind is not installed/running or winbind returns
-an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
-And if that fails, kernel assigns uid and gid (from mount superblock).
+2011/5/19 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Sat, 23 Apr 2011 17:30:17 +0400
+> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>
+>> Simplify many places when we call cifs_revalidate/invalidate to make
+>> it do what it exactly needs.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>> ---
+>> =A0fs/cifs/cifsfs.c | =A0 33 +++++++++++-----
+>> =A0fs/cifs/cifsfs.h | =A0 =A04 +-
+>> =A0fs/cifs/file.c =A0 | =A0 16 ++++++--
+>> =A0fs/cifs/inode.c =A0| =A0117 ++++++++++++++++++++++++++++++++++-------=
+------------
+>> =A04 files changed, 113 insertions(+), 57 deletions(-)
+>>
+>
+> This patch is causing a regression in tests5:
+>
+> ./test5: read and write
+> =A0 =A0 =A0 =A0./test5: (/mnt/salusa/rawhide.test) 'bigfile' has size -21=
+30066000, should be 1048576
+> basic tests failed
+>
+> Pavel, can you track this down?
+>
+> Steve, in the meantime I suggest that this patch not be pushed when
+> the merge window opens.
+>
 
-Enable including winbind header files and idmapping code conditional
-to winbind devel rpms (header and library).
+I figured it out.
 
-An entry such as this
+Steve, I attach two diffs: 1) diff for this version of the patch and
+2) new fixed version of the whole patch - you can use either one that
+is more comfortable to you.
 
-create  cifs.idmap   *       *               /usr/sbin/cifs.idmap %k
+--=20
+Best regards,
+Pavel Shilovsky.
 
-is needed in the file /etc/request-key.conf.
+--20cf303a303fefd9a604a3b15b99
+Content-Type: text/x-patch; charset=US-ASCII; name="CIFS-Simplify-invalidate-part-fix.diff"
+Content-Disposition: attachment;
+	filename="CIFS-Simplify-invalidate-part-fix.diff"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gnwwfaps0
 
+ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNmcy5jCmluZGV4IGVk
+OTJjN2QuLjQ5M2I3NGMgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2ZzLmMKKysrIGIvZnMvY2lm
+cy9jaWZzZnMuYwpAQCAtNjE3LDggKzYxNywxMCBAQCBzdGF0aWMgbG9mZl90IGNpZnNfbGxzZWVr
+KHN0cnVjdCBmaWxlICpmaWxlLCBsb2ZmX3Qgb2Zmc2V0LCBpbnQgb3JpZ2luKQogCQlpZiAoIUNJ
+RlNfSShpbm9kZSktPmNsaWVudENhbkNhY2hlUmVhZCAmJiBpbm9kZS0+aV9tYXBwaW5nICYmCiAJ
+CSAgICBpbm9kZS0+aV9tYXBwaW5nLT5ucnBhZ2VzICE9IDApIHsKIAkJCXJjID0gZmlsZW1hcF9m
+ZGF0YXdhaXQoaW5vZGUtPmlfbWFwcGluZyk7Ci0JCQltYXBwaW5nX3NldF9lcnJvcihpbm9kZS0+
+aV9tYXBwaW5nLCByYyk7Ci0JCQlyZXR1cm4gcmM7CisJCQlpZiAocmMpIHsKKwkJCQltYXBwaW5n
+X3NldF9lcnJvcihpbm9kZS0+aV9tYXBwaW5nLCByYyk7CisJCQkJcmV0dXJuIHJjOworCQkJfQog
+CQl9CiAJCS8qCiAJCSAqIFNvbWUgYXBwbGljYXRpb25zIHBvbGwgZm9yIHRoZSBmaWxlIGxlbmd0
+aCBpbiB0aGlzIHN0cmFuZ2UKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMv
+aW5vZGUuYwppbmRleCAwY2M3ZWRkLi5kZTAyZWQ1IDEwMDY0NAotLS0gYS9mcy9jaWZzL2lub2Rl
+LmMKKysrIGIvZnMvY2lmcy9pbm9kZS5jCkBAIC0xODA1LDggKzE4MDUsMTAgQEAgaW50IGNpZnNf
+Z2V0YXR0cihzdHJ1Y3QgdmZzbW91bnQgKm1udCwgc3RydWN0IGRlbnRyeSAqZGVudHJ5LAogCWlm
+ICghQ0lGU19JKGlub2RlKS0+Y2xpZW50Q2FuQ2FjaGVSZWFkICYmIGlub2RlLT5pX21hcHBpbmcg
+JiYKIAkgICAgaW5vZGUtPmlfbWFwcGluZy0+bnJwYWdlcyAhPSAwKSB7CiAJCXJjID0gZmlsZW1h
+cF9mZGF0YXdhaXQoaW5vZGUtPmlfbWFwcGluZyk7Ci0JCW1hcHBpbmdfc2V0X2Vycm9yKGlub2Rl
+LT5pX21hcHBpbmcsIHJjKTsKLQkJcmV0dXJuIHJjOworCQlpZiAocmMpIHsKKwkJCW1hcHBpbmdf
+c2V0X2Vycm9yKGlub2RlLT5pX21hcHBpbmcsIHJjKTsKKwkJCXJldHVybiByYzsKKwkJfQogCX0K
+IAogCXJjID0gY2lmc19yZXZhbGlkYXRlX2RlbnRyeV9hdHRyKGRlbnRyeSk7Cg==
+--20cf303a303fefd9a604a3b15b99
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-CIFS-Simplify-invalidate-part-try-6.patch"
+Content-Disposition: attachment;
+	filename="0001-CIFS-Simplify-invalidate-part-try-6.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gnwwfxz41
 
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- Makefile.am      |   11 +++-
- aclocal/idmap.m4 |   24 ++++++
- cifs.idmap.c     |  219 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac     |   34 ++++++++-
- 4 files changed, 285 insertions(+), 3 deletions(-)
- create mode 100644 aclocal/idmap.m4
- create mode 100644 cifs.idmap.c
-
-diff --git a/Makefile.am b/Makefile.am
-index 67a0190..c6eeb22 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -8,8 +8,10 @@ mount_cifs_LDADD = $(LIBCAP) $(CAPNG_LDADD)
- 
- man_MANS = mount.cifs.8
- 
-+sbin_PROGRAMS =
-+
- if CONFIG_CIFSUPCALL
--sbin_PROGRAMS = cifs.upcall
-+sbin_PROGRAMS += cifs.upcall
- cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
- cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
- man_MANS += cifs.upcall.8
-@@ -30,3 +32,10 @@ bin_PROGRAMS = cifscreds
- cifscreds_SOURCES = cifscreds.c resolve_host.c util.c
- cifscreds_LDADD = -lkeyutils
- endif
-+
-+if CONFIG_CIFSIDMAP
-+sbin_PROGRAMS += cifs.idmap
-+cifs_idmap_SOURCES = cifs.idmap.c
-+cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
-+endif
-+
-diff --git a/aclocal/idmap.m4 b/aclocal/idmap.m4
-new file mode 100644
-index 0000000..b3dcd92
---- /dev/null
-+++ b/aclocal/idmap.m4
-@@ -0,0 +1,24 @@
-+dnl Headers needed by wbclient.h
-+dnl
-+AC_DEFUN([AC_WBCH_COMPL],[
-+[
-+#ifdef HAVE_STDINT_H
-+#include <stdint.h>
-+#endif
-+]
-+[#ifdef HAVE_STDBOOL_H
-+#include <stdbool.h>
-+#endif
-+]
-+[#ifdef HAVE_STDIO_H
-+#include <stdio.h>
-+#endif
-+]
-+[#ifdef HAVE_STDLIB_H
-+#include <stdlib.h>
-+#endif
-+]
-+[#ifdef HAVE_ERRNO_H
-+#include <errno.h>
-+#endif
-+]])
-diff --git a/cifs.idmap.c b/cifs.idmap.c
-new file mode 100644
-index 0000000..3c718e7
---- /dev/null
-+++ b/cifs.idmap.c
-@@ -0,0 +1,219 @@
-+/*
-+* CIFS idmap helper.
-+* Copyright (C) Shirish Pargaonkar (shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org) 2011
-+*
-+* Used by /sbin/request-key.conf for handling
-+* cifs upcall for SID to uig/gid and uid/gid to SID mapping.
-+* You should have keyutils installed and add
-+* this lines to /etc/request-key.conf file:
-+
-+    create cifs.idmap * * /usr/local/sbin/cifs.idmap %k
-+
-+* This program is free software; you can redistribute it and/or modify
-+* it under the terms of the GNU General Public License as published by
-+* the Free Software Foundation; either version 2 of the License, or
-+* (at your option) any later version.
-+* This program is distributed in the hope that it will be useful,
-+* but WITHOUT ANY WARRANTY; without even the implied warranty of
-+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+* GNU General Public License for more details.
-+* You should have received a copy of the GNU General Public License
-+* along with this program; if not, write to the Free Software
-+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+*/
-+
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif /* HAVE_CONFIG_H */
-+
-+#include <string.h>
-+#include <getopt.h>
-+#include <syslog.h>
-+#include <dirent.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <unistd.h>
-+#include <keyutils.h>
-+#include <stdint.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <limits.h>
-+#include <wbclient.h>
-+
-+static const char *prog = "cifs.idmap";
-+
-+static void usage(void)
-+{
-+	syslog(LOG_INFO, "Usage: %s [-t] [-v] [-l] key_serial", prog);
-+	fprintf(stderr, "Usage: %s [-t] [-v] [-l] key_serial\n", prog);
-+}
-+
-+static int
-+cifs_idmap(const key_serial_t key, const char *key_descr)
-+{
-+	int i;
-+	int len;
-+	uid_t uid = 0;
-+	gid_t gid = 0;;
-+	wbcErr rc = 1;
-+	const char *keystart = key_descr;
-+	const char *keyend = key_descr;
-+	struct wbcDomainSid sid;
-+	struct passwd *pw;
-+	struct group *gr;
-+
-+	len = strlen(key_descr);
-+	/* skip next 4 ';' delimiters to get to description */
-+	for (i = 1; i <= 4; ++i) {
-+		keyend = index(keyend + 1, ';');
-+		if (!keyend) {
-+			syslog(LOG_ERR, "invalid key description: %s",
-+			       key_descr);
-+			return 1;
-+		}
-+	}
-+	if (keyend - keystart < len)
-+		keyend++;
-+	else {
-+		syslog(LOG_ERR, "Invalid key: %s", keystart);
-+		return 1;
-+	}
-+
-+	/*
-+	 * Use winbind to convert received string to a SID and lookup
-+	 * name and map that SID to an uid.  If either of these
-+	 * function calls return with an error,  use system calls to obtain
-+	 * uid of user "nobody". If winbind fails to map a SID to an UID
-+	 * and there is no user named "nobody", return error to the
-+	 * upcall caller. Otherwise instanticate a key using that uid.
-+	 *
-+	 * The same applies to SID and gid mapping.  Instead of a
-+	 * user "nobody", user "nogroup" is looked up if winbind
-+	 * fails to map a SID to a gid.
-+	 */
-+	keystart = keyend;
-+	len = strlen(keyend);
-+	if (strncmp(keyend, "os", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		if (keyend - keystart < len)
-+			keyend++;
-+		else {
-+			syslog(LOG_ERR, "Invalid owner SID: %s", keystart);
-+			return 1;
-+		}
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (rc)
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+		else {
-+			rc = wbcSidToUid(&sid, &uid);
-+			if (rc)
-+				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
-+						keyend, rc);
-+		}
-+		if (rc) { /* either of the two wbcSid functions failed */
-+			pw = getpwnam("nobody");
-+			if (!pw)
-+				syslog(LOG_DEBUG, "SID %s to uid pw error: %d",
-+					keyend, rc);
-+			else {
-+				uid = pw->pw_uid;
-+				rc = 0;
-+			}
-+		}
-+		if (!rc) { /* SID has been mapped to an uid */
-+			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
-+			if (rc)
-+				syslog(LOG_ERR, "%s: key inst: %s",
-+					__func__, strerror(errno));
-+		}
-+	} else if (strncmp(keyend, "gs", 2) == 0) {
-+		keyend = index(keyend + 1, ':');
-+		if (keyend - keystart < len)
-+			keyend++;
-+		else {
-+			syslog(LOG_ERR, "Invalid Group SID: %s", keystart);
-+			return 1;
-+		}
-+		rc = wbcStringToSid(keyend, &sid);
-+		if (rc)
-+			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
-+		else {
-+			rc = wbcSidToGid(&sid, &gid);
-+			if (rc)
-+				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
-+						keyend, rc);
-+		}
-+		if (rc) { /* either of the two wbcSid functions failed */
-+			gr = getgrnam("nogroup");
-+			if (!gr)
-+				syslog(LOG_DEBUG, "SID %s to gid pw error: %d",
-+						keyend, rc);
-+			else {
-+				gid = gr->gr_gid;
-+				rc = 0;
-+			}
-+		}
-+		if (!rc) { /* SID has been mapped to a gid */
-+			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
-+			if (rc)
-+				syslog(LOG_ERR, "%s: key inst: %s",
-+						__func__, strerror(errno));
-+		}
-+	} else
-+		syslog(LOG_DEBUG, "Invalid SID: %s", keyend);
-+
-+	return rc;
-+}
-+
-+int main(const int argc, char *const argv[])
-+{
-+	int c;
-+	long rc = 1;
-+	key_serial_t key = 0;
-+	char *buf;
-+
-+	openlog(prog, 0, LOG_DAEMON);
-+
-+	while ((c = getopt_long(argc, argv, "v", NULL, NULL)) != -1) {
-+		switch (c) {
-+		case 'v':
-+			printf("version: %s\n", VERSION);
-+			goto out;
-+		default:
-+			syslog(LOG_ERR, "unknown option: %c", c);
-+			goto out;
-+		}
-+	}
-+
-+	/* is there a key? */
-+	if (argc <= optind) {
-+		usage();
-+		goto out;
-+	}
-+
-+	/* get key and keyring values */
-+	errno = 0;
-+	key = strtol(argv[optind], NULL, 10);
-+	if (errno != 0) {
-+		key = 0;
-+		syslog(LOG_ERR, "Invalid key format: %s", strerror(errno));
-+		goto out;
-+	}
-+
-+	rc = keyctl_describe_alloc(key, &buf);
-+	if (rc == -1) {
-+		syslog(LOG_ERR, "keyctl_describe_alloc failed: %s",
-+		       strerror(errno));
-+		rc = 1;
-+		goto out;
-+	}
-+
-+	syslog(LOG_DEBUG, "key description: %s", buf);
-+
-+	if ((strncmp(buf, "cifs.idmap", sizeof("cifs.idmap") - 1) == 0))
-+		rc = cifs_idmap(key, buf);
-+out:
-+	return rc;
-+}
-diff --git a/configure.ac b/configure.ac
-index e0e2a60..d8f4290 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -22,13 +22,19 @@ AC_ARG_ENABLE(cifscreds,
- 	enable_cifscreds=$enableval,
- 	enable_cifscreds="no")
- 
-+AC_ARG_ENABLE(cifsidmap,
-+	[AC_HELP_STRING([--enable-cifsidmap],
-+			[Create cifs.idmap binary @<:@default=yes@:>@])],
-+	enable_cifsidmap=$enableval,
-+	enable_cifsidmap="maybe")
-+
- # Checks for programs.
- AC_PROG_CC
- AC_PROG_SED
- AC_GNU_SOURCE
- 
- # Checks for header files.
--AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdlib.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
-+AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
- 
- if test $enable_cifsupcall != "no"; then
- 	AC_CHECK_HEADERS([krb5.h krb5/krb5.h])
-@@ -72,7 +78,7 @@ if test $enable_cifsupcall != "no"; then
- 				fi
- 			])
- fi
--if test $enable_cifsupcall != "no"; then
-+if test $enable_cifsupcall != "no" -o $enable_cifsidmap != "no"; then
- 	AC_CHECK_HEADERS([keyutils.h], , [
- 				if test "$enable_cifsupcall" = "yes"; then
- 					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
-@@ -80,6 +86,12 @@ if test $enable_cifsupcall != "no"; then
- 					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifs.upcall.])
- 					enable_cifsupcall="no"
- 				fi
-+				if test "$enable_cifsidmap" = "yes"; then
-+					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
-+				else
-+					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifs.idmap.])
-+					enable_cifsidmap="no"
-+				fi
- 			])
- fi
- if test $enable_cifsupcall != "no"; then
-@@ -89,6 +101,23 @@ if test $enable_cifsupcall != "no"; then
- 	AC_SUBST(KRB5_LDADD)
- fi
- 
-+if test $enable_cifsidmap != "no"; then
-+	AC_CHECK_HEADERS([wbclient.h], , [
-+				if test "$enable_cifsidmap" = "yes"; then
-+					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
-+				else
-+					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling cifs.idmap.])
-+					enable_cifsidmap="no"
-+				fi
-+			], [ AC_WBCH_COMPL ])
-+fi
-+
-+if test $enable_cifsidmap != "no"; then
-+	AC_CHECK_LIB([wbclient], [wbcStringToSid],
-+		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["Define var have_libwbclient"]) ], [AC_MSG_ERROR([No functioning wbclient library found!])])
-+	AC_SUBST(WINB_LDADD)
-+fi
-+
- if test $enable_cifscreds = "yes"; then
- 	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
- fi
-@@ -140,6 +169,7 @@ LIBS=$cu_saved_libs
- 
- AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
- AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
-+AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
- 
- LIBCAP_NG_PATH
- 
--- 
-1.6.0.2
+RnJvbSBkNDhjMTBlODAwMTI0M2M0NThiODc4MTJhZDNmNjA4YWI3ZGQzMDk1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBQYXZlbCBTaGlsb3Zza3kgPHBpYXN0cnlAZXRlcnNvZnQucnU+
+CkRhdGU6IFRodSwgNyBBcHIgMjAxMSAxODoxODoxMSArMDQwMApTdWJqZWN0OiBbUEFUQ0hdIENJ
+RlM6IFNpbXBsaWZ5IGludmFsaWRhdGUgcGFydCAodHJ5ICM2KQoKU2ltcGxpZnkgbWFueSBwbGFj
+ZXMgd2hlbiB3ZSBjYWxsIGNpZnNfcmV2YWxpZGF0ZS9pbnZhbGlkYXRlIHRvIG1ha2UKaXQgZG8g
+d2hhdCBpdCBleGFjdGx5IG5lZWRzLgoKUmV2aWV3ZWQtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9u
+QHNhbWJhLm9yZz4KU2lnbmVkLW9mZi1ieTogUGF2ZWwgU2hpbG92c2t5IDxwaWFzdHJ5QGV0ZXJz
+b2Z0LnJ1PgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHNmcmVuY2hAdXMuaWJtLmNvbT4K
+LS0tCiBmcy9jaWZzL2NpZnNmcy5jIHwgICAzNSArKysrKysrKysrKy0tLS0tCiBmcy9jaWZzL2Np
+ZnNmcy5oIHwgICAgNCArLQogZnMvY2lmcy9maWxlLmMgICB8ICAgMTYgKysrKystLQogZnMvY2lm
+cy9pbm9kZS5jICB8ICAxMTkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0t
+LS0tLS0tLS0tLS0tLS0tCiA0IGZpbGVzIGNoYW5nZWQsIDExNyBpbnNlcnRpb25zKCspLCA1NyBk
+ZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9jaWZz
+ZnMuYwppbmRleCBmNzM2ZDhhLi4wN2FmNDgyIDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNmcy5j
+CisrKyBiL2ZzL2NpZnMvY2lmc2ZzLmMKQEAgLTYxOCwxNiArNjE4LDMxIEBAIHN0YXRpYyBsb2Zm
+X3QgY2lmc19sbHNlZWsoc3RydWN0IGZpbGUgKmZpbGUsIGxvZmZfdCBvZmZzZXQsIGludCBvcmln
+aW4pCiB7CiAJLyogb3JpZ2luID09IFNFRUtfRU5EID0+IHdlIG11c3QgcmV2YWxpZGF0ZSB0aGUg
+Y2FjaGVkIGZpbGUgbGVuZ3RoICovCiAJaWYgKG9yaWdpbiA9PSBTRUVLX0VORCkgewotCQlpbnQg
+cmV0dmFsOwotCi0JCS8qIHNvbWUgYXBwbGljYXRpb25zIHBvbGwgZm9yIHRoZSBmaWxlIGxlbmd0
+aCBpbiB0aGlzIHN0cmFuZ2UKLQkJICAgd2F5IHNvIHdlIG11c3Qgc2VlayB0byBlbmQgb24gbm9u
+LW9wbG9ja2VkIGZpbGVzIGJ5Ci0JCSAgIHNldHRpbmcgdGhlIHJldmFsaWRhdGUgdGltZSB0byB6
+ZXJvICovCi0JCUNJRlNfSShmaWxlLT5mX3BhdGguZGVudHJ5LT5kX2lub2RlKS0+dGltZSA9IDA7
+Ci0KLQkJcmV0dmFsID0gY2lmc19yZXZhbGlkYXRlX2ZpbGUoZmlsZSk7Ci0JCWlmIChyZXR2YWwg
+PCAwKQotCQkJcmV0dXJuIChsb2ZmX3QpcmV0dmFsOworCQlpbnQgcmM7CisJCXN0cnVjdCBpbm9k
+ZSAqaW5vZGUgPSBmaWxlLT5mX3BhdGguZGVudHJ5LT5kX2lub2RlOworCisJCS8qCisJCSAqIFdl
+IG5lZWQgdG8gYmUgc3VyZSB0aGF0IGFsbCBkaXJ0eSBwYWdlcyBhcmUgd3JpdHRlbiBhbmQgdGhl
+CisJCSAqIHNlcnZlciBoYXMgdGhlIG5ld2VzdCBmaWxlIGxlbmd0aC4KKwkJICovCisJCWlmICgh
+Q0lGU19JKGlub2RlKS0+Y2xpZW50Q2FuQ2FjaGVSZWFkICYmIGlub2RlLT5pX21hcHBpbmcgJiYK
+KwkJICAgIGlub2RlLT5pX21hcHBpbmctPm5ycGFnZXMgIT0gMCkgeworCQkJcmMgPSBmaWxlbWFw
+X2ZkYXRhd2FpdChpbm9kZS0+aV9tYXBwaW5nKTsKKwkJCWlmIChyYykgeworCQkJCW1hcHBpbmdf
+c2V0X2Vycm9yKGlub2RlLT5pX21hcHBpbmcsIHJjKTsKKwkJCQlyZXR1cm4gcmM7CisJCQl9CisJ
+CX0KKwkJLyoKKwkJICogU29tZSBhcHBsaWNhdGlvbnMgcG9sbCBmb3IgdGhlIGZpbGUgbGVuZ3Ro
+IGluIHRoaXMgc3RyYW5nZQorCQkgKiB3YXkgc28gd2UgbXVzdCBzZWVrIHRvIGVuZCBvbiBub24t
+b3Bsb2NrZWQgZmlsZXMgYnkKKwkJICogc2V0dGluZyB0aGUgcmV2YWxpZGF0ZSB0aW1lIHRvIHpl
+cm8uCisJCSAqLworCQlDSUZTX0koaW5vZGUpLT50aW1lID0gMDsKKworCQlyYyA9IGNpZnNfcmV2
+YWxpZGF0ZV9maWxlX2F0dHIoZmlsZSk7CisJCWlmIChyYyA8IDApCisJCQlyZXR1cm4gKGxvZmZf
+dClyYzsKIAl9CiAJcmV0dXJuIGdlbmVyaWNfZmlsZV9sbHNlZWtfdW5sb2NrZWQoZmlsZSwgb2Zm
+c2V0LCBvcmlnaW4pOwogfQpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZnMuaCBiL2ZzL2NpZnMv
+Y2lmc2ZzLmgKaW5kZXggYmI2NDMxMy4uZDMwNDU4NCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZz
+ZnMuaAorKysgYi9mcy9jaWZzL2NpZnNmcy5oCkBAIC01OSw5ICs1OSwxMSBAQCBleHRlcm4gaW50
+IGNpZnNfbWtkaXIoc3RydWN0IGlub2RlICosIHN0cnVjdCBkZW50cnkgKiwgaW50KTsKIGV4dGVy
+biBpbnQgY2lmc19ybWRpcihzdHJ1Y3QgaW5vZGUgKiwgc3RydWN0IGRlbnRyeSAqKTsKIGV4dGVy
+biBpbnQgY2lmc19yZW5hbWUoc3RydWN0IGlub2RlICosIHN0cnVjdCBkZW50cnkgKiwgc3RydWN0
+IGlub2RlICosCiAJCSAgICAgICBzdHJ1Y3QgZGVudHJ5ICopOworZXh0ZXJuIGludCBjaWZzX3Jl
+dmFsaWRhdGVfZmlsZV9hdHRyKHN0cnVjdCBmaWxlICpmaWxwKTsKK2V4dGVybiBpbnQgY2lmc19y
+ZXZhbGlkYXRlX2RlbnRyeV9hdHRyKHN0cnVjdCBkZW50cnkgKik7CiBleHRlcm4gaW50IGNpZnNf
+cmV2YWxpZGF0ZV9maWxlKHN0cnVjdCBmaWxlICpmaWxwKTsKIGV4dGVybiBpbnQgY2lmc19yZXZh
+bGlkYXRlX2RlbnRyeShzdHJ1Y3QgZGVudHJ5ICopOwotZXh0ZXJuIHZvaWQgY2lmc19pbnZhbGlk
+YXRlX21hcHBpbmcoc3RydWN0IGlub2RlICppbm9kZSk7CitleHRlcm4gaW50IGNpZnNfaW52YWxp
+ZGF0ZV9tYXBwaW5nKHN0cnVjdCBpbm9kZSAqaW5vZGUpOwogZXh0ZXJuIGludCBjaWZzX2dldGF0
+dHIoc3RydWN0IHZmc21vdW50ICosIHN0cnVjdCBkZW50cnkgKiwgc3RydWN0IGtzdGF0ICopOwog
+ZXh0ZXJuIGludCBjaWZzX3NldGF0dHIoc3RydWN0IGRlbnRyeSAqLCBzdHJ1Y3QgaWF0dHIgKik7
+CiAKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZmlsZS5jIGIvZnMvY2lmcy9maWxlLmMKaW5kZXggMGFl
+YWFmNy4uYzY3MmFmZSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9maWxlLmMKKysrIGIvZnMvY2lmcy9m
+aWxlLmMKQEAgLTE0NDUsOCArMTQ0NSwxMyBAQCBpbnQgY2lmc19zdHJpY3RfZnN5bmMoc3RydWN0
+IGZpbGUgKmZpbGUsIGludCBkYXRhc3luYykKIAljRllJKDEsICJTeW5jIGZpbGUgLSBuYW1lOiAl
+cyBkYXRhc3luYzogMHgleCIsCiAJCWZpbGUtPmZfcGF0aC5kZW50cnktPmRfbmFtZS5uYW1lLCBk
+YXRhc3luYyk7CiAKLQlpZiAoIUNJRlNfSShpbm9kZSktPmNsaWVudENhbkNhY2hlUmVhZCkKLQkJ
+Y2lmc19pbnZhbGlkYXRlX21hcHBpbmcoaW5vZGUpOworCWlmICghQ0lGU19JKGlub2RlKS0+Y2xp
+ZW50Q2FuQ2FjaGVSZWFkKSB7CisJCXJjID0gY2lmc19pbnZhbGlkYXRlX21hcHBpbmcoaW5vZGUp
+OworCQlpZiAocmMpIHsKKwkJCWNGWUkoMSwgInJjOiAlZCBkdXJpbmcgaW52YWxpZGF0ZSBwaGFz
+ZSIsIHJjKTsKKwkJCXJjID0gMDsgLyogZG9uJ3QgY2FyZSBhYm91dCBpdCBpbiBmc3luYyAqLwor
+CQl9CisJfQogCiAJdGNvbiA9IHRsaW5rX3Rjb24oc21iZmlsZS0+dGxpbmspOwogCWlmICghKGNp
+ZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9OT1NTWU5DKSkKQEAgLTE5MDMsOCAr
+MTkwOCwxMSBAQCBpbnQgY2lmc19maWxlX3N0cmljdF9tbWFwKHN0cnVjdCBmaWxlICpmaWxlLCBz
+dHJ1Y3Qgdm1fYXJlYV9zdHJ1Y3QgKnZtYSkKIAogCXhpZCA9IEdldFhpZCgpOwogCi0JaWYgKCFD
+SUZTX0koaW5vZGUpLT5jbGllbnRDYW5DYWNoZVJlYWQpCi0JCWNpZnNfaW52YWxpZGF0ZV9tYXBw
+aW5nKGlub2RlKTsKKwlpZiAoIUNJRlNfSShpbm9kZSktPmNsaWVudENhbkNhY2hlUmVhZCkgewor
+CQlyYyA9IGNpZnNfaW52YWxpZGF0ZV9tYXBwaW5nKGlub2RlKTsKKwkJaWYgKHJjKQorCQkJcmV0
+dXJuIHJjOworCX0KIAogCXJjID0gZ2VuZXJpY19maWxlX21tYXAoZmlsZSwgdm1hKTsKIAlpZiAo
+cmMgPT0gMCkKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYwpp
+bmRleCBmYmU3ZDU4Li5kZTAyZWQ1IDEwMDY0NAotLS0gYS9mcy9jaWZzL2lub2RlLmMKKysrIGIv
+ZnMvY2lmcy9pbm9kZS5jCkBAIC0xNjgzLDE4ICsxNjgzLDE1IEBAIGNpZnNfaW5vZGVfbmVlZHNf
+cmV2YWwoc3RydWN0IGlub2RlICppbm9kZSkKIC8qCiAgKiBaYXAgdGhlIGNhY2hlLiBDYWxsZWQg
+d2hlbiBpbnZhbGlkX21hcHBpbmcgZmxhZyBpcyBzZXQuCiAgKi8KLXZvaWQKK2ludAogY2lmc19p
+bnZhbGlkYXRlX21hcHBpbmcoc3RydWN0IGlub2RlICppbm9kZSkKIHsKLQlpbnQgcmM7CisJaW50
+IHJjID0gMDsKIAlzdHJ1Y3QgY2lmc0lub2RlSW5mbyAqY2lmc19pID0gQ0lGU19JKGlub2RlKTsK
+IAogCWNpZnNfaS0+aW52YWxpZF9tYXBwaW5nID0gZmFsc2U7CiAKIAlpZiAoaW5vZGUtPmlfbWFw
+cGluZyAmJiBpbm9kZS0+aV9tYXBwaW5nLT5ucnBhZ2VzICE9IDApIHsKLQkJLyogd3JpdGUgYmFj
+ayBhbnkgY2FjaGVkIGRhdGEgKi8KLQkJcmMgPSBmaWxlbWFwX3dyaXRlX2FuZF93YWl0KGlub2Rl
+LT5pX21hcHBpbmcpOwotCQltYXBwaW5nX3NldF9lcnJvcihpbm9kZS0+aV9tYXBwaW5nLCByYyk7
+CiAJCXJjID0gaW52YWxpZGF0ZV9pbm9kZV9wYWdlczIoaW5vZGUtPmlfbWFwcGluZyk7CiAJCWlm
+IChyYykgewogCQkJY0VSUk9SKDEsICIlczogY291bGQgbm90IGludmFsaWRhdGUgaW5vZGUgJXAi
+LCBfX2Z1bmNfXywKQEAgLTE3MDQsNTYgKzE3MDEsNTIgQEAgY2lmc19pbnZhbGlkYXRlX21hcHBp
+bmcoc3RydWN0IGlub2RlICppbm9kZSkKIAl9CiAKIAljaWZzX2ZzY2FjaGVfcmVzZXRfaW5vZGVf
+Y29va2llKGlub2RlKTsKKwlyZXR1cm4gcmM7CiB9CiAKLWludCBjaWZzX3JldmFsaWRhdGVfZmls
+ZShzdHJ1Y3QgZmlsZSAqZmlscCkKK2ludCBjaWZzX3JldmFsaWRhdGVfZmlsZV9hdHRyKHN0cnVj
+dCBmaWxlICpmaWxwKQogewogCWludCByYyA9IDA7CiAJc3RydWN0IGlub2RlICppbm9kZSA9IGZp
+bHAtPmZfcGF0aC5kZW50cnktPmRfaW5vZGU7CiAJc3RydWN0IGNpZnNGaWxlSW5mbyAqY2ZpbGUg
+PSAoc3RydWN0IGNpZnNGaWxlSW5mbyAqKSBmaWxwLT5wcml2YXRlX2RhdGE7CiAKIAlpZiAoIWNp
+ZnNfaW5vZGVfbmVlZHNfcmV2YWwoaW5vZGUpKQotCQlnb3RvIGNoZWNrX2ludmFsOworCQlyZXR1
+cm4gcmM7CiAKIAlpZiAodGxpbmtfdGNvbihjZmlsZS0+dGxpbmspLT51bml4X2V4dCkKIAkJcmMg
+PSBjaWZzX2dldF9maWxlX2luZm9fdW5peChmaWxwKTsKIAllbHNlCiAJCXJjID0gY2lmc19nZXRf
+ZmlsZV9pbmZvKGZpbHApOwogCi1jaGVja19pbnZhbDoKLQlpZiAoQ0lGU19JKGlub2RlKS0+aW52
+YWxpZF9tYXBwaW5nKQotCQljaWZzX2ludmFsaWRhdGVfbWFwcGluZyhpbm9kZSk7Ci0KIAlyZXR1
+cm4gcmM7CiB9CiAKLS8qIHJldmFsaWRhdGUgYSBkZW50cnkncyBpbm9kZSBhdHRyaWJ1dGVzICov
+Ci1pbnQgY2lmc19yZXZhbGlkYXRlX2RlbnRyeShzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpCitpbnQg
+Y2lmc19yZXZhbGlkYXRlX2RlbnRyeV9hdHRyKHN0cnVjdCBkZW50cnkgKmRlbnRyeSkKIHsKIAlp
+bnQgeGlkOwogCWludCByYyA9IDA7Ci0JY2hhciAqZnVsbF9wYXRoID0gTlVMTDsKIAlzdHJ1Y3Qg
+aW5vZGUgKmlub2RlID0gZGVudHJ5LT5kX2lub2RlOwogCXN0cnVjdCBzdXBlcl9ibG9jayAqc2Ig
+PSBkZW50cnktPmRfc2I7CisJY2hhciAqZnVsbF9wYXRoID0gTlVMTDsKIAogCWlmIChpbm9kZSA9
+PSBOVUxMKQogCQlyZXR1cm4gLUVOT0VOVDsKIAotCXhpZCA9IEdldFhpZCgpOwotCiAJaWYgKCFj
+aWZzX2lub2RlX25lZWRzX3JldmFsKGlub2RlKSkKLQkJZ290byBjaGVja19pbnZhbDsKKwkJcmV0
+dXJuIHJjOworCisJeGlkID0gR2V0WGlkKCk7CiAKIAkvKiBjYW4gbm90IHNhZmVseSBncmFiIHRo
+ZSByZW5hbWUgc2VtIGhlcmUgaWYgcmVuYW1lIGNhbGxzIHJldmFsaWRhdGUKIAkgICBzaW5jZSB0
+aGF0IHdvdWxkIGRlYWRsb2NrICovCiAJZnVsbF9wYXRoID0gYnVpbGRfcGF0aF9mcm9tX2RlbnRy
+eShkZW50cnkpOwogCWlmIChmdWxsX3BhdGggPT0gTlVMTCkgewogCQlyYyA9IC1FTk9NRU07Ci0J
+CWdvdG8gY2hlY2tfaW52YWw7CisJCWdvdG8gb3V0OwogCX0KIAotCWNGWUkoMSwgIlJldmFsaWRh
+dGU6ICVzIGlub2RlIDB4JXAgY291bnQgJWQgZGVudHJ5OiAweCVwIGRfdGltZSAlbGQgIgotCQkg
+ImppZmZpZXMgJWxkIiwgZnVsbF9wYXRoLCBpbm9kZSwgaW5vZGUtPmlfY291bnQuY291bnRlciwK
+KwljRllJKDEsICJVcGRhdGUgYXR0cmlidXRlczogJXMgaW5vZGUgMHglcCBjb3VudCAlZCBkZW50
+cnk6IDB4JXAgZF90aW1lICIKKwkJICIlbGQgamlmZmllcyAlbGQiLCBmdWxsX3BhdGgsIGlub2Rl
+LCBpbm9kZS0+aV9jb3VudC5jb3VudGVyLAogCQkgZGVudHJ5LCBkZW50cnktPmRfdGltZSwgamlm
+Zmllcyk7CiAKIAlpZiAoY2lmc19zYl9tYXN0ZXJfdGNvbihDSUZTX1NCKHNiKSktPnVuaXhfZXh0
+KQpAQCAtMTc2Miw0MSArMTc1NSw4MyBAQCBpbnQgY2lmc19yZXZhbGlkYXRlX2RlbnRyeShzdHJ1
+Y3QgZGVudHJ5ICpkZW50cnkpCiAJCXJjID0gY2lmc19nZXRfaW5vZGVfaW5mbygmaW5vZGUsIGZ1
+bGxfcGF0aCwgTlVMTCwgc2IsCiAJCQkJCSB4aWQsIE5VTEwpOwogCi1jaGVja19pbnZhbDoKLQlp
+ZiAoQ0lGU19JKGlub2RlKS0+aW52YWxpZF9tYXBwaW5nKQotCQljaWZzX2ludmFsaWRhdGVfbWFw
+cGluZyhpbm9kZSk7Ci0KK291dDoKIAlrZnJlZShmdWxsX3BhdGgpOwogCUZyZWVYaWQoeGlkKTsK
+IAlyZXR1cm4gcmM7CiB9CiAKK2ludCBjaWZzX3JldmFsaWRhdGVfZmlsZShzdHJ1Y3QgZmlsZSAq
+ZmlscCkKK3sKKwlpbnQgcmM7CisJc3RydWN0IGlub2RlICppbm9kZSA9IGZpbHAtPmZfcGF0aC5k
+ZW50cnktPmRfaW5vZGU7CisKKwlyYyA9IGNpZnNfcmV2YWxpZGF0ZV9maWxlX2F0dHIoZmlscCk7
+CisJaWYgKHJjKQorCQlyZXR1cm4gcmM7CisKKwlpZiAoQ0lGU19JKGlub2RlKS0+aW52YWxpZF9t
+YXBwaW5nKQorCQlyYyA9IGNpZnNfaW52YWxpZGF0ZV9tYXBwaW5nKGlub2RlKTsKKwlyZXR1cm4g
+cmM7Cit9CisKKy8qIHJldmFsaWRhdGUgYSBkZW50cnkncyBpbm9kZSBhdHRyaWJ1dGVzICovCitp
+bnQgY2lmc19yZXZhbGlkYXRlX2RlbnRyeShzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpCit7CisJaW50
+IHJjOworCXN0cnVjdCBpbm9kZSAqaW5vZGUgPSBkZW50cnktPmRfaW5vZGU7CisKKwlyYyA9IGNp
+ZnNfcmV2YWxpZGF0ZV9kZW50cnlfYXR0cihkZW50cnkpOworCWlmIChyYykKKwkJcmV0dXJuIHJj
+OworCisJaWYgKENJRlNfSShpbm9kZSktPmludmFsaWRfbWFwcGluZykKKwkJcmMgPSBjaWZzX2lu
+dmFsaWRhdGVfbWFwcGluZyhpbm9kZSk7CisJcmV0dXJuIHJjOworfQorCiBpbnQgY2lmc19nZXRh
+dHRyKHN0cnVjdCB2ZnNtb3VudCAqbW50LCBzdHJ1Y3QgZGVudHJ5ICpkZW50cnksCiAJCSBzdHJ1
+Y3Qga3N0YXQgKnN0YXQpCiB7CiAJc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lmc19zYiA9IENJRlNf
+U0IoZGVudHJ5LT5kX3NiKTsKIAlzdHJ1Y3QgY2lmc1Rjb25JbmZvICp0Y29uID0gY2lmc19zYl9t
+YXN0ZXJfdGNvbihjaWZzX3NiKTsKLQlpbnQgZXJyID0gY2lmc19yZXZhbGlkYXRlX2RlbnRyeShk
+ZW50cnkpOwotCi0JaWYgKCFlcnIpIHsKLQkJZ2VuZXJpY19maWxsYXR0cihkZW50cnktPmRfaW5v
+ZGUsIHN0YXQpOwotCQlzdGF0LT5ibGtzaXplID0gQ0lGU19NQVhfTVNHU0laRTsKLQkJc3RhdC0+
+aW5vID0gQ0lGU19JKGRlbnRyeS0+ZF9pbm9kZSktPnVuaXF1ZWlkOworCXN0cnVjdCBpbm9kZSAq
+aW5vZGUgPSBkZW50cnktPmRfaW5vZGU7CisJaW50IHJjOwogCi0JCS8qCi0JCSAqIElmIG9uIGEg
+bXVsdGl1c2VyIG1vdW50IHdpdGhvdXQgdW5peCBleHRlbnNpb25zLCBhbmQgdGhlCi0JCSAqIGFk
+bWluIGhhc24ndCBvdmVycmlkZGVuIHRoZW0sIHNldCB0aGUgb3duZXJzaGlwIHRvIHRoZQotCQkg
+KiBmc3VpZC9mc2dpZCBvZiB0aGUgY3VycmVudCBwcm9jZXNzLgotCQkgKi8KLQkJaWYgKChjaWZz
+X3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfTVVMVElVU0VSKSAmJgotCQkgICAgIXRj
+b24tPnVuaXhfZXh0KSB7Ci0JCQlpZiAoIShjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNf
+TU9VTlRfT1ZFUlJfVUlEKSkKLQkJCQlzdGF0LT51aWQgPSBjdXJyZW50X2ZzdWlkKCk7Ci0JCQlp
+ZiAoIShjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfT1ZFUlJfR0lEKSkKLQkJ
+CQlzdGF0LT5naWQgPSBjdXJyZW50X2ZzZ2lkKCk7CisJLyoKKwkgKiBXZSBuZWVkIHRvIGJlIHN1
+cmUgdGhhdCBhbGwgZGlydHkgcGFnZXMgYXJlIHdyaXR0ZW4gYW5kIHRoZSBzZXJ2ZXIKKwkgKiBo
+YXMgYWN0dWFsIGN0aW1lLCBtdGltZSBhbmQgZmlsZSBsZW5ndGguCisJICovCisJaWYgKCFDSUZT
+X0koaW5vZGUpLT5jbGllbnRDYW5DYWNoZVJlYWQgJiYgaW5vZGUtPmlfbWFwcGluZyAmJgorCSAg
+ICBpbm9kZS0+aV9tYXBwaW5nLT5ucnBhZ2VzICE9IDApIHsKKwkJcmMgPSBmaWxlbWFwX2ZkYXRh
+d2FpdChpbm9kZS0+aV9tYXBwaW5nKTsKKwkJaWYgKHJjKSB7CisJCQltYXBwaW5nX3NldF9lcnJv
+cihpbm9kZS0+aV9tYXBwaW5nLCByYyk7CisJCQlyZXR1cm4gcmM7CiAJCX0KIAl9Ci0JcmV0dXJu
+IGVycjsKKworCXJjID0gY2lmc19yZXZhbGlkYXRlX2RlbnRyeV9hdHRyKGRlbnRyeSk7CisJaWYg
+KHJjKQorCQlyZXR1cm4gcmM7CisKKwlnZW5lcmljX2ZpbGxhdHRyKGlub2RlLCBzdGF0KTsKKwlz
+dGF0LT5ibGtzaXplID0gQ0lGU19NQVhfTVNHU0laRTsKKwlzdGF0LT5pbm8gPSBDSUZTX0koaW5v
+ZGUpLT51bmlxdWVpZDsKKworCS8qCisJICogSWYgb24gYSBtdWx0aXVzZXIgbW91bnQgd2l0aG91
+dCB1bml4IGV4dGVuc2lvbnMsIGFuZCB0aGUgYWRtaW4gaGFzbid0CisJICogb3ZlcnJpZGRlbiB0
+aGVtLCBzZXQgdGhlIG93bmVyc2hpcCB0byB0aGUgZnN1aWQvZnNnaWQgb2YgdGhlIGN1cnJlbnQK
+KwkgKiBwcm9jZXNzLgorCSAqLworCWlmICgoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZT
+X01PVU5UX01VTFRJVVNFUikgJiYKKwkgICAgIXRjb24tPnVuaXhfZXh0KSB7CisJCWlmICghKGNp
+ZnNfc2ItPm1udF9jaWZzX2ZsYWdzICYgQ0lGU19NT1VOVF9PVkVSUl9VSUQpKQorCQkJc3RhdC0+
+dWlkID0gY3VycmVudF9mc3VpZCgpOworCQlpZiAoIShjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAm
+IENJRlNfTU9VTlRfT1ZFUlJfR0lEKSkKKwkJCXN0YXQtPmdpZCA9IGN1cnJlbnRfZnNnaWQoKTsK
+Kwl9CisJcmV0dXJuIHJjOwogfQogCiBzdGF0aWMgaW50IGNpZnNfdHJ1bmNhdGVfcGFnZShzdHJ1
+Y3QgYWRkcmVzc19zcGFjZSAqbWFwcGluZywgbG9mZl90IGZyb20pCi0tIAoxLjcuMQoK
+--20cf303a303fefd9a604a3b15b99--
