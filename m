@@ -1,356 +1,402 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 6/7] cifs: convert cifs_writepages to use async writes
-Date: Thu, 19 May 2011 16:22:57 -0400
-Message-ID: <1305836578-26333-7-git-send-email-jlayton@redhat.com>
-References: <1305836578-26333-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs-utils: Create new binary cifs.idmap for sid to uid/gid mapping (try #2)
+Date: Fri, 20 May 2011 03:49:15 -0500
+Message-ID: <1305881355-11026-1-git-send-email-shirishppargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1305836578-26333-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Have cifs_writepages issue asynchronous writes instead of waiting on
-each write call to complete before issuing another. This also allows us
-to return more quickly from writepages. It can just send out all of the
-I/Os and not wait around for the replies.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-In the WB_SYNC_ALL case, if the write completes with a retryable error,
-then the completion workqueue job will resend the write.
+Handle cifs.idmap type of key. Extract a SID string from the description
+and map it to either an uid or gid using winbind APIs.
+If that fails (e.g. because winbind is not installed/running or winbind returns
+an error), try to obtain uid of 'nobody' and gid of 'nogroup'.
+And if that fails, kernel assigns uid and gid (from mount superblock).
 
-This also changes the page locking semantics a little bit. Instead of
-holding the page lock until the response is received, release it after
-doing the send. This will reduce contention for the page lock and should
-prevent processes that have the file mmap'ed from being blocked
-unnecessarily.
+Enable including winbind header files and idmapping code conditional
+to winbind devel rpms (header and library).
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+An entry such as this
+
+create  cifs.idmap   *       *               /usr/sbin/cifs.idmap %k
+
+is needed in the file /etc/request-key.conf.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/file.c |  241 +++++++++++++++++++++++---------------------------------
- 1 files changed, 99 insertions(+), 142 deletions(-)
+ Makefile.am      |   11 +++-
+ aclocal/idmap.m4 |   24 ++++++
+ cifs.idmap.c     |  219 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac     |   34 ++++++++-
+ 4 files changed, 285 insertions(+), 3 deletions(-)
+ create mode 100644 aclocal/idmap.m4
+ create mode 100644 cifs.idmap.c
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0aeaaf7..b81bbd8 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1092,58 +1092,20 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- static int cifs_writepages(struct address_space *mapping,
- 			   struct writeback_control *wbc)
- {
--	unsigned int bytes_to_write;
--	unsigned int bytes_written;
--	struct cifs_sb_info *cifs_sb;
--	int done = 0;
--	pgoff_t end;
--	pgoff_t index;
--	int range_whole = 0;
--	struct kvec *iov;
--	int len;
--	int n_iov = 0;
--	pgoff_t next;
--	int nr_pages;
--	__u64 offset = 0;
--	struct cifsFileInfo *open_file;
--	struct cifsTconInfo *tcon;
--	struct cifsInodeInfo *cifsi = CIFS_I(mapping->host);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
-+	bool done = false, scanned = false, range_whole = false;
-+	pgoff_t end, index;
-+	struct cifs_writedata *wdata;
- 	struct page *page;
--	struct pagevec pvec;
- 	int rc = 0;
--	int scanned = 0;
--	int xid;
--
--	cifs_sb = CIFS_SB(mapping->host->i_sb);
+diff --git a/Makefile.am b/Makefile.am
+index 67a0190..c6eeb22 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -8,8 +8,10 @@ mount_cifs_LDADD = $(LIBCAP) $(CAPNG_LDADD)
  
- 	/*
--	 * If wsize is smaller that the page cache size, default to writing
-+	 * If wsize is smaller than the page cache size, default to writing
- 	 * one page at a time via cifs_writepage
- 	 */
- 	if (cifs_sb->wsize < PAGE_CACHE_SIZE)
- 		return generic_writepages(mapping, wbc);
+ man_MANS = mount.cifs.8
  
--	iov = kmalloc(32 * sizeof(struct kvec), GFP_KERNEL);
--	if (iov == NULL)
--		return generic_writepages(mapping, wbc);
--
--	/*
--	 * if there's no open file, then this is likely to fail too,
--	 * but it'll at least handle the return. Maybe it should be
--	 * a BUG() instead?
--	 */
--	open_file = find_writable_file(CIFS_I(mapping->host), false);
--	if (!open_file) {
--		kfree(iov);
--		return generic_writepages(mapping, wbc);
--	}
--
--	tcon = tlink_tcon(open_file->tlink);
--	cifsFileInfo_put(open_file);
--
--	xid = GetXid();
--
--	pagevec_init(&pvec, 0);
- 	if (wbc->range_cyclic) {
- 		index = mapping->writeback_index; /* Start from prev offset */
- 		end = -1;
-@@ -1151,24 +1113,49 @@ static int cifs_writepages(struct address_space *mapping,
- 		index = wbc->range_start >> PAGE_CACHE_SHIFT;
- 		end = wbc->range_end >> PAGE_CACHE_SHIFT;
- 		if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX)
--			range_whole = 1;
--		scanned = 1;
-+			range_whole = true;
-+		scanned = true;
- 	}
- retry:
--	while (!done && (index <= end) &&
--	       (nr_pages = pagevec_lookup_tag(&pvec, mapping, &index,
--			PAGECACHE_TAG_DIRTY,
--			min(end - index, (pgoff_t)PAGEVEC_SIZE - 1) + 1))) {
--		int first;
--		unsigned int i;
--
--		first = -1;
--		next = 0;
--		n_iov = 0;
--		bytes_to_write = 0;
--
--		for (i = 0; i < nr_pages; i++) {
--			page = pvec.pages[i];
-+	while (!done && index <= end) {
-+		unsigned int i, nr_pages, found_pages;
-+		pgoff_t next = 0, tofind;
-+		struct page **pages;
++sbin_PROGRAMS =
 +
-+		tofind = min((cifs_sb->wsize / PAGE_CACHE_SIZE) - 1,
-+				end - index) + 1;
+ if CONFIG_CIFSUPCALL
+-sbin_PROGRAMS = cifs.upcall
++sbin_PROGRAMS += cifs.upcall
+ cifs_upcall_SOURCES = cifs.upcall.c data_blob.c asn1.c spnego.c util.c
+ cifs_upcall_LDADD = -ltalloc -lkeyutils $(KRB5_LDADD)
+ man_MANS += cifs.upcall.8
+@@ -30,3 +32,10 @@ bin_PROGRAMS = cifscreds
+ cifscreds_SOURCES = cifscreds.c resolve_host.c util.c
+ cifscreds_LDADD = -lkeyutils
+ endif
 +
-+		wdata = cifs_writedata_alloc((unsigned int)tofind);
-+		if (!wdata) {
-+			rc = -ENOMEM;
-+			break;
++if CONFIG_CIFSIDMAP
++sbin_PROGRAMS += cifs.idmap
++cifs_idmap_SOURCES = cifs.idmap.c
++cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
++endif
++
+diff --git a/aclocal/idmap.m4 b/aclocal/idmap.m4
+new file mode 100644
+index 0000000..b3dcd92
+--- /dev/null
++++ b/aclocal/idmap.m4
+@@ -0,0 +1,24 @@
++dnl Headers needed by wbclient.h
++dnl
++AC_DEFUN([AC_WBCH_COMPL],[
++[
++#ifdef HAVE_STDINT_H
++#include <stdint.h>
++#endif
++]
++[#ifdef HAVE_STDBOOL_H
++#include <stdbool.h>
++#endif
++]
++[#ifdef HAVE_STDIO_H
++#include <stdio.h>
++#endif
++]
++[#ifdef HAVE_STDLIB_H
++#include <stdlib.h>
++#endif
++]
++[#ifdef HAVE_ERRNO_H
++#include <errno.h>
++#endif
++]])
+diff --git a/cifs.idmap.c b/cifs.idmap.c
+new file mode 100644
+index 0000000..3c718e7
+--- /dev/null
++++ b/cifs.idmap.c
+@@ -0,0 +1,219 @@
++/*
++* CIFS idmap helper.
++* Copyright (C) Shirish Pargaonkar (shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org) 2011
++*
++* Used by /sbin/request-key.conf for handling
++* cifs upcall for SID to uig/gid and uid/gid to SID mapping.
++* You should have keyutils installed and add
++* this lines to /etc/request-key.conf file:
++
++    create cifs.idmap * * /usr/local/sbin/cifs.idmap %k
++
++* This program is free software; you can redistribute it and/or modify
++* it under the terms of the GNU General Public License as published by
++* the Free Software Foundation; either version 2 of the License, or
++* (at your option) any later version.
++* This program is distributed in the hope that it will be useful,
++* but WITHOUT ANY WARRANTY; without even the implied warranty of
++* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++* GNU General Public License for more details.
++* You should have received a copy of the GNU General Public License
++* along with this program; if not, write to the Free Software
++* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++*/
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
++
++#include <string.h>
++#include <getopt.h>
++#include <syslog.h>
++#include <dirent.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <keyutils.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <limits.h>
++#include <wbclient.h>
++
++static const char *prog = "cifs.idmap";
++
++static void usage(void)
++{
++	syslog(LOG_INFO, "Usage: %s [-t] [-v] [-l] key_serial", prog);
++	fprintf(stderr, "Usage: %s [-t] [-v] [-l] key_serial\n", prog);
++}
++
++static int
++cifs_idmap(const key_serial_t key, const char *key_descr)
++{
++	int i;
++	int len;
++	uid_t uid = 0;
++	gid_t gid = 0;;
++	wbcErr rc = 1;
++	const char *keystart = key_descr;
++	const char *keyend = key_descr;
++	struct wbcDomainSid sid;
++	struct passwd *pw;
++	struct group *gr;
++
++	len = strlen(key_descr);
++	/* skip next 4 ';' delimiters to get to description */
++	for (i = 1; i <= 4; ++i) {
++		keyend = index(keyend + 1, ';');
++		if (!keyend) {
++			syslog(LOG_ERR, "invalid key description: %s",
++			       key_descr);
++			return 1;
 +		}
++	}
++	if (keyend - keystart < len)
++		keyend++;
++	else {
++		syslog(LOG_ERR, "Invalid key: %s", keystart);
++		return 1;
++	}
 +
-+		/*
-+		 * find_get_pages_tag seems to return a max of 256 on each
-+		 * iteration, so we must call it several times in order to
-+		 * fill the array or the wsize is effectively limited to
-+		 * 256 * PAGE_CACHE_SIZE.
-+		 */
-+		found_pages = 0;
-+		pages = wdata->pages;
-+		do {
-+			nr_pages = find_get_pages_tag(mapping, &index,
-+							PAGECACHE_TAG_DIRTY,
-+							tofind, pages);
-+			found_pages += nr_pages;
-+			tofind -= nr_pages;
-+			pages += nr_pages;
-+		} while (nr_pages && tofind && index <= end);
++	/*
++	 * Use winbind to convert received string to a SID and lookup
++	 * name and map that SID to an uid.  If either of these
++	 * function calls return with an error,  use system calls to obtain
++	 * uid of user "nobody". If winbind fails to map a SID to an UID
++	 * and there is no user named "nobody", return error to the
++	 * upcall caller. Otherwise instanticate a key using that uid.
++	 *
++	 * The same applies to SID and gid mapping.  Instead of a
++	 * user "nobody", user "nogroup" is looked up if winbind
++	 * fails to map a SID to a gid.
++	 */
++	keystart = keyend;
++	len = strlen(keyend);
++	if (strncmp(keyend, "os", 2) == 0) {
++		keyend = index(keyend + 1, ':');
++		if (keyend - keystart < len)
++			keyend++;
++		else {
++			syslog(LOG_ERR, "Invalid owner SID: %s", keystart);
++			return 1;
++		}
++		rc = wbcStringToSid(keyend, &sid);
++		if (rc)
++			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
++		else {
++			rc = wbcSidToUid(&sid, &uid);
++			if (rc)
++				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
++						keyend, rc);
++		}
++		if (rc) { /* either of the two wbcSid functions failed */
++			pw = getpwnam("nobody");
++			if (!pw)
++				syslog(LOG_DEBUG, "SID %s to uid pw error: %d",
++					keyend, rc);
++			else {
++				uid = pw->pw_uid;
++				rc = 0;
++			}
++		}
++		if (!rc) { /* SID has been mapped to an uid */
++			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
++			if (rc)
++				syslog(LOG_ERR, "%s: key inst: %s",
++					__func__, strerror(errno));
++		}
++	} else if (strncmp(keyend, "gs", 2) == 0) {
++		keyend = index(keyend + 1, ':');
++		if (keyend - keystart < len)
++			keyend++;
++		else {
++			syslog(LOG_ERR, "Invalid Group SID: %s", keystart);
++			return 1;
++		}
++		rc = wbcStringToSid(keyend, &sid);
++		if (rc)
++			syslog(LOG_DEBUG, "O strtosid: %s, rc: %d", keyend, rc);
++		else {
++			rc = wbcSidToGid(&sid, &gid);
++			if (rc)
++				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
++						keyend, rc);
++		}
++		if (rc) { /* either of the two wbcSid functions failed */
++			gr = getgrnam("nogroup");
++			if (!gr)
++				syslog(LOG_DEBUG, "SID %s to gid pw error: %d",
++						keyend, rc);
++			else {
++				gid = gr->gr_gid;
++				rc = 0;
++			}
++		}
++		if (!rc) { /* SID has been mapped to a gid */
++			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
++			if (rc)
++				syslog(LOG_ERR, "%s: key inst: %s",
++						__func__, strerror(errno));
++		}
++	} else
++		syslog(LOG_DEBUG, "Invalid SID: %s", keyend);
 +
-+		if (found_pages == 0) {
-+			kref_put(&wdata->refcount, cifs_writedata_release);
-+			break;
-+		}
++	return rc;
++}
 +
-+		nr_pages = 0;
-+		for (i = 0; i < found_pages; i++) {
-+			page = wdata->pages[i];
- 			/*
- 			 * At this point we hold neither mapping->tree_lock nor
- 			 * lock on the page itself: the page may be truncated or
-@@ -1177,7 +1164,7 @@ retry:
- 			 * mapping
- 			 */
- 
--			if (first < 0)
-+			if (nr_pages == 0)
- 				lock_page(page);
- 			else if (!trylock_page(page))
- 				break;
-@@ -1188,7 +1175,7 @@ retry:
- 			}
- 
- 			if (!wbc->range_cyclic && page->index > end) {
--				done = 1;
-+				done = true;
- 				unlock_page(page);
- 				break;
- 			}
-@@ -1215,119 +1202,89 @@ retry:
- 			set_page_writeback(page);
- 
- 			if (page_offset(page) >= mapping->host->i_size) {
--				done = 1;
-+				done = true;
- 				unlock_page(page);
- 				end_page_writeback(page);
- 				break;
- 			}
- 
--			/*
--			 * BB can we get rid of this?  pages are held by pvec
--			 */
--			page_cache_get(page);
-+			wdata->pages[i] = page;
-+			next = page->index + 1;
-+			++nr_pages;
++int main(const int argc, char *const argv[])
++{
++	int c;
++	long rc = 1;
++	key_serial_t key = 0;
++	char *buf;
++
++	openlog(prog, 0, LOG_DAEMON);
++
++	while ((c = getopt_long(argc, argv, "v", NULL, NULL)) != -1) {
++		switch (c) {
++		case 'v':
++			printf("version: %s\n", VERSION);
++			goto out;
++		default:
++			syslog(LOG_ERR, "unknown option: %c", c);
++			goto out;
 +		}
++	}
++
++	/* is there a key? */
++	if (argc <= optind) {
++		usage();
++		goto out;
++	}
++
++	/* get key and keyring values */
++	errno = 0;
++	key = strtol(argv[optind], NULL, 10);
++	if (errno != 0) {
++		key = 0;
++		syslog(LOG_ERR, "Invalid key format: %s", strerror(errno));
++		goto out;
++	}
++
++	rc = keyctl_describe_alloc(key, &buf);
++	if (rc == -1) {
++		syslog(LOG_ERR, "keyctl_describe_alloc failed: %s",
++		       strerror(errno));
++		rc = 1;
++		goto out;
++	}
++
++	syslog(LOG_DEBUG, "key description: %s", buf);
++
++	if ((strncmp(buf, "cifs.idmap", sizeof("cifs.idmap") - 1) == 0))
++		rc = cifs_idmap(key, buf);
++out:
++	return rc;
++}
+diff --git a/configure.ac b/configure.ac
+index e0e2a60..d8f4290 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -22,13 +22,19 @@ AC_ARG_ENABLE(cifscreds,
+ 	enable_cifscreds=$enableval,
+ 	enable_cifscreds="no")
  
--			len = min(mapping->host->i_size - page_offset(page),
--				  (loff_t)PAGE_CACHE_SIZE);
-+		/* reset index to refind any pages skipped */
-+		if (nr_pages == 0)
-+			index = wdata->pages[0]->index + 1;
++AC_ARG_ENABLE(cifsidmap,
++	[AC_HELP_STRING([--enable-cifsidmap],
++			[Create cifs.idmap binary @<:@default=yes@:>@])],
++	enable_cifsidmap=$enableval,
++	enable_cifsidmap="maybe")
++
+ # Checks for programs.
+ AC_PROG_CC
+ AC_PROG_SED
+ AC_GNU_SOURCE
  
--			/* reserve iov[0] for the smb header */
--			n_iov++;
--			iov[n_iov].iov_base = kmap(page);
--			iov[n_iov].iov_len = len;
--			bytes_to_write += len;
-+		/* put any pages we aren't going to use */
-+		for (i = nr_pages; i < found_pages; i++) {
-+			page_cache_release(wdata->pages[i]);
-+			wdata->pages[i] = NULL;
-+		}
+ # Checks for header files.
+-AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdlib.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
++AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
  
--			if (first < 0) {
--				first = i;
--				offset = page_offset(page);
--			}
--			next = page->index + 1;
--			if (bytes_to_write + PAGE_CACHE_SIZE > cifs_sb->wsize)
--				break;
-+		/* nothing to write? */
-+		if (nr_pages == 0) {
-+			kref_put(&wdata->refcount, cifs_writedata_release);
-+			continue;
- 		}
--		if (n_iov) {
--retry_write:
--			open_file = find_writable_file(CIFS_I(mapping->host),
--							false);
--			if (!open_file) {
--				cERROR(1, "No writable handles for inode");
--				rc = -EBADF;
--			} else {
--				rc = CIFSSMBWrite2(xid, tcon, open_file->netfid,
--						   bytes_to_write, offset,
--						   &bytes_written, iov, n_iov,
--						   0);
--				cifsFileInfo_put(open_file);
--			}
- 
--			cFYI(1, "Write2 rc=%d, wrote=%u", rc, bytes_written);
-+		wdata->sync_mode = wbc->sync_mode;
-+		wdata->nr_pages = nr_pages;
-+		wdata->offset = page_offset(wdata->pages[0]);
- 
--			/*
--			 * For now, treat a short write as if nothing got
--			 * written. A zero length write however indicates
--			 * ENOSPC or EFBIG. We have no way to know which
--			 * though, so call it ENOSPC for now. EFBIG would
--			 * get translated to AS_EIO anyway.
--			 *
--			 * FIXME: make it take into account the data that did
--			 *	  get written
--			 */
--			if (rc == 0) {
--				if (bytes_written == 0)
--					rc = -ENOSPC;
--				else if (bytes_written < bytes_to_write)
--					rc = -EAGAIN;
-+		do {
-+			if (wdata->cfile != NULL)
-+				cifsFileInfo_put(wdata->cfile);
-+			wdata->cfile = find_writable_file(CIFS_I(mapping->host),
-+							  false);
-+			if (!wdata->cfile) {
-+				cERROR(1, "No writable handles for inode");
-+				rc = -EBADF;
-+				break;
- 			}
-+			rc = cifs_async_writev(wdata);
-+		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
- 
--			/* retry on data-integrity flush */
--			if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN)
--				goto retry_write;
-+		for (i = 0; i < nr_pages; ++i)
-+			unlock_page(wdata->pages[i]);
- 
--			/* fix the stats and EOF */
--			if (bytes_written > 0) {
--				cifs_stats_bytes_written(tcon, bytes_written);
--				cifs_update_eof(cifsi, offset, bytes_written);
--			}
--
--			for (i = 0; i < n_iov; i++) {
--				page = pvec.pages[first + i];
--				/* on retryable write error, redirty page */
-+		/* send failure -- clean up the mess */
-+		if (rc != 0) {
-+			for (i = 0; i < nr_pages; ++i) {
- 				if (rc == -EAGAIN)
--					redirty_page_for_writepage(wbc, page);
--				else if (rc != 0)
--					SetPageError(page);
--				kunmap(page);
--				unlock_page(page);
--				end_page_writeback(page);
--				page_cache_release(page);
-+					redirty_page_for_writepage(wbc,
-+							   wdata->pages[i]);
+ if test $enable_cifsupcall != "no"; then
+ 	AC_CHECK_HEADERS([krb5.h krb5/krb5.h])
+@@ -72,7 +78,7 @@ if test $enable_cifsupcall != "no"; then
+ 				fi
+ 			])
+ fi
+-if test $enable_cifsupcall != "no"; then
++if test $enable_cifsupcall != "no" -o $enable_cifsidmap != "no"; then
+ 	AC_CHECK_HEADERS([keyutils.h], , [
+ 				if test "$enable_cifsupcall" = "yes"; then
+ 					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
+@@ -80,6 +86,12 @@ if test $enable_cifsupcall != "no"; then
+ 					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifs.upcall.])
+ 					enable_cifsupcall="no"
+ 				fi
++				if test "$enable_cifsidmap" = "yes"; then
++					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
 +				else
-+					SetPageError(wdata->pages[i]);
-+				end_page_writeback(wdata->pages[i]);
-+				page_cache_release(wdata->pages[i]);
- 			}
--
- 			if (rc != -EAGAIN)
- 				mapping_set_error(mapping, rc);
--			else
--				rc = 0;
-+		}
-+		kref_put(&wdata->refcount, cifs_writedata_release);
++					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifs.idmap.])
++					enable_cifsidmap="no"
++				fi
+ 			])
+ fi
+ if test $enable_cifsupcall != "no"; then
+@@ -89,6 +101,23 @@ if test $enable_cifsupcall != "no"; then
+ 	AC_SUBST(KRB5_LDADD)
+ fi
  
--			if ((wbc->nr_to_write -= n_iov) <= 0)
--				done = 1;
--			index = next;
--		} else
--			/* Need to re-find the pages we skipped */
--			index = pvec.pages[0]->index + 1;
-+		wbc->nr_to_write -= nr_pages;
-+		if (wbc->nr_to_write <= 0)
-+			done = true;
- 
--		pagevec_release(&pvec);
-+		index = next;
- 	}
++if test $enable_cifsidmap != "no"; then
++	AC_CHECK_HEADERS([wbclient.h], , [
++				if test "$enable_cifsidmap" = "yes"; then
++					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
++				else
++					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling cifs.idmap.])
++					enable_cifsidmap="no"
++				fi
++			], [ AC_WBCH_COMPL ])
++fi
 +
- 	if (!scanned && !done) {
- 		/*
- 		 * We hit the last page and there is more work to be done: wrap
- 		 * back to the start of the file
- 		 */
--		scanned = 1;
-+		scanned = true;
- 		index = 0;
- 		goto retry;
- 	}
++if test $enable_cifsidmap != "no"; then
++	AC_CHECK_LIB([wbclient], [wbcStringToSid],
++		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["Define var have_libwbclient"]) ], [AC_MSG_ERROR([No functioning wbclient library found!])])
++	AC_SUBST(WINB_LDADD)
++fi
 +
- 	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
- 		mapping->writeback_index = index;
+ if test $enable_cifscreds = "yes"; then
+ 	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
+ fi
+@@ -140,6 +169,7 @@ LIBS=$cu_saved_libs
  
--	FreeXid(xid);
--	kfree(iov);
- 	return rc;
- }
+ AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
++AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
+ 
+ LIBCAP_NG_PATH
  
 -- 
-1.7.4.4
+1.6.0.2
