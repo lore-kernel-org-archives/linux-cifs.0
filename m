@@ -1,71 +1,74 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [GIT] CIFS Fixes
-Date: Sat, 21 May 2011 06:34:28 -0500
-Message-ID: <BANLkTi=GCdPNTFEqL-r+i8rQv0LDJdgJ0g@mail.gmail.com>
-References: <BANLkTin1aphq5JHJkTOVjgSAaPWWYBuYYw@mail.gmail.com>
-	<20110521103105.GA20409@infradead.org>
-	<BANLkTi=VAnis_mH7GbRr+aH-bNm8uVpWLA@mail.gmail.com>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Subject: [PATCH] cifs: remove unused SMB2 config and mount options
+Date: Sun, 22 May 2011 07:04:51 -0400
+Message-ID: <20110522110451.GA14262@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTi=VAnis_mH7GbRr+aH-bNm8uVpWLA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, May 21, 2011 at 6:30 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
-e:
-> On Sat, May 21, 2011 at 5:31 AM, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org=
-> wrote:
->> On Fri, May 20, 2011 at 12:41:33PM -0500, Steve French wrote:
->>> Sent the following request up, but plan to send another big set of
->>> changes up with Jeff's aync set (would like help reviewing patches =
-3,
->>> 5 and 6 in particular of Jeff's set) and some of Pavel's SMB2 prep
->>> patches in a few days.
->>
->> Steve, as said numours times before: please don't introduce the half
->> baked smb2 bits into mainline yet. =A0Prepare a separate git tree th=
-at
->> can actually be reviewed properly for it.
->
-> Pavel is reordering the smb2 code and doing cleanup now and this smb2
-> code will be in a distinct branch (actually is in a distinct branch o=
-n
-> his etersoft git server at the moment). =A0 =A0So far, the smb2 pdu w=
-orker
-> functions, and new error handling function and some misc. functions
-> have been multiply reviewed. =A0 The transport handling will need mor=
-e
-> changes and vfs operations are apparently not ready for review yet.
-> I expect the vfs operations to be
+There's no SMB2 support in the CIFS filesystem driver, so there's no need to
+have a config and mount option for it.
 
-Sorry didn't finish the sentence - I expect discussion of vfs
-operations for smb2 pretty soon (obviously on list, and in a distinct
-branch) but he was doing cleanup and resolving merge conflicts of
-other prereqs first.
+Signed-off-by: Christoph Hellwig <hch-jcswGhMUV9g@public.gmane.org>
 
-> Only some minor prep pieces for SMB2 are checked in at this stage.
-> None of the new smb2 C =A0files are checked in =A0yet (nor obviously =
-is
-> CONFIG_CIFS_SMB2 being built). =A0 There are a few more prep patches =
-for
-> smb2 that affect cifs C files (cleanup of the mid for example) that
-> Pavel has updated to 2.6.40 and posted to his server.
->
->
->
-> --
-> Thanks,
->
-> Steve
->
-
-
-
---=20
-Thanks,
-
-Steve
+Index: linux-2.6/fs/cifs/Kconfig
+===================================================================
+--- linux-2.6.orig/fs/cifs/Kconfig	2011-05-22 12:58:07.148945770 +0200
++++ linux-2.6/fs/cifs/Kconfig	2011-05-22 12:58:20.511946113 +0200
+@@ -153,26 +153,6 @@ config CIFS_ACL
+ 	    Allows to fetch CIFS/NTFS ACL from the server.  The DACL blob
+ 	    is handed over to the application/caller.
+ 
+-config CIFS_SMB2
+-	bool "SMB2 network file system support (EXPERIMENTAL)"
+-	depends on EXPERIMENTAL && INET && BROKEN
+-	select NLS
+-	select KEYS
+-	select FSCACHE
+-	select DNS_RESOLVER
+-
+-	help
+-	  This enables experimental support for the SMB2 (Server Message Block
+-	  version 2) protocol. The SMB2 protocol is the successor to the
+-	  popular CIFS and SMB network file sharing protocols. SMB2 is the
+-	  native file sharing mechanism for recent versions of Windows
+-	  operating systems (since Vista).  SMB2 enablement will eventually
+-	  allow users better performance, security and features, than would be
+-	  possible with cifs. Note that smb2 mount options also are simpler
+-	  (compared to cifs) due to protocol improvements.
+-
+-	  Unless you are a developer or tester, say N.
+-
+ config CIFS_NFSD_EXPORT
+ 	  bool "Allow nfsd to export CIFS file system (EXPERIMENTAL)"
+ 	  depends on CIFS && EXPERIMENTAL
+Index: linux-2.6/fs/cifs/connect.c
+===================================================================
+--- linux-2.6.orig/fs/cifs/connect.c	2011-05-22 12:58:07.156946032 +0200
++++ linux-2.6/fs/cifs/connect.c	2011-05-22 12:58:20.515945837 +0200
+@@ -102,7 +102,6 @@ struct smb_vol {
+ 	bool fsc:1;	/* enable fscache */
+ 	bool mfsymlinks:1; /* use Minshall+French Symlinks */
+ 	bool multiuser:1;
+-	bool use_smb2:1; /* force smb2 use on mount instead of cifs */
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+@@ -1062,13 +1061,6 @@ cifs_parse_mount_options(const char *mou
+ 				   (strnicmp(value, "1", 1) == 0)) {
+ 				/* this is the default */
+ 				continue;
+-			} else if ((strnicmp(value, "smb2", 4) == 0) ||
+-				   (strnicmp(value, "2", 1) == 0)) {
+-#ifdef CONFIG_CIFS_SMB2
+-				vol->use_smb2 = true;
+-#else
+-				cERROR(1, "smb2 support not enabled");
+-#endif /* CONFIG_CIFS_SMB2 */
+ 			}
+ 		} else if ((strnicmp(data, "unc", 3) == 0)
+ 			   || (strnicmp(data, "target", 6) == 0)
