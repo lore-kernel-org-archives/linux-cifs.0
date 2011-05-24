@@ -1,34 +1,50 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] manpage: update the description of the wsize= option
-Date: Tue, 24 May 2011 15:03:53 -0400
-Message-ID: <1306263833-29016-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Sage Weil <sage@newdream.net>
+Subject: [PATCH 19/19] cifs: remove unnecessary dentry_unhash on rmdir/rename_dir
+Date: Tue, 24 May 2011 13:06:22 -0700
+Message-ID: <1306267582-5347-20-git-send-email-sage@newdream.net>
+References: <1306267582-5347-1-git-send-email-sage@newdream.net>
+Cc: linux-fsdevel@vger.kernel.org, hch@lst.de,
+	Sage Weil <sage@newdream.net>,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+To: viro@ZenIV.linux.org.uk
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1306267582-5347-1-git-send-email-sage@newdream.net>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-...to account for the changes in the async write patchset.
+Cifs has no problems with lingering references to unlinked directory
+inodes.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+CC: Steve French <sfrench@samba.org>
+CC: linux-cifs@vger.kernel.org
+Signed-off-by: Sage Weil <sage@newdream.net>
 ---
- mount.cifs.8 |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/inode.c |    5 -----
+ 1 files changed, 0 insertions(+), 5 deletions(-)
 
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index ddecb2a..1299725 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -394,9 +394,9 @@ rsize=\fIarg\fR
- default network read size (usually 16K)\&. The client currently can not use rsize larger than CIFSMaxBufSize\&. CIFSMaxBufSize defaults to 16K and may be changed (from 8K to the maximum kmalloc size allowed by your kernel) at module install time for cifs\&.ko\&. Setting CIFSMaxBufSize to a very large value will cause cifs to use more memory and may reduce performance in some cases\&. To use rsize greater than 127K (the original cifs protocol maximum) also requires that the server support a new Unix Capability flag (for very large read) which some newer servers (e\&.g\&. Samba 3\&.0\&.26 or later) do\&. rsize can be set from a minimum of 2048 to a maximum of 130048 (127K or CIFSMaxBufSize, whichever is smaller)
- .RE
- .PP
--wsize=\fIarg\fR
-+wsize=\fIbytes\fR
- .RS 4
--default network write size (default 57344) maximum wsize currently allowed by CIFS is 57344 (fourteen 4096 byte pages)
-+Maximum amount of data that the kernel will send in a write request in bytes. Prior to kernel 2\&.6\&.40, the default and maximum was 57344 (14 * 4096 pages). As of 2\&.6\&.40, the default is 1M, and the maximum allowed is 16M. Note that this value is just a starting point. The client and server may negotiate this size downward according to the server's capabilities.
- .RE
- .PP
- fsc
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 9ac2290..de02ed5 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1461,8 +1461,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
+ 
+ 	cFYI(1, "cifs_rmdir, inode = 0x%p", inode);
+ 
+-	dentry_unhash(direntry);
+-
+ 	xid = GetXid();
+ 
+ 	full_path = build_path_from_dentry(direntry);
+@@ -1571,9 +1569,6 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
+ 	FILE_UNIX_BASIC_INFO *info_buf_target;
+ 	int xid, rc, tmprc;
+ 
+-	if (target_dentry->d_inode && S_ISDIR(target_dentry->d_inode->i_mode))
+-		dentry_unhash(target_dentry);
+-
+ 	cifs_sb = CIFS_SB(source_dir->i_sb);
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
 -- 
-1.7.4.4
+1.7.0
+
