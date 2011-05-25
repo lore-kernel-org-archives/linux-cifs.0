@@ -1,102 +1,136 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: guest mount crashes current git HEAD
-Date: Wed, 25 May 2011 08:46:56 -0500
-Message-ID: <BANLkTim7dUKNxfHFrb1v2Ebt0WUvKDr8_w@mail.gmail.com>
-References: <20110525132755.GA21369@infradead.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix undefined behavior when mount fails
+Date: Wed, 25 May 2011 10:32:01 -0400
+Message-ID: <20110525103201.71d11ad6@tlielax.poochiereds.net>
+References: <1306316134-11736-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110525132755.GA21369-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+In-Reply-To: <1306316134-11736-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel made a fix (now applied to cifs-2.6.git)
+On Wed, 25 May 2011 13:35:34 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-Author: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Date:   Wed May 25 13:35:34 2011 +0400
+> Fix double kfree() calls on the same pointers and cleanup mount code.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   44 +++++++++++++++++---------------------------
+>  1 files changed, 17 insertions(+), 27 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 131afad..d1ed7f9 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -104,29 +104,23 @@ cifs_sb_deactive(struct super_block *sb)
+>  }
+>  
+>  static int
+> -cifs_read_super(struct super_block *sb, struct cifs_sb_info *cifs_sb,
+> -		void *data, struct smb_vol *volume_info, const char *devname,
+> -		int silent)
+> +cifs_read_super(struct super_block *sb, struct smb_vol *volume_info,
+> +		const char *devname, int silent)
+>  {
+>  	struct inode *inode;
+> +	struct cifs_sb_info *cifs_sb;
+>  	int rc = 0;
+>  
+> -	/* BB should we make this contingent on mount parm? */
+> -	sb->s_flags |= MS_NODIRATIME | MS_NOATIME;
+> -	sb->s_fs_info = cifs_sb;
+> +	cifs_sb = CIFS_SB(sb);
+>  
+>  	spin_lock_init(&cifs_sb->tlink_tree_lock);
+>  	cifs_sb->tlink_tree = RB_ROOT;
+>  
+>  	rc = bdi_setup_and_register(&cifs_sb->bdi, "cifs", BDI_CAP_MAP_COPY);
+> -	if (rc) {
+> -		kfree(cifs_sb);
+> +	if (rc)
+>  		return rc;
+> -	}
+> -	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
+>  
+> -	if (data)
+> -		cifs_sb->mountdata = data;
+> +	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
+>  
+>  	rc = cifs_mount(sb, cifs_sb, volume_info, devname);
+>  
+> @@ -179,15 +173,7 @@ out_no_root:
+>  	cifs_umount(sb, cifs_sb);
+>  
+>  out_mount_failed:
+> -	if (cifs_sb) {
+> -		if (cifs_sb->mountdata) {
+> -			kfree(cifs_sb->mountdata);
+> -			cifs_sb->mountdata = NULL;
+> -		}
+> -		unload_nls(cifs_sb->local_nls);
+> -		bdi_destroy(&cifs_sb->bdi);
+> -		kfree(cifs_sb);
+> -	}
+> +	bdi_destroy(&cifs_sb->bdi);
+>  	return rc;
+>  }
+>  
+> @@ -553,7 +539,6 @@ cifs_do_mount(struct file_system_type *fs_type,
+>  	struct cifs_sb_info *cifs_sb;
+>  	struct smb_vol *volume_info;
+>  	struct dentry *root;
+> -	char *copied_data = NULL;
+>  
+>  	cFYI(1, "Devname: %s flags: %d ", dev_name, flags);
+>  
+> @@ -576,20 +561,23 @@ cifs_do_mount(struct file_system_type *fs_type,
+>  		goto out;
+>  	}
+>  
+> -	sb->s_flags = flags;
+> -
+>  	/*
+>  	 * Copy mount params for use in submounts. Better to do
+>  	 * the copy here and deal with the error before cleanup gets
+>  	 * complicated post-mount.
+>  	 */
+> -	copied_data = kstrndup(data, PAGE_SIZE, GFP_KERNEL);
+> -	if (copied_data == NULL) {
+> +	cifs_sb->mountdata = kstrndup(data, PAGE_SIZE, GFP_KERNEL);
+> +	if (cifs_sb->mountdata == NULL) {
+>  		root = ERR_PTR(-ENOMEM);
+>  		goto err_out;
+>  	}
+>  
+> -	rc = cifs_read_super(sb, cifs_sb, copied_data, volume_info, dev_name,
+> +	sb->s_flags = flags;
+> +	/* BB should we make this contingent on mount parm? */
+> +	sb->s_flags |= MS_NODIRATIME | MS_NOATIME;
+> +	sb->s_fs_info = cifs_sb;
+> +
+> +	rc = cifs_read_super(sb, volume_info, dev_name,
+>  			     flags & MS_SILENT ? 1 : 0);
+>  	if (rc) {
+>  		root = ERR_PTR(rc);
+> @@ -604,6 +592,8 @@ out:
+>  	return root;
+>  
+>  err_out:
+> +	kfree(cifs_sb->mountdata);
+> +	unload_nls(cifs_sb->local_nls);
+>  	kfree(cifs_sb);
+>  	deactivate_locked_super(sb);
+>  	cifs_cleanup_volume_info(&volume_info);
 
-    CIFS: Fix undefined behavior when mount fails
 
+Looks reasonable and seems to fix the problem.
 
-On Wed, May 25, 2011 at 8:27 AM, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> =
-wrote:
-> Trying to mount a local shared in my VM I can trivially crash cifs:
->
-> qemu1:~# mount -t cifs 127.0.0.1:test /mnt/scratch/ -o guest
-> [ =A0 55.477707] CIFS VFS: default security mechanism requested. =A0T=
-he default security mechanism will be upgraded from ntlm to ntlmv2 in k=
-ernel release 2.6.41
-> [ =A0 55.499858] ------------[ cut here ]------------
-> [ =A0 55.501683] kernel BUG at /home/hch/work/linux-2.6/mm/slab.c:501=
-!
-> [ =A0 55.502109] invalid opcode: 0000 [#1] SMP
-> [ =A0 55.502109] CPU 0
-> [ =A0 55.502109] Modules linked in:
-> [ =A0 55.502109]
-> [ =A0 55.502109] Pid: 2129, comm: mount.cifs Not tainted 2.6.39+ #164=
- Bochs Bochs
-> [ =A0 55.502109] RIP: 0010:[<ffffffff81135bf0>] =A0[<ffffffff81135bf0=
->] kfree+0x120/0x140
-> [ =A0 55.502109] RSP: 0018:ffff8800575bfc78 =A0EFLAGS: 00010046
-> [ =A0 55.502109] RAX: ffff88005bf5d258 RBX: ffffffff81c9d757 RCX: fff=
-f88005dbfc000
-> [ =A0 55.502109] RDX: 0000000000000000 RSI: 0000000000001c9d RDI: 000=
-0000000000000
-> [ =A0 55.502109] RBP: ffff8800575bfc98 R08: ffe20016af0c0000 R09: fff=
-f8800590796c0
-> [ =A0 55.502109] R10: ffff880059f35b60 R11: 0000000000000000 R12: 000=
-0000000000286
-> [ =A0 55.502109] R13: ffffffff8131711d R14: ffff88005af44200 R15: 000=
-0000000000000
-> [ =A0 55.502109] FS: =A00000000000000000(0000) GS:ffff88005d800000(00=
-63) knlGS:00000000f75ac8d0
-> [ =A0 55.502109] CS: =A00010 DS: 002b ES: 002b CR0: 000000008005003b
-> [ =A0 55.502109] CR2: 00000000f7016100 CR3: 0000000059cca000 CR4: 000=
-00000000006f0
-> [ =A0 55.502109] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000=
-0000000000000
-> [ =A0 55.502109] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 000=
-0000000000400
-> [ =A0 55.502109] Process mount.cifs (pid: 2129, threadinfo ffff880057=
-5be000, task ffff8800593401c0)
-> [ =A0 55.502109] Stack:
-> [ =A0 55.502109] =A0ffff880059c0be00 ffff88005abc3400 000000000000000=
-0 ffff88005af44200
-> [ =A0 55.502109] =A0ffff8800575bfd58 ffffffff8131711d ffff88000000000=
-0 ffff8800575bfd08
-> [ =A0 55.502109] =A0ffff880059396140 ffff880059f35b60 ffff880059c0be8=
-8 ffff88005d51bdb9
-> [ =A0 55.502109] Call Trace:
-> [ =A0 55.502109] =A0[<ffffffff8131711d>] cifs_mount+0x7ad/0x2980
-> [ =A0 55.502109] =A0[<ffffffff81308d44>] cifs_do_mount+0xf4/0x310
-> [ =A0 55.502109] =A0[<ffffffff8113d84b>] mount_fs+0x1b/0xd0
-> [ =A0 55.502109] =A0[<ffffffff811565ee>] vfs_kern_mount+0x5e/0xd0
-> [ =A0 55.502109] =A0[<ffffffff81156a2f>] do_kern_mount+0x4f/0x100
-> [ =A0 55.502109] =A0[<ffffffff81158436>] do_mount+0x436/0x790
-> [ =A0 55.502109] =A0[<ffffffff811050f2>] ? __get_free_pages+0x12/0x80
-> [ =A0 55.502109] =A0[<ffffffff8117e83f>] compat_sys_mount+0x12f/0x280
-> [ =A0 55.502109] =A0[<ffffffff81941225>] sysenter_dispatch+0x7/0x2b
-> [ =A0 55.502109] Code: 48 89 da 49 83 c4 10 4c 89 ee ff d0 49 8b 04 2=
-4 48 85 c0 75 e6 e9 08 ff ff ff 4c 89 ee 4c 89 f7 e8 06 fe ff ff 41 8b =
-45 00 eb 98 <0f> 0b 48 8b 40 10 e9 56 ff ff ff 48 8b 40 10 e9 41 ff ff =
-ff 66
-> [ =A0 55.502109] RIP =A0[<ffffffff81135bf0>] kfree+0x120/0x140
-> [ =A0 55.502109] =A0RSP <ffff8800575bfc78>
-> [ =A0 55.502109] ---[ end trace 7876191bfcd639e3 ]---
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+Pavel, you'll need to respin your last two patches in the shared
+superblock series to account for these changes.
 
-
-
---=20
-Thanks,
-
-Steve
+Reviewed-and-tested-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
