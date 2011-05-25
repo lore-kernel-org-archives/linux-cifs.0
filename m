@@ -1,26 +1,33 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: patches for 2.6.40
-Date: Thu, 26 May 2011 10:10:55 +0400
-Message-ID: <BANLkTimWUozj+P0VXU=JTPqwU1D8tRhnXQ@mail.gmail.com>
+From: =?UTF-8?Q? "=C2=A92011.Coca-Cola_Great_Britain" ?=
+	<info-4AlSaMP/b0NPYcu2f3hruQ@public.gmane.org>
+Subject: (no subject)
+Date: Wed, 25 May 2011 20:38:06 +0200
+Message-ID: <aa181e6b31564356022e23b6524951d1__38424.9794333757$1306394310$gmane$org@localhost>
+Reply-To: jim-gardner.c-EMRzualFZlQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I updated a branch for-next with all my pending patches for 2.6.40:
-http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next.
 
-The list of the patches:
-CIFS: Fix memory leak in cifs_do_mount
-CIFS: Migrate from prefixpath logic
-CIFS: Migrate to shared superblock model
-CIFS: Use pid saved in cifsFileInfo in writepages and set_file_size
-CIFS: Add rwpidforward mount option
 
-Could you review them, please?
 
--- 
-Best regards,
-Pavel Shilovsky.
+--=20
+25-05-2011
+Your Mail-ID has been awarded =C2=A3750,000.00 GBP as one of our online=
+ winners
+in our web bonanza sweepstakes From The Coca-Cola Online Promo 2011 . F=
+or
+claims send;
+Name:
+Address:
+Phone No:
+Age: Sex:
+Occupation:=20
+Country:
+Contact: Mr. Jim Gardner
+Claims department : jim-gardner.c-EMRzualFZlQ@public.gmane.org
+TEL: +44 755 284 8328
