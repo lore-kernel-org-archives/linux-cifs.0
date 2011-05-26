@@ -1,584 +1,369 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [v4 PATCH 3/4] CIFS: Migrate from prefixpath logic
-Date: Thu, 26 May 2011 10:01:58 +0400
-Message-ID: <1306389721-28550-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 1/2] CIFS: Use pid saved from cifsFileInfo in writepages and set_file_size
+Date: Thu, 26 May 2011 10:01:59 +0400
+Message-ID: <1306389721-28550-2-git-send-email-piastry@etersoft.ru>
+References: <1306389721-28550-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1306389721-28550-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now we point superblock to a server share root and set a root dentry
-appropriately. This let us share superblock between mounts like
-//server/sharename/foo/bar and //server/sharename/foo further.
+We need it to make them work with mandatory locking style because
+we can fail in a situation like when kernel need to flush dirty pages
+and there is a lock held by a process who opened file.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifs_fs_sb.h |    2 -
- fs/cifs/cifsfs.c     |  101 ++++++++++++++++++++++++++++++++++++++-
- fs/cifs/cifsglob.h   |   75 +++++++++++++++++++++++++++++
- fs/cifs/cifsproto.h  |    5 +-
- fs/cifs/connect.c    |  128 ++------------------------------------------------
- fs/cifs/dir.c        |    7 +--
- fs/cifs/inode.c      |   19 ++-----
- 7 files changed, 189 insertions(+), 148 deletions(-)
+ fs/cifs/cifsglob.h  |    8 ++++++++
+ fs/cifs/cifsproto.h |   13 +++++--------
+ fs/cifs/cifssmb.c   |   33 ++++++++++++++++++++++++++-------
+ fs/cifs/dir.c       |   18 ++++++++++--------
+ fs/cifs/file.c      |   31 +++++++++++++++++++++----------
+ fs/cifs/inode.c     |   24 ++++++++++++++++++------
+ fs/cifs/link.c      |   12 ++++++++----
+ 7 files changed, 96 insertions(+), 43 deletions(-)
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index a9d5692..c96b44b 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -56,8 +56,6 @@ struct cifs_sb_info {
- 	mode_t	mnt_file_mode;
- 	mode_t	mnt_dir_mode;
- 	unsigned int mnt_cifs_flags;
--	int	prepathlen;
--	char   *prepath; /* relative path under the share to mount to */
- 	char   *mountdata; /* options received at mount time or via DFS refs */
- 	struct backing_dev_info bdi;
- 	struct delayed_work prune_tlinks;
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 1d2a93c..46fdd55 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -415,8 +415,6 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
- 		seq_printf(s, ",nocase");
- 	if (tcon->retry)
- 		seq_printf(s, ",hard");
--	if (cifs_sb->prepath)
--		seq_printf(s, ",prepath=%s", cifs_sb->prepath);
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
- 		seq_printf(s, ",posixpaths");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)
-@@ -530,6 +528,100 @@ static const struct super_operations cifs_super_ops = {
- #endif
- };
- 
-+/*
-+ * Get root dentry from superblock according to prefix path mount option.
-+ * Return dentry with refcount + 1 on success and NULL otherwise.
-+ */
-+static struct dentry *
-+cifs_get_root(struct smb_vol *vol, struct super_block *sb)
-+{
-+	int xid, rc;
-+	struct inode *inode;
-+	struct qstr name;
-+	struct dentry *dparent = NULL, *dchild = NULL, *alias;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-+	unsigned int i, full_len, len;
-+	char *full_path = NULL, *pstart;
-+	char sep;
-+
-+	full_path = cifs_build_path_to_root(vol, cifs_sb,
-+					    cifs_sb_master_tcon(cifs_sb));
-+	if (full_path == NULL)
-+		return NULL;
-+
-+	cFYI(1, "Get root dentry for %s", full_path);
-+
-+	xid = GetXid();
-+	sep = CIFS_DIR_SEP(cifs_sb);
-+	dparent = dget(sb->s_root);
-+	full_len = strlen(full_path);
-+	full_path[full_len] = sep;
-+	pstart = full_path + 1;
-+
-+	for (i = 1, len = 0; i <= full_len; i++) {
-+		if (full_path[i] != sep || !len) {
-+			len++;
-+			continue;
-+		}
-+
-+		full_path[i] = 0;
-+		cFYI(1, "get dentry for %s", pstart);
-+
-+		name.name = pstart;
-+		name.len = len;
-+		name.hash = full_name_hash(pstart, len);
-+		dchild = d_lookup(dparent, &name);
-+		if (dchild == NULL) {
-+			cFYI(1, "not exists");
-+			dchild = d_alloc(dparent, &name);
-+			if (dchild == NULL) {
-+				dput(dparent);
-+				dparent = NULL;
-+				goto out;
-+			}
-+		}
-+
-+		cFYI(1, "get inode");
-+		if (dchild->d_inode == NULL) {
-+			cFYI(1, "not exists");
-+			inode = NULL;
-+			if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
-+				rc = cifs_get_inode_info_unix(&inode, full_path,
-+							      sb, xid);
-+			else
-+				rc = cifs_get_inode_info(&inode, full_path,
-+							 NULL, sb, xid, NULL);
-+			if (rc) {
-+				dput(dchild);
-+				dput(dparent);
-+				dparent = NULL;
-+				goto out;
-+			}
-+			alias = d_materialise_unique(dchild, inode);
-+			if (alias != NULL) {
-+				dput(dchild);
-+				if (IS_ERR(alias)) {
-+					dput(dparent);
-+					dparent = NULL;
-+					goto out;
-+				}
-+				dchild = alias;
-+			}
-+		}
-+		cFYI(1, "parent %p, child %p", dparent, dchild);
-+
-+		dput(dparent);
-+		dparent = dchild;
-+		len = 0;
-+		pstart = full_path + i + 1;
-+		full_path[i] = sep;
-+	}
-+out:
-+	_FreeXid(xid);
-+	kfree(full_path);
-+	return dparent;
-+}
-+
- static struct dentry *
- cifs_do_mount(struct file_system_type *fs_type,
- 	      int flags, const char *dev_name, void *data)
-@@ -585,7 +677,10 @@ cifs_do_mount(struct file_system_type *fs_type,
- 
- 	sb->s_flags |= MS_ACTIVE;
- 
--	root = dget(sb->s_root);
-+	root = cifs_get_root(volume_info, sb);
-+	if (root == NULL)
-+		goto out_super;
-+	cFYI(1, "dentry root is: %p", root);
- 	goto out;
- 
- out_super:
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index fd877c1..f57387a 100644
+index 7f90488..ca0c378 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -155,6 +155,61 @@ struct cifs_cred {
-  *****************************************************************
-  */
- 
-+struct smb_vol {
-+	char *username;
-+	char *password;
-+	char *domainname;
-+	char *UNC;
-+	char *UNCip;
-+	char *iocharset;  /* local code page for mapping to and from Unicode */
-+	char source_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* clnt nb name */
-+	char target_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* srvr nb name */
-+	uid_t cred_uid;
-+	uid_t linux_uid;
-+	gid_t linux_gid;
-+	mode_t file_mode;
-+	mode_t dir_mode;
-+	unsigned secFlg;
-+	bool retry:1;
-+	bool intr:1;
-+	bool setuids:1;
-+	bool override_uid:1;
-+	bool override_gid:1;
-+	bool dynperm:1;
-+	bool noperm:1;
-+	bool no_psx_acl:1; /* set if posix acl support should be disabled */
-+	bool cifs_acl:1;
-+	bool no_xattr:1;   /* set if xattr (EA) support should be disabled*/
-+	bool server_ino:1; /* use inode numbers from server ie UniqueId */
-+	bool direct_io:1;
-+	bool strict_io:1; /* strict cache behavior */
-+	bool remap:1;      /* set to remap seven reserved chars in filenames */
-+	bool posix_paths:1; /* unset to not ask for posix pathnames. */
-+	bool no_linux_ext:1;
-+	bool sfu_emul:1;
-+	bool nullauth:1;   /* attempt to authenticate with null user */
-+	bool nocase:1;     /* request case insensitive filenames */
-+	bool nobrl:1;      /* disable sending byte range locks to srv */
-+	bool mand_lock:1;  /* send mandatory not posix byte range lock reqs */
-+	bool seal:1;       /* request transport encryption on share */
-+	bool nodfs:1;      /* Do not request DFS, even if available */
-+	bool local_lease:1; /* check leases only on local system, not remote */
-+	bool noblocksnd:1;
-+	bool noautotune:1;
-+	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
-+	bool fsc:1;	/* enable fscache */
-+	bool mfsymlinks:1; /* use Minshall+French Symlinks */
-+	bool multiuser:1;
-+	unsigned int rsize;
-+	unsigned int wsize;
-+	bool sockopt_tcp_nodelay:1;
-+	unsigned short int port;
-+	unsigned long actimeo; /* attribute cache timeout (jiffies) */
-+	char *prepath;
-+	struct sockaddr_storage srcaddr; /* allow binding to a local IP */
-+	struct nls_table *local_nls;
-+};
-+
- struct TCP_Server_Info {
- 	struct list_head tcp_ses_list;
- 	struct list_head smb_ses_list;
-@@ -509,6 +564,26 @@ static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
- 		return '\\';
- }
- 
-+static inline void
-+convert_delimiter(char *path, char delim)
-+{
-+	int i;
-+	char old_delim;
-+
-+	if (path == NULL)
-+		return;
-+
-+	if (delim == '/')
-+		old_delim = '\\';
-+	else
-+		old_delim = '/';
-+
-+	for (i = 0; path[i] != '\0'; i++) {
-+		if (path[i] == old_delim)
-+			path[i] = delim;
-+	}
-+}
-+
- #ifdef CONFIG_CIFS_STATS
- #define cifs_stats_inc atomic_inc
- 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8aea885..bba7470 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -57,8 +57,9 @@ extern int init_cifs_idmap(void);
- extern void exit_cifs_idmap(void);
- extern void cifs_destroy_idmaptrees(void);
- extern char *build_path_from_dentry(struct dentry *);
--extern char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
--					struct cifsTconInfo *tcon);
-+extern char *cifs_build_path_to_root(struct smb_vol *vol,
-+				     struct cifs_sb_info *cifs_sb,
-+				     struct cifsTconInfo *tcon);
- extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
- extern char *cifs_compose_mount_options(const char *sb_mountdata,
- 		const char *fullpath, const struct dfs_info3_param *ref,
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 2e7a79c..4f34519 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -57,61 +57,6 @@
- 
- extern mempool_t *cifs_req_poolp;
- 
--struct smb_vol {
--	char *username;
--	char *password;
--	char *domainname;
--	char *UNC;
--	char *UNCip;
--	char *iocharset;  /* local code page for mapping to and from Unicode */
--	char source_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* clnt nb name */
--	char target_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* srvr nb name */
--	uid_t cred_uid;
--	uid_t linux_uid;
--	gid_t linux_gid;
--	mode_t file_mode;
--	mode_t dir_mode;
--	unsigned secFlg;
--	bool retry:1;
--	bool intr:1;
--	bool setuids:1;
--	bool override_uid:1;
--	bool override_gid:1;
--	bool dynperm:1;
--	bool noperm:1;
--	bool no_psx_acl:1; /* set if posix acl support should be disabled */
--	bool cifs_acl:1;
--	bool no_xattr:1;   /* set if xattr (EA) support should be disabled*/
--	bool server_ino:1; /* use inode numbers from server ie UniqueId */
--	bool direct_io:1;
--	bool strict_io:1; /* strict cache behavior */
--	bool remap:1;      /* set to remap seven reserved chars in filenames */
--	bool posix_paths:1; /* unset to not ask for posix pathnames. */
--	bool no_linux_ext:1;
--	bool sfu_emul:1;
--	bool nullauth:1;   /* attempt to authenticate with null user */
--	bool nocase:1;     /* request case insensitive filenames */
--	bool nobrl:1;      /* disable sending byte range locks to srv */
--	bool mand_lock:1;  /* send mandatory not posix byte range lock reqs */
--	bool seal:1;       /* request transport encryption on share */
--	bool nodfs:1;      /* Do not request DFS, even if available */
--	bool local_lease:1; /* check leases only on local system, not remote */
--	bool noblocksnd:1;
--	bool noautotune:1;
--	bool nostrictsync:1; /* do not force expensive SMBflush on every sync */
--	bool fsc:1;	/* enable fscache */
--	bool mfsymlinks:1; /* use Minshall+French Symlinks */
--	bool multiuser:1;
--	unsigned int rsize;
--	unsigned int wsize;
--	bool sockopt_tcp_nodelay:1;
--	unsigned short int port;
--	unsigned long actimeo; /* attribute cache timeout (jiffies) */
--	char *prepath;
--	struct sockaddr_storage srcaddr; /* allow binding to a local IP */
--	struct nls_table *local_nls;
--};
--
- /* FIXME: should these be tunable? */
- #define TLINK_ERROR_EXPIRE	(1 * HZ)
- #define TLINK_IDLE_EXPIRE	(600 * HZ)
-@@ -2566,12 +2511,6 @@ void reset_cifs_unix_caps(int xid, struct cifsTconInfo *tcon,
- 					CIFS_MOUNT_POSIX_PATHS;
- 		}
- 
--		/* We might be setting the path sep back to a different
--		form if we are reconnecting and the server switched its
--		posix path capability for this share */
--		if (sb && (CIFS_SB(sb)->prepathlen > 0))
--			CIFS_SB(sb)->prepath[0] = CIFS_DIR_SEP(CIFS_SB(sb));
--
- 		if (sb && (CIFS_SB(sb)->rsize > 127 * 1024)) {
- 			if ((cap & CIFS_UNIX_LARGE_READ_CAP) == 0) {
- 				CIFS_SB(sb)->rsize = 127 * 1024;
-@@ -2612,26 +2551,6 @@ void reset_cifs_unix_caps(int xid, struct cifsTconInfo *tcon,
- 	}
- }
- 
--static void
--convert_delimiter(char *path, char delim)
--{
--	int i;
--	char old_delim;
--
--	if (path == NULL)
--		return;
--
--	if (delim == '/')
--		old_delim = '\\';
--	else
--		old_delim = '/';
--
--	for (i = 0; path[i] != '\0'; i++) {
--		if (path[i] == old_delim)
--			path[i] = delim;
--	}
--}
--
- void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 			struct cifs_sb_info *cifs_sb)
- {
-@@ -2652,18 +2571,6 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 		/* Windows ME may prefer this */
- 		cFYI(1, "readsize set to minimum: 2048");
- 	}
--	/* calculate prepath */
--	cifs_sb->prepath = pvolume_info->prepath;
--	if (cifs_sb->prepath) {
--		cifs_sb->prepathlen = strlen(cifs_sb->prepath);
--		/* we can not convert the / to \ in the path
--		separators in the prefixpath yet because we do not
--		know (until reset_cifs_unix_caps is called later)
--		whether POSIX PATH CAP is available. We normalize
--		the / to \ after reset_cifs_unix_caps is called */
--		pvolume_info->prepath = NULL;
--	} else
--		cifs_sb->prepathlen = 0;
- 	cifs_sb->mnt_uid = pvolume_info->linux_uid;
- 	cifs_sb->mnt_gid = pvolume_info->linux_gid;
- 	cifs_sb->mnt_file_mode = pvolume_info->file_mode;
-@@ -2827,24 +2734,13 @@ build_unc_path_to_root(const struct smb_vol *volume_info,
- 	char *full_path;
- 
- 	int unc_len = strnlen(volume_info->UNC, MAX_TREE_SIZE + 1);
--	full_path = kmalloc(unc_len + cifs_sb->prepathlen + 1, GFP_KERNEL);
-+	full_path = kmalloc(unc_len + 1, GFP_KERNEL);
- 	if (full_path == NULL)
- 		return ERR_PTR(-ENOMEM);
- 
- 	strncpy(full_path, volume_info->UNC, unc_len);
--	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) {
--		int i;
--		for (i = 0; i < unc_len; i++) {
--			if (full_path[i] == '\\')
--				full_path[i] = '/';
--		}
--	}
--
--	if (cifs_sb->prepathlen)
--		strncpy(full_path + unc_len, cifs_sb->prepath,
--				cifs_sb->prepathlen);
--
--	full_path[unc_len + cifs_sb->prepathlen] = 0; /* add trailing null */
-+	full_path[unc_len] = 0; /* add trailing null */
-+	convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
- 	return full_path;
- }
- 
-@@ -3036,10 +2932,6 @@ try_mount_again:
- 	else
- 		tcon->unix_ext = 0; /* server does not support them */
- 
--	/* convert forward to back slashes in prepath here if needed */
--	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) == 0)
--		convert_delimiter(cifs_sb->prepath, CIFS_DIR_SEP(cifs_sb));
--
- 	if ((tcon->unix_ext == 0) && (cifs_sb->rsize > (1024 * 127))) {
- 		cifs_sb->rsize = 1024 * 127;
- 		cFYI(DBG2, "no very large read support, rsize now 127K");
-@@ -3069,10 +2961,10 @@ remote_path_check:
- 	}
- #endif
- 
--	/* check if a whole path (including prepath) is not remote */
-+	/* check if a whole path is not remote */
- 	if (!rc && tcon) {
- 		/* build_path_to_root works only when we have a valid tcon */
--		full_path = cifs_build_path_to_root(cifs_sb, tcon);
-+		full_path = cifs_build_path_to_root(volume_info, cifs_sb, tcon);
- 		if (full_path == NULL) {
- 			rc = -ENOMEM;
- 			goto mount_fail_check;
-@@ -3098,10 +2990,6 @@ remote_path_check:
- 			rc = -ELOOP;
- 			goto mount_fail_check;
- 		}
--		/* convert forward to back slashes in prepath here if needed */
--		if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) == 0)
--			convert_delimiter(cifs_sb->prepath,
--					CIFS_DIR_SEP(cifs_sb));
- 
- 		rc = expand_dfs_referral(xid, pSesInfo, volume_info, cifs_sb,
- 					 true);
-@@ -3327,7 +3215,6 @@ cifs_umount(struct super_block *sb, struct cifs_sb_info *cifs_sb)
- 	struct rb_root *root = &cifs_sb->tlink_tree;
- 	struct rb_node *node;
- 	struct tcon_link *tlink;
--	char *tmp;
- 
- 	cancel_delayed_work_sync(&cifs_sb->prune_tlinks);
- 
-@@ -3344,11 +3231,6 @@ cifs_umount(struct super_block *sb, struct cifs_sb_info *cifs_sb)
- 	}
- 	spin_unlock(&cifs_sb->tlink_tree_lock);
- 
--	tmp = cifs_sb->prepath;
--	cifs_sb->prepathlen = 0;
--	cifs_sb->prepath = NULL;
--	kfree(tmp);
--
- 	return 0;
- }
- 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 9ea65cf..c33446d 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -50,7 +50,6 @@ build_path_from_dentry(struct dentry *direntry)
- {
- 	struct dentry *temp;
- 	int namelen;
--	int pplen;
- 	int dfsplen;
- 	char *full_path;
- 	char dirsep;
-@@ -63,13 +62,12 @@ build_path_from_dentry(struct dentry *direntry)
- 		when the server crashed */
- 
- 	dirsep = CIFS_DIR_SEP(cifs_sb);
--	pplen = cifs_sb->prepathlen;
- 	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
- 		dfsplen = strnlen(tcon->treeName, MAX_TREE_SIZE + 1);
- 	else
- 		dfsplen = 0;
- cifs_bp_rename_retry:
--	namelen = pplen + dfsplen;
-+	namelen = dfsplen;
- 	for (temp = direntry; !IS_ROOT(temp);) {
- 		namelen += (1 + temp->d_name.len);
- 		temp = temp->d_parent;
-@@ -100,7 +98,7 @@ cifs_bp_rename_retry:
- 			return NULL;
- 		}
- 	}
--	if (namelen != pplen + dfsplen) {
-+	if (namelen != dfsplen) {
- 		cERROR(1, "did not end path lookup where expected namelen is %d",
- 			namelen);
- 		/* presumably this is only possible if racing with a rename
-@@ -126,7 +124,6 @@ cifs_bp_rename_retry:
- 			}
- 		}
- 	}
--	strncpy(full_path + dfsplen, CIFS_SB(direntry->d_sb)->prepath, pplen);
- 	return full_path;
- }
- 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index de02ed5..791d85e 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -735,10 +735,10 @@ static const struct inode_operations cifs_ipc_inode_ops = {
- 	.lookup = cifs_lookup,
+@@ -529,6 +529,14 @@ struct cifsFileInfo {
+ 	struct work_struct oplock_break; /* work for oplock breaks */
  };
  
--char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
--				struct cifsTconInfo *tcon)
-+char *cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
-+			      struct cifsTconInfo *tcon)
++struct cifs_io_parms {
++	__u16 netfid;
++	__u32 pid;
++	__u64 offset;
++	unsigned int length;
++	struct cifsTconInfo *tcon;
++};
++
+ /*
+  * Take a reference on the file private data. Must be called with
+  * cifs_file_list_lock held.
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index bba7470..e41f607 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -349,15 +349,12 @@ extern int CIFSSMBRead(const int xid, struct cifsTconInfo *tcon,
+ 			const int netfid, unsigned int count,
+ 			const __u64 lseek, unsigned int *nbytes, char **buf,
+ 			int *return_buf_type);
+-extern int CIFSSMBWrite(const int xid, struct cifsTconInfo *tcon,
+-			const int netfid, const unsigned int count,
+-			const __u64 lseek, unsigned int *nbytes,
+-			const char *buf, const char __user *ubuf,
++extern int CIFSSMBWrite(const int xid, struct cifs_io_parms *io_parms,
++			unsigned int *nbytes, const char *buf,
++			const char __user *ubuf, const int long_op);
++extern int CIFSSMBWrite2(const int xid, struct cifs_io_parms *io_parms,
++			unsigned int *nbytes, struct kvec *iov, const int nvec,
+ 			const int long_op);
+-extern int CIFSSMBWrite2(const int xid, struct cifsTconInfo *tcon,
+-			const int netfid, const unsigned int count,
+-			const __u64 offset, unsigned int *nbytes,
+-			struct kvec *iov, const int nvec, const int long_op);
+ extern int CIFSGetSrvInodeNumber(const int xid, struct cifsTconInfo *tcon,
+ 			const unsigned char *searchName, __u64 *inode_number,
+ 			const struct nls_table *nls_codepage,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 136df01..f39fa08 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1487,9 +1487,8 @@ CIFSSMBRead(const int xid, struct cifsTconInfo *tcon, const int netfid,
+ 
+ 
+ int
+-CIFSSMBWrite(const int xid, struct cifsTconInfo *tcon,
+-	     const int netfid, const unsigned int count,
+-	     const __u64 offset, unsigned int *nbytes, const char *buf,
++CIFSSMBWrite(const int xid, struct cifs_io_parms *io_parms,
++	     unsigned int *nbytes, const char *buf,
+ 	     const char __user *ubuf, const int long_op)
  {
--	int pplen = cifs_sb->prepathlen;
-+	int pplen = vol->prepath ? strlen(vol->prepath) : 0;
- 	int dfsplen;
- 	char *full_path = NULL;
+ 	int rc = -EACCES;
+@@ -1498,6 +1497,11 @@ CIFSSMBWrite(const int xid, struct cifsTconInfo *tcon,
+ 	int bytes_returned, wct;
+ 	__u32 bytes_sent;
+ 	__u16 byte_count;
++	__u32 pid = io_parms->pid;
++	__u16 netfid = io_parms->netfid;
++	__u64 offset = io_parms->offset;
++	struct cifsTconInfo *tcon = io_parms->tcon;
++	unsigned int count = io_parms->length;
  
-@@ -772,7 +772,7 @@ char *cifs_build_path_to_root(struct cifs_sb_info *cifs_sb,
- 			}
- 		}
+ 	*nbytes = 0;
+ 
+@@ -1519,6 +1523,10 @@ CIFSSMBWrite(const int xid, struct cifsTconInfo *tcon,
+ 		      (void **) &pSMBr);
+ 	if (rc)
+ 		return rc;
++
++	pSMB->hdr.Pid = cpu_to_le16((__u16)pid);
++	pSMB->hdr.PidHigh = cpu_to_le16((__u16)(pid >> 16));
++
+ 	/* tcon and ses pointer are checked in smb_init */
+ 	if (tcon->ses->server == NULL)
+ 		return -ECONNABORTED;
+@@ -1778,6 +1786,9 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 		goto async_writev_out;
  	}
--	strncpy(full_path + dfsplen, cifs_sb->prepath, pplen);
-+	strncpy(full_path + dfsplen, vol->prepath, pplen);
- 	full_path[dfsplen + pplen] = 0; /* add trailing null */
- 	return full_path;
+ 
++	smb->hdr.Pid = cpu_to_le16((__u16)wdata->cfile->pid);
++	smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->cfile->pid >> 16));
++
+ 	smb->AndXCommand = 0xFF;	/* none */
+ 	smb->Fid = wdata->cfile->netfid;
+ 	smb->OffsetLow = cpu_to_le32(wdata->offset & 0xFFFFFFFF);
+@@ -1841,16 +1852,20 @@ async_writev_out:
  }
-@@ -884,19 +884,13 @@ struct inode *cifs_root_iget(struct super_block *sb)
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct inode *inode = NULL;
- 	long rc;
--	char *full_path;
- 	struct cifsTconInfo *tcon = cifs_sb_master_tcon(cifs_sb);
  
--	full_path = cifs_build_path_to_root(cifs_sb, tcon);
--	if (full_path == NULL)
--		return ERR_PTR(-ENOMEM);
--
- 	xid = GetXid();
- 	if (tcon->unix_ext)
--		rc = cifs_get_inode_info_unix(&inode, full_path, sb, xid);
-+		rc = cifs_get_inode_info_unix(&inode, "", sb, xid);
- 	else
--		rc = cifs_get_inode_info(&inode, full_path, NULL, sb,
--						xid, NULL);
-+		rc = cifs_get_inode_info(&inode, "", NULL, sb, xid, NULL);
+ int
+-CIFSSMBWrite2(const int xid, struct cifsTconInfo *tcon,
+-	     const int netfid, const unsigned int count,
+-	     const __u64 offset, unsigned int *nbytes, struct kvec *iov,
+-	     int n_vec, const int long_op)
++CIFSSMBWrite2(const int xid, struct cifs_io_parms *io_parms,
++	      unsigned int *nbytes, struct kvec *iov, int n_vec,
++	      const int long_op)
+ {
+ 	int rc = -EACCES;
+ 	WRITE_REQ *pSMB = NULL;
+ 	int wct;
+ 	int smb_hdr_len;
+ 	int resp_buf_type = 0;
++	__u32 pid = io_parms->pid;
++	__u16 netfid = io_parms->netfid;
++	__u64 offset = io_parms->offset;
++	struct cifsTconInfo *tcon = io_parms->tcon;
++	unsigned int count = io_parms->length;
  
- 	if (!inode) {
- 		inode = ERR_PTR(rc);
-@@ -922,7 +916,6 @@ struct inode *cifs_root_iget(struct super_block *sb)
+ 	*nbytes = 0;
+ 
+@@ -1868,6 +1883,10 @@ CIFSSMBWrite2(const int xid, struct cifsTconInfo *tcon,
+ 	rc = small_smb_init(SMB_COM_WRITE_ANDX, wct, tcon, (void **) &pSMB);
+ 	if (rc)
+ 		return rc;
++
++	pSMB->hdr.Pid = cpu_to_le16((__u16)pid);
++	pSMB->hdr.PidHigh = cpu_to_le16((__u16)(pid >> 16));
++
+ 	/* tcon and ses pointer are checked in smb_init */
+ 	if (tcon->ses->server == NULL)
+ 		return -ECONNABORTED;
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index c33446d..aa0669a 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -354,6 +354,7 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct tcon_link *tlink;
+ 	struct cifsTconInfo *pTcon;
++	struct cifs_io_parms io_parms;
+ 	char *full_path = NULL;
+ 	struct inode *newinode = NULL;
+ 	int oplock = 0;
+@@ -436,16 +437,19 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
+ 	 * timestamps in, but we can reuse it safely */
+ 
+ 	pdev = (struct win_dev *)buf;
++	io_parms.netfid = fileHandle;
++	io_parms.pid = current->tgid;
++	io_parms.tcon = pTcon;
++	io_parms.offset = 0;
++	io_parms.length = sizeof(struct win_dev);
+ 	if (S_ISCHR(mode)) {
+ 		memcpy(pdev->type, "IntxCHR", 8);
+ 		pdev->major =
+ 		      cpu_to_le64(MAJOR(device_number));
+ 		pdev->minor =
+ 		      cpu_to_le64(MINOR(device_number));
+-		rc = CIFSSMBWrite(xid, pTcon,
+-			fileHandle,
+-			sizeof(struct win_dev),
+-			0, &bytes_written, (char *)pdev,
++		rc = CIFSSMBWrite(xid, &io_parms,
++			&bytes_written, (char *)pdev,
+ 			NULL, 0);
+ 	} else if (S_ISBLK(mode)) {
+ 		memcpy(pdev->type, "IntxBLK", 8);
+@@ -453,10 +457,8 @@ int cifs_mknod(struct inode *inode, struct dentry *direntry, int mode,
+ 		      cpu_to_le64(MAJOR(device_number));
+ 		pdev->minor =
+ 		      cpu_to_le64(MINOR(device_number));
+-		rc = CIFSSMBWrite(xid, pTcon,
+-			fileHandle,
+-			sizeof(struct win_dev),
+-			0, &bytes_written, (char *)pdev,
++		rc = CIFSSMBWrite(xid, &io_parms,
++			&bytes_written, (char *)pdev,
+ 			NULL, 0);
+ 	} /* else if (S_ISFIFO) */
+ 	CIFSSMBClose(xid, pTcon, fileHandle);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 00b926c..dfc0d35 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -857,7 +857,7 @@ cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+ 		cifsi->server_eof = end_of_write;
+ }
+ 
+-static ssize_t cifs_write(struct cifsFileInfo *open_file,
++static ssize_t cifs_write(struct cifsFileInfo *open_file, __u32 pid,
+ 			  const char *write_data, size_t write_size,
+ 			  loff_t *poffset)
+ {
+@@ -869,6 +869,7 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
+ 	int xid;
+ 	struct dentry *dentry = open_file->dentry;
+ 	struct cifsInodeInfo *cifsi = CIFS_I(dentry->d_inode);
++	struct cifs_io_parms io_parms;
+ 
+ 	cifs_sb = CIFS_SB(dentry->d_sb);
+ 
+@@ -901,8 +902,13 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file,
+ 			/* iov[0] is reserved for smb header */
+ 			iov[1].iov_base = (char *)write_data + total_written;
+ 			iov[1].iov_len = len;
+-			rc = CIFSSMBWrite2(xid, pTcon, open_file->netfid, len,
+-					   *poffset, &bytes_written, iov, 1, 0);
++			io_parms.netfid = open_file->netfid;
++			io_parms.pid = pid;
++			io_parms.tcon = pTcon;
++			io_parms.offset = *poffset;
++			io_parms.length = len;
++			rc = CIFSSMBWrite2(xid, &io_parms, &bytes_written, iov,
++					   1, 0);
+ 		}
+ 		if (rc || (bytes_written == 0)) {
+ 			if (total_written)
+@@ -1071,8 +1077,8 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 
+ 	open_file = find_writable_file(CIFS_I(mapping->host), false);
+ 	if (open_file) {
+-		bytes_written = cifs_write(open_file, write_data,
+-					   to - from, &offset);
++		bytes_written = cifs_write(open_file, open_file->pid,
++					   write_data, to - from, &offset);
+ 		cifsFileInfo_put(open_file);
+ 		/* Does mm or vfs already set times? */
+ 		inode->i_atime = inode->i_mtime = current_fs_time(inode->i_sb);
+@@ -1363,8 +1369,8 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
+ 		/* BB check if anything else missing out of ppw
+ 		   such as updating last write time */
+ 		page_data = kmap(page);
+-		rc = cifs_write(file->private_data, page_data + offset,
+-				copied, &pos);
++		rc = cifs_write(file->private_data, current->tgid,
++				page_data + offset, copied, &pos);
+ 		/* if (rc < 0) should we set writebehind rc? */
+ 		kunmap(page);
+ 
+@@ -1515,6 +1521,7 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+ 	struct cifsFileInfo *open_file;
+ 	struct cifsTconInfo *pTcon;
+ 	struct cifs_sb_info *cifs_sb;
++	struct cifs_io_parms io_parms;
+ 	int xid, rc;
+ 
+ 	len = iov_length(iov, nr_segs);
+@@ -1573,9 +1580,13 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+ 				if (rc != 0)
+ 					break;
+ 			}
+-			rc = CIFSSMBWrite2(xid, pTcon, open_file->netfid,
+-					   cur_len, *poffset, &written,
+-					   to_send, npages, 0);
++			io_parms.netfid = open_file->netfid;
++			io_parms.pid = current->tgid;
++			io_parms.tcon = pTcon;
++			io_parms.offset = *poffset;
++			io_parms.length = cur_len;
++			rc = CIFSSMBWrite2(xid, &io_parms, &written, to_send,
++					   npages, 0);
+ 		} while (rc == -EAGAIN);
+ 
+ 		for (i = 0; i < npages; i++)
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 791d85e..53ea625 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1866,6 +1866,7 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct tcon_link *tlink = NULL;
+ 	struct cifsTconInfo *pTcon = NULL;
++	struct cifs_io_parms io_parms;
+ 
+ 	/*
+ 	 * To avoid spurious oplock breaks from server, in the case of
+@@ -1887,8 +1888,14 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
+ 		cFYI(1, "SetFSize for attrs rc = %d", rc);
+ 		if ((rc == -EINVAL) || (rc == -EOPNOTSUPP)) {
+ 			unsigned int bytes_written;
+-			rc = CIFSSMBWrite(xid, pTcon, nfid, 0, attrs->ia_size,
+-					  &bytes_written, NULL, NULL, 1);
++
++			io_parms.netfid = nfid;
++			io_parms.pid = npid;
++			io_parms.tcon = pTcon;
++			io_parms.offset = 0;
++			io_parms.length = attrs->ia_size;
++			rc = CIFSSMBWrite(xid, &io_parms, &bytes_written,
++					  NULL, NULL, 1);
+ 			cFYI(1, "Wrt seteof rc %d", rc);
+ 		}
+ 	} else
+@@ -1923,10 +1930,15 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
+ 					CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 			if (rc == 0) {
+ 				unsigned int bytes_written;
+-				rc = CIFSSMBWrite(xid, pTcon, netfid, 0,
+-						  attrs->ia_size,
+-						  &bytes_written, NULL,
+-						  NULL, 1);
++
++				io_parms.netfid = netfid;
++				io_parms.pid = current->tgid;
++				io_parms.tcon = pTcon;
++				io_parms.offset = 0;
++				io_parms.length = attrs->ia_size;
++				rc = CIFSSMBWrite(xid, &io_parms,
++						  &bytes_written,
++						  NULL, NULL,  1);
+ 				cFYI(1, "wrt seteof rc %d", rc);
+ 				CIFSSMBClose(xid, pTcon, netfid);
+ 			}
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index ce417a9..1a6a388 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -184,6 +184,7 @@ CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
+ 	__u16 netfid = 0;
+ 	u8 *buf;
+ 	unsigned int bytes_written = 0;
++	struct cifs_io_parms io_parms;
+ 
+ 	buf = kmalloc(CIFS_MF_SYMLINK_FILE_SIZE, GFP_KERNEL);
+ 	if (!buf)
+@@ -203,10 +204,13 @@ CIFSCreateMFSymLink(const int xid, struct cifsTconInfo *tcon,
+ 		return rc;
  	}
  
- out:
--	kfree(full_path);
- 	/* can not call macro FreeXid here since in a void func
- 	 * TODO: This is no longer true
- 	 */
+-	rc = CIFSSMBWrite(xid, tcon, netfid,
+-			  CIFS_MF_SYMLINK_FILE_SIZE /* length */,
+-			  0 /* offset */,
+-			  &bytes_written, buf, NULL, 0);
++	io_parms.netfid = netfid;
++	io_parms.pid = current->tgid;
++	io_parms.tcon = tcon;
++	io_parms.offset = 0;
++	io_parms.length = CIFS_MF_SYMLINK_FILE_SIZE;
++
++	rc = CIFSSMBWrite(xid, &io_parms, &bytes_written, buf, NULL, 0);
+ 	CIFSSMBClose(xid, tcon, netfid);
+ 	kfree(buf);
+ 	if (rc != 0)
 -- 
 1.7.1
