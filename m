@@ -1,225 +1,151 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [v6 4/4] CIFS: Migrate to shared superblock model
-Date: Thu, 26 May 2011 23:35:47 +0400
-Message-ID: <1306438547-11845-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs-utils: Create man pages for cifs.idmap program
+Date: Thu, 26 May 2011 18:37:55 -0500
+Message-ID: <1306453075-30274-1-git-send-email-shirishppargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add cifs_match_super to use in sget to share superblock between mounts
-that have the same //server/sharename, credentials and mount options.
-It helps us to improve performance on work with future SMB2.1 leases.
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+
+Create man pages for program cifs.idmap
+Enable cifs.idmap config option by default.
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsfs.c   |   19 +++++++++-
- fs/cifs/cifsglob.h |   19 ++++++++++
- fs/cifs/connect.c  |  102 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 139 insertions(+), 1 deletions(-)
+ Makefile.am     |    7 +++++
+ cifs.idmap.8.in |   79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac    |    4 +-
+ 3 files changed, 88 insertions(+), 2 deletions(-)
+ create mode 100644 cifs.idmap.8.in
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 46fdd55..360fe2e 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -630,6 +630,7 @@ cifs_do_mount(struct file_system_type *fs_type,
- 	struct super_block *sb;
- 	struct cifs_sb_info *cifs_sb;
- 	struct smb_vol *volume_info;
-+	struct cifs_mnt_data mnt_data;
- 	struct dentry *root;
+diff --git a/Makefile.am b/Makefile.am
+index 6046369..9066531 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -37,4 +37,11 @@ if CONFIG_CIFSIDMAP
+ sbin_PROGRAMS += cifs.idmap
+ cifs_idmap_SOURCES = cifs.idmap.c
+ cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
++man_MANS += cifs.idmap.8
++
++cifs.idmap.8: cifs.idmap.8.in
++	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
++
++clean-local:
++	rm -f cifs.idmap.8 cifs.idmap.8-t
+ endif
+diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
+new file mode 100644
+index 0000000..9f4680e
+--- /dev/null
++++ b/cifs.idmap.8.in
+@@ -0,0 +1,79 @@
++'\" t
++.\"     Title: cifs.idmap
++.\"    Author: [see the "AUTHOR" section]
++.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
++.\"      Date: 05/26/2011
++.\"    Manual: System Administration tools
++.\"    Source: cifs-utils 4.0
++.\"  Language: English
++.\"
++.TH "CIFS\&.IDMAP" "8" "05/26/2011" "cifs-utils 4\&.0" "System Administration tools"
++.\" -----------------------------------------------------------------
++.\" * set default formatting
++.\" -----------------------------------------------------------------
++.\" disable hyphenation
++.nh
++.\" disable justification (adjust text to left margin only)
++.ad l
++.\" -----------------------------------------------------------------
++.\" * MAIN CONTENT STARTS HERE *
++.\" -----------------------------------------------------------------
++.SH "NAME"
++cifs.idmap \- Userspace helper for mapping ids for Common Internet File System (CIFS)
++.SH "SYNOPSIS"
++.HP \w'\ 'u
++cifs\&.idmap [\-\-version|\-v] {keyid}
++.SH "DESCRIPTION"
++.PP
++This tool is part of the cifs-utils suite\&.
++.PP
++cifs\&.idmap is a userspace helper program for the linux CIFS client filesystem\&. There are a number of activities that the kernel cannot easily do itself\&. This program is a callout program that does these things for the kernel and then returns the result\&.
++.PP
++cifs\&.idmap is generally intended to be run when the kernel calls request\-key(8)
++for a particular key type\&. While it can be run directly from the command\-line, it is not generally intended to be run that way\&.
++.PP
++cifs\&.idmap works in conjuction with winbind facility of Samba suite to map owner and group SIDs to uids and gids respectively.  It is best utilized when a mount option of cifsacl is specified when mounting a cifs share, winbind is specified as one of the search entries for passwd and group databases in file /etc/nsswitch.conf, file smb.conf has winbind specific entries, and winbind daemon program is running. It is also strongly recomemended to use mount options of uid and gid to specify a default uid and gid to map owner SIDs and group SIDs respectively in case services of winbind facility are unavailable.
++.SH "OPTIONS"
++.PP
++\-\-version|\-v
++.RS 4
++Print version number and exit\&.
++.RE
++.SH "CONFIGURATION FOR KEYCTL"
++.PP
++cifs\&.idmap is designed to be called from the kernel via the request\-key callout program\&. This requires that request\-key be told where and how to call this program\&. Currently cifs\&.idmap handles a key type of:
++.PP
++cifs\&.idmap
++.RS 4
++This keytype is for mapping a SID to either an uid or a gid
++.RE
++.PP
++To make this program useful for CIFS, you will need to set up entry for it in request\-key\&.conf(5)\&. Here is an example of an entry for this key type:
++.sp
++.if n \{\
++.RS 4
++.\}
++.nf
++#OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
++#=========  =============  = = ================================
++create      cifs\&.idmap    * * @sbindir@/cifs\&.idmap %k
++.fi
++.if n \{\
++.RE
++.\}
++.PP
++See
++\fBrequest-key.conf5\fR()
++for more info on each field\&.
++.SH "SEE ALSO"
++.PP
++
++\fBrequest-key.conf\fR(5),
++\fBmount.cifs\fR(8)
++.SH "AUTHOR"
++.PP
++Shirish Pargaonkar wrote the cifs\&.idmap program\&.
++.PP
++The
++Linux CIFS Mailing list
++is the preferred place to ask questions regarding these programs\&.
+diff --git a/configure.ac b/configure.ac
+index 6cac703..d7e21c9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,7 +26,7 @@ AC_ARG_ENABLE(cifsidmap,
+ 	[AC_HELP_STRING([--enable-cifsidmap],
+ 			[Create cifs.idmap binary @<:@default=no@:>@])],
+ 	enable_cifsidmap=$enableval,
+-	enable_cifsidmap="no")
++	enable_cifsidmap="maybe")
  
- 	cFYI(1, "Devname: %s flags: %d ", dev_name, flags);
-@@ -646,12 +647,21 @@ cifs_do_mount(struct file_system_type *fs_type,
+ # Checks for programs.
+ AC_PROG_CC
+@@ -152,7 +152,7 @@ LIBS=$cu_saved_libs
  
- 	cifs_setup_cifs_sb(volume_info, cifs_sb);
+ AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
+-AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" = "yes"])
++AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
  
--	sb = sget(fs_type, NULL, set_anon_super, NULL);
-+	mnt_data.vol = volume_info;
-+	mnt_data.cifs_sb = cifs_sb;
-+	mnt_data.flags = flags;
-+
-+	sb = sget(fs_type, cifs_match_super, set_anon_super, &mnt_data);
- 	if (IS_ERR(sb)) {
- 		root = ERR_CAST(sb);
- 		goto out_cifs_sb;
- 	}
+ LIBCAP_NG_PATH
  
-+	if (sb->s_fs_info) {
-+		cFYI(1, "Use existing superblock");
-+		goto out_shared;
-+	}
-+
- 	/*
- 	 * Copy mount params for use in submounts. Better to do
- 	 * the copy here and deal with the error before cleanup gets
-@@ -680,9 +690,16 @@ cifs_do_mount(struct file_system_type *fs_type,
- 	root = cifs_get_root(volume_info, sb);
- 	if (root == NULL)
- 		goto out_super;
-+
- 	cFYI(1, "dentry root is: %p", root);
- 	goto out;
- 
-+out_shared:
-+	root = cifs_get_root(volume_info, sb);
-+	if (root)
-+		cFYI(1, "dentry root is: %p", root);
-+	goto out;
-+
- out_super:
- 	kfree(cifs_sb->mountdata);
- 	deactivate_locked_super(sb);
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f57387a..7f90488 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -210,6 +210,25 @@ struct smb_vol {
- 	struct nls_table *local_nls;
- };
- 
-+#define CIFS_MOUNT_MASK (CIFS_MOUNT_NO_PERM | CIFS_MOUNT_SET_UID | \
-+			 CIFS_MOUNT_SERVER_INUM | CIFS_MOUNT_DIRECT_IO | \
-+			 CIFS_MOUNT_NO_XATTR | CIFS_MOUNT_MAP_SPECIAL_CHR | \
-+			 CIFS_MOUNT_UNX_EMUL | CIFS_MOUNT_NO_BRL | \
-+			 CIFS_MOUNT_CIFS_ACL | CIFS_MOUNT_OVERR_UID | \
-+			 CIFS_MOUNT_OVERR_GID | CIFS_MOUNT_DYNPERM | \
-+			 CIFS_MOUNT_NOPOSIXBRL | CIFS_MOUNT_NOSSYNC | \
-+			 CIFS_MOUNT_FSCACHE | CIFS_MOUNT_MF_SYMLINKS | \
-+			 CIFS_MOUNT_MULTIUSER | CIFS_MOUNT_STRICT_IO)
-+
-+#define CIFS_MS_MASK (MS_RDONLY | MS_MANDLOCK | MS_NOEXEC | MS_NOSUID | \
-+		      MS_NODEV | MS_SYNCHRONOUS)
-+
-+struct cifs_mnt_data {
-+	struct cifs_sb_info *cifs_sb;
-+	struct smb_vol *vol;
-+	int flags;
-+};
-+
- struct TCP_Server_Info {
- 	struct list_head tcp_ses_list;
- 	struct list_head smb_ses_list;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4f34519..60f9205 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2146,6 +2146,100 @@ cifs_put_tlink(struct tcon_link *tlink)
- 	return;
- }
- 
-+static inline struct tcon_link *
-+cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb);
-+
-+static int
-+compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
-+{
-+	struct cifs_sb_info *old = CIFS_SB(sb);
-+	struct cifs_sb_info *new = mnt_data->cifs_sb;
-+
-+	if ((sb->s_flags & CIFS_MS_MASK) != (mnt_data->flags & CIFS_MS_MASK))
-+		return 0;
-+
-+	if ((old->mnt_cifs_flags & CIFS_MOUNT_MASK) !=
-+	    (new->mnt_cifs_flags & CIFS_MOUNT_MASK))
-+		return 0;
-+
-+	if (old->rsize != new->rsize)
-+		return 0;
-+
-+	/*
-+	 * We want to share sb only if we don't specify wsize or specified wsize
-+	 * is greater or equal than existing one.
-+	 */
-+	if (new->wsize && new->wsize < old->wsize)
-+		return 0;
-+
-+	if (old->mnt_uid != new->mnt_uid || old->mnt_gid != new->mnt_gid)
-+		return 0;
-+
-+	if (old->mnt_file_mode != new->mnt_file_mode ||
-+	    old->mnt_dir_mode != new->mnt_dir_mode)
-+		return 0;
-+
-+	if (strcmp(old->local_nls->charset, new->local_nls->charset))
-+		return 0;
-+
-+	if (old->actimeo != new->actimeo)
-+		return 0;
-+
-+	return 1;
-+}
-+
-+int
-+cifs_match_super(struct super_block *sb, void *data)
-+{
-+	struct cifs_mnt_data *mnt_data = (struct cifs_mnt_data *)data;
-+	struct smb_vol *volume_info;
-+	struct cifs_sb_info *cifs_sb;
-+	struct TCP_Server_Info *tcp_srv;
-+	struct cifsSesInfo *ses;
-+	struct cifsTconInfo *tcon;
-+	struct tcon_link *tlink;
-+	struct sockaddr_storage addr;
-+	int rc = 0;
-+
-+	memset(&addr, 0, sizeof(struct sockaddr_storage));
-+
-+	spin_lock(&cifs_tcp_ses_lock);
-+	cifs_sb = CIFS_SB(sb);
-+	tlink = cifs_get_tlink(cifs_sb_master_tlink(cifs_sb));
-+	if (IS_ERR(tlink)) {
-+		spin_unlock(&cifs_tcp_ses_lock);
-+		return rc;
-+	}
-+	tcon = tlink_tcon(tlink);
-+	ses = tcon->ses;
-+	tcp_srv = ses->server;
-+
-+	volume_info = mnt_data->vol;
-+
-+	if (!volume_info->UNCip || !volume_info->UNC)
-+		goto out;
-+
-+	rc = cifs_fill_sockaddr((struct sockaddr *)&addr,
-+				volume_info->UNCip,
-+				strlen(volume_info->UNCip),
-+				volume_info->port);
-+	if (!rc)
-+		goto out;
-+
-+	if (!match_server(tcp_srv, (struct sockaddr *)&addr, volume_info) ||
-+	    !match_session(ses, volume_info) ||
-+	    !match_tcon(tcon, volume_info->UNC)) {
-+		rc = 0;
-+		goto out;
-+	}
-+
-+	rc = compare_mount_options(sb, mnt_data);
-+out:
-+	cifs_put_tlink(tlink);
-+	spin_unlock(&cifs_tcp_ses_lock);
-+	return rc;
-+}
-+
- int
- get_dfs_path(int xid, struct cifsSesInfo *pSesInfo, const char *old_path,
- 	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
-@@ -2571,6 +2665,14 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 		/* Windows ME may prefer this */
- 		cFYI(1, "readsize set to minimum: 2048");
- 	}
-+
-+	/*
-+	 * Temporarily set wsize for matching superblock. If we end up using
-+	 * new sb then cifs_negotiate_wsize will later negotiate it downward
-+	 * if needed.
-+	 */
-+	cifs_sb->wsize = pvolume_info->wsize;
-+
- 	cifs_sb->mnt_uid = pvolume_info->linux_uid;
- 	cifs_sb->mnt_gid = pvolume_info->linux_gid;
- 	cifs_sb->mnt_file_mode = pvolume_info->file_mode;
 -- 
-1.7.1
+1.6.0.2
