@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Subject: Re: [v4 PATCH 4/4] CIFS: Migrate to shared superblock model
-Date: Thu, 26 May 2011 10:09:20 -0400
-Message-ID: <20110526100920.1f731769@corrin.poochiereds.net>
+Date: Thu, 26 May 2011 11:20:01 -0400
+Message-ID: <20110526112001.6602ce52@corrin.poochiereds.net>
 References: <1306389721-28550-1-git-send-email-piastry@etersoft.ru>
 	<1306389721-28550-4-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
@@ -142,11 +142,11 @@ Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 > +		return 0;
 > +
 
-Currently, this will never be checked as the wsize in the new sb isn't
-set yet and will always be 0. I think the right fix is to have
-cifs_setup_cifs_sb() set the wsize in the new sb unconditionally to
-whatever it was set to in the smb_vol. If we end up using the new sb
-then cifs_negotiate_wsize will later negotiate it downward if needed.
+...also I think the above condition should be reversed. We don't want
+to match if new->wsize is smaller than the existing one. Since the
+specified wsize is just a starting point for negotiation, wsize now
+means "any wsize less than or equal to this size". If the old->wsize is
+bigger than that, then it's outside that range and we shouldn't match.
 
 > +	if (old->mnt_uid != new->mnt_uid || old->mnt_gid != new->mnt_gid)
 > +		return 0;
