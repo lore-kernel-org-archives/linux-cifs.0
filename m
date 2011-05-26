@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 2/2] CIFS: Add rwpidforward mount option
-Date: Thu, 26 May 2011 10:02:00 +0400
-Message-ID: <1306389721-28550-3-git-send-email-piastry@etersoft.ru>
+Subject: [v4 PATCH 4/4] CIFS: Migrate to shared superblock model
+Date: Thu, 26 May 2011 10:02:01 +0400
+Message-ID: <1306389721-28550-4-git-send-email-piastry@etersoft.ru>
 References: <1306389721-28550-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,474 +9,200 @@ In-Reply-To: <1306389721-28550-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add rwpidforward mount option that switches on a mode when we forward
-pid of a process who opened a file to any read and write operation.
+Add cifs_match_super to use in sget to share superblock between mounts
+that have the same //server/sharename, credentials and mount options.
+It helps us to improve performance on work with future SMB2.1 leases.
 
-This can prevent applications like WINE from failing on read or write
-operation on a previously locked file region from the same netfd from
-another process if we use mandatory brlock style.
-
-It is actual for WINE because during a run of WINE program two processes
-work on the same netfd - share the same file struct between several VFS
-fds:
-1) WINE-server does open and lock;
-2) WINE-application does read and write.
-
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/README       |    3 ++
- fs/cifs/cifs_fs_sb.h |    1 +
- fs/cifs/cifsfs.c     |    8 +++++
- fs/cifs/cifsglob.h   |    1 +
- fs/cifs/cifsproto.h  |    5 +--
- fs/cifs/cifssmb.c    |   17 +++++++---
- fs/cifs/connect.c    |    4 ++
- fs/cifs/file.c       |   82 +++++++++++++++++++++++++++++++++++++------------
- fs/cifs/inode.c      |   11 +++++--
- fs/cifs/link.c       |   22 ++++++++-----
- 10 files changed, 115 insertions(+), 39 deletions(-)
+ fs/cifs/cifsfs.c   |   19 ++++++++++-
+ fs/cifs/cifsglob.h |   19 +++++++++++
+ fs/cifs/connect.c  |   90 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 127 insertions(+), 1 deletions(-)
 
-diff --git a/fs/cifs/README b/fs/cifs/README
-index 4a3ca0e..c5c2c5e 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -457,6 +457,9 @@ A partial list of the supported mount options follows:
- 		otherwise - read from the server. All written data are stored
- 		in the cache, but if the client doesn't have Exclusive Oplock,
- 		it writes the data to the server.
-+  rwpidforward  Forward pid of a process who opened a file to any read or write
-+		operation on that file. This prevent applications like WINE
-+		from failing on read and write if we use mandatory brlock style.
-   acl   	Allow setfacl and getfacl to manage posix ACLs if server
- 		supports them.  (default)
-   noacl 	Do not allow setfacl and getfacl calls on this mount
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index c96b44b..ffb1459 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -41,6 +41,7 @@
- #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
- #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
- #define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
-+#define CIFS_MOUNT_RWPIDFORWARD	0x80000 /* use pid forwarding for rw */
- 
- struct cifs_sb_info {
- 	struct rb_root tlink_tree;
 diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 360fe2e..26981bf 100644
+index 46fdd55..360fe2e 100644
 --- a/fs/cifs/cifsfs.c
 +++ b/fs/cifs/cifsfs.c
-@@ -415,12 +415,20 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
- 		seq_printf(s, ",nocase");
- 	if (tcon->retry)
- 		seq_printf(s, ",hard");
-+	if (tcon->unix_ext)
-+		seq_printf(s, ",unix");
-+	else
-+		seq_printf(s, ",nounix");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
- 		seq_printf(s, ",posixpaths");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)
- 		seq_printf(s, ",setuids");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
- 		seq_printf(s, ",serverino");
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		seq_printf(s, ",rwpidforward");
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL)
-+		seq_printf(s, ",forcemand");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DIRECT_IO)
- 		seq_printf(s, ",directio");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
+@@ -630,6 +630,7 @@ cifs_do_mount(struct file_system_type *fs_type,
+ 	struct super_block *sb;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct smb_vol *volume_info;
++	struct cifs_mnt_data mnt_data;
+ 	struct dentry *root;
+ 
+ 	cFYI(1, "Devname: %s flags: %d ", dev_name, flags);
+@@ -646,12 +647,21 @@ cifs_do_mount(struct file_system_type *fs_type,
+ 
+ 	cifs_setup_cifs_sb(volume_info, cifs_sb);
+ 
+-	sb = sget(fs_type, NULL, set_anon_super, NULL);
++	mnt_data.vol = volume_info;
++	mnt_data.cifs_sb = cifs_sb;
++	mnt_data.flags = flags;
++
++	sb = sget(fs_type, cifs_match_super, set_anon_super, &mnt_data);
+ 	if (IS_ERR(sb)) {
+ 		root = ERR_CAST(sb);
+ 		goto out_cifs_sb;
+ 	}
+ 
++	if (sb->s_fs_info) {
++		cFYI(1, "Use existing superblock");
++		goto out_shared;
++	}
++
+ 	/*
+ 	 * Copy mount params for use in submounts. Better to do
+ 	 * the copy here and deal with the error before cleanup gets
+@@ -680,9 +690,16 @@ cifs_do_mount(struct file_system_type *fs_type,
+ 	root = cifs_get_root(volume_info, sb);
+ 	if (root == NULL)
+ 		goto out_super;
++
+ 	cFYI(1, "dentry root is: %p", root);
+ 	goto out;
+ 
++out_shared:
++	root = cifs_get_root(volume_info, sb);
++	if (root)
++		cFYI(1, "dentry root is: %p", root);
++	goto out;
++
+ out_super:
+ 	kfree(cifs_sb->mountdata);
+ 	deactivate_locked_super(sb);
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index ca0c378..310cdda 100644
+index f57387a..7f90488 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -200,6 +200,7 @@ struct smb_vol {
- 	bool fsc:1;	/* enable fscache */
- 	bool mfsymlinks:1; /* use Minshall+French Symlinks */
- 	bool multiuser:1;
-+	bool rwpidforward:1; /* pid forward for read/write operations */
- 	unsigned int rsize;
- 	unsigned int wsize;
- 	bool sockopt_tcp_nodelay:1;
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index e41f607..1706345 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -345,9 +345,8 @@ extern int CIFSSMBClose(const int xid, struct cifsTconInfo *tcon,
- extern int CIFSSMBFlush(const int xid, struct cifsTconInfo *tcon,
- 			const int smb_file_id);
+@@ -210,6 +210,25 @@ struct smb_vol {
+ 	struct nls_table *local_nls;
+ };
  
--extern int CIFSSMBRead(const int xid, struct cifsTconInfo *tcon,
--			const int netfid, unsigned int count,
--			const __u64 lseek, unsigned int *nbytes, char **buf,
-+extern int CIFSSMBRead(const int xid, struct cifs_io_parms *io_parms,
-+			unsigned int *nbytes, char **buf,
- 			int *return_buf_type);
- extern int CIFSSMBWrite(const int xid, struct cifs_io_parms *io_parms,
- 			unsigned int *nbytes, const char *buf,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index f39fa08..19fd815 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1382,8 +1382,7 @@ openRetry:
- }
- 
- int
--CIFSSMBRead(const int xid, struct cifsTconInfo *tcon, const int netfid,
--	    const unsigned int count, const __u64 lseek, unsigned int *nbytes,
-+CIFSSMBRead(const int xid, struct cifs_io_parms *io_parms, unsigned int *nbytes,
- 	    char **buf, int *pbuf_type)
- {
- 	int rc = -EACCES;
-@@ -1393,13 +1392,18 @@ CIFSSMBRead(const int xid, struct cifsTconInfo *tcon, const int netfid,
- 	int wct;
- 	int resp_buf_type = 0;
- 	struct kvec iov[1];
-+	__u32 pid = io_parms->pid;
-+	__u16 netfid = io_parms->netfid;
-+	__u64 offset = io_parms->offset;
-+	struct cifsTconInfo *tcon = io_parms->tcon;
-+	unsigned int count = io_parms->length;
- 
- 	cFYI(1, "Reading %d bytes on fid %d", count, netfid);
- 	if (tcon->ses->capabilities & CAP_LARGE_FILES)
- 		wct = 12;
- 	else {
- 		wct = 10; /* old style read */
--		if ((lseek >> 32) > 0)  {
-+		if ((offset >> 32) > 0)  {
- 			/* can not handle this big offset for old */
- 			return -EIO;
- 		}
-@@ -1410,15 +1414,18 @@ CIFSSMBRead(const int xid, struct cifsTconInfo *tcon, const int netfid,
- 	if (rc)
- 		return rc;
- 
-+	pSMB->hdr.Pid = cpu_to_le16((__u16)pid);
-+	pSMB->hdr.PidHigh = cpu_to_le16((__u16)(pid >> 16));
++#define CIFS_MOUNT_MASK (CIFS_MOUNT_NO_PERM | CIFS_MOUNT_SET_UID | \
++			 CIFS_MOUNT_SERVER_INUM | CIFS_MOUNT_DIRECT_IO | \
++			 CIFS_MOUNT_NO_XATTR | CIFS_MOUNT_MAP_SPECIAL_CHR | \
++			 CIFS_MOUNT_UNX_EMUL | CIFS_MOUNT_NO_BRL | \
++			 CIFS_MOUNT_CIFS_ACL | CIFS_MOUNT_OVERR_UID | \
++			 CIFS_MOUNT_OVERR_GID | CIFS_MOUNT_DYNPERM | \
++			 CIFS_MOUNT_NOPOSIXBRL | CIFS_MOUNT_NOSSYNC | \
++			 CIFS_MOUNT_FSCACHE | CIFS_MOUNT_MF_SYMLINKS | \
++			 CIFS_MOUNT_MULTIUSER | CIFS_MOUNT_STRICT_IO)
 +
- 	/* tcon and ses pointer are checked in smb_init */
- 	if (tcon->ses->server == NULL)
- 		return -ECONNABORTED;
- 
- 	pSMB->AndXCommand = 0xFF;       /* none */
- 	pSMB->Fid = netfid;
--	pSMB->OffsetLow = cpu_to_le32(lseek & 0xFFFFFFFF);
-+	pSMB->OffsetLow = cpu_to_le32(offset & 0xFFFFFFFF);
- 	if (wct == 12)
--		pSMB->OffsetHigh = cpu_to_le32(lseek >> 32);
-+		pSMB->OffsetHigh = cpu_to_le32(offset >> 32);
- 
- 	pSMB->Remaining = 0;
- 	pSMB->MaxCount = cpu_to_le16(count & 0xFFFF);
++#define CIFS_MS_MASK (MS_RDONLY | MS_MANDLOCK | MS_NOEXEC | MS_NOSUID | \
++		      MS_NODEV | MS_SYNCHRONOUS)
++
++struct cifs_mnt_data {
++	struct cifs_sb_info *cifs_sb;
++	struct smb_vol *vol;
++	int flags;
++};
++
+ struct TCP_Server_Info {
+ 	struct list_head tcp_ses_list;
+ 	struct list_head smb_ses_list;
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 3172baa..4ebb940 100644
+index 4f34519..3172baa 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -1359,6 +1359,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			vol->server_ino = 1;
- 		} else if (strnicmp(data, "noserverino", 9) == 0) {
- 			vol->server_ino = 0;
-+		} else if (strnicmp(data, "rwpidforward", 4) == 0) {
-+			vol->rwpidforward = 1;
- 		} else if (strnicmp(data, "cifsacl", 7) == 0) {
- 			vol->cifs_acl = 1;
- 		} else if (strnicmp(data, "nocifsacl", 9) == 0) {
-@@ -2689,6 +2691,8 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOSSYNC;
- 	if (pvolume_info->mand_lock)
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOPOSIXBRL;
-+	if (pvolume_info->rwpidforward)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RWPIDFORWARD;
- 	if (pvolume_info->cifs_acl)
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_ACL;
- 	if (pvolume_info->override_uid)
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index dfc0d35..7db74d1 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -725,8 +725,8 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
- 			else
- 				posix_lock_type = CIFS_WRLCK;
- 			rc = CIFSSMBPosixLock(xid, tcon, netfid, 1 /* get */,
--					length,	pfLock,
--					posix_lock_type, wait_flag);
-+					length, pfLock, posix_lock_type,
-+					wait_flag);
- 			FreeXid(xid);
- 			return rc;
- 		}
-@@ -797,8 +797,8 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *pfLock)
- 			posix_lock_type = CIFS_UNLCK;
+@@ -2146,6 +2146,96 @@ cifs_put_tlink(struct tcon_link *tlink)
+ 	return;
+ }
  
- 		rc = CIFSSMBPosixLock(xid, tcon, netfid, 0 /* set */,
--				      length, pfLock,
--				      posix_lock_type, wait_flag);
-+				      length, pfLock, posix_lock_type,
-+				      wait_flag);
- 	} else {
- 		struct cifsFileInfo *fid = file->private_data;
- 
-@@ -1346,6 +1346,14 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- {
- 	int rc;
- 	struct inode *inode = mapping->host;
-+	struct cifsFileInfo *cfile = file->private_data;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(cfile->dentry->d_sb);
-+	__u32 pid;
++static inline struct tcon_link *
++cifs_sb_master_tlink(struct cifs_sb_info *cifs_sb);
 +
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = cfile->pid;
-+	else
-+		pid = current->tgid;
- 
- 	cFYI(1, "write_end for page %p from pos %lld with %d bytes",
- 		 page, pos, copied);
-@@ -1369,8 +1377,7 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- 		/* BB check if anything else missing out of ppw
- 		   such as updating last write time */
- 		page_data = kmap(page);
--		rc = cifs_write(file->private_data, current->tgid,
--				page_data + offset, copied, &pos);
-+		rc = cifs_write(cfile, pid, page_data + offset, copied, &pos);
- 		/* if (rc < 0) should we set writebehind rc? */
- 		kunmap(page);
- 
-@@ -1523,6 +1530,7 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifs_io_parms io_parms;
- 	int xid, rc;
-+	__u32 pid;
- 
- 	len = iov_length(iov, nr_segs);
- 	if (!len)
-@@ -1554,6 +1562,12 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
- 
- 	xid = GetXid();
- 	open_file = file->private_data;
++static int
++compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
++{
++	struct cifs_sb_info *old = CIFS_SB(sb);
++	struct cifs_sb_info *new = mnt_data->cifs_sb;
 +
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = open_file->pid;
-+	else
-+		pid = current->tgid;
++	if ((sb->s_flags & CIFS_MS_MASK) != (mnt_data->flags & CIFS_MS_MASK))
++		return 0;
 +
- 	pTcon = tlink_tcon(open_file->tlink);
- 	inode = file->f_path.dentry->d_inode;
- 
-@@ -1581,7 +1595,7 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
- 					break;
- 			}
- 			io_parms.netfid = open_file->netfid;
--			io_parms.pid = current->tgid;
-+			io_parms.pid = pid;
- 			io_parms.tcon = pTcon;
- 			io_parms.offset = *poffset;
- 			io_parms.length = cur_len;
-@@ -1682,7 +1696,9 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 	struct cifsTconInfo *pTcon;
- 	struct cifsFileInfo *open_file;
- 	struct smb_com_read_rsp *pSMBr;
-+	struct cifs_io_parms io_parms;
- 	char *read_data;
-+	__u32 pid;
- 
- 	if (!nr_segs)
- 		return 0;
-@@ -1697,6 +1713,11 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 	open_file = file->private_data;
- 	pTcon = tlink_tcon(open_file->tlink);
- 
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = open_file->pid;
-+	else
-+		pid = current->tgid;
++	if ((old->mnt_cifs_flags & CIFS_MOUNT_MASK) !=
++	    (new->mnt_cifs_flags & CIFS_MOUNT_MASK))
++		return 0;
 +
- 	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
- 		cFYI(1, "attempting read on write only file instance");
- 
-@@ -1712,8 +1733,12 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 				if (rc != 0)
- 					break;
- 			}
--			rc = CIFSSMBRead(xid, pTcon, open_file->netfid,
--					 cur_len, *poffset, &bytes_read,
-+			io_parms.netfid = open_file->netfid;
-+			io_parms.pid = pid;
-+			io_parms.tcon = pTcon;
-+			io_parms.offset = *poffset;
-+			io_parms.length = len;
-+			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
- 					 &read_data, &buf_type);
- 			pSMBr = (struct smb_com_read_rsp *)read_data;
- 			if (read_data) {
-@@ -1794,7 +1819,9 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
- 	int xid;
- 	char *current_offset;
- 	struct cifsFileInfo *open_file;
-+	struct cifs_io_parms io_parms;
- 	int buf_type = CIFS_NO_BUFFER;
-+	__u32 pid;
- 
- 	xid = GetXid();
- 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
-@@ -1807,6 +1834,11 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
- 	open_file = file->private_data;
- 	pTcon = tlink_tcon(open_file->tlink);
- 
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = open_file->pid;
-+	else
-+		pid = current->tgid;
++	if (old->rsize != new->rsize)
++		return 0;
 +
- 	if ((file->f_flags & O_ACCMODE) == O_WRONLY)
- 		cFYI(1, "attempting read on write only file instance");
- 
-@@ -1829,11 +1861,13 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
- 				if (rc != 0)
- 					break;
- 			}
--			rc = CIFSSMBRead(xid, pTcon,
--					 open_file->netfid,
--					 current_read_size, *poffset,
--					 &bytes_read, &current_offset,
--					 &buf_type);
-+			io_parms.netfid = open_file->netfid;
-+			io_parms.pid = pid;
-+			io_parms.tcon = pTcon;
-+			io_parms.offset = *poffset;
-+			io_parms.length = current_read_size;
-+			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
-+					 &current_offset, &buf_type);
- 		}
- 		if (rc || (bytes_read == 0)) {
- 			if (total_read) {
-@@ -1970,7 +2004,9 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	char *smb_read_data = NULL;
- 	struct smb_com_read_rsp *pSMBr;
- 	struct cifsFileInfo *open_file;
-+	struct cifs_io_parms io_parms;
- 	int buf_type = CIFS_NO_BUFFER;
-+	__u32 pid;
- 
- 	xid = GetXid();
- 	if (file->private_data == NULL) {
-@@ -1992,6 +2028,11 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 		goto read_complete;
- 
- 	cFYI(DBG2, "rpages: num pages %d", num_pages);
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-+		pid = open_file->pid;
-+	else
-+		pid = current->tgid;
++	if (new->wsize && new->wsize > old->wsize)
++		return 0;
 +
- 	for (i = 0; i < num_pages; ) {
- 		unsigned contig_pages;
- 		struct page *tmp_page;
-@@ -2033,12 +2074,13 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 				if (rc != 0)
- 					break;
- 			}
--
--			rc = CIFSSMBRead(xid, pTcon,
--					 open_file->netfid,
--					 read_size, offset,
--					 &bytes_read, &smb_read_data,
--					 &buf_type);
-+			io_parms.netfid = open_file->netfid;
-+			io_parms.pid = pid;
-+			io_parms.tcon = pTcon;
-+			io_parms.offset = offset;
-+			io_parms.length = read_size;
-+			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
-+					 &smb_read_data, &buf_type);
- 			/* BB more RC checks ? */
- 			if (rc == -EAGAIN) {
- 				if (smb_read_data) {
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 53ea625..e2d9dd8 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -374,6 +374,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const unsigned char *path,
- 	__u16 netfid;
- 	struct tcon_link *tlink;
- 	struct cifsTconInfo *tcon;
-+	struct cifs_io_parms io_parms;
- 	char buf[24];
- 	unsigned int bytes_read;
- 	char *pbuf;
-@@ -405,9 +406,13 @@ cifs_sfu_type(struct cifs_fattr *fattr, const unsigned char *path,
- 	if (rc == 0) {
- 		int buf_type = CIFS_NO_BUFFER;
- 			/* Read header */
--		rc = CIFSSMBRead(xid, tcon, netfid,
--				 24 /* length */, 0 /* offset */,
--				 &bytes_read, &pbuf, &buf_type);
-+		io_parms.netfid = netfid;
-+		io_parms.pid = current->tgid;
-+		io_parms.tcon = tcon;
-+		io_parms.offset = 0;
-+		io_parms.length = 24;
-+		rc = CIFSSMBRead(xid, &io_parms, &bytes_read, &pbuf,
-+				 &buf_type);
- 		if ((rc == 0) && (bytes_read >= 8)) {
- 			if (memcmp("IntxBLK", pbuf, 8) == 0) {
- 				cFYI(1, "Block device");
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 1a6a388..4682d44 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -235,6 +235,7 @@ CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
- 	unsigned int bytes_read = 0;
- 	int buf_type = CIFS_NO_BUFFER;
- 	unsigned int link_len = 0;
-+	struct cifs_io_parms io_parms;
- 	FILE_ALL_INFO file_info;
- 
- 	rc = CIFSSMBOpen(xid, tcon, searchName, FILE_OPEN, GENERIC_READ,
-@@ -253,11 +254,13 @@ CIFSQueryMFSymLink(const int xid, struct cifsTconInfo *tcon,
- 	if (!buf)
- 		return -ENOMEM;
- 	pbuf = buf;
-+	io_parms.netfid = netfid;
-+	io_parms.pid = current->tgid;
-+	io_parms.tcon = tcon;
-+	io_parms.offset = 0;
-+	io_parms.length = CIFS_MF_SYMLINK_FILE_SIZE;
- 
--	rc = CIFSSMBRead(xid, tcon, netfid,
--			 CIFS_MF_SYMLINK_FILE_SIZE /* length */,
--			 0 /* offset */,
--			 &bytes_read, &pbuf, &buf_type);
-+	rc = CIFSSMBRead(xid, &io_parms, &bytes_read, &pbuf, &buf_type);
- 	CIFSSMBClose(xid, tcon, netfid);
- 	if (rc != 0) {
- 		kfree(buf);
-@@ -296,6 +299,7 @@ CIFSCheckMFSymlink(struct cifs_fattr *fattr,
- 	__u16 netfid = 0;
- 	struct tcon_link *tlink;
- 	struct cifsTconInfo *pTcon;
-+	struct cifs_io_parms io_parms;
- 	u8 *buf;
- 	char *pbuf;
- 	unsigned int bytes_read = 0;
-@@ -332,11 +336,13 @@ CIFSCheckMFSymlink(struct cifs_fattr *fattr,
- 		goto out;
- 	}
- 	pbuf = buf;
-+	io_parms.netfid = netfid;
-+	io_parms.pid = current->tgid;
-+	io_parms.tcon = pTcon;
-+	io_parms.offset = 0;
-+	io_parms.length = CIFS_MF_SYMLINK_FILE_SIZE;
- 
--	rc = CIFSSMBRead(xid, pTcon, netfid,
--			 CIFS_MF_SYMLINK_FILE_SIZE /* length */,
--			 0 /* offset */,
--			 &bytes_read, &pbuf, &buf_type);
-+	rc = CIFSSMBRead(xid, &io_parms, &bytes_read, &pbuf, &buf_type);
- 	CIFSSMBClose(xid, pTcon, netfid);
- 	if (rc != 0) {
- 		kfree(buf);
++	if (old->mnt_uid != new->mnt_uid || old->mnt_gid != new->mnt_gid)
++		return 0;
++
++	if (old->mnt_file_mode != new->mnt_file_mode ||
++	    old->mnt_dir_mode != new->mnt_dir_mode)
++		return 0;
++
++	if (strcmp(old->local_nls->charset, new->local_nls->charset))
++		return 0;
++
++	if (old->actimeo != new->actimeo)
++		return 0;
++
++	return 1;
++}
++
++int
++cifs_match_super(struct super_block *sb, void *data)
++{
++	struct cifs_mnt_data *mnt_data = (struct cifs_mnt_data *)data;
++	struct smb_vol *volume_info;
++	struct cifs_sb_info *cifs_sb;
++	struct TCP_Server_Info *tcp_srv;
++	struct cifsSesInfo *ses;
++	struct cifsTconInfo *tcon;
++	struct tcon_link *tlink;
++	struct sockaddr_storage addr;
++	int rc = 0;
++
++	memset(&addr, 0, sizeof(struct sockaddr_storage));
++
++	spin_lock(&cifs_tcp_ses_lock);
++	cifs_sb = CIFS_SB(sb);
++	tlink = cifs_get_tlink(cifs_sb_master_tlink(cifs_sb));
++	if (IS_ERR(tlink)) {
++		spin_unlock(&cifs_tcp_ses_lock);
++		return rc;
++	}
++	tcon = tlink_tcon(tlink);
++	ses = tcon->ses;
++	tcp_srv = ses->server;
++
++	volume_info = mnt_data->vol;
++
++	if (!volume_info->UNCip || !volume_info->UNC)
++		goto out;
++
++	rc = cifs_fill_sockaddr((struct sockaddr *)&addr,
++				volume_info->UNCip,
++				strlen(volume_info->UNCip),
++				volume_info->port);
++	if (!rc)
++		goto out;
++
++	if (!match_server(tcp_srv, (struct sockaddr *)&addr, volume_info) ||
++	    !match_session(ses, volume_info) ||
++	    !match_tcon(tcon, volume_info->UNC)) {
++		rc = 0;
++		goto out;
++	}
++
++	rc = compare_mount_options(sb, mnt_data);
++out:
++	cifs_put_tlink(tlink);
++	spin_unlock(&cifs_tcp_ses_lock);
++	return rc;
++}
++
+ int
+ get_dfs_path(int xid, struct cifsSesInfo *pSesInfo, const char *old_path,
+ 	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
 -- 
 1.7.1
