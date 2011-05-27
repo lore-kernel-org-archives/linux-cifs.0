@@ -1,73 +1,84 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: sparse warning in cifsacl.c
-Date: Fri, 27 May 2011 07:27:17 -0500
-Message-ID: <BANLkTimPsO+=Mj0eKC-DhZ_z0Q_FSsRbEg@mail.gmail.com>
-References: <BANLkTinzZeiiOChBDDymhCsuOw57fTP2Ng@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Fri, 27 May 2011 10:36:50 -0500
+Message-ID: <BANLkTikL34jsdYOVL_z6mvwgTk8fAjNVEA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTinzZeiiOChBDDymhCsuOw57fTP2Ng-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, May 26, 2011 at 11:48 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wro=
-te:
-> Shirish - below is a patch to fix a sparse warning in the cifsacl
-> code. =A0The change around line 458 is cosmetic (doesn't look like th=
-e
-> original code caused a problem but at least this quiets sparse) but
-> doesn't sid_authusers have an endian error. =A0 How far back does thi=
-s
-> bug go - does it affect much?
+The following changes since commit 71a8638480eb8fb6cfabe2ee9ca3fbc6e3453a14:
 
-Yes, sid_authusers have an endian error.
+  Merge branch 'viafb-next' of git://github.com/schandinat/linux-2.6
+(2011-05-22 12:39:58 -0700)
 
->
-> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> index 076b69c..5f02b4e 100644
-> --- a/fs/cifs/cifsacl.c
-> +++ b/fs/cifs/cifsacl.c
-> @@ -38,7 +38,7 @@ static const struct cifs_sid sid_everyone =3D {
-> =A0 =A0 =A0 =A01, 1, {0, 0, 0, 0, 0, 1}, {0} };
-> =A0/* security id for Authenticated Users system group */
-> =A0static const struct cifs_sid sid_authusers =3D {
-> - =A0 =A0 =A0 1, 1, {0, 0, 0, 0, 0, 5}, {11} };
+are available in the git repository at:
 
-This variable was addedd in commit 2fbc2f1729e785a7b2faf9d8d60926bb1ff6=
-2af0
+  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git
+..BRANCH.NOT.VERIFIED..
 
-> + =A0 =A0 =A0 1, 1, {0, 0, 0, 0, 0, 5}, {cpu_to_le32(11)} };
-> =A0/* group users */
-> =A0static const struct cifs_sid sid_user =3D {1, 2 , {0, 0, 0, 0, 0, =
-5}, {} };
->
-> @@ -458,7 +458,8 @@ int compare_sids(const struct cifs_sid *ctsid,
-> const struct cifs_sid *cwsid)
-> =A0 =A0 =A0 =A0if (num_subauth) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0for (i =3D 0; i < num_subauth; ++i) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (ctsid->sub_auth[i]=
- !=3D cwsid->sub_auth[i]) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cts=
-id->sub_auth[i] > cwsid->sub_auth[i])
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (le3=
-2_to_cpu(ctsid->sub_auth[i]) >
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 le32_to_cpu(cwsid->sub_auth[i]))
+Christoph Hellwig (1):
+      cifs: remove unused SMB2 config and mount options
 
-This code has been around for quite some time.
+Jeff Layton (7):
+      cifs: consolidate SendReceive response checks
+      cifs: make cifs_send_async take a kvec array
+      cifs: add ignore_pend flag to cifs_call_async
+      cifs: don't call mid_q_entry->callback under the Global_MidLock (try #5)
+      cifs: convert cifs_writepages to use async writes
+      cifs: clean up wsize negotiation and allow for larger wsize
+      cifs: add cifs_async_writev
 
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0return 1;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0return -1;
->
->
-> --
-> Thanks,
->
-> Steve
->
+Pavel Shilovsky (7):
+      CIFS: Simplify connection structure search calls
+      CIFS: Simplify mount code for further shared sb capability
+      CIFS: Fix undefined behavior when mount fails
+      CIFS: Use pid saved from cifsFileInfo in writepages and set_file_size
+      CIFS: Fix memory leak in cifs_do_mount
+      CIFS: Migrate to shared superblock model
+      CIFS: Add rwpidforward mount option
+
+Steve French (5):
+      [CIFS] When mandatory encryption on share, fail mount
+      [CIFS] Migrate from prefixpath logic
+      Fix extended security auth failure
+      [CIFS] Rename three structures to avoid camel case
+      [CIFS] Fix endian error comparing authusers when cifsacl enabled
+
+ fs/cifs/Kconfig        |   20 --
+ fs/cifs/README         |    3 +
+ fs/cifs/cache.c        |    6 +-
+ fs/cifs/cifs_debug.c   |   26 +-
+ fs/cifs/cifs_dfs_ref.c |    2 +-
+ fs/cifs/cifs_fs_sb.h   |    3 +-
+ fs/cifs/cifs_spnego.c  |    2 +-
+ fs/cifs/cifs_spnego.h  |    2 +-
+ fs/cifs/cifsacl.c      |    9 +-
+ fs/cifs/cifsencrypt.c  |   14 +-
+ fs/cifs/cifsfs.c       |  233 ++++++++++++++----
+ fs/cifs/cifsglob.h     |  129 +++++++++-
+ fs/cifs/cifsproto.h    |  209 +++++++++-------
+ fs/cifs/cifssmb.c      |  463 ++++++++++++++++++++++++++++--------
+ fs/cifs/connect.c      |  625 +++++++++++++++++++++++++++---------------------
+ fs/cifs/dir.c          |   33 ++--
+ fs/cifs/file.c         |  376 +++++++++++++++--------------
+ fs/cifs/fscache.c      |    6 +-
+ fs/cifs/fscache.h      |    8 +-
+ fs/cifs/inode.c        |   92 ++++----
+ fs/cifs/ioctl.c        |    2 +-
+ fs/cifs/link.c         |   46 +++--
+ fs/cifs/misc.c         |   32 ++--
+ fs/cifs/netmisc.c      |    2 +-
+ fs/cifs/readdir.c      |    8 +-
+ fs/cifs/sess.c         |   42 ++--
+ fs/cifs/transport.c    |  214 +++++-----------
+ fs/cifs/xattr.c        |    8 +-
+ 28 files changed, 1571 insertions(+), 1044 deletions(-)
+
+-- 
+Thanks,
+
+Steve
