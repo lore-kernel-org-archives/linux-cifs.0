@@ -1,59 +1,59 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Big performance improvements seen with cifs async write patches
- even over localhost
-Date: Fri, 27 May 2011 12:09:30 -0500
-Message-ID: <BANLkTikCUy-R16_QhuwNtynP9mXd9zFDNQ@mail.gmail.com>
-References: <BANLkTinVOaFwkCf33iKNk8GjqiiBEF5N3w@mail.gmail.com>
-	<20110527164702.GB28520@samba2>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: sparse warning in cifsacl.c
+Date: Fri, 27 May 2011 15:44:59 -0400
+Message-ID: <20110527154459.1da9c523@tlielax.poochiereds.net>
+References: <BANLkTinzZeiiOChBDDymhCsuOw57fTP2Ng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110527164702.GB28520@samba2>
+In-Reply-To: <BANLkTinzZeiiOChBDDymhCsuOw57fTP2Ng-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, May 27, 2011 at 11:47 AM, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Fri, May 27, 2011 at 12:14:19AM -0500, Steve French wrote:
->> Did some informal testing of Jeff Layton's cifs async_write patch set
->> tonight (recent kernel). Copying 700MB sequentially was 20% faster
->> from cifs kernel client to Samba 3.6 with his patches - even mounted
->> over localhost (where network latency is a much smaller issue) and
->> with a slow laptop drive!
->>
->> I was simply doing
->>
->> time dd if=/dev/zero of=/mnt/null bs=1M count=700
->>
->> repeated 4 times each way (with old module, and with same code with
->> Jeff's cifs async write code builtin), deleting the target file in
->> between each run.
->>
->> I am looking forward to trying this over GigE tomorrow to servers with
->> faster disks.
+On Thu, 26 May 2011 23:48:45 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Note that Samba defaults to negotiating a 128K write size but sending
-"min receivefile size" in smb.conf to a larger value will allow larger
-writes.   I see slightly better performance on the simple dd test over
-localhost network interface with larger wsize of 512K than I do with
-the default (128K).   I haven't measured the ideal wsize yet but
-presumably it will vary depending on network and disk speed and server
-load.
+> Shirish - below is a patch to fix a sparse warning in the cifsacl
+> code.  The change around line 458 is cosmetic (doesn't look like the
+> original code caused a problem but at least this quiets sparse) but
+> doesn't sid_authusers have an endian error.   How far back does this
+> bug go - does it affect much?
+> 
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index 076b69c..5f02b4e 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -38,7 +38,7 @@ static const struct cifs_sid sid_everyone = {
+>  	1, 1, {0, 0, 0, 0, 0, 1}, {0} };
+>  /* security id for Authenticated Users system group */
+>  static const struct cifs_sid sid_authusers = {
+> -	1, 1, {0, 0, 0, 0, 0, 5}, {11} };
+> +	1, 1, {0, 0, 0, 0, 0, 5}, {cpu_to_le32(11)} };
+					^^^^^^^^^
+This will break on big-endian arches. You need to use
+__constant_cpu_to_le32() instead.
 
-> Very nice ! Now where's my encrypted transport Steve ? :-) :-)
-
-First cleanup patch is in (which gracefully handles failing mounts
-when server requires encryption and client can't do it).    The 2nd
-part - the NTLMSSP negotiation inside setfsunixinfo wasn't too bad and
-I plan to send out for review within a few days.  I haven't written
-the piece which uses these credentials to do the encryption yet.
-
+>  /* group users */
+>  static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
+> 
+> @@ -458,7 +458,8 @@ int compare_sids(const struct cifs_sid *ctsid,
+> const struct cifs_sid *cwsid)
+>  	if (num_subauth) {
+>  		for (i = 0; i < num_subauth; ++i) {
+>  			if (ctsid->sub_auth[i] != cwsid->sub_auth[i]) {
+> -				if (ctsid->sub_auth[i] > cwsid->sub_auth[i])
+> +				if (le32_to_cpu(ctsid->sub_auth[i]) >
+> +					le32_to_cpu(cwsid->sub_auth[i]))
+>  					return 1;
+>  				else
+>  					return -1;
+> 
+> 
 
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
