@@ -1,65 +1,69 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Big performance improvements seen with cifs async write patches
- even over localhost
-Date: Sat, 28 May 2011 12:21:55 -0500
-Message-ID: <BANLkTik1vW-PnEiaSfLnr0pWhr_rFLTowQ@mail.gmail.com>
-References: <BANLkTinVOaFwkCf33iKNk8GjqiiBEF5N3w@mail.gmail.com>
-	<20110527164702.GB28520@samba2>
+From: Darren Salt <linux-Ym6Ivm/Ks7B65+NM0QMiFAbYiX8G1TQY9dF7HbQ/qKg@public.gmane.org>
+Subject: [3.0-rc1] CIFS ACL build failure without CONFIG_KEYS
+Date: Tue, 31 May 2011 17:23:54 +0000
+Message-ID: <51E1844698%linux@youmustbejoking.demon.co.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: multipart/mixed; boundary="1001750892--2062166408--1767141629"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110527164702.GB28520@samba2>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, May 27, 2011 at 11:47 AM, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Fri, May 27, 2011 at 12:14:19AM -0500, Steve French wrote:
->> Did some informal testing of Jeff Layton's cifs async_write patch set
->> tonight (recent kernel). Copying 700MB sequentially was 20% faster
->> from cifs kernel client to Samba 3.6 with his patches - even mounted
->> over localhost (where network latency is a much smaller issue) and
->> with a slow laptop drive!
->>
->> I was simply doing
->>
->> time dd if=/dev/zero of=/mnt/null bs=1M count=700
->>
->> repeated 4 times each way (with old module, and with same code with
->> Jeff's cifs async write code builtin), deleting the target file in
->> between each run.
->>
->> I am looking forward to trying this over GigE tomorrow to servers with
->> faster disks.
->
-> Very nice ! Now where's my encrypted transport Steve ? :-) :-)
->
-> Jeremy.
+This message is in MIME format.
 
-Did some additional informal testing with this (current mainline vs.
-cifs from 2.6.39) and the results are even better.
+--1001750892--2062166408--1767141629
+Content-Type: text/plain; charset=us-ascii
 
-Mounted over GiGE to midrange desktop system from my laptop.  Copying
-2.5GB to the server was 88% faster with current mainline.   Repeated
-the test 3 times each way.  Current mainline cifs averaged 98.9 MB/s
-for sequential file copy vs. 52.6 MB/s (for 2.6.39 and older).
+In 3.0-rc1, without CONFIG_KEYS, cifs-acl.c compilation fails with various
+errors, including one about trying to dereference an incomplete type (struct
+keys, defined in <linux/key.h>).
 
-stevef@stevef-laptop:~$ time dd if=/dev/zero of=/mnt/null bs=1M count=2500
-2500+0 records in
-2500+0 records out
-2621440000 bytes (2.6 GB) copied, 26.3095 s, 99.6 MB/s
-
-real	0m27.201s
-user	0m0.000s
-sys	0m3.340s
-
-
-
+I'm including two patches for this since I don't know which way to go on this
+one: pick whichever is more correct :-)
 
 -- 
-Thanks,
+| Darren Salt  | linux or ds at  | nr. Ashington, |  _  ASCII ribbon
+| using Debian | youmustbejoking | Northumberland | ( ) campaign against
+| GNU/Linux    | ,demon,co,uk    |                |  X  HTML e-mail
+                                                    / \ www.asciiribbon.org
+Live every day like it's your last, because one day you'll be right.
 
-Steve
+
+--1001750892--2062166408--1767141629
+Content-Type: application/octet-stream; name="cifs-acl-key-v1.patch"
+Content-Disposition: attachment; filename="cifs-acl-key-v1.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbTogRGFycmVuIFNhbHQgPGxpbnV4QHlvdW11c3RiZWpva2luZy5kZW1vbi5jby51az4K
+U3ViamVjdDogQ0lGUyBBQ0wgc3VwcG9ydCBuZWVkcyBDT05GSUdfS0VZUywgc28gc2VsZWN0
+IGl0CgpTaWduZWQtb2ZmLWJ5OiBEYXJyZW4gU2FsdCA8bGludXhAeW91bXVzdGJlam9raW5n
+LmRlbW9uLmNvLnVrPgoKLS0tIGEvZnMvY2lmcy9LY29uZmlnLmJhc2UJMjAxMS0wNS0zMCAw
+MTo0MzozNi4wMDAwMDAwMDAgKzAxMDAKKysrIGIvZnMvY2lmcy9LY29uZmlnCTIwMTEtMDUt
+MzEgMTc6MDU6MjEuNjk5NDIxMDM4ICswMTAwCkBAIC0xNDksNiArMTQ5LDcgQEAKIGNvbmZp
+ZyBDSUZTX0FDTAogCSAgYm9vbCAiUHJvdmlkZSBDSUZTIEFDTCBzdXBwb3J0IChFWFBFUklN
+RU5UQUwpIgogCSAgZGVwZW5kcyBvbiBFWFBFUklNRU5UQUwgJiYgQ0lGU19YQVRUUgorCSAg
+c2VsZWN0IEtFWVMKIAkgIGhlbHAKIAkgICAgQWxsb3dzIHRvIGZldGNoIENJRlMvTlRGUyBB
+Q0wgZnJvbSB0aGUgc2VydmVyLiAgVGhlIERBQ0wgYmxvYgogCSAgICBpcyBoYW5kZWQgb3Zl
+ciB0byB0aGUgYXBwbGljYXRpb24vY2FsbGVyLgo=
+
+--1001750892--2062166408--1767141629
+Content-Type: application/octet-stream; name="cifs-acl-key-v2.patch"
+Content-Disposition: attachment; filename="cifs-acl-key-v2.patch"
+Content-Transfer-Encoding: base64
+
+RnJvbTogRGFycmVuIFNhbHQgPGxpbnV4QHlvdW11c3RiZWpva2luZy5kZW1vbi5jby51az4K
+U3ViamVjdDogQ0lGUyBBQ0wgc3VwcG9ydCBuZWVkcyBDT05GSUdfS0VZUywgc28gZGVwZW5k
+IG9uIGl0CgpCdWlsZCBmYWlscyBpZiBDT05GSUdfS0VZUyBpcyBub3Qgc2VsZWN0ZWQuCgpT
+aWduZWQtb2ZmLWJ5OiBEYXJyZW4gU2FsdCA8bGludXhAeW91bXVzdGJlam9raW5nLmRlbW9u
+LmNvLnVrPgoKLS0tIGEvZnMvY2lmcy9LY29uZmlnLmJhc2UJMjAxMS0wNS0zMCAwMTo0Mzoz
+Ni4wMDAwMDAwMDAgKzAxMDAKKysrIGIvZnMvY2lmcy9LY29uZmlnCTIwMTEtMDUtMzEgMTc6
+MTQ6MTAuNDM1ODcwODA4ICswMTAwCkBAIC0xNDgsNyArMTQ4LDcgQEAKIAogY29uZmlnIENJ
+RlNfQUNMCiAJICBib29sICJQcm92aWRlIENJRlMgQUNMIHN1cHBvcnQgKEVYUEVSSU1FTlRB
+TCkiCi0JICBkZXBlbmRzIG9uIEVYUEVSSU1FTlRBTCAmJiBDSUZTX1hBVFRSCisJICBkZXBl
+bmRzIG9uIEVYUEVSSU1FTlRBTCAmJiBDSUZTX1hBVFRSICYmIEtFWVMKIAkgIGhlbHAKIAkg
+ICAgQWxsb3dzIHRvIGZldGNoIENJRlMvTlRGUyBBQ0wgZnJvbSB0aGUgc2VydmVyLiAgVGhl
+IERBQ0wgYmxvYgogCSAgICBpcyBoYW5kZWQgb3ZlciB0byB0aGUgYXBwbGljYXRpb24vY2Fs
+bGVyLgo=
+
+--1001750892--2062166408--1767141629--
