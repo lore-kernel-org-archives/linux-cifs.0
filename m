@@ -1,205 +1,149 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Create man pages for cifs.idmap program
- (try #2)
-Date: Wed, 1 Jun 2011 15:28:48 -0400
-Message-ID: <20110601152848.3f396bcb@tlielax.poochiereds.net>
-References: <1306951902-14115-1-git-send-email-shirishppargaonkar@gmail.com>
+From: Jeff Layton <jlayton@samba.org>
+Subject: ANNOUNCE: cifs-utils release 5.0 available for download
+Date: Wed, 1 Jun 2011 16:11:37 -0400
+Message-ID: <20110601161137.6cbe5cdf@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1306951902-14115-1-git-send-email-shirishppargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	samba@samba.org
+Return-path: <samba-technical-bounces@lists.samba.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed,  1 Jun 2011 13:11:42 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> Create man pages for program cifs.idmap
-> Enable cifs.idmap config option by default.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  Makefile.am     |   14 ++++++++-
->  cifs.idmap.8.in |   90 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  configure.ac    |    7 +++-
->  3 files changed, 108 insertions(+), 3 deletions(-)
->  create mode 100644 cifs.idmap.8.in
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 6046369..4938447 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -9,6 +9,7 @@ mount_cifs_LDADD = $(LIBCAP) $(CAPNG_LDADD)
->  man_MANS = mount.cifs.8
->  
->  sbin_PROGRAMS =
-> +clean-local: clean-local-upcall clean-local-idmap
->  
->  if CONFIG_CIFSUPCALL
->  sbin_PROGRAMS += cifs.upcall
-> @@ -22,8 +23,10 @@ man_MANS += cifs.upcall.8
->  #
->  cifs.upcall.8: cifs.upcall.8.in
->  	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
-> +endif
->  
-> -clean-local:
-> +clean-local-upcall:
-> +if CONFIG_CIFSUPCALL
->  	rm -f cifs.upcall.8 cifs.upcall.8-t
->  endif
->  
-> @@ -37,4 +40,13 @@ if CONFIG_CIFSIDMAP
->  sbin_PROGRAMS += cifs.idmap
->  cifs_idmap_SOURCES = cifs.idmap.c
->  cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
-> +man_MANS += cifs.idmap.8
-> +
-> +cifs.idmap.8: cifs.idmap.8.in
-> +	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
-> +endif
-> +
-> +clean-local-idmap:
-> +if CONFIG_CIFSIDMAP
-> +	rm -f cifs.idmap.8 cifs.idmap.8-t
->  endif
-> diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
-> new file mode 100644
-> index 0000000..fb2e826
-> --- /dev/null
-> +++ b/cifs.idmap.8.in
-> @@ -0,0 +1,90 @@
-> +'\" t
-> +.\"     Title: cifs.idmap
-> +.\"    Author: [see the "AUTHOR" section]
-> +.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
-> +.\"      Date: 05/26/2011
-> +.\"    Manual: System Administration tools
-> +.\"    Source: cifs-utils 4.0
-> +.\"  Language: English
-> +.\"
-> +.TH "CIFS\&.IDMAP" "8" "05/26/2011" "cifs-utils 4\&.0" "System Administration tools"
-> +.\" -----------------------------------------------------------------
-> +.\" * set default formatting
-> +.\" -----------------------------------------------------------------
-> +.\" disable hyphenation
-> +.nh
-> +.\" disable justification (adjust text to left margin only)
-> +.ad l
-> +.\" -----------------------------------------------------------------
-> +.\" * MAIN CONTENT STARTS HERE *
-> +.\" -----------------------------------------------------------------
-> +.SH "NAME"
-> +cifs.idmap \- Userspace helper for mapping ids for Common Internet File System (CIFS)
-> +.SH "SYNOPSIS"
-> +.HP \w'\ 'u
-> +cifs\&.idmap [\-\-version|\-v] {keyid}
-> +.SH "DESCRIPTION"
-> +.PP
-> +This tool is part of the cifs-utils suite\&.
-> +.PP
-> +cifs\&.idmap is a userspace helper program for the linux CIFS client filesystem\&. There are a number of activities that the kernel cannot easily do itself\&. This program is a callout program that does these things for the kernel and then returns the result\&.
-> +.PP
-> +cifs\&.idmap is generally intended to be run when the kernel calls request\-key(8)
-> +for a particular key type\&. While it can be run directly from the command\-line, it is not generally intended to be run that way\&.
-> +.PP
-> +cifs\&.idmap works in conjuction with winbind facility of Samba suite to map owner and group SIDs to uids and gids respectively.  It is best utilized when
-> +.br
-> +\t\- a mount option of cifsacl is specified when mounting a cifs share
-> +.br
-> +\t\- winbind is specified as one of the search entries for passwd and group databases in file /etc/nsswitch.conf
-> +.br
-> +\t\- file smb.conf has winbind specific entries
-> +.br
-> +\t\- winbind daemon program is running
-> +.br
-> +.sp
-> +In case winbind and cifs.idmap facilities are unavailable, file objects in a mounted share are assigned uid and gid of the credentials of the process that mounted the share.  So it is strongly recomemended to use mount options of uid and gid to specify a default uid and gid to map owner SIDs and group SIDs respectively in case services of winbind and cifs.idmap facility are unavailable.  
-> +.SH "OPTIONS"
-> +.PP
-> +\-\-version|\-v
-> +.RS 4
-> +Print version number and exit\&.
-> +.RE
-> +.SH "CONFIGURATION FOR KEYCTL"
-> +.PP
-> +cifs\&.idmap is designed to be called from the kernel via the request\-key callout program\&. This requires that request\-key be told where and how to call this program\&. Currently cifs\&.idmap handles a key type of:
-> +.PP
-> +cifs\&.idmap
-> +.RS 4
-> +This keytype is for mapping a SID to either an uid or a gid
-> +.RE
-> +.PP
-> +To make this program useful for CIFS, you will need to set up entry for it in request\-key\&.conf(5)\&. Here is an example of an entry for this key type:
-> +.sp
-> +.if n \{\
-> +.RS 4
-> +.\}
-> +.nf
-> +#OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
-> +#=========  =============  = = ================================
-> +create      cifs\&.idmap   * * @sbindir@/cifs\&.idmap %k
-> +.fi
-> +.if n \{\
-> +.RE
-> +.\}
-> +.PP
-> +See
-> +\fBrequest-key.conf5\fR()
-> +for more info on each field\&.
-> +.SH "SEE ALSO"
-> +.PP
-> +
-> +\fBrequest-key.conf\fR(5),
-> +\fBmount.cifs\fR(8)
-> +.SH "AUTHOR"
-> +.PP
-> +Shirish Pargaonkar wrote the cifs\&.idmap program\&.
-> +.PP
-> +The
-> +Linux CIFS Mailing list
-> +is the preferred place to ask questions regarding these programs\&.
-> diff --git a/configure.ac b/configure.ac
-> index 6cac703..e21f23e 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -26,7 +26,7 @@ AC_ARG_ENABLE(cifsidmap,
->  	[AC_HELP_STRING([--enable-cifsidmap],
->  			[Create cifs.idmap binary @<:@default=no@:>@])],
->  	enable_cifsidmap=$enableval,
-> -	enable_cifsidmap="no")
-> +	enable_cifsidmap="maybe")
->  
->  # Checks for programs.
->  AC_PROG_CC
-> @@ -88,6 +88,9 @@ if test $enable_cifsupcall != "no" -o $enable_cifsidmap != "no"; then
->  				fi
->  				if test "$enable_cifsidmap" = "yes"; then
->  					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
-> +				else
-> +					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifs.idmap.])
-> +					enable_cifsidmap="no"
->  				fi
->  			])
->  fi
-> @@ -152,7 +155,7 @@ LIBS=$cu_saved_libs
->  
->  AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
->  AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
-> -AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" = "yes"])
-> +AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
->  
->  LIBCAP_NG_PATH
->  
-
-Committed, along with a patch to clean up a few whitespace and minor manpage nits.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpJdCdzIGJl
+ZW4gYSB3aGlsZSBzaW5jZSBvdXIgbGFzdCByZWxlYXNlIGFuZCBTaGlyaXNoJ3MgbmV3IGNpZnMu
+aWRtYXANCnV0aWxpdHkgaGFzIG5vdyBiZWVuIG1lcmdlZC4gVGhlIGxhc3QgcmVsZWFzZSB3YXMg
+NC45LCBzbyBJJ3ZlIGJlZW4gYQ0KYml0IHRvcm4gLS0gc2hvdWxkIEkgY2FsbCB0aGlzIG9uZSA0
+LjEwIG9yIDUuMD8NCg0KVGhlbiBJIGZpZ3VyZWQuLi53aGVuIGluIGRvdWJ0LCBjb3B5IExpbnVz
+LiBTaW5jZSBoZSBqdXN0IGJ1bXBlZCB0aGUNCm1ham9yIHZlcnNpb24gbnVtYmVyIG9mIHRoZSBr
+ZXJuZWwsIHRoaXMgaXMgbm93IHZlcnNpb24gNS4wLg0KDQpUaGUgbWFpbiBjaGFuZ2VzOg0KDQot
+IC0gbW91bnQuY2lmcyBhbHdheXMgdXNlcyB0aGUgb3JpZ2luYWwgZGV2aWNlIHN0cmluZyB0byBl
+bnN1cmUgdGhhdCB1bW91bnRzDQogIGJ5IHVucHJpdmlsZWdlZCB1c2VycyBhcmUgbm90IHByb2Js
+ZW1hdGljDQoNCi0gLSB0aGVyZSBpcyBhIG5ldyBjaWZzLmlkbWFwIHByb2dyYW0gZm9yIGhhbmRs
+aW5nIGlkbWFwcGluZyB1cGNhbGxzDQoNCi0gLSBhIGxvdCBvZiBtYW5wYWdlIHBhdGNoZXMNCg0K
+d2VicGFnZTogICAgaHR0cDovL2xpbnV4LWNpZnMuc2FtYmEub3JnL2NpZnMtdXRpbHMvDQp0YXJi
+YWxsOiAgICBmdHA6Ly9mdHAuc2FtYmEub3JnL3B1Yi9saW51eC1jaWZzL2NpZnMtdXRpbHMvDQpn
+aXQ6ICAgICAgICBnaXQ6Ly9naXQuc2FtYmEub3JnL2NpZnMtdXRpbHMuZ2l0DQpnaXR3ZWI6ICAg
+ICBodHRwOi8vZ2l0LnNhbWJhLm9yZy8/cD1jaWZzLXV0aWxzLmdpdDthPXN1bW1hcnkNCg0KRGV0
+YWlsZWQgY2hhbmdlbG9nIHNpbmNlIDQuOToNCg0KY29tbWl0IDIwMWUzZmNjOGZkMjQzNzk5MGQw
+NjFiMjkyODNkZTI1NmE3ZjM3ZmQNCkF1dGhvcjogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEu
+b3JnPg0KRGF0ZTogICBUdWUgTWFyIDE1IDEzOjMwOjM3IDIwMTEgLTA0MDANCg0KICAgIGF1dG9j
+b25mOiBidW1wIHZlcnNpb24gdG8gNC45LjEgZm9yIGludGVyaW0gYnVpbGRzDQogICAgDQogICAg
+U2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQg
+YmMyYmI2NTk1MDUyNTA4MTQ1NzU3NWE4MzMyNTEzNTVjNjFiNjU5OQ0KQXV0aG9yOiBQYXZlbCBT
+aGlsb3Zza3kgPHBpYXN0cnlAZXRlcnNvZnQucnU+DQpEYXRlOiAgIFR1ZSBNYXIgMTUgMTM6MzA6
+NDQgMjAxMSAtMDQwMA0KDQogICAgbWFucGFnZTogYWRkIGVudHJ5IGZvciBzdHJpY3RjYWNoZSBv
+cHRpb24NCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBQYXZlbCBTaGlsb3Zza3kgPHBpYXN0cnlA
+ZXRlcnNvZnQucnU+DQoNCmNvbW1pdCBmZmFjNjAxYzQ1YjE2N2ExYWYxZDM1NTYxZjFjMDFhYjA4
+MTNjYzE0DQpBdXRob3I6IEx1ayBDbGFlcyA8bHVrQGRlYmlhbi5vcmc+DQpEYXRlOiAgIEZyaSBB
+cHIgOCAxNDoxMzozNSAyMDExIC0wNDAwDQoNCiAgICBtb3VudC5jaWZzOiBVc2Ugb3JpZ2luYWwg
+ZGV2aWNlIHN0cmluZyBhbGwgdGhlIHdheQ0KICAgIA0KICAgIERvbid0IGNvbnN0cnVjdCBhIGRl
+dmljZSBuYW1lLCBidXQgdXNlIHRoZSBvcmlnaW5hbCBkZXZpY2Ugc3RyaW5nDQogICAgdG8gbW91
+bnQgc28gdGhlIGRldmljZSBuYW1lIGluIC9wcm9jL21vdW50cyBtYXRjaGVzIHRoZSBvbmUgaW4N
+CiAgICAvZXRjL2ZzdGFiLg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEx1ayBDbGFlcyA8bHVr
+QGRlYmlhbi5vcmc+DQoNCmNvbW1pdCAwMGU3ZmNiZTlmNTE5YTgyNTE3MDczMjFlYWRkMzRjZjE1
+NjQ0N2U1DQpBdXRob3I6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAg
+RnJpIEFwciAxNSAwNzo0OTo1MSAyMDExIC0wNDAwDQoNCiAgICBtb3VudC5jaWZzOiBmaXggdGVz
+dCBmb3Igc3RydG91bCBmYWlsdXJlIGluIG1vdW50LmNpZnMNCiAgICANCiAgICBJdCBjdXJyZW50
+bHkgdGVzdCB0byBzZWUgaWYgZXJybm8gPT0gLUVJTlZBTCBhbmQgd2hldGhlciB0aGUgZW5kcHRy
+DQogICAgaXMgJ1wwJy4gVGhhdCdzIG5vdCBjb3JyZWN0IGhvd2V2ZXIuIFdoYXQgd2UgcmVhbGx5
+IHdhbnQgaXQgdG8gZG8gaXMNCiAgICBjaGVjayB0byBzZWUgaWYgYW55IGVycm9yIG9jY3VycmVk
+IGJ5IHNldHRpbmcgZXJybm8gdG8gMCBiZWZvcmUgdGhlDQogICAgY29udmVyc2lvbi4gSWYgb25l
+IGRpZCwgdGhlbiB0cnkgdG8gdHJlYXQgdGhlIHZhbHVlIGFzIGEgbmFtZS4NCiAgICANCiAgICBB
+bHNvIGZpeCBhIGJvZ3VzIGNvbXBpbGVyIHdhcm5pbmcgYWJvdXQgY3J1aWQgYmVpbmcgdW5pbml0
+aWFsaXplZC4NCiAgICANCiAgICBSZXBvcnRlZC1ieTogSmlhbiBMaSA8amlhbGlAcmVkaGF0LmNv
+bT4NCiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoN
+CmNvbW1pdCBhNmMyM2Y0NDIxYWUwMmRlOWYwMWJiNjI2NGEwM2VkZTk5NzBjYjE5DQpBdXRob3I6
+IFBhdmVsIFNoaWxvdnNreSA8cGlhc3RyeUBldGVyc29mdC5ydT4NCkRhdGU6ICAgRnJpIE1heSAy
+MCAwNzozNjozMyAyMDExIC0wNDAwDQoNCiAgICBtYW5wYWdlOiBtYWtlIHNlcnZlcmlubyBhbmQg
+bm9zZXJ2ZXJpbm8gb3B0aW9uIGRlc2NyaXB0aW9ucyBjbGVhcg0KICAgIA0KICAgIFNpZ25lZC1v
+ZmYtYnk6IFBhdmVsIFNoaWxvdnNreSA8cGlhc3RyeUBldGVyc29mdC5ydT4NCg0KY29tbWl0IGY2
+OTllOTU5ZDJhZmFkZmZjNmE0ZGI5NmI1N2Y4NzNmN2RkNWU5ZDkNCkF1dGhvcjogU2hpcmlzaCBQ
+YXJnYW9ua2FyIDxzaGlyaXNocGFyZ2FvbmthckBnbWFpbC5jb20+DQpEYXRlOiAgIFR1ZSBNYXkg
+MjQgMTQ6NDk6NTYgMjAxMSAtMDQwMA0KDQogICAgY2lmcy11dGlsczogQ3JlYXRlIG5ldyBiaW5h
+cnkgY2lmcy5pZG1hcCBmb3Igc2lkIHRvIHVpZC9naWQgbWFwcGluZyAodHJ5ICM0KQ0KICAgIA0K
+ICAgIEhhbmRsZSBjaWZzLmlkbWFwIHR5cGUgb2Yga2V5LiBFeHRyYWN0IGEgU0lEIHN0cmluZyBm
+cm9tIHRoZSBkZXNjcmlwdGlvbg0KICAgIGFuZCBtYXAgaXQgdG8gZWl0aGVyIGFuIHVpZCBvciBn
+aWQgdXNpbmcgd2luYmluZCBBUElzLg0KICAgIElmIHRoYXQgZmFpbHMgKGUuZy4gYmVjYXVzZSB3
+aW5iaW5kIGlzIG5vdCBpbnN0YWxsZWQvcnVubmluZyBvciB3aW5iaW5kDQogICAgcmV0dXJucyBh
+biBlcnJvciksIGtlcm5lbCBhc3NpZ25zIHVpZCBhbmQgZ2lkIChmcm9tIG1vdW50IHN1cGVyYmxv
+Y2spLg0KICAgIA0KICAgIEVuYWJsZSBpbmNsdWRpbmcgd2luYmluZCBoZWFkZXIgZmlsZXMgYW5k
+IGlkbWFwcGluZyBjb2RlIGNvbmRpdGlvbmFsDQogICAgdG8gd2luYmluZCBkZXZlbCBycG1zICho
+ZWFkZXIgYW5kIGxpYnJhcnkpLg0KICAgIA0KICAgIEFuIGVudHJ5IHN1Y2ggYXMgdGhpcw0KICAg
+IA0KICAgIGNyZWF0ZSAgY2lmcy5pZG1hcCAgICogICAgICAgKiAgICAgICAgICAgICAgIC91c3Iv
+c2Jpbi9jaWZzLmlkbWFwICVrDQogICAgDQogICAgaXMgbmVlZGVkIGluIHRoZSBmaWxlIC9ldGMv
+cmVxdWVzdC1rZXkuY29uZi4NCiAgICANCiAgICBbTm90ZTogTW9kaWZpZWQgdG8gbm90IGJ1aWxk
+IG5ldyB0b29sIGJ5IGRlZmF1bHQsIGFuZCB0byBmaXggdXAgc29tZQ0KICAgICAgICAgICB3aGl0
+ZXNwYWNlIG11bmdpbmddDQogICAgDQogICAgTW9kaWZpZWQtYnk6IEplZmYgTGF5dG9uIDxqbGF5
+dG9uQHJlZGhhdC5jb20+DQogICAgU2lnbmVkLW9mZi1ieTogU2hpcmlzaCBQYXJnYW9ua2FyIDxz
+aGlyaXNocGFyZ2FvbmthckBnbWFpbC5jb20+DQoNCmNvbW1pdCAwYTMyZDY5OTBlNjdjNDg3NTM0
+MzVlOTg2YzcwNzM4NzZjYWZlN2YzDQpBdXRob3I6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJh
+Lm9yZz4NCkRhdGU6ICAgVHVlIE1heSAyNCAxNDo0OTo1OCAyMDExIC0wNDAwDQoNCiAgICBjaWZz
+LmlkbWFwOiByZW1vdmUgMiB1bnVzZWQgdmFyaWFibGVzDQogICAgDQogICAgY2lmcy5pZG1hcC5j
+OiBJbiBmdW5jdGlvbiDigJhjaWZzX2lkbWFw4oCZOg0KICAgIGNpZnMuaWRtYXAuYzo4NToxNjog
+d2FybmluZzogdW51c2VkIHZhcmlhYmxlIOKAmGdy4oCZIFstV3VudXNlZC12YXJpYWJsZV0NCiAg
+ICBjaWZzLmlkbWFwLmM6ODQ6MTc6IHdhcm5pbmc6IHVudXNlZCB2YXJpYWJsZSDigJhwd+KAmSBb
+LVd1bnVzZWQtdmFyaWFibGVdDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24g
+PGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgZmQ2NDA1YjA1OWQzZDA2NmVjZGZmOTBhNGIw
+MDI0ZDI4Nzk1OTQ4ZQ0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpE
+YXRlOiAgIFR1ZSBNYXkgMjQgMTQ6NTA6MDAgMjAxMSAtMDQwMA0KDQogICAgY2lmcy51cGNhbGw6
+IGRvbid0IHN5c2xvZyB1c2FnZSBtZXNzYWdlDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVm
+ZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgM2EyYTdmYzQwZDk4Mzg5NzY2
+YzgyNDM1YTViNTMzMmFiMjI3MjgzOA0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1i
+YS5vcmc+DQpEYXRlOiAgIFRodSBNYXkgMjYgMTQ6NTY6MzcgMjAxMSAtMDQwMA0KDQogICAgbWFu
+cGFnZTogdXBkYXRlIHRoZSBkZXNjcmlwdGlvbiBvZiB0aGUgd3NpemU9IG9wdGlvbg0KICAgIA0K
+ICAgIC4uLnRvIGFjY291bnQgZm9yIHRoZSBjaGFuZ2VzIGluIHRoZSBhc3luYyB3cml0ZSBwYXRj
+aHNldC4NCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1i
+YS5vcmc+DQoNCmNvbW1pdCBhNjY5ZmIzYmI0NDExZTRmNGQ5NWRlMWExYTJlYzljY2NmZTE0ODcz
+DQpBdXRob3I6IFBhdmVsIFNoaWxvdnNreSA8cGlhc3RyeUBldGVyc29mdC5ydT4NCkRhdGU6ICAg
+TW9uIE1heSAzMCAyMDowMjoxOSAyMDExIC0wNDAwDQoNCiAgICBtYW5wYWdlOiBhZGQgZGVjcmlw
+dGlvbiBhYm91dCBtYXRjaGluZyBzdXBlcmJsb2NrIHRvIHdzaXplPSBvcHRpb24NCiAgICANCiAg
+ICAuLi5hY2NvcmRpbmcgdG8gc2hhcmVkIHN1cGVyYmxvY2sgY2FwYWJpbGl0eSBtZXJnZWQgaW50
+byBjaWZzLTIuNg0KICAgIGdpdCB0cmVlIHJlY2VudGx5Lg0KICAgIA0KICAgIFNpZ25lZC1vZmYt
+Ynk6IFBhdmVsIFNoaWxvdnNreSA8cGlhc3RyeUBldGVyc29mdC5ydT4NCg0KY29tbWl0IDk5NTRj
+NzgwYjhiNWRiMzhlYTlkZmQ5MjBmZjViYmEwZjY4M2E5YmUNCkF1dGhvcjogUGF2ZWwgU2hpbG92
+c2t5IDxwaWFzdHJ5QGV0ZXJzb2Z0LnJ1Pg0KRGF0ZTogICBNb24gTWF5IDMwIDIwOjAyOjI3IDIw
+MTEgLTA0MDANCg0KICAgIG1hbnBhZ2U6IGFkZCBlbnRyeSBmb3IgcndwaWRmb3J3YXJkIG9wdGlv
+bg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IFBhdmVsIFNoaWxvdnNreSA8cGlhc3RyeUBldGVy
+c29mdC5ydT4NCg0KY29tbWl0IGJiOTVhODQ4NDY5ZDY5MTJiNWYwZDA2MDY4MDA2Y2M4MjRjNTkw
+ZjYNCkF1dGhvcjogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTogICBNb24g
+TWF5IDMwIDIwOjA1OjAxIDIwMTEgLTA0MDANCg0KICAgIG1hbnBhZ2U6IGNoYW5nZSBtZW50aW9u
+IG9mIGtlcm5lbCAyLjYuNDAgdG8gMy4wLjANCiAgICANCiAgICAuLi50byBtYXRjaCB0aGUgY2hh
+bmdlIGluIHZlcnNpb25pbmcuDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24g
+PGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgY2JjZTFhNjhjNDE5MzAxOTA0YWQxZmRjN2M1
+NWIxZDNiODZmYmRmZg0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpE
+YXRlOiAgIFdlZCBKdW4gMSAwODo0NzoyMSAyMDExIC0wNDAwDQoNCiAgICBSRUFETUU6IHN1Z2dl
+c3QgdXNlIG9mIGF1dG9yZWNvbmYgLWkNCiAgICANCiAgICBPdGhlcndpc2UgeW91IGdldCB3YXJu
+aW5ncyBhYm91dCBtaXNzaW5nIGZpbGVzIHdpdGggcmVjZW50IGF1dG90b29scy4NCiAgICANCiAg
+ICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNvbW1p
+dCA3YzA0YjkwYmUwMjFlMDNiYzJhYjk3YTljOTFmNjY2MzVjZGNhMzBiDQpBdXRob3I6IFNoaXJp
+c2ggUGFyZ2FvbmthciA8c2hpcmlzaHBhcmdhb25rYXJAZ21haWwuY29tPg0KRGF0ZTogICBXZWQg
+SnVuIDEgMTU6Mjc6MTAgMjAxMSAtMDQwMA0KDQogICAgY2lmcy11dGlsczogQ3JlYXRlIG1hbiBw
+YWdlcyBmb3IgY2lmcy5pZG1hcCBwcm9ncmFtICh0cnkgIzIpDQogICAgDQogICAgQ3JlYXRlIG1h
+biBwYWdlcyBmb3IgcHJvZ3JhbSBjaWZzLmlkbWFwDQogICAgRW5hYmxlIGNpZnMuaWRtYXAgY29u
+ZmlnIG9wdGlvbiBieSBkZWZhdWx0Lg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IFNoaXJpc2gg
+UGFyZ2FvbmthciA8c2hpcmlzaHBhcmdhb25rYXJAZ21haWwuY29tPg0KDQpjb21taXQgMzdjNThi
+YTM4OTgzZjY0ZTVmZjg3M2RlMTg4NjExNjIyMTgwY2Y5Zg0KQXV0aG9yOiBKZWZmIExheXRvbiA8
+amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFdlZCBKdW4gMSAxNToyNzoxNyAyMDExIC0wNDAw
+DQoNCiAgICBtYW5wYWdlOiBmaXggc29tZSBtYW5wYWdlIG5pdHMNCiAgICANCiAgICBGaXggYWxp
+Z25tZW50IG9mIGNvbHVtbnMgYW5kIHRyYWlsaW5nIHdoaXRlc3BhY2UgaW4gY2lmcy5pZG1hcCg4
+KS4gRml4DQogICAgcmVxdWVzdC1rZXkuY29uZig1KSByZWZlcmVuY2UgaW4gY2lmcy5pZG1hcCg4
+KSBhbmQgY2lmcy51cGNhbGwoOCkuDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0
+b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgZWNmZThmOWE2ZjNiOTk0M2YwZGU0NDk5
+NjBiYmE5NTc5MjY1NmZiNA0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+
+DQpEYXRlOiAgIFdlZCBKdW4gMSAxNTo0MTo0NSAyMDExIC0wNDAwDQoNCiAgICBhdXRvY29uZjog
+YnVtcCByZWxlYXNlIHRvIDUuMA0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5dG9u
+IDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJh
+Lm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4w
+LjE3IChHTlUvTGludXgpDQoNCmlFWUVBUkVDQUFZRkFrM21uUW9BQ2drUXlQMGd4UU1keklCOEd3
+Q2ZTcEpFeUVhbXlMOGdHa3N6M05DL1R1aDQNClZFNEFuMGR0cWljekRhQTF4L3pBcXVVVmg0M010
+WGloDQo9YWxaQg0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
