@@ -1,177 +1,47 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Create man pages for cifs.idmap program
-Date: Wed, 1 Jun 2011 08:56:02 -0400
-Message-ID: <20110601085602.7a99a077@tlielax.poochiereds.net>
-References: <1306453075-30274-1-git-send-email-shirishppargaonkar@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] manpage: add decription about matching superblock to
+ wsize= option
+Date: Wed, 1 Jun 2011 09:04:13 -0400
+Message-ID: <20110601090413.0be02bb2@tlielax.poochiereds.net>
+References: <1306483623-8392-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1306453075-30274-1-git-send-email-shirishppargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1306483623-8392-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 26 May 2011 18:37:55 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Fri, 27 May 2011 12:07:03 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ...according to shared superblock capability merged into cifs-2.6
+> git tree recently.
 > 
-> 
-> Create man pages for program cifs.idmap
-> Enable cifs.idmap config option by default.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  Makefile.am     |    7 +++++
->  cifs.idmap.8.in |   79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  configure.ac    |    4 +-
->  3 files changed, 88 insertions(+), 2 deletions(-)
->  create mode 100644 cifs.idmap.8.in
+>  mount.cifs.8 |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> diff --git a/Makefile.am b/Makefile.am
-> index 6046369..9066531 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -37,4 +37,11 @@ if CONFIG_CIFSIDMAP
->  sbin_PROGRAMS += cifs.idmap
->  cifs_idmap_SOURCES = cifs.idmap.c
->  cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
-> +man_MANS += cifs.idmap.8
-> +
-> +cifs.idmap.8: cifs.idmap.8.in
-> +	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
-> +
-> +clean-local:
-> +	rm -f cifs.idmap.8 cifs.idmap.8-t
->  endif
-	^^^^^^^^^^^^
-I don't think you're allowed to have more than clean-local target in
-the makefile.
+> diff --git a/mount.cifs.8 b/mount.cifs.8
+> index 1b6a958..dbfa13c 100644
+> --- a/mount.cifs.8
+> +++ b/mount.cifs.8
+> @@ -396,7 +396,7 @@ default network read size (usually 16K)\&. The client currently can not use rsiz
+>  .PP
+>  wsize=\fIbytes\fR
+>  .RS 4
+> -Maximum amount of data that the kernel will send in a write request in bytes. Prior to kernel 2\&.6\&.40, the default and maximum was 57344 (14 * 4096 pages). As of 2\&.6\&.40, the default is 1M, and the maximum allowed is 16M. Note that this value is just a starting point for negotiation in 2\&.6\&.40 and up. The client and server may negotiate this size downward according to the server's capabilities. In kernels prior to 2\&.6\&.40, no negotiation is performed.
+> +Maximum amount of data that the kernel will send in a write request in bytes\&. Prior to kernel 2\&.6\&.40, the default and maximum was 57344 (14 * 4096 pages)\&. As of 2\&.6\&.40, the default is 1M, and the maximum allowed is 16M\&. Note that this value is just a starting point for negotiation in 2\&.6\&.40 and up\&. The client and server may negotiate this size downward according to the server's capabilities\&. In kernels prior to 2\&.6\&.40, no negotiation is performed\&. It can end up with an existing superblock if this value isn't specified or it's greater or equal than the existing one\&.
+>  .RE
+>  .PP
+>  fsc
 
-> diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
-> new file mode 100644
-> index 0000000..9f4680e
-> --- /dev/null
-> +++ b/cifs.idmap.8.in
-> @@ -0,0 +1,79 @@
-> +'\" t
-> +.\"     Title: cifs.idmap
-> +.\"    Author: [see the "AUTHOR" section]
-> +.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
-> +.\"      Date: 05/26/2011
-> +.\"    Manual: System Administration tools
-> +.\"    Source: cifs-utils 4.0
-> +.\"  Language: English
-> +.\"
-> +.TH "CIFS\&.IDMAP" "8" "05/26/2011" "cifs-utils 4\&.0" "System Administration tools"
-> +.\" -----------------------------------------------------------------
-> +.\" * set default formatting
-> +.\" -----------------------------------------------------------------
-> +.\" disable hyphenation
-> +.nh
-> +.\" disable justification (adjust text to left margin only)
-> +.ad l
-> +.\" -----------------------------------------------------------------
-> +.\" * MAIN CONTENT STARTS HERE *
-> +.\" -----------------------------------------------------------------
-> +.SH "NAME"
-> +cifs.idmap \- Userspace helper for mapping ids for Common Internet File System (CIFS)
-> +.SH "SYNOPSIS"
-> +.HP \w'\ 'u
-> +cifs\&.idmap [\-\-version|\-v] {keyid}
-> +.SH "DESCRIPTION"
-> +.PP
-> +This tool is part of the cifs-utils suite\&.
-> +.PP
-> +cifs\&.idmap is a userspace helper program for the linux CIFS client filesystem\&. There are a number of activities that the kernel cannot easily do itself\&. This program is a callout program that does these things for the kernel and then returns the result\&.
-> +.PP
-> +cifs\&.idmap is generally intended to be run when the kernel calls request\-key(8)
-> +for a particular key type\&. While it can be run directly from the command\-line, it is not generally intended to be run that way\&.
-> +.PP
-> +cifs\&.idmap works in conjuction with winbind facility of Samba suite to map owner and group SIDs to uids and gids respectively.  It is best utilized when a mount option of cifsacl is specified when mounting a cifs share, winbind is specified as one of the search entries for passwd and group databases in file /etc/nsswitch.conf, file smb.conf has winbind specific entries, and winbind daemon program is running.
-			^^^^^^^^^^^^^^
-	This is a rather long sentence. Perhaps this should be an
-	enumerated or bulleted list of recommendations instead?
+Committed. I also merged a patch that changes all occurrences of 2.6.40
+in the manpage to 3.0.0.
 
-> It is also strongly recomemended to use mount options of uid and gid to specify a default uid and gid to map owner SIDs and group SIDs respectively in case services of winbind facility are unavailable.
-		^^^^
-		What happens if I don't do this?
-
-> +.SH "OPTIONS"
-> +.PP
-> +\-\-version|\-v
-> +.RS 4
-> +Print version number and exit\&.
-> +.RE
-> +.SH "CONFIGURATION FOR KEYCTL"
-> +.PP
-> +cifs\&.idmap is designed to be called from the kernel via the request\-key callout program\&. This requires that request\-key be told where and how to call this program\&. Currently cifs\&.idmap handles a key type of:
-> +.PP
-> +cifs\&.idmap
-> +.RS 4
-> +This keytype is for mapping a SID to either an uid or a gid
-> +.RE
-> +.PP
-> +To make this program useful for CIFS, you will need to set up entry for it in request\-key\&.conf(5)\&. Here is an example of an entry for this key type:
-> +.sp
-> +.if n \{\
-> +.RS 4
-> +.\}
-> +.nf
-> +#OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
-> +#=========  =============  = = ================================
-> +create      cifs\&.idmap    * * @sbindir@/cifs\&.idmap %k
-				^^^^^^^^^^^	
-			nit: alignment of the columns is off
-> +.fi
-> +.if n \{\
-> +.RE
-> +.\}
-> +.PP
-> +See
-> +\fBrequest-key.conf5\fR()
-> +for more info on each field\&.
-> +.SH "SEE ALSO"
-> +.PP
-> +
-> +\fBrequest-key.conf\fR(5),
-> +\fBmount.cifs\fR(8)
-> +.SH "AUTHOR"
-> +.PP
-> +Shirish Pargaonkar wrote the cifs\&.idmap program\&.
-> +.PP
-> +The
-> +Linux CIFS Mailing list
-> +is the preferred place to ask questions regarding these programs\&.
-> diff --git a/configure.ac b/configure.ac
-> index 6cac703..d7e21c9 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -26,7 +26,7 @@ AC_ARG_ENABLE(cifsidmap,
->  	[AC_HELP_STRING([--enable-cifsidmap],
->  			[Create cifs.idmap binary @<:@default=no@:>@])],
->  	enable_cifsidmap=$enableval,
-> -	enable_cifsidmap="no")
-> +	enable_cifsidmap="maybe")
->  
->  # Checks for programs.
->  AC_PROG_CC
-> @@ -152,7 +152,7 @@ LIBS=$cu_saved_libs
->  
->  AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
->  AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
-> -AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" = "yes"])
-> +AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
->  
->  LIBCAP_NG_PATH
->  
-
-I think you need a bit more in configure.ac to build this by default.
-You'll also need to fix the check for keyutils.h when $enable_cifsidmap
-= "maybe"
-
+Thanks,
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
