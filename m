@@ -1,60 +1,177 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: CIFS endless console spammage in 2.6.38.7
-Date: Tue, 31 May 2011 15:54:36 -0500
-Message-ID: <BANLkTimNgW-Ff_50HeuFqmS7PXXjuLmYVw@mail.gmail.com>
-References: <4DE5385C.1030808@candelatech.com>
-	<BANLkTik+Z32vDVjB3_Rt7iPrqpJPJYnpwA@mail.gmail.com>
-	<4DE54561.1090906@candelatech.com>
-	<20110531164408.178eeebf@tlielax.poochiereds.net>
-	<BANLkTinyb=tekDwPLqxuSqyQfrgc8MykCw@mail.gmail.com>
-	<4DE55537.5040705@candelatech.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils: Create man pages for cifs.idmap program
+Date: Wed, 1 Jun 2011 08:56:02 -0400
+Message-ID: <20110601085602.7a99a077@tlielax.poochiereds.net>
+References: <1306453075-30274-1-git-send-email-shirishppargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4DE55537.5040705-my8/4N5VtI7c+919tysfdA@public.gmane.org>
+In-Reply-To: <1306453075-30274-1-git-send-email-shirishppargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-we will have more info when run with he quick and dirty modified loggin=
-g
+On Thu, 26 May 2011 18:37:55 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-On Tue, May 31, 2011 at 3:53 PM, Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org> w=
-rote:
-> On 05/31/2011 01:51 PM, Steve French wrote:
->>
->> On Tue, May 31, 2011 at 3:44 PM, Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =A0=
-wrote:
->
->>> Fixing it looks to be anything but trivial. I'm not even quite sure=
- how
->>> to approach it at this point. Suggestions welcome.
->>
->> I thought the kernel was more recent than that - how recent is the k=
-ernel
->> here?
->>
->> I think something related to cifs_sendv returning ENOTSOCK immediate=
-ly
->> when not reconnected could be related.
->
-> My kernel is 2.6.38.7, quite recent. =A0We're using the bind-to-local=
--IP
-> features too, but not sure that matters.
->
-> Ben
->
-> --
-> Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-> Candela Technologies Inc =A0http://www.candelatech.com
->
->
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Create man pages for program cifs.idmap
+> Enable cifs.idmap config option by default.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  Makefile.am     |    7 +++++
+>  cifs.idmap.8.in |   79 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  configure.ac    |    4 +-
+>  3 files changed, 88 insertions(+), 2 deletions(-)
+>  create mode 100644 cifs.idmap.8.in
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 6046369..9066531 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -37,4 +37,11 @@ if CONFIG_CIFSIDMAP
+>  sbin_PROGRAMS += cifs.idmap
+>  cifs_idmap_SOURCES = cifs.idmap.c
+>  cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
+> +man_MANS += cifs.idmap.8
+> +
+> +cifs.idmap.8: cifs.idmap.8.in
+> +	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
+> +
+> +clean-local:
+> +	rm -f cifs.idmap.8 cifs.idmap.8-t
+>  endif
+	^^^^^^^^^^^^
+I don't think you're allowed to have more than clean-local target in
+the makefile.
 
+> diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
+> new file mode 100644
+> index 0000000..9f4680e
+> --- /dev/null
+> +++ b/cifs.idmap.8.in
+> @@ -0,0 +1,79 @@
+> +'\" t
+> +.\"     Title: cifs.idmap
+> +.\"    Author: [see the "AUTHOR" section]
+> +.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+> +.\"      Date: 05/26/2011
+> +.\"    Manual: System Administration tools
+> +.\"    Source: cifs-utils 4.0
+> +.\"  Language: English
+> +.\"
+> +.TH "CIFS\&.IDMAP" "8" "05/26/2011" "cifs-utils 4\&.0" "System Administration tools"
+> +.\" -----------------------------------------------------------------
+> +.\" * set default formatting
+> +.\" -----------------------------------------------------------------
+> +.\" disable hyphenation
+> +.nh
+> +.\" disable justification (adjust text to left margin only)
+> +.ad l
+> +.\" -----------------------------------------------------------------
+> +.\" * MAIN CONTENT STARTS HERE *
+> +.\" -----------------------------------------------------------------
+> +.SH "NAME"
+> +cifs.idmap \- Userspace helper for mapping ids for Common Internet File System (CIFS)
+> +.SH "SYNOPSIS"
+> +.HP \w'\ 'u
+> +cifs\&.idmap [\-\-version|\-v] {keyid}
+> +.SH "DESCRIPTION"
+> +.PP
+> +This tool is part of the cifs-utils suite\&.
+> +.PP
+> +cifs\&.idmap is a userspace helper program for the linux CIFS client filesystem\&. There are a number of activities that the kernel cannot easily do itself\&. This program is a callout program that does these things for the kernel and then returns the result\&.
+> +.PP
+> +cifs\&.idmap is generally intended to be run when the kernel calls request\-key(8)
+> +for a particular key type\&. While it can be run directly from the command\-line, it is not generally intended to be run that way\&.
+> +.PP
+> +cifs\&.idmap works in conjuction with winbind facility of Samba suite to map owner and group SIDs to uids and gids respectively.  It is best utilized when a mount option of cifsacl is specified when mounting a cifs share, winbind is specified as one of the search entries for passwd and group databases in file /etc/nsswitch.conf, file smb.conf has winbind specific entries, and winbind daemon program is running.
+			^^^^^^^^^^^^^^
+	This is a rather long sentence. Perhaps this should be an
+	enumerated or bulleted list of recommendations instead?
 
+> It is also strongly recomemended to use mount options of uid and gid to specify a default uid and gid to map owner SIDs and group SIDs respectively in case services of winbind facility are unavailable.
+		^^^^
+		What happens if I don't do this?
 
---=20
-Thanks,
+> +.SH "OPTIONS"
+> +.PP
+> +\-\-version|\-v
+> +.RS 4
+> +Print version number and exit\&.
+> +.RE
+> +.SH "CONFIGURATION FOR KEYCTL"
+> +.PP
+> +cifs\&.idmap is designed to be called from the kernel via the request\-key callout program\&. This requires that request\-key be told where and how to call this program\&. Currently cifs\&.idmap handles a key type of:
+> +.PP
+> +cifs\&.idmap
+> +.RS 4
+> +This keytype is for mapping a SID to either an uid or a gid
+> +.RE
+> +.PP
+> +To make this program useful for CIFS, you will need to set up entry for it in request\-key\&.conf(5)\&. Here is an example of an entry for this key type:
+> +.sp
+> +.if n \{\
+> +.RS 4
+> +.\}
+> +.nf
+> +#OPERATION  TYPE           D C PROGRAM ARG1 ARG2\&.\&.\&.
+> +#=========  =============  = = ================================
+> +create      cifs\&.idmap    * * @sbindir@/cifs\&.idmap %k
+				^^^^^^^^^^^	
+			nit: alignment of the columns is off
+> +.fi
+> +.if n \{\
+> +.RE
+> +.\}
+> +.PP
+> +See
+> +\fBrequest-key.conf5\fR()
+> +for more info on each field\&.
+> +.SH "SEE ALSO"
+> +.PP
+> +
+> +\fBrequest-key.conf\fR(5),
+> +\fBmount.cifs\fR(8)
+> +.SH "AUTHOR"
+> +.PP
+> +Shirish Pargaonkar wrote the cifs\&.idmap program\&.
+> +.PP
+> +The
+> +Linux CIFS Mailing list
+> +is the preferred place to ask questions regarding these programs\&.
+> diff --git a/configure.ac b/configure.ac
+> index 6cac703..d7e21c9 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -26,7 +26,7 @@ AC_ARG_ENABLE(cifsidmap,
+>  	[AC_HELP_STRING([--enable-cifsidmap],
+>  			[Create cifs.idmap binary @<:@default=no@:>@])],
+>  	enable_cifsidmap=$enableval,
+> -	enable_cifsidmap="no")
+> +	enable_cifsidmap="maybe")
+>  
+>  # Checks for programs.
+>  AC_PROG_CC
+> @@ -152,7 +152,7 @@ LIBS=$cu_saved_libs
+>  
+>  AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+>  AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
+> -AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" = "yes"])
+> +AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
+>  
+>  LIBCAP_NG_PATH
+>  
 
-Steve
+I think you need a bit more in configure.ac to build this by default.
+You'll also need to fix the check for keyutils.h when $enable_cifsidmap
+= "maybe"
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
