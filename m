@@ -1,44 +1,59 @@
-From: Helge Hafting <helge.hafting@hist.no>
-Subject: Re: [2.6.39] CIFS write failures where 2.6.38 works
-Date: Fri, 03 Jun 2011 17:11:05 +0200
-Message-ID: <4DE8F989.50208@hist.no>
-References: <4DE6103E.6010100@hist.no> <4DE8B449.2000008@suse.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix the kernel release version in the default
+ security warning message
+Date: Fri, 3 Jun 2011 10:31:55 -0500
+Message-ID: <BANLkTinC+NR+H9jGVBXGNwhNxxjxgC8GCQ@mail.gmail.com>
+References: <4DE880E3.8020502@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-cifs <linux-cifs@vger.kernel.org>
-To: Suresh Jayaraman <sjayaraman@suse.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4DE8B449.2000008@suse.de>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4DE880E3.8020502-l3A5Bk7waGM@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 03. juni 2011 12:15, Suresh Jayaraman wrote:
-> [Cc linux-cifs@vger.kernel.org]
+merged
+
+On Fri, Jun 3, 2011 at 1:36 AM, Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> w=
+rote:
 >
-> On 06/01/2011 03:41 PM, Helge Hafting wrote:
->> At work I use cifs for accessing a windows server. This has worked fine
->> for a long time, up to and including Debian's 2.6.38-2.
->>
->> I just installed Debians's 2.6.39-1, and had to give up on it.
->> Mounting CIFS works, and I can see the files. But if I
->> try to make a new file (with cp), I get a long delay.
+> When ntlm security mechanim is used, the message that warns about the=
+ upgrade
+> to ntlmv2 got the kernel release version wrong (Blame it on Linus :).=
+ Fix it.
 >
-> What is the security mechanism you are using? If you seeing the problem
-> with ntlm, could you try using ntlmv2 and see whether the problem is
-> reproducible?
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> ---
+> =A0fs/cifs/connect.c | =A0 =A02 +-
+> =A01 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 6d88b82..84c7307 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1976,7 +1976,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server=
+, struct smb_vol *volume_info)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0warned_on_ntlm =3D true;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "default security mechanism =
+requested. =A0The default "
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"security mechanism wi=
+ll be upgraded from ntlm to "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "ntlmv2 in kernel relea=
+se 2.6.41");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "ntlmv2 in kernel relea=
+se 3.1");
+> =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0ses->overrideSecFlg =3D volume_info->secFlg;
+>
+> --
+> 1.7.1
+>
 
-In the beginning, I did not specify the mechanism. So, whatever the 
-default is.
 
-The fstab entry was like this:
-\\servername\resource /mountpoint cifs 
-domain=MYDOMAIN,credentials=/etc/fstabcred,rw,noauto,iocharset=utf8,uid=username,gid=group,sockopt=TCP_NODELAY,users,file_mode=0640,dir_mode=0750,relatime 
-0 0
 
-I looked at cifs options, and tried to add "sign" and "sec=ntlmv2i". It 
-made no difference. Still failure with 2.6.39, and mounting with these 
-new options works fine with 2.6.38
+--=20
+Thanks,
 
-Helge Hafting
+Steve
