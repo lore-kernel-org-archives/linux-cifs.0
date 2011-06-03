@@ -1,89 +1,44 @@
-From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH] cifs: make debugging SMB signature issue easier
-Date: Fri, 03 Jun 2011 16:49:44 +0530
-Message-ID: <4DE8C350.8090100@suse.de>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: make CIFS depend on CRYPTO_ECB
+Date: Fri, 3 Jun 2011 09:10:07 -0400
+Message-ID: <20110603091007.7c7b9910@corrin.poochiereds.net>
+References: <4DE89FFD.6040006@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4DE89FFD.6040006-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-... and make the error message useful. Also make a long variable name shorter
-while at it.
+On Fri, 03 Jun 2011 14:19:01 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/cifsencrypt.c |   14 +++++++-------
- fs/cifs/transport.c   |   10 +++++++---
- 2 files changed, 14 insertions(+), 10 deletions(-)
+> When CONFIG_CRYPTO_ECB is not set, trying to mount a CIFS share with NTLM
+> security resulted in mount failure with the following error:
+>    "CIFS VFS: could not allocate des crypto API"
+> 
+> Seems like a leftover from commit 43988d7.
+> 
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> ---
+>  fs/cifs/Kconfig |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+> index 1cd4c3a..66c68ab 100644
+> --- a/fs/cifs/Kconfig
+> +++ b/fs/cifs/Kconfig
+> @@ -7,6 +7,7 @@ config CIFS
+>  	select CRYPTO_MD5
+>  	select CRYPTO_HMAC
+>  	select CRYPTO_ARC4
+> +	select CRYPTO_ECB
+>  	select CRYPTO_DES
+>  	help
+>  	  This is the client VFS module for the Common Internet File System
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index dfbd9f1..b5aa654 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -179,7 +179,7 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
- {
- 	unsigned int rc;
- 	char server_response_sig[8];
--	char what_we_think_sig_should_be[20];
-+	char expected_sig[20];
- 
- 	if (cifs_pdu == NULL || server == NULL)
- 		return -EINVAL;
-@@ -211,18 +211,18 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
- 	cifs_pdu->Signature.Sequence.Reserved = 0;
- 
- 	mutex_lock(&server->srv_mutex);
--	rc = cifs_calculate_signature(cifs_pdu, server,
--		what_we_think_sig_should_be);
-+	rc = cifs_calculate_signature(cifs_pdu, server, expected_sig);
- 	mutex_unlock(&server->srv_mutex);
- 
- 	if (rc)
- 		return rc;
- 
--/*	cifs_dump_mem("what we think it should be: ",
--		      what_we_think_sig_should_be, 16); */
--
--	if (memcmp(server_response_sig, what_we_think_sig_should_be, 8))
-+	if (memcmp(server_response_sig, expected_sig, 8)) {
-+		cifs_dump_mem("Expected signature: ", expected_sig, 8);
-+		cifs_dump_mem("Signature from server's response: ",
-+				server_response_sig, 8);
- 		return -EACCES;
-+	}
- 	else
- 		return 0;
- 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 147aa22..d7bbbef 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -500,15 +500,19 @@ int
- cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 		   bool log_error)
- {
-+	int rc =0;
-+
- 	dump_smb(mid->resp_buf,
- 		 min_t(u32, 92, be32_to_cpu(mid->resp_buf->smb_buf_length)));
- 
- 	/* convert the length into a more usable form */
- 	if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
- 		/* FIXME: add code to kill session */
--		if (cifs_verify_signature(mid->resp_buf, server,
--					  mid->sequence_number + 1) != 0)
--			cERROR(1, "Unexpected SMB signature");
-+		rc = cifs_verify_signature(mid->resp_buf, server,
-+				mid->sequence_number + 1);
-+		if (rc)
-+			cERROR(1, "Unexpected SMB signature, error %d while"
-+					"verifying signature", rc);
- 	}
- 
- 	/* BB special case reconnect tid and uid here? */
--- 
-1.7.1
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
