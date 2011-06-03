@@ -1,41 +1,38 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: smb2 work status
-Date: Thu, 2 Jun 2011 16:17:50 -0500
-Message-ID: <BANLkTi=NEJ2smKXM_irraWnN6gWpzGbTvA@mail.gmail.com>
-References: <BANLkTik5T2aY4V-Kp-AePZYUR+KgKCyNCA@mail.gmail.com>
+From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Subject: [PATCH] cifs: fix the kernel release version in the default security
+ warning message
+Date: Fri, 03 Jun 2011 12:06:19 +0530
+Message-ID: <4DE880E3.8020502@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTik5T2aY4V-Kp-AePZYUR+KgKCyNCA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Great - I am looking forward to reviewing these
 
-On Thu, Jun 2, 2011 at 4:10 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Hi!
->
-> I applied pending smb2 patches on top of current master branch and
-> created branch smb2-dev:
-> http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-dev
->
-> I also created another branch smb2-dev-experimental and put three
-> commits on top of smb2-dev - it makes mount/umount work but after some
-> period of time kernel crashes - I am working on fixing this now:
-> http://git.etersoft.ru/people/piastry/packages/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-dev-experimental
->
-> Any thoughts/suggestions are welcome!
->
-> --
-> Best regards,
-> Pavel Shilovsky.
->
+When ntlm security mechanim is used, the message that warns about the upgrade
+to ntlmv2 got the kernel release version wrong (Blame it on Linus :). Fix it.
 
+Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+---
+ fs/cifs/connect.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 6d88b82..84c7307 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1976,7 +1976,7 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 		warned_on_ntlm = true;
+ 		cERROR(1, "default security mechanism requested.  The default "
+ 			"security mechanism will be upgraded from ntlm to "
+-			"ntlmv2 in kernel release 2.6.41");
++			"ntlmv2 in kernel release 3.1");
+ 	}
+ 	ses->overrideSecFlg = volume_info->secFlg;
+ 
 -- 
-Thanks,
-
-Steve
+1.7.1
