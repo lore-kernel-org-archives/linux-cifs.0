@@ -1,42 +1,33 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: silence printk when establishing first session on socket
-Date: Mon,  6 Jun 2011 15:40:23 -0400
-Message-ID: <1307389223-25744-1-git-send-email-jlayton@redhat.com>
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: JM <johnmiller-06ZeP6ie+xM@public.gmane.org>
+Subject: Very slow performance with gigabit network
+Date: Mon, 6 Jun 2011 22:58:00 +0200
+Message-ID: <201106062258.00601.johnmiller@email.it>
+Mime-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When signing is enabled, the first session that's established on a
-socket will cause a printk like this to pop:
+Hi all.
+I have a problem with the cifs module in my gigabit network.
+I get the following performance:
+95 mbytes/s with FTP
+65 mbytes/s with samba, windows 7 client
+8 mbytes/ with the cifs module on opensuse 11.4
 
-    CIFS VFS: Unexpected SMB signature
+I have tried all the solutions  found on google,
+such as directio, modifying rsize and wsize, with
+ no improvements. Any advice?
 
-This is because the key exchange hasn't happened yet, so the signature
-field is bogus. Don't try to check the signature on the socket until the
-first session has been established. Also, eliminate the specific check
-for SMB_COM_NEGOTIATE since this check covers that case too.
+I started asking around collegues and others, on the internet too,
+and I found that almost everybody I know have performance
+problem with cifs.
+If needed, I can test some new version of the driver to help
+your job.
+I am a C programmer, even if I am not a kernel programmer and
+I don't know the CIFS protocol
 
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsencrypt.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index dfbd9f1..5a0ee7f 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -184,7 +184,7 @@ int cifs_verify_signature(struct smb_hdr *cifs_pdu,
- 	if (cifs_pdu == NULL || server == NULL)
- 		return -EINVAL;
- 
--	if (cifs_pdu->Command == SMB_COM_NEGOTIATE)
-+	if (!server->session_estab)
- 		return 0;
- 
- 	if (cifs_pdu->Command == SMB_COM_LOCKING_ANDX) {
--- 
-1.7.5.2
+JM
