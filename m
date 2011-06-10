@@ -1,111 +1,66 @@
-From: Martijn Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org>
-Subject: Re: [OOPS] 3.0-rc1 cifs
-Date: Sat, 11 Jun 2011 00:03:31 +0200 (CEST)
-Message-ID: <Pine.LNX.4.64.1106102333470.28401@sarijopen.student.utwente.nl>
-References: <Pine.LNX.4.64.1106092211500.19687@sarijopen.student.utwente.nl>
- <20110609183045.01f6f9fc@tlielax.poochiereds.net>
- <BANLkTimPqmkNJMaJE2_C5zD8ESFOEM3=hg@mail.gmail.com>
- <Pine.LNX.4.64.1106100243370.2168@sarijopen.student.utwente.nl>
- <20110610073702.061bc014@corrin.poochiereds.net>
+From: Kong <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: mount.cifs failed to mount smb2-only shares
+Date: Fri, 10 Jun 2011 22:26:41 +0000 (UTC)
+Message-ID: <loom.20110611T002543-158@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
-Cc: Connor Hansen <cmdkhh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110610073702.061bc014-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 
-On Fri, 10 Jun 2011, Jeff Layton wrote:
+Two problems with smb2-only shares. 
 
-> On Fri, 10 Jun 2011 02:57:21 +0200 (CEST)
-> Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org> wrote:
->
->>
->> <snip>
->>> call in get_dfs_path()
->>> rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
->>>
->>> function header for CIFSTCon
->>> int  CIFSTCon(unsigned int xid, struct cifs_ses *ses,
->>>          const char *tree, struct cifs_tcon *tcon,
->>>          const struct nls_table *nls_codepage)
->>>
->>> get_dfs_path() is passing struct cifs_tcon *tcon as NULL
->>>
->>> from config:  CONFIG_CIFS_WEAK_PW_HASH=y
->>>
->>> in CIFSTCon
->>>
->>> #ifdef CONFIG_CIFS_WEAK_PW_HASH
->>> 3222                 if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
->>> 3223                     (ses->server->secType == LANMAN))
->>> 3224                         calc_lanman_hash(tcon->password,
->>> ses->server->cryptkey,
->>>
->>> in calc_lanman_hash tcon is dereferenced(tcon->password) without being
->>> checked if null
->>>
->>> 3225                                          ses->server->sec_mode &
->>> 3226                                             SECMODE_PW_ENCRYPT ?
->>> true : false,
->>> 3227                                          bcc_ptr);
->>> 3228                 else
->>> 3229 #endif /* CIFS_WEAK_PW_HASH */
->>>
->>> Connor
->>
->>
->> Ave all
->>
->> I recompiled  kernel 3.0-rc1 (hadn't enabled CONFIG_DEBUG_INFO=y) and put
->> the oops (with the new adresses) through gdb per instruction of Jeff. And
->> Connor was spot on!
->>
->> <qoute oops>
->> BUG: unable to handle kernel NULL pointer dereference at 00000000000000a0
->> IP: [<ffffffffa041e286>] CIFSTCon+0xf6/0x4d0 [cifs]
->> </qoute oops>
->>
->> <qoute gdb>
->> This GDB was configured as "x86_64-linux-gnu".
->> For bug reporting instructions, please see:
->> <http://www.gnu.org/software/gdb/bugs/>...
->> Reading symbols from
->> /lib/modules/3.0.0-rc1-debug/kernel/fs/cifs/cifs.ko...done.
->> (gdb) list *(CIFSTCon+0xf6)
->> 0xc2b6 is in CIFSTCon (fs/cifs/connect.c:3230).
->> 3225                                             ses->server->sec_mode &
->> 3226                                                SECMODE_PW_ENCRYPT ?
->> true : false,
->> 3227                                             bcc_ptr);
->> 3228                    else
->> 3229    #endif /* CIFS_WEAK_PW_HASH */
->> 3230                    rc = SMBNTencrypt(tcon->password,
->> ses->server->cryptkey,
->> 3231                                            bcc_ptr);
->> 3232
->> 3233                    bcc_ptr += CIFS_AUTH_RESP_SIZE;
->> 3234                    if (ses->capabilities & CAP_UNICODE) {
->> (gdb)
->> </qoute gdb>
->>
->
-> (cc'ing Sean F. since I suspect this regression is due to his changes)
->
-> Thanks for the analysis, Martijn and Connor...
->
-> What sort of server are you mounting here? It looks like it's using
-> share-level security, so it's either very old or is a samba server
-> configured that way.
+client: ubuntu 11.04 32-bit
+I moved the original mount.cifs (version 4.5)to mount.cifs.old, and installed
+mount.cifs version 5.0.
 
-To be honest ... both :)
-a)server is Debian Etch (samba 3.0.24-6etch10)
-   (yeah i know old, but no time at the moment to upgrade/reinstall the
-   whole system)
-b)share security. (security=share) in smb.conf
-   This is on purpose. (all access is shielded based on hostnames)
+$ uname -r
+2.6.38-8-generic
+$ /sbin/mount.cifs -V
+mount.cifs version: 5.0
+$ /sbin/mount.cifs.old -V
+mount.cifs version: 4.5
 
-Mu
+Server1: windows 2008 64-bit (standalone)
+disable smb1 protocol to make it smb2 only (e.g., add reg value smb1 and set it
+to 0, restart Lanmanserver service.  see
+http://blogs.technet.com/b/askperf/archive/2008/05/30/two-minute-drill-overview-of-smb-2-0.aspx)
+
+$ sudo /sbin/mount.cifs -v -o user=user1,pass=XXXX //AA.BB.CC.DD/C$ mnt
+mount.cifs kernel mount options:
+ip=AA.BB.CC.DD,unc=\\AA.BB.CC.DD\C$,,ver=1,user=user1,pass=********
+mount error(112): Host is down
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+
+syslog:
+Jun 10 14:18:26 ubuntu-1104 kernel: [10703.059510] CIFS VFS: cifs_mount failed
+w/return code = -112
+
+* before I disabled smb1 on server1, the same command can mount the share of the
+same machine successfully.
+* same result if I used /sbin/mount.cifs.old.
+
+Server2: Mac OS X 10.7 (LION, Preview 4)
+Apple replaces samba with their own smbx which speaks SMB2.
+
+$ sudo /sbin/mount.cifs -v -o user=user2,pass=YYYY //EE.FF.GG.HH/Misc mnt
+mount.cifs kernel mount options:
+ip=EE.FF.GG.HH,unc=\\EE.FF.GG.HH\Misc,,ver=1,user=user2,pass=********
+mount error(22): Invalid argument
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+
+syslog:
+Jun 10 14:27:06 ubuntu-1104 kernel: [11222.340976] CIFS VFS: cifs_mount failed
+w/return code = -22
+
+* same result if I used /sbin/mount.cifs.old.
+* the same command works with prior version of Mac OS X (which uses Samba).
+
+Any suggestions?
+
+Thanks.
+
+Kong
