@@ -1,73 +1,111 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: don't allow cifs_reconnect to exit with NULL socket pointer
-Date: Fri, 10 Jun 2011 16:14:57 -0400
-Message-ID: <1307736897-9831-1-git-send-email-jlayton@redhat.com>
-Cc: greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Martijn Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org>
+Subject: Re: [OOPS] 3.0-rc1 cifs
+Date: Sat, 11 Jun 2011 00:03:31 +0200 (CEST)
+Message-ID: <Pine.LNX.4.64.1106102333470.28401@sarijopen.student.utwente.nl>
+References: <Pine.LNX.4.64.1106092211500.19687@sarijopen.student.utwente.nl>
+ <20110609183045.01f6f9fc@tlielax.poochiereds.net>
+ <BANLkTimPqmkNJMaJE2_C5zD8ESFOEM3=hg@mail.gmail.com>
+ <Pine.LNX.4.64.1106100243370.2168@sarijopen.student.utwente.nl>
+ <20110610073702.061bc014@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
+Cc: Connor Hansen <cmdkhh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110610073702.061bc014-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It's possible for the following set of events to happen:
 
-cifsd calls cifs_reconnect which reconnects the socket. A userspace
-process then calls cifs_negotiate_protocol to handle the NEGOTIATE and
-gets a reply. But, while processing the reply, cifsd calls
-cifs_reconnect again.  Eventually the GlobalMid_Lock is dropped and the
-reply from the earlier NEGOTIATE completes and the tcpStatus is set to
-CifsGood. cifs_reconnect then goes through and closes the socket and sets the
-pointer to zero, but because the status is now CifsGood, the new socket
-is not created and cifs_reconnect exits with the socket pointer set to
-NULL.
+On Fri, 10 Jun 2011, Jeff Layton wrote:
 
-Fix this by only setting the tcpStatus to CifsGood if the tcpStatus is
-CifsNeedNegotiate, and by making sure that generic_ip_connect is always
-called at least once in cifs_reconnect.
+> On Fri, 10 Jun 2011 02:57:21 +0200 (CEST)
+> Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org> wrote:
+>
+>>
+>> <snip>
+>>> call in get_dfs_path()
+>>> rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
+>>>
+>>> function header for CIFSTCon
+>>> int  CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+>>>          const char *tree, struct cifs_tcon *tcon,
+>>>          const struct nls_table *nls_codepage)
+>>>
+>>> get_dfs_path() is passing struct cifs_tcon *tcon as NULL
+>>>
+>>> from config:  CONFIG_CIFS_WEAK_PW_HASH=y
+>>>
+>>> in CIFSTCon
+>>>
+>>> #ifdef CONFIG_CIFS_WEAK_PW_HASH
+>>> 3222                 if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
+>>> 3223                     (ses->server->secType == LANMAN))
+>>> 3224                         calc_lanman_hash(tcon->password,
+>>> ses->server->cryptkey,
+>>>
+>>> in calc_lanman_hash tcon is dereferenced(tcon->password) without being
+>>> checked if null
+>>>
+>>> 3225                                          ses->server->sec_mode &
+>>> 3226                                             SECMODE_PW_ENCRYPT ?
+>>> true : false,
+>>> 3227                                          bcc_ptr);
+>>> 3228                 else
+>>> 3229 #endif /* CIFS_WEAK_PW_HASH */
+>>>
+>>> Connor
+>>
+>>
+>> Ave all
+>>
+>> I recompiled  kernel 3.0-rc1 (hadn't enabled CONFIG_DEBUG_INFO=y) and put
+>> the oops (with the new adresses) through gdb per instruction of Jeff. And
+>> Connor was spot on!
+>>
+>> <qoute oops>
+>> BUG: unable to handle kernel NULL pointer dereference at 00000000000000a0
+>> IP: [<ffffffffa041e286>] CIFSTCon+0xf6/0x4d0 [cifs]
+>> </qoute oops>
+>>
+>> <qoute gdb>
+>> This GDB was configured as "x86_64-linux-gnu".
+>> For bug reporting instructions, please see:
+>> <http://www.gnu.org/software/gdb/bugs/>...
+>> Reading symbols from
+>> /lib/modules/3.0.0-rc1-debug/kernel/fs/cifs/cifs.ko...done.
+>> (gdb) list *(CIFSTCon+0xf6)
+>> 0xc2b6 is in CIFSTCon (fs/cifs/connect.c:3230).
+>> 3225                                             ses->server->sec_mode &
+>> 3226                                                SECMODE_PW_ENCRYPT ?
+>> true : false,
+>> 3227                                             bcc_ptr);
+>> 3228                    else
+>> 3229    #endif /* CIFS_WEAK_PW_HASH */
+>> 3230                    rc = SMBNTencrypt(tcon->password,
+>> ses->server->cryptkey,
+>> 3231                                            bcc_ptr);
+>> 3232
+>> 3233                    bcc_ptr += CIFS_AUTH_RESP_SIZE;
+>> 3234                    if (ses->capabilities & CAP_UNICODE) {
+>> (gdb)
+>> </qoute gdb>
+>>
+>
+> (cc'ing Sean F. since I suspect this regression is due to his changes)
+>
+> Thanks for the analysis, Martijn and Connor...
+>
+> What sort of server are you mounting here? It looks like it's using
+> share-level security, so it's either very old or is a samba server
+> configured that way.
 
-Note that this is not a perfect fix for this issue. It's still possible
-that the NEGOTIATE reply is handled after the socket has been closed and
-reconnected. In that case, the socket state will look correct but it no
-NEGOTIATE was performed on it be for the wrong socket. In that situation
-though the server should just shut down the socket on the next attempted
-send, rather than causing the oops that occurs today.
+To be honest ... both :)
+a)server is Debian Etch (samba 3.0.24-6etch10)
+   (yeah i know old, but no time at the moment to upgrade/reinstall the
+   whole system)
+b)share security. (security=share) in smb.conf
+   This is on purpose. (all access is shielded based on hostnames)
 
-Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # .38.x: fd88ce9: [CIFS] cifs: clarify the meaning of tcpStatus == CifsGood
-Reported-and-Tested-by: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index bb659eb..61ed0ba 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -152,7 +152,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		mid_entry->callback(mid_entry);
- 	}
- 
--	while (server->tcpStatus == CifsNeedReconnect) {
-+	do {
- 		try_to_freeze();
- 
- 		/* we should try only the port we connected to before */
-@@ -167,7 +167,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 				server->tcpStatus = CifsNeedNegotiate;
- 			spin_unlock(&GlobalMid_Lock);
- 		}
--	}
-+	} while (server->tcpStatus == CifsNeedReconnect);
- 
- 	return rc;
- }
-@@ -3371,7 +3371,7 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
- 	}
- 	if (rc == 0) {
- 		spin_lock(&GlobalMid_Lock);
--		if (server->tcpStatus != CifsExiting)
-+		if (server->tcpStatus == CifsNeedNegotiate)
- 			server->tcpStatus = CifsGood;
- 		else
- 			rc = -EHOSTDOWN;
--- 
-1.7.5.2
+Mu
