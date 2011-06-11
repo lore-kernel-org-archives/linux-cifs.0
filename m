@@ -1,66 +1,61 @@
-From: Kong <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: mount.cifs failed to mount smb2-only shares
-Date: Fri, 10 Jun 2011 22:26:41 +0000 (UTC)
-Message-ID: <loom.20110611T002543-158@post.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: mount.cifs failed to mount smb2-only shares
+Date: Fri, 10 Jun 2011 20:08:51 -0500
+Message-ID: <BANLkTinKjNUzjCbHmd5oEBTPcUVxUcLJpg@mail.gmail.com>
+References: <BANLkTikE_6VtheOLNJagqMRORF_nMAnE2w@mail.gmail.com>
+	<BANLkTinVTEu1ZMmA_HAZMToeOgyXYf4Eqw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: Kong Li <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <BANLkTinVTEu1ZMmA_HAZMToeOgyXYf4Eqw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Fri, Jun 10, 2011 at 6:47 PM, Kong Li <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Hi Steve,
+>
+> Were you referring to
+> git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/smb2.git?
+> the latest entry is "2010-10-27 =A0 =A0 =A0 =A0 Pavel Shilovsky."
 
-Two problems with smb2-only shares. 
+There are newer smb2 support patches which incorporate review comments
+and are rebased on current 3.0-rc1 kernel.  See below:
 
-client: ubuntu 11.04 32-bit
-I moved the original mount.cifs (version 4.5)to mount.cifs.old, and installed
-mount.cifs version 5.0.
+On Thu, Jun 2, 2011 at 4:10 PM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
+rote:
+> Hi!
+>
+> I applied pending smb2 patches on top of current master branch and
+> created branch smb2-dev:
+> http://git.etersoft.ru/people/piastry/packages/?p=3Dcifs-2.6.git;a=3D=
+shortlog;h=3Drefs/heads/smb2-dev
+>
+> I also created another branch smb2-dev-experimental and put three
+> commits on top of smb2-dev - it makes mount/umount work but after som=
+e
+> period of time kernel crashes - I am working on fixing this now:
+> http://git.etersoft.ru/people/piastry/packages/?p=3Dcifs-2.6.git;a=3D=
+shortlog;h=3Drefs/heads/smb2-dev-experimental
+>
+> Any thoughts/suggestions are welcome!
 
-$ uname -r
-2.6.38-8-generic
-$ /sbin/mount.cifs -V
-mount.cifs version: 5.0
-$ /sbin/mount.cifs.old -V
-mount.cifs version: 4.5
 
-Server1: windows 2008 64-bit (standalone)
-disable smb1 protocol to make it smb2 only (e.g., add reg value smb1 and set it
-to 0, restart Lanmanserver service.  see
-http://blogs.technet.com/b/askperf/archive/2008/05/30/two-minute-drill-overview-of-smb-2-0.aspx)
+> On Fri, Jun 10, 2011 at 4:36 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wr=
+ote:
+>> Current cifs.ko does not include smb2 support...but pavel recently p=
+osted
+>> links to his git tree with updated smb2 patches for testing and revi=
+ew.
+>>
+>> On Jun 10, 2011 5:35 PM, "Kong" <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>
+>
 
-$ sudo /sbin/mount.cifs -v -o user=user1,pass=XXXX //AA.BB.CC.DD/C$ mnt
-mount.cifs kernel mount options:
-ip=AA.BB.CC.DD,unc=\\AA.BB.CC.DD\C$,,ver=1,user=user1,pass=********
-mount error(112): Host is down
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
-syslog:
-Jun 10 14:18:26 ubuntu-1104 kernel: [10703.059510] CIFS VFS: cifs_mount failed
-w/return code = -112
 
-* before I disabled smb1 on server1, the same command can mount the share of the
-same machine successfully.
-* same result if I used /sbin/mount.cifs.old.
+--=20
+Thanks,
 
-Server2: Mac OS X 10.7 (LION, Preview 4)
-Apple replaces samba with their own smbx which speaks SMB2.
-
-$ sudo /sbin/mount.cifs -v -o user=user2,pass=YYYY //EE.FF.GG.HH/Misc mnt
-mount.cifs kernel mount options:
-ip=EE.FF.GG.HH,unc=\\EE.FF.GG.HH\Misc,,ver=1,user=user2,pass=********
-mount error(22): Invalid argument
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
-
-syslog:
-Jun 10 14:27:06 ubuntu-1104 kernel: [11222.340976] CIFS VFS: cifs_mount failed
-w/return code = -22
-
-* same result if I used /sbin/mount.cifs.old.
-* the same command works with prior version of Mac OS X (which uses Samba).
-
-Any suggestions?
-
-Thanks.
-
-Kong
+Steve
