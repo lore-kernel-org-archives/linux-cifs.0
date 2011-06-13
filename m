@@ -1,176 +1,258 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Kong <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: mount.cifs failed with Mac OS X 10.7 (LION, Preview 4)
-Date: Mon, 13 Jun 2011 15:19:16 -0500
-Message-ID: <BANLkTi=CKD9F2Msdxf587QQN+Z5e8_r7BQ@mail.gmail.com>
-References: <loom.20110613T211710-599@post.gmane.org>
+Date: Mon, 13 Jun 2011 20:49:58 +0000 (UTC)
+Message-ID: <loom.20110613T222739-674@post.gmane.org>
+References: <loom.20110613T211710-599@post.gmane.org> <BANLkTi=CKD9F2Msdxf587QQN+Z5e8_r7BQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Kong <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <loom.20110613T211710-599-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looks like a possible server bug (or configuration setting).   Very odd=
- for
-server to require extended security but not require kerberos.
 
-In any case - does mounting with "sec=3Dntlmssp" work?
+No, mounting with "sec=ntlmssp" does not work.
 
-On Mon, Jun 13, 2011 at 2:32 PM, Kong <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
-> Server: Mac OS X 10.7 (LION, Preview 4)
-> Apple replaces samba with their own smbx which speaks SMB1 and SMB2.
-> [In an earlier post, I was wrong by stating Apple's smbx only speaks =
-smb2.]
->
-> client: ubuntu 11.04 32-bit
-> I moved the original mount.cifs (version 4.5) to mount.cifs.old, and =
-installed
-> mount.cifs version 5.0.
->
-> $ uname -r
-> 2.6.38-8-generic
-> $ /sbin/mount.cifs -V
-> mount.cifs version: 5.0
-> $ /sbin/mount.cifs.old -V
-> mount.cifs version: 4.5
->
-> $ /sbin/mount.cifs -v -o user=3Dadministrator,pass=3DYYYY //192.168.7=
-7.244/Misc mnt
-> mount.cifs kernel mount options:
-> ip=3D192.168.77.244,unc=3D\\192.168.77.244\Misc,,ver=3D1,user=3Dadmin=
-istrator,pass=3D****
-> mount error(22): Invalid argument
-> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->
-> The debugging output ("echo 7 > /proc/fs/cifs/cifsFYI"):
-> [ 3770.285371] /build/buildd/linux-2.6.38/fs/cifs/cifsfs.c:
-> Devname: //192.168.77.244/Misc flags: 0
-> [ 3770.288473] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: in cifs_mount as Xid: 136 with uid: 0
-> [ 3770.288501] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Username: administrator
-> [ 3770.288521] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> UNC:\\192.168.77.244\Misc ip: 192.168.77.244
-> [ 3770.288556] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Socket created
-> [ 3770.299030] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
-> [ 3770.308263] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: in cifs_get_smb_ses as Xid: 137 with uid: 0
-> [ 3770.308283] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Existing smb sess not found
-> [ 3770.308308] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
-> secFlags 0x7
-> [ 3770.308328] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
-> For smb_command 114
-> [ 3770.308352] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
-> Sending smb: total_len 82
-> [ 3770.308592] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Demultiplex PID: 3241
-> [ 3770.309134] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> rfc1002 length 0x29
-> [ 3770.309188] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
-> sync_mid_result: cmd=3D114 mid=3D1 state=3D4
-> [ 3770.309246] Status code returned 0xc00000bb NT_STATUS_NOT_SUPPORTE=
-D
-> [ 3770.309295] /build/buildd/linux-2.6.38/fs/cifs/netmisc.c:
-> Mapping smb error code 0xc00000bb to POSIX err -22
-> [ 3770.309324] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
-> negprot rc -22
-> [ 3770.309377] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: leaving cifs_get_smb_ses (xid =3D 137) rc =3D -22
-> [ 3770.309412] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: leaving cifs_mount (xid =3D 136) rc =3D -22
-> [ 3770.309422] CIFS VFS: cifs_mount failed w/return code =3D -22
->
-> The smbx on Mac logged the following:
-> 192.168.77.244 SMB client not supported - Unicode, NT Errors, Long na=
-mes and
-> Extended Security are required
->
-> $ /sbin/mount.cifs.old -v -o user=3Dadministrator,pass=3DYYYY
-> //192.168.77.244/Misc mnt
-> mount.cifs kernel mount options:
-> ip=3D192.168.77.244,unc=3D\\192.168.77.244\Misc,,ver=3D1,user=3Dadmin=
-istrator,pass=3D****
-> mount error(22): Invalid argument
-> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->
-> The debugging output ("echo 7 > /proc/fs/cifs/cifsFYI"):
-> [ 4121.323128] /build/buildd/linux-2.6.38/fs/cifs/cifsfs.c:
-> Devname://192.168.77.244/Misc/ flags: 64
-> [ 4121.325289] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: in cifs_mount as Xid: 138 with uid: 0
-> [ 4121.325302] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Username: administrator
-> [ 4121.325307] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> UNC:\\192.168.77.244\Misc ip: 192.168.77.244
-> [ 4121.325329] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Socket created
-> [ 4121.326135] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
-> [ 4121.326236] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: in cifs_get_smb_ses as Xid: 139 with uid: 0
-> [ 4121.326240] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Existing smb sess not found
-> [ 4121.326252] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
-> secFlags 0x7
-> [ 4121.326261] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
-> For smb_command 114
-> [ 4121.326265] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
-> Sending smb: total_len 82
-> [ 4121.326384] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> Demultiplex PID: 3333
-> [ 4121.327110] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> rfc1002 length 0x29
-> [ 4121.327180] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
-> sync_mid_result:cmd=3D114 mid=3D1 state=3D4
-> [ 4121.327186] Status code returned 0xc00000bb NT_STATUS_NOT_SUPPORTE=
-D
-> [ 4121.327191] /build/buildd/linux-2.6.38/fs/cifs/netmisc.c:
-> Mapping smb error code 0xc00000bb to POSIX err -22
-> [ 4121.327202] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
-> negprot rc -22
-> [ 4121.327209] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: leaving cifs_get_smb_ses (xid =3D 139) rc =3D -22
-> [ 4121.327220] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
-> CIFS VFS: leaving cifs_mount (xid =3D 138) rc =3D -22
-> [ 4121.327225] CIFS VFS: cifs_mount failed w/return code =3D -22
->
-> The smbx on Mac logged the following:
-> 192.168.77.244 SMB client not supported - Unicode, NT Errors, Long na=
-mes and
-> Extended Security are required
->
->
-> * I can mount a share on the same mac from Win2003 or Win2008 client.
-> * the same command works with prior version of Mac OS X (which uses S=
-amba).
->
-> Any suggestions?
->
-> Thanks.
->
-> Kong
->
->
->
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+$ sudo /sbin/mount.cifs -v -o user=administrator,pass='Upt1va2008!',sec=ntlmssp
+//192.168.77.244/Misc mnt
+mount.cifs kernel mount options:ip=192.168.77.244,
+unc=\\192.168.77.244\Misc,sec=ntlmssp,ver=1,user=administrator,pass=********
+mount error(95): Operation not supported
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
+debug output:
+[ 9063.356223] /build/buildd/linux-2.6.38/fs/cifs/cifsfs.c: 
+Devname: //192.168.77.244/Misc flags: 0 
+[ 9063.358102] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: in cifs_mount as Xid: 154 with uid: 0
+[ 9063.358117] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+Username: administrator
+[ 9063.358122] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+UNC: \\192.168.77.244\Misc ip: 192.168.77.244
+[ 9063.358142] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+Socket created
+[ 9063.370719] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+sndbuf 16384 rcvbuf 87380 rcvtimeo 0x6d6
+[ 9063.376125] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: in cifs_get_smb_ses as Xid: 155 with uid: 0
+[ 9063.376132] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+Existing smb sess not found
+[ 9063.376142] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+secFlags 0x80
+[ 9063.376149] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+NTLMSSP only mechanism, enable extended security
+[ 9063.376156] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 114
+[ 9063.376160] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 82
+[ 9063.376324] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+Demultiplex PID: 4219
+[ 9063.377010] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0xd9
+[ 9063.377047] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=114 mid=1 state=4
+[ 9063.377057] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+Dialect: 2
+[ 9063.377065] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 7 oid = 0x1 0x2 0x348 0xbb92
+[ 9063.377069] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 7 oid = 0x1 0x2 0x348 0x1bb92
+[ 9063.377073] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 6 oid = 0x1 0x2 0x2f0 0x2b
+[ 9063.377077] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 7 oid = 0x1 0x3 0x6 0x1
+[ 9063.377121] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 10 oid = 0x1 0x3 0x6 0x1
+[ 9063.377126] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 7 oid = 0x1 0x3 0x5 0x1
+[ 9063.377130] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+OID len = 7 oid = 0x1 0x3 0x6 0x1
+[ 9063.377134] /build/buildd/linux-2.6.38/fs/cifs/asn1.c:
+Need to call asn1_octets_decode() function for 
+not_defined_in_RFC4178@please_ignore
+[ 9063.377138] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+Signing disabled
+[ 9063.377148] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+negprot rc 0
+[ 9063.377156] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+Security Mode: 0x3 Capabilities: 0x8080e2fc TimeAdjust: 0
+[ 9063.377159] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+sess setup type 3
+[ 9063.377165] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+ntlmssp session setup phase 1
+[ 9063.377171] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 115
+[ 9063.377175] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 210
+[ 9063.384412] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0xf8
+[ 9063.384458] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=115 mid=2 state=4
+[ 9063.384464] Status code returned 0xc0000016
+ NT_STATUS_MORE_PROCESSING_REQUIRED
+[ 9063.384470] /build/buildd/linux-2.6.38/fs/cifs/netmisc.c:
+Mapping smb error code 0xc0000016 to POSIX err -5
+[ 9063.384474] /build/buildd/linux-2.6.38/fs/cifs/misc.c:
+Null buffer passed to cifs_small_buf_release
+[ 9063.384481] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+Guest login
+[ 9063.384485] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+UID = 4 
+[ 9063.384489] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+bleft 86
+[ 9063.384494] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+serverOS=Darwin
+[ 9063.384499] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+serverNOS=@(#)PROGRAM:smbd  PROJECT:smbx-102
+[ 9063.384503] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+serverDomain=
+[ 9063.384507] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+ssetup freeing small buf db8ab540
+[ 9063.384513] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+ntlmssp session setup phase 3
+[ 9063.384681] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 115
+[ 9063.384686] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 396
+[ 9063.406617] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x86
+[ 9063.406666] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=115 mid=3 state=4
+[ 9063.406671] /build/buildd/linux-2.6.38/fs/cifs/misc.c:
+Null buffer passed to cifs_small_buf_release
+[ 9063.406677] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+UID = 4 
+[ 9063.406681] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+bleft 86
+[ 9063.406687] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+serverOS=Darwin
+[ 9063.406692] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+serverNOS=@(#)PROGRAM:smbd  PROJECT:smbx-102
+[ 9063.406696] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+serverDomain=
+[ 9063.406700] /build/buildd/linux-2.6.38/fs/cifs/sess.c:
+ssetup freeing small buf db8ab700
+[ 9063.406707] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS Session Established successfully
+[ 9063.406714] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: leaving cifs_get_smb_ses (xid = 155) rc = 0
+[ 9063.406719] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+file mode: 0x1ed dir mode: 0x1ed
+[ 9063.406726] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: in cifs_get_tcon as Xid: 156 with uid: 0
+[ 9063.406738] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 117
+[ 9063.406741] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 98
+[ 9063.422924] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x42
+[ 9063.422961] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=117 mid=4 state=4
+[ 9063.422971] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+disk share connection
+[ 9063.423017] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+nativeFileSystem=NTFS
+[ 9063.423021] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+Tcon flags: 0x0 
+[ 9063.423031] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: leaving cifs_get_tcon (xid = 156) rc = 0
+[ 9063.423035] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS Tcon rc = 0
+[ 9063.423040] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+In QFSDeviceInfo
+[ 9063.423045] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 50
+[ 9063.423049] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 72
+[ 9063.423473] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x44
+[ 9063.423553] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=50 mid=5 state=4
+[ 9063.423567] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+In QFSAttributeInfo
+[ 9063.423572] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 50
+[ 9063.423576] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 72
+[ 9063.424468] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x50
+[ 9063.425066] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=50 mid=6 state=4
+[ 9063.425085] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+In QFSUnixInfo
+[ 9063.425092] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 50
+[ 9063.425096] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 72
+[ 9063.426194] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x27
+[ 9063.426204] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+invalid transact2 word count
+[ 9063.426226] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=50 mid=7 state=4
+[ 9063.426239] Status code returned 0xc0000148 NT_STATUS_INVALID_LEVEL
+[ 9063.426244] /build/buildd/linux-2.6.38/fs/cifs/netmisc.c:
+Mapping smb error code 0xc0000148 to POSIX err -95
+[ 9063.426251] CIFS VFS: Send error in QFSUnixInfo = -95
+[ 9063.426265] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: leaving cifs_mount (xid = 154) rc = 0
+[ 9063.426274] /build/buildd/linux-2.6.38/fs/cifs/inode.c:
+CIFS VFS: in cifs_root_iget as Xid: 157 with uid: 0
+[ 9063.426278] /build/buildd/linux-2.6.38/fs/cifs/inode.c:
+Getting info on 
+[ 9063.426281] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+In QPathInfo (Unix) the path 
+[ 9063.426287] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 50
+[ 9063.426290] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 78
+[ 9063.426937] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x27
+[ 9063.426944] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+invalid transact2 word count
+[ 9063.426959] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=50 mid=8 state=4
+[ 9063.426963] Status code returned 0xc0000003 NT_STATUS_INVALID_INFO_CLASS
+[ 9063.426968] /build/buildd/linux-2.6.38/fs/cifs/netmisc.c:
+Mapping smb error code 0xc0000003 to POSIX err -95
+[ 9063.426980] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+Send error in QPathInfo = -95
+[ 9063.426988] CIFS VFS: cifs_read_super: get root inode failed
+[ 9063.426996] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+cifs_put_tcon: tc_count=1
+[ 9063.426998] 
+[ 9063.427002] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: in cifs_put_tcon as Xid: 158 with uid: 0
+[ 9063.427022] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+In tree disconnect
+[ 9063.427027] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 113
+[ 9063.427031] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 39
+[ 9063.431190] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x27
+[ 9063.431234] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=113 mid=9 state=4
+[ 9063.431305] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+cifs_put_smb_ses: ses_count=1
+[ 9063.431307] 
+[ 9063.431354] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+CIFS VFS: in cifs_put_smb_ses as Xid: 159 with uid: 0
+[ 9063.431360] /build/buildd/linux-2.6.38/fs/cifs/cifssmb.c:
+In SMBLogoff for session disconnect
+[ 9063.431386] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+For smb_command 116
+[ 9063.431390] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+Sending smb: total_len 43
+[ 9063.431847] /build/buildd/linux-2.6.38/fs/cifs/connect.c:
+rfc1002 length 0x27
+[ 9063.431865] /build/buildd/linux-2.6.38/fs/cifs/transport.c:
+sync_mid_result: cmd=116 mid=10 state=4
 
+On the mac, smbx logged the following:
+host77244\administrator connected to path /User/administrator/Misc
 
---=20
-Thanks,
+Thanks.
 
-Steve
+Kong
