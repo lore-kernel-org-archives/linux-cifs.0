@@ -1,7 +1,7 @@
-From: Jeff Layton <jlayton@redhat.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [OOPS] 3.0-rc1 cifs
-Date: Sat, 11 Jun 2011 21:17:23 -0400
-Message-ID: <20110611211723.3e453806@tlielax.poochiereds.net>
+Date: Mon, 13 Jun 2011 11:48:31 -0400
+Message-ID: <20110613114831.37c90109@tlielax.poochiereds.net>
 References: <Pine.LNX.4.64.1106092211500.19687@sarijopen.student.utwente.nl>
 	<20110609183045.01f6f9fc@tlielax.poochiereds.net>
 	<BANLkTimPqmkNJMaJE2_C5zD8ESFOEM3=hg@mail.gmail.com>
@@ -15,18 +15,19 @@ References: <Pine.LNX.4.64.1106092211500.19687@sarijopen.student.utwente.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Connor Hansen <cmdkhh@gmail.com>,
-	Suresh Jayaraman <sjayaraman@suse.de>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sean finney <seanius@seanius.net>
-To: Martijn Uffing <mp3project@sarijopen.student.utwente.nl>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <Pine.LNX.4.64.1106112356500.12565@sarijopen.student.utwente.nl>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Connor Hansen <cmdkhh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Martijn Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <Pine.LNX.4.64.1106112356500.12565-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 On Sun, 12 Jun 2011 00:31:47 +0200 (CEST)
-Martijn Uffing <mp3project@sarijopen.student.utwente.nl> wrote:
+Martijn Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org> wrote:
 
 > 
 > 
@@ -171,18 +172,53 @@ Martijn Uffing <mp3project@sarijopen.student.utwente.nl> wrote:
 > a while)
 > 
 
-That panic doesn't look related to the one you originally reported. I
-think there was at least one double-kfree bug fixed in rc2, so you
-might want to try rebasing to that.
+(cc'ing Pavel)
 
-FWIW, I set up a samba server doing share-level security and was able
-to reproduce your original oops. This patch seems to fix it, and I was
-able to successfully mount using a rc2 based kernel with that patch.
+Ok, I've been able to reproduce on -rc2 as well, simply by mounting
+with -o sec=none. Pavel, I'm pretty sure this got broken by commit
+724d9f1cfb. That patch doesn't handle the "null user" case correctly.
+There are probably several different ways to fix it:
 
-Given that, I'll go ahead and send this up to Steve so that he can
-review it for 3.0.
 
-Thanks,
+[  249.418776] ------------[ cut here ]------------
+[  249.419050] kernel BUG at mm/slub.c:2948!
+[  249.419050] invalid opcode: 0000 [#1] SMP 
+[  249.419050] CPU 1 
+[  249.419050] Modules linked in: des_generic md4 nls_utf8 cifs fscache sunrpc ipx p8022 psnap llc p8023 rose ax25 joydev i2c_piix4 i2c_core virtio_balloon virtio_net virtio_blk [last unloaded: cifs]
+[  249.419050] 
+[  249.419050] Pid: 1058, comm: mount.cifs Not tainted 3.0-0.rc2.git0.2.fc16.x86_64 #1 Bochs Bochs
+[  249.419050] RIP: 0010:[<ffffffff81126249>]  [<ffffffff81126249>] kfree+0x60/0xfc
+[  249.419050] RSP: 0018:ffff88003ba2bce8  EFLAGS: 00010246
+[  249.419050] RAX: 0020000000000000 RBX: ffffffffa013d46d RCX: ffff880034380930
+[  249.419050] RDX: 0020000000000000 RSI: ffff8800314a4ea0 RDI: ffffffffa013d46d
+[  249.419050] RBP: ffff88003ba2bd08 R08: ffff88003e002500 R09: 000000000000005a
+[  249.419050] R10: ffffffff82421ed0 R11: 00000000000003a7 R12: ffffea0000704558
+[  249.419050] R13: ffff88002f1a8050 R14: ffff88003140c2d0 R15: ffff88003a40d330
+[  249.419050] FS:  00007f89290dc740(0000) GS:ffff88003fc00000(0000) knlGS:0000000000000000
+[  249.419050] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+[  249.419050] CR2: 00007f804783a240 CR3: 000000003aea9000 CR4: 00000000000006e0
+[  249.419050] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  249.419050] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+[  249.419050] Process mount.cifs (pid: 1058, threadinfo ffff88003ba2a000, task ffff8800314a47a0)
+[  249.419050] Stack:
+[  249.419050]  ffff88003c312000 ffff88003ba2bd70 ffff88002f1a8050 ffff88003140c2d0
+[  249.419050]  ffff88003ba2bd28 ffffffffa011e1a7 ffff88003ba1c240 ffff88003140c240
+[  249.419050]  ffff88003ba2bda8 ffffffffa0112107 ffff88003ba2bd98 ffff880034380930
+[  249.419050] Call Trace:
+[  249.419050]  [<ffffffffa011e1a7>] cifs_cleanup_volume_info+0x24/0x72 [cifs]
+[  249.419050]  [<ffffffffa0112107>] cifs_do_mount+0x34e/0x364 [cifs]
+[  249.419050]  [<ffffffff8113a2dd>] mount_fs+0x69/0x158
+[  249.419050]  [<ffffffff81103e6c>] ? __alloc_percpu+0x10/0x12
+[  249.419050]  [<ffffffff8114f35e>] vfs_kern_mount+0x63/0xa0
+[  249.419050]  [<ffffffff81150032>] do_kern_mount+0x4d/0xdf
+[  249.419050]  [<ffffffff811516c8>] do_mount+0x63c/0x69f
+[  249.419050]  [<ffffffff811519ac>] sys_mount+0x88/0xc2
+[  249.419050]  [<ffffffff814fb002>] system_call_fastpath+0x16/0x1b
+[  249.419050] Code: e9 ae 00 00 00 48 83 fb 10 0f 86 af 00 00 00 48 89 df e8 11 dd ff ff 49 89 c4 48 8b 00 a8 80 75 19 49 f7 04 24 00 c0 00 00 75 02 <0f> 0b 4c 89 e7 e8 78 e1 fc ff e9 84 00 00 00 4d 8b 6c 24 10 48 
+[  249.419050] RIP  [<ffffffff81126249>] kfree+0x60/0xfc
+[  249.419050]  RSP <ffff88003ba2bce8>
+[  249.474238] ---[ end trace 48c6ff1e268f2f6a ]---
+
 
 -- 
-Jeff Layton <jlayton@redhat.com>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
