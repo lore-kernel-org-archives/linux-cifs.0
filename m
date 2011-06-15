@@ -1,14 +1,15 @@
 From: David Howells <dhowells@redhat.com>
 Subject: [PATCH] FS-Cache: Add a helper to bulk uncache
 	pages on an inode
-Date: Wed, 15 Jun 2011 16:00:43 +0100
-Message-ID: <20110615150043.23820.69786.stgit@warthog.procyon.org.uk>
+Date: Wed, 15 Jun 2011 16:01:32 +0100
+Message-ID: <20110615150132.23875.92942.stgit@warthog.procyon.org.uk>
 Reply-To: Linux filesystem caching discussion list <linux-cachefs@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, sjayaraman@suse.de,
-        linux-fsdevel@redhat.com, linux-cachefs@redhat.com, stable@kernel.org
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        stable@kernel.org
 To: torvalds@osdl.org, akpm@linux-foundation.com
 Return-path: <linux-cachefs-bounces@redhat.com>
 List-Unsubscribe: <https://www.redhat.com/mailman/options/linux-cachefs>,
