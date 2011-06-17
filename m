@@ -1,28 +1,38 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] KEYS/DNS: Fix ____call_usermodehelper() to not lose the session keyring
-Date: Fri, 17 Jun 2011 10:56:51 +0100
-Message-ID: <23040.1308304611@redhat.com>
-References: <BANLkTimxJ5kHOODSPqRPcgbObjZbfT59uw@mail.gmail.com> <20110616235600.14345.16839.stgit@warthog.procyon.org.uk>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, jmorris-gx6/JNMH7DfYtjvyW6yDsg@public.gmane.org,
-	shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Eric Paris <eparis-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+From: David Aldrich <David.Aldrich-R48kc7GjPox+cjeuK/JdrQ@public.gmane.org>
+Subject: FW: Sticky bit problem
+Date: Fri, 17 Jun 2011 10:32:44 +0100
+Message-ID: <0CCCA5445D7FCB4298BBF0739D4FDD52031DBFE7AEAD@EUEXCLU01.EU.NEC.COM>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTimxJ5kHOODSPqRPcgbObjZbfT59uw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org> wrote:
+Hi
 
-> PS. Possibly it might make more sense to just put the "struct cred *"
-> pointer into the "struct subprocess_info" and not change any of the
-> function prototypes at all?
+We are building a Linux app under Centos 5.3, using gnu make 3.81 and gcc 4.12.  The working directory is on a remote machine and is either a Samba share or a Windows 7 share.  We find that in the case of a Windows 7 share the resulting executable has the sticky bit set in group:
 
-That's the way I did it originally, but someone thought doing it with an init
-function was a better idea:-/
+On Windows 7 share:
 
-Your suggestion is slightly complicated by the capability restriction stuff
-that caused the breakage.  That needs to hack the creds at some point.
+-rwxrwSrwx 1 <snip> myapp
+
+On Samba share:
+
+-rwxrwx--x+ 1 <snip> myapp
+
+The Sticky bit prevents another user in the group from executing the application.
+
+Please will someone suggest how we can prevent the sticky bit from being set?
+
+I found a reference on this list that may be relevant:
+
+http://lists.samba.org/archive/linux-cifs-client/2007-October/002294.html
+
+Is this a problem with the CIFS client?
+
+Best regards
 
 David
