@@ -1,186 +1,279 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [linux-cifs-client] problems with signing and new crypto code
-Date: Fri, 17 Jun 2011 12:20:08 -0500
-Message-ID: <BANLkTikwfFqMDPU4wt0J_K41GZcwZGJgLw@mail.gmail.com>
-References: <20110617090656.35e508a5@tlielax.poochiereds.net>
-	<BANLkTikmKEHSKFNczSwNUvSeFZSubiNyoQ@mail.gmail.com>
-	<20110617101321.23ee627e@tlielax.poochiereds.net>
-	<BANLkTimnh92is9yu6fECaZyg=uEoPmMb4Q@mail.gmail.com>
-	<20110617115832.035cd603@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH 1/2] cifs: Add data structures and functions for uid/gid to SID mapping
+Date: Fri, 17 Jun 2011 18:37:01 -0500
+Message-ID: <1308353821-8750-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110617115832.035cd603-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Jun 17, 2011 at 10:58 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrot=
-e:
-> On Fri, 17 Jun 2011 10:40:21 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Fri, Jun 17, 2011 at 9:13 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wr=
-ote:
->> > On Fri, 17 Jun 2011 08:58:40 -0500
->> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >
->> >> On Fri, Jun 17, 2011 at 8:06 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>=
- wrote:
->> >> > Hi Shirish,
->> >> >
->> >> > I've been working on some backports of some upstream patch seri=
-es and
->> >> > have run into what I think is a problem with the new crypto cod=
-e. The
->> >> > problem mainly seems to manifest itself as bad signatures in wr=
-ite
->> >> > calls. This causes a win2k8 server (at least) to reject the cal=
-l with
->> >> > STATUS_ACCESS_DENIED and stop responding to other calls on the =
-socket.
->> >> >
->> >> > I did a bisect of sorts, and got to this patch:
->> >> >
->> >> > commit ca83ce3d5b9ad321ee24f5870a77f0b21ac5a5de
->> >> > Author: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> >> > Date: =A0 Tue Apr 12 09:13:44 2011 -0400
->> >> >
->> >> > =A0 =A0cifs: don't allow mmap'ed pages to be dirtied while unde=
-r writeback (try #3)
->> >> >
->> >> > My original thought was that something was altering these pages=
- while
->> >> > they were under writeback, but I did some instrumentation and f=
-ound
->> >> > that not to be the case. The signature is the same before and a=
-fter
->> >> > the send when this occurs. A key change in this patch is that w=
-hen
->> >> > signing is enabled, the code started using CIFSSMBWrite2(), whi=
-ch
->> >> > marshals up the send buffer in an array of kvecs.
->> >> >
->> >> > That leads me to believe that the cifs_sign_smb2 codepath is bu=
-sted.
->> >> >
->> >> > I'll see if I can come up with a testcase, but I'm not that fam=
-iliar
->> >> > with the kernel crypto code. Is this something you've seen in y=
-our
->> >> > testing? Any immediate thoughts as to where the problem may be?
->> >> >
->> >> > --
->> >> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> >> >
->> >>
->> >
->> > (fixing cc list since I goofed it earlier...)
->> >
->> >> Jeff, no I have not seen this. You think some iozone testing agai=
-nst
->> >> a Windows server with the latest cifs code might expose this prob=
-lem?
->> >> I will try both Windows 2003 server and Windows 2008 server.
->> >>
->> >
->> > I'm using fsstress against win2k8, and it seems to fail on the ini=
-tial
->> > write calls.
->> >
->> >> cifs_sign_smb and cifs_sign_smb2 do the same exact thing except t=
-hat
->> >> the messages that gets used in signature calculation are differen=
-t in these
->> >> routines.
->> >>
->> >> My initial thought was/is the same as yours, the content of messa=
-ge
->> >> used in calculating signature is different at the server and clie=
-nt resulting
->> >> in different signatures hence dropped smb connection by the serve=
-r.
->> >> But it is possible cifs_sign_smb2 and/or cifs_calc_signature2 hav=
-e a bug!
->> >>
->> >
->> > I did a test where I recalculated the signature after calling smb_=
-sendv
->> > and then compared it to the original signature and they matched, b=
-ut
->> > the server rejected it. I'm still trying to nail down the problem,=
- so
->> > the bug could be anywhere really.
->> >
->> > --
->> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> >
->>
->> Strange, iozone just hangs when I issue a command against a file on
->> a Windows 2003 server
->>
->> =A0 =A0 =A0 =A0 Run began: Fri Jun 17 10:34:13 2011
->>
->> =A0 =A0 =A0 =A0 Auto Mode
->> =A0 =A0 =A0 =A0 Command line used:
->> /usr/src/iozone/iozone3_323/src/current/iozone -a -f /mnt/smb_a/nfil=
-e1
->> =A0 =A0 =A0 =A0 Output is in Kbytes/sec
->> =A0 =A0 =A0 =A0 Time Resolution =3D 0.000001 seconds.
->> =A0 =A0 =A0 =A0 Processor cache size set to 1024 Kbytes.
->> =A0 =A0 =A0 =A0 Processor cache line size set to 32 bytes.
->> =A0 =A0 =A0 =A0 File stride size set to 17 * record size.
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 random
->> random =A0 =A0bkwd =A0 record =A0 stride
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 KB =A0reclen =A0 write rewrite =A0 =A0re=
-ad =A0 =A0reread =A0 =A0read
->> write =A0 =A0read =A0rewrite =A0 =A0 read =A0 fwrite frewrite =A0 fr=
-ead =A0freread
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 64 =A0 =A0 =A0 4
->>
->> The last packets 9n wireshark trace on the server is
->>
->> write andx response: status access denied
->> locking andx request fid: xyz
->>
->> and then cifs client reconnects.
->>
->> (may be this is the dropping/locking smb connection because signatur=
-e
->> in the write andx request is invalid).
->
-> Right, that's basically what I see. win2k8 just replies with status
-> access denied. I suspect that that's because the signature is incorre=
-ct.
->
-> I've noticed too that it only happens with larger writes. Right now,
-> I'm trying to figure out the size where it breaks.
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Jeff, no problems with the dd commands
+Add data structures and functions necessary to map a uid and gid to SID.
+These functions are very similar to the ones used to map a SID to uid and gid.
 
-# ls -l /mnt/smb_a/largefle
--rw-r--r-- 1 root root 16641 Jun 17 12:22 /mnt/smb_a/largefile
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsacl.c  |  198 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsglob.h |    4 +
+ 2 files changed, 202 insertions(+), 0 deletions(-)
 
- # dd if=3D/tmp/largefile of/mnt/smb_a/largefile bs=3D16641 count=3D100
-100+0 records in
-100+0 records out
-1664100 bytes (1.7 MB) copied, 0.0350296 s, 47.5 MB/s
-
- # ls -l /mnt/smb_a/largefle
--rw-r--r-- 1 root root 1664100 Jun 17 12:22 /mnt/smb_a/largefile
-
- # dd if=3D/tmp/largefile of=3D/mnt/smb_a/largefile bs=3D16641 count=3D=
-1000
-1000+0 records in
-1000+0 records out
-16641000 bytes (17 MB) copied, 0.241208 s, 69.0 MB/s
-
- # ls -l /mnt/smb_a/largefile
--rw-r--r-- 1 root root 16641000 Jun 17 12:23 /mnt/smb_a/largefile
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 21de1d6..6f72ea6 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -91,9 +91,76 @@ cifs_idmap_shrinker(struct shrinker *shrink, struct shrink_control *sc)
+ 	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
+ 	spin_unlock(&sidgidlock);
+ 
++	root = &siduidtree;
++	spin_lock(&uidsidlock);
++	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
++	spin_unlock(&uidsidlock);
++
++	root = &sidgidtree;
++	spin_lock(&gidsidlock);
++	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
++	spin_unlock(&gidsidlock);
++
+ 	return nr_rem;
+ }
+ 
++static void
++sid_rb_insert(struct rb_root *root, unsigned long cid,
++		struct cifs_sid_id **psidid, char *typestr)
++{
++	char *strptr;
++	struct rb_node *node = root->rb_node;
++	struct rb_node *parent = NULL;
++	struct rb_node **linkto = &(root->rb_node);
++	struct cifs_sid_id *lsidid;
++
++	while (node) {
++		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
++		parent = node;
++		if (cid > lsidid->id) {
++			linkto = &(node->rb_left);
++			node = node->rb_left;
++		}
++		if (cid < lsidid->id) {
++			linkto = &(node->rb_right);
++			node = node->rb_right;
++		}
++	}
++
++	(*psidid)->id = cid;
++	(*psidid)->time = jiffies - (SID_MAP_RETRY + 1);
++	(*psidid)->refcount = 0;
++
++	sprintf((*psidid)->sidstr, "%s", typestr);
++	strptr = (*psidid)->sidstr + strlen((*psidid)->sidstr);
++	sprintf(strptr, "%ld", cid);
++
++	clear_bit(SID_ID_PENDING, &(*psidid)->state);
++	clear_bit(SID_ID_MAPPED, &(*psidid)->state);
++
++	rb_link_node(&(*psidid)->rbnode, parent, linkto);
++	rb_insert_color(&(*psidid)->rbnode, root);
++}
++
++static struct cifs_sid_id *
++sid_rb_search(struct rb_root *root, unsigned long cid)
++{
++	struct rb_node *node = root->rb_node;
++	struct cifs_sid_id *lsidid;
++
++	while (node) {
++		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
++		if (cid > lsidid->id)
++			node = node->rb_left;
++		else if (cid < lsidid->id)
++			node = node->rb_right;
++		else /* node found */
++			return lsidid;
++	}
++
++	return NULL;
++}
++
+ static struct shrinker cifs_shrinker = {
+ 	.shrink = cifs_idmap_shrinker,
+ 	.seeks = DEFAULT_SEEKS,
+@@ -110,6 +177,7 @@ cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
+ 
+ 	memcpy(payload, data, datalen);
+ 	key->payload.data = payload;
++	key->datalen = datalen;
+ 	return 0;
+ }
+ 
+@@ -224,6 +292,120 @@ sidid_pending_wait(void *unused)
+ }
+ 
+ static int
++id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
++{
++	int rc = 0;
++	struct key *sidkey;
++	const struct cred *saved_cred;
++	struct cifs_sid *lsid;
++	struct cifs_sid_id *psidid, *npsidid;
++	struct rb_root *cidtree;
++	spinlock_t *cidlock;
++
++	if (sidtype == SIDOWNER) {
++		cidlock = &siduidlock;
++		cidtree = &uidtree;
++	} else if (sidtype == SIDGROUP) {
++		cidlock = &sidgidlock;
++		cidtree = &gidtree;
++	} else
++		return -ENOENT;
++
++	spin_lock(cidlock);
++	psidid = sid_rb_search(cidtree, cid);
++
++	if (!psidid) { /* node does not exist, allocate one & attempt adding */
++		spin_unlock(cidlock);
++		npsidid = kzalloc(sizeof(struct cifs_sid_id), GFP_KERNEL);
++		if (!npsidid)
++			return -ENOMEM;
++
++		npsidid->sidstr = kmalloc(SIDLEN, GFP_KERNEL);
++		if (!npsidid->sidstr) {
++			kfree(npsidid);
++			return -ENOMEM;
++		}
++
++		spin_lock(cidlock);
++		psidid = sid_rb_search(cidtree, cid);
++		if (psidid) { /* node happened to get inserted meanwhile */
++			++psidid->refcount;
++			spin_unlock(cidlock);
++			kfree(npsidid->sidstr);
++			kfree(npsidid);
++		} else {
++			psidid = npsidid;
++			sid_rb_insert(cidtree, cid, &psidid,
++					sidtype == SIDOWNER ? "oi:" : "gi:");
++			++psidid->refcount;
++			spin_unlock(cidlock);
++		}
++	} else {
++		++psidid->refcount;
++		spin_unlock(cidlock);
++	}
++
++	/*
++	 * If we are here, it is safe to access psidid and its fields
++	 * since a reference was taken earlier while holding the spinlock.
++	 * A reference on the node is put without holding the spinlock
++	 * and it is OK to do so in this case, shrinker will not erase
++	 * this node until all references are put and we do not access
++	 * any fields of the node after a reference is put .
++	 */
++	if (test_bit(SID_ID_MAPPED, &psidid->state)) {
++		memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
++		psidid->time = jiffies; /* update ts for accessing */
++		goto id_sid_out;
++	}
++
++	if (time_after(psidid->time + SID_MAP_RETRY, jiffies)) {
++		rc = -ENOENT;
++		goto id_sid_out;
++	}
++
++	if (!test_and_set_bit(SID_ID_PENDING, &psidid->state)) {
++		saved_cred = override_creds(root_cred);
++		sidkey = request_key(&cifs_idmap_key_type, psidid->sidstr, "");
++		if (IS_ERR(sidkey)) {
++			rc = -ENOENT;
++			cFYI(1, "%s: Can't map and id to a SID", __func__);
++		} else {
++			lsid = (struct cifs_sid *)sidkey->payload.data;
++			memcpy(&psidid->sid, lsid,
++				sidkey->datalen < sizeof(struct cifs_sid) ?
++				sidkey->datalen : sizeof(struct cifs_sid));
++			memcpy(ssid, &psidid->sid,
++				sidkey->datalen < sizeof(struct cifs_sid) ?
++				sidkey->datalen : sizeof(struct cifs_sid));
++			set_bit(SID_ID_MAPPED, &psidid->state);
++			key_put(sidkey);
++			kfree(psidid->sidstr);
++		}
++		psidid->time = jiffies; /* update ts for accessing */
++		revert_creds(saved_cred);
++		clear_bit(SID_ID_PENDING, &psidid->state);
++		wake_up_bit(&psidid->state, SID_ID_PENDING);
++	} else {
++		rc = wait_on_bit(&psidid->state, SID_ID_PENDING,
++				sidid_pending_wait, TASK_INTERRUPTIBLE);
++		if (rc) {
++			cFYI(1, "%s: sidid_pending_wait interrupted %d",
++					__func__, rc);
++			--psidid->refcount;
++			return rc;
++		}
++		if (test_bit(SID_ID_MAPPED, &psidid->state))
++			memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
++		else
++			rc = -ENOENT;
++	}
++id_sid_out:
++	--psidid->refcount;
++	return rc;
++}
++
++static int
+ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+ 		struct cifs_fattr *fattr, uint sidtype)
+ {
+@@ -383,6 +565,10 @@ init_cifs_idmap(void)
+ 	spin_lock_init(&sidgidlock);
+ 	gidtree = RB_ROOT;
+ 
++	spin_lock_init(&uidsidlock);
++	siduidtree = RB_ROOT;
++	spin_lock_init(&gidsidlock);
++	sidgidtree = RB_ROOT;
+ 	register_shrinker(&cifs_shrinker);
+ 
+ 	cFYI(1, "cifs idmap keyring: %d\n", key_serial(keyring));
+@@ -422,6 +608,18 @@ cifs_destroy_idmaptrees(void)
+ 	while ((node = rb_first(root)))
+ 		rb_erase(node, root);
+ 	spin_unlock(&sidgidlock);
++
++	root = &siduidtree;
++	spin_lock(&uidsidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&uidsidlock);
++
++	root = &sidgidtree;
++	spin_lock(&gidsidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&gidsidlock);
+ }
+ 
+ /* if the two SIDs (roughly equivalent to a UUID for a user or group) are
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 6255fa8..6b5e4a5 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -940,6 +940,10 @@ GLOBAL_EXTERN struct rb_root uidtree;
+ GLOBAL_EXTERN struct rb_root gidtree;
+ GLOBAL_EXTERN spinlock_t siduidlock;
+ GLOBAL_EXTERN spinlock_t sidgidlock;
++GLOBAL_EXTERN struct rb_root siduidtree;
++GLOBAL_EXTERN struct rb_root sidgidtree;
++GLOBAL_EXTERN spinlock_t uidsidlock;
++GLOBAL_EXTERN spinlock_t gidsidlock;
+ 
+ void cifs_oplock_break(struct work_struct *work);
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
+-- 
+1.6.0.2
