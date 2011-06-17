@@ -1,69 +1,44 @@
-From: walter harms <wharms-fPG8STNUNVg@public.gmane.org>
-Subject: Re: [patch] cifs: update limit for snprintf() in cifs_construct_tcon()
-Date: Fri, 17 Jun 2011 13:28:25 +0200
-Message-ID: <4DFB3A59.1020805@bfs.de>
-References: <20110617103059.GE2520@shale.localdomain>
-Reply-To: wharms-fPG8STNUNVg@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: problems with signing and new crypto code
+Date: Fri, 17 Jun 2011 09:09:15 -0400
+Message-ID: <20110617090915.4e2fcf60@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"open list:COMMON INTERNET F..." <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"open list:COMMON INTERNET F..." <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110617103059.GE2520-z0WHZYlhLlzP0Z7Jsv878P8+0UxHXcjY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Hi Shirish,
 
+I've been working on some backports of some upstream patch series and
+have run into what I think is a problem with the new crypto code. The
+problem mainly seems to manifest itself as bad signatures in write
+calls. This causes a win2k8 server (at least) to reject the call with
+STATUS_ACCESS_DENIED and stop responding to other calls on the socket.
 
-Am 17.06.2011 12:31, schrieb Dan Carpenter:
-> In 34c87901e113 "Shrink stack space usage in cifs_construct_tcon" we
-> change the size of the username name buffer from MAX_USERNAME_SIZE
-> (256) to 28.  This call to snprintf() needs to be updated as well.
-> 
-> Signed-off-by: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
-> I know that everyone is going to complain about using a literal but
-> it's local to this function and it's commented in the lines above.
-> I'm not opposed to using a define, I suppose, if you give me a good
-> one, but really I'd just as soon leave it as is.  *eye roll in
-> advance*.
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 12cf72d..efd1c7a 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3451,7 +3451,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, uid_t fsuid)
->  		goto out;
->  	}
->  
-> -	snprintf(username, MAX_USERNAME_SIZE, "krb50x%x", fsuid);
-> +	snprintf(username, 28, "krb50x%x", fsuid);
->  	vol_info->username = username;
->  	vol_info->local_nls = cifs_sb->local_nls;
->  	vol_info->linux_uid = fsuid;
+I did a bisect of sorts, and got to this patch:
 
-perhaps we should restrict it in the format also:
-  "krb50x%22x"
-that would leave the opportunity to have a sane limit,
-instead of just cutting.
+commit ca83ce3d5b9ad321ee24f5870a77f0b21ac5a5de
+Author: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Date:   Tue Apr 12 09:13:44 2011 -0400
 
-just my 2 cents,
-re,
- wh
+    cifs: don't allow mmap'ed pages to be dirtied while under writeback (try #3)
 
-just my 2 cents,
-re,
- wh
+My original thought was that something was altering these pages while
+they were under writeback, but I did some instrumentation and found
+that not to be the case. The signature is the same before and after
+the send when this occurs. A key change in this patch is that when
+signing is enabled, the code started using CIFSSMBWrite2(), which
+marshals up the send buffer in an array of kvecs.
 
+That leads me to believe that the cifs_sign_smb2 codepath is busted.
 
+I'll see if I can come up with a testcase, but I'm not that familiar
+with the kernel crypto code. Is this something you've seen in your
+testing? Any immediate thoughts as to where the problem may be?
 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kernel-janitors" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
