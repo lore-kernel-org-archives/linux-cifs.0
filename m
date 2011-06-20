@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: Cleanup: check return codes of crypto api calls
-Date: Mon, 20 Jun 2011 16:14:03 -0500
-Message-ID: <1308604443-16036-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 1/2] cifs: Add data structures and functions for uid/gid to SID mapping (try #2)
+Date: Mon, 20 Jun 2011 17:01:16 -0500
+Message-ID: <1308607276-17015-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,316 +12,276 @@ List-ID: <linux-cifs.vger.kernel.org>
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
-Check return codes of crypto api calls and either log an error or log
-an error and return from the calling function with error.
+Add data structures and functions necessary to map a uid and gid to SID.
+These functions are very similar to the ones used to map a SID to uid and gid.
+This time, instead of storing sid to id mapping sorted on sid value,
+id to sid is stored, sorted on id.
+A cifs upcall sends an id (uid or gid) and expects a SID structure
+in return, if mapping was done successfully.
+
+Changed the return code of failed id to sid mapping to EINVAL.
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |  110 +++++++++++++++++++++++++++++++++++++++---------
- fs/cifs/link.c        |    8 +++-
- fs/cifs/smbencrypt.c  |    8 +++-
- 3 files changed, 103 insertions(+), 23 deletions(-)
+ fs/cifs/cifsacl.c  |  198 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/cifsglob.h |    4 +
+ 2 files changed, 202 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 5a0ee7f..259991b 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -52,19 +52,29 @@ static int cifs_calculate_signature(const struct smb_hdr *cifs_pdu,
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 21de1d6..b7e723a 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -91,9 +91,76 @@ cifs_idmap_shrinker(struct shrinker *shrink, struct shrink_control *sc)
+ 	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
+ 	spin_unlock(&sidgidlock);
  
- 	rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
- 	if (rc) {
--		cERROR(1, "%s: Oould not init md5\n", __func__);
-+		cERROR(1, "%s: Could not init md5\n", __func__);
- 		return rc;
- 	}
- 
--	crypto_shash_update(&server->secmech.sdescmd5->shash,
-+	rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
- 		server->session_key.response, server->session_key.len);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with response\n", __func__);
-+		return rc;
-+	}
- 
--	crypto_shash_update(&server->secmech.sdescmd5->shash,
-+	rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
- 		cifs_pdu->Protocol, be32_to_cpu(cifs_pdu->smb_buf_length));
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with payload\n", __func__);
-+		return rc;
-+	}
- 
- 	rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate md5 hash\n", __func__);
- 
--	return 0;
-+	return rc;
++	root = &siduidtree;
++	spin_lock(&uidsidlock);
++	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
++	spin_unlock(&uidsidlock);
++
++	root = &sidgidtree;
++	spin_lock(&gidsidlock);
++	shrink_idmap_tree(root, nr_to_scan, &nr_rem, &nr_del);
++	spin_unlock(&gidsidlock);
++
+ 	return nr_rem;
  }
  
- /* must be called with server->srv_mutex held */
-@@ -112,12 +122,16 @@ static int cifs_calc_signature2(const struct kvec *iov, int n_vec,
- 
- 	rc = crypto_shash_init(&server->secmech.sdescmd5->shash);
- 	if (rc) {
--		cERROR(1, "%s: Oould not init md5\n", __func__);
-+		cERROR(1, "%s: Could not init md5\n", __func__);
- 		return rc;
- 	}
- 
--	crypto_shash_update(&server->secmech.sdescmd5->shash,
-+	rc = crypto_shash_update(&server->secmech.sdescmd5->shash,
- 		server->session_key.response, server->session_key.len);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with response\n", __func__);
-+		return rc;
++static void
++sid_rb_insert(struct rb_root *root, unsigned long cid,
++		struct cifs_sid_id **psidid, char *typestr)
++{
++	char *strptr;
++	struct rb_node *node = root->rb_node;
++	struct rb_node *parent = NULL;
++	struct rb_node **linkto = &(root->rb_node);
++	struct cifs_sid_id *lsidid;
++
++	while (node) {
++		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
++		parent = node;
++		if (cid > lsidid->id) {
++			linkto = &(node->rb_left);
++			node = node->rb_left;
++		}
++		if (cid < lsidid->id) {
++			linkto = &(node->rb_right);
++			node = node->rb_right;
++		}
 +	}
++
++	(*psidid)->id = cid;
++	(*psidid)->time = jiffies - (SID_MAP_RETRY + 1);
++	(*psidid)->refcount = 0;
++
++	sprintf((*psidid)->sidstr, "%s", typestr);
++	strptr = (*psidid)->sidstr + strlen((*psidid)->sidstr);
++	sprintf(strptr, "%ld", cid);
++
++	clear_bit(SID_ID_PENDING, &(*psidid)->state);
++	clear_bit(SID_ID_MAPPED, &(*psidid)->state);
++
++	rb_link_node(&(*psidid)->rbnode, parent, linkto);
++	rb_insert_color(&(*psidid)->rbnode, root);
++}
++
++static struct cifs_sid_id *
++sid_rb_search(struct rb_root *root, unsigned long cid)
++{
++	struct rb_node *node = root->rb_node;
++	struct cifs_sid_id *lsidid;
++
++	while (node) {
++		lsidid = rb_entry(node, struct cifs_sid_id, rbnode);
++		if (cid > lsidid->id)
++			node = node->rb_left;
++		else if (cid < lsidid->id)
++			node = node->rb_right;
++		else /* node found */
++			return lsidid;
++	}
++
++	return NULL;
++}
++
+ static struct shrinker cifs_shrinker = {
+ 	.shrink = cifs_idmap_shrinker,
+ 	.seeks = DEFAULT_SEEKS,
+@@ -110,6 +177,7 @@ cifs_idmap_key_instantiate(struct key *key, const void *data, size_t datalen)
  
- 	for (i = 0; i < n_vec; i++) {
- 		if (iov[i].iov_len == 0)
-@@ -131,14 +145,24 @@ static int cifs_calc_signature2(const struct kvec *iov, int n_vec,
- 		if (i == 0) {
- 			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
- 				break; /* nothing to sign or corrupt header */
-+			rc =
- 			crypto_shash_update(&server->secmech.sdescmd5->shash,
- 				iov[i].iov_base + 4, iov[i].iov_len - 4);
--		} else
+ 	memcpy(payload, data, datalen);
+ 	key->payload.data = payload;
++	key->datalen = datalen;
+ 	return 0;
+ }
+ 
+@@ -224,6 +292,120 @@ sidid_pending_wait(void *unused)
+ }
+ 
+ static int
++id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
++{
++	int rc = 0;
++	struct key *sidkey;
++	const struct cred *saved_cred;
++	struct cifs_sid *lsid;
++	struct cifs_sid_id *psidid, *npsidid;
++	struct rb_root *cidtree;
++	spinlock_t *cidlock;
++
++	if (sidtype == SIDOWNER) {
++		cidlock = &siduidlock;
++		cidtree = &uidtree;
++	} else if (sidtype == SIDGROUP) {
++		cidlock = &sidgidlock;
++		cidtree = &gidtree;
++	} else
++		return -EINVAL;
++
++	spin_lock(cidlock);
++	psidid = sid_rb_search(cidtree, cid);
++
++	if (!psidid) { /* node does not exist, allocate one & attempt adding */
++		spin_unlock(cidlock);
++		npsidid = kzalloc(sizeof(struct cifs_sid_id), GFP_KERNEL);
++		if (!npsidid)
++			return -ENOMEM;
++
++		npsidid->sidstr = kmalloc(SIDLEN, GFP_KERNEL);
++		if (!npsidid->sidstr) {
++			kfree(npsidid);
++			return -ENOMEM;
++		}
++
++		spin_lock(cidlock);
++		psidid = sid_rb_search(cidtree, cid);
++		if (psidid) { /* node happened to get inserted meanwhile */
++			++psidid->refcount;
++			spin_unlock(cidlock);
++			kfree(npsidid->sidstr);
++			kfree(npsidid);
 +		} else {
-+			rc =
- 			crypto_shash_update(&server->secmech.sdescmd5->shash,
- 				iov[i].iov_base, iov[i].iov_len);
++			psidid = npsidid;
++			sid_rb_insert(cidtree, cid, &psidid,
++					sidtype == SIDOWNER ? "oi:" : "gi:");
++			++psidid->refcount;
++			spin_unlock(cidlock);
 +		}
++	} else {
++		++psidid->refcount;
++		spin_unlock(cidlock);
++	}
++
++	/*
++	 * If we are here, it is safe to access psidid and its fields
++	 * since a reference was taken earlier while holding the spinlock.
++	 * A reference on the node is put without holding the spinlock
++	 * and it is OK to do so in this case, shrinker will not erase
++	 * this node until all references are put and we do not access
++	 * any fields of the node after a reference is put .
++	 */
++	if (test_bit(SID_ID_MAPPED, &psidid->state)) {
++		memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
++		psidid->time = jiffies; /* update ts for accessing */
++		goto id_sid_out;
++	}
++
++	if (time_after(psidid->time + SID_MAP_RETRY, jiffies)) {
++		rc = -EINVAL;
++		goto id_sid_out;
++	}
++
++	if (!test_and_set_bit(SID_ID_PENDING, &psidid->state)) {
++		saved_cred = override_creds(root_cred);
++		sidkey = request_key(&cifs_idmap_key_type, psidid->sidstr, "");
++		if (IS_ERR(sidkey)) {
++			rc = -EINVAL;
++			cFYI(1, "%s: Can't map and id to a SID", __func__);
++		} else {
++			lsid = (struct cifs_sid *)sidkey->payload.data;
++			memcpy(&psidid->sid, lsid,
++				sidkey->datalen < sizeof(struct cifs_sid) ?
++				sidkey->datalen : sizeof(struct cifs_sid));
++			memcpy(ssid, &psidid->sid,
++				sidkey->datalen < sizeof(struct cifs_sid) ?
++				sidkey->datalen : sizeof(struct cifs_sid));
++			set_bit(SID_ID_MAPPED, &psidid->state);
++			key_put(sidkey);
++			kfree(psidid->sidstr);
++		}
++		psidid->time = jiffies; /* update ts for accessing */
++		revert_creds(saved_cred);
++		clear_bit(SID_ID_PENDING, &psidid->state);
++		wake_up_bit(&psidid->state, SID_ID_PENDING);
++	} else {
++		rc = wait_on_bit(&psidid->state, SID_ID_PENDING,
++				sidid_pending_wait, TASK_INTERRUPTIBLE);
 +		if (rc) {
-+			cERROR(1, "%s: Could not update with payload\n",
-+							__func__);
++			cFYI(1, "%s: sidid_pending_wait interrupted %d",
++					__func__, rc);
++			--psidid->refcount;
 +			return rc;
 +		}
- 	}
- 
- 	rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate md5 hash\n", __func__);
- 
- 	return rc;
- }
-@@ -463,8 +487,12 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 	/* calculate md4 hash of password */
- 	E_md4hash(ses->password, nt_hash);
- 
--	crypto_shash_setkey(ses->server->secmech.hmacmd5, nt_hash,
-+	rc = crypto_shash_setkey(ses->server->secmech.hmacmd5, nt_hash,
- 				CIFS_NTHASH_SIZE);
-+	if (rc) {
-+		cERROR(1, "%s: Could not set NT Hash as a key", __func__);
-+		return rc;
++		if (test_bit(SID_ID_MAPPED, &psidid->state))
++			memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
++		else
++			rc = -EINVAL;
 +	}
- 
- 	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
- 	if (rc) {
-@@ -478,13 +506,18 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 	if (user == NULL) {
- 		cERROR(1, "calc_ntlmv2_hash: user mem alloc failure\n");
- 		rc = -ENOMEM;
--		goto calc_exit_2;
-+		return rc;
- 	}
- 	len = cifs_strtoUCS((__le16 *)user, ses->user_name, len, nls_cp);
- 	UniStrupr(user);
- 
--	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
-+	rc = crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
- 				(char *)user, 2 * len);
-+	kfree(user);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with user\n", __func__);
-+		return rc;
-+	}
- 
- 	/* convert ses->domainName to unicode and uppercase */
- 	if (ses->domainName) {
-@@ -494,13 +527,19 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 		if (domain == NULL) {
- 			cERROR(1, "calc_ntlmv2_hash: domain mem alloc failure");
- 			rc = -ENOMEM;
--			goto calc_exit_1;
-+			return rc;
- 		}
- 		len = cifs_strtoUCS((__le16 *)domain, ses->domainName, len,
- 					nls_cp);
-+		rc =
- 		crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
- 					(char *)domain, 2 * len);
- 		kfree(domain);
-+		if (rc) {
-+			cERROR(1, "%s: Could not update with domain\n",
-+								__func__);
-+			return rc;
-+		}
- 	} else if (ses->serverName) {
- 		len = strlen(ses->serverName);
- 
-@@ -508,21 +547,26 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
- 		if (server == NULL) {
- 			cERROR(1, "calc_ntlmv2_hash: server mem alloc failure");
- 			rc = -ENOMEM;
--			goto calc_exit_1;
-+			return rc;
- 		}
- 		len = cifs_strtoUCS((__le16 *)server, ses->serverName, len,
- 					nls_cp);
-+		rc =
- 		crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
- 					(char *)server, 2 * len);
- 		kfree(server);
-+		if (rc) {
-+			cERROR(1, "%s: Could not update with server\n",
-+								__func__);
-+			return rc;
-+		}
- 	}
- 
- 	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
- 					ntlmv2_hash);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate md5 hash\n", __func__);
- 
--calc_exit_1:
--	kfree(user);
--calc_exit_2:
- 	return rc;
- }
- 
-@@ -537,8 +581,12 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
- 		return -1;
- 	}
- 
--	crypto_shash_setkey(ses->server->secmech.hmacmd5,
-+	rc = crypto_shash_setkey(ses->server->secmech.hmacmd5,
- 				ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
-+	if (rc) {
-+		cERROR(1, "%s: Could not set NTLMV2 Hash as a key", __func__);
-+		return rc;
-+	}
- 
- 	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
- 	if (rc) {
-@@ -552,11 +600,17 @@ CalcNTLMv2_response(const struct cifs_ses *ses, char *ntlmv2_hash)
- 	else
- 		memcpy(ses->auth_key.response + offset,
- 			ses->server->cryptkey, CIFS_SERVER_CHALLENGE_SIZE);
--	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
-+	rc = crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
- 		ses->auth_key.response + offset, ses->auth_key.len - offset);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with response\n", __func__);
-+		return rc;
-+	}
- 
- 	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
- 		ses->auth_key.response + CIFS_SESS_KEY_SIZE);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate md5 hash\n", __func__);
- 
- 	return rc;
- }
-@@ -626,8 +680,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 	}
- 
- 	/* now calculate the session key for NTLMv2 */
--	crypto_shash_setkey(ses->server->secmech.hmacmd5,
-+	rc = crypto_shash_setkey(ses->server->secmech.hmacmd5,
- 		ntlmv2_hash, CIFS_HMAC_MD5_HASH_SIZE);
-+	if (rc) {
-+		cERROR(1, "%s: Could not set NTLMV2 Hash as a key", __func__);
-+		goto setup_ntlmv2_rsp_ret;
-+	}
- 
- 	rc = crypto_shash_init(&ses->server->secmech.sdeschmacmd5->shash);
- 	if (rc) {
-@@ -635,12 +693,18 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 		goto setup_ntlmv2_rsp_ret;
- 	}
- 
--	crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
-+	rc = crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
- 		ses->auth_key.response + CIFS_SESS_KEY_SIZE,
- 		CIFS_HMAC_MD5_HASH_SIZE);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with response\n", __func__);
-+		goto setup_ntlmv2_rsp_ret;
-+	}
- 
- 	rc = crypto_shash_final(&ses->server->secmech.sdeschmacmd5->shash,
- 		ses->auth_key.response);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate md5 hash\n", __func__);
- 
- setup_ntlmv2_rsp_ret:
- 	kfree(tiblob);
-@@ -668,8 +732,12 @@ calc_seckey(struct cifs_ses *ses)
- 
- 	desc.tfm = tfm_arc4;
- 
--	crypto_blkcipher_setkey(tfm_arc4, ses->auth_key.response,
-+	rc = crypto_blkcipher_setkey(tfm_arc4, ses->auth_key.response,
- 					CIFS_SESS_KEY_SIZE);
-+	if (rc) {
-+		cERROR(1, "%s: Could not set response as a key", __func__);
-+		return rc;
-+	}
- 
- 	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
- 	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
-@@ -688,7 +756,7 @@ calc_seckey(struct cifs_ses *ses)
- 
- 	crypto_free_blkcipher(tfm_arc4);
- 
--	return 0;
++id_sid_out:
++	--psidid->refcount;
 +	return rc;
++}
++
++static int
+ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+ 		struct cifs_fattr *fattr, uint sidtype)
+ {
+@@ -383,6 +565,10 @@ init_cifs_idmap(void)
+ 	spin_lock_init(&sidgidlock);
+ 	gidtree = RB_ROOT;
+ 
++	spin_lock_init(&uidsidlock);
++	siduidtree = RB_ROOT;
++	spin_lock_init(&gidsidlock);
++	sidgidtree = RB_ROOT;
+ 	register_shrinker(&cifs_shrinker);
+ 
+ 	cFYI(1, "cifs idmap keyring: %d\n", key_serial(keyring));
+@@ -422,6 +608,18 @@ cifs_destroy_idmaptrees(void)
+ 	while ((node = rb_first(root)))
+ 		rb_erase(node, root);
+ 	spin_unlock(&sidgidlock);
++
++	root = &siduidtree;
++	spin_lock(&uidsidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&uidsidlock);
++
++	root = &sidgidtree;
++	spin_lock(&gidsidlock);
++	while ((node = rb_first(root)))
++		rb_erase(node, root);
++	spin_unlock(&gidsidlock);
  }
  
- void
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index 556b1a0..db3f18c 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -74,8 +74,14 @@ symlink_hash(unsigned int link_len, const char *link_str, u8 *md5_hash)
- 		cERROR(1, "%s: Could not init md5 shash\n", __func__);
- 		goto symlink_hash_err;
- 	}
--	crypto_shash_update(&sdescmd5->shash, link_str, link_len);
-+	rc = crypto_shash_update(&sdescmd5->shash, link_str, link_len);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update iwth link_str\n", __func__);
-+		goto symlink_hash_err;
-+	}
- 	rc = crypto_shash_final(&sdescmd5->shash, md5_hash);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate md5 hash\n", __func__);
+ /* if the two SIDs (roughly equivalent to a UUID for a user or group) are
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 6255fa8..6b5e4a5 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -940,6 +940,10 @@ GLOBAL_EXTERN struct rb_root uidtree;
+ GLOBAL_EXTERN struct rb_root gidtree;
+ GLOBAL_EXTERN spinlock_t siduidlock;
+ GLOBAL_EXTERN spinlock_t sidgidlock;
++GLOBAL_EXTERN struct rb_root siduidtree;
++GLOBAL_EXTERN struct rb_root sidgidtree;
++GLOBAL_EXTERN spinlock_t uidsidlock;
++GLOBAL_EXTERN spinlock_t gidsidlock;
  
- symlink_hash_err:
- 	crypto_free_shash(md5);
-diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-index 1525d5e..c857a31 100644
---- a/fs/cifs/smbencrypt.c
-+++ b/fs/cifs/smbencrypt.c
-@@ -159,8 +159,14 @@ mdfour(unsigned char *md4_hash, unsigned char *link_str, int link_len)
- 		cERROR(1, "%s: Could not init md4 shash\n", __func__);
- 		goto mdfour_err;
- 	}
--	crypto_shash_update(&sdescmd4->shash, link_str, link_len);
-+	rc = crypto_shash_update(&sdescmd4->shash, link_str, link_len);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with link_str\n", __func__);
-+		goto mdfour_err;
-+	}
- 	rc = crypto_shash_final(&sdescmd4->shash, md4_hash);
-+	if (rc)
-+		cERROR(1, "%s: Could not genereate md4 hash\n", __func__);
- 
- mdfour_err:
- 	crypto_free_shash(md4);
+ void cifs_oplock_break(struct work_struct *work);
+ void cifs_oplock_break_get(struct cifsFileInfo *cfile);
 -- 
 1.6.0.2
