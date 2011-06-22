@@ -1,36 +1,38 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix wsize negotiation to respect max buffer size
- and active signing
-Date: Tue, 21 Jun 2011 12:37:49 -0400
-Message-ID: <20110621123749.305dd576@tlielax.poochiereds.net>
-References: <1308658097-14805-1-git-send-email-jlayton@redhat.com>
-	<20110621113327.6df5fdd4@tlielax.poochiereds.net>
-	<BANLkTik=QLv-=mynGjxe+8Bp7GCpuhwt8Q@mail.gmail.com>
+From: Bill Good <bgood-mO0wGsvBftXk1uMJSBkQmQ@public.gmane.org>
+Subject: Can't mount CIFS shares under kernel version 3.0-1-generic
+Date: Tue, 21 Jun 2011 21:29:54 -0400
+Message-ID: <4E014592.3070209@velocity.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTik=QLv-=mynGjxe+8Bp7GCpuhwt8Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 21 Jun 2011 11:24:12 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+I have been trying to get this working for a couple of days and 
+according to the LinuxCIFS troubleshooting page this is where I should 
+be asking my question. I am testing Ubuntu Oneiric (11.10) and have a 
+new D-Link DNS-320 ShareCenter that I am trying to get to mount on 
+3.0-1-generic. It is working fine on 2.6.39-02063901-generic so thinking 
+there is something that changed when we moved to the 3.0 kernel. If I am 
+in the wrong place please let me know I will find the correct place. I 
+have included the info that was suggested from the above mentioned page.
 
-> Yep - makes sense - I will plan on merging the respun patch.
-> 
-> Opinions about the rsize equivalent of this going in quickly as well?
-> 
+bill@billsim-1110-64:~$ uname -r
+3.0-1-generic
+bill@billsim-1110-64:~$ mount.cifs -V
+mount.cifs version: 4.9
 
-According to George, reading doesn't have this issue and Hongwei's blog
-is wrong in this respect. That makes some sense since for a read we're
-sending a very small request to the server, and we specify how much we
-want to receive.
+When using the command
+sudo mount -t cifs -o guest //192.168.0.189/Volume_1/test/ 
+/media/bills-dns-game-1110-64test
+with Ubuntu 11.10 kernel 3.0-1-generic it fails to mount.
 
-Eventually, cleaning up the rsize negotiation would be good, but I
-don't think there's any urgency for it.
+If I use the same mount command with Ubuntu 11.10 kernel 
+2.6.39-02063901-generic
+It mounts correctly.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+D-Link DNS-320 ShareCenter NAS
+
+Thanks Bill
