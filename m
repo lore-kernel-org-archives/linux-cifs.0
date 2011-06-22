@@ -1,90 +1,68 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix wsize negotiation to respect max buffer size and active signing (try #4)
-Date: Wed, 22 Jun 2011 17:33:57 -0400
-Message-ID: <1308778437-16794-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: "Shane McColman" <smccolman-WkVietXGWdS4IGBGpn4MSVaTQe2KTcn/@public.gmane.org>
+Subject: RE: CIFS VFS errors
+Date: Wed, 22 Jun 2011 16:39:41 -0600
+Message-ID: <AC93F84448C9430AB4B791EE591F2F97@dynamicsourcemfg.local>
+References: <4BEC36376CA24EBFAA83C16B955BD9CC@dynamicsourcemfg.local><20110608164415.5b8cbf4b@tlielax.poochiereds.net><7A5FF1B06368450BAE39549CE3C621CF@dynamicsourcemfg.local> <20110622163251.16499f4b@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "'Jeff Layton'" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110622163251.16499f4b-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hopefully last version. Base signing check on CAP_UNIX instead of
-tcon->unix_ext, also clean up the comments a bit more.
+I've restarted things and remounted the drive adding wsize to fstab 
 
-According to Hongwei Sun's blog posting here:
+//d7gsjxb1/AOI_1\040(F)/AOI\040Data     /mnt/AOIData    cifs
+rw,_netdev,guest,uid=1000,gid=100,wsize=16384   0 0
 
-    http://blogs.msdn.com/b/openspecification/archive/2009/04/10/smb-maximum-transmit-buffer-size-and-performance-tuning.aspx
+Should have some answers by Monday if not sooner.
 
-CAP_LARGE_WRITEX is ignored when signing is active. Also, the maximum
-size for a write without CAP_LARGE_WRITEX should be the maxBuf that
-the server sent in the NEGOTIATE request.
+Shane McColman PEng. 
+Quality Assurance Engineer
+Dynamic Source Manufacturing Inc. 
+Calgary AB, Canada  
 
-Fix the wsize negotiation to take this into account. While we're at it,
-alter the other wsize definitions to use sizeof(WRITE_REQ) to allow for
-slightly larger amounts of data to potentially be written per request.
+-----Original Message-----
+From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+[mailto:linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Jeff Layton
+Sent: Wednesday, June 22, 2011 2:33 PM
+To: Shane McColman
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: CIFS VFS errors
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |   33 ++++++++++++++++++++-------------
- 1 files changed, 20 insertions(+), 13 deletions(-)
+On Wed, 22 Jun 2011 14:12:23 -0600
+"Shane McColman" <smccolman-WkVietXGWdS4IGBGpn4MSVaTQe2KTcn/@public.gmane.org> wrote:
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b15b5b0..c8cb83e 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2754,21 +2754,21 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 
- /*
-  * When the server supports very large writes via POSIX extensions, we can
-- * allow up to 2^24 - PAGE_CACHE_SIZE.
-+ * allow up to 2^24-1, minus the size of a WRITE_AND_X header, not including
-+ * the RFC1001 length.
-  *
-  * Note that this might make for "interesting" allocation problems during
-- * writeback however (as we have to allocate an array of pointers for the
-- * pages). A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
-+ * writeback however as we have to allocate an array of pointers for the
-+ * pages. A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
-  */
--#define CIFS_MAX_WSIZE ((1<<24) - PAGE_CACHE_SIZE)
-+#define CIFS_MAX_WSIZE ((1<<24) - 1 - sizeof(WRITE_REQ) + 4)
- 
- /*
-- * When the server doesn't allow large posix writes, default to a wsize of
-- * 128k - PAGE_CACHE_SIZE -- one page less than the largest frame size
-- * described in RFC1001. This allows space for the header without going over
-- * that by default.
-+ * When the server doesn't allow large posix writes, only allow a wsize of
-+ * 128k minus the size of the WRITE_AND_X header. That allows for a write up
-+ * to the maximum size described by RFC1002.
-  */
--#define CIFS_MAX_RFC1001_WSIZE (128 * 1024 - PAGE_CACHE_SIZE)
-+#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
- 
- /*
-  * The default wsize is 1M. find_get_pages seems to return a maximum of 256
-@@ -2787,11 +2787,18 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
- 
- 	/* can server support 24-bit write sizes? (via UNIX extensions) */
- 	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
--		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1001_WSIZE);
-+		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1002_WSIZE);
- 
--	/* no CAP_LARGE_WRITE_X? Limit it to 16 bits */
--	if (!(server->capabilities & CAP_LARGE_WRITE_X))
--		wsize = min_t(unsigned int, wsize, USHRT_MAX);
-+	/*
-+	 * no CAP_LARGE_WRITE_X or is signing enabled without CAP_UNIX set?
-+	 * Limit it to max buffer offered by the server, minus the size of the
-+	 * WRITEX header, not including the 4 byte RFC1001 length.
-+	 */
-+	if (!(server->capabilities & CAP_LARGE_WRITE_X) ||
-+	    (!(server->capabilities & CAP_UNIX) &&
-+	     (server->sec_mode & (SECMODE_SIGN_ENABLED|SECMODE_SIGN_REQUIRED))))
-+		wsize = min_t(unsigned int, wsize,
-+				server->maxBuf - sizeof(WRITE_REQ) + 4);
- 
- 	/* hard limit of CIFS_MAX_WSIZE */
- 	wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
+> Over the past two days the number of error messages stayed the same but
+now
+> I'm getting the same problems as reported in 
+> 
+> Bug 36952 -  [2.6.39] CIFS write failures where 2.6.38 works  
+> 
+> I had to restart my software this morning, but I'm pretty sure I should be
+> back to the same spot by Monday (if not sooner).  I can turn on debug
+> logging (as suggested by Jeff in reply to Helge's email) if somebody is
+> interested.  Just let me know.  I really need to get this fixed, so just
+let
+> me know what I can do to help.
+>
+
+I suspect that the issue is with signed connections. Are you using
+signed authentication? The patch that I posted earlier today should fix
+this in mainline if so.
+
+We'll need to do something different for 2.6.39 though. A possible
+workaround in the meantime is to set the wsize to something smaller, eg
+wsize=16384. Could you try that and let me know if it makes the problem
+go away?
+
 -- 
-1.7.5.4
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
