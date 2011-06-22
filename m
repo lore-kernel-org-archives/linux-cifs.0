@@ -1,38 +1,85 @@
-From: Bill Good <bgood-mO0wGsvBftXk1uMJSBkQmQ@public.gmane.org>
-Subject: Can't mount CIFS shares under kernel version 3.0-1-generic
-Date: Tue, 21 Jun 2011 21:29:54 -0400
-Message-ID: <4E014592.3070209@velocity.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix wsize negotiation to respect max buffer size and active signing
+Date: Wed, 22 Jun 2011 09:27:33 -0400
+Message-ID: <1308749253-7900-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I have been trying to get this working for a couple of days and 
-according to the LinuxCIFS troubleshooting page this is where I should 
-be asking my question. I am testing Ubuntu Oneiric (11.10) and have a 
-new D-Link DNS-320 ShareCenter that I am trying to get to mount on 
-3.0-1-generic. It is working fine on 2.6.39-02063901-generic so thinking 
-there is something that changed when we moved to the 3.0 kernel. If I am 
-in the wrong place please let me know I will find the correct place. I 
-have included the info that was suggested from the above mentioned page.
+(minor change to fix off-by one bug in CIFS_MAX_WSIZE and fix up some comments)
 
-bill@billsim-1110-64:~$ uname -r
-3.0-1-generic
-bill@billsim-1110-64:~$ mount.cifs -V
-mount.cifs version: 4.9
+According to Hongwei Sun's blog posting here:
 
-When using the command
-sudo mount -t cifs -o guest //192.168.0.189/Volume_1/test/ 
-/media/bills-dns-game-1110-64test
-with Ubuntu 11.10 kernel 3.0-1-generic it fails to mount.
+    http://blogs.msdn.com/b/openspecification/archive/2009/04/10/smb-maximum-transmit-buffer-size-and-performance-tuning.aspx
 
-If I use the same mount command with Ubuntu 11.10 kernel 
-2.6.39-02063901-generic
-It mounts correctly.
+CAP_LARGE_WRITEX is ignored when signing is active. Also, the maximum
+size for a write without CAP_LARGE_WRITEX should be the maxBuf that
+the server sent in the NEGOTIATE request.
 
-D-Link DNS-320 ShareCenter NAS
+Fix the wsize negotiation to take this into account. While we're at it,
+alter the other wsize definitions to use sizeof(WRITE_REQ) to allow for
+slightly larger amounts of data to potentially be written per request.
 
-Thanks Bill
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |   29 ++++++++++++++++++-----------
+ 1 files changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b15b5b0..47dac13 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2754,21 +2754,21 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+ 
+ /*
+  * When the server supports very large writes via POSIX extensions, we can
+- * allow up to 2^24 - PAGE_CACHE_SIZE.
++ * allow up to 2^24-1 minus the size of a WRITE_AND_X header, not including
++ * the RFC1001 length.
+  *
+  * Note that this might make for "interesting" allocation problems during
+- * writeback however (as we have to allocate an array of pointers for the
+- * pages). A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
++ * writeback however as we have to allocate an array of pointers for the
++ * pages. A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
+  */
+-#define CIFS_MAX_WSIZE ((1<<24) - PAGE_CACHE_SIZE)
++#define CIFS_MAX_WSIZE ((1<<24) - 1 - sizeof(WRITE_REQ) + 4)
+ 
+ /*
+  * When the server doesn't allow large posix writes, default to a wsize of
+- * 128k - PAGE_CACHE_SIZE -- one page less than the largest frame size
+- * described in RFC1001. This allows space for the header without going over
+- * that by default.
++ * 128k minus the size of the WRITE_AND_X header. That allows for a write up
++ * to the maximum size described by RFC1002.
+  */
+-#define CIFS_MAX_RFC1001_WSIZE (128 * 1024 - PAGE_CACHE_SIZE)
++#define CIFS_MAX_RFC1001_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
+ 
+ /*
+  * The default wsize is 1M. find_get_pages seems to return a maximum of 256
+@@ -2789,9 +2789,16 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+ 	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
+ 		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1001_WSIZE);
+ 
+-	/* no CAP_LARGE_WRITE_X? Limit it to 16 bits */
+-	if (!(server->capabilities & CAP_LARGE_WRITE_X))
+-		wsize = min_t(unsigned int, wsize, USHRT_MAX);
++	/*
++	 * no CAP_LARGE_WRITE_X or is signing enabled without unix extensions?
++	 * Limit it to max buffer offered by the server, minus the size of the
++	 * WRITEX header, not including the 4 byte RFC1001 length.
++	 */
++	if (!(server->capabilities & CAP_LARGE_WRITE_X) ||
++	    (!tcon->unix_ext &&
++	     (server->sec_mode & (SECMODE_SIGN_ENABLED|SECMODE_SIGN_REQUIRED))))
++		wsize = min_t(unsigned int, wsize,
++				server->maxBuf - sizeof(WRITE_REQ) + 4);
+ 
+ 	/* hard limit of CIFS_MAX_WSIZE */
+ 	wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
+-- 
+1.7.5.4
