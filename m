@@ -1,55 +1,90 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: demote DFS referral lookup errors to cFYI
-Date: Wed, 22 Jun 2011 17:05:56 -0400
-Message-ID: <1308776756-16030-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org
+Subject: [PATCH] cifs: fix wsize negotiation to respect max buffer size and active signing (try #4)
+Date: Wed, 22 Jun 2011 17:33:57 -0400
+Message-ID: <1308778437-16794-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that we call into this routine on every mount, anyone who doesn't
-have the upcall configured will get multiple printks about failed lookups.
+Hopefully last version. Base signing check on CAP_UNIX instead of
+tcon->unix_ext, also clean up the comments a bit more.
 
-Reported-and-Tested-by: Martijn Uffing <mp3project-dT/mdtNybfnOcQoxchNua+fsyHJTGBv43KldkOmuLK4@public.gmane.org>
+According to Hongwei Sun's blog posting here:
+
+    http://blogs.msdn.com/b/openspecification/archive/2009/04/10/smb-maximum-transmit-buffer-size-and-performance-tuning.aspx
+
+CAP_LARGE_WRITEX is ignored when signing is active. Also, the maximum
+size for a write without CAP_LARGE_WRITEX should be the maxBuf that
+the server sent in the NEGOTIATE request.
+
+Fix the wsize negotiation to take this into account. While we're at it,
+alter the other wsize definitions to use sizeof(WRITE_REQ) to allow for
+slightly larger amounts of data to potentially be written per request.
+
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifs_dfs_ref.c |    5 +++--
- fs/cifs/dns_resolve.c  |    4 ++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ fs/cifs/connect.c |   33 ++++++++++++++++++++-------------
+ 1 files changed, 20 insertions(+), 13 deletions(-)
 
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index 8d8f28c..6873bb6 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -141,10 +141,11 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b15b5b0..c8cb83e 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2754,21 +2754,21 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
  
- 	rc = dns_resolve_server_name_to_ip(*devname, &srvIP);
- 	if (rc < 0) {
--		cERROR(1, "%s: Failed to resolve server part of %s to IP: %d",
--			  __func__, *devname, rc);
-+		cFYI(1, "%s: Failed to resolve server part of %s to IP: %d",
-+			__func__, *devname, rc);
- 		goto compose_mount_options_err;
- 	}
-+
- 	/* md_len = strlen(...) + 12 for 'sep+prefixpath='
- 	 * assuming that we have 'unc=' and 'ip=' in
- 	 * the original sb_mountdata
-diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
-index 548f062..1d2d91d 100644
---- a/fs/cifs/dns_resolve.c
-+++ b/fs/cifs/dns_resolve.c
-@@ -79,8 +79,8 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr)
- 	/* Perform the upcall */
- 	rc = dns_query(NULL, hostname, len, NULL, ip_addr, NULL);
- 	if (rc < 0)
--		cERROR(1, "%s: unable to resolve: %*.*s",
--		       __func__, len, len, hostname);
-+		cFYI(1, "%s: unable to resolve: %*.*s",
-+			__func__, len, len, hostname);
- 	else
- 		cFYI(1, "%s: resolved: %*.*s to %s",
- 		     __func__, len, len, hostname, *ip_addr);
+ /*
+  * When the server supports very large writes via POSIX extensions, we can
+- * allow up to 2^24 - PAGE_CACHE_SIZE.
++ * allow up to 2^24-1, minus the size of a WRITE_AND_X header, not including
++ * the RFC1001 length.
+  *
+  * Note that this might make for "interesting" allocation problems during
+- * writeback however (as we have to allocate an array of pointers for the
+- * pages). A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
++ * writeback however as we have to allocate an array of pointers for the
++ * pages. A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
+  */
+-#define CIFS_MAX_WSIZE ((1<<24) - PAGE_CACHE_SIZE)
++#define CIFS_MAX_WSIZE ((1<<24) - 1 - sizeof(WRITE_REQ) + 4)
+ 
+ /*
+- * When the server doesn't allow large posix writes, default to a wsize of
+- * 128k - PAGE_CACHE_SIZE -- one page less than the largest frame size
+- * described in RFC1001. This allows space for the header without going over
+- * that by default.
++ * When the server doesn't allow large posix writes, only allow a wsize of
++ * 128k minus the size of the WRITE_AND_X header. That allows for a write up
++ * to the maximum size described by RFC1002.
+  */
+-#define CIFS_MAX_RFC1001_WSIZE (128 * 1024 - PAGE_CACHE_SIZE)
++#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
+ 
+ /*
+  * The default wsize is 1M. find_get_pages seems to return a maximum of 256
+@@ -2787,11 +2787,18 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+ 
+ 	/* can server support 24-bit write sizes? (via UNIX extensions) */
+ 	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
+-		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1001_WSIZE);
++		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1002_WSIZE);
+ 
+-	/* no CAP_LARGE_WRITE_X? Limit it to 16 bits */
+-	if (!(server->capabilities & CAP_LARGE_WRITE_X))
+-		wsize = min_t(unsigned int, wsize, USHRT_MAX);
++	/*
++	 * no CAP_LARGE_WRITE_X or is signing enabled without CAP_UNIX set?
++	 * Limit it to max buffer offered by the server, minus the size of the
++	 * WRITEX header, not including the 4 byte RFC1001 length.
++	 */
++	if (!(server->capabilities & CAP_LARGE_WRITE_X) ||
++	    (!(server->capabilities & CAP_UNIX) &&
++	     (server->sec_mode & (SECMODE_SIGN_ENABLED|SECMODE_SIGN_REQUIRED))))
++		wsize = min_t(unsigned int, wsize,
++				server->maxBuf - sizeof(WRITE_REQ) + 4);
+ 
+ 	/* hard limit of CIFS_MAX_WSIZE */
+ 	wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
 -- 
 1.7.5.4
