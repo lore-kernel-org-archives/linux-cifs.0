@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: CIFS VFS errors
-Date: Thu, 23 Jun 2011 09:35:51 -0500
-Message-ID: <BANLkTi=-kTF0sc96twKyWBH8NOwFNwDseg@mail.gmail.com>
+Date: Thu, 23 Jun 2011 09:43:22 -0500
+Message-ID: <BANLkTi=T+=yaQ7MH7g+gmqjFgP2HX4iqJg@mail.gmail.com>
 References: <4BEC36376CA24EBFAA83C16B955BD9CC@dynamicsourcemfg.local>
 	<20110608164415.5b8cbf4b@tlielax.poochiereds.net>
 	<7A5FF1B06368450BAE39549CE3C621CF@dynamicsourcemfg.local>
@@ -160,7 +160,7 @@ blem
 > More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-A wireshark trace should show whether cifs client is sending an
-smb echo request and how does server respond to it.
-May be smb echo thing works differently for a Windows server than
-a server like Samba!
+what does command   modinfo cifs   return version of cifs as?
+I think Jeff's patches are in 1.69 onwards versions of cifs.
+Looks like the requests are timing out which should not be the case.
+Do you see reconnects in /proc/fs/cifs/Stats?
