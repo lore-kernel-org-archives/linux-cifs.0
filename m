@@ -1,55 +1,37 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: DNS resolver cache does not expire
-Date: Thu, 23 Jun 2011 16:14:41 -0400
-Message-ID: <20110623161441.35ea50a4@tlielax.poochiereds.net>
-References: <BANLkTim+Phg+cY6_KAhxhfSeDj1td_GALw@mail.gmail.com>
-	<BANLkTikbk1yvwWCvhmqdH1DHZN1PPEz+hw@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Thu, 23 Jun 2011 15:21:21 -0500
+Message-ID: <BANLkTim=2Gr1_ynOY0A06eqV4n45Znh9dg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Grazvydas Ignotas <notasas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTikbk1yvwWCvhmqdH1DHZN1PPEz+hw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 23 Jun 2011 23:15:29 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+The following changes since commit 2992c4bd5742b31a0ee00a76eee9c1c284507418:
 
-> 2011/6/23 Grazvydas Ignotas <notasas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> > Hello,
-> >
-> > one of our slave servers have changed it's address, and I can no
-> > longer access it's shares that are forwarded to by the main server
-> > using DFS redirection. The slave server resolves correctly when trying
-> > to access it directly, but when trying to access through a mount on
-> > the main server, cifsFYI shows dns_resolve_server_name_to_ip returns
-> > the old address. I've verified slave server names match and windows
-> > clients can access those DFS shares correctly. It has been several
-> > days since server address change. I'm running 2.6.38.2 kernel on
-> > Ubuntu 10.04.
-> >
-> > Any way to clear that dns_resolver cache? I have no desire to reboot
-> > the machine.
-> >
-> 
-> It seems that dns_resolver sets expiry timeout to zero here
-> (http://lxr.free-electrons.com/source/security/keys/key.c#L310) and
-> doesn't change it - so, it always returns cached value.
-> 
-> David, can you comment on this problem, please?
-> 
+  Merge branch 'bugfixes' of
+git://git.linux-nfs.org/projects/trondmy/nfs-2.6 (2011-06-21 18:20:55
+-0700)
 
-I think the right thing to do here is probably to tie the lifetime of
-the key to the record's TTL. Getting that info may be a little tricky
-though since it's not generally available via getaddrinfo and such.
+are available in the git repository at:
 
-Also, for name records that come from /etc/hosts or yp, or some other
-mechanism you'll need to pick a default TTL since those mechanisms
-don't provide one.
+  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
+
+Jeff Layton (1):
+      cifs: fix wsize negotiation to respect max buffer size and
+active signing (try #4)
+
+Pavel Shilovsky (1):
+      CIFS: Fix problem with 3.0-rc1 null user mount failure
+
+ fs/cifs/connect.c |   39 +++++++++++++++++++++++++--------------
+ 1 files changed, 25 insertions(+), 14 deletions(-)
+
 
 -- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Thanks,
+
+Steve
