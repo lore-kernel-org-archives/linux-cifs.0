@@ -1,107 +1,120 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [2.6.39] CIFS write failures where 2.6.38 works
-Date: Thu, 23 Jun 2011 08:00:24 -0400
-Message-ID: <20110623080024.7a1cab88@tlielax.poochiereds.net>
-References: <4DE6103E.6010100@hist.no>
-	<4DE8B449.2000008@suse.de>
-	<4DE8F989.50208@hist.no>
-	<20110609182845.1ebfc678@tlielax.poochiereds.net>
-	<20110622163612.45744bc2@tlielax.poochiereds.net>
-	<4E0322B0.8030102@hist.no>
+From: "Shane McColman" <smccolman-WkVietXGWdS4IGBGpn4MSVaTQe2KTcn/@public.gmane.org>
+Subject: RE: CIFS VFS errors
+Date: Thu, 23 Jun 2011 08:09:48 -0600
+Message-ID: <6753F891F47C4E9CBDFB66A63A8E1367@dynamicsourcemfg.local>
+References: <4BEC36376CA24EBFAA83C16B955BD9CC@dynamicsourcemfg.local><20110608164415.5b8cbf4b@tlielax.poochiereds.net><7A5FF1B06368450BAE39549CE3C621CF@dynamicsourcemfg.local> <20110622163251.16499f4b@tlielax.poochiereds.net> <AC93F84448C9430AB4B791EE591F2F97@dynamicsourcemfg.local>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Cc: Suresh Jayaraman <sjayaraman@suse.de>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-cifs <linux-cifs@vger.kernel.org>
-To: Helge Hafting <helge.hafting@hist.no>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4E0322B0.8030102@hist.no>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <AC93F84448C9430AB4B791EE591F2F97-WkVietXGWdS4IGBGpn4MSbjjLBE8jN/0@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 23 Jun 2011 13:25:36 +0200
-Helge Hafting <helge.hafting@hist.no> wrote:
+Adding wsize to fstab did not work.  I restarted things at 4:15 yesterday
+and in less than hour I was back to the same place.
 
-> On 22. juni 2011 22:36, Jeff Layton wrote:
-> > On Thu, 9 Jun 2011 18:28:45 -0400
-> > Jeff Layton<jlayton@redhat.com>  wrote:
-> >
-> >> On Fri, 03 Jun 2011 17:11:05 +0200
-> >> Helge Hafting<helge.hafting@hist.no>  wrote:
-> >>
-> >>> On 03. juni 2011 12:15, Suresh Jayaraman wrote:
-> >>>> [Cc linux-cifs@vger.kernel.org]
-> >>>>
-> >>>> On 06/01/2011 03:41 PM, Helge Hafting wrote:
-> >>>>> At work I use cifs for accessing a windows server. This has worked fine
-> >>>>> for a long time, up to and including Debian's 2.6.38-2.
-> >>>>>
-> >>>>> I just installed Debians's 2.6.39-1, and had to give up on it.
-> >>>>> Mounting CIFS works, and I can see the files. But if I
-> >>>>> try to make a new file (with cp), I get a long delay.
-> >>>>
-> >>>> What is the security mechanism you are using? If you seeing the problem
-> >>>> with ntlm, could you try using ntlmv2 and see whether the problem is
-> >>>> reproducible?
-> >>>
-> >>> In the beginning, I did not specify the mechanism. So, whatever the
-> >>> default is.
-> >>>
-> >>> The fstab entry was like this:
-> >>> \\servername\resource /mountpoint cifs
-> >>> domain=MYDOMAIN,credentials=/etc/fstabcred,rw,noauto,iocharset=utf8,uid=username,gid=group,sockopt=TCP_NODELAY,users,file_mode=0640,dir_mode=0750,relatime
-> >>> 0 0
-> >>>
-> >>> I looked at cifs options, and tried to add "sign" and "sec=ntlmv2i". It
-> >>> made no difference. Still failure with 2.6.39, and mounting with these
-> >>> new options works fine with 2.6.38
-> >>>
-> >>
-> >> I think we need to understand what's happening on the wire. Are you
-> >> still able to reproduce this? If so, can you turn up debug logging and
-> >> reproduce this?. Instructions for how to do that are here:
-> >>
-> >>      http://wiki.samba.org/index.php/LinuxCIFS_troubleshooting#Enabling_Debugging
-> >>
-> >> Also, it looks like someone opened a bug at kernel.org too:
-> >>
-> >>      https://bugzilla.kernel.org/show_bug.cgi?id=36952
-> >>
-> >> ...so if you can attach the resulting log there, that would be great.
-> >>
-> >
-> > I think that this is probably due to the change that added the
-> > page_mkwrite function to cifs.ko. Prior to that, cifs did single-page
-> > writes on signed connections. Now we do multi-page writes and windows
-> > servers apparently reject large write calls on signed connections.
-> >
-> > One way to test this theory would be to set the wsize to something
-> > smaller when you mount. For instance:
-> >
-> >      wsize=16384
-> >
-> > ...assuming that doesn't go over the server's MaxBufferSize, then that
-> > should act as a workaround. Can you try that and let me know if it
-> > helps?
-> 
-> 
-> Yes, that seemed to fix it. I added wsize=16384 and mounted using 
-> debians 2.6.39-1-amd64 kernel.
-> 
-> I tried a recursive copy of 26MB from one directory tree to another on 
-> that mount. It completed in 24s with no error messages. 1MB/s is not 
-> much, but there may be 40 other users.
-> 
-> The server runs windows 2008r2, 64-bit.
-> 
 
-Great, thanks for testing that. I've already sent Steve French a patch
-that should fix this in 3.0, but we'll need to do something different
-for 2.6.39 stable. I'll roll up a patch for that soon.
+Jun 22 16:15:14 fujimoto kernel: [629641.354375] CIFS VFS: Unexpected lookup
+error -112
+Jun 22 16:15:14 fujimoto kernel: [629641.354383] CIFS VFS: Unexpected lookup
+error -112
+Jun 22 17:08:42 fujimoto kernel: [632843.214260] CIFS VFS: Autodisabling the
+use of server inode numbers on \\d7gsjxb1\AOI_1 (F). This server doesn't
+seem to support them properly. Hardlinks will not be recognized on this
+mount. Consider mounting with the "noserverino" option to silence this
+message.
+Jun 22 17:18:11 fujimoto kernel: [633411.476667] CIFS VFS: Send error in
+read = -11
+Jun 22 17:21:11 fujimoto kernel: [633590.919038] CIFS VFS: Send error in
+read = -11
+Jun 22 17:23:11 fujimoto kernel: [633710.706852] CIFS VFS: Send error in
+read = -11
+Jun 22 17:25:11 fujimoto kernel: [633830.436301] CIFS VFS: Send error in
+read = -11
+Jun 22 17:27:41 fujimoto kernel: [633980.129508] CIFS VFS: Send error in
+read = -11
+Jun 22 17:28:11 fujimoto kernel: [634010.077463] CIFS VFS: Send error in
+read = -11
+Jun 22 17:30:11 fujimoto kernel: [634129.838218] CIFS VFS: Send error in
+read = -11
+Jun 22 17:41:10 fujimoto kernel: [634787.992075] CIFS VFS: Send error in
+read = -11
 
-BTW, 3.0 should have much improved write performance, even with signing
-enabled as that adds the capability to do async writes.
+When I came in this morning I did an ls on the directory to check it and it
+has been 15 minutes and I'm still waiting.
+
+
+Shane McColman PEng. 
+Quality Assurance Engineer
+Dynamic Source Manufacturing Inc.
+Calgary AB, Canada 
+
+-----Original Message-----
+From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+[mailto:linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Shane McColman
+Sent: Wednesday, June 22, 2011 4:40 PM
+To: 'Jeff Layton'
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: RE: CIFS VFS errors
+
+I've restarted things and remounted the drive adding wsize to fstab 
+
+//d7gsjxb1/AOI_1\040(F)/AOI\040Data     /mnt/AOIData    cifs
+rw,_netdev,guest,uid=1000,gid=100,wsize=16384   0 0
+
+Should have some answers by Monday if not sooner.
+
+Shane McColman PEng. 
+Quality Assurance Engineer
+Dynamic Source Manufacturing Inc. 
+Calgary AB, Canada  
+
+-----Original Message-----
+From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+[mailto:linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Jeff Layton
+Sent: Wednesday, June 22, 2011 2:33 PM
+To: Shane McColman
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: CIFS VFS errors
+
+On Wed, 22 Jun 2011 14:12:23 -0600
+"Shane McColman" <smccolman-WkVietXGWdS4IGBGpn4MSVaTQe2KTcn/@public.gmane.org> wrote:
+
+> Over the past two days the number of error messages stayed the same but
+now
+> I'm getting the same problems as reported in 
+> 
+> Bug 36952 -  [2.6.39] CIFS write failures where 2.6.38 works  
+> 
+> I had to restart my software this morning, but I'm pretty sure I should be
+> back to the same spot by Monday (if not sooner).  I can turn on debug
+> logging (as suggested by Jeff in reply to Helge's email) if somebody is
+> interested.  Just let me know.  I really need to get this fixed, so just
+let
+> me know what I can do to help.
+>
+
+I suspect that the issue is with signed connections. Are you using
+signed authentication? The patch that I posted earlier today should fix
+this in mainline if so.
+
+We'll need to do something different for 2.6.39 though. A possible
+workaround in the meantime is to set the wsize to something smaller, eg
+wsize=16384. Could you try that and let me know if it makes the problem
+go away?
 
 -- 
-Jeff Layton <jlayton@redhat.com>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
