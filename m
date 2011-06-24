@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [v2 2/5] CIFS: Simplify socket reading in demultiplex thread
-Date: Fri, 24 Jun 2011 13:47:58 +0400
-Message-ID: <1308908881-22760-3-git-send-email-piastryyy@gmail.com>
+Subject: [v2 3/5] CIFS: Move RFC1002 check to a separate function
+Date: Fri, 24 Jun 2011 13:47:59 +0400
+Message-ID: <1308908881-22760-4-git-send-email-piastryyy@gmail.com>
 References: <1308908881-22760-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,249 +9,156 @@ In-Reply-To: <1308908881-22760-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Move reading to separate function and remove csocket variable.
-
-Also change semantic in a little: goto incomplete_rcv only when
-we get -EAGAIN (or a familiar error) while reading rfc1002 header.
-In this case we don't check for echo timeout when we don't get whole
-header at once, as it was before.
-
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/connect.c |  154 ++++++++++++++++++++++++----------------------------
- 1 files changed, 71 insertions(+), 83 deletions(-)
+ fs/cifs/connect.c |  116 ++++++++++++++++++++++++++++++----------------------
+ 1 files changed, 67 insertions(+), 49 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 285325b..fd1c46c 100644
+index fd1c46c..5389f04 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -357,6 +357,64 @@ allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
+@@ -414,6 +414,63 @@ read_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg,
+ 	return rc;
  }
  
- static int
-+read_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg,
-+		 struct kvec *iov, unsigned int to_read,
-+		 unsigned int *ptotal_read, bool is_header_read)
++static bool
++check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
 +{
-+	int length, rc = 0;
-+	unsigned int total_read;
-+	char *buf = iov->iov_base;
++	char temp = *buf;
++	unsigned int pdu_length = be32_to_cpu(
++				((struct smb_hdr *)buf)->smb_buf_length);
 +
-+	for (total_read = 0; total_read < to_read; total_read += length) {
-+		length = kernel_recvmsg(server->ssocket, smb_msg, iov, 1,
-+					to_read - total_read, 0);
-+		if (server->tcpStatus == CifsExiting) {
-+			/* then will exit */
-+			rc = 2;
-+			break;
-+		} else if (server->tcpStatus == CifsNeedReconnect) {
-+			cifs_reconnect(server);
-+			/* Reconnect wakes up rspns q */
-+			/* Now we will reread sock */
-+			rc = 1;
-+			break;
-+		} else if (length == -ERESTARTSYS ||
-+			   length == -EAGAIN ||
-+			   length == -EINTR) {
-+			/*
-+			 * Minimum sleep to prevent looping, allowing socket
-+			 * to clear and app threads to set tcpStatus
-+			 * CifsNeedReconnect if server hung.
-+			 */
-+			usleep_range(1000, 2000);
-+			length = 0;
-+			if (!is_header_read)
-+				continue;
-+			/* Special handling for header read */
-+			if (total_read) {
-+				iov->iov_base = (to_read - total_read) +
-+						buf;
-+				iov->iov_len = to_read - total_read;
-+				smb_msg->msg_control = NULL;
-+				smb_msg->msg_controllen = 0;
-+				rc = 3;
-+			} else
-+				rc = 1;
-+			break;
-+		} else if (length <= 0) {
-+			cERROR(1, "Received no data, expecting %d",
-+			       to_read - total_read);
-+			cifs_reconnect(server);
-+			rc = 1;
-+			break;
-+		}
++	/*
++	 * The first byte big endian of the length field,
++	 * is actually not part of the length but the type
++	 * with the most common, zero, as regular data.
++	 */
++	if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
++		return false;
++	} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
++		cFYI(1, "Good RFC 1002 session rsp");
++		return false;
++	} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
++		/*
++		 * We get this from Windows 98 instead of an error on
++		 * SMB negprot response.
++		 */
++		cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
++			pdu_length);
++		/* give server a second to clean up */
++		msleep(1000);
++		/*
++		 * Always try 445 first on reconnect since we get NACK
++		 * on some if we ever connected to port 139 (the NACK
++		 * is since we do not begin with RFC1001 session
++		 * initialize frame).
++		 */
++		cifs_set_port((struct sockaddr *)
++				&server->dstaddr, CIFS_PORT);
++		cifs_reconnect(server);
++		wake_up(&server->response_q);
++		return false;
++	} else if (temp != (char) 0) {
++		cERROR(1, "Unknown RFC 1002 frame");
++		cifs_dump_mem(" Received Data: ", buf, 4);
++		cifs_reconnect(server);
++		return false;
 +	}
 +
-+	*ptotal_read = total_read;
-+	return rc;
++	/* else we have an SMB response */
++	if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
++	    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
++		cERROR(1, "Invalid size SMB length %d pdu_length %d",
++		       4, pdu_length+4);
++		cifs_reconnect(server);
++		wake_up(&server->response_q);
++		return false;
++	}
++
++	return true;
 +}
 +
-+static int
+ static int
  cifs_demultiplex_thread(struct TCP_Server_Info *server)
  {
- 	int length;
-@@ -365,14 +423,13 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
- 	struct smb_hdr *smb_buffer = NULL;
- 	struct msghdr smb_msg;
- 	struct kvec iov;
--	struct socket *csocket = server->ssocket;
+@@ -426,7 +483,6 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
  	struct list_head *tmp, *tmp2;
  	struct task_struct *task_to_wake = NULL;
  	struct mid_q_entry *mid_entry;
- 	char temp;
+-	char temp;
  	bool isLargeBuf = false;
  	bool isMultiRsp;
--	int reconnect;
-+	int rc;
- 
- 	current->flags |= PF_MEMALLOC;
- 	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
-@@ -409,51 +466,18 @@ incomplete_rcv:
- 				  "Reconnecting...", server->hostname,
- 				  (echo_retries * SMB_ECHO_INTERVAL / HZ));
- 			cifs_reconnect(server);
--			csocket = server->ssocket;
- 			wake_up(&server->response_q);
+ 	int rc;
+@@ -479,59 +535,21 @@ incomplete_rcv:
+ 		else if (rc == 1)
  			continue;
- 		}
  
--		length =
--		    kernel_recvmsg(csocket, &smb_msg,
--				&iov, 1, pdu_length, 0 /* BB other flags? */);
+-		/* The right amount was read from socket - 4 bytes */
+-		/* so we can now interpret the length field */
 -
--		if (server->tcpStatus == CifsExiting) {
-+		rc = read_from_socket(server, &smb_msg, &iov, pdu_length,
-+				      &total_read, true /* header read */);
-+		if (rc == 3)
-+			goto incomplete_rcv;
-+		else if (rc == 2)
- 			break;
--		} else if (server->tcpStatus == CifsNeedReconnect) {
--			cFYI(1, "Reconnect after server stopped responding");
--			cifs_reconnect(server);
--			cFYI(1, "call to reconnect done");
--			csocket = server->ssocket;
+-		/* the first byte big endian of the length field,
+-		is actually not part of the length but the type
+-		with the most common, zero, as regular data */
+-		temp = *buf;
++		/*
++		 * The right amount was read from socket - 4 bytes,
++		 * so we can now interpret the length field.
++		 */
+ 
+-		/* Note that FC 1001 length is big endian on the wire,
+-		but we convert it here so it is always manipulated
+-		as host byte order */
++		/*
++		 * Note that RFC 1001 length is big endian on the wire,
++		 * but we convert it here so it is always manipulated
++		 * as host byte order.
++		 */
+ 		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
+ 
+ 		cFYI(1, "rfc1002 length 0x%x", pdu_length+4);
+-
+-		if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
 -			continue;
--		} else if (length == -ERESTARTSYS ||
--			   length == -EAGAIN ||
--			   length == -EINTR) {
--			msleep(1); /* minimum sleep to prevent looping
--				allowing socket to clear and app threads to set
--				tcpStatus CifsNeedReconnect if server hung */
--			if (pdu_length < 4) {
--				iov.iov_base = (4 - pdu_length) + buf;
--				iov.iov_len = pdu_length;
--				smb_msg.msg_control = NULL;
--				smb_msg.msg_controllen = 0;
--				goto incomplete_rcv;
--			} else
--				continue;
--		} else if (length <= 0) {
--			cFYI(1, "Reconnect after unexpected peek error %d",
--				length);
+-		} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
+-			cFYI(1, "Good RFC 1002 session rsp");
+-			continue;
+-		} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
+-			/* we get this from Windows 98 instead of
+-			   an error on SMB negprot response */
+-			cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
+-				pdu_length);
+-			/* give server a second to clean up  */
+-			msleep(1000);
+-			/* always try 445 first on reconnect since we get NACK
+-			 * on some if we ever connected to port 139 (the NACK
+-			 * is since we do not begin with RFC1001 session
+-			 * initialize frame)
+-			 */
+-			cifs_set_port((struct sockaddr *)
+-					&server->dstaddr, CIFS_PORT);
 -			cifs_reconnect(server);
--			csocket = server->ssocket;
 -			wake_up(&server->response_q);
-+		else if (rc == 1)
- 			continue;
--		} else if (length < pdu_length) {
--			cFYI(1, "requested %d bytes but only got %d bytes",
--				  pdu_length, length);
--			pdu_length -= length;
--			msleep(1);
--			goto incomplete_rcv;
+-			continue;
+-		} else if (temp != (char) 0) {
+-			cERROR(1, "Unknown RFC 1002 frame");
+-			cifs_dump_mem(" Received Data: ", buf, length);
+-			cifs_reconnect(server);
+-			continue;
 -		}
- 
- 		/* The right amount was read from socket - 4 bytes */
- 		/* so we can now interpret the length field */
-@@ -490,14 +514,12 @@ incomplete_rcv:
- 			cifs_set_port((struct sockaddr *)
- 					&server->dstaddr, CIFS_PORT);
- 			cifs_reconnect(server);
--			csocket = server->ssocket;
- 			wake_up(&server->response_q);
+-
+-		/* else we have an SMB response */
+-		if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
+-			    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
+-			cERROR(1, "Invalid size SMB length %d pdu_length %d",
+-					length, pdu_length+4);
+-			cifs_reconnect(server);
+-			wake_up(&server->response_q);
++		if (!check_rfc1002_header(server, buf))
  			continue;
- 		} else if (temp != (char) 0) {
- 			cERROR(1, "Unknown RFC 1002 frame");
- 			cifs_dump_mem(" Received Data: ", buf, length);
- 			cifs_reconnect(server);
--			csocket = server->ssocket;
- 			continue;
- 		}
- 
-@@ -507,59 +529,25 @@ incomplete_rcv:
- 			cERROR(1, "Invalid size SMB length %d pdu_length %d",
- 					length, pdu_length+4);
- 			cifs_reconnect(server);
--			csocket = server->ssocket;
- 			wake_up(&server->response_q);
- 			continue;
- 		}
+-		}
  
  		/* else length ok */
--		reconnect = 0;
--
  		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
- 			isLargeBuf = true;
- 			memcpy(bigbuf, smallbuf, 4);
- 			smb_buffer = (struct smb_hdr *)bigbuf;
- 			buf = bigbuf;
- 		}
--		length = 0;
-+
- 		iov.iov_base = 4 + buf;
- 		iov.iov_len = pdu_length;
--		for (total_read = 0; total_read < pdu_length;
--		     total_read += length) {
--			length = kernel_recvmsg(csocket, &smb_msg, &iov, 1,
--						pdu_length - total_read, 0);
--			if (server->tcpStatus == CifsExiting) {
--				/* then will exit */
--				reconnect = 2;
--				break;
--			} else if (server->tcpStatus == CifsNeedReconnect) {
--				cifs_reconnect(server);
--				csocket = server->ssocket;
--				/* Reconnect wakes up rspns q */
--				/* Now we will reread sock */
--				reconnect = 1;
--				break;
--			} else if (length == -ERESTARTSYS ||
--				   length == -EAGAIN ||
--				   length == -EINTR) {
--				msleep(1); /* minimum sleep to prevent looping,
--					      allowing socket to clear and app
--					      threads to set tcpStatus
--					      CifsNeedReconnect if server hung*/
--				length = 0;
--				continue;
--			} else if (length <= 0) {
--				cERROR(1, "Received no data, expecting %d",
--					      pdu_length - total_read);
--				cifs_reconnect(server);
--				csocket = server->ssocket;
--				reconnect = 1;
--				break;
--			}
--		}
--		if (reconnect == 2)
-+		rc = read_from_socket(server, &smb_msg, &iov, pdu_length,
-+				      &total_read, false);
-+		if (rc == 2)
- 			break;
--		else if (reconnect == 1)
-+		else if (rc == 1)
- 			continue;
- 
- 		total_read += 4; /* account for rfc1002 hdr */
-@@ -702,7 +690,7 @@ multi_t2_fnd:
- 	msleep(125);
- 
- 	if (server->ssocket) {
--		sock_release(csocket);
-+		sock_release(server->ssocket);
- 		server->ssocket = NULL;
- 	}
- 	/* buffer usually freed in free_mid - need to free it here on exit */
 -- 
 1.7.1
