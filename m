@@ -1,25 +1,15 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: DNS resolver cache does not expire
-Date: Mon, 27 Jun 2011 20:42:10 +0100
-Message-ID: <28505.1309203730@redhat.com>
-References: <BANLkTikOq_dT1SF9aZ=0DNdoVOngvygfZw@mail.gmail.com> <BANLkTim+Phg+cY6_KAhxhfSeDj1td_GALw@mail.gmail.com> <BANLkTikbk1yvwWCvhmqdH1DHZN1PPEz+hw@mail.gmail.com> <21187.1309178053@redhat.com>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Grazvydas Ignotas <notasas-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Werner Maes <Werner.Maes-UiU5zyVfpuo0a//2gYcwQw@public.gmane.org>
+Subject: (unknown)
+Date: Mon, 27 Jun 2011 23:27:24 +0200
+Message-ID: <9F990792DAA5FF4F96FD0B95C9C44C0B0116563868AE@ICTS-S-EXC1-CA.luna.kuleuven.be>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BANLkTikOq_dT1SF9aZ=0DNdoVOngvygfZw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Subject: 
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> Yes, I meant, that dns_query calls request_key -> request_key_and_link
-> -> construct_key_and_link -> construct_alloc_key -> key_alloc and
-> there expiry timeout is set to zero. I don't noticed any other places
-> where this value changes while request_key is being processing. If I
-> miss something, point me, please!
-
-request_key() upcalls to userspace.  The userspace application should call
-keyctl_set_timeout() before calling keyctl_instantiate().
-
-David
+Set linux-cifs-client nomail
