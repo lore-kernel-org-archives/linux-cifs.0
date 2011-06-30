@@ -1,45 +1,29 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [v2 PATCH 0/5] Simplify demultiplex thread
-Date: Thu, 30 Jun 2011 19:06:50 +0400
-Message-ID: <BANLkTi=e+teJrGK2NVJn_=joMpTyz0aVEg@mail.gmail.com>
-References: <1308908881-22760-1-git-send-email-piastryyy@gmail.com>
+From: "PROF.MAURICE IWU" <iwumaurice900-OuV/mKzhOIQ@public.gmane.org>
+Subject: Equity Business Investment
+Date: Thu, 30 Jun 2011 17:44:46 +0200
+Message-ID: <EXCHANGE03YW8BYXifW0000054a__47976.3383781121$1309448708$gmane$org@exchange03.2besource.com>
+Reply-To: <profmauriceiwu2221-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain;
+	charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1308908881-22760-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/6/24 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> This patchset is going to make demultiplex code smaller and let us in=
-tergrate SMB2 protocol support easier further.
->
-> I successfully tested it with Connectathon Testsuites and two paralle=
-l mount/umount scripts.
->
-> This is the 2nd version of the patchset that includes the following c=
-hanges:
-> 1) Christoph's notes.
-> 2) Fix comment style.
->
-> Pavel Shilovsky (5):
-> =A0CIFS: Move buffer allocation to a separate function
-> =A0CIFS: Simplify socket reading in demultiplex thread
-> =A0CIFS: Move RFC1002 check to a separate function
-> =A0CIFS: Move mid search to a separate function
-> =A0CIFS: Cleanup demupltiplex thread exiting code
->
-> =A0fs/cifs/connect.c | =A0630 ++++++++++++++++++++++++++++-----------=
---------------
-> =A01 files changed, 331 insertions(+), 299 deletions(-)
->
->
+Equity Business Investment
+>From Prof. Maurice Iwu 
 
-What's about this patchset?
+Dear Friend,
 
---=20
-Best regards,
-Pavel Shilovsky.
+I am Prof. Maurice M. Iwu, Former Chairman Independent Electoral Commission 
+(INEC).Currently, I am on compulsory terminal leave presently in UK , 
+leading up to my final retirement from public service.
+
+I am seeking your partnership in a mutual benefit project involving 
+investing into your company and secondly on properties and to be precise Estate Development or any other profitable venture of your great idea for our mutual benefit of Equity Market Investment.,
+
+Sincerely,
+Prof. Maurice M.Iwu.
+{INEC.}
