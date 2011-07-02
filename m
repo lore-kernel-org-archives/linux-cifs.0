@@ -1,7 +1,7 @@
 From: "Mr. Allen Williams" <info-S0gwRQkOgRsdnm+yROfE0A@public.gmane.org>
 Subject: 800,000.00(United States Dollars
-Date: Sat, 02 Jul 2011 16:09:41 +0100
-Message-ID: <20110702160941.boex0bo85cw4sco4__7931.5313174904$1309716840$gmane$org@webmail.cs.cf.ac.uk>
+Date: Sat, 02 Jul 2011 16:03:08 +0100
+Message-ID: <20110702160308.e80akso2yokss8o8@webmail.cs.cf.ac.uk>
 Reply-To: western-milan-union-PkbjNfxxIAQqdlJmJB21zg@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain;
