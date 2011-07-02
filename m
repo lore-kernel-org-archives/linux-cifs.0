@@ -1,30 +1,37 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fix
-Date: Sun, 3 Jul 2011 12:59:58 -0500
-Message-ID: <CAH2r5muydfwyjqNhOg=3WvpH8OEdRtUDN77M_zQVmmJ6HwTDiA@mail.gmail.com>
+From: "Mr. Allen Williams" <info-S0gwRQkOgRsdnm+yROfE0A@public.gmane.org>
+Subject: 800,000.00(United States Dollars
+Date: Sat, 02 Jul 2011 16:09:41 +0100
+Message-ID: <20110702160941.boex0bo85cw4sco4__7931.5313174904$1309716840$gmane$org@webmail.cs.cf.ac.uk>
+Reply-To: western-milan-union-PkbjNfxxIAQqdlJmJB21zg@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain;
+	charset=ISO-8859-1;
+	DelSp="Yes";
+	format="flowed"
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit daf54f1f363a61c618662ef66d4bf09d2b090941:
 
-  drm/radeon/kms: Fix chremap setup on RV770 CE (2011-07-01 07:29:46 +1000)
+Dear beneficiary,
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
+This is to re-notify you of the 800,000.00(United States Dollars)that was
+deposited
+here in the western union office in your name is available for pickup.
+Contact us via email for your M.T.C.N Numbers.
 
-Jeff Layton (1):
-      cifs: set socket send and receive timeouts before attempting connect
+Contact Person: Mr. Allen Williams
+Email: western-milan-union-PkbjNfxxIAQqdlJmJB21zg@public.gmane.org
+Tel. +447031977568
+Tel. +447031975981
 
- fs/cifs/connect.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
 
 
--- 
-Thanks,
 
-Steve
+
+
+----------------------------------------------------------------
+This message was sent using IMP, the Internet Messaging Program.
