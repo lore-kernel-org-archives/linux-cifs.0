@@ -1,127 +1,41 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix wsize negotiation for 2.6.39 stable
-Date: Tue,  5 Jul 2011 07:57:38 -0400
-Message-ID: <1309867058-22983-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, helge.hafting-CND4fxrytsY@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Subject: [PATCH] cifs: remove bogus call to cifs_cleanup_volume_info
+Date: Tue,  5 Jul 2011 17:37:37 -0400
+Message-ID: <1309901857-32016-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, awilliam-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Prior to 2.6.39, when signing was enabled on a socket the client only
-sent single-page writes. This changed with commit ca83ce3d5b, which
-made signed and unsigned connections use the same codepaths for write
-calls.
+This call to cifs_cleanup_volume_info is clearly wrong. As soon as it's
+called the following call to cifs_get_tcp_session will oops as the
+volume_info pointer will then be NULL.
 
-This caused a regression when working with windows servers. Windows
-machines will reject writes larger than the MaxBufferSize when signing
-is active, but does not clear the CAP_LARGE_WRITE_X flag in the
-negotiation.
+The caller of cifs_mount should clean up this data since it passed it
+in. There's no need for us to call this here.
 
-This patch backports 2 patches that fix this problem in 3.0 kernels,
-and changes a couple of the constants to values appropriate for the
-writeback code in 2.6.39.
+Regression introduced by commit 724d9f1cfba.
 
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Reported-by: Helge Hafting <helge.hafting-CND4fxrytsY@public.gmane.org>
+Reported-by: Adam Williamson <awilliam-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   64 ++++++++++++++++++++++++++++++++++++----------------
- 1 files changed, 44 insertions(+), 20 deletions(-)
+ fs/cifs/connect.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5236582..8e78710 100644
+index c8cb83e..545e854 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2571,23 +2571,6 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 	else /* default */
- 		cifs_sb->rsize = CIFSMaxBufSize;
+@@ -3012,7 +3012,6 @@ try_mount_again:
+ 		else if (pSesInfo)
+ 			cifs_put_smb_ses(pSesInfo);
  
--	if (pvolume_info->wsize > PAGEVEC_SIZE * PAGE_CACHE_SIZE) {
--		cERROR(1, "wsize %d too large, using 4096 instead",
--			  pvolume_info->wsize);
--		cifs_sb->wsize = 4096;
--	} else if (pvolume_info->wsize)
--		cifs_sb->wsize = pvolume_info->wsize;
--	else
--		cifs_sb->wsize = min_t(const int,
--					PAGEVEC_SIZE * PAGE_CACHE_SIZE,
--					127*1024);
--		/* old default of CIFSMaxBufSize was too small now
--		   that SMB Write2 can send multiple pages in kvec.
--		   RFC1001 does not describe what happens when frame
--		   bigger than 128K is sent so use that as max in
--		   conjunction with 52K kvec constraint on arch with 4K
--		   page size  */
--
- 	if (cifs_sb->rsize < 2048) {
- 		cifs_sb->rsize = 2048;
- 		/* Windows ME may prefer this */
-@@ -2665,6 +2648,48 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 			   "mount option supported");
- }
- 
-+/* Prior to 3.0, cifs couldn't handle writes larger than this */
-+#define CIFS_MAX_WSIZE (PAGEVEC_SIZE * PAGE_CACHE_SIZE)
-+
-+/*
-+ * When the server doesn't allow large posix writes, only allow a wsize of
-+ * 128k minus the size of the WRITE_AND_X header. That allows for a write up
-+ * to the maximum size described by RFC1002.
-+ */
-+#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
-+
-+/* Make the default the same as the max */
-+#define CIFS_DEFAULT_WSIZE CIFS_MAX_WSIZE
-+
-+static unsigned int
-+cifs_negotiate_wsize(struct cifsTconInfo *tcon, struct smb_vol *pvolume_info)
-+{
-+	__u64 unix_cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	unsigned int wsize = pvolume_info->wsize ? pvolume_info->wsize :
-+				CIFS_DEFAULT_WSIZE;
-+
-+	/* can server support 24-bit write sizes? (via UNIX extensions) */
-+	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
-+		wsize = min_t(unsigned int, wsize, CIFS_MAX_RFC1002_WSIZE);
-+
-+	/*
-+	 * no CAP_LARGE_WRITE_X or is signing enabled without CAP_UNIX set?
-+	 * Limit it to max buffer offered by the server, minus the size of the
-+	 * WRITEX header, not including the 4 byte RFC1001 length.
-+	 */
-+	if (!(server->capabilities & CAP_LARGE_WRITE_X) ||
-+	    (!(server->capabilities & CAP_UNIX) &&
-+	     (server->sec_mode & (SECMODE_SIGN_ENABLED|SECMODE_SIGN_REQUIRED))))
-+		wsize = min_t(unsigned int, wsize,
-+				server->maxBuf - sizeof(WRITE_REQ) + 4);
-+
-+	/* hard limit of CIFS_MAX_WSIZE */
-+	wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
-+
-+	return wsize;
-+}
-+
- static int
- is_path_accessible(int xid, struct cifsTconInfo *tcon,
- 		   struct cifs_sb_info *cifs_sb, const char *full_path)
-@@ -2866,13 +2891,12 @@ try_mount_again:
- 		cifs_sb->rsize = 1024 * 127;
- 		cFYI(DBG2, "no very large read support, rsize now 127K");
+-		cifs_cleanup_volume_info(&volume_info);
+ 		FreeXid(xid);
  	}
--	if (!(tcon->ses->capabilities & CAP_LARGE_WRITE_X))
--		cifs_sb->wsize = min(cifs_sb->wsize,
--			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
- 	if (!(tcon->ses->capabilities & CAP_LARGE_READ_X))
- 		cifs_sb->rsize = min(cifs_sb->rsize,
- 			       (tcon->ses->server->maxBuf - MAX_CIFS_HDR_SIZE));
- 
-+	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
-+
- remote_path_check:
- 	/* check if a whole path (including prepath) is not remote */
- 	if (!rc && tcon) {
+ #endif
 -- 
-1.7.5.4
+1.7.6
