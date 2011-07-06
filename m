@@ -1,128 +1,96 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 4/4] cifs: fix expand_dfs_referral
-Date: Wed, 6 Jul 2011 18:14:02 +0400
-Message-ID: <CAKywueQfDc9X92R_OOP13qcJT5QoTE37Hmjej1740Cwk2fpvpA@mail.gmail.com>
-References: <1309954239-17345-1-git-send-email-jlayton@redhat.com>
-	<1309954239-17345-5-git-send-email-jlayton@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: last patches for 3.0
+Date: Wed, 6 Jul 2011 12:35:27 -0500
+Message-ID: <CAH2r5mshrJRCLc-UsY0CGT_Y5Hsfh1-mUmrqH9o9V3FbSBNqwA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1309954239-17345-5-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/7/6 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Regression introduced in commit 724d9f1cfba.
->
-> Prior to that, expand_dfs_referral would regenerate the mount data st=
-ring
-> and then call cifs_parse_mount_options to re-parse it (klunky, but it
-> worked). The above commit moved cifs_parse_mount_options out of cifs_=
-mount,
-> so the re-parsing of the new mount options no longer occurred. Fix it=
- by
-> making expand_dfs_referral re-parse the mount options.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/connect.c | =A0 30 ++++++++++++++++++++----------
-> =A01 files changed, 20 insertions(+), 10 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 46cc0ad..c254411 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -65,6 +65,8 @@ static int ip_connect(struct TCP_Server_Info *serve=
-r);
-> =A0static int generic_ip_connect(struct TCP_Server_Info *server);
-> =A0static void tlink_rb_insert(struct rb_root *root, struct tcon_link=
- *new_tlink);
-> =A0static void cifs_prune_tlinks(struct work_struct *work);
-> +static int cifs_setup_volume_info(struct smb_vol *volume_info, char =
-*mount_data,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 const char *devname);
->
-> =A0/*
-> =A0* cifs tcp session reconnection
-> @@ -2830,12 +2832,9 @@ is_path_accessible(int xid, struct cifs_tcon *=
-tcon,
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> -void
-> -cifs_cleanup_volume_info(struct smb_vol *volume_info)
-> +static void
-> +cleanup_volume_info_contents(struct smb_vol *volume_info)
-> =A0{
-> - =A0 =A0 =A0 if (!volume_info)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return;
-> -
-> =A0 =A0 =A0 =A0kfree(volume_info->username);
-> =A0 =A0 =A0 =A0kzfree(volume_info->password);
-> =A0 =A0 =A0 =A0kfree(volume_info->UNC);
-> @@ -2843,10 +2842,18 @@ cifs_cleanup_volume_info(struct smb_vol *volu=
-me_info)
-> =A0 =A0 =A0 =A0kfree(volume_info->domainname);
-> =A0 =A0 =A0 =A0kfree(volume_info->iocharset);
-> =A0 =A0 =A0 =A0kfree(volume_info->prepath);
-> +}
-> +
-> +void
-> +cifs_cleanup_volume_info(struct smb_vol *volume_info)
-> +{
-> + =A0 =A0 =A0 if (!volume_info)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return;
-> + =A0 =A0 =A0 cleanup_volume_info_contents(volume_info);
-> =A0 =A0 =A0 =A0kfree(volume_info);
-> - =A0 =A0 =A0 return;
-> =A0}
->
-> +
-> =A0#ifdef CONFIG_CIFS_DFS_UPCALL
-> =A0/* build_path_to_root returns full path to root when
-> =A0* we do not have an exiting connection (tcon) */
-> @@ -2915,15 +2922,18 @@ expand_dfs_referral(int xid, struct cifs_ses =
-*pSesInfo,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 &fake_devname);
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0free_dfs_info_array(referrals, num_ref=
-errals);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(fake_devname);
-> -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_sb->mountdata !=3D NULL)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(cifs_sb->mountdat=
-a);
->
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (IS_ERR(mdata)) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D PTR_ERR(mdata);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mdata =3D NULL;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cleanup_volume_info_con=
-tents(volume_info);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memset(volume_info, '\0=
-', sizeof(*volume_info));
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_setup_volum=
-e_info(volume_info, mdata,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fake_devname);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(fake_devname);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(cifs_sb->mountdata);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->mountdata =3D mdata;
-> =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0kfree(full_path);
-> --
-> 1.7.6
->
->
+I have reviewed/merged two of Jeffs 4 recent patches (still reviewing
+the last two)
 
-Reviewed-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On the problem with WindowsXP mounts limiting the number of
+simultaneous requests and timing out when large numbers are sent in
+parallel (especially when doing large numbers of small writes at one
+time) - I am running ok with this patch and did discuss briefly with
+Jeff.  I would rather not do a more invasive patch (if possible) -
+this leaves the behavior as is except for servers which specify an mpx
+under 50 which is reasonable (ie at least 2) - otherwise it should
+work identically, and it seems to fix the XP problem.
 
---=20
-Best regards,
-Pavel Shilovsky.
+commit a30b9327eb4543d45ffb79ebbcabe251eb6a3b9c
+Author: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Date:   Fri Jul 1 12:47:23 2011 -0500
+
+    [CIFS] Limit simultaneous requests to older servers which set maxmpx low
+
+    WindowsXP (at least some service packs) sets the maximum number of
+simultaneous
+    requests to 10 which is smaller than most servers (almost all set
+    the limit at 50) and the cifs client set it to, and when
+    about 30 requests or so are in flight, requests to WindowsXP servers can
+    time out, especially with the new cifs async write code
+    which frequently dispatches larger numbers of requests in parallel
+    than in previous versions of cifs.
+
+    Limit the number of simultaneous requests to what the server
+    sets unless server reports an implausible number (must be a minimum of 2
+    to allow for a request and oplock break).
+
+    Signed-off-by: Steve French <smfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 1a9fe7f..1957f5d 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -453,6 +453,11 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 		}
+ 		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
+ 		server->maxReq = le16_to_cpu(rsp->MaxMpxCount);
++		/* maxReq must be at least 2, almost all servers set to 50,
++		   some old non-MS servers set incorrectly so set to default
++		   (otherwise oplock break e.g. would fail */
++		if (server->maxReq < 2)
++			server->maxReq = CIFS_MAX_REQ; /* 50 */
+ 		server->maxBuf = min((__u32)le16_to_cpu(rsp->MaxBufSize),
+ 				(__u32)CIFSMaxBufSize + MAX_CIFS_HDR_SIZE);
+ 		server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+@@ -560,6 +565,11 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 	/* one byte, so no need to convert this or EncryptionKeyLen from
+ 	   little endian */
+ 	server->maxReq = le16_to_cpu(pSMBr->MaxMpxCount);
++	/* maxReq must be at least 2, almost all servers set to 50,
++	   some old non-MS servers set incorrectly so set to default
++	   (otherwise oplock break e.g. would fail */
++	if (server->maxReq < 2)
++		server->maxReq = CIFS_MAX_REQ; /* 50 */
+ 	/* probably no need to store and check maxvcs */
+ 	server->maxBuf = min(le32_to_cpu(pSMBr->MaxBufferSize),
+ 			(__u32) CIFSMaxBufSize + MAX_CIFS_HDR_SIZE);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 147aa22..e2bd2a9 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -264,7 +264,13 @@ static int wait_for_free_request(struct
+TCP_Server_Info *server,
+
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
++		/* We must check that don't exceed maxReq but on SMB Negotiate
++		   it is not initted yet (maxReq must be at least two) */
++		/* Could also check if oplock enabled but how could turn off? */
++		if ((atomic_read(&server->inFlight) >= cifs_max_pending) ||
++		    ((atomic_read(&server->inFlight) + 1 >= server->maxReq) &&
++		      (server->maxReq > 1))) {
+ 			spin_unlock(&GlobalMid_Lock);
+ #ifdef CONFIG_CIFS_STATS2
+ 			atomic_inc(&server->num_waiters);
+
+-- 
+Thanks,
+
+Steve
