@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [v3 1/5] CIFS: Move buffer allocation to a separate function
-Date: Wed,  6 Jul 2011 14:27:35 +0400
-Message-ID: <1309948059-29704-2-git-send-email-piastryyy@gmail.com>
+Subject: [v3 5/5] CIFS: Cleanup demupltiplex thread exiting code
+Date: Wed,  6 Jul 2011 14:27:39 +0400
+Message-ID: <1309948059-29704-6-git-send-email-piastryyy@gmail.com>
 References: <1309948059-29704-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,159 +11,212 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/connect.c |   86 ++++++++++++++++++++++++++++++++---------------------
- 1 files changed, 52 insertions(+), 34 deletions(-)
+ fs/cifs/connect.c |  173 +++++++++++++++++++++++++++++-----------------------
+ 1 files changed, 96 insertions(+), 77 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7f540df..701c11d 100644
+index a393002..d2a0f51 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -317,14 +317,52 @@ requeue_echo:
- 	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
+@@ -529,6 +529,101 @@ multi_t2_fnd:
+ 	return ret;
  }
  
-+static bool
-+allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
-+		 bool is_large_buf)
++static void clean_demultiplex_info(struct TCP_Server_Info *server)
 +{
-+	char *bbuf = *bigbuf, *sbuf = *smallbuf;
++	int length;
 +
-+	if (bbuf == NULL) {
-+		bbuf = (char *)cifs_buf_get();
-+		if (!bbuf) {
-+			cERROR(1, "No memory for large SMB response");
-+			msleep(3000);
-+			/* retry will check if exiting */
-+			return false;
-+		}
-+	} else if (is_large_buf) {
-+		/* we are reusing a dirty large buf, clear its start */
-+		memset(bbuf, 0, size);
++	/* take it off the list, if it's not already */
++	spin_lock(&cifs_tcp_ses_lock);
++	list_del_init(&server->tcp_ses_list);
++	spin_unlock(&cifs_tcp_ses_lock);
++
++	spin_lock(&GlobalMid_Lock);
++	server->tcpStatus = CifsExiting;
++	spin_unlock(&GlobalMid_Lock);
++	wake_up_all(&server->response_q);
++
++	/*
++	 * Check if we have blocked requests that need to free. Note that
++	 * cifs_max_pending is normally 50, but can be set at module install
++	 * time to as little as two.
++	 */
++	spin_lock(&GlobalMid_Lock);
++	if (atomic_read(&server->inFlight) >= cifs_max_pending)
++		atomic_set(&server->inFlight, cifs_max_pending - 1);
++	/*
++	 * We do not want to set the max_pending too low or we could end up
++	 * with the counter going negative.
++	 */
++	spin_unlock(&GlobalMid_Lock);
++	/*
++	 * Although there should not be any requests blocked on this queue it
++	 * can not hurt to be paranoid and try to wake up requests that may
++	 * haven been blocked when more than 50 at time were on the wire to the
++	 * same server - they now will see the session is in exit state and get
++	 * out of SendReceive.
++	 */
++	wake_up_all(&server->request_q);
++	/* give those requests time to exit */
++	msleep(125);
++
++	if (server->ssocket) {
++		sock_release(server->ssocket);
++		server->ssocket = NULL;
 +	}
 +
-+	if (sbuf == NULL) {
-+		sbuf = (char *)cifs_small_buf_get();
-+		if (!sbuf) {
-+			cERROR(1, "No memory for SMB response");
-+			msleep(1000);
-+			/* retry will check if exiting */
-+			return false;
++	if (!list_empty(&server->pending_mid_q)) {
++		struct list_head dispose_list;
++		struct mid_q_entry *mid_entry;
++		struct list_head *tmp, *tmp2;
++
++		INIT_LIST_HEAD(&dispose_list);
++		spin_lock(&GlobalMid_Lock);
++		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
++			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
++			cFYI(1, "Clearing mid 0x%x", mid_entry->mid);
++			mid_entry->midState = MID_SHUTDOWN;
++			list_move(&mid_entry->qhead, &dispose_list);
 +		}
-+		/* beginning of smb buffer is cleared in our buf_get */
-+	} else {
-+		/* if existing small buf clear beginning */
-+		memset(sbuf, 0, size);
++		spin_unlock(&GlobalMid_Lock);
++
++		/* now walk dispose list and issue callbacks */
++		list_for_each_safe(tmp, tmp2, &dispose_list) {
++			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
++			cFYI(1, "Callback mid 0x%x", mid_entry->mid);
++			list_del_init(&mid_entry->qhead);
++			mid_entry->callback(mid_entry);
++		}
++		/* 1/8th of sec is more than enough time for them to exit */
++		msleep(125);
 +	}
 +
-+	*bigbuf = bbuf;
-+	*smallbuf = sbuf;
++	if (!list_empty(&server->pending_mid_q)) {
++		/*
++		 * mpx threads have not exited yet give them at least the smb
++		 * send timeout time for long ops.
++		 *
++		 * Due to delays on oplock break requests, we need to wait at
++		 * least 45 seconds before giving up on a request getting a
++		 * response and going ahead and killing cifsd.
++		 */
++		cFYI(1, "Wait for exit from demultiplex thread");
++		msleep(46000);
++		/*
++		 * If threads still have not exited they are probably never
++		 * coming home not much else we can do but free the memory.
++		 */
++	}
 +
-+	return true;
++	kfree(server->hostname);
++	kfree(server);
++
++	length = atomic_dec_return(&tcpSesAllocCount);
++	if (length > 0)
++		mempool_resize(cifs_req_poolp, length + cifs_min_rcv,
++				GFP_KERNEL);
 +}
 +
  static int
  cifs_demultiplex_thread(struct TCP_Server_Info *server)
  {
- 	int length;
- 	unsigned int pdu_length, total_read;
-+	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
+@@ -538,7 +633,6 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
  	struct smb_hdr *smb_buffer = NULL;
--	struct smb_hdr *bigbuf = NULL;
--	struct smb_hdr *smallbuf = NULL;
  	struct msghdr smb_msg;
  	struct kvec iov;
- 	struct socket *csocket = server->ssocket;
-@@ -348,34 +386,15 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
- 	while (server->tcpStatus != CifsExiting) {
- 		if (try_to_freeze())
- 			continue;
--		if (bigbuf == NULL) {
--			bigbuf = cifs_buf_get();
--			if (!bigbuf) {
--				cERROR(1, "No memory for large SMB response");
--				msleep(3000);
--				/* retry will check if exiting */
--				continue;
--			}
--		} else if (isLargeBuf) {
--			/* we are reusing a dirty large buf, clear its start */
--			memset(bigbuf, 0, sizeof(struct smb_hdr));
--		}
- 
--		if (smallbuf == NULL) {
--			smallbuf = cifs_small_buf_get();
--			if (!smallbuf) {
--				cERROR(1, "No memory for SMB response");
--				msleep(1000);
--				/* retry will check if exiting */
--				continue;
--			}
--			/* beginning of smb buffer is cleared in our buf_get */
--		} else /* if existing small buf clear beginning */
--			memset(smallbuf, 0, sizeof(struct smb_hdr));
-+		if (!allocate_buffers(&bigbuf, &smallbuf,
-+				      sizeof(struct smb_hdr), isLargeBuf))
-+			continue;
- 
- 		isLargeBuf = false;
- 		isMultiRsp = false;
--		smb_buffer = smallbuf;
-+		smb_buffer = (struct smb_hdr *)smallbuf;
-+		buf = smallbuf;
- 		iov.iov_base = smb_buffer;
- 		iov.iov_len = 4;
- 		smb_msg.msg_control = NULL;
-@@ -414,8 +433,7 @@ incomplete_rcv:
- 				allowing socket to clear and app threads to set
- 				tcpStatus CifsNeedReconnect if server hung */
- 			if (pdu_length < 4) {
--				iov.iov_base = (4 - pdu_length) +
--							(char *)smb_buffer;
-+				iov.iov_base = (4 - pdu_length) + buf;
- 				iov.iov_len = pdu_length;
- 				smb_msg.msg_control = NULL;
- 				smb_msg.msg_controllen = 0;
-@@ -443,7 +461,7 @@ incomplete_rcv:
- 		/* the first byte big endian of the length field,
- 		is actually not part of the length but the type
- 		with the most common, zero, as regular data */
--		temp = *((char *) smb_buffer);
-+		temp = *buf;
- 
- 		/* Note that FC 1001 length is big endian on the wire,
- 		but we convert it here so it is always manipulated
-@@ -477,8 +495,7 @@ incomplete_rcv:
- 			continue;
- 		} else if (temp != (char) 0) {
- 			cERROR(1, "Unknown RFC 1002 frame");
--			cifs_dump_mem(" Received Data: ", (char *)smb_buffer,
--				      length);
-+			cifs_dump_mem(" Received Data: ", buf, length);
- 			cifs_reconnect(server);
- 			csocket = server->ssocket;
- 			continue;
-@@ -501,10 +518,11 @@ incomplete_rcv:
- 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
- 			isLargeBuf = true;
- 			memcpy(bigbuf, smallbuf, 4);
--			smb_buffer = bigbuf;
-+			smb_buffer = (struct smb_hdr *)bigbuf;
-+			buf = bigbuf;
+-	struct list_head *tmp, *tmp2;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+ 	bool isLargeBuf = false;
+@@ -675,88 +769,13 @@ incomplete_rcv:
  		}
- 		length = 0;
--		iov.iov_base = 4 + (char *)smb_buffer;
-+		iov.iov_base = 4 + buf;
- 		iov.iov_len = pdu_length;
- 		for (total_read = 0; total_read < pdu_length;
- 		     total_read += length) {
-@@ -645,7 +663,7 @@ multi_t2_fnd:
- 			   !isMultiRsp) {
- 			cERROR(1, "No task to wake, unknown frame received! "
- 				   "NumMids %d", atomic_read(&midCount));
--			cifs_dump_mem("Received Data is: ", (char *)smb_buffer,
-+			cifs_dump_mem("Received Data is: ", buf,
- 				      sizeof(struct smb_hdr));
- #ifdef CONFIG_CIFS_DEBUG2
- 			cifs_dump_detail(smb_buffer);
+ 	} /* end while !EXITING */
+ 
+-	/* take it off the list, if it's not already */
+-	spin_lock(&cifs_tcp_ses_lock);
+-	list_del_init(&server->tcp_ses_list);
+-	spin_unlock(&cifs_tcp_ses_lock);
+-
+-	spin_lock(&GlobalMid_Lock);
+-	server->tcpStatus = CifsExiting;
+-	spin_unlock(&GlobalMid_Lock);
+-	wake_up_all(&server->response_q);
+-
+-	/* check if we have blocked requests that need to free */
+-	/* Note that cifs_max_pending is normally 50, but
+-	can be set at module install time to as little as two */
+-	spin_lock(&GlobalMid_Lock);
+-	if (atomic_read(&server->inFlight) >= cifs_max_pending)
+-		atomic_set(&server->inFlight, cifs_max_pending - 1);
+-	/* We do not want to set the max_pending too low or we
+-	could end up with the counter going negative */
+-	spin_unlock(&GlobalMid_Lock);
+-	/* Although there should not be any requests blocked on
+-	this queue it can not hurt to be paranoid and try to wake up requests
+-	that may haven been blocked when more than 50 at time were on the wire
+-	to the same server - they now will see the session is in exit state
+-	and get out of SendReceive.  */
+-	wake_up_all(&server->request_q);
+-	/* give those requests time to exit */
+-	msleep(125);
+-
+-	if (server->ssocket) {
+-		sock_release(server->ssocket);
+-		server->ssocket = NULL;
+-	}
+ 	/* buffer usually freed in free_mid - need to free it here on exit */
+ 	cifs_buf_release(bigbuf);
+ 	if (smallbuf) /* no sense logging a debug message if NULL */
+ 		cifs_small_buf_release(smallbuf);
+ 
+-	if (!list_empty(&server->pending_mid_q)) {
+-		struct list_head dispose_list;
+-
+-		INIT_LIST_HEAD(&dispose_list);
+-		spin_lock(&GlobalMid_Lock);
+-		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+-			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+-			cFYI(1, "Clearing mid 0x%x", mid_entry->mid);
+-			mid_entry->midState = MID_SHUTDOWN;
+-			list_move(&mid_entry->qhead, &dispose_list);
+-		}
+-		spin_unlock(&GlobalMid_Lock);
+-
+-		/* now walk dispose list and issue callbacks */
+-		list_for_each_safe(tmp, tmp2, &dispose_list) {
+-			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+-			cFYI(1, "Callback mid 0x%x", mid_entry->mid);
+-			list_del_init(&mid_entry->qhead);
+-			mid_entry->callback(mid_entry);
+-		}
+-		/* 1/8th of sec is more than enough time for them to exit */
+-		msleep(125);
+-	}
+-
+-	if (!list_empty(&server->pending_mid_q)) {
+-		/* mpx threads have not exited yet give them
+-		at least the smb send timeout time for long ops */
+-		/* due to delays on oplock break requests, we need
+-		to wait at least 45 seconds before giving up
+-		on a request getting a response and going ahead
+-		and killing cifsd */
+-		cFYI(1, "Wait for exit from demultiplex thread");
+-		msleep(46000);
+-		/* if threads still have not exited they are probably never
+-		coming home not much else we can do but free the memory */
+-	}
+-
+-	kfree(server->hostname);
+ 	task_to_wake = xchg(&server->tsk, NULL);
+-	kfree(server);
+-
+-	length = atomic_dec_return(&tcpSesAllocCount);
+-	if (length  > 0)
+-		mempool_resize(cifs_req_poolp, length + cifs_min_rcv,
+-				GFP_KERNEL);
++	clean_demultiplex_info(server);
+ 
+ 	/* if server->tsk was NULL then wait for a signal before exiting */
+ 	if (!task_to_wake) {
 -- 
 1.7.1
