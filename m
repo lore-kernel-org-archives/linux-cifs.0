@@ -1,42 +1,59 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: move bdi_setup_and_register outside of CONFIG_CIFS_DFS_UPCALL
-Date: Sat,  9 Jul 2011 12:21:07 -0400
-Message-ID: <1310228467-27466-1-git-send-email-jlayton@redhat.com>
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: 3.0-rc+git OOPS losetup on cifs
+Date: Sat, 9 Jul 2011 12:53:04 -0500
+Message-ID: <CAH2r5ms_5VBD+2c-6Tv+7KzU3NEN9ZHt4Q2nPgxZktn7dbcKxA@mail.gmail.com>
+References: <alpine.DEB.2.02.1107042132500.18300@aurora>
+	<4E155F6F.6070506@suse.de>
+	<alpine.DEB.2.02.1107090250240.5791@aurora>
+	<alpine.DEB.2.02.1107091541080.17541@aurora>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Suresh Jayaraman <sjayaraman@suse.de>,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	Linux-Kernel-Mailinglist <linux-kernel@vger.kernel.org>
+To: Sven-Haegar Koch <haegar@sdinet.de>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <alpine.DEB.2.02.1107091541080.17541@aurora>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-This needs to be done regardless of whether that KConfig option is set
-or not.
+ok - will review today and plan to merge if ok
 
-Reported-by: Sven-Haegar Koch <haegar-DcL44mDNY06zQB+pC5nmwQ@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+On Sat, Jul 9, 2011 at 8:42 AM, Sven-Haegar Koch <haegar@sdinet.de> wrote:
+> On Sat, 9 Jul 2011, Sven-Haegar Koch wrote:
+>
+>> On Thu, 7 Jul 2011, Suresh Jayaraman wrote:
+>>
+>> > On 07/05/2011 01:18 AM, Sven-Haegar Koch wrote:
+>> > > Since a short while (I know it worked with 3.0-rc1) loopback-mounting an
+>> > > image on a samba server mounted with cifs oopses the kernel.
+>> ...
+>> > I couldn't reproduce this with 3.0-rc6 with a smaller image file (1GB).
+>> > But I see no relevant fixes between -rc5 and -rc6.
+>> >
+>> > Can you try to reproduce the same problem with a smaller non-encrypted file?
+>>
+>> I can, and it seems something even more fundamental.
+>
+>
+> Update for the list (archive) readers:
+>
+> The patch in https://bugzilla.kernel.org/show_bug.cgi?id=38972#c12 fixes
+> the problem for me completely.
+>
+> Thanks Jeff Layton
+>
+> c'ya
+> sven-haegar
+>
+> --
+> Three may keep a secret, if two of them are dead.
+> - Ben F.
+>
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index fea9ecf..dd695c5 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3011,6 +3011,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 	struct tcon_link *tlink;
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	int referral_walks_count = 0;
-+#endif
- 
- 	rc = bdi_setup_and_register(&cifs_sb->bdi, "cifs", BDI_CAP_MAP_COPY);
- 	if (rc)
-@@ -3018,6 +3019,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 
- 	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
- 
-+#ifdef CONFIG_CIFS_DFS_UPCALL
- try_mount_again:
- 	/* cleanup activities if we're chasing a referral */
- 	if (referral_walks_count) {
+
+
 -- 
-1.7.6
+Thanks,
+
+Steve
