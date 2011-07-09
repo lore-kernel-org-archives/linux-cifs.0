@@ -1,59 +1,65 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: 3.0-rc+git OOPS losetup on cifs
-Date: Sat, 9 Jul 2011 12:53:04 -0500
-Message-ID: <CAH2r5ms_5VBD+2c-6Tv+7KzU3NEN9ZHt4Q2nPgxZktn7dbcKxA@mail.gmail.com>
-References: <alpine.DEB.2.02.1107042132500.18300@aurora>
-	<4E155F6F.6070506@suse.de>
-	<alpine.DEB.2.02.1107090250240.5791@aurora>
-	<alpine.DEB.2.02.1107091541080.17541@aurora>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: move bdi_setup_and_register outside of CONFIG_CIFS_DFS_UPCALL
+Date: Sat, 9 Jul 2011 17:13:45 -0500
+Message-ID: <CAH2r5mvoRmkhzQbB+Q1dM3wQQYy0jr1NJVr7bhs4e7qvw6zKMg@mail.gmail.com>
+References: <1310228467-27466-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Suresh Jayaraman <sjayaraman@suse.de>,
-	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	Linux-Kernel-Mailinglist <linux-kernel@vger.kernel.org>
-To: Sven-Haegar Koch <haegar@sdinet.de>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <alpine.DEB.2.02.1107091541080.17541@aurora>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1310228467-27466-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-ok - will review today and plan to merge if ok
+looks correct; merged
 
-On Sat, Jul 9, 2011 at 8:42 AM, Sven-Haegar Koch <haegar@sdinet.de> wrote:
-> On Sat, 9 Jul 2011, Sven-Haegar Koch wrote:
+On Sat, Jul 9, 2011 at 11:21 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> This needs to be done regardless of whether that KConfig option is se=
+t
+> or not.
 >
->> On Thu, 7 Jul 2011, Suresh Jayaraman wrote:
->>
->> > On 07/05/2011 01:18 AM, Sven-Haegar Koch wrote:
->> > > Since a short while (I know it worked with 3.0-rc1) loopback-mounting an
->> > > image on a samba server mounted with cifs oopses the kernel.
->> ...
->> > I couldn't reproduce this with 3.0-rc6 with a smaller image file (1GB).
->> > But I see no relevant fixes between -rc5 and -rc6.
->> >
->> > Can you try to reproduce the same problem with a smaller non-encrypted file?
->>
->> I can, and it seems something even more fundamental.
+> Reported-by: Sven-Haegar Koch <haegar-DcL44mDNY06zQB+pC5nmwQ@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/connect.c | =A0 =A02 ++
+> =A01 files changed, 2 insertions(+), 0 deletions(-)
 >
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index fea9ecf..dd695c5 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3011,6 +3011,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct=
+ smb_vol *volume_info)
+> =A0 =A0 =A0 =A0struct tcon_link *tlink;
+> =A0#ifdef CONFIG_CIFS_DFS_UPCALL
+> =A0 =A0 =A0 =A0int referral_walks_count =3D 0;
+> +#endif
 >
-> Update for the list (archive) readers:
+> =A0 =A0 =A0 =A0rc =3D bdi_setup_and_register(&cifs_sb->bdi, "cifs", B=
+DI_CAP_MAP_COPY);
+> =A0 =A0 =A0 =A0if (rc)
+> @@ -3018,6 +3019,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct=
+ smb_vol *volume_info)
 >
-> The patch in https://bugzilla.kernel.org/show_bug.cgi?id=38972#c12 fixes
-> the problem for me completely.
+> =A0 =A0 =A0 =A0cifs_sb->bdi.ra_pages =3D default_backing_dev_info.ra_=
+pages;
 >
-> Thanks Jeff Layton
->
-> c'ya
-> sven-haegar
->
+> +#ifdef CONFIG_CIFS_DFS_UPCALL
+> =A0try_mount_again:
+> =A0 =A0 =A0 =A0/* cleanup activities if we're chasing a referral */
+> =A0 =A0 =A0 =A0if (referral_walks_count) {
 > --
-> Three may keep a secret, if two of them are dead.
-> - Ben F.
+> 1.7.6
+>
 >
 
 
 
--- 
+--=20
 Thanks,
 
 Steve
