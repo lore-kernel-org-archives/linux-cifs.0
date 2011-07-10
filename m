@@ -1,65 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: move bdi_setup_and_register outside of CONFIG_CIFS_DFS_UPCALL
-Date: Sat, 9 Jul 2011 17:13:45 -0500
-Message-ID: <CAH2r5mvoRmkhzQbB+Q1dM3wQQYy0jr1NJVr7bhs4e7qvw6zKMg@mail.gmail.com>
-References: <1310228467-27466-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Fix signing failure when server mandates signing for NTLMSSP
+Date: Sun, 10 Jul 2011 06:55:32 -0500
+Message-ID: <1310298932-6901-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1310228467-27466-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-looks correct; merged
-
-On Sat, Jul 9, 2011 at 11:21 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> This needs to be done regardless of whether that KConfig option is se=
-t
-> or not.
->
-> Reported-by: Sven-Haegar Koch <haegar-DcL44mDNY06zQB+pC5nmwQ@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/connect.c | =A0 =A02 ++
-> =A01 files changed, 2 insertions(+), 0 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index fea9ecf..dd695c5 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3011,6 +3011,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct=
- smb_vol *volume_info)
-> =A0 =A0 =A0 =A0struct tcon_link *tlink;
-> =A0#ifdef CONFIG_CIFS_DFS_UPCALL
-> =A0 =A0 =A0 =A0int referral_walks_count =3D 0;
-> +#endif
->
-> =A0 =A0 =A0 =A0rc =3D bdi_setup_and_register(&cifs_sb->bdi, "cifs", B=
-DI_CAP_MAP_COPY);
-> =A0 =A0 =A0 =A0if (rc)
-> @@ -3018,6 +3019,7 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct=
- smb_vol *volume_info)
->
-> =A0 =A0 =A0 =A0cifs_sb->bdi.ra_pages =3D default_backing_dev_info.ra_=
-pages;
->
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> =A0try_mount_again:
-> =A0 =A0 =A0 =A0/* cleanup activities if we're chasing a referral */
-> =A0 =A0 =A0 =A0if (referral_walks_count) {
-> --
-> 1.7.6
->
->
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
+When using NTLMSSP authentication mechanism, if server mandates
+signing, keep the flags in type 3 messages of the NTLMSSP exchange
+same as in type 1 messages (i.e. keep the indicated capabilities same).
 
---=20
-Thanks,
+Some of the servers such as Samba, expect the flags such as
+Negotiate_Key_Exchange in type 3 message of NTLMSSP exchange as well.
+Some servers like Windows do not.
 
-Steve
+https://bugzilla.samba.org/show_bug.cgi?id=8212
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail>
+---
+ fs/cifs/sess.c |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 3892ab8..d3e6196 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -428,8 +428,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
+ 		if (!ses->server->session_estab)
+-			flags |= NTLMSSP_NEGOTIATE_KEY_XCH |
+-				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
++			flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+ 	}
+ 
+ 	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+@@ -465,10 +464,11 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+ 		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+ 	if (ses->server->sec_mode &
+-	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
++	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
+-	if (ses->server->sec_mode & SECMODE_SIGN_REQUIRED)
+-		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
++		if (!ses->server->session_estab)
++			flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
++	}
+ 
+ 	tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+ 	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+-- 
+1.6.0.2
