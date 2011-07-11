@@ -1,74 +1,71 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: warning on rmmod cifs on current rc6
-Date: Sun, 10 Jul 2011 13:46:52 -0500
-Message-ID: <CAH2r5muEW4fJFQ2qPtkc4a8_+nwB_VEtj_xtm680qFbDnXdGng@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Fix signing failure when server mandates signing
+ for NTLMSSP
+Date: Mon, 11 Jul 2011 09:48:33 -0400
+Message-ID: <20110711094833.7dc02343@tlielax.poochiereds.net>
+References: <1310298932-6901-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1310298932-6901-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Noticed the following warning on rmmod of cifs on most current
-cifs-2.6.git (I have many of the kernel debugging menuconfig options
-on). Ideas?
+On Sun, 10 Jul 2011 06:55:32 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-[13399.427527] kobject: 'cifs-1' (ffff8801410c3c00): kobject_uevent_env
-[13399.427570] kobject: 'cifs-1' (ffff8801410c3c00): fill_kobj_path:
-path = '/devices/virtual/bdi/cifs-1'
-[13399.427652] kobject: 'cifs-1' (ffff8801410c3c00): kobject_cleanup
-[13399.427658] kobject: 'cifs-1' (ffff8801410c3c00): calling ktype release
-[13399.427673] kobject: 'cifs-1': free name
-[13403.168585] FS-Cache: Netfs 'cifs' unregistered from caching
-[13403.480203] kobject: 'cifs_inode_cache' (ffff8801303b30f8):
-kobject_uevent_env
-[13403.480245] kobject: 'cifs_inode_cache' (ffff8801303b30f8):
-fill_kobj_path: path = '/kernel/slab/cifs_inode_cache'
-[13403.480495] kobject: 'cifs_inode_cache' (ffff8801303b30f8): kobject_cleanup
-[13403.480502] kobject: 'cifs_inode_cache' (ffff8801303b30f8): calling
-ktype release
-[13403.480514] kobject: 'cifs_inode_cache': free name
-[13403.480572] kobject: 'cifs_mpx_ids' (ffff88013019d518): kobject_uevent_env
-[13403.480608] kobject: 'cifs_mpx_ids' (ffff88013019d518):
-fill_kobj_path: path = '/kernel/slab/cifs_mpx_ids'
-[13403.480810] kobject: 'cifs_mpx_ids' (ffff88013019d518): kobject_cleanup
-[13403.480816] kobject: 'cifs_mpx_ids' (ffff88013019d518): calling ktype release
-[13403.480827] kobject: 'cifs_mpx_ids': free name
-[13403.481450] kobject: 'cifs_request' (ffff88013019da40): kobject_uevent_env
-[13403.481485] kobject: 'cifs_request' (ffff88013019da40):
-fill_kobj_path: path = '/kernel/slab/cifs_request'
-[13403.481674] kobject: 'cifs_request' (ffff88013019da40): kobject_cleanup
-[13403.481680] kobject: 'cifs_request' (ffff88013019da40): calling ktype release
-[13403.481689] kobject: 'cifs_request': free name
-[13403.481941] kobject: 'cifs_small_rq' (ffff88013019d410): kobject_uevent_env
-[13403.481977] kobject: 'cifs_small_rq' (ffff88013019d410):
-fill_kobj_path: path = '/kernel/slab/cifs_small_rq'
-[13403.482180] kobject: 'cifs_small_rq' (ffff88013019d410): kobject_cleanup
-[13403.482186] kobject: 'cifs_small_rq' (ffff88013019d410): calling
-ktype release
-[13403.482196] kobject: 'cifs_small_rq': free name
-[13403.485052] kobject: 'holders' (ffff880131bd2cc0): kobject_cleanup
-[13403.485060] kobject: 'holders' (ffff880131bd2cc0): auto cleanup kobject_del
-[13403.485075] kobject: 'holders' (ffff880131bd2cc0): calling ktype release
-[13403.485081] kobject: (ffff880131bd2cc0): dynamic_kobj_release
-[13403.485090] kobject: 'holders': free name
-[13403.485105] kobject: 'notes' (ffff8801539dc088): kobject_cleanup
-[13403.485110] kobject: 'notes' (ffff8801539dc088): auto cleanup kobject_del
-[13403.485126] kobject: 'notes' (ffff8801539dc088): calling ktype release
-[13403.485132] kobject: (ffff8801539dc088): dynamic_kobj_release
-[13403.485141] kobject: 'notes': free name
-[13403.485298] kobject: 'cifs' (ffffffffa04829f0): kobject_cleanup
-[13403.485304] kobject: 'cifs' (ffffffffa04829f0): does not have a
-release() function, it is broken and must be fixed.
-[13403.485311] kobject: 'cifs' (ffffffffa04829f0): auto cleanup 'remove' event
-[13403.485317] kobject: 'cifs' (ffffffffa04829f0): kobject_uevent_env
-[13403.485352] kobject: 'cifs' (ffffffffa04829f0): fill_kobj_path:
-path = '/module/cifs'
-[13403.485404] kobject: 'cifs' (ffffffffa04829f0): auto cleanup kobject_del
-[13403.485583] kobject: 'cifs': free name
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> When using NTLMSSP authentication mechanism, if server mandates
+> signing, keep the flags in type 3 messages of the NTLMSSP exchange
+> same as in type 1 messages (i.e. keep the indicated capabilities same).
+> 
+> Some of the servers such as Samba, expect the flags such as
+> Negotiate_Key_Exchange in type 3 message of NTLMSSP exchange as well.
+> Some servers like Windows do not.
+> 
+> https://bugzilla.samba.org/show_bug.cgi?id=8212
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail>
+> ---
+>  fs/cifs/sess.c |   10 +++++-----
+>  1 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+> index 3892ab8..d3e6196 100644
+> --- a/fs/cifs/sess.c
+> +++ b/fs/cifs/sess.c
+> @@ -428,8 +428,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+>  			(SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+>  		flags |= NTLMSSP_NEGOTIATE_SIGN;
+>  		if (!ses->server->session_estab)
+> -			flags |= NTLMSSP_NEGOTIATE_KEY_XCH |
+> -				NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+> +			flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+>  	}
+>  
+>  	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+> @@ -465,10 +464,11 @@ static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+>  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+>  		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC;
+>  	if (ses->server->sec_mode &
+> -	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+> +	   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+>  		flags |= NTLMSSP_NEGOTIATE_SIGN;
+> -	if (ses->server->sec_mode & SECMODE_SIGN_REQUIRED)
+> -		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
+> +		if (!ses->server->session_estab)
+> +			flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+> +	}
+>  
+>  	tmp = pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+>  	sec_blob->NegotiateFlags = cpu_to_le32(flags);
 
+Looks reasonable...
 
--- 
-Thanks,
-
-Steve
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
