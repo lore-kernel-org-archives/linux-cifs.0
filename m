@@ -1,39 +1,45 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: trivial: goto out here is unnecessary
-Date: Mon, 11 Jul 2011 10:18:14 -0400
-Message-ID: <1310393894-12579-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re: [PATCH] cifs: drop spinlock before calling cifs_put_tlink
+Date: Mon, 11 Jul 2011 10:21:26 -0400
+Message-ID: <20110711102126.5174bc51@tlielax.poochiereds.net>
+References: <1310393794-12407-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1310393794-12407-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...and remove some obsolete comments.
+On Mon, 11 Jul 2011 10:16:34 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |    6 ------
- 1 files changed, 0 insertions(+), 6 deletions(-)
+> ...as that function can sleep.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/connect.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index ceab134..dd695c5 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2241,8 +2241,8 @@ cifs_match_super(struct super_block *sb, void *data)
+>  
+>  	rc = compare_mount_options(sb, mnt_data);
+>  out:
+> -	cifs_put_tlink(tlink);
+>  	spin_unlock(&cifs_tcp_ses_lock);
+> +	cifs_put_tlink(tlink);
+>  	return rc;
+>  }
+>  
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 6ec366ff..729514c 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3192,15 +3192,9 @@ mount_fail_check:
- 		else
- 			cifs_put_tcp_session(srvTcp);
- 		bdi_destroy(&cifs_sb->bdi);
--		goto out;
- 	}
- 
--	/* volume_info->password is freed above when existing session found
--	(in which case it is not needed anymore) but when new sesion is created
--	the password ptr is put in the new session structure (in which case the
--	password will be freed at unmount time) */
- out:
--	/* zero out password before freeing */
- 	FreeXid(xid);
- 	return rc;
- }
+Steve, this should probably be pushed to 3.0 if possible. This can
+deadlock if you end up putting the last tcon reference in this call.
+
 -- 
-1.7.6
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
