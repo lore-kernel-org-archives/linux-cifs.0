@@ -1,64 +1,32 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: don't start signing too early
-Date: Mon, 11 Jul 2011 10:16:53 -0400
-Message-ID: <1310393813-12443-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: [PATCH] cifs: eliminate unneeded cast of cifs_demultiplex_thread
+Date: Mon, 11 Jul 2011 10:17:43 -0400
+Message-ID: <1310393863-12531-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Sniffing traffic on the wire shows that windows clients send a zeroed
-out signature field in a NEGOTIATE request, and send "BSRSPYL" in the
-signature field during SESSION_SETUP. Make the cifs client behave the
-same way.
-
-It doesn't seem to make much difference in any server that I've tested
-against, but it's probably best to follow windows behavior as closely as
-possible here.
-
+Reported-by: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c |   16 ++++++++++++++--
- 1 files changed, 14 insertions(+), 2 deletions(-)
+ fs/cifs/connect.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 5a0ee7f..45ae18e 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -77,9 +77,15 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
- 	if ((cifs_pdu == NULL) || (server == NULL))
- 		return -EINVAL;
- 
--	if ((cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) == 0)
-+	if (!(cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) ||
-+	    server->tcpStatus == CifsNeedNegotiate)
- 		return rc;
- 
-+	if (!server->session_estab) {
-+		strncpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
-+		return rc;
-+	}
-+
- 	cifs_pdu->Signature.Sequence.SequenceNumber =
- 			cpu_to_le32(server->sequence_number);
- 	cifs_pdu->Signature.Sequence.Reserved = 0;
-@@ -154,9 +160,15 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
- 	if ((cifs_pdu == NULL) || (server == NULL))
- 		return -EINVAL;
- 
--	if ((cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) == 0)
-+	if (!(cifs_pdu->Flags2 & SMBFLG2_SECURITY_SIGNATURE) ||
-+	    server->tcpStatus == CifsNeedNegotiate)
- 		return rc;
- 
-+	if (!server->session_estab) {
-+		strncpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
-+		return rc;
-+	}
-+
- 	cifs_pdu->Signature.Sequence.SequenceNumber =
- 				cpu_to_le32(server->sequence_number);
- 	cifs_pdu->Signature.Sequence.Reserved = 0;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 729514c..ceab134 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1791,8 +1791,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	 * this will succeed. No need for try_module_get().
+ 	 */
+ 	__module_get(THIS_MODULE);
+-	tcp_ses->tsk = kthread_run((void *)(void *)cifs_demultiplex_thread,
+-				  tcp_ses, "cifsd");
++	tcp_ses->tsk = kthread_run(cifs_demultiplex_thread, tcp_ses, "cifsd");
+ 	if (IS_ERR(tcp_ses->tsk)) {
+ 		rc = PTR_ERR(tcp_ses->tsk);
+ 		cERROR(1, "error %d create cifsd thread", rc);
 -- 
 1.7.6
