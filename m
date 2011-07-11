@@ -1,46 +1,74 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: -o noposixpaths
-Date: Mon, 11 Jul 2011 13:48:20 -0500
-Message-ID: <CAH2r5mvR3E=E066MckaLVjpvwbcWg8BEvH+gtzpF-BSYaLvZUw@mail.gmail.com>
-References: <20110711142311.27b4dfce@tlielax.poochiereds.net>
-	<CAH2r5mv3WOCKk4jL1YXrfvSjt52NOTgJZKatbLqB4U61iuZxRg@mail.gmail.com>
-	<20110711144146.3748d1ff@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] manpage: add some missing options to mount.cifs.8
+Date: Mon, 11 Jul 2011 14:57:16 -0400
+Message-ID: <1310410636-17505-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110711144146.3748d1ff-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Jul 11, 2011 at 1:41 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Mon, 11 Jul 2011 13:32:54 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> Yes, IIRC the apple guys mentioned plausible server scenarios for this
->> (where we want to mount with unix extensions for symlinks and ownership
->> but server can not handle posix path names)
->>
->> Presumably if the server file system does not support posix path names
->> (FAT32, NTFS?) or if we want to restrict the characters (for interoperability
->> with Windows clients accessing the same share?) - might be other cases.
->>
->
-> In that case though, shouldn't those servers just not set
-> CIFS_UNIX_POSIX_PATHNAMES_CAP ?
+Clarify servernetbiosname parameter name, add mention of ignorecase, and
+add a section on noposixpaths.
 
-I don't think servers do that (unset the POSIX_PATHNAMES CAP for one
-share and not others, even assuming the share exports all volumes
-of the same file system type)  for the former case
-(unless they cant support posix path at all for the whole server),
-and for the latter case, not sure that the server can know enough
-information (about other clients which may mount the system)
-to unset the CAP unilaterally.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 |   26 +++++++++++++++++++++++++-
+ 1 files changed, 25 insertions(+), 1 deletions(-)
 
-
-
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index 0615c3a..7e0f117 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -140,11 +140,16 @@ port=\fIarg\fR
+ sets the port number on which the client will attempt to contact the CIFS server\&. If this value is specified, look for an existing connection with this port, and use that if one exists\&. If one doesn't exist, try to create a new connection on that port\&. If that connection fails, return an error\&. If this value isn't specified, look for an existing connection on port 445 or 139\&. If no such connection exists, try to connect on port 445 first and then port 139 if that fails\&. Return an error if both fail\&.
+ .RE
+ .PP
+-servern=\fIarg\fR
++servernetbiosname=\fIarg\fR
+ .RS 4
+ Specify the server netbios name (RFC1001 name) to use when attempting to setup a session to the server\&. Although rarely needed for mounting to newer servers, this option is needed for mounting to some older servers (such as OS/2 or Windows 98 and Windows ME) since when connecting over port 139 they, unlike most newer servers, do not support a default server name\&. A server name can be up to 15 characters long and is usually uppercased\&.
+ .RE
+ .PP
++servern=\fIarg\fR
++.RS 4
++Synonym for \fIservernetbiosname\fR.
++.RE
++.PP
+ netbiosname=\fIarg\fR
+ .RS 4
+ When mounting to servers via port 139, specifies the RFC1001 source name to use to represent the client netbios machine name when doing the RFC1001 netbios session initialize\&.
+@@ -272,6 +277,11 @@ nocase
+ Request case insensitive path name matching (case sensitive is the default if the server suports it)\&.
+ .RE
+ .PP
++ignorecase
++.RS 4
++Synonym for \fInocase\fR.
++.RE
++.PP
+ sec=
+ .RS 4
+ Security mode\&. Allowed values are:
+@@ -436,6 +446,20 @@ positive integer that can hold values between 0 and a maximum value of
+ 2^30 * HZ (frequency of timer interrupt) setting\&.
+ .RE
+ .PP
++noposixpaths
++.RS 4
++If unix extensions are enabled on a share, then the client will typically allow
++filenames to include any character besides '/' in a pathname component, and
++will use forward slashes as a pathname delimiter. This option prevents the
++client from attempting to negotiate the use of posix-style pathnames to the
++server.
++.RE
++.PP
++posixpaths
++.RS 4
++Inverse of \fInoposixpaths\fR.
++.RE
++.PP
+ \-\-verbose
+ .RS 4
+ Print additional debugging information for the mount\&. Note that this parameter must be specified before the \-o\&. For example:
 -- 
-Thanks,
-
-Steve
+1.7.6
