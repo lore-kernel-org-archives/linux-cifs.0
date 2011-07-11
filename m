@@ -1,74 +1,42 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] manpage: add some missing options to mount.cifs.8
-Date: Mon, 11 Jul 2011 14:57:16 -0400
-Message-ID: <1310410636-17505-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Mon, 11 Jul 2011 13:59:39 -0500
+Message-ID: <CAH2r5muJCzah_VMaJz9J5gzfsZ8CcMK_-snyXeAbgz2o9Z4N7w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Clarify servernetbiosname parameter name, add mention of ignorecase, and
-add a section on noposixpaths.
+The following changes since commit de3796e77a587b28f0c9d8e04c02894d3939dc4e:
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.8 |   26 +++++++++++++++++++++++++-
- 1 files changed, 25 insertions(+), 1 deletions(-)
+  Merge branch 'v4l_for_linus' of
+git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-2.6
+(2011-07-06 12:16:49 -0700)
 
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index 0615c3a..7e0f117 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -140,11 +140,16 @@ port=\fIarg\fR
- sets the port number on which the client will attempt to contact the CIFS server\&. If this value is specified, look for an existing connection with this port, and use that if one exists\&. If one doesn't exist, try to create a new connection on that port\&. If that connection fails, return an error\&. If this value isn't specified, look for an existing connection on port 445 or 139\&. If no such connection exists, try to connect on port 445 first and then port 139 if that fails\&. Return an error if both fail\&.
- .RE
- .PP
--servern=\fIarg\fR
-+servernetbiosname=\fIarg\fR
- .RS 4
- Specify the server netbios name (RFC1001 name) to use when attempting to setup a session to the server\&. Although rarely needed for mounting to newer servers, this option is needed for mounting to some older servers (such as OS/2 or Windows 98 and Windows ME) since when connecting over port 139 they, unlike most newer servers, do not support a default server name\&. A server name can be up to 15 characters long and is usually uppercased\&.
- .RE
- .PP
-+servern=\fIarg\fR
-+.RS 4
-+Synonym for \fIservernetbiosname\fR.
-+.RE
-+.PP
- netbiosname=\fIarg\fR
- .RS 4
- When mounting to servers via port 139, specifies the RFC1001 source name to use to represent the client netbios machine name when doing the RFC1001 netbios session initialize\&.
-@@ -272,6 +277,11 @@ nocase
- Request case insensitive path name matching (case sensitive is the default if the server suports it)\&.
- .RE
- .PP
-+ignorecase
-+.RS 4
-+Synonym for \fInocase\fR.
-+.RE
-+.PP
- sec=
- .RS 4
- Security mode\&. Allowed values are:
-@@ -436,6 +446,20 @@ positive integer that can hold values between 0 and a maximum value of
- 2^30 * HZ (frequency of timer interrupt) setting\&.
- .RE
- .PP
-+noposixpaths
-+.RS 4
-+If unix extensions are enabled on a share, then the client will typically allow
-+filenames to include any character besides '/' in a pathname component, and
-+will use forward slashes as a pathname delimiter. This option prevents the
-+client from attempting to negotiate the use of posix-style pathnames to the
-+server.
-+.RE
-+.PP
-+posixpaths
-+.RS 4
-+Inverse of \fInoposixpaths\fR.
-+.RE
-+.PP
- \-\-verbose
- .RS 4
- Print additional debugging information for the mount\&. Note that this parameter must be specified before the \-o\&. For example:
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git
+..BRANCH.NOT.VERIFIED..
+
+Jeff Layton (7):
+      cifs: remove bogus call to cifs_cleanup_volume_info
+      cifs: fix build_unc_path_to_root to account for a prefixpath
+      cifs: have cifs_cleanup_volume_info not take a double pointer
+      cifs: factor smb_vol allocation out of cifs_setup_volume_info
+      cifs: move bdi_setup_and_register outside of CONFIG_CIFS_DFS_UPCALL
+      cifs: fix expand_dfs_referral
+      cifs: drop spinlock before calling cifs_put_tlink
+
+ fs/cifs/cifsfs.c    |    8 ++--
+ fs/cifs/cifsproto.h |    6 +-
+ fs/cifs/connect.c   |  116 +++++++++++++++++++++++++++++----------------------
+ 3 files changed, 73 insertions(+), 57 deletions(-)
+
+
 -- 
-1.7.6
+Thanks,
+
+Steve
