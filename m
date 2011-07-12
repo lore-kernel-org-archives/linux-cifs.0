@@ -1,55 +1,55 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: -o noposixpaths
-Date: Mon, 11 Jul 2011 15:06:26 -0400
-Message-ID: <20110711150626.64dad9bd@tlielax.poochiereds.net>
-References: <20110711142311.27b4dfce@tlielax.poochiereds.net>
-	<CAH2r5mv3WOCKk4jL1YXrfvSjt52NOTgJZKatbLqB4U61iuZxRg@mail.gmail.com>
-	<20110711144146.3748d1ff@tlielax.poochiereds.net>
-	<CAH2r5mvR3E=E066MckaLVjpvwbcWg8BEvH+gtzpF-BSYaLvZUw@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: drop spinlock before calling cifs_put_tlink
+Date: Tue, 12 Jul 2011 09:50:51 +0400
+Message-ID: <CAKywueQ8uAVMD3YtW0b9sgA7wyGanJcYg0e7bYApLzV7EMgX_g@mail.gmail.com>
+References: <1310393794-12407-1-git-send-email-jlayton@redhat.com>
+	<20110711102126.5174bc51@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvR3E=E066MckaLVjpvwbcWg8BEvH+gtzpF-BSYaLvZUw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20110711102126.5174bc51-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 11 Jul 2011 13:48:20 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2011/7/11 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Mon, 11 Jul 2011 10:16:34 -0400
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+>
+>> ...as that function can sleep.
+>>
+>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> ---
+>> =A0fs/cifs/connect.c | =A0 =A02 +-
+>> =A01 files changed, 1 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> index ceab134..dd695c5 100644
+>> --- a/fs/cifs/connect.c
+>> +++ b/fs/cifs/connect.c
+>> @@ -2241,8 +2241,8 @@ cifs_match_super(struct super_block *sb, void =
+*data)
+>>
+>> =A0 =A0 =A0 rc =3D compare_mount_options(sb, mnt_data);
+>> =A0out:
+>> - =A0 =A0 cifs_put_tlink(tlink);
+>> =A0 =A0 =A0 spin_unlock(&cifs_tcp_ses_lock);
+>> + =A0 =A0 cifs_put_tlink(tlink);
+>> =A0 =A0 =A0 return rc;
+>> =A0}
+>>
+>
+> Steve, this should probably be pushed to 3.0 if possible. This can
+> deadlock if you end up putting the last tcon reference in this call.
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
 
-> On Mon, Jul 11, 2011 at 1:41 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > On Mon, 11 Jul 2011 13:32:54 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> Yes, IIRC the apple guys mentioned plausible server scenarios for this
-> >> (where we want to mount with unix extensions for symlinks and ownership
-> >> but server can not handle posix path names)
-> >>
-> >> Presumably if the server file system does not support posix path names
-> >> (FAT32, NTFS?) or if we want to restrict the characters (for interoperability
-> >> with Windows clients accessing the same share?) - might be other cases.
-> >>
-> >
-> > In that case though, shouldn't those servers just not set
-> > CIFS_UNIX_POSIX_PATHNAMES_CAP ?
-> 
-> I don't think servers do that (unset the POSIX_PATHNAMES CAP for one
-> share and not others, even assuming the share exports all volumes
-> of the same file system type)  for the former case
-> (unless they cant support posix path at all for the whole server),
-> and for the latter case, not sure that the server can know enough
-> information (about other clients which may mount the system)
-> to unset the CAP unilaterally.
-> 
+This looks good to me. Thanks!
 
-This explanation doesn't make any sense. IIUC, The server should only
-set the flag if it's appropriate to use posix-style pathnames on the
-share. Why should the server care at all what the clients can support?
-
-Perhaps I should phrase this question differently: Under what
-circumstances would someone want to use the "noposixpaths" mount option?
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--=20
+Best regards,
+Pavel Shilovsky.
