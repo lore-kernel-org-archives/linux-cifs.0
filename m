@@ -1,38 +1,30 @@
-From: Jeremy Allison <jra@samba.org>
-Subject: Re: [patch] cifs: update limit for snprintf() in cifs_construct_tcon()
-Date: Tue, 12 Jul 2011 11:16:34 -0700
-Message-ID: <20110712181634.GC22278@jeremy-laptop>
+From: Dan Carpenter <error27-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [patch] cifs: update limit for snprintf() in
+ cifs_construct_tcon()
+Date: Tue, 12 Jul 2011 21:20:39 +0300
+Message-ID: <20110712182039.GJ18655@shale.localdomain>
 References: <20110617103059.GE2520@shale.localdomain>
-	<CAH2r5mu6TuWs6P8ZeR1=KCv8BLSu0_Z8b2uoVUqXhw55=39CWg@mail.gmail.com>
-Reply-To: Jeremy Allison <jra@samba.org>
+ <CAH2r5mu6TuWs6P8ZeR1=KCv8BLSu0_Z8b2uoVUqXhw55=39CWg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, samba-technical@samba.org
-To: Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"open list:COMMON INTERNET F..." <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"open list:COMMON INTERNET F..." <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CAH2r5mu6TuWs6P8ZeR1=KCv8BLSu0_Z8b2uoVUqXhw55=39CWg@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+In-Reply-To: <CAH2r5mu6TuWs6P8ZeR1=KCv8BLSu0_Z8b2uoVUqXhw55=39CWg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
 On Tue, Jul 12, 2011 at 01:14:00PM -0500, Steve French wrote:
 > What about the following alternative, so we dont rely on the magic
 > number as much.
+> 
 
-Steve,
+Yeah.  That's better.  Want me to do anything or will you just give
+me the reported-by?
 
-	Where is my transport level encryption ?
-
-This is your weekly ping from me on this :-).
-
-Just so you don't forget.. :-).
-
-Jeremy.
+regards,
+dan carpenter
