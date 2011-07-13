@@ -1,75 +1,56 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: lower default and max wsize to what 2.6.39 can handle
-Date: Wed, 13 Jul 2011 06:40:37 -0400
-Message-ID: <1310553637-26792-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	helge.hafting-CND4fxrytsY@public.gmane.org
-To: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Subject: Re: [stable] [PATCH] cifs: fix wsize negotiation for 2.6.39 stable
+Date: Wed, 13 Jul 2011 06:44:04 -0400
+Message-ID: <20110713064404.668d42a5@tlielax.poochiereds.net>
+References: <1310520281-17467-1-git-send-email-jlayton@redhat.com>
+	<20110713022619.GA11043@kroah.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, helge.hafting-CND4fxrytsY@public.gmane.org
+To: Greg KH <greg-U8xfFu+wG4EAvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110713022619.GA11043-U8xfFu+wG4EAvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch is intended for 2.6.39-stable kernels only and is needed to
-fix a regression introduced in 2.6.39. Prior to 2.6.39, when signing was
-enabled on a socket the client only sent single-page writes. This
-changed with commit ca83ce3, which made signed and unsigned connections
-use the same codepaths for write calls.
+On Wed, 13 Jul 2011 04:26:19 +0200
+Greg KH <greg-U8xfFu+wG4EAvxtiuMwx3w@public.gmane.org> wrote:
 
-This caused a regression when working with windows servers. Windows
-machines will reject writes larger than the MaxBufferSize when signing
-is active, but do not clear the CAP_LARGE_WRITE_X flag in the protocol
-negotiation. The upshot is that when signing is active, windows servers
-often reject large writes from the client in 2.6.39.
+> On Tue, Jul 12, 2011 at 09:24:41PM -0400, Jeff Layton wrote:
+> > I sent this a week or so ago, but it apparently missed the recent
+> > 2.6.39.y release. Resending to make sure it gets into the next one.
+> > 
+> > Prior to 2.6.39, when signing was enabled on a socket the client only
+> > sent single-page writes. This changed with commit ca83ce3d5b, which
+> > made signed and unsigned connections use the same codepaths for write
+> > calls.
+> > 
+> > This caused a regression when working with windows servers. Windows
+> > machines will reject writes larger than the MaxBufferSize when signing
+> > is active, but does not clear the CAP_LARGE_WRITE_X flag in the
+> > negotiation.
+> > 
+> > This patch backports 2 patches that fix this problem in 3.0 kernels,
+> > and changes a couple of the constants to values appropriate for the
+> > writeback code in 2.6.39.
+> 
+> Why not just tell me the 2 patches in upstream that need to be
+> backported as Documentation/stable_kernel_rules.txt say to do instead?
+> 
+> thanks,
+> 
+> greg k-h
 
-Because 3.0 adds support for larger wsize values, simply cherry picking
-the upstream patches that fix the wsize negotiation isn't sufficient to
-fix this issue. We also need to alter the maximum and default values to
-something suitable for 2.6.39.
+Ok, we can do it that way instead. I just sent a patch to
+stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org that alters the constants after listing the upstream
+patches as prerequisites.
 
-Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # .39.x: f7910cb: cifs: clean up wsize negotiation and allow for larger wsize
-Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # .39.x: 1190f6a: cifs: fix wsize negotiation to respect max buffer size and active signing (try #4)
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |   20 ++++----------------
- 1 files changed, 4 insertions(+), 16 deletions(-)
+Unfortunately, we cannot simply cherry-pick the upstream patches to fix
+this. 3.0 added support for much larger wsize= values in cifs, and we
+have to account for that difference in 2.6.39.y.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 599f485..8e78710 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2648,16 +2648,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
- 			   "mount option supported");
- }
- 
--/*
-- * When the server supports very large writes via POSIX extensions, we can
-- * allow up to 2^24-1, minus the size of a WRITE_AND_X header, not including
-- * the RFC1001 length.
-- *
-- * Note that this might make for "interesting" allocation problems during
-- * writeback however as we have to allocate an array of pointers for the
-- * pages. A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
-- */
--#define CIFS_MAX_WSIZE ((1<<24) - 1 - sizeof(WRITE_REQ) + 4)
-+/* Prior to 3.0, cifs couldn't handle writes larger than this */
-+#define CIFS_MAX_WSIZE (PAGEVEC_SIZE * PAGE_CACHE_SIZE)
- 
- /*
-  * When the server doesn't allow large posix writes, only allow a wsize of
-@@ -2666,12 +2658,8 @@ static void setup_cifs_sb(struct smb_vol *pvolume_info,
-  */
- #define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
- 
--/*
-- * The default wsize is 1M. find_get_pages seems to return a maximum of 256
-- * pages in a single call. With PAGE_CACHE_SIZE == 4k, this means we can fill
-- * a single wsize request with a single call.
-- */
--#define CIFS_DEFAULT_WSIZE (1024 * 1024)
-+/* Make the default the same as the max */
-+#define CIFS_DEFAULT_WSIZE CIFS_MAX_WSIZE
- 
- static unsigned int
- cifs_negotiate_wsize(struct cifsTconInfo *tcon, struct smb_vol *pvolume_info)
+Thanks,
 -- 
-1.7.6
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
