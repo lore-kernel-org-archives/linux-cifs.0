@@ -1,37 +1,22 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix cast on cifs_demultiplex_thread
-Date: Wed, 20 Jul 2011 11:09:26 -0400
-Message-ID: <1311174566-7172-1-git-send-email-jlayton@redhat.com>
+From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix cast on cifs_demultiplex_thread
+Date: Wed, 20 Jul 2011 16:19:50 +0100
+Message-ID: <20110720151950.GY11013@ZenIV.linux.org.uk>
 References: <1310393863-12531-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+ <1311174566-7172-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1310393863-12531-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1311174566-7172-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-My initial pass at doing this just eliminated the cast altogether. When
-I played with it today though, that caused a compiler warning. So, just
-fix the cast instead.
+On Wed, Jul 20, 2011 at 11:09:26AM -0400, Jeff Layton wrote:
+> My initial pass at doing this just eliminated the cast altogether. When
+> I played with it today though, that caused a compiler warning. So, just
+> fix the cast instead.
 
-Reported-by: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1507ada..dc52872 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1791,7 +1791,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	 * this will succeed. No need for try_module_get().
- 	 */
- 	__module_get(THIS_MODULE);
--	tcp_ses->tsk = kthread_run((void *)(void *)cifs_demultiplex_thread,
-+	tcp_ses->tsk = kthread_run((int(*)(void *))cifs_demultiplex_thread,
- 				  tcp_ses, "cifsd");
- 	if (IS_ERR(tcp_ses->tsk)) {
- 		rc = PTR_ERR(tcp_ses->tsk);
--- 
-1.7.6
+See 7c97c200e2c5aa8b1067bebb99df0a7c2e12ebf3 in vfs-2.6.git...
