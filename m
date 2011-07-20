@@ -1,54 +1,33 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs-utils: add a note about inclusion of keys.dns_resolver program in keyutils
-Date: Tue, 19 Jul 2011 14:54:07 -0400
-Message-ID: <1311101647-25555-1-git-send-email-jlayton@samba.org>
-Cc: keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: smb2 work status
+Date: Wed, 20 Jul 2011 18:19:14 +0400
+Message-ID: <CAKywueSqO5g1M0Nt_ugPHZBbR=Siev0O5HVVvC0Lcj=9zvgtdA@mail.gmail.com>
+References: <CAKywueQqyi6ynwoAv6Q3GzbxYJSOv7k229N3NA_y05kguqA+DQ@mail.gmail.com>
+	<CAKywueRiuj=DrumdGMvdWX6ih8PVz4L0BL7G=LNL6CO+cEfmTQ@mail.gmail.com>
+	<20110716192811.GE26925@infradead.org>
+	<CAKywueSP7p3pja6FociCPXDtcSuChDdHw1JqCwxyhnqMuP5ahg@mail.gmail.com>
+	<20110718154730.GA5822@infradead.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110718154730.GA5822-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-As of version 1.5, the keyutils package is shipping a generic
-dns_resolver upcall. Add a note to the cifs.upcall manpage that mentions
-this and recommends the use of that program over cifs.upcall.
+I updated my branch smb2-dev (with the last changes. I moved to the
+idea like you suggested (to keep separate calls for inode and file
+operations) and organized the code with callbacks in some places
+(cifs_iovec_read, cifs_iovec_write and cifs_reopen_file) that lets us
+share the code between both protocols.
 
-Eventually, we may want to be able to conditionally compile out the
-dns_resolver part of the upcall, but it's already pretty small and
-wouldn't save us very much.
+Next I am going to rethink cifs_get_inode_info according to this model
+too and start to work on buffered i/o file operations. Also, I still
+have not fix code style in earlier patches - going to do it too.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- cifs.upcall.8.in |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
-index 920b12a..03842b7 100644
---- a/cifs.upcall.8.in
-+++ b/cifs.upcall.8.in
-@@ -67,7 +67,7 @@ This keytype is for retrieving kerberos session keys
- .PP
- dns_resolver
- .RS 4
--This key type is for resolving hostnames into IP addresses
-+This key type is for resolving hostnames into IP addresses. Support for this key type may eventually be deprecated (see below).
- .RE
- .PP
- To make this program useful for CIFS, you\'ll need to set up entries for them in request\-key\&.conf(5)\&. Here\'s an example of an entry for each key type:
-@@ -88,11 +88,14 @@ create      dns_resolver   * * @sbindir@/cifs\&.upcall %k
- See
- \fBrequest-key.conf\fR(5)
- for more info on each field\&.
-+
-+The keyutils package has also started including a dns_resolver handling program as well that is preferred over the one in cifs.upcall. If you are using a keyutils version equal to or greater than 1.5, you should use key.dns_resolver to handle the dns_resolver keytype instead of cifs.upcall. See \fBkey.dns_resolver\fR(8) for more info.
- .SH "SEE ALSO"
- .PP
- 
- \fBrequest-key.conf\fR(5),
--\fBmount.cifs\fR(8)
-+\fBmount.cifs\fR(8),
-+\fBkey.dns_resolver\fR(8)
- .SH "AUTHOR"
- .PP
- Igor Mammedov wrote the cifs\&.upcall program\&.
 -- 
-1.7.6
+Best regards,
+Pavel Shilovsky.
