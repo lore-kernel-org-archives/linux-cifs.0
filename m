@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [v4 PATCH 3/5] CIFS: Move RFC1002 check to a separate function
-Date: Sun, 24 Jul 2011 18:59:46 +0400
-Message-ID: <1311519588-2457-3-git-send-email-piastryyy@gmail.com>
+Subject: [v4 PATCH 4/5] CIFS: Move mid search to a separate function
+Date: Sun, 24 Jul 2011 18:59:47 +0400
+Message-ID: <1311519588-2457-4-git-send-email-piastryyy@gmail.com>
 References: <1311519588-2457-1-git-send-email-piastryyy@gmail.com>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,154 +11,161 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/connect.c |  116 ++++++++++++++++++++++++++++++----------------------
- 1 files changed, 67 insertions(+), 49 deletions(-)
+ fs/cifs/connect.c |  126 +++++++++++++++++++++++++---------------------------
+ 1 files changed, 61 insertions(+), 65 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index e8a1d64..92260b0 100644
+index 92260b0..0aa68fd 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -416,6 +416,63 @@ read_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg,
- 	return rc;
+@@ -473,6 +473,64 @@ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
+ 	return true;
  }
  
-+static bool
-+check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
++static struct mid_q_entry *
++find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
++	      int *length, bool is_large_buf, bool *is_multi_rsp, char **bigbuf)
 +{
-+	char temp = *buf;
-+	unsigned int pdu_length = be32_to_cpu(
-+				((struct smb_hdr *)buf)->smb_buf_length);
++	struct mid_q_entry *mid = NULL, *tmp_mid, *ret = NULL;
 +
-+	/*
-+	 * The first byte big endian of the length field,
-+	 * is actually not part of the length but the type
-+	 * with the most common, zero, as regular data.
-+	 */
-+	if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
-+		return false;
-+	} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
-+		cFYI(1, "Good RFC 1002 session rsp");
-+		return false;
-+	} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
-+		/*
-+		 * We get this from Windows 98 instead of an error on
-+		 * SMB negprot response.
-+		 */
-+		cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
-+			pdu_length);
-+		/* give server a second to clean up */
-+		msleep(1000);
-+		/*
-+		 * Always try 445 first on reconnect since we get NACK
-+		 * on some if we ever connected to port 139 (the NACK
-+		 * is since we do not begin with RFC1001 session
-+		 * initialize frame).
-+		 */
-+		cifs_set_port((struct sockaddr *)
-+				&server->dstaddr, CIFS_PORT);
-+		cifs_reconnect(server);
-+		wake_up(&server->response_q);
-+		return false;
-+	} else if (temp != (char) 0) {
-+		cERROR(1, "Unknown RFC 1002 frame");
-+		cifs_dump_mem(" Received Data: ", buf, 4);
-+		cifs_reconnect(server);
-+		return false;
++	spin_lock(&GlobalMid_Lock);
++	list_for_each_entry_safe(mid, tmp_mid, &server->pending_mid_q, qhead) {
++		if (mid->mid != buf->Mid ||
++		    mid->midState != MID_REQUEST_SUBMITTED ||
++		    mid->command != buf->Command)
++			continue;
++
++		if (*length == 0 && check2ndT2(buf, server->maxBuf) > 0) {
++			/* We have a multipart transact2 resp */
++			*is_multi_rsp = true;
++			if (mid->resp_buf) {
++				/* merge response - fix up 1st*/
++				*length = coalesce_t2(buf, mid->resp_buf);
++				if (*length > 0) {
++					*length = 0;
++					mid->multiRsp = true;
++					break;
++				}
++				/* All parts received or packet is malformed. */
++				mid->multiEnd = true;
++				goto multi_t2_fnd;
++			}
++			if (!is_large_buf) {
++				/*FIXME: switch to already allocated largebuf?*/
++				cERROR(1, "1st trans2 resp needs bigbuf");
++			} else {
++				/* Have first buffer */
++				mid->resp_buf = buf;
++				mid->largeBuf = true;
++				*bigbuf = NULL;
++			}
++			break;
++		}
++		mid->resp_buf = buf;
++		mid->largeBuf = is_large_buf;
++multi_t2_fnd:
++		if (*length == 0)
++			mid->midState = MID_RESPONSE_RECEIVED;
++		else
++			mid->midState = MID_RESPONSE_MALFORMED;
++#ifdef CONFIG_CIFS_STATS2
++		mid->when_received = jiffies;
++#endif
++		list_del_init(&mid->qhead);
++		ret = mid;
++		break;
 +	}
++	spin_unlock(&GlobalMid_Lock);
 +
-+	/* else we have an SMB response */
-+	if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
-+	    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
-+		cERROR(1, "Invalid size SMB length %d pdu_length %d",
-+		       4, pdu_length+4);
-+		cifs_reconnect(server);
-+		wake_up(&server->response_q);
-+		return false;
-+	}
-+
-+	return true;
++	return ret;
 +}
 +
  static int
  cifs_demultiplex_thread(struct TCP_Server_Info *server)
  {
-@@ -428,7 +485,6 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
- 	struct list_head *tmp, *tmp2;
+@@ -486,7 +544,7 @@ cifs_demultiplex_thread(struct TCP_Server_Info *server)
  	struct task_struct *task_to_wake = NULL;
  	struct mid_q_entry *mid_entry;
--	char temp;
  	bool isLargeBuf = false;
- 	bool isMultiRsp;
+-	bool isMultiRsp;
++	bool isMultiRsp = false;
  	int rc;
-@@ -481,59 +537,21 @@ incomplete_rcv:
- 		else if (rc == 1)
- 			continue;
  
--		/* The right amount was read from socket - 4 bytes */
--		/* so we can now interpret the length field */
+ 	current->flags |= PF_MEMALLOC;
+@@ -588,72 +646,10 @@ incomplete_rcv:
+ 			cifs_dump_mem("Bad SMB: ", buf,
+ 				      min_t(unsigned int, total_read, 48));
+ 
+-		mid_entry = NULL;
+ 		server->lstrp = jiffies;
+ 
+-		spin_lock(&GlobalMid_Lock);
+-		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+-			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
 -
--		/* the first byte big endian of the length field,
--		is actually not part of the length but the type
--		with the most common, zero, as regular data */
--		temp = *buf;
-+		/*
-+		 * The right amount was read from socket - 4 bytes,
-+		 * so we can now interpret the length field.
-+		 */
- 
--		/* Note that FC 1001 length is big endian on the wire,
--		but we convert it here so it is always manipulated
--		as host byte order */
-+		/*
-+		 * Note that RFC 1001 length is big endian on the wire,
-+		 * but we convert it here so it is always manipulated
-+		 * as host byte order.
-+		 */
- 		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
- 
- 		cFYI(1, "rfc1002 length 0x%x", pdu_length+4);
+-			if (mid_entry->mid != smb_buffer->Mid ||
+-			    mid_entry->midState != MID_REQUEST_SUBMITTED ||
+-			    mid_entry->command != smb_buffer->Command) {
+-				mid_entry = NULL;
+-				continue;
+-			}
 -
--		if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
--			continue;
--		} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
--			cFYI(1, "Good RFC 1002 session rsp");
--			continue;
--		} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
--			/* we get this from Windows 98 instead of
--			   an error on SMB negprot response */
--			cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
--				pdu_length);
--			/* give server a second to clean up  */
--			msleep(1000);
--			/* always try 445 first on reconnect since we get NACK
--			 * on some if we ever connected to port 139 (the NACK
--			 * is since we do not begin with RFC1001 session
--			 * initialize frame)
--			 */
--			cifs_set_port((struct sockaddr *)
--					&server->dstaddr, CIFS_PORT);
--			cifs_reconnect(server);
--			wake_up(&server->response_q);
--			continue;
--		} else if (temp != (char) 0) {
--			cERROR(1, "Unknown RFC 1002 frame");
--			cifs_dump_mem(" Received Data: ", buf, length);
--			cifs_reconnect(server);
--			continue;
+-			if (length == 0 &&
+-			    check2ndT2(smb_buffer, server->maxBuf) > 0) {
+-				/* We have a multipart transact2 resp */
+-				isMultiRsp = true;
+-				if (mid_entry->resp_buf) {
+-					/* merge response - fix up 1st*/
+-					length = coalesce_t2(smb_buffer,
+-							mid_entry->resp_buf);
+-					if (length > 0) {
+-						length = 0;
+-						mid_entry->multiRsp = true;
+-						break;
+-					} else {
+-						/* all parts received or
+-						 * packet is malformed
+-						 */
+-						mid_entry->multiEnd = true;
+-						goto multi_t2_fnd;
+-					}
+-				} else {
+-					if (!isLargeBuf) {
+-						/*
+-						 * FIXME: switch to already
+-						 *        allocated largebuf?
+-						 */
+-						cERROR(1, "1st trans2 resp "
+-							  "needs bigbuf");
+-					} else {
+-						/* Have first buffer */
+-						mid_entry->resp_buf =
+-							 smb_buffer;
+-						mid_entry->largeBuf = true;
+-						bigbuf = NULL;
+-					}
+-				}
+-				break;
+-			}
+-			mid_entry->resp_buf = smb_buffer;
+-			mid_entry->largeBuf = isLargeBuf;
+-multi_t2_fnd:
+-			if (length == 0)
+-				mid_entry->midState = MID_RESPONSE_RECEIVED;
+-			else
+-				mid_entry->midState = MID_RESPONSE_MALFORMED;
+-#ifdef CONFIG_CIFS_STATS2
+-			mid_entry->when_received = jiffies;
+-#endif
+-			list_del_init(&mid_entry->qhead);
+-			break;
 -		}
+-		spin_unlock(&GlobalMid_Lock);
 -
--		/* else we have an SMB response */
--		if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
--			    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
--			cERROR(1, "Invalid size SMB length %d pdu_length %d",
--					length, pdu_length+4);
--			cifs_reconnect(server);
--			wake_up(&server->response_q);
-+		if (!check_rfc1002_header(server, buf))
- 			continue;
--		}
- 
- 		/* else length ok */
- 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
++		mid_entry = find_cifs_mid(server, smb_buffer, &length,
++					  isLargeBuf, &isMultiRsp, &bigbuf);
+ 		if (mid_entry != NULL) {
+ 			mid_entry->callback(mid_entry);
+ 			/* Was previous buf put in mpx struct for multi-rsp? */
 -- 
 1.7.1
