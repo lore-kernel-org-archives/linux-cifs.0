@@ -1,59 +1,26 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: patch status
-Date: Thu, 28 Jul 2011 09:00:18 -0500
-Message-ID: <CADT32eJEoa3iOsZazfgu4xPMZc4es4qFm2zLFY+izeknQo7eNA@mail.gmail.com>
-References: <CAH2r5mtRqCQQiwSuzUv9tjGnmfb9jtqo0odZPrUYyGMBBPor6w@mail.gmail.com>
-	<20110728092259.3717b890@barsoom.rdu.redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Compile warning
+Date: Thu, 28 Jul 2011 11:03:02 -0500
+Message-ID: <CAH2r5muQpc+rtCaVO+BXAAP6+Fubofa8nk0Tv2ceu1zOA7_m4g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110728092259.3717b890-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jul 28, 2011 at 8:22 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> On Thu, 28 Jul 2011 08:07:50 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> Reviewed and merged
->> =A0 =A0 =A0 cifs: advertise the right receive buffer size to the ser=
-ver
->> =A0 =A0 =A0 cifs: trivial: goto out here is unnecessary
->> =A0 =A0 =A0 cifs: don't start signing too early
->> =A0 =A0 =A0 cifs: fix name parsing in CIFSSMBQAllEAs
->>
->> am currently looking at the oplock refcounting patch, and Pavel's
->> demultiplex simplification series, the on to the others.
->>
->> --
->> Thanks,
->>
->> Steve
->
-> Thanks, If you're not going to take this patch that I sent back in
-> March, then I'd appreciate an official "NAK", preferably with the
-> reasoning, so I can stop carrying it in my tree:
->
-> =A0 =A0cifs: remove unneeded variable initialization in cifs_reconnec=
-t_tcon
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+Compiler (gcc 4.4.3 on this system) throws an incorrect warning on
+your recent ea patch.
+It may be worth minor adjustments to remove the compile warning.
 
-Steve, Jeff,
+CC [M]  fs/cifs/cifssmb.o
+fs/cifs/cifssmb.c: In function =91CIFSSMBQAllEAs=92:
+fs/cifs/cifssmb.c:5723: warning: =91ea_name_len=92 may be used
+uninitialized in this function
 
-Just a reminder about the chown/chgrp patchset that I had posted.
 
-Regards,
+--=20
+Thanks,
 
-Shirish
+Steve
