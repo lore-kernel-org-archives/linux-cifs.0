@@ -1,65 +1,32 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: encryption on network
-Date: Fri, 29 Jul 2011 06:16:10 -0400
-Message-ID: <20110729061610.59f282a8@tlielax.poochiereds.net>
-References: <06B0D589A4AC0243AD95D4DA4978081A182DE84D@mbx024-e1-nj-6.exch024.domain.local>
-	<4E31E9DD.2060604@ubiqx.mn.org>
-	<20110728235410.GA4976@jeremy-laptop>
-	<4E31F9E4.2030004@ubiqx.mn.org>
-	<20110729001133.GA6742@jeremy-laptop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "Christopher R. Hertel" <crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org>,
-	Dominic Dougherty <dominic.dougherty-cDnhz4gMPjZOSnsfY10OVw@public.gmane.org>,
-	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: check_newline returns EX_USAGE on error, not -1
+Date: Fri, 29 Jul 2011 07:14:30 -0400
+Message-ID: <1311938070-885-1-git-send-email-jlayton@samba.org>
+Cc: jlieskov-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110729001133.GA6742@jeremy-laptop>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 28 Jul 2011 17:14:35 -0700
-Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+Reported-by: Jan Lieskovsky <jlieskov-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
-> On Thu, Jul 28, 2011 at 07:08:04PM -0500, Christopher R. Hertel wrote:
-> > Jeremy Allison wrote:
-> > > On Thu, Jul 28, 2011 at 05:59:41PM -0500, Christopher R. Hertel wrote:
-> > >> The network traffic is not encrypted.
-> > >>
-> > >> The SMB protocol does not provide any mechanism for encrypting traffic
-> > >> between clients and servers.
-> > > 
-> > > As shipped by Microsoft :-). The UNIX extensions to SMB allow
-> > > encrypted traffic between clients and servers and Samba has
-> > > supported this for a long time (smbclient -e will encrypt
-> > > traffic).
-> > 
-> > Right, but the question particularly listed WinXP as one of the
-> > participating clients.  Windows clients don't support the Unix extensions,
-> > so they don't support encrypted SMB and that kinda ruins the whole thing,
-> > eh?  [sad face]
-> 
-> Yes I realize that. But that's not what you said. You said:
-> "The SMB protocol does not provide any mechanism for encrypting traffic
-> between clients and servers." - but that's not generically true,
-> only between *Microsoft* clients and servers.
-> 
-> You made it sound like that was definitive, and you are the
-> acknowledged authority on CIFS/SMB, so I couldn't let that
-> stand. People link to your posts here :-).
-> 
-> > Please allow me to join the choir on that.  (I'll sit at the back and not
-> > get in anyone's way.)  [winky face]
-> 
-> Maybe if we all wish REALLY HARD, Steve and Jeff will hear
-> us.. :-).
-> 
-
-Sorry, just haven't heard great hue and cry for this feature (other
-than from you, of course :). My next task for cifs is to make it do
-parallel reads, but I haven't had time to start on that yet.
-
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 107a5a5..aa4581f 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1419,8 +1419,7 @@ static int check_newline(const char *progname, const char *name)
+ static int check_mtab(const char *progname, const char *devname,
+ 		      const char *dir)
+ {
+-	if (check_newline(progname, devname) == -1 ||
+-	    check_newline(progname, dir) == -1)
++	if (check_newline(progname, devname) || check_newline(progname, dir))
+ 		return EX_USAGE;
+ 	return 0;
+ }
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.6
