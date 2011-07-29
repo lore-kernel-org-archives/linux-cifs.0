@@ -1,30 +1,41 @@
-From: "Christopher R. Hertel" <crh@ubiqx.mn.org>
+From: Dominic Dougherty <dominic.dougherty-cDnhz4gMPjZOSnsfY10OVw@public.gmane.org>
 Subject: Re: encryption on network
-Date: Thu, 28 Jul 2011 21:34:00 -0500
-Message-ID: <4E321C18.5000201@ubiqx.mn.org>
-References: <06B0D589A4AC0243AD95D4DA4978081A182DE84D@mbx024-e1-nj-6.exch024.domain.local>	<4E31E9DD.2060604@ubiqx.mn.org>	<20110728235410.GA4976@jeremy-laptop>	<4E31F9E4.2030004@ubiqx.mn.org>	<20110729001133.GA6742@jeremy-laptop>	<4E31FE48.7060606@ubiqx.mn.org>
-	<CAH2r5muVFuCNwyAKK+O1s8M2LT5qCFYvYJ5XnxiqhqEDgW_NWQ@mail.gmail.com>
-	<06B0D589A4AC0243AD95D4DA4978081A182DEC78@mbx024-e1-nj-6.exch024.domain.local>
+Date: Fri, 29 Jul 2011 04:04:51 +0000
+Message-ID: <06B0D589A4AC0243AD95D4DA4978081A182DECD8@mbx024-e1-nj-6.exch024.domain.local>
+References: <06B0D589A4AC0243AD95D4DA4978081A182DE84D@mbx024-e1-nj-6.exch024.domain.local>
+	<4E31E9DD.2060604@ubiqx.mn.org>	<20110728235410.GA4976@jeremy-laptop>
+	<4E31F9E4.2030004@ubiqx.mn.org>	<20110729001133.GA6742@jeremy-laptop>
+	<4E31FE48.7060606@ubiqx.mn.org>
+ <CAH2r5muVFuCNwyAKK+O1s8M2LT5qCFYvYJ5XnxiqhqEDgW_NWQ@mail.gmail.com>
+ <06B0D589A4AC0243AD95D4DA4978081A182DEC78@mbx024-e1-nj-6.exch024.domain.local>,<4E321C18.5000201@ubiqx.mn.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench@gmail.com>,
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-	Jeremy Allison <jra@samba.org>,
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-To: Dominic Dougherty <dominic.dougherty@protegrity.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <06B0D589A4AC0243AD95D4DA4978081A182DEC78@mbx024-e1-nj-6.exch024.domain.local>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org" <crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4E321C18.5000201-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
+
+One more option
+Otfe with samba, but in this case you would need otfe on the client
+
+
+
+
+-----Original Message-----
+From: Christopher R. Hertel [crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org]
+Received: Thursday, 28 Jul 2011, 10:34pm
+To: Dominic Dougherty [dominic.dougherty-cDnhz4gMPjZOSnsfY10OVw@public.gmane.org]
+CC: Steve French [smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]; Jeremy Allison [jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org]; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org [samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org]; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org]
+Subject: Re: encryption on network
+
+
 
 On 07/28/2011 09:11 PM, Dominic Dougherty wrote:
 > Thanks guys,
@@ -33,17 +44,17 @@ On 07/28/2011 09:11 PM, Dominic Dougherty wrote:
 >
 > 1.) install a vpn server which is natively support by any windows machine (PPTP or L2TP or IPSEC) on the samba server and establish a vpn connection to the samba server.
 
-I actually prefer OpenVPN, since it runs well on so many platforms, but it's 
+I actually prefer OpenVPN, since it runs well on so many platforms, but it's
 important to go with whichever technology you are most comfortable running.
 
 > 2.) the newer version of samba supports SSL. However, the only valid client for this is smbclient.  Not support by the "net use" command.
 
 This, as Jeremy so rightly pointed out, is based on the Unix extensions to SMB.
 
-I whined earlier that there is no specification for this feature, but we 
-spent almost twenty years without a real specification for SMB itself.  Even 
-now, the [MS-SMB] and [MS-CIFS] docs from Microsoft are written to reflect 
-Windows behavior.  That is, the spec. has to match the product, not the 
+I whined earlier that there is no specification for this feature, but we
+spent almost twenty years without a real specification for SMB itself.  Even
+now, the [MS-SMB] and [MS-CIFS] docs from Microsoft are written to reflect
+Windows behavior.  That is, the spec. has to match the product, not the
 other way 'round.
 
 > 3.) use sshfs on the samba server and install putty on the local windows box and use port forwarding to connect to the samba share.
@@ -65,25 +76,25 @@ No such puppy.
 
 > CIFS is supposed to support encryption, I would have to check up on that.
 
-If you mean CIFS the Linux file system, then you are correct.  It supports 
-the Unix extensions to SMB and so, therefore, should support encrypted SMB 
+If you mean CIFS the Linux file system, then you are correct.  It supports
+the Unix extensions to SMB and so, therefore, should support encrypted SMB
 traffic.  There just hasn't been time to add that feature yet.
 
-If you mean CIFS the alternative name for the SMB protocol, then no.  I was 
-lead author of Microsoft's [MS-CIFS] and [MS-SMB] specifications so I am 
-quite sure about this.  There's no encryption of file data in the 
+If you mean CIFS the alternative name for the SMB protocol, then no.  I was
+lead author of Microsoft's [MS-CIFS] and [MS-SMB] specifications so I am
+quite sure about this.  There's no encryption of file data in the
 protocol...dangit.
 
 Chris -)-----
 
 > -----Original Message-----
-> From: Steve French [mailto:smfrench@gmail.com]
+> From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
 > Sent: Thursday, July 28, 2011 9:23 PM
 > To: Christopher R. Hertel
-> Cc: Jeremy Allison; Dominic Dougherty; samba-technical@lists.samba.org; linux-cifs@vger.kernel.org
+> Cc: Jeremy Allison; Dominic Dougherty; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > Subject: Re: encryption on network
 >
-> On Thu, Jul 28, 2011 at 7:26 PM, Christopher R. Hertel<crh@ubiqx.mn.org>  wrote:
+> On Thu, Jul 28, 2011 at 7:26 PM, Christopher R. Hertel<crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org>  wrote:
 >> Jeremy Allison wrote:
 >> :
 >>>> Right, but the question particularly listed WinXP as one of the
@@ -124,9 +135,9 @@ Chris -)-----
 >
 >
 
--- 
+--
 "Implementing CIFS - the Common Internet FileSystem" ISBN: 013047116X
 Samba Team -- http://www.samba.org/     -)-----   Christopher R. Hertel
 jCIFS Team -- http://jcifs.samba.org/   -)-----   ubiqx development, uninq.
-ubiqx Team -- http://www.ubiqx.org/     -)-----   crh@ubiqx.mn.org
-OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh@ubiqx.org
+ubiqx Team -- http://www.ubiqx.org/     -)-----   crh-jFlgvBokg3lg9hUCZPvPmw@public.gmane.org
+OnLineBook -- http://ubiqx.org/cifs/    -)-----   crh-zuGDro9SezXYtjvyW6yDsg@public.gmane.org
