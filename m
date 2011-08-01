@@ -1,54 +1,52 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Mon, 1 Aug 2011 09:54:51 -0500
-Message-ID: <CAH2r5mt6abR=zssjd7jS0u+ojA=Yk8Vj4==iejQzKCiw8wgXjg@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [v5 PATCH 1/5] CIFS: Move buffer allocation to a separate function
+Date: Mon, 1 Aug 2011 21:42:33 +0400
+Message-ID: <CAKywueS+g18AnsvyVKa3Og31AK0qB8aempu+WF8bzOAwRQa5Xw@mail.gmail.com>
+References: <1312190384-3376-1-git-send-email-piastryyy@gmail.com>
+	<1312190384-3376-2-git-send-email-piastryyy@gmail.com>
+	<CAH2r5mvuUPHkBGNKLXAAUsWx5Vv3gmy=hnYM-z48=0sOBaVRnA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mvuUPHkBGNKLXAAUsWx5Vv3gmy=hnYM-z48=0sOBaVRnA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit 24c3047095fa3954f114bfff2e37b8fcbb216396:
+2011/8/1 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Revewed and Merged (still reviewing the others).
 
-  Merge branch 'nfs-for-3.1' of
-git://git.linux-nfs.org/projects/trondmy/linux-nfs (2011-07-31
-06:26:50 -1000)
+Ok, thanks!
 
-are available in the git repository at:
+>
+> Any idea why your patches (at least the last few) show up
+> with the following checkpatch warning (I don't think
+> it is a problem but thought it might be old git tools
+> on your system which generated the patch).
+>
+>
+> stevef@stevef-laptop:~/cifs-2.6$ scripts/checkpatch.pl ~/pavel1b.patc=
+h
+> WARNING: Use a single space after To:
+> #36:
+> To: =A0 =A0 linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>
+> total: 0 errors, 1 warnings, 153 lines checked
+>
+> /home/stevef/pavel1b.patch has style problems, please review.
+>
+> If any of these errors are false positives, please report
+> them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git master
+Strange. I have git of 1.7.1 version but I am not sure it's a problem:
+I downloaded the patch from
+https://patchwork.kernel.org/patch/1025102/mbox/ and checked it with
+checkpatch.pl - no warnings!
 
-Jeff Layton (7):
-      cifs: advertise the right receive buffer size to the server
-      cifs: trivial: goto out here is unnecessary
-      cifs: don't start signing too early
-      cifs: fix name parsing in CIFSSMBQAllEAs
-      cifs: fix compiler warning in CIFSSMBQAllEAs
-      cifs: simplify refcounting for oplock breaks
-      cifs: remove unneeded variable initialization in cifs_reconnect_tcon
-
-Pavel Shilovsky (5):
-      CIFS: Move buffer allocation to a separate function
-      CIFS: Simplify socket reading in demultiplex thread
-      CIFS: Move RFC1002 check to a separate function
-      CIFS: Move mid search to a separate function
-      CIFS: Cleanup demupltiplex thread exiting code
-
- fs/cifs/cifsencrypt.c |   16 +-
- fs/cifs/cifsfs.c      |   18 --
- fs/cifs/cifsfs.h      |    4 -
- fs/cifs/cifsglob.h    |    2 -
- fs/cifs/cifssmb.c     |    6 +-
- fs/cifs/connect.c     |  659 ++++++++++++++++++++++++++-----------------------
- fs/cifs/file.c        |   27 +--
- fs/cifs/misc.c        |   11 +-
- fs/cifs/sess.c        |    3 +-
- 9 files changed, 370 insertions(+), 376 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
+--=20
+Best regards,
+Pavel Shilovsky.
