@@ -1,43 +1,36 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix missing a decrement of inFlight value
-Date: Wed, 3 Aug 2011 16:14:53 -0400
-Message-ID: <20110803161453.7e111bf3@tlielax.poochiereds.net>
-References: <1312398738-14346-1-git-send-email-piastryyy@gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: smb2 work status
+Date: Thu, 4 Aug 2011 00:20:04 +0400
+Message-ID: <CAKywueRMDnm3t3bYrGbBf85UrpehacSJD2YCYTfPkYhrW9Aw-Q@mail.gmail.com>
+References: <CAKywueQqyi6ynwoAv6Q3GzbxYJSOv7k229N3NA_y05kguqA+DQ@mail.gmail.com>
+	<CAKywueRiuj=DrumdGMvdWX6ih8PVz4L0BL7G=LNL6CO+cEfmTQ@mail.gmail.com>
+	<CAKywueTDhS_FHtssdVbSrBiPksngYsmotU69u9S1QELnm9Vh+w@mail.gmail.com>
+	<CAKywueQ2B6R7EzB2t4WDfR15Ot-x823zBzy9nQwRwZSxdpco1Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1312398738-14346-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <CAKywueQ2B6R7EzB2t4WDfR15Ot-x823zBzy9nQwRwZSxdpco1Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed,  3 Aug 2011 23:12:18 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Updated smb2-dev branch. Changes:
+1) get_file_info (and convert smb2_open and smb2_create to use it),
+2) rename,
+3) hardlink,
+4) flush,
+5) other cleanups and bugfixes.
 
-> if we failed on getting mid entry in cifs_call_async.
-> 
-> Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/transport.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 147aa22..c1b9c4b 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -362,6 +362,8 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
->  	mid = AllocMidQEntry(hdr, server);
->  	if (mid == NULL) {
->  		mutex_unlock(&server->srv_mutex);
-> +		atomic_dec(&server->inFlight);
-> +		wake_up(&server->request_q);
->  		return -ENOMEM;
->  	}
->  
+Also, I created a mirror repository on git.altlinux.org -
+http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-dev
+- due to the problems with git.etersoft.ru.
 
-Good catch -- looks correct:
+Next, I am going to start working with oplocks and SMB2.1 leases related code.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Best regards,
+Pavel Shilovsky.
