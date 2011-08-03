@@ -1,90 +1,33 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: optimize mount.cifs for speed?
-Date: Wed, 3 Aug 2011 10:59:34 -0500
-Message-ID: <CAH2r5muB5yTQ4xFNEjrNAs4BAJxNSn_RNk6Q2Ota3++fGG-X3A@mail.gmail.com>
-References: <CALEFH9SHkdgtLeruSLbEB9HjXAa=SscbFF4C2+yj1sB6i+vMcg@mail.gmail.com>
-	<CAH2r5muMTS1nviEk++L0QebqK9NpirW3trzMd52jRE4jBL+j2g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steffie Morris <steffie.morris-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: Fix missing a decrement of inFlight value
+Date: Wed,  3 Aug 2011 23:12:18 +0400
+Message-ID: <1312398738-14346-1-git-send-email-piastryyy@gmail.com>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muMTS1nviEk++L0QebqK9NpirW3trzMd52jRE4jBL+j2g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Aug 3, 2011 at 10:57 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
-e:
-> On Wed, Aug 3, 2011 at 6:52 AM, Steffie Morris <steffie.morris@gmail.=
-com> wrote:
->> Hi, i have some questions (and problems) regarding speed in linux
->> using mount -t cifs for cifs shares.
->>
->> I have several ubuntu 10.10 workstations and a few windows
->> workstations, on wich i want to interact from one central fileshare.
->> At the moment i have a fileshare on a windows7 machine, and a
->> fileshare (samba) on an ubuntu machine.
->> The netwerk is 1 Gbit
->> From a windows client uploading/downloading to the linux samba serve=
-r
->> i get 115 MB/s.
->> From a window client uploading/downloading to =A0a windows share i g=
-et
->> around 110 MB/s.
->
-> linux cifs client may be faster than windows on LInux 3.0 and later
-> kernels on writes to the server, but is usually slower on large file =
-copy from
-> the server due to lack of asynchronous dispatch of read (something
-> Jeff and I have been looking at adding later this year).
->
-> Even on older kernels, Linux cifs client does much better if multiple
-> processes are running (and against different files/directories) since
-> it looks like we can keep more requests in flight to the server than
-> most other clients - except for the large file copy from the server
-> (async file read) case.
->
->> From the linux client uploading to the windows share i get 60 MB/s.
->> From the linux client uploading to the linux samba =A0server i get 6=
-0 MB/s.
->
-> On current kernels (e.g. Linux 3.0 and 3.01-rc) this (sequential
-> write) should be wire
-> speed - I got >85% wire utilization on GigE even between low end home
-> systems with file copy. =A0 (assuming your disks can keep up with thi=
-s)
->
->> From the linux client reading from the windows share i get 17 MB/s.
->> From t he linux client reading from the linux samba share i get 17MB=
-/s.
->
-> Reads to the same file will be single threaded on the wire (and relat=
-ively
-> smaller than what windows requests, 16K vs. ~60K) - if you have
-> a multithreaded or multiprocess file copy application - you can
-> increase speed of large file copy with mounting with
-> "forcedirectio"
->
->> The biggest problem question i face, is why is reading thru a "mount
->> -t cifs" share this slow?
->> If the linux machine acts as a server the speed is really fast (in
->> combination with a windows client) but when i use the linux machine =
-as
->> a client, the performance is not good.
->> Am i overlooking something? should i be using special options to
->> optimize performance for cifs in client mode on linux ?
->> I think i ruled out hardware network issue's as traffic the other wa=
-y
->> around works (with linux as serving share), and also via FTP, or
->> testing with iperf gives me near full Gbit speeds.
+if we failed on getting mid entry in cifs_call_async.
 
-Also note that Samba's "smbclient" utility (which has an "ftp" like
-interface) does really well with large file copies - I don't know
-of anything likely to much faster at the moment for large file copy.
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/transport.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-
---=20
-Thanks,
-
-Steve
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 147aa22..c1b9c4b 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -362,6 +362,8 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	mid = AllocMidQEntry(hdr, server);
+ 	if (mid == NULL) {
+ 		mutex_unlock(&server->srv_mutex);
++		atomic_dec(&server->inFlight);
++		wake_up(&server->request_q);
+ 		return -ENOMEM;
+ 	}
+ 
+-- 
+1.7.1
