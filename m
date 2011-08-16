@@ -1,38 +1,23 @@
-From: "J. R. Okajima" <hooanon05@yahoo.co.jp>
-Subject: Q: cifs, freeing volume_info->UNCip
-Date: Tue, 16 Aug 2011 08:22:17 +0900
-Message-ID: <7087.1313450537@jrobl>
-Cc: linux-kernel@vger.kernel.org, kirk w <kirkpuppy@yahoo.com>
-To: smfrench@gmail.com, linux-cifs@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Bryan.James.Krone-EXT-zES+1Ur7hjI@public.gmane.org
+Subject: CIFS can't read share
+Date: Tue, 16 Aug 2011 10:34:28 -0500
+Message-ID: <OFF2DA68D6.9F5E142E-ON862578EE.0055727B-862578EE.00558DE9@jci.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
+I can mount my Windows share with "mount -t cifs //10.2.8.42/myshare 
+/mnt/myshare -o 
+user=USER,password=cat,domain=WORKGROUP,sec=ntlmssp,noserverino". But when 
+I try to access the contents of the directory I get "NT Status: 
+STATUS_INVALID_LEVEL" according to wireshark.
 
-Hello,
+Is this a known issue? Is there some configuration I need to add to the 
+kernel?
 
-CIFS cleanup_volume_info_contents() looks like having a memory
-corruption problem.
-When UNCip is set to "&vol->UNC[2]" in cifs_parse_mount_options(), it
-should not be kfree()-ed in cleanup_volume_info_contents().
+Thanks for your help.
 
-If it is correct and the code in mainline is not fixed yet, then here is
-a patch.
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index ccc1afa..e0ea721 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2838,7 +2838,8 @@ cleanup_volume_info_contents(struct smb_vol *volume_info)
- 	kfree(volume_info->username);
- 	kzfree(volume_info->password);
- 	kfree(volume_info->UNC);
--	kfree(volume_info->UNCip);
-+	if (volume_info->UNCip != volume_info->UNC + 2)
-+		kfree(volume_info->UNCip);
- 	kfree(volume_info->domainname);
- 	kfree(volume_info->iocharset);
- 	kfree(volume_info->prepath);
-
-
-J. R. Okajima
+Bryan
