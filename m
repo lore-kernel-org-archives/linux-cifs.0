@@ -1,156 +1,30 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Kernel 3.0: Instant kernel crash when mounting CIFS (also crashes
- with linux-3.1-rc2
-Date: Thu, 18 Aug 2011 11:02:25 -0500
-Message-ID: <CAH2r5msfoDdw_twwuh96AznoY6V7kg1xgk9ZvwZfODgEb6s2VA@mail.gmail.com>
-References: <alpine.DEB.2.02.1108150506310.7571@p34.internal.lan>
-	<alpine.LNX.2.00.1108151117480.19668@swampdragon.chaosbits.net>
-	<20110815064734.403b630f@corrin.poochiereds.net>
-	<alpine.DEB.2.02.1108150653200.7571@p34.internal.lan>
-	<alpine.DEB.2.02.1108151357200.32349@p34.internal.lan>
-	<alpine.DEB.2.02.1108171515050.5877@p34.internal.lan>
-	<3300.1313637592@jrobl>
-	<alpine.DEB.2.02.1108180632000.10458@p34.internal.lan>
-	<alpine.DEB.2.02.1108180807070.7903@p34.internal.lan>
-	<CAH2r5mv9cdP_05dzmGZ_mVOswgNGVViU8Y3Z2Su+JT2Jv2TbSA@mail.gmail.com>
+From: bruce-FsTrmwUK8BR2iXbJP1moag@public.gmane.org
+Subject: mount.cifs prerequisites
+Date: Thu, 18 Aug 2011 17:31:59 +0100
+Message-ID: <6d15d641caf322cf62917e8b03035fbf.squirrel@alpha.server-room.co.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>,
-	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Alan Piszcz <ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mv9cdP_05dzmGZ_mVOswgNGVViU8Y3Z2Su+JT2Jv2TbSA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I did some testing with 3.0 kernel (cifs client) and was getting 90%
-wire speeds writing
-cifs files to the server (Windows or Samba)
 
-On Thu, Aug 18, 2011 at 11:01 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wro=
-te:
-> Writing from cifs kernel client to WIndows or Samba server should be =
-much faster
-> than the reverse (ie large file sequential file copy to server is
-> faster than copying
-> a file from the server) =A0cifs kernel client serializes reads from t=
-he same file
-> (unless mounting forcedirectio, in which case caching is disabled) an=
-d uses
-> a relatively smaller read size (16K) - while for writes they are sent
-> in parallel
-> even if to the same file (and the write size is much larger e.g. 1269=
-76 bytes,
-> and can be set even larger to Samba). =A0There may be a few cases (su=
-ch
-> as copying to WIndowsXP or Windows7) where timeouts on the
-> server slow things down (writing from linux client to Windows XP
-> or Windows 7) but what is the server type?
->
->
-> On Thu, Aug 18, 2011 at 7:14 AM, Justin Piszcz <jpiszcz@lucidpixels.c=
-om> wrote:
->>
->>
->> On Thu, 18 Aug 2011, Justin Piszcz wrote:
->>
->>>
->>>
->>> On Thu, 18 Aug 2011, J. R. Okajima wrote:
->>>
->>>>
->>>> Justin Piszcz:
->>>>>
->>>>> Does anyone know if any kernel supports CIFS w/out crashing? I'd =
-like to
->>>>> backup some CIFS shares, thanks.
->>>>>
->>>>>
->>>>> mount -t cifs //w2/x /mnt -o user=3Duser,pass=3Dpass
->>>>>
->>>>> [ =A0881.388836] CIFS VFS: cifs_mount failed w/return code =3D -2=
-2
->>>>
->>>> =A0 =A0 =A0 =A0:::
->>>>
->>>> Since it failed mounting, this patch will help you. Although the p=
-atch
->>>> will fix one bug, there still may exist another problem.
->>>>
->>>> http://marc.info/?l=3Dlinux-cifs&m=3D131345112022031&w=3D2
->>>
->>> Hi,
->>>
->>> Latest patch (this one) applied to linux-3.1-rc2 works, at least it
->>> mounted
->>> this time and did not instantly crash the kernel!
->>>
->>> I also tried the hostname again (and it did not crash the kernel, b=
-ut it
->>> failed to mount).
->>>
->>> Used the IP and it mounted successfully:
->>> //10.0.0.11/x =A0 =A0 =A0 =A0 =A028T =A05.0T =A0 23T =A019% /mnt
->>> //10.0.0.11/y =A0 =A0 =A0 =A0 =A019T =A01.2T =A0 18T =A0 7% /mnt2
->>>
->>> It has not crashed yet (which is good), I'll apply this patch to my
->>> production machine and test taking backups of this data and let you=
- know
->>> if it crashes again, thanks!
->>>
->>> Justin.
->>
->>
->> Hello,
->>
->> It is working but very slowly:
->>
->> Device eth6 [10.0.1.2] (1/1):
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> Incoming: =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- Outgoing:
->> Curr: 37.60 MByte/s =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Curr: 0.=
-44 MByte/s
->> Avg: 4.98 MByte/s =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Avg: 0=
-=2E09 MByte/s
->> Min: 0.00 MByte/s =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Min: 0=
-=2E00 MByte/s
->> Max: 40.79 MByte/s =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Max: 0=
-=2E48 MByte/s
->> Ttl: 1.45 GByte =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 Ttl:=
- 26.77 MByte
->>
->> Over 10GbE the other direction (Linux -> Windows (via Samba)) I get
->> 500MiB/s, is CIFS slow?
->>
->> I'll look into options to tweak the speed but this is very poor spee=
-d when
->> you have to transfer 5-10TB. =A0However, it is not crashing anymore,=
- so any
->> speed is better than that :)
->>
->> Justin.
->>
->>
->
->
->
-> --
-> Thanks,
->
-> Steve
->
+Dear List,
+I am running a 2.6.28 kernel that I have compiled with cifs filesystem
+support. I am trying to mount a share from a windows 2008 server requiring
+ntlmv2. when I try to pass the option sec=ntlmv2 or ntlmv2i I receive an
+invalid argument message. If I omit the sec option I receive a permission
+denied.
+I have also tried to use a stock Debian kernel (2.6.32) that I have
+checked to have cifs compiled in and I get the same results. If I perform
+a 'modinfo cifs' it shows the module to be loaded and that I am running
+ver 1.61 of cifs.
+Is there any other components I need to check (do I need a library package
+to support ntlmv2??)
+I can mount shares of servers that allow NTLMv1.
 
+Any help gratefully received.
 
-
---=20
-Thanks,
-
-Steve
+Thanks Bruce
