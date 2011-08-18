@@ -1,62 +1,53 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: mount.cifs prerequisites
-Date: Thu, 18 Aug 2011 11:49:03 -0500
-Message-ID: <CAH2r5mtTbfz-1v2fTnk4GZ270UBFX4FKW+zP6Hgq=mXvY7jhYA@mail.gmail.com>
-References: <6d15d641caf322cf62917e8b03035fbf.squirrel@alpha.server-room.co.uk>
+Subject: Re: Q: cifs, freeing volume_info->UNCip
+Date: Thu, 18 Aug 2011 11:55:22 -0500
+Message-ID: <CAH2r5mvA3i8E-KAuQ=+10gfzF1q8dWwB2KQiY3W1FBw_gscurQ@mail.gmail.com>
+References: <7087.1313450537@jrobl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: bruce-FsTrmwUK8BR2iXbJP1moag@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	kirk w <kirkpuppy-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: "J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <6d15d641caf322cf62917e8b03035fbf.squirrel-GUfm462d9MAxcsHehaffLoV0zNHCu08T@public.gmane.org>
+In-Reply-To: <7087.1313450537@jrobl>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-the available messages which can be returned on mount are
-quite limited so sometimes the mapping of network errors
-on to the very limited set of available mount error
-messages can get confusing.
+merged
 
-Do you see mount generating any messages
-in dmesg?  Alternatively, you might turn on cifs debugging
-(echo 7 > /proc/fs/cifs/cifsFYI) and try mount again
-and see if the warning message for the mount failure
-is listed (in dmesg)
-
-On Thu, Aug 18, 2011 at 11:31 AM,  <bruce-FsTrmwUK8BR2iXbJP1moag@public.gmane.org> wrote:
+On Mon, Aug 15, 2011 at 6:22 PM, J. R. Okajima <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org> =
+wrote:
 >
-> Dear List,
-> I am running a 2.6.28 kernel that I have compiled with cifs filesyste=
-m
-> support. I am trying to mount a share from a windows 2008 server requ=
-iring
-> ntlmv2. when I try to pass the option sec=3Dntlmv2 or ntlmv2i I recei=
-ve an
-> invalid argument message. If I omit the sec option I receive a permis=
-sion
-> denied.
-> I have also tried to use a stock Debian kernel (2.6.32) that I have
-> checked to have cifs compiled in and I get the same results. If I per=
-form
-> a 'modinfo cifs' it shows the module to be loaded and that I am runni=
-ng
-> ver 1.61 of cifs.
-> Is there any other components I need to check (do I need a library pa=
-ckage
-> to support ntlmv2??)
-> I can mount shares of servers that allow NTLMv1.
+> Hello,
 >
-> Any help gratefully received.
+> CIFS cleanup_volume_info_contents() looks like having a memory
+> corruption problem.
+> When UNCip is set to "&vol->UNC[2]" in cifs_parse_mount_options(), it
+> should not be kfree()-ed in cleanup_volume_info_contents().
 >
-> Thanks Bruce
+> If it is correct and the code in mainline is not fixed yet, then here=
+ is
+> a patch.
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index ccc1afa..e0ea721 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2838,7 +2838,8 @@ cleanup_volume_info_contents(struct smb_vol *vo=
+lume_info)
+> =A0 =A0 =A0 =A0kfree(volume_info->username);
+> =A0 =A0 =A0 =A0kzfree(volume_info->password);
+> =A0 =A0 =A0 =A0kfree(volume_info->UNC);
+> - =A0 =A0 =A0 kfree(volume_info->UNCip);
+> + =A0 =A0 =A0 if (volume_info->UNCip !=3D volume_info->UNC + 2)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(volume_info->UNCip);
+> =A0 =A0 =A0 =A0kfree(volume_info->domainname);
+> =A0 =A0 =A0 =A0kfree(volume_info->iocharset);
+> =A0 =A0 =A0 =A0kfree(volume_info->prepath);
 >
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+> J. R. Okajima
 >
 
 
