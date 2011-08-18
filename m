@@ -1,50 +1,32 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Q: cifs, freeing volume_info->UNCip
-Date: Wed, 17 Aug 2011 21:29:04 -0400
-Message-ID: <20110817212904.45b79409@corrin.poochiereds.net>
-References: <7087.1313450537@jrobl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kirk w <kirkpuppy-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-To: "J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>
+From: "J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>
+Subject: Re: Kernel 3.0: Instant kernel crash when mounting CIFS (also crashes with linux-3.1-rc2
+Date: Thu, 18 Aug 2011 12:19:52 +0900
+Message-ID: <3300.1313637592@jrobl>
+References: <alpine.DEB.2.02.1108150506310.7571@p34.internal.lan> <alpine.LNX.2.00.1108151117480.19668@swampdragon.chaosbits.net> <20110815064734.403b630f@corrin.poochiereds.net> <alpine.DEB.2.02.1108150653200.7571@p34.internal.lan> <alpine.DEB.2.02.1108151357200.32349@p34.internal.lan> <alpine.DEB.2.02.1108171515050.5877@p34.internal.lan>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Alan Piszcz <ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <7087.1313450537@jrobl>
+In-Reply-To: <alpine.DEB.2.02.1108171515050.5877-0qmrozcXWo8bm2hyYBkBBg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 16 Aug 2011 08:22:17 +0900
-"J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org> wrote:
 
-> 
-> Hello,
-> 
-> CIFS cleanup_volume_info_contents() looks like having a memory
-> corruption problem.
-> When UNCip is set to "&vol->UNC[2]" in cifs_parse_mount_options(), it
-> should not be kfree()-ed in cleanup_volume_info_contents().
-> 
-> If it is correct and the code in mainline is not fixed yet, then here is
-> a patch.
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index ccc1afa..e0ea721 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2838,7 +2838,8 @@ cleanup_volume_info_contents(struct smb_vol *volume_info)
->  	kfree(volume_info->username);
->  	kzfree(volume_info->password);
->  	kfree(volume_info->UNC);
-> -	kfree(volume_info->UNCip);
-> +	if (volume_info->UNCip != volume_info->UNC + 2)
-> +		kfree(volume_info->UNCip);
->  	kfree(volume_info->domainname);
->  	kfree(volume_info->iocharset);
->  	kfree(volume_info->prepath);
-> 
-> 
+Justin Piszcz:
+> Does anyone know if any kernel supports CIFS w/out crashing? I'd like to 
+> backup some CIFS shares, thanks.
+>
+>
+> mount -t cifs //w2/x /mnt -o user=user,pass=pass
+>
+> [  881.388836] CIFS VFS: cifs_mount failed w/return code = -22
+	:::
 
-Looks correct, nice catch. 
+Since it failed mounting, this patch will help you. Although the patch
+will fix one bug, there still may exist another problem.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+http://marc.info/?l=linux-cifs&m=131345112022031&w=2
+
+
+J. R. Okajima
