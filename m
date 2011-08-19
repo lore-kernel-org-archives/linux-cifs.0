@@ -1,82 +1,115 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: Kernel 3.0: Instant kernel crash when mounting CIFS (also crashes
- with linux-3.1-rc2
-Date: Thu, 18 Aug 2011 14:02:09 -0500
-Message-ID: <CAH2r5msrKqmMY4=NP4VvOYNMerB-+Cu+6ba4+0fZcFEqFmcdYw@mail.gmail.com>
-References: <alpine.DEB.2.02.1108150506310.7571@p34.internal.lan>
-	<20110815064734.403b630f@corrin.poochiereds.net>
-	<alpine.DEB.2.02.1108150653200.7571@p34.internal.lan>
-	<alpine.DEB.2.02.1108151357200.32349@p34.internal.lan>
-	<alpine.DEB.2.02.1108171515050.5877@p34.internal.lan>
-	<3300.1313637592@jrobl>
-	<alpine.DEB.2.02.1108180632000.10458@p34.internal.lan>
-	<alpine.DEB.2.02.1108180807070.7903@p34.internal.lan>
-	<alpine.DEB.2.02.1108180821440.7903@p34.internal.lan>
-	<20110818091140.385a9455@barsoom.rdu.redhat.com>
-	<alpine.DEB.2.02.1108180914180.7903@p34.internal.lan>
-	<20110818130408.71c55b96@barsoom.rdu.redhat.com>
-	<alpine.DEB.2.02.1108181314310.7903@p34.internal.lan>
-	<CAH2r5mvNkUWh0rYTbTEWmUPiRsxUbmrGNpTOaebiG0CCKRfA1g@mail.gmail.com>
-	<alpine.DEB.2.02.1108181331180.7903@p34.internal.lan>
-	<CAH2r5msTpKdxwpgG+-3-gkkr5h7Ox1tL86q3LyTBMd1V8WS7aQ@mail.gmail.com>
-	<alpine.DEB.2.02.1108181413030.7903@p34.internal.lan>
-	<20110818145257.035a38e9@barsoom.rdu.redhat.com>
-	<alpine.DEB.2.02.1108181452080.7903@p34.internal.lan>
+From: bruce-FsTrmwUK8BR2iXbJP1moag@public.gmane.org
+Subject: Re: mount.cifs prerequisites
+Date: Fri, 19 Aug 2011 11:51:00 +0100
+Message-ID: <5bb787fe6c68d7e55084b0b7c2a985e7.squirrel@alpha.server-room.co.uk>
+References: <6d15d641caf322cf62917e8b03035fbf.squirrel@alpha.server-room.co.uk>
+    <CAH2r5mtTbfz-1v2fTnk4GZ270UBFX4FKW+zP6Hgq=mXvY7jhYA@mail.gmail.com>
+    <CADQjK6W4equW=jo4sxHSxr5aUvK5aHaV+3es6+ujV+JTrS576w@mail.gmail.com>
+    <CADT32e+s58U-jbbggNZKzc4rybybf3p+7+HJ-zvAz+7CHVDskg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton@samba.org>,
-	"J. R. Okajima" <hooanon05@yahoo.co.jp>,
-	Jesper Juhl <jj@chaosbits.net>, linux-kernel@vger.kernel.org,
-	Alan Piszcz <ap@solarrain.com>,
-	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-To: Justin Piszcz <jpiszcz@lucidpixels.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <alpine.DEB.2.02.1108181452080.7903@p34.internal.lan>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CADT32e+s58U-jbbggNZKzc4rybybf3p+7+HJ-zvAz+7CHVDskg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Aug 18, 2011 at 1:54 PM, Justin Piszcz <jpiszcz@lucidpixels.com> wrote:
->
->
-> On Thu, 18 Aug 2011, Jeff Layton wrote:
->
->> On Thu, 18 Aug 2011 14:18:15 -0400 (EDT)
->> Justin Piszcz <jpiszcz@lucidpixels.com> wrote:
+> On Thu, Aug 18, 2011 at 12:15 PM, Kong Li <likong-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> The invalid argument might be a bug on windows 2008 side.
+>> http://support.microsoft.com/kb/957441
 >>
+>> I had the exact same situation. =A0Applying the fix resolved the iss=
+ue
+>> in my environment.
+>>
+>> Thanks.
+>>
+>> Kong
+>>
+>>
+>> On Thu, Aug 18, 2011 at 9:49 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> wrote:
+>>> the available messages which can be returned on mount are
+>>> quite limited so sometimes the mapping of network errors
+>>> on to the very limited set of available mount error
+>>> messages can get confusing.
 >>>
+>>> Do you see mount generating any messages
+>>> in dmesg? =A0Alternatively, you might turn on cifs debugging
+>>> (echo 7 > /proc/fs/cifs/cifsFYI) and try mount again
+>>> and see if the warning message for the mount failure
+>>> is listed (in dmesg)
+>>>
+>>> On Thu, Aug 18, 2011 at 11:31 AM, =A0<bruce-FsTrmwUK8BR2iXbJP1moag@public.gmane.org> wrote:
+>>>>
+>>>> Dear List,
+>>>> I am running a 2.6.28 kernel that I have compiled with cifs filesy=
+stem
+>>>> support. I am trying to mount a share from a windows 2008 server
+>>>> requiring
+>>>> ntlmv2. when I try to pass the option sec=3Dntlmv2 or ntlmv2i I re=
+ceive
+>>>> an
+>>>> invalid argument message. If I omit the sec option I receive a
+>>>> permission
+>>>> denied.
+>>>> I have also tried to use a stock Debian kernel (2.6.32) that I hav=
+e
+>>>> checked to have cifs compiled in and I get the same results. If I
+>>>> perform
+>>>> a 'modinfo cifs' it shows the module to be loaded and that I am
+>>>> running
+>>>> ver 1.61 of cifs.
+>>>> Is there any other components I need to check (do I need a library
+>>>> package
+>>>> to support ntlmv2??)
+>>>> I can mount shares of servers that allow NTLMv1.
+>>>>
+>>>> Any help gratefully received.
+>>>>
+>>>> Thanks Bruce
+>>>>
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe linux-ci=
+fs"
+>>>> in
+>>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.ht=
+ml
+>>>>
+>>>
+>>>
+>>>
+>>> --
+>>> Thanks,
+>>>
+>>> Steve
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cif=
+s"
+>>> in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.htm=
+l
+>>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
+" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >>
->> Like I said, read performance with cifs.ko just plain sucks currently.
->>
->> Don't look for cifs.ko to achieve anywhere near NFS' performance unless
->> you jump through some very odd hoops (like multithreading your workload
->> in userspace, etc). cifs.ko just doesn't do a good job of keeping the
->> pipe "stuffed" as most calls are handled synchronously. A single task
->> can only handle one call on the wire in most cases. The exception here
->> is writes, but that just recently changed...
->>
->> Reads are done using relatively small buffers and then copied to
->> pagecache. Part of what I'm working on will be to allow for much larger
->> reads directly into the pagecache. That should also help performance
->> significantly.
+>
+> Yes, Jeff Layton had pointed to this
+>  http://support.microsoft.com/kb/957441/en-us
+> earlier.
+>
 
-As Jeff notes, large file sequential read of one file at a time is going
-to be cifs kernel client's worst case.   An earlier cifs async patchset
-(prototype) showed dramatic improvements so it is not
-inherent in the protocol and I am looking forward to seeing
-Jeff's patches for this.
-
-With multiple processes reading/writing cifs does pretty well
-(since the worst case serialization is in cifs_readpages,
-coupled with the relatively small buffer size on reads), as long as
-you are accessing various files at one time.   I have seen
-cifs beat nfs on broader tests such as dbench when lots of activity on the
-wire from multiple processes - but meant to do a dbench run
-on recent kernels to compare.   Would be interesting to compare
-dbench now (with e.g. more than 30 processes) on nfs mount to
-cifs mount.
-
-
--- 
-Thanks,
-
-Steve
+Thanks for all the help. I have now got the stock debian kernel to moun=
+t
+the share using the Microsoft KB. I still have an issue with the kernel=
+ I
+was using but I can work to get round that.
+Thanks again.
+Bruce
