@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 04/14] cifs: simplify read_from_socket
-Date: Fri, 19 Aug 2011 21:55:29 -0400
-Message-ID: <1313805339-1233-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 09/14] cifs: move mid finding into separate routine
+Date: Fri, 19 Aug 2011 21:55:34 -0400
+Message-ID: <1313805339-1233-10-git-send-email-jlayton@redhat.com>
 References: <1313805339-1233-1-git-send-email-jlayton@redhat.com>
 Cc: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,163 +10,148 @@ In-Reply-To: <1313805339-1233-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Move the iovec handling entirely into read_from_socket. That simplifies
-the code and gets rid of the special handling for header reads. With
-this we can also get rid of the "goto incomplete_rcv" label in the main
-demultiplex thread function since we can now treat header and non-header
-receives the same way.
-
-Also, make it return an int (since we'll never receive enough to worry
-about the sign bit anyway), and simply make it return the amount of bytes
-read or a negative error code.
+Begin breaking up find_cifs_mid into smaller pieces. The parts that
+coalesce T2 responses don't really need to be done under the
+GlobalMid_lock anyway. Create a new function that just finds the
+mid on the list, and then later takes it off the list if the entire
+response has been received.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   77 ++++++++++++++++------------------------------------
- 1 files changed, 24 insertions(+), 53 deletions(-)
+ fs/cifs/connect.c |  113 +++++++++++++++++++++++++++++++----------------------
+ 1 files changed, 66 insertions(+), 47 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index e899fec..358e0b0 100644
+index 28007fd..bfd9622 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -376,35 +376,33 @@ server_unresponsive(struct TCP_Server_Info *server)
+@@ -529,61 +529,80 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
  }
  
- static int
--read_from_socket(struct TCP_Server_Info *server,
--		 struct kvec *iov, unsigned int to_read,
--		 unsigned int *ptotal_read, bool is_header_read)
-+read_from_socket(struct TCP_Server_Info *server, char *buf,
-+		 unsigned int to_read)
+ static struct mid_q_entry *
+-find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-	      int *length, bool is_large_buf, bool *is_multi_rsp, char **bigbuf)
++find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
  {
--	int length, rc = 0;
--	unsigned int total_read;
-+	int length = 0;
-+	int total_read;
- 	struct msghdr smb_msg;
--	char *buf = iov->iov_base;
-+	struct kvec iov;
+-	struct mid_q_entry *mid = NULL, *tmp_mid, *ret = NULL;
++	struct mid_q_entry *mid;
  
- 	smb_msg.msg_control = NULL;
- 	smb_msg.msg_controllen = 0;
- 
--	for (total_read = 0; total_read < to_read; total_read += length) {
-+	for (total_read = 0; to_read; total_read += length, to_read -= length) {
- 		if (server_unresponsive(server)) {
--			rc = 1;
-+			total_read = -EAGAIN;
- 			break;
- 		}
- 
--		length = kernel_recvmsg(server->ssocket, &smb_msg, iov, 1,
--					to_read - total_read, 0);
-+		iov.iov_base = buf + total_read;
-+		iov.iov_len = to_read;
-+		length = kernel_recvmsg(server->ssocket, &smb_msg, &iov, 1,
-+					to_read, 0);
- 		if (server->tcpStatus == CifsExiting) {
--			/* then will exit */
--			rc = 2;
-+			total_read = -ESHUTDOWN;
- 			break;
- 		} else if (server->tcpStatus == CifsNeedReconnect) {
- 			cifs_reconnect(server);
--			/* Reconnect wakes up rspns q */
--			/* Now we will reread sock */
--			rc = 1;
-+			total_read = -EAGAIN;
- 			break;
- 		} else if (length == -ERESTARTSYS ||
- 			   length == -EAGAIN ||
-@@ -416,28 +414,16 @@ read_from_socket(struct TCP_Server_Info *server,
- 			 */
- 			usleep_range(1000, 2000);
- 			length = 0;
--			if (!is_header_read)
--				continue;
--			/* Special handling for header read */
--			if (total_read) {
--				iov->iov_base = (to_read - total_read) +
--						buf;
--				iov->iov_len = to_read - total_read;
--				rc = 3;
--			} else
--				rc = 1;
--			break;
-+			continue;
- 		} else if (length <= 0) {
--			cERROR(1, "Received no data, expecting %d",
--			       to_read - total_read);
-+			cERROR(1, "Received no data or error: expecting %d "
-+				  "got %d", to_read, length);
- 			cifs_reconnect(server);
--			rc = 1;
-+			total_read = -EAGAIN;
- 			break;
- 		}
- 	}
+ 	spin_lock(&GlobalMid_Lock);
+-	list_for_each_entry_safe(mid, tmp_mid, &server->pending_mid_q, qhead) {
+-		if (mid->mid != buf->Mid ||
+-		    mid->midState != MID_REQUEST_SUBMITTED ||
+-		    mid->command != buf->Command)
+-			continue;
 -
--	*ptotal_read = total_read;
--	return rc;
-+	return total_read;
+-		if (*length == 0 && check2ndT2(buf) > 0) {
+-			/* We have a multipart transact2 resp */
+-			*is_multi_rsp = true;
+-			if (mid->resp_buf) {
+-				/* merge response - fix up 1st*/
+-				*length = coalesce_t2(buf, mid->resp_buf);
+-				if (*length > 0) {
+-					*length = 0;
+-					mid->multiRsp = true;
+-					break;
+-				}
+-				/* All parts received or packet is malformed. */
+-				mid->multiEnd = true;
+-				goto multi_t2_fnd;
+-			}
+-			if (!is_large_buf) {
+-				/*FIXME: switch to already allocated largebuf?*/
+-				cERROR(1, "1st trans2 resp needs bigbuf");
+-			} else {
+-				/* Have first buffer */
+-				mid->resp_buf = buf;
+-				mid->largeBuf = true;
+-				*bigbuf = NULL;
+-			}
+-			break;
++	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
++		if (mid->mid == buf->Mid &&
++		    mid->midState == MID_REQUEST_SUBMITTED &&
++		    mid->command == buf->Command) {
++			spin_unlock(&GlobalMid_Lock);
++			return mid;
+ 		}
+-		mid->resp_buf = buf;
+-		mid->largeBuf = is_large_buf;
+-multi_t2_fnd:
+-		if (*length == 0)
+-			mid->midState = MID_RESPONSE_RECEIVED;
+-		else
+-			mid->midState = MID_RESPONSE_MALFORMED;
++	}
++	spin_unlock(&GlobalMid_Lock);
++	return NULL;
++}
++
++static void
++dequeue_mid(struct mid_q_entry *mid, int malformed)
++{
+ #ifdef CONFIG_CIFS_STATS2
+-		mid->when_received = jiffies;
++	mid->when_received = jiffies;
+ #endif
+-		list_del_init(&mid->qhead);
+-		ret = mid;
+-		break;
+-	}
++	spin_lock(&GlobalMid_Lock);
++	if (!malformed)
++		mid->midState = MID_RESPONSE_RECEIVED;
++	else
++		mid->midState = MID_RESPONSE_MALFORMED;
++	list_del_init(&mid->qhead);
+ 	spin_unlock(&GlobalMid_Lock);
++}
+ 
+-	return ret;
++static struct mid_q_entry *
++find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
++	      int *malformed, bool is_large_buf, bool *is_multi_rsp,
++	      char **bigbuf)
++{
++	struct mid_q_entry *mid = NULL;
++
++	mid = find_mid(server, buf);
++	if (!mid)
++		return mid;
++
++	if (*malformed == 0 && check2ndT2(buf) > 0) {
++		/* We have a multipart transact2 resp */
++		*is_multi_rsp = true;
++		if (mid->resp_buf) {
++			/* merge response - fix up 1st*/
++			*malformed = coalesce_t2(buf, mid->resp_buf);
++			if (*malformed > 0) {
++				*malformed = 0;
++				mid->multiRsp = true;
++				return NULL;
++			}
++			/* All parts received or packet is malformed. */
++			mid->multiEnd = true;
++			goto multi_t2_fnd;
++		}
++		if (!is_large_buf) {
++			/*FIXME: switch to already allocated largebuf?*/
++			cERROR(1, "1st trans2 resp needs bigbuf");
++		} else {
++			/* Have first buffer */
++			mid->resp_buf = buf;
++			mid->largeBuf = true;
++			*bigbuf = NULL;
++		}
++		return mid;
++	}
++	mid->resp_buf = buf;
++	mid->largeBuf = is_large_buf;
++multi_t2_fnd:
++	dequeue_mid(mid, *malformed);
++	return mid;
  }
  
- static bool
-@@ -658,12 +644,10 @@ cifs_demultiplex_thread(void *p)
- 	unsigned int pdu_length, total_read;
- 	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
- 	struct smb_hdr *smb_buffer = NULL;
--	struct kvec iov;
- 	struct task_struct *task_to_wake = NULL;
- 	struct mid_q_entry *mid_entry;
- 	bool isLargeBuf = false;
- 	bool isMultiRsp = false;
--	int rc;
- 
- 	current->flags |= PF_MEMALLOC;
- 	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
-@@ -686,19 +670,12 @@ cifs_demultiplex_thread(void *p)
- 		isMultiRsp = false;
- 		smb_buffer = (struct smb_hdr *)smallbuf;
- 		buf = smallbuf;
--		iov.iov_base = buf;
--		iov.iov_len = 4;
- 		pdu_length = 4; /* enough to get RFC1001 header */
- 
--incomplete_rcv:
--		rc = read_from_socket(server, &iov, pdu_length,
--				      &total_read, true /* header read */);
--		if (rc == 3)
--			goto incomplete_rcv;
--		else if (rc == 2)
--			break;
--		else if (rc == 1)
-+		length = read_from_socket(server, buf, pdu_length);
-+		if (length < 0)
- 			continue;
-+		total_read = length;
- 
- 		/*
- 		 * The right amount was read from socket - 4 bytes,
-@@ -718,16 +695,10 @@ incomplete_rcv:
- 			buf = bigbuf;
- 		}
- 
--		iov.iov_base = 4 + buf;
--		iov.iov_len = pdu_length;
--		rc = read_from_socket(server, &iov, pdu_length,
--				      &total_read, false);
--		if (rc == 2)
--			break;
--		else if (rc == 1)
-+		length = read_from_socket(server, buf + 4, pdu_length);
-+		if (length < 0)
- 			continue;
--
--		total_read += 4; /* account for rfc1002 hdr */
-+		total_read += length;
- 
- 		dump_smb(smb_buffer, total_read);
- 
+ static void clean_demultiplex_info(struct TCP_Server_Info *server)
 -- 
 1.7.6
