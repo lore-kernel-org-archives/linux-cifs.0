@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 10/14] cifs: eliminate is_multi_rsp parm to find_cifs_mid
-Date: Fri, 19 Aug 2011 21:55:35 -0400
-Message-ID: <1313805339-1233-11-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 12/14] cifs: find mid earlier in receive codepath
+Date: Fri, 19 Aug 2011 21:55:37 -0400
+Message-ID: <1313805339-1233-13-git-send-email-jlayton@redhat.com>
 References: <1313805339-1233-1-git-send-email-jlayton@redhat.com>
 Cc: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,114 +10,90 @@ In-Reply-To: <1313805339-1233-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Change find_cifs_mid to only return NULL if a mid could not be found.
-If we got part of a multi-part T2 response, then coalesce it and still
-return the mid. The caller can determine the T2 receive status from
-the flags in the mid.
-
-With this change, there is no need to pass a pointer to "length" as
-well and just pass by value. If a mid is found, then we can just mark
-it as malformed. If one isn't found, then the value of "length" won't
-change anyway.
+In order to receive directly into a preallocated buffer, we need to ID
+the mid earlier, before the bulk of the response is read. Call the mid
+finding routine as soon as we're able to read the mid.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   35 ++++++++++++++++-------------------
- 1 files changed, 16 insertions(+), 19 deletions(-)
+ fs/cifs/connect.c |   24 +++++++++---------------
+ 1 files changed, 9 insertions(+), 15 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index bfd9622..49c7eee 100644
+index 4b727c2..18171cf 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -563,8 +563,7 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
+@@ -555,16 +555,10 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
+ 	spin_unlock(&GlobalMid_Lock);
+ }
  
- static struct mid_q_entry *
- find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
--	      int *malformed, bool is_large_buf, bool *is_multi_rsp,
--	      char **bigbuf)
-+	      int malformed, bool is_large_buf, char **bigbuf)
+-static struct mid_q_entry *
+-find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-	      int malformed)
++static void
++handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
++	   struct smb_hdr *buf, int malformed)
  {
- 	struct mid_q_entry *mid = NULL;
- 
-@@ -572,16 +571,14 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 	if (!mid)
- 		return mid;
- 
--	if (*malformed == 0 && check2ndT2(buf) > 0) {
--		/* We have a multipart transact2 resp */
--		*is_multi_rsp = true;
-+	if (malformed == 0 && check2ndT2(buf) > 0) {
-+		mid->multiRsp = true;
+-	struct mid_q_entry *mid = NULL;
+-
+-	mid = find_mid(server, buf);
+-	if (!mid)
+-		return mid;
+-
+ 	if (malformed == 0 && check2ndT2(buf) > 0) {
+ 		mid->multiRsp = true;
  		if (mid->resp_buf) {
- 			/* merge response - fix up 1st*/
--			*malformed = coalesce_t2(buf, mid->resp_buf);
--			if (*malformed > 0) {
--				*malformed = 0;
--				mid->multiRsp = true;
--				return NULL;
-+			malformed = coalesce_t2(buf, mid->resp_buf);
-+			if (malformed > 0) {
-+				malformed = 0;
-+				return mid;
+@@ -572,11 +566,11 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+ 			malformed = coalesce_t2(buf, mid->resp_buf);
+ 			if (malformed > 0) {
+ 				malformed = 0;
+-				return mid;
++				return;
  			}
  			/* All parts received or packet is malformed. */
  			mid->multiEnd = true;
-@@ -601,7 +598,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-			goto multi_t2_fnd;
++			return dequeue_mid(mid, malformed);
+ 		}
+ 		if (!server->large_buf) {
+ 			/*FIXME: switch to already allocated largebuf?*/
+@@ -587,7 +581,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+ 			mid->largeBuf = true;
+ 			server->bigbuf = NULL;
+ 		}
+-		return mid;
++		return;
+ 	}
  	mid->resp_buf = buf;
- 	mid->largeBuf = is_large_buf;
- multi_t2_fnd:
--	dequeue_mid(mid, *malformed);
-+	dequeue_mid(mid, malformed);
- 	return mid;
+ 	mid->largeBuf = server->large_buf;
+@@ -599,9 +593,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+ 		else
+ 			server->smallbuf = NULL;
+ 	}
+-multi_t2_fnd:
+ 	dequeue_mid(mid, malformed);
+-	return mid;
  }
  
-@@ -711,7 +708,6 @@ cifs_demultiplex_thread(void *p)
- 	struct task_struct *task_to_wake = NULL;
- 	struct mid_q_entry *mid_entry;
- 	bool isLargeBuf = false;
--	bool isMultiRsp = false;
- 
- 	current->flags |= PF_MEMALLOC;
- 	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
-@@ -731,7 +727,6 @@ cifs_demultiplex_thread(void *p)
+ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+@@ -762,6 +754,8 @@ cifs_demultiplex_thread(void *p)
  			continue;
+ 		server->total_read += length;
  
- 		isLargeBuf = false;
--		isMultiRsp = false;
- 		smb_buffer = (struct smb_hdr *)smallbuf;
- 		buf = smallbuf;
- 		pdu_length = 4; /* enough to get RFC1001 header */
-@@ -809,23 +804,25 @@ cifs_demultiplex_thread(void *p)
++		mid_entry = find_mid(server, smb_buffer);
++
+ 		if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+ 			cERROR(1, "SMB response too long (%u bytes)",
+ 				pdu_length);
+@@ -806,8 +800,8 @@ cifs_demultiplex_thread(void *p)
  
  		server->lstrp = jiffies;
  
--		mid_entry = find_cifs_mid(server, smb_buffer, &length,
--					  isLargeBuf, &isMultiRsp, &bigbuf);
-+		mid_entry = find_cifs_mid(server, smb_buffer, length,
-+					  isLargeBuf, &bigbuf);
+-		mid_entry = find_cifs_mid(server, smb_buffer, length);
  		if (mid_entry != NULL) {
--			mid_entry->callback(mid_entry);
-+			if (mid_entry->multiRsp && !mid_entry->multiEnd)
-+				continue;
-+
- 			/* Was previous buf put in mpx struct for multi-rsp? */
--			if (!isMultiRsp) {
-+			if (!mid_entry->multiRsp) {
- 				/* smb buffer will be freed by user thread */
- 				if (isLargeBuf)
- 					bigbuf = NULL;
- 				else
- 					smallbuf = NULL;
- 			}
-+			mid_entry->callback(mid_entry);
++			handle_mid(mid_entry, server, smb_buffer, length);
+ 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
+ 				mid_entry->callback(mid_entry);
  		} else if (length != 0) {
- 			/* response sanity checks failed */
- 			continue;
--		} else if (!is_valid_oplock_break(smb_buffer, server) &&
--			   !isMultiRsp) {
-+		} else if (!is_valid_oplock_break(smb_buffer, server)) {
- 			cERROR(1, "No task to wake, unknown frame received! "
- 				   "NumMids %d", atomic_read(&midCount));
- 			cifs_dump_mem("Received Data is: ", buf,
 -- 
 1.7.6
