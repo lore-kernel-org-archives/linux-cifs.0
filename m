@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 06/14] cifs: clean up check_rfc1002_header
-Date: Fri, 19 Aug 2011 21:55:31 -0400
-Message-ID: <1313805339-1233-7-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 02/14] cifs: make smb_msg local to read_from_socket
+Date: Fri, 19 Aug 2011 21:55:27 -0400
+Message-ID: <1313805339-1233-3-git-send-email-jlayton@redhat.com>
 References: <1313805339-1233-1-git-send-email-jlayton@redhat.com>
 Cc: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,121 +10,86 @@ In-Reply-To: <1313805339-1233-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Rename it for better clarity as to what it does and have the caller pass
-in just the single type byte. Turn the if statement into a switch and
-optimize it by placing the most common message type at the top. Move the
-header length check back into cifs_demultiplex_thread in preparation
-for adding a new receive phase and normalize the cFYI messages.
+If msg_controllen is 0, then the socket layer should never touch these
+fields. Thus, there's no need to continually reset them. Also, there's
+no need to keep this field on the stack for the demultiplex thread, just
+make it a local variable in read_from_socket.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   63 +++++++++++++++++++++++++---------------------------
- 1 files changed, 30 insertions(+), 33 deletions(-)
+ fs/cifs/connect.c |   17 ++++++++---------
+ 1 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 430e563..ecd8ae7 100644
+index 55efd1d..012d970 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -485,29 +485,29 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
+@@ -359,16 +359,20 @@ allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
  }
  
- static bool
--check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
-+is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ static int
+-read_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg,
++read_from_socket(struct TCP_Server_Info *server,
+ 		 struct kvec *iov, unsigned int to_read,
+ 		 unsigned int *ptotal_read, bool is_header_read)
  {
--	char temp = *buf;
--	unsigned int pdu_length = be32_to_cpu(
--				((struct smb_hdr *)buf)->smb_buf_length);
--
- 	/*
- 	 * The first byte big endian of the length field,
- 	 * is actually not part of the length but the type
- 	 * with the most common, zero, as regular data.
- 	 */
--	if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
--		return false;
--	} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
--		cFYI(1, "Good RFC 1002 session rsp");
--		return false;
--	} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
-+	switch (type) {
-+	case RFC1002_SESSION_MESSAGE:
-+		/* Regular SMB response */
-+		return true;
-+	case RFC1002_SESSION_KEEP_ALIVE:
-+		cFYI(1, "RFC 1002 session keep alive");
-+		break;
-+	case RFC1002_POSITIVE_SESSION_RESPONSE:
-+		cFYI(1, "RFC 1002 positive session response");
-+		break;
-+	case RFC1002_NEGATIVE_SESSION_RESPONSE:
- 		/*
- 		 * We get this from Windows 98 instead of an error on
- 		 * SMB negprot response.
- 		 */
--		cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
--			pdu_length);
-+		cFYI(1, "RFC 1002 negative session response");
- 		/* give server a second to clean up */
- 		msleep(1000);
- 		/*
-@@ -516,29 +516,16 @@ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
- 		 * is since we do not begin with RFC1001 session
- 		 * initialize frame).
- 		 */
--		cifs_set_port((struct sockaddr *)
--				&server->dstaddr, CIFS_PORT);
-+		cifs_set_port((struct sockaddr *)&server->dstaddr, CIFS_PORT);
- 		cifs_reconnect(server);
- 		wake_up(&server->response_q);
--		return false;
--	} else if (temp != (char) 0) {
--		cERROR(1, "Unknown RFC 1002 frame");
--		cifs_dump_mem(" Received Data: ", buf, 4);
--		cifs_reconnect(server);
--		return false;
--	}
--
--	/* else we have an SMB response */
--	if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
--	    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
--		cERROR(1, "Invalid size SMB length %d pdu_length %d",
--		       4, pdu_length+4);
-+		break;
-+	default:
-+		cERROR(1, "RFC 1002 unknown response type 0x%x", type);
- 		cifs_reconnect(server);
--		wake_up(&server->response_q);
--		return false;
- 	}
+ 	int length, rc = 0;
+ 	unsigned int total_read;
++	struct msghdr smb_msg;
+ 	char *buf = iov->iov_base;
  
--	return true;
-+	return false;
- }
- 
- static struct mid_q_entry *
-@@ -741,10 +728,20 @@ cifs_demultiplex_thread(void *p)
- 		 */
- 		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
- 
--		cFYI(1, "rfc1002 length 0x%x", pdu_length+4);
--		if (!check_rfc1002_header(server, buf))
-+		cFYI(1, "RFC1002 header 0x%x", pdu_length);
-+		if (!is_smb_response(server, buf[0]))
- 			continue;
- 
-+		/* check the length */
-+		if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
-+		    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
-+			cERROR(1, "Invalid size SMB length %d pdu_length %d",
-+			       4, pdu_length + 4);
-+			cifs_reconnect(server);
-+			wake_up(&server->response_q);
-+			continue;
-+		}
++	smb_msg.msg_control = NULL;
++	smb_msg.msg_controllen = 0;
 +
- 		/* else length ok */
- 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
- 			isLargeBuf = true;
+ 	for (total_read = 0; total_read < to_read; total_read += length) {
+-		length = kernel_recvmsg(server->ssocket, smb_msg, iov, 1,
++		length = kernel_recvmsg(server->ssocket, &smb_msg, iov, 1,
+ 					to_read - total_read, 0);
+ 		if (server->tcpStatus == CifsExiting) {
+ 			/* then will exit */
+@@ -397,8 +401,6 @@ read_from_socket(struct TCP_Server_Info *server, struct msghdr *smb_msg,
+ 				iov->iov_base = (to_read - total_read) +
+ 						buf;
+ 				iov->iov_len = to_read - total_read;
+-				smb_msg->msg_control = NULL;
+-				smb_msg->msg_controllen = 0;
+ 				rc = 3;
+ 			} else
+ 				rc = 1;
+@@ -634,7 +636,6 @@ cifs_demultiplex_thread(void *p)
+ 	unsigned int pdu_length, total_read;
+ 	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
+ 	struct smb_hdr *smb_buffer = NULL;
+-	struct msghdr smb_msg;
+ 	struct kvec iov;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+@@ -665,8 +666,6 @@ cifs_demultiplex_thread(void *p)
+ 		buf = smallbuf;
+ 		iov.iov_base = buf;
+ 		iov.iov_len = 4;
+-		smb_msg.msg_control = NULL;
+-		smb_msg.msg_controllen = 0;
+ 		pdu_length = 4; /* enough to get RFC1001 header */
+ 
+ incomplete_rcv:
+@@ -681,7 +680,7 @@ incomplete_rcv:
+ 			continue;
+ 		}
+ 
+-		rc = read_from_socket(server, &smb_msg, &iov, pdu_length,
++		rc = read_from_socket(server, &iov, pdu_length,
+ 				      &total_read, true /* header read */);
+ 		if (rc == 3)
+ 			goto incomplete_rcv;
+@@ -710,7 +709,7 @@ incomplete_rcv:
+ 
+ 		iov.iov_base = 4 + buf;
+ 		iov.iov_len = pdu_length;
+-		rc = read_from_socket(server, &smb_msg, &iov, pdu_length,
++		rc = read_from_socket(server, &iov, pdu_length,
+ 				      &total_read, false);
+ 		if (rc == 2)
+ 			break;
 -- 
 1.7.6
