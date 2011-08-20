@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH 3/5] cifs-utils: cifsacl utilities: Create file setcifsacl.c
-Date: Fri, 19 Aug 2011 22:27:38 -0500
-Message-ID: <1313810858-2317-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH 4/5] cifs-utils: cifsacl utilities: Add configure and make directives
+Date: Fri, 19 Aug 2011 22:27:47 -0500
+Message-ID: <1313810867-2340-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
@@ -12,926 +12,110 @@ List-ID: <linux-cifs.vger.kernel.org>
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 
-Four functions are implemented to alter ACL within the security descriptor.
-They are are, add, delete, modify, and set.
-
-Add adds one or more ACEs to the existing ACL.
-
-Delete deletes one mor more ACEs from the existing ACL, entire
-ACE is used to match an ACE that is slated for delete action.
-
-Modify modifies one more more ACEs from the existing ACL. SID or
-name and ACE type are used to match the criterion to select
-an ACE to modification.
-
-Set replaces the existing DACL with the list of ACEs specified.
-
-Start by parsing the command line to build list of ACEs, 
-fetch the security descriptor of the file, parse it and
-build a list of (fetched) ACEs.
-Both the lists are then passed to a specified function for the
-intended action.
-
-setcifsacl.c builds a security descriptor consising of DACL
-and sends that as a blob using setxattr.
+autoconf and automake directives to build utilities getcifsacl
+and setcifsacl.
 
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- setcifsacl.c |  885 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 885 insertions(+), 0 deletions(-)
- create mode 100644 setcifsacl.c
+ Makefile.am  |   24 +++++++++++++++++++++++-
+ configure.ac |   25 ++++++++++++++++++++++++-
+ 2 files changed, 47 insertions(+), 2 deletions(-)
 
-diff --git a/setcifsacl.c b/setcifsacl.c
-new file mode 100644
-index 0000000..2bfee3b
---- /dev/null
-+++ b/setcifsacl.c
-@@ -0,0 +1,885 @@
-+/*
-+* setcifsacl utility
-+*
-+* Copyright (C) Shirish Pargaonkar (shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org) 2011
-+*
-+* Used to alter entries of an ACL or replace an entire ACL in a
-+* security descriptor of a file system object that belongs to a
-+* share mounted using option cifsacl.
-+*
-+* This program is free software; you can redistribute it and/or modify
-+* it under the terms of the GNU General Public License as published by
-+* the Free Software Foundation; either version 2 of the License, or
-+* (at your option) any later version.
-+* This program is distributed in the hope that it will be useful,
-+* but WITHOUT ANY WARRANTY; without even the implied warranty of
-+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+* GNU General Public License for more details.
-+* You should have received a copy of the GNU General Public License
-+* along with this program; if not, write to the Free Software
-+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+*/
-+
-+#include "cifsacl.h"
-+
-+static const char *prog = "setcifsacl";
-+
-+static void
-+copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
-+		int numaces, int acessize)
-+{
-+	int i;
-+
-+	int osidsoffset, gsidsoffset, dacloffset;
-+	struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
-+	struct cifs_sid *nowner_sid_ptr, *ngroup_sid_ptr;
-+	struct cifs_ctrl_acl *dacl_ptr, *ndacl_ptr;
-+
-+	/* copy security descriptor control portion */
-+	osidsoffset = htole32(pntsd->osidoffset);
-+	gsidsoffset = htole32(pntsd->gsidoffset);
-+	dacloffset = htole32(pntsd->dacloffset);
-+
-+	pnntsd->revision = pntsd->revision;
-+	pnntsd->type = pntsd->type;
-+	pnntsd->osidoffset = pntsd->osidoffset;
-+	pnntsd->gsidoffset = pntsd->gsidoffset;
-+	pnntsd->dacloffset = pntsd->dacloffset;
-+
-+	dacl_ptr = (struct cifs_ctrl_acl *)((char *)pntsd + dacloffset);
-+	ndacl_ptr = (struct cifs_ctrl_acl *)((char *)pnntsd + dacloffset);
-+
-+	ndacl_ptr->revision = dacl_ptr->revision;
-+	ndacl_ptr->size = htole16(acessize + sizeof(struct cifs_ctrl_acl));
-+	ndacl_ptr->num_aces = htole32(numaces);
-+
-+	/* copy owner sid */
-+	owner_sid_ptr = (struct cifs_sid *)((char *)pntsd + osidsoffset);
-+	nowner_sid_ptr = (struct cifs_sid *)((char *)pnntsd + osidsoffset);
-+
-+	nowner_sid_ptr->revision = owner_sid_ptr->revision;
-+	nowner_sid_ptr->num_subauth = owner_sid_ptr->num_subauth;
-+	for (i = 0; i < 6; i++)
-+		nowner_sid_ptr->authority[i] = owner_sid_ptr->authority[i];
-+	for (i = 0; i < 5; i++)
-+		nowner_sid_ptr->sub_auth[i] = owner_sid_ptr->sub_auth[i];
-+
-+	/* copy group sid */
-+	group_sid_ptr = (struct cifs_sid *)((char *)pntsd + gsidsoffset);
-+	ngroup_sid_ptr = (struct cifs_sid *)((char *)pnntsd + gsidsoffset);
-+
-+	ngroup_sid_ptr->revision = group_sid_ptr->revision;
-+	ngroup_sid_ptr->num_subauth = group_sid_ptr->num_subauth;
-+	for (i = 0; i < 6; i++)
-+		ngroup_sid_ptr->authority[i] = group_sid_ptr->authority[i];
-+	for (i = 0; i < 5; i++)
-+		ngroup_sid_ptr->sub_auth[i] = group_sid_ptr->sub_auth[i];
-+
-+	return;
-+}
-+
-+static int
-+copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
-+{
-+	int i;
-+
-+	dace->type = sace->type;
-+	dace->flags = sace->flags;
-+	dace->access_req = htole32(sace->access_req);
-+
-+	dace->sid.revision = sace->sid.revision;
-+	dace->sid.num_subauth = sace->sid.num_subauth;
-+	for (i = 0; i < 6; i++)
-+		dace->sid.authority[i] = sace->sid.authority[i];
-+	for (i = 0; i < sace->sid.num_subauth; i++)
-+		dace->sid.sub_auth[i] = sace->sid.sub_auth[i];
-+
-+	dace->size = htole16(sace->size);
-+
-+	return dace->size;
-+}
-+
-+static int
-+compare_aces(struct cifs_ace *sace, struct cifs_ace *dace, int compflags)
-+{
-+	int i;
-+
-+	if (compflags & COMPSID) {
-+		if (dace->sid.revision != sace->sid.revision)
-+			return 0;
-+		if (dace->sid.num_subauth != sace->sid.num_subauth)
-+			return 0;
-+		for (i = 0; i < 6; i++) {
-+			if (dace->sid.authority[i] != sace->sid.authority[i])
-+				return 0;
-+		}
-+		for (i = 0; i < sace->sid.num_subauth; i++) {
-+			if (dace->sid.sub_auth[i] != sace->sid.sub_auth[i])
-+				return 0;
-+		}
-+	}
-+
-+	if (compflags & COMPTYPE) {
-+		if (dace->type != sace->type)
-+			return 0;
-+	}
-+
-+	if (compflags & COMPFLAG) {
-+		if (dace->flags != sace->flags)
-+			return 0;
-+	}
-+
-+	if (compflags & COMPMASK) {
-+		if (dace->access_req != htole32(sace->access_req))
-+			return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+static int
-+get_sec_desc_size(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd,
-+			int aces, ssize_t *bufsize, size_t *acesoffset)
-+{
-+	unsigned int size, acessize, dacloffset;
-+
-+	size = sizeof(struct cifs_ntsd) +
-+		2 * sizeof(struct cifs_sid) +
-+		sizeof(struct cifs_ctrl_acl);
-+
-+	dacloffset = le32toh(pntsd->dacloffset);
-+
-+	*acesoffset = dacloffset + sizeof(struct cifs_ctrl_acl);
-+	acessize = aces * sizeof(struct cifs_ace);
-+	*bufsize = size + acessize;
-+
-+	*npntsd = malloc(*bufsize);
-+	if (!*npntsd) {
-+		printf("%s: Memory allocation failure", __func__);
-+		return errno;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+ace_set(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd, ssize_t *bufsize,
-+			struct cifs_ace **cacesptr, int numcaces)
-+{
-+	int i, rc, acessize = 0;
-+	size_t acesoffset;
-+	char *acesptr;
-+
-+	rc = get_sec_desc_size(pntsd, npntsd, numcaces, bufsize, &acesoffset);
-+	if (rc)
-+		return rc;
-+
-+	acesptr = (char *)*npntsd + acesoffset;
-+	for (i = 0; i < numcaces; ++i) {
-+		acessize += copy_ace((struct cifs_ace *)acesptr, cacesptr[i]);
-+		acesptr += sizeof(struct cifs_ace);
-+	}
-+	copy_sec_desc(pntsd, *npntsd, numcaces, acessize);
-+	acesptr = (char *)*npntsd + acesoffset;
-+
-+
-+	return 0;
-+}
-+
-+static int
-+ace_add(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd, ssize_t *bufsize,
-+		struct cifs_ace **facesptr, int numfaces,
-+		struct cifs_ace **cacesptr, int numcaces)
-+{
-+	int i, rc, numaces, size, acessize = 0;
-+	size_t acesoffset;
-+	char *acesptr;
-+
-+	numaces = numfaces + numcaces;
-+	rc = get_sec_desc_size(pntsd, npntsd, numaces, bufsize, &acesoffset);
-+	if (rc)
-+		return rc;
-+
-+	acesptr = (char *)*npntsd + acesoffset;
-+	for (i = 0; i < numfaces; ++i) {
-+		size = copy_ace((struct cifs_ace *)acesptr, facesptr[i]);
-+		acesptr += size;
-+		acessize += size;
-+	}
-+	for (i = 0; i < numcaces; ++i) {
-+		size = copy_ace((struct cifs_ace *)acesptr, cacesptr[i]);
-+		acesptr += size;
-+		acessize += size;
-+	}
-+	copy_sec_desc(pntsd, *npntsd, numaces, acessize);
-+
-+	return 0;
-+}
-+
-+static int
-+ace_modify(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd, ssize_t *bufsize,
-+		struct cifs_ace **facesptr, int numfaces,
-+		struct cifs_ace **cacesptr, int numcaces)
-+{
-+	int i, j, rc, size, acessize = 0;
-+	size_t acesoffset;
-+	char *acesptr;
-+
-+	if (numfaces == 0) {
-+		printf("%s: No entries to modify", __func__);
-+		return -1;
-+	}
-+
-+	rc = get_sec_desc_size(pntsd, npntsd, numfaces, bufsize, &acesoffset);
-+	if (rc)
-+		return rc;
-+
-+	for (j = 0; j < numcaces; ++j) {
-+		for (i = 0; i < numfaces; ++i) {
-+			if (compare_aces(facesptr[i], cacesptr[j],
-+					COMPSID | COMPTYPE)) {
-+				copy_ace(facesptr[i], cacesptr[j]);
-+				break;
-+			}
-+		}
-+	}
-+
-+	acesptr = (char *)*npntsd + acesoffset;
-+	for (i = 0; i < numfaces; ++i) {
-+		size = copy_ace((struct cifs_ace *)acesptr, facesptr[i]);
-+		acesptr += size;
-+		acessize += size;
-+	}
-+
-+	copy_sec_desc(pntsd, *npntsd, numfaces, acessize);
-+
-+	return 0;
-+}
-+
-+static int
-+ace_delete(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd, ssize_t *bufsize,
-+		struct cifs_ace **facesptr, int numfaces,
-+		struct cifs_ace **cacesptr, int numcaces)
-+{
-+	int i, j, numaces = 0, rc, size, acessize = 0;
-+	size_t acesoffset;
-+	char *acesptr;
-+
-+	if (numfaces == 0) {
-+		printf("%s: No entries to delete\n", __func__);
-+		return -1;
-+	}
-+
-+	if (numfaces < numcaces) {
-+		printf("%s: Invalid entries to delete\n", __func__);
-+		return -1;
-+	}
-+
-+	rc = get_sec_desc_size(pntsd, npntsd, numfaces, bufsize, &acesoffset);
-+	if (rc)
-+		return rc;
-+
-+	acesptr = (char *)*npntsd + acesoffset;
-+	for (i = 0; i < numfaces; ++i) {
-+		for (j = 0; j < numcaces; ++j) {
-+			if (compare_aces(facesptr[i], cacesptr[j], COMPALL))
-+				break;
-+		}
-+		if (j == numcaces) {
-+			size = copy_ace((struct cifs_ace *)acesptr,
-+								facesptr[i]);
-+			acessize += size;
-+			acesptr += size;
-+			++numaces;
-+		}
-+	}
-+
-+	if (numaces == numfaces) {
-+		printf("%s: Nothing to delete\n", __func__);
-+		return 1;
-+	}
-+	copy_sec_desc(pntsd, *npntsd, numaces, acessize);
-+
-+	return 0;
-+}
-+
-+static int
-+get_numfaces(struct cifs_ntsd *pntsd, ssize_t acl_len,
-+			struct cifs_ctrl_acl **daclptr)
-+{
-+	int numfaces = 0;
-+	uint32_t dacloffset;
-+	struct cifs_ctrl_acl *ldaclptr;
-+	char *end_of_acl = ((char *)pntsd) + acl_len;
-+
-+	if (pntsd == NULL)
-+		return 0;
-+
-+	dacloffset = le32toh(pntsd->dacloffset);
-+	if (!dacloffset)
-+		return 0;
-+	else {
-+		ldaclptr = (struct cifs_ctrl_acl *)((char *)pntsd + dacloffset);
-+		/* validate that we do not go past end of acl */
-+		if (end_of_acl >= (char *)ldaclptr + le16toh(ldaclptr->size)) {
-+			numfaces = le32toh(ldaclptr->num_aces);
-+			*daclptr = ldaclptr;
-+		}
-+	}
-+
-+	return numfaces;
-+}
-+
-+static struct cifs_ace **
-+build_fetched_aces(char *daclptr, int numfaces)
-+{
-+	int i, j, rc = 0, acl_size;
-+	char *acl_base;
-+	struct cifs_ace *pace, **facesptr;
-+
-+	facesptr = (struct cifs_ace **)malloc(numfaces *
-+					sizeof(struct cifs_aces *));
-+	if (!facesptr) {
-+		printf("%s: Error %d allocating ACE array",
-+				__func__, errno);
-+		rc = errno;
-+	}
-+
-+	acl_base = daclptr;
-+	acl_size = sizeof(struct cifs_ctrl_acl);
-+	for (i = 0; i < numfaces; ++i) {
-+		facesptr[i] = malloc(sizeof(struct cifs_ace));
-+		if (!facesptr[i]) {
-+			rc = errno;
-+			goto build_fetched_aces_ret;
-+		}
-+		pace = (struct cifs_ace *) (acl_base + acl_size);
-+		memcpy(facesptr[i], pace, sizeof(struct cifs_ace));
-+		acl_base = (char *)pace;
-+		acl_size = le16toh(pace->size);
-+	}
-+
-+build_fetched_aces_ret:
-+	if (rc) {
-+		printf("%s: Invalid fetched ace\n", __func__);
-+		if (i) {
-+			for (j = i; j >= 0; --j)
-+				free(facesptr[j]);
-+		}
-+		free(facesptr);
-+	}
-+	return facesptr;
-+}
-+
-+static int
-+verify_ace_sid(char *sidstr, struct cifs_sid *sid)
-+{
-+	int rc;
-+	char *lstr;
-+	struct passwd *winpswdptr;
-+
-+	lstr = strstr(sidstr, "\\"); /* everything before | */
-+	if (lstr)
-+		++lstr;
-+	else
-+		lstr = sidstr;
-+
-+	/* Check if it is a (raw) SID (string) */
-+	rc = wbcStringToSid(lstr, (struct wbcDomainSid *)sid);
-+	if (!rc)
-+		return rc;
-+
-+	/* Check if it a name (string) which can be resolved to a SID*/
-+	rc = wbcGetpwnam(lstr, &winpswdptr);
-+	if (rc) {
-+		printf("%s: Invalid user name: %s\n", __func__, sidstr);
-+		return rc;
-+	}
-+	rc = wbcUidToSid(winpswdptr->pw_uid, (struct wbcDomainSid *)sid);
-+	if (rc) {
-+		printf("%s: Invalid user: %s\n", __func__, sidstr);
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+verify_ace_type(char *typestr, uint8_t *typeval)
-+{
-+	int i, len;
-+	char *invaltype;
-+
-+	if (strstr(typestr, "0x")) { /* hex type value */
-+		*typeval = strtol(typestr, &invaltype, 16);
-+		if (!strlen(invaltype)) {
-+			if (*typeval != ACCESS_ALLOWED &&
-+				*typeval != ACCESS_DENIED &&
-+				*typeval != ACCESS_ALLOWED_OBJECT &&
-+				*typeval != ACCESS_DENIED_OBJECT) {
-+					printf("%s: Invalid type: %s\n",
-+						__func__, typestr);
-+					return 1;
-+			}
-+			return 0;
-+		}
-+	}
-+
-+	len = strlen(typestr);
-+	for (i = 0; i < len; ++i)
-+		*(typestr + i) = toupper(*(typestr + i));
-+	if (!strcmp(typestr, "ALLOWED"))
-+		*typeval = 0x0;
-+	else if (!strcmp(typestr, "DENIED"))
-+		*typeval = 0x1;
-+	else if (!strcmp(typestr, "ALLOWED_OBJECT"))
-+		*typeval = 0x5;
-+	else if (!strcmp(typestr, "DENIED_OBJECT"))
-+		*typeval = 0x6;
-+	else {
-+		printf("%s: Invalid type: %s\n", __func__, typestr);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static uint8_t
-+ace_flag_value(char *flagstr)
-+{
-+	uint8_t flagval = 0x0;
-+	char *iflag;
-+
-+	iflag = strtok(flagstr, "|"); /* everything before | */
-+	while (iflag) {
-+		if (!strcmp(iflag, "OI"))
-+			flagval += 0x1;
-+		else if (!strcmp(iflag, "CI"))
-+			flagval += 0x2;
-+		else if (!strcmp(iflag, "NP"))
-+			flagval += 0x4;
-+		else if (!strcmp(iflag, "IO"))
-+			flagval += 0x8;
-+		else if (!strcmp(iflag, "I"))
-+			flagval += 0x10;
-+		else
-+			return 0x0; /* Invalid flag */
-+		iflag = strtok(NULL, "|"); /* everything before | */
-+	}
-+
-+	return flagval;
-+}
-+
-+static int
-+verify_ace_flags(char *flagstr, uint8_t *flagval)
-+{
-+	char *invalflag;
-+
-+	if (!strcmp(flagstr, "0") || !strcmp(flagstr, "0x0"))
-+		return 0;
-+
-+	if (strstr(flagstr, "0x")) { /* hex flag value */
-+		*flagval = strtol(flagstr, &invalflag, 16);
-+		if (strlen(invalflag)) {
-+			printf("%s: Invalid flags: %s\n", __func__, flagstr);
-+			return 1;
-+		}
-+	} else
-+		*flagval = ace_flag_value(flagstr);
-+
-+	if (!*flagval || (*flagval & ~VFLAGS)) {
-+		printf("%s: Invalid flag %s and value: 0x%x\n",
-+			__func__, flagstr, *flagval);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static uint32_t
-+ace_mask_value(char *maskstr)
-+{
-+	int i, len;
-+	uint32_t maskval = 0x0;
-+	char *lmask;
-+
-+	if (!strcmp(maskstr, "FULL"))
-+		return FULL_CONTROL;
-+	else if (!strcmp(maskstr, "CHANGE"))
-+		return CHANGE;
-+	else if (!strcmp(maskstr, "D"))
-+		return DELETE;
-+	else if (!strcmp(maskstr, "READ"))
-+		return EREAD;
-+	else {
-+		len = strlen(maskstr);
-+		lmask = maskstr;
-+		for (i = 0; i < len; ++i, ++lmask) {
-+			if (*lmask == 'R')
-+				maskval |= EREAD;
-+			else if (*lmask == 'W')
-+				maskval |= EWRITE;
-+			else if (*lmask == 'X')
-+				maskval |= EXEC;
-+			else if (*lmask == 'D')
-+				maskval |= DELETE;
-+			else if (*lmask == 'P')
-+				maskval |= WRITE_DAC;
-+			else if (*lmask == 'O')
-+				maskval |= WRITE_OWNER;
-+			else
-+				return 0;
-+		}
-+		return maskval;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+verify_ace_mask(char *maskstr, uint32_t *maskval)
-+{
-+	char *invalflag;
-+
-+	if (strstr(maskstr, "0x") || !strcmp(maskstr, "DELDHLD")) {
-+		*maskval = strtol(maskstr, &invalflag, 16);
-+		if (!invalflag) {
-+			printf("%s: Invalid mask: %s\n", __func__, maskstr);
-+			return 1;
-+		}
-+	} else
-+		*maskval = ace_mask_value(maskstr);
-+
-+	if (!*maskval) {
-+		printf("%s: Invalid mask %s and value: 0x%x\n",
-+			__func__, maskstr, *maskval);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct cifs_ace **
-+build_cmdline_aces(char **arrptr, int numcaces)
-+{
-+	int i, rc = 0;
-+	char *acesid, *acetype, *aceflag, *acemask;
-+	struct cifs_ace **cacesptr;
-+
-+	cacesptr = (struct cifs_ace **)malloc(numcaces *
-+				sizeof(struct cifs_aces *));
-+	if (!cacesptr) {
-+		printf("%s: Error %d allocating ACE array", __func__, errno);
-+		return NULL;
-+	}
-+
-+	for (i = 0; i < numcaces; ++i) {
-+		acesid = strtok(arrptr[i], ":");
-+		acetype = strtok(NULL, "/");
-+		aceflag = strtok(NULL, "/");
-+		acemask = strtok(NULL, "/");
-+
-+		if (!acesid || !acetype || !aceflag || !acemask) {
-+			printf("%s: Incomplete ACE: %s\n", __func__, arrptr[i]);
-+			rc = 1;
-+			goto build_cmdline_aces_ret;
-+		}
-+
-+		cacesptr[i] = malloc(sizeof(struct cifs_ace));
-+		if (!cacesptr[i]) {
-+			printf("%s: ACE alloc error %d\n", __func__, errno);
-+			rc = errno;
-+			goto build_cmdline_aces_ret;
-+		}
-+
-+		if (verify_ace_sid(acesid, &cacesptr[i]->sid)) {
-+			printf("%s: Invalid SID: %s\n", __func__, arrptr[i]);
-+			rc = 1;
-+			goto build_cmdline_aces_ret;
-+		}
-+
-+		if (verify_ace_type(acetype, &cacesptr[i]->type)) {
-+			printf("%s: Invalid ACE type: %s\n",
-+					__func__, arrptr[i]);
-+			rc = 1;
-+			goto build_cmdline_aces_ret;
-+		}
-+
-+		if (verify_ace_flags(aceflag, &cacesptr[i]->flags)) {
-+			printf("%s: Invalid ACE flag: %s\n",
-+				__func__, arrptr[i]);
-+			rc = 1;
-+			goto build_cmdline_aces_ret;
-+		}
-+
-+		if (verify_ace_mask(acemask, &cacesptr[i]->access_req)) {
-+			printf("%s: Invalid ACE mask: %s\n",
-+				__func__, arrptr[i]);
-+			rc = 1;
-+			goto build_cmdline_aces_ret;
-+		}
-+
-+		cacesptr[i]->size = 1 + 1 + 2 + 4 + 1 + 1 + 6 +
-+				(cacesptr[i]->sid.num_subauth * 4);
-+	}
-+	return cacesptr;
-+
-+build_cmdline_aces_ret:
-+	for (; i >= 0; --i)
-+		free(cacesptr[i]);
-+	free(cacesptr);
-+	return NULL;
-+}
-+
-+static char **
-+parse_cmdline_aces(char *optarg, int numcaces)
-+{
-+	int i = 0, len;
-+	char *acestr, *vacestr, **arrptr = NULL;
-+
-+	errno = EINVAL;
-+	arrptr = (char **)malloc(numcaces * sizeof(char *));
-+	if (!arrptr) {
-+		printf("%s: Error %d allocating char array\n", __func__, errno);
-+		return NULL;
-+	}
-+
-+	while (i < numcaces) {
-+		acestr = strtok(optarg, ","); /* everything before , */
-+		if (acestr) {
-+			vacestr = strstr(acestr, "ACL:"); /* ace as ACL:*" */
-+			if (vacestr) {
-+				vacestr = strchr(vacestr, ':');
-+				if (vacestr)
-+					++vacestr; /* go past : */
-+				if (vacestr) {
-+					len = strlen(vacestr);
-+					arrptr[i] = malloc(len + 1);
-+					if (!arrptr[i])
-+						goto parse_cmdline_aces_ret;
-+					strcpy(arrptr[i], vacestr);
-+					++i;
-+				} else
-+					goto parse_cmdline_aces_ret;
-+			} else
-+				goto parse_cmdline_aces_ret;
-+		} else
-+			goto parse_cmdline_aces_ret;
-+		optarg = NULL;
-+	}
-+	errno = 0;
-+	return arrptr;
-+
-+parse_cmdline_aces_ret:
-+	printf("%s: Error %d parsing ACEs\n", __func__, errno);
-+	for (;  i >= 0; --i)
-+		free(arrptr[i]);
-+	free(arrptr);
-+	return NULL;
-+}
-+
-+static unsigned int
-+get_numcaces(const char *optarg)
-+{
-+	int i, len;
-+	unsigned int numcaces = 1;
-+
-+	if (!optarg)
-+		return 0;
-+
-+	len = strlen(optarg);
-+	for (i = 0; i < len; ++i) {
-+		if (*(optarg + i) == ',')
-+			++numcaces;
-+	}
-+
-+	return numcaces;
-+}
-+
-+static int
-+setacl_action(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd,
-+		ssize_t *bufsize, struct cifs_ace **facesptr, int numfaces,
-+		struct cifs_ace **cacesptr, int numcaces,
-+		int maction)
-+{
-+	int rc = 1;
-+
-+	switch (maction) {
-+	case 0:
-+		rc = ace_delete(pntsd, npntsd, bufsize, facesptr,
-+				numfaces, cacesptr, numcaces);
-+		break;
-+	case 1:
-+		rc = ace_modify(pntsd, npntsd, bufsize, facesptr,
-+				numfaces, cacesptr, numcaces);
-+		break;
-+	case 2:
-+		rc = ace_add(pntsd, npntsd, bufsize, facesptr,
-+				numfaces, cacesptr, numcaces);
-+		break;
-+	case 3:
-+		rc = ace_set(pntsd, npntsd, bufsize, cacesptr, numcaces);
-+		break;
-+	default:
-+		printf("%s: Invalid action: %d\n", __func__, maction);
-+		break;
-+	}
-+
-+	return rc;
-+}
-+
-+static void
-+setcifsacl_usage(void)
-+{
-+	fprintf(stderr,
-+	"%s: Alter CIFS/NTFS ACL in a security descriptor of a file object\n",
-+		prog);
-+	fprintf(stderr, "Usage: %s option <list_of_ACEs> <file_name>\n", prog);
-+	fprintf(stderr, "Valid options:\n");
-+	fprintf(stderr, "\t-v	Version of the program\n");
-+	fprintf(stderr, "\n\t-a	Add ACE(s), separated by a comma, to an ACL\n");
-+	fprintf(stderr,
-+	"\tsetcifsacl -a \"ACL:Administrator:ALLOWED/0x0/FULL\" <file_name>\n");
-+	fprintf(stderr, "\n");
-+	fprintf(stderr,
-+	"\t-D	Delete ACE(s), separated by a comma, from an ACL\n");
-+	fprintf(stderr,
-+	"\tsetcifsacl -D \"ACL:Administrator:DENIED/0x0/D\" <file_name>\n");
-+	fprintf(stderr, "\n");
-+	fprintf(stderr,
-+	"\t-M	Modify ACE(s), separated by a comma, in an ACL\n");
-+	fprintf(stderr,
-+	"\tsetcifsacl -M \"ACL:user1:ALLOWED/0x0/0x1e01ff\" <file_name>\n");
-+	fprintf(stderr,
-+	"\n\t-S	Replace existing ACL with ACE(s), separated by a comma\n");
-+	fprintf(stderr,
-+	"\tsetcifsacl -S \"ACL:Administrator:ALLOWED/0x0/D\" <file_name>\n");
-+	fprintf(stderr, "\nRefer to setcifsacl(8) manpage for details\n");
-+}
-+
-+int
-+main(const int argc, char *const argv[])
-+{
-+	int i, rc, c, numcaces, numfaces, maction = -1;
-+	ssize_t attrlen, bufsize = BUFSIZE;
-+	char *filename, *attrval, **arrptr = NULL;
-+	struct cifs_ctrl_acl *daclptr = NULL;
-+	struct cifs_ace **cacesptr = NULL, **facesptr = NULL;
-+	struct cifs_ntsd *ntsdptr = NULL;
-+
-+	openlog(prog, 0, LOG_DAEMON);
-+
-+	while ((c = getopt_long(argc, argv, "D:M:a:S:v", NULL, NULL)) != -1) {
-+		switch (c) {
-+		case 'v':
-+			printf("Version: %s\n", VERSION);
-+			goto out;
-+		case 'D':
-+			maction = 0;
-+			break;
-+		case 'M':
-+			maction = 1;
-+			break;
-+		case 'a':
-+			maction = 2;
-+			break;
-+		case 'S':
-+			maction = 3;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+	if (argc != 4) {
-+		setcifsacl_usage();
-+		return -1;
-+	}
-+	filename = argv[3];
-+
-+	numcaces = get_numcaces(optarg);
-+	if (!numcaces) {
-+		printf("%s: No valid ACEs specified", __func__);
-+		return -1;
-+	}
-+
-+	arrptr = parse_cmdline_aces(optarg, numcaces);
-+	if (!arrptr)
-+		goto setcifsacl_numcaces_ret;
-+
-+	cacesptr = build_cmdline_aces(arrptr, numcaces);
-+	if (!cacesptr)
-+		goto setcifsacl_cmdlineparse_ret;
-+
-+cifsacl:
-+	if (bufsize >= XATTR_SIZE_MAX) {
-+		printf("%s: Buffer size %ld exceeds max size of %d\n",
-+				__func__, bufsize, XATTR_SIZE_MAX);
-+		goto setcifsacl_cmdlineverify_ret;
-+	}
-+
-+	attrval = malloc(bufsize * sizeof(char));
-+	if (!attrval) {
-+		printf("error allocating memory for attribute value buffer\n");
-+		goto setcifsacl_cmdlineverify_ret;
-+	}
-+
-+	attrlen = getxattr(filename, ATTRNAME, attrval, bufsize);
-+	if (attrlen == -1) {
-+		if (errno == ERANGE) {
-+			free(attrval);
-+			bufsize += BUFSIZE;
-+			goto cifsacl;
-+		} else {
-+			printf("getxattr error: %d\n", errno);
-+			goto setcifsacl_getx_ret;
-+		}
-+	}
-+
-+	numfaces = get_numfaces((struct cifs_ntsd *)attrval, attrlen, &daclptr);
-+	if (!numfaces && maction != 2) { /* if we are not adding aces */
-+		printf("%s: Empty DACL\n", __func__);
-+		goto setcifsacl_facenum_ret;
-+	}
-+
-+	facesptr = build_fetched_aces((char *)daclptr, numfaces);
-+	if (!facesptr)
-+		goto setcifsacl_facenum_ret;
-+
-+	bufsize = 0;
-+	rc = setacl_action((struct cifs_ntsd *)attrval, &ntsdptr, &bufsize,
-+		facesptr, numfaces, cacesptr, numcaces, maction);
-+	if (rc)
-+		goto setcifsacl_action_ret;
-+
-+	attrlen = setxattr(filename, ATTRNAME, ntsdptr, bufsize, 0);
-+	if (attrlen == -1)
-+		printf("%s: setxattr error: %s\n", __func__, strerror(errno));
-+	goto setcifsacl_facenum_ret;
-+
-+out:
-+	return 0;
-+
-+setcifsacl_action_ret:
-+	free(ntsdptr);
-+
-+setcifsacl_facenum_ret:
-+	for (i = 0; i < numfaces; ++i)
-+		free(facesptr[i]);
-+	free(facesptr);
-+
-+setcifsacl_getx_ret:
-+	free(attrval);
-+
-+setcifsacl_cmdlineverify_ret:
-+	for (i = 0; i < numcaces; ++i)
-+		free(cacesptr[i]);
-+	free(cacesptr);
-+
-+setcifsacl_cmdlineparse_ret:
-+	for (i = 0; i < numcaces; ++i)
-+		free(arrptr[i]);
-+	free(arrptr);
-+
-+setcifsacl_numcaces_ret:
-+	return -1;
-+}
+diff --git a/Makefile.am b/Makefile.am
+index 4938447..7d4bdea 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -9,7 +9,7 @@ mount_cifs_LDADD = $(LIBCAP) $(CAPNG_LDADD)
+ man_MANS = mount.cifs.8
+ 
+ sbin_PROGRAMS =
+-clean-local: clean-local-upcall clean-local-idmap
++clean-local: clean-local-upcall clean-local-idmap clean-local-aclprogs
+ 
+ if CONFIG_CIFSUPCALL
+ sbin_PROGRAMS += cifs.upcall
+@@ -50,3 +50,25 @@ clean-local-idmap:
+ if CONFIG_CIFSIDMAP
+ 	rm -f cifs.idmap.8 cifs.idmap.8-t
+ endif
++
++if CONFIG_CIFSACL
++sbin_PROGRAMS += getcifsacl
++getcifsacl_SOURCES = getcifsacl.c
++getcifsacl_LDADD = -lkeyutils $(WINB_LDADD)
++man_MANS += getcifsacl.8
++
++sbin_PROGRAMS += setcifsacl
++setcifsacl_SOURCES = setcifsacl.c
++setcifsacl_LDADD = -lkeyutils $(WINB_LDADD)
++man_MANS += setcifsacl.8
++
++getcifsacl.8: getcifsacl.8.in
++	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
++setcifsacl.8: setcifsacl.8.in
++	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
++endif
++
++clean-local-aclprogs:
++if CONFIG_CIFSACL
++	rm -f getcifsacl.8 getcifsacl.8-t setcifsacl.8 setcifsacl.8-t
++endif
+diff --git a/configure.ac b/configure.ac
+index 780abe7..5b2bc6d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -28,13 +28,19 @@ AC_ARG_ENABLE(cifsidmap,
+ 	enable_cifsidmap=$enableval,
+ 	enable_cifsidmap="maybe")
+ 
++AC_ARG_ENABLE(cifsacl,
++	[AC_HELP_STRING([--enable-cifsacl],
++			[Create get/set cifsacl binary @<:@default=no@:>@])],
++	enable_cifsacl=$enableval,
++	enable_cifsacl="maybe")
++
+ # Checks for programs.
+ AC_PROG_CC
+ AC_PROG_SED
+ AC_GNU_SOURCE
+ 
+ # Checks for header files.
+-AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
++AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h string.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h sys/xattr.h syslog.h unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
+ 
+ if test $enable_cifsupcall != "no"; then
+ 	AC_CHECK_HEADERS([krb5.h krb5/krb5.h])
+@@ -94,6 +100,22 @@ if test $enable_cifsupcall != "no" -o $enable_cifsidmap != "no"; then
+ 				fi
+ 			])
+ fi
++if test $enable_cifsacl != "no"; then
++	AC_CHECK_HEADERS([wbclient.h], , [
++				if test "$enable_cifsupcall" = "yes"; then
++					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
++				else
++					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling get/setcifsacl.])
++					enable_cifsacl="no"
++				fi
++				if test "$enable_cifsacl" = "yes"; then
++					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
++				else
++					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling get/setcifsacl.])
++					enable_cifsacl="no"
++				fi
++			])
++fi
+ if test $enable_cifsupcall != "no"; then
+ 	AC_CHECK_LIB([krb5], [krb5_init_context],
+ 			[ KRB5_LDADD='-lkrb5' ],
+@@ -156,6 +178,7 @@ LIBS=$cu_saved_libs
+ AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
+ AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
++AM_CONDITIONAL(CONFIG_CIFSACL, [test "$enable_cifsacl" != "no"])
+ 
+ LIBCAP_NG_PATH
+ 
 -- 
 1.6.0.2
