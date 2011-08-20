@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/14] cifs: clean up checkSMB
-Date: Fri, 19 Aug 2011 21:55:33 -0400
-Message-ID: <1313805339-1233-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/14] cifs: move buffer pointers into TCP_Server_Info
+Date: Fri, 19 Aug 2011 21:55:36 -0400
+Message-ID: <1313805339-1233-12-git-send-email-jlayton@redhat.com>
 References: <1313805339-1233-1-git-send-email-jlayton@redhat.com>
 Cc: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,134 +10,251 @@ In-Reply-To: <1313805339-1233-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The variable names in this function are so ambiguous that it's very
-difficult to know what it's doing. Rename them to make it a bit more
-clear.
-
-Also, remove a redundant length check. cifsd checks to make sure that
-the rfclen isn't larger than the maximum frame size when it does the
-receive.
-
-Finally, change checkSMB to return a real error code (-EIO) when
-it finds an error. That will help simplify some coming changes in the
-callers.
+We have several functions that need to access these pointers. Currently
+that's done with a lot of double pointer passing. Instead, move them
+into the TCP_Server_Info and simplify the handling.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |    2 +-
- fs/cifs/misc.c    |   51 +++++++++++++++++++++++++--------------------------
- 2 files changed, 26 insertions(+), 27 deletions(-)
+ fs/cifs/cifsglob.h |    4 ++
+ fs/cifs/connect.c  |  101 +++++++++++++++++++++++----------------------------
+ 2 files changed, 50 insertions(+), 55 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 95dad9d..ea5ca9a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -286,7 +286,11 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_kerberos;		/* supports plain Kerberos */
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
++	bool	large_buf;		/* is current buffer large? */
+ 	struct delayed_work	echo; /* echo ping workqueue job */
++	char	*smallbuf;	/* pointer to current "small" buffer */
++	char	*bigbuf;	/* pointer to current "big" buffer */
++	unsigned int total_read; /* total amount of data read in this pass */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
+ #endif
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5adbeec..28007fd 100644
+index 49c7eee..4b727c2 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -422,7 +422,7 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 
- 	/*
- 	 * FIXME: allocation here may cause deadlocks under memory pressure.
--	 * Switch this to use a fixed, per-socket buffer?
-+	 * Switch this to use a fixed, per-socket buffer.
- 	 */
- 	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_KERNEL);
- 	if (!iov)
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 7c16933..4a1801b 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -420,19 +420,22 @@ check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+@@ -320,27 +320,24 @@ requeue_echo:
  }
  
- int
--checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
-+checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int total_read)
+ static bool
+-allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
+-		 bool is_large_buf)
++allocate_buffers(struct TCP_Server_Info *server)
  {
--	__u32 len = be32_to_cpu(smb->smb_buf_length);
-+	__u32 rfclen = be32_to_cpu(smb->smb_buf_length);
- 	__u32 clc_len;  /* calculated length */
--	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
-+	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x",
-+		total_read, rfclen);
+-	char *bbuf = *bigbuf, *sbuf = *smallbuf;
+-
+-	if (bbuf == NULL) {
+-		bbuf = (char *)cifs_buf_get();
+-		if (!bbuf) {
++	if (!server->bigbuf) {
++		server->bigbuf = (char *)cifs_buf_get();
++		if (!server->bigbuf) {
+ 			cERROR(1, "No memory for large SMB response");
+ 			msleep(3000);
+ 			/* retry will check if exiting */
+ 			return false;
+ 		}
+-	} else if (is_large_buf) {
++	} else if (server->large_buf) {
+ 		/* we are reusing a dirty large buf, clear its start */
+-		memset(bbuf, 0, size);
++		memset(server->bigbuf, 0, sizeof(struct smb_hdr));
+ 	}
  
--	if (length < 2 + sizeof(struct smb_hdr)) {
--		if ((length >= sizeof(struct smb_hdr) - 1)
-+	/* is this frame too small to even get to a BCC? */
-+	if (total_read < 2 + sizeof(struct smb_hdr)) {
-+		if ((total_read >= sizeof(struct smb_hdr) - 1)
- 			    && (smb->Status.CifsError != 0)) {
-+			/* it's an error return */
- 			smb->WordCount = 0;
- 			/* some error cases do not return wct and bcc */
- 			return 0;
--		} else if ((length == sizeof(struct smb_hdr) + 1) &&
-+		} else if ((total_read == sizeof(struct smb_hdr) + 1) &&
- 				(smb->WordCount == 0)) {
- 			char *tmp = (char *)smb;
- 			/* Need to work around a bug in two servers here */
-@@ -452,39 +455,35 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+-	if (sbuf == NULL) {
+-		sbuf = (char *)cifs_small_buf_get();
+-		if (!sbuf) {
++	if (!server->smallbuf) {
++		server->smallbuf = (char *)cifs_small_buf_get();
++		if (!server->smallbuf) {
+ 			cERROR(1, "No memory for SMB response");
+ 			msleep(1000);
+ 			/* retry will check if exiting */
+@@ -349,12 +346,9 @@ allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
+ 		/* beginning of smb buffer is cleared in our buf_get */
+ 	} else {
+ 		/* if existing small buf clear beginning */
+-		memset(sbuf, 0, size);
++		memset(server->smallbuf, 0, sizeof(struct smb_hdr));
+ 	}
+ 
+-	*bigbuf = bbuf;
+-	*smallbuf = sbuf;
+-
+ 	return true;
+ }
+ 
+@@ -563,7 +557,7 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
+ 
+ static struct mid_q_entry *
+ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-	      int malformed, bool is_large_buf, char **bigbuf)
++	      int malformed)
+ {
+ 	struct mid_q_entry *mid = NULL;
+ 
+@@ -584,19 +578,27 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+ 			mid->multiEnd = true;
+ 			goto multi_t2_fnd;
+ 		}
+-		if (!is_large_buf) {
++		if (!server->large_buf) {
+ 			/*FIXME: switch to already allocated largebuf?*/
+ 			cERROR(1, "1st trans2 resp needs bigbuf");
  		} else {
- 			cERROR(1, "Length less than smb header size");
+ 			/* Have first buffer */
+ 			mid->resp_buf = buf;
+ 			mid->largeBuf = true;
+-			*bigbuf = NULL;
++			server->bigbuf = NULL;
  		}
--		return 1;
--	}
--	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
--		cERROR(1, "smb length greater than MaxBufSize, mid=%d",
--				   smb->Mid);
--		return 1;
-+		return -EIO;
+ 		return mid;
  	}
+ 	mid->resp_buf = buf;
+-	mid->largeBuf = is_large_buf;
++	mid->largeBuf = server->large_buf;
++	/* Was previous buf put in mpx struct for multi-rsp? */
++	if (!mid->multiRsp) {
++		/* smb buffer will be freed by user thread */
++		if (server->large_buf)
++			server->bigbuf = NULL;
++		else
++			server->smallbuf = NULL;
++	}
+ multi_t2_fnd:
+ 	dequeue_mid(mid, malformed);
+ 	return mid;
+@@ -702,12 +704,11 @@ cifs_demultiplex_thread(void *p)
+ {
+ 	int length;
+ 	struct TCP_Server_Info *server = p;
+-	unsigned int pdu_length, total_read;
+-	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
++	unsigned int pdu_length;
++	char *buf = NULL;
+ 	struct smb_hdr *smb_buffer = NULL;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+-	bool isLargeBuf = false;
  
-+	/* otherwise, there is enough to get to the BCC */
- 	if (check_smb_hdr(smb, mid))
--		return 1;
-+		return -EIO;
- 	clc_len = smbCalcSize(smb);
+ 	current->flags |= PF_MEMALLOC;
+ 	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
+@@ -722,19 +723,18 @@ cifs_demultiplex_thread(void *p)
+ 		if (try_to_freeze())
+ 			continue;
  
--	if (4 + len != length) {
-+	if (4 + rfclen != total_read) {
- 		cERROR(1, "Length read does not match RFC1001 length %d",
--			   len);
--		return 1;
-+				rfclen);
-+		return -EIO;
- 	}
+-		if (!allocate_buffers(&bigbuf, &smallbuf,
+-				      sizeof(struct smb_hdr), isLargeBuf))
++		if (!allocate_buffers(server))
+ 			continue;
  
--	if (4 + len != clc_len) {
-+	if (4 + rfclen != clc_len) {
- 		/* check if bcc wrapped around for large read responses */
--		if ((len > 64 * 1024) && (len > clc_len)) {
-+		if ((rfclen > 64 * 1024) && (rfclen > clc_len)) {
- 			/* check if lengths match mod 64K */
--			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
-+			if (((4 + rfclen) & 0xFFFF) == (clc_len & 0xFFFF))
- 				return 0; /* bcc wrapped */
+-		isLargeBuf = false;
+-		smb_buffer = (struct smb_hdr *)smallbuf;
+-		buf = smallbuf;
++		server->large_buf = false;
++		smb_buffer = (struct smb_hdr *)server->smallbuf;
++		buf = server->smallbuf;
+ 		pdu_length = 4; /* enough to get RFC1001 header */
+ 
+ 		length = read_from_socket(server, buf, pdu_length);
+ 		if (length < 0)
+ 			continue;
+-		total_read = length;
++		server->total_read = length;
+ 
+ 		/*
+ 		 * The right amount was read from socket - 4 bytes,
+@@ -760,7 +760,7 @@ cifs_demultiplex_thread(void *p)
+ 					  sizeof(struct smb_hdr) - 1 - 4);
+ 		if (length < 0)
+ 			continue;
+-		total_read += length;
++		server->total_read += length;
+ 
+ 		if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+ 			cERROR(1, "SMB response too long (%u bytes)",
+@@ -772,10 +772,11 @@ cifs_demultiplex_thread(void *p)
+ 
+ 		/* else length ok */
+ 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
+-			isLargeBuf = true;
+-			memcpy(bigbuf, smallbuf, total_read);
+-			smb_buffer = (struct smb_hdr *)bigbuf;
+-			buf = bigbuf;
++			server->large_buf = true;
++			memcpy(server->bigbuf, server->smallbuf,
++			       server->total_read);
++			smb_buffer = (struct smb_hdr *)server->bigbuf;
++			buf = server->bigbuf;
  		}
- 		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
--				clc_len, 4 + len, smb->Mid);
-+				clc_len, 4 + rfclen, smb->Mid);
  
--		if (4 + len < clc_len) {
-+		if (4 + rfclen < clc_len) {
- 			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
--					len, smb->Mid);
--			return 1;
--		} else if (len > clc_len + 512) {
-+					rfclen, smb->Mid);
-+			return -EIO;
-+		} else if (rfclen > clc_len + 512) {
- 			/*
- 			 * Some servers (Windows XP in particular) send more
- 			 * data than the lengths in the SMB packet would
-@@ -495,8 +494,8 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
- 			 * data to 512 bytes.
- 			 */
- 			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
--				  "than SMB for mid=%u", len, smb->Mid);
--			return 1;
-+				  "than SMB for mid=%u", rfclen, smb->Mid);
-+			return -EIO;
- 		}
- 	}
- 	return 0;
+ 		/* now read the rest */
+@@ -784,9 +785,9 @@ cifs_demultiplex_thread(void *p)
+ 				  pdu_length - sizeof(struct smb_hdr) + 1 + 4);
+ 		if (length < 0)
+ 			continue;
+-		total_read += length;
++		server->total_read += length;
+ 
+-		dump_smb(smb_buffer, total_read);
++		dump_smb(smb_buffer, server->total_read);
+ 
+ 		/*
+ 		 * We know that we received enough to get to the MID as we
+@@ -797,28 +798,18 @@ cifs_demultiplex_thread(void *p)
+ 		 * 48 bytes is enough to display the header and a little bit
+ 		 * into the payload for debugging purposes.
+ 		 */
+-		length = checkSMB(smb_buffer, smb_buffer->Mid, total_read);
++		length = checkSMB(smb_buffer, smb_buffer->Mid,
++				  server->total_read);
+ 		if (length != 0)
+ 			cifs_dump_mem("Bad SMB: ", buf,
+-				      min_t(unsigned int, total_read, 48));
++				min_t(unsigned int, server->total_read, 48));
+ 
+ 		server->lstrp = jiffies;
+ 
+-		mid_entry = find_cifs_mid(server, smb_buffer, length,
+-					  isLargeBuf, &bigbuf);
++		mid_entry = find_cifs_mid(server, smb_buffer, length);
+ 		if (mid_entry != NULL) {
+-			if (mid_entry->multiRsp && !mid_entry->multiEnd)
+-				continue;
+-
+-			/* Was previous buf put in mpx struct for multi-rsp? */
+-			if (!mid_entry->multiRsp) {
+-				/* smb buffer will be freed by user thread */
+-				if (isLargeBuf)
+-					bigbuf = NULL;
+-				else
+-					smallbuf = NULL;
+-			}
+-			mid_entry->callback(mid_entry);
++			if (!mid_entry->multiRsp || mid_entry->multiEnd)
++				mid_entry->callback(mid_entry);
+ 		} else if (length != 0) {
+ 			/* response sanity checks failed */
+ 			continue;
+@@ -836,9 +827,9 @@ cifs_demultiplex_thread(void *p)
+ 	} /* end while !EXITING */
+ 
+ 	/* buffer usually freed in free_mid - need to free it here on exit */
+-	cifs_buf_release(bigbuf);
+-	if (smallbuf) /* no sense logging a debug message if NULL */
+-		cifs_small_buf_release(smallbuf);
++	cifs_buf_release(server->bigbuf);
++	if (server->smallbuf) /* no sense logging a debug message if NULL */
++		cifs_small_buf_release(server->smallbuf);
+ 
+ 	task_to_wake = xchg(&server->tsk, NULL);
+ 	clean_demultiplex_info(server);
 -- 
 1.7.6
