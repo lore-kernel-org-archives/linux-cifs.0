@@ -1,46 +1,42 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] CIFS: Fix ERR_PTR dereference in cifs_get_root
-Date: Sun, 21 Aug 2011 19:30:15 +0400
-Message-ID: <1313940615-3347-1-git-send-email-piastryyy@gmail.com>
+From: Elias Pipping <pipping-N9AOi2cAC9ZBDgjK7y7TUQ@public.gmane.org>
+Subject: --enable-cifsidmap [default=no]
+Date: Sun, 21 Aug 2011 17:40:50 +0200 (CEST)
+Message-ID: <20110821.174050.349078853015387924.pipping@lavabit.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-move it to the beginning of the loop.
+Hello,
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsfs.c |   10 ++++++----
- 1 files changed, 6 insertions(+), 4 deletions(-)
+configure.ac from cifs-utils 5.0 contains
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 0435bb9..8b79122 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -559,6 +559,12 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
- 		struct inode *dir = dentry->d_inode;
- 		struct dentry *child;
- 
-+		if (!dir) {
-+			dput(dentry);
-+			dentry = ERR_PTR(-ENOENT);
-+			break;
-+		}
-+
- 		/* skip separators */
- 		while (*s == sep)
- 			s++;
-@@ -574,10 +580,6 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
- 		mutex_unlock(&dir->i_mutex);
- 		dput(dentry);
- 		dentry = child;
--		if (!dentry->d_inode) {
--			dput(dentry);
--			dentry = ERR_PTR(-ENOENT);
--		}
- 	} while (!IS_ERR(dentry));
- 	_FreeXid(xid);
- 	kfree(full_path);
--- 
-1.7.1
+  AC_ARG_ENABLE(cifsidmap,
+          [AC_HELP_STRING([--enable-cifsidmap],
+                          [Create cifs.idmap binary @<:@default=no@:>@])],
+          enable_cifsidmap=$enableval,
+          enable_cifsidmap="maybe")
+
+>From my understanding, this should either be
+
+  AC_ARG_ENABLE(cifsidmap,
+          [AC_HELP_STRING([--enable-cifsidmap],
+                          [Create cifs.idmap binary @<:@default=no@:>@])],
+          enable_cifsidmap=$enableval,
+          enable_cifsidmap="no")
+
+or
+
+  AC_ARG_ENABLE(cifsidmap,
+          [AC_HELP_STRING([--enable-cifsidmap],
+                          [Create cifs.idmap binary @<:@default=yes@:>@])],
+          enable_cifsidmap=$enableval,
+          enable_cifsidmap="maybe")
+
+
+Best regards,
+
+Elias Pipping
