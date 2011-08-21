@@ -1,42 +1,60 @@
-From: Elias Pipping <pipping-N9AOi2cAC9ZBDgjK7y7TUQ@public.gmane.org>
-Subject: --enable-cifsidmap [default=no]
-Date: Sun, 21 Aug 2011 17:40:50 +0200 (CEST)
-Message-ID: <20110821.174050.349078853015387924.pipping@lavabit.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix ERR_PTR dereference in cifs_get_root
+Date: Sun, 21 Aug 2011 12:22:51 -0400
+Message-ID: <20110821122251.1e3c05bc@tlielax.poochiereds.net>
+References: <1313940615-3347-1-git-send-email-piastryyy@gmail.com>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1313940615-3347-1-git-send-email-piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+On Sun, 21 Aug 2011 19:30:15 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-configure.ac from cifs-utils 5.0 contains
+> move it to the beginning of the loop.
+> 
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c |   10 ++++++----
+>  1 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 0435bb9..8b79122 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -559,6 +559,12 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+>  		struct inode *dir = dentry->d_inode;
+>  		struct dentry *child;
+>  
+> +		if (!dir) {
+> +			dput(dentry);
+> +			dentry = ERR_PTR(-ENOENT);
+> +			break;
+> +		}
+> +
+>  		/* skip separators */
+>  		while (*s == sep)
+>  			s++;
+> @@ -574,10 +580,6 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+>  		mutex_unlock(&dir->i_mutex);
+>  		dput(dentry);
+>  		dentry = child;
+> -		if (!dentry->d_inode) {
+> -			dput(dentry);
+> -			dentry = ERR_PTR(-ENOENT);
+> -		}
+>  	} while (!IS_ERR(dentry));
+>  	_FreeXid(xid);
+>  	kfree(full_path);
 
-  AC_ARG_ENABLE(cifsidmap,
-          [AC_HELP_STRING([--enable-cifsidmap],
-                          [Create cifs.idmap binary @<:@default=no@:>@])],
-          enable_cifsidmap=$enableval,
-          enable_cifsidmap="maybe")
+What exactly does this fix? The only possible thing I could see it is
+if sb->s_root was a negative dentry, and I'm not sure that would ever
+happen. Would it?
 
->From my understanding, this should either be
-
-  AC_ARG_ENABLE(cifsidmap,
-          [AC_HELP_STRING([--enable-cifsidmap],
-                          [Create cifs.idmap binary @<:@default=no@:>@])],
-          enable_cifsidmap=$enableval,
-          enable_cifsidmap="no")
-
-or
-
-  AC_ARG_ENABLE(cifsidmap,
-          [AC_HELP_STRING([--enable-cifsidmap],
-                          [Create cifs.idmap binary @<:@default=yes@:>@])],
-          enable_cifsidmap=$enableval,
-          enable_cifsidmap="maybe")
-
-
-Best regards,
-
-Elias Pipping
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
