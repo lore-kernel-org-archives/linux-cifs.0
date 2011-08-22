@@ -1,207 +1,237 @@
-From: =?UTF-8?B?VGlsbCBEw7ZyZ2Vz?= <doerges-/hMagybUd5GoYr4blSSd5g@public.gmane.org>
-Subject: Re: [Samba] mount.cifs with "sec=ntlmv2" fails ("mount error(22):
- Invalid argument")
-Date: Mon, 22 Aug 2011 19:01:10 +0200
-Message-ID: <4E528B56.5070301@pre-sense.de>
-References: <4E527F5C.1090205@pre-sense.de> <CADT32eKLjbuUjY1=PS9Pqa5zWnHNcCcouzPHmTo3s+QO-9iQ4A@mail.gmail.com>
+From: Rafael Ganascim <rganascim-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: mount.cifs with "prefixpath" option getting NT_STATUS_ACCESS_DENIED
+Date: Mon, 22 Aug 2011 14:30:07 -0300
+Message-ID: <CAD4ZOMwcYFut0o8Krw-Z+tiGwz9VNvy4jRvwMcXv42P60pJxbg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------000904030605040209010403"
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/mixed; boundary=0015174c0bc423db1204ab1b6e19
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eKLjbuUjY1=PS9Pqa5zWnHNcCcouzPHmTo3s+QO-9iQ4A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------000904030605040209010403
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+--0015174c0bc423db1204ab1b6e19
+Content-Type: text/plain; charset=ISO-8859-1
 
-Hello,
+Hi,
 
-On 22.08.2011 18:28, Shirish Pargaonkar wrote:
-> On Mon, Aug 22, 2011 at 11:10 AM, Till Dörges <doerges-/hMagybUd5GoYr4blSSd5g@public.gmane.org> wrote:
->
->> Hello, everyone,
->>
->> I'm trying to mount a CIFS share served by Samba using mount.cifs with NTLMv2
->> authentication.
->>
->>
->> According to 'man mount.cifs' the option "sec=ntlmv2" should be supported, but it
->> keeps giving me "mount error(22): Invalid argument".
->>
->> The Samba server enforces the use of NTLMv2. When allowing for NTLMv1 on both sides
->> everything works just fine.
->>
->>
->> The client runs kernel 2.6.37.6-0.7-desktop (fully patched openSUSE-11.4) with the
->> CIFS kernel module version 1.68. mount.cifs identifies as "version: 4.6".
->>
->>
->> Mounting on the client side it looks like this:
->>
->> --- snip ---
->> #  mount.cifs //abctest.box/abclaufwerk /mnt/mnt/ --verbose -o
->> domain=ABCTEST,user=abc,pass=secrect,sec=ntlmv2
->>
->> mount.cifs kernel mount options:
->> ip=10.9.0.103,unc=\\abctest.box\abclaufwerk,sec=ntlmv2,ver=1,user=abc,domain=ABCTEST,pass=********
->> mount error(22): Invalid argument
->> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->> --- snap ---
->>
->> CIFS debugging on the client is enabled:
->>
->> --- snip ---
->> #  cat /proc/fs/cifs/cifsFYI
->> 1
->> --- snap ---
->>
->> Which yields the following lines in syslog (for the full log see attachment)
->>
->> --- snip ---
->> Aug 22 17:47:34 client kernel: [28966.056081]
->> /usr/src/packages/BUILD/kernel-desktop-2.6.37.6/linux-2.6.37/fs/cifs/connect.c:
->> Security Mode: 0x3 Capabilities: 0x80f3fd TimeAdjust: -7200
->> Aug 22 17:47:34 client kernel: [28966.056088]
->> /usr/src/packages/BUILD/kernel-desktop-2.6.37.6/linux-2.6.37/fs/cifs/sess.c: sess
->> setup type 2
->> --- snap ---
->>
->> "sess setup type 2" seems to indicate that NTLMv2 is used.
->>
->>
->> The server is running a fully patched openSUSE 11.3 with kernel 2.6.34.8-0.2-default
->> and Samba 3.5.4. Both "lanman auth" and "ntlm auth" are disabled, which should force
->> the use of NTLMv2 according to 'man smb.conf':
->>
->> --- snip ---
->> server # testparm 2> /dev/null | egrep 'ntlm|lan'
->>        ntlm auth = No
->> server #
->> --- snap ---
->>
->> The server's corresponding log entries are also attached.
->>
->>
->> Like said above, when I allow for the use of NTLMv1 on both sides (ntlm auth = Yes on
->> the server and no sec=ntlmv2 on the client) everything works just fine.
->>
->> When I enforce NTLMv2 on the server and don't specify "sec=ntlmv2" with mount.cifs I
->> get "mount error(13): Permission denied" and syslog on the client shows that NTLMv1
->> is tried ("sess setup type 1").
->>
->>
->> So is there anything wrong with my setup? Should NTLMv2 be working between Samba and
->> mount.cifs? If it should, why isn't it in this particular setup?
->>
->>
->> Any hints will be greatly appreciated.
->>
->>
->> TIA -- Till
+I think that this problem is related to:
 
-[...]
+http://article.gmane.org/gmane.linux.kernel.cifs/3878
 
-> sec=ntlmv2 auth type should work between cifs vfs client and Samba server.
 
-Ack.
+I have this fileserver structure:
+ - complete path: //fileserver-la-01/ti$/geral/
+ - //fileserver-la-01/ti$: in this parent dir, my user don't have
+permission to access
 
-> Can you try sec=ntlmssp and see if it works?
 
-Yes, that works.
-I see "sess setup type 3" in my syslog on the client, and "ntlm_password_check:
-Checking NTLMv2 password with domain [***]" on the server. I can sucessfully create
-and remove files on the server from the client.
+Using the kernel version 2.6.38 the mount reports:
 
-> Can you list the smb.conf file here?
+# mount -v /mnt/xxxx/latigeral/
+parsing options: rw,credentials=/etc/credentials,uid=1000
 
-See attachment.
+mount.cifs kernel mount options
+unc=//fileserver-la-01\ti$,user=xxxxxx,pass=xxxxx,ver=1,rw,credentials=/etc/credentials,uid=1000,prefixpath=geral/
+#
 
-> And a wireshark trace when sec=ntlmv2 fails would be really helpful.
 
-See attachment.
+Using the kernel 3.0.2:
 
-HTH -- Till
--- 
-Dipl.-Inform. Till Dörges                  doerges-/hMagybUd5GoYr4blSSd5g@public.gmane.org
-                                  Tel. +49 - 40 - 244 2407 - 14
-                                  Fax  +49 - 40 - 244 2407 - 24
-PRESENSE Technologies GmbH            Sachsenstr. 5, D-20097 HH
-                                         USt-IdNr.: DE263765024
-Geschäftsführer/Managing Directors       AG Hamburg, HRB 107844
-Till Dörges           Jürgen Sander              Axel Theilmann
+# mount -v /mnt/xxxx/latigeral
+parsing options: rw,credentials=/etc/credentials,uid=1000
 
---------------000904030605040209010403
-Content-Type: text/plain;
- name="smb.conf"
+mount.cifs kernel mount options
+unc=//fileserver-la-01\ti$,user=xxxxxx,pass=xxxxx,ver=1,rw,credentials=/etc/credentials,uid=1000,prefixpath=geral/
+mount error(13): Permission denied
+Refer to the mount.cifs(8) manual page (e.g.man mount.cifs)
+#
+
+The cifsFYI messages are in the attachments, cifsFYI.txt.
+
+To workaround this problem (in my box), I had set the 'full_path'
+(from prefixpath) in the call to cifs_get_inode_info in the function
+cifs_root_iget (~ inode.c:888), if the prefixpath isn't null. This
+worked for me, but it's bad solution, I think (i'm not a programmer :(
+).
+
+What do you think about this problem? There are a 'good' solution for it?
+
+
+Thanks,
+--
+
+Rafael Ganascim
+
+--0015174c0bc423db1204ab1b6e19
+Content-Type: text/plain; charset=US-ASCII; name="cifsFYI.txt"
+Content-Disposition: attachment; filename="cifsFYI.txt"
 Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="smb.conf"
+X-Attachment-Id: f_grnq0ecp0
 
-IyBzZXJ2ZXIgIyBlZ3JlcCAtdiBeIyAvZXRjL3NhbWJhL3NtYi5jb25mCltnbG9iYWxdCiAg
-ICAgICAgd29ya2dyb3VwID0gV0RTVEVTVAogICAgICAgIHBhc3NkYiBiYWNrZW5kID0gdGRi
-c2FtCiAgICAgICAgbWFwIHRvIGd1ZXN0ID0gQmFkIFVzZXIKICAgICAgICBndWVzdCBhY2Nv
-dW50ID0gd2RzZ3Vlc3QKICAgICAgICBsb2dvbiBwYXRoID0gXFwlTFxwcm9maWxlc1wubXNw
-cm9maWxlCiAgICAgICAgbG9nb24gaG9tZSA9IFxcJUxcJVVcLjl4cHJvZmlsZQogICAgICAg
-IGxvZ29uIGRyaXZlID0gUDoKICAgICAgICB1c2Vyc2hhcmUgYWxsb3cgZ3Vlc3RzID0gWWVz
-CiAgICAgICAgYWRkIG1hY2hpbmUgc2NyaXB0ID0gL3Vzci9zYmluL3VzZXJhZGQgIC1jIE1h
-Y2hpbmUgLWQgL3Zhci9saWIvbm9ib2R5IC1zIC9iaW4vZmFsc2UgJW0kCiAgICAgICAgZG9t
-YWluIGxvZ29ucyA9IFllcwogICAgICAgIGRvbWFpbiBtYXN0ZXIgPSBZZXMKICAgICAgICBs
-b2NhbCBtYXN0ZXIgPSBZZXMKICAgICAgICBuZXRiaW9zIG5hbWUgPSBXRFNTQU1CQQogICAg
-ICAgIG9zIGxldmVsID0gNjUKICAgICAgICBwcmVmZXJyZWQgbWFzdGVyID0gWWVzCgogICAg
-ICAgIHNlY3VyaXR5ID0gdXNlcgogICAgICAgIGxhbm1hbiBhdXRoID0gbm8KICAgICAgICBu
-dGxtIGF1dGggPSBubwoKICAgICAgICB3aW5zIHN1cHBvcnQgPSBZZXMKICAgICAgICBsb2cg
-bGV2ZWwgPSAxMAoKW2dhc3RsYXVmd2Vya10KICAgICAgICBjb21tZW50ID0gWnVncmlmZiBm
-dWVyIEdhZXN0ZQogICAgICAgIGluaGVyaXQgYWNscyA9IFllcwogICAgICAgIHBhdGggPSAv
-c3J2L3NhbWJhL2d1ZXN0c2hhcmUKICAgICAgICByZWFkIG9ubHkgPSBObwogICAgICAgIGd1
-ZXN0IG9rID0geWVzCiAgICAgICAgZ3Vlc3Qgb25seSA9IHllcwoKW3dkc2xhdWZ3ZXJrXQog
-ICAgICAgIGNvbW1lbnQgPSBTaGFyZSBmdWVyIE51dHplciAnd2RzJwogICAgICAgIGluaGVy
-aXQgYWNscyA9IFllcwogICAgICAgIHBhdGggPSAvc3J2L3NhbWJhL3dkc3NoYXJlCiAgICAg
-ICAgcmVhZCBvbmx5ID0gTm8KICAgICAgICBndWVzdCBvayA9IG5vCiAgICAgICAgdmFsaWQg
-dXNlcnMgPSB3ZHMK
---------------000904030605040209010403
-Content-Type: application/octet-stream;
- name="ntlmv2-mount-failure.pcap"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="ntlmv2-mount-failure.pcap"
-
-1MOyoQIABAAAAAAAAAAAAP//AAABAAAAEopSTneoBgBKAAAASgAAAOwwkXmkwQAcJZwkGggA
-RQAAPNpMQABABpOrwKgBrAoJAGeGHAG9h/0DiQAAAACgAhEczPIAAAIEBbQEAggKAfPZxQAA
-AAABAwMHEopSTmqqBgBKAAAASgAAAAAcJZwkGuwwkXmkwQgARQAAPAAAQAA/Bm74CgkAZ8Co
-AawBvYYcJBQRz4f9A4qgEhagGtoAAAIEBbQEAggKRwDdtQHz2cUBAwMGEopSTp+qBgBCAAAA
-QgAAAOwwkXmkwQAcJZwkGggARQAANNpNQABABpOywKgBrAoJAGeGHAG9h/0DiiQUEdCAEAAj
-zOoAAAEBCAoB89nGRwDdtRKKUk7ZrAYAlAAAAJQAAADsMJF5pMEAHCWcJBoIAEUAAIbaTkAA
-QAaTX8CoAawKCQBnhhwBvYf9A4okFBHQgBgAI808AAABAQgKAfPZxkcA3bUAAABO/1NNQnIA
-AAAAAAHAAAAAAAAAAAAAAAAAAAAfYgAAAQAAKwACTE0xLjJYMDAyAAJMQU5NQU4yLjEAAk5U
-IExNIDAuMTIAAlBPU0lYIDIAEopSTnWuBgBCAAAAQgAAAAAcJZwkGuwwkXmkwQgARQAANMxl
-QAA/BqKaCgkAZ8CoAawBvYYcJBQR0If9A9yAEABbX5cAAAEBCApHAN21AfPZxhKKUk7uzQYA
-owAAAKMAAAAAHCWcJBrsMJF5pMEIAEUAAJXMZkAAPwaiOAoJAGfAqAGsAb2GHCQUEdCH/QPc
-gBgAWyc7AAABAQgKRwDdtwHz2cYAAABd/1NNQnIAAAAAgAPAAAAAAAAAAAAAAAAAAAAfYgAA
-AQARAgADMgABAARBAAAAAAEAmx0AAP3zgAAA6OhU7GDMAYj/CAgANAqFFfQKgJJXAEQAUwBU
-AEUAUwBUAAAAEopSTkLOBgBCAAAAQgAAAOwwkXmkwQAcJZwkGggARQAANNpPQABABpOwwKgB
-rAoJAGeGHAG9h/0D3CQUEjGAEAAjzOoAAAEBCAoB89nPRwDdtxKKUk7rzgYA6gEAAOoBAADs
-MJF5pMEAHCWcJBoIAEUAAdzaUEAAQAaSB8CoAawKCQBnhhwBvYf9A9wkFBIxgBgAI86SAAAB
-AQgKAfPZz0cA3bcAAAGk/1NNQnMAAAAAAAHQAAAAAAAAAAAAAAAAAAAfYgAAAgAN/wAAAFhA
-MgAAAAAAAAAAANQAAAAAANzQgABnAW9hHIrUaps+uhzPI4JDalQBAQAAAAAAABwSXlbsYMwB
-GXpRAU3skLIAAAAAAgAOAFcARABTAFQARQBTAFQAAQA2AHcAZABzAHQAZQBzAHQALgBpAG4A
-dABlAHIAbgAuAHAAcgBlAC0AcwBlAG4AcwBlAC4AZABlAAQADgBXAEQAUwBUAEUAUwBUAAMA
-NgB3AGQAcwB0AGUAcwB0AC4AaQBuAHQAZQByAG4ALgBwAHIAZQAtAHMAZQBuAHMAZQAuAGQA
-ZQAHAAgAHBJeVuxgzAEAAAAAAHcAZABzAAAAVwBEAFMAVABFAFMAVAAAAEwAaQBuAHUAeAAg
-AHYAZQByAHMAaQBvAG4AIAAyAC4ANgAuADMANwAuADYALQAwAC4ANwAtAGQAZQBzAGsAdABv
-AHAAAABDAEkARgBTACAAVgBGAFMAIABDAGwAaQBlAG4AdAAgAGYAbwByACAATABpAG4AdQB4
-AAAAEopSThjWBgBpAAAAaQAAAAAcJZwkGuwwkXmkwQgARQAAW8xnQAA/BqJxCgkAZ8CoAawB
-vYYcJBQSMYf9BYSAGABst9gAAAEBCApHAN24AfPZzwAAACP/U01Ccw0AAMCAA8AAAAAAAAAA
-AAAAAAAAAB9iAAACAAAAABKKUk6CcQcAQgAAAEIAAADsMJF5pMEAHCWcJBoIAEUAADTaUUAA
-QAaTrsCoAawKCQBnhhwBvYf9BYQkFBJYgBAAI8zqAAABAQgKAfPZ+UcA3bgSilJOgsEIAEIA
-AABCAAAA7DCReaTBABwlnCQaCABFAAA02lJAAEAGk63AqAGsCgkAZ4YcAb2H/QWEJBQSWIAR
-ACPM6gAAAQEICgHz2k9HAN24EopSTipTCQBCAAAAQgAAAAAcJZwkGuwwkXmkwQgARQAANMxo
-QAA/BqKXCgkAZ8CoAawBvYYcJBQSWIf9BYWAEABsXKAAAAEBCApHAN3hAfPaTxKKUk6wkAkA
-QgAAAEIAAAAAHCWcJBrsMJF5pMEIAEUAADTMaUAAPwailgoJAGfAqAGsAb2GHCQUEliH/QWF
-gBEAbFycAAABAQgKRwDd5AHz2k8SilJO55AJAEIAAABCAAAA7DCReaTBABwlnCQaCABFAAA0
-AABAAEAGbgDAqAGsCgkAZ4YcAb2H/QWFJBQSWYAQACNcsAAAAQEICgHz2oRHAN3k
---------------000904030605040209010403--
+VXNpbmcgdGhlIGtlcm5lbCB2ZXJzaW9uIDIuNi4zOCB0aGUgbW91bnQgcmVwb3J0czoKCiMgbW91
+bnQgLXYgL21udC94eHh4L2xhdGlnZXJhbC8KcGFyc2luZyBvcHRpb25zOiBydyxjcmVkZW50aWFs
+cz0vZXRjL2NyZWRlbnRpYWxzLHVpZD0xMDAwCgptb3VudC5jaWZzIGtlcm5lbCBtb3VudCBvcHRp
+b25zIHVuYz0vL2ZpbGVzZXJ2ZXItbGEtMDFcdGkkLHVzZXI9eHh4eHh4LHBhc3M9eHh4eHgsdmVy
+PTEscncsY3JlZGVudGlhbHM9L2V0Yy9jcmVkZW50aWFscyx1aWQ9MTAwMCxwcmVmaXhwYXRoPWdl
+cmFsLyAKIwoKIyBkbWVzZwouLi4KZnMvY2lmcy9jaWZzZnMuYzogRGV2bmFtZTogLy9maWxlc2Vy
+dmVyLWxhLTAxL3RpJC9nZXJhbC8gZmxhZ3M6IDY0IApmcy9jaWZzL2Nvbm5lY3QuYzogQ0lGUyBW
+RlM6IGluIGNpZnNfbW91bnQgYXMgWGlkOiAyNyB3aXRoIHVpZDogMApmcy9jaWZzL2Nvbm5lY3Qu
+YzogcHJlZml4IHBhdGggL2dlcmFsLwpmcy9jaWZzL2Nvbm5lY3QuYzogVXNlcm5hbWU6IHh4eHgK
+ZnMvY2lmcy9jb25uZWN0LmM6IFVOQzogXFxmaWxlc2VydmVyLWxhLTAxXHRpJCBpcDogMTcyLjI1
+LjQuMTMKZnMvY2lmcy9jb25uZWN0LmM6IFNvY2tldCBjcmVhdGVkCmZzL2NpZnMvY29ubmVjdC5j
+OiBzbmRidWYgMTYzODQgcmN2YnVmIDg3MzgwIHJjdnRpbWVvIDB4MWI1OApmcy9jaWZzL2Nvbm5l
+Y3QuYzogQ0lGUyBWRlM6IGluIGNpZnNfZ2V0X3NtYl9zZXMgYXMgWGlkOiAyOCB3aXRoIHVpZDog
+MApmcy9jaWZzL2Nvbm5lY3QuYzogRXhpc3Rpbmcgc21iIHNlc3Mgbm90IGZvdW5kCmZzL2NpZnMv
+Y2lmc3NtYi5jOiBzZWNGbGFncyAweDcKZnMvY2lmcy90cmFuc3BvcnQuYzogRm9yIHNtYl9jb21t
+YW5kIDExNApmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5nIHNtYjogIHRvdGFsX2xlbiA3Mwpm
+cy9jaWZzL2Nvbm5lY3QuYzogRGVtdWx0aXBsZXggUElEOiAzMzI3CmZzL2NpZnMvY29ubmVjdC5j
+OiByZmMxMDAyIGxlbmd0aCAweDc5CmZzL2NpZnMvdHJhbnNwb3J0LmM6IHN5bmNfbWlkX3Jlc3Vs
+dDogY21kPTExNCBtaWQ9MSBzdGF0ZT00CmZzL2NpZnMvY2lmc3NtYi5jOiBEaWFsZWN0OiAyCmZz
+L2NpZnMvY2lmc3NtYi5jOiBuZWdwcm90IHJjIDAKZnMvY2lmcy9jb25uZWN0LmM6IFNlY3VyaXR5
+IE1vZGU6IDB4MyBDYXBhYmlsaXRpZXM6IDB4MWYzZmMgVGltZUFkanVzdDogMTA4MDAKZnMvY2lm
+cy9zZXNzLmM6IHNlc3Mgc2V0dXAgdHlwZSAxCmZzL2NpZnMvdHJhbnNwb3J0LmM6IEZvciBzbWJf
+Y29tbWFuZCAxMTUKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6ICB0b3RhbF9sZW4g
+MjUyCmZzL2NpZnMvY29ubmVjdC5jOiByZmMxMDAyIGxlbmd0aCAweGQxCmZzL2NpZnMvdHJhbnNw
+b3J0LmM6IHN5bmNfbWlkX3Jlc3VsdDogY21kPTExNSBtaWQ9MiBzdGF0ZT00CmZzL2NpZnMvbWlz
+Yy5jOiBOdWxsIGJ1ZmZlciBwYXNzZWQgdG8gY2lmc19zbWFsbF9idWZfcmVsZWFzZQpmcy9jaWZz
+L3Nlc3MuYzogVUlEID0gNjE0NSAKZnMvY2lmcy9zZXNzLmM6IGJsZWZ0IDE2Mwpmcy9jaWZzL3Nl
+c3MuYzogc2VydmVyT1M9V2luZG93cyBTZXJ2ZXIgMjAwOCBSMiBTdGFuZGFyZCA3NjAwCmZzL2Np
+ZnMvc2Vzcy5jOiBzZXJ2ZXJOT1M9V2luZG93cyBTZXJ2ZXIgMjAwOCBSMiBTdGFuZGFyZCA2LjEK
+ZnMvY2lmcy9zZXNzLmM6IHNlcnZlckRvbWFpbj14eHh4LUJSCmZzL2NpZnMvc2Vzcy5jOiBzc2V0
+dXAgZnJlZWluZyBzbWFsbCBidWYgZjUwMTNkNDAKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgU2Vz
+c2lvbiBFc3RhYmxpc2hlZCBzdWNjZXNzZnVsbHkKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVkZT
+OiBsZWF2aW5nIGNpZnNfZ2V0X3NtYl9zZXMgKHhpZCA9IDI4KSByYyA9IDAKZnMvY2lmcy9jb25u
+ZWN0LmM6IGZpbGUgbW9kZTogMHgxZWQgIGRpciBtb2RlOiAweDFlZApmcy9jaWZzL2Nvbm5lY3Qu
+YzogQ0lGUyBWRlM6IGluIGNpZnNfZ2V0X3Rjb24gYXMgWGlkOiAyOSB3aXRoIHVpZDogMApmcy9j
+aWZzL3RyYW5zcG9ydC5jOiBGb3Igc21iX2NvbW1hbmQgMTE3CmZzL2NpZnMvdHJhbnNwb3J0LmM6
+IFNlbmRpbmcgc21iOiAgdG90YWxfbGVuIDEwMApmcy9jaWZzL2Nvbm5lY3QuYzogcmZjMTAwMiBs
+ZW5ndGggMHg0Mgpmcy9jaWZzL3RyYW5zcG9ydC5jOiBzeW5jX21pZF9yZXN1bHQ6IGNtZD0xMTcg
+bWlkPTMgc3RhdGU9NApmcy9jaWZzL2Nvbm5lY3QuYzogZGlzayBzaGFyZSBjb25uZWN0aW9uCmZz
+L2NpZnMvY29ubmVjdC5jOiBuYXRpdmVGaWxlU3lzdGVtPU5URlMKZnMvY2lmcy9jb25uZWN0LmM6
+IFRjb24gZmxhZ3M6IDB4MSAKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVkZTOiBsZWF2aW5nIGNp
+ZnNfZ2V0X3Rjb24gKHhpZCA9IDI5KSByYyA9IDAKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVGNv
+biByYyA9IDAKZnMvY2lmcy9jaWZzc21iLmM6IEluIFFGU0RldmljZUluZm8KZnMvY2lmcy90cmFu
+c3BvcnQuYzogRm9yIHNtYl9jb21tYW5kIDUwCmZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcg
+c21iOiAgdG90YWxfbGVuIDcyCmZzL2NpZnMvY29ubmVjdC5jOiByZmMxMDAyIGxlbmd0aCAweDQ0
+CmZzL2NpZnMvdHJhbnNwb3J0LmM6IHN5bmNfbWlkX3Jlc3VsdDogY21kPTUwIG1pZD00IHN0YXRl
+PTQKZnMvY2lmcy9jaWZzc21iLmM6IEluIFFGU0F0dHJpYnV0ZUluZm8KZnMvY2lmcy90cmFuc3Bv
+cnQuYzogRm9yIHNtYl9jb21tYW5kIDUwCmZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcgc21i
+OiAgdG90YWxfbGVuIDcyCmZzL2NpZnMvY29ubmVjdC5jOiByZmMxMDAyIGxlbmd0aCAweDUwCmZz
+L2NpZnMvdHJhbnNwb3J0LmM6IHN5bmNfbWlkX3Jlc3VsdDogY21kPTUwIG1pZD01IHN0YXRlPTQK
+ZnMvY2lmcy90cmFuc3BvcnQuYzogRm9yIHNtYl9jb21tYW5kIDUwCmZzL2NpZnMvdHJhbnNwb3J0
+LmM6IFNlbmRpbmcgc21iOiAgdG90YWxfbGVuIDkyCmZzL2NpZnMvY29ubmVjdC5jOiByZmMxMDAy
+IGxlbmd0aCAweGJlCmZzL2NpZnMvdHJhbnNwb3J0LmM6IHN5bmNfbWlkX3Jlc3VsdDogY21kPTUw
+IG1pZD02IHN0YXRlPTQKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVkZTOiBsZWF2aW5nIGNpZnNf
+bW91bnQgKHhpZCA9IDI3KSByYyA9IDAKZnMvY2lmcy9pbm9kZS5jOiBDSUZTIFZGUzogaW4gY2lm
+c19yb290X2lnZXQgYXMgWGlkOiAzMCB3aXRoIHVpZDogMApmcy9jaWZzL2lub2RlLmM6IEdldHRp
+bmcgaW5mbyBvbiBcZ2VyYWxcCmZzL2NpZnMvdHJhbnNwb3J0LmM6IEZvciBzbWJfY29tbWFuZCA1
+MApmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5nIHNtYjogIHRvdGFsX2xlbiA5Mgpmcy9jaWZz
+L2Nvbm5lY3QuYzogcmZjMTAwMiBsZW5ndGggMHhiZQpmcy9jaWZzL3RyYW5zcG9ydC5jOiBzeW5j
+X21pZF9yZXN1bHQ6IGNtZD01MCBtaWQ9NyBzdGF0ZT00CmZzL2NpZnMvY2lmc3NtYi5jOiBJbiBH
+ZXRTcnZJbm9kZU51bSBmb3IgXGdlcmFsXApmcy9jaWZzL3RyYW5zcG9ydC5jOiBGb3Igc21iX2Nv
+bW1hbmQgNTAKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6ICB0b3RhbF9sZW4gOTIK
+ZnMvY2lmcy9jb25uZWN0LmM6IHJmYzEwMDIgbGVuZ3RoIDB4NDgKZnMvY2lmcy90cmFuc3BvcnQu
+Yzogc3luY19taWRfcmVzdWx0OiBjbWQ9NTAgbWlkPTggc3RhdGU9NApmcy9jaWZzL2lub2RlLmM6
+IGxvb2tpbmcgZm9yIHVuaXF1ZWlkPTE5NzAzMjQ4MzcwMDA2NDcKZnMvY2lmcy9pbm9kZS5jOiBj
+aWZzX3JldmFsaWRhdGVfY2FjaGU6IHJldmFsaWRhdGluZyBpbm9kZSAxOTcwMzI0ODM3MDAwNjQ3
+CmZzL2NpZnMvaW5vZGUuYzogY2lmc19yZXZhbGlkYXRlX2NhY2hlOiBpbm9kZSAxOTcwMzI0ODM3
+MDAwNjQ3IGlzIG5ldwpmcy9jaWZzL2lub2RlLmM6IGlub2RlIDB4ZTk4N2MzNzQgb2xkX3RpbWU9
+MCBuZXdfdGltZT0tMTIxNjU1Ci4uLgoKVXNpbmcgdGhlIGtlcm5lbCAzLjAuMjoKCiMgbW91bnQg
+LXYgL21udC94eHh4L2xhdGlnZXJhbApwYXJzaW5nIG9wdGlvbnM6IHJ3LGNyZWRlbnRpYWxzPS9l
+dGMvY3JlZGVudGlhbHMsdWlkPTEwMDAKCm1vdW50LmNpZnMga2VybmVsIG1vdW50IG9wdGlvbnMg
+dW5jPS8vZmlsZXNlcnZlci1sYS0wMVx0aSQsdXNlcj14eHh4eHgscGFzcz14eHh4eCx2ZXI9MSxy
+dyxjcmVkZW50aWFscz0vZXRjL2NyZWRlbnRpYWxzLHVpZD0xMDAwLHByZWZpeHBhdGg9Z2VyYWwv
+IAptb3VudCBlcnJvcigxMyk6IFBlcm1pc3Npb24gZGVuaWVkClJlZmVyIHRvIHRoZSBtb3VudC5j
+aWZzKDgpIG1hbnVhbCBwYWdlIChlLmcubWFuIG1vdW50LmNpZnMpCiMKCiMgZG1lc2cKLi4uCmZz
+L2NpZnMvY2lmc2ZzLmM6IERldm5hbWU6IC8vZmlsZXNlcnZlci1sYS0wMS90aSQvZ2VyYWwvIGZs
+YWdzOiA2NCAKZnMvY2lmcy9jb25uZWN0LmM6IHByZWZpeCBwYXRoIC9nZXJhbC8KZnMvY2lmcy9j
+b25uZWN0LmM6IFVzZXJuYW1lOiB4eHh4eHgKZnMvY2lmcy9jb25uZWN0LmM6IGZpbGUgbW9kZTog
+MHgxZWQgIGRpciBtb2RlOiAweDFlZApmcy9jaWZzL2Nvbm5lY3QuYzogQ0lGUyBWRlM6IGluIGNp
+ZnNfbW91bnQgYXMgWGlkOiAwIHdpdGggdWlkOiAwCmZzL2NpZnMvY29ubmVjdC5jOiBVTkM6IFxc
+ZmlsZXNlcnZlci1sYS0wMVx0aSQgaXA6IDE3Mi4yNS40LjEzCmZzL2NpZnMvbmV0bWlzYy5jOiBh
+ZGRyZXNzIGNvbnZlcnNpb24gcmV0dXJuZWQgMSBmb3IgMTcyLjI1LjQuMTMKZnMvY2lmcy9jb25u
+ZWN0LmM6IFNvY2tldCBjcmVhdGVkCmZzL2NpZnMvY29ubmVjdC5jOiBzbmRidWYgMTYzODQgcmN2
+YnVmIDg3MzgwIHJjdnRpbWVvIDB4NmQ2CmZzL2NpZnMvY29ubmVjdC5jOiBDSUZTIFZGUzogaW4g
+Y2lmc19nZXRfc21iX3NlcyBhcyBYaWQ6IDEgd2l0aCB1aWQ6IDAKZnMvY2lmcy9jb25uZWN0LmM6
+IEV4aXN0aW5nIHNtYiBzZXNzIG5vdCBmb3VuZApDSUZTIFZGUzogZGVmYXVsdCBzZWN1cml0eSBt
+ZWNoYW5pc20gcmVxdWVzdGVkLiAgVGhlIGRlZmF1bHQgc2VjdXJpdHkgbWVjaGFuaXNtIHdpbGwg
+YmUgdXBncmFkZWQgZnJvbSBudGxtIHRvIG50bG12MiBpbiBrZXJuZWwgcmVsZWFzZSAzLjEKZnMv
+Y2lmcy9jaWZzc21iLmM6IHNlY0ZsYWdzIDB4Nwpmcy9jaWZzL3RyYW5zcG9ydC5jOiBGb3Igc21i
+X2NvbW1hbmQgMTE0CmZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcgc21iOiAgdG90YWxfbGVu
+IDgyCmZzL2NpZnMvY29ubmVjdC5jOiBEZW11bHRpcGxleCBQSUQ6IDQ0MzUKZnMvY2lmcy9jb25u
+ZWN0LmM6IHJmYzEwMDIgbGVuZ3RoIDB4NzkKZnMvY2lmcy90cmFuc3BvcnQuYzogY2lmc19zeW5j
+X21pZF9yZXN1bHQ6IGNtZD0xMTQgbWlkPTEgc3RhdGU9NApmcy9jaWZzL2NpZnNzbWIuYzogRGlh
+bGVjdDogMgpmcy9jaWZzL2NpZnNzbWIuYzogTWF4IGJ1ZiA9IDE2NDcyCmZzL2NpZnMvY2lmc3Nt
+Yi5jOiBuZWdwcm90IHJjIDAKZnMvY2lmcy9jb25uZWN0LmM6IFNlY3VyaXR5IE1vZGU6IDB4MyBD
+YXBhYmlsaXRpZXM6IDB4MWYzZmMgVGltZUFkanVzdDogMTA4MDAKZnMvY2lmcy9zZXNzLmM6IHNl
+c3Mgc2V0dXAgdHlwZSAxCmZzL2NpZnMvdHJhbnNwb3J0LmM6IEZvciBzbWJfY29tbWFuZCAxMTUK
+ZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6ICB0b3RhbF9sZW4gMjU0CmZzL2NpZnMv
+Y29ubmVjdC5jOiByZmMxMDAyIGxlbmd0aCAweGQxCmZzL2NpZnMvdHJhbnNwb3J0LmM6IGNpZnNf
+c3luY19taWRfcmVzdWx0OiBjbWQ9MTE1IG1pZD0yIHN0YXRlPTQKZnMvY2lmcy9taXNjLmM6IE51
+bGwgYnVmZmVyIHBhc3NlZCB0byBjaWZzX3NtYWxsX2J1Zl9yZWxlYXNlCmZzL2NpZnMvc2Vzcy5j
+OiBVSUQgPSAyMDQ4IApmcy9jaWZzL3Nlc3MuYzogYmxlZnQgMTYzCmZzL2NpZnMvc2Vzcy5jOiBz
+ZXJ2ZXJPUz1XaW5kb3dzIFNlcnZlciAyMDA4IFIyIFN0YW5kYXJkIDc2MDAKZnMvY2lmcy9zZXNz
+LmM6IHNlcnZlck5PUz1XaW5kb3dzIFNlcnZlciAyMDA4IFIyIFN0YW5kYXJkIDYuMQpmcy9jaWZz
+L3Nlc3MuYzogc2VydmVyRG9tYWluPVhYWFhYLUJSCmZzL2NpZnMvc2Vzcy5jOiBzc2V0dXAgZnJl
+ZWluZyBzbWFsbCBidWYgZjU0MjZmNDAKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgU2Vzc2lvbiBF
+c3RhYmxpc2hlZCBzdWNjZXNzZnVsbHkKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVkZTOiBsZWF2
+aW5nIGNpZnNfZ2V0X3NtYl9zZXMgKHhpZCA9IDEpIHJjID0gMApmcy9jaWZzL2Nvbm5lY3QuYzog
+Q0lGUyBWRlM6IGluIGNpZnNfZ2V0X3Rjb24gYXMgWGlkOiAyIHdpdGggdWlkOiAwCmZzL2NpZnMv
+dHJhbnNwb3J0LmM6IEZvciBzbWJfY29tbWFuZCAxMTcKZnMvY2lmcy90cmFuc3BvcnQuYzogU2Vu
+ZGluZyBzbWI6ICB0b3RhbF9sZW4gMTAwCmZzL2NpZnMvY29ubmVjdC5jOiByZmMxMDAyIGxlbmd0
+aCAweDQyCmZzL2NpZnMvdHJhbnNwb3J0LmM6IGNpZnNfc3luY19taWRfcmVzdWx0OiBjbWQ9MTE3
+IG1pZD0zIHN0YXRlPTQKZnMvY2lmcy9jb25uZWN0LmM6IGRpc2sgc2hhcmUgY29ubmVjdGlvbgpm
+cy9jaWZzL2Nvbm5lY3QuYzogbmF0aXZlRmlsZVN5c3RlbT1OVEZTCmZzL2NpZnMvY29ubmVjdC5j
+OiBUY29uIGZsYWdzOiAweDEgCmZzL2NpZnMvY29ubmVjdC5jOiBDSUZTIFZGUzogbGVhdmluZyBj
+aWZzX2dldF90Y29uICh4aWQgPSAyKSByYyA9IDAKZnMvY2lmcy9jb25uZWN0LmM6IENJRlMgVGNv
+biByYyA9IDAKZnMvY2lmcy9jaWZzc21iLmM6IEluIFFGU0RldmljZUluZm8KZnMvY2lmcy90cmFu
+c3BvcnQuYzogRm9yIHNtYl9jb21tYW5kIDUwCmZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcg
+c21iOiAgdG90YWxfbGVuIDcyCmZzL2NpZnMvY29ubmVjdC5jOiByZmMxMDAyIGxlbmd0aCAweDQ0
+CmZzL2NpZnMvdHJhbnNwb3J0LmM6IGNpZnNfc3luY19taWRfcmVzdWx0OiBjbWQ9NTAgbWlkPTQg
+c3RhdGU9NApmcy9jaWZzL2NpZnNzbWIuYzogSW4gUUZTQXR0cmlidXRlSW5mbwpmcy9jaWZzL3Ry
+YW5zcG9ydC5jOiBGb3Igc21iX2NvbW1hbmQgNTAKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGlu
+ZyBzbWI6ICB0b3RhbF9sZW4gNzIKZnMvY2lmcy9jb25uZWN0LmM6IHJmYzEwMDIgbGVuZ3RoIDB4
+NTAKZnMvY2lmcy90cmFuc3BvcnQuYzogY2lmc19zeW5jX21pZF9yZXN1bHQ6IGNtZD01MCBtaWQ9
+NSBzdGF0ZT00CmZzL2NpZnMvY29ubmVjdC5jOiBidWlsZF91bmNfcGF0aF90b19yb290OiBmdWxs
+X3BhdGg9XFxmaWxlc2VydmVyLWxhLTAxXHRpJFxnZXJhbFwKZnMvY2lmcy90cmFuc3BvcnQuYzog
+Rm9yIHNtYl9jb21tYW5kIDExNwpmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5nIHNtYjogIHRv
+dGFsX2xlbiA5Mgpmcy9jaWZzL2Nvbm5lY3QuYzogcmZjMTAwMiBsZW5ndGggMHgzYwpmcy9jaWZz
+L3RyYW5zcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTExNyBtaWQ9NiBzdGF0ZT00
+CmZzL2NpZnMvY29ubmVjdC5jOiBDSUZTIFRjb24gcmMgPSAwIGlwY190aWQgPSAyMDQ5CmZzL2Np
+ZnMvY2lmc3NtYi5jOiBJbiBHZXRERlNSZWZlciB0aGUgcGF0aCBcZmlsZXNlcnZlci1sYS0wMVx0
+aSQKZnMvY2lmcy90cmFuc3BvcnQuYzogRm9yIHNtYl9jb21tYW5kIDUwCmZzL2NpZnMvdHJhbnNw
+b3J0LmM6IFNlbmRpbmcgc21iOiAgdG90YWxfbGVuIDExOApmcy9jaWZzL2Nvbm5lY3QuYzogcmZj
+MTAwMiBsZW5ndGggMHgyNwpmcy9jaWZzL2Nvbm5lY3QuYzogaW52YWxpZCB0cmFuc2FjdDIgd29y
+ZCBjb3VudApmcy9jaWZzL3RyYW5zcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTUw
+IG1pZD03IHN0YXRlPTQKZnMvY2lmcy9uZXRtaXNjLmM6IE1hcHBpbmcgc21iIGVycm9yIGNvZGUg
+MHhjMDAwMDIyNSB0byBQT1NJWCBlcnIgLTUKZnMvY2lmcy9jaWZzc21iLmM6IFNlbmQgZXJyb3Ig
+aW4gR2V0REZTUmVmZXIgPSAtNQpmcy9jaWZzL3RyYW5zcG9ydC5jOiBGb3Igc21iX2NvbW1hbmQg
+NTAKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6ICB0b3RhbF9sZW4gOTIKZnMvY2lm
+cy9jb25uZWN0LmM6IHJmYzEwMDIgbGVuZ3RoIDB4YmUKZnMvY2lmcy90cmFuc3BvcnQuYzogY2lm
+c19zeW5jX21pZF9yZXN1bHQ6IGNtZD01MCBtaWQ9OCBzdGF0ZT00CmZzL2NpZnMvY29ubmVjdC5j
+OiBDSUZTIFZGUzogbGVhdmluZyBjaWZzX21vdW50ICh4aWQgPSAwKSByYyA9IDAKZnMvY2lmcy9p
+bm9kZS5jOiBDSUZTIFZGUzogaW4gY2lmc19yb290X2lnZXQgYXMgWGlkOiAzIHdpdGggdWlkOiAw
+CmZzL2NpZnMvaW5vZGUuYzogR2V0dGluZyBpbmZvIG9uIApmcy9jaWZzL3RyYW5zcG9ydC5jOiBG
+b3Igc21iX2NvbW1hbmQgNTAKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6ICB0b3Rh
+bF9sZW4gNzgKZnMvY2lmcy9jb25uZWN0LmM6IHJmYzEwMDIgbGVuZ3RoIDB4MjcKZnMvY2lmcy9j
+b25uZWN0LmM6IGludmFsaWQgdHJhbnNhY3QyIHdvcmQgY291bnQKZnMvY2lmcy90cmFuc3BvcnQu
+YzogY2lmc19zeW5jX21pZF9yZXN1bHQ6IGNtZD01MCBtaWQ9OSBzdGF0ZT00CmZzL2NpZnMvbmV0
+bWlzYy5jOiBNYXBwaW5nIHNtYiBlcnJvciBjb2RlIDB4YzAwMDAwMjIgdG8gUE9TSVggZXJyIC0x
+Mwpmcy9jaWZzL2NpZnNzbWIuYzogU2VuZCBlcnJvciBpbiBRUGF0aEluZm8gPSAtMTMKQ0lGUyBW
+RlM6IGNpZnNfcmVhZF9zdXBlcjogZ2V0IHJvb3QgaW5vZGUgZmFpbGVkCmZzL2NpZnMvY29ubmVj
+dC5jOiBjaWZzX3B1dF90Y29uOiB0Y19jb3VudD0xCgpmcy9jaWZzL2Nvbm5lY3QuYzogQ0lGUyBW
+RlM6IGluIGNpZnNfcHV0X3Rjb24gYXMgWGlkOiA0IHdpdGggdWlkOiAwCmZzL2NpZnMvY2lmc3Nt
+Yi5jOiBJbiB0cmVlIGRpc2Nvbm5lY3QKZnMvY2lmcy90cmFuc3BvcnQuYzogRm9yIHNtYl9jb21t
+YW5kIDExMwpmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5nIHNtYjogIHRvdGFsX2xlbiAzOQpm
+cy9jaWZzL2Nvbm5lY3QuYzogcmZjMTAwMiBsZW5ndGggMHgyNwpmcy9jaWZzL3RyYW5zcG9ydC5j
+OiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTExMyBtaWQ9MTAgc3RhdGU9NApmcy9jaWZzL3Ry
+YW5zcG9ydC5jOiBTZW5kUmN2Tm9Sc3AgZmxhZ3MgNjQgcmMgMApmcy9jaWZzL2Nvbm5lY3QuYzog
+Y2lmc19wdXRfc21iX3Nlczogc2VzX2NvdW50PTEKCmZzL2NpZnMvY29ubmVjdC5jOiBDSUZTIFZG
+UzogaW4gY2lmc19wdXRfc21iX3NlcyBhcyBYaWQ6IDUgd2l0aCB1aWQ6IDAKZnMvY2lmcy9jaWZz
+c21iLmM6IEluIFNNQkxvZ29mZiBmb3Igc2Vzc2lvbiBkaXNjb25uZWN0CmZzL2NpZnMvdHJhbnNw
+b3J0LmM6IEZvciBzbWJfY29tbWFuZCAxMTYKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBz
+bWI6ICB0b3RhbF9sZW4gNDMKZnMvY2lmcy9jb25uZWN0LmM6IHJmYzEwMDIgbGVuZ3RoIDB4MmIK
+ZnMvY2lmcy90cmFuc3BvcnQuYzogY2lmc19zeW5jX21pZF9yZXN1bHQ6IGNtZD0xMTYgbWlkPTEx
+IHN0YXRlPTQKZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZFJjdk5vUnNwIGZsYWdzIDY0IHJjIDAK
+Li4uCgo=
+--0015174c0bc423db1204ab1b6e19--
