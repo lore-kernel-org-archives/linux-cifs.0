@@ -1,78 +1,67 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Add mount option named backup
-Date: Tue, 23 Aug 2011 08:34:26 -0500
-Message-ID: <CADT32eJsMCWxLYH6dNVyUJzHexkRrMFamA7mgOcPNHgu8uHsbA@mail.gmail.com>
-References: <1313166821-9172-1-git-send-email-shirishpargonkar@gmail.com>
-	<CADT32eJsAgNkhnY1VZ6wpxa2013h7TmO6i3H=4a6D8ke8iU2Aw@mail.gmail.com>
-	<20110823091510.2d8b8027@corrin.poochiereds.net>
+From: "Luk Claes" <Luk.Claes-Uy3+E7BMiTU@public.gmane.org>
+Subject: Re: [PATCH] autoconf: fix help message for --enable-cifsidmap
+Date: Tue, 23 Aug 2011 18:21:06 +0200
+Message-ID: <20110823182106.163416ro6niegbci@rozijn.ugent.be>
+References: <1314104603-3941-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII;
+	DelSp=Yes	format=flowed
+Content-Transfer-Encoding: 7BIT
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, pipping-N9AOi2cAC9ZBDgjK7y7TUQ@public.gmane.org,
+	shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110823091510.2d8b8027-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1314104603-3941-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Aug 23, 2011 at 8:15 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Mon, 22 Aug 2011 08:33:49 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Fri, Aug 12, 2011 at 11:33 AM, =A0<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
-rote:
->> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >
->> >
->> > Add mount option backup.
->> >
->> > It allows an authenticated user to access files with the intent to=
- back them
->> > up including their ACLs, who may not have access permission but ha=
-s
->> > "Backup files and directories user right" on them (by virtue of be=
-ing part
->> > of the built-in group Backup Operators.
->> >
->> > If an authenticated user is not part of the built-in group Backup =
-Operators
->> > at the server, access to such files is denied.
->> >
->> >
->> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> > ---
->>
->>
->> Jeff, =A0Steve,
->>
->> Any comments on this patch (and manpage patch in cifs-utils)?
->>
->
-> This seems like a really nasty kludge. It doesn't seem like the
-> implications of this have been carefully considered.
->
-> What happens I mount with the "backup" flag and do not have the
-> necessary permissions on the server to use the flag in an open? Will
-> this new flag be mutually exclusive with "multiuser"?
+Hi Jeff
 
-If an authenticated user on the server does not have
-necessary permission (by virtue of not being in a
-pertinent registry setting or any other means that a
-server employs), then open would fail as it should.
-Because the intent to mount a share with this option
-for an authenticated user is to have access to all the
-files for backup for that user.
+Hmm, I thought it's auto as default which would only be yes if the  
+needed headers and libraries are installed?
 
-I am not sure about the   mulituser   option. Need to
-dwell on that for a while.
+Cheers
 
+Luk
+
+Quoting "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+
+> It currently says "no" is the default, but it should be "yes".
 >
-> One idea that might be better is to come up with way to mark certain
-> (unix) users with the appropriate flag. If all the backup users were =
-in
-> a certan group, for instance, then you could use that info to decide
-> whether to set the flag in the open calls.
+> Reported-by: Elias Pipping <pipping-N9AOi2cAC9ZBDgjK7y7TUQ@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  configure.ac |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/configure.ac b/configure.ac
+> index 780abe7..6a9ad75 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -24,7 +24,7 @@ AC_ARG_ENABLE(cifscreds,
+>
+>  AC_ARG_ENABLE(cifsidmap,
+>  	[AC_HELP_STRING([--enable-cifsidmap],
+> -			[Create cifs.idmap binary @<:@default=no@:>@])],
+> +			[Create cifs.idmap binary @<:@default=yes@:>@])],
+>  	enable_cifsidmap=$enableval,
+>  	enable_cifsidmap="maybe")
 >
 > --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> 1.7.6
 >
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+Luk Claes                                    e-mail: Luk.Claes-Uy3+E7BMiTU@public.gmane.org
+Directie ICT      Afdeling ICT-Infrastructuur            Groep Systemen
+Universiteit Gent      tel: +32 9 264 96 35         fax: +32 9 264 4994
+Krijgslaan 281, gebouw S9, 9000 Gent, Belgie               www.UGent.be
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
