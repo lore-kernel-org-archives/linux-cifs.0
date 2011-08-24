@@ -1,65 +1,53 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: use memcpy for magic string in cifs signature
- generation BSRSPYL
-Date: Wed, 24 Aug 2011 06:48:55 -0400
-Message-ID: <20110824064855.14daa82c@corrin.poochiereds.net>
-References: <1313803157-31952-1-git-send-email-jlayton@redhat.com>
-	<4E549A73.9020801@suse.de>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [GSoC finished] SMB2 protocol support for CIFS Linux kernel module
+Date: Wed, 24 Aug 2011 13:39:23 -0500
+Message-ID: <CAH2r5mupeO8NjLeo1KkX1RPS7zG=74Y8ZCJd8KPontJ_sxnzFA@mail.gmail.com>
+References: <CAKywueS1O6d=T49tz5zVK=npZ9K5-Pw=AsjAKL2bAHJTi7iB4w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4E549A73.9020801-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <CAKywueS1O6d=T49tz5zVK=npZ9K5-Pw=AsjAKL2bAHJTi7iB4w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 24 Aug 2011 12:00:11 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+This is excellent.
 
-> On 08/20/2011 06:49 AM, Jeff Layton wrote:
-> > ...it's more efficient since we know the length.
-> > 
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifsencrypt.c |    4 ++--
-> >  1 files changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> > index e76bfeb..f11dfb6 100644
-> > --- a/fs/cifs/cifsencrypt.c
-> > +++ b/fs/cifs/cifsencrypt.c
-> > @@ -92,7 +92,7 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
-> >  		return rc;
-> >  
-> >  	if (!server->session_estab) {
-> > -		strncpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
-> > +		memcpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
-> >  		return rc;
-> >  	}
-> >  
-> > @@ -189,7 +189,7 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
-> >  		return rc;
-> >  
-> >  	if (!server->session_estab) {
-> > -		strncpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
-> > +		memcpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
-> >  		return rc;
-> >  	}
-> >  
-> 
-> 
-> Looks good to me.
-> 
-> Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> 
-> Any reason why some of the strncpy/strncmp cases were only picked up
-> among the rest? May be depending on how hot the code path is?
-> 
+Also note the huge increase in scalability that SMB2 will allow (over
+cifs) due to 1) dynamic scaling of number of in-flight requests (based
+on "credits" that the server grants) which is more effective for flow
+control than simply using the tcp window to throttle the client back
+and 2) larger i/o sizes
 
-Simply because that's where I noticed them. If you see other places
-that could benefit, then it's probably reasonable to patch them too.
+On Wed, Aug 24, 2011 at 3:55 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =
+wrote:
+> Hi all!
+>
+> The GSoC program finished and I want to share the results. I created =
+a
+> blog post where I described advantages of using SMB2.1 leases caching
+> strategy in cases where we need to keep several file descriptors of
+> the same file opened during an application execution:
+>
+> http://pshilovsky.blogspot.com/2011/08/gsoc-2011-results.html
+>
+> Your comments are appreciated!
+>
+> --
+> Best regards,
+> Pavel Shilovsky.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+
+--=20
+Thanks,
+
+Steve
