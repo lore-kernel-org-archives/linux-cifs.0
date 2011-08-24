@@ -1,70 +1,77 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: Fix broken sec=ntlmv2/i sec mount option for Samba server
-Date: Tue, 23 Aug 2011 20:16:52 -0500
-Message-ID: <1314148612-18487-1-git-send-email-shirishpargaonkarp@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Add mount option named backup
+Date: Tue, 23 Aug 2011 20:16:38 -0500
+Message-ID: <CADT32eJtKsMzdh9fFteytXy1GeP=myYb+HHyUxaoEWtGLiXSdw@mail.gmail.com>
+References: <1313166821-9172-1-git-send-email-shirishpargonkar@gmail.com>
+	<CADT32eJsAgNkhnY1VZ6wpxa2013h7TmO6i3H=4a6D8ke8iU2Aw@mail.gmail.com>
+	<20110823091510.2d8b8027@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110823091510.2d8b8027-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Tue, Aug 23, 2011 at 8:15 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Mon, 22 Aug 2011 08:33:49 -0500
+> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Fri, Aug 12, 2011 at 11:33 AM, =A0<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
+rote:
+>> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >
+>> >
+>> > Add mount option backup.
+>> >
+>> > It allows an authenticated user to access files with the intent to=
+ back them
+>> > up including their ACLs, who may not have access permission but ha=
+s
+>> > "Backup files and directories user right" on them (by virtue of be=
+ing part
+>> > of the built-in group Backup Operators.
+>> >
+>> > If an authenticated user is not part of the built-in group Backup =
+Operators
+>> > at the server, access to such files is denied.
+>> >
+>> >
+>> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> > ---
+>>
+>>
+>> Jeff, =A0Steve,
+>>
+>> Any comments on this patch (and manpage patch in cifs-utils)?
+>>
+>
+> This seems like a really nasty kludge. It doesn't seem like the
+> implications of this have been carefully considered.
+>
+> What happens I mount with the "backup" flag and do not have the
+> necessary permissions on the server to use the flag in an open? Will
+> this new flag be mutually exclusive with "multiuser"?
 
+I think this mount option should be mutually exclusive with multiuser.
 
-Fix sec=ntlmv2/i authentication option during mount of Samba shares.
+>
+> One idea that might be better is to come up with way to mark certain
+> (unix) users with the appropriate flag. If all the backup users were =
+in
+> a certan group, for instance, then you could use that info to decide
+> whether to set the flag in the open calls.
 
-Samba server does not like timestamp field as one of the av pair
-elements during raw ntlmv2 authentication.
-Windows servers do not care whether that av pair field is used in the
-blob for NTLMv2 authentication.
+I think it would be simple and cleanerm for server to enforce the
+access privileges since it can.
 
-For sec=ntlmsspi, build_av_pair is not used, a blob is plucked from
-type 2 response sent by the server to use in authentication.
+The intended use of this mount option is only for authenticated
+user that are known to have the "Backup files and directories"
+user right.
 
-I tested sec=ntlmv2/i and sec=ntlmssp/i mount options against
-Samba (3.6) and Windows - XP, 2003 Server and 7.
-They all worked.
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsencrypt.c |    9 +--------
- 1 files changed, 1 insertions(+), 8 deletions(-)
-
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index e76bfeb..90f85af 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -353,7 +353,6 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 	unsigned int dlen;
- 	unsigned int wlen;
- 	unsigned int size = 6 * sizeof(struct ntlmssp2_name);
--	__le64  curtime;
- 	char *defdmname = "WORKGROUP";
- 	unsigned char *blobptr;
- 	struct ntlmssp2_name *attrptr;
-@@ -373,7 +372,7 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 	 * two times the unicode length of a server name +
- 	 * size of a timestamp (which is 8 bytes).
- 	 */
--	ses->auth_key.len = size + 2 * (2 * dlen) + 2 * (2 * wlen) + 8;
-+	ses->auth_key.len = size + 2 * (2 * dlen) + 2 * (2 * wlen);
- 	ses->auth_key.response = kzalloc(ses->auth_key.len, GFP_KERNEL);
- 	if (!ses->auth_key.response) {
- 		ses->auth_key.len = 0;
-@@ -416,12 +415,6 @@ build_avpair_blob(struct cifs_ses *ses, const struct nls_table *nls_cp)
- 	blobptr += 2 * wlen;
- 	attrptr = (struct ntlmssp2_name *) blobptr;
- 
--	attrptr->type = cpu_to_le16(NTLMSSP_AV_TIMESTAMP);
--	attrptr->length = cpu_to_le16(sizeof(__le64));
--	blobptr = (unsigned char *)attrptr + sizeof(struct ntlmssp2_name);
--	curtime = cpu_to_le64(cifs_UnixTimeToNT(CURRENT_TIME));
--	memcpy(blobptr, &curtime, sizeof(__le64));
--
- 	return 0;
- }
- 
--- 
-1.6.0.2
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>
