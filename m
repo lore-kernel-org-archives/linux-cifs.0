@@ -1,69 +1,65 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix ERR_PTR dereference in cifs_get_root
-Date: Wed, 24 Aug 2011 07:30:34 -0400
-Message-ID: <20110824073034.41817a40@corrin.poochiereds.net>
-References: <1313940615-3347-1-git-send-email-piastryyy@gmail.com>
-	<20110821122251.1e3c05bc@tlielax.poochiereds.net>
+Subject: Re: [PATCH] cifs: use memcpy for magic string in cifs signature
+ generation BSRSPYL
+Date: Wed, 24 Aug 2011 06:48:55 -0400
+Message-ID: <20110824064855.14daa82c@corrin.poochiereds.net>
+References: <1313803157-31952-1-git-send-email-jlayton@redhat.com>
+	<4E549A73.9020801@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110821122251.1e3c05bc-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <4E549A73.9020801-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 21 Aug 2011 12:22:51 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Wed, 24 Aug 2011 12:00:11 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> On Sun, 21 Aug 2011 19:30:15 +0400
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> 
-> > move it to the beginning of the loop.
+> On 08/20/2011 06:49 AM, Jeff Layton wrote:
+> > ...it's more efficient since we know the length.
 > > 
-> > Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > > ---
-> >  fs/cifs/cifsfs.c |   10 ++++++----
-> >  1 files changed, 6 insertions(+), 4 deletions(-)
+> >  fs/cifs/cifsencrypt.c |    4 ++--
+> >  1 files changed, 2 insertions(+), 2 deletions(-)
 > > 
-> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > index 0435bb9..8b79122 100644
-> > --- a/fs/cifs/cifsfs.c
-> > +++ b/fs/cifs/cifsfs.c
-> > @@ -559,6 +559,12 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
-> >  		struct inode *dir = dentry->d_inode;
-> >  		struct dentry *child;
+> > diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> > index e76bfeb..f11dfb6 100644
+> > --- a/fs/cifs/cifsencrypt.c
+> > +++ b/fs/cifs/cifsencrypt.c
+> > @@ -92,7 +92,7 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+> >  		return rc;
 > >  
-> > +		if (!dir) {
-> > +			dput(dentry);
-> > +			dentry = ERR_PTR(-ENOENT);
-> > +			break;
-> > +		}
-> > +
-> >  		/* skip separators */
-> >  		while (*s == sep)
-> >  			s++;
-> > @@ -574,10 +580,6 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
-> >  		mutex_unlock(&dir->i_mutex);
-> >  		dput(dentry);
-> >  		dentry = child;
-> > -		if (!dentry->d_inode) {
-> > -			dput(dentry);
-> > -			dentry = ERR_PTR(-ENOENT);
-> > -		}
-> >  	} while (!IS_ERR(dentry));
-> >  	_FreeXid(xid);
-> >  	kfree(full_path);
+> >  	if (!server->session_estab) {
+> > -		strncpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
+> > +		memcpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
+> >  		return rc;
+> >  	}
+> >  
+> > @@ -189,7 +189,7 @@ int cifs_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+> >  		return rc;
+> >  
+> >  	if (!server->session_estab) {
+> > -		strncpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
+> > +		memcpy(cifs_pdu->Signature.SecuritySignature, "BSRSPYL", 8);
+> >  		return rc;
+> >  	}
+> >  
 > 
-> What exactly does this fix? The only possible thing I could see it is
-> if sb->s_root was a negative dentry, and I'm not sure that would ever
-> happen. Would it?
+> 
+> Looks good to me.
+> 
+> Reviewed-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> 
+> Any reason why some of the strncpy/strncmp cases were only picked up
+> among the rest? May be depending on how hot the code path is?
 > 
 
-Ahh, nevermind. I see the issue...
+Simply because that's where I noticed them. If you see other places
+that could benefit, then it's probably reasonable to patch them too.
 
-If IS_ERR(dentry) is true then we definitely don't want to try and
-dereference the inode. This needs to go into 3.1 and stable as well.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
