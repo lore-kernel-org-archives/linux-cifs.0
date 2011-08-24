@@ -1,25 +1,69 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GSoC finished] SMB2 protocol support for CIFS Linux kernel module
-Date: Wed, 24 Aug 2011 12:55:30 +0400
-Message-ID: <CAKywueS1O6d=T49tz5zVK=npZ9K5-Pw=AsjAKL2bAHJTi7iB4w@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix ERR_PTR dereference in cifs_get_root
+Date: Wed, 24 Aug 2011 07:30:34 -0400
+Message-ID: <20110824073034.41817a40@corrin.poochiereds.net>
+References: <1313940615-3347-1-git-send-email-piastryyy@gmail.com>
+	<20110821122251.1e3c05bc@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20110821122251.1e3c05bc-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi all!
+On Sun, 21 Aug 2011 12:22:51 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-The GSoC program finished and I want to share the results. I created a
-blog post where I described advantages of using SMB2.1 leases caching
-strategy in cases where we need to keep several file descriptors of
-the same file opened during an application execution:
+> On Sun, 21 Aug 2011 19:30:15 +0400
+> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> 
+> > move it to the beginning of the loop.
+> > 
+> > Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > ---
+> >  fs/cifs/cifsfs.c |   10 ++++++----
+> >  1 files changed, 6 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> > index 0435bb9..8b79122 100644
+> > --- a/fs/cifs/cifsfs.c
+> > +++ b/fs/cifs/cifsfs.c
+> > @@ -559,6 +559,12 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+> >  		struct inode *dir = dentry->d_inode;
+> >  		struct dentry *child;
+> >  
+> > +		if (!dir) {
+> > +			dput(dentry);
+> > +			dentry = ERR_PTR(-ENOENT);
+> > +			break;
+> > +		}
+> > +
+> >  		/* skip separators */
+> >  		while (*s == sep)
+> >  			s++;
+> > @@ -574,10 +580,6 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
+> >  		mutex_unlock(&dir->i_mutex);
+> >  		dput(dentry);
+> >  		dentry = child;
+> > -		if (!dentry->d_inode) {
+> > -			dput(dentry);
+> > -			dentry = ERR_PTR(-ENOENT);
+> > -		}
+> >  	} while (!IS_ERR(dentry));
+> >  	_FreeXid(xid);
+> >  	kfree(full_path);
+> 
+> What exactly does this fix? The only possible thing I could see it is
+> if sb->s_root was a negative dentry, and I'm not sure that would ever
+> happen. Would it?
+> 
 
-http://pshilovsky.blogspot.com/2011/08/gsoc-2011-results.html
+Ahh, nevermind. I see the issue...
 
-Your comments are appreciated!
+If IS_ERR(dentry) is true then we definitely don't want to try and
+dereference the inode. This needs to go into 3.1 and stable as well.
 
--- 
-Best regards,
-Pavel Shilovsky.
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
