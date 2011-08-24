@@ -1,77 +1,77 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Add mount option named backup
-Date: Tue, 23 Aug 2011 20:16:38 -0500
-Message-ID: <CADT32eJtKsMzdh9fFteytXy1GeP=myYb+HHyUxaoEWtGLiXSdw@mail.gmail.com>
-References: <1313166821-9172-1-git-send-email-shirishpargonkar@gmail.com>
-	<CADT32eJsAgNkhnY1VZ6wpxa2013h7TmO6i3H=4a6D8ke8iU2Aw@mail.gmail.com>
-	<20110823091510.2d8b8027@corrin.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] [CIFS] ls on mounts to WindowsCE failing with invalid level message
+Date: Tue, 23 Aug 2011 22:16:54 -0500
+Message-ID: <CAH2r5mvmVNySCiSMc9Bz=yi4Zhzg=sYwxLSpiwapAyn6-HEqDQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110823091510.2d8b8027-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Aug 23, 2011 at 8:15 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Mon, 22 Aug 2011 08:33:49 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Fri, Aug 12, 2011 at 11:33 AM, =A0<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
-rote:
->> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >
->> >
->> > Add mount option backup.
->> >
->> > It allows an authenticated user to access files with the intent to=
- back them
->> > up including their ACLs, who may not have access permission but ha=
-s
->> > "Backup files and directories user right" on them (by virtue of be=
-ing part
->> > of the built-in group Backup Operators.
->> >
->> > If an authenticated user is not part of the built-in group Backup =
-Operators
->> > at the server, access to such files is denied.
->> >
->> >
->> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> > ---
->>
->>
->> Jeff, =A0Steve,
->>
->> Any comments on this patch (and manpage patch in cifs-utils)?
->>
->
-> This seems like a really nasty kludge. It doesn't seem like the
-> implications of this have been carefully considered.
->
-> What happens I mount with the "backup" flag and do not have the
-> necessary permissions on the server to use the flag in an open? Will
-> this new flag be mutually exclusive with "multiuser"?
+>From 9b7b518633fd3187c7efe260fe20a0961e4a5f0b Mon Sep 17 00:00:00 2001
+From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Date: Tue, 23 Aug 2011 22:00:26 -0500
+Subject: [CIFS] ls on mounts to WindowsCE failing with invalid level message
 
-I think this mount option should be mutually exclusive with multiuser.
+Mount succeeds to WindowsCE but when user tries
+to access the contents of the directory gets "NT Status:
+STATUS_INVALID_LEVEL" according to wireshark.
 
->
-> One idea that might be better is to come up with way to mark certain
-> (unix) users with the appropriate flag. If all the backup users were =
-in
-> a certan group, for instance, then you could use that info to decide
-> whether to set the flag in the open calls.
+This server does not support the common windows
+readdir (Findfirst) level 257 nor level 258, so "fall back"
+to level 260 if get an EOPNOTSUPP on level FIND_FILE_DIRECTORY_INFO
+and while we are at it fall back to level 1 (FILE_INFO_STANDARD)
+for very old servers if we get an EOPNOTSUPP on level 260.
+(Note that the server returned errors on queries for inode
+numbers via QueryPathInfo so we don't use the infolevel
+SMB_FIND_FILE_ID_FULL_DIR_INFO)
 
-I think it would be simple and cleanerm for server to enforce the
-access privileges since it can.
+Reported-and-tested-by: Bryan James <Bryan.James.Krone-EXT-zES+1Ur7hjI@public.gmane.org>
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/readdir.c |   17 +++++++++++++++++
+ 1 files changed, 17 insertions(+), 0 deletions(-)
 
-The intended use of this mount option is only for authenticated
-user that are known to have the "Backup files and directories"
-user right.
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 5de03ec..ed29706 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -270,6 +270,7 @@ ffirst_retry:
+ 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_DIRECTORY_INFO;
+ 	}
 
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->
++ffirst_retry_with_std_level:
+ 	rc = CIFSFindFirst(xid, pTcon, full_path, cifs_sb->local_nls,
+ 		&cifsFile->netfid, &cifsFile->srch_inf,
+ 		cifs_sb->mnt_cifs_flags &
+@@ -283,7 +284,23 @@ ffirst_retry:
+ 		(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)) {
+ 		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
+ 		goto ffirst_retry;
++	} else if ((rc == -EOPNOTSUPP) && (cifsFile->srch_inf.info_level ==
++					SMB_FIND_FILE_DIRECTORY_INFO)) {
++		/* Windows CE can return EOPNOTSUPP on FILE_DIRECTORY_INFO */
++		cifsFile->srch_inf.info_level =
++				SMB_FIND_FILE_BOTH_DIRECTORY_INFO;
++		goto ffirst_retry_with_std_level;
++	} else if ((rc == -EOPNOTSUPP) && (cifsFile->srch_inf.info_level ==
++					SMB_FIND_FILE_BOTH_DIRECTORY_INFO)) {
++		cifsFile->srch_inf.info_level =
++				SMB_FIND_FILE_FULL_DIRECTORY_INFO;
++		goto ffirst_retry_with_std_level;
++	} else if ((rc == -EOPNOTSUPP) && (cifsFile->srch_inf.info_level ==
++					SMB_FIND_FILE_FULL_DIRECTORY_INFO)) {
++		cifsFile->srch_inf.info_level = SMB_FIND_FILE_INFO_STANDARD;
++		goto ffirst_retry_with_std_level;
+ 	}
++
+ error_exit:
+ 	kfree(full_path);
+ 	cifs_put_tlink(tlink);
+-- 
+
+-- 
+Thanks,
+
+Steve
