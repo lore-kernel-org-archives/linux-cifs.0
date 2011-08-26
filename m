@@ -1,73 +1,128 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 5/5] cifs: don't discard readahead pages that are beyond EOF
-Date: Fri, 26 Aug 2011 15:18:18 -0400
-Message-ID: <1314386298-27424-6-git-send-email-jlayton@redhat.com>
-References: <1314386298-27424-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix NT_STATUS_ACCESS_DENIED for mounts with
+ prefixpath option
+Date: Sat, 27 Aug 2011 00:11:57 +0400
+Message-ID: <CAKywueQQMuTA=xszQYr6sf5L+cZ_s56qrCiL8MqthWS-Xbxw5A@mail.gmail.com>
+References: <1314341541-2476-1-git-send-email-piastry@etersoft.ru>
+	<20110826073437.743c06a3@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1314386298-27424-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20110826073437.743c06a3-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-READ_AND_X past the eof on the server seems to generally return success
-but with zero bytes. If a process writes to a file while leaving in
-sparse regions, then the VFS may issue readahead to try and and fill in
-the gaps. Those pages may be beyond the EOF however, if the writes have
-not been issued to the server yet. cifs_readv_recieve will currently just
-discard the pages from the pagecache when the response comes in.
+2011/8/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Fri, 26 Aug 2011 10:52:21 +0400
+> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>
+>> Reorganize code and make it send qpath info request only for a full
+>> path (//server/share/prefixpath) rather than request for every path
+>> compoment. In this case we end up with negative dentries for all
+>> components except full one and we will instantiate them later if
+>> such a mount is requested.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>> ---
+>> =A0fs/cifs/cifsfs.c =A0| =A0123 +++++++++++++++++++++++++++++++-----=
+-----------------
+>> =A0fs/cifs/cifsfs.h =A0| =A0 =A03 +-
+>> =A0fs/cifs/inode.c =A0 | =A0 =A07 ++-
+>> =A0fs/cifs/readdir.c | =A0 =A09 +++-
+>> =A04 files changed, 85 insertions(+), 57 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+>> index 0435bb9..33a2e1e 100644
+>> --- a/fs/cifs/cifsfs.c
+>> +++ b/fs/cifs/cifsfs.c
+>> @@ -95,14 +95,13 @@ mempool_t *smb2_mid_poolp;
+>> =A0static struct kmem_cache *smb2_mid_cachep;
+>> =A0#endif /* CONFIG_CIFS_SMB2 */
+>>
+>> -static int
+>> +static void
+>> =A0cifs_read_super(struct super_block *sb)
+>> =A0{
+>> - =A0 =A0 struct inode *inode;
+>> - =A0 =A0 struct cifs_sb_info *cifs_sb;
+>> - =A0 =A0 int rc =3D 0;
+>> + =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
+>>
+>> - =A0 =A0 cifs_sb =3D CIFS_SB(sb);
+>> + =A0 =A0 /* BB should we make this contingent on mount parm? */
+>> + =A0 =A0 sb->s_flags |=3D MS_NODIRATIME | MS_NOATIME;
+>>
+>> =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIXACL)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 sb->s_flags |=3D MS_POSIXACL;
+>> @@ -120,26 +119,6 @@ cifs_read_super(struct super_block *sb)
+>> =A0 =A0 =A0 sb->s_bdi =3D &cifs_sb->bdi;
+>> =A0 =A0 =A0 sb->s_blocksize =3D CIFS_MAX_MSGSIZE;
+>> =A0 =A0 =A0 sb->s_blocksize_bits =3D 14; =A0 =A0 =A0/* default 2**14=
+ =3D CIFS_MAX_MSGSIZE */
+>> - =A0 =A0 inode =3D cifs_root_iget(sb);
+>> -
+>> - =A0 =A0 if (IS_ERR(inode)) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 rc =3D PTR_ERR(inode);
+>> - =A0 =A0 =A0 =A0 =A0 =A0 inode =3D NULL;
+>> - =A0 =A0 =A0 =A0 =A0 =A0 goto out_no_root;
+>> - =A0 =A0 }
+>> -
+>> - =A0 =A0 sb->s_root =3D d_alloc_root(inode);
+>> -
+>> - =A0 =A0 if (!sb->s_root) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
+>> - =A0 =A0 =A0 =A0 =A0 =A0 goto out_no_root;
+>> - =A0 =A0 }
+>> -
+>> - =A0 =A0 /* do that *after* d_alloc_root() - we want NULL ->d_op fo=
+r root here */
+>> - =A0 =A0 if (cifs_sb_master_tcon(cifs_sb)->nocase)
+>> - =A0 =A0 =A0 =A0 =A0 =A0 sb->s_d_op =3D &cifs_ci_dentry_ops;
+>> - =A0 =A0 else
+>> - =A0 =A0 =A0 =A0 =A0 =A0 sb->s_d_op =3D &cifs_dentry_ops;
+>>
+>> =A0#ifdef CIFS_NFSD_EXPORT
+>> =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
+>> @@ -148,14 +127,7 @@ cifs_read_super(struct super_block *sb)
+>> =A0 =A0 =A0 }
+>> =A0#endif /* CIFS_NFSD_EXPORT */
+>>
+>> - =A0 =A0 return 0;
+>> -
+>> -out_no_root:
+>> - =A0 =A0 cERROR(1, "cifs_read_super: get root inode failed");
+>> - =A0 =A0 if (inode)
+>> - =A0 =A0 =A0 =A0 =A0 =A0 iput(inode);
+>> -
+>> - =A0 =A0 return rc;
+>> + =A0 =A0 sb->s_flags |=3D MS_ACTIVE;
+>> =A0}
+>>
+>> =A0static void cifs_kill_sb(struct super_block *sb)
+>> @@ -529,6 +501,17 @@ static const struct super_operations cifs_super=
+_ops =3D {
+>> =A0#endif
+>> =A0};
+>>
+>> +static struct dentry *
+>> +cifs_alloc_root(struct super_block *sb)
+>> +{
+>> + =A0 =A0 struct qstr q;
+>> +
+>> + =A0 =A0 q.name =3D "/";
+>
+> =A0 =A0 =A0 =A0I don't think you want a separator in the name. That s=
+eems
+> =A0 =A0 =A0 =A0like it should be "".
+>
 
-That confuses the poor VFS -- it thinks that the i_size is bigger and
-will keep trying to read from the server to fill the gaps. When there
-is no remaining data in the response, and the page is beyond the
-server->eof, then simply zero it out, set it uptodate and leave it
-in place. This ensures that the VFS won't keep trying to issue reads
-for these regions.
+In this case I based it on d_alloc_root() function that fills name as
+"/". Why this should be ""?
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifssmb.c |   15 +++++++++++++++
- 1 files changed, 15 insertions(+), 0 deletions(-)
-
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c5f6ea6..79f346e 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1445,6 +1445,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	struct cifs_readdata *rdata = mid->callback_data;
- 	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
- 	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length);
-+	u64 eof;
-+	pgoff_t eof_index;
- 	struct page *page, *tpage;
- 
- 	cFYI(1, "%s: mid=%u offset=%llu bytes=%u", __func__,
-@@ -1517,6 +1519,11 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	/* marshal up the page array */
- 	remaining = data_len;
- 	rdata->nr_iov = 1;
-+
-+	eof = CIFS_I(rdata->mapping->host)->server_eof;
-+	eof_index = eof ? (eof - 1) >> PAGE_CACHE_SHIFT : 0;
-+	cFYI(1, "eof=%llu eof_index=%lu", eof, eof_index);
-+
- 	list_for_each_entry_safe(page, tpage, &rdata->pages, lru) {
- 		if (remaining >= PAGE_CACHE_SIZE) {
- 			rdata->iov[rdata->nr_iov].iov_base = kmap(page);
-@@ -1539,6 +1546,14 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 			++rdata->nr_iov;
- 			len += remaining;
- 			remaining = 0;
-+		} else if (page->index > eof_index) {
-+			zero_user(page, 0, PAGE_CACHE_SIZE);
-+			list_del(&page->lru);
-+			lru_cache_add_file(page);
-+			flush_dcache_page(page);
-+			SetPageUptodate(page);
-+			unlock_page(page);
-+			page_cache_release(page);
- 		} else {
- 			/* no need to hold page hostage */
- 			delete_from_page_cache(page);
--- 
-1.7.6
+--=20
+Best regards,
+Pavel Shilovsky.
