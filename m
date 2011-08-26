@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/16] cifs: keep a reusable kvec array for receives
-Date: Fri, 26 Aug 2011 15:06:21 -0400
-Message-ID: <1314385589-27136-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 06/16] cifs: simplify read_from_socket
+Date: Fri, 26 Aug 2011 15:06:19 -0400
+Message-ID: <1314385589-27136-7-git-send-email-jlayton@redhat.com>
 References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,85 +10,163 @@ In-Reply-To: <1314385589-27136-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Having to continually allocate a new kvec array is expensive. Allocate
-one that's big enough, and only reallocate it as needed.
+Move the iovec handling entirely into read_from_socket. That simplifies
+the code and gets rid of the special handling for header reads. With
+this we can also get rid of the "goto incomplete_rcv" label in the main
+demultiplex thread function since we can now treat header and non-header
+receives the same way.
+
+Also, make it return an int (since we'll never receive enough to worry
+about the sign bit anyway), and simply make it return the amount of bytes
+read or a negative error code.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    2 ++
- fs/cifs/connect.c  |   26 ++++++++++++++++++++------
- 2 files changed, 22 insertions(+), 6 deletions(-)
+ fs/cifs/connect.c |   77 ++++++++++++++++------------------------------------
+ 1 files changed, 24 insertions(+), 53 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 95dad9d..7d93c62 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -287,6 +287,8 @@ struct TCP_Server_Info {
- 	bool	sec_kerberos;		/* supports plain Kerberos */
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	struct delayed_work	echo; /* echo ping workqueue job */
-+	struct kvec *iov;	/* reusable kvec array for receives */
-+	unsigned int nr_iov;	/* number of kvecs in array */
- #ifdef CONFIG_CIFS_FSCACHE
- 	struct fscache_cookie   *fscache; /* client index cache cookie */
- #endif
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 3ff3fab..f7bd9ba 100644
+index e899fec..358e0b0 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -410,6 +410,24 @@ kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
- 	return nr_segs;
+@@ -376,35 +376,33 @@ server_unresponsive(struct TCP_Server_Info *server)
  }
  
-+static struct kvec *
-+get_server_iovec(struct TCP_Server_Info *server, unsigned int nr_segs)
-+{
-+	struct kvec *new_iov;
-+
-+	if (server->iov && nr_segs <= server->nr_iov)
-+		return server->iov;
-+
-+	/* not big enough -- allocate a new one and release the old */
-+	new_iov = kmalloc(sizeof(*new_iov) * nr_segs, GFP_KERNEL);
-+	if (new_iov) {
-+		kfree(server->iov);
-+		server->iov = new_iov;
-+		server->nr_iov = nr_segs;
-+	}
-+	return new_iov;
-+}
-+
  static int
- readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 		  unsigned int nr_segs, unsigned int to_read)
-@@ -420,11 +438,7 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+-read_from_socket(struct TCP_Server_Info *server,
+-		 struct kvec *iov, unsigned int to_read,
+-		 unsigned int *ptotal_read, bool is_header_read)
++read_from_socket(struct TCP_Server_Info *server, char *buf,
++		 unsigned int to_read)
+ {
+-	int length, rc = 0;
+-	unsigned int total_read;
++	int length = 0;
++	int total_read;
  	struct msghdr smb_msg;
- 	struct kvec *iov;
+-	char *buf = iov->iov_base;
++	struct kvec iov;
  
--	/*
--	 * FIXME: allocation here may cause deadlocks under memory pressure.
--	 * Switch this to use a fixed, per-socket buffer.
--	 */
--	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_KERNEL);
-+	iov = get_server_iovec(server, nr_segs);
- 	if (!iov)
- 		return -ENOMEM;
+ 	smb_msg.msg_control = NULL;
+ 	smb_msg.msg_controllen = 0;
  
-@@ -468,7 +482,6 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+-	for (total_read = 0; total_read < to_read; total_read += length) {
++	for (total_read = 0; to_read; total_read += length, to_read -= length) {
+ 		if (server_unresponsive(server)) {
+-			rc = 1;
++			total_read = -EAGAIN;
+ 			break;
+ 		}
+ 
+-		length = kernel_recvmsg(server->ssocket, &smb_msg, iov, 1,
+-					to_read - total_read, 0);
++		iov.iov_base = buf + total_read;
++		iov.iov_len = to_read;
++		length = kernel_recvmsg(server->ssocket, &smb_msg, &iov, 1,
++					to_read, 0);
+ 		if (server->tcpStatus == CifsExiting) {
+-			/* then will exit */
+-			rc = 2;
++			total_read = -ESHUTDOWN;
+ 			break;
+ 		} else if (server->tcpStatus == CifsNeedReconnect) {
+ 			cifs_reconnect(server);
+-			/* Reconnect wakes up rspns q */
+-			/* Now we will reread sock */
+-			rc = 1;
++			total_read = -EAGAIN;
+ 			break;
+ 		} else if (length == -ERESTARTSYS ||
+ 			   length == -EAGAIN ||
+@@ -416,28 +414,16 @@ read_from_socket(struct TCP_Server_Info *server,
+ 			 */
+ 			usleep_range(1000, 2000);
+ 			length = 0;
+-			if (!is_header_read)
+-				continue;
+-			/* Special handling for header read */
+-			if (total_read) {
+-				iov->iov_base = (to_read - total_read) +
+-						buf;
+-				iov->iov_len = to_read - total_read;
+-				rc = 3;
+-			} else
+-				rc = 1;
+-			break;
++			continue;
+ 		} else if (length <= 0) {
+-			cERROR(1, "Received no data, expecting %d",
+-			       to_read - total_read);
++			cERROR(1, "Received no data or error: expecting %d "
++				  "got %d", to_read, length);
+ 			cifs_reconnect(server);
+-			rc = 1;
++			total_read = -EAGAIN;
  			break;
  		}
  	}
--	kfree(iov);
- 	return total_read;
+-
+-	*ptotal_read = total_read;
+-	return rc;
++	return total_read;
  }
  
-@@ -686,6 +699,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 	}
+ static bool
+@@ -658,12 +644,10 @@ cifs_demultiplex_thread(void *p)
+ 	unsigned int pdu_length, total_read;
+ 	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
+ 	struct smb_hdr *smb_buffer = NULL;
+-	struct kvec iov;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+ 	bool isLargeBuf = false;
+ 	bool isMultiRsp = false;
+-	int rc;
  
- 	kfree(server->hostname);
-+	kfree(server->iov);
- 	kfree(server);
+ 	current->flags |= PF_MEMALLOC;
+ 	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
+@@ -686,19 +670,12 @@ cifs_demultiplex_thread(void *p)
+ 		isMultiRsp = false;
+ 		smb_buffer = (struct smb_hdr *)smallbuf;
+ 		buf = smallbuf;
+-		iov.iov_base = buf;
+-		iov.iov_len = 4;
+ 		pdu_length = 4; /* enough to get RFC1001 header */
  
- 	length = atomic_dec_return(&tcpSesAllocCount);
+-incomplete_rcv:
+-		rc = read_from_socket(server, &iov, pdu_length,
+-				      &total_read, true /* header read */);
+-		if (rc == 3)
+-			goto incomplete_rcv;
+-		else if (rc == 2)
+-			break;
+-		else if (rc == 1)
++		length = read_from_socket(server, buf, pdu_length);
++		if (length < 0)
+ 			continue;
++		total_read = length;
+ 
+ 		/*
+ 		 * The right amount was read from socket - 4 bytes,
+@@ -718,16 +695,10 @@ incomplete_rcv:
+ 			buf = bigbuf;
+ 		}
+ 
+-		iov.iov_base = 4 + buf;
+-		iov.iov_len = pdu_length;
+-		rc = read_from_socket(server, &iov, pdu_length,
+-				      &total_read, false);
+-		if (rc == 2)
+-			break;
+-		else if (rc == 1)
++		length = read_from_socket(server, buf + 4, pdu_length);
++		if (length < 0)
+ 			continue;
+-
+-		total_read += 4; /* account for rfc1002 hdr */
++		total_read += length;
+ 
+ 		dump_smb(smb_buffer, total_read);
+ 
 -- 
 1.7.6
