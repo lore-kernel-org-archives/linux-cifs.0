@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 05/16] cifs: check for unresponsive server every time we call kernel_recvmsg
-Date: Fri, 26 Aug 2011 15:06:18 -0400
-Message-ID: <1314385589-27136-6-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 09/16] cifs: clean up check_rfc1002_header
+Date: Fri, 26 Aug 2011 15:06:22 -0400
+Message-ID: <1314385589-27136-10-git-send-email-jlayton@redhat.com>
 References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,71 +10,121 @@ In-Reply-To: <1314385589-27136-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If the server stops sending data while in the middle of sending a
-response then we still want to reconnect it if it doesn't come back.
+Rename it for better clarity as to what it does and have the caller pass
+in just the single type byte. Turn the if statement into a switch and
+optimize it by placing the most common message type at the top. Move the
+header length check back into cifs_demultiplex_thread in preparation
+for adding a new receive phase and normalize the cFYI messages.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   33 ++++++++++++++++++++++-----------
- 1 files changed, 22 insertions(+), 11 deletions(-)
+ fs/cifs/connect.c |   63 +++++++++++++++++++++++++---------------------------
+ 1 files changed, 30 insertions(+), 33 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 012d970..e899fec 100644
+index f7bd9ba..eb76b29 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -358,6 +358,23 @@ allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
- 	return true;
+@@ -498,29 +498,29 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
  }
  
-+static bool
-+server_unresponsive(struct TCP_Server_Info *server)
-+{
-+	if (echo_retries > 0 && server->tcpStatus == CifsGood &&
-+	    time_after(jiffies, server->lstrp +
-+				(echo_retries * SMB_ECHO_INTERVAL))) {
-+		cERROR(1, "Server %s has not responded in %d seconds. "
-+			  "Reconnecting...", server->hostname,
-+			  (echo_retries * SMB_ECHO_INTERVAL / HZ));
-+		cifs_reconnect(server);
-+		wake_up(&server->response_q);
+ static bool
+-check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
++is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ {
+-	char temp = *buf;
+-	unsigned int pdu_length = be32_to_cpu(
+-				((struct smb_hdr *)buf)->smb_buf_length);
+-
+ 	/*
+ 	 * The first byte big endian of the length field,
+ 	 * is actually not part of the length but the type
+ 	 * with the most common, zero, as regular data.
+ 	 */
+-	if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
+-		return false;
+-	} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
+-		cFYI(1, "Good RFC 1002 session rsp");
+-		return false;
+-	} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
++	switch (type) {
++	case RFC1002_SESSION_MESSAGE:
++		/* Regular SMB response */
 +		return true;
-+	}
-+
-+	return false;
-+}
-+
- static int
- read_from_socket(struct TCP_Server_Info *server,
- 		 struct kvec *iov, unsigned int to_read,
-@@ -372,6 +389,11 @@ read_from_socket(struct TCP_Server_Info *server,
- 	smb_msg.msg_controllen = 0;
++	case RFC1002_SESSION_KEEP_ALIVE:
++		cFYI(1, "RFC 1002 session keep alive");
++		break;
++	case RFC1002_POSITIVE_SESSION_RESPONSE:
++		cFYI(1, "RFC 1002 positive session response");
++		break;
++	case RFC1002_NEGATIVE_SESSION_RESPONSE:
+ 		/*
+ 		 * We get this from Windows 98 instead of an error on
+ 		 * SMB negprot response.
+ 		 */
+-		cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
+-			pdu_length);
++		cFYI(1, "RFC 1002 negative session response");
+ 		/* give server a second to clean up */
+ 		msleep(1000);
+ 		/*
+@@ -529,29 +529,16 @@ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
+ 		 * is since we do not begin with RFC1001 session
+ 		 * initialize frame).
+ 		 */
+-		cifs_set_port((struct sockaddr *)
+-				&server->dstaddr, CIFS_PORT);
++		cifs_set_port((struct sockaddr *)&server->dstaddr, CIFS_PORT);
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+-		return false;
+-	} else if (temp != (char) 0) {
+-		cERROR(1, "Unknown RFC 1002 frame");
+-		cifs_dump_mem(" Received Data: ", buf, 4);
+-		cifs_reconnect(server);
+-		return false;
+-	}
+-
+-	/* else we have an SMB response */
+-	if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
+-	    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
+-		cERROR(1, "Invalid size SMB length %d pdu_length %d",
+-		       4, pdu_length+4);
++		break;
++	default:
++		cERROR(1, "RFC 1002 unknown response type 0x%x", type);
+ 		cifs_reconnect(server);
+-		wake_up(&server->response_q);
+-		return false;
+ 	}
  
- 	for (total_read = 0; total_read < to_read; total_read += length) {
-+		if (server_unresponsive(server)) {
-+			rc = 1;
-+			break;
+-	return true;
++	return false;
+ }
+ 
+ static struct mid_q_entry *
+@@ -755,10 +742,20 @@ cifs_demultiplex_thread(void *p)
+ 		 */
+ 		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
+ 
+-		cFYI(1, "rfc1002 length 0x%x", pdu_length+4);
+-		if (!check_rfc1002_header(server, buf))
++		cFYI(1, "RFC1002 header 0x%x", pdu_length);
++		if (!is_smb_response(server, buf[0]))
+ 			continue;
+ 
++		/* check the length */
++		if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
++		    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
++			cERROR(1, "Invalid size SMB length %d pdu_length %d",
++			       4, pdu_length + 4);
++			cifs_reconnect(server);
++			wake_up(&server->response_q);
++			continue;
 +		}
 +
- 		length = kernel_recvmsg(server->ssocket, &smb_msg, iov, 1,
- 					to_read - total_read, 0);
- 		if (server->tcpStatus == CifsExiting) {
-@@ -669,17 +691,6 @@ cifs_demultiplex_thread(void *p)
- 		pdu_length = 4; /* enough to get RFC1001 header */
- 
- incomplete_rcv:
--		if (echo_retries > 0 && server->tcpStatus == CifsGood &&
--		    time_after(jiffies, server->lstrp +
--					(echo_retries * SMB_ECHO_INTERVAL))) {
--			cERROR(1, "Server %s has not responded in %d seconds. "
--				  "Reconnecting...", server->hostname,
--				  (echo_retries * SMB_ECHO_INTERVAL / HZ));
--			cifs_reconnect(server);
--			wake_up(&server->response_q);
--			continue;
--		}
--
- 		rc = read_from_socket(server, &iov, pdu_length,
- 				      &total_read, true /* header read */);
- 		if (rc == 3)
+ 		/* else length ok */
+ 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
+ 			isLargeBuf = true;
 -- 
 1.7.6
