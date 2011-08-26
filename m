@@ -1,190 +1,158 @@
-From: Tim Lank <timlank-3iNpEh//jjRBDgjK7y7TUQ@public.gmane.org>
-Subject: touch: setting times of `file4': Permission denied
-Date: Fri, 26 Aug 2011 09:19:05 -0400
-Message-ID: <CAHyifnRoqZPUTF0GFGpygMrktmFCPahEHrnBSjR6Bk1a6p+oPg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH] CIFS: Fix the conflict between rwpidforward and rw mount options
+Date: Fri, 26 Aug 2011 22:03:03 +0400
+Message-ID: <1314381783-5614-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Linux-cifs:
+Both these options are started with "rw" - that's why the first one
+isn't switched on even if it is specified. Rename it to piforwardio
+to avoid the wrong matching.
 
-The file "file4" gets created when using the touch command, but the
-error message "touch: setting times of `file4': Permission denied" is
-returned.
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/README       |    2 +-
+ fs/cifs/cifs_fs_sb.h |    2 +-
+ fs/cifs/cifsfs.c     |    6 ++++--
+ fs/cifs/cifsglob.h   |    2 +-
+ fs/cifs/connect.c    |    8 ++++----
+ fs/cifs/file.c       |   10 +++++-----
+ 6 files changed, 16 insertions(+), 14 deletions(-)
 
-Seems like it is having an issue with the utimensat() call to set the
-timestamp?  Why is this?  How is it solved?
-
-Thanks in advance for any assistance.
-
-Tim
-
-# modinfo cifs
-filename:       /lib/modules/2.6.32-131.6.1.el6.x86_64/kernel/fs/cifs/cifs.ko
-version:        1.68
-description:    VFS to access servers complying with the SNIA CIFS
-Specification e.g. Samba and Windows
-license:        GPL
-author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-srcversion:     6BE0EB6FED154E567A97675
-depends:
-vermagic:       2.6.32-131.6.1.el6.x86_64 SMP mod_unload modversions
-parm:           CIFSMaxBufSize:Network buffer size (not including
-header). Default: 16384 Range: 8192 to 130048 (int)
-parm:           cifs_min_rcv:Network buffers in pool. Default: 4
-Range: 1 to 64 (int)
-parm:           cifs_min_small:Small network buffers in pool. Default:
-30 Range: 2 to 256 (int)
-parm:           cifs_max_pending:Simultaneous requests to server.
-Default: 50 Range: 2 to 256 (int)
-
-# mount.cifs -V
-mount.cifs version: 4.8.1
-
-# uname -r
-2.6.32-131.6.1.el6.x86_64
-
-# rpm -qa | grep samba
-samba-client-3.5.6-86.el6.x86_64
-samba-common-3.5.6-86.el6.x86_64
-samba-winbind-clients-3.5.6-86.el6.x86_64
-
-/etc/fstab entry:
-//fileserver/testshare /testmount cifs
-rw,file_mode=0775,dir_mode=0775,uid=4051,gid=4053,credentials=/etc/credentials.txt,_netdev
-0 0
-
-/etc/passwd entry:
-appuser:x:4051:4051:Application user:/home/appuser:/bin/bash
-
-/etc/group entry:
-isperms:x:4053:appuser
-
-# cat /etc/credentials.txt
-username=WINDOWSUSER
-password=<NONEOFYOURBUSINESS>
-
-
-# strace touch file4
-execve("/bin/touch", ["touch", "file4"], [/* 26 vars */]) = 0
-brk(0)                                  = 0x17d5000
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
-0) = 0x7f886e77f000
-access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
-open("/etc/ld.so.cache", O_RDONLY)      = 3
-fstat(3, {st_mode=S_IFREG|0644, st_size=27750, ...}) = 0
-mmap(NULL, 27750, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f886e778000
-close(3)                                = 0
-open("/lib64/librt.so.1", O_RDONLY)     = 3
-read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0@!\0\202?\0\0\0"...,
-832) = 832
-fstat(3, {st_mode=S_IFREG|0755, st_size=47072, ...}) = 0
-mmap(0x3f82000000, 2128816, PROT_READ|PROT_EXEC,
-MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x3f82000000
-mprotect(0x3f82007000, 2093056, PROT_NONE) = 0
-mmap(0x3f82206000, 8192, PROT_READ|PROT_WRITE,
-MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x3f82206000
-close(3)                                = 0
-open("/lib64/libc.so.6", O_RDONLY)      = 3
-read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\260\355\201\0061\0\0\0"...,
-832) = 832
-fstat(3, {st_mode=S_IFREG|0755, st_size=1912928, ...}) = 0
-mmap(0x3106800000, 3737768, PROT_READ|PROT_EXEC,
-MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x3106800000
-mprotect(0x3106987000, 2097152, PROT_NONE) = 0
-mmap(0x3106b87000, 20480, PROT_READ|PROT_WRITE,
-MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x187000) = 0x3106b87000
-mmap(0x3106b8c000, 18600, PROT_READ|PROT_WRITE,
-MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x3106b8c000
-close(3)                                = 0
-open("/lib64/libpthread.so.0", O_RDONLY) = 3
-read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\20\\\0\237;\0\0\0"...,
-832) = 832
-fstat(3, {st_mode=S_IFREG|0755, st_size=145672, ...}) = 0
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
-0) = 0x7f886e777000
-mmap(0x3b9f000000, 2212768, PROT_READ|PROT_EXEC,
-MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x3b9f000000
-mprotect(0x3b9f017000, 2097152, PROT_NONE) = 0
-mmap(0x3b9f217000, 8192, PROT_READ|PROT_WRITE,
-MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x17000) = 0x3b9f217000
-mmap(0x3b9f219000, 13216, PROT_READ|PROT_WRITE,
-MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x3b9f219000
-close(3)                                = 0
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
-0) = 0x7f886e776000
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
-0) = 0x7f886e775000
-arch_prctl(ARCH_SET_FS, 0x7f886e776700) = 0
-mprotect(0x3f82206000, 4096, PROT_READ) = 0
-mprotect(0x3106b87000, 16384, PROT_READ) = 0
-mprotect(0x3b9f217000, 4096, PROT_READ) = 0
-mprotect(0x310621f000, 4096, PROT_READ) = 0
-munmap(0x7f886e778000, 27750)           = 0
-set_tid_address(0x7f886e7769d0)         = 5363
-set_robust_list(0x7f886e7769e0, 0x18)   = 0
-futex(0x7fff60c86b4c, FUTEX_WAKE_PRIVATE, 1) = 0
-futex(0x7fff60c86b4c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME,
-1, NULL, 7f886e776700) = -1 EAGAIN (Resource temporarily unavailable)
-rt_sigaction(SIGRTMIN, {0x3b9f005a90, [], SA_RESTORER|SA_SIGINFO,
-0x3b9f00f520}, NULL, 8) = 0
-rt_sigaction(SIGRT_1, {0x3b9f005b20, [],
-SA_RESTORER|SA_RESTART|SA_SIGINFO, 0x3b9f00f520}, NULL, 8) = 0
-rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
-getrlimit(RLIMIT_STACK, {rlim_cur=10240*1024, rlim_max=RLIM_INFINITY}) = 0
-brk(0)                                  = 0x17d5000
-brk(0x17f6000)                          = 0x17f6000
-open("/usr/lib/locale/locale-archive", O_RDONLY) = 3
-fstat(3, {st_mode=S_IFREG|0644, st_size=99158752, ...}) = 0
-mmap(NULL, 99158752, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f88688e4000
-close(3)                                = 0
-open("file4", O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK, 0666) = 3
-dup2(3, 0)                              = 0
-close(3)                                = 0
-utimensat(0, NULL, NULL, 0)             = -1 EACCES (Permission denied)
-close(0)                                = 0
-open("/usr/share/locale/locale.alias", O_RDONLY) = 0
-fstat(0, {st_mode=S_IFREG|0644, st_size=2512, ...}) = 0
-mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
-0) = 0x7f886e77e000
-read(0, "# Locale name alias data base.\n#"..., 4096) = 2512
-read(0, "", 4096)                       = 0
-close(0)                                = 0
-munmap(0x7f886e77e000, 4096)            = 0
-open("/usr/share/locale/en_US.UTF-8/LC_MESSAGES/coreutils.mo",
-O_RDONLY) = -1 ENOENT (No such file or directory)
-open("/usr/share/locale/en_US.utf8/LC_MESSAGES/coreutils.mo",
-O_RDONLY) = -1 ENOENT (No such file or directory)
-open("/usr/share/locale/en_US/LC_MESSAGES/coreutils.mo", O_RDONLY) =
--1 ENOENT (No such file or directory)
-open("/usr/share/locale/en.UTF-8/LC_MESSAGES/coreutils.mo", O_RDONLY)
-= -1 ENOENT (No such file or directory)
-open("/usr/share/locale/en.utf8/LC_MESSAGES/coreutils.mo", O_RDONLY) =
--1 ENOENT (No such file or directory)
-open("/usr/share/locale/en/LC_MESSAGES/coreutils.mo", O_RDONLY) = 0
-fstat(0, {st_mode=S_IFREG|0644, st_size=435, ...}) = 0
-mmap(NULL, 435, PROT_READ, MAP_PRIVATE, 0, 0) = 0x7f886e77e000
-close(0)                                = 0
-write(2, "touch: ", 7touch: )                  = 7
-write(2, "setting times of `file4'", 24setting times of `file4') = 24
-open("/usr/share/locale/en_US.UTF-8/LC_MESSAGES/libc.mo", O_RDONLY) =
--1 ENOENT (No such file or directory)
-open("/usr/share/locale/en_US.utf8/LC_MESSAGES/libc.mo", O_RDONLY) =
--1 ENOENT (No such file or directory)
-open("/usr/share/locale/en_US/LC_MESSAGES/libc.mo", O_RDONLY) = -1
-ENOENT (No such file or directory)
-open("/usr/share/locale/en.UTF-8/LC_MESSAGES/libc.mo", O_RDONLY) = -1
-ENOENT (No such file or directory)
-open("/usr/share/locale/en.utf8/LC_MESSAGES/libc.mo", O_RDONLY) = -1
-ENOENT (No such file or directory)
-open("/usr/share/locale/en/LC_MESSAGES/libc.mo", O_RDONLY) = -1 ENOENT
-(No such file or directory)
-write(2, ": Permission denied", 19: Permission denied)     = 19
-write(2, "\n", 1
-)                       = 1
-close(1)                                = 0
-close(2)                                = 0
-exit_group(1)                           = ?
+diff --git a/fs/cifs/README b/fs/cifs/README
+index c5c2c5e..a943855 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -457,7 +457,7 @@ A partial list of the supported mount options follows:
+ 		otherwise - read from the server. All written data are stored
+ 		in the cache, but if the client doesn't have Exclusive Oplock,
+ 		it writes the data to the server.
+-  rwpidforward  Forward pid of a process who opened a file to any read or write
++  pidforwardio  Forward pid of a process who opened a file to any read or write
+ 		operation on that file. This prevent applications like WINE
+ 		from failing on read and write if we use mandatory brlock style.
+   acl   	Allow setfacl and getfacl to manage posix ACLs if server
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 7260e11..2a74b6f 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -41,7 +41,7 @@
+ #define CIFS_MOUNT_MF_SYMLINKS	0x10000 /* Minshall+French Symlinks enabled */
+ #define CIFS_MOUNT_MULTIUSER	0x20000 /* multiuser mount */
+ #define CIFS_MOUNT_STRICT_IO	0x40000 /* strict cache mode */
+-#define CIFS_MOUNT_RWPIDFORWARD	0x80000 /* use pid forwarding for rw */
++#define CIFS_MOUNT_PIDFORWARD_IO 0x80000 /* use pid forwarding for rw */
+ #define CIFS_MOUNT_POSIXACL	0x100000 /* mirror of MS_POSIXACL in mnt_cifs_flags */
+ 
+ struct cifs_sb_info {
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index f93eb94..1b16773 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -408,10 +408,12 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
+ 		seq_printf(s, ",setuids");
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM)
+ 		seq_printf(s, ",serverino");
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+-		seq_printf(s, ",rwpidforward");
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_PIDFORWARD_IO)
++		seq_printf(s, ",pidforwardio");
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL)
+ 		seq_printf(s, ",forcemand");
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
++		seq_printf(s, ",strictcache");
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DIRECT_IO)
+ 		seq_printf(s, ",directio");
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 95dad9d..a37452d 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -200,7 +200,7 @@ struct smb_vol {
+ 	bool fsc:1;	/* enable fscache */
+ 	bool mfsymlinks:1; /* use Minshall+French Symlinks */
+ 	bool multiuser:1;
+-	bool rwpidforward:1; /* pid forward for read/write operations */
++	bool pidforwardio:1; /* pid forward for read/write operations */
+ 	unsigned int rsize;
+ 	unsigned int wsize;
+ 	bool sockopt_tcp_nodelay:1;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 633c246..2cadc34 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1401,8 +1401,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 			vol->server_ino = 1;
+ 		} else if (strnicmp(data, "noserverino", 9) == 0) {
+ 			vol->server_ino = 0;
+-		} else if (strnicmp(data, "rwpidforward", 4) == 0) {
+-			vol->rwpidforward = 1;
++		} else if (strnicmp(data, "pidforwardio", 12) == 0) {
++			vol->pidforwardio = 1;
+ 		} else if (strnicmp(data, "cifsacl", 7) == 0) {
+ 			vol->cifs_acl = 1;
+ 		} else if (strnicmp(data, "nocifsacl", 9) == 0) {
+@@ -2759,8 +2759,8 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOSSYNC;
+ 	if (pvolume_info->mand_lock)
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOPOSIXBRL;
+-	if (pvolume_info->rwpidforward)
+-		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RWPIDFORWARD;
++	if (pvolume_info->pidforwardio)
++		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_PIDFORWARD_IO;
+ 	if (pvolume_info->cifs_acl)
+ 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_ACL;
+ 	if (pvolume_info->override_uid)
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9f41a10..bfa7c26 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1352,7 +1352,7 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(cfile->dentry->d_sb);
+ 	__u32 pid;
+ 
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_PIDFORWARD_IO)
+ 		pid = cfile->pid;
+ 	else
+ 		pid = current->tgid;
+@@ -1579,7 +1579,7 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+ 	xid = GetXid();
+ 	open_file = file->private_data;
+ 
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_PIDFORWARD_IO)
+ 		pid = open_file->pid;
+ 	else
+ 		pid = current->tgid;
+@@ -1729,7 +1729,7 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
+ 	open_file = file->private_data;
+ 	pTcon = tlink_tcon(open_file->tlink);
+ 
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_PIDFORWARD_IO)
+ 		pid = open_file->pid;
+ 	else
+ 		pid = current->tgid;
+@@ -1850,7 +1850,7 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	open_file = file->private_data;
+ 	pTcon = tlink_tcon(open_file->tlink);
+ 
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_PIDFORWARD_IO)
+ 		pid = open_file->pid;
+ 	else
+ 		pid = current->tgid;
+@@ -2044,7 +2044,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 		goto read_complete;
+ 
+ 	cFYI(DBG2, "rpages: num pages %d", num_pages);
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
++	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_PIDFORWARD_IO)
+ 		pid = open_file->pid;
+ 	else
+ 		pid = current->tgid;
+-- 
+1.7.1
