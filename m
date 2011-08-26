@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/5] cifs: add cifs_async_readv
-Date: Fri, 26 Aug 2011 15:18:15 -0400
-Message-ID: <1314386298-27424-3-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 3/5] cifs: convert cifs_readpages to use async reads
+Date: Fri, 26 Aug 2011 15:18:16 -0400
+Message-ID: <1314386298-27424-4-git-send-email-jlayton@redhat.com>
 References: <1314386298-27424-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,467 +10,321 @@ In-Reply-To: <1314386298-27424-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...which will allow cifs to do an asynchronous read call to the server.
-The caller will allocate and set up cifs_readdata for each READ_AND_X
-call that should be issued on the wire.
+Now that we have code in place to do asynchronous reads, convert
+cifs_readpages to use it. The new cifs_readpages walks the page_list
+that gets passed in, locks those pages and then adds them into the
+pagecache. It then goes and issues async I/Os to attempt to fill
+those pages and returns.
 
-The caller will lock the pages, add them to the pagecache, and hang them
-off the pages list using the lru list head embedded in struct page. Once
-the read completes, the pages are added to the LRU list, set Uptodate
-and unlocked.
-
-While this may seem like an odd way to handle the pagecache, it does
-prevent the VFS from attempting to issue duplicate reads on the same
-pages.
+The rest is handled by the async readv infrastructure.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |   23 ++++
- fs/cifs/cifssmb.c   |  298 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/connect.c   |   26 +++---
- 3 files changed, 334 insertions(+), 13 deletions(-)
+ fs/cifs/file.c |  260 +++++++++++++++++++------------------------------------
+ 1 files changed, 90 insertions(+), 170 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 51c0ebc..5f5e0c8 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -152,6 +152,12 @@ extern struct cifs_ntsd *get_cifs_acl(struct cifs_sb_info *, struct inode *,
- extern int set_cifs_acl(struct cifs_ntsd *, __u32, struct inode *,
- 				const char *);
- 
-+extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
-+extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
-+		     unsigned int to_read);
-+extern int cifs_readv_from_socket(struct TCP_Server_Info *server,
-+		struct kvec *iov_orig, unsigned int nr_segs,
-+		unsigned int to_read);
- extern void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 			       struct cifs_sb_info *cifs_sb);
- extern int cifs_match_super(struct super_block *, void *);
-@@ -441,6 +447,23 @@ extern int E_md4hash(const unsigned char *passwd, unsigned char *p16);
- extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
- 			unsigned char *p24);
- 
-+/* asynchronous read support */
-+struct cifs_readdata {
-+	struct cifsFileInfo		*cfile;
-+	struct address_space		*mapping;
-+	__u64				offset;
-+	unsigned int			bytes;
-+	pid_t				pid;
-+	int				result;
-+	struct list_head		pages;
-+	unsigned int			nr_iov;
-+	struct kvec			iov[1];
-+};
-+
-+struct cifs_readdata *cifs_readdata_alloc(unsigned int nr_pages);
-+void cifs_readdata_free(struct cifs_readdata *rdata);
-+int cifs_async_readv(struct cifs_readdata *rdata);
-+
- /* asynchronous write support */
- struct cifs_writedata {
- 	struct kref			refcount;
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 911bc7e..c5f6ea6 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -33,6 +33,8 @@
- #include <linux/slab.h>
- #include <linux/posix_acl_xattr.h>
- #include <linux/pagemap.h>
-+#include <linux/swap.h>
-+#include <linux/task_io_accounting_ops.h>
- #include <asm/uaccess.h>
- #include "cifspdu.h"
- #include "cifsglob.h"
-@@ -40,6 +42,7 @@
- #include "cifsproto.h"
- #include "cifs_unicode.h"
- #include "cifs_debug.h"
-+#include "fscache.h"
- 
- #ifdef CONFIG_CIFS_POSIX
- static struct {
-@@ -1386,6 +1389,301 @@ openRetry:
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index fd57165..2f263bd 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1957,82 +1957,15 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
  	return rc;
  }
  
-+struct cifs_readdata *
-+cifs_readdata_alloc(unsigned int nr_pages)
-+{
-+	struct cifs_readdata *rdata;
-+
-+	/* readdata + 1 kvec for each page */
-+	rdata = kzalloc(sizeof(*rdata) +
-+			sizeof(struct kvec) * nr_pages, GFP_KERNEL);
-+	if (rdata != NULL)
-+		INIT_LIST_HEAD(&rdata->pages);
-+	return rdata;
-+}
-+
-+void
-+cifs_readdata_free(struct cifs_readdata *rdata)
-+{
-+	put_pages_list(&rdata->pages);
-+	kfree(rdata);
-+}
-+
-+/*
-+ * Discard any remaining data in the current SMB. To do this, we borrow the
-+ * current bigbuf.
-+ */
-+static int
-+cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
-+{
-+	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
-+	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length);
-+	int remaining = rfclen + 4 - server->total_read;
-+	struct cifs_readdata *rdata = mid->callback_data;
-+
-+	while (remaining > 0) {
-+		int length;
-+
-+		length = cifs_read_from_socket(server, server->bigbuf,
-+				min_t(unsigned int, remaining,
-+					CIFSMaxBufSize + MAX_CIFS_HDR_SIZE));
-+		if (length < 0)
-+			return length;
-+		server->total_read += length;
-+		remaining -= length;
-+	}
-+
-+	dequeue_mid(mid, rdata->result);
-+	return 0;
-+}
-+
-+static int
-+cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
-+{
-+	int length, len, data_len, remaining;
-+	unsigned int data_offset;
-+	struct cifs_readdata *rdata = mid->callback_data;
-+	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
-+	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length);
-+	struct page *page, *tpage;
-+
-+	cFYI(1, "%s: mid=%u offset=%llu bytes=%u", __func__,
-+		mid->mid, rdata->offset, rdata->bytes);
+-
+-static void cifs_copy_cache_pages(struct address_space *mapping,
+-	struct list_head *pages, int bytes_read, char *data)
+-{
+-	struct page *page;
+-	char *target;
+-
+-	while (bytes_read > 0) {
+-		if (list_empty(pages))
+-			break;
+-
+-		page = list_entry(pages->prev, struct page, lru);
+-		list_del(&page->lru);
+-
+-		if (add_to_page_cache_lru(page, mapping, page->index,
+-				      GFP_KERNEL)) {
+-			page_cache_release(page);
+-			cFYI(1, "Add page cache failed");
+-			data += PAGE_CACHE_SIZE;
+-			bytes_read -= PAGE_CACHE_SIZE;
+-			continue;
+-		}
+-		page_cache_release(page);
+-
+-		target = kmap_atomic(page, KM_USER0);
+-
+-		if (PAGE_CACHE_SIZE > bytes_read) {
+-			memcpy(target, data, bytes_read);
+-			/* zero the tail end of this partial page */
+-			memset(target + bytes_read, 0,
+-			       PAGE_CACHE_SIZE - bytes_read);
+-			bytes_read = 0;
+-		} else {
+-			memcpy(target, data, PAGE_CACHE_SIZE);
+-			bytes_read -= PAGE_CACHE_SIZE;
+-		}
+-		kunmap_atomic(target, KM_USER0);
+-
+-		flush_dcache_page(page);
+-		SetPageUptodate(page);
+-		unlock_page(page);
+-		data += PAGE_CACHE_SIZE;
+-
+-		/* add page to FS-Cache */
+-		cifs_readpage_to_fscache(mapping->host, page);
+-	}
+-	return;
+-}
+-
+ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 	struct list_head *page_list, unsigned num_pages)
+ {
+-	int rc = -EACCES;
+-	int xid;
+-	loff_t offset;
+-	struct page *page;
+-	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *pTcon;
+-	unsigned int bytes_read = 0;
+-	unsigned int read_size, i;
+-	char *smb_read_data = NULL;
+-	struct smb_com_read_rsp *pSMBr;
+-	struct cifsFileInfo *open_file;
+-	struct cifs_io_parms io_parms;
+-	int buf_type = CIFS_NO_BUFFER;
+-	__u32 pid;
+-
+-	xid = GetXid();
+-	if (file->private_data == NULL) {
+-		rc = -EBADF;
+-		FreeXid(xid);
+-		return rc;
+-	}
+-	open_file = file->private_data;
+-	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+-	pTcon = tlink_tcon(open_file->tlink);
++	int rc;
++	struct list_head tmplist;
++	struct cifsFileInfo *open_file = file->private_data;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
++	unsigned int rsize = cifs_sb->rsize;
++	pid_t pid;
+ 
+ 	/*
+ 	 * Reads as many pages as possible from fscache. Returns -ENOBUFS
+@@ -2041,125 +1974,112 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+ 	rc = cifs_readpages_from_fscache(mapping->host, mapping, page_list,
+ 					 &num_pages);
+ 	if (rc == 0)
+-		goto read_complete;
++		return rc;
+ 
+-	cFYI(DBG2, "rpages: num pages %d", num_pages);
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
+ 		pid = open_file->pid;
+ 	else
+ 		pid = current->tgid;
+ 
+-	for (i = 0; i < num_pages; ) {
+-		unsigned contig_pages;
+-		struct page *tmp_page;
+-		unsigned long expected_index;
++	rc = 0;
++	INIT_LIST_HEAD(&tmplist);
+ 
+-		if (list_empty(page_list))
+-			break;
++	cFYI(1, "%s: file=%p mapping=%p num_pages=%u", __func__, file,
++		mapping, num_pages);
 +
 +	/*
-+	 * read the rest of READ_RSP header (sans Data array), or whatever we
-+	 * can if there's not enough data. At this point, we've read down to
-+	 * the Mid.
++	 * start with the page at end of list and move it to private
++	 * list. Do the same with any following pages until we hit
++	 * the rsize limit, hit an index discontinuity, or run out of
++	 * pages. Issue the async read and then start the loop again
++	 * until the list is empty.
++	 *
++	 * Note that list order is important. The page_list is in
++	 * the order of declining indexes. When we put the pages in
++	 * the rdata->pages, then we want them in increasing order.
 +	 */
-+	len = min_t(unsigned int, rfclen + 4, sizeof(*rsp)) -
-+			sizeof(struct smb_hdr) + 1;
++	while (!list_empty(page_list)) {
++		unsigned int bytes = PAGE_CACHE_SIZE;
++		unsigned int expected_index;
++		unsigned int nr_pages = 1;
++		loff_t offset;
++		struct page *page, *tpage;
++		struct cifs_readdata *rdata;
+ 
+ 		page = list_entry(page_list->prev, struct page, lru);
 +
-+	rdata->iov[0].iov_base = server->smallbuf + sizeof(struct smb_hdr) - 1;
-+	rdata->iov[0].iov_len = len;
-+
-+	length = cifs_readv_from_socket(server, rdata->iov, 1, len);
-+	if (length < 0)
-+		return length;
-+	server->total_read += length;
-+
-+	/* Was the SMB read successful? */
-+	rdata->result = map_smb_to_linux_error(&rsp->hdr, false);
-+	if (rdata->result != 0) {
-+		cFYI(1, "%s: server returned error %d", __func__,
-+			rdata->result);
-+		return cifs_readv_discard(server, mid);
-+	}
-+
-+	/* Is there enough to get to the rest of the READ_RSP header? */
-+	if (server->total_read < sizeof(READ_RSP) - 1) {
-+		cFYI(1, "%s: server returned short header got=%u expected=%lu",
-+			__func__, server->total_read, sizeof(READ_RSP));
-+		rdata->result = -EIO;
-+		return cifs_readv_discard(server, mid);
-+	}
-+
-+	/* check that DataOffset isn't beyond end of smallbuf */
-+	data_offset = le16_to_cpu(rsp->DataOffset) + 4;
-+	if (data_offset > MAX_CIFS_SMALL_BUFFER_SIZE) {
-+		cFYI(1, "%s: data offset (%u) beyond end of smallbuf",
-+			__func__, data_offset);
-+		rdata->result = -EIO;
-+		return cifs_readv_discard(server, mid);
-+	}
-+
-+	cFYI(1, "%s: total_read=%u data_offset=%u", __func__,
-+		server->total_read, data_offset);
-+	len = data_offset - server->total_read;
-+	if (len > 0) {
-+		/* read any junk before data into the rest of smallbuf */
-+		rdata->iov[0].iov_base = server->smallbuf + server->total_read;
-+		rdata->iov[0].iov_len = len;
-+		length = cifs_readv_from_socket(server, rdata->iov, 1, len);
-+		if (length < 0)
-+			return length;
-+		server->total_read += length;
-+	}
-+
-+	/* set up first iov for signature check */
-+	rdata->iov[0].iov_base = server->smallbuf;
-+	rdata->iov[0].iov_len = server->total_read;
-+	cFYI(1, "0: iov_base=%p iov_len=%lu",
-+		rdata->iov[0].iov_base, rdata->iov[0].iov_len);
-+
-+	/* how much data is in the response? */
-+	data_len = le16_to_cpu(rsp->DataLengthHigh) << 16;
-+	data_len += le16_to_cpu(rsp->DataLength);
-+
-+	/* marshal up the page array */
-+	remaining = data_len;
-+	rdata->nr_iov = 1;
-+	list_for_each_entry_safe(page, tpage, &rdata->pages, lru) {
-+		if (remaining >= PAGE_CACHE_SIZE) {
-+			rdata->iov[rdata->nr_iov].iov_base = kmap(page);
-+			rdata->iov[rdata->nr_iov].iov_len = PAGE_CACHE_SIZE;
-+			cFYI(1, "%u: iov_base=%p iov_len=%lu", rdata->nr_iov,
-+				rdata->iov[rdata->nr_iov].iov_base,
-+				rdata->iov[rdata->nr_iov].iov_len);
-+			++rdata->nr_iov;
-+			len += PAGE_CACHE_SIZE;
-+			remaining -= PAGE_CACHE_SIZE;
-+		} else if (remaining > 0) {
-+			rdata->iov[rdata->nr_iov].iov_base = kmap(page);
-+			rdata->iov[rdata->nr_iov].iov_len = remaining;
-+			cFYI(1, "%u: iov_base=%p iov_len=%lu", rdata->nr_iov,
-+				rdata->iov[rdata->nr_iov].iov_base,
-+				rdata->iov[rdata->nr_iov].iov_len);
-+			/* zero out remainder of page */
-+			memset(rdata->iov[rdata->nr_iov].iov_base + remaining,
-+				'\0', PAGE_CACHE_SIZE - remaining);
-+			++rdata->nr_iov;
-+			len += remaining;
-+			remaining = 0;
-+		} else {
-+			/* no need to hold page hostage */
-+			delete_from_page_cache(page);
-+			list_del(&page->lru);
++		lock_page(page);
++		rc = add_to_page_cache_locked(page, mapping,
++					      page->index, GFP_KERNEL);
++		/* give up if we can't stick it in the cache */
++		if (rc) {
 +			unlock_page(page);
-+			page_cache_release(page);
-+		}
-+	}
-+
-+	/* issue the read */
-+	length = cifs_readv_from_socket(server, &rdata->iov[1],
-+					rdata->nr_iov - 1, len);
-+	if (length < 0)
-+		return length;
-+	server->total_read += length;
-+
-+	rdata->bytes = length;
-+
-+	cFYI(1, "total_read=%u rfclen=%u remaining=%u",
-+		server->total_read, rfclen, remaining);
-+
-+	/* discard anything left over */
-+	if (remaining > 0)
-+		return cifs_readv_discard(server, mid);
-+
-+	dequeue_mid(mid, false);
-+	return length;
-+}
-+
-+static void
-+cifs_readv_callback(struct mid_q_entry *mid)
-+{
-+	struct cifs_readdata *rdata = mid->callback_data;
-+	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct page *page, *tpage;
-+
-+	cFYI(1, "%s: mid=%u state=%d result=%d bytes=%u", __func__,
-+		mid->mid, mid->midState, rdata->result, rdata->bytes);
-+
-+	switch (mid->midState) {
-+	case MID_RESPONSE_RECEIVED:
-+		/* result already set, check signature */
-+		if (server->sec_mode &
-+		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
-+			if (cifs_verify_signature(rdata->iov, rdata->nr_iov,
-+					  server, mid->sequence_number + 1))
-+				cERROR(1, "Unexpected SMB signature");
-+		}
-+		/* FIXME: should this be counted toward the initiating task? */
-+		task_io_account_read(rdata->bytes);
-+		cifs_stats_bytes_read(tcon, rdata->bytes);
-+		break;
-+	case MID_REQUEST_SUBMITTED:
-+	case MID_RETRY_NEEDED:
-+		rdata->result = -EAGAIN;
-+		break;
-+	default:
-+		rdata->result = -EIO;
-+	}
-+
-+	list_for_each_entry_safe(page, tpage, &rdata->pages, lru) {
-+		list_del(&page->lru);
-+
-+		if (rdata->result == 0) {
-+			kunmap(page);
-+			lru_cache_add_file(page);
-+			flush_dcache_page(page);
-+			SetPageUptodate(page);
-+			cifs_readpage_to_fscache(rdata->mapping->host, page);
-+		} else {
-+			delete_from_page_cache(page);
++			break;
 +		}
 +
-+		unlock_page(page);
-+		page_cache_release(page);
-+	}
++		/* move first page to the tmplist */
+ 		offset = (loff_t)page->index << PAGE_CACHE_SHIFT;
++		list_move(&page->lru, &tmplist);
+ 
+-		/* count adjacent pages that we will read into */
+-		contig_pages = 0;
+-		expected_index =
+-			list_entry(page_list->prev, struct page, lru)->index;
+-		list_for_each_entry_reverse(tmp_page, page_list, lru) {
+-			if (tmp_page->index == expected_index) {
+-				contig_pages++;
+-				expected_index++;
+-			} else
++		/* now try and add more pages onto the request */
++		expected_index = page->index + 1;
++		list_for_each_entry_safe_reverse(page, tpage, page_list, lru) {
++			/* discontinuity ? */
++			if (page->index != expected_index)
++				break;
 +
-+	cifs_readdata_free(rdata);
-+	DeleteMidQEntry(mid);
-+	atomic_dec(&tcon->ses->server->inFlight);
-+	wake_up(&tcon->ses->server->request_q);
-+}
++			/* would this page push the read over the rsize? */
++			if (bytes + PAGE_CACHE_SIZE > rsize)
++				break;
 +
-+/* cifs_async_readv - send an async write, and set up mid to handle result */
-+int
-+cifs_async_readv(struct cifs_readdata *rdata)
-+{
-+	int rc;
-+	READ_REQ *smb = NULL;
-+	int wct;
-+	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
++			/* if adding to page cache fails, then stop here */
++			lock_page(page);
++			if (add_to_page_cache_locked(page, mapping,
++						page->index, GFP_KERNEL)) {
++				unlock_page(page);
+ 				break;
+-		}
+-		if (contig_pages + i >  num_pages)
+-			contig_pages = num_pages - i;
+-
+-		/* for reads over a certain size could initiate async
+-		   read ahead */
+-
+-		read_size = contig_pages * PAGE_CACHE_SIZE;
+-		/* Read size needs to be in multiples of one page */
+-		read_size = min_t(const unsigned int, read_size,
+-				  cifs_sb->rsize & PAGE_CACHE_MASK);
+-		cFYI(DBG2, "rpages: read size 0x%x  contiguous pages %d",
+-				read_size, contig_pages);
+-		rc = -EAGAIN;
+-		while (rc == -EAGAIN) {
+-			if (open_file->invalidHandle) {
+-				rc = cifs_reopen_file(open_file, true);
+-				if (rc != 0)
+-					break;
+-			}
+-			io_parms.netfid = open_file->netfid;
+-			io_parms.pid = pid;
+-			io_parms.tcon = pTcon;
+-			io_parms.offset = offset;
+-			io_parms.length = read_size;
+-			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
+-					 &smb_read_data, &buf_type);
+-			/* BB more RC checks ? */
+-			if (rc == -EAGAIN) {
+-				if (smb_read_data) {
+-					if (buf_type == CIFS_SMALL_BUFFER)
+-						cifs_small_buf_release(smb_read_data);
+-					else if (buf_type == CIFS_LARGE_BUFFER)
+-						cifs_buf_release(smb_read_data);
+-					smb_read_data = NULL;
+-				}
+ 			}
++			list_move_tail(&page->lru, &tmplist);
++			bytes += PAGE_CACHE_SIZE;
++			expected_index++;
++			nr_pages++;
+ 		}
+-		if ((rc < 0) || (smb_read_data == NULL)) {
+-			cFYI(1, "Read error in readpages: %d", rc);
 +
-+	cFYI(1, "%s: offset=%llu bytes=%u", __func__,
-+		rdata->offset, rdata->bytes);
-+
-+	if (tcon->ses->capabilities & CAP_LARGE_FILES)
-+		wct = 12;
-+	else {
-+		wct = 10; /* old style read */
-+		if ((rdata->offset >> 32) > 0)  {
-+			/* can not handle this big offset for old */
-+			return -EIO;
++		rdata = cifs_readdata_alloc(nr_pages);
++		if (!rdata) {
++			/* best to give up if we're out of mem */
++			list_for_each_entry_safe(page, tpage, &tmplist, lru) {
++				list_del(&page->lru);
++				delete_from_page_cache(page);
++				unlock_page(page);
++				page_cache_release(page);
++			}
++			rc = -ENOMEM;
+ 			break;
+-		} else if (bytes_read > 0) {
+-			task_io_account_read(bytes_read);
+-			pSMBr = (struct smb_com_read_rsp *)smb_read_data;
+-			cifs_copy_cache_pages(mapping, page_list, bytes_read,
+-				smb_read_data + 4 /* RFC1001 hdr */ +
+-				le16_to_cpu(pSMBr->DataOffset));
+-
+-			i +=  bytes_read >> PAGE_CACHE_SHIFT;
+-			cifs_stats_bytes_read(pTcon, bytes_read);
+-			if ((bytes_read & PAGE_CACHE_MASK) != bytes_read) {
+-				i++; /* account for partial page */
 +		}
-+	}
-+
-+	rc = small_smb_init(SMB_COM_READ_ANDX, wct, tcon, (void **)&smb);
-+	if (rc)
-+		return rc;
-+
-+	smb->hdr.Pid = cpu_to_le16((__u16)rdata->pid);
-+	smb->hdr.PidHigh = cpu_to_le16((__u16)(rdata->pid >> 16));
-+
-+	smb->AndXCommand = 0xFF;	/* none */
-+	smb->Fid = rdata->cfile->netfid;
-+	smb->OffsetLow = cpu_to_le32(rdata->offset & 0xFFFFFFFF);
-+	if (wct == 12)
-+		smb->OffsetHigh = cpu_to_le32(rdata->offset >> 32);
-+	smb->Remaining = 0;
-+	smb->MaxCount = cpu_to_le16(rdata->bytes & 0xFFFF);
-+	smb->MaxCountHigh = cpu_to_le32(rdata->bytes >> 16);
-+	if (wct == 12)
-+		smb->ByteCount = 0;
-+	else {
-+		/* old style read */
-+		struct smb_com_readx_req *smbr =
-+			(struct smb_com_readx_req *)smb;
-+		smbr->ByteCount = 0;
-+	}
-+
-+	/* 4 for RFC1001 length + 1 for BCC */
-+	rdata->iov[0].iov_base = smb;
-+	rdata->iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
-+
-+	rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
-+			     cifs_readv_receive, cifs_readv_callback,
-+			     rdata, false);
-+
-+	if (rc == 0)
-+		cifs_stats_inc(&tcon->num_reads);
-+
-+	cifs_small_buf_release(smb);
-+	return rc;
-+}
-+
- int
- CIFSSMBRead(const int xid, struct cifs_io_parms *io_parms, unsigned int *nbytes,
- 	    char **buf, int *pbuf_type)
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 9d0b1c2..fc0ea41 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -422,9 +422,9 @@ get_server_iovec(struct TCP_Server_Info *server, unsigned int nr_segs)
- 	return new_iov;
- }
  
--static int
--readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
--		  unsigned int nr_segs, unsigned int to_read)
-+int
-+cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
-+		       unsigned int nr_segs, unsigned int to_read)
- {
- 	int length = 0;
- 	int total_read;
-@@ -479,16 +479,16 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 	return total_read;
- }
+-				/* server copy of file can have smaller size
+-				   than client */
+-				/* BB do we need to verify this common case ?
+-				   this case is ok - if we are at server EOF
+-				   we will hit it on next read */
++		rdata->cfile = open_file;
++		rdata->mapping = mapping;
++		rdata->offset = offset;
++		rdata->bytes = bytes;
++		rdata->pid = pid;
++		list_splice_init(&tmplist, &rdata->pages);
  
--static int
--read_from_socket(struct TCP_Server_Info *server, char *buf,
--		 unsigned int to_read)
-+int
-+cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
-+		      unsigned int to_read)
- {
- 	struct kvec iov;
- 
- 	iov.iov_base = buf;
- 	iov.iov_len = to_read;
- 
--	return readv_from_socket(server, &iov, 1, to_read);
-+	return cifs_readv_from_socket(server, &iov, 1, to_read);
- }
- 
- static bool
-@@ -553,8 +553,8 @@ find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
- 	return NULL;
- }
- 
--static void
--dequeue_mid(struct mid_q_entry *mid, int malformed)
-+void
-+dequeue_mid(struct mid_q_entry *mid, bool malformed)
- {
- #ifdef CONFIG_CIFS_STATS2
- 	mid->when_received = jiffies;
-@@ -731,7 +731,7 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+-				/* break; */
++		do {
++			if (open_file->invalidHandle) {
++				rc = cifs_reopen_file(open_file, true);
++				if (rc != 0)
++					continue;
+ 			}
+-		} else {
+-			cFYI(1, "No bytes read (%d) at offset %lld . "
+-				"Cleaning remaining pages from readahead list",
+-				bytes_read, offset);
+-			/* BB turn off caching and do new lookup on
+-			   file size at server? */
++			rc = cifs_async_readv(rdata);
++		} while (rc == -EAGAIN);
++
++		if (rc != 0) {
++			cifs_readdata_free(rdata);
+ 			break;
+ 		}
+-		if (smb_read_data) {
+-			if (buf_type == CIFS_SMALL_BUFFER)
+-				cifs_small_buf_release(smb_read_data);
+-			else if (buf_type == CIFS_LARGE_BUFFER)
+-				cifs_buf_release(smb_read_data);
+-			smb_read_data = NULL;
+-		}
+-		bytes_read = 0;
+-	}
+-
+-/* need to free smb_read_data buf before exit */
+-	if (smb_read_data) {
+-		if (buf_type == CIFS_SMALL_BUFFER)
+-			cifs_small_buf_release(smb_read_data);
+-		else if (buf_type == CIFS_LARGE_BUFFER)
+-			cifs_buf_release(smb_read_data);
+-		smb_read_data = NULL;
  	}
  
- 	/* now read the rest */
--	length = read_from_socket(server,
-+	length = cifs_read_from_socket(server,
- 			  buf + sizeof(struct smb_hdr) - 1,
- 			  pdu_length - sizeof(struct smb_hdr) + 1 + 4);
- 	if (length < 0)
-@@ -792,7 +792,7 @@ cifs_demultiplex_thread(void *p)
- 		buf = server->smallbuf;
- 		pdu_length = 4; /* enough to get RFC1001 header */
+-read_complete:
+-	FreeXid(xid);
+ 	return rc;
+ }
  
--		length = read_from_socket(server, buf, pdu_length);
-+		length = cifs_read_from_socket(server, buf, pdu_length);
- 		if (length < 0)
- 			continue;
- 		server->total_read = length;
-@@ -817,8 +817,8 @@ cifs_demultiplex_thread(void *p)
- 		}
- 
- 		/* read down to the MID */
--		length = read_from_socket(server, buf + 4,
--					  sizeof(struct smb_hdr) - 1 - 4);
-+		length = cifs_read_from_socket(server, buf + 4,
-+					sizeof(struct smb_hdr) - 1 - 4);
- 		if (length < 0)
- 			continue;
- 		server->total_read += length;
 -- 
 1.7.6
