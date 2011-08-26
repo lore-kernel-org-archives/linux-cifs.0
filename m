@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 01/16] cifs: clean up checkSMB
-Date: Fri, 26 Aug 2011 15:06:14 -0400
-Message-ID: <1314385589-27136-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 07/16] cifs: turn read_from_socket into a wrapper around a vectorized version
+Date: Fri, 26 Aug 2011 15:06:20 -0400
+Message-ID: <1314385589-27136-8-git-send-email-jlayton@redhat.com>
 References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,120 +10,123 @@ In-Reply-To: <1314385589-27136-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The variable names in this function are so ambiguous that it's very
-difficult to know what it's doing. Rename them to make it a bit more
-clear.
+Eventually we'll want to allow cifsd to read data directly into the
+pagecache. In order to do that we'll need a routine that can take a
+kvec array and pass that directly to kernel_recvmsg.
 
-Also, remove a redundant length check. cifsd checks to make sure that
-the rfclen isn't larger than the maximum frame size when it does the
-receive.
-
-Finally, change checkSMB to return a real error code (-EIO) when
-it finds an error. That will help simplify some coming changes in the
-callers.
+Unfortunately though, the kernel's recvmsg routines modify the kvec
+array that gets passed in, so we need to use a copy of the kvec array
+and refresh that copy on each pass through the loop.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/misc.c |   51 +++++++++++++++++++++++++--------------------------
- 1 files changed, 25 insertions(+), 26 deletions(-)
+ fs/cifs/connect.c |   72 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 65 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 7c16933..4a1801b 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -420,19 +420,22 @@ check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 358e0b0..3ff3fab 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -375,14 +375,58 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	return false;
  }
  
- int
--checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
-+checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int total_read)
++/*
++ * kvec_array_setup - clone a kvec array, and advance into it
++ * @new:	pointer to memory for cloned array
++ * @iov:	pointer to original array
++ * @nr_segs:	number of members in original array
++ * @bytes:	number of bytes to advance into the cloned array
++ *
++ * This function will copy the array provided in iov to a section of memory
++ * and advance the specified number of bytes into the new array. It returns
++ * the number of segments in the new array. "new" must be at least as big as
++ * the original iov array.
++ */
++static unsigned int
++kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
++		size_t bytes)
++{
++	size_t base = 0;
++
++	while (bytes || !iov->iov_len) {
++		int copy = min(bytes, iov->iov_len);
++
++		bytes -= copy;
++		base += copy;
++		if (iov->iov_len == base) {
++			iov++;
++			nr_segs--;
++			base = 0;
++		}
++	}
++	memcpy(new, iov, sizeof(*iov) * nr_segs);
++	new->iov_base += base;
++	new->iov_len -= base;
++	return nr_segs;
++}
++
+ static int
+-read_from_socket(struct TCP_Server_Info *server, char *buf,
+-		 unsigned int to_read)
++readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
++		  unsigned int nr_segs, unsigned int to_read)
  {
--	__u32 len = be32_to_cpu(smb->smb_buf_length);
-+	__u32 rfclen = be32_to_cpu(smb->smb_buf_length);
- 	__u32 clc_len;  /* calculated length */
--	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
-+	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x",
-+		total_read, rfclen);
+ 	int length = 0;
+ 	int total_read;
++	unsigned int segs;
+ 	struct msghdr smb_msg;
+-	struct kvec iov;
++	struct kvec *iov;
++
++	/*
++	 * FIXME: allocation here may cause deadlocks under memory pressure.
++	 * Switch this to use a fixed, per-socket buffer.
++	 */
++	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_KERNEL);
++	if (!iov)
++		return -ENOMEM;
  
--	if (length < 2 + sizeof(struct smb_hdr)) {
--		if ((length >= sizeof(struct smb_hdr) - 1)
-+	/* is this frame too small to even get to a BCC? */
-+	if (total_read < 2 + sizeof(struct smb_hdr)) {
-+		if ((total_read >= sizeof(struct smb_hdr) - 1)
- 			    && (smb->Status.CifsError != 0)) {
-+			/* it's an error return */
- 			smb->WordCount = 0;
- 			/* some error cases do not return wct and bcc */
- 			return 0;
--		} else if ((length == sizeof(struct smb_hdr) + 1) &&
-+		} else if ((total_read == sizeof(struct smb_hdr) + 1) &&
- 				(smb->WordCount == 0)) {
- 			char *tmp = (char *)smb;
- 			/* Need to work around a bug in two servers here */
-@@ -452,39 +455,35 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
- 		} else {
- 			cERROR(1, "Length less than smb header size");
+ 	smb_msg.msg_control = NULL;
+ 	smb_msg.msg_controllen = 0;
+@@ -393,10 +437,11 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
+ 			break;
  		}
--		return 1;
--	}
--	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
--		cERROR(1, "smb length greater than MaxBufSize, mid=%d",
--				   smb->Mid);
--		return 1;
-+		return -EIO;
- 	}
  
-+	/* otherwise, there is enough to get to the BCC */
- 	if (check_smb_hdr(smb, mid))
--		return 1;
-+		return -EIO;
- 	clc_len = smbCalcSize(smb);
- 
--	if (4 + len != length) {
-+	if (4 + rfclen != total_read) {
- 		cERROR(1, "Length read does not match RFC1001 length %d",
--			   len);
--		return 1;
-+				rfclen);
-+		return -EIO;
- 	}
- 
--	if (4 + len != clc_len) {
-+	if (4 + rfclen != clc_len) {
- 		/* check if bcc wrapped around for large read responses */
--		if ((len > 64 * 1024) && (len > clc_len)) {
-+		if ((rfclen > 64 * 1024) && (rfclen > clc_len)) {
- 			/* check if lengths match mod 64K */
--			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
-+			if (((4 + rfclen) & 0xFFFF) == (clc_len & 0xFFFF))
- 				return 0; /* bcc wrapped */
- 		}
- 		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
--				clc_len, 4 + len, smb->Mid);
-+				clc_len, 4 + rfclen, smb->Mid);
- 
--		if (4 + len < clc_len) {
-+		if (4 + rfclen < clc_len) {
- 			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
--					len, smb->Mid);
--			return 1;
--		} else if (len > clc_len + 512) {
-+					rfclen, smb->Mid);
-+			return -EIO;
-+		} else if (rfclen > clc_len + 512) {
- 			/*
- 			 * Some servers (Windows XP in particular) send more
- 			 * data than the lengths in the SMB packet would
-@@ -495,8 +494,8 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
- 			 * data to 512 bytes.
- 			 */
- 			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
--				  "than SMB for mid=%u", len, smb->Mid);
--			return 1;
-+				  "than SMB for mid=%u", rfclen, smb->Mid);
-+			return -EIO;
+-		iov.iov_base = buf + total_read;
+-		iov.iov_len = to_read;
+-		length = kernel_recvmsg(server->ssocket, &smb_msg, &iov, 1,
+-					to_read, 0);
++		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
++
++		length = kernel_recvmsg(server->ssocket, &smb_msg,
++					iov, segs, to_read, 0);
++
+ 		if (server->tcpStatus == CifsExiting) {
+ 			total_read = -ESHUTDOWN;
+ 			break;
+@@ -423,9 +468,22 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
+ 			break;
  		}
  	}
- 	return 0;
++	kfree(iov);
+ 	return total_read;
+ }
+ 
++static int
++read_from_socket(struct TCP_Server_Info *server, char *buf,
++		 unsigned int to_read)
++{
++	struct kvec iov;
++
++	iov.iov_base = buf;
++	iov.iov_len = to_read;
++
++	return readv_from_socket(server, &iov, 1, to_read);
++}
++
+ static bool
+ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
+ {
 -- 
 1.7.6
