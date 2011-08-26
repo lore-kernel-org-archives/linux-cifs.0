@@ -1,99 +1,39 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 14/16] cifs: find mid earlier in receive codepath
-Date: Fri, 26 Aug 2011 15:06:27 -0400
-Message-ID: <1314385589-27136-15-git-send-email-jlayton@redhat.com>
-References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 1/5] cifs: fix protocol definition for READ_RSP
+Date: Fri, 26 Aug 2011 15:18:14 -0400
+Message-ID: <1314386298-27424-2-git-send-email-jlayton@redhat.com>
+References: <1314386298-27424-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1314385589-27136-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1314386298-27424-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In order to receive directly into a preallocated buffer, we need to ID
-the mid earlier, before the bulk of the response is read. Call the mid
-finding routine as soon as we're able to read the mid.
+There is no pad, and it simplifies the code to remove the "Data" field.
+
+None of the existing code relies on these fields, or on the READ_RSP
+being a particular length.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   24 +++++++++---------------
- 1 files changed, 9 insertions(+), 15 deletions(-)
+ fs/cifs/cifspdu.h |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5c0898a..8a43619 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -568,16 +568,10 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
- 	spin_unlock(&GlobalMid_Lock);
- }
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index de3aa28..3c6ef34 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -1089,9 +1089,7 @@ typedef struct smb_com_read_rsp {
+ 	__le16 DataLengthHigh;
+ 	__u64 Reserved2;
+ 	__u16 ByteCount;
+-	__u8 Pad;		/* BB check for whether padded to DWORD
+-				   boundary and optimum performance here */
+-	char Data[1];
++	/* read response data immediately follows */
+ } __attribute__((packed)) READ_RSP;
  
--static struct mid_q_entry *
--find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
--	      int malformed)
-+static void
-+handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-+	   struct smb_hdr *buf, int malformed)
- {
--	struct mid_q_entry *mid = NULL;
--
--	mid = find_mid(server, buf);
--	if (!mid)
--		return mid;
--
- 	if (malformed == 0 && check2ndT2(buf) > 0) {
- 		mid->multiRsp = true;
- 		if (mid->resp_buf) {
-@@ -585,11 +579,11 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 			malformed = coalesce_t2(buf, mid->resp_buf);
- 			if (malformed > 0) {
- 				malformed = 0;
--				return mid;
-+				return;
- 			}
- 			/* All parts received or packet is malformed. */
- 			mid->multiEnd = true;
--			goto multi_t2_fnd;
-+			return dequeue_mid(mid, malformed);
- 		}
- 		if (!server->large_buf) {
- 			/*FIXME: switch to already allocated largebuf?*/
-@@ -600,7 +594,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 			mid->largeBuf = true;
- 			server->bigbuf = NULL;
- 		}
--		return mid;
-+		return;
- 	}
- 	mid->resp_buf = buf;
- 	mid->largeBuf = server->large_buf;
-@@ -612,9 +606,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 		else
- 			server->smallbuf = NULL;
- 	}
--multi_t2_fnd:
- 	dequeue_mid(mid, malformed);
--	return mid;
- }
- 
- static void clean_demultiplex_info(struct TCP_Server_Info *server)
-@@ -776,6 +768,8 @@ cifs_demultiplex_thread(void *p)
- 			continue;
- 		server->total_read += length;
- 
-+		mid_entry = find_mid(server, smb_buffer);
-+
- 		if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
- 			cERROR(1, "SMB response too long (%u bytes)",
- 				pdu_length);
-@@ -820,8 +814,8 @@ cifs_demultiplex_thread(void *p)
- 
- 		server->lstrp = jiffies;
- 
--		mid_entry = find_cifs_mid(server, smb_buffer, length);
- 		if (mid_entry != NULL) {
-+			handle_mid(mid_entry, server, smb_buffer, length);
- 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
- 				mid_entry->callback(mid_entry);
- 		} else if (length != 0) {
+ typedef struct locking_andx_range {
 -- 
 1.7.6
