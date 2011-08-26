@@ -1,58 +1,129 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 00/16] cifs: cleanup and overhaul of the receive codepath (try #2)
-Date: Fri, 26 Aug 2011 15:06:13 -0400
-Message-ID: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 01/16] cifs: clean up checkSMB
+Date: Fri, 26 Aug 2011 15:06:14 -0400
+Message-ID: <1314385589-27136-2-git-send-email-jlayton@redhat.com>
+References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1314385589-27136-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset does a fairly major cleanup and overhaul of the receive
-codepath for cifs. Aside from basic cleanup, there are two main goals:
+The variable names in this function are so ambiguous that it's very
+difficult to know what it's doing. Rename them to make it a bit more
+clear.
 
-1) allow the receive codepath to identify the mid before receiving all
-of the data for a particular SMB.
+Also, remove a redundant length check. cifsd checks to make sure that
+the rfclen isn't larger than the maximum frame size when it does the
+receive.
 
-...and in turn...
+Finally, change checkSMB to return a real error code (-EIO) when
+it finds an error. That will help simplify some coming changes in the
+callers.
 
-2) add the ability for certain calls to receive their responses into
-their into their own set of buffers.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/misc.c |   51 +++++++++++++++++++++++++--------------------------
+ 1 files changed, 25 insertions(+), 26 deletions(-)
 
-These two changes allow cifs to break the CIFSMaxBufSize barrier for
-receives. This patchset just adds the necessary infrastructure to do
-the above.
-
-A separate patchset will follow that will overhaul cifs_readpages to use
-this infrastructure to allow for a larger rsize.
-
-Jeff Layton (16):
-  cifs: clean up checkSMB
-  cifs: consolidate signature generating code
-  cifs: trivial: remove obsolete comment
-  cifs: make smb_msg local to read_from_socket
-  cifs: check for unresponsive server every time we call kernel_recvmsg
-  cifs: simplify read_from_socket
-  cifs: turn read_from_socket into a wrapper around a vectorized
-    version
-  cifs: keep a reusable kvec array for receives
-  cifs: clean up check_rfc1002_header
-  cifs: add a third receive phase to cifs_demultiplex_thread
-  cifs: move mid finding into separate routine
-  cifs: eliminate is_multi_rsp parm to find_cifs_mid
-  cifs: move buffer pointers into TCP_Server_Info
-  cifs: find mid earlier in receive codepath
-  cifs: break out 3rd receive phase into separate function
-  cifs: add a callback function to receive the rest of the frame
-
- fs/cifs/cifsencrypt.c |  103 ++--------
- fs/cifs/cifsglob.h    |   29 +++-
- fs/cifs/cifsproto.h   |    7 +-
- fs/cifs/cifssmb.c     |    5 +-
- fs/cifs/connect.c     |  519 ++++++++++++++++++++++++++++---------------------
- fs/cifs/misc.c        |   51 +++---
- fs/cifs/transport.c   |   16 +-
- 7 files changed, 391 insertions(+), 339 deletions(-)
-
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 7c16933..4a1801b 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -420,19 +420,22 @@ check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+ }
+ 
+ int
+-checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
++checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int total_read)
+ {
+-	__u32 len = be32_to_cpu(smb->smb_buf_length);
++	__u32 rfclen = be32_to_cpu(smb->smb_buf_length);
+ 	__u32 clc_len;  /* calculated length */
+-	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
++	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x",
++		total_read, rfclen);
+ 
+-	if (length < 2 + sizeof(struct smb_hdr)) {
+-		if ((length >= sizeof(struct smb_hdr) - 1)
++	/* is this frame too small to even get to a BCC? */
++	if (total_read < 2 + sizeof(struct smb_hdr)) {
++		if ((total_read >= sizeof(struct smb_hdr) - 1)
+ 			    && (smb->Status.CifsError != 0)) {
++			/* it's an error return */
+ 			smb->WordCount = 0;
+ 			/* some error cases do not return wct and bcc */
+ 			return 0;
+-		} else if ((length == sizeof(struct smb_hdr) + 1) &&
++		} else if ((total_read == sizeof(struct smb_hdr) + 1) &&
+ 				(smb->WordCount == 0)) {
+ 			char *tmp = (char *)smb;
+ 			/* Need to work around a bug in two servers here */
+@@ -452,39 +455,35 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 		} else {
+ 			cERROR(1, "Length less than smb header size");
+ 		}
+-		return 1;
+-	}
+-	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+-		cERROR(1, "smb length greater than MaxBufSize, mid=%d",
+-				   smb->Mid);
+-		return 1;
++		return -EIO;
+ 	}
+ 
++	/* otherwise, there is enough to get to the BCC */
+ 	if (check_smb_hdr(smb, mid))
+-		return 1;
++		return -EIO;
+ 	clc_len = smbCalcSize(smb);
+ 
+-	if (4 + len != length) {
++	if (4 + rfclen != total_read) {
+ 		cERROR(1, "Length read does not match RFC1001 length %d",
+-			   len);
+-		return 1;
++				rfclen);
++		return -EIO;
+ 	}
+ 
+-	if (4 + len != clc_len) {
++	if (4 + rfclen != clc_len) {
+ 		/* check if bcc wrapped around for large read responses */
+-		if ((len > 64 * 1024) && (len > clc_len)) {
++		if ((rfclen > 64 * 1024) && (rfclen > clc_len)) {
+ 			/* check if lengths match mod 64K */
+-			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
++			if (((4 + rfclen) & 0xFFFF) == (clc_len & 0xFFFF))
+ 				return 0; /* bcc wrapped */
+ 		}
+ 		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
+-				clc_len, 4 + len, smb->Mid);
++				clc_len, 4 + rfclen, smb->Mid);
+ 
+-		if (4 + len < clc_len) {
++		if (4 + rfclen < clc_len) {
+ 			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
+-					len, smb->Mid);
+-			return 1;
+-		} else if (len > clc_len + 512) {
++					rfclen, smb->Mid);
++			return -EIO;
++		} else if (rfclen > clc_len + 512) {
+ 			/*
+ 			 * Some servers (Windows XP in particular) send more
+ 			 * data than the lengths in the SMB packet would
+@@ -495,8 +494,8 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 			 * data to 512 bytes.
+ 			 */
+ 			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
+-				  "than SMB for mid=%u", len, smb->Mid);
+-			return 1;
++				  "than SMB for mid=%u", rfclen, smb->Mid);
++			return -EIO;
+ 		}
+ 	}
+ 	return 0;
 -- 
 1.7.6
