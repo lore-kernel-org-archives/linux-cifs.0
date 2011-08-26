@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 16/16] cifs: add a callback function to receive the rest of the frame
-Date: Fri, 26 Aug 2011 15:06:29 -0400
-Message-ID: <1314385589-27136-17-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 13/16] cifs: move buffer pointers into TCP_Server_Info
+Date: Fri, 26 Aug 2011 15:06:26 -0400
+Message-ID: <1314385589-27136-14-git-send-email-jlayton@redhat.com>
 References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,146 +10,253 @@ In-Reply-To: <1314385589-27136-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In order to handle larger SMBs for readpages and other calls, we want
-to be able to read into a preallocated set of buffers. Rather than
-changing all of the existing code to preallocate buffers however, we
-instead add a receive callback function to the MID.
-
-cifsd will call this function once the mid_q_entry has been identified
-in order to receive the rest of the SMB. If the mid can't be identified
-or the receive pointer is unset, then the standard 3rd phase receive
-function will be called.
+We have several functions that need to access these pointers. Currently
+that's done with a lot of double pointer passing. Instead, move them
+into the TCP_Server_Info and simplify the handling.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |   23 ++++++++++++++++++++---
- fs/cifs/cifsproto.h |    5 +++--
- fs/cifs/cifssmb.c   |    5 +++--
- fs/cifs/connect.c   |    6 +++++-
- fs/cifs/transport.c |    5 +++--
- 5 files changed, 34 insertions(+), 10 deletions(-)
+ fs/cifs/cifsglob.h |    4 ++
+ fs/cifs/connect.c  |  101 +++++++++++++++++++++++----------------------------
+ 2 files changed, 50 insertions(+), 55 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index efa8b37..214fe47 100644
+index 7d93c62..efa8b37 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -649,8 +649,24 @@ static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
- struct mid_q_entry;
- 
- /*
-- * This is the prototype for the mid callback function. When creating one,
-- * take special care to avoid deadlocks. Things to bear in mind:
-+ * This is the prototype for the mid receive function. This function is for
-+ * receiving the rest of the SMB frame, starting with the WordCount (which is
-+ * just after the MID in struct smb_hdr). Note:
-+ *
-+ * - This will be called by cifsd, with no locks held.
-+ * - The mid will still be on the pending_mid_q.
-+ * - mid->resp_buf will point to the current buffer.
-+ *
-+ * Returns zero on a successful receive, or an error. The receive state in
-+ * the TCP_Server_Info will also be updated.
-+ */
-+typedef int (mid_receive_t)(struct TCP_Server_Info *server,
-+			    struct mid_q_entry *mid);
-+
-+/*
-+ * This is the prototype for the mid callback function. This is called once the
-+ * mid has been received off of the socket. When creating one, take special
-+ * care to avoid deadlocks. Things to bear in mind:
-  *
-  * - it will be called by cifsd, with no locks held
-  * - the mid will be removed from any lists
-@@ -668,9 +684,10 @@ struct mid_q_entry {
- 	unsigned long when_sent; /* time when smb send finished */
- 	unsigned long when_received; /* when demux complete (taken off wire) */
+@@ -286,9 +286,13 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberosu2u;	/* supports U2U Kerberos */
+ 	bool	sec_kerberos;		/* supports plain Kerberos */
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
++	bool	large_buf;		/* is current buffer large? */
+ 	struct delayed_work	echo; /* echo ping workqueue job */
+ 	struct kvec *iov;	/* reusable kvec array for receives */
+ 	unsigned int nr_iov;	/* number of kvecs in array */
++	char	*smallbuf;	/* pointer to current "small" buffer */
++	char	*bigbuf;	/* pointer to current "big" buffer */
++	unsigned int total_read; /* total amount of data read in this pass */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
  #endif
-+	mid_receive_t *receive; /* call receive callback */
- 	mid_callback_t *callback; /* call completion callback */
- 	void *callback_data;	  /* general purpose pointer for callback */
--	struct smb_hdr *resp_buf;	/* response buffer */
-+	struct smb_hdr *resp_buf;	/* pointer to received SMB header */
- 	int midState;	/* wish this were enum but can not pass to wait_event */
- 	__u8 command;	/* smb command code */
- 	bool largeBuf:1;	/* if valid response, is pointer to large buf */
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 03dc945..51c0ebc 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -69,8 +69,9 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
- extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
- extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
--			   unsigned int nvec, mid_callback_t *callback,
--			   void *cbdata, bool ignore_pend);
-+			   unsigned int nvec, mid_receive_t *receive,
-+			   mid_callback_t *callback, void *cbdata,
-+			   bool ignore_pend);
- extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct smb_hdr * /* input */ ,
- 			struct smb_hdr * /* out */ ,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 52fc500..911bc7e 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -748,7 +748,8 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
- 	iov.iov_base = smb;
- 	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
- 
--	rc = cifs_call_async(server, &iov, 1, cifs_echo_callback, server, true);
-+	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
-+			     server, true);
- 	if (rc)
- 		cFYI(1, "Echo request failed: %d", rc);
- 
-@@ -1845,7 +1846,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
- 
- 	kref_get(&wdata->refcount);
- 	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
--			     cifs_writev_callback, wdata, false);
-+			     NULL, cifs_writev_callback, wdata, false);
- 
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->num_writes);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index dd4c3bae..9d0b1c2 100644
+index 89950bd..5c0898a 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -825,7 +825,11 @@ cifs_demultiplex_thread(void *p)
+@@ -320,27 +320,24 @@ requeue_echo:
+ }
  
- 		mid_entry = find_mid(server, smb_buffer);
- 
--		length = standard_receive3(server, mid_entry);
-+		if (!mid_entry || !mid_entry->receive)
-+			length = standard_receive3(server, mid_entry);
-+		else
-+			length = mid_entry->receive(server, mid_entry);
-+
- 		if (length < 0)
- 			continue;
- 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 316d4cb..cbad728 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -343,8 +343,8 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
-  */
- int
- cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
--		unsigned int nvec, mid_callback_t *callback, void *cbdata,
--		bool ignore_pend)
-+		unsigned int nvec, mid_receive_t *receive,
-+		mid_callback_t *callback, void *cbdata, bool ignore_pend)
+ static bool
+-allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
+-		 bool is_large_buf)
++allocate_buffers(struct TCP_Server_Info *server)
  {
- 	int rc;
- 	struct mid_q_entry *mid;
-@@ -378,6 +378,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 		goto out_err;
+-	char *bbuf = *bigbuf, *sbuf = *smallbuf;
+-
+-	if (bbuf == NULL) {
+-		bbuf = (char *)cifs_buf_get();
+-		if (!bbuf) {
++	if (!server->bigbuf) {
++		server->bigbuf = (char *)cifs_buf_get();
++		if (!server->bigbuf) {
+ 			cERROR(1, "No memory for large SMB response");
+ 			msleep(3000);
+ 			/* retry will check if exiting */
+ 			return false;
+ 		}
+-	} else if (is_large_buf) {
++	} else if (server->large_buf) {
+ 		/* we are reusing a dirty large buf, clear its start */
+-		memset(bbuf, 0, size);
++		memset(server->bigbuf, 0, sizeof(struct smb_hdr));
  	}
  
-+	mid->receive = receive;
- 	mid->callback = callback;
- 	mid->callback_data = cbdata;
- 	mid->midState = MID_REQUEST_SUBMITTED;
+-	if (sbuf == NULL) {
+-		sbuf = (char *)cifs_small_buf_get();
+-		if (!sbuf) {
++	if (!server->smallbuf) {
++		server->smallbuf = (char *)cifs_small_buf_get();
++		if (!server->smallbuf) {
+ 			cERROR(1, "No memory for SMB response");
+ 			msleep(1000);
+ 			/* retry will check if exiting */
+@@ -349,12 +346,9 @@ allocate_buffers(char **bigbuf, char **smallbuf, unsigned int size,
+ 		/* beginning of smb buffer is cleared in our buf_get */
+ 	} else {
+ 		/* if existing small buf clear beginning */
+-		memset(sbuf, 0, size);
++		memset(server->smallbuf, 0, sizeof(struct smb_hdr));
+ 	}
+ 
+-	*bigbuf = bbuf;
+-	*smallbuf = sbuf;
+-
+ 	return true;
+ }
+ 
+@@ -576,7 +570,7 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
+ 
+ static struct mid_q_entry *
+ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-	      int malformed, bool is_large_buf, char **bigbuf)
++	      int malformed)
+ {
+ 	struct mid_q_entry *mid = NULL;
+ 
+@@ -597,19 +591,27 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+ 			mid->multiEnd = true;
+ 			goto multi_t2_fnd;
+ 		}
+-		if (!is_large_buf) {
++		if (!server->large_buf) {
+ 			/*FIXME: switch to already allocated largebuf?*/
+ 			cERROR(1, "1st trans2 resp needs bigbuf");
+ 		} else {
+ 			/* Have first buffer */
+ 			mid->resp_buf = buf;
+ 			mid->largeBuf = true;
+-			*bigbuf = NULL;
++			server->bigbuf = NULL;
+ 		}
+ 		return mid;
+ 	}
+ 	mid->resp_buf = buf;
+-	mid->largeBuf = is_large_buf;
++	mid->largeBuf = server->large_buf;
++	/* Was previous buf put in mpx struct for multi-rsp? */
++	if (!mid->multiRsp) {
++		/* smb buffer will be freed by user thread */
++		if (server->large_buf)
++			server->bigbuf = NULL;
++		else
++			server->smallbuf = NULL;
++	}
+ multi_t2_fnd:
+ 	dequeue_mid(mid, malformed);
+ 	return mid;
+@@ -716,12 +718,11 @@ cifs_demultiplex_thread(void *p)
+ {
+ 	int length;
+ 	struct TCP_Server_Info *server = p;
+-	unsigned int pdu_length, total_read;
+-	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
++	unsigned int pdu_length;
++	char *buf = NULL;
+ 	struct smb_hdr *smb_buffer = NULL;
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mid_entry;
+-	bool isLargeBuf = false;
+ 
+ 	current->flags |= PF_MEMALLOC;
+ 	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
+@@ -736,19 +737,18 @@ cifs_demultiplex_thread(void *p)
+ 		if (try_to_freeze())
+ 			continue;
+ 
+-		if (!allocate_buffers(&bigbuf, &smallbuf,
+-				      sizeof(struct smb_hdr), isLargeBuf))
++		if (!allocate_buffers(server))
+ 			continue;
+ 
+-		isLargeBuf = false;
+-		smb_buffer = (struct smb_hdr *)smallbuf;
+-		buf = smallbuf;
++		server->large_buf = false;
++		smb_buffer = (struct smb_hdr *)server->smallbuf;
++		buf = server->smallbuf;
+ 		pdu_length = 4; /* enough to get RFC1001 header */
+ 
+ 		length = read_from_socket(server, buf, pdu_length);
+ 		if (length < 0)
+ 			continue;
+-		total_read = length;
++		server->total_read = length;
+ 
+ 		/*
+ 		 * The right amount was read from socket - 4 bytes,
+@@ -774,7 +774,7 @@ cifs_demultiplex_thread(void *p)
+ 					  sizeof(struct smb_hdr) - 1 - 4);
+ 		if (length < 0)
+ 			continue;
+-		total_read += length;
++		server->total_read += length;
+ 
+ 		if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+ 			cERROR(1, "SMB response too long (%u bytes)",
+@@ -786,10 +786,11 @@ cifs_demultiplex_thread(void *p)
+ 
+ 		/* else length ok */
+ 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
+-			isLargeBuf = true;
+-			memcpy(bigbuf, smallbuf, total_read);
+-			smb_buffer = (struct smb_hdr *)bigbuf;
+-			buf = bigbuf;
++			server->large_buf = true;
++			memcpy(server->bigbuf, server->smallbuf,
++			       server->total_read);
++			smb_buffer = (struct smb_hdr *)server->bigbuf;
++			buf = server->bigbuf;
+ 		}
+ 
+ 		/* now read the rest */
+@@ -798,9 +799,9 @@ cifs_demultiplex_thread(void *p)
+ 				  pdu_length - sizeof(struct smb_hdr) + 1 + 4);
+ 		if (length < 0)
+ 			continue;
+-		total_read += length;
++		server->total_read += length;
+ 
+-		dump_smb(smb_buffer, total_read);
++		dump_smb(smb_buffer, server->total_read);
+ 
+ 		/*
+ 		 * We know that we received enough to get to the MID as we
+@@ -811,28 +812,18 @@ cifs_demultiplex_thread(void *p)
+ 		 * 48 bytes is enough to display the header and a little bit
+ 		 * into the payload for debugging purposes.
+ 		 */
+-		length = checkSMB(smb_buffer, smb_buffer->Mid, total_read);
++		length = checkSMB(smb_buffer, smb_buffer->Mid,
++				  server->total_read);
+ 		if (length != 0)
+ 			cifs_dump_mem("Bad SMB: ", buf,
+-				      min_t(unsigned int, total_read, 48));
++				min_t(unsigned int, server->total_read, 48));
+ 
+ 		server->lstrp = jiffies;
+ 
+-		mid_entry = find_cifs_mid(server, smb_buffer, length,
+-					  isLargeBuf, &bigbuf);
++		mid_entry = find_cifs_mid(server, smb_buffer, length);
+ 		if (mid_entry != NULL) {
+-			if (mid_entry->multiRsp && !mid_entry->multiEnd)
+-				continue;
+-
+-			/* Was previous buf put in mpx struct for multi-rsp? */
+-			if (!mid_entry->multiRsp) {
+-				/* smb buffer will be freed by user thread */
+-				if (isLargeBuf)
+-					bigbuf = NULL;
+-				else
+-					smallbuf = NULL;
+-			}
+-			mid_entry->callback(mid_entry);
++			if (!mid_entry->multiRsp || mid_entry->multiEnd)
++				mid_entry->callback(mid_entry);
+ 		} else if (length != 0) {
+ 			/* response sanity checks failed */
+ 			continue;
+@@ -850,9 +841,9 @@ cifs_demultiplex_thread(void *p)
+ 	} /* end while !EXITING */
+ 
+ 	/* buffer usually freed in free_mid - need to free it here on exit */
+-	cifs_buf_release(bigbuf);
+-	if (smallbuf) /* no sense logging a debug message if NULL */
+-		cifs_small_buf_release(smallbuf);
++	cifs_buf_release(server->bigbuf);
++	if (server->smallbuf) /* no sense logging a debug message if NULL */
++		cifs_small_buf_release(server->smallbuf);
+ 
+ 	task_to_wake = xchg(&server->tsk, NULL);
+ 	clean_demultiplex_info(server);
 -- 
 1.7.6
