@@ -1,104 +1,190 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix NT_STATUS_ACCESS_DENIED for mounts with
- prefixpath option
-Date: Fri, 26 Aug 2011 16:36:38 +0400
-Message-ID: <CAKywueTZndUW9YGVGHzvDy4YUMkM5EJP_i9kjz_-jRdt1nUqOQ@mail.gmail.com>
-References: <1314341541-2476-1-git-send-email-piastry@etersoft.ru>
-	<20110826073437.743c06a3@tlielax.poochiereds.net>
+From: Tim Lank <timlank-3iNpEh//jjRBDgjK7y7TUQ@public.gmane.org>
+Subject: touch: setting times of `file4': Permission denied
+Date: Fri, 26 Aug 2011 09:19:05 -0400
+Message-ID: <CAHyifnRoqZPUTF0GFGpygMrktmFCPahEHrnBSjR6Bk1a6p+oPg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110826073437.743c06a3-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/8/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-=2E..
->> +static struct dentry *
->> +cifs_alloc_root(struct super_block *sb)
->> +{
->> + =A0 =A0 struct qstr q;
->> +
->> + =A0 =A0 q.name =3D "/";
->
-> =A0 =A0 =A0 =A0I don't think you want a separator in the name. That s=
-eems
-> =A0 =A0 =A0 =A0like it should be "".
+Linux-cifs:
 
-Ok, I will try.
+The file "file4" gets created when using the touch command, but the
+error message "touch: setting times of `file4': Permission denied" is
+returned.
 
->
->> + =A0 =A0 q.len =3D 1;
->> + =A0 =A0 q.hash =3D full_name_hash(q.name, q.len);
->> + =A0 =A0 return d_alloc_pseudo(sb, &q);
->> +}
->> +
-=2E..
->> -             if (filldir(direntry, "..", 2, file->f_pos,
->> -                  parent_ino(file->f_path.dentry), DT_DIR) < 0) {
->> +             if (!file->f_path.dentry->d_parent->d_inode) {
->> +                     cFYI(1, "parent dir is negative, filling as cu=
-rrent");
->> +                     ino =3D file->f_path.dentry->d_inode->i_ino;
->> +             } else
->> +                     ino =3D parent_ino(file->f_path.dentry);
->> +             if (filldir(direntry, "..", 2, file->f_pos, ino, DT_DI=
-R) < 0) {
->>                       cERROR(1, "Filldir for parent dir failed");
->>                       rc =3D -ENOMEM;
->>                       break;
->>
-> (cc'ing David Howells since he did the sb sharing code for NFS)
->
-> This doesn't seem quite right to me...
->
-> This implies that the parent in this situation would be the parent
-> dentry on the server, but that shouldn't be the case right? Shouldn't
-> this be the mountpoint's parent?
->
-> For instance, suppose you have //server/share/d1/d2/d3 mounted
-> on /mnt/cifs. During the mount, d1 and d2 are instantiated as negativ=
-e
-> dentries. Here, you try to fill in the i_ino for d2 as the inode numb=
-er
-> for "..", but that doesn't seem correct -- shouldn't it be the inode
-> number for /mnt?
+Seems like it is having an issue with the utimensat() call to set the
+timestamp?  Why is this?  How is it solved?
 
-I think that doesn't seem correct too, but I looked through another
-file systems code and found the same things.
+Thanks in advance for any assistance.
 
->
-> I don't have a great feel for this sort of dcache trickery, but I ten=
-d
-> to think we probably ought to follow NFS' example here. It has sort o=
-f
-> an "opportunistic" mechanism for filling in the dcache for a particul=
-ar
-> superblock. This is detailed in the comments on commit 54ceac45.
+Tim
 
-As I understand, NFS does the following:
-1) requests fattr from the server
-error =3D server->nfs_client->rpc_ops->getroot(server, mntfh, &fsinfo);
+# modinfo cifs
+filename:       /lib/modules/2.6.32-131.6.1.el6.x86_64/kernel/fs/cifs/cifs.ko
+version:        1.68
+description:    VFS to access servers complying with the SNIA CIFS
+Specification e.g. Samba and Windows
+license:        GPL
+author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+srcversion:     6BE0EB6FED154E567A97675
+depends:
+vermagic:       2.6.32-131.6.1.el6.x86_64 SMP mod_unload modversions
+parm:           CIFSMaxBufSize:Network buffer size (not including
+header). Default: 16384 Range: 8192 to 130048 (int)
+parm:           cifs_min_rcv:Network buffers in pool. Default: 4
+Range: 1 to 64 (int)
+parm:           cifs_min_small:Small network buffers in pool. Default:
+30 Range: 2 to 256 (int)
+parm:           cifs_max_pending:Simultaneous requests to server.
+Default: 50 Range: 2 to 256 (int)
 
-2) lookup an inode with ino got from the server
-inode =3D nfs_fhget(sb, mntfh, fsinfo.fattr);
+# mount.cifs -V
+mount.cifs version: 4.8.1
 
-3) set dummy root
-error =3D nfs_superblock_set_dummy_root(sb, inode);
+# uname -r
+2.6.32-131.6.1.el6.x86_64
 
-4) get dentry for the inode
-ret =3D d_obtain_alias(inode);
+# rpm -qa | grep samba
+samba-client-3.5.6-86.el6.x86_64
+samba-common-3.5.6-86.el6.x86_64
+samba-winbind-clients-3.5.6-86.el6.x86_64
 
-So, it lookup an existing dentry according to the ino got from the
-server. As for CIFS, we can't do it because we may end up using a
-different inode numbers for the same path (noserverino cases).
+/etc/fstab entry:
+//fileserver/testshare /testmount cifs
+rw,file_mode=0775,dir_mode=0775,uid=4051,gid=4053,credentials=/etc/credentials.txt,_netdev
+0 0
 
-Thoughts?
+/etc/passwd entry:
+appuser:x:4051:4051:Application user:/home/appuser:/bin/bash
 
---=20
-Best regards,
-Pavel Shilovsky.
+/etc/group entry:
+isperms:x:4053:appuser
+
+# cat /etc/credentials.txt
+username=WINDOWSUSER
+password=<NONEOFYOURBUSINESS>
+
+
+# strace touch file4
+execve("/bin/touch", ["touch", "file4"], [/* 26 vars */]) = 0
+brk(0)                                  = 0x17d5000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
+0) = 0x7f886e77f000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY)      = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=27750, ...}) = 0
+mmap(NULL, 27750, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f886e778000
+close(3)                                = 0
+open("/lib64/librt.so.1", O_RDONLY)     = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0@!\0\202?\0\0\0"...,
+832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=47072, ...}) = 0
+mmap(0x3f82000000, 2128816, PROT_READ|PROT_EXEC,
+MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x3f82000000
+mprotect(0x3f82007000, 2093056, PROT_NONE) = 0
+mmap(0x3f82206000, 8192, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x3f82206000
+close(3)                                = 0
+open("/lib64/libc.so.6", O_RDONLY)      = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\260\355\201\0061\0\0\0"...,
+832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1912928, ...}) = 0
+mmap(0x3106800000, 3737768, PROT_READ|PROT_EXEC,
+MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x3106800000
+mprotect(0x3106987000, 2097152, PROT_NONE) = 0
+mmap(0x3106b87000, 20480, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x187000) = 0x3106b87000
+mmap(0x3106b8c000, 18600, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x3106b8c000
+close(3)                                = 0
+open("/lib64/libpthread.so.0", O_RDONLY) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\20\\\0\237;\0\0\0"...,
+832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=145672, ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
+0) = 0x7f886e777000
+mmap(0x3b9f000000, 2212768, PROT_READ|PROT_EXEC,
+MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x3b9f000000
+mprotect(0x3b9f017000, 2097152, PROT_NONE) = 0
+mmap(0x3b9f217000, 8192, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x17000) = 0x3b9f217000
+mmap(0x3b9f219000, 13216, PROT_READ|PROT_WRITE,
+MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x3b9f219000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
+0) = 0x7f886e776000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
+0) = 0x7f886e775000
+arch_prctl(ARCH_SET_FS, 0x7f886e776700) = 0
+mprotect(0x3f82206000, 4096, PROT_READ) = 0
+mprotect(0x3106b87000, 16384, PROT_READ) = 0
+mprotect(0x3b9f217000, 4096, PROT_READ) = 0
+mprotect(0x310621f000, 4096, PROT_READ) = 0
+munmap(0x7f886e778000, 27750)           = 0
+set_tid_address(0x7f886e7769d0)         = 5363
+set_robust_list(0x7f886e7769e0, 0x18)   = 0
+futex(0x7fff60c86b4c, FUTEX_WAKE_PRIVATE, 1) = 0
+futex(0x7fff60c86b4c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME,
+1, NULL, 7f886e776700) = -1 EAGAIN (Resource temporarily unavailable)
+rt_sigaction(SIGRTMIN, {0x3b9f005a90, [], SA_RESTORER|SA_SIGINFO,
+0x3b9f00f520}, NULL, 8) = 0
+rt_sigaction(SIGRT_1, {0x3b9f005b20, [],
+SA_RESTORER|SA_RESTART|SA_SIGINFO, 0x3b9f00f520}, NULL, 8) = 0
+rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+getrlimit(RLIMIT_STACK, {rlim_cur=10240*1024, rlim_max=RLIM_INFINITY}) = 0
+brk(0)                                  = 0x17d5000
+brk(0x17f6000)                          = 0x17f6000
+open("/usr/lib/locale/locale-archive", O_RDONLY) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=99158752, ...}) = 0
+mmap(NULL, 99158752, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f88688e4000
+close(3)                                = 0
+open("file4", O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK, 0666) = 3
+dup2(3, 0)                              = 0
+close(3)                                = 0
+utimensat(0, NULL, NULL, 0)             = -1 EACCES (Permission denied)
+close(0)                                = 0
+open("/usr/share/locale/locale.alias", O_RDONLY) = 0
+fstat(0, {st_mode=S_IFREG|0644, st_size=2512, ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
+0) = 0x7f886e77e000
+read(0, "# Locale name alias data base.\n#"..., 4096) = 2512
+read(0, "", 4096)                       = 0
+close(0)                                = 0
+munmap(0x7f886e77e000, 4096)            = 0
+open("/usr/share/locale/en_US.UTF-8/LC_MESSAGES/coreutils.mo",
+O_RDONLY) = -1 ENOENT (No such file or directory)
+open("/usr/share/locale/en_US.utf8/LC_MESSAGES/coreutils.mo",
+O_RDONLY) = -1 ENOENT (No such file or directory)
+open("/usr/share/locale/en_US/LC_MESSAGES/coreutils.mo", O_RDONLY) =
+-1 ENOENT (No such file or directory)
+open("/usr/share/locale/en.UTF-8/LC_MESSAGES/coreutils.mo", O_RDONLY)
+= -1 ENOENT (No such file or directory)
+open("/usr/share/locale/en.utf8/LC_MESSAGES/coreutils.mo", O_RDONLY) =
+-1 ENOENT (No such file or directory)
+open("/usr/share/locale/en/LC_MESSAGES/coreutils.mo", O_RDONLY) = 0
+fstat(0, {st_mode=S_IFREG|0644, st_size=435, ...}) = 0
+mmap(NULL, 435, PROT_READ, MAP_PRIVATE, 0, 0) = 0x7f886e77e000
+close(0)                                = 0
+write(2, "touch: ", 7touch: )                  = 7
+write(2, "setting times of `file4'", 24setting times of `file4') = 24
+open("/usr/share/locale/en_US.UTF-8/LC_MESSAGES/libc.mo", O_RDONLY) =
+-1 ENOENT (No such file or directory)
+open("/usr/share/locale/en_US.utf8/LC_MESSAGES/libc.mo", O_RDONLY) =
+-1 ENOENT (No such file or directory)
+open("/usr/share/locale/en_US/LC_MESSAGES/libc.mo", O_RDONLY) = -1
+ENOENT (No such file or directory)
+open("/usr/share/locale/en.UTF-8/LC_MESSAGES/libc.mo", O_RDONLY) = -1
+ENOENT (No such file or directory)
+open("/usr/share/locale/en.utf8/LC_MESSAGES/libc.mo", O_RDONLY) = -1
+ENOENT (No such file or directory)
+open("/usr/share/locale/en/LC_MESSAGES/libc.mo", O_RDONLY) = -1 ENOENT
+(No such file or directory)
+write(2, ": Permission denied", 19: Permission denied)     = 19
+write(2, "\n", 1
+)                       = 1
+close(1)                                = 0
+close(2)                                = 0
+exit_group(1)                           = ?
