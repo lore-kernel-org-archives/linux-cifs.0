@@ -1,146 +1,139 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix NT_STATUS_ACCESS_DENIED for mounts with
- prefixpath option
-Date: Fri, 26 Aug 2011 17:23:42 -0400
-Message-ID: <20110826172342.52996149@tlielax.poochiereds.net>
-References: <1314341541-2476-1-git-send-email-piastry@etersoft.ru>
-	<20110826073437.743c06a3@tlielax.poochiereds.net>
-	<CAKywueQQMuTA=xszQYr6sf5L+cZ_s56qrCiL8MqthWS-Xbxw5A@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Kernel 3.0: Instant kernel crash when mounting CIFS (also
+ crashes with linux-3.1-rc2
+Date: Fri, 26 Aug 2011 17:59:40 -0400
+Message-ID: <20110826175940.2830044d@tlielax.poochiereds.net>
+References: <alpine.DEB.2.02.1108150506310.7571@p34.internal.lan>
+	<20110815064734.403b630f@corrin.poochiereds.net>
+	<alpine.DEB.2.02.1108150653200.7571@p34.internal.lan>
+	<alpine.DEB.2.02.1108151357200.32349@p34.internal.lan>
+	<alpine.DEB.2.02.1108171515050.5877@p34.internal.lan>
+	<3300.1313637592@jrobl>
+	<alpine.DEB.2.02.1108180632000.10458@p34.internal.lan>
+	<alpine.DEB.2.02.1108180807070.7903@p34.internal.lan>
+	<alpine.DEB.2.02.1108180821440.7903@p34.internal.lan>
+	<20110818091140.385a9455@barsoom.rdu.redhat.com>
+	<alpine.DEB.2.02.1108180914180.7903@p34.internal.lan>
+	<20110818130408.71c55b96@barsoom.rdu.redhat.com>
+	<alpine.DEB.2.02.1108181314310.7903@p34.internal.lan>
+	<CAH2r5mvNkUWh0rYTbTEWmUPiRsxUbmrGNpTOaebiG0CCKRfA1g@mail.gmail.com>
+	<alpine.DEB.2.02.1108181331180.7903@p34.internal.lan>
+	<CAH2r5msTpKdxwpgG+-3-gkkr5h7Ox1tL86q3LyTBMd1V8WS7aQ@mail.gmail.com>
+	<alpine.DEB.2.02.1108181413030.7903@p34.internal.lan>
+	<20110818145257.035a38e9@barsoom.rdu.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>,
+	Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Alan Piszcz <ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQQMuTA=xszQYr6sf5L+cZ_s56qrCiL8MqthWS-Xbxw5A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20110818145257.035a38e9-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 27 Aug 2011 00:11:57 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Thu, 18 Aug 2011 14:52:57 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> 2011/8/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > On Fri, 26 Aug 2011 10:52:21 +0400
-> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> >
-> >> Reorganize code and make it send qpath info request only for a ful=
-l
-> >> path (//server/share/prefixpath) rather than request for every pat=
-h
-> >> compoment. In this case we end up with negative dentries for all
-> >> components except full one and we will instantiate them later if
-> >> such a mount is requested.
-> >>
-> >> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> >> ---
-> >> =C2=A0fs/cifs/cifsfs.c =C2=A0| =C2=A0123 +++++++++++++++++++++++++=
-++++++----------------------
-> >> =C2=A0fs/cifs/cifsfs.h =C2=A0| =C2=A0 =C2=A03 +-
-> >> =C2=A0fs/cifs/inode.c =C2=A0 | =C2=A0 =C2=A07 ++-
-> >> =C2=A0fs/cifs/readdir.c | =C2=A0 =C2=A09 +++-
-> >> =C2=A04 files changed, 85 insertions(+), 57 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> >> index 0435bb9..33a2e1e 100644
-> >> --- a/fs/cifs/cifsfs.c
-> >> +++ b/fs/cifs/cifsfs.c
-> >> @@ -95,14 +95,13 @@ mempool_t *smb2_mid_poolp;
-> >> =C2=A0static struct kmem_cache *smb2_mid_cachep;
-> >> =C2=A0#endif /* CONFIG_CIFS_SMB2 */
-> >>
-> >> -static int
-> >> +static void
-> >> =C2=A0cifs_read_super(struct super_block *sb)
-> >> =C2=A0{
-> >> - =C2=A0 =C2=A0 struct inode *inode;
-> >> - =C2=A0 =C2=A0 struct cifs_sb_info *cifs_sb;
-> >> - =C2=A0 =C2=A0 int rc =3D 0;
-> >> + =C2=A0 =C2=A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
-> >>
-> >> - =C2=A0 =C2=A0 cifs_sb =3D CIFS_SB(sb);
-> >> + =C2=A0 =C2=A0 /* BB should we make this contingent on mount parm=
-? */
-> >> + =C2=A0 =C2=A0 sb->s_flags |=3D MS_NODIRATIME | MS_NOATIME;
-> >>
-> >> =C2=A0 =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSI=
-XACL)
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sb->s_flags |=3D =
-MS_POSIXACL;
-> >> @@ -120,26 +119,6 @@ cifs_read_super(struct super_block *sb)
-> >> =C2=A0 =C2=A0 =C2=A0 sb->s_bdi =3D &cifs_sb->bdi;
-> >> =C2=A0 =C2=A0 =C2=A0 sb->s_blocksize =3D CIFS_MAX_MSGSIZE;
-> >> =C2=A0 =C2=A0 =C2=A0 sb->s_blocksize_bits =3D 14; =C2=A0 =C2=A0 =C2=
-=A0/* default 2**14 =3D CIFS_MAX_MSGSIZE */
-> >> - =C2=A0 =C2=A0 inode =3D cifs_root_iget(sb);
-> >> -
-> >> - =C2=A0 =C2=A0 if (IS_ERR(inode)) {
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D PTR_ERR(inode);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 inode =3D NULL;
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out_no_root;
-> >> - =C2=A0 =C2=A0 }
-> >> -
-> >> - =C2=A0 =C2=A0 sb->s_root =3D d_alloc_root(inode);
-> >> -
-> >> - =C2=A0 =C2=A0 if (!sb->s_root) {
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D -ENOMEM;
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto out_no_root;
-> >> - =C2=A0 =C2=A0 }
-> >> -
-> >> - =C2=A0 =C2=A0 /* do that *after* d_alloc_root() - we want NULL -=
->d_op for root here */
-> >> - =C2=A0 =C2=A0 if (cifs_sb_master_tcon(cifs_sb)->nocase)
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sb->s_d_op =3D &cifs_c=
-i_dentry_ops;
-> >> - =C2=A0 =C2=A0 else
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sb->s_d_op =3D &cifs_d=
-entry_ops;
-> >>
-> >> =C2=A0#ifdef CIFS_NFSD_EXPORT
-> >> =C2=A0 =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERV=
-ER_INUM) {
-> >> @@ -148,14 +127,7 @@ cifs_read_super(struct super_block *sb)
-> >> =C2=A0 =C2=A0 =C2=A0 }
-> >> =C2=A0#endif /* CIFS_NFSD_EXPORT */
-> >>
-> >> - =C2=A0 =C2=A0 return 0;
-> >> -
-> >> -out_no_root:
-> >> - =C2=A0 =C2=A0 cERROR(1, "cifs_read_super: get root inode failed"=
-);
-> >> - =C2=A0 =C2=A0 if (inode)
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 iput(inode);
-> >> -
-> >> - =C2=A0 =C2=A0 return rc;
-> >> + =C2=A0 =C2=A0 sb->s_flags |=3D MS_ACTIVE;
-> >> =C2=A0}
-> >>
-> >> =C2=A0static void cifs_kill_sb(struct super_block *sb)
-> >> @@ -529,6 +501,17 @@ static const struct super_operations cifs_sup=
-er_ops =3D {
-> >> =C2=A0#endif
-> >> =C2=A0};
-> >>
-> >> +static struct dentry *
-> >> +cifs_alloc_root(struct super_block *sb)
-> >> +{
-> >> + =C2=A0 =C2=A0 struct qstr q;
-> >> +
-> >> + =C2=A0 =C2=A0 q.name =3D "/";
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0I don't think you want a separator in th=
-e name. That seems
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0like it should be "".
-> >
->=20
-> In this case I based it on d_alloc_root() function that fills name as
-> "/". Why this should be ""?
->=20
+> On Thu, 18 Aug 2011 14:18:15 -0400 (EDT)
+> Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org> wrote:
+> 
+> > 
+> > 
+> > On Thu, 18 Aug 2011, Steve French wrote:
+> > 
+> > > If reading files - smbclient (ftp like syntax) should be able to reach
+> > > wire speeds (assuming the server disk can keep up) and for
+> > > writing it should be similar (perhaps a little slower but it won't
+> > > use i/o sizes as large as cifs kernel client).  I would expect
+> > > smbclient to/copy from Windows to be faster than Windows mount -> Samba.
+> > >
+> > > I reached near wirespeeds for GigE with cifs client (writing) to
+> > > Winodws 2003/2008/r2
+> > > and Samba - but didn't have fast enough disks to test 10GigE although I expect
+> > > very good performance with that if you have fast enough server disks (and
+> > > am willing to put performance patches in, if you detect additional
+> > > changes that we should make for 10GigE - in particular allowing
+> > > more than 50 simultaneous requests).
+> > >
+> > > If the registry fix for Windows 7 is in place (or if you copy to
+> > > WIndows 2008, Windows 2003, WIndows 2008r2) -
+> > > cifs kernel client is probably slightly faster for writes than alternatives,
+> > > smbclient much faster for reads.
+> > >
+> > > If going the other direction (Windows client copying to/from Samba server) -
+> > > Samba 3.6 (server) with SMB2 support
+> > > turned on - is going to be faster than most alternatives.
+> > 
+> > Hi,
+> > 
+> > Downloading from an FTP Server on the windows machine:
+> > 
+> > <--- 150 Connection accepted
+> > `file' at 418873344 (24%) 145.58M/s eta:9s [Receiving data]
+> > `file' at 735510528 (42%) 162.93M/s eta:6s [Receiving data]
+> > `file' at 1357185024 (78%) 172.89M/s eta:2s [Receiving data]
+> > <--- 226 Transfer OK 
+> > ---- Got EOF on data connection
+> > ---- Closing data socket
+> > 1719784995 bytes transferred in 9 seconds (181.65M/s)
+> > 
+> > Same file (via CIFS): 50MB/s
+> > 
+> > Device eth6 [10.0.1.2] (1/1):
+> > ================================================================================
+> > Incoming:                               Outgoing:
+> > Curr: 49.17 MByte/s                     Curr: 0.58 MByte/s
+> > Avg: 8.76 MByte/s                       Avg: 0.03 MByte/s
+> > Min: 0.00 MByte/s                       Min: 0.00 MByte/s
+> > Max: 197.68 MByte/s                     Max: 0.86 MByte/s
+> > Ttl: 585.87 GByte                       Ttl: 6.97 GByte
+> > 
+> > 0.02user 4.09system 0:33.84elapsed 12%CPU (0avgtext+0avgdata 3632maxresident)k
+> > 
+> > The RAID's on both systems can achieve > 750MiB/s sustained without any
+> > problems (benchmarked in the past) and the system has 56 PCI-e 2.0 lanes
+> > and a cable between two 10GbE nics.  Not sure where to start, Win7/box tweaks
+> > or Linux/CIFS options?
+> > 
+> > Again, Samba -> Linux = 500MiB/s, so FTP > 3x faster than CIFS.
+> > I know NFS gets a lot of testing (never had an issue with it/performance/etc)
+> > 
+> > However, regarding CIFS-- is there a test suite/or benchmark pack the CIFS 
+> > developers use to make sure everything is working in order?
+> > 
+> > Justin.
+> > 
+> > 
+> 
+> Like I said, read performance with cifs.ko just plain sucks currently.
+> 
+> Don't look for cifs.ko to achieve anywhere near NFS' performance unless
+> you jump through some very odd hoops (like multithreading your workload
+> in userspace, etc). cifs.ko just doesn't do a good job of keeping the
+> pipe "stuffed" as most calls are handled synchronously. A single task
+> can only handle one call on the wire in most cases. The exception here
+> is writes, but that just recently changed...
+> 
+> Reads are done using relatively small buffers and then copied to
+> pagecache. Part of what I'm working on will be to allow for much larger
+> reads directly into the pagecache. That should also help performance
+> significantly.
+> 
 
-You may be right. It just looked odd to me because '/' is typically the
-delimiter between path components and the q.name should be the name of
-the path component itself. If d_alloc_root does it though, you're
-probably OK.
+I just posted a patchset that should improve the performance of
+buffered reads. It's rather large but should apply to current upstream
+kernels. If you've had problems with cifs.ko read performance in the
+past, then this would be a good time to step up and help test them.
 
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+If it makes things easier, then the patchset is also available via the
+cifs-3.2 branch of my public git tree:
+
+    http://git.kernel.org/?p=linux/kernel/git/jlayton/linux.git;a=shortlog;h=refs/heads/cifs-3.2
+
+Thanks,
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
