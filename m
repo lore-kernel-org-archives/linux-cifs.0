@@ -1,68 +1,67 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix the conflict between rwpidforward and rw
- mount options
-Date: Sat, 27 Aug 2011 10:27:37 -0400
-Message-ID: <20110827102737.51d50046@tlielax.poochiereds.net>
-References: <1314381783-5614-1-git-send-email-piastry@etersoft.ru>
-	<20110827060011.55847806@tlielax.poochiereds.net>
-	<CAKywueTwKA38HxwCmmON-96gasPvoSR2HzPgHuU1iEXw_Q6a-w@mail.gmail.com>
+Subject: Re: Kernel 3.0: Instant kernel crash when mounting CIFS (also
+ crashes with linux-3.1-rc2
+Date: Sat, 27 Aug 2011 10:31:49 -0400
+Message-ID: <20110827103149.2d186dbb@tlielax.poochiereds.net>
+References: <alpine.DEB.2.02.1108150506310.7571@p34.internal.lan>
+	<alpine.DEB.2.02.1108180632000.10458@p34.internal.lan>
+	<alpine.DEB.2.02.1108180807070.7903@p34.internal.lan>
+	<alpine.DEB.2.02.1108180821440.7903@p34.internal.lan>
+	<20110818091140.385a9455@barsoom.rdu.redhat.com>
+	<alpine.DEB.2.02.1108180914180.7903@p34.internal.lan>
+	<20110818130408.71c55b96@barsoom.rdu.redhat.com>
+	<alpine.DEB.2.02.1108181314310.7903@p34.internal.lan>
+	<CAH2r5mvNkUWh0rYTbTEWmUPiRsxUbmrGNpTOaebiG0CCKRfA1g@mail.gmail.com>
+	<alpine.DEB.2.02.1108181331180.7903@p34.internal.lan>
+	<CAH2r5msTpKdxwpgG+-3-gkkr5h7Ox1tL86q3LyTBMd1V8WS7aQ@mail.gmail.com>
+	<alpine.DEB.2.02.1108181413030.7903@p34.internal.lan>
+	<20110818145257.035a38e9@barsoom.rdu.redhat.com>
+	<20110826175940.2830044d@tlielax.poochiereds.net>
+	<alpine.DEB.2.02.1108261844170.2203@p34.internal.lan>
+	<CAH2r5mtrUq4aTHgqRyG-YZZoUztU4_k4rh+nXrN13CVckex8ZQ@mail.gmail.com>
+	<alpine.DEB.2.02.1108261914250.2203@p34.internal.lan>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"J. R. Okajima" <hooanon05-/E1597aS9LR3+QwDJ9on6Q@public.gmane.org>,
+	Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Alan Piszcz <ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTwKA38HxwCmmON-96gasPvoSR2HzPgHuU1iEXw_Q6a-w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <alpine.DEB.2.02.1108261914250.2203-0qmrozcXWo8bm2hyYBkBBg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 27 Aug 2011 14:41:36 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Fri, 26 Aug 2011 19:16:28 -0400 (EDT)
+Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org> wrote:
 
-> 2011/8/27 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
-> > On Fri, 26 Aug 2011 22:03:03 +0400
-> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> >
-> >> Both these options are started with "rw" - that's why the first one
-> >> isn't switched on even if it is specified. Rename it to piforwardio
-> >> to avoid the wrong matching.
-> >>
-> >> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> >
-> >
-> > This seems like the wrong way to fix this. Isn't this a problem in
-> > userspace code? It seems like fixing mount.cifs to handle this properly
-> > would be a better fix, and we wouldn't need to change a mount option
-> > (without warning) that's already in kernels that are in the field.
-> >
-> > NAK from my point of view...
-> >
 > 
-> In kernel code we have the section :
 > 
-> cifs_parse_mount_options:
-> ...
-> } else if (strnicmp(data, "rw", 2) == 0) {
->         /* ignore */
-> } else if (strnicmp(data, "ro", 2) == 0) {
-> ...
-> } else if (strnicmp(data, "rwpidforward", 4) == 0) {
->         vol->rwpidforward = 1;
-> } else
-> ...
+> On Fri, 26 Aug 2011, Steve French wrote:
 > 
-> So, it is not only the userspace problem. Even if we fix it kernel
-> code doesn't handle it right too. So, the easier way to fix this is to
-> rename the option, I think.
+> > Fails with Jeff's new 20+ patch series?
+> 
+> Hi,
+> 
+> No, wanted to make sure it still mounted with 3.1-rc2+previous patches before 
+> doing anything, there have been quite a few patches applied recently on the
+> Windows host (updates) I'll need to check with the owner tomorrow; I want 
+> to ensure I can mount as before before applying Jeff's patches.
+> 
+> Justin.
 > 
 
-Except that this option is already in existing kernels that are in the
-field, as well as the documentation (the mount.cifs manpage). Changing
-user-visible interfaces like this without any warning is not good
-practice.
+Doubtful that it's related to your -ENOMEM problem, but I have found a
+couple of problems with the async read patchset. You may want to wait on
+testing it just yet. I've fixed a couple of the problems, but there's
+one I'm still hunting down.
 
-As a side note...how was rwpidforward originally tested if the option
-was broken and could never be turned on?
+Steve, you may want to wait on merging any of it until I understand
+what the problem actually is. I'll re-post the set once I get it
+straightened out.
 
+Thanks,
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
