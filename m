@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Fix the conflict between rwpidforward and rw mount options
-Date: Sat, 27 Aug 2011 20:18:40 +0400
-Message-ID: <1314461920-6116-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2] CIFS: Fix the conflict between rwpidforward and rw mount options
+Date: Sat, 27 Aug 2011 20:19:44 +0400
+Message-ID: <1314461984-6161-1-git-send-email-piastry@etersoft.ru>
 Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
