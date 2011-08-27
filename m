@@ -1,33 +1,52 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] mount.cifs: fix the conflict between rwpidforward and rw mount options
-Date: Sat, 27 Aug 2011 20:21:17 +0400
-Message-ID: <1314462077-6196-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>
+Subject: [PATCH][Trivial] CIFS: Don't free volume_info->UNC until we are
+ entirely done with it.
+Date: Sat, 27 Aug 2011 18:58:34 +0200 (CEST)
+Message-ID: <alpine.LNX.2.00.1108271851470.27813@swampdragon.chaosbits.net>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Both these options are started with "rw" - that's why the first one
-isn't switched on even if it is specified. Fix this by adding a length
-check for "rw" option check.
+In cleanup_volume_info_contents() we kfree(volume_info->UNC); and then 
+proceed to use that variable on the very next line.
+This causes (at least) Coverity Prevent to complain about use-after-free 
+of that variable (and I guess other checkers may do that as well).
+There's not any /real/ problem here since we are just using the value of 
+the pointer, not actually dereferencing it, but it's still trivial to 
+silence the tool, so why not?
+To me at least it also just seems nicer to defer freeing the variable 
+until we are entirely done with it in all respects.
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Signed-off-by: Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>
 ---
- mount.cifs.c |    2 +-
+ fs/cifs/connect.c |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index aa4581f..1e3d534 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -837,7 +837,7 @@ static int parse_opt_token(const char *token)
- 		return OPT_GUEST;
- 	if (strncmp(token, "ro", 2) == 0)
- 		return OPT_RO;
--	if (strncmp(token, "rw", 2) == 0)
-+	if (strncmp(token, "rw", 2) == 0 && strlen(token) == 2)
- 		return OPT_RW;
- 	if (strncmp(token, "remount", 7) == 0)
- 		return OPT_REMOUNT;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 633c246..9bb4b10 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2877,9 +2877,9 @@ cleanup_volume_info_contents(struct smb_vol *volume_info)
+ {
+ 	kfree(volume_info->username);
+ 	kzfree(volume_info->password);
+-	kfree(volume_info->UNC);
+ 	if (volume_info->UNCip != volume_info->UNC + 2)
+ 		kfree(volume_info->UNCip);
++	kfree(volume_info->UNC);
+ 	kfree(volume_info->domainname);
+ 	kfree(volume_info->iocharset);
+ 	kfree(volume_info->prepath);
 -- 
-1.7.1
+1.7.6.1
+
+
+-- 
+Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>       http://www.chaosbits.net/
+Don't top-post http://www.catb.org/jargon/html/T/top-post.html
+Plain text mails only, please.
