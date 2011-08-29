@@ -1,66 +1,132 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 00/16] cifs: cleanup and overhaul of the receive codepath (try #3)
-Date: Mon, 29 Aug 2011 07:16:48 -0400
-Message-ID: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 07/16] cifs: turn read_from_socket into a wrapper around a vectorized version
+Date: Mon, 29 Aug 2011 07:16:55 -0400
+Message-ID: <1314616624-5362-8-git-send-email-jlayton@redhat.com>
+References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1314616624-5362-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the 3rd attempt at this patchset. It's basically the same as the
-earlier ones, with a few bugfixes. It's also more careful to make cifsd
-use GFP_NOFS allocations to prevent deadlocks. For those who haven't
-been following along at home:
+Eventually we'll want to allow cifsd to read data directly into the
+pagecache. In order to do that we'll need a routine that can take a
+kvec array and pass that directly to kernel_recvmsg.
 
-This patchset does a fairly major cleanup and overhaul of the receive
-codepath for cifs. Aside from basic cleanup, there are two main goals:
+Unfortunately though, the kernel's recvmsg routines modify the kvec
+array that gets passed in, so we need to use a copy of the kvec array
+and refresh that copy on each pass through the loop.
 
-1) allow the receive codepath to identify the mid before receiving all
-of the data for a particular SMB.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |   72 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 65 insertions(+), 7 deletions(-)
 
-...and in turn...
-
-2) add the ability for certain calls to receive responses into their
-own set of buffers.
-
-These two changes allow cifs to break the CIFSMaxBufSize barrier for
-receives on certain calls (namely, reads). A separate patchset will
-follow that will overhaul cifs_readpages to use this infrastructure to
-allow for a larger rsize.
-
-These patches take an incremental approach to changes in this code. I
-feel that's essential as bugs in the receive path can be very subtle and
-hard to detect. Being able to bisect to find bugs is a generally a good
-thing. Hence, I highly recommend committing these in order.
-
-Jeff Layton (16):
-  cifs: clean up checkSMB
-  cifs: consolidate signature generating code
-  cifs: trivial: remove obsolete comment
-  cifs: make smb_msg local to read_from_socket
-  cifs: check for unresponsive server every time we call kernel_recvmsg
-  cifs: simplify read_from_socket
-  cifs: turn read_from_socket into a wrapper around a vectorized
-    version
-  cifs: keep a reusable kvec array for receives
-  cifs: clean up check_rfc1002_header
-  cifs: add a third receive phase to cifs_demultiplex_thread
-  cifs: move mid finding into separate routine
-  cifs: eliminate is_multi_rsp parm to find_cifs_mid
-  cifs: move buffer pointers into TCP_Server_Info
-  cifs: find mid earlier in receive codepath
-  cifs: break out 3rd receive phase into separate function
-  cifs: add a callback function to receive the rest of the frame
-
- fs/cifs/cifsencrypt.c |  103 ++--------
- fs/cifs/cifsglob.h    |   29 +++-
- fs/cifs/cifsproto.h   |    7 +-
- fs/cifs/cifssmb.c     |    5 +-
- fs/cifs/connect.c     |  519 ++++++++++++++++++++++++++++---------------------
- fs/cifs/misc.c        |   51 +++---
- fs/cifs/transport.c   |   16 +-
- 7 files changed, 391 insertions(+), 339 deletions(-)
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index e6da201..08c6b0e 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -375,14 +375,58 @@ server_unresponsive(struct TCP_Server_Info *server)
+ 	return false;
+ }
+ 
++/*
++ * kvec_array_setup - clone a kvec array, and advance into it
++ * @new:	pointer to memory for cloned array
++ * @iov:	pointer to original array
++ * @nr_segs:	number of members in original array
++ * @bytes:	number of bytes to advance into the cloned array
++ *
++ * This function will copy the array provided in iov to a section of memory
++ * and advance the specified number of bytes into the new array. It returns
++ * the number of segments in the new array. "new" must be at least as big as
++ * the original iov array.
++ */
++static unsigned int
++kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
++		size_t bytes)
++{
++	size_t base = 0;
++
++	while (bytes || !iov->iov_len) {
++		int copy = min(bytes, iov->iov_len);
++
++		bytes -= copy;
++		base += copy;
++		if (iov->iov_len == base) {
++			iov++;
++			nr_segs--;
++			base = 0;
++		}
++	}
++	memcpy(new, iov, sizeof(*iov) * nr_segs);
++	new->iov_base += base;
++	new->iov_len -= base;
++	return nr_segs;
++}
++
+ static int
+-read_from_socket(struct TCP_Server_Info *server, char *buf,
+-		 unsigned int to_read)
++readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
++		  unsigned int nr_segs, unsigned int to_read)
+ {
+ 	int length = 0;
+ 	int total_read;
++	unsigned int segs;
+ 	struct msghdr smb_msg;
+-	struct kvec iov;
++	struct kvec *iov;
++
++	/*
++	 * FIXME: allocation here may cause deadlocks under memory pressure.
++	 * Switch this to use a fixed, per-socket buffer.
++	 */
++	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_KERNEL);
++	if (!iov)
++		return -ENOMEM;
+ 
+ 	smb_msg.msg_control = NULL;
+ 	smb_msg.msg_controllen = 0;
+@@ -393,10 +437,11 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
+ 			break;
+ 		}
+ 
+-		iov.iov_base = buf + total_read;
+-		iov.iov_len = to_read;
+-		length = kernel_recvmsg(server->ssocket, &smb_msg, &iov, 1,
+-					to_read, 0);
++		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
++
++		length = kernel_recvmsg(server->ssocket, &smb_msg,
++					iov, segs, to_read, 0);
++
+ 		if (server->tcpStatus == CifsExiting) {
+ 			total_read = -ESHUTDOWN;
+ 			break;
+@@ -423,9 +468,22 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
+ 			break;
+ 		}
+ 	}
++	kfree(iov);
+ 	return total_read;
+ }
+ 
++static int
++read_from_socket(struct TCP_Server_Info *server, char *buf,
++		 unsigned int to_read)
++{
++	struct kvec iov;
++
++	iov.iov_base = buf;
++	iov.iov_len = to_read;
++
++	return readv_from_socket(server, &iov, 1, to_read);
++}
++
+ static bool
+ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
+ {
 -- 
 1.7.6
