@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 01/16] cifs: clean up checkSMB
-Date: Mon, 29 Aug 2011 07:16:49 -0400
-Message-ID: <1314616624-5362-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/16] cifs: move mid finding into separate routine
+Date: Mon, 29 Aug 2011 07:16:59 -0400
+Message-ID: <1314616624-5362-12-git-send-email-jlayton@redhat.com>
 References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,120 +10,148 @@ In-Reply-To: <1314616624-5362-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The variable names in this function are so ambiguous that it's very
-difficult to know what it's doing. Rename them to make it a bit more
-clear.
-
-Also, remove a redundant length check. cifsd checks to make sure that
-the rfclen isn't larger than the maximum frame size when it does the
-receive.
-
-Finally, change checkSMB to return a real error code (-EIO) when
-it finds an error. That will help simplify some coming changes in the
-callers.
+Begin breaking up find_cifs_mid into smaller pieces. The parts that
+coalesce T2 responses don't really need to be done under the
+GlobalMid_lock anyway. Create a new function that just finds the
+mid on the list, and then later takes it off the list if the entire
+response has been received.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/misc.c |   51 +++++++++++++++++++++++++--------------------------
- 1 files changed, 25 insertions(+), 26 deletions(-)
+ fs/cifs/connect.c |  113 +++++++++++++++++++++++++++++++----------------------
+ 1 files changed, 66 insertions(+), 47 deletions(-)
 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 7c16933..4a1801b 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -420,19 +420,22 @@ check_smb_hdr(struct smb_hdr *smb, __u16 mid)
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index bc16873..6b4fcb3 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -542,61 +542,80 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
  }
  
- int
--checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
-+checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int total_read)
+ static struct mid_q_entry *
+-find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-	      int *length, bool is_large_buf, bool *is_multi_rsp, char **bigbuf)
++find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
  {
--	__u32 len = be32_to_cpu(smb->smb_buf_length);
-+	__u32 rfclen = be32_to_cpu(smb->smb_buf_length);
- 	__u32 clc_len;  /* calculated length */
--	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
-+	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x",
-+		total_read, rfclen);
+-	struct mid_q_entry *mid = NULL, *tmp_mid, *ret = NULL;
++	struct mid_q_entry *mid;
  
--	if (length < 2 + sizeof(struct smb_hdr)) {
--		if ((length >= sizeof(struct smb_hdr) - 1)
-+	/* is this frame too small to even get to a BCC? */
-+	if (total_read < 2 + sizeof(struct smb_hdr)) {
-+		if ((total_read >= sizeof(struct smb_hdr) - 1)
- 			    && (smb->Status.CifsError != 0)) {
-+			/* it's an error return */
- 			smb->WordCount = 0;
- 			/* some error cases do not return wct and bcc */
- 			return 0;
--		} else if ((length == sizeof(struct smb_hdr) + 1) &&
-+		} else if ((total_read == sizeof(struct smb_hdr) + 1) &&
- 				(smb->WordCount == 0)) {
- 			char *tmp = (char *)smb;
- 			/* Need to work around a bug in two servers here */
-@@ -452,39 +455,35 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
- 		} else {
- 			cERROR(1, "Length less than smb header size");
+ 	spin_lock(&GlobalMid_Lock);
+-	list_for_each_entry_safe(mid, tmp_mid, &server->pending_mid_q, qhead) {
+-		if (mid->mid != buf->Mid ||
+-		    mid->midState != MID_REQUEST_SUBMITTED ||
+-		    mid->command != buf->Command)
+-			continue;
+-
+-		if (*length == 0 && check2ndT2(buf) > 0) {
+-			/* We have a multipart transact2 resp */
+-			*is_multi_rsp = true;
+-			if (mid->resp_buf) {
+-				/* merge response - fix up 1st*/
+-				*length = coalesce_t2(buf, mid->resp_buf);
+-				if (*length > 0) {
+-					*length = 0;
+-					mid->multiRsp = true;
+-					break;
+-				}
+-				/* All parts received or packet is malformed. */
+-				mid->multiEnd = true;
+-				goto multi_t2_fnd;
+-			}
+-			if (!is_large_buf) {
+-				/*FIXME: switch to already allocated largebuf?*/
+-				cERROR(1, "1st trans2 resp needs bigbuf");
+-			} else {
+-				/* Have first buffer */
+-				mid->resp_buf = buf;
+-				mid->largeBuf = true;
+-				*bigbuf = NULL;
+-			}
+-			break;
++	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
++		if (mid->mid == buf->Mid &&
++		    mid->midState == MID_REQUEST_SUBMITTED &&
++		    mid->command == buf->Command) {
++			spin_unlock(&GlobalMid_Lock);
++			return mid;
  		}
--		return 1;
+-		mid->resp_buf = buf;
+-		mid->largeBuf = is_large_buf;
+-multi_t2_fnd:
+-		if (*length == 0)
+-			mid->midState = MID_RESPONSE_RECEIVED;
+-		else
+-			mid->midState = MID_RESPONSE_MALFORMED;
++	}
++	spin_unlock(&GlobalMid_Lock);
++	return NULL;
++}
++
++static void
++dequeue_mid(struct mid_q_entry *mid, int malformed)
++{
+ #ifdef CONFIG_CIFS_STATS2
+-		mid->when_received = jiffies;
++	mid->when_received = jiffies;
+ #endif
+-		list_del_init(&mid->qhead);
+-		ret = mid;
+-		break;
 -	}
--	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
--		cERROR(1, "smb length greater than MaxBufSize, mid=%d",
--				   smb->Mid);
--		return 1;
-+		return -EIO;
- 	}
++	spin_lock(&GlobalMid_Lock);
++	if (!malformed)
++		mid->midState = MID_RESPONSE_RECEIVED;
++	else
++		mid->midState = MID_RESPONSE_MALFORMED;
++	list_del_init(&mid->qhead);
+ 	spin_unlock(&GlobalMid_Lock);
++}
  
-+	/* otherwise, there is enough to get to the BCC */
- 	if (check_smb_hdr(smb, mid))
--		return 1;
-+		return -EIO;
- 	clc_len = smbCalcSize(smb);
+-	return ret;
++static struct mid_q_entry *
++find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
++	      int *malformed, bool is_large_buf, bool *is_multi_rsp,
++	      char **bigbuf)
++{
++	struct mid_q_entry *mid = NULL;
++
++	mid = find_mid(server, buf);
++	if (!mid)
++		return mid;
++
++	if (*malformed == 0 && check2ndT2(buf) > 0) {
++		/* We have a multipart transact2 resp */
++		*is_multi_rsp = true;
++		if (mid->resp_buf) {
++			/* merge response - fix up 1st*/
++			*malformed = coalesce_t2(buf, mid->resp_buf);
++			if (*malformed > 0) {
++				*malformed = 0;
++				mid->multiRsp = true;
++				return NULL;
++			}
++			/* All parts received or packet is malformed. */
++			mid->multiEnd = true;
++			goto multi_t2_fnd;
++		}
++		if (!is_large_buf) {
++			/*FIXME: switch to already allocated largebuf?*/
++			cERROR(1, "1st trans2 resp needs bigbuf");
++		} else {
++			/* Have first buffer */
++			mid->resp_buf = buf;
++			mid->largeBuf = true;
++			*bigbuf = NULL;
++		}
++		return mid;
++	}
++	mid->resp_buf = buf;
++	mid->largeBuf = is_large_buf;
++multi_t2_fnd:
++	dequeue_mid(mid, *malformed);
++	return mid;
+ }
  
--	if (4 + len != length) {
-+	if (4 + rfclen != total_read) {
- 		cERROR(1, "Length read does not match RFC1001 length %d",
--			   len);
--		return 1;
-+				rfclen);
-+		return -EIO;
- 	}
- 
--	if (4 + len != clc_len) {
-+	if (4 + rfclen != clc_len) {
- 		/* check if bcc wrapped around for large read responses */
--		if ((len > 64 * 1024) && (len > clc_len)) {
-+		if ((rfclen > 64 * 1024) && (rfclen > clc_len)) {
- 			/* check if lengths match mod 64K */
--			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
-+			if (((4 + rfclen) & 0xFFFF) == (clc_len & 0xFFFF))
- 				return 0; /* bcc wrapped */
- 		}
- 		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
--				clc_len, 4 + len, smb->Mid);
-+				clc_len, 4 + rfclen, smb->Mid);
- 
--		if (4 + len < clc_len) {
-+		if (4 + rfclen < clc_len) {
- 			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
--					len, smb->Mid);
--			return 1;
--		} else if (len > clc_len + 512) {
-+					rfclen, smb->Mid);
-+			return -EIO;
-+		} else if (rfclen > clc_len + 512) {
- 			/*
- 			 * Some servers (Windows XP in particular) send more
- 			 * data than the lengths in the SMB packet would
-@@ -495,8 +494,8 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
- 			 * data to 512 bytes.
- 			 */
- 			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
--				  "than SMB for mid=%u", len, smb->Mid);
--			return 1;
-+				  "than SMB for mid=%u", rfclen, smb->Mid);
-+			return -EIO;
- 		}
- 	}
- 	return 0;
+ static void clean_demultiplex_info(struct TCP_Server_Info *server)
 -- 
 1.7.6
