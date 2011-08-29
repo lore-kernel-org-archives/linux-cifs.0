@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 09/16] cifs: clean up check_rfc1002_header
-Date: Mon, 29 Aug 2011 07:16:57 -0400
-Message-ID: <1314616624-5362-10-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 01/16] cifs: clean up checkSMB
+Date: Mon, 29 Aug 2011 07:16:49 -0400
+Message-ID: <1314616624-5362-2-git-send-email-jlayton@redhat.com>
 References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,121 +10,120 @@ In-Reply-To: <1314616624-5362-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Rename it for better clarity as to what it does and have the caller pass
-in just the single type byte. Turn the if statement into a switch and
-optimize it by placing the most common message type at the top. Move the
-header length check back into cifs_demultiplex_thread in preparation
-for adding a new receive phase and normalize the cFYI messages.
+The variable names in this function are so ambiguous that it's very
+difficult to know what it's doing. Rename them to make it a bit more
+clear.
+
+Also, remove a redundant length check. cifsd checks to make sure that
+the rfclen isn't larger than the maximum frame size when it does the
+receive.
+
+Finally, change checkSMB to return a real error code (-EIO) when
+it finds an error. That will help simplify some coming changes in the
+callers.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   63 +++++++++++++++++++++++++---------------------------
- 1 files changed, 30 insertions(+), 33 deletions(-)
+ fs/cifs/misc.c |   51 +++++++++++++++++++++++++--------------------------
+ 1 files changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index e16c04b..1093d46 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -498,29 +498,29 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 7c16933..4a1801b 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -420,19 +420,22 @@ check_smb_hdr(struct smb_hdr *smb, __u16 mid)
  }
  
- static bool
--check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
-+is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ int
+-checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
++checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int total_read)
  {
--	char temp = *buf;
--	unsigned int pdu_length = be32_to_cpu(
--				((struct smb_hdr *)buf)->smb_buf_length);
--
- 	/*
- 	 * The first byte big endian of the length field,
- 	 * is actually not part of the length but the type
- 	 * with the most common, zero, as regular data.
- 	 */
--	if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
--		return false;
--	} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
--		cFYI(1, "Good RFC 1002 session rsp");
--		return false;
--	} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
-+	switch (type) {
-+	case RFC1002_SESSION_MESSAGE:
-+		/* Regular SMB response */
-+		return true;
-+	case RFC1002_SESSION_KEEP_ALIVE:
-+		cFYI(1, "RFC 1002 session keep alive");
-+		break;
-+	case RFC1002_POSITIVE_SESSION_RESPONSE:
-+		cFYI(1, "RFC 1002 positive session response");
-+		break;
-+	case RFC1002_NEGATIVE_SESSION_RESPONSE:
- 		/*
- 		 * We get this from Windows 98 instead of an error on
- 		 * SMB negprot response.
- 		 */
--		cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
--			pdu_length);
-+		cFYI(1, "RFC 1002 negative session response");
- 		/* give server a second to clean up */
- 		msleep(1000);
- 		/*
-@@ -529,29 +529,16 @@ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
- 		 * is since we do not begin with RFC1001 session
- 		 * initialize frame).
- 		 */
--		cifs_set_port((struct sockaddr *)
--				&server->dstaddr, CIFS_PORT);
-+		cifs_set_port((struct sockaddr *)&server->dstaddr, CIFS_PORT);
- 		cifs_reconnect(server);
- 		wake_up(&server->response_q);
--		return false;
--	} else if (temp != (char) 0) {
--		cERROR(1, "Unknown RFC 1002 frame");
--		cifs_dump_mem(" Received Data: ", buf, 4);
--		cifs_reconnect(server);
--		return false;
+-	__u32 len = be32_to_cpu(smb->smb_buf_length);
++	__u32 rfclen = be32_to_cpu(smb->smb_buf_length);
+ 	__u32 clc_len;  /* calculated length */
+-	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
++	cFYI(0, "checkSMB Length: 0x%x, smb_buf_length: 0x%x",
++		total_read, rfclen);
+ 
+-	if (length < 2 + sizeof(struct smb_hdr)) {
+-		if ((length >= sizeof(struct smb_hdr) - 1)
++	/* is this frame too small to even get to a BCC? */
++	if (total_read < 2 + sizeof(struct smb_hdr)) {
++		if ((total_read >= sizeof(struct smb_hdr) - 1)
+ 			    && (smb->Status.CifsError != 0)) {
++			/* it's an error return */
+ 			smb->WordCount = 0;
+ 			/* some error cases do not return wct and bcc */
+ 			return 0;
+-		} else if ((length == sizeof(struct smb_hdr) + 1) &&
++		} else if ((total_read == sizeof(struct smb_hdr) + 1) &&
+ 				(smb->WordCount == 0)) {
+ 			char *tmp = (char *)smb;
+ 			/* Need to work around a bug in two servers here */
+@@ -452,39 +455,35 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 		} else {
+ 			cERROR(1, "Length less than smb header size");
+ 		}
+-		return 1;
 -	}
--
--	/* else we have an SMB response */
--	if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
--	    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
--		cERROR(1, "Invalid size SMB length %d pdu_length %d",
--		       4, pdu_length+4);
-+		break;
-+	default:
-+		cERROR(1, "RFC 1002 unknown response type 0x%x", type);
- 		cifs_reconnect(server);
--		wake_up(&server->response_q);
--		return false;
+-	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+-		cERROR(1, "smb length greater than MaxBufSize, mid=%d",
+-				   smb->Mid);
+-		return 1;
++		return -EIO;
  	}
  
--	return true;
-+	return false;
- }
++	/* otherwise, there is enough to get to the BCC */
+ 	if (check_smb_hdr(smb, mid))
+-		return 1;
++		return -EIO;
+ 	clc_len = smbCalcSize(smb);
  
- static struct mid_q_entry *
-@@ -755,10 +742,20 @@ cifs_demultiplex_thread(void *p)
- 		 */
- 		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
+-	if (4 + len != length) {
++	if (4 + rfclen != total_read) {
+ 		cERROR(1, "Length read does not match RFC1001 length %d",
+-			   len);
+-		return 1;
++				rfclen);
++		return -EIO;
+ 	}
  
--		cFYI(1, "rfc1002 length 0x%x", pdu_length+4);
--		if (!check_rfc1002_header(server, buf))
-+		cFYI(1, "RFC1002 header 0x%x", pdu_length);
-+		if (!is_smb_response(server, buf[0]))
- 			continue;
+-	if (4 + len != clc_len) {
++	if (4 + rfclen != clc_len) {
+ 		/* check if bcc wrapped around for large read responses */
+-		if ((len > 64 * 1024) && (len > clc_len)) {
++		if ((rfclen > 64 * 1024) && (rfclen > clc_len)) {
+ 			/* check if lengths match mod 64K */
+-			if (((4 + len) & 0xFFFF) == (clc_len & 0xFFFF))
++			if (((4 + rfclen) & 0xFFFF) == (clc_len & 0xFFFF))
+ 				return 0; /* bcc wrapped */
+ 		}
+ 		cFYI(1, "Calculated size %u vs length %u mismatch for mid=%u",
+-				clc_len, 4 + len, smb->Mid);
++				clc_len, 4 + rfclen, smb->Mid);
  
-+		/* check the length */
-+		if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
-+		    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
-+			cERROR(1, "Invalid size SMB length %d pdu_length %d",
-+			       4, pdu_length + 4);
-+			cifs_reconnect(server);
-+			wake_up(&server->response_q);
-+			continue;
-+		}
-+
- 		/* else length ok */
- 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
- 			isLargeBuf = true;
+-		if (4 + len < clc_len) {
++		if (4 + rfclen < clc_len) {
+ 			cERROR(1, "RFC1001 size %u smaller than SMB for mid=%u",
+-					len, smb->Mid);
+-			return 1;
+-		} else if (len > clc_len + 512) {
++					rfclen, smb->Mid);
++			return -EIO;
++		} else if (rfclen > clc_len + 512) {
+ 			/*
+ 			 * Some servers (Windows XP in particular) send more
+ 			 * data than the lengths in the SMB packet would
+@@ -495,8 +494,8 @@ checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length)
+ 			 * data to 512 bytes.
+ 			 */
+ 			cERROR(1, "RFC1001 size %u more than 512 bytes larger "
+-				  "than SMB for mid=%u", len, smb->Mid);
+-			return 1;
++				  "than SMB for mid=%u", rfclen, smb->Mid);
++			return -EIO;
+ 		}
+ 	}
+ 	return 0;
 -- 
 1.7.6
