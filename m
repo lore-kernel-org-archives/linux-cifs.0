@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/16] cifs: keep a reusable kvec array for receives
-Date: Mon, 29 Aug 2011 07:16:56 -0400
-Message-ID: <1314616624-5362-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 09/16] cifs: clean up check_rfc1002_header
+Date: Mon, 29 Aug 2011 07:16:57 -0400
+Message-ID: <1314616624-5362-10-git-send-email-jlayton@redhat.com>
 References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,86 +10,121 @@ In-Reply-To: <1314616624-5362-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Having to continually allocate a new kvec array is expensive. Allocate
-one that's big enough, and only reallocate it as needed. Also, we need
-to use GFP_NOFS here to ensure that this doesn't deadlock.
+Rename it for better clarity as to what it does and have the caller pass
+in just the single type byte. Turn the if statement into a switch and
+optimize it by placing the most common message type at the top. Move the
+header length check back into cifs_demultiplex_thread in preparation
+for adding a new receive phase and normalize the cFYI messages.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    2 ++
- fs/cifs/connect.c  |   26 ++++++++++++++++++++------
- 2 files changed, 22 insertions(+), 6 deletions(-)
+ fs/cifs/connect.c |   63 +++++++++++++++++++++++++---------------------------
+ 1 files changed, 30 insertions(+), 33 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a37452d..c3caa78 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -287,6 +287,8 @@ struct TCP_Server_Info {
- 	bool	sec_kerberos;		/* supports plain Kerberos */
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	struct delayed_work	echo; /* echo ping workqueue job */
-+	struct kvec *iov;	/* reusable kvec array for receives */
-+	unsigned int nr_iov;	/* number of kvecs in array */
- #ifdef CONFIG_CIFS_FSCACHE
- 	struct fscache_cookie   *fscache; /* client index cache cookie */
- #endif
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 08c6b0e..e16c04b 100644
+index e16c04b..1093d46 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -410,6 +410,24 @@ kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
- 	return nr_segs;
+@@ -498,29 +498,29 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
  }
  
-+static struct kvec *
-+get_server_iovec(struct TCP_Server_Info *server, unsigned int nr_segs)
-+{
-+	struct kvec *new_iov;
-+
-+	if (server->iov && nr_segs <= server->nr_iov)
-+		return server->iov;
-+
-+	/* not big enough -- allocate a new one and release the old */
-+	new_iov = kmalloc(sizeof(*new_iov) * nr_segs, GFP_NOFS);
-+	if (new_iov) {
-+		kfree(server->iov);
-+		server->iov = new_iov;
-+		server->nr_iov = nr_segs;
-+	}
-+	return new_iov;
-+}
-+
- static int
- readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 		  unsigned int nr_segs, unsigned int to_read)
-@@ -420,11 +438,7 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 	struct msghdr smb_msg;
- 	struct kvec *iov;
- 
--	/*
--	 * FIXME: allocation here may cause deadlocks under memory pressure.
--	 * Switch this to use a fixed, per-socket buffer.
--	 */
--	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_KERNEL);
-+	iov = get_server_iovec(server, nr_segs);
- 	if (!iov)
- 		return -ENOMEM;
- 
-@@ -468,7 +482,6 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
- 			break;
- 		}
+ static bool
+-check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
++is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ {
+-	char temp = *buf;
+-	unsigned int pdu_length = be32_to_cpu(
+-				((struct smb_hdr *)buf)->smb_buf_length);
+-
+ 	/*
+ 	 * The first byte big endian of the length field,
+ 	 * is actually not part of the length but the type
+ 	 * with the most common, zero, as regular data.
+ 	 */
+-	if (temp == (char) RFC1002_SESSION_KEEP_ALIVE) {
+-		return false;
+-	} else if (temp == (char)RFC1002_POSITIVE_SESSION_RESPONSE) {
+-		cFYI(1, "Good RFC 1002 session rsp");
+-		return false;
+-	} else if (temp == (char)RFC1002_NEGATIVE_SESSION_RESPONSE) {
++	switch (type) {
++	case RFC1002_SESSION_MESSAGE:
++		/* Regular SMB response */
++		return true;
++	case RFC1002_SESSION_KEEP_ALIVE:
++		cFYI(1, "RFC 1002 session keep alive");
++		break;
++	case RFC1002_POSITIVE_SESSION_RESPONSE:
++		cFYI(1, "RFC 1002 positive session response");
++		break;
++	case RFC1002_NEGATIVE_SESSION_RESPONSE:
+ 		/*
+ 		 * We get this from Windows 98 instead of an error on
+ 		 * SMB negprot response.
+ 		 */
+-		cFYI(1, "Negative RFC1002 Session Response Error 0x%x)",
+-			pdu_length);
++		cFYI(1, "RFC 1002 negative session response");
+ 		/* give server a second to clean up */
+ 		msleep(1000);
+ 		/*
+@@ -529,29 +529,16 @@ check_rfc1002_header(struct TCP_Server_Info *server, char *buf)
+ 		 * is since we do not begin with RFC1001 session
+ 		 * initialize frame).
+ 		 */
+-		cifs_set_port((struct sockaddr *)
+-				&server->dstaddr, CIFS_PORT);
++		cifs_set_port((struct sockaddr *)&server->dstaddr, CIFS_PORT);
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+-		return false;
+-	} else if (temp != (char) 0) {
+-		cERROR(1, "Unknown RFC 1002 frame");
+-		cifs_dump_mem(" Received Data: ", buf, 4);
+-		cifs_reconnect(server);
+-		return false;
+-	}
+-
+-	/* else we have an SMB response */
+-	if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
+-	    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
+-		cERROR(1, "Invalid size SMB length %d pdu_length %d",
+-		       4, pdu_length+4);
++		break;
++	default:
++		cERROR(1, "RFC 1002 unknown response type 0x%x", type);
+ 		cifs_reconnect(server);
+-		wake_up(&server->response_q);
+-		return false;
  	}
--	kfree(iov);
- 	return total_read;
+ 
+-	return true;
++	return false;
  }
  
-@@ -686,6 +699,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 	}
+ static struct mid_q_entry *
+@@ -755,10 +742,20 @@ cifs_demultiplex_thread(void *p)
+ 		 */
+ 		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
  
- 	kfree(server->hostname);
-+	kfree(server->iov);
- 	kfree(server);
+-		cFYI(1, "rfc1002 length 0x%x", pdu_length+4);
+-		if (!check_rfc1002_header(server, buf))
++		cFYI(1, "RFC1002 header 0x%x", pdu_length);
++		if (!is_smb_response(server, buf[0]))
+ 			continue;
  
- 	length = atomic_dec_return(&tcpSesAllocCount);
++		/* check the length */
++		if ((pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) ||
++		    (pdu_length < sizeof(struct smb_hdr) - 1 - 4)) {
++			cERROR(1, "Invalid size SMB length %d pdu_length %d",
++			       4, pdu_length + 4);
++			cifs_reconnect(server);
++			wake_up(&server->response_q);
++			continue;
++		}
++
+ 		/* else length ok */
+ 		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
+ 			isLargeBuf = true;
 -- 
 1.7.6
