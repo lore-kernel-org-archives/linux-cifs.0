@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 12/16] cifs: eliminate is_multi_rsp parm to find_cifs_mid
-Date: Mon, 29 Aug 2011 07:17:00 -0400
-Message-ID: <1314616624-5362-13-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 06/16] cifs: simplify read_from_socket
+Date: Mon, 29 Aug 2011 07:16:54 -0400
+Message-ID: <1314616624-5362-7-git-send-email-jlayton@redhat.com>
 References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,114 +10,163 @@ In-Reply-To: <1314616624-5362-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Change find_cifs_mid to only return NULL if a mid could not be found.
-If we got part of a multi-part T2 response, then coalesce it and still
-return the mid. The caller can determine the T2 receive status from
-the flags in the mid.
+Move the iovec handling entirely into read_from_socket. That simplifies
+the code and gets rid of the special handling for header reads. With
+this we can also get rid of the "goto incomplete_rcv" label in the main
+demultiplex thread function since we can now treat header and non-header
+receives the same way.
 
-With this change, there is no need to pass a pointer to "length" as
-well so just pass by value. If a mid is found, then we can just mark
-it as malformed. If one isn't found, then the value of "length" won't
-change anyway.
+Also, make it return an int (since we'll never receive enough to worry
+about the sign bit anyway), and simply make it return the amount of bytes
+read or a negative error code.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   35 ++++++++++++++++-------------------
- 1 files changed, 16 insertions(+), 19 deletions(-)
+ fs/cifs/connect.c |   77 ++++++++++++++++------------------------------------
+ 1 files changed, 24 insertions(+), 53 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 6b4fcb3..9518457 100644
+index 720a619..e6da201 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -576,8 +576,7 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
- 
- static struct mid_q_entry *
- find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
--	      int *malformed, bool is_large_buf, bool *is_multi_rsp,
--	      char **bigbuf)
-+	      int malformed, bool is_large_buf, char **bigbuf)
- {
- 	struct mid_q_entry *mid = NULL;
- 
-@@ -585,16 +584,14 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 	if (!mid)
- 		return mid;
- 
--	if (*malformed == 0 && check2ndT2(buf) > 0) {
--		/* We have a multipart transact2 resp */
--		*is_multi_rsp = true;
-+	if (malformed == 0 && check2ndT2(buf) > 0) {
-+		mid->multiRsp = true;
- 		if (mid->resp_buf) {
- 			/* merge response - fix up 1st*/
--			*malformed = coalesce_t2(buf, mid->resp_buf);
--			if (*malformed > 0) {
--				*malformed = 0;
--				mid->multiRsp = true;
--				return NULL;
-+			malformed = coalesce_t2(buf, mid->resp_buf);
-+			if (malformed > 0) {
-+				malformed = 0;
-+				return mid;
- 			}
- 			/* All parts received or packet is malformed. */
- 			mid->multiEnd = true;
-@@ -614,7 +611,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 	mid->resp_buf = buf;
- 	mid->largeBuf = is_large_buf;
- multi_t2_fnd:
--	dequeue_mid(mid, *malformed);
-+	dequeue_mid(mid, malformed);
- 	return mid;
+@@ -376,35 +376,33 @@ server_unresponsive(struct TCP_Server_Info *server)
  }
  
-@@ -725,7 +722,6 @@ cifs_demultiplex_thread(void *p)
+ static int
+-read_from_socket(struct TCP_Server_Info *server,
+-		 struct kvec *iov, unsigned int to_read,
+-		 unsigned int *ptotal_read, bool is_header_read)
++read_from_socket(struct TCP_Server_Info *server, char *buf,
++		 unsigned int to_read)
+ {
+-	int length, rc = 0;
+-	unsigned int total_read;
++	int length = 0;
++	int total_read;
+ 	struct msghdr smb_msg;
+-	char *buf = iov->iov_base;
++	struct kvec iov;
+ 
+ 	smb_msg.msg_control = NULL;
+ 	smb_msg.msg_controllen = 0;
+ 
+-	for (total_read = 0; total_read < to_read; total_read += length) {
++	for (total_read = 0; to_read; total_read += length, to_read -= length) {
+ 		if (server_unresponsive(server)) {
+-			rc = 1;
++			total_read = -EAGAIN;
+ 			break;
+ 		}
+ 
+-		length = kernel_recvmsg(server->ssocket, &smb_msg, iov, 1,
+-					to_read - total_read, 0);
++		iov.iov_base = buf + total_read;
++		iov.iov_len = to_read;
++		length = kernel_recvmsg(server->ssocket, &smb_msg, &iov, 1,
++					to_read, 0);
+ 		if (server->tcpStatus == CifsExiting) {
+-			/* then will exit */
+-			rc = 2;
++			total_read = -ESHUTDOWN;
+ 			break;
+ 		} else if (server->tcpStatus == CifsNeedReconnect) {
+ 			cifs_reconnect(server);
+-			/* Reconnect wakes up rspns q */
+-			/* Now we will reread sock */
+-			rc = 1;
++			total_read = -EAGAIN;
+ 			break;
+ 		} else if (length == -ERESTARTSYS ||
+ 			   length == -EAGAIN ||
+@@ -416,28 +414,16 @@ read_from_socket(struct TCP_Server_Info *server,
+ 			 */
+ 			usleep_range(1000, 2000);
+ 			length = 0;
+-			if (!is_header_read)
+-				continue;
+-			/* Special handling for header read */
+-			if (total_read) {
+-				iov->iov_base = (to_read - total_read) +
+-						buf;
+-				iov->iov_len = to_read - total_read;
+-				rc = 3;
+-			} else
+-				rc = 1;
+-			break;
++			continue;
+ 		} else if (length <= 0) {
+-			cERROR(1, "Received no data, expecting %d",
+-			       to_read - total_read);
++			cFYI(1, "Received no data or error: expecting %d "
++				"got %d", to_read, length);
+ 			cifs_reconnect(server);
+-			rc = 1;
++			total_read = -EAGAIN;
+ 			break;
+ 		}
+ 	}
+-
+-	*ptotal_read = total_read;
+-	return rc;
++	return total_read;
+ }
+ 
+ static bool
+@@ -658,12 +644,10 @@ cifs_demultiplex_thread(void *p)
+ 	unsigned int pdu_length, total_read;
+ 	char *buf = NULL, *bigbuf = NULL, *smallbuf = NULL;
+ 	struct smb_hdr *smb_buffer = NULL;
+-	struct kvec iov;
  	struct task_struct *task_to_wake = NULL;
  	struct mid_q_entry *mid_entry;
  	bool isLargeBuf = false;
--	bool isMultiRsp = false;
+ 	bool isMultiRsp = false;
+-	int rc;
  
  	current->flags |= PF_MEMALLOC;
  	cFYI(1, "Demultiplex PID: %d", task_pid_nr(current));
-@@ -745,7 +741,6 @@ cifs_demultiplex_thread(void *p)
- 			continue;
- 
- 		isLargeBuf = false;
--		isMultiRsp = false;
+@@ -686,19 +670,12 @@ cifs_demultiplex_thread(void *p)
+ 		isMultiRsp = false;
  		smb_buffer = (struct smb_hdr *)smallbuf;
  		buf = smallbuf;
+-		iov.iov_base = buf;
+-		iov.iov_len = 4;
  		pdu_length = 4; /* enough to get RFC1001 header */
-@@ -823,23 +818,25 @@ cifs_demultiplex_thread(void *p)
  
- 		server->lstrp = jiffies;
- 
--		mid_entry = find_cifs_mid(server, smb_buffer, &length,
--					  isLargeBuf, &isMultiRsp, &bigbuf);
-+		mid_entry = find_cifs_mid(server, smb_buffer, length,
-+					  isLargeBuf, &bigbuf);
- 		if (mid_entry != NULL) {
--			mid_entry->callback(mid_entry);
-+			if (mid_entry->multiRsp && !mid_entry->multiEnd)
-+				continue;
-+
- 			/* Was previous buf put in mpx struct for multi-rsp? */
--			if (!isMultiRsp) {
-+			if (!mid_entry->multiRsp) {
- 				/* smb buffer will be freed by user thread */
- 				if (isLargeBuf)
- 					bigbuf = NULL;
- 				else
- 					smallbuf = NULL;
- 			}
-+			mid_entry->callback(mid_entry);
- 		} else if (length != 0) {
- 			/* response sanity checks failed */
+-incomplete_rcv:
+-		rc = read_from_socket(server, &iov, pdu_length,
+-				      &total_read, true /* header read */);
+-		if (rc == 3)
+-			goto incomplete_rcv;
+-		else if (rc == 2)
+-			break;
+-		else if (rc == 1)
++		length = read_from_socket(server, buf, pdu_length);
++		if (length < 0)
  			continue;
--		} else if (!is_valid_oplock_break(smb_buffer, server) &&
--			   !isMultiRsp) {
-+		} else if (!is_valid_oplock_break(smb_buffer, server)) {
- 			cERROR(1, "No task to wake, unknown frame received! "
- 				   "NumMids %d", atomic_read(&midCount));
- 			cifs_dump_mem("Received Data is: ", buf,
++		total_read = length;
+ 
+ 		/*
+ 		 * The right amount was read from socket - 4 bytes,
+@@ -718,16 +695,10 @@ incomplete_rcv:
+ 			buf = bigbuf;
+ 		}
+ 
+-		iov.iov_base = 4 + buf;
+-		iov.iov_len = pdu_length;
+-		rc = read_from_socket(server, &iov, pdu_length,
+-				      &total_read, false);
+-		if (rc == 2)
+-			break;
+-		else if (rc == 1)
++		length = read_from_socket(server, buf + 4, pdu_length);
++		if (length < 0)
+ 			continue;
+-
+-		total_read += 4; /* account for rfc1002 hdr */
++		total_read += length;
+ 
+ 		dump_smb(smb_buffer, total_read);
+ 
 -- 
 1.7.6
