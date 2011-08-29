@@ -1,55 +1,63 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH][Trivial] CIFS: Don't free volume_info->UNC until we are
- entirely done with it.
-Date: Mon, 29 Aug 2011 11:40:41 -0400
-Message-ID: <20110829114041.6c1a0a4e@tlielax.poochiereds.net>
-References: <alpine.LNX.2.00.1108271851470.27813@swampdragon.chaosbits.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 0/5] cifs-utils: cifsacl utilities: Implement getcifsacl
+ and setcifsacl (try #2)
+Date: Mon, 29 Aug 2011 12:50:13 -0400
+Message-ID: <20110829125013.35a644bf@tlielax.poochiereds.net>
+References: <1314126215-11943-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	trivial-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-To: Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <alpine.LNX.2.00.1108271851470.27813-h2p7t3/P30RzeRGmFJ5qR7ZzlVVXadcDXqFh9Ls21Oc@public.gmane.org>
+In-Reply-To: <1314126215-11943-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 27 Aug 2011 18:58:34 +0200 (CEST)
-Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org> wrote:
+On Tue, 23 Aug 2011 14:03:35 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> In cleanup_volume_info_contents() we kfree(volume_info->UNC); and then 
-> proceed to use that variable on the very next line.
-> This causes (at least) Coverity Prevent to complain about use-after-free 
-> of that variable (and I guess other checkers may do that as well).
-> There's not any /real/ problem here since we are just using the value of 
-> the pointer, not actually dereferencing it, but it's still trivial to 
-> silence the tool, so why not?
-> To me at least it also just seems nicer to defer freeing the variable 
-> until we are entirely done with it in all respects.
 > 
-> Signed-off-by: Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> Implement utilities getcifsacl and setcifsacl
 > 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 633c246..9bb4b10 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2877,9 +2877,9 @@ cleanup_volume_info_contents(struct smb_vol *volume_info)
->  {
->  	kfree(volume_info->username);
->  	kzfree(volume_info->password);
-> -	kfree(volume_info->UNC);
->  	if (volume_info->UNCip != volume_info->UNC + 2)
->  		kfree(volume_info->UNCip);
-> +	kfree(volume_info->UNC);
->  	kfree(volume_info->domainname);
->  	kfree(volume_info->iocharset);
->  	kfree(volume_info->prepath);
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Set of patches to build utilities getcifsacl and setcifsacl
+> along with their manpages.
+> 
+> getcifsacl fetches a security descriptor of a file off of a
+> share mounted using option cifsacl using API getxattr.
+> It then parses the security descriptor printing control
+> porttion of the security descriptor and then DACL if there
+> is one by printing each ACE with it fields, SID, type, flags, and mask.
+> 
+> setcifsacl builds two lists of ACEs, one specified on the command line
+> and other fetched from the file the way getcifacl does.
+> It then constructs a security descriptor consisting of ACL
+> and uses API setxattr to send the security descriptor as a blob to
+> the server.  setcifsacl also works with files off of shares
+> mounted with option cifsacl.
+> 
+> manpages are provided for both the utilities with some examples
+> in setcifsacl manpage.  The usage of getcifsacl is simple and
+> very much self explanatory.
+>  
+> With these utilities, there is a way to interprete and construct a
+> blob describing security descritpor of a file system object.
+> 
+> These utilities are modeled after smbcacls command in the
+> Samba suite.  They depend on option of cifsacl while
+> mounting a share using cifs client and winbind facility of the
+> Samba suite, to work as intended.
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Seems reasonable for silencing the checker...
+Latest set of 8 patches committed.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
