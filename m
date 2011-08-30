@@ -1,123 +1,77 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Add mount option named backup
-Date: Tue, 30 Aug 2011 09:03:05 -0500
-Message-ID: <CADT32e+XQ7ar7y_MADUwwEi081Q_-QDeY79ga9ykOxVyp=yb8g@mail.gmail.com>
-References: <1313166821-9172-1-git-send-email-shirishpargonkar@gmail.com>
-	<CADT32eJsAgNkhnY1VZ6wpxa2013h7TmO6i3H=4a6D8ke8iU2Aw@mail.gmail.com>
-	<20110823091510.2d8b8027@corrin.poochiereds.net>
-	<CADT32eJPyKhkTx6vbsS4hRnaqAQAs0aTime_pz-NRvowotVyqg@mail.gmail.com>
-	<20110829202910.0038ca06@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/5] cifs: allow cifs to do readpages larger and asynchronously (try #3)
+Date: Tue, 30 Aug 2011 10:46:09 -0400
+Message-ID: <1314715574-23431-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110829202910.0038ca06-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Aug 29, 2011 at 7:29 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Mon, 29 Aug 2011 16:24:33 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Tue, Aug 23, 2011 at 8:15 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
-te:
->> > On Mon, 22 Aug 2011 08:33:49 -0500
->> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >
->> >> On Fri, Aug 12, 2011 at 11:33 AM, =A0<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org=
-> wrote:
->> >> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >> >
->> >> >
->> >> > Add mount option backup.
->> >> >
->> >> > It allows an authenticated user to access files with the intent=
- to back them
->> >> > up including their ACLs, who may not have access permission but=
- has
->> >> > "Backup files and directories user right" on them (by virtue of=
- being part
->> >> > of the built-in group Backup Operators.
->> >> >
->> >> > If an authenticated user is not part of the built-in group Back=
-up Operators
->> >> > at the server, access to such files is denied.
->> >> >
->> >> >
->> >> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >> > ---
->> >>
->> >>
->> >> Jeff, =A0Steve,
->> >>
->> >> Any comments on this patch (and manpage patch in cifs-utils)?
->> >>
->> >
->> > This seems like a really nasty kludge. It doesn't seem like the
->> > implications of this have been carefully considered.
->> >
->> > What happens I mount with the "backup" flag and do not have the
->> > necessary permissions on the server to use the flag in an open? Wi=
-ll
->> > this new flag be mutually exclusive with "multiuser"?
->> >
->> > One idea that might be better is to come up with way to mark certa=
-in
->> > (unix) users with the appropriate flag. If all the backup users we=
-re in
->> > a certan group, for instance, then you could use that info to deci=
-de
->> > whether to set the flag in the open calls.
->> >
->> > --
->> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> >
->>
->> Jeff, one comment, it is not the (unix) user that matters, it is the
->> user on the server (authenticated) user at the server because the
->> user right to access a file in backup mode can be granted only
->> to a user at the server.
->>
->
-> Right, I realize that.
->
->> I think care should be taken to make sure that backup and
->> multiuser are mutually exclusive mount options in mount.cifs.
->>
->
-> My objection here is more fundamental...
->
-> This patchset lends itself to a single, specific use. You can create =
-a
-> mount that you want to use for backups. Typically, when running backu=
-ps
-> like this you also intend for this mount to be used by only one (unix=
-)
-> user.
->
-> Adding a "backup" option is tantamount to adding extra privileges to
-> this mount for anyone who accesses it. However, it's not clear to me
-> how these extra privileges will be secured from other users that don'=
-t
-> necessarily need them.
->
-> It seems to me that it would be far more useful to find a way to only
-> add these extra "backup" permissions for certain unix users that are
-> accessing the mount.
->
-> Does that make sense?
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->
+Another day, another readpages patchset...
 
-Jeff, definitely. Thanks.  I think one way might be to specify an
-user or uid and restrict the usage of that mount to that user id?
-So you can specify mount option as  either backup=3Duserxyz
-or backup=3D1001 perhaps?
+This one refines the original one a bit more. The main changes are:
 
-Regards,
+1) this set goes back to adding the pages to the pagecache before
+submitting the reads on the wire. The reason for this is that we
+want to prevent the VM from reissuing reads for pages that already
+have reads in progress.
 
-Shirish
+2) a reference to the cifsFileInfo is held during the I/O. It's
+possible that the async reads could outlive a ->release operation
+if it were cancelled. To prevent oopses, we need the async read
+jobs to hold a cifsFileInfo reference. We can't put cifsFileInfo
+references from cifsd however, so we need to queue the completion
+of the reads to a workqueue.
+
+3) a patch has been added that limits the bdi.ra_pages according
+to the rsize. This ensures that the VM doesn't end up requesting
+"straggler" pages that would make cifs_readpages issue small reads
+to satisfy.
+
+This patchset uses the infrastructure added in the patchset to overhaul
+the receive path to allow cifs to vastly increase the rsize. It also is
+more efficient and does less copying as the data is read directly into
+the pagecache.
+
+Additionally, readpages is now done asynchronously with this set.
+cifs_readpages just puts the pages in the cache, fires off the reads and
+returns. Eventually, when the reads complete, a workqueue job is queued
+that will mark the pages uptodate and unlock them.
+
+With this set in place, I see a dramatic increase in performance for
+buffered read calls. On a simple dd test of a 1GB file to /dev/null:
+
+prepatch, with 16k rsize:
+1073741824 bytes (1.1 GB) copied, 47.2119 s, 22.7 MB/s
+
+postpatch, with 1M rsize:
+1073741824 bytes (1.1 GB) copied, 11.1602 s, 96.2 MB/s
+
+postpatch, with 60k rsize:
+1073741824 bytes (1.1 GB) copied, 12.5183 s, 85.8 MB/s
+
+Other tests show similar results. These results are from my craptacular
+KVM-based test rig. I expect that the performance boost will be even
+more dramatic on real hardware or on higher-latency connections.
+
+Steve, I'd like to see both of these sets go into 3.2 if at all
+possible. Both of these sets should be bisectable, so committing them in
+order is highly recommended.
+
+Jeff Layton (5):
+  cifs: fix protocol definition for READ_RSP
+  cifs: add cifs_async_readv
+  cifs: convert cifs_readpages to use async reads
+  cifs: allow for larger rsize= options and change defaults
+  cifs: tune bdi.ra_pages in accordance with the rsize
+
+ fs/cifs/cifspdu.h   |    4 +-
+ fs/cifs/cifsproto.h |   24 ++++
+ fs/cifs/cifssmb.c   |  357 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/connect.c   |  159 ++++++++++++++---------
+ fs/cifs/file.c      |  280 ++++++++++++++++------------------------
+ 5 files changed, 591 insertions(+), 233 deletions(-)
+
+-- 
+1.7.6
