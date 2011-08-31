@@ -1,184 +1,93 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Add mount option named backup
-Date: Tue, 30 Aug 2011 12:54:06 -0500
-Message-ID: <CAH2r5mt_Ve4bpch-3dBT8JXw+AP=SE6dX2m3oQoM9mUkJQBR4A@mail.gmail.com>
-References: <1313166821-9172-1-git-send-email-shirishpargonkar@gmail.com>
-	<CADT32eJsAgNkhnY1VZ6wpxa2013h7TmO6i3H=4a6D8ke8iU2Aw@mail.gmail.com>
-	<20110823091510.2d8b8027@corrin.poochiereds.net>
-	<CADT32eJPyKhkTx6vbsS4hRnaqAQAs0aTime_pz-NRvowotVyqg@mail.gmail.com>
-	<20110829202910.0038ca06@corrin.poochiereds.net>
-	<CADT32e+XQ7ar7y_MADUwwEi081Q_-QDeY79ga9ykOxVyp=yb8g@mail.gmail.com>
-	<20110830105201.1aff3900@tlielax.poochiereds.net>
-	<CAH2r5mt4U1pqGiD4ELQnM_Xgies38-dhZj_XtXi1TFWbE-260A@mail.gmail.com>
-	<CADT32eLZW1ihDk_6JTU8Y7Vy5onc6qfJCfChOa=9ZwLd34ubTg@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: wait_event_freezable variant for TASK_KILLABLE?
+Date: Wed, 31 Aug 2011 08:44:00 -0400
+Message-ID: <20110831084400.1908dada@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eLZW1ihDk_6JTU8Y7Vy5onc6qfJCfChOa=9ZwLd34ubTg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Aug 30, 2011 at 12:32 PM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Tue, Aug 30, 2011 at 12:09 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> w=
-rote:
->> On Tue, Aug 30, 2011 at 9:52 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
-te:
->>> On Tue, 30 Aug 2011 09:03:05 -0500
->>> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>
->>>> On Mon, Aug 29, 2011 at 7:29 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> w=
-rote:
->>>> > On Mon, 29 Aug 2011 16:24:33 -0500
->>>> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>> >
->>>> >> On Tue, Aug 23, 2011 at 8:15 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org=
-> wrote:
->>>> >> > On Mon, 22 Aug 2011 08:33:49 -0500
->>>> >> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>>> >> >
->>>> >> >> On Fri, Aug 12, 2011 at 11:33 AM, =A0<shirishpargaonkar@gmai=
-l.com> wrote:
->>>> >> >> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>>> >> >> >
->>>> >> >> >
->>>> >> >> > Add mount option backup.
->>>> >> >> >
->>>> >> >> > It allows an authenticated user to access files with the i=
-ntent to back them
->>>> >> >> > up including their ACLs, who may not have access permissio=
-n but has
->>>> >> >> > "Backup files and directories user right" on them (by virt=
-ue of being part
->>>> >> >> > of the built-in group Backup Operators.
->>>> >> >> >
->>>> >> >> > If an authenticated user is not part of the built-in group=
- Backup Operators
->>>> >> >> > at the server, access to such files is denied.
->>>> >> >> >
->>>> >> >> >
->>>> >> >> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar@gmail=
-=2Ecom>
->>>> >> >> > ---
->>>> >> >>
->>>> >> >>
->>>> >> >> Jeff, =A0Steve,
->>>> >> >>
->>>> >> >> Any comments on this patch (and manpage patch in cifs-utils)=
-?
->>>> >> >>
->>>> >> >
->>>> >> > This seems like a really nasty kludge. It doesn't seem like t=
-he
->>>> >> > implications of this have been carefully considered.
->>>> >> >
->>>> >> > What happens I mount with the "backup" flag and do not have t=
-he
->>>> >> > necessary permissions on the server to use the flag in an ope=
-n? Will
->>>> >> > this new flag be mutually exclusive with "multiuser"?
->>>> >> >
->>>> >> > One idea that might be better is to come up with way to mark =
-certain
->>>> >> > (unix) users with the appropriate flag. If all the backup use=
-rs were in
->>>> >> > a certan group, for instance, then you could use that info to=
- decide
->>>> >> > whether to set the flag in the open calls.
->>>> >> >
->>>> >> > --
->>>> >> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->>>> >> >
->>>> >>
->>>> >> Jeff, one comment, it is not the (unix) user that matters, it i=
-s the
->>>> >> user on the server (authenticated) user at the server because t=
-he
->>>> >> user right to access a file in backup mode can be granted only
->>>> >> to a user at the server.
->>>> >>
->>>> >
->>>> > Right, I realize that.
->>>> >
->>>> >> I think care should be taken to make sure that backup and
->>>> >> multiuser are mutually exclusive mount options in mount.cifs.
->>>> >>
->>>> >
->>>> > My objection here is more fundamental...
->>>> >
->>>> > This patchset lends itself to a single, specific use. You can cr=
-eate a
->>>> > mount that you want to use for backups. Typically, when running =
-backups
->>>> > like this you also intend for this mount to be used by only one =
-(unix)
->>>> > user.
->>>> >
->>>> > Adding a "backup" option is tantamount to adding extra privilege=
-s to
->>>> > this mount for anyone who accesses it. However, it's not clear t=
-o me
->>>> > how these extra privileges will be secured from other users that=
- don't
->>>> > necessarily need them.
->>>> >
->>>> > It seems to me that it would be far more useful to find a way to=
- only
->>>> > add these extra "backup" permissions for certain unix users that=
- are
->>>> > accessing the mount.
->>>> >
->>>> > Does that make sense?
->>>> >
->>>> > --
->>>> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->>>> >
->>>>
->>>> Jeff, definitely. Thanks. =A0I think one way might be to specify a=
-n
->>>> user or uid and restrict the usage of that mount to that user id?
->>>> So you can specify mount option as =A0either backup=3Duserxyz
->>>> or backup=3D1001 perhaps?
->>>>
->>>
->>> Sure, that might be reasonable.
->>>
->>> Since backup privileges are tied to a group on the server, we could
->>> also mirror that semantic on the client. Have a backup=3D<gid> and =
-turn
->>> on the backup flag for any unix user who is in that group. That wou=
-ld
->>> seem to allow for better integration with things like nss_winbind.
->>
->> That seems like a good idea - although I prefer that it allow
->> uid and/or gid to be specified for easier usability
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->>
->
-> Steve, how would we be able to distinguish between uids and gids?
-> The same id e.g 1001, could be either an uid or a gid!
-> The same applies to a name, it could be a group as well as
-> an user name.
-One option - allow them to distinguished via different mount option:
+I had a bug reported a while back that cifs mounts were preventing
+machines from suspending. I can reproduce this pretty readily by simply
+making a cifs mount, leaving it idle for a bit (so that the root dentry
+will need to be revalidated) and then attempting to suspend the
+machine. When I do that I get the following backtrace:
 
-presumably "backupuid=3D"    and "backupgid=3D"    If we choose to reta=
-in
-"backup" as a mount option as well - then when neither backupuid nor
-backupgid is specified then the uid of the process mounting would be
-used as "backupuid" with no backupgid implied by default.
+[ 5323.278130] PM: Syncing filesystems ... done.
+[ 5323.313956] PM: Preparing system for mem sleep
+[ 5323.435457] Freezing user space processes ... 
+[ 5343.444237] Freezing of tasks failed after 20.00 seconds (1 tasks refusing to freeze, wq_busy=0):
+[ 5343.444335] umount          D ffff88011075dc00     0  7400   7383 0x00800084
+[ 5343.444342]  ffff8800c95e1b08 0000000000000086 ffff8800c95e1b40 ffff880000000001
+[ 5343.444348]  ffff880117965cc0 ffff8800c95e1fd8 ffff8800c95e1fd8 0000000000012540
+[ 5343.444354]  ffff8800d5d5c590 ffff880117965cc0 ffff8800c95e1b18 00000001c95e1ad8
+[ 5343.444359] Call Trace:
+[ 5343.444378]  [<ffffffffa044f0ca>] wait_for_response+0x199/0x19e [cifs]
+[ 5343.444384]  [<ffffffff81070566>] ? remove_wait_queue+0x3a/0x3a
+[ 5343.444392]  [<ffffffffa044fe93>] SendReceive+0x184/0x285 [cifs]
+[ 5343.444399]  [<ffffffffa043a51e>] CIFSSMBUnixQPathInfo+0x167/0x212 [cifs]
+[ 5343.444407]  [<ffffffffa044ae90>] cifs_get_inode_info_unix+0x8e/0x165 [cifs]
+[ 5343.444414]  [<ffffffffa0444223>] ? build_path_from_dentry+0xe2/0x20d [cifs]
+[ 5343.444418]  [<ffffffff8111673e>] ? __kmalloc+0x103/0x115
+[ 5343.444425]  [<ffffffffa0444223>] ? build_path_from_dentry+0xe2/0x20d [cifs]
+[ 5343.444431]  [<ffffffffa0444223>] ? build_path_from_dentry+0xe2/0x20d [cifs]
+[ 5343.444439]  [<ffffffffa044c11d>] cifs_revalidate_dentry_attr+0x10b/0x172 [cifs]
+[ 5343.444447]  [<ffffffffa044c259>] cifs_getattr+0x7a/0xfc [cifs]
+[ 5343.444451]  [<ffffffff8112a9f7>] vfs_getattr+0x45/0x63
+[ 5343.444454]  [<ffffffff8112aa6d>] vfs_fstatat+0x58/0x6e
+[ 5343.444457]  [<ffffffff8112aabe>] vfs_stat+0x1b/0x1d
+[ 5343.444460]  [<ffffffff8112abbd>] sys_newstat+0x1a/0x33
+[ 5343.444463]  [<ffffffff8112f9e8>] ? path_put+0x20/0x24
+[ 5343.444466]  [<ffffffff810a0e84>] ? audit_syscall_entry+0x145/0x171
+[ 5343.444469]  [<ffffffff811302d1>] ? putname+0x34/0x36
+[ 5343.444473]  [<ffffffff8148e842>] system_call_fastpath+0x16/0x1b
+[ 5343.444476] 
+[ 5343.444477] Restarting tasks ... done.
 
+wait_for_response basically does this to put a task to sleep while it's
+waiting for the server to respond:
 
+        error = wait_event_killable(server->response_q,
+                                    midQ->midState != MID_REQUEST_SUBMITTED);
 
---=20
-Thanks,
+NFS does similar sorts of things, and I think it has similar problems
+with the freezer.
 
-Steve
+The problem there is pretty clear. That won't wake up unless you send
+it a fatal signal, and we need it to wake up and freeze in that
+situation. So, I made a stab at rolling a wait_event_freezekillable()
+macro, based on wait_event_freezable.
+
+-----------------------[snip]-----------------------------
+
+#define wait_event_freezekillable(wq, condition)                        \
+({                                                                      \
+        int __retval;                                                   \
+        do {                                                            \
+                __retval = wait_event_killable(wq,                      \
+                                (condition) || freezing(current));      \
+                if (__retval && !freezing(current))                     \
+                        break;                                          \
+                else if (!(condition))                                  \
+                        __retval = -ERESTARTSYS;                        \
+        } while (try_to_freeze());                                      \
+        __retval;                                                       \
+})
+
+-----------------------[snip]-----------------------------
+
+However, I still got the same problem when trying to put the task to
+sleep. I could dig in and try to figure out why this isn't working like
+I expect, but I figured I'd ask here first to see if I can determine
+whether linux-pm has advice on how best to approach this. :)
+
+Basically, what we'd like is something akin to wait_event_freezable,
+but that only returns -ERESTARTSYS on fatal signals (SIGKILL).
+
+Thoughts?
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
