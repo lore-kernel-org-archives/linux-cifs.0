@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 3/5] cifs: convert cifs_readpages to use async reads
-Date: Thu,  1 Sep 2011 17:29:46 -0400
-Message-ID: <1314912588-20435-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 4/5] cifs: allow for larger rsize= options and change defaults
+Date: Thu,  1 Sep 2011 17:29:47 -0400
+Message-ID: <1314912588-20435-5-git-send-email-jlayton@redhat.com>
 References: <1314912588-20435-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,332 +10,287 @@ In-Reply-To: <1314912588-20435-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Now that we have code in place to do asynchronous reads, convert
-cifs_readpages to use it. The new cifs_readpages walks the page_list
-that gets passed in, locks and adds the pages to the pagecache and
-sets up cifs_readdata to handle the reads.
+Currently we cap the rsize at a value that fits in CIFSMaxBufSize. That's
+not needed any longer for readpages. Allow the use of larger values for
+readpages. cifs_iovec_read and cifs_read however are still limited to the
+CIFSMaxBufSize. Make sure they don't exceed that.
 
-The rest is handled by the cifs_async_readv infrastructure.
+The patch also changes the rsize defaults. The default when unix
+extensions are enabled is set to 1M for parity with the wsize, and there
+is a hard cap of ~16M.
+
+When unix extensions are not enabled, the default is set to 60k. According
+to MS-CIFS, Windows servers can only send a max of 60k at a time, so
+this is more efficient than requesting a larger size. If the user wishes
+however, the max can be extended up to 128k - the length of the READ_RSP
+header.
+
+Really old servers however require a special hack to ensure that we don't
+request too large a read.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/file.c |  270 +++++++++++++++++++++-----------------------------------
- 1 files changed, 102 insertions(+), 168 deletions(-)
+ fs/cifs/connect.c |  122 +++++++++++++++++++++++++++++++++--------------------
+ fs/cifs/file.c    |   12 ++++-
+ 2 files changed, 86 insertions(+), 48 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index fd57165..8ba82d2 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1957,82 +1957,19 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
- 	return rc;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 6f663ea..3a5c776 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2292,16 +2292,16 @@ compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
+ 	    (new->mnt_cifs_flags & CIFS_MOUNT_MASK))
+ 		return 0;
+ 
+-	if (old->rsize != new->rsize)
+-		return 0;
+-
+ 	/*
+-	 * We want to share sb only if we don't specify wsize or specified wsize
+-	 * is greater or equal than existing one.
++	 * We want to share sb only if we don't specify an r/wsize or
++	 * specified r/wsize is greater than or equal to existing one.
+ 	 */
+ 	if (new->wsize && new->wsize < old->wsize)
+ 		return 0;
+ 
++	if (new->rsize && new->rsize < old->rsize)
++		return 0;
++
+ 	if (old->mnt_uid != new->mnt_uid || old->mnt_gid != new->mnt_gid)
+ 		return 0;
+ 
+@@ -2739,14 +2739,6 @@ void reset_cifs_unix_caps(int xid, struct cifs_tcon *tcon,
+ 					CIFS_MOUNT_POSIX_PATHS;
+ 		}
+ 
+-		if (cifs_sb && (cifs_sb->rsize > 127 * 1024)) {
+-			if ((cap & CIFS_UNIX_LARGE_READ_CAP) == 0) {
+-				cifs_sb->rsize = 127 * 1024;
+-				cFYI(DBG2, "larger reads not supported by srv");
+-			}
+-		}
+-
+-
+ 		cFYI(1, "Negotiate caps 0x%x", (int)cap);
+ #ifdef CONFIG_CIFS_DEBUG2
+ 		if (cap & CIFS_UNIX_FCNTL_CAP)
+@@ -2791,27 +2783,11 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+ 	spin_lock_init(&cifs_sb->tlink_tree_lock);
+ 	cifs_sb->tlink_tree = RB_ROOT;
+ 
+-	if (pvolume_info->rsize > CIFSMaxBufSize) {
+-		cERROR(1, "rsize %d too large, using MaxBufSize",
+-			pvolume_info->rsize);
+-		cifs_sb->rsize = CIFSMaxBufSize;
+-	} else if ((pvolume_info->rsize) &&
+-			(pvolume_info->rsize <= CIFSMaxBufSize))
+-		cifs_sb->rsize = pvolume_info->rsize;
+-	else /* default */
+-		cifs_sb->rsize = CIFSMaxBufSize;
+-
+-	if (cifs_sb->rsize < 2048) {
+-		cifs_sb->rsize = 2048;
+-		/* Windows ME may prefer this */
+-		cFYI(1, "readsize set to minimum: 2048");
+-	}
+-
+ 	/*
+-	 * Temporarily set wsize for matching superblock. If we end up using
+-	 * new sb then cifs_negotiate_wsize will later negotiate it downward
+-	 * if needed.
++	 * Temporarily set r/wsize for matching superblock. If we end up using
++	 * new sb then client will later negotiate it downward if needed.
+ 	 */
++	cifs_sb->rsize = pvolume_info->rsize;
+ 	cifs_sb->wsize = pvolume_info->wsize;
+ 
+ 	cifs_sb->mnt_uid = pvolume_info->linux_uid;
+@@ -2878,29 +2854,41 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
  }
  
--
--static void cifs_copy_cache_pages(struct address_space *mapping,
--	struct list_head *pages, int bytes_read, char *data)
--{
--	struct page *page;
--	char *target;
--
--	while (bytes_read > 0) {
--		if (list_empty(pages))
--			break;
--
--		page = list_entry(pages->prev, struct page, lru);
--		list_del(&page->lru);
--
--		if (add_to_page_cache_lru(page, mapping, page->index,
--				      GFP_KERNEL)) {
--			page_cache_release(page);
--			cFYI(1, "Add page cache failed");
--			data += PAGE_CACHE_SIZE;
--			bytes_read -= PAGE_CACHE_SIZE;
--			continue;
--		}
--		page_cache_release(page);
--
--		target = kmap_atomic(page, KM_USER0);
--
--		if (PAGE_CACHE_SIZE > bytes_read) {
--			memcpy(target, data, bytes_read);
--			/* zero the tail end of this partial page */
--			memset(target + bytes_read, 0,
--			       PAGE_CACHE_SIZE - bytes_read);
--			bytes_read = 0;
--		} else {
--			memcpy(target, data, PAGE_CACHE_SIZE);
--			bytes_read -= PAGE_CACHE_SIZE;
--		}
--		kunmap_atomic(target, KM_USER0);
--
--		flush_dcache_page(page);
--		SetPageUptodate(page);
--		unlock_page(page);
--		data += PAGE_CACHE_SIZE;
--
--		/* add page to FS-Cache */
--		cifs_readpage_to_fscache(mapping->host, page);
--	}
--	return;
--}
--
- static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	struct list_head *page_list, unsigned num_pages)
- {
--	int rc = -EACCES;
--	int xid;
--	loff_t offset;
--	struct page *page;
--	struct cifs_sb_info *cifs_sb;
--	struct cifs_tcon *pTcon;
--	unsigned int bytes_read = 0;
--	unsigned int read_size, i;
--	char *smb_read_data = NULL;
--	struct smb_com_read_rsp *pSMBr;
--	struct cifsFileInfo *open_file;
--	struct cifs_io_parms io_parms;
--	int buf_type = CIFS_NO_BUFFER;
--	__u32 pid;
-+	int rc;
-+	struct list_head tmplist;
-+	struct cifsFileInfo *open_file = file->private_data;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
-+	unsigned int rsize = cifs_sb->rsize;
-+	pid_t pid;
+ /*
+- * When the server supports very large writes via POSIX extensions, we can
+- * allow up to 2^24-1, minus the size of a WRITE_AND_X header, not including
+- * the RFC1001 length.
++ * When the server supports very large reads and writes via POSIX extensions,
++ * we can allow up to 2^24-1, minus the size of a READ/WRITE_AND_X header, not
++ * including the RFC1001 length.
+  *
+  * Note that this might make for "interesting" allocation problems during
+  * writeback however as we have to allocate an array of pointers for the
+  * pages. A 16M write means ~32kb page array with PAGE_CACHE_SIZE == 4096.
++ *
++ * For reads, there is a similar problem as we need to allocate an array
++ * of kvecs to handle the receive, though that should only need to be done
++ * once.
+  */
+ #define CIFS_MAX_WSIZE ((1<<24) - 1 - sizeof(WRITE_REQ) + 4)
++#define CIFS_MAX_RSIZE ((1<<24) - sizeof(READ_RSP) + 4)
  
--	xid = GetXid();
--	if (file->private_data == NULL) {
--		rc = -EBADF;
--		FreeXid(xid);
--		return rc;
--	}
--	open_file = file->private_data;
--	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
--	pTcon = tlink_tcon(open_file->tlink);
-+	/* Give up immediately if rsize is too small to read a page */
-+	if (rsize < PAGE_CACHE_SIZE)
-+		return 0;
+ /*
+- * When the server doesn't allow large posix writes, only allow a wsize of
+- * 128k minus the size of the WRITE_AND_X header. That allows for a write up
++ * When the server doesn't allow large posix writes, only allow a rsize/wsize of
++ * 128k minus the size of the call header. That allows for a read or write up
+  * to the maximum size described by RFC1002.
+  */
+ #define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
++#define CIFS_MAX_RFC1002_RSIZE (128 * 1024 - sizeof(READ_RSP) + 4)
  
- 	/*
- 	 * Reads as many pages as possible from fscache. Returns -ENOBUFS
-@@ -2041,125 +1978,122 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	rc = cifs_readpages_from_fscache(mapping->host, mapping, page_list,
- 					 &num_pages);
- 	if (rc == 0)
--		goto read_complete;
-+		return rc;
+ /*
+  * The default wsize is 1M. find_get_pages seems to return a maximum of 256
+  * pages in a single call. With PAGE_CACHE_SIZE == 4k, this means we can fill
+  * a single wsize request with a single call.
+  */
+-#define CIFS_DEFAULT_WSIZE (1024 * 1024)
++#define CIFS_DEFAULT_IOSIZE (1024 * 1024)
++
++/*
++ * Windows only supports a max of 60k reads. Default to that when posix
++ * extensions aren't in force.
++ */
++#define CIFS_DEFAULT_NON_POSIX_RSIZE (60 *1024)
  
--	cFYI(DBG2, "rpages: num pages %d", num_pages);
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
- 		pid = open_file->pid;
- 	else
- 		pid = current->tgid;
+ static unsigned int
+ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+@@ -2908,7 +2896,7 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+ 	__u64 unix_cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	unsigned int wsize = pvolume_info->wsize ? pvolume_info->wsize :
+-				CIFS_DEFAULT_WSIZE;
++				CIFS_DEFAULT_IOSIZE;
  
--	for (i = 0; i < num_pages; ) {
--		unsigned contig_pages;
--		struct page *tmp_page;
--		unsigned long expected_index;
-+	rc = 0;
-+	INIT_LIST_HEAD(&tmplist);
+ 	/* can server support 24-bit write sizes? (via UNIX extensions) */
+ 	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRITE_CAP))
+@@ -2931,6 +2919,54 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+ 	return wsize;
+ }
  
--		if (list_empty(page_list))
--			break;
-+	cFYI(1, "%s: file=%p mapping=%p num_pages=%u", __func__, file,
-+		mapping, num_pages);
++static unsigned int
++cifs_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
++{
++	__u64 unix_cap = le64_to_cpu(tcon->fsUnixInfo.Capability);
++	struct TCP_Server_Info *server = tcon->ses->server;
++	unsigned int rsize;
++
++	/* can server support 24-bit write sizes? (via UNIX extensions) */
++	if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_READ_CAP)) {
++		rsize = pvolume_info->rsize ? pvolume_info->rsize :
++				CIFS_DEFAULT_NON_POSIX_RSIZE;
++		rsize = min_t(unsigned int, rsize, CIFS_MAX_RFC1002_RSIZE);
++	} else {
++		rsize = pvolume_info->rsize ? pvolume_info->rsize :
++				CIFS_DEFAULT_IOSIZE;
++	}
 +
 +	/*
-+	 * Start with the page at end of list and move it to private
-+	 * list. Do the same with any following pages until we hit
-+	 * the rsize limit, hit an index discontinuity, or run out of
-+	 * pages. Issue the async read and then start the loop again
-+	 * until the list is empty.
-+	 *
-+	 * Note that list order is important. The page_list is in
-+	 * the order of declining indexes. When we put the pages in
-+	 * the rdata->pages, then we want them in increasing order.
++	 * no CAP_LARGE_READ_X? Then MS-CIFS states that we must limit this to
++	 * the client's MaxBufferSize.
 +	 */
-+	while (!list_empty(page_list)) {
-+		unsigned int bytes = PAGE_CACHE_SIZE;
-+		unsigned int expected_index;
-+		unsigned int nr_pages = 1;
-+		loff_t offset;
-+		struct page *page, *tpage;
-+		struct cifs_readdata *rdata;
- 
- 		page = list_entry(page_list->prev, struct page, lru);
++	if (!(server->capabilities & CAP_LARGE_READ_X)) {
++		/*
++		 * HACK! Ancient servers have very small buffers. Even though
++		 * MS-CIFS indicates that servers are only limited by the
++		 * client's bufsize for reads, testing against win98se shows
++		 * that it throws INVALID_PARAMETER errors if you try to
++		 * request too large a read.
++		 *
++		 * If the server advertises a MaxBufferSize of less than one
++		 * page, assume that it also can't satisfy reads larger than
++		 * that either.
++		 *
++		 * FIXME: Is there a better heuristic for this?
++		 */
++		if (server->maxBuf < PAGE_CACHE_SIZE)
++			rsize = min_t(unsigned int, rsize,
++				      server->maxBuf - sizeof(READ_RSP));
++		else
++			rsize = min_t(unsigned int, rsize, CIFSMaxBufSize);
++	}
 +
-+		lock_page(page);
-+		rc = add_to_page_cache_locked(page, mapping,
-+					      page->index, GFP_KERNEL);
++	/* hard limit of CIFS_MAX_RSIZE */
++	rsize = min_t(unsigned int, rsize, CIFS_MAX_RSIZE);
 +
-+		/* give up if we can't stick it in the cache */
-+		if (rc) {
-+			unlock_page(page);
-+			break;
-+		}
++	return rsize;
++}
 +
-+		/* move first page to the tmplist */
- 		offset = (loff_t)page->index << PAGE_CACHE_SHIFT;
-+		list_move(&page->lru, &tmplist);
-+
-+		/* now try and add more pages onto the request */
-+		expected_index = page->index + 1;
-+		list_for_each_entry_safe_reverse(page, tpage, page_list, lru) {
-+			/* discontinuity ? */
-+			if (page->index != expected_index)
-+				break;
-+
-+			/* would this page push the read over the rsize? */
-+			if (bytes + PAGE_CACHE_SIZE > rsize)
-+				break;
- 
--		/* count adjacent pages that we will read into */
--		contig_pages = 0;
--		expected_index =
--			list_entry(page_list->prev, struct page, lru)->index;
--		list_for_each_entry_reverse(tmp_page, page_list, lru) {
--			if (tmp_page->index == expected_index) {
--				contig_pages++;
--				expected_index++;
--			} else
-+			lock_page(page);
-+			if (add_to_page_cache_locked(page, mapping,
-+						page->index, GFP_KERNEL)) {
-+				unlock_page(page);
- 				break;
-+			}
-+			list_move_tail(&page->lru, &tmplist);
-+			bytes += PAGE_CACHE_SIZE;
-+			expected_index++;
-+			nr_pages++;
- 		}
--		if (contig_pages + i >  num_pages)
--			contig_pages = num_pages - i;
--
--		/* for reads over a certain size could initiate async
--		   read ahead */
--
--		read_size = contig_pages * PAGE_CACHE_SIZE;
--		/* Read size needs to be in multiples of one page */
--		read_size = min_t(const unsigned int, read_size,
--				  cifs_sb->rsize & PAGE_CACHE_MASK);
--		cFYI(DBG2, "rpages: read size 0x%x  contiguous pages %d",
--				read_size, contig_pages);
--		rc = -EAGAIN;
--		while (rc == -EAGAIN) {
-+
-+		rdata = cifs_readdata_alloc(nr_pages);
-+		if (!rdata) {
-+			/* best to give up if we're out of mem */
-+			list_for_each_entry_safe(page, tpage, &tmplist, lru) {
-+				list_del(&page->lru);
-+				delete_from_page_cache(page);
-+				unlock_page(page);
-+				page_cache_release(page);
-+			}
-+			rc = -ENOMEM;
-+			break;
-+		}
-+
-+		spin_lock(&cifs_file_list_lock);
-+		cifsFileInfo_get(open_file);
-+		spin_unlock(&cifs_file_list_lock);
-+		rdata->cfile = open_file;
-+		rdata->mapping = mapping;
-+		rdata->offset = offset;
-+		rdata->bytes = bytes;
-+		rdata->pid = pid;
-+		list_splice_init(&tmplist, &rdata->pages);
-+
-+		do {
- 			if (open_file->invalidHandle) {
- 				rc = cifs_reopen_file(open_file, true);
- 				if (rc != 0)
--					break;
--			}
--			io_parms.netfid = open_file->netfid;
--			io_parms.pid = pid;
--			io_parms.tcon = pTcon;
--			io_parms.offset = offset;
--			io_parms.length = read_size;
--			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
--					 &smb_read_data, &buf_type);
--			/* BB more RC checks ? */
--			if (rc == -EAGAIN) {
--				if (smb_read_data) {
--					if (buf_type == CIFS_SMALL_BUFFER)
--						cifs_small_buf_release(smb_read_data);
--					else if (buf_type == CIFS_LARGE_BUFFER)
--						cifs_buf_release(smb_read_data);
--					smb_read_data = NULL;
--				}
-+					continue;
- 			}
--		}
--		if ((rc < 0) || (smb_read_data == NULL)) {
--			cFYI(1, "Read error in readpages: %d", rc);
--			break;
--		} else if (bytes_read > 0) {
--			task_io_account_read(bytes_read);
--			pSMBr = (struct smb_com_read_rsp *)smb_read_data;
--			cifs_copy_cache_pages(mapping, page_list, bytes_read,
--				smb_read_data + 4 /* RFC1001 hdr */ +
--				le16_to_cpu(pSMBr->DataOffset));
--
--			i +=  bytes_read >> PAGE_CACHE_SHIFT;
--			cifs_stats_bytes_read(pTcon, bytes_read);
--			if ((bytes_read & PAGE_CACHE_MASK) != bytes_read) {
--				i++; /* account for partial page */
--
--				/* server copy of file can have smaller size
--				   than client */
--				/* BB do we need to verify this common case ?
--				   this case is ok - if we are at server EOF
--				   we will hit it on next read */
-+			rc = cifs_async_readv(rdata);
-+		} while (rc == -EAGAIN);
- 
--				/* break; */
-+		if (rc != 0) {
-+			list_for_each_entry_safe(page, tpage, &rdata->pages,
-+						 lru) {
-+				list_del(&page->lru);
-+				delete_from_page_cache(page);
-+				unlock_page(page);
-+				page_cache_release(page);
- 			}
--		} else {
--			cFYI(1, "No bytes read (%d) at offset %lld . "
--				"Cleaning remaining pages from readahead list",
--				bytes_read, offset);
--			/* BB turn off caching and do new lookup on
--			   file size at server? */
-+			cifs_readdata_free(rdata);
- 			break;
- 		}
--		if (smb_read_data) {
--			if (buf_type == CIFS_SMALL_BUFFER)
--				cifs_small_buf_release(smb_read_data);
--			else if (buf_type == CIFS_LARGE_BUFFER)
--				cifs_buf_release(smb_read_data);
--			smb_read_data = NULL;
--		}
--		bytes_read = 0;
--	}
--
--/* need to free smb_read_data buf before exit */
--	if (smb_read_data) {
--		if (buf_type == CIFS_SMALL_BUFFER)
--			cifs_small_buf_release(smb_read_data);
--		else if (buf_type == CIFS_LARGE_BUFFER)
--			cifs_buf_release(smb_read_data);
--		smb_read_data = NULL;
+ static int
+ is_path_accessible(int xid, struct cifs_tcon *tcon,
+ 		   struct cifs_sb_info *cifs_sb, const char *full_path)
+@@ -3208,14 +3244,8 @@ try_mount_again:
+ 		CIFSSMBQFSAttributeInfo(xid, tcon);
  	}
  
--read_complete:
--	FreeXid(xid);
- 	return rc;
- }
+-	if ((tcon->unix_ext == 0) && (cifs_sb->rsize > (1024 * 127))) {
+-		cifs_sb->rsize = 1024 * 127;
+-		cFYI(DBG2, "no very large read support, rsize now 127K");
+-	}
+-	if (!(tcon->ses->capabilities & CAP_LARGE_READ_X))
+-		cifs_sb->rsize = min(cifs_sb->rsize, CIFSMaxBufSize);
+-
+ 	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
++	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
  
+ remote_path_check:
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 8ba82d2..8916777 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1714,6 +1714,7 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
+ 	struct smb_com_read_rsp *pSMBr;
+ 	struct cifs_io_parms io_parms;
+ 	char *read_data;
++	unsigned int rsize;
+ 	__u32 pid;
+ 
+ 	if (!nr_segs)
+@@ -1726,6 +1727,9 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
+ 	xid = GetXid();
+ 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+ 
++	/* FIXME: set up handlers for larger reads and/or convert to async */
++	rsize = min_t(unsigned int, cifs_sb->rsize, CIFSMaxBufSize);
++
+ 	open_file = file->private_data;
+ 	pTcon = tlink_tcon(open_file->tlink);
+ 
+@@ -1738,7 +1742,7 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
+ 		cFYI(1, "attempting read on write only file instance");
+ 
+ 	for (total_read = 0; total_read < len; total_read += bytes_read) {
+-		cur_len = min_t(const size_t, len - total_read, cifs_sb->rsize);
++		cur_len = min_t(const size_t, len - total_read, rsize);
+ 		rc = -EAGAIN;
+ 		read_data = NULL;
+ 
+@@ -1830,6 +1834,7 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	unsigned int bytes_read = 0;
+ 	unsigned int total_read;
+ 	unsigned int current_read_size;
++	unsigned int rsize;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifs_tcon *pTcon;
+ 	int xid;
+@@ -1842,6 +1847,9 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	xid = GetXid();
+ 	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+ 
++	/* FIXME: set up handlers for larger reads and/or convert to async */
++	rsize = min_t(unsigned int, cifs_sb->rsize, CIFSMaxBufSize);
++
+ 	if (file->private_data == NULL) {
+ 		rc = -EBADF;
+ 		FreeXid(xid);
+@@ -1862,7 +1870,7 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	     read_size > total_read;
+ 	     total_read += bytes_read, current_offset += bytes_read) {
+ 		current_read_size = min_t(const int, read_size - total_read,
+-					  cifs_sb->rsize);
++					  rsize);
+ 		/* For windows me and 9x we do not want to request more
+ 		than it negotiated since it will refuse the read then */
+ 		if ((pTcon->ses) &&
 -- 
 1.7.6
