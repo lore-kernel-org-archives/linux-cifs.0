@@ -1,68 +1,39 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 5/5] cifs: tune bdi.ra_pages in accordance with the rsize
-Date: Thu,  1 Sep 2011 17:29:48 -0400
-Message-ID: <1314912588-20435-6-git-send-email-jlayton@redhat.com>
-References: <1314912588-20435-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: GPLv2 for cifs-utils existing?
+Date: Fri, 2 Sep 2011 06:40:23 -0400
+Message-ID: <20110902064023.51a3c945@tlielax.poochiereds.net>
+References: <240043230.241860.1314945935851.JavaMail.ngmail@webmail12.arcor-online.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: brennersimon-KvP5wT2u2U0@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1314912588-20435-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <240043230.241860.1314945935851.JavaMail.ngmail-hrWuGRo80rQUOsVZMWqyoH/75uz/KqYjrE5yTffgRl4@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Tune bdi.ra_pages to be a multiple of the rsize. This prevents the VFS
-from asking for pages that require small reads to satisfy.
+On Fri, 2 Sep 2011 08:45:35 +0200 (CEST)
+brennersimon-KvP5wT2u2U0@public.gmane.org wrote:
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |   21 +++++++++++++++++++--
- 1 files changed, 19 insertions(+), 2 deletions(-)
+> > Can you clarify why you'd like to see it as GPLv2?
+> 
+> At the moment, I'm just trying to learn and understand more about the GPLv3. So for several Linux programs I've been seeing what licence they've got. I've heard that GPLv3 is quite virulent. That could prevent a manufacturer (say of routers, receivers or similar things) from using cifs-utils if he didn't want to be all of his code opened. Is that right?
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 3a5c776..f20efa6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3160,6 +3160,22 @@ cifs_get_volume_info(char *mount_data, const char *devname)
- 	return volume_info;
- }
- 
-+/* make sure ra_pages is a multiple of rsize */
-+static inline unsigned int
-+cifs_ra_pages(struct cifs_sb_info *cifs_sb)
-+{
-+	unsigned int reads;
-+	unsigned int rsize_pages = cifs_sb->rsize / PAGE_CACHE_SIZE;
-+
-+	if (rsize_pages >= default_backing_dev_info.ra_pages)
-+		return default_backing_dev_info.ra_pages;
-+	else if (rsize_pages == 0)
-+		return rsize_pages;
-+
-+	reads = default_backing_dev_info.ra_pages / rsize_pages;
-+	return reads * rsize_pages;
-+}
-+
- int
- cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- {
-@@ -3178,8 +3194,6 @@ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- 	if (rc)
- 		return rc;
- 
--	cifs_sb->bdi.ra_pages = default_backing_dev_info.ra_pages;
--
- #ifdef CONFIG_CIFS_DFS_UPCALL
- try_mount_again:
- 	/* cleanup activities if we're chasing a referral */
-@@ -3247,6 +3261,9 @@ try_mount_again:
- 	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
- 	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
- 
-+	/* tune readahead according to rsize */
-+	cifs_sb->bdi.ra_pages = cifs_ra_pages(cifs_sb);
-+
- remote_path_check:
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	/*
+(re-cc'ing linux-cifs and Jeremy who is better versed in this sort of
+thing than I am)
+
+That's nonsense. It's certainly fine to ship GPLv3 software alongside
+closed source code. You'll need to provide source for the GPL'ed parts
+of course, but providing a set of self-contained GPLv3 programs
+shouldn't force a vendor to open anything else.
+
+The problems that you describe typically come in with linking GPL
+libraries against closed source code, which is a bit more murky. That
+shouldn't be a problem with cifs-utils as it doesn't ship any libraries.
+
+That said, I'm not a lawyer and you may want to consult yours before
+doing anything.
+
 -- 
-1.7.6
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
