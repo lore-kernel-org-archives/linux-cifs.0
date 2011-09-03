@@ -1,57 +1,39 @@
-From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Simon Brenner <brennersimon-KvP5wT2u2U0@public.gmane.org>
 Subject: Re: GPLv2 for cifs-utils existing?
-Date: Fri, 02 Sep 2011 09:10:38 -0400
-Message-ID: <1314969038.22877.142.camel@pico.li.ssimo.org>
-References: <240043230.241860.1314945935851.JavaMail.ngmail@webmail12.arcor-online.net>
-	 <20110902064023.51a3c945@tlielax.poochiereds.net>
+Date: Sat, 03 Sep 2011 09:39:17 +0200
+Message-ID: <4E61D9A5.6010303@arcor.de>
+References: <240043230.241860.1314945935851.JavaMail.ngmail@webmail12.arcor-online.net> <20110902064023.51a3c945@tlielax.poochiereds.net> <20110902124740.GB15846@cobija.connexer.com>
+Reply-To: brennersimon-KvP5wT2u2U0@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: brennersimon-KvP5wT2u2U0@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110902064023.51a3c945-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20110902124740.GB15846-Znhnm/lQSyjxW5zecs3cv0EOCMrvLtNR@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2011-09-02 at 06:40 -0400, Jeff Layton wrote:
-> On Fri, 2 Sep 2011 08:45:35 +0200 (CEST)
-> brennersimon-KvP5wT2u2U0@public.gmane.org wrote:
-> 
-> > > Can you clarify why you'd like to see it as GPLv2?
-> > 
-> > At the moment, I'm just trying to learn and understand more about
-> the GPLv3. So for several Linux programs I've been seeing what licence
-> they've got. I've heard that GPLv3 is quite virulent. That could
-> prevent a manufacturer (say of routers, receivers or similar things)
-> from using cifs-utils if he didn't want to be all of his code opened.
+Thanks for all your answers so far!
 
-Almost everything you said up to here is a mixture of FUD,
-misconceptions and outright lies (you are no doubt a victim of such
-lies, not saying you lied).
+> That's to say that if you are distributing a single installable
+> firmware file for your router, and it contains GPL'd software, you would
+> arguably need to provide source for the entire work generating the
+> firmware file.  And this isn't specific to v3 of the GPL either, AFAIK,
+> it's kind of the point of the license to begin with.
 
->  Is that right?
+So how is it when, say, a router manufacturer has its own (proprietary + 
+closed) file format for the firmware files. Within the firmware he uses 
+several GPL projects (v2 or v3) as well as some own closed projects 
+which he doesn't want to be seen by everyone.
 
-No
+Would the manufacturer then have to provide all source code, even its 
+own which he originally wanted to keep private?
+How about the toolchain he used to compile all the stuff?
+If every user has to be able to rebuild his own firmware files then the 
+manufacturer would be forced to open all code.
 
-First of all GPLv3 is no more "virulent" than GPLv2, that it is to say
-it is not at all. A license cannot spread to other code unless the
-copyright holder wants to apply it to his code.
+Can you clarify that for me?
 
-The license, like any other, states some requirements about source code
-and when and how and to whom it needs to be distributed, and when the
-code can be linked to other code. Esp. with cifs-util code, that is not
-a library and therefore arguably not linked together with other code
-there is really no more than mere aggregation going on.
+Thanks!
 
-I strongly suggest you talk to a (knowledgeable) lawyer about what are
-your obligations applied to your specific case if you have this kind of
-doubts. If you do not know lawyers that well versed in free software
-licenses, write me in private and I'll give you names.
-
-Simo.
-
--- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-Simon.
