@@ -1,60 +1,71 @@
-From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: GPLv2 for cifs-utils existing?
-Date: Mon, 05 Sep 2011 13:50:42 -0400
-Message-ID: <1315245042.22877.183.camel@pico.li.ssimo.org>
-References: <20110905161012.GA30136@cobija.connexer.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Simon Brenner <brennersimon-KvP5wT2u2U0@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/5] cifs: allow cifs to do readpages larger and asynchronously (try #5)
+Date: Tue,  6 Sep 2011 10:27:16 -0400
+Message-ID: <1315319241-21637-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110905161012.GA30136-Znhnm/lQSyjxW5zecs3cv0EOCMrvLtNR@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 2011-09-05 at 18:10 +0200, sean finney wrote:
-> > > > If every user has to be able to rebuild his own firmware files
-> then
-> > > > the manufacturer would be forced to open all code.
-> > > 
-> > > I would say so.
-> > 
-> > And you'd be TOTALLY wrong, unless the firware is a single program
-> where
-> > everything is linked together. If, as it almost certainly is, it is
-> just
-> > some sort of squashfs or similar that is unpacked at boot by the
-> kernel,
-> > then you have mere aggregation.
-> 
-> That's kind of what I was getting at above.  Please reconsider the
-> context of that answer, that as a given, the user needs to be able to
-> disassemble/reassemble the firmware and it was in question whether
-> that
-> was even possible.  if you can't reliably take the image apart and put
-> it back together, what's the difference between that and an ELF file
-> with a really large .rodata section?
+The changes since the last patchset are fairly minor. It occurs to me
+that it would be better to simply have the default rsize set to a low
+value when the server's MaxBufferSize is very small, instead of making
+that a hard maximum value. That way, when users know that their server
+can support a larger rsize they can force the value higher.
 
-Ok this would be a case of combining all the code in a single
-executable, which makes a big difference. Unfortunately you are still
-totally wrong wrt the question made.
+There's also a more subtle change -- when there is a problem with the
+read that occurs after adding the page to the pagecache, the page is no
+longer removed from the cache. It's possible that in the intervening
+period that another task has found that page and is waiting on it, and
+might become discombobulated if it's suddenly removed from the cache.
 
-Nobody can force you to disclose code, if the firmware is not found
-compliant then the first option is to simply stop distributing the code
-completely. Of course if you want to keep distributing the code then you
-have to come in compliance, either by removing and replacing the GPLed
-portions (v2 or v3 makes no difference wrt linking executables) or by
-compatibly licensing your own code and distributing its source under the
-terms of the GPL.
+Instead, the code just leaves the page in place and puts it on the LRU
+list, but doesn't set it uptodate. This more closely parallels what
+other filesystems do in their readpages operations.
 
-I find it hard to think that something including the linux kernel (which
-is the only reason to use cifs-utils) is transformed into a single
-executable all linked together. But I guess everything is possible.
+This patchset uses the infrastructure added in the receive path overhaul
+to allow cifs to vastly increase the rsize. It also is more efficient
+and does less copying as the data is read directly into the pagecache.
 
-Simo.
+Additionally, readpages is now done asynchronously with this set.
+cifs_readpages just puts the pages in the cache, fires off the reads and
+returns. Eventually, when the reads complete, a workqueue job is queued
+that will mark the pages uptodate and unlock them.
+
+With this set in place, I see a dramatic increase in performance for
+buffered read calls. On a simple dd test of a 1GB file to /dev/null:
+
+prepatch, with 16k rsize:
+1073741824 bytes (1.1 GB) copied, 47.2119 s, 22.7 MB/s
+
+postpatch, with 1M rsize:
+1073741824 bytes (1.1 GB) copied, 11.1602 s, 96.2 MB/s
+
+postpatch, with 60k rsize:
+1073741824 bytes (1.1 GB) copied, 12.5183 s, 85.8 MB/s
+
+Other tests show similar results. These results are from my craptacular
+KVM-based test rig. I expect that the performance boost will be even
+more dramatic on real hardware or on higher-latency connections.
+
+Steve, I'd like to see both of these sets go into 3.2 if at all
+possible. Both of these sets should be bisectable, so committing them in
+order is highly recommended.
+
+Jeff Layton (5):
+  cifs: fix protocol definition for READ_RSP
+  cifs: add cifs_async_readv
+  cifs: convert cifs_readpages to use async reads
+  cifs: allow for larger rsize= options and change defaults
+  cifs: tune bdi.ra_pages in accordance with the rsize
+
+ fs/cifs/cifspdu.h   |    4 +-
+ fs/cifs/cifsproto.h |   24 ++++
+ fs/cifs/cifssmb.c   |  356 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/connect.c   |  165 +++++++++++++++---------
+ fs/cifs/file.c      |  293 ++++++++++++++++++------------------------
+ 5 files changed, 608 insertions(+), 234 deletions(-)
 
 -- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.6
