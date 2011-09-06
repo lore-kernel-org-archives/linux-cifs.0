@@ -1,207 +1,189 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [RFC/PATCH] cifs.upcall: use kernel.provided principal name if
- available
-Date: Tue, 6 Sep 2011 12:10:17 -0400
-Message-ID: <20110906121017.7ce0018b@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC/PATCH] cifs: add server-provided principal name in upcall
+Date: Tue, 6 Sep 2011 12:16:31 -0400
+Message-ID: <20110906121631.587b9551@tlielax.poochiereds.net>
 References: <1315322512-10652-1-git-send-email-martin.wilck@ts.fujitsu.com>
-	<1315322794-10725-1-git-send-email-martin.wilck@ts.fujitsu.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: Martin Wilck <martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1315322794-10725-1-git-send-email-martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org>
+In-Reply-To: <1315322512-10652-1-git-send-email-martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue,  6 Sep 2011 17:26:34 +0200
+On Tue,  6 Sep 2011 17:21:52 +0200
 Martin Wilck <martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org> wrote:
 
-> This patch complements the kernel patch
-> "cifs: add server-provided principal name in upcall". When cifs.upcall
-> is started with -p, the kernel-provided principal name from the initial
-> negotiation with the server will be used to obtain a ticket. If this fails,
-> "cifs/<hostname>" and "host/hostname" fallbacks will be tried as fallback.
-> 
-> This will enable kerberos-based CIFS mounts on more servers, and make
-> mount.cifs work more similar to smbclient.
-> 
-> Note that the "-p" option must be added in the cifs.upcall line in
-> /etc/request-key.conf to activate this.
+> The current cifs implementation discards a principal name found
+> in the CIFS server's SecBlob. This patch adds the principal name
+> into the data used for the request_key call. Combined with a separate
+> cifs-utils patch, this enables cifs mounts using kerberos on servers
+> that use different principal names than the default cifs/<hostname>
+> or host/<hostname> which are tried by cifs.upcall.
 > 
 > Signed-off-by: Martin Wilck <martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org>
 > ---
->  cifs.upcall.8.in |    6 ++++++
->  cifs.upcall.c    |   38 +++++++++++++++++++++++++++++++-------
->  cifs_spnego.h    |    2 +-
->  3 files changed, 38 insertions(+), 8 deletions(-)
+>  fs/cifs/asn1.c        |   28 ++++++++++++++++++++++++----
+>  fs/cifs/cifs_spnego.c |   10 ++++++++++
+>  fs/cifs/cifs_spnego.h |    2 +-
+>  fs/cifs/cifsglob.h    |    1 +
+>  fs/cifs/connect.c     |    3 +++
+>  5 files changed, 39 insertions(+), 5 deletions(-)
 > 
-> diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
-> index 03842b7..7d90d1e 100644
-> --- a/cifs.upcall.8.in
-> +++ b/cifs.upcall.8.in
-> @@ -52,6 +52,12 @@ Traditionally, the kernel has sent only a single uid= parameter to the upcall fo
->  Newer kernels send a creduid= option as well, which contains what uid it thinks actually owns the credentials that it\'s looking for\&. At mount time, this is generally set to the real uid of the user doing the mount. For multisession mounts, it's set to the fsuid of the mount user. Set this option if you want cifs.upcall to use the older uid= parameter instead of the creduid= parameter\&.
->  .RE
->  .PP
-> +\-\-principal\-from\-kernel|\-p
-> +.RS 4
-> +When this option is used, the principal name obtained by the kernel from the CIFS server is used rather than a principal name derived from the host name. If this fails, the host name is used as fallback.
-> +This makes it possible to obtain credentials for CIFS servers using nonstandard principal names, and makes cifs mounts behave more similar to smbclient, which also uses the server-provided principal name.
-> +.RE
-> +.PP
-
-I'm not opposed to adding this with appropriate warnings about the
-danger involved.
-
-Trusting the SPN provided in the NEGOTIATE response waters down much of
-the security that Kerberos provides. Granted, cifs doesn't currently do
-mutual auth, but if it did, using this would make it pretty useless.
-
-It would probably be a good idea to clearly warn that an attacker can
-use this in order to trick the client into mounting a server of his
-choosing (providing he can redirect the traffic to that server too).
-
-
->  \-\-version|\-v
->  .RS 4
->  Print version number and exit\&.
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index de92092..2adac1d 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -518,11 +518,13 @@ handle_krb5_mech(const char *oid, const char *principal, DATA_BLOB * secblob,
->  #define DKD_HAVE_PID		0x20
->  #define DKD_HAVE_CREDUID	0x40
->  #define DKD_HAVE_USERNAME	0x80
-> +#define DKD_HAVE_PRINCIPAL	0x100
->  #define DKD_MUSTHAVE_SET (DKD_HAVE_HOSTNAME|DKD_HAVE_VERSION|DKD_HAVE_SEC)
+> diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
+> index cfd1ce3..5ab23f2 100644
+> --- a/fs/cifs/asn1.c
+> +++ b/fs/cifs/asn1.c
+> @@ -369,7 +369,7 @@ static unsigned char asn1_ulong_decode(struct asn1_ctx *ctx,
+>  		*integer |= ch;
+>  	}
+>  	return 1;
+> -}
+> +} */
 >  
->  struct decoded_args {
->  	int ver;
->  	char *hostname;
-> +	char *principal;
->  	char *ip;
->  	char *username;
->  	uid_t uid;
-> @@ -557,6 +559,21 @@ decode_key_description(const char *desc, struct decoded_args *arg)
->  			}
->  			retval |= DKD_HAVE_HOSTNAME;
->  			syslog(LOG_DEBUG, "host=%s", arg->hostname);
-> +		} else if (!strncmp(tkn, "pri=", 4)) {
-> +			if (pos == NULL)
-> +				len = strlen(tkn);
-> +			else
-> +				len = pos - tkn;
-> +
-> +			len -= 4;
-> +			SAFE_FREE(arg->principal);
-> +			arg->principal = strndup(tkn + 4, len);
-> +			if (arg->principal == NULL) {
-> +				syslog(LOG_ERR, "Unable to allocate memory");
-> +				return 1;
-> +			}
-> +			retval |= DKD_HAVE_PRINCIPAL;
-> +			syslog(LOG_DEBUG, "pri=%s", arg->principal);
->  		} else if (!strncmp(tkn, "ip4=", 4) || !strncmp(tkn, "ip6=", 4)) {
->  			if (pos == NULL)
->  				len = strlen(tkn);
-> @@ -755,6 +772,7 @@ static void usage(void)
->  const struct option long_options[] = {
->  	{"trust-dns", 0, NULL, 't'},
->  	{"legacy-uid", 0, NULL, 'l'},
-> +	{"principal-from-kernel", 0, NULL, 'p'},
->  	{"version", 0, NULL, 'v'},
->  	{NULL, 0, NULL, 0}
->  };
-> @@ -768,7 +786,7 @@ int main(const int argc, char *const argv[])
->  	size_t datalen;
->  	unsigned int have;
->  	long rc = 1;
-> -	int c, try_dns = 0, legacy_uid = 0;
-> +	int c, try_dns = 0, legacy_uid = 0, use_principal = 0;
->  	char *buf, *princ = NULL, *ccname = NULL;
->  	char hostbuf[NI_MAXHOST], *host;
->  	struct decoded_args arg;
-> @@ -781,7 +799,7 @@ int main(const int argc, char *const argv[])
+>  static unsigned char
+>  asn1_octets_decode(struct asn1_ctx *ctx,
+> @@ -395,7 +395,7 @@ asn1_octets_decode(struct asn1_ctx *ctx,
+>  		(*len)++;
+>  	}
+>  	return 1;
+> -} */
+> +}
 >  
->  	openlog(prog, 0, LOG_DAEMON);
+>  static unsigned char
+>  asn1_subid_decode(struct asn1_ctx *ctx, unsigned long *subid)
+> @@ -496,9 +496,9 @@ decode_negTokenInit(unsigned char *security_blob, int length,
+>  {
+>  	struct asn1_ctx ctx;
+>  	unsigned char *end;
+> -	unsigned char *sequence_end;
+> +	unsigned char *sequence_end, *principal;
+>  	unsigned long *oid = NULL;
+> -	unsigned int cls, con, tag, oidlen, rc;
+> +	unsigned int cls, con, tag, oidlen, rc, princlen;
 >  
-> -	while ((c = getopt_long(argc, argv, "cltv", long_options, NULL)) != -1) {
-> +	while ((c = getopt_long(argc, argv, "cltpv", long_options, NULL)) != -1) {
->  		switch (c) {
->  		case 'c':
->  			/* legacy option -- skip it */
-> @@ -792,6 +810,9 @@ int main(const int argc, char *const argv[])
->  		case 'l':
->  			legacy_uid++;
->  			break;
-> +		case 'p':
-> +			use_principal++;
-> +			break;
->  		case 'v':
->  			printf("version: %s\n", VERSION);
->  			goto out;
-> @@ -873,9 +894,16 @@ int main(const int argc, char *const argv[])
->  	host = arg.hostname;
+>  	/* cifs_dump_mem(" Received SecBlob ", security_blob, length); */
 >  
->  	// do mech specific authorization
-> +	oid = OID_KERBEROS5;
->  	switch (arg.sec) {
->  	case MS_KRB5:
-> +		oid = OID_KERBEROS5_OLD;
->  	case KRB5:
-> +		if (use_principal && have & DKD_HAVE_PRINCIPAL) {
-> +			rc = handle_krb5_mech(oid, arg.principal, &secblob, &sess_key, ccname);
-> +			if (!rc)
-> +				break;
+> @@ -661,6 +661,26 @@ decode_negTokenInit(unsigned char *security_blob, int length,
+>  	}
+>  	cFYI(1, "Need to call asn1_octets_decode() function for %s",
+>  		ctx.pointer);	/* is this UTF-8 or ASCII? */
+> +	if (asn1_octets_decode(&ctx, end, &principal, &princlen) == 0) {
+> +		cFYI(1, "Error decoding principal name exit10");
+> +		return 0;
+> +	} else if (princlen == 0) {
+> +		cFYI(1, "Empty principal name");
+> +	} else if (!strcmp(principal, "not_defined_in_RFC4178@please_ignore")) {
+> +		cFYI(1, "Ignoring principal name");
+> +	} else {
+> +		server->principal = kmalloc(princlen+1, GFP_ATOMIC);
+							^^^^^^^^^^
+					I don't think GFP_ATOMIC is really necessary here.
+
+> +		if (server->principal != NULL) {
+> +			memcpy(server->principal, principal, princlen);
+> +			server->principal[princlen] = '\0';
+> +			cFYI(1, "Got principal: %s", server->principal);
+> +		} else {
+> +			kfree(principal);
+> +			cFYI(1, "Error allocating memory exit 11");
+> +			return 0;
 > +		}
->  retry_new_hostname:
->  		/* for "cifs/" service name + terminating 0 */
->  		datalen = strlen(host) + 5 + 1;
-> @@ -885,11 +913,6 @@ retry_new_hostname:
->  			break;
->  		}
+> +	}
+> +	kfree(principal);
+>  decode_negtoken_exit:
+>  	return 1;
+>  }
+> diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
+> index 2272fd5..356a8a6 100644
+> --- a/fs/cifs/cifs_spnego.c
+> +++ b/fs/cifs/cifs_spnego.c
+> @@ -93,6 +93,9 @@ struct key_type cifs_spnego_key_type = {
+>  /* strlen of ";pid=0x" */
+>  #define PID_KEY_LEN		7
 >  
-> -		if (arg.sec == MS_KRB5)
-> -			oid = OID_KERBEROS5_OLD;
-> -		else
-> -			oid = OID_KERBEROS5;
-> -
-
-This delta and the change above it to move that into the switch would
-be more appropriate in a separate patch.
-
->  		/*
->  		 * try getting a cifs/ principal first and then fall back to
->  		 * getting a host/ principal if that doesn't work.
-> @@ -965,6 +988,7 @@ out:
->  	data_blob_free(&sess_key);
->  	SAFE_FREE(ccname);
->  	SAFE_FREE(arg.hostname);
-> +	SAFE_FREE(arg.principal);
->  	SAFE_FREE(arg.ip);
->  	SAFE_FREE(arg.username);
->  	SAFE_FREE(keydata);
-> diff --git a/cifs_spnego.h b/cifs_spnego.h
-> index f8753a7..d43f965 100644
-> --- a/cifs_spnego.h
-> +++ b/cifs_spnego.h
+> +/* strlen of ";pri=" */
+> +#define PRINC_KEY_LEN		5
+> +
+>  /* get a key struct with a SPNEGO security blob, suitable for session setup */
+>  struct key *
+>  cifs_get_spnego_key(struct cifs_ses *sesInfo)
+> @@ -109,6 +112,8 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+>  	   host=hostname sec=mechanism uid=0xFF user=username */
+>  	desc_len = MAX_VER_STR_LEN +
+>  		   HOST_KEY_LEN + strlen(hostname) +
+> +		   (server->principal ?
+> +			PRINC_KEY_LEN + strlen(server->principal) : 0) +
+>  		   IP_KEY_LEN + INET6_ADDRSTRLEN +
+>  		   MAX_MECH_STR_LEN +
+>  		   UID_KEY_LEN + (sizeof(uid_t) * 2) +
+> @@ -128,6 +133,11 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+>  		hostname);
+>  	dp = description + strlen(description);
+>  
+> +	if (server->principal) {
+> +		sprintf(dp, "pri=%s;", server->principal);
+> +		dp = description + strlen(description);
+> +	}
+> +
+>  	/* add the server address */
+>  	if (server->dstaddr.ss_family == AF_INET)
+>  		sprintf(dp, "ip4=%pI4", &sa->sin_addr);
+> diff --git a/fs/cifs/cifs_spnego.h b/fs/cifs/cifs_spnego.h
+> index 31bef9e..bae1877 100644
+> --- a/fs/cifs/cifs_spnego.h
+> +++ b/fs/cifs/cifs_spnego.h
 > @@ -23,7 +23,7 @@
 >  #ifndef _CIFS_SPNEGO_H
 >  #define _CIFS_SPNEGO_H
 >  
 > -#define CIFS_SPNEGO_UPCALL_VERSION 2
 > +#define CIFS_SPNEGO_UPCALL_VERSION 3
-
-I don't think we need to rev the upcall version for this. Adding a new
-field doesn't require us to change that.
-
 >  
+				^^^^^^^^
+	Again, no need to rev the upcall format.
+
 >  /*
 >   * The version field should always be set to CIFS_SPNEGO_UPCALL_VERSION.
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 95dad9d..86de4fb 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -238,6 +238,7 @@ struct TCP_Server_Info {
+>  	char server_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+>  	enum statusEnum tcpStatus; /* what we think the status is */
+>  	char *hostname; /* hostname portion of UNC string */
+> +	char *principal;
+>  	struct socket *ssocket;
+>  	struct sockaddr_storage dstaddr;
+>  	struct sockaddr_storage srcaddr; /* locally bind to this IP */
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index f4af4cc..6fdca9f 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -618,6 +618,8 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+>  	}
+>  
+>  	kfree(server->hostname);
+> +	if (server->principal != NULL)
+> +		kfree(server->principal);
+
+It's safe to kfree a NULL pointer.
+
+>  	kfree(server);
+>  
+>  	length = atomic_dec_return(&tcpSesAllocCount);
+> @@ -1780,6 +1782,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>  		rc = PTR_ERR(tcp_ses->hostname);
+>  		goto out_err_crypto_release;
+>  	}
+> +	tcp_ses->principal = NULL;
+>  
+>  	tcp_ses->noblocksnd = volume_info->noblocksnd;
+>  	tcp_ses->noautotune = volume_info->noautotune;
 
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
