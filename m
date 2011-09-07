@@ -1,68 +1,102 @@
-From: =?UTF-8?Q?Johannes_Thr=C3=A4n?= <johannes.thraen-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
-Subject: cifs doesn't resolve names in /etc/hosts, error message very confusing
-Date: Wed, 7 Sep 2011 19:37:17 +0200
-Message-ID: <CAFbNW2G+Hteyon=U7OMAy8Ugf_jpG5Kiot0SAYxXSsQ=-BpZgQ@mail.gmail.com>
+From: =?UTF-8?B?VGlsbCBEw7ZyZ2Vz?= <doerges-/hMagybUd5GoYr4blSSd5g@public.gmane.org>
+Subject: Problem mounting subdirs on NetApp
+Date: Wed, 07 Sep 2011 20:43:29 +0200
+Message-ID: <4E67BB51.2030401@pre-sense.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/mixed;
+ boundary="------------010502070708080208030104"
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi all,
+This is a multi-part message in MIME format.
+--------------010502070708080208030104
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Today I had to mount a windows share from a Win2k3 computer onto my
-kubuntu 11.xx.
+Hello, everyone,
 
-I tried the following
+I'm trying to use mount.cifs against a VFiler 3140 (running NetApp OnTap Release
+7.3.3P5).
 
-sudo mount -t cifs -o username=username //servername/share /mnt/test/
+Mounting shares directly works as expected. Mounting subdirs in a share does not, i.e.
 
-after I entered the password, it didn't work with the error message:
+  mount.cifs //server/share ...		is OK, but
+  mount.cifs //server/share/dir ...	fails.
 
-mount error(5): Input/output error
+I tested both an older cifs.ko (1.45) as well as a newer one (the one used in
+openSUSE 11.3, sorry, don't have the version no. handy).
 
-my /var/log/kern.log stated
+In both cases mount.cifs gives me "mount error 6", which translates to "No such
+device or address".
+But the directory definitely does exist (mounting the subdir with a WinXP client does
+work).
 
-Sep  7 18:36:08 zipfl kernel: [451267.341083] CIFS VFS: Unexpected SMB signature
-Sep  7 18:46:41 zipfl kernel: [451900.421030] CIFS VFS: cifs_mount
-failed w/return code = -5
+I'm attaching a PCAP trace to illustrate the problem (the directory name is 'import').
 
-After literally hours I tried the IP instead of the "servername" and it worked.
-My mistake was to put a "IP servername" entry in /etc/hosts and
-thought mount.cifs would understand this "servername" as ssh and
-everybody else does.
-(the fact that the syntax uses // instead of the windows \\ perhaps
-somehow took me in that direction, despite the manpage clearly states
-"UNC-name")
+Any hints would be appreciated.
 
-Ok, my fault, but:
+Thanks -- Till
+-- 
+Dipl.-Inform. Till Dörges                  doerges-/hMagybUd5GoYr4blSSd5g@public.gmane.org
+                                  Tel. +49 - 40 - 244 2407 - 14
+                                  Fax  +49 - 40 - 244 2407 - 24
+PRESENSE Technologies GmbH            Sachsenstr. 5, D-20097 HH
+                                         USt-IdNr.: DE263765024
+Geschäftsführer/Managing Directors       AG Hamburg, HRB 107844
+Till Dörges           Jürgen Sander              Axel Theilmann
 
-Cifs seems to recognize the name halfway (which is at least quirky)
-and confused me to kingdom come with inconsistent error messages:
+--------------010502070708080208030104
+Content-Type: application/octet-stream;
+ name="netapp-dir.pcap"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="netapp-dir.pcap"
 
- - when I give cifs a hostname which is neither a UNC-servername nor
-listed in /etc/hosts it tells me
-"mount error: could not resolve address for...", which is good.
-
-- when I give cifs a hostname, which is listed in /etc/hosts but
-doesn't refer to an existing UNC-servername it tells me
-"mount error(5): Input/output error", which is at least unclear (I
-thought the server might use a deprecated/buggy/unsupported
-smb-version)
-
-- even more confusing: when I give cifs a hostname, which is listed in
-/etc/hosts but doesn't refer to an existing UNC-servername AND supply
-a mistyped password it tells me
-
-"mount error(13) : Permission denied"
-
-,which is very misleading, because I think there's something wrong
-with my credentials AND makes me think the hostname gets resolved
-correctly whereas the opposite is the case.
-
-could you please make those things more clear. It would really have
-saved me at least 2 hours of googling and banging my head against the
-desk.
-
-Regards, Johannes
+1MOyoQIABAAAAAAAAAAAAP//AAABAAAArJBbTnMDDwB+AAAAfgAAAAAH63hPQgBQVoFHKAgA
+RQAAcA4aQABABpPoCjjD4wo4wDK+FgG94nRuXlhgIryAGAW0mOgAAAEBCAoConKAFpVz7wAA
+ADj/U01CcgAAAAAAAYAAAAAAAAAAAAAAAAAAANI4AAAXAAAVAAJOVCBMTSAwLjEyAAJQT1NJ
+WCAyAKyQW07nBA8ApwAAAKcAAAAAUFaBRygAB+t4T0IIAEUAAJmO40AAPwYT9go4wDIKOMPj
+Ab2+FlhgIrzidG6agBhEcDFyAAABAQgKFrUWxQKicoAAAABh/1NNQnIAAAAAmAGAAAAAAAAA
+AAAAAAAAAADSOAAAFwARAAADMgABAASBAAAAAAEAMpuvaP3TAADsmFSQTWbMAYj/CBwAMpuv
+aD4QJWNHAEwAQQBOAFQAXwBEAE8ATQAAAKyQW07+BA8AQgAAAEIAAAAAB+t4T0IAUFaBRygI
+AEUAADQOG0AAQAaUIwo4w+MKOMAyvhYBveJ0bppYYCMhgBAFtKmCAAABAQgKAqJygBa1FsWs
+kFtOyAYPAGABAABgAQAAAAfreE9CAFBWgUcoCABFAAFSDhxAAEAGkwQKOMPjCjjAMr4WAb3i
+dG6aWGAjIYAYBbSZygAAAQEICgKicoAWtRbFAAABGv9TTUJzAAAAAAAB0AAAAAAAAAAAAAAA
+AAAA0jgAABgADf8AAABYQDIAAAAAAAAAGAAYAAAAAADc0AAA3QC8w7vrQR6nK9SAdloWMy1q
+4e7qSQ8CDFC8w7vrQR6nK9SAdloWMy1q4e7qSQ8CDFAAcAByAG8AdgBhAGkAYQAAAEMASQBG
+AFMAXwBMAEkATgBVAFgAXwBEAE8ATQAAAEwAaQBuAHUAeAAgAHYAZQByAHMAaQBvAG4AIAAy
+AC4ANgAuADEANgAuADQANgAtADAALgAxADIALQBkAGUAZgBhAHUAbAB0AAAAQwBJAEYAUwAg
+AFYARgBTACAAQwBsAGkAZQBuAHQAIABmAG8AcgAgAEwAaQBuAHUAeAAAAKyQW05tCw8AzgAA
+AM4AAAAAUFaBRygAB+t4T0IIAEUAAMCP40AAPwYSzwo4wDIKOMPjAb2+FlhgIyHidG+4gBhE
+cMIwAAABAQgKFrUWxQKicoAAAACI/1NNQnMAAAAAmAGAAAAAAAAAAAAAAAAAAADSOAAIGAAD
+/wAAAAAAXwAAVwBpAG4AZABvAHcAcwAgADUALgAwAAAAVwBpAG4AZABvAHcAcwAgADIAMAAw
+ADAAIABMAEEATgAgAE0AYQBuAGEAZwBlAHIAAABHAEwAQQBOAFQAXwBEAE8ATQAAAKyQW05i
+DQ8AnAAAAJwAAAAAB+t4T0IAUFaBRygIAEUAAI4OHUAAQAaTxwo4w+MKOMAyvhYBveJ0b7hY
+YCOtgBgGwJkGAAABAQgKAqJygBa1FsUAAABW/1NNQnUAAAAAAAHQAAAAAAAAAAAAAAAAAADS
+OAAIGQAE/wAAAAgAAQArAABcAFwAbQBpAG8AegBhAGUAbgBcAHAAcgBvAHYAYQBpAGEAAAA/
+Pz8/PwCtkFtOLzMAAIQAAACEAAAAAFBWgUcoAAfreE9CCABFAAB2kONAAD8GEhkKOMAyCjjD
+4wG9vhZYYCOt4nRwEoAYRHD56QAAAQEICha1FsgConKAAAAAPv9TTUJ1AAAAAIgBgAAAAAAA
+AAAAAAAAAEAA0jgACBkAB/8AAAABAP8BHwAAAAAADQBBOgBOAFQARgBTAAAArZBbTkI0AACQ
+AAAAkAAAAAAH63hPQgBQVoFHKAgARQAAgg4eQABABpPSCjjD4wo4wDK+FgG94nRwElhgI++A
+GAbAmPoAAAEBCAoConKHFrUWyAAAAEr/U01CMgAAAAAAAcAAAAAAAAAAAAAAAABAANI4AAga
+AA8IAAAAAgCgDwAAAAAAAAAAAAAIAEIAAAAAAAEABQAJAAAHAQAAAAAAAK2QW04vNQAAzAAA
+AMwAAAAAUFaBRygAB+t4T0IIAEUAAL6R40AAPwYQ0Qo4wDIKOMPjAb2+FlhgI+/idHBggBhE
+cAfzAAABAQgKFrUWyAKicocAAACG/1NNQjIAAAAAiAGAAAAAAAAAAAAAAAAAQADSOAAIGgAK
+AgBKAAAAAgA4AAAASgA8AAAAAABPAJkAAHzMnt393yhQzAHekO1CHWbMATgsRPwcZswBOCxE
+/BxmzAEQAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAGAAAAAAEAAAAAAAACAAAAAACtkFtOfzkA
+AKoAAACqAAAAAAfreE9CAFBWgUcoCABFAACcDh9AAEAGk7cKOMPjCjjAMr4WAb3idHBgWGAk
+eYAYB8yZFAAAAQEICgKicocWtRbIAAAAZP9TTUJ1AAAAAAAB0AAAAAAAAAAAAAAAAAAA0jgA
+CBsABP8AAAAIAAEAOQAAXABcAG0AaQBvAHoAYQBlAG4ALwBwAHIAbwB2AGEAaQBhAFwAaQBt
+AHAAbwByAHQAAAA/Pz8/PwCtkFtOPjoAAGkAAABpAAAAAFBWgUcoAAfreE9CCABFAABbkuNA
+AD8GEDQKOMAyCjjD4wG9vhZYYCR54nRwyIAYRHD0/wAAAQEICha1FsgConKHAAAAI/9TTUJ1
+zAAAwIgBwAAAAAAAAAAAAAAAAAAA0jgAABsAAAAArZBbTvk+AACqAAAAqgAAAAAH63hPQgBQ
+VoFHKAgARQAAnA4gQABABpO2CjjD4wo4wDK+FgG94nRwyFhgJKCAGAfMmRQAAAEBCAoConKI
+FrUWyAAAAGT/U01CdQAAAAAAAdAAAAAAAAAAAAAAAAAAANI4AAgcAAT/AAAACAABADkAAFwA
+XABNAEkATwBaAEEARQBOAC8AUABSAE8AVgBBAEkAQQBcAEkATQBQAE8AUgBUAAAAPz8/Pz8A
+rZBbTsw/AABpAAAAaQAAAABQVoFHKAAH63hPQggARQAAW5PjQAA/Bg80CjjAMgo4w+MBvb4W
+WGAkoOJ0cTCAGERw828AAAEBCAoWtRbIAqJyiAAAACP/U01CdcwAAMCIAcAAAAAAAAAAAAAA
+AAAAANI4AAAcAAAAAK2QW07B2AAAQgAAAEIAAAAAB+t4T0IAUFaBRygIAEUAADQOIUAAQAaU
+HQo4w+MKOMAyvhYBveJ0cTBYYCTHgBAHzKMZAAABAQgKAqJykha1Fsg=
+--------------010502070708080208030104--
