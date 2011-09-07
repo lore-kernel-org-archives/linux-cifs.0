@@ -1,78 +1,68 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [RFC/PATCH] cifs.upcall: use kernel.provided principal name if
-	available
-Date: Wed, 7 Sep 2011 09:03:21 -0400
-Message-ID: <20110907090321.2196de8f@tlielax.poochiereds.net>
-References: <1315322512-10652-1-git-send-email-martin.wilck@ts.fujitsu.com>
-	<1315322794-10725-1-git-send-email-martin.wilck@ts.fujitsu.com>
-	<20110906121017.7ce0018b@tlielax.poochiereds.net>
-	<4E673D6F.90606@ts.fujitsu.com>
+From: =?UTF-8?Q?Johannes_Thr=C3=A4n?= <johannes.thraen-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
+Subject: cifs doesn't resolve names in /etc/hosts, error message very confusing
+Date: Wed, 7 Sep 2011 19:37:17 +0200
+Message-ID: <CAFbNW2G+Hteyon=U7OMAy8Ugf_jpG5Kiot0SAYxXSsQ=-BpZgQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	Martin Wilck <mwilck@arcor.de>
-To: Martin Wilck <martin.wilck@ts.fujitsu.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <4E673D6F.90606@ts.fujitsu.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 07 Sep 2011 11:46:23 +0200
-Martin Wilck <martin.wilck@ts.fujitsu.com> wrote:
+Hi all,
 
-> Hi Jeff,
-> 
-> thanks for reviewing this.
-> 
-> > I'm not opposed to adding this with appropriate warnings about the
-> > danger involved.
-> > 
-> > Trusting the SPN provided in the NEGOTIATE response waters down much of
-> > the security that Kerberos provides. Granted, cifs doesn't currently do
-> > mutual auth, but if it did, using this would make it pretty useless.
-> 
-> Please help me understand - is this functionality any different from
-> smbclient's? If yes, what do I need to change? If no, smbclient users
-> will suffer from the same security risk (I see that a mounted file
-> system is a higher risk than a process like smbclient).
-> 
-> Is there any way to do this more securely?
-> 
-> > It would probably be a good idea to clearly warn that an attacker can
-> > use this in order to trick the client into mounting a server of his
-> > choosing (providing he can redirect the traffic to that server too).
-> 
-> I'm will happily add a warning if you tell me where you'd like to have
-> it - in the man page, or in the kernel logs, or in the cifs.upcall log?
-> 
-> Regards
-> Martin
-> 
+Today I had to mount a windows share from a Win2k3 computer onto my
+kubuntu 11.xx.
 
-(re-cc'ing linux-cifs and cc'ing samba-technical)
+I tried the following
 
-We've discussed this on the list many times before, but the most
-comprehensive discussion is here. I recommend reading over that as it
-explains the problems in detail:
+sudo mount -t cifs -o username=username //servername/share /mnt/test/
 
-    http://lists.samba.org/archive/linux-cifs-client/2008-August/003348.html
+after I entered the password, it didn't work with the error message:
 
-Really, the best answer is not to rely on this. Windows clients never
-have, and recent windows servers don't even populate the field.
+mount error(5): Input/output error
 
-smbclient does, but support for that was added long ago. It should
-probably be removed as Andrew suggested in the above thread, or
-perhaps made conditional on a new smb.conf option that defaults to
-being off.
+my /var/log/kern.log stated
 
--- 
-Jeff Layton <jlayton@samba.org>
+Sep  7 18:36:08 zipfl kernel: [451267.341083] CIFS VFS: Unexpected SMB signature
+Sep  7 18:46:41 zipfl kernel: [451900.421030] CIFS VFS: cifs_mount
+failed w/return code = -5
+
+After literally hours I tried the IP instead of the "servername" and it worked.
+My mistake was to put a "IP servername" entry in /etc/hosts and
+thought mount.cifs would understand this "servername" as ssh and
+everybody else does.
+(the fact that the syntax uses // instead of the windows \\ perhaps
+somehow took me in that direction, despite the manpage clearly states
+"UNC-name")
+
+Ok, my fault, but:
+
+Cifs seems to recognize the name halfway (which is at least quirky)
+and confused me to kingdom come with inconsistent error messages:
+
+ - when I give cifs a hostname which is neither a UNC-servername nor
+listed in /etc/hosts it tells me
+"mount error: could not resolve address for...", which is good.
+
+- when I give cifs a hostname, which is listed in /etc/hosts but
+doesn't refer to an existing UNC-servername it tells me
+"mount error(5): Input/output error", which is at least unclear (I
+thought the server might use a deprecated/buggy/unsupported
+smb-version)
+
+- even more confusing: when I give cifs a hostname, which is listed in
+/etc/hosts but doesn't refer to an existing UNC-servername AND supply
+a mistyped password it tells me
+
+"mount error(13) : Permission denied"
+
+,which is very misleading, because I think there's something wrong
+with my credentials AND makes me think the hostname gets resolved
+correctly whereas the opposite is the case.
+
+could you please make those things more clear. It would really have
+saved me at least 2 hours of googling and banging my head against the
+desk.
+
+Regards, Johannes
