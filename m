@@ -1,7 +1,7 @@
 From: "Mrs. Tessy Brown" <info-XEI106e0wwk@public.gmane.org>
 Subject: Win $500,000 in Coca Cola Company @West Africa end of year promo
-Date: Sun, 11 Sep 2011 01:59:37 +1000
-Message-ID: <201109101559.p8AFxblS011729@mail07.syd.optusnet.com.au>
+Date: Sun, 11 Sep 2011 02:04:35 +1000
+Message-ID: <201109101604.p8AG4ZGs024034@mail02.syd.optusnet.com.au>
 Reply-To: frankmorris10-DaQTI0RpDDMAvxtiuMwx3w@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain
