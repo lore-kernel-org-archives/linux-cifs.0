@@ -1,19 +1,14 @@
-From: Martin Wilck <martin.wilck@ts.fujitsu.com>
-Subject: Re: [RFC/PATCH] cifs.upcall: use kernel.provided principal name if
-	available
-Date: Mon, 12 Sep 2011 11:01:58 +0200
-Message-ID: <4E6DCA86.8020707@ts.fujitsu.com>
-References: <1315322512-10652-1-git-send-email-martin.wilck@ts.fujitsu.com>	<1315322794-10725-1-git-send-email-martin.wilck@ts.fujitsu.com>	<20110906121017.7ce0018b@tlielax.poochiereds.net>	<4E673D6F.90606@ts.fujitsu.com>	<20110907090321.2196de8f@tlielax.poochiereds.net>	<1315431768.22110.4.camel@obed>	<4E686D69.9090503@ts.fujitsu.com>	<1315467589.22110.55.camel@obed>	<4E68BACD.2020403@ts.fujitsu.com>	<1315486914.541.14.camel@obed>	<4E68BF73.2090707@ts.fujitsu.com>	<1315488187.541.16.camel@obed>	<4E68EEAE.2090102@ts.fujitsu.com>
-	<20110909093736.082f0ea4@corrin.poochiereds.net>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: Intermittent file corruption problems with cifs driver?
+Date: Mon, 12 Sep 2011 07:27:36 -0500
+Message-ID: <CAH2r5msrRGT+aMZw8shNRNzbQqfGo8Ba2RHBhUtXznNRvRyykQ@mail.gmail.com>
+References: <20110912083654.GA3338@cobija.connexer.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-	Martin Wilck <mwilck@arcor.de>, Andrew Bartlett <abartlet@samba.org>
-To: Jeff Layton <jlayton@samba.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+To: sean finney <seanius@seanius.net>
 Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20110909093736.082f0ea4@corrin.poochiereds.net>
+In-Reply-To: <20110912083654.GA3338@cobija.connexer.com>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
 	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
 List-Archive: <http://lists.samba.org/pipermail/samba-technical>
@@ -25,34 +20,133 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
-> For the record, I'm not 100% opposed to adding something like this as a
-> workaround. What would probably be better would be a way for someone to
-> specify the SPN in the mount options. The kernel could then pass that
-> to the upcall and we wouldn't need to trust this string from the
-> server. Admins would of course need to know what SPN to put in there
-> however. Something like:
-> 
->     -o spn=cifs/otherhostname.example.com
+On Mon, Sep 12, 2011 at 3:36 AM, sean finney <seanius@seanius.net> wrote:
 
-Sounds good. In our AD environment, an admin can do
+> Hi all,
+>
+> Recently at $customer I've been tasked into looking into a problem they
+> are intermittently having with corrupt file transfers from linux servers
+> to a windows share.
+>
+> Little info on the servers:
+>
+>        Ubuntu Lucid 10.04
+>        Stock and up to date Linux 2.6.32-33-server distro package
+>        Stock cifs-utils 4.5-2 packages
+>
+> Description of behavior:
+>
+>        The servers are all part of a distributed service where each server
+>        regularly uploads 100-200MB zipfiles to the windows share.
+>  Intermittently
+>        the resulting files will be corrupted.  On the client that performs
+>        the upload, the corrupted file will appear to have the correct
+> checksum,
+>        but any other remote client will see it as corrupted.
+>
+>        The problem used to be much more frequent, and mounting with -o
+> directio
+>        seems to have greatly reduced, but not eliminated, the recurrence of
+> the
+>        corruption.  But recently (perhaps due to higher reates of
+> uploads?),
+>        the problem has started recurring.  It doesn't seem uniformly
+> occuring,
+>        but rather in spurts where a couple files will be corrupted in one
+> day,
+>        and then a week will go by with no corruptions.
+>
+>        I do see occasional errors in the kernel logs, though I'm not sure
+> if
+>        they are relevant or not (note that they're at substantially
+> different
+>        times, and at present I have no way to correlate them with
+> corruption,
+>        though I'm working on that):
+>
+>        [170873.721023]  CIFS VFS: Error -104 sending data on socket to
+> server
+>        [170873.728747]  CIFS VFS: Error -32 sending data on socket to
+> server
+>        [515039.940104]  CIFS VFS: No response to cmd 115 mid 32714
+>        [515039.947933]  CIFS VFS: Send error in SessSetup = -11
+>        [521901.595381]  CIFS VFS: No response to cmd 46 mid 37426
+>        [521901.603422]  CIFS VFS: Send error in read = -11
+>        [2097744.571138]  CIFS VFS: No response for cmd 50 mid 48502
+>        [2097849.771138]  CIFS VFS: No response for cmd 114 mid 48519
+>
 
-ldapsearch "(cn=$COMPUTERNAME)" serviceprincipalname
 
-to get the supported principal name(s).
+With log entries like the above, the probability of having a file fail to
+copy
+is high (although I would expect it more with command 47 (SMB WriteAndX,
+but presumably if you get an error reading (command 46) you will
+also have the copy fail - depending on how the application handles
+such errors).
 
-Martin
+The reconnection/retry behavior is much better in more current cifs,
+especially when servers are sometimes very slow (as we saw
+in clustered servers during occassional operations when cluster
+overhead could cause > 15 second delays).   If the server
+is taking greater than 15 seconds or so from time to time
+(or as we see here with rc 104, if the server
+or network randomly drops the connection), I would expect
+big improvements in 2.6.39 or later (or equivalent
+backport as some of the distros have done).
+
+Disabling unix extensions (mount option "nounix") is
+only going to make a difference to Samba and similar servers,
+but I would not expect it to have an effect on this problem.
+mounting "forcedirectio" could have an effect though as it
+1) changes i/o sizes to more closely match the application
+(since the cache is not being used)
+2) allows the application to get errors on writes more
+quickly (since some applications forget to check errors
+on fsync or close, and expect write errors on the actual write)
+
+
+>
+>
+> Reading through the archives along with the rest of teh internetz I've
+> found
+> very little info.  Someone posted here back in february about a similar
+> sounding problem, though I do not see the wsize-len blocks of NULL bytes in
+> the resulting files like they did.
+>
+> I've written a small python script that right now is running on a pair of
+> these servers, which with a couple dozen threads is uploading similarly
+> sized
+> files of arbitrary data, and comparing the upload results of each other.
+> after a few hours I haven't seen it yet, but will keep it runnign for
+> a couple days to see if it shows up.
+>
+> I've also found a couple suggestions out there to "disable linux
+> extensions" and "disable oplocks" when searching on the above kernel error
+> messages, but am hesitant to try them unless there's a strong indication
+> that they will help, and i'm not entirely sure if/whether they will.
+>
+>
+> does this ring a bell with anyone?  at this point i can't just do a
+> blanket "try the latest" upgrade of these servers because they're part
+> of a production application, at least without any further indication that
+> there was a fix for this problem between the current and latest versions.
+> If I can repro the problem, however, and can then take it to a non-prod
+> machine, then I might have a bit more flexibility, but in the meantime
+> thought I'd field the question here on the off chance...
+>
+>
+> thanks!
+>        sean
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+
+
 
 -- 
-Dr. Martin Wilck
-PRIMERGY System Software Engineer
-x86 Server Engineering
+Thanks,
 
-FUJITSU
-Fujitsu Technology Solutions GmbH
-Heinz-Nixdorf-Ring 1
-33106 Paderborn, Germany
-Phone:			++49 5251 525 2796
-Fax:			++49 5251 525 2820
-Email:			martin.wilck@ts.fujitsu.com
-Internet:		http://ts.fujitsu.com
-Company Details:	http://ts.fujitsu.com/imprint
+Steve
