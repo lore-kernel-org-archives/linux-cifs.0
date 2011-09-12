@@ -1,51 +1,82 @@
-From: Webmail Support =?iso-8859-1?b?VGVhba4=?= <ncrotti-qsRmATsD1lge1nWFKniW7A@public.gmane.org>
-Subject: Dear webmail User
-Date: Sat, 10 Sep 2011 15:52:43 -0300
-Message-ID: <20110910155243.iuo6r6x9mok8sccw__30952.8580088683$1315681853$gmane$org@webmail.criba.edu.ar>
-Reply-To: noreply-2RFepEojUI1BDgjK7y7TUQ@public.gmane.org
+From: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+Subject: Intermittent file corruption problems with cifs driver?
+Date: Mon, 12 Sep 2011 10:36:55 +0200
+Message-ID: <20110912083654.GA3338@cobija.connexer.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1;
-	DelSp=Yes	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Dear webmail User:
+Hi all,
 
-An HTK4S virus has been detected in your webmail account folders =20
-because your email has
-exceeded its storage limits which is 20GB as set by administrator you =20
-may no longer be able to received some 101kb mails.
-Your Webmail account therefore requires verification for continuous =20
-activity or you may not be able to send or receive new mail.
-your Webmail account has to be upgraded to our new F-Secure R HTK4S =20
-anti-virus/anti-Spam version =AE2011 to prevent damage to our mail log =
-=20
-and your important files.
-You are required to do this before the next 24 hours of receipt of =20
-this email or your info will be erased and De-activated from our =20
-database.
-fill the form on this link below
+Recently at $customer I've been tasked into looking into a problem they
+are intermittently having with corrupt file transfers from linux servers
+to a windows share.  
+
+Little info on the servers:
+
+	Ubuntu Lucid 10.04
+	Stock and up to date Linux 2.6.32-33-server distro package
+	Stock cifs-utils 4.5-2 packages
+
+Description of behavior:
+
+	The servers are all part of a distributed service where each server
+	regularly uploads 100-200MB zipfiles to the windows share.  Intermittently
+	the resulting files will be corrupted.  On the client that performs
+	the upload, the corrupted file will appear to have the correct checksum,
+	but any other remote client will see it as corrupted.
+
+	The problem used to be much more frequent, and mounting with -o directio
+	seems to have greatly reduced, but not eliminated, the recurrence of the
+	corruption.  But recently (perhaps due to higher reates of uploads?),
+	the problem has started recurring.  It doesn't seem uniformly occuring,
+	but rather in spurts where a couple files will be corrupted in one day,
+	and then a week will go by with no corruptions.
+
+	I do see occasional errors in the kernel logs, though I'm not sure if
+	they are relevant or not (note that they're at substantially different
+	times, and at present I have no way to correlate them with corruption,
+	though I'm working on that):
+
+	[170873.721023]  CIFS VFS: Error -104 sending data on socket to server
+	[170873.728747]  CIFS VFS: Error -32 sending data on socket to server
+	[515039.940104]  CIFS VFS: No response to cmd 115 mid 32714
+	[515039.947933]  CIFS VFS: Send error in SessSetup = -11
+	[521901.595381]  CIFS VFS: No response to cmd 46 mid 37426
+	[521901.603422]  CIFS VFS: Send error in read = -11
+	[2097744.571138]  CIFS VFS: No response for cmd 50 mid 48502
+	[2097849.771138]  CIFS VFS: No response for cmd 114 mid 48519
 
 
-   Click:   =20
-http://www.123contactform.com/contact-form-supportcentre-216780.html
+Reading through the archives along with the rest of teh internetz I've found 
+very little info.  Someone posted here back in february about a similar
+sounding problem, though I do not see the wsize-len blocks of NULL bytes in
+the resulting files like they did.
 
-We apologies for the inconvenience that this will cause you during =20
-this period.
+I've written a small python script that right now is running on a pair of
+these servers, which with a couple dozen threads is uploading similarly sized
+files of arbitrary data, and comparing the upload results of each other.
+after a few hours I haven't seen it yet, but will keep it runnign for
+a couple days to see if it shows up.
 
-Thank you,
-
-Office of the Chief Information Officer
-IT Service Desk
-Phone: (614) 684-HELP (4357)
-TDD: (614) 684-8743
-E-mail: support-team-2RFepEojUI1BDgjK7y7TUQ@public.gmane.org
-=A9 Copyright 2011
+I've also found a couple suggestions out there to "disable linux
+extensions" and "disable oplocks" when searching on the above kernel error
+messages, but am hesitant to try them unless there's a strong indication
+that they will help, and i'm not entirely sure if/whether they will.
 
 
-----------------------------------------------------------------
-This message was sent using IMP, the Internet Messaging Program.
+does this ring a bell with anyone?  at this point i can't just do a
+blanket "try the latest" upgrade of these servers because they're part
+of a production application, at least without any further indication that
+there was a fix for this problem between the current and latest versions.
+If I can repro the problem, however, and can then take it to a non-prod
+machine, then I might have a bit more flexibility, but in the meantime
+thought I'd field the question here on the off chance...
+
+
+thanks!
+	sean
