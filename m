@@ -1,58 +1,35 @@
-From: Martin Wilck <martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org>
-Subject: Re: [RFC/PATCH] cifs.upcall: use kernel.provided principal name if
- available
-Date: Tue, 13 Sep 2011 13:01:21 +0200
-Message-ID: <4E6F3801.7060900@ts.fujitsu.com>
-References: <1315322512-10652-1-git-send-email-martin.wilck@ts.fujitsu.com>		<1315322794-10725-1-git-send-email-martin.wilck@ts.fujitsu.com>		<20110906121017.7ce0018b@tlielax.poochiereds.net>		<4E673D6F.90606@ts.fujitsu.com>		<20110907090321.2196de8f@tlielax.poochiereds.net>		<1315431768.22110.4.camel@obed>	<4E686D69.9090503@ts.fujitsu.com>		<1315467589.22110.55.camel@obed>	<4E68BACD.2020403@ts.fujitsu.com>		<1315486914.541.14.camel@obed>	<4E68BF73.2090707@ts.fujitsu.com>		<1315488187.541.16.camel@obed>	<4E68EEAE.2090102@ts.fujitsu.com>	 <20110909093736.082f0ea4@corrin.poochiereds.net>	 <4E6DCA86.8020707@ts.fujitsu.com> <1315869795.19788.53.camel@ruth>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	Martin Wilck <mwilck-KvP5wT2u2U0@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] manpage: document new rsize= behavior
+Date: Tue, 13 Sep 2011 10:08:59 -0400
+Message-ID: <1315922939-19672-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1315869795.19788.53.camel@ruth>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 09/13/2011 01:23 AM, Andrew Bartlett wrote:
+With the addition of async readpages in 3.2 kernels, the behavior of
+the rsize= option has changed.
 
-> If they know the computer name, why don't they connect to it as
-> $COMPUTERNAME?  That's how this is meant to work - the DNS or netbios
-> name the user resolves for the connection to is either the cn,
-> dnsHostname or in the servicePrincipalNames of the record.  
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-As I said earlier, that's what the Win clients do, and when it fails,
-they fall back to NTLM which won't bother with SPNs. The user never gets
-to know the difference.
-
-> If your users are connecting to names not in that list, why not just add
-> them to the servicePrincipalNames list?  We really should not be adding
-> more and more hacks around this area, they will only bite us later.
-
-I have requested that from our sysadmin.
-
-When I first discovered that Win clients could connect to the service in
-question while the Linux cifs client couldn't, I suspected a problem
-with the cifs client (especially because smbclient was able to connect
-with kerberos, too). I do understand now that this conclusion was wrong.
-
-Regards
-Martin
-
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index 64a8b64..ff505e1 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -414,9 +414,9 @@ nouser_xattr
+ (default) Do not allow getfattr/setfattr to get/set xattrs, even if server would support it otherwise\&.
+ .RE
+ .PP
+-rsize=\fIarg\fR
++rsize=\fIbytes\fR
+ .RS 4
+-default network read size (usually 16K)\&. The client currently can not use rsize larger than CIFSMaxBufSize\&. CIFSMaxBufSize defaults to 16K and may be changed (from 8K to the maximum kmalloc size allowed by your kernel) at module install time for cifs\&.ko\&. Setting CIFSMaxBufSize to a very large value will cause cifs to use more memory and may reduce performance in some cases\&. To use rsize greater than 127K (the original cifs protocol maximum) also requires that the server support a new Unix Capability flag (for very large read) which some newer servers (e\&.g\&. Samba 3\&.0\&.26 or later) do\&. rsize can be set from a minimum of 2048 to a maximum of 130048 (127K or CIFSMaxBufSize, whichever is smaller)
++Maximum amount of data that the kernel will request in a read request in bytes. Prior to kernel 3.2.0, the default was 16k, and the maximum size was limited by the CIFSMaxBufSize module parameter. As of kernel 3.2.0, the behavior varies according to whether POSIX extensions are enabled on the mount and the server supports large POSIX reads. If they are, then the default is 1M, and the maxmimum is 16M. If they are not supported by the server, then the default is 60k and the maximum is around 127k. The reason for the 60k is because it's the maximum size read that windows servers can fill. Note that this value is a maximum, and the client may settle on a smaller size to accomodate what the server supports. In kernels prior to 3.2.0, no negotiation is performed.
+ .RE
+ .PP
+ wsize=\fIbytes\fR
 -- 
-Dr. Martin Wilck
-PRIMERGY System Software Engineer
-x86 Server Engineering
-
-FUJITSU
-Fujitsu Technology Solutions GmbH
-Heinz-Nixdorf-Ring 1
-33106 Paderborn, Germany
-Phone:			++49 5251 525 2796
-Fax:			++49 5251 525 2820
-Email:			martin.wilck-RJz4owOZxyXQFUHtdCDX3A@public.gmane.org
-Internet:		http://ts.fujitsu.com
-Company Details:	http://ts.fujitsu.com/imprint
+1.7.6
