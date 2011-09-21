@@ -1,330 +1,678 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Assume passwords are encoded according to iocharset
-Date: Wed, 21 Sep 2011 11:12:15 -0500
-Message-ID: <CADT32eLX5i8a0ONHkFNvKyY852BRFRsfu_uQh7=RvUPO8TauXg@mail.gmail.com>
-References: <20110327125648.GA3621@osk.mine.nu>
-	<20110408093148.748eda25@corrin.poochiereds.net>
-	<20110408141112.GA20074@osk.mine.nu>
-	<20110408103118.0f1b2e8b@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs: Add mount options for backup intent [try #2]
+Date: Wed, 21 Sep 2011 12:16:53 -0400
+Message-ID: <20110921121653.4b5fdef5@tlielax.poochiereds.net>
+References: <1316543210-12069-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20110921074345.5d007d2c@corrin.poochiereds.net>
+	<CADT32eL6EKoVeU9513bLG4p2bdYfcm3o1Lkg-i8vX=bd-X2f-Q@mail.gmail.com>
+	<20110921084347.13f7c140@corrin.poochiereds.net>
+	<CADT32eJyMxfwPG5w9EMfo0hdrF6mUKtXm_F9WNnkk9wmLSAR8A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	nimbus1_03087-/E1597aS9LQAvxtiuMwx3w@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110408103118.0f1b2e8b-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <CADT32eJyMxfwPG5w9EMfo0hdrF6mUKtXm_F9WNnkk9wmLSAR8A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Apr 8, 2011 at 9:31 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Fri, 8 Apr 2011 16:11:12 +0200
-> Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org> wrote:
->
->> On Friday, April 08, 2011 at 09:48, Jeff Layton wrote:
->> > On Sun, 27 Mar 2011 14:56:48 +0200
->> > Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org> wrote:
->> >
->> > > Modify cifs to assume that the supplied password is encoded acco=
-rding to
->> > > iocharset. =A0Before this patch passwords would be treated as ra=
-w 8-bit data,
->> > > which made authentication with Unicode passwords impossible (at =
-least
->> > > passwords with characters > 0xFF).
->> > >
->> > > The previous code would as a side effect accept passwords encode=
-d with ISO
->> > > 8859-1, since Unicode < 0x100 basically is ISO 8859-1. =A0Softwa=
-re which
->> > > relies on that will no longer support password chars > 0x7F unle=
-ss it also
->> > > uses iocharset=3Diso8859-1. =A0(mount.cifs does not care about t=
-he encoding so
->> > > it will work as expected.)
->> > >
->> > > Signed-off-by: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
->> > > ---
->> > > =A0fs/cifs/cifsencrypt.c | =A0 =A08 +++---
->> > > =A0fs/cifs/cifsproto.h =A0 | =A0 =A08 ++++--
->> > > =A0fs/cifs/connect.c =A0 =A0 | =A0 =A02 +-
->> > > =A0fs/cifs/sess.c =A0 =A0 =A0 =A0| =A0 =A02 +-
->> > > =A0fs/cifs/smbencrypt.c =A0| =A0 60 +++++++++-------------------=
----------------------
->> > > =A05 files changed, 22 insertions(+), 58 deletions(-)
->> > >
->> > > diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
->> > > index 5bb4b09..3c1306d 100644
->> > > --- a/fs/cifs/cifsencrypt.c
->> > > +++ b/fs/cifs/cifsencrypt.c
->> > > @@ -226,7 +226,7 @@ int cifs_verify_signature(struct smb_hdr *ci=
-fs_pdu,
->> > > =A0}
->> > >
->> > > =A0/* first calculate 24 bytes ntlm response and then 16 byte se=
-ssion key */
->> > > -int setup_ntlm_response(struct cifs_ses *ses)
->> > > +int setup_ntlm_response(struct cifs_ses *ses, const struct nls_=
-table *nls_cp)
->> > > =A0{
->> > > =A0 int rc =3D 0;
->> > > =A0 unsigned int temp_len =3D CIFS_SESS_KEY_SIZE + CIFS_AUTH_RES=
-P_SIZE;
->> > > @@ -243,14 +243,14 @@ int setup_ntlm_response(struct cifs_ses *s=
-es)
->> > > =A0 ses->auth_key.len =3D temp_len;
->> > >
->> > > =A0 rc =3D SMBNTencrypt(ses->password, ses->server->cryptkey,
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->auth_key.response + CIFS_=
-SESS_KEY_SIZE);
->> > > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ses->auth_key.response + CIFS_=
-SESS_KEY_SIZE, nls_cp);
->> > > =A0 if (rc) {
->> > > =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s Can't generate NTLM response, er=
-ror: %d",
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func__, rc);
->> > > =A0 =A0 =A0 =A0 =A0 return rc;
->> > > =A0 }
->> > >
->> > > - rc =3D E_md4hash(ses->password, temp_key);
->> > > + rc =3D E_md4hash(ses->password, temp_key, nls_cp);
->> > > =A0 if (rc) {
->> > > =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s Can't generate NT hash, error: %=
-d", __func__, rc);
->> > > =A0 =A0 =A0 =A0 =A0 return rc;
->> > > @@ -458,7 +458,7 @@ static int calc_ntlmv2_hash(struct cifs_ses =
-*ses, char *ntlmv2_hash,
->> > > =A0 }
->> > >
->> > > =A0 /* calculate md4 hash of password */
->> > > - E_md4hash(ses->password, nt_hash);
->> > > + E_md4hash(ses->password, nt_hash, nls_cp);
->> > >
->> > > =A0 crypto_shash_setkey(ses->server->secmech.hmacmd5, nt_hash,
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_NTHASH_=
-SIZE);
->> > > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->> > > index e42dc82..fd6d873 100644
->> > > --- a/fs/cifs/cifsproto.h
->> > > +++ b/fs/cifs/cifsproto.h
->> > > @@ -376,8 +376,9 @@ extern int cifs_sign_smb2(struct kvec *iov, =
-int n_vec, struct TCP_Server_Info *,
->> > > =A0extern int cifs_verify_signature(struct smb_hdr *,
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct TC=
-P_Server_Info *server,
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u32 expect=
-ed_sequence_number);
->> > > -extern int SMBNTencrypt(unsigned char *, unsigned char *, unsig=
-ned char *);
->> > > -extern int setup_ntlm_response(struct cifs_ses *);
->> > > +extern int SMBNTencrypt(unsigned char *, unsigned char *, unsig=
-ned char *,
->> > > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const struct nls_table *);
->> > > +extern int setup_ntlm_response(struct cifs_ses *, const struct =
-nls_table *);
->> > > =A0extern int setup_ntlmv2_rsp(struct cifs_ses *, const struct n=
-ls_table *);
->> > > =A0extern int cifs_crypto_shash_allocate(struct TCP_Server_Info =
-*);
->> > > =A0extern void cifs_crypto_shash_release(struct TCP_Server_Info =
-*);
->> > > @@ -429,7 +430,8 @@ extern int CIFSCheckMFSymlink(struct cifs_fa=
-ttr *fattr,
->> > > =A0 =A0 =A0 =A0 =A0 const unsigned char *path,
->> > > =A0 =A0 =A0 =A0 =A0 struct cifs_sb_info *cifs_sb, int xid);
->> > > =A0extern int mdfour(unsigned char *, unsigned char *, int);
->> > > -extern int E_md4hash(const unsigned char *passwd, unsigned char=
- *p16);
->> > > +extern int E_md4hash(const unsigned char *passwd, unsigned char=
- *p16,
->> > > + =A0 =A0 =A0 =A0 =A0 =A0 =A0const struct nls_table *codepage);
->> > > =A0extern int SMBencrypt(unsigned char *passwd, const unsigned c=
-har *c8,
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned char *p24);
->> > > =A0#endif =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* _CIFSPROTO_H */
->> > > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> > > index 96544a4..3c0190f 100644
->> > > --- a/fs/cifs/connect.c
->> > > +++ b/fs/cifs/connect.c
->> > > @@ -3060,7 +3060,7 @@ CIFSTCon(unsigned int xid, struct cifs_ses=
- *ses,
->> > > =A0 =A0 =A0 =A0 =A0 else
->> > > =A0#endif /* CIFS_WEAK_PW_HASH */
->> > > =A0 =A0 =A0 =A0 =A0 rc =3D SMBNTencrypt(tcon->password, ses->ser=
-ver->cryptkey,
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- bcc_ptr);
->> > > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- bcc_ptr, nls_codepage);
->> > >
->> > > =A0 =A0 =A0 =A0 =A0 bcc_ptr +=3D CIFS_AUTH_RESP_SIZE;
->> > > =A0 =A0 =A0 =A0 =A0 if (ses->capabilities & CAP_UNICODE) {
->> > > diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
->> > > index 6b140e1..17ae0db 100644
->> > > --- a/fs/cifs/sess.c
->> > > +++ b/fs/cifs/sess.c
->> > > @@ -694,7 +694,7 @@ ssetup_ntlmssp_authenticate:
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cpu_to_le16(CIFS_AUTH_RESP_S=
-IZE);
->> > >
->> > > =A0 =A0 =A0 =A0 =A0 /* calculate ntlm response and session key *=
-/
->> > > - =A0 =A0 =A0 =A0 rc =3D setup_ntlm_response(ses);
->> > > + =A0 =A0 =A0 =A0 rc =3D setup_ntlm_response(ses, nls_cp);
->> > > =A0 =A0 =A0 =A0 =A0 if (rc) {
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "Error %d during N=
-TLM authentication", rc);
->> > > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto ssetup_exit;
->> > > diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
->> > > index 1525d5e..92291c1 100644
->> > > --- a/fs/cifs/smbencrypt.c
->> > > +++ b/fs/cifs/smbencrypt.c
->> > > @@ -195,46 +195,13 @@ SMBencrypt(unsigned char *passwd, const un=
-signed char *c8, unsigned char *p24)
->> > > =A0 return rc;
->> > > =A0}
->> > >
->> > > -/* Routines for Windows NT MD4 Hash functions. */
->> > > -static int
->> > > -_my_wcslen(__u16 *str)
->> > > -{
->> > > - int len =3D 0;
->> > > - while (*str++ !=3D 0)
->> > > - =A0 =A0 =A0 =A0 len++;
->> > > - return len;
->> > > -}
->> > > -
->> > > -/*
->> > > - * Convert a string into an NT UNICODE string.
->> > > - * Note that regardless of processor type
->> > > - * this must be in intel (little-endian)
->> > > - * format.
->> > > - */
->> > > -
->> > > -static int
->> > > -_my_mbstowcs(__u16 *dst, const unsigned char *src, int len)
->> > > -{ =A0 =A0 =A0 =A0/* BB not a very good conversion routine - cha=
-nge/fix */
->> > > - int i;
->> > > - __u16 val;
->> > > -
->> > > - for (i =3D 0; i < len; i++) {
->> > > - =A0 =A0 =A0 =A0 val =3D *src;
->> > > - =A0 =A0 =A0 =A0 SSVAL(dst, 0, val);
->> > > - =A0 =A0 =A0 =A0 dst++;
->> > > - =A0 =A0 =A0 =A0 src++;
->> > > - =A0 =A0 =A0 =A0 if (val =3D=3D 0)
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> > > - }
->> > > - return i;
->> > > -}
->> > > -
->> > > =A0/*
->> > > =A0 * Creates the MD4 Hash of the users password in NT UNICODE.
->> > > =A0 */
->> > >
->> > > =A0int
->> > > -E_md4hash(const unsigned char *passwd, unsigned char *p16)
->> > > +E_md4hash(const unsigned char *passwd, unsigned char *p16,
->> > > + =A0 const struct nls_table *codepage)
->> > > =A0{
->> > > =A0 int rc;
->> > > =A0 int len;
->> > > @@ -242,20 +209,14 @@ E_md4hash(const unsigned char *passwd, uns=
-igned char *p16)
->> > >
->> > > =A0 /* Password cannot be longer than 128 characters */
->> > > =A0 if (passwd) {
->> > > - =A0 =A0 =A0 =A0 len =3D strlen((char *) passwd);
->> > > - =A0 =A0 =A0 =A0 if (len > 128)
->> > > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D 128;
->> > > -
->> > > =A0 =A0 =A0 =A0 =A0 /* Password must be converted to NT unicode =
-*/
->> > > - =A0 =A0 =A0 =A0 _my_mbstowcs(wpwd, passwd, len);
->> > > - } else
->> > > + =A0 =A0 =A0 =A0 len =3D cifs_strtoUCS(wpwd, passwd, 128, codep=
-age);
->> > > + } else {
->> > > =A0 =A0 =A0 =A0 =A0 len =3D 0;
->> > > + =A0 =A0 =A0 =A0 *wpwd =3D 0; /* Ensure string is null terminat=
-ed */
->> > > + }
->> > >
->> > > - wpwd[len] =3D 0; =A0/* Ensure string is null terminated */
->> > > - /* Calculate length in bytes */
->> > > - len =3D _my_wcslen(wpwd) * sizeof(__u16);
->> > > -
->> > > - rc =3D mdfour(p16, (unsigned char *) wpwd, len);
->> > > + rc =3D mdfour(p16, (unsigned char *) wpwd, len * sizeof(__u16)=
-);
->> > > =A0 memset(wpwd, 0, 129 * 2);
->> > >
->> > > =A0 return rc;
->> > > @@ -275,7 +236,7 @@ nt_lm_owf_gen(char *pwd, unsigned char nt_p1=
-6[16], unsigned char p16[16])
->> > > =A0 =A0 =A0 =A0 =A0 memcpy(passwd, pwd, 512);
->> > > =A0 /* Calculate the MD4 hash (NT compatible) of the password */
->> > > =A0 memset(nt_p16, '\0', 16);
->> > > - E_md4hash(passwd, nt_p16);
->> > > + E_md4hash(passwd, nt_p16, /* put nls codepage here */);
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ^^^^^^^^^^^^^
->> > =A0 =A0 =A0 =A0 =A0 =A0 Won't this fail to compile?
->>
->> Yes, but it's inside a function which is commented out and not compi=
-led. Instead
->> of adding an extra parameter to the function (which would be require=
-d) I
->> decided just to put a reminder there if that function is ever used i=
-n the
->> future.
->>
->> #if 0 /* currently unused */
->> /* Does both the NT and LM owfs of a user's password */
->> static void
->> nt_lm_owf_gen(char *pwd, unsigned char nt_p16[16], unsigned char p16=
-[16])
->> {
->> =A0 =A0 =A0 =A0 char passwd[514];
->>
->> =A0 =A0 =A0 =A0 memset(passwd, '\0', 514);
->> =A0 =A0 =A0 =A0 if (strlen(pwd) < 513)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strcpy(passwd, pwd);
->> =A0 =A0 =A0 =A0 else
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memcpy(passwd, pwd, 512);
->> =A0 =A0 =A0 =A0 /* Calculate the MD4 hash (NT compatible) of the pas=
-sword */
->> =A0 =A0 =A0 =A0 memset(nt_p16, '\0', 16);
->> =A0 =A0 =A0 =A0 E_md4hash(passwd, nt_p16, /* put nls codepage here *=
-/);
->>
->> =A0 =A0 =A0 =A0 /* Mangle the passwords into Lanman format */
->> =A0 =A0 =A0 =A0 passwd[14] =3D '\0';
->> /* =A0 =A0 =A0strupper(passwd); */
->>
->> =A0 =A0 =A0 =A0 /* Calculate the SMB (lanman) hash functions of the =
-password */
->>
->> =A0 =A0 =A0 =A0 memset(p16, '\0', 16);
->> =A0 =A0 =A0 =A0 E_P16((unsigned char *) passwd, (unsigned char *) p1=
-6);
->>
->> =A0 =A0 =A0 =A0 /* clear out local copy of user's password (just bei=
-ng paranoid). */
->> =A0 =A0 =A0 =A0 memset(passwd, '\0', sizeof(passwd));
->> }
->> #endif
->
-> Ahh, ok. A perfect case to demonstrate why leaving unused crap lying
-> around like this is a bad idea. Perhaps a better scheme would be a
-> separate patch to just remove this function and then rebase your patc=
-h
-> on top of that?
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
+On Wed, 21 Sep 2011 10:10:16 -0500
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-I will resubmit this patch in a day to two with Jeff's comments incorpo=
-rated.
-It fixes bug 7386 on Samba bugzilla.
+> On Wed, Sep 21, 2011 at 7:43 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
+e:
+> > On Wed, 21 Sep 2011 07:35:06 -0500
+> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> On Wed, Sep 21, 2011 at 6:43 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> w=
+rote:
+> >> > On Tue, 20 Sep 2011 13:26:50 -0500
+> >> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+> >> >
+> >> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> >>
+> >> >>
+> >> >> Add mount options backupuid and backugid.
+> >> >>
+> >> >> It allows an authenticated user to access files with the intent=
+ to back them
+> >> >> up including their ACLs, who may not have access permission but=
+ has
+> >> >> "Backup files and directories user right" on them (by virtue of=
+ being part
+> >> >> of the built-in group Backup Operators.
+> >> >>
+> >> >> When mount options backupuid is specified, cifs client restrict=
+s the
+> >> >> use of backup intents to the user whose effective user id is sp=
+ecified
+> >> >> along with the mount option.
+> >> >>
+> >> >> When mount options backupgid is specified, cifs client restrict=
+s the
+> >> >> use of backup intents to the users whose effective user id belo=
+ngs to the
+> >> >> group id specified along with the mount option.
+> >> >>
+> >> >> These mount options are mutually excluisve to mount option =C2=A0=
+mulituser.
+> >> >>
+> >> >> If an authenticated user is not part of the built-in group Back=
+up Operators
+> >> >> at the server, access to such files is denied, even if allowed =
+by the client.
+> >> >>
+> >> >>
+> >> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> >> ---
+> >> >> =C2=A0fs/cifs/cifs_fs_sb.h | =C2=A0 =C2=A03 +++
+> >> >> =C2=A0fs/cifs/cifsacl.c =C2=A0 =C2=A0| =C2=A0 23 ++++++++++++++=
+++++-----
+> >> >> =C2=A0fs/cifs/cifsglob.h =C2=A0 | =C2=A0 =C2=A06 +++++-
+> >> >> =C2=A0fs/cifs/connect.c =C2=A0 =C2=A0| =C2=A0 14 ++++++++++++++
+> >> >> =C2=A0fs/cifs/dir.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 22 ++++=
++++++++++++++++---
+> >> >> =C2=A0fs/cifs/file.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 24 +++++++++=
++++++++++++++--
+> >> >> =C2=A0fs/cifs/link.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 23 +++++++++=
++++++++++-----
+> >> >> =C2=A07 files changed, 99 insertions(+), 16 deletions(-)
+> >> >>
+> >> >> diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+> >> >> index 7260e11..f5483c8 100644
+> >> >> --- a/fs/cifs/cifs_fs_sb.h
+> >> >> +++ b/fs/cifs/cifs_fs_sb.h
+> >> >> @@ -43,6 +43,7 @@
+> >> >> =C2=A0#define CIFS_MOUNT_STRICT_IO 0x40000 /* strict cache mode=
+ */
+> >> >> =C2=A0#define CIFS_MOUNT_RWPIDFORWARD =C2=A0 =C2=A0 =C2=A00x800=
+00 /* use pid forwarding for rw */
+> >> >> =C2=A0#define CIFS_MOUNT_POSIXACL =C2=A00x100000 /* mirror of M=
+S_POSIXACL in mnt_cifs_flags */
+> >> >> +#define CIFS_MOUNT_CIFS_BACKUP =C2=A0 =C2=A0 =C2=A0 0x200000 /=
+* open file with backup intent bit */
+> >> >>
+> >> >> =C2=A0struct cifs_sb_info {
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct rb_root tlink_tree;
+> >> >> @@ -55,6 +56,8 @@ struct cifs_sb_info {
+> >> >> =C2=A0 =C2=A0 =C2=A0 atomic_t active;
+> >> >> =C2=A0 =C2=A0 =C2=A0 uid_t =C2=A0 mnt_uid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 gid_t =C2=A0 mnt_gid;
+> >> >> + =C2=A0 =C2=A0 uid_t =C2=A0 mnt_backupuid;
+> >> >> + =C2=A0 =C2=A0 gid_t =C2=A0 mnt_backupgid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 mode_t =C2=A0mnt_file_mode;
+> >> >> =C2=A0 =C2=A0 =C2=A0 mode_t =C2=A0mnt_dir_mode;
+> >> >> =C2=A0 =C2=A0 =C2=A0 unsigned int mnt_cifs_flags;
+> >> >> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> >> >> index d0f59fa..a0af87a 100644
+> >> >> --- a/fs/cifs/cifsacl.c
+> >> >> +++ b/fs/cifs/cifsacl.c
+> >> >> @@ -945,7 +945,7 @@ static struct cifs_ntsd *get_cifs_acl_by_pa=
+th(struct cifs_sb_info *cifs_sb,
+> >> >> =C2=A0{
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_ntsd *pntsd =3D NULL;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int oplock =3D 0;
+> >> >> - =C2=A0 =C2=A0 int xid, rc;
+> >> >> + =C2=A0 =C2=A0 int xid, rc, create_options =3D 0;
+> >> >> =C2=A0 =C2=A0 =C2=A0 __u16 fid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_tcon *tcon;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct tcon_link *tlink =3D cifs_sb_tlink(=
+cifs_sb);
+> >> >> @@ -956,9 +956,18 @@ static struct cifs_ntsd *get_cifs_acl_by_p=
+ath(struct cifs_sb_info *cifs_sb,
+> >> >> =C2=A0 =C2=A0 =C2=A0 tcon =3D tlink_tcon(tlink);
+> >> >> =C2=A0 =C2=A0 =C2=A0 xid =3D GetXid();
+> >> >>
+> >> >> - =C2=A0 =C2=A0 rc =3D CIFSSMBOpen(xid, tcon, path, FILE_OPEN, =
+READ_CONTROL, 0,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0&fid, &oplock, NULL, cifs_sb->local_nls,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((cifs_sb->mnt_b=
+ackupuid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D=3D curre=
+nt_euid()) ||
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (cifs_sb->mnt_backupgid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in_grou=
+p_p(cifs_sb->mnt_backupgid)))
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D CREATE_OPEN_BAC=
+KUP_INTENT;
+> >> >> + =C2=A0 =C2=A0 }
+> >> >> +
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0^^^^^^^^^^^^^^
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Ugh, plea=
+se put the ugliness above in a helper
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0function.=
+ Maybe something like:
+> >> >
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (backu=
+p_cred(cifs_sb))
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0create_options |=3D CREATE_OPEN_BACKUP_INTENT;
+> >> >
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Also, why=
+ is this dependent on CIFS_MOUNT_CIFS_ACL?
+> >> >
+> >> >> + =C2=A0 =C2=A0 rc =3D CIFSSMBOpen(xid, tcon, path, FILE_OPEN, =
+READ_CONTROL,
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 create_options, &fid, &oplock, NULL, cifs_sb->local_nls,
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (!rc) {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMB=
+GetCIFSACL(xid, tcon, fid, &pntsd, pacllen);
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CIFSSMBClose(x=
+id, tcon, fid);
+> >> >> @@ -995,7 +1004,7 @@ static int set_cifs_acl_by_path(struct cif=
+s_sb_info *cifs_sb, const char *path,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct cifs_nt=
+sd *pnntsd, u32 acllen)
+> >> >> =C2=A0{
+> >> >> =C2=A0 =C2=A0 =C2=A0 int oplock =3D 0;
+> >> >> - =C2=A0 =C2=A0 int xid, rc;
+> >> >> + =C2=A0 =C2=A0 int xid, rc, create_options =3D 0;
+> >> >> =C2=A0 =C2=A0 =C2=A0 __u16 fid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_tcon *tcon;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct tcon_link *tlink =3D cifs_sb_tlink(=
+cifs_sb);
+> >> >> @@ -1006,6 +1015,10 @@ static int set_cifs_acl_by_path(struct c=
+ifs_sb_info *cifs_sb, const char *path,
+> >> >> =C2=A0 =C2=A0 =C2=A0 tcon =3D tlink_tcon(tlink);
+> >> >> =C2=A0 =C2=A0 =C2=A0 xid =3D GetXid();
+> >> >>
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP)
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D=
+ CREATE_OPEN_BACKUP_INTENT;
+> >> >> +
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^^^^^^^^^=
+^^^
+> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0Why aren't you checking the user/grou=
+p here?
+> >> >
+> >> >> =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMBOpen(xid, tcon, path, FILE_O=
+PEN, WRITE_DAC, 0,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0&fid, &oplock, NULL, cifs_sb->local_nls,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CH=
+R);
+> >> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> >> >> index 95dad9d..cd0d7fa 100644
+> >> >> --- a/fs/cifs/cifsglob.h
+> >> >> +++ b/fs/cifs/cifsglob.h
+> >> >> @@ -167,6 +167,8 @@ struct smb_vol {
+> >> >> =C2=A0 =C2=A0 =C2=A0 uid_t cred_uid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 uid_t linux_uid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 gid_t linux_gid;
+> >> >> + =C2=A0 =C2=A0 uid_t backupuid;
+> >> >> + =C2=A0 =C2=A0 gid_t backupgid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 mode_t file_mode;
+> >> >> =C2=A0 =C2=A0 =C2=A0 mode_t dir_mode;
+> >> >> =C2=A0 =C2=A0 =C2=A0 unsigned secFlg;
+> >> >> @@ -179,6 +181,7 @@ struct smb_vol {
+> >> >> =C2=A0 =C2=A0 =C2=A0 bool noperm:1;
+> >> >> =C2=A0 =C2=A0 =C2=A0 bool no_psx_acl:1; /* set if posix acl sup=
+port should be disabled */
+> >> >> =C2=A0 =C2=A0 =C2=A0 bool cifs_acl:1;
+> >> >> + =C2=A0 =C2=A0 bool cifs_backup:1; /* to indicates backup inte=
+nt during file open */
+> >> >> =C2=A0 =C2=A0 =C2=A0 bool no_xattr:1; =C2=A0 /* set if xattr (E=
+A) support should be disabled*/
+> >> >> =C2=A0 =C2=A0 =C2=A0 bool server_ino:1; /* use inode numbers fr=
+om server ie UniqueId */
+> >> >> =C2=A0 =C2=A0 =C2=A0 bool direct_io:1;
+> >> >> @@ -219,7 +222,8 @@ struct smb_vol {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0CIFS_MOUNT_OVERR_GID | CIFS_MOUNT_DYNPERM | \
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0CIFS_MOUNT_NOPOSIXBRL | CIFS_MOUNT_NOSSYNC | \
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0CIFS_MOUNT_FSCACHE | CIFS_MOUNT_MF_SYMLINKS | \
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0CIFS_MOUNT_MULTIUSER | CIFS_MOUNT_STRICT_IO)
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0CIFS_MOUNT_MULTIUSER | CIFS_MOUNT_STRICT_IO | \
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0CIFS_MOUNT_CIFS_BACKUP)
+> >> >>
+> >> >> =C2=A0#define CIFS_MS_MASK (MS_RDONLY | MS_MANDLOCK | MS_NOEXEC=
+ | MS_NOSUID | \
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 MS_NODEV | MS_SYNCHRONOUS)
+> >> >> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> >> >> index f4af4cc..a56624a 100644
+> >> >> --- a/fs/cifs/connect.c
+> >> >> +++ b/fs/cifs/connect.c
+> >> >> @@ -854,6 +854,8 @@ cifs_parse_mount_options(const char *mountd=
+ata, const char *devname,
+> >> >> =C2=A0 =C2=A0 =C2=A0 vol->cred_uid =3D current_uid();
+> >> >> =C2=A0 =C2=A0 =C2=A0 vol->linux_uid =3D current_uid();
+> >> >> =C2=A0 =C2=A0 =C2=A0 vol->linux_gid =3D current_gid();
+> >> >> + =C2=A0 =C2=A0 vol->backupuid =3D NO_CHANGE_32;
+> >> >> + =C2=A0 =C2=A0 vol->backupgid =3D NO_CHANGE_32;
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 /* default to only allowing write access t=
+o owner of the mount */
+> >> >> =C2=A0 =C2=A0 =C2=A0 vol->dir_mode =3D vol->file_mode =3D S_IRU=
+GO | S_IXUGO | S_IWUSR;
+> >> >> @@ -883,6 +885,7 @@ cifs_parse_mount_options(const char *mountd=
+ata, const char *devname,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 cFYI(1, "Null separator not allowed");
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> >> >> =C2=A0 =C2=A0 =C2=A0 }
+> >> >> + =C2=A0 =C2=A0 vol->cifs_backup =3D 0; /* no backup intent */
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 while ((data =3D strsep(&options, separato=
+r)) !=3D NULL) {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!*data)
+> >> >> @@ -1405,6 +1408,8 @@ cifs_parse_mount_options(const char *moun=
+tdata, const char *devname,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 vol->rwpidforward =3D 1;
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (str=
+nicmp(data, "cifsacl", 7) =3D=3D 0) {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 vol->cifs_acl =3D 1;
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (strnicmp=
+(data, "backup", 7) =3D=3D 0) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 vol->cifs_backup =3D 1;
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (str=
+nicmp(data, "nocifsacl", 9) =3D=3D 0) {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 vol->cifs_acl =3D 0;
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (str=
+nicmp(data, "acl", 3) =3D=3D 0) {
+> >> >> @@ -1442,6 +1447,10 @@ cifs_parse_mount_options(const char *mou=
+ntdata, const char *devname,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 vol->mfsymlinks =3D true;
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (str=
+nicmp(data, "multiuser", 8) =3D=3D 0) {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 vol->multiuser =3D true;
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (!strnicm=
+p(data, "backupuid", 9) && value && *value) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 kstrtouint(value, 0, &vol->backupuid);
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else if (!strnicm=
+p(data, "backupgid", 9) && value && *value) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 kstrtouint(value, 0, &vol->backupgid);
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } else
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 printk(KERN_WARNING "CIFS: Unknown mount option %s\n",
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 data);
+> >> >> @@ -2733,6 +2742,8 @@ void cifs_setup_cifs_sb(struct smb_vol *p=
+volume_info,
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_uid =3D pvolume_info->linux_u=
+id;
+> >> >> =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_gid =3D pvolume_info->linux_g=
+id;
+> >> >> + =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D pvolume_info->backup=
+uid;
+> >> >> + =C2=A0 =C2=A0 cifs_sb->mnt_backupgid =3D pvolume_info->backup=
+gid;
+> >> >> =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_file_mode =3D pvolume_info->f=
+ile_mode;
+> >> >> =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_dir_mode =3D pvolume_info->di=
+r_mode;
+> >> >> =C2=A0 =C2=A0 =C2=A0 cFYI(1, "file mode: 0x%x =C2=A0dir mode: 0=
+x%x",
+> >> >> @@ -2763,6 +2774,9 @@ void cifs_setup_cifs_sb(struct smb_vol *p=
+volume_info,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_c=
+ifs_flags |=3D CIFS_MOUNT_RWPIDFORWARD;
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (pvolume_info->cifs_acl)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_c=
+ifs_flags |=3D CIFS_MOUNT_CIFS_ACL;
+> >> >> + =C2=A0 =C2=A0 if (pvolume_info->backupuid !=3D NO_CHANGE_32 |=
+|
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 pvolume_info->backupgid !=3D NO_CHANGE_32)
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_cifs_f=
+lags |=3D CIFS_MOUNT_CIFS_BACKUP;
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (pvolume_info->override_uid)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_c=
+ifs_flags |=3D CIFS_MOUNT_OVERR_UID;
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (pvolume_info->override_gid)
+> >> >> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> >> >> index 72d448b..8a2bff6 100644
+> >> >> --- a/fs/cifs/dir.c
+> >> >> +++ b/fs/cifs/dir.c
+> >> >> @@ -243,7 +243,14 @@ cifs_create(struct inode *inode, struct de=
+ntry *direntry, int mode,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (!tcon->unix_ext && (mode & S_IWUGO) =3D=
+=3D 0)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options=
+ |=3D CREATE_OPTION_READONLY;
+> >> >> -
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((cifs_sb->mnt_b=
+ackupuid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D=3D curre=
+nt_euid()) ||
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (cifs_sb->mnt_backupgid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in_grou=
+p_p(cifs_sb->mnt_backupgid)))
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D CREATE_OPEN_BAC=
+KUP_INTENT;
+> >> >> + =C2=A0 =C2=A0 }
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (tcon->ses->capabilities & CAP_NT_SMBS)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMB=
+Open(xid, tcon, full_path, disposition,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0desiredAccess, create_options,
+> >> >> @@ -357,6 +364,7 @@ int cifs_mknod(struct inode *inode, struct =
+dentry *direntry, int mode,
+> >> >> =C2=A0{
+> >> >> =C2=A0 =C2=A0 =C2=A0 int rc =3D -EPERM;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int xid;
+> >> >> + =C2=A0 =C2=A0 int create_options =3D CREATE_NOT_DIR | CREATE_=
+OPTION_SPECIAL;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_sb_info *cifs_sb;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct tcon_link *tlink;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_tcon *pTcon;
+> >> >> @@ -431,9 +439,17 @@ int cifs_mknod(struct inode *inode, struct=
+ dentry *direntry, int mode,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return rc;
+> >> >> =C2=A0 =C2=A0 =C2=A0 }
+> >> >>
+> >> >> - =C2=A0 =C2=A0 /* FIXME: would WRITE_OWNER | WRITE_DAC be bett=
+er? */
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((cifs_sb->mnt_b=
+ackupuid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D=3D curre=
+nt_euid()) ||
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (cifs_sb->mnt_backupgid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in_grou=
+p_p(cifs_sb->mnt_backupgid)))
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D CREATE_OPEN_BAC=
+KUP_INTENT;
+> >> >> + =C2=A0 =C2=A0 }
+> >> >> +
+> >> >> =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMBOpen(xid, pTcon, full_path, =
+=46ILE_CREATE,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0GENERIC_WRITE, CREATE_NOT_DIR | CREATE_OPTION_SPECIAL,
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0GENERIC_WRITE, create_options,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0&fileHandle, &oplock, buf, cifs_sb->local_nls,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CH=
+R);
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (rc)
+> >> >> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> >> >> index 9f41a10..12eed36 100644
+> >> >> --- a/fs/cifs/file.c
+> >> >> +++ b/fs/cifs/file.c
+> >> >> @@ -174,6 +174,7 @@ cifs_nt_open(char *full_path, struct inode =
+*inode, struct cifs_sb_info *cifs_sb,
+> >> >> =C2=A0 =C2=A0 =C2=A0 int rc;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int desiredAccess;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int disposition;
+> >> >> + =C2=A0 =C2=A0 int create_options =3D CREATE_NOT_DIR;
+> >> >> =C2=A0 =C2=A0 =C2=A0 FILE_ALL_INFO *buf;
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 desiredAccess =3D cifs_convert_flags(f_fla=
+gs);
+> >> >> @@ -210,9 +211,18 @@ cifs_nt_open(char *full_path, struct inode=
+ *inode, struct cifs_sb_info *cifs_sb,
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (!buf)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -ENOMEM=
+;
+> >> >>
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((cifs_sb->mnt_b=
+ackupuid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D=3D curre=
+nt_euid()) ||
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (cifs_sb->mnt_backupgid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in_grou=
+p_p(cifs_sb->mnt_backupgid)))
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D CREATE_OPEN_BAC=
+KUP_INTENT;
+> >> >> + =C2=A0 =C2=A0 }
+> >> >> +
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (tcon->ses->capabilities & CAP_NT_SMBS)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMB=
+Open(xid, tcon, full_path, disposition,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0desiredAccess, CREATE_NOT_DIR, pnetfid, poplock, buf,
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0desiredAccess, create_options, pnetfid, poplock, buf,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0cifs_sb->local_nls, cifs_sb->mnt_cifs_flags
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0& CIFS_MOUNT_MAP_SPECIA=
+L_CHR);
+> >> >> =C2=A0 =C2=A0 =C2=A0 else
+> >> >> @@ -465,6 +475,7 @@ static int cifs_reopen_file(struct cifsFile=
+Info *pCifsFile, bool can_flush)
+> >> >> =C2=A0 =C2=A0 =C2=A0 char *full_path =3D NULL;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int desiredAccess;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int disposition =3D FILE_OPEN;
+> >> >> + =C2=A0 =C2=A0 int create_options =3D CREATE_NOT_DIR;
+> >> >> =C2=A0 =C2=A0 =C2=A0 __u16 netfid;
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 xid =3D GetXid();
+> >> >> @@ -524,6 +535,15 @@ static int cifs_reopen_file(struct cifsFil=
+eInfo *pCifsFile, bool can_flush)
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 desiredAccess =3D cifs_convert_flags(pCifs=
+=46ile->f_flags);
+> >> >>
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((cifs_sb->mnt_b=
+ackupuid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D=3D curre=
+nt_euid()) ||
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (cifs_sb->mnt_backupgid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in_grou=
+p_p(cifs_sb->mnt_backupgid)))
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D CREATE_OPEN_BAC=
+KUP_INTENT;
+> >> >> + =C2=A0 =C2=A0 }
+> >> >> +
+> >> >> =C2=A0 =C2=A0 =C2=A0 /* Can not refresh inode by passing in fil=
+e_info buf to be returned
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0by SMBOpen and then calling g=
+et_inode_info with returned buf
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0since file might have write b=
+ehind data that needs to be flushed
+> >> >> @@ -531,7 +551,7 @@ static int cifs_reopen_file(struct cifsFile=
+Info *pCifsFile, bool can_flush)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0that inode was not dirty loca=
+lly we could do this */
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMBOpen(xid, tcon, full_path, d=
+isposition, desiredAccess,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0CREATE_NOT_DIR, &netfid, &oplock, NULL,
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0create_options, &netfid, &oplock, NULL,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CIFS_MOUNT_MAP_SPECIAL_CHR);
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (rc) {
+> >> >> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+> >> >> index db3f18c..81b6bf9 100644
+> >> >> --- a/fs/cifs/link.c
+> >> >> +++ b/fs/cifs/link.c
+> >> >> @@ -183,14 +183,20 @@ CIFSFormatMFSymlink(u8 *buf, unsigned int=
+ buf_len, const char *link_str)
+> >> >> =C2=A0static int
+> >> >> =C2=A0CIFSCreateMFSymLink(const int xid, struct cifs_tcon *tcon=
+,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+const char *fromName, const char *toName,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const=
+ struct nls_table *nls_codepage, int remap)
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struc=
+t cifs_sb_info *cifs_sb)
+> >> >> =C2=A0{
+> >> >> =C2=A0 =C2=A0 =C2=A0 int rc;
+> >> >> =C2=A0 =C2=A0 =C2=A0 int oplock =3D 0;
+> >> >> + =C2=A0 =C2=A0 int remap;
+> >> >> + =C2=A0 =C2=A0 int create_options =3D CREATE_NOT_DIR;
+> >> >> =C2=A0 =C2=A0 =C2=A0 __u16 netfid =3D 0;
+> >> >> =C2=A0 =C2=A0 =C2=A0 u8 *buf;
+> >> >> =C2=A0 =C2=A0 =C2=A0 unsigned int bytes_written =3D 0;
+> >> >> =C2=A0 =C2=A0 =C2=A0 struct cifs_io_parms io_parms;
+> >> >> + =C2=A0 =C2=A0 struct nls_table *nls_codepage;
+> >> >> +
+> >> >> + =C2=A0 =C2=A0 nls_codepage =3D cifs_sb->local_nls;
+> >> >> + =C2=A0 =C2=A0 remap =3D cifs_sb->mnt_cifs_flags & CIFS_MOUNT_=
+MAP_SPECIAL_CHR;
+> >> >>
+> >> >> =C2=A0 =C2=A0 =C2=A0 buf =3D kmalloc(CIFS_MF_SYMLINK_FILE_SIZE,=
+ GFP_KERNEL);
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (!buf)
+> >> >> @@ -202,8 +208,17 @@ CIFSCreateMFSymLink(const int xid, struct =
+cifs_tcon *tcon,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return rc;
+> >> >> =C2=A0 =C2=A0 =C2=A0 }
+> >> >>
+> >> >> + =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_A=
+CL &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUP) {
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if ((cifs_sb->mnt_b=
+ackupuid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb->mnt_backupuid =3D=3D curre=
+nt_euid()) ||
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (cifs_sb->mnt_backupgid !=3D NO_CHANGE_32 &&
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 in_grou=
+p_p(cifs_sb->mnt_backupgid)))
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 create_options |=3D CREATE_OPEN_BAC=
+KUP_INTENT;
+> >> >> + =C2=A0 =C2=A0 }
+> >> >> +
+> >> >> =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSSMBOpen(xid, tcon, fromName, FI=
+LE_CREATE, GENERIC_WRITE,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0CREATE_NOT_DIR, &netfid, &oplock, NULL,
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0create_options, &netfid, &oplock, NULL,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0nls_codepage, remap);
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (rc !=3D 0) {
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 kfree(buf);
+> >> >> @@ -559,9 +574,7 @@ cifs_symlink(struct inode *inode, struct de=
+ntry *direntry, const char *symname)
+> >> >> =C2=A0 =C2=A0 =C2=A0 /* BB what if DFS and this volume is on di=
+fferent share? BB */
+> >> >> =C2=A0 =C2=A0 =C2=A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_M=
+=46_SYMLINKS)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSCre=
+ateMFSymLink(xid, pTcon, full_path, symname,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0c=
+ifs_sb->local_nls,
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0c=
+ifs_sb->mnt_cifs_flags &
+> >> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 CIFS_MOUNT_MAP_SPECIAL_CHR);
+> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_sb=
+);
+> >> >> =C2=A0 =C2=A0 =C2=A0 else if (pTcon->unix_ext)
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D CIFSUni=
+xCreateSymLink(xid, pTcon, full_path, symname,
+> >> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0cifs_sb->local_nls);
+> >> >
+> >> >
+> >> > --
+> >> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> >> >
+> >>
+> >> Jeff, Thanks. Will correct these. =C2=A0We probably should
+> >> check in kernel that the options multiuser and either or
+> >> both of =C2=A0backupuid and backupgid are not specified
+> >> at the same time besides checking them in mount.cifs.
+> >>
+> >
+> > Why? I see no reason why this must be mutually exclusive with multi=
+user.
+> >
+> > --
+> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> >
+>=20
+> By making mulituser mount option mutually exclusive with either/or
+> backupuid and backupgid, we are trying to prevent a session without
+> backup intent right from using file handles created by another sessio=
+n
+> with the backup intent right.
+
+The whole point of making this a per-uid/gid thing is to allow it to
+work in conjunction with multiuser mounts.
+
+A filehandle is subordinate to a tcon, and that's subordinate to a
+session. So, another session should already never have access to such a
+filehandle.
+
+If you think this opens an attack vector though, perhaps you could
+describe it in detail?
+
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
