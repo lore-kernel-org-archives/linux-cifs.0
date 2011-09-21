@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: Add mount options for backup intent [try #2]
-Date: Wed, 21 Sep 2011 09:52:53 -0500
-Message-ID: <CADT32eJHwgy5tKAd4M754=TB-rYZh_Z=O3sv5=FvS=Oi4Q_9eQ@mail.gmail.com>
+Date: Wed, 21 Sep 2011 10:10:16 -0500
+Message-ID: <CADT32eJyMxfwPG5w9EMfo0hdrF6mUKtXm_F9WNnkk9wmLSAR8A@mail.gmail.com>
 References: <1316543210-12069-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20110921074345.5d007d2c@corrin.poochiereds.net>
 	<CADT32eL6EKoVeU9513bLG4p2bdYfcm3o1Lkg-i8vX=bd-X2f-Q@mail.gmail.com>
@@ -583,17 +583,11 @@ on, full_path, symname,
 > Why? I see no reason why this must be mutually exclusive with multius=
 er.
 >
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>
 
-I think you are right. With cifs client restricting usage of this backu=
-p id
-option to either to a specified uid or gid, it does not matter what the
-uid/gid associated with the subsequent spawned sessions are.
-
-Regarding CIFS_ACL, since this particular right is mostly/prominently
-utilized against Windows servers, the backup intent (and hence mount
-options backupuid/backupgid) was deemed being used in conjunction
-with mount option  cifsacl.
-
-Regards,
-
-Shirish
+By making mulituser mount option mutually exclusive with either/or
+backupuid and backupgid, we are trying to prevent a session without
+backup intent right from using file handles created by another session
+with the backup intent right.
