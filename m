@@ -1,7 +1,7 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils: Add mount options for backup intent and their manpages (try #3)
-Date: Wed, 21 Sep 2011 13:48:03 -0500
-Message-ID: <1316630883-20541-1-git-send-email-shirishpargaonkar@gmail.com>
+Subject: [PATCH] cifs-utils: Add mount options for backup intent and their manpages (try #3 repost)
+Date: Wed, 21 Sep 2011 13:55:45 -0500
+Message-ID: <1316631345-24071-1-git-send-email-shirishpargaonkar@gmail.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
@@ -16,14 +16,13 @@ Add mount options backupuid and backugid and their manpage contents.
 Check for either a valid uid/gid or valid user/group name.
 
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
 ---
  mount.cifs.8 |   14 +++++++++
  mount.cifs.c |   90 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
  2 files changed, 96 insertions(+), 8 deletions(-)
 
 diff --git a/mount.cifs.8 b/mount.cifs.8
-index 64a8b64..900aa63 100644
+index 64a8b64..1210469 100644
 --- a/mount.cifs.8
 +++ b/mount.cifs.8
 @@ -282,6 +282,20 @@ See sections on
@@ -34,14 +33,14 @@ index 64a8b64..900aa63 100644
 +.RS 4
 +Allow access to files with the intent to back them up for a user\&.
 +.sp
-+This option works with the option cifsacl.  It restricts to an user, specified either as an uid or a user name, as an authenticated user at the server, access to files with the intent to back them up including their ACLs, who otherwise may not have access permissions but has "Backup files and directories user right" on them (e.g. by virtue of that authenticated user being part of the built-in group Backup Operators at the server).
++This option restricts to an user, specified either as an uid or a user name, as an authenticated user at the server, access to files with the intent to back them up including their ACLs, who otherwise may not have access permissions but has "Backup files and directories user right" on them (e.g. by virtue of that authenticated user being part of the built-in group Backup Operators at the server).
 +.RE
 +.PP
 +backupgid
 +.RS 4
 +Allow access to files with the intent to back them up for a group\&.
 +.sp
-+This option works with the option cifsacl.  It restricts to an user in a group, specified either as a gid or a group name, as an authenticated user at the server, access to files with the intent to back them up including their ACLs, who otherwise may not have access permissions but has "Backup files and directories user right" on them (e.g. by virtue of that authenticated user being part of the built-in group Backup Operators at the server).
++This option restricts to an user in a group, specified either as a gid or a group name, as an authenticated user at the server, access to files with the intent to back them up including their ACLs, who otherwise may not have access permissions but has "Backup files and directories user right" on them (e.g. by virtue of that authenticated user being part of the built-in group Backup Operators at the server).
 +.RE
 +.PP
  nocase
