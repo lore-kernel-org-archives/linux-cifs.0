@@ -1,56 +1,62 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Re: default security mechanism for 3.1
-Date: Fri, 23 Sep 2011 19:24:22 +0530
-Message-ID: <4E7C8F8E.2040704@suse.com>
-References: <20110923081620.40c0aa17@tlielax.poochiereds.net>	<4E7C7AA1.2060402@suse.com> <20110923094321.1e848857@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] manpage: document sec=ntlmssp(i) and clean up discussion of signing
+Date: Fri, 23 Sep 2011 10:55:59 -0400
+Message-ID: <1316789759-4314-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110923094321.1e848857-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 09/23/2011 07:13 PM, Jeff Layton wrote:
-> On Fri, 23 Sep 2011 17:55:05 +0530
-> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
-> 
->> On 09/23/2011 05:46 PM, Jeff Layton wrote:
->>> A printk warning was added to the kernel about the default security
->>> mode changing in 3.1. As best I can tell though, that has not happened
->>> even though the release is imminent. Are you still planning to change
->>> that? If not, are you planning to fix the printk?
->>>
->>
->> Did you mean this one?
->>    http://www.spinics.net/lists/linux-cifs/msg03976.html
->>
->> I remember Steve posted this patch sometime ago but I'm not seeing them
->> in the cifs development tree..
-> 
-> Yeah, that's the one. Seems a little late to be adding these sorts of
-> behavior changes in 3.1 though, so I'm just wondering what the plan is.
-> 
-> I also have some concerns about defaulting to raw NTLMv2 auth since (at
-> least) win2k8 rejects unless you go in and tweak registry keys. It
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 |   26 ++++++++++++++++++++++++--
+ 1 files changed, 24 insertions(+), 2 deletions(-)
 
-Good point. May be we should just drop those warning messages for 3.1
-and work on aim to make the sec_mode overhaul work for 3.2.. and
-document the new behavior?
-
-> would seem to me to be better to decide the default based on the
-> negotiation:
-> 
-> Set extended security bit in the NegProt by default
-> 
-> If the server sets it, then use NTLMSSP
-> 
-> If it doesn't then use old NTLM (or NTLMv2)
-> 
-> That means an overhaul of how sec_mode is handled though, since that's
-> currently decided too early to do it that way.
-> 
-
--Suresh
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index 64a8b64..48f9312 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -348,7 +348,7 @@ ntlm Use NTLM password hashing (default)
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlmi Use NTLM password hashing with signing (if /proc/fs/cifs/PacketSigningEnabled on or if server requires signing also can be the default)
++ntlmi Use NTLM password hashing with signing
+ .RE
+ .sp
+ .RS 4
+@@ -371,9 +371,31 @@ ntlmv2 Use NTLMv2 password hashing
+ .IP \(bu 2.3
+ .\}
+ ntlmv2i Use NTLMv2 password hashing with packet signing
++.RE
++.sp
++.RS 4
++.ie n \{\
++\h'-04'\(bu\h'+03'\c
++.\}
++.el \{\
++.sp -1
++.IP \(bu 2.3
++.\}
++ntlmssp Use NTLMv2 password hashing encapsulated in NTLMSSP message
++.RE
+ .sp
++.RS 4
++.ie n \{\
++\h'-04'\(bu\h'+03'\c
++.\}
++.el \{\
++.sp -1
++.IP \(bu 2.3
++.\}
++ntlmsspi Use NTLMv2 password hashing encapsulated in NTLMSSP message and enable packet signing
+ .RE
+-[NB This [sec parameter] is under development and expected to be available in cifs kernel module 1\&.40 and later]
++.sp
++If the server requires signing during protocol negotiation, then it may be enabled automatically. Signing may also be enabled automatically if it's enabled in /proc/fs/cifs/SecurityFlags.
+ .RE
+ .PP
+ nobrl
+-- 
+1.7.6.2
