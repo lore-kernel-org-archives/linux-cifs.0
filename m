@@ -1,83 +1,75 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] manpage: document sec=ntlmssp(i) and clean up discussion
- of signing
-Date: Fri, 23 Sep 2011 10:11:40 -0500
-Message-ID: <CADT32eKA66VSr6znDqezMp9cdggZ+pwLtOnCJeqC62pi06dArQ@mail.gmail.com>
-References: <1316789759-4314-1-git-send-email-jlayton@samba.org>
+Subject: Re: default security mechanism for 3.1
+Date: Fri, 23 Sep 2011 10:14:32 -0500
+Message-ID: <CADT32e+KDBM=_jOm4m0cirQGeO7YfH4RADb5fbv7dcvUGG9j+A@mail.gmail.com>
+References: <20110923081620.40c0aa17@tlielax.poochiereds.net>
+	<4E7C7AA1.2060402@suse.com>
+	<20110923094321.1e848857@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1316789759-4314-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20110923094321.1e848857-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Sep 23, 2011 at 9:55 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
-> =A0mount.cifs.8 | =A0 26 ++++++++++++++++++++++++--
-> =A01 files changed, 24 insertions(+), 2 deletions(-)
+On Fri, Sep 23, 2011 at 8:43 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> On Fri, 23 Sep 2011 17:55:05 +0530
+> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
 >
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 64a8b64..48f9312 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -348,7 +348,7 @@ ntlm Use NTLM password hashing (default)
-> =A0.sp -1
-> =A0.IP \(bu 2.3
-> =A0.\}
-> -ntlmi Use NTLM password hashing with signing (if /proc/fs/cifs/Packe=
-tSigningEnabled on or if server requires signing also can be the defaul=
-t)
-> +ntlmi Use NTLM password hashing with signing
+>> On 09/23/2011 05:46 PM, Jeff Layton wrote:
+>> > A printk warning was added to the kernel about the default securit=
+y
+>> > mode changing in 3.1. As best I can tell though, that has not happ=
+ened
+>> > even though the release is imminent. Are you still planning to cha=
+nge
+>> > that? If not, are you planning to fix the printk?
+>> >
+>>
+>> Did you mean this one?
+>> =A0 =A0http://www.spinics.net/lists/linux-cifs/msg03976.html
+>>
+>> I remember Steve posted this patch sometime ago but I'm not seeing t=
+hem
+>> in the cifs development tree..
+>>
+>>
+>> -Suresh
+>
+> Yeah, that's the one. Seems a little late to be adding these sorts of
+> behavior changes in 3.1 though, so I'm just wondering what the plan i=
+s.
+>
+> I also have some concerns about defaulting to raw NTLMv2 auth since (=
+at
+> least) win2k8 rejects unless you go in and tweak registry keys. It
+> would seem to me to be better to decide the default based on the
+> negotiation:
+>
+> Set extended security bit in the NegProt by default
+>
+> If the server sets it, then use NTLMSSP
 
-Nitpicking, perhaps this should be 'packet signing' instead
-of just 'signing' to be consistent with other such phrases.
+Not sure if there are any cifs/smb servers that support
+extended security mechanisms but ntlmssp not being
+one of them, we ought to consider that such a setup
+before choosing ntlmssp if the server set extended
+security bit in negprot response.
 
-> =A0.RE
-> =A0.sp
-> =A0.RS 4
-> @@ -371,9 +371,31 @@ ntlmv2 Use NTLMv2 password hashing
-> =A0.IP \(bu 2.3
-> =A0.\}
-> =A0ntlmv2i Use NTLMv2 password hashing with packet signing
-> +.RE
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +ntlmssp Use NTLMv2 password hashing encapsulated in NTLMSSP message
-
-Not sure whether we need to even mention that this is Raw NTLMSSP
-
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +ntlmsspi Use NTLMv2 password hashing encapsulated in NTLMSSP message=
- and enable packet signing
-> =A0.RE
-> -[NB This [sec parameter] is under development and expected to be ava=
-ilable in cifs kernel module 1\&.40 and later]
-> +.sp
-> +If the server requires signing during protocol negotiation, then it =
-may be enabled automatically. Signing may also be enabled automatically=
- if it's enabled in /proc/fs/cifs/SecurityFlags.
-> =A0.RE
-> =A0.PP
-> =A0nobrl
+>
+> If it doesn't then use old NTLM (or NTLMv2)
+>
+> That means an overhaul of how sec_mode is handled though, since that'=
+s
+> currently decided too early to do it that way.
+>
 > --
-> 1.7.6.2
->
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
  in
