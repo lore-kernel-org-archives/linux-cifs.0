@@ -1,41 +1,44 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: should we change the name of get/setcifsacl ?
-Date: Sun, 25 Sep 2011 06:07:39 -0400
-Message-ID: <20110925060739.6167abb8@tlielax.poochiereds.net>
-References: <20110924083751.111d85a7@tlielax.poochiereds.net>
-	<CADT32eKZKKmo+aEp4P9tFkJNfUY=oueW=6=-gUe_5sxEYS9Fiw@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: broken mandatory locking behavior
+Date: Sun, 25 Sep 2011 15:39:34 +0400
+Message-ID: <CAKywueSgXNhmoA7V82U5Y0=N+DQWysekAwDdsiLMPt6L0OV55Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonk
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eKZKKmo+aEp4P9tFkJNfUY=oueW=6=-gUe_5sxEYS9Fiw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 24 Sep 2011 12:05:03 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Hi all!
 
-> On Sat, Sep 24, 2011 at 7:37 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > The nfs4 ACL tools are called nfs4_getfacl and nfs4_setfacl. I think it
-> > would probably be good for consistency's sake to change the name of the
-> > cifs variants to cifs_getfacl and cifs_setfacl.
-> >
-> > Any thoughts or objections?
-> >
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> >
-> 
-> I have no objection/preference for the tools' names.
-> But there is getfacl and setfacl. And I think richacl has tool/s
-> such as setrichacl.
-> 
+Now I have been working on lock cache capability for cifs module and
+simplification of lock code. So, I faced with a such an interesting
+place - mandatory style unlock code.
 
-Fair enough then. If the richacl tools are named along those
-lines, I'll just leave the cifs ones named as they are.
+The problem is that mandatory semantic doesn't allow to specify a
+range and remove all locks from there. But cifs module allows it. The
+reason why it is so can be that cifs module tries to follow posix
+semantic for mandatory locks. I think it's not what we want at all.
 
-Thanks.
+We have two lock mode for cifs module: posix and mandatory. And as for
+me, we should follow posix semantic for posix locks and mandatory for
+mandatory locks. If we mix these two semantic for mandatory lock mode,
+we reach nothing: no posix (because mandatory locks doesn't allow to
+perform io ops on the locked region by other processes) and no
+mandatory (because we can setup unlock from 0 to infinity and remove
+all locks at once).
+
+The another problem is that this 'broken' code lives on kernel for a
+long time. So, I suggest to discuss it now - while I am here I can
+include this fix into my patchset as well.
+
+Thoughts?
+
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
