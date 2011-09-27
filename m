@@ -1,192 +1,39 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils: Add mount options for backup intent and their manpages (try #6)
-Date: Tue, 27 Sep 2011 13:58:49 -0500
-Message-ID: <1317149929-1206-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [patch] cifs: accidentally creating empty files
+Date: Wed, 28 Sep 2011 00:28:10 +0300
+Message-ID: <20110927212810.GA12900@elgon.mountain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+This solves a problem for where a user without write permissions
+was creating empty files.  This function was supposed to do a lookup
+only, the create happens later.
 
+Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 
-Add mount options backupuid and backugid and their manpage contents.
-Check for either a valid uid/gid or valid user/group name.
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- mount.cifs.8 |   14 +++++++++
- mount.cifs.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 97 insertions(+), 2 deletions(-)
-
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index 81ebdbe..d7eb2dd 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -282,6 +282,20 @@ See sections on
- for more information\&.
- .RE
- .PP
-+backupuid
-+.RS 4
-+Allow access to files with the intent to back them up for a user\&.
-+.sp
-+An authenticated user at the server with a privilege can access file system objects with the intent to back them up to which it otherwise may not have access permissions.  As an example, a privilege would be "Backup files and directories user right" granted by the server by making that user a part of the built-in group Backup Operators. This mount option restricts to the specified user on the client, as such an authenticated user, privilege to access files with the intent to back them up.
-+.RE
-+.PP
-+backupgid
-+.RS 4
-+Allow access to files with the intent to back them up for a group\&.
-+.sp
-+An authenticated user at the server with a privilege can access file system objects with the intent to back them up to which it otherwise may not have access permissions.  As an example, a privilege would be "Backup files and directories user right" granted by the server by making that user a part of the built-in group Backup Operators. This mount option restricts to the users in the specified group on the client, as such an authenticated user, privilege to access files with the intent to back them up.
-+.RE
-+.PP
- nocase
- .RS 4
- Request case insensitive path name matching (case sensitive is the default if the server suports it)\&.
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 1e3d534..36c3ac0 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -158,6 +158,8 @@
- #define OPT_MAND       27
- #define OPT_NOMAND     28
- #define OPT_CRUID      29
-+#define OPT_BKUPUID    30
-+#define OPT_BKUPGID    31
- 
- 
- /* struct for holding parsed mount info for use by privleged process */
-@@ -843,6 +845,10 @@ static int parse_opt_token(const char *token)
- 		return OPT_REMOUNT;
- 	if (strncmp(token, "_netdev", 7) == 0)
- 		return OPT_IGNORE;
-+	if (strncmp(token, "backupuid", 9) == 0)
-+		return OPT_BKUPUID;
-+	if (strncmp(token, "backupgid", 9) == 0)
-+		return OPT_BKUPGID;
- 
- 	return OPT_ERROR;
- }
-@@ -858,11 +864,13 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 	int out_len = 0;
- 	int word_len;
- 	int rc = 0;
-+	int got_bkupuid = 0;
-+	int got_bkupgid = 0;
- 	int got_uid = 0;
- 	int got_cruid = 0;
- 	int got_gid = 0;
--	uid_t uid, cruid = 0;
--	gid_t gid;
-+	uid_t uid, cruid = 0, bkupuid;
-+	gid_t gid, bkupgid;
- 	char *ep;
- 	struct passwd *pw;
- 	struct group *gr;
-@@ -906,6 +914,8 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			value = equals + 1;
- 		}
- 
-+		ep = NULL;
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 72d448b..8515afe 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -566,11 +566,13 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 		if (nd && !(nd->flags & LOOKUP_DIRECTORY) &&
+ 		     (nd->flags & LOOKUP_OPEN) && !pTcon->broken_posix_open &&
+ 		     (nd->intent.open.file->f_flags & O_CREAT)) {
++			unsigned int f_flags;
 +
- 		switch(parse_opt_token(data)) {
- 		case OPT_USERS:
- 			if (!value || !*value) {
-@@ -1171,6 +1181,42 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			break;
- 		case OPT_IGNORE:
- 			goto nocopy;
-+		case OPT_BKUPUID:
-+			if (!value || !*value)
-+				goto nocopy;
-+
-+			got_bkupuid = 1;
-+			bkupuid = strtoul(value, &ep, 10);
-+			if (!strlen(ep))
-+				goto nocopy;
-+
-+			pw = getpwnam(value);
-+			if (pw == NULL) {
-+				fprintf(stderr,
-+					"bad user name \"%s\"\n", value);
-+				return EX_USAGE;
-+			}
-+
-+			bkupuid = pw->pw_uid;
-+			goto nocopy;
-+		case OPT_BKUPGID:
-+			if (!value || !*value)
-+				goto nocopy;
-+
-+			got_bkupgid = 1;
-+			bkupgid = strtoul(value, &ep, 10);
-+			if (!strlen(ep))
-+				goto nocopy;
-+
-+			gr = getgrnam(value);
-+			if (gr == NULL) {
-+				fprintf(stderr,
-+					"bad group name \"%s\"\n", value);
-+				return EX_USAGE;
-+			}
-+
-+			bkupgid = gr->gr_gid;
-+			goto nocopy;
- 		}
- 
- 		/* check size before copying option to buffer */
-@@ -1246,6 +1292,39 @@ nocopy:
- 		}
- 		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
- 	}
-+	/* special-case the uid and gid */
-+	if (got_bkupuid) {
-+		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", bkupuid);
-+
-+		/* comma + "uid=" + terminating NULL == 6 */
-+		if (out_len + word_len + 6 > MAX_OPTIONS_LEN) {
-+			fprintf(stderr, "Options string too long\n");
-+			return EX_USAGE;
-+		}
-+
-+		if (out_len) {
-+			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			out_len++;
-+		}
-+		snprintf(out + out_len, word_len + 11, "backupuid=%s", txtbuf);
-+		out_len = strlen(out);
-+	}
-+	if (got_bkupgid) {
-+		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", bkupgid);
-+
-+		/* comma + "backkupgid=" + terminating NULL == 6 */
-+		if (out_len + word_len + 6 > MAX_OPTIONS_LEN) {
-+			fprintf(stderr, "Options string too long\n");
-+			return EX_USAGE;
-+		}
-+
-+		if (out_len) {
-+			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			out_len++;
-+		}
-+		snprintf(out + out_len, word_len + 11, "backupgid=%s", txtbuf);
-+	}
-+
- 	return 0;
- }
- 
-@@ -1361,6 +1440,8 @@ static struct option longopts[] = {
- 	{"type", 1, NULL, 't'},
- 	{"uid", 1, NULL, '1'},
- 	{"gid", 1, NULL, '2'},
-+	{"backupuid", 1, NULL, '1'},
-+	{"backupgid", 1, NULL, '2'},
- 	{"user", 1, NULL, 'u'},
- 	{"username", 1, NULL, 'u'},
- 	{"dom", 1, NULL, 'd'},
--- 
-1.6.0.2
++			f_flags = (nd->intent.open.file->f_flags & ~O_CREAT);
+ 			rc = cifs_posix_open(full_path, &newInode,
+ 					parent_dir_inode->i_sb,
+ 					nd->intent.open.create_mode,
+-					nd->intent.open.file->f_flags, &oplock,
+-					&fileHandle, xid);
++					f_flags, &oplock, &fileHandle, xid);
+ 			/*
+ 			 * The check below works around a bug in POSIX
+ 			 * open in samba versions 3.3.1 and earlier where
