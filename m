@@ -1,53 +1,55 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Mounts to Windows 7 and "out of memory" or "insufficient server resources"
-Date: Wed, 28 Sep 2011 04:30:56 -0500
-Message-ID: <CADT32eLk5N4WJCMdtcd3MTgR39fCTn4_gQqqobYsxkpcPnfuDQ@mail.gmail.com>
-References: <CAH2r5msivsE_47mESmGR=Xjf2v-kKwi-Qpym2kxuTLPbYudisQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/4] allow freezing of tasks with netfs calls in flight
+Date: Wed, 28 Sep 2011 07:52:37 -0400
+Message-ID: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
+Cc: linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-D0fwSNaahy58zQARNC3f2A@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pavel-+ZI9xUNit7I@public.gmane.org,
+	rjw-KKrjLPT3xs0@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msivsE_47mESmGR=Xjf2v-kKwi-Qpym2kxuTLPbYudisQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Sep 27, 2011 at 4:36 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
-e:
-> FYI - The cifs async write in 3.0 seems to exacerbate problems runnin=
-g
-> out of memory (apparently) on the Windows 7 system (running as a
-> server) after a large file copy to the server completes. =A0 I have b=
-een
-> able to reproduce the same problem on Windows Vista Service Pack 2
-> (which is a good news/bad news story since my earlier testing on
-> Windows Vista showed hangs on some requests rather than returning out
-> of memory). =A0Does not seem to be a problem with any of the Windows
-> server versions just Windows 7 and Vista so far
+We've had a number of reports recently of people with NFS and CIFS
+mounts that were unable to suspend or hibernate their machines. Here
+are a couple of Fedora bugs that illustrate the problem:
 
-If this is a problem with Windows Vista and Windows 7, it is likely
-to be a problem with Windows 2008 Server as well.
-Basically Windows server starting Vista perhaps?
+    https://bugzilla.redhat.com/show_bug.cgi?id=712088
+    https://bugzilla.redhat.com/show_bug.cgi?id=717735
 
->
-> As Pavel noted in an earlier note, increasing MaxWorkItems to 4096 in
-> the Windows registry solves this.
->
-> The cifs async write code does increase large file copy speed
-> dramatically (more than 15% in most environments) - but we are workin=
-g
-> through how to handle the Windows7/WindowsVista problem to see if
-> there are workarounds.
->
-> --
-> Thanks,
->
-> Steve
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+When it occurs the problem is pretty clear. We have a task that's
+sleeping in the kernel in TASK_KILLABLE sleep, generally waiting
+for a reply to come in. Often though, userspace has already taken
+down the interface so that reply will never come. The process then
+fails to freeze and the suspend fails.
+
+This patch fixes this by allowing the TASK_KILLABLE sleeps in NFS and
+CIFS to be awoken by the freezer and then to try to freeze. If a freeze
+event does occur, then the code will treat it as if a schedule() has
+already occured.
+
+I've had a number of people test versions of this set and the results
+have been positive. Part of the problem though is that there are
+sometimes still unrelated problems with suspend/resume that seem to
+cloud the results. As best we can tell though, this patchset does work
+as advertised.
+
+Jeff Layton (4):
+  freezer: make fake_signal_wake_up wake TASK_KILLABLE tasks too
+  cifs, freezer: add wait_event_freezekillable and have cifs use it
+  sunrpc: make rpc_wait_bit_killable handle freeze events
+  nfs: make TASK_KILLABLE sleeps attempt to freeze
+
+ fs/cifs/transport.c     |    3 ++-
+ fs/nfs/inode.c          |    4 +++-
+ fs/nfs/nfs3proc.c       |    3 ++-
+ fs/nfs/nfs4proc.c       |   12 ++++++++----
+ fs/nfs/proc.c           |    3 ++-
+ include/linux/freezer.h |   19 +++++++++++++++++--
+ kernel/freezer.c        |    2 +-
+ net/sunrpc/sched.c      |    4 +++-
+ 8 files changed, 38 insertions(+), 12 deletions(-)
+
+-- 
+1.7.6.2
