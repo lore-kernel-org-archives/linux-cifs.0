@@ -1,58 +1,63 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Mounts to Windows 7 and "out of memory" or "insufficient server resources"
-Date: Wed, 28 Sep 2011 13:25:07 -0500
-Message-ID: <CAH2r5mv8H0esXPdCe2Uuo-TUXas-wZSJWvF3K=iUBS-pYaO4rA@mail.gmail.com>
+Date: Wed, 28 Sep 2011 13:27:33 -0500
+Message-ID: <CAH2r5msGRvhahCXbAb8mj7c28qUzPxOB5dJjjyQFAZvQxZzY-g@mail.gmail.com>
 References: <CAH2r5msivsE_47mESmGR=Xjf2v-kKwi-Qpym2kxuTLPbYudisQ@mail.gmail.com>
-	<20110928080027.2c04b12d@corrin.poochiereds.net>
+	<4E82B4ED.4060107@suse.com>
+	<20110928080622.5e30429b@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+Cc: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110928080027.2c04b12d-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20110928080622.5e30429b-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Sep 28, 2011 at 7:00 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Tue, 27 Sep 2011 16:36:22 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Wed, Sep 28, 2011 at 7:06 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Wed, 28 Sep 2011 11:17:25 +0530
+> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
 >
->> FYI - The cifs async write in 3.0 seems to exacerbate problems runni=
-ng
->> out of memory (apparently) on the Windows 7 system (running as a
->> server) after a large file copy to the server completes. =A0 I have =
-been
->> able to reproduce the same problem on Windows Vista Service Pack 2
->> (which is a good news/bad news story since my earlier testing on
->> Windows Vista showed hangs on some requests rather than returning ou=
-t
->> of memory). =A0Does not seem to be a problem with any of the Windows
->> server versions just Windows 7 and Vista so far.
+>> On 09/28/2011 03:06 AM, Steve French wrote:
+>> > FYI - The cifs async write in 3.0 seems to exacerbate problems run=
+ning
+>> > out of memory (apparently) on the Windows 7 system (running as a
+>> > server) after a large file copy to the server completes. =A0 I hav=
+e been
+>> > able to reproduce the same problem on Windows Vista Service Pack 2
+>> > (which is a good news/bad news story since my earlier testing on
+>> > Windows Vista showed hangs on some requests rather than returning =
+out
+>> > of memory). =A0Does not seem to be a problem with any of the Windo=
+ws
+>> > server versions just Windows 7 and Vista so far.
 >>
->> As Pavel noted in an earlier note, increasing MaxWorkItems to 4096 i=
-n
->> the Windows registry solves this.
+>> The last time when I encountered this, cifs client was reporting "Ca=
+nnot
+>> allocate memory" a.k.a -ENOMEM error. But, it is actually a
+>> NT_STATUS_INSUFF_SERVER_RESOURCES error from Server being mapped to
+>> -ENOMEM. I found this mapping confusing atleast initially. Is this
+>> mapping correct?
 >>
->> The cifs async write code does increase large file copy speed
->> dramatically (more than 15% in most environments) - but we are worki=
-ng
->> through how to handle the Windows7/WindowsVista problem to see if
->> there are workarounds.
+>> Not sure do we have a POSIX equivalent of
+>> NT_STATUS_INSUFF_SERVER_RESOURCES? Should we map it to a error code =
+that
+>> is more obvious?
 >>
 >
-> This is seems likely to be a cifs.ko bug -- it does not respect the
-> MaxReq parm that the server sends in the negotiate and instead uses a
-> hardcoded limit of 50 requests (which is tunable via module parm).
->
-> What value is the server sending in the NEGOTIATE? Ensuring that
-> cifs.ko doesn't exceed that value seems like a worthwhile endeavor.
-> This is likely to be even worse soon when the async read patches are
-> merged.
+> Maybe -EREMOTEIO ?
 
-Yes, the client should not be exceeding the limit, but more testing
-is needed of my earlier patch for that.
+The mapping of NT_STATUS_INSUFFICIENT_SERVER_RESOURCES to posix error
+ENOMEM appears to be correct for multiple reasons.  Windows itself maps=
+ it this
+way when mapping from NT STATUS to DOS errors. For example, on subseque=
+nt
+requests, I see server returning DOS (!) error for error_no_memory on s=
+ome
+types of SMBs and NT error insufficient_server_resources on others.
+
 
 
 --=20
