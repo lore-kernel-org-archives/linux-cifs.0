@@ -1,58 +1,125 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Mounts to Windows 7 and "out of memory" or "insufficient server resources"
-Date: Wed, 28 Sep 2011 20:22:18 -0500
-Message-ID: <CAH2r5mvhLCPpMa3Q4fbXQmMqKKC8aopix0LrQDtCR1-22KTP-Q@mail.gmail.com>
-References: <CAH2r5msivsE_47mESmGR=Xjf2v-kKwi-Qpym2kxuTLPbYudisQ@mail.gmail.com>
-	<CADT32eLk5N4WJCMdtcd3MTgR39fCTn4_gQqqobYsxkpcPnfuDQ@mail.gmail.com>
-	<CAH2r5msGzs65HO_YuuUzhp3RNo+rJEB=ey8Hx5=1r=bpWpjWLA@mail.gmail.com>
-	<20110928155648.09c19e8c@tlielax.poochiereds.net>
+Subject: Re: [PATCH 2/4] cifs, freezer: add wait_event_freezekillable and have
+ cifs use it
+Date: Wed, 28 Sep 2011 23:28:02 -0500
+Message-ID: <CAH2r5mtBwUkTXLQeXzvTC6oAcz1i9jzPGfiE7XTzDTw12A6C_Q@mail.gmail.com>
+References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
+	<1317210761-11518-3-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, pavel-+ZI9xUNit7I@public.gmane.org, rjw-KKrjLPT3xs0@public.gmane.org,
+	linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-HpsXz0BELY4AvxtiuMwx3w@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20110928155648.09c19e8c-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1317210761-11518-3-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Sep 28, 2011 at 2:56 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Wed, 28 Sep 2011 13:28:38 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+The general idea of the patch seems like a good idea to
+me.  Assuming testing feedback was good from the problem
+reporters, what tree would you want it merged from?
+
+On Wed, Sep 28, 2011 at 6:52 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> CIFS currently uses wait_event_killable to put tasks to sleep while
+> they await replies from the server. That function though does not
+> allow the freezer to run. In many cases, the network interface may
+> be going down anyway, in which case the reply will never come. The
+> client then ends up blocking the computer from suspending.
 >
->> On Wed, Sep 28, 2011 at 4:30 AM, Shirish Pargaonkar
->> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> > On Tue, Sep 27, 2011 at 4:36 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>=
- wrote:
->> >> FYI - The cifs async write in 3.0 seems to exacerbate problems ru=
-nning
->> >> out of memory (apparently) on the Windows 7 system (running as a
->> >> server) after a large file copy to the server completes. =A0 I ha=
-ve been
->> >> able to reproduce the same problem on Windows Vista Service Pack =
-2
-
-=46or servers other than Windows 7 and Windows Vista, we have
-not been able to reproduce the problem, so Windows 2003 and Windows 200=
-8
-are probably ok.  I was also unable to reproduce this to Samba or Windo=
-ws XP
-
-But for mounts to Windows 7 or Windows Vista from Linux cifs for 3.0
-kernel or later,
-two workarounds for this Windows problem have been found:
-
-1) As Pavel discovered, increasing MaxWorkItems to 4096 in the Windows
-registry solves this.
-2) Or to workaround this on the Linux client, load the cifs kernel
-module with a lower limit on the simultaneous requests per connection
-ie
-     "modprobe cifs cifs_max_pending=3D10"
-(it would default to 50)
-
-
+> Fix this by adding a new wait_event_freezable variant --
+> wait_event_freezekillable. The idea is to combine the behavior of
+> wait_event_killable and wait_event_freezable -- put the task to
+> sleep and only allow it to be awoken by fatal signals, but also
+> allow the freezer to do its job.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/transport.c =A0 =A0 | =A0 =A03 ++-
+> =A0include/linux/freezer.h | =A0 19 +++++++++++++++++--
+> =A02 files changed, 19 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 10ca6b2..791bc4f 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -26,6 +26,7 @@
+> =A0#include <linux/wait.h>
+> =A0#include <linux/net.h>
+> =A0#include <linux/delay.h>
+> +#include <linux/freezer.h>
+> =A0#include <asm/uaccess.h>
+> =A0#include <asm/processor.h>
+> =A0#include <linux/mempool.h>
+> @@ -324,7 +325,7 @@ wait_for_response(struct TCP_Server_Info *server,=
+ struct mid_q_entry *midQ)
+> =A0{
+> =A0 =A0 =A0 =A0int error;
+>
+> - =A0 =A0 =A0 error =3D wait_event_killable(server->response_q,
+> + =A0 =A0 =A0 error =3D wait_event_freezekillable(server->response_q,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+midQ->midState !=3D MID_REQUEST_SUBMITTED);
+> =A0 =A0 =A0 =A0if (error < 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ERESTARTSYS;
+> diff --git a/include/linux/freezer.h b/include/linux/freezer.h
+> index 1effc8b..3672f73 100644
+> --- a/include/linux/freezer.h
+> +++ b/include/linux/freezer.h
+> @@ -134,10 +134,25 @@ static inline void set_freezable_with_signal(vo=
+id)
+> =A0}
+>
+> =A0/*
+> - * Freezer-friendly wrappers around wait_event_interruptible() and
+> - * wait_event_interruptible_timeout(), originally defined in <linux/=
+wait.h>
+> + * Freezer-friendly wrappers around wait_event_interruptible(),
+> + * wait_event_killable() and wait_event_interruptible_timeout(), ori=
+ginally
+> + * defined in <linux/wait.h>
+> =A0*/
+>
+> +#define wait_event_freezekillable(wq, condition) =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 \
+> +({ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 \
+> + =A0 =A0 =A0 int __retval; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 \
+> + =A0 =A0 =A0 do { =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 __retval =3D wait_event_killable(wq, =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (condit=
+ion) || freezing(current)); =A0 =A0 =A0\
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (__retval && !freezing(current)) =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 \
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break; =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if (!(condition)) =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __retval =3D -ERESTARTS=
+YS; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> + =A0 =A0 =A0 } while (try_to_freeze()); =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> + =A0 =A0 =A0 __retval; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 \
+> +})
+> +
+> =A0#define wait_event_freezable(wq, condition) =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0\
+> =A0({ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ \
+> =A0 =A0 =A0 =A0int __retval; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 \
+> --
+> 1.7.6.2
+>
+>
 
 
 
