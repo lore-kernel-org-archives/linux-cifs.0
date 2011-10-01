@@ -1,81 +1,70 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: broken mandatory locking behavior
-Date: Sat, 1 Oct 2011 08:36:36 -0400
-Message-ID: <20111001083636.247525dc@tlielax.poochiereds.net>
-References: <CAKywueSgXNhmoA7V82U5Y0=N+DQWysekAwDdsiLMPt6L0OV55Q@mail.gmail.com>
+From: Lars =?iso-8859-1?Q?M=FCller?= <lmuelle-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: CIFS  kernel module bug
+Date: Sat, 1 Oct 2011 17:07:30 +0200
+Message-ID: <20111001150730.GJ5170@giles.fritz.box>
+References: <A904EFBF-CBC1-4842-9E50-2A556103B8AA@cam.ac.uk>
+ <20110930140409.51c1a94c@tlielax.poochiereds.net>
+ <E35BF115-B84D-4DB2-BDDC-E356052282F2@cam.ac.uk>
+ <20110930234711.GD14147@samba2>
+ <alpine.LSU.2.00.1110010122210.15683@hermes-2.csi.cam.ac.uk>
+ <6704F264-5437-4948-8C1B-FE3F5CE59C24@cam.ac.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fUvfsPTz/SzOZDdw"
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	PWF Linux <pwf-linux-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueSgXNhmoA7V82U5Y0=N+DQWysekAwDdsiLMPt6L0OV55Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <6704F264-5437-4948-8C1B-FE3F5CE59C24-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 25 Sep 2011 15:39:34 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> Hi all!
-> 
-> Now I have been working on lock cache capability for cifs module and
-> simplification of lock code. So, I faced with a such an interesting
-> place - mandatory style unlock code.
-> 
-> The problem is that mandatory semantic doesn't allow to specify a
-> range and remove all locks from there. But cifs module allows it. The
-> reason why it is so can be that cifs module tries to follow posix
-> semantic for mandatory locks. I think it's not what we want at all.
-> 
-> We have two lock mode for cifs module: posix and mandatory. And as for
-> me, we should follow posix semantic for posix locks and mandatory for
-> mandatory locks. If we mix these two semantic for mandatory lock mode,
-> we reach nothing: no posix (because mandatory locks doesn't allow to
-> perform io ops on the locked region by other processes) and no
-> mandatory (because we can setup unlock from 0 to infinity and remove
-> all locks at once).
-> 
+--fUvfsPTz/SzOZDdw
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm not sure I understand what you're saying here. IIUC, windows does
-not allow the merging of lock ranges. 
+On Sat, Oct 01, 2011 at 09:48:12AM +0100, Anton Altaparmakov wrote:
+>=20
+> On 1 Oct 2011, at 01:34, J.P. King wrote:
+> > Anton will be asleep, so I'll attempt to answer this one.
+> >=20
+> >> What server code is the OES CIFS server running ? I thought Novell CIFS
+> >> services were all Samba based.
+> >=20
+> > We have been told by the people upstairs who run the server that it isn=
+'t.
+>=20
+> It is not Samba based.  Like Apple, Novell have written their own since S=
+amba decided to go GPLv3=E2=80=A6
 
-> The another problem is that this 'broken' code lives on kernel for a
-> long time. So, I suggest to discuss it now - while I am here I can
-> include this fix into my patchset as well.
-> 
+(Potential) FUD alert. ;)
 
-While I'd agree that the situation with locking is far from ideal, I'm
-not sure that the above really adequately describes the situation...
+This Novell CIFS server existed before Novell bought SUSE.  And the
+decission to go with it instead of Samba had nothing to do with the move
+of Samba from GPL v2 to v3.
 
-With cifs.ko, our goal is generally do attempt to map POSIX behavior on
-top of what the CIFS/SMB protocol allows. Locking is one of those
-unfortunate places where this mapping really falls short.
+Lars
+--=20
+Lars M=C3=BCller [=CB=88la=CB=90(r)z =CB=88m=CA=8Fl=C9=90]
+Samba Team
+SUSE Linux, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
 
-Windows locks are always mandatory -- full stop. POSIX locks are
-usually advisory (it is possible to do mandatory locking too, but
-applications rarely do). POSIX allows the merging of lock ranges.
-Windows does not. There are other differences too...
+--fUvfsPTz/SzOZDdw
+Content-Type: application/pgp-signature
 
-Now, most of our users don't care about the intricacies of what the
-protocol allows. They just want their applications to work. So, we
-attempt to accomodate that by mapping POSIX advisory locking on top of
-windows locks. It's imperfect, but we do the best we can.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
 
-Your email above is rather vague -- I get that you want to change
-*something*, but I'm not sure specifically what it is. Perhaps you can
-clarify? What changes will users see with your proposal?
+iD8DBQFOhyyy4NBiK0FKV8MRAvzbAJwLsh6foKhEobFCSnp5tqOFeLEn3ACghdM8
+UYCWNvh08eMSW2Hihkg2xYM=
+=Fi0T
+-----END PGP SIGNATURE-----
 
-We haven't discussed locking on the list in a while -- the last time
-was here:
-
-http://lists.samba.org/archive/linux-cifs-client/2007-July/002088.html
-http://lists.samba.org/archive/linux-cifs-client/2007-August/002167.html
-
-I'd make sure what you're proposing jives with the limitations that
-Jeremy outlined. 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--fUvfsPTz/SzOZDdw--
