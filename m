@@ -1,222 +1,94 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Add mount options for backup intent and
- their manpages (try #6)
-Date: Mon, 3 Oct 2011 07:49:53 -0400
-Message-ID: <20111003074953.06f8eb5d@tlielax.poochiereds.net>
-References: <1317149929-1206-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Lars =?iso-8859-1?Q?M=FCller?= <lmuelle-l3A5Bk7waGM@public.gmane.org>
+Subject: Re: CIFS kernel module bug
+Date: Mon, 3 Oct 2011 18:56:29 +0200
+Message-ID: <20111003165629.GM5170@giles.fritz.box>
+References: <A904EFBF-CBC1-4842-9E50-2A556103B8AA@cam.ac.uk>
+ <20110930140409.51c1a94c@tlielax.poochiereds.net>
+ <E35BF115-B84D-4DB2-BDDC-E356052282F2@cam.ac.uk>
+ <20110930234711.GD14147@samba2>
+ <alpine.LSU.2.00.1110010122210.15683@hermes-2.csi.cam.ac.uk>
+ <6704F264-5437-4948-8C1B-FE3F5CE59C24@cam.ac.uk>
+ <20111001150730.GJ5170@giles.fritz.box>
+ <6A5AB13C-F313-4BF2-A402-F41AB53493F0@cam.ac.uk>
+ <CAFneQcc8D7ho-Yfr2X0DxaLLX11iMU=wSgCw9daKoViZCMk6dA@mail.gmail.com>
+ <65C75335-2A74-4B00-989A-212BAC06A646@cam.ac.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="SgT04PEqo/+yUDw3"
+Cc: Jim McDonough <jmcd-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	PWF Linux <pwf-linux-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1317149929-1206-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <65C75335-2A74-4B00-989A-212BAC06A646-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 27 Sep 2011 13:58:49 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> Add mount options backupuid and backugid and their manpage contents.
-> Check for either a valid uid/gid or valid user/group name.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  mount.cifs.8 |   14 +++++++++
->  mount.cifs.c |   85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 97 insertions(+), 2 deletions(-)
-> 
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 81ebdbe..d7eb2dd 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -282,6 +282,20 @@ See sections on
->  for more information\&.
->  .RE
->  .PP
-> +backupuid
-> +.RS 4
-> +Allow access to files with the intent to back them up for a user\&.
-> +.sp
-> +An authenticated user at the server with a privilege can access file system objects with the intent to back them up to which it otherwise may not have access permissions.  As an example, a privilege would be "Backup files and directories user right" granted by the server by making that user a part of the built-in group Backup Operators. This mount option restricts to the specified user on the client, as such an authenticated user, privilege to access files with the intent to back them up.
+--SgT04PEqo/+yUDw3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Better, but this is still pretty awkward and confusing. This manpage
-needs to answer 3 things:
+Hi,
 
-1. what this option does (turn on the backup intent bit in open calls)
+On Sun, Oct 02, 2011 at 09:16:33PM +0100, Anton Altaparmakov wrote:
+>=20
+> On 1 Oct 2011, at 21:22, Jim McDonough wrote:
+[ 8< ]
+> > I believe both are available on OES, samba and the CIFS server that
+> > has its origins in Netware.
+>=20
+> That is correct but apparently Salford Software (who handle our Netware &=
+ OES site license here in the UK including providing support) have told the=
+ guys running the file server that the samba server on OES is not scalable,=
+ has loads of bugs, and they must stay away from it at all costs and that t=
+hey would not provide any support if our filestore runs that instead of the=
+ Novell CIFSd.
+>=20
+> You can understand why the filestore is thus running the Novell CIFSd rat=
+her than Samba=E2=80=A6
 
-2. what the backup intent bit does (allows a user to open files to
-which he wouldn't ordinarily have access)
+This OES is very likely SUSE Linux Enterprise (SLE) 10 based.  This code
+base initially included Samba 3.0.
 
-3. when should (or shouldn't) the user enable it?
+There is an additional, optional software repository available online
+for SUSE Linux Enterprise customers - named SLES10-GPLv3-Extras - which
+provides Samba 3.4.3[0] - same version and including the same fixes as
+the version used with SLE 11 SP 1.
 
-If this is going to be too long then you may want to add a new section
-to explain the backup intent in detail.
+Ok, that's the good news.  Now to the potential bad part.
 
-> +.RE
-> +.PP
-> +backupgid
-> +.RS 4
-> +Allow access to files with the intent to back them up for a group\&.
-> +.sp
-> +An authenticated user at the server with a privilege can access file system objects with the intent to back them up to which it otherwise may not have access permissions.  As an example, a privilege would be "Backup files and directories user right" granted by the server by making that user a part of the built-in group Backup Operators. This mount option restricts to the users in the specified group on the client, as such an authenticated user, privilege to access files with the intent to back them up.
-> +.RE
-> +.PP
->  nocase
->  .RS 4
->  Request case insensitive path name matching (case sensitive is the default if the server suports it)\&.
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 1e3d534..36c3ac0 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -158,6 +158,8 @@
->  #define OPT_MAND       27
->  #define OPT_NOMAND     28
->  #define OPT_CRUID      29
-> +#define OPT_BKUPUID    30
-> +#define OPT_BKUPGID    31
->  
->  
->  /* struct for holding parsed mount info for use by privleged process */
-> @@ -843,6 +845,10 @@ static int parse_opt_token(const char *token)
->  		return OPT_REMOUNT;
->  	if (strncmp(token, "_netdev", 7) == 0)
->  		return OPT_IGNORE;
-> +	if (strncmp(token, "backupuid", 9) == 0)
-> +		return OPT_BKUPUID;
-> +	if (strncmp(token, "backupgid", 9) == 0)
-> +		return OPT_BKUPGID;
->  
->  	return OPT_ERROR;
->  }
-> @@ -858,11 +864,13 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  	int out_len = 0;
->  	int word_len;
->  	int rc = 0;
-> +	int got_bkupuid = 0;
-> +	int got_bkupgid = 0;
->  	int got_uid = 0;
->  	int got_cruid = 0;
->  	int got_gid = 0;
-> -	uid_t uid, cruid = 0;
-> -	gid_t gid;
-> +	uid_t uid, cruid = 0, bkupuid;
-> +	gid_t gid, bkupgid;
->  	char *ep;
->  	struct passwd *pw;
->  	struct group *gr;
-> @@ -906,6 +914,8 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  			value = equals + 1;
->  		}
->  
-> +		ep = NULL;
-> +
->  		switch(parse_opt_token(data)) {
->  		case OPT_USERS:
->  			if (!value || !*value) {
-> @@ -1171,6 +1181,42 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  			break;
->  		case OPT_IGNORE:
->  			goto nocopy;
-> +		case OPT_BKUPUID:
-> +			if (!value || !*value)
-> +				goto nocopy;
-> +
-> +			got_bkupuid = 1;
-> +			bkupuid = strtoul(value, &ep, 10);
-> +			if (!strlen(ep))
-> +				goto nocopy;
-> +
-> +			pw = getpwnam(value);
-> +			if (pw == NULL) {
-> +				fprintf(stderr,
-> +					"bad user name \"%s\"\n", value);
-> +				return EX_USAGE;
-> +			}
-> +
-> +			bkupuid = pw->pw_uid;
-> +			goto nocopy;
-> +		case OPT_BKUPGID:
-> +			if (!value || !*value)
-> +				goto nocopy;
-> +
-> +			got_bkupgid = 1;
-> +			bkupgid = strtoul(value, &ep, 10);
-> +			if (!strlen(ep))
-> +				goto nocopy;
-> +
-> +			gr = getgrnam(value);
-> +			if (gr == NULL) {
-> +				fprintf(stderr,
-> +					"bad group name \"%s\"\n", value);
-> +				return EX_USAGE;
-> +			}
-> +
-> +			bkupgid = gr->gr_gid;
-> +			goto nocopy;
->  		}
->  
->  		/* check size before copying option to buffer */
-> @@ -1246,6 +1292,39 @@ nocopy:
->  		}
->  		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
->  	}
-> +	/* special-case the uid and gid */
-		^^^
-I don't think you need this comment.
+The bad part only applies if you make use of Domain Services for Windows
+(DSfW) formerly known as xad.
 
-> +	if (got_bkupuid) {
-> +		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", bkupuid);
-> +
-> +		/* comma + "uid=" + terminating NULL == 6 */
-> +		if (out_len + word_len + 6 > MAX_OPTIONS_LEN) {
-> +			fprintf(stderr, "Options string too long\n");
-> +			return EX_USAGE;
-> +		}
-> +
-> +		if (out_len) {
-> +			strlcat(out, ",", MAX_OPTIONS_LEN);
-> +			out_len++;
-> +		}
-> +		snprintf(out + out_len, word_len + 11, "backupuid=%s", txtbuf);
-> +		out_len = strlen(out);
-> +	}
-> +	if (got_bkupgid) {
-> +		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", bkupgid);
-> +
-> +		/* comma + "backkupgid=" + terminating NULL == 6 */
-> +		if (out_len + word_len + 6 > MAX_OPTIONS_LEN) {
-> +			fprintf(stderr, "Options string too long\n");
-> +			return EX_USAGE;
-> +		}
-> +
-> +		if (out_len) {
-> +			strlcat(out, ",", MAX_OPTIONS_LEN);
-> +			out_len++;
-> +		}
-> +		snprintf(out + out_len, word_len + 11, "backupgid=%s", txtbuf);
-> +	}
-> +
->  	return 0;
->  }
->  
-> @@ -1361,6 +1440,8 @@ static struct option longopts[] = {
->  	{"type", 1, NULL, 't'},
->  	{"uid", 1, NULL, '1'},
->  	{"gid", 1, NULL, '2'},
-> +	{"backupuid", 1, NULL, '1'},
-> +	{"backupgid", 1, NULL, '2'},
+Some of the required modifications had not been ported to Samba post-3.0
+and therefore running any post-3.0 Samba code will cause trouble aka
+will not work.  We're working on this with the OES colleagues.
 
-This looks unnecessary and wrong. You're adding a new command line
-alias for --uid called --backupuid?
+Lars
 
->  	{"user", 1, NULL, 'u'},
->  	{"username", 1, NULL, 'u'},
->  	{"dom", 1, NULL, 'd'},
+[0]
+http://www.novell.com/support/viewContent.do?externalId=3D7007836&sliceId=
+=3D1
+--=20
+Lars M=C3=BCller [=CB=88la=CB=90(r)z =CB=88m=CA=8Fl=C9=90]
+Samba Team
+SUSE Linux, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--SgT04PEqo/+yUDw3
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
+
+iD8DBQFOiek94NBiK0FKV8MRAg6tAJ9qTVnd3by9FSkAhDMeAJHmEDY9RACgkZ9j
+SF8c91ugwSuzE5SczY355KU=
+=OB0j
+-----END PGP SIGNATURE-----
+
+--SgT04PEqo/+yUDw3--
