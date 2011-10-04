@@ -1,114 +1,89 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 00/16] cifs: cleanup and overhaul of the receive
- codepath (try #2)
-Date: Tue, 4 Oct 2011 07:00:58 -0400
-Message-ID: <20111004070058.7d3cf2bf@tlielax.poochiereds.net>
-References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
-	<CAKywueRCK+sw=GHBVn-mWe_Z1aWCH6uW=e=5MX7NNPY8Kum9tw@mail.gmail.com>
-	<CAKywueSboCYDxOF2a=Q0eLsKwWuai6BU5mnzAt_C_vjFkhSufw@mail.gmail.com>
+Subject: Re: [PATCH] CIFS: Fix NT_STATUS_ACCESS_DENIED for mounts with
+ prefixpath option
+Date: Tue, 4 Oct 2011 07:23:08 -0400
+Message-ID: <20111004072308.6010ecbc@tlielax.poochiereds.net>
+References: <1314341541-2476-1-git-send-email-piastry@etersoft.ru>
+	<CAKywueRzwQPROzWTNwhbSOeEanV+Pumn=vFDmYL0uuEApfsX9A@mail.gmail.com>
+	<20110830085935.71e671e4@corrin.poochiereds.net>
+	<CAKywueSy2tFQC4mxOBZYjiY=PyLjUZ44v+qvtNNg+zKoxJmeCw@mail.gmail.com>
+	<20110831140044.5ac4a691@tlielax.poochiereds.net>
+	<CAKywueTh-XVrmRH-7AwedShAhmAmFAHs9fsOALrZpkzMhemP=Q@mail.gmail.com>
+	<20110831144152.788c2543@tlielax.poochiereds.net>
+	<CAKywueQB=xM1Uv=HBpBwHSqbDcq43aBm4gYD_XbUahP9fyy9vA@mail.gmail.com>
+	<20110831152247.2f2cfcbd@tlielax.poochiereds.net>
+	<CAKywueQ1shXsy1rSBJx1H7aD80wg-3=GbvKhLXHeH_nJRz3b2g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueSboCYDxOF2a=Q0eLsKwWuai6BU5mnzAt_C_vjFkhSufw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueQ1shXsy1rSBJx1H7aD80wg-3=GbvKhLXHeH_nJRz3b2g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 4 Oct 2011 13:04:19 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Tue, 4 Oct 2011 13:01:35 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> 2011/8/27 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> > 2011/8/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> >> This patchset does a fairly major cleanup and overhaul of the rece=
-ive
-> >> codepath for cifs. Aside from basic cleanup, there are two main go=
-als:
-> >>
-> >> 1) allow the receive codepath to identify the mid before receiving=
- all
-> >> of the data for a particular SMB.
-> >>
-> >> ...and in turn...
-> >>
-> >> 2) add the ability for certain calls to receive their responses in=
-to
-> >> their into their own set of buffers.
-> >>
-> >> These two changes allow cifs to break the CIFSMaxBufSize barrier f=
-or
-> >> receives. This patchset just adds the necessary infrastructure to =
-do
-> >> the above.
-> >>
-> >> A separate patchset will follow that will overhaul cifs_readpages =
-to use
-> >> this infrastructure to allow for a larger rsize.
-> >>
-> >> Jeff Layton (16):
-> >> =C2=A0cifs: clean up checkSMB
-> >> =C2=A0cifs: consolidate signature generating code
-> >> =C2=A0cifs: trivial: remove obsolete comment
-> >> =C2=A0cifs: make smb_msg local to read_from_socket
-> >> =C2=A0cifs: check for unresponsive server every time we call kerne=
-l_recvmsg
-> >> =C2=A0cifs: simplify read_from_socket
-> >> =C2=A0cifs: turn read_from_socket into a wrapper around a vectoriz=
-ed
-> >> =C2=A0 =C2=A0version
-> >> =C2=A0cifs: keep a reusable kvec array for receives
-> >> =C2=A0cifs: clean up check_rfc1002_header
-> >> =C2=A0cifs: add a third receive phase to cifs_demultiplex_thread
-> >> =C2=A0cifs: move mid finding into separate routine
-> >> =C2=A0cifs: eliminate is_multi_rsp parm to find_cifs_mid
-> >> =C2=A0cifs: move buffer pointers into TCP_Server_Info
-> >> =C2=A0cifs: find mid earlier in receive codepath
-> >> =C2=A0cifs: break out 3rd receive phase into separate function
-> >> =C2=A0cifs: add a callback function to receive the rest of the fra=
-me
-> >>
-> >> =C2=A0fs/cifs/cifsencrypt.c | =C2=A0103 ++--------
-> >> =C2=A0fs/cifs/cifsglob.h =C2=A0 =C2=A0| =C2=A0 29 +++-
-> >> =C2=A0fs/cifs/cifsproto.h =C2=A0 | =C2=A0 =C2=A07 +-
-> >> =C2=A0fs/cifs/cifssmb.c =C2=A0 =C2=A0 | =C2=A0 =C2=A05 +-
-> >> =C2=A0fs/cifs/connect.c =C2=A0 =C2=A0 | =C2=A0519 ++++++++++++++++=
-++++++++++++---------------------
-> >> =C2=A0fs/cifs/misc.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 51 +++---
-> >> =C2=A0fs/cifs/transport.c =C2=A0 | =C2=A0 16 +-
-> >> =C2=A07 files changed, 391 insertions(+), 339 deletions(-)
-> >>
-> >> --
-> >> 1.7.6
-> >>
-> >> --
-> >> To unsubscribe from this list: send the line "unsubscribe linux-ci=
-fs" in
-> >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> >> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info=
-=2Ehtml
-> >>
+> Sorry for the long delay on this.
+> 
+> 2011/8/31 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> > If the parent dentry is negative, you mean. Ok, Good point...
 > >
-> > The patchset looks good to me at the first glance. I am going to lo=
-ok
-> > at this more carefully and test it in a few days.
+> > Ok, so you're proposing to wrap this check in a big mutex to prevent
+> > this race when the parent dentry is negative. In the event that it's
+> > positive though, you'll need to make sure that you take the parent's
+> > i_mutex.
+> 
+> Yes, that's what I meant.
+> 
 > >
-> > --
-> > Best regards,
-> > Pavel Shilovsky.
+> > I don't have a great feel for this sort of dcache trickery, but this
+> > whole scheme sounds like it's going to break a lot of assumptions about
+> > how the dcache works. In particular having negative dentries with
+> > children sounds very problematic.
 > >
->=20
-> Sorry for the long delay on this. As patchwork.kernel.org isn't
-> available now, can you point me to public git repo, where I can fetch
-> that changes, please?
->=20
+> > Would it be better to simply make the initial dentry in this case be a
+> > disconnected or root dentry (see DCACHE_DISCONNECTED), and then later
+> > "graft" it into a larger tree if the parent comes to life?
+> >
+> 
+> I am not sure that I understand you right. As I see what you suggest:
+> 
+> Let's predict we have mounted //server/share/a/ so
+> 1. Dummy superblock root is set to //server/share/a/.
+> 2. Get an inode and a dentry for //server/share/a/.
+> 
+> Then, we mount //server/share/, so
+> 3. Get an inode and a dentry for //server/share/
+> 
+> Then, we reach //server/share/a from the second share, so we need to
+> find the existing dentry from the first share. We can store all
+> dentries that pass through cifs_lookup and cifs_get_root with a full
+> path hash and use them in future when such a path is requested.
+> 
+> Makes sense?
+> 
 
+(cc'ing David Howells since he did the original sb-sharing code for NFS
+and may have an opinion here)
 
-Yes, I've moved my git repo to samba.org for the time being:
+That sounds basically like what I'm saying. The tricky part is
+fixing up the parent for the original '/a' when you reach it. To do
+that, I think you'll also need to fix up cifs_lookup to call
+d_materialise_unique instead of d_add.
 
-http://git.samba.org/?p=3Djlayton/linux.git;a=3Dsummary
+This situation however is a bit different from NFS. With NFS, the
+filehandle (and hence the inode) will be the same no matter how you
+reach /a. It's possible though that cifs.ko will be manufacturing
+inode numbers out of thin air.
 
-See the "cifs-3.2" branch.
+So you may need some other mechanism to determine when you've reached a
+"connection" to an existing mount like this, or come up with some way
+to ensure that you always get the right inode when you do a lookup on
+the same pathname.
 
---=20
+-- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
