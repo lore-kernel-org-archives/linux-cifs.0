@@ -1,96 +1,114 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: broken mandatory locking behavior
-Date: Tue, 4 Oct 2011 06:54:51 -0400
-Message-ID: <20111004065451.41bc3d2f@tlielax.poochiereds.net>
-References: <CAKywueSgXNhmoA7V82U5Y0=N+DQWysekAwDdsiLMPt6L0OV55Q@mail.gmail.com>
-	<20111001083636.247525dc@tlielax.poochiereds.net>
-	<CAKywueTN=QTBA+tqT79ObfXYmKmA4Rcx9N-XBDoJCURk0JPu+g@mail.gmail.com>
+Subject: Re: [PATCH 00/16] cifs: cleanup and overhaul of the receive
+ codepath (try #2)
+Date: Tue, 4 Oct 2011 07:00:58 -0400
+Message-ID: <20111004070058.7d3cf2bf@tlielax.poochiereds.net>
+References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
+	<CAKywueRCK+sw=GHBVn-mWe_Z1aWCH6uW=e=5MX7NNPY8Kum9tw@mail.gmail.com>
+	<CAKywueSboCYDxOF2a=Q0eLsKwWuai6BU5mnzAt_C_vjFkhSufw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTN=QTBA+tqT79ObfXYmKmA4Rcx9N-XBDoJCURk0JPu+g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueSboCYDxOF2a=Q0eLsKwWuai6BU5mnzAt_C_vjFkhSufw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 4 Oct 2011 13:42:24 +0400
+On Tue, 4 Oct 2011 13:04:19 +0400
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> 2011/10/1 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > I'm not sure I understand what you're saying here. IIUC, windows does
-> > not allow the merging of lock ranges.
-> 
-> Yes, in CIFS we allow to unlock all locks that appears in unlock
-> region for mandatory locks (by unlocking each one in an order), but
-> Windows doesn't.
-> 
+> 2011/8/27 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> > 2011/8/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> >> This patchset does a fairly major cleanup and overhaul of the rece=
+ive
+> >> codepath for cifs. Aside from basic cleanup, there are two main go=
+als:
+> >>
+> >> 1) allow the receive codepath to identify the mid before receiving=
+ all
+> >> of the data for a particular SMB.
+> >>
+> >> ...and in turn...
+> >>
+> >> 2) add the ability for certain calls to receive their responses in=
+to
+> >> their into their own set of buffers.
+> >>
+> >> These two changes allow cifs to break the CIFSMaxBufSize barrier f=
+or
+> >> receives. This patchset just adds the necessary infrastructure to =
+do
+> >> the above.
+> >>
+> >> A separate patchset will follow that will overhaul cifs_readpages =
+to use
+> >> this infrastructure to allow for a larger rsize.
+> >>
+> >> Jeff Layton (16):
+> >> =C2=A0cifs: clean up checkSMB
+> >> =C2=A0cifs: consolidate signature generating code
+> >> =C2=A0cifs: trivial: remove obsolete comment
+> >> =C2=A0cifs: make smb_msg local to read_from_socket
+> >> =C2=A0cifs: check for unresponsive server every time we call kerne=
+l_recvmsg
+> >> =C2=A0cifs: simplify read_from_socket
+> >> =C2=A0cifs: turn read_from_socket into a wrapper around a vectoriz=
+ed
+> >> =C2=A0 =C2=A0version
+> >> =C2=A0cifs: keep a reusable kvec array for receives
+> >> =C2=A0cifs: clean up check_rfc1002_header
+> >> =C2=A0cifs: add a third receive phase to cifs_demultiplex_thread
+> >> =C2=A0cifs: move mid finding into separate routine
+> >> =C2=A0cifs: eliminate is_multi_rsp parm to find_cifs_mid
+> >> =C2=A0cifs: move buffer pointers into TCP_Server_Info
+> >> =C2=A0cifs: find mid earlier in receive codepath
+> >> =C2=A0cifs: break out 3rd receive phase into separate function
+> >> =C2=A0cifs: add a callback function to receive the rest of the fra=
+me
+> >>
+> >> =C2=A0fs/cifs/cifsencrypt.c | =C2=A0103 ++--------
+> >> =C2=A0fs/cifs/cifsglob.h =C2=A0 =C2=A0| =C2=A0 29 +++-
+> >> =C2=A0fs/cifs/cifsproto.h =C2=A0 | =C2=A0 =C2=A07 +-
+> >> =C2=A0fs/cifs/cifssmb.c =C2=A0 =C2=A0 | =C2=A0 =C2=A05 +-
+> >> =C2=A0fs/cifs/connect.c =C2=A0 =C2=A0 | =C2=A0519 ++++++++++++++++=
+++++++++++++---------------------
+> >> =C2=A0fs/cifs/misc.c =C2=A0 =C2=A0 =C2=A0 =C2=A0| =C2=A0 51 +++---
+> >> =C2=A0fs/cifs/transport.c =C2=A0 | =C2=A0 16 +-
+> >> =C2=A07 files changed, 391 insertions(+), 339 deletions(-)
+> >>
+> >> --
+> >> 1.7.6
+> >>
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-ci=
+fs" in
+> >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> >> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info=
+=2Ehtml
+> >>
 > >
-> > While I'd agree that the situation with locking is far from ideal, I'm
-> > not sure that the above really adequately describes the situation...
+> > The patchset looks good to me at the first glance. I am going to lo=
+ok
+> > at this more carefully and test it in a few days.
 > >
-> > With cifs.ko, our goal is generally do attempt to map POSIX behavior on
-> > top of what the CIFS/SMB protocol allows. Locking is one of those
-> > unfortunate places where this mapping really falls short.
+> > --
+> > Best regards,
+> > Pavel Shilovsky.
 > >
-> > Windows locks are always mandatory -- full stop. POSIX locks are
-> > usually advisory (it is possible to do mandatory locking too, but
-> > applications rarely do). POSIX allows the merging of lock ranges.
-> > Windows does not. There are other differences too...
-> >
-> > Now, most of our users don't care about the intricacies of what the
-> > protocol allows. They just want their applications to work. So, we
-> > attempt to accomodate that by mapping POSIX advisory locking on top of
-> > windows locks. It's imperfect, but we do the best we can.
-> >
-> > Your email above is rather vague -- I get that you want to change
-> > *something*, but I'm not sure specifically what it is. Perhaps you can
-> > clarify? What changes will users see with your proposal?
-> 
-> Ok, sorry for wasn't clear. I suggest to follow Windows semantic
-> fluently for Windows locks - to unlock exactly the lock (one lock)
-> that is requested and no others. So, the end users will need to unlock
-> every lock they set before. On close, Windows remove locks itself -
-> so, we don't need to unlock them explicitly.
-> 
+>=20
+> Sorry for the long delay on this. As patchwork.kernel.org isn't
+> available now, can you point me to public git repo, where I can fetch
+> that changes, please?
+>=20
 
-The VFS calls down to the filesystem to unlock all of the locks prior
-to ->release. How do you propose to tell the difference?
 
-All cifs.ko will see is an unlock from the VFS -- it has no way to know
-whether it's a "normal" unlock or an unlock that's occurring due to a
-close() syscall (and therefore can be skipped).
+Yes, I've moved my git repo to samba.org for the time being:
 
-IOW, doing what you propose here will require VFS-level changes.
+http://git.samba.org/?p=3Djlayton/linux.git;a=3Dsummary
 
-> As we can't follow POSIX semantic Windows locks fluently, I don't
-> think we need to support it partly. So, as the results, we end up with
-> two opposite mode for brlocks: Windows and POSIX. If someone needs
-> such sort mixing as we have now, we can add extra mount option for
-> this further (or vice versa - a mount option for the new mode).
-> 
-> Thoughts?
-> 
+See the "cifs-3.2" branch.
 
-I think this is tantamount to insisting that applications be specially
-written for cifs.ko if they want to do locking.
-
-The larger goal for cifs.ko (as I see it) is to allow applications to
-mostly run unchanged on top of windows servers. Naturally, this is
-impossible since windows doesn't follow POSIX semantics, so the best we
-can do is closely approximate it.
-
-There's certainly room for improvement here, but what you're proposing
-sounds like a step backward from that goal. It will break a lot of
-existing applications that run successfully on top of cifs.ko today.
-
-I'm also not sure I understand the benefit here either. What do you
-think that such a change would gain us?
-
--- 
+--=20
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
