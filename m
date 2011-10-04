@@ -1,96 +1,66 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 00/16] cifs: cleanup and overhaul of the receive codepath
- (try #2)
-Date: Tue, 4 Oct 2011 13:04:19 +0400
-Message-ID: <CAKywueSboCYDxOF2a=Q0eLsKwWuai6BU5mnzAt_C_vjFkhSufw@mail.gmail.com>
-References: <1314385589-27136-1-git-send-email-jlayton@redhat.com>
-	<CAKywueRCK+sw=GHBVn-mWe_Z1aWCH6uW=e=5MX7NNPY8Kum9tw@mail.gmail.com>
+Subject: Re: broken mandatory locking behavior
+Date: Tue, 4 Oct 2011 13:42:24 +0400
+Message-ID: <CAKywueTN=QTBA+tqT79ObfXYmKmA4Rcx9N-XBDoJCURk0JPu+g@mail.gmail.com>
+References: <CAKywueSgXNhmoA7V82U5Y0=N+DQWysekAwDdsiLMPt6L0OV55Q@mail.gmail.com>
+	<20111001083636.247525dc@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
+	Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRCK+sw=GHBVn-mWe_Z1aWCH6uW=e=5MX7NNPY8Kum9tw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20111001083636.247525dc-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/8/27 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> 2011/8/26 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> This patchset does a fairly major cleanup and overhaul of the receiv=
-e
->> codepath for cifs. Aside from basic cleanup, there are two main goal=
-s:
->>
->> 1) allow the receive codepath to identify the mid before receiving a=
-ll
->> of the data for a particular SMB.
->>
->> ...and in turn...
->>
->> 2) add the ability for certain calls to receive their responses into
->> their into their own set of buffers.
->>
->> These two changes allow cifs to break the CIFSMaxBufSize barrier for
->> receives. This patchset just adds the necessary infrastructure to do
->> the above.
->>
->> A separate patchset will follow that will overhaul cifs_readpages to=
- use
->> this infrastructure to allow for a larger rsize.
->>
->> Jeff Layton (16):
->> =A0cifs: clean up checkSMB
->> =A0cifs: consolidate signature generating code
->> =A0cifs: trivial: remove obsolete comment
->> =A0cifs: make smb_msg local to read_from_socket
->> =A0cifs: check for unresponsive server every time we call kernel_rec=
-vmsg
->> =A0cifs: simplify read_from_socket
->> =A0cifs: turn read_from_socket into a wrapper around a vectorized
->> =A0 =A0version
->> =A0cifs: keep a reusable kvec array for receives
->> =A0cifs: clean up check_rfc1002_header
->> =A0cifs: add a third receive phase to cifs_demultiplex_thread
->> =A0cifs: move mid finding into separate routine
->> =A0cifs: eliminate is_multi_rsp parm to find_cifs_mid
->> =A0cifs: move buffer pointers into TCP_Server_Info
->> =A0cifs: find mid earlier in receive codepath
->> =A0cifs: break out 3rd receive phase into separate function
->> =A0cifs: add a callback function to receive the rest of the frame
->>
->> =A0fs/cifs/cifsencrypt.c | =A0103 ++--------
->> =A0fs/cifs/cifsglob.h =A0 =A0| =A0 29 +++-
->> =A0fs/cifs/cifsproto.h =A0 | =A0 =A07 +-
->> =A0fs/cifs/cifssmb.c =A0 =A0 | =A0 =A05 +-
->> =A0fs/cifs/connect.c =A0 =A0 | =A0519 ++++++++++++++++++++++++++++--=
--------------------
->> =A0fs/cifs/misc.c =A0 =A0 =A0 =A0| =A0 51 +++---
->> =A0fs/cifs/transport.c =A0 | =A0 16 +-
->> =A07 files changed, 391 insertions(+), 339 deletions(-)
->>
->> --
->> 1.7.6
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
-" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->>
->
-> The patchset looks good to me at the first glance. I am going to look
-> at this more carefully and test it in a few days.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
->
+2011/10/1 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> I'm not sure I understand what you're saying here. IIUC, windows does
+> not allow the merging of lock ranges.
 
-Sorry for the long delay on this. As patchwork.kernel.org isn't
-available now, can you point me to public git repo, where I can fetch
-that changes, please?
+Yes, in CIFS we allow to unlock all locks that appears in unlock
+region for mandatory locks (by unlocking each one in an order), but
+Windows doesn't.
 
---=20
+>
+> While I'd agree that the situation with locking is far from ideal, I'm
+> not sure that the above really adequately describes the situation...
+>
+> With cifs.ko, our goal is generally do attempt to map POSIX behavior on
+> top of what the CIFS/SMB protocol allows. Locking is one of those
+> unfortunate places where this mapping really falls short.
+>
+> Windows locks are always mandatory -- full stop. POSIX locks are
+> usually advisory (it is possible to do mandatory locking too, but
+> applications rarely do). POSIX allows the merging of lock ranges.
+> Windows does not. There are other differences too...
+>
+> Now, most of our users don't care about the intricacies of what the
+> protocol allows. They just want their applications to work. So, we
+> attempt to accomodate that by mapping POSIX advisory locking on top of
+> windows locks. It's imperfect, but we do the best we can.
+>
+> Your email above is rather vague -- I get that you want to change
+> *something*, but I'm not sure specifically what it is. Perhaps you can
+> clarify? What changes will users see with your proposal?
+
+Ok, sorry for wasn't clear. I suggest to follow Windows semantic
+fluently for Windows locks - to unlock exactly the lock (one lock)
+that is requested and no others. So, the end users will need to unlock
+every lock they set before. On close, Windows remove locks itself -
+so, we don't need to unlock them explicitly.
+
+As we can't follow POSIX semantic Windows locks fluently, I don't
+think we need to support it partly. So, as the results, we end up with
+two opposite mode for brlocks: Windows and POSIX. If someone needs
+such sort mixing as we have now, we can add extra mount option for
+this further (or vice versa - a mount option for the new mode).
+
+Thoughts?
+
+-- 
 Best regards,
 Pavel Shilovsky.
