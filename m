@@ -1,66 +1,74 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Samba] [mount.cifs] Mapping Windows ACLs SIDs to POSIX ACL ?
-Date: Thu, 6 Oct 2011 07:54:20 -0500
-Message-ID: <CADT32eLYwFmSf8P3kyj5GmGCQFvkZTYQ3Yd13nWBEiTWqYcT3A@mail.gmail.com>
-References: <4E8D7788.8000209@exalead.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: default security mechanism for 3.1
+Date: Thu, 6 Oct 2011 13:00:55 -0500
+Message-ID: <CAH2r5mscqwfx8aGU=yP33Y6FLrn3A9S-FU633dTEa1DWB-a9Xg@mail.gmail.com>
+References: <20110923081620.40c0aa17@tlielax.poochiereds.net>
+	<4E7C7AA1.2060402@suse.com>
+	<20110923094321.1e848857@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Xavier Roche <roche+kml2-bMN6HEGc4E9BDgjK7y7TUQ@public.gmane.org>
+Cc: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4E8D7788.8000209-bMN6HEGc4E9BDgjK7y7TUQ@public.gmane.org>
+In-Reply-To: <20110923094321.1e848857-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Oct 6, 2011 at 4:40 AM, Xavier Roche <roche+kml2-bMN6HEGc4E9BDgjK7y7TUQ@public.gmane.org> w=
-rote:
-> Hi folks,
+Yes - I would have liked to change this but clearly too late.
+
+On Fri, Sep 23, 2011 at 8:43 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> On Fri, 23 Sep 2011 17:55:05 +0530
+> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
 >
-> This may sound like a really stupid question, but I could not find an=
-y way
-> to somehow map remote Windows ACLs into POSIX ACLs (mapping users and=
- group
-> SIDs to Unix mapped ids) when mounting a remote share (mount.cifs) on=
- a
-> Linux box.
+>> On 09/23/2011 05:46 PM, Jeff Layton wrote:
+>> > A printk warning was added to the kernel about the default securit=
+y
+>> > mode changing in 3.1. As best I can tell though, that has not happ=
+ened
+>> > even though the release is imminent. Are you still planning to cha=
+nge
+>> > that? If not, are you planning to fix the printk?
+>> >
+>>
+>> Did you mean this one?
+>> =A0 =A0http://www.spinics.net/lists/linux-cifs/msg03976.html
+>>
+>> I remember Steve posted this patch sometime ago but I'm not seeing t=
+hem
+>> in the cifs development tree..
+>>
+>>
+>> -Suresh
 >
-> Is is something not currently implemented ? The smbcacls tool can sho=
-w the
-> actual ACLs remotely, but this information is not exposed to the moun=
-ted
-> filesystem apparently. The acl feature of the client seem to be an ex=
-tension
-> to CIFS allowing to handle POSIX ACLs, not something allowing a mappi=
-ng.
+> Yeah, that's the one. Seems a little late to be adding these sorts of
+> behavior changes in 3.1 though, so I'm just wondering what the plan i=
+s.
 >
-> Any insightful remark or documentation would be welcome!
+> I also have some concerns about defaulting to raw NTLMv2 auth since (=
+at
+> least) win2k8 rejects unless you go in and tweak registry keys. It
+> would seem to me to be better to decide the default based on the
+> negotiation:
 >
-> [ Note: the only potential issue when mapping would be related to den=
-y ACLs
-> (AceType =3D=3D ACCESS_DENIED_ACE_TYPE) ; something which is not mapp=
-able to
-> POSIX ACL. ]
+> Set extended security bit in the NegProt by default
+>
+> If the server sets it, then use NTLMSSP
+>
+> If it doesn't then use old NTLM (or NTLMv2)
+>
+> That means an overhaul of how sec_mode is handled though, since that'=
+s
+> currently decided too early to do it that way.
+>
 > --
-> To unsubscribe from this list go to the following URL and read the
-> instructions: =A0https://lists.samba.org/mailman/options/samba
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >
-,
-Currently cifs client maps DACL to Linux permission model
-but not to POSIX ACL model.
 
-You will need a kernel built with cifs_cifsacl config option
-(because it is still maexperimental) and current cifs-utils package.
-The manpages in that cifs-utils package will have info on how
-to use mount option cifsacl and how to setup id mapping
-(using winbind).
 
-The current cifs-utils package has two binaries, getcifsacl
-and setcifsacl, modeled after smbcacls.
 
-Hope that helps. You may direct any further questions/concerns
-to linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org mailing list.
+--=20
+Thanks,
 
-Regards,
-
-Shirish
+Steve
