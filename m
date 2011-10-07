@@ -1,92 +1,66 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [v3 PATCH 6/6] CIFS: Make cifs_push_locks send as many locks at once as possible
-Date: Fri,  7 Oct 2011 23:34:19 +0400
-Message-ID: <1318016059-29306-7-git-send-email-piastry@etersoft.ru>
-References: <1318016059-29306-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix incorrect max RFC1002 write size value
+Date: Fri, 7 Oct 2011 18:37:47 -0500
+Message-ID: <CAH2r5mu4EzD16wvH8iUMVDoQwkiRpwvBWy2Qbt4CsN3JHoQu=g@mail.gmail.com>
+References: <1318014354-18942-1-git-send-email-piastry@etersoft.ru>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1318016059-29306-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1318014354-18942-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that reduces a traffic and increases a performance.
+Is there a recreation scenario for this.  Your change makes sense but
+is it possible to hit?
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c |   49 +++++++++++++++++++++++++++++++++++++++++++------
- 1 files changed, 43 insertions(+), 6 deletions(-)
+On Fri, Oct 7, 2011 at 2:05 PM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> w=
+rote:
+> ..the length field has only 17 bits.
+>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+> =A0fs/cifs/connect.c | =A0 =A04 ++--
+> =A01 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 633c246..5779002 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2807,10 +2807,10 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolu=
+me_info,
+>
+> =A0/*
+> =A0* When the server doesn't allow large posix writes, only allow a w=
+size of
+> - * 128k minus the size of the WRITE_AND_X header. That allows for a =
+write up
+> + * 2^17-1 minus the size of the WRITE_AND_X header. That allows for =
+a write up
+> =A0* to the maximum size described by RFC1002.
+> =A0*/
+> -#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
+> +#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - 1 - sizeof(WRITE_REQ) +=
+ 4)
+>
+> =A0/*
+> =A0* The default wsize is 1M. find_get_pages seems to return a maximu=
+m of 256
+> --
+> 1.7.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index b4185c1..f6b8ea5 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -820,6 +820,11 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
- 	struct cifsLockInfo *li, *tmp;
- 	struct cifs_tcon *tcon;
- 	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
-+	unsigned int num, max_num;
-+	LOCKING_ANDX_RANGE *buf, *cur;
-+	int types[] = {LOCKING_ANDX_LARGE_FILES,
-+		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
-+	int i;
- 
- 	xid = GetXid();
- 	tcon = tlink_tcon(cfile->tlink);
-@@ -831,17 +836,49 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
- 		return rc;
- 	}
- 
--	list_for_each_entry_safe(li, tmp, &cinode->llist, llist) {
--		stored_rc = CIFSSMBLock(xid, tcon, cfile->netfid,
--					li->pid, li->length, li->offset,
--					0, 1, li->type, 0, 0);
--		if (stored_rc)
--			rc = stored_rc;
-+	max_num = (tcon->ses->server->maxBuf - sizeof(struct smb_hdr)) /
-+		  sizeof(LOCKING_ANDX_RANGE);
-+	buf = kzalloc(max_num * sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
-+	if (!buf) {
-+		mutex_unlock(&cinode->lock_mutex);
-+		FreeXid(xid);
-+		return rc;
-+	}
-+
-+	for (i = 0; i < 2; i++) {
-+		cur = buf;
-+		num = 0;
-+		list_for_each_entry_safe(li, tmp, &cinode->llist, llist) {
-+			if (li->type != types[i])
-+				continue;
-+			cur->Pid = cpu_to_le16(li->pid);
-+			cur->LengthLow = cpu_to_le32((u32)li->length);
-+			cur->LengthHigh = cpu_to_le32((u32)(li->length>>32));
-+			cur->OffsetLow = cpu_to_le32((u32)li->offset);
-+			cur->OffsetHigh = cpu_to_le32((u32)(li->offset>>32));
-+			if (++num == max_num) {
-+				stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
-+						       li->type, 0, num, buf);
-+				if (stored_rc)
-+					rc = stored_rc;
-+				cur = buf;
-+				num = 0;
-+			} else
-+				cur++;
-+		}
-+
-+		if (num) {
-+			stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
-+					       types[i], 0, num, buf);
-+			if (stored_rc)
-+				rc = stored_rc;
-+		}
- 	}
- 
- 	cinode->can_cache_brlcks = false;
- 	mutex_unlock(&cinode->lock_mutex);
- 
-+	kfree(buf);
- 	FreeXid(xid);
- 	return rc;
- }
--- 
-1.7.1
+
+
+--=20
+Thanks,
+
+Steve
