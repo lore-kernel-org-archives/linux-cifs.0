@@ -1,237 +1,290 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Samba] SMB Signing issues... smbclient works, mount does not...
-Date: Fri, 7 Oct 2011 09:48:16 -0500
-Message-ID: <CADT32eJoEXutC2g4PjUBq04KbHHmSHE2piaajS7tjGSmEkxUgA@mail.gmail.com>
-References: <CAOCnWPJDHeyTEai1vcGLbRNMiv3Z0ztT_GaE+Yhu=uKY8zA76Q@mail.gmail.com>
-	<CADT32eKNq5b0BxiMAiT+yKzH_4peewj1wDtCq+4ViewZ4vymHw@mail.gmail.com>
-	<4E8E8C39.80401@fugspbr.org>
-	<CADT32eJQK=6+BQprB6W5-9Fa9oX-zfS5L=V6bAjC8YxAc1MG7Q@mail.gmail.com>
-	<4E8F0039.7020306@fugspbr.org>
+Subject: Re: [PATCH] cifs-utils: Add mount options for backup intent and their
+ manpages (try #6)
+Date: Fri, 7 Oct 2011 10:29:28 -0500
+Message-ID: <CADT32eJVVHPtva-0pfY+D242sN_EvinoQQGnUn9Yh64fXBTA4Q@mail.gmail.com>
+References: <1317149929-1206-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20111003074953.06f8eb5d@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Vini <vini-d6Y6gO9EMTtAfugRpC6u6w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4E8F0039.7020306-d6Y6gO9EMTtAfugRpC6u6w@public.gmane.org>
+In-Reply-To: <20111003074953.06f8eb5d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Oct 7, 2011 at 8:35 AM, Vini <vini-d6Y6gO9EMTtAfugRpC6u6w@public.gmane.org> wrote:
-> Shirish Pargaonkar said the following on 8/10/11 12:20 AM:
->> On Fri, Oct 7, 2011 at 12:20 AM, Vini <vini-d6Y6gO9EMTtAfugRpC6u6w@public.gmane.org> wrote:
->>> On 7/10/2011 1:18 PM, Shirish Pargaonkar wrote:
->>>> On Thu, Oct 6, 2011 at 10:10 PM, Vini <vini-d6Y6gO9EMTtAfugRpC6u6w@public.gmane.org> wrote:
->>>>> Hi All,
->>>>>
->>>>> I seem to have exactly the same problem which was described in th=
-is thread a
->>>>> while ago. I have gone through every piece of information I was a=
-ble to find
->>>>> on mailing list archives but all I found was people reporting sim=
-ilar
->>>>> problems and not a solution to it.
->>>>>
->>>>> As in the original discussion if I use smbclient it works fine bu=
-t if I use
->>>>> mount.cifs it does not work at all. To make smbclient work I have=
- had to add
->>>>> "client ntlmv2 auth =3D yes" to the sbm.conf file.
->>>>>
->>>>> The server I am connecting to is a Windows 2008 R2 and the securi=
-ty policy
->>>>> only allows NTLMv2.
->>>>>
->>>>> I am trying to connect from a Centos 5.5
->>>>>
->>>>> 2.6.18-274.3.1.el5 #1 SMP Tue Sep 6 20:14:03 EDT 2011 i686 i686 i=
-386
->>>>> GNU/Linux
->>>>>
->>>>> libsmbclient-3.5.4-68.2
->>>>> samba-3.5.4-68.2
->>>>> samba-common-3.5.4-68.2
->>>>> samba-client-3.5.4-68.2
->>>>> samba-winbind-clients-3.5.4-68.2
->>>>> cifs-utils-4.4-5.2
->>>>>
->>>>> ls /proc/fs/cifs/
->>>>> cifsFYI
->>>>> DebugData
->>>>> Experimental
->>>>> LinuxExtensionsEnabled
->>>>> LookupCacheEnabled
->>>>> MultiuserMount
->>>>> OplockEnabled
->>>>> SecurityFlags
->>>>> Stats
->>>>> traceSMB
->>>>>
->>>>> modinfo cifs
->>>>> filename: =A0 =A0 =A0 /lib/modules/2.6.18-274.3.1.el5/kernel/fs/c=
-ifs/cifs.ko
->>>>> version: =A0 =A0 =A0 =A01.60RH
->>>>> description: =A0 =A0VFS to access servers complying with the SNIA=
- CIFS
->>>>> Specification e.g. Samba and Windows
->>>>> license: =A0 =A0 =A0 =A0GPL
->>>>> author: =A0 =A0 =A0 =A0 Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
->>>>> srcversion: =A0 =A0 4A9C63C35E60B4C015318F5
->>>>> depends:
->>>>> vermagic: =A0 =A0 =A0 2.6.18-274.3.1.el5 SMP mod_unload 686 REGPA=
-RM 4KSTACKS
->>>>> gcc-4.1
->>>>> parm: =A0 =A0 =A0 =A0 =A0 CIFSMaxBufSize:Network buffer size (not=
- including header).
->>>>> Default: 16384 Range: 8192 to 130048 (int)
->>>>> parm: =A0 =A0 =A0 =A0 =A0 cifs_min_rcv:Network buffers in pool. D=
-efault: 4 Range: 1 to
->>>>> 64 (int)
->>>>> parm: =A0 =A0 =A0 =A0 =A0 cifs_min_small:Small network buffers in=
- pool. Default: 30
->>>>> Range: 2 to 256 (int)
->>>>> parm: =A0 =A0 =A0 =A0 =A0 cifs_max_pending:Simultaneous requests =
-to server. Default:
->>>>> 50 Range: 2 to 256 (int)
->>>>> module_sig:
->>>>> 883f3504e66bf24104f42edc2b0f945112c79009d1e1918c363e6545d5644af26=
-235486a0faee309e3e516f3731905cd551976d305e8c32b5f117ae9b
->>>>>
->>>>>
->>>>> This works without issues:
->>>>>
->>>>> smbclient -U username //192.168.20.129/share
->>>>>
->>>>> But this does not work at all:
->>>>>
->>>>> mount.cifs //192.168.20.129/share /mnt/ -o
->>>>> user=3Dusername,password=3DXXXXXXX,sec=3Dntlmv2
->>>>>
->>>>> For the record I have tried sec=3Dntlmv2i, ntlmssp, krb5i, krb5.
->>>>>
->>>>> Here is what I get when I try:
->>>>>
->>>>>
->>>>>
->>>>> With sec=3Dntlmv2i
->>>>>
->>>>> mount error(22): Invalid argument
->>>>> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->>>>>
->>>>> and dmesg gives:
->>>>>
->>>>> =A0CIFS VFS: Unexpected SMB signature
->>>>> Status code returned 0xc000000d NT_STATUS_INVALID_PARAMETER
->>>>> =A0CIFS VFS: Send error in SessSetup =3D -22
->>>>> =A0CIFS VFS: cifs_mount failed w/return code =3D -22
->>>>>
->>>>>
->>>>>
->>>>> With sec=3Dntlmv2
->>>>>
->>>>> mount error(95): Operation not supported
->>>>> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->>>>>
->>>>> and dmesg gives:
->>>>>
->>>>> =A0CIFS VFS: Server requires packet signing to be enabled in
->>>>> /proc/fs/cifs/SecurityFlags.
->>>>> =A0CIFS VFS: cifs_mount failed w/return code =3D -95
->>>>>
->>>>>
->>>>>
->>>>> With sec=3Dntlmssp
->>>>>
->>>>> mount error(95): Operation not supported
->>>>> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
->>>>>
->>>>> and dmesg gives:
->>>>>
->>>>> =A0CIFS VFS: Server requires packet signing to be enabled in
->>>>> /proc/fs/cifs/SecurityFlags.
->>>>> =A0CIFS VFS: cifs_mount failed w/return code =3D -95
->>>>>
->>>>>
->>>>> I have tried changing the values /proc/fs/cifs/SecurityFlags but =
-no
->>>>> difference at all.
->>>>>
->>>>> may use packet signing =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A00x00001
->>>>> must use packet signing =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 0x01001
->>>>> may use NTLM (most common password hash) =A0 =A0 =A0 =A00x00002
->>>>> must use NTLM =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 0x02002
->>>>> may use NTLMv2 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A00x00004
->>>>> must use NTLMv2 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 0x04004
->>>>> may use Kerberos security =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 0x00008
->>>>> must use Kerberos =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 0x08008
->>>>> may use lanman (weak) password hash =A0 =A0 =A0 =A0 =A0 =A0 0x000=
-10
->>>>> must use lanman password hash =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- 0x10010
->>>>> may use plaintext passwords =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- 0x00020
->>>>> must use plaintext passwords =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A00x20020
->>>>>
->>>>> Reference on line 588
->>>>> http://www.disy.cse.unsw.edu.au/lxr/source/fs/cifs/?v=3Dlinux-2.6=
-=2E32
->>>>>
->>>>> One funny thing is that there should be a pseudo-file called
->>>>> /proc/fs/cifs/PacketSigningEnabled but it does not exist, even on=
- much newer
->>>>> kernels it does not exist.
->>>>>
->>>>>
->>>>> Has anyone been able to overcome this problem?
->>>>>
->>>>> Thanks
->>>>> Vini
->>>>> --
->>>>> To unsubscribe from this list go to the following URL and read th=
-e
->>>>> instructions: =A0https://lists.samba.org/mailman/options/samba
->>>>>
->>>>
->>>> You probably need this patch installed on the Windows 2008 server
->>>> =A0http://support.microsoft.com/kb/957441/en-us
->>>
->>> I have tried this and it did not work either, once I apply it the l=
-ogin
->>> fails with "NT_STATUS_LOGON_FAILURE"
->>>
+On Mon, Oct 3, 2011 at 6:49 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Tue, 27 Sep 2011 13:58:49 -0500
+> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>
+>> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 >>
->> A wireshark trace would be useful. =A0But if you can use latest cifs=
- code
->> from 3.1 kernel on the mainline, that has a NTLMv2 fix, which might
->> fix this problem.
->> You can try either sec=3Dntlmssp or sec=3Dntlmsspi (If signing is en=
-abled
->> on the server) mount option and see that helps.
+>>
+>> Add mount options backupuid and backugid and their manpage contents.
+>> Check for either a valid uid/gid or valid user/group name.
+>>
+>>
+>> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> ---
+>> =A0mount.cifs.8 | =A0 14 +++++++++
+>> =A0mount.cifs.c | =A0 85 +++++++++++++++++++++++++++++++++++++++++++=
++++++++++++++-
+>> =A02 files changed, 97 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/mount.cifs.8 b/mount.cifs.8
+>> index 81ebdbe..d7eb2dd 100644
+>> --- a/mount.cifs.8
+>> +++ b/mount.cifs.8
+>> @@ -282,6 +282,20 @@ See sections on
+>> =A0for more information\&.
+>> =A0.RE
+>> =A0.PP
+>> +backupuid
+>> +.RS 4
+>> +Allow access to files with the intent to back them up for a user\&.
+>> +.sp
+>> +An authenticated user at the server with a privilege can access fil=
+e system objects with the intent to back them up to which it otherwise =
+may not have access permissions. =A0As an example, a privilege would be=
+ "Backup files and directories user right" granted by the server by mak=
+ing that user a part of the built-in group Backup Operators. This mount=
+ option restricts to the specified user on the client, as such an authe=
+nticated user, privilege to access files with the intent to back them u=
+p.
 >
-> Unfortunately I cannot use the latest kernel, the amount of work to
-> upgrade it wouldn't be justifiable.
+> Better, but this is still pretty awkward and confusing. This manpage
+> needs to answer 3 things:
 >
-> Do you want me to use anything special in the mount command when
-> capturing the traffic?
+> 1. what this option does (turn on the backup intent bit in open calls=
+)
+
+Not sure if implentation specifics need to be mentioned in a man page.
+
+>
+> 2. what the backup intent bit does (allows a user to open files to
+> which he wouldn't ordinarily have access)
+
+So IMHO, this can be phrased as
+
+1. what this option does (allows a user to open files to
+which he wouldn't ordinarily have access)
+
+>
+> 3. when should (or shouldn't) the user enable it?
+>
+
+I am not sure how to respond to this.  We are stating the intent
+and purpose of these options.  Would not that suffice?
+Once the intent and purpose are stated, it is upto the user
+how_to_use_it / the_way_they_want_it.
+Or we need to mention cautions?
+
+> If this is going to be too long then you may want to add a new sectio=
+n
+> to explain the backup intent in detail.
+>
+>> +.RE
+>> +.PP
+>> +backupgid
+>> +.RS 4
+>> +Allow access to files with the intent to back them up for a group\&=
+=2E
+>> +.sp
+>> +An authenticated user at the server with a privilege can access fil=
+e system objects with the intent to back them up to which it otherwise =
+may not have access permissions. =A0As an example, a privilege would be=
+ "Backup files and directories user right" granted by the server by mak=
+ing that user a part of the built-in group Backup Operators. This mount=
+ option restricts to the users in the specified group on the client, as=
+ such an authenticated user, privilege to access files with the intent =
+to back them up.
+>> +.RE
+>> +.PP
+>> =A0nocase
+>> =A0.RS 4
+>> =A0Request case insensitive path name matching (case sensitive is th=
+e default if the server suports it)\&.
+>> diff --git a/mount.cifs.c b/mount.cifs.c
+>> index 1e3d534..36c3ac0 100644
+>> --- a/mount.cifs.c
+>> +++ b/mount.cifs.c
+>> @@ -158,6 +158,8 @@
+>> =A0#define OPT_MAND =A0 =A0 =A0 27
+>> =A0#define OPT_NOMAND =A0 =A0 28
+>> =A0#define OPT_CRUID =A0 =A0 =A029
+>> +#define OPT_BKUPUID =A0 =A030
+>> +#define OPT_BKUPGID =A0 =A031
+>>
+>>
+>> =A0/* struct for holding parsed mount info for use by privleged proc=
+ess */
+>> @@ -843,6 +845,10 @@ static int parse_opt_token(const char *token)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return OPT_REMOUNT;
+>> =A0 =A0 =A0 if (strncmp(token, "_netdev", 7) =3D=3D 0)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 return OPT_IGNORE;
+>> + =A0 =A0 if (strncmp(token, "backupuid", 9) =3D=3D 0)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return OPT_BKUPUID;
+>> + =A0 =A0 if (strncmp(token, "backupgid", 9) =3D=3D 0)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 return OPT_BKUPGID;
+>>
+>> =A0 =A0 =A0 return OPT_ERROR;
+>> =A0}
+>> @@ -858,11 +864,13 @@ parse_options(const char *data, struct parsed_=
+mount_info *parsed_info)
+>> =A0 =A0 =A0 int out_len =3D 0;
+>> =A0 =A0 =A0 int word_len;
+>> =A0 =A0 =A0 int rc =3D 0;
+>> + =A0 =A0 int got_bkupuid =3D 0;
+>> + =A0 =A0 int got_bkupgid =3D 0;
+>> =A0 =A0 =A0 int got_uid =3D 0;
+>> =A0 =A0 =A0 int got_cruid =3D 0;
+>> =A0 =A0 =A0 int got_gid =3D 0;
+>> - =A0 =A0 uid_t uid, cruid =3D 0;
+>> - =A0 =A0 gid_t gid;
+>> + =A0 =A0 uid_t uid, cruid =3D 0, bkupuid;
+>> + =A0 =A0 gid_t gid, bkupgid;
+>> =A0 =A0 =A0 char *ep;
+>> =A0 =A0 =A0 struct passwd *pw;
+>> =A0 =A0 =A0 struct group *gr;
+>> @@ -906,6 +914,8 @@ parse_options(const char *data, struct parsed_mo=
+unt_info *parsed_info)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 value =3D equals + 1;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>>
+>> + =A0 =A0 =A0 =A0 =A0 =A0 ep =3D NULL;
+>> +
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 switch(parse_opt_token(data)) {
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 case OPT_USERS:
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!value || !*value) {
+>> @@ -1171,6 +1181,42 @@ parse_options(const char *data, struct parsed=
+_mount_info *parsed_info)
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 case OPT_IGNORE:
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocopy;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 case OPT_BKUPUID:
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!value || !*value)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocop=
+y;
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 got_bkupuid =3D 1;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bkupuid =3D strtoul(value,=
+ &ep, 10);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!strlen(ep))
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocop=
+y;
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pw =3D getpwnam(value);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pw =3D=3D NULL) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf(st=
+derr,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 "bad user name \"%s\"\n", value);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return EX_=
+USAGE;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bkupuid =3D pw->pw_uid;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocopy;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 case OPT_BKUPGID:
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!value || !*value)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocop=
+y;
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 got_bkupgid =3D 1;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bkupgid =3D strtoul(value,=
+ &ep, 10);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!strlen(ep))
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocop=
+y;
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 gr =3D getgrnam(value);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (gr =3D=3D NULL) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf(st=
+derr,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 "bad group name \"%s\"\n", value);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return EX_=
+USAGE;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bkupgid =3D gr->gr_gid;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto nocopy;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>>
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* check size before copying option to b=
+uffer */
+>> @@ -1246,6 +1292,39 @@ nocopy:
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 snprintf(out + out_len, word_len + 5, "g=
+id=3D%s", txtbuf);
+>> =A0 =A0 =A0 }
+>> + =A0 =A0 /* special-case the uid and gid */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0^^^
+> I don't think you need this comment.
+>
+>> + =A0 =A0 if (got_bkupuid) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 word_len =3D snprintf(txtbuf, sizeof(txtbu=
+f), "%u", bkupuid);
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 /* comma + "uid=3D" + terminating NULL =3D=
+=3D 6 */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (out_len + word_len + 6 > MAX_OPTIONS_L=
+EN) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf(stderr, "Options s=
+tring too long\n");
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return EX_USAGE;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (out_len) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strlcat(out, ",", MAX_OPTI=
+ONS_LEN);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 out_len++;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 snprintf(out + out_len, word_len + 11, "ba=
+ckupuid=3D%s", txtbuf);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 out_len =3D strlen(out);
+>> + =A0 =A0 }
+>> + =A0 =A0 if (got_bkupgid) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 word_len =3D snprintf(txtbuf, sizeof(txtbu=
+f), "%u", bkupgid);
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 /* comma + "backkupgid=3D" + terminating N=
+ULL =3D=3D 6 */
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (out_len + word_len + 6 > MAX_OPTIONS_L=
+EN) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fprintf(stderr, "Options s=
+tring too long\n");
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return EX_USAGE;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 if (out_len) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 strlcat(out, ",", MAX_OPTI=
+ONS_LEN);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 out_len++;
+>> + =A0 =A0 =A0 =A0 =A0 =A0 }
+>> + =A0 =A0 =A0 =A0 =A0 =A0 snprintf(out + out_len, word_len + 11, "ba=
+ckupgid=3D%s", txtbuf);
+>> + =A0 =A0 }
+>> +
+>> =A0 =A0 =A0 return 0;
+>> =A0}
+>>
+>> @@ -1361,6 +1440,8 @@ static struct option longopts[] =3D {
+>> =A0 =A0 =A0 {"type", 1, NULL, 't'},
+>> =A0 =A0 =A0 {"uid", 1, NULL, '1'},
+>> =A0 =A0 =A0 {"gid", 1, NULL, '2'},
+>> + =A0 =A0 {"backupuid", 1, NULL, '1'},
+>> + =A0 =A0 {"backupgid", 1, NULL, '2'},
+>
+> This looks unnecessary and wrong. You're adding a new command line
+> alias for --uid called --backupuid?
+>
+>> =A0 =A0 =A0 {"user", 1, NULL, 'u'},
+>> =A0 =A0 =A0 {"username", 1, NULL, 'u'},
+>> =A0 =A0 =A0 {"dom", 1, NULL, 'd'},
 >
 > --
-> Vini
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 >
-
-No, nothing special as such. Just a regular wireshark trace while mount=
-ing
-a filesystem.  I think sec=3Dntlmssp/i will work though, that uses ntlm=
-v2
-authentication also.
-
-Regards,
-
-Shirish
