@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 5/6] CIFS: Send as many mandatory unlock ranges at once as possible
-Date: Fri,  7 Oct 2011 17:10:23 +0400
-Message-ID: <1317993024-15003-6-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 4/6] CIFS: Implement caching mechanism for posix brlocks
+Date: Fri,  7 Oct 2011 17:10:22 +0400
+Message-ID: <1317993024-15003-5-git-send-email-piastry@etersoft.ru>
 References: <1317993024-15003-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,214 +9,264 @@ In-Reply-To: <1317993024-15003-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that reduces a traffic and increases a performance.
+to handle all lock requests on the client in an exclusive oplock case.
 
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    3 +
- fs/cifs/cifssmb.c   |   40 +++++++++++++++++
- fs/cifs/file.c      |  116 +++++++++++++++++++++++++++++++++++----------------
- 3 files changed, 123 insertions(+), 36 deletions(-)
+ fs/cifs/cifsproto.h |    4 +-
+ fs/cifs/cifssmb.c   |    8 ++--
+ fs/cifs/file.c      |  150 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 147 insertions(+), 15 deletions(-)
 
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 276def2..a7c62c7 100644
+index 0d57080..276def2 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -359,6 +359,9 @@ extern int CIFSGetSrvInodeNumber(const int xid, struct cifs_tcon *tcon,
- 			const struct nls_table *nls_codepage,
- 			int remap_special_chars);
- 
-+extern int cifs_lockv(const int xid, struct cifs_tcon *tcon, const __u16 netfid,
-+		      const __u8 lock_type, const __u32 num_unlock,
-+		      const __u32 num_lock, LOCKING_ANDX_RANGE *buf);
- extern int CIFSSMBLock(const int xid, struct cifs_tcon *tcon,
- 			const __u16 netfid, const __u32 netpid, const __u64 len,
- 			const __u64 offset, const __u32 numUnlock,
+@@ -365,8 +365,8 @@ extern int CIFSSMBLock(const int xid, struct cifs_tcon *tcon,
+ 			const __u32 numLock, const __u8 lockType,
+ 			const bool waitFlag, const __u8 oplock_level);
+ extern int CIFSSMBPosixLock(const int xid, struct cifs_tcon *tcon,
+-			const __u16 smb_file_id, const int get_flag,
+-			const __u64 len, struct file_lock *,
++			const __u16 smb_file_id, const __u32 netpid,
++			const int get_flag, const __u64 len, struct file_lock *,
+ 			const __u16 lock_type, const bool waitFlag);
+ extern int CIFSSMBTDis(const int xid, struct cifs_tcon *tcon);
+ extern int CIFSSMBEcho(struct TCP_Server_Info *server);
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 43b1843..f70e204 100644
+index b79d7fd..43b1843 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -1962,6 +1962,46 @@ CIFSSMBWrite2(const int xid, struct cifs_io_parms *io_parms,
- 	return rc;
- }
- 
-+int cifs_lockv(const int xid, struct cifs_tcon *tcon, const __u16 netfid,
-+	       const __u8 lock_type, const __u32 num_unlock,
-+	       const __u32 num_lock, LOCKING_ANDX_RANGE *buf)
-+{
-+	int rc = 0;
-+	LOCK_REQ *pSMB = NULL;
-+	struct kvec iov[2];
-+	int resp_buf_type;
-+	__u16 count;
-+
-+	cFYI(1, "cifs_lockv num lock %d num unlock %d", num_lock, num_unlock);
-+
-+	rc = small_smb_init(SMB_COM_LOCKING_ANDX, 8, tcon, (void **) &pSMB);
-+	if (rc)
-+		return rc;
-+
-+	pSMB->Timeout = 0;
-+	pSMB->NumberOfLocks = cpu_to_le16(num_lock);
-+	pSMB->NumberOfUnlocks = cpu_to_le16(num_unlock);
-+	pSMB->LockType = lock_type;
-+	pSMB->AndXCommand = 0xFF; /* none */
-+	pSMB->Fid = netfid; /* netfid stays le */
-+
-+	count = (num_unlock + num_lock) * sizeof(LOCKING_ANDX_RANGE);
-+	inc_rfc1001_len(pSMB, count);
-+	pSMB->ByteCount = cpu_to_le16(count);
-+
-+	iov[0].iov_base = (char *)pSMB;
-+	iov[0].iov_len = be32_to_cpu(pSMB->hdr.smb_buf_length) + 4 -
-+			 (num_unlock + num_lock) * sizeof(LOCKING_ANDX_RANGE);
-+	iov[1].iov_base = (char *)buf;
-+	iov[1].iov_len = (num_unlock + num_lock) * sizeof(LOCKING_ANDX_RANGE);
-+
-+	cifs_stats_inc(&tcon->num_locks);
-+	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, CIFS_NO_RESP);
-+	if (rc)
-+		cFYI(1, "Send error in cifs_lockv = %d", rc);
-+
-+	return rc;
-+}
+@@ -2035,9 +2035,9 @@ CIFSSMBLock(const int xid, struct cifs_tcon *tcon,
  
  int
- CIFSSMBLock(const int xid, struct cifs_tcon *tcon,
+ CIFSSMBPosixLock(const int xid, struct cifs_tcon *tcon,
+-		const __u16 smb_file_id, const int get_flag, const __u64 len,
+-		struct file_lock *pLockData, const __u16 lock_type,
+-		const bool waitFlag)
++		const __u16 smb_file_id, const __u32 netpid, const int get_flag,
++		const __u64 len, struct file_lock *pLockData,
++		const __u16 lock_type, const bool waitFlag)
+ {
+ 	struct smb_com_transaction2_sfi_req *pSMB  = NULL;
+ 	struct smb_com_transaction2_sfi_rsp *pSMBr = NULL;
+@@ -2095,7 +2095,7 @@ CIFSSMBPosixLock(const int xid, struct cifs_tcon *tcon,
+ 	} else
+ 		pSMB->Timeout = 0;
+ 
+-	parm_data->pid = cpu_to_le32(current->tgid);
++	parm_data->pid = cpu_to_le32(netpid);
+ 	parm_data->start = cpu_to_le64(pLockData->fl_start);
+ 	parm_data->length = cpu_to_le64(len);  /* normalize negative numbers */
+ 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 888227f..59410a8 100644
+index 8c13cd4..888227f 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1048,6 +1048,84 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u8 type,
+@@ -778,7 +778,42 @@ try_again:
  }
  
  static int
-+cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock, int xid)
+-cifs_push_locks(struct cifsFileInfo *cfile)
++cifs_posix_lock_test(struct file *file, struct file_lock *flock)
 +{
-+	int rc = 0, stored_rc;
-+	int types[] = {LOCKING_ANDX_LARGE_FILES,
-+		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
-+	unsigned int i;
-+	unsigned int max_num, num;
-+	LOCKING_ANDX_RANGE *buf, *cur;
-+	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-+	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
-+	struct cifsLockInfo *li, *tmp;
-+	__u64 length = 1 + flock->fl_end - flock->fl_start;
-+
-+	max_num = (tcon->ses->server->maxBuf - sizeof(struct smb_hdr)) /
-+		  sizeof(LOCKING_ANDX_RANGE);
-+	buf = kzalloc(max_num * sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
++	int rc = 0;
++	struct cifsInodeInfo *cinode = CIFS_I(file->f_path.dentry->d_inode);
++	unsigned char saved_type = flock->fl_type;
 +
 +	mutex_lock(&cinode->lock_mutex);
-+	for (i = 0; i < 2; i++) {
-+		cur = buf;
-+		num = 0;
-+		list_for_each_entry_safe(li, tmp, &cinode->llist, llist) {
-+			if (flock->fl_start > li->offset ||
-+			    (flock->fl_start + length) <
-+			    (li->offset + li->length))
-+				continue;
-+			if (current->tgid != li->pid)
-+				continue;
-+			if (cfile->netfid != li->netfid)
-+				continue;
-+			if (types[i] != li->type)
-+				continue;
++	posix_test_lock(file, flock);
 +
-+			if (!cinode->can_cache_brlcks) {
-+				cur->Pid = cpu_to_le16(li->pid);
-+				cur->LengthLow = cpu_to_le32((u32)li->length);
-+				cur->LengthHigh =
-+					cpu_to_le32((u32)(li->length>>32));
-+				cur->OffsetLow = cpu_to_le32((u32)li->offset);
-+				cur->OffsetHigh =
-+					cpu_to_le32((u32)(li->offset>>32));
-+				if (++num == max_num) {
-+					stored_rc = cifs_lockv(xid, tcon,
-+							       cfile->netfid,
-+							       li->type, num,
-+							       0, buf);
-+					if (stored_rc)
-+						rc = stored_rc;
-+					cur = buf;
-+					num = 0;
-+				} else
-+					cur++;
-+			} else {
-+				stored_rc = 0;
-+				cifs_del_lock_waiters(li);
-+			}
-+			if (stored_rc)
-+				rc = stored_rc;
-+			else {
-+				list_del(&li->llist);
-+				kfree(li);
-+			}
-+		}
-+		if (num) {
-+			stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
-+					       types[i], num, 0, buf);
-+			if (stored_rc)
-+				rc = stored_rc;
-+		}
++	if (flock->fl_type == F_UNLCK && !cinode->can_cache_brlcks) {
++		flock->fl_type = saved_type;
++		rc = 1;
 +	}
-+	kfree(buf);
++
 +	mutex_unlock(&cinode->lock_mutex);
 +	return rc;
 +}
 +
 +static int
- cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
- 	   bool wait_flag, bool posix_lck, int lock, int unlock, int xid)
++cifs_posix_lock_set(struct file *file, struct file_lock *flock)
++{
++	struct cifsInodeInfo *cinode = CIFS_I(file->f_path.dentry->d_inode);
++	int rc;
++
++	mutex_lock(&cinode->lock_mutex);
++	if (!cinode->can_cache_brlcks) {
++		mutex_unlock(&cinode->lock_mutex);
++		return 1;
++	}
++	rc = posix_lock_file_wait(file, flock);
++	mutex_unlock(&cinode->lock_mutex);
++	return rc;
++}
++
++static int
++cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
  {
-@@ -1094,43 +1172,9 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
- 			rc = cifs_lock_add(cinode, length, flock->fl_start,
- 					   type, netfid);
- 		}
--	} else if (unlock) {
--		/*
--		 * For each stored lock that this unlock overlaps completely,
--		 * unlock it.
--		 */
--		int stored_rc = 0;
--		struct cifsLockInfo *li, *tmp;
-+	} else if (unlock)
-+		rc = cifs_unlock_range(cfile, flock, xid);
+ 	int xid, rc = 0, stored_rc;
+ 	struct cifsLockInfo *li, *tmp;
+@@ -810,6 +845,91 @@ cifs_push_locks(struct cifsFileInfo *cfile)
+ 	return rc;
+ }
  
--		mutex_lock(&cinode->lock_mutex);
--		list_for_each_entry_safe(li, tmp, &cinode->llist, llist) {
--			if (flock->fl_start > li->offset ||
--			    (flock->fl_start + length) <
--			    (li->offset + li->length))
--				continue;
--			if (current->tgid != li->pid)
--				continue;
--			if (cfile->netfid != li->netfid)
--				continue;
--
--			if (!cinode->can_cache_brlcks)
--				stored_rc = CIFSSMBLock(xid, tcon, netfid,
--							current->tgid,
--							li->length, li->offset,
--							1, 0, li->type, 0, 0);
--			else {
--				stored_rc = 0;
--				cifs_del_lock_waiters(li);
--			}
--			if (stored_rc)
--				rc = stored_rc;
--			else {
--				list_del(&li->llist);
--				kfree(li);
--			}
--		}
--		mutex_unlock(&cinode->lock_mutex);
--	}
- out:
- 	if (flock->fl_flags & FL_POSIX)
- 		posix_lock_file_wait(file, flock);
++/* copied from fs/locks.c with a name change */
++#define cifs_for_each_lock(inode, lockp) \
++	for (lockp = &inode->i_flock; *lockp != NULL; \
++	     lockp = &(*lockp)->fl_next)
++
++static int
++cifs_push_posix_locks(struct cifsFileInfo *cfile)
++{
++	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++	struct file_lock *flock, **before;
++	struct cifsLockInfo *lck, *tmp;
++	int rc = 0, xid, type;
++	__u64 length;
++	struct list_head locks_to_send;
++
++	xid = GetXid();
++
++	mutex_lock(&cinode->lock_mutex);
++	if (!cinode->can_cache_brlcks) {
++		mutex_unlock(&cinode->lock_mutex);
++		FreeXid(xid);
++		return rc;
++	}
++
++	INIT_LIST_HEAD(&locks_to_send);
++
++	lock_flocks();
++	cifs_for_each_lock(cfile->dentry->d_inode, before) {
++		flock = *before;
++		length = 1 + flock->fl_end - flock->fl_start;
++		if (flock->fl_type == F_RDLCK || flock->fl_type == F_SHLCK)
++			type = CIFS_RDLCK;
++		else
++			type = CIFS_WRLCK;
++
++		lck = cifs_lock_init(length, flock->fl_start, type,
++				     cfile->netfid);
++		if (!lck) {
++			rc = -ENOMEM;
++			goto send_locks;
++		}
++		lck->pid = flock->fl_pid;
++
++		list_add_tail(&lck->llist, &locks_to_send);
++	}
++
++send_locks:
++	unlock_flocks();
++
++	list_for_each_entry_safe(lck, tmp, &locks_to_send, llist) {
++		struct file_lock tmp_lock;
++		int stored_rc;
++
++		tmp_lock.fl_start = lck->offset;
++		stored_rc = CIFSSMBPosixLock(xid, tcon, lck->netfid, lck->pid,
++					     0, lck->length, &tmp_lock,
++					     lck->type, 0);
++		if (stored_rc)
++			rc = stored_rc;
++		list_del(&lck->llist);
++		kfree(lck);
++	}
++
++	cinode->can_cache_brlcks = false;
++	mutex_unlock(&cinode->lock_mutex);
++
++	FreeXid(xid);
++	return rc;
++}
++
++static int
++cifs_push_locks(struct cifsFileInfo *cfile)
++{
++	struct cifs_sb_info *cifs_sb = CIFS_SB(cfile->dentry->d_sb);
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++
++	if ((tcon->ses->capabilities & CAP_UNIX) &&
++	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
++	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
++		return cifs_push_posix_locks(cfile);
++
++	return cifs_push_mandatory_locks(cfile);
++}
++
+ static void
+ cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
+ 		bool *wait_flag)
+@@ -855,24 +975,30 @@ cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
+ }
+ 
+ static int
+-cifs_getlk(struct cifsFileInfo *cfile, struct file_lock *flock, __u8 type,
++cifs_getlk(struct file *file, struct file_lock *flock, __u8 type,
+ 	   bool wait_flag, bool posix_lck, int xid)
+ {
+ 	int rc = 0;
+ 	__u64 length = 1 + flock->fl_end - flock->fl_start;
++	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
+ 	__u16 netfid = cfile->netfid;
+-	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 
+ 	if (posix_lck) {
+ 		int posix_lock_type;
++
++		rc = cifs_posix_lock_test(file, flock);
++		if (!rc)
++			return rc;
++
+ 		if (type & LOCKING_ANDX_SHARED_LOCK)
+ 			posix_lock_type = CIFS_RDLCK;
+ 		else
+ 			posix_lock_type = CIFS_WRLCK;
+-		rc = CIFSSMBPosixLock(xid, tcon, netfid, 1 /* get */,
+-				      length, flock, posix_lock_type,
+-				      wait_flag);
++		rc = CIFSSMBPosixLock(xid, tcon, netfid, current->tgid,
++				      1 /* get */, length, flock,
++				      posix_lock_type, wait_flag);
+ 		return rc;
+ 	}
+ 
+@@ -934,6 +1060,11 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+ 
+ 	if (posix_lck) {
+ 		int posix_lock_type;
++
++		rc = cifs_posix_lock_set(file, flock);
++		if (!rc || rc < 0)
++			return rc;
++
+ 		if (type & LOCKING_ANDX_SHARED_LOCK)
+ 			posix_lock_type = CIFS_RDLCK;
+ 		else
+@@ -942,8 +1073,9 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+ 		if (unlock == 1)
+ 			posix_lock_type = CIFS_UNLCK;
+ 
+-		rc = CIFSSMBPosixLock(xid, tcon, netfid, 0 /* set */, length,
+-				      flock, posix_lock_type, wait_flag);
++		rc = CIFSSMBPosixLock(xid, tcon, netfid, current->tgid,
++				      0 /* set */, length, flock,
++				      posix_lock_type, wait_flag);
+ 		goto out;
+ 	}
+ 
+@@ -1042,7 +1174,7 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	 * negative length which we can not accept over the wire.
+ 	 */
+ 	if (IS_GETLK(cmd)) {
+-		rc = cifs_getlk(cfile, flock, type, wait_flag, posix_lck, xid);
++		rc = cifs_getlk(file, flock, type, wait_flag, posix_lck, xid);
+ 		FreeXid(xid);
+ 		return rc;
+ 	}
 -- 
 1.7.1
