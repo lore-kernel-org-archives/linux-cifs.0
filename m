@@ -1,35 +1,29 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [v2 PATCH] CIFS: Fix incorrect max RFC1002 write size value
-Date: Fri,  7 Oct 2011 23:27:31 +0400
-Message-ID: <1318015651-18764-1-git-send-email-piastry@etersoft.ru>
+Subject: [v3 PATCH 0/6] Implement byte-range lock caching
+Date: Fri,  7 Oct 2011 23:34:13 +0400
+Message-ID: <1318016059-29306-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-..the length field has only 17 bits.
+This patchset is going to simplify brlocking code and add the caching support for exclusive oplock cases. I splitted it into several independent parts - so, each can be applied separately once it's reviewed.
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/connect.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+This version of the patchset includes some code style improvements in patch #3.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 633c246..1a645ee 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2807,10 +2807,10 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
- 
- /*
-  * When the server doesn't allow large posix writes, only allow a wsize of
-- * 128k minus the size of the WRITE_AND_X header. That allows for a write up
-+ * 2^17-1 minus the size of the WRITE_AND_X header. That allows for a write up
-  * to the maximum size described by RFC1002.
-  */
--#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4)
-+#define CIFS_MAX_RFC1002_WSIZE ((1<<17) - 1 - sizeof(WRITE_REQ) + 4)
- 
- /*
-  * The default wsize is 1M. find_get_pages seems to return a maximum of 256
--- 
-1.7.1
+Any comments and testing are welcome!
+
+Pavel Shilovsky (6):
+  CIFS: Simplify byte range locking code
+  CIFS: Move byte range lock list from fd to inode
+  CIFS: Implement caching mechanism for mandatory brlocks
+  CIFS: Implement caching mechanism for posix brlocks
+  CIFS: Send as many mandatory unlock ranges at once as possible
+  CIFS: Make cifs_push_locks send as many locks at once as possible
+
+ fs/cifs/cifsfs.c    |    3 +-
+ fs/cifs/cifsglob.h  |   10 +-
+ fs/cifs/cifsproto.h |    9 +-
+ fs/cifs/cifssmb.c   |   52 +++-
+ fs/cifs/file.c      |  767 ++++++++++++++++++++++++++++++++++++++++-----------
+ 5 files changed, 661 insertions(+), 180 deletions(-)
