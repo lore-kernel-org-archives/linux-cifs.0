@@ -1,11 +1,9 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 3/6] CIFS: Implement caching mechanism for mandatory brlocks
-Date: Fri,  7 Oct 2011 17:10:21 +0400
-Message-ID: <1317993024-15003-4-git-send-email-piastry@etersoft.ru>
-References: <1317993024-15003-1-git-send-email-piastry@etersoft.ru>
+Subject: [v2 PATCH 3/6] CIFS: Implement caching mechanism for mandatory brlocks
+Date: Fri,  7 Oct 2011 17:17:40 +0400
+Message-ID: <1317993460-26734-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1317993024-15003-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
@@ -15,8 +13,8 @@ all brlock requests on the client.
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
  fs/cifs/cifsglob.h |    2 +
- fs/cifs/file.c     |  205 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 196 insertions(+), 11 deletions(-)
+ fs/cifs/file.c     |  206 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 197 insertions(+), 11 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
 index 865db31..2fd8a7d 100644
@@ -32,7 +30,7 @@ index 865db31..2fd8a7d 100644
  	__u64 length;
  	__u32 pid;
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index aec848a..8c13cd4 100644
+index aec848a..90ffe4c 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
 @@ -270,11 +270,14 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
@@ -58,7 +56,7 @@ index aec848a..8c13cd4 100644
  		kfree(li);
  	}
  	mutex_unlock(&cifsi->lock_mutex);
-@@ -631,24 +635,181 @@ int cifs_closedir(struct inode *inode, struct file *file)
+@@ -631,24 +635,182 @@ int cifs_closedir(struct inode *inode, struct file *file)
  	return rc;
  }
  
@@ -107,8 +105,9 @@ index aec848a..8c13cd4 100644
 +		if (offset + length <= li->offset ||
 +		    offset >= li->offset + li->length)
 +			continue;
-+		else if (type == li->type &&
-+			   (type & LOCKING_ANDX_SHARED_LOCK))
++		else if ((type & LOCKING_ANDX_SHARED_LOCK) &&
++			 ((li->netfid == netfid && li->pid == current->tgid) ||
++			  type == li->type))
 +			continue;
 +		else {
 +			exist = true;
@@ -244,7 +243,7 @@ index aec848a..8c13cd4 100644
  static void
  cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
  		bool *wait_flag)
-@@ -699,6 +860,7 @@ cifs_getlk(struct cifsFileInfo *cfile, struct file_lock *flock, __u8 type,
+@@ -699,6 +861,7 @@ cifs_getlk(struct cifsFileInfo *cfile, struct file_lock *flock, __u8 type,
  {
  	int rc = 0;
  	__u64 length = 1 + flock->fl_end - flock->fl_start;
@@ -252,7 +251,7 @@ index aec848a..8c13cd4 100644
  	__u16 netfid = cfile->netfid;
  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
  
-@@ -714,6 +876,11 @@ cifs_getlk(struct cifsFileInfo *cfile, struct file_lock *flock, __u8 type,
+@@ -714,6 +877,11 @@ cifs_getlk(struct cifsFileInfo *cfile, struct file_lock *flock, __u8 type,
  		return rc;
  	}
  
@@ -264,7 +263,7 @@ index aec848a..8c13cd4 100644
  	/* BB we could chain these into one lock request BB */
  	rc = CIFSSMBLock(xid, tcon, netfid, current->tgid, length,
  			 flock->fl_start, 0, 1, type, 0, 0);
-@@ -781,12 +948,19 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+@@ -781,12 +949,19 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
  	}
  
  	if (lock) {
@@ -287,7 +286,7 @@ index aec848a..8c13cd4 100644
  		}
  	} else if (unlock) {
  		/*
-@@ -807,10 +981,15 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+@@ -807,10 +982,15 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
  			if (cfile->netfid != li->netfid)
  				continue;
  
@@ -307,7 +306,7 @@ index aec848a..8c13cd4 100644
  			if (stored_rc)
  				rc = stored_rc;
  			else {
-@@ -2443,6 +2622,10 @@ void cifs_oplock_break(struct work_struct *work)
+@@ -2443,6 +2623,10 @@ void cifs_oplock_break(struct work_struct *work)
  		cFYI(1, "Oplock flush inode %p rc %d", inode, rc);
  	}
  
