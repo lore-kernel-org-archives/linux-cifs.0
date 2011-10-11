@@ -1,20 +1,59 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Purpose of GLOBAL_EXTERN macro
-Date: Tue, 11 Oct 2011 15:10:09 +0530
-Message-ID: <4E940EF9.7030603@suse.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 0/4] allow freezing of tasks with netfs calls in flight
+Date: Tue, 11 Oct 2011 06:05:31 -0400
+Message-ID: <20111011060531.09bc378a@tlielax.poochiereds.net>
+References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
+	<20111011061819.GA1377@ucw.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, rjw-KKrjLPT3xs0@public.gmane.org,
+	linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-D0fwSNaahy58zQARNC3f2A@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111011061819.GA1377-+ZI9xUNit7I@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I bumped into the GLOBAL_EXTERN macro in the cifs code. I'm not sure I
-understand the purpose of this. Can someone explain why we need this
-instead of simply using "extern"?
+On Tue, 11 Oct 2011 08:18:19 +0200
+Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org> wrote:
 
+> Hi!
+> 
+> > We've had a number of reports recently of people with NFS and CIFS
+> > mounts that were unable to suspend or hibernate their machines. Here
+> > are a couple of Fedora bugs that illustrate the problem:
+> > 
+> >     https://bugzilla.redhat.com/show_bug.cgi?id=712088
+> >     https://bugzilla.redhat.com/show_bug.cgi?id=717735
+> > 
+> > When it occurs the problem is pretty clear. We have a task that's
+> > sleeping in the kernel in TASK_KILLABLE sleep, generally waiting
+> > for a reply to come in. Often though, userspace has already taken
+> > down the interface so that reply will never come. The process then
+> > fails to freeze and the suspend fails.
+> 
+> Userspace should not take interface down for suspend (*). Why do that?
+> 
 
-Thanks
-Suresh
+I suspect that NetworkManager does this to try and allow for the case
+where someone suspends their laptop and then wanders off to another
+network and then resumes. Either way, we still want to allow suspend
+and hibernate to work regardless of what userspace does during the
+process.
+
+> > This patch fixes this by allowing the TASK_KILLABLE sleeps in NFS and
+> > CIFS to be awoken by the freezer and then to try to freeze. If a freeze
+> > event does occur, then the code will treat it as if a schedule() has
+> > already occured.
+> 
+> Looks like good idea...
+> 
+> (*) unless absolutely neccessary. openvpn?
+> 
+
+Thanks for looking.
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
