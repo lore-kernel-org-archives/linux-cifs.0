@@ -1,400 +1,688 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 4/5] cifs: allow for larger rsize= options and change defaults
-Date: Tue, 11 Oct 2011 13:17:20 +0400
-Message-ID: <CAKywueTHW1mR1gpO27Kxhxuy++bpMu4R8V=inr4-+gtDWa3ceQ@mail.gmail.com>
+Subject: Re: [PATCH 2/5] cifs: add cifs_async_readv
+Date: Tue, 11 Oct 2011 13:30:14 +0400
+Message-ID: <CAKywueRSTX8BT3BJymT+PdCEkVbzCEd+mV=UZa0e3-PZLej7qw@mail.gmail.com>
 References: <1315319241-21637-1-git-send-email-jlayton@redhat.com>
-	<1315319241-21637-5-git-send-email-jlayton@redhat.com>
+	<1315319241-21637-3-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1315319241-21637-5-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1315319241-21637-3-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2011/9/6 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Currently we cap the rsize at a value that fits in CIFSMaxBufSize. Th=
-at's
-> not needed any longer for readpages. Allow the use of larger values f=
-or
-> readpages. cifs_iovec_read and cifs_read however are still limited to=
- the
-> CIFSMaxBufSize. Make sure they don't exceed that.
+> ...which will allow cifs to do an asynchronous read call to the serve=
+r.
+> The caller will allocate and set up cifs_readdata for each READ_AND_X
+> call that should be issued on the wire. The pages passed in are added
+> to the pagecache, but not placed on the LRU list yet (as we need the
+> page->lru to keep the pages on the list in the readdata).
 >
-> The patch also changes the rsize defaults. The default when unix
-> extensions are enabled is set to 1M for parity with the wsize, and th=
-ere
-> is a hard cap of ~16M.
->
-> When unix extensions are not enabled, the default is set to 60k. Acco=
-rding
-> to MS-CIFS, Windows servers can only send a max of 60k at a time, so
-> this is more efficient than requesting a larger size. If the user wis=
-hes
-> however, the max can be extended up to 128k - the length of the READ_=
-RSP
-> header.
->
-> Really old servers however require a special hack to ensure that we d=
-on't
-> request too large a read.
+> When cifsd identifies the mid, it will see that there is a special
+> receive handler for the call, and use that to receive the rest of the
+> frame. cifs_readv_receive will then marshal up a kvec array with
+> kmapped pages from the pagecache, which eliminates one copy of the
+> data. Once the data is received, the pages are added to the LRU list,
+> set uptodate, and unlocked.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
-> =A0fs/cifs/connect.c | =A0118 ++++++++++++++++++++++++++++++++-------=
---------------
-> =A0fs/cifs/file.c =A0 =A0| =A0 12 +++++-
-> =A02 files changed, 82 insertions(+), 48 deletions(-)
+> =A0fs/cifs/cifsproto.h | =A0 24 ++++
+> =A0fs/cifs/cifssmb.c =A0 | =A0356 +++++++++++++++++++++++++++++++++++=
+++++++++++++++++
+> =A0fs/cifs/connect.c =A0 | =A0 26 ++--
+> =A03 files changed, 393 insertions(+), 13 deletions(-)
 >
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 6f663ea..02bc0e2 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2292,16 +2292,16 @@ compare_mount_options(struct super_block *sb,=
- struct cifs_mnt_data *mnt_data)
-> =A0 =A0 =A0 =A0 =A0 =A0(new->mnt_cifs_flags & CIFS_MOUNT_MASK))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 51c0ebc..38406e5 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -152,6 +152,12 @@ extern struct cifs_ntsd *get_cifs_acl(struct cif=
+s_sb_info *, struct inode *,
+> =A0extern int set_cifs_acl(struct cifs_ntsd *, __u32, struct inode *,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const =
+char *);
 >
-> - =A0 =A0 =A0 if (old->rsize !=3D new->rsize)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> -
-> =A0 =A0 =A0 =A0/*
-> - =A0 =A0 =A0 =A0* We want to share sb only if we don't specify wsize=
- or specified wsize
-> - =A0 =A0 =A0 =A0* is greater or equal than existing one.
-> + =A0 =A0 =A0 =A0* We want to share sb only if we don't specify an r/=
-wsize or
-> + =A0 =A0 =A0 =A0* specified r/wsize is greater than or equal to exis=
-ting one.
-> =A0 =A0 =A0 =A0 */
-> =A0 =A0 =A0 =A0if (new->wsize && new->wsize < old->wsize)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> +extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
+> +extern int cifs_read_from_socket(struct TCP_Server_Info *server, cha=
+r *buf,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int to_read);
+> +extern int cifs_readv_from_socket(struct TCP_Server_Info *server,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct kvec *iov_orig, unsigned int nr_=
+segs,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int to_read);
+> =A0extern void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct ci=
+fs_sb_info *cifs_sb);
+> =A0extern int cifs_match_super(struct super_block *, void *);
+> @@ -441,6 +447,24 @@ extern int E_md4hash(const unsigned char *passwd=
+, unsigned char *p16);
+> =A0extern int SMBencrypt(unsigned char *passwd, const unsigned char *=
+c8,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned char *p24);
 >
-> + =A0 =A0 =A0 if (new->rsize && new->rsize < old->rsize)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
+> +/* asynchronous read support */
+> +struct cifs_readdata {
+> + =A0 =A0 =A0 struct cifsFileInfo =A0 =A0 =A0 =A0 =A0 =A0 *cfile;
+> + =A0 =A0 =A0 struct address_space =A0 =A0 =A0 =A0 =A0 =A0*mapping;
+> + =A0 =A0 =A0 __u64 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ offset;
+> + =A0 =A0 =A0 unsigned int =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0byt=
+es;
+> + =A0 =A0 =A0 pid_t =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ pid;
+> + =A0 =A0 =A0 int =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 result;
+> + =A0 =A0 =A0 struct list_head =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pages;
+> + =A0 =A0 =A0 struct work_struct =A0 =A0 =A0 =A0 =A0 =A0 =A0work;
+> + =A0 =A0 =A0 unsigned int =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0nr_=
+iov;
+> + =A0 =A0 =A0 struct kvec =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 iov=
+[1];
+> +};
 > +
-> =A0 =A0 =A0 =A0if (old->mnt_uid !=3D new->mnt_uid || old->mnt_gid !=3D=
- new->mnt_gid)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> +struct cifs_readdata *cifs_readdata_alloc(unsigned int nr_pages);
+> +void cifs_readdata_free(struct cifs_readdata *rdata);
+> +int cifs_async_readv(struct cifs_readdata *rdata);
+> +
+> =A0/* asynchronous write support */
+> =A0struct cifs_writedata {
+> =A0 =A0 =A0 =A0struct kref =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 re=
+fcount;
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index ae1ce01..ac72f28 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -33,6 +33,8 @@
+> =A0#include <linux/slab.h>
+> =A0#include <linux/posix_acl_xattr.h>
+> =A0#include <linux/pagemap.h>
+> +#include <linux/swap.h>
+> +#include <linux/task_io_accounting_ops.h>
+> =A0#include <asm/uaccess.h>
+> =A0#include "cifspdu.h"
+> =A0#include "cifsglob.h"
+> @@ -40,6 +42,7 @@
+> =A0#include "cifsproto.h"
+> =A0#include "cifs_unicode.h"
+> =A0#include "cifs_debug.h"
+> +#include "fscache.h"
 >
-> @@ -2739,14 +2739,6 @@ void reset_cifs_unix_caps(int xid, struct cifs=
-_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0CIFS_MOUNT_POSIX_PATHS;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0#ifdef CONFIG_CIFS_POSIX
+> =A0static struct {
+> @@ -83,6 +86,9 @@ static struct {
+> =A0#endif /* CONFIG_CIFS_WEAK_PW_HASH */
+> =A0#endif /* CIFS_POSIX */
 >
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_sb && (cifs_sb->rsize > 127 * =
-1024)) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((cap & CIFS_UNIX_LA=
-RGE_READ_CAP) =3D=3D 0) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb=
-->rsize =3D 127 * 1024;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(DB=
-G2, "larger reads not supported by srv");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> -
-> -
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Negotiate caps 0x%x", (int)ca=
-p);
-> =A0#ifdef CONFIG_CIFS_DEBUG2
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cap & CIFS_UNIX_FCNTL_CAP)
-> @@ -2791,27 +2783,11 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolu=
-me_info,
-> =A0 =A0 =A0 =A0spin_lock_init(&cifs_sb->tlink_tree_lock);
-> =A0 =A0 =A0 =A0cifs_sb->tlink_tree =3D RB_ROOT;
->
-> - =A0 =A0 =A0 if (pvolume_info->rsize > CIFSMaxBufSize) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "rsize %d too large, using Ma=
-xBufSize",
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pvolume_info->rsize);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->rsize =3D CIFSMaxBufSize;
-> - =A0 =A0 =A0 } else if ((pvolume_info->rsize) &&
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (pvolume_info->rsize <=3D=
- CIFSMaxBufSize))
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->rsize =3D pvolume_info->rsize;
-> - =A0 =A0 =A0 else /* default */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->rsize =3D CIFSMaxBufSize;
-> -
-> - =A0 =A0 =A0 if (cifs_sb->rsize < 2048) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->rsize =3D 2048;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Windows ME may prefer this */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "readsize set to minimum: 2048"=
-);
-> - =A0 =A0 =A0 }
-> -
-> =A0 =A0 =A0 =A0/*
-> - =A0 =A0 =A0 =A0* Temporarily set wsize for matching superblock. If =
-we end up using
-> - =A0 =A0 =A0 =A0* new sb then cifs_negotiate_wsize will later negoti=
-ate it downward
-> - =A0 =A0 =A0 =A0* if needed.
-> + =A0 =A0 =A0 =A0* Temporarily set r/wsize for matching superblock. I=
-f we end up using
-> + =A0 =A0 =A0 =A0* new sb then client will later negotiate it downwar=
-d if needed.
-> =A0 =A0 =A0 =A0 */
-> + =A0 =A0 =A0 cifs_sb->rsize =3D pvolume_info->rsize;
-> =A0 =A0 =A0 =A0cifs_sb->wsize =3D pvolume_info->wsize;
->
-> =A0 =A0 =A0 =A0cifs_sb->mnt_uid =3D pvolume_info->linux_uid;
-> @@ -2878,29 +2854,41 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolu=
-me_info,
+> +/* Forward declarations */
+> +static void cifs_readv_complete(struct work_struct *work);
+> +
+> =A0/* Mark as invalid, all open files on tree connections since they
+> =A0 =A0were closed when session to server was lost */
+> =A0static void mark_open_files_invalid(struct cifs_tcon *pTcon)
+> @@ -1375,6 +1381,356 @@ openRetry:
+> =A0 =A0 =A0 =A0return rc;
 > =A0}
 >
-> =A0/*
-> - * When the server supports very large writes via POSIX extensions, =
-we can
-> - * allow up to 2^24-1, minus the size of a WRITE_AND_X header, not i=
-ncluding
-> - * the RFC1001 length.
-> + * When the server supports very large reads and writes via POSIX ex=
-tensions,
-> + * we can allow up to 2^24-1, minus the size of a READ/WRITE_AND_X h=
-eader, not
-> + * including the RFC1001 length.
-> =A0*
-> =A0* Note that this might make for "interesting" allocation problems =
-during
-> =A0* writeback however as we have to allocate an array of pointers fo=
-r the
-> =A0* pages. A 16M write means ~32kb page array with PAGE_CACHE_SIZE =3D=
-=3D 4096.
-> + *
-> + * For reads, there is a similar problem as we need to allocate an a=
-rray
-> + * of kvecs to handle the receive, though that should only need to b=
-e done
-> + * once.
-> =A0*/
-> =A0#define CIFS_MAX_WSIZE ((1<<24) - 1 - sizeof(WRITE_REQ) + 4)
-> +#define CIFS_MAX_RSIZE ((1<<24) - sizeof(READ_RSP) + 4)
-
-May be (1<<24) - 1 for rsize too as it is for wsize?
->
-> =A0/*
-> - * When the server doesn't allow large posix writes, only allow a ws=
-ize of
-> - * 128k minus the size of the WRITE_AND_X header. That allows for a =
-write up
-> + * When the server doesn't allow large posix writes, only allow a rs=
-ize/wsize of
-> + * 128k minus the size of the call header. That allows for a read or=
- write up
-> =A0* to the maximum size described by RFC1002.
-> =A0*/
-> =A0#define CIFS_MAX_RFC1002_WSIZE (128 * 1024 - sizeof(WRITE_REQ) + 4=
-)
-> +#define CIFS_MAX_RFC1002_RSIZE (128 * 1024 - sizeof(READ_RSP) + 4)
-
-The same issue I reported about for the write. But as it's disable for
-iovec_read it should be hit - anyway, better to fix this.
-
->
-> =A0/*
-> =A0* The default wsize is 1M. find_get_pages seems to return a maximu=
-m of 256
-> =A0* pages in a single call. With PAGE_CACHE_SIZE =3D=3D 4k, this mea=
-ns we can fill
-> =A0* a single wsize request with a single call.
-> =A0*/
-> -#define CIFS_DEFAULT_WSIZE (1024 * 1024)
-> +#define CIFS_DEFAULT_IOSIZE (1024 * 1024)
-> +
-> +/*
-> + * Windows only supports a max of 60k reads. Default to that when po=
-six
-> + * extensions aren't in force.
-> + */
-> +#define CIFS_DEFAULT_NON_POSIX_RSIZE (60 *1024)
->
-> =A0static unsigned int
-> =A0cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolu=
-me_info)
-> @@ -2908,7 +2896,7 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, st=
-ruct smb_vol *pvolume_info)
-> =A0 =A0 =A0 =A0__u64 unix_cap =3D le64_to_cpu(tcon->fsUnixInfo.Capabi=
-lity);
-> =A0 =A0 =A0 =A0struct TCP_Server_Info *server =3D tcon->ses->server;
-> =A0 =A0 =A0 =A0unsigned int wsize =3D pvolume_info->wsize ? pvolume_i=
-nfo->wsize :
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_DE=
-=46AULT_WSIZE;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_DE=
-=46AULT_IOSIZE;
->
-> =A0 =A0 =A0 =A0/* can server support 24-bit write sizes? (via UNIX ex=
-tensions) */
-> =A0 =A0 =A0 =A0if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WR=
-ITE_CAP))
-> @@ -2931,6 +2919,50 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, s=
-truct smb_vol *pvolume_info)
-> =A0 =A0 =A0 =A0return wsize;
-> =A0}
->
-> +static unsigned int
-> +cifs_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *pvolume=
-_info)
+> +struct cifs_readdata *
+> +cifs_readdata_alloc(unsigned int nr_pages)
 > +{
-> + =A0 =A0 =A0 __u64 unix_cap =3D le64_to_cpu(tcon->fsUnixInfo.Capabil=
-ity);
-> + =A0 =A0 =A0 struct TCP_Server_Info *server =3D tcon->ses->server;
-> + =A0 =A0 =A0 unsigned int rsize, defsize;
+> + =A0 =A0 =A0 struct cifs_readdata *rdata;
 > +
-> + =A0 =A0 =A0 /*
-> + =A0 =A0 =A0 =A0* Set default value...
-> + =A0 =A0 =A0 =A0*
-> + =A0 =A0 =A0 =A0* HACK alert! Ancient servers have very small buffer=
-s. Even though
-> + =A0 =A0 =A0 =A0* MS-CIFS indicates that servers are only limited by=
- the client's
-> + =A0 =A0 =A0 =A0* bufsize for reads, testing against win98se shows t=
-hat it throws
-> + =A0 =A0 =A0 =A0* INVALID_PARAMETER errors if you try to request too=
- large a read.
-> + =A0 =A0 =A0 =A0*
-> + =A0 =A0 =A0 =A0* If the server advertises a MaxBufferSize of less t=
-han one page,
-> + =A0 =A0 =A0 =A0* assume that it also can't satisfy reads larger tha=
-n that either.
-> + =A0 =A0 =A0 =A0*
-> + =A0 =A0 =A0 =A0* FIXME: Is there a better heuristic for this?
-> + =A0 =A0 =A0 =A0*/
-> + =A0 =A0 =A0 if (tcon->unix_ext && (unix_cap & CIFS_UNIX_LARGE_READ_=
-CAP))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 defsize =3D CIFS_DEFAULT_IOSIZE;
-> + =A0 =A0 =A0 else if (server->capabilities & CAP_LARGE_READ_X)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 defsize =3D CIFS_DEFAULT_NON_POSIX_RSIZ=
-E;
-> + =A0 =A0 =A0 else if (server->maxBuf >=3D PAGE_CACHE_SIZE)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 defsize =3D CIFSMaxBufSize;
-> + =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 defsize =3D server->maxBuf - sizeof(REA=
-D_RSP);
-> +
-> + =A0 =A0 =A0 rsize =3D pvolume_info->rsize ? pvolume_info->rsize : d=
-efsize;
-> +
-> + =A0 =A0 =A0 /*
-> + =A0 =A0 =A0 =A0* no CAP_LARGE_READ_X? Then MS-CIFS states that we m=
-ust limit this to
-> + =A0 =A0 =A0 =A0* the client's MaxBufferSize.
-> + =A0 =A0 =A0 =A0*/
-> + =A0 =A0 =A0 if (!(server->capabilities & CAP_LARGE_READ_X))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rsize =3D min_t(unsigned int, CIFSMaxBu=
-fSize, rsize);
-> +
-> + =A0 =A0 =A0 /* hard limit of CIFS_MAX_RSIZE */
-> + =A0 =A0 =A0 rsize =3D min_t(unsigned int, rsize, CIFS_MAX_RSIZE);
-> +
-> + =A0 =A0 =A0 return rsize;
+> + =A0 =A0 =A0 /* readdata + 1 kvec for each page */
+> + =A0 =A0 =A0 rdata =3D kzalloc(sizeof(*rdata) +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sizeof(struct kvec) * n=
+r_pages, GFP_KERNEL);
+> + =A0 =A0 =A0 if (rdata !=3D NULL) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 INIT_WORK(&rdata->work, cifs_readv_comp=
+lete);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 INIT_LIST_HEAD(&rdata->pages);
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 return rdata;
 > +}
 > +
-> =A0static int
-> =A0is_path_accessible(int xid, struct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_sb_info *cifs_sb, con=
-st char *full_path)
-> @@ -3208,14 +3240,8 @@ try_mount_again:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFSSMBQFSAttributeInfo(xid, tcon);
+> +void
+> +cifs_readdata_free(struct cifs_readdata *rdata)
+> +{
+> + =A0 =A0 =A0 cifsFileInfo_put(rdata->cfile);
+> + =A0 =A0 =A0 kfree(rdata);
+> +}
+> +
+> +/*
+> + * Discard any remaining data in the current SMB. To do this, we bor=
+row the
+> + * current bigbuf.
+> + */
+> +static int
+> +cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entr=
+y *mid)
+> +{
+> + =A0 =A0 =A0 READ_RSP *rsp =3D (READ_RSP *)server->smallbuf;
+> + =A0 =A0 =A0 unsigned int rfclen =3D be32_to_cpu(rsp->hdr.smb_buf_le=
+ngth);
+> + =A0 =A0 =A0 int remaining =3D rfclen + 4 - server->total_read;
+> + =A0 =A0 =A0 struct cifs_readdata *rdata =3D mid->callback_data;
+> +
+> + =A0 =A0 =A0 while (remaining > 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 int length;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D cifs_read_from_socket(server=
+, server->bigbuf,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 min_t(u=
+nsigned int, remaining,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 CIFSMaxBufSize + MAX_CIFS_HDR_SIZE));
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (length < 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return length;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->total_read +=3D length;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 remaining -=3D length;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 dequeue_mid(mid, rdata->result);
+> + =A0 =A0 =A0 return 0;
+> +}
+> +
+> +static int
+> +cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entr=
+y *mid)
+> +{
+> + =A0 =A0 =A0 int length, len;
+> + =A0 =A0 =A0 unsigned int data_offset, remaining, data_len;
+> + =A0 =A0 =A0 struct cifs_readdata *rdata =3D mid->callback_data;
+> + =A0 =A0 =A0 READ_RSP *rsp =3D (READ_RSP *)server->smallbuf;
+> + =A0 =A0 =A0 unsigned int rfclen =3D be32_to_cpu(rsp->hdr.smb_buf_le=
+ngth) + 4;
+> + =A0 =A0 =A0 u64 eof;
+> + =A0 =A0 =A0 pgoff_t eof_index;
+> + =A0 =A0 =A0 struct page *page, *tpage;
+> +
+> + =A0 =A0 =A0 cFYI(1, "%s: mid=3D%u offset=3D%llu bytes=3D%u", __func=
+__,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->mid, rdata->offset, rdata->bytes);
+> +
+> + =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0* read the rest of READ_RSP header (sans Data array)=
+, or whatever we
+> + =A0 =A0 =A0 =A0* can if there's not enough data. At this point, we'=
+ve read down to
+> + =A0 =A0 =A0 =A0* the Mid.
+> + =A0 =A0 =A0 =A0*/
+> + =A0 =A0 =A0 len =3D min_t(unsigned int, rfclen, sizeof(*rsp)) -
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sizeof(struct smb_hdr) =
++ 1;
+> +
+> + =A0 =A0 =A0 rdata->iov[0].iov_base =3D server->smallbuf + sizeof(st=
+ruct smb_hdr) - 1;
+> + =A0 =A0 =A0 rdata->iov[0].iov_len =3D len;
+> +
+> + =A0 =A0 =A0 length =3D cifs_readv_from_socket(server, rdata->iov, 1=
+, len);
+> + =A0 =A0 =A0 if (length < 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return length;
+> + =A0 =A0 =A0 server->total_read +=3D length;
+> +
+> + =A0 =A0 =A0 /* Was the SMB read successful? */
+> + =A0 =A0 =A0 rdata->result =3D map_smb_to_linux_error(&rsp->hdr, fal=
+se);
+> + =A0 =A0 =A0 if (rdata->result !=3D 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: server returned error %d",=
+ __func__,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->result);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return cifs_readv_discard(server, mid);
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 /* Is there enough to get to the rest of the READ_RSP h=
+eader? */
+> + =A0 =A0 =A0 if (server->total_read < sizeof(READ_RSP)) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: server returned short head=
+er. got=3D%u expected=3D%lu",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func__, server->total=
+_read, sizeof(READ_RSP));
+
+sizeof should be casted to unsigned long to prevent compiler warnings.
+
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->result =3D -EIO;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return cifs_readv_discard(server, mid);
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 data_offset =3D le16_to_cpu(rsp->DataOffset) + 4;
+> + =A0 =A0 =A0 if (data_offset < server->total_read) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* win2k8 sometimes sends an offset o=
+f 0 when the read
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* is beyond the EOF. Treat it as if =
+the data starts just after
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* the header.
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: data offset (%u) inside re=
+ad response header",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func__, data_offset);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 data_offset =3D server->total_read;
+> + =A0 =A0 =A0 } else if (data_offset > MAX_CIFS_SMALL_BUFFER_SIZE) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* data_offset is beyond the end of sma=
+llbuf */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%s: data offset (%u) beyond en=
+d of smallbuf",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __func__, data_offset);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->result =3D -EIO;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return cifs_readv_discard(server, mid);
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 cFYI(1, "%s: total_read=3D%u data_offset=3D%u", __func_=
+_,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->total_read, data_offset);
+> +
+> + =A0 =A0 =A0 len =3D data_offset - server->total_read;
+> + =A0 =A0 =A0 if (len > 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* read any junk before data into the r=
+est of smallbuf */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[0].iov_base =3D server->smal=
+lbuf + server->total_read;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[0].iov_len =3D len;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D cifs_readv_from_socket(serve=
+r, rdata->iov, 1, len);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (length < 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return length;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->total_read +=3D length;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 /* set up first iov for signature check */
+> + =A0 =A0 =A0 rdata->iov[0].iov_base =3D server->smallbuf;
+> + =A0 =A0 =A0 rdata->iov[0].iov_len =3D server->total_read;
+> + =A0 =A0 =A0 cFYI(1, "0: iov_base=3D%p iov_len=3D%lu",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[0].iov_base, rdata->iov[0].i=
+ov_len);
+
+iov_len should be casted to unsigned long to prevent compiler warnings.
+
+> +
+> + =A0 =A0 =A0 /* how much data is in the response? */
+> + =A0 =A0 =A0 data_len =3D le16_to_cpu(rsp->DataLengthHigh) << 16;
+> + =A0 =A0 =A0 data_len +=3D le16_to_cpu(rsp->DataLength);
+> + =A0 =A0 =A0 if (data_offset + data_len > rfclen) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* data_len is corrupt -- discard frame=
+ */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->result =3D -EIO;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return cifs_readv_discard(server, mid);
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 /* marshal up the page array */
+> + =A0 =A0 =A0 len =3D 0;
+> + =A0 =A0 =A0 remaining =3D data_len;
+> + =A0 =A0 =A0 rdata->nr_iov =3D 1;
+> +
+> + =A0 =A0 =A0 /* determine the eof that the server (probably) has */
+> + =A0 =A0 =A0 eof =3D CIFS_I(rdata->mapping->host)->server_eof;
+> + =A0 =A0 =A0 eof_index =3D eof ? (eof - 1) >> PAGE_CACHE_SHIFT : 0;
+> + =A0 =A0 =A0 cFYI(1, "eof=3D%llu eof_index=3D%lu", eof, eof_index);
+> +
+> + =A0 =A0 =A0 list_for_each_entry_safe(page, tpage, &rdata->pages, lr=
+u) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (remaining >=3D PAGE_CACHE_SIZE) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* enough data to fill =
+the page */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[rdata->nr_io=
+v].iov_base =3D kmap(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[rdata->nr_io=
+v].iov_len =3D PAGE_CACHE_SIZE;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%u: idx=3D%lu =
+iov_base=3D%p iov_len=3D%lu",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->=
+nr_iov, page->index,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->=
+iov[rdata->nr_iov].iov_base,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->=
+iov[rdata->nr_iov].iov_len);
+
+iov_len should be casted to unsigned long to prevent compiler warnings.
+
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ++rdata->nr_iov;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len +=3D PAGE_CACHE_SIZ=
+E;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 remaining -=3D PAGE_CAC=
+HE_SIZE;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else if (remaining > 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* enough for partial p=
+age, fill and zero the rest */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[rdata->nr_io=
+v].iov_base =3D kmap(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->iov[rdata->nr_io=
+v].iov_len =3D remaining;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "%u: idx=3D%lu =
+iov_base=3D%p iov_len=3D%lu",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->=
+nr_iov, page->index,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->=
+iov[rdata->nr_iov].iov_base,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->=
+iov[rdata->nr_iov].iov_len);
+
+iov_len should be casted to unsigned long to prevent compiler warnings.
+
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 memset(rdata->iov[rdata=
+->nr_iov].iov_base + remaining,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 '\0', P=
+AGE_CACHE_SIZE - remaining);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ++rdata->nr_iov;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 len +=3D remaining;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 remaining =3D 0;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else if (page->index > eof_index) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* The VFS will not t=
+ry to do readahead past the
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* i_size, but it's p=
+ossible that we have outstanding
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* writes with gaps i=
+n the middle and the i_size hasn't
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* caught up yet. Pop=
+ulate those with zeroed out pages
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* to prevent the VFS=
+ from repeatedly attempting to
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* fill them until th=
+e writes are flushed.
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 zero_user(page, 0, PAGE=
+_CACHE_SIZE);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del(&page->lru);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 lru_cache_add_file(page=
+);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 flush_dcache_page(page)=
+;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 SetPageUptodate(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unlock_page(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 page_cache_release(page=
+);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* no need to hold page=
+ hostage */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del(&page->lru);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 lru_cache_add_file(page=
+);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unlock_page(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 page_cache_release(page=
+);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 /* issue the read if we have any iovecs left to fill */
+> + =A0 =A0 =A0 if (rdata->nr_iov > 1) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D cifs_readv_from_socket(serve=
+r, &rdata->iov[1],
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 rdata->nr_iov - 1, len);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (length < 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return length;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->total_read +=3D length;
+> + =A0 =A0 =A0 } else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D 0;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 rdata->bytes =3D length;
+> +
+> + =A0 =A0 =A0 cFYI(1, "total_read=3D%u rfclen=3D%u remaining=3D%u", s=
+erver->total_read,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rfclen, remaining);
+> +
+> + =A0 =A0 =A0 /* discard anything left over */
+> + =A0 =A0 =A0 if (server->total_read < rfclen)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return cifs_readv_discard(server, mid);
+> +
+> + =A0 =A0 =A0 dequeue_mid(mid, false);
+> + =A0 =A0 =A0 return length;
+> +}
+> +
+> +static void
+> +cifs_readv_complete(struct work_struct *work)
+> +{
+> + =A0 =A0 =A0 struct cifs_readdata *rdata =3D container_of(work,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_readdata, work);
+> + =A0 =A0 =A0 struct page *page, *tpage;
+> +
+> + =A0 =A0 =A0 list_for_each_entry_safe(page, tpage, &rdata->pages, lr=
+u) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del(&page->lru);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 lru_cache_add_file(page);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rdata->result =3D=3D 0) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kunmap(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 flush_dcache_page(page)=
+;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 SetPageUptodate(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unlock_page(page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_readpage_to_fscach=
+e(rdata->mapping->host, page);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 page_cache_release(page);
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 cifs_readdata_free(rdata);
+> +}
+> +
+> +static void
+> +cifs_readv_callback(struct mid_q_entry *mid)
+> +{
+> + =A0 =A0 =A0 struct cifs_readdata *rdata =3D mid->callback_data;
+> + =A0 =A0 =A0 struct cifs_tcon *tcon =3D tlink_tcon(rdata->cfile->tli=
+nk);
+> + =A0 =A0 =A0 struct TCP_Server_Info *server =3D tcon->ses->server;
+> +
+> + =A0 =A0 =A0 cFYI(1, "%s: mid=3D%u state=3D%d result=3D%d bytes=3D%u=
+", __func__,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->mid, mid->midState, rdata->result,=
+ rdata->bytes);
+> +
+> + =A0 =A0 =A0 switch (mid->midState) {
+> + =A0 =A0 =A0 case MID_RESPONSE_RECEIVED:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* result already set, check signature =
+*/
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->sec_mode &
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (SECMODE_SIGN_REQUIRED | SECMOD=
+E_SIGN_ENABLED)) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_verify_signatu=
+re(rdata->iov, rdata->nr_iov,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 server, mid->sequence_number + 1))
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(=
+1, "Unexpected SMB signature");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* FIXME: should this be counted toward=
+ the initiating task? */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 task_io_account_read(rdata->bytes);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_stats_bytes_read(tcon, rdata->byte=
+s);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> + =A0 =A0 =A0 case MID_REQUEST_SUBMITTED:
+> + =A0 =A0 =A0 case MID_RETRY_NEEDED:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->result =3D -EAGAIN;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> + =A0 =A0 =A0 default:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->result =3D -EIO;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 queue_work(system_nrt_wq, &rdata->work);
+> + =A0 =A0 =A0 DeleteMidQEntry(mid);
+> + =A0 =A0 =A0 atomic_dec(&server->inFlight);
+> + =A0 =A0 =A0 wake_up(&server->request_q);
+> +}
+> +
+> +/* cifs_async_readv - send an async write, and set up mid to handle =
+result */
+> +int
+> +cifs_async_readv(struct cifs_readdata *rdata)
+> +{
+> + =A0 =A0 =A0 int rc;
+> + =A0 =A0 =A0 READ_REQ *smb =3D NULL;
+> + =A0 =A0 =A0 int wct;
+> + =A0 =A0 =A0 struct cifs_tcon *tcon =3D tlink_tcon(rdata->cfile->tli=
+nk);
+> +
+> + =A0 =A0 =A0 cFYI(1, "%s: offset=3D%llu bytes=3D%u", __func__,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rdata->offset, rdata->bytes);
+> +
+> + =A0 =A0 =A0 if (tcon->ses->capabilities & CAP_LARGE_FILES)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wct =3D 12;
+> + =A0 =A0 =A0 else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wct =3D 10; /* old style read */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if ((rdata->offset >> 32) > 0) =A0{
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* can not handle this =
+big offset for old */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EIO;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 rc =3D small_smb_init(SMB_COM_READ_ANDX, wct, tcon, (vo=
+id **)&smb);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
+> +
+> + =A0 =A0 =A0 smb->hdr.Pid =3D cpu_to_le16((__u16)rdata->pid);
+> + =A0 =A0 =A0 smb->hdr.PidHigh =3D cpu_to_le16((__u16)(rdata->pid >> =
+16));
+> +
+> + =A0 =A0 =A0 smb->AndXCommand =3D 0xFF; =A0 =A0 =A0 =A0/* none */
+> + =A0 =A0 =A0 smb->Fid =3D rdata->cfile->netfid;
+> + =A0 =A0 =A0 smb->OffsetLow =3D cpu_to_le32(rdata->offset & 0xFFFFFF=
+=46F);
+> + =A0 =A0 =A0 if (wct =3D=3D 12)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 smb->OffsetHigh =3D cpu_to_le32(rdata->=
+offset >> 32);
+> + =A0 =A0 =A0 smb->Remaining =3D 0;
+> + =A0 =A0 =A0 smb->MaxCount =3D cpu_to_le16(rdata->bytes & 0xFFFF);
+> + =A0 =A0 =A0 smb->MaxCountHigh =3D cpu_to_le32(rdata->bytes >> 16);
+> + =A0 =A0 =A0 if (wct =3D=3D 12)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 smb->ByteCount =3D 0;
+> + =A0 =A0 =A0 else {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* old style read */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_com_readx_req *smbr =3D
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (struct smb_com_readx_r=
+eq *)smb;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 smbr->ByteCount =3D 0;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 /* 4 for RFC1001 length + 1 for BCC */
+> + =A0 =A0 =A0 rdata->iov[0].iov_base =3D smb;
+> + =A0 =A0 =A0 rdata->iov[0].iov_len =3D be32_to_cpu(smb->hdr.smb_buf_=
+length) + 4;
+> +
+> + =A0 =A0 =A0 rc =3D cifs_call_async(tcon->ses->server, rdata->iov, 1=
+,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_readv_r=
+eceive, cifs_readv_callback,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rdata, false=
+);
+> +
+> + =A0 =A0 =A0 if (rc =3D=3D 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_stats_inc(&tcon->num_reads);
+> +
+> + =A0 =A0 =A0 cifs_small_buf_release(smb);
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> =A0int
+> =A0CIFSSMBRead(const int xid, struct cifs_io_parms *io_parms, unsigne=
+d int *nbytes,
+> =A0 =A0 =A0 =A0 =A0 =A0char **buf, int *pbuf_type)
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 5dc6df0..6f663ea 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -422,9 +422,9 @@ get_server_iovec(struct TCP_Server_Info *server, =
+unsigned int nr_segs)
+> =A0 =A0 =A0 =A0return new_iov;
+> =A0}
+>
+> -static int
+> -readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_o=
+rig,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int nr_segs, unsigned int =
+to_read)
+> +int
+> +cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *=
+iov_orig,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int nr_segs, un=
+signed int to_read)
+> =A0{
+> =A0 =A0 =A0 =A0int length =3D 0;
+> =A0 =A0 =A0 =A0int total_read;
+> @@ -479,16 +479,16 @@ readv_from_socket(struct TCP_Server_Info *serve=
+r, struct kvec *iov_orig,
+> =A0 =A0 =A0 =A0return total_read;
+> =A0}
+>
+> -static int
+> -read_from_socket(struct TCP_Server_Info *server, char *buf,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int to_read)
+> +int
+> +cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int to_read)
+> =A0{
+> =A0 =A0 =A0 =A0struct kvec iov;
+>
+> =A0 =A0 =A0 =A0iov.iov_base =3D buf;
+> =A0 =A0 =A0 =A0iov.iov_len =3D to_read;
+>
+> - =A0 =A0 =A0 return readv_from_socket(server, &iov, 1, to_read);
+> + =A0 =A0 =A0 return cifs_readv_from_socket(server, &iov, 1, to_read)=
+;
+> =A0}
+>
+> =A0static bool
+> @@ -553,8 +553,8 @@ find_mid(struct TCP_Server_Info *server, struct s=
+mb_hdr *buf)
+> =A0 =A0 =A0 =A0return NULL;
+> =A0}
+>
+> -static void
+> -dequeue_mid(struct mid_q_entry *mid, int malformed)
+> +void
+> +dequeue_mid(struct mid_q_entry *mid, bool malformed)
+> =A0{
+> =A0#ifdef CONFIG_CIFS_STATS2
+> =A0 =A0 =A0 =A0mid->when_received =3D jiffies;
+> @@ -731,7 +731,7 @@ standard_receive3(struct TCP_Server_Info *server,=
+ struct mid_q_entry *mid)
 > =A0 =A0 =A0 =A0}
 >
-> - =A0 =A0 =A0 if ((tcon->unix_ext =3D=3D 0) && (cifs_sb->rsize > (102=
-4 * 127))) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->rsize =3D 1024 * 127;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(DBG2, "no very large read support,=
- rsize now 127K");
-> - =A0 =A0 =A0 }
-> - =A0 =A0 =A0 if (!(tcon->ses->capabilities & CAP_LARGE_READ_X))
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_sb->rsize =3D min(cifs_sb->rsize, =
-CIFSMaxBufSize);
-> -
-> =A0 =A0 =A0 =A0cifs_sb->wsize =3D cifs_negotiate_wsize(tcon, volume_i=
-nfo);
-> + =A0 =A0 =A0 cifs_sb->rsize =3D cifs_negotiate_rsize(tcon, volume_in=
-fo);
+> =A0 =A0 =A0 =A0/* now read the rest */
+> - =A0 =A0 =A0 length =3D read_from_socket(server,
+> + =A0 =A0 =A0 length =3D cifs_read_from_socket(server,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0buf + sizeof(struc=
+t smb_hdr) - 1,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pdu_length - sizeo=
+f(struct smb_hdr) + 1 + 4);
+> =A0 =A0 =A0 =A0if (length < 0)
+> @@ -792,7 +792,7 @@ cifs_demultiplex_thread(void *p)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0buf =3D server->smallbuf;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pdu_length =3D 4; /* enough to get RFC=
+1001 header */
 >
-> =A0remote_path_check:
-> =A0#ifdef CONFIG_CIFS_DFS_UPCALL
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index ba3ef1b..a855ff1 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1715,6 +1715,7 @@ cifs_iovec_read(struct file *file, const struct=
- iovec *iov,
-> =A0 =A0 =A0 =A0struct smb_com_read_rsp *pSMBr;
-> =A0 =A0 =A0 =A0struct cifs_io_parms io_parms;
-> =A0 =A0 =A0 =A0char *read_data;
-> + =A0 =A0 =A0 unsigned int rsize;
-> =A0 =A0 =A0 =A0__u32 pid;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D read_from_socket(server, buf=
+, pdu_length);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D cifs_read_from_socket(server=
+, buf, pdu_length);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (length < 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0continue;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->total_read =3D length;
+> @@ -817,8 +817,8 @@ cifs_demultiplex_thread(void *p)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
 >
-> =A0 =A0 =A0 =A0if (!nr_segs)
-> @@ -1727,6 +1728,9 @@ cifs_iovec_read(struct file *file, const struct=
- iovec *iov,
-> =A0 =A0 =A0 =A0xid =3D GetXid();
-> =A0 =A0 =A0 =A0cifs_sb =3D CIFS_SB(file->f_path.dentry->d_sb);
->
-> + =A0 =A0 =A0 /* FIXME: set up handlers for larger reads and/or conve=
-rt to async */
-> + =A0 =A0 =A0 rsize =3D min_t(unsigned int, cifs_sb->rsize, CIFSMaxBu=
-fSize);
-> +
-> =A0 =A0 =A0 =A0open_file =3D file->private_data;
-> =A0 =A0 =A0 =A0pTcon =3D tlink_tcon(open_file->tlink);
->
-> @@ -1739,7 +1743,7 @@ cifs_iovec_read(struct file *file, const struct=
- iovec *iov,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "attempting read on write only=
- file instance");
->
-> =A0 =A0 =A0 =A0for (total_read =3D 0; total_read < len; total_read +=3D=
- bytes_read) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cur_len =3D min_t(const size_t, len - t=
-otal_read, cifs_sb->rsize);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cur_len =3D min_t(const size_t, len - t=
-otal_read, rsize);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0read_data =3D NULL;
->
-> @@ -1831,6 +1835,7 @@ static ssize_t cifs_read(struct file *file, cha=
-r *read_data, size_t read_size,
-> =A0 =A0 =A0 =A0unsigned int bytes_read =3D 0;
-> =A0 =A0 =A0 =A0unsigned int total_read;
-> =A0 =A0 =A0 =A0unsigned int current_read_size;
-> + =A0 =A0 =A0 unsigned int rsize;
-> =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb;
-> =A0 =A0 =A0 =A0struct cifs_tcon *pTcon;
-> =A0 =A0 =A0 =A0int xid;
-> @@ -1843,6 +1848,9 @@ static ssize_t cifs_read(struct file *file, cha=
-r *read_data, size_t read_size,
-> =A0 =A0 =A0 =A0xid =3D GetXid();
-> =A0 =A0 =A0 =A0cifs_sb =3D CIFS_SB(file->f_path.dentry->d_sb);
->
-> + =A0 =A0 =A0 /* FIXME: set up handlers for larger reads and/or conve=
-rt to async */
-> + =A0 =A0 =A0 rsize =3D min_t(unsigned int, cifs_sb->rsize, CIFSMaxBu=
-fSize);
-> +
-> =A0 =A0 =A0 =A0if (file->private_data =3D=3D NULL) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EBADF;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0FreeXid(xid);
-> @@ -1863,7 +1871,7 @@ static ssize_t cifs_read(struct file *file, cha=
-r *read_data, size_t read_size,
-> =A0 =A0 =A0 =A0 =A0 =A0 read_size > total_read;
-> =A0 =A0 =A0 =A0 =A0 =A0 total_read +=3D bytes_read, current_offset +=3D=
- bytes_read) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0current_read_size =3D min_t(const int,=
- read_size - total_read,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* read down to the MID */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D read_from_socket(server, buf=
+ + 4,
 > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 cifs_sb->rsize);
+ =A0 =A0 =A0 sizeof(struct smb_hdr) - 1 - 4);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 length =3D cifs_read_from_socket(server=
+, buf + 4,
 > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 rsize);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* For windows me and 9x we do not wan=
-t to request more
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0than it negotiated since it will refus=
-e the read then */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if ((pTcon->ses) &&
+ =A0 =A0 sizeof(struct smb_hdr) - 1 - 4);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (length < 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0continue;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->total_read +=3D length;
 > --
 > 1.7.6
 >
