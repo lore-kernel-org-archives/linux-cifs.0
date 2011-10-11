@@ -1,8 +1,8 @@
 From: "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>
-Subject: Re: [PATCH 1/4] freezer: make fake_signal_wake_up wake TASK_KILLABLE tasks too
-Date: Tue, 11 Oct 2011 21:14:28 +0200
-Message-ID: <201110112114.28478.rjw@sisk.pl>
-References: <1317210761-11518-1-git-send-email-jlayton@redhat.com> <20111011061847.GB1377@ucw.cz> <20111011061000.3a3a03fe@tlielax.poochiereds.net>
+Subject: Re: [PATCH 0/4] allow freezing of tasks with netfs calls in flight
+Date: Tue, 11 Oct 2011 21:19:06 +0200
+Message-ID: <201110112119.06547.rjw@sisk.pl>
+References: <1317210761-11518-1-git-send-email-jlayton@redhat.com> <20111011061819.GA1377@ucw.cz> <20111011060531.09bc378a@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
@@ -13,43 +13,42 @@ Cc: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>, trond.myklebust-HgOvQuBEE
 	john-HpsXz0BELY4AvxtiuMwx3w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111011061000.3a3a03fe-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20111011060531.09bc378a-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
 On Tuesday, October 11, 2011, Jeff Layton wrote:
-> On Tue, 11 Oct 2011 08:18:48 +0200
+> On Tue, 11 Oct 2011 08:18:19 +0200
 > Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org> wrote:
 > 
-> > 
 > > Hi!
 > > 
-> > > TASK_KILLABLE is often used to put tasks to sleep for quite some time.
-> > > One of the most common uses is to put tasks to sleep while waiting for
-> > > replies from a server on a networked filesystem (such as CIFS or NFS).
+> > > We've had a number of reports recently of people with NFS and CIFS
+> > > mounts that were unable to suspend or hibernate their machines. Here
+> > > are a couple of Fedora bugs that illustrate the problem:
 > > > 
-> > > Unfortunately, fake_signal_wake_up does not currently wake up tasks
-> > > that are sleeping in TASK_KILLABLE state. This means that even if the
-> > > code were in place to allow them to freeze while in this sleep, it
-> > > wouldn't work anyway.
+> > >     https://bugzilla.redhat.com/show_bug.cgi?id=712088
+> > >     https://bugzilla.redhat.com/show_bug.cgi?id=717735
 > > > 
-> > > This patch changes this function to wake tasks in this state as well.
-> > > This should be harmless -- if the code doing the sleeping doesn't have
-> > > handling to deal with freezer events, it should just go back to sleep.
+> > > When it occurs the problem is pretty clear. We have a task that's
+> > > sleeping in the kernel in TASK_KILLABLE sleep, generally waiting
+> > > for a reply to come in. Often though, userspace has already taken
+> > > down the interface so that reply will never come. The process then
+> > > fails to freeze and the suspend fails.
 > > 
-> > I'm pretty sure this will break something; but that does not mean it
-> > is bad idea, just that it should be merged early and tested a lot.
+> > Userspace should not take interface down for suspend (*). Why do that?
 > > 
 > 
-> FWIW, I looked at most of the places in the kernel that do
-> TASK_KILLABLE sleeps and they look like they'll handle this correctly.
-> The main one I wasn't sure about was mem_cgroup_handle_oom(), but I
-> think it'll do the right thing too. I certainly could have missed
-> something though...
-> 
-> In any case, would you mind merging this via the linux-pm tree for 3.2?
+> I suspect that NetworkManager does this to try and allow for the case
+> where someone suspends their laptop and then wanders off to another
+> network and then resumes.
 
-I will push it for 3.2.
+That's correct.
+
+> Either way, we still want to allow suspend and hibernate to work regardless
+> of what userspace does during the process.
+
+Very true. :-)
 
 Thanks,
 Rafael
