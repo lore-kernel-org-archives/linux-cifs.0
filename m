@@ -1,59 +1,43 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/4] freezer: make fake_signal_wake_up wake
- TASK_KILLABLE tasks too
-Date: Tue, 11 Oct 2011 06:10:00 -0400
-Message-ID: <20111011061000.3a3a03fe@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: Re: [PATCH 3/4] sunrpc: make rpc_wait_bit_killable handle freeze
+ events
+Date: Tue, 11 Oct 2011 06:12:21 -0400
+Message-ID: <20111011061221.2a4a212f@tlielax.poochiereds.net>
 References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
-	<1317210761-11518-2-git-send-email-jlayton@redhat.com>
-	<20111011061847.GB1377@ucw.cz>
+	<1317210761-11518-4-git-send-email-jlayton@redhat.com>
+	<20111011061923.GC1377@ucw.cz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, rjw-KKrjLPT3xs0@public.gmane.org,
-	linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-D0fwSNaahy58zQARNC3f2A@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111011061847.GB1377-+ZI9xUNit7I@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: trond.myklebust@netapp.com, smfrench@gmail.com, rjw@sisk.pl,
+	linux-pm@lists.linux-foundation.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, john@Calva.COM,
+	linux-kernel@vger.kernel.org
+To: Pavel Machek <pavel@ucw.cz>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20111011061923.GC1377@ucw.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 11 Oct 2011 08:18:48 +0200
-Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org> wrote:
+On Tue, 11 Oct 2011 08:19:23 +0200
+Pavel Machek <pavel@ucw.cz> wrote:
 
+> On Wed 2011-09-28 07:52:40, Jeff Layton wrote:
+> > Allow the wait_on_bit_killable sleeps in SUNRPC layer to respect the
+> > freezer. This should allow suspend and hibernate events to occur, even
+> > when there are RPC's pending on the wire.
 > 
-> Hi!
-> 
-> > TASK_KILLABLE is often used to put tasks to sleep for quite some time.
-> > One of the most common uses is to put tasks to sleep while waiting for
-> > replies from a server on a networked filesystem (such as CIFS or NFS).
-> > 
-> > Unfortunately, fake_signal_wake_up does not currently wake up tasks
-> > that are sleeping in TASK_KILLABLE state. This means that even if the
-> > code were in place to allow them to freeze while in this sleep, it
-> > wouldn't work anyway.
-> > 
-> > This patch changes this function to wake tasks in this state as well.
-> > This should be harmless -- if the code doing the sleeping doesn't have
-> > handling to deal with freezer events, it should just go back to sleep.
-> 
-> I'm pretty sure this will break something; but that does not mean it
-> is bad idea, just that it should be merged early and tested a lot.
+> Will the RPC protocols used handle that correctly? What will happen
+> during resume?
 > 
 
-FWIW, I looked at most of the places in the kernel that do
-TASK_KILLABLE sleeps and they look like they'll handle this correctly.
-The main one I wasn't sure about was mem_cgroup_handle_oom(), but I
-think it'll do the right thing too. I certainly could have missed
-something though...
+That depends on the state of the socket during resume. If the
+suspend/resume is quick enough, then the socket may still be connected,
+or if we're using UDP then we might just get the reply and carry on
+successfully. Otherwise, the call will eventually time out, or will be
+cancelled when the kernel finds that the socket has been closed.
 
-In any case, would you mind merging this via the linux-pm tree for 3.2?
+Either way, this should do the right thing.
 
-Thanks,
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Jeff Layton <jlayton@redhat.com>
