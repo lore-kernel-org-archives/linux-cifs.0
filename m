@@ -1,288 +1,229 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/5] cifs: add cifs_async_readv
-Date: Tue, 11 Oct 2011 06:26:17 -0400
-Message-ID: <20111011062617.25376724@tlielax.poochiereds.net>
-References: <1315319241-21637-1-git-send-email-jlayton@redhat.com>
-	<1315319241-21637-3-git-send-email-jlayton@redhat.com>
-	<CAKywueRSTX8BT3BJymT+PdCEkVbzCEd+mV=UZa0e3-PZLej7qw@mail.gmail.com>
+Subject: Re: [RFC][PATCH] cifs: make OplockEnabled a module parameter
+Date: Tue, 11 Oct 2011 06:32:36 -0400
+Message-ID: <20111011063236.3fb399e0@tlielax.poochiereds.net>
+References: <4E940E2B.4050705@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: sjayaraman-l3A5Bk7waGM@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRSTX8BT3BJymT+PdCEkVbzCEd+mV=UZa0e3-PZLej7qw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <4E940E2B.4050705-l3A5Bk7waGM@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 11 Oct 2011 13:30:14 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Tue, 11 Oct 2011 15:06:43 +0530
+Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
 
-> 2011/9/6 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > ...which will allow cifs to do an asynchronous read call to the ser=
-ver.
-> > The caller will allocate and set up cifs_readdata for each READ_AND=
-_X
-> > call that should be issued on the wire. The pages passed in are add=
-ed
-> > to the pagecache, but not placed on the LRU list yet (as we need th=
-e
-> > page->lru to keep the pages on the list in the readdata).
-> >
-> > When cifsd identifies the mid, it will see that there is a special
-> > receive handler for the call, and use that to receive the rest of t=
-he
-> > frame. cifs_readv_receive will then marshal up a kvec array with
-> > kmapped pages from the pagecache, which eliminates one copy of the
-> > data. Once the data is received, the pages are added to the LRU lis=
-t,
-> > set uptodate, and unlocked.
-> >
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> > =C2=A0fs/cifs/cifsproto.h | =C2=A0 24 ++++
-> > =C2=A0fs/cifs/cifssmb.c =C2=A0 | =C2=A0356 ++++++++++++++++++++++++=
-+++++++++++++++++++++++++++
-> > =C2=A0fs/cifs/connect.c =C2=A0 | =C2=A0 26 ++--
-> > =C2=A03 files changed, 393 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> > index 51c0ebc..38406e5 100644
-> > --- a/fs/cifs/cifsproto.h
-> > +++ b/fs/cifs/cifsproto.h
-> > @@ -152,6 +152,12 @@ extern struct cifs_ntsd *get_cifs_acl(struct c=
-ifs_sb_info *, struct inode *,
-> > =C2=A0extern int set_cifs_acl(struct cifs_ntsd *, __u32, struct ino=
-de *,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const char *);
-> >
-> > +extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
-> > +extern int cifs_read_from_socket(struct TCP_Server_Info *server, c=
-har *buf,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0unsigned int to_read);
-> > +extern int cifs_readv_from_socket(struct TCP_Server_Info *server,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct kvec *iov=
-_orig, unsigned int nr_segs,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned int to_=
-read);
-> > =C2=A0extern void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct cifs_sb_info *cifs_sb);
-> > =C2=A0extern int cifs_match_super(struct super_block *, void *);
-> > @@ -441,6 +447,24 @@ extern int E_md4hash(const unsigned char *pass=
-wd, unsigned char *p16);
-> > =C2=A0extern int SMBencrypt(unsigned char *passwd, const unsigned c=
-har *c8,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0unsigned char *p24);
-> >
-> > +/* asynchronous read support */
-> > +struct cifs_readdata {
-> > + =C2=A0 =C2=A0 =C2=A0 struct cifsFileInfo =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 *cfile;
-> > + =C2=A0 =C2=A0 =C2=A0 struct address_space =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0*mapping;
-> > + =C2=A0 =C2=A0 =C2=A0 __u64 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 offset;
-> > + =C2=A0 =C2=A0 =C2=A0 unsigned int =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0bytes;
-> > + =C2=A0 =C2=A0 =C2=A0 pid_t =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pid;
-> > + =C2=A0 =C2=A0 =C2=A0 int =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 result;
-> > + =C2=A0 =C2=A0 =C2=A0 struct list_head =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0pages;
-> > + =C2=A0 =C2=A0 =C2=A0 struct work_struct =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0work;
-> > + =C2=A0 =C2=A0 =C2=A0 unsigned int =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0nr_iov;
-> > + =C2=A0 =C2=A0 =C2=A0 struct kvec =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 iov[1];
-> > +};
-> > +
-> > +struct cifs_readdata *cifs_readdata_alloc(unsigned int nr_pages);
-> > +void cifs_readdata_free(struct cifs_readdata *rdata);
-> > +int cifs_async_readv(struct cifs_readdata *rdata);
-> > +
-> > =C2=A0/* asynchronous write support */
-> > =C2=A0struct cifs_writedata {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0struct kref =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 refcount;
-> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> > index ae1ce01..ac72f28 100644
-> > --- a/fs/cifs/cifssmb.c
-> > +++ b/fs/cifs/cifssmb.c
-> > @@ -33,6 +33,8 @@
-> > =C2=A0#include <linux/slab.h>
-> > =C2=A0#include <linux/posix_acl_xattr.h>
-> > =C2=A0#include <linux/pagemap.h>
-> > +#include <linux/swap.h>
-> > +#include <linux/task_io_accounting_ops.h>
-> > =C2=A0#include <asm/uaccess.h>
-> > =C2=A0#include "cifspdu.h"
-> > =C2=A0#include "cifsglob.h"
-> > @@ -40,6 +42,7 @@
-> > =C2=A0#include "cifsproto.h"
-> > =C2=A0#include "cifs_unicode.h"
-> > =C2=A0#include "cifs_debug.h"
-> > +#include "fscache.h"
-> >
-> > =C2=A0#ifdef CONFIG_CIFS_POSIX
-> > =C2=A0static struct {
-> > @@ -83,6 +86,9 @@ static struct {
-> > =C2=A0#endif /* CONFIG_CIFS_WEAK_PW_HASH */
-> > =C2=A0#endif /* CIFS_POSIX */
-> >
-> > +/* Forward declarations */
-> > +static void cifs_readv_complete(struct work_struct *work);
-> > +
-> > =C2=A0/* Mark as invalid, all open files on tree connections since =
-they
-> > =C2=A0 =C2=A0were closed when session to server was lost */
-> > =C2=A0static void mark_open_files_invalid(struct cifs_tcon *pTcon)
-> > @@ -1375,6 +1381,356 @@ openRetry:
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0return rc;
-> > =C2=A0}
-> >
-> > +struct cifs_readdata *
-> > +cifs_readdata_alloc(unsigned int nr_pages)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_readdata *rdata;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 /* readdata + 1 kvec for each page */
-> > + =C2=A0 =C2=A0 =C2=A0 rdata =3D kzalloc(sizeof(*rdata) +
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 sizeof(struct kvec) * nr_pages, GFP_KERNEL);
-> > + =C2=A0 =C2=A0 =C2=A0 if (rdata !=3D NULL) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 INIT_WORK(&rdata=
-->work, cifs_readv_complete);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 INIT_LIST_HEAD(&=
-rdata->pages);
-> > + =C2=A0 =C2=A0 =C2=A0 }
-> > + =C2=A0 =C2=A0 =C2=A0 return rdata;
-> > +}
-> > +
-> > +void
-> > +cifs_readdata_free(struct cifs_readdata *rdata)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 cifsFileInfo_put(rdata->cfile);
-> > + =C2=A0 =C2=A0 =C2=A0 kfree(rdata);
-> > +}
-> > +
-> > +/*
-> > + * Discard any remaining data in the current SMB. To do this, we b=
-orrow the
-> > + * current bigbuf.
-> > + */
-> > +static int
-> > +cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_en=
-try *mid)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 READ_RSP *rsp =3D (READ_RSP *)server->smallb=
-uf;
-> > + =C2=A0 =C2=A0 =C2=A0 unsigned int rfclen =3D be32_to_cpu(rsp->hdr=
-=2Esmb_buf_length);
-> > + =C2=A0 =C2=A0 =C2=A0 int remaining =3D rfclen + 4 - server->total=
-_read;
-> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_readdata *rdata =3D mid->callbac=
-k_data;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 while (remaining > 0) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int length;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 length =3D cifs_=
-read_from_socket(server, server->bigbuf,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 min_t(unsigned int, remaining,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CIFS=
-MaxBufSize + MAX_CIFS_HDR_SIZE));
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (length < 0)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 return length;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 server->total_re=
-ad +=3D length;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 remaining -=3D l=
-ength;
-> > + =C2=A0 =C2=A0 =C2=A0 }
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 dequeue_mid(mid, rdata->result);
-> > + =C2=A0 =C2=A0 =C2=A0 return 0;
-> > +}
-> > +
-> > +static int
-> > +cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_en=
-try *mid)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 int length, len;
-> > + =C2=A0 =C2=A0 =C2=A0 unsigned int data_offset, remaining, data_le=
-n;
-> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_readdata *rdata =3D mid->callbac=
-k_data;
-> > + =C2=A0 =C2=A0 =C2=A0 READ_RSP *rsp =3D (READ_RSP *)server->smallb=
-uf;
-> > + =C2=A0 =C2=A0 =C2=A0 unsigned int rfclen =3D be32_to_cpu(rsp->hdr=
-=2Esmb_buf_length) + 4;
-> > + =C2=A0 =C2=A0 =C2=A0 u64 eof;
-> > + =C2=A0 =C2=A0 =C2=A0 pgoff_t eof_index;
-> > + =C2=A0 =C2=A0 =C2=A0 struct page *page, *tpage;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 cFYI(1, "%s: mid=3D%u offset=3D%llu bytes=3D=
-%u", __func__,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 mid->mid, rdata-=
->offset, rdata->bytes);
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 /*
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0* read the rest of READ_RSP header (sa=
-ns Data array), or whatever we
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0* can if there's not enough data. At t=
-his point, we've read down to
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0* the Mid.
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
-> > + =C2=A0 =C2=A0 =C2=A0 len =3D min_t(unsigned int, rfclen, sizeof(*=
-rsp)) -
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 sizeof(struct smb_hdr) + 1;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 rdata->iov[0].iov_base =3D server->smallbuf =
-+ sizeof(struct smb_hdr) - 1;
-> > + =C2=A0 =C2=A0 =C2=A0 rdata->iov[0].iov_len =3D len;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 length =3D cifs_readv_from_socket(server, rd=
-ata->iov, 1, len);
-> > + =C2=A0 =C2=A0 =C2=A0 if (length < 0)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return length;
-> > + =C2=A0 =C2=A0 =C2=A0 server->total_read +=3D length;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 /* Was the SMB read successful? */
-> > + =C2=A0 =C2=A0 =C2=A0 rdata->result =3D map_smb_to_linux_error(&rs=
-p->hdr, false);
-> > + =C2=A0 =C2=A0 =C2=A0 if (rdata->result !=3D 0) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cFYI(1, "%s: ser=
-ver returned error %d", __func__,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 rdata->result);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return cifs_read=
-v_discard(server, mid);
-> > + =C2=A0 =C2=A0 =C2=A0 }
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 /* Is there enough to get to the rest of the=
- READ_RSP header? */
-> > + =C2=A0 =C2=A0 =C2=A0 if (server->total_read < sizeof(READ_RSP)) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cFYI(1, "%s: ser=
-ver returned short header. got=3D%u expected=3D%lu",
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 __func__, server->total_read, sizeof(READ_RSP));
->=20
-> sizeof should be casted to unsigned long to prevent compiler warnings=
-=2E
->=20
+> Thus spake Jeff Layton:
+> 
+> "Making that a module parm would allow you to set that parameter at boot
+> time without needing to add special startup scripts. IMO, all of the
+> procfile "switches" under /proc/fs/cifs should be module parms
+> instead."
+> 
+> This seems reasonable so this patch makes OplockEnabled a module
+> parameter and rename it to enable_oplocks to comply with the coding
+> conventions. This patch removes the proc file handling pertaining to
+> /proc/fs/cifs/OplockEnabled which would no longer be required if this
+> patch gets accepted.
+> 
+> This patch doesn't alter the default behavior (Oplocks enabled by
+> default). To disable oplocks when loading the module, use
+>  
+>    modprobe cifs enable_oplocks=0
+> 
+> Note:
+> (a) I'm little worried about eliminating an already known interace to
+>     enable/disable Oplocks. An update to README file mentioning this info
+>     is planned. Do we need to warn users before pulling it off? Any
+>     suggestions on how we could do this?
+> (b) Most of the /proc/fs/cifs switches could be converted to a module
+>     param for e.g. LookupCacheEnabled, LinuxExtensionsEnabled,
+>     MultiuserMount etc. I'll post further patches once this gets
+>     accepted.
+> 
 
-Actually...I think what I need to do here and in the other places you
-pointed out is to use "%z". I'll fix and respin.
+Yeah, I don't think we ought to just rip out these interfaces
+unannounced. What should probably happen is this:
 
-Thanks for the review...
---=20
+Add the new module parms, and a patch that makes a printk pop when the
+old interfaces are used. The printk should announce something like:
+
+"The /proc/fs/cifs/foo interface will be removed in kernel version 3.x.
+Please migrate to using the 'enable_foo' module parameter in cifs.ko."
+
+Make the 3.x version be 2 releases out. Then have patches ready to go
+to remove those interfaces when the 3.x merge window opens.
+
+> Reported-by: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
+> Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+> ---
+>  fs/cifs/cifs_debug.c |   40 ----------------------------------------
+>  fs/cifs/cifsfs.c     |    4 +++-
+>  fs/cifs/cifsglob.h   |    4 +++-
+>  fs/cifs/dir.c        |    2 +-
+>  fs/cifs/file.c       |    4 ++--
+>  5 files changed, 9 insertions(+), 45 deletions(-)
+> 
+> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+> index 2fe3cf1..393b37b 100644
+> --- a/fs/cifs/cifs_debug.c
+> +++ b/fs/cifs/cifs_debug.c
+> @@ -418,7 +418,6 @@ static const struct file_operations cifs_stats_proc_fops = {
+>  
+>  static struct proc_dir_entry *proc_fs_cifs;
+>  static const struct file_operations cifsFYI_proc_fops;
+> -static const struct file_operations cifs_oplock_proc_fops;
+>  static const struct file_operations cifs_lookup_cache_proc_fops;
+>  static const struct file_operations traceSMB_proc_fops;
+>  static const struct file_operations cifs_multiuser_mount_proc_fops;
+> @@ -439,7 +438,6 @@ cifs_proc_init(void)
+>  #endif /* STATS */
+>  	proc_create("cifsFYI", 0, proc_fs_cifs, &cifsFYI_proc_fops);
+>  	proc_create("traceSMB", 0, proc_fs_cifs, &traceSMB_proc_fops);
+> -	proc_create("OplockEnabled", 0, proc_fs_cifs, &cifs_oplock_proc_fops);
+>  	proc_create("LinuxExtensionsEnabled", 0, proc_fs_cifs,
+>  		    &cifs_linux_ext_proc_fops);
+>  	proc_create("MultiuserMount", 0, proc_fs_cifs,
+> @@ -463,7 +461,6 @@ cifs_proc_clean(void)
+>  	remove_proc_entry("Stats", proc_fs_cifs);
+>  #endif
+>  	remove_proc_entry("MultiuserMount", proc_fs_cifs);
+> -	remove_proc_entry("OplockEnabled", proc_fs_cifs);
+>  	remove_proc_entry("SecurityFlags", proc_fs_cifs);
+>  	remove_proc_entry("LinuxExtensionsEnabled", proc_fs_cifs);
+>  	remove_proc_entry("LookupCacheEnabled", proc_fs_cifs);
+> @@ -509,43 +506,6 @@ static const struct file_operations cifsFYI_proc_fops = {
+>  	.write		= cifsFYI_proc_write,
+>  };
+>  
+> -static int cifs_oplock_proc_show(struct seq_file *m, void *v)
+> -{
+> -	seq_printf(m, "%d\n", oplockEnabled);
+> -	return 0;
+> -}
+> -
+> -static int cifs_oplock_proc_open(struct inode *inode, struct file *file)
+> -{
+> -	return single_open(file, cifs_oplock_proc_show, NULL);
+> -}
+> -
+> -static ssize_t cifs_oplock_proc_write(struct file *file,
+> -		const char __user *buffer, size_t count, loff_t *ppos)
+> -{
+> -	char c;
+> -	int rc;
+> -
+> -	rc = get_user(c, buffer);
+> -	if (rc)
+> -		return rc;
+> -	if (c == '0' || c == 'n' || c == 'N')
+> -		oplockEnabled = 0;
+> -	else if (c == '1' || c == 'y' || c == 'Y')
+> -		oplockEnabled = 1;
+> -
+> -	return count;
+> -}
+> -
+> -static const struct file_operations cifs_oplock_proc_fops = {
+> -	.owner		= THIS_MODULE,
+> -	.open		= cifs_oplock_proc_open,
+> -	.read		= seq_read,
+> -	.llseek		= seq_lseek,
+> -	.release	= single_release,
+> -	.write		= cifs_oplock_proc_write,
+> -};
+> -
+>  static int cifs_linux_ext_proc_show(struct seq_file *m, void *v)
+>  {
+>  	seq_printf(m, "%d\n", linuxExtEnabled);
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 3e29899..37c2fbb 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -52,7 +52,6 @@
+>  int cifsFYI = 0;
+>  int cifsERROR = 1;
+>  int traceSMB = 0;
+> -unsigned int oplockEnabled = 1;
+>  unsigned int linuxExtEnabled = 1;
+>  unsigned int lookupCacheEnabled = 1;
+>  unsigned int multiuser_mount = 0;
+> @@ -81,6 +80,9 @@ module_param(echo_retries, ushort, 0644);
+>  MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
+>  			       "reconnecting server. Default: 5. 0 means "
+>  			       "never reconnect.");
+> +unsigned int enable_oplocks = 1;
+> +module_param(enable_oplocks, bool, 0644);
+> +MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool). Default: 1.");
+
+I think you want this as "Default: true" since this is a bool?
+
+>  extern mempool_t *cifs_sm_req_poolp;
+>  extern mempool_t *cifs_req_poolp;
+>  extern mempool_t *cifs_mid_poolp;
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 6255fa8..9c33727 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -922,7 +922,6 @@ GLOBAL_EXTERN unsigned int multiuser_mount; /* if enabled allows new sessions
+>  				to be established on existing mount if we
+>  				have the uid/password or Kerberos credential
+>  				or equivalent for current user */
+> -GLOBAL_EXTERN unsigned int oplockEnabled;
+>  GLOBAL_EXTERN unsigned int lookupCacheEnabled;
+>  GLOBAL_EXTERN unsigned int global_secflags;	/* if on, session setup sent
+>  				with more secure ntlmssp2 challenge/resp */
+> @@ -936,6 +935,9 @@ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
+>  /* reconnect after this many failed echo attempts */
+>  GLOBAL_EXTERN unsigned short echo_retries;
+>  
+> +/* enable or disable oplocks */
+> +GLOBAL_EXTERN unsigned int enable_oplocks;
+> +
+>  GLOBAL_EXTERN struct rb_root uidtree;
+>  GLOBAL_EXTERN struct rb_root gidtree;
+>  GLOBAL_EXTERN spinlock_t siduidlock;
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 81914df..4d83659 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -165,7 +165,7 @@ cifs_create(struct inode *inode, struct dentry *direntry, int mode,
+>  	}
+>  	tcon = tlink_tcon(tlink);
+>  
+> -	if (oplockEnabled)
+> +	if (enable_oplocks)
+>  		oplock = REQ_OPLOCK;
+>  
+>  	if (nd && (nd->flags & LOOKUP_OPEN))
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index bb71471..41149a0 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -369,7 +369,7 @@ int cifs_open(struct inode *inode, struct file *file)
+>  	cFYI(1, "inode = 0x%p file flags are 0x%x for %s",
+>  		 inode, file->f_flags, full_path);
+>  
+> -	if (oplockEnabled)
+> +	if (enable_oplocks)
+>  		oplock = REQ_OPLOCK;
+>  	else
+>  		oplock = 0;
+> @@ -493,7 +493,7 @@ static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
+>  	cFYI(1, "inode = 0x%p file flags 0x%x for %s",
+>  		 inode, pCifsFile->f_flags, full_path);
+>  
+> -	if (oplockEnabled)
+> +	if (enable_oplocks)
+>  		oplock = REQ_OPLOCK;
+>  	else
+>  		oplock = 0;
+
+
+-- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
