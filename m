@@ -1,47 +1,48 @@
-From: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
-Subject: Fwd: cifs ignores sysct setting
-Date: Mon, 10 Oct 2011 15:48:55 +0200 (CEST)
-Message-ID: <fd3c2938-7d3d-41ac-862a-026c5f0ccb1e@absint.swen.nu>
-References: <099ae669-6de2-4566-926e-981066fed122@absint.swen.nu>
+From: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
+Subject: Re: [PATCH 0/4] allow freezing of tasks with netfs calls in flight
+Date: Tue, 11 Oct 2011 08:18:19 +0200
+Message-ID: <20111011061819.GA1377@ucw.cz>
+References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, rjw-KKrjLPT3xs0@public.gmane.org,
+	linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-D0fwSNaahy58zQARNC3f2A@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <099ae669-6de2-4566-926e-981066fed122-VJN6hnAnNNsoZRmjwiK4Kw@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1317210761-11518-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Hi!
+
+> We've had a number of reports recently of people with NFS and CIFS
+> mounts that were unable to suspend or hibernate their machines. Here
+> are a couple of Fedora bugs that illustrate the problem:
+> 
+>     https://bugzilla.redhat.com/show_bug.cgi?id=712088
+>     https://bugzilla.redhat.com/show_bug.cgi?id=717735
+> 
+> When it occurs the problem is pretty clear. We have a task that's
+> sleeping in the kernel in TASK_KILLABLE sleep, generally waiting
+> for a reply to come in. Often though, userspace has already taken
+> down the interface so that reply will never come. The process then
+> fails to freeze and the suspend fails.
+
+Userspace should not take interface down for suspend (*). Why do that?
 
 
-From: "Alexander Swen" <alex-UE4+9DRHXtc@public.gmane.org> 
-To: "Suresh Jayaraman" <sjayaraman-IBi9RG/b67k@public.gmane.org> 
-Sent: Monday, 10 October, 2011 3:44:47 PM 
-Subject: Re: cifs ignores sysct setting 
+> This patch fixes this by allowing the TASK_KILLABLE sleeps in NFS and
+> CIFS to be awoken by the freezer and then to try to freeze. If a freeze
+> event does occur, then the code will treat it as if a schedule() has
+> already occured.
 
-Hi Suresh, thanks for your re, 
+Looks like good idea...
 
-> It is not clear to me why do you want to unload and reload cifs 
-> module 
-> often? The general usage is load module during boot or on first use 
-> and 
-> the module lives on till the machine goes down. 
+(*) unless absolutely neccessary. openvpn?
 
-I don't (want to load cifs often ;-). but I don't want to exec a command to configure cifs once a server starts up). Now, I know I can automate such thing using rc.local etc... but I rather configure those things just as I would configure any other kernel module settings (preferably using modprobe.d/cifs.conf or something similar) 
-
-> I'm not seeing an justification for making it an module parameter. 
-
-I do: when I load for example a module like bonding I tell it how to behave in with settings which i put into a file called /etc/modprobe.d/aliases: 
-alias bond0 bonding 
-options bonding mode=1 miimon=100 
-
-
-> Could you please explain more on how it will be useful? 
-
-i would like to change the behaviour of cifs so that oplock is disabled when it loads. 
-
-can you follow my way of thinking? 
-
-thanks for your cooperation, 
-
-Alex 
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
