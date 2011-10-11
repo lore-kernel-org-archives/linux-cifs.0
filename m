@@ -1,7 +1,8 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH 3/3] cifs: update README about the kernel module parameters
-Date: Tue, 11 Oct 2011 21:28:16 +0530
-Message-ID: <4E946798.90407@suse.de>
+Subject: [PATCH 2/3] cifs: warn about deprecation of /proc/fs/cifs/OplockEnabled
+ interface
+Date: Tue, 11 Oct 2011 21:28:10 +0530
+Message-ID: <4E946792.1060405@suse.de>
 Reply-To: sjayaraman-l3A5Bk7waGM@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -13,34 +14,26 @@ Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+The plan is to deprecate this interface by kernel version 3.4.
 
 Reported-by: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- fs/cifs/README |   14 ++++++++++++++
- 1 files changed, 14 insertions(+), 0 deletions(-)
+ fs/cifs/cifs_debug.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/README b/fs/cifs/README
-index c5c2c5e..95b37a1 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -745,4 +745,18 @@ installed and something like the following lines should be added to the
- create cifs.spnego * * /usr/local/sbin/cifs.upcall %k
- create dns_resolver * * /usr/local/sbin/cifs.upcall %k
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 2fe3cf1..b9c06a8 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -526,6 +526,9 @@ static ssize_t cifs_oplock_proc_write(struct file *file,
+ 	char c;
+ 	int rc;
  
-+CIFS kernel module parameters
-+=============================
-+These module parameters can be specified or modified either during the time of
-+module loading or during the runtime by using the interface
-+	/proc/module/cifs/parameters/<param>
-+
-+i.e. echo "value" > /proc/module/cifs/parameters/<param>
-+
-+1. echo_retries - The number of echo attempts before giving up and
-+		  reconnecting to the server. The default is 5. The value 0
-+		  means never reconnect.
-+
-+2. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
-+		    [Y/y/1]. To disable oplocks use any of [N/n/0].
- 
++	printk(KERN_WARNING "CIFS: The /proc/fs/cifs/OplockEnabled interface "
++	       "will be removed in kernel version 3.4. Please migrate to "
++	       "using the 'enable_oplocks' module parameter in cifs.ko.");
+ 	rc = get_user(c, buffer);
+ 	if (rc)
+ 		return rc;
