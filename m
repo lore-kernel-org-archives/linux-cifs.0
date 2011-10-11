@@ -1,34 +1,65 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: Display strictcache mount option in /proc/mounts
-Date: Tue, 11 Oct 2011 13:43:50 +0100
-Message-ID: <1318337032.3659.65.camel@sprabhu.fab.redhat.com>
+From: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
+Subject: RE: [PATCH 3/4] sunrpc: make rpc_wait_bit_killable handle freeze events
+Date: Tue, 11 Oct 2011 05:52:57 -0700
+Message-ID: <2E1EB2CF9ED1CB4AA966F0EB76EAB4430B91E852@SACMVEXC2-PRD.hq.netapp.com>
+References: <1317210761-11518-1-git-send-email-jlayton@redhat.com><1317210761-11518-4-git-send-email-jlayton@redhat.com><20111011061923.GC1377@ucw.cz> <20111011061221.2a4a212f@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <rjw-KKrjLPT3xs0@public.gmane.org>,
+	<linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>,
+	<linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	<john-D0fwSNaahy58zQARNC3f2A@public.gmane.org>, <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "Jeff Layton" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "Pavel Machek" <pavel-+ZI9xUNit7I@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-class: urn:content-classes:message
+In-Reply-To: <20111011061221.2a4a212f-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Commit d39454ffe4a3c85428483b8a8a8e5e797b6363d5 adds a strictcache mount
-option. This patch allows the display of this mount option in
-/proc/mounts when listing shares mounted with the strictcache mount
-option.
+> -----Original Message-----
+> From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
+> Sent: Tuesday, October 11, 2011 6:12 AM
+> To: Pavel Machek
+> Cc: Myklebust, Trond; smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org; rjw-KKrjLPT3xs0@public.gmane.org; linux-
+> pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; linux-
+> nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; john-D0fwSNaahy58zQARNC3f2A@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Subject: Re: [PATCH 3/4] sunrpc: make rpc_wait_bit_killable handle
+freeze
+> events
+> 
+> On Tue, 11 Oct 2011 08:19:23 +0200
+> Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org> wrote:
+> 
+> > On Wed 2011-09-28 07:52:40, Jeff Layton wrote:
+> > > Allow the wait_on_bit_killable sleeps in SUNRPC layer to respect
+the
+> > > freezer. This should allow suspend and hibernate events to occur,
+> > > even when there are RPC's pending on the wire.
+> >
+> > Will the RPC protocols used handle that correctly? What will happen
+> > during resume?
+> >
+> 
+> That depends on the state of the socket during resume. If the
+> suspend/resume is quick enough, then the socket may still be
+connected, or
+> if we're using UDP then we might just get the reply and carry on
+successfully.
+> Otherwise, the call will eventually time out, or will be cancelled
+when the
+> kernel finds that the socket has been closed.
+> 
+> Either way, this should do the right thing.
 
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Well... The problem when this sort of thing happens is with the replay
+cache. If the RPC in question was a mkdir, for instance, then replaying
+the RPC call when you wake up can be problematic because chances are
+that the server will have forgotten who created the directory, and so
+will reply with EEXIST instead of OK.
+However this is a generic problem when the client is unable to talk to
+the server for a while, and is not particular to suspend.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 54b8f1e..03d2f6b 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -432,6 +432,8 @@ cifs_show_options(struct seq_file *s, struct vfsmount *m)
- 		seq_printf(s, ",mfsymlinks");
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)
- 		seq_printf(s, ",fsc");
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
-+		seq_printf(s, ",strictcache");
- 
- 	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
- 	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
+Cheers
+  Trond
