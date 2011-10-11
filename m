@@ -1,8 +1,10 @@
 From: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
-Subject: Re: [PATCH 0/4] allow freezing of tasks with netfs calls in flight
-Date: Tue, 11 Oct 2011 08:18:19 +0200
-Message-ID: <20111011061819.GA1377@ucw.cz>
+Subject: Re: [PATCH 1/4] freezer: make fake_signal_wake_up wake
+ TASK_KILLABLE tasks too
+Date: Tue, 11 Oct 2011 08:18:48 +0200
+Message-ID: <20111011061847.GB1377@ucw.cz>
 References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
+ <1317210761-11518-2-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, rjw-KKrjLPT3xs0@public.gmane.org,
@@ -12,36 +14,28 @@ Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1317210761-11518-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1317210761-11518-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+
 Hi!
 
-> We've had a number of reports recently of people with NFS and CIFS
-> mounts that were unable to suspend or hibernate their machines. Here
-> are a couple of Fedora bugs that illustrate the problem:
+> TASK_KILLABLE is often used to put tasks to sleep for quite some time.
+> One of the most common uses is to put tasks to sleep while waiting for
+> replies from a server on a networked filesystem (such as CIFS or NFS).
 > 
->     https://bugzilla.redhat.com/show_bug.cgi?id=712088
->     https://bugzilla.redhat.com/show_bug.cgi?id=717735
+> Unfortunately, fake_signal_wake_up does not currently wake up tasks
+> that are sleeping in TASK_KILLABLE state. This means that even if the
+> code were in place to allow them to freeze while in this sleep, it
+> wouldn't work anyway.
 > 
-> When it occurs the problem is pretty clear. We have a task that's
-> sleeping in the kernel in TASK_KILLABLE sleep, generally waiting
-> for a reply to come in. Often though, userspace has already taken
-> down the interface so that reply will never come. The process then
-> fails to freeze and the suspend fails.
+> This patch changes this function to wake tasks in this state as well.
+> This should be harmless -- if the code doing the sleeping doesn't have
+> handling to deal with freezer events, it should just go back to sleep.
 
-Userspace should not take interface down for suspend (*). Why do that?
-
-
-> This patch fixes this by allowing the TASK_KILLABLE sleeps in NFS and
-> CIFS to be awoken by the freezer and then to try to freeze. If a freeze
-> event does occur, then the code will treat it as if a schedule() has
-> already occured.
-
-Looks like good idea...
-
-(*) unless absolutely neccessary. openvpn?
+I'm pretty sure this will break something; but that does not mean it
+is bad idea, just that it should be merged early and tested a lot.
 
 -- 
 (english) http://www.livejournal.com/~pavelmachek
