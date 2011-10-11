@@ -1,35 +1,98 @@
-From: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>
-Subject: Re: [PATCH 3/4] sunrpc: make rpc_wait_bit_killable handle freeze
- events
-Date: Tue, 11 Oct 2011 08:19:23 +0200
-Message-ID: <20111011061923.GC1377@ucw.cz>
-References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
- <1317210761-11518-4-git-send-email-jlayton@redhat.com>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Re: cifs ignores sysct setting
+Date: Tue, 11 Oct 2011 14:44:58 +0530
+Message-ID: <4E940912.1000408@suse.com>
+References: <02d643a6-776c-4ab4-9561-591934939ae8@absint.swen.nu>	<4E92EDC7.30101@suse.com> <20111010093716.68c55bff@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, rjw-KKrjLPT3xs0@public.gmane.org,
-	linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-D0fwSNaahy58zQARNC3f2A@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1317210761-11518-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111010093716.68c55bff-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed 2011-09-28 07:52:40, Jeff Layton wrote:
-> Allow the wait_on_bit_killable sleeps in SUNRPC layer to respect the
-> freezer. This should allow suspend and hibernate events to occur, even
-> when there are RPC's pending on the wire.
+On 10/10/2011 07:07 PM, Jeff Layton wrote:
+> On Mon, 10 Oct 2011 18:36:15 +0530
+> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+> 
+>> On 10/10/2011 03:02 PM, Alexander Swen wrote:
+>>>
+>>> Hi Steve and other CIFS developers, 
+>>>
+>>> please help me with the following: 
+>>> 1. fix the bug I explain below ;-) 
+>>> 2. tell me to what bug tracking system I should to file it to. 
+>>>
+>>> so, imho this is a bug: when I load the cifs module it insists in setting oplockenabled to 1 while we want to have locking disabled (due to our poormen's nas who's performance sinks to subzero when we do serious io ;-) 
+>>>
+>>> I've filed this bug at Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=644135 
+>>>
+>>> I paste all details over here as well: 
+>>> <paste> 
+>>> Package: linux-mage
+>>> Version: 2.6.32-5-amd64
+>>>
+>>> cifs.ko module (which is included in the kernel pkg as far as i know)
+>>> cifs driver version 1.61
+>>>
+>>> when cifs module loads oplock is enabled by default.
+>>> so I can do
+>>> echo 0 >/proc/fs/cifs/OplockEnabled
+>>> but that won't persist through a driver reload. so we tried adding this to /etc/sysctl.conf:
+>>> fs.cifs.OplockEnabled = 0
+>>> however:
+>>>
+>>> root@nl14s0008-vm1:~# echo 0 >/proc/fs/cifs/OplockEnabled
+>>> root@nl14s0008-vm1:~# cat /proc/fs/cifs/OplockEnabled
+>>> 0
+>>> root@nl14s0008-vm1:~# modprobe -r cifs
+>>> root@nl14s0008-vm1:~# tail -1 /etc/sysctl.conf
+>>> fs.cifs.OplockEnabled = 0
+>>
+>> IIUC, CIFS OplockEnabled is not a proper sysctl, it is just a proc
+>> entry. Sysctls are listed below /proc/sys/ directory.
+>>
+>> For e.g. try
+>>    sysctl -w fs.cifs.OplockEnabled=0
+>>
+>> you'll see the error: "/proc/sys/fs/cifs/OplockEnabled: No such file or
+>> directory". Also,
+>>
+>>    sysctl -p
+>>
+>> will throw the error: "/proc/sys/fs/cifs/OplockEnabled: No such file or
+>> directory"
+>>
+>> It is not clear to me why do you want to unload and reload cifs module
+>> often? The general usage is load module during boot or on first use and
+>> the module lives on till the machine goes down.
+>>
+>> I'm not seeing an justification for making it an module parameter. Could
+>> you please explain more on how it will be useful?
+>>
+> 
+> I agree with Alexander on this one...
+> 
+> Making that a module parm would allow you to set that parameter at boot
+> time without needing to add special startup scripts. IMO, all of the
+> procfile "switches" under /proc/fs/cifs should be module parms
+> instead.
 
-Will the RPC protocols used handle that correctly? What will happen
-during resume?
+Making it a module parm would mean that it would no longer be possible
+to dynamically change OplockEnabled. But, that might be Ok, because it
+is quite unusual to change this setting once the module is loaded,
+right?. Also, someone won't be able to see what is the current setting.
+Again, not a big deal.
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> That would also allow us to get rid of some of the special procfile
+> handling code for those files as well.
+> 
+
+Agreed.
+
+I'll whip up a patch and post it soon.
+
+
+-Suresh
