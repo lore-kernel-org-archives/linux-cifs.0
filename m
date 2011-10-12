@@ -1,111 +1,109 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/3] cifs: add new module parameter 'enable_oplocks'
-Date: Wed, 12 Oct 2011 07:28:59 -0400
-Message-ID: <20111012072859.41aeb23a@tlielax.poochiereds.net>
-References: <4E946788.3060101@suse.de>
-	<20111011124405.37e09487@corrin.poochiereds.net>
-	<4E952CBD.2010906@suse.de>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 12/16] cifs: eliminate is_multi_rsp parm to find_cifs_mid
+Date: Wed, 12 Oct 2011 15:34:19 +0400
+Message-ID: <CAKywueShQc2CimaQzivebne_a+L8aVHVsUbLotRn+xEKFU=fUQ@mail.gmail.com>
+References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
+	<1314616624-5362-13-git-send-email-jlayton@redhat.com>
+	<CAKywueS13LXqw2NgbCqd0hyh7qVwzqL7MZwF8Z5X3HdWmJOrBA@mail.gmail.com>
+	<20111012072805.0f21a5a5@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
-To: sjayaraman-l3A5Bk7waGM@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4E952CBD.2010906-l3A5Bk7waGM@public.gmane.org>
+In-Reply-To: <20111012072805.0f21a5a5-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 12 Oct 2011 11:29:25 +0530
-Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
+2011/10/12 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Wed, 12 Oct 2011 12:43:04 +0400
+> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> 2011/8/29 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+>> > Change find_cifs_mid to only return NULL if a mid could not be fou=
+nd.
+>> > If we got part of a multi-part T2 response, then coalesce it and s=
+till
+>> > return the mid. The caller can determine the T2 receive status fro=
+m
+>> > the flags in the mid.
+>> >
+>> > With this change, there is no need to pass a pointer to "length" a=
+s
+>> > well so just pass by value. If a mid is found, then we can just ma=
+rk
+>> > it as malformed. If one isn't found, then the value of "length" wo=
+n't
+>> > change anyway.
+>> >
+>> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> > ---
+>> > =A0fs/cifs/connect.c | =A0 35 ++++++++++++++++-------------------
+>> > =A01 files changed, 16 insertions(+), 19 deletions(-)
+>> >
+>> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> > index 6b4fcb3..9518457 100644
+>> > --- a/fs/cifs/connect.c
+>> > +++ b/fs/cifs/connect.c
+>> > @@ -576,8 +576,7 @@ dequeue_mid(struct mid_q_entry *mid, int malfo=
+rmed)
+>> >
+>> > =A0static struct mid_q_entry *
+>> > =A0find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *b=
+uf,
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 int *malformed, bool is_large_buf, bool =
+*is_multi_rsp,
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 char **bigbuf)
+>> > + =A0 =A0 =A0 =A0 =A0 =A0 int malformed, bool is_large_buf, char *=
+*bigbuf)
+>> > =A0{
+>> > =A0 =A0 =A0 =A0struct mid_q_entry *mid =3D NULL;
+>> >
+>> > @@ -585,16 +584,14 @@ find_cifs_mid(struct TCP_Server_Info *server=
+, struct smb_hdr *buf,
+>> > =A0 =A0 =A0 =A0if (!mid)
+>> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return mid;
+>> >
+>> > - =A0 =A0 =A0 if (*malformed =3D=3D 0 && check2ndT2(buf) > 0) {
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* We have a multipart transact2 res=
+p */
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 *is_multi_rsp =3D true;
+>> > + =A0 =A0 =A0 if (malformed =3D=3D 0 && check2ndT2(buf) > 0) {
+>> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid->multiRsp =3D true;
+>> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (mid->resp_buf) {
+>> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* merge response -=
+ fix up 1st*/
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 *malformed =3D coale=
+sce_t2(buf, mid->resp_buf);
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (*malformed > 0) =
+{
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 *mal=
+formed =3D 0;
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid-=
+>multiRsp =3D true;
+>> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 retu=
+rn NULL;
+>> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 malformed =3D coales=
+ce_t2(buf, mid->resp_buf);
+>> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (malformed > 0) {
+>> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 malf=
+ormed =3D 0;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 ^^^^
+>> this is unnecessary because we return from the function as the next =
+step.
+>>
+>
+> <forehead slap>
+>
+> Correct. It's a harmless thing though. Mind if I fix this in a
+> follow-on patch to the whole series? I hate to have to respin it for
+> this...
+>
 
-> On 10/11/2011 10:14 PM, Jeff Layton wrote:
-> > On Tue, 11 Oct 2011 21:28:00 +0530
-> > Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
-> > 
-> >> Thus spake Jeff Layton:
-> >>
-> >> "Making that a module parm would allow you to set that parameter at boot
-> >> time without needing to add special startup scripts. IMO, all of the
-> >> procfile "switches" under /proc/fs/cifs should be module parms
-> >> instead."
-> >>
-> >> This patch doesn't alter the default behavior (Oplocks are enabled by
-> >> default).
-> >>
-> >> To disable oplocks when loading the module, use
-> >>  
-> >>    modprobe cifs enable_oplocks=0
-> >>
-> >> (any of '0' or 'n' or 'N' conventions can be used).
-> >>
-> >> To disable oplocks at runtime using the new interface, use
-> >>
-> >>    echo 0 > /sys/module/cifs/parameters/enable_oplocks
-> >>
-> >> The older /proc/fs/cifs/OplockEnabled interface will be deprecated
-> >> after two releases. A subsequent patch will add an warning message
-> >> about the deprecation.
-> >>
-> >> Reported-by: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
-> >> Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-> >> ---
-> >>  fs/cifs/cifsfs.c   |    5 +++++
-> >>  fs/cifs/cifsglob.h |    3 +++
-> >>  fs/cifs/dir.c      |    2 +-
-> >>  fs/cifs/file.c     |    4 ++--
-> >>  4 files changed, 11 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> >> index 3e29899..675ab40 100644
-> >> --- a/fs/cifs/cifsfs.c
-> >> +++ b/fs/cifs/cifsfs.c
-> >> @@ -81,6 +81,11 @@ module_param(echo_retries, ushort, 0644);
-> >>  MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
-> >>  			       "reconnecting server. Default: 5. 0 means "
-> >>  			       "never reconnect.");
-> >> +unsigned int enable_oplocks = 1;
-> >> +module_param(enable_oplocks, bool, 0644);
-> >> +MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool). Default:"
-> >> +				 "y/Y/1");
-> >> +
-> >>  extern mempool_t *cifs_sm_req_poolp;
-> >>  extern mempool_t *cifs_req_poolp;
-> >>  extern mempool_t *cifs_mid_poolp;
-> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >> index 6255fa8..b3e229c 100644
-> >> --- a/fs/cifs/cifsglob.h
-> >> +++ b/fs/cifs/cifsglob.h
-> >> @@ -936,6 +936,9 @@ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
-> >>  /* reconnect after this many failed echo attempts */
-> >>  GLOBAL_EXTERN unsigned short echo_retries;
-> >>  
-> >> +/* enable or disable oplocks */
-> >> +GLOBAL_EXTERN unsigned int enable_oplocks;
-> >> +
-> > 
-> > Let's not add an extra variable for this. I'd just rename oplockEnabled
-> > to enable_oplocks and fix up all the references to it. It should
-> > probably also be a bool too...
-> > 
-> 
-> Need not be I think. Looking in to it further it looks like 'bool' type
-> of module parameter are stored in variable of type 'int'. Looking into a
-> few examples comfirms this too (e.g. enable_ino64 and printk_time etc.).
-> So, I'll make it an int.
+The follow-on patch is ok for me.
 
-I don't think so...
-
-types.h has this:
-
-typedef _Bool                   bool;
-
-...and _Bool is an internal type in gcc (and other C9X compilers). I
-think gcc actually uses a char for this internally, but that's not
-always guaranteed to be the case. In any event, why ask for more memory
-than you need here? This is just a single-bit flag.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--=20
+Best regards,
+Pavel Shilovsky.
