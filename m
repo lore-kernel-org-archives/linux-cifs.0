@@ -1,45 +1,37 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH v2 3/3] cifs: update README about the kernel module parameters
-Date: Wed, 12 Oct 2011 11:52:01 +0530
-Message-ID: <4E953209.2020602@suse.com>
+From: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
+Subject: Re: cifs ignores sysct setting
+Date: Wed, 12 Oct 2011 09:10:52 +0200 (CEST)
+Message-ID: <ad4b418d-7021-431a-a32b-4b5aaad0cd31@absint.swen.nu>
+References: <CAH2r5mvqk6vjbPObEfqm+UtdLudNCfRnvLxqDmf6i4Y+syX24w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5mvqk6vjbPObEfqm+UtdLudNCfRnvLxqDmf6i4Y+syX24w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 
-Reported-by: Alexander Swen <alex-UE4+9DRHXtc@public.gmane.org>
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- fs/cifs/README |   14 ++++++++++++++
- 1 files changed, 14 insertions(+), 0 deletions(-)
+> >
+> >
+> > ahhh. no, we are not the only users on the nas, our clientservers
+> > should
+> > just turn off oplocks. it is, we make backups to the nas device and
+> > those
+> > files grow quite big.
 
-diff --git a/fs/cifs/README b/fs/cifs/README
-index c5c2c5e..95b37a1 100644
---- a/fs/cifs/README
-+++ b/fs/cifs/README
-@@ -745,4 +745,18 @@ installed and something like the following lines should be added to the
- create cifs.spnego * * /usr/local/sbin/cifs.upcall %k
- create dns_resolver * * /usr/local/sbin/cifs.upcall %k
- 
-+CIFS kernel module parameters
-+=============================
-+These module parameters can be specified or modified either during the time of
-+module loading or during the runtime by using the interface
-+	/proc/module/cifs/parameters/<param>
-+
-+i.e. echo "value" > /proc/module/cifs/parameters/<param>
-+
-+1. echo_retries - The number of echo attempts before giving up and
-+		  reconnecting to the server. The default is 5. The value 0
-+		  means never reconnect.
-+
-+2. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
-+		    [Y/y/1]. To disable use any of [N/n/0].
- 
+> If you are trying to save RAM on the client, and don't want to cache,
+> and are just using the linux cifs client for backup, you could mount
+> with "forcedirectio" (which turns off caching a little more easily).
+
+Hi Steve, it was that we had i/o timeouts on our cifs mounted volume while doing rsyncs to that volume. since we disabled oplock the timeouts vanished. however, I will suggest your idea to my colleague who had that problem and he might give it a go as well.
+
+thanks for your thoughts!
+Alex
+
+> Thanks,
+
+> Steve
