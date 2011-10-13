@@ -1,90 +1,45 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: async read patchset test results
-Date: Thu, 13 Oct 2011 16:46:51 +0400
-Message-ID: <CAKywueQg90k2FwRB+fJbmwq230p-DP-Zxtrc0+HP_gfieHxM6g@mail.gmail.com>
-References: <CAKywueS=dRdBzumxHc+QH1A3QhfTm7b8a2pM4w0pb6VXoi7aOQ@mail.gmail.com>
-	<20111013083151.55aa1cdf@barsoom.rdu.redhat.com>
+From: =?UTF-8?Q?Johannes_Thr=C3=A4n?= <johannes.thraen-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
+Subject: confusing errormessages from cifs
+Date: Thu, 13 Oct 2011 16:00:37 +0200
+Message-ID: <CAFbNW2F7NU5BM5YpPEOko-MomQ3LdUk2EJA6FEY4fkOQ8dj1mQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111013083151.55aa1cdf-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/10/13 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Thu, 13 Oct 2011 11:28:29 +0400
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> I tested your current cifs-3.2 branch and faced with strange results
->> (assuming Windows 7 share is mounted to /mnt/share):
->>
->
-> I've not seen this, but I'll try to reproduce it in a little while.
->
->> piastry@adventure:~$ dd if=3Dtest1.iso of=3D/mnt/share/test.iso bs=3D=
-100000
->>
->
-> Ok, so test1.iso is in your home directory and you're dd'ing it
-> to /mnt/share/test.iso (which is a cifs mount)
->
->> piastry@adventure:~$ dd of=3Dtest.iso if=3D/mnt/share/test.iso bs=3D=
-100000
->>
->
-> Then you copy test.iso back from the share to your homedir
->
->> piastry@adventure:~$ md5sum test.iso
->> 5eee1675f46ac594dd7800c37e3ba944 =A0test.iso
->>
->
-> Checksum of test.iso in your homedir and end up with the above...
->
->> piastry@adventure:~$ md5sum /mnt/share/test.iso
->> 5eee1675f46ac594dd7800c37e3ba944 =A0/mnt/HOME-share/test.iso
->>
->
-> The checksum matches the (apparent) one on the share
->
->> piastry@adventure:~$ md5sum test1.iso
->> 10d672583cab035e2b55048fbfbbf7ca =A0test1.iso
->>
->
-> But does not match the original.
->
->> Then, I umounted and mounted it again with 3.1-rc9 cifs module -
->> everything was fine. Then, I load previous "buggy" one and everythin=
-g
->> was fine too.
->>
->> So, md5sums are not equal. Any ideas?
->>
->
-> Not something I've seen in my testing. Some questions:
->
-> 1) where is your home directory? is it on a local disk?
+Hi all,
 
-It's on ext3 local hard drive.
+mounting cifs-shares could be a little bit more user friendly/less
+confusing/wrong:
 
->
-> 2) when you say "everything was fine" what checksum did you get?
+ - when I give mount.cifs a hostname which is neither a UNC-servername nor
+listed in /etc/hosts (like mount -t cifs //alice/mount /mountpoint
+with no entry "alice" in /etc/hosts) it tells me:
+"mount error: could not resolve address for...", which is ok and
+suggests mount.cifs uses /etc/hosts.
 
-all checksums matched the original.
+But:
+- when I give mount.cifs a hostname, which is listed in /etc/hosts but
+doesn't refer to an existing UNC-servername it tells me
+"mount error(5): Input/output error", which is at least unclear (I
+thought the server might use a deprecated/buggy/unsupported
+smb-version)
 
->
-> 3) if this test is repeatable, is there any discrepancy in the size o=
-f
-> the file? IOW, when you do the md5sum, it would be good to also do a
-> "stat" against the file the i_size is coming up correctly after each
-> step.
+- even more confusing: when I give cifs a hostname, which is listed in
+/etc/hosts but doesn't refer to an existing UNC-servername AND supply
+a mistyped password it tells me
 
-The size was the same - 415 MB. One time it happened I calculated the
-number of different characters in these files - it was 127 (I don't
-know how it can help, but anyway).
+"mount error(13) : Permission denied"
 
---=20
-Best regards,
-Pavel Shilovsky.
+,which is very misleading, because I think there's something wrong
+with my credentials AND makes me think the hostname gets resolved
+correctly whereas the opposite is the case.
+
+
+could you please make those things more clear. It would really have
+saved me at least 2 hours of googling and banging my head against the
+desk.
+
+Regards, Johannes
