@@ -1,208 +1,73 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 07/16] cifs: turn read_from_socket into a wrapper around
- a vectorized version
-Date: Thu, 13 Oct 2011 08:21:59 -0400
-Message-ID: <20111013082159.73da6a16@barsoom.rdu.redhat.com>
-References: <1314616624-5362-1-git-send-email-jlayton@redhat.com>
-	<1314616624-5362-8-git-send-email-jlayton@redhat.com>
-	<CAKywueQvupyRrQTN7JsSpO9zzUO=O7S4RUV3aPaiaakTJjjRAA@mail.gmail.com>
+Subject: Re: async read patchset test results
+Date: Thu, 13 Oct 2011 08:31:51 -0400
+Message-ID: <20111013083151.55aa1cdf@barsoom.rdu.redhat.com>
+References: <CAKywueS=dRdBzumxHc+QH1A3QhfTm7b8a2pM4w0pb6VXoi7aOQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQvupyRrQTN7JsSpO9zzUO=O7S4RUV3aPaiaakTJjjRAA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueS=dRdBzumxHc+QH1A3QhfTm7b8a2pM4w0pb6VXoi7aOQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 13 Oct 2011 13:20:18 +0400
+On Thu, 13 Oct 2011 11:28:29 +0400
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> 2011/8/29 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > Eventually we'll want to allow cifsd to read data directly into the
-> > pagecache. In order to do that we'll need a routine that can take a
-> > kvec array and pass that directly to kernel_recvmsg.
-> >
-> > Unfortunately though, the kernel's recvmsg routines modify the kvec
-> > array that gets passed in, so we need to use a copy of the kvec arr=
-ay
-> > and refresh that copy on each pass through the loop.
-> >
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> > =C2=A0fs/cifs/connect.c | =C2=A0 72 +++++++++++++++++++++++++++++++=
-++++++++++++++++-----
-> > =C2=A01 files changed, 65 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index e6da201..08c6b0e 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -375,14 +375,58 @@ server_unresponsive(struct TCP_Server_Info *s=
-erver)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0return false;
-> > =C2=A0}
-> >
-> > +/*
-> > + * kvec_array_setup - clone a kvec array, and advance into it
-> > + * @new: =C2=A0 =C2=A0 =C2=A0 pointer to memory for cloned array
-> > + * @iov: =C2=A0 =C2=A0 =C2=A0 pointer to original array
-> > + * @nr_segs: =C2=A0 number of members in original array
-> > + * @bytes: =C2=A0 =C2=A0 number of bytes to advance into the clone=
-d array
-> > + *
-> > + * This function will copy the array provided in iov to a section =
-of memory
-> > + * and advance the specified number of bytes into the new array. I=
-t returns
-> > + * the number of segments in the new array. "new" must be at least=
- as big as
-> > + * the original iov array.
-> > + */
-> > +static unsigned int
-> > +kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int n=
-r_segs,
->=20
-> I think it should be kvec_array_setup as it said in the description a=
-bove.
->=20
+> I tested your current cifs-3.2 branch and faced with strange results
+> (assuming Windows 7 share is mounted to /mnt/share):
+> 
 
-Good catch...
+I've not seen this, but I'll try to reproduce it in a little while.
 
-Unless there is an objection, I'll also fix this in a follow-on patch
-to the series.
+> piastry@adventure:~$ dd if=test1.iso of=/mnt/share/test.iso bs=100000
+> 
 
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t bytes)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 size_t base =3D 0;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 while (bytes || !iov->iov_len) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int copy =3D min=
-(bytes, iov->iov_len);
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bytes -=3D copy;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 base +=3D copy;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (iov->iov_len=
- =3D=3D base) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 iov++;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 nr_segs--;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 base =3D 0;
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> > + =C2=A0 =C2=A0 =C2=A0 }
-> > + =C2=A0 =C2=A0 =C2=A0 memcpy(new, iov, sizeof(*iov) * nr_segs);
-> > + =C2=A0 =C2=A0 =C2=A0 new->iov_base +=3D base;
-> > + =C2=A0 =C2=A0 =C2=A0 new->iov_len -=3D base;
-> > + =C2=A0 =C2=A0 =C2=A0 return nr_segs;
-> > +}
-> > +
-> > =C2=A0static int
-> > -read_from_socket(struct TCP_Server_Info *server, char *buf,
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned i=
-nt to_read)
-> > +readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov=
-_orig,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned =
-int nr_segs, unsigned int to_read)
-> > =C2=A0{
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0int length =3D 0;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0int total_read;
-> > + =C2=A0 =C2=A0 =C2=A0 unsigned int segs;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0struct msghdr smb_msg;
-> > - =C2=A0 =C2=A0 =C2=A0 struct kvec iov;
-> > + =C2=A0 =C2=A0 =C2=A0 struct kvec *iov;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 /*
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0* FIXME: allocation here may cause dea=
-dlocks under memory pressure.
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0* Switch this to use a fixed, per-sock=
-et buffer.
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0*/
-> > + =C2=A0 =C2=A0 =C2=A0 iov =3D kmalloc(sizeof(*iov_orig) * nr_segs,=
- GFP_KERNEL);
-> > + =C2=A0 =C2=A0 =C2=A0 if (!iov)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -ENOMEM;
-> >
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb_msg.msg_control =3D NULL;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0smb_msg.msg_controllen =3D 0;
-> > @@ -393,10 +437,11 @@ read_from_socket(struct TCP_Server_Info *serv=
-er, char *buf,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0break;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> >
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 iov.iov_base =3D=
- buf + total_read;
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 iov.iov_len =3D =
-to_read;
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 length =3D kerne=
-l_recvmsg(server->ssocket, &smb_msg, &iov, 1,
-> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 to_r=
-ead, 0);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 segs =3D kvec_ar=
-ray_init(iov, iov_orig, nr_segs, total_read);
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 length =3D kerne=
-l_recvmsg(server->ssocket, &smb_msg,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 iov,=
- segs, to_read, 0);
-> > +
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (server->=
-tcpStatus =3D=3D CifsExiting) {
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0total_read =3D -ESHUTDOWN;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0break;
-> > @@ -423,9 +468,22 @@ read_from_socket(struct TCP_Server_Info *serve=
-r, char *buf,
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0break;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> > + =C2=A0 =C2=A0 =C2=A0 kfree(iov);
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0return total_read;
-> > =C2=A0}
-> >
-> > +static int
-> > +read_from_socket(struct TCP_Server_Info *server, char *buf,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned i=
-nt to_read)
-> > +{
-> > + =C2=A0 =C2=A0 =C2=A0 struct kvec iov;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 iov.iov_base =3D buf;
-> > + =C2=A0 =C2=A0 =C2=A0 iov.iov_len =3D to_read;
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 return readv_from_socket(server, &iov, 1, to=
-_read);
-> > +}
-> > +
-> > =C2=A0static bool
-> > =C2=A0check_rfc1002_header(struct TCP_Server_Info *server, char *bu=
-f)
-> > =C2=A0{
-> > --
-> > 1.7.6
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
-s" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.=
-html
-> >
->=20
->=20
->=20
-> --=20
-> Best regards,
-> Pavel Shilovsky.
+Ok, so test1.iso is in your home directory and you're dd'ing it
+to /mnt/share/test.iso (which is a cifs mount)
 
+> piastry@adventure:~$ dd of=test.iso if=/mnt/share/test.iso bs=100000
+> 
 
---=20
+Then you copy test.iso back from the share to your homedir
+
+> piastry@adventure:~$ md5sum test.iso
+> 5eee1675f46ac594dd7800c37e3ba944  test.iso
+> 
+
+Checksum of test.iso in your homedir and end up with the above...
+
+> piastry@adventure:~$ md5sum /mnt/share/test.iso
+> 5eee1675f46ac594dd7800c37e3ba944  /mnt/HOME-share/test.iso
+> 
+
+The checksum matches the (apparent) one on the share
+
+> piastry@adventure:~$ md5sum test1.iso
+> 10d672583cab035e2b55048fbfbbf7ca  test1.iso
+> 
+
+But does not match the original.
+
+> Then, I umounted and mounted it again with 3.1-rc9 cifs module -
+> everything was fine. Then, I load previous "buggy" one and everything
+> was fine too.
+> 
+> So, md5sums are not equal. Any ideas?
+> 
+
+Not something I've seen in my testing. Some questions:
+
+1) where is your home directory? is it on a local disk?
+
+2) when you say "everything was fine" what checksum did you get?
+
+3) if this test is repeatable, is there any discrepancy in the size of
+the file? IOW, when you do the md5sum, it would be good to also do a
+"stat" against the file the i_size is coming up correctly after each
+step.
+
+-- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
