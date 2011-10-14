@@ -1,38 +1,28 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Pavel's Lock cleanup
-Date: Fri, 14 Oct 2011 19:04:02 -0500
-Message-ID: <CAH2r5mubN4RGznpLQbgLGSytaK-xM2Mz0dBNm-koKgBuUExPcQ@mail.gmail.com>
-References: <CAH2r5mtNGd-+YUXJwU2USPN_7XnQYdSaYh_HJrzyaM3g6o9szw@mail.gmail.com>
-	<20111014211214.GA15319@fieldses.org>
-	<CAH2r5msGZjEZP=BVWQedO80+W2yPJPvtd0+i5dAS9X0nq6=9kw@mail.gmail.com>
-	<20111014232939.GA15881@fieldses.org>
-	<CAH2r5mvd+N_F897=jAjc7x=186YAHwe=jwQDD=JnOu8YFmu3qw@mail.gmail.com>
+From: Ray Van Dolson <rvandolson-v48TKWNzwFw@public.gmane.org>
+Subject: Watching for changes to a CIFS directory
+Date: Fri, 14 Oct 2011 16:48:17 -0700
+Message-ID: <20111014234816.GA14503@esri.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvd+N_F897=jAjc7x=186YAHwe=jwQDD=JnOu8YFmu3qw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Oct 14, 2011 at 7:02 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
-e:
-> On oplock vs. leases (in MS usage, oplock is the older term). =A0An o=
-plock was -
-> 1) requested on open (presumably what the "op" part of the name meant=
-)
-> 2) had only a few types: =A0"batch" (could cache data, and cache open=
-/close)
-> and "read write" (could cache read or writes of data) and later a
-> "read only" type was
-> added (allowing you to cache writes)
+I'd like to watch a CIFS mounted directory for changes (files being
+created in specific).
 
-oops - I meant "allowing you to cache reads" (obviously)
+Does the CIFS client have working support for either INOTIFY or
+DNOTIFY?  From perusing the mailing list, it seems that INOTIFY support
+is not present, but there was discussion on implementing DNOTIFY
+support some time back[1].  I'm not clear if that was ever partially or
+fully implemented.
 
+My current test scripts are using DNOTIFY and are not working with the
+CIFS client included in RHEL5, Fedora 13 or Fedora 14.
 
---=20
 Thanks,
+Ray
 
-Steve
+[1] http://lists.samba.org/archive/linux-cifs-client/2009-January/003946.html
