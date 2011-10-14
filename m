@@ -1,46 +1,36 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [v3 PATCH 0/6] Implement byte-range lock caching
-Date: Fri, 14 Oct 2011 16:25:47 +0400
-Message-ID: <CAKywueT2FMfH72E4Qthfxatsa83tWQ1YQ2C63xmHETX9ubkukg@mail.gmail.com>
-References: <1318016059-29306-1-git-send-email-piastry@etersoft.ru>
-	<20111014070506.10f0a0b7@tlielax.poochiereds.net>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: Pavel's Lock cleanup
+Date: Fri, 14 Oct 2011 17:12:14 -0400
+Message-ID: <20111014211214.GA15319@fieldses.org>
+References: <CAH2r5mtNGd-+YUXJwU2USPN_7XnQYdSaYh_HJrzyaM3g6o9szw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111014070506.10f0a0b7-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5mtNGd-+YUXJwU2USPN_7XnQYdSaYh_HJrzyaM3g6o9szw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/10/14 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
-> On Fri, =A07 Oct 2011 23:34:13 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> This patchset is going to simplify brlocking code and add the cachin=
-g support for exclusive oplock cases. I splitted it into several indepe=
-ndent parts - so, each can be applied separately once it's reviewed.
->>
->> This version of the patchset includes some code style improvements i=
-n patch #3.
->>
->> Any comments and testing are welcome!
->>
->
-> The above description is a bit vague. Is this just a generic cleanup =
-of
-> the code, or does it represent any behavioral changes?
->
+On Thu, Oct 13, 2011 at 05:23:52PM -0500, Steve French wrote:
+> I like Pavel's lock cleanup (1st patch of series) so far, am
+> continuing to review it, but I also noticed a few things that we need
+> to do in the future. This line of code:
+> 
+> 	if (flock->fl_flags & FL_LEASE)
+> 		cFYI(1, "Lease on file - not implemented yet");
+> 
+> reminded me that we should check if we need to implement this (in cifs
+> we can return yes if we have a lease already (oplock), but in smb2.1
+> and later we can request a lease or an upgrade to an existing one, on
+> the fly).
 
-This patchset consists of cleanup patches as well as the new feature
-(lock cache capability). The behavior for the end user is unchanged (I
-didn't include the patch that changes unlock call behavior - we
-discussed it in "broken mandatory locking behavior" thread).
+And you'll also need to make sure you call break_lease() when you find
+out it's broken.
 
-Thanks for the review of #1, #2 and #3! Could you comment on the others=
-, please?
+A description of the smb (1/2/2.1) oplock and lease semantics would be
+useful--I'm curious whether they're really a good fit for the linux
+vfs's lease semantics.
 
---=20
-Best regards,
-Pavel Shilovsky.
+--b.
