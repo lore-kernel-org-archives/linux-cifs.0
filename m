@@ -1,115 +1,36 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Pavel's Lock cleanup
-Date: Fri, 14 Oct 2011 19:02:55 -0500
-Message-ID: <CAH2r5mvd+N_F897=jAjc7x=186YAHwe=jwQDD=JnOu8YFmu3qw@mail.gmail.com>
+Date: Fri, 14 Oct 2011 19:04:02 -0500
+Message-ID: <CAH2r5mubN4RGznpLQbgLGSytaK-xM2Mz0dBNm-koKgBuUExPcQ@mail.gmail.com>
 References: <CAH2r5mtNGd-+YUXJwU2USPN_7XnQYdSaYh_HJrzyaM3g6o9szw@mail.gmail.com>
 	<20111014211214.GA15319@fieldses.org>
 	<CAH2r5msGZjEZP=BVWQedO80+W2yPJPvtd0+i5dAS9X0nq6=9kw@mail.gmail.com>
 	<20111014232939.GA15881@fieldses.org>
+	<CAH2r5mvd+N_F897=jAjc7x=186YAHwe=jwQDD=JnOu8YFmu3qw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111014232939.GA15881-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+In-Reply-To: <CAH2r5mvd+N_F897=jAjc7x=186YAHwe=jwQDD=JnOu8YFmu3qw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Oct 14, 2011 at 6:29 PM, J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>=
- wrote:
-> On Fri, Oct 14, 2011 at 05:38:59PM -0500, Steve French wrote:
->> On Fri, Oct 14, 2011 at 4:12 PM, J. Bruce Fields <bfields@fieldses.o=
-rg> wrote:
->> > On Thu, Oct 13, 2011 at 05:23:52PM -0500, Steve French wrote:
->> >> I like Pavel's lock cleanup (1st patch of series) so far, am
->> >> continuing to review it, but I also noticed a few things that we =
-need
->> >> to do in the future. This line of code:
->> >>
->> >> =A0 =A0 =A0 if (flock->fl_flags & FL_LEASE)
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Lease on file - not implemen=
-ted yet");
->> >>
->> >> reminded me that we should check if we need to implement this (in=
- cifs
->> >> we can return yes if we have a lease already (oplock), but in smb=
-2.1
->> >> and later we can request a lease or an upgrade to an existing one=
-, on
->> >> the fly).
->> >
->> > And you'll also need to make sure you call break_lease() when you =
-find
->> > out it's broken.
->> >
->> > A description of the smb (1/2/2.1) oplock and lease semantics woul=
-d be
->> > useful--I'm curious whether they're really a good fit for the linu=
-x
->> > vfs's lease semantics.
->>
->> I can probably dig up the exact references in MS-CIFS.pdf and MS-SMB=
-2.pdf
->> but basically SMB2 (original dialect) and CIFS have similar semantic=
-s (and
->> Samba's need to implement CIFS oplocks drove the original implementa=
-tion
->> of leases in the kernel, although it is requested at open time via a=
- flag,
->> not after open as a handle based call). =A0The problem comes in with=
- smb2.1
->> which adds the ability to reaquire leases (which may be ok) and upgr=
-ade
->> leases (from read only to readwrite) and to reuse an existing lease
->> (so the 2nd open from the same client doesn't have to break oplock)
->> which helps Linux which has a common cache manager.
->>
->> smb2.2 adds the ability to do directory leases (to cache directory
->> entries)
->
-> I know all that, but what I'd like to know would be:
-> =A0 =A0 =A0 =A0- What's the difference between a lease and an oplock?
-> =A0 =A0 =A0 =A0- What does each give you the right to cache? =A0For e=
-xample:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0- The Samba folks tell me, not filenam=
-e, only data:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0http://marc.info/?l=3D=
-samba-technical&m=3D131688944117833&w=3D2
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0- Based on these patches, I'm assuming=
- they also give
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0the right to cache locks.
-> =A0 =A0 =A0 =A0 =A0But it would be nice to have references (either
-> =A0 =A0 =A0 =A0 =A0specifications, or test results) to support those =
-statements.
+On Fri, Oct 14, 2011 at 7:02 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
+e:
+> On oplock vs. leases (in MS usage, oplock is the older term). =A0An o=
+plock was -
+> 1) requested on open (presumably what the "op" part of the name meant=
+)
+> 2) had only a few types: =A0"batch" (could cache data, and cache open=
+/close)
+> and "read write" (could cache read or writes of data) and later a
+> "read only" type was
+> added (allowing you to cache writes)
 
-Interesting questions.  The MS-FSA document (in section 3.1.4.12)
-seems to agree with that
-(that querying attributes, and some metadata, timestamps, does not
-break oplock):
+oops - I meant "allowing you to cache reads" (obviously)
 
-(see http://msdn.microsoft.com/en-us/library/860b1516-c452-47b4-bdbc-62=
-5d344e2041.aspx)
-
-"If OpParams.DesiredAccess contains no flags other than FILE_READ_ATTRI=
-BUTES,
-=46ILE_WRITE_ATTRIBUTES, or SYNCHRONIZE, the algorithm returns at this =
-point."
-(ie doesn't break oplock if these are the only flags set).
-
-
-On oplock vs. leases (in MS usage, oplock is the older term).  An oploc=
-k was -
-1) requested on open (presumably what the "op" part of the name meant)
-2) had only a few types:  "batch" (could cache data, and cache open/clo=
-se)
-and "read write" (could cache read or writes of data) and later a
-"read only" type was
-added (allowing you to cache writes)
-
-Leases (a later term in Microsoft documents) had more function (they
-included for
-example a "key" which identifies the owner of the lease).
 
 --=20
 Thanks,
