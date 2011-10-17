@@ -1,70 +1,75 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: mount.cifs on Win2k8 DFS servers
-Date: Mon, 17 Oct 2011 08:28:27 -0400
-Message-ID: <20111017082827.31988338@corrin.poochiereds.net>
-References: <4E9C1876.5090205@keymile.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [patch] CIFS: cleanup min_t() cast in cifs_read()
+Date: Mon, 17 Oct 2011 09:10:01 -0500
+Message-ID: <CAH2r5mufq0=BsZvfGuVdd1BU-gxRpnUmWAm-vzhsOR4KbvGSbg@mail.gmail.com>
+References: <20111017073018.GC7812@elgon.mountain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Gerlando Falauto <gerlando.falauto-SkAbAL50j+5BDgjK7y7TUQ@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4E9C1876.5090205-SkAbAL50j+5BDgjK7y7TUQ@public.gmane.org>
+In-Reply-To: <20111017073018.GC7812-mgFCXtclrQlZLf2FXnZxJA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 17 Oct 2011 13:58:46 +0200
-Gerlando Falauto <gerlando.falauto-SkAbAL50j+5BDgjK7y7TUQ@public.gmane.org> wrote:
+I prefer the change to unsigned int rather than u32 so it is clearer
+that you are not casting the value from 64 bit to 32 bit on some
+architectures.  To avoid reformatting can't you can use "uint" if you
+want the shorter form see:
 
-> Hi,
-> 
-> my CIFS kernel module (linux 2.6.39.3) fails to mount DFS trees from 
-> Win2k8 servers.
-> 
+include/linux/types.h:typedef unsigned int		uint;
 
-I believe this was fixed in 3.0. You should test a later kernel...
+On Mon, Oct 17, 2011 at 2:30 AM, Dan Carpenter <dan.carpenter-QHcLZuEGTsthl2p70BpVqQ@public.gmane.org=
+m> wrote:
+> Smatch complains that the cast to "int" in min_t() changes very large
+> values of current_read_size into negative values and so min_t()
+> could return the wrong value.
+>
+> Also casting the "const" here doesn't make sense.
+>
+> I've changed it to u32 ("unsigned int" take puts us past the 80
+> character limit).
+>
+> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 9f41a10..a61f581 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1861,13 +1861,13 @@ static ssize_t cifs_read(struct file *file, c=
+har *read_data, size_t read_size,
+> =A0 =A0 =A0 =A0for (total_read =3D 0, current_offset =3D read_data;
+> =A0 =A0 =A0 =A0 =A0 =A0 read_size > total_read;
+> =A0 =A0 =A0 =A0 =A0 =A0 total_read +=3D bytes_read, current_offset +=3D=
+ bytes_read) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 current_read_size =3D min_t(const int, =
+read_size - total_read,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 current_read_size =3D min_t(u32, read_s=
+ize - total_read,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0cifs_sb->rsize);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* For windows me and 9x we do not wan=
+t to request more
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0than it negotiated since it will refus=
+e the read then */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if ((pTcon->ses) &&
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0!(pTcon->ses->capabili=
+ties & CAP_LARGE_FILES)) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 current_read_size =3D m=
+in_t(const int, current_read_size,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 current_read_size =3D m=
+in_t(u32, current_read_size,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0pTcon->ses->server->maxBuf - 128);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EAGAIN;
+>
 
-> Whereas upon "Tree Connect AndX Request"s (for a DFS tree) Win2k3 used 
-> to reply with STATUS_PATH_NOT_COVERED, Win2k8 now answers with 
-> STATUS_BAD_NETWORK_NAME, pretty much the same thing it would say about a 
-> non-existing share.
-> 
-> This is somewhat related to:
-> https://bugzilla.samba.org/show_bug.cgi?id=8003
-> but in fact only affects cifs-fs and NOT smbclient which works fine for me.
-> 
-> In fact, Windows machines (and smbclient, for that matter) don't ever 
-> try connecting the tree, as they both start off with a "Trans2 Request" 
-> GET_DFS_REFERRAL.
-> 
-> Excerpt from source3/libsmb/clidfs.c:
-> === CUT ===
->      /* here's the fun part....to support 'msdfs proxy' shares
->        (on Samba or windows) we have to issues a TRANS_GET_DFS_REFERRAL
->         here before trying to connect to the original share.
->         cli_check_msdfs_proxy() will fail if it is a normal share. */
-> 
->      if ((cli_state_capabilities(c) & CAP_DFS) &&
-> === CUT ===
-> 
-> Now, I came up with a workaround (which I would not post here in order 
-> not to be yelled at...) for cifs-fs which simply treats 
-> NT_STATUS_BAD_NETWORK_NAME as NT_STATUS_PATH_NOT_COVERED, but I guess we 
-> need a better solution.
-> 
-> What should be the be best approach for facing this?
-> Detecting the server has DFS capabilities and start getting DFS 
-> referrals to begin with?
-> Has this been discussed in the past? I find it hard to believe that no 
-> one has reported this problem before...
-> 
-> Thanks!
-> Gerlando
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+--=20
+Thanks,
+
+Steve
