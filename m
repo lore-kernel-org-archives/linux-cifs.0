@@ -1,43 +1,45 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Pavel's Lock cleanup
-Date: Sat, 15 Oct 2011 19:27:27 +0400
-Message-ID: <CAKywueSEdX7VKZ3LAM2xvVgqrE0Pu9PMbV+jMVDUt-99CbhFPQ@mail.gmail.com>
-References: <CAH2r5mtNGd-+YUXJwU2USPN_7XnQYdSaYh_HJrzyaM3g6o9szw@mail.gmail.com>
-	<20111014211214.GA15319@fieldses.org>
-	<CAH2r5msGZjEZP=BVWQedO80+W2yPJPvtd0+i5dAS9X0nq6=9kw@mail.gmail.com>
-	<20111014232939.GA15881@fieldses.org>
-	<CAH2r5mvd+N_F897=jAjc7x=186YAHwe=jwQDD=JnOu8YFmu3qw@mail.gmail.com>
-	<CAH2r5mubN4RGznpLQbgLGSytaK-xM2Mz0dBNm-koKgBuUExPcQ@mail.gmail.com>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [patch] CIFS: cleanup min_t() cast in cifs_read()
+Date: Mon, 17 Oct 2011 10:30:18 +0300
+Message-ID: <20111017073018.GC7812@elgon.mountain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mubN4RGznpLQbgLGSytaK-xM2Mz0dBNm-koKgBuUExPcQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/10/15 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> On Fri, Oct 14, 2011 at 7:02 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wr=
-ote:
->> On oplock vs. leases (in MS usage, oplock is the older term). =A0An =
-oplock was -
->> 1) requested on open (presumably what the "op" part of the name mean=
-t)
->> 2) had only a few types: =A0"batch" (could cache data, and cache ope=
-n/close)
->> and "read write" (could cache read or writes of data) and later a
->> "read only" type was
->> added (allowing you to cache writes)
->
-> oops - I meant "allowing you to cache reads" (obviously)
->
+Smatch complains that the cast to "int" in min_t() changes very large
+values of current_read_size into negative values and so min_t()
+could return the wrong value.
 
-Also, note that batch and read write oplocks allow to cache byte-range
-locks on the client.
+Also casting the "const" here doesn't make sense.
 
---=20
-Best regards,
-Pavel Shilovsky.
+I've changed it to u32 ("unsigned int" take puts us past the 80
+character limit).
+
+Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9f41a10..a61f581 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1861,13 +1861,13 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	for (total_read = 0, current_offset = read_data;
+ 	     read_size > total_read;
+ 	     total_read += bytes_read, current_offset += bytes_read) {
+-		current_read_size = min_t(const int, read_size - total_read,
++		current_read_size = min_t(u32, read_size - total_read,
+ 					  cifs_sb->rsize);
+ 		/* For windows me and 9x we do not want to request more
+ 		than it negotiated since it will refuse the read then */
+ 		if ((pTcon->ses) &&
+ 			!(pTcon->ses->capabilities & CAP_LARGE_FILES)) {
+-			current_read_size = min_t(const int, current_read_size,
++			current_read_size = min_t(u32, current_read_size,
+ 					pTcon->ses->server->maxBuf - 128);
+ 		}
+ 		rc = -EAGAIN;
