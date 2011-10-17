@@ -1,36 +1,38 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: [PATCH] cifs-utils: mention the kernel version that introduced cifs.idmap
-Date: Mon, 17 Oct 2011 17:50:04 +0530
-Message-ID: <4E9C1D74.8010204@suse.com>
+From: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+Subject: Re: mount.cifs on Win2k8 DFS servers
+Date: Mon, 17 Oct 2011 14:36:35 +0200
+Message-ID: <20111017123635.GA5978@cobija.connexer.com>
+References: <4E9C1876.5090205@keymile.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Gerlando Falauto <gerlando.falauto-SkAbAL50j+5BDgjK7y7TUQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <4E9C1876.5090205-SkAbAL50j+5BDgjK7y7TUQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-.. in the "NOTES" section.
+On Mon, Oct 17, 2011 at 01:58:46PM +0200, Gerlando Falauto wrote:
+> my CIFS kernel module (linux 2.6.39.3) fails to mount DFS trees from
+> Win2k8 servers.
 
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
----
- cifs.idmap.8.in |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+> This is somewhat related to:
+> https://bugzilla.samba.org/show_bug.cgi?id=8003
 
-diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
-index f2fa3b2..a6d9ccb 100644
---- a/cifs.idmap.8.in
-+++ b/cifs.idmap.8.in
-@@ -76,6 +76,9 @@ create      cifs\&.idmap     * * @sbindir@/cifs\&.idmap %k
- See
- \fBrequest-key.conf\fR(5)
- for more info on each field\&.
-+.SH "NOTES"
-+.PP
-+Support for upcalls to cifs.idmap was initially introduced in the 3.0
-kernel.
- .SH "SEE ALSO"
- .PP
+hrm... i recognize that one :)  reminds me i should go poke the
+samba team as it's still an issue afaik...
+
+> What should be the be best approach for facing this?
+> Detecting the server has DFS capabilities and start getting DFS
+> referrals to begin with?
+> Has this been discussed in the past? I find it hard to believe that
+> no one has reported this problem before...
+
+I think this should be fixed in later kernels... I worked with Jeff
+and Steve to get some patches in for what I think is the same issue
+you're describing, and iirc they landed just after 2.6.39 but before 3.0.
+
+	sean
+
+-- 
