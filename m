@@ -1,80 +1,67 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: mention the required kernel version to make
- cifs.idmap work
-Date: Mon, 17 Oct 2011 11:59:20 -0500
-Message-ID: <CAH2r5msxArv-Hdy6sBVGbNtLcjhwk0EUwGj07H85iOT4KHqiRg@mail.gmail.com>
-References: <4E9C19A3.8010009@suse.de>
-	<20111017081139.564089db@tlielax.poochiereds.net>
+From: sean finney <seanius@seanius.net>
+Subject: Re: mount.cifs on Win2k8 DFS servers
+Date: Mon, 17 Oct 2011 19:11:52 +0200
+Message-ID: <20111017171152.GA7102@cobija.connexer.com>
+References: <4E9C1876.5090205@keymile.com>
+	<20111017123635.GA5978@cobija.connexer.com>
+	<4E9C43F6.9050702@keymile.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: sjayaraman-l3A5Bk7waGM@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111017081139.564089db-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs@vger.kernel.org, jlayton@poochiereds.net,
+	samba-technical@lists.samba.org
+To: Gerlando Falauto <gerlando.falauto@keymile.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+Content-Disposition: inline
+In-Reply-To: <4E9C43F6.9050702@keymile.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Oct 17, 2011 at 7:11 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> On Mon, 17 Oct 2011 17:33:47 +0530
-> Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org> wrote:
->
->> .. properly in the "NOTES" section.
->>
->> Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
->> ---
->> =A0cifs.idmap.8.in | =A0 =A03 +++
->> =A01 files changed, 3 insertions(+), 0 deletions(-)
->>
->> diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
->> index f2fa3b2..7adfdc6 100644
->> --- a/cifs.idmap.8.in
->> +++ b/cifs.idmap.8.in
->> @@ -76,6 +76,9 @@ create =A0 =A0 =A0cifs\&.idmap =A0 =A0 * * @sbindi=
-r@/cifs\&.idmap %k
->> =A0See
->> =A0\fBrequest-key.conf\fR(5)
->> =A0for more info on each field\&.
->> +.SH "NOTES"
->> +.PP
->> +For cifs.idmap to work properly you would need a kernel version 3.0=
- or above.
->> =A0.SH "SEE ALSO"
->> =A0.PP
->>
->
-> This looks reasonable, but I'm always a bit leery of calling out
-> specific versions like this. Some distros (e.g. Red Hat's and Novell'=
-s)
-> will backport features from later kernels, so saying you need a 3.0
-> kernel might be confusing.
->
-> We might want to rephrase this with something like "Support for upcal=
-ls
-> to cifs.idmap was initially introduced in the 3.0 kernel." It's a
-> little more weaselly but it isn't false if someone is working with a
-> kernel that has backported this code.
->
-> Sound reasonable?
+Hiya,
 
-Yes - also to supplement this data can use the cifs version (displayed
-by modinfo) - presumably with wholesale backport of cifs code the
-version number could be updated as well.
+On Mon, Oct 17, 2011 at 05:04:22PM +0200, Gerlando Falauto wrote:
+> So I guess you're talking about these two little fellas:
+> 
+> http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=dd61394586dbd9387fe53b325c6807f61734cf89
+> http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=c1508ca23653245266e2e3ab69a8dad464f7a569
 
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+IIRC there were 3 or 4 more, though mostly cosmetic/cleanup.  They should
+be right before or after those commits.
+
+> 1) I would've expected a more radical fix by skipping to DFS referal
+> altogether when server has DFS capabilities, even before trying a
+> regular connect, so to make it consistent with smbclient.
+> Which (as far as I can tell) has been working like this for a looong time.
+
+I don't think smbclient's behavior is correct either though.  It's
+a ways back now, but at the time I compared the existing behavior of
+smbclient, a couple different windows clients, and cifs.ko, and none
+were really consistant with the other.  The reference doc was not
+entirely specific either IIRC.
+
+But based on what the module was already doing, it seemed "right enough"
+anyway, and with cleanup/refactoring was kept pretty clean in case
+someone wants to improve on it in the future :)
+
+> 2) Shouldn't this/these patch/es also make it into earlier kernels
+> as it is a (not-so-negligible) bugfix?
+
+I don't think it's super trivial to backport it before 2.6.38, at least
+without massaging the patches and cherry picking a few more commits that
+cross paths and/or touch the relevant api's.  But there've been enough
+other bugfixes in the cifs code that for our needs we just upgraded to
+a backported 2.6.38 kernel and dumped the pre-3.0 cifs commit history
+on top of it (we didn't go all the way to 3.0 for entirely uninteresting
+reasons, you should just do that if you have the ability).
 
 
+	sean
 
---=20
-Thanks,
-
-Steve
+-- 
