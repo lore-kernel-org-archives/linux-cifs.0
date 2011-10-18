@@ -1,7 +1,7 @@
 From: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
-Subject: [PATCH] cifs-utils: mention the kernel version that introduced getcifsacl
-Date: Tue, 18 Oct 2011 12:06:13 +0530
-Message-ID: <4E9D1E5D.4020603@suse.de>
+Subject: [PATCH] cifs-utils: mention the kernel version that introduced setcifsacl
+Date: Tue, 18 Oct 2011 12:06:25 +0530
+Message-ID: <4E9D1E69.6060408@suse.de>
 Reply-To: sjayaraman-l3A5Bk7waGM@public.gmane.org
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -17,17 +17,17 @@ List-ID: <linux-cifs.vger.kernel.org>
 Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
 ---
- getcifsacl.8.in |    3 +++
+ setcifsacl.8.in |    3 +++
  1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/getcifsacl.8.in b/getcifsacl.8.in
-index 02e1355..f79f7ff 100644
---- a/getcifsacl.8.in
-+++ b/getcifsacl.8.in
-@@ -40,6 +40,9 @@ Print version number and exit\&.
- .RS 4
- Display a security descriptor in raw mode. Values such as type and flags are displayed in hexadecimal format, a SID is not mapped to a name.
- .RE
+diff --git a/setcifsacl.8.in b/setcifsacl.8.in
+index 98ab0ac..a18b3de 100644
+--- a/setcifsacl.8.in
++++ b/setcifsacl.8.in
+@@ -68,6 +68,9 @@ type: ALLOWED (0x0), DENIED (0x1), OBJECT_ALLOWED (0x5), OBJECT_DENIED (0x6)
+ flags: OBJECT_INHERIT_FLAG (OI or 0x1), CONTAINER_INHERIT_FLAG (CI or 0x2), NO_PROPAGATE_INHERIT_FLAG (NI or 0x4), INHERIT_ONLY_FLAG (IO or 0x8), INHERITED_ACE_FLAG (IA or 0x10) or a combination/OR of these values.
+ .PP
+ mask: Either one of FULL, CHANGE, READ, a combination of R W X D P O, or a hex value
 +.SH "NOTES"
 +.PP
 +Kernel support for getcifsacl/setcifsacl utilities was initially introduced in the 2.6.37 kernel.
