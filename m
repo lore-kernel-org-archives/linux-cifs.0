@@ -1,64 +1,67 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Add mount options for backup intent and
- their manpages (try #7)
-Date: Tue, 18 Oct 2011 07:29:53 -0400
-Message-ID: <20111018072953.1620c71f@corrin.poochiereds.net>
-References: <1318106385-8247-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] manpage: move SEE ALSO section in setcifsacl.1 nearer to bottom
+Date: Tue, 18 Oct 2011 06:31:33 -0500
+Message-ID: <CADT32eLKnXnNOtYktHKhQ-jVKJ25i_w8XG_BVNS1OYWqEBxaNQ@mail.gmail.com>
+References: <1318936969-8475-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1318106385-8247-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1318936969-8475-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat,  8 Oct 2011 15:39:45 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
-
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> Add mount options backupuid and backugid and their manpage contents.
-> Check for either a valid uid/gid or valid user/group name.
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Tue, Oct 18, 2011 at 6:22 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> The convention is to have that close to the bottom of the manpage. In
+> this case, we want it after the EXAMPLES section.
+>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > ---
->  mount.cifs.8 |   40 ++++++++++++++++++++++++++++
->  mount.cifs.c |   82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 120 insertions(+), 2 deletions(-)
-> 
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 81ebdbe..9391294 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -282,6 +282,20 @@ See sections on
->  for more information\&.
->  .RE
->  .PP
-> +backupuid
-
-Also, the manpage should make this clear that you need to provide an argument here. IOW, "backupuid=arg" 
-
-> +.RS 4
-> +Restrict access to files, with the backup intent, to a user\&.
-> +.sp
-> +See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more details
-> +.RE
+> =A0setcifsacl.1 | =A0 12 ++++++------
+> =A01 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/setcifsacl.1 b/setcifsacl.1
+> index be8af0c..8957512 100644
+> --- a/setcifsacl.1
+> +++ b/setcifsacl.1
+> @@ -68,12 +68,6 @@ type: ALLOWED (0x0), DENIED (0x1), OBJECT_ALLOWED =
+(0x5), OBJECT_DENIED (0x6)
+> =A0flags: OBJECT_INHERIT_FLAG (OI or 0x1), CONTAINER_INHERIT_FLAG (CI=
+ or 0x2), NO_PROPAGATE_INHERIT_FLAG (NI or 0x4), INHERIT_ONLY_FLAG (IO =
+or 0x8), INHERITED_ACE_FLAG (IA or 0x10) or a combination/OR of these v=
+alues.
+> =A0.PP
+> =A0mask: Either one of FULL, CHANGE, READ, a combination of R W X D P=
+ O, or a hex value
+> -.SH "SEE ALSO"
+> -.PP
+> -\fBmount.cifs\fR(8),
+> -\fBwinbindd\fR(8),
+> -\fBgetcifsacl\fR(1)
+> -.PP
+> =A0.SH "EXAMPLES"
+> =A0.PP
+> =A0Add an ACE
+> @@ -95,6 +89,12 @@ setcifsacl -S "ACL:CIFSTESTDOM\\Administrator:0x0/=
+0x0/FULL,
+> =A0.br
+> =A0ACL:CIFSTESTDOM\\user2:0x0/0x0/FULL," <file_name>
+> =A0.PP
+> +.SH "SEE ALSO"
 > +.PP
-> +backupgid
-
-...and here...
-
-> +.RS 4
-> +Restrict Allow access to files, with the backup intent, to a group\&.
-> +.sp
-> +See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more details
-> +.RE
+> +\fBmount.cifs\fR(8),
+> +\fBwinbindd\fR(8),
+> +\fBgetcifsacl\fR(1)
 > +.PP
+> =A0.SH "AUTHOR"
+> =A0.PP
+> =A0Shirish Pargaonkar wrote the setcifsacl program\&.
+> --
+> 1.7.6.4
+>
+>
 
-[...]
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Thanks Jeff.  Looks correct.
+Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
