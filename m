@@ -1,206 +1,179 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs-utils:  Add mount options for backup intent and their manpages (try #8)
-Date: Tue, 18 Oct 2011 11:57:01 -0500
-Message-ID: <1318957021-3964-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: async read patchset test results
+Date: Wed, 19 Oct 2011 00:29:53 +0400
+Message-ID: <CAKywueT3d0dEf__rsoFZ1VK3s72CLXJjFQyGqDdTEe=6-hH-Yw@mail.gmail.com>
+References: <CAKywueS=dRdBzumxHc+QH1A3QhfTm7b8a2pM4w0pb6VXoi7aOQ@mail.gmail.com>
+	<20111013083151.55aa1cdf@barsoom.rdu.redhat.com>
+	<CAKywueQg90k2FwRB+fJbmwq230p-DP-Zxtrc0+HP_gfieHxM6g@mail.gmail.com>
+	<20111013133414.77f54658@barsoom.rdu.redhat.com>
+	<CAKywueTjAwgmSpYeqX-iu6FhZbCiG5HTztDhNLWYFMkq3cmoBg@mail.gmail.com>
+	<CAH2r5msUKNYFMMyixLdnZ=BndxOp-ySrViYRhjkBpBDsQh_-aQ@mail.gmail.com>
+	<20111013140039.3200de5d@barsoom.rdu.redhat.com>
+	<CAKywueSfX7sn46uPTz2L3WWWZgpNmEfECJDv70Lr-jjFvTXi+g@mail.gmail.com>
+	<CAKywueQ20Jh139J4E0XfJ+ZTPsO8gDpXPHL2jZ3YBh72ajKAWA@mail.gmail.com>
+	<20111014065508.2f4735d3@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111014065508.2f4735d3-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+2011/10/14 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Fri, 14 Oct 2011 14:02:54 +0400
+> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> Today, I caught it once again and didn't noticed any reconnects (no =
+cERRORs).
+>>
+>> It is surely not depends on Jeff's async read patchset, because I us=
+ed
+>> my cifs-3.2-current branch.
+>>
+>> My branch consists of Steve's master + lockpatchset + smb2 patches.
+>> From another hand, previously I caught it with Jeff's branch (withou=
+t
+>> lockpatchset and smb2 patches). So, that's why the problem is in
+>> existing cifs code now.
+>>
+>> FYI: I checked two files: "buggy" and original, and noticed that the
+>> difference between them is located in one place - positions from
+>> 2014442 to 2014569 - 126 differences with two equal holes.
+>>
+>> So, 2014569 - 2014442 + 1 =3D 128 wrong bytes. Ideas?
+>>
+>
+> Good to know, thanks. I also tried reproducing this for a while last
+> night and was unable to...
+>
+> I used this script:
+>
+> -------------------------[snip]------------------------------
+> #!/bin/bash
+>
+> origfile=3D$1
+> destfile=3D$2
+>
+> origsum=3D`md5sum $origfile | cut -d' ' -f1`
+> i=3D0
+>
+> while true; do
+> =A0 =A0 =A0 =A0echo $i
+> =A0 =A0 =A0 =A0rm -f $destfile $origfile.tmp
+>
+> =A0 =A0 =A0 =A0dd if=3D$origfile of=3D$destfile bs=3D100000
+> =A0 =A0 =A0 =A0if [ $? -ne 0 ]; then
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0echo "dd1 failed"
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0exit 1
+> =A0 =A0 =A0 =A0fi
+>
+> =A0 =A0 =A0 =A0dd if=3D$destfile of=3D$origfile.tmp bs=3D100000
+> =A0 =A0 =A0 =A0if [ $? -ne 0 ]; then
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0echo "dd2 failed"
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0exit 1
+> =A0 =A0 =A0 =A0fi
+>
+> =A0 =A0 =A0 =A0destsum=3D`md5sum $destfile | cut -d' ' -f1`
 
+As you have already read $destfile to $origfile.tmp, there is no need
+to read it again - you only need to calculate md5sum of the
+origfile.tmp.
 
-Add mount options backupuid and backugid and their manpage contents.
-Check for either a valid uid/gid or valid user/group name.
+> =A0 =A0 =A0 =A0if [ "$origsum" !=3D "$destsum" ]; then
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0echo "md5sums don't match! orig=3D$ori=
+gsum dest=3D$destsum"
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stat $origfile
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stat $destfile
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0exit 1
+> =A0 =A0 =A0 =A0fi
+>
+> =A0 =A0 =A0 =A0i=3D`expr $i + 1`
+> done
+>
+> -------------------------[snip]------------------------------
+>
+> I ran the above with the first arg set to a ~615M .iso file on local
+> disk and the second to a file on a cifs mount.
+>
+> I ran it against my win2k8 host for several hours and it never failed=
+=2E
+> I then tried running it against my Windows 7 home host (running on
+> bare-metal) and it would run for a little while and would eventually
+> fail due to the server returning "out of memory" errors. Some of thos=
+e
+> would occur on the NEGOTIATE call, so I chalk that up to a Win7 bug.
+>
+> I never saw this mismatch, but I think we can try to infer something
+> from the nature of the failures that Pavel saw...
+>
+> Since the file was apparently being written properly, the write phase
+> seems like it worked correctly. The data all went into the cache, and
+> then got flushed properly to the server.
+>
+> So, it seems likely that the problem is in the read phase of the test=
+=2E
+> There are several possibilities:
+>
+> 1) we started out doing a cache read, but the cache was invalidated
+> partway through. "Something happened" and one of the reads got mangle=
+d.
+>
+> 2) the server sent us a corrupt read for some reason
+>
+> 3) lower level networking problem caused a corrupt read
+>
+> 4) generic memory corruption in the pagecache of some sort
+>
+> ...plus many others...
+>
+> The fact that only 127 bytes was corrupt is very odd. It would be
+> easier to understand if an entire page were bad, or an entire rsize
+> chunk.
+>
+> If you are able to reproduce this again, it might be helpful to see i=
+f
+> that's consistent. Try to nail down the nature of the corruption -- s=
+ee
+> how much is different and where the different parts are. That may
+> help shed light on the problem...
+>
+> In any case, this will probably take some digging -- we should probab=
+ly
+> open a bug at bugzilla.samba.org and start working on this there.
+> Pavel, would you mind doing that when you have time?
+>
+> Thanks,
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
 
+So, after a closer investigating of the problem I figured out that:
 
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- mount.cifs.8 |   40 +++++++++++++++++++++++++++++
- mount.cifs.c |   80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 118 insertions(+), 2 deletions(-)
+1) It always reproduces after I boot the OS, load module, mount share
+and read the existing file.
 
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index a1839a2..8207bcb 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -282,6 +282,20 @@ See sections on
- for more information\&.
- .RE
- .PP
-+backupuid=arg
-+.RS 4
-+Restrict access to files, with the backup intent, to a user.  Either a name or an id must be provided as an argument, there are no default values.
-+.sp
-+See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more details
-+.RE
-+.PP
-+backupgid=arg
-+.RS 4
-+Restrict Allow access to files, with the backup intent, to a group.  Either a name or an id must be provided as an argument, there are no default values.
-+.sp
-+See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more details
-+.RE
-+.PP
- nocase
- .RS 4
- Request case insensitive path name matching (case sensitive is the default if the server suports it)\&.
-@@ -590,6 +604,32 @@ The mapping between a CIFS/NTFS ACL and POSIX file permission bits is imperfect
- .\}
- If either upcall to cifs.idmap is not setup correctly or winbind is not configured and running, ID mapping will fail. In that case uid and gid will default to either to those values of the share or to the values of uid and/or gid mount options if specified.
- .RE
-+.SH "ACCESSING FILES WITH BACKUP INTENT"
-+.PP
-+For an user on the server, desired access to a file is determined by the permissions and rights associated with that file.  This is typically accomplished using owenrship and ACL.  For a user who does not have access rights to a file, it is still possible to access that file for a specific or a targeted purpose by granting special rights.  One of the specific purposes is to access a file with the intent to either backup or restore i.e. backup intent.  The right to access a file with the backup intent can typically be granted by making that user a part of the built-in group Backup Operators.  Thus, when this user attempts to open a file with the backup intent, open request is sent by setting the bit FILE_OPEN_FOR_BACKUP_INTENT as one of the CreateOptions.
-+
-+As an example, on a Windows server, a user named testuser, cannot open this file with such a security descriptor.
-+.PP
-+REVISION:0x1
-+.sp 0
-+CONTROL:0x9404
-+.sp 0
-+OWNER:Administrator
-+.sp 0
-+GROUP:Domain Users
-+.sp 0
-+ACL:Administrator:ALLOWED/0x0/FULL
-+.PP
-+But the user testuser, if it becomes part of the group Backup Operators, can open the file with the backup intent.
-+
-+Any user on the client side who can authenticate as such a user on the server,
-+can access the files with the backup intent. But it is desirable and preferable for security reasons amongst many, to restrict this special right.
-+
-+The mount option backupuid is used to restrict this special right to a user which is specified by either a name or an id.
-+.sp 0
-+The mount option backupgid is used to restrict this special right to the users in a group which is specified by either a name or an id.
-+.sp 0
-+These two mount options can be used together.
- .SH "FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS"
- .PP
- The core CIFS protocol does not provide unix ownership information or mode for files and directories\&. Because of this, files and directories will generally appear to be owned by whatever values the uid= or gid= options are set, and will have permissions set to the default file_mode and dir_mode for the mount\&. Attempting to change these values via chmod/chown will return success but have no effect\&.
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 1e3d534..147f7fc 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -158,6 +158,8 @@
- #define OPT_MAND       27
- #define OPT_NOMAND     28
- #define OPT_CRUID      29
-+#define OPT_BKUPUID    30
-+#define OPT_BKUPGID    31
- 
- 
- /* struct for holding parsed mount info for use by privleged process */
-@@ -843,6 +845,10 @@ static int parse_opt_token(const char *token)
- 		return OPT_REMOUNT;
- 	if (strncmp(token, "_netdev", 7) == 0)
- 		return OPT_IGNORE;
-+	if (strncmp(token, "backupuid", 9) == 0)
-+		return OPT_BKUPUID;
-+	if (strncmp(token, "backupgid", 9) == 0)
-+		return OPT_BKUPGID;
- 
- 	return OPT_ERROR;
- }
-@@ -858,11 +864,13 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 	int out_len = 0;
- 	int word_len;
- 	int rc = 0;
-+	int got_bkupuid = 0;
-+	int got_bkupgid = 0;
- 	int got_uid = 0;
- 	int got_cruid = 0;
- 	int got_gid = 0;
--	uid_t uid, cruid = 0;
--	gid_t gid;
-+	uid_t uid, cruid = 0, bkupuid;
-+	gid_t gid, bkupgid;
- 	char *ep;
- 	struct passwd *pw;
- 	struct group *gr;
-@@ -1171,6 +1179,42 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			break;
- 		case OPT_IGNORE:
- 			goto nocopy;
-+		case OPT_BKUPUID:
-+			if (!value || !*value)
-+				goto nocopy;
-+
-+			got_bkupuid = 1;
-+			bkupuid = strtoul(value, &ep, 10);
-+			if (!strlen(ep))
-+				goto nocopy;
-+
-+			pw = getpwnam(value);
-+			if (pw == NULL) {
-+				fprintf(stderr,
-+					"bad user name \"%s\"\n", value);
-+				return EX_USAGE;
-+			}
-+
-+			bkupuid = pw->pw_uid;
-+			goto nocopy;
-+		case OPT_BKUPGID:
-+			if (!value || !*value)
-+				goto nocopy;
-+
-+			got_bkupgid = 1;
-+			bkupgid = strtoul(value, &ep, 10);
-+			if (!strlen(ep))
-+				goto nocopy;
-+
-+			gr = getgrnam(value);
-+			if (gr == NULL) {
-+				fprintf(stderr,
-+					"bad group name \"%s\"\n", value);
-+				return EX_USAGE;
-+			}
-+
-+			bkupgid = gr->gr_gid;
-+			goto nocopy;
- 		}
- 
- 		/* check size before copying option to buffer */
-@@ -1246,6 +1290,38 @@ nocopy:
- 		}
- 		snprintf(out + out_len, word_len + 5, "gid=%s", txtbuf);
- 	}
-+	if (got_bkupuid) {
-+		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", bkupuid);
-+
-+		/* comma + "backupuid=" + terminating NULL == 12 */
-+		if (out_len + word_len + 12 > MAX_OPTIONS_LEN) {
-+			fprintf(stderr, "Options string too long\n");
-+			return EX_USAGE;
-+		}
-+
-+		if (out_len) {
-+			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			out_len++;
-+		}
-+		snprintf(out + out_len, word_len + 11, "backupuid=%s", txtbuf);
-+		out_len = strlen(out);
-+	}
-+	if (got_bkupgid) {
-+		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", bkupgid);
-+
-+		/* comma + "backkupgid=" + terminating NULL == 12 */
-+		if (out_len + word_len + 12 > MAX_OPTIONS_LEN) {
-+			fprintf(stderr, "Options string too long\n");
-+			return EX_USAGE;
-+		}
-+
-+		if (out_len) {
-+			strlcat(out, ",", MAX_OPTIONS_LEN);
-+			out_len++;
-+		}
-+		snprintf(out + out_len, word_len + 11, "backupgid=%s", txtbuf);
-+	}
-+
- 	return 0;
- }
- 
--- 
-1.6.0.2
+2) Network traffics that are caught by wireshark on the server
+(Windows 7) and the client are different - I checked it and found the
+same difference in response packets for the area that is different on
+orig and orig.tmp files (the response packet from the capture on the
+server was true and the response packet from the capture on the client
+was failed).
+
+3) The different area is always 128 bytes bounded but appears in
+different places.
+
+4) It doesn't depends on a maybe broken LAN cable - I used two
+different ones with the same results.
+
+So, I don't think that it's cifs module issue and there is no need to
+open a bug on bugzilla.samba.org. It seems that it's the problem with
+the network driver or with the LAN card from my laptop.
+
+Make sense?
+
+--=20
+Best regards,
+Pavel Shilovsky.
