@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 7/9] cifs: find mid earlier in receive codepath
-Date: Wed, 19 Oct 2011 09:16:57 -0400
-Message-ID: <1319030219-3811-8-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 9/9] cifs: add a callback function to receive the rest of the frame
+Date: Wed, 19 Oct 2011 09:16:59 -0400
+Message-ID: <1319030219-3811-10-git-send-email-jlayton@redhat.com>
 References: <1319030219-3811-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,89 +10,146 @@ In-Reply-To: <1319030219-3811-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In order to receive directly into a preallocated buffer, we need to ID
-the mid earlier, before the bulk of the response is read. Call the mid
-finding routine as soon as we're able to read the mid.
+In order to handle larger SMBs for readpages and other calls, we want
+to be able to read into a preallocated set of buffers. Rather than
+changing all of the existing code to preallocate buffers however, we
+instead add a receive callback function to the MID.
+
+cifsd will call this function once the mid_q_entry has been identified
+in order to receive the rest of the SMB. If the mid can't be identified
+or the receive pointer is unset, then the standard 3rd phase receive
+function will be called.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   24 +++++++++---------------
- 1 files changed, 9 insertions(+), 15 deletions(-)
+ fs/cifs/cifsglob.h  |   23 ++++++++++++++++++++---
+ fs/cifs/cifsproto.h |    5 +++--
+ fs/cifs/cifssmb.c   |    5 +++--
+ fs/cifs/connect.c   |    6 +++++-
+ fs/cifs/transport.c |    5 +++--
+ 5 files changed, 34 insertions(+), 10 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a73dd1d..d153d0b 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -656,8 +656,24 @@ static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
+ struct mid_q_entry;
+ 
+ /*
+- * This is the prototype for the mid callback function. When creating one,
+- * take special care to avoid deadlocks. Things to bear in mind:
++ * This is the prototype for the mid receive function. This function is for
++ * receiving the rest of the SMB frame, starting with the WordCount (which is
++ * just after the MID in struct smb_hdr). Note:
++ *
++ * - This will be called by cifsd, with no locks held.
++ * - The mid will still be on the pending_mid_q.
++ * - mid->resp_buf will point to the current buffer.
++ *
++ * Returns zero on a successful receive, or an error. The receive state in
++ * the TCP_Server_Info will also be updated.
++ */
++typedef int (mid_receive_t)(struct TCP_Server_Info *server,
++			    struct mid_q_entry *mid);
++
++/*
++ * This is the prototype for the mid callback function. This is called once the
++ * mid has been received off of the socket. When creating one, take special
++ * care to avoid deadlocks. Things to bear in mind:
+  *
+  * - it will be called by cifsd, with no locks held
+  * - the mid will be removed from any lists
+@@ -675,9 +691,10 @@ struct mid_q_entry {
+ 	unsigned long when_sent; /* time when smb send finished */
+ 	unsigned long when_received; /* when demux complete (taken off wire) */
+ #endif
++	mid_receive_t *receive; /* call receive callback */
+ 	mid_callback_t *callback; /* call completion callback */
+ 	void *callback_data;	  /* general purpose pointer for callback */
+-	struct smb_hdr *resp_buf;	/* response buffer */
++	struct smb_hdr *resp_buf;	/* pointer to received SMB header */
+ 	int midState;	/* wish this were enum but can not pass to wait_event */
+ 	__u8 command;	/* smb command code */
+ 	bool largeBuf:1;	/* if valid response, is pointer to large buf */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index a1fa9ce..8a7adb3 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -69,8 +69,9 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+-			   unsigned int nvec, mid_callback_t *callback,
+-			   void *cbdata, bool ignore_pend);
++			   unsigned int nvec, mid_receive_t *receive,
++			   mid_callback_t *callback, void *cbdata,
++			   bool ignore_pend);
+ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct smb_hdr * /* input */ ,
+ 			struct smb_hdr * /* out */ ,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index c824c10..0613df4 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -737,7 +737,8 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 	iov.iov_base = smb;
+ 	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
+ 
+-	rc = cifs_call_async(server, &iov, 1, cifs_echo_callback, server, true);
++	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
++			     server, true);
+ 	if (rc)
+ 		cFYI(1, "Echo request failed: %d", rc);
+ 
+@@ -1834,7 +1835,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 
+ 	kref_get(&wdata->refcount);
+ 	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
+-			     cifs_writev_callback, wdata, false);
++			     NULL, cifs_writev_callback, wdata, false);
+ 
+ 	if (rc == 0)
+ 		cifs_stats_inc(&tcon->num_writes);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 8918f93..52195ba 100644
+index f05dedd..eeee2f5 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -568,27 +568,21 @@ dequeue_mid(struct mid_q_entry *mid, int malformed)
- 	spin_unlock(&GlobalMid_Lock);
- }
+@@ -824,7 +824,11 @@ cifs_demultiplex_thread(void *p)
  
--static struct mid_q_entry *
--find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
--	      int malformed)
-+static void
-+handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-+	   struct smb_hdr *buf, int malformed)
- {
--	struct mid_q_entry *mid = NULL;
--
--	mid = find_mid(server, buf);
--	if (!mid)
--		return mid;
--
- 	if (malformed == 0 && check2ndT2(buf) > 0) {
- 		mid->multiRsp = true;
- 		if (mid->resp_buf) {
- 			/* merge response - fix up 1st*/
- 			malformed = coalesce_t2(buf, mid->resp_buf);
- 			if (malformed > 0)
--				return mid;
-+				return;
+ 		mid_entry = find_mid(server, smb_buffer);
  
- 			/* All parts received or packet is malformed. */
- 			mid->multiEnd = true;
--			goto multi_t2_fnd;
-+			return dequeue_mid(mid, malformed);
- 		}
- 		if (!server->large_buf) {
- 			/*FIXME: switch to already allocated largebuf?*/
-@@ -599,7 +593,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 			mid->largeBuf = true;
- 			server->bigbuf = NULL;
- 		}
--		return mid;
-+		return;
- 	}
- 	mid->resp_buf = buf;
- 	mid->largeBuf = server->large_buf;
-@@ -611,9 +605,7 @@ find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
- 		else
- 			server->smallbuf = NULL;
- 	}
--multi_t2_fnd:
- 	dequeue_mid(mid, malformed);
--	return mid;
- }
- 
- static void clean_demultiplex_info(struct TCP_Server_Info *server)
-@@ -775,6 +767,8 @@ cifs_demultiplex_thread(void *p)
- 			continue;
- 		server->total_read += length;
- 
-+		mid_entry = find_mid(server, smb_buffer);
+-		length = standard_receive3(server, mid_entry);
++		if (!mid_entry || !mid_entry->receive)
++			length = standard_receive3(server, mid_entry);
++		else
++			length = mid_entry->receive(server, mid_entry);
 +
- 		if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
- 			cERROR(1, "SMB response too long (%u bytes)",
- 				pdu_length);
-@@ -819,8 +813,8 @@ cifs_demultiplex_thread(void *p)
+ 		if (length < 0)
+ 			continue;
  
- 		server->lstrp = jiffies;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 33a3fbf..e7398d0 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -339,8 +339,8 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+  */
+ int
+ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+-		unsigned int nvec, mid_callback_t *callback, void *cbdata,
+-		bool ignore_pend)
++		unsigned int nvec, mid_receive_t *receive,
++		mid_callback_t *callback, void *cbdata, bool ignore_pend)
+ {
+ 	int rc;
+ 	struct mid_q_entry *mid;
+@@ -374,6 +374,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 		goto out_err;
+ 	}
  
--		mid_entry = find_cifs_mid(server, smb_buffer, length);
- 		if (mid_entry != NULL) {
-+			handle_mid(mid_entry, server, smb_buffer, length);
- 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
- 				mid_entry->callback(mid_entry);
- 		} else if (length != 0) {
++	mid->receive = receive;
+ 	mid->callback = callback;
+ 	mid->callback_data = cbdata;
+ 	mid->midState = MID_REQUEST_SUBMITTED;
 -- 
 1.7.6.4
