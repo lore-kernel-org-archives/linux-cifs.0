@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 1/9] cifs: turn read_from_socket into a wrapper around a vectorized version
-Date: Wed, 19 Oct 2011 09:16:51 -0400
-Message-ID: <1319030219-3811-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 4/9] cifs: move mid finding into separate routine
+Date: Wed, 19 Oct 2011 09:16:54 -0400
+Message-ID: <1319030219-3811-5-git-send-email-jlayton@redhat.com>
 References: <1319030219-3811-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,119 +10,148 @@ In-Reply-To: <1319030219-3811-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Eventually we'll want to allow cifsd to read data directly into the
-pagecache. In order to do that we'll need a routine that can take a
-kvec array and pass that directly to kernel_recvmsg.
-
-Unfortunately though, the kernel's recvmsg routines modify the kvec
-array that gets passed in, so we need to use a copy of the kvec array
-and refresh that copy on each pass through the loop.
+Begin breaking up find_cifs_mid into smaller pieces. The parts that
+coalesce T2 responses don't really need to be done under the
+GlobalMid_lock anyway. Create a new function that just finds the
+mid on the list, and then later takes it off the list if the entire
+response has been received.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   68 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 files changed, 61 insertions(+), 7 deletions(-)
+ fs/cifs/connect.c |  113 +++++++++++++++++++++++++++++++----------------------
+ 1 files changed, 66 insertions(+), 47 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 97a65af..4860940 100644
+index 5308bc6..0f69b31 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -375,14 +375,54 @@ server_unresponsive(struct TCP_Server_Info *server)
- 	return false;
+@@ -542,61 +542,80 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
  }
  
-+/*
-+ * kvec_array_init - clone a kvec array, and advance into it
-+ * @new:	pointer to memory for cloned array
-+ * @iov:	pointer to original array
-+ * @nr_segs:	number of members in original array
-+ * @bytes:	number of bytes to advance into the cloned array
-+ *
-+ * This function will copy the array provided in iov to a section of memory
-+ * and advance the specified number of bytes into the new array. It returns
-+ * the number of segments in the new array. "new" must be at least as big as
-+ * the original iov array.
-+ */
-+static unsigned int
-+kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
-+		size_t bytes)
-+{
-+	size_t base = 0;
-+
-+	while (bytes || !iov->iov_len) {
-+		int copy = min(bytes, iov->iov_len);
-+
-+		bytes -= copy;
-+		base += copy;
-+		if (iov->iov_len == base) {
-+			iov++;
-+			nr_segs--;
-+			base = 0;
-+		}
+ static struct mid_q_entry *
+-find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
+-	      int *length, bool is_large_buf, bool *is_multi_rsp, char **bigbuf)
++find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
+ {
+-	struct mid_q_entry *mid = NULL, *tmp_mid, *ret = NULL;
++	struct mid_q_entry *mid;
+ 
+ 	spin_lock(&GlobalMid_Lock);
+-	list_for_each_entry_safe(mid, tmp_mid, &server->pending_mid_q, qhead) {
+-		if (mid->mid != buf->Mid ||
+-		    mid->midState != MID_REQUEST_SUBMITTED ||
+-		    mid->command != buf->Command)
+-			continue;
+-
+-		if (*length == 0 && check2ndT2(buf) > 0) {
+-			/* We have a multipart transact2 resp */
+-			*is_multi_rsp = true;
+-			if (mid->resp_buf) {
+-				/* merge response - fix up 1st*/
+-				*length = coalesce_t2(buf, mid->resp_buf);
+-				if (*length > 0) {
+-					*length = 0;
+-					mid->multiRsp = true;
+-					break;
+-				}
+-				/* All parts received or packet is malformed. */
+-				mid->multiEnd = true;
+-				goto multi_t2_fnd;
+-			}
+-			if (!is_large_buf) {
+-				/*FIXME: switch to already allocated largebuf?*/
+-				cERROR(1, "1st trans2 resp needs bigbuf");
+-			} else {
+-				/* Have first buffer */
+-				mid->resp_buf = buf;
+-				mid->largeBuf = true;
+-				*bigbuf = NULL;
+-			}
+-			break;
++	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
++		if (mid->mid == buf->Mid &&
++		    mid->midState == MID_REQUEST_SUBMITTED &&
++		    mid->command == buf->Command) {
++			spin_unlock(&GlobalMid_Lock);
++			return mid;
+ 		}
+-		mid->resp_buf = buf;
+-		mid->largeBuf = is_large_buf;
+-multi_t2_fnd:
+-		if (*length == 0)
+-			mid->midState = MID_RESPONSE_RECEIVED;
+-		else
+-			mid->midState = MID_RESPONSE_MALFORMED;
 +	}
-+	memcpy(new, iov, sizeof(*iov) * nr_segs);
-+	new->iov_base += base;
-+	new->iov_len -= base;
-+	return nr_segs;
++	spin_unlock(&GlobalMid_Lock);
++	return NULL;
 +}
 +
- static int
--read_from_socket(struct TCP_Server_Info *server, char *buf,
--		 unsigned int to_read)
-+readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
-+		  unsigned int nr_segs, unsigned int to_read)
- {
- 	int length = 0;
- 	int total_read;
-+	unsigned int segs;
- 	struct msghdr smb_msg;
--	struct kvec iov;
-+	struct kvec *iov;
-+
-+	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_NOFS);
-+	if (!iov)
-+		return -ENOMEM;
++static void
++dequeue_mid(struct mid_q_entry *mid, int malformed)
++{
+ #ifdef CONFIG_CIFS_STATS2
+-		mid->when_received = jiffies;
++	mid->when_received = jiffies;
+ #endif
+-		list_del_init(&mid->qhead);
+-		ret = mid;
+-		break;
+-	}
++	spin_lock(&GlobalMid_Lock);
++	if (!malformed)
++		mid->midState = MID_RESPONSE_RECEIVED;
++	else
++		mid->midState = MID_RESPONSE_MALFORMED;
++	list_del_init(&mid->qhead);
+ 	spin_unlock(&GlobalMid_Lock);
++}
  
- 	smb_msg.msg_control = NULL;
- 	smb_msg.msg_controllen = 0;
-@@ -393,10 +433,11 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
- 			break;
- 		}
- 
--		iov.iov_base = buf + total_read;
--		iov.iov_len = to_read;
--		length = kernel_recvmsg(server->ssocket, &smb_msg, &iov, 1,
--					to_read, 0);
-+		segs = kvec_array_init(iov, iov_orig, nr_segs, total_read);
+-	return ret;
++static struct mid_q_entry *
++find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
++	      int *malformed, bool is_large_buf, bool *is_multi_rsp,
++	      char **bigbuf)
++{
++	struct mid_q_entry *mid = NULL;
 +
-+		length = kernel_recvmsg(server->ssocket, &smb_msg,
-+					iov, segs, to_read, 0);
++	mid = find_mid(server, buf);
++	if (!mid)
++		return mid;
 +
- 		if (server->tcpStatus == CifsExiting) {
- 			total_read = -ESHUTDOWN;
- 			break;
-@@ -423,9 +464,22 @@ read_from_socket(struct TCP_Server_Info *server, char *buf,
- 			break;
- 		}
- 	}
-+	kfree(iov);
- 	return total_read;
++	if (*malformed == 0 && check2ndT2(buf) > 0) {
++		/* We have a multipart transact2 resp */
++		*is_multi_rsp = true;
++		if (mid->resp_buf) {
++			/* merge response - fix up 1st*/
++			*malformed = coalesce_t2(buf, mid->resp_buf);
++			if (*malformed > 0) {
++				*malformed = 0;
++				mid->multiRsp = true;
++				return NULL;
++			}
++			/* All parts received or packet is malformed. */
++			mid->multiEnd = true;
++			goto multi_t2_fnd;
++		}
++		if (!is_large_buf) {
++			/*FIXME: switch to already allocated largebuf?*/
++			cERROR(1, "1st trans2 resp needs bigbuf");
++		} else {
++			/* Have first buffer */
++			mid->resp_buf = buf;
++			mid->largeBuf = true;
++			*bigbuf = NULL;
++		}
++		return mid;
++	}
++	mid->resp_buf = buf;
++	mid->largeBuf = is_large_buf;
++multi_t2_fnd:
++	dequeue_mid(mid, *malformed);
++	return mid;
  }
  
-+static int
-+read_from_socket(struct TCP_Server_Info *server, char *buf,
-+		 unsigned int to_read)
-+{
-+	struct kvec iov;
-+
-+	iov.iov_base = buf;
-+	iov.iov_len = to_read;
-+
-+	return readv_from_socket(server, &iov, 1, to_read);
-+}
-+
- static bool
- is_smb_response(struct TCP_Server_Info *server, unsigned char type)
- {
+ static void clean_demultiplex_info(struct TCP_Server_Info *server)
 -- 
 1.7.6.4
