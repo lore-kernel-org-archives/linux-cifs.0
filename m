@@ -1,82 +1,101 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: async read patchset test results
-Date: Wed, 19 Oct 2011 06:54:02 -0400
-Message-ID: <20111019065402.77c20a55@tlielax.poochiereds.net>
-References: <CAKywueS=dRdBzumxHc+QH1A3QhfTm7b8a2pM4w0pb6VXoi7aOQ@mail.gmail.com>
-	<20111013133414.77f54658@barsoom.rdu.redhat.com>
-	<CAKywueTjAwgmSpYeqX-iu6FhZbCiG5HTztDhNLWYFMkq3cmoBg@mail.gmail.com>
-	<CAH2r5msUKNYFMMyixLdnZ=BndxOp-ySrViYRhjkBpBDsQh_-aQ@mail.gmail.com>
-	<20111013140039.3200de5d@barsoom.rdu.redhat.com>
-	<CAKywueSfX7sn46uPTz2L3WWWZgpNmEfECJDv70Lr-jjFvTXi+g@mail.gmail.com>
-	<CAKywueQ20Jh139J4E0XfJ+ZTPsO8gDpXPHL2jZ3YBh72ajKAWA@mail.gmail.com>
-	<20111014065508.2f4735d3@tlielax.poochiereds.net>
-	<CAKywueT3d0dEf__rsoFZ1VK3s72CLXJjFQyGqDdTEe=6-hH-Yw@mail.gmail.com>
-	<CAH2r5muvh_6K_Ou4Jz3Qwu6GNRn9ZJwQ5wLw71g=OfZwj+HVNQ@mail.gmail.com>
-	<CAKywueQ2BAUYj-DKp3=H_t5ySTS=AgiY40t=_9rXw1hD-4MaxQ@mail.gmail.com>
-	<CAH2r5mtAgsJx_uuaEVstysGimS5zs8QxG6dgne4eDmbSyY2A+Q@mail.gmail.com>
-	<CAKywueTeDMugdyZ1qkN_R1G-RPGcLaGmTCFyDqLPWXYSR5W7mg@mail.gmail.com>
-	<CAKywueTGPOU=ej18tH8SO-7=r5E-BjpUkax1aMrQhoWDZJNyxA@mail.gmail.com>
+Subject: Re: [PATCH 2/5] cifs: add cifs_async_readv
+Date: Wed, 19 Oct 2011 06:59:15 -0400
+Message-ID: <20111019065915.0b21f8ba@tlielax.poochiereds.net>
+References: <1318336527-13648-1-git-send-email-jlayton@redhat.com>
+	<1318336527-13648-3-git-send-email-jlayton@redhat.com>
+	<CAKywueR=sXusGdOuAvJHTk1FGURHuDXjj6gz4iJRYeu=Zgkfpg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTGPOU=ej18tH8SO-7=r5E-BjpUkax1aMrQhoWDZJNyxA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueR=sXusGdOuAvJHTk1FGURHuDXjj6gz4iJRYeu=Zgkfpg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 19 Oct 2011 13:57:55 +0400
+On Wed, 19 Oct 2011 14:01:48 +0400
 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> 2011/10/19 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> > 2011/10/19 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> >> If the session could continue after an incorrect checksum (ie retry
-> >> the operation
-> >> that failed due to the network error/corruption)
-> >> then there would be significant advantage in not taking the session down.
-> >> In practice would that request time out and get killed and retried?
-> >
-> > As cifs_check_receive doesn't return any error if checksum doesn't
-> > match the original, readpages continues the read-ahead process and
-> > nothing else happens (I mean the request isn't time out, get killed
-> > and retried).
-> >
-> > So, if we don't kill the session in this case, we can simply return
-> > -EAGAIN and let the calling routine retry the operation itself.
-> > Thoughts?
-> 
-> I tried this patch and it works good to me:
-> 
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 33a3fbf..b54a631 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -508,8 +508,10 @@ cifs_check_receive(struct mid_q_entry *mid,
-> struct TCP_Server_Info *server,
->                 iov.iov_len = len;
->                 /* FIXME: add code to kill session */
->                 if (cifs_verify_signature(&iov, 1, server,
-> -                                         mid->sequence_number + 1) != 0)
-> +                                         mid->sequence_number + 1) != 0) {
->                         cERROR(1, "Unexpected SMB signature");
-> +                       return -EAGAIN;
-> +               }
+> 2011/10/11 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> ...
+> > +
+> > +static void
+> > +cifs_readv_complete(struct work_struct *work)
+> > +{
+> > + =C2=A0 =C2=A0 =C2=A0 struct cifs_readdata *rdata =3D container_of=
+(work,
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 struct cifs_readdata, work);
+> > + =C2=A0 =C2=A0 =C2=A0 struct page *page, *tpage;
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 list_for_each_entry_safe(page, tpage, &rdata=
+->pages, lru) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 list_del(&page->=
+lru);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lru_cache_add_fi=
+le(page);
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rdata->resul=
+t =3D=3D 0) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 kunmap(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 flush_dcache_page(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 SetPageUptodate(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 unlock_page(page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 cifs_readpage_to_fscache(rdata->mapping->host, page);
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+>=20
+> It seems that we should to kunmap and unlock_page for error case too.
+> This change works to me (applied on top of this patch):
+>=20
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 99ab419..a0e23d6 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -1619,15 +1619,18 @@ cifs_readv_complete(struct work_struct *work)
+>         list_for_each_entry_safe(page, tpage, &rdata->pages, lru) {
+>                 list_del(&page->lru);
+>                 lru_cache_add_file(page);
+> +               kunmap(page);
+>=20
+>                 if (rdata->result =3D=3D 0) {
+> -                       kunmap(page);
+>                         flush_dcache_page(page);
+>                         SetPageUptodate(page);
+> -                       unlock_page(page);
+> -                       cifs_readpage_to_fscache(rdata->mapping->host=
+, page);
+>                 }
+>=20
+> +               unlock_page(page);
+> +
+> +               if (rdata->result =3D=3D 0)
+> +                       cifs_readpage_to_fscache(rdata->mapping->host=
+, page);
+> +
+>                 page_cache_release(page);
 >         }
-> 
->         /* BB special case reconnect tid and uid here? */
-> 
-> 
-> I also applied almost the same patch (that includes the fix for
-> cifs_readv_callback) to Jeff's async read patchset , fixed the
-> problems with the error handling in cifs_readv_complete (I posted them
-> to the list) and got the same good result.
-> 
+>         cifs_readdata_free(rdata);
+>=20
+> > +
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 page_cache_relea=
+se(page);
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > + =C2=A0 =C2=A0 =C2=A0 cifs_readdata_free(rdata);
+> > +}
+> > +
+>=20
 
-My concern here would be that this could continuously loop if there
-were a persistent problem with the signature. I'd suggest that we do
-abort the connection after a certain number of signature check failures
-on a socket (5? 10?).
+Good catch -- patch looks correct to me. Since Steve hasn't merged this
+yet, I'll go ahead and roll this into the patch that adds this code.
 
--- 
+Thanks,
+--=20
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
