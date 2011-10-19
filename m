@@ -1,136 +1,61 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs-utils: Add uid/gid to SID mapping functions (try
- #3)
-Date: Wed, 19 Oct 2011 14:27:26 -0400
-Message-ID: <20111019142726.43ba5983@corrin.poochiereds.net>
-References: <1312911245-22404-1-git-send-email-shirishpargonkar@gmail.com>
-	<CADT32eK=G4-S+V1Sc0C5+NuO43oat9u3+GmW2gCSK-gp-ZMCYQ@mail.gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/5] cifs: allow cifs to do readpages larger and
+ asynchronously (try #7)
+Date: Wed, 19 Oct 2011 23:22:09 +0400
+Message-ID: <CAKywueTEa-fDK5edm44+OamNMcmyCQWSDNxMWQc_c2Os9-N8UA@mail.gmail.com>
+References: <1319030695-4115-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eK=G4-S+V1Sc0C5+NuO43oat9u3+GmW2gCSK-gp-ZMCYQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1319030695-4115-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 19 Oct 2011 13:13:23 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2011/10/19 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> This patchset is a respin to fix a bug that Pavel identified in the
+> readv error handling, and to also fix up some merge conflicts that cr=
+ept
+> in with some other patches that Steve merged recently. Other than tho=
+se
+> changes, this is essentially the same patchset as the earlier version=
+s
+> in this series.
+>
+> This set is also available via my git tree on samba.org:
+>
+> =A0 =A0http://git.samba.org/?p=3Djlayton/linux.git;a=3Dsummary
+>
+> Jeff Layton (5):
+> =A0cifs: fix protocol definition for READ_RSP
+> =A0cifs: add cifs_async_readv
+> =A0cifs: convert cifs_readpages to use async reads
+> =A0cifs: allow for larger rsize=3D options and change defaults
+> =A0cifs: tune bdi.ra_pages in accordance with the rsize
+>
+> =A0fs/cifs/cifspdu.h =A0 | =A0 =A04 +-
+> =A0fs/cifs/cifsproto.h | =A0 24 ++++
+> =A0fs/cifs/cifssmb.c =A0 | =A0359 +++++++++++++++++++++++++++++++++++=
+++++++++++++++++
+> =A0fs/cifs/connect.c =A0 | =A0167 +++++++++++++++---------
+> =A0fs/cifs/file.c =A0 =A0 =A0| =A0293 ++++++++++++++++++-------------=
+-----------
+> =A05 files changed, 612 insertions(+), 235 deletions(-)
+>
+> --
+> 1.7.6.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>
 
-> On Tue, Aug 9, 2011 at 12:34 PM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote=
-:
-> > From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> >
-> >
-> > Add functions to map a uid and gid to a SID. =C2=A0These functions =
-are
-> > similar to SID to uid and gid mapping functions.
-> > A SID is what is returned to the cifs module.
-> >
-> >
-> > Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > ---
-> > =C2=A0cifs.idmap.c | =C2=A0 37 ++++++++++++++++++++++++++++++++++++=
-+
-> > =C2=A01 files changed, 37 insertions(+), 0 deletions(-)
-> >
-> > diff --git a/cifs.idmap.c b/cifs.idmap.c
-> > index 56edb58..80802d7 100644
-> > --- a/cifs.idmap.c
-> > +++ b/cifs.idmap.c
-> > @@ -134,6 +134,43 @@ cifs_idmap(const key_serial_t key, const char =
-*key_descr)
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto cifs_id=
-map_ret;
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
-> >
-> > + =C2=A0 =C2=A0 =C2=A0 sidstr =3D strget(key_descr, "oi:");
-> > + =C2=A0 =C2=A0 =C2=A0 if (sidstr) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uid =3D atoi(sid=
-str);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG=
-, "SID: %s, uid: %d", sidstr, uid);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D wbcUidToS=
-id(uid, &sid);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 syslog(LOG_DEBUG, "uid %d to SID =C2=A0error: %d", uid, rc);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!rc) { /* SI=
-D has been mapped to a uid */
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 rc =3D keyctl_instantiate(key, &sid,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size=
-of(struct wbcDomainSid), 0);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 if (rc)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_ERR, "%s: key inst: %=
-s",
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 __fu=
-nc__, strerror(errno));
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto cifs_idmap_=
-ret;
-> > + =C2=A0 =C2=A0 =C2=A0 }
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 sidstr =3D strget(key_descr, "gi:");
-> > + =C2=A0 =C2=A0 =C2=A0 if (sidstr) {
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gid =3D atoi(sid=
-str);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_DEBUG=
-, "SID: %s, gid: %d", sidstr, gid);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D wbcGidToS=
-id(gid, &sid);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (rc)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 syslog(LOG_DEBUG, "gid %d to SID error: %d", gid, rc);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!rc) { /* SI=
-D has been mapped to a gid */
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 rc =3D keyctl_instantiate(key, &sid,
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size=
-of(struct wbcDomainSid), 0);
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 if (rc)
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 syslog(LOG_ERR, "%s: key inst: %=
-s",
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 __fu=
-nc__, strerror(errno));
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> > +
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 goto cifs_idmap_=
-ret;
-> > + =C2=A0 =C2=A0 =C2=A0 }
-> > +
-> > +
-> > =C2=A0 =C2=A0 =C2=A0 =C2=A0syslog(LOG_DEBUG, "Invalid key: %s", key=
-_descr);
-> >
-> > =C2=A0cifs_idmap_ret:
-> > --
-> > 1.6.0.2
-> >
-> >
->=20
-> Hi Jeff, would you consider this patch for a possible merge?
-> The corrosponding kernel code has been merged in 3.2.
-> in Steve's git repository.
->=20
-> Regards,
->=20
-> Shirish
+Reviewed-and-Tested-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-Thanks for reminding me. Committed...
-
-Am I missing anything else? As far as I know, I think the only thing
-left is my manpage update for the rsize option, but I don't want to
-merge that until Steve finishes merging the kernel code for it.
 --=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Best regards,
+Pavel Shilovsky.
