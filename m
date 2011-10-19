@@ -1,144 +1,38 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/4] nfs: make TASK_KILLABLE sleeps attempt to freeze (try #2)
-Date: Wed, 19 Oct 2011 11:18:26 -0400
-Message-ID: <1319037506-6221-1-git-send-email-jlayton@redhat.com>
-References: <1317210761-11518-5-git-send-email-jlayton@redhat.com>
-Cc: linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, john-D0fwSNaahy58zQARNC3f2A@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, pavel-+ZI9xUNit7I@public.gmane.org,
-	rjw-KKrjLPT3xs0@public.gmane.org
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1317210761-11518-5-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils:  Add mount options for backup intent and
+ their manpages (try #8)
+Date: Wed, 19 Oct 2011 13:57:18 -0400
+Message-ID: <20111019135718.776cc255@corrin.poochiereds.net>
+References: <1318957021-3964-1-git-send-email-shirishpargaonkar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1318957021-3964-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Somehow I ended up sending out an earlier version of this patch instead
-of the one actually tested. Here's the correct one.
+On Tue, 18 Oct 2011 11:57:01 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-Allow the TASK_KILLABLE sleeps in NFS layer to respect the freezer. This
-should allow suspend and hibernate events to occur, even when there are
-RPC's pending on the wire.
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Add mount options backupuid and backugid and their manpage contents.
+> Check for either a valid uid/gid or valid user/group name.
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  mount.cifs.8 |   40 +++++++++++++++++++++++++++++
+>  mount.cifs.c |   80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 118 insertions(+), 2 deletions(-)
+> 
 
-Tested-by: John Hughes <john-D0fwSNaahy58zQARNC3f2A@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/nfs/inode.c    |    4 +++-
- fs/nfs/nfs3proc.c |    4 +++-
- fs/nfs/nfs4proc.c |   13 +++++++++----
- fs/nfs/proc.c     |    4 +++-
- 4 files changed, 18 insertions(+), 7 deletions(-)
+Committed.
 
-diff --git a/fs/nfs/inode.c b/fs/nfs/inode.c
-index fe12037..b7c4301 100644
---- a/fs/nfs/inode.c
-+++ b/fs/nfs/inode.c
-@@ -38,6 +38,7 @@
- #include <linux/nfs_xdr.h>
- #include <linux/slab.h>
- #include <linux/compat.h>
-+#include <linux/freezer.h>
- 
- #include <asm/system.h>
- #include <asm/uaccess.h>
-@@ -77,7 +78,8 @@ int nfs_wait_bit_killable(void *word)
- {
- 	if (fatal_signal_pending(current))
- 		return -ERESTARTSYS;
--	schedule();
-+	if (!try_to_freeze())
-+		schedule();
- 	return 0;
- }
- 
-diff --git a/fs/nfs/nfs3proc.c b/fs/nfs/nfs3proc.c
-index 85f1690..5354219 100644
---- a/fs/nfs/nfs3proc.c
-+++ b/fs/nfs/nfs3proc.c
-@@ -17,6 +17,7 @@
- #include <linux/nfs_page.h>
- #include <linux/lockd/bind.h>
- #include <linux/nfs_mount.h>
-+#include <linux/freezer.h>
- 
- #include "iostat.h"
- #include "internal.h"
-@@ -32,7 +33,8 @@ nfs3_rpc_wrapper(struct rpc_clnt *clnt, struct rpc_message *msg, int flags)
- 		res = rpc_call_sync(clnt, msg, flags);
- 		if (res != -EJUKEBOX && res != -EKEYEXPIRED)
- 			break;
--		schedule_timeout_killable(NFS_JUKEBOX_RETRY_TIME);
-+		if (!try_to_freeze())
-+			schedule_timeout_killable(NFS_JUKEBOX_RETRY_TIME);
- 		res = -ERESTARTSYS;
- 	} while (!fatal_signal_pending(current));
- 	return res;
-diff --git a/fs/nfs/nfs4proc.c b/fs/nfs/nfs4proc.c
-index 4700fae..86427d8 100644
---- a/fs/nfs/nfs4proc.c
-+++ b/fs/nfs/nfs4proc.c
-@@ -53,6 +53,7 @@
- #include <linux/sunrpc/bc_xprt.h>
- #include <linux/xattr.h>
- #include <linux/utsname.h>
-+#include <linux/freezer.h>
- 
- #include "nfs4_fs.h"
- #include "delegation.h"
-@@ -244,10 +245,12 @@ static int nfs4_delay(struct rpc_clnt *clnt, long *timeout)
- 		*timeout = NFS4_POLL_RETRY_MIN;
- 	if (*timeout > NFS4_POLL_RETRY_MAX)
- 		*timeout = NFS4_POLL_RETRY_MAX;
--	schedule_timeout_killable(*timeout);
-+	if (!try_to_freeze()) {
-+		schedule_timeout_killable(*timeout);
-+		*timeout <<= 1;
-+	}
- 	if (fatal_signal_pending(current))
- 		res = -ERESTARTSYS;
--	*timeout <<= 1;
- 	return res;
- }
- 
-@@ -3970,8 +3973,10 @@ int nfs4_proc_delegreturn(struct inode *inode, struct rpc_cred *cred, const nfs4
- static unsigned long
- nfs4_set_lock_task_retry(unsigned long timeout)
- {
--	schedule_timeout_killable(timeout);
--	timeout <<= 1;
-+	if (!try_to_freeze()) {
-+		schedule_timeout_killable(timeout);
-+		timeout <<= 1;
-+	}
- 	if (timeout > NFS4_LOCK_MAXTIMEOUT)
- 		return NFS4_LOCK_MAXTIMEOUT;
- 	return timeout;
-diff --git a/fs/nfs/proc.c b/fs/nfs/proc.c
-index ac40b85..0b70e85 100644
---- a/fs/nfs/proc.c
-+++ b/fs/nfs/proc.c
-@@ -41,6 +41,7 @@
- #include <linux/nfs_fs.h>
- #include <linux/nfs_page.h>
- #include <linux/lockd/bind.h>
-+#include <linux/freezer.h>
- #include "internal.h"
- 
- #define NFSDBG_FACILITY		NFSDBG_PROC
-@@ -59,7 +60,8 @@ nfs_rpc_wrapper(struct rpc_clnt *clnt, struct rpc_message *msg, int flags)
- 		res = rpc_call_sync(clnt, msg, flags);
- 		if (res != -EKEYEXPIRED)
- 			break;
--		schedule_timeout_killable(NFS_JUKEBOX_RETRY_TIME);
-+		if (!try_to_freeze())
-+			schedule_timeout_killable(NFS_JUKEBOX_RETRY_TIME);
- 		res = -ERESTARTSYS;
- 	} while (!fatal_signal_pending(current));
- 	return res;
+Thanks,
 -- 
-1.7.6.4
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
