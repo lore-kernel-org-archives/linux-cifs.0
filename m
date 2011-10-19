@@ -1,96 +1,105 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] manpage: cleanups to new backupuid/gid sections
-Date: Wed, 19 Oct 2011 13:07:32 -0500
-Message-ID: <CADT32eJGuR_jK3iT8MwJK58gPhv84VXOQrGC+tZCUwaJ=ZUCCA@mail.gmail.com>
-References: <1319047024-8676-1-git-send-email-jlayton@samba.org>
+Subject: Re: [PATCH] cifs-utils: Add uid/gid to SID mapping functions (try #3)
+Date: Wed, 19 Oct 2011 13:13:23 -0500
+Message-ID: <CADT32eK=G4-S+V1Sc0C5+NuO43oat9u3+GmW2gCSK-gp-ZMCYQ@mail.gmail.com>
+References: <1312911245-22404-1-git-send-email-shirishpargonkar@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319047024-8676-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1312911245-22404-1-git-send-email-shirishpargonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Oct 19, 2011 at 12:57 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
-:
-> Minor cleanups and consistency fixes...
+On Tue, Aug 9, 2011 at 12:34 PM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 >
-> Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>
+> Add functions to map a uid and gid to a SID. =A0These functions are
+> similar to SID to uid and gid mapping functions.
+> A SID is what is returned to the cifs module.
+>
+>
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
-> =A0mount.cifs.8 | =A0 14 +++++---------
-> =A01 files changed, 5 insertions(+), 9 deletions(-)
+> =A0cifs.idmap.c | =A0 37 +++++++++++++++++++++++++++++++++++++
+> =A01 files changed, 37 insertions(+), 0 deletions(-)
 >
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index 8207bcb..958efa5 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -282,16 +282,16 @@ See sections on
-> =A0for more information\&.
-> =A0.RE
-> =A0.PP
-> -backupuid=3Darg
-> +backupuid=3D\fIarg\fR
-> =A0.RS 4
-> -Restrict access to files, with the backup intent, to a user. =A0Eith=
-er a name or an id must be provided as an argument, there are no defaul=
-t values.
-> +Restrict access to files with the backup intent to a user. Either a =
-name or an id must be provided as an argument, there are no default val=
-ues.
-> =A0.sp
-> =A0See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more deta=
-ils
-> =A0.RE
-> =A0.PP
-> -backupgid=3Darg
-> +backupgid=3D\fIarg\fR
-> =A0.RS 4
-> -Restrict Allow access to files, with the backup intent, to a group. =
-=A0Either a name or an id must be provided as an argument, there are no=
- default values.
-> +Restrict access to files with the backup intent to a group. Either a=
- name or an id must be provided as an argument, there are no default va=
-lues.
-> =A0.sp
-> =A0See section \fIACCESSING FILES WITH BACKUP INTENT\fR for more deta=
-ils
-> =A0.RE
-> @@ -625,11 +625,7 @@ But the user testuser, if it becomes part of the=
- group Backup Operators, can ope
-> =A0Any user on the client side who can authenticate as such a user on=
- the server,
-> =A0can access the files with the backup intent. But it is desirable a=
-nd preferable for security reasons amongst many, to restrict this speci=
-al right.
+> diff --git a/cifs.idmap.c b/cifs.idmap.c
+> index 56edb58..80802d7 100644
+> --- a/cifs.idmap.c
+> +++ b/cifs.idmap.c
+> @@ -134,6 +134,43 @@ cifs_idmap(const key_serial_t key, const char *k=
+ey_descr)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto cifs_idmap_ret;
+> =A0 =A0 =A0 =A0}
 >
-> -The mount option backupuid is used to restrict this special right to=
- a user which is specified by either a name or an id.
-> -.sp 0
-> -The mount option backupgid is used to restrict this special right to=
- the users in a group which is specified by either a name or an id.
-> -.sp 0
-> -These two mount options can be used together.
-> +The mount option backupuid is used to restrict this special right to=
- a user which is specified by either a name or an id. The mount option =
-backupgid is used to restrict this special right to the users in a grou=
-p which is specified by either a name or an id. These two mount options=
- can be used together.
-> =A0.SH "FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS"
-> =A0.PP
-> =A0The core CIFS protocol does not provide unix ownership information=
- or mode for files and directories\&. Because of this, files and direct=
-ories will generally appear to be owned by whatever values the uid=3D o=
-r gid=3D options are set, and will have permissions set to the default =
-file_mode and dir_mode for the mount\&. Attempting to change these valu=
-es via chmod/chown will return success but have no effect\&.
+> + =A0 =A0 =A0 sidstr =3D strget(key_descr, "oi:");
+> + =A0 =A0 =A0 if (sidstr) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 uid =3D atoi(sidstr);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "SID: %s, uid: %d", s=
+idstr, uid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcUidToSid(uid, &sid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "uid =
+%d to SID =A0error: %d", uid, rc);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!rc) { /* SID has been mapped to a =
+uid */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D keyctl_instantia=
+te(key, &sid,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 sizeof(struct wbcDomainSid), 0);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(=
+LOG_ERR, "%s: key inst: %s",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 __func__, strerror(errno));
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto cifs_idmap_ret;
+> + =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 sidstr =3D strget(key_descr, "gi:");
+> + =A0 =A0 =A0 if (sidstr) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 gid =3D atoi(sidstr);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "SID: %s, gid: %d", s=
+idstr, gid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D wbcGidToSid(gid, &sid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(LOG_DEBUG, "gid =
+%d to SID error: %d", gid, rc);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (!rc) { /* SID has been mapped to a =
+gid */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D keyctl_instantia=
+te(key, &sid,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 sizeof(struct wbcDomainSid), 0);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 syslog(=
+LOG_ERR, "%s: key inst: %s",
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 __func__, strerror(errno));
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto cifs_idmap_ret;
+> + =A0 =A0 =A0 }
+> +
+> +
+> =A0 =A0 =A0 =A0syslog(LOG_DEBUG, "Invalid key: %s", key_descr);
+>
+> =A0cifs_idmap_ret:
 > --
-> 1.7.6.4
+> 1.6.0.2
 >
 >
 
-Looks good.
+Hi Jeff, would you consider this patch for a possible merge?
+The corrosponding kernel code has been merged in 3.2.
+in Steve's git repository.
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Regards,
+
+Shirish
