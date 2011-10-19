@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/9] cifs: move mid finding into separate routine
-Date: Wed, 19 Oct 2011 09:16:54 -0400
-Message-ID: <1319030219-3811-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 8/9] cifs: break out 3rd receive phase into separate function
+Date: Wed, 19 Oct 2011 09:16:58 -0400
+Message-ID: <1319030219-3811-9-git-send-email-jlayton@redhat.com>
 References: <1319030219-3811-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,148 +10,142 @@ In-Reply-To: <1319030219-3811-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Begin breaking up find_cifs_mid into smaller pieces. The parts that
-coalesce T2 responses don't really need to be done under the
-GlobalMid_lock anyway. Create a new function that just finds the
-mid on the list, and then later takes it off the list if the entire
-response has been received.
+Move the entire 3rd phase of the receive codepath into a separate
+function in preparation for the addition of a pluggable receive
+function.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |  113 +++++++++++++++++++++++++++++++----------------------
- 1 files changed, 66 insertions(+), 47 deletions(-)
+ fs/cifs/connect.c |  101 +++++++++++++++++++++++++++++++----------------------
+ 1 files changed, 59 insertions(+), 42 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5308bc6..0f69b31 100644
+index 52195ba..f05dedd 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -542,61 +542,80 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+@@ -705,6 +705,61 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
  }
  
- static struct mid_q_entry *
--find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
--	      int *length, bool is_large_buf, bool *is_multi_rsp, char **bigbuf)
-+find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
+ static int
++standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
++{
++	int length;
++	char *buf = server->smallbuf;
++	struct smb_hdr *smb_buffer = (struct smb_hdr *)buf;
++	unsigned int pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
++
++	/* make sure this will fit in a large buffer */
++	if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
++		cERROR(1, "SMB response too long (%u bytes)",
++			pdu_length);
++		cifs_reconnect(server);
++		wake_up(&server->response_q);
++		return -EAGAIN;
++	}
++
++	/* switch to large buffer if too big for a small one */
++	if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
++		server->large_buf = true;
++		memcpy(server->bigbuf, server->smallbuf, server->total_read);
++		buf = server->bigbuf;
++		smb_buffer = (struct smb_hdr *)buf;
++	}
++
++	/* now read the rest */
++	length = read_from_socket(server,
++			  buf + sizeof(struct smb_hdr) - 1,
++			  pdu_length - sizeof(struct smb_hdr) + 1 + 4);
++	if (length < 0)
++		return length;
++	server->total_read += length;
++
++	dump_smb(smb_buffer, server->total_read);
++
++	/*
++	 * We know that we received enough to get to the MID as we
++	 * checked the pdu_length earlier. Now check to see
++	 * if the rest of the header is OK. We borrow the length
++	 * var for the rest of the loop to avoid a new stack var.
++	 *
++	 * 48 bytes is enough to display the header and a little bit
++	 * into the payload for debugging purposes.
++	 */
++	length = checkSMB(smb_buffer, smb_buffer->Mid, server->total_read);
++	if (length != 0)
++		cifs_dump_mem("Bad SMB: ", buf,
++			min_t(unsigned int, server->total_read, 48));
++
++	if (mid)
++		handle_mid(mid, server, smb_buffer, length);
++
++	return length;
++}
++
++static int
+ cifs_demultiplex_thread(void *p)
  {
--	struct mid_q_entry *mid = NULL, *tmp_mid, *ret = NULL;
-+	struct mid_q_entry *mid;
+ 	int length;
+@@ -769,57 +824,19 @@ cifs_demultiplex_thread(void *p)
  
- 	spin_lock(&GlobalMid_Lock);
--	list_for_each_entry_safe(mid, tmp_mid, &server->pending_mid_q, qhead) {
--		if (mid->mid != buf->Mid ||
--		    mid->midState != MID_REQUEST_SUBMITTED ||
--		    mid->command != buf->Command)
--			continue;
--
--		if (*length == 0 && check2ndT2(buf) > 0) {
--			/* We have a multipart transact2 resp */
--			*is_multi_rsp = true;
--			if (mid->resp_buf) {
--				/* merge response - fix up 1st*/
--				*length = coalesce_t2(buf, mid->resp_buf);
--				if (*length > 0) {
--					*length = 0;
--					mid->multiRsp = true;
--					break;
--				}
--				/* All parts received or packet is malformed. */
--				mid->multiEnd = true;
--				goto multi_t2_fnd;
--			}
--			if (!is_large_buf) {
--				/*FIXME: switch to already allocated largebuf?*/
--				cERROR(1, "1st trans2 resp needs bigbuf");
--			} else {
--				/* Have first buffer */
--				mid->resp_buf = buf;
--				mid->largeBuf = true;
--				*bigbuf = NULL;
--			}
--			break;
-+	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-+		if (mid->mid == buf->Mid &&
-+		    mid->midState == MID_REQUEST_SUBMITTED &&
-+		    mid->command == buf->Command) {
-+			spin_unlock(&GlobalMid_Lock);
-+			return mid;
+ 		mid_entry = find_mid(server, smb_buffer);
+ 
+-		if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+-			cERROR(1, "SMB response too long (%u bytes)",
+-				pdu_length);
+-			cifs_reconnect(server);
+-			wake_up(&server->response_q);
++		length = standard_receive3(server, mid_entry);
++		if (length < 0)
+ 			continue;
+-		}
+ 
+-		/* else length ok */
+-		if (pdu_length > MAX_CIFS_SMALL_BUFFER_SIZE - 4) {
+-			server->large_buf = true;
+-			memcpy(server->bigbuf, server->smallbuf,
+-			       server->total_read);
+-			smb_buffer = (struct smb_hdr *)server->bigbuf;
++		if (server->large_buf) {
+ 			buf = server->bigbuf;
++			smb_buffer = (struct smb_hdr *)buf;
  		}
--		mid->resp_buf = buf;
--		mid->largeBuf = is_large_buf;
--multi_t2_fnd:
--		if (*length == 0)
--			mid->midState = MID_RESPONSE_RECEIVED;
--		else
--			mid->midState = MID_RESPONSE_MALFORMED;
-+	}
-+	spin_unlock(&GlobalMid_Lock);
-+	return NULL;
-+}
-+
-+static void
-+dequeue_mid(struct mid_q_entry *mid, int malformed)
-+{
- #ifdef CONFIG_CIFS_STATS2
--		mid->when_received = jiffies;
-+	mid->when_received = jiffies;
- #endif
--		list_del_init(&mid->qhead);
--		ret = mid;
--		break;
--	}
-+	spin_lock(&GlobalMid_Lock);
-+	if (!malformed)
-+		mid->midState = MID_RESPONSE_RECEIVED;
-+	else
-+		mid->midState = MID_RESPONSE_MALFORMED;
-+	list_del_init(&mid->qhead);
- 	spin_unlock(&GlobalMid_Lock);
-+}
  
--	return ret;
-+static struct mid_q_entry *
-+find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf,
-+	      int *malformed, bool is_large_buf, bool *is_multi_rsp,
-+	      char **bigbuf)
-+{
-+	struct mid_q_entry *mid = NULL;
-+
-+	mid = find_mid(server, buf);
-+	if (!mid)
-+		return mid;
-+
-+	if (*malformed == 0 && check2ndT2(buf) > 0) {
-+		/* We have a multipart transact2 resp */
-+		*is_multi_rsp = true;
-+		if (mid->resp_buf) {
-+			/* merge response - fix up 1st*/
-+			*malformed = coalesce_t2(buf, mid->resp_buf);
-+			if (*malformed > 0) {
-+				*malformed = 0;
-+				mid->multiRsp = true;
-+				return NULL;
-+			}
-+			/* All parts received or packet is malformed. */
-+			mid->multiEnd = true;
-+			goto multi_t2_fnd;
-+		}
-+		if (!is_large_buf) {
-+			/*FIXME: switch to already allocated largebuf?*/
-+			cERROR(1, "1st trans2 resp needs bigbuf");
-+		} else {
-+			/* Have first buffer */
-+			mid->resp_buf = buf;
-+			mid->largeBuf = true;
-+			*bigbuf = NULL;
-+		}
-+		return mid;
-+	}
-+	mid->resp_buf = buf;
-+	mid->largeBuf = is_large_buf;
-+multi_t2_fnd:
-+	dequeue_mid(mid, *malformed);
-+	return mid;
- }
- 
- static void clean_demultiplex_info(struct TCP_Server_Info *server)
+-		/* now read the rest */
+-		length = read_from_socket(server,
+-				  buf + sizeof(struct smb_hdr) - 1,
+-				  pdu_length - sizeof(struct smb_hdr) + 1 + 4);
+-		if (length < 0)
+-			continue;
+-		server->total_read += length;
+-
+-		dump_smb(smb_buffer, server->total_read);
+-
+-		/*
+-		 * We know that we received enough to get to the MID as we
+-		 * checked the pdu_length earlier. Now check to see
+-		 * if the rest of the header is OK. We borrow the length
+-		 * var for the rest of the loop to avoid a new stack var.
+-		 *
+-		 * 48 bytes is enough to display the header and a little bit
+-		 * into the payload for debugging purposes.
+-		 */
+-		length = checkSMB(smb_buffer, smb_buffer->Mid,
+-				  server->total_read);
+-		if (length != 0)
+-			cifs_dump_mem("Bad SMB: ", buf,
+-				min_t(unsigned int, server->total_read, 48));
+-
+ 		server->lstrp = jiffies;
+-
+ 		if (mid_entry != NULL) {
+-			handle_mid(mid_entry, server, smb_buffer, length);
+ 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
+ 				mid_entry->callback(mid_entry);
+-		} else if (length != 0) {
+-			/* response sanity checks failed */
+-			continue;
+ 		} else if (!is_valid_oplock_break(smb_buffer, server)) {
+ 			cERROR(1, "No task to wake, unknown frame received! "
+ 				   "NumMids %d", atomic_read(&midCount));
 -- 
 1.7.6.4
