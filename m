@@ -1,53 +1,90 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/9] cifs: cleanup and overhaul of the receive codepath (try #4)
-Date: Wed, 19 Oct 2011 09:16:50 -0400
-Message-ID: <1319030219-3811-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 2/9] cifs: keep a reusable kvec array for receives
+Date: Wed, 19 Oct 2011 09:16:52 -0400
+Message-ID: <1319030219-3811-3-git-send-email-jlayton@redhat.com>
+References: <1319030219-3811-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1319030219-3811-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset represents the remainder of the patches that Steve hasn't
-committed yet. The reason for the respin is to incorporate some review
-comments by Pavel and to respin for conflicts due to other patches that
-have been merged into Steve's tree.
+Having to continually allocate a new kvec array is expensive. Allocate
+one that's big enough, and only reallocate it as needed.
 
-The differences are pretty minor:
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |    2 ++
+ fs/cifs/connect.c  |   22 ++++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-1) fix the function name in the comment on kvec_array_init.
-
-2) make the patch that adds readv_from_socket use a GFP_NOFS allocation.
-This was fixed in a later patch, but there could be problems bisecting
-without that change.
-
-3) The unnecessary reset of the "malformed" variable in handle_mid has
-been removed
-
-Other than that, this patchset is essentially the same as before. These
-are also available in the cifs-3.2 branch of my git tree on
-git.samba.org:
-
-    http://git.samba.org/?p=jlayton/linux.git;a=summary
-
-Jeff Layton (9):
-  cifs: turn read_from_socket into a wrapper around a vectorized
-    version
-  cifs: keep a reusable kvec array for receives
-  cifs: add a third receive phase to cifs_demultiplex_thread
-  cifs: move mid finding into separate routine
-  cifs: eliminate is_multi_rsp parm to find_cifs_mid
-  cifs: move buffer pointers into TCP_Server_Info
-  cifs: find mid earlier in receive codepath
-  cifs: break out 3rd receive phase into separate function
-  cifs: add a callback function to receive the rest of the frame
-
- fs/cifs/cifsglob.h  |   29 ++++-
- fs/cifs/cifsproto.h |    5 +-
- fs/cifs/cifssmb.c   |    5 +-
- fs/cifs/connect.c   |  370 +++++++++++++++++++++++++++++++++------------------
- fs/cifs/transport.c |    5 +-
- 5 files changed, 275 insertions(+), 139 deletions(-)
-
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 55ebf39..51ed2de 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -292,6 +292,8 @@ struct TCP_Server_Info {
+ 	bool	sec_kerberos;		/* supports plain Kerberos */
+ 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
+ 	struct delayed_work	echo; /* echo ping workqueue job */
++	struct kvec *iov;	/* reusable kvec array for receives */
++	unsigned int nr_iov;	/* number of kvecs in array */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	struct fscache_cookie   *fscache; /* client index cache cookie */
+ #endif
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 4860940..ee70075 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -410,6 +410,24 @@ kvec_array_init(struct kvec *new, struct kvec *iov, unsigned int nr_segs,
+ 	return nr_segs;
+ }
+ 
++static struct kvec *
++get_server_iovec(struct TCP_Server_Info *server, unsigned int nr_segs)
++{
++	struct kvec *new_iov;
++
++	if (server->iov && nr_segs <= server->nr_iov)
++		return server->iov;
++
++	/* not big enough -- allocate a new one and release the old */
++	new_iov = kmalloc(sizeof(*new_iov) * nr_segs, GFP_NOFS);
++	if (new_iov) {
++		kfree(server->iov);
++		server->iov = new_iov;
++		server->nr_iov = nr_segs;
++	}
++	return new_iov;
++}
++
+ static int
+ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+ 		  unsigned int nr_segs, unsigned int to_read)
+@@ -420,7 +438,7 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+ 	struct msghdr smb_msg;
+ 	struct kvec *iov;
+ 
+-	iov = kmalloc(sizeof(*iov_orig) * nr_segs, GFP_NOFS);
++	iov = get_server_iovec(server, nr_segs);
+ 	if (!iov)
+ 		return -ENOMEM;
+ 
+@@ -464,7 +482,6 @@ readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+ 			break;
+ 		}
+ 	}
+-	kfree(iov);
+ 	return total_read;
+ }
+ 
+@@ -669,6 +686,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	}
+ 
+ 	kfree(server->hostname);
++	kfree(server->iov);
+ 	kfree(server);
+ 
+ 	length = atomic_dec_return(&tcpSesAllocCount);
 -- 
 1.7.6.4
