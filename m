@@ -1,81 +1,41 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/9] cifs: cleanup and overhaul of the receive codepath
- (try #4)
-Date: Wed, 19 Oct 2011 23:22:42 +0400
-Message-ID: <CAKywueTiEmoEDLLt_SPO-qzGScKe1wCFt0HM2JSYHyJ2JoDnZw@mail.gmail.com>
-References: <1319030219-3811-1-git-send-email-jlayton@redhat.com>
+Subject: Re: async read patchset test results
+Date: Wed, 19 Oct 2011 23:31:11 +0400
+Message-ID: <CAKywueQ36XLuEaqXsESBXhbMC5EGmbyqrqROvJg0TAf6LOwnbg@mail.gmail.com>
+References: <CAKywueS=dRdBzumxHc+QH1A3QhfTm7b8a2pM4w0pb6VXoi7aOQ@mail.gmail.com>
+	<20111013083151.55aa1cdf@barsoom.rdu.redhat.com>
+	<CAKywueQg90k2FwRB+fJbmwq230p-DP-Zxtrc0+HP_gfieHxM6g@mail.gmail.com>
+	<20111013133414.77f54658@barsoom.rdu.redhat.com>
+	<CAKywueTjAwgmSpYeqX-iu6FhZbCiG5HTztDhNLWYFMkq3cmoBg@mail.gmail.com>
+	<CAH2r5msUKNYFMMyixLdnZ=BndxOp-ySrViYRhjkBpBDsQh_-aQ@mail.gmail.com>
+	<20111013140039.3200de5d@barsoom.rdu.redhat.com>
+	<CAKywueSfX7sn46uPTz2L3WWWZgpNmEfECJDv70Lr-jjFvTXi+g@mail.gmail.com>
+	<CAKywueQ20Jh139J4E0XfJ+ZTPsO8gDpXPHL2jZ3YBh72ajKAWA@mail.gmail.com>
+	<20111014065508.2f4735d3@tlielax.poochiereds.net>
+	<CAKywueT3d0dEf__rsoFZ1VK3s72CLXJjFQyGqDdTEe=6-hH-Yw@mail.gmail.com>
+	<20111019064229.21310f06@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319030219-3811-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20111019064229.21310f06-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2011/10/19 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> This patchset represents the remainder of the patches that Steve hasn=
-'t
-> committed yet. The reason for the respin is to incorporate some revie=
-w
-> comments by Pavel and to respin for conflicts due to other patches th=
-at
-> have been merged into Steve's tree.
 >
-> The differences are pretty minor:
+> Makes sense. Thanks for digging deeply into it. That helps explain why I
+> haven't been able to reproduce this.
 >
-> 1) fix the function name in the comment on kvec_array_init.
+> You may want to open a bug at kernel.org with these findings or send an
+> email to LKML or the netdev mailing list. I'd imagine that those folks
+> would be very interested in this.
 >
-> 2) make the patch that adds readv_from_socket use a GFP_NOFS allocati=
-on.
-> This was fixed in a later patch, but there could be problems bisectin=
-g
-> without that change.
->
-> 3) The unnecessary reset of the "malformed" variable in handle_mid ha=
-s
-> been removed
->
-> Other than that, this patchset is essentially the same as before. The=
-se
-> are also available in the cifs-3.2 branch of my git tree on
-> git.samba.org:
->
-> =A0 =A0http://git.samba.org/?p=3Djlayton/linux.git;a=3Dsummary
->
-> Jeff Layton (9):
-> =A0cifs: turn read_from_socket into a wrapper around a vectorized
-> =A0 =A0version
-> =A0cifs: keep a reusable kvec array for receives
-> =A0cifs: add a third receive phase to cifs_demultiplex_thread
-> =A0cifs: move mid finding into separate routine
-> =A0cifs: eliminate is_multi_rsp parm to find_cifs_mid
-> =A0cifs: move buffer pointers into TCP_Server_Info
-> =A0cifs: find mid earlier in receive codepath
-> =A0cifs: break out 3rd receive phase into separate function
-> =A0cifs: add a callback function to receive the rest of the frame
->
-> =A0fs/cifs/cifsglob.h =A0| =A0 29 ++++-
-> =A0fs/cifs/cifsproto.h | =A0 =A05 +-
-> =A0fs/cifs/cifssmb.c =A0 | =A0 =A05 +-
-> =A0fs/cifs/connect.c =A0 | =A0370 +++++++++++++++++++++++++++++++++--=
-----------------
-> =A0fs/cifs/transport.c | =A0 =A05 +-
-> =A05 files changed, 275 insertions(+), 139 deletions(-)
->
-> --
-> 1.7.6.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+> What kind of networking hardware is in this laptop, btw?
 
-Reviewed-and-Tested-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+lshw shows: Atheros AR8121/AR8113/AR8114 Gigabit or Fast Ethernet
 
---=20
+-- 
 Best regards,
 Pavel Shilovsky.
