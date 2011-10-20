@@ -1,83 +1,98 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Display strictcache mount option in /proc/mounts
-Date: Wed, 19 Oct 2011 21:10:01 -0500
-Message-ID: <CAH2r5msg+q2g9_iPnhEDbgxmROwVRid=XrkrCPELjH-8vYYbFg@mail.gmail.com>
-References: <1318337032.3659.65.camel@sprabhu.fab.redhat.com>
-	<CAH2r5ms0Udg87PTi9sRZsWbp3+SvCOKScHg3nWh6OtjKFNALqg@mail.gmail.com>
-	<1318861755.30821.27.camel@sprabhu.fab.redhat.com>
+Subject: Re: [patch] cifs: accidentally creating empty files
+Date: Wed, 19 Oct 2011 21:14:37 -0500
+Message-ID: <CAH2r5mtOF=Ja7_mTK576uEqgZqaVH+8YXtOqmZVknBC81sD=8Q@mail.gmail.com>
+References: <20110927212810.GA12900@elgon.mountain>
+	<20111013132755.6c5db87e@barsoom.rdu.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1318861755.30821.27.camel-yuq4rhG59MBosH8Q1Ye95IGKTjYczspe@public.gmane.org>
+In-Reply-To: <20111013132755.6c5db87e-xSBYVWDuneFaJnirhKH9O4GKTjYczspe@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Oct 17, 2011 at 9:29 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
-> On Tue, 2011-10-11 at 12:40 -0500, Steve French wrote:
->> Looks reasonable - are we missing any more from the list of mount
->> options that might matter to display?
+On Thu, Oct 13, 2011 at 12:27 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
+:
+> On Wed, 28 Sep 2011 00:28:10 +0300
+> Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+>
+>> This solves a problem for where a user without write permissions
+>> was creating empty files. =A0This function was supposed to do a look=
+up
+>> only, the create happens later.
 >>
-> When comparing the options parsed in cifs_parse_mount_options() and o=
-nes
-> shown in cifs_show_options(), there seems to be a few which are
-> missing.
 >
-> A quick list made by comparing the options parsed and displayed..
-> sign
-> nostrictsync/strictsync
-> noperm/perm
-> iocharset
-> locallease
-> netbiosname
-> noautotune
-> noblocksnd
-> nodfs
-> port
-> prefixpath
-> sec
-> servern
-> sockopt
+> Not quite. This uses the open-intent goop in the VFS layer that Al Vi=
+ro
+> is trying to get rid of. The idea here is that doing a lookup just to
+> do an open is a waste, when you could just attempt the open. There's =
+no
+> real reason to exempt creates from that if cifs used a sane permissio=
+ns
+> model...
 >
-> Below is a simple patch which also includes the nostrictsync and nope=
-rm
-> mount options.
+>> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+>>
+>> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+>> index 72d448b..8515afe 100644
+>> --- a/fs/cifs/dir.c
+>> +++ b/fs/cifs/dir.c
+>> @@ -566,11 +566,13 @@ cifs_lookup(struct inode *parent_dir_inode, st=
+ruct dentry *direntry,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (nd && !(nd->flags & LOOKUP_DIRECTORY=
+) &&
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(nd->flags & LOOKUP_OPEN) && =
+!pTcon->broken_posix_open &&
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(nd->intent.open.file->f_flag=
+s & O_CREAT)) {
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int f_flags;
+>> +
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 f_flags =3D (nd->intent.op=
+en.file->f_flags & ~O_CREAT);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_posix_open(f=
+ull_path, &newInode,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 parent_dir_inode->i_sb,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 nd->intent.open.create_mode,
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 nd->intent.open.file->f_flags, &oplock,
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 &fileHandle, xid);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 f_flags, &oplock, &fileHandle, xid);
 >
-> Sachin Prabhu
-> --
+> =A0 =A0 =A0 =A0...so this makes it only do the open at lookup time if=
+ the
+> =A0 =A0 =A0 =A0file already exists.
 >
-> Show nostrictsync and noperm mount options in /proc/mounts
+> =A0 =A0 =A0 =A0I suspect the real problem here is that cifs is trying=
+ to
+> =A0 =A0 =A0 =A0enforce permissions on the client, which happens after=
+ the
+> =A0 =A0 =A0 =A0lookup.
 >
-> Add support to print nostrictsync and noperm mount options in /proc/m=
-ounts for shares mounted with these options.
->
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
-> =A0fs/cifs/cifsfs.c | =A0 =A04 ++++
-> =A01 files changed, 4 insertions(+), 0 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 54b8f1e..eb6e8bf 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -432,6 +432,10 @@ cifs_show_options(struct seq_file *s, struct vfs=
-mount *m)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0seq_printf(s, ",mfsymlinks");
-> =A0 =A0 =A0 =A0if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0seq_printf(s, ",fsc");
-> + =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(s, ",nostrictsync");
-> + =A0 =A0 =A0 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_PERM)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 seq_printf(s, ",noperm");
->
-> =A0 =A0 =A0 =A0seq_printf(s, ",rsize=3D%d", cifs_sb->rsize);
-> =A0 =A0 =A0 =A0seq_printf(s, ",wsize=3D%d", cifs_sb->wsize);
+> =A0 =A0 =A0 =A0If the client simply allowed the server to handle the
+> =A0 =A0 =A0 =A0permissions (and used the right credentials for each u=
+ser),
 
-I had to redo to avoid the merge conflict (your patch was not built on
-the previous one so conflicted with it) - but now merged.
+Doesn't this force the create to happen later - rather than
+at lookup time where it belongs?
+
+if the issue is just noperm ... we should let this through if the user
+has local permissions.  Doubling the cost of a file create to Samba
+seems like a bad idea (ie doing aQueryPathInfo AND an NTCreateX
+doubles the roundrip, doubles the load on the server etc.) - the whole
+point of this is to let us do an "atomic" open or create operation
+and not have to split it into multiple requests.  In any case why would
+we do the open and then follow it with a create?
+
+Can we fix this to (at least) narrow the performance penalty.
 
 
 --=20
