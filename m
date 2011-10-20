@@ -1,79 +1,83 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Assume passwords are encoded according to iocharset
- (try #2)
-Date: Thu, 20 Oct 2011 14:29:25 -0500
-Message-ID: <CAH2r5mt4DgW-EHt+2Fh+U67cqbiUFArKRhx5XFm=ETS8cmXmOw@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs: Assume passwords are encoded according to
+ iocharset (try #2)
+Date: Thu, 20 Oct 2011 16:30:06 -0400
+Message-ID: <20111020163006.006fea2e@tlielax.poochiereds.net>
 References: <1319134919-4300-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20111020151300.5fd507ba@tlielax.poochiereds.net>
+	<CAH2r5mt4DgW-EHt+2Fh+U67cqbiUFArKRhx5XFm=ETS8cmXmOw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111020151300.5fd507ba-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <CAH2r5mt4DgW-EHt+2Fh+U67cqbiUFArKRhx5XFm=ETS8cmXmOw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Oct 20, 2011 at 2:13 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Thu, 20 Oct 2011 13:21:59 -0500
-> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->
->> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>
->>
->> Re-posting a patch originally posted by Oskar Liljeblad after
->> rebasing on 3.2.
->>
->>
->> Modify cifs to assume that the supplied password is encoded accordin=
-g
->> to iocharset. =A0Before this patch passwords would be treated as
->> raw 8-bit data, which made authentication with Unicode passwords imp=
-ossible
->> (at least passwords with characters > 0xFF).
->>
->> The previous code would as a side effect accept passwords encoded wi=
-th
->> ISO 8859-1, since Unicode < 0x100 basically is ISO 8859-1. =A0Softwa=
-re which
->> relies on that will no longer support password chars > 0x7F unless i=
-t also
->> uses iocharset=3Diso8859-1. =A0(mount.cifs does not care about the e=
-ncoding so
->> it will work as expected.)
->>
->> Signed-off-by: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
->> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> Tested-by: A <nimbus1_03087-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
->
->
-> I don't know about this. What happens if I have characters in my
-> password that are not part of the current iocharset? I guess I'm
-> screwed?
->
-> The iocharset (and on smbfs, the remotenls) really only referred to t=
-he
-> encoding/decoding of filenames. What's the justification for assuming
-> that the password ought to be governed by that as well?
->
-> If you're mounting with a cred file, is it really correct to assume
-> that it's encoded according to the local charset? It seems like if I
-> have the password stored in a credential file that it ought to work
-> even if I copy it to a host that uses a different iocharset for
-> encoding and decoding filenames.
->
-> Would it be better to have userspace encode the password instead so
-> that you have some flexibility if it's impossible to encode your
-> password in the current iocharset?
-
-that is an interesting point - but if we do pass a new optional type
-of password blob down, we will have to make sure to overwrite/clear it
-carefully.
-
-
---=20
-Thanks,
-
-Steve
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUaHUs
+IDIwIE9jdCAyMDExIDE0OjI5OjI1IC0wNTAwDQpTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWls
+LmNvbT4gd3JvdGU6DQoNCj4gT24gVGh1LCBPY3QgMjAsIDIwMTEgYXQgMjoxMyBQTSwgSmVmZiBM
+YXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPiB3cm90ZToNCj4gPiBPbiBUaHUsIDIwIE9jdCAyMDEx
+IDEzOjIxOjU5IC0wNTAwDQo+ID4gc2hpcmlzaHBhcmdhb25rYXJAZ21haWwuY29tIHdyb3RlOg0K
+PiA+DQo+ID4+IEZyb206IFNoaXJpc2ggUGFyZ2FvbmthciA8c2hpcmlzaHBhcmdhb25rYXJAZ21h
+aWwuY29tPg0KPiA+Pg0KPiA+Pg0KPiA+PiBSZS1wb3N0aW5nIGEgcGF0Y2ggb3JpZ2luYWxseSBw
+b3N0ZWQgYnkgT3NrYXIgTGlsamVibGFkIGFmdGVyDQo+ID4+IHJlYmFzaW5nIG9uIDMuMi4NCj4g
+Pj4NCj4gPj4NCj4gPj4gTW9kaWZ5IGNpZnMgdG8gYXNzdW1lIHRoYXQgdGhlIHN1cHBsaWVkIHBh
+c3N3b3JkIGlzIGVuY29kZWQgYWNjb3JkaW5nDQo+ID4+IHRvIGlvY2hhcnNldC4gwqBCZWZvcmUg
+dGhpcyBwYXRjaCBwYXNzd29yZHMgd291bGQgYmUgdHJlYXRlZCBhcw0KPiA+PiByYXcgOC1iaXQg
+ZGF0YSwgd2hpY2ggbWFkZSBhdXRoZW50aWNhdGlvbiB3aXRoIFVuaWNvZGUgcGFzc3dvcmRzIGlt
+cG9zc2libGUNCj4gPj4gKGF0IGxlYXN0IHBhc3N3b3JkcyB3aXRoIGNoYXJhY3RlcnMgPiAweEZG
+KS4NCj4gPj4NCj4gPj4gVGhlIHByZXZpb3VzIGNvZGUgd291bGQgYXMgYSBzaWRlIGVmZmVjdCBh
+Y2NlcHQgcGFzc3dvcmRzIGVuY29kZWQgd2l0aA0KPiA+PiBJU08gODg1OS0xLCBzaW5jZSBVbmlj
+b2RlIDwgMHgxMDAgYmFzaWNhbGx5IGlzIElTTyA4ODU5LTEuIMKgU29mdHdhcmUgd2hpY2gNCj4g
+Pj4gcmVsaWVzIG9uIHRoYXQgd2lsbCBubyBsb25nZXIgc3VwcG9ydCBwYXNzd29yZCBjaGFycyA+
+IDB4N0YgdW5sZXNzIGl0IGFsc28NCj4gPj4gdXNlcyBpb2NoYXJzZXQ9aXNvODg1OS0xLiDCoCht
+b3VudC5jaWZzIGRvZXMgbm90IGNhcmUgYWJvdXQgdGhlIGVuY29kaW5nIHNvDQo+ID4+IGl0IHdp
+bGwgd29yayBhcyBleHBlY3RlZC4pDQo+ID4+DQo+ID4+IFNpZ25lZC1vZmYtYnk6IE9za2FyIExp
+bGplYmxhZCA8b3NrYXJAb3NrLm1pbmUubnU+DQo+ID4+IFNpZ25lZC1vZmYtYnk6IFNoaXJpc2gg
+UGFyZ2FvbmthciA8c2hpcmlzaHBhcmdhb25rYXJAZ21haWwuY29tPg0KPiA+PiBUZXN0ZWQtYnk6
+IEEgPG5pbWJ1czFfMDMwODdAeWFob28uY29tPg0KPiA+DQo+ID4NCj4gPiBJIGRvbid0IGtub3cg
+YWJvdXQgdGhpcy4gV2hhdCBoYXBwZW5zIGlmIEkgaGF2ZSBjaGFyYWN0ZXJzIGluIG15DQo+ID4g
+cGFzc3dvcmQgdGhhdCBhcmUgbm90IHBhcnQgb2YgdGhlIGN1cnJlbnQgaW9jaGFyc2V0PyBJIGd1
+ZXNzIEknbQ0KPiA+IHNjcmV3ZWQ/DQo+ID4NCj4gPiBUaGUgaW9jaGFyc2V0IChhbmQgb24gc21i
+ZnMsIHRoZSByZW1vdGVubHMpIHJlYWxseSBvbmx5IHJlZmVycmVkIHRvIHRoZQ0KPiA+IGVuY29k
+aW5nL2RlY29kaW5nIG9mIGZpbGVuYW1lcy4gV2hhdCdzIHRoZSBqdXN0aWZpY2F0aW9uIGZvciBh
+c3N1bWluZw0KPiA+IHRoYXQgdGhlIHBhc3N3b3JkIG91Z2h0IHRvIGJlIGdvdmVybmVkIGJ5IHRo
+YXQgYXMgd2VsbD8NCj4gPg0KPiA+IElmIHlvdSdyZSBtb3VudGluZyB3aXRoIGEgY3JlZCBmaWxl
+LCBpcyBpdCByZWFsbHkgY29ycmVjdCB0byBhc3N1bWUNCj4gPiB0aGF0IGl0J3MgZW5jb2RlZCBh
+Y2NvcmRpbmcgdG8gdGhlIGxvY2FsIGNoYXJzZXQ/IEl0IHNlZW1zIGxpa2UgaWYgSQ0KPiA+IGhh
+dmUgdGhlIHBhc3N3b3JkIHN0b3JlZCBpbiBhIGNyZWRlbnRpYWwgZmlsZSB0aGF0IGl0IG91Z2h0
+IHRvIHdvcmsNCj4gPiBldmVuIGlmIEkgY29weSBpdCB0byBhIGhvc3QgdGhhdCB1c2VzIGEgZGlm
+ZmVyZW50IGlvY2hhcnNldCBmb3INCj4gPiBlbmNvZGluZyBhbmQgZGVjb2RpbmcgZmlsZW5hbWVz
+Lg0KPiA+DQo+ID4gV291bGQgaXQgYmUgYmV0dGVyIHRvIGhhdmUgdXNlcnNwYWNlIGVuY29kZSB0
+aGUgcGFzc3dvcmQgaW5zdGVhZCBzbw0KPiA+IHRoYXQgeW91IGhhdmUgc29tZSBmbGV4aWJpbGl0
+eSBpZiBpdCdzIGltcG9zc2libGUgdG8gZW5jb2RlIHlvdXINCj4gPiBwYXNzd29yZCBpbiB0aGUg
+Y3VycmVudCBpb2NoYXJzZXQ/DQo+IA0KPiB0aGF0IGlzIGFuIGludGVyZXN0aW5nIHBvaW50IC0g
+YnV0IGlmIHdlIGRvIHBhc3MgYSBuZXcgb3B0aW9uYWwgdHlwZQ0KPiBvZiBwYXNzd29yZCBibG9i
+IGRvd24sIHdlIHdpbGwgaGF2ZSB0byBtYWtlIHN1cmUgdG8gb3ZlcndyaXRlL2NsZWFyIGl0DQo+
+IGNhcmVmdWxseS4NCj4gDQo+IA0KDQpJIGRvbid0IHRoaW5rIHRoaXMgcmVxdWlyZXMgYW55IGtl
+cm5lbCBjaGFuZ2VzLiBKdXN0IGhhdmUgdGhlIGtlcm5lbA0KdHJlYXQgdGhlIHBhc3N3b3JkIGFz
+IG9wYXF1ZSBsaWtlIGl0IGRvZXMgdG9kYXkuDQoNCkFnYWluLCBJJ20gbm90IHNheWluZyB0aGlz
+IGZvciBjZXJ0YWluLiBNYXliZSB0aGlzIHBhdGNoIG1ha2VzIHRoZSBtb3N0DQpzZW5zZSBhZnRl
+ciBhbGwuIEJ1dCwgSSB0aGluayB3ZSBuZWVkIHNvbWUganVzdGlmaWNhdGlvbiBiZWZvcmUgd2Ug
+anVzdA0KYXNzdW1lIHRoYXQgZGVjb2RpbmcgaXQgYWNjb3JkaW5nIHRvIHRoZSBpb2NoYXJzZXQg
+aXMgdGhlIHJpZ2h0IHRoaW5nDQp0byBkbyBoZXJlLg0KDQotIC0tIA0KSmVmZiBMYXl0b24gPGps
+YXl0b25Ac2FtYmEub3JnPg0KLS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246
+IEdudVBHIHYyLjAuMTggKEdOVS9MaW51eCkNCg0KaVFJY0JBRUJBZ0FHQlFKT29JVFhBQW9KRUFB
+T2FFRVpWb0lWZzZVUC8wWjZCRmx2Mi9VZ1ZTM3BWbk1MbUZIaA0KRkpMTHhIYUhQK1BSYU51bHg1
+V2RKVE01clVDWkRidFpPRzFUUWpzQktIaUp3b0J4eEpyOFdweWFzNVNOdG11QQ0KY3Awb1NqS2ls
+blpreWt1b3ErSWNOdUd5d0UvQWJWaDJIV0Jrd0NpN0pQV1cwRUh0K1U4QlZJZk5iRHBiT3BQag0K
+d1poRS95YkRvdVdUczlDcTBWM01pM1ZGd3lxcFZkUi9oSnRiOElUNllNR09nK0lYczRWNWxYaURO
+dzFFTmRTdQ0KeEt6OEVTc2Z6ZUJoakFmY3grdDVYQVh0ZVVHYXlJUFhVUlF6eTIzTmpGMWJVY3Zx
+cHZuRzJXSFM5dnlFUW5RUw0KbHQ0L0ltUjQ3c2xpSWY4bnVSZTBWVU0vRjhYd1p1UmdYVDlzV3k5
+RU1kb0lWUDFQcG9NYWR5YjJEc3lZdXZiMQ0KemhidDRNTitlT0RqVlNKeUJNWFlxSkxCb0FKN1BM
+OGNmb2hiNW9ZWURNb3Y0Zzl3K0F0dUFjTEpTeGdrS1BtVQ0KK1gvT0VZeUhMOVRvenE1cy9BcFpF
+cS9kcjZybnNCSVBNcXFnL2ZDbUc1Y3FjVHh3K2M5YzVxSUJMY2hMYSt2ag0KakJsRzJNa05nZVVP
+ZjlMdlAvcjU4VWhEQnN6VVlTV3N4c3BMTGRvajVRZUJHNHNrZ3hsMTgyK2ZvUHZ6b2JIbw0KUlR0
+RGtuOW1uNWU5Ky9EcVlkQ0xCWVJMeHN5cHRsQS80N0RuZXZCM0JTcnVuMUxjWGFsUGlOT2NxVU1q
+dVZ6Sw0KK3hMWWgzZ2ZHZlpLSUZ1T0ZBZktEUTg5b1BqWlQyMUFPV3l0NEorRGk1L3BKQ0RWQi9T
+M3FYdnhvT2xqOXp2VA0KZHFMTTVwVXdFcHE4MzBvQ3hQbEINCj1YeVFSDQotLS0tLUVORCBQR1Ag
+U0lHTkFUVVJFLS0tLS0NCg==
