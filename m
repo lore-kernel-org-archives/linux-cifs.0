@@ -1,53 +1,35 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: SMB2 protocol support for CIFS Linux kernel module
-Date: Thu, 20 Oct 2011 19:27:06 +0400
-Message-ID: <CAKywueSJoApMc8RrDO-nfd64FWdNG_Zdw2-Mse01wK3B0h+VzA@mail.gmail.com>
-References: <CAKywueQV4QS5FZiSr8zkeH6tpUokuN4a-yKn5mmZ7F8F_V8_mA@mail.gmail.com>
-	<20111020112058.185cae5e@barsoom.rdu.redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Current cifs code doubles file copy speed from server to Linux client
+ - due to Jeff Layton's async read patch set
+Date: Thu, 20 Oct 2011 12:58:58 -0500
+Message-ID: <CAH2r5msNR2OZRdAtt_V5Z56RiSbyCguTte_XCF1LFj+dNMdrvQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs@vger.kernel.org,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>
-To: Jeff Layton <jlayton@samba.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20111020112058.185cae5e@barsoom.rdu.redhat.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2011/10/20 Jeff Layton <jlayton@samba.org>:
-> On Fri, 14 Oct 2011 13:31:10 +0400
-> Pavel Shilovsky <piastryyy@gmail.com> wrote:
->
->> Hi all!
->>
->> I rebased my cifs-3.2-current branch on top of current
->> cifs-2.6/master. It includes all patches (lock caching + smb2 patches)
->> I want to get into 3.2 release.
->>
->> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/cifs-3.2-current
->>
->> Comments are welcome!
->>
->> --
->> Best regards,
->> Pavel Shilovsky.
->
-> I started looking over them, but it's hard to comment since almost all
-> of them haven't been sent to the list and there's nothing to reply to.
->
-> Would it be possible to send this to the list in one or more patchsets
-> so it can be reviewed like any other series?
->
-> Thanks,
-> --
-> Jeff Layton <jlayton@samba.org>
->
+Did a quick check of the current cifs-2.6.git tree (in linux-next,
+which I will be requesting to be merged into 3.2-pre).=A0 Thanks to Jef=
+f
+Layton's async read patch set, as expected the file copy performance
+from server to Linux client is dramatically faster.
 
-Thanks! I will split it into several patchset and post to the list in
-this case. The last version of patches is here:
+In a quick test copying a directory containing 144MB of movie trailers
+from a typical Windows Vista desktop system (as desktop) using the
+Linux cifs kernel client the speed more than doubled.=A0=A0 Performance
+should be even better to Linux/Samba servers due to Samba's larger
+maximum i/o sizes.
 
-http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/cifs-3.2-aread
+When you also consider that Pavel's byte range lock queueing and lock
+batching patches should help some workloads a lot, and that his SMB2
+code will allow oplock (lease) upgrades - the performance of 3.2 cifs
+kernel client should be much better.
 
--- 
-Best regards,
-Pavel Shilovsky.
+--
+Thanks,
+
+Steve
