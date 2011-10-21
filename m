@@ -1,61 +1,133 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix error handling in cifs_readv_complete
-Date: Fri, 21 Oct 2011 09:25:50 -0500
-Message-ID: <CAH2r5ms=mYhw-BT1qiAYqp=Li6cgaJaPYZtn=K2+hEbYrWMojQ@mail.gmail.com>
-References: <1319177644-2551-1-git-send-email-piastry@etersoft.ru>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Assume passwords are encoded according to iocharset
+ (try #2)
+Date: Fri, 21 Oct 2011 10:10:51 -0500
+Message-ID: <CADT32eJsyxGO3UdoFnTpEHNfw7G+V-CB_awbwHdzp_NUY3wjAQ@mail.gmail.com>
+References: <1319134919-4300-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20111020151300.5fd507ba@tlielax.poochiereds.net>
+	<CAH2r5mt4DgW-EHt+2Fh+U67cqbiUFArKRhx5XFm=ETS8cmXmOw@mail.gmail.com>
+	<20111020163006.006fea2e@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319177644-2551-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <20111020163006.006fea2e-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged
-
-On Fri, Oct 21, 2011 at 1:14 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
-wrote:
-> In cifs_readv_receive we don't update rdata->result to error value
-> after kmap'ing a page. We should kunmap the page in the no error
-> case only.
+On Thu, Oct 20, 2011 at 3:30 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
 >
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
-> =A0fs/cifs/cifssmb.c | =A0 =A02 +-
-> =A01 files changed, 1 insertions(+), 1 deletions(-)
+> On Thu, 20 Oct 2011 14:29:25 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 949e121..5c81cd4 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1667,9 +1667,9 @@ cifs_readv_complete(struct work_struct *work)
-> =A0 =A0 =A0 =A0list_for_each_entry_safe(page, tpage, &rdata->pages, l=
-ru) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del(&page->lru);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0lru_cache_add_file(page);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 kunmap(page);
+>> On Thu, Oct 20, 2011 at 2:13 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
+te:
+>> > On Thu, 20 Oct 2011 13:21:59 -0500
+>> > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>> >
+>> >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >>
+>> >>
+>> >> Re-posting a patch originally posted by Oskar Liljeblad after
+>> >> rebasing on 3.2.
+>> >>
+>> >>
+>> >> Modify cifs to assume that the supplied password is encoded accor=
+ding
+>> >> to iocharset. =C2=A0Before this patch passwords would be treated =
+as
+>> >> raw 8-bit data, which made authentication with Unicode passwords =
+impossible
+>> >> (at least passwords with characters > 0xFF).
+>> >>
+>> >> The previous code would as a side effect accept passwords encoded=
+ with
+>> >> ISO 8859-1, since Unicode < 0x100 basically is ISO 8859-1. =C2=A0=
+Software which
+>> >> relies on that will no longer support password chars > 0x7F unles=
+s it also
+>> >> uses iocharset=3Diso8859-1. =C2=A0(mount.cifs does not care about=
+ the encoding so
+>> >> it will work as expected.)
+>> >>
+>> >> Signed-off-by: Oskar Liljeblad <oskar-Y7VfMkPRzygsCylrc8G9yg@public.gmane.org>
+>> >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >> Tested-by: A <nimbus1_03087-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+>> >
+>> >
+>> > I don't know about this. What happens if I have characters in my
+>> > password that are not part of the current iocharset? I guess I'm
+>> > screwed?
+>> >
+>> > The iocharset (and on smbfs, the remotenls) really only referred t=
+o the
+>> > encoding/decoding of filenames. What's the justification for assum=
+ing
+>> > that the password ought to be governed by that as well?
+>> >
+>> > If you're mounting with a cred file, is it really correct to assum=
+e
+>> > that it's encoded according to the local charset? It seems like if=
+ I
+>> > have the password stored in a credential file that it ought to wor=
+k
+>> > even if I copy it to a host that uses a different iocharset for
+>> > encoding and decoding filenames.
+>> >
+>> > Would it be better to have userspace encode the password instead s=
+o
+>> > that you have some flexibility if it's impossible to encode your
+>> > password in the current iocharset?
+>>
+>> that is an interesting point - but if we do pass a new optional type
+>> of password blob down, we will have to make sure to overwrite/clear =
+it
+>> carefully.
+>>
+>>
 >
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rdata->result =3D=3D 0) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 kunmap(page);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0flush_dcache_page(page=
-);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0SetPageUptodate(page);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> --
-> 1.7.1
+> I don't think this requires any kernel changes. Just have the kernel
+> treat the password as opaque like it does today.
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+> Again, I'm not saying this for certain. Maybe this patch makes the mo=
+st
+> sense after all. But, I think we need some justification before we ju=
+st
+> assume that decoding it according to the iocharset is the right thing
+> to do here.
+>
+> - --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v2.0.18 (GNU/Linux)
 >
 
+I think this patch is good enough.
 
+I set these two different passwords on the Samba server
 
---=20
-Thanks,
+al=C3=BEiz=C3=B4
+=E9=9A=B6=E4=B9=A6
 
-Steve
+and both the times, with utf8 as a codepage on the client,
+mount succeeded.
+It appears that the default utf8 codepage, has large
+enough (perhaps all of Unicode's repertoir) to
+convert a character to unicode.
+
+mount -t cifs //server/share /mnt/smb_b -o iocharset=3Dutf8,user=3Droot=
+%al=C3=BEiz=C3=B4
+
+mount -t cifs //server/share /mnt/smb_b -o iocharset=3Dutf8,user=3Droot=
+%=E9=9A=B6=E4=B9=A6
+
+I did not have to specify iocharset.
+
+Regards,
+
+Shirish
