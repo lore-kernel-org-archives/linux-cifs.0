@@ -1,46 +1,40 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] CIFS: Fix DFS handling in cifs_get_file_info
-Date: Sat, 22 Oct 2011 14:07:56 -0500
-Message-ID: <CAH2r5msGPAovnV6F0FYMf=ydWUrsd2pY4nXHwm=L3tDzmaL8Uw@mail.gmail.com>
-References: <1319279870-17657-1-git-send-email-piastry@etersoft.ru>
-	<20111022070656.4eb6129c@tlielax.poochiereds.net>
-	<CAKywueQuSgAAsO2YN95m7E6jDVVw21v66S+-2bdMxKXm2=Xn+Q@mail.gmail.com>
+From: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+Subject: Re: cifs and win2k8
+Date: Sun, 23 Oct 2011 12:30:03 +0200
+Message-ID: <20111023103003.GA6132@cobija.connexer.com>
+References: <4EA154FC.3090601@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Terrence Shipclark <terrence.shipclark-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQuSgAAsO2YN95m7E6jDVVw21v66S+-2bdMxKXm2=Xn+Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <4EA154FC.3090601-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git
+Hello Terrence,
 
-On Sat, Oct 22, 2011 at 6:12 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
-wrote:
-> 2011/10/22 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> I think this looks fine. Did you actually see a problem with this or
->> did you notice it by inspection?
->
-> I caught it while working with SMB2 code - so, I didn't faced with an=
-y
-> real problem connected with it.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
->
+On Fri, Oct 21, 2011 at 07:18:20AM -0400, Terrence Shipclark wrote:
+> I have been attempting to get the cifs kernel modules to mount the
+> win2k8 dfs at my workplace.   I did finally manage to get
+> the dfs to mount after modifying the kernel module with this small patch
+
+I believe this should already be fixed (in a more correct fashion) in >= 3.0.
+
+> Within the dfs tree there is a referral to //server/share$/folder.
+> My user has access to //server/share$/folder, however do not have
+> access to
+> //server/$share.  While following the referral the cifs module does a
+> QUERY_PATH_INFO on \\server\share$\folder, and then is followed up
+> by a QUERY_PATH_INFO on \\server\share$\ which rightfully returns a
+> STATUS_ACCESS_DENIED from the server.
+
+I've also noticed that the mounting process seems to query more than
+it should, but I've taken the easy way out and asked the local windows
+admin to add "traverse filesystem" and "read attributes" permissions on
+the parent folders, which should be enough.  I suspect that there is a
+"real fix" to avoid this, but haven't looked too hard myself.
 
 
-
---=20
-Thanks,
-
-Steve
+	sean
