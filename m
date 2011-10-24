@@ -1,43 +1,42 @@
-From: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
-Subject: Re: cifs and win2k8
-Date: Mon, 24 Oct 2011 09:35:35 +0200
-Message-ID: <20111024073534.GB7086@cobija.connexer.com>
-References: <CAKywueSZzVmXvzB+PhTyxitrKTWL-o=4qqhRqcdzw=wfaj_wtw@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [v2 PATCH 0/4] Implement byte-range lock caching
+Date: Mon, 24 Oct 2011 07:35:29 -0400
+Message-ID: <20111024073529.28e787a5@tlielax.poochiereds.net>
+References: <1319283212-19024-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Terrence Shipclark <terrence.shipclark-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAKywueSZzVmXvzB+PhTyxitrKTWL-o=4qqhRqcdzw=wfaj_wtw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
- <20111023065534.566a0aad-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1319283212-19024-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Jeff, Pavel,
+On Sat, 22 Oct 2011 15:33:28 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-On Sun, Oct 23, 2011 at 06:55:34AM -0400, Jeff Layton wrote:
-> 3.0 got a patchset to allow superblocks to be shared, but that
-> regressed the above use case (mounting a directory that you have access
-> to but not the stuff below it).
+> This is the rest of byte-range lock cache patchset that includes several fixes in patches #1 and #3.
+> 
+> The patchset is going to simplify brlocking code and add caching support for exclusive oplock cases. I splitted it into several independent parts - so, each can be applied separately once it's reviewed.
+> 
+> Any comments and testing are welcome!
+> 
+> Pavel Shilovsky (4):
+>   CIFS: Implement caching mechanism for mandatory brlocks
+>   CIFS: Implement caching mechanism for posix brlocks
+>   CIFS: Send as many mandatory unlock ranges at once as possible
+>   CIFS: Make cifs_push_locks send as many locks at once as possible
+> 
+>  fs/cifs/cifsglob.h  |    2 +
+>  fs/cifs/cifsproto.h |    7 +-
+>  fs/cifs/cifssmb.c   |   48 +++++-
+>  fs/cifs/file.c      |  533 ++++++++++++++++++++++++++++++++++++++++++++++-----
+>  4 files changed, 538 insertions(+), 52 deletions(-)
+> 
 
-I also seem to recall there being a problem with the request on the target
-directory (existing behavior, not a regression), that it used the SMB
-QueryFileAllInfo or whatever it's called, instead of just QueryFileInfo,
-which is the motivation for needing the "read file attributes" permission.
+This patchset seems to fix the regression in the earlier one. I've also
+looked over it and don't see any obvious problems. Let's get this
+merged early so it can get the full testing cycle for 3.2.
 
-My memory is a bit hazy here, but i have a vague recollection of looking
-at smbclient using the same credentials only doing a QueryFileInfo and
-succeeding.
-
-On Sun, Oct 23, 2011 at 11:10:01PM +0400, Pavel Shilovsky wrote:
-> Also, if you are interested, I can send you the right version of the
-> patch I've already posted.
-
-Please do :)  I can't promise that I have any time to look at it but
-it would be good to have regardless.
-
-
-	sean
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
