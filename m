@@ -1,61 +1,30 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 50/53] CIFS: Introduce smb2 mounts as vers=2
-Date: Tue, 25 Oct 2011 10:12:23 +0400
-Message-ID: <1319523146-2859-51-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 51/53] CIFS: Change Makefile to support CONFIG_CIFS_SMB2
+Date: Tue, 25 Oct 2011 10:12:24 +0400
+Message-ID: <1319523146-2859-52-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
-Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1319523146-2859-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-
-As with Linux nfs client, which uses "nfsvers=" or "vers=" to
-indicate which protocol to use for mount, specifying
-
-"vers=smb2" or "vers=2"
-
-will force an smb2 mount. When vers is not specified cifs is used
-
-ie "vers=cifs" or "vers=1"
-
-We can eventually autonegotiate down from smb2 to cifs
-when smb2 is stable enough to make it the default, but this
-is for the future.  At that time we could also implement a
-"maxprotocol" mount option as smbclient and Samba have today,
-but that would be premature until smb2 is stable.
-
-Intially the smb2 Kconfig option will depend on "BROKEN"
-until the merge is complete, and then be "EXPERIMENTAL"
-When it is no longer experimental we can consider changing
-the default protocol to attempt first.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/connect.c |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+ fs/cifs/Makefile |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 03081f6..305491b 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1276,6 +1276,13 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 				   (strnicmp(value, "1", 1) == 0)) {
- 				/* this is the default */
- 				continue;
-+			} else if ((strnicmp(value, "smb2", 4) == 0) ||
-+				   (strnicmp(value, "2", 1) == 0)) {
-+#ifdef CONFIG_CIFS_SMB2
-+				vol->use_smb2 = true;
-+#else
-+				cERROR(1, "smb2 support not enabled");
-+#endif /* CONFIG_CIFS_SMB2 */
- 			}
- 		} else if ((strnicmp(data, "unc", 3) == 0)
- 			   || (strnicmp(data, "target", 6) == 0)
+diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+index 005d524..00ec0a2 100644
+--- a/fs/cifs/Makefile
++++ b/fs/cifs/Makefile
+@@ -15,3 +15,7 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
+ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+ 
+ cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
++
++cifs-$(CONFIG_CIFS_SMB2) += smb2pdu.o smb2misc.o smb2sess.o smb2transport.o \
++			    maperror.o smb2inode.o smb2dir.o smb2file.o \
++			    smb2readdir.o smb2link.o
 -- 
 1.7.1
