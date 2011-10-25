@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 02/53] CIFS: Allow SMB2 statistics to be tracked
-Date: Tue, 25 Oct 2011 10:11:35 +0400
-Message-ID: <1319523146-2859-3-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 01/53] CIFS: Update cifs global structures to handle smb2 sessions
+Date: Tue, 25 Oct 2011 10:11:34 +0400
+Message-ID: <1319523146-2859-2-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
 Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,534 +12,316 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-Adding SMB2 statistics requires changes to the way cifs handles stats.
-Since there are only 19 command codes, it also is easier to track by exact
-command code than it was for cifs.  Turn the counters for protocol
-ops sent to be a union (one struct for cifs, one for smb2).  While at it
-split out the functions which clear stats and prints stats into their own
-subfunctions so they are easy to read and don't go past 80 columns.
+cifsglob.h defines the per socket structures
+smb2 could already use the per-smb socket structures,
+but to use the per-socket structures required additional
+optional fields. (Note that the tree connection
+structure differs substantially and will probably endup
+as a based tcon structure used by smb2 and cifs and a
+union for the stats.
 
+Also save whole smb2 dialect minor version - Jeff suggested
+that easier to handle future version updates if we treat
+the minor version in its native wire form rather than as
+series of booleans.
+
+Prepratory to merging more of the smb2 global routines
+1) cleanup some unused structs and defines
+2) add in externs for smb2 debugging routines
+
+smb2 needs to save off device_type on tcon and share_flags on tcon and
+session flags and subdialect on sessionsetup
+
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifs_debug.c |  146 ++++++++++++++++++++++++++++++-------------------
- fs/cifs/cifsglob.h   |   56 ++++++++++++-------
- fs/cifs/cifssmb.c    |   54 +++++++++---------
- fs/cifs/misc.c       |    2 +-
- 4 files changed, 152 insertions(+), 106 deletions(-)
+ fs/cifs/TODO         |    2 ++
+ fs/cifs/cifs_debug.h |   12 +++++++++---
+ fs/cifs/cifs_fs_sb.h |    4 +++-
+ fs/cifs/cifsacl.h    |    2 +-
+ fs/cifs/cifsglob.h   |   44 +++++++++++++++++++++++++++++++++-----------
+ fs/cifs/cifspdu.h    |    2 ++
+ fs/cifs/cifssmb.c    |    2 +-
+ fs/cifs/sess.c       |    2 +-
+ 8 files changed, 52 insertions(+), 18 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 84e8c07..8ccdb15 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -249,6 +249,55 @@ static const struct file_operations cifs_debug_data_proc_fops = {
- };
+diff --git a/fs/cifs/TODO b/fs/cifs/TODO
+index 355abcd..2c68abc 100644
+--- a/fs/cifs/TODO
++++ b/fs/cifs/TODO
+@@ -1,5 +1,7 @@
+ Version 1.53 May 20, 2008
  
- #ifdef CONFIG_CIFS_STATS
++PUT IN WARNING FOR NTLMV2 becoming default
 +
+ A Partial List of Missing Features
+ ==================================
+ 
+diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+index 8942b28..fec0743 100644
+--- a/fs/cifs/cifs_debug.h
++++ b/fs/cifs/cifs_debug.h
+@@ -1,6 +1,6 @@
+ /*
+  *
+- *   Copyright (c) International Business Machines  Corp., 2000,2002
++ *   Copyright (c) International Business Machines  Corp., 2000,2011
+  *   Modified by Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *
+  *   This program is free software;  you can redistribute it and/or modify
+@@ -18,7 +18,7 @@
+  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  *
+ */
+-#define CIFS_DEBUG		/* BB temporary */
++#define CIFS_DEBUG		/* remove to disable cifserror logging */
+ 
+ #ifndef _H_CIFS_DEBUG
+ #define _H_CIFS_DEBUG
+@@ -28,6 +28,9 @@ void cifs_dump_mem(char *label, void *data, int length);
+ #define DBG2 2
+ void cifs_dump_detail(struct smb_hdr *);
+ void cifs_dump_mids(struct TCP_Server_Info *);
 +#ifdef CONFIG_CIFS_SMB2
-+static void smb2_clear_stats(struct cifs_tcon *tcon)
-+{
-+	int i;
-+
-+	atomic_set(&tcon->num_smbs_sent, 0);
-+	for (i = 0; i < NUMBER_OF_SMB2_COMMANDS; i++) {
-+		atomic_set(&tcon->stats.smb2_stats.smb2_com_sent[i], 0);
-+		atomic_set(&tcon->stats.smb2_stats.smb2_com_fail[i], 0);
-+	}
-+}
++void smb2_dump_detail(struct smb2_hdr *);
++#endif /* CONFIG_CIFS_SMB2 */
+ #else
+ #define DBG2 0
+ #endif
+@@ -37,12 +40,15 @@ void dump_smb(struct smb_hdr *, int);
+ #define CIFS_RC		0x02
+ #define CIFS_TIMER	0x04
+ 
++#ifdef CONFIG_CIFS_SMB2
++void dump_smb2(struct smb2_hdr *, int);
 +#endif /* CONFIG_CIFS_SMB2 */
 +
-+static void clear_cifs_stats(struct cifs_tcon *tcon)
-+{
-+	atomic_set(&tcon->num_smbs_sent, 0);
-+
-+#ifdef CONFIG_CIFS_SMB2
-+	if (tcon->ses->server->is_smb2) {
-+		smb2_clear_stats(tcon);
-+		return;
-+	}
-+#endif /* CONFIG_CIFS_SMB2 */
-+
-+	/* cifs specific statistics, not applicable to smb2 sessions */
-+	atomic_set(&tcon->stats.cifs_stats.num_writes, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_reads, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_flushes, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_oplock_brks, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_opens, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_posixopens, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_posixmkdirs, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_closes, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_deletes, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_mkdirs, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_rmdirs, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_renames, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_t2renames, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_ffirst, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_fnext, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_fclose, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_hardlinks, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_symlinks, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_locks, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_acl_get, 0);
-+	atomic_set(&tcon->stats.cifs_stats.num_acl_set, 0);
-+}
-+
- static ssize_t cifs_stats_proc_write(struct file *file,
- 		const char __user *buffer, size_t count, loff_t *ppos)
- {
-@@ -279,25 +328,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 					tcon = list_entry(tmp3,
- 							  struct cifs_tcon,
- 							  tcon_list);
--					atomic_set(&tcon->num_smbs_sent, 0);
--					atomic_set(&tcon->num_writes, 0);
--					atomic_set(&tcon->num_reads, 0);
--					atomic_set(&tcon->num_oplock_brks, 0);
--					atomic_set(&tcon->num_opens, 0);
--					atomic_set(&tcon->num_posixopens, 0);
--					atomic_set(&tcon->num_posixmkdirs, 0);
--					atomic_set(&tcon->num_closes, 0);
--					atomic_set(&tcon->num_deletes, 0);
--					atomic_set(&tcon->num_mkdirs, 0);
--					atomic_set(&tcon->num_rmdirs, 0);
--					atomic_set(&tcon->num_renames, 0);
--					atomic_set(&tcon->num_t2renames, 0);
--					atomic_set(&tcon->num_ffirst, 0);
--					atomic_set(&tcon->num_fnext, 0);
--					atomic_set(&tcon->num_fclose, 0);
--					atomic_set(&tcon->num_hardlinks, 0);
--					atomic_set(&tcon->num_symlinks, 0);
--					atomic_set(&tcon->num_locks, 0);
-+					clear_cifs_stats(tcon);
- 				}
- 			}
- 		}
-@@ -307,6 +338,44 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 	return count;
- }
+ /*
+  *	debug ON
+  *	--------
+  */
+ #ifdef CIFS_DEBUG
+-
+ /* information message: e.g., configuration, major event */
+ extern int cifsFYI;
+ #define cifsfyi(fmt, arg...)						\
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 500d658..8e6dd9a 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -1,7 +1,7 @@
+ /*
+  *   fs/cifs/cifs_fs_sb.h
+  *
+- *   Copyright (c) International Business Machines  Corp., 2002,2004
++ *   Copyright (c) International Business Machines  Corp., 2002,2010
+  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *
+  *   This library is free software; you can redistribute it and/or modify
+@@ -24,10 +24,12 @@
  
-+static void cifs_stats_print(struct seq_file *m, struct cifs_tcon *tcon)
-+{
-+	if (tcon->need_reconnect)
-+		seq_puts(m, "\tDISCONNECTED ");
-+	seq_printf(m, "\nSMBs: %d Oplock Breaks: %d",
-+		atomic_read(&tcon->num_smbs_sent),
-+		atomic_read(&tcon->stats.cifs_stats.num_oplock_brks));
-+	seq_printf(m, "\nReads:  %d Bytes: %lld",
-+		atomic_read(&tcon->stats.cifs_stats.num_reads),
-+		(long long)(tcon->bytes_read));
-+	seq_printf(m, "\nWrites: %d Bytes: %lld",
-+		atomic_read(&tcon->stats.cifs_stats.num_writes),
-+		(long long)(tcon->bytes_written));
-+	seq_printf(m, "\nFlushes: %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_flushes));
-+	seq_printf(m, "\nLocks: %d HardLinks: %d Symlinks: %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_locks),
-+		atomic_read(&tcon->stats.cifs_stats.num_hardlinks),
-+		atomic_read(&tcon->stats.cifs_stats.num_symlinks));
-+	seq_printf(m, "\nOpens: %d Closes: %d Deletes: %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_opens),
-+		atomic_read(&tcon->stats.cifs_stats.num_closes),
-+		atomic_read(&tcon->stats.cifs_stats.num_deletes));
-+	seq_printf(m, "\nPosix Opens: %d Posix Mkdirs: %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_posixopens),
-+		atomic_read(&tcon->stats.cifs_stats.num_posixmkdirs));
-+	seq_printf(m, "\nMkdirs: %d Rmdirs: %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_mkdirs),
-+		atomic_read(&tcon->stats.cifs_stats.num_rmdirs));
-+	seq_printf(m, "\nRenames: %d T2 Renames %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_renames),
-+		atomic_read(&tcon->stats.cifs_stats.num_t2renames));
-+	seq_printf(m, "\nFindFirst: %d FNext %d FClose %d",
-+		atomic_read(&tcon->stats.cifs_stats.num_ffirst),
-+		atomic_read(&tcon->stats.cifs_stats.num_fnext),
-+		atomic_read(&tcon->stats.cifs_stats.num_fclose));
-+}
-+
- static int cifs_stats_proc_show(struct seq_file *m, void *v)
- {
- 	int i;
-@@ -354,44 +423,7 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 						  tcon_list);
- 				i++;
- 				seq_printf(m, "\n%d) %s", i, tcon->treeName);
--				if (tcon->need_reconnect)
--					seq_puts(m, "\tDISCONNECTED ");
--				seq_printf(m, "\nSMBs: %d Oplock Breaks: %d",
--					atomic_read(&tcon->num_smbs_sent),
--					atomic_read(&tcon->num_oplock_brks));
--				seq_printf(m, "\nReads:  %d Bytes: %lld",
--					atomic_read(&tcon->num_reads),
--					(long long)(tcon->bytes_read));
--				seq_printf(m, "\nWrites: %d Bytes: %lld",
--					atomic_read(&tcon->num_writes),
--					(long long)(tcon->bytes_written));
--				seq_printf(m, "\nFlushes: %d",
--					atomic_read(&tcon->num_flushes));
--				seq_printf(m, "\nLocks: %d HardLinks: %d "
--					      "Symlinks: %d",
--					atomic_read(&tcon->num_locks),
--					atomic_read(&tcon->num_hardlinks),
--					atomic_read(&tcon->num_symlinks));
--				seq_printf(m, "\nOpens: %d Closes: %d "
--					      "Deletes: %d",
--					atomic_read(&tcon->num_opens),
--					atomic_read(&tcon->num_closes),
--					atomic_read(&tcon->num_deletes));
--				seq_printf(m, "\nPosix Opens: %d "
--					      "Posix Mkdirs: %d",
--					atomic_read(&tcon->num_posixopens),
--					atomic_read(&tcon->num_posixmkdirs));
--				seq_printf(m, "\nMkdirs: %d Rmdirs: %d",
--					atomic_read(&tcon->num_mkdirs),
--					atomic_read(&tcon->num_rmdirs));
--				seq_printf(m, "\nRenames: %d T2 Renames %d",
--					atomic_read(&tcon->num_renames),
--					atomic_read(&tcon->num_t2renames));
--				seq_printf(m, "\nFindFirst: %d FNext %d "
--					      "FClose %d",
--					atomic_read(&tcon->num_ffirst),
--					atomic_read(&tcon->num_fnext),
--					atomic_read(&tcon->num_fclose));
-+				cifs_stats_print(m, tcon);
- 			}
- 		}
- 	}
+ #define CIFS_MOUNT_NO_PERM      1 /* do not do client vfs_perm check */
+ #define CIFS_MOUNT_SET_UID      2 /* set current's euid in create etc. */
++/* SERVER_INUM is always set for SMB2 */
+ #define CIFS_MOUNT_SERVER_INUM  4 /* inode numbers from uniqueid from server  */
+ #define CIFS_MOUNT_DIRECT_IO    8 /* do not write nor read through page cache */
+ #define CIFS_MOUNT_NO_XATTR     0x10  /* if set - disable xattr support       */
+ #define CIFS_MOUNT_MAP_SPECIAL_CHR 0x20 /* remap illegal chars in filenames   */
++/* The following two are not supported for SMB2 */
+ #define CIFS_MOUNT_POSIX_PATHS  0x40  /* Negotiate posix pathnames if possible*/
+ #define CIFS_MOUNT_UNX_EMUL     0x80  /* Network compat with SFUnix emulation */
+ #define CIFS_MOUNT_NO_BRL       0x100 /* No sending byte range locks to srv   */
+diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+index 5c902c7..ba9a9db 100644
+--- a/fs/cifs/cifsacl.h
++++ b/fs/cifs/cifsacl.h
+@@ -1,7 +1,7 @@
+ /*
+  *   fs/cifs/cifsacl.h
+  *
+- *   Copyright (c) International Business Machines  Corp., 2007
++ *   Copyright (c) International Business Machines  Corp., 2007,2010
+  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *
+  *   This library is free software; you can redistribute it and/or modify
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 4c38b04..6dfc7ef 100644
+index 8238aa1..4c38b04 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -292,6 +292,7 @@ struct TCP_Server_Info {
- 	bool	sec_kerberos;		/* supports plain Kerberos */
- 	bool	sec_mskerberos;		/* supports legacy MS Kerberos */
- 	bool	large_buf;		/* is current buffer large? */
-+	bool	is_smb2;		/* smb2 not cifs protocol negotiated */
- 	struct delayed_work	echo; /* echo ping workqueue job */
- 	struct kvec *iov;	/* reusable kvec array for receives */
- 	unsigned int nr_iov;	/* number of kvecs in array */
-@@ -392,6 +393,9 @@ struct cifs_ses {
+@@ -1,7 +1,7 @@
+ /*
+  *   fs/cifs/cifsglob.h
+  *
+- *   Copyright (C) International Business Machines  Corp., 2002,2008
++ *   Copyright (C) International Business Machines  Corp., 2002,2011
+  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+  *              Jeremy Allison (jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
+  *
+@@ -259,7 +259,7 @@ struct TCP_Server_Info {
+ 	struct mutex srv_mutex;
+ 	struct task_struct *tsk;
+ 	char server_GUID[16];
+-	char sec_mode;
++	__u16 sec_mode;
+ 	bool session_estab; /* mark when very first sess is established */
+ 	u16 dialect; /* dialect index that server chose */
+ 	enum securityEnum secType;
+@@ -305,6 +305,18 @@ struct TCP_Server_Info {
+ 	atomic_t in_send; /* requests trying to send */
+ 	atomic_t num_waiters;   /* blocked waiting to get in sendrecv */
+ #endif
++#ifdef CONFIG_CIFS_SMB2
++	wait_queue_head_t read_q; /* used by readpages */
++	atomic_t active_readpage_req; /* used by readpages */
++	atomic_t resp_rdy; /* used by readpages and demultiplex */
++	__le16 smb2_dialect_revision; /* SMB2.0 implemented, 2.1 recognized */
++	struct task_struct *observe;
++	char smb2_crypt_key[CIFS_CRYPTO_KEY_SIZE]; /* BB can we use cifs key */
++	__u64 current_smb2_mid;         /* multiplex id - rotating counter */
++	__u8  speed;  /* helps us identify if this is a slow link */
++	unsigned int	max_read;
++	unsigned int	max_write;
++#endif /* CONFIG_CIFS_SMB2 */
+ };
+ 
+ /*
+@@ -354,7 +366,7 @@ struct cifs_ses {
+ 	char *serverOS;		/* name of operating system underlying server */
+ 	char *serverNOS;	/* name of network operating system of server */
+ 	char *serverDomain;	/* security realm of server */
+-	int Suid;		/* remote smb uid  */
++	__u64 Suid;		/* remote smb uid  */
+ 	uid_t linux_uid;        /* overriding owner of files on the mount */
+ 	uid_t cred_uid;		/* owner of credentials */
+ 	int capabilities;
+@@ -367,6 +379,9 @@ struct cifs_ses {
+ 	struct session_key auth_key;
+ 	struct ntlmssp_auth *ntlmssp; /* ciphertext, flags, server challenge */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
++#ifdef CONFIG_CIFS_SMB2
++	__u16 session_flags;
++#endif /* CONFIG_CIFS_SMB2 */
+ };
+ /* no more than one of the following three session flags may be set */
+ #define CIFS_SES_NT4 1
+@@ -376,6 +391,7 @@ struct cifs_ses {
+    which do not negotiate NTLM or POSIX dialects, but instead
     negotiate one of the older LANMAN dialects */
  #define CIFS_SES_LANMAN 8
- #define CIFS_SES_SMB2 16
-+
-+#define NUMBER_OF_SMB2_COMMANDS 0x0013
-+
++#define CIFS_SES_SMB2 16
  /*
   * there is one of these for each connection to a resource on a particular
   * session
-@@ -409,27 +413,37 @@ struct cifs_tcon {
+@@ -388,7 +404,7 @@ struct cifs_tcon {
+ 	char treeName[MAX_TREE_SIZE + 1]; /* UNC name of resource in ASCII */
+ 	char *nativeFileSystem;
+ 	char *password;		/* for share-level security */
+-	__u16 tid;		/* The 2 byte tree id */
++	__u32 tid;		/* The 4 byte tree id */
+ 	__u16 Flags;		/* optional support bits */
  	enum statusEnum tidStatus;
  #ifdef CONFIG_CIFS_STATS
- 	atomic_t num_smbs_sent;
--	atomic_t num_writes;
--	atomic_t num_reads;
--	atomic_t num_flushes;
--	atomic_t num_oplock_brks;
--	atomic_t num_opens;
--	atomic_t num_closes;
--	atomic_t num_deletes;
--	atomic_t num_mkdirs;
--	atomic_t num_posixopens;
--	atomic_t num_posixmkdirs;
--	atomic_t num_rmdirs;
--	atomic_t num_renames;
--	atomic_t num_t2renames;
--	atomic_t num_ffirst;
--	atomic_t num_fnext;
--	atomic_t num_fclose;
--	atomic_t num_hardlinks;
--	atomic_t num_symlinks;
--	atomic_t num_locks;
--	atomic_t num_acl_get;
--	atomic_t num_acl_set;
-+	union {
-+		struct {
-+			atomic_t num_writes;
-+			atomic_t num_reads;
-+			atomic_t num_flushes;
-+			atomic_t num_oplock_brks;
-+			atomic_t num_opens;
-+			atomic_t num_closes;
-+			atomic_t num_deletes;
-+			atomic_t num_mkdirs;
-+			atomic_t num_posixopens;
-+			atomic_t num_posixmkdirs;
-+			atomic_t num_rmdirs;
-+			atomic_t num_renames;
-+			atomic_t num_t2renames;
-+			atomic_t num_ffirst;
-+			atomic_t num_fnext;
-+			atomic_t num_fclose;
-+			atomic_t num_hardlinks;
-+			atomic_t num_symlinks;
-+			atomic_t num_locks;
-+			atomic_t num_acl_get;
-+			atomic_t num_acl_set;
-+		} cifs_stats;
+@@ -436,6 +452,7 @@ struct cifs_tcon {
+ 	FILE_SYSTEM_ATTRIBUTE_INFO fsAttrInfo; /* ok if fs name truncated */
+ 	FILE_SYSTEM_UNIX_INFO fsUnixInfo;
+ 	bool ipc:1;		/* set if connection to IPC$ eg for RPC/PIPES */
++	bool print:1;		/* set if connection to printer share */
+ 	bool retry:1;
+ 	bool nocase:1;
+ 	bool seal:1;      /* transport encryption for this mounted share */
+@@ -444,6 +461,15 @@ struct cifs_tcon {
+ 	bool local_lease:1; /* check leases (only) on local system not remote */
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
++	bool bad_network_name:1;
 +#ifdef CONFIG_CIFS_SMB2
-+		struct {
-+			atomic_t smb2_com_sent[NUMBER_OF_SMB2_COMMANDS];
-+			atomic_t smb2_com_fail[NUMBER_OF_SMB2_COMMANDS];
-+		} smb2_stats;
-+#endif /* CONFIG CIFS_SMB2 */
-+	} stats;
- #ifdef CONFIG_CIFS_STATS2
- 	unsigned long long time_writes;
- 	unsigned long long time_reads;
++	__u32 capabilities;
++	__u32 share_flags;
++	__u32 maximal_access;
++	__u32 vol_serial_number;
++	__le64 vol_create_time;
++	struct mutex tcon_mutex;
++#endif /* CONFIG_CIFS_SMB2 */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	u64 resource_id;		/* server resource id */
+ 	struct fscache_cookie *fscache;	/* cookie for share */
+@@ -802,6 +828,7 @@ struct cifs_fattr {
+ 	struct timespec	cf_atime;
+ 	struct timespec	cf_mtime;
+ 	struct timespec	cf_ctime;
++	u32		ea_size;
+ };
+ 
+ static inline void free_dfs_info_param(struct dfs_info3_param *param)
+@@ -833,6 +860,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
+ #define   MID_RETRY_NEEDED      8 /* session closed while this request out */
+ #define   MID_RESPONSE_MALFORMED 0x10
+ #define   MID_SHUTDOWN		 0x20
++#define   MID_NO_RESPONSE_NEEDED 0x40
+ 
+ /* Types of response buffer returned from SendReceive2 */
+ #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
+@@ -841,6 +869,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
+ #define   CIFS_IOVEC            4    /* array of response buffers */
+ 
+ /* Type of Request to SendReceive2 */
++#define   CIFS_STD_OP		0
+ #define   CIFS_BLOCKING_OP      1    /* operation can block */
+ #define   CIFS_ASYNC_OP         2    /* do not wait for response */
+ #define   CIFS_TIMEOUT_MASK 0x003    /* only one of above set in req */
+@@ -891,13 +920,6 @@ require use of the stronger protocol */
+ #define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
+ #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
+ #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
+-/*
+- *****************************************************************
+- * All constants go here
+- *****************************************************************
+- */
+-
+-#define UID_HASH (16)
+ 
+ /*
+  * Note that ONE module should define _DECLARE_GLOBALS_HERE to cause the
+diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+index 3c6ef34..47c8d81 100644
+--- a/fs/cifs/cifspdu.h
++++ b/fs/cifs/cifspdu.h
+@@ -428,6 +428,8 @@ struct smb_hdr {
+ 	__u8 WordCount;
+ } __attribute__((packed));
+ 
++struct smb2_hdr;
++
+ /* given a pointer to an smb_hdr, retrieve a void pointer to the ByteCount */
+ static inline void *
+ BCC(struct smb_hdr *smb)
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index ea7b813..4e11051 100644
+index 6600aa2..ea7b813 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -867,7 +867,7 @@ PsxDelete:
- 		cFYI(1, "Posix delete returned %d", rc);
- 	cifs_buf_release(pSMB);
- 
--	cifs_stats_inc(&tcon->num_deletes);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_deletes);
- 
- 	if (rc == -EAGAIN)
- 		goto PsxDelete;
-@@ -909,7 +909,7 @@ DelFileRetry:
- 	pSMB->ByteCount = cpu_to_le16(name_len + 1);
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_deletes);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_deletes);
- 	if (rc)
- 		cFYI(1, "Error in RMFile = %d", rc);
- 
-@@ -953,7 +953,7 @@ RmDirRetry:
- 	pSMB->ByteCount = cpu_to_le16(name_len + 1);
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_rmdirs);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_rmdirs);
- 	if (rc)
- 		cFYI(1, "Error in RMDir = %d", rc);
- 
-@@ -996,7 +996,7 @@ MkDirRetry:
- 	pSMB->ByteCount = cpu_to_le16(name_len + 1);
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_mkdirs);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_mkdirs);
- 	if (rc)
- 		cFYI(1, "Error in Mkdir = %d", rc);
- 
-@@ -1118,9 +1118,9 @@ psx_create_err:
- 	cifs_buf_release(pSMB);
- 
- 	if (posix_flags & SMB_O_DIRECTORY)
--		cifs_stats_inc(&tcon->num_posixmkdirs);
-+		cifs_stats_inc(&tcon->stats.cifs_stats.num_posixmkdirs);
- 	else
--		cifs_stats_inc(&tcon->num_posixopens);
-+		cifs_stats_inc(&tcon->stats.cifs_stats.num_posixopens);
- 
- 	if (rc == -EAGAIN)
- 		goto PsxCreat;
-@@ -1241,7 +1241,7 @@ OldOpenRetry:
- 	/* long_op set to 1 to allow for oplock break timeouts */
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			(struct smb_hdr *)pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_opens);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_opens);
- 	if (rc) {
- 		cFYI(1, "Error in Open = %d", rc);
- 	} else {
-@@ -1354,7 +1354,7 @@ openRetry:
- 	/* long_op set to 1 to allow for oplock break timeouts */
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			(struct smb_hdr *)pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_opens);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_opens);
- 	if (rc) {
- 		cFYI(1, "Error in Open = %d", rc);
- 	} else {
-@@ -1728,7 +1728,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
- 			     rdata, false);
- 
- 	if (rc == 0)
--		cifs_stats_inc(&tcon->num_reads);
-+		cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
- 
- 	cifs_small_buf_release(smb);
- 	return rc;
-@@ -1796,7 +1796,7 @@ CIFSSMBRead(const int xid, struct cifs_io_parms *io_parms, unsigned int *nbytes,
- 	iov[0].iov_len = be32_to_cpu(pSMB->hdr.smb_buf_length) + 4;
- 	rc = SendReceive2(xid, tcon->ses, iov, 1 /* num iovecs */,
- 			 &resp_buf_type, CIFS_LOG_ERROR);
--	cifs_stats_inc(&tcon->num_reads);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
- 	pSMBr = (READ_RSP *)iov[0].iov_base;
- 	if (rc) {
- 		cERROR(1, "Send error in read = %d", rc);
-@@ -1948,7 +1948,7 @@ CIFSSMBWrite(const int xid, struct cifs_io_parms *io_parms,
- 
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, long_op);
--	cifs_stats_inc(&tcon->num_writes);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
- 	if (rc) {
- 		cFYI(1, "Send error in write = %d", rc);
- 	} else {
-@@ -2197,7 +2197,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
- 			     NULL, cifs_writev_callback, wdata, false);
- 
- 	if (rc == 0)
--		cifs_stats_inc(&tcon->num_writes);
-+		cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
- 	else
- 		kref_put(&wdata->refcount, cifs_writedata_release);
- 
-@@ -2287,7 +2287,7 @@ CIFSSMBWrite2(const int xid, struct cifs_io_parms *io_parms,
- 
- 	rc = SendReceive2(xid, tcon->ses, iov, n_vec + 1, &resp_buf_type,
- 			  long_op);
--	cifs_stats_inc(&tcon->num_writes);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
- 	if (rc) {
- 		cFYI(1, "Send error Write2 = %d", rc);
- 	} else if (resp_buf_type == 0) {
-@@ -2353,7 +2353,7 @@ int cifs_lockv(const int xid, struct cifs_tcon *tcon, const __u16 netfid,
- 	iov[1].iov_base = (char *)buf;
- 	iov[1].iov_len = (num_unlock + num_lock) * sizeof(LOCKING_ANDX_RANGE);
- 
--	cifs_stats_inc(&tcon->num_locks);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
- 	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, CIFS_NO_RESP);
- 	if (rc)
- 		cFYI(1, "Send error in cifs_lockv = %d", rc);
-@@ -2422,7 +2422,7 @@ CIFSSMBLock(const int xid, struct cifs_tcon *tcon,
- 				      timeout);
- 		/* SMB buffer freed by function above */
- 	}
--	cifs_stats_inc(&tcon->num_locks);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
- 	if (rc)
- 		cFYI(1, "Send error in Lock = %d", rc);
- 
-@@ -2587,7 +2587,7 @@ CIFSSMBClose(const int xid, struct cifs_tcon *tcon, int smb_file_id)
- 	pSMB->LastWriteTime = 0xFFFFFFFF;
- 	pSMB->ByteCount = 0;
- 	rc = SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr *) pSMB, 0);
--	cifs_stats_inc(&tcon->num_closes);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_closes);
- 	if (rc) {
- 		if (rc != -EINTR) {
- 			/* EINTR is expected when user ctl-c to kill app */
-@@ -2616,7 +2616,7 @@ CIFSSMBFlush(const int xid, struct cifs_tcon *tcon, int smb_file_id)
- 	pSMB->FileID = (__u16) smb_file_id;
- 	pSMB->ByteCount = 0;
- 	rc = SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr *) pSMB, 0);
--	cifs_stats_inc(&tcon->num_flushes);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_flushes);
- 	if (rc)
- 		cERROR(1, "Send error in Flush = %d", rc);
- 
-@@ -2679,7 +2679,7 @@ renameRetry:
- 
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_renames);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_renames);
- 	if (rc)
- 		cFYI(1, "Send error in rename = %d", rc);
- 
-@@ -2758,7 +2758,7 @@ int CIFSSMBRenameOpenFile(const int xid, struct cifs_tcon *pTcon,
- 	pSMB->ByteCount = cpu_to_le16(byte_count);
- 	rc = SendReceive(xid, pTcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&pTcon->num_t2renames);
-+	cifs_stats_inc(&pTcon->stats.cifs_stats.num_t2renames);
- 	if (rc)
- 		cFYI(1, "Send error in Rename (by file handle) = %d", rc);
- 
-@@ -2915,7 +2915,7 @@ createSymLinkRetry:
- 	pSMB->ByteCount = cpu_to_le16(byte_count);
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_symlinks);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_symlinks);
- 	if (rc)
- 		cFYI(1, "Send error in SetPathInfo create symlink = %d", rc);
- 
-@@ -3001,7 +3001,7 @@ createHardLinkRetry:
- 	pSMB->ByteCount = cpu_to_le16(byte_count);
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_hardlinks);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_hardlinks);
- 	if (rc)
- 		cFYI(1, "Send error in SetPathInfo (hard link) = %d", rc);
- 
-@@ -3073,7 +3073,7 @@ winCreateHardLinkRetry:
- 
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_hardlinks);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_hardlinks);
- 	if (rc)
- 		cFYI(1, "Send error in hard link (NT rename) = %d", rc);
- 
-@@ -3490,7 +3490,7 @@ queryAclRetry:
- 
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 		(struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_acl_get);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_acl_get);
- 	if (rc) {
- 		cFYI(1, "Send error in Query POSIX ACL = %d", rc);
- 	} else {
-@@ -3801,7 +3801,7 @@ CIFSSMBGetCIFSACL(const int xid, struct cifs_tcon *tcon, __u16 fid,
- 
- 	rc = SendReceive2(xid, tcon->ses, iov, 1 /* num iovec */, &buf_type,
- 			 0);
--	cifs_stats_inc(&tcon->num_acl_get);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_acl_get);
- 	if (rc) {
- 		cFYI(1, "Send error in QuerySecDesc = %d", rc);
- 	} else {                /* decode response */
-@@ -4405,7 +4405,7 @@ findFirstRetry:
- 
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_ffirst);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_ffirst);
- 
- 	if (rc) {/* BB add logic to retry regular search if Unix search
- 			rejected unexpectedly by server */
-@@ -4532,7 +4532,7 @@ int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
- 
- 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
- 			(struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	cifs_stats_inc(&tcon->num_fnext);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_fnext);
- 	if (rc) {
- 		if (rc == -EBADF) {
- 			psrch_inf->endOfSearch = true;
-@@ -4623,7 +4623,7 @@ CIFSFindClose(const int xid, struct cifs_tcon *tcon,
- 	if (rc)
- 		cERROR(1, "Send error in FindClose = %d", rc);
- 
--	cifs_stats_inc(&tcon->num_fclose);
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_fclose);
- 
- 	/* Since session is dead, search handle closed on server already */
- 	if (rc == -EAGAIN)
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 703ef5c..1934575 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -571,7 +571,7 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
- 			if (tcon->tid != buf->Tid)
- 				continue;
- 
--			cifs_stats_inc(&tcon->num_oplock_brks);
-+			cifs_stats_inc(&tcon->stats.cifs_stats.num_oplock_brks);
- 			spin_lock(&cifs_file_list_lock);
- 			list_for_each(tmp2, &tcon->openFileList) {
- 				netfile = list_entry(tmp2, struct cifsFileInfo,
+@@ -457,7 +457,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 			rc = -EOPNOTSUPP;
+ 			goto neg_err_exit;
+ 		}
+-		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
++		server->sec_mode = le16_to_cpu(rsp->SecurityMode);
+ 		server->maxReq = le16_to_cpu(rsp->MaxMpxCount);
+ 		server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
+ 		server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index c7d80e2..5b7c94f 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -895,7 +895,7 @@ ssetup_ntlmssp_authenticate:
+ 	if (action & GUEST_LOGIN)
+ 		cFYI(1, "Guest login"); /* BB mark SesInfo struct? */
+ 	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
+-	cFYI(1, "UID = %d ", ses->Suid);
++	cFYI(1, "UID = %llu ", ses->Suid);
+ 	/* response can have either 3 or 4 word count - Samba sends 3 */
+ 	/* and lanman response is 3 */
+ 	bytes_remaining = get_bcc(smb_buf);
 -- 
 1.7.1
