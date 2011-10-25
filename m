@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 04/53] CIFS: Do not try to dump cifs mids from smb2 sessions
-Date: Tue, 25 Oct 2011 10:11:37 +0400
-Message-ID: <1319523146-2859-5-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 05/53] CIFS: wait_for_free_request needs to wait on credits returned by server (for SMB2)
+Date: Tue, 25 Oct 2011 10:11:38 +0400
+Message-ID: <1319523146-2859-6-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
 Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,241 +12,110 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-Convert the debug routines in cifs_debug.c to recognize
-smb2 sessions and not try to dump invalid information on
-pending requests.  Check the socket type to see if
-smb2.  Move the printing of cifs specific debug information
-to a helper routine to make it clearer which type
-of information we are printing.
+wait_for_free_request is called to ensure that we don't have more than the
+configured maximum of requests in flight on the wire (for cifs), but for SMB2,
+the number of requests that can be in flight varies dynamically (the client
+may request that the server grant more "credits" in a request, and each
+request uses at least one credit).   Instead of migrating over the original
+smb2_wait_for_free_request function, simply add a check in cifs's original
+wait_for_free_request for the is_smb2 case to make sure that we don't go
+beyond the number of allocated "credits" (ie those that remain from those
+the server has allocated for this tcp session).  Otherwise the logic is unchanged
+(other than to make it extern so that the next function to be added, smb2_sendrcv2
+in  smbtransport.c can call it - smb2_sendrcv2 will be migrated over in the next patch).
 
-cifs and smb2 both use the struct TCP_Server_Info to include information about
-the tcp socket connection to the server.  The list of pending requests
-is one of the "per-socket" pieces of information. smb2 and cifs
-"mid" queue entries (multiplexed network requests, the active requests
-on the wire) differ. smb2 has async support in the protocol,
-as well as operation compounding and larger sizes (than cifs) for
-various fields related to pending requests) so it is important
-not to try to use the pending_mid_q for smb2 tcp sessions
-as if it were a pending cifs request.  Most usage of the
-pending_mid_q is safe because it is in either cifs or smb2
-specific code, but this patch fixes the dumping of debug
-data so we don't dump cifs debug data for an smb2 session.
+Note that smb2 servers will typically allow many more requests in flight at one time
+than cifs servers (which usually default to only 50) and can adjust this as needed.
+This should provide significant performance benefit in some workloads (ie smb2
+in many cases will get more parallelism than cifs and some other protocols
+since some artificially constrain the maximum number of requests).
 
 Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifs_debug.c |  179 +++++++++++++++++++++++++++-----------------------
- 1 files changed, 98 insertions(+), 81 deletions(-)
+ fs/cifs/cifsglob.h  |    1 +
+ fs/cifs/cifsproto.h |    1 +
+ fs/cifs/transport.c |   22 +++++++++++++++++++---
+ 3 files changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 8ccdb15..add9975 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -72,7 +72,7 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- 	struct list_head *tmp;
- 	struct mid_q_entry *mid_entry;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 179b784..b440329 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -311,6 +311,7 @@ struct TCP_Server_Info {
+ 	wait_queue_head_t read_q; /* used by readpages */
+ 	atomic_t active_readpage_req; /* used by readpages */
+ 	atomic_t resp_rdy; /* used by readpages and demultiplex */
++	atomic_t credits;  /* send no more simultaneous requests than this */
+ 	__le16 smb2_dialect_revision; /* SMB2.0 implemented, 2.1 recognized */
+ 	struct task_struct *observe;
+ 	char smb2_crypt_key[CIFS_CRYPTO_KEY_SIZE]; /* BB can we use cifs key */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index ef4f631..823597a 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -68,6 +68,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
++extern int wait_for_free_request(struct TCP_Server_Info *sv, const int long_op);
+ extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 			   unsigned int nvec, mid_receive_t *receive,
+ 			   mid_callback_t *callback, void *cbdata,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0cc9584..25d04df 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -254,7 +254,7 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
+ }
  
--	if (server == NULL)
-+	if ((server == NULL) || (server->is_smb2))
- 		return;
- 
- 	cERROR(1, "Dump pending requests:");
-@@ -105,16 +105,105 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- #endif /* CONFIG_CIFS_DEBUG2 */
- 
- #ifdef CONFIG_PROC_FS
--static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-+
-+static void dump_smb2_debug_info(int i, struct seq_file *m,
-+				struct TCP_Server_Info *server)
+-static int wait_for_free_request(struct TCP_Server_Info *server,
++int wait_for_free_request(struct TCP_Server_Info *server,
+ 				 const int long_op)
  {
--	struct list_head *tmp1, *tmp2, *tmp3;
-+	seq_printf(m, "dumping debug information for smb2 not supported yet\n");
-+}
-+
-+static void dump_cifs_debug_info(int i, struct seq_file *m,
-+				struct TCP_Server_Info *server)
-+{
-+	struct list_head *tmp2, *tmp3;
- 	struct mid_q_entry *mid_entry;
--	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
--	int i, j;
-+	int j;
- 	__u32 dev_type;
+ 	if (long_op == CIFS_ASYNC_OP) {
+@@ -265,7 +265,8 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
  
-+
-+	list_for_each(tmp2, &server->smb_ses_list) {
-+		ses = list_entry(tmp2, struct cifs_ses, smb_ses_list);
-+		if ((ses->serverDomain == NULL) || (ses->serverOS == NULL) ||
-+			(ses->serverNOS == NULL)) {
-+			seq_printf(m, "\n%d) entry for %s not fully "
-+				   "displayed\n\t", i, ses->serverName);
-+		} else {
-+			seq_printf(m,
-+				"\n%d) Name: %s  Domain: %s Uses: %d OS:"
-+				" %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
-+				" session status: %d\t",
-+				i, ses->serverName, ses->serverDomain,
-+				ses->ses_count, ses->serverOS, ses->serverNOS,
-+				ses->capabilities, ses->status);
-+		}
-+		seq_printf(m, "TCP status: %d\n\tLocal Users To "
-+			      "Server: %d SecMode: 0x%x Req On Wire: %d",
-+				server->tcpStatus, server->srv_count,
-+				server->sec_mode,
-+				atomic_read(&server->inFlight));
-+
-+#ifdef CONFIG_CIFS_STATS2
-+		seq_printf(m, " In Send: %d In MaxReq Wait: %d",
-+				atomic_read(&server->in_send),
-+				atomic_read(&server->num_waiters));
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
++		if ((server->is_smb2 == false) &&
++		    atomic_read(&server->inFlight) >= cifs_max_pending) {
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_num_waiters_inc(server);
+ 			wait_event(server->request_q,
+@@ -273,6 +274,16 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
+ 				     < cifs_max_pending);
+ 			cifs_num_waiters_dec(server);
+ 			spin_lock(&GlobalMid_Lock);
++#ifdef CONFIG_CIFS_SMB2
++		} else if (server->is_smb2 &&
++			  (atomic_read(&server->credits) < 1)) {
++			spin_unlock(&GlobalMid_Lock);
++			cifs_num_waiters_inc(server);
++			wait_event(server->request_q,
++				   atomic_read(&server->credits) > 0);
++			cifs_num_waiters_dec(server);
++			spin_lock(&GlobalMid_Lock);
++#endif /* CONFIG_CIFS_SMB2 */
+ 		} else {
+ 			if (server->tcpStatus == CifsExiting) {
+ 				spin_unlock(&GlobalMid_Lock);
+@@ -283,8 +294,13 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
+ 			   as they are allowed to block on server */
+ 
+ 			/* update # of requests on the wire to server */
+-			if (long_op != CIFS_BLOCKING_OP)
++			if (server->is_smb2 == false &&
++			    long_op != CIFS_BLOCKING_OP)
+ 				atomic_inc(&server->inFlight);
++#ifdef CONFIG_CIFS_SMB2
++			else if (server->is_smb2)
++				atomic_dec(&server->credits);
 +#endif
-+
-+		seq_puts(m, "\n\tShares:");
-+		j = 0;
-+		list_for_each(tmp3, &ses->tcon_list) {
-+			tcon = list_entry(tmp3, struct cifs_tcon, tcon_list);
-+			++j;
-+			dev_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
-+			seq_printf(m, "\n\t%d) %s Mounts: %d ", j,
-+				   tcon->treeName, tcon->tc_count);
-+			if (tcon->nativeFileSystem) {
-+				seq_printf(m, "Type: %s ",
-+					   tcon->nativeFileSystem);
-+			}
-+			seq_printf(m, "DevInfo: 0x%x Attributes: 0x%x"
-+				"\nPathComponentMax: %d Status: 0x%d",
-+				le32_to_cpu(
-+					 tcon->fsDevInfo.DeviceCharacteristics),
-+				le32_to_cpu(tcon->fsAttrInfo.Attributes),
-+				le32_to_cpu(
-+				   tcon->fsAttrInfo.MaxPathNameComponentLength),
-+				tcon->tidStatus);
-+			if (dev_type == FILE_DEVICE_DISK)
-+				seq_puts(m, " type: DISK ");
-+			else if (dev_type == FILE_DEVICE_CD_ROM)
-+				seq_puts(m, " type: CDROM ");
-+			else
-+				seq_printf(m, " type: %d ", dev_type);
-+
-+			if (tcon->need_reconnect)
-+				seq_puts(m, "\tDISCONNECTED ");
-+			seq_putc(m, '\n');
-+		}
-+
-+		seq_puts(m, "\n\tMIDs:\n");
-+
-+		spin_lock(&GlobalMid_Lock);
-+		list_for_each(tmp3, &server->pending_mid_q) {
-+			mid_entry = list_entry(tmp3, struct mid_q_entry, qhead);
-+			seq_printf(m, "\tState: %d com: %d pid:"
-+					" %d cbdata: %p mid %d\n",
-+					mid_entry->midState,
-+					(int)mid_entry->command, mid_entry->pid,
-+					mid_entry->callback_data,
-+					mid_entry->mid);
-+		}
-+		spin_unlock(&GlobalMid_Lock);
-+	}
-+}
-+
-+static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-+{
-+	struct list_head *tmp1;
-+	struct TCP_Server_Info *server;
-+	int i;
-+
- 	seq_puts(m,
- 		    "Display Internal CIFS Data Structures for Debugging\n"
- 		    "---------------------------------------------------\n");
-@@ -151,82 +240,10 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 		server = list_entry(tmp1, struct TCP_Server_Info,
- 				    tcp_ses_list);
- 		i++;
--		list_for_each(tmp2, &server->smb_ses_list) {
--			ses = list_entry(tmp2, struct cifs_ses,
--					 smb_ses_list);
--			if ((ses->serverDomain == NULL) ||
--				(ses->serverOS == NULL) ||
--				(ses->serverNOS == NULL)) {
--				seq_printf(m, "\n%d) entry for %s not fully "
--					   "displayed\n\t", i, ses->serverName);
--			} else {
--				seq_printf(m,
--				    "\n%d) Name: %s  Domain: %s Uses: %d OS:"
--				    " %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
--				    " session status: %d\t",
--				i, ses->serverName, ses->serverDomain,
--				ses->ses_count, ses->serverOS, ses->serverNOS,
--				ses->capabilities, ses->status);
--			}
--			seq_printf(m, "TCP status: %d\n\tLocal Users To "
--				   "Server: %d SecMode: 0x%x Req On Wire: %d",
--				   server->tcpStatus, server->srv_count,
--				   server->sec_mode,
--				   atomic_read(&server->inFlight));
--
--#ifdef CONFIG_CIFS_STATS2
--			seq_printf(m, " In Send: %d In MaxReq Wait: %d",
--				atomic_read(&server->in_send),
--				atomic_read(&server->num_waiters));
--#endif
--
--			seq_puts(m, "\n\tShares:");
--			j = 0;
--			list_for_each(tmp3, &ses->tcon_list) {
--				tcon = list_entry(tmp3, struct cifs_tcon,
--						  tcon_list);
--				++j;
--				dev_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
--				seq_printf(m, "\n\t%d) %s Mounts: %d ", j,
--					   tcon->treeName, tcon->tc_count);
--				if (tcon->nativeFileSystem) {
--					seq_printf(m, "Type: %s ",
--						   tcon->nativeFileSystem);
--				}
--				seq_printf(m, "DevInfo: 0x%x Attributes: 0x%x"
--					"\nPathComponentMax: %d Status: 0x%d",
--					le32_to_cpu(tcon->fsDevInfo.DeviceCharacteristics),
--					le32_to_cpu(tcon->fsAttrInfo.Attributes),
--					le32_to_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength),
--					tcon->tidStatus);
--				if (dev_type == FILE_DEVICE_DISK)
--					seq_puts(m, " type: DISK ");
--				else if (dev_type == FILE_DEVICE_CD_ROM)
--					seq_puts(m, " type: CDROM ");
--				else
--					seq_printf(m, " type: %d ", dev_type);
--
--				if (tcon->need_reconnect)
--					seq_puts(m, "\tDISCONNECTED ");
--				seq_putc(m, '\n');
--			}
--
--			seq_puts(m, "\n\tMIDs:\n");
--
--			spin_lock(&GlobalMid_Lock);
--			list_for_each(tmp3, &server->pending_mid_q) {
--				mid_entry = list_entry(tmp3, struct mid_q_entry,
--					qhead);
--				seq_printf(m, "\tState: %d com: %d pid:"
--						" %d cbdata: %p mid %d\n",
--						mid_entry->midState,
--						(int)mid_entry->command,
--						mid_entry->pid,
--						mid_entry->callback_data,
--						mid_entry->mid);
--			}
--			spin_unlock(&GlobalMid_Lock);
--		}
-+		if (server->is_smb2)
-+			dump_smb2_debug_info(i, m, server);
-+		else
-+			dump_cifs_debug_info(i, m, server);
- 	}
- 	spin_unlock(&cifs_tcp_ses_lock);
- 	seq_putc(m, '\n');
+ 			spin_unlock(&GlobalMid_Lock);
+ 			break;
+ 		}
 -- 
 1.7.1
