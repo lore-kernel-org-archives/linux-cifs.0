@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 38/53] CIFS: Add SMB2 support for hardlink operation
-Date: Tue, 25 Oct 2011 10:12:11 +0400
-Message-ID: <1319523146-2859-39-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 39/53] CIFS: Add SMB2 support for flush operation
+Date: Tue, 25 Oct 2011 10:12:12 +0400
+Message-ID: <1319523146-2859-40-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -14,229 +14,223 @@ From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/smb2glob.h  |    3 +-
- fs/cifs/smb2inode.c |   12 ++++--
- fs/cifs/smb2link.c  |  108 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   |    2 +-
- fs/cifs/smb2proto.h |    6 +++
- 5 files changed, 125 insertions(+), 6 deletions(-)
- create mode 100644 fs/cifs/smb2link.c
+ fs/cifs/cifsglob.h  |    1 +
+ fs/cifs/cifsproto.h |    5 +++++
+ fs/cifs/file.c      |   34 +++++++++++++++++++++++++---------
+ fs/cifs/smb2file.c  |   30 ++++++++++++++++++++++++------
+ fs/cifs/smb2proto.h |    6 ++++--
+ 5 files changed, 59 insertions(+), 17 deletions(-)
 
-diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index 55d76ad..9e42f71 100644
---- a/fs/cifs/smb2glob.h
-+++ b/fs/cifs/smb2glob.h
-@@ -174,7 +174,7 @@ struct page_req {
- #define SMB2_MAX_REQ 256
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index d878378..b71c3fc 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -656,6 +656,7 @@ typedef int (iread_callback_t)(int, struct cifsFileInfo *,
+ typedef int (read_callback_t)(int, struct cifsFileInfo *,
+ 			      struct cifs_io_parms *, unsigned int *, char **,
+ 			      int *, unsigned int);
++typedef int (fsync_callback_t)(int, struct cifsFileInfo *);
  
- /* Identifiers for functions that use the open, operation, close pattern
-- * in inode.c:open_op_close() */
-+ * in smb2inode.c:smb2_open_op_close() */
- #define SMB2_OP_SET_DELETE 1
- #define SMB2_OP_SET_INFO 2
- #define SMB2_OP_QUERY_INFO 3
-@@ -182,6 +182,7 @@ struct page_req {
- #define SMB2_OP_MKDIR 5
- #define SMB2_OP_RENAME 6
- #define SMB2_OP_DELETE 7
-+#define SMB2_OP_HARDLINK 8
+ /*
+  * Take a reference on the file private data. Must be called with
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index c0afafd..e99db0a 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -220,6 +220,11 @@ extern int is_dir_changed(struct file *file);
+ extern struct dentry *cifs_readdir_lookup(struct dentry *parent,
+ 					  struct qstr *name,
+ 					  struct cifs_fattr *fattr);
++extern int cifs_strict_fsync_generic(struct file *file, loff_t start,
++				     loff_t end, int datasync,
++				     fsync_callback_t *fsync_cb);
++extern int cifs_fsync_generic(struct file *file, loff_t start, loff_t end,
++			      int datasync, fsync_callback_t *fsync_cb);
+ void cifs_proc_init(void);
+ void cifs_proc_clean(void);
  
- /* Used when constructing chained read requests. */
- #define CHAINED_REQUEST 1
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index d48d78f..a5948b9 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -42,7 +42,7 @@ const struct inode_operations smb2_dir_inode_ops = {
- 	.lookup = cifs_lookup,
- 	.getattr = cifs_getattr,
- 	.unlink = smb2_unlink,
--	.link = cifs_hardlink,
-+	.link = smb2_hardlink,
- 	.mkdir = smb2_mkdir,
- 	.rmdir = smb2_rmdir,
- 	.rename = smb2_rename,
-@@ -140,8 +140,8 @@ void smb2_set_ops(struct inode *inode)
- 	}
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 22cf18b..2c9471c 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2044,12 +2044,17 @@ int cifs_write_end(struct file *file, struct address_space *mapping, loff_t pos,
+ 	return rc;
  }
  
--static int
--smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *srch_path,
-+int
-+smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *path,
- 		   __le32 desired_access, __le32 create_disposition,
- 		   __le32 file_attributes, __le32 create_options,
- 		   void *data, int command)
-@@ -149,7 +149,7 @@ smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *srch_path,
- 	int rc, tmprc = 0;
- 	u64 persist_fid, volatile_fid;
- 
--	rc = SMB2_open(xid, tcon, srch_path, &persist_fid, &volatile_fid,
-+	rc = SMB2_open(xid, tcon, path, &persist_fid, &volatile_fid,
- 		       desired_access, create_disposition, file_attributes,
- 		       create_options);
- 	if (rc)
-@@ -171,6 +171,10 @@ smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *srch_path,
- 		tmprc = SMB2_rename(xid, tcon, persist_fid, volatile_fid,
- 				    (__le16 *)data);
- 		break;
-+	case SMB2_OP_HARDLINK:
-+		tmprc = SMB2_set_hardlink(xid, tcon, persist_fid, volatile_fid,
-+					  (__le16 *)data);
-+		break;
- 	default:
- 		cERROR(1, "Invalid command");
- 		break;
-diff --git a/fs/cifs/smb2link.c b/fs/cifs/smb2link.c
-new file mode 100644
-index 0000000..abeec19
---- /dev/null
-+++ b/fs/cifs/smb2link.c
-@@ -0,0 +1,108 @@
-+/*
-+ *   fs/cifs/smb2link.c
-+ *
-+ *   Copyright (C) 2011
-+ *   Author(s): Pavel Shilovsky (piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org),
-+ *              Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+#include <linux/fs.h>
-+#include <linux/stat.h>
-+#include <linux/slab.h>
-+#include <linux/namei.h>
-+#include "cifsfs.h"
-+#include "cifspdu.h"
-+#include "cifsglob.h"
-+#include "cifsproto.h"
-+#include "cifs_debug.h"
-+#include "cifs_fs_sb.h"
-+#include "smb2glob.h"
-+#include "smb2proto.h"
-+
-+int
-+smb2_hardlink(struct dentry *old_file, struct inode *inode,
-+	      struct dentry *direntry)
+-int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
+-		      int datasync)
++static int
++cifs_fsync_cb(int xid, struct cifsFileInfo *cfile)
 +{
-+	int rc = -EACCES;
-+	int xid;
-+	__le16 *from_name = NULL;
-+	__le16 *to_name = NULL;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	struct cifsInodeInfo *cinode;
-+
-+	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink))
-+		return PTR_ERR(tlink);
-+	tcon = tlink_tcon(tlink);
-+
-+	xid = GetXid();
-+
-+	from_name = build_ucspath_from_dentry(old_file);
-+	to_name = build_ucspath_from_dentry(direntry);
-+	if ((from_name == NULL) || (to_name == NULL)) {
-+		rc = -ENOMEM;
-+		goto smb2_hl_exit;
-+	}
-+
-+	rc = smb2_open_op_close(xid, tcon, from_name, FILE_READ_ATTRIBUTES_LE,
-+				FILE_OPEN_LE, 0, 0, to_name, SMB2_OP_HARDLINK);
-+
-+	if ((rc == -EIO) || (rc == -EINVAL))
-+		rc = -EOPNOTSUPP;
-+
-+	d_drop(direntry);	/* force new lookup from server of target */
-+
-+	/*
-+	 * if source file is cached (oplocked) revalidate will not go to server
-+	 * until the file is closed or oplock broken so update nlinks locally.
-+	 */
-+	if (old_file->d_inode) {
-+		cinode = CIFS_I(old_file->d_inode);
-+		if (rc == 0) {
-+			old_file->d_inode->i_nlink++;
-+/* BB should we make this contingent on superblock flag NOATIME? */
-+/*			old_file->d_inode->i_ctime = CURRENT_TIME;*/
-+			/*
-+			 * parent dir timestamps will update from srv
-+			 * within a second, would it really be worth it
-+			 * to set the parent dir cifs inode time to zero
-+			 * to force revalidate (faster) for it too?
-+			 */
-+		}
-+		/*
-+		 * if not oplocked will force revalidate to get info
-+		 * on source file from srv.
-+		 */
-+		cinode->time = 0;
-+
-+		/*
-+		 * Will update parent dir timestamps from srv within a second.
-+		 * Would it really be worth it to set the parent dir (cifs
-+		 * inode) time field to zero to force revalidate on parent
-+		 * directory faster ie
-+			CIFS_I(inode)->time = 0;
-+		 */
-+	}
-+
-+smb2_hl_exit:
-+	kfree(from_name);
-+	kfree(to_name);
-+	FreeXid(xid);
-+	cifs_put_tlink(tlink);
-+	return rc;
++	return CIFSSMBFlush(xid, tlink_tcon(cfile->tlink), cfile->netfid);
 +}
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 5f91f5e..b349f3d 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1964,7 +1964,7 @@ set_delete_exit:
++
++int cifs_strict_fsync_generic(struct file *file, loff_t start, loff_t end,
++			      int datasync, fsync_callback_t *fsync_cb)
+ {
+ 	int xid;
+ 	int rc = 0;
+-	struct cifs_tcon *tcon;
+ 	struct cifsFileInfo *smbfile = file->private_data;
+ 	struct inode *inode = file->f_path.dentry->d_inode;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+@@ -2072,20 +2077,26 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
+ 		}
+ 	}
+ 
+-	tcon = tlink_tcon(smbfile->tlink);
+ 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+-		rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
++		rc = fsync_cb(xid, smbfile);
+ 
+ 	FreeXid(xid);
+ 	mutex_unlock(&inode->i_mutex);
+ 	return rc;
  }
  
- int SMB2_set_hardlink(const int xid, struct cifs_tcon *tcon,
--		    u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
-+		      u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
+-int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
++int
++cifs_strict_fsync(struct file *file, loff_t start, loff_t end, int datasync)
++{
++	return cifs_strict_fsync_generic(file, datasync, start, end,
++					 cifs_fsync_cb);
++}
++
++int cifs_fsync_generic(struct file *file, loff_t start, loff_t end,
++		       int datasync, fsync_callback_t *fsync_cb)
  {
- 	struct set_info_req *pSMB2;
- 	struct set_info_rsp *pSMB2r = NULL;
+ 	int xid;
+ 	int rc = 0;
+-	struct cifs_tcon *tcon;
+ 	struct cifsFileInfo *smbfile = file->private_data;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+ 	struct inode *inode = file->f_mapping->host;
+@@ -2100,15 +2111,20 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ 	cFYI(1, "Sync file - name: %s datasync: 0x%x",
+ 		file->f_path.dentry->d_name.name, datasync);
+ 
+-	tcon = tlink_tcon(smbfile->tlink);
+ 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
+-		rc = CIFSSMBFlush(xid, tcon, smbfile->netfid);
++		rc = fsync_cb(xid, smbfile);
+ 
+ 	FreeXid(xid);
+ 	mutex_unlock(&inode->i_mutex);
+ 	return rc;
+ }
+ 
++int
++cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
++{
++	return cifs_fsync_generic(file, start, end, datasync, cifs_fsync_cb);
++}
++
+ /*
+  * As file closes, flush all cached write data for this inode checking
+  * for write behind errors.
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index c81f76a..318e4b9 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -43,7 +43,7 @@ const struct file_operations smb2_file_ops = {
+ 	.open = smb2_open,
+ 	.release = cifs_close,
+ 	.lock = cifs_lock,
+-	.fsync = cifs_fsync,
++	.fsync = smb2_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+ 	.splice_read = generic_file_splice_read,
+@@ -62,7 +62,7 @@ const struct file_operations smb2_file_strict_ops = {
+ 	.open = smb2_open,
+ 	.release = cifs_close,
+ 	.lock = cifs_lock,
+-	.fsync = cifs_strict_fsync,
++	.fsync = smb2_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+ 	.splice_read = generic_file_splice_read,
+@@ -82,7 +82,7 @@ const struct file_operations smb2_file_direct_ops = {
+ 	.open = smb2_open,
+ 	.release = cifs_close,
+ 	.lock = cifs_lock,
+-	.fsync = cifs_fsync,
++	.fsync = smb2_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+ 	.splice_read = generic_file_splice_read,
+@@ -100,7 +100,7 @@ const struct file_operations smb2_file_nobrl_ops = {
+ 	.aio_write = cifs_file_aio_write,
+ 	.open = smb2_open,
+ 	.release = cifs_close,
+-	.fsync = cifs_fsync,
++	.fsync = smb2_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap  = cifs_file_mmap,
+ 	.splice_read = generic_file_splice_read,
+@@ -118,7 +118,7 @@ const struct file_operations smb2_file_strict_nobrl_ops = {
+ 	.aio_write = cifs_strict_writev,
+ 	.open = smb2_open,
+ 	.release = cifs_close,
+-	.fsync = cifs_strict_fsync,
++	.fsync = smb2_strict_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_strict_mmap,
+ 	.splice_read = generic_file_splice_read,
+@@ -137,7 +137,7 @@ const struct file_operations smb2_file_direct_nobrl_ops = {
+ 	.aio_write = smb2_user_writev,
+ 	.open = smb2_open,
+ 	.release = cifs_close,
+-	.fsync = cifs_fsync,
++	.fsync = smb2_fsync,
+ 	.flush = cifs_flush,
+ 	.mmap = cifs_file_mmap,
+ 	.splice_read = generic_file_splice_read,
+@@ -478,3 +478,21 @@ smb2_readpages(struct file *file, struct address_space *mapping,
+ 	return cifs_readpages_generic(file, mapping, page_list, num_pages,
+ 				      smb2_async_readv);
+ }
++
++static int
++smb2_fsync_cb(int xid, struct cifsFileInfo *cfile)
++{
++	return SMB2_flush(xid, tlink_tcon(cfile->tlink), cfile->persist_fid,
++			  cfile->volatile_fid);
++}
++
++int smb2_fsync(struct file *file, loff_t start, loff_t end, int datasync)
++{
++	return cifs_fsync_generic(file, start, end, datasync, smb2_fsync_cb);
++}
++
++int smb2_strict_fsync(struct file *file, loff_t start, loff_t end, int datasync)
++{
++	return cifs_strict_fsync_generic(file, start, end, datasync,
++					 smb2_fsync_cb);
++}
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index a9be5de..450b414 100644
+index 450b414..73aab65 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -109,6 +109,10 @@ extern int smb2_query_file_info(struct file *filp);
- extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
- 				 FILE_ALL_INFO *data, struct super_block *sb,
- 				 int xid);
-+extern int smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *path,
-+			      __le32 desired_access, __le32 create_disposition,
-+			      __le32 file_attributes, __le32 create_options,
-+			      void *data, int command);
- extern void smb2_set_ops(struct inode *inode);
- extern bool smb2_is_size_safe_to_change(struct smb2_inode *smb2_ind,
- 					__u64 end_of_file);
-@@ -156,6 +160,8 @@ extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
- extern int smb2_unlink(struct inode *dir, struct dentry *dentry);
- extern int smb2_rename(struct inode *source_dir, struct dentry *source_dentry,
- 		       struct inode *target_dir, struct dentry *target_dentry);
-+extern int smb2_hardlink(struct dentry *old_file, struct inode *inode,
-+			 struct dentry *direntry);
+@@ -124,8 +124,6 @@ extern void smb2_allinfo_to_fattr(struct cifs_fattr *attr,
+ extern void smb2_create_dfs_attr(struct cifs_fattr *fattr,
+ 				 struct super_block *sb);
+ extern void cifs_fattr_to_inode(struct inode *pinode, struct cifs_fattr *attr);
+-extern int smb2_fsync(struct file *file, int datasync);
+-extern int smb2_flush(struct file *file, fl_owner_t id);
+ extern struct cifsFileInfo *smb2_new_fileinfo(__u64 persist_fid,
+ 					      __u64 volatile_fid,
+ 					      struct file *file,
+@@ -142,6 +140,10 @@ extern int smb2_write_cb(int xid, struct cifsFileInfo *cfile,
+ 			 struct cifs_io_parms *parms, unsigned int *written,
+ 			 struct kvec *iov, unsigned long nr_segs,
+ 			 unsigned int remaining_bytes, int timeout);
++extern int smb2_strict_fsync(struct file *file, loff_t start, loff_t end,
++			     int datasync);
++extern int smb2_fsync(struct file *file, loff_t start, loff_t end,
++		      int datasync);
  
- extern int smb2_readdir(struct file *file, void *direntry, filldir_t filldir);
- 
+ extern int smb2_open(struct inode *inode, struct file *file);
+ extern ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
 -- 
 1.7.1
