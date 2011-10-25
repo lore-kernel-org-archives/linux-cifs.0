@@ -1,60 +1,59 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: build failure after merge of the cifs tree
-Date: Wed, 26 Oct 2011 00:59:39 +1100
-Message-ID: <20111026005939.ad20ab7a2dacce216c69e821@canb.auug.org.au>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: linux-next: build failure after merge of the cifs tree
+Date: Tue, 25 Oct 2011 09:51:37 -0500
+Message-ID: <CAH2r5muLiYKCrS2f_DftZSnyuP0EC+vu99mENznCSL8ecnTkpg@mail.gmail.com>
+References: <20111026005939.ad20ab7a2dacce216c69e821@canb.auug.org.au>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Wed__26_Oct_2011_00_59_39_+1100_hlTb9mrG9npMv6BV"
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jeff Layton <jlayton@redhat.com>,
-	Linus <torvalds@linux-foundation.org>
-To: Steve French <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
-Return-path: <linux-next-owner@vger.kernel.org>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Linus <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+To: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111026005939.ad20ab7a2dacce216c69e821-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
---Signature=_Wed__26_Oct_2011_00_59_39_+1100_hlTb9mrG9npMv6BV
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Am fixing it now.  Jeff missed a stub for the non-freezer case.
 
-Hi all,
+diff --git a/include/linux/freezer.h b/include/linux/freezer.h
+index a155561..cd2d55b 100644
+--- a/include/linux/freezer.h
++++ b/include/linux/freezer.h
+@@ -202,6 +202,8 @@ static inline void set_freezable_with_signal(void) =
+{}
 
-After merging the cifs tree, today's linux-next build (powerpc
-iseries_defconfig) failed like this:
+ #define wait_event_freezable_timeout(wq, condition, timeout)		\
+ 		wait_event_interruptible_timeout(wq, condition, timeout)
++#define #define wait_event_freezekillable(wq, condition)		\
++		wait_event_killable(wq, condition)
 
-fs/cifs/transport.c: In function 'wait_for_response':
-fs/cifs/transport.c:328: error: implicit declaration of function 'wait_even=
-t_freezekillable'
 
-Caused by commit f06ac72e9291 ("cifs, freezer: add
-wait_event_freezekillable and have cifs use it").  In this config,
-CONFIG_FREEZER is not set.
+On Tue, Oct 25, 2011 at 8:59 AM, Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org=
+> wrote:
+> Hi all,
+>
+> After merging the cifs tree, today's linux-next build (powerpc
+> iseries_defconfig) failed like this:
+>
+> fs/cifs/transport.c: In function 'wait_for_response':
+> fs/cifs/transport.c:328: error: implicit declaration of function 'wai=
+t_event_freezekillable'
+>
+> Caused by commit f06ac72e9291 ("cifs, freezer: add
+> wait_event_freezekillable and have cifs use it"). =A0In this config,
+> CONFIG_FREEZER is not set.
+> --
+> Cheers,
+> Stephen Rothwell =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sfr-3FnU+UHB4dPYtjvyW6yDsg@public.gmane.org=
+=2Eorg.au
+> http://www.canb.auug.org.au/~sfr/
+>
+
+
+
 --=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
+Thanks,
 
---Signature=_Wed__26_Oct_2011_00_59_39_+1100_hlTb9mrG9npMv6BV
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIcBAEBCAAGBQJOpsDLAAoJEECxmPOUX5FEMEIP/RLO5SYy6mbrYXWNjo8ojpWQ
-LxfsRZ/Hi/aDT+KzSZCtZFBRs98MVQUPRDIGc74EP7smnxVmEZaas1mLUk6hdvh0
-WtKVD9kKg9Lxqgyf1LzY8OBwPX8IbpzWP4MlnPiuoeYk+3cbpE/3r+QyWYAW7Ce4
-MAfg2thplJfKE4+nZWfC4oVGBLI5NlHUsDckdvfKmxuULCbuRrHrQjw9r9Pevc/s
-J51MATceo5cFXsKGWYhJvrVS/dGb6xcD3FeXUe+NGsFr68b+9JPSANL1Mr9J/Tw7
-LOPOCIsTwdV+Vu3S/UeZXKL/CRFmrFeWiDN34uGVU87CDRy+0uFvVUn8CNDj2wb8
-hdR2/uYled7V+vCCSGRGyKa01aJEsYK2IsqT+Ih4TlY4a90zFmO5Z2weG/WJOD9r
-BAPxwMg4V+pOWwrME9aLTYd6iOkFV8OYWKTcebJ/7LcKVZFC+FhFKaTsW7uyvUje
-fNQRMRJg2POAeiaL78lxaNOL+TYUtvuVeckFCBjAsXahN+OhR9JdNosjpRvwopAQ
-RHF/Yo2rvxyN2d0JQ/TM27cRzxctmJ88RllssyfVAfr6Ay+ZFMdv/6CMM69QWsM5
-Jm5lk/Jss0a7KaS4v36EDMEdiV6EqyROnqSi12twVDFkPBvcAThP0aNk/IJWsBz4
-S4UM0prhQoQBzU5NJ9WJ
-=Prs7
------END PGP SIGNATURE-----
-
---Signature=_Wed__26_Oct_2011_00_59_39_+1100_hlTb9mrG9npMv6BV--
+Steve
