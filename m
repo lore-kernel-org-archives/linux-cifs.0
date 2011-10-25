@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 15/53] CIFS: Make demultiplex_thread work with SMB2 code
-Date: Tue, 25 Oct 2011 10:11:48 +0400
-Message-ID: <1319523146-2859-16-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 16/53] CIFS: Get mount/umount work with SMB2 protocol
+Date: Tue, 25 Oct 2011 10:11:49 +0400
+Message-ID: <1319523146-2859-17-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,383 +12,402 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Now we can process SMB2 messages: check message, get message id
-and wakeup awaiting routines.
+Process SMB2 session setup, tree connect, getting inode info,
+tree disconnect and logoff messages.
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifs_debug.c |   14 ++++-
- fs/cifs/connect.c    |  163 +++++++++++++++++++++++++++++++++++++++++---------
- fs/cifs/misc.c       |    5 ++
- 3 files changed, 153 insertions(+), 29 deletions(-)
+ fs/cifs/connect.c  |  107 ++++++++++++++++++++++++++++++++----------
+ fs/cifs/inode.c    |  132 +++++++++++++++++++++++++++++++++++++++++++---------
+ fs/cifs/smb2sess.c |    2 +
+ 3 files changed, 194 insertions(+), 47 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 2122423..66b68e8 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -30,6 +30,9 @@
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index cc4b371..36715a5 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -99,6 +99,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	spin_unlock(&GlobalMid_Lock);
+ 	server->maxBuf = 0;
++#ifdef CONFIG_CIFS_SMB2
++	server->max_read = 0;
++#endif
+ 
+ 	cFYI(1, "Reconnecting tcp session");
+ 
+@@ -313,7 +316,13 @@ cifs_echo_request(struct work_struct *work)
+ 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
+ 		goto requeue_echo;
+ 
+-	rc = CIFSSMBEcho(server);
++	if (server->is_smb2 == false)
++		rc = CIFSSMBEcho(server);
++#ifdef CONFIG_CIFS_SMB2
++	else /*temporarilly disable echo requests for smb2
++		rc = SMB2_echo(server); */
++		rc = 0;
++#endif
+ 	if (rc)
+ 		cFYI(1, "Unable to send echo request to server: %s",
+ 			server->hostname);
+@@ -2153,7 +2162,12 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+ 
+ 	if (ses->status == CifsGood) {
+ 		xid = GetXid();
+-		CIFSSMBLogoff(xid, ses);
++#ifdef CONFIG_CIFS_SMB2
++		if (ses->server->is_smb2)
++			SMB2_logoff(xid, ses);
++		else
++#endif
++			CIFSSMBLogoff(xid, ses);
+ 		_FreeXid(xid);
+ 	}
+ 	sesInfoFree(ses);
+@@ -2314,7 +2328,12 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	xid = GetXid();
+-	CIFSSMBTDis(xid, tcon);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		SMB2_tdis(xid, tcon);
++	else
++#endif
++		CIFSSMBTDis(xid, tcon);
+ 	_FreeXid(xid);
+ 
+ 	cifs_fscache_release_super_cookie(tcon);
+@@ -2325,7 +2344,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ static struct cifs_tcon *
+ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ {
+-	int rc, xid;
++	int rc = 0, xid;
+ 	struct cifs_tcon *tcon;
+ 
+ 	tcon = cifs_find_tcon(ses, volume_info->UNC);
+@@ -2365,7 +2384,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 	 * this TCon call and Unix SetFS as
+ 	 * we do on SessSetup and reconnect? */
+ 	xid = GetXid();
+-	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		rc = SMB2_tcon(xid, ses, volume_info->UNC, tcon,
++			       volume_info->local_nls);
++	else
++#endif
++		rc = CIFSTCon(xid, ses, volume_info->UNC, tcon,
++			      volume_info->local_nls);
+ 	FreeXid(xid);
+ 	cFYI(1, "CIFS Tcon rc = %d", rc);
+ 	if (rc)
+@@ -2520,6 +2546,12 @@ get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
+ 	char *temp_unc;
+ 	int rc = 0;
+ 
++#ifdef CONFIG_CIFS_SMB2
++	if (pSesInfo->server->is_smb2) {
++		/* add missing smb2 dfs code here */
++		return -EREMOTE;
++	}
++#endif
+ 	*pnum_referrals = 0;
+ 	*preferrals = NULL;
+ 
+@@ -3118,22 +3150,38 @@ is_path_accessible(int xid, struct cifs_tcon *tcon,
+ 		   struct cifs_sb_info *cifs_sb, const char *full_path)
+ {
+ 	int rc;
+-	FILE_ALL_INFO *pfile_info;
+-
+-	pfile_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
+-	if (pfile_info == NULL)
+-		return -ENOMEM;
+ 
+-	rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
+-			      0 /* not legacy */, cifs_sb->local_nls,
+-			      cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++#ifdef CONFIG_CIFS_SMB2
++	if (tcon->ses->server->is_smb2) {
++		__u64 persistent_fid, volatile_fid;
++		rc = SMB2_open(xid, tcon, (__le16 *)full_path, &persistent_fid,
++			       &volatile_fid, FILE_READ_ATTRIBUTES, FILE_OPEN,
++			       0, 0);
++		if (rc)
++			return rc;
++		/* rc = SMB2_query_info() */
++		rc = SMB2_close(xid, tcon, persistent_fid, volatile_fid);
++	} else {
++#endif
++		FILE_ALL_INFO *pfile_info = kmalloc(sizeof(FILE_ALL_INFO),
++						     GFP_KERNEL);
++		if (pfile_info == NULL)
++			return -ENOMEM;
+ 
+-	if (rc == -EOPNOTSUPP || rc == -EINVAL)
+-		rc = SMBQueryInformation(xid, tcon, full_path, pfile_info,
+-				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				  CIFS_MOUNT_MAP_SPECIAL_CHR);
+-	kfree(pfile_info);
++		rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
++				      0 /* not legacy */, cifs_sb->local_nls,
++				      cifs_sb->mnt_cifs_flags &
++					CIFS_MOUNT_MAP_SPECIAL_CHR);
++
++		if (rc == -EOPNOTSUPP || rc == -EINVAL)
++			rc = SMBQueryInformation(xid, tcon, full_path,
++					pfile_info, cifs_sb->local_nls,
++					cifs_sb->mnt_cifs_flags &
++					CIFS_MOUNT_MAP_SPECIAL_CHR);
++		kfree(pfile_info);
++#ifdef CONFIG_CIFS_SMB2
++	}
++#endif
+ 	return rc;
+ }
+ 
+@@ -3399,10 +3447,18 @@ try_mount_again:
+ 		tcon->unix_ext = 0; /* server does not support them */
+ 
+ 	/* do not care if following two calls succeed - informational */
+-	if (!tcon->ipc) {
+-		CIFSSMBQFSDeviceInfo(xid, tcon);
+-		CIFSSMBQFSAttributeInfo(xid, tcon);
++#ifdef CONFIG_CIFS_SMB2
++	if (tcon->ses->server->is_smb2) {
++		/* add missing calls here */
++	} else {
++#endif
++		if (!tcon->ipc) {
++			CIFSSMBQFSDeviceInfo(xid, tcon);
++			CIFSSMBQFSAttributeInfo(xid, tcon);
++		}
++#ifdef CONFIG_CIFS_SMB2
+ 	}
++#endif
+ 
+ 	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
+ 	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
+@@ -3720,6 +3776,7 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
+ 	if (ses->server->is_smb2) {
+ 		/* we have one credit to start with */
+ 		atomic_set(&server->credits, 1);
++		server->current_smb2_mid = 0;
+ 		rc = SMB2_negotiate(xid, ses);
+ 		/* BB we probably don't need to retry with modern servers */
+ 		if (rc == -EAGAIN)
+@@ -3768,12 +3825,12 @@ int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
+ 	cFYI(1, "Security Mode: 0x%x Capabilities: 0x%x TimeAdjust: %d",
+ 		 server->sec_mode, server->capabilities, server->timeAdj);
+ 
+-	if (ses->server->is_smb2 == false)
+-		rc = CIFS_SessSetup(xid, ses, nls_info);
+ #ifdef CONFIG_CIFS_SMB2
+-	else
++	if (ses->server->is_smb2)
+ 		rc = SMB2_sess_setup(xid, ses, nls_info);
++	else
+ #endif
++		rc = CIFS_SessSetup(xid, ses, nls_info);
+ 	if (rc) {
+ 		cERROR(1, "Send error in SessSetup = %d", rc);
+ 	} else {
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 2c50bd2..4d03038 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -29,8 +29,11 @@
  #include "cifsproto.h"
  #include "cifs_debug.h"
- #include "cifsfs.h"
+ #include "cifs_fs_sb.h"
++#include "cifs_unicode.h"
+ #include "fscache.h"
+-
 +#ifdef CONFIG_CIFS_SMB2
 +#include "smb2proto.h"
 +#endif
  
- void
- cifs_dump_mem(char *label, void *data, int length)
-@@ -63,9 +66,18 @@ void cifs_dump_detail(struct smb_hdr *smb)
- 	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d",
- 		  smb->Command, smb->Status.CifsError,
- 		  smb->Flags, smb->Flags2, smb->Mid, smb->Pid);
--	cERROR(1, "smb buf %p len %d", smb, smbCalcSize(smb));
-+	cERROR(1, "smb buf %p len %u", smb, smbCalcSize(smb));
+ static void cifs_set_ops(struct inode *inode)
+ {
+@@ -595,9 +598,68 @@ cgfi_exit:
+ 	return rc;
  }
  
+-int cifs_get_inode_info(struct inode **pinode,
+-	const unsigned char *full_path, FILE_ALL_INFO *pfindData,
+-	struct super_block *sb, int xid, const __u16 *pfid)
 +#ifdef CONFIG_CIFS_SMB2
-+void smb2_dump_detail(struct smb2_hdr *smb)
++static void
++move_smb2_info_to_cifs(FILE_ALL_INFO *dst, FILE_ALL_INFO_SMB2 *src)
 +{
-+	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d",
-+		  smb->Command, smb->Status, smb->Flags, smb->MessageId,
-+		  smb->ProcessId);
-+	cERROR(1, "smb buf %p len %u", smb, smb2_calc_size(smb));
++	memcpy(dst, src,
++	       (unsigned int)(&src->CurrentByteOffset) - (unsigned int)src);
++	dst->CurrentByteOffset = src->CurrentByteOffset;
++	dst->Mode = src->Mode;
++	dst->AlignmentRequirement = src->AlignmentRequirement;
++	dst->IndexNumber1 = 0; /* we don't use it */
 +}
-+#endif
- 
- void cifs_dump_mids(struct TCP_Server_Info *server)
- {
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b8a9ef1..cc4b371 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -325,6 +325,14 @@ requeue_echo:
- static bool
- allocate_buffers(struct TCP_Server_Info *server)
- {
-+	size_t buf_size;
 +
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		buf_size = sizeof(struct smb2_hdr);
-+	else
-+#endif
-+		buf_size = sizeof(struct smb_hdr);
- 	if (!server->bigbuf) {
- 		server->bigbuf = (char *)cifs_buf_get();
- 		if (!server->bigbuf) {
-@@ -335,7 +343,7 @@ allocate_buffers(struct TCP_Server_Info *server)
- 		}
- 	} else if (server->large_buf) {
- 		/* we are reusing a dirty large buf, clear its start */
--		memset(server->bigbuf, 0, sizeof(struct smb_hdr));
-+		memset(server->bigbuf, 0, buf_size);
- 	}
- 
- 	if (!server->smallbuf) {
-@@ -349,7 +357,7 @@ allocate_buffers(struct TCP_Server_Info *server)
- 		/* beginning of smb buffer is cleared in our buf_get */
- 	} else {
- 		/* if existing small buf clear beginning */
--		memset(server->smallbuf, 0, sizeof(struct smb_hdr));
-+		memset(server->smallbuf, 0, buf_size);
- 	}
- 
- 	return true;
-@@ -539,7 +547,7 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
- }
- 
- static struct mid_q_entry *
--find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
-+find_cifs_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
- {
- 	struct mid_q_entry *mid;
- 
-@@ -556,6 +564,40 @@ find_mid(struct TCP_Server_Info *server, struct smb_hdr *buf)
- 	return NULL;
- }
- 
-+#ifdef CONFIG_CIFS_SMB2
-+static struct mid_q_entry *
-+find_smb2_mid(struct TCP_Server_Info *server, struct smb2_hdr *buf)
++static int
++smb2_qinfo_helper(int xid, struct cifs_sb_info *cifs_sb, struct cifs_tcon *tcon,
++		  const unsigned char *full_path, FILE_ALL_INFO *pfindData)
 +{
-+	struct mid_q_entry *mid;
++	const unsigned char *start_full_path = full_path;
++	__u64 persistent_fid, volatile_fid;
++	FILE_ALL_INFO_SMB2 *data = NULL;
++	__le16 *path = NULL;
++	int usc_len, rc;
 +
-+	spin_lock(&GlobalMid_Lock);
-+	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-+		if ((mid->mid == buf->MessageId) &&
-+		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
-+		    (mid->command == buf->Command)) {
-+			spin_unlock(&GlobalMid_Lock);
-+			return mid;
-+		}
++	data = kzalloc(sizeof(FILE_ALL_INFO_SMB2) + MAX_NAME*2, GFP_KERNEL);
++	if (data == NULL) {
++		rc = -ENOMEM;
++		goto out;
 +	}
-+	spin_unlock(&GlobalMid_Lock);
-+	return NULL;
-+}
-+#endif
 +
-+static struct mid_q_entry *
-+find_mid(struct TCP_Server_Info *server, char *buf)
-+{
-+	struct mid_q_entry *mid;
++	if (strlen(full_path) && full_path[0] == '\\')
++		start_full_path += 1;
 +
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		mid = find_smb2_mid(server, (struct smb2_hdr *)buf);
-+	else
-+#endif
-+		mid = find_cifs_mid(server, (struct smb_hdr *)buf);
-+	return mid;
-+}
-+
- void
- dequeue_mid(struct mid_q_entry *mid, bool malformed)
- {
-@@ -573,13 +615,18 @@ dequeue_mid(struct mid_q_entry *mid, bool malformed)
- 
- static void
- handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
--	   struct smb_hdr *buf, int malformed)
-+	   char *buf, int malformed)
- {
--	if (malformed == 0 && check2ndT2(buf) > 0) {
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		goto next;
-+#endif
-+	if (malformed == 0 && check2ndT2((struct smb_hdr *)buf) > 0) {
- 		mid->multiRsp = true;
- 		if (mid->resp_buf) {
- 			/* merge response - fix up 1st*/
--			malformed = coalesce_t2(buf, mid->resp_buf);
-+			malformed = coalesce_t2((struct smb_hdr *)buf,
-+						mid->resp_buf);
- 			if (malformed > 0)
- 				return;
- 
-@@ -598,6 +645,9 @@ handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 		}
- 		return;
- 	}
-+#ifdef CONFIG_CIFS_SMB2
-+next:
-+#endif
- 	mid->resp_buf = buf;
- 	mid->large_buf = server->large_buf;
- 	/* Was previous buf put in mpx struct for multi-rsp? */
-@@ -712,13 +762,29 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- {
- 	int length;
- 	char *buf = server->smallbuf;
--	struct smb_hdr *smb_buffer = (struct smb_hdr *)buf;
--	unsigned int pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
-+	unsigned int pdu_length = get_rfc1002_length(buf);
-+	size_t buf_size, max_hdr_size;
-+	struct smb_hdr *smb_buffer;
-+#ifdef CONFIG_CIFS_SMB2
-+	struct smb2_hdr *smb2_buffer;
-+#endif
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2) {
-+		smb2_buffer = (struct smb2_hdr *)buf;
-+		max_hdr_size = MAX_SMB2_HDR_SIZE;
-+		buf_size = sizeof(struct smb2_hdr);
-+	} else {
-+#endif
-+		smb_buffer = (struct smb_hdr *)buf;
-+		max_hdr_size = MAX_CIFS_HDR_SIZE;
-+		buf_size = sizeof(struct smb_hdr);
-+#ifdef CONFIG_CIFS_SMB2
++	path = smb2_strndup_to_ucs(start_full_path,
++				   PATH_MAX, &usc_len,
++				   cifs_sb->local_nls);
++	if (path == NULL) {
++		rc = -ENOMEM;
++		goto out;
 +	}
++
++	rc = SMB2_open(xid, tcon, path, &persistent_fid, &volatile_fid,
++		       FILE_READ_ATTRIBUTES_LE, FILE_OPEN_LE, 0, 0);
++	if (!rc) {
++		rc = SMB2_query_info(xid, tcon, persistent_fid,
++				     volatile_fid, data);
++		SMB2_close(xid, tcon, persistent_fid,
++			   volatile_fid);
++	}
++
++	if (rc)
++		goto out;
++
++	move_smb2_info_to_cifs(pfindData, data);
++out:
++	kfree(data);
++	kfree(path);
++	return rc;
++}
 +#endif
- 	/* make sure this will fit in a large buffer */
--	if (pdu_length > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
--		cERROR(1, "SMB response too long (%u bytes)",
--			pdu_length);
-+	if (pdu_length > CIFSMaxBufSize + max_hdr_size - 4) {
-+		cERROR(1, "SMB response too long (%u bytes)", pdu_length);
- 		cifs_reconnect(server);
- 		wake_up(&server->response_q);
- 		return -EAGAIN;
-@@ -729,18 +795,27 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		server->large_buf = true;
- 		memcpy(server->bigbuf, server->smallbuf, server->total_read);
- 		buf = server->bigbuf;
--		smb_buffer = (struct smb_hdr *)buf;
++
++int cifs_get_inode_info(struct inode **pinode, const unsigned char *full_path,
++			FILE_ALL_INFO *pfindData, struct super_block *sb,
++			int xid, const __u16 *pfid)
+ {
+ 	int rc = 0, tmprc;
+ 	struct cifs_tcon *pTcon;
+@@ -630,21 +692,36 @@ int cifs_get_inode_info(struct inode **pinode,
+ 		}
+ 		pfindData = (FILE_ALL_INFO *)buf;
+ 
+-		/* could do find first instead but this returns more info */
+-		rc = CIFSSMBQPathInfo(xid, pTcon, full_path, pfindData,
+-			      0 /* not legacy */,
+-			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
+-		/* BB optimize code so we do not make the above call
+-		when server claims no NT SMB support and the above call
+-		failed at least once - set flag in tcon or mount */
+-		if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
+-			rc = SMBQueryInformation(xid, pTcon, full_path,
+-					pfindData, cifs_sb->local_nls,
+-					cifs_sb->mnt_cifs_flags &
+-					  CIFS_MOUNT_MAP_SPECIAL_CHR);
+-			adjustTZ = true;
++		if (pTcon->ses->server->is_smb2 == false) {
++			/*
++			 * Could do find first instead but this returns more
++			 * info.
++			 */
++			rc = CIFSSMBQPathInfo(xid, pTcon, full_path, pfindData,
++					      0 /* not legacy */,
++					      cifs_sb->local_nls,
++					      cifs_sb->mnt_cifs_flags &
++					      CIFS_MOUNT_MAP_SPECIAL_CHR);
++			/*
++			 * BB optimize code so we do not make the above call
++			 * when server claims no NT SMB support and the above
++			 * call failed at least once - set flag in tcon or
++			 * mount.
++			 */
++			if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
++				rc = SMBQueryInformation(xid, pTcon, full_path,
++						pfindData, cifs_sb->local_nls,
++						cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
++				adjustTZ = true;
++			}
 +#ifdef CONFIG_CIFS_SMB2
-+		if (server->is_smb2)
-+			smb2_buffer = (struct smb2_hdr *)buf;
-+		else
++		} else
++			rc = smb2_qinfo_helper(xid, cifs_sb, pTcon, full_path,
++					       pfindData);
++#else
+ 		}
 +#endif
-+			smb_buffer = (struct smb_hdr *)buf;
  	}
  
- 	/* now read the rest */
--	length = cifs_read_from_socket(server,
--			  buf + sizeof(struct smb_hdr) - 1,
--			  pdu_length - sizeof(struct smb_hdr) + 1 + 4);
-+	length = cifs_read_from_socket(server, buf + buf_size - 1,
-+				       pdu_length - buf_size + 1 + 4);
- 	if (length < 0)
- 		return length;
- 	server->total_read += length;
- 
--	dump_smb(smb_buffer, server->total_read);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		dump_smb2(smb2_buffer, server->total_read);
-+	else
-+#endif
-+		dump_smb(smb_buffer, server->total_read);
- 
- 	/*
- 	 * We know that we received enough to get to the MID as we
-@@ -751,13 +826,20 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	 * 48 bytes is enough to display the header and a little bit
- 	 * into the payload for debugging purposes.
+ 	if (!rc) {
+@@ -675,7 +752,8 @@ int cifs_get_inode_info(struct inode **pinode,
+ 	 * guaranteed unique?
  	 */
--	length = checkSMB(smb_buffer, smb_buffer->Mid, server->total_read);
+ 	if (*pinode == NULL) {
+-		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM &&
++		    pTcon->ses->server->is_smb2 == false) {
+ 			int rc1 = 0;
+ 
+ 			rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
+@@ -754,12 +832,22 @@ char *cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+ 
+ 	/* if no prefix path, simply set path to the root of share to "" */
+ 	if (pplen == 0) {
+-		full_path = kmalloc(1, GFP_KERNEL);
+-		if (full_path)
+-			full_path[0] = 0;
++		int len = 1;
 +#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		length = checkSMB2(smb2_buffer, smb2_buffer->MessageId,
-+				   server->total_read);
-+	else
++		if (vol->use_smb2)
++			len = 2;
 +#endif
-+		length = checkSMB(smb_buffer, smb_buffer->Mid,
-+				  server->total_read);
- 	if (length != 0)
- 		cifs_dump_mem("Bad SMB: ", buf,
- 			min_t(unsigned int, server->total_read, 48));
- 
- 	if (mid)
--		handle_mid(mid, server, smb_buffer, length);
-+		handle_mid(mid, server, buf, length);
- 
- 	return length;
- }
-@@ -769,7 +851,11 @@ cifs_demultiplex_thread(void *p)
- 	struct TCP_Server_Info *server = p;
- 	unsigned int pdu_length;
- 	char *buf = NULL;
-+	size_t buf_size;
- 	struct smb_hdr *smb_buffer = NULL;
-+#ifdef CONFIG_CIFS_SMB2
-+	struct smb2_hdr *smb2_buffer = NULL;
-+#endif
- 	struct task_struct *task_to_wake = NULL;
- 	struct mid_q_entry *mid_entry;
- 
-@@ -781,6 +867,13 @@ cifs_demultiplex_thread(void *p)
- 		mempool_resize(cifs_req_poolp, length + cifs_min_rcv,
- 				GFP_KERNEL);
++		full_path = kzalloc(len, GFP_KERNEL);
+ 		return full_path;
+ 	}
  
 +#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		buf_size = sizeof(struct smb2_hdr);
-+	else
-+#endif
-+		buf_size = sizeof(struct smb_hdr);
-+
- 	set_freezable();
- 	while (server->tcpStatus != CifsExiting) {
- 		if (try_to_freeze())
-@@ -790,8 +883,13 @@ cifs_demultiplex_thread(void *p)
- 			continue;
- 
- 		server->large_buf = false;
--		smb_buffer = (struct smb_hdr *)server->smallbuf;
- 		buf = server->smallbuf;
-+#ifdef CONFIG_CIFS_SMB2
-+		if (server->is_smb2)
-+			smb2_buffer = (struct smb2_hdr *)buf;
-+		else
-+#endif
-+			smb_buffer = (struct smb_hdr *)buf;
- 		pdu_length = 4; /* enough to get RFC1001 header */
- 
- 		length = cifs_read_from_socket(server, buf, pdu_length);
-@@ -803,14 +901,14 @@ cifs_demultiplex_thread(void *p)
- 		 * The right amount was read from socket - 4 bytes,
- 		 * so we can now interpret the length field.
- 		 */
--		pdu_length = be32_to_cpu(smb_buffer->smb_buf_length);
-+		pdu_length = get_rfc1002_length(buf);
- 
- 		cFYI(1, "RFC1002 header 0x%x", pdu_length);
- 		if (!is_smb_response(server, buf[0]))
- 			continue;
- 
- 		/* make sure we have enough to get to the MID */
--		if (pdu_length < sizeof(struct smb_hdr) - 1 - 4) {
-+		if (pdu_length < buf_size - 1 - 4) {
- 			cERROR(1, "SMB response too short (%u bytes)",
- 				pdu_length);
- 			cifs_reconnect(server);
-@@ -820,12 +918,12 @@ cifs_demultiplex_thread(void *p)
- 
- 		/* read down to the MID */
- 		length = cifs_read_from_socket(server, buf + 4,
--					sizeof(struct smb_hdr) - 1 - 4);
-+					       buf_size - 1 - 4);
- 		if (length < 0)
- 			continue;
- 		server->total_read += length;
- 
--		mid_entry = find_mid(server, smb_buffer);
-+		mid_entry = find_mid(server, buf);
- 
- 		if (!mid_entry || !mid_entry->receive)
- 			length = standard_receive3(server, mid_entry);
-@@ -837,20 +935,29 @@ cifs_demultiplex_thread(void *p)
- 
- 		if (server->large_buf) {
- 			buf = server->bigbuf;
--			smb_buffer = (struct smb_hdr *)buf;
-+#ifdef CONFIG_CIFS_SMB2
-+			if (server->is_smb2)
-+				smb2_buffer = (struct smb2_hdr *)buf;
-+			else
-+#endif
-+				smb_buffer = (struct smb_hdr *)buf;
- 		}
- 
- 		server->lstrp = jiffies;
- 		if (mid_entry != NULL) {
- 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
- 				mid_entry->callback(mid_entry);
--		} else if (!is_valid_oplock_break(smb_buffer, server)) {
-+		} else if (!is_valid_oplock_break((void *)buf, server)) {
- 			cERROR(1, "No task to wake, unknown frame received! "
- 				   "NumMids %d", atomic_read(&midCount));
--			cifs_dump_mem("Received Data is: ", buf,
--				      sizeof(struct smb_hdr));
-+			cifs_dump_mem("Received Data is: ", buf, buf_size);
- #ifdef CONFIG_CIFS_DEBUG2
--			cifs_dump_detail(smb_buffer);
-+#ifdef CONFIG_CIFS_SMB2
-+			if (server->is_smb2)
-+				smb2_dump_detail(smb2_buffer);
-+			else
-+#endif
-+				cifs_dump_detail(smb_buffer);
- 			cifs_dump_mids(server);
- #endif /* CIFS_DEBUG2 */
- 
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 4ead6f9..d291463 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -514,6 +514,11 @@ is_valid_oplock_break(struct smb_hdr *buf, struct TCP_Server_Info *srv)
- 	struct cifsInodeInfo *pCifsInode;
- 	struct cifsFileInfo *netfile;
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	if (srv->is_smb2)
-+		return false;
++	if (vol->use_smb2) {
++		cERROR(1, "prefixpath is not supported for smb2 now");
++		return NULL;
++	}
 +#endif
 +
- 	cFYI(1, "Checking for oplock break or dnotify response");
- 	if ((pSMB->hdr.Command == SMB_COM_NT_TRANSACT) &&
- 	   (pSMB->hdr.Flags & SMBFLG_RESPONSE)) {
+ 	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
+ 		dfsplen = strnlen(tcon->treeName, MAX_TREE_SIZE + 1);
+ 	else
+diff --git a/fs/cifs/smb2sess.c b/fs/cifs/smb2sess.c
+index a42514c..430cf14 100644
+--- a/fs/cifs/smb2sess.c
++++ b/fs/cifs/smb2sess.c
+@@ -39,10 +39,12 @@ int smb2_setup_session(unsigned int xid, struct cifs_ses *psesinfo,
+ 	 */
+ 	if (server->max_read == 0) /* no need to send on reconnect */ {
+ 		atomic_set(&server->credits, 1);
++		server->current_smb2_mid = 0;
+ 		rc = SMB2_negotiate(xid, psesinfo);
+ 		if (rc == -EAGAIN) {
+ 			/* retry only once on 1st time connection */
+ 			atomic_set(&server->credits, 1);
++			server->current_smb2_mid = 0;
+ 			rc = SMB2_negotiate(xid, psesinfo);
+ 			if (rc == -EAGAIN)
+ 				rc = -EHOSTDOWN;
 -- 
 1.7.1
