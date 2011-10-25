@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 40/53] CIFS: Add NTLMSSP sec type to defaults
-Date: Tue, 25 Oct 2011 10:12:13 +0400
-Message-ID: <1319523146-2859-41-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 41/53] CIFS: Disable SMB2.1 protocol negotiating
+Date: Tue, 25 Oct 2011 10:12:14 +0400
+Message-ID: <1319523146-2859-42-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,23 +12,44 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
+because we don't support it now.
+
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ fs/cifs/smb2pdu.c   |    2 +-
+ fs/cifs/transport.c |    7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b71c3fc..c05b4c0 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -998,7 +998,7 @@ require use of the stronger protocol */
- #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
- #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index b349f3d..353bd30 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -525,7 +525,7 @@ static void free_rsp_buf(int resp_buftype, void *pSMB2r)
+ 		cifs_buf_release(pSMB2r);
+ }
  
--#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
-+#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
- #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
- #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
+-#define SMB2_NUM_PROT 2
++#define SMB2_NUM_PROT 1
  
+ #define SMB2_PROT   0
+ #define SMB21_PROT  1
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 651e77e..504a3c2 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -294,8 +294,11 @@ int wait_for_free_request(struct TCP_Server_Info *server,
+ 			  (atomic_read(&server->credits) < 1)) {
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_num_waiters_inc(server);
+-			wait_event(server->request_q,
+-				   atomic_read(&server->credits) > 0);
++			if (wait_event_killable(server->request_q,
++				    atomic_read(&server->credits) > 0)) {
++				cifs_num_waiters_dec(server);
++				return -ENOENT;
++			}
+ 			cifs_num_waiters_dec(server);
+ 			spin_lock(&GlobalMid_Lock);
+ #endif /* CONFIG_CIFS_SMB2 */
 -- 
 1.7.1
