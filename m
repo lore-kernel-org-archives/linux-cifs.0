@@ -1,121 +1,75 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 46/53] CIFS: Add strictcache i/o for SMB2
-Date: Tue, 25 Oct 2011 10:12:19 +0400
-Message-ID: <1319523146-2859-47-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 49/53] CIFS: Introduce SMB2 Kconfig option
+Date: Tue, 25 Oct 2011 10:12:22 +0400
+Message-ID: <1319523146-2859-50-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1319523146-2859-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+SMB2 is the followon to the CIFS (and SMB) protocols
+and the default for Windows since Windows Vista, and also
+now implemented by various non-Windows servers.  SMB2
+is more secure, has various performance advantages, including
+larger i/o sizes, flow control, better caching model and more.
+SMB2 also resolves some scalability limits in the cifs
+protocol and adds many new features while being much
+simpler (only a few dozen commands instead of hundreds)
+and since the protocol is clearer it is
+also more consistently implemented across servers
+and thus easier to optimize.
+
+After much discussion with Jeff Layton, Jeremy Allison
+and others at Connectathon, we decided to move the smb2
+code from a distinct .ko and fstype into distinct
+C files that optionally build in cifs.ko.  As a result
+the Kconfig gets simpler.
+
+To avoid destabilizing cifs, the smb2 code is going
+to be moved into its own experimental CONFIG_CIFS_SMB2 ifdef
+as it is merged and rereviewed.  The changes to stable
+cifs (builds with the smb2 ifdef off) are expected to be
+fairly small.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/smb2file.c  |   50 ++++++++++++++++++++++++++++++++++++++++++++++----
- fs/cifs/smb2proto.h |    4 ++++
- 2 files changed, 50 insertions(+), 4 deletions(-)
+ fs/cifs/Kconfig |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index ba67306..83ba8eb 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -57,8 +57,8 @@ const struct file_operations smb2_file_ops = {
- const struct file_operations smb2_file_strict_ops = {
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = cifs_strict_readv,
--	.aio_write = cifs_strict_writev,
-+	.aio_read = smb2_strict_readv,
-+	.aio_write = smb2_strict_writev,
- 	.open = smb2_open,
- 	.release = cifs_close,
- 	.lock = cifs_lock,
-@@ -114,8 +114,8 @@ const struct file_operations smb2_file_nobrl_ops = {
- const struct file_operations smb2_file_strict_nobrl_ops = {
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = cifs_strict_readv,
--	.aio_write = cifs_strict_writev,
-+	.aio_read = smb2_strict_readv,
-+	.aio_write = smb2_strict_writev,
- 	.open = smb2_open,
- 	.release = cifs_close,
- 	.fsync = smb2_strict_fsync,
-@@ -403,6 +403,26 @@ ssize_t smb2_user_writev(struct kiocb *iocb, const struct iovec *iov,
- 	return written;
- }
- 
-+ssize_t smb2_strict_writev(struct kiocb *iocb, const struct iovec *iov,
-+			   unsigned long nr_segs, loff_t pos)
-+{
-+	struct inode *inode;
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index ed5452e..c2ba4fb 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -160,3 +160,23 @@ config CIFS_NFSD_EXPORT
+ 	  depends on CIFS && EXPERIMENTAL && BROKEN
+ 	  help
+ 	   Allows NFS server to export a CIFS mounted share (nfsd over cifs)
 +
-+	inode = iocb->ki_filp->f_path.dentry->d_inode;
++config CIFS_SMB2
++	bool "SMB2 network file system support (EXPERIMENTAL)"
++	depends on EXPERIMENTAL && INET && BROKEN
++	select NLS
++	select KEYS
++	select FSCACHE
++	select DNS_RESOLVER
 +
-+	if (CIFS_I(inode)->clientCanCacheAll)
-+		return generic_file_aio_write(iocb, iov, nr_segs, pos);
++	help
++	  This enables experimental support for the SMB2 (Server Message Block
++	  version 2) protocol. The SMB2 protocol is the successor to the
++	  popular CIFS and SMB network file sharing protocols. SMB2 is the
++	  native file sharing mechanism for recent versions of Windows
++	  operating systems (since Vista).  SMB2 enablement will eventually
++	  allow users better performance, security and features, than would be
++	  possible with cifs. Note that smb2 mount options also are simpler
++	  (compared to cifs) due to protocol improvements.
 +
-+	/*
-+	 * In strict cache mode we need to write the data to the server exactly
-+	 * from the pos to pos+len-1 rather than flush all affected pages
-+	 * because it may cause a error with mandatory locks on these pages but
-+	 * not on the region from pos to ppos+len-1.
-+	 */
-+
-+	return smb2_user_writev(iocb, iov, nr_segs, pos);
-+}
-+
- static int
- smb2_iread_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
- 	      unsigned int *bytes_read, char **all_data, char **data_offset,
-@@ -442,6 +462,28 @@ ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
- 	return read;
- }
- 
-+ssize_t smb2_strict_readv(struct kiocb *iocb, const struct iovec *iov,
-+			  unsigned long nr_segs, loff_t pos)
-+{
-+	struct inode *inode;
-+
-+	inode = iocb->ki_filp->f_path.dentry->d_inode;
-+
-+	if (CIFS_I(inode)->clientCanCacheRead)
-+		return generic_file_aio_read(iocb, iov, nr_segs, pos);
-+
-+	/*
-+	 * In strict cache mode we need to read from the server all the time
-+	 * if we don't have level II oplock because the server can delay mtime
-+	 * change - so we can't make a decision about inode invalidating.
-+	 * And we can also fail with pagereading if there are mandatory locks
-+	 * on pages affected by this read but not on the region from pos to
-+	 * pos+len-1.
-+	 */
-+
-+	return smb2_user_readv(iocb, iov, nr_segs, pos);
-+}
-+
- int
- smb2_read_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
- 	     unsigned int *bytes_read, char **buf, int *buf_type,
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 0bff335..9f52e74 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -148,8 +148,12 @@ extern int smb2_fsync(struct file *file, loff_t start, loff_t end,
- extern int smb2_open(struct inode *inode, struct file *file);
- extern ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
- 			       unsigned long nr_segs, loff_t pos);
-+extern ssize_t smb2_strict_readv(struct kiocb *iocb, const struct iovec *iov,
-+				 unsigned long nr_segs, loff_t pos);
- extern ssize_t smb2_user_writev(struct kiocb *iocb, const struct iovec *iov,
- 				unsigned long nr_segs, loff_t pos);
-+extern ssize_t smb2_strict_writev(struct kiocb *iocb, const struct iovec *iov,
-+				  unsigned long nr_segs, loff_t pos);
- extern int smb2_writepages(struct address_space *mapping,
- 			   struct writeback_control *wbc);
- extern int smb2_readpages(struct file *file, struct address_space *mapping,
++	  Unless you are a developer or tester, say N.
 -- 
 1.7.1
