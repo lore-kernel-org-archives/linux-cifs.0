@@ -1,28 +1,28 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: linux-next: build failure after merge of the cifs tree
-Date: Tue, 25 Oct 2011 11:58:07 -0400
-Message-ID: <20111025115807.66806f63@corrin.poochiereds.net>
-References: <20111026005939.ad20ab7a2dacce216c69e821@canb.auug.org.au>
-	<CAH2r5muLiYKCrS2f_DftZSnyuP0EC+vu99mENznCSL8ecnTkpg@mail.gmail.com>
-	<CAH2r5mtkByKNPYN50ioRoS79sAR_rhShANcm9o-Qvo7S762VFg@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: cifs dbench performance increased even over localhost mounts
+Date: Tue, 25 Oct 2011 11:24:49 -0500
+Message-ID: <CAH2r5mu39JJ+SH4EwrnLNuNDR81N-x7-x8AadooZ15ddzEWhwg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-cifs@vger.kernel.org, linux-next@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Linus <torvalds@linux-foundation.org>
-To: Steve French <smfrench@gmail.com>
-Return-path: <linux-next-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5mtkByKNPYN50ioRoS79sAR_rhShANcm9o-Qvo7S762VFg@mail.gmail.com>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 25 Oct 2011 10:05:52 -0500
-Steve French <smfrench@gmail.com> wrote:
+In testing the cifs-2.6.git tree for 3.2-pre, I noticed that dbench
+cifs dbench performance improved even over localhost mounts (to Samba)
+by more than 5% (60 processes).   I don't know what part of that is
+due to the improved byte range lock caching (Pavel's patch set) or
+larger i/o sizes on read or better async read dispatch (Jeff's patch
+set), but suspect that the latter helped more.   Relative performance
+should improve even more with fewer dbench processes as better async
+dispatch of large read requests helps utilize the Samba server more
+efficiently.
 
-> Corrected typo in proposed patch and merged to cifs-2.6.git
-> 
 
-Patch looks fine. Thanks for fixing it...
+-- 
+Thanks,
 
-Reviewed-by: Jeff Layton <jlayton@redhat.com>
+Steve
