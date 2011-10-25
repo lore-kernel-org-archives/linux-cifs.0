@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 20/53] CIFS: Add SMB2 support for rmdir operation
-Date: Tue, 25 Oct 2011 10:11:53 +0400
-Message-ID: <1319523146-2859-21-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 21/53] CIFS: Add SMB2 support for unlink operation
+Date: Tue, 25 Oct 2011 10:11:54 +0400
+Message-ID: <1319523146-2859-22-git-send-email-piastry@etersoft.ru>
 References: <1319523146-2859-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -14,94 +14,124 @@ From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/smb2inode.c |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2inode.c |   90 ++++++++++++++++++++++++++++++++++++++++++++++++++-
  fs/cifs/smb2proto.h |    1 +
- 2 files changed, 60 insertions(+), 1 deletions(-)
+ 2 files changed, 90 insertions(+), 1 deletions(-)
 
 diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 722a5b2..3d3df06 100644
+index 3d3df06..1c1c749 100644
 --- a/fs/cifs/smb2inode.c
 +++ b/fs/cifs/smb2inode.c
-@@ -42,7 +42,7 @@ const struct inode_operations smb2_dir_inode_ops = {
- 	.unlink = cifs_unlink,
+@@ -39,7 +39,7 @@ const struct inode_operations smb2_dir_inode_ops = {
+ 	.create = cifs_create,
+ 	.lookup = cifs_lookup,
+ 	.getattr = cifs_getattr,
+-	.unlink = cifs_unlink,
++	.unlink = smb2_unlink,
  	.link = cifs_hardlink,
  	.mkdir = smb2_mkdir,
--	.rmdir = cifs_rmdir,
-+	.rmdir = smb2_rmdir,
- 	.rename = cifs_rename,
- 	.permission = cifs_permission,
- /*	revalidate:cifs_revalidate,   */
-@@ -381,3 +381,61 @@ err_out:
- 	d_drop(direntry);
- 	goto out;
+ 	.rmdir = smb2_rmdir,
+@@ -439,3 +439,91 @@ rmdir_exit:
+ 	FreeXid(xid);
+ 	return rc;
  }
 +
-+int smb2_rmdir(struct inode *inode, struct dentry *direntry)
++int smb2_unlink(struct inode *dir, struct dentry *dentry)
 +{
 +	int rc = 0;
 +	int xid;
-+	struct cifs_sb_info *cifs_sb;
++	struct inode *inode = dentry->d_inode;
++	struct cifsInodeInfo *cifs_inode;
++	struct super_block *sb = dir->i_sb;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
 +	struct tcon_link *tlink;
 +	struct cifs_tcon *tcon;
++	struct iattr *attrs = NULL;
 +	__le16 *ucs_path = NULL;
-+	struct cifsInodeInfo *cifsInode;
++	__u32 dosattr = 0, origattr = 0;
 +
-+	cFYI(1, "smb2_rmdir, inode = 0x%p", inode);
++	cFYI(1, "smb2_unlink, dir=0x%p, dentry=0x%p", dir, dentry);
++
++	tlink = cifs_sb_tlink(cifs_sb);
++	if (IS_ERR(tlink))
++		return PTR_ERR(tlink);
++	tcon = tlink_tcon(tlink);
 +
 +	xid = GetXid();
 +
-+	ucs_path = build_ucspath_from_dentry(direntry);
++	/* Unlink can be called from rename so we can not take the
++	 * sb->s_vfs_rename_mutex here */
++	ucs_path = build_ucspath_from_dentry(dentry);
 +	if (ucs_path == NULL) {
 +		rc = -ENOMEM;
-+		goto rmdir_exit;
++		goto unlink_out;
 +	}
-+
-+	cifs_sb = CIFS_SB(inode->i_sb);
-+	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink)) {
-+		rc = PTR_ERR(tlink);
-+		goto rmdir_exit;
-+	}
-+	tcon = tlink_tcon(tlink);
 +
 +	rc = smb2_open_op_close(xid, tcon, ucs_path, FILE_DELETE_LE,
-+				FILE_OPEN_LE, 0, FILE_DIRECTORY_FILE_LE |
-+				FILE_DELETE_ON_CLOSE_LE, NULL, SMB2_OP_DELETE);
-+	cifs_put_tlink(tlink);
-+
++				FILE_OPEN_LE, 0, FILE_DELETE_ON_CLOSE_LE, NULL,
++				SMB2_OP_DELETE);
 +	if (!rc) {
-+		drop_nlink(inode);
-+		spin_lock(&direntry->d_inode->i_lock);
-+		i_size_write(direntry->d_inode, 0);
-+		clear_nlink(direntry->d_inode);
-+		spin_unlock(&direntry->d_inode->i_lock);
++		if (inode)
++			drop_nlink(inode);
++	} else if (rc == -ENOENT) {
++		d_drop(dentry);
++	} else if (rc == -ETXTBSY) {
++		/*rc = cifs_rename_pending_delete(full_path, dentry, xid);
++		if (rc == 0)
++			drop_nlink(inode);*/
++	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
++		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
++		if (attrs == NULL) {
++			rc = -ENOMEM;
++			goto out_reval;
++		}
++
++		/* try to reset dos attributes */
++		cifs_inode = CIFS_I(inode);
++		origattr = cifs_inode->cifsAttrs;
++		if (origattr == 0)
++			origattr |= ATTR_NORMAL;
++		dosattr = origattr & ~ATTR_READONLY;
++		if (dosattr == 0)
++			dosattr |= ATTR_NORMAL;
++		dosattr |= ATTR_HIDDEN;
++
++/*		rc = cifs_set_file_info(inode, attrs, xid, full_path, dosattr);
++		if (rc != 0)
++			goto out_reval;
++
++		goto retry_std_delete;*/
 +	}
 +
-+	cifsInode = CIFS_I(direntry->d_inode);
-+	cifsInode->time = 0;	/* force revalidate to go get info when
-+				   needed */
-+
-+	cifsInode = CIFS_I(inode);
-+	cifsInode->time = 0;	/* force revalidate to get parent dir info
-+				   since cached search results now invalid */
-+
-+	direntry->d_inode->i_ctime = inode->i_ctime = inode->i_mtime =
-+		current_fs_time(inode->i_sb);
-+
-+rmdir_exit:
++	/* undo the setattr if we errored out and it's needed */
++/*	if (rc != 0 && dosattr != 0)
++		cifs_set_file_info(inode, attrs, xid, full_path, origattr);*/
++out_reval:
++	if (inode) {
++		cifs_inode = CIFS_I(inode);
++		cifs_inode->time = 0;	/* will force revalidate to get info
++					   when needed */
++		inode->i_ctime = current_fs_time(sb);
++	}
++	dir->i_ctime = dir->i_mtime = current_fs_time(sb);
++	cifs_inode = CIFS_I(dir);
++	CIFS_I(dir)->time = 0;	/* force revalidate of dir as well */
++unlink_out:
++	kfree(attrs);
 +	kfree(ucs_path);
 +	FreeXid(xid);
++	cifs_put_tlink(tlink);
 +	return rc;
 +}
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 091e0f5..c35f0a0 100644
+index c35f0a0..df8d421 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -102,6 +102,7 @@ extern int smb2_fsync(struct file *file, int datasync);
- extern int smb2_flush(struct file *file, fl_owner_t id);
+@@ -103,6 +103,7 @@ extern int smb2_flush(struct file *file, fl_owner_t id);
  
  extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
-+extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
+ extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
++extern int smb2_unlink(struct inode *dir, struct dentry *dentry);
  
  /* extern char *smb2_compose_mount_options(const char *sb_mountdata,
  			const char *fullpath, const struct dfs_info3_param *ref,
