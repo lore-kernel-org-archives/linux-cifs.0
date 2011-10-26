@@ -1,30 +1,72 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Remove extra mutex_unlock in cifs_lock_add_if
-Date: Wed, 26 Oct 2011 23:41:04 +0400
-Message-ID: <1319658064-16049-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/4] freezer: make fake_signal_wake_up wake
+ TASK_KILLABLE tasks too
+Date: Wed, 26 Oct 2011 15:55:48 -0400
+Message-ID: <20111026155548.4a7c3dd8@corrin.poochiereds.net>
+References: <1317210761-11518-1-git-send-email-jlayton@redhat.com>
+	<20111011061847.GB1377@ucw.cz>
+	<20111011061000.3a3a03fe@tlielax.poochiereds.net>
+	<201110112114.28478.rjw@sisk.pl>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org>, trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-pm-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	john-HpsXz0BELY4AvxtiuMwx3w@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <201110112114.28478.rjw-KKrjLPT3xs0@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-to prevent the mutex being unlocked twice if we interrupt a blocked lock.
+On Tue, 11 Oct 2011 21:14:28 +0200
+"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org> wrote:
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+> On Tuesday, October 11, 2011, Jeff Layton wrote:
+> > On Tue, 11 Oct 2011 08:18:48 +0200
+> > Pavel Machek <pavel-+ZI9xUNit7I@public.gmane.org> wrote:
+> > 
+> > > 
+> > > Hi!
+> > > 
+> > > > TASK_KILLABLE is often used to put tasks to sleep for quite some time.
+> > > > One of the most common uses is to put tasks to sleep while waiting for
+> > > > replies from a server on a networked filesystem (such as CIFS or NFS).
+> > > > 
+> > > > Unfortunately, fake_signal_wake_up does not currently wake up tasks
+> > > > that are sleeping in TASK_KILLABLE state. This means that even if the
+> > > > code were in place to allow them to freeze while in this sleep, it
+> > > > wouldn't work anyway.
+> > > > 
+> > > > This patch changes this function to wake tasks in this state as well.
+> > > > This should be harmless -- if the code doing the sleeping doesn't have
+> > > > handling to deal with freezer events, it should just go back to sleep.
+> > > 
+> > > I'm pretty sure this will break something; but that does not mean it
+> > > is bad idea, just that it should be merged early and tested a lot.
+> > > 
+> > 
+> > FWIW, I looked at most of the places in the kernel that do
+> > TASK_KILLABLE sleeps and they look like they'll handle this correctly.
+> > The main one I wasn't sure about was mem_cgroup_handle_oom(), but I
+> > think it'll do the right thing too. I certainly could have missed
+> > something though...
+> > 
+> > In any case, would you mind merging this via the linux-pm tree for 3.2?
+> 
+> I will push it for 3.2.
+> 
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 3ad89ec..3dd9af6 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -899,7 +899,6 @@ try_again:
- 		else {
- 			mutex_lock(&cinode->lock_mutex);
- 			list_del_init(&lock->blist);
--			mutex_unlock(&cinode->lock_mutex);
- 		}
- 	}
- 
+Hi Rafael,
+
+Trond asked if you would also be willing to push patches 3 and 4 in
+this series for 3.2 as well [1]? Note that patch #4 got another revision so
+we'll want to make sure that you get that one. I can resend the
+nfs/sunrpc patches if that will help...
+
+[1]: I think Steve F is going to push patch #2, so that one shouldn't
+be an issue. 
+
 -- 
-1.7.1
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
