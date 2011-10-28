@@ -1,55 +1,56 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [GIT] CIFS Fixes
-Date: Fri, 28 Oct 2011 10:16:58 -0500
-Message-ID: <CAH2r5mtEV2YpTTnrE+03_gm=+CKGxOhLOtRBf6VX2QgXihLDrw@mail.gmail.com>
-References: <CAH2r5msFde8+dBW1uku_=qv5maXcypoM3cXWCAOK3pbEKv=86w@mail.gmail.com>
-	<20111027210722.GA29989@infradead.org>
-	<CAH2r5mvCDTE91Mj-HAm_WhSTrzHKi6RNvBL0-+e92POxeqXA9w@mail.gmail.com>
-	<20111027211515.GA1380@infradead.org>
-	<20111028095834.2a89660b@corrin.poochiereds.net>
+Subject: Re: [patch] cifs: accidentally creating empty files
+Date: Fri, 28 Oct 2011 10:27:04 -0500
+Message-ID: <CAH2r5msb_+tenSg1kWCn_0xi2EZu6vboqvmbQ17vRBYoqHp2Eg@mail.gmail.com>
+References: <20110927212810.GA12900@elgon.mountain>
+	<20111013132755.6c5db87e@barsoom.rdu.redhat.com>
+	<CAH2r5mtOF=Ja7_mTK576uEqgZqaVH+8YXtOqmZVknBC81sD=8Q@mail.gmail.com>
+	<20111028072019.GA14900@longonot.mountain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111028095834.2a89660b-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20111028072019.GA14900-dZEljifmRObu9KfB+GxooP8+0UxHXcjY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Oct 28, 2011 at 8:58 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Thu, 27 Oct 2011 17:15:15 -0400
-> Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
->
->> I'm not complaining about Pavel - he has generally done outstanding
->> work.
+On Fri, Oct 28, 2011 at 2:20 AM, Dan Carpenter <dan.carpenter-QHcLZuEGTsthl2p70BpVqQ@public.gmane.org=
+m> wrote:
+> On Wed, Oct 19, 2011 at 09:14:37PM -0500, Steve French wrote:
+>> Doesn't this force the create to happen later - rather than
+>> at lookup time where it belongs?
 >>
->> But patches posted the first time in that form two days ago (and the
->> first time completely for a long time) are simply not suitable for
+>> if the issue is just noperm ... we should let this through if the us=
+er
+>> has local permissions. =A0Doubling the cost of a file create to Samb=
+a
+>> seems like a bad idea (ie doing aQueryPathInfo AND an NTCreateX
+>> doubles the roundrip, doubles the load on the server etc.) - the who=
+le
+>> point of this is to let us do an "atomic" open or create operation
+>> and not have to split it into multiple requests. =A0In any case why =
+would
+>> we do the open and then follow it with a create?
+>>
+>> Can we fix this to (at least) narrow the performance penalty.
+>>
 >
-> I agree. It's definitely premature to merge this series. The patches
-> themselves have never been posted to the list AFAICT, though Pavel ha=
-s
-> on occasion posted a link to his git tree. That's not the same thing
-> however. As a general rule...
->
-> =A0 "If it's not on the list, then it doesn't exist"
+> Yes, it does add another back and forth to file create... =A0It's har=
+d/
+> impossible to check the permissions first and then decide whether to
+> pass the O_CREAT flag. =A0Maybe we could add an if statement to check
+> whether noperm was used and the noperm version could use the create
+> on lookup.
 
-Be fair to Pavel ... I trivially found individual smb2 patches on list =
-as
-far back as February (probably earlier on the other mailing list),
-the stats patch I redid to include Christoph's feedback and Pavel
-incorporated much feedback this summer from at least four developers
-and from the two test events I attended.  You
-gave patch feedback to Pavel multiple times this summer.
-And with him breaking the patches into smaller pieces,
-I can see why he was reluctant to post a 50 patch series,
-but posted a link to them.   Posting the series individually
-is usually better, but this last respin was mainly to deal
-with merge conflicts from your large (nicely done) async
-series and other recent cifs patches.
+Why is it hard to check local permissions? We have the local mode
+for the parent.
+
+Also note that the "intent" flags and the atomic create is not just
+about performance, but also making it atomic reduces some of the weird
+failure cases.
 
 
 
