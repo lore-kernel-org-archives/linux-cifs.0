@@ -1,144 +1,136 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v2 28/53] CIFS: Add write related address space operations for SMB2
-Date: Fri, 28 Oct 2011 23:54:39 +0400
-Message-ID: <1319831704-3572-29-git-send-email-piastry@etersoft.ru>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v2 34/53] [CIFS] Add SMB2 support for cifs_get_file_info
+Date: Fri, 28 Oct 2011 23:54:45 +0400
+Message-ID: <1319831704-3572-35-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-fsdevel@vger.kernel.org,
-	Pavel Shilovsky <piastryyy@gmail.com>
-To: linux-cifs@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1319831704-3572-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastryyy@gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-and temporarily disable writepages support.
-
-Signed-off-by: Pavel Shilovsky <piastryyy@gmail.com>
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/file.c      |   35 +++++++++++++++++++++++++++++------
- fs/cifs/smb2file.c  |   16 ++++++++++++++--
- fs/cifs/smb2proto.h |    4 ++++
- 3 files changed, 47 insertions(+), 8 deletions(-)
+ fs/cifs/inode.c     |   18 +++++++++++++++---
+ fs/cifs/smb2inode.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2proto.h |    1 +
+ 3 files changed, 58 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index f20b38c..4e9616d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1461,9 +1461,10 @@ cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
- 		cifsi->server_eof = end_of_write;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index a465d04..9db398e 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -568,7 +568,8 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+ 	fattr->cf_gid = cifs_sb->mnt_gid;
  }
  
--static ssize_t cifs_write(struct cifsFileInfo *open_file, __u32 pid,
--			  const char *write_data, size_t write_size,
--			  loff_t *poffset)
-+static ssize_t
-+cifs_write_generic(struct cifsFileInfo *open_file, __u32 pid,
-+		   const char *write_data, size_t write_size, loff_t *poffset,
-+		   iwrite_callback_t *write_cb)
+-int cifs_get_file_info(struct file *filp)
++static int
++cifs_query_file_info(struct file *filp)
  {
- 	int rc = 0;
- 	unsigned int bytes_written = 0;
-@@ -1506,13 +1507,12 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file, __u32 pid,
- 			/* iov[0] is reserved for smb header */
- 			iov[1].iov_base = (char *)write_data + total_written;
- 			iov[1].iov_len = len;
--			io_parms.netfid = open_file->netfid;
- 			io_parms.pid = pid;
- 			io_parms.tcon = pTcon;
- 			io_parms.offset = *poffset;
- 			io_parms.length = len;
--			rc = CIFSSMBWrite2(xid, &io_parms, &bytes_written, iov,
--					   1, 0);
-+			rc = write_cb(xid, open_file, &io_parms, &bytes_written,
-+				      iov, 1, write_size - total_written, 0);
- 		}
- 		if (rc || (bytes_written == 0)) {
- 			if (total_written)
-@@ -1540,6 +1540,29 @@ static ssize_t cifs_write(struct cifsFileInfo *open_file, __u32 pid,
- 	return total_written;
+ 	int rc;
+ 	int xid;
+@@ -599,7 +600,7 @@ int cifs_get_file_info(struct file *filp)
+ 		rc = 0;
+ 		CIFS_I(inode)->time = 0;
+ 	default:
+-		goto cgfi_exit;
++		goto cqfi_exit;
+ 	}
+ 
+ 	/*
+@@ -609,11 +610,22 @@ int cifs_get_file_info(struct file *filp)
+ 	fattr.cf_uniqueid = CIFS_I(inode)->uniqueid;
+ 	fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
+ 	cifs_fattr_to_inode(inode, &fattr);
+-cgfi_exit:
++cqfi_exit:
+ 	FreeXid(xid);
+ 	return rc;
  }
  
-+static int cifs_write_cb(int xid, struct cifsFileInfo *cfile,
-+			 struct cifs_io_parms *parms, unsigned int *written,
-+			 struct kvec *iov, unsigned long nr_segs,
-+			 unsigned int remaining_bytes, int timeout)
-+{
-+
-+	parms->netfid = cfile->netfid;
-+	return CIFSSMBWrite2(xid, parms, written, iov, nr_segs, timeout);
-+}
-+
-+static ssize_t
-+cifs_write(struct cifsFileInfo *cfile, __u32 pid, const char *write_data,
-+	   size_t write_size, loff_t *offset)
++int cifs_get_file_info(struct file *filp)
 +{
 +#ifdef CONFIG_CIFS_SMB2
++	struct cifsFileInfo *cfile = filp->private_data;
++
 +	if (tlink_tcon(cfile->tlink)->ses->server->is_smb2)
-+		return cifs_write_generic(cfile, pid, write_data, write_size,
-+					  offset, smb2_write_cb);
++		return smb2_query_file_info(filp);
 +#endif
-+	return cifs_write_generic(cfile, pid, write_data, write_size, offset,
-+				  cifs_write_cb);
++	return cifs_query_file_info(filp);
 +}
 +
- struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
- 					bool fsuid_only)
- {
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index b17e71c..40f05e4 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -152,7 +152,7 @@ const struct address_space_operations smb2_addr_ops = {
- 	.readpage = cifs_readpage,
- 	/*.readpages = cifs_readpages,*/
- 	.writepage = cifs_writepage,
--	.writepages = cifs_writepages,
-+	/*.writepages = cifs_writepages,*/
- 	.write_begin = cifs_write_begin,
- 	.write_end = cifs_write_end,
- 	.set_page_dirty = __set_page_dirty_nobuffers,
-@@ -169,7 +169,7 @@ const struct address_space_operations smb2_addr_ops = {
- const struct address_space_operations smb2_addr_ops_smallbuf = {
- 	.readpage = cifs_readpage,
- 	.writepage = cifs_writepage,
--	.writepages = cifs_writepages,
-+	/*.writepages = cifs_writepages,*/
- 	.write_begin = cifs_write_begin,
- 	.write_end = cifs_write_end,
- 	.set_page_dirty = __set_page_dirty_nobuffers,
-@@ -447,3 +447,15 @@ smb2_read_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
- 	return SMB2_read(xid, parms, bytes_read, buf, buf_type,
- 			 remaining_bytes);
+ static int
+ cifs_query_inode_info(struct inode **pinode, const char *full_path,
+ 			FILE_ALL_INFO *data, struct super_block *sb, int xid,
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 1d21185..17297e4 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -284,6 +284,48 @@ sqii_exit:
+ 	return rc;
  }
-+
-+int
-+smb2_write_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
-+	      unsigned int *written, struct kvec *iov, unsigned long nr_segs,
-+	      unsigned int remaining_bytes, int timeout)
+ 
++int smb2_query_file_info(struct file *filp)
 +{
++	int rc;
++	int xid;
++	FILE_ALL_INFO find_data;
++	struct cifs_fattr fattr;
++	struct inode *inode = filp->f_path.dentry->d_inode;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct cifsFileInfo *cfile = filp->private_data;
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++	FILE_ALL_INFO_SMB2 *smb2_data;
 +
-+	parms->persist_fid = cfile->persist_fid;
-+	parms->volatile_fid = cfile->volatile_fid;
-+	return SMB2_write(xid, parms, written, iov, nr_segs,
-+			  remaining_bytes, timeout);
++	smb2_data = kzalloc(sizeof(FILE_ALL_INFO_SMB2) + MAX_NAME*2,
++			    GFP_KERNEL);
++	if (smb2_data == NULL)
++		return -ENOMEM;
++
++	xid = GetXid();
++	rc = SMB2_query_info(xid, tcon, cfile->persist_fid,
++			     cfile->volatile_fid, smb2_data);
++	if (!rc) {
++		move_smb2_info_to_cifs(&find_data, smb2_data);
++		cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false);
++	} else if (rc == -EREMOTE) {
++		cifs_create_dfs_fattr(&fattr, inode->i_sb);
++		rc = 0;
++	} else
++		goto sqfi_exit;
++
++	/*
++	 * don't bother with SFU junk here -- just mark inode as needing
++	 * revalidation.
++	 */
++	fattr.cf_uniqueid = CIFS_I(inode)->uniqueid;
++	fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
++	cifs_fattr_to_inode(inode, &fattr);
++sqfi_exit:
++	FreeXid(xid);
++	kfree(smb2_data);
++	return rc;
 +}
++
+ int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode)
+ {
+ 	int rc = 0, tmprc;
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index d891915..7798626 100644
+index 45ce215..73bc050 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -123,6 +123,10 @@ extern int smb2_read_cb(int xid, struct cifsFileInfo *cfile,
- 			struct cifs_io_parms *parms, unsigned int *bytes_read,
- 			char **buf, int *buf_type,
- 			unsigned int remaining_bytes);
-+extern int smb2_write_cb(int xid, struct cifsFileInfo *cfile,
-+			 struct cifs_io_parms *parms, unsigned int *written,
-+			 struct kvec *iov, unsigned long nr_segs,
-+			 unsigned int remaining_bytes, int timeout);
+@@ -105,6 +105,7 @@ extern int smb2_setup_session(unsigned int xid, struct cifs_ses *pses_info,
+ extern int smb2_umount(struct super_block *, struct cifs_sb_info *);
  
- extern int smb2_open(struct inode *inode, struct file *file);
- extern ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
+ extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst, FILE_ALL_INFO_SMB2 *src);
++extern int smb2_query_file_info(struct file *filp);
+ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
+ 				 FILE_ALL_INFO *data, struct super_block *sb,
+ 				 int xid);
 -- 
 1.7.1
-
