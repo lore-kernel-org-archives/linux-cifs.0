@@ -1,155 +1,75 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v2 52/53] CIFS: Add statfs support for SMB2
-Date: Fri, 28 Oct 2011 23:55:03 +0400
-Message-ID: <1319831704-3572-53-git-send-email-piastry@etersoft.ru>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v2 49/53] CIFS: Introduce SMB2 Kconfig option
+Date: Fri, 28 Oct 2011 23:55:00 +0400
+Message-ID: <1319831704-3572-50-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-fsdevel@vger.kernel.org
-To: linux-cifs@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1319831704-3572-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
+From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+
+SMB2 is the followon to the CIFS (and SMB) protocols
+and the default for Windows since Windows Vista, and also
+now implemented by various non-Windows servers.  SMB2
+is more secure, has various performance advantages, including
+larger i/o sizes, flow control, better caching model and more.
+SMB2 also resolves some scalability limits in the cifs
+protocol and adds many new features while being much
+simpler (only a few dozen commands instead of hundreds)
+and since the protocol is clearer it is
+also more consistently implemented across servers
+and thus easier to optimize.
+
+After much discussion with Jeff Layton, Jeremy Allison
+and others at Connectathon, we decided to move the smb2
+code from a distinct .ko and fstype into distinct
+C files that optionally build in cifs.ko.  As a result
+the Kconfig gets simpler.
+
+To avoid destabilizing cifs, the smb2 code is going
+to be moved into its own experimental CONFIG_CIFS_SMB2 ifdef
+as it is merged and rereviewed.  The changes to stable
+cifs (builds with the smb2 ifdef off) are expected to be
+fairly small.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsfs.c    |   52 +++++++++++++++++++++++++++++++-------------------
- fs/cifs/smb2glob.h  |    2 +
- fs/cifs/smb2pdu.c   |   18 +++++++++++++++++
- fs/cifs/smb2proto.h |    2 +
- 4 files changed, 54 insertions(+), 20 deletions(-)
+ fs/cifs/Kconfig |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 3683384..844ea94 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -169,31 +169,14 @@ static void cifs_kill_sb(struct super_block *sb)
- 	cifs_umount(cifs_sb);
- }
- 
--static int
--cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
-+static void
-+cifs_queryfs(int xid, struct cifs_tcon *tcon, struct kstatfs *buf)
- {
--	struct super_block *sb = dentry->d_sb;
--	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
--	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 	int rc = -EOPNOTSUPP;
--	int xid;
--
--	xid = GetXid();
- 
- 	buf->f_type = CIFS_MAGIC_NUMBER;
- 
- 	/*
--	 * PATH_MAX may be too long - it would presumably be total path,
--	 * but note that some servers (includinng Samba 3) have a shorter
--	 * maximum path.
--	 *
--	 * Instead could get the real value via SMB_QUERY_FS_ATTRIBUTE_INFO.
--	 */
--	buf->f_namelen = PATH_MAX;
--	buf->f_files = 0;	/* undefined */
--	buf->f_ffree = 0;	/* unlimited */
--
--	/*
- 	 * We could add a second check for a QFS Unix capability bit
- 	 */
- 	if ((tcon->ses->capabilities & CAP_UNIX) &&
-@@ -214,8 +197,37 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
- 	 */
- 	if (rc)
- 		rc = SMBOldQFSInfo(xid, tcon, buf);
-+}
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index ed5452e..c2ba4fb 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -160,3 +160,23 @@ config CIFS_NFSD_EXPORT
+ 	  depends on CIFS && EXPERIMENTAL && BROKEN
+ 	  help
+ 	   Allows NFS server to export a CIFS mounted share (nfsd over cifs)
 +
-+static int
-+cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
-+{
-+	struct super_block *sb = dentry->d_sb;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+	int xid;
++config CIFS_SMB2
++	bool "SMB2 network file system support (EXPERIMENTAL)"
++	depends on EXPERIMENTAL && INET && BROKEN
++	select NLS
++	select KEYS
++	select FSCACHE
++	select DNS_RESOLVER
 +
-+	xid = GetXid();
++	help
++	  This enables experimental support for the SMB2 (Server Message Block
++	  version 2) protocol. The SMB2 protocol is the successor to the
++	  popular CIFS and SMB network file sharing protocols. SMB2 is the
++	  native file sharing mechanism for recent versions of Windows
++	  operating systems (since Vista).  SMB2 enablement will eventually
++	  allow users better performance, security and features, than would be
++	  possible with cifs. Note that smb2 mount options also are simpler
++	  (compared to cifs) due to protocol improvements.
 +
-+	/*
-+	 * PATH_MAX may be too long - it would presumably be total path,
-+	 * but note that some servers (includinng Samba 3) have a shorter
-+	 * maximum path.
-+	 *
-+	 * Instead could get the real value via SMB_QUERY_FS_ATTRIBUTE_INFO.
-+	 */
-+	buf->f_namelen = PATH_MAX;
-+	buf->f_files = 0;	/* undefined */
-+	buf->f_ffree = 0;	/* unlimited */
-+
-+#ifdef CONFIG_CIFS_SMB2
-+	if (tcon->ses->server->is_smb2)
-+		smb2_open_queryfs_close(xid, tcon, buf);
-+	else
-+#endif
-+		cifs_queryfs(xid, tcon, buf);
- 
--	FreeXid(xid);
-+	_FreeXid(xid);
- 	return 0;
- }
- 
-diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index 9e42f71..49634d4 100644
---- a/fs/cifs/smb2glob.h
-+++ b/fs/cifs/smb2glob.h
-@@ -25,6 +25,8 @@
- #include <linux/workqueue.h>
- #include "smb2pdu.h"
- 
-+#define SMB2_MAGIC_NUMBER 0xFE534D42
-+
- /*
-  * The sizes of various internal tables and strings
-  */
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 4ce496a..dc73968 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1921,6 +1921,24 @@ qfsdev_exit:
- 	return rc;
- }
- 
-+void
-+smb2_open_queryfs_close(int xid, struct cifs_tcon *tcon, struct kstatfs *buf)
-+{
-+	int rc;
-+	u64 persist_fid, volatile_fid;
-+	__le16 srch_path = 0; /* Null - open root of share */
-+	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+
-+	rc = SMB2_open(xid, tcon, &srch_path, &persist_fid, &volatile_fid,
-+			FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0, &oplock);
-+	if (!rc) {
-+		buf->f_type = SMB2_MAGIC_NUMBER;
-+		SMB2_QFS_info(xid, tcon, persist_fid, volatile_fid,
-+					  buf);
-+		SMB2_close(xid, tcon, persist_fid, volatile_fid);
-+	}
-+}
-+
- int SMB2_query_info(const int xid, struct cifs_tcon *tcon,
- 		    u64 persistent_fid, u64 volatile_fid,
- 		    FILE_ALL_INFO_SMB2 *pdata)
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 0425700..aa894cc 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -111,6 +111,8 @@ extern int smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *path,
- 			      __u32 desired_access, __u32 create_disposition,
- 			      __u32 file_attributes, __u32 create_options,
- 			      void *data, int command);
-+extern void smb2_open_queryfs_close(int xid, struct cifs_tcon *tcon,
-+				    struct kstatfs *buf);
- extern void smb2_set_ops(struct inode *inode);
- extern bool smb2_is_size_safe_to_change(struct smb2_inode *smb2_ind,
- 					__u64 end_of_file);
++	  Unless you are a developer or tester, say N.
 -- 
 1.7.1
-
