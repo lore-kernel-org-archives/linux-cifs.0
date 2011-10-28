@@ -1,47 +1,35 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Subject: Re: [GIT] CIFS Fixes
-Date: Fri, 28 Oct 2011 09:58:34 -0400
-Message-ID: <20111028095834.2a89660b@corrin.poochiereds.net>
+Date: Fri, 28 Oct 2011 07:28:14 -0700
+Message-ID: <CA+55aFy1BtNSjti8SrEgy-Kc9FWr4gKPx0ytyW=47J+JnaHpHQ@mail.gmail.com>
 References: <CAH2r5msFde8+dBW1uku_=qv5maXcypoM3cXWCAOK3pbEKv=86w@mail.gmail.com>
-	<20111027210722.GA29989@infradead.org>
-	<CAH2r5mvCDTE91Mj-HAm_WhSTrzHKi6RNvBL0-+e92POxeqXA9w@mail.gmail.com>
-	<20111027211515.GA1380@infradead.org>
+ <20111027210722.GA29989@infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111027211515.GA1380-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+In-Reply-To: <20111027210722.GA29989-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 27 Oct 2011 17:15:15 -0400
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+On Thu, Oct 27, 2011 at 2:07 PM, Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> =
+wrote:
+> Clear NAK. =A0The SMB2 support has been posted a couple of days ago, =
+and
+> both Jeff and me as likely reviewers had been travelling during that
+> time, nevermind that a totally new feature really needs more baking t=
+ime
+> than half a week.
 
-> I'm not complaining about Pavel - he has generally done outstanding
-> work.
-> 
-> But patches posted the first time in that form two days ago (and the
-> first time completely for a long time) are simply not suitable for
-> this merge window.  I talked with Jeff about them very briefly at Kernel
-> Summit and we will review them, and they will almost certainly need
-> another respin or two.
-> 
-> Please learn the basic of kernel tree maintainance.
+Thanks for catching that.
 
-I agree. It's definitely premature to merge this series. The patches
-themselves have never been posted to the list AFAICT, though Pavel has
-on occasion posted a link to his git tree. That's not the same thing
-however. As a general rule...
+And in general, I *really* want code to have been in linux-next for
+this merge window (although rebasing has made it annoyingly hard to
+check that).
 
-   "If it's not on the list, then it doesn't exist"
+There was tons of time for it, and linux-next is absolutely huge, so
+it's clear that we have "enough" code in linux-next as-is.
 
-No one will do any comprehensive review of patches that have not been
-sent to the list. I suggest you re-target the SMB2 series for 3.3 once
-we've had an opportunity to review it.
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+                          Linus
