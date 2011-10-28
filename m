@@ -1,218 +1,188 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v2 26/53] CIFS: Add address space ops structures for SMB2
-Date: Fri, 28 Oct 2011 23:54:37 +0400
-Message-ID: <1319831704-3572-27-git-send-email-piastry@etersoft.ru>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v2 27/53] CIFS: Add read related address space operations for SMB2
+Date: Fri, 28 Oct 2011 23:54:38 +0400
+Message-ID: <1319831704-3572-28-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-fsdevel@vger.kernel.org,
-	Pavel Shilovsky <piastryyy@gmail.com>
-To: linux-cifs@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1319831704-3572-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastryyy@gmail.com>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Signed-off-by: Pavel Shilovsky <piastryyy@gmail.com>
+and temporarily disable readpages support.
+
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |   15 +++++++++++++++
- fs/cifs/file.c      |   28 ++++++++++++++--------------
- fs/cifs/smb2file.c  |   30 ++++++++++++++++++++++++++++++
- fs/cifs/smb2inode.c |    4 ++--
- fs/cifs/smb2proto.h |    3 +++
- 5 files changed, 64 insertions(+), 16 deletions(-)
+ fs/cifs/cifsglob.h  |    3 +++
+ fs/cifs/file.c      |   34 +++++++++++++++++++++++++++++-----
+ fs/cifs/smb2file.c  |   13 ++++++++++++-
+ fs/cifs/smb2pdu.c   |   20 +++++++++++++++-----
+ fs/cifs/smb2proto.h |    4 ++++
+ 5 files changed, 63 insertions(+), 11 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 1129f16..eee59f7 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -193,6 +193,21 @@ extern ssize_t cifs_iovec_read_generic(struct file *file,
- 				       unsigned long nr_segs, loff_t *poffset,
- 				       iread_callback_t *read_cb);
- extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
-+extern int cifs_write_end(struct file *file, struct address_space *mapping,
-+			  loff_t pos, unsigned len, unsigned copied,
-+			  struct page *page, void *fsdata);
-+extern int cifs_write_begin(struct file *file, struct address_space *mapping,
-+			    loff_t pos, unsigned len, unsigned flags,
-+			    struct page **pagep, void **fsdata);
-+extern int cifs_release_page(struct page *page, gfp_t gfp);
-+extern void cifs_invalidate_page(struct page *page, unsigned long offset);
-+extern int cifs_launder_page(struct page *page);
-+extern int cifs_readpage(struct file *file, struct page *page);
-+extern int cifs_readpages(struct file *file, struct address_space *mapping,
-+			  struct list_head *page_list, unsigned num_pages);
-+extern int cifs_writepages(struct address_space *mapping,
-+			   struct writeback_control *wbc);
-+extern int cifs_writepage(struct page *page, struct writeback_control *wbc);
- void cifs_proc_init(void);
- void cifs_proc_clean(void);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 1ab2767..465e87c 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -617,6 +617,9 @@ typedef int (iwrite_callback_t)(int, struct cifsFileInfo *,
+ typedef int (iread_callback_t)(int, struct cifsFileInfo *,
+ 			       struct cifs_io_parms *, unsigned int *, char **,
+ 			       char **, int *);
++typedef int (read_callback_t)(int, struct cifsFileInfo *,
++			      struct cifs_io_parms *, unsigned int *, char **,
++			      int *, unsigned int);
  
+ /*
+  * Take a reference on the file private data. Must be called with
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 44f678a..6eb1741 100644
+index 6eb1741..f20b38c 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1699,7 +1699,7 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 	return rc;
+@@ -2493,8 +2493,9 @@ ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
+ 	return cifs_user_readv(iocb, iov, nr_segs, pos);
  }
  
--static int cifs_writepages(struct address_space *mapping,
-+int cifs_writepages(struct address_space *mapping,
- 			   struct writeback_control *wbc)
+-static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+-			 loff_t *poffset)
++static ssize_t
++cifs_read_generic(struct file *file, char *read_data, size_t read_size,
++		  loff_t *poffset, read_callback_t *read_cb)
  {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
-@@ -1937,16 +1937,16 @@ retry_write:
- 	return rc;
- }
- 
--static int cifs_writepage(struct page *page, struct writeback_control *wbc)
-+int cifs_writepage(struct page *page, struct writeback_control *wbc)
- {
- 	int rc = cifs_writepage_locked(page, wbc);
- 	unlock_page(page);
- 	return rc;
- }
- 
--static int cifs_write_end(struct file *file, struct address_space *mapping,
--			loff_t pos, unsigned len, unsigned copied,
--			struct page *page, void *fsdata)
-+int cifs_write_end(struct file *file, struct address_space *mapping, loff_t pos,
-+		   unsigned len, unsigned copied, struct page *page,
-+		   void *fsdata)
- {
- 	int rc;
- 	struct inode *inode = mapping->host;
-@@ -2631,8 +2631,8 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
- 	return rc;
- }
- 
--static int cifs_readpages(struct file *file, struct address_space *mapping,
--	struct list_head *page_list, unsigned num_pages)
-+int cifs_readpages(struct file *file, struct address_space *mapping,
-+		   struct list_head *page_list, unsigned num_pages)
- {
- 	int rc;
- 	struct list_head tmplist;
-@@ -2825,7 +2825,7 @@ read_complete:
- 	return rc;
- }
- 
--static int cifs_readpage(struct file *file, struct page *page)
-+int cifs_readpage(struct file *file, struct page *page)
- {
- 	loff_t offset = (loff_t)page->index << PAGE_CACHE_SHIFT;
  	int rc = -EACCES;
-@@ -2895,9 +2895,9 @@ bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 end_of_file)
- 		return true;
+ 	unsigned int bytes_read = 0;
+@@ -2551,13 +2552,12 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 				if (rc != 0)
+ 					break;
+ 			}
+-			io_parms.netfid = open_file->netfid;
+ 			io_parms.pid = pid;
+ 			io_parms.tcon = pTcon;
+ 			io_parms.offset = *poffset;
+ 			io_parms.length = current_read_size;
+-			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
+-					 &current_offset, &buf_type);
++			rc = read_cb(xid, open_file, &io_parms, &bytes_read,
++				     &current_offset, &buf_type, 0);
+ 		}
+ 		if (rc || (bytes_read == 0)) {
+ 			if (total_read) {
+@@ -2575,6 +2575,30 @@ static ssize_t cifs_read(struct file *file, char *read_data, size_t read_size,
+ 	return total_read;
  }
  
--static int cifs_write_begin(struct file *file, struct address_space *mapping,
--			loff_t pos, unsigned len, unsigned flags,
--			struct page **pagep, void **fsdata)
-+int cifs_write_begin(struct file *file, struct address_space *mapping,
-+		     loff_t pos, unsigned len, unsigned flags,
-+		     struct page **pagep, void **fsdata)
- {
- 	pgoff_t index = pos >> PAGE_CACHE_SHIFT;
- 	loff_t offset = pos & (PAGE_CACHE_SIZE - 1);
-@@ -2967,7 +2967,7 @@ out:
- 	return rc;
- }
- 
--static int cifs_release_page(struct page *page, gfp_t gfp)
-+int cifs_release_page(struct page *page, gfp_t gfp)
- {
- 	if (PagePrivate(page))
- 		return 0;
-@@ -2975,7 +2975,7 @@ static int cifs_release_page(struct page *page, gfp_t gfp)
- 	return cifs_fscache_release_page(page, gfp);
- }
- 
--static void cifs_invalidate_page(struct page *page, unsigned long offset)
-+void cifs_invalidate_page(struct page *page, unsigned long offset)
- {
- 	struct cifsInodeInfo *cifsi = CIFS_I(page->mapping->host);
- 
-@@ -2983,7 +2983,7 @@ static void cifs_invalidate_page(struct page *page, unsigned long offset)
- 		cifs_fscache_invalidate_page(page, &cifsi->vfs_inode);
- }
- 
--static int cifs_launder_page(struct page *page)
-+int cifs_launder_page(struct page *page)
- {
- 	int rc = 0;
- 	loff_t range_start = page_offset(page);
++static int
++cifs_read_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
++	     unsigned int *bytes_read, char **buf, int *buf_type,
++	     unsigned int remaining_bytes)
++{
++	parms->netfid = cfile->netfid;
++	return CIFSSMBRead(xid, parms, bytes_read, buf, buf_type);
++}
++
++static ssize_t
++cifs_read(struct file *file, char *read_data, size_t read_size, loff_t *offset)
++{
++#ifdef CONFIG_CIFS_SMB2
++	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
++
++	if (tlink_tcon(cfile->tlink)->ses->server->is_smb2)
++		return cifs_read_generic(file, read_data, read_size, offset,
++					 smb2_read_cb);
++#endif
++
++	return cifs_read_generic(file, read_data, read_size, offset,
++				 cifs_read_cb);
++}
++
+ /*
+  * If the page is mmap'ed into a process' page tables, then we need to make
+  * sure that it doesn't change while being written back.
 diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 3404d8a..1091934 100644
+index 1091934..b17e71c 100644
 --- a/fs/cifs/smb2file.c
 +++ b/fs/cifs/smb2file.c
-@@ -148,6 +148,36 @@ const struct file_operations smb2_file_direct_nobrl_ops = {
- 	.setlease = cifs_setlease,
- };
+@@ -150,7 +150,7 @@ const struct file_operations smb2_file_direct_nobrl_ops = {
  
-+const struct address_space_operations smb2_addr_ops = {
-+	.readpage = cifs_readpage,
-+	.readpages = cifs_readpages,
-+	.writepage = cifs_writepage,
-+	.writepages = cifs_writepages,
-+	.write_begin = cifs_write_begin,
-+	.write_end = cifs_write_end,
-+	.set_page_dirty = __set_page_dirty_nobuffers,
-+	.releasepage = cifs_release_page,
-+	.invalidatepage = cifs_invalidate_page,
-+	.launder_page = cifs_launder_page,
-+};
+ const struct address_space_operations smb2_addr_ops = {
+ 	.readpage = cifs_readpage,
+-	.readpages = cifs_readpages,
++	/*.readpages = cifs_readpages,*/
+ 	.writepage = cifs_writepage,
+ 	.writepages = cifs_writepages,
+ 	.write_begin = cifs_write_begin,
+@@ -436,3 +436,14 @@ ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
+ 
+ 	return read;
+ }
 +
-+/*
-+ * cifs_readpages requires the server to support a buffer large enough to
-+ * contain the header plus one complete page of data.  Otherwise, we need
-+ * to leave cifs_readpages out of the address space operations.
-+ */
-+const struct address_space_operations smb2_addr_ops_smallbuf = {
-+	.readpage = cifs_readpage,
-+	.writepage = cifs_writepage,
-+	.writepages = cifs_writepages,
-+	.write_begin = cifs_write_begin,
-+	.write_end = cifs_write_end,
-+	.set_page_dirty = __set_page_dirty_nobuffers,
-+	.releasepage = cifs_release_page,
-+	.invalidatepage = cifs_invalidate_page,
-+	.launder_page = cifs_launder_page,
-+};
++int
++smb2_read_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
++	     unsigned int *bytes_read, char **buf, int *buf_type,
++	     unsigned int remaining_bytes)
++{
++	parms->persist_fid = cfile->persist_fid;
++	parms->volatile_fid = cfile->volatile_fid;
++	return SMB2_read(xid, parms, bytes_read, buf, buf_type,
++			 remaining_bytes);
++}
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 2ff0acf..8d13b34 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2311,7 +2311,7 @@ int new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
+ }
+ 
+ int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
+-	      unsigned int *nbytes, char **buf, int *pbuf_type,
++	      unsigned int *nbytes, char **buf, int *buf_type,
+ 	      unsigned int remaining_bytes)
+ {
+ 	int status, resp_buftype, rc = -EACCES;
+@@ -2349,12 +2349,22 @@ int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
+ 			*nbytes = 0;
+ 		}
+ 	}
+-	if (resp_buftype != CIFS_NO_BUFFER) {
+-		*buf = iov[0].iov_base;
 +
- struct cifsFileInfo *
- smb2_new_fileinfo(__u64 persist_fid, __u64 volatile_fid, struct file *file,
- 		  struct tcon_link *tlink, __u32 oplock)
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 4b33f16..1d21185 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -113,9 +113,9 @@ void smb2_set_ops(struct inode *inode)
- 		/* check if server can support readpages */
- 		if (cifs_sb_master_tcon(cifs_sb)->ses->server->max_read <
- 				PAGE_CACHE_SIZE)
--			inode->i_data.a_ops = &cifs_addr_ops_smallbuf;
-+			inode->i_data.a_ops = &smb2_addr_ops_smallbuf;
- 		else
--			inode->i_data.a_ops = &cifs_addr_ops;
-+			inode->i_data.a_ops = &smb2_addr_ops;
- 		break;
- 	case S_IFDIR:
- #ifdef CONFIG_CIFS_DFS_UPCALL
++	if (*buf) {
++		memcpy(*buf, (char *)pSMB2r->hdr.ProtocolId +
++		       pSMB2r->DataOffset, *nbytes);
+ 		if (resp_buftype == CIFS_SMALL_BUFFER)
+-			*pbuf_type = CIFS_SMALL_BUFFER;
++			cifs_small_buf_release(iov[0].iov_base);
+ 		else if (resp_buftype == CIFS_LARGE_BUFFER)
+-			*pbuf_type = CIFS_LARGE_BUFFER;
++			cifs_buf_release(iov[0].iov_base);
++	} else {
++		if (resp_buftype != CIFS_NO_BUFFER) {
++			*buf = iov[0].iov_base;
++			if (resp_buftype == CIFS_SMALL_BUFFER)
++				*buf_type = CIFS_SMALL_BUFFER;
++			else if (resp_buftype == CIFS_LARGE_BUFFER)
++				*buf_type = CIFS_LARGE_BUFFER;
++		}
+ 	}
+ 	return rc;
+ }
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 30ab741..810a7fc 100644
+index 810a7fc..d891915 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -44,6 +44,9 @@ extern const struct file_operations smb2_file_nobrl_ops; /* no brlocks */
- extern const struct file_operations smb2_file_direct_nobrl_ops;
- extern const struct file_operations smb2_file_strict_nobrl_ops;
+@@ -119,6 +119,10 @@ extern struct cifsFileInfo *smb2_new_fileinfo(__u64 persist_fid,
+ extern int smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
+ 			       struct cifs_tcon *tcon, const char *full_path,
+ 			       __u32 *oplock);
++extern int smb2_read_cb(int xid, struct cifsFileInfo *cfile,
++			struct cifs_io_parms *parms, unsigned int *bytes_read,
++			char **buf, int *buf_type,
++			unsigned int remaining_bytes);
  
-+extern const struct address_space_operations smb2_addr_ops;
-+extern const struct address_space_operations smb2_addr_ops_smallbuf;
-+
- /* extern char *build_smb2path_from_dentry(struct dentry *);*/
- extern __le16 *build_ucspath_from_dentry(struct dentry *);
- /*extern __le16 *smb2_build_path_to_root(struct cifs_sb_info *smb2_sb);
+ extern int smb2_open(struct inode *inode, struct file *file);
+ extern ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
 -- 
 1.7.1
-
