@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v2 40/53] CIFS: Add NTLMSSP sec type to defaults
-Date: Fri, 28 Oct 2011 23:54:51 +0400
-Message-ID: <1319831704-3572-41-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2 43/53] CIFS: Process STATUS_PENDING responses for SMB2
+Date: Fri, 28 Oct 2011 23:54:54 +0400
+Message-ID: <1319831704-3572-44-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
 Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
@@ -15,21 +15,60 @@ From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ fs/cifs/connect.c |   19 +++++++++++++++++--
+ fs/cifs/nterr.h   |    1 +
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b71c3fc..c05b4c0 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -998,7 +998,7 @@ require use of the stronger protocol */
- #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
- #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index ab9e972..e46c2bd 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -825,10 +825,10 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	 * into the payload for debugging purposes.
+ 	 */
+ #ifdef CONFIG_CIFS_SMB2
+-	if (server->is_smb2)
++	if (server->is_smb2) {
+ 		length = checkSMB2(smb2_buffer, smb2_buffer->MessageId,
+ 				   server->total_read);
+-	else
++	} else
+ #endif
+ 		length = checkSMB(smb_buffer, smb_buffer->Mid,
+ 				  server->total_read);
+@@ -836,6 +836,21 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		cifs_dump_mem("Bad SMB: ", buf,
+ 			min_t(unsigned int, server->total_read, 48));
  
--#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
-+#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
- #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
- #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
++#ifdef CONFIG_CIFS_SMB2
++	/*
++	* If we negotiate SMB2 protocol and get STATUS_PENDING - update
++	* the number of credits and skip it.
++	*/
++	if (server->is_smb2 &&
++			le32_to_cpu(smb2_buffer->Status) == STATUS_PENDING) {
++		if (!length)
++			atomic_add(le16_to_cpu(smb2_buffer->CreditRequest),
++				   &server->credits);
++		cERROR(1, "STATUS PENDING");
++		return -1;
++	}
++#endif
++
+ 	if (mid)
+ 		handle_mid(mid, server, buf, length);
  
+diff --git a/fs/cifs/nterr.h b/fs/cifs/nterr.h
+index 2572673..e80c0ef 100644
+--- a/fs/cifs/nterr.h
++++ b/fs/cifs/nterr.h
+@@ -40,6 +40,7 @@ extern const struct nt_err_code_struct nt_errs[];
+ #define ERROR_INSUFFICIENT_BUFFER	  0x007a
+ #define STATUS_1804	                  0x070c
+ #define STATUS_NOTIFY_ENUM_DIR            0x010c
++#define STATUS_PENDING			  0x00000103
+ 
+ /* Win32 Error codes extracted using a loop in smbclient then printing a
+    netmon sniff to a file. */
 -- 
 1.7.1
