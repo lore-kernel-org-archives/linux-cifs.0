@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v2 11/53] CIFS: Add sync_smb2_mid_result
-Date: Fri, 28 Oct 2011 23:54:22 +0400
-Message-ID: <1319831704-3572-12-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2 10/53] CIFS: Add routines to free SMB2 mids
+Date: Fri, 28 Oct 2011 23:54:21 +0400
+Message-ID: <1319831704-3572-11-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
 Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,86 +12,86 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-Previously CIFS added a function, sync_mid_result,
-to better handle certain error conditions.
-This patch adds the equivalent for SMB2 mids (the
-functions are used by smb2_sendrcv2
-which is added in the next patch)
+Add smb2_mid_entry_free and free_smb2_mid.
+These are straightforward and generally similarly
+to cifs's DeleteMidQEntry and delete_mid.
 
 Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/smb2transport.c |   58 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 58 insertions(+), 0 deletions(-)
+ fs/cifs/smb2transport.c |   62 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 62 insertions(+), 0 deletions(-)
 
 diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 59aa1c0..2ca9943 100644
+index 94b277e..59aa1c0 100644
 --- a/fs/cifs/smb2transport.c
 +++ b/fs/cifs/smb2transport.c
-@@ -244,6 +244,64 @@ smb2_mid_entry_free(struct smb2_mid_entry *mid_entry)
- 	mempool_free(mid_entry, smb2_mid_poolp);
+@@ -191,4 +191,66 @@ static int get_smb2_mid(struct cifs_ses *ses, struct smb2_hdr *in_buf,
+ 	spin_unlock(&GlobalMid_Lock);
+ 	return 0;
  }
- 
-+/* This is similar to cifs's wait_for_response but obviously for smb2 mids */
-+static int
-+wait_for_smb2_response(struct TCP_Server_Info *server,
-+			struct smb2_mid_entry *midq)
++
++static void
++smb2_mid_entry_free(struct smb2_mid_entry *mid_entry)
 +{
-+	int error;
++#ifdef CONFIG_CIFS_STATS2
++	unsigned long now;
++#endif
++	mid_entry->mid_state = MID_FREE;
++	atomic_dec(&midCount);
 +
-+	error = wait_event_killable(server->response_q,
-+				    midq->mid_state != MID_REQUEST_SUBMITTED);
-+	if (error < 0)
-+		return -ERESTARTSYS;
++	/*
++	 * the large buf free will eventually use a different
++	 * pool (the cifs size is not optimal for smb2) but
++	 * it makes the initial conversion simpler to leave
++	 * it using the cifs large buf pool
++	 */
++	if (mid_entry->large_buf)
++		cifs_buf_release(mid_entry->resp_buf);
++	else
++		cifs_small_buf_release(mid_entry->resp_buf);
++#ifdef CONFIG_CIFS_STATS2
++	now = jiffies;
++	/*
++	 * commands taking longer than one second are indications that
++	 * something is wrong, unless it is quite a slow link or server
++	 */
++	/*
++	 * BB eventually add a mid flag to allow us to indicate other ops such
++	 * as SMB2 reads or writes to "offline" files which are ok to be slow
++	 */
++	if ((now - mid_entry->when_alloc) > HZ) {
++		if ((cifsFYI & CIFS_TIMER) &&
++		   (mid_entry->command != SMB2_LOCK)) {
++			printk(KERN_DEBUG " SMB2 slow rsp: cmd %d mid %lld",
++			       mid_entry->command, mid_entry->mid);
++			printk(" A: 0x%lx S: 0x%lx R: 0x%lx\n",
++			       now - mid_entry->when_alloc,
++			       now - mid_entry->when_sent,
++			       now - mid_entry->when_received);
++		}
++	}
++#endif
 +
-+	return 0;
++	/*
++	 * The next two lines or equivalent will be needed when pagebuf support
++	 * added back in:
++	if (mid_entry->is_kmap_buf && mid_entry->pagebuf_list)
++		kfree(mid_entry->pagebuf_list);
++	*/
++
++	mempool_free(mid_entry, smb2_mid_poolp);
 +}
 +
-+/* This is similar to cifs's sync_mid_result but for smb2 mids */
-+static int
-+sync_smb2_mid_result(struct smb2_mid_entry *mid, struct TCP_Server_Info *server)
++static void
++free_smb2_mid(struct smb2_mid_entry *mid)
 +{
-+	int rc = 0;
-+
-+	cFYI(1, "%s: cmd=%d mid=%lld state=%d", __func__,
-+		le16_to_cpu(mid->command), mid->mid, mid->mid_state);
-+
 +	spin_lock(&GlobalMid_Lock);
-+	/* ensure that it's no longer on the pending_mid_q */
-+	list_del_init(&mid->qhead);
-+
-+	switch (mid->mid_state) {
-+	case MID_RESPONSE_RECEIVED:
-+		spin_unlock(&GlobalMid_Lock);
-+		return rc;
-+	case MID_REQUEST_SUBMITTED:
-+		/* socket is going down, reject all calls */
-+		if (server->tcpStatus == CifsExiting) {
-+			cERROR(1, "%s: canceling mid=%lld cmd=0x%x state=%d",
-+				__func__, mid->mid, le16_to_cpu(mid->command),
-+				mid->mid_state);
-+			rc = -EHOSTDOWN;
-+			break;
-+		}
-+	case MID_RETRY_NEEDED:
-+		rc = -EAGAIN;
-+		break;
-+	case MID_RESPONSE_MALFORMED:
-+		rc = -EIO;
-+		break;
-+	default:
-+		cERROR(1, "%s: invalid mid state mid=%lld state=%d", __func__,
-+			mid->mid, mid->mid_state);
-+		rc = -EIO;
-+	}
++	list_del(&mid->qhead);
 +	spin_unlock(&GlobalMid_Lock);
 +
 +	smb2_mid_entry_free(mid);
-+	return rc;
 +}
-+
- static void
- free_smb2_mid(struct smb2_mid_entry *mid)
- {
+ /* BB add missing functions here */
 -- 
 1.7.1
