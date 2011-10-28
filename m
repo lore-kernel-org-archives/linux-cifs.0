@@ -1,477 +1,415 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v2 13/53] CIFS: Add SMB2 transport routines
-Date: Fri, 28 Oct 2011 23:54:24 +0400
-Message-ID: <1319831704-3572-14-git-send-email-piastry@etersoft.ru>
+From: Pavel Shilovsky <piastry@etersoft.ru>
+Subject: [PATCH v2 16/53] CIFS: Get mount/umount work with SMB2 protocol
+Date: Fri, 28 Oct 2011 23:54:27 +0400
+Message-ID: <1319831704-3572-17-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319831704-3572-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-fsdevel@vger.kernel.org,
+	Pavel Shilovsky <piastryyy@gmail.com>
+To: linux-cifs@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-And simplify smb_sendv to make it process SMB2 requests. It let us
-send SMB2 negotiate message to the server.
+From: Pavel Shilovsky <piastryyy@gmail.com>
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Process SMB2 session setup, tree connect, getting inode info,
+tree disconnect and logoff messages.
+
+Signed-off-by: Pavel Shilovsky <piastryyy@gmail.com>
 ---
- fs/cifs/cifsglob.h      |    6 ++
- fs/cifs/cifsproto.h     |    4 +-
- fs/cifs/smb2misc.c      |   11 +--
- fs/cifs/smb2proto.h     |    4 +-
- fs/cifs/smb2transport.c |  209 ++++++++++++++++++++++++++++++++++++++++-------
- fs/cifs/transport.c     |   75 ++++++++++-------
- 6 files changed, 240 insertions(+), 69 deletions(-)
+ fs/cifs/connect.c  |  107 ++++++++++++++++++++++++++++++++----------
+ fs/cifs/inode.c    |  132 +++++++++++++++++++++++++++++++++++++++++++---------
+ fs/cifs/smb2sess.c |    2 +
+ 3 files changed, 194 insertions(+), 47 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 2703b7e..4ccd893 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -239,6 +239,12 @@ struct cifs_mnt_data {
- 	int flags;
- };
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index ccb7ea7..0187f11 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -99,6 +99,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	spin_unlock(&GlobalMid_Lock);
+ 	server->maxBuf = 0;
++#ifdef CONFIG_CIFS_SMB2
++	server->max_read = 0;
++#endif
  
-+static inline unsigned int
-+get_rfc1002_length(void *buf)
-+{
-+       return be32_to_cpu(*((__be32 *)buf));
-+}
+ 	cFYI(1, "Reconnecting tcp session");
+ 
+@@ -313,7 +316,13 @@ cifs_echo_request(struct work_struct *work)
+ 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
+ 		goto requeue_echo;
+ 
+-	rc = CIFSSMBEcho(server);
++	if (server->is_smb2 == false)
++		rc = CIFSSMBEcho(server);
++#ifdef CONFIG_CIFS_SMB2
++	else /*temporarilly disable echo requests for smb2
++		rc = SMB2_echo(server); */
++		rc = 0;
++#endif
+ 	if (rc)
+ 		cFYI(1, "Unable to send echo request to server: %s",
+ 			server->hostname);
+@@ -2151,7 +2160,12 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+ 
+ 	if (ses->status == CifsGood) {
+ 		xid = GetXid();
+-		CIFSSMBLogoff(xid, ses);
++#ifdef CONFIG_CIFS_SMB2
++		if (ses->server->is_smb2)
++			SMB2_logoff(xid, ses);
++		else
++#endif
++			CIFSSMBLogoff(xid, ses);
+ 		_FreeXid(xid);
+ 	}
+ 	sesInfoFree(ses);
+@@ -2312,7 +2326,12 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	xid = GetXid();
+-	CIFSSMBTDis(xid, tcon);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		SMB2_tdis(xid, tcon);
++	else
++#endif
++		CIFSSMBTDis(xid, tcon);
+ 	_FreeXid(xid);
+ 
+ 	cifs_fscache_release_super_cookie(tcon);
+@@ -2323,7 +2342,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ static struct cifs_tcon *
+ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ {
+-	int rc, xid;
++	int rc = 0, xid;
+ 	struct cifs_tcon *tcon;
+ 
+ 	tcon = cifs_find_tcon(ses, volume_info->UNC);
+@@ -2363,7 +2382,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 	 * this TCon call and Unix SetFS as
+ 	 * we do on SessSetup and reconnect? */
+ 	xid = GetXid();
+-	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		rc = SMB2_tcon(xid, ses, volume_info->UNC, tcon,
++			       volume_info->local_nls);
++	else
++#endif
++		rc = CIFSTCon(xid, ses, volume_info->UNC, tcon,
++			      volume_info->local_nls);
+ 	FreeXid(xid);
+ 	cFYI(1, "CIFS Tcon rc = %d", rc);
+ 	if (rc)
+@@ -2518,6 +2544,12 @@ get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
+ 	char *temp_unc;
+ 	int rc = 0;
+ 
++#ifdef CONFIG_CIFS_SMB2
++	if (pSesInfo->server->is_smb2) {
++		/* add missing smb2 dfs code here */
++		return -EREMOTE;
++	}
++#endif
+ 	*pnum_referrals = 0;
+ 	*preferrals = NULL;
+ 
+@@ -3116,22 +3148,38 @@ is_path_accessible(int xid, struct cifs_tcon *tcon,
+ 		   struct cifs_sb_info *cifs_sb, const char *full_path)
+ {
+ 	int rc;
+-	FILE_ALL_INFO *pfile_info;
+-
+-	pfile_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
+-	if (pfile_info == NULL)
+-		return -ENOMEM;
+ 
+-	rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
+-			      0 /* not legacy */, cifs_sb->local_nls,
+-			      cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++#ifdef CONFIG_CIFS_SMB2
++	if (tcon->ses->server->is_smb2) {
++		__u64 persistent_fid, volatile_fid;
++		rc = SMB2_open(xid, tcon, (__le16 *)full_path, &persistent_fid,
++			       &volatile_fid, FILE_READ_ATTRIBUTES, FILE_OPEN,
++			       0, 0);
++		if (rc)
++			return rc;
++		/* rc = SMB2_query_info() */
++		rc = SMB2_close(xid, tcon, persistent_fid, volatile_fid);
++	} else {
++#endif
++		FILE_ALL_INFO *pfile_info = kmalloc(sizeof(FILE_ALL_INFO),
++						     GFP_KERNEL);
++		if (pfile_info == NULL)
++			return -ENOMEM;
+ 
+-	if (rc == -EOPNOTSUPP || rc == -EINVAL)
+-		rc = SMBQueryInformation(xid, tcon, full_path, pfile_info,
+-				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				  CIFS_MOUNT_MAP_SPECIAL_CHR);
+-	kfree(pfile_info);
++		rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
++				      0 /* not legacy */, cifs_sb->local_nls,
++				      cifs_sb->mnt_cifs_flags &
++					CIFS_MOUNT_MAP_SPECIAL_CHR);
 +
- struct TCP_Server_Info {
- 	struct list_head tcp_ses_list;
- 	struct list_head smb_ses_list;
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 2b3fa3b..5109925 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -36,7 +36,9 @@ extern void cifs_buf_release(void *);
- extern struct smb_hdr *cifs_small_buf_get(void);
- extern void cifs_small_buf_release(void *);
- extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
--			unsigned int /* length */);
-+		    unsigned int /* length */);
-+extern int smb_sendv(struct TCP_Server_Info *server, struct kvec *iov,
-+		     int n_vec);
- extern unsigned int _GetXid(void);
- extern void _FreeXid(unsigned int);
- #define GetXid()						\
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 1a600d8..6f7afdc 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -27,19 +27,18 @@
- #include "cifs_unicode.h"
- #include "smb2status.h"
- 
--/*
--__u64 get_mid(struct tcp_srv_inf *server)
-+__u64 get_mid(struct TCP_Server_Info *server)
- {
- 	__u64 mid;
- 
- 	if (server == NULL)
- 		return 0;
- 
--	spin_lock(&SMB2_mid_lock);
--	mid = server->current_mid++;
--	spin_unlock(&SMB2_mid_lock);
-+	spin_lock(&GlobalMid_Lock);
-+	mid = server->current_smb2_mid++;
-+	spin_unlock(&GlobalMid_Lock);
- 	return mid;
--} */ /* BB do we eventually need an SMB2 version of this routine? BB */
-+} /* BB do we eventually need an SMB2 version of this routine? BB */
- 
- static int
- check_smb2_hdr(struct smb2_hdr *smb, __u64 mid)
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index c4c40bd..e826279 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -38,8 +38,8 @@ extern void free_rsp_buf(int resp_buftype, void *pSMB2r);
- extern struct smb2_hdr *smb2_buf_get(void);
- extern void smb2_buf_release(void *);
- extern struct smb2_hdr *smb2_small_buf_get(void);
--extern void smb2_small_buf_release(void *);
--extern __u64 get_mid(struct TCP_Server_Info *server);*/
-+extern void smb2_small_buf_release(void *);*/
-+extern __u64 get_mid(struct TCP_Server_Info *server);
- extern int small_smb2_init_no_tc(__le16 smb2_cmd,
- 				struct cifs_ses *ses,
- 				void **request_buf);
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 2ca9943..adf24c4 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -38,22 +38,15 @@
- extern mempool_t *smb2_mid_poolp;
- 
- /*
-- *  Send an (optionally, already signed) SMB2 request over a socket.
-- *  This socket is already locked (by a mutex) by the caller so we
-- *  won't have framing problems or mess up SMB2 signatures.
-+ * Set message id for the request. Should be called after wait_for_free_response
-+ * and locking srv_mutex. iov array must have at least 1 element.
-  */
--
--int smb2_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
-+static inline void smb2_seq_num_into_buf(struct TCP_Server_Info *server,
-+					 struct kvec *iov)
- {
--	int rc = -EHOSTDOWN;
--
--	cFYI(1, "function not merged yet");  /* BB fixme */
--
--	return rc;
-+	((struct smb2_hdr *)iov[0].iov_base)->MessageId = get_mid(server);
- }
- 
--
--
- /*
-  *
-  * Send an SMB Request.  No response info (other than return code)
-@@ -108,23 +101,6 @@ smb2_sendrcv_blocking(const unsigned int xid, struct cifs_tcon *tcon,
++		if (rc == -EOPNOTSUPP || rc == -EINVAL)
++			rc = SMBQueryInformation(xid, tcon, full_path,
++					pfile_info, cifs_sb->local_nls,
++					cifs_sb->mnt_cifs_flags &
++					CIFS_MOUNT_MAP_SPECIAL_CHR);
++		kfree(pfile_info);
++#ifdef CONFIG_CIFS_SMB2
++	}
++#endif
  	return rc;
  }
  
--/*
-- * sendrcv2 is passed a cifs_ses structure (rather than simply being
-- * passed the ses->server->socket), because it needs the creds
-- * contained in the cifs_ses struct in order to sign requests.
-- */
--int
--smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
--	     struct kvec *iov, int n_vec, int *presp_buftype /* ret */,
--	     int *status /* ret SMB2 network status code */, const int flags)
--{
--	int rc = -EHOSTDOWN;
--
--	cFYI(1, "function not merged yet");  /* BB fixme */
--
--	return rc;
--}
--
- static void
- wake_up_smb2_task(struct smb2_mid_entry *mid)
- {
-@@ -251,7 +227,7 @@ wait_for_smb2_response(struct TCP_Server_Info *server,
- {
- 	int error;
+@@ -3397,10 +3445,18 @@ try_mount_again:
+ 		tcon->unix_ext = 0; /* server does not support them */
  
--	error = wait_event_killable(server->response_q,
-+	error = wait_event_freezekillable(server->response_q,
- 				    midq->mid_state != MID_REQUEST_SUBMITTED);
- 	if (error < 0)
- 		return -ERESTARTSYS;
-@@ -311,4 +287,177 @@ free_smb2_mid(struct smb2_mid_entry *mid)
+ 	/* do not care if following two calls succeed - informational */
+-	if (!tcon->ipc) {
+-		CIFSSMBQFSDeviceInfo(xid, tcon);
+-		CIFSSMBQFSAttributeInfo(xid, tcon);
++#ifdef CONFIG_CIFS_SMB2
++	if (tcon->ses->server->is_smb2) {
++		/* add missing calls here */
++	} else {
++#endif
++		if (!tcon->ipc) {
++			CIFSSMBQFSDeviceInfo(xid, tcon);
++			CIFSSMBQFSAttributeInfo(xid, tcon);
++		}
++#ifdef CONFIG_CIFS_SMB2
+ 	}
++#endif
  
- 	smb2_mid_entry_free(mid);
+ 	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
+ 	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
+@@ -3718,6 +3774,7 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
+ 	if (ses->server->is_smb2) {
+ 		/* we have one credit to start with */
+ 		atomic_set(&server->credits, 1);
++		server->current_smb2_mid = 0;
+ 		rc = SMB2_negotiate(xid, ses);
+ 		/* BB we probably don't need to retry with modern servers */
+ 		if (rc == -EAGAIN)
+@@ -3766,12 +3823,12 @@ int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
+ 	cFYI(1, "Security Mode: 0x%x Capabilities: 0x%x TimeAdjust: %d",
+ 		 server->sec_mode, server->capabilities, server->timeAdj);
+ 
+-	if (ses->server->is_smb2 == false)
+-		rc = CIFS_SessSetup(xid, ses, nls_info);
+ #ifdef CONFIG_CIFS_SMB2
+-	else
++	if (ses->server->is_smb2)
+ 		rc = SMB2_sess_setup(xid, ses, nls_info);
++	else
+ #endif
++		rc = CIFS_SessSetup(xid, ses, nls_info);
+ 	if (rc) {
+ 		cERROR(1, "Send error in SessSetup = %d", rc);
+ 	} else {
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 2c50bd2..4d03038 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -29,8 +29,11 @@
+ #include "cifsproto.h"
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
++#include "cifs_unicode.h"
+ #include "fscache.h"
+-
++#ifdef CONFIG_CIFS_SMB2
++#include "smb2proto.h"
++#endif
+ 
+ static void cifs_set_ops(struct inode *inode)
+ {
+@@ -595,9 +598,68 @@ cgfi_exit:
+ 	return rc;
  }
+ 
+-int cifs_get_inode_info(struct inode **pinode,
+-	const unsigned char *full_path, FILE_ALL_INFO *pfindData,
+-	struct super_block *sb, int xid, const __u16 *pfid)
++#ifdef CONFIG_CIFS_SMB2
++static void
++move_smb2_info_to_cifs(FILE_ALL_INFO *dst, FILE_ALL_INFO_SMB2 *src)
++{
++	memcpy(dst, src,
++	       (unsigned int)(&src->CurrentByteOffset) - (unsigned int)src);
++	dst->CurrentByteOffset = src->CurrentByteOffset;
++	dst->Mode = src->Mode;
++	dst->AlignmentRequirement = src->AlignmentRequirement;
++	dst->IndexNumber1 = 0; /* we don't use it */
++}
 +
 +static int
-+smb2_check_receive(struct smb2_mid_entry *mid, struct TCP_Server_Info *server,
-+		   unsigned int receive_len, bool log_error)
++smb2_qinfo_helper(int xid, struct cifs_sb_info *cifs_sb, struct cifs_tcon *tcon,
++		  const unsigned char *full_path, FILE_ALL_INFO *pfindData)
 +{
-+	unsigned int len = get_rfc1002_length(mid->resp_buf);
++	const unsigned char *start_full_path = full_path;
++	__u64 persistent_fid, volatile_fid;
++	FILE_ALL_INFO_SMB2 *data = NULL;
++	__le16 *path = NULL;
++	int usc_len, rc;
 +
-+	dump_smb2(mid->resp_buf, min_t(u32, 80, len));
-+	/* convert the length into a more usable form */
-+	if ((receive_len > 24) &&
-+	    (server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED)) {
-+		/* BB fixme */
-+		/*rc = smb2_verify_signature(mid->resp_buf,
-+					&ses->server->mac_signing_key);
-+		if (rc) {
-+			cERROR(1, "Unexpected SMB signature");
-+		} */
-+	}
-+
-+	return map_smb2_to_linux_error(mid->resp_buf, log_error);
-+}
-+
-+/*
-+ * sendrcv2 is passed a cifs_ses structure (rather than simply being
-+ * passed the ses->server->socket), because it needs the creds
-+ * contained in the cifs_ses struct in order to sign requests
-+ */
-+int
-+smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
-+	     struct kvec *iov, int n_vec, int *presp_buftype /* ret */,
-+	     int *status /* ret SMB2 network status code */, const int flags)
-+{
-+	int rc = 0;
-+	int long_op;
-+	unsigned int receive_len;
-+	struct smb2_mid_entry *midQ;
-+	struct smb2_hdr *buf = iov[0].iov_base;
-+	unsigned int credits = 1;
-+
-+	if (status)
-+		*status = STATUS_SUCCESS;
-+	long_op = flags & CIFS_TIMEOUT_MASK;
-+
-+	*presp_buftype = CIFS_NO_BUFFER;  /* no response buf yet */
-+
-+	if ((ses == NULL) || (ses->server == NULL)) {
-+		cifs_small_buf_release(buf);
-+		cERROR(1, "Null session");
-+		return -EIO;
-+	}
-+
-+	if (ses->server->tcpStatus == CifsExiting) {
-+		cifs_small_buf_release(buf);
-+		cFYI(1, "ololo");
-+		return -ENOENT;
-+	}
-+
-+	rc = wait_for_free_request(ses->server, long_op);
-+	if (rc) {
-+		cifs_small_buf_release(buf);
-+		return rc;
-+	}
-+
-+	/*
-+	 * Make sure that we sign in the same order that we send on this socket
-+	 * and avoid races inside tcp sendmsg code that could cause corruption
-+	 * of smb data.
-+	 */
-+
-+	mutex_lock(&ses->server->srv_mutex);
-+
-+	smb2_seq_num_into_buf(ses->server, iov);
-+
-+	rc = get_smb2_mid(ses, buf, &midQ);
-+	if (rc) {
-+		mutex_unlock(&ses->server->srv_mutex);
-+		cifs_small_buf_release(buf);
-+		atomic_inc(&ses->server->credits);
-+		wake_up(&ses->server->request_q);
-+		return rc;
-+	}
-+	/* rc = sign_smb2(iov, n_vec, ses->server); BB
-+	if (rc) {
-+		mutex_unlock(&ses->server->srv_mutex);
-+		cifs_small_buf_release(in_buf);
-+		goto out;
-+	} */
-+
-+	midQ->mid_state = MID_REQUEST_SUBMITTED;
-+	cifs_in_send_inc(ses->server);
-+	rc = smb_sendv(ses->server, iov, n_vec);
-+	cifs_in_send_dec(ses->server);
-+	cifs_save_when_sent(midQ);
-+
-+	mutex_unlock(&ses->server->srv_mutex);
-+
-+	if (rc < 0) {
-+		cifs_small_buf_release(buf);
++	data = kzalloc(sizeof(FILE_ALL_INFO_SMB2) + MAX_NAME*2, GFP_KERNEL);
++	if (data == NULL) {
++		rc = -ENOMEM;
 +		goto out;
 +	}
 +
-+	if (long_op == CIFS_ASYNC_OP) {
-+		cifs_small_buf_release(buf);
++	if (strlen(full_path) && full_path[0] == '\\')
++		start_full_path += 1;
++
++	path = smb2_strndup_to_ucs(start_full_path,
++				   PATH_MAX, &usc_len,
++				   cifs_sb->local_nls);
++	if (path == NULL) {
++		rc = -ENOMEM;
 +		goto out;
 +	}
 +
-+	rc = wait_for_smb2_response(ses->server, midQ);
-+	if (rc != 0) {
-+		/* send_nt_cancel(ses->server, in_buf, midQ); BB */
-+		spin_lock(&GlobalMid_Lock);
-+		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
-+			midQ->callback = free_smb2_mid;
-+			spin_unlock(&GlobalMid_Lock);
-+			cifs_small_buf_release(buf);
-+			atomic_inc(&ses->server->credits);
-+			wake_up(&ses->server->request_q);
-+			return rc;
-+		}
-+		spin_unlock(&GlobalMid_Lock);
++	rc = SMB2_open(xid, tcon, path, &persistent_fid, &volatile_fid,
++		       FILE_READ_ATTRIBUTES_LE, FILE_OPEN_LE, 0, 0);
++	if (!rc) {
++		rc = SMB2_query_info(xid, tcon, persistent_fid,
++				     volatile_fid, data);
++		SMB2_close(xid, tcon, persistent_fid,
++			   volatile_fid);
 +	}
 +
-+	cifs_small_buf_release(buf);
-+
-+	rc = sync_smb2_mid_result(midQ, ses->server);
-+	if (rc) {
-+		atomic_inc(&ses->server->credits);
-+		wake_up(&ses->server->request_q);
-+		return rc;
-+	}
-+
-+	if (!midQ->resp_buf || (midQ->mid_state != MID_RESPONSE_RECEIVED)) {
-+		rc = -EIO;
-+		cFYI(1, "Bad MID state?");
++	if (rc)
 +		goto out;
-+	}
 +
-+	buf = (struct smb2_hdr *)midQ->resp_buf;
-+	receive_len = be32_to_cpu(buf->smb2_buf_length);
-+
-+	if (receive_len > CIFSMaxBufSize + MAX_SMB2_HDR_SIZE) {
-+		cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
-+			receive_len, xid);
-+		rc = -EIO;
-+		goto out;
-+	}
-+
-+	/* rcvd frame is ok */
-+
-+	iov[0].iov_base = (char *)buf;
-+	iov[0].iov_len = receive_len + 4;
-+
-+	if (midQ->large_buf)
-+		*presp_buftype = CIFS_LARGE_BUFFER;
-+	else
-+		*presp_buftype = CIFS_SMALL_BUFFER;
-+
-+	rc = smb2_check_receive(midQ, ses->server, receive_len,
-+				flags & CIFS_LOG_ERROR);
-+
-+	if (status)
-+		*status = le32_to_cpu(buf->Status);
-+
-+	if ((flags & CIFS_NO_RESP) == 0)
-+		/* mark it so buf will not be freed by free_smb2mid */
-+		midQ->resp_buf = NULL;
-+
-+	credits = le16_to_cpu(buf->CreditRequest);
++	move_smb2_info_to_cifs(pfindData, data);
 +out:
-+	atomic_add(credits, &ses->server->credits);
-+	free_smb2_mid(midQ);
-+	wake_up(&ses->server->request_q);
++	kfree(data);
++	kfree(path);
 +	return rc;
 +}
- /* BB add missing functions here */
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 25d04df..ee8a1f8 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -120,18 +120,24 @@ delete_mid(struct mid_q_entry *mid)
- 	DeleteMidQEntry(mid);
- }
- 
--static int
-+int
- smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- {
- 	int rc = 0;
- 	int i = 0;
- 	struct msghdr smb_msg;
-+	__be32 *buf_length = (__be32 *)iov[0].iov_base;
- 	struct smb_hdr *smb_buffer = iov[0].iov_base;
-+#ifdef CONFIG_CIFS_SMB2
-+	struct smb2_hdr *smb2_buffer = iov[0].iov_base;
 +#endif
- 	unsigned int len = iov[0].iov_len;
- 	unsigned int total_len;
- 	int first_vec = 0;
--	unsigned int smb_buf_length = be32_to_cpu(smb_buffer->smb_buf_length);
- 	struct socket *ssocket = server->ssocket;
-+	unsigned int smb_buf_length;
 +
-+	smb_buf_length = get_rfc1002_length(iov[0].iov_base);
- 
- 	if (ssocket == NULL)
- 		return -ENOTSOCK; /* BB eventually add reconnect code here */
-@@ -150,7 +156,12 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 		total_len += iov[i].iov_len;
- 
- 	cFYI(1, "Sending smb:  total_len %d", total_len);
--	dump_smb(smb_buffer, len);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		dump_smb2(smb2_buffer, len);
-+	else
-+#endif
-+		dump_smb(smb_buffer, len);
- 
- 	i = 0;
- 	while (total_len) {
-@@ -158,24 +169,25 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 				    n_vec - first_vec, total_len);
- 		if ((rc == -ENOSPC) || (rc == -EAGAIN)) {
- 			i++;
--			/* if blocking send we try 3 times, since each can block
--			   for 5 seconds. For nonblocking  we have to try more
--			   but wait increasing amounts of time allowing time for
--			   socket to clear.  The overall time we wait in either
--			   case to send on the socket is about 15 seconds.
--			   Similarly we wait for 15 seconds for
--			   a response from the server in SendReceive[2]
--			   for the server to send a response back for
--			   most types of requests (except SMB Write
--			   past end of file which can be slow, and
--			   blocking lock operations). NFS waits slightly longer
--			   than CIFS, but this can make it take longer for
--			   nonresponsive servers to be detected and 15 seconds
--			   is more than enough time for modern networks to
--			   send a packet.  In most cases if we fail to send
--			   after the retries we will kill the socket and
--			   reconnect which may clear the network problem.
--			*/
-+			/*
-+			 * If blocking send we try 3 times, since each can block
-+			 * for 5 seconds. For nonblocking  we have to try more
-+			 * but wait increasing amounts of time allowing time for
-+			 * socket to clear.  The overall time we wait in either
-+			 * case to send on the socket is about 15 seconds.
-+			 * Similarly we wait for 15 seconds for
-+			 * a response from the server in SendReceive[2]
-+			 * for the server to send a response back for
-+			 * most types of requests (except SMB Write
-+			 * past end of file which can be slow, and
-+			 * blocking lock operations). NFS waits slightly longer
-+			 * than CIFS, but this can make it take longer for
-+			 * nonresponsive servers to be detected and 15 seconds
-+			 * is more than enough time for modern networks to
-+			 * send a packet.  In most cases if we fail to send
-+			 * after the retries we will kill the socket and
-+			 * reconnect which may clear the network problem.
-+			 */
- 			if ((i >= 14) || (!server->noblocksnd && (i > 2))) {
- 				cERROR(1, "sends on sock %p stuck for 15 seconds",
- 				    ssocket);
-@@ -196,8 +208,10 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 			break;
++int cifs_get_inode_info(struct inode **pinode, const unsigned char *full_path,
++			FILE_ALL_INFO *pfindData, struct super_block *sb,
++			int xid, const __u16 *pfid)
+ {
+ 	int rc = 0, tmprc;
+ 	struct cifs_tcon *pTcon;
+@@ -630,21 +692,36 @@ int cifs_get_inode_info(struct inode **pinode,
  		}
- 		if (rc == 0) {
--			/* should never happen, letting socket clear before
--			   retrying is our only obvious option here */
+ 		pfindData = (FILE_ALL_INFO *)buf;
+ 
+-		/* could do find first instead but this returns more info */
+-		rc = CIFSSMBQPathInfo(xid, pTcon, full_path, pfindData,
+-			      0 /* not legacy */,
+-			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
+-		/* BB optimize code so we do not make the above call
+-		when server claims no NT SMB support and the above call
+-		failed at least once - set flag in tcon or mount */
+-		if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
+-			rc = SMBQueryInformation(xid, pTcon, full_path,
+-					pfindData, cifs_sb->local_nls,
+-					cifs_sb->mnt_cifs_flags &
+-					  CIFS_MOUNT_MAP_SPECIAL_CHR);
+-			adjustTZ = true;
++		if (pTcon->ses->server->is_smb2 == false) {
 +			/*
-+			 * Should never happen, letting socket clear before
-+			 * retrying is our only obvious option here.
++			 * Could do find first instead but this returns more
++			 * info.
 +			 */
- 			cERROR(1, "tcp sent no data");
- 			msleep(500);
- 			continue;
-@@ -223,10 +237,12 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 	if ((total_len > 0) && (total_len != smb_buf_length + 4)) {
- 		cFYI(1, "partial send (%d remaining), terminating session",
- 			total_len);
--		/* If we have only sent part of an SMB then the next SMB
--		   could be taken as the remainder of this one.  We need
--		   to kill the socket so the server throws away the partial
--		   SMB */
-+		/*
-+		 * If we have only sent part of an SMB then the next SMB
-+		 * could be taken as the remainder of this one.  We need
-+		 * to kill the socket so the server throws away the partial
-+		 * SMB.
-+		 */
- 		server->tcpStatus = CifsNeedReconnect;
++			rc = CIFSSMBQPathInfo(xid, pTcon, full_path, pfindData,
++					      0 /* not legacy */,
++					      cifs_sb->local_nls,
++					      cifs_sb->mnt_cifs_flags &
++					      CIFS_MOUNT_MAP_SPECIAL_CHR);
++			/*
++			 * BB optimize code so we do not make the above call
++			 * when server claims no NT SMB support and the above
++			 * call failed at least once - set flag in tcon or
++			 * mount.
++			 */
++			if ((rc == -EOPNOTSUPP) || (rc == -EINVAL)) {
++				rc = SMBQueryInformation(xid, pTcon, full_path,
++						pfindData, cifs_sb->local_nls,
++						cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
++				adjustTZ = true;
++			}
++#ifdef CONFIG_CIFS_SMB2
++		} else
++			rc = smb2_qinfo_helper(xid, cifs_sb, pTcon, full_path,
++					       pfindData);
++#else
+ 		}
++#endif
  	}
  
-@@ -235,9 +251,8 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
+ 	if (!rc) {
+@@ -675,7 +752,8 @@ int cifs_get_inode_info(struct inode **pinode,
+ 	 * guaranteed unique?
+ 	 */
+ 	if (*pinode == NULL) {
+-		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM &&
++		    pTcon->ses->server->is_smb2 == false) {
+ 			int rc1 = 0;
+ 
+ 			rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
+@@ -754,12 +832,22 @@ char *cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+ 
+ 	/* if no prefix path, simply set path to the root of share to "" */
+ 	if (pplen == 0) {
+-		full_path = kmalloc(1, GFP_KERNEL);
+-		if (full_path)
+-			full_path[0] = 0;
++		int len = 1;
++#ifdef CONFIG_CIFS_SMB2
++		if (vol->use_smb2)
++			len = 2;
++#endif
++		full_path = kzalloc(len, GFP_KERNEL);
+ 		return full_path;
+ 	}
+ 
++#ifdef CONFIG_CIFS_SMB2
++	if (vol->use_smb2) {
++		cERROR(1, "prefixpath is not supported for smb2 now");
++		return NULL;
++	}
++#endif
++
+ 	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
+ 		dfsplen = strnlen(tcon->treeName, MAX_TREE_SIZE + 1);
  	else
- 		rc = 0;
- 
--	/* Don't want to modify the buffer as a
--	   side effect of this call. */
--	smb_buffer->smb_buf_length = cpu_to_be32(smb_buf_length);
-+	/* Don't want to modify the buffer as a side effect of this call. */
-+	*buf_length = cpu_to_be32(smb_buf_length);
- 
- 	return rc;
- }
+diff --git a/fs/cifs/smb2sess.c b/fs/cifs/smb2sess.c
+index 440fe0b..5e51eb4 100644
+--- a/fs/cifs/smb2sess.c
++++ b/fs/cifs/smb2sess.c
+@@ -39,10 +39,12 @@ int smb2_setup_session(unsigned int xid, struct cifs_ses *psesinfo,
+ 	 */
+ 	if (server->max_read == 0) /* no need to send on reconnect */ {
+ 		atomic_set(&server->credits, 1);
++		server->current_smb2_mid = 0;
+ 		rc = SMB2_negotiate(xid, psesinfo);
+ 		if (rc == -EAGAIN) {
+ 			/* retry only once on 1st time connection */
+ 			atomic_set(&server->credits, 1);
++			server->current_smb2_mid = 0;
+ 			rc = SMB2_negotiate(xid, psesinfo);
+ 			if (rc == -EAGAIN)
+ 				rc = -EHOSTDOWN;
 -- 
 1.7.1
+
