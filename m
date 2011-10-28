@@ -1,108 +1,131 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v2 06/53] CIFS: Add missing unicode handling routines needed by smb2
-Date: Fri, 28 Oct 2011 23:54:17 +0400
-Message-ID: <1319831704-3572-7-git-send-email-piastry@etersoft.ru>
+From: Pavel Shilovsky <piastry@etersoft.ru>
+Subject: [PATCH v2 05/53] CIFS: wait_for_free_request needs to wait on credits returned by server (for SMB2)
+Date: Fri, 28 Oct 2011 23:54:16 +0400
+Message-ID: <1319831704-3572-6-git-send-email-piastry@etersoft.ru>
 References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319831704-3572-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, Steve French <sfrench@us.ibm.com>
+To: linux-cifs@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+From: Steve French <sfrench@us.ibm.com>
 
-Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+wait_for_free_request is called to ensure that we don't have more than the
+configured maximum of requests in flight on the wire (for cifs), but for SMB2,
+the number of requests that can be in flight varies dynamically (the client
+may request that the server grant more "credits" in a request, and each
+request uses at least one credit).   Instead of migrating over the original
+smb2_wait_for_free_request function, simply add a check in cifs's original
+wait_for_free_request for the is_smb2 case to make sure that we don't go
+beyond the number of allocated "credits" (ie those that remain from those
+the server has allocated for this tcp session).  Otherwise the logic is unchanged
+(other than to make it extern so that the next function to be added, smb2_sendrcv2
+in  smbtransport.c can call it - smb2_sendrcv2 will be migrated over in the next patch).
+
+Note that smb2 servers will typically allow many more requests in flight at one time
+than cifs servers (which usually default to only 50) and can adjust this as needed.
+This should provide significant performance benefit in some workloads (ie smb2
+in many cases will get more parallelism than cifs and some other protocols
+since some artificially constrain the maximum number of requests).
+
+Signed-off-by: Steve French <sfrench@us.ibm.com>
+Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
 ---
- fs/cifs/cifs_unicode.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/cifs_unicode.h |    7 +++++
- 2 files changed, 68 insertions(+), 0 deletions(-)
+ fs/cifs/cifsglob.h  |    1 +
+ fs/cifs/cifsproto.h |    3 ++-
+ fs/cifs/transport.c |   22 +++++++++++++++++++---
+ 3 files changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-index 1b2e180..7f09423 100644
---- a/fs/cifs/cifs_unicode.c
-+++ b/fs/cifs/cifs_unicode.c
-@@ -330,3 +330,64 @@ ctoUCS_out:
- 	return i;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 179b784..b440329 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -311,6 +311,7 @@ struct TCP_Server_Info {
+ 	wait_queue_head_t read_q; /* used by readpages */
+ 	atomic_t active_readpage_req; /* used by readpages */
+ 	atomic_t resp_rdy; /* used by readpages and demultiplex */
++	atomic_t credits;  /* send no more simultaneous requests than this */
+ 	__le16 smb2_dialect_revision; /* SMB2.0 implemented, 2.1 recognized */
+ 	struct task_struct *observe;
+ 	char smb2_crypt_key[CIFS_CRYPTO_KEY_SIZE]; /* BB can we use cifs key */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index ef4f631..84d1e4c 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -1,7 +1,7 @@
+ /*
+  *   fs/cifs/cifsproto.h
+  *
+- *   Copyright (c) International Business Machines  Corp., 2002,2008
++ *   Copyright (c) International Business Machines  Corp., 2002,2011
+  *   Author(s): Steve French (sfrench@us.ibm.com)
+  *
+  *   This library is free software; you can redistribute it and/or modify
+@@ -68,6 +68,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
+ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
++extern int wait_for_free_request(struct TCP_Server_Info *sv, const int long_op);
+ extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 			   unsigned int nvec, mid_receive_t *receive,
+ 			   mid_callback_t *callback, void *cbdata,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0cc9584..25d04df 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -254,7 +254,7 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
  }
  
-+#ifdef CONFIG_CIFS_SMB2
-+/*
-+ * smb2_local_to_ucs2_bytes - how long will a string be after conversion?
-+ * @from - pointer to input string
-+ * @maxbytes - don't go past this many bytes of input string
-+ * @codepage - source codepage
-+ *
-+ * Walk a string and return the number of bytes that the string will
-+ * be after being converted to the given charset, not including any null
-+ * termination required. Don't walk past maxbytes in the source buffer.
-+ */
-+
-+int
-+smb2_local_to_ucs2_bytes(const char *from, int len,
-+			  const struct nls_table *codepage)
-+{
-+	int charlen;
-+	int i;
-+	wchar_t wchar_to;
-+
-+	if (from == NULL)
-+		return 0;
-+	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
-+		charlen = codepage->char2uni(from, len, &wchar_to);
-+		/* Failed conversion defaults to a question mark */
-+		if (charlen < 1)
-+			charlen = 1;
-+	}
-+	return 2 * i; /* UCS characters are two bytes */
-+}
-+
-+/*
-+ * smb2_strndup_to_ucs - copy a string to wire format from the local codepage
-+ * @src - source string
-+ * @maxlen - don't walk past this many bytes in the source string
-+ * @ucslen - the length of the allocated string in bytes (including null)
-+ * @codepage - source codepage
-+ *
-+ * Take a string convert it from the local codepage to UCS2 and
-+ * put it in a new buffer. Returns a pointer to the new string or NULL on
-+ * error.
-+ */
-+__le16 *
-+smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_len,
-+	     const struct nls_table *codepage)
-+{
-+	int len;
-+	__le16 *dst;
-+
-+	len = smb2_local_to_ucs2_bytes(src, maxlen, codepage);
-+	len += 2; /* NULL */
-+	dst = kmalloc(len, GFP_KERNEL);
-+	if (!dst) {
-+		*ucs_len = 0;
-+		return NULL;
-+	}
-+	cifs_strtoUCS(dst, src, maxlen, codepage);
-+	*ucs_len = len;
-+	return dst;
-+}
-+#endif /* CONFIG_CIFS_SMB2 */
-diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
-index 6d02fd5..e00f677 100644
---- a/fs/cifs/cifs_unicode.h
-+++ b/fs/cifs/cifs_unicode.h
-@@ -380,4 +380,11 @@ UniStrlwr(register wchar_t *upin)
+-static int wait_for_free_request(struct TCP_Server_Info *server,
++int wait_for_free_request(struct TCP_Server_Info *server,
+ 				 const int long_op)
+ {
+ 	if (long_op == CIFS_ASYNC_OP) {
+@@ -265,7 +265,8 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
  
- #endif
- 
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
++		if ((server->is_smb2 == false) &&
++		    atomic_read(&server->inFlight) >= cifs_max_pending) {
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_num_waiters_inc(server);
+ 			wait_event(server->request_q,
+@@ -273,6 +274,16 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
+ 				     < cifs_max_pending);
+ 			cifs_num_waiters_dec(server);
+ 			spin_lock(&GlobalMid_Lock);
 +#ifdef CONFIG_CIFS_SMB2
-+extern int smb2_local_to_ucs2_bytes(const char *from, int len,
-+				    const struct nls_table *codepage);
-+extern __le16 *smb2_strndup_to_ucs(const char *src, const int maxlen,
-+				   int *ucs_len, const struct nls_table *cp);
++		} else if (server->is_smb2 &&
++			  (atomic_read(&server->credits) < 1)) {
++			spin_unlock(&GlobalMid_Lock);
++			cifs_num_waiters_inc(server);
++			wait_event(server->request_q,
++				   atomic_read(&server->credits) > 0);
++			cifs_num_waiters_dec(server);
++			spin_lock(&GlobalMid_Lock);
 +#endif /* CONFIG_CIFS_SMB2 */
-+
- #endif /* _CIFS_UNICODE_H */
+ 		} else {
+ 			if (server->tcpStatus == CifsExiting) {
+ 				spin_unlock(&GlobalMid_Lock);
+@@ -283,8 +294,13 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
+ 			   as they are allowed to block on server */
+ 
+ 			/* update # of requests on the wire to server */
+-			if (long_op != CIFS_BLOCKING_OP)
++			if (server->is_smb2 == false &&
++			    long_op != CIFS_BLOCKING_OP)
+ 				atomic_inc(&server->inFlight);
++#ifdef CONFIG_CIFS_SMB2
++			else if (server->is_smb2)
++				atomic_dec(&server->credits);
++#endif
+ 			spin_unlock(&GlobalMid_Lock);
+ 			break;
+ 		}
 -- 
 1.7.1
+
