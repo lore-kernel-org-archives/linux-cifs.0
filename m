@@ -1,278 +1,95 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2 04/53] CIFS: Do not try to dump cifs mids from smb2
- sessions
-Date: Sat, 29 Oct 2011 01:05:28 -0400
-Message-ID: <20111029010528.4c4ccf4d@corrin.poochiereds.net>
-References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-	<1319831704-3572-5-git-send-email-piastry@etersoft.ru>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [patch] cifs: accidentally creating empty files
+Date: Sat, 29 Oct 2011 00:07:12 -0500
+Message-ID: <CAH2r5mvHF0X6PQ8FyBfVEpQeyWgd7RGkawJykapkKt0K84QTHw@mail.gmail.com>
+References: <20110927212810.GA12900@elgon.mountain>
+	<20111013132755.6c5db87e@barsoom.rdu.redhat.com>
+	<CAH2r5mtOF=Ja7_mTK576uEqgZqaVH+8YXtOqmZVknBC81sD=8Q@mail.gmail.com>
+	<20111028072019.GA14900@longonot.mountain>
+	<CAH2r5msb_+tenSg1kWCn_0xi2EZu6vboqvmbQ17vRBYoqHp2Eg@mail.gmail.com>
+	<20111028234406.01fd23ba@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319831704-3572-5-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <20111028234406.01fd23ba-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 28 Oct 2011 23:54:15 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Fri, Oct 28, 2011 at 10:44 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
+:
+> On Fri, 28 Oct 2011 10:27:04 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> On Fri, Oct 28, 2011 at 2:20 AM, Dan Carpenter <dan.carpenter@oracle=
+=2Ecom> wrote:
+>> > On Wed, Oct 19, 2011 at 09:14:37PM -0500, Steve French wrote:
+>> >> Doesn't this force the create to happen later - rather than
+>> >> at lookup time where it belongs?
+>> >>
+>> >> if the issue is just noperm ... we should let this through if the=
+ user
+>> >> has local permissions. =A0Doubling the cost of a file create to S=
+amba
+>> >> seems like a bad idea (ie doing aQueryPathInfo AND an NTCreateX
+>> >> doubles the roundrip, doubles the load on the server etc.) - the =
+whole
+>> >> point of this is to let us do an "atomic" open or create operatio=
+n
+>> >> and not have to split it into multiple requests. =A0In any case w=
+hy would
+>> >> we do the open and then follow it with a create?
+>> >>
+>> >> Can we fix this to (at least) narrow the performance penalty.
+>> >>
+>> >
+>> > Yes, it does add another back and forth to file create... =A0It's =
+hard/
+>> > impossible to check the permissions first and then decide whether =
+to
+>> > pass the O_CREAT flag. =A0Maybe we could add an if statement to ch=
+eck
+>> > whether noperm was used and the noperm version could use the creat=
+e
+>> > on lookup.
+>>
+>> Why is it hard to check local permissions? We have the local mode
+>> for the parent.
+>>
+>> Also note that the "intent" flags and the atomic create is not just
+>> about performance, but also making it atomic reduces some of the wei=
+rd
+>> failure cases.
+>>
+>
+> We have the local mode for the parent, but we do not have the ownersh=
+ip
+> and mode for the file that has not yet been created. Because of the
+> special (ahem) way that cifs handles permissions, it's easily possibl=
+e
+> for the ownership of the file not to match the user doing that create=
+=2E
+> At that point, later operations on the file can easily fail.
+>
+> This was the primary reason for the multiuser patch series, and why I
+> still say that doing permissions checking on the client is a broken
+> model.
 
-> From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> 
-> Convert the debug routines in cifs_debug.c to recognize
-> smb2 sessions and not try to dump invalid information on
-> pending requests.  Check the socket type to see if
-> smb2.  Move the printing of cifs specific debug information
-> to a helper routine to make it clearer which type
-> of information we are printing.
-> 
-> cifs and smb2 both use the struct TCP_Server_Info to include information about
-> the tcp socket connection to the server.  The list of pending requests
-> is one of the "per-socket" pieces of information. smb2 and cifs
-> "mid" queue entries (multiplexed network requests, the active requests
-> on the wire) differ. smb2 has async support in the protocol,
-> as well as operation compounding and larger sizes (than cifs) for
-> various fields related to pending requests) so it is important
-> not to try to use the pending_mid_q for smb2 tcp sessions
-> as if it were a pending cifs request.  Most usage of the
-> pending_mid_q is safe because it is in either cifs or smb2
-> specific code, but this patch fixes the dumping of debug
-> data so we don't dump cifs debug data for an smb2 session.
-> 
-> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifs_debug.c |  179 +++++++++++++++++++++++++++-----------------------
->  1 files changed, 98 insertions(+), 81 deletions(-)
-> 
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index 8ccdb15..add9975 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -72,7 +72,7 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
->  	struct list_head *tmp;
->  	struct mid_q_entry *mid_entry;
->  
-> -	if (server == NULL)
-> +	if ((server == NULL) || (server->is_smb2))
->  		return;
->  
-
-This looks like a cargo-cult check. When on earth would the server ever
-be NULL here? I think you can just get rid of the NULL check here.
-
->  	cERROR(1, "Dump pending requests:");
-> @@ -105,16 +105,105 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
->  #endif /* CONFIG_CIFS_DEBUG2 */
->  
->  #ifdef CONFIG_PROC_FS
-> -static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-> +
-> +static void dump_smb2_debug_info(int i, struct seq_file *m,
-> +				struct TCP_Server_Info *server)
->  {
-> -	struct list_head *tmp1, *tmp2, *tmp3;
-> +	seq_printf(m, "dumping debug information for smb2 not supported yet\n");
-> +}
-> +
-> +static void dump_cifs_debug_info(int i, struct seq_file *m,
-> +				struct TCP_Server_Info *server)
-> +{
-> +	struct list_head *tmp2, *tmp3;
->  	struct mid_q_entry *mid_entry;
-> -	struct TCP_Server_Info *server;
->  	struct cifs_ses *ses;
->  	struct cifs_tcon *tcon;
-> -	int i, j;
-> +	int j;
->  	__u32 dev_type;
->  
-> +
-> +	list_for_each(tmp2, &server->smb_ses_list) {
-> +		ses = list_entry(tmp2, struct cifs_ses, smb_ses_list);
-> +		if ((ses->serverDomain == NULL) || (ses->serverOS == NULL) ||
-> +			(ses->serverNOS == NULL)) {
-				^^^^^^^
-			No need for the extra parenthesis around each of these.
-
-> +			seq_printf(m, "\n%d) entry for %s not fully "
-> +				   "displayed\n\t", i, ses->serverName);
-> +		} else {
-> +			seq_printf(m,
-> +				"\n%d) Name: %s  Domain: %s Uses: %d OS:"
-> +				" %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
-> +				" session status: %d\t",
-> +				i, ses->serverName, ses->serverDomain,
-> +				ses->ses_count, ses->serverOS, ses->serverNOS,
-> +				ses->capabilities, ses->status);
-> +		}
-> +		seq_printf(m, "TCP status: %d\n\tLocal Users To "
-> +			      "Server: %d SecMode: 0x%x Req On Wire: %d",
-> +				server->tcpStatus, server->srv_count,
-> +				server->sec_mode,
-> +				atomic_read(&server->inFlight));
-> +
-> +#ifdef CONFIG_CIFS_STATS2
-> +		seq_printf(m, " In Send: %d In MaxReq Wait: %d",
-> +				atomic_read(&server->in_send),
-> +				atomic_read(&server->num_waiters));
-> +#endif
-> +
-> +		seq_puts(m, "\n\tShares:");
-> +		j = 0;
-> +		list_for_each(tmp3, &ses->tcon_list) {
-> +			tcon = list_entry(tmp3, struct cifs_tcon, tcon_list);
-> +			++j;
-> +			dev_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
-> +			seq_printf(m, "\n\t%d) %s Mounts: %d ", j,
-> +				   tcon->treeName, tcon->tc_count);
-> +			if (tcon->nativeFileSystem) {
-> +				seq_printf(m, "Type: %s ",
-> +					   tcon->nativeFileSystem);
-> +			}
-> +			seq_printf(m, "DevInfo: 0x%x Attributes: 0x%x"
-> +				"\nPathComponentMax: %d Status: 0x%d",
-> +				le32_to_cpu(
-> +					 tcon->fsDevInfo.DeviceCharacteristics),
-> +				le32_to_cpu(tcon->fsAttrInfo.Attributes),
-> +				le32_to_cpu(
-> +				   tcon->fsAttrInfo.MaxPathNameComponentLength),
-> +				tcon->tidStatus);
-> +			if (dev_type == FILE_DEVICE_DISK)
-> +				seq_puts(m, " type: DISK ");
-> +			else if (dev_type == FILE_DEVICE_CD_ROM)
-> +				seq_puts(m, " type: CDROM ");
-> +			else
-> +				seq_printf(m, " type: %d ", dev_type);
-> +
-
-The above would be better as:
-
-	seq_puts(m, "type: ");
-	switch(dev_type) {
-		...
-	}
-
-> +			if (tcon->need_reconnect)
-> +				seq_puts(m, "\tDISCONNECTED ");
-> +			seq_putc(m, '\n');
-> +		}
-> +
-> +		seq_puts(m, "\n\tMIDs:\n");
-> +
-> +		spin_lock(&GlobalMid_Lock);
-> +		list_for_each(tmp3, &server->pending_mid_q) {
-> +			mid_entry = list_entry(tmp3, struct mid_q_entry, qhead);
-> +			seq_printf(m, "\tState: %d com: %d pid:"
-> +					" %d cbdata: %p mid %d\n",
-> +					mid_entry->midState,
-> +					(int)mid_entry->command, mid_entry->pid,
-> +					mid_entry->callback_data,
-> +					mid_entry->mid);
-> +		}
-> +		spin_unlock(&GlobalMid_Lock);
-> +	}
-> +}
-> +
-> +static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-> +{
-> +	struct list_head *tmp1;
-> +	struct TCP_Server_Info *server;
-> +	int i;
-> +
->  	seq_puts(m,
->  		    "Display Internal CIFS Data Structures for Debugging\n"
->  		    "---------------------------------------------------\n");
-> @@ -151,82 +240,10 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
->  		server = list_entry(tmp1, struct TCP_Server_Info,
->  				    tcp_ses_list);
->  		i++;
-> -		list_for_each(tmp2, &server->smb_ses_list) {
-> -			ses = list_entry(tmp2, struct cifs_ses,
-> -					 smb_ses_list);
-> -			if ((ses->serverDomain == NULL) ||
-> -				(ses->serverOS == NULL) ||
-> -				(ses->serverNOS == NULL)) {
-> -				seq_printf(m, "\n%d) entry for %s not fully "
-> -					   "displayed\n\t", i, ses->serverName);
-> -			} else {
-> -				seq_printf(m,
-> -				    "\n%d) Name: %s  Domain: %s Uses: %d OS:"
-> -				    " %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
-> -				    " session status: %d\t",
-> -				i, ses->serverName, ses->serverDomain,
-> -				ses->ses_count, ses->serverOS, ses->serverNOS,
-> -				ses->capabilities, ses->status);
-> -			}
-> -			seq_printf(m, "TCP status: %d\n\tLocal Users To "
-> -				   "Server: %d SecMode: 0x%x Req On Wire: %d",
-> -				   server->tcpStatus, server->srv_count,
-> -				   server->sec_mode,
-> -				   atomic_read(&server->inFlight));
-> -
-> -#ifdef CONFIG_CIFS_STATS2
-> -			seq_printf(m, " In Send: %d In MaxReq Wait: %d",
-> -				atomic_read(&server->in_send),
-> -				atomic_read(&server->num_waiters));
-> -#endif
-> -
-> -			seq_puts(m, "\n\tShares:");
-> -			j = 0;
-> -			list_for_each(tmp3, &ses->tcon_list) {
-> -				tcon = list_entry(tmp3, struct cifs_tcon,
-> -						  tcon_list);
-> -				++j;
-> -				dev_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
-> -				seq_printf(m, "\n\t%d) %s Mounts: %d ", j,
-> -					   tcon->treeName, tcon->tc_count);
-> -				if (tcon->nativeFileSystem) {
-> -					seq_printf(m, "Type: %s ",
-> -						   tcon->nativeFileSystem);
-> -				}
-> -				seq_printf(m, "DevInfo: 0x%x Attributes: 0x%x"
-> -					"\nPathComponentMax: %d Status: 0x%d",
-> -					le32_to_cpu(tcon->fsDevInfo.DeviceCharacteristics),
-> -					le32_to_cpu(tcon->fsAttrInfo.Attributes),
-> -					le32_to_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength),
-> -					tcon->tidStatus);
-> -				if (dev_type == FILE_DEVICE_DISK)
-> -					seq_puts(m, " type: DISK ");
-> -				else if (dev_type == FILE_DEVICE_CD_ROM)
-> -					seq_puts(m, " type: CDROM ");
-> -				else
-> -					seq_printf(m, " type: %d ", dev_type);
-> -
-> -				if (tcon->need_reconnect)
-> -					seq_puts(m, "\tDISCONNECTED ");
-> -				seq_putc(m, '\n');
-> -			}
-> -
-> -			seq_puts(m, "\n\tMIDs:\n");
-> -
-> -			spin_lock(&GlobalMid_Lock);
-> -			list_for_each(tmp3, &server->pending_mid_q) {
-> -				mid_entry = list_entry(tmp3, struct mid_q_entry,
-> -					qhead);
-> -				seq_printf(m, "\tState: %d com: %d pid:"
-> -						" %d cbdata: %p mid %d\n",
-> -						mid_entry->midState,
-> -						(int)mid_entry->command,
-> -						mid_entry->pid,
-> -						mid_entry->callback_data,
-> -						mid_entry->mid);
-> -			}
-> -			spin_unlock(&GlobalMid_Lock);
-> -		}
-> +		if (server->is_smb2)
-> +			dump_smb2_debug_info(i, m, server);
-> +		else
-> +			dump_cifs_debug_info(i, m, server);
->  	}
->  	spin_unlock(&cifs_tcp_ses_lock);
->  	seq_putc(m, '\n');
+We don't have much choice - we have to allow permission
+checking on the client when client security context
+can't match security context on server - but I would like
+to make multiuser the default (especially if we
+can figure out a way to integrate winbind-like
+upcall for ntlmv2 auth) at least for the future (smb2 etc.)
+even if we can't change the default for cifs mounts.
 
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+
+--=20
+Thanks,
+
+Steve
