@@ -1,542 +1,145 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2 02/53] CIFS: Allow SMB2 statistics to be tracked
-Date: Sat, 29 Oct 2011 01:32:05 -0400
-Message-ID: <20111029013205.33647544@corrin.poochiereds.net>
-References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-	<1319831704-3572-3-git-send-email-piastry@etersoft.ru>
-	<20111029004814.41340503@corrin.poochiereds.net>
-	<CAH2r5mtpckA75LEAynsPLVsPfr7U0wnYAyZ1uKeK2VU9F1CGeQ@mail.gmail.com>
+Subject: Re: [patch] cifs: accidentally creating empty files
+Date: Sat, 29 Oct 2011 01:48:55 -0400
+Message-ID: <20111029014855.13dd53be@corrin.poochiereds.net>
+References: <20110927212810.GA12900@elgon.mountain>
+	<20111013132755.6c5db87e@barsoom.rdu.redhat.com>
+	<CAH2r5mtOF=Ja7_mTK576uEqgZqaVH+8YXtOqmZVknBC81sD=8Q@mail.gmail.com>
+	<20111028072019.GA14900@longonot.mountain>
+	<CAH2r5msb_+tenSg1kWCn_0xi2EZu6vboqvmbQ17vRBYoqHp2Eg@mail.gmail.com>
+	<20111028234406.01fd23ba@corrin.poochiereds.net>
+	<CAH2r5mvHF0X6PQ8FyBfVEpQeyWgd7RGkawJykapkKt0K84QTHw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtpckA75LEAynsPLVsPfr7U0wnYAyZ1uKeK2VU9F1CGeQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5mvHF0X6PQ8FyBfVEpQeyWgd7RGkawJykapkKt0K84QTHw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 29 Oct 2011 00:12:45 -0500
+On Sat, 29 Oct 2011 00:07:12 -0500
 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> On Fri, Oct 28, 2011 at 11:48 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
+> On Fri, Oct 28, 2011 at 10:44 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
 te:
-> > On Fri, 28 Oct 2011 23:54:13 +0400
-> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> > On Fri, 28 Oct 2011 10:27:04 -0500
+> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > >
-> >> From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> >> On Fri, Oct 28, 2011 at 2:20 AM, Dan Carpenter <dan.carpenter@orac=
+le.com> wrote:
+> >> > On Wed, Oct 19, 2011 at 09:14:37PM -0500, Steve French wrote:
+> >> >> Doesn't this force the create to happen later - rather than
+> >> >> at lookup time where it belongs?
+> >> >>
+> >> >> if the issue is just noperm ... we should let this through if t=
+he user
+> >> >> has local permissions. =C2=A0Doubling the cost of a file create=
+ to Samba
+> >> >> seems like a bad idea (ie doing aQueryPathInfo AND an NTCreateX
+> >> >> doubles the roundrip, doubles the load on the server etc.) - th=
+e whole
+> >> >> point of this is to let us do an "atomic" open or create operat=
+ion
+> >> >> and not have to split it into multiple requests. =C2=A0In any c=
+ase why would
+> >> >> we do the open and then follow it with a create?
+> >> >>
+> >> >> Can we fix this to (at least) narrow the performance penalty.
+> >> >>
+> >> >
+> >> > Yes, it does add another back and forth to file create... =C2=A0=
+It's hard/
+> >> > impossible to check the permissions first and then decide whethe=
+r to
+> >> > pass the O_CREAT flag. =C2=A0Maybe we could add an if statement =
+to check
+> >> > whether noperm was used and the noperm version could use the cre=
+ate
+> >> > on lookup.
 > >>
-> >> Adding SMB2 statistics requires changes to the way cifs handles st=
-ats.
-> >> Since there are only 19 command codes, it also is easier to track =
-by exact
-> >> command code than it was for cifs. =C2=A0Turn the counters for pro=
-tocol
-> >> ops sent to be a union (one struct for cifs, one for smb2). =C2=A0=
-While at it
-> >> split out the functions which clear stats and prints stats into th=
-eir own
-> >> subfunctions so they are easy to read and don't go past 80 columns=
-=2E
+> >> Why is it hard to check local permissions? We have the local mode
+> >> for the parent.
 > >>
-> >> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> >> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> >> ---
-> >> =C2=A0fs/cifs/cifs_debug.c | =C2=A0146 +++++++++++++++++++++++++++=
-+++-------------------
-> >> =C2=A0fs/cifs/cifsglob.h =C2=A0 | =C2=A0 56 ++++++++++++-------
-> >> =C2=A0fs/cifs/cifssmb.c =C2=A0 =C2=A0| =C2=A0 54 +++++++++--------=
--
-> >> =C2=A0fs/cifs/misc.c =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A02 +-
-> >> =C2=A04 files changed, 152 insertions(+), 106 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> >> index 84e8c07..8ccdb15 100644
-> >> --- a/fs/cifs/cifs_debug.c
-> >> +++ b/fs/cifs/cifs_debug.c
-> >> @@ -249,6 +249,55 @@ static const struct file_operations cifs_debu=
-g_data_proc_fops =3D {
-> >> =C2=A0};
-> >>
-> >> =C2=A0#ifdef CONFIG_CIFS_STATS
-> >> +
-> >> +#ifdef CONFIG_CIFS_SMB2
-> >> +static void smb2_clear_stats(struct cifs_tcon *tcon)
-> >> +{
-> >> + =C2=A0 =C2=A0 int i;
-> >> +
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->num_smbs_sent, 0);
-> >> + =C2=A0 =C2=A0 for (i =3D 0; i < NUMBER_OF_SMB2_COMMANDS; i++) {
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(&tcon->stat=
-s.smb2_stats.smb2_com_sent[i], 0);
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(&tcon->stat=
-s.smb2_stats.smb2_com_fail[i], 0);
-> >> + =C2=A0 =C2=A0 }
-> >> +}
-> >> +#endif /* CONFIG_CIFS_SMB2 */
-> >> +
-> >> +static void clear_cifs_stats(struct cifs_tcon *tcon)
-> >> +{
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->num_smbs_sent, 0);
-> >> +
-> >> +#ifdef CONFIG_CIFS_SMB2
-> >> + =C2=A0 =C2=A0 if (tcon->ses->server->is_smb2) {
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 smb2_clear_stats(tcon)=
-;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
-> >> + =C2=A0 =C2=A0 }
-> >> +#endif /* CONFIG_CIFS_SMB2 */
-> >> +
-> >
-> > =C2=A0 =C2=A0 ^^^^^^^^^^^^^
-> > The above logic should be encapsulated in smb2_clear_stats, and tha=
+> >> Also note that the "intent" flags and the atomic create is not jus=
 t
-> > function should just be a noop when CONFIG_CIFS_SMB2 is not set.
->=20
-> makes sense - could be easier to read your way
->=20
->=20
-> >> + =C2=A0 =C2=A0 /* cifs specific statistics, not applicable to smb=
-2 sessions */
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_writes, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_reads, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_flushes, 0)=
-;
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_oplock_brks=
-, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_opens, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_posixopens,=
- 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_posixmkdirs=
-, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_closes, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_deletes, 0)=
-;
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_mkdirs, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_rmdirs, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_renames, 0)=
-;
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_t2renames, =
-0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_ffirst, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_fnext, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_fclose, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_hardlinks, =
-0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_symlinks, 0=
-);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_locks, 0);
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_acl_get, 0)=
-;
-> >> + =C2=A0 =C2=A0 atomic_set(&tcon->stats.cifs_stats.num_acl_set, 0)=
-;
-> >> +}
-> >> +
-> >> =C2=A0static ssize_t cifs_stats_proc_write(struct file *file,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const char __user=
- *buffer, size_t count, loff_t *ppos)
-> >> =C2=A0{
-> >> @@ -279,25 +328,7 @@ static ssize_t cifs_stats_proc_write(struct f=
-ile *file,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcon=
- =3D list_entry(tmp3,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct cifs_tc=
-on,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcon_list);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_smbs_sent, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_writes, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_reads, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_oplock_brks, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_opens, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_posixopens, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_posixmkdirs, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_closes, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_deletes, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_mkdirs, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_rmdirs, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_renames, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_t2renames, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_ffirst, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_fnext, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_fclose, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_hardlinks, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_symlinks, 0);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_set(=
-&tcon->num_locks, 0);
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 clear_cifs_=
-stats(tcon);
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 }
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> >> @@ -307,6 +338,44 @@ static ssize_t cifs_stats_proc_write(struct f=
-ile *file,
-> >> =C2=A0 =C2=A0 =C2=A0 return count;
-> >> =C2=A0}
+> >> about performance, but also making it atomic reduces some of the w=
+eird
+> >> failure cases.
 > >>
-> >> +static void cifs_stats_print(struct seq_file *m, struct cifs_tcon=
- *tcon)
-> >> +{
-> >> + =C2=A0 =C2=A0 if (tcon->need_reconnect)
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_puts(m, "\tDISCONN=
-ECTED ");
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nSMBs: %d Oplock Breaks: %d",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->num=
-_smbs_sent),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_oplock_brks));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nReads: =C2=A0%d Bytes: %lld",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_reads),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (long long)(tcon->byte=
-s_read));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nWrites: %d Bytes: %lld",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_writes),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (long long)(tcon->byte=
-s_written));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nFlushes: %d",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_flushes));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nLocks: %d HardLinks: %d Symlinks:=
- %d",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_locks),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_hardlinks),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_symlinks));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nOpens: %d Closes: %d Deletes: %d"=
-,
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_opens),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_closes),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_deletes));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nPosix Opens: %d Posix Mkdirs: %d"=
-,
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_posixopens),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_posixmkdirs));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nMkdirs: %d Rmdirs: %d",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_mkdirs),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_rmdirs));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nRenames: %d T2 Renames %d",
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_renames),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_t2renames));
-> >> + =C2=A0 =C2=A0 seq_printf(m, "\nFindFirst: %d FNext %d FClose %d"=
-,
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_ffirst),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_fnext),
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read(&tcon->sta=
-ts.cifs_stats.num_fclose));
-> >> +}
-> >> +
-> >> =C2=A0static int cifs_stats_proc_show(struct seq_file *m, void *v)
-> >> =C2=A0{
-> >> =C2=A0 =C2=A0 =C2=A0 int i;
-> >> @@ -354,44 +423,7 @@ static int cifs_stats_proc_show(struct seq_fi=
-le *m, void *v)
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 tcon_list);
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 i++;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\n%d) %s", i, tco=
-n->treeName);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (tcon->need_reconnect)
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_puts(m,=
- "\tDISCONNECTED ");
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nSMBs: %d Oplock Breaks=
-: %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_smbs_sent),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_oplock_brks));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nReads: =C2=A0%d Bytes:=
- %lld",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_reads),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (long long)=
-(tcon->bytes_read));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nWrites: %d Bytes: %lld=
-",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_writes),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (long long)=
-(tcon->bytes_written));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nFlushes: %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_flushes));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nLocks: %d HardLinks: %=
-d "
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 "Symlinks: %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_locks),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_hardlinks),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_symlinks));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nOpens: %d Closes: %d "
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 "Deletes: %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_opens),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_closes),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_deletes));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nPosix Opens: %d "
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 "Posix Mkdirs: %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_posixopens),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_posixmkdirs));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nMkdirs: %d Rmdirs: %d"=
-,
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_mkdirs),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_rmdirs));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nRenames: %d T2 Renames=
- %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_renames),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_t2renames));
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 seq_printf(m, "\nFindFirst: %d FNext %d=
- "
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 "FClose %d",
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_ffirst),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_fnext),
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 atomic_read=
-(&tcon->num_fclose));
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cifs_stats_print(m, tcon);
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 }
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> >> =C2=A0 =C2=A0 =C2=A0 }
-> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >> index 4c38b04..6dfc7ef 100644
-> >> --- a/fs/cifs/cifsglob.h
-> >> +++ b/fs/cifs/cifsglob.h
-> >> @@ -292,6 +292,7 @@ struct TCP_Server_Info {
-> >> =C2=A0 =C2=A0 =C2=A0 bool =C2=A0 =C2=A0sec_kerberos; =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 /* supports plain Kerberos */
-> >> =C2=A0 =C2=A0 =C2=A0 bool =C2=A0 =C2=A0sec_mskerberos; =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 /* supports legacy MS Kerberos */
-> >> =C2=A0 =C2=A0 =C2=A0 bool =C2=A0 =C2=A0large_buf; =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* is current buffer large? */
-> >> + =C2=A0 =C2=A0 bool =C2=A0 =C2=A0is_smb2; =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* smb2 not cifs protocol negotiated */
-> >> =C2=A0 =C2=A0 =C2=A0 struct delayed_work =C2=A0 =C2=A0 echo; /* ec=
-ho ping workqueue job */
-> >> =C2=A0 =C2=A0 =C2=A0 struct kvec *iov; =C2=A0 =C2=A0 =C2=A0 /* reu=
-sable kvec array for receives */
-> >> =C2=A0 =C2=A0 =C2=A0 unsigned int nr_iov; =C2=A0 =C2=A0/* number o=
-f kvecs in array */
-> >> @@ -392,6 +393,9 @@ struct cifs_ses {
-> >> =C2=A0 =C2=A0 negotiate one of the older LANMAN dialects */
-> >> =C2=A0#define CIFS_SES_LANMAN 8
-> >> =C2=A0#define CIFS_SES_SMB2 16
-> >> +
-> >> +#define NUMBER_OF_SMB2_COMMANDS 0x0013
-> >> +
-> >> =C2=A0/*
-> >> =C2=A0 * there is one of these for each connection to a resource o=
-n a particular
-> >> =C2=A0 * session
-> >> @@ -409,27 +413,37 @@ struct cifs_tcon {
-> >> =C2=A0 =C2=A0 =C2=A0 enum statusEnum tidStatus;
-> >> =C2=A0#ifdef CONFIG_CIFS_STATS
-> >> =C2=A0 =C2=A0 =C2=A0 atomic_t num_smbs_sent;
-> >> - =C2=A0 =C2=A0 atomic_t num_writes;
-> >> - =C2=A0 =C2=A0 atomic_t num_reads;
-> >> - =C2=A0 =C2=A0 atomic_t num_flushes;
-> >> - =C2=A0 =C2=A0 atomic_t num_oplock_brks;
-> >> - =C2=A0 =C2=A0 atomic_t num_opens;
-> >> - =C2=A0 =C2=A0 atomic_t num_closes;
-> >> - =C2=A0 =C2=A0 atomic_t num_deletes;
-> >> - =C2=A0 =C2=A0 atomic_t num_mkdirs;
-> >> - =C2=A0 =C2=A0 atomic_t num_posixopens;
-> >> - =C2=A0 =C2=A0 atomic_t num_posixmkdirs;
-> >> - =C2=A0 =C2=A0 atomic_t num_rmdirs;
-> >> - =C2=A0 =C2=A0 atomic_t num_renames;
-> >> - =C2=A0 =C2=A0 atomic_t num_t2renames;
-> >> - =C2=A0 =C2=A0 atomic_t num_ffirst;
-> >> - =C2=A0 =C2=A0 atomic_t num_fnext;
-> >> - =C2=A0 =C2=A0 atomic_t num_fclose;
-> >> - =C2=A0 =C2=A0 atomic_t num_hardlinks;
-> >> - =C2=A0 =C2=A0 atomic_t num_symlinks;
-> >> - =C2=A0 =C2=A0 atomic_t num_locks;
-> >> - =C2=A0 =C2=A0 atomic_t num_acl_get;
-> >> - =C2=A0 =C2=A0 atomic_t num_acl_set;
-> >> + =C2=A0 =C2=A0 union {
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct {
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_writes;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_reads;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_flushes;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_oplock_brks;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_opens;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_closes;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_deletes;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_mkdirs;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_posixopens;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_posixmkdirs;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_rmdirs;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_renames;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_t2renames;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_ffirst;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_fnext;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_fclose;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_hardlinks;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_symlinks;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_locks;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_acl_get;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t num_acl_set;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } cifs_stats;
-> >> +#ifdef CONFIG_CIFS_SMB2
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct {
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t smb2_com_sent[NUMBER_OF_SMB2_COMMANDS];
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 atomic_t smb2_com_fail[NUMBER_OF_SMB2_COMMANDS];
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 } smb2_stats;
 > >
-> > Is it really necessary to do this with atomics? Those can have
-> > significant performance impact (TLB flushes, and we don't seem to n=
-eed the
-> > guarantees that they provide for simple counters like this. Perhaps
-> > these should be switched to per-cpu variables or just plain ints?
+> > We have the local mode for the parent, but we do not have the owner=
+ship
+> > and mode for the file that has not yet been created. Because of the
+> > special (ahem) way that cifs handles permissions, it's easily possi=
+ble
+> > for the ownership of the file not to match the user doing that crea=
+te.
+> > At that point, later operations on the file can easily fail.
+> >
+> > This was the primary reason for the multiuser patch series, and why=
+ I
+> > still say that doing permissions checking on the client is a broken
+> > model.
 >=20
-> presumably there is precedent for use of atomics rather than
-> wrapping updates to these in a mutex - if they are just int
-> would we have a case where the two overlapping updates could
-> badly corrupt the value?
+> We don't have much choice - we have to allow permission
+> checking on the client when client security context
+> can't match security context on server - but I would like
+> to make multiuser the default (especially if we
+> can figure out a way to integrate winbind-like
+> upcall for ntlmv2 auth) at least for the future (smb2 etc.)
+> even if we can't change the default for cifs mounts.
 >=20
 
-There's no need for any locking here. I think what you want is a per-cp=
-u
-counter for these.
+That's fine, but that doesn't solve Dan's immediate problem. We need to
+either take his patch or something like it for 3.2 (and probably for
+stable as well) or just rip this crap out altogether.
+
+I'd favor the latter, for the following reason:
+
+----------------------[snip]-------------------
+        /*
+         * O_EXCL: optimize away the lookup, but don't hash the dentry.=
+ Let
+         * the VFS handle the create.
+         */
+        if (nd && (nd->flags & LOOKUP_EXCL)) {
+                d_instantiate(direntry, NULL);
+                rc =3D 0;
+                goto lookup_out;
+        }
+
+	[...]
+
+        if (pTcon->unix_ext) {
+                if (nd && !(nd->flags & LOOKUP_DIRECTORY) &&
+                     (nd->flags & LOOKUP_OPEN) && !pTcon->broken_posix_=
+open &&
+                     (nd->intent.open.file->f_flags & O_CREAT)) {
+                        rc =3D cifs_posix_open(full_path, &newInode,
+                                        parent_dir_inode->i_sb,
+                                        nd->intent.open.create_mode,
+                                        nd->intent.open.file->f_flags, =
+&oplock,
+                                        &fileHandle, xid);
+----------------------[snip]-------------------
+
+Ok, so we optimize away the lookup in the O_EXCL case (which is fine).
+
+Then, we only attempt a posix open if O_CREAT was set (note that
+regular SMB CREATE_ANDX is prohibited here -- why?). Now, with Dan's
+patch, we'll be doing this only when O_CREAT is set, and only when the
+file actually exists on the server (since we'll be clearing=20
+
+This really just makes no sense at all. The times when we can use this
+are so vanishingly small that it makes more sense to just remove this
+stuff. If you really want to do this, it needs a redesign from the
+ground up, with a consideration of each possible case and determination
+of whether it's better (and safe) to use an open instead of lookup in
+that case.
 
 --=20
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
