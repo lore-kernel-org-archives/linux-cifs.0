@@ -1,62 +1,124 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [GIT] CIFS Fixes
-Date: Sat, 29 Oct 2011 16:57:04 -0500
-Message-ID: <CAH2r5muS_1U=RsLavVSnjFUSqDREAoFS+dLpF9gXMrcODv6cEw@mail.gmail.com>
-References: <CAH2r5msFde8+dBW1uku_=qv5maXcypoM3cXWCAOK3pbEKv=86w@mail.gmail.com>
-	<20111027210722.GA29989@infradead.org>
-	<CAH2r5mvCDTE91Mj-HAm_WhSTrzHKi6RNvBL0-+e92POxeqXA9w@mail.gmail.com>
-	<20111027211515.GA1380@infradead.org>
-	<20111028095834.2a89660b@corrin.poochiereds.net>
-	<CAH2r5mtEV2YpTTnrE+03_gm=+CKGxOhLOtRBf6VX2QgXihLDrw@mail.gmail.com>
-	<20111029183532.GF12122@fieldses.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [patch] cifs: accidentally creating empty files
+Date: Sat, 29 Oct 2011 17:03:46 -0500
+Message-ID: <CAH2r5muq4n34Liy_=CQQX-PeTinJFDAPi81fA-eqsTcXw5remQ@mail.gmail.com>
+References: <20110927212810.GA12900@elgon.mountain>
+	<20111013132755.6c5db87e@barsoom.rdu.redhat.com>
+	<CAH2r5mtOF=Ja7_mTK576uEqgZqaVH+8YXtOqmZVknBC81sD=8Q@mail.gmail.com>
+	<20111028072019.GA14900@longonot.mountain>
+	<CAH2r5msb_+tenSg1kWCn_0xi2EZu6vboqvmbQ17vRBYoqHp2Eg@mail.gmail.com>
+	<20111028234406.01fd23ba@corrin.poochiereds.net>
+	<CAH2r5mvHF0X6PQ8FyBfVEpQeyWgd7RGkawJykapkKt0K84QTHw@mail.gmail.com>
+	<20111029014855.13dd53be@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111029183532.GF12122-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, Dan Carpenter <dan.carpenter@oracle.com>
+To: Jeff Layton <jlayton@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20111029014855.13dd53be@corrin.poochiereds.net>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Oct 29, 2011 at 1:35 PM, J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>=
- wrote:
-> The policy I aim for (though no doubt I screw it up) is: every patch =
-I
-> commit should have previously been cc:'d to the appropriate places, i=
-n
-> the form it's applied (eh, modulo whitespace fixes or fixups nearly t=
-hat
-> trivial). =A0And some time should pass before committing. =A0(Totally
-> trivial stuff I figure I can get away with committing immediately,
-> stuff I don't expect much argument over might sit only 24 hours,
-> anything big I try to make sure potential reviewers have a few days t=
+On Sat, Oct 29, 2011 at 12:48 AM, Jeff Layton <jlayton@samba.org> wrote:
+> On Sat, 29 Oct 2011 00:07:12 -0500
+> Steve French <smfrench@gmail.com> wrote:
+>
+>> On Fri, Oct 28, 2011 at 10:44 PM, Jeff Layton <jlayton@samba.org> wrote:
+>> > On Fri, 28 Oct 2011 10:27:04 -0500
+>> > Steve French <smfrench@gmail.com> wrote:
+>> >
+>> >> On Fri, Oct 28, 2011 at 2:20 AM, Dan Carpenter <dan.carpenter@oracle.=
+com> wrote:
+>> >> > On Wed, Oct 19, 2011 at 09:14:37PM -0500, Steve French wrote:
+>> >> >> Doesn't this force the create to happen later - rather than
+>> >> >> at lookup time where it belongs?
+>> >> >>
+>> >> >> if the issue is just noperm ... we should let this through if the =
+user
+>> >> >> has local permissions. =A0Doubling the cost of a file create to Sa=
+mba
+>> >> >> seems like a bad idea (ie doing aQueryPathInfo AND an NTCreateX
+>> >> >> doubles the roundrip, doubles the load on the server etc.) - the w=
+hole
+>> >> >> point of this is to let us do an "atomic" open or create operation
+>> >> >> and not have to split it into multiple requests. =A0In any case wh=
+y would
+>> >> >> we do the open and then follow it with a create?
+>> >> >>
+>> >> >> Can we fix this to (at least) narrow the performance penalty.
+>> >> >>
+>> >> >
+>> >> > Yes, it does add another back and forth to file create... =A0It's h=
+ard/
+>> >> > impossible to check the permissions first and then decide whether t=
 o
-> respond.)
+>> >> > pass the O_CREAT flag. =A0Maybe we could add an if statement to che=
+ck
+>> >> > whether noperm was used and the noperm version could use the create
+>> >> > on lookup.
+>> >>
+>> >> Why is it hard to check local permissions? We have the local mode
+>> >> for the parent.
+>> >>
+>> >> Also note that the "intent" flags and the atomic create is not just
+>> >> about performance, but also making it atomic reduces some of the weir=
+d
+>> >> failure cases.
+>> >>
+>> >
+>> > We have the local mode for the parent, but we do not have the ownershi=
+p
+>> > and mode for the file that has not yet been created. Because of the
+>> > special (ahem) way that cifs handles permissions, it's easily possible
+>> > for the ownership of the file not to match the user doing that create.
+>> > At that point, later operations on the file can easily fail.
+>> >
+>> > This was the primary reason for the multiuser patch series, and why I
+>> > still say that doing permissions checking on the client is a broken
+>> > model.
+>>
+>> We don't have much choice - we have to allow permission
+>> checking on the client when client security context
+>> can't match security context on server - but I would like
+>> to make multiuser the default (especially if we
+>> can figure out a way to integrate winbind-like
+>> upcall for ntlmv2 auth) at least for the future (smb2 etc.)
+>> even if we can't change the default for cifs mounts.
+>>
 >
->> And with him breaking the patches into smaller pieces,
->> I can see why he was reluctant to post a 50 patch series,
->> but posted a link to them.
->
-> Another approach is to break up the 50 patches into logical subsets
-> (especially good is if you can split out any of them as cleanup or
-> bugfixes that can be justified entirely on their own).
+> That's fine, but that doesn't solve Dan's immediate problem. We need to
+> either take his patch or something like it for 3.2 (and probably for
+> stable as well) or just rip this crap out altogether.
 
-He did a reasonable job of breaking them down, but I also suggested
-to him that he defer some of the unrelated cleanup (e.g. a couple
-cifs functions moved from one file  to a (more logical) other file
-which increases the patch size but doesn't have anything to do
-with smb2).  The part that hits existing cifs code is not bad,
-and is the part I am most worried about for careful review in
-the short term.   As we saw with pNFS, I expect multiple changes,
-cleanup, rework of the smb2 specific functions over time, partly
-because smb2 (the protocol) is being enhanced - smb 2.2
-brings some very interesting new features, and partly due
-to adding a few linux extensions (once the support
-for smb2.1 passes all functional tests) and partly because
-we are going to continue to learn more at every test event.
+The benchmark gains are huge for a couple test cases
+(e.g. creating lots of small files) - doesn't make sense to throw it out.
+At worst (I think we can do better) - we only give up on atomic
+open/create for when noperm is not set (we want our users
+to be running noperm or equivalently multiuser).   It is especially
+important since the servers we do best at with create turn out
+to be Linux ( and other Unix which Samba runs on (due to posix extensions))=
+.
+
+If we break create apart as you suggest - we run into
+lookup/getattr/create/open/setattr
+races which are also annoying - we are supposed to send an atomic
+create/open operation
+to minimize strange consequences if the server file changes in between
+(the alternative)
+where getattr/create/open/setattr is done.
+
+
+
 
 --=20
 Thanks,
