@@ -1,75 +1,100 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [patch] cifs: accidentally creating empty files
-Date: Fri, 28 Oct 2011 23:44:06 -0400
-Message-ID: <20111028234406.01fd23ba@corrin.poochiereds.net>
-References: <20110927212810.GA12900@elgon.mountain>
-	<20111013132755.6c5db87e@barsoom.rdu.redhat.com>
-	<CAH2r5mtOF=Ja7_mTK576uEqgZqaVH+8YXtOqmZVknBC81sD=8Q@mail.gmail.com>
-	<20111028072019.GA14900@longonot.mountain>
-	<CAH2r5msb_+tenSg1kWCn_0xi2EZu6vboqvmbQ17vRBYoqHp2Eg@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2 03/53] CIFS: Check for smb2 vs. cifs in
+ find_tcp_session
+Date: Sat, 29 Oct 2011 00:40:46 -0400
+Message-ID: <20111029004046.2bf8e111@corrin.poochiereds.net>
+References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
+	<1319831704-3572-4-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msb_+tenSg1kWCn_0xi2EZu6vboqvmbQ17vRBYoqHp2Eg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1319831704-3572-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 28 Oct 2011 10:27:04 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Fri, 28 Oct 2011 23:54:14 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> On Fri, Oct 28, 2011 at 2:20 AM, Dan Carpenter <dan.carpenter@oracle.=
-com> wrote:
-> > On Wed, Oct 19, 2011 at 09:14:37PM -0500, Steve French wrote:
-> >> Doesn't this force the create to happen later - rather than
-> >> at lookup time where it belongs?
-> >>
-> >> if the issue is just noperm ... we should let this through if the =
-user
-> >> has local permissions. =C2=A0Doubling the cost of a file create to=
- Samba
-> >> seems like a bad idea (ie doing aQueryPathInfo AND an NTCreateX
-> >> doubles the roundrip, doubles the load on the server etc.) - the w=
-hole
-> >> point of this is to let us do an "atomic" open or create operation
-> >> and not have to split it into multiple requests. =C2=A0In any case=
- why would
-> >> we do the open and then follow it with a create?
-> >>
-> >> Can we fix this to (at least) narrow the performance penalty.
-> >>
-> >
-> > Yes, it does add another back and forth to file create... =C2=A0It'=
-s hard/
-> > impossible to check the permissions first and then decide whether t=
-o
-> > pass the O_CREAT flag. =C2=A0Maybe we could add an if statement to =
-check
-> > whether noperm was used and the noperm version could use the create
-> > on lookup.
->=20
-> Why is it hard to check local permissions? We have the local mode
-> for the parent.
->=20
-> Also note that the "intent" flags and the atomic create is not just
-> about performance, but also making it atomic reduces some of the weir=
-d
-> failure cases.
->=20
+> From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> 
+> Also set ses->is_smb2 when smb2 session initialized.
+> 
 
-We have the local mode for the parent, but we do not have the ownership
-and mode for the file that has not yet been created. Because of the
-special (ahem) way that cifs handles permissions, it's easily possible
-for the ownership of the file not to match the user doing that create.
-At that point, later operations on the file can easily fail.
+The commit message doesn't seem to be accurate. ses->is_smb2 is not
+being set here (and doesn't seem to exist).
 
-This was the primary reason for the multiuser patch series, and why I
-still say that doing permissions checking on the client is a broken
-model.
+> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |    1 +
+>  fs/cifs/connect.c  |   16 +++++++++++++++-
+>  2 files changed, 16 insertions(+), 1 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 6dfc7ef..179b784 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -172,6 +172,7 @@ struct smb_vol {
+>  	mode_t file_mode;
+>  	mode_t dir_mode;
+>  	unsigned secFlg;
+> +	bool use_smb2:1; /* use SMB2 protocol rather that CIFS */
+>  	bool retry:1;
+>  	bool intr:1;
+>  	bool setuids:1;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index f70d87d..6743558 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1,7 +1,7 @@
+>  /*
+>   *   fs/cifs/connect.c
+>   *
+> - *   Copyright (C) International Business Machines  Corp., 2002,2009
+> + *   Copyright (C) International Business Machines  Corp., 2002,2011
+>   *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+>   *
+>   *   This library is free software; you can redistribute it and/or modify
+> @@ -1760,6 +1760,14 @@ static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
+>  			   (struct sockaddr *)&vol->srcaddr))
+>  		return 0;
+>  
+> +#ifdef CONFIG_CIFS_SMB2
+> +	if ((server->is_smb2 == true) && (vol->use_smb2 == false))
+> +		return 0;
+> +
+> +	if ((server->is_smb2 == false) && (vol->use_smb2 == true))
+> +		return 0;
+> +#endif /* CONFIG_CIFS_SMB2 */
+> +
+>  	if (!match_port(server, addr))
+>  		return 0;
+>  
+> @@ -1884,6 +1892,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>  
+>  	tcp_ses->noblocksnd = volume_info->noblocksnd;
+>  	tcp_ses->noautotune = volume_info->noautotune;
+> +	/* BB should we set this unconditionally now, especially for SMB2 */
+>  	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
+>  	atomic_set(&tcp_ses->inFlight, 0);
+>  	init_waitqueue_head(&tcp_ses->response_q);
+> @@ -1927,6 +1936,11 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>  		goto out_err_crypto_release;
+>  	}
+>  
+> +#ifdef CONFIG_CIFS_SMB2
+> +	if (volume_info->use_smb2)
+> +		tcp_ses->is_smb2 = true;
+> +#endif /* CONFIG_CIFS_SMB2 */
+> +
+>  	/*
+>  	 * since we're in a cifs function already, we know that
+>  	 * this will succeed. No need for try_module_get().
 
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
