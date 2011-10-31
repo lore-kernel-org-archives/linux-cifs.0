@@ -1,91 +1,171 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/3] CIFS: Fix the VFS brlock cache usage in posix locking case
-Date: Sun, 30 Oct 2011 09:56:09 -0500
-Message-ID: <CAH2r5mvqcrW6y3ekAEs78Qq2tA2SdjhtfqX7k3f5y24HHdjBDA@mail.gmail.com>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH 2/3] CIFS: Simplify setlk error handling for mandatory
+ locking
+Date: Mon, 31 Oct 2011 06:54:44 -0400
+Message-ID: <20111031065444.6214d49a@tlielax.poochiereds.net>
 References: <1319894279-7723-1-git-send-email-piastry@etersoft.ru>
-	<20111030014835.12928ab3@corrin.poochiereds.net>
-	<CAKywueSzd0yjGzs99yaAUJZ1fD7LiPTt4s3TZa45oCGQprQ6nQ@mail.gmail.com>
+	<1319894279-7723-2-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueSzd0yjGzs99yaAUJZ1fD7LiPTt4s3TZa45oCGQprQ6nQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1319894279-7723-2-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Oct 30, 2011 at 4:26 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
-wrote:
-> 2011/10/30 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> On Sat, 29 Oct 2011 17:17:57 +0400
->> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->>
->>> Request to the cache in FL_POSIX case only.
->>>
->>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->>> ---
->>> =A0fs/cifs/file.c | =A0 10 ++++++++--
->>> =A01 files changed, 8 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->>> index 91e05f2..c1f063c 100644
->>> --- a/fs/cifs/file.c
->>> +++ b/fs/cifs/file.c
->>> @@ -793,6 +793,9 @@ cifs_posix_lock_test(struct file *file, struct =
-file_lock *flock)
->>> =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(file->f_path.de=
-ntry->d_inode);
->>> =A0 =A0 =A0 unsigned char saved_type =3D flock->fl_type;
->>>
->>> + =A0 =A0 if ((flock->fl_flags & FL_POSIX) =3D=3D 0)
->>> + =A0 =A0 =A0 =A0 =A0 =A0 return 1;
->>> +
->>> =A0 =A0 =A0 mutex_lock(&cinode->lock_mutex);
->>> =A0 =A0 =A0 posix_test_lock(file, flock);
->>>
->>> @@ -809,12 +812,15 @@ static int
->>> =A0cifs_posix_lock_set(struct file *file, struct file_lock *flock)
->>> =A0{
->>> =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(file->f_path.de=
-ntry->d_inode);
->>> - =A0 =A0 int rc;
->>> + =A0 =A0 int rc =3D 1;
->>> +
->>> + =A0 =A0 if ((flock->fl_flags & FL_POSIX) =3D=3D 0)
->>> + =A0 =A0 =A0 =A0 =A0 =A0 return rc;
->>>
->>> =A0 =A0 =A0 mutex_lock(&cinode->lock_mutex);
->>> =A0 =A0 =A0 if (!cinode->can_cache_brlcks) {
->>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 mutex_unlock(&cinode->lock_mutex);
->>> - =A0 =A0 =A0 =A0 =A0 =A0 return 1;
->>> + =A0 =A0 =A0 =A0 =A0 =A0 return rc;
->>> =A0 =A0 =A0 }
->>> =A0 =A0 =A0 rc =3D posix_lock_file_wait(file, flock);
->>> =A0 =A0 =A0 mutex_unlock(&cinode->lock_mutex);
->>
->> Hmm... I do have an open samba.org bug to allow flock() to work on c=
-ifs
->> as well. Would that be doable with your new locking code? In any cas=
-e,
->> this seems ok:
->>
->> Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->
-> Thanks for the review.
->
-> Do you mean https://bugzilla.samba.org/show_bug.cgi?id=3D6843 ?
->
-> I don't see any problems with implementing flock() on top of the new
-> locking code. We will treat it as usual brlock from 0 to offset_max -
-> the only difference is when we negotiate posix locking we should call
-> flock_lock_file_wait rather than posix_lock_file_wait (add such a
-> check in cifs_posix_lock_test and cifs_posix_lock_set).
+On Sat, 29 Oct 2011 17:17:58 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-yes
+> Now we allocate a lock structure at first, then we request to the server
+> and save the lock if server returned OK though void function - it prevents
+> the situation when we locked a file on the server and then return -ENOMEM
+> from setlk.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/file.c |   64 ++++++++++++++++++++++++++++----------------------------
+>  1 files changed, 32 insertions(+), 32 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index c1f063c..d9cc07f 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -672,7 +672,7 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
+>  }
+>  
+>  static bool
+> -cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+> +__cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+>  			__u64 length, __u8 type, __u16 netfid,
+>  			struct cifsLockInfo **conf_lock)
+>  {
+> @@ -694,6 +694,14 @@ cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+>  	return false;
+>  }
+>  
+> +static bool
+> +cifs_find_lock_conflict(struct cifsInodeInfo *cinode, struct cifsLockInfo *lock,
+> +			struct cifsLockInfo **conf_lock)
+> +{
+> +	return __cifs_find_lock_conflict(cinode, lock->offset, lock->length,
+> +					 lock->type, lock->netfid, conf_lock);
+> +}
+> +
+>  static int
+>  cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+>  	       __u8 type, __u16 netfid, struct file_lock *flock)
+> @@ -704,8 +712,8 @@ cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+>  
+>  	mutex_lock(&cinode->lock_mutex);
+>  
+> -	exist = cifs_find_lock_conflict(cinode, offset, length, type, netfid,
+> -					&conf_lock);
+> +	exist = __cifs_find_lock_conflict(cinode, offset, length, type, netfid,
+> +					  &conf_lock);
+>  	if (exist) {
+>  		flock->fl_start = conf_lock->offset;
+>  		flock->fl_end = conf_lock->offset + conf_lock->length - 1;
+> @@ -723,40 +731,27 @@ cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+>  	return rc;
+>  }
+>  
+> -static int
+> -cifs_lock_add(struct cifsInodeInfo *cinode, __u64 len, __u64 offset,
+> -	      __u8 type, __u16 netfid)
+> +static void
+> +cifs_lock_add(struct cifsInodeInfo *cinode, struct cifsLockInfo *lock)
+>  {
+> -	struct cifsLockInfo *li;
+> -
+> -	li = cifs_lock_init(len, offset, type, netfid);
+> -	if (!li)
+> -		return -ENOMEM;
+> -
+>  	mutex_lock(&cinode->lock_mutex);
+> -	list_add_tail(&li->llist, &cinode->llist);
+> +	list_add_tail(&lock->llist, &cinode->llist);
+>  	mutex_unlock(&cinode->lock_mutex);
+> -	return 0;
+>  }
+>  
+>  static int
+> -cifs_lock_add_if(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+> -		 __u8 type, __u16 netfid, bool wait)
+> +cifs_lock_add_if(struct cifsInodeInfo *cinode, struct cifsLockInfo *lock,
+> +		 bool wait)
+>  {
+> -	struct cifsLockInfo *lock, *conf_lock;
+> +	struct cifsLockInfo *conf_lock;
+>  	bool exist;
+>  	int rc = 0;
+>  
+> -	lock = cifs_lock_init(length, offset, type, netfid);
+> -	if (!lock)
+> -		return -ENOMEM;
+> -
+>  try_again:
+>  	exist = false;
+>  	mutex_lock(&cinode->lock_mutex);
+>  
+> -	exist = cifs_find_lock_conflict(cinode, offset, length, type, netfid,
+> -					&conf_lock);
+> +	exist = cifs_find_lock_conflict(cinode, lock, &conf_lock);
+>  	if (!exist && cinode->can_cache_brlcks) {
+>  		list_add_tail(&lock->llist, &cinode->llist);
+>  		mutex_unlock(&cinode->lock_mutex);
+> @@ -781,7 +776,6 @@ try_again:
+>  		}
+>  	}
+>  
+> -	kfree(lock);
+>  	mutex_unlock(&cinode->lock_mutex);
+>  	return rc;
+>  }
+> @@ -1254,20 +1248,26 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+>  	}
+>  
+>  	if (lock) {
+> -		rc = cifs_lock_add_if(cinode, flock->fl_start, length,
+> -				      type, netfid, wait_flag);
+> +		struct cifsLockInfo *lock;
+> +
+> +		lock = cifs_lock_init(length, flock->fl_start, type, netfid);
+> +		if (!lock)
+> +			return -ENOMEM;
+> +
+> +		rc = cifs_lock_add_if(cinode, lock, wait_flag);
+
+Here, you're adding "lock" to the list...
+
+>  		if (rc < 0)
+> -			return rc;
+> -		else if (!rc)
+> +			kfree(lock);
+> +		if (rc <= 0)
+>  			goto out;
+>  
+>  		rc = CIFSSMBLock(xid, tcon, netfid, current->tgid, length,
+>  				 flock->fl_start, 0, 1, type, wait_flag, 0);
+> -		if (rc == 0) {
+> -			/* For Windows locks we must store them. */
+> -			rc = cifs_lock_add(cinode, length, flock->fl_start,
+> -					   type, netfid);
+> +		if (rc) {
+> +			kfree(lock);
+
+...and here you're freeing "lock" without removing it from the list.
+Isn't that like to cause a problem?
+
+> +			goto out;
+>  		}
+> +
+> +		cifs_lock_add(cinode, lock);
+>  	} else if (unlock)
+>  		rc = cifs_unlock_range(cfile, flock, xid);
+>  
 
 
---=20
-Thanks,
-
-Steve
+-- 
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
