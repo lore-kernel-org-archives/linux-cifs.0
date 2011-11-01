@@ -1,78 +1,48 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Tejun Heo <tj@kernel.org>
 Subject: Re: [RFC PATCH] freezer: revert 27920651fe "PM / Freezer: Make
  fake_signal_wake_up() wake TASK_KILLABLE tasks too"
-Date: Mon, 31 Oct 2011 19:02:11 -0500
-Message-ID: <CAH2r5mscdMPttjgzP1naHEtnzyeJgY06Euyn19Z7=BojBrMcXA@mail.gmail.com>
+Date: Mon, 31 Oct 2011 17:55:05 -0700
+Message-ID: <20111101005505.GO18855@google.com>
 References: <20111031221743.GA18855@google.com>
-	<201111010024.16659.rjw@sisk.pl>
-	<CAH2r5msMiG8MjhYuVv8ehqkBLKc1Av3hi+2q6zwrrXdTTa_+YQ@mail.gmail.com>
-	<20111031235335.GL18855@google.com>
+ <201111010024.16659.rjw@sisk.pl>
+ <20111031233059.GI18855@google.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>
-To: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111031235335.GL18855-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Jeff Layton <jlayton@redhat.com>, Steve French <sfrench@samba.org>,
+	linux-kernel@vger.kernel.org, Oleg Nesterov <oleg@redhat.com>,
+	linux-pm@vger.kernel.org, linux-cifs@vger.kernel.org,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Neil Brown <neilb@suse.de>
+To: "Rafael J. Wysocki" <rjw@sisk.pl>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <20111031233059.GI18855@google.com>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Mon, Oct 31, 2011 at 6:53 PM, Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
-> Hello,
->
-> On Mon, Oct 31, 2011 at 06:45:48PM -0500, Steve French wrote:
->> >> Signed-off-by: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
->> >> Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> >> ---
->> >> Neil, Steve, do the network filesystems need a way to indicate "I=
- can
->> >> either be killed or enter freezer"?
->>
->> Probably, yes, but I will defer to Jeff as he has looked
->> more recently at these issues.
->>
->> I can explain cifs state, and disconnect/reconnection of sessions
->> (and smb2 is a little more feature rich in this regard), but will
->> let Jeff explain the more subtle points you are getting at.
->
-> Hmmm... I'm getting confused.
->
-> For nfs, this really is a non-issue. =A0Either the user wants nointr =
-or
-> intr behavior. =A0NFS nointr is rather crazy - it's basically "nothin=
-g
-> can do anything to tasks which is doing NFS IO until it's complete"
-> and really meant to be used for servers sharing filesystems for /usr,
-> /home and stuff. =A0It doesn't make whole lot of sense on systems whi=
-ch
-> may go suspend and that's why there's intr option.
->
-> I suppose the problem is that cifs doesn't know how to do 'intr' yet,
-> right? =A0If that really is the problem, the correct long term soluti=
-on
-> would be implementing proper intr behavior and it doesn't make any
-> sense to push this type of change to PM core to for short term
-> workaround. =A0Just use prepare_to_wait() / schedule() / finish_wait(=
-)
-> directly w/ INTERRUPTIBLE sleep and don't break out of wait loop on
-> signal_pending(). =A0If this should be used in multiple places, write=
- up
-> a wait_event_XXX() wrapper. =A0There is absolutely no reason to chang=
-e
-> wakeup condition.
+Hey, again.
 
-It isn't that simple (among other reasons due to much time waiting
-in the socket interface), but since this directly addresses problems
-Jeff has spent much time debugging, I would like him to chime in.
+On Mon, Oct 31, 2011 at 04:30:59PM -0700, Tejun Heo wrote:
+> I can't remember one off the top of my head but I'm pretty sure there
+> at least are few which expect tight inter-locking between sleeps and
+> wakeups.  I'll look for examples and post reply.  ISTR them being
+> kernel threads so this might not apply directly but it's still a
+> dangerous game to play.
 
+Hmm... I couldn't find KILLABLE used like that but here are two
+UNINTERRUPTIBLE sleep examples.
 
---=20
-Thanks,
+* kthread_start() depends on the fact that a kthread won't be woken up
+  from UNINTERRUPTIBLE sleep spuriously.
 
-Steve
+* jfs_flush_journal() doesn't check whether the wakeup was spurious
+  after waiting if !tblkGC_COMMITTED.
+
+Maybe we can re-define KILLABLE as killable && freezable but IMHO that
+requires pretty strong rationales.  If at all possible, let's not
+diddle with that if it can be worked around some other way.
+
+Thank you.
+
+-- 
+tejun
