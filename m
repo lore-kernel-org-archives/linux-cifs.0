@@ -1,52 +1,52 @@
-From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Subject: Re: [RFC PATCH] freezer: revert 27920651fe "PM / Freezer: Make
- fake_signal_wake_up() wake TASK_KILLABLE tasks too"
-Date: Tue, 1 Nov 2011 09:55:35 -0700
-Message-ID: <20111101165535.GU18855@google.com>
-References: <20111031221743.GA18855@google.com>
- <201111010024.16659.rjw@sisk.pl>
- <20111031233059.GI18855@google.com>
- <20111101005505.GO18855@google.com>
- <20111101041337.39077229@tlielax.poochiereds.net>
- <20111101065958.50addab5@tlielax.poochiereds.net>
- <20111101163059.GR18855@google.com>
- <1320166171.5019.1.camel@lade.trondhjem.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Linux CIFS corruption bug in kernel 3.0.4 and 3.1
+Date: Tue, 1 Nov 2011 13:37:04 -0400
+Message-ID: <20111101133704.3c7335fb@tlielax.poochiereds.net>
+References: <CAGc=Oh8GGXw6itfAo5-x6CpbwtK1TQeZrerx_zPrC4qABR2m6w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Nick Davis <nick-fUoCq3+lmYBnK6aPwh9DPQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1320166171.5019.1.camel-SyLVLa/KEI9HwK5hSS5vWB2eb7JE58TQ@public.gmane.org>
+In-Reply-To: <CAGc=Oh8GGXw6itfAo5-x6CpbwtK1TQeZrerx_zPrC4qABR2m6w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+On Tue, 1 Nov 2011 10:09:26 -0500
+Nick Davis <nick-fUoCq3+lmYBnK6aPwh9DPQ@public.gmane.org> wrote:
 
-On Tue, Nov 01, 2011 at 12:49:31PM -0400, Trond Myklebust wrote:
-> > #define wait_event_freezekillable(wq, condition)			\
-> > do {									\
-> > 	DEFINE_WAIT(__wait);						\
-> > 	for (;;) {							\
-> > 		prepare_to_wait(&wq, &__wait, TASK_INTERRUPTIBLE);	\
-> > 		if (condition || fatal_signal_pending(current))		\
-> > 			break;						\
-> > 		schedule();						\
-> > 		try_to_freeze();					\
-> > 	}								\
-> > 	finish_wait(&wq, &__wait);					\
-> > } while (0)
-> 
-> Err... Won't this end up busy-waiting if a non-fatal signal is received?
+> Hello,
+>=20
+> I've recently noticed a corruption bug in the Linux kernel CIFS clien=
+t
+> that ships with Ubuntu 11.10 (kernel 3.0, based on upstream 3.0.4).
+> I've filed a bug report with the details on Launchpad
+> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/879228
+>=20
+> As suggested in the Launchpad bug comments, I installed a custom
+> kernel based on the upstream 3.1, but after testing the bug is still
+> present. =C2=A0It was then suggested that I file a bug report with th=
+e
+> upstream subsystem maintainer.
+>=20
+> Let me know if I can provide any further information, or if I should
+> report this issue somewhere else.
+>=20
 
-Ah... right, forgot about signal_pending_state() special case in
-schedule().  Any better ideas, anyone?
+This is the right place to report it, but as we're not all ubuntu users
+it would be helpful for you to outline the problem in your mail to the
+list.
 
--- 
-tejun
+Looking over the launchpad report, it looks like this is something
+you're able to reproduce at will. Is it possible to share that
+reproducer? That would help us to be able to track down the problem and
+verify that it's fixed once we understand it.
+
+What may be best is to open a bug at bugzilla.samba.org so we have a
+place to track info relating to this. If you do that, please cc me on
+the bug and I'll plan to take a look.
+
+Thanks,
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
