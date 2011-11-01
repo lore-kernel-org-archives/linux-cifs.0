@@ -1,152 +1,104 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 3/3] CIFS: Cleanup byte-range locking code style
-Date: Tue, 1 Nov 2011 21:19:46 +0300
-Message-ID: <CAKywueQxU87umPDQeyV38kqEs5pQGqC02wFWXsNACENM4-a2Cw@mail.gmail.com>
-References: <1319894279-7723-1-git-send-email-piastry@etersoft.ru>
-	<1319894279-7723-3-git-send-email-piastry@etersoft.ru>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Linux CIFS corruption bug in kernel 3.0.4 and 3.1
+Date: Tue, 1 Nov 2011 13:21:47 -0500
+Message-ID: <CAH2r5mtwmCrNweqXZJ+pi3Ln5ikGHtnd7VbyfE8ZOTnbwBy1ng@mail.gmail.com>
+References: <CAGc=Oh8GGXw6itfAo5-x6CpbwtK1TQeZrerx_zPrC4qABR2m6w@mail.gmail.com>
+	<20111101133704.3c7335fb@tlielax.poochiereds.net>
+	<CAGc=Oh8jEK6GzadojdhRJOTzYLyGRo43g1sMv6wRB3TNsBK7tA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Nick Davis <nick-fUoCq3+lmYBnK6aPwh9DPQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319894279-7723-3-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <CAGc=Oh8jEK6GzadojdhRJOTzYLyGRo43g1sMv6wRB3TNsBK7tA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/10/29 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> Reorder parms of cifs_lock_init, trivially simplify getlk code and
-> remove extra {} in cifs_lock_add_if.
+Also remember that, even without a test case, we can often debug
+from a combination of wire trace (see
+http://wiki.samba.org/index.php/Capture_Packets)
+and dmesg output (from enabling cifs debugging e.g.
+
+The dmesg or syslog (/var/log/messages) will show certain serious
+errors, but enable additional cifs debugging flags to increase the
+debug output. You can do this by doing:
+
+   #dmesg -c /* this clears kernel ring buffer */
+   #echo 3 > /proc/fs/cifs/cifsFYI /* Enables additional debugging */
+   <do the operation>
+   #dmesg > cifs-debug.txt
+   Attach cifs-debug.txt
+
+
+On Tue, Nov 1, 2011 at 1:04 PM, Nick Davis <nick-fUoCq3+lmYBnK6aPwh9DPQ@public.gmane.org> wrote:
+> Thanks for the reply, Jeff. =A0I've filed a bug with the Samba tracke=
+r
+> as you suggested: =A0https://bugzilla.samba.org/show_bug.cgi?id=3D855=
+9
 >
-> Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
-> =A0fs/cifs/file.c | =A0 43 +++++++++++++++++++-----------------------=
--
-> =A01 files changed, 19 insertions(+), 24 deletions(-)
+> The program I'm using to write the output files is a bioinformatics
+> tool that I've developed as part of my research. =A0Our research grou=
+p
+> plans to release it as an open source tool soon, but currently it's
+> hosted in a private git repository. =A0So at the moment it may be
+> difficult to release for testing.
 >
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index d9cc07f..cf0b153 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -645,20 +645,20 @@ int cifs_closedir(struct inode *inode, struct f=
-ile *file)
-> =A0}
->
-> =A0static struct cifsLockInfo *
-> -cifs_lock_init(__u64 len, __u64 offset, __u8 type, __u16 netfid)
-> +cifs_lock_init(__u64 offset, __u64 length, __u8 type, __u16 netfid)
-> =A0{
-> - =A0 =A0 =A0 struct cifsLockInfo *li =3D
-> + =A0 =A0 =A0 struct cifsLockInfo *lock =3D
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kmalloc(sizeof(struct cifsLockInfo), G=
-=46P_KERNEL);
-> - =A0 =A0 =A0 if (!li)
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return li;
-> - =A0 =A0 =A0 li->netfid =3D netfid;
-> - =A0 =A0 =A0 li->offset =3D offset;
-> - =A0 =A0 =A0 li->length =3D len;
-> - =A0 =A0 =A0 li->type =3D type;
-> - =A0 =A0 =A0 li->pid =3D current->tgid;
-> - =A0 =A0 =A0 INIT_LIST_HEAD(&li->blist);
-> - =A0 =A0 =A0 init_waitqueue_head(&li->block_q);
-> - =A0 =A0 =A0 return li;
-> + =A0 =A0 =A0 if (!lock)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return lock;
-> + =A0 =A0 =A0 lock->offset =3D offset;
-> + =A0 =A0 =A0 lock->length =3D length;
-> + =A0 =A0 =A0 lock->type =3D type;
-> + =A0 =A0 =A0 lock->netfid =3D netfid;
-> + =A0 =A0 =A0 lock->pid =3D current->tgid;
-> + =A0 =A0 =A0 INIT_LIST_HEAD(&lock->blist);
-> + =A0 =A0 =A0 init_waitqueue_head(&lock->block_q);
-> + =A0 =A0 =A0 return lock;
-> =A0}
->
-> =A0static void
-> @@ -770,10 +770,8 @@ try_again:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0(lock->blist.next =3D=3D &lock->blist));
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto try_again;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mutex_lock(&cinode->loc=
-k_mutex);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&lock->bl=
-ist);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mutex_lock(&cinode->lock_mutex);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_del_init(&lock->blist);
-> =A0 =A0 =A0 =A0}
->
-> =A0 =A0 =A0 =A0mutex_unlock(&cinode->lock_mutex);
-> @@ -927,7 +925,7 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0type =3D CIFS_WRLCK;
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 lck =3D cifs_lock_init(length, flock->f=
-l_start, type,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 lck =3D cifs_lock_init(flock->fl_start,=
- length, type,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- cfile->netfid);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!lck) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -ENOMEM;
-> @@ -1064,14 +1062,12 @@ cifs_getlk(struct file *file, struct file_loc=
-k *flock, __u8 type,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc !=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Error unloc=
-king previously locked "
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "=
-range %d during test of lock", rc);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D 0;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> =A0 =A0 =A0 =A0}
->
-> =A0 =A0 =A0 =A0if (type & LOCKING_ANDX_SHARED_LOCK) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0flock->fl_type =3D F_WRLCK;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D 0;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> =A0 =A0 =A0 =A0}
->
-> =A0 =A0 =A0 =A0rc =3D CIFSSMBLock(xid, tcon, netfid, current->tgid, l=
-ength,
-> @@ -1089,8 +1085,7 @@ cifs_getlk(struct file *file, struct file_lock =
-*flock, __u8 type,
-> =A0 =A0 =A0 =A0} else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0flock->fl_type =3D F_WRLCK;
->
-> - =A0 =A0 =A0 rc =3D 0;
-> - =A0 =A0 =A0 return rc;
-> + =A0 =A0 =A0 return 0;
-> =A0}
->
-> =A0static void
-> @@ -1250,7 +1245,7 @@ cifs_setlk(struct file *file, =A0struct file_lo=
-ck *flock, __u8 type,
-> =A0 =A0 =A0 =A0if (lock) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct cifsLockInfo *lock;
->
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 lock =3D cifs_lock_init(length, flock->=
-fl_start, type, netfid);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 lock =3D cifs_lock_init(flock->fl_start=
-, length, type, netfid);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!lock)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOMEM;
->
+> On Tue, Nov 1, 2011 at 12:37 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
+e:
+>> On Tue, 1 Nov 2011 10:09:26 -0500
+>> Nick Davis <nick-fUoCq3+lmYBnK6aPwh9DPQ@public.gmane.org> wrote:
+>>
+>>> Hello,
+>>>
+>>> I've recently noticed a corruption bug in the Linux kernel CIFS cli=
+ent
+>>> that ships with Ubuntu 11.10 (kernel 3.0, based on upstream 3.0.4).
+>>> I've filed a bug report with the details on Launchpad
+>>> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/879228
+>>>
+>>> As suggested in the Launchpad bug comments, I installed a custom
+>>> kernel based on the upstream 3.1, but after testing the bug is stil=
+l
+>>> present. =A0It was then suggested that I file a bug report with the
+>>> upstream subsystem maintainer.
+>>>
+>>> Let me know if I can provide any further information, or if I shoul=
+d
+>>> report this issue somewhere else.
+>>>
+>>
+>> This is the right place to report it, but as we're not all ubuntu us=
+ers
+>> it would be helpful for you to outline the problem in your mail to t=
+he
+>> list.
+>>
+>> Looking over the launchpad report, it looks like this is something
+>> you're able to reproduce at will. Is it possible to share that
+>> reproducer? That would help us to be able to track down the problem =
+and
+>> verify that it's fixed once we understand it.
+>>
+>> What may be best is to open a bug at bugzilla.samba.org so we have a
+>> place to track info relating to this. If you do that, please cc me o=
+n
+>> the bug and I'll plan to take a look.
+>>
+>> Thanks,
+>> --
+>> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>>
 > --
-> 1.7.1
->
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 >
 
-Steve, Jeff,
 
-Since #1 and #2 of this series of three are reviewed and ok could you
-look at this one, please? It's rather simple, I think.
 
 --=20
-Best regards,
-Pavel Shilovsky.
+Thanks,
+
+Steve
