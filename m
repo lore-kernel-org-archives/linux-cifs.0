@@ -1,121 +1,99 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH v2 06/53] CIFS: Add missing unicode handling routines
- needed by smb2
-Date: Tue, 1 Nov 2011 06:12:30 -0400
-Message-ID: <20111101061230.4c6ba635@corrin.poochiereds.net>
-References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
-	<1319831704-3572-7-git-send-email-piastry@etersoft.ru>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC PATCH] freezer: revert 27920651fe "PM / Freezer: Make
+ fake_signal_wake_up() wake TASK_KILLABLE tasks too"
+Date: Tue, 1 Nov 2011 06:59:58 -0400
+Message-ID: <20111101065958.50addab5@tlielax.poochiereds.net>
+References: <20111031221743.GA18855@google.com>
+	<201111010024.16659.rjw@sisk.pl>
+	<20111031233059.GI18855@google.com>
+	<20111101005505.GO18855@google.com>
+	<20111101041337.39077229@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319831704-3572-7-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>, trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111101041337.39077229-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 28 Oct 2011 23:54:17 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Tue, 1 Nov 2011 04:13:37 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> On Mon, 31 Oct 2011 17:55:05 -0700
+> Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
 > 
-> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifs_unicode.c |   61 ++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/cifs_unicode.h |    7 +++++
->  2 files changed, 68 insertions(+), 0 deletions(-)
+> > Hey, again.
+> > 
+> > On Mon, Oct 31, 2011 at 04:30:59PM -0700, Tejun Heo wrote:
+> > > I can't remember one off the top of my head but I'm pretty sure there
+> > > at least are few which expect tight inter-locking between sleeps and
+> > > wakeups.  I'll look for examples and post reply.  ISTR them being
+> > > kernel threads so this might not apply directly but it's still a
+> > > dangerous game to play.
+> > 
+> > Hmm... I couldn't find KILLABLE used like that but here are two
+> > UNINTERRUPTIBLE sleep examples.
+> > 
+> > * kthread_start() depends on the fact that a kthread won't be woken up
+> >   from UNINTERRUPTIBLE sleep spuriously.
+> > 
+> > * jfs_flush_journal() doesn't check whether the wakeup was spurious
+> >   after waiting if !tblkGC_COMMITTED.
+> > 
+> > Maybe we can re-define KILLABLE as killable && freezable but IMHO that
+> > requires pretty strong rationales.  If at all possible, let's not
+> > diddle with that if it can be worked around some other way.
+> > 
+> > Thank you.
+> > 
 > 
-> diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-> index 1b2e180..7f09423 100644
-> --- a/fs/cifs/cifs_unicode.c
-> +++ b/fs/cifs/cifs_unicode.c
-> @@ -330,3 +330,64 @@ ctoUCS_out:
->  	return i;
->  }
->  
-> +#ifdef CONFIG_CIFS_SMB2
-> +/*
-> + * smb2_local_to_ucs2_bytes - how long will a string be after conversion?
-> + * @from - pointer to input string
-> + * @maxbytes - don't go past this many bytes of input string
-> + * @codepage - source codepage
-> + *
-> + * Walk a string and return the number of bytes that the string will
-> + * be after being converted to the given charset, not including any null
-> + * termination required. Don't walk past maxbytes in the source buffer.
-> + */
-> +
-> +int
-> +smb2_local_to_ucs2_bytes(const char *from, int len,
-> +			  const struct nls_table *codepage)
-> +{
-> +	int charlen;
-> +	int i;
-> +	wchar_t wchar_to;
-> +
-> +	if (from == NULL)
-> +		return 0;
-> +	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
-> +		charlen = codepage->char2uni(from, len, &wchar_to);
-> +		/* Failed conversion defaults to a question mark */
-> +		if (charlen < 1)
-> +			charlen = 1;
-> +	}
-> +	return 2 * i; /* UCS characters are two bytes */
-> +}
-> +
-> +/*
-> + * smb2_strndup_to_ucs - copy a string to wire format from the local codepage
-> + * @src - source string
-> + * @maxlen - don't walk past this many bytes in the source string
-> + * @ucslen - the length of the allocated string in bytes (including null)
-> + * @codepage - source codepage
-> + *
-> + * Take a string convert it from the local codepage to UCS2 and
-> + * put it in a new buffer. Returns a pointer to the new string or NULL on
-> + * error.
-> + */
-> +__le16 *
-> +smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_len,
-> +	     const struct nls_table *codepage)
-> +{
-> +	int len;
-> +	__le16 *dst;
-> +
-> +	len = smb2_local_to_ucs2_bytes(src, maxlen, codepage);
-> +	len += 2; /* NULL */
-> +	dst = kmalloc(len, GFP_KERNEL);
-> +	if (!dst) {
-> +		*ucs_len = 0;
-> +		return NULL;
-> +	}
-> +	cifs_strtoUCS(dst, src, maxlen, codepage);
-> +	*ucs_len = len;
-> +	return dst;
-> +}
-> +#endif /* CONFIG_CIFS_SMB2 */
-> diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
-> index 6d02fd5..e00f677 100644
-> --- a/fs/cifs/cifs_unicode.h
-> +++ b/fs/cifs/cifs_unicode.h
-> @@ -380,4 +380,11 @@ UniStrlwr(register wchar_t *upin)
->  
->  #endif
->  
-> +#ifdef CONFIG_CIFS_SMB2
-> +extern int smb2_local_to_ucs2_bytes(const char *from, int len,
-> +				    const struct nls_table *codepage);
-> +extern __le16 *smb2_strndup_to_ucs(const char *src, const int maxlen,
-> +				   int *ucs_len, const struct nls_table *cp);
-> +#endif /* CONFIG_CIFS_SMB2 */
-> +
->  #endif /* _CIFS_UNICODE_H */
+> (cc'ing Trond and the linux-nfs mailing list -- fwiw, he maintains the
+> NFS client code -- Bruce is the NFS server maintainer and probably has
+> little interest in this thread).
+> 
+> The main reason for this change is primarily that we have people with
+> laptops and nfs and cifs mounts that sometimes fail to suspend.
+> 
+> IIUC, the TASK_KILLABLE was mostly added to ensure that file-store
+> writes would be uninterruptible, but still allow those tasks to be
+> killed if the process is going down anyway.
+> 
+> The intr/nointr mount options in NFS have been deprecated since
+> TASK_KILLABLE was added. The scheme now is basically that those sleeps
+> ignore any signals except for fatal ones. So, that knob is meaningless
+> and has been for a long time now.
+> 
+> cifs never had a working intr/nointr knob, but signal handling while
+> waiting for replies was always a difficult thing to handle correctly. I
+> don't think the right answer is to go back to using such a knob in cifs
+> or nfs.
+> 
+> I suppose we could look at going back to the world of complicated
+> signal handling and TASK_INTERRUPTIBLE, but that's not a trivial change
+> either. The TASK_WAKE_FREEZABLE flag you mention might make more sense
+> than doing that.
+> 
 
-Since you're adding these functions with no callers, it would be
-helpful to clarify (in the commit message) how these will be used.
+Also, since task state and signal handling clearly isn't my forte...can
+you clarify what the main difference is in using a TASK_KILLABLE sleep
+vs. TASK_INTERRUPTIBLE with all signals but SIGKILL blocked?
+
+I know that the process state would end up different (S vs. D state).
+Is there anything else we'd need to be concerned with if we converted
+all these call sites to use such a scheme in lieu of a new
+TASK_WAKE_FREEZABLE flag or similar?
 
 -- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
