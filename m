@@ -1,79 +1,53 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [RFC PATCH] freezer: revert 27920651fe "PM / Freezer: Make
- fake_signal_wake_up() wake TASK_KILLABLE tasks too"
-Date: Wed, 2 Nov 2011 07:42:57 -0400
-Message-ID: <20111102074257.7174691c@tlielax.poochiereds.net>
-References: <20111101005505.GO18855@google.com>
-	<20111101041337.39077229@tlielax.poochiereds.net>
-	<20111101065958.50addab5@tlielax.poochiereds.net>
-	<20111101163059.GR18855@google.com>
-	<20111101175953.GB5358@redhat.com>
-	<20111101180601.GV18855@google.com>
-	<20111101181329.GA6739@redhat.com>
-	<20111101182753.GW18855@google.com>
-	<20111101193923.GA9444@redhat.com>
-	<20111101194601.GB9444@redhat.com>
-	<20111101215710.GA13803@google.com>
+	fake_signal_wake_up() wake TASK_KILLABLE tasks too"
+Date: Wed, 2 Nov 2011 16:13:54 +0100
+Message-ID: <20111102151354.GA28527@redhat.com>
+References: <20111101065958.50addab5@tlielax.poochiereds.net> <20111101163059.GR18855@google.com> <20111101175953.GB5358@redhat.com> <20111101180601.GV18855@google.com> <20111101181329.GA6739@redhat.com> <20111101182753.GW18855@google.com> <20111101193923.GA9444@redhat.com> <20111101194601.GB9444@redhat.com> <20111101215710.GA13803@google.com> <20111102074257.7174691c@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+Content-Type: text/plain; charset=us-ascii
+Cc: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
 	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
 	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>, trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
 	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111101215710.GA13803-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20111102074257.7174691c-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 1 Nov 2011 14:57:10 -0700
-Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
+On 11/02, Jeff Layton wrote:
+>
+> On Tue, 1 Nov 2011 14:57:10 -0700
+> Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
+>
+> > For now, let's go with the count/dont_count.  Can you please write up
+> > a patch for that?  Jeff, does this seem okay to you?
+> >
+>
+> Let me make sure I understand since I don't have a great grasp of the
+> freezer internals...
+>
+> This will set the PF_FREEZER_SKIP flag on the task, which prevents
+> try_to_freeze_tasks from incrementing the "todo" var for this process
+> and should let the suspend proceed.
+>
+> So this really makes try_to_freeze_tasks set PF_FREEZING on the task,
+> but not get upset that it doesn't actually call try_to_freeze().
 
-> Hey, Oleg.
-> 
-> On Tue, Nov 01, 2011 at 08:46:01PM +0100, Oleg Nesterov wrote:
-> > On 11/01, Oleg Nesterov wrote:
-> > >
-> > > Or we can add TASK_FREEZABLE (like TASK_WAKEKILL), iirc we already
-> > > discussed this some time ago. And probably it makes sense to add the
-> > > generic wait_event_state().
-> > 
-> > Forgot to mention. I think that before anything else we need
-> > signal_wake_up_state(). For example, note that none of the callers
-> > of signal_wake_up(resume => true) in ptrace code wants to wake up
-> > the killable task.
-> 
-> Yeah, agreed for both wait_event_state() and signal_wake_up_state().
-> For now, let's go with the count/dont_count.  Can you please write up
-> a patch for that?  Jeff, does this seem okay to you?
-> 
+Yes. PF_FREEZER_SKIP means, "please count me as frozen". This task can
+do nothing except refrigerator() after wakeup.
 
-Let me make sure I understand since I don't have a great grasp of the
-freezer internals...
+> Is that sufficient for a process that's just sleeping here?
 
-This will set the PF_FREEZER_SKIP flag on the task, which prevents
-try_to_freeze_tasks from incrementing the "todo" var for this process
-and should let the suspend proceed.
+I think this should work... but this is the question to you ;)
 
-So this really makes try_to_freeze_tasks set PF_FREEZING on the task,
-but not get upset that it doesn't actually call try_to_freeze().
+Oleg.
 
-Is that sufficient for a process that's just sleeping here?
-
-If so, guess I'll need to respin the NFS/RPC patches for this to do
-something similar around the sleeps there since they don't use
-wait_event_*.
-
-> For TASK_FREEZABLE, I'm not entirely sure.  Combined with
-> wait_event_state(), it can definitely reduce the number of different
-> variants of wait_event_*().  Let's see.
-> 
-
-wait_event_state() sounds like a wonderful idea regardless of what we
-do here.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
