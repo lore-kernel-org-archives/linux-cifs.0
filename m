@@ -1,56 +1,70 @@
-From: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
-Subject: CIFS: Rename bug on servers not supporting inode numbers
-Date: Thu, 3 Nov 2011 15:20:17 +0000
-Message-ID: <9A609E6D-DF91-4AF9-855A-6D28E9B95D15@cam.ac.uk>
-Mime-Version: 1.0 (Apple Message framework v1251.1)
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Unix Support <unix-support-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] wait_event_freezekillable: use
+ freezer_do_not_count/freezer_count
+Date: Thu, 3 Nov 2011 11:27:04 -0400
+Message-ID: <20111103112704.4b905bfc@barsoom.rdu.redhat.com>
+References: <20111101163059.GR18855@google.com>
+	<20111101175953.GB5358@redhat.com>
+	<20111101180601.GV18855@google.com>
+	<20111101181329.GA6739@redhat.com>
+	<20111101182753.GW18855@google.com>
+	<20111101193923.GA9444@redhat.com>
+	<20111101194601.GB9444@redhat.com>
+	<20111101215710.GA13803@google.com>
+	<20111102175327.GA4446@redhat.com>
+	<20111103064215.48939e1a@tlielax.poochiereds.net>
+	<20111103141354.GB4417@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>, trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111103141354.GB4417-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi,
+On Thu, 3 Nov 2011 07:13:54 -0700
+Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> wrote:
 
-Our CIFS server problems seem to have no end=85  The Novell CIFS server=
- does not support server inode numbers (when I try the mount option I g=
-et the message it is being turned off as server does not support it) an=
-d thus each inode gets a different number each time it is accessed and =
-it gets a different number again for each readdir call.
+> Hello,
+> 
+> On Thu, Nov 03, 2011 at 06:42:15AM -0400, Jeff Layton wrote:
+> > I'm not sure we really need this macro anymore since this is much
+> > simpler. I could just move cifs back to using wait_event_killable and
+> > simply wrap it in freezer_do_not_count/freezer_count (with some
+> > comments to explain why we're doing that).
+> > 
+> > In any event, I plan to test this scheme out today and will let you
+> > know whether it works...
+> 
+> I think it would be better to put this in a macro as the
+> implementation is likely to change in future and I really don't want
+> to see FREEZER_SKIP scattered around the tree.
+> 
 
-The fun happens with rename() when the rename source and target only di=
-ffer in case, e.g.
+Ok, note though that I also need to do a similar set of changes to the
+nfs and sunrpc code [1].
 
-	touch foo
-	mv foo Foo
+Those call sites do not use wait_event_* macros though. So I'll either
+need to add a separate set of functions/macros to handle those, or
+sprinkle freezer_do_not_count/freezer_count around the code there...
 
-The result?  Because of the difference in inode numbers, the request ge=
-ts through to the CIFS module which promptly does:
+[1] Here are the older patches that depended on the change to
+fake_signal_wake_up. I'll need to convert these to use the new scheme
+once you guys settle on what it should be:
 
-	cifs_unlink(target_dir, target_dentry)
-	rc =3D cifs_do_rename(=85)
+https://git.samba.org/jlayton/?p=jlayton/linux.git;a=commitdiff;h=0f85cbb747a0f9f8a582ae9bf642e094168001be
+https://git.samba.org/jlayton/?p=jlayton/linux.git;a=commitdiff;h=084535708bcb33dd2448e73be5a0f4cac69bea92
 
-And because the cifs_unlink() just removed the source of the rename (as=
- it is the same as the target), "rc" comes back as -ENOENT.
-
-And indeed the file is gone so we just lost the user's file for ever.  =
-)-:
-
-We are tossing around ideas how to fix this but we would be interested =
-in your input as to what you think the fix should be.
-
-In any case this probably should be fixed in the standard kernel CIFS m=
-odule, too, and not just for us locally as this presumably affects anyo=
-ne who is using the CIFS module against case-insensitive, non-server-in=
-ode-number-supporting CIFS servers...
-
-Best regards,
-
-	Anton
---=20
-Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
-Unix Support, Computing Service, University of Cambridge, CB2 3QH, UK
-Linux NTFS maintainer, http://www.linux-ntfs.org/
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
