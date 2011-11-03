@@ -1,56 +1,56 @@
-From: Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC PATCH] freezer: revert 27920651fe "PM / Freezer: Make
-	fake_signal_wake_up() wake TASK_KILLABLE tasks too"
-Date: Thu, 3 Nov 2011 16:10:33 +0100
-Message-ID: <20111103151033.GA26843@redhat.com>
-References: <20111101041337.39077229@tlielax.poochiereds.net> <20111101215710.GA13803@google.com> <20111102162331.GA31947@redhat.com> <201111030011.24062.rjw@sisk.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>, trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>
+From: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Subject: CIFS: Rename bug on servers not supporting inode numbers
+Date: Thu, 3 Nov 2011 15:20:17 +0000
+Message-ID: <9A609E6D-DF91-4AF9-855A-6D28E9B95D15@cam.ac.uk>
+Mime-Version: 1.0 (Apple Message framework v1251.1)
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Unix Support <unix-support-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <201111030011.24062.rjw-KKrjLPT3xs0@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 11/03, Rafael J. Wysocki wrote:
->
-> On Wednesday, November 02, 2011, Oleg Nesterov wrote:
-> >
-> > Rafael, could you remind why freezer_do_not_count/freezer_count check
-> > ->mm != NULL ?
->
-> You're asking difficult questions. ;-)
+Hi,
 
-I am trying ;)
+Our CIFS server problems seem to have no end=85  The Novell CIFS server=
+ does not support server inode numbers (when I try the mount option I g=
+et the message it is being turned off as server does not support it) an=
+d thus each inode gets a different number each time it is accessed and =
+it gets a different number again for each readdir call.
 
-> The intention was to prevent PF_FREEZER_SKIP from having any effect on
-> kernel threads, IIRC.  Anyway, there are only two legitimate users of it
-> (vfork and apm_ioctl) and in both cases the task in question is user space.
+The fun happens with rename() when the rename source and target only di=
+ffer in case, e.g.
 
-Actually CLONE_VFORK is used by call_usermodehelper() paths but this case
-is fine. The caller is the PF_NOFREEZE workqueue thread.
+	touch foo
+	mv foo Foo
 
-> > The comment says "However, we don't want kernel threads to be frozen",
-> > but it is not clear anyway. A kernel thread simply shouldn't use this
-> > interface if it doesn't want to freeze.
-> >
-> > And in any case, PF_KTHREAD looks better if we really need to filter
-> > out the kernel threads.
->
-> PF_FREEZER_SKIP was introduced specifically with vfork in mind and I'm not
-> sure if it's a good idea to re-use it for something else (at least not for
-> something entirely obvious).
+The result?  Because of the difference in inode numbers, the request ge=
+ts through to the CIFS module which promptly does:
 
-Indeed! So why do we check ->mm != NULL?
+	cifs_unlink(target_dir, target_dentry)
+	rc =3D cifs_do_rename(=85)
 
-We can remove this check, right now it doesn't matter. And we are trying
-to avoid the new users of this interface.
+And because the cifs_unlink() just removed the source of the rename (as=
+ it is the same as the target), "rc" comes back as -ENOENT.
 
-Oleg.
+And indeed the file is gone so we just lost the user's file for ever.  =
+)-:
+
+We are tossing around ideas how to fix this but we would be interested =
+in your input as to what you think the fix should be.
+
+In any case this probably should be fixed in the standard kernel CIFS m=
+odule, too, and not just for us locally as this presumably affects anyo=
+ne who is using the CIFS module against case-insensitive, non-server-in=
+ode-number-supporting CIFS servers...
+
+Best regards,
+
+	Anton
+--=20
+Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
+Unix Support, Computing Service, University of Cambridge, CB2 3QH, UK
+Linux NTFS maintainer, http://www.linux-ntfs.org/
