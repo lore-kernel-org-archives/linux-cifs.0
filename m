@@ -1,128 +1,49 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 3/3] CIFS: Cleanup byte-range locking code style
-Date: Thu, 3 Nov 2011 07:19:34 -0400
-Message-ID: <20111103071934.763410bb@tlielax.poochiereds.net>
-References: <1319894279-7723-1-git-send-email-piastry@etersoft.ru>
-	<1319894279-7723-3-git-send-email-piastry@etersoft.ru>
+From: Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH] wait_event_freezekillable: use
+ freezer_do_not_count/freezer_count
+Date: Thu, 3 Nov 2011 07:13:54 -0700
+Message-ID: <20111103141354.GB4417@google.com>
+References: <20111101163059.GR18855@google.com>
+ <20111101175953.GB5358@redhat.com>
+ <20111101180601.GV18855@google.com>
+ <20111101181329.GA6739@redhat.com>
+ <20111101182753.GW18855@google.com>
+ <20111101193923.GA9444@redhat.com>
+ <20111101194601.GB9444@redhat.com>
+ <20111101215710.GA13803@google.com>
+ <20111102175327.GA4446@redhat.com>
+ <20111103064215.48939e1a@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Oleg Nesterov <oleg-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Neil Brown <neilb-l3A5Bk7waGM@public.gmane.org>, trond.myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1319894279-7723-3-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20111103064215.48939e1a-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 29 Oct 2011 17:17:59 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+Hello,
 
-> Reorder parms of cifs_lock_init, trivially simplify getlk code and
-> remove extra {} in cifs_lock_add_if.
+On Thu, Nov 03, 2011 at 06:42:15AM -0400, Jeff Layton wrote:
+> I'm not sure we really need this macro anymore since this is much
+> simpler. I could just move cifs back to using wait_event_killable and
+> simply wrap it in freezer_do_not_count/freezer_count (with some
+> comments to explain why we're doing that).
 > 
-> Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/file.c |   43 +++++++++++++++++++------------------------
->  1 files changed, 19 insertions(+), 24 deletions(-)
-> 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index d9cc07f..cf0b153 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -645,20 +645,20 @@ int cifs_closedir(struct inode *inode, struct file *file)
->  }
->  
->  static struct cifsLockInfo *
-> -cifs_lock_init(__u64 len, __u64 offset, __u8 type, __u16 netfid)
-> +cifs_lock_init(__u64 offset, __u64 length, __u8 type, __u16 netfid)
->  {
-> -	struct cifsLockInfo *li =
-> +	struct cifsLockInfo *lock =
->  		kmalloc(sizeof(struct cifsLockInfo), GFP_KERNEL);
-> -	if (!li)
-> -		return li;
-> -	li->netfid = netfid;
-> -	li->offset = offset;
-> -	li->length = len;
-> -	li->type = type;
-> -	li->pid = current->tgid;
-> -	INIT_LIST_HEAD(&li->blist);
-> -	init_waitqueue_head(&li->block_q);
-> -	return li;
-> +	if (!lock)
-> +		return lock;
-> +	lock->offset = offset;
-> +	lock->length = length;
-> +	lock->type = type;
-> +	lock->netfid = netfid;
-> +	lock->pid = current->tgid;
-> +	INIT_LIST_HEAD(&lock->blist);
-> +	init_waitqueue_head(&lock->block_q);
-> +	return lock;
->  }
->  
->  static void
-> @@ -770,10 +770,8 @@ try_again:
->  					(lock->blist.next == &lock->blist));
->  		if (!rc)
->  			goto try_again;
-> -		else {
-> -			mutex_lock(&cinode->lock_mutex);
-> -			list_del_init(&lock->blist);
-> -		}
-> +		mutex_lock(&cinode->lock_mutex);
-> +		list_del_init(&lock->blist);
->  	}
->  
->  	mutex_unlock(&cinode->lock_mutex);
-> @@ -927,7 +925,7 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
->  		else
->  			type = CIFS_WRLCK;
->  
-> -		lck = cifs_lock_init(length, flock->fl_start, type,
-> +		lck = cifs_lock_init(flock->fl_start, length, type,
->  				     cfile->netfid);
->  		if (!lck) {
->  			rc = -ENOMEM;
-> @@ -1064,14 +1062,12 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u8 type,
->  		if (rc != 0)
->  			cERROR(1, "Error unlocking previously locked "
->  				   "range %d during test of lock", rc);
-> -		rc = 0;
-> -		return rc;
-> +		return 0;
->  	}
->  
->  	if (type & LOCKING_ANDX_SHARED_LOCK) {
->  		flock->fl_type = F_WRLCK;
-> -		rc = 0;
-> -		return rc;
-> +		return 0;
->  	}
->  
->  	rc = CIFSSMBLock(xid, tcon, netfid, current->tgid, length,
-> @@ -1089,8 +1085,7 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u8 type,
->  	} else
->  		flock->fl_type = F_WRLCK;
->  
-> -	rc = 0;
-> -	return rc;
-> +	return 0;
->  }
->  
->  static void
-> @@ -1250,7 +1245,7 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
->  	if (lock) {
->  		struct cifsLockInfo *lock;
->  
-> -		lock = cifs_lock_init(length, flock->fl_start, type, netfid);
-> +		lock = cifs_lock_init(flock->fl_start, length, type, netfid);
->  		if (!lock)
->  			return -ENOMEM;
->  
+> In any event, I plan to test this scheme out today and will let you
+> know whether it works...
 
-Looks good:
+I think it would be better to put this in a macro as the
+implementation is likely to change in future and I really don't want
+to see FREEZER_SKIP scattered around the tree.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thank you.
+
+-- 
+tejun
