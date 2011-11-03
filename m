@@ -1,77 +1,70 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH] wait_event_freezekillable: use
- freezer_do_not_count/freezer_count
-Date: Thu, 3 Nov 2011 06:42:15 -0400
-Message-ID: <20111103064215.48939e1a@tlielax.poochiereds.net>
+Subject: Re: [RFC PATCH] freezer: revert 27920651fe "PM / Freezer: Make
+ fake_signal_wake_up() wake TASK_KILLABLE tasks too"
+Date: Thu, 3 Nov 2011 07:15:16 -0400
+Message-ID: <20111103071516.79fb42fa@tlielax.poochiereds.net>
 References: <20111101041337.39077229@tlielax.poochiereds.net>
-	<20111101065958.50addab5@tlielax.poochiereds.net>
-	<20111101163059.GR18855@google.com>
-	<20111101175953.GB5358@redhat.com>
-	<20111101180601.GV18855@google.com>
-	<20111101181329.GA6739@redhat.com>
-	<20111101182753.GW18855@google.com>
-	<20111101193923.GA9444@redhat.com>
-	<20111101194601.GB9444@redhat.com>
 	<20111101215710.GA13803@google.com>
-	<20111102175327.GA4446@redhat.com>
+	<20111102162331.GA31947@redhat.com>
+	<201111030011.24062.rjw@sisk.pl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Tejun Heo <tj@kernel.org>, "Rafael J. Wysocki" <rjw@sisk.pl>,
+Cc: Oleg Nesterov <oleg@redhat.com>, Tejun Heo <tj@kernel.org>,
 	Steve French <sfrench@samba.org>, linux-kernel@vger.kernel.org,
 	linux-pm@vger.kernel.org, linux-cifs@vger.kernel.org,
 	"J. Bruce Fields" <bfields@fieldses.org>,
 	Neil Brown <neilb@suse.de>, trond.myklebust@netapp.com,
 	linux-nfs@vger.kernel.org
-To: Oleg Nesterov <oleg@redhat.com>
+To: "Rafael J. Wysocki" <rjw@sisk.pl>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20111102175327.GA4446@redhat.com>
+In-Reply-To: <201111030011.24062.rjw@sisk.pl>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Wed, 2 Nov 2011 18:53:27 +0100
-Oleg Nesterov <oleg@redhat.com> wrote:
+On Thu, 3 Nov 2011 00:11:23 +0100
+"Rafael J. Wysocki" <rjw@sisk.pl> wrote:
 
-> fake_signal_wake_up() should not wake up the TASK_KILLABLE tasks,
-> we are going to fix this. This means that wait_event_freezekillable()
-> can't rely on wakeup from freezer. Reimplement it using
-> freezer_do_not_count/freezer_count. This is not really nice, just
-> a simple fix for now.
+> On Wednesday, November 02, 2011, Oleg Nesterov wrote:
+> > Hi,
+> > 
+> > On 11/01, Tejun Heo wrote:
+> > >
+> > > For now, let's go with the count/dont_count.  Can you please write up
+> > > a patch for that?  Jeff, does this seem okay to you?
+> > 
+> > OK, will do in a minute. On top of
+> > "[PATCH pm] freezer: fix wait_event_freezable/__thaw_task races"
+> > you sent. (btw, thanks, I forgout about it ;)
+> > 
+> > Rafael, could you remind why freezer_do_not_count/freezer_count check
+> > ->mm != NULL ?
 > 
-> Signed-off-by: Oleg Nesterov <oleg@redhat.com>
-> ---
+> You're asking difficult questions. ;-)
 > 
->  include/linux/freezer.h |   10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
+> The intention was to prevent PF_FREEZER_SKIP from having any effect on
+> kernel threads, IIRC.  Anyway, there are only two legitimate users of it
+> (vfork and apm_ioctl) and in both cases the task in question is user space.
 > 
-> --- a/include/linux/freezer.h
-> +++ b/include/linux/freezer.h
-> @@ -143,13 +143,9 @@ static inline void set_freezable_with_si
->  #define wait_event_freezekillable(wq, condition)			\
->  ({									\
->  	int __retval;							\
-> -	for (;;) {							\
-> -		__retval = wait_event_killable(wq,			\
-> -				(condition) || freezing(current));	\
-> -		if (__retval || (condition))				\
-> -			break;						\
-> -		try_to_freeze();					\
-> -	}								\
-> +	freezer_do_not_count();						\
-> +	__retval = wait_event_killable(wq, (condition));		\
-> +	freezer_count();						\
->  	__retval;							\
->  })
->  
+> > The comment says "However, we don't want kernel threads to be frozen",
+> > but it is not clear anyway. A kernel thread simply shouldn't use this
+> > interface if it doesn't want to freeze.
+> > 
+> > And in any case, PF_KTHREAD looks better if we really need to filter
+> > out the kernel threads.
+> 
+> PF_FREEZER_SKIP was introduced specifically with vfork in mind and I'm not
+> sure if it's a good idea to re-use it for something else (at least not for
+> something entirely obvious).
 > 
 
-I'm not sure we really need this macro anymore since this is much
-simpler. I could just move cifs back to using wait_event_killable and
-simply wrap it in freezer_do_not_count/freezer_count (with some
-comments to explain why we're doing that).
+FWIW, wrapping wait_event_killable in freezer_do_not_count/freezer_count
+seems to work. The machine suspends consistently with it. It sounds
+like Rafael has concerns about this scheme however, so I'll let you
+guys argue this out :)
 
-In any event, I plan to test this scheme out today and will let you
-know whether it works...
+Once you tell me the right scheme to use, I'll be happy to fix up cifs
+and nfs to use it.
 
 Thanks,
 -- 
