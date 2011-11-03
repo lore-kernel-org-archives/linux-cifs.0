@@ -1,44 +1,50 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS: Rename bug on servers not supporting inode numbers
-Date: Thu, 3 Nov 2011 13:40:56 -0400
-Message-ID: <20111103134056.178ee9e3@barsoom.rdu.redhat.com>
-References: <9A609E6D-DF91-4AF9-855A-6D28E9B95D15@cam.ac.uk>
-	<81357503-810A-477A-A320-D39F2CD69547@cam.ac.uk>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] manpage: document new rsize= behavior
+Date: Thu, 3 Nov 2011 13:54:27 -0400
+Message-ID: <20111103135427.24d8d2df@barsoom.rdu.redhat.com>
+References: <1315922939-19672-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Unix Support <unix-support-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>
-To: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <81357503-810A-477A-A320-D39F2CD69547-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+In-Reply-To: <1315922939-19672-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 3 Nov 2011 15:42:13 +0000
-Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org> wrote:
+On Tue, 13 Sep 2011 10:08:59 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> Hi,
+> With the addition of async readpages in 3.2 kernels, the behavior of
+> the rsize= option has changed.
 > 
-> I should add that we are using iocharset=utf8 mount option which means that the dcache hash/compare functions done in the cifs module do not work because it uses nls_tolower() and nls_strnicmp() both of which for utf8 NLS in the kernel do not do anything at all and effectively behave case sensitively!
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  mount.cifs.8 |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> Thus this bug/problem in all likelyhood only affects utf8 iocharset users on a case-insensitive but case-preserving CIFS server that does not support server inode numbers.
-> 
-> That probably explains why it has not been noticed before!
-> 
-> We need utf8 thus we still need to fix this issue.
-> 
-> Best regards,
-> 
-> 	Anton
+> diff --git a/mount.cifs.8 b/mount.cifs.8
+> index 64a8b64..ff505e1 100644
+> --- a/mount.cifs.8
+> +++ b/mount.cifs.8
+> @@ -414,9 +414,9 @@ nouser_xattr
+>  (default) Do not allow getfattr/setfattr to get/set xattrs, even if server would support it otherwise\&.
+>  .RE
+>  .PP
+> -rsize=\fIarg\fR
+> +rsize=\fIbytes\fR
+>  .RS 4
+> -default network read size (usually 16K)\&. The client currently can not use rsize larger than CIFSMaxBufSize\&. CIFSMaxBufSize defaults to 16K and may be changed (from 8K to the maximum kmalloc size allowed by your kernel) at module install time for cifs\&.ko\&. Setting CIFSMaxBufSize to a very large value will cause cifs to use more memory and may reduce performance in some cases\&. To use rsize greater than 127K (the original cifs protocol maximum) also requires that the server support a new Unix Capability flag (for very large read) which some newer servers (e\&.g\&. Samba 3\&.0\&.26 or later) do\&. rsize can be set from a minimum of 2048 to a maximum of 130048 (127K or CIFSMaxBufSize, whichever is smaller)
+> +Maximum amount of data that the kernel will request in a read request in bytes. Prior to kernel 3.2.0, the default was 16k, and the maximum size was limited by the CIFSMaxBufSize module parameter. As of kernel 3.2.0, the behavior varies according to whether POSIX extensions are enabled on the mount and the server supports large POSIX reads. If they are, then the default is 1M, and the maxmimum is 16M. If they are not supported by the server, then the default is 60k and the maximum is around 127k. The reason for the 60k is because it's the maximum size read that windows servers can fill. Note that this value is a maximum, and the client may settle on a smaller size to accomodate what the server supports. In kernels prior to 3.2.0, no negotiation is performed.
+>  .RE
+>  .PP
+>  wsize=\fIbytes\fR
+> -- 
+> 1.7.6
 > 
 
-I'm confused...
-
-If the filesystem being served out by the server is using utf8, then
-how is it handling the case-insensitivity?
+Committed.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
