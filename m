@@ -1,109 +1,150 @@
-From: NamJae Jeon <linkinjeon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: CIFS: Rename bug on servers not supporting inode numbers
-Date: Fri, 4 Nov 2011 08:37:26 +0900
-Message-ID: <CAKYAXd98n+zPJPhuNXrtUNZjukXODNFQzLVPJKyP-+QKiYbQiA@mail.gmail.com>
-References: <9A609E6D-DF91-4AF9-855A-6D28E9B95D15@cam.ac.uk>
-	<81357503-810A-477A-A320-D39F2CD69547@cam.ac.uk>
-	<20111103134056.178ee9e3@barsoom.rdu.redhat.com>
-	<A2505FE2-FE28-4C23-879E-357C9D3AA03F@cam.ac.uk>
-	<CAH2r5mtye1DHKbPYMKnkcZjfVKBqek=a7DWGPJvxCsoLEhzDXA@mail.gmail.com>
+From: "Donald R. Gray Jr" <donald.r.gray-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Patch numeric domain names
+Date: Thu, 3 Nov 2011 23:03:36 -0400
+Message-ID: <005801cc9a9e$59d4f2a0$0d7ed7e0$@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Unix Support <unix-support-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Content-Type: multipart/signed;
+	protocol="application/x-pkcs7-signature";
+	micalg=SHA1;
+	boundary="----=_NextPart_000_0052_01CC9A7C.D1674510"
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtye1DHKbPYMKnkcZjfVKBqek=a7DWGPJvxCsoLEhzDXA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-us
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2011/11/4 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> What is the actual sequence of events from the wire perspective (the
-> actual smb requests sent)?
->
->
-> On Thu, Nov 3, 2011 at 6:25 PM, Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org> =
-wrote:
->> Hi,
->>
->> On 3 Nov 2011, at 17:40, Jeff Layton wrote:
->>> On Thu, 3 Nov 2011 15:42:13 +0000 Anton Altaparmakov <aia21-ZqumhiR2WNE@public.gmane.org=
-uk> wrote:
->>>>
->>>> I should add that we are using iocharset=3Dutf8 mount option which=
- means that the dcache hash/compare functions done in the cifs module d=
-o not work because it uses nls_tolower() and nls_strnicmp() both of whi=
-ch for utf8 NLS in the kernel do not do anything at all and effectively=
- behave case sensitively!
->>>>
->>>> Thus this bug/problem in all likelyhood only affects utf8 iocharse=
-t users on a case-insensitive but case-preserving CIFS server that does=
- not support server inode numbers.
+This is a multipart message in MIME format.
 
-Hi.
-There is no upper/lower case table on nls utf8. so If you use iocharset=
-=3Dutf8,
-filesystem will be case sensitive.
-so we can add upper/lower case table like other charset.
-And Currently surrogate pair is not working on nls utf8.
-because it is limited by MAX_WCHAR_T in nls utf8
-I think that upper/lower case table and surrogate pair support should
-be fixed on nls utf8.
-I should know Andrew's opinion to fix these problem.
->>>>
->>>> That probably explains why it has not been noticed before!
->>>>
->>>> We need utf8 thus we still need to fix this issue.
->>
->>> I'm confused...
->>>
->>> If the filesystem being served out by the server is using utf8, the=
-n
->>> how is it handling the case-insensitivity?
->>
->>
->> The file system being served is NSS (the Netware one but now mounted=
- on Open Enterprise Server with Linux kernel rather than actual Netware=
- kernel). =C2=A0No idea how it works I am afraid. =C2=A0It supports lot=
-s of different namespaces as well as being case-insensitive and case pr=
-eserving when using the LONG name space (which is now being served thro=
-ugh CIFS).
->>
->> If it was NTFS or exFAT I could tell you exactly how they work (each=
- volume has an upcase table mapping the 65536 UCS-2 Unicode characters =
-to their upper case equivalents and each 16-bit character is upper-case=
-d individually, more recently Windows has switched to using UTF-16 inst=
-ead of UCS-2 and the upcase table changed when that happened though it =
-remained the same size and I think for file system purposes the fact th=
-at there are surrogates in the above UCS-2 =C2=A0 Unicode range is simp=
-ly ignored)...
->>
->> Best regards,
->>
->> =C2=A0 =C2=A0 =C2=A0 =C2=A0Anton
->> --
->> Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
->> Unix Support, Computing Service, University of Cambridge, CB2 3QH, U=
-K
->> Linux NTFS maintainer, http://www.linux-ntfs.org/
->>
->>
->
->
->
-> --
-> Thanks,
->
-> Steve
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kerne=
-l" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.ht=
-ml
-> Please read the FAQ at =C2=A0http://www.tux.org/lkml/
->
+------=_NextPart_000_0052_01CC9A7C.D1674510
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_001_0053_01CC9A7C.D1674510"
+
+
+------=_NextPart_001_0053_01CC9A7C.D1674510
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Patch to allow numbers in domain names for cifscreds. 
+
+------=_NextPart_001_0053_01CC9A7C.D1674510
+Content-Type: application/octet-stream;
+	name="cifs-utils-all_numeric_domain_names.diff"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="cifs-utils-all_numeric_domain_names.diff"
+
+diff --git a/cifscreds.c b/cifscreds.c=0A=
+index f21a47f..5fbf4e8 100644=0A=
+--- a/cifscreds.c=0A=
++++ b/cifscreds.c=0A=
+@@ -43,7 +43,8 @@=0A=
+ /* allowed and disallowed characters for user and domain name */=0A=
+ #define USER_DISALLOWED_CHARS "\\/\"[]:|<>+=3D;,?*@"=0A=
+ #define DOMAIN_ALLOWED_CHARS "abcdefghijklmnopqrstuvwxyz" \=0A=
+-			     "ABCDEFGHIJKLMNOPQRSTUVWXYZ-."=0A=
++			     "ABCDEFGHIJKLMNOPQRSTUVWXYZ-." \=0A=
++			     "0123456789"=0A=
+ =0A=
+ /* destination keyring */=0A=
+ #define DEST_KEYRING KEY_SPEC_USER_KEYRING=0A=
+
+------=_NextPart_001_0053_01CC9A7C.D1674510--
+
+------=_NextPart_000_0052_01CC9A7C.D1674510
+Content-Type: application/pkcs7-signature;
+	name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="smime.p7s"
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIOmDCCBDIw
+ggMaoAMCAQICAQEwDQYJKoZIhvcNAQEFBQAwezELMAkGA1UEBhMCR0IxGzAZBgNVBAgMEkdyZWF0
+ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBwwHU2FsZm9yZDEaMBgGA1UECgwRQ29tb2RvIENBIExpbWl0
+ZWQxITAfBgNVBAMMGEFBQSBDZXJ0aWZpY2F0ZSBTZXJ2aWNlczAeFw0wNDAxMDEwMDAwMDBaFw0y
+ODEyMzEyMzU5NTlaMHsxCzAJBgNVBAYTAkdCMRswGQYDVQQIDBJHcmVhdGVyIE1hbmNoZXN0ZXIx
+EDAOBgNVBAcMB1NhbGZvcmQxGjAYBgNVBAoMEUNvbW9kbyBDQSBMaW1pdGVkMSEwHwYDVQQDDBhB
+QUEgQ2VydGlmaWNhdGUgU2VydmljZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC+
+QJ30buHqdoccTUVEjr5GyIMGncEq/hgfjuQC+vOrXVCKFjELmgbQxXAizUktVGPMtm5oRgtT6stM
+JMC8ck7q8RWu9FSaEgrDerIzYOLaiVXzIljz3tzP74OGooyUT59o8piQRoQnx3a/48w1LIteB2Rl
+gsBIsKiR+WGfdiBQqJHHZrXreGIDVvCKGhPqMaMeoJn9OPb2JzJYbwf1a7j7FCuvt6rM1mNfc4za
+BZmoOKjLF3g2UazpnvR4Oo3PD9lC4pgMqy+fDgHe75+ZSfEt36x0TRuYtUfF5SnR+ZAYx2KcvoPH
+Jns+iiXHwN2d5jVoECCdj9je0sOEnA1e6C/JAgMBAAGjgcAwgb0wHQYDVR0OBBYEFKARCiM+lvEH
+7OKvKe+CpX/QMKS0MA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MHsGA1UdHwR0MHIw
+OKA2oDSGMmh0dHA6Ly9jcmwuY29tb2RvY2EuY29tL0FBQUNlcnRpZmljYXRlU2VydmljZXMuY3Js
+MDagNKAyhjBodHRwOi8vY3JsLmNvbW9kby5uZXQvQUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmww
+DQYJKoZIhvcNAQEFBQADggEBAAhW/ALwm+j/pPrWe8ZEgM5PxMX2AFjMpra8FEloBHbo5u5d7AIP
+YNaNUBhPJk4B4+awpe6/vHRUQb/9/BK4x09a9IlgBX9gtwVK8/bxwr/EuXSGti19a8zS80bdL8bg
+asPDNAMsfZbdWsIOpwqZwQWLqwwv81w6z2w3VQmH3lNAbFjv/LarZW4E9hvcPOBaFcae2fFZSDAh
+ZQNs7Okhc+ybA6HgN62gFRiP+roCzqcsqRATLNTlCCarIpdg+JBedNSimlO98qlo4KJuwtdssaMP
+nr/raOdW8q7y4ys4OgmBtWuF174t7T8at7Jj4vViLILUagBBUPE5g5+V6TaWmG4wggTdMIIDxaAD
+AgECAhBxkvvmGV+sTRKFdHE0ohinMA0GCSqGSIb3DQEBBQUAMHsxCzAJBgNVBAYTAkdCMRswGQYD
+VQQIDBJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcMB1NhbGZvcmQxGjAYBgNVBAoMEUNvbW9k
+byBDQSBMaW1pdGVkMSEwHwYDVQQDDBhBQUEgQ2VydGlmaWNhdGUgU2VydmljZXMwHhcNMDQwMTAx
+MDAwMDAwWhcNMjgxMjMxMjM1OTU5WjCBrjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAlVUMRcwFQYD
+VQQHEw5TYWx0IExha2UgQ2l0eTEeMBwGA1UEChMVVGhlIFVTRVJUUlVTVCBOZXR3b3JrMSEwHwYD
+VQQLExhodHRwOi8vd3d3LnVzZXJ0cnVzdC5jb20xNjA0BgNVBAMTLVVUTi1VU0VSRmlyc3QtQ2xp
+ZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBFbWFpbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALI5haTyfatBO2JGN67NwWB1vDll+UoaR6K5zEjMapjVTTUZuaRC5c5J4oovHnzSMQfHTrSD
+ZJ0uKdWiZMSFvYVRNXmkTmiQexx6pJKoF/KYFfKTzMmkMpW7DE8wvZigC4vlbhuiRvp4vKJvq1le
+pS/Pytptqi/rrKGzaqq3Lmc1i3nhHmmI4uZGzaCl6r4LznY6eg6b6vzaJ1s9cx8i5khhxkzzabGo
+Lhu21DEgLLyCio6kDqXXiUP8FlqvHXHXEVnauocNr/rz4cLwpMVnjNbWVDreCqS6A3ezZcj9HtN0
+YqoYymiTHqGFfvVHZcv4TVcodNI0/zC27vZiMBSMLOsCAwEAAaOCAScwggEjMB8GA1UdIwQYMBaA
+FKARCiM+lvEH7OKvKe+CpX/QMKS0MB0GA1UdDgQWBBSJgmd9xJ0mcABLtFBIfN49rgRufTAOBgNV
+HQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUH
+AwQwEQYDVR0gBAowCDAGBgRVHSAAMHsGA1UdHwR0MHIwOKA2oDSGMmh0dHA6Ly9jcmwuY29tb2Rv
+Y2EuY29tL0FBQUNlcnRpZmljYXRlU2VydmljZXMuY3JsMDagNKAyhjBodHRwOi8vY3JsLmNvbW9k
+by5uZXQvQUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwEQYJYIZIAYb4QgEBBAQDAgEGMA0GCSqG
+SIb3DQEBBQUAA4IBAQCdlcs8uH6lCcQevwvCx3aOOTyUxhCqTwzJ4KuEXYlU4GU7820cfDcsJVRf
+liH8N4SRnRXcFE+Bz1Qda2xFYMct+ZdRTPlmyjyggoymyPDi6dRK+ew/VsnddozDggFPbADzHhph
+dARHA6nGQFeRvGUixSdnT1fbZFrZjR+6hi/0Bq6cae3p9M8pF9jgSp8aIC+XTFG7RgfEijdOIOMJ
+MWjHnsSLneh+EbwyaBCWEZhE2CpRYE2I63Q630MGMsg5Vow6EVLTQaRDA/Tt7zMn2zngFE4mydj1
+OeKJuJNdtykmQeqzm66D/Hd1yujKtf7iZUpjPkTE0MNeh3OpmByvfxV/MIIFfTCCBGWgAwIBAgIR
+APT8kHf+s0op6t2vhgOmpXYwDQYJKoZIhvcNAQEFBQAwga4xCzAJBgNVBAYTAlVTMQswCQYDVQQI
+EwJVVDEXMBUGA1UEBxMOU2FsdCBMYWtlIENpdHkxHjAcBgNVBAoTFVRoZSBVU0VSVFJVU1QgTmV0
+d29yazEhMB8GA1UECxMYaHR0cDovL3d3dy51c2VydHJ1c3QuY29tMTYwNAYDVQQDEy1VVE4tVVNF
+UkZpcnN0LUNsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgRW1haWwwHhcNMTEwNDA0MDAwMDAwWhcN
+MTIwNDAzMjM1OTU5WjAoMSYwJAYJKoZIhvcNAQkBFhdkb25hbGQuci5ncmF5QGdtYWlsLmNvbTCC
+ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMotvsIIC2LmDb4ybMNLGaW5N6biIwzLvJiG
+eXjc7aqZb3MFkCbH/r0MbYFCb6vF02TvM0HQaiUKdiAzzDwDOmYTYmVHN+GHhAwmgBKPG+idCqNJ
+acfWH9tAZjSqItxWiqVFCPLQxu174XSTYAJcg6Bnk+47x4aBr017XPBCtStrMzYmOeZMGHIn8FhO
+oLD1YSEA6Prmv++HPnNm2BjAjLLXZ1+oMevPdCocF1BugbkNIOx8o3Yli99y+MhYOAlkHnSrn9io
+PzgTKzCc+btnil5r5i4/q7yzBTzRwJcCNntd42x1Sj9dIxHej+RMMj6wwTiOPOUDZP8gNYCqCtox
+ZjMCAwEAAaOCAhkwggIVMB8GA1UdIwQYMBaAFImCZ33EnSZwAEu0UEh83j2uBG59MB0GA1UdDgQW
+BBSKoYIyUE9HeSJUFFS62AHWrZ7Q9TAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAgBgNV
+HSUEGTAXBggrBgEFBQcDBAYLKwYBBAGyMQEDBQIwEQYJYIZIAYb4QgEBBAQDAgUgMEYGA1UdIAQ/
+MD0wOwYMKwYBBAGyMQECAQEBMCswKQYIKwYBBQUHAgEWHWh0dHBzOi8vc2VjdXJlLmNvbW9kby5u
+ZXQvQ1BTMIGlBgNVHR8EgZ0wgZowTKBKoEiGRmh0dHA6Ly9jcmwuY29tb2RvY2EuY29tL1VUTi1V
+U0VSRmlyc3QtQ2xpZW50QXV0aGVudGljYXRpb25hbmRFbWFpbC5jcmwwSqBIoEaGRGh0dHA6Ly9j
+cmwuY29tb2RvLm5ldC9VVE4tVVNFUkZpcnN0LUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kRW1haWwu
+Y3JsMGwGCCsGAQUFBwEBBGAwXjA2BggrBgEFBQcwAoYqaHR0cDovL2NydC5jb21vZG9jYS5jb20v
+VVROQUFBQ2xpZW50Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20w
+IgYDVR0RBBswGYEXZG9uYWxkLnIuZ3JheUBnbWFpbC5jb20wDQYJKoZIhvcNAQEFBQADggEBAKSl
+O+9s0UQ1fstD3CLqe/3XDE/xZawHLVXiW2KOEcTJFj3BCfww7YpJoGJ/Ge5ZX6CRGRqhZc1a0Zyf
+lVDFJ3lGzHCRIQwKAGiysZSKRAe4WWc7AC23ZZjtmhrT5lQx1WImkJXPLyC3/DIOt0vWIxW76P08
+gt4VqY94sMGmjG8fKLrfOWDmppe/MnU7rT7EHL4SY7OB8yv5rMMQ+tvk0yCEnrzEzV2amCK8zS6u
+10SN3Fx5ullsUXliy0jJsCbf6ooVP4c7UbXYfMAYp++2k52aVtDtXOYoe667YPHIbYMvNJhSIYlq
+E1lxV1REJF+1UA1X2qjEtaINAjRaML6ybL0xggStMIIEqQIBATCBxDCBrjELMAkGA1UEBhMCVVMx
+CzAJBgNVBAgTAlVUMRcwFQYDVQQHEw5TYWx0IExha2UgQ2l0eTEeMBwGA1UEChMVVGhlIFVTRVJU
+UlVTVCBOZXR3b3JrMSEwHwYDVQQLExhodHRwOi8vd3d3LnVzZXJ0cnVzdC5jb20xNjA0BgNVBAMT
+LVVUTi1VU0VSRmlyc3QtQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBFbWFpbAIRAPT8kHf+s0op
+6t2vhgOmpXYwCQYFKw4DAhoFAKCCAr0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG
+9w0BCQUxDxcNMTExMTA0MDMwMzM2WjAjBgkqhkiG9w0BCQQxFgQUtH6mn8qhzruiLnYjl7YPd3J2
+Rr0wgasGCSqGSIb3DQEJDzGBnTCBmjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAoGCCqGSIb3
+DQMHMAsGCWCGSAFlAwQBAjAOBggqhkiG9w0DAgICAIAwBwYFKw4DAgcwDQYIKoZIhvcNAwICAUAw
+DQYIKoZIhvcNAwICASgwBwYFKw4DAhowCwYJYIZIAWUDBAIDMAsGCWCGSAFlAwQCAjALBglghkgB
+ZQMEAgEwgdUGCSsGAQQBgjcQBDGBxzCBxDCBrjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAlVUMRcw
+FQYDVQQHEw5TYWx0IExha2UgQ2l0eTEeMBwGA1UEChMVVGhlIFVTRVJUUlVTVCBOZXR3b3JrMSEw
+HwYDVQQLExhodHRwOi8vd3d3LnVzZXJ0cnVzdC5jb20xNjA0BgNVBAMTLVVUTi1VU0VSRmlyc3Qt
+Q2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBFbWFpbAIRAPT8kHf+s0op6t2vhgOmpXYwgdcGCyqG
+SIb3DQEJEAILMYHHoIHEMIGuMQswCQYDVQQGEwJVUzELMAkGA1UECBMCVVQxFzAVBgNVBAcTDlNh
+bHQgTGFrZSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxITAfBgNVBAsTGGh0
+dHA6Ly93d3cudXNlcnRydXN0LmNvbTE2MDQGA1UEAxMtVVROLVVTRVJGaXJzdC1DbGllbnQgQXV0
+aGVudGljYXRpb24gYW5kIEVtYWlsAhEA9PyQd/6zSinq3a+GA6aldjANBgkqhkiG9w0BAQEFAASC
+AQAnOFdAIP3chfBkX4TJmmetE6bbjOlrVLI3FPxvtKx6yNE9+7zM3WBH6I/Iu4gLVHmf5Lreps/g
+tbjm9OngGFaP8FPEKRkj4AseusxEWt1vVAnf8YyGbPf74+zjjuYcj09K77evKyv6yldBjcZ+aMnk
+H1/HR3yTG431mFczXLLOsLZOKj0ZSU+3PDR3fHqabe77nhGhsMqxZud1CHDkFD2rwz/+S8+6wAgE
+3zZ+JSKTrRzpY87ua83vUmiOXK76MUluYGzd62C3WFNjwcVzZchZHMgagVzvO00ZvkdPWYjR0jhK
+pl7M+W/KZji4RW0gmrOC19fG/xesNcsl4GYH4KVWAAAAAAAA
+
+------=_NextPart_000_0052_01CC9A7C.D1674510--
