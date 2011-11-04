@@ -1,57 +1,59 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: How to test multiusermount?
-Date: Fri, 4 Nov 2011 00:56:16 -0500
-Message-ID: <CAH2r5mtAbBhRj6SSB5TNWW4OtTJhno7szPH7FR6tn0rS1FB6=w@mail.gmail.com>
-References: <CANXojcwxf0aD=_18_6D6=WkG86F9Qx4PTf7F=2husGbASac6hA@mail.gmail.com>
-	<20111101060428.5d474bb9@tlielax.poochiereds.net>
-	<4EB37983.3080607@suse.com>
+From: =?iso-8859-1?Q?Bj=F6rn?= JACKE <bj@SerNet.DE>
+Subject: Re: CIFS: Rename bug on servers not supporting inode numbers
+Date: Fri, 4 Nov 2011 12:16:36 +0100
+Message-ID: <E1RMHlS-00HYp9-Hk@intern.SerNet.DE>
+References: <9A609E6D-DF91-4AF9-855A-6D28E9B95D15@cam.ac.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4EB37983.3080607-IBi9RG/b67k@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	LKML <linux-kernel@vger.kernel.org>, xfs@oss.sgi.com,
+	Steve French <sfrench@samba.org>, linux-fsdevel@vger.kernel.org,
+	Unix Support <unix-support@ucs.cam.ac.uk>
+To: Anton Altaparmakov <aia21@cam.ac.uk>
+Return-path: <samba-technical-bounces@lists.samba.org>
+Content-Disposition: inline
+In-Reply-To: <9A609E6D-DF91-4AF9-855A-6D28E9B95D15@cam.ac.uk>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Nov 4, 2011 at 12:34 AM, Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>=
- wrote:
-> On 11/01/2011 03:34 PM, Jeff Layton wrote:
->> On Tue, 1 Nov 2011 00:12:21 +0100
->> Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>
->>> Hi,
->>>
->>> I would like to test the multiusermounts?
->>>
->>> I know to set:
->>>
->>> =A0echo 1 > /proc/fs/cifs/MultiuserMount
->>>
->>> and add an option to the mount command, but I can remember/read som=
-ewhere
->>> that one have to add some mapping somehwere:
->>>
->>> local user : remote user
->>> ...
->>>
->>> Is this correct?
->>>
->>
->> No. The MultiuserMount code that the above switch activates is
->> basically deprecated (and never worked very well in the first place)=
-=2E
->
-> So, time for planning its good riddance?
+On 2011-11-03 at 15:20 +0000 Anton Altaparmakov sent off:
+> Hi,
+>=20
+> Our CIFS server problems seem to have no end=E2=80=A6  The Novell CIFS =
+server does not support server inode numbers (when I try the mount option=
+ I get the message it is being turned off as server does not support it) =
+and thus each inode gets a different number each time it is accessed and =
+it gets a different number again for each readdir call.
+>=20
+> The fun happens with rename() when the rename source and target only di=
+ffer in case, e.g.
+>=20
+> 	touch foo
+> 	mv foo Foo
 
-Mainly waiting for some way to have ntlmv2 enablement of multiuser
-mount (krb5 only is too restrictive).
+somehow related seems https://bugzilla.kernel.org/show_bug.cgi?id=3D39512
+(as long as kernel bugzilla is dead, see
+http://www.linux.sgi.com/archives/xfs-masters/2011-07/msg00022.html )
 
+Case insensitive filesystems seem to be a problem in general on Linux. No=
+t sure
+how far kernel and/or glibc are involved in the problem. As a workaround =
+for
+the mess you need to do a temporary rename to a different name (not just =
+a case
+equivalent name).
 
-
+Bj=C3=B6rn
 --=20
-Thanks,
-
-Steve
+SerNet GmbH, Bahnhofsallee 1b, 37081 G=C3=B6ttingen
+phone: +49-551-370000-0, fax: +49-551-370000-9
+AG G=C3=B6ttingen, HRB 2816, GF: Dr. Johannes Loxen
