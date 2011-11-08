@@ -1,126 +1,181 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Add support for flock over a cifs mount.
-Date: Tue, 08 Nov 2011 17:26:41 +0000
-Message-ID: <1320773203.1690.35.camel@sprabhu.fab.redhat.com>
-References: <1320696342.1690.19.camel@sprabhu.fab.redhat.com>
-	 <CAKywueTSqckM1iVsrEu47RwBA3GnpfZU17QrrNineJBVOcZdvQ@mail.gmail.com>
-	 <1320751612.2941.10.camel@localhost>
-	 <CAKywueQ65EgLz9iDd2exq85jBMGrBFLiq=mq2dOY9poy3_1h0g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] CIFS: Simplify setlk error handling for mandatory
+ locking
+Date: Tue, 08 Nov 2011 18:42:53 +0000
+Message-ID: <1320777775.1690.41.camel@sprabhu.fab.redhat.com>
+References: <1319894279-7723-1-git-send-email-piastry@etersoft.ru>
+	 <1319894279-7723-2-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeffrey Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQ65EgLz9iDd2exq85jBMGrBFLiq=mq2dOY9poy3_1h0g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1319894279-7723-2-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 2011-11-08 at 16:21 +0400, Pavel Shilovsky wrote:
-
-> >> > @@ -1231,12 +1248,27 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
-> >> >        struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-> >> >        struct cifsInodeInfo *cinode = CIFS_I(file->f_path.dentry->d_inode);
-> >> >        __u16 netfid = cfile->netfid;
-> >> > +       unsigned char fl_flags = flock->fl_flags;
-> >> > +
-> >> > +       if (unlock) {
-> >> > +               /*Check for existance of lock*/
-> >> > +               flock->fl_flags |= FL_EXISTS;
-> >> > +               if (do_vfs_lock(flock->fl_file, flock) == -ENOENT)
-> >> > +                       goto out;
-> >> > +       } else {
-> >> > +               /*Check if we can obtain lock*/
-> >> > +               flock->fl_flags |= FL_ACCESS;
-> >> > +               rc = do_vfs_lock(flock->fl_file, flock);
-> >> > +               if (rc < 0)
-> >> > +                       goto out;
-> >> > +       }
-> >> > +       flock->fl_flags = fl_flags;
-> >>
-> >> I think this should be skipped for non-posix locks. These locks have
-> >> their own cache (cifs_lock_* functions) associated with cifsInodeInfo
-> >> structure - so, we can't make a solution to 'goto out;' without
-> >> looking at this cache.
-> >
-> > I could follow Jeff's suggestion here and take the BUG out of
-> > do_vfs_lock(). In case of non posix/non flocks, the do_vfs_lock will
-> > simply return 0 and not trigger the goto out and proceed normally.
-> 
-> Sorry, I think I wasn't clear. In CIFS we have two locks variant
-> according to whether we use POSIX extensions or not. In the case of
-> POSIX extensions enabled we use VFS brlock cache and it is mirrors the
-> locks we have on the remote side. So, everything is good in this case.
-> 
-> Let's look at the case when POSIX extensions are disabled - Windows
-> locking style. The brlocks behavior changes and we use our own cache
-> for them but we need to call posix_file_lock_wait at the end of
-> cifs_setlk  to make some use-cases work (e.g. unlock locks of the
-> child process when it finishes, etc) . And these locks are still
-> FL_POSIX locks from VFS point of view.
-
 Pavel,
 
-The code behaves in a similar manner to the previous versions of the
-code in case of non posix locks. This simply adds support for FL_FLOCK
-in addition to Posix lock. 
+I may have found a bug in this patch. I've commented inline.
 
-Let me explain what has to happen for the goto out to be called in the 2
-if conditions which seem to be the problem.
+On Sat, 2011-10-29 at 17:17 +0400, Pavel Shilovsky wrote:
+> Now we allocate a lock structure at first, then we request to the server
+> and save the lock if server returned OK though void function - it prevents
+> the situation when we locked a file on the server and then return -ENOMEM
+> from setlk.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/file.c |   64 ++++++++++++++++++++++++++++----------------------------
+>  1 files changed, 32 insertions(+), 32 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index c1f063c..d9cc07f 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -672,7 +672,7 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
+>  }
+>  
+>  static bool
+> -cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+> +__cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+>  			__u64 length, __u8 type, __u16 netfid,
+>  			struct cifsLockInfo **conf_lock)
+>  {
+> @@ -694,6 +694,14 @@ cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+>  	return false;
+>  }
+>  
+> +static bool
+> +cifs_find_lock_conflict(struct cifsInodeInfo *cinode, struct cifsLockInfo *lock,
+> +			struct cifsLockInfo **conf_lock)
+> +{
+> +	return __cifs_find_lock_conflict(cinode, lock->offset, lock->length,
+> +					 lock->type, lock->netfid, conf_lock);
+> +}
+> +
+>  static int
+>  cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+>  	       __u8 type, __u16 netfid, struct file_lock *flock)
+> @@ -704,8 +712,8 @@ cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+>  
+>  	mutex_lock(&cinode->lock_mutex);
+>  
+> -	exist = cifs_find_lock_conflict(cinode, offset, length, type, netfid,
+> -					&conf_lock);
+> +	exist = __cifs_find_lock_conflict(cinode, offset, length, type, netfid,
+> +					  &conf_lock);
+>  	if (exist) {
+>  		flock->fl_start = conf_lock->offset;
+>  		flock->fl_end = conf_lock->offset + conf_lock->length - 1;
+> @@ -723,40 +731,27 @@ cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+>  	return rc;
+>  }
+>  
+> -static int
+> -cifs_lock_add(struct cifsInodeInfo *cinode, __u64 len, __u64 offset,
+> -	      __u8 type, __u16 netfid)
+> +static void
+> +cifs_lock_add(struct cifsInodeInfo *cinode, struct cifsLockInfo *lock)
+>  {
+> -	struct cifsLockInfo *li;
+> -
+> -	li = cifs_lock_init(len, offset, type, netfid);
+> -	if (!li)
+> -		return -ENOMEM;
+> -
+>  	mutex_lock(&cinode->lock_mutex);
+> -	list_add_tail(&li->llist, &cinode->llist);
+> +	list_add_tail(&lock->llist, &cinode->llist);
+>  	mutex_unlock(&cinode->lock_mutex);
+> -	return 0;
+>  }
+>  
+>  static int
+> -cifs_lock_add_if(struct cifsInodeInfo *cinode, __u64 offset, __u64 length,
+> -		 __u8 type, __u16 netfid, bool wait)
+> +cifs_lock_add_if(struct cifsInodeInfo *cinode, struct cifsLockInfo *lock,
+> +		 bool wait)
+>  {
+> -	struct cifsLockInfo *lock, *conf_lock;
+> +	struct cifsLockInfo *conf_lock;
+>  	bool exist;
+>  	int rc = 0;
+>  
+> -	lock = cifs_lock_init(length, offset, type, netfid);
+> -	if (!lock)
+> -		return -ENOMEM;
+> -
+>  try_again:
+>  	exist = false;
+>  	mutex_lock(&cinode->lock_mutex);
+>  
+> -	exist = cifs_find_lock_conflict(cinode, offset, length, type, netfid,
+> -					&conf_lock);
+> +	exist = cifs_find_lock_conflict(cinode, lock, &conf_lock);
+>  	if (!exist && cinode->can_cache_brlcks) {
+>  		list_add_tail(&lock->llist, &cinode->llist);
+>  		mutex_unlock(&cinode->lock_mutex);
+> @@ -781,7 +776,6 @@ try_again:
+>  		}
+>  	}
+>  
+> -	kfree(lock);
+>  	mutex_unlock(&cinode->lock_mutex);
+>  	return rc;
+>  }
+> @@ -1254,20 +1248,26 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+>  	}
+>  
+>  	if (lock) {
+> -		rc = cifs_lock_add_if(cinode, flock->fl_start, length,
+> -				      type, netfid, wait_flag);
+> +		struct cifsLockInfo *lock;
+> +
+> +		lock = cifs_lock_init(length, flock->fl_start, type, netfid);
+> +		if (!lock)
+> +			return -ENOMEM;
+> +
+> +		rc = cifs_lock_add_if(cinode, lock, wait_flag);
+>  		if (rc < 0)
+> -			return rc;
+> -		else if (!rc)
+> +			kfree(lock);
+> +		if (rc <= 0)
+>  			goto out;
 
-1) 
-        if (unlock) {
-                /*Check for existance of lock*/
-                flock->fl_flags |= FL_EXISTS; 
-                if (do_vfs_lock(flock->fl_file, flock) == -ENOENT)
+The return values for cifs_lock_add_if could be
+0 - If no locks exist and we can cache byte range locks
+1 - If lock doesn't exist and we do not cache byte range locks.
+< 0 in case of an error
+
+In case of an error, ie. return value < 0, shouldn't we just return rc
+and skip the call to posix_lock_file_wait below?
+
+This should be 
+                if (rc < 0) {
+                        kfree(lock);
+			return rc;
+                if (!rc)
                         goto out;
-
-The comment associated with FL_EXISTS in include/linux/fs.h is 
-#define FL_EXISTS       16      /* when unlocking, test for existence */
-
-If this was an unlock request and the call to unlock the file reports
-that the lock doesn't exists then goto out and exit with -ENOENT. This
-is correct since there is no lock on this file to unlock.
-
-If the lock did exist, then it unlocks the lock, proceeds normally and
-calls cifs_unlock_range(cfile, flock, xid) further below which unlocks
-the lock held in the local brlocks cache.
-
-2)        
-	 } else {
-                /*Check if we can obtain lock*/
-                flock->fl_flags |= FL_ACCESS;
-                rc = do_vfs_lock(flock->fl_file, flock);
-                if (rc < 0)
-                        goto out;
-
-
-The comment associated with FL_ACCESS in include/linux/fs.h is 
-#define FL_ACCESS       8       /* not trying to lock, just looking */
-
-It attempts to lock the file. If this attempt fails, it refuses to do
-the remote lock call since we will not be able to get a local lock in
-this case. In this case, exit with the error message returned by
-do_vfs_lock().
-
-If it face no problems obtaining a lock locally then proceed to perform
-normal locking operations as before and finally obtain a lock on the
-local system with 
-
-out_lock:
-        if (rc == 0 && lock) {
-                /*We have to sleep here*/
-                flock->fl_flags |= FL_SLEEP;
-                do_vfs_lock(file, flock);
-        }
-
-We have to use do_vfs_lock() in this case since we are now dealing with
-both flocks as well as posix locks. The same use case you explained
-earlier holds where any existing flocks and posix locks on the file have
-to be cleared when the file is closed. The old call to
-posix_lock_file_wait will only end up adding a posix lock to the file
-when we instead need a flock.
-
 
 Sachin Prabhu
+
+
+>  
+>  		rc = CIFSSMBLock(xid, tcon, netfid, current->tgid, length,
+>  				 flock->fl_start, 0, 1, type, wait_flag, 0);
+> -		if (rc == 0) {
+> -			/* For Windows locks we must store them. */
+> -			rc = cifs_lock_add(cinode, length, flock->fl_start,
+> -					   type, netfid);
+> +		if (rc) {
+> +			kfree(lock);
+> +			goto out;
+>  		}
+> +
+> +		cifs_lock_add(cinode, lock);
+>  	} else if (unlock)
+>  		rc = cifs_unlock_range(cfile, flock, xid);
+>  
