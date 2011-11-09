@@ -1,106 +1,117 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Fix sparse warning when calling cifs_strtoUCS
-Date: Wed, 9 Nov 2011 13:12:59 -0600
-Message-ID: <CADT32eLH4rKRUy0UEPE4QO9WKXPNS+4sLinE8Zth=nGOGU25=g@mail.gmail.com>
-References: <1320417736-15607-1-git-send-email-shirishpargaonkar@gmail.com>
-	<CAH2r5mukqT1tJWqdpeTQj_ZpcvvZuoa2yCgRAQLTd9pS3P-uMA@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: lower default wsize when unix extensions are not used
+Date: Wed, 9 Nov 2011 14:55:36 -0600
+Message-ID: <CAH2r5mtmboSEMHbj6ixh6UGSgiTFz1Mn=ZU6fkQaCSu7n6h=EQ@mail.gmail.com>
+References: <1320863843-29406-1-git-send-email-jlayton@redhat.com>
+	<20111109134140.2105ed9e@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, phireph0x-/E1597aS9LQAvxtiuMwx3w@public.gmane.org,
+	piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mukqT1tJWqdpeTQj_ZpcvvZuoa2yCgRAQLTd9pS3P-uMA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20111109134140.2105ed9e-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Nov 8, 2011 at 5:52 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote=
+How much of a performance hit does this make?  I would expect that
+dropping the writesize by more than 50% to most non-Samba servers to
+work around a bug in Solaris seems extreme.  If this hurts our
+performance measurably, it may be more pragmatic to limit the wsize
+change to a subset of these (e.g. based on server type) - seems more
+fair to not punish other servers for a Solaris bug.
+
+On Wed, Nov 9, 2011 at 12:41 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
 :
-> Isn't this cleaner (avoids adding a cast by defining wpwd as what it
-> really is, le16, rather than u16)?
+> On Wed, =A09 Nov 2011 13:37:23 -0500
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 >
-> diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
-> index 7cacba1..80d8508 100644
-> --- a/fs/cifs/smbencrypt.c
-> +++ b/fs/cifs/smbencrypt.c
-> @@ -209,7 +209,7 @@ E_md4hash(const unsigned char *passwd, unsigned c=
-har *p16,
-> =A0{
-> =A0 =A0 =A0 =A0int rc;
-> =A0 =A0 =A0 =A0int len;
-> - =A0 =A0 =A0 __u16 wpwd[129];
-> + =A0 =A0 =A0 __le16 wpwd[129];
->
-> =A0 =A0 =A0 =A0/* Password cannot be longer than 128 characters */
-> =A0 =A0 =A0 =A0if (passwd) /* Password must be converted to NT unicod=
-e */
-> @@ -219,8 +219,8 @@ E_md4hash(const unsigned char *passwd, unsigned c=
-har *p16,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*wpwd =3D 0; /* Ensure string is null =
-terminated */
-> =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 rc =3D mdfour(p16, (unsigned char *) wpwd, len * sizeof=
-(__u16));
-> - =A0 =A0 =A0 memset(wpwd, 0, 129 * sizeof(__u16));
-> + =A0 =A0 =A0 rc =3D mdfour(p16, (unsigned char *) wpwd, len * sizeof=
-(__le16));
-> + =A0 =A0 =A0 memset(wpwd, 0, 129 * sizeof(__le16));
->
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> On Fri, Nov 4, 2011 at 9:42 AM, =A0<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
-e:
->> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> We've had some reports of servers (namely, the Solaris in-kernel CIF=
+S
+>> server) that don't deal properly with writes that are "too large" ev=
+en
+>> though they set CAP_LARGE_WRITE_ANDX. Change the default to better
+>> mirror what windows clients do.
 >>
->>
->> Fix sparse endian check warning while calling cifs_strtoUCS
->>
->> CHECK =A0 fs/cifs/smbencrypt.c
->> fs/cifs/smbencrypt.c:216:37: warning: incorrect type in argument 1
->> (different base types)
->> fs/cifs/smbencrypt.c:216:37: =A0 =A0expected restricted __le16 [user=
-type] *<noident>
->> fs/cifs/smbencrypt.c:216:37: =A0 =A0got unsigned short *<noident>
->>
->>
->> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>> Reported-by: Nick Davis <phireph0x-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >> ---
->> =A0fs/cifs/smbencrypt.c | =A0 =A02 +-
->> =A01 files changed, 1 insertions(+), 1 deletions(-)
+>> =A0fs/cifs/connect.c | =A0 23 +++++++++++++++++++----
+>> =A01 files changed, 19 insertions(+), 4 deletions(-)
 >>
->> diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
->> index 7cacba1..56002ae 100644
->> --- a/fs/cifs/smbencrypt.c
->> +++ b/fs/cifs/smbencrypt.c
->> @@ -213,7 +213,7 @@ E_md4hash(const unsigned char *passwd, unsigned =
-char *p16,
+>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> index d6a972d..bf82f88 100644
+>> --- a/fs/cifs/connect.c
+>> +++ b/fs/cifs/connect.c
+>> @@ -2912,18 +2912,33 @@ void cifs_setup_cifs_sb(struct smb_vol *pvol=
+ume_info,
+>> =A0#define CIFS_DEFAULT_IOSIZE (1024 * 1024)
 >>
->> =A0 =A0 =A0 =A0/* Password cannot be longer than 128 characters */
->> =A0 =A0 =A0 =A0if (passwd) /* Password must be converted to NT unico=
-de */
->> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D cifs_strtoUCS(wpwd, passwd, 12=
-8, codepage);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 len =3D cifs_strtoUCS((__le16 *)wpwd, =
-passwd, 128, codepage);
->> =A0 =A0 =A0 =A0else {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0len =3D 0;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*wpwd =3D 0; /* Ensure string is null=
- terminated */
->> --
->> 1.6.0.2
+>> =A0/*
+>> - * Windows only supports a max of 60k reads. Default to that when p=
+osix
+>> - * extensions aren't in force.
+>> + * Windows only supports a max of 60kb reads and 65535 byte writes.=
+ Default to
+>> + * those values when posix extensions aren't in force. In actuality=
+ here, we
+>> + * use 65536 to allow for a write that is a multiple of 4k. Most se=
+rvers seem
+>> + * to be ok with the extra byte even though Windows doesn't send wr=
+ites that
+>> + * are that large.
+>> + *
+>> + * Citation:
+>> + *
+>> + * http://blogs.msdn.com/b/openspecification/archive/2009/04/10/smb=
+-maximum-transmit-buffer-size-and-performance-tuning.aspx
+>> =A0 */
+>> =A0#define CIFS_DEFAULT_NON_POSIX_RSIZE (60 * 1024)
+>> +#define CIFS_DEFAULT_NON_POSIX_WSIZE (65536)
 >>
+>> =A0static unsigned int
+>> =A0cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvol=
+ume_info)
+>> =A0{
+>> =A0 =A0 =A0 __u64 unix_cap =3D le64_to_cpu(tcon->fsUnixInfo.Capabili=
+ty);
+>> =A0 =A0 =A0 struct TCP_Server_Info *server =3D tcon->ses->server;
+>> - =A0 =A0 unsigned int wsize =3D pvolume_info->wsize ? pvolume_info-=
+>wsize :
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_DEFAU=
+LT_IOSIZE;
+>> + =A0 =A0 unsigned int wsize;
+>> +
+>> + =A0 =A0 /* start with specified wsize, or default */
+>> + =A0 =A0 if (pvolume_info->wsize)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 wsize =3D pvolume_info->wsize;
+>> + =A0 =A0 else if (tcon->unix_ext && (unix_cap & CIFS_UNIX_LARGE_WRI=
+TE_CAP))
+>> + =A0 =A0 =A0 =A0 =A0 =A0 wsize =3D CIFS_DEFAULT_IOSIZE;
+>> + =A0 =A0 else
+>> + =A0 =A0 =A0 =A0 =A0 =A0 wsize =3D CIFS_DEFAULT_NON_POSIX_WSIZE;
 >>
+>> =A0 =A0 =A0 /* can server support 24-bit write sizes? (via UNIX exte=
+nsions) */
+>> =A0 =A0 =A0 if (!tcon->unix_ext || !(unix_cap & CIFS_UNIX_LARGE_WRIT=
+E_CAP))
 >
 >
+> I should also mention that I suspect that this will fix this bug
+> without needing extra options:
 >
+> =A0 =A0https://bugzilla.samba.org/show_bug.cgi?id=3D8559
+>
+> If it looks acceptable, this might be suitable for stable too.
 > --
-> Thanks,
->
-> Steve
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >
 
-Yes, that looks correct.
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+--=20
+Thanks,
+
+Steve
