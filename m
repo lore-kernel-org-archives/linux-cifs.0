@@ -1,57 +1,153 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Add support for flock over a cifs mount.
-Date: Fri, 11 Nov 2011 14:11:18 +0000
-Message-ID: <1321020680.1690.57.camel@sprabhu.fab.redhat.com>
-References: <1320696342.1690.19.camel@sprabhu.fab.redhat.com>
-	 <CAKywueTSqckM1iVsrEu47RwBA3GnpfZU17QrrNineJBVOcZdvQ@mail.gmail.com>
-	 <1320751612.2941.10.camel@localhost>
-	 <CAKywueQ65EgLz9iDd2exq85jBMGrBFLiq=mq2dOY9poy3_1h0g@mail.gmail.com>
-	 <1320773203.1690.35.camel@sprabhu.fab.redhat.com>
-	 <CAKywueSRYxizd+mKw8p93Os0Aqij+R2Dh=2hu6JuJ+bv7S+uWw@mail.gmail.com>
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH] KEYS: Allow special keyrings to be cleared
+Date: Fri, 11 Nov 2011 16:07:53 +0000
+Message-ID: <20111111160753.5190.36069.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeffrey Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueSRYxizd+mKw8p93Os0Aqij+R2Dh=2hu6JuJ+bv7S+uWw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: keyrings@linux-nfs.org, linux-security-module@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+To: jmorris@redhat.com
+Return-path: <linux-security-module-owner@vger.kernel.org>
+Sender: linux-security-module-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 2011-11-08 at 23:08 +0400, Pavel Shilovsky wrote:
+The kernel contains some special internal keyrings, for instance the DNS
+resolver keyring :
 
-> Let's predict the following situation:
-> 
-> 1) f1 = open(filename)
-> 2) f2 = open(filename) # the same process
-> 3) f1.lock(0, 1) # lock file from 0 to 1
-> 4) f2.lock(1, 2) # lock file from 1 to 2
-> 5) f1.unlock(0, 2)
-> 
-> it unlocks both locks (3) and (4) from the VFS cache but unlock only
-> (3) lock from CIFS-lock cache and server side (see cifs_unlock_range -
-> it unlocks only locks held by the same fd, not the same process) - the
-> lock (4) is still there.
-> 
-> 6) f2.unlock(1, 2)
-> 
-> it appears into if (unlock) {}, fails on FL_EXISTS with -ENOENT and
-> goto out. The result we can't unlock the existing lock - the problem!
-> 
+2a93faf1 I-----     1 perm 1f030000     0     0 keyring   .dns_resolver: empty
 
-Hello Pavel,
+It would occasionally be useful to allow the contents of such keyrings to be
+flushed by root (cache invalidation).
 
-Thanks for your reply.
+Allow a flag to be set on a keyring to mark that someone possessing the
+sysadmin capability can clear the keyring, even without normal write access to
+the keyring.
 
-In my opinion this behaviour is wrong. The application running on the
-Linux box will expect the locking behaviour to follow Posix locking
-semantics. The current behaviour will break these applications which
-expect the system to work in this manner.
+Set this flag on the special keyrings created by the DNS resolver, the NFS
+identity mapper and the CIFS identity mapper.
 
-After step 5, the client should unlock the whole range and send 2
-separate unlock requests to the file server using 2 different netfids if
-required.
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Jeff Layton <jlayton@redhat.com>
+Acked-by: Steve Dickson <steved@redhat.com>
+---
 
+ Documentation/networking/dns_resolver.txt |    4 ++++
+ Documentation/security/keys.txt           |    4 ++++
+ fs/cifs/cifsacl.c                         |    1 +
+ fs/nfs/idmap.c                            |    1 +
+ include/linux/key.h                       |    1 +
+ net/dns_resolver/dns_key.c                |    1 +
+ security/keys/keyctl.c                    |   15 ++++++++++++++-
+ 7 files changed, 26 insertions(+), 1 deletions(-)
 
-Sachin Prabhu
+diff --git a/Documentation/networking/dns_resolver.txt b/Documentation/networking/dns_resolver.txt
+index 7f531ad..d86adcd 100644
+--- a/Documentation/networking/dns_resolver.txt
++++ b/Documentation/networking/dns_resolver.txt
+@@ -102,6 +102,10 @@ implemented in the module can be called after doing:
+      If _expiry is non-NULL, the expiry time (TTL) of the result will be
+      returned also.
+ 
++The kernel maintains an internal keyring in which it caches looked up keys.
++This can be cleared by any process that has the CAP_SYS_ADMIN capability by
++the use of KEYCTL_KEYRING_CLEAR on the keyring ID.
++
+ 
+ ===============================
+ READING DNS KEYS FROM USERSPACE
+diff --git a/Documentation/security/keys.txt b/Documentation/security/keys.txt
+index 4d75931..713ec23 100644
+--- a/Documentation/security/keys.txt
++++ b/Documentation/security/keys.txt
+@@ -554,6 +554,10 @@ The keyctl syscall functions are:
+      process must have write permission on the keyring, and it must be a
+      keyring (or else error ENOTDIR will result).
+ 
++     This function can also be used to clear special kernel keyrings if they
++     are appropriately marked if the user has CAP_SYS_ADMIN capability.  The
++     DNS resolver cache keyring is an example of this.
++
+ 
+  (*) Link a key into a keyring:
+ 
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 72ddf23..854749d 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -556,6 +556,7 @@ init_cifs_idmap(void)
+ 
+ 	/* instruct request_key() to use this special keyring as a cache for
+ 	 * the results it looks up */
++	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
+ 	cred->thread_keyring = keyring;
+ 	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
+ 	root_cred = cred;
+diff --git a/fs/nfs/idmap.c b/fs/nfs/idmap.c
+index 47d1c6f..d5a80f8 100644
+--- a/fs/nfs/idmap.c
++++ b/fs/nfs/idmap.c
+@@ -115,6 +115,7 @@ int nfs_idmap_init(void)
+ 	if (ret < 0)
+ 		goto failed_put_key;
+ 
++	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
+ 	cred->thread_keyring = keyring;
+ 	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
+ 	id_resolver_cache = cred;
+diff --git a/include/linux/key.h b/include/linux/key.h
+index 183a6af..3ac4128 100644
+--- a/include/linux/key.h
++++ b/include/linux/key.h
+@@ -155,6 +155,7 @@ struct key {
+ #define KEY_FLAG_IN_QUOTA	3	/* set if key consumes quota */
+ #define KEY_FLAG_USER_CONSTRUCT	4	/* set if key is being constructed in userspace */
+ #define KEY_FLAG_NEGATIVE	5	/* set if key is negative */
++#define KEY_FLAG_ROOT_CAN_CLEAR	6	/* set if key can be cleared by root without permission */
+ 
+ 	/* the description string
+ 	 * - this is used to match a key against search criteria
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index fa000d2..c73bba3 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -281,6 +281,7 @@ static int __init init_dns_resolver(void)
+ 
+ 	/* instruct request_key() to use this special keyring as a cache for
+ 	 * the results it looks up */
++	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
+ 	cred->thread_keyring = keyring;
+ 	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
+ 	dns_resolver_cache = cred;
+diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
+index 0b3f5d7..6523599 100644
+--- a/security/keys/keyctl.c
++++ b/security/keys/keyctl.c
+@@ -388,11 +388,24 @@ long keyctl_keyring_clear(key_serial_t ringid)
+ 	keyring_ref = lookup_user_key(ringid, KEY_LOOKUP_CREATE, KEY_WRITE);
+ 	if (IS_ERR(keyring_ref)) {
+ 		ret = PTR_ERR(keyring_ref);
++
++		/* Root is permitted to invalidate certain special keyrings */
++		if (capable(CAP_SYS_ADMIN)) {
++			keyring_ref = lookup_user_key(ringid, 0, 0);
++			if (IS_ERR(keyring_ref))
++				goto error;
++			if (test_bit(KEY_FLAG_ROOT_CAN_CLEAR,
++				     &key_ref_to_ptr(keyring_ref)->flags))
++				goto clear;
++			goto error_put;
++		}
++
+ 		goto error;
+ 	}
+ 
++clear:
+ 	ret = keyring_clear(key_ref_to_ptr(keyring_ref));
+-
++error_put:
+ 	key_ref_put(keyring_ref);
+ error:
+ 	return ret;
+
