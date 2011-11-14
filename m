@@ -1,37 +1,38 @@
-From: Thomas Meyer <thomas-VsYtu1Qij5c@public.gmane.org>
-Subject: [PATCH] cifs: Use kmemdup rather than duplicating its implementation
-Date: Sat, 12 Nov 2011 10:22:34 +0100
-Message-ID: <1321089754.20155.128.camel@localhost.localdomain>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] cifs.upcall: silence unused parameter warning
+Date: Sun, 13 Nov 2011 20:03:02 -0500
+Message-ID: <1321232582-13298-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Use kmemdup rather than duplicating its implementation
+cifs.upcall.c: In function =E2=80=98cifs_krb5_principal_get_realm=E2=80=
+=99:
+cifs.upcall.c:80:57: warning: unused parameter =E2=80=98context=E2=80=99=
+ [-Wunused-parameter]
 
-The semantic patch that makes this change is available
-in scripts/coccinelle/api/memdup.cocci.
-
-Signed-off-by: Thomas Meyer <thomas-VsYtu1Qij5c@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
+ cifs.upcall.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff -u -p a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
---- a/fs/cifs/cifs_spnego.c 2011-11-07 19:38:22.023802738 +0100
-+++ b/fs/cifs/cifs_spnego.c 2011-11-08 10:34:14.586074433 +0100
-@@ -37,12 +37,11 @@ cifs_spnego_key_instantiate(struct key *
- 	int ret;
- 
- 	ret = -ENOMEM;
--	payload = kmalloc(datalen, GFP_KERNEL);
-+	payload = kmemdup(data, datalen, GFP_KERNEL);
- 	if (!payload)
- 		goto error;
- 
- 	/* attach the data */
--	memcpy(payload, data, datalen);
- 	key->payload.data = payload;
- 	ret = 0;
- 
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index de92092..51af37a 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -76,7 +76,7 @@ typedef enum _sectype {
+  *
+  */
+=20
+-static char *cifs_krb5_principal_get_realm(krb5_context context,
++static char *cifs_krb5_principal_get_realm(krb5_context context __attr=
+ibute__ ((unused)),
+ 					   krb5_principal principal)
+ {
+ #ifdef HAVE_KRB5_PRINCIPAL_GET_REALM	/* Heimdal */
+--=20
+1.7.6.4
