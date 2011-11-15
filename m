@@ -1,61 +1,64 @@
-From: "Justin Piszcz" <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
-Subject: RE: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot allocate memory
-Date: Tue, 15 Nov 2011 14:27:11 -0500
-Message-ID: <004b01cca3cc$932e4240$b98ac6c0$@lucidpixels.com>
-References: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com> <4EC269FC.1060104@suse.com>
+From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 0/3] cifs.upcall: attempt to use AD-style service
+ principals
+Date: Wed, 16 Nov 2011 08:37:24 +1100
+Message-ID: <1321393046.5973.76.camel@ruth>
+References: <1321233448-13548-1-git-send-email-jlayton@samba.org>
+	 <1321237738.11559.31.camel@ruth>
+	 <1321240351.3953.803.camel@pico.li.ssimo.org>
+	 <20111114094449.66a35717@tlielax.poochiereds.net>
+	 <1321310728.5973.29.camel@ruth>
+	 <1321311883.3953.886.camel@pico.li.ssimo.org>
+	 <1321319411.5973.38.camel@ruth>
+	 <20111115091510.167a9435@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org>,
-	"'linux-cifs'" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "'Suresh Jayaraman'" <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Cc: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4EC269FC.1060104-IBi9RG/b67k@public.gmane.org>
-Content-Language: en-us
+In-Reply-To: <20111115091510.167a9435-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On Tue, 2011-11-15 at 09:15 -0500, Jeff Layton wrote:
 
-
------Original Message-----
-From: Suresh Jayaraman [mailto:sjayaraman-IBi9RG/b67k@public.gmane.org] 
-Sent: Tuesday, November 15, 2011 8:33 AM
-To: Justin Piszcz
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org; linux-cifs
-Subject: Re: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot
-allocate memory
-
-[Cc linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org]
-
-On 11/15/2011 12:34 AM, Justin Piszcz wrote:
-> Hi,
+> Ok, based on the comments so far, how does this sound for a potential
+> scheme:
 > 
-> CIFS "works" when I mount a Windows 7 host from my Linux host
-(3.1.1-x86_64)
-> but if I turn my machine off (Windows) and turn it back on, I get the
-> following error, is this normal? With NFS as a hardmount it just recovers,
-> with CIFS do I need to setup some sort of canary to unmount/remount?
+> 	INPUT: foo
+> 	TRY:
+> 	    FOO$
+> 	    cifs/foo.[guessed domain]
 > 
->  $ ls /cifs_mnt
-> ls: cannot access /cifs_mnt: Cannot allocate memory
+>	INPUT: foo.example.com
+> 	TRY:
+> 	    cifs/foo.example.com
 > 
+> To summarize, for shortnames, we'd try SHORTNAME$ first. If that fails,
+> then guess a domain name, append the value to the hostname, and prepend
+> it with "cifs/".
 
-This looks like a problem specific to Windows 7 or above. Quick tests on
-my test machines shows that cifs attempts to connect, times out,
-attempts to reconnect and gets -EHOSTUNREACH in case of both Windows
-Servers and Samba Servers. This is the expected behavior.
+No, we should never use FOO$ (this is AD only, and equivalent to
+cifs/foo), so we should instead simply do:
 
-OTOH, this sounds like a problem related to an error due to the Windows
-server being unable to allocate from the system nonpaged pool (seen in
-the past). Do you see anything that is related to the error in Windows
-Event viewer?
+INPUT: foo
+TRY:
+    cifs/foo
+    cifs/foo.[guessed domain]
 
-Hi,
+INPUT: foo.example.com
+TRY:
+    cifs/foo.example.com
 
-Yes, you are correct--
+I would prefer that the kerberos client library actually did this (as
+then it would 'just work' for all other kerberos applications), but
+sadly the behaviour here is not always what you expect, and can use
+reverse DNS (which is an even worse fate).  See the rdns option in
+krb5.conf (which I typically turn off). 
 
-The server was unable to allocate from the system nonpaged pool because the
-server reached the configured limit for nonpaged pool allocations.
-
-Justin.
+Andrew Bartlett
+-- 
+Andrew Bartlett                                http://samba.org/~abartlet/
+Authentication Developer, Samba Team           http://samba.org
