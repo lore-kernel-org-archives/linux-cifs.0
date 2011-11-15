@@ -1,44 +1,43 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: re-add NULL pointer check in cifs_save_resume_key
-Date: Tue, 15 Nov 2011 08:05:30 -0500
-Message-ID: <20111115080530.22d15e19@tlielax.poochiereds.net>
-References: <1321356298-22132-1-git-send-email-jlayton@redhat.com>
-	<20111115123243.GA11156@infradead.org>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Re: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot
+ allocate memory
+Date: Tue, 15 Nov 2011 19:02:44 +0530
+Message-ID: <4EC269FC.1060104@suse.com>
+References: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	adamgmetzler-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Justin Piszcz <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111115123243.GA11156-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+In-Reply-To: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 15 Nov 2011 07:32:43 -0500
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+[Cc linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org]
 
-> On Tue, Nov 15, 2011 at 06:24:58AM -0500, Jeff Layton wrote:
-> > Prior to commit eaf35b1, cifs_save_resume_key had some NULL pointer
-> > checks at the top. It turns out that at least one of those NULL
-> > pointer checks is needed after all.
-> > 
-> > When the LastNameOffset in a FIND reply appears to be beyond the end of
-> > the buffer, CIFSFindFirst and CIFSFindNext will set srch_inf.last_entry
-> > to NULL. Since eaf35b1, the code will now oops in this situation.
-> > 
-> > This patch just readds the NULL pointer check for file_info in
-> > cifs_save_resume_key to prevent the code from oopsing.
+On 11/15/2011 12:34 AM, Justin Piszcz wrote:
+> Hi,
 > 
-> Ooops. sorry.  Can you move the checks into the callers instead, to
-> make it more obvious what is going here, if needed including comments?
+> CIFS "works" when I mount a Windows 7 host from my Linux host (3.1.1-x86_64)
+> but if I turn my machine off (Windows) and turn it back on, I get the
+> following error, is this normal? With NFS as a hardmount it just recovers,
+> with CIFS do I need to setup some sort of canary to unmount/remount?
+> 
+>  $ ls /cifs_mnt
+> ls: cannot access /cifs_mnt: Cannot allocate memory
 > 
 
-No problem, it's really hard to tell which NULL pointer checks in the
-cifs code are meaningful since it's littered with useless ones.
+This looks like a problem specific to Windows 7 or above. Quick tests on
+my test machines shows that cifs attempts to connect, times out,
+attempts to reconnect and gets -EHOSTUNREACH in case of both Windows
+Servers and Samba Servers. This is the expected behavior.
 
-That's a good point about moving the check into the callers. I just
-resent a respun patch that I think will do the right thing...
+OTOH, this sounds like a problem related to an error due to the Windows
+server being unable to allocate from the system nonpaged pool (seen in
+the past). Do you see anything that is related to the error in Windows
+Event viewer?
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+-Suresh
