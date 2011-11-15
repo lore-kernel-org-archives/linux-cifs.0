@@ -1,95 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Pfif] [PFIF] Maximum write size
-Date: Tue, 15 Nov 2011 11:41:17 -0600
-Message-ID: <CAH2r5mvQGTC-K4xrLpY2KaTYKfz14nBe5EQLnNA-A9N1-QpfFQ@mail.gmail.com>
-References: <CAH2r5mvOhO9OabDN=GuH_dCp5rABMxWi9qy3-AB_ZD+tgfZ7ng@mail.gmail.com>
-	<4EC29E13.8080606@samba.org>
+From: "Justin Piszcz" <jpiszcz-BP4nVm5VUdNhbmWW9KSYcQ@public.gmane.org>
+Subject: RE: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot allocate memory
+Date: Tue, 15 Nov 2011 14:27:11 -0500
+Message-ID: <004b01cca3cc$932e4240$b98ac6c0$@lucidpixels.com>
+References: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com> <4EC269FC.1060104@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"samba-technical-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org Jeff Layton" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org>,
+	"'linux-cifs'" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "'Suresh Jayaraman'" <sjayaraman-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4EC29E13.8080606-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <4EC269FC.1060104-IBi9RG/b67k@public.gmane.org>
+Content-Language: en-us
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Nov 15, 2011 at 11:14 AM, Stefan (metze) Metzmacher
-<metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Hi Steve,
->
->> In SMB WriteX (see MS-SMB 2.2.4.3 it says
->>
->> "the CountHigh field. This field is used when the CAP_LARGE_WRITEX
->> capability has been negotiated to allow for file writes larger than
->> 0xFFFF bytes in length."
->>
->> Could we get a clarification on the following:
->>
->> 1) When CAP_LARGE_WRITEX is set, what write sizes must the server
->> support? (we were assuming up to 127K)
->>
->> 2) How does the server indicate that it does not support this maximu=
-m
->> size? (e.g. we found a server which set CAP_LARGE_WRITEX and support=
-s
->> 100K write but not 127K writes, and returned "INVALID_PARAMETER" for
->> larger writes rather than simply writing the smaller amount). =A0Wha=
-t NT
->> Status code must the server return on a write size too large?
->>
->> 3) What is the largest size which Windows clients can send? (and whi=
-ch
->> Windows servers will process?) In particular, can Windows clients se=
-nd
->> 64K or more in a single write?
->
-> You might want to look at cli_write_max_bufsize() in Samba.
-> We use "useable_space =3D 0x1FFFF - data_offset", which results
-> in a SMB PDU of size 0x1FFFF, which is the maximum size for NBT.
->
-> CAP_LARGE_READX however is broken on Windows and we have to truncate
-> like this useable_space =3D MIN(useable_space, UINT16_MAX);
-
-Yes - we follow this today, with a result of max write size of 127K
-and max read smaller.
-The problem is that apparently Solaris has a bug with sizes over 100K.
- Jeff fears
-other servers have bugs and wants to limit the write size to less than
-64K by default.
-His testing in his development environment shows dramatic performance
-loss going from 127K to 64K, although my testing showed significant los=
-s but
-not as bad.
-
-My instinct is to:
-1) set the defaults for writes to reasonable value based on all of the
-information we
-have (I am hoping that additional clues in negotiate, sessionsetup or W=
-riteX
-response can be used to detect the broken server type) so we don't puni=
-sh
-the 99% of the servers (Windows, NetApp, EMC, Samba) that handle this
-just fine
-2) at least log (possibly fall back and alter wsize, and retry if the e=
-rror
-paths can be determined) when the status code for WriteX
-returns INVALID_PARAMETER (apparently Solaris returns this on the first
-write) since I can't see anything else that INVALID_PARAMETER is likely
-to mean other than - "my server can't handle a big write despite what w=
-e
-said in our capabilities").   Generally, I prefer that we sensibly retr=
-y
-writes on errors returned from the server and not sure why this case
-should be different (although Jeff says the code path is hard to retry
-on, I think it is worth analyzing more carefully just in case since
-there are certainly other error codes that writeX should retry on).
-
-Can't smbclient send more than 64K to Windows on writes?
 
 
---=20
-Thanks,
+-----Original Message-----
+From: Suresh Jayaraman [mailto:sjayaraman-IBi9RG/b67k@public.gmane.org] 
+Sent: Tuesday, November 15, 2011 8:33 AM
+To: Justin Piszcz
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; ap-SDpCatL+S6WaMJb+Lgu22Q@public.gmane.org; linux-cifs
+Subject: Re: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot
+allocate memory
 
-Steve
+[Cc linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org]
+
+On 11/15/2011 12:34 AM, Justin Piszcz wrote:
+> Hi,
+> 
+> CIFS "works" when I mount a Windows 7 host from my Linux host
+(3.1.1-x86_64)
+> but if I turn my machine off (Windows) and turn it back on, I get the
+> following error, is this normal? With NFS as a hardmount it just recovers,
+> with CIFS do I need to setup some sort of canary to unmount/remount?
+> 
+>  $ ls /cifs_mnt
+> ls: cannot access /cifs_mnt: Cannot allocate memory
+> 
+
+This looks like a problem specific to Windows 7 or above. Quick tests on
+my test machines shows that cifs attempts to connect, times out,
+attempts to reconnect and gets -EHOSTUNREACH in case of both Windows
+Servers and Samba Servers. This is the expected behavior.
+
+OTOH, this sounds like a problem related to an error due to the Windows
+server being unable to allocate from the system nonpaged pool (seen in
+the past). Do you see anything that is related to the error in Windows
+Event viewer?
+
+Hi,
+
+Yes, you are correct--
+
+The server was unable to allocate from the system nonpaged pool because the
+server reached the configured limit for nonpaged pool allocations.
+
+Justin.
