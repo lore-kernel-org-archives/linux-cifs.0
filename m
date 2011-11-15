@@ -1,63 +1,50 @@
-From: Matthieu Patou <mat@samba.org>
-Subject: Re: [PATCH 0/3] cifs.upcall: attempt to use AD-style service
-	principals
-Date: Tue, 15 Nov 2011 12:18:52 +0100
-Message-ID: <4EC24A9C.7080301@samba.org>
-Reply-To: mat@samba.org
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-To: Jeff Layton <jlayton@samba.org>, linux-cifs@vger.kernel.org,
-	samba-technical <samba-technical@lists.samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: re-add NULL pointer check in cifs_save_resume_key
+Date: Tue, 15 Nov 2011 06:24:58 -0500
+Message-ID: <1321356298-22132-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
+	adamgmetzler-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 14/11/2011 02:17, Jeff Layton wrote:
+Prior to commit eaf35b1, cifs_save_resume_key had some NULL pointer
+checks at the top. It turns out that at least one of those NULL
+pointer checks is needed after all.
 
-> We've had a request recently to allow cifs.upcall to use AD-style
-> service principals. While trying to nail down what they need, I asked
-> Simo his opinion on how best to pick a service principal for a given
-> hostname. His suggestion was:
->
-> 	INPUT: fooo
-> 	TRY in order:
->    		FOOO$@REALM
-> 		cifs/fooo.<guessed domain ?>@REALM
->    		host/fooo.<guessed domain ?>@REALM
->
-> 	INPUT: bar.example.com
-> 	TRY in order:
-> 		cifs/bar.example.com@REALM
-> 		BAR$@REALM
-> 		host/bar.example.com@REALM
->
-> This patchset attempts to embody that logic.
->
-> Suggestions welcome. Those reviewing it, please pay particular attention
-> to the scheme for guessing a domain name. I want to make certain that
-> we're not opening up any security holes with that scheme.
+When the LastNameOffset in a FIND reply appears to be beyond the end of
+the buffer, CIFSFindFirst and CIFSFindNext will set srch_inf.last_entry
+to NULL. Since eaf35b1, the code will now oops in this situation.
 
-Jeff, you have to pay attention to DFS volumes.
-IE. if I want to mount //mydomain.corp/sysvol you will never get a 
-ticket for cifs/mydomain.corp@REALM instead you need to locate with 
-trans2 calls (for smb1, I don't remember the name for smb2) the domain 
-controlers (DC) that could provide you the share.
-For sysvol it's still quite simple but you can have other DFS volume 
-that are not stored on DC, would be great to have DFS awareness in the 
-cifs client.
+This patch just readds the NULL pointer check for file_info in
+cifs_save_resume_key to prevent the code from oopsing.
 
-Matthieu
+This should fix:
 
+    https://bugzilla.redhat.com/show_bug.cgi?id=750247
+
+Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
+Reported-by: Adam G. Metzler <adamgmetzler-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/readdir.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 5de03ec..4fcb6f5 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -483,6 +483,9 @@ static int cifs_save_resume_key(const char *current_entry,
+ 	struct cifs_dirent de;
+ 	int rc;
+ 
++	if (!file_info)
++		return -EINVAL;
++
+ 	rc = cifs_fill_dirent(&de, current_entry, file_info->srch_inf.info_level,
+ 			      file_info->srch_inf.unicode);
+ 	if (!rc) {
 -- 
-Matthieu Patou
-Samba Team
-http://samba.org
+1.7.6.4
