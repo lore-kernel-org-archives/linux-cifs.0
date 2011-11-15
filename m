@@ -1,50 +1,96 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: re-add NULL pointer check in cifs_save_resume_key
-Date: Tue, 15 Nov 2011 06:24:58 -0500
-Message-ID: <1321356298-22132-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-	adamgmetzler-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Aravind M D <aravind-f8yKZFm1E5Q@public.gmane.org>
+Subject: Re: CIFS mount twice
+Date: Tue, 15 Nov 2011 17:56:12 +0530
+Message-ID: <20111115175612.Horde.N_P5LFwlEB5Owlpkz20HVLA@mail.linuz.in>
+References: <20111114172138.Horde.60sJZ1wlEB5OwQDKknIWLdA@mail.linuz.in>
+ <loom.20111115T070545-916@post.gmane.org>
+ <20111115054504.550248e0@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed; DelSp=Yes
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111115054504.550248e0-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Prior to commit eaf35b1, cifs_save_resume_key had some NULL pointer
-checks at the top. It turns out that at least one of those NULL
-pointer checks is needed after all.
+Quoting Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
 
-When the LastNameOffset in a FIND reply appears to be beyond the end of
-the buffer, CIFSFindFirst and CIFSFindNext will set srch_inf.last_entry
-to NULL. Since eaf35b1, the code will now oops in this situation.
+> On Tue, 15 Nov 2011 06:07:39 +0000 (UTC)
+> Aravind M D <aravind-f8yKZFm1E5Q@public.gmane.org> wrote:
+>
+>> Aravind M D <aravind@...> writes:
+>>
+>>
+>> >
+>> > Hi,
+>> >
+>> >   I have some cifs mount points configured on my /etc/fstab.
+>> >
+>> >   When i am doing mount -a command mount points are mouting again.
+>> >
+>> >   If mount command is issued mount point is showing twice.
+>> >
+>> >   If i use mount through command line also i am facing the same issue.
+>> >
+>> >   Please help me.
+>> >
+>> >   Rgds,
+>> >   Aravind M D
+>> >
+>>
+>> Can someone help me with the below issue.
+>>
+>> Thanks in Advance
+>>
+>
+> Not with the description you've given as there's just hardly anything
+> there in the way of details...
+>
+> I set up my fedora rawhide test box with a cifs mount in /etc/fstab and
+> then ran mount -a several times. It was only mounted once.
+>
+> IIUC, it's the job of /bin/mount to only attempt to mount filesystems
+> that have not already been mounted when mount -a is run. If that's not
+> happening on your machine then it sounds like something is broken there.
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-This patch just readds the NULL pointer check for file_info in
-cifs_save_resume_key to prevent the code from oopsing.
+Hi Jeff,
 
-This should fix:
+I have SLES 11 SAP systems on which some CIFS FS are configured on /etc/fstab.
 
-    https://bugzilla.redhat.com/show_bug.cgi?id=750247
+~#cat /etc/fstab
+//oese-sc1-osi01/osiris1       /oese-sc1-osi01/osiris1/
+cifs                  username=user1,password=pass1,uid=200,gid=200
+//oese-sc1-osi02/osiris2       /oese-sc1-osi02/osiris2/
+cifs                  username=user1,password=pass1,uid=200,gid=200
+//oese-sc1-osi99/osiris0       /oese-sc1-osi99/osiris0/
+cifs                  username=user1,password=pass1,uid=200,gid=200
 
-Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Reported-by: Adam G. Metzler <adamgmetzler-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/readdir.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+Already these FS are mounted on my system. When i run mount -a and mount
+command below is the output.
 
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index 5de03ec..4fcb6f5 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -483,6 +483,9 @@ static int cifs_save_resume_key(const char *current_entry,
- 	struct cifs_dirent de;
- 	int rc;
- 
-+	if (!file_info)
-+		return -EINVAL;
-+
- 	rc = cifs_fill_dirent(&de, current_entry, file_info->srch_inf.info_level,
- 			      file_info->srch_inf.unicode);
- 	if (!rc) {
--- 
-1.7.6.4
+~#mount
+
+//oese-sc1-osi01/osiris1 on /oese-sc1-osi01/osiris1 type cifs (rw,mand)
+//oese-sc1-osi02/osiris2 on /oese-sc1-osi02/osiris2 type cifs (rw,mand)
+//oese-sc1-osi99/osiris0 on /oese-sc1-osi99/osiris0 type cifs (rw,mand)
+//oese-sc1-osi01/osiris1 on /oese-sc1-osi01/osiris1 type cifs (rw,mand)
+//oese-sc1-osi02/osiris2 on /oese-sc1-osi02/osiris2 type cifs (rw,mand)
+//oese-sc1-osi99/osiris0 on /oese-sc1-osi99/osiris0 type cifs (rw,mand)
+
+Mounts are showing twice.
+
+I have tested the same on Debian 6 also i have faced same problem. But in
+the debian 6 i tried upgrading the cifs-utils to the latest version.
+
+Once cifs-utils was upgraded the mount -a will mount partition only once.
+
+But when i mount the same FS using command line in debian it will show twice.
+
+Why CIFS FS is mounting on already mounted mount points.
+
+-  Aravin
