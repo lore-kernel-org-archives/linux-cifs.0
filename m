@@ -1,52 +1,84 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 0/4] cifs.upcall: revise scheme for picking a krb5 SPN
-Date: Wed, 23 Nov 2011 07:44:02 -0500
-Message-ID: <1322052246-18707-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH 4/4] cifs.upcall: try and guess the domain name on unqualified names
+Date: Wed, 23 Nov 2011 07:44:06 -0500
+Message-ID: <1322052246-18707-5-git-send-email-jlayton@samba.org>
+References: <1322052246-18707-1-git-send-email-jlayton@samba.org>
 Cc: abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1322052246-18707-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patchset is a second attempt at overhauling the scheme to pick a
-SPN in cifs.upcall. The current code simply prefixes the "cifs/" to the
-hostname. If that fails, it prepends it with "host/" instead and tries
-again.
+Resolve the unqualified hostname and set AI_CANONNAME to make sure that
+field is populated. Scan forward to the first '.' in ai_canonname, and
+append that value onto the unqualified hostname to get a FQDN. Then
+prepend that value with "cifs/" and try to get a service ticket for
+that principal.
 
-Over time, this scheme hasn't been ideal and we get occasional confused
-users on the mailing list who aren't sure why krb5 auth isn't working
-for them. This patchset attempts to revise that to make this easier. The
-changes are as follows:
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifs.upcall.c |   47 ++++++++++++++++++++++++++++++++++++++++++-----
+ 1 files changed, 42 insertions(+), 5 deletions(-)
 
-- In discussion of the earlier patchset, Andrew pointed out that getting
-  a "host/" principal is probably wrong and we shouldn't do that. In AD,
-  "cifs/<host>" is generally an alias for "host/<host>" anyway. This
-  patchset eliminates that.
-
-- since DNS is case-insensitive and most KDCs are case-sensitive, it's
-  probably advantageous to lowercase the hostname prior to constructing
-  the SPN.
-
-- finally, in the event that the user provides an unqualified hostname,
-  we should try to guess the domain name if we fail to get a SPN
-  containing the unqualified name
-
-This patchset does the above and seems to work correctly.
-
-Suggestions and comments are welcome...
-
-Thanks,
-
-Jeff Layton (4):
-  cifs.upcall: move to an on-stack princ buffer
-  cifs.upcall: always lowercase the hostname
-  cifs.upcall: move to Andrew's suggested algorithm for picking a
-    principal
-  cifs.upcall: try and guess the domain name on unqualified names
-
- Makefile.am   |    2 +-
- cifs.upcall.c |  110 ++++++++++++++++++++++++++++++++++++++++++++------------
- 2 files changed, 87 insertions(+), 25 deletions(-)
-
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 16dec81..f560d21 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -926,12 +926,49 @@ retry_new_hostname:
+ 			break;
+ 
+ 		/*
+-		 * FIXME: try to guess the DNS domain name for non-FQDN's.
+-		 *
+-		 * Use getaddrinfo() to resolve the hostname of the server and
+-		 * set ai_canonname. Then use the domainname in ai_canonname
+-		 * to turn the unqualified hostname into a FQDN.
++		 * If hostname has a '.', assume it's a FQDN, otherwise we want to
++		 * guess the domainname.
+ 		 */
++		if (!strchr(host, '.')) {
++			struct addrinfo hints;
++			struct addrinfo *ai;
++			char *domainname;
++
++			/*
++			 * use getaddrinfo() to resolve the hostname of the server
++			 * and set ai_canonname.
++			 */
++			memset(&hints, 0, sizeof(hints));
++			hints.ai_family = AF_UNSPEC;
++			hints.ai_flags = AI_CANONNAME;
++			rc = getaddrinfo(host, NULL, &hints, &ai);
++			if (rc) {
++				syslog(LOG_ERR, "Unable to resolve host address: %s [%s]",
++				       host, gai_strerror(rc));
++				break;
++			}
++
++			/* scan forward to first '.' in ai_canonnname */
++			domainname = strchr(ai->ai_canonname, '.');
++			if (!domainname) {
++				rc = -EINVAL;
++				freeaddrinfo(ai);
++				break;
++			}
++			lowercase_string(domainname);
++			rc = snprintf(princ, sizeof(princ), "cifs/%s%s",
++					host, domainname);
++			freeaddrinfo(ai);
++			if (rc < 0 || (size_t)rc >= sizeof(princ)) {
++				syslog(LOG_ERR, "Problem setting hostname in string: %ld", rc);
++				rc = -EINVAL;
++				break;
++			}
++
++			rc = handle_krb5_mech(oid, princ, &secblob, &sess_key, ccname);
++			if (!rc)
++				break;
++		}
+ 
+ 		if (!try_dns || !(have & DKD_HAVE_IP))
+ 			break;
 -- 
 1.7.6.4
