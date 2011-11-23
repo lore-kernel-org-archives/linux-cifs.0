@@ -1,41 +1,30 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/4] cifs.upcall: always lowercase the hostname
-Date: Wed, 23 Nov 2011 09:26:44 -0500
-Message-ID: <20111123092644.381e8a8e@tlielax.poochiereds.net>
-References: <1322052246-18707-1-git-send-email-jlayton@samba.org>
-	<1322052246-18707-3-git-send-email-jlayton@samba.org>
-	<20111123130536.GA4143@cobija.connexer.com>
+From: Alan Stern <stern-nwvwT67g6+6dFdvTe/nMLpVzexx5G7lz@public.gmane.org>
+Subject: Re: CIFS: Rename bug on servers not supporting inode numbers
+Date: Wed, 23 Nov 2011 11:31:47 -0500 (EST)
+Message-ID: <Pine.LNX.4.44L0.1111231131100.2111-100000@iolanthe.rowland.org>
+References: <CAKYAXd965Md2D4mnDbROoNcKZPQs2dERh8y7aDHtoJ+FJcK1QQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	<linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Unix Support <unix-support-IE+S/cj2AuA2EctHIo1CcQ@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>,
+	<ashishsangwan2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: NamJae Jeon <linkinjeon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111123130536.GA4143-Znhnm/lQSyjxW5zecs3cv0EOCMrvLtNR@public.gmane.org>
+In-Reply-To: <CAKYAXd965Md2D4mnDbROoNcKZPQs2dERh8y7aDHtoJ+FJcK1QQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 23 Nov 2011 14:05:36 +0100
-sean finney <seanius-ADwgVSpYHhHR7s880joybQ@public.gmane.org> wrote:
+On Wed, 23 Nov 2011, NamJae Jeon wrote:
 
-> On Wed, Nov 23, 2011 at 07:44:04AM -0500, Jeff Layton wrote:
-> > Most KDCs are case-sensitive (the notable exception being AD), but DNS
-> > is case-insensitive. To prevent admins from having to put in all
-> > possible case combinations of a principal, lowercase the hostname prior
-> > to trying to get a principal.
-> 
-> you'll have to excuse my ignorance if i'm missing something, but what
-> happens if the pricincpal *is* uppercase on the KDC?
-> 
-> 	sean
+> Hi. Alan.
+> Would you know why there is no upper/lower case table in nls utf8 ?
+> And Currently Surrogate pair is not supported also in nls utf8. Is
+> there the reason ?
 
-It depends on whether the KDC is case-sensitive. AD is generally not,
-so this should work fine there. On a non-AD KDC (e.g. MIT or Heimdal)
-it will probably fail.
+I don't know.
 
-The idea here is to ensure that we don't have admins adding every
-possible case-combination of an SPN in order to handle every possible
-case-combination of a hostname.
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Alan Stern
