@@ -1,7 +1,7 @@
 From: jr <creature.eternal-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: problem mounting under Xubuntu
-Date: Mon, 28 Nov 2011 03:17:28 +0000
-Message-ID: <4ED2FD48.7060108@gmail.com>
+Date: Mon, 28 Nov 2011 03:35:22 +0000
+Message-ID: <4ED3017A.9030502@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
@@ -16,14 +16,14 @@ started using Xubuntu (11.10) and cannot get the mount.cifs to the NAS
 working.
 
 the following command works from my slackware system:
-   mount.cifs //server/share /mnt -o guest
+   mount.cifs //nas/public /mnt -o guest
 
 the same command (except added option ro) executed on Xubuntu gives error
    CIFS VFS: Send error in SessSetup = -13
 
 I can access the NAS via smbclient.
 
-after days of googling, I'm still no wiser.  below is a listing of the 
+after days of googling I'm still no wiser.  below is a listing of the 
 dmesg output.  help, please.
 
 
