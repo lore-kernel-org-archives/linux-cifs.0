@@ -1,403 +1,609 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS mount: 3.2.0-rc3 suspend crash
-Date: Thu, 1 Dec 2011 06:33:15 -0500
-Message-ID: <20111201063315.5aa68bd4@tlielax.poochiereds.net>
-References: <4ED56C12.1040708@gmail.com>
-	<4ED5C047.6040500@linux.vnet.ibm.com>
-	<20111130062502.68d9db59@tlielax.poochiereds.net>
-	<4ED6AF7B.9090101@gmail.com>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: RFC: Attach locks to cifsFileInfo instead of cifsInodeInfo
+Date: Thu, 1 Dec 2011 16:36:39 +0400
+Message-ID: <CAKywueRy6t3Znn3__=OvY-meagLJ3sHft++Uzk6KiyEgC=+gug@mail.gmail.com>
+References: <1320696342.1690.19.camel@sprabhu.fab.redhat.com>
+	<CAKywueTSqckM1iVsrEu47RwBA3GnpfZU17QrrNineJBVOcZdvQ@mail.gmail.com>
+	<1320751612.2941.10.camel@localhost>
+	<CAKywueQ65EgLz9iDd2exq85jBMGrBFLiq=mq2dOY9poy3_1h0g@mail.gmail.com>
+	<1320773203.1690.35.camel@sprabhu.fab.redhat.com>
+	<CAKywueSRYxizd+mKw8p93Os0Aqij+R2Dh=2hu6JuJ+bv7S+uWw@mail.gmail.com>
+	<1321020680.1690.57.camel@sprabhu.fab.redhat.com>
+	<CAKywueQwM49dfne1L_d4WVa3zENdshbuuiZ9tVzv=BiF171_8w@mail.gmail.com>
+	<1321276715.1690.78.camel@sprabhu.fab.redhat.com>
+	<1321547488.1690.122.camel@sprabhu.fab.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "Srivatsa S. Bhat" <srivatsa.bhat-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>,
-	Linux PM mailing list <linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
-	Belisko Marek <marek.belisko-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Woody Suwalski <terraluna977-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeffrey Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4ED6AF7B.9090101-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1321547488.1690.122.camel-yuq4rhG59MBosH8Q1Ye95IGKTjYczspe@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 30 Nov 2011 17:34:35 -0500
-Woody Suwalski <terraluna977-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2011/11/17 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Pavel,
+>
+> I've made some changes to the locking code which makes it easier to
+> unlock all locks on an inode. This fixes the earlier problem where
+> unlock =A0requests would only process the locks for that open file
+> instance while ignoring the locks on other open file instances for th=
+at
+> inode.
+>
+> However we still have one major issue. In case of unlocks, the curren=
+t
+> code will only return locks which are completely within the range
+> specified by the unlock command. If we get an unlock request which
+> divides a =A0brlock into 2, we ignore the unlock request for that brl=
+ock.
+> This will result in a situation where the application finds a lock on=
+ a
+> part of the file it expected to be unlocked. Should we check for thes=
+e
+> cases and return an EFAULT in cases where the unlock request will not
+> completely unlock the entire range?
 
-> Jeff Layton wrote:
-> > On Wed, 30 Nov 2011 11:03:59 +0530
-> > "Srivatsa S. Bhat"<srivatsa.bhat-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>  wrote:
-> >
-> >> Adding linux-pm, Jeff Layton and others to CC.
-> >>
-> >> Regards,
-> >> Srivatsa S. Bhat
-> >>
-> >> On 11/30/2011 05:04 AM, Woody Suwalski wrote:
-> >>
-> >>> With CIFS mount present, suspend2ram seems to be failing on 3.2.0-rc3.
-> >>> It may be similar to recent NFS suspend issues?
-> >>>
-> >>> I have done couple of suspends, then did mount.cifs (at 555 seconds),
-> >>> and then tried suspend again.  The problem is easy to duplicate.
-> >>>
-> >>> The hardware is a netbook Asus EeePC.
-> >>> I guess will find out if:
-> >>> - cifs for real 3.2 fixes the problem
-> >>> - NFS fix for -rc4 work for CIFS as well...
-> >>>
-> >>> Thanks, Woody
-> >>>
-> >>>
-> >>> [  153.974532] uhci_hcd 0000:00:1d.1: PCI INT B disabled
-> >>> [  153.974578] uhci_hcd 0000:00:1d.0: PCI INT A disabled
-> >>> [  153.975774] i915 0000:00:02.0: PCI INT A disabled
-> >>> [  153.977210] ACPI handle has no context!
-> >>> [  153.977302] atl2 0000:03:00.0: PCI INT A disabled
-> >>> [  153.977316] ACPI handle has no context!
-> >>> [  154.277181] snd_hda_intel 0000:00:1b.0: PCI INT A disabled
-> >>> [  154.288119] PM: suspend of devices complete after 414.210 msecs
-> >>> [  154.299212] ehci_hcd 0000:00:1d.7: PME# enabled
-> >>> [  154.299257] ehci_hcd 0000:00:1d.7: wake-up capability enabled by ACPI
-> >>> [  154.310114] uhci_hcd 0000:00:1d.3: wake-up capability enabled by ACPI
-> >>> [  154.310178] uhci_hcd 0000:00:1d.2: wake-up capability enabled by ACPI
-> >>> [  154.310235] uhci_hcd 0000:00:1d.1: wake-up capability enabled by ACPI
-> >>> [  154.310293] uhci_hcd 0000:00:1d.0: wake-up capability enabled by ACPI
-> >>> [  154.310418] PM: late suspend of devices complete after 22.283 msecs
-> >>> [  154.310451] ACPI: Preparing to enter system sleep state S3
-> >>> [  154.311671] PM: Saving platform NVS memory
-> >>> [  154.312968] Disabling non-boot CPUs ...
-> >>> [  154.312968] ACPI: Low-level resume complete
-> >>> [  154.312968] PM: Restoring platform NVS memory
-> >>> [  154.312968] Force enabled HPET at resume
-> >>> [  154.313366] ACPI: Waking up from system sleep state S3
-> >>> [  154.341485] snd_hda_intel 0000:00:1b.0: restoring config space at
-> >>> offset 0x1 (was 0x100006, writing 0x100002)
-> >>> [  154.341550] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x9 (was 0x1fff1, writing 0x10511041)
-> >>> [  154.341566] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x8 (was 0xfff0, writing 0x10301020)
-> >>> [  154.341580] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x7 (was 0xf0, writing 0x3030)
-> >>> [  154.341603] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x1 (was 0x100104, writing 0x100507)
-> >>> [  154.341689] pcieport 0000:00:1c.1: restoring config space at offset
-> >>> 0x9 (was 0x1fff1, writing 0x10111001)
-> >>> [  154.341705] pcieport 0000:00:1c.1: restoring config space at offset
-> >>> 0x7 (was 0xf0, writing 0x2020)
-> >>> [  154.341728] pcieport 0000:00:1c.1: restoring config space at offset
-> >>> 0x1 (was 0x100106, writing 0x100507)
-> >>> [  154.341812] pcieport 0000:00:1c.2: restoring config space at offset
-> >>> 0x7 (was 0xf0, writing 0x1010)
-> >>> [  154.341834] pcieport 0000:00:1c.2: restoring config space at offset
-> >>> 0x1 (was 0x100106, writing 0x100507)
-> >>> [  154.341920] uhci_hcd 0000:00:1d.0: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  154.341958] uhci_hcd 0000:00:1d.0: wake-up capability disabled by ACPI
-> >>> [  154.342004] uhci_hcd 0000:00:1d.1: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  154.342086] uhci_hcd 0000:00:1d.1: wake-up capability disabled by ACPI
-> >>> [  154.342137] uhci_hcd 0000:00:1d.2: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  154.342166] uhci_hcd 0000:00:1d.2: wake-up capability disabled by ACPI
-> >>> [  154.342211] uhci_hcd 0000:00:1d.3: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  154.342239] uhci_hcd 0000:00:1d.3: wake-up capability disabled by ACPI
-> >>> [  154.342296] ehci_hcd 0000:00:1d.7: restoring config space at offset
-> >>> 0x1 (was 0x2900006, writing 0x2900002)
-> >>> [  154.342335] ehci_hcd 0000:00:1d.7: wake-up capability disabled by ACPI
-> >>> [  154.342349] ehci_hcd 0000:00:1d.7: PME# disabled
-> >>> [  154.342374] pci 0000:00:1e.0: restoring config space at offset 0xf
-> >>> (was 0x60000, writing 0x600ff)
-> >>> [  154.342606] atl2 0000:03:00.0: restoring config space at offset 0x1
-> >>> (was 0x100006, writing 0x100406)
-> >>> [  154.343209] PM: early resume of devices complete after 1.941 msecs
-> >>> [  154.343454] i915 0000:00:02.0: PCI INT A ->  GSI 16 (level, low) ->
-> >>> IRQ 16
-> >>> [  154.343470] i915 0000:00:02.0: setting latency timer to 64
-> >>> [  154.347098] snd_hda_intel 0000:00:1b.0: PCI INT A ->  GSI 16 (level,
-> >>> low) ->  IRQ 16
-> >>> [  154.347117] snd_hda_intel 0000:00:1b.0: setting latency timer to 64
-> >>> [  154.347218] snd_hda_intel 0000:00:1b.0: irq 43 for MSI/MSI-X
-> >>> [  154.347424] uhci_hcd 0000:00:1d.0: PCI INT A ->  GSI 23 (level, low)
-> >>> ->  IRQ 23
-> >>> [  154.347442] uhci_hcd 0000:00:1d.0: setting latency timer to 64
-> >>> [  154.347479] usb usb2: root hub lost power or was reset
-> >>> [  154.347543] uhci_hcd 0000:00:1d.1: PCI INT B ->  GSI 19 (level, low)
-> >>> ->  IRQ 19
-> >>> [  154.347559] uhci_hcd 0000:00:1d.1: setting latency timer to 64
-> >>> [  154.347593] usb usb3: root hub lost power or was reset
-> >>> [  154.347653] uhci_hcd 0000:00:1d.2: PCI INT C ->  GSI 18 (level, low)
-> >>> ->  IRQ 18
-> >>> [  154.347670] uhci_hcd 0000:00:1d.2: setting latency timer to 64
-> >>> [  154.347702] usb usb4: root hub lost power or was reset
-> >>> [  154.347760] uhci_hcd 0000:00:1d.3: PCI INT D ->  GSI 16 (level, low)
-> >>> ->  IRQ 16
-> >>> [  154.347776] uhci_hcd 0000:00:1d.3: setting latency timer to 64
-> >>> [  154.347808] usb usb5: root hub lost power or was reset
-> >>> [  154.347867] ehci_hcd 0000:00:1d.7: PCI INT A ->  GSI 23 (level, low)
-> >>> ->  IRQ 23
-> >>> [  154.347884] ehci_hcd 0000:00:1d.7: setting latency timer to 64
-> >>> [  154.347988] pci 0000:00:1e.0: setting latency timer to 64
-> >>> [  154.348125] ata_piix 0000:00:1f.2: PCI INT B ->  GSI 19 (level, low)
-> >>> ->  IRQ 19
-> >>> [  154.348140] ata_piix 0000:00:1f.2: setting latency timer to 64
-> >>> [  154.354172] atl2 0000:03:00.0: PCI INT A ->  GSI 17 (level, low) ->
-> >>> IRQ 17
-> >>> [  154.354192] atl2 0000:03:00.0: setting latency timer to 64
-> >>> [  154.354309] atl2 0000:03:00.0: irq 44 for MSI/MSI-X
-> >>> [  154.354722] sd 1:0:0:0: [sda] Starting disk
-> >>> [  154.525453] ata2.00: ACPI cmd ef/03:44:00:00:00:a0 (SET FEATURES)
-> >>> filtered out
-> >>> [  154.525470] ata2.00: ACPI cmd ef/03:0c:00:00:00:a0 (SET FEATURES)
-> >>> filtered out
-> >>> [  154.531325] ata2.00: configured for UDMA/66
-> >>> [  154.591089] usb 1-5: reset high-speed USB device number 2 using ehci_hcd
-> >>> [  154.805066] PM: resume of devices complete after 461.739 msecs
-> >>> [  154.805801] Restarting tasks ... done.
-> >>> [  154.832376] video LNXVIDEO:00: Restoring backlight state
-> >>> [  155.964388] atl2: eth0 NIC Link is Up<100 Mbps Full Duplex>
-> >>> [  265.377852] PM: Syncing filesystems ... done.
-> >>> [  265.427397] Freezing user space processes ... (elapsed 0.01 seconds)
-> >>> done.
-> >>> [  265.438118] Freezing remaining freezable tasks ... (elapsed 0.01
-> >>> seconds) done.
-> >>> [  265.449211] Suspending console(s) (use no_console_suspend to debug)
-> >>> [  265.451744] sd 1:0:0:0: [sda] Stopping disk
-> >>> [  265.555169] ata_piix 0000:00:1f.2: PCI INT B disabled
-> >>> [  265.555281] ehci_hcd 0000:00:1d.7: PCI INT A disabled
-> >>> [  265.555336] uhci_hcd 0000:00:1d.3: PCI INT D disabled
-> >>> [  265.555384] uhci_hcd 0000:00:1d.2: PCI INT C disabled
-> >>> [  265.555432] uhci_hcd 0000:00:1d.1: PCI INT B disabled
-> >>> [  265.555479] uhci_hcd 0000:00:1d.0: PCI INT A disabled
-> >>> [  265.555639] snd_hda_intel 0000:00:1b.0: PCI INT A disabled
-> >>> [  265.556302] i915 0000:00:02.0: PCI INT A disabled
-> >>> [  265.558207] ACPI handle has no context!
-> >>> [  265.558302] atl2 0000:03:00.0: PCI INT A disabled
-> >>> [  265.558316] ACPI handle has no context!
-> >>> [  265.569117] PM: suspend of devices complete after 119.214 msecs
-> >>> [  265.580216] ehci_hcd 0000:00:1d.7: PME# enabled
-> >>> [  265.580261] ehci_hcd 0000:00:1d.7: wake-up capability enabled by ACPI
-> >>> [  265.591121] uhci_hcd 0000:00:1d.3: wake-up capability enabled by ACPI
-> >>> [  265.591186] uhci_hcd 0000:00:1d.2: wake-up capability enabled by ACPI
-> >>> [  265.591244] uhci_hcd 0000:00:1d.1: wake-up capability enabled by ACPI
-> >>> [  265.591302] uhci_hcd 0000:00:1d.0: wake-up capability enabled by ACPI
-> >>> [  265.591581] PM: late suspend of devices complete after 22.446 msecs
-> >>> [  265.591615] ACPI: Preparing to enter system sleep state S3
-> >>> [  265.592832] PM: Saving platform NVS memory
-> >>> [  265.594133] Disabling non-boot CPUs ...
-> >>> [  265.594133] ACPI: Low-level resume complete
-> >>> [  265.594133] PM: Restoring platform NVS memory
-> >>> [  265.594133] Force enabled HPET at resume
-> >>> [  265.594133] ACPI: Waking up from system sleep state S3
-> >>> [  265.621463] snd_hda_intel 0000:00:1b.0: restoring config space at
-> >>> offset 0x1 (was 0x100006, writing 0x100002)
-> >>> [  265.621528] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x9 (was 0x1fff1, writing 0x10511041)
-> >>> [  265.621544] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x8 (was 0xfff0, writing 0x10301020)
-> >>> [  265.621559] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x7 (was 0xf0, writing 0x3030)
-> >>> [  265.621582] pcieport 0000:00:1c.0: restoring config space at offset
-> >>> 0x1 (was 0x100104, writing 0x100507)
-> >>> [  265.621667] pcieport 0000:00:1c.1: restoring config space at offset
-> >>> 0x9 (was 0x1fff1, writing 0x10111001)
-> >>> [  265.621684] pcieport 0000:00:1c.1: restoring config space at offset
-> >>> 0x7 (was 0xf0, writing 0x2020)
-> >>> [  265.621706] pcieport 0000:00:1c.1: restoring config space at offset
-> >>> 0x1 (was 0x100106, writing 0x100507)
-> >>> [  265.621791] pcieport 0000:00:1c.2: restoring config space at offset
-> >>> 0x7 (was 0xf0, writing 0x1010)
-> >>> [  265.621813] pcieport 0000:00:1c.2: restoring config space at offset
-> >>> 0x1 (was 0x100106, writing 0x100507)
-> >>> [  265.621899] uhci_hcd 0000:00:1d.0: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  265.621938] uhci_hcd 0000:00:1d.0: wake-up capability disabled by ACPI
-> >>> [  265.621983] uhci_hcd 0000:00:1d.1: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  265.622057] uhci_hcd 0000:00:1d.1: wake-up capability disabled by ACPI
-> >>> [  265.622111] uhci_hcd 0000:00:1d.2: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  265.622139] uhci_hcd 0000:00:1d.2: wake-up capability disabled by ACPI
-> >>> [  265.622183] uhci_hcd 0000:00:1d.3: restoring config space at offset
-> >>> 0x1 (was 0x2800005, writing 0x2800001)
-> >>> [  265.622210] uhci_hcd 0000:00:1d.3: wake-up capability disabled by ACPI
-> >>> [  265.622267] ehci_hcd 0000:00:1d.7: restoring config space at offset
-> >>> 0x1 (was 0x2900006, writing 0x2900002)
-> >>> [  265.622305] ehci_hcd 0000:00:1d.7: wake-up capability disabled by ACPI
-> >>> [  265.622320] ehci_hcd 0000:00:1d.7: PME# disabled
-> >>> [  265.622344] pci 0000:00:1e.0: restoring config space at offset 0xf
-> >>> (was 0x60000, writing 0x600ff)
-> >>> [  265.622575] atl2 0000:03:00.0: restoring config space at offset 0x1
-> >>> (was 0x100006, writing 0x100406)
-> >>> [  265.623172] PM: early resume of devices complete after 1.925 msecs
-> >>> [  265.623416] i915 0000:00:02.0: PCI INT A ->  GSI 16 (level, low) ->
-> >>> IRQ 16
-> >>> [  265.623432] i915 0000:00:02.0: setting latency timer to 64
-> >>> [  265.627096] snd_hda_intel 0000:00:1b.0: PCI INT A ->  GSI 16 (level,
-> >>> low) ->  IRQ 16
-> >>> [  265.627115] snd_hda_intel 0000:00:1b.0: setting latency timer to 64
-> >>> [  265.627215] snd_hda_intel 0000:00:1b.0: irq 43 for MSI/MSI-X
-> >>> [  265.627429] uhci_hcd 0000:00:1d.0: PCI INT A ->  GSI 23 (level, low)
-> >>> ->  IRQ 23
-> >>> [  265.627448] uhci_hcd 0000:00:1d.0: setting latency timer to 64
-> >>> [  265.627485] usb usb2: root hub lost power or was reset
-> >>> [  265.627548] uhci_hcd 0000:00:1d.1: PCI INT B ->  GSI 19 (level, low)
-> >>> ->  IRQ 19
-> >>> [  265.627564] uhci_hcd 0000:00:1d.1: setting latency timer to 64
-> >>> [  265.627597] usb usb3: root hub lost power or was reset
-> >>> [  265.627659] uhci_hcd 0000:00:1d.2: PCI INT C ->  GSI 18 (level, low)
-> >>> ->  IRQ 18
-> >>> [  265.627675] uhci_hcd 0000:00:1d.2: setting latency timer to 64
-> >>> [  265.627707] usb usb4: root hub lost power or was reset
-> >>> [  265.627766] uhci_hcd 0000:00:1d.3: PCI INT D ->  GSI 16 (level, low)
-> >>> ->  IRQ 16
-> >>> [  265.627781] uhci_hcd 0000:00:1d.3: setting latency timer to 64
-> >>> [  265.627814] usb usb5: root hub lost power or was reset
-> >>> [  265.627873] ehci_hcd 0000:00:1d.7: PCI INT A ->  GSI 23 (level, low)
-> >>> ->  IRQ 23
-> >>> [  265.627889] ehci_hcd 0000:00:1d.7: setting latency timer to 64
-> >>> [  265.627993] pci 0000:00:1e.0: setting latency timer to 64
-> >>> [  265.628130] ata_piix 0000:00:1f.2: PCI INT B ->  GSI 19 (level, low)
-> >>> ->  IRQ 19
-> >>> [  265.628145] ata_piix 0000:00:1f.2: setting latency timer to 64
-> >>> [  265.634153] atl2 0000:03:00.0: PCI INT A ->  GSI 17 (level, low) ->
-> >>> IRQ 17
-> >>> [  265.634173] atl2 0000:03:00.0: setting latency timer to 64
-> >>> [  265.634290] atl2 0000:03:00.0: irq 44 for MSI/MSI-X
-> >>> [  265.634712] sd 1:0:0:0: [sda] Starting disk
-> >>> [  265.796709] ata2.00: ACPI cmd ef/03:44:00:00:00:a0 (SET FEATURES)
-> >>> filtered out
-> >>> [  265.796726] ata2.00: ACPI cmd ef/03:0c:00:00:00:a0 (SET FEATURES)
-> >>> filtered out
-> >>> [  265.803326] ata2.00: configured for UDMA/66
-> >>> [  265.880091] usb 1-5: reset high-speed USB device number 2 using ehci_hcd
-> >>> [  266.091960] PM: resume of devices complete after 468.673 msecs
-> >>> [  266.092731] Restarting tasks ... done.
-> >>> [  266.112098] video LNXVIDEO:00: Restoring backlight state
-> >>> [  267.219459] atl2: eth0 NIC Link is Up<100 Mbps Full Duplex>
-> >>> [  554.912659] FS-Cache: Loaded
-> >>> [  554.950749] FS-Cache: Netfs 'cifs' registered for caching
-> >>> [  555.047550] CIFS VFS: default security mechanism requested.  The
-> >>> default security mechanism will be upgraded from ntlm to ntlmv2 in
-> >>> kernel release 3.2
-> >>> [ 2094.090461] PM: Syncing filesystems ... done.
-> >>> [ 2094.155385] Freezing user space processes ... (elapsed 0.01 seconds)
-> >>> done.
-> >>> [ 2094.166113] Freezing remaining freezable tasks ...
-> >>> [ 2114.175108] Freezing of tasks failed after 20.00 seconds (1 tasks
-> >>> refusing to freeze, wq_busy=0):
-> >>> [ 2114.175586] cifsd           S ccb50b40     0  2219      2 0x00800000
-> >>> [ 2114.175611]  cc6cc000 00000046 00000000 ccb50b40 cc776b40 cc41d000
-> >>> cc776780 cc61d960
-> >>> [ 2114.175635]  cc4d81c0 c178ec40 c178ec40 ccb50980 00000000 ccb50980
-> >>> c1031e88 00000001
-> >>> [ 2114.175660]  c1031f9f c10230f5 c1559ee1 c17a7140 c1031e88 00000001
-> >>> c1031f9f c10230f5
-> >>> [ 2114.175684] Call Trace:
-> >>> [ 2114.175710]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.175723]  [<c1031f9f>] ? add_preempt_count+0x5f/0xa0
-> >>> [ 2114.175747]  [<c10230f5>] ? default_spin_lock_flags+0x5/0x10
-> >>> [ 2114.175770]  [<c1559ee1>] ? _raw_spin_lock_irqsave+0x31/0x50
-> >>> [ 2114.175782]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.175794]  [<c1031f9f>] ? add_preempt_count+0x5f/0xa0
-> >>> [ 2114.175807]  [<c10230f5>] ? default_spin_lock_flags+0x5/0x10
-> >>> [ 2114.175820]  [<c1559ee1>] ? _raw_spin_lock_irqsave+0x31/0x50
-> >>> [ 2114.175832]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.175846]  [<c15588c1>] ? schedule_timeout+0x111/0x1d0
-> >>> [ 2114.175860]  [<c1512500>] ? tcp_rcv_established+0x170/0x760
-> >>> [ 2114.175878]  [<c1041fa0>] ? usleep_range+0x40/0x40
-> >>> [ 2114.175897]  [<c14cb6e7>] ? sk_wait_data+0xa7/0xb0
-> >>> [ 2114.175920]  [<c104ffc0>] ? abort_exclusive_wait+0x90/0x90
-> >>> [ 2114.175943]  [<c1509948>] ? tcp_recvmsg+0x588/0xb80
-> >>> [ 2114.175956]  [<c1001c0a>] ? __switch_to+0xea/0x1d0
-> >>> [ 2114.175976]  [<c1008e97>] ? native_sched_clock+0x27/0x90
-> >>> [ 2114.175993]  [<c152685f>] ? inet_recvmsg+0x6f/0xb0
-> >>> [ 2114.176063]  [<c14c7f70>] ? sock_recvmsg+0xe0/0x120
-> >>> [ 2114.176086]  [<c1242df8>] ? timerqueue_add+0x58/0xb0
-> >>> [ 2114.176098]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.176112]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.176123]  [<c1031f07>] ? sub_preempt_count+0x67/0xa0
-> >>> [ 2114.176145]  [<c1559d1b>] ? _raw_spin_unlock_irqrestore+0x1b/0x40
-> >>> [ 2114.176165]  [<c1053a43>] ? hrtimer_try_to_cancel+0x43/0xa0
-> >>> [ 2114.176178]  [<c1053ab1>] ? hrtimer_cancel+0x11/0x20
-> >>> [ 2114.176191]  [<c155934c>] ? schedule_hrtimeout_range_clock+0xcc/0x170
-> >>> [ 2114.176206]  [<c10536c0>] ? update_rmtp+0x80/0x80
-> >>> [ 2114.176219]  [<c14c7fe7>] ? kernel_recvmsg+0x37/0x50
-> >>> [ 2114.176268]  [<d0611228>] ? cifs_readv_from_socket+0x148/0x2b0 [cifs]
-> >>> [ 2114.176283]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.176309]  [<d06113ac>] ? cifs_read_from_socket+0x1c/0x20 [cifs]
-> >>> [ 2114.176333]  [<d0611522>] ? cifs_demultiplex_thread+0x112/0xc20 [cifs]
-> >>> [ 2114.176348]  [<c1031e88>] ? get_parent_ip+0x8/0x20
-> >>> [ 2114.176370]  [<d0611410>] ? dequeue_mid+0x60/0x60 [cifs]
-> >>> [ 2114.176391]  [<c104f9c9>] ? kthread+0x69/0x70
-> >>> [ 2114.176406]  [<c104f960>] ? kthread_worker_fn+0x150/0x150
-> >>> [ 2114.176420]  [<c155af76>] ? kernel_thread_helper+0x6/0xd
-> >>> [ 2114.176466]
-> >>> [ 2114.176473] Restarting tasks ... done.
-> >>> [ 2114.201577] video LNXVIDEO:00: Restoring backlight state
-> >>> [ 2114.210975] lxpanel[1452]: segfault at 0 ip b6ead703 sp bfea8924
-> >>> error 4 in libc-2.13.so[b6e39000+13e000]
-> >>> -- 
-> > Thanks for reporting this. Does the following patch fix it?
-> >
-> > -----------------------[snip]------------------------
-> >
-> > cifs: attempt to freeze while looping on a receive attempt
-> >
-> > In the recent overhaul of the demultiplex thread receive path, we
-> > neglected to ensure that we attempt to freeze on each pass through the
-> > loop.
-> >
-> > Reported-by: Woody Suwalski<terraluna977-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > Signed-off-by: Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >   fs/cifs/connect.c |    2 ++
-> >   1 files changed, 2 insertions(+), 0 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index bf82f88..d166e3a 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -441,6 +441,8 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
-> >   	smb_msg.msg_controllen = 0;
-> >
-> >   	for (total_read = 0; to_read; total_read += length, to_read -= length) {
-> > +		try_to_freeze();
-> > +
-> >   		if (server_unresponsive(server)) {
-> >   			total_read = -EAGAIN;
-> >   			break;
-> Jeff, I have tested on a similar EeePC box - the same cifsd crash.
-> The patch did not help...
-> 
-> Woody
-> 
+Yes, I think that we should report to the userspace to let the
+application know about the failure. I found this on fcntl man page:
 
-Well, that is odd then...
+ENOLCK
+Too many segment locks open, lock table is full, or a remote locking
+protocol failed (e.g., locking over NFS).
 
-First, we should clarify here: This is not a crash. The above stack
-trace is just telling us that the freezer wasn't able to freeze the
-cifs kthread that handles the receive codepath. It's possible that the
-userspace code wasn't able to deal with that and you had to reboot your
-machine after this, but that's really a separate problem if so.
+I think this fits our scenario.
 
-cifsd does blocking receives. When it creates a socket, it does this:
+>
+> Sachin Prabhu
+>
+> ----
+>
+> Attach locks to cifsFileInfo instead of cifsInodeInfo
+>
+> Locks in CIFS are attached to an open file instances ie. all
+> lock/unlock requests made to the file server should contain the filei=
+d
+> which represents the open file instance. Grouping all brlocks accordi=
+ng
+> to the fileid therefore makes it easier to process especially when
+> multiple lock or unlock requests for a file are to be made.
+>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 8f1fe32..8a71b0d 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -949,7 +949,6 @@ cifs_init_once(void *inode)
+> =A0 =A0 =A0 =A0struct cifsInodeInfo *cifsi =3D inode;
+>
+> =A0 =A0 =A0 =A0inode_init_once(&cifsi->vfs_inode);
+> - =A0 =A0 =A0 INIT_LIST_HEAD(&cifsi->llist);
+> =A0 =A0 =A0 =A0mutex_init(&cifsi->lock_mutex);
+> =A0}
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 8238aa1..409d932 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -527,6 +527,7 @@ struct cifs_search_info {
+> =A0struct cifsFileInfo {
+> =A0 =A0 =A0 =A0struct list_head tlist; /* pointer to next fid owned b=
+y tcon */
+> =A0 =A0 =A0 =A0struct list_head flist; /* next fid (file instance) fo=
+r this inode */
+> + =A0 =A0 =A0 struct list_head llist; /* brlocks for this file */
+> =A0 =A0 =A0 =A0unsigned int uid; =A0 =A0 =A0 /* allows finding which =
+=46ileInfo structure */
+> =A0 =A0 =A0 =A0__u32 pid; =A0 =A0 =A0 =A0 =A0 =A0 =A0/* process id wh=
+o opened file */
+> =A0 =A0 =A0 =A0__u16 netfid; =A0 =A0 =A0 =A0 =A0 /* file id from remo=
+te */
+> @@ -567,9 +568,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_f=
+ile);
+> =A0*/
+>
+> =A0struct cifsInodeInfo {
+> - =A0 =A0 =A0 struct list_head llist; =A0 =A0 =A0 =A0 /* brlocks for =
+this inode */
+> =A0 =A0 =A0 =A0bool can_cache_brlcks;
+> - =A0 =A0 =A0 struct mutex lock_mutex; =A0 =A0 =A0 =A0/* protect two =
+fields above */
+> + =A0 =A0 =A0 struct mutex lock_mutex; =A0 =A0 =A0 =A0/* protect cifs=
+=46ileInfo->llist
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0& cifsInodeInfo->can_cache_brlcks */
+> =A0 =A0 =A0 =A0/* BB add in lists for dirty pages i.e. write caching =
+info for oplock */
+> =A0 =A0 =A0 =A0struct list_head openFileList;
+> =A0 =A0 =A0 =A0__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, comp=
+ressed, system */
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index cf0b153..3f6b169 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -264,6 +264,7 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *=
+file,
+> =A0 =A0 =A0 =A0pCifsFile->tlink =3D cifs_get_tlink(tlink);
+> =A0 =A0 =A0 =A0mutex_init(&pCifsFile->fh_mutex);
+> =A0 =A0 =A0 =A0INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break)=
+;
+> + =A0 =A0 =A0 INIT_LIST_HEAD(&pCifsFile->llist);
+>
+> =A0 =A0 =A0 =A0spin_lock(&cifs_file_list_lock);
+> =A0 =A0 =A0 =A0list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openF=
+ileList));
+> @@ -333,15 +334,11 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs=
+_file)
+> =A0 =A0 =A0 =A0/* Delete any outstanding lock records. We'll lose the=
+m when the file
+> =A0 =A0 =A0 =A0 * is closed anyway.
+> =A0 =A0 =A0 =A0 */
+> - =A0 =A0 =A0 mutex_lock(&cifsi->lock_mutex);
+> - =A0 =A0 =A0 list_for_each_entry_safe(li, tmp, &cifsi->llist, llist)=
+ {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (li->netfid !=3D cifs_file->netfid)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continue;
+> + =A0 =A0 =A0 list_for_each_entry_safe(li, tmp, &cifs_file->llist, ll=
+ist) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0list_del(&li->llist);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_del_lock_waiters(li);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kfree(li);
+> =A0 =A0 =A0 =A0}
+> - =A0 =A0 =A0 mutex_unlock(&cifsi->lock_mutex);
+>
+> =A0 =A0 =A0 =A0cifs_put_tlink(cifs_file->tlink);
+> =A0 =A0 =A0 =A0dput(cifs_file->dentry);
+> @@ -672,47 +669,82 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock=
+)
+> =A0}
+>
+> =A0static bool
+> -__cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset=
+,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u64 length, __u8 type=
+, __u16 netfid,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifsLockInfo **c=
+onf_lock)
+> +__cifs_find_lock_conflict_file(struct cifsFileInfo *cifs_file, __u64=
+ offset,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0__u64 le=
+ngth, __u8 type,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct c=
+ifsLockInfo **conf_lock)
+> =A0{
+> - =A0 =A0 =A0 struct cifsLockInfo *li, *tmp;
+> + =A0 =A0 =A0 struct cifsLockInfo *li;
+>
+> - =A0 =A0 =A0 list_for_each_entry_safe(li, tmp, &cinode->llist, llist=
+) {
+> + =A0 =A0 =A0 list_for_each_entry(li, &cifs_file->llist, llist) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Check if range matches */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (offset + length <=3D li->offset ||
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0offset >=3D li->offset + li->l=
+ength)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0continue;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else if ((type & LOCKING_ANDX_SHARED_LO=
+CK) &&
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0((netfid =3D=3D li->=
+netfid && current->tgid =3D=3D li->pid) ||
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 type =3D=3D li->typ=
+e))
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continue;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 *conf_lock =3D li;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Is the request for a shared lock */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (type =3D=3D LOCKING_ANDX_SHARED_LOC=
+K) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Does this process al=
+ready posses a lock? */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (current->tgid =3D=3D=
+ li->pid)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return =
+false;
+You should check if netfids match too, because it is not allowed to
+set a shared lock by one handle to an exclusive lock by another.
 
-        socket->sk->sk_rcvtimeo = 7 * HZ;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* Is the existing lock=
+ a shared lock too? */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (li->type =3D=3D LOC=
+KING_ANDX_SHARED_LOCK)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return =
+false;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* We have found a conflicting lock */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 *conf_lock =3D li;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return true;
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 return false;
+> +}
+> +
+> +static bool
+> +__cifs_find_lock_conflict(struct cifsFileInfo *cifs_file, __u64 offs=
+et,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u64 length, __u8 =
+type,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifsLockInfo=
+ **conf_lock)
+> +{
+> + =A0 =A0 =A0 struct cifsFileInfo *file, *tmp;
+> + =A0 =A0 =A0 bool rc;
+> + =A0 =A0 =A0 struct cifsInodeInfo *cifs_inode =3D CIFS_I(cifs_file->=
+dentry->d_inode);
+> +
+> + =A0 =A0 =A0 /* We need to check across every open instance of the i=
+node */
+> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
+> + =A0 =A0 =A0 list_for_each_entry_safe(file, tmp, &cifs_inode->openFi=
+leList, flist) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFileInfo_get(file);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D __cifs_find_lock_conflict_file(f=
+ile, offset, length,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 type, conf_lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return true;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFileInfo_put(file);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
+> =A0 =A0 =A0 =A0}
+> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
+> +
+> =A0 =A0 =A0 =A0return false;
+> =A0}
+>
+> =A0static bool
+> -cifs_find_lock_conflict(struct cifsInodeInfo *cinode, struct cifsLoc=
+kInfo *lock,
+> +cifs_find_lock_conflict(struct cifsFileInfo *cifs_file,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifsLockInfo *lo=
+ck,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct cifsLockInfo **=
+conf_lock)
+> =A0{
+> - =A0 =A0 =A0 return __cifs_find_lock_conflict(cinode, lock->offset, =
+lock->length,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0lock->type, lock->netfid, conf_lock);
+> + =A0 =A0 =A0 return __cifs_find_lock_conflict(cifs_file, lock->offse=
+t, lock->length,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0lock->type, conf_lock);
+> =A0}
+>
+> =A0static int
+> -cifs_lock_test(struct cifsInodeInfo *cinode, __u64 offset, __u64 len=
+gth,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0__u8 type, __u16 netfid, struct file_loc=
+k *flock)
+> +cifs_lock_test(struct cifsFileInfo *cifs_file, __u64 offset, __u64 l=
+ength,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0__u8 type, struct file_lock *flock)
+> =A0{
+> =A0 =A0 =A0 =A0int rc =3D 0;
+> =A0 =A0 =A0 =A0struct cifsLockInfo *conf_lock;
+> =A0 =A0 =A0 =A0bool exist;
+> + =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(cifs_file->dent=
+ry->d_inode);
+>
+> =A0 =A0 =A0 =A0mutex_lock(&cinode->lock_mutex);
+>
+> - =A0 =A0 =A0 exist =3D __cifs_find_lock_conflict(cinode, offset, len=
+gth, type, netfid,
+> + =A0 =A0 =A0 exist =3D __cifs_find_lock_conflict(cifs_file, offset, =
+length, type,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0&conf_lock);
+> =A0 =A0 =A0 =A0if (exist) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0flock->fl_start =3D conf_lock->offset;
+> @@ -732,18 +764,21 @@ cifs_lock_test(struct cifsInodeInfo *cinode, __=
+u64 offset, __u64 length,
+> =A0}
+>
+> =A0static void
+> -cifs_lock_add(struct cifsInodeInfo *cinode, struct cifsLockInfo *loc=
+k)
+> +cifs_lock_add(struct cifsFileInfo *cifs_file, struct cifsLockInfo *l=
+ock)
+> =A0{
+> + =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(cifs_file->dent=
+ry->d_inode);
+> +
+> =A0 =A0 =A0 =A0mutex_lock(&cinode->lock_mutex);
+> - =A0 =A0 =A0 list_add_tail(&lock->llist, &cinode->llist);
+> + =A0 =A0 =A0 list_add_tail(&lock->llist, &cifs_file->llist);
+> =A0 =A0 =A0 =A0mutex_unlock(&cinode->lock_mutex);
+> =A0}
+>
+> =A0static int
+> -cifs_lock_add_if(struct cifsInodeInfo *cinode, struct cifsLockInfo *=
+lock,
+> +cifs_lock_add_if(struct cifsFileInfo *cifs_file, struct cifsLockInfo=
+ *lock,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bool wait)
+> =A0{
+> =A0 =A0 =A0 =A0struct cifsLockInfo *conf_lock;
+> + =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(cifs_file->dent=
+ry->d_inode);
+> =A0 =A0 =A0 =A0bool exist;
+> =A0 =A0 =A0 =A0int rc =3D 0;
+>
+> @@ -751,9 +786,9 @@ try_again:
+> =A0 =A0 =A0 =A0exist =3D false;
+> =A0 =A0 =A0 =A0mutex_lock(&cinode->lock_mutex);
+>
+> - =A0 =A0 =A0 exist =3D cifs_find_lock_conflict(cinode, lock, &conf_l=
+ock);
+> + =A0 =A0 =A0 exist =3D cifs_find_lock_conflict(cifs_file, lock, &con=
+f_lock);
+> =A0 =A0 =A0 =A0if (!exist && cinode->can_cache_brlcks) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_add_tail(&lock->llist, &cinode->ll=
+ist);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_add_tail(&lock->llist, &cifs_file-=
+>llist);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&cinode->lock_mutex);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> =A0 =A0 =A0 =A0}
+> @@ -823,7 +858,7 @@ static int
+> =A0cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+> =A0{
+> =A0 =A0 =A0 =A0int xid, rc =3D 0, stored_rc;
+> - =A0 =A0 =A0 struct cifsLockInfo *li, *tmp;
+> + =A0 =A0 =A0 struct cifsLockInfo *li;
+> =A0 =A0 =A0 =A0struct cifs_tcon *tcon;
+> =A0 =A0 =A0 =A0struct cifsInodeInfo *cinode =3D CIFS_I(cfile->dentry-=
+>d_inode);
+> =A0 =A0 =A0 =A0unsigned int num, max_num;
+> @@ -854,7 +889,7 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cf=
+ile)
+> =A0 =A0 =A0 =A0for (i =3D 0; i < 2; i++) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cur =3D buf;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0num =3D 0;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each_entry_safe(li, tmp, &cino=
+de->llist, llist) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each_entry(li, &cfile->llist, =
+llist) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (li->type !=3D type=
+s[i])
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0contin=
+ue;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cur->Pid =3D cpu_to_le=
+16(li->pid);
+> @@ -865,8 +900,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *c=
+file)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (++num =3D=3D max_n=
+um) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stored=
+_rc =3D cifs_lockv(xid, tcon, cfile->netfid,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 li->type, 0, num, buf);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (sto=
+red_rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (sto=
+red_rc) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 cERROR(1, "Error while syncing locks");
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0rc =3D stored_rc;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cur =3D=
+ buf;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0num =3D=
+ 0;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
+> @@ -876,8 +913,10 @@ cifs_push_mandatory_locks(struct cifsFileInfo *c=
+file)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (num) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stored_rc =3D cifs_loc=
+kv(xid, tcon, cfile->netfid,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 types[i], 0, num, buf);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (stored_rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (stored_rc) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(=
+1, "Error while syncing locks");
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D=
+ stored_rc;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0}
+>
+> @@ -1026,7 +1065,6 @@ cifs_getlk(struct file *file, struct file_lock =
+*flock, __u8 type,
+> =A0 =A0 =A0 =A0__u64 length =3D 1 + flock->fl_end - flock->fl_start;
+> =A0 =A0 =A0 =A0struct cifsFileInfo *cfile =3D (struct cifsFileInfo *)=
+file->private_data;
+> =A0 =A0 =A0 =A0struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
+> - =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(cfile->dentry->=
+d_inode);
+> =A0 =A0 =A0 =A0__u16 netfid =3D cfile->netfid;
+>
+> =A0 =A0 =A0 =A0if (posix_lck) {
+> @@ -1046,8 +1084,7 @@ cifs_getlk(struct file *file, struct file_lock =
+*flock, __u8 type,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 rc =3D cifs_lock_test(cinode, flock->fl_start, length, =
+type, netfid,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 flock);
+> + =A0 =A0 =A0 rc =3D cifs_lock_test(cfile, flock->fl_start, length, t=
+ype, flock);
+> =A0 =A0 =A0 =A0if (!rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+>
+> @@ -1108,7 +1145,8 @@ cifs_free_llist(struct list_head *llist)
+> =A0}
+>
+> =A0static int
+> -cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *floc=
+k, int xid)
+> +cifs_unlock_range_file(struct cifsFileInfo *cfile, struct file_lock =
+*flock,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int xid)
+> =A0{
+> =A0 =A0 =A0 =A0int rc =3D 0, stored_rc;
+> =A0 =A0 =A0 =A0int types[] =3D {LOCKING_ANDX_LARGE_FILES,
+> @@ -1134,15 +1172,11 @@ cifs_unlock_range(struct cifsFileInfo *cfile,=
+ struct file_lock *flock, int xid)
+> =A0 =A0 =A0 =A0for (i =3D 0; i < 2; i++) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cur =3D buf;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0num =3D 0;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each_entry_safe(li, tmp, &cino=
+de->llist, llist) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 list_for_each_entry_safe(li, tmp, &cfil=
+e->llist, llist) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (flock->fl_start > =
+li->offset ||
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(flock->fl_sta=
+rt + length) <
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(li->offset + =
+li->length))
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0contin=
+ue;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (current->tgid !=3D =
+li->pid)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continu=
+e;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cfile->netfid !=3D =
+li->netfid)
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continu=
+e;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (types[i] !=3D li->=
+type)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0contin=
+ue;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!cinode->can_cache=
+_brlcks) {
+> @@ -1172,7 +1206,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, s=
+truct file_lock *flock, int xid)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 * the inode list.
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0cifs_move_llist(&tmp_llist,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &cinode->llist=
+);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 &cfile->llist)=
+;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0rc =3D stored_rc;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0} else
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0/*
+> @@ -1198,7 +1232,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, s=
+truct file_lock *flock, int xid)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0stored_rc =3D cifs_loc=
+kv(xid, tcon, cfile->netfid,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 types[i], num, 0, buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (stored_rc) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_mo=
+ve_llist(&tmp_llist, &cinode->llist);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_mo=
+ve_llist(&tmp_llist, &cfile->llist);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D=
+ stored_rc;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_f=
+ree_llist(&tmp_llist);
+> @@ -1211,6 +1245,30 @@ cifs_unlock_range(struct cifsFileInfo *cfile, =
+struct file_lock *flock, int xid)
+> =A0}
+>
+> =A0static int
+> +cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *floc=
+k, int xid)
+> +{
+> + =A0 =A0 =A0 struct cifsFileInfo *file, *tmp;
+> + =A0 =A0 =A0 struct cifsInodeInfo *cifs_inode =3D CIFS_I(cfile->dent=
+ry->d_inode);
+> + =A0 =A0 =A0 int rc =3D 0;
+> +
+> + =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
+> + =A0 =A0 =A0 list_for_each_entry_safe(file, tmp, &cifs_inode->openFi=
+leList, flist) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (file->pid !=3D current->pid)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 continue;
+The same cifsFileInfo structure can be shared between several
+processes and every can set a brlock on it. But file->pid still has
+the pid only of the process who opened the file. So, such a check
+should be done in cifs_unlock_range_file with lock->pid.
 
-...so the maximum amount of time that this code ought to sit in
-kernel_recvmsg is ~7s. If kernel_recvmsg returns certain error codes
-(like -EAGAIN), it'll sleep for another second or two before going
-around the loop again. So the max time that a loop iteration takes
-should always be less than ~10s.
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFileInfo_get(file);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_unlock_range_file(file, flo=
+ck, xid);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (rc < 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "VFS is out of =
+sync with lock on server!");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifsFileInfo_put(file);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&cifs_file_list_lock);
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 spin_unlock(&cifs_file_list_lock);
+> +
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> +static int
+> =A0cifs_setlk(struct file *file, =A0struct file_lock *flock, __u8 typ=
+e,
+> =A0 =A0 =A0 =A0 =A0 bool wait_flag, bool posix_lck, int lock, int unl=
+ock, int xid)
+> =A0{
+> @@ -1218,7 +1276,6 @@ cifs_setlk(struct file *file, =A0struct file_lo=
+ck *flock, __u8 type,
+> =A0 =A0 =A0 =A0__u64 length =3D 1 + flock->fl_end - flock->fl_start;
+> =A0 =A0 =A0 =A0struct cifsFileInfo *cfile =3D (struct cifsFileInfo *)=
+file->private_data;
+> =A0 =A0 =A0 =A0struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
+> - =A0 =A0 =A0 struct cifsInodeInfo *cinode =3D CIFS_I(file->f_path.de=
+ntry->d_inode);
+> =A0 =A0 =A0 =A0__u16 netfid =3D cfile->netfid;
+>
+> =A0 =A0 =A0 =A0if (posix_lck) {
+> @@ -1249,7 +1306,7 @@ cifs_setlk(struct file *file, =A0struct file_lo=
+ck *flock, __u8 type,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!lock)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOMEM;
+>
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_lock_add_if(cinode, lock, w=
+ait_flag);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_lock_add_if(cfile, lock, wa=
+it_flag);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc < 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kfree(lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc <=3D 0)
+> @@ -1262,7 +1319,7 @@ cifs_setlk(struct file *file, =A0struct file_lo=
+ck *flock, __u8 type,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_lock_add(cinode, lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_lock_add(cfile, lock);
+> =A0 =A0 =A0 =A0} else if (unlock)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D cifs_unlock_range(cfile, flock,=
+ xid);
+>
+>
+>
 
-With the above patch, cifsd will try_to_freeze() on each pass through
-the loop. If that didn't fix the problem, and you got the same stack
-trace, then that suggests that the time being spent in kernel_recvmsg
-is more than 20s. Perhaps this is due to some lower-level networking
-problem?
+In general, I like your idea to group brlocks to the file structure
+(that reverts my previous change) but this should be done in two steps
+to make the history bisectable:
+1) move locks to cifsFileInfo,
+2) change cifs_unlock_range to unlock all process locks that are in
+the requested unlock range.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--=20
+Best regards,
+Pavel Shilovsky.
