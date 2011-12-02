@@ -1,70 +1,122 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: problem mounting under Xubuntu
-Date: Fri, 2 Dec 2011 09:39:46 -0600
-Message-ID: <CADT32eJmg1FCvyoksCssjwGQmR75xMdRW_zSdP5z+V6hQSbqsQ@mail.gmail.com>
-References: <4ED3017A.9030502@gmail.com>
-	<20111128153207.163adbfe@tlielax.poochiereds.net>
+From: =?UTF-8?Q?Johannes_Thr=C3=A4n?= <johannes.thraen-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
+Subject: Re: vim reports file having changed
+Date: Fri, 2 Dec 2011 18:27:34 +0100
+Message-ID: <CAFbNW2FJuRQMLspnSqGcvNRfCT=2zsVO+x0eQJ6mTFKJTQkdBw@mail.gmail.com>
+References: <CAFbNW2Fv58h_r1rmtk0rHg+uJ0C9i1Rtoy2DEDm-Hxw-ZtK_mQ@mail.gmail.com>
+	<20111201104417.4b3ce577@barsoom.rdu.redhat.com>
+	<CADT32eJT=J+Jip_LFTX8SKZcEYUgdP7k=3PkE=q5UeH1rL2Ehg@mail.gmail.com>
+	<CAFbNW2EQC5d506pXTzJUMtHGUL-76Wz9CoVTJkf0WAdb5VQX1w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: jr <creature.eternal-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20111128153207.163adbfe-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <CAFbNW2EQC5d506pXTzJUMtHGUL-76Wz9CoVTJkf0WAdb5VQX1w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Nov 28, 2011 at 2:32 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
-:
-> On Mon, 28 Nov 2011 03:35:22 +0000
-> jr <creature.eternal-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Hi,
+
+I found out that vim remembers the last modified time, size, mode and
+the inode number to monitor file changes.
+
+I also tested the issue with other windows servers. With windows 7
+everthing's fine and we happen to have another windows server 2003,
+where the problem does not occur.
+I found out, that the problematic server is in fact a "small business
+server", which is also seems to be a kind of windows server 2003 as
+reported by /proc/fs/cifs/DebugData. The output of
+/proc/fs/cifs/DebugData for both only differs in "secmode":
+
+good server: [...]Local Users To Server: 1 SecMode: 0x3 Req On Wire: 0[=
+=2E..]
+bad   server: [...]Local Users To Server: 1 SecMode: 0xf Req On Wire: 0=
+[...]
+
+perhaps this helps?
+
+
+On Thu, Dec 1, 2011 at 7:22 PM, Johannes Thr=C3=A4n
+<johannes.thraen-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org> wrote:
+> sorry for having been unspecific:
+> with sometime i mean: some seconds after first saving the file.
+> sometimes 2 sometimes 20 not more. as I recreated the error, I found
+> out, it only occurs after saving the file once.
+> the exact error message vim confronts me with is:
+>
+> WARNING: The file has been changed since reading it!!!
+> Do you really want to write to it (y/n)?
+>
+> I have no idea how vim determines file changes in terms of system
+> calls. the vim maintainer was neither polite nor helpful, he just sen=
+t
+> me here. I asked him again, perhaps he'll answer. Until then I strace=
+d
+> -t the thing and prefiltered the output. the test file's name is
+> "test" and it contains the text "this is a test". I saved the file
+> twice, the first save went well, the second save (few seconds later)
+> didn't. see attachment.
+>
+> thanks!
 >
 >
-> --------------[snip]----------------
->> [92841.247667] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS=
-: in
->> cifs_get_tcon as Xid: 54 with uid: 0
->> [92841.247673] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
->> smb_command 117
->> [92841.247677] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sendin=
+> On Thu, Dec 1, 2011 at 4:56 PM, Shirish Pargaonkar
+> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> On Thu, Dec 1, 2011 at 9:44 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
+e:
+>>> On Wed, 30 Nov 2011 15:25:01 +0100
+>>> Johannes Thr=C3=A4n <johannes.thraen-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org> wrote:
+>>>
+>>>> Hi all,
+>>>>
+>>>> I reported this before here, it somehow went under. So I'll try ag=
+ain:
+>>>>
+>>>> When I open a file which is located on a cifs-mounted windows shar=
+e
+>>>> with vim, vim will after some time always report the file as havin=
 g
->> smb: =A0total_len 90
->> [92841.248606] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002
->> length 0x27
->> [92841.248620] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
->> cifs_sync_mid_result: cmd=3D117 mid=3D3 state=3D4
->> [92841.248625] Status code returned 0xc0000022 NT_STATUS_ACCESS_DENI=
-ED
->> [92841.248630] /build/buildd/linux-3.0.0/fs/cifs/netmisc.c: Mapping =
-smb
->> error code 0xc0000022 to POSIX err -13
->> [92841.248635] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS=
-:
->> leaving cifs_get_tcon (xid =3D 54) rc =3D -13
->> [92841.248639] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS Tco=
-n rc
->> =3D -13
-> --------------[snip]----------------
->
-> Looks like the tree connect is falling down. Does the user you're
-> connecting as have access to the exported share? You may want to chec=
-k
-> the logs on the NAS and see why it's rejecting the tree connect reque=
-st.
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
-
-Looked at the wireshark traces.
-
-Jeff is right. Tree connect is denied for    anonymous   user.
-Tree connect to IPC$ share succeeds subsequently.
-
-You are authenticating as user jr when using smbclient but as user
-anonymous when using cifs client.  I think that makes a difference
-during tree connect.
+>>>> changed upon saving, regardless whether it has actually changed or
+>>>> not.
+>>>>
+>>>> I reported this also to the vim maintainer who told me, there he
+>>>> doesn't know of a similar problem with samba. Ergo it's probably a
+>>>> problem with cifs.
+>>>> I work on a daily basis with mentioned setup, so I would be vary g=
+lad
+>>>> to help resolve it.
+>>>>
+>>>> mount.cifs -v gives 4.5, I use kubuntu 11.04 and vim 7.2
+>>>>
+>>>
+>>> Unfortunately, this sort of report doesn't help us to help you very
+>>> much. I have no idea what vim is actually complaining about when it
+>>> says that the file has changed.
+>>>
+>>> As it's a kernel filesystem, it primarily deals with userspace code=
+ via
+>>> system calls. If you can phrase your problem in that context then
+>>> that would help. We'd need to know what vim is actually looking at =
+to
+>>> detect that the file has changed. Is it the mtime?
+>>>
+>>> --
+>>> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cif=
+s" in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.=
+html
+>>>
+>>
+>> yes, that would be useful. I just tried with vim 7.2.22, cifs versio=
+n 1.76
+>> against a Windows 2003 server and after two minutes of opening a fil=
+e
+>> and while closing, no errors or messages.
+>>
+>> What is the exact error message by vim? =C2=A0And how long is "somet=
+ime"?
+>> A trace data (strace, wireshark, tcpdump) obtained while
+>> encountering/recreating the problem would help.
