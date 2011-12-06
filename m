@@ -1,20 +1,60 @@
-From: "Larry Johnson" <lljj25-GgIMwil6s/8+LmFmA5utRUnX1fCMXBoTeUgtzdfzOuqWMoqzzOqGTLNAH6kLmebB@public.gmane.org>
-Subject: Strictly for you
-Date: Tue, 6 Dec 2011 12:57:56 -0000
-Message-ID: <1RXuan-0jdICu0@fwd09.t-online.de>
-Reply-To: <lajohnson3-oOUosDVPyJ8S+FvcfC7Uqw@public.gmane.org>
+From: "Rafael J. Wysocki" <rjw-KKrjLPT3xs0@public.gmane.org>
+Subject: Re: CIFS mount: 3.2.0-rc3 suspend crash
+Date: Tue, 6 Dec 2011 22:33:50 +0100
+Message-ID: <201112062233.50317.rjw@sisk.pl>
+References: <4ED56C12.1040708@gmail.com> <4ED5C047.6040500@linux.vnet.ibm.com> <20111130062502.68d9db59@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-To: unlisted-recipients:; (no To-header on input)
+Cc: "Srivatsa S. Bhat" <srivatsa.bhat-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>,
+	Woody Suwalski <terraluna977-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Linux PM mailing list <linux-pm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Tejun Heo <tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>,
+	Belisko Marek <marek.belisko-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20111130062502.68d9db59-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-My name is larry Johnson, Director of Inspection here in Atlanta airport Georgia USA. During our investigation i discovered two consignment with your name tagged of them. when scanned it revealed an undisclosed sum of money in a Metal Trunk Box weighing approximately 110kg each. I want to use my good office to bring them to you for mutual benefit. only on the condition that we will share it 50% for 50% for me.
+On Wednesday, November 30, 2011, Jeff Layton wrote:
+> On Wed, 30 Nov 2011 11:03:59 +0530
+> "Srivatsa S. Bhat" <srivatsa.bhat-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org> wrote:
 
-Get back to me now with your full name, address and direct telephone numbers on my private emial: ljohnsonus-oOUosDVPyJ8S+FvcfC7Uqw@public.gmane.org as soon as i hear from you, i will forward all the details of the delivery to you including the time frame.
+[...]
+> 
+> cifs: attempt to freeze while looping on a receive attempt
+> 
+> In the recent overhaul of the demultiplex thread receive path, we
+> neglected to ensure that we attempt to freeze on each pass through the
+> loop.
+> 
+> Reported-by: Woody Suwalski <terraluna977-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-Larry Johnson
-404-6477526
+I suppose this patch is going to go through the CIFS tree?
+
+Rafael
+
+
+> ---
+>  fs/cifs/connect.c |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+> 
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index bf82f88..d166e3a 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -441,6 +441,8 @@ cifs_readv_from_socket(struct TCP_Server_Info *server, struct kvec *iov_orig,
+>  	smb_msg.msg_controllen = 0;
+>  
+>  	for (total_read = 0; to_read; total_read += length, to_read -= length) {
+> +		try_to_freeze();
+> +
+>  		if (server_unresponsive(server)) {
+>  			total_read = -EAGAIN;
+>  			break;
+> 
