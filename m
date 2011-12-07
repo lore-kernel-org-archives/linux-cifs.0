@@ -1,52 +1,58 @@
-From: "Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com>
-Subject: Re: CIFS mount: 3.2.0-rc3 suspend crash
-Date: Wed, 07 Dec 2011 09:15:35 +0530
-Message-ID: <4EDEE15F.2000107@linux.vnet.ibm.com>
-References: <4ED56C12.1040708@gmail.com>	<4ED5C047.6040500@linux.vnet.ibm.com> <20111130062502.68d9db59@tlielax.poochiereds.net> <201112062233.50317.rjw@sisk.pl> <20111206163810.24663e3f@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	Woody Suwalski <terraluna977@gmail.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Linux PM mailing list <linux-pm@vger.kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Belisko Marek <marek.belisko@gmail.com>,
-	linux-cifs@vger.kernel.org, smfrench@gmail.com
-To: Jeff Layton <jlayton@redhat.com>
+From: Greg KH <gregkh@suse.de>
+Subject: [21/27] cifs: fix cifs stable patch cifs-fix-oplock-break-handling-try-2.patch
+Date: Wed, 07 Dec 2011 08:54:54 -0800
+Message-ID: <20111207165602.151282904@clark.kroah.org>
+References: <20111207165611.GA19872@kroah.com>
+Cc: <torvalds@linux-foundation.org>, <akpm@linux-foundation.org>,
+	<alan@lxorguk.ukuu.org.uk>, Pavel Shilovsky <piastryyy@gmail.com>,
+	Steve French <smfrench@gmail.com>,
+	linux-cifs <linux-cifs@vger.kernel.org>,
+	Steve French <sfrench@us.ibm.com>,
+	Pavel Shilovsky <piastry@etersoft.ru>,
+	Suresh Jayaraman <sjayaraman@suse.com>
+To: <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20111206163810.24663e3f@tlielax.poochiereds.net>
+In-Reply-To: <20111207165611.GA19872@kroah.com>
 Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On 12/07/2011 03:08 AM, Jeff Layton wrote:
+2.6.32-longterm review patch.  If anyone has any objections, please let me know.
 
-> On Tue, 6 Dec 2011 22:33:50 +0100
-> "Rafael J. Wysocki" <rjw@sisk.pl> wrote:
-> 
->> On Wednesday, November 30, 2011, Jeff Layton wrote:
->>> On Wed, 30 Nov 2011 11:03:59 +0530
->>> "Srivatsa S. Bhat" <srivatsa.bhat@linux.vnet.ibm.com> wrote:
->>
->> [...]
->>>
->>> cifs: attempt to freeze while looping on a receive attempt
->>>
->>> In the recent overhaul of the demultiplex thread receive path, we
->>> neglected to ensure that we attempt to freeze on each pass through the
->>> loop.
->>>
->>> Reported-by: Woody Suwalski <terraluna977@gmail.com>
->>> Signed-off-by: Jeff Layton <jlayton@redhat.com>
->>
->> I suppose this patch is going to go through the CIFS tree?
->>
-> 
+------------------
+
+From: Suresh Jayaraman <sjayaraman@suse.com>
+
+The stable release 2.6.32.32 added the upstream commit
+12fed00de963433128b5366a21a55808fab2f756. However, one of the hunks of
+the original patch seems missing from the stable backport which can be
+found here:
+   http://permalink.gmane.org/gmane.linux.kernel.stable/5676
+
+This hunk corresponds to the change in is_valid_oplock_break() at
+fs/cifs/misc.c.
+
+This patch backports the missing hunk and is against
+linux-2.6.32.y stable kernel.
 
 
-Jeff, thanks for the patch and for solving the freezing problem!
+Cc: Steve French <sfrench@us.ibm.com>
+Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
+Signed-off-by: Suresh Jayaraman <sjayaraman@suse.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@suse.de>
 
-Reviewed-by: Srivatsa S. Bhat <srivatsa.bhat@linux.vnet.ibm.com>
+---
+ fs/cifs/misc.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards,
-Srivatsa S. Bhat
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -584,6 +584,9 @@ is_valid_oplock_break(struct smb_hdr *bu
+ 				pCifsInode->clientCanCacheAll = false;
+ 				if (pSMB->OplockLevel == 0)
+ 					pCifsInode->clientCanCacheRead = false;
++				else if (pSMB->OplockLevel)
++					pCifsInode->clientCanCacheRead = true;
++
+ 				rc = slow_work_enqueue(&netfile->oplock_break);
+ 				if (rc) {
+ 					cERROR(1, ("failed to enqueue oplock "
