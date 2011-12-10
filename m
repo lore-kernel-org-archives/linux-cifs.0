@@ -1,68 +1,107 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] contrib: add a set of sample /etc/request-key.d files
-Date: Fri, 9 Dec 2011 22:00:31 -0500
-Message-ID: <20111209220031.725d6510@tlielax.poochiereds.net>
-References: <1323484623-15619-1-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+Subject: [PATCH v2] contrib: add a set of sample /etc/request-key.d files
+Date: Sat, 10 Dec 2011 06:49:59 -0500
+Message-ID: <1323517799-22756-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1323484623-15619-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBGcmks
-ICA5IERlYyAyMDExIDIxOjM3OjAzIC0wNTAwDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
-cmc+IHdyb3RlOg0KDQo+IEFkZCBhIGNvbnRyaWIgZGlyZWN0b3J5LCBhIHNldCBvZiBzYW1wbGUg
-L2V0Yy9yZXF1ZXN0LWtleS5kIGZpbGVzIGFuZA0KPiBhIFJFQURNRSB0aGF0IGV4cGxhaW5zIHdo
-YXQgdGhleSdyZSBmb3IuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRv
-bkBzYW1iYS5vcmc+DQo+IC0tLQ0KPiAgY29udHJpYi9yZXF1ZXN0LWtleS5kL1JFQURNRSAgICAg
-ICAgICAgfCAgICA3ICsrKysrKysNCj4gIGNvbnRyaWIvcmVxdWVzdC1rZXkuZC9jaWZzLmlkbWFw
-ZC5jb25mIHwgICAgMSArDQo+ICBjb250cmliL3JlcXVlc3Qta2V5LmQvY2lmcy5zcG5lZ28uY29u
-ZiB8ICAgIDEgKw0KPiAgMyBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMoKyksIDAgZGVsZXRp
-b25zKC0pDQo+ICBjcmVhdGUgbW9kZSAxMDA2NDQgY29udHJpYi9SRUFETUUNCj4gIGNyZWF0ZSBt
-b2RlIDEwMDY0NCBjb250cmliL3JlcXVlc3Qta2V5LmQvUkVBRE1FDQo+ICBjcmVhdGUgbW9kZSAx
-MDA2NDQgY29udHJpYi9yZXF1ZXN0LWtleS5kL2NpZnMuaWRtYXBkLmNvbmYNCj4gIGNyZWF0ZSBt
-b2RlIDEwMDY0NCBjb250cmliL3JlcXVlc3Qta2V5LmQvY2lmcy5zcG5lZ28uY29uZg0KPiANCj4g
-ZGlmZiAtLWdpdCBhL2NvbnRyaWIvUkVBRE1FIGIvY29udHJpYi9SRUFETUUNCj4gbmV3IGZpbGUg
-bW9kZSAxMDA2NDQNCj4gaW5kZXggMDAwMDAwMC4uZTY5ZGUyOQ0KPiBkaWZmIC0tZ2l0IGEvY29u
-dHJpYi9yZXF1ZXN0LWtleS5kL1JFQURNRSBiL2NvbnRyaWIvcmVxdWVzdC1rZXkuZC9SRUFETUUN
-Cj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQNCj4gaW5kZXggMDAwMDAwMC4uYjYwNWRhNw0KPiAtLS0g
-L2Rldi9udWxsDQo+ICsrKyBiL2NvbnRyaWIvcmVxdWVzdC1rZXkuZC9SRUFETUUNCj4gQEAgLTAs
-MCArMSw3IEBADQo+ICtBcyBvZiB2ZXJzaW9uIDEuNS41LCBwcmlvciB0byBvcGVuaW5nIC9ldGMv
-cmVxdWVzdC1rZXkuY29uZiwgdGhlDQo+ICtyZXF1ZXN0LWtleSB1dGlsaXR5IHdpbGwgbG9vayBm
-aXJzdCBpbiAvZXRjL3JlcXVlc3Qta2V5LmQgZm9yIGEgZmlsZSBvZg0KPiArdGhlIGtleSB0eXBl
-IG5hbWUgcGx1cyAiLmNvbmYiLiBUaGVzZSBmaWxlcyBhcmUgZXhhbXBsZSBjb25maWcgZmlsZXMN
-Cj4gK3RoYXQgZGlzdHJvIHBhY2thZ2VycyBjYW4gdXNlIHRvIGhhdmUgcmVxdWVzdC1rZXkgYXV0
-b2NvbmZpZ3VyZWQgdG8NCj4gK3VzZSB0aGUgY2lmcyB1dGlsaXRpZXMgdGhhdCBhcmUgaW5zdGFs
-bGVkLiBUeXBpY2FsbHksIGRpc3RybyBwYWNrYWdlcnMNCj4gK3dpbGwgd2FudCB0byBkcm9wIHRo
-ZXNlIGludG8gL2V0Yy9yZXF1ZXN0LWtleS5kLg0KPiArDQo+IGRpZmYgLS1naXQgYS9jb250cmli
-L3JlcXVlc3Qta2V5LmQvY2lmcy5pZG1hcGQuY29uZiBiL2NvbnRyaWIvcmVxdWVzdC1rZXkuZC9j
-aWZzLmlkbWFwZC5jb25mDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAu
-Ljg0ZDNkNWUNCj4gLS0tIC9kZXYvbnVsbA0KPiArKysgYi9jb250cmliL3JlcXVlc3Qta2V5LmQv
-Y2lmcy5pZG1hcGQuY29uZg0KCQkJXl5eXl5eXl5eXl5eXl5eXl5eXl5eXl5eXgkNCk9vcHMsIGZp
-bGVuYW1lIGhlcmUgaXMgd3JvbmcuIEknbGwgcGxhbiB0byBmaXggdGhhdCB3L28gcmVwb3N0aW5n
-DQp1bmxlc3MgYW55b25lIGVsc2UgaGFzIGNvbW1lbnRzLg0KDQo+IEBAIC0wLDAgKzEgQEANCj4g
-K2NyZWF0ZSAgY2lmcy5pZG1hcCAgICAqICogL3Vzci9zYmluL2NpZnMuaWRtYXAgJWsNCj4gZGlm
-ZiAtLWdpdCBhL2NvbnRyaWIvcmVxdWVzdC1rZXkuZC9jaWZzLnNwbmVnby5jb25mIGIvY29udHJp
-Yi9yZXF1ZXN0LWtleS5kL2NpZnMuc3BuZWdvLmNvbmYNCj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQN
-Cj4gaW5kZXggMDAwMDAwMC4uYTk0YWZkOA0KPiAtLS0gL2Rldi9udWxsDQo+ICsrKyBiL2NvbnRy
-aWIvcmVxdWVzdC1rZXkuZC9jaWZzLnNwbmVnby5jb25mDQo+IEBAIC0wLDAgKzEgQEANCj4gK2Ny
-ZWF0ZSAgY2lmcy5zcG5lZ28gICAgKiAqIC91c3Ivc2Jpbi9jaWZzLnVwY2FsbCAlaw0KDQoNCi0g
-LS0gDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQotLS0tLUJFR0lOIFBHUCBTSUdO
-QVRVUkUtLS0tLQ0KVmVyc2lvbjogR251UEcgdjIuMC4xOCAoR05VL0xpbnV4KQ0KDQppUUljQkFF
-QkFnQUdCUUpPNHN0UEFBb0pFQUFPYUVFWlZvSVZBdWdRQUphcEh4UFhBS1dDMGFrREFnOFA0ejZw
-DQphdHR5Rk8rUkw4eGdERHBuWTFzRWJzK3g5bjF2c3M0dXNWb1Z0a3NBSVM5UFk4d3BQTnkyZStQ
-bEJISjkzM1hSDQp4Wi9HS2hjS0dRaTkvSDlQblh0WUxrakpFQmxjd0lVekZpWmJZZlBrem1CeU00
-d2ZaeXNkSmxxYU1sYmZSVjJwDQpkY1d0RDkzSVFwMDJ6cGZ2amtIeUh2VGs0RE1DdzhUY01CWUE0
-QjY0aEsxamxZWVBIVmNtUERrSVltYnU4RnBKDQp1ME1ST0x3RGhXWW9XQTNUaGdKQ2VySWpvemhv
-MzRvaVZQMEkwSnc3TFd0ZnRqUWJGSGFSS2JRbnVscnd3SkV4DQpPayttUExYRG5WTjNseWtjUGFx
-a3JCbUN2YmFkKy8wSmlXWDJHMG14RnpIcDkzazBNVHlERmxMdHpkNkRNMDFsDQo0SGluVEtaQVho
-bExhRjRvamRPRjhlUFVaWWJUTmlJYXNsTzVYdmJ4WWlTZzYwa0lwREw0MkhGbGZxcHc4MEdtDQpt
-NFpsS1ZJa2tDSjNzUk04S3BGalhDZFh5RStNYVlJYVJjeHRCTS9EaXdlLy9CWHI2NEVHU1Q3bHBq
-QTBqdG5TDQo3eEt2eFZ0MjZiVXpwSkRwMUFMVmdnUFcyZHphNUphMm0yeWNFbTRsdUFNWSs0SndV
-L3BvY1IreXRlNGt4SittDQpjZ1N2NzhmS2FLUkhGbVZHSW1JSW5EZU4rMC9rTjd5YXFWbktUM3l6
-SFVFZmVQaGU1SjJybFQ1ZHhFTUdHR2dMDQpRNEFjUlFyTFp3QzNQVW5UTGZIb0JiWktiZy9QazA4
-VGRiaTZJN05LUzZ1UWdJTXZUZVRiRU5NZCtaS2RzUWt5DQpkRjlNNi9MZ0NhQ3lkbUsvY0xuYw0K
-PS9KM2sNCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+Add a contrib directory, a set of sample /etc/request-key.d files and
+a README that explains what they're for. This version sets the path
+to the upcall programs based on the configure options.
+
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ Makefile.am                               |    2 ++
+ configure.ac                              |    2 +-
+ contrib/Makefile.am                       |    1 +
+ contrib/request-key.d/Makefile.am         |    9 +++++++++
+ contrib/request-key.d/README              |    7 +++++++
+ contrib/request-key.d/cifs.idmap.conf.in  |    1 +
+ contrib/request-key.d/cifs.spnego.conf.in |    1 +
+ 7 files changed, 22 insertions(+), 1 deletions(-)
+ create mode 100644 contrib/Makefile.am
+ create mode 100644 contrib/README
+ create mode 100644 contrib/request-key.d/Makefile.am
+ create mode 100644 contrib/request-key.d/README
+ create mode 100644 contrib/request-key.d/cifs.idmap.conf.in
+ create mode 100644 contrib/request-key.d/cifs.spnego.conf.in
+
+diff --git a/Makefile.am b/Makefile.am
+index 934ea6f..cb20442 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -69,3 +69,5 @@ clean-local-aclprogs:
+ if CONFIG_CIFSACL
+ 	rm -f getcifsacl.8 getcifsacl.8-t setcifsacl.8 setcifsacl.8-t
+ endif
++
++SUBDIRS = contrib
+diff --git a/configure.ac b/configure.ac
+index 474b3f4..8476f94 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4,7 +4,7 @@
+ AC_INIT([cifs-utils], [5.2.1], [cifs-utils-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org], [cifs-utils], [http://linux-cifs.samba.org/cifs-utils/])
+ AC_CONFIG_SRCDIR([replace.h])
+ AC_CONFIG_HEADERS([config.h])
+-AC_CONFIG_FILES([Makefile])
++AC_CONFIG_FILES([Makefile contrib/Makefile contrib/request-key.d/Makefile])
+ AC_CONFIG_MACRO_DIR(aclocal)
+ 
+ AM_INIT_AUTOMAKE
+diff --git a/contrib/Makefile.am b/contrib/Makefile.am
+new file mode 100644
+index 0000000..4d4916a
+--- /dev/null
++++ b/contrib/Makefile.am
+@@ -0,0 +1 @@
++SUBDIRS = request-key.d
+diff --git a/contrib/README b/contrib/README
+new file mode 100644
+index 0000000..e69de29
+diff --git a/contrib/request-key.d/Makefile.am b/contrib/request-key.d/Makefile.am
+new file mode 100644
+index 0000000..5bda10d
+--- /dev/null
++++ b/contrib/request-key.d/Makefile.am
+@@ -0,0 +1,9 @@
++noinst_DATA = cifs.idmap.conf cifs.spnego.conf
++cifs.idmap.conf: cifs.idmap.conf.in
++	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
++
++cifs.spnego.conf: cifs.spnego.conf.in
++	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
++
++clean-local:
++	rm -f cifs.idmap.conf cifs.spnego.conf
+diff --git a/contrib/request-key.d/README b/contrib/request-key.d/README
+new file mode 100644
+index 0000000..821f9ba
+--- /dev/null
++++ b/contrib/request-key.d/README
+@@ -0,0 +1,7 @@
++As of version 1.5.5, prior to opening /etc/request-key.conf, the
++request-key utility will look first in /etc/request-key.d for a file of
++the key type name plus ".conf". These files are example config files
++that distro packagers can use to have request-key autoconfigured to
++use the cifs utilities that are installed. Typically, distro packagers
++will want to drop the resulting .conf files into /etc/request-key.d.
++
+diff --git a/contrib/request-key.d/cifs.idmap.conf.in b/contrib/request-key.d/cifs.idmap.conf.in
+new file mode 100644
+index 0000000..a0e25f1
+--- /dev/null
++++ b/contrib/request-key.d/cifs.idmap.conf.in
+@@ -0,0 +1 @@
++create  cifs.idmap    * * @sbindir@/cifs.idmap %k
+diff --git a/contrib/request-key.d/cifs.spnego.conf.in b/contrib/request-key.d/cifs.spnego.conf.in
+new file mode 100644
+index 0000000..4ca47b0
+--- /dev/null
++++ b/contrib/request-key.d/cifs.spnego.conf.in
+@@ -0,0 +1 @@
++create  cifs.spnego    * * @sbindir@/cifs.upcall %k
+-- 
+1.7.7.3
