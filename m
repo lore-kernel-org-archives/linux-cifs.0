@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 07/16] cifscreds: remove user parameter from create_description
-Date: Sun, 11 Dec 2011 11:34:14 -0500
-Message-ID: <1323621263-14452-8-git-send-email-jlayton@samba.org>
+Subject: [PATCH 08/16] cifscreds: make username part of value instead of description
+Date: Sun, 11 Dec 2011 11:34:15 -0500
+Message-ID: <1323621263-14452-9-git-send-email-jlayton@samba.org>
 References: <1323621263-14452-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,86 +9,73 @@ In-Reply-To: <1323621263-14452-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The username should be part of the key payload and not part of
-the description. Also, prefix the address with an "a:" in the
-description. Eventually we'll also need a "domain" key variant.
+Change the payload to be "username:password". Since usernames can't
+contain ':', this is suitable delimiter. Also, create_description
+is just a sprintf now, so eliminate it.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifscreds.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+ cifscreds.c |   30 +++++++++++-------------------
+ 1 files changed, 11 insertions(+), 19 deletions(-)
 
 diff --git a/cifscreds.c b/cifscreds.c
-index a9181ef..a6cec98 100644
+index a6cec98..b6c1fb6 100644
 --- a/cifscreds.c
 +++ b/cifscreds.c
-@@ -85,19 +85,19 @@ static void usage(void)
- 
- /* create key's description string from given credentials */
- static char *
--create_description(const char *addr, const char *user, char *desc)
-+create_description(const char *addr, char *desc)
- {
- 	char *str_end;
- 	int str_len;
- 
--	sprintf(desc, "%s:%s:%s:", THIS_PROGRAM_NAME, addr, user);
-+	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
- 
- 	return desc;
+@@ -83,30 +83,17 @@ static void usage(void)
+ 	exit(EXIT_FAILURE);
  }
  
+-/* create key's description string from given credentials */
+-static char *
+-create_description(const char *addr, char *desc)
+-{
+-	char *str_end;
+-	int str_len;
+-
+-	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
+-
+-	return desc;
+-}
+-
  /* search a specific key in keyring */
  static key_serial_t
--key_search(const char *addr, const char *user)
-+key_search(const char *addr)
+ key_search(const char *addr)
  {
- 	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + \
- 		+ sizeof(THIS_PROGRAM_NAME) + 3];
-@@ -106,7 +106,7 @@ key_search(const char *addr, const char *user)
+-	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + \
+-		+ sizeof(THIS_PROGRAM_NAME) + 3];
++	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
+ 	key_serial_t key, *pk;
+ 	void *keylist;
  	char *buffer;
  	int count, dpos, n, ret;
  
--	create_description(addr, user, desc);
-+	create_description(addr, desc);
+-	create_description(addr, desc);
++	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
  
  	/* read the key payload data */
  	count = keyctl_read_alloc(DEST_KEYRING, &keylist);
-@@ -210,7 +210,7 @@ key_add(const char *addr, const char *user, const char *pass)
+@@ -208,12 +195,17 @@ key_search_all_out:
+ static key_serial_t
+ key_add(const char *addr, const char *user, const char *pass)
  {
- 	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + sizeof(THIS_PROGRAM_NAME) + 3];
+-	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + sizeof(THIS_PROGRAM_NAME) + 3];
++	int len;
++	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
++	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
++
++	/* set key description */
++	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
  
--	create_description(addr, user, desc);
-+	create_description(addr, desc);
+-	create_description(addr, desc);
++	/* set payload contents */
++	len = sprintf(val, "%s:%s", user, pass);
  
- 	return add_key("user", desc, pass, strnlen(pass, MOUNT_PASSWD_SIZE) + 1,
- 		DEST_KEYRING);
-@@ -251,7 +251,7 @@ static int cifscreds_add(int argc, char *argv[])
- 		*nextaddress++ = '\0';
+-	return add_key("user", desc, pass, strnlen(pass, MOUNT_PASSWD_SIZE) + 1,
+-		DEST_KEYRING);
++	return add_key("user", desc, val, len + 1, DEST_KEYRING);
+ }
  
- 	while (currentaddress) {
--		if (key_search(currentaddress, argv[3]) > 0) {
-+		if (key_search(currentaddress) > 0) {
- 			printf("You already have stashed credentials "
- 				"for %s (%s)\n", currentaddress, argv[2]);
- 			printf("If you want to update them use:\n");
-@@ -349,7 +349,7 @@ static int cifscreds_clear(int argc, char *argv[])
- 		*nextaddress++ = '\0';
- 
- 	while (currentaddress) {
--		key_serial_t key = key_search(currentaddress, argv[3]);
-+		key_serial_t key = key_search(currentaddress);
- 		if (key > 0) {
- 			if (keyctl(KEYCTL_UNLINK, key, DEST_KEYRING) < 0) {
- 				fprintf(stderr, "error: Removing key from "
-@@ -454,7 +454,7 @@ static int cifscreds_update(int argc, char *argv[])
- 		*nextaddress++ = '\0';
- 
- 	while (currentaddress) {
--		if (key_search(currentaddress, argv[3]) > 0) {
-+		if (key_search(currentaddress) > 0) {
- 			addrs[count] = currentaddress;
- 			count++;
- 		}
+ /* add command handler */
 -- 
 1.7.7.3
