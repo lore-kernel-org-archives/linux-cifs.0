@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 08/16] cifscreds: make username part of value instead of description
-Date: Sun, 11 Dec 2011 11:34:15 -0500
-Message-ID: <1323621263-14452-9-git-send-email-jlayton@samba.org>
+Subject: [PATCH 09/16] cifscreds: make usage use "return" and have callers return
+Date: Sun, 11 Dec 2011 11:34:16 -0500
+Message-ID: <1323621263-14452-10-git-send-email-jlayton@samba.org>
 References: <1323621263-14452-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,73 +9,101 @@ In-Reply-To: <1323621263-14452-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Change the payload to be "username:password". Since usernames can't
-contain ':', this is suitable delimiter. Also, create_description
-is just a sprintf now, so eliminate it.
+...banish the use of exit(), which may be helpful in the future in
+the event that we eventually move some of this code into a library.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifscreds.c |   30 +++++++++++-------------------
- 1 files changed, 11 insertions(+), 19 deletions(-)
+ cifscreds.c |   21 +++++++++++----------
+ 1 files changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/cifscreds.c b/cifscreds.c
-index a6cec98..b6c1fb6 100644
+index b6c1fb6..3ed15f2 100644
 --- a/cifscreds.c
 +++ b/cifscreds.c
-@@ -83,30 +83,17 @@ static void usage(void)
- 	exit(EXIT_FAILURE);
+@@ -70,7 +70,8 @@ struct command commands[] = {
+ };
+ 
+ /* display usage information */
+-static void usage(void)
++static int
++usage(void)
+ {
+ 	struct command *cmd;
+ 
+@@ -80,7 +81,7 @@ static void usage(void)
+ 			cmd->name, cmd->format);
+ 	fprintf(stderr, "\n");
+ 
+-	exit(EXIT_FAILURE);
++	return EXIT_FAILURE;
  }
  
--/* create key's description string from given credentials */
--static char *
--create_description(const char *addr, char *desc)
--{
--	char *str_end;
--	int str_len;
--
--	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
--
--	return desc;
--}
--
  /* search a specific key in keyring */
- static key_serial_t
- key_search(const char *addr)
- {
--	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + \
--		+ sizeof(THIS_PROGRAM_NAME) + 3];
-+	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
- 	key_serial_t key, *pk;
- 	void *keylist;
- 	char *buffer;
- 	int count, dpos, n, ret;
+@@ -217,7 +218,7 @@ static int cifscreds_add(int argc, char *argv[])
+ 	int ret;
  
--	create_description(addr, desc);
-+	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
+ 	if (argc != 4)
+-		usage();
++		return usage();
  
- 	/* read the key payload data */
- 	count = keyctl_read_alloc(DEST_KEYRING, &keylist);
-@@ -208,12 +195,17 @@ key_search_all_out:
- static key_serial_t
- key_add(const char *addr, const char *user, const char *pass)
- {
--	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + sizeof(THIS_PROGRAM_NAME) + 3];
-+	int len;
-+	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
-+	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
-+
-+	/* set key description */
-+	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
+ 	ret = resolve_host(argv[2], addrstr);
+ 	switch (ret) {
+@@ -312,7 +313,7 @@ static int cifscreds_clear(int argc, char *argv[])
+ 	int ret, count = 0, errors = 0;
  
--	create_description(addr, desc);
-+	/* set payload contents */
-+	len = sprintf(val, "%s:%s", user, pass);
+ 	if (argc != 4)
+-		usage();
++		return usage();
  
--	return add_key("user", desc, pass, strnlen(pass, MOUNT_PASSWD_SIZE) + 1,
--		DEST_KEYRING);
-+	return add_key("user", desc, val, len + 1, DEST_KEYRING);
+ 	ret = resolve_host(argv[2], addrstr);
+ 	switch (ret) {
+@@ -380,7 +381,7 @@ static int cifscreds_clearall(int argc, char *argv[] __attribute__ ((unused)))
+ 	int count = 0, errors = 0;
+ 
+ 	if (argc != 2)
+-		usage();
++		return usage();
+ 
+ 	/*
+ 	 * search for all program's credentials stashed in session keyring
+@@ -420,7 +421,7 @@ static int cifscreds_update(int argc, char *argv[])
+ 	int ret, id, count = 0;
+ 
+ 	if (argc != 4)
+-		usage();
++		return usage();
+ 
+ 	ret = resolve_host(argv[2], addrstr);
+ 	switch (ret) {
+@@ -491,7 +492,7 @@ int main(int argc, char **argv)
+ 		thisprogram = THIS_PROGRAM_NAME;
+ 
+ 	if (argc == 1)
+-		usage();
++		return usage();
+ 
+ 	/* find the best fit command */
+ 	best = NULL;
+@@ -510,7 +511,7 @@ int main(int argc, char **argv)
+ 		/* partial match */
+ 		if (best) {
+ 			fprintf(stderr, "Ambiguous command\n");
+-			exit(EXIT_FAILURE);
++			return EXIT_FAILURE;
+ 		}
+ 
+ 		best = cmd;
+@@ -518,8 +519,8 @@ int main(int argc, char **argv)
+ 
+ 	if (!best) {
+ 		fprintf(stderr, "Unknown command\n");
+-		exit(EXIT_FAILURE);
++		return EXIT_FAILURE;
+ 	}
+ 
+-	exit(best->action(argc, argv));
++	return best->action(argc, argv);
  }
- 
- /* add command handler */
 -- 
 1.7.7.3
