@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 13/16] cifscreds: make key_search use keyctl_search
-Date: Sun, 11 Dec 2011 11:34:20 -0500
-Message-ID: <1323621263-14452-14-git-send-email-jlayton@samba.org>
+Subject: [PATCH 14/16] cifscreds: loosen allowed characters in domain names
+Date: Sun, 11 Dec 2011 11:34:21 -0500
+Message-ID: <1323621263-14452-15-git-send-email-jlayton@samba.org>
 References: <1323621263-14452-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,86 +9,50 @@ In-Reply-To: <1323621263-14452-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...which is much more efficient than walking the keyring by hand.
+As Donald points out, NetBIOS domains are allowed more characters than
+the code currently allows. Change the test to one that checks for
+disallowed characters instead.
 
-Also, eliminate the "user" parameter since we don't want to search
-by username. Also must add "search" permission to the key as well.
+Also, I can't find anything that says that '@' is not allowed in a
+username. Might as well allow that too. Worst case, the server will
+reject the username.
 
+Reported-by: Donald R. Gray Jr <donald.r.gray-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifscreds.c |   50 +++-----------------------------------------------
- 1 files changed, 3 insertions(+), 47 deletions(-)
+ cifscreds.c |   13 ++++++++-----
+ 1 files changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/cifscreds.c b/cifscreds.c
-index 279517a..55279f7 100644
+index 55279f7..3d40540 100644
 --- a/cifscreds.c
 +++ b/cifscreds.c
-@@ -103,54 +103,10 @@ static key_serial_t
- key_search(const char *addr, char keytype)
- {
- 	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
--	key_serial_t key, *pk;
--	void *keylist;
--	char *buffer;
--	int count, dpos, n, ret;
+@@ -42,10 +42,13 @@
+ #define MOUNT_PASSWD_SIZE 128
+ #define MAX_DOMAIN_SIZE 64
  
- 	sprintf(desc, "%s:%c:%s", THIS_PROGRAM_NAME, keytype, addr);
+-/* allowed and disallowed characters for user and domain name */
+-#define USER_DISALLOWED_CHARS "\\/\"[]:|<>+=;,?*@"
+-#define DOMAIN_ALLOWED_CHARS "abcdefghijklmnopqrstuvwxyz" \
+-			     "ABCDEFGHIJKLMNOPQRSTUVWXYZ-."
++/*
++ * disallowed characters for user and domain names. See:
++ * http://technet.microsoft.com/en-us/library/bb726984.aspx
++ * http://support.microsoft.com/kb/909264
++ */
++#define USER_DISALLOWED_CHARS "\\/\"[]:|<>+=;,?*"
++#define DOMAIN_DISALLOWED_CHARS "\\/:*?\"<>|"
  
--	/* read the key payload data */
--	count = keyctl_read_alloc(DEST_KEYRING, &keylist);
--	if (count < 0)
--		return 0;
--
--	count /= sizeof(key_serial_t);
--
--	if (count == 0) {
--		ret = 0;
--		goto key_search_out;
--	}
--
--	/* list the keys in the keyring */
--	pk = keylist;
--	do {
--		key = *pk++;
--
--		ret = keyctl_describe_alloc(key, &buffer);
--		if (ret < 0)
--			continue;
--
--		n = sscanf(buffer, "%*[^;];%*d;%*d;%*x;%n", &dpos);
--		if (n) {
--			free(buffer);
--			continue;
--		}
--
--		if (!strcmp(buffer + dpos, desc)) {
--			ret = key;
--			free(buffer);
--			goto key_search_out;
--		}
--		free(buffer);
--
--	} while (--count);
--
--	ret = 0;
--
--key_search_out:
--	free(keylist);
--	return ret;
-+	return keyctl_search(DEST_KEYRING, "user", desc, 0);
- }
+ /* destination keyring */
+ #define DEST_KEYRING KEY_SPEC_USER_KEYRING
+@@ -523,7 +526,7 @@ int main(int argc, char **argv)
+ 		arg.host = argv[optind + 1];
  
- /* search all program's keys in keyring */
-@@ -298,8 +254,8 @@ static int cifscreds_add(struct cmdarg *arg)
- 				currentaddress);
- 		} else {
- 			if (keyctl(KEYCTL_SETPERM, key, KEY_POS_VIEW | \
--				KEY_POS_WRITE | KEY_USR_VIEW | \
--				KEY_USR_WRITE) < 0
-+				KEY_POS_WRITE | KEY_POS_SEARCH | KEY_USR_VIEW | \
-+				KEY_USR_WRITE | KEY_USR_SEARCH) < 0
- 			) {
- 				fprintf(stderr, "error: Setting permissons "
- 					"on key, attempt to delete...\n");
+ 	if (arg.host && arg.keytype == 'd' &&
+-	    strspn(arg.host, DOMAIN_ALLOWED_CHARS) != strnlen(arg.host, MAX_DOMAIN_SIZE)) {
++	    strpbrk(arg.host, DOMAIN_DISALLOWED_CHARS)) {
+ 		fprintf(stderr, "error: Domain name contains invalid characters\n");
+ 		return EXIT_FAILURE;
+ 	}
 -- 
 1.7.7.3
