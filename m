@@ -1,107 +1,79 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2] contrib: add a set of sample /etc/request-key.d files
-Date: Sat, 10 Dec 2011 06:49:59 -0500
-Message-ID: <1323517799-22756-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH 00/16] cifscreds: cleanup and overhaul of cifscreds utility
+Date: Sun, 11 Dec 2011 11:34:07 -0500
+Message-ID: <1323621263-14452-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add a contrib directory, a set of sample /etc/request-key.d files and
-a README that explains what they're for. This version sets the path
-to the upcall programs based on the configure options.
+This patchset is a cleanup and overhaul of the cifscreds utility that
+lives in the cifs-utils tree today. Igor Druzhinindid a wonderful job on
+this when he did the original code a couple of years ago, but I did a
+rather poor job at the time of communicating what we actually need for
+this tool to do. Mea culpa...
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- Makefile.am                               |    2 ++
- configure.ac                              |    2 +-
- contrib/Makefile.am                       |    1 +
- contrib/request-key.d/Makefile.am         |    9 +++++++++
- contrib/request-key.d/README              |    7 +++++++
- contrib/request-key.d/cifs.idmap.conf.in  |    1 +
- contrib/request-key.d/cifs.spnego.conf.in |    1 +
- 7 files changed, 22 insertions(+), 1 deletions(-)
- create mode 100644 contrib/Makefile.am
- create mode 100644 contrib/README
- create mode 100644 contrib/request-key.d/Makefile.am
- create mode 100644 contrib/request-key.d/README
- create mode 100644 contrib/request-key.d/cifs.idmap.conf.in
- create mode 100644 contrib/request-key.d/cifs.spnego.conf.in
+This patch is a first pass at morphing it into a tool that's more like
+what we need. I believe with this, I'll be able to roll some kernel
+patches that can use the stashed key for establishing sessions.
 
-diff --git a/Makefile.am b/Makefile.am
-index 934ea6f..cb20442 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -69,3 +69,5 @@ clean-local-aclprogs:
- if CONFIG_CIFSACL
- 	rm -f getcifsacl.8 getcifsacl.8-t setcifsacl.8 setcifsacl.8-t
- endif
-+
-+SUBDIRS = contrib
-diff --git a/configure.ac b/configure.ac
-index 474b3f4..8476f94 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -4,7 +4,7 @@
- AC_INIT([cifs-utils], [5.2.1], [cifs-utils-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org], [cifs-utils], [http://linux-cifs.samba.org/cifs-utils/])
- AC_CONFIG_SRCDIR([replace.h])
- AC_CONFIG_HEADERS([config.h])
--AC_CONFIG_FILES([Makefile])
-+AC_CONFIG_FILES([Makefile contrib/Makefile contrib/request-key.d/Makefile])
- AC_CONFIG_MACRO_DIR(aclocal)
- 
- AM_INIT_AUTOMAKE
-diff --git a/contrib/Makefile.am b/contrib/Makefile.am
-new file mode 100644
-index 0000000..4d4916a
---- /dev/null
-+++ b/contrib/Makefile.am
-@@ -0,0 +1 @@
-+SUBDIRS = request-key.d
-diff --git a/contrib/README b/contrib/README
-new file mode 100644
-index 0000000..e69de29
-diff --git a/contrib/request-key.d/Makefile.am b/contrib/request-key.d/Makefile.am
-new file mode 100644
-index 0000000..5bda10d
---- /dev/null
-+++ b/contrib/request-key.d/Makefile.am
-@@ -0,0 +1,9 @@
-+noinst_DATA = cifs.idmap.conf cifs.spnego.conf
-+cifs.idmap.conf: cifs.idmap.conf.in
-+	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
-+
-+cifs.spnego.conf: cifs.spnego.conf.in
-+	$(SED) 's,[@]sbindir@,$(sbindir),' $(srcdir)/$@.in > $@-t && mv $@-t $@
-+
-+clean-local:
-+	rm -f cifs.idmap.conf cifs.spnego.conf
-diff --git a/contrib/request-key.d/README b/contrib/request-key.d/README
-new file mode 100644
-index 0000000..821f9ba
---- /dev/null
-+++ b/contrib/request-key.d/README
-@@ -0,0 +1,7 @@
-+As of version 1.5.5, prior to opening /etc/request-key.conf, the
-+request-key utility will look first in /etc/request-key.d for a file of
-+the key type name plus ".conf". These files are example config files
-+that distro packagers can use to have request-key autoconfigured to
-+use the cifs utilities that are installed. Typically, distro packagers
-+will want to drop the resulting .conf files into /etc/request-key.d.
-+
-diff --git a/contrib/request-key.d/cifs.idmap.conf.in b/contrib/request-key.d/cifs.idmap.conf.in
-new file mode 100644
-index 0000000..a0e25f1
---- /dev/null
-+++ b/contrib/request-key.d/cifs.idmap.conf.in
-@@ -0,0 +1 @@
-+create  cifs.idmap    * * @sbindir@/cifs.idmap %k
-diff --git a/contrib/request-key.d/cifs.spnego.conf.in b/contrib/request-key.d/cifs.spnego.conf.in
-new file mode 100644
-index 0000000..4ca47b0
---- /dev/null
-+++ b/contrib/request-key.d/cifs.spnego.conf.in
-@@ -0,0 +1 @@
-+create  cifs.spnego    * * @sbindir@/cifs.upcall %k
+The idea here is that we want to be able to allow users to stash their
+NTLM credentials in the kernel, so that it's possible to establish a
+session on the fly when that user walks into a multiuser mount. In
+
+To that end, there are a number of changes that I'm proposing:
+
+- a number of structural cleanups that may make this code more amenable
+  to conversion to a library later and that make it easier to maintain
+
+- hang these off of the session keyring instead of the uid keyring. I
+  believe this will make this more friendly for use in containers and
+  may make it harder to compromise the user's password.
+
+- instead of having the domain as an optional parameter, allow the user
+  to specify it in lieu of the hostname. During session setup, the kernel can
+  first look for a host-specific key, and then fall back to looking for
+  one that matches the domain if a host key isn't found.
+
+There are still some things that need to be done to make this really
+usable:
+
+- a manpage
+
+- kernel patches that can make these keys usable
+
+- a better way to protect the key payload from prying eyes. I'm
+  discussing this with David Howells. We may need to consider a new
+  kernel key type for this, but I'd like to avoid that if possible.
+
+Comments and suggestions welcome...
+
+Jeff Layton (16):
+  util: move getusername to util.c
+  cifs: add unused attribute to argv parm in cifscreds_clearall
+  cifscreds: eliminate domain parm from create_description
+  cifscreds: eliminate domain parm from key_search
+  cifscreds: remove domain parm from key_add
+  cifscreds: eliminate domain parm from most commands
+  cifscreds: remove user parameter from create_description
+  cifscreds: make username part of value instead of description
+  cifscreds: make usage use "return" and have callers return
+  cifscreds: move option parsing into main()
+  cifscreds: make username parameter optional
+  cifscreds: add --domain flag
+  cifscreds: make key_search use keyctl_search
+  cifscreds: loosen allowed characters in domain names
+  cifscreds: further restrict permissions on keys
+  cifscreds: use the session keyring
+
+ cifscreds.c  |  303 ++++++++++++++++++++++++---------------------------------
+ mount.cifs.c |   11 --
+ util.c       |   13 +++
+ util.h       |    1 +
+ 4 files changed, 142 insertions(+), 186 deletions(-)
+
 -- 
 1.7.7.3
