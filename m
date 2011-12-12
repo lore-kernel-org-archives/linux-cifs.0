@@ -1,40 +1,80 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 16/16] cifscreds: use the session keyring
-Date: Sun, 11 Dec 2011 11:34:23 -0500
-Message-ID: <1323621263-14452-17-git-send-email-jlayton@samba.org>
-References: <1323621263-14452-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: roel <roel.kluin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: ceph, cifs, nfs, fuse: boolean and / or confusion
+Date: Tue, 13 Dec 2011 00:06:36 +0100
+Message-ID: <4EE688FC.8090606@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, sage-BnTBU8nroG7k1uMJSBkQmQ@public.gmane.org,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>,
+	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1323621263-14452-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This seems like a reasonable change, but I'm willing to listen to
-arguments to the contrary...
+The test not SEEK_CUR or not SEEK_SET always evaluates to true
 
-cifscreds currently hangs the keys off of the uid keyring. It seems
-more appropriate though that we require that each session have its
-own set. This might be particularly important in a containerized
-situation. If a user authenticates in one container, then we probably
-don't want to allow a user in another to "borrow" those creds.
-
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Roel Kluin <roel.kluin-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- cifscreds.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ fs/ceph/file.c   |    2 +-
+ fs/cifs/cifsfs.c |    2 +-
+ fs/fuse/file.c   |    2 +-
+ fs/nfs/file.c    |    2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/cifscreds.c b/cifscreds.c
-index 1e9bb6e..25dfdf3 100644
---- a/cifscreds.c
-+++ b/cifscreds.c
-@@ -51,7 +51,7 @@
- #define DOMAIN_DISALLOWED_CHARS "\\/:*?\"<>|"
+diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+index ce549d3..4d61a66 100644
+--- a/fs/ceph/file.c
++++ b/fs/ceph/file.c
+@@ -797,7 +797,7 @@ static loff_t ceph_llseek(struct file *file, loff_t offset, int origin)
  
- /* destination keyring */
--#define DEST_KEYRING KEY_SPEC_USER_KEYRING
-+#define DEST_KEYRING KEY_SPEC_SESSION_KEYRING
+ 	mutex_lock(&inode->i_mutex);
+ 	__ceph_do_pending_vmtruncate(inode);
+-	if (origin != SEEK_CUR || origin != SEEK_SET) {
++	if (origin != SEEK_CUR && origin != SEEK_SET) {
+ 		ret = ceph_do_getattr(inode, CEPH_STAT_CAP_SIZE);
+ 		if (ret < 0) {
+ 			offset = ret;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 8f1fe32..f8351c2 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -703,7 +703,7 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+ 	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
+ 	 * the cached file length
+ 	 */
+-	if (origin != SEEK_SET || origin != SEEK_CUR) {
++	if (origin != SEEK_SET && origin != SEEK_CUR) {
+ 		int rc;
+ 		struct inode *inode = file->f_path.dentry->d_inode;
  
- struct cmdarg {
- 	char		*host;
--- 
-1.7.7.3
+diff --git a/fs/fuse/file.c b/fs/fuse/file.c
+index 594f07a..19029e9 100644
+--- a/fs/fuse/file.c
++++ b/fs/fuse/file.c
+@@ -1556,7 +1556,7 @@ static loff_t fuse_file_llseek(struct file *file, loff_t offset, int origin)
+ 	struct inode *inode = file->f_path.dentry->d_inode;
+ 
+ 	mutex_lock(&inode->i_mutex);
+-	if (origin != SEEK_CUR || origin != SEEK_SET) {
++	if (origin != SEEK_CUR && origin != SEEK_SET) {
+ 		retval = fuse_update_attributes(inode, NULL, file, NULL);
+ 		if (retval)
+ 			goto exit;
+diff --git a/fs/nfs/file.c b/fs/nfs/file.c
+index eca56d4..606ef0f 100644
+--- a/fs/nfs/file.c
++++ b/fs/nfs/file.c
+@@ -147,7 +147,7 @@ static loff_t nfs_file_llseek(struct file *filp, loff_t offset, int origin)
+ 	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
+ 	 * the cached file length
+ 	 */
+-	if (origin != SEEK_SET || origin != SEEK_CUR) {
++	if (origin != SEEK_SET && origin != SEEK_CUR) {
+ 		struct inode *inode = filp->f_mapping->host;
+ 
+ 		int retval = nfs_revalidate_file_size(inode, filp);
