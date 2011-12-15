@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH v2 00/12] cifscreds: cleanup and overhaul of cifscreds utility
-Date: Thu, 15 Dec 2011 12:20:15 -0600
-Message-ID: <CADT32eKaX0Fd6iskcGtUTd0R5i+0SzMwAyjtubk-=RGZ6huB4w@mail.gmail.com>
+Date: Thu, 15 Dec 2011 12:32:46 -0600
+Message-ID: <CADT32eJ3vtbcDLmtNVEq0CNyrq-qZSark_xfv=xZfsFwSPM=6g@mail.gmail.com>
 References: <1323972736-15804-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -43,13 +43,6 @@ o
 r
 > NTLM credentials in the kernel, so that it's possible to establish a
 > session on the fly when that user walks into a multiuser mount.
-
-Jeff, is there an initial/earlier document that states exactly how
-a user can stash NTLM credentials?
-
-By NTLM credentials, it is meant that server/domain name/address
-and corrosponding password etc.?
-
 >
 > To that end, there are a number of changes that I'm proposing:
 >
@@ -106,3 +99,5 @@ for
  in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+
+Will there be a utility like smbpasswd as part of cifs-utils package?
