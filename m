@@ -1,49 +1,60 @@
-From: Casey <csease-YgS7x4LLi8k@public.gmane.org>
-Subject: cifs issue with Domain Based DFS share on Windows Server 2008 R2
-Date: Wed, 14 Dec 2011 21:38:09 +0000 (UTC)
-Message-ID: <loom.20111214T223547-440@post.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: cifs issue with Domain Based DFS share on Windows Server 2008
+ R2
+Date: Wed, 14 Dec 2011 20:58:03 -0500
+Message-ID: <20111214205803.4367866c@corrin.poochiereds.net>
+References: <loom.20111214T223547-440@post.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Casey <csease-YgS7x4LLi8k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <loom.20111214T223547-440-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
-
-I have been working on this for weeks and have exhausted all my resourc=
-es. I am
-hoping to get some help. We are having an issue connecting to domain ba=
-sed DFS
-shares on Windows 2008 R2 servers. It used to work when one of the DCs =
-were
-Windows 2003, but that DC has been decommissioned. I can get a browse t=
-hese
-shares using smbclient, but cifs is our preferred method of mounting wi=
-ndows
-shares. We can mount directly to the backend dfs servers, just not thro=
-ugh the
-Domain namespace.
-
-Here is some background information:
-
-Kernel =3D 2.6.32-131.12.1.el6.i686
-Samba version =3D 3.5.10-114.el6.i686
-mount.cifs version: 4.8.1
-cifs-utils and keyutils is installed with request-key.conf configured c=
-orrectly.
-Doing a Wireshark trace of the failed mount shows we are not getting re=
-ferrals.
-CIFS debug shows =E2=80=9CStatus code returned 0xc00000cc NT_STATUS_BAD=
-_NETWORK_NAME=E2=80=9D
-I have tried with all different sec protocols to no avail.
-
-Mount command we are using in fstab:
-                //<domain name>/<DFS root> /opt/test cifs
-rw,username=3D*****,password=3D*****,domain=3DNDGOV,dir_mode=3D0755,fil=
-e_mode=3D0644 0 0
-
-Thank you very much for your time!
-
-Casey
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBXZWQs
+IDE0IERlYyAyMDExIDIxOjM4OjA5ICswMDAwIChVVEMpDQpDYXNleSA8Y3NlYXNlQG5kLmdvdj4g
+d3JvdGU6DQoNCj4gSGVsbG8sDQo+IA0KPiBJIGhhdmUgYmVlbiB3b3JraW5nIG9uIHRoaXMgZm9y
+IHdlZWtzIGFuZCBoYXZlIGV4aGF1c3RlZCBhbGwgbXkgcmVzb3VyY2VzLiBJIGFtDQo+IGhvcGlu
+ZyB0byBnZXQgc29tZSBoZWxwLiBXZSBhcmUgaGF2aW5nIGFuIGlzc3VlIGNvbm5lY3RpbmcgdG8g
+ZG9tYWluIGJhc2VkIERGUw0KPiBzaGFyZXMgb24gV2luZG93cyAyMDA4IFIyIHNlcnZlcnMuIEl0
+IHVzZWQgdG8gd29yayB3aGVuIG9uZSBvZiB0aGUgRENzIHdlcmUNCj4gV2luZG93cyAyMDAzLCBi
+dXQgdGhhdCBEQyBoYXMgYmVlbiBkZWNvbW1pc3Npb25lZC4gSSBjYW4gZ2V0IGEgYnJvd3NlIHRo
+ZXNlDQo+IHNoYXJlcyB1c2luZyBzbWJjbGllbnQsIGJ1dCBjaWZzIGlzIG91ciBwcmVmZXJyZWQg
+bWV0aG9kIG9mIG1vdW50aW5nIHdpbmRvd3MNCj4gc2hhcmVzLiBXZSBjYW4gbW91bnQgZGlyZWN0
+bHkgdG8gdGhlIGJhY2tlbmQgZGZzIHNlcnZlcnMsIGp1c3Qgbm90IHRocm91Z2ggdGhlDQo+IERv
+bWFpbiBuYW1lc3BhY2UuDQo+IA0KPiBIZXJlIGlzIHNvbWUgYmFja2dyb3VuZCBpbmZvcm1hdGlv
+bjoNCj4gDQo+IEtlcm5lbCA9IDIuNi4zMi0xMzEuMTIuMS5lbDYuaTY4Ng0KPiBTYW1iYSB2ZXJz
+aW9uID0gMy41LjEwLTExNC5lbDYuaTY4Ng0KPiBtb3VudC5jaWZzIHZlcnNpb246IDQuOC4xDQo+
+IGNpZnMtdXRpbHMgYW5kIGtleXV0aWxzIGlzIGluc3RhbGxlZCB3aXRoIHJlcXVlc3Qta2V5LmNv
+bmYgY29uZmlndXJlZCBjb3JyZWN0bHkuDQo+IERvaW5nIGEgV2lyZXNoYXJrIHRyYWNlIG9mIHRo
+ZSBmYWlsZWQgbW91bnQgc2hvd3Mgd2UgYXJlIG5vdCBnZXR0aW5nIHJlZmVycmFscy4NCj4gQ0lG
+UyBkZWJ1ZyBzaG93cyDigJxTdGF0dXMgY29kZSByZXR1cm5lZCAweGMwMDAwMGNjIE5UX1NUQVRV
+U19CQURfTkVUV09SS19OQU1F4oCdDQo+IEkgaGF2ZSB0cmllZCB3aXRoIGFsbCBkaWZmZXJlbnQg
+c2VjIHByb3RvY29scyB0byBubyBhdmFpbC4NCj4gDQo+IE1vdW50IGNvbW1hbmQgd2UgYXJlIHVz
+aW5nIGluIGZzdGFiOg0KPiAgICAgICAgICAgICAgICAgLy88ZG9tYWluIG5hbWU+LzxERlMgcm9v
+dD4gL29wdC90ZXN0IGNpZnMNCj4gcncsdXNlcm5hbWU9KioqKioscGFzc3dvcmQ9KioqKiosZG9t
+YWluPU5ER09WLGRpcl9tb2RlPTA3NTUsZmlsZV9tb2RlPTA2NDQgMCAwDQo+IA0KPiBUaGFuayB5
+b3UgdmVyeSBtdWNoIGZvciB5b3VyIHRpbWUhDQo+IA0KDQpTb3VuZHMgc2ltaWxhciB0byB0aGUg
+cHJvYmxlbSB0aGF0IFNlYW4gRmlubmV5IGZpeGVkIGVhcmxpZXIgdGhpcyB5ZWFyLg0KWW91IHBy
+b2JhYmx5IG5lZWQgcGF0Y2hlcyB0aGUgcGF0Y2hlcyB0aGF0IHN0YXJ0IHdpdGggY29tbWl0IGRk
+NjEzOTQ1Lg0KSWYgeW91J3JlIHVzaW5nIFJIRUwsIHRoZW4geW91J3JlIHdlbGNvbWUgdG8gb3Bl
+biBhIHN1cHBvcnQgY2FzZSBhbmQNCmFzayBmb3IgdGhvc2UgdG8gYmUgYmFja3BvcnRlZC4NCg0K
+LSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJ
+R05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNC
+QUVCQWdBR0JRSk82VlEzQUFvSkVBQU9hRUVaVm9JVmZxa1AvM0FXb0pFNmJSZ2RVYmk3azloOWNJ
+Ni8NCnpMYWlUck4wT3FFSVhlQzFRSm9wdU0yenloSk5xU0w0Mjk5M1NQZ3V6YVYxNnYrSmpjQkZN
+VmtCa1VnbWFaYlMNCjVLTWE0aVM0RUp3UjVCVmdFdXgzQmtrRG9ycHFyWHlsaDFwbXhCcVN2NmdG
+K3JRRUpjKzFTUHhqbTg1T2RSVDMNCkVGM1BJb1pESmRIamw2L2l0M29XTCt5Y0tFN2Ricm9aNXZB
+WThwTGNvOU84UWx5QVkvVFVzRjVkckxQdDg1MGUNCnJsb0huR2VPM0VqS0hLOHZVNG4vZWZOSkZm
+dldJQWRxdHdrd2tvNmdNbXV5cHo0MEZqSGdiU0hjZDBpaW1WdWENCmN5cHR3Y2xiSW94U2QvYmkx
+WWtaUXdDcktDdnU5TXRjMjR1YUg3RnpmM0tOWGFETitMcUdPNFA2OG1zWlZoeFENCk0xRFhLd0dt
+MTJKbHg0eUN6NjZsUHdTS2tGUXF5UngxNkhYTHBNU3didzBvR1R1Y3RHejRtNzlvQVhkd2lMRXQN
+ClEwOEpJaHhIQWV4a1FsdkYydkZyQUxUeXBwb2pZMXFvWkRTck51czFKaHI5bkRkdjE4NFlGZXVs
+cjZzdkZnajgNCitRRGpmelNJb0ZXTmhYVk9yVmMvTlhDQWpJWGV4RmRUNUx5RE5TVUZmekgrQTNu
+bHpULzB0YTMvS3FuWDIxZXgNCmNrL05aN2l3cG1WVi9CWk14bENlOW5LcUlReFdkdnpKT2puMFV5
+N0JSelUzYnRBcGNIbkRsYllYWlc0dXcyeHMNCmdVdk9WQWdTcXV5S2hicUdFbFhTVTFnRTFLT1Rv
+NFVTY0ZxWmVpSzA1UFpqWW1kcGx2MHhxT213QkxBbWllTHYNClA5QjVHY0pCcGF5U3hPbTR2WlJN
+DQo9eEZSeA0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
