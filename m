@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 01/12] util: move getusername to util.c
-Date: Thu, 15 Dec 2011 13:12:05 -0500
-Message-ID: <1323972736-15804-2-git-send-email-jlayton@samba.org>
+Subject: [PATCH v2 05/12] cifscreds: make username part of value instead of description
+Date: Thu, 15 Dec 2011 13:12:09 -0500
+Message-ID: <1323972736-15804-6-git-send-email-jlayton@samba.org>
 References: <1323972736-15804-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,73 +9,73 @@ In-Reply-To: <1323972736-15804-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Change the payload to be "username:password". Since usernames can't
+contain ':', this is suitable delimiter. Also, create_description
+is just a sprintf now, so eliminate it.
+
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- mount.cifs.c |   11 -----------
- util.c       |   13 +++++++++++++
- util.h       |    1 +
- 3 files changed, 14 insertions(+), 11 deletions(-)
+ cifscreds.c |   30 +++++++++++-------------------
+ 1 files changed, 11 insertions(+), 19 deletions(-)
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 147f7fc..ced9f4e 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -361,17 +361,6 @@ static int set_password(struct parsed_mount_info *parsed_info, const char *src)
- 	return 0;
+diff --git a/cifscreds.c b/cifscreds.c
+index a6cec98..b6c1fb6 100644
+--- a/cifscreds.c
++++ b/cifscreds.c
+@@ -83,30 +83,17 @@ static void usage(void)
+ 	exit(EXIT_FAILURE);
  }
  
--/* caller frees username if necessary */
--static char *getusername(uid_t uid)
+-/* create key's description string from given credentials */
+-static char *
+-create_description(const char *addr, char *desc)
 -{
--	char *username = NULL;
--	struct passwd *password = getpwuid(uid);
+-	char *str_end;
+-	int str_len;
 -
--	if (password)
--		username = password->pw_name;
--	return username;
+-	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
+-
+-	return desc;
 -}
 -
- /*
-  * Parse a username string into parsed_mount_info fields. The format is:
-  *
-diff --git a/util.c b/util.c
-index 41c6784..80d5a80 100644
---- a/util.c
-+++ b/util.c
-@@ -24,6 +24,7 @@
+ /* search a specific key in keyring */
+ static key_serial_t
+ key_search(const char *addr)
+ {
+-	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + \
+-		+ sizeof(THIS_PROGRAM_NAME) + 3];
++	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
+ 	key_serial_t key, *pk;
+ 	void *keylist;
+ 	char *buffer;
+ 	int count, dpos, n, ret;
  
- #include <sys/types.h>
- #include <string.h>
-+#include <pwd.h>
+-	create_description(addr, desc);
++	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
  
- /* glibc doesn't have strlcpy, strlcat. Ensure we do. JRA. We
-  * don't link to libreplace so need them here. */
-@@ -69,3 +70,15 @@ size_t strlcat(char *d, const char *s, size_t bufsize)
+ 	/* read the key payload data */
+ 	count = keyctl_read_alloc(DEST_KEYRING, &keylist);
+@@ -208,12 +195,17 @@ key_search_all_out:
+ static key_serial_t
+ key_add(const char *addr, const char *user, const char *pass)
+ {
+-	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + sizeof(THIS_PROGRAM_NAME) + 3];
++	int len;
++	char desc[INET6_ADDRSTRLEN + sizeof(THIS_PROGRAM_NAME) + 4];
++	char val[MOUNT_PASSWD_SIZE +  MAX_USERNAME_SIZE + 2];
++
++	/* set key description */
++	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
+ 
+-	create_description(addr, desc);
++	/* set payload contents */
++	len = sprintf(val, "%s:%s", user, pass);
+ 
+-	return add_key("user", desc, pass, strnlen(pass, MOUNT_PASSWD_SIZE) + 1,
+-		DEST_KEYRING);
++	return add_key("user", desc, val, len + 1, DEST_KEYRING);
  }
- #endif
  
-+/* caller frees username if necessary */
-+char *
-+getusername(uid_t uid)
-+{
-+	char *username = NULL;
-+	struct passwd *password = getpwuid(uid);
-+
-+	if (password)
-+		username = password->pw_name;
-+	return username;
-+}
-+
-diff --git a/util.h b/util.h
-index 7a44faf..d3ca015 100644
---- a/util.h
-+++ b/util.h
-@@ -28,5 +28,6 @@
- size_t strlcpy(char *d, const char *s, size_t bufsize);
- size_t strlcat(char *d, const char *s, size_t bufsize);
- 
-+char *getusername(uid_t uid);
- #endif /* _LIBUTIL_H */
- 
+ /* add command handler */
 -- 
 1.7.1
