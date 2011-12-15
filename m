@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 06/12] cifscreds: make usage use "return" and have callers return
-Date: Thu, 15 Dec 2011 13:12:10 -0500
-Message-ID: <1323972736-15804-7-git-send-email-jlayton@samba.org>
+Subject: [PATCH v2 08/12] cifscreds: make username parameter optional
+Date: Thu, 15 Dec 2011 13:12:12 -0500
+Message-ID: <1323972736-15804-9-git-send-email-jlayton@samba.org>
 References: <1323972736-15804-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,101 +9,103 @@ In-Reply-To: <1323972736-15804-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...banish the use of exit(), which may be helpful in the future in
-the event that we eventually move some of this code into a library.
+...and use getopt_long to get it. If someone doesn't specify the username,
+use getusername() to get it.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifscreds.c |   21 +++++++++++----------
- 1 files changed, 11 insertions(+), 10 deletions(-)
+ cifscreds.c |   39 ++++++++++++++++++++++++++++-----------
+ 1 files changed, 28 insertions(+), 11 deletions(-)
 
 diff --git a/cifscreds.c b/cifscreds.c
-index b6c1fb6..3ed15f2 100644
+index 79ab426..f45497a 100644
 --- a/cifscreds.c
 +++ b/cifscreds.c
-@@ -70,7 +70,8 @@ struct command commands[] = {
+@@ -27,8 +27,10 @@
+ #include <string.h>
+ #include <ctype.h>
+ #include <keyutils.h>
++#include <getopt.h>
+ #include "mount.h"
+ #include "resolve_host.h"
++#include "util.h"
+ 
+ #define THIS_PROGRAM_NAME "cifscreds"
+ 
+@@ -49,8 +51,8 @@
+ #define DEST_KEYRING KEY_SPEC_USER_KEYRING
+ 
+ struct cmdarg {
+-	char	*host;
+-	char	*user;
++	char		*host;
++	char		*user;
  };
  
+ struct command {
+@@ -67,13 +69,18 @@ static int cifscreds_update(struct cmdarg *arg);
+ const char *thisprogram;
+ 
+ struct command commands[] = {
+-	{ cifscreds_add,	"add",		"<host> <user>" },
+-	{ cifscreds_clear,	"clear",	"<host> <user>" },
++	{ cifscreds_add,	"add",		"[-u username] <host>" },
++	{ cifscreds_clear,	"clear",	"[-u username] <host>" },
+ 	{ cifscreds_clearall,	"clearall",	"" },
+-	{ cifscreds_update,	"update",	"<host> <user>" },
++	{ cifscreds_update,	"update",	"[-u username] <host>" },
+ 	{ NULL, "", NULL }
+ };
+ 
++struct option longopts[] = {
++	{"username", 1, NULL, 'u'},
++	{NULL, 0, NULL, 0}
++};
++
  /* display usage information */
--static void usage(void)
-+static int
-+usage(void)
- {
- 	struct command *cmd;
- 
-@@ -80,7 +81,7 @@ static void usage(void)
- 			cmd->name, cmd->format);
- 	fprintf(stderr, "\n");
- 
--	exit(EXIT_FAILURE);
-+	return EXIT_FAILURE;
- }
- 
- /* search a specific key in keyring */
-@@ -217,7 +218,7 @@ static int cifscreds_add(int argc, char *argv[])
- 	int ret;
- 
- 	if (argc != 4)
--		usage();
-+		return usage();
- 
- 	ret = resolve_host(argv[2], addrstr);
- 	switch (ret) {
-@@ -312,7 +313,7 @@ static int cifscreds_clear(int argc, char *argv[])
- 	int ret, count = 0, errors = 0;
- 
- 	if (argc != 4)
--		usage();
-+		return usage();
- 
- 	ret = resolve_host(argv[2], addrstr);
- 	switch (ret) {
-@@ -380,7 +381,7 @@ static int cifscreds_clearall(int argc, char *argv[] __attribute__ ((unused)))
- 	int count = 0, errors = 0;
- 
- 	if (argc != 2)
--		usage();
-+		return usage();
- 
- 	/*
- 	 * search for all program's credentials stashed in session keyring
-@@ -420,7 +421,7 @@ static int cifscreds_update(int argc, char *argv[])
- 	int ret, id, count = 0;
- 
- 	if (argc != 4)
--		usage();
-+		return usage();
- 
- 	ret = resolve_host(argv[2], addrstr);
- 	switch (ret) {
-@@ -491,7 +492,7 @@ int main(int argc, char **argv)
- 		thisprogram = THIS_PROGRAM_NAME;
- 
+ static int
+ usage(void)
+@@ -499,12 +506,22 @@ int main(int argc, char **argv)
  	if (argc == 1)
--		usage();
-+		return usage();
+ 		return usage();
  
++	while((n = getopt_long(argc, argv, "u:", longopts, NULL)) != -1) {
++		switch (n) {
++		case 'u':
++			arg.user = optarg;
++			break;
++		default:
++			return usage();
++		}
++	}
++
  	/* find the best fit command */
  	best = NULL;
-@@ -510,7 +511,7 @@ int main(int argc, char **argv)
- 		/* partial match */
- 		if (best) {
- 			fprintf(stderr, "Ambiguous command\n");
--			exit(EXIT_FAILURE);
-+			return EXIT_FAILURE;
- 		}
+-	n = strnlen(argv[1], MAX_COMMAND_SIZE);
++	n = strnlen(argv[optind], MAX_COMMAND_SIZE);
  
- 		best = cmd;
-@@ -518,8 +519,8 @@ int main(int argc, char **argv)
+ 	for (cmd = commands; cmd->action; cmd++) {
+-		if (memcmp(cmd->name, argv[1], n) != 0)
++		if (memcmp(cmd->name, argv[optind], n) != 0)
+ 			continue;
  
- 	if (!best) {
- 		fprintf(stderr, "Unknown command\n");
--		exit(EXIT_FAILURE);
-+		return EXIT_FAILURE;
+ 		if (cmd->name[n] == 0) {
+@@ -527,12 +544,12 @@ int main(int argc, char **argv)
+ 		return EXIT_FAILURE;
  	}
  
--	exit(best->action(argc, argv));
-+	return best->action(argc, argv);
+-	/* first argument should be host */
++	/* second argument should be host */
+ 	if (argc >= 3)
+-		arg.host = argv[2];
++		arg.host = argv[optind + 1];
+ 
+-	if (argc >= 4)
+-		arg.user = argv[3];
++	if (arg.user == NULL)
++		arg.user = getusername(getuid());
+ 
+ 	return best->action(&arg);
  }
 -- 
 1.7.1
