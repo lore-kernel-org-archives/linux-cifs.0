@@ -1,209 +1,119 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: problem mounting under Xubuntu
-Date: Fri, 16 Dec 2011 11:00:44 -0600
-Message-ID: <CADT32eL1bTXwypBchEjhGWNqzFRgD-+nK4zNOHFHuuNtki=RrQ@mail.gmail.com>
-References: <4ED2FD48.7060108@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v2 00/12] cifscreds: cleanup and overhaul of cifscreds
+ utility
+Date: Sat, 17 Dec 2011 06:44:32 -0500
+Message-ID: <20111217064432.1c881440@corrin.poochiereds.net>
+References: <1323972736-15804-1-git-send-email-jlayton@samba.org>
+	<CADT32eKaX0Fd6iskcGtUTd0R5i+0SzMwAyjtubk-=RGZ6huB4w@mail.gmail.com>
+	<20111215135901.01cfec1b@barsoom.rdu.redhat.com>
+	<CADT32e+9stCUG+8dcxSh8VTu_5+gW0d_=3ZPqTgrGVd0J+qCcw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: jr <creature.eternal-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4ED2FD48.7060108-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <CADT32e+9stCUG+8dcxSh8VTu_5+gW0d_=3ZPqTgrGVd0J+qCcw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Nov 27, 2011 at 9:17 PM, jr <creature.eternal-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> hi,
->
-> started using Xubuntu (11.10) and cannot get the mount.cifs to the NA=
-S
-> working.
->
-> the following command works from my slackware system:
-> =A0mount.cifs //server/share /mnt -o guest
->
-> the same command (except added option ro) executed on Xubuntu gives e=
-rror
-> =A0CIFS VFS: Send error in SessSetup =3D -13
->
-> I can access the NAS via smbclient.
->
-> after days of googling, I'm still no wiser. =A0below is a listing of =
-the dmesg
-> output. =A0help, please.
->
->
-> [92841.000417] /build/buildd/linux-3.0.0/fs/cifs/cifsfs.c: Devname:
-> //nas/public flags: 1
-> [92841.000428] /build/buildd/linux-3.0.0/fs/cifs/connect.c: null user
-> [92841.000434] /build/buildd/linux-3.0.0/fs/cifs/connect.c: file mode=
-: 0x1ed
-> =A0dir mode: 0x1ed
-> [92841.000506] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:=
- in
-> cifs_mount as Xid: 52 with uid: 0
-> [92841.000510] /build/buildd/linux-3.0.0/fs/cifs/connect.c: UNC:
-> \\nas\public ip: 192.168.0.10
-> [92841.000530] /build/buildd/linux-3.0.0/fs/cifs/connect.c: Socket cr=
-eated
-> [92841.000534] /build/buildd/linux-3.0.0/fs/cifs/connect.c: sndbuf 16=
-384
-> rcvbuf 87380 rcvtimeo 0x6d6
-> [92841.001152] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:=
- in
-> cifs_get_smb_ses as Xid: 53 with uid: 0
-> [92841.001157] /build/buildd/linux-3.0.0/fs/cifs/connect.c: Existing =
-smb
-> sess not found
-> [92841.001165] /build/buildd/linux-3.0.0/fs/cifs/cifssmb.c: secFlags =
-0x7
-> [92841.001170] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
-> smb_command 114
-> [92841.001174] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sending=
- smb:
-> =A0total_len 82
-> [92841.001194] /build/buildd/linux-3.0.0/fs/cifs/connect.c: Demultipl=
-ex PID:
-> 6045
-> [92841.243749] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002 l=
-ength
-> 0x65
-> [92841.243770] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
-> cifs_sync_mid_result: cmd=3D114 mid=3D1 state=3D4
-> [92841.243777] /build/buildd/linux-3.0.0/fs/cifs/cifssmb.c: Dialect: =
-2
-> [92841.243783] /build/buildd/linux-3.0.0/fs/cifs/cifssmb.c: negprot r=
-c 0
-> [92841.243787] /build/buildd/linux-3.0.0/fs/cifs/connect.c: Security =
-Mode:
-> 0x3 Capabilities: 0xe3fd TimeAdjust: 0
-> [92841.243791] /build/buildd/linux-3.0.0/fs/cifs/sess.c: sess setup t=
-ype 1
-> [92841.243828] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
-> smb_command 115
-> [92841.243832] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sending=
- smb:
-> =A0total_len 232
-> [92841.247606] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002 l=
-ength
-> 0x66
-> [92841.247623] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
-> cifs_sync_mid_result: cmd=3D115 mid=3D2 state=3D4
-> [92841.247628] /build/buildd/linux-3.0.0/fs/cifs/misc.c: Null buffer =
-passed
-> to cifs_small_buf_release
-> [92841.247632] /build/buildd/linux-3.0.0/fs/cifs/sess.c: Guest login
-> [92841.247635] /build/buildd/linux-3.0.0/fs/cifs/sess.c: UID =3D 100
-> [92841.247638] /build/buildd/linux-3.0.0/fs/cifs/sess.c: bleft 56
-> [92841.247642] /build/buildd/linux-3.0.0/fs/cifs/sess.c: serverOS=3DU=
-nix
-> [92841.247646] /build/buildd/linux-3.0.0/fs/cifs/sess.c: serverNOS=3D=
-Samba
-> 3.0.34
-> [92841.247650] /build/buildd/linux-3.0.0/fs/cifs/sess.c:
-> serverDomain=3DWORKGROUP
-> [92841.247654] /build/buildd/linux-3.0.0/fs/cifs/sess.c: ssetup freei=
-ng
-> small buf f1f32540
-> [92841.247657] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS Sess=
-ion
-> Established successfully
-> [92841.247662] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:
-> leaving cifs_get_smb_ses (xid =3D 53) rc =3D 0
-> [92841.247667] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:=
- in
-> cifs_get_tcon as Xid: 54 with uid: 0
-> [92841.247673] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
-> smb_command 117
-> [92841.247677] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sending=
- smb:
-> =A0total_len 90
-> [92841.248606] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002 l=
-ength
-> 0x27
-> [92841.248620] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
-> cifs_sync_mid_result: cmd=3D117 mid=3D3 state=3D4
-> [92841.248625] Status code returned 0xc0000022 NT_STATUS_ACCESS_DENIE=
-D
-> [92841.248630] /build/buildd/linux-3.0.0/fs/cifs/netmisc.c: Mapping s=
-mb
-> error code 0xc0000022 to POSIX err -13
-> [92841.248635] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:
-> leaving cifs_get_tcon (xid =3D 54) rc =3D -13
-> [92841.248639] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS Tcon=
- rc =3D
-> -13
-> [92841.248643] /build/buildd/linux-3.0.0/fs/cifs/connect.c:
-> build_unc_path_to_root: full_path=3D\\nas\public
-> [92841.248648] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
-> smb_command 117
-> [92841.248652] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sending=
- smb:
-> =A0total_len 94
-> [92841.251461] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002 l=
-ength
-> 0x3c
-> [92841.251473] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
-> cifs_sync_mid_result: cmd=3D117 mid=3D4 state=3D4
-> [92841.251478] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS Tcon=
- rc =3D 0
-> ipc_tid =3D 1
-> [92841.251482] /build/buildd/linux-3.0.0/fs/cifs/cifssmb.c: In GetDFS=
-Refer
-> the path \nas\public
-> [92841.251487] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
-> smb_command 50
-> [92841.251490] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sending=
- smb:
-> =A0total_len 108
-> [92841.252726] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002 l=
-ength
-> 0x27
-> [92841.252731] /build/buildd/linux-3.0.0/fs/cifs/connect.c: invalid
-> transact2 word count
-> [92841.252743] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
-> cifs_sync_mid_result: cmd=3D50 mid=3D5 state=3D4
-> [92841.252748] Status code returned 0xc0000002 NT_STATUS_NOT_IMPLEMEN=
-TED
-> [92841.252752] /build/buildd/linux-3.0.0/fs/cifs/netmisc.c: Mapping s=
-mb
-> error code 0xc0000002 to POSIX err -22
-> [92841.252756] /build/buildd/linux-3.0.0/fs/cifs/cifssmb.c: Send erro=
-r in
-> GetDFSRefer =3D -22
-> [92841.252760] /build/buildd/linux-3.0.0/fs/cifs/connect.c:
-> cifs_put_smb_ses: ses_count=3D1
-> [92841.252762]
-> [92841.252765] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:=
- in
-> cifs_put_smb_ses as Xid: 55 with uid: 0
-> [92841.252769] /build/buildd/linux-3.0.0/fs/cifs/cifssmb.c: In SMBLog=
-off for
-> session disconnect
-> [92841.252773] /build/buildd/linux-3.0.0/fs/cifs/transport.c: For
-> smb_command 116
-> [92841.252776] /build/buildd/linux-3.0.0/fs/cifs/transport.c: Sending=
- smb:
-> =A0total_len 43
-> [92841.253503] /build/buildd/linux-3.0.0/fs/cifs/connect.c: rfc1002 l=
-ength
-> 0x2b
-> [92841.253515] /build/buildd/linux-3.0.0/fs/cifs/transport.c:
-> cifs_sync_mid_result: cmd=3D116 mid=3D6 state=3D4
-> [92841.256596] /build/buildd/linux-3.0.0/fs/cifs/connect.c: CIFS VFS:
-> leaving cifs_mount (xid =3D 52) rc =3D -13
-> [92841.256600] CIFS VFS: cifs_mount failed w/return code =3D -13
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+On Fri, 16 Dec 2011 09:48:30 -0600
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-jr, when can you rebuild your cifs module without selecting
-CONFIG_CIFS_WEAK_PW_HASH as one of the config options to build
-cifs, load it up and see if that module works?
+> On Thu, Dec 15, 2011 at 12:59 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
+te:
+> > On Thu, 15 Dec 2011 12:20:15 -0600
+> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> On Thu, Dec 15, 2011 at 12:12 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> =
+wrote:
+> >> > This patchset is a cleanup and overhaul of the cifscreds utility=
+ that
+> >> > lives in the cifs-utils tree today. Igor Druzhinin did a wonderf=
+ul job
+> >> > on this when he did the original code a couple of years ago, but=
+ I did a
+> >> > rather poor job at the time of communicating what we actually ne=
+ed for
+> >> > this tool to do. Mea culpa...
+> >> >
+> >> > This patch is a second pass at morphing it into a tool that's mo=
+re like
+> >> > what we need. I believe with this, I'll be able to roll some ker=
+nel
+> >> > patches that can use the stashed key for establishing sessions.
+> >> >
+> >> > I've made a few changes since the last set:
+> >> >
+> >> > - combine some of the earlier patches so it's a smaller set
+> >> >
+> >> > - I've dropped the patch to make key_search use keyctl_search. I=
+'d still
+> >> > =C2=A0like to do this differently, but for now it's not possible=
+ to do so
+> >> > =C2=A0and protect the key payload
+> >> >
+> >> > The idea here is that we want to be able to allow users to stash=
+ their
+> >> > NTLM credentials in the kernel, so that it's possible to establi=
+sh a
+> >> > session on the fly when that user walks into a multiuser mount.
+> >>
+> >> Jeff, is there an initial/earlier document that states exactly how
+> >> a user can stash NTLM credentials?
+> >>
+> >> By NTLM credentials, it is meant that server/domain name/address
+> >> and corrosponding password etc.?
+> >>
+> >
+> > Correct. The idea here is that this tool stashes a key (or keys) in=
+ the
+> > session keyring with a name like:
+> >
+> > =C2=A0 =C2=A0cifscreds:a:<IP Address>
+> >
+> > ...or:
+> >
+> > =C2=A0 =C2=A0cifscreds:d:<NT Domain Name>
+> >
+> > ...that key has a payload that looks like this:
+> >
+> > =C2=A0 <username>:<password>
+> >
+> > For a multiuser mount, when a user walks into the mount for the fir=
+st
+> > time, the kernel can look for a key in the keyring for the right se=
+rver,
+> > or failing that, the right NT domain. It can then get username and
+> > password info out of the payload to establish a session.
+> >
+> > We could also use this to get credentials for the initial mount too=
+,
+> > but that use-case is less compelling.
+> >
+> > --
+> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>=20
+> Jeff, one of the concerns would be, how to sync up the pasword at the
+> server and domain.  If the user password at the server changes,
+> user must make corrosponding changes at the client machine?
 
-Regards,
+Yes, at least prior to the next reconnect. Those are the perils of
+password-based auth.
 
-Shirish
+> Is there a provision to delete or update NTLM credential?
+
+Yes, the cifscreds command has delete and update functionality.
+
+> Also, if the same user can use multiple client machines to authentica=
+te to the
+> same server or domain, should every client machine have a copy of
+> (the same) NTLM credentials stashed?  And then if password changes,
+> user must remember to update NTLM credentials on each client machine!
+
+Yes. It's somewhat similar to the situation with kerberos tickets. This
+is just a way for users to securely store their username and password
+so we can use it for multiuser mounts.
+
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
