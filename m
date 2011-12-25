@@ -1,78 +1,36 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Any interest in inotify messages via netlink.
-Date: Sat, 24 Dec 2011 22:17:06 +0100
-Message-ID: <CANXojcw0i_pRBZmc_y1wDtXqdRK5TnQHKoroxqhQxPiuLwwjHA@mail.gmail.com>
-References: <CANXojcycznnzbzrM8eX19b6hEDwzQ29MMTOedAGDCXX=HRqPFQ@mail.gmail.com>
-	<CAH2r5muSWtexaKuEj+Aa9B1nYyq9AXnoTNNVpY+Ek9PbjrU8bA@mail.gmail.com>
+From: "postcodesloetrij-  Bonus" <Postinfo-XmxE97WL2LwS+FvcfC7Uqw@public.gmane.org>
+Subject: End of year bonus!!
+Date: Sun, 25 Dec 2011 14:55:33 -0700
+Message-ID: <0bb7cee5361d32f4a30bf4aa2b0d9925.squirrel__45133.7427636192$1324851218$gmane$org@macmail.lakotanetwork.com>
+Reply-To: Postinfo-XmxE97WL2LwS+FvcfC7Uqw@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muSWtexaKuEj+Aa9B1nYyq9AXnoTNNVpY+Ek9PbjrU8bA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I'm afraid we're not speaking about the same.
+postcodesloetrij-  Bonus !!
 
-I know SMB supports already inotify like calls (SMB Change request)
-but my question is whether netlink messages, about a inotify being set
-(or removed) on the cifs filesystem, is of any use to you.
+Promotion advertisement !!: we are please to inform you that the
+Postcode-lottery yearly award award promotion program held 25th Dec  2011,
+have pronounce your e-mail address as the luckily winner of a total sum:
+of ?100,000(One Hundred Thousand Euros
+Only)
 
-=46or FUSE fs's I'm experminting with this, in the way I described in m=
-y
-previous post.
+Please email via BV Post-lottery Solicitors Fund Verification Department
+with your Serial-No:LE-0031#55330 for your claim,
 
-Stef
+Office/Email:Postinfo-XmxE97WL2LwS+FvcfC7Uqw@public.gmane.org
+Tell:+31-645-764-338/Netherlands
 
-2011/12/24 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Cifs (the protocol) supports inotify-like messages (the original conc=
-ept was
-> invented for os2 and windows desktop guis to use smb/cifs to refresh =
-remote
-> directory listings). With directory oplock added in Smb2.2 so
->
-> On Dec 24, 2011 4:22 AM, "Stef Bon" <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>
->> Hi,
->>
->> earlier I mentioned here I'm working on the ability for filesystems
->> like FUSE based, cifs and nfs.
->>
->> Recently I've created a patch for the kernel, which makes the calls
->> inotify_add_watch and inotify_remove_watch
->> send a message to userspace, containing (pid, fd, wd, [mask], [path]=
-).
->>
->> (in case of add watch the values between [] are sent also, when remo=
-ve
->> not)
->>
->> My idea for a FUSE based fs is to listen to this messages (familiy
->> GENERIC, group VFS_INOTIFY),
->> filter messages out which do not apply (only those messages for the
->> used mountpoint for fs) and then let the FUSE fs take proper action,
->> which suits the backend.
->>
->> In case of a simple overlay fs, this means that it sets watch on the
->> underlying fs, and send change events (which fits the mask) to the
->> kernel. Recent FUSE versions have calls added which can notify the
->> kernel about a change, without the need of a related request, like
->> getattr, open, lookup etc.
->> The fs has to remove this/stop this when a remove watch message is
->> received. A proper adiminstration of current watches set is required=
-=2E
->>
->>
->> Can this also work for cifs?? I always thought that cifs is just lik=
-e
->> FUSE in userspace, but that isn't the case is it?
->>
->> Stef
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
-" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.h=
-tml
+This program is organize to promote the postcode lottery company award
+yearly, and we are strictly and skeptical regard your winning information
+that  is why you are advice to forward your serial number the claim
+department only and without any dis-closer to any person /friends for
+security reason
+
+Sincerely,
+Mrs:Hase Van Willems
+Promotion Coordinator.
