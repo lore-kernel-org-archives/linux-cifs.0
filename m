@@ -1,7 +1,7 @@
 From: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: [PATCH] mount.cifs: Properly update mtab during remount
-Date: Wed, 28 Dec 2011 01:29:02 -0200
-Message-ID: <1325042942-6572-1-git-send-email-cmaiolino@redhat.com>
+Date: Wed, 28 Dec 2011 01:22:12 -0200
+Message-ID: <1325042532-5500-1-git-send-email-cmaiolino@redhat.com>
 Cc: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
