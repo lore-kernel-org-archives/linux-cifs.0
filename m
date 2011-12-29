@@ -1,154 +1,86 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: Properly update mtab during remount
-Date: Wed, 28 Dec 2011 21:18:01 -0500
-Message-ID: <20111228211801.42d548ee@corrin.poochiereds.net>
-References: <1325042532-5500-1-git-send-email-cmaiolino@redhat.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs: ls of mount point gives input/output error (probably
+ related to CIFS: getdents() broken for large dirs)
+Date: Thu, 29 Dec 2011 00:40:50 -0600
+Message-ID: <CADT32e+DsLkz2=Tf7vSpY90A_Cf6HLag8ozvb_MJdpXzyBY5oQ@mail.gmail.com>
+References: <4EFBAF99.3010208@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Konstantinos Skarlatos <k.skarlatos-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1325042532-5500-1-git-send-email-cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <4EFBAF99.3010208-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 28 Dec 2011 01:22:12 -0200
-Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+On Wed, Dec 28, 2011 at 6:08 PM, Konstantinos Skarlatos
+<k.skarlatos-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> I mount via cifs a windows XP share, df gives me correct sizes, but w=
+hen I
+> ls the mount point i get input/output error.
+> strace: http://pastebin.com/WXf8M1nu
+>
+> mount --verbose -t cifs -o username=3Dadministrator,password=3Dblahbl=
+ah
+> //192.168.0.11/jobs /mnt/backups/montaz/jobs
+> mount.cifs kernel mount options:
+> ip=3D192.168.0.11,unc=3D\\192.168.0.11\jobs,,ver=3D1,user=3Dadministr=
+ator,pass=3D********
+>
+> df
+> //192.168.0.11/jobs =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0 =A0 =A0 114464 =A0105196
+> =A09268 =A092% /mnt/backups/montaz/jobs
+>
+> ls /mnt/backups/montaz/jobs/
+> ls: reading directory /mnt/backups/montaz/jobs/: Input/output error
+> total 0
+>
+> the fun thing is that i can cd to a lower level directory, and ls wor=
+ks fine
+> there! only the mount point has the problem
+>
+> ls /mnt/backups/montaz/jobs/test
+> total 44K
+> drwxr-xr-x 1 root root =A0 =A00 Apr 30 =A02010 blah blah/e
+>
+> kernel version 3.2rc7
+>
+> this seems to be related to :
+> https://lkml.org/lkml/2011/8/1/427
+> Re: [3.0.0+][Regression][Bisected] CIFS: getdents() broken for large =
+dirs
+>
+> Please CC because i am not subscribed
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 
-> During a remount of a cifs filesystem, the mtab file is not properly updated, which
-> leads to a doubled entry of the same filesystem in the /etc/mtab file. This patch
-> adds a new function del_mtab() which is called before the add_mtab() in case the fs
-> is being remounted.
-> The del_mtab() function will delete from the mtab, the old entry from the filesystem which
-> is being remounted, and then, calls add_mtab() to add an updated entry to the mtab file.
-> 
-> Signed-off-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  mount.cifs.c |   81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 81 insertions(+), 0 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 147f7fc..6535b40 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -161,6 +161,7 @@
->  #define OPT_BKUPUID    30
->  #define OPT_BKUPGID    31
->  
-> +#define MNT_TMP_PATH "/tmp/mtab.tmp"
->  
->  /* struct for holding parsed mount info for use by privleged process */
->  struct parsed_mount_info {
-> @@ -1624,6 +1625,81 @@ add_mtab_exit:
->  	return rc;
->  }
->  
-> +static int
-> +del_mtab(char *devname, char *mountpoint)
-> +{
-> +	int fd, tmprc, rc = 0;
-> +	FILE *mnttmp, *mntmtab;
-> +	struct mntent *mountent;
-> +	struct stat statbuf;
-> +
-> +	rc = lock_mtab();
-> +	if(rc) {
-> +		fprintf(stderr, "del_mtab: cannot lock mtab");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	mntmtab = setmntent(MOUNTED, "r");
-> +	if (!mntmtab) {
-> +		fprintf(stderr, "del_mtab: could not update mount table\n");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	mnttmp = setmntent(MNT_TMP_PATH, "w");
-> +	if (!mnttmp) {
-> +		fprintf(stderr, "del_mtab: could not update mount table\n");
-> +		endmntent(mntmtab);
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	fd = fileno(mntmtab);
-> +	if (fd < 0) {
-> +		fprintf(stderr, "mntent does not appear to be valid\n");
-> +		endmntent(mntmtab);
-> +		endmntent(mnttmp);
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	while((mountent = getmntent(mntmtab)) != NULL){
-> +		if(!strcmp(mountent->mnt_dir,mountpoint))
-> +			continue;
-> +		rc = addmntent(mnttmp, mountent);
-> +		if (rc) {
-> +			fprintf(stderr, "unable to add mount entry to mtab\n");
-> +			ftruncate(fd, statbuf.st_size);
-> +			rc = EX_FILEIO;
-> +			break;
-> +		}
-> +	}
-> +
-> +	rc = fstat(fd, &statbuf);
-> +	if (rc != 0) {
-> +		fprintf(stderr, "unable to fstat open mtab\n");
-> +		endmntent(mntmtab);
-> +		endmntent(mnttmp);
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	tmprc = my_endmntent(mntmtab, statbuf.st_size);
-> +	if (tmprc) {
-> +		fprintf(stderr, "error %d detected on close of mtab\n", tmprc);
-> +		rc = EX_FILEIO;
-> +	}
-> +	endmntent(mnttmp);
-> +
-> +	rename(MNT_TMP_PATH, MOUNTED);
+I was working on phrasing a question for MS.
+Noticed this problem too.
 
-You seem to me making the assumption that MNT_TMP_PATH and MOUNTED are
-on the same filesystem. That's not necessarily (or even commonly) the
-case. If you want to do this, you'll probably want to make sure they
-are on the same filesystem.
+MS-CIFS - v20101001, in section 2.2.2.3.1, does not list
+info level codes higher than 0x104 for Trans2 subcommand
+Trans2_find_first2.
 
-> +	unlink(MNT_TMP_PATH);
-> +
-> +del_mtab_exit:
-> +	unlock_mtab();
-> +	return rc;
-> +}
-> +
->  /* have the child drop root privileges */
->  static int
->  drop_child_privs(void)
-> @@ -2021,6 +2097,11 @@ mount_retry:
->  	}
->  
->  do_mtab:
-> +	if(parsed_info->flags & MS_REMOUNT){
-       ^^^^^^
-    nit: we try to follow kernel coding style in this code...
-   
-> +		rc = del_mtab(orig_dev, mountpoint);
-> +		if(rc)
-> +			goto mount_exit;
-> +	}
->  	if (!parsed_info->nomtab && !mtab_unusable())
->  		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
->  
+Yet servers such as Windows 2008 and Windows 7, respond
+to info levels such as 0x105 correctly. But Windows XP responds
+to this info level (0x105) incorrectly.  The Find_First2 data
+has fewer entries than the ones listed in search Count field of
+=46ind First2 parameters.
 
-Patch looks reasonable otherwise. Nice work...
+Servers such as Windows XP and 2000 should return
+an error EOPNOTSUPP for info levels higher than 0x104 but
+they do not.
 
-Note too, that remounts in the kernel cifs code are quite broken. It
-always returns 0 without ever actually changing anything. It would be
-helpful to fix that as well...
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+http://msdn.microsoft.com/en-us/library/cc246806(v=3Dprot.13).aspx says=
+ that
+Windows XP does not handle SMB_FIND_FILE_ID_FULL_DIRECTORY_INFO.
+
+"<66> Section 2.2.8.1.2: The SMB_FIND_FILE_ID_FULL_DIRECTORY_INFO
+Information Level was introduced in Windows Server 2003 and is not
+present in Windows 2000 Server and Windows XP."
