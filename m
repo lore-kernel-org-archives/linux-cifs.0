@@ -1,12 +1,12 @@
 From: Konstantinos Skarlatos <k.skarlatos-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: cifs: ls of mount point gives input/output error (probably related
  to CIFS: getdents() broken for large dirs)
-Date: Sat, 31 Dec 2011 00:54:15 +0200
-Message-ID: <4EFE4117.6000706@gmail.com>
+Date: Sat, 31 Dec 2011 01:54:14 +0200
+Message-ID: <4EFE4F26.4070309@gmail.com>
 References: <4EFBAF99.3010208@gmail.com> <20111228210420.2a422d11@corrin.poochiereds.net> <4EFC413A.80302@gmail.com> <20111229083930.77fafba8@tlielax.poochiereds.net> <4EFC7124.3060900@gmail.com> <4EFD7EBB.2060708@gmail.com> <20111230081120.3f7710f1@tlielax.poochiereds.net> <4EFDFC4E.30102@gmail.com> <4EFE3130.8030500@gmail.com> <CADT32e+KQGeZn9h7pZnMzzXu=iqWNJZ5KinbZx5WS1kEpAMj-Q@mail.gmail.com> <4EFE3EDB.3090405@gmail.com>
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
- boundary="------------090206000904090403060608"
+ boundary="------------070007000507020909010700"
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -15,7 +15,7 @@ Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 This is a multi-part message in MIME format.
---------------090206000904090403060608
+--------------070007000507020909010700
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
@@ -42,26 +42,26 @@ On 31/12/2011 12:44 πμ, Konstantinos Skarlatos wrote:
 >>>>>>>>>>> I ls the mount point i get input/output error.
 >>>>>>>>>>> strace: http://pastebin.com/WXf8M1nu
 >>>>>>>>>>>
->>>>>>>>>>> mount --verbose -t cifs -o 
+>>>>>>>>>>> mount --verbose -t cifs -o
 >>>>>>>>>>> username=administrator,password=blahblah
 >>>>>>>>>>> //192.168.0.11/jobs /mnt/backups/montaz/jobs
 >>>>>>>>>>> mount.cifs kernel mount options:
 >>>>>>>>>>>
->>>>>>>>>>> ip=192.168.0.11,unc=\\192.168.0.11\jobs,,ver=1,user=administrator,pass=******** 
+>>>>>>>>>>> ip=192.168.0.11,unc=\\192.168.0.11\jobs,,ver=1,user=administrator,pass=********
 >>>>>>>>>>>
 >>>>>>>>>>>
 >>>>>>>>>>>
 >>>>>>>>>>> df
->>>>>>>>>>> //192.168.0.11/jobs                                       
+>>>>>>>>>>> //192.168.0.11/jobs
 >>>>>>>>>>> 114464
 >>>>>>>>>>> 105196      9268  92% /mnt/backups/montaz/jobs
 >>>>>>>>>>>
 >>>>>>>>>>> ls /mnt/backups/montaz/jobs/
->>>>>>>>>>> ls: reading directory /mnt/backups/montaz/jobs/: 
+>>>>>>>>>>> ls: reading directory /mnt/backups/montaz/jobs/:
 >>>>>>>>>>> Input/output error
 >>>>>>>>>>> total 0
 >>>>>>>>>>>
->>>>>>>>>>> the fun thing is that i can cd to a lower level directory, 
+>>>>>>>>>>> the fun thing is that i can cd to a lower level directory,
 >>>>>>>>>>> and ls
 >>>>>>>>>>> works
 >>>>>>>>>>> fine there! only the mount point has the problem
@@ -78,7 +78,7 @@ On 31/12/2011 12:44 πμ, Konstantinos Skarlatos wrote:
 >>>>>>>>>>> Re: [3.0.0+][Regression][Bisected] CIFS: getdents() broken for
 >>>>>>>>>>> large dirs
 >>>>>>>>>>>
->>>>>>>>>> Hmmm, maybe. What makes you think that it's related? What 
+>>>>>>>>>> Hmmm, maybe. What makes you think that it's related? What
 >>>>>>>>>> sort of
 >>>>>>>>>> server are you seeing this against?
 >>>>>>>>> Windows XP service pack 2 (greek)
@@ -96,15 +96,15 @@ On 31/12/2011 12:44 πμ, Konstantinos Skarlatos wrote:
 >>>>> complicated and I'm not certain what the problem actually is...
 >>>>>
 >>>>> One thing that's interesting is that the total data being sent in the
->>>>> request is rather large (16336 bytes). I think that's legit, but 
+>>>>> request is rather large (16336 bytes). I think that's legit, but
 >>>>> maybe
 >>>>> it's exceeding the end of the buffer once we try to coalesce it.
 >>>>>
 >>>>> Would it be possible to get the cFYI output from this test?
->>>> I did not get a cFYI output from that test, but i redid a 
+>>>> I did not get a cFYI output from that test, but i redid a
 >>>> mount-ls-umount
 >>>> and am attaching the tcpdump
->>>> Also here http://pastebin.com/J20uC6kU you can find the cifsFYI and 
+>>>> Also here http://pastebin.com/J20uC6kU you can find the cifsFYI and
 >>>> the
 i forgot to mention that since i got this pastebin and the attached 
 tcpdump the contents of jobs have not changed at all, so you can compare 
@@ -114,51 +114,52 @@ with these if you like
 >>>>> Is this a regression? Did it work with earlier kernels and only
 >>>>> recently start failing?
 >>>>>
->>>> I do not know, and i am a bit afraid to downgrade this machine 
+>>>> I do not know, and i am a bit afraid to downgrade this machine
 >>>> below 3.0
->>>> due to some changes arch linux has introduced recently. I can 
+>>>> due to some changes arch linux has introduced recently. I can
 >>>> always set up
->>>> a few virtual machines though, and i can even request permission 
+>>>> a few virtual machines though, and i can even request permission
 >>>> from my
->>>> company to give you shell access if you like. Which kernel versions 
+>>>> company to give you shell access if you like. Which kernel versions
 >>>> would
 >>>> you like me to test?
 >>> I just tested  3.1.5-1-ARCH on a virtual machine and it works, so it is
 >>> probably a regression... On the same virtual machine 3.2-rc7 produces
->>> input/output error. The virtual machine is a fresh install of arch 
+>>> input/output error. The virtual machine is a fresh install of arch
 >>> linux.
 >>> here is the relevant pastebin http://pastebin.com/BwX2DqJC
 >>> and attached is the tcpdump
 >>> As a am a noob to all this, what should I do next in order to help you?
->>> maybe compile a 3.1 kernel from official sources to make sure no 
+>>> maybe compile a 3.1 kernel from official sources to make sure no
 >>> patches
 >>> from arch linux interfere?
 >>>
 >> It is the same request from the cifs client in both the successful and
->> unsuccessful cases. trans2, findfirst2, infolevel of 261 and search 
+>> unsuccessful cases. trans2, findfirst2, infolevel of 261 and search
 >> count
 >> of 150.
 >> So nothing has changed from what is emanating from cifs client.
 >>
 >> In the error case, Windows XP responds with search count of 142 whereas
->> in successful case, Windows XP responds with search count of 
+>> in successful case, Windows XP responds with search count of
 >> significantly
 >> less number, e.g. 36.
 >>
->> Are files/directories in  jobs  directory less now i.e. has anything 
+>> Are files/directories in  jobs  directory less now i.e. has anything
 >> changed
->> in this directory on the server 192.168.0.11 i.e. have files been 
+>> in this directory on the server 192.168.0.11 i.e. have files been
 >> deleted,
->> directories removed etc. since the failure was noticed the very first 
+>> directories removed etc. since the failure was noticed the very first
 >> time?
-> there are some changes in the jobs directory since the failure was 
-> noticed, but they are quite minor. at most one folder was deleted and 
-> one was added, and the pdf files in the root dir (1_B_MAYRO.pdf 
+> there are some changes in the jobs directory since the failure was
+> noticed, but they are quite minor. at most one folder was deleted and
+> one was added, and the pdf files in the root dir (1_B_MAYRO.pdf
 > 1XR.pdf ....7_B_MAYRO.pdf  ) were overwritten, +- one or two files.
 >
 
+(resent as non-html)
 
---------------090206000904090403060608
+--------------070007000507020909010700
 Content-Type: application/octet-stream;
  name="cifs-traffic2.pcap"
 Content-Transfer-Encoding: base64
@@ -595,4 +596,4 @@ qAAL2LYBvccrYUDobY+VgBEByoJrAAABAQgKAbdnEgACOm4O+f1OmW4EAEIAAABCAAAAHG9l
 P/aUyDo11CkECABFAAA0Dx9AAIAGaWDAqAALwKgA6QG92LbobY+VxythQYAR+s3bigAAAQEI
 CgACOm8Bt2cSDvn9TqRuBABCAAAAQgAAAMg6NdQpBBxvZT/2lAgARQAANBxVQABABpwqwKgA
 6cCoAAvYtgG9xythQehtj5aAEAHKgmsAAAEBCAoBt2cSAAI6bw==
---------------090206000904090403060608--
+--------------070007000507020909010700--
