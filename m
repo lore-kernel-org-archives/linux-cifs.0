@@ -1,268 +1,189 @@
-From: Konstantinos Skarlatos <k.skarlatos@gmail.com>
-Subject: Re: cifs: ls of mount point gives input/output error (probably related
- to CIFS: getdents() broken for large dirs)
-Date: Fri, 30 Dec 2011 11:04:59 +0200
-Message-ID: <4EFD7EBB.2060708@gmail.com>
-References: <4EFBAF99.3010208@gmail.com> <20111228210420.2a422d11@corrin.poochiereds.net> <4EFC413A.80302@gmail.com> <20111229083930.77fafba8@tlielax.poochiereds.net> <4EFC7124.3060900@gmail.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: Re: [PATCH v2 06/53] CIFS: Add missing unicode handling routines
+ needed by smb2
+Date: Fri, 30 Dec 2011 07:42:08 -0500
+Message-ID: <20111230074208.561b8fdb@tlielax.poochiereds.net>
+References: <1319831704-3572-1-git-send-email-piastry@etersoft.ru>
+	<1319831704-3572-7-git-send-email-piastry@etersoft.ru>
+	<CADT32e+W2Q-sVeKtxLVwLUTdxAJsRtr5CG=QVgMqR2_QL1aYKw@mail.gmail.com>
+	<CAKywueQNRCdUHxDS9aLDrbiEw4CF5p31VReMXEVRcd9ALqW4UQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------040509080506050203020702"
-Cc: linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <4EFC7124.3060900@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Shirish Pargaonkar <shirishpargaonkar@gmail.com>,
+	Steve French <sfrench@us.ibm.com>, linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+To: Pavel Shilovsky <piastry@etersoft.ru>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <CAKywueQNRCdUHxDS9aLDrbiEw4CF5p31VReMXEVRcd9ALqW4UQ@mail.gmail.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------040509080506050203020702
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+On Thu, 29 Dec 2011 19:01:24 +0400
+Pavel Shilovsky <piastry@etersoft.ru> wrote:
 
-On 29/12/2011 3:54 μμ, Konstantinos Skarlatos wrote:
-> On Πέμπτη, 29 Δεκέμβριος 2011 3:39:30 μμ, Jeff Layton wrote:
->> On Thu, 29 Dec 2011 12:30:18 +0200
->> Konstantinos Skarlatos<k.skarlatos@gmail.com>  wrote:
->>
->>> On 29/12/2011 4:04 πμ, Jeff Layton wrote:
->>>> On Thu, 29 Dec 2011 02:08:57 +0200
->>>> Konstantinos Skarlatos<k.skarlatos@gmail.com>   wrote:
->>>>
->>>>> I mount via cifs a windows XP share, df gives me correct sizes, 
->>>>> but when
->>>>> I ls the mount point i get input/output error.
->>>>> strace: http://pastebin.com/WXf8M1nu
->>>>>
->>>>> mount --verbose -t cifs -o username=administrator,password=blahblah
->>>>> //192.168.0.11/jobs /mnt/backups/montaz/jobs
->>>>> mount.cifs kernel mount options:
->>>>> ip=192.168.0.11,unc=\\192.168.0.11\jobs,,ver=1,user=administrator,pass=******** 
->>>>>
->>>>>
->>>>> df
->>>>> //192.168.0.11/jobs                                       114464
->>>>> 105196      9268  92% /mnt/backups/montaz/jobs
->>>>>
->>>>> ls /mnt/backups/montaz/jobs/
->>>>> ls: reading directory /mnt/backups/montaz/jobs/: Input/output error
->>>>> total 0
->>>>>
->>>>> the fun thing is that i can cd to a lower level directory, and ls 
->>>>> works
->>>>> fine there! only the mount point has the problem
->>>>>
->>>>> ls /mnt/backups/montaz/jobs/test
->>>>> total 44K
->>>>> drwxr-xr-x 1 root root    0 Apr 30  2010 blah blah/
->>>>> ......
->>>>>
->>>>> kernel version 3.2rc7
->>>>>
->>>>> this seems to be related to :
->>>>> https://lkml.org/lkml/2011/8/1/427
->>>>> Re: [3.0.0+][Regression][Bisected] CIFS: getdents() broken for 
->>>>> large dirs
->>>>>
->>>> Hmmm, maybe. What makes you think that it's related? What sort of
->>>> server are you seeing this against?
->>> Windows XP service pack 2 (greek)
->>
->>
->> How many files are in the directory?
->>
-> 140 folders and 20 files
->
-Attached is a tcp dump of my session.
+> 2011/11/1 Shirish Pargaonkar <shirishpargaonkar@gmail.com>:
+> > On Fri, Oct 28, 2011 at 2:54 PM, Pavel Shilovsky <piastry@etersoft.=
+ru> wrote:
+> >> From: Steve French <sfrench@us.ibm.com>
+> >>
+> >> Signed-off-by: Steve French <sfrench@us.ibm.com>
+> >> Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
+> >> ---
+> >> =C2=A0fs/cifs/cifs_unicode.c | =C2=A0 61 +++++++++++++++++++++++++=
++++++++++++++++++++++++
+> >> =C2=A0fs/cifs/cifs_unicode.h | =C2=A0 =C2=A07 +++++
+> >> =C2=A02 files changed, 68 insertions(+), 0 deletions(-)
+> >>
+> >> diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+> >> index 1b2e180..7f09423 100644
+> >> --- a/fs/cifs/cifs_unicode.c
+> >> +++ b/fs/cifs/cifs_unicode.c
+> >> @@ -330,3 +330,64 @@ ctoUCS_out:
+> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0return i;
+> >> =C2=A0}
+> >>
+> >> +#ifdef CONFIG_CIFS_SMB2
+> >> +/*
+> >> + * smb2_local_to_ucs2_bytes - how long will a string be after con=
+version?
+> >> + * @from - pointer to input string
+> >> + * @maxbytes - don't go past this many bytes of input string
+> >> + * @codepage - source codepage
+> >> + *
+> >> + * Walk a string and return the number of bytes that the string w=
+ill
+> >> + * be after being converted to the given charset, not including a=
+ny null
+> >> + * termination required. Don't walk past maxbytes in the source b=
+uffer.
+> >> + */
+> >> +
+> >> +int
+> >> +smb2_local_to_ucs2_bytes(const char *from, int len,
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 const struct nls_table *codepage)
+> >> +{
+> >> + =C2=A0 =C2=A0 =C2=A0 int charlen;
+> >> + =C2=A0 =C2=A0 =C2=A0 int i;
+> >> + =C2=A0 =C2=A0 =C2=A0 wchar_t wchar_to;
+> >> +
+> >> + =C2=A0 =C2=A0 =C2=A0 if (from =3D=3D NULL)
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;
 
---------------040509080506050203020702
-Content-Type: application/octet-stream;
- name="cifs-traffic.zip"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="cifs-traffic.zip"
+		^^^^^^^^
+Are there really cases where you'll pass in a NULL pointer here?
 
-UEsDBBQAAgAIACtYnj8+w0jxKCYAAHkpAQARAAAAY2lmcy10cmFmZmljLnBjYXDEWwlYFMe2
-rmZYRkQFo4ZEoqNBryuyCbigDAIyssqggFFA4q5oBEQEF1yieGMgolfjEq8xaLjGLYo8twga
-44cB12fUqNe4vJsY9SbEuCCLvFOnuqd6hnYGv/e+94Zv+nT1zJz/bHXq1Onm8rf7P7ci1kR6
-NTYSIgCtWNAQ6dpLRUbAOX1XDOx/uae1y6yJQ5+tVZNgQgb7PwsgAbbZi8uLya/wbnn1ifBN
-YthZW8plq5VP8pJ0QqysO7pbW6nthe7V1fS6oFLZUc55wDkSxvTNeDL+yDkgp18AybVtGEa5
-Uu7CN1ef3KvY0Au42+1r29joUUI525QANyIIantJdkGwtqLc1wP3QBgHKsnt7f8c5c4zkdsO
-EHrnOpLUJdMJcpVkphzLgeNaOF+rxHG5fw1y7K/I0Zmk9ss35kgVb9RHBKYxqcuJ0ctVgx7o
-TazCIzzcPOPd3T3hVBsZoY30dPMgVpGxmvAIjbubB1yOjtLr4jWeKOPN3ipyEH5/UMmmX+a4
-U5vW3zCxaW+QMyHXuXF3hwdMRtJD+7Mo5yyDjLnKMjpZEZU9UGsn1AM/abhHSO3PHfMunq4S
-8hrVvYjDf5aMt9OfjIojUSSGhJHhcIwio0g0fDkCziJJLNGSMaKhH/Q267oXaOjlJoZOAEW2
-NHEdKEI5tu6jIj4gG32bchR6+NdSjvNWK3IE1zlvMOYIYlVTs6S/0nVWpBVMIRIbIIWlM/zR
-10348gHSQxVdrnLOb3BaWns6/3p18bTi1rufzp07/1XXyXgygaSSqWQmvNNJBkmDKxlkFmHB
-E46fzCFZREMyyUS4mg5XZsE1DfEibsQT3u6kL1x/n/jA94cRHQkhevh0tEiHkRnwi4nwiwwY
-TULOGhlf5hdrdxU5C+dnlYKrLMcDg+ukSXBtSQw7F5Hr/PKw/40mwbXCYEWl4FJDZDWSFRBT
-iYTEoSwTQLK5oJ2G9AedPEjT656gKf2j0mshrjQQX+PhG+PJZLQM/UWTGKTK+YJyW2nWUgq6
-Qv86DLruxiFyLuJexcaeECKZGTuahMgYqtycV4WIWkWsaYioQb1+hIyFPw8yAF3lAU7yQ5fR
-cw/4ZBqol0KooYbSF8qb6aEiy+DKMiVnZOZ4Yva0N3bGxp4g81fgjPcupTZxxhCDvKbOUDN5
-7RrJEJC2THgDr7Yi2oE4cWkIMRvmgUx/hfO/Ktlwvn892nCQiQ2/ArmmUxtm725iwyAqk6eS
-DVEma9LGitDZdl/FP7HCvEFTkQr+iLVAJVvrqSLL4eJyJWtl5XihtexMrDUdpPsTrPXG+JdN
-rBVgkCxXWTJ76lv68kMv++F5C0LsgGhEe23zNGuvBrTXQBN7/QmS7aX2yuryuvayaYa9bNBe
-B7xUpBAuFirZa1mON071WhN77U0MOz8o17mhcmhOE3uFm7eXDbVXO4O92on2ag+1CFiMTRRi
-iDYq4Qkvs/P1JdruXWPbnR8EUjZS271z73Xnq+1rzFcdJJVhxNVovl7yVpGFcGWhkkU/yOmP
-EdjKxKKNIPMGsGhq9YAmFvV71XwV1ExemK9+IG0jrHn0bUd00cOkWuY3kGY/nO9Xsl6RfyNa
-z9HEehvuVWwaRK23a7zBen+I1pvxqshj0tiRNj1wuLUN/6gHCRIjzxEqHXipmpkFqQZD+qsg
-9RN8N7Hnezk+aM8uxvbcNCgx7EKLXOf6hrN6I3v+AUzeRQ02C6Q8V1kDETgCgD+B80+UTLdk
-CEHTeRib7kILAE+hppu4qInpRpiftGrSRo3TVG46tWHS2mBSYXUXyrfWR0Uuw/llJcOczvHF
-qXvQxDApIGMcGGbvt+2bGCbf/NRVE3srWEqphHTSxpDB+Fkc+8ql5A7aurjTwstdzz1pOWjd
-/WJ6uIw6EuWXwKtJmhrA/SNgtQ4UJ/8/fMz6QEAfuJv4IA70fAI+WPj++tf1QYvX9MFNX7M+
-8EMflJj44AnIuB18MP7E0tf1QYv/Bx/86mvWB1bog34mPth+r2LzcvDB8uxdr+sD+2b44DcV
-94HrAL64NvHB/JwB6IMGYx9sXg4ywpJf/8bQvzfxQZB5H9hTH6gNPlCLPmjFvuLXj63/VLJR
-F83tb4ao0HLzTSwHy/7mc7C/WS7b3zRQ6c4Ax+txVmYKiSHWyNFLkSP4YvoVieNjB8uFxF9A
-15bNKCRUApXMIcGKrIOL65S8kJczEL1QbeKFc4lhF2GhqatMKTB4oRqlIyT61V5gktkTca/l
-h/suVki8BaedyzCWO6S/K4YOykyolJ0SrMx5xAbtl21sv4tQTHzW1dgjaL/qKuA4faba3Oyw
-RY69FTmCR2LHSRyf2VGO5mdHT9Db4TUyFJXv51lqcxlqEPrla2O/fNYVZFwJfllwoJ3kl0An
-lNFshmLy/d9mKKqj1Qdqc161Qx9kmfhgJehZAl4t4F6lPgh0ohxLgONG4LZRieOqIWrk2FmR
-ozMpeHDUmCPtEJj3aivSpi1TLYB/0tbgVYHAVuxNmFu2ULYT1L+X6N+9aWoyAhDo29S/ToNz
-BlP/Phpo4t8SkPYO+LfbmnRT/zpZm/dvK2JvTy4MpbJS/5Y7stLuLHhOnY+nofBhPDH2d1ZR
-Ywslf5v62ZFNVcNLyqZu4vh/wtdaIa7cRM5TxHF27Lmg8slVQk3md13DgE/MkZ5BO8o5tR4s
-flF0U1d0E3/9xzZ6PAlcgyA2k+DNujcTxc8/EGk771V1E9SVwtoVB2s/BJyZ6/JxLFFTOSlG
-J9n46y30GAY4scA7FfjOwl5RGpkHm5IMvEYL6CzpB5s+vXjpeKVw+9bSiR6AF/r2rh+uw3hL
-YVv95f1VAnGUGUrUq4cMzwpbmR0BL4l4w9sT3+5YsCfBJkgLE10L2oZB1CWQUJIr/m6hd+eN
-9dFVwujMW2tuAI40lnBjTPzaFX3CX2ue0eNExNWS4fAXTMJBw2C0biCcj4LzJNB/ApkE35oB
-dpgs09v1XOHqD/dw/I0Lv8CxOfyuMvw+z+mxJeIHopYMOQSyTyzIoYdPGDYxiqPSyRveW7CQ
-43puKU6hY3O4zjLcqnqCEUtxg8G+OqIBu/sZ0CT98lsUd42aXSXsu3Ybcb5y34tjczjdZTh5
-tQTbFG6okxb9Fw660V5hEPpSC2Ouo4S77tC4x9/O47jqHr/j2ByuPJ5m1rFlqyku8zPtFAfL
-rPup+Lubb/hM+Xokx63IiMOxOdwgGe62F/Rog7ixGLEUWwej/hDNScQXj7FilIWBHBqIvukw
-o+aBJHOx3yr3eLLI1/uN45h3rswanCGnfrP9QyKAnrFdzua0I6O0MdRaJlfOU3qcJHiA5DEy
-BClf3Bzbtpzmox3PIxSpw4/iAnubUcr/bRn/0aKfPTCOk0gE6J2AfVHj+JXwNh67H0/5Tohz
-TVCiDnuWsC/uW6KI51zL/OuJ/rSMN0SoSKN8V6V3TFeiBzpdY1/UXFPE80U8O8Qzp58Uv6FZ
-Plvj8qsM+bdD1uLB4TKqtH7I4/dgHZPCC/vtHoDb15AP+yrkQ0nPR+vWrAoG/qUe5xXpu4dE
-CcuzFPV89oKth17NtGvX3cnbKd+Uml2KdHibK6KCVxTx1LUcrzl2nVH5bJwd8L3bMyuP8r85
-rjCZjk9WFux/B2j44jK8ZUg+YVRjkm9PvGA3UbzRk/T+Bc0DGrSnDrOCsp63PBLyaZxETitU
-pEsz17Mv5q5X1HM46mmLa1tz7Dr6sw07KN/L9T8q0rqdfxPnx98U8UaKdvW2YFcpvxwP7nnG
-C/gmxh8eRfmPHd/jezput7rLT5RmlBxm5U05o6b5ZZu4jvV/RX7J3ZfiMgz47DpdeYXyL9q9
-FccSvXMlUcwviYr6nES/OQH/5uWXQzucHNxpfvxyzo8Ub4k2AscSdZ0jVhC5uYp4x58y6/g0
-0187Bp3XUL49/r0J49LzZIcu7jJaevi0OO9OK+KdEOsQn2bqV7Xhug/l+9hx6XWqX7ymq6+7
-jJZ2nC3ms9mKeKrnbB74NlO/m1bbYyjf/Y8n36B46r1t9e4y6vjsqPjNY4p4wc9ZfedrQb88
-kSaWT0pdPBfqyPAjmD/vTrFvOfljTpXyp59s/N0TZk8trM6j8f7dMJjnQXgXT4vrL53vtPbQ
-472+aLiWALEbhbnA26D3pw3vdr8TweVwSdueTMd3K7bPoVRJDqN1g26LyXysOTSAEYrIWsCT
-7lWLYSjSZX5W5PY8jnek893fJ33MqRKeu3x/gHp3B746QNRiTovGaoNKoMOaklYdOpM6SKor
-n22r63/xbKUB39rl0dT6vZwq4cv3JxdQ34ECQw5HG2sAJ9TEvzW9d9fZFVQJ2/YcQ5zoP2qO
-BJVyqoTjKRv3x/q1NeE4QYgUht7VYq03XKwz/eAYLH4nyqSODk0fU9vbnsux8/CkLrdHcmpJ
-31EY9r0AMQKfPwhEaYLxRqZ83cpOiq9zOMpxyK1BH7c/KqMKOPJ16x7OHweM5CDcJcRhNFH9
-ghFxOEav3iSeen00a+5PZRx3oY9blztlnCrhyvdHvQrw+RKVFqM1Do5RGEd0HIm1bahYy+tk
-c4ivKwE7F1zxOsLxqzsf7DvzBKdK+PJ15e4GXPUFNmOoriGAxPkvO7bhTW1RlVDvWIb8fxtX
-MNpORpX4y3tAC5F/ssDX/ySsDST+A99Zsf1qeYWQ4jP0Bcape1l6cCmnSvwdZONhfdF+WF/E
-g/Q6MQJpZ6UszWxXqQX2gDJNekB37lXsOZbrSOpkXSW11FWanm62VxOAvRof417NnmOv6NWo
-X6NXQ5OvPaly9CPljtirkebXspeh8R/9s1J4HDeljtqvR37tzcMvKg1UyX4dZOPe2J8ZT1Kw
-95CCT19MxecwZuINO0OebnllYQHsuyUcn5lF3xfu4VQJRyMb/4J+KpXtwVmshcKsZmtFENbb
-Uv5yPXL3POVb23D6HF0PSw8JF+h45/g4/6UHoL5wFb8oJmeNSf5qe58en1vE0xh6EMp9AL8+
-Z+aE5HO9/9Hi3L98tnOqpLe8D3C3ljkvEBDCADcU12cdotJYlXAiXz4cWrSQ47TObNnQ9wCn
-SjjtZONTtWweBKJ2gQYdoyBjELG7jXXv7fVVXk95vGx72OcvNA9LVAlnsGycgXVUNyMdksR1
-Tocdh3C8SvsA1MIheF2Pe4FQXDWCjfKn68zqTZ2Cud7qeT79qBwSVZKnj2z8X7/T42wTeaJx
-BQ4VaxEtrsWBeD5GXCmldeP++18mjbSFfc2RaYjv9lmbP6m9JWppH3kPk/lo4M7sPRx3O95G
-KyIduwOiJ1Rnkr9rdhzWUL0l3OMJuSc6B3Nqyd/JP9Djz4A7CjysEdfE0YYVSpq3g9+Z9E3w
-EY6TqL8VH3qEU0vzduxnBDNooFhN0ue0pDkUJVYB8jj2qYmzX2rD8fZEaBf80Z5TS3o14jrc
-BmOH1lFh4DMWW1qjuDkX0DBgqIbjuDy1PzFhLqdKOL1k4+KnLG6CxF0+q2h0mCXCRL2CxdqV
-dQWM6428lYt/2DyF49/uPPIqjReJKuHL+3bLsI6chDOGWZPFpt7QjaXxQyuQKHzsVvLntVZz
-qw914bjPwt1+o3gStVQvd6yhx++xntDi/IjEmjUIZ6nGkEMlPQc+6zfgzT4cb6CmTRm1r0SV
-8Fxl4zEu9PitiBeDscos6ol9ulH4hB/FNp6XIWtSLxddrBR2uKQi7s6LU+fQ+JGoJfsWY/6f
-gLhh6M0YzEY6zAbGVtfJ7PvzNwfuTk+sMuBmnUyyfniUU0v2nfcH6+uzGpJamGU+HRxpLynS
-xL62b5X964tkjhdbVKQugnH9vnXdKLVk323YDslUWNua9tvl68DGfK9TNQc47rXi78bvP8Sp
-Eu4Q2Tgb508Jzha269Jj9UXjNwxjVo+Zl0VXJK5D0eJOgsV4EEjM7b51YJD7vfmAu2gWkyf/
-c4eH8zm1ZHf/PqzOZLX6MECNEfdesWgJL5P9dsql7d5V+zheVvGbv/gc4NRSXhyG83cn9vaD
-cc+QYNj7ybOGVOfmZn1y9VNY38fcmY148R+uHLphIaeW6tzKWtb/kd9LkPeX0ibf7fawhPOP
-LHWIeVTCqSX+3TDv9pbxH2BUB6VV3v880onz3/eW784YJ04t1Zkzatj+aiJ4YCo+BZyBT0hP
-xCOfD7dDdjlkn6s04HSa8MirdQdOLc2HIFwgnoh6sJ14pGEFof1e+S6Kz4f8nPR5p15w3LHT
-356xvj2nSrgB8voW42EI4FLOIYAQjj2BJDHqE2S4rDKKhlnTtDaS5DlWdjC1ahu3t71v/dd0
-LFEleQbKxh/WsT6FsTysVqMZgmV+ab2JwagNE2cnm8fGdXDKW0cbTz6uFEqGZaA81RNKLlC7
-SNRSHXwV7ROK3fRoXG2ZX/R458bH4P9VqYv8K3ZXGXAqrhz65+jjnFry/27EuYD3FPVo+xjM
-APRhRR/si8n/h4H3S05Vd/x3hwdcv+v9vU45w1iilvphFXfxKN4Lk6qJJMX1R48rX5RoeR3K
-I+mvedB5bP18rv/LGxdvvb2AU0vrXhjm5RdG9+R0eA8yBHOhDjMxz7+Sf196pF0+1Qn2Gzsy
-Edd5deHwsgJOLfl3+CK8CyZQlEAx97K1NhAxJTtnLjowYyLki2Knbpc6Ac6F1r+k0rHbCvtY
-ev/Py874Prbpvi6vht3/C8E5RVc7DdYPLH41WEewyAoV7+G4iY+jGuf/yKeP5nadzPVdO3XT
-zbRiTi3l/1v03zNIAd5Hpl0/WoHT9ZetdDz/S/Vq5N9XPvw1heNNWhDSPe1jTi3tczbVsvks
-4YUarTa8+h9lUrFKcXVhRvS6Y0crhSnqeYh/3/t59oZvKw3UUlzlrsHqUeD3zZNkPkgSM8pw
-8X4Pt/OD3tv/XLezyoCb9fh60pN9nEq9mvR0s70ae+zVzGnaqyk7lesoTFHq1XTMMNurCcJe
-jadxr6bs1P9qr2ZVF/ZcjZk4uob716WyFSNIXKn0YFG652JZWlrn75YcDB29tUo4OS2H1cUZ
-T/JTtnJqqd93HdeFPti7Zv93Q2OG58GbsXsXRxZx/tMe3wgcV8SpEn8f2bgE+X9k4D9GzAJs
-J87Om65AepAiAnd40nyJ/j4nutGey5FSFLSZ1v0StTRf7uE6kIb1b5S4owpD9Fhcg+LFtcdP
-9hyMPD9Et5449fPFHP/t6zPCv1jMqaX8sA/Xg1RZL5faWap+6SPz8Ygr+TUr+WL8qWSOdytv
-TtXZZE4t+XU19mVSZOtMGNpT4p8SOkLVfplMn82pKzos49RSfRiN9wM6iL4LxFVMvh8fkzyp
-31moM13OLkD+H5zNL6RjiVrylyfOAw/F3gJ96qE/9sBDcf2WMp88v+VOrRywpwvH737qoFNj
-F04t1Q32uK6w/7cLxr0Ly6yxuGqyO0ryulF6PiV2Tmn8DZneDyavPUPHElXCtZWNf8V9agz+
-b9x02Xrs8qX+0Kc/VgqZ/XKR7yOb+vabYCxRS/W2bV9Wz+uwh6JFjULF554iZH5zWFk50h32
-9xJOrZveviSPU0t+O4jz7B2Ma52hD0gtF4n7Xw2R7iywbBYr2k+aZ3mXSq2W2EAdsHoJ4g8e
-ObOg0IZTJXwX2fh38b6nKb58dZLX+ZM+nJbmcpTjjehzZMapo5xaqqujatmj4ubwklD3OLHP
-EIa9hkDx/ofe5D5djHM/oXMJl8fBZc9X9P6cRJXk8ZaNz+O876kgj9JMkkupN5o/Y0qPLz6z
-hcuRnd2q+PwWTi3Nn7HYh/8JYy0Cs23Uf7dz/lFVVVkcv48MUULxoQlKQuhoy1yiVmI1i/EH
-CggP6EGTQvIyC9RQS/AHogmEE7LKUfphKjMmmjlqZsZMLinHShv5UZk2ma3U4iXSrJHMMTRF
-mXv2ueeee9+775xsWf2zWUt3l1xn33Puuefs/T37frQ41/r9Yc8/uLrGFVvVYBt8vozGnfbq
-J+9Xr5mV5f3roa6xv+Z3LHhL13yTk+k4jzqM2TEPD7/yeqPur0/f0bdcfZ1b2XnWOYiv7wZ/
-TlCVU2GfY/Vtl+672rfqzkZb9RoHxLcpu44NIde7sqMgvnVZxLfG+rbvztPzGNp+hnayTCvc
-jHlaAkS6keo4ToU/kXBS6IQowhjxsn7nlBR0e7OG93tLYV0EuWZWtv7Hwzj3M9yXWWdOeefm
-J4e+ydufPWXAmnd2cyt7jvkBtP4kSctQnJpuZdSKjPvN2uKm0kf2qPvj7uVUl0w+FTF9D7cy
-/ffQELrfJEGGGAfvDVkfiU+nR/yVqO92fDzz0nLdhfu5//L5q8oX7+dWNo/WP02/mkzSvnFm
-yhhr/+DDhWc+eYW3b89ZPfnwK9zK4oGxl9l4knybnkYkGN735n1zPiI6J2t/4eiEcVUPcSs7
-L59DCuuVY5B5OOAtIGMVr53A0sreVNA8zXpny9aI5e//vtE2qu8zVDff9eFIUm/CrGydKYT3
-73k940nUzgki9aw7CWoWnKDq8vlyNXHotrL13G/COwNPk/nKrKzu4zEYzyIvv77WWaZxs/18
-Z68pb5D6EuY/sf7qeXJ+yKxsPw+Eyfup6ZyHqhrDIT9m49t6Z155+Vbu56OpS1uXb+VWNr6d
-Wqh+kAenwKTuPQ/+m6w0c9VVJV+NUvJAs5th2scGnw5fum4f9zv92y0XyTWzsn1sCNRBnNFP
-JDLhvaAx2BjQVlO1tyQZct8xHnnuS3odyB87iL/NgU13kLqpxj9kKlXq9YoLMc8TO6hJ+4dn
-rdffOvj9zmu6jzSY+zyPMJ4k63X0RxffNr4XHx9lYmt4ai+DlaxXm5bSee/QKilTtHtKg30g
-A3IcF0R5k7Xfmd+7shn5dSmzGm2VS1bQOOv5I+1ps7iV5f/vQtwTouVxCYZKp0iY/fF6jOk0
-1Y908rsYG7KhQfc7xP1iGrlm1spvV8P1RngeGfCOZcLTMK/DzUnl48n3Hqz9uLC6uN8Vcitb
-h8dfpPGTA/KzTF1T0es2J4xZ8she3v7u6P6OnL3cytp3LKd5qANWSId+ysf2Tb/8VVUHJvD2
-d1RnJzRM4FaWZ374Ld3HHDA3E7RZ4V2lxfqzydFwtJOa7/335Eo6Dy4mbvYv41a2rxBlJapA
-qNUEglZT4K3VHGosDrbVW2k1k+YFKG1BCvzx1GqCWooSiFbzXalZqznUyLSalRGeWk3QzmvS
-ahYGjVImqf+6MEiJbad16A7tXU/RtHC2ju/2K+nsX8vH72DNhWmda7mV1bP1Ax1tGWQIyRb7
-pJ6XpZ/c0mUJ9zNwXEI22R+ZleVloZr+TxWWREPWTM8FndrZOq2RoIqEMa/d8cb/AmpXc/9+
-F0YcItfMyvLaryCOLYN1ymFYh0aU585038Db3f3gi11InQezsnXosrY+0/WPrsUOPeogK7C5
-FpHN+7jKf03ZV8397nz5Db91W7mVrUMBLfRcgVZ7OvW6UvYe+49ynFs9utE2Yexz9FzeOWdk
-8H3cyt5jpY2uE2SVyNQ0ZFJzSPuXqFVeDNfn4bkF63JInPbyphdo3dfZ2/MWTeVWFk+sgP4s
-0M5iWJUnWy3482p679ir9re5n8Ppq2vINbOyeOJHiOun2dJgP2VxaArsm8PhRIZWAnjqb483
-nS1yFjXofve2RG8/4OBWlk8saaPvsVV+lGzIw3X96O+t21bkN9oyZqwFfwPSnjl+aw23snm5
-BN63rjCeaaDi8vyFnjkZT+H4evK2fVnFaDX+3NFQBX6fPNN8ivhjVlYvEwvrf7iH32T9BI/1
-b6b79pqsdO6nZ1vFN650bmX9+wz0uSn6lzFsv6FatVm9TjWOa+G4kX5/5n4zByz94Ka13Mr8
-Fl6m33VY+XVp9c9Orc8Jxvyw9NGNX9dyvzv371vhruVWFu/HgN9nLPy6lAJ1PlF6F6FVuQwn
-P3yffelvXw0My+H+k7PLwjJmcSuLG77/ivyda/gSiSrWbFwPJr2Ye++aRlvA0PU0n1+xzpm0
-hltZ3VpOO5+vtFqfjaFLPzOnVXR0bWXv5cjc94M/ruF+hwyYmH6ohlvZe2k/z/yO12LG+7U4
-NhHiuzEe587nPj6wOPqFBt1f+Rf1TdGV3MrWuW9gnfuTtmpTddcJfaI5vX4+90PLPV+r+8Pj
-b22h74e9aXvBRm5l8fl9l2k2ZOXHBXo8ee8nQa3IeL2aja93s1MTsheq60992Dbwv/K2nPD4
-hdzK9o8i8N8J/GfoTzNR/9Y1GVYGpz6uewc95lbKuL9uIx6IJ/Efs7I4Zir46636S9ZizRRN
-pzLHMR8lv5UZoLbXfjkV9LDZc4/Ddb8DO75ftF/1H+Cthxnfw/g2X34iPWI0kp/dpWtferxx
-Ym5eVC3v5/6OLr3713Ir27/s0M8H4V3IgDNlT603HlaHVI/1NvvUxjc3lxj8fv1s5ZYSbmXv
-5174Hus2S82PfdszBnynQIzHxjv7y7iWBzZxv3F9JnXJ3MStbB6/1s7WW3NNSCKsc9bag/F5
-Hw46fu8/x3L/kQmtJe+O5Va27sZdpHXMxHucFm1laDFKpBYtJ2kzgPzmbqirHaaPe9uPuW5S
-78r8Tw+5sXLCHm5l+439Av3uxdq/seqAzDYeX1aE1L7SHKjGC4tfo+c1jxbHkHiWWdl6n99G
-4/V0TXdIhcrIRJ6H/sF9Ja6jQW8/rUfMzKgt3MrytrYfaH1SuqYoT9LWP6bfVHX7zx3j1vD7
-/2bRvw+Qa2Zl+s2CdloXboy+42ClS9LUYpdJO3ZpNUDjtHpwkgW65gnzypsgr8z3zitPFFvl
-lYfUFj/J9xexXYKgxQGWLYba6jvrLV5aqVFABGyXIWpe2e0a2C7k/sbO8xexXZKA7bLBnPee
-KM5OOhxdHHrp6PnNet47Cu5RyHah9/dT2C7/qNlVcX3YLqSP89Q+Ckgs3eAZhJmfweFo98GT
-dvIM/tJoegbkrjPEz6D7zyKxkDsdv8BfVDGSDBUjg81P46Rdvdun1aex1FAxoj0NUcUIvVNf
-JBYbkliQxIIkFvhBEou3XySxKEhiQRILkligtAlJLEhiQRILkliQxIIkFiSxIInFWmH8rUgs
-RFlJW+AvUva6gwb0uIcG9LT74Nk+ZmXv0iqirpAWfxBrNWmg1Qw0azVn+/jQalZdg1aDJBYk
-sQhP5JHEgiQWJLEgiUUWLyOJBUksoA8iiQVJLIZrJLEgiQVJLEhiQRILklis5tUvSWIhysoV
-sVYTDFrNHC+tps4W5Uur2bRQqNVkgFYTZdJq1Nauq1aDJBYksSCJBUksgi/WkMSCJBYksSCJ
-RZ/PSGJBEouCJBZf6wySWJDEgiQWJLGw9pHEQvexX4vEQpSVbQuFWk0P0Gpme2s19sG+tJrT
-hf4iEsskILHMNWs19sFMqzGQWDStRkRisdBqkMSCJBbJOoQkFiSxiOYlkliQxIIkFiSxIInF
-HMcgiQVJLEhiQRKLjMRCssAzhcK80g555SzvvDLihK+88qmlQgpICLTY07LFUFv95FfNLSpC
-CshQNa8M/tkUkDtKhNUKWVCt0NecAUecUO/2ZHFoR8e1VSvQO/VFAfFDCghSQJACAj9IAfH2
-ixQQBSkgSAFBCgiU1SAFBCkgSAFBCghSQJACghQQpIBYq1u/JQUkuUSoKvUEDegxDw3opLtu
-WLNPCohYq3GBVtPbrNUMa74OWg1SQJACIjwNRgoIUkCQAoIUEFm8jBQQpICAPogUEKSAGK6R
-AoIUEKSAIAUEKSBIAbGaV784BUSs1fQCrWamt1YzptUnBaRUqNVMA60mxKzVjGm9rloNUkCQ
-AoIUEKSACL6WQgoIUkCQAoIUEH0+IwUEKSAKUkB8rTNIAUEKCFJAkALC2kcKCN3HflUKSKlQ
-q7kZtJoZ3lqNs82XVnP4KSEFJBcoINPMWo2zjWk110YBsdBqkAKCFBDJOoQUEKSAiOYlUkCQ
-AoIUEKSAIAXEHMcgBQQpIEgBQQrIT6GAHHtKmFf2hrxyunde+dBWj7yykuWVq5cJKSCh0GJ3
-yxZDbfXLyswtKkIKyL5blIAeP5sCEl4urFaYCdUKN5kz4Ie2ZicdiVEz4Fc9qhUqxdUK9E59
-UUBuQAoIUkCQAgI/SAHx9osUEAUpIEgBQQoIlNUgBQQpIEgBQQoIUkCQAoIUEKSAWKtbvyUF
-ZGS5UFUKAw0ox6wBHYlx1z2xy5eqdEKs1cwGrSbArNU8ses6aDVIAUEKiPA0GCkgSAFBCghS
-QGTxMlJAkAIC+iBSQJACYrhGCghSQJACghQQpIAgBcRqXv3SFJBTYq2mD2g1j3prNaV7fGk1
-FcuFWs1c0Go6mbWa0j3XVatBCghSQJACghQQwddSSAFBCghSQJACos9npIAgBURBCoivdQYp
-IEgBQQoIUkBY+0gBofvYr0kBWbVcqNX0Ba3mEW+t5rn3fGk1X1YIKSDzgQKSYdZqnnuPaTUe
-FJBKMQXEQqtBCghSQCTrEFJAkAIimpdIAUEKCFJAkAKCFBBzHIMUEKSAIAUEKSA/hQLirhDm
-leGQV07zzis3zLfKK4+oLV5wBsLJz0qrFktjb4EWe1q2GGqrvyuEtXi1QKOATPRNARkRqQTY
-le5kPfNTXu5u+D86BeRGpYsak2pjSe5vTkag8inoet55r/JBUSHJe9vzzXnvhvnqPS5T897J
-fy3X895MuEc1rPed99L76+oHB2J+ULzk1Er7tU/PGZOj+bLtWSsmR7Bi/WPT/6I504PKRPhS
-Kx362PX+QNAKZ1g9g6zYfvAM7vF4BsvcddUB5Bn0mWZ6BqRoqz/p4xM+n0EIG9wKg2Ovwc0q
-WgSDe9w8uNUBqvPt6uCOCE/3GlzuuFjoeK3qeBac/lv02BUbAT2+y6PH21Xn0aTHIZ959XgQ
-cVygGIaZn5urjnsqfh36lPrC4Nyr166iIuj15x69jlZv4Kja6869PvDqNXde7NP5IM156elA
-0RscCT13efT8qHoDmeY3+GoxuQHSYlh8kKjFW6HFbMsWe5haXMdazDK06DVAdxYtJgN0xc9j
-gDLVVj8v7tHR+dZh+gBlkVZJi7nie4yCe5zicY+fq61mefSa3GPW/wFQSwECFAAUAAIACAAr
-WJ4/PsNI8SgmAAB5KQEAEQAAAAAAAAAAACAAAAAAAAAAY2lmcy10cmFmZmljLnBjYXBQSwUG
-AAAAAAEAAQA/AAAAVyYAAAAA
---------------040509080506050203020702--
+> >> + =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; len && *from; i++, from +=3D =
+charlen, len -=3D charlen) {
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 charlen =3D cod=
+epage->char2uni(from, len, &wchar_to);
+								^^^^
+						This may result	in an unaligned
+						access. You should use
+						put_unaligned to place this
+						in the string.
+
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Failed conve=
+rsion defaults to a question mark */
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (charlen < 1=
+)
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 charlen =3D 1;
+> >> + =C2=A0 =C2=A0 =C2=A0 }
+> >> + =C2=A0 =C2=A0 =C2=A0 return 2 * i; /* UCS characters are two byt=
+es */
+> >> +}
+> >> +
+> >> +/*
+> >> + * smb2_strndup_to_ucs - copy a string to wire format from the lo=
+cal codepage
+> >> + * @src - source string
+> >> + * @maxlen - don't walk past this many bytes in the source string
+> >> + * @ucslen - the length of the allocated string in bytes (includi=
+ng null)
+> >> + * @codepage - source codepage
+> >> + *
+> >> + * Take a string convert it from the local codepage to UCS2 and
+> >> + * put it in a new buffer. Returns a pointer to the new string or=
+ NULL on
+> >> + * error.
+> >> + */
+> >> +__le16 *
+> >> +smb2_strndup_to_ucs(const char *src, const int maxlen, int *ucs_l=
+en,
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const struct nls_table =
+*codepage)
+> >> +{
+> >> + =C2=A0 =C2=A0 =C2=A0 int len;
+> >> + =C2=A0 =C2=A0 =C2=A0 __le16 *dst;
+> >> +
+> >> + =C2=A0 =C2=A0 =C2=A0 len =3D smb2_local_to_ucs2_bytes(src, maxle=
+n, codepage);
+> >> + =C2=A0 =C2=A0 =C2=A0 len +=3D 2; /* NULL */
+> >> + =C2=A0 =C2=A0 =C2=A0 dst =3D kmalloc(len, GFP_KERNEL);
+> >> + =C2=A0 =C2=A0 =C2=A0 if (!dst) {
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 *ucs_len =3D 0;
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return NULL;
+> >> + =C2=A0 =C2=A0 =C2=A0 }
+> >> + =C2=A0 =C2=A0 =C2=A0 cifs_strtoUCS(dst, src, maxlen, codepage);
+> >> + =C2=A0 =C2=A0 =C2=A0 *ucs_len =3D len;
+> >> + =C2=A0 =C2=A0 =C2=A0 return dst;
+> >> +}
+> >> +#endif /* CONFIG_CIFS_SMB2 */
+> >> diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+> >> index 6d02fd5..e00f677 100644
+> >> --- a/fs/cifs/cifs_unicode.h
+> >> +++ b/fs/cifs/cifs_unicode.h
+> >> @@ -380,4 +380,11 @@ UniStrlwr(register wchar_t *upin)
+> >>
+> >> =C2=A0#endif
+> >>
+> >> +#ifdef CONFIG_CIFS_SMB2
+> >> +extern int smb2_local_to_ucs2_bytes(const char *from, int len,
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const struct nls_t=
+able *codepage);
+> >> +extern __le16 *smb2_strndup_to_ucs(const char *src, const int max=
+len,
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int *ucs_len, const=
+ struct nls_table *cp);
+> >> +#endif /* CONFIG_CIFS_SMB2 */
+> >> +
+> >> =C2=A0#endif /* _CIFS_UNICODE_H */
+> >> --
+> >> 1.7.1
+> >>
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-ci=
+fs" in
+> >> the body of a message to majordomo@vger.kernel.org
+> >> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info=
+=2Ehtml
+> >>
+> >
+> > Should these functions be renamed to *utf16* instead of *ucs*
+> > to reflect the unicode encoding used in cifs/smb2 protocol?
+>=20
+> Seems no problem to rename it.
+>=20
+> Jeff, Steve, thoughts? If no objections - I will rename *ucs* to *utf=
+16*.
+>=20
+Yeah, now that I look over the NLS code, it does seem to be converting
+to UTF16 and not to UCS2. You should probably rename the existing *ucs*
+functions in cifs_unicode.c as well.
+
+Also, we should probably settle on a prefix for these that makes sense.
+These are only currently used by smb2 code, but they aren't truly
+smb2-specific. I'd name them cifs_* myself, but maybe something more
+neutral makes sense?
+
+--=20
+Jeff Layton <jlayton@redhat.com>
+--
+To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
+" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
