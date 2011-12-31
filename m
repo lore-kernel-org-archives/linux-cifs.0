@@ -1,8 +1,8 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: cifs: ls of mount point gives input/output error (probably
  related to CIFS: getdents() broken for large dirs)
-Date: Fri, 30 Dec 2011 23:43:15 -0600
-Message-ID: <CADT32eJ8NgYTOknQd0-=cD=HzH0Q8JHuiMezVH0+PbncL593HA@mail.gmail.com>
+Date: Fri, 30 Dec 2011 23:58:09 -0600
+Message-ID: <CADT32e+X+8X8u_AZUtg_oMSFhavYxzi9dUofxvRaWaUeSMWJcA@mail.gmail.com>
 References: <4EFBAF99.3010208@gmail.com>
 	<20111228210420.2a422d11@corrin.poochiereds.net>
 	<4EFC413A.80302@gmail.com>
@@ -156,5 +156,10 @@ ches
 1 has
 > it.
 
-I suspect 3.2.0-rc1 cifs will work correctly against a Windows 2003 or
-Windows 7 or Window 2008 server.
+different responses by Windows XP is causing the error.
+cifs does not send different requests in 3.16 and 3.2.0 (to receive
+different responses from Windows XP).
+
+I have 3.1.0-1-default-1+ and I see this error against a Windows XP sha=
+re
+when number of file system objects are large in the directory.
