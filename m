@@ -1,8 +1,8 @@
 From: Konstantinos Skarlatos <k.skarlatos-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: cifs: ls of mount point gives input/output error (probably related
  to CIFS: getdents() broken for large dirs)
-Date: Sun, 01 Jan 2012 14:38:35 +0200
-Message-ID: <4F0053CB.4040102@gmail.com>
+Date: Sun, 01 Jan 2012 15:58:05 +0200
+Message-ID: <4F00666D.70904@gmail.com>
 References: <4EFBAF99.3010208@gmail.com> <20111228210420.2a422d11@corrin.poochiereds.net> <4EFC413A.80302@gmail.com> <20111229083930.77fafba8@tlielax.poochiereds.net> <4EFC7124.3060900@gmail.com> <4EFD7EBB.2060708@gmail.com> <20111230081120.3f7710f1@tlielax.poochiereds.net> <4EFDFC4E.30102@gmail.com> <20111231065922.05727805@tlielax.poochiereds.net> <4EFF04E3.70200@gmail.com> <4EFF110C.7010302@gmail.com> <20111231202331.2a03bb35@corrin.poochiereds.net> <20120101064449.50277028@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8;
@@ -221,11 +221,13 @@ ld
 > probably test this one instead. Either way, let me know soon if you c=
 an
 > so we can get this into 3.2.
-Hello, i just woke up from the new year celebration :) . I think that i=
-=20
-will be able to test this patch in an hour or so.
 
-Regards
+Ok, I tested and it works fine for me. Thanks!
+
+PS: would you like me to send any cFYI or tcpdumps?
+
+Tested-by: Konstantinos Skarlatos<k.skarlatos-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
 >
 > ---------------------------[snip]----------------------------
 >
