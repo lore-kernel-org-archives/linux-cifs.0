@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 1/4] keys: add a "secret" key type
-Date: Fri,  6 Jan 2012 14:30:44 -0500
-Message-ID: <1325878247-12030-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 2/4] cifs: sanitize username handling
+Date: Fri,  6 Jan 2012 14:30:45 -0500
+Message-ID: <1325878247-12030-3-git-send-email-jlayton@redhat.com>
 References: <1325878247-12030-1-git-send-email-jlayton@redhat.com>
 Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org
@@ -11,100 +11,114 @@ In-Reply-To: <1325878247-12030-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-For CIFS, we want to be able to store NTLM credentials (aka username
-and password) in the keyring. We do not, however want to allow users
-to fetch those keys back out of the keyring since that would be a
-security risk.
+Currently, it's not very clear whether you're allowed to have a NULL
+vol->username or ses->user_name. Some places check for it and some don't.
 
-Unfortunately, due to the nuances of key permission bits, it's not
-possible to do this. We need to grant search permissions so the kernel
-can find these keys, but that also implies permissions to read the
-payload.
-
-Resolve this by adding a new key_type. This key type is essentially
-the same as key_type_user, but does not define a .read op. This
-prevents the payload from ever being visible from userspace.
+Make it clear that a NULL pointer is OK in these fields, and ensure that
+all the callers check for that.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- include/keys/user-type.h     |    3 ++-
- security/keys/internal.h     |    1 +
- security/keys/key.c          |    1 +
- security/keys/user_defined.c |   17 +++++++++++++++++
- 4 files changed, 21 insertions(+), 1 deletions(-)
+ fs/cifs/cifs_spnego.c |   10 +++++++---
+ fs/cifs/cifsencrypt.c |   11 ++++++++---
+ fs/cifs/connect.c     |   19 ++++++++++++-------
+ 3 files changed, 27 insertions(+), 13 deletions(-)
 
-diff --git a/include/keys/user-type.h b/include/keys/user-type.h
-index c37c342..41b5515 100644
---- a/include/keys/user-type.h
-+++ b/include/keys/user-type.h
-@@ -17,7 +17,7 @@
+diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
+index 2272fd5..e622863 100644
+--- a/fs/cifs/cifs_spnego.c
++++ b/fs/cifs/cifs_spnego.c
+@@ -113,9 +113,11 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+ 		   MAX_MECH_STR_LEN +
+ 		   UID_KEY_LEN + (sizeof(uid_t) * 2) +
+ 		   CREDUID_KEY_LEN + (sizeof(uid_t) * 2) +
+-		   USER_KEY_LEN + strlen(sesInfo->user_name) +
+ 		   PID_KEY_LEN + (sizeof(pid_t) * 2) + 1;
  
- /*****************************************************************************/
- /*
-- * the payload for a key of type "user"
-+ * the payload for a key of type "user" or "secret"
-  * - once filled in and attached to a key:
-  *   - the payload struct is invariant may not be changed, only replaced
-  *   - the payload must be read with RCU procedures or with the key semaphore
-@@ -33,6 +33,7 @@ struct user_key_payload {
- };
- 
- extern struct key_type key_type_user;
-+extern struct key_type key_type_secret;
- 
- extern int user_instantiate(struct key *key, const void *data, size_t datalen);
- extern int user_update(struct key *key, const void *data, size_t datalen);
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index c7a7cae..2784e07 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -33,6 +33,7 @@
- 
- extern struct key_type key_type_dead;
- extern struct key_type key_type_user;
-+extern struct key_type key_type_secret;
- 
- /*****************************************************************************/
- /*
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 4414abd..3d1d79d 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -996,6 +996,7 @@ void __init key_init(void)
- 	list_add_tail(&key_type_keyring.link, &key_types_list);
- 	list_add_tail(&key_type_dead.link, &key_types_list);
- 	list_add_tail(&key_type_user.link, &key_types_list);
-+	list_add_tail(&key_type_secret.link, &key_types_list);
- 
- 	/* record the root user tracking */
- 	rb_link_node(&root_key_user.node,
-diff --git a/security/keys/user_defined.c b/security/keys/user_defined.c
-index 69ff52c..e25782f 100644
---- a/security/keys/user_defined.c
-+++ b/security/keys/user_defined.c
-@@ -36,6 +36,23 @@ struct key_type key_type_user = {
- EXPORT_SYMBOL_GPL(key_type_user);
- 
- /*
-+ * This key type is essentially the same as key_type_user, but it does
-+ * not define a .read op. This is suitable for storing information in
-+ * the keyring that you do not want to be readable from userspace. For
-+ * instance, passwords or secret encryption keys.
-+ */
-+struct key_type key_type_secret = {
-+	.name		= "secret",
-+	.instantiate	= user_instantiate,
-+	.update		= user_update,
-+	.match		= user_match,
-+	.revoke		= user_revoke,
-+	.destroy	= user_destroy,
-+	.describe	= user_describe,
-+};
-+EXPORT_SYMBOL_GPL(key_type_secret);
++	if (sesInfo->user_name)
++		desc_len += USER_KEY_LEN + strlen(sesInfo->user_name);
 +
-+/*
-  * instantiate a user defined key
-  */
- int user_instantiate(struct key *key, const void *data, size_t datalen)
+ 	spnego_key = ERR_PTR(-ENOMEM);
+ 	description = kzalloc(desc_len, GFP_KERNEL);
+ 	if (description == NULL)
+@@ -152,8 +154,10 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+ 	dp = description + strlen(description);
+ 	sprintf(dp, ";creduid=0x%x", sesInfo->cred_uid);
+ 
+-	dp = description + strlen(description);
+-	sprintf(dp, ";user=%s", sesInfo->user_name);
++	if (sesInfo->user_name) {
++		dp = description + strlen(description);
++		sprintf(dp, ";user=%s", sesInfo->user_name);
++	}
+ 
+ 	dp = description + strlen(description);
+ 	sprintf(dp, ";pid=0x%x", current->pid);
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 5d9b9ac..bce99e6 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -420,15 +420,20 @@ static int calc_ntlmv2_hash(struct cifs_ses *ses, char *ntlmv2_hash,
+ 	}
+ 
+ 	/* convert ses->user_name to unicode and uppercase */
+-	len = strlen(ses->user_name);
++	len = ses->user_name ? strlen(ses->user_name) : 0;
+ 	user = kmalloc(2 + (len * 2), GFP_KERNEL);
+ 	if (user == NULL) {
+ 		cERROR(1, "calc_ntlmv2_hash: user mem alloc failure\n");
+ 		rc = -ENOMEM;
+ 		return rc;
+ 	}
+-	len = cifs_strtoUCS((__le16 *)user, ses->user_name, len, nls_cp);
+-	UniStrupr(user);
++
++	if (len) {
++		len = cifs_strtoUCS((__le16 *)user, ses->user_name, len, nls_cp);
++		UniStrupr(user);
++	} else {
++		memset(user, '\0', 2);
++	}
+ 
+ 	rc = crypto_shash_update(&ses->server->secmech.sdeschmacmd5->shash,
+ 				(char *)user, 2 * len);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 8dbb6ff..5e96e60 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1997,10 +1997,16 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
+ 			return 0;
+ 		break;
+ 	default:
++		/* NULL username means anonymous session */
++		if (ses->user_name == NULL) {
++			if (!vol->nullauth)
++				return 0;
++			break;
++		}
++
+ 		/* anything else takes username/password */
+-		if (ses->user_name == NULL)
+-			return 0;
+-		if (strncmp(ses->user_name, vol->username,
++		if (strncmp(ses->user_name,
++			    vol->username ? vol->username: "",
+ 			    MAX_USERNAME_SIZE))
+ 			return 0;
+ 		if (strlen(vol->username) != 0 &&
+@@ -3152,10 +3158,9 @@ cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
+ 		return -EINVAL;
+ 
+ 	if (volume_info->nullauth) {
+-		cFYI(1, "null user");
+-		volume_info->username = kzalloc(1, GFP_KERNEL);
+-		if (volume_info->username == NULL)
+-			return -ENOMEM;
++		cFYI(1, "Anonymous login");
++		kfree(volume_info->username);
++		volume_info->username = NULL;
+ 	} else if (volume_info->username) {
+ 		/* BB fixme parse for domain name here */
+ 		cFYI(1, "Username: %s", volume_info->username);
 -- 
 1.7.7.4
