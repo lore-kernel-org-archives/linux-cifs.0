@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 04/15] cifscreds: remove user parameter from create_description
-Date: Fri,  6 Jan 2012 13:14:36 -0500
-Message-ID: <1325873687-11229-5-git-send-email-jlayton@samba.org>
+Subject: [PATCH v3 06/15] cifscreds: make usage use "return" and have callers return
+Date: Fri,  6 Jan 2012 13:14:38 -0500
+Message-ID: <1325873687-11229-7-git-send-email-jlayton@samba.org>
 References: <1325873687-11229-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,86 +9,101 @@ In-Reply-To: <1325873687-11229-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The username should be part of the key payload and not part of
-the description. Also, prefix the address with an "a:" in the
-description. Eventually we'll also need a "domain" key variant.
+...banish the use of exit(), which may be helpful in the future in
+the event that we eventually move some of this code into a library.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifscreds.c |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+ cifscreds.c |   21 +++++++++++----------
+ 1 files changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/cifscreds.c b/cifscreds.c
-index a9181ef..a6cec98 100644
+index b6c1fb6..3ed15f2 100644
 --- a/cifscreds.c
 +++ b/cifscreds.c
-@@ -85,19 +85,19 @@ static void usage(void)
+@@ -70,7 +70,8 @@ struct command commands[] = {
+ };
  
- /* create key's description string from given credentials */
- static char *
--create_description(const char *addr, const char *user, char *desc)
-+create_description(const char *addr, char *desc)
+ /* display usage information */
+-static void usage(void)
++static int
++usage(void)
  {
- 	char *str_end;
- 	int str_len;
+ 	struct command *cmd;
  
--	sprintf(desc, "%s:%s:%s:", THIS_PROGRAM_NAME, addr, user);
-+	sprintf(desc, "%s:a:%s", THIS_PROGRAM_NAME, addr);
+@@ -80,7 +81,7 @@ static void usage(void)
+ 			cmd->name, cmd->format);
+ 	fprintf(stderr, "\n");
  
- 	return desc;
+-	exit(EXIT_FAILURE);
++	return EXIT_FAILURE;
  }
  
  /* search a specific key in keyring */
- static key_serial_t
--key_search(const char *addr, const char *user)
-+key_search(const char *addr)
- {
- 	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + \
- 		+ sizeof(THIS_PROGRAM_NAME) + 3];
-@@ -106,7 +106,7 @@ key_search(const char *addr, const char *user)
- 	char *buffer;
- 	int count, dpos, n, ret;
+@@ -217,7 +218,7 @@ static int cifscreds_add(int argc, char *argv[])
+ 	int ret;
  
--	create_description(addr, user, desc);
-+	create_description(addr, desc);
+ 	if (argc != 4)
+-		usage();
++		return usage();
  
- 	/* read the key payload data */
- 	count = keyctl_read_alloc(DEST_KEYRING, &keylist);
-@@ -210,7 +210,7 @@ key_add(const char *addr, const char *user, const char *pass)
- {
- 	char desc[INET6_ADDRSTRLEN + MAX_USERNAME_SIZE + sizeof(THIS_PROGRAM_NAME) + 3];
+ 	ret = resolve_host(argv[2], addrstr);
+ 	switch (ret) {
+@@ -312,7 +313,7 @@ static int cifscreds_clear(int argc, char *argv[])
+ 	int ret, count = 0, errors = 0;
  
--	create_description(addr, user, desc);
-+	create_description(addr, desc);
+ 	if (argc != 4)
+-		usage();
++		return usage();
  
- 	return add_key("user", desc, pass, strnlen(pass, MOUNT_PASSWD_SIZE) + 1,
- 		DEST_KEYRING);
-@@ -251,7 +251,7 @@ static int cifscreds_add(int argc, char *argv[])
- 		*nextaddress++ = '\0';
+ 	ret = resolve_host(argv[2], addrstr);
+ 	switch (ret) {
+@@ -380,7 +381,7 @@ static int cifscreds_clearall(int argc, char *argv[] __attribute__ ((unused)))
+ 	int count = 0, errors = 0;
  
- 	while (currentaddress) {
--		if (key_search(currentaddress, argv[3]) > 0) {
-+		if (key_search(currentaddress) > 0) {
- 			printf("You already have stashed credentials "
- 				"for %s (%s)\n", currentaddress, argv[2]);
- 			printf("If you want to update them use:\n");
-@@ -349,7 +349,7 @@ static int cifscreds_clear(int argc, char *argv[])
- 		*nextaddress++ = '\0';
+ 	if (argc != 2)
+-		usage();
++		return usage();
  
- 	while (currentaddress) {
--		key_serial_t key = key_search(currentaddress, argv[3]);
-+		key_serial_t key = key_search(currentaddress);
- 		if (key > 0) {
- 			if (keyctl(KEYCTL_UNLINK, key, DEST_KEYRING) < 0) {
- 				fprintf(stderr, "error: Removing key from "
-@@ -454,7 +454,7 @@ static int cifscreds_update(int argc, char *argv[])
- 		*nextaddress++ = '\0';
+ 	/*
+ 	 * search for all program's credentials stashed in session keyring
+@@ -420,7 +421,7 @@ static int cifscreds_update(int argc, char *argv[])
+ 	int ret, id, count = 0;
  
- 	while (currentaddress) {
--		if (key_search(currentaddress, argv[3]) > 0) {
-+		if (key_search(currentaddress) > 0) {
- 			addrs[count] = currentaddress;
- 			count++;
+ 	if (argc != 4)
+-		usage();
++		return usage();
+ 
+ 	ret = resolve_host(argv[2], addrstr);
+ 	switch (ret) {
+@@ -491,7 +492,7 @@ int main(int argc, char **argv)
+ 		thisprogram = THIS_PROGRAM_NAME;
+ 
+ 	if (argc == 1)
+-		usage();
++		return usage();
+ 
+ 	/* find the best fit command */
+ 	best = NULL;
+@@ -510,7 +511,7 @@ int main(int argc, char **argv)
+ 		/* partial match */
+ 		if (best) {
+ 			fprintf(stderr, "Ambiguous command\n");
+-			exit(EXIT_FAILURE);
++			return EXIT_FAILURE;
  		}
+ 
+ 		best = cmd;
+@@ -518,8 +519,8 @@ int main(int argc, char **argv)
+ 
+ 	if (!best) {
+ 		fprintf(stderr, "Unknown command\n");
+-		exit(EXIT_FAILURE);
++		return EXIT_FAILURE;
+ 	}
+ 
+-	exit(best->action(argc, argv));
++	return best->action(argc, argv);
+ }
 -- 
 1.7.7.4
