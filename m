@@ -1,103 +1,86 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: allow admins to specify an alternate krb5.conf
- file
-Date: Tue, 10 Jan 2012 13:37:31 -0500
-Message-ID: <20120110133731.703e891b@tlielax.poochiereds.net>
-References: <1326220007-527-1-git-send-email-jlayton@samba.org>
+From: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: Properly update mtab during remount V2
+Date: Tue, 10 Jan 2012 16:53:02 -0200
+Message-ID: <20120110185302.GB25854@andromeda.usersys.redhat.com>
+References: <1325178125-13884-1-git-send-email-cmaiolino@redhat.com>
+ <20120103072229.3cb43bf4@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, myllynen-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: unlisted-recipients:; (no To-header on input)
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1326220007-527-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20120103072229.3cb43bf4-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 10 Jan 2012 13:26:47 -0500
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-
-> This was actually requested by the Red Hat QA group, who sometimes work
-> with multiple krb5.conf files when testing.
+Hi Jeff
+On Tue, Jan 03, 2012 at 07:22:29AM -0500, Jeff Layton wrote:
+> > +
+> > +	mtabfile = strdup(MOUNTED);
 > 
-> Requested-by: Marko Myllynen <myllynen-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  cifs.upcall.8.in |    8 +++++++-
->  cifs.upcall.c    |   13 ++++++++++---
->  2 files changed, 17 insertions(+), 4 deletions(-)
+> This looks like a buffer overrun. Here, you're strduping MOUNTED...
 > 
-> diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
-> index 0d79a99..3ae0562 100644
-> --- a/cifs.upcall.8.in
-> +++ b/cifs.upcall.8.in
-> @@ -22,7 +22,7 @@
->  cifs.upcall \- Userspace upcall helper for Common Internet File System (CIFS)
->  .SH "SYNOPSIS"
->  .HP \w'\ 'u
-> -cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\-uid|\-l] {keyid}
-> +cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\-uid|\-l] [--krb5conf=/path/to/krb5.conf|-k /path/to/...] {keyid}
->  .SH "DESCRIPTION"
->  .PP
->  This tool is part of the cifs-utils suite\&.
-> @@ -38,6 +38,12 @@ for a particular key type\&. While it can be run directly from the command\-line
->  This option is deprecated and is currently ignored\&.
->  .RE
->  .PP
-> +\--krb5conf=/path/to/krb5.conf|-k /path/to/krb5.conf
-> +.RS 4
-> +This option allows administrators to set an alternate location for the
-> +krb5.conf file that cifs.upcall will use.
-> +.RE
-> +.PP
->  \-\-trust\-dns|\-t
->  .RS 4
->  With krb5 upcalls, the name used as the host portion of the service principal defaults to the hostname portion of the UNC\&. This option allows the upcall program to reverse resolve the network address of the server in order to get the hostname\&.
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index f560d21..0d222cb 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -759,12 +759,13 @@ lowercase_string(char *c)
->  
->  static void usage(void)
->  {
-> -	fprintf(stderr, "Usage: %s [-t] [-v] [-l] key_serial\n", prog);
-> +	fprintf(stderr, "Usage: %s [-k /path/to/krb5.conf] [-t] [-v] [-l] key_serial\n", prog);
->  }
->  
->  const struct option long_options[] = {
-> -	{"trust-dns", 0, NULL, 't'},
-> +	{"krb5conf", 1, NULL, 'k'},
->  	{"legacy-uid", 0, NULL, 'l'},
-> +	{"trust-dns", 0, NULL, 't'},
->  	{"version", 0, NULL, 'v'},
->  	{NULL, 0, NULL, 0}
->  };
-> @@ -792,7 +793,7 @@ int main(const int argc, char *const argv[])
->  
->  	openlog(prog, 0, LOG_DAEMON);
->  
-> -	while ((c = getopt_long(argc, argv, "cltv", long_options, NULL)) != -1) {
-> +	while ((c = getopt_long(argc, argv, "ck:ltv", long_options, NULL)) != -1) {
->  		switch (c) {
->  		case 'c':
->  			/* legacy option -- skip it */
-> @@ -800,6 +801,12 @@ int main(const int argc, char *const argv[])
->  		case 't':
->  			try_dns++;
->  			break;
-> +		case 'k':
-> +			if (setenv("KRB5_CONFIG", optarg, 1) != 0) {
-> +				syslog(LOG_ERR, "unable to set $KRB5_CONFIG: %d", errno);
-> +				goto out;
-> +			}
-> +			break;
->  		case 'l':
->  			legacy_uid++;
->  			break;
+> > +	mtabdir = dirname(mtabfile);
+> 
+> Then altering that string to get the dirname...
+> 
+> > +	if (!mtabdir) {
+> > +		fprintf(stderr, "del_mtab: cannot determine current mtab path");
+> > +		rc = EX_FILEIO;
+> > +		goto del_mtab_exit;
+> > +	}
+> > +
+> > +	tmpfile = strcat(mtabdir, MNT_TMP_FILE);
+> 
+> Then using strcat to append MNT_TMP_FILE to mtabdir. But, won't that be
+> longer than the original string that you strdup'ed?
+> 
+Right, makes sense. I'll be changing this to pre-allocate enough memory
+to tmpfile and mtabdir before concatenate the strings.
 
-Oops -- note that this is a patch to cifs.upcall.c in cifs-utils. The
-"cifs:" makes it look like a kernel patch, but it isn't...
+> > +		if (rc) {
+> > +			fprintf(stderr, "del_mtab: unable to add mount entry to mtab\n");
+> > +			ftruncate(fd, statbuf.st_size);
+> 
+> 			^^^^^^^^^^^^
+> 			At this point, statbuf is full of leftover stack
+> 			junk. You're going to truncate it to an unknown
+> 			value here since you haven't fstat'ed it yet.
+> 
+> 			In any case, there's no reason to truncate the
+> 			original mnttab here. You aren't altering it.
+> 			Won't that potentially fail since you opened it
+> 			"r" anyway?
+> 
+
+About the ftruncate, I'm removing it since it's not necessary. About the
+open mode of mnttab, the rename() function doesn't need the file to be
+opened, look that both files are closed before call rename().
+
+> > +	}
+> > +
+> > +	tmprc = my_endmntent(mntmtab, statbuf.st_size);
+> > +	if (tmprc) {
+> > +		fprintf(stderr, "del_mtab: error %d detected on close of mtab\n", tmprc);
+> > +		rc = EX_FILEIO;
+> > +	}
+> 
+> You probably don't need to use my_endmntent here since the original
+> mtab isn't being altered, just replaced.
+> 
+> > +	endmntent(mnttmp);
+> 
+> You should however fflush the mnttmp stream, and fsync that fd before
+> you replace the mtab. You could use my_endmntent for that, but there's
+> no need to truncate if that fails -- you'll just want to delete the
+> tmpfile in that case and return an error (right?).
+> 
+I'm changing the order here. I'll close mnttmp using my_endmntent() to
+ensure it gets synched before it's closed and use endmntent() to close
+the mntmtab since the last one does not need a sync.
+
+I hope to have the patch today yet.
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--Carlos
