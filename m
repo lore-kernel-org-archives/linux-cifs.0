@@ -1,149 +1,164 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: allow admins to specify an alternate krb5.conf file
-Date: Tue, 10 Jan 2012 13:18:53 -0600
-Message-ID: <CADT32eLroF4EoreYdNqgA2V7H+4YNBt9_oke=HFa8ZsHG9UvhA@mail.gmail.com>
-References: <1326220007-527-1-git-send-email-jlayton@samba.org>
-	<CADT32eJ_Md78_eZ_zyox55GOy=2dsRjZXs-QAVELZD9eGAUQXA@mail.gmail.com>
-	<20120110141626.6545c293@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, myllynen-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] mount.cifs: Properly update mtab during remount V3
+Date: Tue, 10 Jan 2012 18:49:22 -0200
+Message-ID: <1326228562-18494-1-git-send-email-cmaiolino@redhat.com>
+Cc: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120110141626.6545c293-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jan 10, 2012 at 1:16 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Tue, 10 Jan 2012 13:04:53 -0600
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Tue, Jan 10, 2012 at 12:26 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wr=
-ote:
->> > This was actually requested by the Red Hat QA group, who sometimes=
- work
->> > with multiple krb5.conf files when testing.
->> >
->> > Requested-by: Marko Myllynen <myllynen-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> > ---
->> > =A0cifs.upcall.8.in | =A0 =A08 +++++++-
->> > =A0cifs.upcall.c =A0 =A0| =A0 13 ++++++++++---
->> > =A02 files changed, 17 insertions(+), 4 deletions(-)
->> >
->> > diff --git a/cifs.upcall.8.in b/cifs.upcall.8.in
->> > index 0d79a99..3ae0562 100644
->> > --- a/cifs.upcall.8.in
->> > +++ b/cifs.upcall.8.in
->> > @@ -22,7 +22,7 @@
->> > =A0cifs.upcall \- Userspace upcall helper for Common Internet File=
- System (CIFS)
->> > =A0.SH "SYNOPSIS"
->> > =A0.HP \w'\ 'u
->> > -cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\=
--uid|\-l] {keyid}
->> > +cifs\&.upcall [\-\-trust\-dns|\-t] [\-\-version|\-v] [\-\-legacy\=
--uid|\-l] [--krb5conf=3D/path/to/krb5.conf|-k /path/to/...] {keyid}
->> > =A0.SH "DESCRIPTION"
->> > =A0.PP
->> > =A0This tool is part of the cifs-utils suite\&.
->> > @@ -38,6 +38,12 @@ for a particular key type\&. While it can be ru=
-n directly from the command\-line
->> > =A0This option is deprecated and is currently ignored\&.
->> > =A0.RE
->> > =A0.PP
->> > +\--krb5conf=3D/path/to/krb5.conf|-k /path/to/krb5.conf
->> > +.RS 4
->> > +This option allows administrators to set an alternate location fo=
-r the
->> > +krb5.conf file that cifs.upcall will use.
->> > +.RE
->> > +.PP
->> > =A0\-\-trust\-dns|\-t
->> > =A0.RS 4
->> > =A0With krb5 upcalls, the name used as the host portion of the ser=
-vice principal defaults to the hostname portion of the UNC\&. This opti=
-on allows the upcall program to reverse resolve the network address of =
-the server in order to get the hostname\&.
->> > diff --git a/cifs.upcall.c b/cifs.upcall.c
->> > index f560d21..0d222cb 100644
->> > --- a/cifs.upcall.c
->> > +++ b/cifs.upcall.c
->> > @@ -759,12 +759,13 @@ lowercase_string(char *c)
->> >
->> > =A0static void usage(void)
->> > =A0{
->> > - =A0 =A0 =A0 fprintf(stderr, "Usage: %s [-t] [-v] [-l] key_serial=
-\n", prog);
->> > + =A0 =A0 =A0 fprintf(stderr, "Usage: %s [-k /path/to/krb5.conf] [=
--t] [-v] [-l] key_serial\n", prog);
->> > =A0}
->> >
->> > =A0const struct option long_options[] =3D {
->> > - =A0 =A0 =A0 {"trust-dns", 0, NULL, 't'},
->> > + =A0 =A0 =A0 {"krb5conf", 1, NULL, 'k'},
->> > =A0 =A0 =A0 =A0{"legacy-uid", 0, NULL, 'l'},
->> > + =A0 =A0 =A0 {"trust-dns", 0, NULL, 't'},
->> > =A0 =A0 =A0 =A0{"version", 0, NULL, 'v'},
->> > =A0 =A0 =A0 =A0{NULL, 0, NULL, 0}
->> > =A0};
->> > @@ -792,7 +793,7 @@ int main(const int argc, char *const argv[])
->> >
->> > =A0 =A0 =A0 =A0openlog(prog, 0, LOG_DAEMON);
->> >
->> > - =A0 =A0 =A0 while ((c =3D getopt_long(argc, argv, "cltv", long_o=
-ptions, NULL)) !=3D -1) {
->> > + =A0 =A0 =A0 while ((c =3D getopt_long(argc, argv, "ck:ltv", long=
-_options, NULL)) !=3D -1) {
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0switch (c) {
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case 'c':
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* legacy option --=
- skip it */
->> > @@ -800,6 +801,12 @@ int main(const int argc, char *const argv[])
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case 't':
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0try_dns++;
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 case 'k':
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (setenv("KRB5_CON=
-=46IG", optarg, 1) !=3D 0) {
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 sysl=
-og(LOG_ERR, "unable to set $KRB5_CONFIG: %d", errno);
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto=
- out;
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case 'l':
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0legacy_uid++;
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
->> > --
->> > 1.7.7.4
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe linux-ci=
-fs" in
->> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.ht=
-ml
->>
->> Who does getenv on KRB5_CONFIG?
->>
->
-> The krb5 libraries.
->
->> Also, is the name of the environment variable as KRB5_CONFIG, decide=
-d?
->> It is a common name, perhaps we can change it to something like
->> CIFS_KRB5_CONFIG (and mention it in the manpage) to make it
->> cifs (upcall) specific?
->
-> It's a well-known environment variable that affects what krb5.conf th=
-e
-> krb5 libs will use. What would be the point of changing the name?
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+During a remount of a cifs filesystem, the mtab file is not properly updated, which
+leads to a doubled entry of the same filesystem in the /etc/mtab file. This patch
+adds a new function del_mtab() which is called before the add_mtab() in case the fs
+is being remounted.
+The del_mtab() function will delete from the mtab, the old entry from the filesystem
+which is being remounted, and then, calls add_mtab() to add an updated entry to the
+mtab file.
 
-got it.  Patch looks fine then.
+Signed-off-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ mount.cifs.c |  107 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 107 insertions(+), 0 deletions(-)
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 147f7fc..a7c76e9 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -42,6 +42,7 @@
+ #include <fcntl.h>
+ #include <limits.h>
+ #include <paths.h>
++#include <libgen.h>
+ #include <sys/mman.h>
+ #include <sys/wait.h>
+ #ifdef HAVE_LIBCAP_NG
+@@ -161,6 +162,7 @@
+ #define OPT_BKUPUID    30
+ #define OPT_BKUPGID    31
+ 
++#define MNT_TMP_FILE "/.mtab.tmp.XXXXXX"
+ 
+ /* struct for holding parsed mount info for use by privleged process */
+ struct parsed_mount_info {
+@@ -1624,6 +1626,106 @@ add_mtab_exit:
+ 	return rc;
+ }
+ 
++static int
++del_mtab(char *mountpoint)
++{
++	int fd, tmprc, rc = 0;
++	FILE *mnttmp, *mntmtab;
++	struct mntent *mountent;
++	struct stat statbuf;
++	char *mtabfile, *mtabdir, *mtabtmpfile;
++
++	mtabfile = strdup(MOUNTED);
++	mtabdir = dirname(mtabfile);
++	mtabdir = realloc(mtabdir, strlen(mtabdir) + strlen(MNT_TMP_FILE) + 2 );
++	if (!mtabdir) {
++		fprintf(stderr, "del_mtab: cannot determine current mtab path");
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	mtabtmpfile = malloc(strlen(mtabdir) + strlen(MNT_TMP_FILE) + 2 );
++	mtabtmpfile = strcat(mtabdir, MNT_TMP_FILE);
++	if (!mtabtmpfile) {
++		fprintf(stderr, "del_mtab: cannot allocate memory to tmp file");
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	mtabtmpfile = mktemp(mtabtmpfile);
++	if (!mtabtmpfile) {
++		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	atexit(unlock_mtab);
++	rc = lock_mtab();
++	if (rc) {
++		fprintf(stderr, "del_mtab: cannot lock mtab");
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	mntmtab = setmntent(MOUNTED, "r");
++	if (!mntmtab) {
++		fprintf(stderr, "del_mtab: could not update mount table\n");
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	mnttmp = setmntent(mtabtmpfile, "w");
++	if (!mnttmp) {
++		fprintf(stderr, "del_mtab: could not update mount table\n");
++		endmntent(mntmtab);
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	fd = fileno(mnttmp);
++	if (fd < 0) {
++		fprintf(stderr, "del_mtab: mntent does not appear to be valid\n");
++		endmntent(mntmtab);
++		endmntent(mnttmp);
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	while ((mountent = getmntent(mntmtab)) != NULL) {
++		if (!strcmp(mountent->mnt_dir,mountpoint))
++			continue;
++		rc = addmntent(mnttmp, mountent);
++		if (rc) {
++			fprintf(stderr, "del_mtab: unable to add mount entry to mtab\n");
++			rc = EX_FILEIO;
++			break;
++		}
++	}
++
++	rc = fstat(fd, &statbuf);
++	if (rc != 0) {
++		fprintf(stderr, "del_mtab: unable to fstat open tmp file\n");
++		endmntent(mntmtab);
++		endmntent(mnttmp);
++		rc = EX_FILEIO;
++		goto del_mtab_exit;
++	}
++
++	tmprc = my_endmntent(mnttmp, statbuf.st_size);
++	if (tmprc) {
++		fprintf(stderr, "del_mtab: error %d detected on close of tmp file\n",
++				tmprc);
++		rc = EX_FILEIO;
++	}
++	endmntent(mntmtab);
++
++	rename(mtabtmpfile, MOUNTED);
++
++del_mtab_exit:
++	unlock_mtab();
++	return rc;
++}
++
+ /* have the child drop root privileges */
+ static int
+ drop_child_privs(void)
+@@ -2021,6 +2123,11 @@ mount_retry:
+ 	}
+ 
+ do_mtab:
++	if (parsed_info->flags & MS_REMOUNT){
++		rc = del_mtab(mountpoint);
++		if (rc)
++			goto mount_exit;
++	}
+ 	if (!parsed_info->nomtab && !mtab_unusable())
+ 		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
+ 
+-- 
+1.7.6.4
