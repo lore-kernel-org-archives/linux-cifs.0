@@ -1,167 +1,178 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v3 08/15] cifscreds: make username parameter optional
-Date: Wed, 11 Jan 2012 12:54:28 -0600
-Message-ID: <CADT32eKpvhk_9590JG8J5D9t0KXXVajWmdU-aVjuioS5-evjVw@mail.gmail.com>
-References: <1325873687-11229-1-git-send-email-jlayton@samba.org>
-	<1325873687-11229-9-git-send-email-jlayton@samba.org>
-	<CADT32eJAfBUozLzhobOpWq62hygwi1mfB76ZzWBfy7tKdVzhGA@mail.gmail.com>
-	<20120111134825.6a3dee8e@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: Properly update mtab during remount V4
+Date: Wed, 11 Jan 2012 14:08:54 -0500
+Message-ID: <20120111140854.33aedba7@tlielax.poochiereds.net>
+References: <1326303262-26843-1-git-send-email-cmaiolino@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120111134825.6a3dee8e-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1326303262-26843-1-git-send-email-cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jan 11, 2012 at 12:48 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
-:
-> On Wed, 11 Jan 2012 12:22:30 -0600
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Fri, Jan 6, 2012 at 12:14 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wro=
-te:
->> > ...and use getopt_long to get it. If someone doesn't specify the u=
-sername,
->> > use getusername() to get it.
->> >
->> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->> > ---
->> > =A0cifscreds.c | =A0 39 ++++++++++++++++++++++++++++-----------
->> > =A01 files changed, 28 insertions(+), 11 deletions(-)
->> >
->> > diff --git a/cifscreds.c b/cifscreds.c
->> > index 79ab426..f45497a 100644
->> > --- a/cifscreds.c
->> > +++ b/cifscreds.c
->> > @@ -27,8 +27,10 @@
->> > =A0#include <string.h>
->> > =A0#include <ctype.h>
->> > =A0#include <keyutils.h>
->> > +#include <getopt.h>
->> > =A0#include "mount.h"
->> > =A0#include "resolve_host.h"
->> > +#include "util.h"
->> >
->> > =A0#define THIS_PROGRAM_NAME "cifscreds"
->> >
->> > @@ -49,8 +51,8 @@
->> > =A0#define DEST_KEYRING KEY_SPEC_USER_KEYRING
->> >
->> > =A0struct cmdarg {
->> > - =A0 =A0 =A0 char =A0 =A0*host;
->> > - =A0 =A0 =A0 char =A0 =A0*user;
->> > + =A0 =A0 =A0 char =A0 =A0 =A0 =A0 =A0 =A0*host;
->> > + =A0 =A0 =A0 char =A0 =A0 =A0 =A0 =A0 =A0*user;
->> > =A0};
->> >
->> > =A0struct command {
->> > @@ -67,13 +69,18 @@ static int cifscreds_update(struct cmdarg *arg=
-);
->> > =A0const char *thisprogram;
->> >
->> > =A0struct command commands[] =3D {
->> > - =A0 =A0 =A0 { cifscreds_add, =A0 =A0 =A0 =A0"add", =A0 =A0 =A0 =A0=
- =A0"<host> <user>" },
->> > - =A0 =A0 =A0 { cifscreds_clear, =A0 =A0 =A0"clear", =A0 =A0 =A0 =A0=
-"<host> <user>" },
->> > + =A0 =A0 =A0 { cifscreds_add, =A0 =A0 =A0 =A0"add", =A0 =A0 =A0 =A0=
- =A0"[-u username] <host>" },
->> > + =A0 =A0 =A0 { cifscreds_clear, =A0 =A0 =A0"clear", =A0 =A0 =A0 =A0=
-"[-u username] <host>" },
->> > =A0 =A0 =A0 =A0{ cifscreds_clearall, =A0 "clearall", =A0 =A0 "" },
->> > - =A0 =A0 =A0 { cifscreds_update, =A0 =A0 "update", =A0 =A0 =A0 "<=
-host> <user>" },
->> > + =A0 =A0 =A0 { cifscreds_update, =A0 =A0 "update", =A0 =A0 =A0 "[=
--u username] <host>" },
->> > =A0 =A0 =A0 =A0{ NULL, "", NULL }
->> > =A0};
->> >
->> > +struct option longopts[] =3D {
->> > + =A0 =A0 =A0 {"username", 1, NULL, 'u'},
->> > + =A0 =A0 =A0 {NULL, 0, NULL, 0}
->> > +};
->> > +
->> > =A0/* display usage information */
->> > =A0static int
->> > =A0usage(void)
->> > @@ -499,12 +506,22 @@ int main(int argc, char **argv)
->> > =A0 =A0 =A0 =A0if (argc =3D=3D 1)
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return usage();
->> >
->> > + =A0 =A0 =A0 while((n =3D getopt_long(argc, argv, "u:", longopts,=
- NULL)) !=3D -1) {
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 switch (n) {
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 case 'u':
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 arg.user =3D optarg;
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 default:
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return usage();
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> > + =A0 =A0 =A0 }
->> > +
->> > =A0 =A0 =A0 =A0/* find the best fit command */
->> > =A0 =A0 =A0 =A0best =3D NULL;
->> > - =A0 =A0 =A0 n =3D strnlen(argv[1], MAX_COMMAND_SIZE);
->> > + =A0 =A0 =A0 n =3D strnlen(argv[optind], MAX_COMMAND_SIZE);
->> >
->> > =A0 =A0 =A0 =A0for (cmd =3D commands; cmd->action; cmd++) {
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (memcmp(cmd->name, argv[1], n) !=3D=
- 0)
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (memcmp(cmd->name, argv[optind], =
-n) !=3D 0)
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0continue;
->> >
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cmd->name[n] =3D=3D 0) {
->> > @@ -527,12 +544,12 @@ int main(int argc, char **argv)
->> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return EXIT_FAILURE;
->> > =A0 =A0 =A0 =A0}
->> >
->> > - =A0 =A0 =A0 /* first argument should be host */
->> > + =A0 =A0 =A0 /* second argument should be host */
->> > =A0 =A0 =A0 =A0if (argc >=3D 3)
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 arg.host =3D argv[2];
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 arg.host =3D argv[optind + 1];
->> >
->> > - =A0 =A0 =A0 if (argc >=3D 4)
->> > - =A0 =A0 =A0 =A0 =A0 =A0 =A0 arg.user =3D argv[3];
->> > + =A0 =A0 =A0 if (arg.user =3D=3D NULL)
->> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 arg.user =3D getusername(getuid());
->> >
->> > =A0 =A0 =A0 =A0return best->action(&arg);
->> > =A0}
->> > --
->> > 1.7.7.4
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe linux-ci=
-fs" in
->> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> > More majordomo info at =A0http://vger.kernel.org/majordomo-info.ht=
-ml
->>
->> Just a thought, can user specify only one hostname and would hostnam=
-e
->> be always the last argument for cifscreds_* commands?
->>
->> I was thinking whtether an user might want to manipulate keys for
->> multiple servers in one command!
->
-> Not a bad idea at all.
->
-> I don't see anything that would preclude that. I suppose we could tak=
-e
-> multiple host or domain arguments, and set keys for all of them. I'd
+On Wed, 11 Jan 2012 15:34:22 -0200
+Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-yes, something like a comma separated list
+> During a remount of a cifs filesystem, the mtab file is not properly updated, which
+> leads to a doubled entry of the same filesystem in the /etc/mtab file. This patch
+> adds a new function del_mtab() which is called before the add_mtab() in case the fs
+> is being remounted.
+> The del_mtab() function will delete from the mtab, the old entry from the filesystem
+> which is being remounted, and then, calls add_mtab() to add an updated entry to the
+> mtab file.
+> 
+> Signed-off-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  mount.cifs.c |   98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 files changed, 98 insertions(+), 0 deletions(-)
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 147f7fc..53b2a7d 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -42,6 +42,7 @@
+>  #include <fcntl.h>
+>  #include <limits.h>
+>  #include <paths.h>
+> +#include <libgen.h>
+>  #include <sys/mman.h>
+>  #include <sys/wait.h>
+>  #ifdef HAVE_LIBCAP_NG
+> @@ -161,6 +162,7 @@
+>  #define OPT_BKUPUID    30
+>  #define OPT_BKUPGID    31
+>  
+> +#define MNT_TMP_FILE "/.mtab.cifs.XXXXXX"
+>  
+>  /* struct for holding parsed mount info for use by privleged process */
+>  struct parsed_mount_info {
+> @@ -1624,6 +1626,97 @@ add_mtab_exit:
+>  	return rc;
+>  }
+>  
+> +static int
+> +del_mtab(char *mountpoint)
+> +{
+> +	int tmprc, rc = 0;
+> +	FILE *mnttmp, *mntmtab;
+> +	struct mntent *mountent;
+> +	char *mtabfile, *mtabdir, *mtabtmpfile;
+> +
+> +	mtabfile = strdup(MOUNTED);
+> +	mtabdir = dirname(mtabfile);
+> +	mtabdir = realloc(mtabdir, strlen(mtabdir) + strlen(MNT_TMP_FILE) + 2);
+> +	if (!mtabdir) {
+> +		fprintf(stderr, "del_mtab: cannot determine current mtab path");
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_exit;
+> +	}
+> +
+> +	mtabtmpfile = strcat(mtabdir, MNT_TMP_FILE);
+> +	if (!mtabtmpfile) {
+> +		fprintf(stderr, "del_mtab: cannot allocate memory to tmp file");
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_exit;
+> +	}
+> +
+> +	atexit(unlock_mtab);
+> +	rc = lock_mtab();
+> +	if (rc) {
+> +		fprintf(stderr, "del_mtab: cannot lock mtab");
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_exit;
+> +	}
+> +
+> +	mtabtmpfile = mktemp(mtabtmpfile);
+> +	if (!mtabtmpfile) {
+> +		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_exit;
+> +	}
+> +
+> +	mntmtab = setmntent(MOUNTED, "r");
+> +	if (!mntmtab) {
+> +		fprintf(stderr, "del_mtab: could not update mount table\n");
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_exit;
+> +	}
+> +
+> +	mnttmp = setmntent(mtabtmpfile, "w");
+> +	if (!mnttmp) {
+> +		fprintf(stderr, "del_mtab: could not update mount table\n");
+> +		endmntent(mntmtab);
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_exit;
+> +	}
+> +
+> +	while ((mountent = getmntent(mntmtab)) != NULL) {
+> +		if (!strcmp(mountent->mnt_dir,mountpoint))
+> +			continue;
+> +		rc = addmntent(mnttmp, mountent);
+> +		if (rc) {
+> +			fprintf(stderr, "del_mtab: unable to add mount entry to mtab\n");
+> +			rc = EX_FILEIO;
+> +			goto del_mtab_error;
+> +		}
+> +	}
+> +
+> +	endmntent(mntmtab);
+> +
+> +	tmprc = my_endmntent(mnttmp, 0);
+> +	if (tmprc) {
+> +		fprintf(stderr, "del_mtab: error %d detected on close of tmp file\n",
+> +				tmprc);
+> +		rc = EX_FILEIO;
+> +		goto del_mtab_error;
+> +	}
+> +
+> +	rename(mtabtmpfile, MOUNTED);
+> +
+> +del_mtab_exit:
+> +	unlock_mtab();
+> +	free(mtabdir);
+> +	return rc;
+> +
+> +del_mtab_error:
+> +	if (unlink(mtabtmpfile))
+> +		fprintf(stderr, "del_mtab: failed to delete tmp file - %s\n",
+> +				strerror(errno));
+> +	unlock_mtab();
+> +	free(mtabdir);
+> +	return rc;
 
-> probably not do that in this patchset since I'm already making a lot =
-of
-> changes here, but it wouldn't be too hard to do.
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+You can replace the above 3 lines with "goto del_mtab_exit". That's
+better since it consolidates the cleanup code in a single place.
 
-fair enough
+> +}
+> +
+>  /* have the child drop root privileges */
+>  static int
+>  drop_child_privs(void)
+> @@ -2021,6 +2114,11 @@ mount_retry:
+>  	}
+>  
+>  do_mtab:
+> +	if (parsed_info->flags & MS_REMOUNT){
+
+nit: please add a space between the '(' and '{'.
+
+The above should probably respect the '-n' flag too, and check that the
+mtab is usable before trying to change anything. What you might want to
+do is move that whole if statement inside the following if statement that
+checks nomtab and mtab_unusable.
+
+> +		rc = del_mtab(mountpoint);
+> +		if (rc)
+> +			goto mount_exit;
+> +	}
+>  	if (!parsed_info->nomtab && !mtab_unusable())
+>  		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
+>  
+
+Almost there!
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
