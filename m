@@ -1,87 +1,173 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [patch] cifs: integer overflow in parse_dacl()
-Date: Wed, 11 Jan 2012 12:31:34 -0600
-Message-ID: <CAH2r5msciOkxvxTrQrN9mKKCiJvM_anmxU7sag_TGk92LoKEwQ@mail.gmail.com>
-References: <20120111074627.GA4519@elgon.mountain>
-	<CADT32eLVwQT9V67BX8TkjVHDnQoYS7OqA_-xbnjY57ZXO3EfsA@mail.gmail.com>
-	<CAH2r5muDQUL=0HcoFHH3QvP7C2pyy0=S9ESFBcm=qOYg3ESdxQ@mail.gmail.com>
-	<20120111132053.467e8cae@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v3 08/15] cifscreds: make username parameter optional
+Date: Wed, 11 Jan 2012 13:48:25 -0500
+Message-ID: <20120111134825.6a3dee8e@tlielax.poochiereds.net>
+References: <1325873687-11229-1-git-send-email-jlayton@samba.org>
+	<1325873687-11229-9-git-send-email-jlayton@samba.org>
+	<CADT32eJAfBUozLzhobOpWq62hygwi1mfB76ZzWBfy7tKdVzhGA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120111132053.467e8cae-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <CADT32eJAfBUozLzhobOpWq62hygwi1mfB76ZzWBfy7tKdVzhGA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We could calculate max_aces based on a minimum sized ace and maximum
-smb frame size (which would be 64K presumably for Windows for
-non-Writes, but larger for Samba), but not sure if it is worth the
-trouble unless you find a path where we would parse beyond end of
-frame,
+On Wed, 11 Jan 2012 12:22:30 -0600
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-On Wed, Jan 11, 2012 at 12:20 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote=
-:
-> On Wed, 11 Jan 2012 11:24:03 -0600
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Wed, Jan 11, 2012 at 9:50 AM, Shirish Pargaonkar
->> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> > On Wed, Jan 11, 2012 at 1:46 AM, Dan Carpenter <dan.carpenter@orac=
-le.com> wrote:
->> >> On 32 bit systems num_aces * sizeof(struct cifs_ace *) could over=
-flow
->> >> leading to a smaller ppace buffer than we expected.
->> >>
->> >> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
->> >>
->> >> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
->> >> index 72ddf23..c1b2544 100644
->> >> --- a/fs/cifs/cifsacl.c
->> >> +++ b/fs/cifs/cifsacl.c
->> >> @@ -909,6 +909,8 @@ static void parse_dacl(struct cifs_acl *pdacl=
-, char *end_of_acl,
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0umode_t group_mask =3D S_IRWXG;
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0umode_t other_mask =3D S_IRWXU | S=
-_IRWXG | S_IRWXO;
->> >>
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (num_aces > ULONG_MAX / sizeof(s=
-truct cifs_ace *))
->> >
->> > Should an error/warning (like cifs client can't handle these many =
-aces or
->> > possible erroneous number of aces sent by server etc.) be logged b=
-efore
->> > returning?
->> >
->> >> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return;
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ppace =3D kmalloc(num_aces * sizeo=
-f(struct cifs_ace *),
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0GF=
-P_KERNEL);
->> >> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!ppace) {
->>
->> Perhaps. =A0 Also note that you would overflow maximum smb size if n=
-um
->> aces is huge
->> so would you have even gotten this far?
->>
->
-> Only if the smb frame is properly formed. It's possible that it's
-> corrupt in such a way that the num_aces field is much larger than it
-> should be, but the rest of the frame looks OK.
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> On Fri, Jan 6, 2012 at 12:14 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
+e:
+> > ...and use getopt_long to get it. If someone doesn't specify the us=
+ername,
+> > use getusername() to get it.
+> >
+> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> > ---
+> > =C2=A0cifscreds.c | =C2=A0 39 ++++++++++++++++++++++++++++---------=
+--
+> > =C2=A01 files changed, 28 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/cifscreds.c b/cifscreds.c
+> > index 79ab426..f45497a 100644
+> > --- a/cifscreds.c
+> > +++ b/cifscreds.c
+> > @@ -27,8 +27,10 @@
+> > =C2=A0#include <string.h>
+> > =C2=A0#include <ctype.h>
+> > =C2=A0#include <keyutils.h>
+> > +#include <getopt.h>
+> > =C2=A0#include "mount.h"
+> > =C2=A0#include "resolve_host.h"
+> > +#include "util.h"
+> >
+> > =C2=A0#define THIS_PROGRAM_NAME "cifscreds"
+> >
+> > @@ -49,8 +51,8 @@
+> > =C2=A0#define DEST_KEYRING KEY_SPEC_USER_KEYRING
+> >
+> > =C2=A0struct cmdarg {
+> > - =C2=A0 =C2=A0 =C2=A0 char =C2=A0 =C2=A0*host;
+> > - =C2=A0 =C2=A0 =C2=A0 char =C2=A0 =C2=A0*user;
+> > + =C2=A0 =C2=A0 =C2=A0 char =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+*host;
+> > + =C2=A0 =C2=A0 =C2=A0 char =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+*user;
+> > =C2=A0};
+> >
+> > =C2=A0struct command {
+> > @@ -67,13 +69,18 @@ static int cifscreds_update(struct cmdarg *arg)=
+;
+> > =C2=A0const char *thisprogram;
+> >
+> > =C2=A0struct command commands[] =3D {
+> > - =C2=A0 =C2=A0 =C2=A0 { cifscreds_add, =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+"add", =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0"<host> <user>" },
+> > - =C2=A0 =C2=A0 =C2=A0 { cifscreds_clear, =C2=A0 =C2=A0 =C2=A0"clea=
+r", =C2=A0 =C2=A0 =C2=A0 =C2=A0"<host> <user>" },
+> > + =C2=A0 =C2=A0 =C2=A0 { cifscreds_add, =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+"add", =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0"[-u username] <host>" },
+> > + =C2=A0 =C2=A0 =C2=A0 { cifscreds_clear, =C2=A0 =C2=A0 =C2=A0"clea=
+r", =C2=A0 =C2=A0 =C2=A0 =C2=A0"[-u username] <host>" },
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0{ cifscreds_clearall, =C2=A0 "clearall",=
+ =C2=A0 =C2=A0 "" },
+> > - =C2=A0 =C2=A0 =C2=A0 { cifscreds_update, =C2=A0 =C2=A0 "update", =
+=C2=A0 =C2=A0 =C2=A0 "<host> <user>" },
+> > + =C2=A0 =C2=A0 =C2=A0 { cifscreds_update, =C2=A0 =C2=A0 "update", =
+=C2=A0 =C2=A0 =C2=A0 "[-u username] <host>" },
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0{ NULL, "", NULL }
+> > =C2=A0};
+> >
+> > +struct option longopts[] =3D {
+> > + =C2=A0 =C2=A0 =C2=A0 {"username", 1, NULL, 'u'},
+> > + =C2=A0 =C2=A0 =C2=A0 {NULL, 0, NULL, 0}
+> > +};
+> > +
+> > =C2=A0/* display usage information */
+> > =C2=A0static int
+> > =C2=A0usage(void)
+> > @@ -499,12 +506,22 @@ int main(int argc, char **argv)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if (argc =3D=3D 1)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return usage=
+();
+> >
+> > + =C2=A0 =C2=A0 =C2=A0 while((n =3D getopt_long(argc, argv, "u:", l=
+ongopts, NULL)) !=3D -1) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (n) {
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 case 'u':
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 arg.user =3D optarg;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 break;
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 default:
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 return usage();
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+> > + =C2=A0 =C2=A0 =C2=A0 }
+> > +
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0/* find the best fit command */
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0best =3D NULL;
+> > - =C2=A0 =C2=A0 =C2=A0 n =3D strnlen(argv[1], MAX_COMMAND_SIZE);
+> > + =C2=A0 =C2=A0 =C2=A0 n =3D strnlen(argv[optind], MAX_COMMAND_SIZE=
+);
+> >
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0for (cmd =3D commands; cmd->action; cmd+=
++) {
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (memcmp(cmd->=
+name, argv[1], n) !=3D 0)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (memcmp(cmd->=
+name, argv[optind], n) !=3D 0)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0continue;
+> >
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (cmd->nam=
+e[n] =3D=3D 0) {
+> > @@ -527,12 +544,12 @@ int main(int argc, char **argv)
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return EXIT_=
+=46AILURE;
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0}
+> >
+> > - =C2=A0 =C2=A0 =C2=A0 /* first argument should be host */
+> > + =C2=A0 =C2=A0 =C2=A0 /* second argument should be host */
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0if (argc >=3D 3)
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 arg.host =3D arg=
+v[2];
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 arg.host =3D arg=
+v[optind + 1];
+> >
+> > - =C2=A0 =C2=A0 =C2=A0 if (argc >=3D 4)
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 arg.user =3D arg=
+v[3];
+> > + =C2=A0 =C2=A0 =C2=A0 if (arg.user =3D=3D NULL)
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 arg.user =3D get=
+username(getuid());
+> >
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0return best->action(&arg);
+> > =C2=A0}
+> > --
+> > 1.7.7.4
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-cif=
+s" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.=
+html
+>=20
+> Just a thought, can user specify only one hostname and would hostname
+> be always the last argument for cifscreds_* commands?
+>=20
+> I was thinking whtether an user might want to manipulate keys for
+> multiple servers in one command!
 
+Not a bad idea at all.
 
+I don't see anything that would preclude that. I suppose we could take
+multiple host or domain arguments, and set keys for all of them. I'd
+probably not do that in this patchset since I'm already making a lot of
+changes here, but it wouldn't be too hard to do.
 
 --=20
-Thanks,
-
-Steve
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
