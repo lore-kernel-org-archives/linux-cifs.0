@@ -1,155 +1,73 @@
-From: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] mount.cifs: Properly update mtab during remount V4
-Date: Wed, 11 Jan 2012 15:34:22 -0200
-Message-ID: <1326303262-26843-1-git-send-email-cmaiolino@redhat.com>
-Cc: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [patch] cifs: integer overflow in parse_dacl()
+Date: Wed, 11 Jan 2012 13:20:53 -0500
+Message-ID: <20120111132053.467e8cae@tlielax.poochiereds.net>
+References: <20120111074627.GA4519@elgon.mountain>
+	<CADT32eLVwQT9V67BX8TkjVHDnQoYS7OqA_-xbnjY57ZXO3EfsA@mail.gmail.com>
+	<CAH2r5muDQUL=0HcoFHH3QvP7C2pyy0=S9ESFBcm=qOYg3ESdxQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5muDQUL=0HcoFHH3QvP7C2pyy0=S9ESFBcm=qOYg3ESdxQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-During a remount of a cifs filesystem, the mtab file is not properly updated, which
-leads to a doubled entry of the same filesystem in the /etc/mtab file. This patch
-adds a new function del_mtab() which is called before the add_mtab() in case the fs
-is being remounted.
-The del_mtab() function will delete from the mtab, the old entry from the filesystem
-which is being remounted, and then, calls add_mtab() to add an updated entry to the
-mtab file.
+On Wed, 11 Jan 2012 11:24:03 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Signed-off-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- mount.cifs.c |   98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 98 insertions(+), 0 deletions(-)
+> On Wed, Jan 11, 2012 at 9:50 AM, Shirish Pargaonkar
+> <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> > On Wed, Jan 11, 2012 at 1:46 AM, Dan Carpenter <dan.carpenter@oracl=
+e.com> wrote:
+> >> On 32 bit systems num_aces * sizeof(struct cifs_ace *) could overf=
+low
+> >> leading to a smaller ppace buffer than we expected.
+> >>
+> >> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+> >>
+> >> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> >> index 72ddf23..c1b2544 100644
+> >> --- a/fs/cifs/cifsacl.c
+> >> +++ b/fs/cifs/cifsacl.c
+> >> @@ -909,6 +909,8 @@ static void parse_dacl(struct cifs_acl *pdacl,=
+ char *end_of_acl,
+> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0umode_t gro=
+up_mask =3D S_IRWXG;
+> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0umode_t oth=
+er_mask =3D S_IRWXU | S_IRWXG | S_IRWXO;
+> >>
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (num_aces > =
+ULONG_MAX / sizeof(struct cifs_ace *))
+> >
+> > Should an error/warning (like cifs client can't handle these many a=
+ces or
+> > possible erroneous number of aces sent by server etc.) be logged be=
+fore
+> > returning?
+> >
+> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 return;
+> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ppace =3D k=
+malloc(num_aces * sizeof(struct cifs_ace *),
+> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0GFP_KERNEL);
+> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (!ppace)=
+ {
+>=20
+> Perhaps.   Also note that you would overflow maximum smb size if num
+> aces is huge
+> so would you have even gotten this far?
+>=20
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 147f7fc..53b2a7d 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -42,6 +42,7 @@
- #include <fcntl.h>
- #include <limits.h>
- #include <paths.h>
-+#include <libgen.h>
- #include <sys/mman.h>
- #include <sys/wait.h>
- #ifdef HAVE_LIBCAP_NG
-@@ -161,6 +162,7 @@
- #define OPT_BKUPUID    30
- #define OPT_BKUPGID    31
- 
-+#define MNT_TMP_FILE "/.mtab.cifs.XXXXXX"
- 
- /* struct for holding parsed mount info for use by privleged process */
- struct parsed_mount_info {
-@@ -1624,6 +1626,97 @@ add_mtab_exit:
- 	return rc;
- }
- 
-+static int
-+del_mtab(char *mountpoint)
-+{
-+	int tmprc, rc = 0;
-+	FILE *mnttmp, *mntmtab;
-+	struct mntent *mountent;
-+	char *mtabfile, *mtabdir, *mtabtmpfile;
-+
-+	mtabfile = strdup(MOUNTED);
-+	mtabdir = dirname(mtabfile);
-+	mtabdir = realloc(mtabdir, strlen(mtabdir) + strlen(MNT_TMP_FILE) + 2);
-+	if (!mtabdir) {
-+		fprintf(stderr, "del_mtab: cannot determine current mtab path");
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	mtabtmpfile = strcat(mtabdir, MNT_TMP_FILE);
-+	if (!mtabtmpfile) {
-+		fprintf(stderr, "del_mtab: cannot allocate memory to tmp file");
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	atexit(unlock_mtab);
-+	rc = lock_mtab();
-+	if (rc) {
-+		fprintf(stderr, "del_mtab: cannot lock mtab");
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	mtabtmpfile = mktemp(mtabtmpfile);
-+	if (!mtabtmpfile) {
-+		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	mntmtab = setmntent(MOUNTED, "r");
-+	if (!mntmtab) {
-+		fprintf(stderr, "del_mtab: could not update mount table\n");
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	mnttmp = setmntent(mtabtmpfile, "w");
-+	if (!mnttmp) {
-+		fprintf(stderr, "del_mtab: could not update mount table\n");
-+		endmntent(mntmtab);
-+		rc = EX_FILEIO;
-+		goto del_mtab_exit;
-+	}
-+
-+	while ((mountent = getmntent(mntmtab)) != NULL) {
-+		if (!strcmp(mountent->mnt_dir,mountpoint))
-+			continue;
-+		rc = addmntent(mnttmp, mountent);
-+		if (rc) {
-+			fprintf(stderr, "del_mtab: unable to add mount entry to mtab\n");
-+			rc = EX_FILEIO;
-+			goto del_mtab_error;
-+		}
-+	}
-+
-+	endmntent(mntmtab);
-+
-+	tmprc = my_endmntent(mnttmp, 0);
-+	if (tmprc) {
-+		fprintf(stderr, "del_mtab: error %d detected on close of tmp file\n",
-+				tmprc);
-+		rc = EX_FILEIO;
-+		goto del_mtab_error;
-+	}
-+
-+	rename(mtabtmpfile, MOUNTED);
-+
-+del_mtab_exit:
-+	unlock_mtab();
-+	free(mtabdir);
-+	return rc;
-+
-+del_mtab_error:
-+	if (unlink(mtabtmpfile))
-+		fprintf(stderr, "del_mtab: failed to delete tmp file - %s\n",
-+				strerror(errno));
-+	unlock_mtab();
-+	free(mtabdir);
-+	return rc;
-+}
-+
- /* have the child drop root privileges */
- static int
- drop_child_privs(void)
-@@ -2021,6 +2114,11 @@ mount_retry:
- 	}
- 
- do_mtab:
-+	if (parsed_info->flags & MS_REMOUNT){
-+		rc = del_mtab(mountpoint);
-+		if (rc)
-+			goto mount_exit;
-+	}
- 	if (!parsed_info->nomtab && !mtab_unusable())
- 		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
- 
--- 
-1.7.6.4
+Only if the smb frame is properly formed. It's possible that it's
+corrupt in such a way that the num_aces field is much larger than it
+should be, but the rest of the frame looks OK.
+
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
