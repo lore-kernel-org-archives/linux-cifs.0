@@ -1,178 +1,71 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: Properly update mtab during remount V4
-Date: Wed, 11 Jan 2012 14:08:54 -0500
-Message-ID: <20120111140854.33aedba7@tlielax.poochiereds.net>
-References: <1326303262-26843-1-git-send-email-cmaiolino@redhat.com>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [patch] cifs: integer overflow in parse_dacl()
+Date: Thu, 12 Jan 2012 10:06:17 +0300
+Message-ID: <20120112070617.GQ3644@mwanda>
+References: <20120111074627.GA4519@elgon.mountain>
+ <CADT32eLVwQT9V67BX8TkjVHDnQoYS7OqA_-xbnjY57ZXO3EfsA@mail.gmail.com>
+ <CAH2r5muDQUL=0HcoFHH3QvP7C2pyy0=S9ESFBcm=qOYg3ESdxQ@mail.gmail.com>
+ <20120111132053.467e8cae@tlielax.poochiereds.net>
+ <CAH2r5msciOkxvxTrQrN9mKKCiJvM_anmxU7sag_TGk92LoKEwQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="vIXBmblrD40XNCy4"
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1326303262-26843-1-git-send-email-cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5msciOkxvxTrQrN9mKKCiJvM_anmxU7sag_TGk92LoKEwQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 11 Jan 2012 15:34:22 -0200
-Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> During a remount of a cifs filesystem, the mtab file is not properly updated, which
-> leads to a doubled entry of the same filesystem in the /etc/mtab file. This patch
-> adds a new function del_mtab() which is called before the add_mtab() in case the fs
-> is being remounted.
-> The del_mtab() function will delete from the mtab, the old entry from the filesystem
-> which is being remounted, and then, calls add_mtab() to add an updated entry to the
-> mtab file.
-> 
-> Signed-off-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  mount.cifs.c |   98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 98 insertions(+), 0 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 147f7fc..53b2a7d 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -42,6 +42,7 @@
->  #include <fcntl.h>
->  #include <limits.h>
->  #include <paths.h>
-> +#include <libgen.h>
->  #include <sys/mman.h>
->  #include <sys/wait.h>
->  #ifdef HAVE_LIBCAP_NG
-> @@ -161,6 +162,7 @@
->  #define OPT_BKUPUID    30
->  #define OPT_BKUPGID    31
->  
-> +#define MNT_TMP_FILE "/.mtab.cifs.XXXXXX"
->  
->  /* struct for holding parsed mount info for use by privleged process */
->  struct parsed_mount_info {
-> @@ -1624,6 +1626,97 @@ add_mtab_exit:
->  	return rc;
->  }
->  
-> +static int
-> +del_mtab(char *mountpoint)
-> +{
-> +	int tmprc, rc = 0;
-> +	FILE *mnttmp, *mntmtab;
-> +	struct mntent *mountent;
-> +	char *mtabfile, *mtabdir, *mtabtmpfile;
-> +
-> +	mtabfile = strdup(MOUNTED);
-> +	mtabdir = dirname(mtabfile);
-> +	mtabdir = realloc(mtabdir, strlen(mtabdir) + strlen(MNT_TMP_FILE) + 2);
-> +	if (!mtabdir) {
-> +		fprintf(stderr, "del_mtab: cannot determine current mtab path");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	mtabtmpfile = strcat(mtabdir, MNT_TMP_FILE);
-> +	if (!mtabtmpfile) {
-> +		fprintf(stderr, "del_mtab: cannot allocate memory to tmp file");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	atexit(unlock_mtab);
-> +	rc = lock_mtab();
-> +	if (rc) {
-> +		fprintf(stderr, "del_mtab: cannot lock mtab");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	mtabtmpfile = mktemp(mtabtmpfile);
-> +	if (!mtabtmpfile) {
-> +		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	mntmtab = setmntent(MOUNTED, "r");
-> +	if (!mntmtab) {
-> +		fprintf(stderr, "del_mtab: could not update mount table\n");
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	mnttmp = setmntent(mtabtmpfile, "w");
-> +	if (!mnttmp) {
-> +		fprintf(stderr, "del_mtab: could not update mount table\n");
-> +		endmntent(mntmtab);
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_exit;
-> +	}
-> +
-> +	while ((mountent = getmntent(mntmtab)) != NULL) {
-> +		if (!strcmp(mountent->mnt_dir,mountpoint))
-> +			continue;
-> +		rc = addmntent(mnttmp, mountent);
-> +		if (rc) {
-> +			fprintf(stderr, "del_mtab: unable to add mount entry to mtab\n");
-> +			rc = EX_FILEIO;
-> +			goto del_mtab_error;
-> +		}
-> +	}
-> +
-> +	endmntent(mntmtab);
-> +
-> +	tmprc = my_endmntent(mnttmp, 0);
-> +	if (tmprc) {
-> +		fprintf(stderr, "del_mtab: error %d detected on close of tmp file\n",
-> +				tmprc);
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_error;
-> +	}
-> +
-> +	rename(mtabtmpfile, MOUNTED);
-> +
-> +del_mtab_exit:
-> +	unlock_mtab();
-> +	free(mtabdir);
-> +	return rc;
-> +
-> +del_mtab_error:
-> +	if (unlink(mtabtmpfile))
-> +		fprintf(stderr, "del_mtab: failed to delete tmp file - %s\n",
-> +				strerror(errno));
-> +	unlock_mtab();
-> +	free(mtabdir);
-> +	return rc;
+--vIXBmblrD40XNCy4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-You can replace the above 3 lines with "goto del_mtab_exit". That's
-better since it consolidates the cleanup code in a single place.
+On Wed, Jan 11, 2012 at 12:31:34PM -0600, Steve French wrote:
+> We could calculate max_aces based on a minimum sized ace and maximum
+> smb frame size (which would be 64K presumably for Windows for
+> non-Writes, but larger for Samba), but not sure if it is worth the
+> trouble unless you find a path where we would parse beyond end of
+> frame,
 
-> +}
-> +
->  /* have the child drop root privileges */
->  static int
->  drop_child_privs(void)
-> @@ -2021,6 +2114,11 @@ mount_retry:
->  	}
->  
->  do_mtab:
-> +	if (parsed_info->flags & MS_REMOUNT){
+This was a static checker test and I haven't tried to exploit it.
+You guys are more familiar with the code obviously and you've lost
+me with the talk about max_aces.  I don't see that anywhere in the
+code...
 
-nit: please add a space between the '(' and '{'.
+$ grep max_aces fs/cifs/ -iR | wc -l
+0
 
-The above should probably respect the '-n' flag too, and check that the
-mtab is usable before trying to change anything. What you might want to
-do is move that whole if statement inside the following if statement that
-checks nomtab and mtab_unusable.
+regards,
+dan carpenter
 
-> +		rc = del_mtab(mountpoint);
-> +		if (rc)
-> +			goto mount_exit;
-> +	}
->  	if (!parsed_info->nomtab && !mtab_unusable())
->  		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
->  
 
-Almost there!
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--vIXBmblrD40XNCy4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPDoZpAAoJEOnZkXI/YHqRgzkP/RIJUmVsDXkf0/GCatUcLkyf
+Woxy/dUjZXi95iB3VsrN8CuyLlNAkMnDT2yVEL8pxT1txcA+RFyLW2YmGfbCRcD0
+XwVSkhYFZdruTkY1CoxFQ62aMtJWZ0CJXSRj7ylKsofgo5L77hkj1/NqvJ5sJ+DK
+ZUOoFIncQoUDI3ggiZzPL5h9fd3XLEqPoPejxOFFZRd3HmX3+uIoaGjbloL4ToMq
+m+ChPd6SbMoyzGyMOWsFVMv3UYxTPBQ3dM38SHsdZfU9svCZlLEZDkkUBM0TjdmJ
+ILLc6dyUu7DYWGZTIKqqc4/R4knABpwrPgTxJdTgbOnfDeiTW7jOAzWmGiIwCge7
+ICqC8jyYVgWN96nNM0sg3Sn8I3Ye5L5MT/BlSx+ysz4PjTiAaVN8TdkMwX+s2YDE
+000n5NSWTej9FfobNWGEt34BzOzt1Wo/aAcJpwa16rSRwwgkuNlBMRBih3VtxDdy
+pNaRAGQfrWtkBB7UJTOqVO1Eqe0oGVN6Gyq8RI2UnIPFEO2tSyOGE3jRQhEZGiSo
+/c4pvqxRuXT+kQBHk1E1Huw6fmWpUwT2C1YhljOrPf7WJLbF3IEXD/7UqHkA+MYe
+mq1zbAa+IFgrhyCwMd0dSUDFE9qdHtDZyobnrF30srzT9d8Je3RVRxuiCm8aluBh
+lExRrYpHH+wo0ytNGk9F
+=7YLy
+-----END PGP SIGNATURE-----
+
+--vIXBmblrD40XNCy4--
