@@ -1,48 +1,62 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Mirko Scholz <mscholz5-2/1ofaGcC4w@public.gmane.org>
 Subject: Re: file truncation on newer linux-cifs versions
-Date: Sun, 15 Jan 2012 07:31:35 -0500
-Message-ID: <20120115073135.79a52645@corrin.poochiereds.net>
-References: <20120113230701.GA3100@gwdu05.gwdg.de>
-	<CAOhYWN+dLLKXs6MU3W88oHzyFgi1KV+7oh1qPh61ZEqUA-Jw8w@mail.gmail.com>
-	<20120114135057.GA4197@gwdu05.gwdg.de>
-	<20120114093322.7e36221d@tlielax.poochiereds.net>
-	<20120114153041.GA11000@gwdu05.gwdg.de>
+Date: Sun, 15 Jan 2012 20:04:46 +0100
+Message-ID: <20120115190445.GA4008@gwdu05.gwdg.de>
+References: <20120113230701.GA3100@gwdu05.gwdg.de> <CAOhYWN+dLLKXs6MU3W88oHzyFgi1KV+7oh1qPh61ZEqUA-Jw8w@mail.gmail.com> <20120114135057.GA4197@gwdu05.gwdg.de> <20120114093322.7e36221d@tlielax.poochiereds.net> <CAH2r5ms9wfz_3dGeCLJ7bvXeKeerSEfFpbiTz6C_WdPbFk6WXA@mail.gmail.com>
+Reply-To: mscholz5-2/1ofaGcC4w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: mscholz5-2/1ofaGcC4w@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120114153041.GA11000-b2CffKLTPqzm5j4aBFDdOg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5ms9wfz_3dGeCLJ7bvXeKeerSEfFpbiTz6C_WdPbFk6WXA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 14 Jan 2012 16:30:41 +0100
-Mirko Scholz <mscholz5-2/1ofaGcC4w@public.gmane.org> wrote:
 
-> > To a degree...
-> > 
-> > [...]
-> 
-> Thanks for the information.  And sorry that you must repeat yourself.
-> It is actually the same as
-> https://bugzilla.samba.org/show_bug.cgi?id=8559 
-> 
-> Maybe one should add "Try again using wsize=65536" to
-> http://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
-> for the time beeing.
-> 
+On Sat, Jan 14, 2012 at 03:46:05PM -0600, Steve French wrote:
+> Can you experiment a little with setting different wsize values and see
+> if the server's bug starts at exactly 64K, or as we saw with another
+> server ~100K.  
+Wouldn't the -ENOSPC not appear at that size?  Anyways I tried
+68k, 80k and 100k, the problem of truncation remains.
 
-(re-cc'ing linux-cifs)
+> There is significant performance benefit in setting the wsize to
+> larger than 64K, but if we find a second server that maxes at ~100K we
+> may want to set it to that.  
 
-No problem.
+> I still would prefer to workaround buggy servers if it were possible
+> to recognize them because I hate to punish (with 20%+ or more worse
+> write performance) the vast majority of servers (Windows,Samba,
+> NetApp) for the bug of a few.
+IMHO there are a couple of alternatives, that do not punish other
+servers:
 
-Not a bad idea. I'll plan to add a FAQ or known problems section or
-something soon.
+educate your users, as
 
-That said, I'd prefer it if cifs.ko used a default wsize that was more
-or less guaranteed to work with any server in the field, and allowed
-people to set it higher if they know their server is able to handle it.
+* while elevated logging display a warning when encountering a short
+write.  Just that someone without deeper CIFS knowledge gets a hint.
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+I just didn't follow linux-cifs and haven't been aware of the wsize
+option at all, sorry.
+
+or do the workaround
+
+* during negotiation log something like "detected buggy/sub-performant
+server, setting wsize to known safe 65536" as at least one NIC driver
+did
+
+* go with 64k as default and have a white list of performant servers
+
+Whether you black or white list depends entirely which list is expected
+to be more definitive, doesn't it?  As I have no clue how many different
+CIFS servers there are, the white list sounds more rational to me.  But
+our setup may be a bit special anyways because Blue Arc supports NFS
+exports.  IT dept. only objects against shared access.
+
+> I would be curious though if your server gives any indication of write
+> error or silently ignores the large write.
+Expect an answer during next week.  I myself cannot obtain such
+information.
+
+Mirko
