@@ -1,50 +1,65 @@
-From: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2] mount.cifs: handle errors from rename() in del_mtab
-Date: Mon, 16 Jan 2012 16:57:44 -0200
-Message-ID: <20120116185744.GA9108@andromeda.usersys.redhat.com>
-References: <1326738193-18339-1-git-send-email-jlayton@samba.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: packed attribute
+Date: Tue, 17 Jan 2012 00:26:33 +0400
+Message-ID: <CAKywueST9AEjZLWCMsMuvBaN9t73BNXPoFpBGwW3F=tYQQfBmg@mail.gmail.com>
+References: <CAKywueSu=S-VkqS5K7=PYpt0a2hxR8Q=tmQrTEXSOvrKe=__Nw@mail.gmail.com>
+	<20120116075723.2a4d30bd@tlielax.poochiereds.net>
+	<CAH2r5mu49inWDNA_tVx2UW81ZPeMiBufa+8K2_z0fXUmmX4FbQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1326738193-18339-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <CAH2r5mu49inWDNA_tVx2UW81ZPeMiBufa+8K2_z0fXUmmX4FbQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Looks good,
+2012/1/16 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> On Mon, Jan 16, 2012 at 6:57 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
+te:
+>> On Mon, 16 Jan 2012 16:35:27 +0400
+>> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>
+>>> I noticed that when I run checkpatch.pl over my smb2 patches it fai=
+ls on
+>>>
+>>> struct example {
+>>> ...
+>>> } __attribute__((packed));
+>>>
+>>> and suggests to use
+>>>
+>>> struct example {
+>>> ...
+>>> } __packed;
+>>>
+>>> Also we already have many such "style broken" structures in cifsdpu=
+=2Eh.
+>>>
+>>> What do you think about it? Should we fix them all?
+>>>
+>>
+>> Hmm interesting...there's some discussion of this a few months ago h=
+ere:
+>>
+>> =A0 =A0https://lkml.org/lkml/2011/6/22/25
+>>
+>> ...looks like __packed is a shortcut in the kernel's compiler-gcc.h
+>> header. Looks like using __packed is fine in new code as long as the
+>> header will never be used by userspace (which may not have that
+>> shortcut defined).
+>>
+>
+> For new code it is good to make sure it is checkpatch clean
+> or reasonably close. =A0 I doubt it is worth the trouble to
+> go through cifspdu.h and change existing defines for something
+> like ihis, but for smb2pdu.h might as well make it clean.
+>
 
-On Mon, Jan 16, 2012 at 01:23:13PM -0500, Jeff Layton wrote:
-> The new del_mtab code ignored errors from rename(). Make it handle that
-> error as well like it does other errors.
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Reviewed-by: Carlos Maiolino <cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  mount.cifs.c |    6 +++++-
->  1 files changed, 5 insertions(+), 1 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index af071c1..78a4811 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -1700,7 +1700,11 @@ del_mtab(char *mountpoint)
->  		goto del_mtab_error;
->  	}
->  
-> -	rename(mtabtmpfile, MOUNTED);
-> +	if (rename(mtabtmpfile, MOUNTED)) {
-> +		fprintf(stderr, "del_mtab: error %d when renaming mtab in place\n", errno);
-> +		rc = EX_FILEIO;
-> +		goto del_mtab_error;
-> +	}
->  
->  del_mtab_exit:
->  	unlock_mtab();
-> -- 
-> 1.7.7.4
-> 
+Ok, I will change my smb2 patches appropriately.
 
--- 
---Carlos
+--=20
+Best regards,
+Pavel Shilovsky.
