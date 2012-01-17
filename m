@@ -1,151 +1,51 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: better instrumentation for coalesce_t2
-Date: Tue, 17 Jan 2012 16:40:11 -0500
-Message-ID: <1326836411-6932-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: [PATCH v3 0/4] cifs: allow multiuser mounts with authtypes besides krb5
+Date: Tue, 17 Jan 2012 16:42:23 -0500
+Message-ID: <1326836547-7011-1-git-send-email-jlayton@redhat.com>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When coalesce_t2 returns an error, have it throw a cFYI message that
-explains the reason. Also rename some variables to clarify what they
-represent.
+When the (newer) multiuser mount code was initially introduced for cifs,
+I limited it to sec=krb5 auth. When a new user walks into a mount, we
+have no way to prompt for a username and password from the kernel, so
+the only auth type we could support was krb5.
 
-Reported-and-Tested-by: Konstantinos Skarlatos <k.skarlatos-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |   84 +++++++++++++++++++++++++++++++---------------------
- 1 files changed, 50 insertions(+), 34 deletions(-)
+This patchset extends the code to allow other auth types to use
+multiuser mounts. The idea here is for users to put their username and
+password for a particular server or domain into the keyring. The kernel
+can then look for that key and use those credentials to establish a
+session on the user's behalf.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4666780..5cc1585 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -225,74 +225,90 @@ static int check2ndT2(struct smb_hdr *pSMB)
- 
- static int coalesce_t2(struct smb_hdr *psecond, struct smb_hdr *pTargetSMB)
- {
--	struct smb_t2_rsp *pSMB2 = (struct smb_t2_rsp *)psecond;
-+	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)psecond;
- 	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)pTargetSMB;
--	char *data_area_of_target;
--	char *data_area_of_buf2;
-+	char *data_area_of_tgt;
-+	char *data_area_of_src;
- 	int remaining;
--	unsigned int byte_count, total_in_buf;
--	__u16 total_data_size, total_in_buf2;
-+	unsigned int byte_count, total_in_tgt;
-+	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
- 
--	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
-+	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
-+	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
- 
--	if (total_data_size !=
--	    get_unaligned_le16(&pSMB2->t2_rsp.TotalDataCount))
--		cFYI(1, "total data size of primary and secondary t2 differ");
-+	if (tgt_total_cnt != src_total_cnt)
-+		cFYI(1, "total data count of primary and secondary t2 differ "
-+			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
- 
--	total_in_buf = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
-+	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
- 
--	remaining = total_data_size - total_in_buf;
-+	remaining = tgt_total_cnt - total_in_tgt;
- 
--	if (remaining < 0)
-+	if (remaining < 0) {
-+		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
-+			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
- 		return -EPROTO;
-+	}
- 
--	if (remaining == 0) /* nothing to do, ignore */
-+	if (remaining == 0) {
-+		/* nothing to do, ignore */
-+		cFYI(1, "no more data remains");
- 		return 0;
-+	}
- 
--	total_in_buf2 = get_unaligned_le16(&pSMB2->t2_rsp.DataCount);
--	if (remaining < total_in_buf2) {
-+	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
-+	if (remaining < total_in_src)
- 		cFYI(1, "transact2 2nd response contains too much data");
--	}
- 
- 	/* find end of first SMB data area */
--	data_area_of_target = (char *)&pSMBt->hdr.Protocol +
-+	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
- 				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
--	/* validate target area */
- 
--	data_area_of_buf2 = (char *)&pSMB2->hdr.Protocol +
--				get_unaligned_le16(&pSMB2->t2_rsp.DataOffset);
-+	/* validate target area */
-+	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
-+				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
- 
--	data_area_of_target += total_in_buf;
-+	data_area_of_tgt += total_in_tgt;
- 
--	/* copy second buffer into end of first buffer */
--	total_in_buf += total_in_buf2;
-+	total_in_tgt += total_in_src;
- 	/* is the result too big for the field? */
--	if (total_in_buf > USHRT_MAX)
-+	if (total_in_tgt > USHRT_MAX) {
-+		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
- 		return -EPROTO;
--	put_unaligned_le16(total_in_buf, &pSMBt->t2_rsp.DataCount);
-+	}
-+	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
- 
- 	/* fix up the BCC */
- 	byte_count = get_bcc(pTargetSMB);
--	byte_count += total_in_buf2;
-+	byte_count += total_in_src;
- 	/* is the result too big for the field? */
--	if (byte_count > USHRT_MAX)
-+	if (byte_count > USHRT_MAX) {
-+		cFYI(1, "coalesced BCC too large (%u)", byte_count);
- 		return -EPROTO;
-+	}
- 	put_bcc(byte_count, pTargetSMB);
- 
- 	byte_count = be32_to_cpu(pTargetSMB->smb_buf_length);
--	byte_count += total_in_buf2;
-+	byte_count += total_in_src;
- 	/* don't allow buffer to overflow */
--	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4)
-+	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
-+		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
- 		return -ENOBUFS;
-+	}
- 	pTargetSMB->smb_buf_length = cpu_to_be32(byte_count);
- 
--	memcpy(data_area_of_target, data_area_of_buf2, total_in_buf2);
-+	/* copy second buffer into end of first buffer */
-+	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
- 
--	if (remaining == total_in_buf2) {
--		cFYI(1, "found the last secondary response");
--		return 0; /* we are done */
--	} else /* more responses to go */
-+	if (remaining != total_in_src) {
-+		/* more responses to go */
-+		cFYI(1, "waiting for more secondary responses");
- 		return 1;
-+	}
-+
-+	/* we are done */
-+	cFYI(1, "found the last secondary response");
-+	return 0;
- }
- 
- static void
+Because of the quirkiness of keyring permissions, this patchset adds a
+new key type that does not allow the keys to be read from userspace.
+That should prevent compromise of the credentials by someone walking up
+to the user's machine while she is away at lunch.
+
+This patchset requires some changes to cifs-utils as well, to make it
+use the new key_type, description and payload format. I sent that set
+to the linux-cifs list earlier today.
+
+Comments and review of both sets is appreciated...
+
+Jeff Layton (4):
+  keys: add a "logon" key type
+  cifs: sanitize username handling
+  cifs: fetch credentials out of keyring for non-krb5 auth multiuser
+    mounts
+  cifs: warn about impending deprecation of legacy MultiuserMount code
+
+ fs/cifs/cifs_debug.c         |   11 ++-
+ fs/cifs/cifs_spnego.c        |   10 ++-
+ fs/cifs/cifsencrypt.c        |   11 ++-
+ fs/cifs/connect.c            |  194 ++++++++++++++++++++++++++++++++++++++----
+ include/keys/user-type.h     |    3 +-
+ security/keys/internal.h     |    1 +
+ security/keys/key.c          |    1 +
+ security/keys/user_defined.c |   37 ++++++++
+ 8 files changed, 243 insertions(+), 25 deletions(-)
+
 -- 
 1.7.7.5
