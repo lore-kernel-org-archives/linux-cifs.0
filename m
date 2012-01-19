@@ -1,10 +1,10 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
 Subject: Re: Trouble accessing Buffalo NAS with CIFSFS
-Date: Thu, 19 Jan 2012 07:05:43 -0500
-Message-ID: <20120119070543.662a3c56@tlielax.poochiereds.net>
+Date: Thu, 19 Jan 2012 23:08:50 +0530
+Message-ID: <4F18552A.3030804@suse.com>
 References: <20120119090752.9b7aea6c.ralda@gmx.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: "ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org>
@@ -13,23 +13,12 @@ In-Reply-To: <20120119090752.9b7aea6c.ralda-Mmb7MZpHnFY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 19 Jan 2012 09:07:52 +0100
-"ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org> wrote:
-
-> Hi!
-> 
-> Some weeks ago I upgraded my Linux system to a recent kernel (currently
-> 3.2.1). Since this update I have trouble accessing my NAS station
-> (Buffalo DriveStation 2Share) with CIFSFS.
-> 
-> Formerly I used an older 2.6er Kernel with SMBFS to mount and access
-> the NAS station. The speed was not that high, but the connection worked
-> without failures. As the SMBFS vanished I had to switch to CIFS in the
+On 01/19/2012 01:37 PM, ralda-Mmb7MZpHnFY@public.gmane.org wrote:
 > new installation. With CIFS I can mount the NAS station and I can see
 > the directory listings, but whenever I try to copy a file to the NAS
 > station the copy hangs and probably never return (leaving the process
 > with a D status in process list).
-> 
+
 > The NAS is mounted like this (output from /proc/mounts):
 > 
 > //archiv/share /nas cifs rw,mand,nosuid,nodev,noexec,relatime,sec=ntlm,
@@ -59,28 +48,12 @@ On Thu, 19 Jan 2012 09:07:52 +0100
 > CIFS VFS: Error -32 sending data on socket to server
 > ...
 > 
-> adding "noserverino" to mount options silences one message in the above
-> list but changes the other behavior.
-> 
-> CIFS is compiled statically into the kernel. Self optimized statical
-> kernel, not standard modular distro kernel.
-> 
-> I really need help to get the NAS back to a working state. Feel free to
-> ask for any information you need for diagnosis. If required I'm able to
-> add patches and recompile the kernel for diagnosis.
-> 
-> Thx ahead
-> Harald
 
-It sounds like the server is not responding for some reason. We'll
-probably need to see a network capture to understand what's going on:
+Error -32 is -EPIPE and it is kinda unusual from kernel_sendmsg(). I'm
+suspecting problems with CIFS socket/TCP state but hard to tell without
+much information. Wondering perhaps, CIFS should also handle -EPIPE like
+sunrpc and try to gracefully shutdown the socket on -EPIPE allowing
+reconnections works without trouble...
 
-    http://wiki.samba.org/index.php/LinuxCIFS_troubleshooting#Wire_Captures
 
-If you can open a bug at bugzilla.samba.org, you can upload the
-captures there and won't need to send it to the mailing list. If you do
-that, please cc me on it.
-
-Thanks,
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Suresh
