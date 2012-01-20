@@ -1,263 +1,164 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 17/50] CIFS: Do not try to dump cifs mids from SMB2 sessions
-Date: Fri, 20 Jan 2012 12:34:38 +0400
-Message-ID: <1327048511-2342-17-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 19/50] CIFS: Add SMB2 support for mkdir operation
+Date: Fri, 20 Jan 2012 12:34:40 +0400
+Message-ID: <1327048511-2342-19-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
-Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1327048511-2342-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Convert the debug routines in cifs_debug.c to recognize
-SMB2 sessions and not try to dump invalid information on
-pending requests. Check the socket type to see if SMB2.
-Move the printing of CIFS specific debug information
-to a helper routine to make it clearer which type
-of information we are printing.
-
-CIFS and SMB2 both use the struct TCP_Server_Info to include
-information about the tcp socket connection to the server.
-The list of pending requests is one of the "per-socket" pieces
-of information. SMB2 and CIFS "mid" queue entries (multiplexed
-network requests, the active requests on the wire) differ.
-SMB2 has async support in the protocol, as well as operation
-compounding and larger sizes (than CIFS) for various fields
-related to pending requests) so it is important not to try
-to use the pending_mid_q for SMB2 tcp sessions as if it were
-a pending cifs request. Most usage of the pending_mid_q is safe
-because it is in either CIFS or SMB2 specific code, but this
-patch fixes the dumping of debug data so we don't dump CIFS
-debugdata for an SMB2 session.
-
-Also get rid of the extra (server == NULL) check in cifs_dump_mids.
-
-Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifs_debug.c |  186 ++++++++++++++++++++++++++++----------------------
- 1 files changed, 105 insertions(+), 81 deletions(-)
+ fs/cifs/cifsfs.c    |    3 ++
+ fs/cifs/smb2inode.c |  100 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2proto.h |    1 +
+ 3 files changed, 103 insertions(+), 1 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 6a7bb76..3522e26 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -84,8 +84,10 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- 	struct list_head *tmp;
- 	struct mid_q_entry *mid_entry;
- 
--	if (server == NULL)
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 4869540..5881760 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -49,6 +49,9 @@
+ #include "cifs_spnego.h"
+ #include "fscache.h"
+ #define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
 +#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
- 		return;
++#include "smb2proto.h"
 +#endif
  
- 	cERROR(1, "Dump pending requests:");
- 	spin_lock(&GlobalMid_Lock);
-@@ -117,16 +119,110 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- #endif /* CONFIG_CIFS_DEBUG2 */
- 
- #ifdef CONFIG_PROC_FS
--static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ int cifsFYI = 0;
+ int cifsERROR = 1;
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index c7462ac..9c634f0 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -41,7 +41,7 @@ const struct inode_operations smb2_dir_inode_ops = {
+ 	.getattr = cifs_getattr,
+ 	.unlink = cifs_unlink,
+ 	.link = cifs_hardlink,
+-	.mkdir = cifs_mkdir,
++	.mkdir = smb2_mkdir,
+ 	.rmdir = cifs_rmdir,
+ 	.rename = cifs_rename,
+ 	.permission = cifs_permission,
+@@ -283,3 +283,101 @@ sqii_exit:
+ 	cifs_put_tlink(tlink);
+ 	return rc;
+ }
 +
-+static void dump_smb2_debug_info(int i, struct seq_file *m,
-+				struct TCP_Server_Info *server)
- {
--	struct list_head *tmp1, *tmp2, *tmp3;
-+	seq_printf(m, "dumping debug information for smb2 not supported yet\n");
-+}
-+
-+static void dump_cifs_debug_info(int i, struct seq_file *m,
-+				struct TCP_Server_Info *server)
++int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode)
 +{
-+	struct list_head *tmp2, *tmp3;
- 	struct mid_q_entry *mid_entry;
--	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
--	int i, j;
-+	int j;
- 	__u32 dev_type;
- 
++	int rc = 0, tmprc;
++	int xid;
++	struct cifs_sb_info *cifs_sb;
++	struct tcon_link *tlink;
++	struct cifs_tcon *tcon;
++	struct inode *newinode = NULL;
++	__le16 *utf16_path = NULL;
++	char *full_path = NULL;
 +
-+	list_for_each(tmp2, &server->smb_ses_list) {
-+		ses = list_entry(tmp2, struct cifs_ses, smb_ses_list);
-+		if (ses->serverDomain == NULL || ses->serverOS == NULL ||
-+		    ses->serverNOS == NULL) {
-+			seq_printf(m, "\n%d) entry for %s not fully "
-+				   "displayed\n\t", i, ses->serverName);
-+		} else {
-+			seq_printf(m,
-+				"\n%d) Name: %s  Domain: %s Uses: %d OS:"
-+				" %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
-+				" session status: %d\t",
-+				i, ses->serverName, ses->serverDomain,
-+				ses->ses_count, ses->serverOS, ses->serverNOS,
-+				ses->capabilities, ses->status);
-+		}
-+		seq_printf(m, "TCP status: %d\n\tLocal Users To "
-+			      "Server: %d SecMode: 0x%x Req On Wire: %d",
-+				server->tcpStatus, server->srv_count,
-+				server->sec_mode,
-+				atomic_read(&server->inFlight));
++	cFYI(1, "%s: mode = 0x%x inode = 0x%p", __func__, mode, inode);
 +
-+#ifdef CONFIG_CIFS_STATS2
-+		seq_printf(m, " In Send: %d In MaxReq Wait: %d",
-+				atomic_read(&server->in_send),
-+				atomic_read(&server->num_waiters));
-+#endif
++	cifs_sb = CIFS_SB(inode->i_sb);
++	tlink = cifs_sb_tlink(cifs_sb);
++	if (IS_ERR(tlink))
++		return PTR_ERR(tlink);
++	tcon = tlink_tcon(tlink);
 +
-+		seq_puts(m, "\n\tShares:");
-+		j = 0;
-+		list_for_each(tmp3, &ses->tcon_list) {
-+			tcon = list_entry(tmp3, struct cifs_tcon, tcon_list);
-+			++j;
-+			dev_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
-+			seq_printf(m, "\n\t%d) %s Mounts: %d ", j,
-+				   tcon->treeName, tcon->tc_count);
-+			if (tcon->nativeFileSystem) {
-+				seq_printf(m, "Type: %s ",
-+					   tcon->nativeFileSystem);
-+			}
-+			seq_printf(m, "DevInfo: 0x%x Attributes: 0x%x"
-+				"\nPathComponentMax: %d Status: 0x%d",
-+				le32_to_cpu(
-+					 tcon->fsDevInfo.DeviceCharacteristics),
-+				le32_to_cpu(tcon->fsAttrInfo.Attributes),
-+				le32_to_cpu(
-+				   tcon->fsAttrInfo.MaxPathNameComponentLength),
-+				tcon->tidStatus);
-+			seq_puts(m, " type : ");
-+			switch (dev_type) {
-+			case FILE_DEVICE_DISK:
-+				seq_puts(m, "DISK ");
-+				break;
-+			case FILE_DEVICE_CD_ROM:
-+				seq_puts(m, "CDROM ");
-+				break;
-+			default:
-+				seq_printf(m, "%d ", dev_type);
-+			}
++	xid = GetXid();
 +
-+			if (tcon->need_reconnect)
-+				seq_puts(m, "\tDISCONNECTED ");
-+			seq_putc(m, '\n');
-+		}
-+
-+		seq_puts(m, "\n\tMIDs:\n");
-+
-+		spin_lock(&GlobalMid_Lock);
-+		list_for_each(tmp3, &server->pending_mid_q) {
-+			mid_entry = list_entry(tmp3, struct mid_q_entry, qhead);
-+			seq_printf(m, "\tState: %d com: %d pid:"
-+				      " %d cbdata: %p mid %llu\n",
-+				      mid_entry->mid_state,
-+				      le16_to_cpu(mid_entry->command),
-+				      mid_entry->pid, mid_entry->callback_data,
-+				      mid_entry->mid);
-+		}
-+		spin_unlock(&GlobalMid_Lock);
++	full_path = build_path_from_dentry(direntry);
++	if (full_path == NULL) {
++		rc = -ENOMEM;
++		goto err_out;
 +	}
++
++	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb->local_nls);
++	if (utf16_path == NULL) {
++		rc = -ENOMEM;
++		goto err_out;
++	}
++
++	rc = smb2_open_op_close(xid, tcon, utf16_path, FILE_WRITE_ATTRIBUTES,
++				FILE_CREATE, 0, CREATE_NOT_FILE, NULL,
++				SMB2_OP_MKDIR);
++	if (rc)
++		goto err_out;
++
++	inc_nlink(inode);
++
++	rc = cifs_get_inode_info(&newinode, full_path, NULL, inode->i_sb, xid,
++				 NULL);
++
++	d_instantiate(direntry, newinode);
++	 /*
++	  * setting nlink not necessary except in cases where we
++	  * failed to get it from the server or was set bogus
++	  */
++	if ((direntry->d_inode) && (direntry->d_inode->i_nlink < 2))
++		set_nlink(inode, 2);
++
++	mode &= ~current_umask();
++	/* must turn on setgid bit if parent dir has it */
++	if (inode->i_mode & S_ISGID)
++		mode |= S_ISGID;
++
++	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
++	    (mode & S_IWUGO) == 0) {
++		FILE_BASIC_INFO data;
++		struct cifsInodeInfo *cifs_i;
++		u32 dosattrs;
++		memset(&data, 0, sizeof(data));
++		cifs_i = CIFS_I(newinode);
++		dosattrs = cifs_i->cifsAttrs | ATTR_READONLY;
++		data.Attributes = cpu_to_le32(dosattrs);
++		tmprc = smb2_open_op_close(xid, tcon, utf16_path,
++					   FILE_WRITE_ATTRIBUTES,
++					   FILE_CREATE, 0,
++					   CREATE_NOT_FILE, &data,
++					   SMB2_OP_SET_INFO);
++		if (tmprc == 0)
++			cifs_i->cifsAttrs = dosattrs;
++	}
++
++	if (direntry->d_inode) {
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
++			direntry->d_inode->i_mode = (mode | S_IFDIR);
++		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
++			direntry->d_inode->i_uid = current_fsuid();
++			if (inode->i_mode & S_ISGID)
++				direntry->d_inode->i_gid = inode->i_gid;
++			else
++				direntry->d_inode->i_gid = current_fsgid();
++		}
++	}
++
++out:
++	kfree(utf16_path);
++	FreeXid(xid);
++	cifs_put_tlink(tlink);
++	return rc;
++err_out:
++	cFYI(1, "%s returned 0x%x", __func__, rc);
++	d_drop(direntry);
++	goto out;
 +}
-+
-+static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
-+{
-+	struct list_head *tmp1;
-+	struct TCP_Server_Info *server;
-+	int i;
-+
- 	seq_puts(m,
- 		    "Display Internal CIFS Data Structures for Debugging\n"
- 		    "---------------------------------------------------\n");
-@@ -163,82 +259,10 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 		server = list_entry(tmp1, struct TCP_Server_Info,
- 				    tcp_ses_list);
- 		i++;
--		list_for_each(tmp2, &server->smb_ses_list) {
--			ses = list_entry(tmp2, struct cifs_ses,
--					 smb_ses_list);
--			if ((ses->serverDomain == NULL) ||
--				(ses->serverOS == NULL) ||
--				(ses->serverNOS == NULL)) {
--				seq_printf(m, "\n%d) entry for %s not fully "
--					   "displayed\n\t", i, ses->serverName);
--			} else {
--				seq_printf(m,
--				    "\n%d) Name: %s  Domain: %s Uses: %d OS:"
--				    " %s\n\tNOS: %s\tCapability: 0x%x\n\tSMB"
--				    " session status: %d\t",
--				i, ses->serverName, ses->serverDomain,
--				ses->ses_count, ses->serverOS, ses->serverNOS,
--				ses->capabilities, ses->status);
--			}
--			seq_printf(m, "TCP status: %d\n\tLocal Users To "
--				   "Server: %d SecMode: 0x%x Req On Wire: %d",
--				   server->tcpStatus, server->srv_count,
--				   server->sec_mode,
--				   atomic_read(&server->inFlight));
--
--#ifdef CONFIG_CIFS_STATS2
--			seq_printf(m, " In Send: %d In MaxReq Wait: %d",
--				atomic_read(&server->in_send),
--				atomic_read(&server->num_waiters));
--#endif
--
--			seq_puts(m, "\n\tShares:");
--			j = 0;
--			list_for_each(tmp3, &ses->tcon_list) {
--				tcon = list_entry(tmp3, struct cifs_tcon,
--						  tcon_list);
--				++j;
--				dev_type = le32_to_cpu(tcon->fsDevInfo.DeviceType);
--				seq_printf(m, "\n\t%d) %s Mounts: %d ", j,
--					   tcon->treeName, tcon->tc_count);
--				if (tcon->nativeFileSystem) {
--					seq_printf(m, "Type: %s ",
--						   tcon->nativeFileSystem);
--				}
--				seq_printf(m, "DevInfo: 0x%x Attributes: 0x%x"
--					"\nPathComponentMax: %d Status: 0x%d",
--					le32_to_cpu(tcon->fsDevInfo.DeviceCharacteristics),
--					le32_to_cpu(tcon->fsAttrInfo.Attributes),
--					le32_to_cpu(tcon->fsAttrInfo.MaxPathNameComponentLength),
--					tcon->tidStatus);
--				if (dev_type == FILE_DEVICE_DISK)
--					seq_puts(m, " type: DISK ");
--				else if (dev_type == FILE_DEVICE_CD_ROM)
--					seq_puts(m, " type: CDROM ");
--				else
--					seq_printf(m, " type: %d ", dev_type);
--
--				if (tcon->need_reconnect)
--					seq_puts(m, "\tDISCONNECTED ");
--				seq_putc(m, '\n');
--			}
--
--			seq_puts(m, "\n\tMIDs:\n");
--
--			spin_lock(&GlobalMid_Lock);
--			list_for_each(tmp3, &server->pending_mid_q) {
--				mid_entry = list_entry(tmp3, struct mid_q_entry,
--					qhead);
--				seq_printf(m, "\tState: %d com: %d pid:"
--					      " %d cbdata: %p mid %llu\n",
--					      mid_entry->mid_state,
--					      le16_to_cpu(mid_entry->command),
--					      mid_entry->pid,
--					      mid_entry->callback_data,
--					      mid_entry->mid);
--			}
--			spin_unlock(&GlobalMid_Lock);
--		}
-+		if (server->is_smb2)
-+			dump_smb2_debug_info(i, m, server);
-+		else
-+			dump_cifs_debug_info(i, m, server);
- 	}
- 	spin_unlock(&cifs_tcp_ses_lock);
- 	seq_putc(m, '\n');
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 8e98cf6..52eea64 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -57,6 +57,7 @@ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
+ 				 FILE_ALL_INFO *data, struct super_block *sb,
+ 				 int xid);
+ extern void smb2_set_ops(struct inode *inode);
++extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
+ 
+ /*
+  *  SMB2 Worker functions - most of protocol specific implementation details
 -- 
 1.7.1
