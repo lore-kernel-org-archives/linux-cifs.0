@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 31/50] CIFS: Add writepages support for SMB2
-Date: Fri, 20 Jan 2012 12:34:52 +0400
-Message-ID: <1327048511-2342-31-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 32/50] CIFS: Add readpages support for SMB2
+Date: Fri, 20 Jan 2012 12:34:53 +0400
+Message-ID: <1327048511-2342-32-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -14,447 +14,414 @@ From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h      |   17 +++++++
- fs/cifs/cifsproto.h     |   17 ++-----
- fs/cifs/cifssmb.c       |    5 +-
- fs/cifs/file.c          |   14 ++++-
- fs/cifs/smb2file.c      |   10 +++-
- fs/cifs/smb2pdu.c       |  123 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2proto.h     |   11 ++++
- fs/cifs/smb2transport.c |   65 ++++++++++++++++++++++++-
- 8 files changed, 240 insertions(+), 22 deletions(-)
+ fs/cifs/cifsglob.h  |   16 ++++++++++
+ fs/cifs/cifsproto.h |   20 ++++---------
+ fs/cifs/cifssmb.c   |   78 +++++++++++++++++++++++++++++++++++++++++----------
+ fs/cifs/file.c      |   14 +++++++--
+ fs/cifs/smb2file.c  |   10 ++++++-
+ fs/cifs/smb2pdu.c   |   71 ++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2proto.h |    3 ++
+ 7 files changed, 179 insertions(+), 33 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 31cce8e..74c723b 100644
+index 74c723b..dc88667 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -593,6 +593,23 @@ typedef int (reopen_callback_t)(struct cifsFileInfo *cifs_file, int xid,
+@@ -593,6 +593,22 @@ typedef int (reopen_callback_t)(struct cifsFileInfo *cifs_file, int xid,
  				 struct cifs_tcon *tcon, const char *full_path,
  				 __u32 *oplock);
  
-+struct cifs_writedata;
-+typedef int (awritev_callback_t)(struct cifs_writedata *);
-+
-+/* asynchronous write support */
-+struct cifs_writedata {
-+	struct kref			refcount;
-+	enum writeback_sync_modes	sync_mode;
-+	struct work_struct		work;
-+	awritev_callback_t		*requeue_writev;
++/* asynchronous read support */
++struct cifs_readdata {
 +	struct cifsFileInfo		*cfile;
++	struct address_space		*mapping;
 +	__u64				offset;
 +	unsigned int			bytes;
++	pid_t				pid;
 +	int				result;
-+	unsigned int			nr_pages;
-+	struct page			*pages[1];
++	struct list_head		pages;
++	struct work_struct		work;
++	unsigned int			nr_iov;
++	struct kvec			iov[1];
 +};
 +
- struct cifs_io_parms {
- 	__u16 netfid;
- 	__u64 persist_fid;
++typedef int (areadv_callback_t)(struct cifs_readdata *);
++
+ struct cifs_writedata;
+ typedef int (awritev_callback_t)(struct cifs_writedata *);
+ 
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 9b447a0..e273ab3 100644
+index e273ab3..b970867 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -212,10 +212,14 @@ extern int cifs_readpages(struct file *file, struct address_space *mapping,
+@@ -210,6 +210,11 @@ extern int cifs_launder_page(struct page *page);
+ extern int cifs_readpage(struct file *file, struct page *page);
+ extern int cifs_readpages(struct file *file, struct address_space *mapping,
  			  struct list_head *page_list, unsigned num_pages);
++extern int cifs_readpages_generic(struct file *file,
++				  struct address_space *mapping,
++				  struct list_head *page_list,
++				  unsigned num_pages,
++				  areadv_callback_t *read_cb);
  extern int cifs_writepages(struct address_space *mapping,
  			   struct writeback_control *wbc);
-+extern int cifs_writepages_generic(struct address_space *mapping,
-+				   struct writeback_control *wbc,
-+				   awritev_callback_t *async_writev);
- extern int cifs_writepage(struct page *page, struct writeback_control *wbc);
- void cifs_proc_init(void);
- void cifs_proc_clean(void);
+ extern int cifs_writepages_generic(struct address_space *mapping,
+@@ -502,23 +507,10 @@ extern int E_md4hash(const unsigned char *passwd, unsigned char *p16,
+ extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
+ 			unsigned char *p24);
  
-+extern void inc_rfc1001_len(void *pSMB, int count);
- extern int cifs_negotiate_protocol(unsigned int xid,
- 				  struct cifs_ses *ses);
- extern int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
-@@ -516,19 +520,6 @@ struct cifs_readdata *cifs_readdata_alloc(unsigned int nr_pages);
- void cifs_readdata_free(struct cifs_readdata *rdata);
- int cifs_async_readv(struct cifs_readdata *rdata);
- 
--/* asynchronous write support */
--struct cifs_writedata {
--	struct kref			refcount;
--	enum writeback_sync_modes	sync_mode;
--	struct work_struct		work;
+-/* asynchronous read support */
+-struct cifs_readdata {
 -	struct cifsFileInfo		*cfile;
+-	struct address_space		*mapping;
 -	__u64				offset;
 -	unsigned int			bytes;
+-	pid_t				pid;
 -	int				result;
--	unsigned int			nr_pages;
--	struct page			*pages[1];
+-	struct list_head		pages;
+-	struct work_struct		work;
+-	unsigned int			nr_iov;
+-	struct kvec			iov[1];
 -};
 -
+ struct cifs_readdata *cifs_readdata_alloc(unsigned int nr_pages);
+ void cifs_readdata_free(struct cifs_readdata *rdata);
+ int cifs_async_readv(struct cifs_readdata *rdata);
++int cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid);
+ 
  int cifs_async_writev(struct cifs_writedata *wdata);
  struct cifs_writedata *cifs_writedata_alloc(unsigned int nr_pages);
- void cifs_writedata_release(struct kref *refcount);
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index ac41696..0e29b36 100644
+index 0e29b36..274ea72 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -365,7 +365,7 @@ vt2_err:
- 	return -EINVAL;
- }
+@@ -43,6 +43,9 @@
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+ #include "fscache.h"
++#ifdef CONFIG_CIFS_SMB2
++#include "smb2proto.h"
++#endif
  
--static inline void inc_rfc1001_len(void *pSMB, int count)
-+inline void inc_rfc1001_len(void *pSMB, int count)
- {
- 	struct smb_hdr *hdr = (struct smb_hdr *)pSMB;
- 
-@@ -2001,7 +2001,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
- 	}
- 
- 	do {
--		rc = cifs_async_writev(wdata);
-+		rc = wdata->requeue_writev(wdata);
- 	} while (rc == -EAGAIN);
- 
- 	for (i = 0; i < wdata->nr_pages; i++) {
-@@ -2108,6 +2108,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
- 		break;
- 	}
- 
-+	wdata->requeue_writev = cifs_async_writev;
- 	queue_work(system_nrt_wq, &wdata->work);
- 	DeleteMidQEntry(mid);
- 	atomic_dec(&tcon->ses->server->inFlight);
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e0a12fa..9e377f2 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1743,8 +1743,10 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
- 	return rc;
- }
- 
--int cifs_writepages(struct address_space *mapping,
--			   struct writeback_control *wbc)
-+int
-+cifs_writepages_generic(struct address_space *mapping,
-+			struct writeback_control *wbc,
-+			awritev_callback_t *async_writev)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(mapping->host->i_sb);
- 	bool done = false, scanned = false, range_whole = false;
-@@ -1897,7 +1899,7 @@ retry:
- 				rc = -EBADF;
- 				break;
- 			}
--			rc = cifs_async_writev(wdata);
-+			rc = async_writev(wdata);
- 		} while (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN);
- 
- 		for (i = 0; i < nr_pages; ++i)
-@@ -1942,6 +1944,12 @@ retry:
- 	return rc;
- }
- 
-+int
-+cifs_writepages(struct address_space *mapping, struct writeback_control *wbc)
-+{
-+	return cifs_writepages_generic(mapping, wbc, cifs_async_writev);
-+}
-+
+ #ifdef CONFIG_CIFS_POSIX
+ static struct {
+@@ -1410,17 +1413,24 @@ cifs_readdata_free(struct cifs_readdata *rdata)
  static int
- cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
+ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
  {
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 6e55700..1894b77 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -151,7 +151,7 @@ const struct address_space_operations smb2_addr_ops = {
- 	.readpage = cifs_readpage,
- 	/*.readpages = cifs_readpages,*/
- 	.writepage = cifs_writepage,
--	/*.writepages = cifs_writepages,*/
-+	.writepages = smb2_writepages,
- 	.write_begin = cifs_write_begin,
- 	.write_end = cifs_write_end,
- 	.set_page_dirty = __set_page_dirty_nobuffers,
-@@ -168,7 +168,7 @@ const struct address_space_operations smb2_addr_ops = {
- const struct address_space_operations smb2_addr_ops_smallbuf = {
- 	.readpage = cifs_readpage,
- 	.writepage = cifs_writepage,
--	/*.writepages = cifs_writepages,*/
-+	.writepages = smb2_writepages,
- 	.write_begin = cifs_write_begin,
- 	.write_end = cifs_write_end,
- 	.set_page_dirty = __set_page_dirty_nobuffers,
-@@ -459,3 +459,9 @@ smb2_write_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
- 	return SMB2_write(xid, parms, written, iov, nr_segs,
- 			  remaining_bytes, timeout);
- }
+-	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
+-	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length);
++	unsigned int rfclen = get_rfc1002_length(server->smallbuf);
+ 	int remaining = rfclen + 4 - server->total_read;
+ 	struct cifs_readdata *rdata = mid->callback_data;
++	size_t max_hdr_size;
 +
-+int
-+smb2_writepages(struct address_space *mapping, struct writeback_control *wbc)
-+{
-+	return cifs_writepages_generic(mapping, wbc, smb2_async_writev);
-+}
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index f323d6d..8791b85 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -31,6 +31,7 @@
- #include <linux/kernel.h>
- #include <linux/vfs.h>
- #include <linux/uaccess.h>
-+#include <linux/pagemap.h>
- #include <linux/xattr.h>
- #include "smb2pdu.h"
- #include "cifsglob.h"
-@@ -1299,3 +1300,125 @@ int SMB2_write(const int xid, struct cifs_io_parms *io_parms,
- 	}
- 	return rc;
- }
-+
-+/*
-+ * Check the mid_state and signature on received buffer (if any), and queue the
-+ * workqueue completion task.
-+ */
-+static void
-+smb2_writev_callback(struct mid_q_entry *mid)
-+{
-+	struct cifs_writedata *wdata = mid->callback_data;
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	unsigned int written;
-+	struct smb2_write_rsp *smb2 = (struct smb2_write_rsp *)mid->resp_buf;
-+	unsigned int credits_received = 1;
-+
-+	switch (mid->mid_state) {
-+	case MID_RESPONSE_RECEIVED:
-+		credits_received = le16_to_cpu(smb2->hdr.CreditRequest);
-+		wdata->result = smb2_check_receive(mid, tcon->ses->server,
-+						   get_rfc1002_length(smb2), 0);
-+		if (wdata->result != 0)
-+			break;
-+
-+		written = le32_to_cpu(smb2->DataLength);
-+		/*
-+		 * Mask off high 16 bits when bytes written as returned
-+		 * by the server is greater than bytes requested by the
-+		 * client. OS/2 servers are known to set incorrect
-+		 * CountHigh values.
-+		 */
-+		if (written > wdata->bytes)
-+			written &= 0xFFFF;
-+
-+		if (written < wdata->bytes)
-+			wdata->result = -ENOSPC;
-+		else
-+			wdata->bytes = written;
-+		break;
-+	case MID_REQUEST_SUBMITTED:
-+	case MID_RETRY_NEEDED:
-+		wdata->result = -EAGAIN;
-+		break;
-+	default:
-+		wdata->result = -EIO;
-+		break;
-+	}
-+
-+	wdata->requeue_writev = smb2_async_writev;
-+	queue_work(system_nrt_wq, &wdata->work);
-+	DeleteMidQEntry(mid);
-+	atomic_add(credits_received, &tcon->ses->server->credits);
-+	wake_up(&tcon->ses->server->request_q);
-+}
-+
-+/* smb2_async_writev - send an async write, and set up mid to handle result */
-+int
-+smb2_async_writev(struct cifs_writedata *wdata)
-+{
-+	int i, rc = -EACCES;
-+	struct smb2_write_req *smb2 = NULL;
-+	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-+	struct inode *inode = wdata->cfile->dentry->d_inode;
-+	struct kvec *iov = NULL;
-+
-+	rc = small_smb2_init(SMB2_WRITE, tcon, (void **) &smb2);
-+	if (rc)
-+		goto async_writev_out;
-+
-+	/* 1 iov per page + 1 for header */
-+	iov = kzalloc((wdata->nr_pages + 1) * sizeof(*iov), GFP_NOFS);
-+	if (iov == NULL) {
-+		rc = -ENOMEM;
-+		goto async_writev_out;
-+	}
-+
-+	smb2->hdr.ProcessId = cpu_to_le32(wdata->cfile->pid);
-+
-+	smb2->PersistentFileId = wdata->cfile->persist_fid;
-+	smb2->VolatileFileId = wdata->cfile->volatile_fid;
-+	smb2->WriteChannelInfoOffset = 0;
-+	smb2->WriteChannelInfoLength = 0;
-+	smb2->Channel = 0;
-+	smb2->Offset = cpu_to_le64(wdata->offset);
-+	smb2->DataOffset = cpu_to_le16(
-+				offsetof(struct smb2_write_req, Buffer) - 4);
-+	smb2->RemainingBytes = 0;
-+
-+	/* 4 for RFC1001 length + 1 for BCC */
-+	iov[0].iov_len = be32_to_cpu(smb2->hdr.smb2_buf_length) + 4 - 1;
-+	iov[0].iov_base = smb2;
-+
-+	/* marshal up the pages into iov array */
-+	wdata->bytes = 0;
-+	for (i = 0; i < wdata->nr_pages; i++) {
-+		iov[i + 1].iov_len = min(inode->i_size -
-+				      page_offset(wdata->pages[i]),
-+					(loff_t)PAGE_CACHE_SIZE);
-+		iov[i + 1].iov_base = kmap(wdata->pages[i]);
-+		wdata->bytes += iov[i + 1].iov_len;
-+	}
-+
-+	cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
-+
-+	smb2->Length = cpu_to_le32(wdata->bytes);
-+
-+	inc_rfc1001_len(&smb2->hdr, wdata->bytes - 1);
-+
-+	kref_get(&wdata->refcount);
-+	rc = smb2_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
-+			     NULL, smb2_writev_callback, wdata, false);
-+
-+	if (rc)
-+		kref_put(&wdata->refcount, cifs_writedata_release);
-+
-+	/* send is done, unmap pages */
-+	for (i = 0; i < wdata->nr_pages; i++)
-+		kunmap(wdata->pages[i]);
-+
-+async_writev_out:
-+	cifs_small_buf_release(smb2);
-+	kfree(iov);
-+	return rc;
-+}
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index d84e604..7336c2b 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -23,6 +23,7 @@
- #define _SMB2PROTO_H
- #include <linux/nls.h>
- #include <linux/key-type.h>
-+#include "cifsproto.h"
++#ifdef CONFIG_CIFS_SMB2
++	if (server->is_smb2)
++		max_hdr_size = MAX_SMB2_HDR_SIZE;
++	else
++#endif
++		max_hdr_size = MAX_CIFS_HDR_SIZE;
  
- struct statfs;
+ 	while (remaining > 0) {
+ 		int length;
  
-@@ -56,9 +57,16 @@ extern __le16 *cifs_convert_path_to_utf16(const char *from,
- 					  struct nls_table *local_nls);
- extern __le16 *cifs_build_utf16path_from_dentry(struct dentry *direntry);
- 
-+extern int smb2_check_receive(struct mid_q_entry *mid,
-+			      struct TCP_Server_Info *server,
-+			      unsigned int receive_len, bool log_error);
- extern int smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
- 			 struct kvec *vec, int nvec, int *ret_buf_type,
- 			 int *status, const int flags);
-+extern int smb2_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-+			   unsigned int nvec, mid_receive_t *receive,
-+			   mid_callback_t *callback, void *cbdata,
-+			   bool ignore_pend);
- extern int smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
- 			      struct smb2_hdr *in_buf, int flags);
- extern int smb2_setup_session(unsigned int xid, struct cifs_ses *psesinfo,
-@@ -95,6 +103,8 @@ extern int smb2_read_cb(int xid, struct cifsFileInfo *cfile,
- 			struct cifs_io_parms *parms, unsigned int *bytes_read,
- 			char **buf, int *buf_type,
- 			unsigned int remaining_bytes);
-+extern int smb2_writepages(struct address_space *mapping,
-+			   struct writeback_control *wbc);
- 
- /*
-  *  SMB2 Worker functions - most of protocol specific implementation details
-@@ -120,6 +130,7 @@ extern int SMB2_query_info(const int xid, struct cifs_tcon *tcon,
- extern int SMB2_write(const int xid, struct cifs_io_parms *io_parms,
- 		      unsigned int *nbytes, struct kvec *iov, int n_vec,
- 		      const unsigned int remaining_bytes, int wtimeout);
-+extern int smb2_async_writev(struct cifs_writedata *wdata);
- extern int smb2_new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
- 			     unsigned int remaining_bytes, int request_type);
- extern int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index b5702f3..05240ab 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -120,7 +120,7 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_hdr *buf,
+ 		length = cifs_read_from_socket(server, server->bigbuf,
+ 				min_t(unsigned int, remaining,
+-					CIFSMaxBufSize + MAX_CIFS_HDR_SIZE));
++					CIFSMaxBufSize + max_hdr_size));
+ 		if (length < 0)
+ 			return length;
+ 		server->total_read += length;
+@@ -1431,30 +1441,47 @@ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
  	return 0;
  }
  
 -static int
 +int
- smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 		   unsigned int receive_len, bool log_error)
+ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
  {
-@@ -308,4 +308,65 @@ smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
+ 	int length, len;
+ 	unsigned int data_offset, remaining, data_len;
+ 	struct cifs_readdata *rdata = mid->callback_data;
+-	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
+-	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length) + 4;
++	unsigned int rfclen = get_rfc1002_length(server->smallbuf) + 4;
++	READ_RSP *smb_rsp = NULL;
++#ifdef CONFIG_CIFS_SMB2
++	struct smb2_read_rsp *smb2_rsp = NULL;
++#endif
+ 	u64 eof;
+ 	pgoff_t eof_index;
+ 	struct page *page, *tpage;
++	size_t read_buf_size, buf_size;
+ 
+ 	cFYI(1, "%s: mid=%llu offset=%llu bytes=%u", __func__,
+ 		mid->mid, rdata->offset, rdata->bytes);
+ 
++#ifdef CONFIG_CIFS_SMB2
++	if (server->is_smb2) {
++		smb2_rsp = (struct smb2_read_rsp *)server->smallbuf;
++		read_buf_size = sizeof(*smb2_rsp) - 1;
++		buf_size = sizeof(struct smb2_hdr);
++	} else {
++#endif
++		smb_rsp = (READ_RSP *)server->smallbuf;
++		read_buf_size = sizeof(*smb_rsp);
++		buf_size = sizeof(struct smb_hdr);
++#ifdef CONFIG_CIFS_SMB2
++	}
++#endif
++
+ 	/*
+ 	 * read the rest of READ_RSP header (sans Data array), or whatever we
+ 	 * can if there's not enough data. At this point, we've read down to
+ 	 * the Mid.
+ 	 */
+-	len = min_t(unsigned int, rfclen, sizeof(*rsp)) -
+-			sizeof(struct smb_hdr) + 1;
++	len = min_t(unsigned int, rfclen, read_buf_size) - buf_size + 1;
+ 
+-	rdata->iov[0].iov_base = server->smallbuf + sizeof(struct smb_hdr) - 1;
++	rdata->iov[0].iov_base = server->smallbuf + buf_size - 1;
+ 	rdata->iov[0].iov_len = len;
+ 
+ 	length = cifs_readv_from_socket(server, rdata->iov, 1, len);
+@@ -1463,7 +1490,12 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	server->total_read += length;
+ 
+ 	/* Was the SMB read successful? */
+-	rdata->result = map_smb_to_linux_error(&rsp->hdr, false);
++#ifdef CONFIG_CIFS_SMB2
++	if (server->is_smb2)
++		rdata->result = map_smb2_to_linux_error(&smb2_rsp->hdr, false);
++	else
++#endif
++		rdata->result = map_smb_to_linux_error(&smb_rsp->hdr, false);
+ 	if (rdata->result != 0) {
+ 		cFYI(1, "%s: server returned error %d", __func__,
+ 			rdata->result);
+@@ -1471,14 +1503,20 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	}
+ 
+ 	/* Is there enough to get to the rest of the READ_RSP header? */
+-	if (server->total_read < sizeof(READ_RSP)) {
++	if (server->total_read < read_buf_size) {
+ 		cFYI(1, "%s: server returned short header. got=%u expected=%zu",
+-			__func__, server->total_read, sizeof(READ_RSP));
++			__func__, server->total_read, read_buf_size);
+ 		rdata->result = -EIO;
+ 		return cifs_readv_discard(server, mid);
+ 	}
+ 
+-	data_offset = le16_to_cpu(rsp->DataOffset) + 4;
++#ifdef CONFIG_CIFS_SMB2
++	if (server->is_smb2)
++		data_offset = smb2_rsp->DataOffset;
++	else
++#endif
++		data_offset = le16_to_cpu(smb_rsp->DataOffset);
++	data_offset += 4;
+ 	if (data_offset < server->total_read) {
+ 		/*
+ 		 * win2k8 sometimes sends an offset of 0 when the read
+@@ -1517,8 +1555,16 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		rdata->iov[0].iov_base, rdata->iov[0].iov_len);
+ 
+ 	/* how much data is in the response? */
+-	data_len = le16_to_cpu(rsp->DataLengthHigh) << 16;
+-	data_len += le16_to_cpu(rsp->DataLength);
++#ifdef CONFIG_CIFS_SMB2
++	if (server->is_smb2)
++		data_len = le32_to_cpu(smb2_rsp->DataLength);
++	else {
++#endif
++		data_len = le16_to_cpu(smb_rsp->DataLengthHigh) << 16;
++		data_len += le16_to_cpu(smb_rsp->DataLength);
++#ifdef CONFIG_CIFS_SMB2
++	}
++#endif
+ 	if (data_offset + data_len > rfclen) {
+ 		/* data_len is corrupt -- discard frame */
+ 		rdata->result = -EIO;
+@@ -1605,6 +1651,8 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	if (server->total_read < rfclen)
+ 		return cifs_readv_discard(server, mid);
+ 
++	mid->resp_buf = server->smallbuf;
++	server->smallbuf = NULL;
+ 	dequeue_mid(mid, false);
+ 	return length;
+ }
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9e377f2..61348b2 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2707,8 +2707,9 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
  	return rc;
  }
  
--/* BB add missing functions here */
-+/*
-+ * Send a SMB2 request and set the callback function in the mid to handle
-+ * the result. Caller is responsible for dealing with timeouts.
-+ */
+-int cifs_readpages(struct file *file, struct address_space *mapping,
+-		   struct list_head *page_list, unsigned num_pages)
++int cifs_readpages_generic(struct file *file, struct address_space *mapping,
++			   struct list_head *page_list, unsigned num_pages,
++			   areadv_callback_t *async_readv)
+ {
+ 	int rc;
+ 	struct list_head tmplist;
+@@ -2838,7 +2839,7 @@ int cifs_readpages(struct file *file, struct address_space *mapping,
+ 				if (rc != 0)
+ 					continue;
+ 			}
+-			rc = cifs_async_readv(rdata);
++			rc = async_readv(rdata);
+ 		} while (rc == -EAGAIN);
+ 
+ 		if (rc != 0) {
+@@ -2857,6 +2858,13 @@ int cifs_readpages(struct file *file, struct address_space *mapping,
+ 	return rc;
+ }
+ 
++int cifs_readpages(struct file *file, struct address_space *mapping,
++		   struct list_head *page_list, unsigned num_pages)
++{
++	return cifs_readpages_generic(file, mapping, page_list, num_pages,
++				      cifs_async_readv);
++}
++
+ static int cifs_readpage_worker(struct file *file, struct page *page,
+ 	loff_t *poffset)
+ {
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index 1894b77..3cfef35 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -149,7 +149,7 @@ const struct file_operations smb2_file_direct_nobrl_ops = {
+ 
+ const struct address_space_operations smb2_addr_ops = {
+ 	.readpage = cifs_readpage,
+-	/*.readpages = cifs_readpages,*/
++	.readpages = smb2_readpages,
+ 	.writepage = cifs_writepage,
+ 	.writepages = smb2_writepages,
+ 	.write_begin = cifs_write_begin,
+@@ -465,3 +465,11 @@ smb2_writepages(struct address_space *mapping, struct writeback_control *wbc)
+ {
+ 	return cifs_writepages_generic(mapping, wbc, smb2_async_writev);
+ }
++
 +int
-+smb2_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-+		unsigned int nvec, mid_receive_t *receive,
-+		mid_callback_t *callback, void *cbdata, bool ignore_pend)
++smb2_readpages(struct file *file, struct address_space *mapping,
++	       struct list_head *page_list, unsigned num_pages)
++{
++	return cifs_readpages_generic(file, mapping, page_list, num_pages,
++				      smb2_async_readv);
++}
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 8791b85..dfb17fd 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -30,6 +30,7 @@
+ #include <linux/fs.h>
+ #include <linux/kernel.h>
+ #include <linux/vfs.h>
++#include <linux/task_io_accounting_ops.h>
+ #include <linux/uaccess.h>
+ #include <linux/pagemap.h>
+ #include <linux/xattr.h>
+@@ -1422,3 +1423,73 @@ async_writev_out:
+ 	kfree(iov);
+ 	return rc;
+ }
++
++static void
++smb2_readv_callback(struct mid_q_entry *mid)
++{
++	struct cifs_readdata *rdata = mid->callback_data;
++	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
++	struct TCP_Server_Info *server = tcon->ses->server;
++	struct smb2_hdr *buf = (struct smb2_hdr *)mid->resp_buf;
++	unsigned int credits_received = 1;
++
++	cFYI(1, "%s: mid=%llu state=%d result=%d bytes=%u", __func__,
++		mid->mid, mid->mid_state, rdata->result, rdata->bytes);
++
++	switch (mid->mid_state) {
++	case MID_RESPONSE_RECEIVED:
++		credits_received = le16_to_cpu(buf->CreditRequest);
++		/* result already set, check signature */
++		/* if (server->sec_mode &
++		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
++			if (smb2_verify_signature(mid->resp_buf, server))
++				cERROR(1, "Unexpected SMB signature"); */
++		/* FIXME: should this be counted toward the initiating task? */
++		task_io_account_read(rdata->bytes);
++		cifs_stats_bytes_read(tcon, rdata->bytes);
++		break;
++	case MID_REQUEST_SUBMITTED:
++	case MID_RETRY_NEEDED:
++		rdata->result = -EAGAIN;
++		break;
++	default:
++		rdata->result = -EIO;
++	}
++
++	queue_work(system_nrt_wq, &rdata->work);
++	DeleteMidQEntry(mid);
++	atomic_add(credits_received, &server->credits);
++	wake_up(&server->request_q);
++}
++
++/* smb2_async_readv - send an async write, and set up mid to handle result */
++int
++smb2_async_readv(struct cifs_readdata *rdata)
 +{
 +	int rc;
-+	struct mid_q_entry *mid;
-+	struct smb2_hdr *hdr = (struct smb2_hdr *)iov[0].iov_base;
++	struct smb2_hdr *buf;
++	struct cifs_io_parms io_parms;
 +
-+	rc = cifs_wait_for_free_request(server,
-+					ignore_pend ? CIFS_ASYNC_OP : 0);
++	cFYI(1, "%s: offset=%llu bytes=%u", __func__,
++		rdata->offset, rdata->bytes);
++
++	io_parms.tcon = tlink_tcon(rdata->cfile->tlink);
++	io_parms.offset = rdata->offset;
++	io_parms.length = rdata->bytes;
++	io_parms.volatile_fid = rdata->cfile->volatile_fid;
++	io_parms.persist_fid = rdata->cfile->persist_fid;
++	io_parms.pid = rdata->pid;
++	rc = smb2_new_read_req(&rdata->iov[0], &io_parms, 0, 0);
 +	if (rc)
 +		return rc;
 +
-+	mutex_lock(&server->srv_mutex);
++	buf = (struct smb2_hdr *)rdata->iov[0].iov_base;
++	rdata->iov[0].iov_len = get_rfc1002_length(rdata->iov[0].iov_base) + 4;
 +
-+	smb2_seq_num_into_buf(server, iov);
++	rc = smb2_call_async(io_parms.tcon->ses->server, rdata->iov, 1,
++			     cifs_readv_receive, smb2_readv_callback,
++			     rdata, false);
 +
-+	mid = smb2_mid_entry_alloc(hdr, server);
-+	if (mid == NULL) {
-+		mutex_unlock(&server->srv_mutex);
-+		atomic_inc(&server->credits);
-+		wake_up(&server->request_q);
-+		return -ENOMEM;
-+	}
-+
-+	/* put it on the pending_mid_q */
-+	spin_lock(&GlobalMid_Lock);
-+	list_add_tail(&mid->qhead, &server->pending_mid_q);
-+	spin_unlock(&GlobalMid_Lock);
-+
-+	/* rc = smb2_sign_smb2(iov, nvec, server);
-+	if (rc) {
-+		mutex_unlock(&server->srv_mutex);
-+		goto out_err;
-+	} */
-+
-+	mid->receive = receive;
-+	mid->callback = callback;
-+	mid->callback_data = cbdata;
-+	mid->mid_state = MID_REQUEST_SUBMITTED;
-+
-+	cifs_in_send_inc(server);
-+	rc = smb_sendv(server, iov, nvec);
-+	cifs_in_send_dec(server);
-+	cifs_save_when_sent(mid);
-+	mutex_unlock(&server->srv_mutex);
-+
-+	if (rc)
-+		goto out_err;
-+
-+	return rc;
-+out_err:
-+	cifs_delete_mid(mid);
-+	atomic_inc(&server->credits);
-+	wake_up(&server->request_q);
++	cifs_small_buf_release(buf);
 +	return rc;
 +}
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 7336c2b..6e7eed0 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -105,6 +105,8 @@ extern int smb2_read_cb(int xid, struct cifsFileInfo *cfile,
+ 			unsigned int remaining_bytes);
+ extern int smb2_writepages(struct address_space *mapping,
+ 			   struct writeback_control *wbc);
++extern int smb2_readpages(struct file *file, struct address_space *mapping,
++			  struct list_head *page_list, unsigned num_pages);
+ 
+ /*
+  *  SMB2 Worker functions - most of protocol specific implementation details
+@@ -136,5 +138,6 @@ extern int smb2_new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
+ extern int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
+ 		     unsigned int *nbytes, char **buf, int *pbuf_type,
+ 		     unsigned int remaining_bytes);
++extern int smb2_async_readv(struct cifs_readdata *rdata);
+ 
+ #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
