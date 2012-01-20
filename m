@@ -1,214 +1,136 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 33/50] CIFS: Add echo request support for SMB2
-Date: Fri, 20 Jan 2012 12:34:54 +0400
-Message-ID: <1327048511-2342-33-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 34/50] CIFS: Add SMB2 support for cifs_get_file_info
+Date: Fri, 20 Jan 2012 12:34:55 +0400
+Message-ID: <1327048511-2342-34-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1327048511-2342-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    3 +++
- fs/cifs/connect.c   |   19 +++++++------------
- fs/cifs/smb2misc.c  |   25 +++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   |   47 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   |   12 ++++++++++++
- fs/cifs/smb2proto.h |    2 ++
- 6 files changed, 96 insertions(+), 12 deletions(-)
+ fs/cifs/inode.c     |   18 +++++++++++++++---
+ fs/cifs/smb2inode.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2proto.h |    1 +
+ 3 files changed, 58 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index dc88667..887765c 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -80,6 +80,9 @@
- /*           (max path length + 1 for null) * 2 for unicode    */
- #define MAX_NAME 514
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 5bc1f78..811cf97 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -568,7 +568,8 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+ 	fattr->cf_gid = cifs_sb->mnt_gid;
+ }
  
-+/* SMB echo "timeout" -- FIXME: tunable? */
-+#define SMB_ECHO_INTERVAL (60 * HZ)
-+
- #include "cifspdu.h"
- 
- #ifndef XATTR_DOS_ATTRIB
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 3a217d7..86f13a3 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -56,9 +56,6 @@
- #define CIFS_PORT 445
- #define RFC1001_PORT 139
- 
--/* SMB echo "timeout" -- FIXME: tunable? */
--#define SMB_ECHO_INTERVAL (60 * HZ)
--
- extern mempool_t *cifs_req_poolp;
- 
- /* FIXME: should these be tunable? */
-@@ -317,14 +314,7 @@ cifs_echo_request(struct work_struct *work)
- 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
- 		goto requeue_echo;
- 
--#ifdef CONFIG_CIFS_SMB2
--	if (server->is_smb2)
--		/* temporarilly disable echo requests for SMB2 */
--		rc = 0;
--	else
--#endif
--		rc = CIFSSMBEcho(server);
--
-+	rc = CIFSSMBEcho(server);
- 	if (rc)
- 		cFYI(1, "Unable to send echo request to server: %s",
- 			server->hostname);
-@@ -2040,7 +2030,12 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	tcp_ses->lstrp = jiffies;
- 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
- 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
--	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (volume_info->use_smb2)
-+		INIT_DELAYED_WORK(&tcp_ses->echo, smb2_echo_request);
-+	else
-+#endif
-+		INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+-int cifs_get_file_info(struct file *filp)
++static int
++cifs_query_file_info(struct file *filp)
+ {
+ 	int rc;
+ 	int xid;
+@@ -599,7 +600,7 @@ int cifs_get_file_info(struct file *filp)
+ 		rc = 0;
+ 		CIFS_I(inode)->time = 0;
+ 	default:
+-		goto cgfi_exit;
++		goto cqfi_exit;
+ 	}
  
  	/*
- 	 * at this point we are the only ones with the pointer
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index d63987c..52b68fb 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -330,3 +330,28 @@ calc_size_exit:
- 	cFYI(1, "smb2 len %d", len);
- 	return len;
- }
-+
-+void
-+smb2_echo_request(struct work_struct *work)
-+{
-+	int rc = 0;
-+	struct TCP_Server_Info *server = container_of(work,
-+					struct TCP_Server_Info, echo.work);
-+
-+	/*
-+	 * We cannot send an echo until the NEGOTIATE_PROTOCOL request is
-+	 * done, which is indicated by max_read != 0. Also, no need to ping
-+	 * if we got a response recently.
-+	 */
-+	if (server->max_read == 0 ||
-+	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
-+		goto requeue_echo;
-+
-+	rc = SMB2_echo(server);
-+	if (rc)
-+		cFYI(1, "Unable to send echo request to server: %s",
-+			server->hostname);
-+
-+requeue_echo:
-+	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
-+}
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index dfb17fd..0bb7877 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1493,3 +1493,50 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 	cifs_small_buf_release(buf);
+@@ -609,11 +610,22 @@ int cifs_get_file_info(struct file *filp)
+ 	fattr.cf_uniqueid = CIFS_I(inode)->uniqueid;
+ 	fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
+ 	cifs_fattr_to_inode(inode, &fattr);
+-cgfi_exit:
++cqfi_exit:
+ 	FreeXid(xid);
  	return rc;
  }
-+
-+/*
-+ * This is a no-op for now. We're not really interested in the reply, but
-+ * rather in the fact that the server sent one and that server->lstrp
-+ * gets updated.
-+ *
-+ * FIXME: maybe we should consider checking that the reply matches request?
-+ */
-+static void
-+smb2_echo_callback(struct mid_q_entry *mid)
+ 
++int cifs_get_file_info(struct file *filp)
 +{
-+	struct TCP_Server_Info *server = mid->callback_data;
-+	struct smb2_echo_rsp *smb2 = (struct smb2_echo_rsp *)mid->resp_buf;
-+	unsigned int credits_received = 1;
++#ifdef CONFIG_CIFS_SMB2
++	struct cifsFileInfo *cfile = filp->private_data;
 +
-+	if (mid->mid_state == MID_RESPONSE_RECEIVED)
-+		credits_received = le16_to_cpu(smb2->hdr.CreditRequest);
-+
-+	DeleteMidQEntry(mid);
-+	atomic_add(credits_received, &server->credits);
-+	wake_up(&server->request_q);
++	if (tlink_tcon(cfile->tlink)->ses->server->is_smb2)
++		return smb2_query_file_info(filp);
++#endif
++	return cifs_query_file_info(filp);
 +}
 +
-+int
-+SMB2_echo(struct TCP_Server_Info *server)
+ static int
+ cifs_query_inode_info(struct inode **pinode, const char *full_path,
+ 			FILE_ALL_INFO *data, struct super_block *sb, int xid,
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 60e8b1e..30c7c89 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -284,6 +284,48 @@ sqii_exit:
+ 	return rc;
+ }
+ 
++int smb2_query_file_info(struct file *filp)
 +{
-+	struct smb2_echo_req *smb2;
-+	int rc = 0;
-+	struct kvec iov;
++	int rc;
++	int xid;
++	FILE_ALL_INFO find_data;
++	struct cifs_fattr fattr;
++	struct inode *inode = filp->f_path.dentry->d_inode;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct cifsFileInfo *cfile = filp->private_data;
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++	struct smb2_file_all_info *smb2_data;
 +
-+	cFYI(1, "In echo request");
++	smb2_data = kzalloc(sizeof(struct smb2_file_all_info) + MAX_NAME*2,
++			    GFP_KERNEL);
++	if (smb2_data == NULL)
++		return -ENOMEM;
 +
-+	rc = small_smb2_init(SMB2_ECHO, NULL, (void **)&smb2);
-+	if (rc)
-+		return rc;
++	xid = GetXid();
++	rc = SMB2_query_info(xid, tcon, cfile->persist_fid,
++			     cfile->volatile_fid, smb2_data);
++	if (!rc) {
++		move_smb2_info_to_cifs(&find_data, smb2_data);
++		cifs_all_info_to_fattr(&fattr, &find_data, cifs_sb, false);
++	} else if (rc == -EREMOTE) {
++		cifs_create_dfs_fattr(&fattr, inode->i_sb);
++		rc = 0;
++	} else
++		goto sqfi_exit;
 +
-+	iov.iov_base = smb2;
-+	iov.iov_len = be32_to_cpu(smb2->hdr.smb2_buf_length) + 4;
-+
-+	rc = smb2_call_async(server, &iov, 1, NULL, smb2_echo_callback, server,
-+			     false);
-+	if (rc)
-+		cFYI(1, "Echo request failed: %d", rc);
-+
-+	cifs_small_buf_release(smb2);
++	/*
++	 * don't bother with SFU junk here -- just mark inode as needing
++	 * revalidation.
++	 */
++	fattr.cf_uniqueid = CIFS_I(inode)->uniqueid;
++	fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
++	cifs_fattr_to_inode(inode, &fattr);
++sqfi_exit:
++	FreeXid(xid);
++	kfree(smb2_data);
 +	return rc;
 +}
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 92d0982..81bd490 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -499,6 +499,18 @@ struct smb2_write_rsp {
- 	__u8   Buffer[1];
- } __packed;
- 
-+struct smb2_echo_req {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 4 */
-+	__u16  Reserved;
-+} __packed;
 +
-+struct smb2_echo_rsp {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 4 */
-+	__u16  Reserved;
-+} __packed;
-+
- /* Possible InfoType values */
- #define SMB2_O_INFO_FILE	0x01
- #define SMB2_O_INFO_FILESYSTEM	0x02
+ int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode)
+ {
+ 	int rc = 0, tmprc;
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 6e7eed0..c64362e 100644
+index c64362e..5d1ac2b 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -71,6 +71,7 @@ extern int smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
- 			      struct smb2_hdr *in_buf, int flags);
- extern int smb2_setup_session(unsigned int xid, struct cifs_ses *psesinfo,
- 			      struct nls_table *nls_info);
-+extern void smb2_echo_request(struct work_struct *work);
+@@ -75,6 +75,7 @@ extern void smb2_echo_request(struct work_struct *work);
  
  extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
  				   struct smb2_file_all_info *src);
-@@ -139,5 +140,6 @@ extern int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
- 		     unsigned int *nbytes, char **buf, int *pbuf_type,
- 		     unsigned int remaining_bytes);
- extern int smb2_async_readv(struct cifs_readdata *rdata);
-+extern int SMB2_echo(struct TCP_Server_Info *server);
- 
- #endif			/* _SMB2PROTO_H */
++extern int smb2_query_file_info(struct file *filp);
+ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
+ 				 FILE_ALL_INFO *data, struct super_block *sb,
+ 				 int xid);
 -- 
 1.7.1
