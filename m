@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 05/50] CIFS: Add SMB2 transport routines
-Date: Fri, 20 Jan 2012 12:34:26 +0400
-Message-ID: <1327048511-2342-5-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 09/50] CIFS: Add capability to send SMB2 negotiate message
+Date: Fri, 20 Jan 2012 12:34:30 +0400
+Message-ID: <1327048511-2342-9-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,265 +9,199 @@ In-Reply-To: <1327048511-2342-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-And simplify smb_sendv to make it process SMB2 requests. It let us
-send SMB2 negotiate message to the server.
+and temporarily disable SMB2.1 negotiating.
 
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifs_debug.h    |    3 +
- fs/cifs/cifsglob.h      |   18 +++
- fs/cifs/cifsproto.h     |   12 ++-
- fs/cifs/smb2misc.c      |   35 ++++++
- fs/cifs/smb2pdu.h       |   59 +++++++++
- fs/cifs/smb2proto.h     |   42 +++++++
- fs/cifs/smb2transport.c |  305 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/transport.c     |  142 +++++++++++++----------
- 8 files changed, 554 insertions(+), 62 deletions(-)
- create mode 100644 fs/cifs/smb2misc.c
- create mode 100644 fs/cifs/smb2proto.h
- create mode 100644 fs/cifs/smb2transport.c
+ fs/cifs/cifsglob.h  |   10 +-
+ fs/cifs/cifsproto.h |    1 +
+ fs/cifs/cifssmb.c   |    8 +-
+ fs/cifs/connect.c   |   19 +++
+ fs/cifs/sess.c      |    2 +-
+ fs/cifs/smb2misc.c  |    8 +-
+ fs/cifs/smb2pdu.c   |  384 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |   39 +++++
+ fs/cifs/smb2proto.h |    8 +
+ 9 files changed, 469 insertions(+), 10 deletions(-)
+ create mode 100644 fs/cifs/smb2pdu.c
 
-diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
-index 8942b28..e9911bf 100644
---- a/fs/cifs/cifs_debug.h
-+++ b/fs/cifs/cifs_debug.h
-@@ -33,6 +33,9 @@ void cifs_dump_mids(struct TCP_Server_Info *);
- #endif
- extern int traceSMB;		/* flag which enables the function below */
- void dump_smb(struct smb_hdr *, int);
-+#ifdef CONFIG_CIFS_SMB2
-+void dump_smb2(struct smb2_hdr *smb_buf, int smb_buf_length);
-+#endif
- #define CIFS_INFO	0x01
- #define CIFS_RC		0x02
- #define CIFS_TIMER	0x04
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 15c3a92..bb2af48 100644
+index e5f0b86..d06a373 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -22,11 +22,15 @@
- #include <linux/in.h>
- #include <linux/in6.h>
- #include <linux/slab.h>
-+#include <linux/mempool.h>
- #include <linux/workqueue.h>
- #include "cifs_fs_sb.h"
- #include "cifsacl.h"
- #include <crypto/internal/hash.h>
- #include <linux/scatterlist.h>
-+#ifdef CONFIG_CIFS_SMB2
-+#include "smb2pdu.h"
+@@ -270,7 +270,7 @@ struct TCP_Server_Info {
+ 	struct mutex srv_mutex;
+ 	struct task_struct *tsk;
+ 	char server_GUID[16];
+-	char sec_mode;
++	__u16 sec_mode;
+ 	bool session_estab; /* mark when very first sess is established */
+ 	u16 dialect; /* dialect index that server chose */
+ 	enum securityEnum secType;
+@@ -320,7 +320,11 @@ struct TCP_Server_Info {
+ #ifdef CONFIG_CIFS_SMB2
+ 	atomic_t credits; /* send no more simultaneous requests than this */
+ 	__u64 current_smb2_mid;         /* multiplex id - rotating counter */
+-#endif
++	__le16 smb2_dialect_revision; /* SMB2.0 implemented, 2.1 recognized */
++/*	char smb2_crypt_key[CIFS_CRYPTO_KEY_SIZE];  BB can we use cifs key? */
++	unsigned int	max_read;
++	unsigned int	max_write;
 +#endif /* CONFIG_CIFS_SMB2 */
- 
- /*
-  * The sizes of various internal tables and strings
-@@ -236,6 +240,12 @@ struct cifs_mnt_data {
- 	int flags;
- };
- 
-+static inline unsigned int
-+get_rfc1002_length(void *buf)
-+{
-+	return be32_to_cpu(*((__be32 *)buf));
-+}
-+
- struct TCP_Server_Info {
- 	struct list_head tcp_ses_list;
- 	struct list_head smb_ses_list;
-@@ -307,6 +317,9 @@ struct TCP_Server_Info {
- 	atomic_t in_send; /* requests trying to send */
- 	atomic_t num_waiters;   /* blocked waiting to get in sendrecv */
- #endif
-+#ifdef CONFIG_CIFS_SMB2
-+	__u64 current_smb2_mid;         /* multiplex id - rotating counter */
-+#endif
  };
  
  /*
-@@ -693,6 +706,7 @@ struct mid_q_entry {
- 	unsigned long when_sent; /* time when smb send finished */
- 	unsigned long when_received; /* when demux complete (taken off wire) */
- #endif
-+	bool is_smb2:1;		/* SMB2 mid */
- 	mid_receive_t *receive; /* call receive callback */
- 	mid_callback_t *callback; /* call completion callback */
- 	void *callback_data;	/* general purpose pointer for callback */
-@@ -835,6 +849,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- #define   MID_RETRY_NEEDED      8 /* session closed while this request out */
- #define   MID_RESPONSE_MALFORMED 0x10
- #define   MID_SHUTDOWN		 0x20
-+#define   MID_NO_RESPONSE_NEEDED 0x40
- 
- /* Types of response buffer returned from SendReceive2 */
- #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
-@@ -843,6 +858,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- #define   CIFS_IOVEC            4    /* array of response buffers */
- 
- /* Type of Request to SendReceive2 */
-+#define   CIFS_STD_OP		0
- #define   CIFS_BLOCKING_OP      1    /* operation can block */
- #define   CIFS_ASYNC_OP         2    /* do not wait for response */
- #define   CIFS_TIMEOUT_MASK 0x003    /* only one of above set in req */
-@@ -1028,4 +1044,6 @@ void cifs_oplock_break(struct work_struct *work);
- 
- extern const struct slow_work_ops cifs_oplock_break_ops;
- 
-+extern mempool_t *cifs_mid_poolp;
-+
- #endif	/* _CIFS_GLOB_H */
+@@ -370,7 +374,7 @@ struct cifs_ses {
+ 	char *serverOS;		/* name of operating system underlying server */
+ 	char *serverNOS;	/* name of network operating system of server */
+ 	char *serverDomain;	/* security realm of server */
+-	int Suid;		/* remote smb uid  */
++	__u64 Suid;		/* remote smb uid  */
+ 	uid_t linux_uid;        /* overriding owner of files on the mount */
+ 	uid_t cred_uid;		/* owner of credentials */
+ 	int capabilities;
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 6f4e243..d1e30d9 100644
+index b6c784b..3344a9f 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -36,7 +36,9 @@ extern void cifs_buf_release(void *);
- extern struct smb_hdr *cifs_small_buf_get(void);
- extern void cifs_small_buf_release(void *);
- extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
--			unsigned int /* length */);
-+		    unsigned int /* length */);
-+extern int smb_sendv(struct TCP_Server_Info *server, struct kvec *iov,
-+		     int n_vec);
- extern unsigned int _GetXid(void);
- extern void _FreeXid(unsigned int);
- #define GetXid()						\
-@@ -68,6 +70,14 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
- extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
- extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
-+extern void cifs_delete_mid(struct mid_q_entry *midEntry);
-+extern int cifs_sync_mid_result(struct mid_q_entry *mid,
-+				struct TCP_Server_Info *server);
-+extern int cifs_wait_for_free_request(struct TCP_Server_Info *server,
-+				      const int long_op);
-+extern int cifs_wait_for_response(struct TCP_Server_Info *server,
-+				  struct mid_q_entry *midQ);
-+extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 			   unsigned int nvec, mid_receive_t *receive,
- 			   mid_callback_t *callback, void *cbdata,
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-new file mode 100644
-index 0000000..355fb15
---- /dev/null
-+++ b/fs/cifs/smb2misc.c
-@@ -0,0 +1,35 @@
-+/*
-+ *   fs/cifs/smb2misc.c
-+ *
-+ *   Copyright (C) International Business Machines  Corp., 2002,2011
-+ *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
-+ *              Pavel Shilovsky (pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+#include <linux/ctype.h>
-+#include "smb2pdu.h"
-+#include "cifsglob.h"
-+#include "cifsproto.h"
-+#include "smb2proto.h"
-+#include "cifs_debug.h"
-+#include "cifs_unicode.h"
-+#include "smb2status.h"
-+
-+void
-+dump_smb2(struct smb2_hdr *smb_buf, int smb_buf_length)
-+{
-+	dump_smb((struct smb_hdr *)smb_buf, smb_buf_length);
-+}
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index e3e67bb..5ec0c9f 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -26,6 +26,65 @@
- #include <net/sock.h>
+@@ -179,6 +179,7 @@ extern struct smb_vol *cifs_get_volume_info(char *mount_data,
+ extern int cifs_mount(struct cifs_sb_info *, struct smb_vol *);
+ extern void cifs_umount(struct cifs_sb_info *);
+ extern void cifs_dfs_release_automount_timer(void);
++extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
+ void cifs_proc_init(void);
+ void cifs_proc_clean(void);
  
- /*
-+ * Note that, due to trying to use names similar to the protocol specifications,
-+ * there are many mixed case field names in the structures below.  Although
-+ * this does not match typical Linux kernel style, it is necessary to be
-+ * be able to match against the protocol specfication.
-+ *
-+ * SMB2 commands
-+ * Some commands have minimal (wct=0,bcc=0), or uninteresting, responses
-+ * (ie no useful data other than the SMB error code itself) and are marked such.
-+ * Knowing this helps avoid response buffer allocations and copy in some cases.
-+ */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index abf7fbd..2834838 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -91,7 +91,7 @@ static void cifs_readv_complete(struct work_struct *work);
+ 
+ /* Mark as invalid, all open files on tree connections since they
+    were closed when session to server was lost */
+-static void mark_open_files_invalid(struct cifs_tcon *pTcon)
++void cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ {
+ 	struct cifsFileInfo *open_file = NULL;
+ 	struct list_head *tmp;
+@@ -99,7 +99,7 @@ static void mark_open_files_invalid(struct cifs_tcon *pTcon)
+ 
+ /* list all files open on tree connection and mark them invalid */
+ 	spin_lock(&cifs_file_list_lock);
+-	list_for_each_safe(tmp, tmp1, &pTcon->openFileList) {
++	list_for_each_safe(tmp, tmp1, &tcon->openFileList) {
+ 		open_file = list_entry(tmp, struct cifsFileInfo, tlist);
+ 		open_file->invalidHandle = true;
+ 		open_file->oplock_break_cancelled = true;
+@@ -186,7 +186,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 		goto out;
+ 	}
+ 
+-	mark_open_files_invalid(tcon);
++	cifs_mark_open_files_invalid(tcon);
+ 	rc = CIFSTCon(0, ses, tcon->treeName, tcon, nls_codepage);
+ 	mutex_unlock(&ses->session_mutex);
+ 	cFYI(1, "reconnect tcon rc = %d", rc);
+@@ -457,7 +457,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 			rc = -EOPNOTSUPP;
+ 			goto neg_err_exit;
+ 		}
+-		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
++		server->sec_mode = le16_to_cpu(rsp->SecurityMode);
+ 		server->maxReq = le16_to_cpu(rsp->MaxMpxCount);
+ 		server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
+ 		server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 9d4b3c2..a79c979 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3721,6 +3721,21 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
+ 	int rc = 0;
+ 	struct TCP_Server_Info *server = ses->server;
+ 
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2) {
++		if (server->max_read != 0)
++			return 0;
++		/* we have one credit to start with */
++		atomic_set(&server->credits, 1);
++		rc = SMB2_negotiate(xid, ses);
++		/* BB we probably don't need to retry with modern servers */
++		if (rc == -EAGAIN)
++			rc = -EHOSTDOWN;
 +
-+/* List is sent on wire as little endian */
-+#define SMB2_NEGOTIATE		cpu_to_le16(0x0000)
-+#define SMB2_SESSION_SETUP	cpu_to_le16(0x0001)
-+#define SMB2_LOGOFF		cpu_to_le16(0x0002) /* trivial request/resp */
-+#define SMB2_TREE_CONNECT	cpu_to_le16(0x0003)
-+#define SMB2_TREE_DISCONNECT	cpu_to_le16(0x0004) /* trivial req/resp */
-+#define SMB2_CREATE		cpu_to_le16(0x0005)
-+#define SMB2_CLOSE		cpu_to_le16(0x0006)
-+#define SMB2_FLUSH		cpu_to_le16(0x0007) /* trivial resp */
-+#define SMB2_READ		cpu_to_le16(0x0008)
-+#define SMB2_WRITE		cpu_to_le16(0x0009)
-+#define SMB2_LOCK		cpu_to_le16(0x000A)
-+#define SMB2_IOCTL		cpu_to_le16(0x000B)
-+#define SMB2_CANCEL		cpu_to_le16(0x000C)
-+#define SMB2_ECHO		cpu_to_le16(0x000D)
-+#define SMB2_QUERY_DIRECTORY	cpu_to_le16(0x000E)
-+#define SMB2_CHANGE_NOTIFY	cpu_to_le16(0x000F)
-+#define SMB2_QUERY_INFO		cpu_to_le16(0x0010)
-+#define SMB2_SET_INFO		cpu_to_le16(0x0011)
-+#define SMB2_OPLOCK_BREAK	cpu_to_le16(0x0012)
++		goto neg_prot_exit;
++	}
++#endif /* CONFIG_CIFS_SMB2 */
 +
-+/* Same List of commands in host endian */
-+#define SMB2NEGOTIATE		0x0000
-+#define SMB2SESSION_SETUP	0x0001
-+#define SMB2LOGOFF		0x0002 /* trivial request/resp */
-+#define SMB2TREE_CONNECT	0x0003
-+#define SMB2TREE_DISCONNECT	0x0004 /* trivial req/resp */
-+#define SMB2CREATE		0x0005
-+#define SMB2CLOSE		0x0006
-+#define SMB2FLUSH		0x0007 /* trivial resp */
-+#define SMB2READ		0x0008
-+#define SMB2WRITE		0x0009
-+#define SMB2LOCK		0x000A
-+#define SMB2IOCTL		0x000B
-+#define SMB2CANCEL		0x000C
-+#define SMB2ECHO		0x000D
-+#define SMB2QUERY_DIRECTORY	0x000E
-+#define SMB2CHANGE_NOTIFY	0x000F
-+#define SMB2QUERY_INFO		0x0010
-+#define SMB2SET_INFO		0x0011
-+#define SMB2OPLOCK_BREAK	0x0012
+ 	/* only send once per connect */
+ 	if (server->maxBuf != 0)
+ 		return 0;
+@@ -3732,6 +3747,10 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
+ 		if (rc == -EAGAIN)
+ 			rc = -EHOSTDOWN;
+ 	}
 +
-+#define NUMBER_OF_SMB2_COMMANDS	0x0013
-+
-+/* BB FIXME - analyze following length BB */
-+#define MAX_SMB2_HDR_SIZE 0x78 /* 4 len + 64 hdr + (2*24 wct) + 2 bct + 2 pad */
-+
-+/*
-  * SMB2 Header Definition
-  *
-  * "MBZ" :  Must be Zero
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
++#ifdef CONFIG_CIFS_SMB2
++neg_prot_exit:
++#endif /* CONFIG_CIFS_SMB2 */
+ 	if (rc == 0) {
+ 		spin_lock(&GlobalMid_Lock);
+ 		if (server->tcpStatus == CifsNeedNegotiate)
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index d85efad..47ef44e 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -895,7 +895,7 @@ ssetup_ntlmssp_authenticate:
+ 	if (action & GUEST_LOGIN)
+ 		cFYI(1, "Guest login"); /* BB mark SesInfo struct? */
+ 	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
+-	cFYI(1, "UID = %d ", ses->Suid);
++	cFYI(1, "UID = %llu ", ses->Suid);
+ 	/* response can have either 3 or 4 word count - Samba sends 3 */
+ 	/* and lanman response is 3 */
+ 	bytes_remaining = get_bcc(smb_buf);
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 2390c02..86888ca 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -203,8 +203,7 @@ static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
+  * Returns the pointer to the beginning of the data area. Length of the data
+  * area and the offset to it (from the beginning of the smb are also returned.
+  */
+-static char *
+-smb2_get_data_area_len(int *poff, int *plen, struct smb2_hdr *pSMB2)
++char *smb2_get_data_area_len(int *poff, int *plen, struct smb2_hdr *pSMB2)
+ {
+ 	*poff = 0;
+ 	*plen = 0;
+@@ -222,6 +221,11 @@ smb2_get_data_area_len(int *poff, int *plen, struct smb2_hdr *pSMB2)
+ 	 */
+ 	switch (pSMB2->Command) {
+ 	case SMB2_NEGOTIATE:
++		*poff = le16_to_cpu(
++		    ((struct smb2_negotiate_rsp *)pSMB2)->SecurityBufferOffset);
++		*plen = le16_to_cpu(
++		    ((struct smb2_negotiate_rsp *)pSMB2)->SecurityBufferLength);
++		break;
+ 	case SMB2_SESSION_SETUP:
+ 	case SMB2_CREATE:
+ 	case SMB2_READ:
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
 new file mode 100644
-index 0000000..6cffdf1
+index 0000000..99de190
 --- /dev/null
-+++ b/fs/cifs/smb2proto.h
-@@ -0,0 +1,42 @@
++++ b/fs/cifs/smb2pdu.c
+@@ -0,0 +1,384 @@
 +/*
-+ *   fs/cifs/smb2proto.h
++ *   fs/cifs/smb2pdu.c
 + *
-+ *   Copyright (c) International Business Machines  Corp., 2002, 2011
++ *   Copyright (C) International Business Machines  Corp., 2009, 2011
 + *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
 + *              Pavel Shilovsky (pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
++ *
++ *   Contains the routines for constructing the SMB2 PDUs themselves
 + *
 + *   This library is free software; you can redistribute it and/or modify
 + *   it under the terms of the GNU Lesser General Public License as published
@@ -283,704 +217,438 @@ index 0000000..6cffdf1
 + *   along with this library; if not, write to the Free Software
 + *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 + */
-+#ifndef _SMB2PROTO_H
-+#define _SMB2PROTO_H
-+#include <linux/nls.h>
-+#include <linux/key-type.h>
 +
-+struct statfs;
-+
-+/*
-+ *****************************************************************
-+ * All Prototypes
-+ *****************************************************************
-+ */
-+extern int map_smb2_to_linux_error(struct smb2_hdr *smb2, int logErr);
-+
-+extern int smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
-+			 struct kvec *vec, int nvec, int *ret_buf_type,
-+			 int *status, const int flags);
-+extern int smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
-+			      struct smb2_hdr *in_buf, int flags);
-+
-+#endif			/* _SMB2PROTO_H */
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-new file mode 100644
-index 0000000..d7f1c05
---- /dev/null
-+++ b/fs/cifs/smb2transport.c
-@@ -0,0 +1,305 @@
-+/*
-+ *   fs/cifs/smb2transport.c
-+ *
-+ *   Copyright (C) International Business Machines  Corp., 2002, 2011
-+ *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
-+ *              Jeremy Allison (jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2006
-+ *              Pavel Shilovsky (pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
++ /* SMB2 PDU handling routines here - except for leftovers (eg session setup) */
++ /* Note that there are handle based routines which must be		      */
++ /* treated slightly differently for reconnection purposes since we never     */
++ /* want to reuse a stale file handle and only the caller knows the file info */
 +
 +#include <linux/fs.h>
-+#include <linux/list.h>
-+#include <linux/wait.h>
-+#include <linux/net.h>
-+#include <linux/delay.h>
++#include <linux/kernel.h>
++#include <linux/vfs.h>
 +#include <linux/uaccess.h>
-+#include <asm/processor.h>
-+#include <linux/mempool.h>
++#include <linux/xattr.h>
 +#include "smb2pdu.h"
 +#include "cifsglob.h"
++#include "cifsacl.h"
 +#include "cifsproto.h"
 +#include "smb2proto.h"
++#include "cifs_unicode.h"
 +#include "cifs_debug.h"
++#include "ntlmssp.h"
 +#include "smb2status.h"
 +
-+static __u64
-+smb2_get_mid(struct TCP_Server_Info *server)
-+{
-+	__u64 mid;
++/*
++ *  The following table defines the expected "StructureSize" of SMB2 requests
++ *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS requests.
++ *
++ *  Note that commands are defined in smb2pdu.h in le16 but the array below is
++ *  indexed by command in host byte order
++ */
++static const int smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
++	/* SMB2_NEGOTIATE */ 36,
++	/* SMB2_SESSION_SETUP */ 25,
++	/* SMB2_LOGOFF */ 4,
++	/* SMB2_TREE_CONNECT */	9,
++	/* SMB2_TREE_DISCONNECT */ 4,
++	/* SMB2_CREATE */ 57,
++	/* SMB2_CLOSE */ 24,
++	/* SMB2_FLUSH */ 24,
++	/* SMB2_READ */	49,
++	/* SMB2_WRITE */ 49,
++	/* SMB2_LOCK */	48,
++	/* SMB2_IOCTL */ 57,
++	/* SMB2_CANCEL */ 4,
++	/* SMB2_ECHO */ 4,
++	/* SMB2_QUERY_DIRECTORY */ 33,
++	/* SMB2_CHANGE_NOTIFY */ 32,
++	/* SMB2_QUERY_INFO */ 41,
++	/* SMB2_SET_INFO */ 33,
++	/* SMB2_OPLOCK_BREAK */  24 /* BB this is 36 for LEASE_BREAK variant */
++};
 +
-+	spin_lock(&GlobalMid_Lock);
-+	mid = server->current_smb2_mid++;
-+	spin_unlock(&GlobalMid_Lock);
-+	return mid;
-+} /* BB do we eventually need an SMB2 version of this routine? BB */
 +
 +/*
-+ * Set message id for the request. Should be called after wait_for_free_request
-+ * and when srv_mutex is held. iov array must have at least 1 element.
++ * NB: MID can not be set if tcon not passed in, in that
++ * case it is responsbility of caller to set the mid
 + */
-+static inline void
-+smb2_seq_num_into_buf(struct TCP_Server_Info *server, struct kvec *iov)
++static void
++smb2_hdr_assemble(struct smb2_hdr *buffer, __le16 smb2_cmd /* command */ ,
++		  const struct cifs_tcon *tcon)
 +{
-+	((struct smb2_hdr *)iov[0].iov_base)->MessageId = smb2_get_mid(server);
-+}
-+
-+static struct mid_q_entry *
-+smb2_mid_entry_alloc(const struct smb2_hdr *smb_buffer,
-+		     struct TCP_Server_Info *server)
-+{
-+	struct mid_q_entry *temp;
-+
-+	if (server == NULL) {
-+		cERROR(1, "Null TCP session in smb2_mid_entry_alloc");
-+		return NULL;
-+	}
-+
-+	temp = mempool_alloc(cifs_mid_poolp, GFP_NOFS);
-+	if (temp == NULL)
-+		return temp;
-+	else {
-+		memset(temp, 0, sizeof(struct mid_q_entry));
-+		temp->mid = smb_buffer->MessageId;	/* always LE */
-+		temp->pid = current->pid;
-+		temp->command = smb_buffer->Command;	/* Always LE */
-+		temp->when_alloc = jiffies;
-+		temp->is_smb2 = true;
-+
-+		/*
-+		 * The default is for the mid to be synchronous, so the
-+		 * default callback just wakes up the current task.
-+		 */
-+		temp->callback = cifs_wake_up_task;
-+		temp->callback_data = current;
-+	}
-+
-+	atomic_inc(&midCount);
-+	temp->mid_state = MID_REQUEST_ALLOCATED;
-+	return temp;
-+}
-+
-+static int
-+smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_hdr *buf,
-+		   struct mid_q_entry **mid)
-+{
-+	if (ses->server->tcpStatus == CifsExiting)
-+		return -ENOENT;
-+
-+	if (ses->server->tcpStatus == CifsNeedReconnect) {
-+		cFYI(1, "tcp session dead - return to caller to retry");
-+		return -EAGAIN;
-+	}
-+
-+	if (ses->status != CifsGood) {
-+		/* check if SMB2 session is bad because we are setting it up */
-+		if ((buf->Command != SMB2_SESSION_SETUP) &&
-+		    (buf->Command != SMB2_NEGOTIATE))
-+			return -EAGAIN;
-+		/* else ok - we are setting up session */
-+	}
-+	*mid = smb2_mid_entry_alloc(buf, ses->server);
-+	if (*mid == NULL)
-+		return -ENOMEM;
-+	spin_lock(&GlobalMid_Lock);
-+	list_add_tail(&(*mid)->qhead, &ses->server->pending_mid_q);
-+	spin_unlock(&GlobalMid_Lock);
-+	return 0;
-+}
-+
-+static int
-+smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-+		   unsigned int receive_len, bool log_error)
-+{
-+	unsigned int len = get_rfc1002_length(mid->resp_buf);
-+
-+	dump_smb2(mid->resp_buf, min_t(u32, 80, len));
-+	/* convert the length into a more usable form */
-+	/* BB - uncomment with SMB2 signing implementation */
-+	/* if ((receive_len > 24) &&
-+	    (server->sec_mode & (SECMODE_SIGN_REQUIRED|SECMODE_SIGN_ENABLED))) {
-+		if (smb2_verify_signature(mid->resp_buf, server))
-+			cERROR(1, "Unexpected SMB signature");
-+	} */
-+
-+	return map_smb2_to_linux_error(mid->resp_buf, log_error);
-+}
-+
-+int
-+smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
-+	      struct kvec *iov, int n_vec, int *presp_buftype /* ret */,
-+	      int *status /* ret SMB2 network status code */, const int flags)
-+{
-+	int rc = 0;
-+	int long_op;
-+	unsigned int receive_len;
-+	struct mid_q_entry *midQ;
-+	struct smb2_hdr *buf = iov[0].iov_base;
-+
-+	if (status)
-+		*status = STATUS_SUCCESS;
-+	long_op = flags & CIFS_TIMEOUT_MASK;
-+
-+	*presp_buftype = CIFS_NO_BUFFER;  /* no response buf yet */
-+
-+	if ((ses == NULL) || (ses->server == NULL)) {
-+		cifs_small_buf_release(buf);
-+		cERROR(1, "Null session");
-+		return -EIO;
-+	}
-+
-+	if (ses->server->tcpStatus == CifsExiting) {
-+		cifs_small_buf_release(buf);
-+		return -ENOENT;
-+	}
-+
-+	rc = cifs_wait_for_free_request(ses->server, long_op);
-+	if (rc) {
-+		cifs_small_buf_release(buf);
-+		return rc;
-+	}
++	struct list_head *temp_item;
++	struct cifs_ses *ses;
++	struct smb2_pdu *smb = (struct smb2_pdu *)buffer;
++	char *temp = (char *) buffer;
++	/* lookup word count ie StructureSize from table */
++	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_cmd)];
 +
 +	/*
-+	 * Make sure that we sign in the same order that we send on this socket
-+	 * and avoid races inside tcp sendmsg code that could cause corruption
-+	 * of smb data.
++	 * smaller than SMALL_BUFFER_SIZE but bigger than fixed area of
++	 * largest operations (Create)
 +	 */
++	memset(temp, 0, 256);
 +
-+	mutex_lock(&ses->server->srv_mutex);
++	/* Note this is only network field converted to big endian */
++	buffer->smb2_buf_length = cpu_to_be32(parmsize + sizeof(struct smb2_hdr)
++			- 4 /*  RFC 1001 length field itself not counted */);
 +
-+	smb2_seq_num_into_buf(ses->server, iov);
++	buffer->ProtocolId[0] = 0xFE;
++	buffer->ProtocolId[1] = 'S';
++	buffer->ProtocolId[2] = 'M';
++	buffer->ProtocolId[3] = 'B';
++	buffer->StructureSize = cpu_to_le16(64);
++	buffer->Command = smb2_cmd;
++	buffer->CreditRequest = cpu_to_le16(2); /* BB make this dynamic */
++	buffer->ProcessId = cpu_to_le32((__u16)current->tgid);
 +
-+	rc = smb2_get_mid_entry(ses, buf, &midQ);
-+	if (rc) {
-+		mutex_unlock(&ses->server->srv_mutex);
-+		cifs_small_buf_release(buf);
-+		wake_up(&ses->server->request_q);
-+		return rc;
-+	}
-+	/* rc = smb2_sign_smb2(iov, n_vec, ses->server);
-+	if (rc) {
-+		mutex_unlock(&ses->server->srv_mutex);
-+		cifs_small_buf_release(buf);
++	if (!tcon)
 +		goto out;
-+	} */
 +
-+	midQ->mid_state = MID_REQUEST_SUBMITTED;
-+	cifs_in_send_inc(ses->server);
-+	rc = smb_sendv(ses->server, iov, n_vec);
-+	cifs_in_send_dec(ses->server);
-+	cifs_save_when_sent(midQ);
++	buffer->TreeId = tcon->tid;
++	/* For the multiuser case, there are few obvious technically  */
++	/* possible mechanisms to match the local linux user (uid)    */
++	/* to a valid remote smb user (smb_uid):		      */
++	/*      1) Query Winbind (or other local pam/nss daemon       */
++	/*         for userid/password/logon_domain or credential      */
++	/*      2) Query Winbind for uid to sid to username mapping   */
++	/*         and see if we have a matching password for existing*/
++	/*         session for that user perhas getting password by   */
++	/*         adding a new pam_smb2 module that stores passwords */
++	/*         so that the smb2 vfs can get at that for all logged*/
++	/*         on users					      */
++	/*      3) (Which is the mechanism we have chosen)	      */
++	/*         Search through sessions to the same server for a   */
++	/*         a match on the uid that was passed in on mount     */
++	/*         with the current processes uid (or euid?) and use  */
++	/*         that smb uid.   If no existing smb session for     */
++	/*         that uid found, use the default smb session ie     */
++	/*         the smb session for the volume mounted which is    */
++	/*         the same as would be used if the multiuser mount   */
++	/*         flag were disabled.  */
 +
-+	mutex_unlock(&ses->server->srv_mutex);
++	/*  BB Add support for establishing new tcon and SMB Session  */
++	/*      with userid/password pairs found on the smb session   */
++	/*      for other target tcp/ip addresses		BB    */
++	if (!tcon->ses)
++		goto set_tcon_flags;
 +
-+	if (rc < 0) {
-+		cifs_small_buf_release(buf);
-+		goto out;
-+	}
++	/* Uid is not converted */
++	buffer->SessionId = tcon->ses->Suid;
++	/* BB check this against related recent cifs changes */
++	if (multiuser_mount == 0)
++		goto set_tcon_flags;
 +
-+	if (long_op == CIFS_ASYNC_OP) {
-+		cifs_small_buf_release(buf);
-+		goto out;
-+	}
++	if (current_fsuid() == tcon->ses->linux_uid)
++		goto set_tcon_flags;
 +
-+	rc = cifs_wait_for_response(ses->server, midQ);
-+	if (rc != 0) {
-+		/* BB send cancel message */
-+		spin_lock(&GlobalMid_Lock);
-+		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
-+			midQ->callback = cifs_delete_mid;
-+			spin_unlock(&GlobalMid_Lock);
-+			cifs_small_buf_release(buf);
-+			wake_up(&ses->server->request_q);
-+			return rc;
++	cFYI(1, "Multiuser mode and UID did not match tcon uid");
++	spin_lock(&cifs_tcp_ses_lock);
++	list_for_each(temp_item,
++		      &tcon->ses->server->smb_ses_list) {
++		ses = list_entry(temp_item, struct cifs_ses,
++				 smb_ses_list);
++		if (ses->linux_uid == current_fsuid()) {
++			if (ses->server == tcon->ses->server) {
++				buffer->SessionId = ses->Suid;
++				break;
++			}
++			/* BB eventually call smb2_setup_session here */
++			cFYI(1, "local UID found but no smb sess with this "
++			     "server exists");
 +		}
-+		spin_unlock(&GlobalMid_Lock);
 +	}
-+
-+	cifs_small_buf_release(buf);
-+
-+	rc = cifs_sync_mid_result(midQ, ses->server);
-+	if (rc) {
-+		wake_up(&ses->server->request_q);
-+		return rc;
-+	}
-+
-+	if (!midQ->resp_buf || (midQ->mid_state != MID_RESPONSE_RECEIVED)) {
-+		rc = -EIO;
-+		cFYI(1, "Bad MID state?");
-+		goto out;
-+	}
-+
-+	buf = (struct smb2_hdr *)midQ->resp_buf;
-+	receive_len = get_rfc1002_length(buf);
-+
-+	if (receive_len > CIFSMaxBufSize + MAX_SMB2_HDR_SIZE) {
-+		cERROR(1, "Frame too large received.  Length: %d  Xid: %d",
-+			receive_len, xid);
-+		rc = -EIO;
-+		goto out;
-+	}
-+
-+	/* rcvd frame is ok */
-+
-+	iov[0].iov_base = (char *)buf;
-+	iov[0].iov_len = receive_len + 4;
-+	if (midQ->large_buf)
-+		*presp_buftype = CIFS_LARGE_BUFFER;
-+	else
-+		*presp_buftype = CIFS_SMALL_BUFFER;
-+
-+	rc = smb2_check_receive(midQ, ses->server, receive_len,
-+				flags & CIFS_LOG_ERROR);
-+
-+	if (status)
-+		*status = le32_to_cpu(buf->Status);
-+
-+	if ((flags & CIFS_NO_RESP) == 0)
-+		/* mark it so buf will not be freed by free_smb2mid */
-+		midQ->resp_buf = NULL;
-+
++	spin_unlock(&cifs_tcp_ses_lock);
++set_tcon_flags:
++	/* BB check following DFS flags BB */
++	/* BB do we have to add check for SHI1005_FLAGS_DFS_ROOT too? */
++	/* if (tcon->share_flags & SHI1005_FLAGS_DFS)
++		buffer->Flags |= SMB2_FLAGS_DFS_OPERATIONS; */
++	/* BB how does SMB2 do case sensitive? */
++	/* if (tcon->nocase)
++		buffer->Flags |= SMBFLG_CASELESS; */
++	/* if (tcon->ses && tcon->ses->server &&
++	    (tcon->ses->server->sec_mode & SECMODE_SIGN_REQUIRED))
++		buffer->Flags |= SMB2_FLAGS_SIGNED; */
 +out:
-+	cifs_delete_mid(midQ);
-+	wake_up(&ses->server->request_q);
++	smb->StructureSize2 = cpu_to_le16(parmsize);
++	return;
++}
++
++static int
++smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
++{
++	int rc = 0;
++	/* BB add missing code here */
 +	return rc;
 +}
 +
 +/*
-+ * Send an SMB2 Request. No response info (other than return code) needs to
-+ * be parsed.
-+ *
-+ * flags indicate the type of request buffer and how long to wait
-+ * and whether to log NT STATUS code (error) before mapping it to POSIX error.
++ * Allocate and return pointer to an SMB request buffer, and set basic
++ * SMB information in the SMB header. If the return code is zero, this
++ * function must have filled in request_buf pointer.
 + */
-+int
-+smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
-+		   struct smb2_hdr *in_buf, int flags)
++static int
++small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
++		void **request_buf)
 +{
-+	int rc;
-+	struct kvec iov[1];
-+	int resp_buf_type;
++	int rc = 0;
 +
-+	iov[0].iov_base = (char *)in_buf;
-+	iov[0].iov_len = get_rfc1002_length(in_buf) + 4;
-+	flags |= CIFS_NO_RESP;
-+	rc = smb2_sendrcv2(xid, ses, iov, 1, &resp_buf_type, NULL, flags);
-+	/* BB remove the following debug line eventually */
-+	cFYI(1, "%s flags %d rc %d", __func__, flags, rc);
++	rc = smb2_reconnect(smb2_command, tcon);
++	if (rc)
++		return rc;
++
++	/* BB eventually switch this to SMB2 specific small buf size */
++	*request_buf = cifs_small_buf_get();
++	if (*request_buf == NULL) {
++		/* BB should we add a retry in here if not a writepage? */
++		return -ENOMEM;
++	}
++
++	smb2_hdr_assemble((struct smb2_hdr *) *request_buf, smb2_command, tcon);
++
++	if (tcon != NULL) {
++#ifdef CONFIG_CIFS_STATS2
++		/*
++		uint16_t com_code = le16_to_cpu(smb2_command);
++		cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_sent[com_code]);
++		*/
++#endif
++		cifs_stats_inc(&tcon->num_smbs_sent);
++	}
 +
 +	return rc;
 +}
 +
-+/* BB add missing functions here */
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index f3f98ad..f7ac3f0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -35,10 +35,8 @@
- #include "cifsproto.h"
- #include "cifs_debug.h"
- 
--extern mempool_t *cifs_mid_poolp;
--
--static void
--wake_up_task(struct mid_q_entry *mid)
-+void
-+cifs_wake_up_task(struct mid_q_entry *mid)
- {
- 	wake_up_process(mid->callback_data);
- }
-@@ -70,7 +68,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
- 		 * The default is for the mid to be synchronous, so the
- 		 * default callback just wakes up the current task.
- 		 */
--		temp->callback = wake_up_task;
-+		temp->callback = cifs_wake_up_task;
- 		temp->callback_data = current;
- 	}
- 
-@@ -83,7 +81,15 @@ void
- DeleteMidQEntry(struct mid_q_entry *midEntry)
- {
- #ifdef CONFIG_CIFS_STATS2
-+	__le16 command;
- 	unsigned long now;
++static void free_rsp_buf(int resp_buftype, void *pSMB2r)
++{
++	if (resp_buftype == CIFS_SMALL_BUFFER)
++		cifs_small_buf_release(pSMB2r);
++	else if (resp_buftype == CIFS_LARGE_BUFFER)
++		cifs_buf_release(pSMB2r);
++}
 +
-+#ifdef CONFIG_CIFS_SMB2
-+	if (midEntry->is_smb2)
-+		command = SMB2_LOCK;
-+	else
-+#endif
-+		command = cpu_to_le16(SMB_COM_LOCKING_ANDX);
- #endif
- 	midEntry->mid_state = MID_FREE;
- 	atomic_dec(&midCount);
-@@ -98,8 +104,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
- 	 * something is wrong, unless it is quite a slow link or server.
- 	 */
- 	if ((now - midEntry->when_alloc) > HZ) {
--		if ((cifsFYI & CIFS_TIMER) &&
--		    (midEntry->command != cpu_to_le16(SMB_COM_LOCKING_ANDX))) {
-+		if ((cifsFYI & CIFS_TIMER) && (midEntry->command != command)) {
- 			printk(KERN_DEBUG " CIFS slow rsp: cmd %d mid %llu",
- 			       midEntry->command, midEntry->mid);
- 			printk(" A: 0x%lx S: 0x%lx R: 0x%lx\n",
-@@ -112,8 +117,8 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
- 	mempool_free(midEntry, cifs_mid_poolp);
- }
- 
--static void
--delete_mid(struct mid_q_entry *mid)
-+void
-+cifs_delete_mid(struct mid_q_entry *mid)
- {
- 	spin_lock(&GlobalMid_Lock);
- 	list_del(&mid->qhead);
-@@ -122,18 +127,24 @@ delete_mid(struct mid_q_entry *mid)
- 	DeleteMidQEntry(mid);
- }
- 
--static int
-+int
- smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- {
- 	int rc = 0;
- 	int i = 0;
- 	struct msghdr smb_msg;
-+	__be32 *buf_length = (__be32 *)iov[0].iov_base;
- 	struct smb_hdr *smb_buffer = iov[0].iov_base;
-+#ifdef CONFIG_CIFS_SMB2
-+	struct smb2_hdr *smb2_buffer = iov[0].iov_base;
-+#endif
- 	unsigned int len = iov[0].iov_len;
- 	unsigned int total_len;
- 	int first_vec = 0;
--	unsigned int smb_buf_length = be32_to_cpu(smb_buffer->smb_buf_length);
- 	struct socket *ssocket = server->ssocket;
-+	unsigned int smb_buf_length;
++#define SMB2_NUM_PROT 1
 +
-+	smb_buf_length = get_rfc1002_length(iov[0].iov_base);
- 
- 	if (ssocket == NULL)
- 		return -ENOTSOCK; /* BB eventually add reconnect code here */
-@@ -152,7 +163,12 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 		total_len += iov[i].iov_len;
- 
- 	cFYI(1, "Sending smb:  total_len %d", total_len);
--	dump_smb(smb_buffer, len);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		dump_smb2(smb2_buffer, len);
-+	else
++#define SMB2_PROT   0
++#define SMB21_PROT  1
++#define BAD_PROT 0xFFFF
++
++static struct {
++	int index;
++	__le16 name;
++} smb2protocols[] = {
++	{SMB2_PROT,  cpu_to_le16(0x0202)},
++	{SMB21_PROT, cpu_to_le16(0x0210)},
++	{BAD_PROT,   cpu_to_le16(0xFFFF)}
++};
++
++/*
++ *
++ *	SMB2 Worker functions follow:
++ *
++ *	The general structure of the worker functions is:
++ *	1) Call smb2_init (assembles SMB2 header)
++ *	2) Initialize SMB2 command specific fields in fixed length area of SMB
++ *	3) Call smb_sendrcv2 (sends request on socket and waits for response)
++ *	4) Decode SMB2 command specific fields in the fixed length area
++ *	5) Decode variable length data area (if any for this SMB2 command type)
++ *	6) Call free smb buffer
++ *	7) return
++ *
++ */
++
++int
++SMB2_negotiate(unsigned int xid, struct cifs_ses *ses)
++{
++	struct smb2_negotiate_req *pSMB2;
++	struct smb2_negotiate_rsp *pSMB2r;
++	struct kvec iov[1];
++	int rc = 0;
++	int status;
++	int resp_buftype;
++	struct TCP_Server_Info *server;
++	unsigned int sec_flags;
++	u16 i;
++	u16 temp = 0;
++	int blob_offset, blob_length;
++	char *security_blob;
++
++	cFYI(1, "Negotiate protocol");
++
++	if (ses->server)
++		server = ses->server;
++	else {
++		rc = -EIO;
++		return rc;
++	}
++
++	rc = small_smb2_init(SMB2_NEGOTIATE, NULL, (void **) &pSMB2);
++	if (rc)
++		return rc;
++
++	/* if any of auth flags (ie not sign or seal) are overriden use them */
++	if (ses->overrideSecFlg & (~(CIFSSEC_MUST_SIGN | CIFSSEC_MUST_SEAL)))
++		sec_flags = ses->overrideSecFlg;  /* BB FIXME fix sign flags?*/
++	else /* if override flags set only sign/seal OR them with global auth */
++		sec_flags = global_secflags | ses->overrideSecFlg;
++
++	cFYI(1, "sec_flags 0x%x", sec_flags);
++
++	pSMB2->hdr.SessionId = 0;
++
++	for (i = 0; i < SMB2_NUM_PROT; i++)
++		pSMB2->Dialects[i] = smb2protocols[i].name;
++
++	pSMB2->DialectCount = cpu_to_le16(i);
++	pSMB2->hdr.smb2_buf_length =
++		cpu_to_be32(be32_to_cpu(pSMB2->hdr.smb2_buf_length) + (i * 2));
++
++	/* only one of SMB2 signing flags may be set in SMB2 request */
++	if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN)
++		temp = SMB2_NEGOTIATE_SIGNING_REQUIRED;
++	else if (sec_flags & CIFSSEC_MAY_SIGN) /* MAY_SIGN is a single flag */
++		temp = SMB2_NEGOTIATE_SIGNING_ENABLED;
++
++	pSMB2->SecurityMode = cpu_to_le16(temp);
++
++	pSMB2->Capabilities = cpu_to_le32(SMB2_GLOBAL_CAP_DFS);
++
++	iov[0].iov_base = (char *)pSMB2;
++	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4;
++
++	rc = smb2_sendrcv2(xid, ses, iov, 1, &resp_buftype /* ret */, &status,
++			   CIFS_STD_OP | CIFS_LOG_ERROR);
++
++	cFYI(1, "negotiate returned buftype %d with rc %d status 0x%x",
++		 resp_buftype, rc, status);
++	pSMB2r = (struct smb2_negotiate_rsp *)iov[0].iov_base;
++	/*
++	 * No tcon so can't do
++	 * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
++	 */
++	if (rc != 0)
++		goto neg_exit;
++
++	if (pSMB2r == NULL) {
++		rc = -EIO;
++		goto neg_exit;
++	}
++
++	cFYI(1, "mode 0x%x", pSMB2r->SecurityMode);
++
++	if (pSMB2r->DialectRevision == smb2protocols[SMB21_PROT].name)
++		cFYI(1, "negotiated smb2.1 dialect");
++	else if (pSMB2r->DialectRevision == smb2protocols[SMB2_PROT].name)
++		cFYI(1, "negotiated smb2 dialect");
++	else {
++		cERROR(1, "Illegal dialect returned by server %d",
++			   le16_to_cpu(pSMB2r->DialectRevision));
++		rc = -EIO;
++		goto neg_exit;
++	}
++	ses->server->smb2_dialect_revision = pSMB2r->DialectRevision;
++
++	ses->server->maxBuf = le32_to_cpu(pSMB2r->MaxTransactSize);
++	ses->server->max_read = le32_to_cpu(pSMB2r->MaxReadSize);
++	ses->server->max_write = le32_to_cpu(pSMB2r->MaxWriteSize);
++	/* BB Do we need to validate the SecurityMode? */
++	ses->server->sec_mode = le16_to_cpu(pSMB2r->SecurityMode);
++	ses->server->capabilities = le32_to_cpu(pSMB2r->Capabilities);
++
++	security_blob = smb2_get_data_area_len(&blob_offset, &blob_length,
++					       &pSMB2r->hdr);
++	if (blob_length == 0) {
++		cERROR(1, "missing security blob on negprot");
++		rc = -EIO;
++		goto neg_exit;
++	}
++#ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
++	rc = decode_neg_token_init(security_blob, blob_length,
++				   &ses->server->sec_type);
++	if (rc == 1)
++		rc = 0;
++	else if (rc == 0) {
++		rc = -EIO;
++		goto neg_exit;
++	}
 +#endif
-+		dump_smb(smb_buffer, len);
++
++neg_exit:
++	free_rsp_buf(resp_buftype, pSMB2r);
++	return rc;
++}
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 041e83b..72d8137 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -141,4 +141,43 @@ struct smb2_err_rsp {
+ 	__u8   ErrorData[1];  /* variable length */
+ } __packed;
  
- 	i = 0;
- 	while (total_len) {
-@@ -160,24 +176,25 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 				    n_vec - first_vec, total_len);
- 		if ((rc == -ENOSPC) || (rc == -EAGAIN)) {
- 			i++;
--			/* if blocking send we try 3 times, since each can block
--			   for 5 seconds. For nonblocking  we have to try more
--			   but wait increasing amounts of time allowing time for
--			   socket to clear.  The overall time we wait in either
--			   case to send on the socket is about 15 seconds.
--			   Similarly we wait for 15 seconds for
--			   a response from the server in SendReceive[2]
--			   for the server to send a response back for
--			   most types of requests (except SMB Write
--			   past end of file which can be slow, and
--			   blocking lock operations). NFS waits slightly longer
--			   than CIFS, but this can make it take longer for
--			   nonresponsive servers to be detected and 15 seconds
--			   is more than enough time for modern networks to
--			   send a packet.  In most cases if we fail to send
--			   after the retries we will kill the socket and
--			   reconnect which may clear the network problem.
--			*/
-+			/*
-+			 * If blocking send we try 3 times, since each can block
-+			 * for 5 seconds. For nonblocking  we have to try more
-+			 * but wait increasing amounts of time allowing time for
-+			 * socket to clear.  The overall time we wait in either
-+			 * case to send on the socket is about 15 seconds.
-+			 * Similarly we wait for 15 seconds for
-+			 * a response from the server in SendReceive[2]
-+			 * for the server to send a response back for
-+			 * most types of requests (except SMB Write
-+			 * past end of file which can be slow, and
-+			 * blocking lock operations). NFS waits slightly longer
-+			 * than CIFS, but this can make it take longer for
-+			 * nonresponsive servers to be detected and 15 seconds
-+			 * is more than enough time for modern networks to
-+			 * send a packet.  In most cases if we fail to send
-+			 * after the retries we will kill the socket and
-+			 * reconnect which may clear the network problem.
-+			 */
- 			if ((i >= 14) || (!server->noblocksnd && (i > 2))) {
- 				cERROR(1, "sends on sock %p stuck for 15 seconds",
- 				    ssocket);
-@@ -198,8 +215,10 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 			break;
- 		}
- 		if (rc == 0) {
--			/* should never happen, letting socket clear before
--			   retrying is our only obvious option here */
-+			/*
-+			 * Should never happen, letting socket clear before
-+			 * retrying is our only obvious option here.
-+			 */
- 			cERROR(1, "tcp sent no data");
- 			msleep(500);
- 			continue;
-@@ -225,10 +244,12 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 	if ((total_len > 0) && (total_len != smb_buf_length + 4)) {
- 		cFYI(1, "partial send (%d remaining), terminating session",
- 			total_len);
--		/* If we have only sent part of an SMB then the next SMB
--		   could be taken as the remainder of this one.  We need
--		   to kill the socket so the server throws away the partial
--		   SMB */
-+		/*
-+		 * If we have only sent part of an SMB then the next SMB
-+		 * could be taken as the remainder of this one.  We need
-+		 * to kill the socket so the server throws away the partial
-+		 * SMB.
-+		 */
- 		server->tcpStatus = CifsNeedReconnect;
- 	}
++struct smb2_negotiate_req {
++	struct smb2_hdr hdr;
++	__le16 StructureSize; /* Must be 36 */
++	__le16 DialectCount;
++	__le16 SecurityMode;
++	__le16 Reserved;	/* MBZ */
++	__le32 Capabilities;
++	__u8   ClientGUID[16];	/* MBZ */
++	__le64 ClientStartTime;	/* MBZ */
++	__le16 Dialects[2]; /* variable length */ /* Must include 0x0202 */
++} __packed;
++
++/* SecurityMode flags */
++#define	SMB2_NEGOTIATE_SIGNING_ENABLED	0x0001
++#define SMB2_NEGOTIATE_SIGNING_REQUIRED	0x0002
++/* Capabilities flags */
++#define SMB2_GLOBAL_CAP_DFS		0x00000001
++#define SMB2_GLOBAL_CAP_LEASING		0x00000002 /* Resp only New to SMB2.1 */
++#define SMB2_GLOBAL_CAP_LARGE_MTU	0X00000004 /* Resp only New to SMB2.1 */
++
++struct smb2_negotiate_rsp {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 65 */
++	__le16 SecurityMode;
++	__le16 DialectRevision; /* Should be 0x0202 */
++	__le16 Reserved;	/* MBZ */
++	__u8   ServerGUID[16];
++	__le32 Capabilities;
++	__le32 MaxTransactSize;
++	__le32 MaxReadSize;
++	__le32 MaxWriteSize;
++	__le64 SystemTime;	/* MBZ */
++	__le64 ServerStartTime;
++	__le16 SecurityBufferOffset;
++	__le16 SecurityBufferLength;
++	__le32 Reserved2;	/* may be any value, Ignore */
++	__u8   Buffer[1];	/* variable length GSS security buffer */
++} __packed;
++
+ #endif				/* _SMB2PDU_H */
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 92a119a..665f569 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -34,6 +34,8 @@ struct statfs;
+ extern int map_smb2_to_linux_error(struct smb2_hdr *smb2, int logErr);
+ extern int checkSMB2(struct smb2_hdr *smb, __u64 mid, unsigned int length);
+ extern unsigned int smb2_calc_size(struct smb2_hdr *pSMB2h);
++extern char *smb2_get_data_area_len(int *poff, int *plen,
++				     struct smb2_hdr *pSMB2);
  
-@@ -237,9 +258,8 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 	else
- 		rc = 0;
+ extern int smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
+ 			 struct kvec *vec, int nvec, int *ret_buf_type,
+@@ -41,4 +43,10 @@ extern int smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
+ extern int smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
+ 			      struct smb2_hdr *in_buf, int flags);
  
--	/* Don't want to modify the buffer as a
--	   side effect of this call. */
--	smb_buffer->smb_buf_length = cpu_to_be32(smb_buf_length);
-+	/* Don't want to modify the buffer as a side effect of this call. */
-+	*buf_length = cpu_to_be32(smb_buf_length);
- 
- 	return rc;
- }
-@@ -256,8 +276,8 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
- 	return smb_sendv(server, &iov, 1);
- }
- 
--static int
--wait_for_free_request(struct TCP_Server_Info *server, const int long_op)
-+int
-+cifs_wait_for_free_request(struct TCP_Server_Info *server, const int long_op)
- {
- 	if (long_op == CIFS_ASYNC_OP) {
- 		/* oplock breaks must not be held up */
-@@ -322,8 +342,8 @@ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
- 	return 0;
- }
- 
--static int
--wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
-+int
-+cifs_wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- {
- 	int error;
- 
-@@ -335,7 +355,6 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- 	return 0;
- }
- 
--
- /*
-  * Send a SMB request and set the callback function in the mid to handle
-  * the result. Caller is responsible for dealing with timeouts.
-@@ -349,7 +368,8 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	struct mid_q_entry *mid;
- 	struct smb_hdr *hdr = (struct smb_hdr *)iov[0].iov_base;
- 
--	rc = wait_for_free_request(server, ignore_pend ? CIFS_ASYNC_OP : 0);
-+	rc = cifs_wait_for_free_request(server,
-+					ignore_pend ? CIFS_ASYNC_OP : 0);
- 	if (rc)
- 		return rc;
- 
-@@ -393,7 +413,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 
- 	return rc;
- out_err:
--	delete_mid(mid);
-+	cifs_delete_mid(mid);
- 	atomic_dec(&server->inFlight);
- 	wake_up(&server->request_q);
- 	return rc;
-@@ -425,7 +445,7 @@ SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
- 	return rc;
- }
- 
--static int
-+int
- cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- {
- 	int rc = 0;
-@@ -550,7 +570,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	   to the same server. We may make this configurable later or
- 	   use ses->maxReq */
- 
--	rc = wait_for_free_request(ses->server, long_op);
-+	rc = cifs_wait_for_free_request(ses->server, long_op);
- 	if (rc) {
- 		cifs_small_buf_release(in_buf);
- 		return rc;
-@@ -596,7 +616,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 		goto out;
- 	}
- 
--	rc = wait_for_response(ses->server, midQ);
-+	rc = cifs_wait_for_response(ses->server, midQ);
- 	if (rc != 0) {
- 		send_nt_cancel(ses->server, in_buf, midQ);
- 		spin_lock(&GlobalMid_Lock);
-@@ -636,11 +656,11 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = cifs_check_receive(midQ, ses->server, flags & CIFS_LOG_ERROR);
- 
--	/* mark it so buf will not be freed by delete_mid */
-+	/* mark it so buf will not be freed by cifs_delete_mid */
- 	if ((flags & CIFS_NO_RESP) == 0)
- 		midQ->resp_buf = NULL;
- out:
--	delete_mid(midQ);
-+	cifs_delete_mid(midQ);
- 	atomic_dec(&ses->server->inFlight);
- 	wake_up(&ses->server->request_q);
- 
-@@ -679,7 +699,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 		return -EIO;
- 	}
- 
--	rc = wait_for_free_request(ses->server, long_op);
-+	rc = cifs_wait_for_free_request(ses->server, long_op);
- 	if (rc)
- 		return rc;
- 
-@@ -718,7 +738,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	if (long_op == CIFS_ASYNC_OP)
- 		goto out;
- 
--	rc = wait_for_response(ses->server, midQ);
-+	rc = cifs_wait_for_response(ses->server, midQ);
- 	if (rc != 0) {
- 		send_nt_cancel(ses->server, in_buf, midQ);
- 		spin_lock(&GlobalMid_Lock);
-@@ -752,7 +772,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	memcpy(out_buf, buf, *pbytes_returned + 4);
- 	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
--	delete_mid(midQ);
-+	cifs_delete_mid(midQ);
- 	atomic_dec(&ses->server->inFlight);
- 	wake_up(&ses->server->request_q);
- 
-@@ -820,7 +840,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 		return -EIO;
- 	}
- 
--	rc = wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
-+	rc = cifs_wait_for_free_request(ses->server, CIFS_BLOCKING_OP);
- 	if (rc)
- 		return rc;
- 
-@@ -838,7 +858,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = cifs_sign_smb(in_buf, ses->server, &midQ->sequence_number);
- 	if (rc) {
--		delete_mid(midQ);
-+		cifs_delete_mid(midQ);
- 		mutex_unlock(&ses->server->srv_mutex);
- 		return rc;
- 	}
-@@ -851,7 +871,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	mutex_unlock(&ses->server->srv_mutex);
- 
- 	if (rc < 0) {
--		delete_mid(midQ);
-+		cifs_delete_mid(midQ);
- 		return rc;
- 	}
- 
-@@ -872,7 +892,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 			   blocking lock to return. */
- 			rc = send_nt_cancel(ses->server, in_buf, midQ);
- 			if (rc) {
--				delete_mid(midQ);
-+				cifs_delete_mid(midQ);
- 				return rc;
- 			}
- 		} else {
-@@ -884,12 +904,12 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 			/* If we get -ENOLCK back the lock may have
- 			   already been removed. Don't exit in this case. */
- 			if (rc && rc != -ENOLCK) {
--				delete_mid(midQ);
-+				cifs_delete_mid(midQ);
- 				return rc;
- 			}
- 		}
- 
--		rc = wait_for_response(ses->server, midQ);
-+		rc = cifs_wait_for_response(ses->server, midQ);
- 		if (rc) {
- 			send_nt_cancel(ses->server, in_buf, midQ);
- 			spin_lock(&GlobalMid_Lock);
-@@ -922,7 +942,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	memcpy(out_buf, buf, *pbytes_returned + 4);
- 	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
--	delete_mid(midQ);
-+	cifs_delete_mid(midQ);
- 	if (rstart && rc == -EACCES)
- 		return -ERESTARTSYS;
- 	return rc;
++/*
++ *  SMB2 Worker functions - most of protocol specific implementation details
++ *  are contained within these calls
++ */
++extern int SMB2_negotiate(unsigned int xid, struct cifs_ses *ses);
++
+ #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
