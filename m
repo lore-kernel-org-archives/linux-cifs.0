@@ -1,7 +1,7 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Trouble accessing Buffalo NAS with CIFSFS
-Date: Fri, 20 Jan 2012 14:32:35 -0500
-Message-ID: <20120120143235.1d4d811e@tlielax.poochiereds.net>
+Date: Fri, 20 Jan 2012 13:42:17 -0600
+Message-ID: <CAH2r5mt5KPtK_5Abz8nz_sKH3vT2h=1d7DHHBvX4BSRd37auug@mail.gmail.com>
 References: <20120119090752.9b7aea6c.ralda@gmx.de>
 	<20120119070543.662a3c56@tlielax.poochiereds.net>
 	<20120120113042.0fdfea5f.ralda@gmx.de>
@@ -9,77 +9,141 @@ References: <20120119090752.9b7aea6c.ralda@gmx.de>
 	<20120120165657.00042c72.ralda@gmx.de>
 	<20120120111936.5329cbb4@tlielax.poochiereds.net>
 	<20120120200626.b04b1d40.ralda@gmx.de>
+	<20120120143235.1d4d811e@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120120200626.b04b1d40.ralda-Mmb7MZpHnFY@public.gmane.org>
+In-Reply-To: <20120120143235.1d4d811e-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBGcmks
-IDIwIEphbiAyMDEyIDIwOjA2OjI2ICswMTAwDQoicmFsZGFAZ214LmRlIiA8cmFsZGFAZ214LmRl
-PiB3cm90ZToNCg0KPiBIYWxsbyBKZWZmIQ0KPiANCj4gPiBBdCB0aGlzIHBvaW50LCBJJ2Qgc3Vn
-Z2VzdCBqdXN0IHNldHRpbmcgdGhlIGNpZnNfbWF4X3BlbmRpbmcgbW9kdWxlDQo+ID4gcGFybSBs
-b3cgICgxIG9yIDIpIGFuZCBzZWVpbmcgaWYgdGhhdCBoZWxwcy4gSWYgaXQgZG9lcywgdGhlbiB0
-aGF0DQo+ID4gc2hvdWxkIGJhc2ljYWxseSBlbXVsYXRlIHRoZSBlZmZlY3Qgb2Ygc3RldmUncyBl
-dmVudHVhbCBwYXRjaC4gSWYgaXQNCj4gPiBkb2Vzbid0IHRoZW4gd2UnbGwgcHJvYmFibHkgbmVl
-ZCB0byBoYXZlIGEgY2xvc2VyIGxvb2sgYXQgd2h5IGl0IGlzbid0Lg0KPiANCj4gSSBoYXZlIHNl
-dCBjaWZzX21heF9wZW5kaW5nIHRvIDIgKHNldHRpbmcgaXQgMSByZXN1bHRzIGluIHZhbHVlIDIp
-Lg0KPiBHaXZpbmcgaW50ZXJlc3RpbmcgcmVzdWx0czoNCj4gDQo+IE5vcm1hbCBtb3VudC9jcCBv
-ZiBzaW5nbGUgZmlsZSB3b3JrcyAoc2FtZSBtb3VudCBwYXJhbWV0ZXIgYXMgYmVmb3JlKS4NCj4g
-DQo+IENvcHlpbmcgc2V2ZXJhbCBmaWxlcyB3aXRoIG1pZG5pZ2h0IGNvbW1hbmRlciBzaG93ZWQg
-bWUgYSBjb3B5IHNwZWVkIG9mDQo+IDQuNSB0byA1LjYgTUJ5dGUgcGVyIHNlY29uZCAtIHN0YXJ0
-IGF0IDQuNSBhbmQgcmFpc2luZyBxdWlja2x5IHRvIDUuNikuDQo+IFRoaXMgc3BlZWQgaXMgaGln
-aGVyIHRoZW4gZXZlciByZWNlaXZlZCBvbiBjb3B5aW5nIHRvIHRoZSBzYW1lIE5BUw0KPiBzdGF0
-aW9uIGZyb20gc2FtZSBoYXJkd2FyZSBpbnN0YWxsYXRpb24uIEZvcm1lcmx5IChrZXJuZWwgMi42
-LjE4DQo+IFNNQkZTKSBjb3BpZXMgc3RhcnRldCBiZWxvdyAzLjUgTUJwcyBhbmQgcmFpc2VkIHNs
-b3dseSB1cCB0byBhYm91dCA0DQo+IE1CcHMgKG9yIHNsaWdodGx5IGFib3ZlIC0gb25seSBhdCB2
-ZXJ5IGJpZyBmaWxlcykuIFNvIHJlZHVjaW5nIHRoZQ0KPiBzZXR0aW5nIG9mIGNpZnNfbWF4X3Bl
-bmRpZyBub3Qgb25seSBsZXQgdGhlIGRyaXZlIHdvcmsgaXQgYWRkaXRpb25hbGx5DQo+IGdhdmUg
-bWUgYSBiaWcgc3RlcCBpbiBzcGVlZCBvcHRpbWl6YXRpb24uDQo+IA0KDQpOb3Qgc3VyZSB3aHkg
-dGhhdCB3b3VsZCBiZSB1bmxlc3MgcmVxdWVzdHMgd2VyZSBzb21ldGltZXMgZ2V0dGluZw0KZHJv
-cHBlZCBvbiB0aGUgZmxvb3IgYW5kIHRoZSBjbGllbnQgd2FzIG9jY2FzaW9uYWxseSBhYmxlIHRv
-IHJlY292ZXIuDQoNCj4gLi4uIGJ1dDogU3dpdGNoaW5nIHZpcnR1YWwgY29uc29sZSBkdXJpbmcg
-Y29weSBwcm9jZXNzIGxldCB0aGUgY29weQ0KPiBzdG9wIHdpdGggYSBzdHVjayBtYyBhcyBiZWZv
-cmUuIFRoZSBvbmx5IGRpZmZlcmVuY2U6IEFmdGVyIGtpbGxpbmcgdGhlDQo+IHByb2Nlc3MgYW5k
-IGEgZGVsYXkgb2YgYWJvdXQgMiBtaW51dGVzIChmZWx0LCBub3QgbWVhc3VyZWQpIHRoZSBwcm9j
-ZXNzDQo+IGRpc2FwcGVhcmVkIGFuZCBOQVMgZHJpdmUgcmV0dXJuZWQgdG8gYSB3b3JraW5nIHN0
-YXRlIHdpdGhvdXQgc3lzdGVtDQo+IHJlYm9vdC4NCj4gDQo+IElmIHlvdSBsaWtlL25lZWQgSSBt
-YXkgY2F0Y2ggbW9yZSBkYXRhIGZvciBkaWFnbm9zaXMgdG9tb3Jyb3cuIEp1c3QgbGV0DQo+IG1l
-IGtub3cgd2hhdCB5b3UgbmVlZCBhbmQgaG93IEkgc2hhbGwgdGVzdC4gSSdtIHdpbGxpbmcgdG8g
-Z2l2ZSB5b3UgYWxsDQo+IGRhdGEgZm9yIGRpYWdub3NpcyBJJ20gYWJsZSB0byBjb2xsZWN0Lg0K
-PiANCg0KVGhpcyBpcyBjZXJ0YWlubHkgYSB2ZXJ5IHRyb3VibGVzb21lIGRldmljZSA6KQ0KDQpJ
-IHRoaW5rIHRoZSBleGlzdGluZyBjb2RlIGlzIHdyb25nIGluIHRoYXQgaXQgc2V0cyB0aGUgZmxv
-b3IgdmFsdWUgdG9vDQpoaWdoICgyIHdoZW4gaXQgc2hvdWxkIGJlIDEpLiBUaGUgcHJvYmxlbSB3
-ZSBnZXQgaW50byBob3dldmVyIGlzIHRoYXQNCndoZW4gdGhlIHNlcnZlciBjYW4ndCBoYW5kbGUg
-Y29uY3VycmVudCByZXF1ZXN0cywgd2UgbXVzdCBkaXNhYmxlDQpjZXJ0YWluIGZlYXR1cmVzLg0K
-DQpXZSd2ZSBkaXNjdXNzZWQgdGhpcyBvbiB0aGUgbGlzdCBiZWZvcmUsIGJ1dCB3ZSBwcm9iYWJs
-eSBvdWdodCB0byBkbw0Kc29tZXRoaW5nIGxpa2UgdGhpcyBkZXBlbmRpbmcgb24gd2hhdCB0aGUg
-c2VydmVyIHNlbmRzIGZvciB0aGUgbWF4bXB4DQp2YWx1ZToNCg0KbWF4bXB4ID49IDM6IG5vcm1h
-bCBvcGVyYXRpb24NCg0KbWF4bXB4ID0gMjogZGlzYWJsZSBvcGxvY2tzLCBzaW5jZSBkb2luZyB3
-cml0ZXMgd2hpbGUgdGhlcmUncyBzdGlsbCBhbg0Kb3V0c3RhbmRpbmcgb3BlbiBpcyBwcm9ibGVt
-YXRpYw0KDQptYXhtcHggPSAxOiBkaXNhYmxlIHNlbmRpbmcgc21iIGVjaG9lcy4gVGhpcyBkb2Vz
-IG1lYW4gdGhhdCB3ZSBjYW4ndCBkbw0KZGV0ZWN0aW9uIG9mIHVucmVzcG9uc2l2ZSBzZXJ2ZXJz
-IGNvcnJlY3RseSwgYnV0IHRoZXJlJ3Mgbm90IG11Y2ggZWxzZQ0Kd2UgY2FuIGRvIGF0IHRoYXQg
-cG9pbnQuDQoNClN0ZXZlLCB3aGF0J3MgZ29pbmcgb24gd2l0aCB0aGF0IHBhdGNoPyBJdCdzIGJl
-ZW4gbWFueSBtb250aHMgc2luY2Ugd2UNCmRpc2N1c3NlZCBpdCBsYXN0LiBEbyB5b3UgaGF2ZSBh
-bnl0aGluZyB0aGF0IEhhcmFsZCBjYW4gdGVzdD8NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5
-dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBH
-bnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JRSlBHY0ZUQUFvSkVBQU9h
-RUVaVm9JVncya1FBTFZjdWZWUUcxcUw2dHd1L1NMYk1wZ24NClliclllSEYrTytUZHNDSnhHekJy
-OCsvRlpGZEdDWUlJenJDZ2laSXdINUNiMzhtOFVSZmFpa200cVV2N1Fhd1gNCitwVmVjbU9aZVNm
-THU0RHl0ZnNOWDdLTGlzcUdmanVIelFjMUZuWEZUdlRnVUR3aFJkVm9LbVhJZmpJZXRESXUNCmNt
-bEFjcGFFRWZST0dPa0ZiM0ROWUxQMitUZis5ZmdaMFlUSjV2dm16cGNLNWkxOGpubWJ5QklUem1F
-dkJ4TWwNCmFBdGdMTFJyRHNiZjZsZCtySUFubTNGRUtjaXNINzAyVzJOYm43ckYzZEdYSXR0MHJl
-RHdvcjh6WlBqeEZ2RG4NCkxDekRmYjIyOFpiZW5mcklzV0FBM1psRkJBSjRxQVJiNzZSMkltLzAv
-N3o2MmRvRkx5c1MyOHBJL1lWNXQxN3INCnJUbGMzODZNRkdxYTZmZkx1RXd0NDlvc2tOYVZ3R3Vx
-Qm9aNE95Q1lvUmp1ZTB1QzJ6bU1BSFA3YllkeXFybTENCisvOWNoUDBQMlZDc3hUcXpURjFsdzdI
-cFpPZ2ZGLzA4SHI1bCs0SS9yYWFTSFV5RHlodS9ndnh1R09IYUtSbzMNCm9iOGpUNTVqMTA0c0M5
-V0JJRGlPMHJYdVV2MG9xZ0hiQmhzemR1UTJUNE13WWpITmx3eTVFZ0EyYVJaQnZxa3ENCmplVW9q
-WHNQZDRwalFzTmY1VnoxUzZSVmZIelBEUWtyRi9PNVFQbEphQmdUcTY5UERRQ1pseHZ3YjhkbUJt
-aFkNCm45bGtuN0tNSXM5Qm1CNVhRNlZGYnRnSXIyRkVRelNUYjBjb2U4VnM2ZHgzRDhQMkQwdG5J
-MjBJMFdhT2s1dUYNCmNCZDY0MHpOeXRiakxUbE9sYnlPDQo9SVdZcA0KLS0tLS1FTkQgUEdQIFNJ
-R05BVFVSRS0tLS0tDQo=
+On Fri, Jan 20, 2012 at 1:32 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> On Fri, 20 Jan 2012 20:06:26 +0100
+> "ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org> wrote:
+>
+>> Hallo Jeff!
+>>
+>> > At this point, I'd suggest just setting the cifs_max_pending modul=
+e
+>> > parm low =A0(1 or 2) and seeing if that helps. If it does, then th=
+at
+>> > should basically emulate the effect of steve's eventual patch. If =
+it
+>> > doesn't then we'll probably need to have a closer look at why it i=
+sn't.
+>>
+>> I have set cifs_max_pending to 2 (setting it 1 results in value 2).
+>> Giving interesting results:
+>>
+>> Normal mount/cp of single file works (same mount parameter as before=
+).
+>>
+>> Copying several files with midnight commander showed me a copy speed=
+ of
+>> 4.5 to 5.6 MByte per second - start at 4.5 and raising quickly to 5.=
+6).
+>> This speed is higher then ever received on copying to the same NAS
+>> station from same hardware installation. Formerly (kernel 2.6.18
+>> SMBFS) copies startet below 3.5 MBps and raised slowly up to about 4
+>> MBps (or slightly above - only at very big files). So reducing the
+>> setting of cifs_max_pendig not only let the drive work it additional=
+ly
+>> gave me a big step in speed optimization.
+>>
+>
+> Not sure why that would be unless requests were sometimes getting
+> dropped on the floor and the client was occasionally able to recover.
+>
+>> ... but: Switching virtual console during copy process let the copy
+>> stop with a stuck mc as before. The only difference: After killing t=
+he
+>> process and a delay of about 2 minutes (felt, not measured) the proc=
+ess
+>> disappeared and NAS drive returned to a working state without system
+>> reboot.
+>>
+>> If you like/need I may catch more data for diagnosis tomorrow. Just =
+let
+>> me know what you need and how I shall test. I'm willing to give you =
+all
+>> data for diagnosis I'm able to collect.
+>>
+>
+> This is certainly a very troublesome device :)
+>
+> I think the existing code is wrong in that it sets the floor value to=
+o
+> high (2 when it should be 1). The problem we get into however is that
+> when the server can't handle concurrent requests, we must disable
+> certain features.
+>
+> We've discussed this on the list before, but we probably ought to do
+> something like this depending on what the server sends for the maxmpx
+> value:
+>
+> maxmpx >=3D 3: normal operation
+>
+> maxmpx =3D 2: disable oplocks, since doing writes while there's still=
+ an
+> outstanding open is problematic
+>
+> maxmpx =3D 1: disable sending smb echoes. This does mean that we can'=
+t do
+> detection of unresponsive servers correctly, but there's not much els=
+e
+> we can do at that point.
+>
+> Steve, what's going on with that patch? It's been many months since w=
+e
+> discussed it last. Do you have anything that Harald can test?
+
+I thought I put an earlier version of this on list, but I did run
+into problems with it and async write.   I do want to combine
+this with bumping the global value of maximum requests so
+we use the minimum of the server value and what we set
+but servers which handle more simultaneous requests
+benefit.
+
+As you note, a server device which can't handle 3 simultaneous requests
+is basically broken, but if it lowers support cost for us on the
+client to stumble through with
+oplock off and echo off (to those ancient servers), it may be better
+than failing mount
+or setting the value to a "reasonable minimum" (2 or 3).  There may be =
+servers
+which just have a bug and set it to 1, when in fact they would allow th=
+e case
+you describe, pending open, write and echo - but we may be able to get =
+away with
+an implied minimum value of 2 (where we always assume the server can ha=
+ndle echo
+plus one other request).   In any case we need to warn on this.  I will=
+ code up
+something this weekend.  IIRC Samba and Windows don't enforce maxmpx  (=
+and
+it gets really complicated for Windows as a server due to their queuing=
+ problems
+as we saw from the delayed response on the dochelp request).  By far th=
+e
+biggest issue is throttling our requests back to some versions of
+Windows (XP or Vista?)
+which set it to 10 and although more than 10 works, they have strange
+problems when
+it hits 25 or so simultaneous (and these servers are far more common).
+
+Ideas how to test this (since I don't have one of the ancient NAS that =
+have
+this 1 request limit).
+requests
+
+
+--=20
+Thanks,
+
+Steve
