@@ -1,7 +1,7 @@
-From: "ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org>
+From: Harald Becker <ralda-EpAXEXF9o6F0qlt80xJpHw@public.gmane.org>
 Subject: Re: Trouble accessing Buffalo NAS with CIFSFS
-Date: Fri, 20 Jan 2012 22:07:17 +0100
-Message-ID: <20120120220717.08df94b9.ralda@gmx.de>
+Date: Fri, 20 Jan 2012 21:54:09 +0100
+Message-ID: <20120120215409.059838c1.ralda@address4me.eu>
 References: <20120119090752.9b7aea6c.ralda@gmx.de>
 	<20120119070543.662a3c56@tlielax.poochiereds.net>
 	<20120120113042.0fdfea5f.ralda@gmx.de>
@@ -10,32 +10,27 @@ References: <20120119090752.9b7aea6c.ralda@gmx.de>
 	<20120120111936.5329cbb4@tlielax.poochiereds.net>
 	<20120120200626.b04b1d40.ralda@gmx.de>
 	<20120120143235.1d4d811e@tlielax.poochiereds.net>
+	<CAH2r5mt5KPtK_5Abz8nz_sKH3vT2h=1d7DHHBvX4BSRd37auug@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120120143235.1d4d811e-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <CAH2r5mt5KPtK_5Abz8nz_sKH3vT2h=1d7DHHBvX4BSRd37auug-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hallo Jeff!
+Hallo Steve!
 
-> This is certainly a very troublesome device :)
+> Ideas how to test this (since I don't have one of the ancient NAS that have
+> this 1 request limit).
 
-Absolutely sure. I won't recommend one to buy such a drive. I didn't
-wanted to buy that type of drive but due to a communication problem
-someone else bought me that one. As I didn't had to pay for it, there
-was no reason to call for an exchange. Especially as the drive does
-what I need .. ohps, did ... until I updated my Linux boxes to recent
-kernel versions.
+I'm willing to help, do the tests and collect the data for diagnosis
+for you. If this fits your needs.
 
-The drive itself isn't bad. It's fan less, silent and doesn't get hot
-even on lengthy copy sessions (Samsung 1TB 3.5inch SATA drive).
-Accessing the drive via USB gives speeds above 20 MByte per second,
-which is not so bad for USB 2.0 drives. The NAS feature is handy but
-awesome, however.
+Solving the problem is not time critical for me, so we do not need to
+hurry.
 
 --
 Harald
