@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 41/50] CIFS: Process oplocks for SMB2
-Date: Fri, 20 Jan 2012 12:35:02 +0400
-Message-ID: <1327048511-2342-41-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 42/50] CIFS: Request SMB2.1 leases
+Date: Fri, 20 Jan 2012 12:35:03 +0400
+Message-ID: <1327048511-2342-42-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,371 +12,413 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
+if server supports them and we need oplocks.
+
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsproto.h   |    2 +-
- fs/cifs/connect.c     |   19 ++++++++++++++++++-
- fs/cifs/file.c        |   14 ++++++--------
- fs/cifs/nterr.h       |    1 +
- fs/cifs/smb2file.c    |   35 ++++++++++++++++++++++++++++-------
- fs/cifs/smb2inode.c   |   12 +++++++-----
- fs/cifs/smb2pdu.c     |    9 +++++----
- fs/cifs/smb2proto.h   |    5 +++--
- fs/cifs/smb2readdir.c |    4 +++-
- 9 files changed, 72 insertions(+), 29 deletions(-)
+ fs/cifs/cifsfs.c    |    5 ++-
+ fs/cifs/cifsglob.h  |    3 +
+ fs/cifs/smb2file.c  |    9 ++-
+ fs/cifs/smb2inode.c |   12 +++--
+ fs/cifs/smb2pdu.c   |  142 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ fs/cifs/smb2pdu.h   |   31 +++++++++++-
+ 6 files changed, 185 insertions(+), 17 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 1a32f98..dae5043 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -137,7 +137,7 @@ extern struct cifsFileInfo *cifs_new_fileinfo(__u16 netfid, struct file *file,
- 					      __u32 oplock);
- extern void cifs_new_fileinfo_generic(struct file *file,
- 				      struct cifsFileInfo *cfile,
--				      struct tcon_link *tlink, __u32 oplock);
-+				      struct tcon_link *tlink);
- extern int cifs_posix_open(const char *full_path, struct inode **pinode,
- 			   struct super_block *sb, int mode,
- 			   unsigned int f_flags, __u32 *poplock, __u16 *pnetfid,
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 86f13a3..d544676 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -850,6 +850,21 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		cifs_dump_mem("Bad SMB: ", buf,
- 			min_t(unsigned int, server->total_read, 48));
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	/*
-+	* If we negotiate SMB2 protocol and get STATUS_PENDING - update
-+	* the number of credits and skip it.
-+	*/
-+	if (server->is_smb2 &&
-+			le32_to_cpu(smb2_buffer->Status) == STATUS_PENDING) {
-+		if (!length)
-+			atomic_add(le16_to_cpu(smb2_buffer->CreditRequest),
-+				   &server->credits);
-+		cFYI(1, "STATUS_PENDING received");
-+		return -1;
-+	}
-+#endif
-+
- 	if (mid)
- 		handle_mid(mid, server, buf, length);
- 
-@@ -3188,9 +3203,11 @@ is_path_accessible(int xid, struct cifs_tcon *tcon,
- #ifdef CONFIG_CIFS_SMB2
- 	if (tcon->ses->server->is_smb2) {
- 		__u64 persistent_fid, volatile_fid;
-+		__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
-+
- 		rc = SMB2_open(xid, tcon, (__le16 *)full_path, &persistent_fid,
- 			       &volatile_fid, FILE_READ_ATTRIBUTES, FILE_OPEN,
--			       0, 0);
-+			       0, 0, &oplock);
- 		if (rc)
- 			return rc;
- 		/* rc = SMB2_query_info() */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index c2e108b..3937d51 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -249,18 +249,21 @@ cifs_new_fileinfo(__u16 netfid, struct file *file,
- 		  struct tcon_link *tlink, __u32 oplock)
- {
- 	struct cifsFileInfo *cfile;
-+	struct cifsInodeInfo *cinode = CIFS_I(file->f_path.dentry->d_inode);
- 
- 	cfile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
- 	if (cfile == NULL)
- 		return cfile;
- 	cfile->netfid = netfid;
--	cifs_new_fileinfo_generic(file, cfile, tlink, oplock);
-+	cifs_new_fileinfo_generic(file, cfile, tlink);
-+	cifs_set_oplock_level(cinode, oplock);
-+	cinode->can_cache_brlcks = cinode->clientCanCacheAll;
- 	return cfile;
- }
- 
- void
- cifs_new_fileinfo_generic(struct file *file, struct cifsFileInfo *cfile,
--			  struct tcon_link *tlink, __u32 oplock)
-+			  struct tcon_link *tlink)
- {
- 	struct dentry *dentry = file->f_path.dentry;
- 	struct inode *inode = dentry->d_inode;
-@@ -285,9 +288,6 @@ cifs_new_fileinfo_generic(struct file *file, struct cifsFileInfo *cfile,
- 		list_add_tail(&cfile->flist, &cinode->openFileList);
- 	spin_unlock(&cifs_file_list_lock);
- 
--	cifs_set_oplock_level(cinode, oplock);
--	cinode->can_cache_brlcks = cinode->clientCanCacheAll;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 1b5df36..c59a5b2 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -36,6 +36,7 @@
+ #include <linux/kthread.h>
+ #include <linux/freezer.h>
+ #include <linux/namei.h>
++#include <linux/random.h>
+ #include <net/ipv6.h>
+ #include "cifsfs.h"
+ #include "cifspdu.h"
+@@ -258,7 +259,9 @@ cifs_alloc_inode(struct super_block *sb)
+ 	cifs_inode->server_eof = 0;
+ 	cifs_inode->uniqueid = 0;
+ 	cifs_inode->createtime = 0;
 -
- 	file->private_data = cfile;
- }
- 
-@@ -547,6 +547,7 @@ cifs_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
- 
- reopen_success:
- 	cifs_file->netfid = netfid;
-+	cifs_set_oplock_level(CIFS_I(inode), *oplock);
- reopen_error_exit:
- 	return rc;
- }
-@@ -561,7 +562,6 @@ cifs_reopen_file_generic(struct cifsFileInfo *cifs_file, bool can_flush,
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifs_tcon *tcon;
- 	struct inode *inode;
--	struct cifsInodeInfo *cifs_inode;
- 	char *full_path = NULL;
- 
- 	xid = GetXid();
-@@ -598,7 +598,6 @@ cifs_reopen_file_generic(struct cifsFileInfo *cifs_file, bool can_flush,
- 	mutex_unlock(&cifs_file->fh_mutex);
- 	if (rc)
- 		goto out;
--	cifs_inode = CIFS_I(inode);
- 
- 	if (can_flush) {
- 		rc = filemap_write_and_wait(inode->i_mapping);
-@@ -617,7 +616,6 @@ cifs_reopen_file_generic(struct cifsFileInfo *cifs_file, bool can_flush,
- 	     we can not go to the server to get the new inod
- 	     info */
- 
--	cifs_set_oplock_level(cifs_inode, oplock);
- 	cifs_relock_file(cifs_file);
- 	cifs_file->invalidHandle = false;
- 
-diff --git a/fs/cifs/nterr.h b/fs/cifs/nterr.h
-index 2572673..942b75c 100644
---- a/fs/cifs/nterr.h
-+++ b/fs/cifs/nterr.h
-@@ -40,6 +40,7 @@ extern const struct nt_err_code_struct nt_errs[];
- #define ERROR_INSUFFICIENT_BUFFER	  0x007a
- #define STATUS_1804	                  0x070c
- #define STATUS_NOTIFY_ENUM_DIR            0x010c
-+#define STATUS_PENDING			  0x0103
- 
- /* Win32 Error codes extracted using a loop in smbclient then printing a
-    netmon sniff to a file. */
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 2d5e2db..5b2c6c0 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -177,9 +177,28 @@ const struct address_space_operations smb2_addr_ops_smallbuf = {
- 	.launder_page = cifs_launder_page,
++#ifdef CONFIG_CIFS_SMB2
++	get_random_bytes(&cifs_inode->lease_key, 16);
++#endif
+ 	/* Can not set i_flags here - they get immediately overwritten
+ 	   to zero by the VFS */
+ /*	cifs_inode->vfs_inode.i_flags = S_NOATIME | S_NOCMTIME;*/
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 75d96a6..5b9f3d6 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -692,6 +692,9 @@ struct cifsInodeInfo {
+ 	struct fscache_cookie *fscache;
+ #endif
+ 	struct inode vfs_inode;
++#ifdef CONFIG_CIFS_SMB2
++	__u8 lease_key[16];
++#endif
  };
  
-+static void
-+smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u8 oplock)
-+{
-+	if (oplock == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
-+		cinode->clientCanCacheAll = true;
-+		cinode->clientCanCacheRead = true;
-+		cFYI(1, "Exclusive Oplock granted on inode %p",
-+		     &cinode->vfs_inode);
-+	} else if (oplock == SMB2_OPLOCK_LEVEL_II) {
-+		cinode->clientCanCacheAll = false;
-+		cinode->clientCanCacheRead = true;
-+		cFYI(1, "Level II Oplock granted on inode %p",
-+		    &cinode->vfs_inode);
-+	} else {
-+		cinode->clientCanCacheAll = false;
-+		cinode->clientCanCacheRead = false;
-+	}
-+}
+ static inline struct cifsInodeInfo *
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index 5b2c6c0..794707b 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -241,6 +241,9 @@ smb2_open_helper(struct file *file, struct inode *inode, const char *full_path,
+ 	}
+ 
+ 	*oplock = SMB2_OPLOCK_LEVEL_EXCLUSIVE;
++	if (tcon->ses->server->smb2_dialect_revision == cpu_to_le16(0x0210))
++		memcpy(oplock + 1, &CIFS_I(inode)->lease_key, 16);
 +
- struct cifsFileInfo *
- smb2_new_fileinfo(__u64 persist_fid, __u64 volatile_fid, struct file *file,
--		  struct tcon_link *tlink, __u32 oplock)
-+		  struct tcon_link *tlink, __u8 oplock)
+ 	rc = SMB2_open(xid, tcon, smb2_path, persist_fid, volatile_fid,
+ 		       desired_access, create_disposition, 0, 0, oplock);
+ 	if (rc)
+@@ -263,7 +266,7 @@ int smb2_open(struct inode *inode, struct file *file)
  {
- 	struct cifsFileInfo *cfile;
- 
-@@ -188,7 +207,8 @@ smb2_new_fileinfo(__u64 persist_fid, __u64 volatile_fid, struct file *file,
- 		return cfile;
- 	cfile->persist_fid = persist_fid;
- 	cfile->volatile_fid = volatile_fid;
--	cifs_new_fileinfo_generic(file, cfile, tlink, oplock);
-+	cifs_new_fileinfo_generic(file, cfile, tlink);
-+	smb2_set_oplock_level(CIFS_I(file->f_path.dentry->d_inode), oplock);
- 	return cfile;
- }
- 
-@@ -220,9 +240,9 @@ smb2_open_helper(struct file *file, struct inode *inode, const char *full_path,
+ 	int rc = -EACCES;
+ 	int xid;
+-	__u8 oplock;
++	__u8 oplock[17];
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifsFileInfo *cifs_file;
+ 	struct tcon_link *tlink;
+@@ -294,7 +297,7 @@ int smb2_open(struct inode *inode, struct file *file)
  		goto out;
  	}
  
-+	*oplock = SMB2_OPLOCK_LEVEL_EXCLUSIVE;
- 	rc = SMB2_open(xid, tcon, smb2_path, persist_fid, volatile_fid,
--		       desired_access, create_disposition, 0, 0);
--
-+		       desired_access, create_disposition, 0, 0, oplock);
+-	rc = smb2_open_helper(file, inode, full_path, &oplock, &persist_fid,
++	rc = smb2_open_helper(file, inode, full_path, oplock, &persist_fid,
+ 			      &volatile_fid, data, tcon, xid);
  	if (rc)
  		goto out;
- 
-@@ -234,7 +254,6 @@ smb2_open_helper(struct file *file, struct inode *inode, const char *full_path,
- 
- 	move_smb2_info_to_cifs(data, smb2_data);
- out:
--	*oplock = 0;
- 	kfree(smb2_data);
- 	kfree(smb2_path);
- 	return rc;
-@@ -335,8 +354,10 @@ smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
- 		goto reopen_error_exit;
+@@ -306,7 +309,7 @@ int smb2_open(struct inode *inode, struct file *file)
  	}
  
-+	*oplock = SMB2_OPLOCK_LEVEL_EXCLUSIVE;
- 	rc = SMB2_open(xid, tcon, smb2_path, &persist_fid, &volatile_fid,
--		       desired_access, create_disposition, 0, 0);
-+		       desired_access, create_disposition, 0, 0,
-+		       (__u8 *)oplock);
- 	if (rc) {
- 		mutex_unlock(&cifs_file->fh_mutex);
- 		cFYI(1, "cifs_open returned 0x%x", rc);
-@@ -346,7 +367,7 @@ smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
- 
- 	cifs_file->persist_fid = persist_fid;
- 	cifs_file->volatile_fid = volatile_fid;
--	*oplock = 0;
-+	smb2_set_oplock_level(CIFS_I(inode), *oplock);
- reopen_error_exit:
- 	kfree(smb2_path);
- 	return rc;
+ 	cifs_file = smb2_new_fileinfo(persist_fid, volatile_fid, file, tlink,
+-				      oplock);
++				      *oplock);
+ 	if (cifs_file == NULL) {
+ 		SMB2_close(xid, tcon, persist_fid, volatile_fid);
+ 		rc = -ENOMEM;
 diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 31285b5..b3de208 100644
+index b3de208..50bb75c 100644
 --- a/fs/cifs/smb2inode.c
 +++ b/fs/cifs/smb2inode.c
-@@ -148,10 +148,11 @@ smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *srch_path,
- {
- 	int rc, tmprc = 0;
- 	u64 persist_fid, volatile_fid;
-+	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
- 
- 	rc = SMB2_open(xid, tcon, srch_path, &persist_fid, &volatile_fid,
- 		       desired_access, create_disposition, file_attributes,
--		       create_options);
-+		       create_options, &oplock);
- 	if (rc)
- 		return rc;
- 
-@@ -561,7 +562,7 @@ unlink_out:
- 
- static int
- smb2_create_helper(struct inode *dir, struct dentry *direntry, int mode,
--		   struct nameidata *nd, __u32 *oplock, __u64 *persist_fid,
-+		   struct nameidata *nd, __u8 *oplock, __u64 *persist_fid,
- 		   __u64 *volatile_fid, int xid, struct cifs_tcon *tcon,
- 		   const char *full_path, void *data)
- {
-@@ -609,8 +610,10 @@ smb2_create_helper(struct inode *dir, struct dentry *direntry, int mode,
- 		goto out;
+@@ -611,6 +611,9 @@ smb2_create_helper(struct inode *dir, struct dentry *direntry, int mode,
  	}
  
-+	*oplock = SMB2_OPLOCK_LEVEL_EXCLUSIVE;
+ 	*oplock = SMB2_OPLOCK_LEVEL_EXCLUSIVE;
++	if (tcon->ses->server->smb2_dialect_revision == cpu_to_le16(0x0210))
++		get_random_bytes(oplock + 1, 16);
++
  	rc = SMB2_open(xid, tcon, smb2_path, persist_fid, volatile_fid,
--		       desired_access, create_disposition, 0, create_options);
-+		       desired_access, create_disposition, 0, create_options,
-+		       oplock);
- 	if (rc)
- 		goto out;
- 
-@@ -631,7 +634,6 @@ smb2_create_helper(struct inode *dir, struct dentry *direntry, int mode,
- 	move_smb2_info_to_cifs(data, smb2_data);
- 
- out:
--	*oplock = 0;
- 	kfree(smb2_data);
- 	kfree(smb2_path);
- 	return rc;
-@@ -643,7 +645,7 @@ smb2_create(struct inode *dir, struct dentry *direntry, int mode,
+ 		       desired_access, create_disposition, 0, create_options,
+ 		       oplock);
+@@ -645,7 +648,7 @@ smb2_create(struct inode *dir, struct dentry *direntry, int mode,
  {
  	int rc = -ENOENT;
  	int xid;
--	__u32 oplock = 0;
-+	__u8 oplock = 0;
+-	__u8 oplock = 0;
++	__u8 oplock[17];
  	/*
  	 * BB below access is probably too much for mknod to request
  	 *    but we have to do query and setpathinfo so requesting
+@@ -681,7 +684,7 @@ smb2_create(struct inode *dir, struct dentry *direntry, int mode,
+ 		goto smb2_create_out;
+ 	}
+ 
+-	rc = smb2_create_helper(dir, direntry, mode, nd, &oplock, &persist_fid,
++	rc = smb2_create_helper(dir, direntry, mode, nd, oplock, &persist_fid,
+ 				&volatile_fid, xid, tcon, full_path, buf);
+ 	if (rc) {
+ 		cFYI(1, "smb2_create returned 0x%x", rc);
+@@ -696,9 +699,10 @@ smb2_create(struct inode *dir, struct dentry *direntry, int mode,
+ 	}
+ 
+ 	if (newinode) {
++		memcpy(CIFS_I(newinode)->lease_key, oplock + 1, 16);
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
+ 			newinode->i_mode = mode;
+-		if ((oplock & CIFS_CREATE_ACTION) &&
++		if ((*oplock & CIFS_CREATE_ACTION) &&
+ 		    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)) {
+ 			newinode->i_uid = current_fsuid();
+ 			if (dir->i_mode & S_ISGID)
+@@ -722,7 +726,7 @@ smb2_create(struct inode *dir, struct dentry *direntry, int mode,
+ 		}
+ 
+ 		file_info = smb2_new_fileinfo(persist_fid, volatile_fid,
+-					      filp, tlink, oplock);
++					      filp, tlink, *oplock);
+ 		if (file_info == NULL) {
+ 			fput(filp);
+ 			SMB2_close(xid, tcon, persist_fid, volatile_fid);
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 31e735f..30dc552 100644
+index 30dc552..8fe4ac1 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -881,7 +881,7 @@ int SMB2_tdis(const int xid, struct cifs_tcon *tcon)
+@@ -358,7 +358,7 @@ static void free_rsp_buf(int resp_buftype, void *pSMB2r)
+ 		cifs_buf_release(pSMB2r);
+ }
+ 
+-#define SMB2_NUM_PROT 1
++#define SMB2_NUM_PROT 2
+ 
+ #define SMB2_PROT   0
+ #define SMB21_PROT  1
+@@ -443,6 +443,7 @@ SMB2_negotiate(unsigned int xid, struct cifs_ses *ses)
+ 	pSMB2->SecurityMode = cpu_to_le16(temp);
+ 
+ 	pSMB2->Capabilities = cpu_to_le32(SMB2_GLOBAL_CAP_DFS);
++	pSMB2->ClientGUID[0] = pSMB2->ClientGUID[3] = pSMB2->ClientGUID[7] = 7;
+ 
+ 	iov[0].iov_base = (char *)pSMB2;
+ 	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4;
+@@ -878,6 +879,87 @@ int SMB2_tdis(const int xid, struct cifs_tcon *tcon)
+ 	return rc;
+ }
+ 
++static struct create_lease *
++create_lease_buf(u8 *lease_key, u8 oplock)
++{
++	struct create_lease *buf;
++
++	buf = kmalloc(sizeof(struct create_lease), GFP_KERNEL);
++	if (!buf)
++		return NULL;
++
++	memset(buf, 0, sizeof(struct create_lease));
++
++	buf->lcontext.LeaseKeyLow = cpu_to_le64(*((u64 *)lease_key));
++	buf->lcontext.LeaseKeyHigh = cpu_to_le64(*((u64 *)(lease_key + 8)));
++	if (enable_oplocks) {
++		if (oplock == SMB2_OPLOCK_LEVEL_EXCLUSIVE)
++			buf->lcontext.LeaseState = SMB2_LEASE_WRITE_CACHING |
++						   SMB2_LEASE_READ_CACHING;
++		else if (oplock == SMB2_OPLOCK_LEVEL_II)
++			buf->lcontext.LeaseState = SMB2_LEASE_READ_CACHING;
++		else if (oplock == SMB2_OPLOCK_LEVEL_BATCH)
++			buf->lcontext.LeaseState = SMB2_LEASE_HANDLE_CACHING |
++						   SMB2_LEASE_READ_CACHING |
++						   SMB2_LEASE_WRITE_CACHING;
++	}
++
++	buf->ccontext.DataOffset = cpu_to_le16(offsetof
++					(struct create_lease, lcontext));
++	buf->ccontext.DataLength = cpu_to_le32(sizeof(struct lease_context));
++	buf->ccontext.NameOffset = cpu_to_le16(offsetof
++				(struct create_lease, Name));
++	buf->ccontext.NameLength = cpu_to_le16(4);
++	buf->Name[0] = 'R';
++	buf->Name[1] = 'q';
++	buf->Name[2] = 'L';
++	buf->Name[3] = 's';
++	return buf;
++}
++
++static __u8
++parse_lease_state(struct smb2_create_rsp *smb)
++{
++	char *data_offset;
++	struct create_lease *lc;
++	__u8 oplock = 0;
++	bool found = false;
++
++	data_offset = (char *)smb;
++	data_offset += 4 + le32_to_cpu(smb->CreateContextsOffset);
++	lc = (struct create_lease *)data_offset;
++	do {
++		char *name = le16_to_cpu(lc->ccontext.NameOffset) + (char *)lc;
++		if (le16_to_cpu(lc->ccontext.NameLength) != 4) {
++			lc = (struct create_lease *)((char *)lc
++					+ le32_to_cpu(lc->ccontext.Next));
++			continue;
++		}
++		if (strncmp(name, "RqLs", 4)) {
++			lc = (struct create_lease *)((char *)lc
++					+ le32_to_cpu(lc->ccontext.Next));
++			continue;
++		}
++		found = true;
++		break;
++	} while (le32_to_cpu(lc->ccontext.Next) != 0);
++
++	if (!found)
++		return oplock;
++
++	if (le32_to_cpu(lc->lcontext.LeaseState) & SMB2_LEASE_WRITE_CACHING) {
++		if (le32_to_cpu(lc->lcontext.LeaseState) &
++						SMB2_LEASE_HANDLE_CACHING)
++			oplock = SMB2_OPLOCK_LEVEL_BATCH;
++		else
++			oplock = SMB2_OPLOCK_LEVEL_EXCLUSIVE;
++	} else if (le32_to_cpu(lc->lcontext.LeaseState) &
++						SMB2_LEASE_READ_CACHING)
++		oplock = SMB2_OPLOCK_LEVEL_II;
++
++	return oplock;
++}
++
  int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
  	      u64 *persistent_fid, u64 *volatile_fid, __u32 desired_access,
  	      __u32 create_disposition, __u32 file_attributes,
--	      __u32 create_options)
-+	      __u32 create_options, __u8 *oplock)
- {
- 	struct smb2_create_req *pSMB2;
+@@ -887,10 +969,12 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
  	struct smb2_create_rsp *pSMB2r;
-@@ -905,9 +905,9 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_ses *ses = tcon->ses;
+-	struct kvec iov[2];
++	struct kvec iov[3];
+ 	int resp_buftype;
+ 	int status;
+ 	int uni_path_len;
++	__le16 *copy_path = NULL;
++	int copy_size;
+ 	int rc = 0;
+ 	int num_iovecs = 2;
+ 
+@@ -905,10 +989,6 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
  	if (rc)
  		return rc;
  
--	/* if (enable_oplocks)
--		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_BATCH;
--	else */
-+	if (enable_oplocks)
-+		pSMB2->RequestedOplockLevel = *oplock;
-+	else
- 		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_NONE;
+-	if (enable_oplocks)
+-		pSMB2->RequestedOplockLevel = *oplock;
+-	else
+-		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_NONE;
  	pSMB2->ImpersonationLevel = IL_IMPERSONATION;
  	pSMB2->DesiredAccess = cpu_to_le32(desired_access);
-@@ -958,6 +958,7 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
+ 	/* File attributes ignored on open (used in create though) */
+@@ -918,7 +998,7 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
+ 	pSMB2->CreateOptions = cpu_to_le32(create_options);
+ 	uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
+ 	pSMB2->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req)
+-			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
++			- 8 /* pad */ - 4 /* do not count rfc1001 len field */);
+ 
+ 	iov[0].iov_base = (char *)pSMB2;
+ 
+@@ -930,16 +1010,57 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
+ 		pSMB2->NameLength = cpu_to_le16(uni_path_len - 2);
+ 		/* -1 since last byte is buf[0] which is sent below (path) */
+ 		iov[0].iov_len--;
++		if (uni_path_len % 8 != 0) {
++			copy_size = uni_path_len / 8 * 8;
++			if (copy_size < uni_path_len)
++				copy_size += 8;
++
++			copy_path = kzalloc(copy_size, GFP_KERNEL);
++			if (!copy_path)
++				return -ENOMEM;
++			memcpy((char *)copy_path, (const char *)path,
++				uni_path_len);
++			uni_path_len = copy_size;
++			path = copy_path;
++		}
++
+ 		iov[1].iov_len = uni_path_len;
+ 		iov[1].iov_base = path;
+ 	 /* -1 since last byte is buf[0] which was counted in smb2_buf_len */
+ 		pSMB2->hdr.smb2_buf_length = cpu_to_be32(be32_to_cpu(
+ 				pSMB2->hdr.smb2_buf_length) + uni_path_len - 1);
+ 	} else {
++		iov[0].iov_len += 7;
++		pSMB2->hdr.smb2_buf_length = cpu_to_be32(be32_to_cpu(
++				pSMB2->hdr.smb2_buf_length) + 8 - 1);
+ 		num_iovecs = 1;
+ 		pSMB2->NameLength = 0;
+ 	}
+ 
++	if (!enable_oplocks)
++		*oplock = SMB2_OPLOCK_LEVEL_NONE;
++
++	if (tcon->ses->server->smb2_dialect_revision == cpu_to_le16(0x0202) ||
++	    *oplock == SMB2_OPLOCK_LEVEL_NONE)
++		pSMB2->RequestedOplockLevel = *oplock;
++	else {
++		iov[num_iovecs].iov_base = create_lease_buf(oplock+1, *oplock);
++		if (iov[num_iovecs].iov_base == NULL) {
++			cifs_small_buf_release(pSMB2);
++			kfree(copy_path);
++			return -ENOMEM;
++		}
++		iov[num_iovecs].iov_len = sizeof(struct create_lease);
++		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_LEASE;
++		pSMB2->CreateContextsOffset = cpu_to_le32(
++			sizeof(struct smb2_create_req) - 4 - 8 +
++			iov[num_iovecs-1].iov_len);
++		pSMB2->CreateContextsLength = cpu_to_le32(
++			sizeof(struct create_lease));
++		inc_rfc1001_len(&pSMB2->hdr, sizeof(struct create_lease));
++		num_iovecs++;
++	}
++
+ /*	cERROR(1, "unipathlen 0x%x iov0len 0x%x iov1len 0x%x", uni_path_len,
+ 		iov[0].iov_len, iov[1].iov_len); */ /* BB REMOVEME BB */
+ 	rc = smb2_sendrcv2(xid, ses, iov, num_iovecs, &resp_buftype /* ret */,
+@@ -958,8 +1079,13 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
  	}
  	*persistent_fid = pSMB2r->PersistentFileId;
  	*volatile_fid = pSMB2r->VolatileFileId;
-+	*oplock = pSMB2r->OplockLevel;
+-	*oplock = pSMB2r->OplockLevel;
++
++	if (pSMB2r->OplockLevel == SMB2_OPLOCK_LEVEL_LEASE)
++		*oplock = parse_lease_state(pSMB2r);
++	else
++		*oplock = pSMB2r->OplockLevel;
  creat_exit:
++	kfree(copy_path);
  	free_rsp_buf(resp_buftype, pSMB2r);
  	return rc;
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index baf46d3..df44cf2 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -99,7 +99,7 @@ extern struct cifsFileInfo *smb2_new_fileinfo(__u64 persist_fid,
- 					      __u64 volatile_fid,
- 					      struct file *file,
- 					      struct tcon_link *tlink,
--					      __u32 oplock);
-+					      __u8 oplock);
- extern int smb2_open(struct inode *inode, struct file *file);
- extern int smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
- 			       struct cifs_tcon *tcon, const char *full_path,
-@@ -140,7 +140,8 @@ extern int SMB2_tdis(const int xid, struct cifs_tcon *tcon);
- extern int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
- 		      u64 *persistent_fid, u64 *volatile_fid,
- 		      __u32 desired_access, __u32 create_disposition,
--		      __u32 file_attributes, __u32 create_options);
-+		      __u32 file_attributes, __u32 create_options,
-+		      __u8 *oplock);
- extern int SMB2_close(const int xid, struct cifs_tcon *tcon,
- 		      u64 persistent_file_id, u64 volatile_file_id);
- extern int SMB2_query_info(const int xid, struct cifs_tcon *tcon,
-diff --git a/fs/cifs/smb2readdir.c b/fs/cifs/smb2readdir.c
-index a9b489f..ce4b5cd 100644
---- a/fs/cifs/smb2readdir.c
-+++ b/fs/cifs/smb2readdir.c
-@@ -87,6 +87,7 @@ static int smb2_initiate_search(const int xid, struct file *file)
- 	struct cifs_tcon *tcon;
- 	struct tcon_link *tlink;
- 	u64 persistent_fid, volatile_fid;
-+	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ }
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 7d7c596..f1c263b 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -392,7 +392,7 @@ struct smb2_create_req {
+ 	__le16 NameLength;
+ 	__le32 CreateContextsOffset;
+ 	__le32 CreateContextsLength;
+-	__u8   Buffer[1];
++	__u8   Buffer[8];
+ } __packed;
  
- 	smb2_sb = CIFS_SB(file->f_path.dentry->d_sb);
- 	tlink = cifs_sb_tlink(smb2_sb);
-@@ -101,7 +102,8 @@ static int smb2_initiate_search(const int xid, struct file *file)
- 		return -ENOMEM;
+ struct smb2_create_rsp {
+@@ -416,6 +416,35 @@ struct smb2_create_rsp {
+ 	__u8   Buffer[1];
+ } __packed;
  
- 	rc = SMB2_open(xid, tcon, full_path, &persistent_fid, &volatile_fid,
--		       FILE_READ_ATTRIBUTES | FILE_READ_DATA, FILE_OPEN, 0, 0);
-+		       FILE_READ_ATTRIBUTES | FILE_READ_DATA, FILE_OPEN, 0, 0,
-+		       &oplock);
- 	if (rc) {
- 		cERROR(1, "open of dir failed before readdir with rc = %d", rc);
- 		goto initiate_search_exit;
++struct create_context {
++	__le32 Next;
++	__le16 NameOffset;
++	__le16 NameLength;
++	__le16 Reserved;
++	__le16 DataOffset;
++	__le32 DataLength;
++	__u8 Buffer[0];
++} __packed;
++
++#define SMB2_LEASE_NONE			cpu_to_le32(0x00)
++#define SMB2_LEASE_READ_CACHING		cpu_to_le32(0x01)
++#define SMB2_LEASE_HANDLE_CACHING	cpu_to_le32(0x02)
++#define SMB2_LEASE_WRITE_CACHING	cpu_to_le32(0x04)
++
++struct lease_context {
++	__le64 LeaseKeyLow;
++	__le64 LeaseKeyHigh;
++	__le32 LeaseState;
++	__le32 LeaseFlags;
++	__le64 LeaseDuration;
++} __packed;
++
++struct create_lease {
++	struct create_context ccontext;
++	__u8   Name[8];
++	struct lease_context lcontext;
++} __packed;
++
+ /* Currently defined values for close flags */
+ #define SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB	cpu_to_le16(0x0001)
+ struct smb2_close_req {
 -- 
 1.7.1
