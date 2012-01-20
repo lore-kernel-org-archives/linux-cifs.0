@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 13/50] CIFS: Add SMB2 support for is_path_accessible
-Date: Fri, 20 Jan 2012 12:34:34 +0400
-Message-ID: <1327048511-2342-13-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 11/50] CIFS: Add tree connect/disconnect capability for SMB2
+Date: Fri, 20 Jan 2012 12:34:32 +0400
+Message-ID: <1327048511-2342-11-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,426 +9,411 @@ In-Reply-To: <1327048511-2342-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that needs for a successful mount through SMB2 protocol.
-
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/connect.c   |   44 +++++++++----
- fs/cifs/smb2misc.c  |    5 ++
- fs/cifs/smb2pdu.c   |  138 ++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   |  167 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2proto.h |    6 ++
- 5 files changed, 346 insertions(+), 14 deletions(-)
+ fs/cifs/cifs_unicode.c |   59 +++++++++++++++++++
+ fs/cifs/cifs_unicode.h |    5 +-
+ fs/cifs/cifsglob.h     |   11 +++-
+ fs/cifs/connect.c      |   16 +++++-
+ fs/cifs/smb2pdu.c      |  146 +++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2pdu.h      |   57 +++++++++++++++++++
+ fs/cifs/smb2proto.h    |    4 +
+ 7 files changed, 292 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1152001..60c63b6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3147,22 +3147,38 @@ is_path_accessible(int xid, struct cifs_tcon *tcon,
- 		   struct cifs_sb_info *cifs_sb, const char *full_path)
- {
- 	int rc;
--	FILE_ALL_INFO *pfile_info;
- 
--	pfile_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
--	if (pfile_info == NULL)
--		return -ENOMEM;
--
--	rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
--			      0 /* not legacy */, cifs_sb->local_nls,
--			      cifs_sb->mnt_cifs_flags &
--				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (tcon->ses->server->is_smb2) {
-+		__u64 persistent_fid, volatile_fid;
-+		rc = SMB2_open(xid, tcon, (__le16 *)full_path, &persistent_fid,
-+			       &volatile_fid, FILE_READ_ATTRIBUTES, FILE_OPEN,
-+			       0, 0);
-+		if (rc)
-+			return rc;
-+		/* rc = SMB2_query_info() */
-+		rc = SMB2_close(xid, tcon, persistent_fid, volatile_fid);
-+	} else {
-+#endif
-+		FILE_ALL_INFO *pfile_info = kmalloc(sizeof(FILE_ALL_INFO),
-+						     GFP_KERNEL);
-+		if (pfile_info == NULL)
-+			return -ENOMEM;
- 
--	if (rc == -EOPNOTSUPP || rc == -EINVAL)
--		rc = SMBQueryInformation(xid, tcon, full_path, pfile_info,
--				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
--				  CIFS_MOUNT_MAP_SPECIAL_CHR);
--	kfree(pfile_info);
-+		rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
-+				      0 /* not legacy */, cifs_sb->local_nls,
-+				      cifs_sb->mnt_cifs_flags &
-+					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+
-+		if (rc == -EOPNOTSUPP || rc == -EINVAL)
-+			rc = SMBQueryInformation(xid, tcon, full_path,
-+					pfile_info, cifs_sb->local_nls,
-+					cifs_sb->mnt_cifs_flags &
-+					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		kfree(pfile_info);
-+#ifdef CONFIG_CIFS_SMB2
-+	}
-+#endif
- 	return rc;
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index fbb9da9..5fb7372 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -331,3 +331,62 @@ ctoUTF16_out:
+ 	return i;
  }
  
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 70f5fbc..16272e5 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -233,6 +233,11 @@ char *smb2_get_data_area_len(int *poff, int *plen, struct smb2_hdr *pSMB2)
- 		  ((struct smb2_sess_setup_rsp *)pSMB2)->SecurityBufferLength);
- 		break;
- 	case SMB2_CREATE:
-+		*poff = le32_to_cpu(
-+		    ((struct smb2_create_rsp *)pSMB2)->CreateContextsOffset);
-+		*plen = le32_to_cpu(
-+		    ((struct smb2_create_rsp *)pSMB2)->CreateContextsLength);
-+		break;
- 	case SMB2_READ:
- 	case SMB2_QUERY_INFO:
- 	case SMB2_QUERY_DIRECTORY:
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1c40896..1e2cd95 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -876,3 +876,141 @@ int SMB2_tdis(const int xid, struct cifs_tcon *tcon)
- 
- 	return rc;
- }
++#ifdef CONFIG_CIFS_SMB2
++/*
++ * cifs_local_to_utf16_bytes - how long will a string be after conversion?
++ * @from - pointer to input string
++ * @maxbytes - don't go past this many bytes of input string
++ * @codepage - source codepage
++ *
++ * Walk a string and return the number of bytes that the string will
++ * be after being converted to the given charset, not including any null
++ * termination required. Don't walk past maxbytes in the source buffer.
++ */
 +
-+int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
-+	      u64 *persistent_fid, u64 *volatile_fid, __u32 desired_access,
-+	      __u32 create_disposition, __u32 file_attributes,
-+	      __u32 create_options)
++static int
++cifs_local_to_utf16_bytes(const char *from, int len,
++			  const struct nls_table *codepage)
 +{
-+	struct smb2_create_req *pSMB2;
-+	struct smb2_create_rsp *pSMB2r;
-+	struct TCP_Server_Info *server;
-+	struct cifs_ses *ses = tcon->ses;
-+	struct kvec iov[2];
-+	int resp_buftype;
-+	int status;
-+	int uni_path_len;
-+	int rc = 0;
-+	int num_iovecs = 2;
++	int charlen;
++	int i;
++	wchar_t wchar_to;
 +
-+	cFYI(1, "create/open");
-+
-+	if (ses && (ses->server))
-+		server = ses->server;
-+	else
-+		return -EIO;
-+
-+	rc = small_smb2_init(SMB2_CREATE, tcon, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
-+
-+	if (enable_oplocks)
-+		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_BATCH;
-+	else
-+		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_NONE;
-+	pSMB2->ImpersonationLevel = IL_IMPERSONATION;
-+	pSMB2->DesiredAccess = cpu_to_le32(desired_access);
-+	/* File attributes ignored on open (used in create though) */
-+	pSMB2->FileAttributes = cpu_to_le32(file_attributes);
-+	pSMB2->ShareAccess = FILE_SHARE_ALL_LE;
-+	pSMB2->CreateDisposition = cpu_to_le32(create_disposition);
-+	pSMB2->CreateOptions = cpu_to_le32(create_options);
-+	uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
-+	pSMB2->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req)
-+			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
-+
-+	iov[0].iov_base = (char *)pSMB2;
-+
-+	/*  rfc1001 length field is 4 bytes so added below */
-+	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4;
-+
-+	 /* MUST set path len (NameLength) to 0 opening root of share */
-+	if (uni_path_len >= 4) {
-+		pSMB2->NameLength = cpu_to_le16(uni_path_len - 2);
-+		/* -1 since last byte is buf[0] which is sent below (path) */
-+		iov[0].iov_len--;
-+		iov[1].iov_len = uni_path_len;
-+		iov[1].iov_base = path;
-+	 /* -1 since last byte is buf[0] which was counted in smb2_buf_len */
-+		pSMB2->hdr.smb2_buf_length = cpu_to_be32(be32_to_cpu(
-+				pSMB2->hdr.smb2_buf_length) + uni_path_len - 1);
-+	} else {
-+		num_iovecs = 1;
-+		pSMB2->NameLength = 0;
++	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
++		charlen = codepage->char2uni(from, len, &wchar_to);
++		/* Failed conversion defaults to a question mark */
++		if (charlen < 1)
++			charlen = 1;
 +	}
-+
-+/*	cERROR(1, "unipathlen 0x%x iov0len 0x%x iov1len 0x%x", uni_path_len,
-+		iov[0].iov_len, iov[1].iov_len); */ /* BB REMOVEME BB */
-+	rc = smb2_sendrcv2(xid, ses, iov, num_iovecs, &resp_buftype /* ret */,
-+			   &status, CIFS_STD_OP | CIFS_LOG_ERROR);
-+	cFYI(1, "creat buftype %d rc %d status %d", resp_buftype, rc, status);
-+	pSMB2r = (struct smb2_create_rsp *)iov[0].iov_base;
-+
-+	if (rc != 0) {
-+		cifs_stats_fail_inc(tcon, SMB2CREATE);
-+		goto creat_exit;
-+	}
-+
-+	if (pSMB2r == NULL) {
-+		rc = -EIO;
-+		goto creat_exit;
-+	}
-+	*persistent_fid = pSMB2r->PersistentFileId;
-+	*volatile_fid = pSMB2r->VolatileFileId;
-+creat_exit:
-+	free_rsp_buf(resp_buftype, pSMB2r);
-+	return rc;
++	return 2 * i; /* UTF16 characters are two bytes */
 +}
 +
-+int SMB2_close(const int xid, struct cifs_tcon *tcon,
-+	       u64 persistent_file_id, u64 volatile_file_id)
++/*
++ * cifs_strndup_to_utf16 - copy a string to wire format from the local codepage
++ * @src - source string
++ * @maxlen - don't walk past this many bytes in the source string
++ * @utf16_len - the length of the allocated string in bytes (including null)
++ * @codepage - source codepage
++ *
++ * Take a string convert it from the local codepage to UTF16 and
++ * put it in a new buffer. Returns a pointer to the new string or NULL on
++ * error.
++ */
++__le16 *
++cifs_strndup_to_utf16(const char *src, const int maxlen, int *utf16_len,
++		      const struct nls_table *codepage)
 +{
-+	struct smb2_close_req *pSMB2;
-+	struct smb2_close_rsp *pSMB2r;
-+	struct TCP_Server_Info *server;
-+	struct cifs_ses *ses = tcon->ses;
-+	struct kvec iov[1];
-+	int resp_buftype;
-+	int status;
++	int len;
++	__le16 *dst;
++
++	len = cifs_local_to_utf16_bytes(src, maxlen, codepage);
++	len += 2; /* NULL */
++	dst = kmalloc(len, GFP_KERNEL);
++	if (!dst) {
++		*utf16_len = 0;
++		return NULL;
++	}
++	cifs_strtoUTF16(dst, src, maxlen, codepage);
++	*utf16_len = len;
++	return dst;
++}
++#endif /* CONFIG_CIFS_SMB2 */
+diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+index a513a54..4e8f09c 100644
+--- a/fs/cifs/cifs_unicode.h
++++ b/fs/cifs/cifs_unicode.h
+@@ -82,9 +82,12 @@ int cifs_strtoUTF16(__le16 *, const char *, int, const struct nls_table *);
+ char *cifs_strndup_from_utf16(const char *src, const int maxlen,
+ 			      const bool is_unicode,
+ 			      const struct nls_table *codepage);
++#ifdef CONFIG_CIFS_SMB2
++extern __le16 *cifs_strndup_to_utf16(const char *src, const int maxlen,
++				     int *ucs_len, const struct nls_table *cp);
++#endif /* CONFIG_CIFS_SMB2 */
+ extern int cifsConvertToUTF16(__le16 *target, const char *source, int maxlen,
+ 			      const struct nls_table *cp, int mapChars);
+-
+ #endif
+ 
+ /*
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 8739f52..63af6cd 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -411,7 +411,7 @@ struct cifs_tcon {
+ 	char treeName[MAX_TREE_SIZE + 1]; /* UNC name of resource in ASCII */
+ 	char *nativeFileSystem;
+ 	char *password;		/* for share-level security */
+-	__u16 tid;		/* The 2 byte tree id */
++	__u32 tid;		/* The 4 byte tree id */
+ 	__u16 Flags;		/* optional support bits */
+ 	enum statusEnum tidStatus;
+ #ifdef CONFIG_CIFS_STATS
+@@ -459,6 +459,7 @@ struct cifs_tcon {
+ 	FILE_SYSTEM_ATTRIBUTE_INFO fsAttrInfo; /* ok if fs name truncated */
+ 	FILE_SYSTEM_UNIX_INFO fsUnixInfo;
+ 	bool ipc:1;		/* set if connection to IPC$ eg for RPC/PIPES */
++	bool print:1;		/* set if connection to printer share */
+ 	bool retry:1;
+ 	bool nocase:1;
+ 	bool seal:1;      /* transport encryption for this mounted share */
+@@ -467,6 +468,14 @@ struct cifs_tcon {
+ 	bool local_lease:1; /* check leases (only) on local system not remote */
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
++	bool bad_network_name:1;
++#ifdef CONFIG_CIFS_SMB2
++	__u32 capabilities;
++	__u32 share_flags;
++	__u32 maximal_access;
++	__u32 vol_serial_number;
++	__le64 vol_create_time;
++#endif /* CONFIG_CIFS_SMB2 */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	u64 resource_id;		/* server resource id */
+ 	struct fscache_cookie *fscache;	/* cookie for share */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 2130b68..1152001 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2331,7 +2331,12 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+ 	xid = GetXid();
+-	CIFSSMBTDis(xid, tcon);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		SMB2_tdis(xid, tcon);
++	else
++#endif
++		CIFSSMBTDis(xid, tcon);
+ 	_FreeXid(xid);
+ 
+ 	cifs_fscache_release_super_cookie(tcon);
+@@ -2382,7 +2387,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 	 * this TCon call and Unix SetFS as
+ 	 * we do on SessSetup and reconnect? */
+ 	xid = GetXid();
+-	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		rc = SMB2_tcon(xid, ses, volume_info->UNC, tcon,
++			       volume_info->local_nls);
++	else
++#endif
++		rc = CIFSTCon(xid, ses, volume_info->UNC, tcon,
++			      volume_info->local_nls);
+ 	FreeXid(xid);
+ 	cFYI(1, "CIFS Tcon rc = %d", rc);
+ 	if (rc)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index f894f4e..c6f5f1f 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -166,8 +166,8 @@ smb2_hdr_assemble(struct smb2_hdr *buffer, __le16 smb2_cmd /* command */ ,
+ set_tcon_flags:
+ 	/* BB check following DFS flags BB */
+ 	/* BB do we have to add check for SHI1005_FLAGS_DFS_ROOT too? */
+-	/* if (tcon->share_flags & SHI1005_FLAGS_DFS)
+-		buffer->Flags |= SMB2_FLAGS_DFS_OPERATIONS; */
++	if (tcon->share_flags & SHI1005_FLAGS_DFS)
++		buffer->Flags |= SMB2_FLAGS_DFS_OPERATIONS;
+ 	/* BB how does SMB2 do case sensitive? */
+ 	/* if (tcon->nocase)
+ 		buffer->Flags |= SMBFLG_CASELESS; */
+@@ -609,3 +609,145 @@ SMB2_logoff(const int xid, struct cifs_ses *ses)
+ 	 */
+ 	return rc;
+ }
++
++static inline void cifs_stats_fail_inc(struct cifs_tcon *tcon, uint16_t code)
++{
++	/* cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[code]); */
++}
++
++int
++SMB2_tcon(unsigned int xid, struct cifs_ses *ses,
++	  const char *tree, struct cifs_tcon *tcon,
++	  const struct nls_table *cp)
++{
++	struct smb2_tree_connect_req *pSMB2;
++	struct smb2_tree_connect_rsp *pSMB2r = NULL;
++	struct kvec iov[2];
 +	int rc = 0;
++	int resp_buftype;
++	int unc_path_len;
++	int status;
++	struct TCP_Server_Info *server;
++	__le16 *unc_path = NULL;
 +
-+	cFYI(1, "Close");
++	cFYI(1, "TCON");
 +
-+	if (ses && (ses->server))
++	if ((ses->server) && tree)
 +		server = ses->server;
 +	else
 +		return -EIO;
 +
-+	rc = small_smb2_init(SMB2_CLOSE, tcon, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
++	if (tcon && tcon->bad_network_name)
++		return -ENOENT;
 +
-+	pSMB2->PersistentFileId = persistent_file_id;
-+	pSMB2->VolatileFileId = volatile_file_id;
++	unc_path = cifs_strndup_to_utf16(tree, MAX_NAME /* BB find better */,
++					 &unc_path_len, cp);
++	if (unc_path == NULL)
++		return -ENOMEM;
++
++	if (unc_path_len < 2) {
++		kfree(unc_path);
++		return -EINVAL;
++	}
++
++	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &pSMB2);
++	if (rc) {
++		kfree(unc_path);
++		return rc;
++	}
 +
 +	iov[0].iov_base = (char *)pSMB2;
 +	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length)
-+					+ 4 /* rfc1001 len */;
++					+ 4 /* rfc1001 len */ - 1 /* pad */;
 +
-+	rc = smb2_sendrcv2(xid, ses, iov, 1, &resp_buftype /* ret */, &status,
++	/* Testing shows that buffer offset must be at location of Buffer[0] */
++	pSMB2->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req)
++			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
++	pSMB2->PathLength = cpu_to_le16(unc_path_len - 2);
++	iov[1].iov_base = unc_path;
++	iov[1].iov_len = unc_path_len;
++
++	pSMB2->hdr.smb2_buf_length =
++		cpu_to_be32(be32_to_cpu(pSMB2->hdr.smb2_buf_length)
++			    - 1 /* pad */ + unc_path_len);
++
++	rc = smb2_sendrcv2(xid, ses, iov, 2, &resp_buftype /* ret */, &status,
 +			   CIFS_STD_OP | CIFS_LOG_ERROR);
-+	cFYI(1, "CLOSE buftype %d rc %d status %d", resp_buftype, rc, status);
-+	pSMB2r = (struct smb2_close_rsp *)iov[0].iov_base;
++	cFYI(1, "tcon buftype %d rc %d status %d", resp_buftype, rc, status);
++	pSMB2r = (struct smb2_tree_connect_rsp *)iov[0].iov_base;
 +
 +	if (rc != 0) {
-+		if (tcon)
-+			cifs_stats_fail_inc(tcon, SMB2CLOSE);
-+		goto close_exit;
++		cifs_stats_fail_inc(tcon, SMB2TREE_CONNECT);
++		tcon->need_reconnect = true;
++		goto tcon_exit;
 +	}
 +
 +	if (pSMB2r == NULL) {
 +		rc = -EIO;
-+		goto close_exit;
++		goto tcon_exit;
 +	}
 +
-+	/* BB FIXME - decode close response, update inode for caching */
++	if (pSMB2r->ShareType & SMB2_SHARE_TYPE_DISK)
++		cFYI(1, "connection to disk share");
++	else if (pSMB2r->ShareType & SMB2_SHARE_TYPE_PIPE) {
++		tcon->ipc = true;
++		cFYI(1, "connection to pipe share");
++	} else if (pSMB2r->ShareType & SMB2_SHARE_TYPE_PRINT) {
++		tcon->print = true;
++		cFYI(1, "connection to printer");
++	} else {
++		cERROR(1, "unknown share type %d", pSMB2r->ShareType);
++		rc = -EOPNOTSUPP;
++		goto tcon_exit;
++	}
 +
-+close_exit:
++	tcon->share_flags = le32_to_cpu(pSMB2r->ShareFlags);
++	tcon->tidStatus = CifsGood;
++	tcon->need_reconnect = false;
++	tcon->tid = pSMB2r->hdr.TreeId;
++	if ((pSMB2r->Capabilities & SMB2_SHARE_CAP_DFS) &&
++	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
++		cERROR(1, "DFS capability contradicts DFS flag");
++
++	tcon->maximal_access = le32_to_cpu(pSMB2r->MaximalAccess);
++
++	strncpy(tcon->treeName, tree, MAX_TREE_SIZE);
++tcon_exit:
++	if (pSMB2r->hdr.Status == cpu_to_le32(STATUS_BAD_NETWORK_NAME)) {
++		cERROR(1, "BAD_NETWORK_NAME: %s", tree);
++		tcon->bad_network_name = true;
++	}
 +	free_rsp_buf(resp_buftype, pSMB2r);
++	kfree(unc_path);
++
++	return rc;
++}
++
++int SMB2_tdis(const int xid, struct cifs_tcon *tcon)
++{
++	struct smb2_tree_disconnect_req *pSMB2; /* response is trivial */
++	int rc = 0;
++	struct TCP_Server_Info *server;
++	struct cifs_ses *ses = tcon->ses;
++
++	cFYI(1, "Tree Disconnect");
++
++	if (ses && (ses->server))
++		server = ses->server;
++	else
++		return -EIO;
++
++	if ((tcon->need_reconnect) || (tcon->ses->need_reconnect))
++		return 0;
++
++	rc = small_smb2_init(SMB2_TREE_DISCONNECT, tcon, (void **) &pSMB2);
++	if (rc)
++		return rc;
++
++	rc = smb2_sendrcv_norsp(xid, ses, &pSMB2->hdr,
++				CIFS_STD_OP | CIFS_LOG_ERROR);
++	if (rc)
++		cifs_stats_fail_inc(tcon, SMB2TREE_DISCONNECT);
++
 +	return rc;
 +}
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 9316914..a3a08bb 100644
+index f62442d..9316914 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -274,4 +274,171 @@ struct smb2_tree_disconnect_rsp {
+@@ -217,4 +217,61 @@ struct smb2_logoff_rsp {
  	__le16 Reserved;
  } __packed;
  
-+/* File Attrubutes */
-+#define FILE_ATTRIBUTE_READONLY			0x00000001
-+#define FILE_ATTRIBUTE_HIDDEN			0x00000002
-+#define FILE_ATTRIBUTE_SYSTEM			0x00000004
-+#define FILE_ATTRIBUTE_DIRECTORY		0x00000010
-+#define FILE_ATTRIBUTE_ARCHIVE			0x00000020
-+#define FILE_ATTRIBUTE_NORMAL			0x00000080
-+#define FILE_ATTRIBUTE_TEMPORARY		0x00000100
-+#define FILE_ATTRIBUTE_SPARSE_FILE		0x00000200
-+#define FILE_ATTRIBUTE_REPARSE_POINT		0x00000400
-+#define FILE_ATTRIBUTE_COMPRESSED		0x00000800
-+#define FILE_ATTRIBUTE_OFFLINE			0x00001000
-+#define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED	0x00002000
-+#define FILE_ATTRIBUTE_ENCRYPTED		0x00004000
-+
-+/* Oplock levels */
-+#define SMB2_OPLOCK_LEVEL_NONE		0x00
-+#define SMB2_OPLOCK_LEVEL_II		0x01
-+#define SMB2_OPLOCK_LEVEL_EXCLUSIVE	0x08
-+#define SMB2_OPLOCK_LEVEL_BATCH		0x09
-+#define SMB2_OPLOCK_LEVEL_LEASE		0xFF
-+
-+/* Desired Access Flags */
-+#define FILE_READ_DATA_LE		cpu_to_le32(0x00000001)
-+#define FILE_WRITE_DATA_LE		cpu_to_le32(0x00000002)
-+#define FILE_APPEND_DATA_LE		cpu_to_le32(0x00000004)
-+#define FILE_READ_EA_LE			cpu_to_le32(0x00000008)
-+#define FILE_WRITE_EA_LE		cpu_to_le32(0x00000010)
-+#define FILE_EXECUTE_LE			cpu_to_le32(0x00000020)
-+#define FILE_READ_ATTRIBUTES_LE		cpu_to_le32(0x00000080)
-+#define FILE_WRITE_ATTRIBUTES_LE	cpu_to_le32(0x00000100)
-+#define FILE_DELETE_LE			cpu_to_le32(0x00010000)
-+#define FILE_READ_CONTROL_LE		cpu_to_le32(0x00020000)
-+#define FILE_WRITE_DAC_LE		cpu_to_le32(0x00040000)
-+#define FILE_WRITE_OWNER_LE		cpu_to_le32(0x00080000)
-+#define FILE_SYNCHRONIZE_LE		cpu_to_le32(0x00100000)
-+#define FILE_ACCESS_SYSTEM_SECURITY_LE	cpu_to_le32(0x01000000)
-+#define FILE_MAXIMAL_ACCESS_LE		cpu_to_le32(0x02000000)
-+#define FILE_GENERIC_ALL_LE		cpu_to_le32(0x10000000)
-+#define FILE_GENERIC_EXECUTE_LE		cpu_to_le32(0x20000000)
-+#define FILE_GENERIC_WRITE_LE		cpu_to_le32(0x40000000)
-+#define FILE_GENERIC_READ_LE		cpu_to_le32(0x80000000)
-+
-+/* ShareAccess Flags */
-+#define FILE_SHARE_READ_LE		cpu_to_le32(0x00000001)
-+#define FILE_SHARE_WRITE_LE		cpu_to_le32(0x00000002)
-+#define FILE_SHARE_DELETE_LE		cpu_to_le32(0x00000004)
-+#define FILE_SHARE_ALL_LE		cpu_to_le32(0x00000007)
-+
-+/* CreateDisposition Flags */
-+#define FILE_SUPERSEDE_LE		cpu_to_le32(0x00000000)
-+#define FILE_OPEN_LE			cpu_to_le32(0x00000001)
-+#define FILE_CREATE_LE			cpu_to_le32(0x00000002)
-+#define	FILE_OPEN_IF_LE			cpu_to_le32(0x00000003)
-+#define FILE_OVERWRITE_LE		cpu_to_le32(0x00000004)
-+#define FILE_OVERWRITE_IF_LE		cpu_to_le32(0x00000005)
-+
-+/* CreateOptions Flags */
-+#define FILE_DIRECTORY_FILE_LE		cpu_to_le32(0x00000001)
-+/* same as #define CREATE_NOT_FILE_LE	cpu_to_le32(0x00000001) */
-+#define FILE_WRITE_THROUGH_LE		cpu_to_le32(0x00000002)
-+#define FILE_SEQUENTIAL_ONLY_LE		cpu_to_le32(0x00000004)
-+#define FILE_NO_INTERMEDIATE_BUFFERRING_LE cpu_to_le32(0x00000008)
-+#define FILE_SYNCHRONOUS_IO_ALERT_LE	cpu_to_le32(0x00000010)
-+#define FILE_SYNCHRONOUS_IO_NON_ALERT_LE	cpu_to_le32(0x00000020)
-+#define FILE_NON_DIRECTORY_FILE_LE	cpu_to_le32(0x00000040)
-+#define FILE_COMPLETE_IF_OPLOCKED_LE	cpu_to_le32(0x00000100)
-+#define FILE_NO_EA_KNOWLEDGE_LE		cpu_to_le32(0x00000200)
-+#define FILE_RANDOM_ACCESS_LE		cpu_to_le32(0x00000800)
-+#define FILE_DELETE_ON_CLOSE_LE		cpu_to_le32(0x00001000)
-+#define FILE_OPEN_BY_FILE_ID_LE		cpu_to_le32(0x00002000)
-+#define FILE_OPEN_FOR_BACKUP_INTENT_LE	cpu_to_le32(0x00004000)
-+#define FILE_NO_COMPRESSION_LE		cpu_to_le32(0x00008000)
-+#define FILE_RESERVE_OPFILTER_LE	cpu_to_le32(0x00100000)
-+#define FILE_OPEN_REPARSE_POINT_LE	cpu_to_le32(0x00200000)
-+#define FILE_OPEN_NO_RECALL_LE		cpu_to_le32(0x00400000)
-+#define FILE_OPEN_FOR_FREE_SPACE_QUERY_LE cpu_to_le32(0x00800000)
-+
-+#define FILE_READ_RIGHTS_LE (FILE_READ_DATA_LE | FILE_READ_EA_LE \
-+			| FILE_READ_ATTRIBUTES_LE)
-+#define FILE_WRITE_RIGHTS_LE (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE \
-+			| FILE_WRITE_EA_LE | FILE_WRITE_ATTRIBUTES_LE)
-+#define FILE_EXEC_RIGHTS_LE (FILE_EXECUTE_LE)
-+
-+/* Impersonation Levels */
-+#define IL_ANONYMOUS		cpu_to_le32(0x00000000)
-+#define IL_IDENTIFICATION	cpu_to_le32(0x00000001)
-+#define IL_IMPERSONATION	cpu_to_le32(0x00000002)
-+#define IL_DELEGATE		cpu_to_le32(0x00000003)
-+
-+/* Create Context Values */
-+#define SMB2_CREATE_EA_BUFFER			"ExtA" /* extended attributes */
-+#define SMB2_CREATE_SD_BUFFER			"SecD" /* security descriptor */
-+#define SMB2_CREATE_DURABLE_HANDLE_REQUEST	"DHnQ"
-+#define SMB2_CREATE_DURABLE_HANDLE_RECONNECT	"DHnC"
-+#define SMB2_CREATE_ALLOCATION_SIZE		"AlSi"
-+#define SMB2_CREATE_QUERY_MAXIMAL_ACCESS_REQUEST "MxAc"
-+#define SMB2_CREATE_TIMEWARP_REQUEST		"TWrp"
-+#define SMB2_CREATE_QUERY_ON_DISK_ID		"QFid"
-+#define SMB2_CREATE_REQUEST_LEASE		"RqLs"
-+
-+struct smb2_create_req {
++struct smb2_tree_connect_req {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 57 */
-+	__u8   SecurityFlags;
-+	__u8   RequestedOplockLevel;
-+	__le32 ImpersonationLevel;
-+	__le64 SmbCreateFlags;
-+	__le64 Reserved;
-+	__le32 DesiredAccess;
-+	__le32 FileAttributes;
-+	__le32 ShareAccess;
-+	__le32 CreateDisposition;
-+	__le32 CreateOptions;
-+	__le16 NameOffset;
-+	__le16 NameLength;
-+	__le32 CreateContextsOffset;
-+	__le32 CreateContextsLength;
-+	__u8   Buffer[1];
++	__le16 StructureSize;	/* Must be 9 */
++	__le16 Reserved;
++	__le16 PathOffset;
++	__le16 PathLength;
++	__u8   Buffer[1];	/* variable length */
 +} __packed;
 +
-+struct smb2_create_rsp {
++struct smb2_tree_connect_rsp {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 89 */
-+	__u8   OplockLevel;
++	__le16 StructureSize;	/* Must be 16 */
++	__u8   ShareType;  /* see below */
 +	__u8   Reserved;
-+	__le32 CreateAction;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 AllocationSize;
-+	__le64 EndofFile;
-+	__le32 FileAttributes;
-+	__le32 Reserved2;
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
-+	__le32 CreateContextsOffset;
-+	__le32 CreateContextsLength;
-+	__u8   Buffer[1];
++	__le32 ShareFlags; /* see below */
++	__le32 Capabilities; /* see below */
++	__le32 MaximalAccess;
 +} __packed;
 +
-+/* Currently defined values for close flags */
-+#define SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB	cpu_to_le16(0x0001)
-+struct smb2_close_req {
++/* Possible ShareType values */
++#define SMB2_SHARE_TYPE_DISK	0x01
++#define SMB2_SHARE_TYPE_PIPE	0x02
++#define	SMB2_SHARE_TYPE_PRINT	0x03
++
++/*
++ * Possible ShareFlags - exactly one and only one of the first 4 caching flags
++ * must be set (any of the remaining, SHI1005, flags may be set individually
++ * or in combination.
++ */
++#define SMB2_SHAREFLAG_MANUAL_CACHING			0x00000000
++#define SMB2_SHAREFLAG_AUTO_CACHING			0x00000010
++#define SMB2_SHAREFLAG_VDO_CACHING			0x00000020
++#define SMB2_SHAREFLAG_NO_CACHING			0x00000030
++#define SHI1005_FLAGS_DFS				0x00000001
++#define SHI1005_FLAGS_DFS_ROOT				0x00000002
++#define SHI1005_FLAGS_RESTRICT_EXCLUSIVE_OPENS		0x00000100
++#define SHI1005_FLAGS_FORCE_SHARED_DELETE		0x00000200
++#define SHI1005_FLAGS_ALLOW_NAMESPACE_CACHING		0x00000400
++#define SHI1005_FLAGS_ACCESS_BASED_DIRECTORY_ENUM	0x00000800
++#define SHI1005_FLAGS_FORCE_LEVELII_OPLOCK		0x00001000
++#define SHI1005_FLAGS_ENABLE_HASH			0x00002000
++
++/* Possible share capabilities */
++#define SMB2_SHARE_CAP_DFS	cpu_to_le32(0x00000008)
++
++struct smb2_tree_disconnect_req {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 24 */
-+	__le16 Flags;
-+	__le32 Reserved;
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
++	__le16 StructureSize;	/* Must be 4 */
++	__le16 Reserved;
 +} __packed;
 +
-+struct smb2_close_rsp {
++struct smb2_tree_disconnect_rsp {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* 60 */
-+	__le16 Flags;
-+	__le32 Reserved;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 AllocationSize;	/* Beginning of FILE_STANDARD_INFO equivalent */
-+	__le64 EndOfFile;
-+	__le32 Attributes;
++	__le16 StructureSize;	/* Must be 4 */
++	__le16 Reserved;
 +} __packed;
 +
  #endif				/* _SMB2PDU_H */
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 825c7d0..8393802 100644
+index cb92666..5dfff16 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -57,5 +57,11 @@ extern int SMB2_tcon(unsigned int xid, struct cifs_ses *ses,
- 		    const char *tree, struct cifs_tcon *tcon,
- 		    const struct nls_table *);
- extern int SMB2_tdis(const int xid, struct cifs_tcon *tcon);
-+extern int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
-+		      u64 *persistent_fid, u64 *volatile_fid,
-+		      __u32 desired_access, __u32 create_disposition,
-+		      __u32 file_attributes, __u32 create_options);
-+extern int SMB2_close(const int xid, struct cifs_tcon *tcon,
-+		      u64 persistent_file_id, u64 volatile_file_id);
+@@ -51,5 +51,9 @@ extern int SMB2_negotiate(unsigned int xid, struct cifs_ses *ses);
+ extern int SMB2_sess_setup(unsigned int xid, struct cifs_ses *ses,
+ 			   const struct nls_table *nls_cp);
+ extern int SMB2_logoff(const int xid, struct cifs_ses *ses);
++extern int SMB2_tcon(unsigned int xid, struct cifs_ses *ses,
++		    const char *tree, struct cifs_tcon *tcon,
++		    const struct nls_table *);
++extern int SMB2_tdis(const int xid, struct cifs_tcon *tcon);
  
  #endif			/* _SMB2PROTO_H */
 -- 
