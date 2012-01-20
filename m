@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 19/50] CIFS: Add SMB2 support for mkdir operation
-Date: Fri, 20 Jan 2012 12:34:40 +0400
-Message-ID: <1327048511-2342-19-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 20/50] CIFS: Add SMB2 support for rmdir operation
+Date: Fri, 20 Jan 2012 12:34:41 +0400
+Message-ID: <1327048511-2342-20-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -14,149 +14,130 @@ From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsfs.c    |    3 ++
- fs/cifs/smb2inode.c |  100 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smb2proto.h |    1 +
- 3 files changed, 103 insertions(+), 1 deletions(-)
+ fs/cifs/smb2dir.c   |   16 +++++++++++++
+ fs/cifs/smb2inode.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2proto.h |    2 +
+ 3 files changed, 80 insertions(+), 1 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 4869540..5881760 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -49,6 +49,9 @@
- #include "cifs_spnego.h"
- #include "fscache.h"
- #define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
-+#ifdef CONFIG_CIFS_SMB2
-+#include "smb2proto.h"
-+#endif
- 
- int cifsFYI = 0;
- int cifsERROR = 1;
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index c7462ac..9c634f0 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -41,7 +41,7 @@ const struct inode_operations smb2_dir_inode_ops = {
- 	.getattr = cifs_getattr,
- 	.unlink = cifs_unlink,
- 	.link = cifs_hardlink,
--	.mkdir = cifs_mkdir,
-+	.mkdir = smb2_mkdir,
- 	.rmdir = cifs_rmdir,
- 	.rename = cifs_rename,
- 	.permission = cifs_permission,
-@@ -283,3 +283,101 @@ sqii_exit:
- 	cifs_put_tlink(tlink);
- 	return rc;
+diff --git a/fs/cifs/smb2dir.c b/fs/cifs/smb2dir.c
+index 92b664f..cf0e966 100644
+--- a/fs/cifs/smb2dir.c
++++ b/fs/cifs/smb2dir.c
+@@ -59,3 +59,19 @@ cifs_convert_path_to_utf16(const char *from, struct nls_table *local_nls)
+ 	to = cifs_strndup_to_utf16(start_of_path, PATH_MAX, &len, local_nls);
+ 	return to;
  }
 +
-+int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode)
++__le16 *
++cifs_build_utf16path_from_dentry(struct dentry *direntry)
 +{
-+	int rc = 0, tmprc;
++	char *path;
++	__le16 *utf16_path;
++
++	path = build_path_from_dentry(direntry);
++	if (path == NULL)
++		return NULL;
++
++	utf16_path = cifs_convert_path_to_utf16(path,
++					CIFS_SB(direntry->d_sb)->local_nls);
++	kfree(path);
++	return utf16_path;
++}
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 9c634f0..73cf635 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -42,7 +42,7 @@ const struct inode_operations smb2_dir_inode_ops = {
+ 	.unlink = cifs_unlink,
+ 	.link = cifs_hardlink,
+ 	.mkdir = smb2_mkdir,
+-	.rmdir = cifs_rmdir,
++	.rmdir = smb2_rmdir,
+ 	.rename = cifs_rename,
+ 	.permission = cifs_permission,
+ /*	revalidate:cifs_revalidate,   */
+@@ -381,3 +381,64 @@ err_out:
+ 	d_drop(direntry);
+ 	goto out;
+ }
++
++int smb2_rmdir(struct inode *inode, struct dentry *direntry)
++{
++	int rc = 0;
 +	int xid;
 +	struct cifs_sb_info *cifs_sb;
 +	struct tcon_link *tlink;
 +	struct cifs_tcon *tcon;
-+	struct inode *newinode = NULL;
 +	__le16 *utf16_path = NULL;
-+	char *full_path = NULL;
++	struct cifsInodeInfo *cifsInode;
 +
-+	cFYI(1, "%s: mode = 0x%x inode = 0x%p", __func__, mode, inode);
-+
-+	cifs_sb = CIFS_SB(inode->i_sb);
-+	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink))
-+		return PTR_ERR(tlink);
-+	tcon = tlink_tcon(tlink);
++	cFYI(1, "%s: inode = 0x%p", __func__, inode);
 +
 +	xid = GetXid();
 +
-+	full_path = build_path_from_dentry(direntry);
-+	if (full_path == NULL) {
-+		rc = -ENOMEM;
-+		goto err_out;
-+	}
-+
-+	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb->local_nls);
++	utf16_path = cifs_build_utf16path_from_dentry(direntry);
 +	if (utf16_path == NULL) {
 +		rc = -ENOMEM;
-+		goto err_out;
++		goto rmdir_exit;
 +	}
 +
-+	rc = smb2_open_op_close(xid, tcon, utf16_path, FILE_WRITE_ATTRIBUTES,
-+				FILE_CREATE, 0, CREATE_NOT_FILE, NULL,
-+				SMB2_OP_MKDIR);
-+	if (rc)
-+		goto err_out;
++	cifs_sb = CIFS_SB(inode->i_sb);
++	tlink = cifs_sb_tlink(cifs_sb);
++	if (IS_ERR(tlink)) {
++		rc = PTR_ERR(tlink);
++		goto rmdir_exit;
++	}
++	tcon = tlink_tcon(tlink);
 +
-+	inc_nlink(inode);
++	rc = smb2_open_op_close(xid, tcon, utf16_path, DELETE, FILE_OPEN, 0,
++				CREATE_NOT_FILE | CREATE_DELETE_ON_CLOSE, NULL,
++				SMB2_OP_DELETE);
++	cifs_put_tlink(tlink);
 +
-+	rc = cifs_get_inode_info(&newinode, full_path, NULL, inode->i_sb, xid,
-+				 NULL);
-+
-+	d_instantiate(direntry, newinode);
-+	 /*
-+	  * setting nlink not necessary except in cases where we
-+	  * failed to get it from the server or was set bogus
-+	  */
-+	if ((direntry->d_inode) && (direntry->d_inode->i_nlink < 2))
-+		set_nlink(inode, 2);
-+
-+	mode &= ~current_umask();
-+	/* must turn on setgid bit if parent dir has it */
-+	if (inode->i_mode & S_ISGID)
-+		mode |= S_ISGID;
-+
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
-+	    (mode & S_IWUGO) == 0) {
-+		FILE_BASIC_INFO data;
-+		struct cifsInodeInfo *cifs_i;
-+		u32 dosattrs;
-+		memset(&data, 0, sizeof(data));
-+		cifs_i = CIFS_I(newinode);
-+		dosattrs = cifs_i->cifsAttrs | ATTR_READONLY;
-+		data.Attributes = cpu_to_le32(dosattrs);
-+		tmprc = smb2_open_op_close(xid, tcon, utf16_path,
-+					   FILE_WRITE_ATTRIBUTES,
-+					   FILE_CREATE, 0,
-+					   CREATE_NOT_FILE, &data,
-+					   SMB2_OP_SET_INFO);
-+		if (tmprc == 0)
-+			cifs_i->cifsAttrs = dosattrs;
++	if (!rc) {
++		drop_nlink(inode);
++		spin_lock(&direntry->d_inode->i_lock);
++		i_size_write(direntry->d_inode, 0);
++		clear_nlink(direntry->d_inode);
++		spin_unlock(&direntry->d_inode->i_lock);
 +	}
 +
-+	if (direntry->d_inode) {
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
-+			direntry->d_inode->i_mode = (mode | S_IFDIR);
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
-+			direntry->d_inode->i_uid = current_fsuid();
-+			if (inode->i_mode & S_ISGID)
-+				direntry->d_inode->i_gid = inode->i_gid;
-+			else
-+				direntry->d_inode->i_gid = current_fsgid();
-+		}
-+	}
++	cifsInode = CIFS_I(direntry->d_inode);
++	/* force revalidate to go get info when needed */
++	cifsInode->time = 0;
 +
-+out:
++	cifsInode = CIFS_I(inode);
++	/*
++	 * force revalidate to get parent dir info since cached search results
++	 * now invalid
++	 */
++	cifsInode->time = 0;
++
++	direntry->d_inode->i_ctime = inode->i_ctime = inode->i_mtime =
++		current_fs_time(inode->i_sb);
++
++rmdir_exit:
 +	kfree(utf16_path);
 +	FreeXid(xid);
-+	cifs_put_tlink(tlink);
 +	return rc;
-+err_out:
-+	cFYI(1, "%s returned 0x%x", __func__, rc);
-+	d_drop(direntry);
-+	goto out;
 +}
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 8e98cf6..52eea64 100644
+index 52eea64..8c2f734 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -57,6 +57,7 @@ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
- 				 FILE_ALL_INFO *data, struct super_block *sb,
+@@ -44,6 +44,7 @@ extern char *smb2_get_data_area_len(int *poff, int *plen,
+ 				     struct smb2_hdr *pSMB2);
+ extern __le16 *cifs_convert_path_to_utf16(const char *from,
+ 					  struct nls_table *local_nls);
++extern __le16 *cifs_build_utf16path_from_dentry(struct dentry *direntry);
+ 
+ extern int smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
+ 			 struct kvec *vec, int nvec, int *ret_buf_type,
+@@ -58,6 +59,7 @@ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
  				 int xid);
  extern void smb2_set_ops(struct inode *inode);
-+extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
+ extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
++extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
  
  /*
   *  SMB2 Worker functions - most of protocol specific implementation details
