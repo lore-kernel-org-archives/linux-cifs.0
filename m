@@ -1,53 +1,85 @@
-From: "ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: Trouble accessing Buffalo NAS with CIFSFS
-Date: Fri, 20 Jan 2012 20:06:26 +0100
-Message-ID: <20120120200626.b04b1d40.ralda@gmx.de>
+Date: Fri, 20 Jan 2012 14:32:35 -0500
+Message-ID: <20120120143235.1d4d811e@tlielax.poochiereds.net>
 References: <20120119090752.9b7aea6c.ralda@gmx.de>
 	<20120119070543.662a3c56@tlielax.poochiereds.net>
 	<20120120113042.0fdfea5f.ralda@gmx.de>
 	<20120120101938.7ca7464d@tlielax.poochiereds.net>
 	<20120120165657.00042c72.ralda@gmx.de>
 	<20120120111936.5329cbb4@tlielax.poochiereds.net>
+	<20120120200626.b04b1d40.ralda@gmx.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: "ralda-Mmb7MZpHnFY@public.gmane.org" <ralda-Mmb7MZpHnFY@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120120111936.5329cbb4-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20120120200626.b04b1d40.ralda-Mmb7MZpHnFY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hallo Jeff!
-
-> At this point, I'd suggest just setting the cifs_max_pending module
-> parm low  (1 or 2) and seeing if that helps. If it does, then that
-> should basically emulate the effect of steve's eventual patch. If it
-> doesn't then we'll probably need to have a closer look at why it isn't.
-
-I have set cifs_max_pending to 2 (setting it 1 results in value 2).
-Giving interesting results:
-
-Normal mount/cp of single file works (same mount parameter as before).
-
-Copying several files with midnight commander showed me a copy speed of
-4.5 to 5.6 MByte per second - start at 4.5 and raising quickly to 5.6).
-This speed is higher then ever received on copying to the same NAS
-station from same hardware installation. Formerly (kernel 2.6.18
-SMBFS) copies startet below 3.5 MBps and raised slowly up to about 4
-MBps (or slightly above - only at very big files). So reducing the
-setting of cifs_max_pendig not only let the drive work it additionally
-gave me a big step in speed optimization.
-
-... but: Switching virtual console during copy process let the copy
-stop with a stuck mc as before. The only difference: After killing the
-process and a delay of about 2 minutes (felt, not measured) the process
-disappeared and NAS drive returned to a working state without system
-reboot.
-
-If you like/need I may catch more data for diagnosis tomorrow. Just let
-me know what you need and how I shall test. I'm willing to give you all
-data for diagnosis I'm able to collect.
-
---
-Harald
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBGcmks
+IDIwIEphbiAyMDEyIDIwOjA2OjI2ICswMTAwDQoicmFsZGFAZ214LmRlIiA8cmFsZGFAZ214LmRl
+PiB3cm90ZToNCg0KPiBIYWxsbyBKZWZmIQ0KPiANCj4gPiBBdCB0aGlzIHBvaW50LCBJJ2Qgc3Vn
+Z2VzdCBqdXN0IHNldHRpbmcgdGhlIGNpZnNfbWF4X3BlbmRpbmcgbW9kdWxlDQo+ID4gcGFybSBs
+b3cgICgxIG9yIDIpIGFuZCBzZWVpbmcgaWYgdGhhdCBoZWxwcy4gSWYgaXQgZG9lcywgdGhlbiB0
+aGF0DQo+ID4gc2hvdWxkIGJhc2ljYWxseSBlbXVsYXRlIHRoZSBlZmZlY3Qgb2Ygc3RldmUncyBl
+dmVudHVhbCBwYXRjaC4gSWYgaXQNCj4gPiBkb2Vzbid0IHRoZW4gd2UnbGwgcHJvYmFibHkgbmVl
+ZCB0byBoYXZlIGEgY2xvc2VyIGxvb2sgYXQgd2h5IGl0IGlzbid0Lg0KPiANCj4gSSBoYXZlIHNl
+dCBjaWZzX21heF9wZW5kaW5nIHRvIDIgKHNldHRpbmcgaXQgMSByZXN1bHRzIGluIHZhbHVlIDIp
+Lg0KPiBHaXZpbmcgaW50ZXJlc3RpbmcgcmVzdWx0czoNCj4gDQo+IE5vcm1hbCBtb3VudC9jcCBv
+ZiBzaW5nbGUgZmlsZSB3b3JrcyAoc2FtZSBtb3VudCBwYXJhbWV0ZXIgYXMgYmVmb3JlKS4NCj4g
+DQo+IENvcHlpbmcgc2V2ZXJhbCBmaWxlcyB3aXRoIG1pZG5pZ2h0IGNvbW1hbmRlciBzaG93ZWQg
+bWUgYSBjb3B5IHNwZWVkIG9mDQo+IDQuNSB0byA1LjYgTUJ5dGUgcGVyIHNlY29uZCAtIHN0YXJ0
+IGF0IDQuNSBhbmQgcmFpc2luZyBxdWlja2x5IHRvIDUuNikuDQo+IFRoaXMgc3BlZWQgaXMgaGln
+aGVyIHRoZW4gZXZlciByZWNlaXZlZCBvbiBjb3B5aW5nIHRvIHRoZSBzYW1lIE5BUw0KPiBzdGF0
+aW9uIGZyb20gc2FtZSBoYXJkd2FyZSBpbnN0YWxsYXRpb24uIEZvcm1lcmx5IChrZXJuZWwgMi42
+LjE4DQo+IFNNQkZTKSBjb3BpZXMgc3RhcnRldCBiZWxvdyAzLjUgTUJwcyBhbmQgcmFpc2VkIHNs
+b3dseSB1cCB0byBhYm91dCA0DQo+IE1CcHMgKG9yIHNsaWdodGx5IGFib3ZlIC0gb25seSBhdCB2
+ZXJ5IGJpZyBmaWxlcykuIFNvIHJlZHVjaW5nIHRoZQ0KPiBzZXR0aW5nIG9mIGNpZnNfbWF4X3Bl
+bmRpZyBub3Qgb25seSBsZXQgdGhlIGRyaXZlIHdvcmsgaXQgYWRkaXRpb25hbGx5DQo+IGdhdmUg
+bWUgYSBiaWcgc3RlcCBpbiBzcGVlZCBvcHRpbWl6YXRpb24uDQo+IA0KDQpOb3Qgc3VyZSB3aHkg
+dGhhdCB3b3VsZCBiZSB1bmxlc3MgcmVxdWVzdHMgd2VyZSBzb21ldGltZXMgZ2V0dGluZw0KZHJv
+cHBlZCBvbiB0aGUgZmxvb3IgYW5kIHRoZSBjbGllbnQgd2FzIG9jY2FzaW9uYWxseSBhYmxlIHRv
+IHJlY292ZXIuDQoNCj4gLi4uIGJ1dDogU3dpdGNoaW5nIHZpcnR1YWwgY29uc29sZSBkdXJpbmcg
+Y29weSBwcm9jZXNzIGxldCB0aGUgY29weQ0KPiBzdG9wIHdpdGggYSBzdHVjayBtYyBhcyBiZWZv
+cmUuIFRoZSBvbmx5IGRpZmZlcmVuY2U6IEFmdGVyIGtpbGxpbmcgdGhlDQo+IHByb2Nlc3MgYW5k
+IGEgZGVsYXkgb2YgYWJvdXQgMiBtaW51dGVzIChmZWx0LCBub3QgbWVhc3VyZWQpIHRoZSBwcm9j
+ZXNzDQo+IGRpc2FwcGVhcmVkIGFuZCBOQVMgZHJpdmUgcmV0dXJuZWQgdG8gYSB3b3JraW5nIHN0
+YXRlIHdpdGhvdXQgc3lzdGVtDQo+IHJlYm9vdC4NCj4gDQo+IElmIHlvdSBsaWtlL25lZWQgSSBt
+YXkgY2F0Y2ggbW9yZSBkYXRhIGZvciBkaWFnbm9zaXMgdG9tb3Jyb3cuIEp1c3QgbGV0DQo+IG1l
+IGtub3cgd2hhdCB5b3UgbmVlZCBhbmQgaG93IEkgc2hhbGwgdGVzdC4gSSdtIHdpbGxpbmcgdG8g
+Z2l2ZSB5b3UgYWxsDQo+IGRhdGEgZm9yIGRpYWdub3NpcyBJJ20gYWJsZSB0byBjb2xsZWN0Lg0K
+PiANCg0KVGhpcyBpcyBjZXJ0YWlubHkgYSB2ZXJ5IHRyb3VibGVzb21lIGRldmljZSA6KQ0KDQpJ
+IHRoaW5rIHRoZSBleGlzdGluZyBjb2RlIGlzIHdyb25nIGluIHRoYXQgaXQgc2V0cyB0aGUgZmxv
+b3IgdmFsdWUgdG9vDQpoaWdoICgyIHdoZW4gaXQgc2hvdWxkIGJlIDEpLiBUaGUgcHJvYmxlbSB3
+ZSBnZXQgaW50byBob3dldmVyIGlzIHRoYXQNCndoZW4gdGhlIHNlcnZlciBjYW4ndCBoYW5kbGUg
+Y29uY3VycmVudCByZXF1ZXN0cywgd2UgbXVzdCBkaXNhYmxlDQpjZXJ0YWluIGZlYXR1cmVzLg0K
+DQpXZSd2ZSBkaXNjdXNzZWQgdGhpcyBvbiB0aGUgbGlzdCBiZWZvcmUsIGJ1dCB3ZSBwcm9iYWJs
+eSBvdWdodCB0byBkbw0Kc29tZXRoaW5nIGxpa2UgdGhpcyBkZXBlbmRpbmcgb24gd2hhdCB0aGUg
+c2VydmVyIHNlbmRzIGZvciB0aGUgbWF4bXB4DQp2YWx1ZToNCg0KbWF4bXB4ID49IDM6IG5vcm1h
+bCBvcGVyYXRpb24NCg0KbWF4bXB4ID0gMjogZGlzYWJsZSBvcGxvY2tzLCBzaW5jZSBkb2luZyB3
+cml0ZXMgd2hpbGUgdGhlcmUncyBzdGlsbCBhbg0Kb3V0c3RhbmRpbmcgb3BlbiBpcyBwcm9ibGVt
+YXRpYw0KDQptYXhtcHggPSAxOiBkaXNhYmxlIHNlbmRpbmcgc21iIGVjaG9lcy4gVGhpcyBkb2Vz
+IG1lYW4gdGhhdCB3ZSBjYW4ndCBkbw0KZGV0ZWN0aW9uIG9mIHVucmVzcG9uc2l2ZSBzZXJ2ZXJz
+IGNvcnJlY3RseSwgYnV0IHRoZXJlJ3Mgbm90IG11Y2ggZWxzZQ0Kd2UgY2FuIGRvIGF0IHRoYXQg
+cG9pbnQuDQoNClN0ZXZlLCB3aGF0J3MgZ29pbmcgb24gd2l0aCB0aGF0IHBhdGNoPyBJdCdzIGJl
+ZW4gbWFueSBtb250aHMgc2luY2Ugd2UNCmRpc2N1c3NlZCBpdCBsYXN0LiBEbyB5b3UgaGF2ZSBh
+bnl0aGluZyB0aGF0IEhhcmFsZCBjYW4gdGVzdD8NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5
+dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBH
+bnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JRSlBHY0ZUQUFvSkVBQU9h
+RUVaVm9JVncya1FBTFZjdWZWUUcxcUw2dHd1L1NMYk1wZ24NClliclllSEYrTytUZHNDSnhHekJy
+OCsvRlpGZEdDWUlJenJDZ2laSXdINUNiMzhtOFVSZmFpa200cVV2N1Fhd1gNCitwVmVjbU9aZVNm
+THU0RHl0ZnNOWDdLTGlzcUdmanVIelFjMUZuWEZUdlRnVUR3aFJkVm9LbVhJZmpJZXRESXUNCmNt
+bEFjcGFFRWZST0dPa0ZiM0ROWUxQMitUZis5ZmdaMFlUSjV2dm16cGNLNWkxOGpubWJ5QklUem1F
+dkJ4TWwNCmFBdGdMTFJyRHNiZjZsZCtySUFubTNGRUtjaXNINzAyVzJOYm43ckYzZEdYSXR0MHJl
+RHdvcjh6WlBqeEZ2RG4NCkxDekRmYjIyOFpiZW5mcklzV0FBM1psRkJBSjRxQVJiNzZSMkltLzAv
+N3o2MmRvRkx5c1MyOHBJL1lWNXQxN3INCnJUbGMzODZNRkdxYTZmZkx1RXd0NDlvc2tOYVZ3R3Vx
+Qm9aNE95Q1lvUmp1ZTB1QzJ6bU1BSFA3YllkeXFybTENCisvOWNoUDBQMlZDc3hUcXpURjFsdzdI
+cFpPZ2ZGLzA4SHI1bCs0SS9yYWFTSFV5RHlodS9ndnh1R09IYUtSbzMNCm9iOGpUNTVqMTA0c0M5
+V0JJRGlPMHJYdVV2MG9xZ0hiQmhzemR1UTJUNE13WWpITmx3eTVFZ0EyYVJaQnZxa3ENCmplVW9q
+WHNQZDRwalFzTmY1VnoxUzZSVmZIelBEUWtyRi9PNVFQbEphQmdUcTY5UERRQ1pseHZ3YjhkbUJt
+aFkNCm45bGtuN0tNSXM5Qm1CNVhRNlZGYnRnSXIyRkVRelNUYjBjb2U4VnM2ZHgzRDhQMkQwdG5J
+MjBJMFdhT2s1dUYNCmNCZDY0MHpOeXRiakxUbE9sYnlPDQo9SVdZcA0KLS0tLS1FTkQgUEdQIFNJ
+R05BVFVSRS0tLS0tDQo=
