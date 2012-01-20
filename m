@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 21/50] CIFS: Add SMB2 support for unlink operation
-Date: Fri, 20 Jan 2012 12:34:42 +0400
-Message-ID: <1327048511-2342-21-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 23/50] CIFS: Add SMB2 support for reopen file operation
+Date: Fri, 20 Jan 2012 12:34:44 +0400
+Message-ID: <1327048511-2342-23-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
 Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -14,100 +14,313 @@ From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/smb2inode.c |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smb2proto.h |    1 +
- 2 files changed, 66 insertions(+), 1 deletions(-)
+ fs/cifs/cifsglob.h  |    4 ++
+ fs/cifs/file.c      |  146 +++++++++++++++++++++++++++++++-------------------
+ fs/cifs/smb2file.c  |   49 +++++++++++++++++
+ fs/cifs/smb2proto.h |    3 +
+ 4 files changed, 146 insertions(+), 56 deletions(-)
 
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 73cf635..667723a 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -39,7 +39,7 @@ const struct inode_operations smb2_dir_inode_ops = {
- 	.create = cifs_create,
- 	.lookup = cifs_lookup,
- 	.getattr = cifs_getattr,
--	.unlink = cifs_unlink,
-+	.unlink = smb2_unlink,
- 	.link = cifs_hardlink,
- 	.mkdir = smb2_mkdir,
- 	.rmdir = smb2_rmdir,
-@@ -442,3 +442,67 @@ rmdir_exit:
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 9bd13fe..99baed0 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -589,6 +589,10 @@ struct cifsFileInfo {
+ 	struct work_struct oplock_break; /* work for oplock breaks */
+ };
+ 
++typedef int (reopen_callback_t)(struct cifsFileInfo *cifs_file, int xid,
++				 struct cifs_tcon *tcon, const char *full_path,
++				 __u32 *oplock);
++
+ struct cifs_io_parms {
+ 	__u16 netfid;
+ 	__u32 pid;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index bda75ca..2e5bda1 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -479,53 +479,26 @@ static int cifs_relock_file(struct cifsFileInfo *cifsFile)
+ 	return rc;
+ }
+ 
+-static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
++static int
++cifs_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
++		    struct cifs_tcon *tcon, const char *full_path,
++		    __u32 *oplock)
+ {
+ 	int rc = -EACCES;
+-	int xid;
+-	__u32 oplock;
+ 	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *tcon;
+-	struct cifsInodeInfo *pCifsInode;
+ 	struct inode *inode;
+-	char *full_path = NULL;
+-	int desiredAccess;
++	int desired_access;
+ 	int disposition = FILE_OPEN;
+ 	int create_options = CREATE_NOT_DIR;
+ 	__u16 netfid;
+ 
+-	xid = GetXid();
+-	mutex_lock(&pCifsFile->fh_mutex);
+-	if (!pCifsFile->invalidHandle) {
+-		mutex_unlock(&pCifsFile->fh_mutex);
+-		rc = 0;
+-		FreeXid(xid);
+-		return rc;
+-	}
+-
+-	inode = pCifsFile->dentry->d_inode;
++	inode = cifs_file->dentry->d_inode;
+ 	cifs_sb = CIFS_SB(inode->i_sb);
+-	tcon = tlink_tcon(pCifsFile->tlink);
+-
+-/* can not grab rename sem here because various ops, including
+-   those that already have the rename sem can end up causing writepage
+-   to get called and if the server was down that means we end up here,
+-   and we can never tell if the caller already has the rename_sem */
+-	full_path = build_path_from_dentry(pCifsFile->dentry);
+-	if (full_path == NULL) {
+-		rc = -ENOMEM;
+-		mutex_unlock(&pCifsFile->fh_mutex);
+-		FreeXid(xid);
+-		return rc;
+-	}
+-
+-	cFYI(1, "inode = 0x%p file flags 0x%x for %s",
+-		 inode, pCifsFile->f_flags, full_path);
+ 
+ 	if (enable_oplocks)
+-		oplock = REQ_OPLOCK;
++		*oplock = REQ_OPLOCK;
+ 	else
+-		oplock = 0;
++		*oplock = 0;
+ 
+ 	if (tcon->unix_ext && (tcon->ses->capabilities & CAP_UNIX) &&
+ 	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+@@ -535,21 +508,23 @@ static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
+ 		 * O_CREAT, O_EXCL and O_TRUNC already had their effect on the
+ 		 * original open. Must mask them off for a reopen.
+ 		 */
+-		unsigned int oflags = pCifsFile->f_flags &
+-						~(O_CREAT | O_EXCL | O_TRUNC);
++		unsigned int oflags = cifs_file->f_flags &
++				      ~(O_CREAT | O_EXCL | O_TRUNC);
+ 
+ 		rc = cifs_posix_open(full_path, NULL, inode->i_sb,
+-				cifs_sb->mnt_file_mode /* ignored */,
+-				oflags, &oplock, &netfid, xid);
++				     cifs_sb->mnt_file_mode /* ignored */,
++				     oflags, oplock, &netfid, xid);
+ 		if (rc == 0) {
+ 			cFYI(1, "posix reopen succeeded");
+ 			goto reopen_success;
+ 		}
+-		/* fallthrough to retry open the old way on errors, especially
+-		   in the reconnect path it is important to retry hard */
++		/*
++		 * fallthrough to retry open the old way on errors, especially
++		 * in the reconnect path it is important to retry hard.
++		 */
+ 	}
+ 
+-	desiredAccess = cifs_convert_flags(pCifsFile->f_flags);
++	desired_access = cifs_convert_flags(cifs_file->f_flags);
+ 
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
+@@ -560,30 +535,78 @@ static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
+ 	   and server version of file size can be stale. If we knew for sure
+ 	   that inode was not dirty locally we could do this */
+ 
+-	rc = CIFSSMBOpen(xid, tcon, full_path, disposition, desiredAccess,
+-			 create_options, &netfid, &oplock, NULL,
++	rc = CIFSSMBOpen(xid, tcon, full_path, disposition, desired_access,
++			 create_options, &netfid, oplock, NULL,
+ 			 cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+ 				CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	if (rc) {
+-		mutex_unlock(&pCifsFile->fh_mutex);
+ 		cFYI(1, "cifs_open returned 0x%x", rc);
+-		cFYI(1, "oplock: %d", oplock);
++		cFYI(1, "oplock: %d", *oplock);
+ 		goto reopen_error_exit;
+ 	}
+ 
+ reopen_success:
+-	pCifsFile->netfid = netfid;
+-	pCifsFile->invalidHandle = false;
+-	mutex_unlock(&pCifsFile->fh_mutex);
+-	pCifsInode = CIFS_I(inode);
++	cifs_file->netfid = netfid;
++reopen_error_exit:
++	return rc;
++}
++
++static int
++cifs_reopen_file_generic(struct cifsFileInfo *cifs_file, bool can_flush,
++			 reopen_callback_t *reopen_cb)
++{
++	int rc = -EACCES;
++	int xid;
++	__u32 oplock;
++	struct cifs_sb_info *cifs_sb;
++	struct cifs_tcon *tcon;
++	struct inode *inode;
++	struct cifsInodeInfo *cifs_inode;
++	char *full_path = NULL;
++
++	xid = GetXid();
++	mutex_lock(&cifs_file->fh_mutex);
++	if (!cifs_file->invalidHandle) {
++		mutex_unlock(&cifs_file->fh_mutex);
++		rc = 0;
++		FreeXid(xid);
++		return rc;
++	}
++
++	inode = cifs_file->dentry->d_inode;
++	cifs_sb = CIFS_SB(inode->i_sb);
++	tcon = tlink_tcon(cifs_file->tlink);
++
++	/*
++	 * Can not grab rename sem here because various ops, including
++	 * those that already have the rename sem can end up causing writepage
++	 * to get called and if the server was down that means we end up here,
++	 * and we can never tell if the caller already has the rename_sem.
++	 */
++	full_path = build_path_from_dentry(cifs_file->dentry);
++	if (full_path == NULL) {
++		rc = -ENOMEM;
++		mutex_unlock(&cifs_file->fh_mutex);
++		FreeXid(xid);
++		return rc;
++	}
++
++	cFYI(1, "inode = 0x%p file flags 0x%x for %s", inode,
++	     cifs_file->f_flags, full_path);
++
++	rc = reopen_cb(cifs_file, xid, tcon, full_path, &oplock);
++	mutex_unlock(&cifs_file->fh_mutex);
++	if (rc)
++		goto out;
++	cifs_inode = CIFS_I(inode);
+ 
+ 	if (can_flush) {
+ 		rc = filemap_write_and_wait(inode->i_mapping);
+ 		mapping_set_error(inode->i_mapping, rc);
+ 
+ 		if (tcon->unix_ext)
+-			rc = cifs_get_inode_info_unix(&inode,
+-				full_path, inode->i_sb, xid);
++			rc = cifs_get_inode_info_unix(&inode, full_path,
++						      inode->i_sb, xid);
+ 		else
+ 			rc = cifs_get_inode_info(&inode, full_path, NULL,
+ 						 inode->i_sb, xid, NULL);
+@@ -594,16 +617,27 @@ reopen_success:
+ 	     we can not go to the server to get the new inod
+ 	     info */
+ 
+-	cifs_set_oplock_level(pCifsInode, oplock);
++	cifs_set_oplock_level(cifs_inode, oplock);
++	cifs_relock_file(cifs_file);
++	cifs_file->invalidHandle = false;
+ 
+-	cifs_relock_file(pCifsFile);
+-
+-reopen_error_exit:
++out:
+ 	kfree(full_path);
  	FreeXid(xid);
  	return rc;
  }
-+
-+int smb2_unlink(struct inode *dir, struct dentry *dentry)
+ 
++static int cifs_reopen_file(struct cifsFileInfo *cifs_file, bool can_flush)
 +{
-+	int rc = 0;
-+	int xid;
-+	struct inode *inode = dentry->d_inode;
-+	struct cifsInodeInfo *cifs_inode;
-+	struct super_block *sb = dir->i_sb;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	__le16 *utf16_path = NULL;
++#ifdef CONFIG_CIFS_SMB2
++	if (tlink_tcon(cifs_file->tlink)->ses->server->is_smb2)
++		return cifs_reopen_file_generic(cifs_file, can_flush,
++						smb2_reopen_file_cb);
++#endif
++	return cifs_reopen_file_generic(cifs_file, can_flush,
++					cifs_reopen_file_cb);
++}
 +
-+	cFYI(1, "%s: dir=0x%p, dentry=0x%p", __func__, dir, dentry);
+ int cifs_close(struct inode *inode, struct file *file)
+ {
+ 	if (file->private_data != NULL) {
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index ef083b8..1166118 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -272,3 +272,52 @@ out:
+ 	cifs_put_tlink(tlink);
+ 	return rc;
+ }
 +
-+	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink))
-+		return PTR_ERR(tlink);
-+	tcon = tlink_tcon(tlink);
++int
++smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
++		    struct cifs_tcon *tcon, const char *full_path,
++		    __u32 *oplock)
++{
++	int rc = -EACCES;
++	struct cifs_sb_info *cifs_sb;
++	struct inode *inode;
++	__u32 desired_access;
++	__u32 create_disposition = FILE_OPEN;
++	__le16 *smb2_path = NULL;
++	__u64 persist_fid, volatile_fid;
 +
-+	xid = GetXid();
++	inode = cifs_file->dentry->d_inode;
++	cifs_sb = CIFS_SB(inode->i_sb);
++
++	desired_access = cifs_convert_flags(cifs_file->f_flags);
 +
 +	/*
-+	 * Unlink can be called from rename so we can not take the
-+	 * sb->s_vfs_rename_mutex here.
++	 * Can not refresh inode by passing in file_info buf to be returned
++	 * by SMB2_open and then calling get_inode_info with returned buf
++	 * since file might have write behind data that needs to be flushed
++	 * and server version of file size can be stale. If we knew for sure
++	 * that inode was not dirty locally we could do this.
 +	 */
-+	utf16_path = cifs_build_utf16path_from_dentry(dentry);
-+	if (utf16_path == NULL) {
++
++	smb2_path = cifs_convert_path_to_utf16(full_path, cifs_sb->local_nls);
++	if (smb2_path == NULL) {
 +		rc = -ENOMEM;
-+		goto unlink_out;
++		goto reopen_error_exit;
 +	}
 +
-+	rc = smb2_open_op_close(xid, tcon, utf16_path, DELETE,
-+				FILE_OPEN, 0, CREATE_DELETE_ON_CLOSE, NULL,
-+				SMB2_OP_DELETE);
-+	if (!rc) {
-+		if (inode)
-+			drop_nlink(inode);
-+	} else if (rc == -ENOENT) {
-+		d_drop(dentry);
-+	} else if (rc == -ETXTBSY) {
-+		/* rc = cifs_rename_pending_delete(full_path, dentry, xid);
-+		if (rc == 0)
-+			drop_nlink(inode); */
-+	} else if ((rc == -EACCES) && inode)
-+		/* BB reset dos attributes and retry once */
-+
-+	/* BB undo the setattr if we errored out and it's needed */
-+	if (inode) {
-+		cifs_inode = CIFS_I(inode);
-+		/* will force revalidate to get info when needed */
-+		cifs_inode->time = 0;
-+		inode->i_ctime = current_fs_time(sb);
++	rc = SMB2_open(xid, tcon, smb2_path, &persist_fid, &volatile_fid,
++		       desired_access, create_disposition, 0, 0);
++	if (rc) {
++		mutex_unlock(&cifs_file->fh_mutex);
++		cFYI(1, "cifs_open returned 0x%x", rc);
++		cFYI(1, "oplock: %d", *oplock);
++		goto reopen_error_exit;
 +	}
-+	dir->i_ctime = dir->i_mtime = current_fs_time(sb);
-+	cifs_inode = CIFS_I(dir);
-+	/* force revalidate of dir as well */
-+	CIFS_I(dir)->time = 0;
-+unlink_out:
-+	kfree(utf16_path);
-+	FreeXid(xid);
-+	cifs_put_tlink(tlink);
++
++	cifs_file->persist_fid = persist_fid;
++	cifs_file->volatile_fid = volatile_fid;
++	*oplock = 0;
++reopen_error_exit:
++	kfree(smb2_path);
 +	return rc;
 +}
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 8c2f734..32c064c 100644
+index dcc4016..cf3331e 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -60,6 +60,7 @@ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
- extern void smb2_set_ops(struct inode *inode);
- extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
- extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
-+extern int smb2_unlink(struct inode *dir, struct dentry *dentry);
+@@ -77,6 +77,9 @@ extern struct cifsFileInfo *smb2_new_fileinfo(__u64 persist_fid,
+ 					      struct tcon_link *tlink,
+ 					      __u32 oplock);
+ extern int smb2_open(struct inode *inode, struct file *file);
++extern int smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
++			       struct cifs_tcon *tcon, const char *full_path,
++			       __u32 *oplock);
  
  /*
   *  SMB2 Worker functions - most of protocol specific implementation details
