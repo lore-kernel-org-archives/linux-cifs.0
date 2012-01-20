@@ -1,465 +1,853 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 25/50] CIFS: Add SMB2 support for cifs_iovec_read
-Date: Fri, 20 Jan 2012 12:34:46 +0400
-Message-ID: <1327048511-2342-25-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 22/50] CIFS: Add SMB2 support for open/close file operations
+Date: Fri, 20 Jan 2012 12:34:43 +0400
+Message-ID: <1327048511-2342-22-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1327048511-2342-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
 Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    3 +
- fs/cifs/cifsproto.h |    4 ++
- fs/cifs/file.c      |   76 ++++++++++++++++++++++++-------------
- fs/cifs/smb2file.c  |   43 ++++++++++++++++++++-
- fs/cifs/smb2glob.h  |    6 +++
- fs/cifs/smb2misc.c  |    4 ++
- fs/cifs/smb2pdu.c   |  105 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   |   28 +++++++++++++
- fs/cifs/smb2proto.h |    7 +++
- 9 files changed, 248 insertions(+), 28 deletions(-)
+ fs/cifs/cifsfs.c    |   85 ----------------
+ fs/cifs/cifsfs.h    |    4 +
+ fs/cifs/cifsglob.h  |    4 +
+ fs/cifs/cifsproto.h |   19 +++--
+ fs/cifs/file.c      |  182 ++++++++++++++++++++++++++--------
+ fs/cifs/smb2file.c  |  274 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2inode.c |   14 ++--
+ fs/cifs/smb2pdu.c   |    4 +-
+ fs/cifs/smb2proto.h |   16 +++
+ 9 files changed, 461 insertions(+), 141 deletions(-)
+ create mode 100644 fs/cifs/smb2file.c
 
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5881760..1b5df36 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -681,91 +681,6 @@ out_nls:
+ 	goto out;
+ }
+ 
+-static ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
+-				   unsigned long nr_segs, loff_t pos)
+-{
+-	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
+-	ssize_t written;
+-	int rc;
+-
+-	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+-
+-	if (CIFS_I(inode)->clientCanCacheAll)
+-		return written;
+-
+-	rc = filemap_fdatawrite(inode->i_mapping);
+-	if (rc)
+-		cFYI(1, "cifs_file_aio_write: %d rc on %p inode", rc, inode);
+-
+-	return written;
+-}
+-
+-static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+-{
+-	/*
+-	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
+-	 * the cached file length
+-	 */
+-	if (origin != SEEK_SET || origin != SEEK_CUR) {
+-		int rc;
+-		struct inode *inode = file->f_path.dentry->d_inode;
+-
+-		/*
+-		 * We need to be sure that all dirty pages are written and the
+-		 * server has the newest file length.
+-		 */
+-		if (!CIFS_I(inode)->clientCanCacheRead && inode->i_mapping &&
+-		    inode->i_mapping->nrpages != 0) {
+-			rc = filemap_fdatawait(inode->i_mapping);
+-			if (rc) {
+-				mapping_set_error(inode->i_mapping, rc);
+-				return rc;
+-			}
+-		}
+-		/*
+-		 * Some applications poll for the file length in this strange
+-		 * way so we must seek to end on non-oplocked files by
+-		 * setting the revalidate time to zero.
+-		 */
+-		CIFS_I(inode)->time = 0;
+-
+-		rc = cifs_revalidate_file_attr(file);
+-		if (rc < 0)
+-			return (loff_t)rc;
+-	}
+-	return generic_file_llseek(file, offset, origin);
+-}
+-
+-static int cifs_setlease(struct file *file, long arg, struct file_lock **lease)
+-{
+-	/* note that this is called by vfs setlease with lock_flocks held
+-	   to protect *lease from going away */
+-	struct inode *inode = file->f_path.dentry->d_inode;
+-	struct cifsFileInfo *cfile = file->private_data;
+-
+-	if (!(S_ISREG(inode->i_mode)))
+-		return -EINVAL;
+-
+-	/* check if file is oplocked */
+-	if (((arg == F_RDLCK) &&
+-		(CIFS_I(inode)->clientCanCacheRead)) ||
+-	    ((arg == F_WRLCK) &&
+-		(CIFS_I(inode)->clientCanCacheAll)))
+-		return generic_setlease(file, arg, lease);
+-	else if (tlink_tcon(cfile->tlink)->local_lease &&
+-		 !CIFS_I(inode)->clientCanCacheRead)
+-		/* If the server claims to support oplock on this
+-		   file, then we still need to check oplock even
+-		   if the local_lease mount option is set, but there
+-		   are servers which do not support oplock for which
+-		   this mount option may be useful if the user
+-		   knows that the file won't be changed on the server
+-		   by anyone else */
+-		return generic_setlease(file, arg, lease);
+-	else
+-		return -EAGAIN;
+-}
+-
+ struct file_system_type cifs_fs_type = {
+ 	.owner = THIS_MODULE,
+ 	.name = "cifs",
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index 2009adc..198a141 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -82,6 +82,8 @@ extern ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
+ 			       unsigned long nr_segs, loff_t pos);
+ extern ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
+ 				 unsigned long nr_segs, loff_t pos);
++extern ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
++				   unsigned long nr_segs, loff_t pos);
+ extern ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
+ 				unsigned long nr_segs, loff_t pos);
+ extern ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+@@ -92,6 +94,8 @@ extern int cifs_strict_fsync(struct file *, loff_t, loff_t, int);
+ extern int cifs_flush(struct file *, fl_owner_t id);
+ extern int cifs_file_mmap(struct file * , struct vm_area_struct *);
+ extern int cifs_file_strict_mmap(struct file * , struct vm_area_struct *);
++extern int cifs_setlease(struct file *file, long arg, struct file_lock **lease);
++extern loff_t cifs_llseek(struct file *file, loff_t offset, int origin);
+ extern const struct file_operations cifs_dir_ops;
+ extern int cifs_dir_open(struct inode *inode, struct file *file);
+ extern int cifs_readdir(struct file *file, void *direntry, filldir_t filldir);
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index e2eee60..dedeb0f 100644
+index 37fe4c5..9bd13fe 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -607,6 +607,9 @@ typedef int (iwrite_callback_t)(int, struct cifsFileInfo *,
- 				struct cifs_io_parms *, unsigned int *,
- 				struct kvec *, unsigned long, unsigned int,
- 				int);
-+typedef int (iread_callback_t)(int, struct cifsFileInfo *,
-+			       struct cifs_io_parms *, unsigned int *, char **,
-+			       char **, int *);
- 
- /*
-  * Take a reference on the file private data. Must be called with
+@@ -572,6 +572,10 @@ struct cifsFileInfo {
+ 	unsigned int uid;	/* allows finding which FileInfo structure */
+ 	__u32 pid;		/* process id who opened file */
+ 	__u16 netfid;		/* file id from remote */
++#ifdef CONFIG_CIFS_SMB2
++	__u64 volatile_fid;	/* volatile file id for smb2 */
++	__u64 persist_fid;	/* persist file id for smb2 */
++#endif
+ 	/* BB add lock scope info here if needed */ ;
+ 	/* lock scope id (0 if none) */
+ 	struct dentry *dentry;
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 1c7bedb..76b65dd 100644
+index 0692428..9f5c2e3 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -193,6 +193,10 @@ extern ssize_t cifs_iovec_write_generic(struct file *file,
- 					const struct iovec *iov,
- 					unsigned long nr_segs, loff_t *poffset,
- 					iwrite_callback_t *write_cb);
-+extern ssize_t cifs_iovec_read_generic(struct file *file,
-+				       const struct iovec *iov,
-+				       unsigned long nr_segs, loff_t *poffset,
-+				       iread_callback_t *read_cb);
- extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
- void cifs_proc_init(void);
- void cifs_proc_clean(void);
+@@ -130,13 +130,18 @@ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+ 				      int offset);
+ extern void cifs_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock);
+ 
+-extern struct cifsFileInfo *cifs_new_fileinfo(__u16 fileHandle,
+-				struct file *file, struct tcon_link *tlink,
+-				__u32 oplock);
+-extern int cifs_posix_open(char *full_path, struct inode **pinode,
+-				struct super_block *sb,
+-				int mode, unsigned int f_flags,
+-				__u32 *poplock, __u16 *pnetfid, int xid);
++extern int cifs_convert_flags(unsigned int flags);
++extern int cifs_get_disposition(unsigned int flags);
++extern struct cifsFileInfo *cifs_new_fileinfo(__u16 netfid, struct file *file,
++					      struct tcon_link *tlink,
++					      __u32 oplock);
++extern void cifs_new_fileinfo_generic(struct file *file,
++				      struct cifsFileInfo *cfile,
++				      struct tcon_link *tlink, __u32 oplock);
++extern int cifs_posix_open(const char *full_path, struct inode **pinode,
++			   struct super_block *sb, int mode,
++			   unsigned int f_flags, __u32 *poplock, __u16 *pnetfid,
++			   int xid);
+ void cifs_fill_uniqueid(struct super_block *sb, struct cifs_fattr *fattr);
+ extern void cifs_unix_basic_to_fattr(struct cifs_fattr *fattr,
+ 				     FILE_UNIX_BASIC_INFO *info,
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index ac1ec04..b90417e 100644
+index 51dfd74..bda75ca 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -2361,9 +2361,28 @@ ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
- 	return written;
+@@ -42,8 +42,11 @@
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
+ #include "fscache.h"
++#ifdef CONFIG_CIFS_SMB2
++#include "smb2proto.h"
++#endif
+ 
+-static inline int cifs_convert_flags(unsigned int flags)
++inline int cifs_convert_flags(unsigned int flags)
+ {
+ 	if ((flags & O_ACCMODE) == O_RDONLY)
+ 		return GENERIC_READ;
+@@ -91,7 +94,7 @@ static u32 cifs_posix_convert_flags(unsigned int flags)
+ 	return posix_flags;
  }
  
--static ssize_t
--cifs_iovec_read(struct file *file, const struct iovec *iov,
--		 unsigned long nr_segs, loff_t *poffset)
-+static int
-+cifs_iread_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
-+	      unsigned int *bytes_read, char **all_data, char **data_offset,
-+	      int *resp_buf_type)
-+{
-+	struct smb_com_read_rsp *pSMBr;
-+	int rc;
-+
-+	parms->netfid = cfile->netfid;
-+	rc = CIFSSMBRead(xid, parms, bytes_read, all_data, resp_buf_type);
-+	if (!(*all_data))
-+		return rc;
-+
-+	pSMBr = (struct smb_com_read_rsp *)(*all_data);
-+	*data_offset = *all_data + 4 + le16_to_cpu(pSMBr->DataOffset);
-+	return rc;
-+}
-+
-+ssize_t
-+cifs_iovec_read_generic(struct file *file, const struct iovec *iov,
-+			unsigned long nr_segs, loff_t *poffset,
-+			iread_callback_t *read_cb)
+-static inline int cifs_get_disposition(unsigned int flags)
++inline int cifs_get_disposition(unsigned int flags)
+ {
+ 	if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+ 		return FILE_CREATE;
+@@ -105,9 +108,9 @@ static inline int cifs_get_disposition(unsigned int flags)
+ 		return FILE_OPEN;
+ }
+ 
+-int cifs_posix_open(char *full_path, struct inode **pinode,
+-			struct super_block *sb, int mode, unsigned int f_flags,
+-			__u32 *poplock, __u16 *pnetfid, int xid)
++int cifs_posix_open(const char *full_path, struct inode **pinode,
++		    struct super_block *sb, int mode, unsigned int f_flags,
++		    __u32 *poplock, __u16 *pnetfid, int xid)
  {
  	int rc;
- 	int xid;
-@@ -2372,11 +2391,11 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 	size_t len, cur_len;
- 	int iov_offset = 0;
- 	struct cifs_sb_info *cifs_sb;
--	struct cifs_tcon *pTcon;
-+	struct cifs_tcon *tcon;
- 	struct cifsFileInfo *open_file;
--	struct smb_com_read_rsp *pSMBr;
- 	struct cifs_io_parms io_parms;
- 	char *read_data;
-+	char *data_offset = NULL;
- 	unsigned int rsize;
- 	__u32 pid;
- 
-@@ -2394,7 +2413,7 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 	rsize = min_t(unsigned int, cifs_sb->rsize, CIFSMaxBufSize);
- 
- 	open_file = file->private_data;
--	pTcon = tlink_tcon(open_file->tlink);
-+	tcon = tlink_tcon(open_file->tlink);
- 
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
- 		pid = open_file->pid;
-@@ -2416,27 +2435,24 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 				if (rc != 0)
- 					break;
- 			}
--			io_parms.netfid = open_file->netfid;
- 			io_parms.pid = pid;
--			io_parms.tcon = pTcon;
-+			io_parms.tcon = tcon;
- 			io_parms.offset = *poffset;
- 			io_parms.length = cur_len;
--			rc = CIFSSMBRead(xid, &io_parms, &bytes_read,
--					 &read_data, &buf_type);
--			pSMBr = (struct smb_com_read_rsp *)read_data;
--			if (read_data) {
--				char *data_offset = read_data + 4 +
--						le16_to_cpu(pSMBr->DataOffset);
--				if (memcpy_toiovecend(iov, data_offset,
--						      iov_offset, bytes_read))
--					rc = -EFAULT;
--				if (buf_type == CIFS_SMALL_BUFFER)
--					cifs_small_buf_release(read_data);
--				else if (buf_type == CIFS_LARGE_BUFFER)
--					cifs_buf_release(read_data);
--				read_data = NULL;
--				iov_offset += bytes_read;
--			}
-+			rc = read_cb(xid, open_file, &io_parms, &bytes_read,
-+				     &read_data, &data_offset, &buf_type);
-+			if (rc)
-+				continue;
-+
-+			if (memcpy_toiovecend(iov, data_offset,
-+					      iov_offset, bytes_read))
-+				rc = -EFAULT;
-+			if (buf_type == CIFS_SMALL_BUFFER)
-+				cifs_small_buf_release(read_data);
-+			else if (buf_type == CIFS_LARGE_BUFFER)
-+				cifs_buf_release(read_data);
-+			read_data = NULL;
-+			iov_offset += bytes_read;
- 		}
- 
- 		if (rc || (bytes_read == 0)) {
-@@ -2447,7 +2463,7 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 				return rc;
- 			}
- 		} else {
--			cifs_stats_bytes_read(pTcon, bytes_read);
-+			cifs_stats_bytes_read(tcon, bytes_read);
- 			*poffset += bytes_read;
- 		}
- 	}
-@@ -2456,8 +2472,16 @@ cifs_iovec_read(struct file *file, const struct iovec *iov,
- 	return total_read;
+ 	FILE_UNIX_BASIC_INFO *presp_data;
+@@ -168,9 +171,9 @@ posix_open_ret:
  }
  
-+static ssize_t
-+cifs_iovec_read(struct file *file, const struct iovec *iov,
-+		unsigned long nr_segs, loff_t *poffset)
-+{
-+	return cifs_iovec_read_generic(file, iov, nr_segs, poffset,
-+				       cifs_iread_cb);
+ static int
+-cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
+-	     struct cifs_tcon *tcon, unsigned int f_flags, __u32 *poplock,
+-	     __u16 *pnetfid, int xid)
++cifs_nt_open(const char *full_path, struct inode *inode,
++	     struct cifs_sb_info *cifs_sb, struct cifs_tcon *tcon,
++	     unsigned int f_flags, __u32 *poplock, __u16 *pnetfid, int xid)
+ {
+ 	int rc;
+ 	int desiredAccess;
+@@ -242,43 +245,50 @@ out:
+ }
+ 
+ struct cifsFileInfo *
+-cifs_new_fileinfo(__u16 fileHandle, struct file *file,
++cifs_new_fileinfo(__u16 netfid, struct file *file,
+ 		  struct tcon_link *tlink, __u32 oplock)
+ {
++	struct cifsFileInfo *cfile;
++
++	cfile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
++	if (cfile == NULL)
++		return cfile;
++	cfile->netfid = netfid;
++	cifs_new_fileinfo_generic(file, cfile, tlink, oplock);
++	return cfile;
 +}
 +
- ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
--			       unsigned long nr_segs, loff_t pos)
-+			unsigned long nr_segs, loff_t pos)
- {
- 	ssize_t read;
- 
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index a00a453..9829ed7 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -76,7 +76,7 @@ const struct file_operations smb2_file_direct_ops = {
- 	/* BB reevaluate whether they can be done with directio, no cache */
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = cifs_user_readv,
-+	.aio_read = smb2_user_readv,
- 	.aio_write = smb2_user_writev,
- 	.open = smb2_open,
- 	.release = cifs_close,
-@@ -132,7 +132,7 @@ const struct file_operations smb2_file_direct_nobrl_ops = {
- 	/* BB reevaluate whether they can be done with directio, no cache */
- 	.read = do_sync_read,
- 	.write = do_sync_write,
--	.aio_read = cifs_user_readv,
-+	.aio_read = smb2_user_readv,
- 	.aio_write = smb2_user_writev,
- 	.open = smb2_open,
- 	.release = cifs_close,
-@@ -367,3 +367,42 @@ ssize_t smb2_user_writev(struct kiocb *iocb, const struct iovec *iov,
- 
- 	return written;
- }
-+
-+static int
-+smb2_iread_cb(int xid, struct cifsFileInfo *cfile, struct cifs_io_parms *parms,
-+	      unsigned int *bytes_read, char **all_data, char **data_offset,
-+	      int *resp_buf_type)
++void
++cifs_new_fileinfo_generic(struct file *file, struct cifsFileInfo *cfile,
++			  struct tcon_link *tlink, __u32 oplock)
 +{
-+	struct smb2_read_rsp *pSMB2r;
+ 	struct dentry *dentry = file->f_path.dentry;
+ 	struct inode *inode = dentry->d_inode;
+-	struct cifsInodeInfo *pCifsInode = CIFS_I(inode);
+-	struct cifsFileInfo *pCifsFile;
+-
+-	pCifsFile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
+-	if (pCifsFile == NULL)
+-		return pCifsFile;
+-
+-	pCifsFile->count = 1;
+-	pCifsFile->netfid = fileHandle;
+-	pCifsFile->pid = current->tgid;
+-	pCifsFile->uid = current_fsuid();
+-	pCifsFile->dentry = dget(dentry);
+-	pCifsFile->f_flags = file->f_flags;
+-	pCifsFile->invalidHandle = false;
+-	pCifsFile->tlink = cifs_get_tlink(tlink);
+-	mutex_init(&pCifsFile->fh_mutex);
+-	INIT_WORK(&pCifsFile->oplock_break, cifs_oplock_break);
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++
++	cfile->count = 1;
++	cfile->pid = current->tgid;
++	cfile->uid = current_fsuid();
++	cfile->dentry = dget(dentry);
++	cfile->f_flags = file->f_flags;
++	cfile->invalidHandle = false;
++	cfile->tlink = cifs_get_tlink(tlink);
++	mutex_init(&cfile->fh_mutex);
++	INIT_WORK(&cfile->oplock_break, cifs_oplock_break);
+ 
+ 	spin_lock(&cifs_file_list_lock);
+-	list_add(&pCifsFile->tlist, &(tlink_tcon(tlink)->openFileList));
++	list_add(&cfile->tlist, &(tlink_tcon(tlink)->openFileList));
+ 	/* if readable file instance put first in list*/
+ 	if (file->f_mode & FMODE_READ)
+-		list_add(&pCifsFile->flist, &pCifsInode->openFileList);
++		list_add(&cfile->flist, &cinode->openFileList);
+ 	else
+-		list_add_tail(&pCifsFile->flist, &pCifsInode->openFileList);
++		list_add_tail(&cfile->flist, &cinode->openFileList);
+ 	spin_unlock(&cifs_file_list_lock);
+ 
+-	cifs_set_oplock_level(pCifsInode, oplock);
+-	pCifsInode->can_cache_brlcks = pCifsInode->clientCanCacheAll;
++	cifs_set_oplock_level(cinode, oplock);
++	cinode->can_cache_brlcks = cinode->clientCanCacheAll;
+ 
+-	file->private_data = pCifsFile;
+-	return pCifsFile;
++	file->private_data = cfile;
+ }
+ 
+ static void cifs_del_lock_waiters(struct cifsLockInfo *lock);
+@@ -323,10 +333,16 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	cancel_work_sync(&cifs_file->oplock_break);
+ 
+ 	if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
+-		int xid, rc;
++		int xid, rc = 0;
+ 
+ 		xid = GetXid();
+-		rc = CIFSSMBClose(xid, tcon, cifs_file->netfid);
++#ifdef CONFIG_CIFS_SMB2
++		if (tcon->ses->server->is_smb2)
++			rc = SMB2_close(xid, tcon, cifs_file->persist_fid,
++					cifs_file->volatile_fid);
++		else
++#endif
++			rc = CIFSSMBClose(xid, tcon, cifs_file->netfid);
+ 		FreeXid(xid);
+ 	}
+ 
+@@ -348,7 +364,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+ 	kfree(cifs_file);
+ }
+ 
+-int cifs_open(struct inode *inode, struct file *file)
++int
++cifs_open(struct inode *inode, struct file *file)
+ {
+ 	int rc = -EACCES;
+ 	int xid;
+@@ -356,7 +373,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink;
+-	struct cifsFileInfo *pCifsFile = NULL;
++	struct cifsFileInfo *cifs_file = NULL;
+ 	char *full_path = NULL;
+ 	bool posix_open_ok = false;
+ 	__u16 netfid;
+@@ -419,8 +436,8 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			goto out;
+ 	}
+ 
+-	pCifsFile = cifs_new_fileinfo(netfid, file, tlink, oplock);
+-	if (pCifsFile == NULL) {
++	cifs_file = cifs_new_fileinfo(netfid, file, tlink, oplock);
++	if (cifs_file == NULL) {
+ 		CIFSSMBClose(xid, tcon, netfid);
+ 		rc = -ENOMEM;
+ 		goto out;
+@@ -441,7 +458,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			.device	= 0,
+ 		};
+ 		CIFSSMBUnixSetFileInfo(xid, tcon, &args, netfid,
+-					pCifsFile->pid);
++					cifs_file->pid);
+ 	}
+ 
+ out:
+@@ -643,6 +660,72 @@ int cifs_closedir(struct inode *inode, struct file *file)
+ 	return rc;
+ }
+ 
++loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
++{
++	/*
++	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
++	 * the cached file length
++	 */
++	if (origin != SEEK_SET || origin != SEEK_CUR) {
++		int rc;
++		struct inode *inode = file->f_path.dentry->d_inode;
++
++		/*
++		 * We need to be sure that all dirty pages are written and the
++		 * server has the newest file length.
++		 */
++		if (!CIFS_I(inode)->clientCanCacheRead && inode->i_mapping &&
++		    inode->i_mapping->nrpages != 0) {
++			rc = filemap_fdatawait(inode->i_mapping);
++			if (rc) {
++				mapping_set_error(inode->i_mapping, rc);
++				return rc;
++			}
++		}
++		/*
++		 * Some applications poll for the file length in this strange
++		 * way so we must seek to end on non-oplocked files by
++		 * setting the revalidate time to zero.
++		 */
++		CIFS_I(inode)->time = 0;
++
++		rc = cifs_revalidate_file_attr(file);
++		if (rc < 0)
++			return (loff_t)rc;
++	}
++	return generic_file_llseek(file, offset, origin);
++}
++
++int cifs_setlease(struct file *file, long arg, struct file_lock **lease)
++{
++	/* note that this is called by vfs setlease with lock_flocks held
++	   to protect *lease from going away */
++	struct inode *inode = file->f_path.dentry->d_inode;
++	struct cifsFileInfo *cfile = file->private_data;
++
++	if (!(S_ISREG(inode->i_mode)))
++		return -EINVAL;
++
++	/* check if file is oplocked */
++	if (((arg == F_RDLCK) &&
++		(CIFS_I(inode)->clientCanCacheRead)) ||
++	    ((arg == F_WRLCK) &&
++		(CIFS_I(inode)->clientCanCacheAll)))
++		return generic_setlease(file, arg, lease);
++	else if (tlink_tcon(cfile->tlink)->local_lease &&
++		 !CIFS_I(inode)->clientCanCacheRead)
++		/* If the server claims to support oplock on this
++		   file, then we still need to check oplock even
++		   if the local_lease mount option is set, but there
++		   are servers which do not support oplock for which
++		   this mount option may be useful if the user
++		   knows that the file won't be changed on the server
++		   by anyone else */
++		return generic_setlease(file, arg, lease);
++	else
++		return -EAGAIN;
++}
++
+ static struct cifsLockInfo *
+ cifs_lock_init(__u64 offset, __u64 length, __u8 type, __u16 netfid)
+ {
+@@ -2204,6 +2287,25 @@ ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	return cifs_user_writev(iocb, iov, nr_segs, pos);
+ }
+ 
++ssize_t cifs_file_aio_write(struct kiocb *iocb, const struct iovec *iov,
++			    unsigned long nr_segs, loff_t pos)
++{
++	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
++	ssize_t written;
 +	int rc;
 +
-+	parms->persist_fid = cfile->persist_fid;
-+	parms->volatile_fid = cfile->volatile_fid;
-+	rc = SMB2_read(xid, parms, bytes_read, all_data, resp_buf_type, 0);
-+	if (!(*all_data))
-+		return rc;
++	written = generic_file_aio_write(iocb, iov, nr_segs, pos);
 +
-+	pSMB2r = (struct smb2_read_rsp *)(*all_data);
-+	*data_offset = (char *)pSMB2r->hdr.ProtocolId + pSMB2r->DataOffset;
++	if (CIFS_I(inode)->clientCanCacheAll)
++		return written;
++
++	rc = filemap_fdatawrite(inode->i_mapping);
++	if (rc)
++		cFYI(1, "cifs_file_aio_write: %d rc on %p inode", rc, inode);
++
++	return written;
++}
++
+ static ssize_t
+ cifs_iovec_read(struct file *file, const struct iovec *iov,
+ 		 unsigned long nr_segs, loff_t *poffset)
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+new file mode 100644
+index 0000000..ef083b8
+--- /dev/null
++++ b/fs/cifs/smb2file.c
+@@ -0,0 +1,274 @@
++/*
++ *   fs/cifs/smb2file.c
++ *
++ *   Copyright (C) International Business Machines  Corp., 2002, 2011
++ *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org),
++ *              Pavel Shilovsky ((pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
++ *
++ *   This library is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU Lesser General Public License as published
++ *   by the Free Software Foundation; either version 2.1 of the License, or
++ *   (at your option) any later version.
++ *
++ *   This library is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
++ *   the GNU Lesser General Public License for more details.
++ *
++ *   You should have received a copy of the GNU Lesser General Public License
++ *   along with this library; if not, write to the Free Software
++ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
++ */
++#include <linux/fs.h>
++#include <linux/stat.h>
++#include <linux/slab.h>
++#include <linux/pagemap.h>
++#include <asm/div64.h>
++#include "cifsfs.h"
++#include "cifspdu.h"
++#include "cifsglob.h"
++#include "cifsproto.h"
++#include "cifs_debug.h"
++#include "cifs_fs_sb.h"
++#include "cifs_unicode.h"
++#include "fscache.h"
++#include "smb2proto.h"
++
++const struct file_operations smb2_file_ops = {
++	.read = do_sync_read,
++	.write = do_sync_write,
++	.aio_read = generic_file_aio_read,
++	.aio_write = cifs_file_aio_write,
++	.open = smb2_open,
++	.release = cifs_close,
++	.lock = cifs_lock,
++	.fsync = cifs_fsync,
++	.flush = cifs_flush,
++	.mmap  = cifs_file_mmap,
++	.splice_read = generic_file_splice_read,
++	.llseek = cifs_llseek,
++#ifdef CONFIG_CIFS_POSIX
++	.unlocked_ioctl	= cifs_ioctl,
++#endif /* CONFIG_CIFS_POSIX */
++	.setlease = cifs_setlease,
++};
++
++const struct file_operations smb2_file_strict_ops = {
++	.read = do_sync_read,
++	.write = do_sync_write,
++	.aio_read = cifs_strict_readv,
++	.aio_write = cifs_strict_writev,
++	.open = smb2_open,
++	.release = cifs_close,
++	.lock = cifs_lock,
++	.fsync = cifs_strict_fsync,
++	.flush = cifs_flush,
++	.mmap = cifs_file_strict_mmap,
++	.splice_read = generic_file_splice_read,
++	.llseek = cifs_llseek,
++#ifdef CONFIG_CIFS_POSIX
++	.unlocked_ioctl	= cifs_ioctl,
++#endif /* CONFIG_CIFS_POSIX */
++	.setlease = cifs_setlease,
++};
++
++const struct file_operations smb2_file_direct_ops = {
++	/* BB reevaluate whether they can be done with directio, no cache */
++	.read = do_sync_read,
++	.write = do_sync_write,
++	.aio_read = cifs_user_readv,
++	.aio_write = cifs_user_writev,
++	.open = smb2_open,
++	.release = cifs_close,
++	.lock = cifs_lock,
++	.fsync = cifs_fsync,
++	.flush = cifs_flush,
++	.mmap = cifs_file_mmap,
++	.splice_read = generic_file_splice_read,
++#ifdef CONFIG_CIFS_POSIX
++	.unlocked_ioctl  = cifs_ioctl,
++#endif /* CONFIG_CIFS_POSIX */
++	.llseek = cifs_llseek,
++	.setlease = cifs_setlease,
++};
++
++const struct file_operations smb2_file_nobrl_ops = {
++	.read = do_sync_read,
++	.write = do_sync_write,
++	.aio_read = generic_file_aio_read,
++	.aio_write = cifs_file_aio_write,
++	.open = smb2_open,
++	.release = cifs_close,
++	.fsync = cifs_fsync,
++	.flush = cifs_flush,
++	.mmap  = cifs_file_mmap,
++	.splice_read = generic_file_splice_read,
++	.llseek = cifs_llseek,
++#ifdef CONFIG_CIFS_POSIX
++	.unlocked_ioctl	= cifs_ioctl,
++#endif /* CONFIG_CIFS_POSIX */
++	.setlease = cifs_setlease,
++};
++
++const struct file_operations smb2_file_strict_nobrl_ops = {
++	.read = do_sync_read,
++	.write = do_sync_write,
++	.aio_read = cifs_strict_readv,
++	.aio_write = cifs_strict_writev,
++	.open = smb2_open,
++	.release = cifs_close,
++	.fsync = cifs_strict_fsync,
++	.flush = cifs_flush,
++	.mmap = cifs_file_strict_mmap,
++	.splice_read = generic_file_splice_read,
++	.llseek = cifs_llseek,
++#ifdef CONFIG_CIFS_POSIX
++	.unlocked_ioctl	= cifs_ioctl,
++#endif /* CONFIG_CIFS_POSIX */
++	.setlease = cifs_setlease,
++};
++
++const struct file_operations smb2_file_direct_nobrl_ops = {
++	/* BB reevaluate whether they can be done with directio, no cache */
++	.read = do_sync_read,
++	.write = do_sync_write,
++	.aio_read = cifs_user_readv,
++	.aio_write = cifs_user_writev,
++	.open = smb2_open,
++	.release = cifs_close,
++	.fsync = cifs_fsync,
++	.flush = cifs_flush,
++	.mmap = cifs_file_mmap,
++	.splice_read = generic_file_splice_read,
++#ifdef CONFIG_CIFS_POSIX
++	.unlocked_ioctl  = cifs_ioctl,
++#endif /* CONFIG_CIFS_POSIX */
++	.llseek = cifs_llseek,
++	.setlease = cifs_setlease,
++};
++
++struct cifsFileInfo *
++smb2_new_fileinfo(__u64 persist_fid, __u64 volatile_fid, struct file *file,
++		  struct tcon_link *tlink, __u32 oplock)
++{
++	struct cifsFileInfo *cfile;
++
++	cfile = kzalloc(sizeof(struct cifsFileInfo), GFP_KERNEL);
++	if (cfile == NULL)
++		return cfile;
++	cfile->persist_fid = persist_fid;
++	cfile->volatile_fid = volatile_fid;
++	cifs_new_fileinfo_generic(file, cfile, tlink, oplock);
++	return cfile;
++}
++
++static int
++smb2_open_helper(struct file *file, struct inode *inode, const char *full_path,
++		 __u8 *oplock, __u64 *persist_fid, __u64 *volatile_fid,
++		 FILE_ALL_INFO *data, struct cifs_tcon *tcon, int xid)
++{
++	int rc;
++	__u32 desired_access = FILE_READ_ATTRIBUTES;
++	__u32 create_disposition;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	__le16 *smb2_path;
++	struct smb2_file_all_info *smb2_data = NULL;
++
++	desired_access |= cifs_convert_flags(file->f_flags);
++	create_disposition = cifs_get_disposition(file->f_flags);
++
++	smb2_path = cifs_convert_path_to_utf16(full_path, cifs_sb->local_nls);
++	if (smb2_path == NULL) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	smb2_data = kzalloc(sizeof(struct smb2_file_all_info) + MAX_NAME * 2,
++			    GFP_KERNEL);
++	if (smb2_data == NULL) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	rc = SMB2_open(xid, tcon, smb2_path, persist_fid, volatile_fid,
++		       desired_access, create_disposition, 0, 0);
++
++	if (rc)
++		goto out;
++
++	rc = SMB2_query_info(xid, tcon, *persist_fid, *volatile_fid, smb2_data);
++	if (rc) {
++		SMB2_close(xid, tcon, *persist_fid, *volatile_fid);
++		goto out;
++	}
++
++	move_smb2_info_to_cifs(data, smb2_data);
++out:
++	*oplock = 0;
++	kfree(smb2_data);
++	kfree(smb2_path);
 +	return rc;
 +}
 +
-+static ssize_t
-+smb2_iovec_read(struct file *file, const struct iovec *iov,
-+		unsigned long nr_segs, loff_t *poffset)
-+{
-+	return cifs_iovec_read_generic(file, iov, nr_segs, poffset,
-+				       smb2_iread_cb);
-+}
-+
-+ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
-+			unsigned long nr_segs, loff_t pos)
-+{
-+	ssize_t read;
-+
-+	read = smb2_iovec_read(iocb->ki_filp, iov, nr_segs, &pos);
-+	if (read > 0)
-+		iocb->ki_pos = pos;
-+
-+	return read;
-+}
-diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index 1db1196..bde9f99 100644
---- a/fs/cifs/smb2glob.h
-+++ b/fs/cifs/smb2glob.h
-@@ -40,4 +40,10 @@
- #define SMB2_OP_RENAME 6
- #define SMB2_OP_DELETE 7
- 
-+/* Used when constructing chained read requests. */
-+#define CHAINED_REQUEST 1
-+#define START_OF_CHAIN 2
-+#define END_OF_CHAIN 4
-+#define RELATED_REQUEST 8
-+
- #endif	/* _SMB2_GLOB_H */
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index ad84694..d63987c 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -245,6 +245,10 @@ char *smb2_get_data_area_len(int *poff, int *plen, struct smb2_hdr *pSMB2)
- 		    ((struct smb2_query_info_rsp *)pSMB2)->OutputBufferLength);
- 		break;
- 	case SMB2_READ:
-+		*poff = ((struct smb2_read_rsp *)pSMB2)->DataOffset;
-+		*plen = le32_to_cpu(
-+				((struct smb2_read_rsp *)pSMB2)->DataLength);
-+		break;
- 	case SMB2_QUERY_DIRECTORY:
- 	case SMB2_IOCTL:
- 	case SMB2_CHANGE_NOTIFY:
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 457718a..c4d4928 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -41,6 +41,7 @@
- #include "cifs_debug.h"
- #include "ntlmssp.h"
- #include "smb2status.h"
-+#include "smb2glob.h"
- 
- /*
-  *  The following table defines the expected "StructureSize" of SMB2 requests
-@@ -1127,6 +1128,110 @@ qinf_exit:
- }
- 
- /*
-+ * To form a chain of read requests, any read requests after the
-+ * first should have the end_of_chain boolean set to true.
-+ */
-+int smb2_new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
-+		      unsigned int remaining_bytes, int request_type)
++int smb2_open(struct inode *inode, struct file *file)
 +{
 +	int rc = -EACCES;
-+	struct smb2_read_req *pSMB2 = NULL;
++	int xid;
++	__u8 oplock;
++	struct cifs_sb_info *cifs_sb;
++	struct cifsFileInfo *cifs_file;
++	struct tcon_link *tlink;
++	struct cifs_tcon *tcon;
++	__u64 persist_fid, volatile_fid;
++	char *full_path;
++	FILE_ALL_INFO *data = NULL;
 +
-+	rc = small_smb2_init(SMB2_READ, io_parms->tcon, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
-+	if (io_parms->tcon->ses->server == NULL)
-+		return -ECONNABORTED;
++	xid = GetXid();
 +
-+	pSMB2->hdr.ProcessId = cpu_to_le32(io_parms->pid);
-+
-+	pSMB2->PersistentFileId = io_parms->persist_fid;
-+	pSMB2->VolatileFileId = io_parms->volatile_fid;
-+	pSMB2->ReadChannelInfoOffset = 0; /* reserved */
-+	pSMB2->ReadChannelInfoLength = 0; /* reserved */
-+	pSMB2->Channel = 0; /* reserved */
-+	pSMB2->MinimumCount = 0;
-+	pSMB2->Length = cpu_to_le32(io_parms->length);
-+	pSMB2->Offset = cpu_to_le64(io_parms->offset);
-+
-+	if (request_type & CHAINED_REQUEST) {
-+		if (!(request_type & END_OF_CHAIN)) {
-+			pSMB2->hdr.NextCommand = cpu_to_le32(
-+				be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4);
-+		} else /* END_OF_CHAIN */
-+			pSMB2->hdr.NextCommand = 0;
-+		if (request_type & RELATED_REQUEST) {
-+			pSMB2->hdr.Flags |= SMB2_FLAGS_RELATED_OPERATIONS;
-+			/*
-+			 * related requests use info from previous
-+			 * read request in chain.
-+			 */
-+			pSMB2->hdr.SessionId = 0xFFFFFFFF;
-+			pSMB2->hdr.TreeId = 0xFFFFFFFF;
-+			pSMB2->PersistentFileId = 0xFFFFFFFF;
-+			pSMB2->VolatileFileId = 0xFFFFFFFF;
-+		}
++	cifs_sb = CIFS_SB(inode->i_sb);
++	tlink = cifs_sb_tlink(cifs_sb);
++	if (IS_ERR(tlink)) {
++		FreeXid(xid);
++		return PTR_ERR(tlink);
 +	}
-+	if (remaining_bytes > io_parms->length)
-+		pSMB2->RemainingBytes = cpu_to_le32(remaining_bytes);
-+	else
-+		pSMB2->RemainingBytes = 0;
++	tcon = tlink_tcon(tlink);
 +
-+	iov[0].iov_base = (char *)pSMB2;
-+	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4;
-+	return rc;
-+}
-+
-+int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
-+	      unsigned int *nbytes, char **buf, int *pbuf_type,
-+	      unsigned int remaining_bytes)
-+{
-+	int status, resp_buftype, rc = -EACCES;
-+	struct smb2_read_rsp *pSMB2r = NULL;
-+	struct kvec iov[1];
-+
-+	*nbytes = 0;
-+	rc = smb2_new_read_req(iov, io_parms, remaining_bytes, 0);
-+	if (rc)
-+		return rc;
-+
-+	rc = smb2_sendrcv2(xid, io_parms->tcon->ses, iov, 1,
-+			   &resp_buftype, &status,
-+			   CIFS_STD_OP | CIFS_LOG_ERROR);
-+	if (status == STATUS_END_OF_FILE) {
-+		free_rsp_buf(resp_buftype, iov[0].iov_base);
-+		return 0;
++	full_path = build_path_from_dentry(file->f_path.dentry);
++	if (full_path == NULL) {
++		rc = -ENOMEM;
++		goto out;
 +	}
 +
-+	cFYI(1, "read returned buftype %d with rc %d status 0x%x",
-+		 resp_buftype, rc, status);
++	data = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
++	if (data == NULL) {
++		rc = -ENOMEM;
++		goto out;
++	}
 +
-+	pSMB2r = (struct smb2_read_rsp *)iov[0].iov_base;
++	rc = smb2_open_helper(file, inode, full_path, &oplock, &persist_fid,
++			      &volatile_fid, data, tcon, xid);
++	if (rc)
++		goto out;
 +
++	rc = smb2_query_inode_info(&inode, full_path, data, inode->i_sb, xid);
 +	if (rc) {
-+		cifs_stats_fail_inc(io_parms->tcon, SMB2READ);
-+		cERROR(1, "Send error in read = %d", rc);
-+	} else {
-+		*nbytes = le32_to_cpu(pSMB2r->DataLength);
-+		if ((*nbytes > CIFS_MAX_MSGSIZE) ||
-+		    (*nbytes > io_parms->length)) {
-+			cFYI(1, "bad length %d for count %d", *nbytes,
-+			     io_parms->length);
-+			rc = -EIO;
-+			*nbytes = 0;
-+		}
++		SMB2_close(xid, tcon, persist_fid, volatile_fid);
++		goto out;
 +	}
-+	if (resp_buftype != CIFS_NO_BUFFER) {
-+		*buf = iov[0].iov_base;
-+		if (resp_buftype == CIFS_SMALL_BUFFER)
-+			*pbuf_type = CIFS_SMALL_BUFFER;
-+		else if (resp_buftype == CIFS_LARGE_BUFFER)
-+			*pbuf_type = CIFS_LARGE_BUFFER;
++
++	cifs_file = smb2_new_fileinfo(persist_fid, volatile_fid, file, tlink,
++				      oplock);
++	if (cifs_file == NULL) {
++		SMB2_close(xid, tcon, persist_fid, volatile_fid);
++		rc = -ENOMEM;
++		goto out;
 +	}
++
++	cifs_fscache_set_inode_cookie(inode, file);
++out:
++	kfree(full_path);
++	kfree(data);
++	FreeXid(xid);
++	cifs_put_tlink(tlink);
 +	return rc;
 +}
-+
-+/*
-  * SMB2_write function gets iov pointer to kvec array with n_vec as a length.
-  * The length field from io_parms must be at least 1 and indicates a number of
-  * elements with data to write that begins with position 1 in iov array. All
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index a66bf18..92d0982 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -441,6 +441,34 @@ struct smb2_close_rsp {
- 	__le32 Attributes;
- } __packed;
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 667723a..97bef79 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -96,18 +96,18 @@ void smb2_set_ops(struct inode *inode)
+ 		inode->i_op = &smb2_file_inode_ops;
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DIRECT_IO) {
+ 			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
+-				inode->i_fop = &cifs_file_direct_nobrl_ops;
++				inode->i_fop = &smb2_file_direct_nobrl_ops;
+ 			else
+-				inode->i_fop = &cifs_file_direct_ops;
++				inode->i_fop = &smb2_file_direct_ops;
+ 		} else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO) {
+ 			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
+-				inode->i_fop = &cifs_file_strict_nobrl_ops;
++				inode->i_fop = &smb2_file_strict_nobrl_ops;
+ 			else
+-				inode->i_fop = &cifs_file_strict_ops;
++				inode->i_fop = &smb2_file_strict_ops;
+ 		} else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_BRL)
+-			inode->i_fop = &cifs_file_nobrl_ops;
++			inode->i_fop = &smb2_file_nobrl_ops;
+ 		else { /* not direct, send byte range locks */
+-			inode->i_fop = &cifs_file_ops;
++			inode->i_fop = &smb2_file_ops;
+ 		}
  
-+struct smb2_read_req {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 49 */
-+	__u8   Padding; /* offset from start of SMB2 header to place read */
-+	__u8   Reserved;
-+	__le32 Length;
-+	__le64 Offset;
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
-+	__le32 MinimumCount;
-+	__le32 Channel; /* Reserved MBZ */
-+	__le32 RemainingBytes;
-+	__le16 ReadChannelInfoOffset; /* Reserved MBZ */
-+	__le16 ReadChannelInfoLength; /* Reserved MBZ */
-+	__u8   Buffer[1];
-+} __packed;
-+
-+struct smb2_read_rsp {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 17 */
-+	__u8   DataOffset;
-+	__u8   Reserved;
-+	__le32 DataLength;
-+	__le32 DataRemaining;
-+	__u32  Reserved2;
-+	__u8   Buffer[1];
-+} __packed;
-+
- /* For write request Flags field below the following flag is defined: */
- #define SMB2_WRITEFLAG_WRITE_THROUGH 0x00000001
+ 		/* check if server can support readpages */
+@@ -177,7 +177,7 @@ smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *srch_path,
+ 	return rc;
+ }
  
+-static void
++void
+ move_smb2_info_to_cifs(FILE_ALL_INFO *dst, struct smb2_file_all_info *src)
+ {
+ 	memcpy(dst, src, (size_t)(&src->CurrentByteOffset) - (size_t)src);
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index b1682e4..f2b2511 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -902,9 +902,9 @@ int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
+ 	if (rc)
+ 		return rc;
+ 
+-	if (enable_oplocks)
++	/* if (enable_oplocks)
+ 		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_BATCH;
+-	else
++	else */
+ 		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_NONE;
+ 	pSMB2->ImpersonationLevel = IL_IMPERSONATION;
+ 	pSMB2->DesiredAccess = cpu_to_le32(desired_access);
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 56fa08c..b477b90 100644
+index 32c064c..dcc4016 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -82,6 +82,8 @@ extern int smb2_reopen_file_cb(struct cifsFileInfo *cifs_file, int xid,
- 			       __u32 *oplock);
- extern ssize_t smb2_user_writev(struct kiocb *iocb, const struct iovec *iov,
- 				unsigned long nr_segs, loff_t pos);
-+extern ssize_t smb2_user_readv(struct kiocb *iocb, const struct iovec *iov,
-+			       unsigned long nr_segs, loff_t pos);
+@@ -32,6 +32,13 @@ extern const struct inode_operations smb2_symlink_inode_ops;
  
+ extern const struct file_operations smb2_dir_ops;
+ 
++extern const struct file_operations smb2_file_ops;
++extern const struct file_operations smb2_file_direct_ops; /* if directio mnt */
++extern const struct file_operations smb2_file_strict_ops; /* if strictio mnt */
++extern const struct file_operations smb2_file_nobrl_ops; /* no brlocks */
++extern const struct file_operations smb2_file_direct_nobrl_ops;
++extern const struct file_operations smb2_file_strict_nobrl_ops;
++
+ /*
+  *****************************************************************
+  * All Prototypes
+@@ -54,6 +61,8 @@ extern int smb2_sendrcv_norsp(const unsigned int xid, struct cifs_ses *ses,
+ extern int smb2_setup_session(unsigned int xid, struct cifs_ses *psesinfo,
+ 			      struct nls_table *nls_info);
+ 
++extern void move_smb2_info_to_cifs(FILE_ALL_INFO *dst,
++				   struct smb2_file_all_info *src);
+ extern int smb2_query_inode_info(struct inode **pinode, const char *full_path,
+ 				 FILE_ALL_INFO *data, struct super_block *sb,
+ 				 int xid);
+@@ -62,6 +71,13 @@ extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
+ extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
+ extern int smb2_unlink(struct inode *dir, struct dentry *dentry);
+ 
++extern struct cifsFileInfo *smb2_new_fileinfo(__u64 persist_fid,
++					      __u64 volatile_fid,
++					      struct file *file,
++					      struct tcon_link *tlink,
++					      __u32 oplock);
++extern int smb2_open(struct inode *inode, struct file *file);
++
  /*
   *  SMB2 Worker functions - most of protocol specific implementation details
-@@ -107,5 +109,10 @@ extern int SMB2_query_info(const int xid, struct cifs_tcon *tcon,
- extern int SMB2_write(const int xid, struct cifs_io_parms *io_parms,
- 		      unsigned int *nbytes, struct kvec *iov, int n_vec,
- 		      const unsigned int remaining_bytes, int wtimeout);
-+extern int smb2_new_read_req(struct kvec *iov, struct cifs_io_parms *io_parms,
-+			     unsigned int remaining_bytes, int request_type);
-+extern int SMB2_read(const int xid, struct cifs_io_parms *io_parms,
-+		     unsigned int *nbytes, char **buf, int *pbuf_type,
-+		     unsigned int remaining_bytes);
- 
- #endif			/* _SMB2PROTO_H */
+  *  are contained within these calls
 -- 
 1.7.1
