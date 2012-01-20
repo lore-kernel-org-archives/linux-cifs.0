@@ -1,44 +1,31 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: cifs: fetch credentials out of keyring for non-krb5 auth
- multiuser mounts
-Date: Fri, 20 Jan 2012 07:23:27 -0500
-Message-ID: <20120120072327.20218d24@tlielax.poochiereds.net>
-References: <20120120082132.GA21512@elgon.mountain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix error handling when cifscreds key payload is an error
+Date: Fri, 20 Jan 2012 08:04:37 -0500
+Message-ID: <1327064677-15896-1-git-send-email-jlayton@redhat.com>
+Cc: dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120120082132.GA21512-mgFCXtclrQlZLf2FXnZxJA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 20 Jan 2012 11:21:32 +0300
-Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+Reported-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> Hi Jeff,
-> 
-> The patch 8a8798a5ff90: "cifs: fetch credentials out of keyring for 
-> non-krb5 auth multiuser mounts" from Jan 17, 2012, has a problem here:
-> 
-> +       upayload = key->payload.data;
-> +       if (IS_ERR_OR_NULL(upayload)) {
-> +               rc = PTR_ERR(key);
->                              ^^^
-> "key" is a valid pointer not an ERR_PTR.  Also "upayload" can be NULL
-> and PTR_ERR(NULL) is success.
-> 
-> +               goto out_key_put;
-> +       }
-> 
-> regards,
-> dan carpenter
-> 
-
-Doh! Good catch. Steve has already queued this patch for inclusion, but
-I'll spin up a patch to fix it.
-
-Thanks,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 986709a..aa687c8 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2125,7 +2125,7 @@ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
+ 	down_read(&key->sem);
+ 	upayload = key->payload.data;
+ 	if (IS_ERR_OR_NULL(upayload)) {
+-		rc = PTR_ERR(key);
++		rc = upayload ? PTR_ERR(upayload) : -EINVAL;
+ 		goto out_key_put;
+ 	}
+ 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.7.5
