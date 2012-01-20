@@ -1,272 +1,446 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 46/50] CIFS: Add statfs support for SMB2
-Date: Fri, 20 Jan 2012 12:35:07 +0400
-Message-ID: <1327048511-2342-46-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 45/50] CIFS: Enable signing in SMB2
+Date: Fri, 20 Jan 2012 12:35:06 +0400
+Message-ID: <1327048511-2342-45-git-send-email-piastry@etersoft.ru>
 References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1327048511-2342-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/cifsfs.c    |   52 ++++++++++++++++----------
- fs/cifs/smb2glob.h  |    2 +
- fs/cifs/smb2pdu.c   |  100 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   |   19 ++++++++++
- fs/cifs/smb2proto.h |    5 +++
- 5 files changed, 158 insertions(+), 20 deletions(-)
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index c59a5b2..40b64da 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -164,31 +164,14 @@ static void cifs_kill_sb(struct super_block *sb)
- 	cifs_umount(cifs_sb);
- }
- 
--static int
--cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
-+static void
-+cifs_queryfs(int xid, struct cifs_tcon *tcon, struct kstatfs *buf)
+Use hmac-sha256 and rather than hmac-md5 that is used for CIFS/SMB.
+
+Signature field in SMB2 header is 16 bytes instead of 8 bytes.
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/Kconfig         |    1 +
+ fs/cifs/cifsencrypt.c   |   30 +++++++++-
+ fs/cifs/cifsglob.h      |    2 +
+ fs/cifs/smb2glob.h      |    4 +
+ fs/cifs/smb2pdu.c       |   48 ++++++++++++--
+ fs/cifs/smb2proto.h     |    2 +
+ fs/cifs/smb2transport.c |  157 ++++++++++++++++++++++++++++++++++++++++++++--
+ 7 files changed, 229 insertions(+), 15 deletions(-)
+
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index f66cc16..ed5452e 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -9,6 +9,7 @@ config CIFS
+ 	select CRYPTO_ARC4
+ 	select CRYPTO_ECB
+ 	select CRYPTO_DES
++	select CRYPTO_SHA256
+ 	help
+ 	  This is the client VFS module for the Common Internet File System
+ 	  (CIFS) protocol which is the successor to the Server Message Block
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index f6ddd3d..55c1534 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -681,12 +681,17 @@ calc_seckey(struct cifs_ses *ses)
+ void
+ cifs_crypto_shash_release(struct TCP_Server_Info *server)
  {
--	struct super_block *sb = dentry->d_sb;
--	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
--	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 	int rc = -EOPNOTSUPP;
--	int xid;
++	if (server->secmech.hmacsha256)
++		crypto_free_shash(server->secmech.hmacsha256);
++
+ 	if (server->secmech.md5)
+ 		crypto_free_shash(server->secmech.md5);
+ 
+ 	if (server->secmech.hmacmd5)
+ 		crypto_free_shash(server->secmech.hmacmd5);
+ 
++	kfree(server->secmech.sdeschmacsha256);
++
+ 	kfree(server->secmech.sdeschmacmd5);
+ 
+ 	kfree(server->secmech.sdescmd5);
+@@ -711,6 +716,13 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 		goto crypto_allocate_md5_fail;
+ 	}
+ 
++	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
++	if (IS_ERR(server->secmech.hmacsha256)) {
++		cERROR(1, "could not allocate crypto hmacsha256\n");
++		rc = PTR_ERR(server->secmech.hmacsha256);
++		goto crypto_allocate_hmacsha256_fail;
++	}
++
+ 	size = sizeof(struct shash_desc) +
+ 			crypto_shash_descsize(server->secmech.hmacmd5);
+ 	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
+@@ -722,7 +734,6 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
+ 	server->secmech.sdeschmacmd5->shash.flags = 0x0;
+ 
 -
--	xid = GetXid();
+ 	size = sizeof(struct shash_desc) +
+ 			crypto_shash_descsize(server->secmech.md5);
+ 	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
+@@ -734,12 +745,29 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
+ 	server->secmech.sdescmd5->shash.flags = 0x0;
  
- 	buf->f_type = CIFS_MAGIC_NUMBER;
- 
- 	/*
--	 * PATH_MAX may be too long - it would presumably be total path,
--	 * but note that some servers (includinng Samba 3) have a shorter
--	 * maximum path.
--	 *
--	 * Instead could get the real value via SMB_QUERY_FS_ATTRIBUTE_INFO.
--	 */
--	buf->f_namelen = PATH_MAX;
--	buf->f_files = 0;	/* undefined */
--	buf->f_ffree = 0;	/* unlimited */
--
--	/*
- 	 * We could add a second check for a QFS Unix capability bit
- 	 */
- 	if ((tcon->ses->capabilities & CAP_UNIX) &&
-@@ -209,8 +192,37 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
- 	 */
- 	if (rc)
- 		rc = SMBOldQFSInfo(xid, tcon, buf);
-+}
++	size = sizeof(struct shash_desc) +
++			crypto_shash_descsize(server->secmech.hmacsha256);
++	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
++	if (!server->secmech.sdeschmacsha256) {
++		cERROR(1, "%s: Can't alloc hmacsha256\n", __func__);
++		rc = -ENOMEM;
++		goto crypto_allocate_hmacsha256_sdesc_fail;
++	}
++	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
++	server->secmech.sdeschmacsha256->shash.flags = 0x0;
 +
-+static int
-+cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
-+{
-+	struct super_block *sb = dentry->d_sb;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-+	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+	int xid;
-+
-+	xid = GetXid();
-+
-+	/*
-+	 * PATH_MAX may be too long - it would presumably be total path,
-+	 * but note that some servers (includinng Samba 3) have a shorter
-+	 * maximum path.
-+	 *
-+	 * Instead could get the real value via SMB_QUERY_FS_ATTRIBUTE_INFO.
-+	 */
-+	buf->f_namelen = PATH_MAX;
-+	buf->f_files = 0;	/* undefined */
-+	buf->f_ffree = 0;	/* unlimited */
-+
-+#ifdef CONFIG_CIFS_SMB2
-+	if (tcon->ses->server->is_smb2)
-+		smb2_open_queryfs_close(xid, tcon, buf);
-+	else
-+#endif
-+		cifs_queryfs(xid, tcon, buf);
- 
--	FreeXid(xid);
-+	_FreeXid(xid);
  	return 0;
- }
  
++crypto_allocate_hmacsha256_sdesc_fail:
++	kfree(server->secmech.sdescmd5);
++
+ crypto_allocate_md5_sdesc_fail:
+ 	kfree(server->secmech.sdeschmacmd5);
+ 
+ crypto_allocate_hmacmd5_sdesc_fail:
++	crypto_free_shash(server->secmech.hmacsha256);
++
++crypto_allocate_hmacsha256_fail:
+ 	crypto_free_shash(server->secmech.md5);
+ 
+ crypto_allocate_md5_fail:
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index a42a1d8..70a2b30 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -132,8 +132,10 @@ struct sdesc {
+ struct cifs_secmech {
+ 	struct crypto_shash *hmacmd5; /* hmac-md5 hash function */
+ 	struct crypto_shash *md5; /* md5 hash function */
++	struct crypto_shash *hmacsha256; /* hmac-sha256 hash function */
+ 	struct sdesc *sdeschmacmd5;  /* ctxt to generate ntlmv2 hash, CR1 */
+ 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
++	struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
+ };
+ 
+ /* per smb session structure/fields */
 diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index a6b8826..16ed042 100644
+index 460d330..a6b8826 100644
 --- a/fs/cifs/smb2glob.h
 +++ b/fs/cifs/smb2glob.h
-@@ -22,6 +22,8 @@
- #ifndef _SMB2_GLOB_H
- #define _SMB2_GLOB_H
+@@ -47,4 +47,8 @@
+ #define END_OF_CHAIN 4
+ #define RELATED_REQUEST 8
  
-+#define SMB2_MAGIC_NUMBER 0xFE534D42
++#define SMB2_SIGNATURE_SIZE (16)
++#define SMB2_NTLMV2_SESSKEY_SIZE (16)
++#define SMB2_HMACSHA256_SIZE (32)
 +
- /*
-  *****************************************************************
-  * Constants go here
+ #endif	/* _SMB2_GLOB_H */
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 30aba71..91e0bb1 100644
+index 01b188e..30aba71 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2101,3 +2101,103 @@ SMB2_lease_break(const int xid, struct cifs_tcon *tcon, __u8 *lease_key,
- 
- 	return rc;
- }
+@@ -174,9 +174,9 @@ set_tcon_flags:
+ 	/* BB how does SMB2 do case sensitive? */
+ 	/* if (tcon->nocase)
+ 		buffer->Flags |= SMBFLG_CASELESS; */
+-	/* if (tcon->ses && tcon->ses->server &&
++	if (tcon->ses && tcon->ses->server &&
+ 	    (tcon->ses->server->sec_mode & SECMODE_SIGN_REQUIRED))
+-		buffer->Flags |= SMB2_FLAGS_SIGNED; */
++		buffer->Flags |= SMB2_FLAGS_SIGNED;
+ out:
+ 	smb->StructureSize2 = cpu_to_le16(parmsize);
+ 	return;
+@@ -494,6 +494,37 @@ SMB2_negotiate(unsigned int xid, struct cifs_ses *ses)
+ 		rc = -EIO;
+ 		goto neg_exit;
+ 	}
 +
-+static void
-+copy_fs_info_to_kstatfs(struct smb2_fs_full_size_info *pfs_inf,
-+			struct kstatfs *kst)
-+{
-+	kst->f_bsize = le32_to_cpu(pfs_inf->BytesPerSector) *
-+			  le32_to_cpu(pfs_inf->SectorsPerAllocationUnit);
-+	kst->f_blocks = le64_to_cpu(pfs_inf->TotalAllocationUnits);
-+	kst->f_bfree  = le64_to_cpu(pfs_inf->ActualAvailableAllocationUnits);
-+	kst->f_bavail = le64_to_cpu(pfs_inf->CallerAvailableAllocationUnits);
-+	return;
-+}
-+
-+static int build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon,
-+			      int level, int outbuf_len,
-+			      u64 persistent_fid, u64 volatile_fid)
-+{
-+	int rc;
-+	struct smb2_query_info_req *pSMB2;
-+
-+	cFYI(1, "Query FSInfo level %d", level);
-+
-+	if ((tcon->ses == NULL) || (tcon->ses->server == NULL))
-+		return -EIO;
-+
-+	rc = small_smb2_init(SMB2_QUERY_INFO, tcon, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
-+
-+	pSMB2->InfoType = SMB2_O_INFO_FILESYSTEM;
-+	pSMB2->FileInfoClass = level;
-+	pSMB2->PersistentFileId = persistent_fid;
-+	pSMB2->VolatileFileId = volatile_fid;
-+	pSMB2->InputBufferOffset = cpu_to_le16(
-+		sizeof(struct smb2_query_info_req) - 1 /* pad */
-+		- 4 /* RFC1001 len */);
-+	pSMB2->OutputBufferLength = cpu_to_le32(
-+		outbuf_len + sizeof(struct smb2_query_info_rsp) - 1 - 4);
-+
-+	iov->iov_base = (char *)pSMB2;
-+	iov->iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4;
-+	return 0;
-+}
-+
-+int SMB2_QFS_info(const int xid, struct cifs_tcon *tcon,
-+		  u64 persistent_fid, u64 volatile_fid, struct kstatfs *fsdat)
-+{
-+	struct smb2_query_info_rsp *pSMB2r = NULL;
-+	struct kvec iov;
-+	int rc = 0;
-+	int resp_buftype;
-+	int status;
-+	struct cifs_ses *ses = tcon->ses;
-+	struct smb2_fs_full_size_info *psize_inf = NULL;
-+
-+	rc = build_qfs_info_req(&iov, tcon, FS_FULL_SIZE_INFORMATION,
-+				sizeof(struct smb2_fs_full_size_info),
-+				persistent_fid, volatile_fid);
-+	if (rc)
-+		return rc;
-+
-+	rc = smb2_sendrcv2(xid, ses, &iov, 1, &resp_buftype /* ret */, &status,
-+			   CIFS_STD_OP | CIFS_LOG_ERROR);
-+	cFYI(1, "qfsinfo buftype %d rc %d status %d", resp_buftype, rc, status);
-+	if (rc) {
-+		cifs_stats_fail_inc(tcon, SMB2QUERY_INFO);
-+		goto qinf_exit;
++	if ((sec_flags & CIFSSEC_MAY_SIGN) == 0) {
++		/* MUST_SIGN already includes the MAY_SIGN FLAG
++		   so if this is zero it means that signing is disabled */
++		cFYI(1, "Signing disabled");
++		if (ses->server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED) {
++			cERROR(1, "Server requires "
++				   "packet signing to be enabled in "
++				   "/proc/fs/cifs/SecurityFlags.");
++			rc = -EOPNOTSUPP;
++		}
++		ses->server->sec_mode &=
++			~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
++	} else if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) {
++		/* signing required */
++		cFYI(1, "Must sign - sec_flags 0x%x", sec_flags);
++		if ((ses->server->sec_mode & (SMB2_NEGOTIATE_SIGNING_ENABLED |
++				SMB2_NEGOTIATE_SIGNING_REQUIRED)) == 0) {
++			cERROR(1, "signing required but server lacks support");
++			rc = -EOPNOTSUPP;
++		} else
++			ses->server->sec_mode
++				|= SECMODE_SIGN_REQUIRED;
++	} else {
++		/* signing optional ie CIFSSEC_MAY_SIGN */
++		if ((ses->server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED)
++									== 0)
++			ses->server->sec_mode &=
++				~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
 +	}
-+	pSMB2r = (struct smb2_query_info_rsp *)iov.iov_base;
 +
-+	psize_inf = (struct smb2_fs_full_size_info *)(4 /* RFC1001 len */ +
-+		le16_to_cpu(pSMB2r->OutputBufferOffset) + (char *)&pSMB2r->hdr);
-+	rc = validate_buf(le16_to_cpu(pSMB2r->OutputBufferOffset),
-+			  le32_to_cpu(pSMB2r->OutputBufferLength),
-+			  &pSMB2r->hdr, sizeof(struct smb2_fs_full_size_info));
-+	if (!rc)
-+		copy_fs_info_to_kstatfs(psize_inf, fsdat);
+ #ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
+ 	rc = decode_neg_token_init(security_blob, blob_length,
+ 				   &ses->server->sec_type);
+@@ -727,6 +758,8 @@ SMB2_logoff(const int xid, struct cifs_ses *ses)
+ 
+ 	 /* since no tcon, smb2_init can not do this, so do here */
+ 	pSMB2->hdr.SessionId = ses->Suid;
++	if (server->sec_mode & SECMODE_SIGN_REQUIRED)
++		pSMB2->hdr.Flags |= SMB2_FLAGS_SIGNED;
+ 
+ 	rc = smb2_sendrcv_norsp(xid, ses, &pSMB2->hdr,
+ 				CIFS_STD_OP | CIFS_LOG_ERROR);
+@@ -797,7 +830,6 @@ SMB2_tcon(unsigned int xid, struct cifs_ses *ses,
+ 	pSMB2->hdr.smb2_buf_length =
+ 		cpu_to_be32(be32_to_cpu(pSMB2->hdr.smb2_buf_length)
+ 			    - 1 /* pad */ + unc_path_len);
+-
+ 	rc = smb2_sendrcv2(xid, ses, iov, 2, &resp_buftype /* ret */, &status,
+ 			   CIFS_STD_OP | CIFS_LOG_ERROR);
+ 	cFYI(1, "tcon buftype %d rc %d status %d", resp_buftype, rc, status);
+@@ -1556,10 +1588,12 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 	case MID_RESPONSE_RECEIVED:
+ 		credits_received = le16_to_cpu(buf->CreditRequest);
+ 		/* result already set, check signature */
+-		/* if (server->sec_mode &
+-		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+-			if (smb2_verify_signature(mid->resp_buf, server))
+-				cERROR(1, "Unexpected SMB signature"); */
++		if (server->sec_mode &
++		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
++			if (smb2_verify_signature2(rdata->iov, rdata->nr_iov,
++						   server))
++				cERROR(1, "Unexpected SMB signature");
++		}
+ 		/* FIXME: should this be counted toward the initiating task? */
+ 		task_io_account_read(rdata->bytes);
+ 		cifs_stats_bytes_read(tcon, rdata->bytes);
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 4c47505..b3af93c 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -60,6 +60,8 @@ extern __le16 *cifs_build_utf16path_from_dentry(struct dentry *direntry);
+ extern int smb2_check_receive(struct mid_q_entry *mid,
+ 			      struct TCP_Server_Info *server,
+ 			      unsigned int receive_len, bool log_error);
++extern int smb2_verify_signature2(struct kvec *, unsigned int,
++				  struct TCP_Server_Info *);
+ extern int smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
+ 			 struct kvec *vec, int nvec, int *ret_buf_type,
+ 			 int *status, const int flags);
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 05240ab..8837322 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -35,6 +35,149 @@
+ #include "smb2proto.h"
+ #include "cifs_debug.h"
+ #include "smb2status.h"
++#include "smb2glob.h"
 +
-+qinf_exit:
-+	free_rsp_buf(resp_buftype, iov.iov_base);
++static int
++smb2_calc_signature2(const struct kvec *iov, int n_vec,
++		     struct TCP_Server_Info *server)
++{
++	int i, rc;
++	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
++	unsigned char *sigptr = smb2_signature;
++	struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
++
++	memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
++	memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
++
++	rc = crypto_shash_setkey(server->secmech.hmacsha256,
++		server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
++	if (rc) {
++		cERROR(1, "%s: Could not update with response\n", __func__);
++		return rc;
++	}
++
++	rc = crypto_shash_init(&server->secmech.sdeschmacsha256->shash);
++	if (rc) {
++		cERROR(1, "%s: Could not init md5\n", __func__);
++		return rc;
++	}
++
++	for (i = 0; i < n_vec; i++) {
++		if (iov[i].iov_len == 0)
++			continue;
++		if (iov[i].iov_base == NULL) {
++			cERROR(1, "null iovec entry");
++			return -EIO;
++		}
++		/*
++		 * The first entry includes a length field (which does not get
++		 * signed that occupies the first 4 bytes before the header).
++		 */
++		if (i == 0) {
++			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
++				break; /* nothing to sign or corrupt header */
++			rc =
++			crypto_shash_update(
++				&server->secmech.sdeschmacsha256->shash,
++				iov[i].iov_base + 4, iov[i].iov_len - 4);
++		} else {
++			rc =
++			crypto_shash_update(
++				&server->secmech.sdeschmacsha256->shash,
++				iov[i].iov_base, iov[i].iov_len);
++		}
++		if (rc) {
++			cERROR(1, "%s: Could not update with payload\n",
++							__func__);
++			return rc;
++		}
++	}
++
++	rc = crypto_shash_final(&server->secmech.sdeschmacsha256->shash,
++				sigptr);
++	if (rc)
++		cERROR(1, "%s: Could not generate sha256 hash\n", __func__);
++
++	memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
++
 +	return rc;
 +}
 +
-+void
-+smb2_open_queryfs_close(int xid, struct cifs_tcon *tcon, struct kstatfs *buf)
++/* must be called with server->srv_mutex held */
++static int
++smb2_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server)
 +{
-+	int rc;
-+	u64 persist_fid, volatile_fid;
-+	__le16 srch_path = 0; /* Null - open root of share */
-+	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
++	int rc = 0;
++	struct smb2_hdr *smb2_pdu = iov[0].iov_base;
 +
-+	rc = SMB2_open(xid, tcon, &srch_path, &persist_fid, &volatile_fid,
-+			FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0, &oplock);
-+	if (!rc) {
-+		buf->f_type = SMB2_MAGIC_NUMBER;
-+		SMB2_QFS_info(xid, tcon, persist_fid, volatile_fid,
-+					  buf);
-+		SMB2_close(xid, tcon, persist_fid, volatile_fid);
++	if (!(smb2_pdu->Flags & SMB2_FLAGS_SIGNED) ||
++	    server->tcpStatus == CifsNeedNegotiate)
++		return rc;
++
++	if (!server->session_estab) {
++		strncpy(smb2_pdu->Signature, "BSRSPYL", 8);
++		return rc;
 +	}
++
++	rc = smb2_calc_signature2(iov, n_vec, server);
++
++	return rc;
 +}
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 9ec9a29..20aba30 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -672,6 +672,25 @@ struct smb2_lease_ack {
-  *	BB consider moving to a different header
-  */
- 
-+/* File System Information Classes */
-+#define FS_VOLUME_INFORMATION		1 /* Query */
-+#define FS_LABEL_INFORMATION		2 /* Set */
-+#define FS_SIZE_INFORMATION		3 /* Query */
-+#define FS_DEVICE_INFORMATION		4 /* Query */
-+#define FS_ATTRIBUTE_INFORMATION	5 /* Query */
-+#define FS_CONTROL_INFORMATION		6 /* Query, Set */
-+#define FS_FULL_SIZE_INFORMATION	7 /* Query */
-+#define FS_OBJECT_ID_INFORMATION	8 /* Query, Set */
-+#define FS_DRIVER_PATH_INFORMATION	9 /* Query */
 +
-+struct smb2_fs_full_size_info {
-+	__le64 TotalAllocationUnits;
-+	__le64 CallerAvailableAllocationUnits;
-+	__le64 ActualAvailableAllocationUnits;
-+	__le32 SectorsPerAllocationUnit;
-+	__le32 BytesPerSector;
-+} __packed;
++int
++smb2_verify_signature2(struct kvec *iov, unsigned int n_vec,
++		       struct TCP_Server_Info *server)
++{
++	unsigned int rc;
++	char server_response_sig[16];
++	struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
 +
- /* partial list of QUERY INFO levels */
- #define FILE_DIRECTORY_INFORMATION	1
- #define FILE_FULL_DIRECTORY_INFORMATION 2
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index b3af93c..bbdc47e 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -91,6 +91,8 @@ extern int smb2_open_op_close(int xid, struct cifs_tcon *tcon, __le16 *path,
- 			      __u32 desired_access, __u32 create_disposition,
- 			      __u32 file_attributes, __u32 create_options,
- 			      void *data, int command);
-+extern void smb2_open_queryfs_close(int xid, struct cifs_tcon *tcon,
-+				    struct kstatfs *buf);
- extern void smb2_set_ops(struct inode *inode);
- extern int smb2_mkdir(struct inode *inode, struct dentry *direntry, int mode);
- extern int smb2_rmdir(struct inode *inode, struct dentry *direntry);
-@@ -186,5 +188,8 @@ extern int SMB2_oplock_break(const int xid, struct cifs_tcon *tcon,
- 			     const __u8 oplock_level);
- extern int SMB2_lease_break(const int xid, struct cifs_tcon *tcon,
- 			    __u8 *lease_key, const __le32 lease_state);
-+extern int SMB2_QFS_info(const int xid, struct cifs_tcon *tcon,
-+			 u64 persistent_file_id, u64 volatile_file_id,
-+			 struct kstatfs *FSData);
++	if ((smb2_pdu->Command == SMB2_NEGOTIATE) ||
++	    (smb2_pdu->Command == SMB2_OPLOCK_BREAK) ||
++	    (!server->session_estab))
++		return 0;
++
++	/*
++	 * BB what if signatures are supposed to be on for session but
++	 * server does not send one? BB
++	 */
++
++	/* Do not need to verify session setups with signature "BSRSPYL " */
++	if (memcmp(smb2_pdu->Signature, "BSRSPYL ", 8) == 0)
++		cFYI(1, "dummy signature received for smb command 0x%x",
++			smb2_pdu->Command);
++
++	/*
++	 * Save off the origiginal signature so we can modify the smb and check
++	 * our calculated signature against what the server sent.
++	 */
++	memcpy(server_response_sig, smb2_pdu->Signature, SMB2_SIGNATURE_SIZE);
++
++	memset(smb2_pdu->Signature, 0, SMB2_SIGNATURE_SIZE);
++
++	mutex_lock(&server->srv_mutex);
++	rc = smb2_calc_signature2(iov, n_vec, server);
++	mutex_unlock(&server->srv_mutex);
++
++	if (rc)
++		return rc;
++
++	if (memcmp(server_response_sig, smb2_pdu->Signature,
++		   SMB2_SIGNATURE_SIZE))
++		return -EACCES;
++	else
++		return 0;
++}
++
++static int
++smb2_verify_signature(struct smb2_hdr *smb2_pdu, struct TCP_Server_Info *server)
++{
++	struct kvec iov;
++
++	iov.iov_base = (char *)smb2_pdu;
++	iov.iov_len = get_rfc1002_length(smb2_pdu) + 4;
++	return smb2_verify_signature2(&iov, 1, server);
++}
  
- #endif			/* _SMB2PROTO_H */
+ static __u64
+ smb2_get_mid(struct TCP_Server_Info *server)
+@@ -128,12 +271,11 @@ smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 
+ 	dump_smb2(mid->resp_buf, min_t(u32, 80, len));
+ 	/* convert the length into a more usable form */
+-	/* BB - uncomment with SMB2 signing implementation */
+-	/* if ((receive_len > 24) &&
++	if ((receive_len > 24) &&
+ 	    (server->sec_mode & (SECMODE_SIGN_REQUIRED|SECMODE_SIGN_ENABLED))) {
+ 		if (smb2_verify_signature(mid->resp_buf, server))
+ 			cERROR(1, "Unexpected SMB signature");
+-	} */
++	}
+ 
+ 	return map_smb2_to_linux_error(mid->resp_buf, log_error);
+ }
+@@ -191,12 +333,13 @@ smb2_sendrcv2(const unsigned int xid, struct cifs_ses *ses,
+ 		wake_up(&ses->server->request_q);
+ 		return rc;
+ 	}
+-	/* rc = smb2_sign_smb2(iov, n_vec, ses->server);
++
++	rc = smb2_sign_smb2(iov, n_vec, ses->server);
+ 	if (rc) {
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		cifs_small_buf_release(buf);
+ 		goto out;
+-	} */
++	}
+ 
+ 	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(ses->server);
+@@ -343,11 +486,11 @@ smb2_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	list_add_tail(&mid->qhead, &server->pending_mid_q);
+ 	spin_unlock(&GlobalMid_Lock);
+ 
+-	/* rc = smb2_sign_smb2(iov, nvec, server);
++	rc = smb2_sign_smb2(iov, nvec, server);
+ 	if (rc) {
+ 		mutex_unlock(&server->srv_mutex);
+ 		goto out_err;
+-	} */
++	}
+ 
+ 	mid->receive = receive;
+ 	mid->callback = callback;
 -- 
 1.7.1
