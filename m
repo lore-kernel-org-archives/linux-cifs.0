@@ -1,71 +1,56 @@
-From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: eliminate CONFIG_CIFS_WEAK_PW_HASH
-Date: Sat, 21 Jan 2012 12:26:43 -0500
-Message-ID: <1327166803.2908.761.camel@pico.li.ssimo.org>
-References: <1327091153-22391-1-git-send-email-jlayton@redhat.com>
-	 <CAH2r5msOk=4rz_XUGi+GitzVGyJrSo9B1iGXdjz0Bnymzt0NyQ@mail.gmail.com>
-	 <20120120153856.6ded308a@tlielax.poochiereds.net>
-	 <CAH2r5ms6YbZp+erat9RQw7-vMxem6vLWp72Yaf=Z8d4p=4+BBQ@mail.gmail.com>
-	 <1327118615.7985.5.camel@ruth>
-	 <20120121073720.3cf546fc@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 50/50] CIFS: Change Makefile to support CONFIG_CIFS_SMB2
+Date: Mon, 23 Jan 2012 06:36:34 -0500
+Message-ID: <20120123063634.4aa95a1d@tlielax.poochiereds.net>
+References: <1327048511-2342-1-git-send-email-piastry@etersoft.ru>
+	<1327048511-2342-50-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120121073720.3cf546fc-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1327048511-2342-50-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 2012-01-21 at 07:37 -0500, Jeff Layton wrote: 
-> On Sat, 21 Jan 2012 15:03:31 +1100
-> Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Fri, 20 Jan 2012 12:35:11 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/Makefile |    4 ++++
+>  1 files changed, 4 insertions(+), 0 deletions(-)
 > 
-> > On Fri, 2012-01-20 at 14:45 -0600, Steve French wrote:
-> > > My general thinking on this is as follows:
-> > > 
-> > > If the kernel is distributed to all the workstations in an organization
-> > > with this Kconfig option disabled, it makes it harder for individual users
-> > > to make the mistake of enabling lanman (sec=lanman, or the Kconfig
-> > > option) on a public network and thus send weak password hashes
-> > > which could be discovered simply.   Most distros make the choice
-> > > of enabling broader compatibility with old pre-1997 servers but
-> > > it is a very small set of servers who would require lanman support,
-> > > and a large number of potential attackers who could benefit if
-> > > users enable lanman on a public network.  I suspect that there
-> > > are environments where removing code (via Kconfig) is preferred
-> > > to trusting all owners of all workstations running that organizations
-> > > standard linux to never enable lanman at runtime.
-> > > 
-> > > But ... the opinion of security specialists on this would be welcome.
-> > 
-> > We have been though some of this with the kerberos libs, which now allow
-> > (default?) to not even compile with weak crypto.  If the weak crypto is
-> > not compiled in, it can therefore be asserted that the weak crypto
-> > cannot be used, and this makes it easier to comply with security
-> > audits/certification etc.
-> > 
-> > I don't want to make your code more complex than it needs to be, but LM
-> > encryption really, really needs to go away.  If it is not a major
-> > bother, I would like to make it easier for that to happen if possible.
-> > 
-> 
-> The only way for it to go away completely is for all servers that
-> support only that encryption to go away completely. Unfortunately,
-> that's a tall order -- there are still at least some in the field and
-> people need to get at data on them.
+> diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+> index 005d524..0f72f14 100644
+> --- a/fs/cifs/Makefile
+> +++ b/fs/cifs/Makefile
+> @@ -15,3 +15,7 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
+>  cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+>  
+>  cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+> +
+> +cifs-$(CONFIG_CIFS_SMB2) += smb2pdu.o smb2misc.o smb2transport.o maperror.o \
+> +			    smb2inode.o smb2dir.o smb2file.o smb2readdir.o \
+> +			    smb2link.o
 
-Jeff, can you identify them ?
 
-LM only servers means pre Win 95 machines, I'd be curious to know what
-servers are there that really support only LM hashes and not NT hashes.
+I'm a bit concerned about the order of the patches. The idea here
+seems to be: "merge all of the code needed to support SMB2 with it
+disabled, and then flip a switch to turn it all on". Experience has
+shown that that strategy of merging large scale changes tends to be
+problematic.
 
-Simo.
+Bugs that creep in, but because the "switch" is in the last few patches
+we can't bisect to narrow down the cause. What might be better is to
+move the last few patches earlier in the series. That would allow
+someone to mount a SMB2 filesystem, even if some things on it don't
+actually work yet.
+
+If, for instance, an oops creeps in and we're not sure what's causing
+it, we could bisect down to an earlier patch and narrow down the amount
+of changes that we'll need to look at.
 
 -- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
