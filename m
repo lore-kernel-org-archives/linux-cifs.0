@@ -1,70 +1,81 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [patch] cifs: NULL dereference on allocation failure
-Date: Tue, 24 Jan 2012 07:43:49 -0500
-Message-ID: <20120124074349.065af6be@tlielax.poochiereds.net>
-References: <20120124083922.GA29097@elgon.mountain>
-	<20120124074104.095f8755@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v3 00/15] cifscreds: cleanup and overhaul of cifscreds
+ utility
+Date: Tue, 24 Jan 2012 08:33:29 -0500
+Message-ID: <20120124083329.0ebbcbe0@tlielax.poochiereds.net>
+References: <1325873687-11229-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120124074104.095f8755-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1325873687-11229-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 24 Jan 2012 07:41:04 -0500
+On Fri,  6 Jan 2012 13:14:32 -0500
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> On Tue, 24 Jan 2012 11:39:22 +0300
-> Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+> This patchset is a cleanup and overhaul of the cifscreds utility that
+> lives in the cifs-utils tree today. Igor Druzhinin did a wonderful job
+> on this when he did the original code a couple of years ago, but I did a
+> rather poor job at the time of communicating what we actually need for
+> this tool to do. Mea culpa...
 > 
-> > We should just return directly here, the goto causes a NULL dereference.
-> > 
-> > Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> > 
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 986709a..026d646 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -3857,10 +3857,8 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, uid_t fsuid)
-> >  	struct smb_vol *vol_info;
-> >  
-> >  	vol_info = kzalloc(sizeof(*vol_info), GFP_KERNEL);
-> > -	if (vol_info == NULL) {
-> > -		tcon = ERR_PTR(-ENOMEM);
-> > -		goto out;
-> > -	}
-> > +	if (vol_info == NULL)
-> > +		return ERR_PTR(-ENOMEM);
-> >  
-> >  	vol_info->local_nls = cifs_sb->local_nls;
-> >  	vol_info->linux_uid = fsuid;
+> This patch is a third pass at morphing it into a tool that's more like
+> what we need. I believe with this, I'll be able to roll some kernel
+> patches that can use the stashed key for establishing sessions.
 > 
-> Huh? How so? Here's what "out:" looks like in my tree:
+> I've made a few changes since the last set:
 > 
-> ---------------[snip]----------------
-> out:
->         kfree(vol_info);
+> - convert the tool to use the new "secret" key_type that I'm proposing
 > 
->         return tcon;
-> ---------------[snip]----------------
+> - a manpage has been added
 > 
-> vol_info is NULL, so the kfree is safe. This patch shouldn't break
-> anything, but I don't think it's strictly necessary.
+> - the key is now prefixed with "cifs:" instead of "cifscreds:"
+> 
+> The idea here is that we want to be able to allow users to stash their
+> NTLM credentials in the kernel, so that it's possible to establish a
+> session on the fly when that user walks into a multiuser mount.
+> 
+> This set should be considered in conjunction with the kernel patchset
+> that I proposed earlier today:
+> 
+>     [PATCH 0/3] cifs: allow multiuser mounts with authtypes besides krb5
+> 
+> 
+> Jeff Layton (15):
+>   util: move getusername to util.c
+>   cifscreds: add unused attribute to argv parm in cifscreds_clearall
+>   cifscreds: eliminate domain parm from most functions
+>   cifscreds: remove user parameter from create_description
+>   cifscreds: make username part of value instead of description
+>   cifscreds: make usage use "return" and have callers return
+>   cifscreds: move option parsing into main()
+>   cifscreds: make username parameter optional
+>   cifscreds: add --domain flag
+>   cifscreds: loosen allowed characters in domain names
+>   cifscreds: use the session keyring
+>   cifscreds: make cifscreds use the "unreadable" keyring
+>   cifscreds: make key_search use keyctl_search
+>   cifscreds: change prefix on keys to "cifs:" instead of "cifscreds:"
+>   cifscreds: add a manpage
+> 
+>  Makefile.am   |    1 +
+>  cifscreds.1   |  188 ++++++++++++++++++++++++++++++++++
+>  cifscreds.c   |  311 +++++++++++++++++++++++++--------------------------------
+>  cifscreds.pod |   81 +++++++++++++++
+>  mount.cifs.c  |   11 --
+>  util.c        |   13 +++
+>  util.h        |    1 +
+>  7 files changed, 418 insertions(+), 188 deletions(-)
+>  create mode 100644 cifscreds.1
+>  create mode 100644 cifscreds.pod
 > 
 
-Sorry, I was looking at the wrong branch. The patch is correct and
-necessary. With the most recent changes, here's what "out:" looks like:
+I've gone ahead and merged this patchset with some small changes to
+account for the new "login" key type, and some small changes to the new
+manpage.
 
----------------[snip]----------------
-out:
-        kfree(vol_info->username);
-        kfree(vol_info->password);
-        kfree(vol_info);
----------------[snip]----------------
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
