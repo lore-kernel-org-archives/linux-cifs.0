@@ -1,63 +1,57 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifscreds: build it by default
-Date: Tue, 24 Jan 2012 08:34:39 -0500
-Message-ID: <1327412079-5818-1-git-send-email-jlayton@samba.org>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [patch] cifs: NULL dereference on allocation failure
+Date: Tue, 24 Jan 2012 10:37:43 -0600
+Message-ID: <CAH2r5msPnEzmOZNr-PBU3y40uJ+9FeZzbUGVxmMnc2bKeRurew@mail.gmail.com>
+References: <20120124083922.GA29097@elgon.mountain>
 Mime-Version: 1.0
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, samba-technical@lists.samba.org
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20120124083922.GA29097@elgon.mountain>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-...but either error out or disable it if keyutils.h isn't present.
+Merged into cifs-2.6.git
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- configure.ac |   18 +++++++++++++-----
- 1 files changed, 13 insertions(+), 5 deletions(-)
+On Tue, Jan 24, 2012 at 2:39 AM, Dan Carpenter <dan.carpenter@oracle.com> w=
+rote:
+> We should just return directly here, the goto causes a NULL dereference.
+>
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 986709a..026d646 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3857,10 +3857,8 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, =
+uid_t fsuid)
+> =A0 =A0 =A0 =A0struct smb_vol *vol_info;
+>
+> =A0 =A0 =A0 =A0vol_info =3D kzalloc(sizeof(*vol_info), GFP_KERNEL);
+> - =A0 =A0 =A0 if (vol_info =3D=3D NULL) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon =3D ERR_PTR(-ENOMEM);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+> - =A0 =A0 =A0 }
+> + =A0 =A0 =A0 if (vol_info =3D=3D NULL)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return ERR_PTR(-ENOMEM);
+>
+> =A0 =A0 =A0 =A0vol_info->local_nls =3D cifs_sb->local_nls;
+> =A0 =A0 =A0 =A0vol_info->linux_uid =3D fsuid;
 
-diff --git a/configure.ac b/configure.ac
-index 8476f94..ebea5c1 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -18,9 +18,9 @@ AC_ARG_ENABLE(cifsupcall,
- 
- AC_ARG_ENABLE(cifscreds,
- 	[AC_HELP_STRING([--enable-cifscreds],
--			[Create cifscreds utility @<:@default=no@:>@])],
-+			[Create cifscreds utility @<:@default=yes@:>@])],
- 	enable_cifscreds=$enableval,
--	enable_cifscreds="no")
-+	enable_cifscreds="maybe")
- 
- AC_ARG_ENABLE(cifsidmap,
- 	[AC_HELP_STRING([--enable-cifsidmap],
-@@ -152,8 +152,16 @@ fi
- # checks for wbclient.h and libwbclient.so library
- AC_TEST_WBCHL
- 
--if test $enable_cifscreds = "yes"; then
--	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
-+if test $enable_cifscreds != "no"; then
-+	AC_CHECK_HEADERS([keyutils.h], , [
-+
-+				if test $enable_cifscreds = "yes"; then
-+					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
-+				else
-+					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifscreds.])
-+					enable_cifscreds="no"
-+				fi
-+			])
- fi
- 
- 
-@@ -175,7 +183,7 @@ fi
- LIBS=$cu_saved_libs
- 
- AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
--AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
-+AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" != "no"])
- AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
- AM_CONDITIONAL(CONFIG_CIFSACL, [test "$enable_cifsacl" != "no"])
- 
--- 
-1.7.7.5
+
+
+--=20
+Thanks,
+
+Steve
