@@ -1,81 +1,63 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v3 00/15] cifscreds: cleanup and overhaul of cifscreds
- utility
-Date: Tue, 24 Jan 2012 08:33:29 -0500
-Message-ID: <20120124083329.0ebbcbe0@tlielax.poochiereds.net>
-References: <1325873687-11229-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH] cifscreds: build it by default
+Date: Tue, 24 Jan 2012 08:34:39 -0500
+Message-ID: <1327412079-5818-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1325873687-11229-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri,  6 Jan 2012 13:14:32 -0500
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+...but either error out or disable it if keyutils.h isn't present.
 
-> This patchset is a cleanup and overhaul of the cifscreds utility that
-> lives in the cifs-utils tree today. Igor Druzhinin did a wonderful job
-> on this when he did the original code a couple of years ago, but I did a
-> rather poor job at the time of communicating what we actually need for
-> this tool to do. Mea culpa...
-> 
-> This patch is a third pass at morphing it into a tool that's more like
-> what we need. I believe with this, I'll be able to roll some kernel
-> patches that can use the stashed key for establishing sessions.
-> 
-> I've made a few changes since the last set:
-> 
-> - convert the tool to use the new "secret" key_type that I'm proposing
-> 
-> - a manpage has been added
-> 
-> - the key is now prefixed with "cifs:" instead of "cifscreds:"
-> 
-> The idea here is that we want to be able to allow users to stash their
-> NTLM credentials in the kernel, so that it's possible to establish a
-> session on the fly when that user walks into a multiuser mount.
-> 
-> This set should be considered in conjunction with the kernel patchset
-> that I proposed earlier today:
-> 
->     [PATCH 0/3] cifs: allow multiuser mounts with authtypes besides krb5
-> 
-> 
-> Jeff Layton (15):
->   util: move getusername to util.c
->   cifscreds: add unused attribute to argv parm in cifscreds_clearall
->   cifscreds: eliminate domain parm from most functions
->   cifscreds: remove user parameter from create_description
->   cifscreds: make username part of value instead of description
->   cifscreds: make usage use "return" and have callers return
->   cifscreds: move option parsing into main()
->   cifscreds: make username parameter optional
->   cifscreds: add --domain flag
->   cifscreds: loosen allowed characters in domain names
->   cifscreds: use the session keyring
->   cifscreds: make cifscreds use the "unreadable" keyring
->   cifscreds: make key_search use keyctl_search
->   cifscreds: change prefix on keys to "cifs:" instead of "cifscreds:"
->   cifscreds: add a manpage
-> 
->  Makefile.am   |    1 +
->  cifscreds.1   |  188 ++++++++++++++++++++++++++++++++++
->  cifscreds.c   |  311 +++++++++++++++++++++++++--------------------------------
->  cifscreds.pod |   81 +++++++++++++++
->  mount.cifs.c  |   11 --
->  util.c        |   13 +++
->  util.h        |    1 +
->  7 files changed, 418 insertions(+), 188 deletions(-)
->  create mode 100644 cifscreds.1
->  create mode 100644 cifscreds.pod
-> 
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ configure.ac |   18 +++++++++++++-----
+ 1 files changed, 13 insertions(+), 5 deletions(-)
 
-I've gone ahead and merged this patchset with some small changes to
-account for the new "login" key type, and some small changes to the new
-manpage.
-
+diff --git a/configure.ac b/configure.ac
+index 8476f94..ebea5c1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -18,9 +18,9 @@ AC_ARG_ENABLE(cifsupcall,
+ 
+ AC_ARG_ENABLE(cifscreds,
+ 	[AC_HELP_STRING([--enable-cifscreds],
+-			[Create cifscreds utility @<:@default=no@:>@])],
++			[Create cifscreds utility @<:@default=yes@:>@])],
+ 	enable_cifscreds=$enableval,
+-	enable_cifscreds="no")
++	enable_cifscreds="maybe")
+ 
+ AC_ARG_ENABLE(cifsidmap,
+ 	[AC_HELP_STRING([--enable-cifsidmap],
+@@ -152,8 +152,16 @@ fi
+ # checks for wbclient.h and libwbclient.so library
+ AC_TEST_WBCHL
+ 
+-if test $enable_cifscreds = "yes"; then
+-	AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])])
++if test $enable_cifscreds != "no"; then
++	AC_CHECK_HEADERS([keyutils.h], , [
++
++				if test $enable_cifscreds = "yes"; then
++					AC_MSG_ERROR([keyutils.h not found, consider installing keyutils-libs-devel.])
++				else
++					AC_MSG_WARN([keyutils.h not found, consider installing keyutils-libs-devel. Disabling cifscreds.])
++					enable_cifscreds="no"
++				fi
++			])
+ fi
+ 
+ 
+@@ -175,7 +183,7 @@ fi
+ LIBS=$cu_saved_libs
+ 
+ AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+-AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" = "yes"])
++AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSACL, [test "$enable_cifsacl" != "no"])
+ 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.7.5
