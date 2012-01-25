@@ -1,92 +1,59 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifscreds: build it by default
-Date: Tue, 24 Jan 2012 12:01:45 -0600
-Message-ID: <CADT32e+kb7sQg0bdyP1w2NeNT_qzg3BA4DPgLJ_f2aTRNk5wPw@mail.gmail.com>
-References: <1327412079-5818-1-git-send-email-jlayton@samba.org>
+From: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix error handling when cifscreds key payload is
+ an error
+Date: Wed, 25 Jan 2012 10:32:57 +0300
+Message-ID: <20120125073257.GV3356@mwanda>
+References: <1327064677-15896-1-git-send-email-jlayton@redhat.com>
+ <CAH2r5mtTtYzj5MJXc5pu3L+cKO1XKrrcx6=gr8W_874sYPzfnw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4PR/+zdSfVlxyWed"
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1327412079-5818-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAH2r5mtTtYzj5MJXc5pu3L+cKO1XKrrcx6=gr8W_874sYPzfnw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jan 24, 2012 at 7:34 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> ...but either error out or disable it if keyutils.h isn't present.
->
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
-> =A0configure.ac | =A0 18 +++++++++++++-----
-> =A01 files changed, 13 insertions(+), 5 deletions(-)
->
-> diff --git a/configure.ac b/configure.ac
-> index 8476f94..ebea5c1 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -18,9 +18,9 @@ AC_ARG_ENABLE(cifsupcall,
->
-> =A0AC_ARG_ENABLE(cifscreds,
-> =A0 =A0 =A0 =A0[AC_HELP_STRING([--enable-cifscreds],
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 [Create cifscreds utili=
-ty @<:@default=3Dno@:>@])],
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 [Create cifscreds utili=
-ty @<:@default=3Dyes@:>@])],
-> =A0 =A0 =A0 =A0enable_cifscreds=3D$enableval,
-> - =A0 =A0 =A0 enable_cifscreds=3D"no")
-> + =A0 =A0 =A0 enable_cifscreds=3D"maybe")
->
-> =A0AC_ARG_ENABLE(cifsidmap,
-> =A0 =A0 =A0 =A0[AC_HELP_STRING([--enable-cifsidmap],
-> @@ -152,8 +152,16 @@ fi
-> =A0# checks for wbclient.h and libwbclient.so library
-> =A0AC_TEST_WBCHL
->
-> -if test $enable_cifscreds =3D "yes"; then
-> - =A0 =A0 =A0 AC_CHECK_HEADERS([keyutils.h], , [AC_MSG_ERROR([keyutil=
-s.h not found, consider installing keyutils-libs-devel.])])
-> +if test $enable_cifscreds !=3D "no"; then
-> + =A0 =A0 =A0 AC_CHECK_HEADERS([keyutils.h], , [
-> +
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if test=
- $enable_cifscreds =3D "yes"; then
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 AC_MSG_ERROR([keyutils.h not found, consider installing keyuti=
-ls-libs-devel.])
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 else
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 AC_MSG_WARN([keyutils.h not found, consider installing keyutil=
-s-libs-devel. Disabling cifscreds.])
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 enable_cifscreds=3D"no"
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fi
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 ])
-> =A0fi
->
->
-> @@ -175,7 +183,7 @@ fi
-> =A0LIBS=3D$cu_saved_libs
->
-> =A0AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" !=3D =
-"no"])
-> -AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" =3D "yes"=
-])
-> +AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" !=3D "no"=
-])
-> =A0AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" !=3D "n=
-o"])
-> =A0AM_CONDITIONAL(CONFIG_CIFSACL, [test "$enable_cifsacl" !=3D "no"])
->
-> --
-> 1.7.7.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 
-Looks correct.
+--4PR/+zdSfVlxyWed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Fri, Jan 20, 2012 at 01:44:07PM -0600, Steve French wrote:
+> Looks reasonable.  Was this found by static code analysis?
+>=20
+
+I saw this in reading the code for something else.  But it should be
+a static checker thing, definitely.  I'm writing a check for that
+now.
+
+regards,
+dan carpenter
+
+
+--4PR/+zdSfVlxyWed
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJPH7AoAAoJEOnZkXI/YHqRYWwQAKO4YzJ5IlYA7fkQlscjH15M
+I/07eZG/Pwf8tner4L9YW3Pe0f+iKjZG9XgwUzqyYeSgUrNh8d+8OvZ1NNcrR3C+
+ywfpc/AQOhMba9NzNWX61r38cwRXJk+DGFHN2w3tbHpmoXszIVomMUNFTzXJQ1S5
+Pzu/7b5vbZ0ERFbdpp+pUWcXTB98eBliU6WE8RJHMpwbM1ICrcCo9wjbn84nruNu
+y8ySJJGoX8pdYXfV9rcetNLsiKEHiiU69QOZp5bx9s5XMt8dh/iaOrJYslWyWu0/
+NgFmbznNqUz4zuYkFR/2+k/uhLdC0yF0Mxb5qiVItQkZeVf2ZCMekdOZopMQPq5O
+3xaoAhGu+Ne8oDgn85bS1n5etY1L352RN6SLz85SMLvHoCDRsQgGBzlZjUgg2Twm
+CD1pMlV9e72WbwSaLb5SkCQrWU9AunCkPNTn+dUJRmaHAnMZrkCjP3te61aXJMH9
+4/FPQf7N33zsEa0Z811G6TLkJaLF7mHnJD1QguWWHUAbhmcT561FuK9VhuLOOED/
+HijzKJR/68l6K6iweGIxJ1J47HPPUGHPGZFunkKavyHsIU0o18eR+tP1dx/8i2ni
+P9vGZ5/qZM9LrCET8VG94Gt8LrdPzrAMUDEIIg66vAb8tckVGJrNy9+23xFA11EG
+V8reo3NVbAI+8i5phQX7
+=7LQE
+-----END PGP SIGNATURE-----
+
+--4PR/+zdSfVlxyWed--
