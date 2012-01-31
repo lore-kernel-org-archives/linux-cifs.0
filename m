@@ -1,13 +1,13 @@
 From: Steve French <smfrench@gmail.com>
 Subject: Re: [patch] cifs: check offset in decode_ntlmssp_challenge()
-Date: Tue, 31 Jan 2012 07:42:21 -0600
-Message-ID: <CAH2r5msBVC85CXQy_2sUtBKoaj1=5bBexy_WZ7P58+S8EjrW-A@mail.gmail.com>
+Date: Tue, 31 Jan 2012 07:43:10 -0600
+Message-ID: <CAH2r5ms5mt9=pzOhKKpJ16wqnu_A-aRy2oJm4HVCrwUH1aBfvA@mail.gmail.com>
 References: <20120131085201.GB22039@elgon.mountain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, samba-technical@lists.samba.org
-To: Dan Carpenter <dan.carpenter@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-cifs@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	samba-technical@lists.samba.org
 Return-path: <samba-technical-bounces@lists.samba.org>
 In-Reply-To: <20120131085201.GB22039@elgon.mountain>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
@@ -23,8 +23,9 @@ List-Id: linux-cifs.vger.kernel.org
 
 merged to cifs-2.6.git
 
-On Tue, Jan 31, 2012 at 2:52 AM, Dan Carpenter <dan.carpenter@oracle.com>wrote:
-
+On Tue, Jan 31, 2012 at 2:52 AM, Dan Carpenter <dan.carpenter@oracle.com> w=
+rote:
+>
 > We should check that we're not copying memory from beyond the end of the
 > blob.
 >
@@ -34,24 +35,27 @@ On Tue, Jan 31, 2012 at 2:52 AM, Dan Carpenter <dan.carpenter@oracle.com>wrote:
 > index d85efad..eb76741 100644
 > --- a/fs/cifs/sess.c
 > +++ b/fs/cifs/sess.c
-> @@ -395,6 +395,10 @@ static int decode_ntlmssp_challenge(char *bcc_ptr,
-> int blob_len,
->        ses->ntlmssp->server_flags = le32_to_cpu(pblob->NegotiateFlags);
->        tioffset = le32_to_cpu(pblob->TargetInfoArray.BufferOffset);
->        tilen = le16_to_cpu(pblob->TargetInfoArray.Length);
-> +       if (tioffset > blob_len || tioffset + tilen > blob_len) {
-> +               cERROR(1, "tioffset + tilen too high %u + %u", tioffset,
-> tilen);
-> +               return -EINVAL;
-> +       }
->        if (tilen) {
->                ses->auth_key.response = kmalloc(tilen, GFP_KERNEL);
->                if (!ses->auth_key.response) {
->
+> @@ -395,6 +395,10 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, i=
+nt blob_len,
+> =A0 =A0 =A0 =A0ses->ntlmssp->server_flags =3D le32_to_cpu(pblob->Negotiat=
+eFlags);
+> =A0 =A0 =A0 =A0tioffset =3D le32_to_cpu(pblob->TargetInfoArray.BufferOffs=
+et);
+> =A0 =A0 =A0 =A0tilen =3D le16_to_cpu(pblob->TargetInfoArray.Length);
+> + =A0 =A0 =A0 if (tioffset > blob_len || tioffset + tilen > blob_len) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "tioffset + tilen too high %u + %=
+u", tioffset, tilen);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
+> + =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0if (tilen) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ses->auth_key.response =3D kmalloc(tilen, =
+GFP_KERNEL);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!ses->auth_key.response) {
 
 
 
--- 
+
+--
 Thanks,
 
 Steve
