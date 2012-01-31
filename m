@@ -1,61 +1,104 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [patch] cifs: check offset in decode_ntlmssp_challenge()
-Date: Tue, 31 Jan 2012 07:43:10 -0600
-Message-ID: <CAH2r5ms5mt9=pzOhKKpJ16wqnu_A-aRy2oJm4HVCrwUH1aBfvA@mail.gmail.com>
-References: <20120131085201.GB22039@elgon.mountain>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH -next] cifs: fix printk format warnings
+Date: Tue, 31 Jan 2012 07:43:37 -0600
+Message-ID: <CAH2r5mu2VXWkP49RzPuedN9hY6G-WcbyYB3WMJSf2NkRe2VO7Q@mail.gmail.com>
+References: <20120130144102.8d202c7d8eccd503a86b3053@canb.auug.org.au>
+	<4F2764E9.4010506@xenotime.net>
+	<20120131054231.66669e41@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Cc: linux-cifs@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	samba-technical@lists.samba.org
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20120131085201.GB22039@elgon.mountain>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Randy Dunlap <rdunlap-/UHa2rfvQTnk1uMJSBkQmQ@public.gmane.org>,
+	Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>,
+	linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120131054231.66669e41-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-merged to cifs-2.6.git
+Merged to cifs-2.6.git
 
-On Tue, Jan 31, 2012 at 2:52 AM, Dan Carpenter <dan.carpenter@oracle.com> w=
-rote:
+On Tue, Jan 31, 2012 at 4:42 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> On Mon, 30 Jan 2012 19:50:01 -0800
+> Randy Dunlap <rdunlap-/UHa2rfvQTnk1uMJSBkQmQ@public.gmane.org> wrote:
 >
-> We should check that we're not copying memory from beyond the end of the
-> blob.
+>> From: Randy Dunlap <rdunlap-/UHa2rfvQTnk1uMJSBkQmQ@public.gmane.org>
+>>
+>> Fix printk format warnings for ssize_t variables:
+>>
+>> fs/cifs/connect.c:2145:3: warning: format '%ld' expects type 'long i=
+nt', but argument 3 has type 'ssize_t'
+>> fs/cifs/connect.c:2152:3: warning: format '%ld' expects type 'long i=
+nt', but argument 3 has type 'ssize_t'
+>> fs/cifs/connect.c:2160:3: warning: format '%ld' expects type 'long i=
+nt', but argument 3 has type 'ssize_t'
+>> fs/cifs/connect.c:2170:3: warning: format '%ld' expects type 'long i=
+nt', but argument 3 has type 'ssize_t'
+>>
+>> Signed-off-by: Randy Dunlap <rdunlap-/UHa2rfvQTnk1uMJSBkQmQ@public.gmane.org>
+>> Cc: =A0 Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>> Cc: =A0 linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> ---
+>> =A0fs/cifs/connect.c | =A0 =A08 ++++----
+>> =A01 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> --- linux-next-20120130.orig/fs/cifs/connect.c
+>> +++ linux-next-20120130/fs/cifs/connect.c
+>> @@ -2142,14 +2142,14 @@ cifs_set_cifscreds(struct smb_vol *vol,
+>>
+>> =A0 =A0 =A0 len =3D delim - payload;
+>> =A0 =A0 =A0 if (len > MAX_USERNAME_SIZE || len <=3D 0) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Bad value from username search (l=
+en=3D%ld)", len);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Bad value from username search (l=
+en=3D%zd)", len);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EINVAL;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out_key_put;
+>> =A0 =A0 =A0 }
+>>
+>> =A0 =A0 =A0 vol->username =3D kstrndup(payload, len, GFP_KERNEL);
+>> =A0 =A0 =A0 if (!vol->username) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Unable to allocate %ld bytes for =
+username", len);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Unable to allocate %zd bytes for =
+username", len);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out_key_put;
+>> =A0 =A0 =A0 }
+>> @@ -2157,7 +2157,7 @@ cifs_set_cifscreds(struct smb_vol *vol,
+>>
+>> =A0 =A0 =A0 len =3D key->datalen - (len + 1);
+>> =A0 =A0 =A0 if (len > MAX_PASSWORD_SIZE || len <=3D 0) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Bad len for password search (len=3D=
+%ld)", len);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Bad len for password search (len=3D=
+%zd)", len);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -EINVAL;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(vol->username);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->username =3D NULL;
+>> @@ -2167,7 +2167,7 @@ cifs_set_cifscreds(struct smb_vol *vol,
+>> =A0 =A0 =A0 ++delim;
+>> =A0 =A0 =A0 vol->password =3D kstrndup(delim, len, GFP_KERNEL);
+>> =A0 =A0 =A0 if (!vol->password) {
+>> - =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Unable to allocate %ld bytes for =
+password", len);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "Unable to allocate %zd bytes for =
+password", len);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D -ENOMEM;
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 kfree(vol->username);
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->username =3D NULL;
 >
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Looks correct.
 >
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index d85efad..eb76741 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -395,6 +395,10 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, i=
-nt blob_len,
-> =A0 =A0 =A0 =A0ses->ntlmssp->server_flags =3D le32_to_cpu(pblob->Negotiat=
-eFlags);
-> =A0 =A0 =A0 =A0tioffset =3D le32_to_cpu(pblob->TargetInfoArray.BufferOffs=
-et);
-> =A0 =A0 =A0 =A0tilen =3D le16_to_cpu(pblob->TargetInfoArray.Length);
-> + =A0 =A0 =A0 if (tioffset > blob_len || tioffset + tilen > blob_len) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "tioffset + tilen too high %u + %=
-u", tioffset, tilen);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EINVAL;
-> + =A0 =A0 =A0 }
-> =A0 =A0 =A0 =A0if (tilen) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ses->auth_key.response =3D kmalloc(tilen, =
-GFP_KERNEL);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!ses->auth_key.response) {
+> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
 
 
-
---
+--=20
 Thanks,
 
 Steve
