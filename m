@@ -1,20 +1,23 @@
-From: Chris Clayton <chris2553-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: 3.3.0-rc2+: oops went mounting via cifs
-Date: Thu, 2 Feb 2012 16:21:16 +0000
-Message-ID: <201202021621.16500.chris2553@googlemail.com>
-References: <CAGGLNVgbJSRsb5S_3ZF64LzE8yhTWHHQ_xvPoEiKdkdMZAakZQ@mail.gmail.com> <CADT32eJGV2LwTaqB7eUCpBv-hyUxtFdPsk7N_2g92yG4KoVruw@mail.gmail.com>
+Date: Thu, 2 Feb 2012 13:42:16 -0500
+Message-ID: <20120202134216.5cdbae23@dantu.rdu.redhat.com>
+References: <CAGGLNVgbJSRsb5S_3ZF64LzE8yhTWHHQ_xvPoEiKdkdMZAakZQ@mail.gmail.com>
+	<CADT32eJGV2LwTaqB7eUCpBv-hyUxtFdPsk7N_2g92yG4KoVruw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+Cc: Chris Clayton <chris2553-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <CADT32eJGV2LwTaqB7eUCpBv-hyUxtFdPsk7N_2g92yG4KoVruw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thursday 02 February 2012 15:38:47 Shirish Pargaonkar wrote:
+On Thu, 2 Feb 2012 09:38:47 -0600
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+
 > On Thu, Feb 2, 2012 at 9:20 AM, Chris Clayton <chris2553@googlemail.c=
 om> wrote:
 > > Hi.
@@ -96,15 +99,10 @@ rd
 > > --
 > > The more I see, the more I know. The more I know, the less I
 > > understand. Changing Man - Paul Weller
->
+>=20
 > Does this attached patch fix the oops?
 
-Yes, that fixes it. Thanks for the speedy fix - very impressive!
+Thanks -- probably fallout from 04febabc. Looks like I missed a spot.
+Patch looks correct to me:
 
-Tested-by: Chris Clayton  <chris2553-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
-
-
-
---=20
-The more I see, the more I know. The more I know, the less I understand=
-=2E Changing Man - Paul Weller
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
