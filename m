@@ -1,83 +1,111 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] CIFS: Fix NULL pointer dereference in
-	cifs_construct_tcon()
-Date: Tue, 7 Feb 2012 22:26:42 -0600
-Message-ID: <CAH2r5mud1Y1dWDzr6zn2aD5y0HtPhn_CKP-ZQVR-QNQDWxpqOg@mail.gmail.com>
-References: <alpine.LNX.2.00.1202050030520.30244@swampdragon.chaosbits.net>
-	<20120205062204.763bdab6@tlielax.poochiereds.net>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 1/2] Define ENOAUTHSERVICE to indicate "Authentication service
+ unavailable"
+Date: Wed, 08 Feb 2012 12:29:05 +0000
+Message-ID: <20120208122905.8902.65762.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	Jesper Juhl <jj@chaosbits.net>, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-To: Jeff Layton <jlayton@redhat.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20120205062204.763bdab6@tlielax.poochiereds.net>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org
+To: jmorris-gx6/JNMH7DfYtjvyW6yDsg@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-It should be merged now.
+As the kernel has or will have filesystems (and possibly other services) that
+want to obtain authentication tokens and/or encryption data on demand (via
+GSSAPI for example), it would seem useful to provide an additional error code
+to indicate a problem with the lookup, rather than overloading some other error
+code.
 
-In addition, jeff's more recent 3 patches are now in cifs-2.6.git
+We already have EKEYREJECTED, EKEYREVOKED and EKEYEXPIRED to indicate problems
+with a token that we already have, but what if the authentication server just
+isn't available?
 
-On Sun, Feb 5, 2012 at 5:22 AM, Jeff Layton <jlayton@redhat.com> wrote:
->
-> On Sun, 5 Feb 2012 00:35:19 +0100 (CET)
-> Jesper Juhl <jj@chaosbits.net> wrote:
->
-> > If the call to kcalloc() fails and returns NULL we'll dereference a
-> > NULL 'vol_info' after we jump to the 'out:' label.
-> >
-> > Signed-off-by: Jesper Juhl <jj@chaosbits.net>
-> > ---
-> > =A0fs/cifs/connect.c | =A0 =A04 ++--
-> > =A01 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 986709a..bd67b7c 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -3859,7 +3859,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb,=
- uid_t fsuid)
-> > =A0 =A0 =A0 vol_info =3D kzalloc(sizeof(*vol_info), GFP_KERNEL);
-> > =A0 =A0 =A0 if (vol_info =3D=3D NULL) {
-> > =A0 =A0 =A0 =A0 =A0 =A0 =A0 tcon =3D ERR_PTR(-ENOMEM);
-> > - =A0 =A0 =A0 =A0 =A0 =A0 goto out;
-> > + =A0 =A0 =A0 =A0 =A0 =A0 goto out2;
-> > =A0 =A0 =A0 }
-> >
-> > =A0 =A0 =A0 vol_info->local_nls =3D cifs_sb->local_nls;
-> > @@ -3901,7 +3901,7 @@ out:
-> > =A0 =A0 =A0 kfree(vol_info->username);
-> > =A0 =A0 =A0 kfree(vol_info->password);
-> > =A0 =A0 =A0 kfree(vol_info);
-> > -
-> > +out2:
-> > =A0 =A0 =A0 return tcon;
-> > =A0}
-> >
->
-> Thanks. Dan Carpenter already sent a patch a couple of weeks ago to fix
-> this. Steve has it in his tree, but hasn't pushed it to Linus yet.
->
-> Steve, is there a reason you're waiting?
->
-> --
-> Jeff Layton <jlayton@redhat.com>
+Define ENOAUTHSERVICE to indicate "Authentication service unavailable".  This
+can be used to indicate, for example, that an attempt was made by request_key()
+to retrieve a key, but the authentication server (e.g. a KDC) it is supposed to
+contact didn't answer or that it couldn't determine the location of a suitable
+server.
 
+One way this can be used is that the user of a network filesystem can get a TGT
+from the KDC and stash it in their session keyring, then the filesystem can
+attempt to automatically get a ticket for accessing the filesystem - but if the
+server is uncontactable then the ticket can be negatively instantiated with
+KEYCTL_REJECT, giving the error to be handed to future requests as
+ENOAUTHSERVICE and a small timeout so that the key will expire from the cache
+and allow a retry after a short while to prevent thrashing.
 
+Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
 
+ arch/alpha/include/asm/errno.h  |    1 +
+ arch/mips/include/asm/errno.h   |    1 +
+ arch/parisc/include/asm/errno.h |    1 +
+ arch/sparc/include/asm/errno.h  |    1 +
+ include/asm-generic/errno.h     |    1 +
+ 5 files changed, 5 insertions(+), 0 deletions(-)
 
---
-Thanks,
-
-Steve
+diff --git a/arch/alpha/include/asm/errno.h b/arch/alpha/include/asm/errno.h
+index e5f29ca..5edc21e 100644
+--- a/arch/alpha/include/asm/errno.h
++++ b/arch/alpha/include/asm/errno.h
+@@ -121,6 +121,7 @@
+ #define	ENOTRECOVERABLE	137	/* State not recoverable */
+ 
+ #define	ERFKILL		138	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	139	/* Authentication service not available */
+ 
+ #define EHWPOISON	139	/* Memory page has hardware error */
+ 
+diff --git a/arch/mips/include/asm/errno.h b/arch/mips/include/asm/errno.h
+index 6dcd358..9e0b83f 100644
+--- a/arch/mips/include/asm/errno.h
++++ b/arch/mips/include/asm/errno.h
+@@ -120,6 +120,7 @@
+ #define	ENOTRECOVERABLE	166	/* State not recoverable */
+ 
+ #define	ERFKILL		167	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	168	/* Authentication service not available */
+ 
+ #define EHWPOISON	168	/* Memory page has hardware error */
+ 
+diff --git a/arch/parisc/include/asm/errno.h b/arch/parisc/include/asm/errno.h
+index 135ad60..c4598b6 100644
+--- a/arch/parisc/include/asm/errno.h
++++ b/arch/parisc/include/asm/errno.h
+@@ -121,6 +121,7 @@
+ #define ENOTRECOVERABLE	255	/* State not recoverable */
+ 
+ #define	ERFKILL		256	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	257	/* Authentication service not available */
+ 
+ #define EHWPOISON	257	/* Memory page has hardware error */
+ 
+diff --git a/arch/sparc/include/asm/errno.h b/arch/sparc/include/asm/errno.h
+index c351aba..ab4f9f5 100644
+--- a/arch/sparc/include/asm/errno.h
++++ b/arch/sparc/include/asm/errno.h
+@@ -111,6 +111,7 @@
+ #define	ENOTRECOVERABLE	133	/* State not recoverable */
+ 
+ #define	ERFKILL		134	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	135	/* Authentication service not available */
+ 
+ #define EHWPOISON	135	/* Memory page has hardware error */
+ 
+diff --git a/include/asm-generic/errno.h b/include/asm-generic/errno.h
+index a1331ce..52325ca 100644
+--- a/include/asm-generic/errno.h
++++ b/include/asm-generic/errno.h
+@@ -107,6 +107,7 @@
+ #define	ENOTRECOVERABLE	131	/* State not recoverable */
+ 
+ #define ERFKILL		132	/* Operation not possible due to RF-kill */
++#define	ENOAUTHSERVICE	133	/* Authentication service not available */
+ 
+ #define EHWPOISON	133	/* Memory page has hardware error */
+ 
