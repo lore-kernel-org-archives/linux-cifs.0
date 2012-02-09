@@ -1,21 +1,43 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [MAC Lion] smbclient "Open AndX Request->STATUS_NOT_SUPPORTED"
-Date: Thu, 9 Feb 2012 00:07:08 -0600
-Message-ID: <CADT32eLbq_oE4Eehg3qo+bwmSS2K4ZHYVb4pfHwKF=YBgNssDw@mail.gmail.com>
-References: <D9F023C0-2563-4670-87C3-85CABDF8EA35@multitech.com>
-	<E1Rtaas-00H0p7-IF@intern.SerNet.DE>
-	<EE8750E0-F138-438E-8198-1F4B5BE5CFFF@apple.com>
-	<A6E1B1277FAD3B48A3C0F38B9C12FCE182AB7D@SVMVVWPEXCH01.dc.multitech.prv>
+From: "Bob Balsover" <cifs-MPfZBXey4klWk0Htik3J/w@public.gmane.org>
+Subject: [MAC Lion] smbclient "Open AndX Request->STATUS_NOT_SUPPORTED"
+Date: Wed, 8 Feb 2012 22:59:13 -0800
+Message-ID: <000301cce6f8$551aa830$ff4ff890$@com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: George K Colley <gcolley-2kanFRK1NckAvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Darrik Spaude <dspaude-BGUGTLuWYFm1Z/+hSey0Gg@public.gmane.org>
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <A6E1B1277FAD3B48A3C0F38B9C12FCE182AB7D-HHW3LFhzwhv3GK0kuUd8OGQCH64ISku/NA752UdN0/I@public.gmane.org>
+Content-Language: en-us
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+We have also been seeing this problem, it appears it might be in Apple'=
+s
+flawed authentication the new SMBX or whatever they call it. We are onl=
+y
+able to mount and write to a SMB share on an Lion 10.7.3 machine using
+guest, any attempt with a normal user account fails every time. We have=
+ been
+using the same parameters as you have
+'pass=3Dxxx,user=3Dyyy,nounix,noserverino,sec=3Dntlmssp'.  Darrik, I wi=
+ll leave
+uploading the trace to you as I don't think that I can to it tomorrow. =
+ If
+you are having trouble mounting it as guest verify that you have the pr=
+oper
+permissions on the share.
+
+-Bob
+
+-----Original Message-----
+=46rom: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+[mailto:linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Shirish Pargaonk=
+ar
+Sent: Wednesday, February 08, 2012 10:07 PM
+To: Darrik Spaude
+Cc: George K Colley; linux-cifs
+Subject: Re: [MAC Lion] smbclient "Open AndX Request->STATUS_NOT_SUPPOR=
+TED"
 
 On Wed, Feb 8, 2012 at 5:28 PM, Darrik Spaude <dspaude-BGUGTLuWYFm1Z/+hSey0Gg@public.gmane.org> w=
 rote:
@@ -56,3 +78,8 @@ would be helpful.
 Regards,
 
 Shirish
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" i=
+n
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
