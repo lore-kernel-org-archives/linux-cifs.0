@@ -1,56 +1,58 @@
-From: Valdis.Kletnieks-PjAqaU27lzQ@public.gmane.org
-Subject: Re: [PATCH 1/2] Define ENOAUTHSERVICE to indicate "Authentication service unavailable"
-Date: Wed, 08 Feb 2012 18:53:50 -0500
-Message-ID: <22934.1328745230@turing-police.cc.vt.edu>
-References: <20120208122905.8902.65762.stgit@warthog.procyon.org.uk>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [MAC Lion] smbclient "Open AndX Request->STATUS_NOT_SUPPORTED"
+Date: Thu, 9 Feb 2012 00:07:08 -0600
+Message-ID: <CADT32eLbq_oE4Eehg3qo+bwmSS2K4ZHYVb4pfHwKF=YBgNssDw@mail.gmail.com>
+References: <D9F023C0-2563-4670-87C3-85CABDF8EA35@multitech.com>
+	<E1Rtaas-00H0p7-IF@intern.SerNet.DE>
+	<EE8750E0-F138-438E-8198-1F4B5BE5CFFF@apple.com>
+	<A6E1B1277FAD3B48A3C0F38B9C12FCE182AB7D@SVMVVWPEXCH01.dc.multitech.prv>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1328745230_2846P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Cc: jmorris-gx6/JNMH7DfYtjvyW6yDsg@public.gmane.org, keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-security-module-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: Your message of "Wed, 08 Feb 2012 12:29:05 GMT."
-             <20120208122905.8902.65762.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: George K Colley <gcolley-2kanFRK1NckAvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Darrik Spaude <dspaude-BGUGTLuWYFm1Z/+hSey0Gg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <A6E1B1277FAD3B48A3C0F38B9C12FCE182AB7D-HHW3LFhzwhv3GK0kuUd8OGQCH64ISku/NA752UdN0/I@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
---==_Exmh_1328745230_2846P
-Content-Type: text/plain; charset=us-ascii
-
-On Wed, 08 Feb 2012 12:29:05 GMT, David Howells said:
-
-> +#define	ENOAUTHSERVICE	139	/* Authentication service not available */
+On Wed, Feb 8, 2012 at 5:28 PM, Darrik Spaude <dspaude-BGUGTLuWYFm1Z/+hSey0Gg@public.gmane.org> w=
+rote:
+>> You should be using cifs to connect to Lion.
 >
->  #define EHWPOISON	139	/* Memory page has hardware error */
+> George,
+>
+> Is there a specific cifs version and list of options to use? It seems
+> that there is some minimum cifs version before this problem is resolv=
+ed.
+> We have tried the following and both of them fail:
+>
+> # mount.cifs -V =A0 (Updated Embedded Server, kernel 2.6.32.28)
+> mount.cifs version: 1.14-3.5.6
+>
+> # mount.cifs -V =A0 (Ubuntu 10.04 LTS, kernel 2.6.32-38)
+> mount.cifs version: 1.12-3.4.7
+>
+>
+> The command options we have tried (based on lots of searching) are
+> 'nounix,noserverino,sec=3Dntlmssp'.
+>
+> The command is then:
+> mount.cifs //192.168.1.2/Shared mntpoint -o
+> 'guest,nounix,noserverino,sec=3Dntlmssp'
+>
+> Ubuntu gives a different error (-126) with the sec=3Dntlmssp. The emb=
+edded
+> server just gives error -22.
+>
+> Any help is appreciated,
+> Darrik
+>
 
-Was this an intentional overload of 139 (and so on for other archs)?
-Just checking - I'm sure if it goes in like this, we'll see a patch to "fix" the
-collision for 3.16.0 or so... ;)
+I think this concerns linux cifs vfs client.  If so, a wireshark trace
+would be helpful.
 
---==_Exmh_1328745230_2846P
-Content-Type: application/pgp-signature
+Regards,
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iQIVAwUBTzMLDgdmEQWDXROgAQLo8w/9GSAkuhd+TKRP7GBY/vtnzb8/kyvEnJ5M
-kXAsV/k12ZKsyRo+qat0scVkIIVR+siFVQMBMAOE4r4Y14CGYMInhrpsNLa0vhqK
-GdS5+GNIAbHj8PBJSYxxHffiQisePTTbAppzW68to/jRe3eYcWQdlJgcjdOMYSKJ
-TxLJi7R36FNZAMW5C6VjrEZcWym+LOizeSuX0a4hGMkWbo1D6YO/bsqI0703fhh3
-+q3n6KLZahVNZQ4zNDtIuznUgm/SEWnz5kyZF+Lj0pCxCC/00Qtl0d47YGQ8Bfcr
-6v+v2loI96oHJypLbPOoovwqpPV5YUoiaLS+aKFyEcMb+Soa8kSpPSkb+lkQZ/eK
-FTkdLuRFQ4cK9Dk1mqFa94x7XsVv6FfXt4NUKuWSm2cqEzUbdEbmXsdwT69oMcYV
-aYd//3xYcjtcwDi+lovc7THYIj2UJYtZVxIeZpitxISMdAJ+gZEYzmgDKF+O4IDj
-DYdnO8PVMfdosULrhP5GpYtjYJ0vL/HSNXSkGtJ/OWIlBIBFl2yXtOpzkjqndtBE
-WBmmfQHvSNjYU5Ab/udNYNoT4+rEKkkBLTtbWwFvgNPiiE5PLYLrUrdyqz4Y6KAb
-B9OkVk4AWq0UlCeNCl2onHKdsT61rfImD8wygJyJ2oau7TWw4itQE2LV/pLQY68T
-HrD/BwmIDcY=
-=h9rq
------END PGP SIGNATURE-----
-
---==_Exmh_1328745230_2846P--
+Shirish
