@@ -1,124 +1,77 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix mkdir/rmdir bug for the non-POSIX case
-Date: Thu, 16 Feb 2012 05:51:17 -0500
-Message-ID: <20120216055117.5e1e8a1e@tlielax.poochiereds.net>
-References: <1328810892-21925-1-git-send-email-piastry@etersoft.ru>
-	<20120210132216.03badf59@tlielax.poochiereds.net>
-	<4F38BB30.9030107@suse.com>
-	<20120213083544.486aa192@tlielax.poochiereds.net>
-	<CAH2r5msQm=3EAqBmjHqWVHP2Gu_X8UMhwcjfC8agqvvc1boEsg@mail.gmail.com>
-	<CAKywueR7Lyy63SJpQS8au=_EDzYGDJHKA0U9KOpxneyk2V9t8g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueR7Lyy63SJpQS8au=_EDzYGDJHKA0U9KOpxneyk2V9t8g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+Subject: [PATCH 00/11] Push file_update_time() into .page_mkwrite
+Date: Thu, 16 Feb 2012 14:46:08 +0100
+Message-ID: <1329399979-3647-1-git-send-email-jack@suse.cz>
+Cc: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Sandeen <sandeen@redhat.com>,
+	Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
+	Peter Zijlstra <a.p.zijlstra@chello.nl>,
+	Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>,
+	Arnaldo Carvalho de Melo <acme@ghostprotocols.net>,
+	Jaya Kumar <jayalk@intworks.biz>,
+	Sage Weil <sage@newdream.net>, ceph-devel@vger.kernel.org,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Ron Minnich <rminnich@sandia.gov>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	v9fs-developer@lists.sourceforge.net,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	fuse-devel@lists.sourceforge.net,
+	Steven Whitehouse <swhiteho@redhat.com>,
+	cluster-devel@redhat.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Trond Myklebust <Trond.Myklebust@netapp
+To: LKML <linux-kernel@vger.kernel.org>
+Return-path: <ceph-devel-owner@vger.kernel.org>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, 15 Feb 2012 22:09:53 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+  Hello,
 
-> 2012/2/13 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> > On Mon, Feb 13, 2012 at 7:35 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wr=
-ote:
-> >> On Mon, 13 Feb 2012 12:56:40 +0530
-> >> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
-> >>
-> >>> On 02/10/2012 11:52 PM, Jeff Layton wrote:
-> >>> > On Thu, =C2=A09 Feb 2012 21:08:12 +0300
-> >>> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> >>> >
-> >>> >> Currently we do inc_nlink/drop_nlink for a parent directory fo=
-r every
-> >>> >> mkdir and rmdir calls. That's wrong when POSIX extensions are =
-disabled
-> >>> >> because in this case a server doesn't do the same things and r=
-eturns
-> >>> >> the old value on the next QueryInfo request. As the result, we=
- update
-> >>> >> our value with the server one and then decrement it on every r=
-mdir
-> >>> >> call - go to negative nlink values.
-> >>> >>
-> >>> >> Fix this by doing inc_nlink/drop_nlink for parent directory in=
- mkdir
-> >>> >> and rmdir in POSIX case only. Also add cERROR when nlink value=
- <=3D 2
-> >>> >> and we still try to decrement it (possible broken servers).
-> >>> >>
-> >>> >
-> >>> > Rather than doing that, I think it would be better not to do th=
-e
-> >>> > inc/dec_nlink in either case and instead to set cifsi->time on =
-the
-> >>> > parent to 0 for both cases.
-> >>> >
-> >>> > That should force it to have the directory attributes refetched=
- at the
-> >>> > next opportunity. Since we're not doing that now, we're likely =
-missing
-> >>> > out on stuff like directory mtime changes as well.
-> >>> >
-> >>>
-> >>> Hmm.. don't we have to do both? Keep the nlink value sane and for=
-ce
-> >>> refetching attrs. Wondering if we don't update nlink what will ha=
-ppen in
-> >>> cases
-> >>>
-> >>> =C2=A0 =C2=A0(a) when mkdir/rmdir is run in a tight loop
-> >>> =C2=A0 =C2=A0(b) when a dir is moved from one to another within t=
-he cifs mount
-> >>>
-> >>
-> >> I don't think so -- we either need to fake i_nlink and ignore the =
-value
-> >> from the server, or treat the server as authoritative.
-> >>
-> >> Trying to monkey with the nlink value on the client and overwritin=
-g it
-> >> with the value from the server is always going to be racy. I think=
- the
-> >> only time it really matters is if you're using generic_drop_inode,
-> >> which we do when CIFS_MOUNT_SERVER_INUM is set.
-> >>
-> >> That said, the values we get out of some servers for i_nlink are
-> >> non-sensical. Perhaps we'd be best off to just fake the i_nlink va=
-lue
-> >> across the board. We have had people in the past complain that i_n=
-link
-> >> is always 0 in some cases.
-> >
-> > For the non-Unix case, you may be right. =C2=A0We wouldn't want to
-> > add a big performance penalty to do QueryPathInfo more often
-> > for a value which the server may report wrong anyway.
-> >
-> >
->=20
-> So, It seems that ignoring NumberOfLinks value from FILE_ALL_INFO
-> structure on QueryPathInfo in non-POSIX case is the best we can do. I=
-f
-> nobody objects I will create a patch for this.
->=20
+  to provide reliable support for filesystem freezing, filesystems need to have
+complete control over when metadata is changed. In particular,
+file_update_time() calls from page fault code make it impossible for
+filesystems to prevent inodes from being dirtied while the filesystem is
+frozen.
 
-I think there are several pieces needed here:
+To fix the issue, this patch set changes page fault code to call
+file_update_time() only when ->page_mkwrite() callback is not provided. If the
+callback is provided, it is the responsibility of the filesystem to perform
+update of i_mtime / i_ctime if needed. We also push file_update_time() call
+to all existing ->page_mkwrite() implementations if the time update does not
+obviously happen by other means. If you know your filesystem does not need
+update of modification times in ->page_mkwrite() handler, please speak up and
+I'll drop the patch for your filesystem.
 
-1) get rid of the inc/dec_nlink calls on the parent inode altogether.
-Trying to do that on the client is never going to make any sense.
-Replace them with a reset of the cifsi->time to 0 to force a reval of
-the inode attributes at some point in the future.
+As a side note, an alternative would be to remove call of file_update_time()
+from page fault code altogether and require all filesystems needing it to do
+that in their ->page_mkwrite() implementation. That is certainly possible
+although maybe slightly inefficient and would require auditting 100+
+vm_operations_structs *shake*.
 
-2) fake the i_nlink value on directories for the non-posix case. In
-other cases, NumberOfLinks is probably something we should use.
+If I get acks on these patches, Andrew, would you be willing to take these
+patches?
 
-3) maybe fix cifs_drop_inode to handle this situation correctly? It
-seems like calling generic_drop_inode on it when we're faking i_nlink
-would be wrong, but maybe it's ok. I'm not sure.
+								Honza
 
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+CC: Peter Zijlstra <a.p.zijlstra@chello.nl>
+CC: Ingo Molnar <mingo@elte.hu>
+CC: Paul Mackerras <paulus@samba.org>
+CC: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
+CC: Jaya Kumar <jayalk@intworks.biz>
+CC: Sage Weil <sage@newdream.net>
+CC: ceph-devel@vger.kernel.org
+CC: Steve French <sfrench@samba.org>
+CC: linux-cifs@vger.kernel.org
+CC: Eric Van Hensbergen <ericvh@gmail.com>
+CC: Ron Minnich <rminnich@sandia.gov>
+CC: Latchesar Ionkov <lucho@ionkov.net>
+CC: v9fs-developer@lists.sourceforge.net
+CC: Miklos Szeredi <miklos@szeredi.hu>
+CC: fuse-devel@lists.sourceforge.net
+CC: Steven Whitehouse <swhiteho@redhat.com>
+CC: cluster-devel@redhat.com
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: Trond Myklebust <Trond.Myklebust@netapp.com>
+CC: linux-nfs@vger.kernel.org
