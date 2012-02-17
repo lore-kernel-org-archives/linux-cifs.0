@@ -1,66 +1,111 @@
-From: Andrey Chervonets <a.chervonets-WKmEczWRmnjsq35pWSNszA@public.gmane.org>
-Subject: Can't download files from your site. :(
-Date: Fri, 17 Feb 2012 09:12:53 +0200
-Message-ID: <4F3DFDF5.9070802@cominder.eu>
-References: <4F3D878A.8090306@cominder.eu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v2] CIFS: Fix mkdir/rmdir bug for the non-POSIX case
+Date: Fri, 17 Feb 2012 16:13:30 +0300
+Message-ID: <1329484410-30540-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4F3D878A.8090306-WKmEczWRmnjsq35pWSNszA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Good day!
+Currently we do inc/drop_nlink for a parent directory for every
+mkdir/rmdir calls. That's wrong when Unix extensions are disabled
+because in this case a server doesn't follow the same semantic and
+returns the old value on the next QueryInfo request. As the result,
+we update our value with the server one and then decrement it on
+every rmdir call - go to negative nlink values.
 
-Recently I has found the site with advanced CIFS, which looks like 
-solution for my client using DFS, but need use it from Linux too.
+Fix this by removing inc/drop_nlink for the parent directory from
+mkdir/rmdir, setting it for a revalidation and ignoring NumberOfLinks
+for directories when Unix extensions are disabled.
 
-1) But can not download some files:
-     The following links are broken - at least I can  not get anything 
-from there:
-    a) Installation info: 
-http://git.kernel.org/?p=linux/kernel/git/sfrench/cifs-backport-old-kernels.git;a=blob;f=fs/cifs/README
-     shows: /pub/scm /  404 - No such project
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/inode.c |   28 +++++++++++++++++++---------
+ 1 files changed, 19 insertions(+), 9 deletions(-)
 
-    b) at download page (http://linux-cifs.samba.org/cifs_download.html ):
-           for RHEL4...: fs/cifs src 1.34a : 
-ftp://pserver.samba.org/samba/ftp/cifs-cvs/cifs-1.34-RHEL4a.tar.gz
-
-but link to current 1.50 is OK : 
-http://pserver.samba.org/samba/ftp/cifs-cvs/cifs-1.50.tar.gz
-
-2) At start page also not clear:
-     from one side -  "has been backported to compile (on 2.4 kernels, 
-not just older 2.6. kernel versions)"
-     from other side - "files for the fs/cifs directory which includes a 
-relatively recent version of the cifs vfs which has been backported to 
-build on various earlier kernels (2.6.14 or later)"
-
-My system is:
-
--bash-3.00$  uname -a
-Linux hostname*2.6.9*-89.0.0.0.1.ELsmp #1 SMP Tue May 19 05:31:20 EDT 
-2009 x86_64 x86_64 x86_64 GNU/Linux
-
--bash-3.00$ cat /etc/issue
-Enterprise Linux Enterprise Linux AS release 4 (October Update 8)
-(this is Oracle Linux, almost 1:1 as RHEL 4.8)
-
-So questions:
-1) is it possible to make working Advanced CIFS on my platform?
-2) if yes - which version of sources (or may be rpm also available) 
-should I download and installed (if ot 1.50 - where can I get it)
-3) Installation instructions also required.
-
-Thanks in advance for assistance!
-
-
-Best regards,
-
-Andrey Chervonets
-----------------------
-CoMinder Support
-http://www.cominder.eu/
-GSM: +371 26517848
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index a5f54b7..745da3d 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -534,6 +534,11 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+ 	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+ 		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
+ 		fattr->cf_dtype = DT_DIR;
++		/*
++		 * Server can return wrong NumberOfLinks value for directories
++		 * when Unix extensions are disabled - fake it.
++		 */
++		fattr->cf_nlink = 2;
+ 	} else {
+ 		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
+ 		fattr->cf_dtype = DT_REG;
+@@ -541,9 +546,9 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+ 		/* clear write bits if ATTR_READONLY is set */
+ 		if (fattr->cf_cifsattrs & ATTR_READONLY)
+ 			fattr->cf_mode &= ~(S_IWUGO);
+-	}
+ 
+-	fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
++		fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
++	}
+ 
+ 	fattr->cf_uid = cifs_sb->mnt_uid;
+ 	fattr->cf_gid = cifs_sb->mnt_gid;
+@@ -1322,7 +1327,6 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
+ 			}
+ /*BB check (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID ) to see if need
+ 	to set uid/gid */
+-			inc_nlink(inode);
+ 
+ 			cifs_unix_basic_to_fattr(&fattr, pInfo, cifs_sb);
+ 			cifs_fill_uniqueid(inode->i_sb, &fattr);
+@@ -1355,7 +1359,6 @@ mkdir_retry_old:
+ 		d_drop(direntry);
+ 	} else {
+ mkdir_get_info:
+-		inc_nlink(inode);
+ 		if (pTcon->unix_ext)
+ 			rc = cifs_get_inode_info_unix(&newinode, full_path,
+ 						      inode->i_sb, xid);
+@@ -1436,6 +1439,11 @@ mkdir_get_info:
+ 		}
+ 	}
+ mkdir_out:
++	/*
++	 * Force revalidate to get parent dir info when needed since cached
++	 * attributes are invalid now.
++	 */
++	CIFS_I(inode)->time = 0;
+ 	kfree(full_path);
+ 	FreeXid(xid);
+ 	cifs_put_tlink(tlink);
+@@ -1475,7 +1483,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
+ 	cifs_put_tlink(tlink);
+ 
+ 	if (!rc) {
+-		drop_nlink(inode);
+ 		spin_lock(&direntry->d_inode->i_lock);
+ 		i_size_write(direntry->d_inode, 0);
+ 		clear_nlink(direntry->d_inode);
+@@ -1483,12 +1490,15 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
+ 	}
+ 
+ 	cifsInode = CIFS_I(direntry->d_inode);
+-	cifsInode->time = 0;	/* force revalidate to go get info when
+-				   needed */
++	/* force revalidate to go get info when needed */
++	cifsInode->time = 0;
+ 
+ 	cifsInode = CIFS_I(inode);
+-	cifsInode->time = 0;	/* force revalidate to get parent dir info
+-				   since cached search results now invalid */
++	/*
++	 * Force revalidate to get parent dir info when needed since cached
++	 * attributes are invalid now.
++	 */
++	cifsInode->time = 0;
+ 
+ 	direntry->d_inode->i_ctime = inode->i_ctime = inode->i_mtime =
+ 		current_fs_time(inode->i_sb);
+-- 
+1.7.1
