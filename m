@@ -1,72 +1,74 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 1/6] CIFS: Introduce credit-based flow control
-Date: Sat, 18 Feb 2012 06:54:48 -0500
-Message-ID: <20120218065448.5c3a6d79@tlielax.poochiereds.net>
-References: <1328776890-4190-1-git-send-email-piastry@etersoft.ru>
-	<20120212075309.7368d89b@tlielax.poochiereds.net>
-	<CAKywueRHe7_s2TCaHuthm6m8kQ4zjKkmtf_SLNT0RMvJgPaqJw@mail.gmail.com>
-	<20120215101107.32befdc6@tlielax.poochiereds.net>
-	<CAKywueTh2Y4uuLr+2W9Rrv+rtNM6xtbq+3M7gL41hpUZd5is1Q@mail.gmail.com>
-	<CAKywueQvD+jG_b+38Aw_YW8OA4TeOYE3O11KYXAq-UUMQA4C2w@mail.gmail.com>
-	<CAH2r5mu=JpGa6xC8p96THOXLhyeRZ3=aFhpD4quYP+G+in_dUQ@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/3] cifs: clean up call to cifs_dfs_release_automount_timer()
+Date: Mon, 20 Feb 2012 05:23:54 -0600
+Message-ID: <CADT32e+RiGwF9shDbVVuXed=ES4CUHCA=gYbi7TK+kJ6PV-sXg@mail.gmail.com>
+References: <1329489104-7823-1-git-send-email-jlayton@redhat.com>
+	<1329489104-7823-2-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	stern-nwvwT67g6+6dFdvTe/nMLpVzexx5G7lz@public.gmane.org, tj-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mu=JpGa6xC8p96THOXLhyeRZ3=aFhpD4quYP+G+in_dUQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1329489104-7823-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 17 Feb 2012 23:58:41 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Fri, Feb 17, 2012 at 8:31 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> Take the #ifdef junk out of the code, and turn it into a noop macro
+> when CONFIG_CIFS_DFS_UPCALL isn't defined.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> =A0fs/cifs/cifsfs.c =A0 =A0| =A0 =A02 --
+> =A0fs/cifs/cifsproto.h | =A0 =A06 ++++++
+> =A02 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index b1fd382..f5fa651 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -1182,9 +1182,7 @@ exit_cifs(void)
+> =A0 =A0 =A0 =A0cFYI(DBG2, "exit_cifs");
+> =A0 =A0 =A0 =A0cifs_proc_clean();
+> =A0 =A0 =A0 =A0cifs_fscache_unregister();
+> -#ifdef CONFIG_CIFS_DFS_UPCALL
+> =A0 =A0 =A0 =A0cifs_dfs_release_automount_timer();
+> -#endif
+> =A0#ifdef CONFIG_CIFS_ACL
+> =A0 =A0 =A0 =A0cifs_destroy_idmaptrees();
+> =A0 =A0 =A0 =A0exit_cifs_idmap();
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 6f4e243..121b949 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -168,7 +168,13 @@ extern struct smb_vol *cifs_get_volume_info(char=
+ *mount_data,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0 =A0 =A0const char *devname);
+> =A0extern int cifs_mount(struct cifs_sb_info *, struct smb_vol *);
+> =A0extern void cifs_umount(struct cifs_sb_info *);
+> +
+> +#if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
+> =A0extern void cifs_dfs_release_automount_timer(void);
+> +#else /* ! IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) */
+> +#define cifs_dfs_release_automount_timer() =A0 =A0 do { } while(0)
+> +#endif /* ! IS_ENABLED(CONFIG_CIFS_DFS_UPCALL) */
+> +
+> =A0void cifs_proc_init(void);
+> =A0void cifs_proc_clean(void);
+>
+> --
+> 1.7.7.6
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
 
-> I am not convinced that we need to keep enough echo retries ... probably ok
-> to be able to send one echo if we have 49 other requests pending, but don't
-> think it makes sense to reserve more - if the first echo times out, we can
-> probably simply exceed negotiated mpxcount - the session would be going
-> down anyway.  Why would we have to save more than one for oplock - if we
-> receive multiple breaks, we simply process them serially.
-> 
+Looks correct.
 
-I agree to a point. I think the code that does echoes and handles
-reconnects based on it could use some work. There's virtually no reason
-to resend an echo request if the server didn't respond to the last one.
-We are using TCP after all, so presumably the echo request won't get
-dropped by the networking layer. That probably means we can just
-hardcode echo_retries to 1 and get rid of that module parm.
-
-Keeping one slot open to handle echoes is probably reasonable in most
-cases. In the event that maxmpx is 1 though we can't reasonably send an
-echo when the server goes unresponsive since we won't have a slot. In
-that case, I suggest we just don't send any echoes, and simply
-reconnect if there is an outstanding call to which the server hasn't
-responded in a certain amount of time.
-
-Exceeding the maxmpx though is not a good idea. Servers send that value
-for a reason and we shouldn't ignore it. Some may handle it gracefully,
-but there are a lot of crappy CIFS servers in the field and many of them
-don't handle exceeding the maxmpx well. Best not to do that even if it
-seems expedient.
-
-Oplock breaks are a bigger problem. When we get an oplock break, we
-have to do more than just send the response to that. We often have to
-initiate writeback as well. We need to keep at least one slot open for
-that so we don't deadlock, but how best to ensure that the writeback
-can proceed?
-
-If only the oplock break response is allowed to use the reserved slot,
-then that potentially leaves writeback hung waiting for a slot. What
-may make sense is to allow writes to dip into the emergency credit
-"pool" too if we're writing out of the cache and the inode doesn't have
-an oplock that allows caching of writes.
-
-In practice, it might even make sense to disable writing to the cache
-when the number of slots is low but still more than 2 (maybe less than
-5 or so?). Writable oplocks aren't terribly helpful when the throughput
-to the server is low since it can take a long time to do writeback.
-Probably that threshold could be made tunable somehow.
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
