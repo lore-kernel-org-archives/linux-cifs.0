@@ -1,122 +1,286 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2] CIFS: Fix mkdir/rmdir bug for the non-POSIX case
-Date: Tue, 21 Feb 2012 10:00:06 -0500
-Message-ID: <20120221100006.7e43e8b9@tlielax.poochiereds.net>
-References: <1329484410-30540-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH 01/11] CIFS: Simplify inFlight logic
+Date: Wed, 22 Feb 2012 10:32:54 +0300
+Message-ID: <1329895984-9251-2-git-send-email-piastry@etersoft.ru>
+References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1329484410-30540-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1329895984-9251-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 17 Feb 2012 16:13:30 +0300
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+by making it as unsigned integer and surround access with req_lock
+from server structure.
 
-> Currently we do inc/drop_nlink for a parent directory for every
-> mkdir/rmdir calls. That's wrong when Unix extensions are disabled
-> because in this case a server doesn't follow the same semantic and
-> returns the old value on the next QueryInfo request. As the result,
-> we update our value with the server one and then decrement it on
-> every rmdir call - go to negative nlink values.
-> 
-> Fix this by removing inc/drop_nlink for the parent directory from
-> mkdir/rmdir, setting it for a revalidation and ignoring NumberOfLinks
-> for directories when Unix extensions are disabled.
-> 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/inode.c |   28 +++++++++++++++++++---------
->  1 files changed, 19 insertions(+), 9 deletions(-)
-> 
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index a5f54b7..745da3d 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -534,6 +534,11 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
->  	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
->  		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
->  		fattr->cf_dtype = DT_DIR;
-> +		/*
-> +		 * Server can return wrong NumberOfLinks value for directories
-> +		 * when Unix extensions are disabled - fake it.
-> +		 */
-> +		fattr->cf_nlink = 2;
->  	} else {
->  		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
->  		fattr->cf_dtype = DT_REG;
-> @@ -541,9 +546,9 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
->  		/* clear write bits if ATTR_READONLY is set */
->  		if (fattr->cf_cifsattrs & ATTR_READONLY)
->  			fattr->cf_mode &= ~(S_IWUGO);
-> -	}
->  
-> -	fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
-> +		fattr->cf_nlink = le32_to_cpu(info->NumberOfLinks);
-> +	}
->  
->  	fattr->cf_uid = cifs_sb->mnt_uid;
->  	fattr->cf_gid = cifs_sb->mnt_gid;
-> @@ -1322,7 +1327,6 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
->  			}
->  /*BB check (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID ) to see if need
->  	to set uid/gid */
-> -			inc_nlink(inode);
->  
->  			cifs_unix_basic_to_fattr(&fattr, pInfo, cifs_sb);
->  			cifs_fill_uniqueid(inode->i_sb, &fattr);
-> @@ -1355,7 +1359,6 @@ mkdir_retry_old:
->  		d_drop(direntry);
->  	} else {
->  mkdir_get_info:
-> -		inc_nlink(inode);
->  		if (pTcon->unix_ext)
->  			rc = cifs_get_inode_info_unix(&newinode, full_path,
->  						      inode->i_sb, xid);
-> @@ -1436,6 +1439,11 @@ mkdir_get_info:
->  		}
->  	}
->  mkdir_out:
-> +	/*
-> +	 * Force revalidate to get parent dir info when needed since cached
-> +	 * attributes are invalid now.
-> +	 */
-> +	CIFS_I(inode)->time = 0;
->  	kfree(full_path);
->  	FreeXid(xid);
->  	cifs_put_tlink(tlink);
-> @@ -1475,7 +1483,6 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
->  	cifs_put_tlink(tlink);
->  
->  	if (!rc) {
-> -		drop_nlink(inode);
->  		spin_lock(&direntry->d_inode->i_lock);
->  		i_size_write(direntry->d_inode, 0);
->  		clear_nlink(direntry->d_inode);
-> @@ -1483,12 +1490,15 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
->  	}
->  
->  	cifsInode = CIFS_I(direntry->d_inode);
-> -	cifsInode->time = 0;	/* force revalidate to go get info when
-> -				   needed */
-> +	/* force revalidate to go get info when needed */
-> +	cifsInode->time = 0;
->  
->  	cifsInode = CIFS_I(inode);
-> -	cifsInode->time = 0;	/* force revalidate to get parent dir info
-> -				   since cached search results now invalid */
-> +	/*
-> +	 * Force revalidate to get parent dir info when needed since cached
-> +	 * attributes are invalid now.
-> +	 */
-> +	cifsInode->time = 0;
->  
->  	direntry->d_inode->i_ctime = inode->i_ctime = inode->i_mtime =
->  		current_fs_time(inode->i_sb);
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifs_debug.c |    3 +--
+ fs/cifs/cifsglob.h   |   21 ++++++++++++++++++++-
+ fs/cifs/cifssmb.c    |    6 +++---
+ fs/cifs/connect.c    |   10 +++++-----
+ fs/cifs/transport.c  |   45 +++++++++++++++++++++++----------------------
+ 5 files changed, 52 insertions(+), 33 deletions(-)
 
-Looks good.
-
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 24b3dfc..573b899 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -171,8 +171,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 			seq_printf(m, "TCP status: %d\n\tLocal Users To "
+ 				   "Server: %d SecMode: 0x%x Req On Wire: %d",
+ 				   server->tcpStatus, server->srv_count,
+-				   server->sec_mode,
+-				   atomic_read(&server->inFlight));
++				   server->sec_mode, in_flight(server));
+ 
+ #ifdef CONFIG_CIFS_STATS2
+ 			seq_printf(m, " In Send: %d In MaxReq Wait: %d",
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 76e7d8b..44cfc9a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -255,7 +255,8 @@ struct TCP_Server_Info {
+ 	bool noblocksnd;		/* use blocking sendmsg */
+ 	bool noautotune;		/* do not autotune send buf sizes */
+ 	bool tcp_nodelay;
+-	atomic_t inFlight;  /* number of requests on the wire to server */
++	unsigned int in_flight;  /* number of requests on the wire to server */
++	spinlock_t req_lock; /* protect the value above */
+ 	struct mutex srv_mutex;
+ 	struct task_struct *tsk;
+ 	char server_GUID[16];
+@@ -307,6 +308,24 @@ struct TCP_Server_Info {
+ #endif
+ };
+ 
++static inline unsigned int
++in_flight(struct TCP_Server_Info *server)
++{
++	unsigned int num;
++	spin_lock(&server->req_lock);
++	num = server->in_flight;
++	spin_unlock(&server->req_lock);
++	return num;
++}
++
++static inline void
++dec_in_flight(struct TCP_Server_Info *server)
++{
++	spin_lock(&server->req_lock);
++	server->in_flight--;
++	spin_unlock(&server->req_lock);
++}
++
+ /*
+  * Macros to allow the TCP_Server_Info->net field and related code to drop out
+  * when CONFIG_NET_NS isn't set.
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 8b7794c..0b50551 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -716,7 +716,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+ 	struct TCP_Server_Info *server = mid->callback_data;
+ 
+ 	DeleteMidQEntry(mid);
+-	atomic_dec(&server->inFlight);
++	dec_in_flight(server);
+ 	wake_up(&server->request_q);
+ }
+ 
+@@ -1669,7 +1669,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 
+ 	queue_work(system_nrt_wq, &rdata->work);
+ 	DeleteMidQEntry(mid);
+-	atomic_dec(&server->inFlight);
++	dec_in_flight(server);
+ 	wake_up(&server->request_q);
+ }
+ 
+@@ -2110,7 +2110,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+ 
+ 	queue_work(system_nrt_wq, &wdata->work);
+ 	DeleteMidQEntry(mid);
+-	atomic_dec(&tcon->ses->server->inFlight);
++	dec_in_flight(tcon->ses->server);
+ 	wake_up(&tcon->ses->server->request_q);
+ }
+ 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 602f77c..12286d0 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -647,14 +647,14 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	 * cifs_max_pending is normally 50, but can be set at module install
+ 	 * time to as little as two.
+ 	 */
+-	spin_lock(&GlobalMid_Lock);
+-	if (atomic_read(&server->inFlight) >= cifs_max_pending)
+-		atomic_set(&server->inFlight, cifs_max_pending - 1);
++	spin_lock(&server->req_lock);
++	if (server->in_flight >= cifs_max_pending)
++		server->in_flight = cifs_max_pending - 1;
+ 	/*
+ 	 * We do not want to set the max_pending too low or we could end up
+ 	 * with the counter going negative.
+ 	 */
+-	spin_unlock(&GlobalMid_Lock);
++	spin_unlock(&server->req_lock);
+ 	/*
+ 	 * Although there should not be any requests blocked on this queue it
+ 	 * can not hurt to be paranoid and try to wake up requests that may
+@@ -1909,7 +1909,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	tcp_ses->noblocksnd = volume_info->noblocksnd;
+ 	tcp_ses->noautotune = volume_info->noautotune;
+ 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
+-	atomic_set(&tcp_ses->inFlight, 0);
++	tcp_ses->in_flight = 0;
+ 	init_waitqueue_head(&tcp_ses->response_q);
+ 	init_waitqueue_head(&tcp_ses->request_q);
+ 	INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0cc9584..fc1904f 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -254,28 +254,29 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	return smb_sendv(server, &iov, 1);
+ }
+ 
+-static int wait_for_free_request(struct TCP_Server_Info *server,
+-				 const int long_op)
++static int
++wait_for_free_request(struct TCP_Server_Info *server, const int long_op)
+ {
++	spin_lock(&server->req_lock);
++
+ 	if (long_op == CIFS_ASYNC_OP) {
+ 		/* oplock breaks must not be held up */
+-		atomic_inc(&server->inFlight);
++		server->in_flight++;
++		spin_unlock(&server->req_lock);
+ 		return 0;
+ 	}
+ 
+-	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
+-			spin_unlock(&GlobalMid_Lock);
++		if (server->in_flight >= cifs_max_pending) {
++			spin_unlock(&server->req_lock);
+ 			cifs_num_waiters_inc(server);
+ 			wait_event(server->request_q,
+-				   atomic_read(&server->inFlight)
+-				     < cifs_max_pending);
++				   in_flight(server) < cifs_max_pending);
+ 			cifs_num_waiters_dec(server);
+-			spin_lock(&GlobalMid_Lock);
++			spin_lock(&server->req_lock);
+ 		} else {
+ 			if (server->tcpStatus == CifsExiting) {
+-				spin_unlock(&GlobalMid_Lock);
++				spin_unlock(&server->req_lock);
+ 				return -ENOENT;
+ 			}
+ 
+@@ -284,8 +285,8 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
+ 
+ 			/* update # of requests on the wire to server */
+ 			if (long_op != CIFS_BLOCKING_OP)
+-				atomic_inc(&server->inFlight);
+-			spin_unlock(&GlobalMid_Lock);
++				server->in_flight++;
++			spin_unlock(&server->req_lock);
+ 			break;
+ 		}
+ 	}
+@@ -359,7 +360,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	mid = AllocMidQEntry(hdr, server);
+ 	if (mid == NULL) {
+ 		mutex_unlock(&server->srv_mutex);
+-		atomic_dec(&server->inFlight);
++		dec_in_flight(server);
+ 		wake_up(&server->request_q);
+ 		return -ENOMEM;
+ 	}
+@@ -392,7 +393,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	return rc;
+ out_err:
+ 	delete_mid(mid);
+-	atomic_dec(&server->inFlight);
++	dec_in_flight(server);
+ 	wake_up(&server->request_q);
+ 	return rc;
+ }
+@@ -564,7 +565,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		cifs_small_buf_release(in_buf);
+ 		/* Update # of requests on wire to server */
+-		atomic_dec(&ses->server->inFlight);
++		dec_in_flight(ses->server);
+ 		wake_up(&ses->server->request_q);
+ 		return rc;
+ 	}
+@@ -601,7 +602,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 			midQ->callback = DeleteMidQEntry;
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_small_buf_release(in_buf);
+-			atomic_dec(&ses->server->inFlight);
++			dec_in_flight(ses->server);
+ 			wake_up(&ses->server->request_q);
+ 			return rc;
+ 		}
+@@ -612,7 +613,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	rc = cifs_sync_mid_result(midQ, ses->server);
+ 	if (rc != 0) {
+-		atomic_dec(&ses->server->inFlight);
++		dec_in_flight(ses->server);
+ 		wake_up(&ses->server->request_q);
+ 		return rc;
+ 	}
+@@ -637,7 +638,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 		midQ->resp_buf = NULL;
+ out:
+ 	delete_mid(midQ);
+-	atomic_dec(&ses->server->inFlight);
++	dec_in_flight(ses->server);
+ 	wake_up(&ses->server->request_q);
+ 
+ 	return rc;
+@@ -688,7 +689,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc) {
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		/* Update # of requests on wire to server */
+-		atomic_dec(&ses->server->inFlight);
++		dec_in_flight(ses->server);
+ 		wake_up(&ses->server->request_q);
+ 		return rc;
+ 	}
+@@ -721,7 +722,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 			/* no longer considered to be "in-flight" */
+ 			midQ->callback = DeleteMidQEntry;
+ 			spin_unlock(&GlobalMid_Lock);
+-			atomic_dec(&ses->server->inFlight);
++			dec_in_flight(ses->server);
+ 			wake_up(&ses->server->request_q);
+ 			return rc;
+ 		}
+@@ -730,7 +731,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	rc = cifs_sync_mid_result(midQ, ses->server);
+ 	if (rc != 0) {
+-		atomic_dec(&ses->server->inFlight);
++		dec_in_flight(ses->server);
+ 		wake_up(&ses->server->request_q);
+ 		return rc;
+ 	}
+@@ -747,7 +748,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = cifs_check_receive(midQ, ses->server, 0);
+ out:
+ 	delete_mid(midQ);
+-	atomic_dec(&ses->server->inFlight);
++	dec_in_flight(ses->server);
+ 	wake_up(&ses->server->request_q);
+ 
+ 	return rc;
+-- 
+1.7.1
