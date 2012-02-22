@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 09/11] CIFS: Separate protocol-specific code from cifs_readv_receive code
-Date: Wed, 22 Feb 2012 10:33:02 +0300
-Message-ID: <1329895984-9251-10-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 11/11] CIFS: Change mid_q_entry structure fields
+Date: Wed, 22 Feb 2012 10:33:04 +0300
+Message-ID: <1329895984-9251-12-git-send-email-piastry@etersoft.ru>
 References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,232 +9,418 @@ In-Reply-To: <1329895984-9251-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+to be protocol-unspecific and big enough to keep both CIFS
+and SMB2 values.
+
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |   12 ++++++++++
- fs/cifs/cifsproto.h |    2 +-
- fs/cifs/cifssmb.c   |   58 +++++++++++++++++++++++++++++++++-----------------
- fs/cifs/connect.c   |   12 ----------
- fs/cifs/netmisc.c   |    3 +-
- 5 files changed, 53 insertions(+), 34 deletions(-)
+ fs/cifs/cifs_debug.c |   20 +++++++++---------
+ fs/cifs/cifsglob.h   |   10 ++++----
+ fs/cifs/cifssmb.c    |   12 +++++-----
+ fs/cifs/connect.c    |   22 ++++++++++----------
+ fs/cifs/misc.c       |    2 +-
+ fs/cifs/transport.c  |   52 +++++++++++++++++++++++++-------------------------
+ 6 files changed, 59 insertions(+), 59 deletions(-)
 
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index bcd0db7..81be263 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -80,15 +80,15 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
+ 	spin_lock(&GlobalMid_Lock);
+ 	list_for_each(tmp, &server->pending_mid_q) {
+ 		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+-		cERROR(1, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %d",
+-			mid_entry->midState,
+-			(int)mid_entry->command,
++		cERROR(1, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %llu",
++			mid_entry->mid_state,
++			le16_to_cpu(mid_entry->command),
+ 			mid_entry->pid,
+ 			mid_entry->callback_data,
+ 			mid_entry->mid);
+ #ifdef CONFIG_CIFS_STATS2
+ 		cERROR(1, "IsLarge: %d buf: %p time rcv: %ld now: %ld",
+-			mid_entry->largeBuf,
++			mid_entry->large_buf,
+ 			mid_entry->resp_buf,
+ 			mid_entry->when_received,
+ 			jiffies);
+@@ -218,12 +218,12 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 				mid_entry = list_entry(tmp3, struct mid_q_entry,
+ 					qhead);
+ 				seq_printf(m, "\tState: %d com: %d pid:"
+-						" %d cbdata: %p mid %d\n",
+-						mid_entry->midState,
+-						(int)mid_entry->command,
+-						mid_entry->pid,
+-						mid_entry->callback_data,
+-						mid_entry->mid);
++					      " %d cbdata: %p mid %llu\n",
++					      mid_entry->mid_state,
++					      le16_to_cpu(mid_entry->command),
++					      mid_entry->pid,
++					      mid_entry->callback_data,
++					      mid_entry->mid);
+ 			}
+ 			spin_unlock(&GlobalMid_Lock);
+ 		}
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index e95b8b1..c9128f4 100644
+index 7e3761e..3f09ffb 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -351,6 +351,18 @@ has_free_credits(struct TCP_Server_Info *server, unsigned int *val)
- 	return res;
- }
- 
-+static inline size_t
-+header_size(void)
-+{
-+	return sizeof(struct smb_hdr);
-+}
-+
-+static inline size_t
-+max_header_size(void)
-+{
-+	return MAX_CIFS_HDR_SIZE;
-+}
-+
- /*
-  * Macros to allow the TCP_Server_Info->net field and related code to drop out
-  * when CONFIG_NET_NS isn't set.
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 97a400c..68c8f02 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -103,7 +103,7 @@ extern int cifs_convert_address(struct sockaddr *dst, const char *src, int len);
- extern int cifs_set_port(struct sockaddr *addr, const unsigned short int port);
- extern int cifs_fill_sockaddr(struct sockaddr *dst, const char *src, int len,
- 				const unsigned short int port);
--extern int map_smb_to_linux_error(struct smb_hdr *smb, bool logErr);
-+extern int map_smb_to_linux_error(char *buf, bool logErr);
- extern void header_assemble(struct smb_hdr *, char /* command */ ,
- 			    const struct cifs_tcon *, int /* length of
- 			    fixed section (word count) in two byte units */);
+@@ -741,8 +741,8 @@ typedef void (mid_callback_t)(struct mid_q_entry *mid);
+ /* one of these for every pending CIFS request to the server */
+ struct mid_q_entry {
+ 	struct list_head qhead;	/* mids waiting on reply from this server */
+-	__u16 mid;		/* multiplex id */
+-	__u16 pid;		/* process id */
++	__u64 mid;		/* multiplex id */
++	__u32 pid;		/* process id */
+ 	__u32 sequence_number;  /* for CIFS signing */
+ 	unsigned long when_alloc;  /* when mid was created */
+ #ifdef CONFIG_CIFS_STATS2
+@@ -753,9 +753,9 @@ struct mid_q_entry {
+ 	mid_callback_t *callback; /* call completion callback */
+ 	void *callback_data;	  /* general purpose pointer for callback */
+ 	void *resp_buf;		/* pointer to received SMB header */
+-	int midState;	/* wish this were enum but can not pass to wait_event */
+-	__u8 command;	/* smb command code */
+-	bool largeBuf:1;	/* if valid response, is pointer to large buf */
++	int mid_state;	/* wish this were enum but can not pass to wait_event */
++	__le16 command;		/* smb command code */
++	bool large_buf:1;	/* if valid response, is pointer to large buf */
+ 	bool multiRsp:1;	/* multiple trans2 responses for one request  */
+ 	bool multiEnd:1;	/* both received */
+ };
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 5ba869f..767091e 100644
+index 767091e..f2a5e91 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -1412,8 +1412,7 @@ cifs_readdata_free(struct cifs_readdata *rdata)
- static int
- cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- {
--	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
--	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length);
-+	unsigned int rfclen = get_rfc1002_length(server->smallbuf);
- 	int remaining = rfclen + 4 - server->total_read;
- 	struct cifs_readdata *rdata = mid->callback_data;
- 
-@@ -1422,7 +1421,7 @@ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 
- 		length = cifs_read_from_socket(server, server->bigbuf,
- 				min_t(unsigned int, remaining,
--					CIFSMaxBufSize + MAX_CIFS_HDR_SIZE));
-+					CIFSMaxBufSize + max_header_size()));
- 		if (length < 0)
- 			return length;
- 		server->total_read += length;
-@@ -1433,14 +1432,35 @@ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	return 0;
- }
- 
-+static inline size_t
-+read_rsp_size(void)
-+{
-+	return sizeof(READ_RSP);
-+}
-+
-+static inline unsigned int
-+read_data_offset(char *buf)
-+{
-+	READ_RSP *rsp = (READ_RSP *)buf;
-+	return le16_to_cpu(rsp->DataOffset);
-+}
-+
-+static inline unsigned int
-+read_data_length(char *buf)
-+{
-+	READ_RSP *rsp = (READ_RSP *)buf;
-+	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
-+	       le16_to_cpu(rsp->DataLength);
-+}
-+
- static int
- cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- {
- 	int length, len;
- 	unsigned int data_offset, remaining, data_len;
- 	struct cifs_readdata *rdata = mid->callback_data;
--	READ_RSP *rsp = (READ_RSP *)server->smallbuf;
--	unsigned int rfclen = be32_to_cpu(rsp->hdr.smb_buf_length) + 4;
-+	char *buf = server->smallbuf;
-+	unsigned int buflen = get_rfc1002_length(buf) + 4;
- 	u64 eof;
+@@ -1465,7 +1465,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
  	pgoff_t eof_index;
  	struct page *page, *tpage;
-@@ -1453,10 +1473,9 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	 * can if there's not enough data. At this point, we've read down to
- 	 * the Mid.
- 	 */
--	len = min_t(unsigned int, rfclen, sizeof(*rsp)) -
--			sizeof(struct smb_hdr) + 1;
-+	len = min_t(unsigned int, buflen, read_rsp_size()) - header_size() + 1;
  
--	rdata->iov[0].iov_base = server->smallbuf + sizeof(struct smb_hdr) - 1;
-+	rdata->iov[0].iov_base = buf + header_size() - 1;
- 	rdata->iov[0].iov_len = len;
+-	cFYI(1, "%s: mid=%u offset=%llu bytes=%u", __func__,
++	cFYI(1, "%s: mid=%llu offset=%llu bytes=%u", __func__,
+ 		mid->mid, rdata->offset, rdata->bytes);
  
- 	length = cifs_readv_from_socket(server, rdata->iov, 1, len);
-@@ -1465,7 +1484,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	server->total_read += length;
+ 	/*
+@@ -1663,10 +1663,10 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
  
- 	/* Was the SMB read successful? */
--	rdata->result = map_smb_to_linux_error(&rsp->hdr, false);
-+	rdata->result = map_smb_to_linux_error(buf, false);
- 	if (rdata->result != 0) {
- 		cFYI(1, "%s: server returned error %d", __func__,
- 			rdata->result);
-@@ -1473,14 +1492,14 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	}
+-	cFYI(1, "%s: mid=%u state=%d result=%d bytes=%u", __func__,
+-		mid->mid, mid->midState, rdata->result, rdata->bytes);
++	cFYI(1, "%s: mid=%llu state=%d result=%d bytes=%u", __func__,
++		mid->mid, mid->mid_state, rdata->result, rdata->bytes);
  
- 	/* Is there enough to get to the rest of the READ_RSP header? */
--	if (server->total_read < sizeof(READ_RSP)) {
-+	if (server->total_read < read_rsp_size()) {
- 		cFYI(1, "%s: server returned short header. got=%u expected=%zu",
--			__func__, server->total_read, sizeof(READ_RSP));
-+			__func__, server->total_read, read_rsp_size());
- 		rdata->result = -EIO;
- 		return cifs_readv_discard(server, mid);
- 	}
+-	switch (mid->midState) {
++	switch (mid->mid_state) {
+ 	case MID_RESPONSE_RECEIVED:
+ 		/* result already set, check signature */
+ 		if (server->sec_mode &
+@@ -2085,7 +2085,7 @@ cifs_writedata_alloc(unsigned int nr_pages)
+ }
  
--	data_offset = le16_to_cpu(rsp->DataOffset) + 4;
-+	data_offset = read_data_offset(buf) + 4;
- 	if (data_offset < server->total_read) {
- 		/*
- 		 * win2k8 sometimes sends an offset of 0 when the read
-@@ -1504,7 +1523,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	len = data_offset - server->total_read;
- 	if (len > 0) {
- 		/* read any junk before data into the rest of smallbuf */
--		rdata->iov[0].iov_base = server->smallbuf + server->total_read;
-+		rdata->iov[0].iov_base = buf + server->total_read;
- 		rdata->iov[0].iov_len = len;
- 		length = cifs_readv_from_socket(server, rdata->iov, 1, len);
- 		if (length < 0)
-@@ -1513,15 +1532,14 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	}
+ /*
+- * Check the midState and signature on received buffer (if any), and queue the
++ * Check the mid_state and signature on received buffer (if any), and queue the
+  * workqueue completion task.
+  */
+ static void
+@@ -2096,7 +2096,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+ 	unsigned int written;
+ 	WRITE_RSP *smb = (WRITE_RSP *)mid->resp_buf;
  
- 	/* set up first iov for signature check */
--	rdata->iov[0].iov_base = server->smallbuf;
-+	rdata->iov[0].iov_base = buf;
- 	rdata->iov[0].iov_len = server->total_read;
- 	cFYI(1, "0: iov_base=%p iov_len=%zu",
- 		rdata->iov[0].iov_base, rdata->iov[0].iov_len);
- 
- 	/* how much data is in the response? */
--	data_len = le16_to_cpu(rsp->DataLengthHigh) << 16;
--	data_len += le16_to_cpu(rsp->DataLength);
--	if (data_offset + data_len > rfclen) {
-+	data_len = read_data_length(buf);
-+	if (data_offset + data_len > buflen) {
- 		/* data_len is corrupt -- discard frame */
- 		rdata->result = -EIO;
- 		return cifs_readv_discard(server, mid);
-@@ -1600,11 +1618,11 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 
- 	rdata->bytes = length;
- 
--	cFYI(1, "total_read=%u rfclen=%u remaining=%u", server->total_read,
--		rfclen, remaining);
-+	cFYI(1, "total_read=%u buflen=%u remaining=%u", server->total_read,
-+		buflen, remaining);
- 
- 	/* discard anything left over */
--	if (server->total_read < rfclen)
-+	if (server->total_read < buflen)
- 		return cifs_readv_discard(server, mid);
- 
- 	dequeue_mid(mid, false);
+-	switch (mid->midState) {
++	switch (mid->mid_state) {
+ 	case MID_RESPONSE_RECEIVED:
+ 		wdata->result = cifs_check_receive(mid, tcon->ses->server, 0);
+ 		if (wdata->result != 0)
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index efb0a44..cf70d86 100644
+index cf70d86..a305df5 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -338,18 +338,6 @@ requeue_echo:
- 	queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECHO_INTERVAL);
+@@ -143,8 +143,8 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	spin_lock(&GlobalMid_Lock);
+ 	list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+ 		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+-		if (mid_entry->midState == MID_REQUEST_SUBMITTED)
+-			mid_entry->midState = MID_RETRY_NEEDED;
++		if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
++			mid_entry->mid_state = MID_RETRY_NEEDED;
+ 		list_move(&mid_entry->qhead, &retry_list);
+ 	}
+ 	spin_unlock(&GlobalMid_Lock);
+@@ -564,8 +564,8 @@ find_mid(struct TCP_Server_Info *server, char *buffer)
+ 	spin_lock(&GlobalMid_Lock);
+ 	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
+ 		if (mid->mid == buf->Mid &&
+-		    mid->midState == MID_REQUEST_SUBMITTED &&
+-		    mid->command == buf->Command) {
++		    mid->mid_state == MID_REQUEST_SUBMITTED &&
++		    le16_to_cpu(mid->command) == buf->Command) {
+ 			spin_unlock(&GlobalMid_Lock);
+ 			return mid;
+ 		}
+@@ -582,9 +582,9 @@ dequeue_mid(struct mid_q_entry *mid, bool malformed)
+ #endif
+ 	spin_lock(&GlobalMid_Lock);
+ 	if (!malformed)
+-		mid->midState = MID_RESPONSE_RECEIVED;
++		mid->mid_state = MID_RESPONSE_RECEIVED;
+ 	else
+-		mid->midState = MID_RESPONSE_MALFORMED;
++		mid->mid_state = MID_RESPONSE_MALFORMED;
+ 	list_del_init(&mid->qhead);
+ 	spin_unlock(&GlobalMid_Lock);
+ }
+@@ -611,13 +611,13 @@ handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 		} else {
+ 			/* Have first buffer */
+ 			mid->resp_buf = buf;
+-			mid->largeBuf = true;
++			mid->large_buf = true;
+ 			server->bigbuf = NULL;
+ 		}
+ 		return;
+ 	}
+ 	mid->resp_buf = buf;
+-	mid->largeBuf = server->large_buf;
++	mid->large_buf = server->large_buf;
+ 	/* Was previous buf put in mpx struct for multi-rsp? */
+ 	if (!mid->multiRsp) {
+ 		/* smb buffer will be freed by user thread */
+@@ -673,8 +673,8 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 		spin_lock(&GlobalMid_Lock);
+ 		list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+ 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+-			cFYI(1, "Clearing mid 0x%x", mid_entry->mid);
+-			mid_entry->midState = MID_SHUTDOWN;
++			cFYI(1, "Clearing mid 0x%llx", mid_entry->mid);
++			mid_entry->mid_state = MID_SHUTDOWN;
+ 			list_move(&mid_entry->qhead, &dispose_list);
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+@@ -682,7 +682,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 		/* now walk dispose list and issue callbacks */
+ 		list_for_each_safe(tmp, tmp2, &dispose_list) {
+ 			mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+-			cFYI(1, "Callback mid 0x%x", mid_entry->mid);
++			cFYI(1, "Callback mid 0x%llx", mid_entry->mid);
+ 			list_del_init(&mid_entry->qhead);
+ 			mid_entry->callback(mid_entry);
+ 		}
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index e91f983..f8bdb5e 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -268,7 +268,7 @@ __u64 GetNextMid(struct TCP_Server_Info *server)
+ 		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
+ 			++num_mids;
+ 			if (mid_entry->mid == cur_mid &&
+-			    mid_entry->midState == MID_REQUEST_SUBMITTED) {
++			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
+ 				/* This mid is in use, try a different one */
+ 				collision = true;
+ 				break;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 70d6e9f..993ec18 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -60,8 +60,8 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 		memset(temp, 0, sizeof(struct mid_q_entry));
+ 		temp->mid = smb_buffer->Mid;	/* always LE */
+ 		temp->pid = current->pid;
+-		temp->command = smb_buffer->Command;
+-		cFYI(1, "For smb_command %d", temp->command);
++		temp->command = cpu_to_le16(smb_buffer->Command);
++		cFYI(1, "For smb_command %d", smb_buffer->Command);
+ 	/*	do_gettimeofday(&temp->when_sent);*/ /* easier to use jiffies */
+ 		/* when mid allocated can be before when sent */
+ 		temp->when_alloc = jiffies;
+@@ -75,7 +75,7 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+ 	}
+ 
+ 	atomic_inc(&midCount);
+-	temp->midState = MID_REQUEST_ALLOCATED;
++	temp->mid_state = MID_REQUEST_ALLOCATED;
+ 	return temp;
  }
  
--static inline size_t
--header_size(void)
--{
--	return sizeof(struct smb_hdr);
--}
--
--static inline size_t
--max_header_size(void)
--{
--	return MAX_CIFS_HDR_SIZE;
--}
--
- static bool
- allocate_buffers(struct TCP_Server_Info *server)
- {
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index 73e47e8..dd23a32 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -836,8 +836,9 @@ ntstatus_to_dos(__u32 ntstatus, __u8 *eclass, __u16 *ecode)
- }
+@@ -85,9 +85,9 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ #ifdef CONFIG_CIFS_STATS2
+ 	unsigned long now;
+ #endif
+-	midEntry->midState = MID_FREE;
++	midEntry->mid_state = MID_FREE;
+ 	atomic_dec(&midCount);
+-	if (midEntry->largeBuf)
++	if (midEntry->large_buf)
+ 		cifs_buf_release(midEntry->resp_buf);
+ 	else
+ 		cifs_small_buf_release(midEntry->resp_buf);
+@@ -97,8 +97,8 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+ 	   something is wrong, unless it is quite a slow link or server */
+ 	if ((now - midEntry->when_alloc) > HZ) {
+ 		if ((cifsFYI & CIFS_TIMER) &&
+-		   (midEntry->command != SMB_COM_LOCKING_ANDX)) {
+-			printk(KERN_DEBUG " CIFS slow rsp: cmd %d mid %d",
++		    (midEntry->command != cpu_to_le16(SMB_COM_LOCKING_ANDX))) {
++			printk(KERN_DEBUG " CIFS slow rsp: cmd %d mid %llu",
+ 			       midEntry->command, midEntry->mid);
+ 			printk(" A: 0x%lx S: 0x%lx R: 0x%lx\n",
+ 			       now - midEntry->when_alloc,
+@@ -323,7 +323,7 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+ 	int error;
  
- int
--map_smb_to_linux_error(struct smb_hdr *smb, bool logErr)
-+map_smb_to_linux_error(char *buf, bool logErr)
+ 	error = wait_event_freezekillable(server->response_q,
+-				    midQ->midState != MID_REQUEST_SUBMITTED);
++				    midQ->mid_state != MID_REQUEST_SUBMITTED);
+ 	if (error < 0)
+ 		return -ERESTARTSYS;
+ 
+@@ -386,7 +386,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	mid->receive = receive;
+ 	mid->callback = callback;
+ 	mid->callback_data = cbdata;
+-	mid->midState = MID_REQUEST_SUBMITTED;
++	mid->mid_state = MID_REQUEST_SUBMITTED;
+ 
+ 	cifs_in_send_inc(server);
+ 	rc = smb_sendv(server, iov, nvec);
+@@ -436,11 +436,11 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
  {
-+	struct smb_hdr *smb = (struct smb_hdr *)buf;
- 	unsigned int i;
- 	int rc = -EIO;	/* if transport error smb error may not be set */
- 	__u8 smberrclass;
+ 	int rc = 0;
+ 
+-	cFYI(1, "%s: cmd=%d mid=%d state=%d", __func__, mid->command,
+-		mid->mid, mid->midState);
++	cFYI(1, "%s: cmd=%d mid=%llu state=%d", __func__,
++	     le16_to_cpu(mid->command), mid->mid, mid->mid_state);
+ 
+ 	spin_lock(&GlobalMid_Lock);
+-	switch (mid->midState) {
++	switch (mid->mid_state) {
+ 	case MID_RESPONSE_RECEIVED:
+ 		spin_unlock(&GlobalMid_Lock);
+ 		return rc;
+@@ -455,8 +455,8 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+ 		break;
+ 	default:
+ 		list_del_init(&mid->qhead);
+-		cERROR(1, "%s: invalid mid state mid=%d state=%d", __func__,
+-			mid->mid, mid->midState);
++		cERROR(1, "%s: invalid mid state mid=%llu state=%d", __func__,
++		       mid->mid, mid->mid_state);
+ 		rc = -EIO;
+ 	}
+ 	spin_unlock(&GlobalMid_Lock);
+@@ -601,7 +601,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 		return rc;
+ 	}
+ 
+-	midQ->midState = MID_REQUEST_SUBMITTED;
++	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(ses->server);
+ 	rc = smb_sendv(ses->server, iov, n_vec);
+ 	cifs_in_send_dec(ses->server);
+@@ -623,7 +623,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc != 0) {
+ 		send_nt_cancel(ses->server, (struct smb_hdr *)buf, midQ);
+ 		spin_lock(&GlobalMid_Lock);
+-		if (midQ->midState == MID_REQUEST_SUBMITTED) {
++		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			midQ->callback = DeleteMidQEntry;
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_small_buf_release(buf);
+@@ -643,7 +643,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 		return rc;
+ 	}
+ 
+-	if (!midQ->resp_buf || midQ->midState != MID_RESPONSE_RECEIVED) {
++	if (!midQ->resp_buf || midQ->mid_state != MID_RESPONSE_RECEIVED) {
+ 		rc = -EIO;
+ 		cFYI(1, "Bad MID state?");
+ 		goto out;
+@@ -652,7 +652,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	buf = (char *)midQ->resp_buf;
+ 	iov[0].iov_base = buf;
+ 	iov[0].iov_len = get_rfc1002_length(buf) + 4;
+-	if (midQ->largeBuf)
++	if (midQ->large_buf)
+ 		*pRespBufType = CIFS_LARGE_BUFFER;
+ 	else
+ 		*pRespBufType = CIFS_SMALL_BUFFER;
+@@ -726,7 +726,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 		goto out;
+ 	}
+ 
+-	midQ->midState = MID_REQUEST_SUBMITTED;
++	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 
+ 	cifs_in_send_inc(ses->server);
+ 	rc = smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
+@@ -744,7 +744,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc != 0) {
+ 		send_nt_cancel(ses->server, in_buf, midQ);
+ 		spin_lock(&GlobalMid_Lock);
+-		if (midQ->midState == MID_REQUEST_SUBMITTED) {
++		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			/* no longer considered to be "in-flight" */
+ 			midQ->callback = DeleteMidQEntry;
+ 			spin_unlock(&GlobalMid_Lock);
+@@ -763,7 +763,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	}
+ 
+ 	if (!midQ->resp_buf || !out_buf ||
+-	    midQ->midState != MID_RESPONSE_RECEIVED) {
++	    midQ->mid_state != MID_RESPONSE_RECEIVED) {
+ 		rc = -EIO;
+ 		cERROR(1, "Bad MID state?");
+ 		goto out;
+@@ -867,7 +867,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 		return rc;
+ 	}
+ 
+-	midQ->midState = MID_REQUEST_SUBMITTED;
++	midQ->mid_state = MID_REQUEST_SUBMITTED;
+ 	cifs_in_send_inc(ses->server);
+ 	rc = smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
+ 	cifs_in_send_dec(ses->server);
+@@ -883,13 +883,13 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* Wait for a reply - allow signals to interrupt. */
+ 	rc = wait_event_interruptible(ses->server->response_q,
+-		(!(midQ->midState == MID_REQUEST_SUBMITTED)) ||
++		(!(midQ->mid_state == MID_REQUEST_SUBMITTED)) ||
+ 		((ses->server->tcpStatus != CifsGood) &&
+ 		 (ses->server->tcpStatus != CifsNew)));
+ 
+ 	/* Were we interrupted by a signal ? */
+ 	if ((rc == -ERESTARTSYS) &&
+-		(midQ->midState == MID_REQUEST_SUBMITTED) &&
++		(midQ->mid_state == MID_REQUEST_SUBMITTED) &&
+ 		((ses->server->tcpStatus == CifsGood) ||
+ 		 (ses->server->tcpStatus == CifsNew))) {
+ 
+@@ -923,7 +923,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 		if (rc) {
+ 			send_nt_cancel(ses->server, in_buf, midQ);
+ 			spin_lock(&GlobalMid_Lock);
+-			if (midQ->midState == MID_REQUEST_SUBMITTED) {
++			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 				/* no longer considered to be "in-flight" */
+ 				midQ->callback = DeleteMidQEntry;
+ 				spin_unlock(&GlobalMid_Lock);
+@@ -946,7 +946,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 	}
+ 
+ 	/* rcvd frame is ok */
+-	if (out_buf == NULL || midQ->midState != MID_RESPONSE_RECEIVED) {
++	if (out_buf == NULL || midQ->mid_state != MID_RESPONSE_RECEIVED) {
+ 		rc = -EIO;
+ 		cERROR(1, "Bad MID state?");
+ 		goto out;
 -- 
 1.7.1
