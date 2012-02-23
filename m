@@ -1,129 +1,63 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Do not kmalloc under the flocks spinlock
-Date: Thu, 23 Feb 2012 06:49:31 -0500
-Message-ID: <20120223064931.23539689@tlielax.poochiereds.net>
-References: <1329901855-11683-1-git-send-email-piastry@etersoft.ru>
-	<20120222073446.1fbdddac@tlielax.poochiereds.net>
-	<CAKywueRMobe5OEm4K2Xrh3KwTDKXk4Uh-68gM==UnHXvQNBonQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix dentry refcount leak when opening a FIFO on lookup
+Date: Thu, 23 Feb 2012 09:37:45 -0500
+Message-ID: <1330007865-19962-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, caiqian-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRMobe5OEm4K2Xrh3KwTDKXk4Uh-68gM==UnHXvQNBonQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 23 Feb 2012 10:56:40 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+The cifs code will attempt to open files on lookup under certain
+circumstances. What happens though if we find that the file we opened
+was actually a FIFO or other special file?
 
-> 2012/2/22 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> >
-> > Hmm...looking at my machine:
-> >
-> > (gdb) p sizeof(struct cifsLockInfo)
-> > $1 =3D 144
-> >
-> > So that's 144 bytes per struct...what's the upper limit on "count"?
-> >
-> > It seems like that could potentially be a large allocation, and we =
-have
-> > to do this in the oplock break codepath.
-> >
-> > Instead of doing this, would it be better to allocate these when
-> > the VFS first calls ->lock, and attach them to a new member of
-> > file_lock.fl_u?
->=20
-> Every time we can have a different number of locks - so, can't
-> pre-allocate it.=20
+Currently, the open filehandle just ends up being leaked leading to
+a dentry refcount mismatch and oops on umount. Fix this by having the
+code close the filehandle on the server if it turns out not to be a
+regular file. While we're at it, change this spaghetti if statement
+into a switch too.
 
-You could preallocate these:
+Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Reported-by: CAI Qian <caiqian-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/dir.c |   20 ++++++++++++++++++--
+ 1 files changed, 18 insertions(+), 2 deletions(-)
 
-1/ Do the allocation in cifs_setlk
-2/ Attach it to a new fl_u member in the file_lock struct
-3/ Add a fl_release_private op to free that object
-
-Of course, you will need to consider how to deal with lock splitting
-and merging if you do that...
-
-> I can create new struct for this only - without extra
-> llist, blist, block_q fields, that can save enough memory.
->
-
-That sounds preferable. We really don't want to allocate more memory
-than is needed. Plus, anytime you duplicate information at least one
-copy is going to be wrong at some point in time.
-
-> >
-> >> =C2=A0 =C2=A0 =C2=A0 lock_flocks();
-> >> =C2=A0 =C2=A0 =C2=A0 cifs_for_each_lock(cfile->dentry->d_inode, be=
-fore) {
-> >> @@ -950,35 +962,38 @@ cifs_push_posix_locks(struct cifsFileInfo *c=
-file)
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 type =3D CIFS_RDLCK;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 type =3D CIFS_WRLCK;
-> >> -
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck =3D cifs_lock_init=
-(flock->fl_start, length, type,
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cfile->netfid);
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!lck) {
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 rc =3D -ENOMEM;
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 goto send_locks;
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck =3D &lcks[i];
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck->pid =3D floc=
-k->fl_pid;
-> >> -
-> >> - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 list_add_tail(&lck->ll=
-ist, &locks_to_send);
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck->netfid =3D cfile-=
->netfid;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck->length =3D length=
-;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck->type =3D type;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 lck->offset =3D flock-=
->fl_start;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 i++;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (i =3D=3D count)
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 break;
-> >> =C2=A0 =C2=A0 =C2=A0 }
-> >> -
-> >> -send_locks:
-> >> =C2=A0 =C2=A0 =C2=A0 unlock_flocks();
-> >>
-> >> - =C2=A0 =C2=A0 list_for_each_entry_safe(lck, tmp, &locks_to_send,=
- llist) {
-> >> + =C2=A0 =C2=A0 if (i =3D=3D count)
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cERROR(1, "Can't push =
-all brlocks!");
-> >> +
-> >
-> > This sort of thing always makes me a little worried. Sure, you're
-> > allocating a bunch of extra locks, but what's the potential effect
-> > of not being able to push all the locks here? The user is going to
-> > see this message and have no clue of what it means.
-> >
-> > Even I'm not sure what this means in practice. The VFS will have a
-> > record of this lock, but the server won't...
-> >
->=20
-> I really think that there will be no such situations, because we hold
-> inode->lock_mutex - the locking state should leave the same.
->=20
-
-I don't share that optimism.
-
-The lock_mutex protects the cinode->llist, but here you're walking the
-inode->i_flock list. It's certainly possible that it could change in
-between unlock_flocks and lock_flocks.
-
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 63a196b..bc7e244 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -584,10 +584,26 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 			 * If either that or op not supported returned, follow
+ 			 * the normal lookup.
+ 			 */
+-			if ((rc == 0) || (rc == -ENOENT))
++			switch (rc) {
++			case 0:
++				/*
++				 * The server may allow us to open things like
++				 * FIFOs, but the client isn't set up to deal
++				 * with that. If it's not a regular file, just
++				 * close it and proceed as if it were a normal
++				 * lookup.
++				 */
++				if (newInode && !S_ISREG(newInode->i_mode)) {
++					CIFSSMBClose(xid, pTcon, fileHandle);
++					break;
++				}
++			case -ENOENT:
+ 				posix_open = true;
+-			else if ((rc == -EINVAL) || (rc != -EOPNOTSUPP))
++			case -EOPNOTSUPP:
++				break;
++			default:
+ 				pTcon->broken_posix_open = true;
++			}
+ 		}
+ 		if (!posix_open)
+ 			rc = cifs_get_inode_info_unix(&newInode, full_path,
+-- 
+1.7.7.6
