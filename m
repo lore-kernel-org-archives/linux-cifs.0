@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] cifs: fix dentry refcount leak when opening a FIFO on lookup
-Date: Fri, 24 Feb 2012 11:53:27 -0600
-Message-ID: <CADT32eJbv7n71sAFx8Tm2qOMsjC24_PM89Ee5VQKV6Dg52-uiw@mail.gmail.com>
+Date: Fri, 24 Feb 2012 11:59:25 -0600
+Message-ID: <CADT32eLr1B5XPkBqE3Lmj7v1sa1yoXE3MNNiJ+ubPf3t+UJSWg@mail.gmail.com>
 References: <1330007865-19962-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
@@ -65,9 +65,6 @@ Inode && !S_ISREG(newInode->i_mode)) {
 > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
  =A0 =A0 break;
 > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-
-Should there be    else posix_open =3D true;       statement?
-
 > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 case -ENOENT:
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0posix_=
 open =3D true;
@@ -91,3 +88,6 @@ info_unix(&newInode, full_path,
  in
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+
+One  more thing, should CIFSPOSIXDelFile should be called to match
+CIFSPOSIXOpen or CIFSMBClose is just as good enough?
