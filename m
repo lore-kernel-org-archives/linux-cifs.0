@@ -1,88 +1,79 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] mount.cifs: fix tests for strtoul success
-Date: Thu, 23 Feb 2012 10:40:35 -0500
-Message-ID: <1330011635-20907-1-git-send-email-jlayton@samba.org>
+From: CAI Qian <caiqian-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix dentry refcount leak when opening a FIFO on lookup
+Date: Fri, 24 Feb 2012 03:09:39 -0500 (EST)
+Message-ID: <d6f8aa81-4656-402d-ba43-13caad90939f@zmail14.collab.prod.int.phx2.redhat.com>
+References: <1330007865-19962-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Cc: ksquizza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1330007865-19962-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The current test just looks to see if errno was 0 after the conversion
-but we need to do a bit more. According to the strtoul manpage:
 
-    If there were no digits at all, strtoul() stores the original value
-    of nptr in *endptr (and returns 0).
 
-So, if you pass in a string of letters, strtoul will return 0, but
-won't actually have converted anything. Luckily, in most cases, /bin/mount
-papers over this bug by doing uid/gid conversions itself before calling
-mount.cifs.
-
-Fix this by also checking to ensure that strtoul() converted the entire
-string in addition to checking that it didn't set errno. While we're at
-it, fix the test in backupuid/backupgid options as well which doesn't
-currently check whether errno got set.
-
-Reported-by: Kyle Squizzato <ksquizza-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.c |   12 +++++++-----
- 1 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/mount.cifs.c b/mount.cifs.c
-index a46a22c..824cd3a 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1032,7 +1032,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			got_uid = 1;
- 			errno = 0;
- 			uid = strtoul(value, &ep, 10);
--			if (errno == 0)
-+			if (errno == 0 && *ep == '\0')
- 				goto nocopy;
- 
- 			pw = getpwnam(value);
-@@ -1051,7 +1051,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			got_cruid = 1;
- 			errno = 0;
- 			cruid = strtoul(value, &ep, 10);
--			if (errno == 0)
-+			if (errno == 0 && *ep == '\0')
- 				goto nocopy;
- 
- 			pw = getpwnam(value);
-@@ -1069,7 +1069,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 			got_gid = 1;
- 			errno = 0;
- 			gid = strtoul(value, &ep, 10);
--			if (errno == 0)
-+			if (errno == 0 && *ep == '\0')
- 				goto nocopy;
- 
- 			gr = getgrnam(value);
-@@ -1175,8 +1175,9 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 				goto nocopy;
- 
- 			got_bkupuid = 1;
-+			errno = 0;
- 			bkupuid = strtoul(value, &ep, 10);
--			if (!strlen(ep))
-+			if (errno == 0 && *ep == '\0')
- 				goto nocopy;
- 
- 			pw = getpwnam(value);
-@@ -1193,8 +1194,9 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 				goto nocopy;
- 
- 			got_bkupgid = 1;
-+			errno = 0;
- 			bkupgid = strtoul(value, &ep, 10);
--			if (!strlen(ep))
-+			if (errno == 0 && *ep == '\0')
- 				goto nocopy;
- 
- 			gr = getgrnam(value);
--- 
-1.7.7.6
+----- Original Message -----
+> The cifs code will attempt to open files on lookup under certain
+> circumstances. What happens though if we find that the file we opened
+> was actually a FIFO or other special file?
+> 
+> Currently, the open filehandle just ends up being leaked leading to
+> a dentry refcount mismatch and oops on umount. Fix this by having the
+> code close the filehandle on the server if it turns out not to be a
+> regular file. While we're at it, change this spaghetti if statement
+> into a switch too.
+> 
+> Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Reported-by: CAI Qian <caiqian-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Tested-by: CAI Qian <caiqian-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/dir.c |   20 ++++++++++++++++++--
+>  1 files changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 63a196b..bc7e244 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -584,10 +584,26 @@ cifs_lookup(struct inode *parent_dir_inode,
+> struct dentry *direntry,
+>  			 * If either that or op not supported returned, follow
+>  			 * the normal lookup.
+>  			 */
+> -			if ((rc == 0) || (rc == -ENOENT))
+> +			switch (rc) {
+> +			case 0:
+> +				/*
+> +				 * The server may allow us to open things like
+> +				 * FIFOs, but the client isn't set up to deal
+> +				 * with that. If it's not a regular file, just
+> +				 * close it and proceed as if it were a normal
+> +				 * lookup.
+> +				 */
+> +				if (newInode && !S_ISREG(newInode->i_mode)) {
+> +					CIFSSMBClose(xid, pTcon, fileHandle);
+> +					break;
+> +				}
+> +			case -ENOENT:
+>  				posix_open = true;
+> -			else if ((rc == -EINVAL) || (rc != -EOPNOTSUPP))
+> +			case -EOPNOTSUPP:
+> +				break;
+> +			default:
+>  				pTcon->broken_posix_open = true;
+> +			}
+>  		}
+>  		if (!posix_open)
+>  			rc = cifs_get_inode_info_unix(&newInode, full_path,
+> --
+> 1.7.7.6
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"
+> in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
