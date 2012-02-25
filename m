@@ -1,16 +1,17 @@
 From: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
-Subject: (unknown)
-Date: Sat, 25 Feb 2012 15:15:33 +0100
-Message-ID: <1188355785.217822.1330179332876.JavaMail.www@wwinf8305>
+Subject: cifs oplock windows share
+Date: Sat, 25 Feb 2012 15:23:36 +0100
+Message-ID: <790056146.218351.1330179815970.JavaMail.www@wwinf8305>
 Reply-To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+Sorry for reposting precedent mail
 
 Hello=20
 I am working in a university.
@@ -20,8 +21,9 @@ The linux home is local, but the document directory is mounted on a win=
 dows share via pam_mount and cifs
 The windows share is configured like this in /etc/security/pam_mount.co=
 nf.xml
-
-"=20
+volume user=3D"*" fstype=3D"cifs" server=3D"$SERVEURDONNEES" path=3D"$R=
+EPERTOIREDONNES/%(DOMAIN_USER)" mountpoint=3D"~/Documents" options=3D"n=
+ounix,noserverino
 
 Everything was working when only a few computers were connected.
 Howether, when several linux computers were working, there was the prob=
