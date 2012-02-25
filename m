@@ -1,155 +1,70 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v2] CIFS: Fix mkdir/rmdir bug for the non-POSIX case
-Date: Sat, 25 Feb 2012 13:11:26 +0400
-Message-ID: <CAKywueS0XKjuX_sLfb=Lhp=hLgrYpq7ndAtNGDjq1pFg16A7dA@mail.gmail.com>
-References: <1329484410-30540-1-git-send-email-piastry@etersoft.ru>
-	<20120221100006.7e43e8b9@tlielax.poochiereds.net>
+From: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
+Subject: (unknown)
+Date: Sat, 25 Feb 2012 15:15:33 +0100
+Message-ID: <1188355785.217822.1330179332876.JavaMail.www@wwinf8305>
+Reply-To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120221100006.7e43e8b9-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Subject: 
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/2/21 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> On Fri, 17 Feb 2012 16:13:30 +0300
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> Currently we do inc/drop_nlink for a parent directory for every
->> mkdir/rmdir calls. That's wrong when Unix extensions are disabled
->> because in this case a server doesn't follow the same semantic and
->> returns the old value on the next QueryInfo request. As the result,
->> we update our value with the server one and then decrement it on
->> every rmdir call - go to negative nlink values.
->>
->> Fix this by removing inc/drop_nlink for the parent directory from
->> mkdir/rmdir, setting it for a revalidation and ignoring NumberOfLink=
-s
->> for directories when Unix extensions are disabled.
->>
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->> ---
->> =A0fs/cifs/inode.c | =A0 28 +++++++++++++++++++---------
->> =A01 files changed, 19 insertions(+), 9 deletions(-)
->>
->> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
->> index a5f54b7..745da3d 100644
->> --- a/fs/cifs/inode.c
->> +++ b/fs/cifs/inode.c
->> @@ -534,6 +534,11 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr=
-, FILE_ALL_INFO *info,
->> =A0 =A0 =A0 if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_mode =3D S_IFDIR | cifs_sb->mn=
-t_dir_mode;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_dtype =3D DT_DIR;
->> + =A0 =A0 =A0 =A0 =A0 =A0 /*
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* Server can return wrong NumberOfLinks=
- value for directories
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0* when Unix extensions are disabled - f=
-ake it.
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
->> + =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_nlink =3D 2;
->> =A0 =A0 =A0 } else {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_mode =3D S_IFREG | cifs_sb->mn=
-t_file_mode;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_dtype =3D DT_REG;
->> @@ -541,9 +546,9 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr,=
- FILE_ALL_INFO *info,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* clear write bits if ATTR_READONLY is =
-set */
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (fattr->cf_cifsattrs & ATTR_READONLY)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_mode &=3D ~(S_=
-IWUGO);
->> - =A0 =A0 }
->>
->> - =A0 =A0 fattr->cf_nlink =3D le32_to_cpu(info->NumberOfLinks);
->> + =A0 =A0 =A0 =A0 =A0 =A0 fattr->cf_nlink =3D le32_to_cpu(info->Numb=
-erOfLinks);
->> + =A0 =A0 }
->>
->> =A0 =A0 =A0 fattr->cf_uid =3D cifs_sb->mnt_uid;
->> =A0 =A0 =A0 fattr->cf_gid =3D cifs_sb->mnt_gid;
->> @@ -1322,7 +1327,6 @@ int cifs_mkdir(struct inode *inode, struct den=
-try *direntry, umode_t mode)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> =A0/*BB check (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID ) to see=
- if need
->> =A0 =A0 =A0 to set uid/gid */
->> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 inc_nlink(inode);
->>
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_unix_basic_to_fattr=
-(&fattr, pInfo, cifs_sb);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_fill_uniqueid(inode=
-->i_sb, &fattr);
->> @@ -1355,7 +1359,6 @@ mkdir_retry_old:
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 d_drop(direntry);
->> =A0 =A0 =A0 } else {
->> =A0mkdir_get_info:
->> - =A0 =A0 =A0 =A0 =A0 =A0 inc_nlink(inode);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (pTcon->unix_ext)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D cifs_get_inode_in=
-fo_unix(&newinode, full_path,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 inode->i_sb, xid);
->> @@ -1436,6 +1439,11 @@ mkdir_get_info:
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> =A0 =A0 =A0 }
->> =A0mkdir_out:
->> + =A0 =A0 /*
->> + =A0 =A0 =A0* Force revalidate to get parent dir info when needed s=
-ince cached
->> + =A0 =A0 =A0* attributes are invalid now.
->> + =A0 =A0 =A0*/
->> + =A0 =A0 CIFS_I(inode)->time =3D 0;
->> =A0 =A0 =A0 kfree(full_path);
->> =A0 =A0 =A0 FreeXid(xid);
->> =A0 =A0 =A0 cifs_put_tlink(tlink);
->> @@ -1475,7 +1483,6 @@ int cifs_rmdir(struct inode *inode, struct den=
-try *direntry)
->> =A0 =A0 =A0 cifs_put_tlink(tlink);
->>
->> =A0 =A0 =A0 if (!rc) {
->> - =A0 =A0 =A0 =A0 =A0 =A0 drop_nlink(inode);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lock(&direntry->d_inode->i_lock);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 i_size_write(direntry->d_inode, 0);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 clear_nlink(direntry->d_inode);
->> @@ -1483,12 +1490,15 @@ int cifs_rmdir(struct inode *inode, struct d=
-entry *direntry)
->> =A0 =A0 =A0 }
->>
->> =A0 =A0 =A0 cifsInode =3D CIFS_I(direntry->d_inode);
->> - =A0 =A0 cifsInode->time =3D 0; =A0 =A0/* force revalidate to go ge=
-t info when
->> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0nee=
-ded */
->> + =A0 =A0 /* force revalidate to go get info when needed */
->> + =A0 =A0 cifsInode->time =3D 0;
->>
->> =A0 =A0 =A0 cifsInode =3D CIFS_I(inode);
->> - =A0 =A0 cifsInode->time =3D 0; =A0 =A0/* force revalidate to get p=
-arent dir info
->> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0sin=
-ce cached search results now invalid */
->> + =A0 =A0 /*
->> + =A0 =A0 =A0* Force revalidate to get parent dir info when needed s=
-ince cached
->> + =A0 =A0 =A0* attributes are invalid now.
->> + =A0 =A0 =A0*/
->> + =A0 =A0 cifsInode->time =3D 0;
->>
->> =A0 =A0 =A0 direntry->d_inode->i_ctime =3D inode->i_ctime =3D inode-=
->i_mtime =3D
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 current_fs_time(inode->i_sb);
->
-> Looks good.
->
-> Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Hello=20
+I am working in a university.
+I have integrated 160 linux Fedora 14 clients in a Active directory wit=
+h Windows Server 2008 with winbind.
+The linux home is local, but the document directory is mounted on a win=
+dows share via pam_mount and cifs
+The windows share is configured like this in /etc/security/pam_mount.co=
+nf.xml
 
-Steve, what's about this patch? I think it should go to stable as well.
+"=20
 
---=20
-Best regards,
-Pavel Shilovsky.
+Everything was working when only a few computers were connected.
+Howether, when several linux computers were working, there was the prob=
+lem :
+ct 5 16:42:24 u1209-01l kernel: [ 58.783078] CIFS VFS: No response for =
+cmd 114 mid 1
+Oct 5 16:42:24 u1209-01l kernel: [ 58.783094] CIFS VFS: cifs_mount fail=
+ed w/return code =3D -112
+Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(mount.c:64): Errors f=
+rom underlying mount program:
+Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(mount.c:68): mount er=
+ror(112): Host is down
+Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(mount.c:68): Refer to=
+ the mount.cifs(8) manual page (e.g. man mount.cifs)
+Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(pam_mount.c:521): mou=
+nt of data/u20 failed
+
+And the windows share went completely out of line: the server must be r=
+ebooted ...
+I have put=20
+modprobe cifs
+echo 0 > /proc/fs/cifs/OplockEnabled
+on the /etc/rc.d/rc.local in all the linux clients and everything was r=
+esolved.
+
+Everything is working fine for several months.
+
+Now in another part of the university, I have put the same system on 10=
+0 Fedora 14 clients.
+The only difference is the Windows Server is 2008 R2 and don't use the =
+same SMB: version 2.1
+The problem is back again... The windows share freezes and the windows =
+server R2 must be rebooted.
+echo 0 > /proc/fs/cifs/OplockEnabled don't seem to work anymore
+I don't understand well how to resolve the problem.
+Is this a cifs problem ? Must I downgrade the windows Server to 2008 ?
+I have read about to put max protocol =3D smb2 in smb.conf. What must I=
+ investigate for resolving this ?
+
+Cheers,
+Thanks.
+Serge
+
+Une messagerie gratuite, garantie =C3=A0 vie et des services en plus, =C3=
+=A7a vous tente ?
+Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
