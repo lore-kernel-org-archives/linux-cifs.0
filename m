@@ -1,183 +1,139 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 03/11] CIFS: Count blocking lock command
-Date: Mon, 27 Feb 2012 17:23:07 -0600
-Message-ID: <CAH2r5mujUbTEe0xtk_sfM1xokCk7FnX=6JKO539ut88Z+RS7wA@mail.gmail.com>
+Subject: Re: [PATCH 04/11] CIFS: Delete echo_retries module parm
+Date: Mon, 27 Feb 2012 17:39:46 -0600
+Message-ID: <CAH2r5mtabJkqJ5AaW-f2pZX71+x5CZbfasiExC6s2jcbaMPf6g@mail.gmail.com>
 References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
-	<1329895984-9251-4-git-send-email-piastry@etersoft.ru>
+	<1329895984-9251-5-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1329895984-9251-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1329895984-9251-5-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I don't think we can do this for the cifs case - 49 blocking locks and
-we would deadlock our system (a pending write could block forever) -
-for smb2.2 it makes more sense.  I don't think it actually causes a
-problem to exceed 50 blocks locks - but if we want to count blocking
-locks we will have to limit the maximum number of blocking locks to 2
-or 3 less than maxmpx and not allow blocking locks if maxmpx is lower
-than 3.
+Having interesting conversations here about maxmpx, echo, blocking lock=
+s etc.
+
+To Samba apparently we should not be limiting these requests in flight
+- they can go far beyond 50 with no problem (although for non-SMB2
+case we should be checking for a few other things - like that opens
+don't exceed 64K on cifs).
+
+=46or blocking locks the story (according to Chris H.) is interesting,
+but we can allow up to maxmpx (actually maxmpx minus one or two, for
+oplock, and one other non-blocking command presumably) per pid-mid
+pair (ie mids per process).   So we should be able to allow 48 (or 8,
+ie two less than maxmpx, depending on server) simultaneous pending
+blocking locks per process (per process/per connection) not per
+connection.
 
 On Wed, Feb 22, 2012 at 1:32 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
 wrote:
-> to make sure we don't exceed the number of credits we have in this ca=
-se.
+> It's the essential step before respecting MaxMpxCount value during
+> negotiating because we will keep only one extra slot for sending
+> echo requests. If there is no response for echo message - reconnect
+> the tcp session.
 >
 > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
-> =A0fs/cifs/transport.c | =A0 32 +++++++++++++++++++++-----------
-> =A01 files changed, 21 insertions(+), 11 deletions(-)
+> =A0fs/cifs/README =A0 =A0 | =A0 =A06 +-----
+> =A0fs/cifs/cifsfs.c =A0 | =A0 =A05 -----
+> =A0fs/cifs/cifsglob.h | =A0 =A03 ---
+> =A0fs/cifs/connect.c =A0| =A0 =A07 +++----
+> =A04 files changed, 4 insertions(+), 17 deletions(-)
 >
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 44ac0aa..fa93720 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -279,15 +279,8 @@ wait_for_free_request(struct TCP_Server_Info *se=
-rver, const int long_op)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_u=
-nlock(&server->req_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- -ENOENT;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> diff --git a/fs/cifs/README b/fs/cifs/README
+> index 895da1d..b7d782b 100644
+> --- a/fs/cifs/README
+> +++ b/fs/cifs/README
+> @@ -753,10 +753,6 @@ module loading or during the runtime by using th=
+e interface
+>
+> =A0i.e. echo "value" > /sys/module/cifs/parameters/<param>
+>
+> -1. echo_retries - The number of echo attempts before giving up and
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 reconnecting to the server. The def=
+ault is 5. The value 0
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 means never reconnect.
 > -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* can not count lockin=
-g commands against total
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0as they are allo=
-wed to block on server */
+> -2. enable_oplocks - Enable or disable oplocks. Oplocks are enabled b=
+y default.
+> +1. enable_oplocks - Enable or disable oplocks. Oplocks are enabled b=
+y default.
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0[Y/y/1]. To disable use any of=
+ [N/n/0].
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index b1fd382..e1ce1ca 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -77,11 +77,6 @@ unsigned int cifs_max_pending =3D CIFS_MAX_REQ;
+> =A0module_param(cifs_max_pending, int, 0444);
+> =A0MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to serve=
+r. "
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "=
+Default: 50 Range: 2 to 256");
+> -unsigned short echo_retries =3D 5;
+> -module_param(echo_retries, ushort, 0644);
+> -MODULE_PARM_DESC(echo_retries, "Number of echo attempts before givin=
+g up and "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"reconne=
+cting server. Default: 5. 0 means "
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"never r=
+econnect.");
+> =A0module_param(enable_oplocks, bool, 0644);
+> =A0MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool)=
+=2E Default:"
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "y/Y/=
+1");
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 600d61c..674792e 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1049,9 +1049,6 @@ GLOBAL_EXTERN unsigned int cifs_min_rcv; =A0 =A0=
+/* min size of big ntwrk buf pool */
+> =A0GLOBAL_EXTERN unsigned int cifs_min_small; =A0/* min size of small=
+ buf pool */
+> =A0GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at on=
+ce to server*/
+>
+> -/* reconnect after this many failed echo attempts */
+> -GLOBAL_EXTERN unsigned short echo_retries;
 > -
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* update # of requests=
- on the wire to server */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (long_op !=3D CIFS_B=
-LOCKING_OP) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server-=
->credits--;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server-=
->in_flight++;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->credits--;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->in_flight++;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&server->r=
-eq_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -816,7 +809,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -EIO;
-> =A0 =A0 =A0 =A0}
->
-> - =A0 =A0 =A0 rc =3D wait_for_free_request(ses->server, CIFS_BLOCKING=
-_OP);
-> + =A0 =A0 =A0 rc =3D wait_for_free_request(ses->server, 0);
-> =A0 =A0 =A0 =A0if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
->
-> @@ -829,6 +822,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0rc =3D allocate_mid(ses, in_buf, &midQ);
-> =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
->
-> @@ -836,6 +831,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete_mid(midQ);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
->
-> @@ -848,6 +845,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->
-> =A0 =A0 =A0 =A0if (rc < 0) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete_mid(midQ);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
->
-> @@ -869,6 +868,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D send_nt_cancel(=
-ses->server, in_buf, midQ);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete=
-_mid(midQ);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up=
-(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else {
-> @@ -881,6 +882,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 already been remo=
-ved. Don't exit in this case. */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc && rc !=3D -ENO=
-LCK) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete=
-_mid(midQ);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up=
-(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -893,6 +896,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* no =
-longer considered to be "in-flight" */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0midQ->=
-callback =3D DeleteMidQEntry;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_u=
-nlock(&GlobalMid_Lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up=
-(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid=
-_Lock);
-> @@ -903,8 +908,11 @@ SendReceiveBlockingLock(const unsigned int xid, =
-struct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0}
->
-> =A0 =A0 =A0 =A0rc =3D cifs_sync_mid_result(midQ, ses->server);
-> - =A0 =A0 =A0 if (rc !=3D 0)
-> + =A0 =A0 =A0 if (rc !=3D 0) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> + =A0 =A0 =A0 }
->
-> =A0 =A0 =A0 =A0/* rcvd frame is ok */
-> =A0 =A0 =A0 =A0if (out_buf =3D=3D NULL || midQ->midState !=3D MID_RES=
-PONSE_RECEIVED) {
-> @@ -918,6 +926,8 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0rc =3D cifs_check_receive(midQ, ses->server, 0);
-> =A0out:
-> =A0 =A0 =A0 =A0delete_mid(midQ);
-> + =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0if (rstart && rc =3D=3D -EACCES)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ERESTARTSYS;
-> =A0 =A0 =A0 =A0return rc;
+> =A0#ifdef CONFIG_CIFS_ACL
+> =A0GLOBAL_EXTERN struct rb_root uidtree;
+> =A0GLOBAL_EXTERN struct rb_root gidtree;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 673813f..86d7a40 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -373,12 +373,11 @@ allocate_buffers(struct TCP_Server_Info *server=
+)
+> =A0static bool
+> =A0server_unresponsive(struct TCP_Server_Info *server)
+> =A0{
+> - =A0 =A0 =A0 if (echo_retries > 0 && server->tcpStatus =3D=3D CifsGo=
+od &&
+> - =A0 =A0 =A0 =A0 =A0 time_after(jiffies, server->lstrp +
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (echo_r=
+etries * SMB_ECHO_INTERVAL))) {
+> + =A0 =A0 =A0 if (server->tcpStatus =3D=3D CifsGood &&
+> + =A0 =A0 =A0 =A0 =A0 time_after(jiffies, server->lstrp + SMB_ECHO_IN=
+TERVAL)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Server %s has not responded=
+ in %d seconds. "
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0"Reconnecting...",=
+ server->hostname,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 (echo_retries * SMB=
+_ECHO_INTERVAL / HZ));
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 SMB_ECHO_INTERVAL /=
+ HZ);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_reconnect(server);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&server->response_q);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return true;
 > --
 > 1.7.1
 >
