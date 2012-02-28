@@ -1,896 +1,671 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 06/11] CIFS: Respect MaxMpxCount field
-Date: Mon, 27 Feb 2012 18:01:04 -0600
-Message-ID: <CAH2r5mvVToaHozN3=YgCCCWFFnjE9AP5xX_BF2JdxDj_JvKsbQ@mail.gmail.com>
+Subject: Re: [PATCH 07/11] CIFS: Separate protocol-specific code from
+ transport routines
+Date: Mon, 27 Feb 2012 18:03:01 -0600
+Message-ID: <CAH2r5msSathjY4NfnQs-Jd1HhbHLRGRF3c+D=TkoAHrDp0PH+Q@mail.gmail.com>
 References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
-	<1329895984-9251-7-git-send-email-piastry@etersoft.ru>
+	<1329895984-9251-8-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1329895984-9251-7-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1329895984-9251-8-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is going to be more complicated than it seems.
+Looks reasonable to me.
 
-Apparently (according to Chris), Windows will often allow mapmpx simult=
-aneous
-requests per process for various handle based requests.   In addition a=
-ccording
-to JRA, Samba server does not care if you go beyond maxmpx (and there i=
-s
-a big performance advantage of that).   On the other hand - if the serv=
-er
-sets maxmpx to less than 10, these kind of changes probably make sense
-(those servers are probably broken otherwise), but for normal servers
-this will end up restricting more than windows (for more than than the
-maxmpx per pid).   Generally, for servers like Samba that support
-simultaneous requests reasonably we have to be careful about killing
-performance especially now that with Jeff's async reads and writes
-we will frequently get up to 50 (and should probably make it easier
-to have more than 50 to servers like Samba).
-
-Quoting JRA and Volker - "You should be able to queue
-thousands of simultaneous requests from one client to Samba"
-(as long as the client doesn't time out.  The server keeps
-responding to the earlier requests, so with our client timeout
-code weshould be fine).
-
-On Wed, Feb 22, 2012 at 1:32 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
+On Wed, Feb 22, 2012 at 1:33 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
 wrote:
-> by setting the number of available credits to it except 2 that goes
-> to extra echo and oplock slots. If MaxMpxCount is 2 - disable oplocks=
-,
-> if 1 - disable oplocks and echos.
+> that lets us use this functions for SMB2.
 >
 > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
-> =A0fs/cifs/cifsfs.c =A0 =A0| =A0 12 --------
-> =A0fs/cifs/cifsglob.h =A0| =A0 60 ++++++++++++++++++-----------------=
----
-> =A0fs/cifs/cifsproto.h | =A0 =A07 ++++-
-> =A0fs/cifs/cifssmb.c =A0 | =A0 16 ++++++----
-> =A0fs/cifs/connect.c =A0 | =A0 10 +++---
-> =A0fs/cifs/dir.c =A0 =A0 =A0 | =A0 =A05 ++-
-> =A0fs/cifs/file.c =A0 =A0 =A0| =A0 =A04 +-
-> =A0fs/cifs/misc.c =A0 =A0 =A0| =A0 49 +++++++++++++++++++++++++++++++
-> =A0fs/cifs/transport.c | =A0 79 +++++++++++++++++++++++++------------=
---------------
-> =A09 files changed, 142 insertions(+), 100 deletions(-)
+> =A0fs/cifs/cifs_debug.h | =A0 =A02 +-
+> =A0fs/cifs/cifsglob.h =A0 | =A0 =A06 ++
+> =A0fs/cifs/cifsproto.h =A0| =A0 =A02 +-
+> =A0fs/cifs/cifssmb.c =A0 =A0| =A0 21 +++---
+> =A0fs/cifs/misc.c =A0 =A0 =A0 | =A0 =A05 +-
+> =A0fs/cifs/transport.c =A0| =A0171 +++++++++++++++++++++++++++++-----=
+----------------
+> =A06 files changed, 119 insertions(+), 88 deletions(-)
 >
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index e1ce1ca..a9b483b 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -73,10 +73,6 @@ unsigned int cifs_min_small =3D 30;
-> =A0module_param(cifs_min_small, int, 0);
-> =A0MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. D=
-efault: 30 "
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "Rang=
-e: 2 to 256");
-> -unsigned int cifs_max_pending =3D CIFS_MAX_REQ;
-> -module_param(cifs_max_pending, int, 0444);
-> -MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server.=
- "
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
-"Default: 50 Range: 2 to 256");
-> =A0module_param(enable_oplocks, bool, 0644);
-> =A0MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool)=
-=2E Default:"
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "y/Y/=
-1");
-> @@ -1108,14 +1104,6 @@ init_cifs(void)
-> =A0 =A0 =A0 =A0spin_lock_init(&cifs_file_list_lock);
-> =A0 =A0 =A0 =A0spin_lock_init(&GlobalMid_Lock);
->
-> - =A0 =A0 =A0 if (cifs_max_pending < 2) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_max_pending =3D 2;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "cifs_max_pending set to min of=
- 2");
-> - =A0 =A0 =A0 } else if (cifs_max_pending > 256) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_max_pending =3D 256;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "cifs_max_pending set to max of=
- 256");
-> - =A0 =A0 =A0 }
-> -
-> =A0 =A0 =A0 =A0rc =3D cifs_fscache_register();
-> =A0 =A0 =A0 =A0if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out_clean_proc;
+> diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+> index 8942b28..0a234c1 100644
+> --- a/fs/cifs/cifs_debug.h
+> +++ b/fs/cifs/cifs_debug.h
+> @@ -32,7 +32,7 @@ void cifs_dump_mids(struct TCP_Server_Info *);
+> =A0#define DBG2 0
+> =A0#endif
+> =A0extern int traceSMB; =A0 =A0 =A0 =A0 =A0 /* flag which enables the=
+ function below */
+> -void dump_smb(struct smb_hdr *, int);
+> +void dump_smb(void *, int);
+> =A0#define CIFS_INFO =A0 =A0 =A00x01
+> =A0#define CIFS_RC =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00x02
+> =A0#define CIFS_TIMER =A0 =A0 0x04
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 674792e..4b13be5 100644
+> index 4b13be5..e56baca 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
-> @@ -53,17 +53,6 @@
-> =A0*/
-> =A0#define CIFS_MAX_ACTIMEO (1 << 30)
->
-> -/*
-> - * MAX_REQ is the maximum number of requests that WE will send
-> - * on one socket concurrently. It also matches the most common
-> - * value of max multiplex returned by servers. =A0We may
-> - * eventually want to use the negotiated value (in case
-> - * future servers can handle more) when we are more confident that
-> - * we will not have problems oveloading the socket with pending
-> - * write data.
-> - */
-> -#define CIFS_MAX_REQ 50
-> -
-> =A0#define RFC1001_NAME_LEN 15
-> =A0#define RFC1001_NAME_LEN_WITH_NULL (RFC1001_NAME_LEN + 1)
->
-> @@ -255,7 +244,11 @@ struct TCP_Server_Info {
-> =A0 =A0 =A0 =A0bool noblocksnd; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* use=
- blocking sendmsg */
-> =A0 =A0 =A0 =A0bool noautotune; =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* do =
-not autotune send buf sizes */
-> =A0 =A0 =A0 =A0bool tcp_nodelay;
-> - =A0 =A0 =A0 int credits; =A0/* send no more requests at once */
-> + =A0 =A0 =A0 bool oplocks:1; /* server supports async oplock breaks =
-*/
-> + =A0 =A0 =A0 bool echos:1; /* server supports async echos */
-> + =A0 =A0 =A0 unsigned int echo_credits; /* reserve for echos */
-> + =A0 =A0 =A0 unsigned int oplock_credits; /* reserve for oplock brea=
-ks */
-> + =A0 =A0 =A0 unsigned int credits; =A0/* send no more requests at on=
-ce */
-> =A0 =A0 =A0 =A0unsigned int in_flight; =A0/* number of requests on th=
-e wire to server */
-> =A0 =A0 =A0 =A0spinlock_t req_lock; =A0/* protect the two values abov=
-e */
-> =A0 =A0 =A0 =A0struct mutex srv_mutex;
-> @@ -309,6 +302,12 @@ struct TCP_Server_Info {
-> =A0#endif
+> @@ -224,6 +224,12 @@ struct cifs_mnt_data {
+> =A0 =A0 =A0 =A0int flags;
 > =A0};
 >
-> +/*
-> + * The minimal value to set before negotiating and don't issue extra=
- messaging
-> + * in cifs_change_conf.
-> + */
-> +#define CIFS_CREDITS_DEFAULT 3
+> +static inline unsigned int
+> +get_rfc1002_length(void *buf)
+> +{
+> + =A0 =A0 =A0 return be32_to_cpu(*((__be32 *)buf));
+> +}
 > +
-> =A0static inline unsigned int
-> =A0in_flight(struct TCP_Server_Info *server)
-> =A0{
-> @@ -319,31 +318,31 @@ in_flight(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0return num;
-> =A0}
->
-> -static inline int
-> -get_credits(struct TCP_Server_Info *server)
-> -{
-> - =A0 =A0 =A0 int num;
-> - =A0 =A0 =A0 spin_lock(&server->req_lock);
-> - =A0 =A0 =A0 num =3D server->credits;
-> - =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> - =A0 =A0 =A0 return num;
-> -}
-> +#define =A0 CIFS_OBREAK_OP =A0 =A00x080 =A0 =A0/* oplock break reque=
-st */
-> +#define =A0 CIFS_ECHO_OP =A0 =A0 0x0100 =A0 =A0/* echo request */
-> +#define =A0 CIFS_REQ_MASK =A0 =A00x0180 =A0 =A0/* mask request type =
-*/
->
-> -static inline void
-> -add_credits(struct TCP_Server_Info *server, unsigned int add)
-> +static inline unsigned int*
-> +get_credits_field(struct TCP_Server_Info *server, const int optype)
-> =A0{
-> - =A0 =A0 =A0 spin_lock(&server->req_lock);
-> - =A0 =A0 =A0 server->credits +=3D add;
-> - =A0 =A0 =A0 server->in_flight--;
-> - =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> + =A0 =A0 =A0 switch (optype) {
-> + =A0 =A0 =A0 case CIFS_ECHO_OP:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return &server->echo_credits;
-> + =A0 =A0 =A0 case CIFS_OBREAK_OP:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return &server->oplock_credits;
-> + =A0 =A0 =A0 default:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return &server->credits;
-> + =A0 =A0 =A0 }
-> =A0}
->
-> -static inline void
-> -set_credits(struct TCP_Server_Info *server, int val)
-> +static inline bool
-> +has_free_credits(struct TCP_Server_Info *server, unsigned int *val)
-> =A0{
-> + =A0 =A0 =A0 bool res;
-> =A0 =A0 =A0 =A0spin_lock(&server->req_lock);
-> - =A0 =A0 =A0 server->credits =3D val;
-> + =A0 =A0 =A0 res =3D *val > 0;
-> =A0 =A0 =A0 =A0spin_unlock(&server->req_lock);
-> + =A0 =A0 =A0 return res;
-> =A0}
->
-> =A0/*
-> @@ -1047,7 +1046,6 @@ GLOBAL_EXTERN unsigned int linuxExtEnabled;/*en=
-able Linux/Unix CIFS extensions*/
-> =A0GLOBAL_EXTERN unsigned int CIFSMaxBufSize; =A0/* max size not incl=
-uding hdr */
-> =A0GLOBAL_EXTERN unsigned int cifs_min_rcv; =A0 =A0/* min size of big=
- ntwrk buf pool */
-> =A0GLOBAL_EXTERN unsigned int cifs_min_small; =A0/* min size of small=
- buf pool */
-> -GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once=
- to server*/
->
-> =A0#ifdef CONFIG_CIFS_ACL
-> =A0GLOBAL_EXTERN struct rb_root uidtree;
+> =A0struct TCP_Server_Info {
+> =A0 =A0 =A0 =A0struct list_head tcp_ses_list;
+> =A0 =A0 =A0 =A0struct list_head smb_ses_list;
 > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 6f4e243..75163a6 100644
+> index 75163a6..6ba8d1c 100644
 > --- a/fs/cifs/cifsproto.h
 > +++ b/fs/cifs/cifsproto.h
-> @@ -71,7 +71,7 @@ extern void DeleteMidQEntry(struct mid_q_entry *mid=
-Entry);
-> =A0extern int cifs_call_async(struct TCP_Server_Info *server, struct =
-kvec *iov,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 unsigned int nvec=
-, mid_receive_t *receive,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_callback_t *c=
-allback, void *cbdata,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bool ignore_pend=
-);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int optype);
-> =A0extern int SendReceive(const unsigned int /* xid */ , struct cifs_=
-ses *,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_hdr * /* in=
-put */ ,
+> @@ -77,7 +77,7 @@ extern int SendReceive(const unsigned int /* xid */=
+ , struct cifs_ses *,
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_hdr * /* ou=
 t */ ,
-> @@ -169,6 +169,11 @@ extern struct smb_vol *cifs_get_volume_info(char=
- *mount_data,
-> =A0extern int cifs_mount(struct cifs_sb_info *, struct smb_vol *);
-> =A0extern void cifs_umount(struct cifs_sb_info *);
-> =A0extern void cifs_dfs_release_automount_timer(void);
-> +extern int cifs_reconnect(struct TCP_Server_Info *server);
-> +extern void cifs_change_conf(struct TCP_Server_Info *server);
-> +extern void add_credits(struct TCP_Server_Info *server, unsigned int=
- add,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const int optype);
-> +extern void set_credits(struct TCP_Server_Info *server, unsigned int=
- val);
-> =A0void cifs_proc_init(void);
-> =A0void cifs_proc_clean(void);
->
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int * /* bytes returne=
+d */ , const int long_op);
+> =A0extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_se=
+s *ses,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_hdr *in_buf,=
+ int flags);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 char *in_buf, i=
+nt flags);
+> =A0extern int cifs_check_receive(struct mid_q_entry *mid,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct TCP_Server_Info=
+ *server, bool log_error);
+> =A0extern int SendReceive2(const unsigned int /* xid */ , struct cifs=
+_ses *,
 > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index c255c25..985dcce 100644
+> index 985dcce..5ba869f 100644
 > --- a/fs/cifs/cifssmb.c
 > +++ b/fs/cifs/cifssmb.c
-> @@ -459,6 +459,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_se=
-s *ses)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->sec_mode =3D (__u8)le16_to_cpu=
-(rsp->SecurityMode);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->maxReq =3D le16_to_cpu(rsp->Ma=
-xMpxCount);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 set_credits(server, server->maxReq);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->maxBuf =3D le16_to_cpu(rsp->Ma=
-xBufSize);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->max_vcs =3D le16_to_cpu(rsp->M=
-axNumberVcs);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* even though we do not use raw we mi=
-ght as well set this
-> @@ -565,6 +566,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_se=
-s *ses)
-> =A0 =A0 =A0 =A0/* one byte, so no need to convert this or EncryptionK=
-eyLen from
-> =A0 =A0 =A0 =A0 =A0 little endian */
-> =A0 =A0 =A0 =A0server->maxReq =3D le16_to_cpu(pSMBr->MaxMpxCount);
-> + =A0 =A0 =A0 set_credits(server, server->maxReq);
-> =A0 =A0 =A0 =A0/* probably no need to store and check maxvcs */
-> =A0 =A0 =A0 =A0server->maxBuf =3D le32_to_cpu(pSMBr->MaxBufferSize);
-> =A0 =A0 =A0 =A0server->max_rw =3D le32_to_cpu(pSMBr->MaxRawSize);
-> @@ -716,7 +718,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
-> =A0 =A0 =A0 =A0struct TCP_Server_Info *server =3D mid->callback_data;
->
-> =A0 =A0 =A0 =A0DeleteMidQEntry(mid);
-> - =A0 =A0 =A0 add_credits(server, 1);
-> + =A0 =A0 =A0 add_credits(server, 1, CIFS_ECHO_OP);
-> =A0 =A0 =A0 =A0wake_up(&server->request_q);
-> =A0}
->
-> @@ -744,7 +746,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0iov.iov_len =3D be32_to_cpu(smb->hdr.smb_buf_length) +=
- 4;
->
-> =A0 =A0 =A0 =A0rc =3D cifs_call_async(server, &iov, 1, NULL, cifs_ech=
-o_callback,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server, true=
-);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server, CIFS=
-_ECHO_OP);
+> @@ -693,7 +693,7 @@ CIFSSMBTDis(const int xid, struct cifs_tcon *tcon=
+)
 > =A0 =A0 =A0 =A0if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Echo request failed: %d", rc)=
-;
->
-> @@ -1669,7 +1671,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
->
-> =A0 =A0 =A0 =A0queue_work(system_nrt_wq, &rdata->work);
-> =A0 =A0 =A0 =A0DeleteMidQEntry(mid);
-> - =A0 =A0 =A0 add_credits(server, 1);
-> + =A0 =A0 =A0 add_credits(server, 1, 0);
-> =A0 =A0 =A0 =A0wake_up(&server->request_q);
-> =A0}
->
-> @@ -1725,7 +1727,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
->
-> =A0 =A0 =A0 =A0rc =3D cifs_call_async(tcon->ses->server, rdata->iov, =
-1,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_readv_re=
-ceive, cifs_readv_callback,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rdata, false=
-);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rdata, 0);
->
-> =A0 =A0 =A0 =A0if (rc =3D=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_stats_inc(&tcon->num_reads);
-> @@ -2110,7 +2112,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
->
-> =A0 =A0 =A0 =A0queue_work(system_nrt_wq, &wdata->work);
-> =A0 =A0 =A0 =A0DeleteMidQEntry(mid);
-> - =A0 =A0 =A0 add_credits(tcon->ses->server, 1);
-> + =A0 =A0 =A0 add_credits(tcon->ses->server, 1, 0);
-> =A0 =A0 =A0 =A0wake_up(&tcon->ses->server->request_q);
-> =A0}
->
-> @@ -2194,7 +2196,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
->
-> =A0 =A0 =A0 =A0kref_get(&wdata->refcount);
-> =A0 =A0 =A0 =A0rc =3D cifs_call_async(tcon->ses->server, iov, wdata->=
-nr_pages + 1,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0NULL, cifs_w=
-ritev_callback, wdata, false);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0NULL, cifs_w=
-ritev_callback, wdata, 0);
->
-> =A0 =A0 =A0 =A0if (rc =3D=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_stats_inc(&tcon->num_writes);
-> @@ -2382,7 +2384,7 @@ CIFSSMBLock(const int xid, struct cifs_tcon *tc=
-on,
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
 >
-> =A0 =A0 =A0 =A0if (lockType =3D=3D LOCKING_ANDX_OPLOCK_RELEASE) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 timeout =3D CIFS_ASYNC_OP; /* no respon=
-se expected */
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 timeout =3D CIFS_ASYNC_OP | CIFS_OBREAK=
-_OP;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pSMB->Timeout =3D 0;
-> =A0 =A0 =A0 =A0} else if (waitFlag) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0timeout =3D CIFS_BLOCKING_OP; /* block=
-ing operation, no timeout */
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 86d7a40..aa97dab 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -78,7 +78,7 @@ static int cifs_setup_volume_info(struct smb_vol *v=
-olume_info, char *mount_data,
-> =A0* reconnect tcp session
-> =A0* wake up waiters on reconnection? - (not needed currently)
-> =A0*/
-> -static int
-> +int
-> =A0cifs_reconnect(struct TCP_Server_Info *server)
-> =A0{
-> =A0 =A0 =A0 =A0int rc =3D 0;
-> @@ -324,7 +324,7 @@ cifs_echo_request(struct work_struct *work)
-> =A0 =A0 =A0 =A0 * done, which is indicated by maxBuf !=3D 0. Also, no=
- need to ping if
-> =A0 =A0 =A0 =A0 * we got a response recently
-> =A0 =A0 =A0 =A0 */
-> - =A0 =A0 =A0 if (server->maxBuf =3D=3D 0 ||
-> + =A0 =A0 =A0 if (!server->echos || server->maxBuf =3D=3D 0 ||
-> =A0 =A0 =A0 =A0 =A0 =A0time_before(jiffies, server->lstrp + SMB_ECHO_=
-INTERVAL - HZ))
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto requeue_echo;
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, smb_buffer, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *)smb_buf=
+fer, 0);
+> =A0 =A0 =A0 =A0if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Tree disconnect failed %d", r=
+c);
 >
-> @@ -1901,7 +1901,7 @@ cifs_get_tcp_session(struct smb_vol *volume_inf=
-o)
-> =A0 =A0 =A0 =A0tcp_ses->noautotune =3D volume_info->noautotune;
-> =A0 =A0 =A0 =A0tcp_ses->tcp_nodelay =3D volume_info->sockopt_tcp_node=
-lay;
-> =A0 =A0 =A0 =A0tcp_ses->in_flight =3D 0;
-> - =A0 =A0 =A0 tcp_ses->credits =3D cifs_max_pending;
-> + =A0 =A0 =A0 tcp_ses->credits =3D CIFS_CREDITS_DEFAULT;
-> =A0 =A0 =A0 =A0init_waitqueue_head(&tcp_ses->response_q);
-> =A0 =A0 =A0 =A0init_waitqueue_head(&tcp_ses->request_q);
-> =A0 =A0 =A0 =A0INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
-> @@ -3751,11 +3751,11 @@ int cifs_negotiate_protocol(unsigned int xid,=
- struct cifs_ses *ses)
-> =A0 =A0 =A0 =A0if (server->maxBuf !=3D 0)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> @@ -790,7 +790,7 @@ CIFSSMBLogoff(const int xid, struct cifs_ses *ses=
+)
+> =A0 =A0 =A0 =A0pSMB->hdr.Uid =3D ses->Suid;
 >
-> - =A0 =A0 =A0 set_credits(server, cifs_max_pending);
-> + =A0 =A0 =A0 set_credits(server, CIFS_CREDITS_DEFAULT);
-> =A0 =A0 =A0 =A0rc =3D CIFSSMBNegotiate(xid, ses);
-> =A0 =A0 =A0 =A0if (rc =3D=3D -EAGAIN) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* retry only once on 1st time connect=
-ion */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 set_credits(server, cifs_max_pending);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 set_credits(server, CIFS_CREDITS_DEFAUL=
-T);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D CIFSSMBNegotiate(xid, ses);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc =3D=3D -EAGAIN)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -EHOSTDOWN;
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 63a196b..e183e38 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -171,7 +171,7 @@ cifs_create(struct inode *inode, struct dentry *d=
-irentry, umode_t mode,
+> =A0 =A0 =A0 =A0pSMB->AndXCommand =3D 0xFF;
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, ses, (struct smb_hdr *) pS=
+MB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, ses, (char *) pSMB, 0);
+> =A0session_already_dead:
+> =A0 =A0 =A0 =A0mutex_unlock(&ses->session_mutex);
+>
+> @@ -2420,8 +2420,7 @@ CIFSSMBLock(const int xid, struct cifs_tcon *tc=
+on,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0(struct smb_hdr *) pSM=
+B, &bytes_returned);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(pSMB);
+> =A0 =A0 =A0 =A0} else {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses,=
+ (struct smb_hdr *)pSMB,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 timeout);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses,=
+ (char *)pSMB, timeout);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* SMB buffer freed by function above =
+*/
 > =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0tcon =3D tlink_tcon(tlink);
+> =A0 =A0 =A0 =A0cifs_stats_inc(&tcon->num_locks);
+> @@ -2588,7 +2587,7 @@ CIFSSMBClose(const int xid, struct cifs_tcon *t=
+con, int smb_file_id)
+> =A0 =A0 =A0 =A0pSMB->FileID =3D (__u16) smb_file_id;
+> =A0 =A0 =A0 =A0pSMB->LastWriteTime =3D 0xFFFFFFFF;
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D 0;
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0cifs_stats_inc(&tcon->num_closes);
+> =A0 =A0 =A0 =A0if (rc) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc !=3D -EINTR) {
+> @@ -2617,7 +2616,7 @@ CIFSSMBFlush(const int xid, struct cifs_tcon *t=
+con, int smb_file_id)
 >
-> - =A0 =A0 =A0 if (enable_oplocks)
-> + =A0 =A0 =A0 if (tcon->ses->server->oplocks)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0oplock =3D REQ_OPLOCK;
+> =A0 =A0 =A0 =A0pSMB->FileID =3D (__u16) smb_file_id;
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D 0;
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0cifs_stats_inc(&tcon->num_flushes);
+> =A0 =A0 =A0 =A0if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Send error in Flush =3D %d"=
+, rc);
+> @@ -4625,7 +4624,7 @@ CIFSFindClose(const int xid, struct cifs_tcon *=
+tcon,
 >
-> =A0 =A0 =A0 =A0if (nd)
-> @@ -492,7 +492,7 @@ cifs_lookup(struct inode *parent_dir_inode, struc=
-t dentry *direntry,
-> =A0{
-> =A0 =A0 =A0 =A0int xid;
-> =A0 =A0 =A0 =A0int rc =3D 0; /* to get around spurious gcc warning, s=
-et to zero here */
-> - =A0 =A0 =A0 __u32 oplock =3D enable_oplocks ? REQ_OPLOCK : 0;
-> + =A0 =A0 =A0 __u32 oplock;
-> =A0 =A0 =A0 =A0__u16 fileHandle =3D 0;
-> =A0 =A0 =A0 =A0bool posix_open =3D false;
-> =A0 =A0 =A0 =A0struct cifs_sb_info *cifs_sb;
-> @@ -517,6 +517,7 @@ cifs_lookup(struct inode *parent_dir_inode, struc=
-t dentry *direntry,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return (struct dentry *)tlink;
+> =A0 =A0 =A0 =A0pSMB->FileID =3D searchHandle;
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D 0;
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Send error in FindClose =3D=
+ %d", rc);
+>
+> @@ -5646,7 +5645,7 @@ CIFSSMBSetFileSize(const int xid, struct cifs_t=
+con *tcon, __u64 size,
+> =A0 =A0 =A0 =A0pSMB->Reserved4 =3D 0;
+> =A0 =A0 =A0 =A0inc_rfc1001_len(pSMB, byte_count);
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D cpu_to_le16(byte_count);
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0if (rc) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Send error in SetFileInfo (Se=
+tFileSize) =3D %d", rc);
 > =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0pTcon =3D tlink_tcon(tlink);
-> + =A0 =A0 =A0 oplock =3D pTcon->ses->server->oplocks ? REQ_OPLOCK : 0=
-;
+> @@ -5715,7 +5714,7 @@ CIFSSMBSetFileInfo(const int xid, struct cifs_t=
+con *tcon,
+> =A0 =A0 =A0 =A0inc_rfc1001_len(pSMB, byte_count);
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D cpu_to_le16(byte_count);
+> =A0 =A0 =A0 =A0memcpy(data_offset, data, sizeof(FILE_BASIC_INFO));
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Send error in Set Time (SetFi=
+leInfo) =3D %d", rc);
 >
-> =A0 =A0 =A0 =A0/*
-> =A0 =A0 =A0 =A0 * Don't allow the separator character in a path compo=
-nent.
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 4dd9283..b5e38b1 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -380,7 +380,7 @@ int cifs_open(struct inode *inode, struct file *f=
-ile)
-> =A0 =A0 =A0 =A0cFYI(1, "inode =3D 0x%p file flags are 0x%x for %s",
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 inode, file->f_flags, full_path);
+> @@ -5774,7 +5773,7 @@ CIFSSMBSetFileDisposition(const int xid, struct=
+ cifs_tcon *tcon,
+> =A0 =A0 =A0 =A0inc_rfc1001_len(pSMB, byte_count);
+> =A0 =A0 =A0 =A0pSMB->ByteCount =3D cpu_to_le16(byte_count);
+> =A0 =A0 =A0 =A0*data_offset =3D delete_file ? 1 : 0;
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Send error in SetFileDisposit=
+ion =3D %d", rc);
 >
-> - =A0 =A0 =A0 if (enable_oplocks)
-> + =A0 =A0 =A0 if (tcon->ses->server->oplocks)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0oplock =3D REQ_OPLOCK;
-> =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0oplock =3D 0;
-> @@ -505,7 +505,7 @@ static int cifs_reopen_file(struct cifsFileInfo *=
-pCifsFile, bool can_flush)
-> =A0 =A0 =A0 =A0cFYI(1, "inode =3D 0x%p file flags 0x%x for %s",
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 inode, pCifsFile->f_flags, full_path)=
-;
+> @@ -6006,7 +6005,7 @@ CIFSSMBUnixSetFileInfo(const int xid, struct ci=
+fs_tcon *tcon,
 >
-> - =A0 =A0 =A0 if (enable_oplocks)
-> + =A0 =A0 =A0 if (tcon->ses->server->oplocks)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0oplock =3D REQ_OPLOCK;
-> =A0 =A0 =A0 =A0else
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0oplock =3D 0;
+> =A0 =A0 =A0 =A0cifs_fill_unix_set_info(data_offset, args);
+>
+> - =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (struct smb_hdr=
+ *) pSMB, 0);
+> + =A0 =A0 =A0 rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, =
+0);
+> =A0 =A0 =A0 =A0if (rc)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Send error in Set Time (SetFi=
+leInfo) =3D %d", rc);
+>
 > diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 703ef5c..e14dc8f 100644
+> index e14dc8f..8e7516f 100644
 > --- a/fs/cifs/misc.c
 > +++ b/fs/cifs/misc.c
-> @@ -690,3 +690,52 @@ backup_cred(struct cifs_sb_info *cifs_sb)
->
-> =A0 =A0 =A0 =A0return false;
+> @@ -604,16 +604,15 @@ is_valid_oplock_break(struct smb_hdr *buf, stru=
+ct TCP_Server_Info *srv)
 > =A0}
-> +
-> +void
-> +cifs_change_conf(struct TCP_Server_Info *server)
-> +{
-> + =A0 =A0 =A0 server->oplock_credits =3D server->echo_credits =3D 0;
-> + =A0 =A0 =A0 switch (server->credits) {
-> + =A0 =A0 =A0 case 0:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_reconnect(server);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return;
-> + =A0 =A0 =A0 case 1:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->echos =3D false;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->oplocks =3D false;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "disabling echos and oplocks"=
-);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> + =A0 =A0 =A0 case 2:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->echos =3D true;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->oplocks =3D false;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->echo_credits =3D 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cFYI(1, "disabling oplocks");
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
-> + =A0 =A0 =A0 default:
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->echos =3D true;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->oplocks =3D true;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->echo_credits =3D 1;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->oplock_credits =3D 1;
-> + =A0 =A0 =A0 }
-> + =A0 =A0 =A0 server->credits -=3D server->echo_credits + server->opl=
-ock_credits;
-> +}
-> +
-> +void
-> +add_credits(struct TCP_Server_Info *server, const unsigned int add,
-> + =A0 =A0 =A0 =A0 =A0 const int optype)
-> +{
-> + =A0 =A0 =A0 unsigned int *val;
-> + =A0 =A0 =A0 spin_lock(&server->req_lock);
-> + =A0 =A0 =A0 val =3D get_credits_field(server, optype);
-> + =A0 =A0 =A0 *val +=3D add;
-> + =A0 =A0 =A0 server->in_flight--;
-> + =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> +}
-> +
-> +void
-> +set_credits(struct TCP_Server_Info *server, const unsigned int val)
-> +{
-> + =A0 =A0 =A0 spin_lock(&server->req_lock);
-> + =A0 =A0 =A0 server->credits =3D val;
-> + =A0 =A0 =A0 cifs_change_conf(server);
-> + =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> +}
+>
+> =A0void
+> -dump_smb(struct smb_hdr *smb_buf, int smb_buf_length)
+> +dump_smb(void *buf, int smb_buf_length)
+> =A0{
+> =A0 =A0 =A0 =A0int i, j;
+> =A0 =A0 =A0 =A0char debug_line[17];
+> - =A0 =A0 =A0 unsigned char *buffer;
+> + =A0 =A0 =A0 unsigned char *buffer =3D buf;
+>
+> =A0 =A0 =A0 =A0if (traceSMB =3D=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return;
+>
+> - =A0 =A0 =A0 buffer =3D (unsigned char *) smb_buf;
+> =A0 =A0 =A0 =A0for (i =3D 0, j =3D 0; i < smb_buf_length; i++, j++) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (i % 8 =3D=3D 0) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* have reached the be=
+ginning of line */
 > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 938d20b..91f009d 100644
+> index 91f009d..0d2707e 100644
 > --- a/fs/cifs/transport.c
 > +++ b/fs/cifs/transport.c
-> @@ -255,44 +255,41 @@ smb_send(struct TCP_Server_Info *server, struct=
- smb_hdr *smb_buffer,
+> @@ -126,11 +126,11 @@ smb_sendv(struct TCP_Server_Info *server, struc=
+t kvec *iov, int n_vec)
+> =A0 =A0 =A0 =A0int rc =3D 0;
+> =A0 =A0 =A0 =A0int i =3D 0;
+> =A0 =A0 =A0 =A0struct msghdr smb_msg;
+> - =A0 =A0 =A0 struct smb_hdr *smb_buffer =3D iov[0].iov_base;
+> + =A0 =A0 =A0 __be32 *buf_len =3D (__be32 *)(iov[0].iov_base);
+> =A0 =A0 =A0 =A0unsigned int len =3D iov[0].iov_len;
+> =A0 =A0 =A0 =A0unsigned int total_len;
+> =A0 =A0 =A0 =A0int first_vec =3D 0;
+> - =A0 =A0 =A0 unsigned int smb_buf_length =3D be32_to_cpu(smb_buffer-=
+>smb_buf_length);
+> + =A0 =A0 =A0 unsigned int smb_buf_length =3D get_rfc1002_length(iov[=
+0].iov_base);
+> =A0 =A0 =A0 =A0struct socket *ssocket =3D server->ssocket;
+>
+> =A0 =A0 =A0 =A0if (ssocket =3D=3D NULL)
+> @@ -150,7 +150,7 @@ smb_sendv(struct TCP_Server_Info *server, struct =
+kvec *iov, int n_vec)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0total_len +=3D iov[i].iov_len;
+>
+> =A0 =A0 =A0 =A0cFYI(1, "Sending smb: =A0total_len %d", total_len);
+> - =A0 =A0 =A0 dump_smb(smb_buffer, len);
+> + =A0 =A0 =A0 dump_smb(iov[0].iov_base, len);
+>
+> =A0 =A0 =A0 =A0i =3D 0;
+> =A0 =A0 =A0 =A0while (total_len) {
+> @@ -158,24 +158,24 @@ smb_sendv(struct TCP_Server_Info *server, struc=
+t kvec *iov, int n_vec)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+n_vec - first_vec, total_len);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if ((rc =3D=3D -ENOSPC) || (rc =3D=3D =
+-EAGAIN)) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0i++;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* if blocking send we =
+try 3 times, since each can block
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0for 5 seconds. F=
+or nonblocking =A0we have to try more
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0but wait increas=
+ing amounts of time allowing time for
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0socket to clear.=
+ =A0The overall time we wait in either
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case to send on =
+the socket is about 15 seconds.
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Similarly we wai=
+t for 15 seconds for
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0a response from =
+the server in SendReceive[2]
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0for the server t=
+o send a response back for
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0most types of re=
+quests (except SMB Write
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0past end of file=
+ which can be slow, and
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0blocking lock op=
+erations). NFS waits slightly longer
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0than CIFS, but t=
+his can make it take longer for
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0nonresponsive se=
+rvers to be detected and 15 seconds
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0is more than eno=
+ugh time for modern networks to
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0send a packet. =A0=
+In most cases if we fail to send
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0after the retrie=
+s we will kill the socket and
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0reconnect which =
+may clear the network problem.
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 */
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* If blocking send w=
+e try 3 times, since each can block
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* for 5 seconds. For=
+ nonblocking =A0we have to try more
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* but wait increasin=
+g amounts of time allowing time for
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* socket to clear. =A0=
+The overall time we wait in either
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* case to send on th=
+e socket is about 15 seconds.
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Similarly we wait =
+for 15 seconds for a response from
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* the server in Send=
+Receive[2] for the server to send
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* a response back fo=
+r most types of requests (except
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* SMB Write past end=
+ of file which can be slow, and
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* blocking lock oper=
+ations). NFS waits slightly longer
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* than CIFS, but thi=
+s can make it take longer for
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* nonresponsive serv=
+ers to be detected and 15 seconds
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* is more than enoug=
+h time for modern networks to
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* send a packet. =A0=
+In most cases if we fail to send
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* after the retries =
+we will kill the socket and
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* reconnect which ma=
+y clear the network problem.
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if ((i >=3D 14) || (!s=
+erver->noblocksnd && (i > 2))) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR=
+(1, "sends on sock %p stuck for 15 seconds",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ssocket);
+> @@ -235,9 +235,8 @@ smb_sendv(struct TCP_Server_Info *server, struct =
+kvec *iov, int n_vec)
+> =A0 =A0 =A0 =A0else
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D 0;
+>
+> - =A0 =A0 =A0 /* Don't want to modify the buffer as a
+> - =A0 =A0 =A0 =A0 =A0side effect of this call. */
+> - =A0 =A0 =A0 smb_buffer->smb_buf_length =3D cpu_to_be32(smb_buf_leng=
+th);
+> + =A0 =A0 =A0 /* Don't want to modify the buffer as a side effect of =
+this call. */
+> + =A0 =A0 =A0 *buf_len =3D cpu_to_be32(smb_buf_length);
+>
+> =A0 =A0 =A0 =A0return rc;
 > =A0}
->
-> =A0static int
-> -wait_for_free_request(struct TCP_Server_Info *server, const int long=
-_op)
-> +wait_for_free_credits(struct TCP_Server_Info *server, unsigned int *=
-num)
-> =A0{
-> =A0 =A0 =A0 =A0int rc;
->
-> - =A0 =A0 =A0 spin_lock(&server->req_lock);
-> -
-> - =A0 =A0 =A0 if (long_op =3D=3D CIFS_ASYNC_OP) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* oplock breaks must not be held up */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->in_flight++;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->credits--;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 0;
-> - =A0 =A0 =A0 }
-> -
-> =A0 =A0 =A0 =A0while (1) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->credits <=3D 0) {
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (*num =3D=3D 0) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&server->r=
-eq_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_num_waiters_inc(s=
-erver);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D wait_event_inte=
-rruptible(server->request_q,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 get_credits(server) > 0);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0 has_free_credits(server, num));
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_num_waiters_dec(s=
-erver);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_lock(&server->req=
-_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=
-=3D CifsExiting) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
-lock(&server->req_lock);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (server->tcpStatus =3D=
-=3D CifsExiting)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- -ENOENT;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 server->credits--;
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 *num -=3D 1;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server->in_flight++;
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_unlock(&server->re=
-q_lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> =A0 =A0 =A0 =A0}
+> @@ -331,6 +330,33 @@ wait_for_response(struct TCP_Server_Info *server=
+, struct mid_q_entry *midQ)
 > =A0 =A0 =A0 =A0return 0;
 > =A0}
 >
 > +static int
-> +wait_for_free_request(struct TCP_Server_Info *server, const int opty=
-pe)
+> +cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec=
+ *iov,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int nvec, s=
+truct mid_q_entry **ret_mid)
 > +{
 > + =A0 =A0 =A0 int rc;
-> + =A0 =A0 =A0 spin_lock(&server->req_lock);
-> + =A0 =A0 =A0 rc =3D wait_for_free_credits(server, get_credits_field(=
-server, optype));
-> + =A0 =A0 =A0 spin_unlock(&server->req_lock);
+> + =A0 =A0 =A0 struct smb_hdr *hdr =3D (struct smb_hdr *)iov[0].iov_ba=
+se;
+> + =A0 =A0 =A0 struct mid_q_entry *mid;
+> +
+> + =A0 =A0 =A0 /* enable signing if server requires it */
+> + =A0 =A0 =A0 if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE=
+_SIGN_ENABLED))
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 hdr->Flags2 |=3D SMBFLG2_SECURITY_SIGNA=
+TURE;
+> +
+> + =A0 =A0 =A0 mid =3D AllocMidQEntry(hdr, server);
+> + =A0 =A0 =A0 if (mid =3D=3D NULL)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
+> +
+> + =A0 =A0 =A0 /* put it on the pending_mid_q */
+> + =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> + =A0 =A0 =A0 list_add_tail(&mid->qhead, &server->pending_mid_q);
+> + =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> +
+> + =A0 =A0 =A0 rc =3D cifs_sign_smb2(iov, nvec, server, &mid->sequence=
+_number);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 delete_mid(mid);
+> + =A0 =A0 =A0 *ret_mid =3D mid;
 > + =A0 =A0 =A0 return rc;
 > +}
-> +
-> =A0static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_b=
-uf,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct mid_q_entry **p=
-pmidQ)
-> =A0{
-> @@ -342,13 +339,13 @@ wait_for_response(struct TCP_Server_Info *serve=
-r, struct mid_q_entry *midQ)
-> =A0int
-> =A0cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int nvec, mid_receive_t *rece=
-ive,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_callback_t *callback, void *cbdata,=
- bool ignore_pend)
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 mid_callback_t *callback, void *cbdata,=
- int optype)
+>
+> =A0/*
+> =A0* Send a SMB request and set the callback function in the mid to h=
+andle
+> @@ -343,34 +369,18 @@ cifs_call_async(struct TCP_Server_Info *server,=
+ struct kvec *iov,
 > =A0{
 > =A0 =A0 =A0 =A0int rc;
 > =A0 =A0 =A0 =A0struct mid_q_entry *mid;
-> =A0 =A0 =A0 =A0struct smb_hdr *hdr =3D (struct smb_hdr *)iov[0].iov_b=
-ase;
+> - =A0 =A0 =A0 struct smb_hdr *hdr =3D (struct smb_hdr *)iov[0].iov_ba=
+se;
 >
-> - =A0 =A0 =A0 rc =3D wait_for_free_request(server, ignore_pend ? CIFS=
-_ASYNC_OP : 0);
-> + =A0 =A0 =A0 rc =3D wait_for_free_request(server, optype);
+> =A0 =A0 =A0 =A0rc =3D wait_for_free_request(server, optype);
 > =A0 =A0 =A0 =A0if (rc)
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
 >
-> @@ -360,7 +357,7 @@ cifs_call_async(struct TCP_Server_Info *server, s=
-truct kvec *iov,
-> =A0 =A0 =A0 =A0mid =3D AllocMidQEntry(hdr, server);
-> =A0 =A0 =A0 =A0if (mid =3D=3D NULL) {
+> - =A0 =A0 =A0 /* enable signing if server requires it */
+> - =A0 =A0 =A0 if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE=
+_SIGN_ENABLED))
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 hdr->Flags2 |=3D SMBFLG2_SECURITY_SIGNA=
+TURE;
+> -
+> =A0 =A0 =A0 =A0mutex_lock(&server->srv_mutex);
+> - =A0 =A0 =A0 mid =3D AllocMidQEntry(hdr, server);
+> - =A0 =A0 =A0 if (mid =3D=3D NULL) {
+> + =A0 =A0 =A0 rc =3D cifs_setup_async_request(server, iov, nvec, &mid=
+);
+> + =A0 =A0 =A0 if (rc) {
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&server->srv_mutex);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(server, 1, optype);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0add_credits(server, 1, optype);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOMEM;
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -ENOMEM;
+> - =A0 =A0 =A0 }
+> -
+> - =A0 =A0 =A0 /* put it on the pending_mid_q */
+> - =A0 =A0 =A0 spin_lock(&GlobalMid_Lock);
+> - =A0 =A0 =A0 list_add_tail(&mid->qhead, &server->pending_mid_q);
+> - =A0 =A0 =A0 spin_unlock(&GlobalMid_Lock);
+> -
+> - =A0 =A0 =A0 rc =3D cifs_sign_smb2(iov, nvec, server, &mid->sequence=
+_number);
+> - =A0 =A0 =A0 if (rc) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 mutex_unlock(&server->srv_mutex);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out_err;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
 > =A0 =A0 =A0 =A0}
-> @@ -393,7 +390,7 @@ cifs_call_async(struct TCP_Server_Info *server, s=
-truct kvec *iov,
-> =A0 =A0 =A0 =A0return rc;
-> =A0out_err:
-> =A0 =A0 =A0 =A0delete_mid(mid);
-> - =A0 =A0 =A0 add_credits(server, 1);
-> + =A0 =A0 =A0 add_credits(server, 1, optype);
-> =A0 =A0 =A0 =A0wake_up(&server->request_q);
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
-> @@ -526,10 +523,12 @@ SendReceive2(const unsigned int xid, struct cif=
-s_ses *ses,
+>
+> =A0 =A0 =A0 =A0mid->receive =3D receive;
+> @@ -406,14 +416,14 @@ out_err:
+> =A0*/
+> =A0int
+> =A0SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_hdr *in_buf, int flags)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0char *in_buf, int flags)
 > =A0{
-> =A0 =A0 =A0 =A0int rc =3D 0;
+> =A0 =A0 =A0 =A0int rc;
+> =A0 =A0 =A0 =A0struct kvec iov[1];
+> =A0 =A0 =A0 =A0int resp_buf_type;
+>
+> - =A0 =A0 =A0 iov[0].iov_base =3D (char *)in_buf;
+> - =A0 =A0 =A0 iov[0].iov_len =3D be32_to_cpu(in_buf->smb_buf_length) =
++ 4;
+> + =A0 =A0 =A0 iov[0].iov_base =3D in_buf;
+> + =A0 =A0 =A0 iov[0].iov_len =3D get_rfc1002_length(in_buf) + 4;
+> =A0 =A0 =A0 =A0flags |=3D CIFS_NO_RESP;
+> =A0 =A0 =A0 =A0rc =3D SendReceive2(xid, ses, iov, 1, &resp_buf_type, =
+flags);
+> =A0 =A0 =A0 =A0cFYI(DBG2, "SendRcvNoRsp flags %d rc %d", flags, rc);
+> @@ -496,7 +506,7 @@ int
+> =A0cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info=
+ *server,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bool log_error)
+> =A0{
+> - =A0 =A0 =A0 unsigned int len =3D be32_to_cpu(mid->resp_buf->smb_buf=
+_length) + 4;
+> + =A0 =A0 =A0 unsigned int len =3D get_rfc1002_length(mid->resp_buf) =
++ 4;
+>
+> =A0 =A0 =A0 =A0dump_smb(mid->resp_buf, min_t(u32, 92, len));
+>
+> @@ -516,6 +526,24 @@ cifs_check_receive(struct mid_q_entry *mid, stru=
+ct TCP_Server_Info *server,
+> =A0 =A0 =A0 =A0return map_smb_to_linux_error(mid->resp_buf, log_error=
+);
+> =A0}
+>
+> +static int
+> +cifs_setup_request(struct cifs_ses *ses, struct kvec *iov,
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int nvec, struct mid_q_=
+entry **ret_mid)
+> +{
+> + =A0 =A0 =A0 int rc;
+> + =A0 =A0 =A0 struct smb_hdr *hdr =3D (struct smb_hdr *)iov[0].iov_ba=
+se;
+> + =A0 =A0 =A0 struct mid_q_entry *mid;
+> +
+> + =A0 =A0 =A0 rc =3D allocate_mid(ses, hdr, &mid);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return rc;
+> + =A0 =A0 =A0 rc =3D cifs_sign_smb2(iov, nvec, ses->server, &mid->seq=
+uence_number);
+> + =A0 =A0 =A0 if (rc)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 delete_mid(mid);
+> + =A0 =A0 =A0 *ret_mid =3D mid;
+> + =A0 =A0 =A0 return rc;
+> +}
+> +
+> =A0int
+> =A0SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+> =A0 =A0 =A0 =A0 =A0 =A0 struct kvec *iov, int n_vec, int *pRespBufTyp=
+e /* ret */,
+> @@ -525,7 +553,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
+ses *ses,
 > =A0 =A0 =A0 =A0int long_op;
-> + =A0 =A0 =A0 int optype;
+> =A0 =A0 =A0 =A0int optype;
 > =A0 =A0 =A0 =A0struct mid_q_entry *midQ;
-> =A0 =A0 =A0 =A0struct smb_hdr *in_buf =3D iov[0].iov_base;
+> - =A0 =A0 =A0 struct smb_hdr *in_buf =3D iov[0].iov_base;
+> + =A0 =A0 =A0 char *buf =3D iov[0].iov_base;
 >
 > =A0 =A0 =A0 =A0long_op =3D flags & CIFS_TIMEOUT_MASK;
-> + =A0 =A0 =A0 optype =3D flags & CIFS_REQ_MASK;
->
+> =A0 =A0 =A0 =A0optype =3D flags & CIFS_REQ_MASK;
+> @@ -533,47 +561,45 @@ SendReceive2(const unsigned int xid, struct cif=
+s_ses *ses,
 > =A0 =A0 =A0 =A0*pRespBufType =3D CIFS_NO_BUFFER; =A0/* no response bu=
 f yet */
 >
-> @@ -548,7 +547,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
-ses *ses,
-> =A0 =A0 =A0 =A0 =A0 to the same server. We may make this configurable=
- later or
-> =A0 =A0 =A0 =A0 =A0 use ses->maxReq */
->
-> - =A0 =A0 =A0 rc =3D wait_for_free_request(ses->server, long_op);
-> + =A0 =A0 =A0 rc =3D wait_for_free_request(ses->server, optype);
-> =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(in_buf);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> @@ -565,7 +564,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
-ses *ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release(in_buf);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Update # of requests on wire to ser=
-ver */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, optype);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
-> @@ -602,7 +601,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
-ses *ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0midQ->callback =3D Del=
-eteMidQEntry;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid=
-_Lock);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_small_buf_release=
-(in_buf);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server=
-, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server=
-, 1, optype);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->=
-request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -613,7 +612,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
-ses *ses,
->
-> =A0 =A0 =A0 =A0rc =3D cifs_sync_mid_result(midQ, ses->server);
-> =A0 =A0 =A0 =A0if (rc !=3D 0) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, optype);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
-> @@ -638,7 +637,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
-ses *ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0midQ->resp_buf =3D NULL;
-> =A0out:
-> =A0 =A0 =A0 =A0delete_mid(midQ);
-> - =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 add_credits(ses->server, 1, optype);
-> =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
->
-> =A0 =A0 =A0 =A0return rc;
-> @@ -675,7 +674,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
-es *ses,
+> =A0 =A0 =A0 =A0if ((ses =3D=3D NULL) || (ses->server =3D=3D NULL)) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cERROR(1, "Null session");
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -EIO;
 > =A0 =A0 =A0 =A0}
 >
-> - =A0 =A0 =A0 rc =3D wait_for_free_request(ses->server, long_op);
-> + =A0 =A0 =A0 rc =3D wait_for_free_request(ses->server, 0);
-> =A0 =A0 =A0 =A0if (rc)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> =A0 =A0 =A0 =A0if (ses->server->tcpStatus =3D=3D CifsExiting) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ENOENT;
+> =A0 =A0 =A0 =A0}
 >
-> @@ -689,7 +688,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
-es *ses,
+> - =A0 =A0 =A0 /* Ensure that we do not send more than 50 overlapping =
+requests
+> - =A0 =A0 =A0 =A0 =A0to the same server. We may make this configurabl=
+e later or
+> - =A0 =A0 =A0 =A0 =A0use ses->maxReq */
+> + =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0* Ensure that we do not send more than 50 overlappin=
+g requests
+> + =A0 =A0 =A0 =A0* to the same server. We may make this configurable =
+later or
+> + =A0 =A0 =A0 =A0* use ses->maxReq.
+> + =A0 =A0 =A0 =A0*/
+>
+> =A0 =A0 =A0 =A0rc =3D wait_for_free_request(ses->server, optype);
+> =A0 =A0 =A0 =A0if (rc) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 /* make sure that we sign in the same order that we sen=
+d on this socket
+> - =A0 =A0 =A0 =A0 =A0and avoid races inside tcp sendmsg code that cou=
+ld cause corruption
+> - =A0 =A0 =A0 =A0 =A0of smb data */
+> + =A0 =A0 =A0 /*
+> + =A0 =A0 =A0 =A0* Make sure that we sign in the same order that we s=
+end on this socket
+> + =A0 =A0 =A0 =A0* and avoid races inside tcp sendmsg code that could=
+ cause corruption
+> + =A0 =A0 =A0 =A0* of smb data.
+> + =A0 =A0 =A0 =A0*/
+>
+> =A0 =A0 =A0 =A0mutex_lock(&ses->server->srv_mutex);
+>
+> - =A0 =A0 =A0 rc =3D allocate_mid(ses, in_buf, &midQ);
+> + =A0 =A0 =A0 rc =3D cifs_setup_request(ses, iov, n_vec, &midQ);
 > =A0 =A0 =A0 =A0if (rc) {
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(buf);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Update # of requests on wire to ser=
 ver */
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, 0);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0add_credits(ses->server, 1, optype);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
 > =A0 =A0 =A0 =A0}
-> @@ -722,7 +721,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
-es *ses,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* no longer considere=
-d to be "in-flight" */
+> - =A0 =A0 =A0 rc =3D cifs_sign_smb2(iov, n_vec, ses->server, &midQ->s=
+equence_number);
+> - =A0 =A0 =A0 if (rc) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 mutex_unlock(&ses->server->srv_mutex);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto out;
+> - =A0 =A0 =A0 }
+>
+> =A0 =A0 =A0 =A0midQ->midState =3D MID_REQUEST_SUBMITTED;
+> =A0 =A0 =A0 =A0cifs_in_send_inc(ses->server);
+> @@ -584,23 +610,23 @@ SendReceive2(const unsigned int xid, struct cif=
+s_ses *ses,
+> =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
+>
+> =A0 =A0 =A0 =A0if (rc < 0) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
+> =A0 =A0 =A0 =A0}
+>
+> =A0 =A0 =A0 =A0if (long_op =3D=3D CIFS_ASYNC_OP) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
+> =A0 =A0 =A0 =A0}
+>
+> =A0 =A0 =A0 =A0rc =3D wait_for_response(ses->server, midQ);
+> =A0 =A0 =A0 =A0if (rc !=3D 0) {
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 send_nt_cancel(ses->server, in_buf, mid=
+Q);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 send_nt_cancel(ses->server, (struct smb=
+_hdr *)buf, midQ);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_lock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (midQ->midState =3D=3D MID_REQUEST_=
+SUBMITTED) {
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0midQ->callback =3D Del=
 eteMidQEntry;
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid=
 _Lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server=
-, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server=
-, 1, 0);
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(=
+in_buf);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 cifs_small_buf_release(=
+buf);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0add_credits(ses->serve=
+r, 1, optype);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->=
 request_q);
 > =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -731,7 +730,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
-es *ses,
+> @@ -608,7 +634,7 @@ SendReceive2(const unsigned int xid, struct cifs_=
+ses *ses,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_unlock(&GlobalMid_Lock);
+> =A0 =A0 =A0 =A0}
+>
+> - =A0 =A0 =A0 cifs_small_buf_release(in_buf);
+> + =A0 =A0 =A0 cifs_small_buf_release(buf);
 >
 > =A0 =A0 =A0 =A0rc =3D cifs_sync_mid_result(midQ, ses->server);
 > =A0 =A0 =A0 =A0if (rc !=3D 0) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
+> @@ -623,8 +649,9 @@ SendReceive2(const unsigned int xid, struct cifs_=
+ses *ses,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto out;
 > =A0 =A0 =A0 =A0}
-> @@ -748,7 +747,7 @@ SendReceive(const unsigned int xid, struct cifs_s=
-es *ses,
-> =A0 =A0 =A0 =A0rc =3D cifs_check_receive(midQ, ses->server, 0);
-> =A0out:
-> =A0 =A0 =A0 =A0delete_mid(midQ);
-> - =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
 >
-> =A0 =A0 =A0 =A0return rc;
-> @@ -827,7 +826,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0rc =3D allocate_mid(ses, in_buf, &midQ);
-> =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
-> @@ -836,7 +835,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete_mid(midQ);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mutex_unlock(&ses->server->srv_mutex);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
-> @@ -850,7 +849,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->
-> =A0 =A0 =A0 =A0if (rc < 0) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete_mid(midQ);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
-> @@ -873,7 +872,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D send_nt_cancel(=
-ses->server, in_buf, midQ);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete=
-_mid(midQ);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_u=
-p(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -887,7 +886,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 already been remo=
-ved. Don't exit in this case. */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc && rc !=3D -ENO=
-LCK) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0delete=
-_mid(midQ);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_u=
-p(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -901,7 +900,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* no =
-longer considered to be "in-flight" */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0midQ->=
-callback =3D DeleteMidQEntry;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0spin_u=
-nlock(&GlobalMid_Lock);
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_cre=
-dits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_u=
-p(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return=
- rc;
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
-> @@ -914,7 +913,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
->
-> =A0 =A0 =A0 =A0rc =3D cifs_sync_mid_result(midQ, ses->server);
-> =A0 =A0 =A0 =A0if (rc !=3D 0) {
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return rc;
-> =A0 =A0 =A0 =A0}
-> @@ -931,7 +930,7 @@ SendReceiveBlockingLock(const unsigned int xid, s=
-truct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0rc =3D cifs_check_receive(midQ, ses->server, 0);
-> =A0out:
-> =A0 =A0 =A0 =A0delete_mid(midQ);
-> - =A0 =A0 =A0 add_credits(ses->server, 1);
-> + =A0 =A0 =A0 add_credits(ses->server, 1, 0);
-> =A0 =A0 =A0 =A0wake_up(&ses->server->request_q);
-> =A0 =A0 =A0 =A0if (rstart && rc =3D=3D -EACCES)
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -ERESTARTSYS;
+> - =A0 =A0 =A0 iov[0].iov_base =3D (char *)midQ->resp_buf;
+> - =A0 =A0 =A0 iov[0].iov_len =3D be32_to_cpu(midQ->resp_buf->smb_buf_=
+length) + 4;
+> + =A0 =A0 =A0 buf =3D (char *)midQ->resp_buf;
+> + =A0 =A0 =A0 iov[0].iov_base =3D buf;
+> + =A0 =A0 =A0 iov[0].iov_len =3D get_rfc1002_length(buf) + 4;
+> =A0 =A0 =A0 =A0if (midQ->largeBuf)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*pRespBufType =3D CIFS_LARGE_BUFFER;
+> =A0 =A0 =A0 =A0else
 > --
 > 1.7.1
 >
