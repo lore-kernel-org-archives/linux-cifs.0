@@ -1,62 +1,103 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH 06/11] CIFS: Respect MaxMpxCount field
-Date: Tue, 28 Feb 2012 14:47:36 -0500
-Message-ID: <20120228144736.18124fc3@tlielax.poochiereds.net>
+Date: Tue, 28 Feb 2012 14:03:53 -0600
+Message-ID: <CAH2r5mvJE+ACNVuv+HEQMuwvaMTzfOb7Msk4U1ZVnZ046AEi1Q@mail.gmail.com>
 References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
 	<1329895984-9251-7-git-send-email-piastry@etersoft.ru>
 	<CAH2r5mvVToaHozN3=YgCCCWFFnjE9AP5xX_BF2JdxDj_JvKsbQ@mail.gmail.com>
 	<20120228114341.1629ed85@tlielax.poochiereds.net>
 	<CAH2r5mvFyw8Cn8nXN9ZBZogBGVr5L5T9aX7Zs8DOiZgDUqGp1Q@mail.gmail.com>
+	<20120228144736.18124fc3@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvFyw8Cn8nXN9ZBZogBGVr5L5T9aX7Zs8DOiZgDUqGp1Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20120228144736.18124fc3-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUdWUs
-IDI4IEZlYiAyMDEyIDExOjQyOjQ5IC0wNjAwDQpTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWls
-LmNvbT4gd3JvdGU6DQoNCj4gSSB0aGluayB0aGUgYmVzdCB3YXkgdG8gaGFuZGxlIHRoaXMgaXMg
-dG8gZG8gdGhlIHNwZWNpYWwgY2FzaW5nDQo+IChsaW1pdGluZyByZXRyaWVzLCB0dXJuaW5nIG9m
-ZiBieXRlIHJhbmdlIGJsb2NraW5nIGxvY2tzLCB0dXJuaW5nIG9mZg0KPiBvcGxvY2spIGZvciB0
-aGUgc2VydmVycyB3aGljaCBkbyBsaW1pdCBtYXhtcHggdG8gc21hbGwgdmFsdWVzLiAgIEZvcg0K
-PiBtYXhtcHg9NTAgb3IgaGlnaGVyIChvciBpZiB5b3Ugd2lzaCB0byBuYXJyb3cgdGhpcywgZGlz
-dGluZ3Vpc2gNCj4gc2VydmVycyBsaWtlIFNhbWJhIG1vcmUgbmFycm93bHkgYnkgY2hlY2sgZm9y
-IHRoZSB1bml4IGV4dGVuc2lvbnMgdGhhdA0KPiBpcyBmaW5lKSB3aGljaCBzaG91bGRuJ3QgYmUg
-c3RyaWN0ZXIgdGhhbiB3aW5kb3dzICh3aG9zZSBjbGllbnQgd2lsbA0KPiBleGNlZWQgNTAgc2lt
-dWx0YW5lb3VzIHJlcXVlc3RzIGZvciB2YXJpb3VzIGNhc2VzIENocmlzIGRlc2NyaWJlZCkuDQo+
-IFRoZXJlIGlzIGEgc2lnbmlmaWNhbnQgY2hhbmNlIG9mIGRlYWRsb2NrIGlmIHdlIGRvbid0IGFs
-bG93IHdyaXRlcw0KPiB0aHJvdWdoIGR1ZSB0byBjb3VudGluZyBibG9ja2luZyBieXRlIHJhbmdl
-IGxvY2tzIGFnYWluc3QgbWF4bXB4IHRvbw0KPiBzdHJpY3RseS4gICBXZSBkbyBoYXZlIHRvIGZp
-eCB0aGUgY2FzZSBvZiBtYXhtcHggPSAxIG9yIDIgKGRpc2FibGUNCj4gb3Bsb2NrIGFuZCBwb3Nz
-aWJseSBlY2hvKSBhbmQgZW5mb3JjZSBtYXhtcHggZm9yIHRob3NlIHdoaWNoIHNldCBpdA0KPiBs
-b3dlciB0aGFuIDUwIC0gYnV0IHRoZSBieXRlIHJhbmdlIGxvY2sgaXNzdWUgaGFzIG5ldmVyIGNv
-bWUgdXAsIGFuZA0KPiBmaXhpbmcgaXQgdGhlIHdheSBwYXZlbCBkZXNjcmliZXMgd291bGQgYmUg
-c3RyaWN0ZXIgdGhhbiB3aW5kb3dzIGFuZA0KPiByaXNrIGRlYWRsb2NrIGJ5IGNoZXdpbmcgdXAg
-c2xvdHMuDQo+IA0KPiBBbm90aGVyIGlzc3VlIGlzIHRoYXQgd2UgYXJlIHNpZ25pZmljYW50bHkg
-dW5kZXJ1dGlsaXplcyBTYW1iYSBieQ0KPiBzZXR0aW5nIG1heG1weCBzbyBsb3csIGJ1dCBpZiB3
-ZSBleHBlY3QgdG8gbW92ZSB0byBTTUIyIHNvb24sIGl0IG1heQ0KPiBub3QgbWF0dGVyLg0KPiAN
-Cg0KSSdtIGhhdmluZyBhIGhhcmQgdGltZSB1bmRlcnN0YW5kaW5nIHdoYXQgeW91J3JlIHByb3Bv
-c2luZyBhYm92ZS4gSXQNCnNvdW5kcyBsaWtlIHlvdSdyZSBzYXlpbmcgdGhhdCB3aGVuIHRoZSBz
-ZXJ2ZXIgc2VuZHMgbWF4bXB4ID49IDUwIHRoYXQNCnlvdSB0aGluayB3ZSBzaG91bGQgZWZmZWN0
-aXZlbHkgdHJlYXQgdGhhdCBhcyB1bmxpbWl0ZWQ/DQoNCkNhbiB5b3UgbGF5IG91dCB0aGUgInJ1
-bGVzIiAoYW5kIHRoZSBleGNlcHRpb25zIHRoZXJlb2YpIHRoYXQgeW91J3JlDQpwcm9wb3Npbmcg
-aGVyZT8NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVH
-SU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgp
-DQoNCmlRSWNCQUVCQWdBR0JRSlBUUzlZQUFvSkVBQU9hRUVaVm9JVmR1WVFBTlZHZkZNVlgwWjJU
-S0tjUFhONU5zVVgNCmFHc3NUVFRvSzJKSzZrU2JLRm1TeFFIQ21ENG5TUEhjM1c1cXBzazRWUTBG
-NUtDNnR1Tk1vd2NXSEphWi9mMmYNClFvMlRpSDdqZ1JuZVdPdjJ5N2R4WjY2R3MrMW1QUElWUkVo
-SHEwRUp6VkgvV1BjVXErVlJrd2wzTzhrK1dRT2gNClFWWllvajVBYXAvc0t6d2pkWDVMY1M0alVF
-dXFYVlpHL25wMjE2Z3JLcjF6S3BnbzRmQVhrMjJzRnJwaXZLeVANClhVeXlQNlNVNUVBZzJFYkE3
-bGJFR0dtbWZRejdIUmlXWitWbndkOWdkYkExdXA2dnRhU0Y0bXM1YWlFNnkrWE4NCmMra2FHdmdQ
-NkVXbk5ibGF2RUVPSmQ5K2Rrc0hRNWZYUm82dDNyR3ZGbWRrQUdabGs2a0NzZTZONnphS25wQ2kN
-ClhFZW9JaHEvRkRBbFVObVU3L0I0SW9Ya0hxcmY3TGdYUXZ5Y3VQM2lVRks1TjYxRmZPK05RdnRP
-dUhoaGJoSDgNCmM0Sm9pVmhlUUtKaDNESnd3NkRrckxtbWpLaHdmMWJ5cnNZTHlDczBYbS9ZeUsv
-L3RsS2VOM3pGMGhTM2o4ZjgNCmYxN1AxUXllRTFFK0ZXZCtRRVRoVEt1UjV2TU5jQ0E0eUJGY3RD
-N2dpZGk5OHZQWTJMNit4TlRxVVdaa1VUZHINCnBCU2lLYWhYbXM4b055dmYxaWpxb3k5OXdSTElP
-TDBmWExVSUJGL05YRHcwR3k0WW1KdlI1UEtld29YUVl1K1INCkpFSVRDMU1QaWl6QTdZS2d4MzdP
-bWtFUkdwVmw5N3I5UVMyRnZwU1VoQmZzZ29YT0tXUjRjcys3S1BHWlFCQkYNCkFvL3k3TC9EQVZH
-Rm9ZYk11VFpGDQo9akpmcA0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
+Attempt to summarize after discussions with jra and Chris:
+
+- don't make default case to Samba worse performance than it already is
+- don't "fix" by adding restrictions on echo retries and blocking
+locks when it is not broken (windows allows these, and counts blocking
+locks against the pid not against the session).   For servers which
+allow few mpx, perhaps those for 10 or fewer - if you think they are
+buggy, I don't mind treating echo and blocking locks differently than
+we do now - but echo and blocking locks don't need to be restricted
+the way Pavel suggested to windows and samba and any normal server
+(and there is some risk in restricting them that way).   We could
+probably limit the number of blocking locks (out of resource error,
+returning ENOLOCK) when there are 50 (e.g.) on a process (or 10 if the
+server supports maxmpx of 10, and zero if maxmpx is less than 3 or
+less than 10).
+- for other smb requests (the ones we enforce today) enforce the limit
+the server returns (rather than 50 always)
+
+On Tue, Feb 28, 2012 at 1:47 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> On Tue, 28 Feb 2012 11:42:49 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> I think the best way to handle this is to do the special casing
+>> (limiting retries, turning off byte range blocking locks, turning of=
+f
+>> oplock) for the servers which do limit maxmpx to small values. =A0 F=
+or
+>> maxmpx=3D50 or higher (or if you wish to narrow this, distinguish
+>> servers like Samba more narrowly by check for the unix extensions th=
+at
+>> is fine) which shouldn't be stricter than windows (whose client will
+>> exceed 50 simultaneous requests for various cases Chris described).
+>> There is a significant chance of deadlock if we don't allow writes
+>> through due to counting blocking byte range locks against maxmpx too
+>> strictly. =A0 We do have to fix the case of maxmpx =3D 1 or 2 (disab=
+le
+>> oplock and possibly echo) and enforce maxmpx for those which set it
+>> lower than 50 - but the byte range lock issue has never come up, and
+>> fixing it the way pavel describes would be stricter than windows and
+>> risk deadlock by chewing up slots.
+>>
+>> Another issue is that we are significantly underutilizes Samba by
+>> setting maxmpx so low, but if we expect to move to SMB2 soon, it may
+>> not matter.
+>>
+>
+> I'm having a hard time understanding what you're proposing above. It
+> sounds like you're saying that when the server sends maxmpx >=3D 50 t=
+hat
+> you think we should effectively treat that as unlimited?
+>
+> Can you lay out the "rules" (and the exceptions thereof) that you're
+> proposing here?
+>
+> - --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v2.0.18 (GNU/Linux)
+>
+> iQIcBAEBAgAGBQJPTS9YAAoJEAAOaEEZVoIVduYQANVGfFMVX0Z2TKKcPXN5NsUX
+> aGssTTToK2JK6kSbKFmSxQHCmD4nSPHc3W5qpsk4VQ0F5KC6tuNMowcWHJaZ/f2f
+> Qo2TiH7jgRneWOv2y7dxZ66Gs+1mPPIVREhHq0EJzVH/WPcUq+VRkwl3O8k+WQOh
+> QVZYoj5Aap/sKzwjdX5LcS4jUEuqXVZG/np216grKr1zKpgo4fAXk22sFrpivKyP
+> XUyyP6SU5EAg2EbA7lbEGGmmfQz7HRiWZ+Vnwd9gdbA1up6vtaSF4ms5aiE6y+XN
+> c+kaGvgP6EWnNblavEEOJd9+dksHQ5fXRo6t3rGvFmdkAGZlk6kCse6N6zaKnpCi
+> XEeoIhq/FDAlUNmU7/B4IoXkHqrf7LgXQvycuP3iUFK5N61FfO+NQvtOuHhhbhH8
+> c4JoiVheQKJh3DJww6DkrLmmjKhwf1byrsYLyCs0Xm/YyK//tlKeN3zF0hS3j8f8
+> f17P1QyeE1E+FWd+QEThTKuR5vMNcCA4yBFctC7gidi98vPY2L6+xNTqUWZkUTdr
+> pBSiKahXms8oNyvf1ijqoy99wRLIOL0fXLUIBF/NXDw0Gy4YmJvR5PKewoXQYu+R
+> JEITC1MPiizA7YKgx37OmkERGpVl97r9QS2FvpSUhBfsgoXOKWR4cs+7KPGZQBBF
+> Ao/y7L/DAVGFoYbMuTZF
+> =3DjJfp
+> -----END PGP SIGNATURE-----
+
+
+
+--=20
+Thanks,
+
+Steve
