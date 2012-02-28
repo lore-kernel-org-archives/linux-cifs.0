@@ -1,70 +1,91 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 01/11] CIFS: Simplify inFlight logic
-Date: Tue, 28 Feb 2012 15:39:27 +0400
-Message-ID: <CAKywueQ4S-V13O_gpNAHRpWo6NikQnA1KQYvokrVPRf2vW=xYQ@mail.gmail.com>
-References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
-	<1329895984-9251-2-git-send-email-piastry@etersoft.ru>
-	<CAH2r5msNLEF9qVvKsTVTUnPyUjk+7iYVJTxZgd_uuXLAE0iyRg@mail.gmail.com>
-	<CAKywueQNFbwDqwr7adWsUZmaYX28tz3kYnL1=4itBHAFV1aeaA@mail.gmail.com>
-	<20120228063120.76265cd9@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: cifs oplock windows share
+Date: Tue, 28 Feb 2012 06:48:16 -0500
+Message-ID: <20120228064816.68731aca@tlielax.poochiereds.net>
+References: <790056146.218351.1330179815970.JavaMail.www@wwinf8305>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120228063120.76265cd9-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <790056146.218351.1330179815970.JavaMail.www@wwinf8305>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/2/28 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Tue, 28 Feb 2012 13:38:46 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> 2012/2/28 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> > I got a chance to look through this patch set in more detail on th=
-e way
->> > to the SMB2.2 test event. =A0I liked many of the patches, but this=
- one
->> > seems to complicate, rather than simplify by adding a spinlock
->> > to what used to be an atomic_inc. =A0There is also a possibility t=
-hat this
->> > spinlock will become hot. =A0I don't mind moving the atomic_inc in=
-side the
->> > new dec_in_flight macro though to make it easier in the future.
->> >
->>
->> The idea was to simplify the usage of inFlight value. Now it is
->> protected by both spin_lock and atomic mechanism in one case and wit=
-h
->> only atomic in another - =A0I think it's rather complicated. The pat=
-ch
->> gets rid of one of the protection mechanism (atomic) and use only
->> spin_lock - this spin_lock is used further for protecting oplock and
->> echo specific variables as well.
->>
->
-> The problem here is that the locking around this variable is unclear:
->
-> If you need a spinlock to access/change it, then why use an atomic? I=
-f
-> an atomic is sufficient then why use the spinlock at all?
->
-> I don't much care what scheme you end up using for this, but if you
-> really need a belt-and-suspenders approach (atomic + spinlock), then
-> the reasoning for it needs to be clearly documented. We mere mortals
-> must understand how it's supposed to work so we don't break it later.
+On Sat, 25 Feb 2012 15:23:36 +0100
+"sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org> wrote:
 
-I don't know how the existing approach comes the tree but I guess that
-it needs to be atomic to easily decrement and read this variable and
-needs to be surrounded by spinlocks in wait_for_free_request to make
-sure we are not incrementing the value that is already >=3D
-cifs_max_pending.
+> Sorry for reposting precedent mail
+>=20
+> Hello=20
+> I am working in a university.
+> I have integrated 160 linux Fedora 14 clients in a Active directory w=
+ith Windows Server 2008 with winbind.
+> The linux home is local, but the document directory is mounted on a w=
+indows share via pam_mount and cifs
+> The windows share is configured like this in /etc/security/pam_mount.=
+conf.xml
+> volume user=3D"*" fstype=3D"cifs" server=3D"$SERVEURDONNEES" path=3D"=
+$REPERTOIREDONNES/%(DOMAIN_USER)" mountpoint=3D"~/Documents" options=3D=
+"nounix,noserverino
+>=20
+> Everything was working when only a few computers were connected.
+> Howether, when several linux computers were working, there was the pr=
+oblem :
+> ct 5 16:42:24 u1209-01l kernel: [ 58.783078] CIFS VFS: No response fo=
+r cmd 114 mid 1
+> Oct 5 16:42:24 u1209-01l kernel: [ 58.783094] CIFS VFS: cifs_mount fa=
+iled w/return code =3D -112
+> Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(mount.c:64): Errors=
+ from underlying mount program:
+> Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(mount.c:68): mount =
+error(112): Host is down
+> Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(mount.c:68): Refer =
+to the mount.cifs(8) manual page (e.g. man mount.cifs)
+> Oct 5 16:42:24 u1209-01l kdm: :0[1926]: pam_mount(pam_mount.c:521): m=
+ount of data/u20 failed
+>=20
+> And the windows share went completely out of line: the server must be=
+ rebooted ...
+> I have put=20
+> modprobe cifs
+> echo 0 > /proc/fs/cifs/OplockEnabled
+> on the /etc/rc.d/rc.local in all the linux clients and everything was=
+ resolved.
+>=20
+> Everything is working fine for several months.
+>=20
+> Now in another part of the university, I have put the same system on =
+100 Fedora 14 clients.
+> The only difference is the Windows Server is 2008 R2 and don't use th=
+e same SMB: version 2.1
+> The problem is back again... The windows share freezes and the window=
+s server R2 must be rebooted.
+> echo 0 > /proc/fs/cifs/OplockEnabled don't seem to work anymore
+> I don't understand well how to resolve the problem.
+> Is this a cifs problem ? Must I downgrade the windows Server to 2008 =
+?
+> I have read about to put max protocol =3D smb2 in smb.conf. What must=
+ I investigate for resolving this ?
+>=20
+> Cheers,
+> Thanks.
+> Serge
+>=20
+> Une messagerie gratuite, garantie =C3=A0 vie et des services en plus,=
+ =C3=A7a vous tente ?
+> Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
 
-The whole scheme is rather complicated of course - so, the goal of
-this patch is to make it more understandable and simple (only one
-protection mechanism - spin_lock).
+I suspect that disabling oplocks just papered over the real problem by
+forcing the I/O to the server to be spread out more evenly.
+
+If your server is going unresponsive then it sounds like that server is
+broken. That's not generally a good way to handle an error condition.
+
+I'm not sure exactly what would cause that though. You may need help
+from the server vendor (aka MS) in order to determine the real cause of
+the problem.
 
 --=20
-Best regards,
-Pavel Shilovsky.
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
