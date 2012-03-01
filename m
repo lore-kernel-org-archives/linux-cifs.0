@@ -1,73 +1,89 @@
-From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [PATCH 06/11] CIFS: Respect MaxMpxCount field
-Date: Thu, 1 Mar 2012 10:48:23 -0800
-Message-ID: <20120301184823.GE1930@jeremy-laptop>
+Date: Thu, 1 Mar 2012 14:12:48 -0500
+Message-ID: <20120301141248.1e6fb722@samba.org>
 References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
- <1329895984-9251-7-git-send-email-piastry@etersoft.ru>
- <CAH2r5mvVToaHozN3=YgCCCWFFnjE9AP5xX_BF2JdxDj_JvKsbQ@mail.gmail.com>
- <20120228114341.1629ed85@tlielax.poochiereds.net>
- <CAH2r5mvFyw8Cn8nXN9ZBZogBGVr5L5T9aX7Zs8DOiZgDUqGp1Q@mail.gmail.com>
- <20120228144736.18124fc3@tlielax.poochiereds.net>
- <CAH2r5mvJE+ACNVuv+HEQMuwvaMTzfOb7Msk4U1ZVnZ046AEi1Q@mail.gmail.com>
- <CAKywueSxe_wZwudx3UK14C94o53zjghsTJJSah=CQSqy0uhZRQ@mail.gmail.com>
- <CAH2r5mvFiwpVwcBgfuXvEGC1_8snLMAsp4fRVEDMqTWXDJdu9w@mail.gmail.com>
- <20120301133747.5fc891b5@samba.org>
-Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+	<1329895984-9251-7-git-send-email-piastry@etersoft.ru>
+	<CAH2r5mvVToaHozN3=YgCCCWFFnjE9AP5xX_BF2JdxDj_JvKsbQ@mail.gmail.com>
+	<20120228114341.1629ed85@tlielax.poochiereds.net>
+	<CAH2r5mvFyw8Cn8nXN9ZBZogBGVr5L5T9aX7Zs8DOiZgDUqGp1Q@mail.gmail.com>
+	<20120228144736.18124fc3@tlielax.poochiereds.net>
+	<CAH2r5mvJE+ACNVuv+HEQMuwvaMTzfOb7Msk4U1ZVnZ046AEi1Q@mail.gmail.com>
+	<CAKywueSxe_wZwudx3UK14C94o53zjghsTJJSah=CQSqy0uhZRQ@mail.gmail.com>
+	<CAH2r5mvFiwpVwcBgfuXvEGC1_8snLMAsp4fRVEDMqTWXDJdu9w@mail.gmail.com>
+	<20120301133747.5fc891b5@samba.org>
+	<20120301184823.GE1930@jeremy-laptop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20120301133747.5fc891b5-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20120301184823.GE1930@jeremy-laptop>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Mar 01, 2012 at 01:37:47PM -0500, Jeff Layton wrote:
-> 
-> (cc'ing Chris and Jeremy to make sure I understand)
-> 
-> The description above is a good start but doesn't quite outline the
-> clear concise "rules" for this that I was looking for.
-> 
-> So if I understand what Steve wrote above, he's basically saying that
-> we should enforce the maxmpx for everything but blocking locks and
-> echoes? Is that correct? If so then I think that's wrong and won't fix
-> any of the problems that people have reported with the existing code.
-> 
-> It's all well and good that *some* servers allow you to exceed the
-> maxmpx in *some* cases, but we can't code to that assumption. We know
-> well that many servers do not handle exceeding the maxmpx gracefully at
-> all. As always we have to code to the lowest common denominator by
-> default, and then optionally allow people to exceed that if they choose
-> to do so.
-> 
-> I think this is a case where we need a good description in a human
-> language (preferably english) of how this should work (aka a
-> specification), and then write code to match that description (aka code
-> to the spec).
-> 
-> Anything else is going to send us down the rabbit hole where we are
-> today with cifs.ko -- a bunch of ad-hoc, broken code that no one really
-> understands.
-> 
-> While we may not like it, a hard cap on the number of outstanding
-> requests is required by the protocol docs that Chris helped write.
-> 
-> Allow me to quote from MS-CIFS:
-> 
-> MaxMpxCount (2 bytes): The maximum number of outstanding SMB operations
-> that the server supports. This value includes existing OpLocks, the
-> NT_TRANSACT_NOTIFY_CHANGE subcommand, and any other commands that are
-> pending on the server.
-> 
-> There's nothing in there that says anything about certain commands
-> being excepted from that value.
-
-The only way to know this for sure is to put in a request
-to Microsoft doc-help to ask if SMBecho and blocking SMB
-locks are exempted from the maxmpx count.
-
-Jeremy.
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUaHUs
+IDEgTWFyIDIwMTIgMTA6NDg6MjMgLTA4MDANCkplcmVteSBBbGxpc29uIDxqcmFAc2FtYmEub3Jn
+PiB3cm90ZToNCg0KPiBPbiBUaHUsIE1hciAwMSwgMjAxMiBhdCAwMTozNzo0N1BNIC0wNTAwLCBK
+ZWZmIExheXRvbiB3cm90ZToNCj4gPiANCj4gPiAoY2MnaW5nIENocmlzIGFuZCBKZXJlbXkgdG8g
+bWFrZSBzdXJlIEkgdW5kZXJzdGFuZCkNCj4gPiANCj4gPiBUaGUgZGVzY3JpcHRpb24gYWJvdmUg
+aXMgYSBnb29kIHN0YXJ0IGJ1dCBkb2Vzbid0IHF1aXRlIG91dGxpbmUgdGhlDQo+ID4gY2xlYXIg
+Y29uY2lzZSAicnVsZXMiIGZvciB0aGlzIHRoYXQgSSB3YXMgbG9va2luZyBmb3IuDQo+ID4gDQo+
+ID4gU28gaWYgSSB1bmRlcnN0YW5kIHdoYXQgU3RldmUgd3JvdGUgYWJvdmUsIGhlJ3MgYmFzaWNh
+bGx5IHNheWluZyB0aGF0DQo+ID4gd2Ugc2hvdWxkIGVuZm9yY2UgdGhlIG1heG1weCBmb3IgZXZl
+cnl0aGluZyBidXQgYmxvY2tpbmcgbG9ja3MgYW5kDQo+ID4gZWNob2VzPyBJcyB0aGF0IGNvcnJl
+Y3Q/IElmIHNvIHRoZW4gSSB0aGluayB0aGF0J3Mgd3JvbmcgYW5kIHdvbid0IGZpeA0KPiA+IGFu
+eSBvZiB0aGUgcHJvYmxlbXMgdGhhdCBwZW9wbGUgaGF2ZSByZXBvcnRlZCB3aXRoIHRoZSBleGlz
+dGluZyBjb2RlLg0KPiA+IA0KPiA+IEl0J3MgYWxsIHdlbGwgYW5kIGdvb2QgdGhhdCAqc29tZSog
+c2VydmVycyBhbGxvdyB5b3UgdG8gZXhjZWVkIHRoZQ0KPiA+IG1heG1weCBpbiAqc29tZSogY2Fz
+ZXMsIGJ1dCB3ZSBjYW4ndCBjb2RlIHRvIHRoYXQgYXNzdW1wdGlvbi4gV2Uga25vdw0KPiA+IHdl
+bGwgdGhhdCBtYW55IHNlcnZlcnMgZG8gbm90IGhhbmRsZSBleGNlZWRpbmcgdGhlIG1heG1weCBn
+cmFjZWZ1bGx5IGF0DQo+ID4gYWxsLiBBcyBhbHdheXMgd2UgaGF2ZSB0byBjb2RlIHRvIHRoZSBs
+b3dlc3QgY29tbW9uIGRlbm9taW5hdG9yIGJ5DQo+ID4gZGVmYXVsdCwgYW5kIHRoZW4gb3B0aW9u
+YWxseSBhbGxvdyBwZW9wbGUgdG8gZXhjZWVkIHRoYXQgaWYgdGhleSBjaG9vc2UNCj4gPiB0byBk
+byBzby4NCj4gPiANCj4gPiBJIHRoaW5rIHRoaXMgaXMgYSBjYXNlIHdoZXJlIHdlIG5lZWQgYSBn
+b29kIGRlc2NyaXB0aW9uIGluIGEgaHVtYW4NCj4gPiBsYW5ndWFnZSAocHJlZmVyYWJseSBlbmds
+aXNoKSBvZiBob3cgdGhpcyBzaG91bGQgd29yayAoYWthIGENCj4gPiBzcGVjaWZpY2F0aW9uKSwg
+YW5kIHRoZW4gd3JpdGUgY29kZSB0byBtYXRjaCB0aGF0IGRlc2NyaXB0aW9uIChha2EgY29kZQ0K
+PiA+IHRvIHRoZSBzcGVjKS4NCj4gPiANCj4gPiBBbnl0aGluZyBlbHNlIGlzIGdvaW5nIHRvIHNl
+bmQgdXMgZG93biB0aGUgcmFiYml0IGhvbGUgd2hlcmUgd2UgYXJlDQo+ID4gdG9kYXkgd2l0aCBj
+aWZzLmtvIC0tIGEgYnVuY2ggb2YgYWQtaG9jLCBicm9rZW4gY29kZSB0aGF0IG5vIG9uZSByZWFs
+bHkNCj4gPiB1bmRlcnN0YW5kcy4NCj4gPiANCj4gPiBXaGlsZSB3ZSBtYXkgbm90IGxpa2UgaXQs
+IGEgaGFyZCBjYXAgb24gdGhlIG51bWJlciBvZiBvdXRzdGFuZGluZw0KPiA+IHJlcXVlc3RzIGlz
+IHJlcXVpcmVkIGJ5IHRoZSBwcm90b2NvbCBkb2NzIHRoYXQgQ2hyaXMgaGVscGVkIHdyaXRlLg0K
+PiA+IA0KPiA+IEFsbG93IG1lIHRvIHF1b3RlIGZyb20gTVMtQ0lGUzoNCj4gPiANCj4gPiBNYXhN
+cHhDb3VudCAoMiBieXRlcyk6IFRoZSBtYXhpbXVtIG51bWJlciBvZiBvdXRzdGFuZGluZyBTTUIg
+b3BlcmF0aW9ucw0KPiA+IHRoYXQgdGhlIHNlcnZlciBzdXBwb3J0cy4gVGhpcyB2YWx1ZSBpbmNs
+dWRlcyBleGlzdGluZyBPcExvY2tzLCB0aGUNCj4gPiBOVF9UUkFOU0FDVF9OT1RJRllfQ0hBTkdF
+IHN1YmNvbW1hbmQsIGFuZCBhbnkgb3RoZXIgY29tbWFuZHMgdGhhdCBhcmUNCj4gPiBwZW5kaW5n
+IG9uIHRoZSBzZXJ2ZXIuDQo+ID4gDQo+ID4gVGhlcmUncyBub3RoaW5nIGluIHRoZXJlIHRoYXQg
+c2F5cyBhbnl0aGluZyBhYm91dCBjZXJ0YWluIGNvbW1hbmRzDQo+ID4gYmVpbmcgZXhjZXB0ZWQg
+ZnJvbSB0aGF0IHZhbHVlLg0KPiANCj4gVGhlIG9ubHkgd2F5IHRvIGtub3cgdGhpcyBmb3Igc3Vy
+ZSBpcyB0byBwdXQgaW4gYSByZXF1ZXN0DQo+IHRvIE1pY3Jvc29mdCBkb2MtaGVscCB0byBhc2sg
+aWYgU01CZWNobyBhbmQgYmxvY2tpbmcgU01CDQo+IGxvY2tzIGFyZSBleGVtcHRlZCBmcm9tIHRo
+ZSBtYXhtcHggY291bnQuDQo+IA0KDQpUaGF0IHdpbGwgcHJvYmFibHkgdGVsbCB1cyB3aGF0IFdp
+bmRvd3MgZG9lcywgYnV0IHRoZSBwcm9ibGVtcyBhcmUgbm90DQpuZWNlc3NhcmlseSB3aXRoIFdp
+bmRvd3Mgc2VydmVycy4gVGhlcmUgYXJlIGEgbG90IG9mIGNyYXBweSBDSUZTDQpzZXJ2ZXJzIGlu
+IHRoZSBmaWVsZCBhbmQgTWljcm9zb2Z0IGNhbid0IHRlbGwgdXMgaG93IHRoZXkgYmVoYXZlIGlu
+DQp0aGlzIHJlZ2FyZC4NCg0KU3RpbGwsIGl0IHdvbid0IGh1cnQgdG8gYXNrLCBzbyBJJ2xsIGRv
+IHNvLi4uSSBqdXN0IGRvbid0IHRoaW5rIHRoZWlyDQphbnN3ZXIgd2lsbCBoYXZlIG11Y2ggYmVh
+cmluZyBvbiB3aGF0IHdlJ2xsIGV2ZW50dWFsbHkgaGF2ZSB0bw0KaW1wbGVtZW50Lg0KDQoNCi0g
+LS0gDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQotLS0tLUJFR0lOIFBHUCBTSUdO
+QVRVUkUtLS0tLQ0KVmVyc2lvbjogR251UEcgdjIuMC4xOCAoR05VL0xpbnV4KQ0KDQppUUljQkFF
+QkFnQUdCUUpQVDhvd0FBb0pFQUFPYUVFWlZvSVZrVkFRQUs3WjlhK2tybVhuVVFtYmZqWXIrakVk
+DQpidnBYcDJGV3BpSnh6aG52NEVRUG9NSGxXVWpZYzJtQ0xlT3ZvLzQycGNZekR6eDBHa280Rjlo
+ZkpKVEI3Umo2DQpScXVlR3pKcHZqcHV3K0hObzN0MFlVWFUrL09VMkUrT0JDRW51UTVhN0syc0pH
+STRCVW1YTGZYS2VDYVdMOEJ6DQo1SC9DZGJVa3pGTTZUSDlRVGU3dmJ3a0hSZ1RCcU1QZDdVZ3kx
+Y3JXV08wdGhKcGtSRjlNa0pDQ2RhWEl4a2dQDQpMaU4xMEU1RDV3a2ZUZGIwU1dBaFl2YzhGdkVr
+Uzh3S0VRY00rQk40NVBxYVdpVzJnTVpwUzRjZ1FkY1d6SDFJDQpEbHoyekpsTVpsVjVmNzFEUVZI
+Q0R2bFk0NFRmTi9MamxuQTErd1c2aC9RaEpvbUpRaFpLelRrMmFxVGhpRjRoDQppTkNPUHZsRHVC
+YWIwWkF5bkdqN1ZBNEtaMEROWS9DVnJxSDIwT0hXOVJPa0xDamNxQ0hndng1ZUVHWFBrV2NtDQpI
+aFk4OGVXcG1yajdueForenFpcEt3bEphczhadTdOWWl4R1dFUFEzaitkeGViaHhMS2ZxQkRRQmdw
+WHBvWkZIDQpXaEVwNUwzM1JGNE5Va0t5MFRvaWhYanhwOEhMRUZoZk9BZ1R6YktKUzRHdFBEZnlj
+a1hxdzN5TDk2N2daRVYzDQpMSkVCakk1K2tqVU9FSUh0Ky91aFNRRFZNL3VUK3NGTVFwQmJ0R2d1
+SzBrNFdJSWJGZ1QzY3ZHL1NuQ1VJZFhCDQpPOWpFWlRaN0R0Wlk2ckczNUtxMDV1c2NsV0Z6OUZp
+MnUvRlZUcVp4SmNNOHVmdVk1YzV2QXBMOVNQZ3pON3pyDQpxR1BtN0JNNk1QMngra1ZMM2ZIcw0K
+PWNsd20NCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
