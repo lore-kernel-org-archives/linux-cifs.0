@@ -1,41 +1,90 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [patch] cifs: writing past end of struct in
- cifs_convert_address()
-Date: Thu, 1 Mar 2012 06:47:32 -0500
-Message-ID: <20120301064732.135a5383@tlielax.poochiereds.net>
-References: <20120301070652.GA6959@elgon.mountain>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
+Date: Thu, 1 Mar 2012 13:23:19 +0100
+Message-ID: <20120301122319.GE4385@quack.suse.cz>
+References: <1330602103-8851-1-git-send-email-jack@suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120301070652.GA6959-mgFCXtclrQlZLf2FXnZxJA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
+	dchinner@redhat.com, Jan Kara <jack@suse.cz>,
+	Jaya Kumar <jayalk@intworks.biz>, Sage Weil <sage@newdream.net>,
+	ceph-devel@vger.kernel.org, Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org, Eric Van Hensbergen <ericvh@gmail.com>,
+	Ron Minnich <rminnich@sandia.gov>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	v9fs-developer@lists.sourceforge.net,
+	Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.sourceforge.net,
+	Steven Whitehouse <swhiteho@redhat.com>, cluster-devel@redhat.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <1330602103-8851-1-git-send-email-jack@suse.cz>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 1 Mar 2012 10:06:52 +0300
-Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+  Bah, the subject should have been 0/9... Sorry.
 
-> "s6->sin6_scope_id" is an int bits but strict_strtoul() writes a long
-> so this can corrupt memory on 64 bit systems.
+								Honza
+On Thu 01-03-12 12:41:34, Jan Kara wrote:
+>   Hello,
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+>   to provide reliable support for filesystem freezing, filesystems need to have
+> complete control over when metadata is changed. In particular,
+> file_update_time() calls from page fault code make it impossible for
+> filesystems to prevent inodes from being dirtied while the filesystem is
+> frozen.
 > 
-> diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-> index 73e47e8..cab99b5 100644
-> --- a/fs/cifs/netmisc.c
-> +++ b/fs/cifs/netmisc.c
-> @@ -197,8 +197,7 @@ cifs_convert_address(struct sockaddr *dst, const char *src, int len)
->  		memcpy(scope_id, pct + 1, slen);
->  		scope_id[slen] = '\0';
->  
-> -		rc = strict_strtoul(scope_id, 0,
-> -					(unsigned long *)&s6->sin6_scope_id);
-> +		rc = kstrtouint(scope_id, 0, &s6->sin6_scope_id);
->  		rc = (rc == 0) ? 1 : 0;
->  	}
->  
+> To fix the issue, this patch set changes page fault code to call
+> file_update_time() only when ->page_mkwrite() callback is not provided. If the
+> callback is provided, it is the responsibility of the filesystem to perform
+> update of i_mtime / i_ctime if needed. We also push file_update_time() call
+> to all existing ->page_mkwrite() implementations if the time update does not
+> obviously happen by other means. If you know your filesystem does not need
+> update of modification times in ->page_mkwrite() handler, please speak up and
+> I'll drop the patch for your filesystem.
+> 
+> As a side note, an alternative would be to remove call of file_update_time()
+> from page fault code altogether and require all filesystems needing it to do
+> that in their ->page_mkwrite() implementation. That is certainly possible
+> although maybe slightly inefficient and would require auditting 100+
+> vm_operations_structs *shiver*.
+> 
+> Changes since v1:
+> * Dropped patches for filesystems which don't need them
+> * Added some acks
+> * Improved sysfs patch by Alex Elder's suggestion
+> 
+> Andrew, would you be willing to merge these patches via your tree?
+> 
+> 								Honza
+> 
+> CC: Jaya Kumar <jayalk@intworks.biz>
+> CC: Sage Weil <sage@newdream.net>
+> CC: ceph-devel@vger.kernel.org
+> CC: Steve French <sfrench@samba.org>
+> CC: linux-cifs@vger.kernel.org
+> CC: Eric Van Hensbergen <ericvh@gmail.com>
+> CC: Ron Minnich <rminnich@sandia.gov>
+> CC: Latchesar Ionkov <lucho@ionkov.net>
+> CC: v9fs-developer@lists.sourceforge.net
+> CC: Miklos Szeredi <miklos@szeredi.hu>
+> CC: fuse-devel@lists.sourceforge.net
+> CC: Steven Whitehouse <swhiteho@redhat.com>
+> CC: cluster-devel@redhat.com
+> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Jan Kara <jack@suse.cz>
+SUSE Labs, CR
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Fight unfair telecom internet charges in Canada: sign http://stopthemeter.ca/
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
