@@ -1,37 +1,55 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: MaxMpx and Blocking Locks
-Date: Thu, 1 Mar 2012 16:30:48 -0600
-Message-ID: <CAH2r5mvXFjDG=eX4xp49d6QNBfD_r1OxdDSkj9bDbmUKKGrKAQ@mail.gmail.com>
+From: Ted Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
+Date: Thu, 1 Mar 2012 18:29:42 -0500
+Message-ID: <20120301232942.GH32588@thunk.org>
+References: <1330602103-8851-1-git-send-email-jack@suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
+	dchinner@redhat.com, Jaya Kumar <jayalk@intworks.biz>,
+	Sage Weil <sage@newdream.net>, ceph-devel@vger.kernel.org,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Ron Minnich <rminnich@sandia.gov>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	v9fs-developer@lists.sourceforge.net,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	fuse-devel@lists.sourceforge.net,
+	Steven Whitehouse <swhiteho@redhat.com>, cluster-devel@redhat.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jan Kara <jack@suse.cz>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <1330602103-8851-1-git-send-email-jack@suse.cz>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-FYI - There was followup discussion after the dochelp response,
-explaining some of the quirks, and some still open questions (about
-why Windows doesn't return an error as implied, for example).
+On Thu, Mar 01, 2012 at 12:41:34PM +0100, Jan Kara wrote:
+> 
+> To fix the issue, this patch set changes page fault code to call
+> file_update_time() only when ->page_mkwrite() callback is not provided. If the
+> callback is provided, it is the responsibility of the filesystem to perform
+> update of i_mtime / i_ctime if needed. We also push file_update_time() call
+> to all existing ->page_mkwrite() implementations if the time update does not
+> obviously happen by other means. If you know your filesystem does not need
+> update of modification times in ->page_mkwrite() handler, please speak up and
+> I'll drop the patch for your filesystem.
 
-My concern remains that we don't want to make things worse with the
-fix (opening up deadlocks or data integrity issues) so I would prefer
-to  allow SMB Echo through (since it works to all known servers with
-MaxMpx 10 or greater, and the alternative, not sending it, may cause
-the session to drop and make things worse). Chris Hertel had an
-interesting suggestion (he may be able to describe it in more detail)
-though for limiting blocking locks to avoid blocking locks "starving"
-the available mpx (which are needed for read and write etc.).   I had
-suggested limiting outstanding blocking locks to MaxMpx - 2 (or
-something similar) - Chris suggested that the client instead use
-MaxMpx/2 as a maximum for blocking locks to avoid "starving" the
-system (and e.g. deadlocking when we have to do writeback).  This
-would involve us keeping a counter of outstanding blocking locks in
-the session structure.  This shouldn't slow performance much because a
-simple atomic counter could be used and is probably good enough for an
-approximation of the current pending locks (it would not require an
-expensive semaphore or spinlock).
+I don't know if this introductory text is going to be saved anywhere
+permanent, such as the merge commit (since git now has the ability to
+have much more informative merge descriptions).  But if it is going to
+be preserved, it might be worth mentioning that if the filesystem uses
+block_page_mkpage(), it will handled automatically for them since the
+patch series does push the call to file_update_time(0 into
+__block_page_mkpage().
 
--- 
-Thanks,
+					- Ted
 
-Steve
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Fight unfair telecom internet charges in Canada: sign http://stopthemeter.ca/
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
