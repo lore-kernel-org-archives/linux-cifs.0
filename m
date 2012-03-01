@@ -1,58 +1,37 @@
-From: Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>
-Subject: [PATCH] cifs: don't dereference potentially NULL variable in
- match_session()
-Date: Thu, 1 Mar 2012 21:45:13 +0100 (CET)
-Message-ID: <alpine.LNX.2.00.1203012143280.19443@swampdragon.chaosbits.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: MaxMpx and Blocking Locks
+Date: Thu, 1 Mar 2012 16:30:48 -0600
+Message-ID: <CAH2r5mvXFjDG=eX4xp49d6QNBfD_r1OxdDSkj9bDbmUKKGrKAQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This bit of code:
-...
-		if (strncmp(ses->user_name,
-			    vol->username ? vol->username : "",
-			    MAX_USERNAME_SIZE))
-			return 0;
-...
-implies that 'vol->username' may be NULL.
-If it is NULL, then the 'strlen(vol->username)' that follows will
-dereference a NULL pointer.
+FYI - There was followup discussion after the dochelp response,
+explaining some of the quirks, and some still open questions (about
+why Windows doesn't return an error as implied, for example).
 
-This patch should take care of that issue.
-
-Signed-off-by: Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>
----
- fs/cifs/connect.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
- Compile tested only.
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 602f77c..2f3cf02 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2014,8 +2014,9 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
- 			    vol->username ? vol->username : "",
- 			    MAX_USERNAME_SIZE))
- 			return 0;
--		if (strlen(vol->username) != 0 &&
--		    ses->password != NULL &&
-+		if (vol->username &&
-+		    strlen(vol->username) != 0 &&
-+		    ses->password &&
- 		    strncmp(ses->password,
- 			    vol->password ? vol->password : "",
- 			    MAX_PASSWORD_SIZE))
--- 
-1.7.9.2
-
+My concern remains that we don't want to make things worse with the
+fix (opening up deadlocks or data integrity issues) so I would prefer
+to  allow SMB Echo through (since it works to all known servers with
+MaxMpx 10 or greater, and the alternative, not sending it, may cause
+the session to drop and make things worse). Chris Hertel had an
+interesting suggestion (he may be able to describe it in more detail)
+though for limiting blocking locks to avoid blocking locks "starving"
+the available mpx (which are needed for read and write etc.).   I had
+suggested limiting outstanding blocking locks to MaxMpx - 2 (or
+something similar) - Chris suggested that the client instead use
+MaxMpx/2 as a maximum for blocking locks to avoid "starving" the
+system (and e.g. deadlocking when we have to do writeback).  This
+would involve us keeping a counter of outstanding blocking locks in
+the session structure.  This shouldn't slow performance much because a
+simple atomic counter could be used and is probably good enough for an
+approximation of the current pending locks (it would not require an
+expensive semaphore or spinlock).
 
 -- 
-Jesper Juhl <jj-IYz4IdjRLj0sV2N9l4h3zg@public.gmane.org>       http://www.chaosbits.net/
-Don't top-post http://www.catb.org/jargon/html/T/top-post.html
-Plain text mails only, please.
+Thanks,
+
+Steve
