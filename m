@@ -1,54 +1,43 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: cifs oplock windows share
-Date: Fri, 2 Mar 2012 11:43:11 -0500
-Message-ID: <20120302114311.59022036@tlielax.poochiereds.net>
-References: <790056146.218351.1330179815970.JavaMail.www@wwinf8305>
-	<20120228064816.68731aca@tlielax.poochiereds.net>
-	<1699379793.34636.1330705303637.JavaMail.www@wwinf8310>
+From: "Mark Christiansen" <mchristi-lfcS8c3Mqgg@public.gmane.org>
+Subject: help - can't stat() cifs file system
+Date: Fri, 2 Mar 2012 14:29:44 -0800
+Message-ID: <026601ccf8c3$faea9310$f0bfb930$@uw.edu>
+Reply-To: <mchristi-lfcS8c3Mqgg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1699379793.34636.1330705303637.JavaMail.www@wwinf8310>
+Content-Language: en-us
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 02 Mar 2012 17:21:44 +0100
-"sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org> wrote:
+To whom it may concern,
 
-> 
-> Thanks for your response.
-> 
-> I am actually migrating users data from a windows 2008 R2 file server to another windows 2008.
-> I fear i don't understand why I have to disable oplocks.
-> 
+I am using linux kernel 2.6.32-220.4.1.el6.x86_64 (RHEL6) and cifs vers=
+ion
+4.8.1.=A0 Using a mount point (/mnt/tmp), we are able to read/write to =
+our
+Windows directories.=A0 Occasionally, a user will kill a job that is wr=
+iting
+to these directories.=A0 When this happens, it corrupts the mount point
+somehow and we get a permission denied error when we do an =93ls=94.=A0=
+=20
 
-I fear that I don't either. I was just speculating.
+If I do an =93lsof=94 and grep for the path, I get a =A0message:
 
-> Is the cifs protocol compatible with windows 2008 smb ? 
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 WARNING: can=92t stat() c=
+ifs file system /mnt/tmp
 
-Yes. I often test against win2k8 and don't see this problem.
+It seems that if I am able to successfully unmount all of these mount
+points, that I can do a =93mount =96a=94 and recover.=A0=20
 
-> Must I specify max protocol =smb2 in samba ? 
+However, how can I avoid this problem in the first place (besides havin=
+g the
+user not kill jobs)?=A0 It seems like this is something a user should b=
+e able
+to do without bringing down the mount points.
 
-You mean in smb.conf? The cifs client doesn't use that at all. That's
-for the samba userspace code. cifs.ko does not support smb2 at this
-time. 
+Thank you in advance,
 
-> The issue this day:
-> Linux Cifs mount on Windows 2008 (via pam_mount): work with oplocks disabled.
-> Linux cifs mount on Windows 2008 R2 (via pam_mount): don't seems to work even with oplocks disabled
-> (Perhaps thereis another problem on the server but I don't think so)
-> 
-
-I can't help much with this since you haven't provided any details.
-
-"works" and "doesn't work" doesn't tell me anything about what's really
-wrong. If you say "it failed with this error message" or "I got this
-error message in the log when I attempted it", then that may tell us
-something.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Mark=20
