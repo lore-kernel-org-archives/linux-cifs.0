@@ -1,55 +1,79 @@
-From: Ted Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
-Date: Thu, 1 Mar 2012 18:29:42 -0500
-Message-ID: <20120301232942.GH32588@thunk.org>
-References: <1330602103-8851-1-git-send-email-jack@suse.cz>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: (unknown)
+Date: Thu, 1 Mar 2012 19:03:31 -0600
+Message-ID: <CAH2r5muLpNMSa3qgPswa6P4A_HtmZ9FnR9wPs=BFHVGonh=q_w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
-	dchinner@redhat.com, Jaya Kumar <jayalk@intworks.biz>,
-	Sage Weil <sage@newdream.net>, ceph-devel@vger.kernel.org,
-	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	Eric Van Hensbergen <ericvh@gmail.com>,
-	Ron Minnich <rminnich@sandia.gov>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	v9fs-developer@lists.sourceforge.net,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	fuse-devel@lists.sourceforge.net,
-	Steven Whitehouse <swhiteho@redhat.com>, cluster-devel@redhat.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Jan Kara <jack@suse.cz>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <1330602103-8851-1-git-send-email-jack@suse.cz>
-Sender: owner-linux-mm@kvack.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Subject: 
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Mar 01, 2012 at 12:41:34PM +0100, Jan Kara wrote:
-> 
-> To fix the issue, this patch set changes page fault code to call
-> file_update_time() only when ->page_mkwrite() callback is not provided. If the
-> callback is provided, it is the responsibility of the filesystem to perform
-> update of i_mtime / i_ctime if needed. We also push file_update_time() call
-> to all existing ->page_mkwrite() implementations if the time update does not
-> obviously happen by other means. If you know your filesystem does not need
-> update of modification times in ->page_mkwrite() handler, please speak up and
-> I'll drop the patch for your filesystem.
+Turns out it is easy to negotiate SMB2.2 against Windows 8 (rather
+than just 2.1 or 2.0 as Pavel's current git tree does).  Basic
+operations worked fine.  SMB2.2 is a very cool protocol, but since
+most features are optional, upgrading to SMB2.2 is not bad.  For
+example this change to Pavel's git tree is trivial:
 
-I don't know if this introductory text is going to be saved anywhere
-permanent, such as the merge commit (since git now has the ability to
-have much more informative merge descriptions).  But if it is going to
-be preserved, it might be worth mentioning that if the filesystem uses
-block_page_mkpage(), it will handled automatically for them since the
-patch series does push the call to file_update_time(0 into
-__block_page_mkpage().
+diff -U 4 fs/smb2/smb2pdu.c fs/cifs/smb2pdu.c
+--- fs/smb2/smb2pdu.c	2012-03-01 18:30:24.986486510 -0600
++++ fs/cifs/smb2pdu.c	2012-03-01 18:33:35.066765305 -0600
+@@ -357,20 +357,22 @@
+ 	else if (resp_buftype == CIFS_LARGE_BUFFER)
+ 		cifs_buf_release(pSMB2r);
+ }
 
-					- Ted
+-#define SMB2_NUM_PROT 2
++#define SMB2_NUM_PROT 3
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Fight unfair telecom internet charges in Canada: sign http://stopthemeter.ca/
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+ #define SMB2_PROT   0
+ #define SMB21_PROT  1
++#define SMB22_PROT  2
+ #define BAD_PROT 0xFFFF
+
+ static struct {
+ 	int index;
+ 	__le16 name;
+ } smb2protocols[] = {
+ 	{SMB2_PROT,  cpu_to_le16(SMB2_PROT_ID)},
+ 	{SMB21_PROT, cpu_to_le16(SMB21_PROT_ID)},
++	{SMB22_PROT, cpu_to_le16(SMB22_PROT_ID)},
+ 	{BAD_PROT,   cpu_to_le16(BAD_PROT_ID)}
+ };
+
+ /*
+@@ -464,9 +466,11 @@
+ 	}
+
+ 	cFYI(1, "mode 0x%x", pSMB2r->SecurityMode);
+
+-	if (pSMB2r->DialectRevision == smb2protocols[SMB21_PROT].name)
++	if (pSMB2r->DialectRevision == smb2protocols[SMB22_PROT].name)
++		cFYI(1, "negotiated smb2.2 dialect");
++	else if (pSMB2r->DialectRevision == smb2protocols[SMB21_PROT].name)
+ 		cFYI(1, "negotiated smb2.1 dialect");
+ 	else if (pSMB2r->DialectRevision == smb2protocols[SMB2_PROT].name)
+ 		cFYI(1, "negotiated smb2 dialect");
+ 	else {
+diff -U 4 fs/smb2/smb2pdu.h fs/cifs/smb2pdu.h
+--- fs/smb2/smb2pdu.h	2012-03-01 18:30:24.986486510 -0600
++++ fs/cifs/smb2pdu.h	2012-03-01 18:32:11.896643315 -0600
+@@ -38,8 +38,10 @@
+  */
+
+ #define SMB2_PROT_ID  0x0202
+ #define SMB21_PROT_ID 0x0210
++#define SMB22_PROT_ID 0x0224
++
+ #define BAD_PROT_ID   0xFFFF
+
+ /* List is sent on wire as little endian */
+ #define SMB2_NEGOTIATE		cpu_to_le16(0x0000)
+
+-- 
+Thanks,
+
+Steve
