@@ -1,67 +1,61 @@
-From: santosh nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] cifs: possible memory leak in xattr.
-Date: Fri,  2 Mar 2012 11:47:26 +0530
-Message-ID: <1330669046-13738-1-git-send-email-santoshprasadnayak@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
+Date: Fri, 2 Mar 2012 10:41:22 +0100
+Message-ID: <20120302094122.GA1744@quack.suse.cz>
+References: <1330602103-8851-1-git-send-email-jack@suse.cz>
+ <20120301232942.GH32588@thunk.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Jan Kara <jack@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
+	dchinner@redhat.com, Jaya Kumar <jayalk@intworks.biz>,
+	Sage Weil <sage@newdream.net>, ceph-devel@vger.kernel.org,
+	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Ron Minnich <rminnich@sandia.gov>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	v9fs-developer@lists.sourceforge.net,
+	Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.sourceforge.net,
+	Steven Whitehouse <swhiteho@redhat.com>, cluster-devel@redhat.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Ted Ts'o <tytso@mit.edu>
+Return-path: <owner-linux-mm@kvack.org>
+Content-Disposition: inline
+In-Reply-To: <20120301232942.GH32588@thunk.org>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-From: Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Thu 01-03-12 18:29:42, Ted Tso wrote:
+> On Thu, Mar 01, 2012 at 12:41:34PM +0100, Jan Kara wrote:
+> > 
+> > To fix the issue, this patch set changes page fault code to call
+> > file_update_time() only when ->page_mkwrite() callback is not provided. If the
+> > callback is provided, it is the responsibility of the filesystem to perform
+> > update of i_mtime / i_ctime if needed. We also push file_update_time() call
+> > to all existing ->page_mkwrite() implementations if the time update does not
+> > obviously happen by other means. If you know your filesystem does not need
+> > update of modification times in ->page_mkwrite() handler, please speak up and
+> > I'll drop the patch for your filesystem.
+> 
+> I don't know if this introductory text is going to be saved anywhere
+> permanent, such as the merge commit (since git now has the ability to
+> have much more informative merge descriptions).  But if it is going to
+> be preserved, it might be worth mentioning that if the filesystem uses
+> block_page_mkpage(), it will handled automatically for them since the
+> patch series does push the call to file_update_time(0 into
+> __block_page_mkpage().
+  Good point, added to description.
 
-Memory is allocated irrespective of whether CIFS_ACL is configured
-or not. But free is happenning only if CIFS_ACL is set. This is a
-possible memory leak scenario.
-
-Fix is:
-Allocate and free memory only if CIFS_ACL is configured.
-
-Signed-off-by: Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/xattr.c |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 45f07c4..10d92cf 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -105,7 +105,6 @@ int cifs_setxattr(struct dentry *direntry, const char *ea_name,
- 	struct cifs_tcon *pTcon;
- 	struct super_block *sb;
- 	char *full_path;
--	struct cifs_ntsd *pacl;
- 
- 	if (direntry == NULL)
- 		return -EIO;
-@@ -164,23 +163,24 @@ int cifs_setxattr(struct dentry *direntry, const char *ea_name,
- 			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
- 	} else if (strncmp(ea_name, CIFS_XATTR_CIFS_ACL,
- 			strlen(CIFS_XATTR_CIFS_ACL)) == 0) {
-+#ifdef CONFIG_CIFS_ACL
-+		struct cifs_ntsd *pacl;
- 		pacl = kmalloc(value_size, GFP_KERNEL);
- 		if (!pacl) {
- 			cFYI(1, "%s: Can't allocate memory for ACL",
- 					__func__);
- 			rc = -ENOMEM;
- 		} else {
--#ifdef CONFIG_CIFS_ACL
- 			memcpy(pacl, ea_value, value_size);
- 			rc = set_cifs_acl(pacl, value_size,
- 				direntry->d_inode, full_path, CIFS_ACL_DACL);
- 			if (rc == 0) /* force revalidate of the inode */
- 				CIFS_I(direntry->d_inode)->time = 0;
- 			kfree(pacl);
-+		}
- #else
- 			cFYI(1, "Set CIFS ACL not supported yet");
- #endif /* CONFIG_CIFS_ACL */
--		}
- 	} else {
- 		int temp;
- 		temp = strncmp(ea_name, POSIX_ACL_XATTR_ACCESS,
+								Honza
 -- 
-1.7.4.4
+Jan Kara <jack@suse.cz>
+SUSE Labs, CR
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Fight unfair telecom internet charges in Canada: sign http://stopthemeter.ca/
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
