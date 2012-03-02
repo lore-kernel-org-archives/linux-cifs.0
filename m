@@ -1,61 +1,40 @@
-From: Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
-Date: Fri, 2 Mar 2012 10:41:22 +0100
-Message-ID: <20120302094122.GA1744@quack.suse.cz>
-References: <1330602103-8851-1-git-send-email-jack@suse.cz>
- <20120301232942.GH32588@thunk.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] Block: use a freezable workqueue for disk-event polling
+Date: Fri, 02 Mar 2012 10:51:43 +0100
+Message-ID: <4F50982F.7090301@kernel.dk>
+References: <Pine.LNX.4.44L0.1202171615550.1194-100000@iolanthe.rowland.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jan Kara <jack@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
-	dchinner@redhat.com, Jaya Kumar <jayalk@intworks.biz>,
-	Sage Weil <sage@newdream.net>, ceph-devel@vger.kernel.org,
-	Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	Eric Van Hensbergen <ericvh@gmail.com>,
-	Ron Minnich <rminnich@sandia.gov>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	v9fs-developer@lists.sourceforge.net,
-	Miklos Szeredi <miklos@szeredi.hu>, fuse-devel@lists.sourceforge.net,
-	Steven Whitehouse <swhiteho@redhat.com>, cluster-devel@redhat.com,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Ted Ts'o <tytso@mit.edu>
-Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
-In-Reply-To: <20120301232942.GH32588@thunk.org>
-Sender: owner-linux-mm@kvack.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: "Rafael J. Wysocki" <rjw@sisk.pl>, Tejun Heo <tj@kernel.org>,
+	Steve French <sfrench@samba.org>, Chris Ball <cjb@laptop.org>,
+	Jeff Layton <jlayton@poochiereds.net>,
+	David Airlie <airlied@linux.ie>,
+	David Howells <dhowells@redhat.com>,
+	Linux-pm mailing list <linux-pm@vger.kernel.org>,
+	linux-cifs@vger.kernel.org, linux-mmc@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, keyrings@linux-nfs.org
+To: Alan Stern <stern@rowland.harvard.edu>
+Return-path: <linux-mmc-owner@vger.kernel.org>
+In-Reply-To: <Pine.LNX.4.44L0.1202171615550.1194-100000@iolanthe.rowland.org>
+Sender: linux-mmc-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu 01-03-12 18:29:42, Ted Tso wrote:
-> On Thu, Mar 01, 2012 at 12:41:34PM +0100, Jan Kara wrote:
-> > 
-> > To fix the issue, this patch set changes page fault code to call
-> > file_update_time() only when ->page_mkwrite() callback is not provided. If the
-> > callback is provided, it is the responsibility of the filesystem to perform
-> > update of i_mtime / i_ctime if needed. We also push file_update_time() call
-> > to all existing ->page_mkwrite() implementations if the time update does not
-> > obviously happen by other means. If you know your filesystem does not need
-> > update of modification times in ->page_mkwrite() handler, please speak up and
-> > I'll drop the patch for your filesystem.
+On 02/17/2012 10:22 PM, Alan Stern wrote:
+> This patch (as1519) fixes a bug in the block layer's disk-events
+> polling.  The polling is done by a work routine queued on the
+> system_nrt_wq workqueue.  Since that workqueue isn't freezable, the
+> polling continues even in the middle of a system sleep transition.
 > 
-> I don't know if this introductory text is going to be saved anywhere
-> permanent, such as the merge commit (since git now has the ability to
-> have much more informative merge descriptions).  But if it is going to
-> be preserved, it might be worth mentioning that if the filesystem uses
-> block_page_mkpage(), it will handled automatically for them since the
-> patch series does push the call to file_update_time(0 into
-> __block_page_mkpage().
-  Good point, added to description.
+> Obviously, polling a suspended drive for media changes and such isn't
+> a good thing to do; in the case of USB mass-storage devices it can
+> lead to real problems requiring device resets and even re-enumeration.
+> 
+> The patch fixes things by creating a new system-wide, non-reentrant,
+> freezable workqueue and using it for disk-events polling.
 
-								Honza
+Thanks Alan, picked up.
+
 -- 
-Jan Kara <jack@suse.cz>
-SUSE Labs, CR
+Jens Axboe
 
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Fight unfair telecom internet charges in Canada: sign http://stopthemeter.ca/
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
