@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 01/17] CIFS: Simplify inFlight logic
-Date: Sat,  3 Mar 2012 12:37:02 +0300
-Message-ID: <1330767438-19469-2-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 04/17] CIFS: Delete echo_retries module parm
+Date: Sat,  3 Mar 2012 12:37:05 +0300
+Message-ID: <1330767438-19469-5-git-send-email-piastry@etersoft.ru>
 References: <1330767438-19469-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,278 +9,84 @@ In-Reply-To: <1330767438-19469-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-by making it as unsigned integer and surround access with req_lock
-from server structure.
+It's the essential step before respecting MaxMpxCount value during
+negotiating because we will keep only one extra slot for sending
+echo requests. If there is no response during two echo intervals -
+reconnect the tcp session.
 
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifs_debug.c |    3 +--
- fs/cifs/cifsglob.h   |   21 ++++++++++++++++++++-
- fs/cifs/cifssmb.c    |    6 +++---
- fs/cifs/connect.c    |   10 +++++-----
- fs/cifs/transport.c  |   45 +++++++++++++++++++++++----------------------
- 5 files changed, 52 insertions(+), 33 deletions(-)
+ fs/cifs/README     |    6 +-----
+ fs/cifs/cifsfs.c   |    5 -----
+ fs/cifs/cifsglob.h |    3 ---
+ fs/cifs/connect.c  |    7 +++----
+ 4 files changed, 4 insertions(+), 17 deletions(-)
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 24b3dfc..573b899 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -171,8 +171,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			seq_printf(m, "TCP status: %d\n\tLocal Users To "
- 				   "Server: %d SecMode: 0x%x Req On Wire: %d",
- 				   server->tcpStatus, server->srv_count,
--				   server->sec_mode,
--				   atomic_read(&server->inFlight));
-+				   server->sec_mode, in_flight(server));
+diff --git a/fs/cifs/README b/fs/cifs/README
+index 895da1d..b7d782b 100644
+--- a/fs/cifs/README
++++ b/fs/cifs/README
+@@ -753,10 +753,6 @@ module loading or during the runtime by using the interface
  
- #ifdef CONFIG_CIFS_STATS2
- 			seq_printf(m, " In Send: %d In MaxReq Wait: %d",
+ i.e. echo "value" > /sys/module/cifs/parameters/<param>
+ 
+-1. echo_retries - The number of echo attempts before giving up and
+-		  reconnecting to the server. The default is 5. The value 0
+-		  means never reconnect.
+-
+-2. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
++1. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
+ 		    [Y/y/1]. To disable use any of [N/n/0].
+ 
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index b1fd382..e1ce1ca 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -77,11 +77,6 @@ unsigned int cifs_max_pending = CIFS_MAX_REQ;
+ module_param(cifs_max_pending, int, 0444);
+ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
+ 				   "Default: 50 Range: 2 to 256");
+-unsigned short echo_retries = 5;
+-module_param(echo_retries, ushort, 0644);
+-MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
+-			       "reconnecting server. Default: 5. 0 means "
+-			       "never reconnect.");
+ module_param(enable_oplocks, bool, 0644);
+ MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool). Default:"
+ 				 "y/Y/1");
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 76e7d8b..44cfc9a 100644
+index fa1a9f9..5e6c54e 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -255,7 +255,8 @@ struct TCP_Server_Info {
- 	bool noblocksnd;		/* use blocking sendmsg */
- 	bool noautotune;		/* do not autotune send buf sizes */
- 	bool tcp_nodelay;
--	atomic_t inFlight;  /* number of requests on the wire to server */
-+	unsigned int in_flight;  /* number of requests on the wire to server */
-+	spinlock_t req_lock; /* protect the value above */
- 	struct mutex srv_mutex;
- 	struct task_struct *tsk;
- 	char server_GUID[16];
-@@ -307,6 +308,24 @@ struct TCP_Server_Info {
- #endif
- };
+@@ -1053,9 +1053,6 @@ GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
+ GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
+ GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
  
-+static inline unsigned int
-+in_flight(struct TCP_Server_Info *server)
-+{
-+	unsigned int num;
-+	spin_lock(&server->req_lock);
-+	num = server->in_flight;
-+	spin_unlock(&server->req_lock);
-+	return num;
-+}
-+
-+static inline void
-+dec_in_flight(struct TCP_Server_Info *server)
-+{
-+	spin_lock(&server->req_lock);
-+	server->in_flight--;
-+	spin_unlock(&server->req_lock);
-+}
-+
- /*
-  * Macros to allow the TCP_Server_Info->net field and related code to drop out
-  * when CONFIG_NET_NS isn't set.
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 8b7794c..0b50551 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -716,7 +716,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
- 	struct TCP_Server_Info *server = mid->callback_data;
- 
- 	DeleteMidQEntry(mid);
--	atomic_dec(&server->inFlight);
-+	dec_in_flight(server);
- 	wake_up(&server->request_q);
- }
- 
-@@ -1669,7 +1669,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 
- 	queue_work(system_nrt_wq, &rdata->work);
- 	DeleteMidQEntry(mid);
--	atomic_dec(&server->inFlight);
-+	dec_in_flight(server);
- 	wake_up(&server->request_q);
- }
- 
-@@ -2110,7 +2110,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
- 
- 	queue_work(system_nrt_wq, &wdata->work);
- 	DeleteMidQEntry(mid);
--	atomic_dec(&tcon->ses->server->inFlight);
-+	dec_in_flight(tcon->ses->server);
- 	wake_up(&tcon->ses->server->request_q);
- }
- 
+-/* reconnect after this many failed echo attempts */
+-GLOBAL_EXTERN unsigned short echo_retries;
+-
+ #ifdef CONFIG_CIFS_ACL
+ GLOBAL_EXTERN struct rb_root uidtree;
+ GLOBAL_EXTERN struct rb_root gidtree;
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 602f77c..12286d0 100644
+index 708be6c..79e8c68 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -647,14 +647,14 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
- 	 * cifs_max_pending is normally 50, but can be set at module install
- 	 * time to as little as two.
- 	 */
--	spin_lock(&GlobalMid_Lock);
--	if (atomic_read(&server->inFlight) >= cifs_max_pending)
--		atomic_set(&server->inFlight, cifs_max_pending - 1);
-+	spin_lock(&server->req_lock);
-+	if (server->in_flight >= cifs_max_pending)
-+		server->in_flight = cifs_max_pending - 1;
- 	/*
- 	 * We do not want to set the max_pending too low or we could end up
- 	 * with the counter going negative.
- 	 */
--	spin_unlock(&GlobalMid_Lock);
-+	spin_unlock(&server->req_lock);
- 	/*
- 	 * Although there should not be any requests blocked on this queue it
- 	 * can not hurt to be paranoid and try to wake up requests that may
-@@ -1909,7 +1909,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	tcp_ses->noblocksnd = volume_info->noblocksnd;
- 	tcp_ses->noautotune = volume_info->noautotune;
- 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
--	atomic_set(&tcp_ses->inFlight, 0);
-+	tcp_ses->in_flight = 0;
- 	init_waitqueue_head(&tcp_ses->response_q);
- 	init_waitqueue_head(&tcp_ses->request_q);
- 	INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 0cc9584..fc1904f 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -254,28 +254,29 @@ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
- 	return smb_sendv(server, &iov, 1);
- }
- 
--static int wait_for_free_request(struct TCP_Server_Info *server,
--				 const int long_op)
-+static int
-+wait_for_free_request(struct TCP_Server_Info *server, const int long_op)
+@@ -373,12 +373,11 @@ allocate_buffers(struct TCP_Server_Info *server)
+ static bool
+ server_unresponsive(struct TCP_Server_Info *server)
  {
-+	spin_lock(&server->req_lock);
-+
- 	if (long_op == CIFS_ASYNC_OP) {
- 		/* oplock breaks must not be held up */
--		atomic_inc(&server->inFlight);
-+		server->in_flight++;
-+		spin_unlock(&server->req_lock);
- 		return 0;
- 	}
- 
--	spin_lock(&GlobalMid_Lock);
- 	while (1) {
--		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
--			spin_unlock(&GlobalMid_Lock);
-+		if (server->in_flight >= cifs_max_pending) {
-+			spin_unlock(&server->req_lock);
- 			cifs_num_waiters_inc(server);
- 			wait_event(server->request_q,
--				   atomic_read(&server->inFlight)
--				     < cifs_max_pending);
-+				   in_flight(server) < cifs_max_pending);
- 			cifs_num_waiters_dec(server);
--			spin_lock(&GlobalMid_Lock);
-+			spin_lock(&server->req_lock);
- 		} else {
- 			if (server->tcpStatus == CifsExiting) {
--				spin_unlock(&GlobalMid_Lock);
-+				spin_unlock(&server->req_lock);
- 				return -ENOENT;
- 			}
- 
-@@ -284,8 +285,8 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
- 
- 			/* update # of requests on the wire to server */
- 			if (long_op != CIFS_BLOCKING_OP)
--				atomic_inc(&server->inFlight);
--			spin_unlock(&GlobalMid_Lock);
-+				server->in_flight++;
-+			spin_unlock(&server->req_lock);
- 			break;
- 		}
- 	}
-@@ -359,7 +360,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	mid = AllocMidQEntry(hdr, server);
- 	if (mid == NULL) {
- 		mutex_unlock(&server->srv_mutex);
--		atomic_dec(&server->inFlight);
-+		dec_in_flight(server);
- 		wake_up(&server->request_q);
- 		return -ENOMEM;
- 	}
-@@ -392,7 +393,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	return rc;
- out_err:
- 	delete_mid(mid);
--	atomic_dec(&server->inFlight);
-+	dec_in_flight(server);
- 	wake_up(&server->request_q);
- 	return rc;
- }
-@@ -564,7 +565,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 		mutex_unlock(&ses->server->srv_mutex);
- 		cifs_small_buf_release(in_buf);
- 		/* Update # of requests on wire to server */
--		atomic_dec(&ses->server->inFlight);
-+		dec_in_flight(ses->server);
- 		wake_up(&ses->server->request_q);
- 		return rc;
- 	}
-@@ -601,7 +602,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 			midQ->callback = DeleteMidQEntry;
- 			spin_unlock(&GlobalMid_Lock);
- 			cifs_small_buf_release(in_buf);
--			atomic_dec(&ses->server->inFlight);
-+			dec_in_flight(ses->server);
- 			wake_up(&ses->server->request_q);
- 			return rc;
- 		}
-@@ -612,7 +613,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0) {
--		atomic_dec(&ses->server->inFlight);
-+		dec_in_flight(ses->server);
- 		wake_up(&ses->server->request_q);
- 		return rc;
- 	}
-@@ -637,7 +638,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 		midQ->resp_buf = NULL;
- out:
- 	delete_mid(midQ);
--	atomic_dec(&ses->server->inFlight);
-+	dec_in_flight(ses->server);
- 	wake_up(&ses->server->request_q);
- 
- 	return rc;
-@@ -688,7 +689,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	if (rc) {
- 		mutex_unlock(&ses->server->srv_mutex);
- 		/* Update # of requests on wire to server */
--		atomic_dec(&ses->server->inFlight);
-+		dec_in_flight(ses->server);
- 		wake_up(&ses->server->request_q);
- 		return rc;
- 	}
-@@ -721,7 +722,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 			/* no longer considered to be "in-flight" */
- 			midQ->callback = DeleteMidQEntry;
- 			spin_unlock(&GlobalMid_Lock);
--			atomic_dec(&ses->server->inFlight);
-+			dec_in_flight(ses->server);
- 			wake_up(&ses->server->request_q);
- 			return rc;
- 		}
-@@ -730,7 +731,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0) {
--		atomic_dec(&ses->server->inFlight);
-+		dec_in_flight(ses->server);
- 		wake_up(&ses->server->request_q);
- 		return rc;
- 	}
-@@ -747,7 +748,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
- 	delete_mid(midQ);
--	atomic_dec(&ses->server->inFlight);
-+	dec_in_flight(ses->server);
- 	wake_up(&ses->server->request_q);
- 
- 	return rc;
+-	if (echo_retries > 0 && server->tcpStatus == CifsGood &&
+-	    time_after(jiffies, server->lstrp +
+-				(echo_retries * SMB_ECHO_INTERVAL))) {
++	if (server->tcpStatus == CifsGood &&
++	    time_after(jiffies, server->lstrp + 2 * SMB_ECHO_INTERVAL)) {
+ 		cERROR(1, "Server %s has not responded in %d seconds. "
+ 			  "Reconnecting...", server->hostname,
+-			  (echo_retries * SMB_ECHO_INTERVAL / HZ));
++			  (2 * SMB_ECHO_INTERVAL) / HZ);
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+ 		return true;
 -- 
 1.7.1
