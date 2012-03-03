@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Do not kmalloc under the flocks spinlock
-Date: Sat,  3 Mar 2012 10:20:40 +0300
-Message-ID: <1330759240-7459-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2] CIFS: Do not kmalloc under the flocks spinlock
+Date: Sat,  3 Mar 2012 10:50:28 +0300
+Message-ID: <1330761028-7511-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
