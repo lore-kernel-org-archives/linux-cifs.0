@@ -1,68 +1,67 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: nlink warning
-Date: Sat, 3 Mar 2012 14:03:41 +0400
-Message-ID: <CAKywueTtE+bEPH43KFNbPq10ewvfbQP4VpHU5r7Gaw5jVJjN9w@mail.gmail.com>
-References: <CAKywueRvoQgcWefU+xJeN-o3UNLK1FZSnCwRf55hYVm5tMAohQ@mail.gmail.com>
-	<CAKywueRFgM4z4fzHjo4vDrL7jKSunw9onx39-1zx=0C2SzmqfQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: help - can't stat() cifs file system
+Date: Sat, 3 Mar 2012 06:35:58 -0500
+Message-ID: <20120303063558.2a1885c3@tlielax.poochiereds.net>
+References: <026601ccf8c3$faea9310$f0bfb930$@uw.edu>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: <mchristi-lfcS8c3Mqgg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRFgM4z4fzHjo4vDrL7jKSunw9onx39-1zx=0C2SzmqfQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <026601ccf8c3$faea9310$f0bfb930$@uw.edu>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/3/3 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> 2012/3/3 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> FYI: Noted such warnings running dbench 3
->>
->> [11030.790449] WARNING: at /home/apw/COD/linux/fs/inode.c:290
->> drop_nlink+0x3b/0x40()
->> [11030.790452] Hardware name: MS-7309
->> [11030.790454] Modules linked in: cifs(O) des_generic md4 nls_utf8
->> binfmt_misc snd_hda_codec_realtek snd_hda_intel snd_hda_codec
->> snd_hwdep snd_pcm nouveau ttm drm_kms_helper drm snd_seq_midi
->> snd_rawmidi snd_seq_midi_event k8temp snd_seq snd_timer snd_seq_devi=
-ce
->> mxm_wmi video i2c_nforce2 snd wmi ppdev soundcore lp snd_page_alloc
->> parport_pc mac_hid serio_raw parport floppy skge sata_nv pata_amd
->> forcedeth [last unloaded: cifs]
->> [11030.790491] Pid: 19338, comm: dbench Tainted: G =A0 =A0 =A0 =A0W =
-=A0O
->> 3.3.0-030300rc2-generic-pae #201201311735
->> [11030.790495] Call Trace:
->> [11030.790502] =A0[<c1042792>] warn_slowpath_common+0x72/0xa0
->> [11030.790506] =A0[<c115f63b>] ? drop_nlink+0x3b/0x40
->> [11030.790510] =A0[<c115f63b>] ? drop_nlink+0x3b/0x40
->> [11030.790515] =A0[<c10427e2>] warn_slowpath_null+0x22/0x30
->> [11030.790519] =A0[<c115f63b>] drop_nlink+0x3b/0x40
->> [11030.790530] =A0[<fa01d9f4>] cifs_unlink+0xe4/0x650 [cifs]
->> [11030.790534] =A0[<c11563b0>] ? path_lookupat+0xb0/0x5c0
->> [11030.790539] =A0[<c159fb1d>] ? _raw_spin_lock+0xd/0x10
->> [11030.790543] =A0[<c159fb1d>] ? _raw_spin_lock+0xd/0x10
->> [11030.790548] =A0[<c1153e73>] vfs_unlink+0x83/0xf0
->> [11030.790552] =A0[<c1157434>] do_unlinkat+0x154/0x180
->> [11030.790556] =A0[<c1157475>] sys_unlink+0x15/0x20
->> [11030.790561] =A0[<c15a6c5f>] sysenter_do_call+0x12/0x28
->> [11030.790564] ---[ end trace 71953eb479f2ec1b ]---
->>
->
-> ...against Samba-3.5.4.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
+On Fri, 2 Mar 2012 14:29:44 -0800
+"Mark Christiansen" <mchristi-lfcS8c3Mqgg@public.gmane.org> wrote:
 
-NFS code does this in unlink codepath:
+> To whom it may concern,
+>=20
+> I am using linux kernel 2.6.32-220.4.1.el6.x86_64 (RHEL6) and cifs ve=
+rsion
+> 4.8.1.=C2=A0 Using a mount point (/mnt/tmp), we are able to read/writ=
+e to our
+> Windows directories.=C2=A0 Occasionally, a user will kill a job that =
+is writing
+> to these directories.=C2=A0 When this happens, it corrupts the mount =
+point
+> somehow and we get a permission denied error when we do an =E2=80=9Cl=
+s=E2=80=9D.=C2=A0=20
+>=20
+> If I do an =E2=80=9Clsof=E2=80=9D and grep for the path, I get a =C2=A0=
+message:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 WARNING: can=E2=80=99t stat() cifs file system /m=
+nt/tmp
+>=20
+> It seems that if I am able to successfully unmount all of these mount
+> points, that I can do a =E2=80=9Cmount =E2=80=93a=E2=80=9D and recove=
+r.=C2=A0=20
+>=20
+> However, how can I avoid this problem in the first place (besides hav=
+ing the
+> user not kill jobs)?=C2=A0 It seems like this is something a user sho=
+uld be able
+> to do without bringing down the mount points.
+>=20
+> Thank you in advance,
+>=20
+> Mark=20
+>=20
+>=20
 
-1224 >-------spin_lock(&inode->i_lock);
-1225 >-------if (inode->i_nlink > 0)
-1226 >------->-------drop_nlink(inode);
-1227 >-------spin_unlock(&inode->i_lock);
+That certainly sounds like a bug, but we'll need to do some work to
+track down the cause.
 
-May be we should something like it?
+What would be ideal would be for you to open a RH support case so we
+could work with you to track down the cause and a reproducer.
+Alternately, you could open a bug at bugzilla.redhat.com and work with
+it there if you're not able to open cases with our support people. If
+you do the latter, be sure to cc me on the bug and I'll see if I can
+help.
 
+Thanks,
 --=20
-Best regards,
-Pavel Shilovsky.
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
