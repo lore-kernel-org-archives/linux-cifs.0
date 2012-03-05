@@ -1,38 +1,93 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Connect notifyfs to cifs possible.
-Date: Mon, 5 Mar 2012 09:54:27 +0100
-Message-ID: <CANXojczcNTpzgWf95Np9OHhFRu2hGqh=SrOe+UMm294t8HNuPw@mail.gmail.com>
+From: santosh prasad nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: possible memory leak in xattr.
+Date: Mon, 5 Mar 2012 15:48:03 +0530
+Message-ID: <CAOD=uF4BFgAxGoAc6HeiX7bY_HRG0i6epaW9XTojweYnD1qn0Q@mail.gmail.com>
+References: <1330669046-13738-1-git-send-email-santoshprasadnayak@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1330669046-13738-1-git-send-email-santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+Can you please comment on it ?
 
-I'm working on a successor of gamin, a file system change notifier.
 
-Like with gamin client apps can connect to it and instruct it to watch
-a specific path.
+regards
+santosh
 
-It's up to the notifyfs service to decide what backend (inotify,
-polling etc) to use.
-
-New in my fs is the ability to "forward" the request to set a watch to
-a fs. I do not have
-a working example, but what I've got looks promising. I've got a
-simple FUSE overlay fs, and this will use,
-whenever it receives a request to set a watch from notifyfs, it set's
-a inotify watch on the underlying fs, and send any event back to
-notify fs.
-
-To make this possible the filesystem, here thus the FUSE overlay fs,
-has to connect to noitifyfs when it starts up, and register itself as
-client fs, and also has to send it's own mountpoint to notifyfs.
-
-I looked into the code of mount.cifs, but it's not that easy to
-connect to via a socket, because the mainloop is in the kernel, not in
-userspace. Is this somehowe (event fd??) still possible?
-
-Stef
+On Fri, Mar 2, 2012 at 11:47 AM, santosh nayak
+<santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> From: Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+> Memory is allocated irrespective of whether CIFS_ACL is configured
+> or not. But free is happenning only if CIFS_ACL is set. This is a
+> possible memory leak scenario.
+>
+> Fix is:
+> Allocate and free memory only if CIFS_ACL is configured.
+>
+> Signed-off-by: Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+> =A0fs/cifs/xattr.c | =A0 =A06 +++---
+> =A01 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+> index 45f07c4..10d92cf 100644
+> --- a/fs/cifs/xattr.c
+> +++ b/fs/cifs/xattr.c
+> @@ -105,7 +105,6 @@ int cifs_setxattr(struct dentry *direntry, const =
+char *ea_name,
+> =A0 =A0 =A0 =A0struct cifs_tcon *pTcon;
+> =A0 =A0 =A0 =A0struct super_block *sb;
+> =A0 =A0 =A0 =A0char *full_path;
+> - =A0 =A0 =A0 struct cifs_ntsd *pacl;
+>
+> =A0 =A0 =A0 =A0if (direntry =3D=3D NULL)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -EIO;
+> @@ -164,23 +163,24 @@ int cifs_setxattr(struct dentry *direntry, cons=
+t char *ea_name,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->mnt_cifs_flag=
+s & CIFS_MOUNT_MAP_SPECIAL_CHR);
+> =A0 =A0 =A0 =A0} else if (strncmp(ea_name, CIFS_XATTR_CIFS_ACL,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0strlen(CIFS_XATTR_CIFS=
+_ACL)) =3D=3D 0) {
+> +#ifdef CONFIG_CIFS_ACL
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_ntsd *pacl;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pacl =3D kmalloc(value_size, GFP_KERNE=
+L);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!pacl) {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "%s: Can't all=
+ocate memory for ACL",
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+ =A0 =A0__func__);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -ENOMEM;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else {
+> -#ifdef CONFIG_CIFS_ACL
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0memcpy(pacl, ea_value,=
+ value_size);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D set_cifs_acl(pa=
+cl, value_size,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0dirent=
+ry->d_inode, full_path, CIFS_ACL_DACL);
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc =3D=3D 0) /* fo=
+rce revalidate of the inode */
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_I=
+(direntry->d_inode)->time =3D 0;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kfree(pacl);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> =A0#else
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Set CIFS ACL =
+not supported yet");
+> =A0#endif /* CONFIG_CIFS_ACL */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> =A0 =A0 =A0 =A0} else {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int temp;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0temp =3D strncmp(ea_name, POSIX_ACL_XA=
+TTR_ACCESS,
+> --
+> 1.7.4.4
+>
