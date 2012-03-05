@@ -1,141 +1,38 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v3] CIFS: Do not kmalloc under the flocks spinlock
-Date: Mon,  5 Mar 2012 09:39:20 +0300
-Message-ID: <1330929560-1955-1-git-send-email-piastry@etersoft.ru>
-Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Connect notifyfs to cifs possible.
+Date: Mon, 5 Mar 2012 09:54:27 +0100
+Message-ID: <CANXojczcNTpzgWf95Np9OHhFRu2hGqh=SrOe+UMm294t8HNuPw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Reorganize the code to make the memory already allocated before
-spinlock'ed loop.
+Hi,
 
-Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c |   69 +++++++++++++++++++++++++++++++++++++++++++++----------
- 1 files changed, 56 insertions(+), 13 deletions(-)
+I'm working on a successor of gamin, a file system change notifier.
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4dd9283..5e64748 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -920,16 +920,26 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
- 	for (lockp = &inode->i_flock; *lockp != NULL; \
- 	     lockp = &(*lockp)->fl_next)
- 
-+struct lock_to_push {
-+	struct list_head llist;
-+	__u64 offset;
-+	__u64 length;
-+	__u32 pid;
-+	__u16 netfid;
-+	__u8 type;
-+};
-+
- static int
- cifs_push_posix_locks(struct cifsFileInfo *cfile)
- {
- 	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
- 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
- 	struct file_lock *flock, **before;
--	struct cifsLockInfo *lck, *tmp;
-+	unsigned int count = 0, i = 0;
- 	int rc = 0, xid, type;
-+	struct list_head locks_to_send, *el;
-+	struct lock_to_push *lck, *tmp;
- 	__u64 length;
--	struct list_head locks_to_send;
- 
- 	xid = GetXid();
- 
-@@ -940,29 +950,55 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
- 		return rc;
- 	}
- 
-+	lock_flocks();
-+	cifs_for_each_lock(cfile->dentry->d_inode, before) {
-+		if ((*before)->fl_flags & FL_POSIX)
-+			count++;
-+	}
-+	unlock_flocks();
-+
- 	INIT_LIST_HEAD(&locks_to_send);
- 
-+	/*
-+	 * Allocating count locks is enough because no locks can be added to
-+	 * the list while we are holding cinode->lock_mutex that protects
-+	 * locking operations of this inode.
-+	 */
-+	for (; i < count; i++) {
-+		lck = kmalloc(sizeof(struct lock_to_push), GFP_KERNEL);
-+		if (!lck) {
-+			rc = -ENOMEM;
-+			goto err_out;
-+		}
-+		list_add_tail(&lck->llist, &locks_to_send);
-+	}
-+
-+	i = 0;
-+	el = locks_to_send.next;
- 	lock_flocks();
- 	cifs_for_each_lock(cfile->dentry->d_inode, before) {
-+		if (el == &locks_to_send) {
-+			/* something is really wrong */
-+			cERROR(1, "Can't push all brlocks!");
-+			break;
-+		}
- 		flock = *before;
-+		if ((flock->fl_flags & FL_POSIX) == 0)
-+			continue;
- 		length = 1 + flock->fl_end - flock->fl_start;
- 		if (flock->fl_type == F_RDLCK || flock->fl_type == F_SHLCK)
- 			type = CIFS_RDLCK;
- 		else
- 			type = CIFS_WRLCK;
--
--		lck = cifs_lock_init(flock->fl_start, length, type,
--				     cfile->netfid);
--		if (!lck) {
--			rc = -ENOMEM;
--			goto send_locks;
--		}
-+		lck = list_entry(el, struct lock_to_push, llist);
- 		lck->pid = flock->fl_pid;
--
--		list_add_tail(&lck->llist, &locks_to_send);
-+		lck->netfid = cfile->netfid;
-+		lck->length = length;
-+		lck->type = type;
-+		lck->offset = flock->fl_start;
-+		i++;
-+		el = el->next;
- 	}
--
--send_locks:
- 	unlock_flocks();
- 
- 	list_for_each_entry_safe(lck, tmp, &locks_to_send, llist) {
-@@ -979,11 +1015,18 @@ send_locks:
- 		kfree(lck);
- 	}
- 
-+out:
- 	cinode->can_cache_brlcks = false;
- 	mutex_unlock(&cinode->lock_mutex);
- 
- 	FreeXid(xid);
- 	return rc;
-+err_out:
-+	list_for_each_entry_safe(lck, tmp, &locks_to_send, llist) {
-+		list_del(&lck->llist);
-+		kfree(lck);
-+	}
-+	goto out;
- }
- 
- static int
--- 
-1.7.1
+Like with gamin client apps can connect to it and instruct it to watch
+a specific path.
+
+It's up to the notifyfs service to decide what backend (inotify,
+polling etc) to use.
+
+New in my fs is the ability to "forward" the request to set a watch to
+a fs. I do not have
+a working example, but what I've got looks promising. I've got a
+simple FUSE overlay fs, and this will use,
+whenever it receives a request to set a watch from notifyfs, it set's
+a inotify watch on the underlying fs, and send any event back to
+notify fs.
+
+To make this possible the filesystem, here thus the FUSE overlay fs,
+has to connect to noitifyfs when it starts up, and register itself as
+client fs, and also has to send it's own mountpoint to notifyfs.
+
+I looked into the code of mount.cifs, but it's not that easy to
+connect to via a socket, because the mainloop is in the kernel, not in
+userspace. Is this somehowe (event fd??) still possible?
+
+Stef
