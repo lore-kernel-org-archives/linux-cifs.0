@@ -1,109 +1,124 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: possible memory leak in xattr.
-Date: Tue, 6 Mar 2012 21:51:18 -0600
-Message-ID: <CAH2r5mvXcVKCZJW6uFR=sbe4grgOJ6rm3RhiwGRRZT7zTQ7hwA@mail.gmail.com>
-References: <1330669046-13738-1-git-send-email-santoshprasadnayak@gmail.com>
-	<CADT32eK-3jKZRfa60Ki6cbfmV1RTkxZ_vE07NMsQV_nSn-nmNQ@mail.gmail.com>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Connect notifyfs to cifs possible.
+Date: Wed, 7 Mar 2012 11:44:10 +0100
+Message-ID: <CANXojcx-k+27VGbB-9sOUZSQ-y0vdoKMggoX26erGbw0CCBOJQ@mail.gmail.com>
+References: <CANXojczcNTpzgWf95Np9OHhFRu2hGqh=SrOe+UMm294t8HNuPw@mail.gmail.com>
+	<CANXojcxVmSfJyCfoUHxiNVwyzr9hMKT6Of=rQfGY410r-DdZNQ@mail.gmail.com>
+	<CAH2r5muEK8HYhXTU_w7Z9bVPVuguZ8mfwyQLMwVRCCtRupG2Fg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: santosh nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eK-3jKZRfa60Ki6cbfmV1RTkxZ_vE07NMsQV_nSn-nmNQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5muEK8HYhXTU_w7Z9bVPVuguZ8mfwyQLMwVRCCtRupG2Fg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-merged into cifs-2.6.git
+Hi,
 
-On Mon, Mar 5, 2012 at 7:40 AM, Shirish Pargaonkar
-<shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Fri, Mar 2, 2012 at 12:17 AM, santosh nayak
-> <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> From: Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+yes I agree, it's an important feature.
+
+And yes it's a challenge to design this.
+
+I've started a project page at :
+
+https://code.google.com/p/notifyfs/
+
+Your email is not complete: you write a sentence "There is" and it stop=
+s.
+Is it worth sending the rest of you planned writing?
+
+Stef
+
+
+2012/3/6 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Notify is great for cifs (smb/cifs clients regularly used it as far
+> back as OS/2, and Windows desktops use it with cifs and smb2 as a key
+> feature of their desktop). =C2=A0What is going to be fun to figure ou=
+t is
+> how "directory oplocks" (in smb2.2) can be used to simplify this and
+> make it perform even better. =C2=A0There is
+>
+> I am looking forward to understanding more how would like to tie this=
+ in.
+>
+> On Mon, Mar 5, 2012 at 7:15 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> Hi,
 >>
->> Memory is allocated irrespective of whether CIFS_ACL is configured
->> or not. But free is happenning only if CIFS_ACL is set. This is a
->> possible memory leak scenario.
+>> I've got a clue howto do this, but it can be wromng, since I know
+>> howto program sockets since some months now.
 >>
->> Fix is:
->> Allocate and free memory only if CIFS_ACL is configured.
+>> It's doable with a eventfd.
 >>
->> Signed-off-by: Santosh Nayak <santoshprasadnayak-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->> =A0fs/cifs/xattr.c | =A0 =A06 +++---
->> =A01 files changed, 3 insertions(+), 3 deletions(-)
+>> Notifyfs can create when dealing with cifs an event fd, and pass it
+>> via a socket to mount.cifs.
+>> Mount.cifs passes this to the kernel via an option, and when it's
+>> finishing, closes the socket.
 >>
->> diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
->> index 45f07c4..10d92cf 100644
->> --- a/fs/cifs/xattr.c
->> +++ b/fs/cifs/xattr.c
->> @@ -105,7 +105,6 @@ int cifs_setxattr(struct dentry *direntry, const=
- char *ea_name,
->> =A0 =A0 =A0 =A0struct cifs_tcon *pTcon;
->> =A0 =A0 =A0 =A0struct super_block *sb;
->> =A0 =A0 =A0 =A0char *full_path;
->> - =A0 =A0 =A0 struct cifs_ntsd *pacl;
+>> This way the event fd is active, and can be used for forwarding noti=
+fy
+>> events/commands (and maybe others as well...)
 >>
->> =A0 =A0 =A0 =A0if (direntry =3D=3D NULL)
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return -EIO;
->> @@ -164,23 +163,24 @@ int cifs_setxattr(struct dentry *direntry, con=
-st char *ea_name,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->mnt_cifs_fla=
-gs & CIFS_MOUNT_MAP_SPECIAL_CHR);
->> =A0 =A0 =A0 =A0} else if (strncmp(ea_name, CIFS_XATTR_CIFS_ACL,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0strlen(CIFS_XATTR_CIF=
-S_ACL)) =3D=3D 0) {
->> +#ifdef CONFIG_CIFS_ACL
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_ntsd *pacl;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0pacl =3D kmalloc(value_size, GFP_KERN=
-EL);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (!pacl) {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "%s: Can't al=
-locate memory for ACL",
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0 =A0__func__);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D -ENOMEM;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0} else {
->> -#ifdef CONFIG_CIFS_ACL
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0memcpy(pacl, ea_value=
-, value_size);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0rc =3D set_cifs_acl(p=
-acl, value_size,
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0diren=
-try->d_inode, full_path, CIFS_ACL_DACL);
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (rc =3D=3D 0) /* f=
-orce revalidate of the inode */
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_=
-I(direntry->d_inode)->time =3D 0;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0kfree(pacl);
->> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> =A0#else
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "Set CIFS ACL=
- not supported yet");
->> =A0#endif /* CONFIG_CIFS_ACL */
->> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
->> =A0 =A0 =A0 =A0} else {
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int temp;
->> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0temp =3D strncmp(ea_name, POSIX_ACL_X=
-ATTR_ACCESS,
->> --
->> 1.7.4.4
+>> Please I do not want to push something here, but would like to make
+>> notifyfs work with filesystems like FUSE, nfs and cifs, and maybe
+>> others as well. I think that in near future, when more and more data
+>> is available remote on local servers (using existing fs's like cifs
+>> and nfs) AND on servers on the Internet, using a FUSE fs or somethin=
+g
+>> else (maybe cifs???) notifying the user and apps of changes is a ver=
+y
+>> nice and good thing. Then it's up to the filesystem howto forward th=
+e
+>> notifyfs request.
 >>
+>> Stef
+>>
+>>
+>> 2012/3/5 Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>>> Hi,
+>>>
+>>> I'm working on a successor of gamin, a file system change notifier.
+>>>
+>>> Like with gamin client apps can connect to it and instruct it to wa=
+tch
+>>> a specific path.
+>>>
+>>> It's up to the notifyfs service to decide what backend (inotify,
+>>> polling etc) to use.
+>>>
+>>> New in my fs is the ability to "forward" the request to set a watch=
+ to
+>>> a fs. I do not have
+>>> a working example, but what I've got looks promising. I've got a
+>>> simple FUSE overlay fs, and this will use,
+>>> whenever it receives a request to set a watch from notifyfs, it set=
+'s
+>>> a inotify watch on the underlying fs, and send any event back to
+>>> notify fs.
+>>>
+>>> To make this possible the filesystem, here thus the FUSE overlay fs=
+,
+>>> has to connect to noitifyfs when it starts up, and register itself =
+as
+>>> client fs, and also has to send it's own mountpoint to notifyfs.
+>>>
+>>> I looked into the code of mount.cifs, but it's not that easy to
+>>> connect to via a socket, because the mainloop is in the kernel, not=
+ in
+>>> userspace. Is this somehowe (event fd??) still possible?
+>>>
+>>> Stef
 >> --
 >> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
 " in
 >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+>> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.h=
+tml
 >
-> Looks correct.
 >
-> Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-
-
---=20
-Thanks,
-
-Steve
+>
+> --
+> Thanks,
+>
+> Steve
