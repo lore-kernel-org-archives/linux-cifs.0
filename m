@@ -1,124 +1,88 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Connect notifyfs to cifs possible.
-Date: Wed, 7 Mar 2012 11:44:10 +0100
-Message-ID: <CANXojcx-k+27VGbB-9sOUZSQ-y0vdoKMggoX26erGbw0CCBOJQ@mail.gmail.com>
-References: <CANXojczcNTpzgWf95Np9OHhFRu2hGqh=SrOe+UMm294t8HNuPw@mail.gmail.com>
-	<CANXojcxVmSfJyCfoUHxiNVwyzr9hMKT6Of=rQfGY410r-DdZNQ@mail.gmail.com>
-	<CAH2r5muEK8HYhXTU_w7Z9bVPVuguZ8mfwyQLMwVRCCtRupG2Fg@mail.gmail.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
+Date: Thu, 08 Mar 2012 15:12:56 -0800
+Message-ID: <4F593CF8.2000105@amacapital.net>
+References: <1330602103-8851-1-git-send-email-jack@suse.cz>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muEK8HYhXTU_w7Z9bVPVuguZ8mfwyQLMwVRCCtRupG2Fg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+ LKML <linux-kernel@vger.kernel.org>,
+ Al Viro <viro@ZenIV.linux.org.uk>, linux-fsdevel@vger.kernel.org,
+ dchinner@redhat.com, Jaya Kumar <jayalk@intworks.biz>,
+ Sage Weil <sage@newdream.net>,
+ ceph-devel@vger.kernel.org, Steve French <sfrench@samba.org>,
+ linux-cifs@vger.kernel.org, Eric Van Hensbergen <ericvh@gmail.com>,
+ Ron Minnich <rminnich@sandia.gov>,
+ Latchesar Ionkov <lucho@ionkov.net>,
+ v9fs-developer@lists.sourceforge.net, Miklos Szeredi <miklos@szeredi.hu>,
+ fuse-devel@lists.sourceforge.net,
+ Steven Whitehouse <swhiteho@redhat.com>,
+ cluster-devel@redhat.com,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jan Kara <jack@suse.cz>
+Return-path: <owner-linux-mm@kvack.org>
+In-Reply-To: <1330602103-8851-1-git-send-email-jack@suse.cz>
+Sender: owner-linux-mm@kvack.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi,
+On 03/01/2012 03:41 AM, Jan Kara wrote:
+>   Hello,
+> 
+>   to provide reliable support for filesystem freezing, filesystems need to have
+> complete control over when metadata is changed. In particular,
+> file_update_time() calls from page fault code make it impossible for
+> filesystems to prevent inodes from being dirtied while the filesystem is
+> frozen.
+> 
+> To fix the issue, this patch set changes page fault code to call
+> file_update_time() only when ->page_mkwrite() callback is not provided. If the
+> callback is provided, it is the responsibility of the filesystem to perform
+> update of i_mtime / i_ctime if needed. We also push file_update_time() call
+> to all existing ->page_mkwrite() implementations if the time update does not
+> obviously happen by other means. If you know your filesystem does not need
+> update of modification times in ->page_mkwrite() handler, please speak up and
+> I'll drop the patch for your filesystem.
+> 
+> As a side note, an alternative would be to remove call of file_update_time()
+> from page fault code altogether and require all filesystems needing it to do
+> that in their ->page_mkwrite() implementation. That is certainly possible
+> although maybe slightly inefficient and would require auditting 100+
+> vm_operations_structs *shiver*.
 
-yes I agree, it's an important feature.
-
-And yes it's a challenge to design this.
-
-I've started a project page at :
-
-https://code.google.com/p/notifyfs/
-
-Your email is not complete: you write a sentence "There is" and it stop=
-s.
-Is it worth sending the rest of you planned writing?
-
-Stef
 
 
-2012/3/6 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Notify is great for cifs (smb/cifs clients regularly used it as far
-> back as OS/2, and Windows desktops use it with cifs and smb2 as a key
-> feature of their desktop). =C2=A0What is going to be fun to figure ou=
-t is
-> how "directory oplocks" (in smb2.2) can be used to simplify this and
-> make it perform even better. =C2=A0There is
->
-> I am looking forward to understanding more how would like to tie this=
- in.
->
-> On Mon, Mar 5, 2012 at 7:15 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Hi,
->>
->> I've got a clue howto do this, but it can be wromng, since I know
->> howto program sockets since some months now.
->>
->> It's doable with a eventfd.
->>
->> Notifyfs can create when dealing with cifs an event fd, and pass it
->> via a socket to mount.cifs.
->> Mount.cifs passes this to the kernel via an option, and when it's
->> finishing, closes the socket.
->>
->> This way the event fd is active, and can be used for forwarding noti=
-fy
->> events/commands (and maybe others as well...)
->>
->> Please I do not want to push something here, but would like to make
->> notifyfs work with filesystems like FUSE, nfs and cifs, and maybe
->> others as well. I think that in near future, when more and more data
->> is available remote on local servers (using existing fs's like cifs
->> and nfs) AND on servers on the Internet, using a FUSE fs or somethin=
-g
->> else (maybe cifs???) notifying the user and apps of changes is a ver=
-y
->> nice and good thing. Then it's up to the filesystem howto forward th=
-e
->> notifyfs request.
->>
->> Stef
->>
->>
->> 2012/3/5 Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->>> Hi,
->>>
->>> I'm working on a successor of gamin, a file system change notifier.
->>>
->>> Like with gamin client apps can connect to it and instruct it to wa=
-tch
->>> a specific path.
->>>
->>> It's up to the notifyfs service to decide what backend (inotify,
->>> polling etc) to use.
->>>
->>> New in my fs is the ability to "forward" the request to set a watch=
- to
->>> a fs. I do not have
->>> a working example, but what I've got looks promising. I've got a
->>> simple FUSE overlay fs, and this will use,
->>> whenever it receives a request to set a watch from notifyfs, it set=
-'s
->>> a inotify watch on the underlying fs, and send any event back to
->>> notify fs.
->>>
->>> To make this possible the filesystem, here thus the FUSE overlay fs=
-,
->>> has to connect to noitifyfs when it starts up, and register itself =
-as
->>> client fs, and also has to send it's own mountpoint to notifyfs.
->>>
->>> I looked into the code of mount.cifs, but it's not that easy to
->>> connect to via a socket, because the mainloop is in the kernel, not=
- in
->>> userspace. Is this somehowe (event fd??) still possible?
->>>
->>> Stef
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
-" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at =C2=A0http://vger.kernel.org/majordomo-info.h=
-tml
->
->
->
-> --
-> Thanks,
->
-> Steve
+IMO updating file times should happen when changes get written out, not
+when a page is made writable, for two reasons:
+
+1. Correctness.  With the current approach, it's very easy for files to
+be changed after the last mtime update -- any changes between mkwrite
+and actual writeback won't affect mtime.
+
+2. Performance.  I have an application (presumably guessable from my
+email address) for which blocking in page_mkwrite is an absolute
+show-stopper.  (In fact it's so bad that we reverted back to running on
+Windows until I hacked up a kernel to not do this.)  I have an incorrect
+patch [1] to fix it, but I haven't gotten around to a real fix.  (I also
+have stable pages reverted in my kernel.  Some day I'll submit a patch
+to make it a filesystem option.  Or maybe it should even be a block
+device / queue property like the alignment offset and optimal io size --
+there are plenty of block device and file combinations which don't
+benefit at all from stable pages.)
+
+I'd prefer if file_update_time in page_mkwrite didn't proliferate.  A
+better fix is probably to introduce a new inode flag, update it when a
+page is undirtied, and then dirty and write the inode from the writeback
+path.  (Kind of like my patch, but with an inode flag instead of a page
+flag, and with the file_update_time done from the fs.)
+
+[1] http://patchwork.ozlabs.org/patch/122516/
+
+--Andy
+
+--
+To unsubscribe, send a message with 'unsubscribe linux-mm' in
+the body to majordomo@kvack.org.  For more info on Linux MM,
+see: http://www.linux-mm.org/ .
+Fight unfair telecom internet charges in Canada: sign http://stopthemeter.ca/
+Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
