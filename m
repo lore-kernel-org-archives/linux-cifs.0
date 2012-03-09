@@ -1,96 +1,71 @@
-From: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-Subject: Re: [PATCH 00/11 v2] Push file_update_time() into .page_mkwrite
-Date: Fri, 9 Mar 2012 09:19:52 +0100
-Message-ID: <20120309081952.GA21038@quack.suse.cz>
-References: <1330602103-8851-1-git-send-email-jack@suse.cz>
- <4F593CF8.2000105@amacapital.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 06/11] CIFS: Respect MaxMpxCount field
+Date: Fri, 9 Mar 2012 07:39:30 -0500
+Message-ID: <20120309073930.3a79fa10@redhat.com>
+References: <1329895984-9251-1-git-send-email-piastry@etersoft.ru>
+	<1329895984-9251-7-git-send-email-piastry@etersoft.ru>
+	<CAH2r5mvVToaHozN3=YgCCCWFFnjE9AP5xX_BF2JdxDj_JvKsbQ@mail.gmail.com>
+	<CAKywueRwzdak2LfpfVkiX2ue0A-0a15J9kO8kgUYseRPXM8Tfw@mail.gmail.com>
+	<20120303070921.5ce2bb10@tlielax.poochiereds.net>
+	<CAH2r5mvGjzS73bhgG54Yzcqui9qxfv7e3yrxWZX+weSUQB4cHA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>, Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
-	linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dchinner-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	Jaya Kumar <jayalk-vMRLXvPMFfQANPMfv7sqcg@public.gmane.org>,
-	Sage Weil <sage-BnTBU8nroG7k1uMJSBkQmQ@public.gmane.org>, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
-	Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
-	v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>,
-	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	Steven Whitehouse <swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	Greg Kroah-Hartman <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
-To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <4F593CF8.2000105-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
+In-Reply-To: <CAH2r5mvGjzS73bhgG54Yzcqui9qxfv7e3yrxWZX+weSUQB4cHA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-  Hello,
+On Sat, 3 Mar 2012 21:14:19 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-On Thu 08-03-12 15:12:56, Andy Lutomirski wrote:
-> On 03/01/2012 03:41 AM, Jan Kara wrote:
-> >   Hello,
-> > 
-> >   to provide reliable support for filesystem freezing, filesystems need to have
-> > complete control over when metadata is changed. In particular,
-> > file_update_time() calls from page fault code make it impossible for
-> > filesystems to prevent inodes from being dirtied while the filesystem is
-> > frozen.
-> > 
-> > To fix the issue, this patch set changes page fault code to call
-> > file_update_time() only when ->page_mkwrite() callback is not provided. If the
-> > callback is provided, it is the responsibility of the filesystem to perform
-> > update of i_mtime / i_ctime if needed. We also push file_update_time() call
-> > to all existing ->page_mkwrite() implementations if the time update does not
-> > obviously happen by other means. If you know your filesystem does not need
-> > update of modification times in ->page_mkwrite() handler, please speak up and
-> > I'll drop the patch for your filesystem.
-> > 
-> > As a side note, an alternative would be to remove call of file_update_time()
-> > from page fault code altogether and require all filesystems needing it to do
-> > that in their ->page_mkwrite() implementation. That is certainly possible
-> > although maybe slightly inefficient and would require auditting 100+
-> > vm_operations_structs *shiver*.
 > 
+> On the issue of why Samba didn't up maxmpx, I expect it is simply that
+> until Jeff fixed async read/write, it was rare for a client to send 50
+> requests in parallel.
 > 
-> 
-> IMO updating file times should happen when changes get written out, not
-> when a page is made writable, for two reasons:
-> 
-> 1. Correctness.  With the current approach, it's very easy for files to
-> be changed after the last mtime update -- any changes between mkwrite
-> and actual writeback won't affect mtime.
-> 
-> 2. Performance.  I have an application (presumably guessable from my
-> email address) for which blocking in page_mkwrite is an absolute
-> show-stopper.  (In fact it's so bad that we reverted back to running on
-> Windows until I hacked up a kernel to not do this.)  I have an incorrect
-> patch [1] to fix it, but I haven't gotten around to a real fix.  (I also
-> have stable pages reverted in my kernel.  Some day I'll submit a patch
-> to make it a filesystem option.  Or maybe it should even be a block
-> device / queue property like the alignment offset and optimal io size --
-> there are plenty of block device and file combinations which don't
-> benefit at all from stable pages.)
-> 
-> I'd prefer if file_update_time in page_mkwrite didn't proliferate.  A
-> better fix is probably to introduce a new inode flag, update it when a
-> page is undirtied, and then dirty and write the inode from the writeback
-> path.  (Kind of like my patch, but with an inode flag instead of a page
-> flag, and with the file_update_time done from the fs.)
-> 
-> [1] http://patchwork.ozlabs.org/patch/122516/
-  Andy, I'm aware of your problems. Just firstly, I wouldn't like to
-complicate the filesystem freezing patch set even more by improving unrelated
-things. And secondly, I think these changes won't make fixing your problem
-harder. I'd even argue it will be easier because you can do conversion
-filesystem by filesystem. Getting lock ordering and other things right for
-all filesystems at once is much harded.
 
-								Honza
+Are windows clients hard capped at 50 outstanding calls or so?
+
+> On the SMB2 credits vs. CIFS maxmpx topic ...  more than once at the
+> MS Plugfest I heard pushback on treating SMB2 credits and CIFS maxmpx
+> similarly - they are totally unrelated.  SMB2 credits are pretty
+> straightforward - we get them back on every request so they are
+> constantly changing, but the rules are easier to understand (and are
+> well documented, where the CIFS maxmpx behavior is only partially
+> documented).
+> 
+
+I can understand their POV, and that may be correct. I think we ought
+to step back though and consider the fundamental problem that we're
+trying to solve. When we want to send a call on the wire, we need to
+know:
+
+"Is this particular call allowed to go out onto the wire at this time
+or does it need to wait for another event to occur?"
+
+Earlier, I suggested: "Let's treat SMB1 maxmpx handling as a trivial
+case of SMB2 credits." If that's not possible for some reason then we
+ought to consider something like this:
+
+"Let's build this out the transport layer so that it can accomodate
+both sets of protocols by allowing us to plug in different rules
+depending on the protocol."
+
+Now that we're looking more closely at this, I think you're correct
+that SMB1 maxmpx limits and SMB2 credits follow different "rules". But
+I also think that it's best to engineer this in such a way that we can
+"plug in" the correct ruleset for answering the above question based on
+the protocol version in use.
+
+The trick is to do this in such a way that we only "plug in" what needs
+to be different. If treating SMB1 maxmpx limits as a trivial case of
+SMB2 credits is too difficult, then I would take that as a sign that we
+just need to expand how much of that decision making needs to be
+protocol specific.
+
 -- 
-Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-SUSE Labs, CR
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
