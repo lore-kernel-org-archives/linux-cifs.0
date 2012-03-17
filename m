@@ -1,86 +1,355 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Fix a spurious error in cifs_push_posix_locks
-Date: Sat, 17 Mar 2012 06:10:06 -0400
-Message-ID: <20120317061006.68c0305e@tlielax.poochiereds.net>
-References: <1331966815-3124-1-git-send-email-piastry@etersoft.ru>
+Subject: Re: [PATCH v2 03/11] CIFS: Introduce credit-based flow control
+Date: Sat, 17 Mar 2012 06:32:58 -0400
+Message-ID: <20120317063258.77618c0e@tlielax.poochiereds.net>
+References: <1331910574-998-1-git-send-email-piastry@etersoft.ru>
+	<1331910574-998-4-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1331966815-3124-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1331910574-998-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 17 Mar 2012 09:46:55 +0300
+On Fri, 16 Mar 2012 18:09:26 +0300
 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+
+> and send no more than credits value requests at once. For SMB/CIFS
+> it's trivial: increment this value by receiving any message and
+> decrement by sending one.
+> 
+
+The existing code essentially "hardcodes" a value of 50 instead of
+using maxReq. While I think that's wrong, if you change that behavior
+in the first patch, it's going to make tracking down any regressions
+from this very difficult.
+
+I think it might be better to have this series introduce no behavioral
+changes at all, and simply reorganize the code around a credit-based
+model. Once that's complete and working, then do a patch that makes the
+code respect maxReq.
+
+I know that that's more work, but we do need to be careful when we're
+tinkering with the low-level plumbing like this...
 
 > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/file.c |   19 ++++++++++---------
->  1 files changed, 10 insertions(+), 9 deletions(-)
+>  fs/cifs/cifsglob.h  |   11 +++++++----
+>  fs/cifs/cifsproto.h |    3 +++
+>  fs/cifs/cifssmb.c   |   10 +++++-----
+>  fs/cifs/connect.c   |   14 ++++++--------
+>  fs/cifs/misc.c      |   18 ++++++++++++++++++
+>  fs/cifs/transport.c |   36 ++++++++++++++++++++----------------
+>  6 files changed, 59 insertions(+), 33 deletions(-)
 > 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 4aa6080..159fcc5 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -960,9 +960,9 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
->  	INIT_LIST_HEAD(&locks_to_send);
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index fb78bc9..d55de96 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -250,8 +250,9 @@ struct TCP_Server_Info {
+>  	bool noblocksnd;		/* use blocking sendmsg */
+>  	bool noautotune;		/* do not autotune send buf sizes */
+>  	bool tcp_nodelay;
+> +	int credits;  /* send no more requests at once */
+>  	unsigned int in_flight;  /* number of requests on the wire to server */
+> -	spinlock_t req_lock; /* protect the value above */
+> +	spinlock_t req_lock;  /* protect the two values above */
+>  	struct mutex srv_mutex;
+>  	struct task_struct *tsk;
+>  	char server_GUID[16];
+> @@ -314,12 +315,14 @@ in_flight(struct TCP_Server_Info *server)
+>  	return num;
+>  }
 >  
+> -static inline void
+> -dec_in_flight(struct TCP_Server_Info *server)
+> +static inline bool
+> +has_credits(struct TCP_Server_Info *server)
+>  {
+> +	int num;
+>  	spin_lock(&server->req_lock);
+> -	server->in_flight--;
+> +	num = server->credits;
+>  	spin_unlock(&server->req_lock);
+> +	return num > 0;
+>  }
+>  
+>  /*
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 6f4e243..47a769e 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -88,6 +88,9 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
+>  			struct smb_hdr *in_buf ,
+>  			struct smb_hdr *out_buf,
+>  			int *bytes_returned);
+> +extern void cifs_add_credits(struct TCP_Server_Info *server,
+> +			     const unsigned int add);
+> +extern void cifs_set_credits(struct TCP_Server_Info *server, const int val);
+>  extern int checkSMB(struct smb_hdr *smb, __u16 mid, unsigned int length);
+>  extern bool is_valid_oplock_break(struct smb_hdr *smb,
+>  				  struct TCP_Server_Info *);
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index d7cbcfa..08c84a1 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -461,7 +461,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+>  		server->maxReq = min_t(unsigned int,
+>  				       le16_to_cpu(rsp->MaxMpxCount),
+>  				       cifs_max_pending);
+> -		server->oplocks = server->maxReq > 1 ? enable_oplocks : false;
+> +		cifs_set_credits(server, server->maxReq);
+>  		server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
+>  		server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+>  		/* even though we do not use raw we might as well set this
+> @@ -569,7 +569,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+>  	   little endian */
+>  	server->maxReq = min_t(unsigned int, le16_to_cpu(pSMBr->MaxMpxCount),
+>  			       cifs_max_pending);
+> -	server->oplocks = server->maxReq > 1 ? enable_oplocks : false;
+> +	cifs_set_credits(server, server->maxReq);
+>  	/* probably no need to store and check maxvcs */
+>  	server->maxBuf = le32_to_cpu(pSMBr->MaxBufferSize);
+>  	server->max_rw = le32_to_cpu(pSMBr->MaxRawSize);
+> @@ -721,7 +721,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+>  	struct TCP_Server_Info *server = mid->callback_data;
+>  
+>  	DeleteMidQEntry(mid);
+> -	dec_in_flight(server);
+> +	cifs_add_credits(server, 1);
+>  	wake_up(&server->request_q);
+	^^^^^^^^^
+
+The above wake_up always follows the call to cifs_add_credits. Should
+you go ahead and move it inside of cifs_add_credits?
+
+
+>  }
+>  
+> @@ -1674,7 +1674,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+>  
+>  	queue_work(system_nrt_wq, &rdata->work);
+>  	DeleteMidQEntry(mid);
+> -	dec_in_flight(server);
+> +	cifs_add_credits(server, 1);
+>  	wake_up(&server->request_q);
+>  }
+>  
+> @@ -2115,7 +2115,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+>  
+>  	queue_work(system_nrt_wq, &wdata->work);
+>  	DeleteMidQEntry(mid);
+> -	dec_in_flight(tcon->ses->server);
+> +	cifs_add_credits(tcon->ses->server, 1);
+>  	wake_up(&tcon->ses->server->request_q);
+>  }
+>  
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index a7627f2..f3a0c49 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -642,14 +642,10 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+>  	spin_unlock(&GlobalMid_Lock);
+>  	wake_up_all(&server->response_q);
+>  
+> -	/* Check if we have blocked requests that need to free. */
+> +	/* check if we have blocked requests that need to free */
+>  	spin_lock(&server->req_lock);
+> -	if (server->in_flight >= server->maxReq)
+> -		server->in_flight = server->maxReq - 1;
+> -	/*
+> -	 * We do not want to set the max_pending too low or we could end up
+> -	 * with the counter going negative.
+> -	 */
+> +	if (server->credits <= 0)
+> +		server->credits = 1;
+>  	spin_unlock(&server->req_lock);
 >  	/*
-> -	 * Allocating count locks is enough because no locks can be added to
-> -	 * the list while we are holding cinode->lock_mutex that protects
-> -	 * locking operations of this inode.
-> +	 * Allocating count locks is enough because no FL_POSIX locks can be
-> +	 * added to the list while we are holding cinode->lock_mutex that
-> +	 * protects locking operations of this inode.
->  	 */
->  	for (; i < count; i++) {
->  		lck = kmalloc(sizeof(struct lock_to_push), GFP_KERNEL);
-> @@ -973,18 +973,20 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
->  		list_add_tail(&lck->llist, &locks_to_send);
+>  	 * Although there should not be any requests blocked on this queue it
+> @@ -1906,7 +1902,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>  	tcp_ses->noautotune = volume_info->noautotune;
+>  	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
+>  	tcp_ses->in_flight = 0;
+> -	tcp_ses->maxReq = 1; /* enough to send negotiate request */
+> +	tcp_ses->credits = 1;
+>  	init_waitqueue_head(&tcp_ses->response_q);
+>  	init_waitqueue_head(&tcp_ses->request_q);
+>  	INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
+> @@ -3756,9 +3752,11 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
+>  	if (server->maxBuf != 0)
+>  		return 0;
+>  
+> +	cifs_set_credits(server, 1);
+>  	rc = CIFSSMBNegotiate(xid, ses);
+>  	if (rc == -EAGAIN) {
+>  		/* retry only once on 1st time connection */
+> +		cifs_set_credits(server, 1);
+>  		rc = CIFSSMBNegotiate(xid, ses);
+>  		if (rc == -EAGAIN)
+>  			rc = -EHOSTDOWN;
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index 703ef5c..5dc936b 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -690,3 +690,21 @@ backup_cred(struct cifs_sb_info *cifs_sb)
+>  
+>  	return false;
+>  }
+> +
+> +void
+> +cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
+> +{
+> +	spin_lock(&server->req_lock);
+> +	server->credits += add;
+> +	server->in_flight--;
+> +	spin_unlock(&server->req_lock);
+> +}
+> +
+> +void
+> +cifs_set_credits(struct TCP_Server_Info *server, const int val)
+> +{
+> +	spin_lock(&server->req_lock);
+> +	server->credits = val;
+> +	server->oplocks = val > 1 ? enable_oplocks : false;
+> +	spin_unlock(&server->req_lock);
+> +}
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index e2673aa..e8a4fd3 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -262,16 +262,16 @@ wait_for_free_request(struct TCP_Server_Info *server, const int long_op)
+>  	if (long_op == CIFS_ASYNC_OP) {
+>  		/* oplock breaks must not be held up */
+>  		server->in_flight++;
+> +		server->credits--;
+>  		spin_unlock(&server->req_lock);
+>  		return 0;
 >  	}
 >  
-> -	i = 0;
->  	el = locks_to_send.next;
->  	lock_flocks();
->  	cifs_for_each_lock(cfile->dentry->d_inode, before) {
-> +		flock = *before;
-> +		if ((flock->fl_flags & FL_POSIX) == 0)
-> +			continue;
->  		if (el == &locks_to_send) {
-
-Nit: a clearer way to do this would be to list_del the locks as you use
-them, and then check for list_empty(&locks_to_send). This works too,
-but is not as self documenting. It's not a big deal though...
-
-> -			/* something is really wrong */
+>  	while (1) {
+> -		if (server->in_flight >= server->maxReq) {
+> +		if (server->credits <= 0) {
+>  			spin_unlock(&server->req_lock);
+>  			cifs_num_waiters_inc(server);
+> -			wait_event(server->request_q,
+> -				   in_flight(server) < server->maxReq);
+> +			wait_event(server->request_q, has_credits(server));
+>  			cifs_num_waiters_dec(server);
+>  			spin_lock(&server->req_lock);
+>  		} else {
+> @@ -280,12 +280,16 @@ wait_for_free_request(struct TCP_Server_Info *server, const int long_op)
+>  				return -ENOENT;
+>  			}
+>  
+> -			/* can not count locking commands against total
+> -			   as they are allowed to block on server */
 > +			/*
-> +			 * The list ended. We don't have enough allocated
-> +			 * structures - something is really wrong.
+> +			 * Can not count locking commands against total
+> +			 * as they are allowed to block on server.
 > +			 */
->  			cERROR(1, "Can't push all brlocks!");
+>  
+>  			/* update # of requests on the wire to server */
+> -			if (long_op != CIFS_BLOCKING_OP)
+> +			if (long_op != CIFS_BLOCKING_OP) {
+> +				server->credits--;
+>  				server->in_flight++;
+> +			}
+>  			spin_unlock(&server->req_lock);
 >  			break;
 >  		}
-> -		flock = *before;
-> -		if ((flock->fl_flags & FL_POSIX) == 0)
-> -			continue;
->  		length = 1 + flock->fl_end - flock->fl_start;
->  		if (flock->fl_type == F_RDLCK || flock->fl_type == F_SHLCK)
->  			type = CIFS_RDLCK;
-> @@ -996,7 +998,6 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
->  		lck->length = length;
->  		lck->type = type;
->  		lck->offset = flock->fl_start;
-> -		i++;
->  		el = el->next;
+> @@ -360,7 +364,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>  	mid = AllocMidQEntry(hdr, server);
+>  	if (mid == NULL) {
+>  		mutex_unlock(&server->srv_mutex);
+> -		dec_in_flight(server);
+> +		cifs_add_credits(server, 1);
+>  		wake_up(&server->request_q);
+>  		return -ENOMEM;
 >  	}
->  	unlock_flocks();
+> @@ -393,7 +397,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>  	return rc;
+>  out_err:
+>  	delete_mid(mid);
+> -	dec_in_flight(server);
+> +	cifs_add_credits(server, 1);
+>  	wake_up(&server->request_q);
+>  	return rc;
+>  }
+> @@ -565,7 +569,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+>  		mutex_unlock(&ses->server->srv_mutex);
+>  		cifs_small_buf_release(in_buf);
+>  		/* Update # of requests on wire to server */
+> -		dec_in_flight(ses->server);
+> +		cifs_add_credits(ses->server, 1);
+>  		wake_up(&ses->server->request_q);
+>  		return rc;
+>  	}
+> @@ -602,7 +606,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+>  			midQ->callback = DeleteMidQEntry;
+>  			spin_unlock(&GlobalMid_Lock);
+>  			cifs_small_buf_release(in_buf);
+> -			dec_in_flight(ses->server);
+> +			cifs_add_credits(ses->server, 1);
+>  			wake_up(&ses->server->request_q);
+>  			return rc;
+>  		}
+> @@ -613,7 +617,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+>  
+>  	rc = cifs_sync_mid_result(midQ, ses->server);
+>  	if (rc != 0) {
+> -		dec_in_flight(ses->server);
+> +		cifs_add_credits(ses->server, 1);
+>  		wake_up(&ses->server->request_q);
+>  		return rc;
+>  	}
+> @@ -638,7 +642,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+>  		midQ->resp_buf = NULL;
+>  out:
+>  	delete_mid(midQ);
+> -	dec_in_flight(ses->server);
+> +	cifs_add_credits(ses->server, 1);
+>  	wake_up(&ses->server->request_q);
+>  
+>  	return rc;
+> @@ -689,7 +693,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+>  	if (rc) {
+>  		mutex_unlock(&ses->server->srv_mutex);
+>  		/* Update # of requests on wire to server */
+> -		dec_in_flight(ses->server);
+> +		cifs_add_credits(ses->server, 1);
+>  		wake_up(&ses->server->request_q);
+>  		return rc;
+>  	}
+> @@ -722,7 +726,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+>  			/* no longer considered to be "in-flight" */
+>  			midQ->callback = DeleteMidQEntry;
+>  			spin_unlock(&GlobalMid_Lock);
+> -			dec_in_flight(ses->server);
+> +			cifs_add_credits(ses->server, 1);
+>  			wake_up(&ses->server->request_q);
+>  			return rc;
+>  		}
+> @@ -731,7 +735,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+>  
+>  	rc = cifs_sync_mid_result(midQ, ses->server);
+>  	if (rc != 0) {
+> -		dec_in_flight(ses->server);
+> +		cifs_add_credits(ses->server, 1);
+>  		wake_up(&ses->server->request_q);
+>  		return rc;
+>  	}
+> @@ -748,7 +752,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+>  	rc = cifs_check_receive(midQ, ses->server, 0);
+>  out:
+>  	delete_mid(midQ);
+> -	dec_in_flight(ses->server);
+> +	cifs_add_credits(ses->server, 1);
+>  	wake_up(&ses->server->request_q);
+>  
+>  	return rc;
 
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-
-...you might also want to add:
-
-Reported-by: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
