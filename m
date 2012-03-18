@@ -1,100 +1,109 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 01/11] CIFS: Respect negotiated MaxMpxCount
-Date: Sat, 17 Mar 2012 10:20:59 -0500
-Message-ID: <CAH2r5msMKiEyS2-ak2+tQoRFommSHRcCNwp-J+XtgovmSae7-A@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2 06/11] CIFS: Delete echo_retries module parm
+Date: Sun, 18 Mar 2012 06:30:32 -0400
+Message-ID: <20120318063032.63a8e99b@tlielax.poochiereds.net>
 References: <1331910574-998-1-git-send-email-piastry@etersoft.ru>
-	<1331910574-998-2-git-send-email-piastry@etersoft.ru>
-	<20120317071201.7f28683b@tlielax.poochiereds.net>
-	<CAKywueTDsGhcHiGM_uX6V0dnY3m_W4kD2qcb+JWRq=UVnBnvPw@mail.gmail.com>
+	<1331910574-998-7-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=KOI8-R
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueTDsGhcHiGM_uX6V0dnY3m_W4kD2qcb+JWRq=UVnBnvPw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1331910574-998-7-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Mar 17, 2012 at 9:53 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =
-wrote:
-> 17 =CD=C1=D2=D4=C1 2012=9A=C7. 15:12 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=
-=D8 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
->> On Fri, 16 Mar 2012 18:09:24 +0300
->> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->>
->>> Some servers sets this value less than 50 that was hardcoded and
->>> we lost the connection if when we exceed this limit. Fix this by
->>> respecting this value - not sending more than the server allows.
->>>
->>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->>> ---
->>> =9Afs/cifs/cifsfs.c =9A =9A| =9A =9A8 ++++----
->>> =9Afs/cifs/cifsglob.h =9A| =9A 10 +++-------
->>> =9Afs/cifs/cifssmb.c =9A | =9A =9A9 +++++++--
->>> =9Afs/cifs/connect.c =9A | =9A 11 ++++-------
->>> =9Afs/cifs/dir.c =9A =9A =9A | =9A =9A6 ++++--
->>> =9Afs/cifs/file.c =9A =9A =9A| =9A =9A4 ++--
->>> =9Afs/cifs/transport.c | =9A =9A4 ++--
->>
->> Introducing a behavior change like this at the beginning of the seri=
-es
->> is probably a mistake. You'll have no reasonable way to bisect down
->> regressions, so you won't know if a problem is due to the change to =
-a
->> credit-based model or due to changing the client to respect the maxm=
-px.
->>
->> Instead of doing this, we should instead reorganize the code around =
-a
->> credit based model first, while attempting to mimic the existing
->> behavior as closely as possible. Once that framework is in place, th=
-en
->> change the behavior and start respecting the maxmpx.
->>
->> If you do that, then someone can reasonably bisect between those two
->> changes and we can determine the source of a regression.
->> --
->> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
-> This was done to push this patch to 3.3 and stable tree as well.
-> That's why it is in the start of series.
->
-> If we decide not to push it for now, I agree that this patch should b=
-e
-> in the modified version (according to changes from other patches) at
-> the end of the series.
->
-> Steve, your thoughts?
->
-> --
-> Best regards,
-> Pavel Shilovsky.
+On Fri, 16 Mar 2012 18:09:29 +0300
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-We want to fix the reported (cifs) problem first with a simple patch
-(that would be suitable for stable too).
+> It's the essential step before respecting MaxMpxCount value during
+> negotiating because we will keep only one extra slot for sending
+> echo requests. If there is no response during two echo intervals -
+> reconnect the tcp session.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/README     |    6 +-----
+>  fs/cifs/cifsfs.c   |    5 -----
+>  fs/cifs/cifsglob.h |    3 ---
+>  fs/cifs/connect.c  |    7 +++----
+>  4 files changed, 4 insertions(+), 17 deletions(-)
+> 
+> diff --git a/fs/cifs/README b/fs/cifs/README
+> index 895da1d..b7d782b 100644
+> --- a/fs/cifs/README
+> +++ b/fs/cifs/README
+> @@ -753,10 +753,6 @@ module loading or during the runtime by using the interface
+>  
+>  i.e. echo "value" > /sys/module/cifs/parameters/<param>
+>  
+> -1. echo_retries - The number of echo attempts before giving up and
+> -		  reconnecting to the server. The default is 5. The value 0
+> -		  means never reconnect.
+> -
+> -2. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
+> +1. enable_oplocks - Enable or disable oplocks. Oplocks are enabled by default.
+>  		    [Y/y/1]. To disable use any of [N/n/0].
+>  
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 6ee1cb4..f266161 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -77,11 +77,6 @@ unsigned int cifs_max_pending = CIFS_MAX_REQ;
+>  module_param(cifs_max_pending, int, 0444);
+>  MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
+>  				   "Default: 32767 Range: 2 to 32767.");
+> -unsigned short echo_retries = 5;
+> -module_param(echo_retries, ushort, 0644);
+> -MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
+> -			       "reconnecting server. Default: 5. 0 means "
+> -			       "never reconnect.");
+>  module_param(enable_oplocks, bool, 0644);
+>  MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool). Default:"
+>  				 "y/Y/1");
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 2309a67..339ebe3 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1038,9 +1038,6 @@ GLOBAL_EXTERN unsigned int cifs_min_rcv;    /* min size of big ntwrk buf pool */
+>  GLOBAL_EXTERN unsigned int cifs_min_small;  /* min size of small buf pool */
+>  GLOBAL_EXTERN unsigned int cifs_max_pending; /* MAX requests at once to server*/
+>  
+> -/* reconnect after this many failed echo attempts */
+> -GLOBAL_EXTERN unsigned short echo_retries;
+> -
+>  #ifdef CONFIG_CIFS_ACL
+>  GLOBAL_EXTERN struct rb_root uidtree;
+>  GLOBAL_EXTERN struct rb_root gidtree;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index f3a0c49..4156351 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -373,12 +373,11 @@ allocate_buffers(struct TCP_Server_Info *server)
+>  static bool
+>  server_unresponsive(struct TCP_Server_Info *server)
+>  {
+> -	if (echo_retries > 0 && server->tcpStatus == CifsGood &&
+> -	    time_after(jiffies, server->lstrp +
+> -				(echo_retries * SMB_ECHO_INTERVAL))) {
+> +	if (server->tcpStatus == CifsGood &&
+> +	    time_after(jiffies, server->lstrp + 2 * SMB_ECHO_INTERVAL)) {
 
-The most important reported problems are mounts to servers
-running some versions of Windows Vista and some versions of Windows 7
-which set maxmpx below 50 and more importantly have maxworkitems
-(in the windows registry on the server) set at too small a value to han=
-dle
-the 20 or 30 async reads or writes which are now often in flight to the=
-m.
+Since you're replacing a variable with a hardcoded value like this, it's
+probably a good idea to add a comment that explains why we're using 2 *
+SMB_ECHO_INTERVAL here. Otherwise we'll forget in a year or two...
 
-The fix we need first is to honor the maxmpx that the server sets (and
-probably remove cifs_max_pending which is obsolete as
-a global module parm or simply do the minimum of cifs_max_pending
-and maxmpx as the earlier patch did).  If desired (to workaround buggy
-servers) in a second patch we could add a mount parm if we think there =
-are
-servers such as windows 7 for which we will need to set the
-negotiated value lower (due to their maxworkitems registry
-problem), or Samba for which maxmpx could be ignored
-(and as JRA and others indicated - we could send
-a thousand requests in parallel).
+>  		cERROR(1, "Server %s has not responded in %d seconds. "
+>  			  "Reconnecting...", server->hostname,
+> -			  (echo_retries * SMB_ECHO_INTERVAL / HZ));
+> +			  (2 * SMB_ECHO_INTERVAL) / HZ);
+>  		cifs_reconnect(server);
+>  		wake_up(&server->response_q);
+>  		return true;
 
---=20
-Thanks,
+If you're targeting part of this series for stable, then it seems like
+this patch ought to be earlier in it (#2 or #3 or so). Looks fine to me
+though other than the nit about the comment.
 
-Steve
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
