@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH v2 01/11] CIFS: Respect negotiated MaxMpxCount
-Date: Sun, 18 Mar 2012 06:33:52 -0400
-Message-ID: <20120318063352.1a3794e7@tlielax.poochiereds.net>
+Date: Sun, 18 Mar 2012 06:50:59 -0400
+Message-ID: <20120318065059.62592afb@tlielax.poochiereds.net>
 References: <1331910574-998-1-git-send-email-piastry@etersoft.ru>
 	<1331910574-998-2-git-send-email-piastry@etersoft.ru>
 	<20120317071201.7f28683b@tlielax.poochiereds.net>
@@ -89,12 +89,13 @@ t
 andle
 > the 20 or 30 async reads or writes which are now often in flight to t=
 hem.
->
+>=20
 > The fix we need first is to honor the maxmpx that the server sets (an=
 d
 > probably remove cifs_max_pending which is obsolete as
 > a global module parm or simply do the minimum of cifs_max_pending
-> and maxmpx as the earlier patch did). If desired (to workaround buggy
+> and maxmpx as the earlier patch did).=20
+> If desired (to workaround buggy
 > servers) in a second patch we could add a mount parm if we think ther=
 e are
 > servers such as windows 7 for which we will need to set the
@@ -104,21 +105,14 @@ e are
 > a thousand requests in parallel).
 >=20
 
-Ok, that sounds like a reasonable approach.
+By the way...
 
-If you want to do that though would it make more sense to do a patch or
-series that just fixes the problem with smb1 without introducing
-credits? That series could be targeted for stable and you could then do
-another series on top of it that converts to a credit based model and
-adds in the smb2 code.
+What's the plan for blocking locks and echoes here? Do you plan to make
+them just ignore the maxmpx limit?
 
-The spec is so ambiguous here that we can be reasonably sure that
-*something* will break. We ought to try to proceed in such a way that
-we can deal with those problems quickly and efficiently as they arise.
-
-The thing we don't want to do is conflate the credit based changes with
-the change to respect maxmpx too much since that'll make it tough to
-know what caused a particular problem...
+Another important case to consider is the (apparently common) case
+where maxmpx is 1. We don't really want to make things worse against
+such servers...
 
 --=20
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
