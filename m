@@ -1,244 +1,212 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v2 10/11] CIFS: Expand CurrentMid field
-Date: Tue, 20 Mar 2012 11:37:27 +0400
-Message-ID: <CAKywueTpa6Hmz7oQ=8S1ViRU9ky7wqhKN+f=eaWrJY1457X86w@mail.gmail.com>
-References: <1331910574-998-1-git-send-email-piastry@etersoft.ru>
-	<1331910574-998-11-git-send-email-piastry@etersoft.ru>
-	<20120319162410.42b95f13@redhat.com>
-	<CAH2r5mujZook3O2Ojvu+vjx5Y5uYuormbtbDW69iOLEf1XVQgg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=KOI8-R
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: Respect negotiated MaxMpxCount
+Date: Tue, 20 Mar 2012 12:55:09 +0300
+Message-ID: <1332237309-9586-1-git-send-email-piastry@etersoft.ru>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mujZook3O2Ojvu+vjx5Y5uYuormbtbDW69iOLEf1XVQgg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-20 =CD=C1=D2=D4=C1 2012=9A=C7. 0:48 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
- Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
-> On Mon, Mar 19, 2012 at 3:24 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
->> On Fri, 16 Mar 2012 18:09:33 +0300
->> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->>
->>> While in CIFS/SMB we have 16 bit mid, in SMB2 it is 64 bit.
->>> Convert the existing field to 64 bit and mask off higher bits
->>> for CIFS/SMB.
->>>
->>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->>> ---
->>> =9Afs/cifs/cifsglob.h =9A| =9A =9A2 +-
->>> =9Afs/cifs/cifsproto.h | =9A =9A2 +-
->>> =9Afs/cifs/misc.c =9A =9A =9A| =9A 84 ++++++++++++++++++++++++++++-=
-----------------------
->>> =9A3 files changed, 48 insertions(+), 40 deletions(-)
->>>
->>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->>> index a403398..b213458 100644
->>> --- a/fs/cifs/cifsglob.h
->>> +++ b/fs/cifs/cifsglob.h
->>> @@ -282,7 +282,7 @@ struct TCP_Server_Info {
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A=
-vcnumbers */
->>> =9A =9A =9A int capabilities; /* allow selective disabling of caps =
-by smb sess */
->>> =9A =9A =9A int timeAdj; =9A/* Adjust for difference in server time=
- zone in sec */
->>> - =9A =9A __u16 CurrentMid; =9A =9A =9A =9A /* multiplex id - rotat=
-ing counter */
->>> + =9A =9A __u64 CurrentMid; =9A =9A =9A =9A /* multiplex id - rotat=
-ing counter */
->>
->> It occurs to me that a simpler way to do this might be to turn this
->> into a union with a u16 and u64 field. This works just as well thoug=
-h...
->>
->>> =9A =9A =9A char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, n=
-tlmv2 etc */
->>> =9A =9A =9A /* 16th byte of RFC1001 workstation name is always null=
- */
->>> =9A =9A =9A char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NUL=
-L];
->>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->>> index db38a40..8958721 100644
->>> --- a/fs/cifs/cifsproto.h
->>> +++ b/fs/cifs/cifsproto.h
->>> @@ -115,7 +115,7 @@ extern int small_smb_init_no_tc(const int smb_c=
-md, const int wct,
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A void **=
-request_buf);
->>> =9Aextern int CIFS_SessSetup(unsigned int xid, struct cifs_ses *ses=
-,
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9Aconst struct=
- nls_table *nls_cp);
->>> -extern __u16 GetNextMid(struct TCP_Server_Info *server);
->>> +extern __u64 GetNextMid(struct TCP_Server_Info *server);
->>> =9Aextern struct timespec cifs_NTtimeToUnix(__le64 utc_nanoseconds_=
-since_1601);
->>> =9Aextern u64 cifs_UnixTimeToNT(struct timespec);
->>> =9Aextern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_=
-time,
->>> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
->>> index 88459d0..0b743b7 100644
->>> --- a/fs/cifs/misc.c
->>> +++ b/fs/cifs/misc.c
->>> @@ -213,54 +213,61 @@ cifs_small_buf_release(void *buf_to_free)
->>> =9A}
->>>
->>> =9A/*
->>> - =9A =9A Find a free multiplex id (SMB mid). Otherwise there could=
- be
->>> - =9A =9A mid collisions which might cause problems, demultiplexing=
- the
->>> - =9A =9A wrong response to this request. Multiplex ids could colli=
-de if
->>> - =9A =9A one of a series requests takes much longer than the other=
-s, or
->>> - =9A =9A if a very large number of long lived requests (byte range
->>> - =9A =9A locks or FindNotify requests) are pending. =9ANo more tha=
-n
->>> - =9A =9A 64K-1 requests can be outstanding at one time. =9AIf no
->>> - =9A =9A mids are available, return zero. =9AA future optimization
->>> - =9A =9A could make the combination of mids and uid the key we use
->>> - =9A =9A to demultiplex on (rather than mid alone).
->>> - =9A =9A In addition to the above check, the cifs demultiplex
->>> - =9A =9A code already used the command code as a secondary
->>> - =9A =9A check of the frame and if signing is negotiated the
->>> - =9A =9A response would be discarded if the mid were the same
->>> - =9A =9A but the signature was wrong. =9ASince the mid is not put =
-in the
->>> - =9A =9A pending queue until later (when it is about to be dispatc=
-hed)
->>> - =9A =9A we do have to limit the number of outstanding requests
->>> - =9A =9A to somewhat less than 64K-1 although it is hard to imagin=
-e
->>> - =9A =9A so many threads being in the vfs at one time.
->>> -*/
->>> -__u16 GetNextMid(struct TCP_Server_Info *server)
->>> + * Find a free multiplex id (SMB mid). Otherwise there could be
->>> + * mid collisions which might cause problems, demultiplexing the
->>> + * wrong response to this request. Multiplex ids could collide if
->>> + * one of a series requests takes much longer than the others, or
->>> + * if a very large number of long lived requests (byte range
->>> + * locks or FindNotify requests) are pending. No more than
->>> + * 64K-1 requests can be outstanding at one time. If no
->>> + * mids are available, return zero. A future optimization
->>> + * could make the combination of mids and uid the key we use
->>> + * to demultiplex on (rather than mid alone).
->>> + * In addition to the above check, the cifs demultiplex
->>> + * code already used the command code as a secondary
->>> + * check of the frame and if signing is negotiated the
->>> + * response would be discarded if the mid were the same
->>> + * but the signature was wrong. Since the mid is not put in the
->>> + * pending queue until later (when it is about to be dispatched)
->>> + * we do have to limit the number of outstanding requests
->>> + * to somewhat less than 64K-1 although it is hard to imagine
->>> + * so many threads being in the vfs at one time.
->>> + */
->>> +__u64 GetNextMid(struct TCP_Server_Info *server)
->>> =9A{
->>> - =9A =9A __u16 mid =3D 0;
->>> - =9A =9A __u16 last_mid;
->>> + =9A =9A __u64 mid =3D 0;
->>> + =9A =9A __u16 last_mid, cur_mid;
->>> =9A =9A =9A bool collision;
->>>
->>> =9A =9A =9A spin_lock(&GlobalMid_Lock);
->>> - =9A =9A last_mid =3D server->CurrentMid; /* we do not want to loo=
-p forever */
->>> - =9A =9A server->CurrentMid++;
->>> - =9A =9A /* This nested loop looks more expensive than it is.
->>> - =9A =9A In practice the list of pending requests is short,
->>> - =9A =9A fewer than 50, and the mids are likely to be unique
->>> - =9A =9A on the first pass through the loop unless some request
->>> - =9A =9A takes longer than the 64 thousand requests before it
->>> - =9A =9A (and it would also have to have been a request that
->>> - =9A =9A =9Adid not time out) */
->>> - =9A =9A while (server->CurrentMid !=3D last_mid) {
->>> +
->>> + =9A =9A /* mid is 16 bit only for CIFS/SMB */
->>> + =9A =9A cur_mid =3D (__u16)((server->CurrentMid) & 0xffff);
->>> + =9A =9A /* we do not want to loop forever */
->>> + =9A =9A last_mid =3D cur_mid;
->>> + =9A =9A cur_mid++;
->>> +
->>> + =9A =9A /*
->>> + =9A =9A =9A* This nested loop looks more expensive than it is.
->>> + =9A =9A =9A* In practice the list of pending requests is short,
->>> + =9A =9A =9A* fewer than 50, and the mids are likely to be unique
->>> + =9A =9A =9A* on the first pass through the loop unless some reque=
-st
->>> + =9A =9A =9A* takes longer than the 64 thousand requests before it
->>> + =9A =9A =9A* (and it would also have to have been a request that
->>> + =9A =9A =9A* did not time out).
->>> + =9A =9A =9A*/
->>> + =9A =9A while (cur_mid !=3D last_mid) {
->>> =9A =9A =9A =9A =9A =9A =9A struct mid_q_entry *mid_entry;
->>> =9A =9A =9A =9A =9A =9A =9A unsigned int num_mids;
->>>
->>> =9A =9A =9A =9A =9A =9A =9A collision =3D false;
->>> - =9A =9A =9A =9A =9A =9A if (server->CurrentMid =3D=3D 0)
->>> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A server->CurrentMid++;
->>> + =9A =9A =9A =9A =9A =9A if (cur_mid =3D=3D 0)
->>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A cur_mid++;
->>>
->>> =9A =9A =9A =9A =9A =9A =9A num_mids =3D 0;
->>> =9A =9A =9A =9A =9A =9A =9A list_for_each_entry(mid_entry, &server-=
->pending_mid_q, qhead) {
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A ++num_mids;
->>> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A if (mid_entry->mid =3D=3D=
- server->CurrentMid &&
->>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A if (mid_entry->mid =3D=3D=
- cur_mid &&
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A mid_entry->midS=
-tate =3D=3D MID_REQUEST_SUBMITTED) {
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A /* This=
- mid is in use, try a different one */
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A collisi=
-on =3D true;
->>> @@ -282,10 +289,11 @@ __u16 GetNextMid(struct TCP_Server_Info *serv=
-er)
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A server->tcpStatus =3D C=
-ifsNeedReconnect;
->>>
->>> =9A =9A =9A =9A =9A =9A =9A if (!collision) {
->>> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A mid =3D server->CurrentMi=
-d;
->>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A mid =3D (__u64)cur_mid;
->>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A server->CurrentMid =3D mi=
-d;
->>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A break;
->>> =9A =9A =9A =9A =9A =9A =9A }
->>> - =9A =9A =9A =9A =9A =9A server->CurrentMid++;
->>> + =9A =9A =9A =9A =9A =9A cur_mid++;
->>> =9A =9A =9A }
->>> =9A =9A =9A spin_unlock(&GlobalMid_Lock);
->>> =9A =9A =9A return mid;
->>
->> Not directly related to this patch, but should we move all of these =
-mid
->> operations under the req_lock instead of the GlobalMid_Lock? The glo=
-bal
->> spinlock is a bottleneck and all of the structures involved should b=
-e
->> per-server anyway.
->>
->> Anyway, I think this looks ok
->>
->> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
-> The idea of a union for these two key fields is worth thinking about
-> more - any more opinions from others on this?
->
+Some servers sets this value less than 50 that was hardcoded and
+we lost the connection if when we exceed this limit. Fix this by
+respecting this value - not sending more than the server allows.
 
-I think our main goal is to make to code is cleaner as possible. If we
-change this to a union we can't use the same codepath for both
-protocols - more protocol specific code - harder to understand, fix
-bugs, etc.
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsfs.c    |    8 ++++----
+ fs/cifs/cifsglob.h  |   10 +++-------
+ fs/cifs/cifssmb.c   |    9 +++++++--
+ fs/cifs/connect.c   |   11 ++++-------
+ fs/cifs/dir.c       |    6 ++++--
+ fs/cifs/file.c      |    4 ++--
+ fs/cifs/transport.c |    4 ++--
+ 7 files changed, 26 insertions(+), 26 deletions(-)
 
-
---=20
-Best regards,
-Pavel Shilovsky.
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index b1fd382..6ee1cb4 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -76,7 +76,7 @@ MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. Default: 30 "
+ unsigned int cifs_max_pending = CIFS_MAX_REQ;
+ module_param(cifs_max_pending, int, 0444);
+ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
+-				   "Default: 50 Range: 2 to 256");
++				   "Default: 32767 Range: 2 to 32767.");
+ unsigned short echo_retries = 5;
+ module_param(echo_retries, ushort, 0644);
+ MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
+@@ -1116,9 +1116,9 @@ init_cifs(void)
+ 	if (cifs_max_pending < 2) {
+ 		cifs_max_pending = 2;
+ 		cFYI(1, "cifs_max_pending set to min of 2");
+-	} else if (cifs_max_pending > 256) {
+-		cifs_max_pending = 256;
+-		cFYI(1, "cifs_max_pending set to max of 256");
++	} else if (cifs_max_pending > CIFS_MAX_REQ) {
++		cifs_max_pending = CIFS_MAX_REQ;
++		cFYI(1, "cifs_max_pending set to max of %u", CIFS_MAX_REQ);
+ 	}
+ 
+ 	rc = cifs_fscache_register();
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 76e7d8b..d47d20a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -55,14 +55,9 @@
+ 
+ /*
+  * MAX_REQ is the maximum number of requests that WE will send
+- * on one socket concurrently. It also matches the most common
+- * value of max multiplex returned by servers.  We may
+- * eventually want to use the negotiated value (in case
+- * future servers can handle more) when we are more confident that
+- * we will not have problems oveloading the socket with pending
+- * write data.
++ * on one socket concurrently.
+  */
+-#define CIFS_MAX_REQ 50
++#define CIFS_MAX_REQ 32767
+ 
+ #define RFC1001_NAME_LEN 15
+ #define RFC1001_NAME_LEN_WITH_NULL (RFC1001_NAME_LEN + 1)
+@@ -263,6 +258,7 @@ struct TCP_Server_Info {
+ 	bool session_estab; /* mark when very first sess is established */
+ 	u16 dialect; /* dialect index that server chose */
+ 	enum securityEnum secType;
++	bool oplocks:1; /* enable oplocks */
+ 	unsigned int maxReq;	/* Clients should submit no more */
+ 	/* than maxReq distinct unanswered SMBs to the server when using  */
+ 	/* multiplexed reads or writes */
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 8b7794c..cd66b76 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -458,7 +458,10 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 			goto neg_err_exit;
+ 		}
+ 		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
+-		server->maxReq = le16_to_cpu(rsp->MaxMpxCount);
++		server->maxReq = min_t(unsigned int,
++				       le16_to_cpu(rsp->MaxMpxCount),
++				       cifs_max_pending);
++		server->oplocks = server->maxReq > 1 ? enable_oplocks : false;
+ 		server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
+ 		server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+ 		/* even though we do not use raw we might as well set this
+@@ -564,7 +567,9 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 
+ 	/* one byte, so no need to convert this or EncryptionKeyLen from
+ 	   little endian */
+-	server->maxReq = le16_to_cpu(pSMBr->MaxMpxCount);
++	server->maxReq = min_t(unsigned int, le16_to_cpu(pSMBr->MaxMpxCount),
++			       cifs_max_pending);
++	server->oplocks = server->maxReq > 1 ? enable_oplocks : false;
+ 	/* probably no need to store and check maxvcs */
+ 	server->maxBuf = le32_to_cpu(pSMBr->MaxBufferSize);
+ 	server->max_rw = le32_to_cpu(pSMBr->MaxRawSize);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 602f77c..03f71fb 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -642,14 +642,10 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
+ 	spin_unlock(&GlobalMid_Lock);
+ 	wake_up_all(&server->response_q);
+ 
+-	/*
+-	 * Check if we have blocked requests that need to free. Note that
+-	 * cifs_max_pending is normally 50, but can be set at module install
+-	 * time to as little as two.
+-	 */
++	/* Check if we have blocked requests that need to free. */
+ 	spin_lock(&GlobalMid_Lock);
+-	if (atomic_read(&server->inFlight) >= cifs_max_pending)
+-		atomic_set(&server->inFlight, cifs_max_pending - 1);
++	if (atomic_read(&server->inFlight) >= server->maxReq)
++		atomic_set(&server->inFlight, server->maxReq - 1);
+ 	/*
+ 	 * We do not want to set the max_pending too low or we could end up
+ 	 * with the counter going negative.
+@@ -1910,6 +1906,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	tcp_ses->noautotune = volume_info->noautotune;
+ 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
+ 	atomic_set(&tcp_ses->inFlight, 0);
++	tcp_ses->maxReq = 1; /* enough to send negotiate request */
+ 	init_waitqueue_head(&tcp_ses->response_q);
+ 	init_waitqueue_head(&tcp_ses->request_q);
+ 	INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index bc7e244..d172c8e 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -171,7 +171,7 @@ cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
+ 	}
+ 	tcon = tlink_tcon(tlink);
+ 
+-	if (enable_oplocks)
++	if (tcon->ses->server->oplocks)
+ 		oplock = REQ_OPLOCK;
+ 
+ 	if (nd)
+@@ -492,7 +492,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ {
+ 	int xid;
+ 	int rc = 0; /* to get around spurious gcc warning, set to zero here */
+-	__u32 oplock = enable_oplocks ? REQ_OPLOCK : 0;
++	__u32 oplock;
+ 	__u16 fileHandle = 0;
+ 	bool posix_open = false;
+ 	struct cifs_sb_info *cifs_sb;
+@@ -518,6 +518,8 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 	}
+ 	pTcon = tlink_tcon(tlink);
+ 
++	oplock = pTcon->ses->server->oplocks ? REQ_OPLOCK : 0;
++
+ 	/*
+ 	 * Don't allow the separator character in a path component.
+ 	 * The VFS will not allow "/", but "\" is allowed by posix.
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 8e02dbd..159fcc5 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -380,7 +380,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 	cFYI(1, "inode = 0x%p file flags are 0x%x for %s",
+ 		 inode, file->f_flags, full_path);
+ 
+-	if (enable_oplocks)
++	if (tcon->ses->server->oplocks)
+ 		oplock = REQ_OPLOCK;
+ 	else
+ 		oplock = 0;
+@@ -505,7 +505,7 @@ static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
+ 	cFYI(1, "inode = 0x%p file flags 0x%x for %s",
+ 		 inode, pCifsFile->f_flags, full_path);
+ 
+-	if (enable_oplocks)
++	if (tcon->ses->server->oplocks)
+ 		oplock = REQ_OPLOCK;
+ 	else
+ 		oplock = 0;
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0cc9584..99a27cf 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -265,12 +265,12 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
+ 
+ 	spin_lock(&GlobalMid_Lock);
+ 	while (1) {
+-		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
++		if (atomic_read(&server->inFlight) >= server->maxReq) {
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_num_waiters_inc(server);
+ 			wait_event(server->request_q,
+ 				   atomic_read(&server->inFlight)
+-				     < cifs_max_pending);
++				     < server->maxReq);
+ 			cifs_num_waiters_dec(server);
+ 			spin_lock(&GlobalMid_Lock);
+ 		} else {
+-- 
+1.7.1
