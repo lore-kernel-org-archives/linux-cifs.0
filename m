@@ -1,220 +1,139 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Respect negotiated MaxMpxCount
-Date: Tue, 20 Mar 2012 06:35:17 -0400
-Message-ID: <20120320063517.2de289cd@tlielax.poochiereds.net>
-References: <1332237309-9586-1-git-send-email-piastry@etersoft.ru>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Issue with CIFS mounting of DFS ROOT mount when redirecting
+ from one domain controller to the next
+Date: Tue, 20 Mar 2012 06:38:26 -0400
+Message-ID: <20120320063826.78a89b3d@tlielax.poochiereds.net>
+References: <7B8A1CD01838314387266CEE4CEB05600A136B3AD0@EX-002.mail.navisite.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Thomas Hadig <thomas.hadig-O4KOoiensp/QT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1332237309-9586-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <7B8A1CD01838314387266CEE4CEB05600A136B3AD0-flUYDV2ZbChssxH0ZAyVedUmYfiRyxip@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 20 Mar 2012 12:55:09 +0300
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Mon, 19 Mar 2012 18:21:28 -0400
+Thomas Hadig <thomas.hadig-O4KOoiensp/QT0dZR+AlfA@public.gmane.org> wrote:
 
-> Some servers sets this value less than 50 that was hardcoded and
-> we lost the connection if when we exceed this limit. Fix this by
-> respecting this value - not sending more than the server allows.
-> 
-> Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c    |    8 ++++----
->  fs/cifs/cifsglob.h  |   10 +++-------
->  fs/cifs/cifssmb.c   |    9 +++++++--
->  fs/cifs/connect.c   |   11 ++++-------
->  fs/cifs/dir.c       |    6 ++++--
->  fs/cifs/file.c      |    4 ++--
->  fs/cifs/transport.c |    4 ++--
->  7 files changed, 26 insertions(+), 26 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index b1fd382..6ee1cb4 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -76,7 +76,7 @@ MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. Default: 30 "
->  unsigned int cifs_max_pending = CIFS_MAX_REQ;
->  module_param(cifs_max_pending, int, 0444);
->  MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
-> -				   "Default: 50 Range: 2 to 256");
-> +				   "Default: 32767 Range: 2 to 32767.");
->  unsigned short echo_retries = 5;
->  module_param(echo_retries, ushort, 0644);
->  MODULE_PARM_DESC(echo_retries, "Number of echo attempts before giving up and "
-> @@ -1116,9 +1116,9 @@ init_cifs(void)
->  	if (cifs_max_pending < 2) {
->  		cifs_max_pending = 2;
->  		cFYI(1, "cifs_max_pending set to min of 2");
-> -	} else if (cifs_max_pending > 256) {
-> -		cifs_max_pending = 256;
-> -		cFYI(1, "cifs_max_pending set to max of 256");
-> +	} else if (cifs_max_pending > CIFS_MAX_REQ) {
-> +		cifs_max_pending = CIFS_MAX_REQ;
-> +		cFYI(1, "cifs_max_pending set to max of %u", CIFS_MAX_REQ);
->  	}
->  
->  	rc = cifs_fscache_register();
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 76e7d8b..d47d20a 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -55,14 +55,9 @@
->  
->  /*
->   * MAX_REQ is the maximum number of requests that WE will send
-> - * on one socket concurrently. It also matches the most common
-> - * value of max multiplex returned by servers.  We may
-> - * eventually want to use the negotiated value (in case
-> - * future servers can handle more) when we are more confident that
-> - * we will not have problems oveloading the socket with pending
-> - * write data.
-> + * on one socket concurrently.
->   */
-> -#define CIFS_MAX_REQ 50
-> +#define CIFS_MAX_REQ 32767
->  
->  #define RFC1001_NAME_LEN 15
->  #define RFC1001_NAME_LEN_WITH_NULL (RFC1001_NAME_LEN + 1)
-> @@ -263,6 +258,7 @@ struct TCP_Server_Info {
->  	bool session_estab; /* mark when very first sess is established */
->  	u16 dialect; /* dialect index that server chose */
->  	enum securityEnum secType;
-> +	bool oplocks:1; /* enable oplocks */
->  	unsigned int maxReq;	/* Clients should submit no more */
->  	/* than maxReq distinct unanswered SMBs to the server when using  */
->  	/* multiplexed reads or writes */
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 8b7794c..cd66b76 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -458,7 +458,10 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
->  			goto neg_err_exit;
->  		}
->  		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
-> -		server->maxReq = le16_to_cpu(rsp->MaxMpxCount);
-> +		server->maxReq = min_t(unsigned int,
-> +				       le16_to_cpu(rsp->MaxMpxCount),
-> +				       cifs_max_pending);
-> +		server->oplocks = server->maxReq > 1 ? enable_oplocks : false;
->  		server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
->  		server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
->  		/* even though we do not use raw we might as well set this
-> @@ -564,7 +567,9 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
->  
->  	/* one byte, so no need to convert this or EncryptionKeyLen from
->  	   little endian */
-> -	server->maxReq = le16_to_cpu(pSMBr->MaxMpxCount);
-> +	server->maxReq = min_t(unsigned int, le16_to_cpu(pSMBr->MaxMpxCount),
-> +			       cifs_max_pending);
-> +	server->oplocks = server->maxReq > 1 ? enable_oplocks : false;
->  	/* probably no need to store and check maxvcs */
->  	server->maxBuf = le32_to_cpu(pSMBr->MaxBufferSize);
->  	server->max_rw = le32_to_cpu(pSMBr->MaxRawSize);
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 602f77c..03f71fb 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -642,14 +642,10 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
->  	spin_unlock(&GlobalMid_Lock);
->  	wake_up_all(&server->response_q);
->  
-> -	/*
-> -	 * Check if we have blocked requests that need to free. Note that
-> -	 * cifs_max_pending is normally 50, but can be set at module install
-> -	 * time to as little as two.
-> -	 */
-> +	/* Check if we have blocked requests that need to free. */
->  	spin_lock(&GlobalMid_Lock);
-> -	if (atomic_read(&server->inFlight) >= cifs_max_pending)
-> -		atomic_set(&server->inFlight, cifs_max_pending - 1);
-> +	if (atomic_read(&server->inFlight) >= server->maxReq)
-> +		atomic_set(&server->inFlight, server->maxReq - 1);
->  	/*
->  	 * We do not want to set the max_pending too low or we could end up
->  	 * with the counter going negative.
-> @@ -1910,6 +1906,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
->  	tcp_ses->noautotune = volume_info->noautotune;
->  	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
->  	atomic_set(&tcp_ses->inFlight, 0);
-> +	tcp_ses->maxReq = 1; /* enough to send negotiate request */
->  	init_waitqueue_head(&tcp_ses->response_q);
->  	init_waitqueue_head(&tcp_ses->request_q);
->  	INIT_LIST_HEAD(&tcp_ses->pending_mid_q);
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index bc7e244..d172c8e 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -171,7 +171,7 @@ cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
->  	}
->  	tcon = tlink_tcon(tlink);
->  
-> -	if (enable_oplocks)
-> +	if (tcon->ses->server->oplocks)
->  		oplock = REQ_OPLOCK;
->  
->  	if (nd)
-> @@ -492,7 +492,7 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->  {
->  	int xid;
->  	int rc = 0; /* to get around spurious gcc warning, set to zero here */
-> -	__u32 oplock = enable_oplocks ? REQ_OPLOCK : 0;
-> +	__u32 oplock;
->  	__u16 fileHandle = 0;
->  	bool posix_open = false;
->  	struct cifs_sb_info *cifs_sb;
-> @@ -518,6 +518,8 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->  	}
->  	pTcon = tlink_tcon(tlink);
->  
-> +	oplock = pTcon->ses->server->oplocks ? REQ_OPLOCK : 0;
-> +
->  	/*
->  	 * Don't allow the separator character in a path component.
->  	 * The VFS will not allow "/", but "\" is allowed by posix.
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 8e02dbd..159fcc5 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -380,7 +380,7 @@ int cifs_open(struct inode *inode, struct file *file)
->  	cFYI(1, "inode = 0x%p file flags are 0x%x for %s",
->  		 inode, file->f_flags, full_path);
->  
-> -	if (enable_oplocks)
-> +	if (tcon->ses->server->oplocks)
->  		oplock = REQ_OPLOCK;
->  	else
->  		oplock = 0;
-> @@ -505,7 +505,7 @@ static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
->  	cFYI(1, "inode = 0x%p file flags 0x%x for %s",
->  		 inode, pCifsFile->f_flags, full_path);
->  
-> -	if (enable_oplocks)
-> +	if (tcon->ses->server->oplocks)
->  		oplock = REQ_OPLOCK;
->  	else
->  		oplock = 0;
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 0cc9584..99a27cf 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -265,12 +265,12 @@ static int wait_for_free_request(struct TCP_Server_Info *server,
->  
->  	spin_lock(&GlobalMid_Lock);
->  	while (1) {
-> -		if (atomic_read(&server->inFlight) >= cifs_max_pending) {
-> +		if (atomic_read(&server->inFlight) >= server->maxReq) {
->  			spin_unlock(&GlobalMid_Lock);
->  			cifs_num_waiters_inc(server);
->  			wait_event(server->request_q,
->  				   atomic_read(&server->inFlight)
-> -				     < cifs_max_pending);
-> +				     < server->maxReq);
->  			cifs_num_waiters_dec(server);
->  			spin_lock(&GlobalMid_Lock);
->  		} else {
+> Hi,
+>=20
+> I am using the CIFS module from Linux kernel 3.2.9.
+>=20
+> We have the following setup:
+>=20
+> In DNS,=C2=A0 domain.net resolves to our secondary AD server=C2=A0=C2=
+=A0 ad2.domain.net
+> Our primary domain controller is ad1.domain.net and has a DFS redirec=
+tion set up from \\ad1\share\Users to \\files\share\Users.=20
+>=20
+> When mounting =C2=A0=C2=A0=C2=A0\\domain.net\share\Users=C2=A0 I get =
+an error.
+>=20
+> I traced this down to the cifs_mount function in fs/cifs/connect.c. I=
+n there, rc is set to 0 at the beginning but never reset.
+> In short, adding an rc=3D0; line after the label try_mount_again: fix=
+es the issue.
+>=20
+> Detailed information:
+> - Connecting to \\domain.net\share\Users =C2=A0connects to ad2 with a=
+ SMB_COM_NEGOTIATE, SMB_COM_SESSION_SETUP_ANDX, and SMB_COM_TREE_CONNEC=
+T_ANDX.
+> - SMB_COM_TREE_CONNECT_ANDX fails with STATUS_BAD_NETWORK_NAME causin=
+g rc to be non-zero and jumping to remote_path_check:
+> - It connects to ad2's IPC$ share and retrieves the DFS_REFERRAL whic=
+h leads to \\ad1\share and jumps to try_mount_again:
+> - It closes the samba session to ad2.
+> - Now, it connects to ad1 with SMB_COM_NEGOTIATE, SMB_COM_SESSION_SET=
+UP_ANDX, and SMB_COM_TREE_CONNECT_ANDX.
+> - This time, it succeeds and continues with SMB_COM_TRANSACTION2/ TRA=
+NS2_QUERY_FS_INFORMATION/SMB_QUERY_FS_DEVICE_INFO and SMB_QUERY_FS_ATTR=
+IBUTE_INFO.
+> - It comes to:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* check if a whole path i=
+s not remote */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!rc && tcon) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 /* build_path_to_root works only when we have a v=
+alid tcon */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 where rc is still non-zero and, thus, does NOT ch=
+eck again for a DFS_REFERRAL.
+> - I closes the samba session to ad1 and exists with the -6 mount erro=
+r from the initial tree connect.
+>=20
+> The correct behavior would be to reset rc to 0 when connecting to a d=
+ifferent samba session.
+>=20
+>=20
+> Patch info:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rc =3D bdi_setup_and_regis=
+ter(&cifs_sb->bdi, "cifs", BDI_CAP_MAP_COPY);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (rc)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return rc;
+>=20
+> #ifdef CONFIG_CIFS_DFS_UPCALL
+> try_mount_again:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* cleanup activities if w=
+e're chasing a referral */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (referral_walks_count) =
+{
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if (tcon)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c=
+ifs_put_tcon(tcon);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 else if (pSesInfo)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0c=
+ifs_put_smb_ses(pSesInfo);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0FreeXid(xid);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> #endif
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tcon =3D NULL;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pSesInfo =3D NULL;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 srvTcp =3D NULL;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 full_path =3D NULL;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tlink =3D NULL;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rc=3D0;
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 xid =3D GetXid();
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* get a reference to a tc=
+p session */
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 srvTcp =3D cifs_get_tcp_se=
+ssion(volume_info);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (IS_ERR(srvTcp)) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 rc =3D PTR_ERR(srvTcp);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 bdi_destroy(&cifs_sb->bdi);
+> =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto out;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
+>=20
+>=20
+> Thanks
+> Thomas
+>=20
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Nice analysis. That looks correct to me too...
+
+Care to spin up a patch with a description and signed-off-by line? You
+can add my Reviewed-by if so...
+
+--=20
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
