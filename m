@@ -1,314 +1,243 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v2 09/11] CIFS: Separate protocol-specific code from
- cifs_readv_receive code
-Date: Tue, 20 Mar 2012 11:33:42 +0400
-Message-ID: <CAKywueSvsb+BP7ktb0QEgL3WmrO8j42bicvd-WjWNro6qGRc7w@mail.gmail.com>
+Subject: Re: [PATCH v2 10/11] CIFS: Expand CurrentMid field
+Date: Tue, 20 Mar 2012 11:37:27 +0400
+Message-ID: <CAKywueTpa6Hmz7oQ=8S1ViRU9ky7wqhKN+f=eaWrJY1457X86w@mail.gmail.com>
 References: <1331910574-998-1-git-send-email-piastry@etersoft.ru>
-	<1331910574-998-10-git-send-email-piastry@etersoft.ru>
-	<20120319161728.1f8cec40@redhat.com>
+	<1331910574-998-11-git-send-email-piastry@etersoft.ru>
+	<20120319162410.42b95f13@redhat.com>
+	<CAH2r5mujZook3O2Ojvu+vjx5Y5uYuormbtbDW69iOLEf1XVQgg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=KOI8-R
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120319161728.1f8cec40-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAH2r5mujZook3O2Ojvu+vjx5Y5uYuormbtbDW69iOLEf1XVQgg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-20 =CD=C1=D2=D4=C1 2012=9A=C7. 0:17 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
- Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
-> On Fri, 16 Mar 2012 18:09:32 +0300
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->> ---
->> =9Afs/cifs/cifsglob.h =9A| =9A 12 ++++++++++
->> =9Afs/cifs/cifsproto.h | =9A =9A2 +-
->> =9Afs/cifs/cifssmb.c =9A | =9A 58 +++++++++++++++++++++++++++++++++-=
-----------------
->> =9Afs/cifs/connect.c =9A | =9A 12 ----------
->> =9Afs/cifs/netmisc.c =9A | =9A =9A3 +-
->> =9A5 files changed, 53 insertions(+), 34 deletions(-)
+20 =CD=C1=D2=D4=C1 2012=9A=C7. 0:48 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
+ Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
+> On Mon, Mar 19, 2012 at 3:24 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
+te:
+>> On Fri, 16 Mar 2012 18:09:33 +0300
+>> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 >>
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index 34a897e..a403398 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -341,6 +341,18 @@ has_credits(struct TCP_Server_Info *server, int=
- *credits)
->> =9A =9A =9A return num > 0;
->> =9A}
+>>> While in CIFS/SMB we have 16 bit mid, in SMB2 it is 64 bit.
+>>> Convert the existing field to 64 bit and mask off higher bits
+>>> for CIFS/SMB.
+>>>
+>>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>>> ---
+>>> =9Afs/cifs/cifsglob.h =9A| =9A =9A2 +-
+>>> =9Afs/cifs/cifsproto.h | =9A =9A2 +-
+>>> =9Afs/cifs/misc.c =9A =9A =9A| =9A 84 ++++++++++++++++++++++++++++-=
+----------------------
+>>> =9A3 files changed, 48 insertions(+), 40 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>>> index a403398..b213458 100644
+>>> --- a/fs/cifs/cifsglob.h
+>>> +++ b/fs/cifs/cifsglob.h
+>>> @@ -282,7 +282,7 @@ struct TCP_Server_Info {
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A=
+vcnumbers */
+>>> =9A =9A =9A int capabilities; /* allow selective disabling of caps =
+by smb sess */
+>>> =9A =9A =9A int timeAdj; =9A/* Adjust for difference in server time=
+ zone in sec */
+>>> - =9A =9A __u16 CurrentMid; =9A =9A =9A =9A /* multiplex id - rotat=
+ing counter */
+>>> + =9A =9A __u64 CurrentMid; =9A =9A =9A =9A /* multiplex id - rotat=
+ing counter */
 >>
->> +static inline size_t
->> +header_size(void)
->> +{
->> + =9A =9A return sizeof(struct smb_hdr);
->> +}
->> +
->> +static inline size_t
->> +max_header_size(void)
->> +{
->> + =9A =9A return MAX_CIFS_HDR_SIZE;
->> +}
->> +
->> =9A/*
->> =9A * Macros to allow the TCP_Server_Info->net field and related cod=
-e to drop out
->> =9A * when CONFIG_NET_NS isn't set.
->> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->> index 15c9b59..db38a40 100644
->> --- a/fs/cifs/cifsproto.h
->> +++ b/fs/cifs/cifsproto.h
->> @@ -106,7 +106,7 @@ extern int cifs_convert_address(struct sockaddr =
-*dst, const char *src, int len);
->> =9Aextern int cifs_set_port(struct sockaddr *addr, const unsigned sh=
-ort int port);
->> =9Aextern int cifs_fill_sockaddr(struct sockaddr *dst, const char *s=
-rc, int len,
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A const un=
-signed short int port);
->> -extern int map_smb_to_linux_error(struct smb_hdr *smb, bool logErr)=
-;
->> +extern int map_smb_to_linux_error(char *buf, bool logErr);
->> =9Aextern void header_assemble(struct smb_hdr *, char /* command */ =
+>> It occurs to me that a simpler way to do this might be to turn this
+>> into a union with a u16 and u64 field. This works just as well thoug=
+h...
+>>
+>>> =9A =9A =9A char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, n=
+tlmv2 etc */
+>>> =9A =9A =9A /* 16th byte of RFC1001 workstation name is always null=
+ */
+>>> =9A =9A =9A char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NUL=
+L];
+>>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>>> index db38a40..8958721 100644
+>>> --- a/fs/cifs/cifsproto.h
+>>> +++ b/fs/cifs/cifsproto.h
+>>> @@ -115,7 +115,7 @@ extern int small_smb_init_no_tc(const int smb_c=
+md, const int wct,
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A void **=
+request_buf);
+>>> =9Aextern int CIFS_SessSetup(unsigned int xid, struct cifs_ses *ses=
 ,
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A const struct cif=
-s_tcon *, int /* length of
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A fixed section (w=
-ord count) in two byte units */);
->> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
->> index d3b8089..765f804 100644
->> --- a/fs/cifs/cifssmb.c
->> +++ b/fs/cifs/cifssmb.c
->> @@ -1415,8 +1415,7 @@ cifs_readdata_free(struct cifs_readdata *rdata=
-)
->> =9Astatic int
->> =9Acifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_e=
-ntry *mid)
->> =9A{
->> - =9A =9A READ_RSP *rsp =3D (READ_RSP *)server->smallbuf;
->> - =9A =9A unsigned int rfclen =3D be32_to_cpu(rsp->hdr.smb_buf_lengt=
-h);
->> + =9A =9A unsigned int rfclen =3D get_rfc1002_length(server->smallbu=
-f);
->> =9A =9A =9A int remaining =3D rfclen + 4 - server->total_read;
->> =9A =9A =9A struct cifs_readdata *rdata =3D mid->callback_data;
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9Aconst struct=
+ nls_table *nls_cp);
+>>> -extern __u16 GetNextMid(struct TCP_Server_Info *server);
+>>> +extern __u64 GetNextMid(struct TCP_Server_Info *server);
+>>> =9Aextern struct timespec cifs_NTtimeToUnix(__le64 utc_nanoseconds_=
+since_1601);
+>>> =9Aextern u64 cifs_UnixTimeToNT(struct timespec);
+>>> =9Aextern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_=
+time,
+>>> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+>>> index 88459d0..0b743b7 100644
+>>> --- a/fs/cifs/misc.c
+>>> +++ b/fs/cifs/misc.c
+>>> @@ -213,54 +213,61 @@ cifs_small_buf_release(void *buf_to_free)
+>>> =9A}
+>>>
+>>> =9A/*
+>>> - =9A =9A Find a free multiplex id (SMB mid). Otherwise there could=
+ be
+>>> - =9A =9A mid collisions which might cause problems, demultiplexing=
+ the
+>>> - =9A =9A wrong response to this request. Multiplex ids could colli=
+de if
+>>> - =9A =9A one of a series requests takes much longer than the other=
+s, or
+>>> - =9A =9A if a very large number of long lived requests (byte range
+>>> - =9A =9A locks or FindNotify requests) are pending. =9ANo more tha=
+n
+>>> - =9A =9A 64K-1 requests can be outstanding at one time. =9AIf no
+>>> - =9A =9A mids are available, return zero. =9AA future optimization
+>>> - =9A =9A could make the combination of mids and uid the key we use
+>>> - =9A =9A to demultiplex on (rather than mid alone).
+>>> - =9A =9A In addition to the above check, the cifs demultiplex
+>>> - =9A =9A code already used the command code as a secondary
+>>> - =9A =9A check of the frame and if signing is negotiated the
+>>> - =9A =9A response would be discarded if the mid were the same
+>>> - =9A =9A but the signature was wrong. =9ASince the mid is not put =
+in the
+>>> - =9A =9A pending queue until later (when it is about to be dispatc=
+hed)
+>>> - =9A =9A we do have to limit the number of outstanding requests
+>>> - =9A =9A to somewhat less than 64K-1 although it is hard to imagin=
+e
+>>> - =9A =9A so many threads being in the vfs at one time.
+>>> -*/
+>>> -__u16 GetNextMid(struct TCP_Server_Info *server)
+>>> + * Find a free multiplex id (SMB mid). Otherwise there could be
+>>> + * mid collisions which might cause problems, demultiplexing the
+>>> + * wrong response to this request. Multiplex ids could collide if
+>>> + * one of a series requests takes much longer than the others, or
+>>> + * if a very large number of long lived requests (byte range
+>>> + * locks or FindNotify requests) are pending. No more than
+>>> + * 64K-1 requests can be outstanding at one time. If no
+>>> + * mids are available, return zero. A future optimization
+>>> + * could make the combination of mids and uid the key we use
+>>> + * to demultiplex on (rather than mid alone).
+>>> + * In addition to the above check, the cifs demultiplex
+>>> + * code already used the command code as a secondary
+>>> + * check of the frame and if signing is negotiated the
+>>> + * response would be discarded if the mid were the same
+>>> + * but the signature was wrong. Since the mid is not put in the
+>>> + * pending queue until later (when it is about to be dispatched)
+>>> + * we do have to limit the number of outstanding requests
+>>> + * to somewhat less than 64K-1 although it is hard to imagine
+>>> + * so many threads being in the vfs at one time.
+>>> + */
+>>> +__u64 GetNextMid(struct TCP_Server_Info *server)
+>>> =9A{
+>>> - =9A =9A __u16 mid =3D 0;
+>>> - =9A =9A __u16 last_mid;
+>>> + =9A =9A __u64 mid =3D 0;
+>>> + =9A =9A __u16 last_mid, cur_mid;
+>>> =9A =9A =9A bool collision;
+>>>
+>>> =9A =9A =9A spin_lock(&GlobalMid_Lock);
+>>> - =9A =9A last_mid =3D server->CurrentMid; /* we do not want to loo=
+p forever */
+>>> - =9A =9A server->CurrentMid++;
+>>> - =9A =9A /* This nested loop looks more expensive than it is.
+>>> - =9A =9A In practice the list of pending requests is short,
+>>> - =9A =9A fewer than 50, and the mids are likely to be unique
+>>> - =9A =9A on the first pass through the loop unless some request
+>>> - =9A =9A takes longer than the 64 thousand requests before it
+>>> - =9A =9A (and it would also have to have been a request that
+>>> - =9A =9A =9Adid not time out) */
+>>> - =9A =9A while (server->CurrentMid !=3D last_mid) {
+>>> +
+>>> + =9A =9A /* mid is 16 bit only for CIFS/SMB */
+>>> + =9A =9A cur_mid =3D (__u16)((server->CurrentMid) & 0xffff);
+>>> + =9A =9A /* we do not want to loop forever */
+>>> + =9A =9A last_mid =3D cur_mid;
+>>> + =9A =9A cur_mid++;
+>>> +
+>>> + =9A =9A /*
+>>> + =9A =9A =9A* This nested loop looks more expensive than it is.
+>>> + =9A =9A =9A* In practice the list of pending requests is short,
+>>> + =9A =9A =9A* fewer than 50, and the mids are likely to be unique
+>>> + =9A =9A =9A* on the first pass through the loop unless some reque=
+st
+>>> + =9A =9A =9A* takes longer than the 64 thousand requests before it
+>>> + =9A =9A =9A* (and it would also have to have been a request that
+>>> + =9A =9A =9A* did not time out).
+>>> + =9A =9A =9A*/
+>>> + =9A =9A while (cur_mid !=3D last_mid) {
+>>> =9A =9A =9A =9A =9A =9A =9A struct mid_q_entry *mid_entry;
+>>> =9A =9A =9A =9A =9A =9A =9A unsigned int num_mids;
+>>>
+>>> =9A =9A =9A =9A =9A =9A =9A collision =3D false;
+>>> - =9A =9A =9A =9A =9A =9A if (server->CurrentMid =3D=3D 0)
+>>> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A server->CurrentMid++;
+>>> + =9A =9A =9A =9A =9A =9A if (cur_mid =3D=3D 0)
+>>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A cur_mid++;
+>>>
+>>> =9A =9A =9A =9A =9A =9A =9A num_mids =3D 0;
+>>> =9A =9A =9A =9A =9A =9A =9A list_for_each_entry(mid_entry, &server-=
+>pending_mid_q, qhead) {
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A ++num_mids;
+>>> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A if (mid_entry->mid =3D=3D=
+ server->CurrentMid &&
+>>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A if (mid_entry->mid =3D=3D=
+ cur_mid &&
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A mid_entry->midS=
+tate =3D=3D MID_REQUEST_SUBMITTED) {
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A /* This=
+ mid is in use, try a different one */
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A collisi=
+on =3D true;
+>>> @@ -282,10 +289,11 @@ __u16 GetNextMid(struct TCP_Server_Info *serv=
+er)
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A server->tcpStatus =3D C=
+ifsNeedReconnect;
+>>>
+>>> =9A =9A =9A =9A =9A =9A =9A if (!collision) {
+>>> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A mid =3D server->CurrentMi=
+d;
+>>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A mid =3D (__u64)cur_mid;
+>>> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A server->CurrentMid =3D mi=
+d;
+>>> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A break;
+>>> =9A =9A =9A =9A =9A =9A =9A }
+>>> - =9A =9A =9A =9A =9A =9A server->CurrentMid++;
+>>> + =9A =9A =9A =9A =9A =9A cur_mid++;
+>>> =9A =9A =9A }
+>>> =9A =9A =9A spin_unlock(&GlobalMid_Lock);
+>>> =9A =9A =9A return mid;
 >>
->> @@ -1425,7 +1424,7 @@ cifs_readv_discard(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry *mid)
+>> Not directly related to this patch, but should we move all of these =
+mid
+>> operations under the req_lock instead of the GlobalMid_Lock? The glo=
+bal
+>> spinlock is a bottleneck and all of the structures involved should b=
+e
+>> per-server anyway.
 >>
->> =9A =9A =9A =9A =9A =9A =9A length =3D cifs_read_from_socket(server,=
- server->bigbuf,
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A min_t(un=
-signed int, remaining,
->> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A=
- =9A CIFSMaxBufSize + MAX_CIFS_HDR_SIZE));
->> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A=
- =9A CIFSMaxBufSize + max_header_size()));
->> =9A =9A =9A =9A =9A =9A =9A if (length < 0)
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A return length;
->> =9A =9A =9A =9A =9A =9A =9A server->total_read +=3D length;
->> @@ -1436,14 +1435,35 @@ cifs_readv_discard(struct TCP_Server_Info *s=
-erver, struct mid_q_entry *mid)
->> =9A =9A =9A return 0;
->> =9A}
+>> Anyway, I think this looks ok
 >>
->> +static inline size_t
->> +read_rsp_size(void)
->> +{
->> + =9A =9A return sizeof(READ_RSP);
->> +}
->> +
->> +static inline unsigned int
->> +read_data_offset(char *buf)
->> +{
->> + =9A =9A READ_RSP *rsp =3D (READ_RSP *)buf;
->> + =9A =9A return le16_to_cpu(rsp->DataOffset);
->> +}
->> +
->> +static inline unsigned int
->> +read_data_length(char *buf)
->> +{
->> + =9A =9A READ_RSP *rsp =3D (READ_RSP *)buf;
->> + =9A =9A return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
->> + =9A =9A =9A =9A =9A =9Ale16_to_cpu(rsp->DataLength);
->> +}
->> +
->> =9Astatic int
->> =9Acifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_e=
-ntry *mid)
->> =9A{
->> =9A =9A =9A int length, len;
->> =9A =9A =9A unsigned int data_offset, remaining, data_len;
->> =9A =9A =9A struct cifs_readdata *rdata =3D mid->callback_data;
->> - =9A =9A READ_RSP *rsp =3D (READ_RSP *)server->smallbuf;
->> - =9A =9A unsigned int rfclen =3D be32_to_cpu(rsp->hdr.smb_buf_lengt=
-h) + 4;
->> + =9A =9A char *buf =3D server->smallbuf;
->> + =9A =9A unsigned int buflen =3D get_rfc1002_length(buf) + 4;
->> =9A =9A =9A u64 eof;
->> =9A =9A =9A pgoff_t eof_index;
->> =9A =9A =9A struct page *page, *tpage;
->> @@ -1456,10 +1476,9 @@ cifs_readv_receive(struct TCP_Server_Info *se=
-rver, struct mid_q_entry *mid)
->> =9A =9A =9A =9A* can if there's not enough data. At this point, we'v=
-e read down to
->> =9A =9A =9A =9A* the Mid.
->> =9A =9A =9A =9A*/
->> - =9A =9A len =3D min_t(unsigned int, rfclen, sizeof(*rsp)) -
->> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A sizeof(struct smb_hdr) + 1=
-;
->> + =9A =9A len =3D min_t(unsigned int, buflen, read_rsp_size()) - hea=
-der_size() + 1;
->>
->> - =9A =9A rdata->iov[0].iov_base =3D server->smallbuf + sizeof(struc=
-t smb_hdr) - 1;
->> + =9A =9A rdata->iov[0].iov_base =3D buf + header_size() - 1;
->> =9A =9A =9A rdata->iov[0].iov_len =3D len;
->>
->> =9A =9A =9A length =3D cifs_readv_from_socket(server, rdata->iov, 1,=
- len);
->> @@ -1468,7 +1487,7 @@ cifs_readv_receive(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry *mid)
->> =9A =9A =9A server->total_read +=3D length;
->>
->> =9A =9A =9A /* Was the SMB read successful? */
->> - =9A =9A rdata->result =3D map_smb_to_linux_error(&rsp->hdr, false)=
-;
->> + =9A =9A rdata->result =3D map_smb_to_linux_error(buf, false);
->> =9A =9A =9A if (rdata->result !=3D 0) {
->> =9A =9A =9A =9A =9A =9A =9A cFYI(1, "%s: server returned error %d", =
-__func__,
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A rdata->result);
->> @@ -1476,14 +1495,14 @@ cifs_readv_receive(struct TCP_Server_Info *s=
-erver, struct mid_q_entry *mid)
->> =9A =9A =9A }
->>
->> =9A =9A =9A /* Is there enough to get to the rest of the READ_RSP he=
-ader? */
->> - =9A =9A if (server->total_read < sizeof(READ_RSP)) {
->> + =9A =9A if (server->total_read < read_rsp_size()) {
->> =9A =9A =9A =9A =9A =9A =9A cFYI(1, "%s: server returned short heade=
-r. got=3D%u expected=3D%zu",
->> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A __func__, server->total_re=
-ad, sizeof(READ_RSP));
->> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A __func__, server->total_re=
-ad, read_rsp_size());
->> =9A =9A =9A =9A =9A =9A =9A rdata->result =3D -EIO;
->> =9A =9A =9A =9A =9A =9A =9A return cifs_readv_discard(server, mid);
->> =9A =9A =9A }
->>
->> - =9A =9A data_offset =3D le16_to_cpu(rsp->DataOffset) + 4;
->> + =9A =9A data_offset =3D read_data_offset(buf) + 4;
->> =9A =9A =9A if (data_offset < server->total_read) {
->> =9A =9A =9A =9A =9A =9A =9A /*
->> =9A =9A =9A =9A =9A =9A =9A =9A* win2k8 sometimes sends an offset of=
- 0 when the read
->> @@ -1507,7 +1526,7 @@ cifs_readv_receive(struct TCP_Server_Info *ser=
-ver, struct mid_q_entry *mid)
->> =9A =9A =9A len =3D data_offset - server->total_read;
->> =9A =9A =9A if (len > 0) {
->> =9A =9A =9A =9A =9A =9A =9A /* read any junk before data into the re=
-st of smallbuf */
->> - =9A =9A =9A =9A =9A =9A rdata->iov[0].iov_base =3D server->smallbu=
-f + server->total_read;
->> + =9A =9A =9A =9A =9A =9A rdata->iov[0].iov_base =3D buf + server->t=
-otal_read;
->> =9A =9A =9A =9A =9A =9A =9A rdata->iov[0].iov_len =3D len;
->> =9A =9A =9A =9A =9A =9A =9A length =3D cifs_readv_from_socket(server=
-, rdata->iov, 1, len);
->> =9A =9A =9A =9A =9A =9A =9A if (length < 0)
->> @@ -1516,15 +1535,14 @@ cifs_readv_receive(struct TCP_Server_Info *s=
-erver, struct mid_q_entry *mid)
->> =9A =9A =9A }
->>
->> =9A =9A =9A /* set up first iov for signature check */
->> - =9A =9A rdata->iov[0].iov_base =3D server->smallbuf;
->> + =9A =9A rdata->iov[0].iov_base =3D buf;
->> =9A =9A =9A rdata->iov[0].iov_len =3D server->total_read;
->> =9A =9A =9A cFYI(1, "0: iov_base=3D%p iov_len=3D%zu",
->> =9A =9A =9A =9A =9A =9A =9A rdata->iov[0].iov_base, rdata->iov[0].io=
-v_len);
->>
->> =9A =9A =9A /* how much data is in the response? */
->> - =9A =9A data_len =3D le16_to_cpu(rsp->DataLengthHigh) << 16;
->> - =9A =9A data_len +=3D le16_to_cpu(rsp->DataLength);
->> - =9A =9A if (data_offset + data_len > rfclen) {
->> + =9A =9A data_len =3D read_data_length(buf);
->> + =9A =9A if (data_offset + data_len > buflen) {
->> =9A =9A =9A =9A =9A =9A =9A /* data_len is corrupt -- discard frame =
-*/
->> =9A =9A =9A =9A =9A =9A =9A rdata->result =3D -EIO;
->> =9A =9A =9A =9A =9A =9A =9A return cifs_readv_discard(server, mid);
->> @@ -1603,11 +1621,11 @@ cifs_readv_receive(struct TCP_Server_Info *s=
-erver, struct mid_q_entry *mid)
->>
->> =9A =9A =9A rdata->bytes =3D length;
->>
->> - =9A =9A cFYI(1, "total_read=3D%u rfclen=3D%u remaining=3D%u", serv=
-er->total_read,
->> - =9A =9A =9A =9A =9A =9A rfclen, remaining);
->> + =9A =9A cFYI(1, "total_read=3D%u buflen=3D%u remaining=3D%u", serv=
-er->total_read,
->> + =9A =9A =9A =9A =9A =9A buflen, remaining);
->>
->> =9A =9A =9A /* discard anything left over */
->> - =9A =9A if (server->total_read < rfclen)
->> + =9A =9A if (server->total_read < buflen)
->> =9A =9A =9A =9A =9A =9A =9A return cifs_readv_discard(server, mid);
->>
->> =9A =9A =9A dequeue_mid(mid, false);
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index 76cffc9..3d46493 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -338,18 +338,6 @@ requeue_echo:
->> =9A =9A =9A queue_delayed_work(system_nrt_wq, &server->echo, SMB_ECH=
-O_INTERVAL);
->> =9A}
->>
->> -static inline size_t
->> -header_size(void)
->> -{
->> - =9A =9A return sizeof(struct smb_hdr);
->> -}
->> -
->> -static inline size_t
->> -max_header_size(void)
->> -{
->> - =9A =9A return MAX_CIFS_HDR_SIZE;
->> -}
->> -
->> =9Astatic bool
->> =9Aallocate_buffers(struct TCP_Server_Info *server)
->> =9A{
->> diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
->> index 73e47e8..dd23a32 100644
->> --- a/fs/cifs/netmisc.c
->> +++ b/fs/cifs/netmisc.c
->> @@ -836,8 +836,9 @@ ntstatus_to_dos(__u32 ntstatus, __u8 *eclass, __=
-u16 *ecode)
->> =9A}
->>
->> =9Aint
->> -map_smb_to_linux_error(struct smb_hdr *smb, bool logErr)
->> +map_smb_to_linux_error(char *buf, bool logErr)
->> =9A{
->> + =9A =9A struct smb_hdr *smb =3D (struct smb_hdr *)buf;
->> =9A =9A =9A unsigned int i;
->> =9A =9A =9A int rc =3D -EIO; =9A/* if transport error smb error may =
-not be set */
->> =9A =9A =9A __u8 smberrclass;
+>> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 >
-> You're changing the prototype of the above function, but are not
-> changing both of the callers. If you expect to pass different pointer
-> types in there in the future, then it might be best to call it a void
-> pointer instead of a char?
+> The idea of a union for these two key fields is worth thinking about
+> more - any more opinions from others on this?
+>
 
-The first caller is cifs_readv_receive and it passes char pointer -
-ok. The second caller is cifs_check_receive - passes void pointer - ok
-too.
+I think our main goal is to make to code is cleaner as possible. If we
+change this to a union we can't use the same codepath for both
+protocols - more protocol specific code - harder to understand, fix
+bugs, etc.
+
 
 --=20
 Best regards,
