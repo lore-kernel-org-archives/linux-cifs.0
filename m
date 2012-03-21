@@ -1,35 +1,70 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Respect negotiated MaxMpxCount
-Date: Wed, 21 Mar 2012 20:48:34 +0400
-Message-ID: <CAKywueQMAxVByQArPFqDM45AQ3JKHE9wF4MXyuQ455AijYN02g@mail.gmail.com>
-References: <1332237309-9586-1-git-send-email-piastry@etersoft.ru>
-	<20120320063517.2de289cd@tlielax.poochiereds.net>
-	<CAH2r5msK5W0Gp7QGe2U9U89_eXKrxaJO-8aiftKUmDfNS14_Ag@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs: pull request for 3.4
+Date: Wed, 21 Mar 2012 11:56:29 -0500
+Message-ID: <CAH2r5mtyn-c-BokGYhJRWWJ4+hQf-qB7XUtsSuE7xc_rEVFi=g@mail.gmail.com>
+References: <20120319094558.1b6094b4@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=KOI8-R
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msK5W0Gp7QGe2U9U89_eXKrxaJO-8aiftKUmDfNS14_Ag-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20120319094558.1b6094b4-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-20 =CD=C1=D2=D4=C1 2012=9A=C7. 18:52 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
- Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
-> I like this better than my earlier patch.
->
-> I will try this in my test environment, but I don't have a Windows
-> Vista system or VM configured at the moment. =9AAnyone have a WIndows
-> Vista system to try this patch against? =9AIn particular large
-> sequential file copy (cp of file 500MB or larger) to server with
-> maxmpx 10 and maxworkitems at default value in the WIndows Vista
-> registry.
->
+=46YI - merged the first two. reviewing the others.
 
-tried it with ~400 MB file - everything went ok.
+Cleaned up checkpatch warning in first one before merging.
+
+On Mon, Mar 19, 2012 at 8:45 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> I think these patches have all been acked/reviewed for 3.4. You may
+> pull them when ready:
+>
+> The following changes since commit 762ad8a5330325b789cfb6dc896f81cf27=
+3ff4e9:
+>
+> =A0Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/sparc (2=
+012-03-13 18:39:28 -0700)
+>
+> are available in the git repository at:
+>
+> =A0git://git.samba.org/jlayton/linux.git cifs-3.4
+>
+> Jeff Layton (11):
+> =A0 =A0 =A0cifs: clean up call to cifs_dfs_release_automount_timer()
+> =A0 =A0 =A0cifs: clean up ordering in exit_cifs
+> =A0 =A0 =A0cifs: add new cifsiod_wq workqueue
+> =A0 =A0 =A0cifs: add pid field to cifs_writedata
+> =A0 =A0 =A0cifs: allow caller to specify completion op when allocatin=
+g writedata
+> =A0 =A0 =A0cifs: fix allocation in cifs_write_allocate_pages
+> =A0 =A0 =A0cifs: make cifsFileInfo_get return the cifsFileInfo pointe=
+r
+> =A0 =A0 =A0cifs: fix up get_numpages
+> =A0 =A0 =A0cifs: abstract out function to marshal up the iovec array =
+for async writes
+> =A0 =A0 =A0cifs: call cifs_update_eof with i_lock held
+> =A0 =A0 =A0cifs: convert cifs_iovec_write to use async writes
+>
+> =A0fs/cifs/cifsfs.c =A0 =A0| =A0 25 +++--
+> =A0fs/cifs/cifsglob.h =A0| =A0 =A07 +-
+> =A0fs/cifs/cifsproto.h | =A0 15 +++-
+> =A0fs/cifs/cifssmb.c =A0 | =A0 35 ++++---
+> =A0fs/cifs/connect.c =A0 | =A0 =A08 +-
+> =A0fs/cifs/file.c =A0 =A0 =A0| =A0271 +++++++++++++++++++++++++++++++=
+++------------------
+> =A0fs/cifs/misc.c =A0 =A0 =A0| =A0 =A02 +-
+> =A07 files changed, 235 insertions(+), 128 deletions(-)
+>
+>
+> --
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+
 
 --=20
-Best regards,
-Pavel Shilovsky.
+Thanks,
+
+Steve
