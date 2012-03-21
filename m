@@ -1,54 +1,80 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix issue mounting of DFS ROOT when redirecting from one domain controller to the next
-Date: Wed, 21 Mar 2012 06:30:40 -0400
-Message-ID: <1332325840-14906-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, thomas.hadig-O4KOoiensp/QT0dZR+AlfA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Subject: Inode link count on mounted Win98 shares
+Date: Wed, 21 Mar 2012 12:18:17 +0100
+Message-ID: <4F69B8F9.9020808@innominate.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch fixes an issue when cifs_mount receives a
-STATUS_BAD_NETWORK_NAME error during cifs_get_tcon but is able to
-continue after an DFS ROOT referral. In this case, the return code
-variable is not reset prior to trying to mount from the system referred
-to. Thus, is_path_accessible is not executed and the final DFS referral
-is not performed causing a mount error.
+Greetings,
 
-Use case: In DNS, example.com  resolves to the secondary AD server
-ad2.example.com Our primary domain controller is ad1.example.com and has
-a DFS redirection set up from \\ad1\share\Users to \\files\share\Users.
-Mounting \\example.com\share\Users fails.
+I want to make some CIFS shared drives accesible through a firewall. For 
+that sake, I have a CIFS shared drive on a Linux box (box0, kernel 
+2.6.27.57) which is accesible from outside the firewall. On the share on 
+that box I mount all the shared drives from within the firewall so that 
+they can be accessed from client-external.
 
-Regression introduced by commit 724d9f1.
+   client-external
+     172.16.1.2
+          |
+          |
+     172.16.1.1/24
+    box0 (router, firewall)
+     192.168.1.1/24
+          |
+   +------+-------+
+   |              |
+  win98          winxp
+192.168.1.2   192.168.1.3
 
-Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Signed-off-by: Thomas Hadig <thomas-O4KOoiensp/QT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+box0 exports a CIFS shared drive, say \\172.16.1.1\testshare, which 
+refers to local directory, /mnt/share. On /mnt/share I mount two further 
+shared drives, say win98 and winxp. Thus, the contents from win98 and 
+winxp become indirectly visible to the external network 
+(client-external) via 172.16.1.1.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index fff5e5d..6b3d919 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3371,7 +3371,7 @@ cifs_ra_pages(struct cifs_sb_info *cifs_sb)
- int
- cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- {
--	int rc = 0;
-+	int rc;
- 	int xid;
- 	struct cifs_ses *pSesInfo;
- 	struct cifs_tcon *tcon;
-@@ -3398,6 +3398,7 @@ try_mount_again:
- 		FreeXid(xid);
- 	}
- #endif
-+	rc = 0;
- 	tcon = NULL;
- 	pSesInfo = NULL;
- 	srvTcp = NULL;
+This works well if I mount \\172.16.1.1\testshare using a Linux-based 
+client-external. Everything works as expected and I can browse the 
+contents of both, winxp and win98. However, when I mount 
+\\172.16.1.1\testshare on a Windows machine, I am unable to browse the 
+contents of the win98 directory. While the winxp directory appears 
+correctly as a folder in the Windows Explorer, the win98 directory 
+appears as a zero byte file (even though it is mounted correctly on box0.)
+
+I tested the same setup using my local workstation (with Debian squeeze, 
+kernel 2.6.32-5) and came to the same observations. The only difference 
+I could find between the mounted winxp share and the win98 share on box0 
+is that the winxp mount point exhibits an inode link count of 1 after 
+being mounted while the win98 mount point has an inode link count of 0:
+
+root:/mnt/share# ls -l
+total 8
+(...)
+drwxr-xr-x 0 root root    0 Feb 23 01:39 win98
+drwxr-xr-x 1 root root    0 Mar 13 13:32 winxp
+
+I have tried pretty much every mount option and the behavior is always 
+the same.
+
+My questions are:
+1. Why do Windows 98 mounted shares show this behavior?
+2. Is there any way to correct this so as to be able to browse these 
+shares indirectly (as described) from a Windows PC?
+
+Any information would be highly appreciated!
+
+Kind regards,
+
 -- 
-1.7.7.6
+Federico Sauter / Firmware developer
+Innominate Security Technologies AG / protecting industrial networks
+tel: +49.30.921028-210 / fax: +49.30.921028-020
+Rudower Chaussee 13 / D-12489 Berlin / http://www.innominate.com/
+
+Register Court: AG Charlottenburg, HR B 81603
+Management Board: Dirk Seewald
+Chairman of the Supervisory Board: Christoph Leifer
