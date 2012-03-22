@@ -1,148 +1,144 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: use standard token parser for mount options
-Date: Wed, 21 Mar 2012 16:38:18 -0400
-Message-ID: <20120321163818.0418fd2c@redhat.com>
-References: <1331307197.10670.2.camel@localhost>
-	<20120321133855.52901c60@redhat.com>
-	<1332354787.2818.7.camel@localhost>
-	<20120321163051.0fa2c714@redhat.com>
-	<CAH2r5mt6NiZmF1JZPG2sZ7bwNFiWpxxQ9Q6OoJXC_st7+oUoZg@mail.gmail.com>
+From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Subject: Re: Inode link count on mounted Win98 shares
+Date: Thu, 22 Mar 2012 10:28:18 +0100
+Message-ID: <4F6AF0B2.1070403@innominate.com>
+References: <4F69B8F9.9020808@innominate.com>	<20120321132300.42a95d51@redhat.com> <CAKywueR4v0MVpL-LoNsyjcDgzV3Tp9hkOvK3gLOP9o-SkJX_bQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=KOI8-R;
+	format=flowed
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mt6NiZmF1JZPG2sZ7bwNFiWpxxQ9Q6OoJXC_st7+oUoZg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueR4v0MVpL-LoNsyjcDgzV3Tp9hkOvK3gLOP9o-SkJX_bQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 21 Mar 2012 15:33:57 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On 03/21/2012 07:24 PM, Pavel Shilovsky wrote:
+> 21 =CD=C1=D2=D4=C1 2012 =C7. 21:23 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
+ Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>  =CE=C1=D0=C9=D3=C1=CC:
+>> On Wed, 21 Mar 2012 12:18:17 +0100
+>> Federico Sauter<fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>  wrote:
+>>
+>>> Greetings,
+>>>
+>>> I want to make some CIFS shared drives accesible through a firewall=
+=2E For
+>>> that sake, I have a CIFS shared drive on a Linux box (box0, kernel
+>>> 2.6.27.57) which is accesible from outside the firewall. On the sha=
+re on
+>>> that box I mount all the shared drives from within the firewall so =
+that
+>>> they can be accessed from client-external.
+>>>
+>>>     client-external
+>>>       172.16.1.2
+>>>            |
+>>>            |
+>>>       172.16.1.1/24
+>>>      box0 (router, firewall)
+>>>       192.168.1.1/24
+>>>            |
+>>>     +------+-------+
+>>>     |              |
+>>>    win98          winxp
+>>> 192.168.1.2   192.168.1.3
+>>>
+>>> box0 exports a CIFS shared drive, say \\172.16.1.1\testshare, which
+>>> refers to local directory, /mnt/share. On /mnt/share I mount two fu=
+rther
+>>> shared drives, say win98 and winxp. Thus, the contents from win98 a=
+nd
+>>> winxp become indirectly visible to the external network
+>>> (client-external) via 172.16.1.1.
+>>>
+>>> This works well if I mount \\172.16.1.1\testshare using a Linux-bas=
+ed
+>>> client-external. Everything works as expected and I can browse the
+>>> contents of both, winxp and win98. However, when I mount
+>>> \\172.16.1.1\testshare on a Windows machine, I am unable to browse =
+the
+>>> contents of the win98 directory. While the winxp directory appears
+>>> correctly as a folder in the Windows Explorer, the win98 directory
+>>> appears as a zero byte file (even though it is mounted correctly on=
+ box0.)
+>>>
+>>> I tested the same setup using my local workstation (with Debian squ=
+eeze,
+>>> kernel 2.6.32-5) and came to the same observations. The only differ=
+ence
+>>> I could find between the mounted winxp share and the win98 share on=
+ box0
+>>> is that the winxp mount point exhibits an inode link count of 1 aft=
+er
+>>> being mounted while the win98 mount point has an inode link count o=
+f 0:
+>>>
+>>> root:/mnt/share# ls -l
+>>> total 8
+>>> (...)
+>>> drwxr-xr-x 0 root root    0 Feb 23 01:39 win98
+>>> drwxr-xr-x 1 root root    0 Mar 13 13:32 winxp
+>>>
+>>> I have tried pretty much every mount option and the behavior is alw=
+ays
+>>> the same.
+>>>
+>>> My questions are:
+>>> 1. Why do Windows 98 mounted shares show this behavior?
+>>> 2. Is there any way to correct this so as to be able to browse thes=
+e
+>>> shares indirectly (as described) from a Windows PC?
+>>>
+>>> Any information would be highly appreciated!
+>>>
+>>> Kind regards,
+>>>
+>>
+>> That sounds like whatever tool you are using to "browse" is broken.
+>> Just because the link count is 0 doesn't mean that it's a plain file=
+=2E
+>>
+>> The inode link count is provided by the server via the NumberOfLinks
+>> field in the QueryPathInfo response. What you are seeing here is jus=
+t an
+>> implementation difference between Linux and Windows. Linux usually h=
+as
+>> a non-zero inode link count on directories, but at least some versio=
+ns
+>> of windows will report a link count of 0 for a directory.
+>>
+>> As best I can tell -- neither one is more correct than the other.
+>> They're just differences in how this is implemented.
+>>
+>> Most likely, this will change in very recent kernels with Pavel's fi=
+x
+>> to have the client fake up i_nlink values for directories, once Stev=
+e
+>> gets around to merging it.
+>>
+>> --
+>> Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
+" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> It is already in mainline:
+>
+> http://git.samba.org/?p=3Dsfrench/cifs-2.6.git;a=3Dcommit;h=3D71fece9=
+511717750d86691e0f517ad04f3c8a801
+>
 
-> Sachin,
-> I am a little worried about merge conflicts - am about 1/3 of the way
-> through merging (and reviewing) Pavel's and similarly have started to
-> merge Jeff's patches, so make sure you rebase them on what is in
-> cifs-2.6.git tree on samba.org
->=20
-
-I applied Sachin's patch on top of Pavel's set and mine and it merged
-just fine...
-
-> On Wed, Mar 21, 2012 at 3:30 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wro=
-te:
-> > On Wed, 21 Mar 2012 18:33:07 +0000
-> > Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> >
-> >> On Wed, 2012-03-21 at 13:38 -0400, Jeff Layton wrote:
-> >> > On Fri, 09 Mar 2012 15:33:17 +0000
-> >> > Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> >> >
-> >> > > Use the standard token parser instead of the long if confidtio=
-n to parse
-> >> > > cifs mount options.
-> >> > >
-> >> > > This was first proposed by Scott Lovenberg
-> >> > > http://lists.samba.org/archive/linux-cifs-client/2010-May/0060=
-79.html
-> >> > >
-> >> > > Mount options have been grouped together in terms of their inp=
-ut types.
-> >> > > Aliases for username, password, domain and credentials have be=
-en added.
-> >> > > The password parser has been modified to make it easier to rea=
-d.
-> >> > >
-> >> > > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >> > >
-> >> >
-> >> >
-> >> > In testing this today, I found a problem. I tried to mount up a =
-share
-> >> > with sec=3Dnone as the options. With that, I got this error:
-> >> >
-> >> > =C2=A0 =C2=A0 CIFS: Unknown mount option pass=3D
-> >> >
-> >> > The problem is that the mount.cifs helper will pass a blank "pas=
-s=3D"
-> >> > option to the kernel. It seems like the standard option parser d=
-oesn't
-> >> > have a way to allow you to specify an optional argument. That ma=
-y need
-> >> > to be added in order for this to work.
-> >>
-> >>
-> >> We could use it in this manner.
-> >>
-> >> ----
-> >> Allow mount option pass to be a blank value.
-> >>
-> >> When using sec=3Dnone, the mount.cifs helper will pass a blank 'pa=
-ss=3D'
-> >> mount option. This should be handled by the parser.
-> >>
-> >> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >> ---
-> >> =C2=A0fs/cifs/connect.c | =C2=A0 =C2=A07 +++++++
-> >> =C2=A01 files changed, 7 insertions(+), 0 deletions(-)
-> >>
-> >> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> >> index 8f83ea0..831f242 100644
-> >> --- a/fs/cifs/connect.c
-> >> +++ b/fs/cifs/connect.c
-> >> @@ -107,6 +107,9 @@ enum {
-> >> =C2=A0 =C2=A0 =C2=A0 /* Mount options to be ignored */
-> >> =C2=A0 =C2=A0 =C2=A0 Opt_ignore,
-> >>
-> >> + =C2=A0 =C2=A0 /* Options which could be blank */
-> >> + =C2=A0 =C2=A0 Opt_blank_pass,
-> >> +
-> >> =C2=A0 =C2=A0 =C2=A0 Opt_err
-> >> =C2=A0};
-> >>
-> >> @@ -180,6 +183,7 @@ static const match_table_t cifs_mount_option_t=
-okens =3D {
-> >>
-> >> =C2=A0 =C2=A0 =C2=A0 { Opt_user, "user=3D%s" },
-> >> =C2=A0 =C2=A0 =C2=A0 { Opt_user, "username=3D%s" },
-> >> + =C2=A0 =C2=A0 { Opt_blank_pass, "pass=3D" },
-> >> =C2=A0 =C2=A0 =C2=A0 { Opt_pass, "pass=3D%s" },
-> >> =C2=A0 =C2=A0 =C2=A0 { Opt_pass, "password=3D%s" },
-> >> =C2=A0 =C2=A0 =C2=A0 { Opt_ip, "ip=3D%s" },
-> >> @@ -1546,6 +1550,9 @@ cifs_parse_mount_options(const char *mountda=
-ta, const char *devname,
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 }
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 vol->nullauth =3D 0;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 break;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 case Opt_blank_pass:
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 vol->password =3D NULL;
-> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 break;
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 case Opt_pass:
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 /* passwords have to be handled differently
-> >> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0* to allow the character used for deliminator
-> >
-> > ACK.
-> >
-> > Since Steve hasn't committed this yet, care to send a respin of the
-> > original? I don't think there are any others that require the abili=
-ty
-> > to handle a blank option, but we can always add that later if neede=
-d.
-> >
-> > --
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->=20
->=20
->=20
-
+Excellent! Thanks so much for the info!
 
 --=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+=46ederico Sauter / Firmware developer
+Innominate Security Technologies AG / protecting industrial networks
+tel: +49.30.921028-210 / fax: +49.30.921028-020
+Rudower Chaussee 13 / D-12489 Berlin / http://www.innominate.com/
+
+Register Court: AG Charlottenburg, HR B 81603
+Management Board: Dirk Seewald
+Chairman of the Supervisory Board: Christoph Leifer
