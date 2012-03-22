@@ -1,144 +1,118 @@
-From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
-Subject: Re: Inode link count on mounted Win98 shares
-Date: Thu, 22 Mar 2012 10:28:18 +0100
-Message-ID: <4F6AF0B2.1070403@innominate.com>
-References: <4F69B8F9.9020808@innominate.com>	<20120321132300.42a95d51@redhat.com> <CAKywueR4v0MVpL-LoNsyjcDgzV3Tp9hkOvK3gLOP9o-SkJX_bQ@mail.gmail.com>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 1/2] Define ENOAUTHSERVICE to indicate "Authentication service
+ unavailable"
+Date: Thu, 22 Mar 2012 13:35:32 +0000
+Message-ID: <20120322133531.23390.95890.stgit@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=KOI8-R;
-	format=flowed
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueR4v0MVpL-LoNsyjcDgzV3Tp9hkOvK3gLOP9o-SkJX_bQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steven Whitehouse <swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Steve Dickson <steved-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: torvalds-de/tnXTf+JLsfHDXvbKv3VaTQe2KTcn/@public.gmane.org
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On 03/21/2012 07:24 PM, Pavel Shilovsky wrote:
-> 21 =CD=C1=D2=D4=C1 2012 =C7. 21:23 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
- Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>  =CE=C1=D0=C9=D3=C1=CC:
->> On Wed, 21 Mar 2012 12:18:17 +0100
->> Federico Sauter<fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>  wrote:
->>
->>> Greetings,
->>>
->>> I want to make some CIFS shared drives accesible through a firewall=
-=2E For
->>> that sake, I have a CIFS shared drive on a Linux box (box0, kernel
->>> 2.6.27.57) which is accesible from outside the firewall. On the sha=
-re on
->>> that box I mount all the shared drives from within the firewall so =
-that
->>> they can be accessed from client-external.
->>>
->>>     client-external
->>>       172.16.1.2
->>>            |
->>>            |
->>>       172.16.1.1/24
->>>      box0 (router, firewall)
->>>       192.168.1.1/24
->>>            |
->>>     +------+-------+
->>>     |              |
->>>    win98          winxp
->>> 192.168.1.2   192.168.1.3
->>>
->>> box0 exports a CIFS shared drive, say \\172.16.1.1\testshare, which
->>> refers to local directory, /mnt/share. On /mnt/share I mount two fu=
-rther
->>> shared drives, say win98 and winxp. Thus, the contents from win98 a=
-nd
->>> winxp become indirectly visible to the external network
->>> (client-external) via 172.16.1.1.
->>>
->>> This works well if I mount \\172.16.1.1\testshare using a Linux-bas=
-ed
->>> client-external. Everything works as expected and I can browse the
->>> contents of both, winxp and win98. However, when I mount
->>> \\172.16.1.1\testshare on a Windows machine, I am unable to browse =
-the
->>> contents of the win98 directory. While the winxp directory appears
->>> correctly as a folder in the Windows Explorer, the win98 directory
->>> appears as a zero byte file (even though it is mounted correctly on=
- box0.)
->>>
->>> I tested the same setup using my local workstation (with Debian squ=
-eeze,
->>> kernel 2.6.32-5) and came to the same observations. The only differ=
-ence
->>> I could find between the mounted winxp share and the win98 share on=
- box0
->>> is that the winxp mount point exhibits an inode link count of 1 aft=
-er
->>> being mounted while the win98 mount point has an inode link count o=
-f 0:
->>>
->>> root:/mnt/share# ls -l
->>> total 8
->>> (...)
->>> drwxr-xr-x 0 root root    0 Feb 23 01:39 win98
->>> drwxr-xr-x 1 root root    0 Mar 13 13:32 winxp
->>>
->>> I have tried pretty much every mount option and the behavior is alw=
-ays
->>> the same.
->>>
->>> My questions are:
->>> 1. Why do Windows 98 mounted shares show this behavior?
->>> 2. Is there any way to correct this so as to be able to browse thes=
-e
->>> shares indirectly (as described) from a Windows PC?
->>>
->>> Any information would be highly appreciated!
->>>
->>> Kind regards,
->>>
->>
->> That sounds like whatever tool you are using to "browse" is broken.
->> Just because the link count is 0 doesn't mean that it's a plain file=
-=2E
->>
->> The inode link count is provided by the server via the NumberOfLinks
->> field in the QueryPathInfo response. What you are seeing here is jus=
-t an
->> implementation difference between Linux and Windows. Linux usually h=
-as
->> a non-zero inode link count on directories, but at least some versio=
-ns
->> of windows will report a link count of 0 for a directory.
->>
->> As best I can tell -- neither one is more correct than the other.
->> They're just differences in how this is implemented.
->>
->> Most likely, this will change in very recent kernels with Pavel's fi=
-x
->> to have the client fake up i_nlink values for directories, once Stev=
-e
->> gets around to merging it.
->>
->> --
->> Jeff Layton<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs=
-" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> It is already in mainline:
->
-> http://git.samba.org/?p=3Dsfrench/cifs-2.6.git;a=3Dcommit;h=3D71fece9=
-511717750d86691e0f517ad04f3c8a801
->
+As the kernel has or will have filesystems (and possibly other services) that
+want to obtain authentication tokens and/or encryption data on demand (via
+GSSAPI for example), it would seem useful to provide an additional error code
+to indicate a problem with the lookup, rather than overloading some other error
+code.
 
-Excellent! Thanks so much for the info!
+We already have EKEYREJECTED, EKEYREVOKED and EKEYEXPIRED to indicate problems
+with a token that we already have, but what if the authentication server just
+isn't available?
 
---=20
-=46ederico Sauter / Firmware developer
-Innominate Security Technologies AG / protecting industrial networks
-tel: +49.30.921028-210 / fax: +49.30.921028-020
-Rudower Chaussee 13 / D-12489 Berlin / http://www.innominate.com/
+Define ENOAUTHSERVICE to indicate "Authentication service unavailable".  This
+can be used to indicate, for example, that an attempt was made by request_key()
+to retrieve a key, but the authentication server (e.g. a KDC) it is supposed to
+contact didn't answer or that it couldn't determine the location of a suitable
+server.
 
-Register Court: AG Charlottenburg, HR B 81603
-Management Board: Dirk Seewald
-Chairman of the Supervisory Board: Christoph Leifer
+One way this can be used is that the user of a network filesystem could get a
+TGT from the KDC and stash it in their session keyring, then the filesystem can
+attempt to automatically get a ticket for accessing the filesystem - but if the
+server is uncontactable then the ticket can be negatively instantiated with
+KEYCTL_REJECT, giving the error to be handed to future requests as
+ENOAUTHSERVICE and a small timeout so that the key will expire from the cache
+and allow a retry after a short while to prevent thrashing.
+
+I envision that this error would primarily be generated by a kernel upcall for
+the kernel to then pass back to the original userspace caller.  The kernel
+itself might not actually pay any attention to it, except as a hint as to
+whether to retry.
+
+Signed-off-by: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Acked-by: Steven Whitehouse <swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Acked-by: Steve Dickson <steved-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Liked-by: Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+
+ arch/alpha/include/asm/errno.h  |    2 ++
+ arch/mips/include/asm/errno.h   |    1 +
+ arch/parisc/include/asm/errno.h |    1 +
+ arch/sparc/include/asm/errno.h  |    1 +
+ include/asm-generic/errno.h     |    1 +
+ 5 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/arch/alpha/include/asm/errno.h b/arch/alpha/include/asm/errno.h
+index e5f29ca..dce5fc9 100644
+--- a/arch/alpha/include/asm/errno.h
++++ b/arch/alpha/include/asm/errno.h
+@@ -124,4 +124,6 @@
+ 
+ #define EHWPOISON	139	/* Memory page has hardware error */
+ 
++#define	ENOAUTHSERVICE	140	/* Authentication service not available */
++
+ #endif
+diff --git a/arch/mips/include/asm/errno.h b/arch/mips/include/asm/errno.h
+index 6dcd358..67c46bd 100644
+--- a/arch/mips/include/asm/errno.h
++++ b/arch/mips/include/asm/errno.h
+@@ -122,6 +122,7 @@
+ #define	ERFKILL		167	/* Operation not possible due to RF-kill */
+ 
+ #define EHWPOISON	168	/* Memory page has hardware error */
++#define	ENOAUTHSERVICE	169	/* Authentication service not available */
+ 
+ #define EDQUOT		1133	/* Quota exceeded */
+ 
+diff --git a/arch/parisc/include/asm/errno.h b/arch/parisc/include/asm/errno.h
+index 135ad60..3a6ffcd 100644
+--- a/arch/parisc/include/asm/errno.h
++++ b/arch/parisc/include/asm/errno.h
+@@ -123,5 +123,6 @@
+ #define	ERFKILL		256	/* Operation not possible due to RF-kill */
+ 
+ #define EHWPOISON	257	/* Memory page has hardware error */
++#define	ENOAUTHSERVICE	258	/* Authentication service not available */
+ 
+ #endif
+diff --git a/arch/sparc/include/asm/errno.h b/arch/sparc/include/asm/errno.h
+index c351aba..94a878f 100644
+--- a/arch/sparc/include/asm/errno.h
++++ b/arch/sparc/include/asm/errno.h
+@@ -113,5 +113,6 @@
+ #define	ERFKILL		134	/* Operation not possible due to RF-kill */
+ 
+ #define EHWPOISON	135	/* Memory page has hardware error */
++#define	ENOAUTHSERVICE	136	/* Authentication service not available */
+ 
+ #endif
+diff --git a/include/asm-generic/errno.h b/include/asm-generic/errno.h
+index a1331ce..5e2b296 100644
+--- a/include/asm-generic/errno.h
++++ b/include/asm-generic/errno.h
+@@ -109,5 +109,6 @@
+ #define ERFKILL		132	/* Operation not possible due to RF-kill */
+ 
+ #define EHWPOISON	133	/* Memory page has hardware error */
++#define	ENOAUTHSERVICE	134	/* Authentication service not available */
+ 
+ #endif
