@@ -1,80 +1,76 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 00/16] Get SMB2 mount work
-Date: Mon, 26 Mar 2012 13:21:27 +0400
-Message-ID: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 02/16] CIFS: Introduce SMB2 mounts as vers=2
+Date: Mon, 26 Mar 2012 13:21:29 +0400
+Message-ID: <1332753703-4315-3-git-send-email-piastry@etersoft.ru>
+References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
+Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1332753703-4315-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the first SMB2 code specific patchset that enables experimental
-SMB2 support for cifs module. This patchset lets mount/stat work
-on SMB2 shares.
+From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-Also, it doesn't follow the "transport ops" approach we discussed with
-Jeff Layton recently in the list but this part can be easily modified
-further without big code changes.
+As with Linux nfs client, which uses "nfsvers=" or "vers=" to
+indicate which protocol to use for mount, specifying
 
-The reason why I am posting it in this way is due to the fact that
-I have already given much testing for this variant of the patchset
-and don't want to change things before the release.
+"vers=smb2" or "vers=2"
 
-I rebased this on top of Jeff's cifs-3.4 branch.
+will force an SMB2 mount. When vers is not specified CIFS is used
 
-Pavel Shilovsky (13):
-  CIFS: Check for SMB2 vs CIFS in find_tcp_session
-  CIFS: Add SMB2 status codes
-  CIFS: Make transport routines work with SMB2
-  CIFS: Add SMB2 credits support
-  CIFS: Make demultiplex_thread work with SMB2 code
-  CIFS: Respect SMB2 max hdr size for cifs_request kmem_cache
-  CIFS: Add capability to send SMB2 negotiate message
-  CIFS: Add session setup/logoff capability for SMB2
-  CIFS: Add tree connect/disconnect capability for SMB2
-  CIFS: Process reconnects for SMB2 shares
-  CIFS: Add SMB2 support for is_path_accessible
-  CIFS: Query SMB2 inode info
-  CIFS: Get SMB2 mount work
+ie "vers=cifs" or "vers=1"
 
-Steve French (3):
-  CIFS: Introduce SMB2 Kconfig option
-  CIFS: Introduce SMB2 mounts as vers=2
-  CIFS: Map SMB2 status codes to POSIX errors
+We can eventually autonegotiate down from SMB2 to CIFS
+when SMB2 is stable enough to make it the default, but this
+is for the future.  At that time we could also implement a
+"maxprotocol" mount option as smbclient and Samba have today,
+but that would be premature until SMB2 is stable.
 
- fs/cifs/Kconfig         |   20 +
- fs/cifs/Makefile        |    3 +
- fs/cifs/cifs_debug.c    |   27 +-
- fs/cifs/cifs_debug.h    |    1 +
- fs/cifs/cifs_unicode.c  |   59 ++
- fs/cifs/cifs_unicode.h  |    5 +-
- fs/cifs/cifsfs.c        |    7 +-
- fs/cifs/cifsglob.h      |   74 ++-
- fs/cifs/cifsproto.h     |   28 +-
- fs/cifs/cifssmb.c       |   27 +-
- fs/cifs/connect.c       |  213 +++++-
- fs/cifs/dir.c           |    6 +-
- fs/cifs/file.c          |    5 +-
- fs/cifs/inode.c         |  105 ++-
- fs/cifs/misc.c          |   96 +++-
- fs/cifs/ntlmssp.h       |   10 +
- fs/cifs/sess.c          |    8 +-
- fs/cifs/smb2glob.h      |   44 ++
- fs/cifs/smb2inode.c     |  183 +++++
- fs/cifs/smb2maperror.c  | 1829 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2misc.c      |  357 +++++++++
- fs/cifs/smb2pdu.c       | 1113 ++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h       |  556 ++++++++++++++
- fs/cifs/smb2proto.h     |   79 ++
- fs/cifs/smb2status.h    | 1782 +++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2transport.c |  151 ++++
- fs/cifs/transport.c     |  106 ++-
- 27 files changed, 6744 insertions(+), 150 deletions(-)
- create mode 100644 fs/cifs/smb2glob.h
- create mode 100644 fs/cifs/smb2inode.c
- create mode 100644 fs/cifs/smb2maperror.c
- create mode 100644 fs/cifs/smb2misc.c
- create mode 100644 fs/cifs/smb2pdu.c
- create mode 100644 fs/cifs/smb2pdu.h
- create mode 100644 fs/cifs/smb2proto.h
- create mode 100644 fs/cifs/smb2status.h
- create mode 100644 fs/cifs/smb2transport.c
+Intially the SMB2 Kconfig option will depend on "BROKEN"
+until the merge is complete, and then be "EXPERIMENTAL"
+When it is no longer experimental we can consider changing
+the default protocol to attempt first.
+
+Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |    3 +++
+ fs/cifs/connect.c  |    8 ++++++++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 4ff6313..9e28070 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -167,6 +167,9 @@ struct smb_vol {
+ 	umode_t file_mode;
+ 	umode_t dir_mode;
+ 	unsigned secFlg;
++#ifdef CONFIG_CIFS_SMB2
++	bool use_smb2:1; /* use SMB2 protocol rather than CIFS */
++#endif
+ 	bool retry:1;
+ 	bool intr:1;
+ 	bool setuids:1;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 9808154..955f0a3 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1856,6 +1856,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 			    strnicmp(string, "1", 1) == 0) {
+ 				/* This is the default */
+ 				break;
++			} else if (strnicmp(string, "smb2", 4) == 0 ||
++				   strnicmp(string, "2", 1) == 0) {
++#ifdef CONFIG_CIFS_SMB2
++				vol->use_smb2 = true;
++#else
++				cERROR(1, "SMB2 support not enabled");
++#endif /* CONFIG_CIFS_SMB2 */
++				break;
+ 			}
+ 			/* For all other value, error */
+ 			printk(KERN_WARNING "CIFS: Invalid version"
+-- 
+1.7.1
