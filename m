@@ -1,82 +1,80 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 03/16] CIFS: Check for SMB2 vs CIFS in find_tcp_session
-Date: Mon, 26 Mar 2012 13:21:30 +0400
-Message-ID: <1332753703-4315-4-git-send-email-piastry@etersoft.ru>
-References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 00/16] Get SMB2 mount work
+Date: Mon, 26 Mar 2012 13:21:27 +0400
+Message-ID: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1332753703-4315-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/cifsglob.h |    3 +++
- fs/cifs/connect.c  |   16 +++++++++++++++-
- 2 files changed, 18 insertions(+), 1 deletions(-)
+This is the first SMB2 code specific patchset that enables experimental
+SMB2 support for cifs module. This patchset lets mount/stat work
+on SMB2 shares.
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 9e28070..fbee8ef 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -267,6 +267,9 @@ struct TCP_Server_Info {
- 	char server_GUID[16];
- 	char sec_mode;
- 	bool session_estab; /* mark when very first sess is established */
-+#ifdef CONFIG_CIFS_SMB2
-+	bool is_smb2;	/* SMB2 not CIFS protocol negotiated */
-+#endif
- 	u16 dialect; /* dialect index that server chose */
- 	enum securityEnum secType;
- 	bool oplocks:1; /* enable oplocks */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 955f0a3..1fbc21f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1,7 +1,7 @@
- /*
-  *   fs/cifs/connect.c
-  *
-- *   Copyright (C) International Business Machines  Corp., 2002,2009
-+ *   Copyright (C) International Business Machines  Corp., 2002,2011
-  *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
-  *
-  *   This library is free software; you can redistribute it and/or modify
-@@ -2093,6 +2093,14 @@ static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
- 			   (struct sockaddr *)&vol->srcaddr))
- 		return 0;
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	if ((server->is_smb2 == true) && (vol->use_smb2 == false))
-+		return 0;
-+
-+	if ((server->is_smb2 == false) && (vol->use_smb2 == true))
-+		return 0;
-+#endif /* CONFIG_CIFS_SMB2 */
-+
- 	if (!match_port(server, addr))
- 		return 0;
- 
-@@ -2217,6 +2225,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 
- 	tcp_ses->noblocksnd = volume_info->noblocksnd;
- 	tcp_ses->noautotune = volume_info->noautotune;
-+	/* BB should we set this unconditionally now, especially for SMB2 */
- 	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
- 	tcp_ses->in_flight = 0;
- 	tcp_ses->credits = 1;
-@@ -2261,6 +2270,11 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		goto out_err_crypto_release;
- 	}
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	if (volume_info->use_smb2)
-+		tcp_ses->is_smb2 = true;
-+#endif /* CONFIG_CIFS_SMB2 */
-+
- 	/*
- 	 * since we're in a cifs function already, we know that
- 	 * this will succeed. No need for try_module_get().
--- 
-1.7.1
+Also, it doesn't follow the "transport ops" approach we discussed with
+Jeff Layton recently in the list but this part can be easily modified
+further without big code changes.
+
+The reason why I am posting it in this way is due to the fact that
+I have already given much testing for this variant of the patchset
+and don't want to change things before the release.
+
+I rebased this on top of Jeff's cifs-3.4 branch.
+
+Pavel Shilovsky (13):
+  CIFS: Check for SMB2 vs CIFS in find_tcp_session
+  CIFS: Add SMB2 status codes
+  CIFS: Make transport routines work with SMB2
+  CIFS: Add SMB2 credits support
+  CIFS: Make demultiplex_thread work with SMB2 code
+  CIFS: Respect SMB2 max hdr size for cifs_request kmem_cache
+  CIFS: Add capability to send SMB2 negotiate message
+  CIFS: Add session setup/logoff capability for SMB2
+  CIFS: Add tree connect/disconnect capability for SMB2
+  CIFS: Process reconnects for SMB2 shares
+  CIFS: Add SMB2 support for is_path_accessible
+  CIFS: Query SMB2 inode info
+  CIFS: Get SMB2 mount work
+
+Steve French (3):
+  CIFS: Introduce SMB2 Kconfig option
+  CIFS: Introduce SMB2 mounts as vers=2
+  CIFS: Map SMB2 status codes to POSIX errors
+
+ fs/cifs/Kconfig         |   20 +
+ fs/cifs/Makefile        |    3 +
+ fs/cifs/cifs_debug.c    |   27 +-
+ fs/cifs/cifs_debug.h    |    1 +
+ fs/cifs/cifs_unicode.c  |   59 ++
+ fs/cifs/cifs_unicode.h  |    5 +-
+ fs/cifs/cifsfs.c        |    7 +-
+ fs/cifs/cifsglob.h      |   74 ++-
+ fs/cifs/cifsproto.h     |   28 +-
+ fs/cifs/cifssmb.c       |   27 +-
+ fs/cifs/connect.c       |  213 +++++-
+ fs/cifs/dir.c           |    6 +-
+ fs/cifs/file.c          |    5 +-
+ fs/cifs/inode.c         |  105 ++-
+ fs/cifs/misc.c          |   96 +++-
+ fs/cifs/ntlmssp.h       |   10 +
+ fs/cifs/sess.c          |    8 +-
+ fs/cifs/smb2glob.h      |   44 ++
+ fs/cifs/smb2inode.c     |  183 +++++
+ fs/cifs/smb2maperror.c  | 1829 +++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2misc.c      |  357 +++++++++
+ fs/cifs/smb2pdu.c       | 1113 ++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h       |  556 ++++++++++++++
+ fs/cifs/smb2proto.h     |   79 ++
+ fs/cifs/smb2status.h    | 1782 +++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2transport.c |  151 ++++
+ fs/cifs/transport.c     |  106 ++-
+ 27 files changed, 6744 insertions(+), 150 deletions(-)
+ create mode 100644 fs/cifs/smb2glob.h
+ create mode 100644 fs/cifs/smb2inode.c
+ create mode 100644 fs/cifs/smb2maperror.c
+ create mode 100644 fs/cifs/smb2misc.c
+ create mode 100644 fs/cifs/smb2pdu.c
+ create mode 100644 fs/cifs/smb2pdu.h
+ create mode 100644 fs/cifs/smb2proto.h
+ create mode 100644 fs/cifs/smb2status.h
+ create mode 100644 fs/cifs/smb2transport.c
