@@ -1,71 +1,73 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] mount.cifs: add support for -s option
-Date: Sat, 24 Mar 2012 08:26:59 -0400
-Message-ID: <1332592019-8080-1-git-send-email-jlayton@samba.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH 01/16] CIFS: Introduce SMB2 Kconfig option
+Date: Mon, 26 Mar 2012 13:21:28 +0400
+Message-ID: <1332753703-4315-2-git-send-email-piastry@etersoft.ru>
+References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
+Cc: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1332753703-4315-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-autofs generally calls mount helpers with '-s'. Handle that the same
-way we do for NFS -- append ",sloppy" option to the mount options.
+From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 
-The kernel can look for that option to decide whether to ignore
-unknown mount options, warn, or error out.
+SMB2 is the followon to the CIFS (and SMB) protocols
+and the default for Windows since Windows Vista, and also
+now implemented by various non-Windows servers. SMB2
+is more secure, has various performance advantages, including
+larger i/o sizes, flow control, better caching model and more.
+SMB2 also resolves some scalability limits in the CIFS
+protocol and adds many new features while being much
+simpler (only a few dozen commands instead of hundreds)
+and since the protocol is clearer it is also more consistently
+implemented across servers and thus easier to optimize.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+After much discussion with Jeff Layton, Jeremy Allison
+and others at Connectathon, we decided to move the SMB2
+code from a distinct .ko and fstype into distinct
+C files that optionally build in cifs.ko. As a result
+the Kconfig gets simpler.
+
+To avoid destabilizing CIFS, the SMB2 code is going
+to be moved into its own experimental CONFIG_CIFS_SMB2 ifdef
+as it is merged and rereviewed. The changes to stable
+CIFS (builds with the SMB2 ifdef off) are expected to be
+fairly small.
+
+Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- mount.cifs.c |   10 +++++++++-
- 1 files changed, 9 insertions(+), 1 deletions(-)
+ fs/cifs/Kconfig |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 824cd3a..c0aea35 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1438,6 +1438,7 @@ static struct option longopts[] = {
- 	{"pass", 1, NULL, 'p'},
- 	{"credentials", 1, NULL, 'c'},
- 	{"port", 1, NULL, 'P'},
-+	{"sloppy", 0, NULL, 's'},
- 	{NULL, 0, NULL, 0}
- };
- 
-@@ -1863,6 +1864,7 @@ int main(int argc, char **argv)
- 	char *currentaddress, *nextaddress;
- 	int rc = 0;
- 	int already_uppercased = 0;
-+	int sloppy = 0;
- 	size_t options_size = MAX_OPTIONS_LEN;
- 	struct parsed_mount_info *parsed_info = NULL;
- 	pid_t pid;
-@@ -1900,7 +1902,7 @@ int main(int argc, char **argv)
- 	}
- 
- 	/* add sharename in opts string as unc= parm */
--	while ((c = getopt_long(argc, argv, "?fhno:rvVw",
-+	while ((c = getopt_long(argc, argv, "?fhno:rsvVw",
- 				longopts, NULL)) != -1) {
- 		switch (c) {
- 		case '?':
-@@ -1932,6 +1934,9 @@ int main(int argc, char **argv)
- 		case 'f':
- 			++parsed_info->fakemnt;
- 			break;
-+		case 's':
-+			++sloppy;
-+			break;
- 		default:
- 			fprintf(stderr, "unknown command-line option: %c\n", c);
- 			rc = mount_usage(stderr);
-@@ -2037,6 +2042,9 @@ mount_retry:
- 		strlcat(options, parsed_info->prefix, options_size);
- 	}
- 
-+	if (sloppy)
-+		strlcat(options, ",sloppy", options_size);
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index 2b243af..a08306a 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -158,3 +158,23 @@ config CIFS_NFSD_EXPORT
+ 	  depends on CIFS && EXPERIMENTAL && BROKEN
+ 	  help
+ 	   Allows NFS server to export a CIFS mounted share (nfsd over cifs)
 +
- 	if (parsed_info->verboseflag)
- 		fprintf(stderr, "%s kernel mount options: %s",
- 			thisprogram, options);
++config CIFS_SMB2
++	bool "SMB2 network file system support (EXPERIMENTAL)"
++	depends on EXPERIMENTAL && INET && BROKEN
++	select NLS
++	select KEYS
++	select FSCACHE
++	select DNS_RESOLVER
++
++	help
++	  This enables experimental support for the SMB2 (Server Message Block
++	  version 2) protocol. The SMB2 protocol is the successor to the
++	  popular CIFS and SMB network file sharing protocols. SMB2 is the
++	  native file sharing mechanism for recent versions of Windows
++	  operating systems (since Vista).  SMB2 enablement will eventually
++	  allow users better performance, security and features, than would be
++	  possible with cifs. Note that smb2 mount options also are simpler
++	  (compared to cifs) due to protocol improvements.
++
++	  Unless you are a developer or tester, say N.
 -- 
-1.7.7.6
+1.7.1
