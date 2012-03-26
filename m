@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 11/16] CIFS: Add session setup/logoff capability for SMB2
-Date: Mon, 26 Mar 2012 13:21:38 +0400
-Message-ID: <1332753703-4315-12-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 12/16] CIFS: Add tree connect/disconnect capability for SMB2
+Date: Mon, 26 Mar 2012 13:21:39 +0400
+Message-ID: <1332753703-4315-13-git-send-email-piastry@etersoft.ru>
 References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,400 +11,396 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    3 +
- fs/cifs/connect.c   |   14 +++-
- fs/cifs/ntlmssp.h   |   10 +++
- fs/cifs/sess.c      |    6 +-
- fs/cifs/smb2misc.c  |    5 +
- fs/cifs/smb2pdu.c   |  225 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   |   37 +++++++++
- fs/cifs/smb2proto.h |    3 +
- 8 files changed, 298 insertions(+), 5 deletions(-)
+ fs/cifs/cifs_unicode.c |   59 ++++++++++++++++++++
+ fs/cifs/cifs_unicode.h |    5 ++-
+ fs/cifs/cifsglob.h     |   11 ++++-
+ fs/cifs/connect.c      |   18 +++++-
+ fs/cifs/smb2pdu.c      |  142 +++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2pdu.h      |   57 +++++++++++++++++++
+ fs/cifs/smb2proto.h    |    4 ++
+ 7 files changed, 289 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 49f6a57..63eb795 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -450,6 +450,9 @@ struct cifs_ses {
- 	struct session_key auth_key;
- 	struct ntlmssp_auth *ntlmssp; /* ciphertext, flags, server challenge */
- 	bool need_reconnect:1; /* connection reset, uid now invalid */
-+#ifdef CONFIG_CIFS_SMB2
-+	__u16 session_flags;
-+#endif /* CONFIG_CIFS_SMB2 */
- };
- /* no more than one of the following three session flags may be set */
- #define CIFS_SES_NT4 1
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c59d051..46c203f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2427,7 +2427,12 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index fbb9da9..5fb7372 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -331,3 +331,62 @@ ctoUTF16_out:
+ 	return i;
+ }
  
- 	if (ses->status == CifsGood) {
- 		xid = GetXid();
--		CIFSSMBLogoff(xid, ses);
 +#ifdef CONFIG_CIFS_SMB2
-+		if (ses->server->is_smb2)
-+			SMB2_logoff(xid, ses);
-+		else
-+#endif
-+			CIFSSMBLogoff(xid, ses);
- 		_FreeXid(xid);
- 	}
- 	sesInfoFree(ses);
-@@ -4184,7 +4189,12 @@ int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
- 	cFYI(1, "Security Mode: 0x%x Capabilities: 0x%x TimeAdjust: %d",
- 		 server->sec_mode, server->capabilities, server->timeAdj);
- 
--	rc = CIFS_SessSetup(xid, ses, nls_info);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (ses->server->is_smb2)
-+		rc = SMB2_sess_setup(xid, ses, nls_info);
-+	else
-+#endif
-+		rc = CIFS_SessSetup(xid, ses, nls_info);
- 	if (rc) {
- 		cERROR(1, "Send error in SessSetup = %d", rc);
- 	} else {
-diff --git a/fs/cifs/ntlmssp.h b/fs/cifs/ntlmssp.h
-index 5d52e4a..848249f 100644
---- a/fs/cifs/ntlmssp.h
-+++ b/fs/cifs/ntlmssp.h
-@@ -126,3 +126,13 @@ typedef struct _AUTHENTICATE_MESSAGE {
- 	   do not set the version is present flag */
- 	char UserString[0];
- } __attribute__((packed)) AUTHENTICATE_MESSAGE, *PAUTHENTICATE_MESSAGE;
-+
 +/*
-+ * Size of the session key (crypto key encrypted with the password
++ * cifs_local_to_utf16_bytes - how long will a string be after conversion?
++ * @from - pointer to input string
++ * @maxbytes - don't go past this many bytes of input string
++ * @codepage - source codepage
++ *
++ * Walk a string and return the number of bytes that the string will
++ * be after being converted to the given charset, not including any null
++ * termination required. Don't walk past maxbytes in the source buffer.
 + */
 +
-+int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len, struct cifs_ses *ses);
-+void build_ntlmssp_negotiate_blob(unsigned char *pbuffer, struct cifs_ses *ses);
-+int build_ntlmssp_auth_blob(unsigned char *pbuffer, u16 *buflen,
-+			struct cifs_ses *ses,
-+			const struct nls_table *nls_cp);
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index f88fa4d..45b01bb 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -364,7 +364,7 @@ static int decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
- 	return rc;
- }
++static int
++cifs_local_to_utf16_bytes(const char *from, int len,
++			  const struct nls_table *codepage)
++{
++	int charlen;
++	int i;
++	wchar_t wchar_to;
++
++	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
++		charlen = codepage->char2uni(from, len, &wchar_to);
++		/* Failed conversion defaults to a question mark */
++		if (charlen < 1)
++			charlen = 1;
++	}
++	return 2 * i; /* UTF16 characters are two bytes */
++}
++
++/*
++ * cifs_strndup_to_utf16 - copy a string to wire format from the local codepage
++ * @src - source string
++ * @maxlen - don't walk past this many bytes in the source string
++ * @utf16_len - the length of the allocated string in bytes (including null)
++ * @codepage - source codepage
++ *
++ * Take a string convert it from the local codepage to UTF16 and
++ * put it in a new buffer. Returns a pointer to the new string or NULL on
++ * error.
++ */
++__le16 *
++cifs_strndup_to_utf16(const char *src, const int maxlen, int *utf16_len,
++		      const struct nls_table *codepage)
++{
++	int len;
++	__le16 *dst;
++
++	len = cifs_local_to_utf16_bytes(src, maxlen, codepage);
++	len += 2; /* NULL */
++	dst = kmalloc(len, GFP_KERNEL);
++	if (!dst) {
++		*utf16_len = 0;
++		return NULL;
++	}
++	cifs_strtoUTF16(dst, src, maxlen, codepage);
++	*utf16_len = len;
++	return dst;
++}
++#endif /* CONFIG_CIFS_SMB2 */
+diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+index a513a54..4e8f09c 100644
+--- a/fs/cifs/cifs_unicode.h
++++ b/fs/cifs/cifs_unicode.h
+@@ -82,9 +82,12 @@ int cifs_strtoUTF16(__le16 *, const char *, int, const struct nls_table *);
+ char *cifs_strndup_from_utf16(const char *src, const int maxlen,
+ 			      const bool is_unicode,
+ 			      const struct nls_table *codepage);
++#ifdef CONFIG_CIFS_SMB2
++extern __le16 *cifs_strndup_to_utf16(const char *src, const int maxlen,
++				     int *ucs_len, const struct nls_table *cp);
++#endif /* CONFIG_CIFS_SMB2 */
+ extern int cifsConvertToUTF16(__le16 *target, const char *source, int maxlen,
+ 			      const struct nls_table *cp, int mapChars);
+-
+ #endif
  
--static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
-+int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 				    struct cifs_ses *ses)
- {
- 	unsigned int tioffset; /* challenge message target info area */
-@@ -415,7 +415,7 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ /*
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 63eb795..0b680f6 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -474,7 +474,7 @@ struct cifs_tcon {
+ 	char treeName[MAX_TREE_SIZE + 1]; /* UNC name of resource in ASCII */
+ 	char *nativeFileSystem;
+ 	char *password;		/* for share-level security */
+-	__u16 tid;		/* The 2 byte tree id */
++	__u32 tid;		/* The 4 byte tree id */
+ 	__u16 Flags;		/* optional support bits */
+ 	enum statusEnum tidStatus;
+ #ifdef CONFIG_CIFS_STATS
+@@ -522,6 +522,7 @@ struct cifs_tcon {
+ 	FILE_SYSTEM_ATTRIBUTE_INFO fsAttrInfo; /* ok if fs name truncated */
+ 	FILE_SYSTEM_UNIX_INFO fsUnixInfo;
+ 	bool ipc:1;		/* set if connection to IPC$ eg for RPC/PIPES */
++	bool print:1;		/* set if connection to printer share */
+ 	bool retry:1;
+ 	bool nocase:1;
+ 	bool seal:1;      /* transport encryption for this mounted share */
+@@ -530,6 +531,14 @@ struct cifs_tcon {
+ 	bool local_lease:1; /* check leases (only) on local system not remote */
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
++	bool bad_network_name:1;
++#ifdef CONFIG_CIFS_SMB2
++	__u32 capabilities;
++	__u32 share_flags;
++	__u32 maximal_access;
++	__u32 vol_serial_number;
++	__le64 vol_create_time;
++#endif /* CONFIG_CIFS_SMB2 */
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	u64 resource_id;		/* server resource id */
+ 	struct fscache_cookie *fscache;	/* cookie for share */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 46c203f..e067af3 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2719,7 +2719,12 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
- /* We do not malloc the blob, it is passed in pbuffer, because
-    it is fixed size, and small, making this approach cleaner */
--static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
-+void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
- 					 struct cifs_ses *ses)
+ 	xid = GetXid();
+-	CIFSSMBTDis(xid, tcon);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		SMB2_tdis(xid, tcon);
++	else
++#endif
++		CIFSSMBTDis(xid, tcon);
+ 	_FreeXid(xid);
+ 
+ 	cifs_fscache_release_super_cookie(tcon);
+@@ -2730,7 +2735,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ static struct cifs_tcon *
+ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
  {
- 	NEGOTIATE_MESSAGE *sec_blob = (NEGOTIATE_MESSAGE *)pbuffer;
-@@ -451,7 +451,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
- /* We do not malloc the blob, it is passed in pbuffer, because its
-    maximum possible size is fixed and small, making this approach cleaner.
-    This function returns the length of the data in the blob */
--static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
-+int build_ntlmssp_auth_blob(unsigned char *pbuffer,
- 					u16 *buflen,
- 				   struct cifs_ses *ses,
- 				   const struct nls_table *nls_cp)
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 88918ac..4817fac 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -222,6 +222,11 @@ char *smb2_get_data_area_len(int *poff, int *plen, struct smb2_hdr *pSMB2)
- 		    ((struct smb2_negotiate_rsp *)pSMB2)->SecurityBufferLength);
- 		break;
- 	case SMB2_SESSION_SETUP:
-+		*poff = le16_to_cpu(
-+		  ((struct smb2_sess_setup_rsp *)pSMB2)->SecurityBufferOffset);
-+		*plen = le16_to_cpu(
-+		  ((struct smb2_sess_setup_rsp *)pSMB2)->SecurityBufferLength);
-+		break;
- 	case SMB2_CREATE:
- 	case SMB2_READ:
- 	case SMB2_QUERY_INFO:
+-	int rc, xid;
++	int rc = 0, xid;
+ 	struct cifs_tcon *tcon;
+ 
+ 	tcon = cifs_find_tcon(ses, volume_info->UNC);
+@@ -2770,7 +2775,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 	 * this TCon call and Unix SetFS as
+ 	 * we do on SessSetup and reconnect? */
+ 	xid = GetXid();
+-	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
++#ifdef CONFIG_CIFS_SMB2
++	if (ses->server->is_smb2)
++		rc = SMB2_tcon(xid, ses, volume_info->UNC, tcon,
++			       volume_info->local_nls);
++	else
++#endif
++		rc = CIFSTCon(xid, ses, volume_info->UNC, tcon,
++			      volume_info->local_nls);
+ 	FreeXid(xid);
+ 	cFYI(1, "CIFS Tcon rc = %d", rc);
+ 	if (rc)
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1a12e7f..28fbadc 100644
+index 28fbadc..71bf301 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -383,3 +383,228 @@ neg_exit:
- 	free_rsp_buf(resp_buftype, pSMB2r);
+@@ -166,8 +166,8 @@ smb2_hdr_assemble(struct smb2_hdr *buffer, __le16 smb2_cmd /* command */ ,
+ set_tcon_flags:
+ 	/* BB check following DFS flags BB */
+ 	/* BB do we have to add check for SHI1005_FLAGS_DFS_ROOT too? */
+-	/* if (tcon->share_flags & SHI1005_FLAGS_DFS)
+-		buffer->Flags |= SMB2_FLAGS_DFS_OPERATIONS; */
++	if (tcon->share_flags & SHI1005_FLAGS_DFS)
++		buffer->Flags |= SMB2_FLAGS_DFS_OPERATIONS;
+ 	/* BB how does SMB2 do case sensitive? */
+ 	/* if (tcon->nocase)
+ 		buffer->Flags |= SMBFLG_CASELESS; */
+@@ -608,3 +608,141 @@ SMB2_logoff(const int xid, struct cifs_ses *ses)
+ 	 */
  	return rc;
  }
 +
-+int
-+SMB2_sess_setup(unsigned int xid, struct cifs_ses *ses,
-+		const struct nls_table *nls_cp)
++static inline void cifs_stats_fail_inc(struct cifs_tcon *tcon, uint16_t code)
 +{
-+	struct smb2_sess_setup_req *pSMB2;
-+	struct smb2_sess_setup_rsp *pSMB2r = NULL;
-+	struct kvec iov[2];
-+	int rc = 0;
-+	int resp_buftype;
-+	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
-+	struct TCP_Server_Info *server;
-+	unsigned int sec_flags;
-+	u8 temp = 0;
-+	u16 blob_length = 0;
-+	char *security_blob;
-+	char *ntlmssp_blob = NULL;
-+	bool use_spnego = false; /* else use raw ntlmssp */
-+
-+	cFYI(1, "Session Setup");
-+
-+	if (ses->server)
-+		server = ses->server;
-+	else {
-+		rc = -EIO;
-+		return rc;
-+	}
-+
-+	/* if memory allocation is successful, caller of this function
-+	 * frees it.
-+	 */
-+	ses->ntlmssp = kmalloc(sizeof(struct ntlmssp_auth), GFP_KERNEL);
-+	if (!ses->ntlmssp)
-+		return -ENOMEM;
-+
-+	ses->server->secType = RawNTLMSSP;
-+
-+ssetup_ntlmssp_authenticate:
-+	if (phase == NtLmChallenge)
-+		phase = NtLmAuthenticate; /* if ntlmssp, now final phase */
-+
-+	rc = small_smb2_init(SMB2_SESSION_SETUP, NULL, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
-+
-+	/* if any of auth flags (ie not sign or seal) are overriden use them */
-+	if (ses->overrideSecFlg & (~(CIFSSEC_MUST_SIGN | CIFSSEC_MUST_SEAL)))
-+		sec_flags = ses->overrideSecFlg;  /* BB FIXME fix sign flags?*/
-+	else /* if override flags set only sign/seal OR them with global auth */
-+		sec_flags = global_secflags | ses->overrideSecFlg;
-+
-+	cFYI(1, "sec_flags 0x%x", sec_flags);
-+
-+	pSMB2->hdr.SessionId = 0; /* First session, not a reauthenticate */
-+	pSMB2->VcNumber = 0; /* MBZ */
-+	/* to enable echos and oplocks */
-+	pSMB2->hdr.CreditRequest = cpu_to_le16(3);
-+
-+	/* only one of SMB2 signing flags may be set in SMB2 request */
-+	if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN)
-+		temp = SMB2_NEGOTIATE_SIGNING_REQUIRED;
-+	else if (ses->server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED)
-+		temp = SMB2_NEGOTIATE_SIGNING_REQUIRED;
-+	else if (sec_flags & CIFSSEC_MAY_SIGN) /* MAY_SIGN is a single flag */
-+		temp = SMB2_NEGOTIATE_SIGNING_ENABLED;
-+
-+	pSMB2->SecurityMode = temp;
-+
-+	/* We only support the DFS cap (others are currently undefined) */
-+	pSMB2->Capabilities = cpu_to_le32(SMB2_GLOBAL_CAP_DFS
-+						& ses->server->capabilities);
-+	pSMB2->Channel = 0; /* MBZ */
-+	iov[0].iov_base = (char *)pSMB2;
-+	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length)
-+					+ 4 /* rfc1001 len */ - 1 /* pad */;
-+	if (phase == NtLmNegotiate) {
-+		ntlmssp_blob = kmalloc(sizeof(struct _NEGOTIATE_MESSAGE),
-+					GFP_KERNEL);
-+		if (ntlmssp_blob == NULL) {
-+			rc = -ENOMEM;
-+			goto ssetup_exit;
-+		}
-+
-+		build_ntlmssp_negotiate_blob(ntlmssp_blob, ses);
-+		if (use_spnego) {
-+			/* blob_length = build_spnego_ntlmssp_blob(
-+					&security_blob,
-+					sizeof(struct _NEGOTIATE_MESSAGE),
-+					ntlmssp_blob); */
-+			/* BB eventually need to add this */
-+			cERROR(1, "spnego not supported for SMB2 yet");
-+			rc = -EOPNOTSUPP;
-+			kfree(ntlmssp_blob);
-+			goto ssetup_exit;
-+		} else {
-+			blob_length = sizeof(struct _NEGOTIATE_MESSAGE);
-+			/* with raw NTLMSSP we don't encapsulate in SPNEGO */
-+			security_blob = ntlmssp_blob;
-+		}
-+	} else if (phase == NtLmAuthenticate) {
-+		pSMB2->hdr.SessionId = ses->Suid;
-+		ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
-+					GFP_KERNEL);
-+		if (ntlmssp_blob == NULL) {
-+			cERROR(1, "failed to malloc ntlmssp blob");
-+			rc = -ENOMEM;
-+			goto ssetup_exit;
-+		}
-+		rc = build_ntlmssp_auth_blob(ntlmssp_blob, &blob_length,
-+					ses, nls_cp);
-+		if (rc) {
-+			cFYI(1, "build_ntlmssp_auth_blob failed %d", rc);
-+			goto ssetup_exit; /* BB double check error handling */
-+		}
-+		if (use_spnego) {
-+			/* blob_length = build_spnego_ntlmssp_blob(
-+							&security_blob,
-+							blob_length,
-+							ntlmssp_blob); */
-+			cERROR(1, "spnego not supported for SMB2 yet");
-+			rc = -EOPNOTSUPP;
-+			kfree(ntlmssp_blob);
-+			goto ssetup_exit;
-+		} else {
-+			security_blob = ntlmssp_blob;
-+		}
-+	} else {
-+		cERROR(1, "illegal ntlmssp phase");
-+		rc = -EIO;
-+		goto ssetup_exit;
-+	}
-+
-+	/* Testing shows that buffer offset must be at location of Buffer[0] */
-+	pSMB2->SecurityBufferOffset = cpu_to_le16(
-+			sizeof(struct smb2_sess_setup_req) - 1 /* pad */
-+			- 4 /* rfc1001 len */);
-+	pSMB2->SecurityBufferLength = cpu_to_le16(blob_length);
-+	iov[1].iov_base = security_blob;
-+	iov[1].iov_len = blob_length;
-+
-+	pSMB2->hdr.smb2_buf_length =
-+		cpu_to_be32(be32_to_cpu(pSMB2->hdr.smb2_buf_length)
-+			    - 1 /* pad */ + blob_length);
-+
-+	/* BB add code to build os and lm fields */
-+
-+	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, 0);
-+
-+	kfree(security_blob);
-+	pSMB2r = (struct smb2_sess_setup_rsp *)iov[0].iov_base;
-+	if (pSMB2r->hdr.Status ==
-+			cpu_to_le32(STATUS_MORE_PROCESSING_REQUIRED)) {
-+		if (phase != NtLmNegotiate) {
-+			cERROR(1, "Unexpected more processing error");
-+			goto ssetup_exit;
-+		}
-+		if (offsetof(struct smb2_sess_setup_rsp, Buffer) - 4 !=
-+			le16_to_cpu(pSMB2r->SecurityBufferOffset)) {
-+			cERROR(1, "Invalid security buffer offset %d",
-+				    le16_to_cpu(pSMB2r->SecurityBufferOffset));
-+			rc = -EIO;
-+			goto ssetup_exit;
-+		}
-+
-+		/* NTLMSSP Negotiate sent now processing challenge (response) */
-+		phase = NtLmChallenge; /* process ntlmssp challenge */
-+		rc = 0; /* MORE_PROCESSING is not an error here but expected */
-+		ses->Suid = pSMB2r->hdr.SessionId;
-+		rc = decode_ntlmssp_challenge(pSMB2r->Buffer,
-+				le16_to_cpu(pSMB2r->SecurityBufferLength), ses);
-+	}
-+
-+	/* BB eventually add code for SPNEGO decoding of NtlmChallenge blob,
-+	   but at least the raw NTLMSSP case works */
-+
-+	/*
-+	 * No tcon so can't do
-+	 * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
-+	 */
-+	if (rc != 0)
-+		goto ssetup_exit;
-+
-+	if (pSMB2r == NULL) {
-+		rc = -EIO;
-+		goto ssetup_exit;
-+	}
-+
-+	ses->session_flags = le16_to_cpu(pSMB2r->SessionFlags);
-+ssetup_exit:
-+	free_rsp_buf(resp_buftype, pSMB2r);
-+
-+	/* if ntlmssp, and negotiate succeeded, proceed to authenticate phase */
-+	if ((phase == NtLmChallenge) && (rc == 0))
-+		goto ssetup_ntlmssp_authenticate;
-+	return rc;
++	/* cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[code]); */
 +}
 +
 +int
-+SMB2_logoff(const int xid, struct cifs_ses *ses)
++SMB2_tcon(unsigned int xid, struct cifs_ses *ses,
++	  const char *tree, struct cifs_tcon *tcon,
++	  const struct nls_table *cp)
 +{
-+	struct smb2_logoff_req *pSMB2; /* response is also trivial struct */
++	struct smb2_tree_connect_req *pSMB2;
++	struct smb2_tree_connect_rsp *pSMB2r = NULL;
++	struct kvec iov[2];
++	int rc = 0;
++	int resp_buftype;
++	int unc_path_len;
++	struct TCP_Server_Info *server;
++	__le16 *unc_path = NULL;
++
++	cFYI(1, "TCON");
++
++	if ((ses->server) && tree)
++		server = ses->server;
++	else
++		return -EIO;
++
++	if (tcon && tcon->bad_network_name)
++		return -ENOENT;
++
++	unc_path = cifs_strndup_to_utf16(tree, MAX_NAME /* BB find better */,
++					 &unc_path_len, cp);
++	if (unc_path == NULL)
++		return -ENOMEM;
++
++	if (unc_path_len < 2) {
++		kfree(unc_path);
++		return -EINVAL;
++	}
++
++	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &pSMB2);
++	if (rc) {
++		kfree(unc_path);
++		return rc;
++	}
++
++	iov[0].iov_base = (char *)pSMB2;
++	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length)
++					+ 4 /* rfc1001 len */ - 1 /* pad */;
++
++	/* Testing shows that buffer offset must be at location of Buffer[0] */
++	pSMB2->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req)
++			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
++	pSMB2->PathLength = cpu_to_le16(unc_path_len - 2);
++	iov[1].iov_base = unc_path;
++	iov[1].iov_len = unc_path_len;
++
++	pSMB2->hdr.smb2_buf_length =
++		cpu_to_be32(be32_to_cpu(pSMB2->hdr.smb2_buf_length)
++			    - 1 /* pad */ + unc_path_len);
++
++	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, 0);
++	pSMB2r = (struct smb2_tree_connect_rsp *)iov[0].iov_base;
++
++	if (rc != 0) {
++		cifs_stats_fail_inc(tcon, SMB2TREE_CONNECT);
++		tcon->need_reconnect = true;
++		goto tcon_exit;
++	}
++
++	if (pSMB2r == NULL) {
++		rc = -EIO;
++		goto tcon_exit;
++	}
++
++	if (pSMB2r->ShareType & SMB2_SHARE_TYPE_DISK)
++		cFYI(1, "connection to disk share");
++	else if (pSMB2r->ShareType & SMB2_SHARE_TYPE_PIPE) {
++		tcon->ipc = true;
++		cFYI(1, "connection to pipe share");
++	} else if (pSMB2r->ShareType & SMB2_SHARE_TYPE_PRINT) {
++		tcon->print = true;
++		cFYI(1, "connection to printer");
++	} else {
++		cERROR(1, "unknown share type %d", pSMB2r->ShareType);
++		rc = -EOPNOTSUPP;
++		goto tcon_exit;
++	}
++
++	tcon->share_flags = le32_to_cpu(pSMB2r->ShareFlags);
++	tcon->tidStatus = CifsGood;
++	tcon->need_reconnect = false;
++	tcon->tid = pSMB2r->hdr.TreeId;
++	if ((pSMB2r->Capabilities & SMB2_SHARE_CAP_DFS) &&
++	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
++		cERROR(1, "DFS capability contradicts DFS flag");
++
++	tcon->maximal_access = le32_to_cpu(pSMB2r->MaximalAccess);
++
++	strncpy(tcon->treeName, tree, MAX_TREE_SIZE);
++tcon_exit:
++	if (pSMB2r->hdr.Status == cpu_to_le32(STATUS_BAD_NETWORK_NAME)) {
++		cERROR(1, "BAD_NETWORK_NAME: %s", tree);
++		tcon->bad_network_name = true;
++	}
++	free_rsp_buf(resp_buftype, pSMB2r);
++	kfree(unc_path);
++
++	return rc;
++}
++
++int SMB2_tdis(const int xid, struct cifs_tcon *tcon)
++{
++	struct smb2_tree_disconnect_req *pSMB2; /* response is trivial */
 +	int rc = 0;
 +	struct TCP_Server_Info *server;
++	struct cifs_ses *ses = tcon->ses;
 +
-+	cFYI(1, "disconnect session %p", ses);
++	cFYI(1, "Tree Disconnect");
 +
 +	if (ses && (ses->server))
 +		server = ses->server;
 +	else
 +		return -EIO;
 +
-+	rc = small_smb2_init(SMB2_LOGOFF, NULL, (void **) &pSMB2);
++	if ((tcon->need_reconnect) || (tcon->ses->need_reconnect))
++		return 0;
++
++	rc = small_smb2_init(SMB2_TREE_DISCONNECT, tcon, (void **) &pSMB2);
 +	if (rc)
 +		return rc;
 +
-+	 /* since no tcon, smb2_init can not do this, so do here */
-+	pSMB2->hdr.SessionId = ses->Suid;
++	rc = SendReceiveNoRsp(xid, ses, (char *)&pSMB2->hdr, 0);
++	if (rc)
++		cifs_stats_fail_inc(tcon, SMB2TREE_DISCONNECT);
 +
-+	rc = SendReceiveNoRsp(xid, ses, (char *) &pSMB2->hdr, 0);
-+	/*
-+	 * No tcon so can't do
-+	 * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
-+	 */
 +	return rc;
 +}
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 65be640..3886266 100644
+index 3886266..b7d07ff 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -181,4 +181,41 @@ struct smb2_negotiate_rsp {
- 	__u8   Buffer[1];	/* variable length GSS security buffer */
+@@ -218,4 +218,61 @@ struct smb2_logoff_rsp {
+ 	__le16 Reserved;
  } __packed;
  
-+struct smb2_sess_setup_req {
++struct smb2_tree_connect_req {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 25 */
-+	__u8   VcNumber;
-+	__u8   SecurityMode;
-+	__le32 Capabilities;
-+	__le32 Channel;
-+	__le16 SecurityBufferOffset;
-+	__le16 SecurityBufferLength;
-+	__le64 PreviousSessionId;
-+	__u8   Buffer[1];	/* variable length GSS security buffer */
++	__le16 StructureSize;	/* Must be 9 */
++	__le16 Reserved;
++	__le16 PathOffset;
++	__le16 PathLength;
++	__u8   Buffer[1];	/* variable length */
 +} __packed;
 +
-+/* Currently defined SessionFlags */
-+#define SMB2_SESSION_FLAG_IS_GUEST	0x0001
-+#define SMB2_SESSION_FLAG_IS_NULL	0x0002
-+struct smb2_sess_setup_rsp {
++struct smb2_tree_connect_rsp {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 9 */
-+	__le16 SessionFlags;
-+	__le16 SecurityBufferOffset;
-+	__le16 SecurityBufferLength;
-+	__u8   Buffer[1];	/* variable length GSS security buffer */
++	__le16 StructureSize;	/* Must be 16 */
++	__u8   ShareType;  /* see below */
++	__u8   Reserved;
++	__le32 ShareFlags; /* see below */
++	__le32 Capabilities; /* see below */
++	__le32 MaximalAccess;
 +} __packed;
 +
-+struct smb2_logoff_req {
++/* Possible ShareType values */
++#define SMB2_SHARE_TYPE_DISK	0x01
++#define SMB2_SHARE_TYPE_PIPE	0x02
++#define	SMB2_SHARE_TYPE_PRINT	0x03
++
++/*
++ * Possible ShareFlags - exactly one and only one of the first 4 caching flags
++ * must be set (any of the remaining, SHI1005, flags may be set individually
++ * or in combination.
++ */
++#define SMB2_SHAREFLAG_MANUAL_CACHING			0x00000000
++#define SMB2_SHAREFLAG_AUTO_CACHING			0x00000010
++#define SMB2_SHAREFLAG_VDO_CACHING			0x00000020
++#define SMB2_SHAREFLAG_NO_CACHING			0x00000030
++#define SHI1005_FLAGS_DFS				0x00000001
++#define SHI1005_FLAGS_DFS_ROOT				0x00000002
++#define SHI1005_FLAGS_RESTRICT_EXCLUSIVE_OPENS		0x00000100
++#define SHI1005_FLAGS_FORCE_SHARED_DELETE		0x00000200
++#define SHI1005_FLAGS_ALLOW_NAMESPACE_CACHING		0x00000400
++#define SHI1005_FLAGS_ACCESS_BASED_DIRECTORY_ENUM	0x00000800
++#define SHI1005_FLAGS_FORCE_LEVELII_OPLOCK		0x00001000
++#define SHI1005_FLAGS_ENABLE_HASH			0x00002000
++
++/* Possible share capabilities */
++#define SMB2_SHARE_CAP_DFS	cpu_to_le32(0x00000008)
++
++struct smb2_tree_disconnect_req {
 +	struct smb2_hdr hdr;
 +	__le16 StructureSize;	/* Must be 4 */
 +	__le16 Reserved;
 +} __packed;
 +
-+struct smb2_logoff_rsp {
++struct smb2_tree_disconnect_rsp {
 +	struct smb2_hdr hdr;
 +	__le16 StructureSize;	/* Must be 4 */
 +	__le16 Reserved;
@@ -412,16 +408,17 @@ index 65be640..3886266 100644
 +
  #endif				/* _SMB2PDU_H */
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index bc283ff..ec12d6e 100644
+index ec12d6e..bb57de3 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -48,5 +48,8 @@ extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
-  *  are contained within these calls
-  */
- extern int SMB2_negotiate(unsigned int xid, struct cifs_ses *ses);
-+extern int SMB2_sess_setup(unsigned int xid, struct cifs_ses *ses,
-+			   const struct nls_table *nls_cp);
-+extern int SMB2_logoff(const int xid, struct cifs_ses *ses);
+@@ -51,5 +51,9 @@ extern int SMB2_negotiate(unsigned int xid, struct cifs_ses *ses);
+ extern int SMB2_sess_setup(unsigned int xid, struct cifs_ses *ses,
+ 			   const struct nls_table *nls_cp);
+ extern int SMB2_logoff(const int xid, struct cifs_ses *ses);
++extern int SMB2_tcon(unsigned int xid, struct cifs_ses *ses,
++		    const char *tree, struct cifs_tcon *tcon,
++		    const struct nls_table *);
++extern int SMB2_tdis(const int xid, struct cifs_tcon *tcon);
  
  #endif			/* _SMB2PROTO_H */
 -- 
