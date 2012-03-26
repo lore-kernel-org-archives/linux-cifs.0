@@ -1,106 +1,118 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 16/16] CIFS: Get SMB2 mount work
-Date: Mon, 26 Mar 2012 13:21:43 +0400
-Message-ID: <1332753703-4315-17-git-send-email-piastry@etersoft.ru>
-References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: silence compiler warnings showing up with gcc-4.7.0
+Date: Mon, 26 Mar 2012 09:55:29 -0400
+Message-ID: <1332770129-23118-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1332753703-4315-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-by disabling DFS, prefixpath and ipc functions.
+gcc-4.7.0 has started throwing these warnings when building cifs.ko.
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+  CC [M]  fs/cifs/cifssmb.o
+fs/cifs/cifssmb.c: In function =E2=80=98CIFSSMBSetCIFSACL=E2=80=99:
+fs/cifs/cifssmb.c:3905:9: warning: array subscript is above array bound=
+s [-Warray-bounds]
+fs/cifs/cifssmb.c: In function =E2=80=98CIFSSMBSetFileInfo=E2=80=99:
+fs/cifs/cifssmb.c:5711:8: warning: array subscript is above array bound=
+s [-Warray-bounds]
+fs/cifs/cifssmb.c: In function =E2=80=98CIFSSMBUnixSetFileInfo=E2=80=99=
+:
+fs/cifs/cifssmb.c:6001:25: warning: array subscript is above array boun=
+ds [-Warray-bounds]
+
+This patch cleans up the code a bit by using the offsetof macro instead
+of the funky "&pSMB->hdr.Protocol" construct.
+
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c |   29 +++++++++++++++++++++++++----
- fs/cifs/inode.c   |   16 +++++++++++++---
- 2 files changed, 38 insertions(+), 7 deletions(-)
+ fs/cifs/cifssmb.c |   24 ++++++++++++------------
+ 1 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 77e6520..8a9bd44 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -523,7 +523,14 @@ cifs_echo_request(struct work_struct *work)
- 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
- 		goto requeue_echo;
- 
--	rc = CIFSSMBEcho(server);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (server->is_smb2)
-+		/* temporarilly disable echo requests for SMB2 */
-+		rc = 0;
-+	else
-+#endif
-+		rc = CIFSSMBEcho(server);
-+
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 8fecc99..f52c5ab 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -3892,13 +3892,12 @@ CIFSSMBSetCIFSACL(const int xid, struct cifs_tc=
+on *tcon, __u16 fid,
+ 	int rc =3D 0;
+ 	int bytes_returned =3D 0;
+ 	SET_SEC_DESC_REQ *pSMB =3D NULL;
+-	NTRANSACT_RSP *pSMBr =3D NULL;
++	void *pSMBr;
+=20
+ setCifsAclRetry:
+-	rc =3D smb_init(SMB_COM_NT_TRANSACT, 19, tcon, (void **) &pSMB,
+-			(void **) &pSMBr);
++	rc =3D smb_init(SMB_COM_NT_TRANSACT, 19, tcon, (void **) &pSMB, &pSMB=
+r);
  	if (rc)
- 		cFYI(1, "Unable to send echo request to server: %s",
- 			server->hostname);
-@@ -2940,6 +2947,12 @@ get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
- 	char *temp_unc;
- 	int rc = 0;
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	if (pSesInfo->server->is_smb2) {
-+		/* add missing smb2 dfs code here */
-+		return -EREMOTE;
-+	}
-+#endif
- 	*pnum_referrals = 0;
- 	*preferrals = NULL;
- 
-@@ -3846,10 +3859,18 @@ try_mount_again:
- 		tcon->unix_ext = 0; /* server does not support them */
- 
- 	/* do not care if following two calls succeed - informational */
--	if (!tcon->ipc) {
--		CIFSSMBQFSDeviceInfo(xid, tcon);
--		CIFSSMBQFSAttributeInfo(xid, tcon);
-+#ifdef CONFIG_CIFS_SMB2
-+	if (tcon->ses->server->is_smb2) {
-+		/* add missing calls here */
-+	} else {
-+#endif
-+		if (!tcon->ipc) {
-+			CIFSSMBQFSDeviceInfo(xid, tcon);
-+			CIFSSMBQFSAttributeInfo(xid, tcon);
-+		}
-+#ifdef CONFIG_CIFS_SMB2
- 	}
-+#endif
- 
- 	cifs_sb->wsize = cifs_negotiate_wsize(tcon, volume_info);
- 	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index ad0b7b7..182adf2 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -780,12 +780,22 @@ char *cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
- 
- 	/* if no prefix path, simply set path to the root of share to "" */
- 	if (pplen == 0) {
--		full_path = kmalloc(1, GFP_KERNEL);
--		if (full_path)
--			full_path[0] = 0;
-+		int len = 1;
-+#ifdef CONFIG_CIFS_SMB2
-+		if (vol->use_smb2)
-+			len = 2;
-+#endif
-+		full_path = kzalloc(len, GFP_KERNEL);
- 		return full_path;
- 	}
- 
-+#ifdef CONFIG_CIFS_SMB2
-+	if (vol->use_smb2) {
-+		cERROR(1, "prefixpath is not supported for smb2 now");
-+		return NULL;
-+	}
-+#endif
+-			return (rc);
++		return rc;
+=20
+ 	pSMB->MaxSetupCount =3D 0;
+ 	pSMB->Reserved =3D 0;
+@@ -3926,9 +3925,8 @@ setCifsAclRetry:
+ 	pSMB->AclFlags =3D cpu_to_le32(aclflag);
+=20
+ 	if (pntsd && acllen) {
+-		memcpy((char *) &pSMBr->hdr.Protocol + data_offset,
+-			(char *) pntsd,
+-			acllen);
++		memcpy((char *)pSMBr + offsetof(struct smb_hdr, Protocol) +
++				data_offset, pntsd, acllen);
+ 		inc_rfc1001_len(pSMB, byte_count + data_count);
+ 	} else
+ 		inc_rfc1001_len(pSMB, byte_count);
+@@ -5708,7 +5706,8 @@ CIFSSMBSetFileInfo(const int xid, struct cifs_tco=
+n *tcon,
+ 	param_offset =3D offsetof(struct smb_com_transaction2_sfi_req, Fid) -=
+ 4;
+ 	offset =3D param_offset + params;
+=20
+-	data_offset =3D (char *) (&pSMB->hdr.Protocol) + offset;
++	data_offset =3D (char *)pSMB +
++			offsetof(struct smb_hdr, Protocol) + offset;
+=20
+ 	count =3D sizeof(FILE_BASIC_INFO);
+ 	pSMB->MaxParameterCount =3D cpu_to_le16(2);
+@@ -5977,7 +5976,7 @@ CIFSSMBUnixSetFileInfo(const int xid, struct cifs=
+_tcon *tcon,
+ 		       u16 fid, u32 pid_of_opener)
+ {
+ 	struct smb_com_transaction2_sfi_req *pSMB  =3D NULL;
+-	FILE_UNIX_BASIC_INFO *data_offset;
++	char *data_offset;
+ 	int rc =3D 0;
+ 	u16 params, param_offset, offset, byte_count, count;
+=20
+@@ -5999,8 +5998,9 @@ CIFSSMBUnixSetFileInfo(const int xid, struct cifs=
+_tcon *tcon,
+ 	param_offset =3D offsetof(struct smb_com_transaction2_sfi_req, Fid) -=
+ 4;
+ 	offset =3D param_offset + params;
+=20
+-	data_offset =3D (FILE_UNIX_BASIC_INFO *)
+-				((char *)(&pSMB->hdr.Protocol) + offset);
++	data_offset =3D (char *)pSMB +
++			offsetof(struct smb_hdr, Protocol) + offset;
 +
- 	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
- 		dfsplen = strnlen(tcon->treeName, MAX_TREE_SIZE + 1);
- 	else
--- 
-1.7.1
+ 	count =3D sizeof(FILE_UNIX_BASIC_INFO);
+=20
+ 	pSMB->MaxParameterCount =3D cpu_to_le16(2);
+@@ -6022,7 +6022,7 @@ CIFSSMBUnixSetFileInfo(const int xid, struct cifs=
+_tcon *tcon,
+ 	inc_rfc1001_len(pSMB, byte_count);
+ 	pSMB->ByteCount =3D cpu_to_le16(byte_count);
+=20
+-	cifs_fill_unix_set_info(data_offset, args);
++	cifs_fill_unix_set_info((FILE_UNIX_BASIC_INFO *)data_offset, args);
+=20
+ 	rc =3D SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, 0);
+ 	if (rc)
+--=20
+1.7.7.6
