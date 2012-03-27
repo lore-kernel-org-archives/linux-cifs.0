@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v3 3/5] CIFS: Separate protocol specific lock type handling
-Date: Tue, 27 Mar 2012 15:38:37 +0400
-Message-ID: <1332848319-6483-4-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v3 2/5] CIFS: Convert lock type to 32 bit variable
+Date: Tue, 27 Mar 2012 15:38:36 +0400
+Message-ID: <1332848319-6483-3-git-send-email-piastry@etersoft.ru>
 References: <1332848319-6483-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,135 +9,85 @@ In-Reply-To: <1332848319-6483-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+to handle SMB2 lock type field further.
+
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/file.c |   48 +++++++++++++++++++++++++++++++++++++-----------
- 1 files changed, 37 insertions(+), 11 deletions(-)
+ fs/cifs/cifsglob.h |    2 +-
+ fs/cifs/file.c     |   13 +++++++------
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 4e095ae..16b5b19 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -547,7 +547,7 @@ struct cifsLockInfo {
+ 	__u64 offset;
+ 	__u64 length;
+ 	__u32 pid;
+-	__u8 type;
++	__u32 type;
+ };
+ 
+ /*
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 2e541f0..6e72b1f 100644
+index cc54033..2e541f0 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -684,6 +684,30 @@ cifs_locks_delete_block(struct file_lock *waiter)
- 	unlock_flocks();
+@@ -965,7 +965,8 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 			cur->OffsetHigh = cpu_to_le32((u32)(li->offset>>32));
+ 			if (++num == max_num) {
+ 				stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
+-						       li->type, 0, num, buf);
++						       (__u8)li->type, 0, num,
++						       buf);
+ 				if (stored_rc)
+ 					rc = stored_rc;
+ 				cur = buf;
+@@ -976,7 +977,7 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 
+ 		if (num) {
+ 			stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
+-					       types[i], 0, num, buf);
++					       (__u8)types[i], 0, num, buf);
+ 			if (stored_rc)
+ 				rc = stored_rc;
+ 		}
+@@ -1120,7 +1121,7 @@ cifs_push_locks(struct cifsFileInfo *cfile)
  }
  
-+static inline __u32
-+large_lock_type(void)
-+{
-+	return LOCKING_ANDX_LARGE_FILES;
-+}
-+
-+static inline __u32
-+exclusive_lock_type(void)
-+{
-+	return 0;
-+}
-+
-+static inline __u32
-+shared_lock_type(void)
-+{
-+	return LOCKING_ANDX_SHARED_LOCK;
-+}
-+
-+static inline __u32
-+unlock_lock_type(void)
-+{
-+	return 0;
-+}
-+
- static bool
- __cifs_find_fid_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
- 			      __u64 length, __u8 type, __u16 netfid,
-@@ -695,7 +719,7 @@ __cifs_find_fid_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
- 		if (offset + length <= li->offset ||
- 		    offset >= li->offset + li->length)
- 			continue;
--		else if ((type & LOCKING_ANDX_SHARED_LOCK) &&
-+		else if ((type & shared_lock_type()) &&
- 			 ((netfid == cfile->netfid && current->tgid == li->pid)
- 			 || type == li->type))
- 			continue;
-@@ -764,7 +788,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
- 		flock->fl_start = conf_lock->offset;
- 		flock->fl_end = conf_lock->offset + conf_lock->length - 1;
- 		flock->fl_pid = conf_lock->pid;
--		if (conf_lock->type & LOCKING_ANDX_SHARED_LOCK)
-+		if (conf_lock->type & shared_lock_type())
- 			flock->fl_type = F_RDLCK;
- 		else
- 			flock->fl_type = F_WRLCK;
-@@ -1141,24 +1165,27 @@ cifs_read_flock(struct file_lock *flock, __u32 *type, int *lock, int *unlock,
- 	    (~(FL_POSIX | FL_FLOCK | FL_SLEEP | FL_ACCESS | FL_LEASE)))
- 		cFYI(1, "Unknown lock flags 0x%x", flock->fl_flags);
+ static void
+-cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
++cifs_read_flock(struct file_lock *flock, __u32 *type, int *lock, int *unlock,
+ 		bool *wait_flag)
+ {
+ 	if (flock->fl_flags & FL_POSIX)
+@@ -1164,7 +1165,7 @@ cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
+ }
  
--	*type = LOCKING_ANDX_LARGE_FILES;
-+	*type = large_lock_type();
- 	if (flock->fl_type == F_WRLCK) {
- 		cFYI(1, "F_WRLCK ");
-+		*type |= exclusive_lock_type();
- 		*lock = 1;
- 	} else if (flock->fl_type == F_UNLCK) {
- 		cFYI(1, "F_UNLCK");
-+		*type |= unlock_lock_type();
- 		*unlock = 1;
- 		/* Check if unlock includes more than one lock range */
- 	} else if (flock->fl_type == F_RDLCK) {
- 		cFYI(1, "F_RDLCK");
--		*type |= LOCKING_ANDX_SHARED_LOCK;
-+		*type |= shared_lock_type();
- 		*lock = 1;
- 	} else if (flock->fl_type == F_EXLCK) {
- 		cFYI(1, "F_EXLCK");
-+		*type |= exclusive_lock_type();
- 		*lock = 1;
- 	} else if (flock->fl_type == F_SHLCK) {
- 		cFYI(1, "F_SHLCK");
--		*type |= LOCKING_ANDX_SHARED_LOCK;
-+		*type |= shared_lock_type();
- 		*lock = 1;
- 	} else
- 		cFYI(1, "Unknown type of lock");
-@@ -1181,7 +1208,7 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
- 		if (!rc)
- 			return rc;
+ static int
+-cifs_getlk(struct file *file, struct file_lock *flock, __u8 type,
++cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
+ 	   bool wait_flag, bool posix_lck, int xid)
+ {
+ 	int rc = 0;
+@@ -1352,7 +1353,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock, int xid)
+ }
  
--		if (type & LOCKING_ANDX_SHARED_LOCK)
-+		if (type & shared_lock_type())
- 			posix_lock_type = CIFS_RDLCK;
- 		else
- 			posix_lock_type = CIFS_WRLCK;
-@@ -1209,19 +1236,18 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
- 		return 0;
- 	}
+ static int
+-cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
++cifs_setlk(struct file *file,  struct file_lock *flock, __u32 type,
+ 	   bool wait_flag, bool posix_lck, int lock, int unlock, int xid)
+ {
+ 	int rc = 0;
+@@ -1423,7 +1424,7 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	struct cifsInodeInfo *cinode;
+ 	struct cifsFileInfo *cfile;
+ 	__u16 netfid;
+-	__u8 type;
++	__u32 type;
  
--	if (type & LOCKING_ANDX_SHARED_LOCK) {
-+	if (type & shared_lock_type()) {
- 		flock->fl_type = F_WRLCK;
- 		return 0;
- 	}
- 
- 	rc = CIFSSMBLock(xid, tcon, netfid, current->tgid, length,
- 			 flock->fl_start, 0, 1,
--			 type | LOCKING_ANDX_SHARED_LOCK, 0, 0);
-+			 type | shared_lock_type(), 0, 0);
- 	if (rc == 0) {
- 		rc = CIFSSMBLock(xid, tcon, netfid, current->tgid,
- 				 length, flock->fl_start, 1, 0,
--				 type | LOCKING_ANDX_SHARED_LOCK,
--				 0, 0);
-+				 type | shared_lock_type(), 0, 0);
- 		flock->fl_type = F_RDLCK;
- 		if (rc != 0)
- 			cERROR(1, "Error unlocking previously locked "
-@@ -1369,7 +1395,7 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u32 type,
- 		if (!rc || rc < 0)
- 			return rc;
- 
--		if (type & LOCKING_ANDX_SHARED_LOCK)
-+		if (type & shared_lock_type())
- 			posix_lock_type = CIFS_RDLCK;
- 		else
- 			posix_lock_type = CIFS_WRLCK;
+ 	rc = -EACCES;
+ 	xid = GetXid();
 -- 
 1.7.1
