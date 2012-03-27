@@ -1,85 +1,92 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Add missed forcemand mount option
-Date: Tue, 27 Mar 2012 21:17:23 +0400
-Message-ID: <CAKywueT3Hoce-HrR14KamF2rhW4rjb-8PodejLEABNdmVZAhfA@mail.gmail.com>
-References: <1332867075-3231-1-git-send-email-piastry@etersoft.ru>
-	<20120327130715.39682caa@tlielax.poochiereds.net>
+Subject: Re: [PATCH v2 0/6] Prepare byte-range locking code for future SMB2 usage
+Date: Tue, 27 Mar 2012 22:00:30 +0400
+Message-ID: <CAKywueTbYWtTNB39uqNK+=u1iOfH9CqUDoqMZYcYFpVOmEX_dw@mail.gmail.com>
+References: <1331911072-1078-1-git-send-email-piastry@etersoft.ru>
+	<20120326144847.42719249@corrin.poochiereds.net>
+	<CAKywueQaV9a8Db7G+TmqCXTPWxMVgse_bJeEOj0y3yyzjggYzA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=KOI8-R
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120327130715.39682caa-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <CAKywueQaV9a8Db7G+TmqCXTPWxMVgse_bJeEOj0y3yyzjggYzA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-27 =CD=C1=D2=D4=C1 2012=9A=C7. 21:07 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
- Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
-> On Tue, 27 Mar 2012 20:51:15 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> The 'forcemand' form of 'forcemandatorylock' mount option was missed
->> when the code moved to use the standard token parser. Return it back=
-=2E
+27 =CD=C1=D2=D4=C1 2012=9A=C7. 15:00 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
+ Pavel Shilovsky
+<piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
+> 26 =CD=C1=D2=D4=C1 2012=9A=C7. 22:48 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=
+=D8 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
+>> On Fri, 16 Mar 2012 18:17:46 +0300
+>> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 >>
->> Also fix a comment style in the parser.
+>>> This is one of the preparation step that makes the byte-range locki=
+ng code more
+>>> protocol independent.
+>>>
 >>
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->> ---
->> =9Afs/cifs/connect.c | =9A =9A7 +++++--
->> =9A1 files changed, 5 insertions(+), 2 deletions(-)
+>> Ok, I sat down to review this set today, but found it very difficult=
+ to
+>> do so. Most of these patches have little to no explanation or
+>> justification at all. Terseness is not a virtue when it come to patc=
+h
+>> descriptions:
 >>
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index 26327ea..7e4775c 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -140,6 +140,7 @@ static const match_table_t cifs_mount_option_tok=
-ens =3D {
->> =9A =9A =9A { Opt_nobrl, "nobrl" },
->> =9A =9A =9A { Opt_nobrl, "nolock" },
->> =9A =9A =9A { Opt_forcemandatorylock, "forcemandatorylock" },
->> + =9A =9A { Opt_forcemandatorylock, "forcemand" },
+>>> Pavel Shilovsky (6):
+>>> =9A CIFS: Move locks to file structure
+>> ^^^
+>> That's all that patch says. No explanation of *why* you're moving th=
+ose
+>> to the file structure -- whatever that is. Do you mean cifsFileInfo =
+here?
+>>
+>>> =9A CIFS: Fix VFS locks usage
+>>
+>> This one says:
+>>
+>> Surround VFS posix_lock_file_wait calls with CIFS lock_mutex
+>> where it needs.
+>>
+>> ...so you're saying that the existing code is broken? Or is it only =
+a
+>> problem for SMB2 support? Does a fix need to go to stable?
+>>
+>>> =9A CIFS: Convert lock type to 32 bit variable
+>>> =9A CIFS: Separate protocol specific lock type handling
+>>> =9A CIFS: Separate protocol specific part from getlk
+>>> =9A CIFS: Separate protocol specific part from setlk
+>>>
+>>> =9Afs/cifs/cifsfs.c =9A | =9A =9A1 -
+>>> =9Afs/cifs/cifsglob.h | =9A =9A5 +-
+>>> =9Afs/cifs/file.c =9A =9A | =9A250 ++++++++++++++++++++++++++++++++=
++++++---------------
+>>> =9A3 files changed, 182 insertions(+), 74 deletions(-)
+>>>
+>>
+>> Given that it's not clear to me what the goal of this patchset is, n=
+ot
+>> to mention the lack of any description on these patches, I can't
+>> reasonably review this.
+>>
 >
-> This looks fine.
+> Sorry - forgot to add proper descriptions for these two patches - wil=
+l
+> repost asap.
 >
->> =9A =9A =9A { Opt_setuids, "setuids" },
->> =9A =9A =9A { Opt_nosetuids, "nosetuids" },
->> =9A =9A =9A { Opt_dynperm, "dynperm" },
->> @@ -1397,9 +1398,11 @@ cifs_parse_mount_options(const char *mountdat=
-a, const char *devname,
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A break;
->> =9A =9A =9A =9A =9A =9A =9A case Opt_nobrl:
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A vol->nobrl =3D =9A1;
->> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A /* turn off mandatory lock=
-ing in mode
->> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A /*
->> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A* turn off mandatory lo=
-cking in mode
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A* if remote locking i=
-s turned off since the
->> - =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A* local vfs will do adv=
-isory */
->> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A* local vfs will do adv=
-isory
->> + =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A*/
->
-> This doesn't look like it's related but just a comment cleanup?
+> --
+> Best regards,
+> Pavel Shilovsky.
 
-Yes - just a cleanup!
-
->
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A if (vol->file_mode =3D=3D
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A (S_IALLU=
-GO & ~(S_ISUID | S_IXGRP)))
->> =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A =9A vol->fil=
-e_mode =3D S_IALLUGO;
->
-> Either way...
->
-> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-
-
+rebased cifs-patches branch
+(http://git.altlinux.org/people/piastry/public/?p=3Dcifs-2.6.git;a=3Dsh=
+ortlog;h=3Drefs/heads/cifs-patches)
+and smb2-3.4 branch
+(http://git.altlinux.org/people/piastry/public/?p=3Dcifs-2.6.git;a=3Dsh=
+ortlog;h=3Drefs/heads/smb2-3.4)
+on top of the current Steve's master for an easier review.
 
 --=20
 Best regards,
