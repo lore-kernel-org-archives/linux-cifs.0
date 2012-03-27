@@ -1,74 +1,114 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v2 0/6] Prepare byte-range locking code for future SMB2 usage
-Date: Tue, 27 Mar 2012 15:00:05 +0400
-Message-ID: <CAKywueQaV9a8Db7G+TmqCXTPWxMVgse_bJeEOj0y3yyzjggYzA@mail.gmail.com>
-References: <1331911072-1078-1-git-send-email-piastry@etersoft.ru>
-	<20120326144847.42719249@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=KOI8-R
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] CIFS: Fix VFS lock usage for oplocked files
+Date: Tue, 27 Mar 2012 15:36:15 +0400
+Message-ID: <1332848175-6441-1-git-send-email-piastry@etersoft.ru>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120326144847.42719249-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-26 =CD=C1=D2=D4=C1 2012=9A=C7. 22:48 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
- Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
-> On Fri, 16 Mar 2012 18:17:46 +0300
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> This is one of the preparation step that makes the byte-range lockin=
-g code more
->> protocol independent.
->>
->
-> Ok, I sat down to review this set today, but found it very difficult =
-to
-> do so. Most of these patches have little to no explanation or
-> justification at all. Terseness is not a virtue when it come to patch
-> descriptions:
->
->> Pavel Shilovsky (6):
->> =9A CIFS: Move locks to file structure
-> ^^^
-> That's all that patch says. No explanation of *why* you're moving tho=
-se
-> to the file structure -- whatever that is. Do you mean cifsFileInfo h=
-ere?
->
->> =9A CIFS: Fix VFS locks usage
->
-> This one says:
->
-> Surround VFS posix_lock_file_wait calls with CIFS lock_mutex
-> where it needs.
->
-> ...so you're saying that the existing code is broken? Or is it only a
-> problem for SMB2 support? Does a fix need to go to stable?
->
->> =9A CIFS: Convert lock type to 32 bit variable
->> =9A CIFS: Separate protocol specific lock type handling
->> =9A CIFS: Separate protocol specific part from getlk
->> =9A CIFS: Separate protocol specific part from setlk
->>
->> =9Afs/cifs/cifsfs.c =9A | =9A =9A1 -
->> =9Afs/cifs/cifsglob.h | =9A =9A5 +-
->> =9Afs/cifs/file.c =9A =9A | =9A250 +++++++++++++++++++++++++++++++++=
-++++---------------
->> =9A3 files changed, 182 insertions(+), 74 deletions(-)
->>
->
-> Given that it's not clear to me what the goal of this patchset is, no=
-t
-> to mention the lack of any description on these patches, I can't
-> reasonably review this.
->
+We can deadlock if we have a write oplock and two processes
+use the same file handle. In this case the first process can't
+unlock its lock if another process blocked on the lock in the
+same time.
 
-Sorry - forgot to add proper descriptions for these two patches - will
-repost asap.
+Fix this by removing lock_mutex protection from waiting on a
+blocked lock and protect only posix_lock_file call.
 
---=20
-Best regards,
-Pavel Shilovsky.
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/file.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 files changed, 52 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 159fcc5..2bf04e9 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -671,6 +671,21 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
+ 	}
+ }
+ 
++/*
++ * Copied from fs/locks.c with small changes.
++ * Remove waiter from blocker's block list.
++ * When blocker ends up pointing to itself then the list is empty.
++ */
++static void
++cifs_locks_delete_block(struct file_lock *waiter)
++{
++	lock_flocks();
++	list_del_init(&waiter->fl_block);
++	list_del_init(&waiter->fl_link);
++	waiter->fl_next = NULL;
++	unlock_flocks();
++}
++
+ static bool
+ __cifs_find_lock_conflict(struct cifsInodeInfo *cinode, __u64 offset,
+ 			__u64 length, __u8 type, __u16 netfid,
+@@ -820,6 +835,39 @@ cifs_posix_lock_test(struct file *file, struct file_lock *flock)
+ 	return rc;
+ }
+ 
++/* Called with locked lock_mutex, return with unlocked. */
++static int
++cifs_posix_lock_file_wait_locked(struct file *file, struct file_lock *flock)
++{
++	struct cifsInodeInfo *cinode = CIFS_I(file->f_path.dentry->d_inode);
++	int rc;
++
++	while (true) {
++		rc = posix_lock_file(file, flock, NULL);
++		mutex_unlock(&cinode->lock_mutex);
++		if (rc != FILE_LOCK_DEFERRED)
++			break;
++		rc = wait_event_interruptible(flock->fl_wait, !flock->fl_next);
++		if (!rc) {
++			mutex_lock(&cinode->lock_mutex);
++			continue;
++		}
++		cifs_locks_delete_block(flock);
++		break;
++	}
++	return rc;
++}
++
++static int
++cifs_posix_lock_file_wait(struct file *file, struct file_lock *flock)
++{
++	struct cifsInodeInfo *cinode = CIFS_I(file->f_path.dentry->d_inode);
++
++	mutex_lock(&cinode->lock_mutex);
++	/* lock_mutex will be released by the function below */
++	return cifs_posix_lock_file_wait_locked(file, flock);
++}
++
+ /*
+  * Set the byte-range lock (posix style). Returns:
+  * 1) 0, if we set the lock and don't need to request to the server;
+@@ -840,9 +888,9 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
+ 		mutex_unlock(&cinode->lock_mutex);
+ 		return rc;
+ 	}
+-	rc = posix_lock_file_wait(file, flock);
+-	mutex_unlock(&cinode->lock_mutex);
+-	return rc;
++
++	/* lock_mutex will be released by the function below */
++	return cifs_posix_lock_file_wait_locked(file, flock);
+ }
+ 
+ static int
+@@ -1338,7 +1386,7 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
+ 
+ out:
+ 	if (flock->fl_flags & FL_POSIX)
+-		posix_lock_file_wait(file, flock);
++		cifs_posix_lock_file_wait(file, flock);
+ 	return rc;
+ }
+ 
+-- 
+1.7.1
