@@ -1,99 +1,99 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v3] CIFS: Fix VFS lock usage for oplocked files
-Date: Wed, 28 Mar 2012 17:36:17 +0400
-Message-ID: <1332941777-4506-1-git-send-email-piastry@etersoft.ru>
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: [PATCH v2 0/6] Prepare byte-range locking code for future SMB2 usage
+Date: Wed, 28 Mar 2012 20:48:19 +0400
+Message-ID: <CAKywueRbrBLnEieD+D10nBwK6X5WY1tPNNRXU0fSH4L8i3pC4A@mail.gmail.com>
+References: <1331911072-1078-1-git-send-email-piastry@etersoft.ru>
+	<20120326144847.42719249@corrin.poochiereds.net>
+	<CAKywueQaV9a8Db7G+TmqCXTPWxMVgse_bJeEOj0y3yyzjggYzA@mail.gmail.com>
+	<CAKywueTbYWtTNB39uqNK+=u1iOfH9CqUDoqMZYcYFpVOmEX_dw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=KOI8-R
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueTbYWtTNB39uqNK+=u1iOfH9CqUDoqMZYcYFpVOmEX_dw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We can deadlock if we have a write oplock and two processes
-use the same file handle. In this case the first process can't
-unlock its lock if the second process blocked on the lock in the
-same time.
+27 =CD=C1=D2=D4=C1 2012=9A=C7. 22:00 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=D8=
+ Pavel Shilovsky
+<piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
+> 27 =CD=C1=D2=D4=C1 2012=9A=C7. 15:00 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=
+=D8 Pavel Shilovsky
+> <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
+>> 26 =CD=C1=D2=D4=C1 2012=9A=C7. 22:48 =D0=CF=CC=D8=DA=CF=D7=C1=D4=C5=CC=
+=D8 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> =CE=C1=D0=C9=D3=C1=CC:
+>>> On Fri, 16 Mar 2012 18:17:46 +0300
+>>> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>>>
+>>>> This is one of the preparation step that makes the byte-range lock=
+ing code more
+>>>> protocol independent.
+>>>>
+>>>
+>>> Ok, I sat down to review this set today, but found it very difficul=
+t to
+>>> do so. Most of these patches have little to no explanation or
+>>> justification at all. Terseness is not a virtue when it come to pat=
+ch
+>>> descriptions:
+>>>
+>>>> Pavel Shilovsky (6):
+>>>> =9A CIFS: Move locks to file structure
+>>> ^^^
+>>> That's all that patch says. No explanation of *why* you're moving t=
+hose
+>>> to the file structure -- whatever that is. Do you mean cifsFileInfo=
+ here?
+>>>
+>>>> =9A CIFS: Fix VFS locks usage
+>>>
+>>> This one says:
+>>>
+>>> Surround VFS posix_lock_file_wait calls with CIFS lock_mutex
+>>> where it needs.
+>>>
+>>> ...so you're saying that the existing code is broken? Or is it only=
+ a
+>>> problem for SMB2 support? Does a fix need to go to stable?
+>>>
+>>>> =9A CIFS: Convert lock type to 32 bit variable
+>>>> =9A CIFS: Separate protocol specific lock type handling
+>>>> =9A CIFS: Separate protocol specific part from getlk
+>>>> =9A CIFS: Separate protocol specific part from setlk
+>>>>
+>>>> =9Afs/cifs/cifsfs.c =9A | =9A =9A1 -
+>>>> =9Afs/cifs/cifsglob.h | =9A =9A5 +-
+>>>> =9Afs/cifs/file.c =9A =9A | =9A250 +++++++++++++++++++++++++++++++=
+++++++---------------
+>>>> =9A3 files changed, 182 insertions(+), 74 deletions(-)
+>>>>
+>>>
+>>> Given that it's not clear to me what the goal of this patchset is, =
+not
+>>> to mention the lack of any description on these patches, I can't
+>>> reasonably review this.
+>>>
+>>
+>> Sorry - forgot to add proper descriptions for these two patches - wi=
+ll
+>> repost asap.
+>>
+>> --
+>> Best regards,
+>> Pavel Shilovsky.
+>
+> rebased cifs-patches branch
+> (http://git.altlinux.org/people/piastry/public/?p=3Dcifs-2.6.git;a=3D=
+shortlog;h=3Drefs/heads/cifs-patches)
+> and smb2-3.4 branch
+> (http://git.altlinux.org/people/piastry/public/?p=3Dcifs-2.6.git;a=3D=
+shortlog;h=3Drefs/heads/smb2-3.4)
+> on top of the current Steve's master for an easier review.
 
-Fix it by using posix_lock_file rather than posix_lock_file_wait
-under cinode->lock_mutex. If we request a blocking lock and
-posix_lock_file indicates that there is another lock that prevents
-us, wait untill that lock is released and restart our call.
+updated branches according to he new version of VFS lock usage fix.
 
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c     |   10 +++++++++-
- fs/locks.c         |    3 ++-
- include/linux/fs.h |    5 +++++
- 3 files changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 460d87b..fae765d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -835,13 +835,21 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
- 	if ((flock->fl_flags & FL_POSIX) == 0)
- 		return rc;
- 
-+try_again:
- 	mutex_lock(&cinode->lock_mutex);
- 	if (!cinode->can_cache_brlcks) {
- 		mutex_unlock(&cinode->lock_mutex);
- 		return rc;
- 	}
--	rc = posix_lock_file_wait(file, flock);
-+
-+	rc = posix_lock_file(file, flock, NULL);
- 	mutex_unlock(&cinode->lock_mutex);
-+	if (rc == FILE_LOCK_DEFERRED) {
-+		rc = wait_event_interruptible(flock->fl_wait, !flock->fl_next);
-+		if (!rc)
-+			goto try_again;
-+		locks_delete_block(flock);
-+	}
- 	return rc;
- }
- 
-diff --git a/fs/locks.c b/fs/locks.c
-index 637694b..0d68f1f 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -510,12 +510,13 @@ static void __locks_delete_block(struct file_lock *waiter)
- 
- /*
-  */
--static void locks_delete_block(struct file_lock *waiter)
-+void locks_delete_block(struct file_lock *waiter)
- {
- 	lock_flocks();
- 	__locks_delete_block(waiter);
- 	unlock_flocks();
- }
-+EXPORT_SYMBOL(locks_delete_block);
- 
- /* Insert waiter into blocker's block list.
-  * We use a circular list so that processes can be easily woken up in
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index fa63f1b..d8fd8df 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1211,6 +1211,7 @@ extern int vfs_setlease(struct file *, long, struct file_lock **);
- extern int lease_modify(struct file_lock **, int);
- extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
- extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
-+extern void locks_delete_block(struct file_lock *waiter);
- extern void lock_flocks(void);
- extern void unlock_flocks(void);
- #else /* !CONFIG_FILE_LOCKING */
-@@ -1355,6 +1356,10 @@ static inline int lock_may_write(struct inode *inode, loff_t start,
- 	return 1;
- }
- 
-+static inline void locks_delete_block(struct file_lock *waiter)
-+{
-+}
-+
- static inline void lock_flocks(void)
- {
- }
--- 
-1.7.1
+--=20
+Best regards,
+Pavel Shilovsky.
