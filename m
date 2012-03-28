@@ -1,67 +1,99 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: add support for -s option
-Date: Wed, 28 Mar 2012 07:45:34 -0400
-Message-ID: <20120328074534.74edaf3d@tlielax.poochiereds.net>
-References: <1332592019-8080-1-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v3] CIFS: Fix VFS lock usage for oplocked files
+Date: Wed, 28 Mar 2012 17:36:17 +0400
+Message-ID: <1332941777-4506-1-git-send-email-piastry@etersoft.ru>
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1332592019-8080-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBTYXQs
-IDI0IE1hciAyMDEyIDA4OjI2OjU5IC0wNDAwDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
-cmc+IHdyb3RlOg0KDQo+IGF1dG9mcyBnZW5lcmFsbHkgY2FsbHMgbW91bnQgaGVscGVycyB3aXRo
-ICctcycuIEhhbmRsZSB0aGF0IHRoZSBzYW1lDQo+IHdheSB3ZSBkbyBmb3IgTkZTIC0tIGFwcGVu
-ZCAiLHNsb3BweSIgb3B0aW9uIHRvIHRoZSBtb3VudCBvcHRpb25zLg0KPiANCj4gVGhlIGtlcm5l
-bCBjYW4gbG9vayBmb3IgdGhhdCBvcHRpb24gdG8gZGVjaWRlIHdoZXRoZXIgdG8gaWdub3JlDQo+
-IHVua25vd24gbW91bnQgb3B0aW9ucywgd2Fybiwgb3IgZXJyb3Igb3V0Lg0KPiANCj4gU2lnbmVk
-LW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KPiAtLS0NCj4gIG1vdW50
-LmNpZnMuYyB8ICAgMTAgKysrKysrKysrLQ0KPiAgMSBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlv
-bnMoKyksIDEgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbW91bnQuY2lmcy5jIGIv
-bW91bnQuY2lmcy5jDQo+IGluZGV4IDgyNGNkM2EuLmMwYWVhMzUgMTAwNjQ0DQo+IC0tLSBhL21v
-dW50LmNpZnMuYw0KPiArKysgYi9tb3VudC5jaWZzLmMNCj4gQEAgLTE0MzgsNiArMTQzOCw3IEBA
-IHN0YXRpYyBzdHJ1Y3Qgb3B0aW9uIGxvbmdvcHRzW10gPSB7DQo+ICAJeyJwYXNzIiwgMSwgTlVM
-TCwgJ3AnfSwNCj4gIAl7ImNyZWRlbnRpYWxzIiwgMSwgTlVMTCwgJ2MnfSwNCj4gIAl7InBvcnQi
-LCAxLCBOVUxMLCAnUCd9LA0KPiArCXsic2xvcHB5IiwgMCwgTlVMTCwgJ3MnfSwNCj4gIAl7TlVM
-TCwgMCwgTlVMTCwgMH0NCj4gIH07DQo+ICANCj4gQEAgLTE4NjMsNiArMTg2NCw3IEBAIGludCBt
-YWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4gIAljaGFyICpjdXJyZW50YWRkcmVzcywgKm5l
-eHRhZGRyZXNzOw0KPiAgCWludCByYyA9IDA7DQo+ICAJaW50IGFscmVhZHlfdXBwZXJjYXNlZCA9
-IDA7DQo+ICsJaW50IHNsb3BweSA9IDA7DQo+ICAJc2l6ZV90IG9wdGlvbnNfc2l6ZSA9IE1BWF9P
-UFRJT05TX0xFTjsNCj4gIAlzdHJ1Y3QgcGFyc2VkX21vdW50X2luZm8gKnBhcnNlZF9pbmZvID0g
-TlVMTDsNCj4gIAlwaWRfdCBwaWQ7DQo+IEBAIC0xOTAwLDcgKzE5MDIsNyBAQCBpbnQgbWFpbihp
-bnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+ICAJfQ0KPiAgDQo+ICAJLyogYWRkIHNoYXJlbmFtZSBp
-biBvcHRzIHN0cmluZyBhcyB1bmM9IHBhcm0gKi8NCj4gLQl3aGlsZSAoKGMgPSBnZXRvcHRfbG9u
-ZyhhcmdjLCBhcmd2LCAiP2Zobm86cnZWdyIsDQo+ICsJd2hpbGUgKChjID0gZ2V0b3B0X2xvbmco
-YXJnYywgYXJndiwgIj9maG5vOnJzdlZ3IiwNCj4gIAkJCQlsb25nb3B0cywgTlVMTCkpICE9IC0x
-KSB7DQo+ICAJCXN3aXRjaCAoYykgew0KPiAgCQljYXNlICc/JzoNCj4gQEAgLTE5MzIsNiArMTkz
-NCw5IEBAIGludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikNCj4gIAkJY2FzZSAnZic6DQo+
-ICAJCQkrK3BhcnNlZF9pbmZvLT5mYWtlbW50Ow0KPiAgCQkJYnJlYWs7DQo+ICsJCWNhc2UgJ3Mn
-Og0KPiArCQkJKytzbG9wcHk7DQo+ICsJCQlicmVhazsNCj4gIAkJZGVmYXVsdDoNCj4gIAkJCWZw
-cmludGYoc3RkZXJyLCAidW5rbm93biBjb21tYW5kLWxpbmUgb3B0aW9uOiAlY1xuIiwgYyk7DQo+
-ICAJCQlyYyA9IG1vdW50X3VzYWdlKHN0ZGVycik7DQo+IEBAIC0yMDM3LDYgKzIwNDIsOSBAQCBt
-b3VudF9yZXRyeToNCj4gIAkJc3RybGNhdChvcHRpb25zLCBwYXJzZWRfaW5mby0+cHJlZml4LCBv
-cHRpb25zX3NpemUpOw0KPiAgCX0NCj4gIA0KPiArCWlmIChzbG9wcHkpDQo+ICsJCXN0cmxjYXQo
-b3B0aW9ucywgIixzbG9wcHkiLCBvcHRpb25zX3NpemUpOw0KPiArDQo+ICAJaWYgKHBhcnNlZF9p
-bmZvLT52ZXJib3NlZmxhZykNCj4gIAkJZnByaW50ZihzdGRlcnIsICIlcyBrZXJuZWwgbW91bnQg
-b3B0aW9uczogJXMiLA0KPiAgCQkJdGhpc3Byb2dyYW0sIG9wdGlvbnMpOw0KDQpNZXJnZWQuLi4N
-Ci0gLS0gDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQotLS0tLUJFR0lOIFBHUCBT
-SUdOQVRVUkUtLS0tLQ0KVmVyc2lvbjogR251UEcgdjIuMC4xOCAoR05VL0xpbnV4KQ0KDQppUUlj
-QkFFQkFnQUdCUUpQY3ZuZUFBb0pFQUFPYUVFWlZvSVZUbVlRQUtKT1FlV2E2ZVA4YmNMaGxBZEY3
-Rkd4DQp6UFBJL3U5YVluK1hqclMvY25RSzZ6Q1FCWGYyV3llbVVDYUtXTThvcXo3TStQSmlJQ1lR
-VnRia1ZCc0t6MFZXDQpYbHBydXlVKzNob2dMWE1FQzlwTFJPSWpjTkFuTUw3TUZpL2FtUFY3dnJQ
-dDdVM3pmaE8vNnNPTXd6U0ErM0lrDQpDQWh0a0NTV2xTeXNmSXl1OTJNZ1NqZUFTMjVlVGpxdW1X
-UGZUZFZFOUwweG9CQ29aZkR6bURGTWJrZHN2bG1nDQpiUlhIYyttSjlkNjVSZHZHSU9ZWllPZExy
-K0NkR0I0SjJXSG9BZWh1QzhIV3VhOFRPOStYeGoyQVJJUFd4Si9jDQpBREVFOUV3RXRUZ0UyblBB
-MFdVeVNWUDlSeGt2YXJZQVBKaUFaeThnT1BsUS9RREkxR2g0UEVFZjFHUzFDdGlSDQo5T1E1NTE1
-TDUzQlFyWmxGYnhxcHdzbUp6K0lyVWtLbkFkMVNKQ01rM1F1eHgzVEk1c2lLKzZDWWZhYWMxVkF0
-DQpPWDVrUnN2aGpMZ3loMHZ4RFdKbEdGMzdMZEJxSmVlQk45ME56WXA3am5UV0hhVFNrMllWWHd6
-bWVUZ1I0UHFRDQpQWXlEd1NId3grNkZyMlN2aU8vdytMWU9iZnhKNVpkSjhMaVdRU25GcmdGQUJC
-U0kyTEZZeW9nVkx6eWF5S3BNDQpKMTI1RGtZNnVYL21aVld1bGE0bjlqQmd0MSs5SlVuN2dsdWwv
-UEdBbm41OGM4bUVUaGRXaXpmalZkSUlkWC9rDQpoVUFmZm13YjRsYkMwUzdQRGprNW9kNGcrcmc4
-dFpaOWVRTXp3OGhZVmhIc0Z3TGdQZ3AyYzdKVHhwTzlkdzlDDQpsWTNXNnJaQU9hcFlYQjZyRlhs
-Rg0KPWtlaGsNCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+We can deadlock if we have a write oplock and two processes
+use the same file handle. In this case the first process can't
+unlock its lock if the second process blocked on the lock in the
+same time.
+
+Fix it by using posix_lock_file rather than posix_lock_file_wait
+under cinode->lock_mutex. If we request a blocking lock and
+posix_lock_file indicates that there is another lock that prevents
+us, wait untill that lock is released and restart our call.
+
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/file.c     |   10 +++++++++-
+ fs/locks.c         |    3 ++-
+ include/linux/fs.h |    5 +++++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 460d87b..fae765d 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -835,13 +835,21 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
+ 	if ((flock->fl_flags & FL_POSIX) == 0)
+ 		return rc;
+ 
++try_again:
+ 	mutex_lock(&cinode->lock_mutex);
+ 	if (!cinode->can_cache_brlcks) {
+ 		mutex_unlock(&cinode->lock_mutex);
+ 		return rc;
+ 	}
+-	rc = posix_lock_file_wait(file, flock);
++
++	rc = posix_lock_file(file, flock, NULL);
+ 	mutex_unlock(&cinode->lock_mutex);
++	if (rc == FILE_LOCK_DEFERRED) {
++		rc = wait_event_interruptible(flock->fl_wait, !flock->fl_next);
++		if (!rc)
++			goto try_again;
++		locks_delete_block(flock);
++	}
+ 	return rc;
+ }
+ 
+diff --git a/fs/locks.c b/fs/locks.c
+index 637694b..0d68f1f 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -510,12 +510,13 @@ static void __locks_delete_block(struct file_lock *waiter)
+ 
+ /*
+  */
+-static void locks_delete_block(struct file_lock *waiter)
++void locks_delete_block(struct file_lock *waiter)
+ {
+ 	lock_flocks();
+ 	__locks_delete_block(waiter);
+ 	unlock_flocks();
+ }
++EXPORT_SYMBOL(locks_delete_block);
+ 
+ /* Insert waiter into blocker's block list.
+  * We use a circular list so that processes can be easily woken up in
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index fa63f1b..d8fd8df 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1211,6 +1211,7 @@ extern int vfs_setlease(struct file *, long, struct file_lock **);
+ extern int lease_modify(struct file_lock **, int);
+ extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
+ extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
++extern void locks_delete_block(struct file_lock *waiter);
+ extern void lock_flocks(void);
+ extern void unlock_flocks(void);
+ #else /* !CONFIG_FILE_LOCKING */
+@@ -1355,6 +1356,10 @@ static inline int lock_may_write(struct inode *inode, loff_t start,
+ 	return 1;
+ }
+ 
++static inline void locks_delete_block(struct file_lock *waiter)
++{
++}
++
+ static inline void lock_flocks(void)
+ {
+ }
+-- 
+1.7.1
