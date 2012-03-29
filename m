@@ -1,100 +1,175 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v3] CIFS: Fix VFS lock usage for oplocked files
-Date: Wed, 28 Mar 2012 21:56:19 +0400
-Message-ID: <1332957379-5922-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs.upcall: use krb5_sname_to_principal to construct
+ principal name
+Date: Thu, 29 Mar 2012 09:49:04 -0400
+Message-ID: <20120329094904.4bfef087@corrin.poochiereds.net>
+References: <1332934967-1768-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1332934967-1768-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We can deadlock if we have a write oplock and two processes
-use the same file handle. In this case the first process can't
-unlock its lock if the second process blocked on the lock in the
-same time.
+On Wed, 28 Mar 2012 07:42:47 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-Fix it by using posix_lock_file rather than posix_lock_file_wait
-under cinode->lock_mutex. If we request a blocking lock and
-posix_lock_file indicates that there is another lock that prevents
-us, wait untill that lock is released and restart our call.
+> Currently, we build the string by hand then then construct the
+> principal name with krb5_parse_name. That bypasses the domain_realm
+> section in krb5.conf however.
+> 
+> Switch the code to use krb5_sname_to_principal instead which is more
+> suited to this task. In order for that to work, we change a couple of
+> calling functions to pass down a hostname instead of a principal
+> name, and then pass in "cifs" as the service name.
+> 
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  cifs.upcall.c |   47 ++++++++++++++++++++---------------------------
+>  1 files changed, 20 insertions(+), 27 deletions(-)
+> 
+> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> index 0d222cb..9e7f7e2 100644
+> --- a/cifs.upcall.c
+> +++ b/cifs.upcall.c
+> @@ -324,7 +324,7 @@ static char *find_krb5_cc(const char *dirname, uid_t uid)
+>  }
+>  
+>  static int
+> -cifs_krb5_get_req(const char *principal, const char *ccname,
+> +cifs_krb5_get_req(const char *host, const char *ccname,
+>  		  DATA_BLOB * mechtoken, DATA_BLOB * sess_key)
+>  {
+>  	krb5_error_code ret;
+> @@ -360,10 +360,11 @@ cifs_krb5_get_req(const char *principal, const char *ccname,
+>  		goto out_free_ccache;
+>  	}
+>  
+> -	ret = krb5_parse_name(context, principal, &in_creds.server);
+> +	ret = krb5_sname_to_principal(context, host, "cifs", KRB5_NT_UNKNOWN,
+> +					&in_creds.server);
+>  	if (ret) {
+> -		syslog(LOG_DEBUG, "%s: unable to parse principal (%s).",
+> -		       __func__, principal);
+> +		syslog(LOG_DEBUG, "%s: unable to convert sname to princ (%s).",
+> +		       __func__, host);
+>  		goto out_free_principal;
+>  	}
+>  
+> @@ -371,7 +372,7 @@ cifs_krb5_get_req(const char *principal, const char *ccname,
+>  	krb5_free_principal(context, in_creds.server);
+>  	if (ret) {
+>  		syslog(LOG_DEBUG, "%s: unable to get credentials for %s",
+> -		       __func__, principal);
+> +		       __func__, host);
+>  		goto out_free_principal;
+>  	}
+>  
+> @@ -428,14 +429,14 @@ cifs_krb5_get_req(const char *principal, const char *ccname,
+>  				   &in_data, out_creds, &apreq_pkt);
+>  	if (ret) {
+>  		syslog(LOG_DEBUG, "%s: unable to make AP-REQ for %s",
+> -		       __func__, principal);
+> +		       __func__, host);
+>  		goto out_free_auth;
+>  	}
+>  
+>  	ret = krb5_auth_con_getsendsubkey(context, auth_context, &tokb);
+>  	if (ret) {
+>  		syslog(LOG_DEBUG, "%s: unable to get session key for %s",
+> -		       __func__, principal);
+> +		       __func__, host);
+>  		goto out_free_auth;
+>  	}
+>  
+> @@ -480,17 +481,16 @@ out_free_context:
+>   * ret: 0 - success, others - failure
+>   */
+>  static int
+> -handle_krb5_mech(const char *oid, const char *principal, DATA_BLOB * secblob,
+> +handle_krb5_mech(const char *oid, const char *host, DATA_BLOB * secblob,
+>  		 DATA_BLOB * sess_key, const char *ccname)
+>  {
+>  	int retval;
+>  	DATA_BLOB tkt, tkt_wrapped;
+>  
+> -	syslog(LOG_DEBUG, "%s: getting service ticket for %s", __func__,
+> -	       principal);
+> +	syslog(LOG_DEBUG, "%s: getting service ticket for %s", __func__, host);
+>  
+>  	/* get a kerberos ticket for the service and extract the session key */
+> -	retval = cifs_krb5_get_req(principal, ccname, &tkt, sess_key);
+> +	retval = cifs_krb5_get_req(host, ccname, &tkt, sess_key);
+>  	if (retval) {
+>  		syslog(LOG_DEBUG, "%s: failed to obtain service ticket (%d)",
+>  		       __func__, retval);
+> @@ -782,7 +782,6 @@ int main(const int argc, char *const argv[])
+>  	int c, try_dns = 0, legacy_uid = 0;
+>  	char *buf, *ccname = NULL;
+>  	char hostbuf[NI_MAXHOST], *host;
+> -	char princ[NI_MAXHOST + 5]; /* 5 == len of "cifs/" */
+>  	struct decoded_args arg;
+>  	const char *oid;
+>  	uid_t uid;
+> @@ -921,29 +920,23 @@ int main(const int argc, char *const argv[])
+>  
+>  retry_new_hostname:
+>  		lowercase_string(host);
+> -		/* try "cifs/hostname" first */
+> -		rc = snprintf(princ, sizeof(princ), "cifs/%s", host);
+> -		if (rc < 0 || (size_t)rc >= sizeof(princ)) {
+> -			syslog(LOG_ERR,"Unable to set hostname %s in buffer.", host);
+> -			goto out;
+> -		}
+> -
+> -		rc = handle_krb5_mech(oid, princ, &secblob, &sess_key, ccname);
+> +		rc = handle_krb5_mech(oid, host, &secblob, &sess_key, ccname);
+>  		if (!rc)
+>  			break;
+>  
+>  		/*
+> -		 * If hostname has a '.', assume it's a FQDN, otherwise we want to
+> -		 * guess the domainname.
+> +		 * If hostname has a '.', assume it's a FQDN, otherwise we
+> +		 * want to guess the domainname.
+>  		 */
+>  		if (!strchr(host, '.')) {
+>  			struct addrinfo hints;
+>  			struct addrinfo *ai;
+>  			char *domainname;
+> +			char fqdn[NI_MAXHOST];
+>  
+>  			/*
+> -			 * use getaddrinfo() to resolve the hostname of the server
+> -			 * and set ai_canonname.
+> +			 * use getaddrinfo() to resolve the hostname of the
+> +			 * server and set ai_canonname.
+>  			 */
+>  			memset(&hints, 0, sizeof(hints));
+>  			hints.ai_family = AF_UNSPEC;
+> @@ -963,16 +956,16 @@ retry_new_hostname:
+>  				break;
+>  			}
+>  			lowercase_string(domainname);
+> -			rc = snprintf(princ, sizeof(princ), "cifs/%s%s",
+> +			rc = snprintf(fqdn, sizeof(fqdn), "%s%s",
+>  					host, domainname);
+>  			freeaddrinfo(ai);
+> -			if (rc < 0 || (size_t)rc >= sizeof(princ)) {
+> +			if (rc < 0 || (size_t)rc >= sizeof(fqdn)) {
+>  				syslog(LOG_ERR, "Problem setting hostname in string: %ld", rc);
+>  				rc = -EINVAL;
+>  				break;
+>  			}
+>  
+> -			rc = handle_krb5_mech(oid, princ, &secblob, &sess_key, ccname);
+> +			rc = handle_krb5_mech(oid, fqdn, &secblob, &sess_key, ccname);
+>  			if (!rc)
+>  				break;
+>  		}
 
-Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c     |   10 +++++++++-
- fs/locks.c         |    3 ++-
- include/linux/fs.h |    5 +++++
- 3 files changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 460d87b..fae765d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -835,13 +835,21 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
- 	if ((flock->fl_flags & FL_POSIX) == 0)
- 		return rc;
- 
-+try_again:
- 	mutex_lock(&cinode->lock_mutex);
- 	if (!cinode->can_cache_brlcks) {
- 		mutex_unlock(&cinode->lock_mutex);
- 		return rc;
- 	}
--	rc = posix_lock_file_wait(file, flock);
-+
-+	rc = posix_lock_file(file, flock, NULL);
- 	mutex_unlock(&cinode->lock_mutex);
-+	if (rc == FILE_LOCK_DEFERRED) {
-+		rc = wait_event_interruptible(flock->fl_wait, !flock->fl_next);
-+		if (!rc)
-+			goto try_again;
-+		locks_delete_block(flock);
-+	}
- 	return rc;
- }
- 
-diff --git a/fs/locks.c b/fs/locks.c
-index 637694b..0d68f1f 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -510,12 +510,13 @@ static void __locks_delete_block(struct file_lock *waiter)
- 
- /*
-  */
--static void locks_delete_block(struct file_lock *waiter)
-+void locks_delete_block(struct file_lock *waiter)
- {
- 	lock_flocks();
- 	__locks_delete_block(waiter);
- 	unlock_flocks();
- }
-+EXPORT_SYMBOL(locks_delete_block);
- 
- /* Insert waiter into blocker's block list.
-  * We use a circular list so that processes can be easily woken up in
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index fa63f1b..d8fd8df 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1211,6 +1211,7 @@ extern int vfs_setlease(struct file *, long, struct file_lock **);
- extern int lease_modify(struct file_lock **, int);
- extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
- extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
-+extern void locks_delete_block(struct file_lock *waiter);
- extern void lock_flocks(void);
- extern void unlock_flocks(void);
- #else /* !CONFIG_FILE_LOCKING */
-@@ -1355,6 +1356,10 @@ static inline int lock_may_write(struct inode *inode, loff_t start,
- 	return 1;
- }
- 
-+static inline void locks_delete_block(struct file_lock *waiter)
-+{
-+}
-+
- static inline void lock_flocks(void)
- {
- }
+Merged...
 -- 
-1.7.1
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
