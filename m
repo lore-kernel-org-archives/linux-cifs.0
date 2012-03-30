@@ -1,129 +1,94 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: sync/fsync issues on cifs drives
-Date: Fri, 30 Mar 2012 16:03:17 -0400
-Message-ID: <20120330160317.74e2570f@corrin.poochiereds.net>
-References: <4F75F1BF.3050604@innominate.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH 2/2] CIFS: Convert lock type to 32 bit variable
+Date: Sat, 31 Mar 2012 00:25:02 +0400
+Message-ID: <1333139102-8265-2-git-send-email-piastry@etersoft.ru>
+References: <1333139102-8265-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4F75F1BF.3050604-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+In-Reply-To: <1333139102-8265-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 30 Mar 2012 19:47:43 +0200
-Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org> wrote:
+to handle SMB2 lock type field further.
 
-> Greetings,
-> 
-> 
-> I am using an older kernel (2.6.27.57). I have made the following 
-> observations:
-> 
-> Let S be a windows shared drive that maps to the local directory s (on 
-> Windows) and let Q be another shared drive on the same machine, such 
-> that Q maps to the local directory q and that s is the parent of q.
-> 
-> On my machine, I am mounting both S and Q separately, so that S is 
-> mounted read-only and Q is mounted with read/write access. I have also 
-> mounted S and Q using a different user for each as well as using the 
-> same user for both. This does not seem to make a difference (even though 
-> at least once it seemed to matter, but I could not reproduce it.)
-> 
-> Scenario 1:
-> When I finish my operations, I write the results to Q and perform a 
-> fsync system call on each one of the written files.
-> 
-> I have observed that, under Windows NT4 this leads to an error condition:
-> 
->    fsync failed (11): Resource temporarily unavailable
-> 
-> Also showing LOG entries similar to:
-> 
->    kernel:  CIFS VFS: Write2 ret -11, wrote 9370
->    kernel:  CIFS VFS: No response to cmd 46 mid 58582
-> 
-> Scenario 2:
-> On a separated process that has nothing to do with the shared drives, a 
-> sync system calls stalls for a very long time (possibly hours) before 
-> returning.
-> 
-> I observed this behavior on NT4, I have reports of this happening with 
-> Windows 2008 R2 Server, but I could *not* reproduce it with Windows XP 
-> PRO nor with Windows Server 2003.
-> 
-> ---- END of observations ----
-> 
-> Question 1: why does this happen?
-> 
-> Question 2: Is this fixed in a newer kernel release?
-> 
-> Question 3: Is there any way to limit a sync call to a single filesystem?
-> 
-> ---- END of questions -----
-> 
-> I went ahead and looked at the kernel code, and the reason for this is 
-> clearly that on fs/cifs/file.c:162
-> 
->          if (n_iov) {
->              /* Search for a writable handle every time we call
->               * CIFSSMBWrite2.  We can't rely on the last handle
->               * we used to still be valid
->               */
->              open_file = find_writable_file(CIFS_I(mapping->host));
->              if (!open_file) {
->                  cERROR(1, ("No writable handles for inode"));
->                  rc = -EBADF;
->              } else {
->                  rc = CIFSSMBWrite2(xid, cifs_sb->tcon, 
-> 
->                             open_file->netfid,
->                             bytes_to_write, offset,
->                             &bytes_written, iov, n_iov,
->                             CIFS_LONG_OP);
->                  atomic_dec(&open_file->wrtPending);
->                  if (rc || bytes_written < bytes_to_write) {
->                      cERROR(1, ("Write2 ret %d, wrote %d",
->                            rc, bytes_written));
->                      /* BB what if continued retry is
->                         requested via mount flags? */
->                      if (rc == -ENOSPC)
->                          set_bit(AS_ENOSPC, &mapping->flags);
->                      else
->                          set_bit(AS_EIO, &mapping->flags);
->                  } else {
->                      cifs_stats_bytes_written(cifs_sb->tcon,
->                                   bytes_written);
->                  }
->              }
-> 
-> The call to CIFSSMBWrite2 is never checked for an EAGAIN condition 
-> (which is what is returned in those cases.) I have not experimented with 
-> this yet (it may very well be that any number of retries end of in the 
-> same situation,) but wanted to know whether modiying this would make 
-> sense at all or not. I am fairly new to this portion of the kernel code.
-> 
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |    2 +-
+ fs/cifs/file.c     |   13 +++++++------
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-I think you might want to look at commit
-941b853d779de3298e39f1eb4e252984464eaea8, though that has never really
-had much testing in isolation from the conversion to async writes.
-
-> Note: I am not suggesting making a patch out of that idea, I just want 
-> to check whether the idea makes sense.
-> 
-> Thanks in advance for your kind support!
-> 
-> 
-> Cheers,
-> 
-
-2.6.27 is really old at this point...
-
-The short answer here is that the behavior in more recent kernels
-(3.x-ish) should be much better. The cifs client now does asynchronous
-writes which speeds things up tremendously. It's also more tolerant of
-network problems during writeback.
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index de1a80d..cd7cf2b 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -547,7 +547,7 @@ struct cifsLockInfo {
+ 	__u64 offset;
+ 	__u64 length;
+ 	__u32 pid;
+-	__u8 type;
++	__u32 type;
+ };
+ 
+ /*
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index f258373..a39f73f 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -912,7 +912,8 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 			cur->OffsetHigh = cpu_to_le32((u32)(li->offset>>32));
+ 			if (++num == max_num) {
+ 				stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
+-						       li->type, 0, num, buf);
++						       (__u8)li->type, 0, num,
++						       buf);
+ 				if (stored_rc)
+ 					rc = stored_rc;
+ 				cur = buf;
+@@ -923,7 +924,7 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 
+ 		if (num) {
+ 			stored_rc = cifs_lockv(xid, tcon, cfile->netfid,
+-					       types[i], 0, num, buf);
++					       (__u8)types[i], 0, num, buf);
+ 			if (stored_rc)
+ 				rc = stored_rc;
+ 		}
+@@ -1067,7 +1068,7 @@ cifs_push_locks(struct cifsFileInfo *cfile)
+ }
+ 
+ static void
+-cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
++cifs_read_flock(struct file_lock *flock, __u32 *type, int *lock, int *unlock,
+ 		bool *wait_flag)
+ {
+ 	if (flock->fl_flags & FL_POSIX)
+@@ -1111,7 +1112,7 @@ cifs_read_flock(struct file_lock *flock, __u8 *type, int *lock, int *unlock,
+ }
+ 
+ static int
+-cifs_getlk(struct file *file, struct file_lock *flock, __u8 type,
++cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
+ 	   bool wait_flag, bool posix_lck, int xid)
+ {
+ 	int rc = 0;
+@@ -1299,7 +1300,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock, int xid)
+ }
+ 
+ static int
+-cifs_setlk(struct file *file,  struct file_lock *flock, __u8 type,
++cifs_setlk(struct file *file,  struct file_lock *flock, __u32 type,
+ 	   bool wait_flag, bool posix_lck, int lock, int unlock, int xid)
+ {
+ 	int rc = 0;
+@@ -1370,7 +1371,7 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	struct cifsInodeInfo *cinode;
+ 	struct cifsFileInfo *cfile;
+ 	__u16 netfid;
+-	__u8 type;
++	__u32 type;
+ 
+ 	rc = -EACCES;
+ 	xid = GetXid();
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.1
