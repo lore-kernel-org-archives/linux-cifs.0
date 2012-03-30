@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 1/2] CIFS: Move locks to cifsFileInfo structure
-Date: Sat, 31 Mar 2012 00:25:01 +0400
-Message-ID: <1333139102-8265-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2 1/2] CIFS: Move locks to cifsFileInfo structure
+Date: Sat, 31 Mar 2012 00:31:39 +0400
+Message-ID: <1333139499-9158-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -32,7 +32,7 @@ index d342128..5105f23 100644
  }
  
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 4ff6313..de1a80d 100644
+index 4ff6313..5371195 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
 @@ -548,7 +548,6 @@ struct cifsLockInfo {
@@ -62,9 +62,9 @@ index 4ff6313..de1a80d 100644
  	bool can_cache_brlcks;
 -	struct mutex lock_mutex;	/* protect two fields above */
 +	struct mutex lock_mutex;	/*
-+					 * protect the field above and llist from
-+					 * every cifsFileInfo structure from
-+					 * openFileList
++					 * protect the field above and llist
++					 * from every cifsFileInfo structure
++					 * from openFileList
 +					 */
  	/* BB add in lists for dirty pages i.e. write caching info for oplock */
  	struct list_head openFileList;
