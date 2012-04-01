@@ -1,68 +1,71 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 30 Mar 2012 16:04:50 -0500
-Message-ID: <CAH2r5mtRpNBgjE5qTcb6sejy1Oq_uKOQtRPU2_hoyk7TnRubww@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [ 105/175] CIFS: Respect negotiated MaxMpxCount
+Date: Sun, 1 Apr 2012 09:55:39 -0400
+Message-ID: <20120401095539.31323c95@corrin.poochiereds.net>
+References: <20120330195801.GA31806@kroah.com>
+	<20120330194846.517484801@linuxfoundation.org>
+	<20120331201825.036fe1d8@corrin.poochiereds.net>
+	<CAH2r5muM-4_pVt59XeNrOZZ=28P0hT8GiMqBUk+0nxnUw9L+VA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org,
+	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5muM-4_pVt59XeNrOZZ=28P0hT8GiMqBUk+0nxnUw9L+VA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit e22057c8599373e5caef0bc42bdb95d2a361ab0d:
-  Linus Torvalds (1):
-        Merge tag 'stable/for-linus-3.4-tag-two' of
-git://git.kernel.org/.../konrad/xen
+On Sun, 1 Apr 2012 02:26:58 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-are available in the git repository at:
+> On Sat, Mar 31, 2012 at 7:18 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
+e:
+> > On Fri, 30 Mar 2012 12:50:10 -0700
+> > Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org> wrote:
+> >
+> >> 3.3-stable review patch. =C2=A0If anyone has any objections, pleas=
+e let me know.
+> >>
+> >
+> > I'm not sure it's a good idea to put this patch into any stable rel=
+ease
+> > just yet. I think it's a correct and necessary fix, but it has some
+> > potential to cause regressions too (or uncover other preexisting
+> > problems with this code). Might it be best to wait until we have so=
+me
+> > more experience with this before we push it into stable?
+>=20
+> Delaying it a little is probably ok, but weigh that against the
+> frequency/severity
+> of the problem that Pavel's fix addresses:  ie sequential writes to s=
+ome
+> versions of Windows 7 and Windows Vista can fail partway
+> through large file copy (which also causes those servers
+> to become unresponsive to subsequent connection requests
+> as well) so the fix does address a hot problem.
+>=20
+>=20
+>=20
 
-  git://git.samba.org/sfrench/cifs-2.6.git master
+I'm not disputing whether this patch is correct. It's clearly a bug
+that cifs.ko has never respected this value, and it's quite problematic
+with certain servers.
 
-Jeff Layton (11):
-      cifs: add new cifsiod_wq workqueue
-      cifs: add pid field to cifs_writedata
-      cifs: allow caller to specify completion op when allocating writedata
-      cifs: fix allocation in cifs_write_allocate_pages
-      cifs: make cifsFileInfo_get return the cifsFileInfo pointer
-      cifs: fix up get_numpages
-      cifs: abstract out function to marshal up the iovec array for async writes
-      cifs: call cifs_update_eof with i_lock held
-      cifs: convert cifs_iovec_write to use async writes
-      cifs: remove /proc/fs/cifs/OplockEnabled
-      cifs: handle "sloppy" option appropriately
+The problem is that we don't have any confirmation that:
 
-Pavel Shilovsky (6):
-      CIFS: Separate protocol-specific code from transport routines
-      CIFS: Separate protocol-specific code from demultiplex code
-      CIFS: Separate protocol-specific code from cifs_readv_receive code
-      CIFS: Expand CurrentMid field
-      CIFS: Change mid_q_entry structure fields
-      CIFS: Add missed forcemand mount option
+a) this fixes any of the problems that we think it will
 
-Sachin Prabhu (1):
-      cifs: use standard token parser for mount options
+b) this doesn't introduce any regressions
 
-Steve French (3):
-      [CIFS] Fix trivial sparse warning with asyn i/o patch
-      Merge branch 'for-3.4'
-      [CIFS] Update CIFS version number to 1.77
+The request slot allocation code is quite fiddly and fragile, and I
+think the potential for "b" is somewhat high. I'd feel more comfortable
+if we waited until we have more experience with this patch before
+merging it into stable.
 
- fs/cifs/cifs_debug.c |   68 +--
- fs/cifs/cifs_debug.h |    4 +-
- fs/cifs/cifsfs.c     |   13 +-
- fs/cifs/cifsfs.h     |    2 +-
- fs/cifs/cifsglob.h   |   39 +-
- fs/cifs/cifsproto.h  |   20 +-
- fs/cifs/cifssmb.c    |  126 +++--
- fs/cifs/connect.c    | 1454 ++++++++++++++++++++++++++++++--------------------
- fs/cifs/file.c       |  271 ++++++----
- fs/cifs/misc.c       |  100 ++--
- fs/cifs/netmisc.c    |    3 +-
- fs/cifs/transport.c  |  227 +++++----
- 12 files changed, 1381 insertions(+), 946 deletions(-)
-
--- 
-Thanks,
-
-Steve
+--=20
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
