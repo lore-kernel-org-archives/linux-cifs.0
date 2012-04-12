@@ -1,260 +1,156 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Cleanup handling of NULL value passed for a mount option
-Date: Wed, 11 Apr 2012 13:03:47 +0100
-Message-ID: <1334145827.2791.3.camel@localhost>
-References: <201204100823.24207.chris2553@googlemail.com>
-	 <1334050772.2149.4.camel@localhost>
-	 <20120410071630.567d70cb@tlielax.poochiereds.net>
-	 <201204101413.27748.chris2553@googlemail.com>
-	 <1334064516.2149.9.camel@localhost> <1334077947.2149.32.camel@localhost>
-	 <CAH2r5mtrYxLueLL9VDSWE2G+86ZDyqXaFdOJz0FkNp8J0OzEUQ@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v2] mount.cifs: don't allow unprivileged users to mount
+ onto dirs to which they can't chdir
+Date: Thu, 12 Apr 2012 06:57:29 -0400
+Message-ID: <20120412065729.19a9eb4b@tlielax.poochiereds.net>
+References: <1333395019-7334-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Linux CIFS mailing list <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Chris Clayton <chris2553-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jesus Olmos <jesus.olmos-QVTk+HlWL3hBDgjK7y7TUQ@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtrYxLueLL9VDSWE2G+86ZDyqXaFdOJz0FkNp8J0OzEUQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1333395019-7334-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 2012-04-10 at 21:17 -0500, Steve French wrote:
-> Sachin,
-> Did you doublecheck the other 9 string based parms that we can pass in
-> (domain etc.) that don't have special casing yet?  Do any of them need
-> changes too?
-
-Yes. I checked the remaining string and numerical mount options and
-compared them to the old code and apart from user, password and ip
-address, none of the other mount options allow NULL values. In the old
-code, these either result in error or are just ignored. 
-
-The new code returns an error if a blank value is passed when a value is
-expected.
-
-Sachin Prabhu
-
-> 
-> On Tue, Apr 10, 2012 at 12:12 PM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > Allow blank user= and ip= mount option. Also clean up redundant
-> > checks for NULL values since the token parser will not actually
-> > match mount options with NULL values unless explicitly specified.
-> >
-> > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > Reported-by: Chris Clayton <chris2553-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
-> >
-> > ---
-> >  fs/cifs/connect.c |   80 ++++++++++++----------------------------------------
-> >  1 files changed, 19 insertions(+), 61 deletions(-)
-> >
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index d81e933..6a86f3d 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -109,6 +109,8 @@ enum {
-> >
-> >        /* Options which could be blank */
-> >        Opt_blank_pass,
-> > +       Opt_blank_user,
-> > +       Opt_blank_ip,
-> >
-> >        Opt_err
-> >  };
-> > @@ -183,11 +185,15 @@ static const match_table_t cifs_mount_option_tokens = {
-> >        { Opt_wsize, "wsize=%s" },
-> >        { Opt_actimeo, "actimeo=%s" },
-> >
-> > +       { Opt_blank_user, "user=" },
-> > +       { Opt_blank_user, "username=" },
-> >        { Opt_user, "user=%s" },
-> >        { Opt_user, "username=%s" },
-> >        { Opt_blank_pass, "pass=" },
-> >        { Opt_pass, "pass=%s" },
-> >        { Opt_pass, "password=%s" },
-> > +       { Opt_blank_ip, "ip=" },
-> > +       { Opt_blank_ip, "addr=" },
-> >        { Opt_ip, "ip=%s" },
-> >        { Opt_ip, "addr=%s" },
-> >        { Opt_unc, "unc=%s" },
-> > @@ -1534,15 +1540,17 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >
-> >                /* String Arguments */
-> >
-> > +               case Opt_blank_user:
-> > +                       /* null user, ie. anonymous authentication */
-> > +                       vol->nullauth = 1;
-> > +                       vol->username = NULL;
-> > +                       break;
-> >                case Opt_user:
-> >                        string = match_strdup(args);
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               /* null user, ie. anonymous authentication */
-> > -                               vol->nullauth = 1;
-> > -                       } else if (strnlen(string, MAX_USERNAME_SIZE) >
-> > +                       if (strnlen(string, MAX_USERNAME_SIZE) >
-> >                                                        MAX_USERNAME_SIZE) {
-> >                                printk(KERN_WARNING "CIFS: username too long\n");
-> >                                goto cifs_parse_mount_err;
-> > @@ -1611,14 +1619,15 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        }
-> >                        vol->password[j] = '\0';
-> >                        break;
-> > +               case Opt_blank_ip:
-> > +                       vol->UNCip = NULL;
-> > +                       break;
-> >                case Opt_ip:
-> >                        string = match_strdup(args);
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               vol->UNCip = NULL;
-> > -                       } else if (strnlen(string, INET6_ADDRSTRLEN) >
-> > +                       if (strnlen(string, INET6_ADDRSTRLEN) >
-> >                                                INET6_ADDRSTRLEN) {
-> >                                printk(KERN_WARNING "CIFS: ip address "
-> >                                                    "too long\n");
-> > @@ -1636,12 +1645,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: invalid path to "
-> > -                                                   "network resource\n");
-> > -                               goto cifs_parse_mount_err;
-> > -                       }
-> > -
-> >                        temp_len = strnlen(string, 300);
-> >                        if (temp_len  == 300) {
-> >                                printk(KERN_WARNING "CIFS: UNC name too long\n");
-> > @@ -1670,11 +1673,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: invalid domain"
-> > -                                                   " name\n");
-> > -                               goto cifs_parse_mount_err;
-> > -                       } else if (strnlen(string, 256) == 256) {
-> > +                       if (strnlen(string, 256) == 256) {
-> >                                printk(KERN_WARNING "CIFS: domain name too"
-> >                                                    " long\n");
-> >                                goto cifs_parse_mount_err;
-> > @@ -1693,11 +1692,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: srcaddr value not"
-> > -                                                   " specified\n");
-> > -                               goto cifs_parse_mount_err;
-> > -                       } else if (!cifs_convert_address(
-> > +                       if (!cifs_convert_address(
-> >                                        (struct sockaddr *)&vol->srcaddr,
-> >                                        string, strlen(string))) {
-> >                                printk(KERN_WARNING "CIFS:  Could not parse"
-> > @@ -1710,11 +1705,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: Invalid path"
-> > -                                                   " prefix\n");
-> > -                               goto cifs_parse_mount_err;
-> > -                       }
-> >                        temp_len = strnlen(string, 1024);
-> >                        if (string[0] != '/')
-> >                                temp_len++; /* missing leading slash */
-> > @@ -1742,11 +1732,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: Invalid iocharset"
-> > -                                                   " specified\n");
-> > -                               goto cifs_parse_mount_err;
-> > -                       } else if (strnlen(string, 1024) >= 65) {
-> > +                       if (strnlen(string, 1024) >= 65) {
-> >                                printk(KERN_WARNING "CIFS: iocharset name "
-> >                                                    "too long.\n");
-> >                                goto cifs_parse_mount_err;
-> > @@ -1771,11 +1757,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: No socket option"
-> > -                                                   " specified\n");
-> > -                               goto cifs_parse_mount_err;
-> > -                       }
-> >                        if (strnicmp(string, "TCP_NODELAY", 11) == 0)
-> >                                vol->sockopt_tcp_nodelay = 1;
-> >                        break;
-> > @@ -1784,12 +1765,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: Invalid (empty)"
-> > -                                                   " netbiosname\n");
-> > -                               break;
-> > -                       }
-> > -
-> >                        memset(vol->source_rfc1001_name, 0x20,
-> >                                RFC1001_NAME_LEN);
-> >                        /*
-> > @@ -1817,11 +1792,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: Empty server"
-> > -                                       " netbiosname specified\n");
-> > -                               break;
-> > -                       }
-> >                        /* last byte, type, is 0x20 for servr type */
-> >                        memset(vol->target_rfc1001_name, 0x20,
-> >                                RFC1001_NAME_LEN_WITH_NULL);
-> > @@ -1848,12 +1818,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               cERROR(1, "no protocol version specified"
-> > -                                         " after vers= mount option");
-> > -                               goto cifs_parse_mount_err;
-> > -                       }
-> > -
-> >                        if (strnicmp(string, "cifs", 4) == 0 ||
-> >                            strnicmp(string, "1", 1) == 0) {
-> >                                /* This is the default */
-> > @@ -1868,12 +1832,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
-> >                        if (string == NULL)
-> >                                goto out_nomem;
-> >
-> > -                       if (!*string) {
-> > -                               printk(KERN_WARNING "CIFS: no security flavor"
-> > -                                                   " specified\n");
-> > -                               break;
-> > -                       }
-> > -
-> >                        if (cifs_parse_security_flavors(string, vol) != 0)
-> >                                goto cifs_parse_mount_err;
-> >                        break;
-> > --
-> > 1.7.7.6
-> >
-> >
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBNb24s
+ICAyIEFwciAyMDEyIDE1OjMwOjE5IC0wNDAwDQpKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
+cmc+IHdyb3RlOg0KDQo+IFRoaXMgdmVyc2lvbiBvZiB0aGUgcGF0Y2ggYWRkcyBzb21lIGluZm8g
+dG8gdGhlIE5PVEVTIHNlY3Rpb24gb2YgdGhlDQo+IG1vdW50LmNpZnMoOCkgbWFucGFnZSBhcyB3
+ZWxsLg0KPiANCj4gSWYgbW91bnQuY2lmcyBpcyBpbnN0YWxsZWQgYXMgYSBzZXR1aWQgcm9vdCBw
+cm9ncmFtLCB0aGVuIGEgdXNlciBjYW4NCj4gdXNlIGl0IHRvIGdhdGhlciBpbmZvcm1hdGlvbiBh
+Ym91dCBmaWxlcyBhbmQgZGlyZWN0b3JpZXMgdG8gd2hpY2ggaGUNCj4gZG9lcyBub3QgaGF2ZSBh
+Y2Nlc3MuDQo+IA0KPiBPbmUgb2YgdGhlIGZpcnN0IHRoaW5ncyB0aGF0IG1vdW50LmNpZnMgZG9l
+cyBpcyB0byBjaGRpcigpIGludG8gdGhlDQo+IG1vdW50cG9pbnQgYW5kIHRoZW4gcHJvY2VlZHMg
+dG8gcGVyZm9ybSB0aGUgbW91bnQgb250byAiLiIuIEEgbWFsaWNpb3VzDQo+IHVzZXIgY291bGQg
+ZXhwbG9pdCB0aGlzIGZhY3QgdG8gZGV0ZXJtaW5lIGluZm9ybWF0aW9uIGFib3V0IGRpcmVjdG9y
+aWVzDQo+IHRvIHdoaWNoIGhlIGRvZXMgbm90IGhhdmUgYWNjZXNzLiBTcGVjaWZpY2FsbHksIHdo
+ZXRoZXIgdGhlIGRlbnRyeSBpbg0KPiBxdWVzdGlvbiBpcyBhIGZpbGUgb3IgZGlyZWN0b3J5IGFu
+ZCB3aGV0aGVyIGl0IGV4aXN0cyBhdCBhbGwuDQo+IA0KPiBUaGlzIHBhdGNoIGZpeGVzIHRoaXMg
+YnkgbWFraW5nIHRoZSBwcm9ncmFtIHN3aXRjaCB0aGUgZnN1aWQgdG8gdGhlDQo+IHJlYWwgdWlk
+IGZvciB1bnByaXZpbGVnZWQgdXNlcnMgd2hlbiBtb3VudGluZy4NCj4gDQo+IE5vdGUgdGhhdCB0
+aGlzIGlzIGEgYmVoYXZpb3IgY2hhbmdlLiBtb3VudC5jaWZzIGhhcyBpbiB0aGUgcGFzdCBhbGxv
+d2VkDQo+IHVzZXJzIHRvIG1vdW50IG9udG8gYW55IGRpcmVjdG9yeSBhcyBsb25nIGFzIGl0J3Mg
+bGlzdGVkIGluIC9ldGMvZnN0YWINCj4gYXMgYSB1c2VyIG1vdW50LiBXaXRoIHRoaXMgY2hhbmdl
+LCB0aGUgdXNlciBtdXN0IGFsc28gYmUgYWJsZSB0byBjaGRpcg0KPiBpbnRvIHRoZSBtb3VudHBv
+aW50IHdpdGhvdXQgbmVlZGluZyBzcGVjaWFsIHByaXZpbGVnZXMuIEhvcGVmdWxseSBub3QNCj4g
+bWFueSBwZW9wbGUgaGF2ZSBzdWNoIGEgcGF0aG9sb2dpY2FsIGNvbmZpZ3VyYXRpb24uDQo+IA0K
+PiBUaGlzIHBhdGNoIHNob3VsZCBmaXggQ1ZFLTIwMTItMTU4Ni4NCj4gDQo+IFJlcG9ydGVkLWJ5
+OiBKZXN1cyBPbG1vcyA8amVzdXMub2xtb3NAYmx1ZWxpdi5jb20+DQo+IFNpZ25lZC1vZmYtYnk6
+IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCj4gLS0tDQo+ICBjb25maWd1cmUuYWMg
+fCAgICA0ICsrKw0KPiAgbW91bnQuY2lmcy44IHwgICAgMyArLQ0KPiAgbW91bnQuY2lmcy5jIHwg
+ICA4NSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0t
+LS0tLS0tDQo+ICAzIGZpbGVzIGNoYW5nZWQsIDcyIGluc2VydGlvbnMoKyksIDIwIGRlbGV0aW9u
+cygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZS5hYyBiL2NvbmZpZ3VyZS5hYw0KPiBp
+bmRleCAzMDI3ZWJhLi4xZjU2MWY1IDEwMDY0NA0KPiAtLS0gYS9jb25maWd1cmUuYWMNCj4gKysr
+IGIvY29uZmlndXJlLmFjDQo+IEBAIC03Nyw2ICs3NywxMCBAQCBBQ19DSEVDS19GVU5DUyhjbG9j
+a19nZXR0aW1lLCBbXSwgWw0KPiAgIyBDaGVja3MgZm9yIGhlYWRlciBmaWxlcy4NCj4gIEFDX0NI
+RUNLX0hFQURFUlMoW2FycGEvaW5ldC5oIGN0eXBlLmggZmNudGwuaCBpbnR0eXBlcy5oIGxpbWl0
+cy5oIG1udGVudC5oIG5ldGRiLmggc3RkZGVmLmggc3RkaW50Lmggc3RkYm9vbC5oIHN0ZGxpYi5o
+IHN0ZGlvLmggZXJybm8uaCBzdHJpbmcuaCBzdHJpbmdzLmggc3lzL21vdW50Lmggc3lzL3BhcmFt
+Lmggc3lzL3NvY2tldC5oIHN5cy90aW1lLmggc3lzbG9nLmggdW5pc3RkLmhdLCAsIFtBQ19NU0df
+RVJST1IoW25lY2Vzc2FyeSBoZWFkZXIocykgbm90IGZvdW5kXSldKQ0KPiAgDQo+ICsjIGRvIHdl
+IGhhdmUgc3lzL2ZzdWlkLmggYW5kIHNldGZzdWlkKCk/DQo+ICtBQ19DSEVDS19IRUFERVJTKFtz
+eXMvZnN1aWQuaF0pDQo+ICtBQ19DSEVDS19GVU5DKHNldGZzdWlkLCAsIFtBQ19NU0dfRVJST1Io
+W1N5c3RlbSBkb2VzIG5vdCBzdXBwb3J0IHNldGZzdWlkKCldKV0pDQo+ICsNCj4gIGlmIHRlc3Qg
+JGVuYWJsZV9jaWZzdXBjYWxsICE9ICJubyI7IHRoZW4NCj4gIAlBQ19DSEVDS19IRUFERVJTKFtr
+cmI1Lmgga3JiNS9rcmI1LmhdKQ0KPiAgCWlmIHRlc3QgeCRhY19jdl9oZWFkZXJfa3JiNV9rcmI1
+X2ggIT0geHllcyA7IHRoZW4NCj4gZGlmZiAtLWdpdCBhL21vdW50LmNpZnMuOCBiL21vdW50LmNp
+ZnMuOA0KPiBpbmRleCAxZjA3ZDJjLi5jYmYyZTc2IDEwMDY0NA0KPiAtLS0gYS9tb3VudC5jaWZz
+LjgNCj4gKysrIGIvbW91bnQuY2lmcy44DQo+IEBAIC02NTksNyArNjU5LDggQEAgVGhlIHZhcmlh
+YmxlDQo+ICBtYXkgY29udGFpbiB0aGUgcGF0aG5hbWUgb2YgYSBmaWxlIHRvIHJlYWQgdGhlIHBh
+c3N3b3JkIGZyb21cJi4gQSBzaW5nbGUgbGluZSBvZiBpbnB1dCBpcyByZWFkIGFuZCB1c2VkIGFz
+IHRoZSBwYXNzd29yZFwmLg0KPiAgLlNIICJOT1RFUyINCj4gIC5QUA0KPiAtVGhpcyBjb21tYW5k
+IG1heSBiZSB1c2VkIG9ubHkgYnkgcm9vdCwgdW5sZXNzIGluc3RhbGxlZCBzZXR1aWQsIGluIHdo
+aWNoIGNhc2UgdGhlIG5vZWV4ZWMgYW5kIG5vc3VpZCBtb3VudCBmbGFncyBhcmUgZW5hYmxlZFwm
+LiBXaGVuIGluc3RhbGxlZCBhcyBhIHNldHVpZCBwcm9ncmFtLCB0aGUgcHJvZ3JhbSBmb2xsb3dz
+IHRoZSBjb252ZW50aW9ucyBzZXQgZm9ydGggYnkgdGhlIG1vdW50IHByb2dyYW0gZm9yIHVzZXIg
+bW91bnRzXCYuDQo+ICtUaGlzIGNvbW1hbmQgbWF5IGJlIHVzZWQgb25seSBieSByb290LCB1bmxl
+c3MgaW5zdGFsbGVkIHNldHVpZCwgaW4gd2hpY2ggY2FzZSB0aGUgbm9lZXhlYyBhbmQgbm9zdWlk
+IG1vdW50IGZsYWdzIGFyZSBlbmFibGVkXCYuIFdoZW4gaW5zdGFsbGVkIGFzIGEgc2V0dWlkIHBy
+b2dyYW0sIHRoZSBwcm9ncmFtIGZvbGxvd3MgdGhlIGNvbnZlbnRpb25zIHNldCBmb3J0aCBieSB0
+aGUgbW91bnQgcHJvZ3JhbSBmb3IgdXNlciBtb3VudHMsIHdpdGggdGhlIGFkZGVkIHJlc3RyaWN0
+aW9uIHRoYXQgdXNlcnMgbXVzdCBiZSBhYmxlIHRvIGNoZGlyKCkgaW50byB0aGUNCj4gK21vdW50
+cG9pbnQgcHJpb3IgdG8gdGhlIG1vdW50IGluIG9yZGVyIHRvIGJlIGFibGUgdG8gbW91bnQgb250
+byBpdC4NCj4gIC5QUA0KPiAgU29tZSBzYW1iYSBjbGllbnQgdG9vbHMgbGlrZSBzbWJjbGllbnQo
+OCkgaG9ub3VyIGNsaWVudFwtc2lkZSBjb25maWd1cmF0aW9uIHBhcmFtZXRlcnMgcHJlc2VudCBp
+biBzbWJcJi5jb25mXCYuIFVubGlrZSB0aG9zZSBjbGllbnQgdG9vbHMsDQo+ICBcZkltb3VudFwm
+LmNpZnNcZlINCj4gZGlmZiAtLWdpdCBhL21vdW50LmNpZnMuYyBiL21vdW50LmNpZnMuYw0KPiBp
+bmRleCBjMGFlYTM1Li5mMGIwNzNlIDEwMDY0NA0KPiAtLS0gYS9tb3VudC5jaWZzLmMNCj4gKysr
+IGIvbW91bnQuY2lmcy5jDQo+IEBAIC00NSw2ICs0NSw5IEBADQo+ICAjaW5jbHVkZSA8bGliZ2Vu
+Lmg+DQo+ICAjaW5jbHVkZSA8c3lzL21tYW4uaD4NCj4gICNpbmNsdWRlIDxzeXMvd2FpdC5oPg0K
+PiArI2lmZGVmIEhBVkVfU1lTX0ZTVUlEX0gNCj4gKyNpbmNsdWRlIDxzeXMvZnN1aWQuaD4NCj4g
+KyNlbmRpZiAvKiBIQVZFX1NZU19GU1VJRF9IICovDQo+ICAjaWZkZWYgSEFWRV9MSUJDQVBfTkcN
+Cj4gICNpbmNsdWRlIDxjYXAtbmcuaD4NCj4gICNlbHNlIC8qIEhBVkVfTElCQ0FQX05HICovDQo+
+IEBAIC0xODU0LDYgKzE4NTcsNjggQEAgYXNzZW1ibGVfZXhpdDoNCj4gIAlyZXR1cm4gcmM7DQo+
+ICB9DQo+ICANCj4gKy8qDQo+ICsgKiBjaGRpcigpIGludG8gdGhlIG1vdW50cG9pbnQgYW5kIGRl
+dGVybWluZSAicmVhbHBhdGgiLiBXZSBhc3N1bWUgaGVyZSB0aGF0DQo+ICsgKiAibW91bnRwb2lu
+dCIgaXMgYSBzdGF0aWNhbGx5IGFsbG9jYXRlZCBzdHJpbmcgYW5kIGRvZXMgbm90IG5lZWQgdG8g
+YmUgZnJlZWQuDQo+ICsgKi8NCj4gK3N0YXRpYyBpbnQNCj4gK2FjcXVpcmVfbW91bnRwb2ludChj
+aGFyICoqbW91bnRwb2ludHApDQo+ICt7DQo+ICsJaW50IHJjLCBkYWNyYzsNCj4gKwl1aWRfdCBy
+ZWFsdWlkLCBvbGRmc3VpZDsNCj4gKwlnaWRfdCBvbGRmc2dpZDsNCj4gKwljaGFyICptb3VudHBv
+aW50Ow0KPiArDQo+ICsJLyoNCj4gKwkgKiBBY3F1aXJlIHRoZSBuZWNlc3NhcnkgcHJpdmlsZWdl
+cyB0byBjaGRpciB0byB0aGUgbW91bnRwb2ludC4gSWYNCj4gKwkgKiB0aGUgcmVhbCB1aWQgaXMg
+cm9vdCwgdGhlbiB3ZSByZWFjcXVpcmUgQ0FQX0RBQ19SRUFEX1NFQVJDSC4gSWYNCj4gKwkgKiBp
+dCdzIG5vdCwgdGhlbiB3ZSBjaGFuZ2UgdGhlIGZzdWlkIHRvIHRoZSByZWFsIHVpZCB0byBlbnN1
+cmUgdGhhdA0KPiArCSAqIHRoZSBtb3VudGluZyB1c2VyIGFjdHVhbGx5IGhhcyBhY2Nlc3MgdG8g
+dGhlIG1vdW50cG9pbnQuDQo+ICsJICoNCj4gKwkgKiBUaGUgbW91bnQoOCkgbWFucGFnZSBkb2Vz
+IG5vdCBzdGF0ZSB0aGF0IHVzZXJzIG11c3QgYmUgYWJsZSB0bw0KPiArCSAqIGNoZGlyIGludG8g
+dGhlIG1vdW50cG9pbnQgaW4gb3JkZXIgdG8gbW91bnQgb250byBpdCwgYnV0IGlmIHdlDQo+ICsJ
+ICogYWxsb3cgdGhhdCwgdGhlbiBhbiB1bnByaXZpbGVnZWQgdXNlciBjb3VsZCB1c2UgdGhpcyBw
+cm9ncmFtIHRvDQo+ICsJICogInByb2JlIiBpbnRvIGRpcmVjdG9yaWVzIHRvIHdoaWNoIGhlIGRv
+ZXMgbm90IGhhdmUgYWNjZXNzLg0KPiArCSAqLw0KPiArCXJlYWx1aWQgPSBnZXR1aWQoKTsNCj4g
+KwlpZiAocmVhbHVpZCA9PSAwKSB7DQo+ICsJCWRhY3JjID0gdG9nZ2xlX2RhY19jYXBhYmlsaXR5
+KDAsIDEpOw0KPiArCQlpZiAoZGFjcmMpDQo+ICsJCQlyZXR1cm4gZGFjcmM7DQo+ICsJfSBlbHNl
+IHsNCj4gKwkJb2xkZnN1aWQgPSBzZXRmc3VpZChyZWFsdWlkKTsNCj4gKwkJb2xkZnNnaWQgPSBz
+ZXRmc2dpZChnZXRnaWQoKSk7DQo+ICsJfQ0KPiArDQo+ICsJcmMgPSBjaGRpcigqbW91bnRwb2lu
+dHApOw0KPiArCWlmIChyYykgew0KPiArCQlmcHJpbnRmKHN0ZGVyciwgIkNvdWxkbid0IGNoZGly
+IHRvICVzOiAlc1xuIiwgKm1vdW50cG9pbnRwLA0KPiArCQkJc3RyZXJyb3IoZXJybm8pKTsNCj4g
+KwkJcmMgPSBFWF9VU0FHRTsNCj4gKwkJZ290byByZXN0b3JlX3ByaXZzOw0KPiArCX0NCj4gKw0K
+PiArCW1vdW50cG9pbnQgPSByZWFscGF0aCgiLiIsIE5VTEwpOw0KPiArCWlmICghbW91bnRwb2lu
+dCkgew0KPiArCQlmcHJpbnRmKHN0ZGVyciwgIlVuYWJsZSB0byByZXNvbHZlICVzIHRvIGNhbm9u
+aWNhbCBwYXRoOiAlc1xuIiwNCj4gKwkJCSptb3VudHBvaW50cCwgc3RyZXJyb3IoZXJybm8pKTsN
+Cj4gKwkJcmMgPSBFWF9TWVNFUlI7DQo+ICsJfQ0KPiArDQo+ICsJKm1vdW50cG9pbnRwID0gbW91
+bnRwb2ludDsNCj4gK3Jlc3RvcmVfcHJpdnM6DQo+ICsJaWYgKHJlYWx1aWQgPT0gMCkgew0KPiAr
+CQlkYWNyYyA9IHRvZ2dsZV9kYWNfY2FwYWJpbGl0eSgwLCAwKTsNCj4gKwkJaWYgKGRhY3JjKQ0K
+PiArCQkJcmMgPSByYyA/IHJjIDogZGFjcmM7DQo+ICsJfSBlbHNlIHsNCj4gKwkJc2V0ZnN1aWQo
+b2xkZnN1aWQpOw0KPiArCQlzZXRmc2dpZChvbGRmc2dpZCk7DQo+ICsJfQ0KPiArDQo+ICsJcmV0
+dXJuIHJjOw0KPiArfQ0KPiArDQo+ICBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpDQo+
+ICB7DQo+ICAJaW50IGM7DQo+IEBAIC0xOTUzLDI1ICsyMDE4LDcgQEAgaW50IG1haW4oaW50IGFy
+Z2MsIGNoYXIgKiphcmd2KQ0KPiAgCW1vdW50cG9pbnQgPSBhcmd2W29wdGluZCArIDFdOw0KPiAg
+DQo+ICAJLyogY2hkaXIgaW50byBtb3VudHBvaW50IGFzIHNvb24gYXMgcG9zc2libGUgKi8NCj4g
+LQlyYyA9IHRvZ2dsZV9kYWNfY2FwYWJpbGl0eSgwLCAxKTsNCj4gLQlpZiAocmMpDQo+IC0JCXJl
+dHVybiByYzsNCj4gLQlyYyA9IGNoZGlyKG1vdW50cG9pbnQpOw0KPiAtCWlmIChyYykgew0KPiAt
+CQlmcHJpbnRmKHN0ZGVyciwgIkNvdWxkbid0IGNoZGlyIHRvICVzOiAlc1xuIiwgbW91bnRwb2lu
+dCwNCj4gLQkJCXN0cmVycm9yKGVycm5vKSk7DQo+IC0JCXJjID0gRVhfVVNBR0U7DQo+IC0JCWdv
+dG8gbW91bnRfZXhpdDsNCj4gLQl9DQo+IC0NCj4gLQltb3VudHBvaW50ID0gcmVhbHBhdGgoIi4i
+LCBOVUxMKTsNCj4gLQlpZiAoIW1vdW50cG9pbnQpIHsNCj4gLQkJZnByaW50ZihzdGRlcnIsICJV
+bmFibGUgdG8gcmVzb2x2ZSAlcyB0byBjYW5vbmljYWwgcGF0aDogJXNcbiIsDQo+IC0JCQltb3Vu
+dHBvaW50LCBzdHJlcnJvcihlcnJubykpOw0KPiAtCQlyYyA9IEVYX1NZU0VSUjsNCj4gLQkJZ290
+byBtb3VudF9leGl0Ow0KPiAtCX0NCj4gLQlyYyA9IHRvZ2dsZV9kYWNfY2FwYWJpbGl0eSgwLCAw
+KTsNCj4gKwlyYyA9IGFjcXVpcmVfbW91bnRwb2ludCgmbW91bnRwb2ludCk7DQo+ICAJaWYgKHJj
+KQ0KPiAgCQlyZXR1cm4gcmM7DQo+ICANCg0KTWVyZ2VkLi4uDQoNClRoaXMgcGF0Y2ggZml4ZWQg
+dGhlIHByb2JsZW0gZm9yIG1lIHRoYXQgd2FzIGRldGFpbGVkIGhlcmU6DQoNCiAgICBodHRwczov
+L2J1Z3ppbGxhLnNhbWJhLm9yZy9zaG93X2J1Zy5jZ2k/aWQ9ODgyMQ0KDQpKZXN1cyAodGhlIG9y
+aWdpbmFsIHJlcG9ydGVyIG9mIHRoZSBidWcpIHNhaWQgdGhhdCBpdCBkaWQgbm90IGZpeCB0aGUN
+Cmlzc3VlIGZvciBoaW0sIGJ1dCBJIHdhcyBuZXZlciBhYmxlIHRvIGdldCBkZXRhaWxzIGFzIHRv
+IHdoeS4gQXQgdGhpcw0KcG9pbnQsIEknbSBnb2luZyB0byBnbyBhaGVhZCBhbmQgY2FsbCB0aGlz
+IGZpeGVkLCBidXQgd2lsbCBiZSBoYXBweSB0bw0KcmV2aXNpdCB0aGUgaXNzdWUgaWYgdGhlcmUn
+cyBzdGlsbCBhIHdheSB0byB1c2UgbW91bnQuY2lmcyB0byBJRCBmaWxlcw0KYW5kIGRpcmVjdG9y
+aWVzLg0KDQotIC0tIA0KSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KLS0tLS1CRUdJ
+TiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYyLjAuMTggKEdOVS9MaW51eCkN
+Cg0KaVFJY0JBRUJBZ0FHQlFKUGhyVVpBQW9KRUFBT2FFRVpWb0lWQlQ4UC9SU3NlbXlrR3dlSjdw
+UWErZkFKdlJZNQ0KWXZYbTFJZHFQcVV1bG04NnFFUGF1c3YwWnQzTmZpc2RESTdUdkd6WGs2NGVx
+VDVha3VQZDM3ZTFrR21pSDJWWQ0KSzZyNnV5ZWVNU0FjZ29RWFZIemlyMFNkNmNKNVZRYkk5L3l6
+MEZoeGgwdHQvMzdaUXpRYWU5bndFdmRZT2tHLw0KWW1mQmR3RC81WEdGQ2FDc1Zsd2t2Mit6Lzlu
+RkVQK3A2VnhtdmJaTU13RVZuRWFVckNoaDJCVjViR2c1bGMvaQ0Kd1l0cEg4YXV1RWxzZnRrRjlV
+dnVHT21vS1J1eHRtMVp3Nzl5MGlYdzAyZDE4REp1OStHN2JpMjlGOFpVVG5reQ0KZDYxTzQwc0tj
+a3BLVDBKN0hQU3R4V1F1d1VXcy9DQ0RYWlhXZkZpSU40ZWI2cHF1SkhPTnpDYUp4U1orSHNHMA0K
+Z0pXTlFQSjczNmsvSFdnKysvVjY1YmVQYzVHeGJCSXRlYjhsSEZVdDBpWHB1Uk9UU0NJN01IMGwy
+L3BQVWFYVg0KWTVDQ1lSU0RLNVlSdmNSYzl3UzNFaVZMOUNWbkxtNWp2R21uQnhvbGs2NHVpUzJm
+S3Q3d1pPVllneFVwNk1Tbw0KQ1FQeGVvOXN2ekI3WDB4QnVGbDFoMjluempzTmE3SWg0TUlZUXB1
+Q0swaWg2QU41cVo1RldiTUV6VHNIYmdEbQ0KaThGc0I5Rld5YXc5RzZwUFFvQkw2VzNsK0VKcTZz
+ZkFWd05OZkEwNEIrQVBnYzA0cTBtNUd3aEplcW1XUURISg0KdVJKYUJvdFphNXc2bFdhMnlvMkFi
+eUdGTW1FQzJCd2NNakFWaE1CbjZtM3VmQVJ0ZXdHQUt5RnpIemE2ejJ4UQ0KMDVSNUlPZWt1MUZK
+ajlLNDFPdWENCj1Yb01SDQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0NCg==
