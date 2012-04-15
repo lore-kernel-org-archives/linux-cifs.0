@@ -1,144 +1,94 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] autoconf: fix tests for wbclient to use pkgconfig
-Date: Sat, 14 Apr 2012 08:32:52 -0400
-Message-ID: <1334406772-5533-1-git-send-email-jlayton@samba.org>
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs-utils: fix up some compiler warnings in asn1.c
+Date: Sun, 15 Apr 2012 07:51:25 -0400
+Message-ID: <1334490685-14366-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Use the pkgconfig file that's included with wbclient to perform the test
-for wbclient usability, and to set the correct CFLAGS and LDADD.
+These have been around for quite some time.
 
-This is particularly necessary on recent Fedora with samba4 since it
-puts the wbclient.h file in a different directory than before.
+gcc -DHAVE_CONFIG_H -I.    -Wall -Wextra -g -O2 -MT asn1.o -MD -MP -MF
+=2Edeps/asn1.Tpo -c -o asn1.o asn1.c
+asn1.c: In function =E2=80=98asn1_write=E2=80=99:
+asn1.c:45:19: warning: comparison between signed and unsigned integer
+expressions [-Wsign-compare]
+asn1.c: In function =E2=80=98asn1_peek=E2=80=99:
+asn1.c:411:22: warning: comparison between signed and unsigned integer
+expressions [-Wsign-compare]
+asn1.c: In function =E2=80=98asn1_tag_remaining=E2=80=99:
+asn1.c:541:16: warning: comparison between signed and unsigned integer
+expressions [-Wsign-compare]
+asn1.c: In function =E2=80=98_ber_read_OID_String_impl=E2=80=99:
+asn1.c:570:22: warning: comparison between signed and unsigned integer
+expressions [-Wsign-compare]
 
-Also, remove a redundant test for wbclient.h from configure.ac.
+Almost all of these are due to the fact that asn1_data->ofs is a
+signed value, and ->length is unsigned. In most cases, I've fixed
+it by casting ofs to an unsigned value, but in one case, I cast
+length to a signed value since it looked possible for the result
+to go negative.
+
+Hopefully the values here will always be small enough that this is
+never a real problem.
+
+This should clear the way to add -Werror to the cflags in the near
+future.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- Makefile.am      |    9 ++++++---
- aclocal/idmap.m4 |   37 +++----------------------------------
- configure.ac     |   15 ---------------
- 3 files changed, 9 insertions(+), 52 deletions(-)
+ asn1.c |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 924c99e..17ad8e1 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -41,7 +41,8 @@ endif
- if CONFIG_CIFSIDMAP
- sbin_PROGRAMS += cifs.idmap
- cifs_idmap_SOURCES = cifs.idmap.c
--cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
-+cifs_idmap_LDADD = -lkeyutils $(WBCLIENT_LIBS)
-+cifs_idmap_CFLAGS = $(WBCLIENT_CFLAGS)
- man_MANS += cifs.idmap.8
- 
- cifs.idmap.8: cifs.idmap.8.in
-@@ -56,12 +57,14 @@ endif
- if CONFIG_CIFSACL
- bin_PROGRAMS += getcifsacl
- getcifsacl_SOURCES = getcifsacl.c
--getcifsacl_LDADD = $(WINB_LDADD)
-+getcifsacl_LDADD = $(WBCLIENT_LIBS)
-+getcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
- man_MANS += getcifsacl.1
- 
- bin_PROGRAMS += setcifsacl
- setcifsacl_SOURCES = setcifsacl.c
--setcifsacl_LDADD = $(WINB_LDADD)
-+setcifsacl_LDADD = $(WBCLIENT_LIBS)
-+setcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
- man_MANS += setcifsacl.1
- 
- endif
-diff --git a/aclocal/idmap.m4 b/aclocal/idmap.m4
-index ada73f0..70a0649 100644
---- a/aclocal/idmap.m4
-+++ b/aclocal/idmap.m4
-@@ -1,33 +1,8 @@
--dnl Headers needed by wbclient.h
--dnl
--AC_DEFUN([AC_WBCH_COMPL],[
--[
--#ifdef HAVE_STDINT_H
--#include <stdint.h>
--#endif
--]
--[#ifdef HAVE_STDBOOL_H
--#include <stdbool.h>
--#endif
--]
--[#ifdef HAVE_STDIO_H
--#include <stdio.h>
--#endif
--]
--[#ifdef HAVE_STDLIB_H
--#include <stdlib.h>
--#endif
--]
--[#ifdef HAVE_ERRNO_H
--#include <errno.h>
--#endif
--]])
--
--dnl Check for wbclient.h header and libwbclient.so
-+dnl Check for wbclient package
- dnl
- AC_DEFUN([AC_TEST_WBCHL],[
- if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
--	AC_CHECK_HEADERS([wbclient.h], , [
-+	PKG_CHECK_MODULES(WBCLIENT, wbclient, , [
- 				if test "$enable_cifsidmap" = "yes"; then
- 					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
- 				else
-@@ -40,7 +15,7 @@ if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
- 					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling cifsacl.])
- 					enable_cifsacl="no"
- 				fi
--			], [ AC_WBCH_COMPL ])
-+			])
- fi
- 
- if test $enable_cifsacl != "no"; then
-@@ -53,10 +28,4 @@ if test $enable_cifsacl != "no"; then
- 				fi
- 			], [ ])
- fi
--
--if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
--	AC_CHECK_LIB([wbclient], [wbcStringToSid],
--		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["Define var have_libwbclient"]) ], [AC_MSG_ERROR([No functioning wbclient library found!])])
--	AC_SUBST(WINB_LDADD)
--fi
- ])
-diff --git a/configure.ac b/configure.ac
-index 1f561f5..9b5ce15 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -139,21 +139,6 @@ if test $enable_cifsupcall != "no" -o $enable_cifsidmap != "no"; then
- 				fi
- 			])
- fi
--if test $enable_cifsacl != "no"; then
--	AC_CHECK_HEADERS([wbclient.h], , [
--				if test "$enable_cifsacl" = "yes"; then
--					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
--				else
--					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling getcifsacl.])
--					enable_cifsacl="no"
--				fi
--			],
--			[AC_INCLUDES_DEFAULT]
--			[#ifdef HAVE_STDBOOL_H
--			    #include <stdbool.h>
--			    #endif
--			])
--fi
- if test $enable_cifsupcall != "no"; then
- 	AC_CHECK_LIB([krb5], [krb5_init_context],
- 			[ KRB5_LDADD='-lkrb5' ],
--- 
+diff --git a/asn1.c b/asn1.c
+index 4103419..34475b6 100644
+--- a/asn1.c
++++ b/asn1.c
+@@ -41,8 +41,9 @@ void asn1_free(struct asn1_data *data)
+ /* write to the ASN1 buffer, advancing the buffer pointer */
+ bool asn1_write(struct asn1_data *data, const void *p, int len)
+ {
+-	if (data->has_error) return false;
+-	if (data->length < data->ofs+len) {
++	if (data->has_error)
++		return false;
++	if (data->length < (size_t)data->ofs + len) {
+ 		uint8_t *newp;
+ 		newp =3D talloc_realloc(data, data->data, uint8_t, data->ofs+len);
+ 		if (!newp) {
+@@ -408,7 +409,7 @@ bool asn1_peek(struct asn1_data *data, void *p, int=
+ len)
+ 	if (len < 0 || data->ofs + len < data->ofs || data->ofs + len < len)
+ 		return false;
+=20
+-	if (data->ofs + len > data->length) {
++	if ((size_t)data->ofs + len > data->length) {
+ 		/* we need to mark the buffer as consumed, so the caller knows
+ 		   this was an out of data error, and not a decode error */
+ 		data->ofs =3D data->length;
+@@ -538,7 +539,7 @@ int asn1_tag_remaining(struct asn1_data *data)
+ 		return -1;
+ 	}
+ 	remaining =3D data->nesting->taglen - (data->ofs - data->nesting->sta=
+rt);
+-	if (remaining > (data->length - data->ofs)) {
++	if (remaining > (ssize_t)data->length - data->ofs) {
+ 		data->has_error =3D true;
+ 		return -1;
+ 	}
+@@ -553,7 +554,7 @@ int asn1_tag_remaining(struct asn1_data *data)
+ static bool _ber_read_OID_String_impl(TALLOC_CTX *mem_ctx, DATA_BLOB b=
+lob,
+ 					const char **OID, size_t *bytes_eaten)
+ {
+-	int i;
++	unsigned int i;
+ 	uint8_t *b;
+ 	unsigned int v;
+ 	char *tmp_oid =3D NULL;
+--=20
 1.7.7.6
