@@ -1,155 +1,57 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2] autoconf: fix tests for wbclient to use pkgconfig
-Date: Sun, 15 Apr 2012 08:14:19 -0400
-Message-ID: <1334492059-17750-1-git-send-email-jlayton@samba.org>
-Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [Lsf] [RFC] writeback and cgroup
+Date: Sun, 15 Apr 2012 20:25:30 -0500
+Message-ID: <CAH2r5msT-PgA5gqFTFBgDUQbPKzyEohKQ_auKX1jZLtivUJmxg@mail.gmail.com>
+References: <20120403183655.GA23106@dhcp-172-17-108-109.mtv.corp.google.com>
+	<20120404145134.GC12676@redhat.com>
+	<20120404184909.GB29686@dhcp-172-17-108-109.mtv.corp.google.com>
+	<1334404423.2528.75.camel@twins>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1334404423.2528.75.camel@twins>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-(This version adds AM_PROG_CC_C_O to configure.ac, which is now
-necessary since I'm adding per-target CFLAGS)
+This long thread on linux-mm and linux-fsdevel has been discussing
+writeback, throttling, cgroups etc.=A0 This post reminded me that we
+should look more carefully at the cifs bdi implementation, compare to
+nfs, and also check what needs to be improved in the bdi
+implementation to handle smb2 credits.=A0 It will be interesting to see
+if that will help writeback.
 
-Use the pkgconfig file that's included with wbclient to perform the test
-for wbclient usability, and to set the correct CFLAGS and LDADD.
+On Sat, Apr 14, 2012 at 6:53 AM, Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> =
+wrote:
+>
+> On Wed, 2012-04-04 at 11:49 -0700, Tejun Heo wrote:
+> > > - How to handle NFS.
+> >
+> > As said above, maybe through network based bdi pressure propagation=
+,
+> > Maybe some other special case mechanism. =A0Unsure but I don't thin=
+k
+> > this concern should dictate the whole design.
+>
+> NFS has a custom bdi implementation and implements congestion control
+> based on the number of outstanding writeback pages.
+>
+> See fs/nfs/write.c:nfs_{set,end}_page_writeback
+>
+> All !block based filesystems have their own BDI implementation, I'm n=
+ot
+> sure on the congestion implementation of anything other than NFS thou=
+gh.
+> _______________________________________________
+> Lsf mailing list
+> Lsf-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+> https://lists.linuxfoundation.org/mailman/listinfo/lsf
 
-This is particularly necessary on recent Fedora with samba4 since it
-puts the wbclient.h file in a different directory than before.
 
-Also, remove a redundant test for wbclient.h from configure.ac.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- Makefile.am      |    9 ++++++---
- aclocal/idmap.m4 |   37 +++----------------------------------
- configure.ac     |   16 +---------------
- 3 files changed, 10 insertions(+), 52 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 924c99e..17ad8e1 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -41,7 +41,8 @@ endif
- if CONFIG_CIFSIDMAP
- sbin_PROGRAMS += cifs.idmap
- cifs_idmap_SOURCES = cifs.idmap.c
--cifs_idmap_LDADD = -lkeyutils $(WINB_LDADD)
-+cifs_idmap_LDADD = -lkeyutils $(WBCLIENT_LIBS)
-+cifs_idmap_CFLAGS = $(WBCLIENT_CFLAGS)
- man_MANS += cifs.idmap.8
- 
- cifs.idmap.8: cifs.idmap.8.in
-@@ -56,12 +57,14 @@ endif
- if CONFIG_CIFSACL
- bin_PROGRAMS += getcifsacl
- getcifsacl_SOURCES = getcifsacl.c
--getcifsacl_LDADD = $(WINB_LDADD)
-+getcifsacl_LDADD = $(WBCLIENT_LIBS)
-+getcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
- man_MANS += getcifsacl.1
- 
- bin_PROGRAMS += setcifsacl
- setcifsacl_SOURCES = setcifsacl.c
--setcifsacl_LDADD = $(WINB_LDADD)
-+setcifsacl_LDADD = $(WBCLIENT_LIBS)
-+setcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
- man_MANS += setcifsacl.1
- 
- endif
-diff --git a/aclocal/idmap.m4 b/aclocal/idmap.m4
-index ada73f0..70a0649 100644
---- a/aclocal/idmap.m4
-+++ b/aclocal/idmap.m4
-@@ -1,33 +1,8 @@
--dnl Headers needed by wbclient.h
--dnl
--AC_DEFUN([AC_WBCH_COMPL],[
--[
--#ifdef HAVE_STDINT_H
--#include <stdint.h>
--#endif
--]
--[#ifdef HAVE_STDBOOL_H
--#include <stdbool.h>
--#endif
--]
--[#ifdef HAVE_STDIO_H
--#include <stdio.h>
--#endif
--]
--[#ifdef HAVE_STDLIB_H
--#include <stdlib.h>
--#endif
--]
--[#ifdef HAVE_ERRNO_H
--#include <errno.h>
--#endif
--]])
--
--dnl Check for wbclient.h header and libwbclient.so
-+dnl Check for wbclient package
- dnl
- AC_DEFUN([AC_TEST_WBCHL],[
- if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
--	AC_CHECK_HEADERS([wbclient.h], , [
-+	PKG_CHECK_MODULES(WBCLIENT, wbclient, , [
- 				if test "$enable_cifsidmap" = "yes"; then
- 					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
- 				else
-@@ -40,7 +15,7 @@ if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
- 					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling cifsacl.])
- 					enable_cifsacl="no"
- 				fi
--			], [ AC_WBCH_COMPL ])
-+			])
- fi
- 
- if test $enable_cifsacl != "no"; then
-@@ -53,10 +28,4 @@ if test $enable_cifsacl != "no"; then
- 				fi
- 			], [ ])
- fi
--
--if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
--	AC_CHECK_LIB([wbclient], [wbcStringToSid],
--		[ WINB_LDADD='-lwbclient' ] [ AC_DEFINE(HAVE_LIBWBCLIENT, 1, ["Define var have_libwbclient"]) ], [AC_MSG_ERROR([No functioning wbclient library found!])])
--	AC_SUBST(WINB_LDADD)
--fi
- ])
-diff --git a/configure.ac b/configure.ac
-index 1f561f5..d5d978b 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -46,6 +46,7 @@ AC_ARG_VAR(ROOTSBINDIR, [Location where files ordinarily under /sbin should be i
- AC_PROG_CC
- AC_PROG_SED
- AC_GNU_SOURCE
-+AM_PROG_CC_C_O
- 
- # Checks for typedefs, structures, and compiler characteristics.
- AC_HEADER_STDBOOL
-@@ -139,21 +140,6 @@ if test $enable_cifsupcall != "no" -o $enable_cifsidmap != "no"; then
- 				fi
- 			])
- fi
--if test $enable_cifsacl != "no"; then
--	AC_CHECK_HEADERS([wbclient.h], , [
--				if test "$enable_cifsacl" = "yes"; then
--					AC_MSG_ERROR([wbclient.h not found, consider installing libwbclient-devel.])
--				else
--					AC_MSG_WARN([wbclient.h not found, consider installing libwbclient-devel. Disabling getcifsacl.])
--					enable_cifsacl="no"
--				fi
--			],
--			[AC_INCLUDES_DEFAULT]
--			[#ifdef HAVE_STDBOOL_H
--			    #include <stdbool.h>
--			    #endif
--			])
--fi
- if test $enable_cifsupcall != "no"; then
- 	AC_CHECK_LIB([krb5], [krb5_init_context],
- 			[ KRB5_LDADD='-lkrb5' ],
--- 
-1.7.7.6
+--
+Thanks,
+
+Steve
