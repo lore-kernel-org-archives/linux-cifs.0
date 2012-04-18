@@ -1,31 +1,65 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Tue, 17 Apr 2012 11:10:39 -0500
-Message-ID: <CAH2r5mvZk1qCwdbkWW6LD4=xvzr_1=dbPNAM3Rw=yVRWrm1rkQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 4/5] SUNRPC: Add RPC based upcall mechanism for RPCGSS
+ auth
+Date: Wed, 18 Apr 2012 06:59:26 -0400
+Message-ID: <20120418065926.55d75ec2@tlielax.poochiereds.net>
+References: <1334669948-4156-1-git-send-email-simo@redhat.com>
+	<1334669948-4156-5-git-send-email-simo@redhat.com>
+	<20120417222825.GA32619@fieldses.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, bfields-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120417222825.GA32619-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit f68e556e23d1a4176b563bcb25d8baf2c5313f91:
-  Linus Torvalds (1):
-        Make the "word-at-a-time" helper functions more commonly usable
+On Tue, 17 Apr 2012 18:28:25 -0400
+"J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org> wrote:
 
-are available in the git repository at:
+> On Tue, Apr 17, 2012 at 09:39:07AM -0400, Simo Sorce wrote:
+> > This patch implements a sunrpc client to use the services of the gssproxy
+> > userspace daemon.
+> > 
+> > In particular it allows to perform calls in user space using an RPC
+> > call instead of custom hand-coded upcall/downcall messages.
+> 
+> The "hand-coded" messages aren't really particularly hard to generate or
+> parse.  Let's just drop that argument.
+> 
+> > Currently only accept_sec_context is implemented as that is all is needed for
+> > the server case.
+> > 
+> > File server modules like NFS and CIFS can use full gssapi services this way,
+> > once init_sec_context is also implemented.
+> 
+> What's the situation with CIFS, by the way?  (How does it currently do
+> gssapi, and what are their plans?)
+> 
 
-  git://git.samba.org/sfrench/cifs-2.6.git ..BRANCH.NOT.VERIFIED..
+Currently it has its own upcall that's done using the keys API. It's
+pretty limited. It's stateless and so doesn't handle multistage
+negotiation properly, for instance but it works well enough for our
+purposes...
 
-Sachin Prabhu (2):
-      Cleanup handling of NULL value passed for a mount option
-      Fix number parsing in cifs_parse_mount_options
+If there's common infrastructure in the kernel for handling GSSAPI then
+we'd be interested in using that instead. I'm all for less code that we
+have to maintain ourselves...
 
- fs/cifs/connect.c |   82 +++++++++++++----------------------------------------
- 1 files changed, 20 insertions(+), 62 deletions(-)
+We would of course need to come up with a transition scheme to the new
+daemon. We might need some small modifications too since CIFS expects
+the blob to be wrapped in SPNEGO as well, but that's fairly easy to
+manage and we could do that in kernel space if needed.
+
+My only (minor) reservation is that moving to this would mean cifs
+would be dependent to some degree on the sunrpc code. It's not a huge
+problem. Most distros won't care, but some embedded ones might.
+
+What we'll probably do is wait until this is more settled with nfs(d)
+and then look at moving to it.
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
