@@ -1,48 +1,34 @@
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [patch] cifs: fix revalidation test in cifs_llseek()
-Date: Fri, 20 Apr 2012 00:06:19 +0300
-Message-ID: <20120419210619.GA19074@elgon.mountain>
+From: Paul Eggert <eggert@cs.ucla.edu>
+Subject: Re: [PATCH 0/6] Extended file stat system call
+Date: Thu, 19 Apr 2012 14:51:18 -0700
+Message-ID: <4F9088D6.9020203@cs.ucla.edu>
+References: <20120419140558.17272.74360.stgit@warthog.procyon.org.uk> <20120419163238.61D382C0DF@topped-with-meat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	samba-technical@lists.samba.org, Josef Bacik <josef@redhat.com>
-To: Steve French <sfrench@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-Content-Disposition: inline
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
+ wine-devel@winehq.org, kfm-devel@kde.org, nautilus-list@gnome.org,
+ linux-api@vger.kernel.org, libc-alpha@sourceware.org
+To: Roland McGrath <roland@hack.frob.com>
+Return-path: <libc-alpha-return-27653-glibc-alpha=m.gmane.org@sourceware.org>
+In-Reply-To: <20120419163238.61D382C0DF@topped-with-meat.com>
+List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
+List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
+List-Archive: <http://sourceware.org/ml/libc-alpha/>
+List-Post: <mailto:libc-alpha@sourceware.org>
+List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
+Sender: libc-alpha-owner@sourceware.org
 List-Id: linux-cifs.vger.kernel.org
 
-This test is always true so it means we revalidate the length every
-time, which generates more network traffic.  This was introduced in
-06222e491e "fs: handle SEEK_HOLE/SEEK_DATA properly in all fs's that
-define their own llseek".
+On 04/19/2012 09:32 AM, Roland McGrath wrote:
+> I have no comment on the functionality.  But "xstat" is probably a poor
+> choice of name. 
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
-Josef, there were three other places that had this same problem but I
-think they've all been fixed now.  Except that I had a question about
-nfs_file_llseek().  Isn't that reversed?  It seems like it only
-revalidates when it's not supposed to.  I chose to copy what
-fuse_file_llseek() does instead.
+In AIX 7.1 the (similar) function is called statxat instead of xstat.
+The API isn't exactly the same, but it's the same basic idea.
+Might be worth looking at, not merely to see whether the API
+should be the same, but also to borrow good ideas even if not.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index d342128..97d26c7 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -695,7 +695,7 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
- 	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
- 	 * the cached file length
- 	 */
--	if (origin != SEEK_SET || origin != SEEK_CUR) {
-+	if (origin == SEEK_SET || origin == SEEK_CUR) {
- 		int rc;
- 		struct inode *inode = file->f_path.dentry->d_inode;
- 
+http://pic.dhe.ibm.com/infocenter/aix/v7r1/topic/com.ibm.aix.basetechref/doc/basetrf2/statx.htm
