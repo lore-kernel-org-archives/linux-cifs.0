@@ -1,41 +1,84 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: build breaks with krb5 < 1.7 in the 5.4 release
-Date: Thu, 19 Apr 2012 14:03:49 -0400
-Message-ID: <20120419140349.6eb2432e@corrin.poochiereds.net>
-References: <20120419180006.GS12994@hip.fritz.box>
+From: Lars =?iso-8859-1?Q?M=FCller?= <lmuelle-IBi9RG/b67k@public.gmane.org>
+Subject: mount.cifs.c toggle_dac_capability() stores return code
+Date: Thu, 19 Apr 2012 20:56:13 +0200
+Message-ID: <20120419185612.GT12994@hip.fritz.box>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Lars =?UTF-8?B?TcO8bGxlcg==?= <lmuelle-IBi9RG/b67k@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="v6YRErhBvjoBjrPV"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120419180006.GS12994-aSaWmTCphX8QgCKCZH8Z8g@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUaHUs
-IDE5IEFwciAyMDEyIDIwOjAwOjA3ICswMjAwDQpMYXJzIE3DvGxsZXIgPGxtdWVsbGVAc3VzZS5j
-b20+IHdyb3RlOg0KDQo+IEhpIGxpbnV4LWNpZnMsDQo+IA0KPiBwcm9kdWN0cyBjb21pbmcgd2l0
-aCBNSVQga3JiNSA8IDEuNyAobGlrZSBTVVNFIExpbnV4IEVudGVycHJpc2UgMTEgU1AgMQ0KPiBv
-ciBTUCAyKSBzdWZmZXIgZnJvbSB0aGUgc2FtZSBpc3N1ZSBhcyBkZXNjcmliZWQgYnkNCj4gaHR0
-cHM6Ly9idWd6aWxsYS5zYW1iYS5vcmcvc2hvd19idWcuY2dpP2lkPTY5MTgNCj4gDQo+IFRoZSBk
-ZWNsYXJhdGlvbiBvZiBrcmI1X2F1dGhfY29uX3NldF9yZXFfY2tzdW10eXBlIGlzIG1pc3Npbmcu
-DQo+IA0KPiBUaGUgYXR0YWNoZWQgcGF0Y2ggZml4ZXMgdGhpcyBpc3N1ZS4NCj4gDQo+IENoZWVy
-cywNCj4gDQo+IExhcnMNCg0KTG9va3MgZ29vZC4gSSdsbCBjb21taXQgaW4gdGhlIG5leHQgZmV3
-IGRheXMgaWYgbm8gb25lIG9iamVjdHMuDQoNClRoYW5rcyENCi0gLS0gDQpKZWZmIExheXRvbiA8
-amxheXRvbkBzYW1iYS5vcmc+DQotLS0tLUJFR0lOIFBHUCBTSUdOQVRVUkUtLS0tLQ0KVmVyc2lv
-bjogR251UEcgdjIuMC4xOCAoR05VL0xpbnV4KQ0KDQppUUljQkFFQkFnQUdCUUpQa0ZPRkFBb0pF
-QUFPYUVFWlZvSVY5VUVQL1I4NGhGVU9Bd054Qi9VeXdKdWxpcnl2DQo2WmNTSXlqZGFxbGV3WjU1
-eDNEUmpFeGRJVmJuVm9vL2hzS2NHZzltYTc4czRkZzRmWTFobmlLOXpHNWlUQUNYDQp3MXpKUVRr
-K3VxNWRscWozSDFrS05oVitGRjd6Q3FmelRPSEpkcGd6Y0V6eHpmSUtUam9tWklQdlNOMGp3cVRM
-DQpVWS90dXk4RWVReFR3cWgwV0tFMTRKbUlPazQ4UlNGYytFcHZ1My9DSjZsL3B3UTdLdkRIYXg3
-NE8weXdlbzVqDQpkaFdESTYvZUM4REtWc2dMNm56SmsreGp6Z3ZYWUp4NS83VFE4ejR4NGhJZ3di
-K01uM2svaHlncjUwbnpTWURlDQpuZmxoWkRWWHVvMk5vWGZmSTF3V3AzT3YvOTJOWmFZZkh6bWRn
-eng4cTZzM21xUmtvV0pyVjRyVlgwU2FVZ2J3DQpxbnBuS25TU3YzTWlkRDN1cFdxK2ZySE1BcFhS
-dDJCUlN3YUw5b1pSL0JaYlExWkMwZVRYbFhWRTJDc3J6UEZSDQo1UTFYNHZ1cXJzRUdyRFdVc1Z3
-OHhaVXFSai9xMENSREdLOENySXg4M2NrK3lSRGhQc295ZlVxVmN6UWxvb2xxDQpmUm5kMm5ZLyti
-bTJxRjRQc2NVUXY0SWRSQ0lkeEdDL2ZzV1RuNkdEcmhId0xhYlhLTEFqcll3Sm5zaHIwZUdCDQpC
-SHloVUFiZ0FLb2puck8yRi9MU3p1ZCtmcVg4ZGpuWTNjU3dSeGZESXYwdFE2LzN4U1FUeUFDNjVW
-N0ZsY1RHDQpLaWhOWWV2Sk1NcnNCT3IvVVZDQ21LTGZuMmY0VEI5UFllREQ2UU1QY0pzUHUwTkFu
-S0w3NnQ1RCs2Wk9ZZ1l3DQpQMmhvMndQVmNsMGdvV3JxeHQ4TQ0KPTJZZDkNCi0tLS0tRU5EIFBH
-UCBTSUdOQVRVUkUtLS0tLQ0K
+
+--v6YRErhBvjoBjrPV
+Content-Type: multipart/mixed; boundary="nHJAUhyIZkPvF01C"
+Content-Disposition: inline
+
+
+--nHJAUhyIZkPvF01C
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hello again,
+
+the build process of the cifs-utils for Mandriva 2011 made me notice of
+the unused variable rc in toggle_dac_capability() of mount.cifs.c.
+
+A bit up in the code we store the return value and do not make use of it
+while calling return.
+
+The attached patch intends to fix this.
+
+The failing build result is still visible at
+https://build.opensuse.org/package/live_build_log?arch=3Dx86_64&package=3Dc=
+ifs-utils&project=3Dnetwork%3Asamba%3ASTABLE&repository=3DMandriva_2011
+
+Cheers,
+
+Lars
+--=20
+Lars M=C3=BCller [=CB=88la=CB=90(r)z =CB=88m=CA=8Fl=C9=90]
+Samba Team + SUSE Labs
+SUSE Linux, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
+
+--nHJAUhyIZkPvF01C
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment; filename="mount.cifs-toggle_dac_capability-return-stored-returncode.diff"
+
+Author: Lars Mueller <lmuelle-IBi9RG/b67k@public.gmane.org>
+Subject: cifs-utils don't make use of stored return code
+Bugzilla: na
+Upstream-Reported: http://permalink.gmane.org/gmane.linux.kernel.cifs/5935
+Upstream-Acknowledged: Yes
+
+Index: cifs-utils-5.4/mount.cifs.c
+===================================================================
+--- cifs-utils-5.4.orig/mount.cifs.c
++++ cifs-utils-5.4/mount.cifs.c
+@@ -577,7 +577,7 @@ toggle_dac_capability(int writable, int
+ 	}
+ free_caps:
+ 	cap_free(caps);
+-	return 0;
++	return rc;
+ }
+ #else /* HAVE_LIBCAP */
+ static int
+
+--nHJAUhyIZkPvF01C--
+
+--v6YRErhBvjoBjrPV
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.18 (GNU/Linux)
+
+iD8DBQFPkF/M4NBiK0FKV8MRAnaVAJ4gYdyxw8hpFhFjHqiDEqFKKBKa3QCeNgny
++XTVKTHlK31Gn5FmuP4gg9w=
+=5ZVm
+-----END PGP SIGNATURE-----
+
+--v6YRErhBvjoBjrPV--
