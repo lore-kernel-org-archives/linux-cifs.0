@@ -1,105 +1,43 @@
-From: Lars =?iso-8859-1?Q?M=FCller?= <lmuelle-IBi9RG/b67k@public.gmane.org>
-Subject: build breaks with krb5 < 1.7 in the 5.4 release
-Date: Thu, 19 Apr 2012 20:00:07 +0200
-Message-ID: <20120419180006.GS12994@hip.fritz.box>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: uninitialized variables in the 5.4 release
+Date: Thu, 19 Apr 2012 14:01:44 -0400
+Message-ID: <20120419140144.7b435b50@corrin.poochiereds.net>
+References: <20120419175242.GR12994@hip.fritz.box>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="p6hDAtPN9q+ZnUca"
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Lars =?UTF-8?B?TcO8bGxlcg==?= <lmuelle-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
+In-Reply-To: <20120419175242.GR12994-aSaWmTCphX8QgCKCZH8Z8g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-
---p6hDAtPN9q+ZnUca
-Content-Type: multipart/mixed; boundary="OwXh6gFRjCd3qPCM"
-Content-Disposition: inline
-
-
---OwXh6gFRjCd3qPCM
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi linux-cifs,
-
-products coming with MIT krb5 < 1.7 (like SUSE Linux Enterprise 11 SP 1
-or SP 2) suffer from the same issue as described by
-https://bugzilla.samba.org/show_bug.cgi?id=3D6918
-
-The declaration of krb5_auth_con_set_req_cksumtype is missing.
-
-The attached patch fixes this issue.
-
-Cheers,
-
-Lars
---=20
-Lars M=C3=BCller [=CB=88la=CB=90(r)z =CB=88m=CA=8Fl=C9=90]
-Samba Team + SUSE Labs
-SUSE Linux, Maxfeldstra=C3=9Fe 5, 90409 N=C3=BCrnberg, Germany
-
---OwXh6gFRjCd3qPCM
-Content-Type: text/x-patch; charset=us-ascii
-Content-Disposition: attachment; filename="krb5_auth_con_set_req_cksumtype-implicit-declaration.diff"
-Content-Transfer-Encoding: quoted-printable
-
-Author: Lars Mueller <lmuelle-IBi9RG/b67k@public.gmane.org>
-Subject: cifs-utils build breaks with krb5 < 1.7
-Bugzilla: na
-Inspiration: https://bugzilla.samba.org/show_bug.cgi?id=3D6918
-
-Index: cifs-utils-5.4/configure.ac
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
---- cifs-utils-5.4.orig/configure.ac
-+++ cifs-utils-5.4/configure.ac
-@@ -178,6 +178,9 @@ if test $enable_cifsupcall !=3D "no"; then
- 	AC_CHECK_FUNCS([krb5_auth_con_setaddrs krb5_auth_con_set_req_cksumtype])
- fi
-=20
-+# MIT krb5 < 1.7 does not have this declaration but does have the symbol
-+AC_CHECK_DECLS(krb5_auth_con_set_req_cksumtype, [], [], [#include <krb5.h>=
-])
-+
- LIBS=3D$cu_saved_libs
-=20
- AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" !=3D "no"])
-Index: cifs-utils-5.4/cifs.upcall.c
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
---- cifs-utils-5.4.orig/cifs.upcall.c
-+++ cifs-utils-5.4/cifs.upcall.c
-@@ -415,6 +415,14 @@ cifs_krb5_get_req(const char *host, cons
- 	 */
- 	in_data.data =3D discard_const_p(char, gss_cksum);
- 	in_data.length =3D 24;
-+
-+	/* MIT krb5 < 1.7 is missing the prototype, but still has the symbol */
-+#if !HAVE_DECL_KRB5_AUTH_CON_SET_REQ_CKSUMTYPE
-+	krb5_error_code krb5_auth_con_set_req_cksumtype(
-+		krb5_context      context,
-+		krb5_auth_context auth_context,
-+		krb5_cksumtype    cksumtype);
-+#endif
- 	ret =3D krb5_auth_con_set_req_cksumtype(context, auth_context, 0x8003);
- 	if (ret) {
- 		syslog(LOG_DEBUG, "%s: unable to set 0x8003 checksum",
-
---OwXh6gFRjCd3qPCM--
-
---p6hDAtPN9q+ZnUca
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.18 (GNU/Linux)
-
-iD8DBQFPkFKm4NBiK0FKV8MRAjipAJ92jZhRTPc8rW3lO5A5NE2mhg81mQCgsuDt
-b6+MMVwbKOOiqK6xxDY87Do=
-=lnxM
------END PGP SIGNATURE-----
-
---p6hDAtPN9q+ZnUca--
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUaHUs
+IDE5IEFwciAyMDEyIDE5OjUyOjQyICswMjAwDQpMYXJzIE3DvGxsZXIgPGxtdWVsbGVAc3VzZS5j
+b20+IHdyb3RlOg0KDQo+IEhpLA0KPiANCj4gb2xkZXIgZ2NjIHZlcnNpb25zICg0LjMgaW4gdGhl
+IGNhc2Ugb2YgU1VTRSBMaW51eCBFbnRlcnByaXNlIDExIFNQIDEgYW5kDQo+IFNQIDIpIGNvbXBs
+YWluIGFib3V0IHVuaW5pdGlhbGl6ZWQgdmFyaWFibGVzIGluIHRoZSByZWNlbnQgNS40IHJlbGVh
+c2UuDQo+IA0KPiBUaGUgYXR0YWNoZWQgcGF0Y2ggbWFrZXMgdGhlIGJ1aWxkIHByb2Nlc3MgYSBi
+aXQgcXVpZXRlci4NCj4gDQo+IENoZWVycywNCj4gDQo+IExhcnMNCg0KTG9va3MgcmVhc29uYWJs
+ZSBpZiBpdCBzaWxlbmNlcyB0aGUgY29tcGlsZXIgd2FybmluZ3Mgb24gb2xkZXIgZ2NjLA0KZXZl
+biBpZiBpdCdzIG5vdCByZWFsbHkgYSBidWcgcGVyLXNlLiBJIGRvIHdvbmRlciBpZiB0aGVyZSdz
+IHNvbWUNCmFubm90YXRpb24geW91IGNhbiBhZGQgdG8gc2lsZW5jZSB0aGF0IHdhcm5pbmcsIGJ1
+dCBpdCdzIHByb2JhYmx5IG5vdA0Kd29ydGggd29ycnlpbmcgYWJvdXQuDQoNCkknbGwgY29tbWl0
+IGl0IGluIHRoZSBuZXh0IGZldyBkYXlzIGlmIG5vIG9uZSBvYmplY3RzLi4uIA0KLSAtLSANCkpl
+ZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0t
+LS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JR
+SlBrRk1JQUFvSkVBQU9hRUVaVm9JVlk3VVAvakxkOEdrbUJhTEhjdFpuVDhFejQrdFQNClJNTmRJ
+NDRmaWgrTkMzOTVaTnI1ZUNUVzc2WGdIMkFpUHRQa21Rc3Y3bmtrYWdvcENjQkZZbEtQbVRZRzdZ
+T2oNCnhheG1GbVFidWQvMVFIRDB2TFN1aHFZQ01lbW1HTjVMVXJZRWVFRFh1NjltNUYzK0N4d0U3
+Rk1aWGRRcFRTK3UNCm52OHgzbnpBYXFKRmhWNm5Tdld4TURWTGJ6MEdDeXNOak1QYjdGTjZ6bTdy
+RUQxdnk0dFVWNFJuUWRHS2NSSncNCldPcG5kUklua1pDY2RYZk5DV1NhT1ByUzl6anV2bENoTHJn
+WVZKZDFyZzBTQVc1ZTkrTnRFQnlJcEtGdVNLRFgNCmhNYnVkbEhxNlg5aytyeWViMmxqc08wSS82
+TGRaMy9nYnhsaFZaNzB0UGs4TkovcnFXZm9mdS9KY3NSNHRSOU8NCjBmN043M0lhTTdzYXptcEJk
+am1sTTJxc3BMbFdqeVFiNEhKT2JCZ25iSFZ1SXRJSnJZcmFFa2xxRkhDaVVEb3kNClhaRlI5ZnpT
+Q2w5UEFYSFRsYkpidFhGN1VjOWo3MmdmbkNjdGVZbTJzTk1XelBxTGJHUEJaL2k2MVhDelA4SG0N
+ClRUVXlwNTdkak02TkNLUzkxYk5BSHVZbGk4VGtOSzl0ajdQTW1WMjViS0s5V3ZrY3RmVzMvRDJP
+Rzd6YWYvMWUNCncwdVJPNnowdUFKR1c1dURmSlpEMmhTd3ZmcFpJNll1NE5NeDNKSXVzdlVMVUN5
+NG43ZWFUNjIrVnRsMHZlVVUNCkVHUlBERmh1R2JPNnFMYS9ZaDdTU1J6WE1IT09mbzNYY3VRL3RG
+V1dyN0JjUDZSV2l6OEgyYndLV2xvdzlwclUNCk5VNnV0dTNpWlhRbUZMTXBRZmhrDQo9aHJvSg0K
+LS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
