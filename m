@@ -1,66 +1,152 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/6] Extended file stat system call
-Date: Thu, 19 Apr 2012 12:11:11 -0500
-Message-ID: <CAH2r5ms4WQV3DnTvqNN=2N71Cj8UHwj8Z6+RHXgrAOv6mSoyQg@mail.gmail.com>
-References: <20120419140558.17272.74360.stgit@warthog.procyon.org.uk>
+From: =?iso-8859-1?B?RnLpZOlyaWMgTC4gVy4=?= Meunier
+	<fredlwm-fLz7/M+a0ZzR7s880joybQ@public.gmane.org>
+Subject: CIFS shares keep hanging with VirtualBox
+Date: Thu, 19 Apr 2012 14:36:27 -0300
+Message-ID: <20120419173627.GA4337@pervalidus>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org,
-	kfm-devel-RoXCvvDuEio@public.gmane.org, nautilus-list-rDKQcyrBJuzYtjvyW6yDsg@public.gmane.org,
-	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120419140558.17272.74360.stgit-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: multipart/mixed; boundary="y0ulUmNC+osPPQO6"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Apr 19, 2012 at 9:05 AM, David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->
-> Implement a pair of new system calls to provide extended and further extensible
- stat functions.
-<snip>
-> Should the default for a network fs be to do an unconditional (heavyweight)
-> stat with a flag to suppress going to the server to update the locally held
-> attributes and flushing pending writebacks?
 
-Even though we can use leases (oplocks) to avoid the roundrtrip, it is
-probably too expensive to default to forcing a cache flush, especially
-when a common case is to get the file creation time or inode number
-information (stable vs volatile).
+--y0ulUmNC+osPPQO6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Would it be better to make the stable vs volatile inode number an attribute
-of the volume  or something returned by the proposed xstat?
+I use VirtualBox (4.1.12) on Windows 7 Ultimate SP1. The guest is Linux 
+(kernel 3.3.2, cifs-utils 5.3), which I boot directly from a partition.
 
-> Should things like the Windows Archive, Hidden and System bits be handled
-> through IOC flags, perhaps expanded to 64-bits?
+If I use CIFS to access the Windows partitions, the connections 
+constantly hang and the applications to access it deadlock until killed.
 
-Today I export these through an psuedo-xattr in cifs.ko, I am curious how
-NTFS and FAT export these on linux.
+For example:
 
-> ==========
-> TO BE DONE
-> ==========
->
-> Autofs, ntfs, btrfs, ...
+$ cd /mnt
+$ ls
 
-Given the overlap in optional attributes between the network
-protocol and local NTFS (and ReFS and to a lesser extent FAT)
-I would expect cifs.ko and the ntfs implementations
-info to map pretty closely.
+It hangs (the share in question is mounted under /mnt/ntfs2).
 
-> I should perhaps use u8/u32/u64 rather than uint8/32/64_t.
->
-> Handle remote filesystems being offline and indicate this with
-> XSTAT_INFO_OFFLINE.
+'ps' returns "3174 pts/0 D+ 0:00 ls --color=auto" and the load average 
+increases until I 'kill -9' the process.
 
-You already have support for an indicator for offline files (HSM),
-would XSTAT_INFO_OFFLINE be intended for the case
-where the network session to the server is disconnected
-(and in which you case the application does not want to reconnect)?
+The only message I get in the logs is "CIFS VFS: Server 192.168.1.64 has 
+not responded in 300 seconds. Reconnecting..."
 
--- 
-Thanks,
+After that, the share only works if remounted.
 
-Steve
+I don't know what's causing it, but it works perfectly from VMware 
+Player using the same setup, so it looks like a bug in VirtualBox, not 
+in CIFS ?
+
+This isn't a new issue, as I started using VMware Player in July 2011 
+after giving up getting CIFS to work reliably with VirtualBox.
+
+I'm attaching a log created with 'echo 7 > /proc/fs/cifs/cifsFYI', just 
+in case it helps, and am willing to do other things to, it not solve it, 
+at least know what to blame. At 14:26, I killed both 'ls' processes and 
+unmounted the partition.
+
+--y0ulUmNC+osPPQO6
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="cifs.txt.gz"
+Content-Transfer-Encoding: base64
+
+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
+
+--y0ulUmNC+osPPQO6--
