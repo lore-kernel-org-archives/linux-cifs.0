@@ -1,8 +1,9 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/2] CIFS: Show backupuid/gid in /proc/mounts
-Date: Tue, 24 Apr 2012 11:18:14 -0400
-Message-ID: <20120424111814.517fe886@tlielax.poochiereds.net>
-References: <1335277694.3604.8.camel@localhost>
+Subject: Re: [PATCH 2/2] Use correct conversion specifiers in
+ cifs_show_options
+Date: Tue, 24 Apr 2012 11:18:32 -0400
+Message-ID: <20120424111832.58afcbe7@tlielax.poochiereds.net>
+References: <1335277710.3604.9.camel@localhost>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -11,72 +12,52 @@ Cc: Linux CIFS mailing list <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1335277694.3604.8.camel@localhost>
+In-Reply-To: <1335277710.3604.9.camel@localhost>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 24 Apr 2012 15:28:14 +0100
+On Tue, 24 Apr 2012 15:28:30 +0100
 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> Show  backupuid/backupgid in /proc/mounts for cifs shares mounted with
-> the backupuid/backupgid feature.
-> 
-> Also consolidate the two separate checks for 
-> pvolume_info->backupuid_specified into a single if condition in 
-> cifs_setup_cifs_sb().
+> cifs_show_options uses the wrong conversion specifier for uid, gid,
+> rsize & wsize. Correct this to %u to match it to the variable type
+> 'unsigned integer'.
 > 
 > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/cifsfs.c  |    4 ++++
->  fs/cifs/connect.c |   12 ++++++------
->  2 files changed, 10 insertions(+), 6 deletions(-)
+>  fs/cifs/cifsfs.c |    8 ++++----
+>  1 files changed, 4 insertions(+), 4 deletions(-)
 > 
 > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index d342128..ea8eb92 100644
+> index ea8eb92..811245b 100644
 > --- a/fs/cifs/cifsfs.c
 > +++ b/fs/cifs/cifsfs.c
-> @@ -434,6 +434,10 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
->  		seq_printf(s, ",noperm");
->  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO)
->  		seq_printf(s, ",strictcache");
-> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUPUID)
-> +		seq_printf(s, ",backupuid=%u", cifs_sb->mnt_backupuid);
-> +	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUPGID)
-> +		seq_printf(s, ",backupgid=%u", cifs_sb->mnt_backupgid);
+> @@ -370,13 +370,13 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+>  				   (int)(srcaddr->sa_family));
+>  	}
 >  
->  	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
->  	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index f31dc9a..f4d381e 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3228,10 +3228,6 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+> -	seq_printf(s, ",uid=%d", cifs_sb->mnt_uid);
+> +	seq_printf(s, ",uid=%u", cifs_sb->mnt_uid);
+>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID)
+>  		seq_printf(s, ",forceuid");
+>  	else
+>  		seq_printf(s, ",noforceuid");
 >  
->  	cifs_sb->mnt_uid = pvolume_info->linux_uid;
->  	cifs_sb->mnt_gid = pvolume_info->linux_gid;
-> -	if (pvolume_info->backupuid_specified)
-> -		cifs_sb->mnt_backupuid = pvolume_info->backupuid;
-> -	if (pvolume_info->backupgid_specified)
-> -		cifs_sb->mnt_backupgid = pvolume_info->backupgid;
->  	cifs_sb->mnt_file_mode = pvolume_info->file_mode;
->  	cifs_sb->mnt_dir_mode = pvolume_info->dir_mode;
->  	cFYI(1, "file mode: 0x%hx  dir mode: 0x%hx",
-> @@ -3262,10 +3258,14 @@ void cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RWPIDFORWARD;
->  	if (pvolume_info->cifs_acl)
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_ACL;
-> -	if (pvolume_info->backupuid_specified)
-> +	if (pvolume_info->backupuid_specified) {
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPUID;
-> -	if (pvolume_info->backupgid_specified)
-> +		cifs_sb->mnt_backupuid = pvolume_info->backupuid;
-> +	}
-> +	if (pvolume_info->backupgid_specified) {
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPGID;
-> +		cifs_sb->mnt_backupgid = pvolume_info->backupgid;
-> +	}
->  	if (pvolume_info->override_uid)
->  		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_UID;
->  	if (pvolume_info->override_gid)
+> -	seq_printf(s, ",gid=%d", cifs_sb->mnt_gid);
+> +	seq_printf(s, ",gid=%u", cifs_sb->mnt_gid);
+>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID)
+>  		seq_printf(s, ",forcegid");
+>  	else
+> @@ -439,8 +439,8 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_BACKUPGID)
+>  		seq_printf(s, ",backupgid=%u", cifs_sb->mnt_backupgid);
+>  
+> -	seq_printf(s, ",rsize=%d", cifs_sb->rsize);
+> -	seq_printf(s, ",wsize=%d", cifs_sb->wsize);
+> +	seq_printf(s, ",rsize=%u", cifs_sb->rsize);
+> +	seq_printf(s, ",wsize=%u", cifs_sb->wsize);
+>  	/* convert actimeo and display it in seconds */
+>  		seq_printf(s, ",actimeo=%lu", cifs_sb->actimeo / HZ);
+>  
 
 Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
