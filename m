@@ -1,25 +1,32 @@
-From: "Cao Lixin" <caolixin-rBrC3Zcc+NIFQeE35raUng@public.gmane.org>
-Subject: Emergency Email, Please get back.
-Date: Tue, 24 Apr 2012 14:40:54 +0800
-Message-ID: <20120424064046.B4D11242AEB0__2148.46397652781$1335249686$gmane$org@csmtp3.one.com>
-Reply-To: <cao23lixin-SrPyuzuu+o61Qrn1Bg8BZw@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/2] Fixes to cifs_show_options
+Date: Tue, 24 Apr 2012 15:27:46 +0100
+Message-ID: <1335277666.3604.7.camel@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	smfrench <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Linux CIFS mailing list <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello, 
+/proc/mounts does not show the mount options backupuid/backupgid for
+cifs shares mounted with those options. 
 
-I have a secured business proposal for you worth USD28,350,000.00. Get back for details. 
+While adding the backupuid/backupgid options to cifs_show_options, I
+noticed that we incorrectly use %d instead of %u for the unsigned
+variables used to denote uid, gid, rsize and wsize. This is fixed
+by the second patch
 
-Email: cao23lixin-SrPyuzuu+o61Qrn1Bg8BZw@public.gmane.org
+Sachin Prabhu (2):
+  CIFS: Show backupuid/gid in /proc/mounts
+  Use correct conversion specifiers in cifs_show_options
 
-I await your response.
+ fs/cifs/cifsfs.c  |   12 ++++++++----
+ fs/cifs/connect.c |   12 ++++++------
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
-Best Regards. 
-  
-Cao Lixin 
+-- 
+1.7.7.6
