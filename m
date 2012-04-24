@@ -1,23 +1,25 @@
-From: "Flink, Mollie" <MollieFlink-eRvo43AAUes@public.gmane.org>
-Subject: Re-Validate your Email Account!
-Date: Mon, 23 Apr 2012 01:42:30 +0000
-Message-ID: <02E037382450A1478A8293A4DCC666D1D9B5A9@30SWL-MB-01.JUF.NET>
+From: "Cao Lixin" <caolixin-rBrC3Zcc+NIFQeE35raUng@public.gmane.org>
+Subject: Emergency Email, Please get back.
+Date: Tue, 24 Apr 2012 14:40:54 +0800
+Message-ID: <20120424064046.B4D11242AEB0__2148.46397652781$1335249686$gmane$org@csmtp3.one.com>
+Reply-To: <cao23lixin-SrPyuzuu+o61Qrn1Bg8BZw@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Undisclosed recipients:;
+Content-Type: text/plain;
+	charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Re-Validate your Email Account!
+Hello, 
 
-Your mailbox has exceeded one or more size limits set by the administrator.
-You can not send or receive new mail until size of your mail box is reduced.
-For more space, Please click the link below and fill in the details of correct account.
-================>
+I have a secured business proposal for you worth USD28,350,000.00. Get back for details. 
 
-http://xoutlootvali.moy.su/Microsoft-Outlook-WebAccess.htm
-Thanks and sorry for the inconvenience.
-System Manager.
+Email: cao23lixin-SrPyuzuu+o61Qrn1Bg8BZw@public.gmane.org
+
+I await your response.
+
+Best Regards. 
+  
+Cao Lixin 
