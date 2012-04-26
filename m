@@ -1,93 +1,36 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] use mkstemp instead of mktemp
-Date: Thu, 26 Apr 2012 14:22:15 -0400
-Message-ID: <20120426142215.59d29cb6@corrin.poochiereds.net>
-References: <1335454598-27812-1-git-send-email-gitter.spiros@gmail.com>
+From: Roland McGrath <roland-/Z5OmTQCD9xF6kxbq+BtvQ@public.gmane.org>
+Subject: Re: [PATCH 0/6] Extended file stat system call
+Date: Thu, 26 Apr 2012 11:22:02 -0700 (PDT)
+Message-ID: <20120426182202.9B2442C0EA@topped-with-meat.com>
+References: <20120419230556.A80392C0AF@topped-with-meat.com>
+	<20120419140558.17272.74360.stgit@warthog.procyon.org.uk>
+	<20120419163238.61D382C0DF@topped-with-meat.com>
+	<4F9088D6.9020203@cs.ucla.edu>
+	<20173.1335449760@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cmaiolino-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Elia Pinto <gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1335454598-27812-1-git-send-email-gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Paul Eggert <eggert-764C0pRuGfqVc3sceRu5cw@public.gmane.org>, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org, kfm-devel-RoXCvvDuEio@public.gmane.org, nautilus-list-rDKQcyrBJuzYtjvyW6yDsg@public.gmane.org,
+	linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: David Howells's message of  Thursday, 26 April 2012 15:16:00 +0100 <20173.1335449760-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 26 Apr 2012 11:36:38 -0400
-Elia Pinto <gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> As described in the manual page mktemp(3) the use of this feature
-> is strongly discouraged in favor of mkstemp(3).
+> Roland McGrath <roland-/Z5OmTQCD9xF6kxbq+BtvQ@public.gmane.org> wrote:
 > 
-> In fact the mkstemp() function generates a unique temporary file
-> name from the supplied template,
-> opens a file of that name using the O_EXCL flag (guaranteeing the
-> current process to be the only user) and returns a file descriptor.
+> > statx seems like a better family of names.  I also think it's worthwhile to
+> > see if the interface can be made to more closely match the AIX precedent.
 > 
-> But the POSIX specification does not say anything about file modes,
-> so the application should make sure its umask
-> is set appropriately before calling mkstemp.
-> ( ref. https://buildsecurityin.us-cert.gov/bsi/articles/knowledge/coding/781-BSI.html)
-> 
-> Signed-off-by: Elia Pinto <gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  mount.cifs.c |   18 +++++++++++++-----
->  1 files changed, 13 insertions(+), 5 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index c90ce3e..bdd9d28 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -1627,6 +1627,9 @@ del_mtab(char *mountpoint)
->  	FILE *mnttmp, *mntmtab;
->  	struct mntent *mountent;
->  	char *mtabfile, *mtabdir, *mtabtmpfile;
-> +	mode_t mode;
-> +	FILE *spf;
-> +	int fd = -1 ;
->  
->  	mtabfile = strdup(MOUNTED);
->  	mtabdir = dirname(mtabfile);
-> @@ -1652,12 +1655,17 @@ del_mtab(char *mountpoint)
->  		goto del_mtab_exit;
->  	}
->  
-> -	mtabtmpfile = mktemp(mtabtmpfile);
-> -	if (!mtabtmpfile) {
-> -		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
-> -		rc = EX_FILEIO;
-> -		goto del_mtab_exit;
-> +	mode = umask(0077);
+> I'm not sure we can make Linux xstat (or whatever) match AIX statxat() very
+> closely, at least from a syscall interface point of view.  
 
-(cc'ing Carlos since he did most of this work originally)
-
-I think we want the final mtab to be group and world-readable, right?
-So maybe umask(0033) would be better? We should probably also reset the
-umask afterward too just to be safe...
-
-> +	(void) umask(mode);
-> +	if ((fd = mkstemp(mtabtmpfile)) == -1 ||
-> +		(spf = fdopen(fd, "w+")) == NULL) {
-> +		if (fd != -1) {
-> +			fprintf(stderr, "del_mtab: cannot setup tmp file destination");
-> +			rc = EX_FILEIO;
-> +			goto del_mtab_exit;
-> +                }
->  	}
-> +	(void) fclose(spf);
->  
-
-Looks reasonable to change to mkstemp, but what's the point of doing the
-the fdopen there if you're just going to immediately close it
-afterward? Why not just close(fd) there?
-
-...or, is it legit to call fdopen on fd and and then just pretend
-that's equivalent to a setmntent and get rid of the later setmntent to
-open the file?
-
->  	mntmtab = setmntent(MOUNTED, "r");
->  	if (!mntmtab) {
+OK.  It was just worth a look.
 
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Thanks,
+Roland
