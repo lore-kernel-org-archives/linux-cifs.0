@@ -1,67 +1,94 @@
-From: Elia Pinto <gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] use mkstemp instead of mktemp
-Date: Thu, 26 Apr 2012 11:36:38 -0400
-Message-ID: <1335454598-27812-1-git-send-email-gitter.spiros@gmail.com>
-Cc: Elia Pinto <gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH 0/6] Extended file stat system call
+Date: Thu, 26 Apr 2012 16:52:15 +0100
+Message-ID: <24787.1335455535@redhat.com>
+References: <CAH2r5mv1Lijdwk5zsQwYJr4Etb6fhrRyNXm-iFCQX+HecboGrQ@mail.gmail.com> <20120419140558.17272.74360.stgit@warthog.procyon.org.uk> <CAH2r5ms4WQV3DnTvqNN=2N71Cj8UHwj8Z6+RHXgrAOv6mSoyQg@mail.gmail.com> <20656.1335450358@redhat.com>
+Cc: dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
+        wine-devel@winehq.org, kfm-devel@kde.org, nautilus-list@gnome.org,
+        linux-api@vger.kernel.org, libc-alpha@sourceware.org
+To: Steve French <smfrench@gmail.com>
+Return-path: <libc-alpha-return-28004-glibc-alpha=m.gmane.org@sourceware.org>
+In-Reply-To: <CAH2r5mv1Lijdwk5zsQwYJr4Etb6fhrRyNXm-iFCQX+HecboGrQ@mail.gmail.com>
+List-Unsubscribe: <mailto:libc-alpha-unsubscribe-glibc-alpha=m.gmane.org@sourceware.org>
+List-Subscribe: <mailto:libc-alpha-subscribe@sourceware.org>
+List-Archive: <http://sourceware.org/ml/libc-alpha/>
+List-Post: <mailto:libc-alpha@sourceware.org>
+List-Help: <mailto:libc-alpha-help@sourceware.org>, <http://sourceware.org/ml/#faqs>
+Sender: libc-alpha-owner@sourceware.org
+List-Id: linux-cifs.vger.kernel.org
 
-As described in the manual page mktemp(3) the use of this feature
-is strongly discouraged in favor of mkstemp(3).
+Steve French <smfrench@gmail.com> wrote:
 
-In fact the mkstemp() function generates a unique temporary file
-name from the supplied template,
-opens a file of that name using the O_EXCL flag (guaranteeing the
-current process to be the only user) and returns a file descriptor.
+> >> Would it be better to make the stable vs volatile inode number an attribute
+> >> of the volume or something returned by the proposed xstat?
+> >
+> > I'm not sure what you mean by a stable vs a volatile inode number.
+> 
+> Both NFS and CIFS (and SMB2) can return inode numbers or equivalent unique
+> identifier, but in the case of CIFS some old servers don't support the calls
+> which return inode numbers (or don't return them for all file system types,
+> Windows FAT?) so in these cases cifs has to create inode numbers on the fly
+> on the client.  inode numbers created on the client are not "stable" they can
+> change on unmount/remount (which can cause problems for backup applications).
 
-But the POSIX specification does not say anything about file modes,
-so the application should make sure its umask
-is set appropriately before calling mkstemp.
-( ref. https://buildsecurityin.us-cert.gov/bsi/articles/knowledge/coding/781-BSI.html)
+In the volatile case you'd probably want to unset XSTAT_INO in st_mask as the
+inode number is a local fabrication.  However, since there is a remote file ID,
+we could add an XSTAT_INFO_FILE_ID flag to indicate there's a standard xattr
+holding this.  On CIFS this could be the servername + pathname, on NFS this
+could be the server address + FH on AFS the cell+volID+FID+uniquifier for
+example.  That's independent of xstat, however, and wouldn't be returned as
+it's a blob that could be quite large.
 
-Signed-off-by: Elia Pinto <gitter.spiros-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- mount.cifs.c |   18 +++++++++++++-----
- 1 files changed, 13 insertions(+), 5 deletions(-)
+I presume in some cases, there is not a unique file ID that persists across
+rename.
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index c90ce3e..bdd9d28 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1627,6 +1627,9 @@ del_mtab(char *mountpoint)
- 	FILE *mnttmp, *mntmtab;
- 	struct mntent *mountent;
- 	char *mtabfile, *mtabdir, *mtabtmpfile;
-+	mode_t mode;
-+	FILE *spf;
-+	int fd = -1 ;
- 
- 	mtabfile = strdup(MOUNTED);
- 	mtabdir = dirname(mtabfile);
-@@ -1652,12 +1655,17 @@ del_mtab(char *mountpoint)
- 		goto del_mtab_exit;
- 	}
- 
--	mtabtmpfile = mktemp(mtabtmpfile);
--	if (!mtabtmpfile) {
--		fprintf(stderr, "del_mtab: cannot setup tmp file destination");
--		rc = EX_FILEIO;
--		goto del_mtab_exit;
-+	mode = umask(0077);
-+	(void) umask(mode);
-+	if ((fd = mkstemp(mtabtmpfile)) == -1 ||
-+		(spf = fdopen(fd, "w+")) == NULL) {
-+		if (fd != -1) {
-+			fprintf(stderr, "del_mtab: cannot setup tmp file destination");
-+			rc = EX_FILEIO;
-+			goto del_mtab_exit;
-+                }
- 	}
-+	(void) fclose(spf);
- 
- 	mntmtab = setmntent(MOUNTED, "r");
- 	if (!mntmtab) {
--- 
-1.7.1
+> Similarly NFSv4 does not require that servers always return stable inode
+> numbers (that will never change) and introduced a concept of "volatile file
+> handle."
+
+Can I presume the inode number cannot be considered stable if the NFS4 FH is
+non-volatile?  Furthermore, can I presume NFS2/3 inode numbers are supposed to
+be stable?
+
+> Basically the question is whether it is worth reporting a flag on the call
+> which returns the inode number to indicate that the inode number is "stable"
+> (would not change on reboot or reconnection) or "volatile."  Since the
+> majority of NFS and SMB2 servers can return stable inode numbers, I don't
+> feel strongly about the need for an indicator of "stable" vs. "volatile" but
+> I mention it because backup and migration applications mention this (if inode
+> numbers are volatile, they may have to check for hardlinks differently for
+> example)
+
+It may be that unsetting XSTAT_INO if you've fabricated the inode number
+locally is sufficient.
+
+> >> > Handle remote filesystems being offline and indicate this with
+> >> > XSTAT_INFO_OFFLINE.
+> >>
+> >> You already have support for an indicator for offline files (HSM),
+
+Which indicator is this?  Or do you mean XSTAT_INFO_OFFLINE?
+
+> >> would XSTAT_INFO_OFFLINE be intended for the case
+> >> where the network session to the server is disconnected
+> >> (and in which you case the application does not want to reconnect)?
+> >
+> > Hmmm...  Interesting question.  Both NTFS and CIFS have an offline
+> > attribute (which is where I originally got this from) - but should I have a
+> > separate indicator to indicate the client can't access a server over a
+> > network (ie. we've gone to disconnected operation on this file)?
+> > E.g. should there be a XSTAT_INFO_DISCONNECTED too?
+> 
+> my reaction is no, since it adds complexity.  If you do a stat on a
+> disconnected volume (where the network is temporarily down) reconnection will
+> be attempted.  If reconnection fails then the xstat will either fail or be
+> retried forever depending on the value of "hard" vs. "soft" mount flag.
+
+I was thinking of how to handle disconnected operation, where you can't just
+sit there and churn waiting for the server to come back or give an error.  On
+the other hand, as long as there's some spare space in the struct, we can deal
+with that later when we actually start to implement D/O.
+
+David
