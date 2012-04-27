@@ -1,66 +1,44 @@
-From: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
-Subject: [PATCH] cifs - check S_AUTOMOUNT in revalidate
-Date: Fri, 27 Apr 2012 16:18:15 +0800
-Message-ID: <20120427081815.4478.26011.stgit@perseus.themaw.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 0/6] Extended file stat system call
+Date: Fri, 27 Apr 2012 10:19:09 +0100
+Message-ID: <3279.1335518349@redhat.com>
+References: <3F302713-B675-4BAA-B2B7-235E03C5975F@dilger.ca> <CAH2r5mv1Lijdwk5zsQwYJr4Etb6fhrRyNXm-iFCQX+HecboGrQ@mail.gmail.com> <20120419140558.17272.74360.stgit@warthog.procyon.org.uk> <CAH2r5ms4WQV3DnTvqNN=2N71Cj8UHwj8Z6+RHXgrAOv6mSoyQg@mail.gmail.com> <20656.1335450358@redhat.com> <24787.1335455535@redhat.com>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org" <wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org>,
+	"kfm-devel-RoXCvvDuEio@public.gmane.org" <kfm-devel-RoXCvvDuEio@public.gmane.org>,
+	"nautilus-list-rDKQcyrBJuzYtjvyW6yDsg@public.gmane.org" <nautilus-list-rDKQcyrBJuzYtjvyW6yDsg@public.gmane.org>,
+	"linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org" <libc-alpha-9JcytcrH/bA+uJoB2kUjGw@public.gmane.org>
+To: Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <3F302713-B675-4BAA-B2B7-235E03C5975F-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-When revalidating a dentry, if the inode wasn't known to be a dfs
-entry when the dentry was instantiated, such as when created via
-->readdir(), the DCACHE_NEED_AUTOMOUNT flag needs to be set on the
-dentry in ->d_revalidate().
+Andreas Dilger <adilger-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org> wrote:
 
-The false return from cifs_d_revalidate(), due to the inode now
-being marked with the S_AUTOMOUNT flag, might not invalidate the
-dentry if there is a concurrent unlazy path walk. This is because
-the dentry reference count will be at least 2 in this case causing
-d_invalidate() to return EBUSY. So the asumption that the dentry
-will be discarded then correctly instantiated via ->lookup() might
-not hold.
+> > However, since there is a remote file ID, we could add an
+> > XSTAT_INFO_FILE_ID flag to indicate there's a standard xattr holding this.
+> 
+> It is a bit strange that the kernel would return a flag that was not
+> requested, but not fatal.
 
-Signed-off-by: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
----
+On the other hand, if it costs the kernel nothing to generate this indicator...
 
- fs/cifs/dir.c |   17 ++++++++++++-----
- 1 files changed, 12 insertions(+), 5 deletions(-)
+For network filesystems, for instance, you might know that there is some other
+file ID because of the way the fs is specified.
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index d172c8e..ec4e9a2 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -668,12 +668,19 @@ cifs_d_revalidate(struct dentry *direntry, struct nameidata *nd)
- 			return 0;
- 		else {
- 			/*
--			 * Forcibly invalidate automounting directory inodes
--			 * (remote DFS directories) so to have them
--			 * instantiated again for automount
-+			 * If the inode wasn't known to be a dfs entry when
-+			 * the dentry was instantiated, such as when created
-+			 * via ->readdir(), it needs to be set now since the
-+			 * attributes will have been updated by
-+			 * cifs_revalidate_dentry().
- 			 */
--			if (IS_AUTOMOUNT(direntry->d_inode))
--				return 0;
-+			if (IS_AUTOMOUNT(direntry->d_inode) &&
-+			   !(direntry->d_flags & DCACHE_NEED_AUTOMOUNT)) {
-+				spin_lock(&direntry->d_lock);
-+				direntry->d_flags |= DCACHE_NEED_AUTOMOUNT;
-+				spin_unlock(&direntry->d_lock);
-+			}
-+
- 			return 1;
- 		}
- 	}
+I was thinking that many of the fields will be given values, even if you don't
+ask for them, because the values (or approximations thereof) are present in
+memory already.
+
+David
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
