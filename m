@@ -1,37 +1,35 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 27 Apr 2012 17:38:07 -0500
-Message-ID: <CAH2r5mtB70PEfxB7-hRigJ0mdqvTtGahmpOX56-R+0CsOjZk8Q@mail.gmail.com>
+From: Paul Eggert <eggert@cs.ucla.edu>
+Subject: Re: [PATCH 0/6] Extended file stat system call
+Date: Fri, 27 Apr 2012 16:54:41 -0700
+Message-ID: <4F9B31C1.3010701@cs.ucla.edu>
+References: <20120419163238.61D382C0DF@topped-with-meat.com> <20120419140558.17272.74360.stgit@warthog.procyon.org.uk> <19184.1335448455@redhat.com> <20120426182524.E5ADF2C0EC@topped-with-meat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Cc: David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
+	wine-devel@winehq.org, kfm-devel@kde.org, nautilus-list@gnome.org,
+	linux-api@vger.kernel.org, libc-alpha@sourceware.org
+To: Roland McGrath <roland@hack.frob.com>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <20120426182524.E5ADF2C0EC@topped-with-meat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-The following changes since commit c6f5c93098f5577210f8f3ea22209b3f266c66af:
-  Linus Torvalds (1):
-        Merge branch 'for-3.4' of git://linux-nfs.org/~bfields/linux
+On 04/26/2012 11:25 AM, Roland McGrath wrote:
+> What I'd really prefer is a name that is less meaninglessly arcane,
 
-are available in the git repository at:
+Since people are used to the string "stat", and since this is
+about getting related attributes, how about using the string "statr"?
+Thus "statrat" could be the syscall that acts like fstatat, but gets
+related attributes too.
 
-  git://git.samba.org/sfrench/cifs-2.6.git master
+A bonus of this name is that a "stat rat" is slang
+for someone who loves looking at statistics, often
+sports statistics.  Billy Beane is a stat rat.
+Someone who cares about files' statistics is also
+a stat rat.
 
-Jeff Layton (1):
-      cifs: fix offset handling in cifs_iovec_write
-
-Sachin Prabhu (2):
-      CIFS: Show backupuid/gid in /proc/mounts
-      Use correct conversion specifiers in cifs_show_options
-
- fs/cifs/cifsfs.c  |   12 ++++++++----
- fs/cifs/connect.c |   12 ++++++------
- fs/cifs/file.c    |    3 ++-
- 3 files changed, 16 insertions(+), 11 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
+The "r" in "statrat" could stand for "related", or
+for "relevant", or for whatever you like.
