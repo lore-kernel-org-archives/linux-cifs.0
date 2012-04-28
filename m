@@ -1,107 +1,92 @@
-From: Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCH 0/6] Extended file stat system call
-Date: Sat, 28 Apr 2012 10:58:56 +1000
-Message-ID: <20120428005856.GI9541@dastard>
-References: <20120427010610.GE9541@dastard>
- <20120419140558.17272.74360.stgit@warthog.procyon.org.uk>
- <4111.1335519545@redhat.com>
- <20120427131306.GG9541@dastard>
- <F2018580-9ACC-4A63-A8D1-155FA371749A@dilger.ca>
+From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Subject: Re: [PATCH] cifs - check S_AUTOMOUNT in revalidate
+Date: Fri, 27 Apr 2012 19:46:01 -0700
+Message-ID: <CA+55aFwx-vCQcbU5pKcRxFm1uJmjrT_OafTTMx026idX+H1oJg@mail.gmail.com>
+References: <20120427081815.4478.26011.stgit@perseus.themaw.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-ext4@vger.kernel.org,
-	wine-devel@winehq.org, kfm-devel@kde.org, nautilus-list@gnome.org,
-	linux-api@vger.kernel.org, libc-alpha@sourceware.org
-To: Andreas Dilger <adilger@dilger.ca>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <F2018580-9ACC-4A63-A8D1-155FA371749A@dilger.ca>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120427081815.4478.26011.stgit-jgopVnDzZD88qxobedHYj6xOck334EZe@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Apr 27, 2012 at 01:31:07PM -0600, Andreas Dilger wrote:
-> On 2012-04-27, at 7:13 AM, Dave Chinner wrote:
-> > Have a look at fs/xfs/xfs_dinode.h. There's a bunch of flags defined
-> > at the bottom of the file.
-> > 
-> > Stuff like the "nodefrag", "nodump", and "prealloc" bits seem fairly
-> > generic - they are for indicating that files are to be avoided for
-> > defrag or backup purposes, the prealloc bit indicates that fallocate
-> > has been used to reserve space on the inode (finding files that space
-> > can be punched out of safely), and so on.
-> 
-> There is already the FS_NODUMP_FL in the standard FS_IOC_GETFLAGS ioctl
-> and I expect this to be in statxat() also.
+Steve? I have a CIFS pull request from you now, and it doesn't contain
+this one. I don't know the code well enough to say one way or the
+other, so I haven't applied this. Pls Ack/Nak.
 
-I forgot that was one of the generic flags :/
+                   Linus
 
-> In ext4 there was also an
-> EXT4_EOFBLOCKS_FL added for inodes with fallocate'd data beyond EOF,
-> but Eric thought it was a pain to maintain and it has been deprecated
-> in ext4 and e2fsprogs recently.
-
-I'd think that flag is more of a "filesystem implementation
-specific" flag than a general "this file contained persistent
-preallocation" flag, which is essentially what the XFS flag says.
-XFS uses in various ways to optimise extent management on the file
-(e.g. don't truncate extents past EOF when closing the file), but it
-is not specific to one particular aspect of the preallocation
-implementation.
-
-> >> OTOH, there's plenty of uncommitted space, so if we can condense
-> >> the hints down to something small, we could perhaps add it later -
-> >> but from your paragraph above, it doesn't sound like it'll be small.
-> > 
-> > Allocation block size, minimum sane IO size (to avoid page cache RMW
-> > cycles or DIO zeroing), minimum prefered IO size (e.g. stripe unit),
-> > optimal IO size for bandwidth (e.g. stripe width). I don't think
-> > there's much more than that which will be really usable by
-> > applications.
-> 
-> I think this is a minimal set that makes sense, and is manageable for
-> both the interface and for users.  Even if it isn't 100% correct for
-> every file of every filesystem, it still makes sense for many systems.
-
-That's the aim, isn't it? To expose what is useful to the majority
-in a simple manner?
-
-> I'd suggest st_frsize (like BSD statvfs() f_frsize) would be the
-> minimum fragment or page size, st_iosize (BSD f_iosize) could be
-> the optimal IO size, and "st_stripesize" for the minimum preferred RAID/chunk size.
-
-Personally, I think those names are, well, terribly lacking in
-obviousness. Something more along the lines of:
-
-	st_blksize		- file block size
-	st_alloc_blksize	- allocation block size/alignment
-	st_small_io_size	- IO size/alignment that avoids
-				  filesystem/page cache RMW
-	st_preferred_io_size	- preferred IO size for general
-				  usage.
-	st_large_io_size	- IO size/alignment for high
-				  bandwidth sequential IO
-
-With the aim that applications tend to use st_preferred_io_size for
-all general IO (i.e. the default), st_small_io_size for small IO,
-IOPS intensive workloads, and st_large_io_size for writing large
-chunks of sequential data.
-
-> One could argue that "st_blksize" is used for the "optimal IO size"
-> on Linux today, but this is an overloaded term.  It _appears_ to
-> represent the filesystem blocksize, which it usually is not, and on
-> BSD st_bsize means the minimum blocksize and has a confusingly
-> similar name.  Since any application using this API needs to do some
-> extra coding already, we may as well give the structure members good
-> names that are not ambiguous.
-
-Well said - I couldn't have stated the case better myself. ;)
-
-Cheers,
-
-Dave.
-
--- 
-Dave Chinner
-david@fromorbit.com
+On Fri, Apr 27, 2012 at 1:18 AM, Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org> wrote:
+> When revalidating a dentry, if the inode wasn't known to be a dfs
+> entry when the dentry was instantiated, such as when created via
+> ->readdir(), the DCACHE_NEED_AUTOMOUNT flag needs to be set on the
+> dentry in ->d_revalidate().
+>
+> The false return from cifs_d_revalidate(), due to the inode now
+> being marked with the S_AUTOMOUNT flag, might not invalidate the
+> dentry if there is a concurrent unlazy path walk. This is because
+> the dentry reference count will be at least 2 in this case causing
+> d_invalidate() to return EBUSY. So the asumption that the dentry
+> will be discarded then correctly instantiated via ->lookup() might
+> not hold.
+>
+> Signed-off-by: Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>
+> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> ---
+>
+> =A0fs/cifs/dir.c | =A0 17 ++++++++++++-----
+> =A01 files changed, 12 insertions(+), 5 deletions(-)
+>
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index d172c8e..ec4e9a2 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -668,12 +668,19 @@ cifs_d_revalidate(struct dentry *direntry, stru=
+ct nameidata *nd)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 0;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0else {
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/*
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Forcibly invalidat=
+e automounting directory inodes
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* (remote DFS direct=
+ories) so to have them
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* instantiated again=
+ for automount
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* If the inode wasn'=
+t known to be a dfs entry when
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* the dentry was ins=
+tantiated, such as when created
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* via ->readdir(), i=
+t needs to be set now since the
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* attributes will ha=
+ve been updated by
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* cifs_revalidate_de=
+ntry().
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 */
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (IS_AUTOMOUNT(dirent=
+ry->d_inode))
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return =
+0;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (IS_AUTOMOUNT(dirent=
+ry->d_inode) &&
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0!(direntry->d_fl=
+ags & DCACHE_NEED_AUTOMOUNT)) {
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_lo=
+ck(&direntry->d_lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 direntr=
+y->d_flags |=3D DCACHE_NEED_AUTOMOUNT;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 spin_un=
+lock(&direntry->d_lock);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> +
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0return 1;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0}
+> =A0 =A0 =A0 =A0}
+>
