@@ -1,21 +1,20 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: setuids/setgids by default
-Date: Sat, 28 Apr 2012 10:52:01 -0500
-Message-ID: <CAH2r5msFQ504mwveQ6hZpXoZpTuPjze=GgOBowVg4xACfuP5+Q@mail.gmail.com>
+Date: Sun, 29 Apr 2012 08:52:51 +0400
+Message-ID: <CAKywueQx59wbr9pnvS=q-EqT33vfL9pGuFQF3h94-nRBc_5BXA@mail.gmail.com>
 References: <CAKywueSQQfzwkWgE33+w=y2pnQQd4nxhvJX71NaAa0E_BLAcbg@mail.gmail.com>
 	<20120428080230.160c6b38@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <20120428080230.160c6b38-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Apr 28, 2012 at 7:02 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+2012/4/28 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
 > On Sat, 28 Apr 2012 14:42:35 +0400
 > Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
@@ -68,15 +67,27 @@ st
 er
 > see a transition to that being the default. It's the only sane
 > solution, IMO.
+>
+> That said, if you want to do some cleanup work on the permissions mou=
+nt
+> options mess model, I'll be happy to help review it...
+>
+> FWIW, I gave a talk at sambaxp a couple of years ago that covered a l=
+ot
+> of the problems. I'd advise you to have a look at that before you spe=
+nd
+> too much time looking at this...
+>
+> =A0 =A0http://sambaxp.org/index.php?id=3D38
+>
+> ...see the talk on "Multi-session Linux CIFS".
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-I think moving to multiuser as default for SMB2 mounts, for example,
-would be logical (and probably cifsacl as well, and of course noperm
-checking on the client) - not sure we want to change the cifs mount
-defaults quickly but makes sense for smb2 (and reduces
-complexity).
-
+Ok, now I understand the problem, thanks. Seems multiuser is the best
+we can do with it.
 
 --=20
-Thanks,
-
-Steve
+Best regards,
+Pavel Shilovsky.
