@@ -1,108 +1,47 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 0/4] cifs: pave way for change to "strictcache" by
- default
-Date: Mon, 30 Apr 2012 07:28:46 -0400
-Message-ID: <20120430072846.69d489aa@corrin.poochiereds.net>
-References: <1335524179-1671-1-git-send-email-jlayton@redhat.com>
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [patch v2] cifs: fix revalidation test in cifs_llseek()
+Date: Mon, 30 Apr 2012 17:36:21 +0300
+Message-ID: <20120430143621.GK6447@mwanda>
+References: <20120419210619.GA19074@elgon.mountain>
+	<CAKywueQrrHdqXXrHQbP=vjs_MLjksvR09cpax0iWw-PS6ms=fg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1335524179-1671-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, samba-technical@lists.samba.org,
+	Josef Bacik <josef@redhat.com>
+To: Pavel Shilovsky <piastryyy@gmail.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+Content-Disposition: inline
+In-Reply-To: <CAKywueQrrHdqXXrHQbP=vjs_MLjksvR09cpax0iWw-PS6ms=fg@mail.gmail.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, 27 Apr 2012 06:56:15 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+This test is always true so it means we revalidate the length every
+time, which generates more network traffic.  When it is SEEK_SET or
+SEEK_CUR, then we don't need to revalidate.
 
-> cifs.ko currently does not follow the CIFS protocol as it should by
-> default. The protocol specifies (paraphrasing) "Thou shalt not cache
-> file data without an oplock." cifs.ko by default *does* do this however,
-> opting for a more NFS-like cache coherency scheme. It caches file data
-> in the pagecache, and invalidate it when the attributes look like the
-> file has changed.
-> 
-> Unfortunately, this can and does cause cache coherency problems. The
-> kernel can end up buffering up writes for longer than it should. In
-> particular, internal testing at RH with Samba/CTDB has shown cache
-> coherency problems when we don't mount on the clients with
-> strictcache:
-> 
->     https://bugzilla.redhat.com/show_bug.cgi?id=742314
-> 
-> Up until now, we've shied away from changing this default primarily for
-> performance reasons. The code to handle uncached reads and writes was
-> synchronous, and very slow. With the addition of async uncached writes
-> in 3.4 and async uncached reads in 3.5, I think performance is good
-> enough that we ought to change the defaults to be "strictcache" for
-> better adherence to the protocol.
-> 
-> This patchset begins this transition by cleaning up the mount options
-> that we use to control the cache behavior, and adding some warnings
-> about the impending behavior change. I'm proposing that we follow the
-> kernel convention of warning for 2 releases about user-visible changes
-> and then we'll make the switch in 3.7.
-> 
-> At the same time, it corrects a problem with the current code. The
-> different cache behaviors are not considered to be mutually exclusive
-> even though they should be. If someone (for instance) specifies
-> "strictcache" and "fsc" the results are poorly defined. The first
-> patch corrects this.
-> 
-> If this looks acceptable, I'll also plan to spin up a manpage patch
-> to help document this change.
-> 
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+v2:  I had the test reversed in the first version.
 
-(cc'ing samba-technical too for those that don't follow linux-cifs...)
-
-I discussed this some via IM with Steve last week and he has his doubts
-about whether we should do this. I think we ought to bring this
-discussion to the lists though so we can try to settle this in time for
-the next kernel merge window.
-
-The (valid) point that he brings up is that this will harm performance
-when an application is doing small I/Os sizes and does not have an
-oplock. This is true -- reads and writes will be synchronous and will
-match the sizes that come from userspace. An application doing small
-I/Os will suffer performance-wise when it does not have an oplock on an
-open file.
-
-He also claims that Windows will still buffer up writes when it doesn't
-have an oplock in an effort to do larger I/Os on the wire. I've got a
-dochelp request into MS to clarify this point and what the protocol
-mandates, but I don't think the answer there will have much bearing on
-what we should do. There are a number of problems with keeping
-"cache=loose" the default...
-
-When we do I/O out of the pagecache, then we more or less do it along
-page boundaries. If another client has locked a region in the middle of
-a page, then that request will generally fail. We have no way to know
-what region is locked, so we have no way to handle this case.
-
-We also have quite a few documented cases where using "strictcache" has
-fixed cache coherency problems. Here's one, for instance, but there are
-others:
-
-    https://bugzilla.samba.org/show_bug.cgi?id=6174
-
-I think it's important that cifs.ko is safe to use by default, even if
-it's a little slower. We can always tell people "try cache=loose" if
-their workload is slow with "cache=strict", but having defaults that
-can munch your data is really not acceptable. 
-
-I guess the question we have to answer is:
-
-"Is it worth risking data corruption in order to eke out better
-performance when a user is doing small I/Os and does not have an oplock?"
-
-To me, the answer is an unqualified "no". In most cases, you don't have
-an oplock because another client has the file open. In those cases,
-cache coherency generally trumps performance. In cases where it
-doesn't, a user has the freedom to mount with "cache=loose" with the
-understanding of all that that entails.
-
-Thoughts?
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 811245b..4a6ad20 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -699,7 +699,7 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
+ 	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
+ 	 * the cached file length
+ 	 */
+-	if (origin != SEEK_SET || origin != SEEK_CUR) {
++	if (origin != SEEK_SET && origin != SEEK_CUR) {
+ 		int rc;
+ 		struct inode *inode = file->f_path.dentry->d_inode;
+ 
