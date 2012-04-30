@@ -1,48 +1,55 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [patch v2] cifs: fix revalidation test in cifs_llseek()
-Date: Mon, 30 Apr 2012 11:15:14 -0400
-Message-ID: <20120430111514.72b54efa@corrin.poochiereds.net>
-References: <20120419210619.GA19074@elgon.mountain>
-	<CAKywueQrrHdqXXrHQbP=vjs_MLjksvR09cpax0iWw-PS6ms=fg@mail.gmail.com>
-	<20120430143621.GK6447@mwanda>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 0/4] cifs: pave way for change to "strictcache" by
+ default
+Date: Mon, 30 Apr 2012 11:45:47 -0400
+Message-ID: <20120430114547.3c9580c1@corrin.poochiereds.net>
+References: <1335524179-1671-1-git-send-email-jlayton@redhat.com>
+	<20120430072846.69d489aa@corrin.poochiereds.net>
+	<CAH2r5msnmF0d_bmctzKtzSQ-+y9VRa2=USDO8kV=QF9KV+J=7g@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	Josef Bacik <josef-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120430143621.GK6447@mwanda>
+In-Reply-To: <CAH2r5msnmF0d_bmctzKtzSQ-+y9VRa2=USDO8kV=QF9KV+J=7g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 30 Apr 2012 17:36:21 +0300
-Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org> wrote:
+On Mon, 30 Apr 2012 10:11:43 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> This test is always true so it means we revalidate the length every
-> time, which generates more network traffic.  When it is SEEK_SET or
-> SEEK_CUR, then we don't need to revalidate.
+> There is a related question of how deferring writes slightly (e.g. to
+> buffer a full page or a full smb buffer) could corrupt data?
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> ---
-> v2:  I had the test reversed in the first version.
+
+You're returning from write(2) without actually sending it to the
+backing store, but a read(2) will go to that backing store. So,
+applications that expect the results of that write to be visible to
+other clients (or even on the same client) won't see it.
+
+> AFAIK - there isn't an ordering guarantee in posix when writes from
+> two different applications overlap (thus the need for byte range locks
+> or other synchronization mechanisms, or flush/fsync).
 > 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 811245b..4a6ad20 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -699,7 +699,7 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int origin)
->  	 * origin == SEEK_END || SEEK_DATA || SEEK_HOLE => we must revalidate
->  	 * the cached file length
->  	 */
-> -	if (origin != SEEK_SET || origin != SEEK_CUR) {
-> +	if (origin != SEEK_SET && origin != SEEK_CUR) {
->  		int rc;
->  		struct inode *inode = file->f_path.dentry->d_inode;
->  
 
-Looks good.
+Correct, there isn't, but even locking doesn't really help with cifs.ko
+since it doesn't treat locks as cache coherency points like the nfs
+client does. Even if it did though, the NFS cache coherency model is not
+necessarily something we want to emulate. It's pretty fragile itself.
+Coarse-grained timestamps on the underlying fs can easily break it for
+instance.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To compound the problem, windows servers tend to be quite lazy about
+mtime updates. So even if you do proper locking, there's no guarantee
+that the "loose" cache coherency algorithm in cifs.ko will detect that
+the file has changed. Another client might do some writes but the mtime
+doesn't necessarily change as a result.
+
+I'm certainly aware that this might slow down performance in some
+cases. Those people however can always switch to the less-safe
+cache=loose if they wish. By default however, we should attempt to
+follow the letter of the protocol as best we can...
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
