@@ -1,75 +1,73 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: lockdep pops with -rc5 kernel
-Date: Tue, 1 May 2012 17:40:29 -0400
-Message-ID: <20120501174029.1da84b19@tlielax.poochiereds.net>
-References: <20120501172220.4d34b839@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: don't cap ra_pages at the same level as default_backing_dev_info
+Date: Tue,  1 May 2012 17:51:57 -0400
+Message-ID: <1335909117-17314-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120501172220.4d34b839-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUdWUs
-IDEgTWF5IDIwMTIgMTc6MjI6MjAgLTA0MDANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9y
-Zz4gd3JvdGU6DQoNCj4gSSdtIHN0aWxsIHNlZWluZyB0aGlzIGxvY2tkZXAgcG9wIHdpdGggLXJj
-NSBrZXJuZWwuIEkgdGhvdWdodCBQYXZlbCBoYWQNCj4gZml4ZWQgdGhpcywgYnV0IG1heWJlIGhp
-cyBwYXRjaCBoYXNuJ3QgYmVlbiBtZXJnZWQgeWV0PyBPciBhbSBJDQo+IG1pc3Rha2VuPyBJbiBh
-bnkgY2FzZSwgaXQgbG9va3MgbGlrZSBpdCBqdXN0IG5lZWRzIHNvbWUgbG9ja2RlcA0KPiBhbm5v
-dGF0aW9uIGFuZCB3ZSBwcm9iYWJseSB3YW50IHRoaXMgZml4ZWQgYmVmb3JlIDMuNCBzaGlwcy4u
-Lg0KPiANCj4gWyAgIDU1LjIxODc1M10gSU5GTzogdHJ5aW5nIHRvIHJlZ2lzdGVyIG5vbi1zdGF0
-aWMga2V5Lg0KPiBbICAgNTUuMjE5Mzk2XSB0aGUgY29kZSBpcyBmaW5lIGJ1dCBuZWVkcyBsb2Nr
-ZGVwIGFubm90YXRpb24uDQo+IFsgICA1NS4yMTkzOTZdIHR1cm5pbmcgb2ZmIHRoZSBsb2NraW5n
-IGNvcnJlY3RuZXNzIHZhbGlkYXRvci4NCj4gWyAgIDU1LjIxOTM5Nl0gUGlkOiA4NTUsIGNvbW06
-IG1vdW50LmNpZnMgTm90IHRhaW50ZWQgMy40LjAtcmM1KyAjMTUNCj4gWyAgIDU1LjIxOTM5Nl0g
-Q2FsbCBUcmFjZToNCj4gWyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZmZmY4MTBjZDdiNj5dIF9fbG9j
-a19hY3F1aXJlKzB4MTMwNi8weDFhZDANCj4gWyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZmZmY4MTBj
-Y2JlMz5dID8gX19sb2NrX2FjcXVpcmUrMHg3MzMvMHgxYWQwDQo+IFsgICA1NS4yMTkzOTZdICBb
-PGZmZmZmZmZmODEwY2YyYWQ+XSA/IHRyYWNlX2hhcmRpcnFzX29uKzB4ZC8weDEwDQo+IFsgICA1
-NS4yMTkzOTZdICBbPGZmZmZmZmZmODEzMmZmOGQ+XSA/IHBvaW50ZXIuaXNyYS4xMSsweDFmZC8w
-eDJkMA0KPiBbICAgNTUuMjE5Mzk2XSAgWzxmZmZmZmZmZjgxMGNlNjYxPl0gbG9ja19hY3F1aXJl
-KzB4YTEvMHgxZjANCj4gWyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZmZmZhMDBmOTZmZT5dID8gY2lm
-c19zZXRfY3JlZGl0cysweDJlLzB4NzAgW2NpZnNdDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZm
-ZmZmYTAwZThjYTA+XSA/IGNpZnNfZ2V0X3NtYl9zZXMrMHgxNjAvMHg0YzAgW2NpZnNdDQo+IFsg
-ICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODE2YWQ2NDY+XSBfcmF3X3NwaW5fbG9jaysweDQ2LzB4
-ODANCj4gWyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZmZmZhMDBmOTZmZT5dID8gY2lmc19zZXRfY3Jl
-ZGl0cysweDJlLzB4NzAgW2NpZnNdDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODE2YWEz
-MjM+XSA/IG11dGV4X2xvY2tfbmVzdGVkKzB4MmMzLzB4MzkwDQo+IFsgICA1NS4yMTkzOTZdICBb
-PGZmZmZmZmZmYTAwZjk2ZmU+XSBjaWZzX3NldF9jcmVkaXRzKzB4MmUvMHg3MCBbY2lmc10NCj4g
-WyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZmZmZhMDBlODhhZD5dIGNpZnNfbmVnb3RpYXRlX3Byb3Rv
-Y29sKzB4NGQvMHhlMCBbY2lmc10NCj4gWyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZmZmZhMDBlOGNh
-Yj5dIGNpZnNfZ2V0X3NtYl9zZXMrMHgxNmIvMHg0YzAgW2NpZnNdDQo+IFsgICA1NS4yMTkzOTZd
-ICBbPGZmZmZmZmZmYTAwZTkwOTk+XSBjaWZzX21vdW50KzB4OTkvMHg2ZjAgW2NpZnNdDQo+IFsg
-ICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmYTAwZDZlZmM+XSBjaWZzX2RvX21vdW50KzB4YWMvMHg0
-ZDAgW2NpZnNdDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODExYzI4YjM+XSBtb3VudF9m
-cysweDQzLzB4MWIwDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODExZGYzOGY+XSB2ZnNf
-a2Vybl9tb3VudCsweDZmLzB4MTAwDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODExZGZm
-MTQ+XSBkb19rZXJuX21vdW50KzB4NTQvMHgxMTANCj4gWyAgIDU1LjIxOTM5Nl0gIFs8ZmZmZmZm
-ZmY4MTFlMTc3YT5dIGRvX21vdW50KzB4MjZhLzB4ODQwDQo+IFsgICA1NS4yMTkzOTZdICBbPGZm
-ZmZmZmZmODExNTUzMjQ+XSA/IF9fZ2V0X2ZyZWVfcGFnZXMrMHgxNC8weDUwDQo+IFsgICA1NS4y
-MTkzOTZdICBbPGZmZmZmZmZmODExZTEzN2E+XSA/IGNvcHlfbW91bnRfb3B0aW9ucysweDNhLzB4
-MTgwDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODExZTFlOGQ+XSBzeXNfbW91bnQrMHg4
-ZC8weGUwDQo+IFsgICA1NS4yMTkzOTZdICBbPGZmZmZmZmZmODE2YjZmMjk+XSBzeXN0ZW1fY2Fs
-bF9mYXN0cGF0aCsweDE2LzB4MWINCj4gDQoNCk9rLCBJIHRoaW5rIEkndmUgZm91bmQgdGhlIHBy
-b2JsZW0uIFRoZSByZXFfbG9jayB3YXNuJ3QgYmVpbmcNCmluaXRpYWxpemVkIChvdWNoKS4gSSd2
-ZSBqdXN0IHNlbnQgYSBwYXRjaCB0aGF0IEkgdGhpbmsgaXMgcHJldHR5DQpvYnZpb3VzLg0KDQpT
-dGV2ZSwgdGhhdCBzaG91bGQgYmUgcHVzaGVkIHRvIExpbnVzIEFTQVAuLi4NCg0KQ2hlZXJzLA0K
-LSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJ
-R05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNC
-QUVCQWdBR0JRSlBvRmhOQUFvSkVBQU9hRUVaVm9JVnVya1FBSnVuMjNXejJ0R2o4WjNieGdnVTQ5
-NzcNCklnZnh3cGJySmNsdHNPL3J3Zk9UM3A4NWVEWEtLL0lCUmtWMTN1V29QR2YyaDliY29zeUh6
-c0hXMlZwNmI1UzANCjJjNXZGaTdWM2FCZ2ZlYTVmcjRtUE9DZlo4MXFDT3BIY29URzVvWUpCTTAy
-TXdsbExPT25RcWVkYkxHOU1BeDgNCkpBaDRLbFYzbCtodUpDeklHc1dIRWhJc1NabHhRMFgrRzNl
-dSsvWXMvNlhyaTZyN3lScXRwL1N6bFJMek4rY1MNClFubHlmZE5uTGdhZnc3ekNsL3BmMUlNcHhG
-eXlTUDBhMzdacVBFWU5YUGhoTkJvU2J0RDhvNWhCWDI1SVdjeFINClBneC9YZk1nZUorbXA0cDM1
-Z2xTRFFQOHk2ZnB0eUdxWUg0cUhLQkg0b3NVOFJpaHFJNEd0MFByT1NHZmN0WDYNClRndDBTM1ZN
-QTk4ZkNYM21TUkRsK01IcXQxN2orSDJxV0xlQmJrTHB1K0ZLWEMzVFQybUZZQ2JWeVZXK1BSRlUN
-CjJsNEVRN0phU1NDSEFRRUpsNW90ei92eGRmWUNlNGl4RkFjQjRPV3dEaXBwV004VWRKWHp2bnJG
-MnFSK2xkL0kNCjZjQk5CYSttNU9RYUl5NGJIRW1lMUR3VStuRWtoaEFSZkJBMFQrMVBBc0dtbTVt
-a3BERVM2aENvOEtxVndHRkgNCkpKRTh2U3FVWm8rY2ZvZ0c0UU1MbXh3NSthbDN5MitHREdEcmhJ
-eGdOYUNFOHhBTWFTYyttb0d6aitCc29vcjINCkpXTkdBTCtUTWRkYjhmMGM2NEN1WkZDVGxHTVFj
-bzY5dlVNQldNdE4rcWpZeE9BaTk2bDNxUEFUaWo1WlZQeFgNClljUi9jTjNRQnZoZTJrano2QzVl
-DQo9Vkthcg0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
+While testing, I've found that even when we are able to negotiate a
+much larger rsize with the server, on-the-wire reads often end up being
+capped at 128k because of ra_pages being capped at that level.
+
+Lifting this restriction gave almost a twofold increase in sequential
+read performance on my craptactular KVM test rig with a 1M rsize:
+
+$ dd if=./ddtest.out of=/dev/null bs=1M count=1024
+
+Prepatch:
+1048576000 bytes (1.0 GB) copied, 28.1979 s, 37.2 MB/s
+
+Postpatch:
+1048576000 bytes (1.0 GB) copied, 11.92 s, 88.0 MB/s
+
+I think this is safe since the actual ra_pages that the VM requests
+is run through max_sane_readahead() prior to submitting the I/O. Under
+memory pressure we should end up with large readahead requests being
+suppressed anyway.
+
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c |   18 +-----------------
+ 1 files changed, 1 insertions(+), 17 deletions(-)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 0d783e2..d41a4a8 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3705,22 +3705,6 @@ cifs_get_volume_info(char *mount_data, const char *devname)
+ 	return volume_info;
+ }
+ 
+-/* make sure ra_pages is a multiple of rsize */
+-static inline unsigned int
+-cifs_ra_pages(struct cifs_sb_info *cifs_sb)
+-{
+-	unsigned int reads;
+-	unsigned int rsize_pages = cifs_sb->rsize / PAGE_CACHE_SIZE;
+-
+-	if (rsize_pages >= default_backing_dev_info.ra_pages)
+-		return default_backing_dev_info.ra_pages;
+-	else if (rsize_pages == 0)
+-		return rsize_pages;
+-
+-	reads = default_backing_dev_info.ra_pages / rsize_pages;
+-	return reads * rsize_pages;
+-}
+-
+ int
+ cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
+ {
+@@ -3808,7 +3792,7 @@ try_mount_again:
+ 	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
+ 
+ 	/* tune readahead according to rsize */
+-	cifs_sb->bdi.ra_pages = cifs_ra_pages(cifs_sb);
++	cifs_sb->bdi.ra_pages = cifs_sb->rsize / PAGE_CACHE_SIZE;
+ 
+ remote_path_check:
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-- 
+1.7.7.6
