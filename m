@@ -1,50 +1,49 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 0/4] cifs: pave way for change to "strictcache" by
- default
-Date: Mon, 30 Apr 2012 12:05:17 -0400
-Message-ID: <20120430120517.07d76ed1@corrin.poochiereds.net>
-References: <1335524179-1671-1-git-send-email-jlayton@redhat.com>
-	<20120430072846.69d489aa@corrin.poochiereds.net>
-	<CAH2r5msnmF0d_bmctzKtzSQ-+y9VRa2=USDO8kV=QF9KV+J=7g@mail.gmail.com>
-	<20120430114547.3c9580c1@corrin.poochiereds.net>
-	<CAH2r5mue-u8cDYhsxxHqTTwOyb4_qEok2CLB3N8+9EfK0_JmHQ@mail.gmail.com>
+Subject: lockdep pops with -rc5 kernel
+Date: Tue, 1 May 2012 17:22:20 -0400
+Message-ID: <20120501172220.4d34b839@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mue-u8cDYhsxxHqTTwOyb4_qEok2CLB3N8+9EfK0_JmHQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 30 Apr 2012 10:50:25 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+I'm still seeing this lockdep pop with -rc5 kernel. I thought Pavel had
+fixed this, but maybe his patch hasn't been merged yet? Or am I
+mistaken? In any case, it looks like it just needs some lockdep
+annotation and we probably want this fixed before 3.4 ships...
 
-> On Mon, Apr 30, 2012 at 10:45 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > On Mon, 30 Apr 2012 10:11:43 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> >> There is a related question of how deferring writes slightly (e.g. to
-> >> buffer a full page or a full smb buffer) could corrupt data?
-> >>
-> >
-> > You're returning from write(2) without actually sending it to the
-> > backing store, but a read(2) will go to that backing store. So,
-> > applications that expect the results of that write to be visible to
-> > other clients (or even on the same client) won't see it.
-> 
-> well the results of the write MUST be visible to others reading
-> on the same client.  In what case would they not be
-> (other than perhaps some odd private memory mapping case)
-> 
-> 
-
-If you're delaying the write, how are you going to satisfy that read?
-
-Where will the results of that write be stored such that the read can
-then see it? Typically the answer would be "the pagecache" but you
-can't use it in this case.
+[   55.218753] INFO: trying to register non-static key.
+[   55.219396] the code is fine but needs lockdep annotation.
+[   55.219396] turning off the locking correctness validator.
+[   55.219396] Pid: 855, comm: mount.cifs Not tainted 3.4.0-rc5+ #15
+[   55.219396] Call Trace:
+[   55.219396]  [<ffffffff810cd7b6>] __lock_acquire+0x1306/0x1ad0
+[   55.219396]  [<ffffffff810ccbe3>] ? __lock_acquire+0x733/0x1ad0
+[   55.219396]  [<ffffffff810cf2ad>] ? trace_hardirqs_on+0xd/0x10
+[   55.219396]  [<ffffffff8132ff8d>] ? pointer.isra.11+0x1fd/0x2d0
+[   55.219396]  [<ffffffff810ce661>] lock_acquire+0xa1/0x1f0
+[   55.219396]  [<ffffffffa00f96fe>] ? cifs_set_credits+0x2e/0x70 [cifs]
+[   55.219396]  [<ffffffffa00e8ca0>] ? cifs_get_smb_ses+0x160/0x4c0 [cifs]
+[   55.219396]  [<ffffffff816ad646>] _raw_spin_lock+0x46/0x80
+[   55.219396]  [<ffffffffa00f96fe>] ? cifs_set_credits+0x2e/0x70 [cifs]
+[   55.219396]  [<ffffffff816aa323>] ? mutex_lock_nested+0x2c3/0x390
+[   55.219396]  [<ffffffffa00f96fe>] cifs_set_credits+0x2e/0x70 [cifs]
+[   55.219396]  [<ffffffffa00e88ad>] cifs_negotiate_protocol+0x4d/0xe0 [cifs]
+[   55.219396]  [<ffffffffa00e8cab>] cifs_get_smb_ses+0x16b/0x4c0 [cifs]
+[   55.219396]  [<ffffffffa00e9099>] cifs_mount+0x99/0x6f0 [cifs]
+[   55.219396]  [<ffffffffa00d6efc>] cifs_do_mount+0xac/0x4d0 [cifs]
+[   55.219396]  [<ffffffff811c28b3>] mount_fs+0x43/0x1b0
+[   55.219396]  [<ffffffff811df38f>] vfs_kern_mount+0x6f/0x100
+[   55.219396]  [<ffffffff811dff14>] do_kern_mount+0x54/0x110
+[   55.219396]  [<ffffffff811e177a>] do_mount+0x26a/0x840
+[   55.219396]  [<ffffffff81155324>] ? __get_free_pages+0x14/0x50
+[   55.219396]  [<ffffffff811e137a>] ? copy_mount_options+0x3a/0x180
+[   55.219396]  [<ffffffff811e1e8d>] sys_mount+0x8d/0xe0
+[   55.219396]  [<ffffffff816b6f29>] system_call_fastpath+0x16/0x1b
 
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
