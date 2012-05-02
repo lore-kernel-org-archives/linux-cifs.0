@@ -1,73 +1,90 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: don't cap ra_pages at the same level as default_backing_dev_info
-Date: Tue,  1 May 2012 17:51:57 -0400
-Message-ID: <1335909117-17314-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: lockdep pops with -rc5 kernel
+Date: Tue, 1 May 2012 21:57:09 -0500
+Message-ID: <CAH2r5muR3sQq8M2X1wHkY+uh_9eG5gGEqbKAcZt9t-G=-_J1Eg@mail.gmail.com>
+References: <20120501172220.4d34b839@tlielax.poochiereds.net>
+	<20120501174029.1da84b19@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120501174029.1da84b19-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-While testing, I've found that even when we are able to negotiate a
-much larger rsize with the server, on-the-wire reads often end up being
-capped at 128k because of ra_pages being capped at that level.
+On Tue, May 1, 2012 at 4:40 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA1
+>
+> On Tue, 1 May 2012 17:22:20 -0400
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>
+> > I'm still seeing this lockdep pop with -rc5 kernel. I thought Pavel=
+ had
+> > fixed this, but maybe his patch hasn't been merged yet? Or am I
+> > mistaken? In any case, it looks like it just needs some lockdep
+> > annotation and we probably want this fixed before 3.4 ships...
+> >
+> > [ =A0 55.218753] INFO: trying to register non-static key.
+> > [ =A0 55.219396] the code is fine but needs lockdep annotation.
+> > [ =A0 55.219396] turning off the locking correctness validator.
+> > [ =A0 55.219396] Pid: 855, comm: mount.cifs Not tainted 3.4.0-rc5+ =
+#15
+> > [ =A0 55.219396] Call Trace:
+> > [ =A0 55.219396] =A0[<ffffffff810cd7b6>] __lock_acquire+0x1306/0x1a=
+d0
+> > [ =A0 55.219396] =A0[<ffffffff810ccbe3>] ? __lock_acquire+0x733/0x1=
+ad0
+> > [ =A0 55.219396] =A0[<ffffffff810cf2ad>] ? trace_hardirqs_on+0xd/0x=
+10
+> > [ =A0 55.219396] =A0[<ffffffff8132ff8d>] ? pointer.isra.11+0x1fd/0x=
+2d0
+> > [ =A0 55.219396] =A0[<ffffffff810ce661>] lock_acquire+0xa1/0x1f0
+> > [ =A0 55.219396] =A0[<ffffffffa00f96fe>] ? cifs_set_credits+0x2e/0x=
+70 [cifs]
+> > [ =A0 55.219396] =A0[<ffffffffa00e8ca0>] ? cifs_get_smb_ses+0x160/0=
+x4c0 [cifs]
+> > [ =A0 55.219396] =A0[<ffffffff816ad646>] _raw_spin_lock+0x46/0x80
+> > [ =A0 55.219396] =A0[<ffffffffa00f96fe>] ? cifs_set_credits+0x2e/0x=
+70 [cifs]
+> > [ =A0 55.219396] =A0[<ffffffff816aa323>] ? mutex_lock_nested+0x2c3/=
+0x390
+> > [ =A0 55.219396] =A0[<ffffffffa00f96fe>] cifs_set_credits+0x2e/0x70=
+ [cifs]
+> > [ =A0 55.219396] =A0[<ffffffffa00e88ad>] cifs_negotiate_protocol+0x=
+4d/0xe0 [cifs]
+> > [ =A0 55.219396] =A0[<ffffffffa00e8cab>] cifs_get_smb_ses+0x16b/0x4=
+c0 [cifs]
+> > [ =A0 55.219396] =A0[<ffffffffa00e9099>] cifs_mount+0x99/0x6f0 [cif=
+s]
+> > [ =A0 55.219396] =A0[<ffffffffa00d6efc>] cifs_do_mount+0xac/0x4d0 [=
+cifs]
+> > [ =A0 55.219396] =A0[<ffffffff811c28b3>] mount_fs+0x43/0x1b0
+> > [ =A0 55.219396] =A0[<ffffffff811df38f>] vfs_kern_mount+0x6f/0x100
+> > [ =A0 55.219396] =A0[<ffffffff811dff14>] do_kern_mount+0x54/0x110
+> > [ =A0 55.219396] =A0[<ffffffff811e177a>] do_mount+0x26a/0x840
+> > [ =A0 55.219396] =A0[<ffffffff81155324>] ? __get_free_pages+0x14/0x=
+50
+> > [ =A0 55.219396] =A0[<ffffffff811e137a>] ? copy_mount_options+0x3a/=
+0x180
+> > [ =A0 55.219396] =A0[<ffffffff811e1e8d>] sys_mount+0x8d/0xe0
+> > [ =A0 55.219396] =A0[<ffffffff816b6f29>] system_call_fastpath+0x16/=
+0x1b
+> >
+>
+> Ok, I think I've found the problem. The req_lock wasn't being
+> initialized (ouch). I've just sent a patch that I think is pretty
+> obvious.
+>
+> Steve, that should be pushed to Linus ASAP...
+>
 
-Lifting this restriction gave almost a twofold increase in sequential
-read performance on my craptactular KVM test rig with a 1M rsize:
+agreed.
 
-$ dd if=./ddtest.out of=/dev/null bs=1M count=1024
+--
+Thanks,
 
-Prepatch:
-1048576000 bytes (1.0 GB) copied, 28.1979 s, 37.2 MB/s
-
-Postpatch:
-1048576000 bytes (1.0 GB) copied, 11.92 s, 88.0 MB/s
-
-I think this is safe since the actual ra_pages that the VM requests
-is run through max_sane_readahead() prior to submitting the I/O. Under
-memory pressure we should end up with large readahead requests being
-suppressed anyway.
-
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c |   18 +-----------------
- 1 files changed, 1 insertions(+), 17 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0d783e2..d41a4a8 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3705,22 +3705,6 @@ cifs_get_volume_info(char *mount_data, const char *devname)
- 	return volume_info;
- }
- 
--/* make sure ra_pages is a multiple of rsize */
--static inline unsigned int
--cifs_ra_pages(struct cifs_sb_info *cifs_sb)
--{
--	unsigned int reads;
--	unsigned int rsize_pages = cifs_sb->rsize / PAGE_CACHE_SIZE;
--
--	if (rsize_pages >= default_backing_dev_info.ra_pages)
--		return default_backing_dev_info.ra_pages;
--	else if (rsize_pages == 0)
--		return rsize_pages;
--
--	reads = default_backing_dev_info.ra_pages / rsize_pages;
--	return reads * rsize_pages;
--}
--
- int
- cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *volume_info)
- {
-@@ -3808,7 +3792,7 @@ try_mount_again:
- 	cifs_sb->rsize = cifs_negotiate_rsize(tcon, volume_info);
- 
- 	/* tune readahead according to rsize */
--	cifs_sb->bdi.ra_pages = cifs_ra_pages(cifs_sb);
-+	cifs_sb->bdi.ra_pages = cifs_sb->rsize / PAGE_CACHE_SIZE;
- 
- remote_path_check:
- #ifdef CONFIG_CIFS_DFS_UPCALL
--- 
-1.7.7.6
+Steve
