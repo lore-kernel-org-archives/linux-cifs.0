@@ -1,82 +1,95 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 01/16] CIFS: Introduce SMB2 Kconfig option
-Date: Sun, 6 May 2012 08:25:28 -0400
-Message-ID: <20120506082528.2226356f@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 02/16] CIFS: Introduce SMB2 mounts as vers=2
+Date: Sun, 6 May 2012 08:31:03 -0400
+Message-ID: <20120506083103.605e3dae@corrin.poochiereds.net>
 References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
-	<1332753703-4315-2-git-send-email-piastry@etersoft.ru>
+	<1332753703-4315-3-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1332753703-4315-2-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1332753703-4315-3-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 26 Mar 2012 13:21:28 +0400
+On Mon, 26 Mar 2012 13:21:29 +0400
 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
 > From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 > 
-> SMB2 is the followon to the CIFS (and SMB) protocols
-> and the default for Windows since Windows Vista, and also
-> now implemented by various non-Windows servers. SMB2
-> is more secure, has various performance advantages, including
-> larger i/o sizes, flow control, better caching model and more.
-> SMB2 also resolves some scalability limits in the CIFS
-> protocol and adds many new features while being much
-> simpler (only a few dozen commands instead of hundreds)
-> and since the protocol is clearer it is also more consistently
-> implemented across servers and thus easier to optimize.
+> As with Linux nfs client, which uses "nfsvers=" or "vers=" to
+> indicate which protocol to use for mount, specifying
 > 
-> After much discussion with Jeff Layton, Jeremy Allison
-> and others at Connectathon, we decided to move the SMB2
-> code from a distinct .ko and fstype into distinct
-> C files that optionally build in cifs.ko. As a result
-> the Kconfig gets simpler.
+> "vers=smb2" or "vers=2"
 > 
-> To avoid destabilizing CIFS, the SMB2 code is going
-> to be moved into its own experimental CONFIG_CIFS_SMB2 ifdef
-> as it is merged and rereviewed. The changes to stable
-> CIFS (builds with the SMB2 ifdef off) are expected to be
-> fairly small.
+> will force an SMB2 mount. When vers is not specified CIFS is used
 > 
+> ie "vers=cifs" or "vers=1"
+> 
+> We can eventually autonegotiate down from SMB2 to CIFS
+> when SMB2 is stable enough to make it the default, but this
+> is for the future.  At that time we could also implement a
+> "maxprotocol" mount option as smbclient and Samba have today,
+> but that would be premature until SMB2 is stable.
+> 
+> Intially the SMB2 Kconfig option will depend on "BROKEN"
+> until the merge is complete, and then be "EXPERIMENTAL"
+> When it is no longer experimental we can consider changing
+> the default protocol to attempt first.
+> 
+> Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/Kconfig |   20 ++++++++++++++++++++
->  1 files changed, 20 insertions(+), 0 deletions(-)
+>  fs/cifs/cifsglob.h |    3 +++
+>  fs/cifs/connect.c  |    8 ++++++++
+>  2 files changed, 11 insertions(+), 0 deletions(-)
 > 
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index 2b243af..a08306a 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -158,3 +158,23 @@ config CIFS_NFSD_EXPORT
->  	  depends on CIFS && EXPERIMENTAL && BROKEN
->  	  help
->  	   Allows NFS server to export a CIFS mounted share (nfsd over cifs)
-> +
-> +config CIFS_SMB2
-> +	bool "SMB2 network file system support (EXPERIMENTAL)"
-> +	depends on EXPERIMENTAL && INET && BROKEN
-> +	select NLS
-> +	select KEYS
-> +	select FSCACHE
-> +	select DNS_RESOLVER
-> +
-> +	help
-> +	  This enables experimental support for the SMB2 (Server Message Block
-> +	  version 2) protocol. The SMB2 protocol is the successor to the
-> +	  popular CIFS and SMB network file sharing protocols. SMB2 is the
-> +	  native file sharing mechanism for recent versions of Windows
-> +	  operating systems (since Vista).  SMB2 enablement will eventually
-> +	  allow users better performance, security and features, than would be
-> +	  possible with cifs. Note that smb2 mount options also are simpler
-> +	  (compared to cifs) due to protocol improvements.
-> +
-> +	  Unless you are a developer or tester, say N.
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 4ff6313..9e28070 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -167,6 +167,9 @@ struct smb_vol {
+>  	umode_t file_mode;
+>  	umode_t dir_mode;
+>  	unsigned secFlg;
+> +#ifdef CONFIG_CIFS_SMB2
+> +	bool use_smb2:1; /* use SMB2 protocol rather than CIFS */
+> +#endif
 
-Looks reasonable...
+Now that we have a new SMB major version to deal with, a boolean really
+seems unsuited to this purpose. Should we change this to be an unsigned
+int or something and assign the correct version number to it?
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>  	bool retry:1;
+>  	bool intr:1;
+>  	bool setuids:1;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 9808154..955f0a3 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1856,6 +1856,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>  			    strnicmp(string, "1", 1) == 0) {
+>  				/* This is the default */
+>  				break;
+> +			} else if (strnicmp(string, "smb2", 4) == 0 ||
+> +				   strnicmp(string, "2", 1) == 0) {
+> +#ifdef CONFIG_CIFS_SMB2
+> +				vol->use_smb2 = true;
+> +#else
+> +				cERROR(1, "SMB2 support not enabled");
+
+I think we should not try to accept ver=smb2 or anything. Let's stick
+with numbered versions. In fact, the ver=cifs that the current code
+allows should also be removed, IMO. Nothing sends that now, and we
+shouldn't establish the precedent.
+
+> +#endif /* CONFIG_CIFS_SMB2 */
+> +				break;
+>  			}
+>  			/* For all other value, error */
+>  			printk(KERN_WARNING "CIFS: Invalid version"
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
