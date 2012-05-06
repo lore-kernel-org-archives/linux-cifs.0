@@ -1,95 +1,93 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [PATCH 02/16] CIFS: Introduce SMB2 mounts as vers=2
-Date: Sun, 6 May 2012 08:31:03 -0400
-Message-ID: <20120506083103.605e3dae@corrin.poochiereds.net>
+Date: Sun, 6 May 2012 08:37:48 -0400
+Message-ID: <20120506083748.388b0d4a@corrin.poochiereds.net>
 References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
 	<1332753703-4315-3-git-send-email-piastry@etersoft.ru>
+	<20120506083103.605e3dae@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Transfer-Encoding: base64
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1332753703-4315-3-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <20120506083103.605e3dae-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 26 Mar 2012 13:21:29 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-
-> From: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> 
-> As with Linux nfs client, which uses "nfsvers=" or "vers=" to
-> indicate which protocol to use for mount, specifying
-> 
-> "vers=smb2" or "vers=2"
-> 
-> will force an SMB2 mount. When vers is not specified CIFS is used
-> 
-> ie "vers=cifs" or "vers=1"
-> 
-> We can eventually autonegotiate down from SMB2 to CIFS
-> when SMB2 is stable enough to make it the default, but this
-> is for the future.  At that time we could also implement a
-> "maxprotocol" mount option as smbclient and Samba have today,
-> but that would be premature until SMB2 is stable.
-> 
-> Intially the SMB2 Kconfig option will depend on "BROKEN"
-> until the merge is complete, and then be "EXPERIMENTAL"
-> When it is no longer experimental we can consider changing
-> the default protocol to attempt first.
-> 
-> Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h |    3 +++
->  fs/cifs/connect.c  |    8 ++++++++
->  2 files changed, 11 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 4ff6313..9e28070 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -167,6 +167,9 @@ struct smb_vol {
->  	umode_t file_mode;
->  	umode_t dir_mode;
->  	unsigned secFlg;
-> +#ifdef CONFIG_CIFS_SMB2
-> +	bool use_smb2:1; /* use SMB2 protocol rather than CIFS */
-> +#endif
-
-Now that we have a new SMB major version to deal with, a boolean really
-seems unsuited to this purpose. Should we change this to be an unsigned
-int or something and assign the correct version number to it?
-
->  	bool retry:1;
->  	bool intr:1;
->  	bool setuids:1;
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 9808154..955f0a3 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1856,6 +1856,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->  			    strnicmp(string, "1", 1) == 0) {
->  				/* This is the default */
->  				break;
-> +			} else if (strnicmp(string, "smb2", 4) == 0 ||
-> +				   strnicmp(string, "2", 1) == 0) {
-> +#ifdef CONFIG_CIFS_SMB2
-> +				vol->use_smb2 = true;
-> +#else
-> +				cERROR(1, "SMB2 support not enabled");
-
-I think we should not try to accept ver=smb2 or anything. Let's stick
-with numbered versions. In fact, the ver=cifs that the current code
-allows should also be removed, IMO. Nothing sends that now, and we
-shouldn't establish the precedent.
-
-> +#endif /* CONFIG_CIFS_SMB2 */
-> +				break;
->  			}
->  			/* For all other value, error */
->  			printk(KERN_WARNING "CIFS: Invalid version"
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBTdW4s
+IDYgTWF5IDIwMTIgMDg6MzE6MDMgLTA0MDANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9y
+Zz4gd3JvdGU6DQoNCj4gT24gTW9uLCAyNiBNYXIgMjAxMiAxMzoyMToyOSArMDQwMA0KPiBQYXZl
+bCBTaGlsb3Zza3kgPHBpYXN0cnlAZXRlcnNvZnQucnU+IHdyb3RlOg0KPiANCj4gPiBGcm9tOiBT
+dGV2ZSBGcmVuY2ggPHNmcmVuY2hAdXMuaWJtLmNvbT4NCj4gPiANCj4gPiBBcyB3aXRoIExpbnV4
+IG5mcyBjbGllbnQsIHdoaWNoIHVzZXMgIm5mc3ZlcnM9IiBvciAidmVycz0iIHRvDQo+ID4gaW5k
+aWNhdGUgd2hpY2ggcHJvdG9jb2wgdG8gdXNlIGZvciBtb3VudCwgc3BlY2lmeWluZw0KPiA+IA0K
+PiA+ICJ2ZXJzPXNtYjIiIG9yICJ2ZXJzPTIiDQo+ID4gDQo+ID4gd2lsbCBmb3JjZSBhbiBTTUIy
+IG1vdW50LiBXaGVuIHZlcnMgaXMgbm90IHNwZWNpZmllZCBDSUZTIGlzIHVzZWQNCj4gPiANCj4g
+PiBpZSAidmVycz1jaWZzIiBvciAidmVycz0xIg0KPiA+IA0KPiA+IFdlIGNhbiBldmVudHVhbGx5
+IGF1dG9uZWdvdGlhdGUgZG93biBmcm9tIFNNQjIgdG8gQ0lGUw0KPiA+IHdoZW4gU01CMiBpcyBz
+dGFibGUgZW5vdWdoIHRvIG1ha2UgaXQgdGhlIGRlZmF1bHQsIGJ1dCB0aGlzDQo+ID4gaXMgZm9y
+IHRoZSBmdXR1cmUuICBBdCB0aGF0IHRpbWUgd2UgY291bGQgYWxzbyBpbXBsZW1lbnQgYQ0KPiA+
+ICJtYXhwcm90b2NvbCIgbW91bnQgb3B0aW9uIGFzIHNtYmNsaWVudCBhbmQgU2FtYmEgaGF2ZSB0
+b2RheSwNCj4gPiBidXQgdGhhdCB3b3VsZCBiZSBwcmVtYXR1cmUgdW50aWwgU01CMiBpcyBzdGFi
+bGUuDQo+ID4gDQo+ID4gSW50aWFsbHkgdGhlIFNNQjIgS2NvbmZpZyBvcHRpb24gd2lsbCBkZXBl
+bmQgb24gIkJST0tFTiINCj4gPiB1bnRpbCB0aGUgbWVyZ2UgaXMgY29tcGxldGUsIGFuZCB0aGVu
+IGJlICJFWFBFUklNRU5UQUwiDQo+ID4gV2hlbiBpdCBpcyBubyBsb25nZXIgZXhwZXJpbWVudGFs
+IHdlIGNhbiBjb25zaWRlciBjaGFuZ2luZw0KPiA+IHRoZSBkZWZhdWx0IHByb3RvY29sIHRvIGF0
+dGVtcHQgZmlyc3QuDQo+ID4gDQo+ID4gUmV2aWV3ZWQtYnk6IFBhdmVsIFNoaWxvdnNreSA8cGlh
+c3RyeUBldGVyc29mdC5ydT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHNmcmVu
+Y2hAdXMuaWJtLmNvbT4NCj4gPiAtLS0NCj4gPiAgZnMvY2lmcy9jaWZzZ2xvYi5oIHwgICAgMyAr
+KysNCj4gPiAgZnMvY2lmcy9jb25uZWN0LmMgIHwgICAgOCArKysrKysrKw0KPiA+ICAyIGZpbGVz
+IGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pDQo+ID4gDQo+ID4gZGlm
+ZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaA0KPiA+IGlu
+ZGV4IDRmZjYzMTMuLjllMjgwNzAgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9jaWZzZ2xvYi5o
+DQo+ID4gKysrIGIvZnMvY2lmcy9jaWZzZ2xvYi5oDQo+ID4gQEAgLTE2Nyw2ICsxNjcsOSBAQCBz
+dHJ1Y3Qgc21iX3ZvbCB7DQo+ID4gIAl1bW9kZV90IGZpbGVfbW9kZTsNCj4gPiAgCXVtb2RlX3Qg
+ZGlyX21vZGU7DQo+ID4gIAl1bnNpZ25lZCBzZWNGbGc7DQo+ID4gKyNpZmRlZiBDT05GSUdfQ0lG
+U19TTUIyDQo+ID4gKwlib29sIHVzZV9zbWIyOjE7IC8qIHVzZSBTTUIyIHByb3RvY29sIHJhdGhl
+ciB0aGFuIENJRlMgKi8NCj4gPiArI2VuZGlmDQo+IA0KPiBOb3cgdGhhdCB3ZSBoYXZlIGEgbmV3
+IFNNQiBtYWpvciB2ZXJzaW9uIHRvIGRlYWwgd2l0aCwgYSBib29sZWFuIHJlYWxseQ0KPiBzZWVt
+cyB1bnN1aXRlZCB0byB0aGlzIHB1cnBvc2UuIFNob3VsZCB3ZSBjaGFuZ2UgdGhpcyB0byBiZSBh
+biB1bnNpZ25lZA0KPiBpbnQgb3Igc29tZXRoaW5nIGFuZCBhc3NpZ24gdGhlIGNvcnJlY3QgdmVy
+c2lvbiBudW1iZXIgdG8gaXQ/DQo+IA0KPiA+ICAJYm9vbCByZXRyeToxOw0KPiA+ICAJYm9vbCBp
+bnRyOjE7DQo+ID4gIAlib29sIHNldHVpZHM6MTsNCj4gPiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9j
+b25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYw0KPiA+IGluZGV4IDk4MDgxNTQuLjk1NWYwYTMg
+MTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMNCj4gPiArKysgYi9mcy9jaWZzL2Nv
+bm5lY3QuYw0KPiA+IEBAIC0xODU2LDYgKzE4NTYsMTQgQEAgY2lmc19wYXJzZV9tb3VudF9vcHRp
+b25zKGNvbnN0IGNoYXIgKm1vdW50ZGF0YSwgY29uc3QgY2hhciAqZGV2bmFtZSwNCj4gPiAgCQkJ
+ICAgIHN0cm5pY21wKHN0cmluZywgIjEiLCAxKSA9PSAwKSB7DQo+ID4gIAkJCQkvKiBUaGlzIGlz
+IHRoZSBkZWZhdWx0ICovDQo+ID4gIAkJCQlicmVhazsNCj4gPiArCQkJfSBlbHNlIGlmIChzdHJu
+aWNtcChzdHJpbmcsICJzbWIyIiwgNCkgPT0gMCB8fA0KPiA+ICsJCQkJICAgc3RybmljbXAoc3Ry
+aW5nLCAiMiIsIDEpID09IDApIHsNCj4gPiArI2lmZGVmIENPTkZJR19DSUZTX1NNQjINCj4gPiAr
+CQkJCXZvbC0+dXNlX3NtYjIgPSB0cnVlOw0KPiA+ICsjZWxzZQ0KPiA+ICsJCQkJY0VSUk9SKDEs
+ICJTTUIyIHN1cHBvcnQgbm90IGVuYWJsZWQiKTsNCj4gDQo+IEkgdGhpbmsgd2Ugc2hvdWxkIG5v
+dCB0cnkgdG8gYWNjZXB0IHZlcj1zbWIyIG9yIGFueXRoaW5nLiBMZXQncyBzdGljaw0KPiB3aXRo
+IG51bWJlcmVkIHZlcnNpb25zLiBJbiBmYWN0LCB0aGUgdmVyPWNpZnMgdGhhdCB0aGUgY3VycmVu
+dCBjb2RlDQo+IGFsbG93cyBzaG91bGQgYWxzbyBiZSByZW1vdmVkLCBJTU8uIE5vdGhpbmcgc2Vu
+ZHMgdGhhdCBub3csIGFuZCB3ZQ0KPiBzaG91bGRuJ3QgZXN0YWJsaXNoIHRoZSBwcmVjZWRlbnQu
+DQo+IA0KPiA+ICsjZW5kaWYgLyogQ09ORklHX0NJRlNfU01CMiAqLw0KPiA+ICsJCQkJYnJlYWs7
+DQo+ID4gIAkJCX0NCj4gPiAgCQkJLyogRm9yIGFsbCBvdGhlciB2YWx1ZSwgZXJyb3IgKi8NCj4g
+PiAgCQkJcHJpbnRrKEtFUk5fV0FSTklORyAiQ0lGUzogSW52YWxpZCB2ZXJzaW9uIg0KPiANCg0K
+Q2FycnlpbmcgdGhpcyB0aG91Z2h0IGEgYml0IGZ1cnRoZXIsIEkgdGhpbmsgd2UgbmVlZCB0byBz
+dGVwIGJhY2sgYW5kDQpjb25zaWRlciB3aGF0IHRoaXMgc2hvdWxkIGxvb2sgbGlrZSBmcm9tIGEg
+dXNlcidzIHN0YW5kcG9pbnQ6DQoNCkFmdGVyIGFsbCwgd2hhdCBkb2VzICJ2ZXI9MiIgbWVhbiBv
+dmVyIHRoZSBsb25nLXRlcm0/IDIuMDAyPyAyLjEwMD8NCg0KUGVyaGFwcyB3ZSBzaG91bGQgbm90
+IGFjY2VwdCAidmVyPTIiIGFuZCByZXF1aXJlIGFuIGV4cGxpY2l0ICJ2ZXI9Mi4wIg0Kb3IgInZl
+cj0yLjEiPyBEaXR0byB3aXRoIDMuMD8NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNh
+bWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2
+Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JRSlBwbkNoQUFvSkVBQU9hRUVaVm9J
+VnlRMFFBS0hGT1hQM0RuTVRYb2NCWUJQbSs1RGsNCkVjWTh6WGV4bldMc0JJUHpqQURYMDNoYVpG
+OW5RRkR4bG1Fem1GU0M2a0lYbHg3ZVhJd0UvV1RGTDdvaWo1ZmYNClRxTVNPcVpFcXhTUFp6eVRm
+M0p4RnFLNm1MNzV4ckM0WXZMTFUyVUhVYzFIa0NXSEVxeVJmbEN1K0tzYTVab3ENCmI5NWQwbVpB
+c1lMNHJPVDE4ek9QVlF1aXJSZTQxVS9NTlNJeStnTVFPWnFTZWdGc2hHWTBYSGo3dytxbEFtSk4N
+CldreGFrSm00Y3RoMUtUaXJLSm5TaUJsVjU3emlITEZTVE9sVjFlTElPeW9UWko1TWdnOVFFTlBo
+cmlzMEN0NDUNCjJmcUFpdTA5SnZGWnNIczBlSnBmMHFsdlp3bVU4Uk1pUFRZVlJMbDZIakQ1cFpP
+RmNtWFVVcnFjUnZqVG1nMWgNCmFVYmpmeGZyeUtQYUtiaVFuUU50dDFmMExQandqSnJBN3p1aDRr
+SExsUzNET2wzNDFWMFl6TVdHUTRGR0M0b1INCmF1YjNMQktBYS9wSmNnT3U2RFA3UjVyODdxM0oz
+ZjJYUzhBUlFwUWNwZ0hjejV5L3VnVlFpNWkyRlZDMzFFczENCko1NythWk00Y1Z5cXlGSXMyTUIx
+L2FPVEpPbE5OeExZdDI2QlEzS1BnLytqOGZmSzdwbnRpdVRLTGs1aXNYWUENCkY0TzlkamVSWG9Y
+UVk5Y09KNm5hRzNsMExKN3k1MUpHRDRwQnBZQlREUzdTYUdDTmRpSW11b3hJZ0sxZWxkbG8NCnpX
+bUNmdWxscTNTMGJhZDhBV2ErWW5vQW5WMXYzeTlwb01SSFZ2WWdWM2kvcVJQdlFXK2ljeTFkRUFz
+UGZhN1cNCkNON1pJdXB4OS9IamM2OHNjZCtlDQo9WXoyWg0KLS0tLS1FTkQgUEdQIFNJR05BVFVS
+RS0tLS0tDQo=
