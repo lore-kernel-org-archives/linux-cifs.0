@@ -1,93 +1,107 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 02/16] CIFS: Introduce SMB2 mounts as vers=2
-Date: Sun, 6 May 2012 08:37:48 -0400
-Message-ID: <20120506083748.388b0d4a@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 03/16] CIFS: Check for SMB2 vs CIFS in find_tcp_session
+Date: Sun, 6 May 2012 10:01:29 -0400
+Message-ID: <20120506100129.0b2f626b@corrin.poochiereds.net>
 References: <1332753703-4315-1-git-send-email-piastry@etersoft.ru>
-	<1332753703-4315-3-git-send-email-piastry@etersoft.ru>
-	<20120506083103.605e3dae@corrin.poochiereds.net>
+	<1332753703-4315-4-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120506083103.605e3dae-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1332753703-4315-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBTdW4s
-IDYgTWF5IDIwMTIgMDg6MzE6MDMgLTA0MDANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9y
-Zz4gd3JvdGU6DQoNCj4gT24gTW9uLCAyNiBNYXIgMjAxMiAxMzoyMToyOSArMDQwMA0KPiBQYXZl
-bCBTaGlsb3Zza3kgPHBpYXN0cnlAZXRlcnNvZnQucnU+IHdyb3RlOg0KPiANCj4gPiBGcm9tOiBT
-dGV2ZSBGcmVuY2ggPHNmcmVuY2hAdXMuaWJtLmNvbT4NCj4gPiANCj4gPiBBcyB3aXRoIExpbnV4
-IG5mcyBjbGllbnQsIHdoaWNoIHVzZXMgIm5mc3ZlcnM9IiBvciAidmVycz0iIHRvDQo+ID4gaW5k
-aWNhdGUgd2hpY2ggcHJvdG9jb2wgdG8gdXNlIGZvciBtb3VudCwgc3BlY2lmeWluZw0KPiA+IA0K
-PiA+ICJ2ZXJzPXNtYjIiIG9yICJ2ZXJzPTIiDQo+ID4gDQo+ID4gd2lsbCBmb3JjZSBhbiBTTUIy
-IG1vdW50LiBXaGVuIHZlcnMgaXMgbm90IHNwZWNpZmllZCBDSUZTIGlzIHVzZWQNCj4gPiANCj4g
-PiBpZSAidmVycz1jaWZzIiBvciAidmVycz0xIg0KPiA+IA0KPiA+IFdlIGNhbiBldmVudHVhbGx5
-IGF1dG9uZWdvdGlhdGUgZG93biBmcm9tIFNNQjIgdG8gQ0lGUw0KPiA+IHdoZW4gU01CMiBpcyBz
-dGFibGUgZW5vdWdoIHRvIG1ha2UgaXQgdGhlIGRlZmF1bHQsIGJ1dCB0aGlzDQo+ID4gaXMgZm9y
-IHRoZSBmdXR1cmUuICBBdCB0aGF0IHRpbWUgd2UgY291bGQgYWxzbyBpbXBsZW1lbnQgYQ0KPiA+
-ICJtYXhwcm90b2NvbCIgbW91bnQgb3B0aW9uIGFzIHNtYmNsaWVudCBhbmQgU2FtYmEgaGF2ZSB0
-b2RheSwNCj4gPiBidXQgdGhhdCB3b3VsZCBiZSBwcmVtYXR1cmUgdW50aWwgU01CMiBpcyBzdGFi
-bGUuDQo+ID4gDQo+ID4gSW50aWFsbHkgdGhlIFNNQjIgS2NvbmZpZyBvcHRpb24gd2lsbCBkZXBl
-bmQgb24gIkJST0tFTiINCj4gPiB1bnRpbCB0aGUgbWVyZ2UgaXMgY29tcGxldGUsIGFuZCB0aGVu
-IGJlICJFWFBFUklNRU5UQUwiDQo+ID4gV2hlbiBpdCBpcyBubyBsb25nZXIgZXhwZXJpbWVudGFs
-IHdlIGNhbiBjb25zaWRlciBjaGFuZ2luZw0KPiA+IHRoZSBkZWZhdWx0IHByb3RvY29sIHRvIGF0
-dGVtcHQgZmlyc3QuDQo+ID4gDQo+ID4gUmV2aWV3ZWQtYnk6IFBhdmVsIFNoaWxvdnNreSA8cGlh
-c3RyeUBldGVyc29mdC5ydT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHNmcmVu
-Y2hAdXMuaWJtLmNvbT4NCj4gPiAtLS0NCj4gPiAgZnMvY2lmcy9jaWZzZ2xvYi5oIHwgICAgMyAr
-KysNCj4gPiAgZnMvY2lmcy9jb25uZWN0LmMgIHwgICAgOCArKysrKysrKw0KPiA+ICAyIGZpbGVz
-IGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pDQo+ID4gDQo+ID4gZGlm
-ZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaA0KPiA+IGlu
-ZGV4IDRmZjYzMTMuLjllMjgwNzAgMTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9jaWZzZ2xvYi5o
-DQo+ID4gKysrIGIvZnMvY2lmcy9jaWZzZ2xvYi5oDQo+ID4gQEAgLTE2Nyw2ICsxNjcsOSBAQCBz
-dHJ1Y3Qgc21iX3ZvbCB7DQo+ID4gIAl1bW9kZV90IGZpbGVfbW9kZTsNCj4gPiAgCXVtb2RlX3Qg
-ZGlyX21vZGU7DQo+ID4gIAl1bnNpZ25lZCBzZWNGbGc7DQo+ID4gKyNpZmRlZiBDT05GSUdfQ0lG
-U19TTUIyDQo+ID4gKwlib29sIHVzZV9zbWIyOjE7IC8qIHVzZSBTTUIyIHByb3RvY29sIHJhdGhl
-ciB0aGFuIENJRlMgKi8NCj4gPiArI2VuZGlmDQo+IA0KPiBOb3cgdGhhdCB3ZSBoYXZlIGEgbmV3
-IFNNQiBtYWpvciB2ZXJzaW9uIHRvIGRlYWwgd2l0aCwgYSBib29sZWFuIHJlYWxseQ0KPiBzZWVt
-cyB1bnN1aXRlZCB0byB0aGlzIHB1cnBvc2UuIFNob3VsZCB3ZSBjaGFuZ2UgdGhpcyB0byBiZSBh
-biB1bnNpZ25lZA0KPiBpbnQgb3Igc29tZXRoaW5nIGFuZCBhc3NpZ24gdGhlIGNvcnJlY3QgdmVy
-c2lvbiBudW1iZXIgdG8gaXQ/DQo+IA0KPiA+ICAJYm9vbCByZXRyeToxOw0KPiA+ICAJYm9vbCBp
-bnRyOjE7DQo+ID4gIAlib29sIHNldHVpZHM6MTsNCj4gPiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9j
-b25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYw0KPiA+IGluZGV4IDk4MDgxNTQuLjk1NWYwYTMg
-MTAwNjQ0DQo+ID4gLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMNCj4gPiArKysgYi9mcy9jaWZzL2Nv
-bm5lY3QuYw0KPiA+IEBAIC0xODU2LDYgKzE4NTYsMTQgQEAgY2lmc19wYXJzZV9tb3VudF9vcHRp
-b25zKGNvbnN0IGNoYXIgKm1vdW50ZGF0YSwgY29uc3QgY2hhciAqZGV2bmFtZSwNCj4gPiAgCQkJ
-ICAgIHN0cm5pY21wKHN0cmluZywgIjEiLCAxKSA9PSAwKSB7DQo+ID4gIAkJCQkvKiBUaGlzIGlz
-IHRoZSBkZWZhdWx0ICovDQo+ID4gIAkJCQlicmVhazsNCj4gPiArCQkJfSBlbHNlIGlmIChzdHJu
-aWNtcChzdHJpbmcsICJzbWIyIiwgNCkgPT0gMCB8fA0KPiA+ICsJCQkJICAgc3RybmljbXAoc3Ry
-aW5nLCAiMiIsIDEpID09IDApIHsNCj4gPiArI2lmZGVmIENPTkZJR19DSUZTX1NNQjINCj4gPiAr
-CQkJCXZvbC0+dXNlX3NtYjIgPSB0cnVlOw0KPiA+ICsjZWxzZQ0KPiA+ICsJCQkJY0VSUk9SKDEs
-ICJTTUIyIHN1cHBvcnQgbm90IGVuYWJsZWQiKTsNCj4gDQo+IEkgdGhpbmsgd2Ugc2hvdWxkIG5v
-dCB0cnkgdG8gYWNjZXB0IHZlcj1zbWIyIG9yIGFueXRoaW5nLiBMZXQncyBzdGljaw0KPiB3aXRo
-IG51bWJlcmVkIHZlcnNpb25zLiBJbiBmYWN0LCB0aGUgdmVyPWNpZnMgdGhhdCB0aGUgY3VycmVu
-dCBjb2RlDQo+IGFsbG93cyBzaG91bGQgYWxzbyBiZSByZW1vdmVkLCBJTU8uIE5vdGhpbmcgc2Vu
-ZHMgdGhhdCBub3csIGFuZCB3ZQ0KPiBzaG91bGRuJ3QgZXN0YWJsaXNoIHRoZSBwcmVjZWRlbnQu
-DQo+IA0KPiA+ICsjZW5kaWYgLyogQ09ORklHX0NJRlNfU01CMiAqLw0KPiA+ICsJCQkJYnJlYWs7
-DQo+ID4gIAkJCX0NCj4gPiAgCQkJLyogRm9yIGFsbCBvdGhlciB2YWx1ZSwgZXJyb3IgKi8NCj4g
-PiAgCQkJcHJpbnRrKEtFUk5fV0FSTklORyAiQ0lGUzogSW52YWxpZCB2ZXJzaW9uIg0KPiANCg0K
-Q2FycnlpbmcgdGhpcyB0aG91Z2h0IGEgYml0IGZ1cnRoZXIsIEkgdGhpbmsgd2UgbmVlZCB0byBz
-dGVwIGJhY2sgYW5kDQpjb25zaWRlciB3aGF0IHRoaXMgc2hvdWxkIGxvb2sgbGlrZSBmcm9tIGEg
-dXNlcidzIHN0YW5kcG9pbnQ6DQoNCkFmdGVyIGFsbCwgd2hhdCBkb2VzICJ2ZXI9MiIgbWVhbiBv
-dmVyIHRoZSBsb25nLXRlcm0/IDIuMDAyPyAyLjEwMD8NCg0KUGVyaGFwcyB3ZSBzaG91bGQgbm90
-IGFjY2VwdCAidmVyPTIiIGFuZCByZXF1aXJlIGFuIGV4cGxpY2l0ICJ2ZXI9Mi4wIg0Kb3IgInZl
-cj0yLjEiPyBEaXR0byB3aXRoIDMuMD8NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNh
-bWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2
-Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JRSlBwbkNoQUFvSkVBQU9hRUVaVm9J
-VnlRMFFBS0hGT1hQM0RuTVRYb2NCWUJQbSs1RGsNCkVjWTh6WGV4bldMc0JJUHpqQURYMDNoYVpG
-OW5RRkR4bG1Fem1GU0M2a0lYbHg3ZVhJd0UvV1RGTDdvaWo1ZmYNClRxTVNPcVpFcXhTUFp6eVRm
-M0p4RnFLNm1MNzV4ckM0WXZMTFUyVUhVYzFIa0NXSEVxeVJmbEN1K0tzYTVab3ENCmI5NWQwbVpB
-c1lMNHJPVDE4ek9QVlF1aXJSZTQxVS9NTlNJeStnTVFPWnFTZWdGc2hHWTBYSGo3dytxbEFtSk4N
-CldreGFrSm00Y3RoMUtUaXJLSm5TaUJsVjU3emlITEZTVE9sVjFlTElPeW9UWko1TWdnOVFFTlBo
-cmlzMEN0NDUNCjJmcUFpdTA5SnZGWnNIczBlSnBmMHFsdlp3bVU4Uk1pUFRZVlJMbDZIakQ1cFpP
-RmNtWFVVcnFjUnZqVG1nMWgNCmFVYmpmeGZyeUtQYUtiaVFuUU50dDFmMExQandqSnJBN3p1aDRr
-SExsUzNET2wzNDFWMFl6TVdHUTRGR0M0b1INCmF1YjNMQktBYS9wSmNnT3U2RFA3UjVyODdxM0oz
-ZjJYUzhBUlFwUWNwZ0hjejV5L3VnVlFpNWkyRlZDMzFFczENCko1NythWk00Y1Z5cXlGSXMyTUIx
-L2FPVEpPbE5OeExZdDI2QlEzS1BnLytqOGZmSzdwbnRpdVRLTGs1aXNYWUENCkY0TzlkamVSWG9Y
-UVk5Y09KNm5hRzNsMExKN3k1MUpHRDRwQnBZQlREUzdTYUdDTmRpSW11b3hJZ0sxZWxkbG8NCnpX
-bUNmdWxscTNTMGJhZDhBV2ErWW5vQW5WMXYzeTlwb01SSFZ2WWdWM2kvcVJQdlFXK2ljeTFkRUFz
-UGZhN1cNCkNON1pJdXB4OS9IamM2OHNjZCtlDQo9WXoyWg0KLS0tLS1FTkQgUEdQIFNJR05BVFVS
-RS0tLS0tDQo=
+On Mon, 26 Mar 2012 13:21:30 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+
+> Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |    3 +++
+>  fs/cifs/connect.c  |   16 +++++++++++++++-
+>  2 files changed, 18 insertions(+), 1 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 9e28070..fbee8ef 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -267,6 +267,9 @@ struct TCP_Server_Info {
+>  	char server_GUID[16];
+>  	char sec_mode;
+>  	bool session_estab; /* mark when very first sess is established */
+> +#ifdef CONFIG_CIFS_SMB2
+> +	bool is_smb2;	/* SMB2 not CIFS protocol negotiated */
+> +#endif
+>  	u16 dialect; /* dialect index that server chose */
+>  	enum securityEnum secType;
+>  	bool oplocks:1; /* enable oplocks */
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 955f0a3..1fbc21f 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1,7 +1,7 @@
+>  /*
+>   *   fs/cifs/connect.c
+>   *
+> - *   Copyright (C) International Business Machines  Corp., 2002,2009
+> + *   Copyright (C) International Business Machines  Corp., 2002,2011
+>   *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+>   *
+>   *   This library is free software; you can redistribute it and/or modify
+> @@ -2093,6 +2093,14 @@ static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
+>  			   (struct sockaddr *)&vol->srcaddr))
+>  		return 0;
+>  
+> +#ifdef CONFIG_CIFS_SMB2
+> +	if ((server->is_smb2 == true) && (vol->use_smb2 == false))
+> +		return 0;
+> +
+> +	if ((server->is_smb2 == false) && (vol->use_smb2 == true))
+> +		return 0;
+> +#endif /* CONFIG_CIFS_SMB2 */
+> +
+
+Again, booleans for this seem like a less than ideal solution. Better
+to have this based on a version number or maybe a protocol version enum?
+
+>  	if (!match_port(server, addr))
+>  		return 0;
+>  
+> @@ -2217,6 +2225,7 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>  
+>  	tcp_ses->noblocksnd = volume_info->noblocksnd;
+>  	tcp_ses->noautotune = volume_info->noautotune;
+> +	/* BB should we set this unconditionally now, especially for SMB2 */
+>  	tcp_ses->tcp_nodelay = volume_info->sockopt_tcp_nodelay;
+
+Why is it more important to use TCP_NODELAY for SMB2? The above comment
+doesn't really say...
+
+>  	tcp_ses->in_flight = 0;
+>  	tcp_ses->credits = 1;
+> @@ -2261,6 +2270,11 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+>  		goto out_err_crypto_release;
+>  	}
+>  
+> +#ifdef CONFIG_CIFS_SMB2
+> +	if (volume_info->use_smb2)
+> +		tcp_ses->is_smb2 = true;
+> +#endif /* CONFIG_CIFS_SMB2 */
+> +
+
+The above should instead set a pointer to a "struct
+protocol_operations" or something. That struct could have a version
+field within it and it would give you a mechanism to allow for
+protocol-version specific behavior without resorting to sprinkling
+"is_smb2" checks all over the code.
+
+>  	/*
+>  	 * since we're in a cifs function already, we know that
+>  	 * this will succeed. No need for try_module_get().
+
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
