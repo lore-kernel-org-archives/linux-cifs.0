@@ -1,71 +1,70 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: linux-next workflow question for cifs
-Date: Wed, 9 May 2012 15:02:20 -0400
-Message-ID: <20120509190220.GA27077@fieldses.org>
-References: <CAH2r5mtBK-C0Uc6gVY0Dk+YfbaFE+OfCbM+A_2BmiTVzZMchmQ@mail.gmail.com>
- <20120509175219.GA26477@fieldses.org>
- <20120509140847.277d5c0b@corrin.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [GIT] CIFS Fix
+Date: Wed, 9 May 2012 15:26:21 -0500
+Message-ID: <CAH2r5mt-+i09Y8zndpYGWsrNDax8+cDbVCGk1kg43Hsp=8V+2Q@mail.gmail.com>
+References: <CAH2r5muJzvc0xtOuUsLuKLFBSLDK_wQTusG0F3NJzVC0U2qUeQ@mail.gmail.com>
+	<CA+55aFy9DHquXRbbx--n3ZVpJ4e7SfWXFF-uVT=meK414oi1ng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20120509140847.277d5c0b-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <CA+55aFy9DHquXRbbx--n3ZVpJ4e7SfWXFF-uVT=meK414oi1ng-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, May 09, 2012 at 02:08:47PM -0400, Jeff Layton wrote:
-> For "normal" branches that you expect people to pull, I agree. For
-> linux-next though, it really doesn't matter too much since it gets
-> re-created from scratch every day.
-> 
-> Rewriting history is explicitly ok there, but you do of course want
-> that branch to be bisectable if at all possible in order to make it
-> easier to track down regressions.
-> 
-> OTOH, if someone says "I got a panic on linux-next from on last
-> Thursday", it might be tough to know what was in that pull if you're
-> changing the history regularly. It is a bit of a balancing act, I guess.
+History should be clean now - I reset back to the previous rc, merged
+with your current tree and then applied the one trivial cifs patch.
 
-Yeah.  So the way I currently do it, in case it's of any use:
+The following changes since commit 7ee94d97aafacf5a019b3578e0eae6daa2e2=
+bcd5:
+  Linus Torvalds (1):
+        Merge tag 'fixes-for-linus' of git://git.kernel.org/.../arm/arm=
+-soc
 
-I have a for-next branch in my public repo, and a for-next-incoming in my
-local repo.  The latter gets rebased, the former doesn't.
+are available in the git repository at:
 
-I apply stuff to for-next-incoming when I start considering it, but I
-rearrange and rewrite it on top of for-next all the time.
+  git://git.samba.org/sfrench/cifs-2.6.git master
 
-Every now and then I do a
+Dan Carpenter (1):
+      cifs: fix revalidation test in cifs_llseek()
 
-	gitk for-next..for-next-incoming
+ fs/cifs/cifsfs.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-and look for the longest initial set of commits that:
 
-	- are based on patches that have been posted at least 24 hours.
-	  (Exceptions for something urgent or trivial.)
-	- have passed any required review.
+On Wed, May 9, 2012 at 1:19 PM, Linus Torvalds
+<torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org> wrote:
+> On Wed, May 9, 2012 at 6:12 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wro=
+te:
+>> The following changes since commit 5c503f8c0f7550ffe76e388172f898d8d=
+11a336e:
+>> =A0Steve French (1):
+>> =A0 =A0 =A0 =A0Merge branch 'master' of git://git.kernel.org/.../tor=
+valds/linux-2.6
+>>
+>> are available in the git repository at:
+>>
+>> =A0git://git.samba.org/sfrench/cifs-2.6.git master
+>>
+>> Dan Carpenter (1):
+>> =A0 =A0 =A0cifs: fix revalidation test in cifs_llseek()
+>>
+>> =A0fs/cifs/cifsfs.c | =A0 =A02 +-
+>> =A01 files changed, 1 insertions(+), 1 deletions(-)
+>
+> This is not at all what I get. I get four commits, three of which are
+> rebased versions of the ones I already pulled last week. And two
+> pointless back-to-back merges.
+>
+> Not pulled.
+>
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0Linus
 
-I run about a half hour of simple automated regression tests on the
-commit at the top of that initial piece and push it to for-3.5.
 
-I try to do that as I go along, rather than waiting a month and then
-pushing a bunch out at once.
 
-There are some things that -next testing routinely catches that I still
-miss (cross-compiles or various config options).  I should probably add
-more of those to my tests.
+--=20
+Thanks,
 
-But so far that's been close enough to bisectable that I haven't felt
-a strong need to break my self-imposed rule and rebase.
-
-> In any case, for some background...the problem we're trying to solve
-> here is that patches sit on linux-cifs mailing list with no activity
-> for months when they should be soaking in linux-next. So we're trying
-> to come up with a workflow that allows us to get them into linux-next
-> in a more timely fashion. If that requires not using an append-only
-> branch, I'm ok with that...
-
-Makes sense.
-
---b.
+Steve
