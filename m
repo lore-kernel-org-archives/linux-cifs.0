@@ -1,46 +1,59 @@
-From: Andreas Dilger <adilger@dilger.ca>
-Subject: Re: Extended file stat: Splitting file- and fs-specific info?
-Date: Wed, 9 May 2012 07:51:21 -0600
-Message-ID: <F6D8E5E4-D187-4EE6-8827-6BB90BE6E8BC@dilger.ca>
-References: <20120509002420.GL5091@dastard> <20120419140558.17272.74360.stgit@warthog.procyon.org.uk> <16281.1336508382@redhat.com> <20170.1336555274@redhat.com> <20120509111958.GA11345@infradead.org> <4FAA5B24.1020306@itwm.fraunhofer.de> <20120509120544.GA17535@infradead.org> <4FAA6230.7040700@itwm.fraunhofer.de>
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Christoph Hellwig <hch@infradead.org>,
-	David Howells <dhowells@redhat.com>,
-	Dave Chinner <david@fromorbit.com>, bfields@fieldses.org,
-	smfrench@gmail.com, ben@decadent.org.uk,
-	Trond.Myklebust@netapp.com, roland@hack.frob.com, jra@samba.org,
-	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-ext4@vger.kernel.org, linux-api@vger.kernel.org,
-	libc-alpha@sourceware.org
-To: Bernd Schubert <bernd.schubert@itwm.fraunhofer.de>
-Return-path: <linux-ext4-owner@vger.kernel.org>
-In-Reply-To: <4FAA6230.7040700@itwm.fraunhofer.de>
-Sender: linux-ext4-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: linux-next workflow question for cifs
+Date: Wed, 09 May 2012 15:04:01 +0100
+Message-ID: <1336572241.2116.3.camel@localhost>
+References: <CAH2r5mtBK-C0Uc6gVY0Dk+YfbaFE+OfCbM+A_2BmiTVzZMchmQ@mail.gmail.com>
+	 <20120509094511.29ca89ea@corrin.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120509094511.29ca89ea-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 2012-05-09, at 6:25 AM, Bernd Schubert wrote:
-> On 05/09/2012 02:05 PM, Christoph Hellwig wrote:
->> On Wed, May 09, 2012 at 01:55:16PM +0200, Bernd Schubert wrote:
->>> The basic idea of generation numbers is to check if an inode was
->>> recycled, so only if the tuple of inode-number and generation-number
->>> matches we still have the same file. Kernel nfs
->> 
->> NFS does not and should not look at the inode generation.  Except for a
->> bit of legacy code for the old pre-Linux 2.4 filehandles it looks at the
->> opaque file handle returned and only interpreted by the filesystem.  Any
->> userspace NFS server should do the same.
+On Wed, 2012-05-09 at 09:45 -0400, Jeff Layton wrote:
+> On Wed, 9 May 2012 08:19:05 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > 
-> Ok, I didn't look how kernel NFS does it for quite some time already...
-> User space NFS only can do it beginning with 2.6.39 - given that user space also needs to support older kernels and other OSs, which might not have open_by_handle, userspace unfortunately cannot entirely rely on that feature.
+> > Trying to figure out the easiest way for the workflow for the new
+> > cifs-2.6.git linux-next branch for this scenario:
+> > 
+> > - push a series of patches to cifs-2.6.git linux-next
+> > - someone adds an ack to a patch in the middle, or even a coding
+> > change to a patch in the middle
+> > - how do I easiest make this change and repush (without constantly
+> > doing git push --force)
+> > 
+> > Do I rename the branch on my local workstation, do a git push (what is
+> > the option to delete a branch remotely...?), then switch on the local
+> > box to the newly renamed branch, amend the patch (will gitk or other
+> > gui tool make this easier than what I use today which is git command
+> > line option which launches a vi-like interface  which is a little bit
+> > of a pain), rename the branch back and then push the new linux-next
+> > branch (and create it on the remote server) ....
+> > 
+> 
+> The upstream linux-next tree is recreated from scratch every time. So,
+> there's no harm in rebasing that branch, or rewriting its history. Only
+> the end product matters.
+> 
+> I use stgit heavily, so editing a patch description in the middle of a
+> stack is trivial. Not sure what you can do with regular git tools or
+> something like gitk.
+>
+> I guess you could create a new branch and cherry-pick all of the
+> patches from the old, while doing something like "git commit --amend"
+> to add Reviewed-by lines and such. It's a bit cumbersome, but the basic
+> git tools are sort of primitive for this sort of thing...
+> 
 
-But even fewer kernels have sys_statxat() in them (i.e. none), so you can rely on that even less than open_by_handle()...
+I've used git rebase -i <commit list>
+to amend the commit messages, reorder the patches and also to squash
+multiple patches into a single patch. However I am not sure you can push
+a branch modified in this manner to a remote server. If you are using a
+fresh remote branch each time, this is a non issue.
 
-Cheers, Andreas
-
-
-
-
-
+Sachin Prabhu
