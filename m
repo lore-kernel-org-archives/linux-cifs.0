@@ -1,47 +1,29 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Question about howto test notify with a fuse fs.
-Date: Thu, 10 May 2012 05:03:59 -0500
-Message-ID: <CAH2r5mseZhACM=ji2sbV5peJ=AG=imR0eNrP2cZjLPCySA6XqA@mail.gmail.com>
-References: <CANXojcznM1pMJO5pe7TXV1qED89J0+SdSz59yfwWJganZP896g@mail.gmail.com>
+From: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+Subject: Avoiding (DFS) regressions by having an automatic testing framework
+Date: Thu, 10 May 2012 17:55:06 +0200
+Message-ID: <4FABE4DA.3070408@debian.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcznM1pMJO5pe7TXV1qED89J0+SdSz59yfwWJganZP896g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-smbclient is not SMB2 aware yet.
+Hi
 
-We could probably provide an ioctl for this in the short term based on
-Pavel's smb2 tree.  See smb2-dev branch of pavel's git tree for
-cifs.ko
+As there were some DFS regressions that took a rather long time to get 
+noticed, we want to avoid having these and other regressions reappear. 
+So the idea is to set up a system that does some of the XFS testsuite 
+tests for the linux cifs client and also does some 'remote' tests 
+against Windows and Samba (including DFS).
 
-http://git.altlinux.org/people/piastry/public/cifs-2.6.git?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-dev
+Steve suggested to use resources Dann offered us lately. So I guess we 
+have to look how we can coordinate and implement this all. Is someone 
+volunteering to coordinate the efforts? I'm more than happy to help with 
+integrating and maybe help writing some of the tests.
 
-On Thu, May 10, 2012 at 4:22 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Hi,
->
-> earlier we spoke about monitoring SMB shares with cifs for file changes.
->
-> I've posted a question on samba-technical howto send a
-> SMB2_CHANGE_NOTIFY message to the server using smbclient:
->
-> https://lists.samba.org/archive/samba-technical/2012-May/083472.html
->
-> No reaction so far. I'm interested cause there are fuse fs's like
-> fusesmb (using libsmbclient) to
-> provide access to SMB shares. For me it's very easy to test notifyfs,
-> easier than cifs.
-> Do you maybe know howto send a message like that (and receive) using
-> libsmbclient?
->
-> Stef
+Cheers
 
-
-
--- 
-Thanks,
-
-Steve
+Luk
