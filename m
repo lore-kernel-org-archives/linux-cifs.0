@@ -1,52 +1,163 @@
-From: Sedat Dilek <sedat.dilek-gM/Ye1E23mwN+BqQ9rBEUg@public.gmane.org>
-Subject: Re: [PATCH] cifs: Fix comment as d_alloc_root() is replaced by d_make_root()
-Date: Fri, 11 May 2012 15:33:51 +0200
-Message-ID: <CA+icZUXa3LRrRrj74MzpFSrzcKw6TZxb2L18dorfyNR1j0qnSA@mail.gmail.com>
-References: <1335615233-17746-1-git-send-email-sedat.dilek@gmail.com>
-Reply-To: sedat.dilek-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Include backup intent search flags during
+ searches
+Date: Fri, 11 May 2012 13:50:23 -0400
+Message-ID: <20120511135023.092d6c0a@corrin.poochiereds.net>
+References: <1336628304-1208-1-git-send-email-shirishpargaonkar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Sedat Dilek <sedat.dilek-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1335615233-17746-1-git-send-email-sedat.dilek-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1336628304-1208-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Apr 28, 2012 at 2:13 PM, Sedat Dilek <sedat.dilek-gM/Ye1E23myhRSP0FMvGiw@public.gmane.org=
-m> wrote:
-> For more details see <file: Documentation/filesystems/porting>.
->
-> Signed-off-by: Sedat Dilek <sedat.dilek-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Thu, 10 May 2012 00:38:24 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> As observed and suggested by Tushar Gosavi...
+> 
+> ---------
+> readdir calls these function to send TRANS2_FIND_FIRST and
+> TRANS2_FIND_NEXT command to the server. The current cifs module is
+> not specifying CIFS_SEARCH_BACKUP_SEARCH flag while sending these
+> command when backupuid/backupgid is specified. This can be resolved
+> by specifying CIFS_SEARCH_BACKUP_SEARCH flag.
+> ---------
+> 
+> 
+> Reported-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
-> =C2=A0fs/cifs/cifsfs.c | =C2=A0 =C2=A02 +-
-> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index d342128..62843d9 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -125,7 +125,7 @@ cifs_read_super(struct super_block *sb)
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0goto out_no_ro=
-ot;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0}
->
-> - =C2=A0 =C2=A0 =C2=A0 /* do that *after* d_alloc_root() - we want NU=
-LL ->d_op for root here */
-> + =C2=A0 =C2=A0 =C2=A0 /* do that *after* d_make_root() - we want NUL=
-L ->d_op for root here */
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0if (cifs_sb_master_tcon(cifs_sb)->nocase)
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sb->s_d_op =3D=
- &cifs_ci_dentry_ops;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0else
-> --
-> 1.7.9.5
->
+>  fs/cifs/cifsproto.h |    6 ++++--
+>  fs/cifs/cifssmb.c   |   10 ++++------
+>  fs/cifs/readdir.c   |   15 +++++++++++++--
+>  3 files changed, 21 insertions(+), 10 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 96192c1..97f5d03 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -192,11 +192,13 @@ extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+>  
+>  extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+>  		const char *searchName, const struct nls_table *nls_codepage,
+> -		__u16 *searchHandle, struct cifs_search_info *psrch_inf,
+> +		__u16 *searchHandle, __u16 search_flags,
+> +		struct cifs_search_info *psrch_inf,
+>  		int map, const char dirsep);
+>  
+>  extern int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
+> -		__u16 searchHandle, struct cifs_search_info *psrch_inf);
+> +		__u16 searchHandle, __u16 search_flags,
+> +		struct cifs_search_info *psrch_inf);
+>  
+>  extern int CIFSFindClose(const int, struct cifs_tcon *tcon,
+>  			const __u16 search_handle);
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index da2f544..17c310a 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -4344,7 +4344,7 @@ int
+>  CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+>  	      const char *searchName,
+>  	      const struct nls_table *nls_codepage,
+> -	      __u16 *pnetfid,
+> +	      __u16 *pnetfid, __u16 search_flags,
+>  	      struct cifs_search_info *psrch_inf, int remap, const char dirsep)
+>  {
+>  /* level 257 SMB_ */
+> @@ -4416,8 +4416,7 @@ findFirstRetry:
+>  	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
+>  			ATTR_DIRECTORY);
+>  	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
+> -	pSMB->SearchFlags = cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END |
+> -		CIFS_SEARCH_RETURN_RESUME);
+> +	pSMB->SearchFlags = cpu_to_le16(search_flags);
+>  	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+>  
+>  	/* BB what should we set StorageType to? Does it matter? BB */
+> @@ -4487,7 +4486,7 @@ findFirstRetry:
+>  	return rc;
+>  }
+>  
+> -int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
+> +int CIFSFindNext(const int xid, struct cifs_tcon *tcon, __u16 search_flags,
+>  		 __u16 searchHandle, struct cifs_search_info *psrch_inf)
+>  {
+>  	TRANSACTION2_FNEXT_REQ *pSMB = NULL;
+> @@ -4531,8 +4530,7 @@ int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
+>  		cpu_to_le16(CIFSMaxBufSize / sizeof(FILE_UNIX_INFO));
+>  	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+>  	pSMB->ResumeKey = psrch_inf->resume_key;
+> -	pSMB->SearchFlags =
+> -	      cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME);
+> +	pSMB->SearchFlags = cpu_to_le16(search_flags);
+>  
+>  	name_len = psrch_inf->resume_name_len;
+>  	params += name_len;
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index e2bbc68..297e432 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -219,6 +219,7 @@ int get_symlink_reparse_path(char *full_path, struct cifs_sb_info *cifs_sb,
+>  
+>  static int initiate_cifs_search(const int xid, struct file *file)
+>  {
+> +	__u16 search_flags = 0;
+>  	int rc = 0;
+>  	char *full_path = NULL;
+>  	struct cifsFileInfo *cifsFile;
+> @@ -270,8 +271,12 @@ ffirst_retry:
+>  		cifsFile->srch_inf.info_level = SMB_FIND_FILE_DIRECTORY_INFO;
+>  	}
+>  
+> +	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
+> +	if (backup_cred(cifs_sb))
+> +		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
+> +
+>  	rc = CIFSFindFirst(xid, pTcon, full_path, cifs_sb->local_nls,
+> -		&cifsFile->netfid, &cifsFile->srch_inf,
+> +		&cifsFile->netfid, search_flags, &cifsFile->srch_inf,
+>  		cifs_sb->mnt_cifs_flags &
+>  			CIFS_MOUNT_MAP_SPECIAL_CHR, CIFS_DIR_SEP(cifs_sb));
+>  	if (rc == 0)
+> @@ -502,11 +507,13 @@ static int cifs_save_resume_key(const char *current_entry,
+>  static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
+>  	struct file *file, char **ppCurrentEntry, int *num_to_ret)
+>  {
+> +	__u16 search_flags = 0;
+>  	int rc = 0;
+>  	int pos_in_buf = 0;
+>  	loff_t first_entry_in_buffer;
+>  	loff_t index_to_find = file->f_pos;
+>  	struct cifsFileInfo *cifsFile = file->private_data;
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+>  	/* check if index in the buffer */
+>  
+>  	if ((cifsFile == NULL) || (ppCurrentEntry == NULL) ||
+> @@ -560,10 +567,14 @@ static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
+>  						cifsFile);
+>  	}
+>  
+> +	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
+> +	if (backup_cred(cifs_sb))
+> +		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
+> +
+>  	while ((index_to_find >= cifsFile->srch_inf.index_of_last_entry) &&
+>  	      (rc == 0) && !cifsFile->srch_inf.endOfSearch) {
+>  		cFYI(1, "calling findnext2");
+> -		rc = CIFSFindNext(xid, pTcon, cifsFile->netfid,
+> +		rc = CIFSFindNext(xid, pTcon, cifsFile->netfid, search_flags,
+>  				  &cifsFile->srch_inf);
+>  		/* FindFirst/Next set last_entry to NULL on malformed reply */
+>  		if (cifsFile->srch_inf.last_entry)
 
-Ping!? (This patch is for 3.4-final.)
+Looks reasonably straightforward...
 
-- Sedat -
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
