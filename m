@@ -1,209 +1,138 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: Include backup intent search flags during searches
-Date: Fri, 11 May 2012 15:44:40 -0500
-Message-ID: <CADT32eL7h9+7VwRXfhNjc-SRymgxBEX0TGC-12zhxgEa3Gd5pw@mail.gmail.com>
-References: <1336628304-1208-1-git-send-email-shirishpargaonkar@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: remove smb2 multicall binary code
+Date: Fri, 11 May 2012 21:00:36 -0400
+Message-ID: <1336784436-9176-1-git-send-email-jlayton@samba.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1336628304-1208-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, May 10, 2012 at 12:38 AM,  <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->
->
-> As observed and suggested by Tushar Gosavi...
->
-> ---------
-> readdir calls these function to send TRANS2_FIND_FIRST and
-> TRANS2_FIND_NEXT command to the server. The current cifs module is
-> not specifying CIFS_SEARCH_BACKUP_SEARCH flag while sending these
-> command when backupuid/backupgid is specified. This can be resolved
-> by specifying CIFS_SEARCH_BACKUP_SEARCH flag.
-> ---------
->
->
-> Reported-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
-> =A0fs/cifs/cifsproto.h | =A0 =A06 ++++--
-> =A0fs/cifs/cifssmb.c =A0 | =A0 10 ++++------
-> =A0fs/cifs/readdir.c =A0 | =A0 15 +++++++++++++--
-> =A03 files changed, 21 insertions(+), 10 deletions(-)
->
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 96192c1..97f5d03 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -192,11 +192,13 @@ extern int CIFSTCon(unsigned int xid, struct ci=
-fs_ses *ses,
->
-> =A0extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const char *searchName, const struct n=
-ls_table *nls_codepage,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u16 *searchHandle, struct cifs_search=
-_info *psrch_inf,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u16 *searchHandle, __u16 search_flags=
-,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_search_info *psrch_inf,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int map, const char dirsep);
->
-> =A0extern int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u16 searchHandle, struct cifs_search_=
-info *psrch_inf);
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u16 searchHandle, __u16 search_flags,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct cifs_search_info *psrch_inf);
->
-> =A0extern int CIFSFindClose(const int, struct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const __u16 search_han=
-dle);
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index da2f544..17c310a 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -4344,7 +4344,7 @@ int
-> =A0CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0const char *searchName,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0const struct nls_table *nls_codepage,
-> - =A0 =A0 =A0 =A0 =A0 =A0 __u16 *pnetfid,
-> + =A0 =A0 =A0 =A0 =A0 =A0 __u16 *pnetfid, __u16 search_flags,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0struct cifs_search_info *psrch_inf, int re=
-map, const char dirsep)
-> =A0{
-> =A0/* level 257 SMB_ */
-> @@ -4416,8 +4416,7 @@ findFirstRetry:
-> =A0 =A0 =A0 =A0 =A0 =A0cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR=
-_SYSTEM |
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0ATTR_DIRECTORY);
-> =A0 =A0 =A0 =A0pSMB->SearchCount =3D cpu_to_le16(CIFSMaxBufSize/sizeo=
-f(FILE_UNIX_INFO));
-> - =A0 =A0 =A0 pSMB->SearchFlags =3D cpu_to_le16(CIFS_SEARCH_CLOSE_AT_=
-END |
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 CIFS_SEARCH_RETURN_RESUME);
-> + =A0 =A0 =A0 pSMB->SearchFlags =3D cpu_to_le16(search_flags);
-> =A0 =A0 =A0 =A0pSMB->InformationLevel =3D cpu_to_le16(psrch_inf->info=
-_level);
->
-> =A0 =A0 =A0 =A0/* BB what should we set StorageType to? Does it matte=
-r? BB */
-> @@ -4487,7 +4486,7 @@ findFirstRetry:
-> =A0 =A0 =A0 =A0return rc;
-> =A0}
->
-> -int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
-> +int CIFSFindNext(const int xid, struct cifs_tcon *tcon, __u16 search=
-_flags,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 __u16 searchHandle, struct cifs_searc=
-h_info *psrch_inf)
-> =A0{
+This was added when it was thought that smb2 would be a different fstype
+altogether. Now that we are not adding a separate fstype, this code is
+no longer needed since nothing will ever call /sbin/mount.smb2.
 
-Jeff, Thanks.  Need to fix this, so will have to respin with just this =
-correct.
-search _flags and searchHandle are reversed.
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.c |   61 +++------------------------------------------------------
+ 1 files changed, 4 insertions(+), 57 deletions(-)
 
-Also, waiting for some test feedback as well before respinning.
-
-Regards,
-
-Shrish
-> =A0 =A0 =A0 =A0TRANSACTION2_FNEXT_REQ *pSMB =3D NULL;
-> @@ -4531,8 +4530,7 @@ int CIFSFindNext(const int xid, struct cifs_tco=
-n *tcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cpu_to_le16(CIFSMaxBufSize / sizeof(FI=
-LE_UNIX_INFO));
-> =A0 =A0 =A0 =A0pSMB->InformationLevel =3D cpu_to_le16(psrch_inf->info=
-_level);
-> =A0 =A0 =A0 =A0pSMB->ResumeKey =3D psrch_inf->resume_key;
-> - =A0 =A0 =A0 pSMB->SearchFlags =3D
-> - =A0 =A0 =A0 =A0 =A0 =A0 cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END | CIFS=
-_SEARCH_RETURN_RESUME);
-> + =A0 =A0 =A0 pSMB->SearchFlags =3D cpu_to_le16(search_flags);
->
-> =A0 =A0 =A0 =A0name_len =3D psrch_inf->resume_name_len;
-> =A0 =A0 =A0 =A0params +=3D name_len;
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index e2bbc68..297e432 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -219,6 +219,7 @@ int get_symlink_reparse_path(char *full_path, str=
-uct cifs_sb_info *cifs_sb,
->
-> =A0static int initiate_cifs_search(const int xid, struct file *file)
-> =A0{
-> + =A0 =A0 =A0 __u16 search_flags =3D 0;
-> =A0 =A0 =A0 =A0int rc =3D 0;
-> =A0 =A0 =A0 =A0char *full_path =3D NULL;
-> =A0 =A0 =A0 =A0struct cifsFileInfo *cifsFile;
-> @@ -270,8 +271,12 @@ ffirst_retry:
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifsFile->srch_inf.info_level =3D SMB_=
-=46IND_FILE_DIRECTORY_INFO;
-> =A0 =A0 =A0 =A0}
->
-> + =A0 =A0 =A0 search_flags =3D CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH=
-_RETURN_RESUME;
-> + =A0 =A0 =A0 if (backup_cred(cifs_sb))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 search_flags |=3D CIFS_SEARCH_BACKUP_SE=
-ARCH;
-> +
-> =A0 =A0 =A0 =A0rc =3D CIFSFindFirst(xid, pTcon, full_path, cifs_sb->l=
-ocal_nls,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 &cifsFile->netfid, &cifsFile->srch_inf,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 &cifsFile->netfid, search_flags, &cifsF=
-ile->srch_inf,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cifs_sb->mnt_cifs_flags &
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0CIFS_MOUNT_MAP_SPECIAL=
-_CHR, CIFS_DIR_SEP(cifs_sb));
-> =A0 =A0 =A0 =A0if (rc =3D=3D 0)
-> @@ -502,11 +507,13 @@ static int cifs_save_resume_key(const char *cur=
-rent_entry,
-> =A0static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
-> =A0 =A0 =A0 =A0struct file *file, char **ppCurrentEntry, int *num_to_=
-ret)
-> =A0{
-> + =A0 =A0 =A0 __u16 search_flags =3D 0;
-> =A0 =A0 =A0 =A0int rc =3D 0;
-> =A0 =A0 =A0 =A0int pos_in_buf =3D 0;
-> =A0 =A0 =A0 =A0loff_t first_entry_in_buffer;
-> =A0 =A0 =A0 =A0loff_t index_to_find =3D file->f_pos;
-> =A0 =A0 =A0 =A0struct cifsFileInfo *cifsFile =3D file->private_data;
-> + =A0 =A0 =A0 struct cifs_sb_info *cifs_sb =3D CIFS_SB(file->f_path.d=
-entry->d_sb);
-> =A0 =A0 =A0 =A0/* check if index in the buffer */
->
-> =A0 =A0 =A0 =A0if ((cifsFile =3D=3D NULL) || (ppCurrentEntry =3D=3D N=
-ULL) ||
-> @@ -560,10 +567,14 @@ static int find_cifs_entry(const int xid, struc=
-t cifs_tcon *pTcon,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =A0 =A0 =A0 =A0 =A0cifsFile);
-> =A0 =A0 =A0 =A0}
->
-> + =A0 =A0 =A0 search_flags =3D CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH=
-_RETURN_RESUME;
-> + =A0 =A0 =A0 if (backup_cred(cifs_sb))
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 search_flags |=3D CIFS_SEARCH_BACKUP_SE=
-ARCH;
-> +
-> =A0 =A0 =A0 =A0while ((index_to_find >=3D cifsFile->srch_inf.index_of=
-_last_entry) &&
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0(rc =3D=3D 0) && !cifsFile->srch_inf.endOf=
-Search) {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0cFYI(1, "calling findnext2");
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSFindNext(xid, pTcon, cifsFil=
-e->netfid,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 rc =3D CIFSFindNext(xid, pTcon, cifsFil=
-e->netfid, search_flags,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0&c=
-ifsFile->srch_inf);
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* FindFirst/Next set last_entry to NU=
-LL on malformed reply */
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifsFile->srch_inf.last_entry)
-> --
-> 1.6.0.2
->
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 3041987..2d1d842 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -181,7 +181,6 @@ struct parsed_mount_info {
+ 
+ const char *thisprogram;
+ const char *cifs_fstype = "cifs";
+-const char *smb2_fstype = "smb2";
+ 
+ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info);
+ 
+@@ -250,7 +249,7 @@ check_fstab(const char *progname, const char *mountpoint, const char *devname,
+ 
+ BB end finish BB */
+ 
+-static int mount_cifs_usage(FILE * stream)
++static int mount_usage(FILE * stream)
+ {
+ 	fprintf(stream, "\nUsage:  %s <remotetarget> <dir> -o <options>\n",
+ 		thisprogram);
+@@ -290,52 +289,6 @@ static int mount_cifs_usage(FILE * stream)
+ 	return 0;
+ }
+ 
+-static int mount_smb2_usage(FILE *stream)
+-{
+-	fprintf(stream, "\nUsage:  %s <remotetarget> <dir> -o <options>\n",
+-		thisprogram);
+-	fprintf(stream, "\nMount the remote target, specified as a UNC name,");
+-	fprintf(stream, " to a local directory.\n\nOptions:\n");
+-	fprintf(stream, "\tuser=<arg>\n\tpass=<arg>\n\tdom=<arg>\n");
+-	fprintf(stream, "\nLess commonly used options:");
+-	fprintf(stream,
+-		"\n\tcredentials=<filename>,guest,perm,noperm,rw,ro,");
+-	fprintf(stream,
+-		"\n\tsep=<char>,iocharset=<codepage>,exec,noexec");
+-	fprintf(stream,
+-		"\n\tnolock,directio,sec=<authentication mechanism>,sign");
+-	fprintf(stream,
+-		"\n\tuid=<uid>,gid=<gid>,dir_mode=<mode>,file_mode=<mode>");
+-	fprintf(stream, "\n\nRarely used options:");
+-	fprintf(stream,
+-		"\n\tport=<tcpport>,rsize=<size>,wsize=<size>,unc=<unc_name>,ip=<ip_address>,");
+-	fprintf(stream,
+-		"\n\tdev,nodev,hard,soft,intr,");
+-	fprintf(stream,
+-		"\n\tnointr,ignorecase,noacl,prefixpath=<path>,nobrl");
+-	fprintf(stream,
+-		"\n\nOptions are described in more detail in the manual page");
+-	fprintf(stream, "\n\tman 8 mount.smb2\n");
+-	fprintf(stream, "\nTo display the version number of the mount helper:");
+-	fprintf(stream, "\n\tmount.smb2 -V\n");
+-
+-	if (stream == stderr)
+-		return EX_USAGE;
+-	return 0;
+-}
+-
+-static int mount_usage(FILE *stream)
+-{
+-	int rc;
+-
+-	if (strcmp(thisprogram, "mount.smb2") == 0)
+-		rc = mount_smb2_usage(stream);
+-	else
+-		rc = mount_cifs_usage(stream);
+-
+-	return rc;
+-}
+-
+ /*
+  * CIFS has to "escape" commas in the password field so that they don't
+  * end up getting confused for option delimiters. Copy password into pw
+@@ -1928,7 +1881,6 @@ int main(int argc, char **argv)
+ 	size_t options_size = MAX_OPTIONS_LEN;
+ 	struct parsed_mount_info *parsed_info = NULL;
+ 	pid_t pid;
+-	const char *fstype;
+ 
+ 	rc = check_setuid();
+ 	if (rc)
+@@ -2109,14 +2061,9 @@ mount_retry:
+ 	if (rc)
+ 		goto mount_exit;
+ 
+-	if (strcmp(thisprogram, "mount.smb2") == 0)
+-		fstype = smb2_fstype;
+-	else
+-		fstype = cifs_fstype;
+-
+ 	if (!parsed_info->fakemnt) {
+ 		toggle_dac_capability(0, 1);
+-		rc = mount(orig_dev, ".", fstype, parsed_info->flags, options);
++		rc = mount(orig_dev, ".", cifs_fstype, parsed_info->flags, options);
+ 		toggle_dac_capability(0, 0);
+ 		if (rc == 0)
+ 			goto do_mtab;
+@@ -2133,7 +2080,7 @@ mount_retry:
+ 			goto mount_retry;
+ 		case ENODEV:
+ 			fprintf(stderr,
+-				"mount error: %s filesystem not supported by the system\n", fstype);
++				"mount error: %s filesystem not supported by the system\n", cifs_fstype);
+ 			break;
+ 		case ENXIO:
+ 			if (!already_uppercased &&
+@@ -2163,7 +2110,7 @@ do_mtab:
+ 				goto mount_exit;
+ 		}
+ 
+-		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, fstype);
++		rc = add_mtab(orig_dev, mountpoint, parsed_info->flags, cifs_fstype);
+ 	}
+ 
+ mount_exit:
+-- 
+1.7.7.6
