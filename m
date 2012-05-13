@@ -1,64 +1,58 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: remove smb2 multicall binary code
-Date: Sat, 12 May 2012 16:12:46 -0400
-Message-ID: <20120512161246.40eecb56@corrin.poochiereds.net>
-References: <1336784436-9176-1-git-send-email-jlayton@samba.org>
-	<CAH2r5msRufn6WRjhoFuFtZTD=7v-7_9K9jG6+KMQxLeGConwnQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH] doc: update mailing list
+Date: Sun, 13 May 2012 11:44:05 +0200
+Message-ID: <1336902245-20046-1-git-send-email-luk@debian.org>
+Cc: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msRufn6WRjhoFuFtZTD=7v-7_9K9jG6+KMQxLeGConwnQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBGcmks
-IDExIE1heSAyMDEyIDIxOjQzOjU3IC0wNTAwDQpTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWls
-LmNvbT4gd3JvdGU6DQoNCj4gVGhpcyBtYXkgYmUgZmluZSBidXQgd2UgbmVlZCB0byBhc2sgdGhl
-IG9idmlvdXMgcXVlc3Rpb24gLi4uDQo+IA0KPiBBcmUgd2Ugc3VyZSB0aGF0IHdlIGRvbid0IGV2
-ZXIgd2FudCBhIGRpc3RpbmN0IGZzdHlwZSAoY2lmcyB2cy4gc21iMikNCj4gaW4gdGhlIGxvbmcg
-cnVuPw0KPiANCj4gSXQgZG9lcyBzZWVtIHN0cmFuZ2UgdGhhdCBzbWIyIGFuZCBjaWZzIHdvdWxk
-IGJlIHRoZSBzYW1lIGZzdHlwZS4gIEZvciBhIHdoaWxlDQo+IGZzdGFiIHN1cHBvcnRlZCBuZnM0
-IGFzIGFuIGZzdHlwZSAoYXMgZGlzdGluY3QgZnJvbSBuZnMgKG5mczMpKSBjaWZzDQo+IGFuZCBz
-bWIyIGFyZQ0KPiBxdWl0ZSBhIGJpdCBkaWZmZXJlbnQuDQo+IA0KPiBDZXJ0YWlubHkgY2FsbGlu
-ZyBzbWIzIG9yIHNtYjIgYXMgY2lmcyBzaG91bGQgd29yayAtIGJ1dCBJIGhhdmUgdGhlIGZlZWxp
-bmcNCj4gdGhhdCBzbWIzIHdpbGwgaW4gdGhlIGxvbmcgcnVuIGJlIGJldHRlciBrbm93biBhcyBh
-IG5hbWUgKHRoYW4gY2lmcykgc28NCj4gd2Ugd2lsbCBoYXZlIHRvIHByb3ZpZGUgc3lub255bXMg
-KG1vdW50LnNtYjMgY291bGQgYmFzaWNhbGx5IHdvdWxkDQo+IGJlIG1vdW50LmNpZnMgYnV0IHBh
-c3MgdmVycz0zKQ0KPiANCg0KSSBzZWUgbm8gdmFsdWUgaW4gYSBzZXBhcmF0ZSBmc3R5cGUgaGVy
-ZS4gSXQganVzdCBhZGRzIGNvbmZ1c2lvbiBhbmQNCmV4dHJhIGNvZGUgdGhhdCB3ZSdsbCBuZWVk
-IHRvIG1haW50YWluIGFuZCBhbHNvIGRvZXNuJ3QgYWRkIGFueXRoaW5nDQpmcm9tIGEgdXNlciBp
-bnRlcmZhY2UgcGVyc3BlY3RpdmUgLS0gcXVpdGUgdGhlIGNvbnRyYXJ5LCByZWFsbHkuLi4NCg0K
-L2Jpbi9tb3VudCBhbHJlYWR5IGtub3dzIHRvIGNob29zZSBhICJjaWZzIiBmc3R5cGUgd2hlbmV2
-ZXIgaXQgc2VlcyBhDQpkZXZpY2Ugc3RyaW5nIHRoYXQgbG9va3MgbGlrZSBhIFVOQy4gQSBkaWZm
-ZXJlbnQgZnN0eXBlIGJyZWFrcyB0aGF0DQpoZXVyaXN0aWMuIFNvLCB0aGUgb25seSB3YXkgL3Ni
-aW4vbW91bnQuc21iMiBvciAvc2Jpbi9tb3VudC5zbWIzIHdvdWxkDQpldmVyIGJlIGNhbGxlZCBp
-cyBpZiB5b3Ugd2VyZSB0byBtb3VudCB3aXRoIGEgc3BlY2lmaWMgY29tbWFuZCBsaWtlOg0KDQog
-ICAgIyBtb3VudCAtdCBzbWIyIC8vc2VydmVyL3NoYXJlLi4uDQoNCi4uLmFuZCBJIGRvbid0IGNv
-bnNpZGVyIHRoYXQgYW55IGVhc2llciBmcm9tIGEgdXNlciBwZXJzcGVjdGl2ZSB0aGFuDQp1c2lu
-ZyAiLW8gdmVycz0iDQoNCkFsc28sIGlmIHlvdSBldmVyIHdhbnQgdG8gZG8gYXV0b25lZ290aWF0
-aW9uLCB0aGVuIGEgc2VwYXJhdGUgZnN0eXBlIGlzDQpyZWFsbHkgYSBub24tc3RhcnRlci4gT25j
-ZSB5b3UndmUgY2FsbGVkIG1vdW50KCkgdGhlbiB5b3VyIGZzdHlwZSBpcw0KZGVjaWRlZCBhbmQg
-dGhhdCdzIHRoYXQuLi4NCg0KVGhlIGZhY3QgdGhhdCBuZnM0IHdhcyBhIHNlcGFyYXRlIGZzdHlw
-ZSBmcm9tIG5mcyBpcyBwcmV0dHkgd2VsbA0KY29uc2lkZXJlZCBhIG1pc3Rha2Ugbm93LiBXZSdy
-ZSBtb3ZpbmcgYXMgcXVpY2tseSBhcyB3ZSBjYW4gdG8NCmRlcHJlY2F0ZSB0aGUgdXNlIG9mICct
-dCBuZnM0JyBpbiB0aGUgbWFpbmxpbmUgaW1wbGVtZW50YXRpb24sIGZ3aXcuDQoNCkluIHNob3J0
-LCBqdXN0IHNheSBubyB0byBhIG5ldyBmc3R5cGUgdW5sZXNzIGl0J3MgdW5hdm9pZGFibGUuLi4g
-OykNCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4g
-UEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoN
-CmlRSWNCQUVCQWdBR0JRSlByc1JFQUFvSkVBQU9hRUVaVm9JVlNHNFFBSWx1b1RlU2pkZ09TZlZz
-WEtxakVUdUYNCkUvWnRhUExUa1JKSzN4eTFpS1JCdkY2TWs2STZFanpNMkRaK2J0L3hwWXhjellu
-blQrVXVGR1dUTCtOLzljakwNCkNHaVpLU0RZdERyRHhvK0paVzdzRVhwOURzMTlqVTFaU09EbFhs
-dTJtYVJvWEoxVmJrWm9FdkV4YUJIQW8rMDANCkd3SHoxRGU5U083dVNTQ25MRFN2ZjZnL3o2TnJm
-VWU1ckZDeWhOU3VPc1ZsWTJ0bi9oMndpUG5ZKzJqOVpiRU0NCmg5WmdvRXRpWnJXNkpnUmxpQ1ox
-SGlNZnJuUitsbGhzR0diUi9oQ1V4NlplYkhCWXNTNnRNVEkxTjZaQnMwUGoNCjVnd2M5Ym81c2R6
-WUhHOUZGMXhQNU1NUFd2bngzRCszOEJQMGY0QlY0Ui8wbUdrcVliazl6NURQL0xvb3FmZWgNCnJI
-ZmpzOEdSSXVrbWFyZHVRc2tCa1l6KzNBb1NmOHpkWkNwWGJJQnNGdjUwU1lPTHZqMWFiVkdFdlds
-cGxtU0oNClhKd0hqZFBhaUtqOWlLVVhRNncyeFNFY1RkNHB3aTUyZ1c5SFRiY3QveHd5dE5aTGtV
-a1kzOE40VG9MZ1h6aDANCnVSWElUV1I0SkdNdmVXcWpXd2NFT2hOV2ZpWnROT0RCWnFnUmFpQXhO
-cmFmMU1lRDhNb2FDbnZSQjJCRW02cXQNCmd1MWVOYkcxTHpYZzdBZlp4bDZaZnoxR01vY2NId3Uy
-TEZDTVlVbWJDSHp6dXByU0thZ3J6UUFobmZNRVdzamUNCjc3d1R4bmxnM0R3S3dDNWNkby9TMHNH
-elUwdjhqRTVldmZzd1gwUXQ0MGxxT1hOS3ZwY2ZUTGpkRERHUXIzNzYNCjRZSmRiMzdmL1lPZm9T
-R1d4NENpDQo9eTRTQQ0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
+Signed-off-by: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+---
+ configure.ac          |    2 +-
+ doc/cifs.upcall.8.xml |    2 +-
+ doc/mount.cifs.8.xml  |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 2d2e15f..70708cd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,7 +1,7 @@
+ #                                               -*- Autoconf -*-
+ # Process this file with autoconf to produce a configure script.
+ 
+-AC_INIT([cifs-utils], [5.4.1], [cifs-utils-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org], [cifs-utils], [https://wiki.samba.org/index.php/LinuxCIFS_utils])
++AC_INIT([cifs-utils], [5.4.1], [linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org], [cifs-utils], [https://wiki.samba.org/index.php/LinuxCIFS_utils])
+ AC_CONFIG_SRCDIR([replace.h])
+ AC_CONFIG_HEADERS([config.h])
+ AC_CONFIG_FILES([Makefile contrib/Makefile contrib/request-key.d/Makefile])
+diff --git a/doc/cifs.upcall.8.xml b/doc/cifs.upcall.8.xml
+index 92d1454..77b9208 100644
+--- a/doc/cifs.upcall.8.xml
++++ b/doc/cifs.upcall.8.xml
+@@ -114,7 +114,7 @@ See <citerefentry><refentrytitle>request-key.conf<manvolnum>5</manvolnum></refen
+ 	<para>Igor Mammedov wrote the cifs.upcall program.</para>
+ 	<para>Jeff Layton authored this manpage.</para>
+ 	<para>The maintainer of the Linux CIFS VFS is Steve French.</para>
+-        <para>The <ulink url="mailto:linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org">Linux
++        <para>The <ulink url="mailto:linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">Linux
+ 		CIFS Mailing list</ulink> is the preferred place to ask
+ 		questions regarding these programs.
+ 	</para>
+diff --git a/doc/mount.cifs.8.xml b/doc/mount.cifs.8.xml
+index af20c10..df3b9b5 100644
+--- a/doc/mount.cifs.8.xml
++++ b/doc/mount.cifs.8.xml
+@@ -742,7 +742,7 @@ server type you are trying to contact.
+ 
+ 	<para>The maintainer of the Linux cifs vfs and the userspace
+ 		tool <emphasis>mount.cifs</emphasis> is <ulink url="mailto:sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org">Steve French</ulink>.
+-		The <ulink url="mailto:linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org">Linux CIFS Mailing list</ulink> 
++		The <ulink url="mailto:linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">Linux CIFS Mailing list</ulink> 
+ 		is the preferred place to ask questions regarding these programs. 
+ 	</para>
+ 
+-- 
+1.7.10
