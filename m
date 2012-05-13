@@ -1,58 +1,57 @@
-From: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH] doc: update mailing list
-Date: Sun, 13 May 2012 11:44:05 +0200
-Message-ID: <1336902245-20046-1-git-send-email-luk@debian.org>
-Cc: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Subject: linux-next: failed to fetch the cifs tree
+Date: Mon, 14 May 2012 09:54:54 +1000
+Message-ID: <20120514095454.39dd3f95eead6d94ea4f554d@canb.auug.org.au>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Mon__14_May_2012_09_54_54_+1000_K2r4emotbUgJYilO"
+Cc: linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
----
- configure.ac          |    2 +-
- doc/cifs.upcall.8.xml |    2 +-
- doc/mount.cifs.8.xml  |    2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+--Signature=_Mon__14_May_2012_09_54_54_+1000_K2r4emotbUgJYilO
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/configure.ac b/configure.ac
-index 2d2e15f..70708cd 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -1,7 +1,7 @@
- #                                               -*- Autoconf -*-
- # Process this file with autoconf to produce a configure script.
- 
--AC_INIT([cifs-utils], [5.4.1], [cifs-utils-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org], [cifs-utils], [https://wiki.samba.org/index.php/LinuxCIFS_utils])
-+AC_INIT([cifs-utils], [5.4.1], [linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org], [cifs-utils], [https://wiki.samba.org/index.php/LinuxCIFS_utils])
- AC_CONFIG_SRCDIR([replace.h])
- AC_CONFIG_HEADERS([config.h])
- AC_CONFIG_FILES([Makefile contrib/Makefile contrib/request-key.d/Makefile])
-diff --git a/doc/cifs.upcall.8.xml b/doc/cifs.upcall.8.xml
-index 92d1454..77b9208 100644
---- a/doc/cifs.upcall.8.xml
-+++ b/doc/cifs.upcall.8.xml
-@@ -114,7 +114,7 @@ See <citerefentry><refentrytitle>request-key.conf<manvolnum>5</manvolnum></refen
- 	<para>Igor Mammedov wrote the cifs.upcall program.</para>
- 	<para>Jeff Layton authored this manpage.</para>
- 	<para>The maintainer of the Linux CIFS VFS is Steve French.</para>
--        <para>The <ulink url="mailto:linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org">Linux
-+        <para>The <ulink url="mailto:linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">Linux
- 		CIFS Mailing list</ulink> is the preferred place to ask
- 		questions regarding these programs.
- 	</para>
-diff --git a/doc/mount.cifs.8.xml b/doc/mount.cifs.8.xml
-index af20c10..df3b9b5 100644
---- a/doc/mount.cifs.8.xml
-+++ b/doc/mount.cifs.8.xml
-@@ -742,7 +742,7 @@ server type you are trying to contact.
- 
- 	<para>The maintainer of the Linux cifs vfs and the userspace
- 		tool <emphasis>mount.cifs</emphasis> is <ulink url="mailto:sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org">Steve French</ulink>.
--		The <ulink url="mailto:linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org">Linux CIFS Mailing list</ulink> 
-+		The <ulink url="mailto:linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">Linux CIFS Mailing list</ulink> 
- 		is the preferred place to ask questions regarding these programs. 
- 	</para>
- 
--- 
-1.7.10
+Hi all,
+
+Trying to fetch the cifs tree gets this error:
+
+fatal: Couldn't find remote ref refs/heads/for-next
+
+and checking via "git ls-remote" shows that the remote tree has only a
+"master" branch that is set to v3.4-rc7.   Something got lost along the
+way ...
+
+I will use the cifs tree from next-20120511 for today.
+
+--=20
+Cheers,
+Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
+
+--Signature=_Mon__14_May_2012_09_54_54_+1000_K2r4emotbUgJYilO
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCAAGBQJPsEnOAAoJEECxmPOUX5FELjkP/0lY6aOgpsvP9hnoCqsWNfmS
+PYYfhW9y7ZISuTpZWl86yemKGnFMoaHDWOKvno7be6qm4+YLG89E2EzsU8HczMMo
+PVylWKF5c3wo11HrvodUTDrh7TcpwX1flDUqtSOCI11+hC4fOTIbM5KeWdaJ8shO
+aQxpW7VEVMzTFvdCA4P8rYdN/ouNFlreyPlh9v9etDPasjbzCbbwQ7DqJW3Rc2vf
+7ITDTsU9ivMEANy7WReL9kETl8fnwrV38F3qDFSQUpm3NhAqz9hjjdcwQsqzHXfP
+AxJ/1OF19hUr/NGxDRoAWFK7Cmy4s9F2ejNhIXH+Vn05Ho/mk+pDiBKaq7wr/KHI
+ENzZ43Yxg4HV7Z5A3ncvAGRCv7MAx3GhQs4x36NMnhB1NeFyQjX4Hfa6dE0xwIhW
+10NttoehhGneS2NV5bBkdJ3ANKZovyU5jIo81Z3erLF3BQZrn48larkGir+cNwF3
+ISnacmmHBY5AlNKPqhgIeB69t66bKdy/W1rW8BORol/59F1vgll4f+RQFOH2sxcs
+3A1qgLB9OVKOxKZ5sExQWo2ZszF2vCmCShZn6dgjmyJPJIacZ6xpQ2ayCUPVhpz9
+lZReIhJVUPKFpzO3rQn0pIJkejsh7qer+OQF1MDINKJqygoyXS57IiIUCUHLwDzo
+N7P7IhlJATkkXoem3z2o
+=4GjZ
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__14_May_2012_09_54_54_+1000_K2r4emotbUgJYilO--
