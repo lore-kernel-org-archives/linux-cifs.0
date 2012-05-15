@@ -1,8 +1,8 @@
 From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH v2] cifs: Include backup intent search flags during searches
-Date: Tue, 15 May 2012 09:06:08 -0500
-Message-ID: <1337090768-22037-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org,
+Subject: [PATCH] cifs: fix oops while traversing open file list
+Date: Tue, 15 May 2012 09:47:19 -0500
+Message-ID: <1337093239-23409-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	<stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -12,145 +12,133 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-As observed and suggested by Tushar Gosavi...
+While traversing the linked list of open file handles, if the identfied
+file handle is invalid, a reopen is attempted and if it fails, we 
+resume traversing where we stopped and cifs can oops while accessing
+invalid next element, for list might have changed.
 
----------
-readdir calls these function to send TRANS2_FIND_FIRST and
-TRANS2_FIND_NEXT command to the server. The current cifs module is
-not specifying CIFS_SEARCH_BACKUP_SEARCH flag while sending these
-command when backupuid/backupgid is specified. This can be resolved
-by specifying CIFS_SEARCH_BACKUP_SEARCH flag.
----------
+So mark the invalid file handle and attempt reopen if no
+valid file handle is found in rest of the list.
+Move the invalid file handle to the end of the list and
+if reopen fails for that file handle, start traversing the list again
+from the begining.
+Repeat this four times before giving up and returning an error if
+file reopen keeps failing.
+
 
 Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-Reported-and-Tested-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
 ---
- fs/cifs/cifsproto.h |    6 ++++--
- fs/cifs/cifssmb.c   |   12 +++++-------
- fs/cifs/readdir.c   |   15 +++++++++++++--
- 3 files changed, 22 insertions(+), 11 deletions(-)
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/file.c     |   55 +++++++++++++++++++++++++++++----------------------
+ 2 files changed, 32 insertions(+), 24 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 96192c1..97f5d03 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -192,11 +192,13 @@ extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 4ff6313..73fea28 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -43,6 +43,7 @@
  
- extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
- 		const char *searchName, const struct nls_table *nls_codepage,
--		__u16 *searchHandle, struct cifs_search_info *psrch_inf,
-+		__u16 *searchHandle, __u16 search_flags,
-+		struct cifs_search_info *psrch_inf,
- 		int map, const char dirsep);
+ #define CIFS_MIN_RCV_POOL 4
  
- extern int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
--		__u16 searchHandle, struct cifs_search_info *psrch_inf);
-+		__u16 searchHandle, __u16 search_flags,
-+		struct cifs_search_info *psrch_inf);
- 
- extern int CIFSFindClose(const int, struct cifs_tcon *tcon,
- 			const __u16 search_handle);
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index da2f544..6b79efd 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -4344,7 +4344,7 @@ int
- CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
- 	      const char *searchName,
- 	      const struct nls_table *nls_codepage,
--	      __u16 *pnetfid,
-+	      __u16 *pnetfid, __u16 search_flags,
- 	      struct cifs_search_info *psrch_inf, int remap, const char dirsep)
++#define MAX_REOPEN_ATT	5 /* these many maximum attempts to reopen a file */
+ /*
+  * default attribute cache timeout (jiffies)
+  */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 81725e9..52da2d2 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1539,10 +1539,11 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
+ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
+ 					bool fsuid_only)
  {
- /* level 257 SMB_ */
-@@ -4416,8 +4416,7 @@ findFirstRetry:
- 	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
- 			ATTR_DIRECTORY);
- 	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
--	pSMB->SearchFlags = cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END |
--		CIFS_SEARCH_RETURN_RESUME);
-+	pSMB->SearchFlags = cpu_to_le16(search_flags);
- 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+-	struct cifsFileInfo *open_file;
++	struct cifsFileInfo *open_file, *inv_file = NULL;
+ 	struct cifs_sb_info *cifs_sb;
+ 	bool any_available = false;
+ 	int rc;
++	unsigned int refind = 0;
  
- 	/* BB what should we set StorageType to? Does it matter? BB */
-@@ -4487,8 +4486,8 @@ findFirstRetry:
- 	return rc;
+ 	/* Having a null inode here (because mapping->host was set to zero by
+ 	the VFS or MM) should not happen but we had reports of on oops (due to
+@@ -1562,40 +1563,25 @@ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
+ 
+ 	spin_lock(&cifs_file_list_lock);
+ refind_writable:
++	if (refind > MAX_REOPEN_ATT) {
++		spin_unlock(&cifs_file_list_lock);
++		return NULL;
++	}
+ 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
+ 		if (!any_available && open_file->pid != current->tgid)
+ 			continue;
+ 		if (fsuid_only && open_file->uid != current_fsuid())
+ 			continue;
+ 		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
+-			cifsFileInfo_get(open_file);
+-
+ 			if (!open_file->invalidHandle) {
+ 				/* found a good writable file */
++				cifsFileInfo_get(open_file);
+ 				spin_unlock(&cifs_file_list_lock);
+ 				return open_file;
++			} else {
++				if (!inv_file)
++					inv_file = open_file;
+ 			}
+-
+-			spin_unlock(&cifs_file_list_lock);
+-
+-			/* Had to unlock since following call can block */
+-			rc = cifs_reopen_file(open_file, false);
+-			if (!rc)
+-				return open_file;
+-
+-			/* if it fails, try another handle if possible */
+-			cFYI(1, "wp failed on reopen file");
+-			cifsFileInfo_put(open_file);
+-
+-			spin_lock(&cifs_file_list_lock);
+-
+-			/* else we simply continue to the next entry. Thus
+-			   we do not loop on reopen errors.  If we
+-			   can not reopen the file, for example if we
+-			   reconnected to a server with another client
+-			   racing to delete or lock the file we would not
+-			   make progress if we restarted before the beginning
+-			   of the loop here. */
+ 		}
+ 	}
+ 	/* couldn't find useable FH with same pid, try any available */
+@@ -1603,7 +1589,28 @@ refind_writable:
+ 		any_available = true;
+ 		goto refind_writable;
+ 	}
++
++	if (inv_file) {
++		any_available = false;
++		cifsFileInfo_get(inv_file);
++		list_del(&inv_file->flist);
++		list_add_tail(&inv_file->flist, &cifs_inode->openFileList);
++	}
++
+ 	spin_unlock(&cifs_file_list_lock);
++
++	if (inv_file) {
++		rc = cifs_reopen_file(inv_file, false);
++		if (!rc)
++			return inv_file;
++		else {
++			spin_lock(&cifs_file_list_lock);
++			cifsFileInfo_put(inv_file);
++			++refind;
++			goto refind_writable;
++		}
++	}
++
+ 	return NULL;
  }
  
--int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
--		 __u16 searchHandle, struct cifs_search_info *psrch_inf)
-+int CIFSFindNext(const int xid, struct cifs_tcon *tcon, __u16 searchHandle,
-+		 __u16 search_flags, struct cifs_search_info *psrch_inf)
- {
- 	TRANSACTION2_FNEXT_REQ *pSMB = NULL;
- 	TRANSACTION2_FNEXT_RSP *pSMBr = NULL;
-@@ -4531,8 +4530,7 @@ int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
- 		cpu_to_le16(CIFSMaxBufSize / sizeof(FILE_UNIX_INFO));
- 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
- 	pSMB->ResumeKey = psrch_inf->resume_key;
--	pSMB->SearchFlags =
--	      cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME);
-+	pSMB->SearchFlags = cpu_to_le16(search_flags);
- 
- 	name_len = psrch_inf->resume_name_len;
- 	params += name_len;
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index e2bbc68..297e432 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -219,6 +219,7 @@ int get_symlink_reparse_path(char *full_path, struct cifs_sb_info *cifs_sb,
- 
- static int initiate_cifs_search(const int xid, struct file *file)
- {
-+	__u16 search_flags = 0;
- 	int rc = 0;
- 	char *full_path = NULL;
- 	struct cifsFileInfo *cifsFile;
-@@ -270,8 +271,12 @@ ffirst_retry:
- 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_DIRECTORY_INFO;
- 	}
- 
-+	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
-+	if (backup_cred(cifs_sb))
-+		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
-+
- 	rc = CIFSFindFirst(xid, pTcon, full_path, cifs_sb->local_nls,
--		&cifsFile->netfid, &cifsFile->srch_inf,
-+		&cifsFile->netfid, search_flags, &cifsFile->srch_inf,
- 		cifs_sb->mnt_cifs_flags &
- 			CIFS_MOUNT_MAP_SPECIAL_CHR, CIFS_DIR_SEP(cifs_sb));
- 	if (rc == 0)
-@@ -502,11 +507,13 @@ static int cifs_save_resume_key(const char *current_entry,
- static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
- 	struct file *file, char **ppCurrentEntry, int *num_to_ret)
- {
-+	__u16 search_flags = 0;
- 	int rc = 0;
- 	int pos_in_buf = 0;
- 	loff_t first_entry_in_buffer;
- 	loff_t index_to_find = file->f_pos;
- 	struct cifsFileInfo *cifsFile = file->private_data;
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
- 	/* check if index in the buffer */
- 
- 	if ((cifsFile == NULL) || (ppCurrentEntry == NULL) ||
-@@ -560,10 +567,14 @@ static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
- 						cifsFile);
- 	}
- 
-+	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
-+	if (backup_cred(cifs_sb))
-+		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
-+
- 	while ((index_to_find >= cifsFile->srch_inf.index_of_last_entry) &&
- 	      (rc == 0) && !cifsFile->srch_inf.endOfSearch) {
- 		cFYI(1, "calling findnext2");
--		rc = CIFSFindNext(xid, pTcon, cifsFile->netfid,
-+		rc = CIFSFindNext(xid, pTcon, cifsFile->netfid, search_flags,
- 				  &cifsFile->srch_inf);
- 		/* FindFirst/Next set last_entry to NULL on malformed reply */
- 		if (cifsFile->srch_inf.last_entry)
 -- 
 1.6.0.2
