@@ -1,164 +1,209 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix oops while traversing open file list
-Date: Tue, 15 May 2012 12:55:25 -0400
-Message-ID: <20120515125525.19ef9cc8@tlielax.poochiereds.net>
-References: <1337093239-23409-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 1/4] cifs: add a cache= option to better describe the
+ different cache flavors
+Date: Tue, 15 May 2012 13:34:45 -0500
+Message-ID: <CAH2r5msGcUSo2JLq=qUvWUfm3ynA18-5dPyZDbMB=F-1=BtXCw@mail.gmail.com>
+References: <1335524179-1671-1-git-send-email-jlayton@redhat.com>
+	<1335524179-1671-2-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337093239-23409-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1335524179-1671-2-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 15 May 2012 09:47:19 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+Why is "fsc" (in particular caching of reads, to file, for oplocked
+files) mutually exclusive with "strictcache" (write through of
+non-oplocked files).
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> While traversing the linked list of open file handles, if the identfied
-> file handle is invalid, a reopen is attempted and if it fails, we 
-> resume traversing where we stopped and cifs can oops while accessing
-> invalid next element, for list might have changed.
-> 
-> So mark the invalid file handle and attempt reopen if no
-> valid file handle is found in rest of the list.
-> Move the invalid file handle to the end of the list and
-> if reopen fails for that file handle, start traversing the list again
-> from the begining.
-> Repeat this four times before giving up and returning an error if
-> file reopen keeps failing.
-> 
-> 
-> Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Fri, Apr 27, 2012 at 5:56 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote=
+:
+> Currently, we have several mount options that control cifs' cache
+> behavior, but those options aren't considered to be mutually exclusiv=
+e.
+> The result is poorly-defined when someone specifies more than one of
+> these options at mont time.
+>
+> Fix this by adding a new cache=3D mount option that will supercede "f=
+sc",
+> "strictcache", and "forcedirectio". That will help make it clear that
+> these options are mutually exclusive. Also, change the legacy options=
+ to
+> be mutually exclusive too, to ensure that users don't get surprises.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |    1 +
->  fs/cifs/file.c     |   55 +++++++++++++++++++++++++++++----------------------
->  2 files changed, 32 insertions(+), 24 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 4ff6313..73fea28 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -43,6 +43,7 @@
->  
->  #define CIFS_MIN_RCV_POOL 4
->  
-> +#define MAX_REOPEN_ATT	5 /* these many maximum attempts to reopen a file */
-
-
-I don't know about this...
-
-What happens if we have a long network partition, and then make 5
-attempts to open the file that time out? AFAICT, we'll end up returning
-NULL, and see the dreaded "No writable handles for inode" and then
-we end up with people complaining about "corrupt data" on writeback.
-
-Is that really the outcome we want with this? That doesn't seem like
-very resilient behavior for a network filesystem.
-
->  /*
->   * default attribute cache timeout (jiffies)
->   */
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 81725e9..52da2d2 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1539,10 +1539,11 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
->  struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
->  					bool fsuid_only)
->  {
-> -	struct cifsFileInfo *open_file;
-> +	struct cifsFileInfo *open_file, *inv_file = NULL;
->  	struct cifs_sb_info *cifs_sb;
->  	bool any_available = false;
->  	int rc;
-> +	unsigned int refind = 0;
->  
->  	/* Having a null inode here (because mapping->host was set to zero by
->  	the VFS or MM) should not happen but we had reports of on oops (due to
-> @@ -1562,40 +1563,25 @@ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
->  
->  	spin_lock(&cifs_file_list_lock);
->  refind_writable:
-> +	if (refind > MAX_REOPEN_ATT) {
-> +		spin_unlock(&cifs_file_list_lock);
-> +		return NULL;
-> +	}
->  	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
->  		if (!any_available && open_file->pid != current->tgid)
->  			continue;
->  		if (fsuid_only && open_file->uid != current_fsuid())
->  			continue;
->  		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
-> -			cifsFileInfo_get(open_file);
-> -
->  			if (!open_file->invalidHandle) {
->  				/* found a good writable file */
-> +				cifsFileInfo_get(open_file);
->  				spin_unlock(&cifs_file_list_lock);
->  				return open_file;
-> +			} else {
-> +				if (!inv_file)
-> +					inv_file = open_file;
->  			}
-> -
-> -			spin_unlock(&cifs_file_list_lock);
-> -
-> -			/* Had to unlock since following call can block */
-> -			rc = cifs_reopen_file(open_file, false);
-> -			if (!rc)
-> -				return open_file;
-> -
-> -			/* if it fails, try another handle if possible */
-> -			cFYI(1, "wp failed on reopen file");
-> -			cifsFileInfo_put(open_file);
-> -
-> -			spin_lock(&cifs_file_list_lock);
-> -
-> -			/* else we simply continue to the next entry. Thus
-> -			   we do not loop on reopen errors.  If we
-> -			   can not reopen the file, for example if we
-> -			   reconnected to a server with another client
-> -			   racing to delete or lock the file we would not
-> -			   make progress if we restarted before the beginning
-> -			   of the loop here. */
->  		}
->  	}
->  	/* couldn't find useable FH with same pid, try any available */
-> @@ -1603,7 +1589,28 @@ refind_writable:
->  		any_available = true;
->  		goto refind_writable;
->  	}
+> =A0fs/cifs/connect.c | =A0 74 +++++++++++++++++++++++++++++++++++++++=
++++++++++++--
+> =A01 files changed, 71 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index f31dc9a..de967dc 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -102,7 +102,7 @@ enum {
+> =A0 =A0 =A0 =A0Opt_srcaddr, Opt_prefixpath,
+> =A0 =A0 =A0 =A0Opt_iocharset, Opt_sockopt,
+> =A0 =A0 =A0 =A0Opt_netbiosname, Opt_servern,
+> - =A0 =A0 =A0 Opt_ver, Opt_sec,
+> + =A0 =A0 =A0 Opt_ver, Opt_sec, Opt_cache,
+>
+> =A0 =A0 =A0 =A0/* Mount options to be ignored */
+> =A0 =A0 =A0 =A0Opt_ignore,
+> @@ -212,6 +212,7 @@ static const match_table_t cifs_mount_option_toke=
+ns =3D {
+> =A0 =A0 =A0 =A0{ Opt_ver, "vers=3D%s" },
+> =A0 =A0 =A0 =A0{ Opt_ver, "version=3D%s" },
+> =A0 =A0 =A0 =A0{ Opt_sec, "sec=3D%s" },
+> + =A0 =A0 =A0 { Opt_cache, "cache=3D%s" },
+>
+> =A0 =A0 =A0 =A0{ Opt_ignore, "cred" },
+> =A0 =A0 =A0 =A0{ Opt_ignore, "credentials" },
+> @@ -258,6 +259,23 @@ static const match_table_t cifs_secflavor_tokens=
+ =3D {
+> =A0 =A0 =A0 =A0{ Opt_sec_err, NULL }
+> =A0};
+>
+> +/* cache flavors */
+> +enum {
+> + =A0 =A0 =A0 Opt_cache_fsc,
+> + =A0 =A0 =A0 Opt_cache_loose,
+> + =A0 =A0 =A0 Opt_cache_strict,
+> + =A0 =A0 =A0 Opt_cache_none,
+> + =A0 =A0 =A0 Opt_cache_err
+> +};
 > +
-> +	if (inv_file) {
-> +		any_available = false;
-> +		cifsFileInfo_get(inv_file);
-> +		list_del(&inv_file->flist);
-> +		list_add_tail(&inv_file->flist, &cifs_inode->openFileList);
-> +	}
+> +static const match_table_t cifs_cacheflavor_tokens =3D {
+> + =A0 =A0 =A0 { Opt_cache_fsc, "fsc" },
+> + =A0 =A0 =A0 { Opt_cache_loose, "loose" },
+> + =A0 =A0 =A0 { Opt_cache_strict, "strict" },
+> + =A0 =A0 =A0 { Opt_cache_none, "none" },
+> + =A0 =A0 =A0 { Opt_cache_err, NULL }
+> +};
 > +
->  	spin_unlock(&cifs_file_list_lock);
+> =A0static int ip_connect(struct TCP_Server_Info *server);
+> =A0static int generic_ip_connect(struct TCP_Server_Info *server);
+> =A0static void tlink_rb_insert(struct rb_root *root, struct tcon_link=
+ *new_tlink);
+> @@ -1183,6 +1201,42 @@ static int cifs_parse_security_flavors(char *v=
+alue,
+> =A0}
+>
+> =A0static int
+> +cifs_parse_cache_flavor(char *value, struct smb_vol *vol)
+> +{
+> + =A0 =A0 =A0 substring_t args[MAX_OPT_ARGS];
 > +
-> +	if (inv_file) {
-> +		rc = cifs_reopen_file(inv_file, false);
-> +		if (!rc)
-> +			return inv_file;
-> +		else {
-> +			spin_lock(&cifs_file_list_lock);
-> +			cifsFileInfo_put(inv_file);
-> +			++refind;
-> +			goto refind_writable;
-> +		}
-> +	}
+> + =A0 =A0 =A0 switch (match_token(value, cifs_cacheflavor_tokens, arg=
+s)) {
+> + =A0 =A0 =A0 case Opt_cache_fsc:
+> +#ifndef CONFIG_CIFS_FSCACHE
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "cache=3Dfsc support requires=
+ that the kernel be "
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 "built with CONFIG_=
+CIFS_FSCACHE enabled.");
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 1;
+> +#endif
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->fsc =3D true;
+> + =A0 =A0 =A0 case Opt_cache_loose:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->fsc =3D false;
+> + =A0 =A0 =A0 case Opt_cache_strict:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->fsc =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> + =A0 =A0 =A0 case Opt_cache_none:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->fsc =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> + =A0 =A0 =A0 default:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 cERROR(1, "bad cache=3D option: %s", va=
+lue);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return 1;
+> + =A0 =A0 =A0 }
+> + =A0 =A0 =A0 return 0;
+> +}
 > +
->  	return NULL;
->  }
->  
+> +static int
+> =A0cifs_parse_mount_options(const char *mountdata, const char *devnam=
+e,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_vol *vol)
+> =A0{
+> @@ -1411,10 +1465,14 @@ cifs_parse_mount_options(const char *mountdat=
+a, const char *devname,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0vol->seal =3D 1;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case Opt_direct:
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D 1;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->fsc =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D true=
+;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D fals=
+e;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case Opt_strictcache:
+> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D 1;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->fsc =3D false;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D fals=
+e;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D true=
+;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case Opt_noac:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0printk(KERN_WARNING "C=
+IFS: Mount option noac not "
+> @@ -1428,6 +1486,8 @@ cifs_parse_mount_options(const char *mountdata,=
+ const char *devname,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto cifs_parse_mount_=
+err;
+> =A0#endif
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0vol->fsc =3D true;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->direct_io =3D fals=
+e;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 vol->strict_io =3D fals=
+e;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0case Opt_mfsymlinks:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0vol->mfsymlinks =3D tr=
+ue;
+> @@ -1835,6 +1895,14 @@ cifs_parse_mount_options(const char *mountdata=
+, const char *devname,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0if (cifs_parse_securit=
+y_flavors(string, vol) !=3D 0)
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0goto c=
+ifs_parse_mount_err;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0break;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 case Opt_cache:
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 string =3D match_strdup=
+(args);
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (string =3D=3D NULL)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto ou=
+t_nomem;
+> +
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (cifs_parse_cache_fl=
+avor(string, vol) !=3D 0)
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 goto ci=
+fs_parse_mount_err;
+> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 break;
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0default:
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/*
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 * An option we don't =
+recognize. Save it off for later
+> --
+> 1.7.7.6
+>
 
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+--=20
+Thanks,
+
+Steve
