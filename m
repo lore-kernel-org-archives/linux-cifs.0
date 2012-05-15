@@ -1,55 +1,156 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Re: Linux 3.2.17 and netapp 8.1
-Date: Tue, 15 May 2012 19:15:21 +0530
-Message-ID: <4FB25DF1.9080402@suse.com>
-References: <4FB0FDDA.5080604@orange.com> <20120514120159.2f6de2fa@corrin.poochiereds.net> <4FB12D71.3040403@orange.com> <20120514121824.273198a9@corrin.poochiereds.net> <4FB13173.1070509@orange.com> <20120514131559.7ca0cdc4@corrin.poochiereds.net> <4FB203AE.3020408@orange.com> <20120515090907.39197340@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: eric2.valette-C0LM0jrOve7QT0dZR+AlfA@public.gmane.org, donald.r.gray-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v2] cifs: Include backup intent search flags during searches
+Date: Tue, 15 May 2012 09:06:08 -0500
+Message-ID: <1337090768-22037-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	<stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120515090907.39197340-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 05/15/2012 06:39 PM, Jeff Layton wrote:
-> On Tue, 15 May 2012 09:20:14 +0200
-> VALETTE Eric RD-MAPS-REN <eric2.valette-C0LM0jrOve7QT0dZR+AlfA@public.gmane.org> wrote:
-> 
->> On 05/14/2012 07:15 PM, Jeff Layton wrote:
->>>
->>> BTW: I've seen prototype SMB2 support in git tress pushed in october.
->>> Any plan to submit something upstream?
->>>
->>> Thanks for your support,
->>>
->>>
->>> Yes, we're working on it. I think we've come to some consensus on a
->>> basic design and I believe Pavel is now working to forward-port the
->>> previous patches to that design.
->>>
->> OK. Will wait then. Any chance it might helps with the netapp?
->>
->>> In Netapps defense Ontap 8.1 is an early release which are known to be buggy.
->> Well its been released around february if google can be trusted and what 
->> this says is that netapp don't care about Linux support at all and do 
->> not even perform basic test with linux client. I'm rather sure we asked 
->> about linux compatibility before moving from 7.xx to 8.01.
->>
->> -- eric
->>
-> 
-> For the record...
-> 
-> The story I've heard in the past (albeit second or third hand) is that
-> Netapp is not interested in interop with non-windows clients. It's
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Yeah, I have heard similar stories too and from what I have heard from
-the NetApp customers, NetApp seems to strongly suggest to use _only_ NFS
-with the Linux clients.
+As observed and suggested by Tushar Gosavi...
 
+---------
+readdir calls these function to send TRANS2_FIND_FIRST and
+TRANS2_FIND_NEXT command to the server. The current cifs module is
+not specifying CIFS_SEARCH_BACKUP_SEARCH flag while sending these
+command when backupuid/backupgid is specified. This can be resolved
+by specifying CIFS_SEARCH_BACKUP_SEARCH flag.
+---------
 
-Thanks
-Suresh
+Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Reported-and-Tested-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+---
+ fs/cifs/cifsproto.h |    6 ++++--
+ fs/cifs/cifssmb.c   |   12 +++++-------
+ fs/cifs/readdir.c   |   15 +++++++++++++--
+ 3 files changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 96192c1..97f5d03 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -192,11 +192,13 @@ extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+ 
+ extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+ 		const char *searchName, const struct nls_table *nls_codepage,
+-		__u16 *searchHandle, struct cifs_search_info *psrch_inf,
++		__u16 *searchHandle, __u16 search_flags,
++		struct cifs_search_info *psrch_inf,
+ 		int map, const char dirsep);
+ 
+ extern int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
+-		__u16 searchHandle, struct cifs_search_info *psrch_inf);
++		__u16 searchHandle, __u16 search_flags,
++		struct cifs_search_info *psrch_inf);
+ 
+ extern int CIFSFindClose(const int, struct cifs_tcon *tcon,
+ 			const __u16 search_handle);
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index da2f544..6b79efd 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4344,7 +4344,7 @@ int
+ CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+ 	      const char *searchName,
+ 	      const struct nls_table *nls_codepage,
+-	      __u16 *pnetfid,
++	      __u16 *pnetfid, __u16 search_flags,
+ 	      struct cifs_search_info *psrch_inf, int remap, const char dirsep)
+ {
+ /* level 257 SMB_ */
+@@ -4416,8 +4416,7 @@ findFirstRetry:
+ 	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
+ 			ATTR_DIRECTORY);
+ 	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
+-	pSMB->SearchFlags = cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END |
+-		CIFS_SEARCH_RETURN_RESUME);
++	pSMB->SearchFlags = cpu_to_le16(search_flags);
+ 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+ 
+ 	/* BB what should we set StorageType to? Does it matter? BB */
+@@ -4487,8 +4486,8 @@ findFirstRetry:
+ 	return rc;
+ }
+ 
+-int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
+-		 __u16 searchHandle, struct cifs_search_info *psrch_inf)
++int CIFSFindNext(const int xid, struct cifs_tcon *tcon, __u16 searchHandle,
++		 __u16 search_flags, struct cifs_search_info *psrch_inf)
+ {
+ 	TRANSACTION2_FNEXT_REQ *pSMB = NULL;
+ 	TRANSACTION2_FNEXT_RSP *pSMBr = NULL;
+@@ -4531,8 +4530,7 @@ int CIFSFindNext(const int xid, struct cifs_tcon *tcon,
+ 		cpu_to_le16(CIFSMaxBufSize / sizeof(FILE_UNIX_INFO));
+ 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+ 	pSMB->ResumeKey = psrch_inf->resume_key;
+-	pSMB->SearchFlags =
+-	      cpu_to_le16(CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME);
++	pSMB->SearchFlags = cpu_to_le16(search_flags);
+ 
+ 	name_len = psrch_inf->resume_name_len;
+ 	params += name_len;
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index e2bbc68..297e432 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -219,6 +219,7 @@ int get_symlink_reparse_path(char *full_path, struct cifs_sb_info *cifs_sb,
+ 
+ static int initiate_cifs_search(const int xid, struct file *file)
+ {
++	__u16 search_flags = 0;
+ 	int rc = 0;
+ 	char *full_path = NULL;
+ 	struct cifsFileInfo *cifsFile;
+@@ -270,8 +271,12 @@ ffirst_retry:
+ 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_DIRECTORY_INFO;
+ 	}
+ 
++	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
++	if (backup_cred(cifs_sb))
++		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
++
+ 	rc = CIFSFindFirst(xid, pTcon, full_path, cifs_sb->local_nls,
+-		&cifsFile->netfid, &cifsFile->srch_inf,
++		&cifsFile->netfid, search_flags, &cifsFile->srch_inf,
+ 		cifs_sb->mnt_cifs_flags &
+ 			CIFS_MOUNT_MAP_SPECIAL_CHR, CIFS_DIR_SEP(cifs_sb));
+ 	if (rc == 0)
+@@ -502,11 +507,13 @@ static int cifs_save_resume_key(const char *current_entry,
+ static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
+ 	struct file *file, char **ppCurrentEntry, int *num_to_ret)
+ {
++	__u16 search_flags = 0;
+ 	int rc = 0;
+ 	int pos_in_buf = 0;
+ 	loff_t first_entry_in_buffer;
+ 	loff_t index_to_find = file->f_pos;
+ 	struct cifsFileInfo *cifsFile = file->private_data;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+ 	/* check if index in the buffer */
+ 
+ 	if ((cifsFile == NULL) || (ppCurrentEntry == NULL) ||
+@@ -560,10 +567,14 @@ static int find_cifs_entry(const int xid, struct cifs_tcon *pTcon,
+ 						cifsFile);
+ 	}
+ 
++	search_flags = CIFS_SEARCH_CLOSE_AT_END | CIFS_SEARCH_RETURN_RESUME;
++	if (backup_cred(cifs_sb))
++		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
++
+ 	while ((index_to_find >= cifsFile->srch_inf.index_of_last_entry) &&
+ 	      (rc == 0) && !cifsFile->srch_inf.endOfSearch) {
+ 		cFYI(1, "calling findnext2");
+-		rc = CIFSFindNext(xid, pTcon, cifsFile->netfid,
++		rc = CIFSFindNext(xid, pTcon, cifsFile->netfid, search_flags,
+ 				  &cifsFile->srch_inf);
+ 		/* FindFirst/Next set last_entry to NULL on malformed reply */
+ 		if (cifsFile->srch_inf.last_entry)
+-- 
+1.6.0.2
