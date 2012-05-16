@@ -1,43 +1,47 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2] cifs: fix misspelling of "forcedirectio"
-Date: Wed, 16 May 2012 12:31:20 +0100
-Message-ID: <1337167880.3236.1.camel@localhost>
-References: <1337166781-18307-1-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v2 0/4] cifs: pave way for change to "strictcache" by default
+Date: Wed, 16 May 2012 07:55:50 -0400
+Message-ID: <1337169354-19045-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337166781-18307-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2012-05-16 at 07:13 -0400, Jeff Layton wrote:
-> ...and add a "directio" synonym since that's what the manpage has
-> always advertised.
-> 
-> Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 5dcc551..e0b56d7 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -164,7 +164,8 @@ static const match_table_t cifs_mount_option_tokens = {
->  	{ Opt_sign, "sign" },
->  	{ Opt_seal, "seal" },
->  	{ Opt_direct, "direct" },
-> -	{ Opt_direct, "forceddirectio" },
-> +	{ Opt_direct, "directio" },
-> +	{ Opt_direct, "forcedirectio" },
->  	{ Opt_strictcache, "strictcache" },
->  	{ Opt_noac, "noac" },
->  	{ Opt_fsc, "fsc" },
+This is the second version of this patchset. The first version of this
+lays out the rationale for this change and is available here:
 
-ACK
+    http://permalink.gmane.org/gmane.linux.kernel.cifs/6007
 
-Sachin Prabhu
+In discussing this, Steve pointed out that fsc is not necessarily
+mutually exclusive with cache=strict. While I've always tended to think
+of fsc as a mechanism to cache data across reboots, it can also function
+as a "swap for pagecache" mechanism as well, allowing you to cache more
+data locally than you have RAM.
+
+That said, I don't think the intersection of cache=strict and fsc will
+work properly today. I'm skeptical that the fscache is being invalidated
+correctly when an oplock is lost and reacquired. That should probably be
+fixed at some point if we want this to work.
+
+Still, that's good enough reason not to make fsc mutually exclusive with
+the other cache= options. This patchset then removes fsc from that
+mutual exclusion and the warnings.
+
+I've left Pavel's Reviewed-by's in place since this patchset is in the
+same spirit as the previous one. Pavel, let me know if you'd like those
+removed.
+
+Jeff Layton (4):
+  cifs: add a cache= option to better describe the different cache
+    flavors
+  cifs: add deprecation warnings to strictcache and forcedirectio
+  cifs: display cache= option in /proc/mounts
+  cifs: add warning about change in default cache semantics in 3.7
+
+ fs/cifs/cifsfs.c  |   18 ++++++++++---
+ fs/cifs/connect.c |   76 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 87 insertions(+), 7 deletions(-)
+
+-- 
+1.7.7.6
