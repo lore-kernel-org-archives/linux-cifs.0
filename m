@@ -1,182 +1,226 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix oops while traversing open file list (try #2)
-Date: Wed, 16 May 2012 13:55:48 -0400
-Message-ID: <20120516135548.2acb454a@tlielax.poochiereds.net>
-References: <1337188413-28947-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v4 3/5] CIFS: Separate protocol specific lock type
+ handling
+Date: Wed, 16 May 2012 14:25:00 -0400
+Message-ID: <20120516142500.531aca81@tlielax.poochiereds.net>
+References: <1337162254-13121-1-git-send-email-piastry@etersoft.ru>
+	<1337162254-13121-4-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337188413-28947-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1337162254-13121-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 16 May 2012 12:13:33 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Wed, 16 May 2012 13:57:32 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> While traversing the linked list of open file handles, if the identfied
-> file handle is invalid, a reopen is attempted and if it fails, we
-> resume traversing where we stopped and cifs can oops while accessing
-> invalid next element, for list might have changed.
-> 
-> So mark the invalid file handle and attempt reopen if no
-> valid file handle is found in rest of the list.
-> Move the invalid file handle to the end of the list and
-> if reopen fails for that file handle, start traversing the list again
-> from the begining.
-> Repeat this four times before giving up and returning an error if
-> file reopen keeps failing.
-> 
-> 
-> Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |    1 +
->  fs/cifs/file.c     |   54 ++++++++++++++++++++++++++++-----------------------
->  2 files changed, 31 insertions(+), 24 deletions(-)
+>  fs/cifs/cifsglob.h |    4 ++++
+>  fs/cifs/file.c     |   40 ++++++++++++++++++++++++----------------
+>  fs/cifs/smb1ops.c  |    5 +++++
+>  3 files changed, 33 insertions(+), 16 deletions(-)
 > 
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 4ff6313..73fea28 100644
+> index 0e06de1..6943448 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
-> @@ -43,6 +43,7 @@
+> @@ -164,6 +164,10 @@ struct smb_version_operations {
 >  
->  #define CIFS_MIN_RCV_POOL 4
+>  struct smb_version_values {
+>  	char		*version_string;
+> +	__u32		large_lock_type;
+> +	__u32		exclusive_lock_type;
+> +	__u32		shared_lock_type;
+> +	__u32		unlock_lock_type;
+>  };
 >  
-> +#define MAX_REOPEN_ATT	5 /* these many maximum attempts to reopen a file */
->  /*
->   * default attribute cache timeout (jiffies)
->   */
+
+It would probably be good to send your respin of my patchset so that we
+can see what this one is based on...
+
+>  struct smb_vol {
 > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 81725e9..88407ad 100644
+> index 8d5d9c0..ac71f85 100644
 > --- a/fs/cifs/file.c
 > +++ b/fs/cifs/file.c
-> @@ -1539,10 +1539,11 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
->  struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
->  					bool fsuid_only)
+> @@ -675,12 +675,13 @@ cifs_find_fid_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
+>  			    struct cifsLockInfo **conf_lock)
 >  {
-> -	struct cifsFileInfo *open_file;
-> +	struct cifsFileInfo *open_file, *inv_file = NULL;
->  	struct cifs_sb_info *cifs_sb;
->  	bool any_available = false;
->  	int rc;
-> +	unsigned int refind = 0;
+>  	struct cifsLockInfo *li;
+> +	struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
 >  
->  	/* Having a null inode here (because mapping->host was set to zero by
->  	the VFS or MM) should not happen but we had reports of on oops (due to
-> @@ -1562,40 +1563,25 @@ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
->  
->  	spin_lock(&cifs_file_list_lock);
->  refind_writable:
-> +	if (refind > MAX_REOPEN_ATT) {
-> +		spin_unlock(&cifs_file_list_lock);
-> +		return NULL;
-> +	}
->  	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
->  		if (!any_available && open_file->pid != current->tgid)
+>  	list_for_each_entry(li, &cfile->llist, llist) {
+>  		if (offset + length <= li->offset ||
+>  		    offset >= li->offset + li->length)
 >  			continue;
->  		if (fsuid_only && open_file->uid != current_fsuid())
+> -		else if ((type & LOCKING_ANDX_SHARED_LOCK) &&
+> +		else if ((type & server->vals->shared_lock_type) &&
+>  			 ((netfid == cfile->netfid && current->tgid == li->pid)
+>  			 || type == li->type))
 >  			continue;
->  		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
-> -			cifsFileInfo_get(open_file);
-> -
->  			if (!open_file->invalidHandle) {
->  				/* found a good writable file */
-> +				cifsFileInfo_get(open_file);
->  				spin_unlock(&cifs_file_list_lock);
->  				return open_file;
-> +			} else {
-> +				if (!inv_file)
-> +					inv_file = open_file;
->  			}
-> -
-> -			spin_unlock(&cifs_file_list_lock);
-> -
-> -			/* Had to unlock since following call can block */
-> -			rc = cifs_reopen_file(open_file, false);
-> -			if (!rc)
-> -				return open_file;
-> -
-> -			/* if it fails, try another handle if possible */
-> -			cFYI(1, "wp failed on reopen file");
-> -			cifsFileInfo_put(open_file);
-> -
-> -			spin_lock(&cifs_file_list_lock);
-> -
-> -			/* else we simply continue to the next entry. Thus
-> -			   we do not loop on reopen errors.  If we
-> -			   can not reopen the file, for example if we
-> -			   reconnected to a server with another client
-> -			   racing to delete or lock the file we would not
-> -			   make progress if we restarted before the beginning
-> -			   of the loop here. */
->  		}
->  	}
->  	/* couldn't find useable FH with same pid, try any available */
-> @@ -1603,7 +1589,27 @@ refind_writable:
->  		any_available = true;
->  		goto refind_writable;
->  	}
-> +
-> +	if (inv_file) {
-> +		any_available = false;
-> +		cifsFileInfo_get(inv_file);
-> +		list_move_tail(&inv_file->flist, &cifs_inode->openFileList);
-> +	}
-> +
-
-Hmm...now that I think about this, do we really want to move this to
-the end of the list here? If this turns out to be reclaimable we will
-have moved it to the end of the list, and then it will be the *last*
-one found on the next pass into this function.
-
->  	spin_unlock(&cifs_file_list_lock);
-> +
-> +	if (inv_file) {
-> +		rc = cifs_reopen_file(inv_file, false);
-> +		if (!rc)
-> +			return inv_file;
-> +		else {
-> +			spin_lock(&cifs_file_list_lock);
-> +			cifsFileInfo_put(inv_file);
-
-		Here's where I have to rescind my Ack -- sorry :(
-
-		This is going to deadlock -- the first thing
-		that cifsFileInfo_put() does is lock the
-		cifs_file_list_lock.
-
-		It seems to me that moving the file to the end of the
-		list here would make more sense. IOW, we should only do
-		that if it turned out not to be reclaimable. Right?
-
-> +			++refind;
-> +			goto refind_writable;
-> +		}
-> +	}
-> +
->  	return NULL;
->  }
+> @@ -726,6 +727,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+>  	int rc = 0;
+>  	struct cifsLockInfo *conf_lock;
+>  	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
+> +	struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
+>  	bool exist;
 >  
+>  	mutex_lock(&cinode->lock_mutex);
+> @@ -736,7 +738,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+>  		flock->fl_start = conf_lock->offset;
+>  		flock->fl_end = conf_lock->offset + conf_lock->length - 1;
+>  		flock->fl_pid = conf_lock->pid;
+> -		if (conf_lock->type & LOCKING_ANDX_SHARED_LOCK)
+> +		if (conf_lock->type & server->vals->shared_lock_type)
+>  			flock->fl_type = F_RDLCK;
+>  		else
+>  			flock->fl_type = F_WRLCK;
+> @@ -1069,7 +1071,7 @@ cifs_push_locks(struct cifsFileInfo *cfile)
+>  
+>  static void
+>  cifs_read_flock(struct file_lock *flock, __u32 *type, int *lock, int *unlock,
+> -		bool *wait_flag)
+> +		bool *wait_flag, struct TCP_Server_Info *server)
+>  {
+>  	if (flock->fl_flags & FL_POSIX)
+>  		cFYI(1, "Posix");
+> @@ -1088,24 +1090,27 @@ cifs_read_flock(struct file_lock *flock, __u32 *type, int *lock, int *unlock,
+>  	    (~(FL_POSIX | FL_FLOCK | FL_SLEEP | FL_ACCESS | FL_LEASE)))
+>  		cFYI(1, "Unknown lock flags 0x%x", flock->fl_flags);
+>  
+> -	*type = LOCKING_ANDX_LARGE_FILES;
+> +	*type = server->vals->large_lock_type;
+>  	if (flock->fl_type == F_WRLCK) {
+>  		cFYI(1, "F_WRLCK ");
+> +		*type |= server->vals->exclusive_lock_type;
+>  		*lock = 1;
+>  	} else if (flock->fl_type == F_UNLCK) {
+>  		cFYI(1, "F_UNLCK");
+> +		*type |= server->vals->unlock_lock_type;
+>  		*unlock = 1;
+>  		/* Check if unlock includes more than one lock range */
+>  	} else if (flock->fl_type == F_RDLCK) {
+>  		cFYI(1, "F_RDLCK");
+> -		*type |= LOCKING_ANDX_SHARED_LOCK;
+> +		*type |= server->vals->shared_lock_type;
+>  		*lock = 1;
+>  	} else if (flock->fl_type == F_EXLCK) {
+>  		cFYI(1, "F_EXLCK");
+> +		*type |= server->vals->exclusive_lock_type;
+>  		*lock = 1;
+>  	} else if (flock->fl_type == F_SHLCK) {
+>  		cFYI(1, "F_SHLCK");
+> -		*type |= LOCKING_ANDX_SHARED_LOCK;
+> +		*type |= server->vals->shared_lock_type;
+>  		*lock = 1;
+>  	} else
+>  		cFYI(1, "Unknown type of lock");
+> @@ -1119,6 +1124,7 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
+>  	__u64 length = 1 + flock->fl_end - flock->fl_start;
+>  	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
+>  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+> +	struct TCP_Server_Info *server = tcon->ses->server;
+>  	__u16 netfid = cfile->netfid;
+>  
+>  	if (posix_lck) {
+> @@ -1128,7 +1134,7 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
+>  		if (!rc)
+>  			return rc;
+>  
+> -		if (type & LOCKING_ANDX_SHARED_LOCK)
+> +		if (type & server->vals->shared_lock_type)
+>  			posix_lock_type = CIFS_RDLCK;
+>  		else
+>  			posix_lock_type = CIFS_WRLCK;
+> @@ -1152,23 +1158,22 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
+>  		flock->fl_type = F_UNLCK;
+>  		if (rc != 0)
+>  			cERROR(1, "Error unlocking previously locked "
+> -				   "range %d during test of lock", rc);
+> +				  "range %d during test of lock", rc);
+>  		return 0;
+>  	}
+>  
+> -	if (type & LOCKING_ANDX_SHARED_LOCK) {
+> +	if (type & server->vals->shared_lock_type) {
+>  		flock->fl_type = F_WRLCK;
+>  		return 0;
+>  	}
+>  
+>  	rc = CIFSSMBLock(xid, tcon, netfid, current->tgid, length,
+>  			 flock->fl_start, 0, 1,
+> -			 type | LOCKING_ANDX_SHARED_LOCK, 0, 0);
+> +			 type | server->vals->shared_lock_type, 0, 0);
+>  	if (rc == 0) {
+>  		rc = CIFSSMBLock(xid, tcon, netfid, current->tgid,
+>  				 length, flock->fl_start, 1, 0,
+> -				 type | LOCKING_ANDX_SHARED_LOCK,
+> -				 0, 0);
+> +				 type | server->vals->shared_lock_type, 0, 0);
+>  		flock->fl_type = F_RDLCK;
+>  		if (rc != 0)
+>  			cERROR(1, "Error unlocking previously locked "
+> @@ -1307,6 +1312,7 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u32 type,
+>  	__u64 length = 1 + flock->fl_end - flock->fl_start;
+>  	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
+>  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+> +	struct TCP_Server_Info *server = tcon->ses->server;
+>  	__u16 netfid = cfile->netfid;
+>  
+>  	if (posix_lck) {
+> @@ -1316,7 +1322,7 @@ cifs_setlk(struct file *file,  struct file_lock *flock, __u32 type,
+>  		if (!rc || rc < 0)
+>  			return rc;
+>  
+> -		if (type & LOCKING_ANDX_SHARED_LOCK)
+> +		if (type & server->vals->shared_lock_type)
+>  			posix_lock_type = CIFS_RDLCK;
+>  		else
+>  			posix_lock_type = CIFS_WRLCK;
+> @@ -1380,11 +1386,13 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+>  		"end: %lld", cmd, flock->fl_flags, flock->fl_type,
+>  		flock->fl_start, flock->fl_end);
+>  
+> -	cifs_read_flock(flock, &type, &lock, &unlock, &wait_flag);
+> -
+> -	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+>  	cfile = (struct cifsFileInfo *)file->private_data;
+>  	tcon = tlink_tcon(cfile->tlink);
+> +
+> +	cifs_read_flock(flock, &type, &lock, &unlock, &wait_flag,
+> +			tcon->ses->server);
+> +
+> +	cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
+>  	netfid = cfile->netfid;
+>  	cinode = CIFS_I(file->f_path.dentry->d_inode);
+>  
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index fa486f0..af48a8b 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -20,6 +20,7 @@
+>  #include "cifsglob.h"
+>  #include "cifsproto.h"
+>  #include "cifs_debug.h"
+> +#include "cifspdu.h"
+>  
+>  /*
+>   * An NT cancel request header looks just like the original request except:
+> @@ -65,4 +66,8 @@ struct smb_version_operations smb1_operations = {
+>  
+>  struct smb_version_values smb1_values = {
+>  	.version_string = SMB1_VERSION_STRING,
+> +	.large_lock_type = LOCKING_ANDX_LARGE_FILES,
+> +	.exclusive_lock_type = 0,
+> +	.shared_lock_type = LOCKING_ANDX_SHARED_LOCK,
+> +	.unlock_lock_type = 0,
+>  };
 
-Also, should we go ahead and abandon the ordering of the openFileList?
+Much cleaner than having a bunch of is_smb2 checks all over the place.
 
->From cifs_new_fileinfo:
-
-        /* if readable file instance put first in list*/
-        if (file->f_mode & FMODE_READ)
-                list_add(&pCifsFile->flist, &pCifsInode->openFileList);
-        else
-                list_add_tail(&pCifsFile->flist, &pCifsInode->openFileList);
-
-...I'll note that nothing walks this list backward, so it's a pointless
-"optimization". Ordering the list by "availability" might make more
-sense.
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
