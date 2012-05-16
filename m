@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 2/3] cifs: add a smb_version_operations/values structures and a smb_version enum
-Date: Wed, 16 May 2012 23:15:04 +0400
-Message-ID: <1337195705-1381-3-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH 3/3] cifs: convert send_nt_cancel into a version specific op
+Date: Wed, 16 May 2012 23:15:05 +0400
+Message-ID: <1337195705-1381-4-git-send-email-piastry@etersoft.ru>
 References: <1337195705-1381-1-git-send-email-piastry@etersoft.ru>
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,238 +12,181 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-We need a way to dispatch different operations for different versions.
-Behold the smb_version_operations/values structures. For now, those
-structures just hold the version enum value and nothing uses them.
-Eventually, we'll expand them to cover other operations/values as we
-change the callers to dispatch from here.
+For SMB2, this should be a no-op. Obviously if we wanted to do something
+for the SMB2 case, we could also define an operation here for it.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/Makefile   |    2 +-
- fs/cifs/cifsfs.c   |    1 +
- fs/cifs/cifsglob.h |   19 +++++++++++++++++++
- fs/cifs/connect.c  |   42 +++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/smb1ops.c  |   27 +++++++++++++++++++++++++++
- 5 files changed, 89 insertions(+), 2 deletions(-)
- create mode 100644 fs/cifs/smb1ops.c
+ fs/cifs/cifsglob.h  |    6 +++++-
+ fs/cifs/smb1ops.c   |   41 +++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/transport.c |   46 ++++++++--------------------------------------
+ 3 files changed, 54 insertions(+), 39 deletions(-)
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index 005d524..0fe7025 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -6,7 +6,7 @@ obj-$(CONFIG_CIFS) += cifs.o
- cifs-y := cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o inode.o \
- 	  link.o misc.o netmisc.o smbencrypt.o transport.o asn1.o \
- 	  cifs_unicode.o nterr.o xattr.o cifsencrypt.o \
--	  readdir.o ioctl.o sess.o export.o
-+	  readdir.o ioctl.o sess.o export.o smb1ops.o
- 
- cifs-$(CONFIG_CIFS_ACL) += cifsacl.o
- 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f718d57..8a6928c 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -354,6 +354,7 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 	struct sockaddr *srcaddr;
- 	srcaddr = (struct sockaddr *)&tcon->ses->server->srcaddr;
- 
-+	seq_printf(s, ",vers=%s", tcon->ses->server->vals->version_string);
- 	cifs_show_security(s, tcon->ses->server);
- 	cifs_show_cache_flavor(s, cifs_sb);
- 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a867d99..812e22a 100644
+index 812e22a..c41bf6d 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -150,6 +150,17 @@ struct cifs_cred {
-  *****************************************************************
-  */
- 
-+enum smb_version {
-+	Smb_1 = 1,
-+};
-+
-+struct smb_version_operations {
-+};
-+
-+struct smb_version_values {
-+	char		*version_string;
-+};
-+
- struct smb_vol {
- 	char *username;
- 	char *password;
-@@ -205,6 +216,8 @@ struct smb_vol {
- 	bool sockopt_tcp_nodelay:1;
- 	unsigned short int port;
- 	unsigned long actimeo; /* attribute cache timeout (jiffies) */
-+	struct smb_version_operations *ops;
-+	struct smb_version_values *vals;
- 	char *prepath;
- 	struct sockaddr_storage srcaddr; /* allow binding to a local IP */
- 	struct nls_table *local_nls;
-@@ -242,6 +255,8 @@ struct TCP_Server_Info {
- 	int srv_count; /* reference counter */
- 	/* 15 character server name + 0x20 16th byte indicating type = srv */
- 	char server_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
-+	struct smb_version_operations	*ops;
-+	struct smb_version_values	*vals;
- 	enum statusEnum tcpStatus; /* what we think the status is */
- 	char *hostname; /* hostname portion of UNC string */
- 	struct socket *ssocket;
-@@ -1069,4 +1084,8 @@ void cifs_oplock_break(struct work_struct *work);
- extern const struct slow_work_ops cifs_oplock_break_ops;
- extern struct workqueue_struct *cifsiod_wq;
- 
-+/* Operations for different SMB versions */
-+#define SMB1_VERSION_STRING	"1.0"
-+extern struct smb_version_operations smb1_operations;
-+extern struct smb_version_values smb1_values;
- #endif	/* _CIFS_GLOB_H */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0c82881..5fa0403 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -102,7 +102,7 @@ enum {
- 	Opt_srcaddr, Opt_prefixpath,
- 	Opt_iocharset, Opt_sockopt,
- 	Opt_netbiosname, Opt_servern,
--	Opt_ver, Opt_sec, Opt_cache,
-+	Opt_ver, Opt_vers, Opt_sec, Opt_cache,
- 
- 	/* Mount options to be ignored */
- 	Opt_ignore,
-@@ -209,6 +209,7 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_netbiosname, "netbiosname=%s" },
- 	{ Opt_servern, "servern=%s" },
- 	{ Opt_ver, "ver=%s" },
-+	{ Opt_vers, "vers=%s" },
- 	{ Opt_sec, "sec=%s" },
- 	{ Opt_cache, "cache=%s" },
- 
-@@ -274,6 +275,10 @@ static const match_table_t cifs_cacheflavor_tokens = {
- 	{ Opt_cache_err, NULL }
+@@ -154,7 +154,12 @@ enum smb_version {
+ 	Smb_1 = 1,
  };
  
-+static const match_table_t cifs_smb_version_tokens = {
-+	{ Smb_1, SMB1_VERSION_STRING },
-+};
++struct mid_q_entry;
++struct TCP_Server_Info;
 +
- static int ip_connect(struct TCP_Server_Info *server);
- static int generic_ip_connect(struct TCP_Server_Info *server);
- static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink);
-@@ -1224,6 +1229,23 @@ cifs_parse_cache_flavor(char *value, struct smb_vol *vol)
+ struct smb_version_operations {
++	int (*send_cancel)(struct TCP_Server_Info *, void *,
++			   struct mid_q_entry *);
+ };
+ 
+ struct smb_version_values {
+@@ -718,7 +723,6 @@ static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
+ 
+ #endif
+ 
+-struct mid_q_entry;
+ 
+ /*
+  * This is the prototype for the mid receive function. This function is for
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index d2850d1..fa486f0 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -18,8 +18,49 @@
+  */
+ 
+ #include "cifsglob.h"
++#include "cifsproto.h"
++#include "cifs_debug.h"
++
++/*
++ * An NT cancel request header looks just like the original request except:
++ *
++ * The Command is SMB_COM_NT_CANCEL
++ * The WordCount is zeroed out
++ * The ByteCount is zeroed out
++ *
++ * This function mangles an existing request buffer into a
++ * SMB_COM_NT_CANCEL request and then sends it.
++ */
++static int
++send_nt_cancel(struct TCP_Server_Info *server, void *buf,
++	       struct mid_q_entry *mid)
++{
++	int rc = 0;
++	struct smb_hdr *in_buf = (struct smb_hdr *)buf;
++
++	/* -4 for RFC1001 length and +2 for BCC field */
++	in_buf->smb_buf_length = cpu_to_be32(sizeof(struct smb_hdr) - 4  + 2);
++	in_buf->Command = SMB_COM_NT_CANCEL;
++	in_buf->WordCount = 0;
++	put_bcc(0, in_buf);
++
++	mutex_lock(&server->srv_mutex);
++	rc = cifs_sign_smb(in_buf, server, &mid->sequence_number);
++	if (rc) {
++		mutex_unlock(&server->srv_mutex);
++		return rc;
++	}
++	rc = smb_send(server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
++	mutex_unlock(&server->srv_mutex);
++
++	cFYI(1, "issued NT_CANCEL for mid %u, rc = %d",
++		in_buf->Mid, rc);
++
++	return rc;
++}
+ 
+ struct smb_version_operations smb1_operations = {
++	.send_cancel = send_nt_cancel,
+ };
+ 
+ struct smb_version_values smb1_values = {
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0961336..269a5a7 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -483,41 +483,11 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+ 	return rc;
  }
  
- static int
-+cifs_parse_smb_version(char *value, struct smb_vol *vol)
-+{
-+	substring_t args[MAX_OPT_ARGS];
-+
-+	switch (match_token(value, cifs_smb_version_tokens, args)) {
-+	case Smb_1:
-+		vol->ops = &smb1_operations;
-+		vol->vals = &smb1_values;
-+		break;
-+	default:
-+		cERROR(1, "Unknown vers= option specified: %s", value);
-+		return 1;
-+	}
-+	return 0;
-+}
-+
-+static int
- cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			 struct smb_vol *vol)
+-/*
+- * An NT cancel request header looks just like the original request except:
+- *
+- * The Command is SMB_COM_NT_CANCEL
+- * The WordCount is zeroed out
+- * The ByteCount is zeroed out
+- *
+- * This function mangles an existing request buffer into a
+- * SMB_COM_NT_CANCEL request and then sends it.
+- */
+-static int
+-send_nt_cancel(struct TCP_Server_Info *server, struct smb_hdr *in_buf,
+-		struct mid_q_entry *mid)
++static inline int
++send_cancel(struct TCP_Server_Info *server, void *buf, struct mid_q_entry *mid)
  {
-@@ -1276,6 +1298,10 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+-	int rc = 0;
+-
+-	/* -4 for RFC1001 length and +2 for BCC field */
+-	in_buf->smb_buf_length = cpu_to_be32(sizeof(struct smb_hdr) - 4  + 2);
+-	in_buf->Command = SMB_COM_NT_CANCEL;
+-	in_buf->WordCount = 0;
+-	put_bcc(0, in_buf);
+-
+-	mutex_lock(&server->srv_mutex);
+-	rc = cifs_sign_smb(in_buf, server, &mid->sequence_number);
+-	if (rc) {
+-		mutex_unlock(&server->srv_mutex);
+-		return rc;
+-	}
+-	rc = smb_send(server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
+-	mutex_unlock(&server->srv_mutex);
+-
+-	cFYI(1, "issued NT_CANCEL for mid %u, rc = %d",
+-		in_buf->Mid, rc);
+-
+-	return rc;
++	return server->ops->send_cancel ?
++				server->ops->send_cancel(server, buf, mid) : 0;
+ }
  
- 	vol->actimeo = CIFS_DEF_ACTIMEO;
+ int
+@@ -636,7 +606,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
  
-+	/* FIXME: add autonegotiation -- for now, SMB1 is default */
-+	vol->ops = &smb1_operations;
-+	vol->vals = &smb1_values;
-+
- 	if (!mountdata)
- 		goto cifs_parse_mount_err;
+ 	rc = wait_for_response(ses->server, midQ);
+ 	if (rc != 0) {
+-		send_nt_cancel(ses->server, (struct smb_hdr *)buf, midQ);
++		send_cancel(ses->server, buf, midQ);
+ 		spin_lock(&GlobalMid_Lock);
+ 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			midQ->callback = DeleteMidQEntry;
+@@ -753,7 +723,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
  
-@@ -1879,6 +1905,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			printk(KERN_WARNING "CIFS: Invalid version"
- 					    " specified\n");
- 			goto cifs_parse_mount_err;
-+		case Opt_vers:
-+			string = match_strdup(args);
-+			if (string == NULL)
-+				goto out_nomem;
-+
-+			if (cifs_parse_smb_version(string, vol) != 0)
-+				goto cifs_parse_mount_err;
-+			break;
- 		case Opt_sec:
- 			string = match_strdup(args);
- 			if (string == NULL)
-@@ -2107,6 +2141,9 @@ match_security(struct TCP_Server_Info *server, struct smb_vol *vol)
- static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
- 			 struct smb_vol *vol)
- {
-+	if ((server->vals != vol->vals) || (server->ops != vol->ops))
-+		return 0;
-+
- 	if (!net_eq(cifs_net_ns(server), current->nsproxy->net_ns))
- 		return 0;
+ 	rc = wait_for_response(ses->server, midQ);
+ 	if (rc != 0) {
+-		send_nt_cancel(ses->server, in_buf, midQ);
++		send_cancel(ses->server, in_buf, midQ);
+ 		spin_lock(&GlobalMid_Lock);
+ 		if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 			/* no longer considered to be "in-flight" */
+@@ -898,7 +868,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 		if (in_buf->Command == SMB_COM_TRANSACTION2) {
+ 			/* POSIX lock. We send a NT_CANCEL SMB to cause the
+ 			   blocking lock to return. */
+-			rc = send_nt_cancel(ses->server, in_buf, midQ);
++			rc = send_cancel(ses->server, in_buf, midQ);
+ 			if (rc) {
+ 				delete_mid(midQ);
+ 				return rc;
+@@ -919,7 +889,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
  
-@@ -2229,6 +2266,8 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 		goto out_err;
- 	}
- 
-+	tcp_ses->ops = volume_info->ops;
-+	tcp_ses->vals = volume_info->vals;
- 	cifs_set_net_ns(tcp_ses, get_net(current->nsproxy->net_ns));
- 	tcp_ses->hostname = extract_hostname(volume_info->UNC);
- 	if (IS_ERR(tcp_ses->hostname)) {
-@@ -3635,6 +3674,7 @@ cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
- 	if (cifs_parse_mount_options(mount_data, devname, volume_info))
- 		return -EINVAL;
- 
-+
- 	if (volume_info->nullauth) {
- 		cFYI(1, "Anonymous login");
- 		kfree(volume_info->username);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-new file mode 100644
-index 0000000..d2850d1
---- /dev/null
-+++ b/fs/cifs/smb1ops.c
-@@ -0,0 +1,27 @@
-+/*
-+ *  SMB1 (CIFS) version specific operations
-+ *
-+ *  Copyright (c) 2012, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-+ *
-+ *  This library is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License v2 as published
-+ *  by the Free Software Foundation.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *  the GNU Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public License
-+ *  along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+
-+#include "cifsglob.h"
-+
-+struct smb_version_operations smb1_operations = {
-+};
-+
-+struct smb_version_values smb1_values = {
-+	.version_string = SMB1_VERSION_STRING,
-+};
+ 		rc = wait_for_response(ses->server, midQ);
+ 		if (rc) {
+-			send_nt_cancel(ses->server, in_buf, midQ);
++			send_cancel(ses->server, in_buf, midQ);
+ 			spin_lock(&GlobalMid_Lock);
+ 			if (midQ->mid_state == MID_REQUEST_SUBMITTED) {
+ 				/* no longer considered to be "in-flight" */
 -- 
 1.7.1
