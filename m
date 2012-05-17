@@ -1,211 +1,81 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 5/5] CIFS: Move add/set_credits and get_credits_field to
- ops structure
-Date: Thu, 17 May 2012 12:45:50 -0500
-Message-ID: <CADT32e+fTn3D1QK8oc4O0GaxbvCDWLAaEYHp1OXYbncGGfiStg@mail.gmail.com>
-References: <1337269424-9494-1-git-send-email-piastry@etersoft.ru>
-	<1337269424-9494-6-git-send-email-piastry@etersoft.ru>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: don't send a mandatory ver= option to the
+ kernel
+Date: Thu, 17 May 2012 13:54:37 -0400
+Message-ID: <20120517135437.6af5c851@corrin.poochiereds.net>
+References: <1336763001-7315-1-git-send-email-jlayton@samba.org>
+	<1337273046.2275.1.camel@localhost>
+	<CAH2r5muvJ=QUt6MsYQiZpZDWp+GRzviJRnJ6Q7O5eE1zYNOnJg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337269424-9494-6-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <CAH2r5muvJ=QUt6MsYQiZpZDWp+GRzviJRnJ6Q7O5eE1zYNOnJg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, May 17, 2012 at 10:43 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>=
- wrote:
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
-> =A0fs/cifs/cifsglob.h =A0| =A0 25 +++++++++++++++----------
-> =A0fs/cifs/cifsproto.h | =A0 =A03 ---
-> =A0fs/cifs/misc.c =A0 =A0 =A0| =A0 19 -------------------
-> =A0fs/cifs/smb1ops.c =A0 | =A0 28 ++++++++++++++++++++++++++++
-> =A0fs/cifs/transport.c | =A0 =A03 ++-
-> =A05 files changed, 45 insertions(+), 33 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 7b3e8fe..d17db87 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -167,6 +167,9 @@ struct smb_version_operations {
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct mid_q_=
-entry **);
-> =A0 =A0 =A0 =A0int (*check_receive)(struct mid_q_entry *, struct TCP_=
-Server_Info *,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bool);
-> + =A0 =A0 =A0 void (*add_credits)(struct TCP_Server_Info *, const uns=
-igned int);
-> + =A0 =A0 =A0 void (*set_credits)(struct TCP_Server_Info *, const int=
-);
-> + =A0 =A0 =A0 int * (*get_credits_field)(struct TCP_Server_Info *);
-> =A0 =A0 =A0 =A0unsigned int (*read_data_offset)(char *);
-> =A0 =A0 =A0 =A0unsigned int (*read_data_length)(char *);
-> =A0 =A0 =A0 =A0int (*map_error)(char *, bool);
-> @@ -367,16 +370,6 @@ in_flight(struct TCP_Server_Info *server)
-> =A0 =A0 =A0 =A0return num;
-> =A0}
->
-> -static inline int*
-> -get_credits_field(struct TCP_Server_Info *server)
-> -{
-> - =A0 =A0 =A0 /*
-> - =A0 =A0 =A0 =A0* This will change to switch statement when we reser=
-ve slots for echos
-> - =A0 =A0 =A0 =A0* and oplock breaks.
-> - =A0 =A0 =A0 =A0*/
-> - =A0 =A0 =A0 return &server->credits;
-> -}
-> -
-> =A0static inline bool
-> =A0has_credits(struct TCP_Server_Info *server, int *credits)
-> =A0{
-> @@ -387,6 +380,18 @@ has_credits(struct TCP_Server_Info *server, int =
-*credits)
-> =A0 =A0 =A0 =A0return num > 0;
-> =A0}
->
-> +static inline void
-> +cifs_add_credits(struct TCP_Server_Info *server, const unsigned int =
-add)
-> +{
-> + =A0 =A0 =A0 server->ops->add_credits(server, add);
-> +}
-> +
-> +static inline void
-> +cifs_set_credits(struct TCP_Server_Info *server, const int val)
-> +{
-> + =A0 =A0 =A0 server->ops->set_credits(server, val);
-> +}
-> +
-> =A0/*
-> =A0* Macros to allow the TCP_Server_Info->net field and related code =
-to drop out
-> =A0* when CONFIG_NET_NS isn't set.
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 57af642..5ec21ec 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -90,9 +90,6 @@ extern int SendReceiveBlockingLock(const unsigned i=
-nt xid,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_hdr *in_buf=
- ,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0struct smb_hdr *out_bu=
-f,
-> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0int *bytes_returned);
-> -extern void cifs_add_credits(struct TCP_Server_Info *server,
-> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const unsign=
-ed int add);
-> -extern void cifs_set_credits(struct TCP_Server_Info *server, const i=
-nt val);
-> =A0extern int checkSMB(char *buf, unsigned int length);
-> =A0extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *=
-);
-> =A0extern bool backup_cred(struct cifs_sb_info *);
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index d2bb1e7..e2552d2 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -653,22 +653,3 @@ backup_cred(struct cifs_sb_info *cifs_sb)
->
-> =A0 =A0 =A0 =A0return false;
-> =A0}
-> -
-> -void
-> -cifs_add_credits(struct TCP_Server_Info *server, const unsigned int =
-add)
-> -{
-> - =A0 =A0 =A0 spin_lock(&server->req_lock);
-> - =A0 =A0 =A0 server->credits +=3D add;
-> - =A0 =A0 =A0 server->in_flight--;
-> - =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> - =A0 =A0 =A0 wake_up(&server->request_q);
-> -}
-> -
-> -void
-> -cifs_set_credits(struct TCP_Server_Info *server, const int val)
-> -{
-> - =A0 =A0 =A0 spin_lock(&server->req_lock);
-> - =A0 =A0 =A0 server->credits =3D val;
-> - =A0 =A0 =A0 server->oplocks =3D val > 1 ? enable_oplocks : false;
-> - =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> -}
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 8a0b35b..17a69ed 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -102,11 +102,39 @@ cifs_find_mid(struct TCP_Server_Info *server, c=
-har *buffer)
-> =A0 =A0 =A0 =A0return NULL;
-> =A0}
->
-> +static void
-> +_cifs_add_credits(struct TCP_Server_Info *server, const unsigned int=
- add)
-> +{
-> + =A0 =A0 =A0 spin_lock(&server->req_lock);
-> + =A0 =A0 =A0 server->credits +=3D add;
-> + =A0 =A0 =A0 server->in_flight--;
-> + =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> + =A0 =A0 =A0 wake_up(&server->request_q);
-> +}
-> +
-> +static void
-> +_cifs_set_credits(struct TCP_Server_Info *server, const int val)
-> +{
-> + =A0 =A0 =A0 spin_lock(&server->req_lock);
-> + =A0 =A0 =A0 server->credits =3D val;
-> + =A0 =A0 =A0 server->oplocks =3D val > 1 ? enable_oplocks : false;
-> + =A0 =A0 =A0 spin_unlock(&server->req_lock);
-> +}
-> +
-> +static int *
-> +cifs_get_credits_field(struct TCP_Server_Info *server)
-> +{
-> + =A0 =A0 =A0 return &server->credits;
-> +}
-> +
-> =A0struct smb_version_operations smb1_operations =3D {
-> =A0 =A0 =A0 =A0.send_cancel =3D send_nt_cancel,
-> =A0 =A0 =A0 =A0.compare_fids =3D cifs_compare_fids,
-> =A0 =A0 =A0 =A0.setup_request =3D cifs_setup_request,
-> =A0 =A0 =A0 =A0.check_receive =3D cifs_check_receive,
-> + =A0 =A0 =A0 .add_credits =3D _cifs_add_credits,
-> + =A0 =A0 =A0 .set_credits =3D _cifs_set_credits,
-> + =A0 =A0 =A0 .get_credits_field =3D cifs_get_credits_field,
-> =A0 =A0 =A0 =A0.read_data_offset =3D cifs_read_data_offset,
-> =A0 =A0 =A0 =A0.read_data_length =3D cifs_read_data_length,
-> =A0 =A0 =A0 =A0.map_error =3D map_smb_to_linux_error,
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 87bd998..64c35fd 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -304,7 +304,8 @@ wait_for_free_credits(struct TCP_Server_Info *ser=
-ver, const int optype,
-> =A0static int
-> =A0wait_for_free_request(struct TCP_Server_Info *server, const int op=
-type)
-> =A0{
-> - =A0 =A0 =A0 return wait_for_free_credits(server, optype, get_credit=
-s_field(server));
-> + =A0 =A0 =A0 return wait_for_free_credits(server, optype,
-> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0server->ops->get_credits_field(server));
-> =A0}
->
-> =A0static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_b=
-uf,
-> --
-> 1.7.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+On Thu, 17 May 2012 12:03:26 -0500
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Looks correct.
+> On Thu, May 17, 2012 at 11:44 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> > On Fri, 2012-05-11 at 15:03 -0400, Jeff Layton wrote:
+> >> Traditionally, this ver= option was used to specify the "options
+> >> version" that we're passing in. It has always been set to '1' though
+> >> and we have never changed that.
+> >>
+> >> Eventually we want to have a ver= (or vers=) option that allows users
+> >> to specify the SMB version that they want to use to talk to the server.
+> >>
+> >> At that point, this option will just get in the way. Let's go ahead
+> >> and remove it now in preparation for that day.
+> >>
+> >
+> > Do we need 'ver=' mount option to specify the SMB version number? Isn't
+> > 'vers=' sufficient for this?
+> 
+> Yes - "vers" is sufficient (although I am fine with adding synonyms to
+> make it easier for nfs users - e.g. "smbvers=" or if we want to have
+> smb2 specific utility programs (e.g. for a phone or tablet) that call
+> do_mount automatically set vers=2.1.
+> 
+> I think that there will be times when we want (the kernel cifs.ko) to
+> know the version number of the user space utility (bugs? security
+> problems? debugging mount errors, at least when debugging set to
+> maximum level to log to dmesg?) so I think we should pass the real
+> mount.cifs version number in "ver=" as was the original intent (if for
+> nothing else it would help debugging mount bugs so we could log it to
+> dmesg in a few cases) - but since we have been sending "1" instead of
+> the mount.cifs version (and it is not currently used by the kernel
+> code) I can understand Jeff's point.  In any case, we can't use "ver="
+> to mean "vers=" (ie the requested dialect the user wants to use) as if
+> so current mount.cifs will force cifs by sending "ver=1" and when we
+> want to move the default in the future it would get in the way
+> (cifs.ko would require an update of mount.cifs but we would have no
+> way of telling in kernel whether it was the old mount.cifs - kind of a
+> catch-22 due to the lack of version number)
+> 
 
-Acked-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Yes, I don't think we're going to use ver= as a synonym for vers=.
+
+That said, we haven't needed a way for the kernel to recognize the
+userspace "options version" and no other userspace mount helper that
+I'm aware of has such a thing. After all, a userspace mount helper
+isn't even required...someone can mount cifs just fine w/o one as long
+as they pass in ip=.
+
+Handling an options version is more of a problem with binary mount
+options, where you need to know if you're breaking the ABI. With text
+based options, it's just not an issue.
+
+So I think going ahead and getting rid of this in the kernel is the
+right thing to do. It's just useless cruft that may get in the way in
+the future.
+
+If the kernel ever needs to determine the mount helper "version" for
+some reason, then it can treat a lack of ver= at all identically to how
+it handles a helper that passes in ver=1.
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
