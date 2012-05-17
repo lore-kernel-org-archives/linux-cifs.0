@@ -1,57 +1,84 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/5] Move protocol specific transport code to ops struct
-Date: Thu, 17 May 2012 11:16:00 -0500
-Message-ID: <CAH2r5mun0=CeQZjBQrSQP9CWu-P82azdg9KiBn_kgPdzvSifVg@mail.gmail.com>
-References: <1337269424-9494-1-git-send-email-piastry@etersoft.ru>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: don't send a mandatory ver= option to the
+ kernel
+Date: Thu, 17 May 2012 17:44:06 +0100
+Message-ID: <1337273046.2275.1.camel@localhost>
+References: <1336763001-7315-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337269424-9494-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1336763001-7315-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-These look reasonable to me.  Let me know if any objections.
+On Fri, 2012-05-11 at 15:03 -0400, Jeff Layton wrote:
+> Traditionally, this ver= option was used to specify the "options
+> version" that we're passing in. It has always been set to '1' though
+> and we have never changed that.
+> 
+> Eventually we want to have a ver= (or vers=) option that allows users
+> to specify the SMB version that they want to use to talk to the server.
+> 
+> At that point, this option will just get in the way. Let's go ahead
+> and remove it now in preparation for that day.
+> 
 
-On Thu, May 17, 2012 at 10:43 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>=
- wrote:
-> Here is yet another patchset that is targeted to make existing cifs c=
-ode
-> more protocol independent and let us add new protocols easily further=
-=2E
->
-> It can be merge as soons as got reviewed and ok for 3.5.
->
-> Pavel Shilovsky (5):
-> =A0CIFS: Move protocol specific part from SendReceive2 to ops struct
-> =A0CIFS: Move header_size/max_header_size to ops structure
-> =A0CIFS: Move protocol specific part from cifs_readv_receive to ops
-> =A0 =A0struct
-> =A0CIFS: Move protocol specific demultiplex thread calls to ops struc=
-t
-> =A0CIFS: Move add/set_credits and get_credits_field to ops structure
->
-> =A0fs/cifs/cifsglob.h =A0| =A0 45 +++++++++++++++++++----------
-> =A0fs/cifs/cifsproto.h | =A0 =A05 +--
-> =A0fs/cifs/cifssmb.c =A0 | =A0 39 ++++++-------------------
-> =A0fs/cifs/connect.c =A0 | =A0 44 ++++++++--------------------
-> =A0fs/cifs/misc.c =A0 =A0 =A0| =A0 19 ------------
-> =A0fs/cifs/smb1ops.c =A0 | =A0 78 +++++++++++++++++++++++++++++++++++=
-++++++++++++++++
-> =A0fs/cifs/transport.c | =A0 10 ++++--
-> =A07 files changed, 138 insertions(+), 102 deletions(-)
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+Do we need 'ver=' mount option to specify the SMB version number? Isn't
+'vers=' sufficient for this?
 
+Sachin Prabhu
 
-
---=20
-Thanks,
-
-Steve
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  mount.cifs.c |   20 +++++++-------------
+>  1 files changed, 7 insertions(+), 13 deletions(-)
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 0408158..3041987 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -100,12 +100,6 @@
+>  #define MAX_DOMAIN_SIZE 64
+>  
+>  /*
+> - * value of the ver= option that gets passed to the kernel. Used to indicate
+> - * behavioral changes introduced in the mount helper.
+> - */
+> -#define OPTIONS_VERSION "1"
+> -
+> -/*
+>   * mount.cifs has been the subject of many "security" bugs that have arisen
+>   * because of users and distributions installing it as a setuid root program
+>   * before it had been audited for security holes. The default behavior is
+> @@ -1833,21 +1827,21 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+>  			goto assemble_exit;
+>  	}
+>  
+> -	/* copy in ver= string. It's not really needed, but what the hell */
+> -	if (*parsed_info->options)
+> -		strlcat(parsed_info->options, ",", sizeof(parsed_info->options));
+> -	strlcat(parsed_info->options, "ver=", sizeof(parsed_info->options));
+> -	strlcat(parsed_info->options, OPTIONS_VERSION, sizeof(parsed_info->options));
+> -
+>  	/* copy in user= string */
+>  	if (parsed_info->got_user) {
+> -		strlcat(parsed_info->options, ",user=",
+> +		if (*parsed_info->options)
+> +			strlcat(parsed_info->options, ",",
+> +				sizeof(parsed_info->options));
+> +		strlcat(parsed_info->options, "user=",
+>  			sizeof(parsed_info->options));
+>  		strlcat(parsed_info->options, parsed_info->username,
+>  			sizeof(parsed_info->options));
+>  	}
+>  
+>  	if (*parsed_info->domain) {
+> +		if (*parsed_info->options)
+> +			strlcat(parsed_info->options, ",",
+> +				sizeof(parsed_info->options));
+>  		strlcat(parsed_info->options, ",domain=",
+>  			sizeof(parsed_info->options));
+>  		strlcat(parsed_info->options, parsed_info->domain,
