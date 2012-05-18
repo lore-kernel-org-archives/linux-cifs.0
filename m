@@ -1,178 +1,172 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 3/5] CIFS: Move protocol specific part from
- cifs_readv_receive to ops struct
-Date: Fri, 18 May 2012 12:43:29 -0400
-Message-ID: <20120518124329.013af956@corrin.poochiereds.net>
+Subject: Re: [PATCH 4/5] CIFS: Move protocol specific demultiplex thread
+ calls to ops struct
+Date: Fri, 18 May 2012 12:51:53 -0400
+Message-ID: <20120518125153.03c3ab34@corrin.poochiereds.net>
 References: <1337269424-9494-1-git-send-email-piastry@etersoft.ru>
-	<1337269424-9494-4-git-send-email-piastry@etersoft.ru>
+	<1337269424-9494-5-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337269424-9494-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1337269424-9494-5-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 17 May 2012 19:43:42 +0400
+On Thu, 17 May 2012 19:43:43 +0400
 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
 > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |    4 ++++
->  fs/cifs/cifssmb.c  |   34 +++++++---------------------------
->  fs/cifs/smb1ops.c  |   19 +++++++++++++++++++
->  3 files changed, 30 insertions(+), 27 deletions(-)
+>  fs/cifs/cifsglob.h |    6 ++++++
+>  fs/cifs/connect.c  |   27 ++++-----------------------
+>  fs/cifs/smb1ops.c  |   26 ++++++++++++++++++++++++++
+>  3 files changed, 36 insertions(+), 23 deletions(-)
 > 
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 94657e2..080dd86 100644
+> index 080dd86..7b3e8fe 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
-> @@ -167,6 +167,9 @@ struct smb_version_operations {
->  			     struct mid_q_entry **);
->  	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
->  			     bool);
-> +	unsigned int (*read_data_offset)(char *);
-> +	unsigned int (*read_data_length)(char *);
-> +	int (*map_error)(char *, bool);
+> @@ -170,6 +170,12 @@ struct smb_version_operations {
+>  	unsigned int (*read_data_offset)(char *);
+>  	unsigned int (*read_data_length)(char *);
+>  	int (*map_error)(char *, bool);
+> +	struct mid_q_entry * (*find_mid)(struct TCP_Server_Info *, char *);
+> +#ifdef CONFIG_CIFS_DEBUG2
+> +	void (*dump_detail)(void *);
+> +#endif
+> +	int (*check_message)(char *, unsigned int);
+> +	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
 >  };
 >  
-
-Minor comment -- it might be good to start adding some comments so that
-we can keep track of what each of these functions does. This struct is
-likely to become large over time and the logic for some of these things
-will eventually be lost in antiquity.
-
 >  struct smb_version_values {
-> @@ -177,6 +180,7 @@ struct smb_version_values {
->  	__u32		unlock_lock_type;
->  	size_t		header_size;
->  	size_t		max_header_size;
-> +	size_t		read_rsp_size;
->  };
->  
->  #define HEADER_SIZE(server) (server->vals->header_size)
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 77463f7..b1f3751 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1411,27 +1411,6 @@ cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  	return 0;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 65ec6ef..ce033d7 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -783,25 +783,6 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+>  	return false;
 >  }
 >  
-> -static inline size_t
-> -read_rsp_size(void)
+> -static struct mid_q_entry *
+> -find_mid(struct TCP_Server_Info *server, char *buffer)
 > -{
-> -	return sizeof(READ_RSP);
+> -	struct smb_hdr *buf = (struct smb_hdr *)buffer;
+> -	struct mid_q_entry *mid;
+> -
+> -	spin_lock(&GlobalMid_Lock);
+> -	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
+> -		if (mid->mid == buf->Mid &&
+> -		    mid->mid_state == MID_REQUEST_SUBMITTED &&
+> -		    le16_to_cpu(mid->command) == buf->Command) {
+> -			spin_unlock(&GlobalMid_Lock);
+> -			return mid;
+> -		}
+> -	}
+> -	spin_unlock(&GlobalMid_Lock);
+> -	return NULL;
 > -}
 > -
-> -static inline unsigned int
-> -read_data_offset(char *buf)
-> -{
-> -	READ_RSP *rsp = (READ_RSP *)buf;
-> -	return le16_to_cpu(rsp->DataOffset);
-> -}
-> -
-> -static inline unsigned int
-> -read_data_length(char *buf)
-> -{
-> -	READ_RSP *rsp = (READ_RSP *)buf;
-> -	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
-> -	       le16_to_cpu(rsp->DataLength);
-> -}
-> -
->  static int
->  cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+>  void
+>  dequeue_mid(struct mid_q_entry *mid, bool malformed)
 >  {
-> @@ -1449,7 +1428,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  	 * can if there's not enough data. At this point, we've read down to
->  	 * the Mid.
+> @@ -986,7 +967,7 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+>  	 * 48 bytes is enough to display the header and a little bit
+>  	 * into the payload for debugging purposes.
 >  	 */
-> -	len = min_t(unsigned int, buflen, read_rsp_size()) -
-> +	len = min_t(unsigned int, buflen, server->vals->read_rsp_size) -
->  							HEADER_SIZE(server) + 1;
+> -	length = checkSMB(buf, server->total_read);
+> +	length = server->ops->check_message(buf, server->total_read);
+>  	if (length != 0)
+>  		cifs_dump_mem("Bad SMB: ", buf,
+>  			min_t(unsigned int, server->total_read, 48));
+> @@ -1059,7 +1040,7 @@ cifs_demultiplex_thread(void *p)
+>  			continue;
+>  		server->total_read += length;
 >  
->  	rdata->iov[0].iov_base = buf + HEADER_SIZE(server) - 1;
-> @@ -1461,7 +1440,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  	server->total_read += length;
+> -		mid_entry = find_mid(server, buf);
+> +		mid_entry = server->ops->find_mid(server, buf);
 >  
->  	/* Was the SMB read successful? */
-> -	rdata->result = map_smb_to_linux_error(buf, false);
-> +	rdata->result = server->ops->map_error(buf, false);
->  	if (rdata->result != 0) {
->  		cFYI(1, "%s: server returned error %d", __func__,
->  			rdata->result);
-> @@ -1469,14 +1448,15 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  	}
+>  		if (!mid_entry || !mid_entry->receive)
+>  			length = standard_receive3(server, mid_entry);
+> @@ -1076,13 +1057,13 @@ cifs_demultiplex_thread(void *p)
+>  		if (mid_entry != NULL) {
+>  			if (!mid_entry->multiRsp || mid_entry->multiEnd)
+>  				mid_entry->callback(mid_entry);
+> -		} else if (!is_valid_oplock_break(buf, server)) {
+> +		} else if (!server->ops->is_oplock_break(buf, server)) {
+>  			cERROR(1, "No task to wake, unknown frame received! "
+>  				   "NumMids %d", atomic_read(&midCount));
+>  			cifs_dump_mem("Received Data is: ", buf,
+>  				      HEADER_SIZE(server));
+>  #ifdef CONFIG_CIFS_DEBUG2
+> -			cifs_dump_detail(buf);
+> +			server->ops->dump_detail(buf);
+>  			cifs_dump_mids(server);
+>  #endif /* CIFS_DEBUG2 */
 >  
->  	/* Is there enough to get to the rest of the READ_RSP header? */
-> -	if (server->total_read < read_rsp_size()) {
-> +	if (server->total_read < server->vals->read_rsp_size) {
->  		cFYI(1, "%s: server returned short header. got=%u expected=%zu",
-> -			__func__, server->total_read, read_rsp_size());
-> +			__func__, server->total_read,
-> +			server->vals->read_rsp_size);
->  		rdata->result = -EIO;
->  		return cifs_readv_discard(server, mid);
->  	}
->  
-> -	data_offset = read_data_offset(buf) + 4;
-> +	data_offset = server->ops->read_data_offset(buf) + 4;
->  	if (data_offset < server->total_read) {
->  		/*
->  		 * win2k8 sometimes sends an offset of 0 when the read
-> @@ -1515,7 +1495,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  		rdata->iov[0].iov_base, rdata->iov[0].iov_len);
->  
->  	/* how much data is in the response? */
-> -	data_len = read_data_length(buf);
-> +	data_len = server->ops->read_data_length(buf);
->  	if (data_offset + data_len > buflen) {
->  		/* data_len is corrupt -- discard frame */
->  		rdata->result = -EIO;
+
+
+Hmmm, might it be cleaner to unconditionally add the dump_detail
+operation to smb_version_operations, and only set it when
+CONFIG_CIFS_DEBUG2 is enabled?
+
+With that, you could get rid of the #ifdef clutter in the code above...
+
+
 > diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 5dc365f..31a6111 100644
+> index 31a6111..8a0b35b 100644
 > --- a/fs/cifs/smb1ops.c
 > +++ b/fs/cifs/smb1ops.c
-> @@ -67,11 +67,29 @@ cifs_compare_fids(struct cifsFileInfo *ob1, struct cifsFileInfo *ob2)
->  	return ob1->netfid == ob2->netfid;
+> @@ -22,6 +22,7 @@
+>  #include "cifs_debug.h"
+>  #include "cifspdu.h"
+>  #include "cifsproto.h"
+> +#include "cifs_debug.h"
+>  
+>  /*
+>   * An NT cancel request header looks just like the original request except:
+> @@ -82,6 +83,25 @@ cifs_read_data_length(char *buf)
+>  	       le16_to_cpu(rsp->DataLength);
 >  }
 >  
-> +static unsigned int
-> +cifs_read_data_offset(char *buf)
+> +static struct mid_q_entry *
+> +cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
 > +{
-> +	READ_RSP *rsp = (READ_RSP *)buf;
-> +	return le16_to_cpu(rsp->DataOffset);
-> +}
+> +	struct smb_hdr *buf = (struct smb_hdr *)buffer;
+> +	struct mid_q_entry *mid;
 > +
-> +static unsigned int
-> +cifs_read_data_length(char *buf)
-> +{
-> +	READ_RSP *rsp = (READ_RSP *)buf;
-> +	return (le16_to_cpu(rsp->DataLengthHigh) << 16) +
-> +	       le16_to_cpu(rsp->DataLength);
+> +	spin_lock(&GlobalMid_Lock);
+> +	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
+> +		if (mid->mid == buf->Mid &&
+> +		    mid->mid_state == MID_REQUEST_SUBMITTED &&
+> +		    le16_to_cpu(mid->command) == buf->Command) {
+> +			spin_unlock(&GlobalMid_Lock);
+> +			return mid;
+> +		}
+> +	}
+> +	spin_unlock(&GlobalMid_Lock);
+> +	return NULL;
 > +}
 > +
 >  struct smb_version_operations smb1_operations = {
 >  	.send_cancel = send_nt_cancel,
 >  	.compare_fids = cifs_compare_fids,
->  	.setup_request = cifs_setup_request,
->  	.check_receive = cifs_check_receive,
-> +	.read_data_offset = cifs_read_data_offset,
-> +	.read_data_length = cifs_read_data_length,
-> +	.map_error = map_smb_to_linux_error,
+> @@ -90,6 +110,12 @@ struct smb_version_operations smb1_operations = {
+>  	.read_data_offset = cifs_read_data_offset,
+>  	.read_data_length = cifs_read_data_length,
+>  	.map_error = map_smb_to_linux_error,
+> +	.find_mid = cifs_find_mid,
+> +	.check_message = checkSMB,
+> +#ifdef CONFIG_CIFS_DEBUG2
+> +	.dump_detail = cifs_dump_detail,
+> +#endif
+> +	.is_oplock_break = is_valid_oplock_break,
 >  };
 >  
 >  struct smb_version_values smb1_values = {
-> @@ -82,4 +100,5 @@ struct smb_version_values smb1_values = {
->  	.unlock_lock_type = 0,
->  	.header_size = sizeof(struct smb_hdr),
->  	.max_header_size = MAX_CIFS_HDR_SIZE,
-> +	.read_rsp_size = sizeof(READ_RSP),
->  };
 
 
-Patch is otherwise fine though...
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
