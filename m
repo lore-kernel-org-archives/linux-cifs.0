@@ -1,172 +1,186 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 4/5] CIFS: Move protocol specific demultiplex thread
- calls to ops struct
-Date: Fri, 18 May 2012 12:51:53 -0400
-Message-ID: <20120518125153.03c3ab34@corrin.poochiereds.net>
+Subject: Re: [PATCH 5/5] CIFS: Move add/set_credits and get_credits_field to
+ ops structure
+Date: Fri, 18 May 2012 12:54:39 -0400
+Message-ID: <20120518125439.23525985@corrin.poochiereds.net>
 References: <1337269424-9494-1-git-send-email-piastry@etersoft.ru>
-	<1337269424-9494-5-git-send-email-piastry@etersoft.ru>
+	<1337269424-9494-6-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337269424-9494-5-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1337269424-9494-6-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 17 May 2012 19:43:43 +0400
+On Thu, 17 May 2012 19:43:44 +0400
 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
 > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |    6 ++++++
->  fs/cifs/connect.c  |   27 ++++-----------------------
->  fs/cifs/smb1ops.c  |   26 ++++++++++++++++++++++++++
->  3 files changed, 36 insertions(+), 23 deletions(-)
+>  fs/cifs/cifsglob.h  |   25 +++++++++++++++----------
+>  fs/cifs/cifsproto.h |    3 ---
+>  fs/cifs/misc.c      |   19 -------------------
+>  fs/cifs/smb1ops.c   |   28 ++++++++++++++++++++++++++++
+>  fs/cifs/transport.c |    3 ++-
+>  5 files changed, 45 insertions(+), 33 deletions(-)
 > 
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 080dd86..7b3e8fe 100644
+> index 7b3e8fe..d17db87 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
-> @@ -170,6 +170,12 @@ struct smb_version_operations {
+> @@ -167,6 +167,9 @@ struct smb_version_operations {
+>  			     struct mid_q_entry **);
+>  	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
+>  			     bool);
+> +	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
+> +	void (*set_credits)(struct TCP_Server_Info *, const int);
+> +	int * (*get_credits_field)(struct TCP_Server_Info *);
 >  	unsigned int (*read_data_offset)(char *);
 >  	unsigned int (*read_data_length)(char *);
 >  	int (*map_error)(char *, bool);
-> +	struct mid_q_entry * (*find_mid)(struct TCP_Server_Info *, char *);
-> +#ifdef CONFIG_CIFS_DEBUG2
-> +	void (*dump_detail)(void *);
-> +#endif
-> +	int (*check_message)(char *, unsigned int);
-> +	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
->  };
->  
->  struct smb_version_values {
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 65ec6ef..ce033d7 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -783,25 +783,6 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
->  	return false;
+> @@ -367,16 +370,6 @@ in_flight(struct TCP_Server_Info *server)
+>  	return num;
 >  }
 >  
-> -static struct mid_q_entry *
-> -find_mid(struct TCP_Server_Info *server, char *buffer)
+> -static inline int*
+> -get_credits_field(struct TCP_Server_Info *server)
 > -{
-> -	struct smb_hdr *buf = (struct smb_hdr *)buffer;
-> -	struct mid_q_entry *mid;
-> -
-> -	spin_lock(&GlobalMid_Lock);
-> -	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-> -		if (mid->mid == buf->Mid &&
-> -		    mid->mid_state == MID_REQUEST_SUBMITTED &&
-> -		    le16_to_cpu(mid->command) == buf->Command) {
-> -			spin_unlock(&GlobalMid_Lock);
-> -			return mid;
-> -		}
-> -	}
-> -	spin_unlock(&GlobalMid_Lock);
-> -	return NULL;
+> -	/*
+> -	 * This will change to switch statement when we reserve slots for echos
+> -	 * and oplock breaks.
+> -	 */
+> -	return &server->credits;
 > -}
 > -
->  void
->  dequeue_mid(struct mid_q_entry *mid, bool malformed)
+>  static inline bool
+>  has_credits(struct TCP_Server_Info *server, int *credits)
 >  {
-> @@ -986,7 +967,7 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->  	 * 48 bytes is enough to display the header and a little bit
->  	 * into the payload for debugging purposes.
->  	 */
-> -	length = checkSMB(buf, server->total_read);
-> +	length = server->ops->check_message(buf, server->total_read);
->  	if (length != 0)
->  		cifs_dump_mem("Bad SMB: ", buf,
->  			min_t(unsigned int, server->total_read, 48));
-> @@ -1059,7 +1040,7 @@ cifs_demultiplex_thread(void *p)
->  			continue;
->  		server->total_read += length;
->  
-> -		mid_entry = find_mid(server, buf);
-> +		mid_entry = server->ops->find_mid(server, buf);
->  
->  		if (!mid_entry || !mid_entry->receive)
->  			length = standard_receive3(server, mid_entry);
-> @@ -1076,13 +1057,13 @@ cifs_demultiplex_thread(void *p)
->  		if (mid_entry != NULL) {
->  			if (!mid_entry->multiRsp || mid_entry->multiEnd)
->  				mid_entry->callback(mid_entry);
-> -		} else if (!is_valid_oplock_break(buf, server)) {
-> +		} else if (!server->ops->is_oplock_break(buf, server)) {
->  			cERROR(1, "No task to wake, unknown frame received! "
->  				   "NumMids %d", atomic_read(&midCount));
->  			cifs_dump_mem("Received Data is: ", buf,
->  				      HEADER_SIZE(server));
->  #ifdef CONFIG_CIFS_DEBUG2
-> -			cifs_dump_detail(buf);
-> +			server->ops->dump_detail(buf);
->  			cifs_dump_mids(server);
->  #endif /* CIFS_DEBUG2 */
->  
-
-
-Hmmm, might it be cleaner to unconditionally add the dump_detail
-operation to smb_version_operations, and only set it when
-CONFIG_CIFS_DEBUG2 is enabled?
-
-With that, you could get rid of the #ifdef clutter in the code above...
-
-
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 31a6111..8a0b35b 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -22,6 +22,7 @@
->  #include "cifs_debug.h"
->  #include "cifspdu.h"
->  #include "cifsproto.h"
-> +#include "cifs_debug.h"
->  
->  /*
->   * An NT cancel request header looks just like the original request except:
-> @@ -82,6 +83,25 @@ cifs_read_data_length(char *buf)
->  	       le16_to_cpu(rsp->DataLength);
+> @@ -387,6 +380,18 @@ has_credits(struct TCP_Server_Info *server, int *credits)
+>  	return num > 0;
 >  }
 >  
-> +static struct mid_q_entry *
-> +cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
+> +static inline void
+> +cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
 > +{
-> +	struct smb_hdr *buf = (struct smb_hdr *)buffer;
-> +	struct mid_q_entry *mid;
+> +	server->ops->add_credits(server, add);
+> +}
 > +
-> +	spin_lock(&GlobalMid_Lock);
-> +	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-> +		if (mid->mid == buf->Mid &&
-> +		    mid->mid_state == MID_REQUEST_SUBMITTED &&
-> +		    le16_to_cpu(mid->command) == buf->Command) {
-> +			spin_unlock(&GlobalMid_Lock);
-> +			return mid;
-> +		}
-> +	}
-> +	spin_unlock(&GlobalMid_Lock);
-> +	return NULL;
+> +static inline void
+> +cifs_set_credits(struct TCP_Server_Info *server, const int val)
+> +{
+> +	server->ops->set_credits(server, val);
+> +}
+> +
+
+nit: maybe call these "add_credits and set_credits" and get rid of the
+leading '_' on the SMB1 functions below?
+
+>  /*
+>   * Macros to allow the TCP_Server_Info->net field and related code to drop out
+>   * when CONFIG_NET_NS isn't set.
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 57af642..5ec21ec 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -90,9 +90,6 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
+>  			struct smb_hdr *in_buf ,
+>  			struct smb_hdr *out_buf,
+>  			int *bytes_returned);
+> -extern void cifs_add_credits(struct TCP_Server_Info *server,
+> -			     const unsigned int add);
+> -extern void cifs_set_credits(struct TCP_Server_Info *server, const int val);
+>  extern int checkSMB(char *buf, unsigned int length);
+>  extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *);
+>  extern bool backup_cred(struct cifs_sb_info *);
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index d2bb1e7..e2552d2 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -653,22 +653,3 @@ backup_cred(struct cifs_sb_info *cifs_sb)
+>  
+>  	return false;
+>  }
+> -
+> -void
+> -cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
+> -{
+> -	spin_lock(&server->req_lock);
+> -	server->credits += add;
+> -	server->in_flight--;
+> -	spin_unlock(&server->req_lock);
+> -	wake_up(&server->request_q);
+> -}
+> -
+> -void
+> -cifs_set_credits(struct TCP_Server_Info *server, const int val)
+> -{
+> -	spin_lock(&server->req_lock);
+> -	server->credits = val;
+> -	server->oplocks = val > 1 ? enable_oplocks : false;
+> -	spin_unlock(&server->req_lock);
+> -}
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 8a0b35b..17a69ed 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -102,11 +102,39 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
+>  	return NULL;
+>  }
+>  
+> +static void
+> +_cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
+> +{
+> +	spin_lock(&server->req_lock);
+> +	server->credits += add;
+> +	server->in_flight--;
+> +	spin_unlock(&server->req_lock);
+> +	wake_up(&server->request_q);
+> +}
+> +
+> +static void
+> +_cifs_set_credits(struct TCP_Server_Info *server, const int val)
+> +{
+> +	spin_lock(&server->req_lock);
+> +	server->credits = val;
+> +	server->oplocks = val > 1 ? enable_oplocks : false;
+> +	spin_unlock(&server->req_lock);
+> +}
+> +
+> +static int *
+> +cifs_get_credits_field(struct TCP_Server_Info *server)
+> +{
+> +	return &server->credits;
 > +}
 > +
 >  struct smb_version_operations smb1_operations = {
 >  	.send_cancel = send_nt_cancel,
 >  	.compare_fids = cifs_compare_fids,
-> @@ -90,6 +110,12 @@ struct smb_version_operations smb1_operations = {
+>  	.setup_request = cifs_setup_request,
+>  	.check_receive = cifs_check_receive,
+> +	.add_credits = _cifs_add_credits,
+> +	.set_credits = _cifs_set_credits,
+> +	.get_credits_field = cifs_get_credits_field,
 >  	.read_data_offset = cifs_read_data_offset,
 >  	.read_data_length = cifs_read_data_length,
 >  	.map_error = map_smb_to_linux_error,
-> +	.find_mid = cifs_find_mid,
-> +	.check_message = checkSMB,
-> +#ifdef CONFIG_CIFS_DEBUG2
-> +	.dump_detail = cifs_dump_detail,
-> +#endif
-> +	.is_oplock_break = is_valid_oplock_break,
->  };
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 87bd998..64c35fd 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -304,7 +304,8 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int optype,
+>  static int
+>  wait_for_free_request(struct TCP_Server_Info *server, const int optype)
+>  {
+> -	return wait_for_free_credits(server, optype, get_credits_field(server));
+> +	return wait_for_free_credits(server, optype,
+> +				     server->ops->get_credits_field(server));
+>  }
 >  
->  struct smb_version_values smb1_values = {
+>  static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
 
+Other than the minor nit above, this looks fine:
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
