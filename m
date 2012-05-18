@@ -1,128 +1,124 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix oops while traversing open file list (try #2)
-Date: Fri, 18 May 2012 12:25:04 -0400
-Message-ID: <20120518122504.295c58a0@corrin.poochiereds.net>
-References: <1337188413-28947-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20120516135548.2acb454a@tlielax.poochiereds.net>
-	<CADT32eJ1VuL52DLnc=SuNjiSEzwMHXOtM4VJXfYZrmTSUoDQYA@mail.gmail.com>
-	<20120518082956.44ec8785@corrin.poochiereds.net>
-	<CADT32eLFpHkerpiW_WGv_DqetOn5SuFBDo+WVe0dhziXf-3r1g@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 1/5] CIFS: Move protocol specific part from SendReceive2
+ to ops struct
+Date: Fri, 18 May 2012 12:35:59 -0400
+Message-ID: <20120518123559.208d4730@corrin.poochiereds.net>
+References: <1337269424-9494-1-git-send-email-piastry@etersoft.ru>
+	<1337269424-9494-2-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eLFpHkerpiW_WGv_DqetOn5SuFBDo+WVe0dhziXf-3r1g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1337269424-9494-2-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 18 May 2012 11:14:38 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Thu, 17 May 2012 19:43:40 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> On Fri, May 18, 2012 at 7:29 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrot=
-e:
-> > On Wed, 16 May 2012 15:41:24 -0500
-> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> > [...]
-> >
-> >> >
-> >> > Hmm...now that I think about this, do we really want to move thi=
-s to
-> >> > the end of the list here? If this turns out to be reclaimable we=
- will
-> >> > have moved it to the end of the list, and then it will be the *l=
-ast*
-> >> > one found on the next pass into this function.
-> >>
-> >> yes, but we need to keep this element on the list while reclaimati=
-on
-> >> is going on. =C2=A0If we keep where it is and reclaim fails, we ma=
-y oops
-> >> for we are not sure if the next element is still intact (that is t=
-he reason
-> >> of the oops in the first place) since we will continue down the li=
-st
-> >> looking for another file handle.
-> >>
-> >
-> > No, because once you drop the spinlock to do the reclaim you have t=
-o
-> > start walking the list from the head again.
-> >
-> >> >
-> >> >> =C2=A0 =C2=A0 =C2=A0 spin_unlock(&cifs_file_list_lock);
-> >> >> +
-> >> >> + =C2=A0 =C2=A0 if (inv_file) {
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rc =3D cifs_reopen_=
-file(inv_file, false);
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!rc)
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 return inv_file;
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 else {
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 spin_lock(&cifs_file_list_lock);
-> >> >> + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 cifsFileInfo_put(inv_file);
-> >> >
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Here's wh=
-ere I have to rescind my Ack -- sorry :(
-> >> >
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0This is g=
-oing to deadlock -- the first thing
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0that cifs=
-=46ileInfo_put() does is lock the
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cifs_file=
-_list_lock.
-> >>
-> >> Agree. =C2=A0Thanks. I think reversing the order of the calls
-> >> spin_lock() and cifsFileInfo_put(), should take care of that.
-> >>
-> >
-> > Yes, that should be fine.
-> >
-> >> >
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0It seems =
-to me that moving the file to the end of the
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0list here=
- would make more sense. IOW, we should only do
-> >> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0that if i=
-t turned out not to be reclaimable. Right?
-> >>
-> >> But the problem would remain. =C2=A0We are reclaiming without lock
-> >> so we have to consider the possibility that reclaim could fail, so
-> >> list move could fail if the next element has become stale/invalid.
-> >>
-> >
-> > No -- if the reclaim fails, you go to refind_writable and start
-> > walking the list all over again from the head. Once you drop the
-> > spinlock you *must* do that regardless of whether you moved this en=
-try
-> > or not. You don't know if other threads have modified it while you =
-no
-> > longer hold the lock.
-> >
-> > The idea with moving this to the end is that you want to avoid pick=
-ing
-> > the same FID over and over again in the event that it's unreclaimab=
-le,
-> > while there are others that could be reclaimed. There's no need to =
-do
-> > that however if the file is able to be reclaimed.
->=20
-> Jeff, not clear yet.  What I am trying to say is, if the reclaim fail=
-s,
-> then, we can't reliably move the element to the end of the list
-> since its links are not reliable after dropping the lock.
-> So we do not know if the reclaim will succeedor fail, if it fails,
-> we can't be sure that move will not oops and so we do not take
-> a chance and move it before attempting reclaim.
->=20
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h  |    5 +++++
+>  fs/cifs/cifsproto.h |    2 ++
+>  fs/cifs/smb1ops.c   |    3 +++
+>  fs/cifs/transport.c |    7 ++++---
+>  4 files changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index b6e97f8..ff06211 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -157,11 +157,16 @@ enum smb_version {
+>  struct mid_q_entry;
+>  struct TCP_Server_Info;
+>  struct cifsFileInfo;
+> +struct cifs_ses;
+>  
+>  struct smb_version_operations {
+>  	int (*send_cancel)(struct TCP_Server_Info *, void *,
+>  			   struct mid_q_entry *);
+>  	bool (*compare_fids)(struct cifsFileInfo *, struct cifsFileInfo *);
+> +	int (*setup_request)(struct cifs_ses *, struct kvec *, unsigned int,
+> +			     struct mid_q_entry **);
+> +	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
+> +			     bool);
+>  };
+>  
+>  struct smb_version_values {
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 0a3fa96..57af642 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -78,6 +78,8 @@ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+>  			int * /* bytes returned */ , const int long_op);
+>  extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
+>  			    char *in_buf, int flags);
+> +extern int cifs_setup_request(struct cifs_ses *, struct kvec *, unsigned int,
+> +			      struct mid_q_entry **);
+>  extern int cifs_check_receive(struct mid_q_entry *mid,
+>  			struct TCP_Server_Info *server, bool log_error);
+>  extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index ce27f86..3b7cf89 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -21,6 +21,7 @@
+>  #include "cifsproto.h"
+>  #include "cifs_debug.h"
+>  #include "cifspdu.h"
+> +#include "cifsproto.h"
 
-The list links will be reliable as long as you hold a reference to the
-file. So, you just need to make sure you move it to the end of the list
-before you do the cifsFileInfo_put.
+	^^^^
+Holy double-includes, batman! Please fix this before merging.
 
---=20
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>  
+>  /*
+>   * An NT cancel request header looks just like the original request except:
+> @@ -69,6 +70,8 @@ cifs_compare_fids(struct cifsFileInfo *ob1, struct cifsFileInfo *ob2)
+>  struct smb_version_operations smb1_operations = {
+>  	.send_cancel = send_nt_cancel,
+>  	.compare_fids = cifs_compare_fids,
+> +	.setup_request = cifs_setup_request,
+> +	.check_receive = cifs_check_receive,
+>  };
+>  
+>  struct smb_version_values smb1_values = {
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 269a5a7..87bd998 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -514,7 +514,7 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+>  	return map_smb_to_linux_error(mid->resp_buf, log_error);
+>  }
+>  
+> -static int
+> +int
+>  cifs_setup_request(struct cifs_ses *ses, struct kvec *iov,
+>  		   unsigned int nvec, struct mid_q_entry **ret_mid)
+>  {
+> @@ -577,7 +577,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+>  
+>  	mutex_lock(&ses->server->srv_mutex);
+>  
+> -	rc = cifs_setup_request(ses, iov, n_vec, &midQ);
+> +	rc = ses->server->ops->setup_request(ses, iov, n_vec, &midQ);
+>  	if (rc) {
+>  		mutex_unlock(&ses->server->srv_mutex);
+>  		cifs_small_buf_release(buf);
+> @@ -640,7 +640,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+>  	else
+>  		*pRespBufType = CIFS_SMALL_BUFFER;
+>  
+> -	rc = cifs_check_receive(midQ, ses->server, flags & CIFS_LOG_ERROR);
+> +	rc = ses->server->ops->check_receive(midQ, ses->server,
+> +					     flags & CIFS_LOG_ERROR);
+>  
+>  	/* mark it so buf will not be freed by delete_mid */
+>  	if ((flags & CIFS_NO_RESP) == 0)
+
+Looks fine otherwise -- if you just remove the unneeded #include
+addition, you can add my:
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
