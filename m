@@ -1,186 +1,922 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 5/5] CIFS: Move add/set_credits and get_credits_field to
- ops structure
-Date: Fri, 18 May 2012 12:54:39 -0400
-Message-ID: <20120518125439.23525985@corrin.poochiereds.net>
-References: <1337269424-9494-1-git-send-email-piastry@etersoft.ru>
-	<1337269424-9494-6-git-send-email-piastry@etersoft.ru>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH] doc: remove old XML sources for mount.cifs.8 and
+ cifs.upcall.8
+Date: Fri, 18 May 2012 13:11:03 -0400
+Message-ID: <20120518131103.16995c7b@corrin.poochiereds.net>
+References: <1336992695-24231-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337269424-9494-6-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1336992695-24231-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 17 May 2012 19:43:44 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+On Mon, 14 May 2012 06:51:35 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h  |   25 +++++++++++++++----------
->  fs/cifs/cifsproto.h |    3 ---
->  fs/cifs/misc.c      |   19 -------------------
->  fs/cifs/smb1ops.c   |   28 ++++++++++++++++++++++++++++
->  fs/cifs/transport.c |    3 ++-
->  5 files changed, 45 insertions(+), 33 deletions(-)
+> These files were added when I originally split these tools off from the
+> samba sources, but we haven't ever used them to build the actual
+> manpages and they haven't been maintained. Remove them.
 > 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 7b3e8fe..d17db87 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -167,6 +167,9 @@ struct smb_version_operations {
->  			     struct mid_q_entry **);
->  	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
->  			     bool);
-> +	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
-> +	void (*set_credits)(struct TCP_Server_Info *, const int);
-> +	int * (*get_credits_field)(struct TCP_Server_Info *);
->  	unsigned int (*read_data_offset)(char *);
->  	unsigned int (*read_data_length)(char *);
->  	int (*map_error)(char *, bool);
-> @@ -367,16 +370,6 @@ in_flight(struct TCP_Server_Info *server)
->  	return num;
->  }
->  
-> -static inline int*
-> -get_credits_field(struct TCP_Server_Info *server)
-> -{
-> -	/*
-> -	 * This will change to switch statement when we reserve slots for echos
-> -	 * and oplock breaks.
-> -	 */
-> -	return &server->credits;
-> -}
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  doc/cifs.upcall.8.xml |  123 --------
+>  doc/mount.cifs.8.xml  |  751 -------------------------------------------------
+>  2 files changed, 0 insertions(+), 874 deletions(-)
+>  delete mode 100644 doc/cifs.upcall.8.xml
+>  delete mode 100644 doc/mount.cifs.8.xml
+> 
+> diff --git a/doc/cifs.upcall.8.xml b/doc/cifs.upcall.8.xml
+> deleted file mode 100644
+> index 77b9208..0000000
+> --- a/doc/cifs.upcall.8.xml
+> +++ /dev/null
+> @@ -1,123 +0,0 @@
+> -<?xml version="1.0" encoding="iso-8859-1"?>
+> -<!DOCTYPE refentry PUBLIC "-//Samba-Team//DTD DocBook V4.2-Based Variant V1.0//EN" "http://www.samba.org/samba/DTD/samba-doc">
+> -<refentry id="cifs.upcall.8">
 > -
->  static inline bool
->  has_credits(struct TCP_Server_Info *server, int *credits)
->  {
-> @@ -387,6 +380,18 @@ has_credits(struct TCP_Server_Info *server, int *credits)
->  	return num > 0;
->  }
->  
-> +static inline void
-> +cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
-> +{
-> +	server->ops->add_credits(server, add);
-> +}
-> +
-> +static inline void
-> +cifs_set_credits(struct TCP_Server_Info *server, const int val)
-> +{
-> +	server->ops->set_credits(server, val);
-> +}
-> +
-
-nit: maybe call these "add_credits and set_credits" and get rid of the
-leading '_' on the SMB1 functions below?
-
->  /*
->   * Macros to allow the TCP_Server_Info->net field and related code to drop out
->   * when CONFIG_NET_NS isn't set.
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 57af642..5ec21ec 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -90,9 +90,6 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
->  			struct smb_hdr *in_buf ,
->  			struct smb_hdr *out_buf,
->  			int *bytes_returned);
-> -extern void cifs_add_credits(struct TCP_Server_Info *server,
-> -			     const unsigned int add);
-> -extern void cifs_set_credits(struct TCP_Server_Info *server, const int val);
->  extern int checkSMB(char *buf, unsigned int length);
->  extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *);
->  extern bool backup_cred(struct cifs_sb_info *);
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index d2bb1e7..e2552d2 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -653,22 +653,3 @@ backup_cred(struct cifs_sb_info *cifs_sb)
->  
->  	return false;
->  }
 > -
-> -void
-> -cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
-> -{
-> -	spin_lock(&server->req_lock);
-> -	server->credits += add;
-> -	server->in_flight--;
-> -	spin_unlock(&server->req_lock);
-> -	wake_up(&server->request_q);
-> -}
+> -<refmeta>
+> -        <refentrytitle>cifs.upcall</refentrytitle>
+> -        <manvolnum>8</manvolnum>
+> -        <refmiscinfo class="source">cifs-utils</refmiscinfo>
+> -        <refmiscinfo class="manual">System Administration tools</refmiscinfo>
+> -        <refmiscinfo class="version">4.0</refmiscinfo>
+> -</refmeta>
 > -
-> -void
-> -cifs_set_credits(struct TCP_Server_Info *server, const int val)
-> -{
-> -	spin_lock(&server->req_lock);
-> -	server->credits = val;
-> -	server->oplocks = val > 1 ? enable_oplocks : false;
-> -	spin_unlock(&server->req_lock);
-> -}
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 8a0b35b..17a69ed 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -102,11 +102,39 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
->  	return NULL;
->  }
->  
-> +static void
-> +_cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
-> +{
-> +	spin_lock(&server->req_lock);
-> +	server->credits += add;
-> +	server->in_flight--;
-> +	spin_unlock(&server->req_lock);
-> +	wake_up(&server->request_q);
-> +}
-> +
-> +static void
-> +_cifs_set_credits(struct TCP_Server_Info *server, const int val)
-> +{
-> +	spin_lock(&server->req_lock);
-> +	server->credits = val;
-> +	server->oplocks = val > 1 ? enable_oplocks : false;
-> +	spin_unlock(&server->req_lock);
-> +}
-> +
-> +static int *
-> +cifs_get_credits_field(struct TCP_Server_Info *server)
-> +{
-> +	return &server->credits;
-> +}
-> +
->  struct smb_version_operations smb1_operations = {
->  	.send_cancel = send_nt_cancel,
->  	.compare_fids = cifs_compare_fids,
->  	.setup_request = cifs_setup_request,
->  	.check_receive = cifs_check_receive,
-> +	.add_credits = _cifs_add_credits,
-> +	.set_credits = _cifs_set_credits,
-> +	.get_credits_field = cifs_get_credits_field,
->  	.read_data_offset = cifs_read_data_offset,
->  	.read_data_length = cifs_read_data_length,
->  	.map_error = map_smb_to_linux_error,
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 87bd998..64c35fd 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -304,7 +304,8 @@ wait_for_free_credits(struct TCP_Server_Info *server, const int optype,
->  static int
->  wait_for_free_request(struct TCP_Server_Info *server, const int optype)
->  {
-> -	return wait_for_free_credits(server, optype, get_credits_field(server));
-> +	return wait_for_free_credits(server, optype,
-> +				     server->ops->get_credits_field(server));
->  }
->  
->  static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
+> -<refnamediv>
+> -        <refname>cifs.upcall</refname>
+> -        <refpurpose>Userspace upcall helper for Common Internet File System (CIFS)</refpurpose>
+> -</refnamediv>
+> -
+> -<refsynopsisdiv>
+> -        <cmdsynopsis>
+> -                <command>cifs.upcall</command>
+> -                <arg choice="opt">--trust-dns|-t</arg>
+> -                <arg choice="opt">--version|-v</arg>
+> -                <arg choice="req">keyid</arg>
+> -        </cmdsynopsis>
+> -</refsynopsisdiv>
+> -
+> -
+> -<refsect1>
+> -        <title>DESCRIPTION</title>
+> -
+> -        <para>This tool is part of the cifs-utils suite.</para>
+> -
+> -<para>cifs.upcall is a userspace helper program for the linux CIFS client
+> -filesystem. There are a number of activities that the kernel cannot easily
+> -do itself. This program is a callout program that does these things for the
+> -kernel and then returns the result.</para>
+> -
+> -<para>cifs.upcall is generally intended to be run when the kernel calls
+> -request-key<manvolnum>8</manvolnum> for a particular key type. While it
+> -can be run directly from the command-line, it's not generally intended
+> -to be run that way.</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>OPTIONS</title>
+> -	<variablelist>
+> -		<varlistentry>
+> -		<term>-c</term>
+> -		<listitem><para>This option is deprecated and is currently ignored.
+> -		</para></listitem>
+> -		</varlistentry>
+> -		<varlistentry>
+> -		<term>--trust-dns|-t</term>
+> -		<listitem><para>With krb5 upcalls, the name used as the host portion of the service principal defaults to the hostname portion of the UNC. This option allows the upcall program to reverse resolve the network address of the server in order to get the hostname.</para>
+> -		<para>This is less secure than not trusting DNS. When using this option, it's possible that an attacker could get control of DNS and trick the client into mounting a different server altogether. It's preferable to instead add server principals to the KDC for every possible hostname, but this option exists for cases where that isn't possible. The default is to not trust reverse hostname lookups in this fashion.
+> -		</para></listitem>
+> -		</varlistentry>
+> -		<varlistentry>
+> -		<term>--version|-v</term>
+> -		<listitem><para>Print version number and exit.
+> -		</para></listitem>
+> -		</varlistentry>
+> -	</variablelist>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>CONFIGURATION FOR KEYCTL</title>
+> -	<para>cifs.upcall is designed to be called from the kernel via the
+> -	request-key callout program. This requires that request-key be told
+> -	where and how to call this program. The current cifs.upcall program
+> -	handles two different key types:
+> -	</para>
+> -
+> -	<variablelist>
+> -		<varlistentry>
+> -		<term>cifs.spnego</term>
+> -		<listitem><para>This keytype is for retrieving kerberos session keys
+> -		</para></listitem>
+> -		</varlistentry>
+> -
+> -		<varlistentry>
+> -		<term>dns_resolver</term>
+> -		<listitem><para>This key type is for resolving hostnames into IP addresses
+> -		</para></listitem>
+> -		</varlistentry>
+> -	</variablelist>
+> -
+> -	<para>To make this program useful for CIFS, you'll need to set up entries for them in request-key.conf<manvolnum>5</manvolnum>. Here's an example of an entry for each key type:</para>
+> -<programlisting>
+> -#OPERATION  TYPE           D C PROGRAM ARG1 ARG2...
+> -#=========  =============  = = ================================
+> -create      cifs.spnego    * * /usr/local/sbin/cifs.upcall %k
+> -create      dns_resolver   * * /usr/local/sbin/cifs.upcall %k
+> -</programlisting>
+> -<para>
+> -See <citerefentry><refentrytitle>request-key.conf<manvolnum>5</manvolnum></refentrytitle></citerefentry> for more info on each field.
+> -</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -        <title>SEE ALSO</title>
+> -        <para>
+> -	<citerefentry><refentrytitle>request-key.conf</refentrytitle>
+> -        <manvolnum>5</manvolnum></citerefentry>,
+> -	<citerefentry><refentrytitle>mount.cifs</refentrytitle>
+> -        <manvolnum>8</manvolnum></citerefentry>
+> -	</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -        <title>AUTHOR</title>
+> -
+> -	<para>Igor Mammedov wrote the cifs.upcall program.</para>
+> -	<para>Jeff Layton authored this manpage.</para>
+> -	<para>The maintainer of the Linux CIFS VFS is Steve French.</para>
+> -        <para>The <ulink url="mailto:linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">Linux
+> -		CIFS Mailing list</ulink> is the preferred place to ask
+> -		questions regarding these programs.
+> -	</para>
+> -</refsect1>
+> -
+> -</refentry>
+> diff --git a/doc/mount.cifs.8.xml b/doc/mount.cifs.8.xml
+> deleted file mode 100644
+> index df3b9b5..0000000
+> --- a/doc/mount.cifs.8.xml
+> +++ /dev/null
+> @@ -1,751 +0,0 @@
+> -<?xml version="1.0" encoding="iso-8859-1"?>
+> -<!DOCTYPE refentry PUBLIC "-//Samba-Team//DTD DocBook V4.2-Based Variant V1.0//EN" "http://www.samba.org/samba/DTD/samba-doc">
+> -<refentry id="mount.cifs.8">
+> -
+> -<refmeta>
+> -	<refentrytitle>mount.cifs</refentrytitle>
+> -	<manvolnum>8</manvolnum>
+> -	<refmiscinfo class="source">cifs-utils</refmiscinfo>
+> -	<refmiscinfo class="manual">System Administration tools</refmiscinfo>
+> -	<refmiscinfo class="version">4.0</refmiscinfo>
+> -</refmeta>
+> -
+> -
+> -<refnamediv>
+> -	<refname>mount.cifs</refname>
+> -	<refpurpose>mount using the Common Internet File System (CIFS)</refpurpose>
+> -</refnamediv>
+> -
+> -<refsynopsisdiv>
+> -	<cmdsynopsis>
+> -
+> -		<command>mount.cifs</command>
+> -		<arg choice="req">service</arg>	
+> -		<arg choice="req">mount-point</arg>	
+> -		<arg choice="opt">-o options</arg>	
+> -	</cmdsynopsis>
+> -</refsynopsisdiv>
+> -
+> -<refsect1>
+> -	<title>DESCRIPTION</title>
+> -
+> -	<para>This tool is part of the cifs-utils suite.</para>
+> -
+> -	<para>mount.cifs mounts a Linux CIFS filesystem. It
+> -is usually invoked indirectly by
+> -the <citerefentry><refentrytitle>mount</refentrytitle><manvolnum>8</manvolnum></citerefentry> command when using the 
+> -"-t cifs" option. This command only works in Linux, and the kernel must
+> -support the cifs filesystem. The CIFS protocol is the successor to the 
+> -SMB protocol and is supported by most Windows servers and many other
+> -commercial servers and Network Attached Storage appliances as well as 
+> -by the popular Open Source server Samba.
+> -	</para>
+> -
+> -	<para>
+> -	The mount.cifs utility attaches the UNC name (exported network resource)
+> -	specified as <emphasis>service</emphasis> (using //server/share syntax,
+> -	where "server" is the server name or IP address and "share" is the name
+> -	of the share) to the local directory <emphasis>mount-point</emphasis>.
+> -	</para>
+> -
+> -	<para>
+> -		Options to <emphasis>mount.cifs</emphasis> are specified as a comma-separated
+> -list of key=value pairs. It is possible to send options other
+> -than those listed here, assuming that the cifs filesystem kernel module (cifs.ko) supports them.   
+> -Unrecognized cifs mount options passed to the cifs vfs kernel code will be logged to the
+> -kernel log.
+> -
+> -	</para>
+> -
+> -	<para><emphasis>mount.cifs</emphasis> causes the cifs vfs to launch a thread named cifsd. After mounting it keeps running until
+> -		the mounted resource is unmounted (usually via the umount utility).
+> -	</para>
+> -
+> -	<para>
+> -		<emphasis>mount.cifs -V</emphasis> command displays the version of cifs mount helper.
+> -	</para>
+> -	<para>
+> -
+> -		<emphasis>modinfo cifs</emphasis> command displays the version of cifs module.
+> -	</para>
+> -
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>OPTIONS</title>
+> -	<variablelist>
+> -		<varlistentry><term>user=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>specifies the username to connect as. If
+> -				this is not given, then the environment variable <emphasis>USER</emphasis> is used. This option can also take the
+> -form "user%password" or "workgroup/user" or
+> -"workgroup/user%password" to allow the password and workgroup
+> -to be specified as part of the username.
+> -		</para>
+> -
+> -<note>
+> -	<para>
+> -	The cifs vfs accepts the parameter <parameter>user=</parameter>, or for users familiar with smbfs it accepts the longer form of the parameter <parameter>username=</parameter>.  Similarly the longer smbfs style parameter names may be accepted as synonyms for the shorter cifs parameters <parameter>pass=</parameter>,<parameter>dom=</parameter> and <parameter>cred=</parameter>.
+> -	</para>
+> -</note>
+> -
+> -		</listitem>
+> -	</varlistentry>
+> -
+> -	<varlistentry><term>password=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>specifies the CIFS password. If this
+> -option is not given then the environment variable
+> -<emphasis>PASSWD</emphasis> is used. If the password is not specified
+> -directly or indirectly via an argument to mount, <emphasis>mount.cifs</emphasis> will prompt
+> -for a password, unless the guest option is specified.
+> -</para>
+> -
+> -<para>Note that a password which contains the delimiter
+> -character (i.e. a comma ',') will fail to be parsed correctly
+> -on the command line.  However, the same password defined
+> -in the PASSWD environment variable or via a credentials file (see
+> -below) or entered at the password prompt will be read correctly.
+> -</para>
+> -	</listitem></varlistentry>
+> -
+> -	<varlistentry><term>credentials=<replaceable>filename</replaceable></term>
+> -
+> -		<listitem><para>
+> -				specifies a file that contains a username
+> -				and/or password and optionally the name of the
+> -				workgroup. The format of the file is:
+> -			</para>
+> -
+> -<programlisting>
+> -		username=<replaceable>value</replaceable>
+> -		password=<replaceable>value</replaceable>
+> -		domain=<replaceable>value</replaceable>
+> -</programlisting>
+> -
+> -		<para>
+> -This is preferred over having passwords in plaintext in a
+> -shared file, such as <filename>/etc/fstab</filename>. Be sure to protect any
+> -credentials file properly.
+> -		</para>
+> -	</listitem></varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>uid=<replaceable>arg</replaceable></term>
+> -		<listitem>
+> -
+> -	<para>sets the uid that will own all files or directories on the
+> -mounted filesystem when the server does not provide ownership
+> -information. It may be specified as either a username or a numeric uid.
+> -When not specified, the default is uid 0.  The mount.cifs helper must be
+> -at version 1.10 or higher to support specifying the uid in non-numeric
+> -form. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more
+> -information.  </para>
+> -
+> -</listitem>
+> -</varlistentry>
+> -
+> -<varlistentry>
+> -	<term>forceuid</term>
+> -	<listitem>
+> -		<para>instructs the client to ignore any uid provided by
+> -the server for files and directories and to always assign the owner to
+> -be the value of the uid= option. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more information.</para>
+> -	</listitem>
+> -</varlistentry>
+> -
+> -<varlistentry>
+> -	<term>gid=<replaceable>arg</replaceable></term>
+> -	<listitem>
+> -
+> -		<para>sets the gid that will own all files or
+> -directories on the mounted filesystem when the server does not provide
+> -ownership information.  It may be specified as either a groupname or a
+> -numeric gid.  When not specified, the default is gid 0. The mount.cifs
+> -helper must be at version 1.10 or higher to support specifying the gid
+> -in non-numeric form. See the section on FILE AND DIRECTORY OWNERSHIP AND
+> -PERMISSIONS below for more information.</para>
+> -
+> -	</listitem>
+> -</varlistentry>
+> -
+> -<varlistentry>
+> -	<term>forcegid</term>
+> -	<listitem>
+> -		<para>instructs the client to ignore any gid provided by
+> -the server for files and directories and to always assign the owner to
+> -be the value of the gid= option. See the section on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS below for more information.</para>
+> -	</listitem>
+> -</varlistentry>
+> -
+> -<varlistentry>
+> -		<term>port=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>sets the port number on the server to attempt to contact to negotiate
+> -CIFS support.  If the CIFS server is not listening on this port or
+> -if it is not specified, the default ports will be tried i.e. 
+> -port 445 is tried and if no response then port 139 is tried.
+> -		</para></listitem>
+> -	</varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>servern=<replaceable>arg</replaceable></term>
+> -
+> -                <listitem><para>
+> -		Specify the server netbios name (RFC1001 name) to use
+> -                when attempting to setup a session to the server. Although
+> -		rarely needed for mounting to newer servers, this option
+> -                is needed for mounting to some older servers (such
+> -                as OS/2 or Windows 98 and Windows ME) since when connecting
+> -		over port 139 they, unlike most newer servers, do not
+> -                support a default server name.  A server name can be up
+> -                to 15 characters long and is usually uppercased.
+> -                </para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>netbiosname=<replaceable>arg</replaceable></term>
+> -
+> -                <listitem><para>When mounting to servers via port 139, specifies the RFC1001
+> -                source name to use to represent the client netbios machine
+> -                name when doing the RFC1001 netbios session initialize.
+> -		</para></listitem>
+> -        </varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>file_mode=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>If the server does not support the CIFS Unix extensions this
+> -				overrides the default file mode.</para></listitem>
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>dir_mode=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>If the server does not support the CIFS Unix extensions this
+> -				overrides the default mode for directories. </para></listitem>
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>ip=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>sets the destination IP address.  This option is set automatically if the server name portion of the requested UNC name can be resolved so rarely needs to be specified by the user.</para></listitem>
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>domain=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>sets the domain (workgroup) of the user </para></listitem>
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>guest</term>
+> -
+> -		<listitem><para>don't prompt for a password </para></listitem>
+> -
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>iocharset</term>
+> -
+> -		<listitem><para>Charset used to convert local path names to and from
+> -		Unicode. Unicode is used by default for network path
+> -		names if the server supports it. If iocharset is
+> -		not specified then the nls_default specified
+> -		during the local client kernel build will be used.
+> -		If server does not support Unicode, this parameter is
+> -		unused. </para></listitem>
+> -
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>ro</term>
+> -
+> -		<listitem><para>mount read-only</para></listitem>
+> -
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>rw</term>
+> -		<listitem><para>mount read-write</para></listitem>
+> -	</varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>setuids</term>
+> -                <listitem><para>If the CIFS Unix extensions are negotiated with the server
+> -                the client will attempt to set the effective uid and gid of
+> -                the local process on newly created files, directories, and
+> -                devices (create, mkdir, mknod). If the CIFS Unix Extensions
+> -                are not negotiated, for newly created files and directories
+> -                instead of using the default uid and gid specified on the
+> -                the mount, cache the new file's uid and gid locally which means
+> -                that the uid for the file can change when the inode is
+> -                reloaded (or the user remounts the share).</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>nosetuids</term>
+> -                <listitem><para>The client will not attempt to set the uid and gid on
+> -                on newly created files, directories, and devices (create,
+> -                mkdir, mknod) which will result in the server setting the
+> -                uid and gid to the default (usually the server uid of the
+> -                user who mounted the share).  Letting the server (rather than
+> -                the client) set the uid and gid is the default.If the CIFS
+> -                Unix Extensions are not negotiated then the uid and gid for
+> -                new files will appear to be the uid (gid) of the mounter or the
+> -                uid (gid) parameter specified on the mount.</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>perm</term>
+> -                <listitem><para>Client does permission checks (vfs_permission check of uid
+> -                and gid of the file against the mode and desired operation),
+> -                Note that this is in addition to the normal ACL check on the
+> -                target machine done by the server software.
+> -                Client permission checking is enabled by default.</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>noperm</term>
+> -                <listitem><para>Client does not do permission checks.  This can expose
+> -                files on this mount to access by other users on the local
+> -                client system. It is typically only needed when the server
+> -                supports the CIFS Unix Extensions but the UIDs/GIDs on the
+> -                client and server system do not match closely enough to allow
+> -                access by the user doing the mount.
+> -                Note that this does not affect the normal ACL check on the
+> -                target machine done by the server software (of the server
+> -                ACL against the user name provided at mount time).</para></listitem>
+> -        </varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>dynperm</term>
+> -		<listitem><para>Instructs the server to maintain ownership and
+> -permissions in memory that can't be stored on the server. This information can disappear at any time (whenever the inode is flushed from the cache), so while this may help make some applications work, it's behavior is somewhat unreliable. See the section below on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS for more information.
+> -		</para></listitem>
+> -	</varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>directio</term>
+> -                <listitem><para>Do not do inode data caching on files opened on this mount.
+> -                This precludes mmaping files on this mount. In some cases
+> -                with fast networks and little or no caching benefits on the
+> -                client (e.g. when the application is doing large sequential
+> -                reads bigger than page size without rereading the same data)
+> -                this can provide better performance than the default
+> -                behavior which caches reads (readahead) and writes
+> -                (writebehind) through the local Linux client pagecache
+> -                if oplock (caching token) is granted and held. Note that
+> -                direct allows write operations larger than page size
+> -                to be sent to the server. On some kernels this requires the cifs.ko module
+> -		to be built with the CIFS_EXPERIMENTAL configure option.</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>mapchars</term>
+> -                <listitem><para>Translate six of the seven reserved characters (not backslash, but including the colon, question mark, pipe, asterik, greater than and less than characters)
+> -                to the remap range (above 0xF000), which also
+> -                allows the CIFS client to recognize files created with
+> -                such characters by Windows's POSIX emulation. This can
+> -                also be useful when mounting to most versions of Samba
+> -                (which also forbids creating and opening files
+> -                whose names contain any of these seven characters).
+> -                This has no effect if the server does not support
+> -                Unicode on the wire. Please note that the files created
+> -		with mapchars mount option may not be accessible
+> -		if the share is mounted without that option.</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>nomapchars</term>
+> -                <listitem><para>Do not translate any of these seven characters (default)</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>intr</term>
+> -                <listitem><para>currently unimplemented</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>nointr</term>
+> -                <listitem><para>(default) currently unimplemented </para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>hard</term>
+> -                <listitem><para>The  program  accessing  a file on the cifs mounted file system will hang when the
+> -              server crashes.</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>soft</term>
+> -                <listitem><para>(default) The  program  accessing  a file on the cifs mounted file system will not hang when the server crashes and will return errors to the user application.</para></listitem>
+> -        </varlistentry>
+> -
+> -	<varlistentry>
+> -                <term>noacl</term>
+> -                <listitem><para>Do not allow POSIX ACL operations even if server would support them.</para><para>
+> -		The CIFS client can get and set POSIX ACLs (getfacl, setfacl) to Samba servers
+> -		version 3.0.10 and later.  Setting POSIX ACLs requires enabling both XATTR and
+> -		then POSIX support in the CIFS configuration options when building the cifs
+> -		module.  POSIX ACL support can be disabled on a per mount basis by specifying
+> -		"noacl" on mount.</para>
+> -		</listitem>
+> -	</varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>nocase</term>
+> -                <listitem>
+> -		<para>Request case insensitive path name matching (case
+> -                sensitive is the default if the server suports it).
+> -		</para>
+> -                </listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>sec=</term>
+> -                <listitem>
+> -                <para>Security mode.  Allowed values are:</para>
+> -			<itemizedlist>
+> -                        <listitem><para>none    attempt to connection as a null user (no name) </para></listitem>
+> -                        <listitem><para>krb5    Use Kerberos version 5 authentication</para></listitem>
+> -                        <listitem><para>krb5i   Use Kerberos authentication and packet signing</para></listitem>
+> -                        <listitem><para>ntlm    Use NTLM password hashing (default)</para></listitem>
+> -                        <listitem><para>ntlmi   Use NTLM password hashing with signing (if
+> -                                /proc/fs/cifs/PacketSigningEnabled on or if
+> -                                server requires signing also can be the default)</para></listitem>
+> -                        <listitem><para>ntlmv2  Use NTLMv2 password hashing</para></listitem>
+> -                        <listitem><para>ntlmv2i Use NTLMv2 password hashing with packet signing</para></listitem>
+> -			</itemizedlist>
+> -
+> -			<para>[NB This [sec parameter] is under development and expected to be available in cifs kernel module 1.40 and later]
+> -                </para>
+> -                </listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>nobrl</term>
+> -                <listitem>
+> -                <para>Do not send byte range lock requests to the server.
+> -                This is necessary for certain applications that break
+> -                with cifs style mandatory byte range locks (and most
+> -                cifs servers do not yet support requesting advisory
+> -                byte range locks).
+> -                </para>
+> -                </listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>sfu</term>
+> -                <listitem>
+> -                <para>
+> -		When the CIFS Unix Extensions are not negotiated, attempt to
+> -                create device files and fifos in a format compatible with
+> -                Services for Unix (SFU).  In addition retrieve bits 10-12
+> -                of the mode via the SETFILEBITS extended attribute (as
+> -                SFU does).  In the future the bottom 9 bits of the mode
+> -                mode also will be emulated using queries of the security
+> -                descriptor (ACL). [NB: requires version 1.39 or later
+> -		of the CIFS VFS.  To recognize symlinks and be able
+> -		to create symlinks in an SFU interoperable form
+> -		requires version 1.40 or later of the CIFS VFS kernel module.
+> -                </para>
+> -                </listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>serverino</term>
+> -                <listitem><para>Use inode numbers (unique persistent file identifiers)
+> -		returned by the server instead of automatically generating
+> -                temporary inode numbers on the client.  Although server inode numbers
+> -                make it easier to spot hardlinked files (as they will have
+> -                the same inode numbers) and inode numbers may be persistent (which is
+> -		userful for some sofware),
+> -                the server does not guarantee that the inode numbers
+> -                are unique if multiple server side mounts are exported under a
+> -                single share (since inode numbers on the servers might not
+> -                be unique if multiple filesystems are mounted under the same
+> -                shared higher level directory).  Note that not all 
+> -                servers support returning server inode numbers, although
+> -		those that support the CIFS Unix Extensions, and Windows 2000 and
+> -		later servers typically do support this (although not necessarily
+> -		on every local server filesystem). Parameter has no effect if
+> -                the server lacks support for returning inode numbers or equivalent.
+> -		</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>noserverino</term>
+> -		<listitem>
+> -		<para>
+> -			Client generates inode numbers (rather than
+> -		using the actual one from the server) by default.
+> -		</para>
+> -		<para>
+> -			See section <emphasis>INODE NUMBERS</emphasis> for
+> -		more information.
+> -		</para></listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -		<term>nounix</term>
+> -		<listitem>
+> -		<para>
+> -			Disable the CIFS Unix Extensions for this mount. This
+> -		can be useful in order to turn off multiple settings at once.
+> -		This includes POSIX acls, POSIX locks, POSIX paths, symlink
+> -		support and retrieving uids/gids/mode from the server. This
+> -		can also be useful to work around a bug in a server that
+> -		supports Unix Extensions.
+> -		</para>
+> -		<para>
+> -		See section <emphasis>INODE NUMBERS</emphasis> for
+> -		more information.
+> -		</para> </listitem>
+> -        </varlistentry>
+> -
+> -        <varlistentry>
+> -                <term>nouser_xattr</term>
+> -                <listitem><para>(default) Do not allow getfattr/setfattr to get/set xattrs, even if server would support it otherwise. </para></listitem>
+> -        </varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>rsize=<replaceable>arg</replaceable></term>
+> -		<listitem><para>default network read size (usually 16K). The client currently
+> -                can not use rsize larger than CIFSMaxBufSize. CIFSMaxBufSize
+> -                defaults to 16K and may be changed (from 8K to the maximum
+> -                kmalloc size allowed by your kernel) at module install time
+> -                for cifs.ko. Setting CIFSMaxBufSize to a very large value
+> -                will cause cifs to use more memory and may reduce performance
+> -                in some cases.  To use rsize greater than 127K (the original
+> -                cifs protocol maximum) also requires that the server support
+> -                a new Unix Capability flag (for very large read) which some
+> -                newer servers (e.g. Samba 3.0.26 or later) do. rsize can be
+> -                set from a minimum of 2048 to a maximum of 130048 (127K or
+> -                CIFSMaxBufSize, whichever is smaller)
+> -
+> -		</para></listitem>
+> -	</varlistentry>
+> -
+> -	<varlistentry>
+> -		<term>wsize=<replaceable>arg</replaceable></term>
+> -
+> -		<listitem><para>default network write size (default 57344)
+> -                maximum wsize currently allowed by CIFS is 57344 (fourteen
+> -                4096 byte pages)</para></listitem>
+> -	</varlistentry>
+> -	<varlistentry>
+> -		<term>fsc</term>
+> -
+> -		<listitem><para>Enable local disk caching using FS-Cache
+> -		for cifs. This option could be useful to improve performance
+> -		on a slow link, heavily loaded server and/or network
+> -		where reading from the disk is faster than reading from the
+> -		server (over the network). This could also impact the
+> -		scalability positively as the number of calls to the server
+> -		are reduced. But, be warned that local caching is not suitable
+> -		for all workloads, for e.g., read-once type workloads. So
+> -		you need to consider carefully the situation/workload before
+> -		using this option. Currently, local disk caching is enabled
+> -		for CIFS files opened as read-only.
+> -		NOTE: This feature is available only in the recent kernels
+> -		that have been built with the kernel config option
+> -		CONFIG_CIFS_FSCACHE. You also need to have cachefilesd daemon
+> -		installed and running to make the cache operational.
+> -                </para></listitem>
+> -	</varlistentry>
+> -	 <varlistentry>
+> -                <term>--verbose</term>
+> -                <listitem><para>Print additional debugging information for the mount. Note that this parameter must be specified before the -o. For example:</para><para>mount -t cifs //server/share /mnt --verbose -o user=username</para></listitem>
+> -        </varlistentry>
+> -
+> -
+> -	</variablelist>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>SERVICE FORMATTING AND DELIMITERS</title>
+> -
+> -	<para>
+> -		It's generally preferred to use forward slashes (/) as a delimiter in service names. They are considered to be the "universal delimiter" since they are generally not allowed to be embedded within path components on Windows machines and the client can convert them to blackslashes (\) unconditionally. Conversely, backslash characters are allowed by POSIX to be part of a path component, and can't be automatically converted in the same way.
+> -	</para>
+> -	<para>
+> -		mount.cifs will attempt to convert backslashes to forward slashes where it's able to do so, but it cannot do so in any path component following the sharename.
+> -	</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>INODE NUMBERS</title>
+> -	<para>
+> -		When Unix Extensions are enabled, we use the actual inode
+> -	number provided by the server in response to the POSIX calls as an
+> -	inode number.
+> -	</para>
+> -	<para>
+> -		When Unix Extensions are disabled and "serverino" mount option
+> -	is enabled there is no way to get the server inode number. The
+> -	client typically maps the server-assigned "UniqueID" onto an inode
+> -	number.
+> -	</para>
+> -	<para>
+> -		Note that the UniqueID is a different value from the server
+> -	inode number. The UniqueID value is unique over the scope of the entire
+> -	server and is often greater than 2 power 32. This value often makes
+> -	programs that are not compiled with LFS (Large File Support), to
+> -	trigger a glibc EOVERFLOW error as this won't fit in the target
+> -	structure field. It is strongly recommended to compile your programs
+> -	with LFS support (i.e. with -D_FILE_OFFSET_BITS=64) to prevent this
+> -	problem. You can also use "noserverino" mount option to generate inode
+> -	numbers smaller than 2 power 32 on the client. But you may not be able
+> -	to detect hardlinks properly.
+> -	</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS</title>
+> -
+> -	<para> The core CIFS protocol does not provide unix ownership
+> -information or mode for files and directories. Because of this, files
+> -and directories will generally appear to be owned by whatever values the
+> -uid= or gid= options are set, and will have permissions set to the
+> -default file_mode and dir_mode for the mount. Attempting to change these
+> -values via chmod/chown will return success but have no effect.</para>
+> -
+> -	<para>When the client and server negotiate unix extensions,
+> -files and directories will be assigned the uid, gid, and mode provided
+> -by the server. Because CIFS mounts are generally single-user, and the
+> -same credentials are used no matter what user accesses the mount, newly
+> -created files and directories will generally be given ownership
+> -corresponding to whatever credentials were used to mount the
+> -share.</para>
+> -
+> -	<para>If the uid's and gid's being used do not match on the
+> -client and server, the forceuid and forcegid options may be helpful.
+> -Note however, that there is no corresponding option to override the
+> -mode. Permissions assigned to a file when forceuid or forcegid are in
+> -effect may not reflect the the real permissions.</para>
+> -
+> -	<para>When unix extensions are not negotiated, it's also
+> -possible to emulate them locally on the server using the "dynperm" mount
+> -option. When this mount option is in effect, newly created files and
+> -directories will receive what appear to be proper permissions. These
+> -permissions are not stored on the server however and can disappear at
+> -any time in the future (subject to the whims of the kernel flushing out
+> -the inode cache). In general, this mount option is discouraged.
+> -	</para>
+> -
+> -	<para>It's also possible to override permission checking on the client
+> -altogether via the noperm option. Server-side permission checks cannot be
+> -overriden. The permission checks done by the server will always correspond to
+> -the credentials used to mount the share, and not necessarily to the user who is accessing the share.</para>
+> -
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>ENVIRONMENT VARIABLES</title>
+> -
+> -	<para>
+> -		The variable <emphasis>USER</emphasis> may contain the username of the
+> -person to be used to authenticate to the server.
+> -The variable can be used to set both username and
+> -password by using the format username%password.
+> -	</para>
+> -	
+> -	<para>
+> -		The variable <emphasis>PASSWD</emphasis> may contain the password of the
+> -person using the client.
+> -	</para>
+> -
+> -	<para>
+> -		The variable <emphasis>PASSWD_FILE</emphasis> may contain the pathname
+> -of a file to read the password from. A single line of input is
+> -read and used as the password.
+> -	</para>
+> -
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>NOTES</title>
+> -	
+> -	<para>This command may be used only by root, unless installed setuid, in which case the noeexec and nosuid mount flags are enabled. When installed as a setuid program, the program follows the conventions set forth by the mount program for user mounts.</para>
+> -
+> -	<para>
+> -	Some samba client tools like smbclient(8) honour client-side
+> -	configuration parameters present in smb.conf. Unlike those
+> -	client tools, <emphasis>mount.cifs</emphasis> ignores smb.conf
+> -	completely.
+> -	</para>
+> -
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>CONFIGURATION</title>
+> -		<para>
+> -The primary mechanism for making configuration changes and for reading 
+> -debug information for the cifs vfs is via the Linux /proc filesystem.
+> -In the directory <filename>/proc/fs/cifs</filename> are various 
+> -configuration files and pseudo files which can display debug information.  
+> -There are additional startup options such as maximum buffer size and number
+> -of buffers which only may be set when the kernel cifs vfs (cifs.ko module) is 
+> -loaded.  These can be seen by running the modinfo utility against the file
+> -cifs.ko which will list the options that may be passed to cifs during module
+> -installation (device driver load).
+> -For more information see the kernel file <filename>fs/cifs/README</filename>.
+> -</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>BUGS</title>
+> -
+> -	<para>Mounting using the CIFS URL specification is currently not supported.
+> -	</para>
+> -
+> -	<para>The credentials file does not handle usernames or passwords with
+> -		leading space.</para>
+> -
+> -	<para>
+> -Note that the typical response to a bug report is a suggestion
+> -to try the latest version first. So please try doing that first,
+> -and always include which versions you use of relevant software
+> -when reporting bugs (minimum: mount.cifs (try mount.cifs -V), kernel (see /proc/version) and
+> -server type you are trying to contact.
+> -</para>
+> -</refsect1>
+> -
+> -
+> -
+> -<refsect1>
+> -	<title>VERSION</title>
+> -
+> -	<para>This man page is correct for version 1.52 of 
+> -	the cifs vfs filesystem (roughly Linux kernel 2.6.24).</para>
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>SEE ALSO</title>
+> -	<para>
+> -	Documentation/filesystems/cifs.txt and fs/cifs/README in the linux kernel
+> -	source tree may contain additional options and information.
+> -</para>
+> -        <para><citerefentry><refentrytitle>umount.cifs</refentrytitle>
+> -        <manvolnum>8</manvolnum></citerefentry></para>
+> -
+> -</refsect1>
+> -
+> -<refsect1>
+> -	<title>AUTHOR</title>
+> -	
+> -	<para>Steve French</para>
+> -
+> -	<para>The syntax and manpage were loosely based on that of smbmount. It 
+> -		was converted to Docbook/XML by Jelmer Vernooij.</para>
+> -
+> -	<para>The maintainer of the Linux cifs vfs and the userspace
+> -		tool <emphasis>mount.cifs</emphasis> is <ulink url="mailto:sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org">Steve French</ulink>.
+> -		The <ulink url="mailto:linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org">Linux CIFS Mailing list</ulink> 
+> -		is the preferred place to ask questions regarding these programs. 
+> -	</para>
+> -
+> -</refsect1>
+> -
+> -</refentry>
 
-Other than the minor nit above, this looks fine:
+Committed...
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
