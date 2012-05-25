@@ -1,21 +1,29 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: security mechanism message
-Date: Fri, 25 May 2012 12:16:22 +0400
-Message-ID: <CAKywueQ6XysarjAddSxmn2+Emmq9Jb-ArFM4w+NroPMN_5ABWQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 0/6] transport/session code move to ops struct
+Date: Fri, 25 May 2012 13:19:17 +0400
+Message-ID: <1337937563-8417-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I still have these message:
+This is the regular patchset that makes the existing cifs code work through
+ops struct of the server.
 
-CIFS VFS: default security mechanism requested.  The default security
-mechanism will be upgraded from ntlm to ntlmv2 in kernel release 3.3
+Pavel Shilovsky (6):
+  CIFS: Move get_next_mid to ops struct
+  CIFS: Move trans2 processing to ops struct
+  CIFS: Extend credit mechanism to process request type
+  CIFS: Move protocol specific negotiate code to ops struct
+  CIFS: Move protocol specific session setup/logoff code to ops struct
+  CIFS: Move protocol specific tcon/tdis code to ops struct
 
-May be we should change it to "3.6" or smth else?
-
--- 
-Best regards,
-Pavel Shilovsky.
+ fs/cifs/cifsglob.h  |   40 ++++++-
+ fs/cifs/cifsproto.h |   12 +--
+ fs/cifs/cifssmb.c   |   22 ++--
+ fs/cifs/connect.c   |  226 ++++++---------------------------------
+ fs/cifs/misc.c      |   89 +---------------
+ fs/cifs/sess.c      |    5 +-
+ fs/cifs/smb1ops.c   |  298 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/transport.c |   36 ++++---
+ 8 files changed, 400 insertions(+), 328 deletions(-)
