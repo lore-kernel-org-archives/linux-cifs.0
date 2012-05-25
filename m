@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 5/6] CIFS: Move protocol specific session setup/logoff code to ops struct
-Date: Fri, 25 May 2012 13:19:22 +0400
-Message-ID: <1337937563-8417-6-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 6/6] CIFS: Move protocol specific tcon/tdis code to ops struct
+Date: Fri, 25 May 2012 13:19:23 +0400
+Message-ID: <1337937563-8417-7-git-send-email-pshilovsky@samba.org>
 References: <1337937563-8417-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,91 +9,160 @@ In-Reply-To: <1337937563-8417-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+and rename some variable around the code changes.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    4 ++++
- fs/cifs/cifsproto.h |    4 ++--
- fs/cifs/connect.c   |    4 ++--
- fs/cifs/sess.c      |    3 +--
+ fs/cifs/cifsglob.h  |    6 ++++++
+ fs/cifs/cifsproto.h |    5 ++---
+ fs/cifs/connect.c   |   47 ++++++++++++++++++++++++-----------------------
  fs/cifs/smb1ops.c   |    2 ++
- 5 files changed, 11 insertions(+), 6 deletions(-)
+ 4 files changed, 34 insertions(+), 26 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 1e09082..ee957a9 100644
+index ee957a9..e7faddb 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -196,6 +196,10 @@ struct smb_version_operations {
- 	bool (*need_neg)(struct TCP_Server_Info *);
- 	/* negotiate to the server */
- 	int (*negotiate)(int, struct cifs_ses *);
-+	/* setup smb sessionn */
-+	int (*sess_setup)(int, struct cifs_ses *, const struct nls_table *);
-+	/* close smb session */
-+	int (*logoff)(int, struct cifs_ses *);
+@@ -160,6 +160,7 @@ struct mid_q_entry;
+ struct TCP_Server_Info;
+ struct cifsFileInfo;
+ struct cifs_ses;
++struct cifs_tcon;
+ 
+ struct smb_version_operations {
+ 	int (*send_cancel)(struct TCP_Server_Info *, void *,
+@@ -200,6 +201,11 @@ struct smb_version_operations {
+ 	int (*sess_setup)(int, struct cifs_ses *, const struct nls_table *);
+ 	/* close smb session */
+ 	int (*logoff)(int, struct cifs_ses *);
++	/* connect to a server share */
++	int (*tree_connect)(int, struct cifs_ses *, const char *,
++			    struct cifs_tcon *, const struct nls_table *);
++	/* close tree connecion */
++	int (*tree_disconnect)(int, struct cifs_tcon *);
  };
  
  struct smb_version_values {
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 41d5a76..ecb8b28 100644
+index ecb8b28..749dc00 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -112,8 +112,8 @@ extern void header_assemble(struct smb_hdr *, char /* command */ ,
- extern int small_smb_init_no_tc(const int smb_cmd, const int wct,
- 				struct cifs_ses *ses,
- 				void **request_buf);
--extern int CIFS_SessSetup(unsigned int xid, struct cifs_ses *ses,
--			     const struct nls_table *nls_cp);
-+extern int CIFS_SessSetup(int xid, struct cifs_ses *ses,
-+			  const struct nls_table *nls_cp);
- extern struct timespec cifs_NTtimeToUnix(__le64 utc_nanoseconds_since_1601);
- extern u64 cifs_UnixTimeToNT(struct timespec);
- extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
+@@ -184,9 +184,8 @@ extern int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
+ 			struct nls_table *nls_info);
+ extern int CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses);
+ 
+-extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+-			const char *tree, struct cifs_tcon *tcon,
+-			const struct nls_table *);
++extern int CIFSTCon(int xid, struct cifs_ses *ses, const char *tree,
++		    struct cifs_tcon *tcon, const struct nls_table *);
+ 
+ extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+ 		const char *searchName, const struct nls_table *nls_codepage,
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 73db014..6a46fc9 100644
+index 6a46fc9..c74a45e 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2262,7 +2262,7 @@ cifs_put_smb_ses(struct cifs_ses *ses)
+@@ -2549,7 +2549,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
- 	if (ses->status == CifsGood) {
- 		xid = GetXid();
--		CIFSSMBLogoff(xid, ses);
-+		server->ops->logoff(xid, ses);
- 		_FreeXid(xid);
+ 	xid = GetXid();
+-	CIFSSMBTDis(xid, tcon);
++	ses->server->ops->tree_disconnect(xid, tcon);
+ 	_FreeXid(xid);
+ 
+ 	cifs_fscache_release_super_cookie(tcon);
+@@ -2596,13 +2596,15 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		goto out_fail;
  	}
- 	sesInfoFree(ses);
-@@ -3978,7 +3978,7 @@ int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
- 	cFYI(1, "Security Mode: 0x%x Capabilities: 0x%x TimeAdjust: %d",
- 		 server->sec_mode, server->capabilities, server->timeAdj);
  
--	rc = CIFS_SessSetup(xid, ses, nls_info);
-+	rc = server->ops->sess_setup(xid, ses, nls_info);
- 	if (rc) {
- 		cERROR(1, "Send error in SessSetup = %d", rc);
- 	} else {
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index f88fa4d..382a96f 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -556,8 +556,7 @@ setup_ntlmv2_ret:
+-	/* BB Do we need to wrap session_mutex around
+-	 * this TCon call and Unix SetFS as
+-	 * we do on SessSetup and reconnect? */
++	/*
++	 * BB Do we need to wrap session_mutex around this TCon call and Unix
++	 * SetFS as we do on SessSetup and reconnect?
++	 */
+ 	xid = GetXid();
+-	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
++	rc = ses->server->ops->tree_connect(xid, ses, volume_info->UNC, tcon,
++					    volume_info->local_nls);
+ 	FreeXid(xid);
+-	cFYI(1, "CIFS Tcon rc = %d", rc);
++	cFYI(1, "Tcon rc = %d", rc);
+ 	if (rc)
+ 		goto out_fail;
+ 
+@@ -2748,35 +2750,34 @@ out:
  }
  
  int
--CIFS_SessSetup(unsigned int xid, struct cifs_ses *ses,
--	       const struct nls_table *nls_cp)
-+CIFS_SessSetup(int xid, struct cifs_ses *ses, const struct nls_table *nls_cp)
+-get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
+-	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
+-	     struct dfs_info3_param **preferrals, int remap)
++get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
++	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
++	     struct dfs_info3_param **referrals, int remap)
  {
+ 	char *temp_unc;
  	int rc = 0;
- 	int wct;
+ 
+-	*pnum_referrals = 0;
+-	*preferrals = NULL;
++	*num_referrals = 0;
++	*referrals = NULL;
+ 
+-	if (pSesInfo->ipc_tid == 0) {
++	if (ses->ipc_tid == 0) {
+ 		temp_unc = kmalloc(2 /* for slashes */ +
+-			strnlen(pSesInfo->serverName,
+-				SERVER_NAME_LEN_WITH_NULL * 2)
+-				 + 1 + 4 /* slash IPC$ */  + 2,
+-				GFP_KERNEL);
++			strnlen(ses->serverName, SERVER_NAME_LEN_WITH_NULL * 2)
++				+ 1 + 4 /* slash IPC$ */ + 2, GFP_KERNEL);
+ 		if (temp_unc == NULL)
+ 			return -ENOMEM;
+ 		temp_unc[0] = '\\';
+ 		temp_unc[1] = '\\';
+-		strcpy(temp_unc + 2, pSesInfo->serverName);
+-		strcpy(temp_unc + 2 + strlen(pSesInfo->serverName), "\\IPC$");
+-		rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
+-		cFYI(1, "CIFS Tcon rc = %d ipc_tid = %d", rc, pSesInfo->ipc_tid);
++		strcpy(temp_unc + 2, ses->serverName);
++		strcpy(temp_unc + 2 + strlen(ses->serverName), "\\IPC$");
++		rc = ses->server->ops->tree_connect(xid, ses, temp_unc, NULL,
++						    nls_codepage);
++		cFYI(1, "Tcon rc = %d ipc_tid = %d", rc, ses->ipc_tid);
+ 		kfree(temp_unc);
+ 	}
+ 	if (rc == 0)
+-		rc = CIFSGetDFSRefer(xid, pSesInfo, old_path, preferrals,
+-				     pnum_referrals, nls_codepage, remap);
++		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
++				     num_referrals, nls_codepage, remap);
+ 	/* BB map targetUNCs to dfs_info3 structures, here or
+ 		in CIFSGetDFSRefer BB */
+ 
+@@ -3755,7 +3756,7 @@ out:
+  * pointer may be NULL.
+  */
+ int
+-CIFSTCon(unsigned int xid, struct cifs_ses *ses,
++CIFSTCon(int xid, struct cifs_ses *ses,
+ 	 const char *tree, struct cifs_tcon *tcon,
+ 	 const struct nls_table *nls_codepage)
+ {
 diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index b8f73c9..70ce554 100644
+index 70ce554..5e8d811 100644
 --- a/fs/cifs/smb1ops.c
 +++ b/fs/cifs/smb1ops.c
-@@ -430,6 +430,8 @@ struct smb_version_operations smb1_operations = {
- 	.check_trans2 = cifs_check_trans2,
- 	.need_neg = cifs_need_neg,
+@@ -432,6 +432,8 @@ struct smb_version_operations smb1_operations = {
  	.negotiate = cifs_negotiate,
-+	.sess_setup = CIFS_SessSetup,
-+	.logoff = CIFSSMBLogoff,
+ 	.sess_setup = CIFS_SessSetup,
+ 	.logoff = CIFSSMBLogoff,
++	.tree_connect = CIFSTCon,
++	.tree_disconnect = CIFSSMBTDis,
  };
  
  struct smb_version_values smb1_values = {
