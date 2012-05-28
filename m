@@ -1,76 +1,34 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Possible CIFS bug - open one file, get another
-Date: Sun, 27 May 2012 23:08:50 -0500
-Message-ID: <CAH2r5ms+QpPxz1g80Yx_qAGopqfjMVkJc2+s10000LShXv0pog@mail.gmail.com>
-References: <loom.20120528T051852-75@post.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dan Stromberg <strombrg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2 0/7] transport/session code move to ops struct
+Date: Mon, 28 May 2012 13:30:07 +0400
+Message-ID: <1338197414-22340-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <loom.20120528T051852-75-eS7Uydv5nfjZ+VzJOa5vwg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A network trace such as from wireshark or netmon (e.g. attached to a
-bug report) would help - as it would let us compare a working and
-failing scenario and see if the client is sending the wrong file name
-or the server is opening the wrong file in response to a request to
-open the correct file.
+This is the regular patchset that makes the existing cifs code work through
+ops struct of the server.
 
-There is additional information at
-http://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+The version #2 consists the S_OP code that makes the code execution safer.
 
-On Sun, May 27, 2012 at 10:22 PM, Dan Stromberg <strombrg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wr=
-ote:
->
-> Hi folks.
->
-> I have what may be an in-kernel CIFS filesystem bug.
->
-> It seems that if I open a specific file, I get the contents of a diff=
-erent file
-> back.
->
-> This may or may not have security implications.
->
-> Oddly, if I read the file with the same code in CPython 2.x, CPython =
-3.x or Pypy
-> (recent trunk), I see the error. =A0But if I run exactly the same cod=
-e on Jython
-> 2.5.x, it works fine.
->
-> Also, if I reboot, things work OK for a while.
->
-> And if I umount+mount, that works too.
->
-> I ran across the issue, because I have a backup program I've been wri=
-ting for
-> fun, and it saves the same timestamp inside a file, and in its filena=
-me. =A0When I
-> assert that the two are the same within some smallish tolerance, the =
-assertion
-> sometimes fails, as described above.
->
-> Is there a bugtracker somewhere that such an issue should go into?
->
-> Has this already been fixed in later kernels?
->
-> I'm on Linux Mint 12, kernel 3.0.0-12-generic.
->
-> Thanks!
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at =A0http://vger.kernel.org/majordomo-info.html
+Pavel Shilovsky (7):
+  CIFS: Introduce S_OP/S_OPV macros for a safe access to ops struct
+    field
+  CIFS: Move get_next_mid to ops struct
+  CIFS: Move trans2 processing to ops struct
+  CIFS: Extend credit mechanism to process request type
+  CIFS: Move protocol specific negotiate code to ops struct
+  CIFS: Move protocol specific session setup/logoff code to ops struct
+  CIFS: Move protocol specific tcon/tdis code to ops struct
 
-
-
---=20
-Thanks,
-
-Steve
+ fs/cifs/cifsglob.h  |   60 +++++++++--
+ fs/cifs/cifsproto.h |   12 +--
+ fs/cifs/cifssmb.c   |   28 +++---
+ fs/cifs/connect.c   |  236 +++++++-----------------------------------
+ fs/cifs/file.c      |    2 +-
+ fs/cifs/misc.c      |   89 +----------------
+ fs/cifs/sess.c      |    5 +-
+ fs/cifs/smb1ops.c   |  290 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/transport.c |   47 +++++----
+ 9 files changed, 423 insertions(+), 346 deletions(-)
