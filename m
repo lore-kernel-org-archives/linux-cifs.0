@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 5/7] CIFS: Move protocol specific negotiate code to ops struct
-Date: Mon, 28 May 2012 13:30:12 +0400
-Message-ID: <1338197414-22340-6-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 4/7] CIFS: Extend credit mechanism to process request type
+Date: Mon, 28 May 2012 13:30:11 +0400
+Message-ID: <1338197414-22340-5-git-send-email-pshilovsky@samba.org>
 References: <1338197414-22340-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,157 +9,313 @@ In-Reply-To: <1338197414-22340-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+that will be required further by SMB2 code. As for CIFS - the logic
+isn't changed.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    8 ++++++--
- fs/cifs/cifssmb.c  |    2 +-
- fs/cifs/connect.c  |   15 ++++-----------
- fs/cifs/sess.c     |    2 +-
- fs/cifs/smb1ops.c  |   23 +++++++++++++++++++++++
- 5 files changed, 35 insertions(+), 15 deletions(-)
+ fs/cifs/cifsglob.h  |   12 ++++++++----
+ fs/cifs/cifsproto.h |    2 +-
+ fs/cifs/cifssmb.c   |   12 ++++++------
+ fs/cifs/smb1ops.c   |   10 ++--------
+ fs/cifs/transport.c |   34 +++++++++++++++++++---------------
+ 5 files changed, 36 insertions(+), 34 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index c1030ce..9152e31 100644
+index 3b2d313..c1030ce 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -192,6 +192,10 @@ struct smb_version_operations {
- 	/* process transaction2 response */
- 	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
- 			     char *, int);
-+	/* check if we need to negotiate */
-+	bool (*need_neg)(struct TCP_Server_Info *);
-+	/* negotiate to the server */
-+	int (*negotiate)(int, struct cifs_ses *);
- };
- 
- struct smb_version_values {
-@@ -324,7 +328,7 @@ struct TCP_Server_Info {
- 	struct mutex srv_mutex;
- 	struct task_struct *tsk;
- 	char server_GUID[16];
--	char sec_mode;
-+	__u16 sec_mode;
- 	bool session_estab; /* mark when very first sess is established */
- 	u16 dialect; /* dialect index that server chose */
- 	enum securityEnum secType;
-@@ -477,7 +481,7 @@ struct cifs_ses {
- 	char *serverOS;		/* name of operating system underlying server */
- 	char *serverNOS;	/* name of network operating system of server */
- 	char *serverDomain;	/* security realm of server */
--	int Suid;		/* remote smb uid  */
-+	__u64 Suid;		/* remote smb uid  */
- 	uid_t linux_uid;        /* overriding owner of files on the mount */
- 	uid_t cred_uid;		/* owner of credentials */
- 	int capabilities;
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 2105e56..6fa39fe 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -456,7 +456,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
- 			rc = -EOPNOTSUPP;
- 			goto neg_err_exit;
- 		}
--		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
-+		server->sec_mode = le16_to_cpu(rsp->SecurityMode);
- 		server->maxReq = min_t(unsigned int,
- 				       le16_to_cpu(rsp->MaxMpxCount),
- 				       cifs_max_pending);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1c7af1d..0b9351a 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -406,7 +406,7 @@ cifs_echo_request(struct work_struct *work)
- 	 * done, which is indicated by maxBuf != 0. Also, no need to ping if
- 	 * we got a response recently
- 	 */
--	if (server->maxBuf == 0 ||
-+	if (S_OP(server, need_neg, false, server) ||
- 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
- 		goto requeue_echo;
- 
-@@ -3945,18 +3945,12 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
- 	struct TCP_Server_Info *server = ses->server;
- 
- 	/* only send once per connect */
--	if (server->maxBuf != 0)
-+	if (!S_OP(server, need_neg, false, server))
- 		return 0;
- 
- 	set_credits(server, 1);
--	rc = CIFSSMBNegotiate(xid, ses);
--	if (rc == -EAGAIN) {
--		/* retry only once on 1st time connection */
--		set_credits(server, 1);
--		rc = CIFSSMBNegotiate(xid, ses);
--		if (rc == -EAGAIN)
--			rc = -EHOSTDOWN;
--	}
-+
-+	rc = S_OP(server, negotiate, -ENOSYS, xid, ses);
- 	if (rc == 0) {
- 		spin_lock(&GlobalMid_Lock);
- 		if (server->tcpStatus == CifsNeedNegotiate)
-@@ -3964,7 +3958,6 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
- 		else
- 			rc = -EHOSTDOWN;
- 		spin_unlock(&GlobalMid_Lock);
--
- 	}
- 
- 	return rc;
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 551d0c2..f88fa4d 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -898,7 +898,7 @@ ssetup_ntlmssp_authenticate:
- 	if (action & GUEST_LOGIN)
- 		cFYI(1, "Guest login"); /* BB mark SesInfo struct? */
- 	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
--	cFYI(1, "UID = %d ", ses->Suid);
-+	cFYI(1, "UID = %llu ", ses->Suid);
- 	/* response can have either 3 or 4 word count - Samba sends 3 */
- 	/* and lanman response is 3 */
- 	bytes_remaining = get_bcc(smb_buf);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index a562695..0ae208a 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -377,6 +377,27 @@ cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 	return true;
+@@ -171,9 +171,11 @@ struct smb_version_operations {
+ 	/* check response: verify signature, map error */
+ 	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
+ 			     bool);
+-	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
++	void (*add_credits)(struct TCP_Server_Info *, const unsigned int,
++			    const int);
+ 	void (*set_credits)(struct TCP_Server_Info *, const int);
+-	int * (*get_credits_field)(struct TCP_Server_Info *);
++	int * (*get_credits_field)(struct TCP_Server_Info *, const int);
++	unsigned int (*get_credits)(struct mid_q_entry *);
+ 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
+ 	/* data offset from read response message */
+ 	unsigned int (*read_data_offset)(char *);
+@@ -410,9 +412,10 @@ has_credits(struct TCP_Server_Info *server, int *credits)
  }
  
-+static bool
-+cifs_need_neg(struct TCP_Server_Info *server)
-+{
-+	return server->maxBuf == 0;
-+}
-+
-+static int
-+cifs_negotiate(int xid, struct cifs_ses *ses)
-+{
-+	int rc;
-+	rc = CIFSSMBNegotiate(xid, ses);
-+	if (rc == -EAGAIN) {
-+		/* retry only once on 1st time connection */
-+		set_credits(ses->server, 1);
-+		rc = CIFSSMBNegotiate(xid, ses);
-+		if (rc == -EAGAIN)
-+			rc = -EHOSTDOWN;
-+	}
-+	return rc;
-+}
-+
- struct smb_version_operations smb1_operations = {
- 	.send_cancel = send_nt_cancel,
- 	.compare_fids = cifs_compare_fids,
-@@ -393,6 +414,8 @@ struct smb_version_operations smb1_operations = {
- 	.dump_detail = cifs_dump_detail,
- 	.is_oplock_break = is_valid_oplock_break,
- 	.check_trans2 = cifs_check_trans2,
-+	.need_neg = cifs_need_neg,
-+	.negotiate = cifs_negotiate,
- };
+ static inline void
+-add_credits(struct TCP_Server_Info *server, const unsigned int add)
++add_credits(struct TCP_Server_Info *server, const unsigned int add,
++	    const int optype)
+ {
+-	S_OPV(server, add_credits, server, add);
++	S_OPV(server, add_credits, server, add, optype);
+ }
  
- struct smb_version_values smb1_values = {
+ static inline void
+@@ -974,6 +977,7 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
+ #define   CIFS_LOG_ERROR    0x010    /* log NT STATUS if non-zero */
+ #define   CIFS_LARGE_BUF_OP 0x020    /* large request buffer */
+ #define   CIFS_NO_RESP      0x040    /* no response buffer required */
++#define   CIFS_REQ_MASK    0x0180    /* mask request type */
+ 
+ /* Security Flags: indicate type of session setup needed */
+ #define   CIFSSEC_MAY_SIGN	0x00001
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 0a6cbfe..41d5a76 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -71,7 +71,7 @@ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+ extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 			   unsigned int nvec, mid_receive_t *receive,
+ 			   mid_callback_t *callback, void *cbdata,
+-			   bool ignore_pend);
++			   const int optype);
+ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+ 			struct smb_hdr * /* input */ ,
+ 			struct smb_hdr * /* out */ ,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index b80c4fd..2105e56 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -720,7 +720,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+ 	struct TCP_Server_Info *server = mid->callback_data;
+ 
+ 	DeleteMidQEntry(mid);
+-	add_credits(server, 1);
++	add_credits(server, 1, 0);
+ }
+ 
+ int
+@@ -747,7 +747,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+ 	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
+ 
+ 	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
+-			     server, true);
++			     server, CIFS_ASYNC_OP);
+ 	if (rc)
+ 		cFYI(1, "Echo request failed: %d", rc);
+ 
+@@ -1563,7 +1563,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 
+ 	queue_work(cifsiod_wq, &rdata->work);
+ 	DeleteMidQEntry(mid);
+-	add_credits(server, 1);
++	add_credits(server, 1, 0);
+ }
+ 
+ /* cifs_async_readv - send an async write, and set up mid to handle result */
+@@ -1619,7 +1619,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
+ 	kref_get(&rdata->refcount);
+ 	rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
+ 			     cifs_readv_receive, cifs_readv_callback,
+-			     rdata, false);
++			     rdata, 0);
+ 
+ 	if (rc == 0)
+ 		cifs_stats_inc(&tcon->num_reads);
+@@ -2010,7 +2010,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
+ 
+ 	queue_work(cifsiod_wq, &wdata->work);
+ 	DeleteMidQEntry(mid);
+-	add_credits(tcon->ses->server, 1);
++	add_credits(tcon->ses->server, 1, 0);
+ }
+ 
+ /* cifs_async_writev - send an async write, and set up mid to handle result */
+@@ -2090,7 +2090,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 
+ 	kref_get(&wdata->refcount);
+ 	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
+-			     NULL, cifs_writev_callback, wdata, false);
++			     NULL, cifs_writev_callback, wdata, 0);
+ 
+ 	if (rc == 0)
+ 		cifs_stats_inc(&tcon->num_writes);
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 28359e7..a562695 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -101,7 +101,8 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
+ }
+ 
+ static void
+-cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
++cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add,
++		 const int optype)
+ {
+ 	spin_lock(&server->req_lock);
+ 	server->credits += add;
+@@ -119,12 +120,6 @@ cifs_set_credits(struct TCP_Server_Info *server, const int val)
+ 	spin_unlock(&server->req_lock);
+ }
+ 
+-static int *
+-cifs_get_credits_field(struct TCP_Server_Info *server)
+-{
+-	return &server->credits;
+-}
+-
+ /*
+  * Find a free multiplex id (SMB mid). Otherwise there could be
+  * mid collisions which might cause problems, demultiplexing the
+@@ -389,7 +384,6 @@ struct smb_version_operations smb1_operations = {
+ 	.check_receive = cifs_check_receive,
+ 	.add_credits = cifs_add_credits,
+ 	.set_credits = cifs_set_credits,
+-	.get_credits_field = cifs_get_credits_field,
+ 	.get_next_mid = cifs_get_next_mid,
+ 	.read_data_offset = cifs_read_data_offset,
+ 	.read_data_length = cifs_read_data_length,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 9bb5362..3fcfc20 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -307,7 +307,7 @@ wait_for_free_request(struct TCP_Server_Info *server, const int optype)
+ 	return wait_for_free_credits(server, optype,
+ 				     S_OP(server, get_credits_field,
+ 					  &server->credits /* def ret */,
+-					  server));
++					  server, optype));
+ }
+ 
+ static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
+@@ -386,12 +386,12 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
+ int
+ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 		unsigned int nvec, mid_receive_t *receive,
+-		mid_callback_t *callback, void *cbdata, bool ignore_pend)
++		mid_callback_t *callback, void *cbdata, const int optype)
+ {
+ 	int rc;
+ 	struct mid_q_entry *mid;
+ 
+-	rc = wait_for_free_request(server, ignore_pend ? CIFS_ASYNC_OP : 0);
++	rc = wait_for_free_request(server, optype);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -399,7 +399,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	rc = cifs_setup_async_request(server, iov, nvec, &mid);
+ 	if (rc) {
+ 		mutex_unlock(&server->srv_mutex);
+-		add_credits(server, 1);
++		add_credits(server, 1, optype);
+ 		wake_up(&server->request_q);
+ 		return rc;
+ 	}
+@@ -421,7 +421,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	return rc;
+ out_err:
+ 	delete_mid(mid);
+-	add_credits(server, 1);
++	add_credits(server, 1, optype);
+ 	wake_up(&server->request_q);
+ 	return rc;
+ }
+@@ -540,11 +540,13 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	     const int flags)
+ {
+ 	int rc = 0;
+-	int long_op;
++	int long_op, optype;
+ 	struct mid_q_entry *midQ;
+ 	char *buf = iov[0].iov_base;
++	unsigned int credits = 1;
+ 
+ 	long_op = flags & CIFS_TIMEOUT_MASK;
++	optype = flags & CIFS_REQ_MASK;
+ 
+ 	*pRespBufType = CIFS_NO_BUFFER;  /* no response buf yet */
+ 
+@@ -565,7 +567,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	 * use ses->maxReq.
+ 	 */
+ 
+-	rc = wait_for_free_request(ses->server, long_op);
++	rc = wait_for_free_request(ses->server, optype);
+ 	if (rc) {
+ 		cifs_small_buf_release(buf);
+ 		return rc;
+@@ -584,7 +586,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		cifs_small_buf_release(buf);
+ 		/* Update # of requests on wire to server */
+-		add_credits(ses->server, 1);
++		add_credits(ses->server, 1, optype);
+ 		return rc;
+ 	}
+ 
+@@ -614,7 +616,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 			midQ->callback = DeleteMidQEntry;
+ 			spin_unlock(&GlobalMid_Lock);
+ 			cifs_small_buf_release(buf);
+-			add_credits(ses->server, 1);
++			add_credits(ses->server, 1, optype);
+ 			return rc;
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+@@ -624,7 +626,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	rc = cifs_sync_mid_result(midQ, ses->server);
+ 	if (rc != 0) {
+-		add_credits(ses->server, 1);
++		add_credits(ses->server, 1, optype);
+ 		return rc;
+ 	}
+ 
+@@ -642,6 +644,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 	else
+ 		*pRespBufType = CIFS_SMALL_BUFFER;
+ 
++	credits = S_OP(ses->server, get_credits, 1, midQ);
++
+ 	rc = S_OP(ses->server, check_receive, -ENOSYS, midQ, ses->server,
+ 		  flags & CIFS_LOG_ERROR);
+ 
+@@ -650,7 +654,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
+ 		midQ->resp_buf = NULL;
+ out:
+ 	delete_mid(midQ);
+-	add_credits(ses->server, 1);
++	add_credits(ses->server, credits, optype);
+ 
+ 	return rc;
+ }
+@@ -700,7 +704,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	if (rc) {
+ 		mutex_unlock(&ses->server->srv_mutex);
+ 		/* Update # of requests on wire to server */
+-		add_credits(ses->server, 1);
++		add_credits(ses->server, 1, 0);
+ 		return rc;
+ 	}
+ 
+@@ -732,7 +736,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 			/* no longer considered to be "in-flight" */
+ 			midQ->callback = DeleteMidQEntry;
+ 			spin_unlock(&GlobalMid_Lock);
+-			add_credits(ses->server, 1);
++			add_credits(ses->server, 1, 0);
+ 			return rc;
+ 		}
+ 		spin_unlock(&GlobalMid_Lock);
+@@ -740,7 +744,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	rc = cifs_sync_mid_result(midQ, ses->server);
+ 	if (rc != 0) {
+-		add_credits(ses->server, 1);
++		add_credits(ses->server, 1, 0);
+ 		return rc;
+ 	}
+ 
+@@ -756,7 +760,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = cifs_check_receive(midQ, ses->server, 0);
+ out:
+ 	delete_mid(midQ);
+-	add_credits(ses->server, 1);
++	add_credits(ses->server, 1, 0);
+ 
+ 	return rc;
+ }
 -- 
 1.7.1
