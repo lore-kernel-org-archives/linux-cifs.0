@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 1/7] CIFS: Introduce S_OP/S_OPV macros for a safe access to ops struct field
-Date: Mon, 28 May 2012 13:30:08 +0400
-Message-ID: <1338197414-22340-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 2/7] CIFS: Move get_next_mid to ops struct
+Date: Mon, 28 May 2012 13:30:09 +0400
+Message-ID: <1338197414-22340-3-git-send-email-pshilovsky@samba.org>
 References: <1338197414-22340-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,184 +11,331 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |   22 ++++++++++++++++++++--
- fs/cifs/cifssmb.c   |    6 +++---
- fs/cifs/connect.c   |    8 ++++----
- fs/cifs/file.c      |    2 +-
- fs/cifs/transport.c |   13 +++++++------
- 5 files changed, 35 insertions(+), 16 deletions(-)
+ fs/cifs/cifsglob.h  |    7 ++++
+ fs/cifs/cifsproto.h |    1 -
+ fs/cifs/cifssmb.c   |    8 ++--
+ fs/cifs/connect.c   |    2 +-
+ fs/cifs/misc.c      |   89 +--------------------------------------------------
+ fs/cifs/smb1ops.c   |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/transport.c |    2 +-
+ 7 files changed, 103 insertions(+), 95 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 20350a9..168be60 100644
+index 168be60..8e42c91 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -367,6 +367,24 @@ struct TCP_Server_Info {
- #endif
- };
- 
-+/*
-+ * The macro is used for safe access to ops field.
-+ *
-+ * @server - pointer to the server.
-+ * @op - name of ops field.
-+ * @miss_code - return code.
-+ * @... - ops field arguments.
-+ *
-+ * Return miss_code if server->ops doesn't have op field. Otherwise - return
-+ * servr->ops->op(...).
-+ */
-+
-+#define S_OP(server, op, miss_code, ...) \
-+	(server->ops->op ? server->ops->op(__VA_ARGS__) : miss_code)
-+
-+/* Void returned version of S_OP macro */
-+#define S_OPV(server, op, ...) S_OP(server, op, 0, __VA_ARGS__)
-+
- static inline unsigned int
- in_flight(struct TCP_Server_Info *server)
- {
-@@ -390,13 +408,13 @@ has_credits(struct TCP_Server_Info *server, int *credits)
- static inline void
- add_credits(struct TCP_Server_Info *server, const unsigned int add)
- {
--	server->ops->add_credits(server, add);
-+	S_OPV(server, add_credits, server, add);
+@@ -174,6 +174,7 @@ struct smb_version_operations {
+ 	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
+ 	void (*set_credits)(struct TCP_Server_Info *, const int);
+ 	int * (*get_credits_field)(struct TCP_Server_Info *);
++	__u64 (*get_next_mid)(struct TCP_Server_Info *);
+ 	/* data offset from read response message */
+ 	unsigned int (*read_data_offset)(char *);
+ 	/* data length from read response message */
+@@ -417,6 +418,12 @@ set_credits(struct TCP_Server_Info *server, const int val)
+ 	S_OPV(server, set_credits, server, val);
  }
  
- static inline void
- set_credits(struct TCP_Server_Info *server, const int val)
- {
--	server->ops->set_credits(server, val);
-+	S_OPV(server, set_credits, server, val);
- }
- 
++static inline __u64
++get_next_mid(struct TCP_Server_Info *server)
++{
++	return S_OP(server, get_next_mid, 0, server);
++}
++
  /*
+  * Macros to allow the TCP_Server_Info->net field and related code to drop out
+  * when CONFIG_NET_NS isn't set.
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 5ec21ec..0a6cbfe 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -114,7 +114,6 @@ extern int small_smb_init_no_tc(const int smb_cmd, const int wct,
+ 				void **request_buf);
+ extern int CIFS_SessSetup(unsigned int xid, struct cifs_ses *ses,
+ 			     const struct nls_table *nls_cp);
+-extern __u64 GetNextMid(struct TCP_Server_Info *server);
+ extern struct timespec cifs_NTtimeToUnix(__le64 utc_nanoseconds_since_1601);
+ extern u64 cifs_UnixTimeToNT(struct timespec);
+ extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index b5ad716..2d73db8 100644
+index 2d73db8..b80c4fd 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -1440,7 +1440,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	server->total_read += length;
+@@ -268,7 +268,7 @@ small_smb_init_no_tc(const int smb_command, const int wct,
+ 		return rc;
  
- 	/* Was the SMB read successful? */
--	rdata->result = server->ops->map_error(buf, false);
-+	rdata->result = S_OP(server, map_error, -ENOSYS, buf, false);
- 	if (rdata->result != 0) {
- 		cFYI(1, "%s: server returned error %d", __func__,
- 			rdata->result);
-@@ -1456,7 +1456,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		return cifs_readv_discard(server, mid);
+ 	buffer = (struct smb_hdr *)*request_buf;
+-	buffer->Mid = GetNextMid(ses->server);
++	buffer->Mid = get_next_mid(ses->server);
+ 	if (ses->capabilities & CAP_UNICODE)
+ 		buffer->Flags2 |= SMBFLG2_UNICODE;
+ 	if (ses->capabilities & CAP_STATUS32)
+@@ -402,7 +402,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
+ 
+ 	cFYI(1, "secFlags 0x%x", secFlags);
+ 
+-	pSMB->hdr.Mid = GetNextMid(server);
++	pSMB->hdr.Mid = get_next_mid(server);
+ 	pSMB->hdr.Flags2 |= (SMBFLG2_UNICODE | SMBFLG2_ERR_STATUS);
+ 
+ 	if ((secFlags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
+@@ -782,7 +782,7 @@ CIFSSMBLogoff(const int xid, struct cifs_ses *ses)
+ 		return rc;
  	}
  
--	data_offset = server->ops->read_data_offset(buf) + 4;
-+	data_offset = S_OP(server, read_data_offset, 0, buf) + 4;
- 	if (data_offset < server->total_read) {
- 		/*
- 		 * win2k8 sometimes sends an offset of 0 when the read
-@@ -1495,7 +1495,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		rdata->iov[0].iov_base, rdata->iov[0].iov_len);
+-	pSMB->hdr.Mid = GetNextMid(ses->server);
++	pSMB->hdr.Mid = get_next_mid(ses->server);
  
- 	/* how much data is in the response? */
--	data_len = server->ops->read_data_length(buf);
-+	data_len = S_OP(server, read_data_length, 0, buf);
- 	if (data_offset + data_len > buflen) {
- 		/* data_len is corrupt -- discard frame */
- 		rdata->result = -EIO;
+ 	if (ses->server->sec_mode &
+ 		   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+@@ -4762,7 +4762,7 @@ getDFSRetry:
+ 
+ 	/* server pointer checked in called function,
+ 	but should never be null here anyway */
+-	pSMB->hdr.Mid = GetNextMid(ses->server);
++	pSMB->hdr.Mid = get_next_mid(ses->server);
+ 	pSMB->hdr.Tid = ses->ipc_tid;
+ 	pSMB->hdr.Uid = ses->Suid;
+ 	if (ses->capabilities & CAP_STATUS32)
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index ccafded..cba90e2 100644
+index cba90e2..5402432 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -968,7 +968,7 @@ standard_receive3(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	 * 48 bytes is enough to display the header and a little bit
- 	 * into the payload for debugging purposes.
- 	 */
--	length = server->ops->check_message(buf, server->total_read);
-+	length = S_OP(server, check_message, -ENOSYS, buf, server->total_read);
- 	if (length != 0)
- 		cifs_dump_mem("Bad SMB: ", buf,
- 			min_t(unsigned int, server->total_read, 48));
-@@ -1041,7 +1041,7 @@ cifs_demultiplex_thread(void *p)
- 			continue;
- 		server->total_read += length;
+@@ -3938,7 +3938,7 @@ CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+ 	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
+ 			NULL /*no tid */ , 4 /*wct */ );
  
--		mid_entry = server->ops->find_mid(server, buf);
-+		mid_entry = S_OP(server, find_mid, NULL, server, buf);
+-	smb_buffer->Mid = GetNextMid(ses->server);
++	smb_buffer->Mid = get_next_mid(ses->server);
+ 	smb_buffer->Uid = ses->Suid;
+ 	pSMB = (TCONX_REQ *) smb_buffer;
+ 	pSMBr = (TCONX_RSP *) smb_buffer_response;
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index e2552d2..557506a 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -212,93 +212,6 @@ cifs_small_buf_release(void *buf_to_free)
+ 	return;
+ }
  
- 		if (!mid_entry || !mid_entry->receive)
- 			length = standard_receive3(server, mid_entry);
-@@ -1058,13 +1058,13 @@ cifs_demultiplex_thread(void *p)
- 		if (mid_entry != NULL) {
- 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
- 				mid_entry->callback(mid_entry);
--		} else if (!server->ops->is_oplock_break(buf, server)) {
-+		} else if (!S_OP(server, is_oplock_break, false, buf, server)) {
- 			cERROR(1, "No task to wake, unknown frame received! "
- 				   "NumMids %d", atomic_read(&midCount));
- 			cifs_dump_mem("Received Data is: ", buf,
- 				      HEADER_SIZE(server));
- #ifdef CONFIG_CIFS_DEBUG2
--			server->ops->dump_detail(buf);
-+			S_OPV(server, dump_detail, buf);
- 			cifs_dump_mids(server);
- #endif /* CIFS_DEBUG2 */
+-/*
+- * Find a free multiplex id (SMB mid). Otherwise there could be
+- * mid collisions which might cause problems, demultiplexing the
+- * wrong response to this request. Multiplex ids could collide if
+- * one of a series requests takes much longer than the others, or
+- * if a very large number of long lived requests (byte range
+- * locks or FindNotify requests) are pending. No more than
+- * 64K-1 requests can be outstanding at one time. If no
+- * mids are available, return zero. A future optimization
+- * could make the combination of mids and uid the key we use
+- * to demultiplex on (rather than mid alone).
+- * In addition to the above check, the cifs demultiplex
+- * code already used the command code as a secondary
+- * check of the frame and if signing is negotiated the
+- * response would be discarded if the mid were the same
+- * but the signature was wrong. Since the mid is not put in the
+- * pending queue until later (when it is about to be dispatched)
+- * we do have to limit the number of outstanding requests
+- * to somewhat less than 64K-1 although it is hard to imagine
+- * so many threads being in the vfs at one time.
+- */
+-__u64 GetNextMid(struct TCP_Server_Info *server)
+-{
+-	__u64 mid = 0;
+-	__u16 last_mid, cur_mid;
+-	bool collision;
+-
+-	spin_lock(&GlobalMid_Lock);
+-
+-	/* mid is 16 bit only for CIFS/SMB */
+-	cur_mid = (__u16)((server->CurrentMid) & 0xffff);
+-	/* we do not want to loop forever */
+-	last_mid = cur_mid;
+-	cur_mid++;
+-
+-	/*
+-	 * This nested loop looks more expensive than it is.
+-	 * In practice the list of pending requests is short,
+-	 * fewer than 50, and the mids are likely to be unique
+-	 * on the first pass through the loop unless some request
+-	 * takes longer than the 64 thousand requests before it
+-	 * (and it would also have to have been a request that
+-	 * did not time out).
+-	 */
+-	while (cur_mid != last_mid) {
+-		struct mid_q_entry *mid_entry;
+-		unsigned int num_mids;
+-
+-		collision = false;
+-		if (cur_mid == 0)
+-			cur_mid++;
+-
+-		num_mids = 0;
+-		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
+-			++num_mids;
+-			if (mid_entry->mid == cur_mid &&
+-			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
+-				/* This mid is in use, try a different one */
+-				collision = true;
+-				break;
+-			}
+-		}
+-
+-		/*
+-		 * if we have more than 32k mids in the list, then something
+-		 * is very wrong. Possibly a local user is trying to DoS the
+-		 * box by issuing long-running calls and SIGKILL'ing them. If
+-		 * we get to 2^16 mids then we're in big trouble as this
+-		 * function could loop forever.
+-		 *
+-		 * Go ahead and assign out the mid in this situation, but force
+-		 * an eventual reconnect to clean out the pending_mid_q.
+-		 */
+-		if (num_mids > 32768)
+-			server->tcpStatus = CifsNeedReconnect;
+-
+-		if (!collision) {
+-			mid = (__u64)cur_mid;
+-			server->CurrentMid = mid;
+-			break;
+-		}
+-		cur_mid++;
+-	}
+-	spin_unlock(&GlobalMid_Lock);
+-	return mid;
+-}
+-
+ /* NB: MID can not be set if treeCon not passed in, in that
+    case it is responsbility of caller to set the mid */
+ void
+@@ -334,7 +247,7 @@ header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
  
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 253170d..ab2ce7a 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -682,7 +682,7 @@ cifs_find_fid_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
- 		    offset >= li->offset + li->length)
- 			continue;
- 		else if ((type & server->vals->shared_lock_type) &&
--			 ((server->ops->compare_fids(cur, cfile) &&
-+			 ((S_OP(server, compare_fids, false, cur, cfile) &&
- 			   current->tgid == li->pid) || type == li->type))
- 			continue;
- 		else {
+ 			/* Uid is not converted */
+ 			buffer->Uid = treeCon->ses->Suid;
+-			buffer->Mid = GetNextMid(treeCon->ses->server);
++			buffer->Mid = get_next_mid(treeCon->ses->server);
+ 		}
+ 		if (treeCon->Flags & SMB_SHARE_IS_IN_DFS)
+ 			buffer->Flags2 |= SMBFLG2_DFS;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index d9d615f..6dec38f 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -125,6 +125,94 @@ cifs_get_credits_field(struct TCP_Server_Info *server)
+ 	return &server->credits;
+ }
+ 
++/*
++ * Find a free multiplex id (SMB mid). Otherwise there could be
++ * mid collisions which might cause problems, demultiplexing the
++ * wrong response to this request. Multiplex ids could collide if
++ * one of a series requests takes much longer than the others, or
++ * if a very large number of long lived requests (byte range
++ * locks or FindNotify requests) are pending. No more than
++ * 64K-1 requests can be outstanding at one time. If no
++ * mids are available, return zero. A future optimization
++ * could make the combination of mids and uid the key we use
++ * to demultiplex on (rather than mid alone).
++ * In addition to the above check, the cifs demultiplex
++ * code already used the command code as a secondary
++ * check of the frame and if signing is negotiated the
++ * response would be discarded if the mid were the same
++ * but the signature was wrong. Since the mid is not put in the
++ * pending queue until later (when it is about to be dispatched)
++ * we do have to limit the number of outstanding requests
++ * to somewhat less than 64K-1 although it is hard to imagine
++ * so many threads being in the vfs at one time.
++ */
++static __u64
++cifs_get_next_mid(struct TCP_Server_Info *server)
++{
++	__u64 mid = 0;
++	__u16 last_mid, cur_mid;
++	bool collision;
++
++	spin_lock(&GlobalMid_Lock);
++
++	/* mid is 16 bit only for CIFS/SMB */
++	cur_mid = (__u16)((server->CurrentMid) & 0xffff);
++	/* we do not want to loop forever */
++	last_mid = cur_mid;
++	cur_mid++;
++
++	/*
++	 * This nested loop looks more expensive than it is.
++	 * In practice the list of pending requests is short,
++	 * fewer than 50, and the mids are likely to be unique
++	 * on the first pass through the loop unless some request
++	 * takes longer than the 64 thousand requests before it
++	 * (and it would also have to have been a request that
++	 * did not time out).
++	 */
++	while (cur_mid != last_mid) {
++		struct mid_q_entry *mid_entry;
++		unsigned int num_mids;
++
++		collision = false;
++		if (cur_mid == 0)
++			cur_mid++;
++
++		num_mids = 0;
++		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
++			++num_mids;
++			if (mid_entry->mid == cur_mid &&
++			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
++				/* This mid is in use, try a different one */
++				collision = true;
++				break;
++			}
++		}
++
++		/*
++		 * if we have more than 32k mids in the list, then something
++		 * is very wrong. Possibly a local user is trying to DoS the
++		 * box by issuing long-running calls and SIGKILL'ing them. If
++		 * we get to 2^16 mids then we're in big trouble as this
++		 * function could loop forever.
++		 *
++		 * Go ahead and assign out the mid in this situation, but force
++		 * an eventual reconnect to clean out the pending_mid_q.
++		 */
++		if (num_mids > 32768)
++			server->tcpStatus = CifsNeedReconnect;
++
++		if (!collision) {
++			mid = (__u64)cur_mid;
++			server->CurrentMid = mid;
++			break;
++		}
++		cur_mid++;
++	}
++	spin_unlock(&GlobalMid_Lock);
++	return mid;
++}
++
+ struct smb_version_operations smb1_operations = {
+ 	.send_cancel = send_nt_cancel,
+ 	.compare_fids = cifs_compare_fids,
+@@ -133,6 +221,7 @@ struct smb_version_operations smb1_operations = {
+ 	.add_credits = cifs_add_credits,
+ 	.set_credits = cifs_set_credits,
+ 	.get_credits_field = cifs_get_credits_field,
++	.get_next_mid = cifs_get_next_mid,
+ 	.read_data_offset = cifs_read_data_offset,
+ 	.read_data_length = cifs_read_data_length,
+ 	.map_error = map_smb_to_linux_error,
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 1b36ffe..9e2123b 100644
+index 9e2123b..9bb5362 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -305,7 +305,9 @@ static int
- wait_for_free_request(struct TCP_Server_Info *server, const int optype)
- {
- 	return wait_for_free_credits(server, optype,
--				     server->ops->get_credits_field(server));
-+				     S_OP(server, get_credits_field,
-+					  &server->credits /* def ret */,
-+					  server));
- }
+@@ -780,7 +780,7 @@ send_lock_cancel(const unsigned int xid, struct cifs_tcon *tcon,
  
- static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
-@@ -487,8 +489,7 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
- static inline int
- send_cancel(struct TCP_Server_Info *server, void *buf, struct mid_q_entry *mid)
- {
--	return server->ops->send_cancel ?
--				server->ops->send_cancel(server, buf, mid) : 0;
-+	return S_OP(server, send_cancel, 0, server, buf, mid);
- }
+ 	pSMB->LockType = LOCKING_ANDX_CANCEL_LOCK|LOCKING_ANDX_LARGE_FILES;
+ 	pSMB->Timeout = 0;
+-	pSMB->hdr.Mid = GetNextMid(ses->server);
++	pSMB->hdr.Mid = get_next_mid(ses->server);
  
- int
-@@ -578,7 +579,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 
- 	mutex_lock(&ses->server->srv_mutex);
- 
--	rc = ses->server->ops->setup_request(ses, iov, n_vec, &midQ);
-+	rc = S_OP(ses->server, setup_request, -ENOSYS, ses, iov, n_vec, &midQ);
- 	if (rc) {
- 		mutex_unlock(&ses->server->srv_mutex);
- 		cifs_small_buf_release(buf);
-@@ -641,8 +642,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	else
- 		*pRespBufType = CIFS_SMALL_BUFFER;
- 
--	rc = ses->server->ops->check_receive(midQ, ses->server,
--					     flags & CIFS_LOG_ERROR);
-+	rc = S_OP(ses->server, check_receive, -ENOSYS, midQ, ses->server,
-+		  flags & CIFS_LOG_ERROR);
- 
- 	/* mark it so buf will not be freed by delete_mid */
- 	if ((flags & CIFS_NO_RESP) == 0)
+ 	return SendReceive(xid, ses, in_buf, out_buf,
+ 			&bytes_returned, 0);
 -- 
 1.7.1
