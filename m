@@ -1,170 +1,42 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 7/7] CIFS: Move protocol specific tcon/tdis code to ops struct
-Date: Mon, 28 May 2012 13:30:14 +0400
-Message-ID: <1338197414-22340-8-git-send-email-pshilovsky@samba.org>
-References: <1338197414-22340-1-git-send-email-pshilovsky@samba.org>
+From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Why do we use a global lock when manipulating MIDs
+Date: Mon, 28 May 2012 17:30:22 -0700
+Message-ID: <CACyXjPwtjOMispfRE1uy2jTj6oAv4CNburFirWDwDcnhmCNw2w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=Big5
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338197414-22340-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-and rename some variable around the code changes.
+Hi folks,
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsglob.h  |    6 ++++++
- fs/cifs/cifsproto.h |    5 ++---
- fs/cifs/connect.c   |   47 ++++++++++++++++++++++++-----------------------
- fs/cifs/smb1ops.c   |    2 ++
- 4 files changed, 34 insertions(+), 26 deletions(-)
+I am reading the code because I am interested in adding SMB2.2/3.0
+support around multi-connect.
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a725d4a..c9e6df3 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -160,6 +160,7 @@ struct mid_q_entry;
- struct TCP_Server_Info;
- struct cifsFileInfo;
- struct cifs_ses;
-+struct cifs_tcon;
- 
- struct smb_version_operations {
- 	int (*send_cancel)(struct TCP_Server_Info *, void *,
-@@ -200,6 +201,11 @@ struct smb_version_operations {
- 	int (*sess_setup)(int, struct cifs_ses *, const struct nls_table *);
- 	/* close smb session */
- 	int (*logoff)(int, struct cifs_ses *);
-+	/* connect to a server share */
-+	int (*tree_connect)(int, struct cifs_ses *, const char *,
-+			    struct cifs_tcon *, const struct nls_table *);
-+	/* close tree connecion */
-+	int (*tree_disconnect)(int, struct cifs_tcon *);
- };
- 
- struct smb_version_values {
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index ecb8b28..749dc00 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -184,9 +184,8 @@ extern int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
- 			struct nls_table *nls_info);
- extern int CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses);
- 
--extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
--			const char *tree, struct cifs_tcon *tcon,
--			const struct nls_table *);
-+extern int CIFSTCon(int xid, struct cifs_ses *ses, const char *tree,
-+		    struct cifs_tcon *tcon, const struct nls_table *);
- 
- extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
- 		const char *searchName, const struct nls_table *nls_codepage,
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 416e941..ad72c67 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2549,7 +2549,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	xid = GetXid();
--	CIFSSMBTDis(xid, tcon);
-+	S_OPV(ses->server, tree_disconnect, xid, tcon);
- 	_FreeXid(xid);
- 
- 	cifs_fscache_release_super_cookie(tcon);
-@@ -2596,13 +2596,15 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		goto out_fail;
- 	}
- 
--	/* BB Do we need to wrap session_mutex around
--	 * this TCon call and Unix SetFS as
--	 * we do on SessSetup and reconnect? */
-+	/*
-+	 * BB Do we need to wrap session_mutex around this TCon call and Unix
-+	 * SetFS as we do on SessSetup and reconnect?
-+	 */
- 	xid = GetXid();
--	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
-+	rc = S_OP(ses->server, tree_connect, -ENOSYS, xid, ses,
-+		  volume_info->UNC, tcon, volume_info->local_nls);
- 	FreeXid(xid);
--	cFYI(1, "CIFS Tcon rc = %d", rc);
-+	cFYI(1, "Tcon rc = %d", rc);
- 	if (rc)
- 		goto out_fail;
- 
-@@ -2748,35 +2750,34 @@ out:
- }
- 
- int
--get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
--	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
--	     struct dfs_info3_param **preferrals, int remap)
-+get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
-+	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
-+	     struct dfs_info3_param **referrals, int remap)
- {
- 	char *temp_unc;
- 	int rc = 0;
- 
--	*pnum_referrals = 0;
--	*preferrals = NULL;
-+	*num_referrals = 0;
-+	*referrals = NULL;
- 
--	if (pSesInfo->ipc_tid == 0) {
-+	if (ses->ipc_tid == 0) {
- 		temp_unc = kmalloc(2 /* for slashes */ +
--			strnlen(pSesInfo->serverName,
--				SERVER_NAME_LEN_WITH_NULL * 2)
--				 + 1 + 4 /* slash IPC$ */  + 2,
--				GFP_KERNEL);
-+			strnlen(ses->serverName, SERVER_NAME_LEN_WITH_NULL * 2)
-+				+ 1 + 4 /* slash IPC$ */ + 2, GFP_KERNEL);
- 		if (temp_unc == NULL)
- 			return -ENOMEM;
- 		temp_unc[0] = '\\';
- 		temp_unc[1] = '\\';
--		strcpy(temp_unc + 2, pSesInfo->serverName);
--		strcpy(temp_unc + 2 + strlen(pSesInfo->serverName), "\\IPC$");
--		rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
--		cFYI(1, "CIFS Tcon rc = %d ipc_tid = %d", rc, pSesInfo->ipc_tid);
-+		strcpy(temp_unc + 2, ses->serverName);
-+		strcpy(temp_unc + 2 + strlen(ses->serverName), "\\IPC$");
-+		rc = S_OP(ses->server, tree_connect, -ENOSYS, xid, ses,
-+			  temp_unc, NULL, nls_codepage);
-+		cFYI(1, "Tcon rc = %d ipc_tid = %d", rc, ses->ipc_tid);
- 		kfree(temp_unc);
- 	}
- 	if (rc == 0)
--		rc = CIFSGetDFSRefer(xid, pSesInfo, old_path, preferrals,
--				     pnum_referrals, nls_codepage, remap);
-+		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
-+				     num_referrals, nls_codepage, remap);
- 	/* BB map targetUNCs to dfs_info3 structures, here or
- 		in CIFSGetDFSRefer BB */
- 
-@@ -3755,7 +3756,7 @@ out:
-  * pointer may be NULL.
-  */
- int
--CIFSTCon(unsigned int xid, struct cifs_ses *ses,
-+CIFSTCon(int xid, struct cifs_ses *ses,
- 	 const char *tree, struct cifs_tcon *tcon,
- 	 const struct nls_table *nls_codepage)
- {
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 6fe8617..9371973 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -418,6 +418,8 @@ struct smb_version_operations smb1_operations = {
- 	.negotiate = cifs_negotiate,
- 	.sess_setup = CIFS_SessSetup,
- 	.logoff = CIFSSMBLogoff,
-+	.tree_connect = CIFSTCon,
-+	.tree_disconnect = CIFSSMBTDis,
- };
- 
- struct smb_version_values smb1_values = {
--- 
-1.7.1
+I noticed the following code, which confuses me.
+
+        /* put it on the pending_mid_q */
+        spin_lock(&GlobalMid_Lock);
+        list_add_tail(&mid->qhead, &server->pending_mid_q);
+        spin_unlock(&GlobalMid_Lock);
+
+        rc =3D cifs_sign_smb2(iov, nvec, server, &mid->sequence_number)=
+;
+        if (rc)
+                cifs_delete_mid(mid);
+        *ret_mid =3D mid;
+        return rc;
+
+Since MIDs are allocated on a per-server basis and the list that the
+new struct mid_q_entry is placed on is in the struct TCP_Server_Info
+why are we using GlobalMid_Lock. It seems that we could move that
+spinlock into struct TCP_Server_Info.
+
+What am I missing here?
+
+--=20
+Regards,
+Richard Sharpe
+(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
