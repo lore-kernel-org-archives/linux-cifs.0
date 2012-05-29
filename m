@@ -1,52 +1,65 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2 0/7] transport/session code move to ops struct
-Date: Tue, 29 May 2012 18:34:18 +0400
-Message-ID: <CAKywueQEi7uZ8zjjV3uKf31zzzrUqo2k40tpCrhJ9-ZTtJ5zTQ@mail.gmail.com>
-References: <1338197414-22340-1-git-send-email-pshilovsky@samba.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Tue, 29 May 2012 10:51:41 -0500
+Message-ID: <CAH2r5mvstY0cDsL1MseEqJ2uQdJv-rhXSZiSimtnMkDbQpzhhQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338197414-22340-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/5/28 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> This is the regular patchset that makes the existing cifs code work t=
-hrough
-> ops struct of the server.
->
-> The version #2 consists the S_OP code that makes the code execution s=
-afer.
->
-> Pavel Shilovsky (7):
-> =A0CIFS: Introduce S_OP/S_OPV macros for a safe access to ops struct
-> =A0 =A0field
-> =A0CIFS: Move get_next_mid to ops struct
-> =A0CIFS: Move trans2 processing to ops struct
-> =A0CIFS: Extend credit mechanism to process request type
-> =A0CIFS: Move protocol specific negotiate code to ops struct
-> =A0CIFS: Move protocol specific session setup/logoff code to ops stru=
-ct
-> =A0CIFS: Move protocol specific tcon/tdis code to ops struct
->
-> =A0fs/cifs/cifsglob.h =A0| =A0 60 +++++++++--
-> =A0fs/cifs/cifsproto.h | =A0 12 +--
-> =A0fs/cifs/cifssmb.c =A0 | =A0 28 +++---
-> =A0fs/cifs/connect.c =A0 | =A0236 +++++++----------------------------=
--------
-> =A0fs/cifs/file.c =A0 =A0 =A0| =A0 =A02 +-
-> =A0fs/cifs/misc.c =A0 =A0 =A0| =A0 89 +----------------
-> =A0fs/cifs/sess.c =A0 =A0 =A0| =A0 =A05 +-
-> =A0fs/cifs/smb1ops.c =A0 | =A0290 +++++++++++++++++++++++++++++++++++=
-+++++++++++++++-
-> =A0fs/cifs/transport.c | =A0 47 +++++----
-> =A09 files changed, 423 insertions(+), 346 deletions(-)
->
+The following changes since commit 0e93b4b304ae052ba1bc73f6d34a68556fe93429:
+  Linus Torvalds (1):
+        Merge git://git.kernel.org/pub/scm/virt/kvm/kvm
 
-Let's consider this version invalid - will repost soon.
+are available in the git repository at:
 
---=20
-Best regards,
-Pavel Shilovsky.
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+Jeff Layton (14):
+      cifs: make cifs_readdata_alloc take a work_func_t arg
+      cifs: abstract out function to marshal the iovec for readv receives
+      cifs: add refcounting to cifs_readdata structures
+      cifs: add wrapper for cifs_async_readv to retry opening file
+      cifs: convert cifs_iovec_read to use async reads
+      cifs: remove legacy MultiuserMount option
+      cifs: add a deprecation warning to CIFS_IOC_CHECKUMOUNT ioctl
+      cifs: add a cache= option to better describe the different cache flavors
+      cifs: add deprecation warnings to strictcache and forcedirectio
+      cifs: display cache= option in /proc/mounts
+      cifs: add warning about change in default cache semantics in 3.7
+      cifs: remove the vers= and version= synonyms for ver=
+      cifs: add a smb_version_operations/values structures and a
+smb_version enum
+      cifs: convert send_nt_cancel into a version specific op
+
+Pavel Shilovsky (10):
+      CIFS: Move locks to cifsFileInfo structure
+      CIFS: Convert lock type to 32 bit variable
+      CIFS: Separate protocol specific lock type handling
+      CIFS: Separate protocol specific part from getlk
+      CIFS: Separate protocol specific part from setlk
+      CIFS: Move protocol specific part from SendReceive2 to ops struct
+      CIFS: Move header_size/max_header_size to ops structure
+      CIFS: Move protocol specific part from cifs_readv_receive to ops struct
+      CIFS: Move protocol specific demultiplex thread calls to ops struct
+      CIFS: Move add/set_credits and get_credits_field to ops structure
+
+Sedat Dilek (1):
+      cifs: Fix comment as d_alloc_root() is replaced by d_make_root()
+
+Shirish Pargaonkar (2):
+      cifs: Include backup intent search flags during searches {try #2)
+      cifs: fix oops while traversing open file list (try #4)
+
+Steve French (2):
+      CIFS: Introduce SMB2 Kconfig option
+      CIFS: Introduce SMB2 mounts as vers=2.1
+
+
+-- 
+Thanks,
+
+Steve
