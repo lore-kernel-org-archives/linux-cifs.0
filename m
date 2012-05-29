@@ -1,201 +1,29 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 5/7] CIFS: Move protocol specific negotiate code to ops struct
-Date: Tue, 29 May 2012 20:19:02 +0400
-Message-ID: <1338308344-29149-6-git-send-email-pshilovsky@samba.org>
-References: <1338308344-29149-1-git-send-email-pshilovsky@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Subject: Re: [GIT] CIFS Fixes
+Date: Tue, 29 May 2012 12:30:27 -0700
+Message-ID: <CA+55aFw2f+Jt-PLn6dWF7HjisRYHebmkxoLhx61QY0qSoj5Ubw@mail.gmail.com>
+References: <CAH2r5mvstY0cDsL1MseEqJ2uQdJv-rhXSZiSimtnMkDbQpzhhQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338308344-29149-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <CAH2r5mvstY0cDsL1MseEqJ2uQdJv-rhXSZiSimtnMkDbQpzhhQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsglob.h  |    8 ++++++--
- fs/cifs/cifsproto.h |    5 ++---
- fs/cifs/cifssmb.c   |    4 ++--
- fs/cifs/connect.c   |   18 ++++++------------
- fs/cifs/sess.c      |    2 +-
- fs/cifs/smb1ops.c   |   23 +++++++++++++++++++++++
- 6 files changed, 40 insertions(+), 20 deletions(-)
+On Tue, May 29, 2012 at 8:51 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrot=
+e:
+> The following changes since commit 0e93b4b304ae052ba1bc73f6d34a68556f=
+e93429:
+> =A0Linus Torvalds (1):
+> =A0 =A0 =A0 =A0Merge git://git.kernel.org/pub/scm/virt/kvm/kvm
+>
+> are available in the git repository at:
+>
+> =A0git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b0afcb6..30fe2ac 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -192,6 +192,10 @@ struct smb_version_operations {
- 	/* process transaction2 response */
- 	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
- 			     char *, int);
-+	/* check if we need to negotiate */
-+	bool (*need_neg)(struct TCP_Server_Info *);
-+	/* negotiate to the server */
-+	int (*negotiate)(const int, struct cifs_ses *);
- };
- 
- struct smb_version_values {
-@@ -324,7 +328,7 @@ struct TCP_Server_Info {
- 	struct mutex srv_mutex;
- 	struct task_struct *tsk;
- 	char server_GUID[16];
--	char sec_mode;
-+	__u16 sec_mode;
- 	bool session_estab; /* mark when very first sess is established */
- 	u16 dialect; /* dialect index that server chose */
- 	enum securityEnum secType;
-@@ -477,7 +481,7 @@ struct cifs_ses {
- 	char *serverOS;		/* name of operating system underlying server */
- 	char *serverNOS;	/* name of network operating system of server */
- 	char *serverDomain;	/* security realm of server */
--	int Suid;		/* remote smb uid  */
-+	__u64 Suid;		/* remote smb uid  */
- 	uid_t linux_uid;        /* overriding owner of files on the mount */
- 	uid_t cred_uid;		/* owner of credentials */
- 	int capabilities;
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 41d5a76..5e8efd8 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -178,11 +178,10 @@ extern void cifs_dfs_release_automount_timer(void);
- void cifs_proc_init(void);
- void cifs_proc_clean(void);
- 
--extern int cifs_negotiate_protocol(unsigned int xid,
--				  struct cifs_ses *ses);
-+extern int cifs_negotiate_protocol(const int xid, struct cifs_ses *ses);
- extern int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
- 			struct nls_table *nls_info);
--extern int CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses);
-+extern int CIFSSMBNegotiate(const int xid, struct cifs_ses *ses);
- 
- extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
- 			const char *tree, struct cifs_tcon *tcon,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 65898cc..751b9c8 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -372,7 +372,7 @@ static inline void inc_rfc1001_len(void *pSMB, int count)
- }
- 
- int
--CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
-+CIFSSMBNegotiate(const int xid, struct cifs_ses *ses)
- {
- 	NEGOTIATE_REQ *pSMB;
- 	NEGOTIATE_RSP *pSMBr;
-@@ -456,7 +456,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
- 			rc = -EOPNOTSUPP;
- 			goto neg_err_exit;
- 		}
--		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
-+		server->sec_mode = le16_to_cpu(rsp->SecurityMode);
- 		server->maxReq = min_t(unsigned int,
- 				       le16_to_cpu(rsp->MaxMpxCount),
- 				       cifs_max_pending);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index dc96835..a49a2a7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -406,7 +406,7 @@ cifs_echo_request(struct work_struct *work)
- 	 * done, which is indicated by maxBuf != 0. Also, no need to ping if
- 	 * we got a response recently
- 	 */
--	if (server->maxBuf == 0 ||
-+	if (S_OP(server, need_neg, false, server) ||
- 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
- 		goto requeue_echo;
- 
-@@ -3939,24 +3939,19 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
- 	kfree(cifs_sb);
- }
- 
--int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
-+int
-+cifs_negotiate_protocol(const int xid, struct cifs_ses *ses)
- {
- 	int rc = 0;
- 	struct TCP_Server_Info *server = ses->server;
- 
- 	/* only send once per connect */
--	if (server->maxBuf != 0)
-+	if (!S_OP(server, need_neg, false, server))
- 		return 0;
- 
- 	set_credits(server, 1);
--	rc = CIFSSMBNegotiate(xid, ses);
--	if (rc == -EAGAIN) {
--		/* retry only once on 1st time connection */
--		set_credits(server, 1);
--		rc = CIFSSMBNegotiate(xid, ses);
--		if (rc == -EAGAIN)
--			rc = -EHOSTDOWN;
--	}
-+
-+	rc = S_OP(server, negotiate, -ENOSYS, xid, ses);
- 	if (rc == 0) {
- 		spin_lock(&GlobalMid_Lock);
- 		if (server->tcpStatus == CifsNeedNegotiate)
-@@ -3964,7 +3959,6 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
- 		else
- 			rc = -EHOSTDOWN;
- 		spin_unlock(&GlobalMid_Lock);
--
- 	}
- 
- 	return rc;
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 551d0c2..f88fa4d 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -898,7 +898,7 @@ ssetup_ntlmssp_authenticate:
- 	if (action & GUEST_LOGIN)
- 		cFYI(1, "Guest login"); /* BB mark SesInfo struct? */
- 	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
--	cFYI(1, "UID = %d ", ses->Suid);
-+	cFYI(1, "UID = %llu ", ses->Suid);
- 	/* response can have either 3 or 4 word count - Samba sends 3 */
- 	/* and lanman response is 3 */
- 	bytes_remaining = get_bcc(smb_buf);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index f4f8394..5bfc26a 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -389,6 +389,27 @@ cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 	return true;
- }
- 
-+static bool
-+cifs_need_neg(struct TCP_Server_Info *server)
-+{
-+	return server->maxBuf == 0;
-+}
-+
-+static int
-+cifs_negotiate(const int xid, struct cifs_ses *ses)
-+{
-+	int rc;
-+	rc = CIFSSMBNegotiate(xid, ses);
-+	if (rc == -EAGAIN) {
-+		/* retry only once on 1st time connection */
-+		set_credits(ses->server, 1);
-+		rc = CIFSSMBNegotiate(xid, ses);
-+		if (rc == -EAGAIN)
-+			rc = -EHOSTDOWN;
-+	}
-+	return rc;
-+}
-+
- struct smb_version_operations smb1_operations = {
- 	.send_cancel = send_nt_cancel,
- 	.compare_fids = cifs_compare_fids,
-@@ -407,6 +428,8 @@ struct smb_version_operations smb1_operations = {
- 	.dump_detail = cifs_dump_detail,
- 	.is_oplock_break = is_valid_oplock_break,
- 	.check_trans2 = cifs_check_trans2,
-+	.need_neg = cifs_need_neg,
-+	.negotiate = cifs_negotiate,
- };
- 
- struct smb_version_values smb1_values = {
--- 
-1.7.1
+Diffstat?
+
+                    Linus
