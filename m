@@ -1,355 +1,222 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v3 2/7] CIFS: Move get_next_mid to ops struct
-Date: Wed, 30 May 2012 11:32:35 -0400
-Message-ID: <20120530113235.175add74@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Subject: Re: [PATCH v3 3/7] CIFS: Move trans2 processing to ops struct
+Date: Wed, 30 May 2012 11:35:23 -0400
+Message-ID: <20120530113523.6b76177e@corrin.poochiereds.net>
 References: <1338308344-29149-1-git-send-email-pshilovsky@samba.org>
-	<1338308344-29149-3-git-send-email-pshilovsky@samba.org>
+	<1338308344-29149-4-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338308344-29149-3-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1338308344-29149-4-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 29 May 2012 20:18:59 +0400
+On Tue, 29 May 2012 20:19:00 +0400
 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
 > Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h  |    7 ++++
->  fs/cifs/cifsproto.h |    1 -
->  fs/cifs/cifssmb.c   |    8 ++--
->  fs/cifs/connect.c   |    2 +-
->  fs/cifs/misc.c      |   89 +--------------------------------------------------
->  fs/cifs/smb1ops.c   |   89 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/transport.c |    2 +-
->  7 files changed, 103 insertions(+), 95 deletions(-)
+>  fs/cifs/cifsglob.h |    3 +
+>  fs/cifs/connect.c  |  160 +------------------------------------------------
+>  fs/cifs/smb1ops.c  |  170 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 174 insertions(+), 159 deletions(-)
 > 
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 48d1009..a660577 100644
+> index a660577..3b8828b 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
-> @@ -174,6 +174,7 @@ struct smb_version_operations {
->  	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
->  	void (*set_credits)(struct TCP_Server_Info *, const int);
->  	int * (*get_credits_field)(struct TCP_Server_Info *);
-> +	__u64 (*get_next_mid)(struct TCP_Server_Info *);
->  	/* data offset from read response message */
->  	unsigned int (*read_data_offset)(char *);
->  	/* data length from read response message */
-> @@ -417,6 +418,12 @@ set_credits(struct TCP_Server_Info *server, const int val)
->  	server->ops->set_credits(server, val);
->  }
+> @@ -187,6 +187,9 @@ struct smb_version_operations {
+>  	/* verify the message */
+>  	int (*check_message)(char *, unsigned int);
+>  	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
+> +	/* process transaction2 response */
+> +	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
+> +			     char *, int);
+>  };
 >  
-> +static inline __u64
-> +get_next_mid(struct TCP_Server_Info *server)
-> +{
-> +	return server->ops->get_next_mid(server);
-> +}
-> +
-
-Not sure I see the value in this wrapper, but I'm not too concerned
-about it...
-
->  /*
->   * Macros to allow the TCP_Server_Info->net field and related code to drop out
->   * when CONFIG_NET_NS isn't set.
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 5ec21ec..0a6cbfe 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -114,7 +114,6 @@ extern int small_smb_init_no_tc(const int smb_cmd, const int wct,
->  				void **request_buf);
->  extern int CIFS_SessSetup(unsigned int xid, struct cifs_ses *ses,
->  			     const struct nls_table *nls_cp);
-> -extern __u64 GetNextMid(struct TCP_Server_Info *server);
->  extern struct timespec cifs_NTtimeToUnix(__le64 utc_nanoseconds_since_1601);
->  extern u64 cifs_UnixTimeToNT(struct timespec);
->  extern struct timespec cnvrtDosUnixTm(__le16 le_date, __le16 le_time,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index b5ad716..5b40073 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -268,7 +268,7 @@ small_smb_init_no_tc(const int smb_command, const int wct,
->  		return rc;
->  
->  	buffer = (struct smb_hdr *)*request_buf;
-> -	buffer->Mid = GetNextMid(ses->server);
-> +	buffer->Mid = get_next_mid(ses->server);
->  	if (ses->capabilities & CAP_UNICODE)
->  		buffer->Flags2 |= SMBFLG2_UNICODE;
->  	if (ses->capabilities & CAP_STATUS32)
-> @@ -402,7 +402,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
->  
->  	cFYI(1, "secFlags 0x%x", secFlags);
->  
-> -	pSMB->hdr.Mid = GetNextMid(server);
-> +	pSMB->hdr.Mid = get_next_mid(server);
->  	pSMB->hdr.Flags2 |= (SMBFLG2_UNICODE | SMBFLG2_ERR_STATUS);
->  
->  	if ((secFlags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
-> @@ -782,7 +782,7 @@ CIFSSMBLogoff(const int xid, struct cifs_ses *ses)
->  		return rc;
->  	}
->  
-> -	pSMB->hdr.Mid = GetNextMid(ses->server);
-> +	pSMB->hdr.Mid = get_next_mid(ses->server);
->  
->  	if (ses->server->sec_mode &
->  		   (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
-> @@ -4762,7 +4762,7 @@ getDFSRetry:
->  
->  	/* server pointer checked in called function,
->  	but should never be null here anyway */
-> -	pSMB->hdr.Mid = GetNextMid(ses->server);
-> +	pSMB->hdr.Mid = get_next_mid(ses->server);
->  	pSMB->hdr.Tid = ses->ipc_tid;
->  	pSMB->hdr.Uid = ses->Suid;
->  	if (ses->capabilities & CAP_STATUS32)
+>  struct smb_version_values {
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index a849aca..9362f90 100644
+> index 9362f90..dc96835 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -3938,7 +3938,7 @@ CIFSTCon(unsigned int xid, struct cifs_ses *ses,
->  	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
->  			NULL /*no tid */ , 4 /*wct */ );
->  
-> -	smb_buffer->Mid = GetNextMid(ses->server);
-> +	smb_buffer->Mid = get_next_mid(ses->server);
->  	smb_buffer->Uid = ses->Suid;
->  	pSMB = (TCONX_REQ *) smb_buffer;
->  	pSMBr = (TCONX_RSP *) smb_buffer_response;
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index e2552d2..557506a 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -212,93 +212,6 @@ cifs_small_buf_release(void *buf_to_free)
->  	return;
+> @@ -394,143 +394,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+>  	return rc;
 >  }
 >  
 > -/*
-> - * Find a free multiplex id (SMB mid). Otherwise there could be
-> - * mid collisions which might cause problems, demultiplexing the
-> - * wrong response to this request. Multiplex ids could collide if
-> - * one of a series requests takes much longer than the others, or
-> - * if a very large number of long lived requests (byte range
-> - * locks or FindNotify requests) are pending. No more than
-> - * 64K-1 requests can be outstanding at one time. If no
-> - * mids are available, return zero. A future optimization
-> - * could make the combination of mids and uid the key we use
-> - * to demultiplex on (rather than mid alone).
-> - * In addition to the above check, the cifs demultiplex
-> - * code already used the command code as a secondary
-> - * check of the frame and if signing is negotiated the
-> - * response would be discarded if the mid were the same
-> - * but the signature was wrong. Since the mid is not put in the
-> - * pending queue until later (when it is about to be dispatched)
-> - * we do have to limit the number of outstanding requests
-> - * to somewhat less than 64K-1 although it is hard to imagine
-> - * so many threads being in the vfs at one time.
+> -	return codes:
+> -		0 	not a transact2, or all data present
+> -		>0 	transact2 with that much data missing
+> -		-EINVAL = invalid transact2
+> -
 > - */
-> -__u64 GetNextMid(struct TCP_Server_Info *server)
+> -static int check2ndT2(char *buf)
 > -{
-> -	__u64 mid = 0;
-> -	__u16 last_mid, cur_mid;
-> -	bool collision;
+> -	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
+> -	struct smb_t2_rsp *pSMBt;
+> -	int remaining;
+> -	__u16 total_data_size, data_in_this_rsp;
 > -
-> -	spin_lock(&GlobalMid_Lock);
+> -	if (pSMB->Command != SMB_COM_TRANSACTION2)
+> -		return 0;
 > -
-> -	/* mid is 16 bit only for CIFS/SMB */
-> -	cur_mid = (__u16)((server->CurrentMid) & 0xffff);
-> -	/* we do not want to loop forever */
-> -	last_mid = cur_mid;
-> -	cur_mid++;
-> -
-> -	/*
-> -	 * This nested loop looks more expensive than it is.
-> -	 * In practice the list of pending requests is short,
-> -	 * fewer than 50, and the mids are likely to be unique
-> -	 * on the first pass through the loop unless some request
-> -	 * takes longer than the 64 thousand requests before it
-> -	 * (and it would also have to have been a request that
-> -	 * did not time out).
-> -	 */
-> -	while (cur_mid != last_mid) {
-> -		struct mid_q_entry *mid_entry;
-> -		unsigned int num_mids;
-> -
-> -		collision = false;
-> -		if (cur_mid == 0)
-> -			cur_mid++;
-> -
-> -		num_mids = 0;
-> -		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
-> -			++num_mids;
-> -			if (mid_entry->mid == cur_mid &&
-> -			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
-> -				/* This mid is in use, try a different one */
-> -				collision = true;
-> -				break;
-> -			}
-> -		}
-> -
-> -		/*
-> -		 * if we have more than 32k mids in the list, then something
-> -		 * is very wrong. Possibly a local user is trying to DoS the
-> -		 * box by issuing long-running calls and SIGKILL'ing them. If
-> -		 * we get to 2^16 mids then we're in big trouble as this
-> -		 * function could loop forever.
-> -		 *
-> -		 * Go ahead and assign out the mid in this situation, but force
-> -		 * an eventual reconnect to clean out the pending_mid_q.
-> -		 */
-> -		if (num_mids > 32768)
-> -			server->tcpStatus = CifsNeedReconnect;
-> -
-> -		if (!collision) {
-> -			mid = (__u64)cur_mid;
-> -			server->CurrentMid = mid;
-> -			break;
-> -		}
-> -		cur_mid++;
+> -	/* check for plausible wct, bcc and t2 data and parm sizes */
+> -	/* check for parm and data offset going beyond end of smb */
+> -	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
+> -		cFYI(1, "invalid transact2 word count");
+> -		return -EINVAL;
 > -	}
-> -	spin_unlock(&GlobalMid_Lock);
-> -	return mid;
+> -
+> -	pSMBt = (struct smb_t2_rsp *)pSMB;
+> -
+> -	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+> -	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
+> -
+> -	if (total_data_size == data_in_this_rsp)
+> -		return 0;
+> -	else if (total_data_size < data_in_this_rsp) {
+> -		cFYI(1, "total data %d smaller than data in frame %d",
+> -			total_data_size, data_in_this_rsp);
+> -		return -EINVAL;
+> -	}
+> -
+> -	remaining = total_data_size - data_in_this_rsp;
+> -
+> -	cFYI(1, "missing %d bytes from transact2, check next response",
+> -		remaining);
+> -	if (total_data_size > CIFSMaxBufSize) {
+> -		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
+> -			total_data_size, CIFSMaxBufSize);
+> -		return -EINVAL;
+> -	}
+> -	return remaining;
 > -}
 > -
->  /* NB: MID can not be set if treeCon not passed in, in that
->     case it is responsbility of caller to set the mid */
->  void
-> @@ -334,7 +247,7 @@ header_assemble(struct smb_hdr *buffer, char smb_command /* command */ ,
->  
->  			/* Uid is not converted */
->  			buffer->Uid = treeCon->ses->Suid;
-> -			buffer->Mid = GetNextMid(treeCon->ses->server);
-> +			buffer->Mid = get_next_mid(treeCon->ses->server);
->  		}
->  		if (treeCon->Flags & SMB_SHARE_IS_IN_DFS)
->  			buffer->Flags2 |= SMBFLG2_DFS;
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index d9d615f..6dec38f 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -125,6 +125,94 @@ cifs_get_credits_field(struct TCP_Server_Info *server)
->  	return &server->credits;
->  }
->  
-> +/*
-> + * Find a free multiplex id (SMB mid). Otherwise there could be
-> + * mid collisions which might cause problems, demultiplexing the
-> + * wrong response to this request. Multiplex ids could collide if
-> + * one of a series requests takes much longer than the others, or
-> + * if a very large number of long lived requests (byte range
-> + * locks or FindNotify requests) are pending. No more than
-> + * 64K-1 requests can be outstanding at one time. If no
-> + * mids are available, return zero. A future optimization
-> + * could make the combination of mids and uid the key we use
-> + * to demultiplex on (rather than mid alone).
-> + * In addition to the above check, the cifs demultiplex
-> + * code already used the command code as a secondary
-> + * check of the frame and if signing is negotiated the
-> + * response would be discarded if the mid were the same
-> + * but the signature was wrong. Since the mid is not put in the
-> + * pending queue until later (when it is about to be dispatched)
-> + * we do have to limit the number of outstanding requests
-> + * to somewhat less than 64K-1 although it is hard to imagine
-> + * so many threads being in the vfs at one time.
-> + */
-> +static __u64
-> +cifs_get_next_mid(struct TCP_Server_Info *server)
-> +{
-> +	__u64 mid = 0;
-> +	__u16 last_mid, cur_mid;
-> +	bool collision;
-> +
-> +	spin_lock(&GlobalMid_Lock);
-> +
-> +	/* mid is 16 bit only for CIFS/SMB */
-> +	cur_mid = (__u16)((server->CurrentMid) & 0xffff);
-> +	/* we do not want to loop forever */
-> +	last_mid = cur_mid;
-> +	cur_mid++;
-> +
-> +	/*
-> +	 * This nested loop looks more expensive than it is.
-> +	 * In practice the list of pending requests is short,
-> +	 * fewer than 50, and the mids are likely to be unique
-> +	 * on the first pass through the loop unless some request
-> +	 * takes longer than the 64 thousand requests before it
-> +	 * (and it would also have to have been a request that
-> +	 * did not time out).
-> +	 */
-> +	while (cur_mid != last_mid) {
-> +		struct mid_q_entry *mid_entry;
-> +		unsigned int num_mids;
-> +
-> +		collision = false;
-> +		if (cur_mid == 0)
-> +			cur_mid++;
-> +
-> +		num_mids = 0;
-> +		list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
-> +			++num_mids;
-> +			if (mid_entry->mid == cur_mid &&
-> +			    mid_entry->mid_state == MID_REQUEST_SUBMITTED) {
-> +				/* This mid is in use, try a different one */
-> +				collision = true;
-> +				break;
-> +			}
-> +		}
-> +
-> +		/*
-> +		 * if we have more than 32k mids in the list, then something
-> +		 * is very wrong. Possibly a local user is trying to DoS the
-> +		 * box by issuing long-running calls and SIGKILL'ing them. If
-> +		 * we get to 2^16 mids then we're in big trouble as this
-> +		 * function could loop forever.
-> +		 *
-> +		 * Go ahead and assign out the mid in this situation, but force
-> +		 * an eventual reconnect to clean out the pending_mid_q.
-> +		 */
-> +		if (num_mids > 32768)
-> +			server->tcpStatus = CifsNeedReconnect;
-> +
-> +		if (!collision) {
-> +			mid = (__u64)cur_mid;
-> +			server->CurrentMid = mid;
-> +			break;
-> +		}
-> +		cur_mid++;
-> +	}
-> +	spin_unlock(&GlobalMid_Lock);
-> +	return mid;
-> +}
-> +
->  struct smb_version_operations smb1_operations = {
->  	.send_cancel = send_nt_cancel,
->  	.compare_fids = cifs_compare_fids,
-> @@ -133,6 +221,7 @@ struct smb_version_operations smb1_operations = {
->  	.add_credits = cifs_add_credits,
->  	.set_credits = cifs_set_credits,
->  	.get_credits_field = cifs_get_credits_field,
-> +	.get_next_mid = cifs_get_next_mid,
->  	.read_data_offset = cifs_read_data_offset,
->  	.read_data_length = cifs_read_data_length,
->  	.map_error = map_smb_to_linux_error,
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 81d68f4..6fdb5be 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -778,7 +778,7 @@ send_lock_cancel(const unsigned int xid, struct cifs_tcon *tcon,
->  
->  	pSMB->LockType = LOCKING_ANDX_CANCEL_LOCK|LOCKING_ANDX_LARGE_FILES;
->  	pSMB->Timeout = 0;
-> -	pSMB->hdr.Mid = GetNextMid(ses->server);
-> +	pSMB->hdr.Mid = get_next_mid(ses->server);
->  
->  	return SendReceive(xid, ses, in_buf, out_buf,
->  			&bytes_returned, 0);
+> -static int coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+> -{
+> -	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
+> -	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
+> -	char *data_area_of_tgt;
+> -	char *data_area_of_src;
+> -	int remaining;
+> -	unsigned int byte_count, total_in_tgt;
+> -	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
+> -
+> -	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
+> -	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+> -
+> -	if (tgt_total_cnt != src_total_cnt)
+> -		cFYI(1, "total data count of primary and secondary t2 differ "
+> -			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
+> -
+> -	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
+> -
+> -	remaining = tgt_total_cnt - total_in_tgt;
+> -
+> -	if (remaining < 0) {
+> -		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
+> -			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
+> -		return -EPROTO;
+> -	}
+> -
+> -	if (remaining == 0) {
+> -		/* nothing to do, ignore */
+> -		cFYI(1, "no more data remains");
+> -		return 0;
+> -	}
+> -
+> -	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
+> -	if (remaining < total_in_src)
+> -		cFYI(1, "transact2 2nd response contains too much data");
+> -
+> -	/* find end of first SMB data area */
+> -	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
+> -				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
+> -
+> -	/* validate target area */
+> -	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
+> -				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
+> -
+> -	data_area_of_tgt += total_in_tgt;
+> -
+> -	total_in_tgt += total_in_src;
+> -	/* is the result too big for the field? */
+> -	if (total_in_tgt > USHRT_MAX) {
+> -		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
+> -		return -EPROTO;
+> -	}
+> -	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
+> -
+> -	/* fix up the BCC */
+> -	byte_count = get_bcc(target_hdr);
+> -	byte_count += total_in_src;
+> -	/* is the result too big for the field? */
+> -	if (byte_count > USHRT_MAX) {
+> -		cFYI(1, "coalesced BCC too large (%u)", byte_count);
+> -		return -EPROTO;
+> -	}
+> -	put_bcc(byte_count, target_hdr);
+> -
+> -	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
+> -	byte_count += total_in_src;
+> -	/* don't allow buffer to overflow */
+> -	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+> -		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
+> -		return -ENOBUFS;
+> -	}
+> -	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
+> -
+> -	/* copy second buffer into end of first buffer */
+> -	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
+> -
+> -	if (remaining != total_in_src) {
+> -		/* more responses to go */
+> -		cFYI(1, "waiting for more secondary responses");
+> -		return 1;
+> -	}
+> -
+> -	/* we are done */
+> -	cFYI(1, "found the last secondary response");
+> -	return 0;
+> -}
+> -
+>  static void
+>  cifs_echo_request(struct work_struct *work)
+>  {
+> @@ -803,29 +666,8 @@ static void
+>  handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+>  	   char *buf, int malformed)
+>  {
+> -	if (malformed == 0 && check2ndT2(buf) > 0) {
+> -		mid->multiRsp = true;
+> -		if (mid->resp_buf) {
+> -			/* merge response - fix up 1st*/
+> -			malformed = coalesce_t2(buf, mid->resp_buf);
+> -			if (malformed > 0)
+> -				return;
+> -
+> -			/* All parts received or packet is malformed. */
+> -			mid->multiEnd = true;
+> -			return dequeue_mid(mid, malformed);
+> -		}
+> -		if (!server->large_buf) {
+> -			/*FIXME: switch to already allocated largebuf?*/
+> -			cERROR(1, "1st trans2 resp needs bigbuf");
+> -		} else {
+> -			/* Have first buffer */
+> -			mid->resp_buf = buf;
+> -			mid->large_buf = true;
+> -			server->bigbuf = NULL;
+> -		}
+> +	if (S_OP(server, check_trans2, false, mid, server, buf, malformed))
 
+Blech, do you really think this makes the code clearer? I personally
+find this macro ugly, but I suppose it's a matter of taste...
 
+Looks fine otherwise, and I'm not concerned enough about the ugliness
+to NAK it on those grounds...
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
