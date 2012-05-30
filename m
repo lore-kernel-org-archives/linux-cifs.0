@@ -1,222 +1,72 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH v3 3/7] CIFS: Move trans2 processing to ops struct
-Date: Wed, 30 May 2012 11:35:23 -0400
-Message-ID: <20120530113523.6b76177e@corrin.poochiereds.net>
-References: <1338308344-29149-1-git-send-email-pshilovsky@samba.org>
-	<1338308344-29149-4-git-send-email-pshilovsky@samba.org>
+From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: I would like to work on removing GlobalMid_Lock as my first task ...
+Date: Wed, 30 May 2012 08:48:07 -0700
+Message-ID: <CACyXjPwCGNzW9sTSPYuW54652YzVruGAua4Qu7J15=dKCmn5-g@mail.gmail.com>
+References: <CACyXjPxLq_3tVNvxUbv9+npEv7xB2MhThnKVMe-9E=ExgHrcJQ@mail.gmail.com>
+	<CAKywueQEw25p16T2=DAHi9zRHvKR3ueW=0U6Fp9WYLdOxFH0jQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=Big5
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338308344-29149-4-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <CAKywueQEw25p16T2=DAHi9zRHvKR3ueW=0U6Fp9WYLdOxFH0jQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 29 May 2012 20:19:00 +0400
-Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Wed, May 30, 2012 at 8:00 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> =
+wrote:
+> 2012/5/30 Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> Hi folks,
+>>
+>> I find it easier to get to know a body of code if I have a specific =
+goal.
+>>
+>> If no one has any objections I would like to work on removing
+>> GlobalMid_Lock (or at least, moving it into struct TCP_Server_Info.)
+>>
+>> Which branch should I work in? I can see:
+>>
+>>  master
+>> * smb2-dev
+>>  remotes/origin/HEAD -> origin/master
+>>  remotes/origin/cifs-patches
+>>  remotes/origin/for-next
+>>  remotes/origin/master
+>>  remotes/origin/smb2-3.4
+>>  remotes/origin/smb2-dev
+>>  remotes/origin/smb2-dev-prev
+>>  remotes/origin/smb2-dev2
+>
+> [Deletia]
+>
+> Hi!
+>
+> That's good point to start with - no objections from my side.
+>
+> I think you should create your own branch based on Steve's master. As
+> soon as we come to agreement with a change (from any author - yours,
+> Jeff's, etc) it will go to Steve's for-next branch and each of us
+> should rebase his own work branch(es) - from my side they are
+> 'cifs-patches' and 'smb2-dev'.
+>
+> Let the list know about your branch as your create it and if it will
+> be available online, please.
 
-> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h |    3 +
->  fs/cifs/connect.c  |  160 +------------------------------------------------
->  fs/cifs/smb1ops.c  |  170 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 174 insertions(+), 159 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index a660577..3b8828b 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -187,6 +187,9 @@ struct smb_version_operations {
->  	/* verify the message */
->  	int (*check_message)(char *, unsigned int);
->  	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
-> +	/* process transaction2 response */
-> +	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
-> +			     char *, int);
->  };
->  
->  struct smb_version_values {
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 9362f90..dc96835 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -394,143 +394,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
->  	return rc;
->  }
->  
-> -/*
-> -	return codes:
-> -		0 	not a transact2, or all data present
-> -		>0 	transact2 with that much data missing
-> -		-EINVAL = invalid transact2
-> -
-> - */
-> -static int check2ndT2(char *buf)
-> -{
-> -	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
-> -	struct smb_t2_rsp *pSMBt;
-> -	int remaining;
-> -	__u16 total_data_size, data_in_this_rsp;
-> -
-> -	if (pSMB->Command != SMB_COM_TRANSACTION2)
-> -		return 0;
-> -
-> -	/* check for plausible wct, bcc and t2 data and parm sizes */
-> -	/* check for parm and data offset going beyond end of smb */
-> -	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
-> -		cFYI(1, "invalid transact2 word count");
-> -		return -EINVAL;
-> -	}
-> -
-> -	pSMBt = (struct smb_t2_rsp *)pSMB;
-> -
-> -	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
-> -	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
-> -
-> -	if (total_data_size == data_in_this_rsp)
-> -		return 0;
-> -	else if (total_data_size < data_in_this_rsp) {
-> -		cFYI(1, "total data %d smaller than data in frame %d",
-> -			total_data_size, data_in_this_rsp);
-> -		return -EINVAL;
-> -	}
-> -
-> -	remaining = total_data_size - data_in_this_rsp;
-> -
-> -	cFYI(1, "missing %d bytes from transact2, check next response",
-> -		remaining);
-> -	if (total_data_size > CIFSMaxBufSize) {
-> -		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
-> -			total_data_size, CIFSMaxBufSize);
-> -		return -EINVAL;
-> -	}
-> -	return remaining;
-> -}
-> -
-> -static int coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
-> -{
-> -	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
-> -	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
-> -	char *data_area_of_tgt;
-> -	char *data_area_of_src;
-> -	int remaining;
-> -	unsigned int byte_count, total_in_tgt;
-> -	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
-> -
-> -	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
-> -	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
-> -
-> -	if (tgt_total_cnt != src_total_cnt)
-> -		cFYI(1, "total data count of primary and secondary t2 differ "
-> -			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
-> -
-> -	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
-> -
-> -	remaining = tgt_total_cnt - total_in_tgt;
-> -
-> -	if (remaining < 0) {
-> -		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
-> -			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
-> -		return -EPROTO;
-> -	}
-> -
-> -	if (remaining == 0) {
-> -		/* nothing to do, ignore */
-> -		cFYI(1, "no more data remains");
-> -		return 0;
-> -	}
-> -
-> -	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
-> -	if (remaining < total_in_src)
-> -		cFYI(1, "transact2 2nd response contains too much data");
-> -
-> -	/* find end of first SMB data area */
-> -	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
-> -				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
-> -
-> -	/* validate target area */
-> -	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
-> -				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
-> -
-> -	data_area_of_tgt += total_in_tgt;
-> -
-> -	total_in_tgt += total_in_src;
-> -	/* is the result too big for the field? */
-> -	if (total_in_tgt > USHRT_MAX) {
-> -		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
-> -		return -EPROTO;
-> -	}
-> -	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
-> -
-> -	/* fix up the BCC */
-> -	byte_count = get_bcc(target_hdr);
-> -	byte_count += total_in_src;
-> -	/* is the result too big for the field? */
-> -	if (byte_count > USHRT_MAX) {
-> -		cFYI(1, "coalesced BCC too large (%u)", byte_count);
-> -		return -EPROTO;
-> -	}
-> -	put_bcc(byte_count, target_hdr);
-> -
-> -	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
-> -	byte_count += total_in_src;
-> -	/* don't allow buffer to overflow */
-> -	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
-> -		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
-> -		return -ENOBUFS;
-> -	}
-> -	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
-> -
-> -	/* copy second buffer into end of first buffer */
-> -	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
-> -
-> -	if (remaining != total_in_src) {
-> -		/* more responses to go */
-> -		cFYI(1, "waiting for more secondary responses");
-> -		return 1;
-> -	}
-> -
-> -	/* we are done */
-> -	cFYI(1, "found the last secondary response");
-> -	return 0;
-> -}
-> -
->  static void
->  cifs_echo_request(struct work_struct *work)
->  {
-> @@ -803,29 +666,8 @@ static void
->  handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
->  	   char *buf, int malformed)
->  {
-> -	if (malformed == 0 && check2ndT2(buf) > 0) {
-> -		mid->multiRsp = true;
-> -		if (mid->resp_buf) {
-> -			/* merge response - fix up 1st*/
-> -			malformed = coalesce_t2(buf, mid->resp_buf);
-> -			if (malformed > 0)
-> -				return;
-> -
-> -			/* All parts received or packet is malformed. */
-> -			mid->multiEnd = true;
-> -			return dequeue_mid(mid, malformed);
-> -		}
-> -		if (!server->large_buf) {
-> -			/*FIXME: switch to already allocated largebuf?*/
-> -			cERROR(1, "1st trans2 resp needs bigbuf");
-> -		} else {
-> -			/* Have first buffer */
-> -			mid->resp_buf = buf;
-> -			mid->large_buf = true;
-> -			server->bigbuf = NULL;
-> -		}
-> +	if (S_OP(server, check_trans2, false, mid, server, buf, malformed))
+Hmmm, where is the best place to host my stuff. At the moment it is
+just on my laptop. Would github object if I have a large repos there?
+:-) Maybe I should create one on git.samba.org ...
 
-Blech, do you really think this makes the code clearer? I personally
-find this macro ugly, but I suppose it's a matter of taste...
+> P.S. It seems that your remote 'origin' here is my git repo on
+> git.altlinux.ru. You should refetch it often enough if you want to ge=
+t
+> my latest version (smb2-dev-prev, smb2-dev2, smb2-3.4 no longer exist=
+)
+>>  master
 
-Looks fine otherwise, and I'm not concerned enough about the ugliness
-to NAK it on those grounds...
+Yeah, I do fetch regularly and rebase all the time ...
 
-Reviewed-by: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+--=20
+Regards,
+Richard Sharpe
+(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
