@@ -1,157 +1,163 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH] manpage: document the cache= option and mark
- strictcache and directio as being deprecated
-Date: Wed, 30 May 2012 06:10:08 -0400
-Message-ID: <20120530061008.3c0963f2@corrin.poochiereds.net>
-References: <1337606093-5742-1-git-send-email-jlayton@samba.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: ANNOUNCE: cifs-utils release 5.5 is ready for download
+Date: Wed, 30 May 2012 06:37:13 -0400
+Message-ID: <20120530063713.10a9f796@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Transfer-Encoding: base64
+To: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1337606093-5742-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 21 May 2012 09:14:53 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-
-> ...also add a CACHE COHERENCY section so that we can explain cifs' behavior
-> in detail.
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  mount.cifs.8 |  100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 files changed, 100 insertions(+), 0 deletions(-)
-> 
-> diff --git a/mount.cifs.8 b/mount.cifs.8
-> index cbf2e76..f6a66bf 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -220,14 +220,58 @@ dynperm
->  Instructs the server to maintain ownership and permissions in memory that can\'t be stored on the server\&. This information can disappear at any time (whenever the inode is flushed from the cache), so while this may help make some applications work, it\'s behavior is somewhat unreliable\&. See the section below on FILE AND DIRECTORY OWNERSHIP AND PERMISSIONS for more information\&.
->  .RE
->  .PP
-> +cache=
-> +.RS 4
-> +Cache mode\&. See the section below on CACHE COHERENCY for details. Allowed values are:
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +none: do not cache file data at all
-> +.RE
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +strict: follow the CIFS/SMB2 protocol strictly
-> +.RE
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +loose: allow loose caching semantics
-> +.RE
-> +.PP
-> +The default in kernels prior to 3.7 was "loose". As of kernel 3.7 the default is "strict".
-> +.RE
-> +.PP
->  directio
->  .RS 4
->  Do not do inode data caching on files opened on this mount\&. This precludes mmaping files on this mount\&. In some cases with fast networks and little or no caching benefits on the client (e\&.g\&. when the application is doing large sequential reads bigger than page size without rereading the same data) this can provide better performance than the default behavior which caches reads (readahead) and writes (writebehind) through the local Linux client pagecache if oplock (caching token) is granted and held\&. Note that direct allows write operations larger than page size to be sent to the server\&. On some kernels this requires the cifs\&.ko module to be built with the CIFS_EXPERIMENTAL configure option\&.
-> +.PP
-> +This option is will be deprecated in 3.7. Users should use cache=none instead on more recent kernels.
->  .RE
->  .PP
->  strictcache
->  .RS 4
->  Use for switching on strict cache mode\&. In this mode the client reads from the cache all the time it has Oplock Level II, otherwise - read from the server\&. As for write - the client stores a data in the cache in Exclusive Oplock case, otherwise - write directly to the server\&.
-> +.PP
-> +This option is will be deprecated in 3.7. Users should use cache=strict instead on more recent kernels.
->  .RE
->  .PP
->  rwpidforward
-> @@ -531,6 +575,62 @@ When Unix Extensions are enabled, we use the actual inode number provided by the
->  When Unix Extensions are disabled and "serverino" mount option is enabled there is no way to get the server inode number\&. The client typically maps the server\-assigned "UniqueID" onto an inode number\&.
->  .PP
->  Note that the UniqueID is a different value from the server inode number\&. The UniqueID value is unique over the scope of the entire server and is often greater than 2 power 32\&. This value often makes programs that are not compiled with LFS (Large File Support), to trigger a glibc EOVERFLOW error as this won\'t fit in the target structure field\&. It is strongly recommended to compile your programs with LFS support (i\&.e\&. with \-D_FILE_OFFSET_BITS=64) to prevent this problem\&. You can also use "noserverino" mount option to generate inode numbers smaller than 2 power 32 on the client\&. But you may not be able to detect hardlinks properly\&.
-> +.SH CACHE COHERENCY
-> +With a network filesystem such as CIFS or NFS, the client must contend with
-> +the fact that activity on other clients or the server could change the contents
-> +or attributes of a file without the client being aware of it. One way to deal
-> +with such a problem is to mandate that all file accesses go to the server
-> +directly. This is performance prohibitive however, so most protocols have some
-> +mechanism to allow the client to cache data locally.
-> +.PP
-> +The CIFS protocol mandates (in effect) that the client should not cache file
-> +data unless it holds an opportunistic lock (aka oplock) or a lease. Both of
-> +these entities allow the client to guarantee certain types of exclusive access
-> +to a file so that it can access its contents without needing to continually
-> +interact with the server. The server will call back the client when it needs to
-> +revoke either of them and allow the client a certain amount of time to flush
-> +any cached data.
-> +.PP
-> +The cifs client uses the kernel's pagecache to cache file data. Any I/O that's
-> +done through the pagecache is generally page-aligned. This can be problematic
-> +when combined with byte-range locks as Windows' locking is mandatory and can
-> +block reads and writes from occurring.
-> +.PP
-> +cache=none means that the client never utilizes the cache for normal reads and
-> +writes. It always accesses the server directly to satisfy a read or write request.
-> +.PP
-> +cache=strict means that the client will attempt to follow the CIFS/SMB2
-> +protocol strictly. That is, the cache is only trusted when the client holds
-> +an oplock. When the client does not hold an oplock, then the client bypasses
-> +the cache and accesses the server directly to satisfy a read or write request. By
-> +doing this, the client avoids problems with byte range locks. Additionally, byte
-> +range locks are cached on the client when it holds an oplock and are "pushed" to
-> +the server when that oplock is recalled.
-> +.PP
-> +cache=loose allows the client to use looser protocol semantics which can sometimes
-> +provide better performance at the expense of cache coherency. File access always
-> +involves the pagecache. When an oplock or lease is not held, then the client will
-> +attempt to flush the cache soon after a write to a file. Note that that flush
-> +does not necessarily occur before a write system call returns.
-> +.PP
-> +In the case of a read without holding an oplock, the client will attempt to
-> +periodically check the attributes of the file in order to ascertain whether it
-> +has changed and the cache might no longer be valid. This mechanism is much like
-> +the one that NFSv2/3 use for cache coherency, but it particularly problematic
-> +with CIFS. Windows is quite "lazy" with respect to updating the "LastWriteTime"
-> +field that the client uses to verify this. The effect is that cache=loose can
-> +cause data corruption when multiple readers and writers are working on the
-> +same files.
-> +.PP
-> +Because of this, when multiple clients are accessing the same set of files, then
-> +cache=strict is recommended. That helps eliminate problems with cache coherency by
-> +following the CIFS/SMB2 protocols more strictly.
-> +.PP
-> +Note too that no matter what caching model is used, the client will always use
-> +the pagecache to handle mmap'ed files. Writes to mmap'ed files are only guaranteed
-> +to be flushed to the server when msync() is called, or on close().
-> +.PP
-> +The default in kernels prior to 3.7 was "loose". As of 3.7, the default is "strict".
->  .SH CIFS/NTFS ACL, SID/UID/GID MAPPING, SECURITY DESCRIPTORS
->  This option is used to work with file objects which posses Security Descriptors and CIFS/NTFS ACL instead of UID, GID, file permission bits, and POSIX ACL as user authentication model. This is the most common authentication model for CIFS servers and is the one used by Windows.
->  .sp
-
-Merged...
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpOb3RoaW5n
+IHRlcnJpYmx5IGVhcnRoLXNoYXR0ZXJpbmcgaW4gdGhpcyByZWxlYXNlLiBXZSBoYWQgYSBudW1i
+ZXIgb2YNCnJlcG9ydHMgb2YgYnVpbGQtYnJlYWtpbmcgcHJvYmxlbXMgaW4gdmVyc2lvbiA1LjQs
+IG1vc3RseSBkdWUgdG8gdGhlDQpmYWN0IHRoYXQgd2Ugbm93IHR1cm4gb24gLVdlcnJvciBieSBk
+ZWZhdWx0LCBhbmQgYSBudW1iZXIgb2YgcGF0Y2hlcyB0bw0KZml4IHRoZW0uDQoNCkknbSBzdGFy
+dGluZyB0byBoYXZlIGRvdWJ0cyBhcyB0byB3aGV0aGVyIGl0J3MgYSBnb29kIGlkZWEgdG8ga2Vl
+cA0KLSAtV2Vycm9yIGluIHRoZSBkZWZhdWx0IENGTEFHUy4gVGhpcyBpcyBidWlsdCBpbiBhIGxh
+cmdlIHJhbmdlIG9mDQplbnZpcm9ubWVudHMgYW5kIHdpdGggYSBsYXJnZSByYW5nZSBvZiBkaWZm
+ZXJlbnQgdG9vbCB2ZXJzaW9ucy4NCkNhdGNoaW5nIGFsbCBvZiB0aGUgd2FybmluZ3MgY2FuIGJl
+IGRpZmZpY3VsdC4NCg0KSSd2ZSBsZWZ0IHRoYXQgZmxhZyBpbiBwbGFjZSBmb3Igbm93LCBidXQg
+aWYgaXQncyBjYXVzaW5nIHNpZ25pZmljYW50DQpwYWluIGZvciBhbnlvbmUgdGhlbiBwbGVhc2Ug
+c3BlYWsgdXAsIGFuZCB3ZSBtaWdodCByZW1vdmUgaXQgaW4gYSBsYXRlcg0KcmVsZWFzZS4NCg0K
+SGlnaGxpZ2h0czoNCg0KICogYSBidW5jaCBvZiBmaXhlcyBmb3IgY29tcGlsZSB0aW1lIHdhcm5p
+bmdzIGFuZCBidWlsZCBicmVha3MNCg0KICogc29tZSBmaXhlcyBpbiB0aGUgbGliY2FwIGNhcGFi
+aWxpdGllcyBkcm9wcGluZyBjb2RlIA0KDQogKiByZW1vdmUgdW5uZWVkZWQgbW91bnQuc21iMiBt
+dWx0aWNhbGwgY29kZSBhbmQgb3RoZXIgcHJlcCB3b3JrIGZvcg0KICAgc21iMiBzdXBwb3J0DQoN
+CiAqIG1hbnBhZ2UgdXBkYXRlcyBmb3Iga2VybmVsLWxldmVsIGJlaGF2aW9yIGNoYW5nZXMgDQoN
+CndlYnBhZ2U6ICAgIGh0dHBzOi8vd2lraS5zYW1iYS5vcmcvaW5kZXgucGhwL0xpbnV4Q0lGU191
+dGlscw0KdGFyYmFsbDogICAgZnRwOi8vZnRwLnNhbWJhLm9yZy9wdWIvbGludXgtY2lmcy9jaWZz
+LXV0aWxzLw0KZ2l0OiAgICAgICAgZ2l0Oi8vZ2l0LnNhbWJhLm9yZy9jaWZzLXV0aWxzLmdpdA0K
+Z2l0d2ViOiAgICAgaHR0cDovL2dpdC5zYW1iYS5vcmcvP3A9Y2lmcy11dGlscy5naXQ7YT1zdW1t
+YXJ5DQoNCkRldGFpbGVkIGxpc3Qgb2YgY2hhbmdlcyBzaW5jZSA1LjQ6DQoNCmNvbW1pdCA2NzZm
+MDM4NmRmNTFiMzZkZjQyZDhiNmI4MTViN2Q5ZDhiNjkzNGRjDQpBdXRob3I6IEplZmYgTGF5dG9u
+IDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgVGh1IEFwciAxOSAwNzoyOTozMyAyMDEyIC0w
+NDAwDQoNCiAgICBhdXRvY29uZjogc2V0IHZlcnNpb24gdG8gNS40LjEgZm9yIGludGVyaW0gYnVp
+bGRzDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEu
+b3JnPg0KDQpjb21taXQgOGM2MjY4Y2JiZDQyMDI2MzFlNWM0YjMwMjk3YWRjMDA4OGExZDU2OA0K
+QXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFRodSBBcHIg
+MTkgMDc6Mjk6NDYgMjAxMiAtMDQwMA0KDQogICAgbW91bnQuY2lmczogZml4IHVwIHNvbWUgLURf
+Rk9SVElGWV9TT1VSQ0U9MiB3YXJuaW5ncw0KICAgIA0KICAgIC4uLmFuZCBhZGQgLURfRk9SVElG
+WV9TT1VSQ0U9MiB0byB0aGUgZGVmYXVsdCAkQ0ZMQUdTLg0KICAgIA0KICAgIEFja2VkLWJ5OiBB
+Y2tlZC1ieTogU3VyZXNoIEpheWFyYW1hbiA8c2pheWFyYW1hbkBzdXNlLmNvbT4NCiAgICBTaWdu
+ZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNvbW1pdCBiZTVi
+OTU0ZTM1ODU4YzA5ZGZhZWVlMzNiZjA2YmIwZGM3NmE4NmY5DQpBdXRob3I6IExhcnMgTXVlbGxl
+ciA8bG11ZWxsZUBzdXNlLmNvbT4NCkRhdGU6ICAgRnJpIEFwciAyMCAwNzo1ODo1NCAyMDEyIC0w
+NDAwDQoNCiAgICBtb3VudC5jaWZzOiB1bmluaXRpYWxpemVkIHZhcmlhYmxlcyBpbiBtb3VudC5j
+aWZzDQogICAgDQogICAgb2xkZXIgZ2NjIHZlcnNpb25zICg0LjMgaW4gdGhlIGNhc2Ugb2YgU1VT
+RSBMaW51eCBFbnRlcnByaXNlIDExIFNQIDEgYW5kDQogICAgU1AgMikgY29tcGxhaW4gYWJvdXQg
+dW5pbml0aWFsaXplZCB2YXJpYWJsZXMgaW4gdGhlIHJlY2VudCA1LjQgcmVsZWFzZS4NCiAgICAN
+CiAgICBUaGUgYXR0YWNoZWQgcGF0Y2ggbWFrZXMgdGhlIGJ1aWxkIHByb2Nlc3MgYSBiaXQgcXVp
+ZXRlci4NCiAgICANCiAgICBBY2tlZC1ieTogU3VyZXNoIEpheWFyYW1hbiA8c2pheWFyYW1hbkBz
+dXNlLmNvbT4NCiAgICBTaWduZWQtb2ZmLWJ5OiBMYXJzIE11ZWxsZXIgPGxtdWVsbGVAc3VzZS5j
+b20+DQoNCmNvbW1pdCBlNWYxMjRjMTBmYThlNTgyYzVkZjYxMDE3ZDZmNmMyYjEwYzM5N2RjDQpB
+dXRob3I6IExhcnMgTXVlbGxlciA8bG11ZWxsZUBzdXNlLmNvbT4NCkRhdGU6ICAgRnJpIEFwciAy
+MCAwNzo1OTowNiAyMDEyIC0wNDAwDQoNCiAgICBjaWZzLnVwY2FsbDogbWlzc2luZyBwcm90b3R5
+cGUgZm9yIGtyYjVfYXV0aF9jb25fc2V0X3JlcV9ja3N1bXR5cGUgaW4gTUlUDQogICAga3JiNSA8
+IDEuNw0KICAgIA0KICAgIA0KICAgIHByb2R1Y3RzIGNvbWluZyB3aXRoIE1JVCBrcmI1IDwgMS43
+IChsaWtlIFNVU0UgTGludXggRW50ZXJwcmlzZSAxMSBTUCAxDQogICAgb3IgU1AgMikgc3VmZmVy
+IGZyb20gdGhlIHNhbWUgaXNzdWUgYXMgZGVzY3JpYmVkIGJ5DQogICAgaHR0cHM6Ly9idWd6aWxs
+YS5zYW1iYS5vcmcvc2hvd19idWcuY2dpP2lkPTY5MTgNCiAgICANCiAgICBUaGUgZGVjbGFyYXRp
+b24gb2Yga3JiNV9hdXRoX2Nvbl9zZXRfcmVxX2Nrc3VtdHlwZSBpcyBtaXNzaW5nLg0KICAgIA0K
+ICAgIEluc3BpcmF0aW9uOiBodHRwczovL2J1Z3ppbGxhLnNhbWJhLm9yZy9zaG93X2J1Zy5jZ2k/
+aWQ9NjkxOA0KICAgIA0KICAgIEFja2VkLWJ5OiBTdXJlc2ggSmF5YXJhbWFuIDxzamF5YXJhbWFu
+QHN1c2UuY29tPg0KICAgIFNpZ25lZC1vZmYtYnk6IExhcnMgTXVlbGxlciA8bG11ZWxsZUBzdXNl
+LmNvbT4NCg0KY29tbWl0IDBhYTEyZGU1YzE1NjVkNTZhMjQwZDdiMGRkODE0MzE2ZjRlYTgxZjMN
+CkF1dGhvcjogTGFycyBNdWVsbGVyIDxsbXVlbGxlQHN1c2UuY29tPg0KRGF0ZTogICBGcmkgQXBy
+IDIwIDA3OjU5OjE1IDIwMTIgLTA0MDANCg0KICAgIG1vdW50LmNpZnM6IHRvZ2dsZV9kYWNfY2Fw
+YWJpbGl0eSgpIHN0b3JlcyByZXR1cm4gY29kZQ0KICAgIA0KICAgIHRoZSBidWlsZCBwcm9jZXNz
+IG9mIHRoZSBjaWZzLXV0aWxzIGZvciBNYW5kcml2YSAyMDExIG1hZGUgbWUgbm90aWNlIG9mDQog
+ICAgdGhlIHVudXNlZCB2YXJpYWJsZSByYyBpbiB0b2dnbGVfZGFjX2NhcGFiaWxpdHkoKSBvZiBt
+b3VudC5jaWZzLmMuDQogICAgDQogICAgQSBiaXQgdXAgaW4gdGhlIGNvZGUgd2Ugc3RvcmUgdGhl
+IHJldHVybiB2YWx1ZSBhbmQgZG8gbm90IG1ha2UgdXNlIG9mIGl0DQogICAgd2hpbGUgY2FsbGlu
+ZyByZXR1cm4uDQogICAgDQogICAgVGhlIGF0dGFjaGVkIHBhdGNoIGludGVuZHMgdG8gZml4IHRo
+aXMuDQogICAgDQogICAgVGhlIGZhaWxpbmcgYnVpbGQgcmVzdWx0IGlzIHN0aWxsIHZpc2libGUg
+YXQNCiAgICBodHRwczovL2J1aWxkLm9wZW5zdXNlLm9yZy9wYWNrYWdlL2xpdmVfYnVpbGRfbG9n
+P2FyY2g9eDg2XzY0JnBhY2thZ2U9Y2lmcy11dGlscyZwcm9qZWN0PW5ldHdvcmslM0FzYW1iYSUz
+QVNUQUJMRSZyZXBvc2l0b3J5PU1hbmRyaXZhXzIwMTENCiAgICANCiAgICBBY2tlZC1ieTogU3Vy
+ZXNoIEpheWFyYW1hbiA8c2pheWFyYW1hbkBzdXNlLmNvbT4NCiAgICBTaWduZWQtb2ZmLWJ5OiBM
+YXJzIE11ZWxsZXIgPGxtdWVsbGVAc3VzZS5jb20+DQoNCmNvbW1pdCBhOTFmYjA2NzEyNzNlNGVm
+OTA3OWVlNzg2MDU3NGM0NjBhYTk0YTUxDQpBdXRob3I6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNh
+bWJhLm9yZz4NCkRhdGU6ICAgRnJpIEFwciAyMCAwNzo1OToxNyAyMDEyIC0wNDAwDQoNCiAgICBt
+b3VudC5jaWZzOiByZW1vdmUgdW5uZWNlc3NhcnkgZ2V0dWlkKCkgY2hlY2sgaW4gbGliY2FwIHZl
+cnNpb24gb2YgdG9nZ2xlX2RhY19jYXBhYmlsaXR5DQogICAgDQogICAgSSdtIG5vdCBzdXJlIHdo
+YXQgSSB3YXMgdGhpbmtpbmcgd2hlbiBJIGFkZGVkIHRoYXQgY2hlY2sgaW4sIGJ1dCBpdCdzDQog
+ICAgYmVlbiB0aGVyZSBzaW5jZSB0aGUgaW5jZXB0aW9uLiBXZSBzaG91bGRuJ3QgY2FyZSBhdCBh
+bGwgd2hhdCB0aGUNCiAgICByZWFsIHVpZCBpcyB3aGVuIHdlIGNhbGwgdG9nZ2xlX2RhY19jYXBh
+YmlsaXR5IGFuZCBpbmRlZWQgd2UgZG9uJ3QNCiAgICBjYXJlIHdpdGggdGhlIGxpYmNhcC1uZyB2
+ZXJzaW9uLiBSZW1vdmUgdGhhdCBjaGVjay4NCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZm
+IExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQoNCmNvbW1pdCBiYWI1NzJhODliZDBkOTg5YmQ3
+NjFlOGNlYTkyNmRmY2Y0OGI5MzhkDQpBdXRob3I6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJh
+Lm9yZz4NCkRhdGU6ICAgV2VkIE1heSAyIDE0OjI1OjI4IDIwMTIgLTA0MDANCg0KICAgIG1vdW50
+LmNpZnM6IGRvbid0IHBhc3MgY3JlZGVudGlhbHM9IG9wdGlvbiB0byB0aGUga2VybmVsDQogICAg
+DQogICAgV2UgaGFuZGxlIHRoaXMgb3B0aW9uIGluIHVzZXJzcGFjZSwgc28gdGhlcmUncyBsaXR0
+bGUgdmFsdWUgaW4gYWxzbw0KICAgIHBhc3NpbmcgaXQgdG8gdGhlIGtlcm5lbC4NCiAgICANCiAg
+ICBBbHNvIGZpeCBtaW5vciBkb3VibGUtY29tbWEgbml0IGluIHRoZSBvcHRpb25zIHN0cmluZy4N
+CiAgICANCiAgICBSZXBvcnRlZC1ieTogUm9uYWxkIDxyb25hbGQ2NDVAZ21haWwuY29tPg0KICAg
+IFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KY29tbWl0
+IDk0MTBjNzc2YTNiZDY5YTg0MzRlNWYwMTE3NGJjNTlmMDhlN2U2MmENCkF1dGhvcjogSmVmZiBM
+YXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTogICBNb24gTWF5IDE0IDA2OjQxOjI5IDIw
+MTIgLTA0MDANCg0KICAgIGRvYzogdXBkYXRlIG1haWxpbmcgbGlzdA0KICAgIA0KICAgIFNpZ25l
+ZC1vZmYtYnk6IEx1ayBDbGFlcyA8bHVrQGRlYmlhbi5vcmc+DQoNCmNvbW1pdCA5ZTNjM2M0YjRh
+ZTRjM2U5ZWIyZWI2Mjk3YzMxYzUwMzM3YjJmZDA3DQpBdXRob3I6IEplZmYgTGF5dG9uIDxqbGF5
+dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgVGh1IE1heSAxNyAwNjo0NjozOCAyMDEyIC0wNDAwDQoN
+CiAgICBtb3VudC5jaWZzOiBkb24ndCBzZW5kIGEgbWFuZGF0b3J5IHZlcj0gb3B0aW9uIHRvIHRo
+ZSBrZXJuZWwNCiAgICANCiAgICBUcmFkaXRpb25hbGx5LCB0aGlzIHZlcj0gb3B0aW9uIHdhcyB1
+c2VkIHRvIHNwZWNpZnkgdGhlICJvcHRpb25zDQogICAgdmVyc2lvbiIgdGhhdCB3ZSdyZSBwYXNz
+aW5nIGluLiBJdCBoYXMgYWx3YXlzIGJlZW4gc2V0IHRvICcxJyB0aG91Z2gNCiAgICBhbmQgd2Ug
+aGF2ZSBuZXZlciBjaGFuZ2VkIHRoYXQuDQogICAgDQogICAgRXZlbnR1YWxseSB3ZSB3YW50IHRv
+IGhhdmUgYSB2ZXI9IChvciB2ZXJzPSkgb3B0aW9uIHRoYXQgYWxsb3dzIHVzZXJzDQogICAgdG8g
+c3BlY2lmeSB0aGUgU01CIHZlcnNpb24gdGhhdCB0aGV5IHdhbnQgdG8gdXNlIHRvIHRhbGsgdG8g
+dGhlIHNlcnZlci4NCiAgICANCiAgICBBdCB0aGF0IHBvaW50LCB0aGlzIG9wdGlvbiB3aWxsIGp1
+c3QgZ2V0IGluIHRoZSB3YXkuIExldCdzIGdvIGFoZWFkDQogICAgYW5kIHJlbW92ZSBpdCBub3cg
+aW4gcHJlcGFyYXRpb24gZm9yIHRoYXQgZGF5Lg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEpl
+ZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCg0KY29tbWl0IGYxNjE1MzIzNTVjMWI0MTBh
+MzA4YmQxNjVjNjBjMmIxZTZkNjY5MWMNCkF1dGhvcjogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2Ft
+YmEub3JnPg0KRGF0ZTogICBUaHUgTWF5IDE3IDA2OjQ2OjM4IDIwMTIgLTA0MDANCg0KICAgIG1v
+dW50LmNpZnM6IHJlbW92ZSBzbWIyIG11bHRpY2FsbCBiaW5hcnkgY29kZQ0KICAgIA0KICAgIFRo
+aXMgd2FzIGFkZGVkIHdoZW4gaXQgd2FzIHRob3VnaHQgdGhhdCBzbWIyIHdvdWxkIGJlIGEgZGlm
+ZmVyZW50IGZzdHlwZQ0KICAgIGFsdG9nZXRoZXIuIE5vdyB0aGF0IHdlIGFyZSBub3QgYWRkaW5n
+IGEgc2VwYXJhdGUgZnN0eXBlLCB0aGlzIGNvZGUgaXMNCiAgICBubyBsb25nZXIgbmVlZGVkIHNp
+bmNlIG5vdGhpbmcgd2lsbCBldmVyIGNhbGwgL3NiaW4vbW91bnQuc21iMi4NCiAgICANCiAgICBD
+YzogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFpbC5jb20+DQogICAgU2lnbmVkLW9mZi1ieTog
+SmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgMjRhYjdiMDYzNjI0MzQw
+YzBmMGEzZDU3ODE1MjJjMjAzZDgyNjVmOQ0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBz
+YW1iYS5vcmc+DQpEYXRlOiAgIFRodSBNYXkgMTcgMDY6NDY6MzggMjAxMiAtMDQwMA0KDQogICAg
+ZG9jOiByZW1vdmUgb2xkIFhNTCBzb3VyY2VzIGZvciBtb3VudC5jaWZzLjggYW5kIGNpZnMudXBj
+YWxsLjgNCiAgICANCiAgICBUaGVzZSBmaWxlcyB3ZXJlIGFkZGVkIHdoZW4gSSBvcmlnaW5hbGx5
+IHNwbGl0IHRoZXNlIHRvb2xzIG9mZiBmcm9tIHRoZQ0KICAgIHNhbWJhIHNvdXJjZXMsIGJ1dCB3
+ZSBoYXZlbid0IGV2ZXIgdXNlZCB0aGVtIHRvIGJ1aWxkIHRoZSBhY3R1YWwNCiAgICBtYW5wYWdl
+cyBhbmQgdGhleSBoYXZlbid0IGJlZW4gbWFpbnRhaW5lZC4gUmVtb3ZlIHRoZW0uDQogICAgDQog
+ICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21t
+aXQgY2I4ZDI4ZTk1NTBiYWY2NzRlMjBmYmJlMTYyYzBhNGJjZjIwYmU2Yg0KQXV0aG9yOiBMdWsg
+Q2xhZXMgPGx1a0BkZWJpYW4ub3JnPg0KRGF0ZTogICBTYXQgTWF5IDE5IDA2OjM3OjIxIDIwMTIg
+LTA0MDANCg0KICAgIG1vdW50LmNpZnM6IHVudXNlZCB2YXJpYWJsZXMNCg0KY29tbWl0IDk1N2E5
+NDgzOGE3NzlhMTA2ZTVjMDk4MDY2NzhlYWVjYjhmY2IyNDINCkF1dGhvcjogSmVmZiBMYXl0b24g
+PGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTogICBNb24gTWF5IDIxIDA5OjE0OjE3IDIwMTIgLTA0
+MDANCg0KICAgIG1hbnBhZ2U6IGRvY3VtZW50IHRoZSBjYWNoZT0gb3B0aW9uIGFuZCBtYXJrIHN0
+cmljdGNhY2hlIGFuZCBkaXJlY3RpbyBhcw0KICAgIGJlaW5nIGRlcHJlY2F0ZWQNCiAgICANCiAg
+ICAuLi5hbHNvIGFkZCBhIENBQ0hFIENPSEVSRU5DWSBzZWN0aW9uIHNvIHRoYXQgd2UgY2FuIGV4
+cGxhaW4gY2lmcycgYmVoYXZpb3INCiAgICBpbiBkZXRhaWwuDQogICAgDQogICAgU2lnbmVkLW9m
+Zi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgZTUyYjcyYWYy
+ZmM1NDE3N2VjZjExMDIyYTJhZWJiYWE1YTcxYjc2Yg0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxh
+eXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFdlZCBNYXkgMzAgMDY6MTI6MTYgMjAxMiAtMDQwMA0K
+DQogICAgYXV0b2NvbmY6IHNldCB2ZXJzaW9uIHRvIDUuNQ0KICAgIA0KICAgIFNpZ25lZC1vZmYt
+Ynk6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05B
+VFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVC
+QWdBR0JRSlB4ZmhmQUFvSkVBQU9hRUVaVm9JVlk1MFFBTVNFVXVRZi9SVFB5ZHZNeVYyVjdQcGcN
+CldnMTlyRW1qUC8xZHcrdmtsVDBEc3ZvVUxxZDJxcFF3dEVrQ0drVlFMVU02YlRHblFVLzkwcmpl
+Sk1DWTdIQkkNCjV4ZXVNTkFwM3drU0ViL3lHNzVTWDFFV3lLS2RUTW4zN2xZR1AwRzltWFc0dUV1
+dXg5emlHWFZtQmpudVU2aXANCndqbmZYN2s4V3FkS25UTjU2cmowbGJTQUFXOWlnMlcyR3NrcTFS
+bFRqSFdGNnorb3E3eWtNNWI3dHFEQ0lValANCmc1SzFmYnc3RGlXV1B6WCtkV2IvQmorRlFsNmV1
+M2h2emczWE02UWxIMk5ST2FIems0V21xU3p4QkNkdkpMeDYNCnlaWjhNbWppUzRYTDVUbVc5Q1pP
+bEEwejBOV1ZITVpONVEzQWowaktGdGt6VmtpK2ZEOXBzZ25taWhWd2VhaC8NCk15WkduUU5BYzNC
+akZyTGF1T05wMnBHZDcwWDBSZUh0Mk9XcWdMZGFDV1lRR0NCeDQxaWlwbjhVWXliZjdtd08NCjZ6
+L2x2NXJCamlVZmJFV25xTDVUQ1prY0tTK3hwWDJ1dVY2bG5KUVlrSHRGTnE1aXdTSUVJVWlFWTMv
+WGxNNzkNClJYZGFSYXRWeWQvOVR2a2J6VGsxdTJJdk5jOGZJTjBWMEk4WnpZS1UveVdGa05rMTlj
+OVBVRWJkYTNHeHl5cTINCmVSd01MMTBkY1lHME1yMHFtaUZtK1FBQSs5eFlwVkY5T1RlZTNBRklQ
+SG56WS83SmY5VFlDNXlKZk5ZK3BzYWUNClhDTW55RVBwSlhtU3JHbCtybEhZRWVsMWFPUkhVRlJC
+WUZzRHVYRjIramJUb0lnMUdXTmVWOHFWTmtDZVdZcU0NCjFSMkp1UUxwSnQ5NjFkRnQ4S3VzDQo9
+aStIOA0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
