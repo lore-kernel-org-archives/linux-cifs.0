@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v4 4/7] CIFS: Extend credit mechanism to process request type
-Date: Thu, 31 May 2012 16:50:54 +0400
-Message-ID: <1338468657-29742-6-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v4 3/7] CIFS: Move trans2 processing to ops struct
+Date: Thu, 31 May 2012 16:50:53 +0400
+Message-ID: <1338468657-29742-5-git-send-email-pshilovsky@samba.org>
 References: <1338468657-29742-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,323 +9,394 @@ In-Reply-To: <1338468657-29742-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Split all requests to echos, oplocks and others - each group uses
-its own credit slot. This change is required to support SMB2 code.
-
-As for CIFS - we don't use this approach and the logic isn't changed.
-
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |   14 ++++++++++----
- fs/cifs/cifsproto.h |    2 +-
- fs/cifs/cifssmb.c   |   12 ++++++------
- fs/cifs/smb1ops.c   |   12 ++++++++++--
- fs/cifs/transport.c |   34 +++++++++++++++++++---------------
- 5 files changed, 46 insertions(+), 28 deletions(-)
+ fs/cifs/cifsglob.h |    3 +
+ fs/cifs/connect.c  |  161 +------------------------------------------------
+ fs/cifs/smb1ops.c  |  170 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 175 insertions(+), 159 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 2aac4e5..560b011 100644
+index 6df0cbe..2aac4e5 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -171,9 +171,11 @@ struct smb_version_operations {
- 	/* check response: verify signature, map error */
- 	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
- 			     bool);
--	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
-+	void (*add_credits)(struct TCP_Server_Info *, const unsigned int,
-+			    const int);
- 	void (*set_credits)(struct TCP_Server_Info *, const int);
--	int * (*get_credits_field)(struct TCP_Server_Info *);
-+	int * (*get_credits_field)(struct TCP_Server_Info *, const int);
-+	unsigned int (*get_credits)(struct mid_q_entry *);
- 	__u64 (*get_next_mid)(struct TCP_Server_Info *);
- 	/* data offset from read response message */
- 	unsigned int (*read_data_offset)(char *);
-@@ -392,9 +394,10 @@ has_credits(struct TCP_Server_Info *server, int *credits)
+@@ -187,6 +187,9 @@ struct smb_version_operations {
+ 	/* verify the message */
+ 	int (*check_message)(char *, unsigned int);
+ 	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
++	/* process transaction2 response */
++	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
++			     char *, int);
+ };
+ 
+ struct smb_version_values {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 78db68a..ca0288d 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -394,143 +394,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	return rc;
  }
  
- static inline void
--add_credits(struct TCP_Server_Info *server, const unsigned int add)
-+add_credits(struct TCP_Server_Info *server, const unsigned int add,
-+	    const int optype)
+-/*
+-	return codes:
+-		0 	not a transact2, or all data present
+-		>0 	transact2 with that much data missing
+-		-EINVAL = invalid transact2
+-
+- */
+-static int check2ndT2(char *buf)
+-{
+-	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
+-	struct smb_t2_rsp *pSMBt;
+-	int remaining;
+-	__u16 total_data_size, data_in_this_rsp;
+-
+-	if (pSMB->Command != SMB_COM_TRANSACTION2)
+-		return 0;
+-
+-	/* check for plausible wct, bcc and t2 data and parm sizes */
+-	/* check for parm and data offset going beyond end of smb */
+-	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
+-		cFYI(1, "invalid transact2 word count");
+-		return -EINVAL;
+-	}
+-
+-	pSMBt = (struct smb_t2_rsp *)pSMB;
+-
+-	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+-	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
+-
+-	if (total_data_size == data_in_this_rsp)
+-		return 0;
+-	else if (total_data_size < data_in_this_rsp) {
+-		cFYI(1, "total data %d smaller than data in frame %d",
+-			total_data_size, data_in_this_rsp);
+-		return -EINVAL;
+-	}
+-
+-	remaining = total_data_size - data_in_this_rsp;
+-
+-	cFYI(1, "missing %d bytes from transact2, check next response",
+-		remaining);
+-	if (total_data_size > CIFSMaxBufSize) {
+-		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
+-			total_data_size, CIFSMaxBufSize);
+-		return -EINVAL;
+-	}
+-	return remaining;
+-}
+-
+-static int coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+-{
+-	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
+-	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
+-	char *data_area_of_tgt;
+-	char *data_area_of_src;
+-	int remaining;
+-	unsigned int byte_count, total_in_tgt;
+-	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
+-
+-	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
+-	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+-
+-	if (tgt_total_cnt != src_total_cnt)
+-		cFYI(1, "total data count of primary and secondary t2 differ "
+-			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
+-
+-	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
+-
+-	remaining = tgt_total_cnt - total_in_tgt;
+-
+-	if (remaining < 0) {
+-		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
+-			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
+-		return -EPROTO;
+-	}
+-
+-	if (remaining == 0) {
+-		/* nothing to do, ignore */
+-		cFYI(1, "no more data remains");
+-		return 0;
+-	}
+-
+-	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
+-	if (remaining < total_in_src)
+-		cFYI(1, "transact2 2nd response contains too much data");
+-
+-	/* find end of first SMB data area */
+-	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
+-				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
+-
+-	/* validate target area */
+-	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
+-				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
+-
+-	data_area_of_tgt += total_in_tgt;
+-
+-	total_in_tgt += total_in_src;
+-	/* is the result too big for the field? */
+-	if (total_in_tgt > USHRT_MAX) {
+-		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
+-		return -EPROTO;
+-	}
+-	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
+-
+-	/* fix up the BCC */
+-	byte_count = get_bcc(target_hdr);
+-	byte_count += total_in_src;
+-	/* is the result too big for the field? */
+-	if (byte_count > USHRT_MAX) {
+-		cFYI(1, "coalesced BCC too large (%u)", byte_count);
+-		return -EPROTO;
+-	}
+-	put_bcc(byte_count, target_hdr);
+-
+-	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
+-	byte_count += total_in_src;
+-	/* don't allow buffer to overflow */
+-	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+-		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
+-		return -ENOBUFS;
+-	}
+-	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
+-
+-	/* copy second buffer into end of first buffer */
+-	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
+-
+-	if (remaining != total_in_src) {
+-		/* more responses to go */
+-		cFYI(1, "waiting for more secondary responses");
+-		return 1;
+-	}
+-
+-	/* we are done */
+-	cFYI(1, "found the last secondary response");
+-	return 0;
+-}
+-
+ static void
+ cifs_echo_request(struct work_struct *work)
  {
--	server->ops->add_credits(server, add);
-+	server->ops->add_credits(server, add, optype);
- }
- 
- static inline void
-@@ -956,6 +959,9 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- #define   CIFS_LOG_ERROR    0x010    /* log NT STATUS if non-zero */
- #define   CIFS_LARGE_BUF_OP 0x020    /* large request buffer */
- #define   CIFS_NO_RESP      0x040    /* no response buffer required */
-+#define   CIFS_ECHO_OP      0x080    /* echo request */
-+#define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
-+#define   CIFS_REQ_MASK    0x0180    /* mask request type */
- 
- /* Security Flags: indicate type of session setup needed */
- #define   CIFSSEC_MAY_SIGN	0x00001
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 0a6cbfe..41d5a76 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -71,7 +71,7 @@ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
- extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 			   unsigned int nvec, mid_receive_t *receive,
- 			   mid_callback_t *callback, void *cbdata,
--			   bool ignore_pend);
-+			   const int optype);
- extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct smb_hdr * /* input */ ,
- 			struct smb_hdr * /* out */ ,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 5b40073..65898cc 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -720,7 +720,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
- 	struct TCP_Server_Info *server = mid->callback_data;
- 
- 	DeleteMidQEntry(mid);
--	add_credits(server, 1);
-+	add_credits(server, 1, 0);
- }
- 
- int
-@@ -747,7 +747,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
- 	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
- 
- 	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
--			     server, true);
-+			     server, CIFS_ASYNC_OP);
- 	if (rc)
- 		cFYI(1, "Echo request failed: %d", rc);
- 
-@@ -1563,7 +1563,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 
- 	queue_work(cifsiod_wq, &rdata->work);
- 	DeleteMidQEntry(mid);
--	add_credits(server, 1);
-+	add_credits(server, 1, 0);
- }
- 
- /* cifs_async_readv - send an async write, and set up mid to handle result */
-@@ -1619,7 +1619,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
- 	kref_get(&rdata->refcount);
- 	rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
- 			     cifs_readv_receive, cifs_readv_callback,
--			     rdata, false);
-+			     rdata, 0);
- 
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->num_reads);
-@@ -2010,7 +2010,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
- 
- 	queue_work(cifsiod_wq, &wdata->work);
- 	DeleteMidQEntry(mid);
--	add_credits(tcon->ses->server, 1);
-+	add_credits(tcon->ses->server, 1, 0);
- }
- 
- /* cifs_async_writev - send an async write, and set up mid to handle result */
-@@ -2090,7 +2090,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
- 
- 	kref_get(&wdata->refcount);
- 	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
--			     NULL, cifs_writev_callback, wdata, false);
-+			     NULL, cifs_writev_callback, wdata, 0);
- 
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->num_writes);
+@@ -803,29 +666,9 @@ static void
+ handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 	   char *buf, int malformed)
+ {
+-	if (malformed == 0 && check2ndT2(buf) > 0) {
+-		mid->multiRsp = true;
+-		if (mid->resp_buf) {
+-			/* merge response - fix up 1st*/
+-			malformed = coalesce_t2(buf, mid->resp_buf);
+-			if (malformed > 0)
+-				return;
+-
+-			/* All parts received or packet is malformed. */
+-			mid->multiEnd = true;
+-			return dequeue_mid(mid, malformed);
+-		}
+-		if (!server->large_buf) {
+-			/*FIXME: switch to already allocated largebuf?*/
+-			cERROR(1, "1st trans2 resp needs bigbuf");
+-		} else {
+-			/* Have first buffer */
+-			mid->resp_buf = buf;
+-			mid->large_buf = true;
+-			server->bigbuf = NULL;
+-		}
++	if (server->ops->check_trans2 &&
++	    server->ops->check_trans2(mid, server, buf, malformed))
+ 		return;
+-	}
+ 	mid->resp_buf = buf;
+ 	mid->large_buf = server->large_buf;
+ 	/* Was previous buf put in mpx struct for multi-rsp? */
 diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 28359e7..f4f8394 100644
+index 6dec38f..28359e7 100644
 --- a/fs/cifs/smb1ops.c
 +++ b/fs/cifs/smb1ops.c
-@@ -101,7 +101,8 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
+@@ -213,6 +213,175 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
+ 	return mid;
  }
  
- static void
--cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
-+cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add,
-+		 const int optype)
- {
- 	spin_lock(&server->req_lock);
- 	server->credits += add;
-@@ -120,11 +121,17 @@ cifs_set_credits(struct TCP_Server_Info *server, const int val)
- }
- 
- static int *
--cifs_get_credits_field(struct TCP_Server_Info *server)
-+cifs_get_credits_field(struct TCP_Server_Info *server, const int optype)
- {
- 	return &server->credits;
- }
- 
-+static unsigned int
-+cifs_get_credits(struct mid_q_entry *mid)
++/*
++	return codes:
++		0	not a transact2, or all data present
++		>0	transact2 with that much data missing
++		-EINVAL	invalid transact2
++ */
++static int
++check2ndT2(char *buf)
 +{
-+	return 1;
++	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
++	struct smb_t2_rsp *pSMBt;
++	int remaining;
++	__u16 total_data_size, data_in_this_rsp;
++
++	if (pSMB->Command != SMB_COM_TRANSACTION2)
++		return 0;
++
++	/* check for plausible wct, bcc and t2 data and parm sizes */
++	/* check for parm and data offset going beyond end of smb */
++	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
++		cFYI(1, "invalid transact2 word count");
++		return -EINVAL;
++	}
++
++	pSMBt = (struct smb_t2_rsp *)pSMB;
++
++	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
++	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
++
++	if (total_data_size == data_in_this_rsp)
++		return 0;
++	else if (total_data_size < data_in_this_rsp) {
++		cFYI(1, "total data %d smaller than data in frame %d",
++			total_data_size, data_in_this_rsp);
++		return -EINVAL;
++	}
++
++	remaining = total_data_size - data_in_this_rsp;
++
++	cFYI(1, "missing %d bytes from transact2, check next response",
++		remaining);
++	if (total_data_size > CIFSMaxBufSize) {
++		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
++			total_data_size, CIFSMaxBufSize);
++		return -EINVAL;
++	}
++	return remaining;
 +}
 +
- /*
-  * Find a free multiplex id (SMB mid). Otherwise there could be
-  * mid collisions which might cause problems, demultiplexing the
-@@ -390,6 +397,7 @@ struct smb_version_operations smb1_operations = {
- 	.add_credits = cifs_add_credits,
- 	.set_credits = cifs_set_credits,
- 	.get_credits_field = cifs_get_credits_field,
-+	.get_credits = cifs_get_credits,
- 	.get_next_mid = cifs_get_next_mid,
- 	.read_data_offset = cifs_read_data_offset,
- 	.read_data_length = cifs_read_data_length,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 3097ee5..289eb69 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -305,7 +305,7 @@ static int
- wait_for_free_request(struct TCP_Server_Info *server, const int optype)
- {
- 	return wait_for_free_credits(server, optype,
--				     server->ops->get_credits_field(server));
-+				server->ops->get_credits_field(server, optype));
- }
- 
- static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
-@@ -384,12 +384,12 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
- int
- cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 		unsigned int nvec, mid_receive_t *receive,
--		mid_callback_t *callback, void *cbdata, bool ignore_pend)
-+		mid_callback_t *callback, void *cbdata, const int optype)
- {
- 	int rc;
- 	struct mid_q_entry *mid;
- 
--	rc = wait_for_free_request(server, ignore_pend ? CIFS_ASYNC_OP : 0);
-+	rc = wait_for_free_request(server, optype);
- 	if (rc)
- 		return rc;
- 
-@@ -397,7 +397,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	rc = cifs_setup_async_request(server, iov, nvec, &mid);
- 	if (rc) {
- 		mutex_unlock(&server->srv_mutex);
--		add_credits(server, 1);
-+		add_credits(server, 1, optype);
- 		wake_up(&server->request_q);
- 		return rc;
- 	}
-@@ -419,7 +419,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	return rc;
- out_err:
- 	delete_mid(mid);
--	add_credits(server, 1);
-+	add_credits(server, 1, optype);
- 	wake_up(&server->request_q);
- 	return rc;
- }
-@@ -539,11 +539,13 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	     const int flags)
- {
- 	int rc = 0;
--	int long_op;
-+	int long_op, optype;
- 	struct mid_q_entry *midQ;
- 	char *buf = iov[0].iov_base;
-+	unsigned int credits = 1;
- 
- 	long_op = flags & CIFS_TIMEOUT_MASK;
-+	optype = flags & CIFS_REQ_MASK;
- 
- 	*pRespBufType = CIFS_NO_BUFFER;  /* no response buf yet */
- 
-@@ -564,7 +566,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	 * use ses->maxReq.
- 	 */
- 
--	rc = wait_for_free_request(ses->server, long_op);
-+	rc = wait_for_free_request(ses->server, optype);
- 	if (rc) {
- 		cifs_small_buf_release(buf);
- 		return rc;
-@@ -583,7 +585,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 		mutex_unlock(&ses->server->srv_mutex);
- 		cifs_small_buf_release(buf);
- 		/* Update # of requests on wire to server */
--		add_credits(ses->server, 1);
-+		add_credits(ses->server, 1, optype);
- 		return rc;
- 	}
- 
-@@ -613,7 +615,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 			midQ->callback = DeleteMidQEntry;
- 			spin_unlock(&GlobalMid_Lock);
- 			cifs_small_buf_release(buf);
--			add_credits(ses->server, 1);
-+			add_credits(ses->server, 1, optype);
- 			return rc;
- 		}
- 		spin_unlock(&GlobalMid_Lock);
-@@ -623,7 +625,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0) {
--		add_credits(ses->server, 1);
-+		add_credits(ses->server, 1, optype);
- 		return rc;
- 	}
- 
-@@ -641,6 +643,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	else
- 		*pRespBufType = CIFS_SMALL_BUFFER;
- 
-+	credits = ses->server->ops->get_credits(midQ);
++static int
++coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
++{
++	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
++	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
++	char *data_area_of_tgt;
++	char *data_area_of_src;
++	int remaining;
++	unsigned int byte_count, total_in_tgt;
++	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
 +
- 	rc = ses->server->ops->check_receive(midQ, ses->server,
- 					     flags & CIFS_LOG_ERROR);
++	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
++	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
++
++	if (tgt_total_cnt != src_total_cnt)
++		cFYI(1, "total data count of primary and secondary t2 differ "
++			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
++
++	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
++
++	remaining = tgt_total_cnt - total_in_tgt;
++
++	if (remaining < 0) {
++		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
++			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
++		return -EPROTO;
++	}
++
++	if (remaining == 0) {
++		/* nothing to do, ignore */
++		cFYI(1, "no more data remains");
++		return 0;
++	}
++
++	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
++	if (remaining < total_in_src)
++		cFYI(1, "transact2 2nd response contains too much data");
++
++	/* find end of first SMB data area */
++	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
++				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
++
++	/* validate target area */
++	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
++				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
++
++	data_area_of_tgt += total_in_tgt;
++
++	total_in_tgt += total_in_src;
++	/* is the result too big for the field? */
++	if (total_in_tgt > USHRT_MAX) {
++		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
++		return -EPROTO;
++	}
++	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
++
++	/* fix up the BCC */
++	byte_count = get_bcc(target_hdr);
++	byte_count += total_in_src;
++	/* is the result too big for the field? */
++	if (byte_count > USHRT_MAX) {
++		cFYI(1, "coalesced BCC too large (%u)", byte_count);
++		return -EPROTO;
++	}
++	put_bcc(byte_count, target_hdr);
++
++	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
++	byte_count += total_in_src;
++	/* don't allow buffer to overflow */
++	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
++		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
++		return -ENOBUFS;
++	}
++	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
++
++	/* copy second buffer into end of first buffer */
++	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
++
++	if (remaining != total_in_src) {
++		/* more responses to go */
++		cFYI(1, "waiting for more secondary responses");
++		return 1;
++	}
++
++	/* we are done */
++	cFYI(1, "found the last secondary response");
++	return 0;
++}
++
++static bool
++cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
++		  char *buf, int malformed)
++{
++	if (malformed)
++		return false;
++	if (check2ndT2(buf) <= 0)
++		return false;
++	mid->multiRsp = true;
++	if (mid->resp_buf) {
++		/* merge response - fix up 1st*/
++		malformed = coalesce_t2(buf, mid->resp_buf);
++		if (malformed > 0)
++			return true;
++		/* All parts received or packet is malformed. */
++		mid->multiEnd = true;
++		dequeue_mid(mid, malformed);
++		return true;
++	}
++	if (!server->large_buf) {
++		/*FIXME: switch to already allocated largebuf?*/
++		cERROR(1, "1st trans2 resp needs bigbuf");
++	} else {
++		/* Have first buffer */
++		mid->resp_buf = buf;
++		mid->large_buf = true;
++		server->bigbuf = NULL;
++	}
++	return true;
++}
++
+ struct smb_version_operations smb1_operations = {
+ 	.send_cancel = send_nt_cancel,
+ 	.compare_fids = cifs_compare_fids,
+@@ -229,6 +398,7 @@ struct smb_version_operations smb1_operations = {
+ 	.check_message = checkSMB,
+ 	.dump_detail = cifs_dump_detail,
+ 	.is_oplock_break = is_valid_oplock_break,
++	.check_trans2 = cifs_check_trans2,
+ };
  
-@@ -649,7 +653,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 		midQ->resp_buf = NULL;
- out:
- 	delete_mid(midQ);
--	add_credits(ses->server, 1);
-+	add_credits(ses->server, credits, optype);
- 
- 	return rc;
- }
-@@ -699,7 +703,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	if (rc) {
- 		mutex_unlock(&ses->server->srv_mutex);
- 		/* Update # of requests on wire to server */
--		add_credits(ses->server, 1);
-+		add_credits(ses->server, 1, 0);
- 		return rc;
- 	}
- 
-@@ -731,7 +735,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 			/* no longer considered to be "in-flight" */
- 			midQ->callback = DeleteMidQEntry;
- 			spin_unlock(&GlobalMid_Lock);
--			add_credits(ses->server, 1);
-+			add_credits(ses->server, 1, 0);
- 			return rc;
- 		}
- 		spin_unlock(&GlobalMid_Lock);
-@@ -739,7 +743,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 
- 	rc = cifs_sync_mid_result(midQ, ses->server);
- 	if (rc != 0) {
--		add_credits(ses->server, 1);
-+		add_credits(ses->server, 1, 0);
- 		return rc;
- 	}
- 
-@@ -755,7 +759,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
- 	delete_mid(midQ);
--	add_credits(ses->server, 1);
-+	add_credits(ses->server, 1, 0);
- 
- 	return rc;
- }
+ struct smb_version_values smb1_values = {
 -- 
 1.7.1
