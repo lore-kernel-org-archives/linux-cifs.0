@@ -1,34 +1,40 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v4 0/7] transport/session code move to ops struct
-Date: Thu, 31 May 2012 16:50:49 +0400
-Message-ID: <1338468657-29742-1-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v4 1/7] CIFS: Add safe access to is_valid_oplock and dump_detail ops struct field
+Date: Thu, 31 May 2012 16:50:50 +0400
+Message-ID: <1338468657-29742-2-git-send-email-pshilovsky@samba.org>
+References: <1338468657-29742-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1338468657-29742-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the regular patchset that makes the existing cifs code work through
-ops struct of the server.
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/connect.c |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-This version eliminate S_OP/S_OPV and makes the code more similiar to kernel
-code style.
-
-Pavel Shilovsky (7):
-  CIFS: Make accessing is_valid_oplock/dump_detail ops struct field
-    safe
-  CIFS: Move get_next_mid to ops struct
-  CIFS: Move trans2 processing to ops struct
-  CIFS: Extend credit mechanism to process request type
-  CIFS: Move protocol specific negotiate code to ops struct
-  CIFS: Move protocol specific session setup/logoff code to ops struct
-  CIFS: Move protocol specific tcon/tdis code to ops struct
-
- fs/cifs/cifsglob.h  |   43 +++++++-
- fs/cifs/cifsproto.h |   21 ++--
- fs/cifs/cifssmb.c   |   24 ++--
- fs/cifs/connect.c   |  277 ++++++++++++------------------------------------
- fs/cifs/misc.c      |   89 +---------------
- fs/cifs/sess.c      |    4 +-
- fs/cifs/smb1ops.c   |  298 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/transport.c |   36 ++++---
- 8 files changed, 444 insertions(+), 348 deletions(-)
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index ccafded..3647b1a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1058,13 +1058,15 @@ cifs_demultiplex_thread(void *p)
+ 		if (mid_entry != NULL) {
+ 			if (!mid_entry->multiRsp || mid_entry->multiEnd)
+ 				mid_entry->callback(mid_entry);
+-		} else if (!server->ops->is_oplock_break(buf, server)) {
++		} else if (!server->ops->is_oplock_break ||
++			   !server->ops->is_oplock_break(buf, server)) {
+ 			cERROR(1, "No task to wake, unknown frame received! "
+ 				   "NumMids %d", atomic_read(&midCount));
+ 			cifs_dump_mem("Received Data is: ", buf,
+ 				      HEADER_SIZE(server));
+ #ifdef CONFIG_CIFS_DEBUG2
+-			server->ops->dump_detail(buf);
++			if (server->ops->dump_detail)
++				server->ops->dump_detail(buf);
+ 			cifs_dump_mids(server);
+ #endif /* CIFS_DEBUG2 */
+ 
+-- 
+1.7.1
