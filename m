@@ -1,51 +1,82 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Re: ANNOUNCE: cifs-utils release 5.5 is ready for download
-Date: Thu, 31 May 2012 11:19:42 +0530
-Message-ID: <4FC70676.20504@suse.com>
-References: <20120530063713.10a9f796@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/2] CIFS: Fix possible wrong memory allocation
+Date: Thu, 31 May 2012 14:44:03 +0400
+Message-ID: <1338461044-6896-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120530063713.10a9f796-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 05/30/2012 04:07 PM, Jeff Layton wrote:
-> -----BEGIN PGP SIGNED MESSAGE-----
-> Hash: SHA1
+when cifs_reconnect sets maxBuf to 0 and we try to calculate a size
+of memory we need to store locks.
 
-> 
-> I'm starting to have doubts as to whether it's a good idea to keep
-> - -Werror in the default CFLAGS. This is built in a large range of
-> environments and with a large range of different tool versions.
-> Catching all of the warnings can be difficult.
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/file.c |   31 +++++++++++++++++++++++++------
+ 1 files changed, 25 insertions(+), 6 deletions(-)
 
-Yeah, I'm having my doubts too, now.
-
-> I've left that flag in place for now, but if it's causing significant
-> pain for anyone then please speak up, and we might remove it in a later
-> release.
-> 
-
-There is no significant pain for me, but I'm little worried about
-cifs-utils not being to able to build successfully in different
-environments (due to -Werror being default) which we won't be able to
-test and verify anyway.
-
-Perhaps, we can decide not to keep -Werror as the default flag but
-ensure that we (maintainers/developers) run with this enabled from
-time-to-time to ensure that real problems are not sneaking in.
-
-Another way to approach is to leave the flag as-is for a while so that
-we can catch all of these as they will probably be reported anyway.
-
-The former sounds more user friendly than the latter. But, I don't have
-any strong opinions on either.
-
-
-Thanks
-Suresh
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 253170d..de8abb6 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -876,7 +876,7 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 	struct cifsLockInfo *li, *tmp;
+ 	struct cifs_tcon *tcon;
+ 	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
+-	unsigned int num, max_num;
++	unsigned int num, max_num, max_buf;
+ 	LOCKING_ANDX_RANGE *buf, *cur;
+ 	int types[] = {LOCKING_ANDX_LARGE_FILES,
+ 		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
+@@ -892,8 +892,19 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 		return rc;
+ 	}
+ 
+-	max_num = (tcon->ses->server->maxBuf - sizeof(struct smb_hdr)) /
+-		  sizeof(LOCKING_ANDX_RANGE);
++	/*
++	 * Accessing maxBuf is racy with cifs_reconnect - need to store value
++	 * and check it for zero before using.
++	 */
++	max_buf = tcon->ses->server->maxBuf;
++	if (!max_buf) {
++		mutex_unlock(&cinode->lock_mutex);
++		FreeXid(xid);
++		return -EINVAL;
++	}
++
++	max_num = (max_buf - sizeof(struct smb_hdr)) /
++						sizeof(LOCKING_ANDX_RANGE);
+ 	buf = kzalloc(max_num * sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
+ 	if (!buf) {
+ 		mutex_unlock(&cinode->lock_mutex);
+@@ -1218,7 +1229,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock, int xid)
+ 	int types[] = {LOCKING_ANDX_LARGE_FILES,
+ 		       LOCKING_ANDX_SHARED_LOCK | LOCKING_ANDX_LARGE_FILES};
+ 	unsigned int i;
+-	unsigned int max_num, num;
++	unsigned int max_num, num, max_buf;
+ 	LOCKING_ANDX_RANGE *buf, *cur;
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
+@@ -1228,8 +1239,16 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock, int xid)
+ 
+ 	INIT_LIST_HEAD(&tmp_llist);
+ 
+-	max_num = (tcon->ses->server->maxBuf - sizeof(struct smb_hdr)) /
+-		  sizeof(LOCKING_ANDX_RANGE);
++	/*
++	 * Accessing maxBuf is racy with cifs_reconnect - need to store value
++	 * and check it for zero before using.
++	 */
++	max_buf = tcon->ses->server->maxBuf;
++	if (!max_buf)
++		return -EINVAL;
++
++	max_num = (max_buf - sizeof(struct smb_hdr)) /
++						sizeof(LOCKING_ANDX_RANGE);
+ 	buf = kzalloc(max_num * sizeof(LOCKING_ANDX_RANGE), GFP_KERNEL);
+ 	if (!buf)
+ 		return -ENOMEM;
+-- 
+1.7.1
