@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v4 1/7] CIFS: Add safe access to is_valid_oplock and dump_detail ops struct field
-Date: Thu, 31 May 2012 16:50:50 +0400
-Message-ID: <1338468657-29742-2-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v4 1/7] CIFS: Make accessing is_valid_oplock/dump_detail ops struct field safe
+Date: Thu, 31 May 2012 16:50:51 +0400
+Message-ID: <1338468657-29742-3-git-send-email-pshilovsky@samba.org>
 References: <1338468657-29742-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
