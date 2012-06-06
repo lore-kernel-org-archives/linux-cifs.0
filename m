@@ -1,8 +1,8 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
 Subject: Re: [PATCH v4 4/7] CIFS: Extend credit mechanism to process request
  type
-Date: Wed, 6 Jun 2012 07:40:57 -0400
-Message-ID: <20120606074057.3f7bd708@corrin.poochiereds.net>
+Date: Wed, 6 Jun 2012 07:57:59 -0400
+Message-ID: <20120606075759.5a50fd34@corrin.poochiereds.net>
 References: <1338468657-29742-1-git-send-email-pshilovsky@samba.org>
 	<1338468657-29742-6-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
@@ -69,21 +69,15 @@ Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 >  #define   CIFS_NO_RESP      0x040    /* no response buffer required */
 > +#define   CIFS_ECHO_OP      0x080    /* echo request */
 > +#define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
-
-Why are you adding these flags? They aren't used anywhere in this
-patch.
-
-As a matter of good design too, I'm not sure I like enshrining
-an optype into a flag since it doesn't tell you what that flag is
-supposed to indicate. It's also quite version specific.
-
-Instead of a adding these flags, consider instead adding flags that
-more clearly indicate the behavior that you want these flags to
-give you. For instance, a flag to make it ignore the credit limits in
-some cases, or that allows you to dip into an "emergency pool".
-
 > +#define   CIFS_REQ_MASK    0x0180    /* mask request type */
 >  
+
+
+Ok, now that I went back and read the patch description, I think I
+understand why you're doing it this way. Still, it's generally good
+practice to add flags only when you're going to use them, or to explain
+why you're adding them without setting them anywhere.
+
 >  /* Security Flags: indicate type of session setup needed */
 >  #define   CIFSSEC_MAY_SIGN	0x00001
 > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
@@ -118,6 +112,13 @@ some cases, or that allows you to dip into an "emergency pool".
 >  	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
 > -			     server, true);
 > +			     server, CIFS_ASYNC_OP);
+
+Even if the SMB1 operation doesn't use this, it's probably a good idea
+to set the ECHO flag here. If you ever change the behavior of the other
+operations, you might avoid a bug that way.
+
+Probably ditto for the oplock break operation.
+
 >  	if (rc)
 >  		cFYI(1, "Echo request failed: %d", rc);
 >  
@@ -352,4 +353,4 @@ some cases, or that allows you to dip into an "emergency pool".
 
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
