@@ -1,356 +1,164 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH v4 4/7] CIFS: Extend credit mechanism to process request
- type
-Date: Wed, 6 Jun 2012 07:57:59 -0400
-Message-ID: <20120606075759.5a50fd34@corrin.poochiereds.net>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v4 4/7] CIFS: Extend credit mechanism to process request type
+Date: Thu, 7 Jun 2012 19:51:01 +0400
+Message-ID: <CAKywueRZ0nxOCFXw+cUNPPJ+vmYwKTAgB7Y9FAyPDQor1gyWSA@mail.gmail.com>
 References: <1338468657-29742-1-git-send-email-pshilovsky@samba.org>
 	<1338468657-29742-6-git-send-email-pshilovsky@samba.org>
+	<20120606075759.5a50fd34@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338468657-29742-6-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <20120606075759.5a50fd34-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 31 May 2012 16:50:54 +0400
-Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+2012/6/6 Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>:
+> On Thu, 31 May 2012 16:50:54 +0400
+> Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>
+>> Split all requests to echos, oplocks and others - each group uses
+>> its own credit slot. This change is required to support SMB2 code.
+>>
+>> As for CIFS - we don't use this approach and the logic isn't changed=
+=2E
+>>
+>> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>> ---
+>> =A0fs/cifs/cifsglob.h =A0| =A0 14 ++++++++++----
+>> =A0fs/cifs/cifsproto.h | =A0 =A02 +-
+>> =A0fs/cifs/cifssmb.c =A0 | =A0 12 ++++++------
+>> =A0fs/cifs/smb1ops.c =A0 | =A0 12 ++++++++++--
+>> =A0fs/cifs/transport.c | =A0 34 +++++++++++++++++++---------------
+>> =A05 files changed, 46 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> index 2aac4e5..560b011 100644
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -171,9 +171,11 @@ struct smb_version_operations {
+>> =A0 =A0 =A0 /* check response: verify signature, map error */
+>> =A0 =A0 =A0 int (*check_receive)(struct mid_q_entry *, struct TCP_Se=
+rver_Info *,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bool);
+>> - =A0 =A0 void (*add_credits)(struct TCP_Server_Info *, const unsign=
+ed int);
+>> + =A0 =A0 void (*add_credits)(struct TCP_Server_Info *, const unsign=
+ed int,
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 const int);
+>> =A0 =A0 =A0 void (*set_credits)(struct TCP_Server_Info *, const int)=
+;
+>> - =A0 =A0 int * (*get_credits_field)(struct TCP_Server_Info *);
+>> + =A0 =A0 int * (*get_credits_field)(struct TCP_Server_Info *, const=
+ int);
+>> + =A0 =A0 unsigned int (*get_credits)(struct mid_q_entry *);
+>> =A0 =A0 =A0 __u64 (*get_next_mid)(struct TCP_Server_Info *);
+>> =A0 =A0 =A0 /* data offset from read response message */
+>> =A0 =A0 =A0 unsigned int (*read_data_offset)(char *);
+>> @@ -392,9 +394,10 @@ has_credits(struct TCP_Server_Info *server, int=
+ *credits)
+>> =A0}
+>>
+>> =A0static inline void
+>> -add_credits(struct TCP_Server_Info *server, const unsigned int add)
+>> +add_credits(struct TCP_Server_Info *server, const unsigned int add,
+>> + =A0 =A0 =A0 =A0 const int optype)
+>> =A0{
+>> - =A0 =A0 server->ops->add_credits(server, add);
+>> + =A0 =A0 server->ops->add_credits(server, add, optype);
+>> =A0}
+>>
+>> =A0static inline void
+>> @@ -956,6 +959,9 @@ static inline void free_dfs_info_array(struct df=
+s_info3_param *param,
+>> =A0#define =A0 CIFS_LOG_ERROR =A0 =A00x010 =A0 =A0/* log NT STATUS i=
+f non-zero */
+>> =A0#define =A0 CIFS_LARGE_BUF_OP 0x020 =A0 =A0/* large request buffe=
+r */
+>> =A0#define =A0 CIFS_NO_RESP =A0 =A0 =A00x040 =A0 =A0/* no response b=
+uffer required */
+>> +#define =A0 CIFS_ECHO_OP =A0 =A0 =A00x080 =A0 =A0/* echo request */
+>> +#define =A0 CIFS_OBREAK_OP =A0 0x0100 =A0 =A0/* oplock break reques=
+t */
+>> +#define =A0 CIFS_REQ_MASK =A0 =A00x0180 =A0 =A0/* mask request type=
+ */
+>>
+>
+>
+> Ok, now that I went back and read the patch description, I think I
+> understand why you're doing it this way. Still, it's generally good
+> practice to add flags only when you're going to use them, or to expla=
+in
+> why you're adding them without setting them anywhere.
 
-> Split all requests to echos, oplocks and others - each group uses
-> its own credit slot. This change is required to support SMB2 code.
-> 
-> As for CIFS - we don't use this approach and the logic isn't changed.
-> 
-> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h  |   14 ++++++++++----
->  fs/cifs/cifsproto.h |    2 +-
->  fs/cifs/cifssmb.c   |   12 ++++++------
->  fs/cifs/smb1ops.c   |   12 ++++++++++--
->  fs/cifs/transport.c |   34 +++++++++++++++++++---------------
->  5 files changed, 46 insertions(+), 28 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 2aac4e5..560b011 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -171,9 +171,11 @@ struct smb_version_operations {
->  	/* check response: verify signature, map error */
->  	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
->  			     bool);
-> -	void (*add_credits)(struct TCP_Server_Info *, const unsigned int);
-> +	void (*add_credits)(struct TCP_Server_Info *, const unsigned int,
-> +			    const int);
->  	void (*set_credits)(struct TCP_Server_Info *, const int);
-> -	int * (*get_credits_field)(struct TCP_Server_Info *);
-> +	int * (*get_credits_field)(struct TCP_Server_Info *, const int);
-> +	unsigned int (*get_credits)(struct mid_q_entry *);
->  	__u64 (*get_next_mid)(struct TCP_Server_Info *);
->  	/* data offset from read response message */
->  	unsigned int (*read_data_offset)(char *);
-> @@ -392,9 +394,10 @@ has_credits(struct TCP_Server_Info *server, int *credits)
->  }
->  
->  static inline void
-> -add_credits(struct TCP_Server_Info *server, const unsigned int add)
-> +add_credits(struct TCP_Server_Info *server, const unsigned int add,
-> +	    const int optype)
->  {
-> -	server->ops->add_credits(server, add);
-> +	server->ops->add_credits(server, add, optype);
->  }
->  
->  static inline void
-> @@ -956,6 +959,9 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
->  #define   CIFS_LOG_ERROR    0x010    /* log NT STATUS if non-zero */
->  #define   CIFS_LARGE_BUF_OP 0x020    /* large request buffer */
->  #define   CIFS_NO_RESP      0x040    /* no response buffer required */
-> +#define   CIFS_ECHO_OP      0x080    /* echo request */
-> +#define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
-> +#define   CIFS_REQ_MASK    0x0180    /* mask request type */
->  
+Ok, it seems I need to add an extra description to the commit message.
 
+>
+>> =A0/* Security Flags: indicate type of session setup needed */
+>> =A0#define =A0 CIFSSEC_MAY_SIGN =A0 0x00001
+>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>> index 0a6cbfe..41d5a76 100644
+>> --- a/fs/cifs/cifsproto.h
+>> +++ b/fs/cifs/cifsproto.h
+>> @@ -71,7 +71,7 @@ extern void DeleteMidQEntry(struct mid_q_entry *mi=
+dEntry);
+>> =A0extern int cifs_call_async(struct TCP_Server_Info *server, struct=
+ kvec *iov,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0unsigned int nvec=
+, mid_receive_t *receive,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0mid_callback_t *c=
+allback, void *cbdata,
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bool ignore_pend);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const int optype);
+>> =A0extern int SendReceive(const unsigned int /* xid */ , struct cifs=
+_ses *,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_hdr * /* inpu=
+t */ ,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 struct smb_hdr * /* out =
+*/ ,
+>> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+>> index 5b40073..65898cc 100644
+>> --- a/fs/cifs/cifssmb.c
+>> +++ b/fs/cifs/cifssmb.c
+>> @@ -720,7 +720,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
+>> =A0 =A0 =A0 struct TCP_Server_Info *server =3D mid->callback_data;
+>>
+>> =A0 =A0 =A0 DeleteMidQEntry(mid);
+>> - =A0 =A0 add_credits(server, 1);
+>> + =A0 =A0 add_credits(server, 1, 0);
+>> =A0}
+>>
+>> =A0int
+>> @@ -747,7 +747,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+>> =A0 =A0 =A0 iov.iov_len =3D be32_to_cpu(smb->hdr.smb_buf_length) + 4=
+;
+>>
+>> =A0 =A0 =A0 rc =3D cifs_call_async(server, &iov, 1, NULL, cifs_echo_=
+callback,
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server, true);
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0server, CIFS_AS=
+YNC_OP);
+>
+> Even if the SMB1 operation doesn't use this, it's probably a good ide=
+a
+> to set the ECHO flag here. If you ever change the behavior of the oth=
+er
+> operations, you might avoid a bug that way.
+>
+> Probably ditto for the oplock break operation.
 
-Ok, now that I went back and read the patch description, I think I
-understand why you're doing it this way. Still, it's generally good
-practice to add flags only when you're going to use them, or to explain
-why you're adding them without setting them anywhere.
+We need to set CIFS_ASYNC_OP flag here because it indicates that we
+can't wait until credits come (according to the echo behavior in CIFS
+that we discussed earlier). So, setting ECHO flag here means that we
+need to consume credit from 'echo' slot - that doesn't match the
+reality. As for the oplock break operation - it is the same.
 
->  /* Security Flags: indicate type of session setup needed */
->  #define   CIFSSEC_MAY_SIGN	0x00001
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 0a6cbfe..41d5a76 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -71,7 +71,7 @@ extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
->  extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
->  			   unsigned int nvec, mid_receive_t *receive,
->  			   mid_callback_t *callback, void *cbdata,
-> -			   bool ignore_pend);
-> +			   const int optype);
->  extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
->  			struct smb_hdr * /* input */ ,
->  			struct smb_hdr * /* out */ ,
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 5b40073..65898cc 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -720,7 +720,7 @@ cifs_echo_callback(struct mid_q_entry *mid)
->  	struct TCP_Server_Info *server = mid->callback_data;
->  
->  	DeleteMidQEntry(mid);
-> -	add_credits(server, 1);
-> +	add_credits(server, 1, 0);
->  }
->  
->  int
-> @@ -747,7 +747,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
->  	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
->  
->  	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
-> -			     server, true);
-> +			     server, CIFS_ASYNC_OP);
+May be we should rename 'CIFS_ASYNC_OP' flag to make it more
+informative (e.g. CIFS_NOCREDIT_OP or smth else) ?
 
-Even if the SMB1 operation doesn't use this, it's probably a good idea
-to set the ECHO flag here. If you ever change the behavior of the other
-operations, you might avoid a bug that way.
-
-Probably ditto for the oplock break operation.
-
->  	if (rc)
->  		cFYI(1, "Echo request failed: %d", rc);
->  
-> @@ -1563,7 +1563,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
->  
->  	queue_work(cifsiod_wq, &rdata->work);
->  	DeleteMidQEntry(mid);
-> -	add_credits(server, 1);
-> +	add_credits(server, 1, 0);
->  }
->  
->  /* cifs_async_readv - send an async write, and set up mid to handle result */
-> @@ -1619,7 +1619,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
->  	kref_get(&rdata->refcount);
->  	rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
->  			     cifs_readv_receive, cifs_readv_callback,
-> -			     rdata, false);
-> +			     rdata, 0);
->  
->  	if (rc == 0)
->  		cifs_stats_inc(&tcon->num_reads);
-> @@ -2010,7 +2010,7 @@ cifs_writev_callback(struct mid_q_entry *mid)
->  
->  	queue_work(cifsiod_wq, &wdata->work);
->  	DeleteMidQEntry(mid);
-> -	add_credits(tcon->ses->server, 1);
-> +	add_credits(tcon->ses->server, 1, 0);
->  }
->  
->  /* cifs_async_writev - send an async write, and set up mid to handle result */
-> @@ -2090,7 +2090,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
->  
->  	kref_get(&wdata->refcount);
->  	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
-> -			     NULL, cifs_writev_callback, wdata, false);
-> +			     NULL, cifs_writev_callback, wdata, 0);
->  
->  	if (rc == 0)
->  		cifs_stats_inc(&tcon->num_writes);
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 28359e7..f4f8394 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -101,7 +101,8 @@ cifs_find_mid(struct TCP_Server_Info *server, char *buffer)
->  }
->  
->  static void
-> -cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add)
-> +cifs_add_credits(struct TCP_Server_Info *server, const unsigned int add,
-> +		 const int optype)
->  {
->  	spin_lock(&server->req_lock);
->  	server->credits += add;
-> @@ -120,11 +121,17 @@ cifs_set_credits(struct TCP_Server_Info *server, const int val)
->  }
->  
->  static int *
-> -cifs_get_credits_field(struct TCP_Server_Info *server)
-> +cifs_get_credits_field(struct TCP_Server_Info *server, const int optype)
->  {
->  	return &server->credits;
->  }
->  
-> +static unsigned int
-> +cifs_get_credits(struct mid_q_entry *mid)
-> +{
-> +	return 1;
-> +}
-> +
->  /*
->   * Find a free multiplex id (SMB mid). Otherwise there could be
->   * mid collisions which might cause problems, demultiplexing the
-> @@ -390,6 +397,7 @@ struct smb_version_operations smb1_operations = {
->  	.add_credits = cifs_add_credits,
->  	.set_credits = cifs_set_credits,
->  	.get_credits_field = cifs_get_credits_field,
-> +	.get_credits = cifs_get_credits,
->  	.get_next_mid = cifs_get_next_mid,
->  	.read_data_offset = cifs_read_data_offset,
->  	.read_data_length = cifs_read_data_length,
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 3097ee5..289eb69 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -305,7 +305,7 @@ static int
->  wait_for_free_request(struct TCP_Server_Info *server, const int optype)
->  {
->  	return wait_for_free_credits(server, optype,
-> -				     server->ops->get_credits_field(server));
-> +				server->ops->get_credits_field(server, optype));
->  }
->  
->  static int allocate_mid(struct cifs_ses *ses, struct smb_hdr *in_buf,
-> @@ -384,12 +384,12 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
->  int
->  cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
->  		unsigned int nvec, mid_receive_t *receive,
-> -		mid_callback_t *callback, void *cbdata, bool ignore_pend)
-> +		mid_callback_t *callback, void *cbdata, const int optype)
->  {
->  	int rc;
->  	struct mid_q_entry *mid;
->  
-> -	rc = wait_for_free_request(server, ignore_pend ? CIFS_ASYNC_OP : 0);
-> +	rc = wait_for_free_request(server, optype);
->  	if (rc)
->  		return rc;
->  
-> @@ -397,7 +397,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
->  	rc = cifs_setup_async_request(server, iov, nvec, &mid);
->  	if (rc) {
->  		mutex_unlock(&server->srv_mutex);
-> -		add_credits(server, 1);
-> +		add_credits(server, 1, optype);
->  		wake_up(&server->request_q);
->  		return rc;
->  	}
-> @@ -419,7 +419,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
->  	return rc;
->  out_err:
->  	delete_mid(mid);
-> -	add_credits(server, 1);
-> +	add_credits(server, 1, optype);
->  	wake_up(&server->request_q);
->  	return rc;
->  }
-> @@ -539,11 +539,13 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  	     const int flags)
->  {
->  	int rc = 0;
-> -	int long_op;
-> +	int long_op, optype;
->  	struct mid_q_entry *midQ;
->  	char *buf = iov[0].iov_base;
-> +	unsigned int credits = 1;
->  
->  	long_op = flags & CIFS_TIMEOUT_MASK;
-> +	optype = flags & CIFS_REQ_MASK;
->  
->  	*pRespBufType = CIFS_NO_BUFFER;  /* no response buf yet */
->  
-> @@ -564,7 +566,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  	 * use ses->maxReq.
->  	 */
->  
-> -	rc = wait_for_free_request(ses->server, long_op);
-> +	rc = wait_for_free_request(ses->server, optype);
->  	if (rc) {
->  		cifs_small_buf_release(buf);
->  		return rc;
-> @@ -583,7 +585,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  		mutex_unlock(&ses->server->srv_mutex);
->  		cifs_small_buf_release(buf);
->  		/* Update # of requests on wire to server */
-> -		add_credits(ses->server, 1);
-> +		add_credits(ses->server, 1, optype);
->  		return rc;
->  	}
->  
-> @@ -613,7 +615,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  			midQ->callback = DeleteMidQEntry;
->  			spin_unlock(&GlobalMid_Lock);
->  			cifs_small_buf_release(buf);
-> -			add_credits(ses->server, 1);
-> +			add_credits(ses->server, 1, optype);
->  			return rc;
->  		}
->  		spin_unlock(&GlobalMid_Lock);
-> @@ -623,7 +625,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  
->  	rc = cifs_sync_mid_result(midQ, ses->server);
->  	if (rc != 0) {
-> -		add_credits(ses->server, 1);
-> +		add_credits(ses->server, 1, optype);
->  		return rc;
->  	}
->  
-> @@ -641,6 +643,8 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  	else
->  		*pRespBufType = CIFS_SMALL_BUFFER;
->  
-> +	credits = ses->server->ops->get_credits(midQ);
-> +
->  	rc = ses->server->ops->check_receive(midQ, ses->server,
->  					     flags & CIFS_LOG_ERROR);
->  
-> @@ -649,7 +653,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
->  		midQ->resp_buf = NULL;
->  out:
->  	delete_mid(midQ);
-> -	add_credits(ses->server, 1);
-> +	add_credits(ses->server, credits, optype);
->  
->  	return rc;
->  }
-> @@ -699,7 +703,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
->  	if (rc) {
->  		mutex_unlock(&ses->server->srv_mutex);
->  		/* Update # of requests on wire to server */
-> -		add_credits(ses->server, 1);
-> +		add_credits(ses->server, 1, 0);
->  		return rc;
->  	}
->  
-> @@ -731,7 +735,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
->  			/* no longer considered to be "in-flight" */
->  			midQ->callback = DeleteMidQEntry;
->  			spin_unlock(&GlobalMid_Lock);
-> -			add_credits(ses->server, 1);
-> +			add_credits(ses->server, 1, 0);
->  			return rc;
->  		}
->  		spin_unlock(&GlobalMid_Lock);
-> @@ -739,7 +743,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
->  
->  	rc = cifs_sync_mid_result(midQ, ses->server);
->  	if (rc != 0) {
-> -		add_credits(ses->server, 1);
-> +		add_credits(ses->server, 1, 0);
->  		return rc;
->  	}
->  
-> @@ -755,7 +759,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
->  	rc = cifs_check_receive(midQ, ses->server, 0);
->  out:
->  	delete_mid(midQ);
-> -	add_credits(ses->server, 1);
-> +	add_credits(ses->server, 1, 0);
->  
->  	return rc;
->  }
-
-
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+--=20
+Best regards,
+Pavel Shilovsky.
