@@ -1,43 +1,34 @@
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [RFC, PATCH] fs: push rcu_barrier() from deactivate_locked_super() to
- filesystems
-Date: Sat,  9 Jun 2012 00:28:50 +0300
-Message-ID: <1339190930-17233-1-git-send-email-kirill.shutemov@linux.intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: Latchesar Ionkov <lucho@ionkov.net>, Dave Kleikamp <shaggy@kernel.org>,
- jfs-discussion@lists.sourceforge.net,
- Phillip Lougher <phillip@squashfs.org.uk>, Jan Kara <jack@suse.cz>,
- Kai Bankett <chaosman@ontika.net>, logfs@logfs.org,
- Frederic Weisbecker <fweisbec@gmail.com>, Anders Larsen <al@alarsen.net>,
- Trond Myklebust <Trond.Myklebust@netapp.com>,
- William Irwin <wli@holomorphy.com>, "Dmitry V. Levin" <ldv@altlinux.org>,
- David Howells <dhowells@redhat.com>,
- Dustin Kirkland <dustin.kirkland@gazzang.com>,
- Andreas Dilger <adilger.kernel@dilger.ca>,
- Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
- KONISHI Ryusuke <konishi.ryusuke@lab.ntt.co.jp>,
- Petr Vandrovec <petr@vandrovec.name>, linux-afs@lists.infradead.org,
- Alexey Khoroshilov <khoroshilov@ispras.ru>, linux-cifs@vger.kernel.org,
- Namjae Jeon <linkinjeon@gmail.com>, linux-nilfs@vger.kernel.org,
- fuse-devel@lists.source
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
- Linus Torvalds <torvalds@linux-foundation.org>
-Return-path: <linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-mtd/>
-List-Post: <mailto:linux-mtd@lists.infradead.org>
-List-Help: <mailto:linux-mtd-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-mtd>,
- <mailto:linux-mtd-request@lists.infradead.org?subject=subscribe>
-Sender: linux-mtd-bounces@lists.infradead.org
-Errors-To: linux-mtd-bounces+gldm-linux-mtd-36=gmane.org@lists.infradead.org
-List-Id: linux-cifs.vger.kernel.org
+From: "Kirill A. Shutemov" <kirill.shutemov-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Subject: [RFC, PATCH, RESEND] fs: push rcu_barrier() from deactivate_locked_super() to filesystems
+Date: Sat,  9 Jun 2012 00:41:03 +0300
+Message-ID: <1339191663-17693-1-git-send-email-kirill.shutemov@linux.intel.com>
+Cc: Boaz Harrosh <bharrosh-C4P08NqkoRlBDgjK7y7TUQ@public.gmane.org>, Tao Ma <boyu.mt-3b8fjiQLQpfQT0dZR+AlfA@public.gmane.org>,
+	Andrew Morton <akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>,
+	Nick Piggin <npiggin-tSWWG44O7X1aa/9Udqfwiw@public.gmane.org>,
+	"Dmitry V. Levin" <ldv-u2l5PoMzF/Vg9hUCZPvPmw@public.gmane.org>,
+	v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	codalist-/uMB558Y47wP4a1z8dhFYw@public.gmane.org, ecryptfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	osd-dev-yNzVSZO3znNg9hUCZPvPmw@public.gmane.org, linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, linux-mtd-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	jfs-discussion-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, logfs-PCqxUs/MD9bYtjvyW6yDsg@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nilfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-ntfs-dev-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, ocfs2-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org,
+	reiserfs-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Kirill A. Shutemov" <kirill.shutemov-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+To: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+From: "Kirill A. Shutemov" <kirill.shutemov-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 
+Sorry for resend. Original mail had too long cc list.
+
+====
 There's no reason to call rcu_barrier() on every deactivate_locked_super().
 We only need to make sure that all delayed rcu free inodes are flushed
 before we destroy related cache.
@@ -46,7 +37,7 @@ Removing rcu_barrier() from deactivate_locked_super() affects some
 fas paths. E.g. on my machine exit_group() of a last process in IPC
 namespace takes 0.07538s. rcu_barrier() takes 0.05188s of that time.
 
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
 ---
  fs/9p/v9fs.c             |    5 +++++
  fs/adfs/super.c          |    5 +++++
@@ -860,8 +851,3 @@ index 0d9de41..bbcbf2a 100644
  	kmem_zone_destroy(xfs_efi_zone);
 -- 
 1.7.10
-
-
-______________________________________________________
-Linux MTD discussion mailing list
-http://lists.infradead.org/mailman/listinfo/linux-mtd/
