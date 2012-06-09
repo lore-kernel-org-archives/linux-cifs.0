@@ -1,208 +1,60 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v5 5/5] CIFS: Move protocol specific tcon/tdis code to ops struct
-Date: Sat,  9 Jun 2012 10:26:04 +0400
-Message-ID: <1339223164-9721-6-git-send-email-pshilovsky@samba.org>
-References: <1339223164-9721-1-git-send-email-pshilovsky@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1339223164-9721-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Marco Stornelli <marco.stornelli@gmail.com>
+Subject: Re: [RFC, PATCH, RESEND] fs: push rcu_barrier() from deactivate_locked_super()
+ to filesystems
+Date: Sat, 09 Jun 2012 09:06:28 +0200
+Message-ID: <4FD2F5F4.1000106@gmail.com>
+References: <1339191663-17693-1-git-send-email-kirill.shutemov@linux.intel.com> <20120608150253.e42464a6.akpm@linux-foundation.org> <20120608221446.GA18250@otc-wbsnb-06> <20120608152550.258d6a30.akpm@linux-foundation.org> <20120608222734.GT30000@ZenIV.linux.org.uk> <20120608153120.b722d7c3.akpm@linux-foundation.org> <20120608233127.GB18981@otc-wbsnb-06> <20120608163751.7a8ec2bc.akpm@linux-foundation.org> <CA+55aFw5k3daxeoZb9H1HGcOCWjPF+d7inSbf0QHmG-atp4reQ@mail.gmail.com> <20120608172842.9826b5cd.akpm@linux-foundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	"Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Boaz Harrosh <bharrosh@panasas.com>,
+	Tao Ma <boyu.mt@taobao.com>, Nick Piggin <npiggin@kernel.dk>,
+	"Dmitry V. Levin" <ldv@altlinux.org>,
+	v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	codalist@telemann.coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+	osd-dev@open-osd.org, linux-ext4@vger.kernel.org,
+	fuse-devel@lists.sourceforge.net, linux-mtd@lists.infradead.org,
+	jfs-discussion@lists.sourceforge.net, logfs@logfs.org,
+	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+	linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
+	rei
+To: Andrew Morton <akpm@linux-foundation.org>
+Return-path: <ceph-devel-owner@vger.kernel.org>
+In-Reply-To: <20120608172842.9826b5cd.akpm@linux-foundation.org>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-and rename variables around the code changes.
+Il 09/06/2012 02:28, Andrew Morton ha scritto:
+> On Fri, 8 Jun 2012 16:46:47 -0700 Linus Torvalds<torvalds@linux-foundation.org>  wrote:
+>
+>> Of course, if you just mean having a VFS wrapper that does
+>>
+>>      static void vfs_inode_kmem_cache_destroy(struct kmem_cache *cachep)
+>>      {
+>>          rcu_barrier();
+>>          kmem_cache_destroy(cachep);
+>>      }
+>>
+>> then we could do that. Not much better than what Kirill's patch did,
+>> but at least we could have that comment in just one single place.
+>
+> That's conceptually what I meant.  But it has the problem that new and
+> out-of-tree filesystems might forget to do it.  Which is why I suggest
+> adding a kmem_cache* argument to unregister_filesystem() for this.
+>
+> It's a bit awkward, and the fs can pass in NULL if it knows what it's
+> doing.  But it's reliable.
+> --
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsglob.h  |    6 ++++
- fs/cifs/cifsproto.h |    5 +--
- fs/cifs/connect.c   |   71 ++++++++++++++++++++++++++++++---------------------
- fs/cifs/smb1ops.c   |    2 +
- 4 files changed, 52 insertions(+), 32 deletions(-)
+The call of rcu_barrier should be mandatory for the "unload fs module" 
+problem, right? If the fs is compiled statically maybe we could avoid 
+it, but (eventually) this kind of decision is per-fs, so this could be a 
+clue that the call of rcu_barrier maybe is inside each fs not in VFS.
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 812f27c..1266e2e 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -160,6 +160,7 @@ struct mid_q_entry;
- struct TCP_Server_Info;
- struct cifsFileInfo;
- struct cifs_ses;
-+struct cifs_tcon;
- 
- struct smb_version_operations {
- 	int (*send_cancel)(struct TCP_Server_Info *, void *,
-@@ -201,6 +202,11 @@ struct smb_version_operations {
- 			  const struct nls_table *);
- 	/* close smb session */
- 	int (*logoff)(const int, struct cifs_ses *);
-+	/* connect to a server share */
-+	int (*tree_connect)(const int, struct cifs_ses *, const char *,
-+			    struct cifs_tcon *, const struct nls_table *);
-+	/* close tree connecion */
-+	int (*tree_disconnect)(const int, struct cifs_tcon *);
- };
- 
- struct smb_version_values {
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8e6cd38..2f4f661 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -183,9 +183,8 @@ extern int cifs_setup_session(const int xid, struct cifs_ses *ses,
- 			      struct nls_table *nls_info);
- extern int CIFSSMBNegotiate(const int xid, struct cifs_ses *ses);
- 
--extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
--			const char *tree, struct cifs_tcon *tcon,
--			const struct nls_table *);
-+extern int CIFSTCon(const int xid, struct cifs_ses *ses, const char *tree,
-+		    struct cifs_tcon *tcon, const struct nls_table *);
- 
- extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
- 		const char *searchName, const struct nls_table *nls_codepage,
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 9679352..d14bd45 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2552,7 +2552,8 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	xid = GetXid();
--	CIFSSMBTDis(xid, tcon);
-+	if (ses->server->ops->tree_disconnect)
-+		ses->server->ops->tree_disconnect(xid, tcon);
- 	_FreeXid(xid);
- 
- 	cifs_fscache_release_super_cookie(tcon);
-@@ -2577,6 +2578,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		return tcon;
- 	}
- 
-+	if (!ses->server->ops->tree_connect) {
-+		rc = -ENOSYS;
-+		goto out_fail;
-+	}
-+
- 	tcon = tconInfoAlloc();
- 	if (tcon == NULL) {
- 		rc = -ENOMEM;
-@@ -2599,13 +2605,15 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		goto out_fail;
- 	}
- 
--	/* BB Do we need to wrap session_mutex around
--	 * this TCon call and Unix SetFS as
--	 * we do on SessSetup and reconnect? */
-+	/*
-+	 * BB Do we need to wrap session_mutex around this TCon call and Unix
-+	 * SetFS as we do on SessSetup and reconnect?
-+	 */
- 	xid = GetXid();
--	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
-+	rc = ses->server->ops->tree_connect(xid, ses, volume_info->UNC, tcon,
-+					    volume_info->local_nls);
- 	FreeXid(xid);
--	cFYI(1, "CIFS Tcon rc = %d", rc);
-+	cFYI(1, "Tcon rc = %d", rc);
- 	if (rc)
- 		goto out_fail;
- 
-@@ -2614,10 +2622,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		cFYI(1, "DFS disabled (%d)", tcon->Flags);
- 	}
- 	tcon->seal = volume_info->seal;
--	/* we can have only one retry value for a connection
--	   to a share so for resources mounted more than once
--	   to the same server share the last value passed in
--	   for the retry flag is used */
-+	/*
-+	 * We can have only one retry value for a connection to a share so for
-+	 * resources mounted more than once to the same server share the last
-+	 * value passed in for the retry flag is used.
-+	 */
- 	tcon->retry = volume_info->retry;
- 	tcon->nocase = volume_info->nocase;
- 	tcon->local_lease = volume_info->local_lease;
-@@ -2751,37 +2760,41 @@ out:
- }
- 
- int
--get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
--	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
--	     struct dfs_info3_param **preferrals, int remap)
-+get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
-+	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
-+	     struct dfs_info3_param **referrals, int remap)
- {
- 	char *temp_unc;
- 	int rc = 0;
- 
--	*pnum_referrals = 0;
--	*preferrals = NULL;
-+	if (!ses->server->ops->tree_connect)
-+		return -ENOSYS;
-+
-+	*num_referrals = 0;
-+	*referrals = NULL;
- 
--	if (pSesInfo->ipc_tid == 0) {
-+	if (ses->ipc_tid == 0) {
- 		temp_unc = kmalloc(2 /* for slashes */ +
--			strnlen(pSesInfo->serverName,
--				SERVER_NAME_LEN_WITH_NULL * 2)
--				 + 1 + 4 /* slash IPC$ */  + 2,
--				GFP_KERNEL);
-+			strnlen(ses->serverName, SERVER_NAME_LEN_WITH_NULL * 2)
-+				+ 1 + 4 /* slash IPC$ */ + 2, GFP_KERNEL);
- 		if (temp_unc == NULL)
- 			return -ENOMEM;
- 		temp_unc[0] = '\\';
- 		temp_unc[1] = '\\';
--		strcpy(temp_unc + 2, pSesInfo->serverName);
--		strcpy(temp_unc + 2 + strlen(pSesInfo->serverName), "\\IPC$");
--		rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
--		cFYI(1, "CIFS Tcon rc = %d ipc_tid = %d", rc, pSesInfo->ipc_tid);
-+		strcpy(temp_unc + 2, ses->serverName);
-+		strcpy(temp_unc + 2 + strlen(ses->serverName), "\\IPC$");
-+		rc = ses->server->ops->tree_connect(xid, ses, temp_unc, NULL,
-+						    nls_codepage);
-+		cFYI(1, "Tcon rc = %d ipc_tid = %d", rc, ses->ipc_tid);
- 		kfree(temp_unc);
- 	}
- 	if (rc == 0)
--		rc = CIFSGetDFSRefer(xid, pSesInfo, old_path, preferrals,
--				     pnum_referrals, nls_codepage, remap);
--	/* BB map targetUNCs to dfs_info3 structures, here or
--		in CIFSGetDFSRefer BB */
-+		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
-+				     num_referrals, nls_codepage, remap);
-+	/*
-+	 * BB - map targetUNCs to dfs_info3 structures, here or in
-+	 * CIFSGetDFSRefer.
-+	 */
- 
- 	return rc;
- }
-@@ -3758,7 +3771,7 @@ out:
-  * pointer may be NULL.
-  */
- int
--CIFSTCon(unsigned int xid, struct cifs_ses *ses,
-+CIFSTCon(const int xid, struct cifs_ses *ses,
- 	 const char *tree, struct cifs_tcon *tcon,
- 	 const struct nls_table *nls_codepage)
- {
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index ba3071f..1a3f08c 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -432,6 +432,8 @@ struct smb_version_operations smb1_operations = {
- 	.negotiate = cifs_negotiate,
- 	.sess_setup = CIFS_SessSetup,
- 	.logoff = CIFSSMBLogoff,
-+	.tree_connect = CIFSTCon,
-+	.tree_disconnect = CIFSSMBTDis,
- };
- 
- struct smb_version_values smb1_values = {
--- 
-1.7.1
+Marco
