@@ -1,44 +1,46 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH] automake: revert -Werror by default
-Date: Tue, 12 Jun 2012 21:22:28 +0530
-Message-ID: <4FD765BC.1020309@suse.com>
-References: <1339496358-27940-1-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Subject: Patch: Fix return value in cifsConvertToUTF16().
+Date: Tue, 12 Jun 2012 23:32:40 +0100
+Message-ID: <AA265B63-A9D7-4A21-A279-88894DEF46C4@cam.ac.uk>
+Mime-Version: 1.0 (Apple Message framework v1278)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1339496358-27940-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 06/12/2012 03:49 PM, Jeff Layton wrote:
-> I think in hindsight, that adding -Werror by default was a mistake.
-> cifs-utils is built in a wide range of environments and tools, and it's
-> very difficult to eliminate all of the possible warnings.
-> 
-> Let's go ahead and remove it and reduce the steady trickle of patches
-> that are simply to silence obscure warnings.
-> 
-> Cc: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  Makefile.am |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 05729ca..b412262 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -1,4 +1,4 @@
-> -AM_CFLAGS = -Wall -Wextra -Werror -D_FORTIFY_SOURCE=2
-> +AM_CFLAGS = -Wall -Wextra -D_FORTIFY_SOURCE=2
->  ACLOCAL_AMFLAGS = -I aclocal
->  
+Hi,
 
-+ 1
+Please apply the below patch which fixes the return value in cifsConvertToUTF16().  At the moment it is returning the number of bytes in the input string which is not the same as returning the number of returned UTF16 characters!  (Note the mount is done using "iocharset=utf8".)
 
-Sounds like the right thing to do.
+This causes rename system call with source being a Unicode name to fail because in UTF8 the unicode characters are more than one byte long thus cifsConvertToUTF16() returns a number larger than the actual number of returned UTF16 characters thus CIFSSMBRename() ends up constructing one or more NULL characters at the end of the source filename thus it sends a rename command like this to the server: "source_name\0 target_name" which the server presumably interprets as just "source_name" which is obviously bogus for a rename call and thus the rename fails.
 
-Acked-by: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+The simple and obviously correct fix is the below patch which changes the cifsConvertToUTF16() function to return variable "j" instead of "i" which is the index into the destination UTF16 array which is the correct thing to do and fixes the rename bug.
+
+Signed-off-by: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+
+Best regards,
+
+	Anton
+-- 
+Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
+Unix Support, Computing Service, University of Cambridge, CB2 3QH, UK
+Linux NTFS maintainer, http://www.linux-ntfs.org/
+---
+
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index fbb9da9..33ef60d 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -328,6 +328,6 @@ cifsConvertToUTF16(__le16 *target, const char *source, int s
+ 	}
+ 
+ ctoUTF16_out:
+-	return i;
++	return j;
+ }
+ 
+ 
