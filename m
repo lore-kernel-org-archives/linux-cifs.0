@@ -1,46 +1,99 @@
-From: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
-Subject: Patch: Fix return value in cifsConvertToUTF16().
-Date: Tue, 12 Jun 2012 23:32:40 +0100
-Message-ID: <AA265B63-A9D7-4A21-A279-88894DEF46C4@cam.ac.uk>
-Mime-Version: 1.0 (Apple Message framework v1278)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: cifs fails on v3.5
+Date: Thu, 14 Jun 2012 14:29:38 +0400
+Message-ID: <CAKywueS=iWT21dvx8z2Yrp_ZHMAaHwZgckgFXDoctk1y=ov+JA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+I upgraded the kernel to v3.5-rc2 on my Ubuntu (from
+http://kernel.ubuntu.com/~kernel-ppa/mainline/) and faced with the
+problem: if I build the module and load it (even without any using of
+it) I can't unload it with 'module is busy' message. Sometimes the
+rmmod command returns with 'Killed' and I get this in dmesg:
 
-Please apply the below patch which fixes the return value in cifsConvertToUTF16().  At the moment it is returning the number of bytes in the input string which is not the same as returning the number of returned UTF16 characters!  (Note the mount is done using "iocharset=utf8".)
+Jun 14 13:30:10 workstation kernel: [  527.849739] BUG: unable to
+handle kernel paging request at 35af7004
+Jun 14 13:30:10 workstation kernel: [  527.849765] IP: [<c109f965>]
+module_refcount+0x25/0x90
+Jun 14 13:30:10 workstation kernel: [  527.849775] *pdpt =
+000000002c8d8001 *pde = 0000000000000000
+Jun 14 13:30:10 workstation kernel: [  527.849786] Oops: 0000 [#1] SMP
+Jun 14 13:30:10 workstation kernel: [  527.849816] Modules linked in:
+cifs(O) fscache binfmt_misc snd_hda_codec_realtek snd_hd
+a_intel snd_hda_codec snd_hwdep snd_pcm snd_seq_midi snd_rawmidi
+snd_seq_midi_event snd_seq snd_timer snd_seq_device snd nouve
+au ttm drm_kms_helper drm i2c_algo_bit kvm_amd mxm_wmi soundcore video
+snd_page_alloc kvm i2c_nforce2 wmi k8temp serio_raw mac
+_hid ppdev parport_pc lp parport floppy skge pata_amd sata_nv
+forcedeth [last unloaded: cifs]
+Jun 14 13:30:10 workstation kernel: [  527.849854]
+Jun 14 13:30:10 workstation kernel: [  527.849865] Pid: 3180, comm:
+rmmod Tainted: G           O 3.5.0-030500rc2-generic #2012
+06082235 MSI MS-7309/MS-7309
+Jun 14 13:30:10 workstation kernel: [  527.849877] EIP:
+0060:[<c109f965>] EFLAGS: 00010293 CPU: 0
+Jun 14 13:30:10 workstation kernel: [  527.849887] EIP is at
+module_refcount+0x25/0x90
+Jun 14 13:30:10 workstation kernel: [  527.849894] EAX: 00000000 EBX:
+ecbe21e0 ECX: 35af7000 EDX: 00000000
+Jun 14 13:30:10 workstation kernel: [  527.849903] ESI: 00000000 EDI:
+fa0be780 EBP: f5801ec4 ESP: f5801eb8
+Jun 14 13:30:10 workstation kernel: [  527.849912]  DS: 007b ES: 007b
+FS: 00d8 GS: 00e0 SS: 0068
+Jun 14 13:30:10 workstation kernel: [  527.849920] CR0: 8005003b CR2:
+35af7004 CR3: 2c8a0000 CR4: 000007f0
+Jun 14 13:30:10 workstation kernel: [  527.849929] DR0: 00000000 DR1:
+00000000 DR2: 00000000 DR3: 00000000
+Jun 14 13:30:10 workstation kernel: [  527.849937] DR6: ffff0ff0 DR7: 00000400
+Jun 14 13:30:10 workstation kernel: [  527.849945] Process rmmod (pid:
+3180, ti=f5800000 task=f6c7a5e0 task.ti=f5800000)
+Jun 14 13:30:10 workstation kernel: [  527.849954] Stack:
+Jun 14 13:30:10 workstation kernel: [  527.849965]  ecbe21e0 ecbe21e0
+fa0be784 f5801efc c109fa28 ecbe21e0 c177e6da fa0be78c
+Jun 14 13:30:10 workstation kernel: [  527.849978]  0004321e fa0be780
+fa0be784 f5801f20 ecbe21e0 20bfff3c fffffff4 ecbe21e0
+Jun 14 13:30:10 workstation kernel: [  527.849992]  fa0be784 f5801f3c
+c116ab35 00000000 00000000 b7791000 ecbe2208 00000400
+Jun 14 13:30:10 workstation kernel: [  527.850001] Call Trace:
+Jun 14 13:30:10 workstation kernel: [  527.850010]  [<c109fa28>]
+m_show+0x58/0x1b0
+Jun 14 13:30:10 workstation kernel: [  527.850020]  [<c116ab35>]
+seq_read+0x145/0x380
+Jun 14 13:30:10 workstation kernel: [  527.850029]  [<c116a9f0>] ?
+seq_lseek+0x170/0x170
+Jun 14 13:30:10 workstation kernel: [  527.850040]  [<c119c2a4>]
+proc_reg_read+0x64/0xa0
+Jun 14 13:30:10 workstation kernel: [  527.850053]  [<c114dd5c>]
+vfs_read+0x8c/0x160
+Jun 14 13:30:10 workstation kernel: [  527.850061]  [<c119c240>] ?
+proc_reg_write+0xa0/0xa0
+Jun 14 13:30:10 workstation kernel: [  527.850071]  [<c114de6d>]
+sys_read+0x3d/0x70
+Jun 14 13:30:10 workstation kernel: [  527.850081]  [<c15cf89f>]
+sysenter_do_call+0x12/0x28
+Jun 14 13:30:10 workstation kernel: [  527.850120] Code: 5b 5d c3 8d
+76 00 55 89 e5 57 56 53 3e 8d 74 26 00 31 f6 89 c7 b8 ff
+ff ff ff eb 13 66 90 8b 0c 85 a0 c6 8a c1 8b 97 78 01 00 00 <03> 74 0a
+04 8d 48 01 a1 0c 59 5d c1 ba 08 00 00 00 e8 f5 ad 22
+Jun 14 13:30:10 workstation kernel: [  527.850567] EIP: [<c109f965>]
+module_refcount+0x25/0x90 SS:ESP 0068:f5801eb8
 
-This causes rename system call with source being a Unicode name to fail because in UTF8 the unicode characters are more than one byte long thus cifsConvertToUTF16() returns a number larger than the actual number of returned UTF16 characters thus CIFSSMBRename() ends up constructing one or more NULL characters at the end of the source filename thus it sends a rename command like this to the server: "source_name\0 target_name" which the server presumably interprets as just "source_name" which is obviously bogus for a rename call and thus the rename fails.
 
-The simple and obviously correct fix is the below patch which changes the cifsConvertToUTF16() function to return variable "j" instead of "i" which is the index into the destination UTF16 array which is the correct thing to do and fixes the rename bug.
+Another thing I noticed is /proc/fs/cifs/traceSMB is set to some big
+negative value - very strange.
 
-Signed-off-by: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+If I use the module from the package everything is ok. Also with all
+previous kernels everything goes fine too.
 
-Best regards,
+Any thoughts on what can be broken in v3.5 from v3.4?
 
-	Anton
+fyi: v3.5-rc2 doesn't make any difference.
+
 -- 
-Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
-Unix Support, Computing Service, University of Cambridge, CB2 3QH, UK
-Linux NTFS maintainer, http://www.linux-ntfs.org/
----
-
-diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-index fbb9da9..33ef60d 100644
---- a/fs/cifs/cifs_unicode.c
-+++ b/fs/cifs/cifs_unicode.c
-@@ -328,6 +328,6 @@ cifsConvertToUTF16(__le16 *target, const char *source, int s
- 	}
- 
- ctoUTF16_out:
--	return i;
-+	return j;
- }
- 
- 
+Best regards,
+Pavel Shilovsky.
