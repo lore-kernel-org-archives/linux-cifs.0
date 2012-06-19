@@ -1,162 +1,112 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 04/22] CIFS: Add SMB2 credits support
-Date: Tue, 19 Jun 2012 16:39:53 +0400
-Message-ID: <1340109611-7210-5-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 06/22] CIFS: Respect SMB2 header/max header size
+Date: Tue, 19 Jun 2012 16:39:55 +0400
+Message-ID: <1340109611-7210-7-git-send-email-pshilovsky@samba.org>
 References: <1340109611-7210-1-git-send-email-pshilovsky@samba.org>
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1340109611-7210-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-For SMB2 protocol we can add more than one credit for one received
-request: it depends on CreditRequest field in SMB2 response header.
-Also we divide all requests by type: echos, oplocks and others. Each
-type uses its own slot pull.
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Use SMB2 header size values for allocation and memset because they
+are bigger and suitable for both CIFS and SMB2.
+
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    5 +++
- fs/cifs/cifsproto.h |    1 +
- fs/cifs/connect.c   |    2 +-
- fs/cifs/smb2ops.c   |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 84 insertions(+), 1 deletions(-)
+ fs/cifs/cifsfs.c |   14 ++++++++++++--
+ fs/cifs/misc.c   |   25 +++++++++++++++++++------
+ 2 files changed, 31 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index ae27ab8..6c062e2 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -343,6 +343,11 @@ struct TCP_Server_Info {
- 	char server_GUID[16];
- 	__u16 sec_mode;
- 	bool session_estab; /* mark when very first sess is established */
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 8b6e344..bb4b919 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -48,6 +48,9 @@
+ #include <linux/key-type.h>
+ #include "cifs_spnego.h"
+ #include "fscache.h"
 +#ifdef CONFIG_CIFS_SMB2
-+	int echo_credits;  /* echo reserved slots */
-+	int oplock_credits;  /* oplock break reserved slots */
-+	bool echos:1; /* enable echos */
++#include "smb2pdu.h"
 +#endif
- 	u16 dialect; /* dialect index that server chose */
- 	enum securityEnum secType;
- 	bool oplocks:1; /* enable oplocks */
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index c45adfa..19987a7 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -91,6 +91,7 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
- 			struct smb_hdr *in_buf ,
- 			struct smb_hdr *out_buf,
- 			int *bytes_returned);
-+extern int cifs_reconnect(struct TCP_Server_Info *server);
- extern int checkSMB(char *buf, unsigned int length);
- extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *);
- extern bool backup_cred(struct cifs_sb_info *);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 72fb35b..d45df03 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -296,7 +296,7 @@ static int cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
-  * reconnect tcp session
-  * wake up waiters on reconnection? - (not needed currently)
-  */
--static int
-+int
- cifs_reconnect(struct TCP_Server_Info *server)
+ #define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
+ 
+ int cifsFYI = 0;
+@@ -981,6 +984,14 @@ cifs_destroy_inodecache(void)
+ static int
+ cifs_init_request_bufs(void)
  {
- 	int rc = 0;
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 80d9674..1393d70 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -20,6 +20,79 @@
- #include "cifsglob.h"
- #include "smb2pdu.h"
- #include "smb2proto.h"
-+#include "cifsproto.h"
-+#include "cifs_debug.h"
-+
-+static void
-+change_conf(struct TCP_Server_Info *server)
-+{
-+	server->credits += server->echo_credits + server->oplock_credits;
-+	server->oplock_credits = server->echo_credits = 0;
-+	switch (server->credits) {
-+	case 0:
-+		cifs_reconnect(server);
-+		return;
-+	case 1:
-+		server->echos = false;
-+		server->oplocks = false;
-+		cERROR(1, "disabling echos and oplocks");
-+		break;
-+	case 2:
-+		server->echos = true;
-+		server->oplocks = false;
-+		server->echo_credits = 1;
-+		cFYI(1, "disabling oplocks");
-+		break;
-+	default:
-+		server->echos = true;
-+		server->oplocks = true;
-+		server->echo_credits = 1;
-+		server->oplock_credits = 1;
-+	}
-+	server->credits -= server->echo_credits + server->oplock_credits;
-+}
-+
-+static void
-+smb2_add_credits(struct TCP_Server_Info *server, const unsigned int add,
-+		 const int optype)
-+{
-+	int *val;
-+	spin_lock(&server->req_lock);
-+	val = server->ops->get_credits_field(server, optype);
-+	*val += add;
-+	server->in_flight--;
-+	if (server->in_flight == 0)
-+		change_conf(server);
-+	spin_unlock(&server->req_lock);
-+	wake_up(&server->request_q);
-+}
-+
-+static void
-+smb2_set_credits(struct TCP_Server_Info *server, const int val)
-+{
-+	spin_lock(&server->req_lock);
-+	server->credits = val;
-+	spin_unlock(&server->req_lock);
-+}
-+
-+static int *
-+smb2_get_credits_field(struct TCP_Server_Info *server, const int optype)
-+{
-+	switch (optype) {
-+	case CIFS_ECHO_OP:
-+		return &server->echo_credits;
-+	case CIFS_OBREAK_OP:
-+		return &server->oplock_credits;
-+	default:
-+		return &server->credits;
-+	}
-+}
-+
-+static unsigned int
-+smb2_get_credits(struct mid_q_entry *mid)
-+{
-+	return le16_to_cpu(((struct smb2_hdr *)mid->resp_buf)->CreditRequest);
-+}
++	size_t max_hdr_size = MAX_CIFS_HDR_SIZE;
++#ifdef CONFIG_CIFS_SMB2
++	/*
++	 * SMB2 maximum header size is bigger than CIFS one - no problems to
++	 * allocate some more bytes for CIFS.
++	 */
++	max_hdr_size = MAX_SMB2_HDR_SIZE;
++#endif
+ 	if (CIFSMaxBufSize < 8192) {
+ 	/* Buffer size can not be smaller than 2 * PATH_MAX since maximum
+ 	Unicode path name has to fit in any SMB/CIFS path based frames */
+@@ -992,8 +1003,7 @@ cifs_init_request_bufs(void)
+ 	}
+ /*	cERROR(1, "CIFSMaxBufSize %d 0x%x",CIFSMaxBufSize,CIFSMaxBufSize); */
+ 	cifs_req_cachep = kmem_cache_create("cifs_request",
+-					    CIFSMaxBufSize +
+-					    MAX_CIFS_HDR_SIZE, 0,
++					    CIFSMaxBufSize + max_hdr_size, 0,
+ 					    SLAB_HWCACHE_ALIGN, NULL);
+ 	if (cifs_req_cachep == NULL)
+ 		return -ENOMEM;
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 557506a..df9f886 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -29,6 +29,9 @@
+ #include "smberr.h"
+ #include "nterr.h"
+ #include "cifs_unicode.h"
++#ifdef CONFIG_CIFS_SMB2
++#include "smb2pdu.h"
++#endif
  
- static __u64
- smb2_get_next_mid(struct TCP_Server_Info *server)
-@@ -36,6 +109,10 @@ smb2_get_next_mid(struct TCP_Server_Info *server)
- struct smb_version_operations smb21_operations = {
- 	.setup_request = smb2_setup_request,
- 	.check_receive = smb2_check_receive,
-+	.add_credits = smb2_add_credits,
-+	.set_credits = smb2_set_credits,
-+	.get_credits_field = smb2_get_credits_field,
-+	.get_credits = smb2_get_credits,
- 	.get_next_mid = smb2_get_next_mid,
- };
+ extern mempool_t *cifs_sm_req_poolp;
+ extern mempool_t *cifs_req_poolp;
+@@ -143,17 +146,27 @@ struct smb_hdr *
+ cifs_buf_get(void)
+ {
+ 	struct smb_hdr *ret_buf = NULL;
+-
+-/* We could use negotiated size instead of max_msgsize -
+-   but it may be more efficient to always alloc same size
+-   albeit slightly larger than necessary and maxbuffersize
+-   defaults to this and can not be bigger */
++	size_t buf_size = sizeof(struct smb_hdr);
++
++#ifdef CONFIG_CIFS_SMB2
++	/*
++	 * SMB2 header is bigger than CIFS one - no problems to clean some
++	 * more bytes for CIFS.
++	 */
++	buf_size = sizeof(struct smb2_hdr);
++#endif
++	/*
++	 * We could use negotiated size instead of max_msgsize -
++	 * but it may be more efficient to always alloc same size
++	 * albeit slightly larger than necessary and maxbuffersize
++	 * defaults to this and can not be bigger.
++	 */
+ 	ret_buf = mempool_alloc(cifs_req_poolp, GFP_NOFS);
  
+ 	/* clear the first few header bytes */
+ 	/* for most paths, more is cleared in header_assemble */
+ 	if (ret_buf) {
+-		memset(ret_buf, 0, sizeof(struct smb_hdr) + 3);
++		memset(ret_buf, 0, buf_size + 3);
+ 		atomic_inc(&bufAllocCount);
+ #ifdef CONFIG_CIFS_STATS2
+ 		atomic_inc(&totBufAllocCount);
 -- 
 1.7.1
