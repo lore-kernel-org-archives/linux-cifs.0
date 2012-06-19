@@ -1,536 +1,173 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 14/22] CIFS: Add SMB2 support for is_path_accessible
-Date: Tue, 19 Jun 2012 16:40:03 +0400
-Message-ID: <1340109611-7210-15-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 22/22] CIFS: Allow SMB2 statistics to be tracked
+Date: Tue, 19 Jun 2012 16:40:11 +0400
+Message-ID: <1340109611-7210-23-git-send-email-pshilovsky@samba.org>
 References: <1340109611-7210-1-git-send-email-pshilovsky@samba.org>
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1340109611-7210-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Since there are only 19 command codes, it also is easier to track by exact
+command code than it was for cifs.
 
-that needs for a successful mount through SMB2 protocol.
-
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifs_unicode.c |   61 +++++++++++++++++
- fs/cifs/cifs_unicode.h |    5 ++
- fs/cifs/smb2misc.c     |   25 +++++++
- fs/cifs/smb2ops.c      |   25 +++++++
- fs/cifs/smb2pdu.c      |  130 +++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h      |  167 ++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2proto.h    |    8 ++
- 7 files changed, 421 insertions(+), 0 deletions(-)
+ fs/cifs/cifsglob.h |    9 ++++++
+ fs/cifs/smb2ops.c  |   81 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c  |    4 +--
+ 3 files changed, 91 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-index 97c1d42..7dab9c0 100644
---- a/fs/cifs/cifs_unicode.c
-+++ b/fs/cifs/cifs_unicode.c
-@@ -330,3 +330,64 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
- ctoUTF16_out:
- 	return i;
- }
-+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3665e1c..9f11a78 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -28,6 +28,9 @@
+ #include "cifsacl.h"
+ #include <crypto/internal/hash.h>
+ #include <linux/scatterlist.h>
 +#ifdef CONFIG_CIFS_SMB2
-+/*
-+ * cifs_local_to_utf16_bytes - how long will a string be after conversion?
-+ * @from - pointer to input string
-+ * @maxbytes - don't go past this many bytes of input string
-+ * @codepage - source codepage
-+ *
-+ * Walk a string and return the number of bytes that the string will
-+ * be after being converted to the given charset, not including any null
-+ * termination required. Don't walk past maxbytes in the source buffer.
-+ */
-+
-+static int
-+cifs_local_to_utf16_bytes(const char *from, int len,
-+			  const struct nls_table *codepage)
-+{
-+	int charlen;
-+	int i;
-+	wchar_t wchar_to;
-+
-+	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
-+		charlen = codepage->char2uni(from, len, &wchar_to);
-+		/* Failed conversion defaults to a question mark */
-+		if (charlen < 1)
-+			charlen = 1;
-+	}
-+	return 2 * i; /* UTF16 characters are two bytes */
-+}
-+
-+/*
-+ * cifs_strndup_to_utf16 - copy a string to wire format from the local codepage
-+ * @src - source string
-+ * @maxlen - don't walk past this many bytes in the source string
-+ * @utf16_len - the length of the allocated string in bytes (including null)
-+ * @cp - source codepage
-+ * @remap - map special chars
-+ *
-+ * Take a string convert it from the local codepage to UTF16 and
-+ * put it in a new buffer. Returns a pointer to the new string or NULL on
-+ * error.
-+ */
-+__le16 *
-+cifs_strndup_to_utf16(const char *src, const int maxlen, int *utf16_len,
-+		      const struct nls_table *cp, int remap)
-+{
-+	int len;
-+	__le16 *dst;
-+
-+	len = cifs_local_to_utf16_bytes(src, maxlen, cp);
-+	len += 2; /* NULL */
-+	dst = kmalloc(len, GFP_KERNEL);
-+	if (!dst) {
-+		*utf16_len = 0;
-+		return NULL;
-+	}
-+	cifsConvertToUTF16(dst, src, strlen(src), cp, remap);
-+	*utf16_len = len;
-+	return dst;
-+}
-+#endif /* CONFIG_CIFS_SMB2 */
-diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
-index a44c6eb..4fb0974 100644
---- a/fs/cifs/cifs_unicode.h
-+++ b/fs/cifs/cifs_unicode.h
-@@ -84,6 +84,11 @@ char *cifs_strndup_from_utf16(const char *src, const int maxlen,
- 			      const struct nls_table *codepage);
- extern int cifsConvertToUTF16(__le16 *target, const char *source, int maxlen,
- 			      const struct nls_table *cp, int mapChars);
-+#ifdef CONFIG_CIFS_SMB2
-+extern __le16 *cifs_strndup_to_utf16(const char *src, const int maxlen,
-+				     int *utf16_len, const struct nls_table *cp,
-+				     int remap);
-+#endif /* CONFIG_CIFS_SMB2 */
- #endif
++#include "smb2pdu.h"
++#endif
  
  /*
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index b690852..2c061fd 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -229,6 +229,11 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
- 		    ((struct smb2_sess_setup_rsp *)hdr)->SecurityBufferLength);
- 		break;
- 	case SMB2_CREATE:
-+		*off = le32_to_cpu(
-+		    ((struct smb2_create_rsp *)hdr)->CreateContextsOffset);
-+		*len = le32_to_cpu(
-+		    ((struct smb2_create_rsp *)hdr)->CreateContextsLength);
-+		break;
- 	case SMB2_READ:
- 	case SMB2_QUERY_INFO:
- 	case SMB2_QUERY_DIRECTORY:
-@@ -312,3 +317,23 @@ calc_size_exit:
- 	cFYI(1, "smb2 len %d", len);
- 	return len;
- }
-+
-+/* Note: caller must free return buffer */
-+__le16 *
-+cifs_convert_path_to_utf16(const char *from, struct cifs_sb_info *cifs_sb)
-+{
-+	int len;
-+	const char *start_of_path;
-+	__le16 *to;
-+
-+	/* Windows doesn't allow paths beginning with \ */
-+	if (from[0] == '\\')
-+		start_of_path = from + 1;
-+	else
-+		start_of_path = from;
-+	to = cifs_strndup_to_utf16(start_of_path, PATH_MAX, &len,
-+				   cifs_sb->local_nls,
-+				   cifs_sb->mnt_cifs_flags &
-+					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	return to;
-+}
+  * The sizes of various internal tables and strings
+@@ -582,6 +585,12 @@ struct cifs_tcon {
+ 			atomic_t num_acl_get;
+ 			atomic_t num_acl_set;
+ 		} cifs_stats;
++#ifdef CONFIG_CIFS_SMB2
++		struct {
++			atomic_t smb2_com_sent[NUMBER_OF_SMB2_COMMANDS];
++			atomic_t smb2_com_failed[NUMBER_OF_SMB2_COMMANDS];
++		} smb2_stats;
++#endif /* CONFIG_CIFS_SMB2 */
+ 	} stats;
+ #ifdef CONFIG_CIFS_STATS2
+ 	unsigned long long time_writes;
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index a904b35..75904b7 100644
+index bf277c3..e3686ee 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -156,6 +156,30 @@ smb2_negotiate(const int xid, struct cifs_ses *ses)
- 	return rc;
+@@ -212,6 +212,85 @@ smb2_can_echo(struct TCP_Server_Info *server)
+ 	return server->echos;
  }
  
-+static int
-+smb2_is_path_accessible(const int xid, struct cifs_tcon *tcon,
-+			struct cifs_sb_info *cifs_sb, const char *full_path)
++static void
++smb2_clear_stats(struct cifs_tcon *tcon)
 +{
-+	int rc;
-+	__u64 persistent_fid, volatile_fid;
-+	__le16 *utf16_path;
-+
-+	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb);
-+	if (!utf16_path)
-+		return -ENOMEM;
-+
-+	rc = SMB2_open(xid, tcon, utf16_path, &persistent_fid, &volatile_fid,
-+		       FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0);
-+	if (rc) {
-+		kfree(utf16_path);
-+		return rc;
++#ifdef CONFIG_CIFS_STATS
++	int i;
++	for (i = 0; i < NUMBER_OF_SMB2_COMMANDS; i++) {
++		atomic_set(&tcon->stats.smb2_stats.smb2_com_sent[i], 0);
++		atomic_set(&tcon->stats.smb2_stats.smb2_com_failed[i], 0);
 +	}
++#endif
++}
 +
-+	rc = SMB2_close(xid, tcon, persistent_fid, volatile_fid);
-+	kfree(utf16_path);
-+	return rc;
++static void
++smb2_print_stats(struct seq_file *m, struct cifs_tcon *tcon)
++{
++#ifdef CONFIG_CIFS_STATS
++	atomic_t *sent = tcon->stats.smb2_stats.smb2_com_sent;
++	atomic_t *failed = tcon->stats.smb2_stats.smb2_com_failed;
++	seq_printf(m, "\nNegotiates: %d sent %d failed",
++		   atomic_read(&sent[SMB2NEGOTIATE]),
++		   atomic_read(&failed[SMB2NEGOTIATE]));
++	seq_printf(m, "\nSessionSetups: %d sent %d failed",
++		   atomic_read(&sent[SMB2SESSION_SETUP]),
++		   atomic_read(&failed[SMB2SESSION_SETUP]));
++#define SMB2LOGOFF		0x0002 /* trivial request/resp */
++	seq_printf(m, "\nLogoffs: %d sent %d failed",
++		   atomic_read(&sent[SMB2LOGOFF]),
++		   atomic_read(&failed[SMB2LOGOFF]));
++	seq_printf(m, "\nTreeConnects: %d sent %d failed",
++		   atomic_read(&sent[SMB2TREE_CONNECT]),
++		   atomic_read(&failed[SMB2TREE_CONNECT]));
++	seq_printf(m, "\nTreeDisconnects: %d sent %d failed",
++		   atomic_read(&sent[SMB2TREE_DISCONNECT]),
++		   atomic_read(&failed[SMB2TREE_DISCONNECT]));
++	seq_printf(m, "\nCreates: %d sent %d failed",
++		   atomic_read(&sent[SMB2CREATE]),
++		   atomic_read(&failed[SMB2CREATE]));
++	seq_printf(m, "\nCloses: %d sent %d failed",
++		   atomic_read(&sent[SMB2CLOSE]),
++		   atomic_read(&failed[SMB2CLOSE]));
++	seq_printf(m, "\nFlushes: %d sent %d failed",
++		   atomic_read(&sent[SMB2FLUSH]),
++		   atomic_read(&failed[SMB2FLUSH]));
++	seq_printf(m, "\nReads: %d sent %d failed",
++		   atomic_read(&sent[SMB2READ]),
++		   atomic_read(&failed[SMB2READ]));
++	seq_printf(m, "\nWrites: %d sent %d failed",
++		   atomic_read(&sent[SMB2WRITE]),
++		   atomic_read(&failed[SMB2WRITE]));
++	seq_printf(m, "\nLocks: %d sent %d failed",
++		   atomic_read(&sent[SMB2LOCK]),
++		   atomic_read(&failed[SMB2LOCK]));
++	seq_printf(m, "\nIOCTLs: %d sent %d failed",
++		   atomic_read(&sent[SMB2IOCTL]),
++		   atomic_read(&failed[SMB2IOCTL]));
++	seq_printf(m, "\nCancels: %d sent %d failed",
++		   atomic_read(&sent[SMB2CANCEL]),
++		   atomic_read(&failed[SMB2CANCEL]));
++	seq_printf(m, "\nEchos: %d sent %d failed",
++		   atomic_read(&sent[SMB2ECHO]),
++		   atomic_read(&failed[SMB2ECHO]));
++	seq_printf(m, "\nQueryDirectories: %d sent %d failed",
++		   atomic_read(&sent[SMB2QUERY_DIRECTORY]),
++		   atomic_read(&failed[SMB2QUERY_DIRECTORY]));
++	seq_printf(m, "\nChangeNotifies: %d sent %d failed",
++		   atomic_read(&sent[SMB2CHANGE_NOTIFY]),
++		   atomic_read(&failed[SMB2CHANGE_NOTIFY]));
++	seq_printf(m, "\nQueryInfos: %d sent %d failed",
++		   atomic_read(&sent[SMB2QUERY_INFO]),
++		   atomic_read(&failed[SMB2QUERY_INFO]));
++	seq_printf(m, "\nSetInfos: %d sent %d failed",
++		   atomic_read(&sent[SMB2SET_INFO]),
++		   atomic_read(&failed[SMB2SET_INFO]));
++	seq_printf(m, "\nOplockBreaks: %d sent %d failed",
++		   atomic_read(&sent[SMB2OPLOCK_BREAK]),
++		   atomic_read(&failed[SMB2OPLOCK_BREAK]));
++#endif
 +}
 +
  struct smb_version_operations smb21_operations = {
  	.setup_request = smb2_setup_request,
  	.check_receive = smb2_check_receive,
-@@ -173,6 +197,7 @@ struct smb_version_operations smb21_operations = {
- 	.logoff = SMB2_logoff,
- 	.tree_connect = SMB2_tcon,
- 	.tree_disconnect = SMB2_tdis,
-+	.is_path_accessible = smb2_is_path_accessible,
- };
- 
- struct smb_version_values smb21_values = {
+@@ -223,6 +302,8 @@ struct smb_version_operations smb21_operations = {
+ 	.find_mid = smb2_find_mid,
+ 	.check_message = smb2_check_message,
+ 	.dump_detail = smb2_dump_detail,
++	.clear_stats = smb2_clear_stats,
++	.print_stats = smb2_print_stats,
+ 	.need_neg = smb2_need_neg,
+ 	.negotiate = smb2_negotiate,
+ 	.sess_setup = SMB2_sess_setup,
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 9ec0bfe..e56ea77 100644
+index 10eb1b6..609eb04 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -839,3 +839,133 @@ SMB2_tdis(const int xid, struct cifs_tcon *tcon)
+@@ -286,10 +286,8 @@ small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
  
- 	return rc;
+ 	if (tcon != NULL) {
+ #ifdef CONFIG_CIFS_STATS2
+-		/*
+ 		uint16_t com_code = le16_to_cpu(smb2_command);
+ 		cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_sent[com_code]);
+-		*/
+ #endif
+ 		cifs_stats_inc(&tcon->num_smbs_sent);
+ 	}
+@@ -685,7 +683,7 @@ SMB2_logoff(const int xid, struct cifs_ses *ses)
+ 
+ static inline void cifs_stats_fail_inc(struct cifs_tcon *tcon, uint16_t code)
+ {
+-	/* cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[code]); */
++	cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_failed[code]);
  }
-+
-+int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
-+	      u64 *persistent_fid, u64 *volatile_fid, __u32 desired_access,
-+	      __u32 create_disposition, __u32 file_attributes,
-+	      __u32 create_options)
-+{
-+	struct smb2_create_req *pSMB2;
-+	struct smb2_create_rsp *pSMB2r;
-+	struct TCP_Server_Info *server;
-+	struct cifs_ses *ses = tcon->ses;
-+	struct kvec iov[2];
-+	int resp_buftype;
-+	int uni_path_len;
-+	int rc = 0;
-+	int num_iovecs = 2;
-+
-+	cFYI(1, "create/open");
-+
-+	if (ses && (ses->server))
-+		server = ses->server;
-+	else
-+		return -EIO;
-+
-+	rc = small_smb2_init(SMB2_CREATE, tcon, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
-+
-+	if (enable_oplocks)
-+		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_BATCH;
-+	else
-+		pSMB2->RequestedOplockLevel = SMB2_OPLOCK_LEVEL_NONE;
-+	pSMB2->ImpersonationLevel = IL_IMPERSONATION;
-+	pSMB2->DesiredAccess = cpu_to_le32(desired_access);
-+	/* File attributes ignored on open (used in create though) */
-+	pSMB2->FileAttributes = cpu_to_le32(file_attributes);
-+	pSMB2->ShareAccess = FILE_SHARE_ALL_LE;
-+	pSMB2->CreateDisposition = cpu_to_le32(create_disposition);
-+	pSMB2->CreateOptions = cpu_to_le32(create_options);
-+	uni_path_len = (2 * UniStrnlen((wchar_t *)path, PATH_MAX)) + 2;
-+	pSMB2->NameOffset = cpu_to_le16(sizeof(struct smb2_create_req)
-+			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
-+
-+	iov[0].iov_base = (char *)pSMB2;
-+
-+	/* rfc1001 length field is 4 bytes so added below */
-+	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length) + 4;
-+
-+	/* MUST set path len (NameLength) to 0 opening root of share */
-+	if (uni_path_len >= 4) {
-+		pSMB2->NameLength = cpu_to_le16(uni_path_len - 2);
-+		/* -1 since last byte is buf[0] which is sent below (path) */
-+		iov[0].iov_len--;
-+		iov[1].iov_len = uni_path_len;
-+		iov[1].iov_base = path;
-+	/* -1 since last byte is buf[0] which was counted in smb2_buf_len */
-+		pSMB2->hdr.smb2_buf_length = cpu_to_be32(be32_to_cpu(
-+				pSMB2->hdr.smb2_buf_length) + uni_path_len - 1);
-+	} else {
-+		num_iovecs = 1;
-+		pSMB2->NameLength = 0;
-+	}
-+
-+	rc = SendReceive2(xid, ses, iov, num_iovecs, &resp_buftype, 0);
-+	pSMB2r = (struct smb2_create_rsp *)iov[0].iov_base;
-+
-+	if (rc != 0) {
-+		cifs_stats_fail_inc(tcon, SMB2CREATE);
-+		goto creat_exit;
-+	}
-+
-+	if (pSMB2r == NULL) {
-+		rc = -EIO;
-+		goto creat_exit;
-+	}
-+	*persistent_fid = pSMB2r->PersistentFileId;
-+	*volatile_fid = pSMB2r->VolatileFileId;
-+creat_exit:
-+	free_rsp_buf(resp_buftype, pSMB2r);
-+	return rc;
-+}
-+
-+int SMB2_close(const int xid, struct cifs_tcon *tcon,
-+	       u64 persistent_file_id, u64 volatile_file_id)
-+{
-+	struct smb2_close_req *pSMB2;
-+	struct smb2_close_rsp *pSMB2r;
-+	struct TCP_Server_Info *server;
-+	struct cifs_ses *ses = tcon->ses;
-+	struct kvec iov[1];
-+	int resp_buftype;
-+	int rc = 0;
-+
-+	cFYI(1, "Close");
-+
-+	if (ses && (ses->server))
-+		server = ses->server;
-+	else
-+		return -EIO;
-+
-+	rc = small_smb2_init(SMB2_CLOSE, tcon, (void **) &pSMB2);
-+	if (rc)
-+		return rc;
-+
-+	pSMB2->PersistentFileId = persistent_file_id;
-+	pSMB2->VolatileFileId = volatile_file_id;
-+
-+	iov[0].iov_base = (char *)pSMB2;
-+	iov[0].iov_len = be32_to_cpu(pSMB2->hdr.smb2_buf_length)
-+					+ 4 /* rfc1001 len */;
-+
-+	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, 0);
-+	pSMB2r = (struct smb2_close_rsp *)iov[0].iov_base;
-+
-+	if (rc != 0) {
-+		if (tcon)
-+			cifs_stats_fail_inc(tcon, SMB2CLOSE);
-+		goto close_exit;
-+	}
-+
-+	if (pSMB2r == NULL) {
-+		rc = -EIO;
-+		goto close_exit;
-+	}
-+
-+	/* BB FIXME - decode close response, update inode for caching */
-+
-+close_exit:
-+	free_rsp_buf(resp_buftype, pSMB2r);
-+	return rc;
-+}
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index 007de36..6101ba2 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -275,4 +275,171 @@ struct smb2_tree_disconnect_rsp {
- 	__le16 Reserved;
- } __packed;
  
-+/* File Attrubutes */
-+#define FILE_ATTRIBUTE_READONLY			0x00000001
-+#define FILE_ATTRIBUTE_HIDDEN			0x00000002
-+#define FILE_ATTRIBUTE_SYSTEM			0x00000004
-+#define FILE_ATTRIBUTE_DIRECTORY		0x00000010
-+#define FILE_ATTRIBUTE_ARCHIVE			0x00000020
-+#define FILE_ATTRIBUTE_NORMAL			0x00000080
-+#define FILE_ATTRIBUTE_TEMPORARY		0x00000100
-+#define FILE_ATTRIBUTE_SPARSE_FILE		0x00000200
-+#define FILE_ATTRIBUTE_REPARSE_POINT		0x00000400
-+#define FILE_ATTRIBUTE_COMPRESSED		0x00000800
-+#define FILE_ATTRIBUTE_OFFLINE			0x00001000
-+#define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED	0x00002000
-+#define FILE_ATTRIBUTE_ENCRYPTED		0x00004000
-+
-+/* Oplock levels */
-+#define SMB2_OPLOCK_LEVEL_NONE		0x00
-+#define SMB2_OPLOCK_LEVEL_II		0x01
-+#define SMB2_OPLOCK_LEVEL_EXCLUSIVE	0x08
-+#define SMB2_OPLOCK_LEVEL_BATCH		0x09
-+#define SMB2_OPLOCK_LEVEL_LEASE		0xFF
-+
-+/* Desired Access Flags */
-+#define FILE_READ_DATA_LE		cpu_to_le32(0x00000001)
-+#define FILE_WRITE_DATA_LE		cpu_to_le32(0x00000002)
-+#define FILE_APPEND_DATA_LE		cpu_to_le32(0x00000004)
-+#define FILE_READ_EA_LE			cpu_to_le32(0x00000008)
-+#define FILE_WRITE_EA_LE		cpu_to_le32(0x00000010)
-+#define FILE_EXECUTE_LE			cpu_to_le32(0x00000020)
-+#define FILE_READ_ATTRIBUTES_LE		cpu_to_le32(0x00000080)
-+#define FILE_WRITE_ATTRIBUTES_LE	cpu_to_le32(0x00000100)
-+#define FILE_DELETE_LE			cpu_to_le32(0x00010000)
-+#define FILE_READ_CONTROL_LE		cpu_to_le32(0x00020000)
-+#define FILE_WRITE_DAC_LE		cpu_to_le32(0x00040000)
-+#define FILE_WRITE_OWNER_LE		cpu_to_le32(0x00080000)
-+#define FILE_SYNCHRONIZE_LE		cpu_to_le32(0x00100000)
-+#define FILE_ACCESS_SYSTEM_SECURITY_LE	cpu_to_le32(0x01000000)
-+#define FILE_MAXIMAL_ACCESS_LE		cpu_to_le32(0x02000000)
-+#define FILE_GENERIC_ALL_LE		cpu_to_le32(0x10000000)
-+#define FILE_GENERIC_EXECUTE_LE		cpu_to_le32(0x20000000)
-+#define FILE_GENERIC_WRITE_LE		cpu_to_le32(0x40000000)
-+#define FILE_GENERIC_READ_LE		cpu_to_le32(0x80000000)
-+
-+/* ShareAccess Flags */
-+#define FILE_SHARE_READ_LE		cpu_to_le32(0x00000001)
-+#define FILE_SHARE_WRITE_LE		cpu_to_le32(0x00000002)
-+#define FILE_SHARE_DELETE_LE		cpu_to_le32(0x00000004)
-+#define FILE_SHARE_ALL_LE		cpu_to_le32(0x00000007)
-+
-+/* CreateDisposition Flags */
-+#define FILE_SUPERSEDE_LE		cpu_to_le32(0x00000000)
-+#define FILE_OPEN_LE			cpu_to_le32(0x00000001)
-+#define FILE_CREATE_LE			cpu_to_le32(0x00000002)
-+#define	FILE_OPEN_IF_LE			cpu_to_le32(0x00000003)
-+#define FILE_OVERWRITE_LE		cpu_to_le32(0x00000004)
-+#define FILE_OVERWRITE_IF_LE		cpu_to_le32(0x00000005)
-+
-+/* CreateOptions Flags */
-+#define FILE_DIRECTORY_FILE_LE		cpu_to_le32(0x00000001)
-+/* same as #define CREATE_NOT_FILE_LE	cpu_to_le32(0x00000001) */
-+#define FILE_WRITE_THROUGH_LE		cpu_to_le32(0x00000002)
-+#define FILE_SEQUENTIAL_ONLY_LE		cpu_to_le32(0x00000004)
-+#define FILE_NO_INTERMEDIATE_BUFFERRING_LE cpu_to_le32(0x00000008)
-+#define FILE_SYNCHRONOUS_IO_ALERT_LE	cpu_to_le32(0x00000010)
-+#define FILE_SYNCHRONOUS_IO_NON_ALERT_LE	cpu_to_le32(0x00000020)
-+#define FILE_NON_DIRECTORY_FILE_LE	cpu_to_le32(0x00000040)
-+#define FILE_COMPLETE_IF_OPLOCKED_LE	cpu_to_le32(0x00000100)
-+#define FILE_NO_EA_KNOWLEDGE_LE		cpu_to_le32(0x00000200)
-+#define FILE_RANDOM_ACCESS_LE		cpu_to_le32(0x00000800)
-+#define FILE_DELETE_ON_CLOSE_LE		cpu_to_le32(0x00001000)
-+#define FILE_OPEN_BY_FILE_ID_LE		cpu_to_le32(0x00002000)
-+#define FILE_OPEN_FOR_BACKUP_INTENT_LE	cpu_to_le32(0x00004000)
-+#define FILE_NO_COMPRESSION_LE		cpu_to_le32(0x00008000)
-+#define FILE_RESERVE_OPFILTER_LE	cpu_to_le32(0x00100000)
-+#define FILE_OPEN_REPARSE_POINT_LE	cpu_to_le32(0x00200000)
-+#define FILE_OPEN_NO_RECALL_LE		cpu_to_le32(0x00400000)
-+#define FILE_OPEN_FOR_FREE_SPACE_QUERY_LE cpu_to_le32(0x00800000)
-+
-+#define FILE_READ_RIGHTS_LE (FILE_READ_DATA_LE | FILE_READ_EA_LE \
-+			| FILE_READ_ATTRIBUTES_LE)
-+#define FILE_WRITE_RIGHTS_LE (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE \
-+			| FILE_WRITE_EA_LE | FILE_WRITE_ATTRIBUTES_LE)
-+#define FILE_EXEC_RIGHTS_LE (FILE_EXECUTE_LE)
-+
-+/* Impersonation Levels */
-+#define IL_ANONYMOUS		cpu_to_le32(0x00000000)
-+#define IL_IDENTIFICATION	cpu_to_le32(0x00000001)
-+#define IL_IMPERSONATION	cpu_to_le32(0x00000002)
-+#define IL_DELEGATE		cpu_to_le32(0x00000003)
-+
-+/* Create Context Values */
-+#define SMB2_CREATE_EA_BUFFER			"ExtA" /* extended attributes */
-+#define SMB2_CREATE_SD_BUFFER			"SecD" /* security descriptor */
-+#define SMB2_CREATE_DURABLE_HANDLE_REQUEST	"DHnQ"
-+#define SMB2_CREATE_DURABLE_HANDLE_RECONNECT	"DHnC"
-+#define SMB2_CREATE_ALLOCATION_SIZE		"AlSi"
-+#define SMB2_CREATE_QUERY_MAXIMAL_ACCESS_REQUEST "MxAc"
-+#define SMB2_CREATE_TIMEWARP_REQUEST		"TWrp"
-+#define SMB2_CREATE_QUERY_ON_DISK_ID		"QFid"
-+#define SMB2_CREATE_REQUEST_LEASE		"RqLs"
-+
-+struct smb2_create_req {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 57 */
-+	__u8   SecurityFlags;
-+	__u8   RequestedOplockLevel;
-+	__le32 ImpersonationLevel;
-+	__le64 SmbCreateFlags;
-+	__le64 Reserved;
-+	__le32 DesiredAccess;
-+	__le32 FileAttributes;
-+	__le32 ShareAccess;
-+	__le32 CreateDisposition;
-+	__le32 CreateOptions;
-+	__le16 NameOffset;
-+	__le16 NameLength;
-+	__le32 CreateContextsOffset;
-+	__le32 CreateContextsLength;
-+	__u8   Buffer[1];
-+} __packed;
-+
-+struct smb2_create_rsp {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 89 */
-+	__u8   OplockLevel;
-+	__u8   Reserved;
-+	__le32 CreateAction;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 AllocationSize;
-+	__le64 EndofFile;
-+	__le32 FileAttributes;
-+	__le32 Reserved2;
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
-+	__le32 CreateContextsOffset;
-+	__le32 CreateContextsLength;
-+	__u8   Buffer[1];
-+} __packed;
-+
-+/* Currently defined values for close flags */
-+#define SMB2_CLOSE_FLAG_POSTQUERY_ATTRIB	cpu_to_le16(0x0001)
-+struct smb2_close_req {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 24 */
-+	__le16 Flags;
-+	__le32 Reserved;
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
-+} __packed;
-+
-+struct smb2_close_rsp {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* 60 */
-+	__le16 Flags;
-+	__le32 Reserved;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 AllocationSize;	/* Beginning of FILE_STANDARD_INFO equivalent */
-+	__le64 EndOfFile;
-+	__le32 Attributes;
-+} __packed;
-+
- #endif				/* _SMB2PDU_H */
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 0d51482..5ffc5ec 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -36,6 +36,8 @@ extern int map_smb2_to_linux_error(char *buf, bool log_err);
- extern int smb2_check_message(char *buf, unsigned int length);
- extern unsigned int smb2_calc_size(struct smb2_hdr *hdr);
- extern char *smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr);
-+extern __le16 *cifs_convert_path_to_utf16(const char *from,
-+					  struct cifs_sb_info *cifs_sb);
- 
- extern int smb2_check_receive(struct mid_q_entry *mid,
- 			      struct TCP_Server_Info *server, bool log_error);
-@@ -54,5 +56,11 @@ extern int SMB2_tcon(const int xid, struct cifs_ses *ses,
- 		     const char *tree, struct cifs_tcon *tcon,
- 		     const struct nls_table *);
- extern int SMB2_tdis(const int xid, struct cifs_tcon *tcon);
-+extern int SMB2_open(const int xid, struct cifs_tcon *tcon, __le16 *path,
-+		      u64 *persistent_fid, u64 *volatile_fid,
-+		      __u32 desired_access, __u32 create_disposition,
-+		      __u32 file_attributes, __u32 create_options);
-+extern int SMB2_close(const int xid, struct cifs_tcon *tcon,
-+		      u64 persistent_file_id, u64 volatile_file_id);
- 
- #endif			/* _SMB2PROTO_H */
+ #define MAX_SHARENAME_LENGTH (255 /* server */ + 80 /* share */ + 1 /* NULL */)
 -- 
 1.7.1
