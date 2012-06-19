@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 11/22] CIFS: Move getting dfs referalls to ops struct
-Date: Tue, 19 Jun 2012 16:40:00 +0400
-Message-ID: <1340109611-7210-12-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 13/22] CIFS: Move is_path_accessible to ops struct
+Date: Tue, 19 Jun 2012 16:40:02 +0400
+Message-ID: <1340109611-7210-14-git-send-email-pshilovsky@samba.org>
 References: <1340109611-7210-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,125 +11,120 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    5 +++++
- fs/cifs/cifsproto.h |    8 ++++----
- fs/cifs/cifssmb.c   |    3 +--
- fs/cifs/connect.c   |    9 +++++----
- fs/cifs/smb1ops.c   |   12 ++++++++++++
- 5 files changed, 27 insertions(+), 10 deletions(-)
+ fs/cifs/cifsglob.h |    3 +++
+ fs/cifs/connect.c  |   31 ++++++-------------------------
+ fs/cifs/smb1ops.c  |   25 +++++++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 25 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 3215026..e045c31 100644
+index 4f82900..7f5cb14 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -162,6 +162,7 @@ struct TCP_Server_Info;
- struct cifsFileInfo;
- struct cifs_ses;
- struct cifs_tcon;
-+struct dfs_info3_param;
- 
- struct smb_version_operations {
- 	int (*send_cancel)(struct TCP_Server_Info *, void *,
-@@ -208,6 +209,10 @@ struct smb_version_operations {
- 			    struct cifs_tcon *, const struct nls_table *);
- 	/* close tree connecion */
- 	int (*tree_disconnect)(const int, struct cifs_tcon *);
-+	/* get DFS referrals */
-+	int (*get_dfs_refer)(const int, struct cifs_ses *, const char *,
-+			     struct dfs_info3_param **, unsigned int *,
-+			     const struct nls_table *, int);
+@@ -215,6 +215,9 @@ struct smb_version_operations {
+ 			     const struct nls_table *, int);
+ 	/* informational QFS call */
+ 	void (*qfs_tcon)(const int, struct cifs_tcon *);
++	/* check if a path is accessible or not */
++	int (*is_path_accessible)(const int, struct cifs_tcon *,
++				  struct cifs_sb_info *, const char *);
  };
  
  struct smb_version_values {
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 6152571..8b5f2a6 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -223,10 +223,10 @@ extern int CIFSSMBUnixQPathInfo(const int xid,
- 			const struct nls_table *nls_codepage, int remap);
- 
- extern int CIFSGetDFSRefer(const int xid, struct cifs_ses *ses,
--			const unsigned char *searchName,
--			struct dfs_info3_param **target_nodes,
--			unsigned int *number_of_nodes_in_array,
--			const struct nls_table *nls_codepage, int remap);
-+			   const char *searchName,
-+			   struct dfs_info3_param **target_nodes,
-+			   unsigned int *num_of_nodes,
-+			   const struct nls_table *nls_codepage, int remap);
- 
- extern int get_dfs_path(int xid, struct cifs_ses *pSesInfo,
- 			const char *old_path,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c3bfe9a..13e1c7f 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -4741,8 +4741,7 @@ parse_DFS_referrals_exit:
- }
- 
- int
--CIFSGetDFSRefer(const int xid, struct cifs_ses *ses,
--		const unsigned char *searchName,
-+CIFSGetDFSRefer(const int xid, struct cifs_ses *ses, const char *searchName,
- 		struct dfs_info3_param **target_nodes,
- 		unsigned int *num_of_nodes,
- 		const struct nls_table *nls_codepage, int remap)
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index d6fc429..5e62b3a 100644
+index 3f6b66a..a1f301f 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2772,7 +2772,7 @@ get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
- 	char *temp_unc;
- 	int rc = 0;
- 
--	if (!ses->server->ops->tree_connect)
-+	if (!ses->server->ops->tree_connect || !ses->server->ops->get_dfs_refer)
- 		return -ENOSYS;
- 
- 	*num_referrals = 0;
-@@ -2794,11 +2794,12 @@ get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
- 		kfree(temp_unc);
- 	}
- 	if (rc == 0)
--		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
--				     num_referrals, nls_codepage, remap);
-+		rc = ses->server->ops->get_dfs_refer(xid, ses, old_path,
-+						     referrals, num_referrals,
-+						     nls_codepage, remap);
- 	/*
- 	 * BB - map targetUNCs to dfs_info3 structures, here or in
--	 * CIFSGetDFSRefer.
-+	 * ses->server->ops->get_dfs_refer.
- 	 */
- 
- 	return rc;
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index cd7fbfd..fc17951 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -410,6 +410,17 @@ cifs_negotiate(const int xid, struct cifs_ses *ses)
- 	return rc;
+@@ -3385,30 +3385,6 @@ cifs_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
+ 	return rsize;
  }
  
-+static int
-+cifs_get_dfs_refer(const int xid, struct cifs_ses *ses, const char *search_name,
-+		   struct dfs_info3_param **target_nodes,
-+		   unsigned int *num_of_nodes,
-+		   const struct nls_table *nls_codepage, int remap)
+-static int
+-is_path_accessible(int xid, struct cifs_tcon *tcon,
+-		   struct cifs_sb_info *cifs_sb, const char *full_path)
+-{
+-	int rc;
+-	FILE_ALL_INFO *pfile_info;
+-
+-	pfile_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
+-	if (pfile_info == NULL)
+-		return -ENOMEM;
+-
+-	rc = CIFSSMBQPathInfo(xid, tcon, full_path, pfile_info,
+-			      0 /* not legacy */, cifs_sb->local_nls,
+-			      cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
+-
+-	if (rc == -EOPNOTSUPP || rc == -EINVAL)
+-		rc = SMBQueryInformation(xid, tcon, full_path, pfile_info,
+-				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+-				  CIFS_MOUNT_MAP_SPECIAL_CHR);
+-	kfree(pfile_info);
+-	return rc;
+-}
+-
+ static void
+ cleanup_volume_info_contents(struct smb_vol *volume_info)
+ {
+@@ -3686,13 +3662,18 @@ remote_path_check:
+ 
+ 	/* check if a whole path is not remote */
+ 	if (!rc && tcon) {
++		if (!server->ops->is_path_accessible) {
++			rc = -ENOSYS;
++			goto mount_fail_check;
++		}
+ 		/* build_path_to_root works only when we have a valid tcon */
+ 		full_path = cifs_build_path_to_root(volume_info, cifs_sb, tcon);
+ 		if (full_path == NULL) {
+ 			rc = -ENOMEM;
+ 			goto mount_fail_check;
+ 		}
+-		rc = is_path_accessible(xid, tcon, cifs_sb, full_path);
++		rc = server->ops->is_path_accessible(xid, tcon, cifs_sb,
++						     full_path);
+ 		if (rc != 0 && rc != -EREMOTE) {
+ 			kfree(full_path);
+ 			goto mount_fail_check;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 00cae9e..554ecba 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -428,6 +428,30 @@ cifs_qfs_tcon(const int xid, struct cifs_tcon *tcon)
+ 	CIFSSMBQFSAttributeInfo(xid, tcon);
+ }
+ 
++int
++cifs_is_path_accessible(const int xid, struct cifs_tcon *tcon,
++			struct cifs_sb_info *cifs_sb, const char *full_path)
 +{
-+	return CIFSGetDFSRefer(xid, ses, search_name, target_nodes,
-+			       num_of_nodes, nls_codepage, remap);
-+	/* BB map targetUNCs to dfs_info3 here or in CIFSGetDFSRefer. */
++	int rc;
++	FILE_ALL_INFO *file_info;
++
++	file_info = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
++	if (file_info == NULL)
++		return -ENOMEM;
++
++	rc = CIFSSMBQPathInfo(xid, tcon, full_path, file_info,
++			      0 /* not legacy */, cifs_sb->local_nls,
++			      cifs_sb->mnt_cifs_flags &
++				CIFS_MOUNT_MAP_SPECIAL_CHR);
++
++	if (rc == -EOPNOTSUPP || rc == -EINVAL)
++		rc = SMBQueryInformation(xid, tcon, full_path, file_info,
++				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
++				  CIFS_MOUNT_MAP_SPECIAL_CHR);
++	kfree(file_info);
++	return rc;
 +}
 +
  struct smb_version_operations smb1_operations = {
  	.send_cancel = send_nt_cancel,
  	.compare_fids = cifs_compare_fids,
-@@ -434,6 +445,7 @@ struct smb_version_operations smb1_operations = {
- 	.logoff = CIFSSMBLogoff,
- 	.tree_connect = CIFSTCon,
+@@ -454,6 +478,7 @@ struct smb_version_operations smb1_operations = {
  	.tree_disconnect = CIFSSMBTDis,
-+	.get_dfs_refer = cifs_get_dfs_refer,
+ 	.get_dfs_refer = cifs_get_dfs_refer,
+ 	.qfs_tcon = cifs_qfs_tcon,
++	.is_path_accessible = cifs_is_path_accessible,
  };
  
  struct smb_version_values smb1_values = {
