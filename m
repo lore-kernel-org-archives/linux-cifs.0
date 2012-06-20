@@ -1,90 +1,95 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 01/22] CIFS: Add SMB2 status codes
-Date: Wed, 20 Jun 2012 18:33:42 +0400
-Message-ID: <CAKywueQVavHPXaK6KvPUR6LSEo-h4wqOZt4xDGs1dpbkFBckVQ@mail.gmail.com>
-References: <1340109611-7210-1-git-send-email-pshilovsky@samba.org>
-	<1340109611-7210-2-git-send-email-pshilovsky@samba.org>
-	<20120619152207.6d48ec92@corrin.poochiereds.net>
-	<CAKywueRzeAV2P-nO=K3kpVaLoh=i462kaLaLGgJvEs4Mrteh1w@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v2 00/24] Get SMB2 mount work
+Date: Wed, 20 Jun 2012 18:30:40 +0400
+Message-ID: <1340202664-28696-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRzeAV2P-nO=K3kpVaLoh=i462kaLaLGgJvEs4Mrteh1w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/6/20 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> 2012/6/20 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> On Tue, 19 Jun 2012 16:39:50 +0400
->> Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
->>
->>> +#define STATUS_GUARD_PAGE_VIOLATION =A0 0x80000001
->>> +#define STATUS_DATATYPE_MISALIGNMENT =A00x80000002
->>> +#define STATUS_BREAKPOINT =A0 =A0 0x80000003
->>> +#define STATUS_SINGLE_STEP =A0 =A00x80000004
->>> +/* #define STATUS_BUFFER_OVERFLOW =A0 =A0 0x80000005 */
->>> +#define STATUS_NO_MORE_FILES =A00x80000006
->>> +#define STATUS_WAKE_SYSTEM_DEBUGGER =A0 0x80000007
->>> +#define STATUS_HANDLES_CLOSED =A0 =A0 =A0 =A0 0x8000000A
->>> +#define STATUS_NO_INHERITANCE =A0 =A0 =A0 =A0 0x8000000B
->>> +#define STATUS_GUID_SUBSTITUTION_MADE =A0 =A0 =A0 =A0 0x8000000C
->>
->> Well, on the plus side, you did comment out STATUS_BUFFER_OVERFLOW
->> which was a definite conflict with the definitions in the SMB1 statu=
-s
->> code list. However...I'm fairly certain that there are other conflic=
-ts
->> here, so that was just an example.
->>
->> You really have two choices here:
->>
->> 1) make smb2status.h and nterr.h be mutually exclusive. Ensure that =
-you
->> never #include both files. At first glance, this may be easy, but th=
-e
->> trick will be to ensure that no one does this in the future.
->>
->> 2) rename all of these error codes such that they do not conflict wi=
-th
->> the SMB1 errors. This is more certain to ensure that you don't have
->> problems, but it's a bigger change.
->>
->> I really don't care which one you choose, but we really do need to t=
-ake
->> steps to ensure that we do not get conflicts here.
->>
->> --
->> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->
-> nterr.h has only 5 macros started with STATUS_:
->
-> #define STATUS_MORE_ENTRIES =A0 =A0 =A0 =A0 =A0 =A0 =A0 0x0105
-> #define STATUS_1804>---- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00x070c
-> #define STATUS_NOTIFY_ENUM_DIR =A0 =A0 =A0 =A0 =A0 =A00x010c
-> #define STATUS_SOME_UNMAPPED =A0 =A0 =A0 0x0107
-> #define STATUS_BUFFER_OVERFLOW =A0 =A0 0x80000005
->
-> I've already checked all them and commented dublicates in smb2status.=
-h
-> (STATUS_MORE_ENTRIES, STATUS_NOTIFY_ENUM_DIR, STATUS_BUFFER_OVERFLOW)
-> - no conflicts now.
->
-> But I don't care to rename all error codes to something like
-> SMB2_STATUS_ to make sure we will not miss something in future.
->
-> --
-> Best regards,
-> Pavel Shilovsky.
+This is the first chunk of SMB2 patches. It allows:
+1) mount a network share,
+2) stat inode information,
+3) send echo message,
+4) display statistics.
 
-After a discussion with Jeff we came to the following rules:
-1) prefix 7 error codes from nterr.h with NT_ that doesn't thave NT_
-and consider them as CIFS codes.
-2) consider codes from smb2status.h patch as new style codes (suitable
-for SMB2, SMB2.1 and SMB3).
+The patchset implements the approach of having ops structure of
+protocol-specific callbacks that is used by the generic code.
 
---=20
-Best regards,
-Pavel Shilovsky.
+Changes since version #1:
+- add patch that fixes Get/FreeXid
+- add patch that prefixes existing CIFS STATUS_ codes with NT_
+
+Pavel Shilovsky (23):
+  CIFS: Rename Get/FreeXid and make them work with unsigned int
+  CIFS: Rename 7 error codes to NT_ style
+  CIFS: Add SMB2 status codes
+  CIFS: Make transport routines work with SMB2
+  CIFS: Add SMB2 credits support
+  CIFS: Make demultiplex_thread work with SMB2 code
+  CIFS: Respect SMB2 header/max header size
+  CIFS: Add capability to send SMB2 negotiate message
+  CIFS: Add session setup/logoff capability for SMB2
+  CIFS: Add tree connect/disconnect capability for SMB2
+  CIFS: Process reconnects for SMB2 shares
+  CIFS: Move getting dfs referalls to ops struct
+  CIFS: Move informational tcon calls to ops struct
+  CIFS: Move is_path_accessible to ops struct
+  CIFS: Add SMB2 support for is_path_accessible
+  CIFS: Move query inode info code to ops struct
+  CIFS: Query SMB2 inode info
+  CIFS: Move building path to root to ops struct
+  CIFS: Add SMB2 support for build_path_to_root
+  CIFS: Move echo code to osp struct
+  CIFS: Add echo request support for SMB2
+  CIFS: Move clear/print_stats code to ops struct
+  CIFS: Allow SMB2 statistics to be tracked
+
+Steve French (1):
+  CIFS: Map SMB2 status codes to POSIX errors
+
+ fs/cifs/Makefile        |    3 +-
+ fs/cifs/cifs_debug.c    |   62 +--
+ fs/cifs/cifs_dfs_ref.c  |    7 +-
+ fs/cifs/cifs_unicode.c  |   60 ++
+ fs/cifs/cifs_unicode.h  |    6 +-
+ fs/cifs/cifsacl.c       |   21 +-
+ fs/cifs/cifsfs.c        |   24 +-
+ fs/cifs/cifsglob.h      |  126 +++-
+ fs/cifs/cifsproto.h     |  210 +++---
+ fs/cifs/cifssmb.c       |  303 ++++----
+ fs/cifs/connect.c       |  151 ++---
+ fs/cifs/dir.c           |   24 +-
+ fs/cifs/file.c          |  133 ++--
+ fs/cifs/inode.c         |  209 ++----
+ fs/cifs/ioctl.c         |    6 +-
+ fs/cifs/link.c          |   24 +-
+ fs/cifs/misc.c          |   31 +-
+ fs/cifs/nterr.c         |    6 +-
+ fs/cifs/nterr.h         |   26 +-
+ fs/cifs/ntlmssp.h       |   10 +
+ fs/cifs/readdir.c       |   15 +-
+ fs/cifs/sess.c          |    6 +-
+ fs/cifs/smb1ops.c       |  186 +++++
+ fs/cifs/smb2glob.h      |   44 ++
+ fs/cifs/smb2inode.c     |  124 ++++
+ fs/cifs/smb2maperror.c  | 1829 +++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2misc.c      |  344 +++++++++
+ fs/cifs/smb2ops.c       |  298 ++++++++
+ fs/cifs/smb2pdu.c       | 1125 +++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h       |  568 +++++++++++++++
+ fs/cifs/smb2proto.h     |   75 ++
+ fs/cifs/smb2status.h    | 1782 +++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2transport.c |  151 ++++
+ fs/cifs/transport.c     |   13 +-
+ fs/cifs/xattr.c         |   24 +-
+ 35 files changed, 7317 insertions(+), 709 deletions(-)
+ create mode 100644 fs/cifs/smb2glob.h
+ create mode 100644 fs/cifs/smb2inode.c
+ create mode 100644 fs/cifs/smb2maperror.c
+ create mode 100644 fs/cifs/smb2misc.c
+ create mode 100644 fs/cifs/smb2pdu.c
+ create mode 100644 fs/cifs/smb2pdu.h
+ create mode 100644 fs/cifs/smb2proto.h
+ create mode 100644 fs/cifs/smb2status.h
+ create mode 100644 fs/cifs/smb2transport.c
