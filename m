@@ -1,45 +1,100 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Remove sparse warnings
-Date: Wed, 20 Jun 2012 22:09:57 +0200
-Message-ID: <CAH2r5mtiYCjBdqMv_vAfZmzCu8qxhSQ431Jx-PvfFtUFEiHagA@mail.gmail.com>
+Subject: Re: [PATCH 01/22] CIFS: Add SMB2 status codes
+Date: Wed, 20 Jun 2012 16:49:41 -0700
+Message-ID: <CAH2r5mv4LT+MMeCNcEt2wkxrg-3Pck8Z_U+gBj3EkedvSn+YVw@mail.gmail.com>
+References: <1340109611-7210-1-git-send-email-pshilovsky@samba.org>
+	<1340109611-7210-2-git-send-email-pshilovsky@samba.org>
+	<20120619152207.6d48ec92@corrin.poochiereds.net>
+	<CAKywueRzeAV2P-nO=K3kpVaLoh=i462kaLaLGgJvEs4Mrteh1w@mail.gmail.com>
+	<CAKywueQVavHPXaK6KvPUR6LSEo-h4wqOZt4xDGs1dpbkFBckVQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueQVavHPXaK6KvPUR6LSEo-h4wqOZt4xDGs1dpbkFBckVQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Two minor fixes to include in your smb2 patches (to remove sparse warnings)
+On Wed, Jun 20, 2012 at 7:33 AM, Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>=
+ wrote:
+> 2012/6/20 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+>> 2012/6/20 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+>>> On Tue, 19 Jun 2012 16:39:50 +0400
+>>> Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>>>
+>>>> +#define STATUS_GUARD_PAGE_VIOLATION =A0 0x80000001
+>>>> +#define STATUS_DATATYPE_MISALIGNMENT =A00x80000002
+>>>> +#define STATUS_BREAKPOINT =A0 =A0 0x80000003
+>>>> +#define STATUS_SINGLE_STEP =A0 =A00x80000004
+>>>> +/* #define STATUS_BUFFER_OVERFLOW =A0 =A0 0x80000005 */
+>>>> +#define STATUS_NO_MORE_FILES =A00x80000006
+>>>> +#define STATUS_WAKE_SYSTEM_DEBUGGER =A0 0x80000007
+>>>> +#define STATUS_HANDLES_CLOSED =A0 =A0 =A0 =A0 0x8000000A
+>>>> +#define STATUS_NO_INHERITANCE =A0 =A0 =A0 =A0 0x8000000B
+>>>> +#define STATUS_GUID_SUBSTITUTION_MADE =A0 =A0 =A0 =A0 0x8000000C
+>>>
+>>> Well, on the plus side, you did comment out STATUS_BUFFER_OVERFLOW
+>>> which was a definite conflict with the definitions in the SMB1 stat=
+us
+>>> code list. However...I'm fairly certain that there are other confli=
+cts
+>>> here, so that was just an example.
+>>>
+>>> You really have two choices here:
+>>>
+>>> 1) make smb2status.h and nterr.h be mutually exclusive. Ensure that=
+ you
+>>> never #include both files. At first glance, this may be easy, but t=
+he
+>>> trick will be to ensure that no one does this in the future.
+>>>
+>>> 2) rename all of these error codes such that they do not conflict w=
+ith
+>>> the SMB1 errors. This is more certain to ensure that you don't have
+>>> problems, but it's a bigger change.
+>>>
+>>> I really don't care which one you choose, but we really do need to =
+take
+>>> steps to ensure that we do not get conflicts here.
+>>>
+>>> --
+>>> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>>
+>> nterr.h has only 5 macros started with STATUS_:
+>>
+>> #define STATUS_MORE_ENTRIES =A0 =A0 =A0 =A0 =A0 =A0 =A0 0x0105
+>> #define STATUS_1804>---- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A00x070c
+>> #define STATUS_NOTIFY_ENUM_DIR =A0 =A0 =A0 =A0 =A0 =A00x010c
+>> #define STATUS_SOME_UNMAPPED =A0 =A0 =A0 0x0107
+>> #define STATUS_BUFFER_OVERFLOW =A0 =A0 0x80000005
+>>
+>> I've already checked all them and commented dublicates in smb2status=
+=2Eh
+>> (STATUS_MORE_ENTRIES, STATUS_NOTIFY_ENUM_DIR, STATUS_BUFFER_OVERFLOW=
+)
+>> - no conflicts now.
+>>
+>> But I don't care to rename all error codes to something like
+>> SMB2_STATUS_ to make sure we will not miss something in future.
+>>
+>> --
+>> Best regards,
+>> Pavel Shilovsky.
+>
+> After a discussion with Jeff we came to the following rules:
+> 1) prefix 7 error codes from nterr.h with NT_ that doesn't thave NT_
+> and consider them as CIFS codes.
+> 2) consider codes from smb2status.h patch as new style codes (suitabl=
+e
+> for SMB2, SMB2.1 and SMB3).
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 0b435f8..8836c7b 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -439,7 +439,7 @@ extern int CIFSSMBSetEA(const unsigned int xid,
-struct cifs_tcon *tcon,
- 		const struct nls_table *nls_codepage, int remap_special_chars);
- extern int CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon,
- 			__u16 fid, struct cifs_ntsd **acl_inf, __u32 *buflen);
--extern int CIFSSMBSetCIFSACL(const int, struct cifs_tcon *, __u16,
-+extern int CIFSSMBSetCIFSACL(const unsigned int, struct cifs_tcon *, __u16,
- 			struct cifs_ntsd *, __u32, int);
- extern int CIFSSMBGetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
- 		const unsigned char *searchName,
-diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
-index 5023483..a97f86b 100644
---- a/fs/cifs/smb2maperror.c
-+++ b/fs/cifs/smb2maperror.c
-@@ -25,6 +25,7 @@
- #include "cifs_debug.h"
- #include "smb2pdu.h"
- #include "smb2status.h"
-+#include "smb2proto.h"
+Yes - but also have to doublecheck that we didn't miss some new ones.
 
- struct status_to_posix_error {
- 	__u32 smb2_status;
 
--- 
+
+--=20
 Thanks,
 
 Steve
