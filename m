@@ -1,473 +1,410 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 07/24] CIFS: Make demultiplex_thread work with SMB2 code
-Date: Wed, 20 Jun 2012 18:30:47 +0400
-Message-ID: <1340202664-28696-8-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v2 10/24] CIFS: Add session setup/logoff capability for SMB2
+Date: Wed, 20 Jun 2012 18:30:50 +0400
+Message-ID: <1340202664-28696-11-git-send-email-pshilovsky@samba.org>
 References: <1340202664-28696-1-git-send-email-pshilovsky@samba.org>
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1340202664-28696-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-Now we can process SMB2 messages: check message, get message id
-and wakeup awaiting routines.
-
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/Makefile     |    2 +-
- fs/cifs/cifs_debug.c |    2 +-
- fs/cifs/smb2misc.c   |  304 ++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2ops.c    |   37 ++++++
- fs/cifs/smb2pdu.h    |   30 +++++
- fs/cifs/smb2proto.h  |    2 +
- 6 files changed, 375 insertions(+), 2 deletions(-)
- create mode 100644 fs/cifs/smb2misc.c
+ fs/cifs/cifsglob.h  |    3 +
+ fs/cifs/ntlmssp.h   |   10 +++
+ fs/cifs/sess.c      |    6 +-
+ fs/cifs/smb2misc.c  |    5 +
+ fs/cifs/smb2ops.c   |    2 +
+ fs/cifs/smb2pdu.c   |  223 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |   37 +++++++++
+ fs/cifs/smb2proto.h |    3 +
+ 8 files changed, 286 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index a73d7f8..b77e9ec 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -16,4 +16,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
- 
- cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
- 
--cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o
-+cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o smb2misc.o
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index e814052..8aa8693 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -65,7 +65,7 @@ void cifs_dump_detail(void *buf)
- 	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d",
- 		  smb->Command, smb->Status.CifsError,
- 		  smb->Flags, smb->Flags2, smb->Mid, smb->Pid);
--	cERROR(1, "smb buf %p len %d", smb, smbCalcSize(smb));
-+	cERROR(1, "smb buf %p len %u", smb, smbCalcSize(smb));
- #endif /* CONFIG_CIFS_DEBUG2 */
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 414cbbc..b70af21 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -498,6 +498,9 @@ struct cifs_ses {
+ 	struct session_key auth_key;
+ 	struct ntlmssp_auth *ntlmssp; /* ciphertext, flags, server challenge */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
++#ifdef CONFIG_CIFS_SMB2
++	__u16 session_flags;
++#endif /* CONFIG_CIFS_SMB2 */
+ };
+ /* no more than one of the following three session flags may be set */
+ #define CIFS_SES_NT4 1
+diff --git a/fs/cifs/ntlmssp.h b/fs/cifs/ntlmssp.h
+index 5d52e4a..848249f 100644
+--- a/fs/cifs/ntlmssp.h
++++ b/fs/cifs/ntlmssp.h
+@@ -126,3 +126,13 @@ typedef struct _AUTHENTICATE_MESSAGE {
+ 	   do not set the version is present flag */
+ 	char UserString[0];
+ } __attribute__((packed)) AUTHENTICATE_MESSAGE, *PAUTHENTICATE_MESSAGE;
++
++/*
++ * Size of the session key (crypto key encrypted with the password
++ */
++
++int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len, struct cifs_ses *ses);
++void build_ntlmssp_negotiate_blob(unsigned char *pbuffer, struct cifs_ses *ses);
++int build_ntlmssp_auth_blob(unsigned char *pbuffer, u16 *buflen,
++			struct cifs_ses *ses,
++			const struct nls_table *nls_cp);
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index e25b312..b298d27 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -364,7 +364,7 @@ static int decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
+ 	return rc;
  }
  
+-static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
++int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 				    struct cifs_ses *ses)
+ {
+ 	unsigned int tioffset; /* challenge message target info area */
+@@ -415,7 +415,7 @@ static int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 
+ /* We do not malloc the blob, it is passed in pbuffer, because
+    it is fixed size, and small, making this approach cleaner */
+-static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
++void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 					 struct cifs_ses *ses)
+ {
+ 	NEGOTIATE_MESSAGE *sec_blob = (NEGOTIATE_MESSAGE *)pbuffer;
+@@ -451,7 +451,7 @@ static void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ /* We do not malloc the blob, it is passed in pbuffer, because its
+    maximum possible size is fixed and small, making this approach cleaner.
+    This function returns the length of the data in the blob */
+-static int build_ntlmssp_auth_blob(unsigned char *pbuffer,
++int build_ntlmssp_auth_blob(unsigned char *pbuffer,
+ 					u16 *buflen,
+ 				   struct cifs_ses *ses,
+ 				   const struct nls_table *nls_cp)
 diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-new file mode 100644
-index 0000000..03167eb
---- /dev/null
+index 1cea426..b690852 100644
+--- a/fs/cifs/smb2misc.c
 +++ b/fs/cifs/smb2misc.c
-@@ -0,0 +1,304 @@
-+/*
-+ *   fs/cifs/smb2misc.c
-+ *
-+ *   Copyright (C) International Business Machines  Corp., 2002,2011
-+ *                 Etersoft, 2012
-+ *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
-+ *              Pavel Shilovsky (pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
-+#include <linux/ctype.h>
-+#include "smb2pdu.h"
-+#include "cifsglob.h"
-+#include "cifsproto.h"
-+#include "smb2proto.h"
-+#include "cifs_debug.h"
-+#include "cifs_unicode.h"
-+#include "smb2status.h"
-+
-+static int
-+check_smb2_hdr(struct smb2_hdr *hdr, __u64 mid)
-+{
-+	/*
-+	 * Make sure that this really is an SMB, that it is a response,
-+	 * and that the message ids match
-+	 */
-+	if ((*(__le32 *)hdr->ProtocolId == cpu_to_le32(0x424d53fe)) &&
-+	    (mid == hdr->MessageId)) {
-+		if (hdr->Flags & SMB2_FLAGS_SERVER_TO_REDIR)
-+			return 0;
-+		else {
-+			/* only one valid case where server sends us request */
-+			if (hdr->Command == SMB2_OPLOCK_BREAK)
-+				return 0;
-+			else
-+				cERROR(1, "Received Request not response");
-+		}
-+	} else { /* bad signature or mid */
-+		if (*(__le32 *)hdr->ProtocolId != cpu_to_le32(0x424d53fe))
-+			cERROR(1, "Bad protocol string signature header %x",
-+			       *(unsigned int *) hdr->ProtocolId);
-+		if (mid != hdr->MessageId)
-+			cERROR(1, "Mids do not match");
-+	}
-+	cERROR(1, "Bad SMB detected. The Mid=%llu", hdr->MessageId);
-+	return 1;
-+}
-+
-+/*
-+ *  The following table defines the expected "StructureSize" of SMB2 responses
-+ *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS responses.
-+ *
-+ *  Note that commands are defined in smb2pdu.h in le16 but the array below is
-+ *  indexed by command in host byte order
-+ */
-+static const int smb2_rsp_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
-+	/* SMB2_NEGOTIATE */ 65,
-+	/* SMB2_SESSION_SETUP */ 9,
-+	/* SMB2_LOGOFF */ 4,
-+	/* SMB2_TREE_CONNECT */	16,
-+	/* SMB2_TREE_DISCONNECT */ 4,
-+	/* SMB2_CREATE */ 89,
-+	/* SMB2_CLOSE */ 60,
-+	/* SMB2_FLUSH */ 4,
-+	/* SMB2_READ */	17,
-+	/* SMB2_WRITE */ 17,
-+	/* SMB2_LOCK */	4,
-+	/* SMB2_IOCTL */ 49,
-+	/* SMB2_CANCEL */ 0, /* BB CHECK this ... not listed in documentation */
-+	/* SMB2_ECHO */ 4,
-+	/* SMB2_QUERY_DIRECTORY */ 9,
-+	/* SMB2_CHANGE_NOTIFY */ 9,
-+	/* SMB2_QUERY_INFO */ 9,
-+	/* SMB2_SET_INFO */ 2,
-+	/* SMB2_OPLOCK_BREAK */ 24 /* BB FIXME can also be 44 for lease break */
-+};
-+
-+int
-+smb2_check_message(char *buf, unsigned int length)
-+{
-+	struct smb2_hdr *hdr = (struct smb2_hdr *)buf;
-+	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
-+	__u64 mid = hdr->MessageId;
-+	__u32 len = get_rfc1002_length(buf);
-+	__u32 clc_len;  /* calculated length */
-+	int command;
-+
-+	/* BB disable following printk later */
-+	cFYI(1, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
-+
-+	/*
-+	 * Add function to do table lookup of StructureSize by command
-+	 * ie Validate the wct via smb2_struct_sizes table above
-+	 */
-+
-+	if (length < 2 + sizeof(struct smb2_hdr)) {
-+		if ((length >= sizeof(struct smb2_hdr)) && (hdr->Status != 0)) {
-+			pdu->StructureSize2 = 0;
-+			/*
-+			 * As with SMB/CIFS, on some error cases servers may
-+			 * not return wct properly
-+			 */
-+			return 0;
-+		} else {
-+			cERROR(1, "Length less than smb header size");
-+		}
-+		return 1;
-+	}
-+	if (len > CIFSMaxBufSize + MAX_SMB2_HDR_SIZE - 4) {
-+		cERROR(1, "smb length greater than maximum, mid=%lld", mid);
-+		return 1;
-+	}
-+
-+	if (check_smb2_hdr(hdr, mid))
-+		return 1;
-+
-+	if (le16_to_cpu(hdr->StructureSize) != 64) {
-+		cERROR(1, "Illegal structure size %d",
-+			  le16_to_cpu(hdr->StructureSize));
-+		return 1;
-+	}
-+
-+	command = le16_to_cpu(hdr->Command);
-+	if (command >= NUMBER_OF_SMB2_COMMANDS) {
-+		cERROR(1, "illegal SMB2 command %d", command);
-+		return 1;
-+	}
-+
-+	if (smb2_rsp_struct_sizes[command] !=
-+	    le16_to_cpu(pdu->StructureSize2)) {
-+		if ((hdr->Status == 0) ||
-+		    (le16_to_cpu(pdu->StructureSize2) != 9)) {
-+			/* error packets have 9 byte structure size */
-+			cERROR(1, "Illegal response size %d for command %d",
-+				   le16_to_cpu(pdu->StructureSize2), command);
-+			return 1;
-+		}
-+	}
-+
-+	clc_len = smb2_calc_size(hdr);
-+
-+	if (4 + len != length) {
-+		cERROR(1, "Length read does not match RFC1001 length %d",
-+			   len);
-+		return 1;
-+	}
-+
-+	if (4 + len != clc_len) {
-+		cFYI(1, "Calculated size %d length %d mismatch for mid %lld",
-+			 clc_len, 4 + len, mid);
-+		if (clc_len == 4 + len + 1) /* BB FIXME (fix samba) */
-+			return 0; /* BB workaround Samba 3 bug SessSetup rsp */
-+		return 1;
-+	}
-+	return 0;
-+}
-+
-+/*
-+ *  The size of the variable area depends on the offset and length fields
-+ *  located in different fields for various SMB2 responses.  SMB2 responses
-+ *  with no variable length info, show an offset of zero for the offset field.
-+ */
-+static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
-+	/* SMB2_NEGOTIATE */ true,
-+	/* SMB2_SESSION_SETUP */ true,
-+	/* SMB2_LOGOFF */ false,
-+	/* SMB2_TREE_CONNECT */	false,
-+	/* SMB2_TREE_DISCONNECT */ false,
-+	/* SMB2_CREATE */ true,
-+	/* SMB2_CLOSE */ false,
-+	/* SMB2_FLUSH */ false,
-+	/* SMB2_READ */	true,
-+	/* SMB2_WRITE */ false,
-+	/* SMB2_LOCK */	false,
-+	/* SMB2_IOCTL */ true,
-+	/* SMB2_CANCEL */ false, /* BB CHECK this not listed in documentation */
-+	/* SMB2_ECHO */ false,
-+	/* SMB2_QUERY_DIRECTORY */ true,
-+	/* SMB2_CHANGE_NOTIFY */ true,
-+	/* SMB2_QUERY_INFO */ true,
-+	/* SMB2_SET_INFO */ false,
-+	/* SMB2_OPLOCK_BREAK */ false
-+};
-+
-+/*
-+ * Returns the pointer to the beginning of the data area. Length of the data
-+ * area and the offset to it (from the beginning of the smb are also returned.
-+ */
-+static char *
-+smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
-+{
-+	*off = 0;
-+	*len = 0;
-+
-+	/* error responses do not have data area */
-+	if (hdr->Status &&
-+	   (le32_to_cpu(hdr->Status) != STATUS_MORE_PROCESSING_REQUIRED) &&
-+	   (le16_to_cpu(((struct smb2_err_rsp *)hdr)->StructureSize) == 9))
-+		return NULL;
-+
-+	/*
-+	 * Following commands have data areas so we have to get the location
-+	 * of the data buffer offset and data buffer length for the particular
-+	 * command.
-+	 */
-+	switch (hdr->Command) {
-+	case SMB2_NEGOTIATE:
-+	case SMB2_SESSION_SETUP:
-+	case SMB2_CREATE:
-+	case SMB2_READ:
-+	case SMB2_QUERY_INFO:
-+	case SMB2_QUERY_DIRECTORY:
-+	case SMB2_IOCTL:
-+	case SMB2_CHANGE_NOTIFY:
-+	default:
-+		/* BB FIXME for unimplemented cases above */
-+		cERROR(1, "no length check for command");
+@@ -223,6 +223,11 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
+ 		    ((struct smb2_negotiate_rsp *)hdr)->SecurityBufferLength);
+ 		break;
+ 	case SMB2_SESSION_SETUP:
++		*off = le16_to_cpu(
++		    ((struct smb2_sess_setup_rsp *)hdr)->SecurityBufferOffset);
++		*len = le16_to_cpu(
++		    ((struct smb2_sess_setup_rsp *)hdr)->SecurityBufferLength);
 +		break;
-+	}
-+
-+	/*
-+	 * Invalid length or offset probably means data area is invalid, but
-+	 * we have little choice but to ignore the data area in this case.
-+	 */
-+	if (*off > 4096) {
-+		dump_stack();
-+		cERROR(1, "offset %d too large, data area ignored", *off);
-+		*len = 0;
-+		*off = 0;
-+	} else if (*off < 0) {
-+		cERROR(1, "negative offset to data invalid ignore data area");
-+		*off = 0;
-+		*len = 0;
-+	} else if (*len < 0) {
-+		cERROR(1, "negative data length invalid, data area ignored");
-+		*len = 0;
-+	} else if (*len > 128 * 1024) {
-+		cERROR(1, "data area larger than 128K");
-+		*len = 0;
-+	}
-+
-+	/* return pointer to beginning of data area, ie offset from SMB start */
-+	if ((*off != 0) && (*len != 0))
-+		return hdr->ProtocolId + *off;
-+	else
-+		return NULL;
-+}
-+
-+/*
-+ * Calculate the size of the SMB message based on the fixed header
-+ * portion, the number of word parameters and the data portion of the message.
-+ */
-+unsigned int
-+smb2_calc_size(struct smb2_hdr *hdr)
-+{
-+	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
-+	int offset; /* the offset from the beginning of SMB to data area */
-+	int data_length; /* the length of the variable length data area */
-+	/* Structure Size has already been checked to make sure it is 64 */
-+	int len = 4 + le16_to_cpu(pdu->hdr.StructureSize);
-+
-+	/*
-+	 * StructureSize2, ie length of fixed parameter area has already
-+	 * been checked to make sure it is the correct length.
-+	 */
-+	len += le16_to_cpu(pdu->StructureSize2);
-+
-+	if (has_smb2_data_area[le16_to_cpu(hdr->Command)] == false)
-+		goto calc_size_exit;
-+
-+	smb2_get_data_area_len(&offset, &data_length, hdr);
-+	cFYI(1, "smb2 data length %d offset %d", data_length, offset);
-+
-+	if (data_length > 0) {
-+		/*
-+		 * Check to make sure that data area begins after fixed area,
-+		 * Note that last byte of the fixed area is part of data area
-+		 * for some commands, typically those with odd StructureSize,
-+		 * so we must add one to the calculation (and 4 to account for
-+		 * the size of the RFC1001 hdr.
-+		 */
-+		if (offset + 4 + 1 < len) {
-+			cERROR(1, "data area overlaps SMB2 header, ignoring");
-+			data_length = 0;
-+		} else {
-+			len = 4 + offset + data_length;
-+		}
-+	}
-+calc_size_exit:
-+	cFYI(1, "smb2 len %d", len);
-+	return len;
-+}
+ 	case SMB2_CREATE:
+ 	case SMB2_READ:
+ 	case SMB2_QUERY_INFO:
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index ab2590f..88cbfce 100644
+index e542685..5b2ddfb 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -105,6 +105,38 @@ smb2_get_next_mid(struct TCP_Server_Info *server)
- 	return mid;
- }
- 
-+static struct mid_q_entry *
-+smb2_find_mid(struct TCP_Server_Info *server, char *buf)
-+{
-+	struct mid_q_entry *mid;
-+	struct smb2_hdr *hdr = (struct smb2_hdr *)buf;
-+
-+	spin_lock(&GlobalMid_Lock);
-+	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-+		if ((mid->mid == hdr->MessageId) &&
-+		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
-+		    (mid->command == hdr->Command)) {
-+			spin_unlock(&GlobalMid_Lock);
-+			return mid;
-+		}
-+	}
-+	spin_unlock(&GlobalMid_Lock);
-+	return NULL;
-+}
-+
-+static void
-+smb2_dump_detail(void *buf)
-+{
-+#ifdef CONFIG_CIFS_DEBUG2
-+	struct smb2_hdr *smb = (struct smb2_hdr *)buf;
-+
-+	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d",
-+		  smb->Command, smb->Status, smb->Flags, smb->MessageId,
-+		  smb->ProcessId);
-+	cERROR(1, "smb buf %p len %u", smb, smb2_calc_size(smb));
-+#endif
-+}
-+
- struct smb_version_operations smb21_operations = {
- 	.setup_request = smb2_setup_request,
- 	.check_receive = smb2_check_receive,
-@@ -113,9 +145,14 @@ struct smb_version_operations smb21_operations = {
- 	.get_credits_field = smb2_get_credits_field,
- 	.get_credits = smb2_get_credits,
- 	.get_next_mid = smb2_get_next_mid,
-+	.find_mid = smb2_find_mid,
-+	.check_message = smb2_check_message,
-+	.dump_detail = smb2_dump_detail,
+@@ -168,6 +168,8 @@ struct smb_version_operations smb21_operations = {
+ 	.dump_detail = smb2_dump_detail,
+ 	.need_neg = smb2_need_neg,
+ 	.negotiate = smb2_negotiate,
++	.sess_setup = SMB2_sess_setup,
++	.logoff = SMB2_logoff,
  };
  
  struct smb_version_values smb21_values = {
- 	.version_string = SMB21_VERSION_STRING,
-+	.header_size = sizeof(struct smb2_hdr),
-+	.max_header_size = MAX_SMB2_HDR_SIZE,
- 	.lock_cmd = SMB2_LOCK,
- };
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 22a7448..dc8e785 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -328,3 +328,226 @@ neg_exit:
+ 	free_rsp_buf(resp_buftype, rsp);
+ 	return rc;
+ }
++
++int
++SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
++		const struct nls_table *nls_cp)
++{
++	struct smb2_sess_setup_req *req;
++	struct smb2_sess_setup_rsp *rsp = NULL;
++	struct kvec iov[2];
++	int rc = 0;
++	int resp_buftype;
++	__le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
++	struct TCP_Server_Info *server;
++	unsigned int sec_flags;
++	u8 temp = 0;
++	u16 blob_length = 0;
++	char *security_blob;
++	char *ntlmssp_blob = NULL;
++	bool use_spnego = false; /* else use raw ntlmssp */
++
++	cFYI(1, "Session Setup");
++
++	if (ses->server)
++		server = ses->server;
++	else {
++		rc = -EIO;
++		return rc;
++	}
++
++	/*
++	 * If memory allocation is successful, caller of this function
++	 * frees it.
++	 */
++	ses->ntlmssp = kmalloc(sizeof(struct ntlmssp_auth), GFP_KERNEL);
++	if (!ses->ntlmssp)
++		return -ENOMEM;
++
++	ses->server->secType = RawNTLMSSP;
++
++ssetup_ntlmssp_authenticate:
++	if (phase == NtLmChallenge)
++		phase = NtLmAuthenticate; /* if ntlmssp, now final phase */
++
++	rc = small_smb2_init(SMB2_SESSION_SETUP, NULL, (void **) &req);
++	if (rc)
++		return rc;
++
++	/* if any of auth flags (ie not sign or seal) are overriden use them */
++	if (ses->overrideSecFlg & (~(CIFSSEC_MUST_SIGN | CIFSSEC_MUST_SEAL)))
++		sec_flags = ses->overrideSecFlg;  /* BB FIXME fix sign flags?*/
++	else /* if override flags set only sign/seal OR them with global auth */
++		sec_flags = global_secflags | ses->overrideSecFlg;
++
++	cFYI(1, "sec_flags 0x%x", sec_flags);
++
++	req->hdr.SessionId = 0; /* First session, not a reauthenticate */
++	req->VcNumber = 0; /* MBZ */
++	/* to enable echos and oplocks */
++	req->hdr.CreditRequest = cpu_to_le16(3);
++
++	/* only one of SMB2 signing flags may be set in SMB2 request */
++	if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN)
++		temp = SMB2_NEGOTIATE_SIGNING_REQUIRED;
++	else if (ses->server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED)
++		temp = SMB2_NEGOTIATE_SIGNING_REQUIRED;
++	else if (sec_flags & CIFSSEC_MAY_SIGN) /* MAY_SIGN is a single flag */
++		temp = SMB2_NEGOTIATE_SIGNING_ENABLED;
++
++	req->SecurityMode = temp;
++	req->Capabilities = 0;
++	req->Channel = 0; /* MBZ */
++
++	iov[0].iov_base = (char *)req;
++	iov[0].iov_len = be32_to_cpu(req->hdr.smb2_buf_length)
++					+ 4 /* rfc1001 len */ - 1 /* pad */;
++	if (phase == NtLmNegotiate) {
++		ntlmssp_blob = kmalloc(sizeof(struct _NEGOTIATE_MESSAGE),
++				       GFP_KERNEL);
++		if (ntlmssp_blob == NULL) {
++			rc = -ENOMEM;
++			goto ssetup_exit;
++		}
++		build_ntlmssp_negotiate_blob(ntlmssp_blob, ses);
++		if (use_spnego) {
++			/* blob_length = build_spnego_ntlmssp_blob(
++					&security_blob,
++					sizeof(struct _NEGOTIATE_MESSAGE),
++					ntlmssp_blob); */
++			/* BB eventually need to add this */
++			cERROR(1, "spnego not supported for SMB2 yet");
++			rc = -EOPNOTSUPP;
++			kfree(ntlmssp_blob);
++			goto ssetup_exit;
++		} else {
++			blob_length = sizeof(struct _NEGOTIATE_MESSAGE);
++			/* with raw NTLMSSP we don't encapsulate in SPNEGO */
++			security_blob = ntlmssp_blob;
++		}
++	} else if (phase == NtLmAuthenticate) {
++		req->hdr.SessionId = ses->Suid;
++		ntlmssp_blob = kzalloc(sizeof(struct _NEGOTIATE_MESSAGE) + 500,
++				       GFP_KERNEL);
++		if (ntlmssp_blob == NULL) {
++			cERROR(1, "failed to malloc ntlmssp blob");
++			rc = -ENOMEM;
++			goto ssetup_exit;
++		}
++		rc = build_ntlmssp_auth_blob(ntlmssp_blob, &blob_length, ses,
++					     nls_cp);
++		if (rc) {
++			cFYI(1, "build_ntlmssp_auth_blob failed %d", rc);
++			goto ssetup_exit; /* BB double check error handling */
++		}
++		if (use_spnego) {
++			/* blob_length = build_spnego_ntlmssp_blob(
++							&security_blob,
++							blob_length,
++							ntlmssp_blob); */
++			cERROR(1, "spnego not supported for SMB2 yet");
++			rc = -EOPNOTSUPP;
++			kfree(ntlmssp_blob);
++			goto ssetup_exit;
++		} else {
++			security_blob = ntlmssp_blob;
++		}
++	} else {
++		cERROR(1, "illegal ntlmssp phase");
++		rc = -EIO;
++		goto ssetup_exit;
++	}
++
++	/* Testing shows that buffer offset must be at location of Buffer[0] */
++	req->SecurityBufferOffset = cpu_to_le16(
++				sizeof(struct smb2_sess_setup_req) - 1 /* pad */
++				- 4 /* rfc1001 len */);
++	req->SecurityBufferLength = cpu_to_le16(blob_length);
++	iov[1].iov_base = security_blob;
++	iov[1].iov_len = blob_length;
++
++	req->hdr.smb2_buf_length =
++			cpu_to_be32(be32_to_cpu(req->hdr.smb2_buf_length)
++			- 1 /* pad */ + blob_length);
++
++	/* BB add code to build os and lm fields */
++
++	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, CIFS_LOG_ERROR);
++
++	kfree(security_blob);
++	rsp = (struct smb2_sess_setup_rsp *)iov[0].iov_base;
++	if (rsp->hdr.Status == cpu_to_le32(STATUS_MORE_PROCESSING_REQUIRED)) {
++		if (phase != NtLmNegotiate) {
++			cERROR(1, "Unexpected more processing error");
++			goto ssetup_exit;
++		}
++		if (offsetof(struct smb2_sess_setup_rsp, Buffer) - 4 !=
++			le16_to_cpu(rsp->SecurityBufferOffset)) {
++			cERROR(1, "Invalid security buffer offset %d",
++				    le16_to_cpu(rsp->SecurityBufferOffset));
++			rc = -EIO;
++			goto ssetup_exit;
++		}
++
++		/* NTLMSSP Negotiate sent now processing challenge (response) */
++		phase = NtLmChallenge; /* process ntlmssp challenge */
++		rc = 0; /* MORE_PROCESSING is not an error here but expected */
++		ses->Suid = rsp->hdr.SessionId;
++		rc = decode_ntlmssp_challenge(rsp->Buffer,
++				le16_to_cpu(rsp->SecurityBufferLength), ses);
++	}
++
++	/*
++	 * BB eventually add code for SPNEGO decoding of NtlmChallenge blob,
++	 * but at least the raw NTLMSSP case works.
++	 */
++	/*
++	 * No tcon so can't do
++	 * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
++	 */
++	if (rc != 0)
++		goto ssetup_exit;
++
++	if (rsp == NULL) {
++		rc = -EIO;
++		goto ssetup_exit;
++	}
++
++	ses->session_flags = le16_to_cpu(rsp->SessionFlags);
++ssetup_exit:
++	free_rsp_buf(resp_buftype, rsp);
++
++	/* if ntlmssp, and negotiate succeeded, proceed to authenticate phase */
++	if ((phase == NtLmChallenge) && (rc == 0))
++		goto ssetup_ntlmssp_authenticate;
++	return rc;
++}
++
++int
++SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
++{
++	struct smb2_logoff_req *req; /* response is also trivial struct */
++	int rc = 0;
++	struct TCP_Server_Info *server;
++
++	cFYI(1, "disconnect session %p", ses);
++
++	if (ses && (ses->server))
++		server = ses->server;
++	else
++		return -EIO;
++
++	rc = small_smb2_init(SMB2_LOGOFF, NULL, (void **) &req);
++	if (rc)
++		return rc;
++
++	 /* since no tcon, smb2_init can not do this, so do here */
++	req->hdr.SessionId = ses->Suid;
++
++	rc = SendReceiveNoRsp(xid, ses, (char *) &req->hdr, 0);
++	/*
++	 * No tcon so can't do
++	 * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
++	 */
++	return rc;
++}
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index c7f52e3..efb0d98 100644
+index 449973c..a29a2cc 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -112,4 +112,34 @@ struct smb2_hdr {
- 	__u8   Signature[16];
+@@ -181,4 +181,41 @@ struct smb2_negotiate_rsp {
+ 	__u8   Buffer[1];	/* variable length GSS security buffer */
  } __packed;
  
-+struct smb2_pdu {
++struct smb2_sess_setup_req {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize2; /* size of wct area (varies, request specific) */
++	__le16 StructureSize; /* Must be 25 */
++	__u8   VcNumber;
++	__u8   SecurityMode;
++	__le32 Capabilities;
++	__le32 Channel;
++	__le16 SecurityBufferOffset;
++	__le16 SecurityBufferLength;
++	__le64 PreviousSessionId;
++	__u8   Buffer[1];	/* variable length GSS security buffer */
 +} __packed;
 +
-+/*
-+ *	SMB2 flag definitions
-+ */
-+#define SMB2_FLAGS_SERVER_TO_REDIR	cpu_to_le32(0x00000001) /* Response */
-+#define SMB2_FLAGS_ASYNC_COMMAND	cpu_to_le32(0x00000002)
-+#define SMB2_FLAGS_RELATED_OPERATIONS	cpu_to_le32(0x00000004)
-+#define SMB2_FLAGS_SIGNED		cpu_to_le32(0x00000008)
-+#define SMB2_FLAGS_DFS_OPERATIONS	cpu_to_le32(0x10000000)
-+
-+/*
-+ *	Definitions for SMB2 Protocol Data Units (network frames)
-+ *
-+ *  See MS-SMB2.PDF specification for protocol details.
-+ *  The Naming convention is the lower case version of the SMB2
-+ *  command code name for the struct. Note that structures must be packed.
-+ *
-+ */
-+struct smb2_err_rsp {
++/* Currently defined SessionFlags */
++#define SMB2_SESSION_FLAG_IS_GUEST	0x0001
++#define SMB2_SESSION_FLAG_IS_NULL	0x0002
++struct smb2_sess_setup_rsp {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize;
-+	__le16 Reserved; /* MBZ */
-+	__le32 ByteCount;  /* even if zero, at least one byte follows */
-+	__u8   ErrorData[1];  /* variable length */
++	__le16 StructureSize; /* Must be 9 */
++	__le16 SessionFlags;
++	__le16 SecurityBufferOffset;
++	__le16 SecurityBufferLength;
++	__u8   Buffer[1];	/* variable length GSS security buffer */
++} __packed;
++
++struct smb2_logoff_req {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 4 */
++	__le16 Reserved;
++} __packed;
++
++struct smb2_logoff_rsp {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 4 */
++	__le16 Reserved;
 +} __packed;
 +
  #endif				/* _SMB2PDU_H */
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 0e59afb..19bf987 100644
+index fead10c..e02a098 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -33,6 +33,8 @@ struct statfs;
-  *****************************************************************
+@@ -47,5 +47,8 @@ extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
+  *  are contained within these calls.
   */
- extern int map_smb2_to_linux_error(char *buf, bool log_err);
-+extern int smb2_check_message(char *buf, unsigned int length);
-+extern unsigned int smb2_calc_size(struct smb2_hdr *hdr);
+ extern int SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses);
++extern int SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
++			   const struct nls_table *nls_cp);
++extern int SMB2_logoff(const unsigned int xid, struct cifs_ses *ses);
  
- extern int smb2_check_receive(struct mid_q_entry *mid,
- 			      struct TCP_Server_Info *server, bool log_error);
+ #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
