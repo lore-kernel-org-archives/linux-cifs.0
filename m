@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v6 3/5] CIFS: Move protocol specific negotiate code to ops struct
-Date: Wed, 20 Jun 2012 14:54:09 +0400
-Message-ID: <1340189651-25093-4-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v6 5/5] CIFS: Move protocol specific tcon/tdis code to ops struct
+Date: Wed, 20 Jun 2012 14:54:11 +0400
+Message-ID: <1340189651-25093-6-git-send-email-pshilovsky@samba.org>
 References: <1340189651-25093-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,206 +9,231 @@ In-Reply-To: <1340189651-25093-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+and rename variables around the code changes.
+
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    8 ++++++--
- fs/cifs/cifsproto.h |    6 +++---
- fs/cifs/cifssmb.c   |    4 ++--
- fs/cifs/connect.c   |   24 +++++++++++-------------
- fs/cifs/sess.c      |    2 +-
- fs/cifs/smb1ops.c   |   23 +++++++++++++++++++++++
- 6 files changed, 46 insertions(+), 21 deletions(-)
+ fs/cifs/cifsglob.h  |    6 ++++
+ fs/cifs/cifsproto.h |    8 +++---
+ fs/cifs/cifssmb.c   |    2 +-
+ fs/cifs/connect.c   |   73 ++++++++++++++++++++++++++++++---------------------
+ fs/cifs/smb1ops.c   |    2 +
+ 5 files changed, 56 insertions(+), 35 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 844b77c..8a41505 100644
+index a6eb9be..6d18962 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -192,6 +192,10 @@ struct smb_version_operations {
- 	/* process transaction2 response */
- 	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
- 			     char *, int);
-+	/* check if we need to negotiate */
-+	bool (*need_neg)(struct TCP_Server_Info *);
-+	/* negotiate to the server */
-+	int (*negotiate)(const unsigned int, struct cifs_ses *);
+@@ -160,6 +160,7 @@ struct mid_q_entry;
+ struct TCP_Server_Info;
+ struct cifsFileInfo;
+ struct cifs_ses;
++struct cifs_tcon;
+ 
+ struct smb_version_operations {
+ 	int (*send_cancel)(struct TCP_Server_Info *, void *,
+@@ -201,6 +202,11 @@ struct smb_version_operations {
+ 			  const struct nls_table *);
+ 	/* close smb session */
+ 	int (*logoff)(const unsigned int, struct cifs_ses *);
++	/* connect to a server share */
++	int (*tree_connect)(const unsigned int, struct cifs_ses *, const char *,
++			    struct cifs_tcon *, const struct nls_table *);
++	/* close tree connecion */
++	int (*tree_disconnect)(const unsigned int, struct cifs_tcon *);
  };
  
  struct smb_version_values {
-@@ -324,7 +328,7 @@ struct TCP_Server_Info {
- 	struct mutex srv_mutex;
- 	struct task_struct *tsk;
- 	char server_GUID[16];
--	char sec_mode;
-+	__u16 sec_mode;
- 	bool session_estab; /* mark when very first sess is established */
- 	u16 dialect; /* dialect index that server chose */
- 	enum securityEnum secType;
-@@ -459,7 +463,7 @@ struct cifs_ses {
- 	char *serverOS;		/* name of operating system underlying server */
- 	char *serverNOS;	/* name of network operating system of server */
- 	char *serverDomain;	/* security realm of server */
--	int Suid;		/* remote smb uid  */
-+	__u64 Suid;		/* remote smb uid  */
- 	uid_t linux_uid;        /* overriding owner of files on the mount */
- 	uid_t cred_uid;		/* owner of credentials */
- 	int capabilities;
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index f52074d..047b87e 100644
+index a4360c5..e1689e7 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -178,11 +178,11 @@ extern void cifs_dfs_release_automount_timer(void);
- void cifs_proc_init(void);
- void cifs_proc_clean(void);
+@@ -184,9 +184,9 @@ extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 			      struct nls_table *nls_info);
+ extern int CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses);
  
--extern int cifs_negotiate_protocol(unsigned int xid,
--				  struct cifs_ses *ses);
-+extern int cifs_negotiate_protocol(const unsigned int xid,
-+				   struct cifs_ses *ses);
- extern int cifs_setup_session(unsigned int xid, struct cifs_ses *ses,
- 			struct nls_table *nls_info);
--extern int CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses);
-+extern int CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses);
+-extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
+-			const char *tree, struct cifs_tcon *tcon,
+-			const struct nls_table *);
++extern int CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
++		    const char *tree, struct cifs_tcon *tcon,
++		    const struct nls_table *);
  
- extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
- 			const char *tree, struct cifs_tcon *tcon,
+ extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+ 		const char *searchName, const struct nls_table *nls_codepage,
+@@ -388,7 +388,7 @@ extern int CIFSSMBPosixLock(const int xid, struct cifs_tcon *tcon,
+ 			const __u16 smb_file_id, const __u32 netpid,
+ 			const int get_flag, const __u64 len, struct file_lock *,
+ 			const __u16 lock_type, const bool waitFlag);
+-extern int CIFSSMBTDis(const int xid, struct cifs_tcon *tcon);
++extern int CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon);
+ extern int CIFSSMBEcho(struct TCP_Server_Info *server);
+ extern int CIFSSMBLogoff(const unsigned int xid, struct cifs_ses *ses);
+ 
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 58f1ab5..56ec436 100644
+index eb2ac1b..90f7de8 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -372,7 +372,7 @@ static inline void inc_rfc1001_len(void *pSMB, int count)
+@@ -670,7 +670,7 @@ neg_err_exit:
  }
  
  int
--CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
-+CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+-CIFSSMBTDis(const int xid, struct cifs_tcon *tcon)
++CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon)
  {
- 	NEGOTIATE_REQ *pSMB;
- 	NEGOTIATE_RSP *pSMBr;
-@@ -456,7 +456,7 @@ CIFSSMBNegotiate(unsigned int xid, struct cifs_ses *ses)
- 			rc = -EOPNOTSUPP;
- 			goto neg_err_exit;
- 		}
--		server->sec_mode = (__u8)le16_to_cpu(rsp->SecurityMode);
-+		server->sec_mode = le16_to_cpu(rsp->SecurityMode);
- 		server->maxReq = min_t(unsigned int,
- 				       le16_to_cpu(rsp->MaxMpxCount),
- 				       cifs_max_pending);
+ 	struct smb_hdr *smb_buffer;
+ 	int rc = 0;
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b26f85c..ec05a08 100644
+index c51d048..b91f64d 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -406,7 +406,7 @@ cifs_echo_request(struct work_struct *work)
- 	 * done, which is indicated by maxBuf != 0. Also, no need to ping if
- 	 * we got a response recently
- 	 */
--	if (server->maxBuf == 0 ||
-+	if (!server->ops->need_neg || server->ops->need_neg(server) ||
- 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
- 		goto requeue_echo;
- 
-@@ -2405,7 +2405,8 @@ static bool warned_on_ntlm;  /* globals init to false automatically */
- static struct cifs_ses *
- cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+@@ -2541,7 +2541,7 @@ cifs_find_tcon(struct cifs_ses *ses, const char *unc)
+ static void
+ cifs_put_tcon(struct cifs_tcon *tcon)
  {
--	int rc = -ENOMEM, xid;
-+	int rc = -ENOMEM;
+-	int xid;
 +	unsigned int xid;
- 	struct cifs_ses *ses;
- 	struct sockaddr_in *addr = (struct sockaddr_in *)&server->dstaddr;
- 	struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&server->dstaddr;
-@@ -3944,24 +3945,22 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
- 	kfree(cifs_sb);
- }
+ 	struct cifs_ses *ses = tcon->ses;
  
--int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
-+int
-+cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses)
- {
- 	int rc = 0;
- 	struct TCP_Server_Info *server = ses->server;
+ 	cFYI(1, "%s: tc_count=%d\n", __func__, tcon->tc_count);
+@@ -2555,7 +2555,8 @@ cifs_put_tcon(struct cifs_tcon *tcon)
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
-+	if (!server->ops->need_neg || !server->ops->negotiate)
-+		return -ENOSYS;
-+
- 	/* only send once per connect */
--	if (server->maxBuf != 0)
-+	if (!server->ops->need_neg(server))
- 		return 0;
+ 	xid = GetXid();
+-	CIFSSMBTDis(xid, tcon);
++	if (ses->server->ops->tree_disconnect)
++		ses->server->ops->tree_disconnect(xid, tcon);
+ 	_FreeXid(xid);
  
- 	set_credits(server, 1);
--	rc = CIFSSMBNegotiate(xid, ses);
--	if (rc == -EAGAIN) {
--		/* retry only once on 1st time connection */
--		set_credits(server, 1);
--		rc = CIFSSMBNegotiate(xid, ses);
--		if (rc == -EAGAIN)
--			rc = -EHOSTDOWN;
--	}
-+
-+	rc = server->ops->negotiate(xid, ses);
- 	if (rc == 0) {
- 		spin_lock(&GlobalMid_Lock);
- 		if (server->tcpStatus == CifsNeedNegotiate)
-@@ -3969,7 +3968,6 @@ int cifs_negotiate_protocol(unsigned int xid, struct cifs_ses *ses)
- 		else
- 			rc = -EHOSTDOWN;
- 		spin_unlock(&GlobalMid_Lock);
--
+ 	cifs_fscache_release_super_cookie(tcon);
+@@ -2580,6 +2581,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		return tcon;
  	}
  
- 	return rc;
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 551d0c2..f88fa4d 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -898,7 +898,7 @@ ssetup_ntlmssp_authenticate:
- 	if (action & GUEST_LOGIN)
- 		cFYI(1, "Guest login"); /* BB mark SesInfo struct? */
- 	ses->Suid = smb_buf->Uid;   /* UID left in wire format (le) */
--	cFYI(1, "UID = %d ", ses->Suid);
-+	cFYI(1, "UID = %llu ", ses->Suid);
- 	/* response can have either 3 or 4 word count - Samba sends 3 */
- 	/* and lanman response is 3 */
- 	bytes_remaining = get_bcc(smb_buf);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index f4f8394..ea4fb8a 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -389,6 +389,27 @@ cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 	return true;
++	if (!ses->server->ops->tree_connect) {
++		rc = -ENOSYS;
++		goto out_fail;
++	}
++
+ 	tcon = tconInfoAlloc();
+ 	if (tcon == NULL) {
+ 		rc = -ENOMEM;
+@@ -2602,13 +2608,15 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		goto out_fail;
+ 	}
+ 
+-	/* BB Do we need to wrap session_mutex around
+-	 * this TCon call and Unix SetFS as
+-	 * we do on SessSetup and reconnect? */
++	/*
++	 * BB Do we need to wrap session_mutex around this TCon call and Unix
++	 * SetFS as we do on SessSetup and reconnect?
++	 */
+ 	xid = GetXid();
+-	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
++	rc = ses->server->ops->tree_connect(xid, ses, volume_info->UNC, tcon,
++					    volume_info->local_nls);
+ 	FreeXid(xid);
+-	cFYI(1, "CIFS Tcon rc = %d", rc);
++	cFYI(1, "Tcon rc = %d", rc);
+ 	if (rc)
+ 		goto out_fail;
+ 
+@@ -2617,10 +2625,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+ 		cFYI(1, "DFS disabled (%d)", tcon->Flags);
+ 	}
+ 	tcon->seal = volume_info->seal;
+-	/* we can have only one retry value for a connection
+-	   to a share so for resources mounted more than once
+-	   to the same server share the last value passed in
+-	   for the retry flag is used */
++	/*
++	 * We can have only one retry value for a connection to a share so for
++	 * resources mounted more than once to the same server share the last
++	 * value passed in for the retry flag is used.
++	 */
+ 	tcon->retry = volume_info->retry;
+ 	tcon->nocase = volume_info->nocase;
+ 	tcon->local_lease = volume_info->local_lease;
+@@ -2754,37 +2763,41 @@ out:
  }
  
-+static bool
-+cifs_need_neg(struct TCP_Server_Info *server)
-+{
-+	return server->maxBuf == 0;
-+}
+ int
+-get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
+-	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
+-	     struct dfs_info3_param **preferrals, int remap)
++get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
++	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
++	     struct dfs_info3_param **referrals, int remap)
+ {
+ 	char *temp_unc;
+ 	int rc = 0;
+ 
+-	*pnum_referrals = 0;
+-	*preferrals = NULL;
++	if (!ses->server->ops->tree_connect)
++		return -ENOSYS;
 +
-+static int
-+cifs_negotiate(const unsigned int xid, struct cifs_ses *ses)
-+{
-+	int rc;
-+	rc = CIFSSMBNegotiate(xid, ses);
-+	if (rc == -EAGAIN) {
-+		/* retry only once on 1st time connection */
-+		set_credits(ses->server, 1);
-+		rc = CIFSSMBNegotiate(xid, ses);
-+		if (rc == -EAGAIN)
-+			rc = -EHOSTDOWN;
-+	}
-+	return rc;
-+}
-+
- struct smb_version_operations smb1_operations = {
- 	.send_cancel = send_nt_cancel,
- 	.compare_fids = cifs_compare_fids,
-@@ -407,6 +428,8 @@ struct smb_version_operations smb1_operations = {
- 	.dump_detail = cifs_dump_detail,
- 	.is_oplock_break = is_valid_oplock_break,
- 	.check_trans2 = cifs_check_trans2,
-+	.need_neg = cifs_need_neg,
-+	.negotiate = cifs_negotiate,
++	*num_referrals = 0;
++	*referrals = NULL;
+ 
+-	if (pSesInfo->ipc_tid == 0) {
++	if (ses->ipc_tid == 0) {
+ 		temp_unc = kmalloc(2 /* for slashes */ +
+-			strnlen(pSesInfo->serverName,
+-				SERVER_NAME_LEN_WITH_NULL * 2)
+-				 + 1 + 4 /* slash IPC$ */  + 2,
+-				GFP_KERNEL);
++			strnlen(ses->serverName, SERVER_NAME_LEN_WITH_NULL * 2)
++				+ 1 + 4 /* slash IPC$ */ + 2, GFP_KERNEL);
+ 		if (temp_unc == NULL)
+ 			return -ENOMEM;
+ 		temp_unc[0] = '\\';
+ 		temp_unc[1] = '\\';
+-		strcpy(temp_unc + 2, pSesInfo->serverName);
+-		strcpy(temp_unc + 2 + strlen(pSesInfo->serverName), "\\IPC$");
+-		rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
+-		cFYI(1, "CIFS Tcon rc = %d ipc_tid = %d", rc, pSesInfo->ipc_tid);
++		strcpy(temp_unc + 2, ses->serverName);
++		strcpy(temp_unc + 2 + strlen(ses->serverName), "\\IPC$");
++		rc = ses->server->ops->tree_connect(xid, ses, temp_unc, NULL,
++						    nls_codepage);
++		cFYI(1, "Tcon rc = %d ipc_tid = %d", rc, ses->ipc_tid);
+ 		kfree(temp_unc);
+ 	}
+ 	if (rc == 0)
+-		rc = CIFSGetDFSRefer(xid, pSesInfo, old_path, preferrals,
+-				     pnum_referrals, nls_codepage, remap);
+-	/* BB map targetUNCs to dfs_info3 structures, here or
+-		in CIFSGetDFSRefer BB */
++		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
++				     num_referrals, nls_codepage, remap);
++	/*
++	 * BB - map targetUNCs to dfs_info3 structures, here or in
++	 * CIFSGetDFSRefer.
++	 */
+ 
+ 	return rc;
+ }
+@@ -3761,7 +3774,7 @@ out:
+  * pointer may be NULL.
+  */
+ int
+-CIFSTCon(unsigned int xid, struct cifs_ses *ses,
++CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 	 const char *tree, struct cifs_tcon *tcon,
+ 	 const struct nls_table *nls_codepage)
+ {
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 6b0a5d6..728595f 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -432,6 +432,8 @@ struct smb_version_operations smb1_operations = {
+ 	.negotiate = cifs_negotiate,
+ 	.sess_setup = CIFS_SessSetup,
+ 	.logoff = CIFSSMBLogoff,
++	.tree_connect = CIFSTCon,
++	.tree_disconnect = CIFSSMBTDis,
  };
  
  struct smb_version_values smb1_values = {
