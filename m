@@ -1,74 +1,236 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2 07/24] CIFS: Make demultiplex_thread work with SMB2
- code
-Date: Thu, 21 Jun 2012 11:44:37 -0700
-Message-ID: <20120621114437.72a9483d@corrin.poochiereds.net>
+Subject: Re: [PATCH v2 05/24] CIFS: Make transport routines work with SMB2
+Date: Thu, 21 Jun 2012 09:41:18 -0700
+Message-ID: <20120621094118.3946afbf@corrin.poochiereds.net>
 References: <1340202664-28696-1-git-send-email-pshilovsky@samba.org>
-	<1340202664-28696-8-git-send-email-pshilovsky@samba.org>
+	<1340202664-28696-6-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1340202664-28696-8-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1340202664-28696-6-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 20 Jun 2012 18:30:47 +0400
+On Wed, 20 Jun 2012 18:30:45 +0400
 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > 
-> Now we can process SMB2 messages: check message, get message id
-> and wakeup awaiting routines.
-> 
-> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/Makefile     |    2 +-
->  fs/cifs/cifs_debug.c |    2 +-
->  fs/cifs/smb2misc.c   |  304 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smb2ops.c    |   37 ++++++
->  fs/cifs/smb2pdu.h    |   30 +++++
->  fs/cifs/smb2proto.h  |    2 +
->  6 files changed, 375 insertions(+), 2 deletions(-)
->  create mode 100644 fs/cifs/smb2misc.c
+>  fs/cifs/Makefile        |    2 +-
+>  fs/cifs/cifsglob.h      |    5 ++
+>  fs/cifs/cifsproto.h     |    1 +
+>  fs/cifs/smb1ops.c       |    1 +
+>  fs/cifs/smb2ops.c       |   17 +++++
+>  fs/cifs/smb2pdu.h       |   59 ++++++++++++++++++
+>  fs/cifs/smb2proto.h     |    5 ++
+>  fs/cifs/smb2transport.c |  151 +++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/transport.c     |   13 ++--
+>  9 files changed, 246 insertions(+), 8 deletions(-)
+>  create mode 100644 fs/cifs/smb2transport.c
 > 
 > diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-> index a73d7f8..b77e9ec 100644
+> index 4a77271..a73d7f8 100644
 > --- a/fs/cifs/Makefile
 > +++ b/fs/cifs/Makefile
 > @@ -16,4 +16,4 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
 >  
 >  cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
 >  
-> -cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o
-> +cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o smb2misc.o
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index e814052..8aa8693 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -65,7 +65,7 @@ void cifs_dump_detail(void *buf)
->  	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d",
->  		  smb->Command, smb->Status.CifsError,
->  		  smb->Flags, smb->Flags2, smb->Mid, smb->Pid);
-> -	cERROR(1, "smb buf %p len %d", smb, smbCalcSize(smb));
-> +	cERROR(1, "smb buf %p len %u", smb, smbCalcSize(smb));
->  #endif /* CONFIG_CIFS_DEBUG2 */
->  }
+> -cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o
+> +cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 6d18962..3575f0f 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -22,6 +22,7 @@
+>  #include <linux/in.h>
+>  #include <linux/in6.h>
+>  #include <linux/slab.h>
+> +#include <linux/mempool.h>
+>  #include <linux/workqueue.h>
+>  #include "cifs_fs_sb.h"
+>  #include "cifsacl.h"
+> @@ -218,6 +219,7 @@ struct smb_version_values {
+>  	size_t		header_size;
+>  	size_t		max_header_size;
+>  	size_t		read_rsp_size;
+> +	__le16		lock_cmd;
+>  };
 >  
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> new file mode 100644
-> index 0000000..03167eb
-> --- /dev/null
-> +++ b/fs/cifs/smb2misc.c
-> @@ -0,0 +1,304 @@
-> +/*
-> + *   fs/cifs/smb2misc.c
+>  #define HEADER_SIZE(server) (server->vals->header_size)
+> @@ -812,6 +814,7 @@ typedef void (mid_callback_t)(struct mid_q_entry *mid);
+>  /* one of these for every pending CIFS request to the server */
+>  struct mid_q_entry {
+>  	struct list_head qhead;	/* mids waiting on reply from this server */
+> +	struct TCP_Server_Info *server;	/* server corresponding to this mid */
+>  	__u64 mid;		/* multiplex id */
+>  	__u32 pid;		/* process id */
+>  	__u32 sequence_number;  /* for CIFS signing */
+> @@ -1153,6 +1156,8 @@ void cifs_oplock_break(struct work_struct *work);
+>  extern const struct slow_work_ops cifs_oplock_break_ops;
+>  extern struct workqueue_struct *cifsiod_wq;
+>  
+> +extern mempool_t *cifs_mid_poolp;
+> +
+>  /* Operations for different SMB versions */
+>  #define SMB1_VERSION_STRING	"1.0"
+>  extern struct smb_version_operations smb1_operations;
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 7ae25c2..80d35ee 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -68,6 +68,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+>  extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+>  					struct TCP_Server_Info *server);
+>  extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+> +extern void cifs_wake_up_task(struct mid_q_entry *mid);
+>  extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>  			   unsigned int nvec, mid_receive_t *receive,
+>  			   mid_callback_t *callback, void *cbdata,
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 728595f..8f87386 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -445,4 +445,5 @@ struct smb_version_values smb1_values = {
+>  	.header_size = sizeof(struct smb_hdr),
+>  	.max_header_size = MAX_CIFS_HDR_SIZE,
+>  	.read_rsp_size = sizeof(READ_RSP),
+> +	.lock_cmd = cpu_to_le16(SMB_COM_LOCKING_ANDX),
+>  };
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index f065e89..09530f4 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -18,10 +18,27 @@
+>   */
+>  
+>  #include "cifsglob.h"
+> +#include "smb2pdu.h"
+> +#include "smb2proto.h"
+> +
+> +static __u64
+> +smb2_get_next_mid(struct TCP_Server_Info *server)
+> +{
+> +	__u64 mid;
+> +	/* for SMB2 we need the current value */
+> +	spin_lock(&GlobalMid_Lock);
+> +	mid = server->CurrentMid++;
+> +	spin_unlock(&GlobalMid_Lock);
+> +	return mid;
+> +}
+>  
+>  struct smb_version_operations smb21_operations = {
+> +	.setup_request = smb2_setup_request,
+> +	.check_receive = smb2_check_receive,
+> +	.get_next_mid = smb2_get_next_mid,
+>  };
+>  
+>  struct smb_version_values smb21_values = {
+>  	.version_string = SMB21_VERSION_STRING,
+> +	.lock_cmd = SMB2_LOCK,
+>  };
+> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> index d35ac68..c7f52e3 100644
+> --- a/fs/cifs/smb2pdu.h
+> +++ b/fs/cifs/smb2pdu.h
+> @@ -27,6 +27,65 @@
+>  #include <net/sock.h>
+>  
+>  /*
+> + * Note that, due to trying to use names similar to the protocol specifications,
+> + * there are many mixed case field names in the structures below.  Although
+> + * this does not match typical Linux kernel style, it is necessary to be
+> + * be able to match against the protocol specfication.
 > + *
-> + *   Copyright (C) International Business Machines  Corp., 2002,2011
+> + * SMB2 commands
+> + * Some commands have minimal (wct=0,bcc=0), or uninteresting, responses
+> + * (ie no useful data other than the SMB error code itself) and are marked such.
+> + * Knowing this helps avoid response buffer allocations and copy in some cases.
+> + */
+> +
+> +/* List of commands in host endian */
+> +#define SMB2_NEGOTIATE_HE	0x0000
+> +#define SMB2_SESSION_SETUP_HE	0x0001
+> +#define SMB2_LOGOFF_HE		0x0002 /* trivial request/resp */
+> +#define SMB2_TREE_CONNECT_HE	0x0003
+> +#define SMB2_TREE_DISCONNECT_HE	0x0004 /* trivial req/resp */
+> +#define SMB2_CREATE_HE		0x0005
+> +#define SMB2_CLOSE_HE		0x0006
+> +#define SMB2_FLUSH_HE		0x0007 /* trivial resp */
+> +#define SMB2_READ_HE		0x0008
+> +#define SMB2_WRITE_HE		0x0009
+> +#define SMB2_LOCK_HE		0x000A
+> +#define SMB2_IOCTL_HE		0x000B
+> +#define SMB2_CANCEL_HE		0x000C
+> +#define SMB2_ECHO_HE		0x000D
+> +#define SMB2_QUERY_DIRECTORY_HE	0x000E
+> +#define SMB2_CHANGE_NOTIFY_HE	0x000F
+> +#define SMB2_QUERY_INFO_HE	0x0010
+> +#define SMB2_SET_INFO_HE	0x0011
+> +#define SMB2_OPLOCK_BREAK_HE	0x0012
+> +
+> +/* The same list in little endian */
+> +#define SMB2_NEGOTIATE		cpu_to_le16(SMB2_NEGOTIATE_HE)
+> +#define SMB2_SESSION_SETUP	cpu_to_le16(SMB2_SESSION_SETUP_HE)
+> +#define SMB2_LOGOFF		cpu_to_le16(SMB2_LOGOFF_HE)
+> +#define SMB2_TREE_CONNECT	cpu_to_le16(SMB2_TREE_CONNECT_HE)
+> +#define SMB2_TREE_DISCONNECT	cpu_to_le16(SMB2_TREE_DISCONNECT_HE)
+> +#define SMB2_CREATE		cpu_to_le16(SMB2_CREATE_HE)
+> +#define SMB2_CLOSE		cpu_to_le16(SMB2_CLOSE_HE)
+> +#define SMB2_FLUSH		cpu_to_le16(SMB2_FLUSH_HE)
+> +#define SMB2_READ		cpu_to_le16(SMB2_READ_HE)
+> +#define SMB2_WRITE		cpu_to_le16(SMB2_WRITE_HE)
+> +#define SMB2_LOCK		cpu_to_le16(SMB2_LOCK_HE)
+> +#define SMB2_IOCTL		cpu_to_le16(SMB2_IOCTL_HE)
+> +#define SMB2_CANCEL		cpu_to_le16(SMB2_CANCEL_HE)
+> +#define SMB2_ECHO		cpu_to_le16(SMB2_ECHO_HE)
+> +#define SMB2_QUERY_DIRECTORY	cpu_to_le16(SMB2_QUERY_DIRECTORY_HE)
+> +#define SMB2_CHANGE_NOTIFY	cpu_to_le16(SMB2_CHANGE_NOTIFY_HE)
+> +#define SMB2_QUERY_INFO		cpu_to_le16(SMB2_QUERY_INFO_HE)
+> +#define SMB2_SET_INFO		cpu_to_le16(SMB2_SET_INFO_HE)
+> +#define SMB2_OPLOCK_BREAK	cpu_to_le16(SMB2_OPLOCK_BREAK_HE)
+> +
+> +#define NUMBER_OF_SMB2_COMMANDS	0x0013
+> +
+> +/* BB FIXME - analyze following length BB */
+> +#define MAX_SMB2_HDR_SIZE 0x78 /* 4 len + 64 hdr + (2*24 wct) + 2 bct + 2 pad */
+> +
+> +/*
+>   * SMB2 Header Definition
+>   *
+>   * "MBZ" :  Must be Zero
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index 08249ee..0e59afb 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -34,4 +34,9 @@ struct statfs;
+>   */
+>  extern int map_smb2_to_linux_error(char *buf, bool log_err);
+>  
+> +extern int smb2_check_receive(struct mid_q_entry *mid,
+> +			      struct TCP_Server_Info *server, bool log_error);
+> +extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
+> +			      unsigned int nvec, struct mid_q_entry **ret_mid);
+> +
+>  #endif			/* _SMB2PROTO_H */
+> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+> new file mode 100644
+> index 0000000..b4b6b9a
+> --- /dev/null
+> +++ b/fs/cifs/smb2transport.c
+> @@ -0,0 +1,151 @@
+> +/*
+> + *   fs/cifs/smb2transport.c
+> + *
+> + *   Copyright (C) International Business Machines  Corp., 2002, 2011
 > + *                 Etersoft, 2012
 > + *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
+> + *              Jeremy Allison (jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2006
 > + *              Pavel Shilovsky (pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
 > + *
 > + *   This library is free software; you can redistribute it and/or modify
@@ -85,444 +247,193 @@ Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 > + *   along with this library; if not, write to the Free Software
 > + *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 > + */
-> +#include <linux/ctype.h>
+> +
+> +#include <linux/fs.h>
+> +#include <linux/list.h>
+> +#include <linux/wait.h>
+> +#include <linux/net.h>
+> +#include <linux/delay.h>
+> +#include <linux/uaccess.h>
+> +#include <asm/processor.h>
+> +#include <linux/mempool.h>
 > +#include "smb2pdu.h"
 > +#include "cifsglob.h"
 > +#include "cifsproto.h"
 > +#include "smb2proto.h"
 > +#include "cifs_debug.h"
-> +#include "cifs_unicode.h"
 > +#include "smb2status.h"
 > +
-> +static int
-> +check_smb2_hdr(struct smb2_hdr *hdr, __u64 mid)
+> +/*
+> + * Set message id for the request. Should be called after wait_for_free_request
+> + * and when srv_mutex is held.
+> + */
+> +static inline void
+> +smb2_seq_num_into_buf(struct TCP_Server_Info *server, struct smb2_hdr *hdr)
 > +{
-> +	/*
-> +	 * Make sure that this really is an SMB, that it is a response,
-> +	 * and that the message ids match
-> +	 */
-> +	if ((*(__le32 *)hdr->ProtocolId == cpu_to_le32(0x424d53fe)) &&
-
-			... == __constant_cpu_to_le32()
-
-		It would also be good to turn that into a #define'ed constant and use it in the check below.
-
-> +	    (mid == hdr->MessageId)) {
-> +		if (hdr->Flags & SMB2_FLAGS_SERVER_TO_REDIR)
-> +			return 0;
-> +		else {
-> +			/* only one valid case where server sends us request */
-> +			if (hdr->Command == SMB2_OPLOCK_BREAK)
-> +				return 0;
-> +			else
-> +				cERROR(1, "Received Request not response");
-> +		}
-> +	} else { /* bad signature or mid */
-> +		if (*(__le32 *)hdr->ProtocolId != cpu_to_le32(0x424d53fe))
-> +			cERROR(1, "Bad protocol string signature header %x",
-> +			       *(unsigned int *) hdr->ProtocolId);
-> +		if (mid != hdr->MessageId)
-> +			cERROR(1, "Mids do not match");
-> +	}
-> +	cERROR(1, "Bad SMB detected. The Mid=%llu", hdr->MessageId);
-> +	return 1;
+> +	hdr->MessageId = get_next_mid(server);
 > +}
 > +
-> +/*
-> + *  The following table defines the expected "StructureSize" of SMB2 responses
-> + *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS responses.
-> + *
-> + *  Note that commands are defined in smb2pdu.h in le16 but the array below is
-> + *  indexed by command in host byte order
-> + */
-> +static const int smb2_rsp_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
-> +	/* SMB2_NEGOTIATE */ 65,
-> +	/* SMB2_SESSION_SETUP */ 9,
-> +	/* SMB2_LOGOFF */ 4,
-> +	/* SMB2_TREE_CONNECT */	16,
-> +	/* SMB2_TREE_DISCONNECT */ 4,
-> +	/* SMB2_CREATE */ 89,
-> +	/* SMB2_CLOSE */ 60,
-> +	/* SMB2_FLUSH */ 4,
-> +	/* SMB2_READ */	17,
-> +	/* SMB2_WRITE */ 17,
-> +	/* SMB2_LOCK */	4,
-> +	/* SMB2_IOCTL */ 49,
-> +	/* SMB2_CANCEL */ 0, /* BB CHECK this ... not listed in documentation */
-> +	/* SMB2_ECHO */ 4,
-> +	/* SMB2_QUERY_DIRECTORY */ 9,
-> +	/* SMB2_CHANGE_NOTIFY */ 9,
-> +	/* SMB2_QUERY_INFO */ 9,
-> +	/* SMB2_SET_INFO */ 2,
-> +	/* SMB2_OPLOCK_BREAK */ 24 /* BB FIXME can also be 44 for lease break */
-> +};
-> +
-
-It might save a few cycles (and memory) to make the above an array of
-__le16's and go ahead and __constant_cpu_to_le16 the values. Then you
-wouldn't need to convert the values in the headers below.
-
-> +int
-> +smb2_check_message(char *buf, unsigned int length)
+> +static struct mid_q_entry *
+> +smb2_mid_entry_alloc(const struct smb2_hdr *smb_buffer,
+> +		     struct TCP_Server_Info *server)
 > +{
-> +	struct smb2_hdr *hdr = (struct smb2_hdr *)buf;
-> +	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
-> +	__u64 mid = hdr->MessageId;
-> +	__u32 len = get_rfc1002_length(buf);
-> +	__u32 clc_len;  /* calculated length */
-> +	int command;
+> +	struct mid_q_entry *temp;
 > +
-> +	/* BB disable following printk later */
-> +	cFYI(1, "checkSMB Length: 0x%x, smb_buf_length: 0x%x", length, len);
-> +
-> +	/*
-> +	 * Add function to do table lookup of StructureSize by command
-> +	 * ie Validate the wct via smb2_struct_sizes table above
-> +	 */
-> +
-> +	if (length < 2 + sizeof(struct smb2_hdr)) {
-> +		if ((length >= sizeof(struct smb2_hdr)) && (hdr->Status != 0)) {
-> +			pdu->StructureSize2 = 0;
-> +			/*
-> +			 * As with SMB/CIFS, on some error cases servers may
-> +			 * not return wct properly
-> +			 */
-> +			return 0;
-> +		} else {
-> +			cERROR(1, "Length less than smb header size");
-> +		}
-> +		return 1;
-> +	}
-> +	if (len > CIFSMaxBufSize + MAX_SMB2_HDR_SIZE - 4) {
-> +		cERROR(1, "smb length greater than maximum, mid=%lld", mid);
-> +		return 1;
+> +	if (server == NULL) {
+> +		cERROR(1, "Null TCP session in smb2_mid_entry_alloc");
+> +		return NULL;
 > +	}
 > +
-> +	if (check_smb2_hdr(hdr, mid))
-> +		return 1;
+> +	temp = mempool_alloc(cifs_mid_poolp, GFP_NOFS);
+> +	if (temp == NULL)
+> +		return temp;
+> +	else {
+> +		memset(temp, 0, sizeof(struct mid_q_entry));
+> +		temp->mid = smb_buffer->MessageId;	/* always LE */
+> +		temp->pid = current->pid;
+> +		temp->command = smb_buffer->Command;	/* Always LE */
+> +		temp->when_alloc = jiffies;
+> +		temp->server = server;
 > +
-> +	if (le16_to_cpu(hdr->StructureSize) != 64) {
-> +		cERROR(1, "Illegal structure size %d",
-> +			  le16_to_cpu(hdr->StructureSize));
-> +		return 1;
+> +		/*
+> +		 * The default is for the mid to be synchronous, so the
+> +		 * default callback just wakes up the current task.
+> +		 */
+> +		temp->callback = cifs_wake_up_task;
+> +		temp->callback_data = current;
 > +	}
 > +
-> +	command = le16_to_cpu(hdr->Command);
-> +	if (command >= NUMBER_OF_SMB2_COMMANDS) {
-> +		cERROR(1, "illegal SMB2 command %d", command);
-> +		return 1;
+> +	atomic_inc(&midCount);
+> +	temp->mid_state = MID_REQUEST_ALLOCATED;
+> +	return temp;
+> +}
+> +
+> +static int
+> +smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_hdr *buf,
+> +		   struct mid_q_entry **mid)
+> +{
+> +	if (ses->server->tcpStatus == CifsExiting)
+> +		return -ENOENT;
+> +
+> +	if (ses->server->tcpStatus == CifsNeedReconnect) {
+> +		cFYI(1, "tcp session dead - return to caller to retry");
+> +		return -EAGAIN;
 > +	}
 > +
-> +	if (smb2_rsp_struct_sizes[command] !=
-> +	    le16_to_cpu(pdu->StructureSize2)) {
-> +		if ((hdr->Status == 0) ||
-> +		    (le16_to_cpu(pdu->StructureSize2) != 9)) {
-The 9 here should probably be a preprocessor constant:
-
-    #define SMB2_ERROR_STRUCTURE_SIZE2	__constant_le16_to_cpu(9)
-
-Then you could just compare that to a bare pdu->StructureSize2
-
-> +			/* error packets have 9 byte structure size */
-> +			cERROR(1, "Illegal response size %d for command %d",
-> +				   le16_to_cpu(pdu->StructureSize2), command);
-> +			return 1;
-> +		}
+> +	if (ses->status != CifsGood) {
+> +		/* check if SMB2 session is bad because we are setting it up */
+> +		if ((buf->Command != SMB2_SESSION_SETUP) &&
+> +		    (buf->Command != SMB2_NEGOTIATE))
+> +			return -EAGAIN;
+> +		/* else ok - we are setting up session */
 > +	}
-> +
-> +	clc_len = smb2_calc_size(hdr);
-> +
-> +	if (4 + len != length) {
-> +		cERROR(1, "Length read does not match RFC1001 length %d",
-> +			   len);
-> +		return 1;
-> +	}
-
-
-Does RFC1001 apply here? The error message above could be clearer.
-
-> +
-> +	if (4 + len != clc_len) {
-> +		cFYI(1, "Calculated size %d length %d mismatch for mid %lld",
-> +			 clc_len, 4 + len, mid);
-> +		if (clc_len == 4 + len + 1) /* BB FIXME (fix samba) */
-> +			return 0; /* BB workaround Samba 3 bug SessSetup rsp */
-> +		return 1;
-> +	}
+> +	*mid = smb2_mid_entry_alloc(buf, ses->server);
+> +	if (*mid == NULL)
+> +		return -ENOMEM;
+> +	spin_lock(&GlobalMid_Lock);
+> +	list_add_tail(&(*mid)->qhead, &ses->server->pending_mid_q);
+> +	spin_unlock(&GlobalMid_Lock);
 > +	return 0;
 > +}
 > +
-> +/*
-> + *  The size of the variable area depends on the offset and length fields
-> + *  located in different fields for various SMB2 responses.  SMB2 responses
-> + *  with no variable length info, show an offset of zero for the offset field.
-> + */
-> +static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
-> +	/* SMB2_NEGOTIATE */ true,
-> +	/* SMB2_SESSION_SETUP */ true,
-> +	/* SMB2_LOGOFF */ false,
-> +	/* SMB2_TREE_CONNECT */	false,
-> +	/* SMB2_TREE_DISCONNECT */ false,
-> +	/* SMB2_CREATE */ true,
-> +	/* SMB2_CLOSE */ false,
-> +	/* SMB2_FLUSH */ false,
-> +	/* SMB2_READ */	true,
-> +	/* SMB2_WRITE */ false,
-> +	/* SMB2_LOCK */	false,
-> +	/* SMB2_IOCTL */ true,
-> +	/* SMB2_CANCEL */ false, /* BB CHECK this not listed in documentation */
-> +	/* SMB2_ECHO */ false,
-> +	/* SMB2_QUERY_DIRECTORY */ true,
-> +	/* SMB2_CHANGE_NOTIFY */ true,
-> +	/* SMB2_QUERY_INFO */ true,
-> +	/* SMB2_SET_INFO */ false,
-> +	/* SMB2_OPLOCK_BREAK */ false
-> +};
-> +
-> +/*
-> + * Returns the pointer to the beginning of the data area. Length of the data
-> + * area and the offset to it (from the beginning of the smb are also returned.
-> + */
-> +static char *
-> +smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
+> +int
+> +smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+> +		   bool log_error)
 > +{
-> +	*off = 0;
-> +	*len = 0;
+> +	unsigned int len = get_rfc1002_length(mid->resp_buf);
 > +
-> +	/* error responses do not have data area */
-> +	if (hdr->Status &&
-> +	   (le32_to_cpu(hdr->Status) != STATUS_MORE_PROCESSING_REQUIRED) &&
-
-I wonder...should we also convert the STATUS_* constants to LE values?
-That would save a few cycles on BE machines...
-
-> +	   (le16_to_cpu(((struct smb2_err_rsp *)hdr)->StructureSize) == 9))
-> +		return NULL;
+> +	dump_smb(mid->resp_buf, min_t(u32, 80, len));
+> +	/* convert the length into a more usable form */
+> +	/* BB - uncomment with SMB2 signing implementation */
+> +	/* if ((len > 24) &&
+> +	    (server->sec_mode & (SECMODE_SIGN_REQUIRED|SECMODE_SIGN_ENABLED))) {
+> +		if (smb2_verify_signature(mid->resp_buf, server))
+> +			cERROR(1, "Unexpected SMB signature");
+> +	} */
 > +
-> +	/*
-> +	 * Following commands have data areas so we have to get the location
-> +	 * of the data buffer offset and data buffer length for the particular
-> +	 * command.
-> +	 */
-> +	switch (hdr->Command) {
-> +	case SMB2_NEGOTIATE:
-> +	case SMB2_SESSION_SETUP:
-> +	case SMB2_CREATE:
-> +	case SMB2_READ:
-> +	case SMB2_QUERY_INFO:
-> +	case SMB2_QUERY_DIRECTORY:
-> +	case SMB2_IOCTL:
-> +	case SMB2_CHANGE_NOTIFY:
-> +	default:
-> +		/* BB FIXME for unimplemented cases above */
-> +		cERROR(1, "no length check for command");
-> +		break;
-> +	}
-> +
-> +	/*
-> +	 * Invalid length or offset probably means data area is invalid, but
-> +	 * we have little choice but to ignore the data area in this case.
-> +	 */
-> +	if (*off > 4096) {
-> +		dump_stack();
-
-Is a stack trace likely to be helpful here? I wouldn't think so...
-
-> +		cERROR(1, "offset %d too large, data area ignored", *off);
-> +		*len = 0;
-> +		*off = 0;
-> +	} else if (*off < 0) {
-> +		cERROR(1, "negative offset to data invalid ignore data area");
-
-Printing the actual value might be helpful.
-
-> +		*off = 0;
-> +		*len = 0;
-> +	} else if (*len < 0) {
-> +		cERROR(1, "negative data length invalid, data area ignored");
-
-Ditto...
-
-> +		*len = 0;
-> +	} else if (*len > 128 * 1024) {
-> +		cERROR(1, "data area larger than 128K");
-
-How big was it?
-
-> +		*len = 0;
-> +	}
-> +
-> +	/* return pointer to beginning of data area, ie offset from SMB start */
-> +	if ((*off != 0) && (*len != 0))
-> +		return hdr->ProtocolId + *off;
-> +	else
-> +		return NULL;
+> +	return map_smb2_to_linux_error(mid->resp_buf, log_error);
 > +}
 > +
-> +/*
-> + * Calculate the size of the SMB message based on the fixed header
-> + * portion, the number of word parameters and the data portion of the message.
-> + */
-> +unsigned int
-> +smb2_calc_size(struct smb2_hdr *hdr)
+> +int
+> +smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
+> +		   unsigned int nvec, struct mid_q_entry **ret_mid)
 > +{
-> +	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
-> +	int offset; /* the offset from the beginning of SMB to data area */
-> +	int data_length; /* the length of the variable length data area */
-> +	/* Structure Size has already been checked to make sure it is 64 */
-> +	int len = 4 + le16_to_cpu(pdu->hdr.StructureSize);
-> +
-> +	/*
-> +	 * StructureSize2, ie length of fixed parameter area has already
-> +	 * been checked to make sure it is the correct length.
-> +	 */
-> +	len += le16_to_cpu(pdu->StructureSize2);
-> +
-> +	if (has_smb2_data_area[le16_to_cpu(hdr->Command)] == false)
-> +		goto calc_size_exit;
-> +
-> +	smb2_get_data_area_len(&offset, &data_length, hdr);
-> +	cFYI(1, "smb2 data length %d offset %d", data_length, offset);
-> +
-> +	if (data_length > 0) {
-> +		/*
-> +		 * Check to make sure that data area begins after fixed area,
-> +		 * Note that last byte of the fixed area is part of data area
-> +		 * for some commands, typically those with odd StructureSize,
-> +		 * so we must add one to the calculation (and 4 to account for
-> +		 * the size of the RFC1001 hdr.
-> +		 */
-> +		if (offset + 4 + 1 < len) {
-> +			cERROR(1, "data area overlaps SMB2 header, ignoring");
-
-Again, some info that would help us to debug this situation might be
-helpful. What were offset and len?
-
-> +			data_length = 0;
-> +		} else {
-> +			len = 4 + offset + data_length;
-> +		}
-> +	}
-> +calc_size_exit:
-> +	cFYI(1, "smb2 len %d", len);
-> +	return len;
-> +}
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index ab2590f..88cbfce 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -105,6 +105,38 @@ smb2_get_next_mid(struct TCP_Server_Info *server)
->  	return mid;
->  }
->  
-> +static struct mid_q_entry *
-> +smb2_find_mid(struct TCP_Server_Info *server, char *buf)
-> +{
+> +	int rc;
+> +	struct smb2_hdr *hdr = (struct smb2_hdr *)iov[0].iov_base;
 > +	struct mid_q_entry *mid;
-> +	struct smb2_hdr *hdr = (struct smb2_hdr *)buf;
 > +
-> +	spin_lock(&GlobalMid_Lock);
-> +	list_for_each_entry(mid, &server->pending_mid_q, qhead) {
-> +		if ((mid->mid == hdr->MessageId) &&
-> +		    (mid->mid_state == MID_REQUEST_SUBMITTED) &&
-> +		    (mid->command == hdr->Command)) {
-> +			spin_unlock(&GlobalMid_Lock);
-> +			return mid;
-> +		}
-> +	}
-> +	spin_unlock(&GlobalMid_Lock);
-> +	return NULL;
+> +	smb2_seq_num_into_buf(ses->server, hdr);
+> +
+> +	rc = smb2_get_mid_entry(ses, hdr, &mid);
+> +	if (rc)
+> +		return rc;
+> +	/* rc = smb2_sign_smb2(iov, nvec, ses->server);
+> +	if (rc)
+> +		delete_mid(mid); */
+> +	*ret_mid = mid;
+> +	return rc;
 > +}
 > +
-> +static void
-> +smb2_dump_detail(void *buf)
-> +{
-> +#ifdef CONFIG_CIFS_DEBUG2
-> +	struct smb2_hdr *smb = (struct smb2_hdr *)buf;
-> +
-> +	cERROR(1, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d",
-> +		  smb->Command, smb->Status, smb->Flags, smb->MessageId,
-> +		  smb->ProcessId);
-> +	cERROR(1, "smb buf %p len %u", smb, smb2_calc_size(smb));
-> +#endif
-> +}
-> +
->  struct smb_version_operations smb21_operations = {
->  	.setup_request = smb2_setup_request,
->  	.check_receive = smb2_check_receive,
-> @@ -113,9 +145,14 @@ struct smb_version_operations smb21_operations = {
->  	.get_credits_field = smb2_get_credits_field,
->  	.get_credits = smb2_get_credits,
->  	.get_next_mid = smb2_get_next_mid,
-> +	.find_mid = smb2_find_mid,
-> +	.check_message = smb2_check_message,
-> +	.dump_detail = smb2_dump_detail,
->  };
+> +/* BB add missing functions here */
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index bfbf0f9..bd51339 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -35,10 +35,8 @@
+>  #include "cifsproto.h"
+>  #include "cifs_debug.h"
 >  
->  struct smb_version_values smb21_values = {
->  	.version_string = SMB21_VERSION_STRING,
-> +	.header_size = sizeof(struct smb2_hdr),
-> +	.max_header_size = MAX_SMB2_HDR_SIZE,
->  	.lock_cmd = SMB2_LOCK,
->  };
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index c7f52e3..efb0d98 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -112,4 +112,34 @@ struct smb2_hdr {
->  	__u8   Signature[16];
->  } __packed;
+> -extern mempool_t *cifs_mid_poolp;
+> -
+> -static void
+> -wake_up_task(struct mid_q_entry *mid)
+> +void
+> +cifs_wake_up_task(struct mid_q_entry *mid)
+>  {
+>  	wake_up_process(mid->callback_data);
+>  }
+> @@ -65,12 +63,13 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
+>  	/*	do_gettimeofday(&temp->when_sent);*/ /* easier to use jiffies */
+>  		/* when mid allocated can be before when sent */
+>  		temp->when_alloc = jiffies;
+> +		temp->server = server;
 >  
-> +struct smb2_pdu {
-> +	struct smb2_hdr hdr;
-> +	__le16 StructureSize2; /* size of wct area (varies, request specific) */
-> +} __packed;
-> +
-> +/*
-> + *	SMB2 flag definitions
-> + */
-> +#define SMB2_FLAGS_SERVER_TO_REDIR	cpu_to_le32(0x00000001) /* Response */
-> +#define SMB2_FLAGS_ASYNC_COMMAND	cpu_to_le32(0x00000002)
-> +#define SMB2_FLAGS_RELATED_OPERATIONS	cpu_to_le32(0x00000004)
-> +#define SMB2_FLAGS_SIGNED		cpu_to_le32(0x00000008)
-> +#define SMB2_FLAGS_DFS_OPERATIONS	cpu_to_le32(0x10000000)
-> +
-
-Probably should use __constant_cpu_to_le32 here, though these macros
-can sometimes figure that out (if __builtin_constant_p is true for these
-values).
-
-> +/*
-> + *	Definitions for SMB2 Protocol Data Units (network frames)
-> + *
-> + *  See MS-SMB2.PDF specification for protocol details.
-> + *  The Naming convention is the lower case version of the SMB2
-> + *  command code name for the struct. Note that structures must be packed.
-> + *
-> + */
-> +struct smb2_err_rsp {
-> +	struct smb2_hdr hdr;
-> +	__le16 StructureSize;
-> +	__le16 Reserved; /* MBZ */
-> +	__le32 ByteCount;  /* even if zero, at least one byte follows */
-> +	__u8   ErrorData[1];  /* variable length */
-> +} __packed;
-> +
->  #endif				/* _SMB2PDU_H */
-> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> index 0e59afb..19bf987 100644
-> --- a/fs/cifs/smb2proto.h
-> +++ b/fs/cifs/smb2proto.h
-> @@ -33,6 +33,8 @@ struct statfs;
->   *****************************************************************
->   */
->  extern int map_smb2_to_linux_error(char *buf, bool log_err);
-> +extern int smb2_check_message(char *buf, unsigned int length);
-> +extern unsigned int smb2_calc_size(struct smb2_hdr *hdr);
+>  		/*
+>  		 * The default is for the mid to be synchronous, so the
+>  		 * default callback just wakes up the current task.
+>  		 */
+> -		temp->callback = wake_up_task;
+> +		temp->callback = cifs_wake_up_task;
+>  		temp->callback_data = current;
+>  	}
 >  
->  extern int smb2_check_receive(struct mid_q_entry *mid,
->  			      struct TCP_Server_Info *server, bool log_error);
+> @@ -83,6 +82,7 @@ void
+>  DeleteMidQEntry(struct mid_q_entry *midEntry)
+>  {
+>  #ifdef CONFIG_CIFS_STATS2
+> +	__le16 command = midEntry->server->vals->lock_cmd;
+>  	unsigned long now;
+>  #endif
+>  	midEntry->mid_state = MID_FREE;
+> @@ -96,8 +96,7 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
+>  	/* commands taking longer than one second are indications that
+>  	   something is wrong, unless it is quite a slow link or server */
+>  	if ((now - midEntry->when_alloc) > HZ) {
+> -		if ((cifsFYI & CIFS_TIMER) &&
+> -		    (midEntry->command != cpu_to_le16(SMB_COM_LOCKING_ANDX))) {
+> +		if ((cifsFYI & CIFS_TIMER) && (midEntry->command != command)) {
+>  			printk(KERN_DEBUG " CIFS slow rsp: cmd %d mid %llu",
+>  			       midEntry->command, midEntry->mid);
+>  			printk(" A: 0x%lx S: 0x%lx R: 0x%lx\n",
 
+Looks fine, but I wonder whether we'd be better off just getting rid of
+the above warning and the lock_cmd field. The lock_cmd is only used
+there, and that firing off warnings just because the call took more
+than 1s seems goofy to me. We know that writes long past the EOF can
+take a very long time with MS servers. Is the above warning really of
+value?
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+That's a minor nit though and something we can remove later if we
+decide to.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
