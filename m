@@ -1,94 +1,176 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH v2 02/24] CIFS: Rename 7 error codes to NT_ style
-Date: Wed, 20 Jun 2012 18:00:28 -0700
-Message-ID: <20120620180028.052b33ac@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2 06/24] CIFS: Add SMB2 credits support
+Date: Wed, 20 Jun 2012 19:20:38 -0700
+Message-ID: <20120620192038.26b486ec@corrin.poochiereds.net>
 References: <1340202664-28696-1-git-send-email-pshilovsky@samba.org>
-	<1340202664-28696-3-git-send-email-pshilovsky@samba.org>
+	<1340202664-28696-7-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1340202664-28696-3-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1340202664-28696-7-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 20 Jun 2012 18:30:42 +0400
+On Wed, 20 Jun 2012 18:30:46 +0400
 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> and consider such codes as CIFS errors.
+> For SMB2 protocol we can add more than one credit for one received
+> request: it depends on CreditRequest field in SMB2 response header.
+> Also we divide all requests by type: echos, oplocks and others. Each
+> type uses its own slot pull.
 > 
 > Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > ---
->  fs/cifs/nterr.c |    6 +++---
->  fs/cifs/nterr.h |   26 ++++++++++++++------------
->  2 files changed, 17 insertions(+), 15 deletions(-)
+>  fs/cifs/cifsglob.h  |    5 +++
+>  fs/cifs/cifsproto.h |    1 +
+>  fs/cifs/connect.c   |    2 +-
+>  fs/cifs/smb2ops.c   |   77 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 84 insertions(+), 1 deletions(-)
 > 
-> diff --git a/fs/cifs/nterr.c b/fs/cifs/nterr.c
-> index 819fd99..908a3c7 100644
-> --- a/fs/cifs/nterr.c
-> +++ b/fs/cifs/nterr.c
-> @@ -31,7 +31,7 @@ const struct nt_err_code_struct nt_errs[] = {
->  	{"NT_STATUS_INVALID_INFO_CLASS", NT_STATUS_INVALID_INFO_CLASS},
->  	{"NT_STATUS_INFO_LENGTH_MISMATCH", NT_STATUS_INFO_LENGTH_MISMATCH},
->  	{"NT_STATUS_ACCESS_VIOLATION", NT_STATUS_ACCESS_VIOLATION},
-> -	{"STATUS_BUFFER_OVERFLOW", STATUS_BUFFER_OVERFLOW},
-> +	{"STATUS_BUFFER_OVERFLOW", NT_STATUS_BUFFER_OVERFLOW},
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 3575f0f..d94d3ee 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -343,6 +343,11 @@ struct TCP_Server_Info {
+>  	char server_GUID[16];
+>  	__u16 sec_mode;
+>  	bool session_estab; /* mark when very first sess is established */
+> +#ifdef CONFIG_CIFS_SMB2
+> +	int echo_credits;  /* echo reserved slots */
+> +	int oplock_credits;  /* oplock break reserved slots */
+> +	bool echos:1; /* enable echos */
+> +#endif
+>  	u16 dialect; /* dialect index that server chose */
+>  	enum securityEnum secType;
+>  	bool oplocks:1; /* enable oplocks */
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 80d35ee..907f43c 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -91,6 +91,7 @@ extern int SendReceiveBlockingLock(const unsigned int xid,
+>  			struct smb_hdr *in_buf ,
+>  			struct smb_hdr *out_buf,
+>  			int *bytes_returned);
+> +extern int cifs_reconnect(struct TCP_Server_Info *server);
+>  extern int checkSMB(char *buf, unsigned int length);
+>  extern bool is_valid_oplock_break(char *, struct TCP_Server_Info *);
+>  extern bool backup_cred(struct cifs_sb_info *);
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 718bbea..cced470 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -296,7 +296,7 @@ static int cifs_setup_volume_info(struct smb_vol *volume_info, char *mount_data,
+>   * reconnect tcp session
+>   * wake up waiters on reconnection? - (not needed currently)
+>   */
+> -static int
+> +int
+>  cifs_reconnect(struct TCP_Server_Info *server)
+>  {
+>  	int rc = 0;
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 09530f4..ab2590f 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -20,6 +20,79 @@
+>  #include "cifsglob.h"
+>  #include "smb2pdu.h"
+>  #include "smb2proto.h"
+> +#include "cifsproto.h"
+> +#include "cifs_debug.h"
+> +
+> +static void
+> +change_conf(struct TCP_Server_Info *server)
+> +{
+> +	server->credits += server->echo_credits + server->oplock_credits;
+> +	server->oplock_credits = server->echo_credits = 0;
+> +	switch (server->credits) {
+> +	case 0:
+> +		cifs_reconnect(server);
+> +		return;
+> +	case 1:
+> +		server->echos = false;
 
-Should you also change the text version of these names? Since we print
-those when debugging, then it might be nice to have them match the
-actual #define names.
+		minor nit if you end up respinning this. The proper
+		spelling in English is "echoes".
 
->  	{"NT_STATUS_IN_PAGE_ERROR", NT_STATUS_IN_PAGE_ERROR},
->  	{"NT_STATUS_PAGEFILE_QUOTA", NT_STATUS_PAGEFILE_QUOTA},
->  	{"NT_STATUS_INVALID_HANDLE", NT_STATUS_INVALID_HANDLE},
-> @@ -681,7 +681,7 @@ const struct nt_err_code_struct nt_errs[] = {
->  	 NT_STATUS_QUOTA_LIST_INCONSISTENT},
->  	{"NT_STATUS_FILE_IS_OFFLINE", NT_STATUS_FILE_IS_OFFLINE},
->  	{"NT_STATUS_NO_MORE_ENTRIES", NT_STATUS_NO_MORE_ENTRIES},
-> -	{"STATUS_MORE_ENTRIES", STATUS_MORE_ENTRIES},
-> -	{"STATUS_SOME_UNMAPPED", STATUS_SOME_UNMAPPED},
-> +	{"STATUS_MORE_ENTRIES", NT_STATUS_MORE_ENTRIES},
-> +	{"STATUS_SOME_UNMAPPED", NT_STATUS_SOME_UNMAPPED},
->  	{NULL, 0}
+> +		server->oplocks = false;
+> +		cERROR(1, "disabling echos and oplocks");
+> +		break;
+> +	case 2:
+> +		server->echos = true;
+> +		server->oplocks = false;
+> +		server->echo_credits = 1;
+> +		cFYI(1, "disabling oplocks");
+> +		break;
+> +	default:
+> +		server->echos = true;
+> +		server->oplocks = true;
+> +		server->echo_credits = 1;
+> +		server->oplock_credits = 1;
+> +	}
+> +	server->credits -= server->echo_credits + server->oplock_credits;
+> +}
+> +
+> +static void
+> +smb2_add_credits(struct TCP_Server_Info *server, const unsigned int add,
+> +		 const int optype)
+> +{
+> +	int *val;
+> +	spin_lock(&server->req_lock);
+> +	val = server->ops->get_credits_field(server, optype);
+> +	*val += add;
+> +	server->in_flight--;
+> +	if (server->in_flight == 0)
+> +		change_conf(server);
+> +	spin_unlock(&server->req_lock);
+> +	wake_up(&server->request_q);
+> +}
+> +
+> +static void
+> +smb2_set_credits(struct TCP_Server_Info *server, const int val)
+> +{
+> +	spin_lock(&server->req_lock);
+> +	server->credits = val;
+> +	spin_unlock(&server->req_lock);
+> +}
+> +
+> +static int *
+> +smb2_get_credits_field(struct TCP_Server_Info *server, const int optype)
+> +{
+> +	switch (optype) {
+> +	case CIFS_ECHO_OP:
+> +		return &server->echo_credits;
+> +	case CIFS_OBREAK_OP:
+> +		return &server->oplock_credits;
+> +	default:
+> +		return &server->credits;
+> +	}
+> +}
+> +
+> +static unsigned int
+> +smb2_get_credits(struct mid_q_entry *mid)
+> +{
+> +	return le16_to_cpu(((struct smb2_hdr *)mid->resp_buf)->CreditRequest);
+> +}
+>  
+>  static __u64
+>  smb2_get_next_mid(struct TCP_Server_Info *server)
+> @@ -35,6 +108,10 @@ smb2_get_next_mid(struct TCP_Server_Info *server)
+>  struct smb_version_operations smb21_operations = {
+>  	.setup_request = smb2_setup_request,
+>  	.check_receive = smb2_check_receive,
+> +	.add_credits = smb2_add_credits,
+> +	.set_credits = smb2_set_credits,
+> +	.get_credits_field = smb2_get_credits_field,
+> +	.get_credits = smb2_get_credits,
+>  	.get_next_mid = smb2_get_next_mid,
 >  };
-> diff --git a/fs/cifs/nterr.h b/fs/cifs/nterr.h
-> index 2572673..7a0eae5 100644
-> --- a/fs/cifs/nterr.h
-> +++ b/fs/cifs/nterr.h
-> @@ -35,18 +35,20 @@ struct nt_err_code_struct {
->  extern const struct nt_err_code_struct nt_errs[];
 >  
->  /* Win32 Status codes. */
-> -#define STATUS_MORE_ENTRIES               0x0105
-> -#define ERROR_INVALID_PARAMETER		  0x0057
-> -#define ERROR_INSUFFICIENT_BUFFER	  0x007a
-> -#define STATUS_1804	                  0x070c
-> -#define STATUS_NOTIFY_ENUM_DIR            0x010c
-> +#define NT_STATUS_MORE_ENTRIES         0x0105
-> +#define NT_ERROR_INVALID_PARAMETER     0x0057
-> +#define NT_ERROR_INSUFFICIENT_BUFFER   0x007a
-> +#define NT_STATUS_1804                 0x070c
-> +#define NT_STATUS_NOTIFY_ENUM_DIR      0x010c
->  
-> -/* Win32 Error codes extracted using a loop in smbclient then printing a
-> -   netmon sniff to a file. */
-> +/*
-> + * Win32 Error codes extracted using a loop in smbclient then printing a netmon
-> + * sniff to a file.
-> + */
->  
-> -#define NT_STATUS_OK 0x0000
-> -#define STATUS_SOME_UNMAPPED       0x0107
-> -#define STATUS_BUFFER_OVERFLOW     0x80000005
-> +#define NT_STATUS_OK                   0x0000
-> +#define NT_STATUS_SOME_UNMAPPED        0x0107
-> +#define NT_STATUS_BUFFER_OVERFLOW  0x80000005
->  #define NT_STATUS_NO_MORE_ENTRIES  0x8000001a
->  #define NT_STATUS_MEDIA_CHANGED    0x8000001c
->  #define NT_STATUS_END_OF_MEDIA     0x8000001e
 
+Looks fine.
 
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
