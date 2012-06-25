@@ -1,314 +1,151 @@
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: manual merge of the vfs tree with the cifs tree
-Date: Mon, 25 Jun 2012 12:11:08 +1000
-Message-ID: <20120625121108.882a4319f8e4f66e074c46b2@canb.auug.org.au>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: Use systemd's mechanism for getting
+ password, if present
+Date: Mon, 25 Jun 2012 15:24:39 -0400
+Message-ID: <20120625152439.1a68fb6f@tlielax.poochiereds.net>
+References: <4FE43C1F.8060605@suse.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Mon__25_Jun_2012_12_11_08_+1000_kL=l9MeuAd1Q0r9T"
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pavel Shilovsky <pshilovsky@samba.org>,
-	Steve French <smfrench@gmail.com>,
-	<linux-cifs@vger.kernel.org>, Miklos Szeredi <mszeredi@suse.cz>
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Return-path: <linux-next-owner@vger.kernel.org>
-Sender: linux-next-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
-
---Signature=_Mon__25_Jun_2012_12_11_08_+1000_kL=l9MeuAd1Q0r9T
 Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Ankit Jain <jankit-IBi9RG/b67k@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <4FE43C1F.8060605-IBi9RG/b67k@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Hi Al,
+On Fri, 22 Jun 2012 15:04:23 +0530
+Ankit Jain <jankit-IBi9RG/b67k@public.gmane.org> wrote:
 
-Today's linux-next merge of the vfs tree got a conflict in fs/cifs/dir.c
-between commit 76023fd85bfd ("CIFS: Rename Get/FreeXid and make them work
-with unsigned int") from the cifs tree and commit 070ac6cd4b0a ("cifs:
-implement i_op->atomic_open()") from the vfs tree.
+> If the mount requests are "from" cifstab, then just asking for
+> "Password:" would be unclear, this asks it as:
+>   "Password for user@.. :"
+> 
+>   I'm not subscribed to the mailing list.
+> 
+> ---
+> mount.cifs: Use systemd's mechanism for getting password, if present.
+>     
+> If systemd is running, then use /bin/systemd-ask-password to get
+> the password instead of get_pass(..) .
+> 
+> Reference: bug: https://bugzilla.novell.com/show_bug.cgi?id=767894
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 6f3f382..d721de6 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -1687,6 +1687,58 @@ drop_child_privs(void)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * If systemd is present, then try to get password via
+> + * /bin/systemd-ask-password, else just use getpass(..)
+> + */
+> +static char*
+> +get_password(const char *prompt, char *input, int capacity)
+> +{
+> +	int is_systemd_running;
+> +	struct stat a, b;
+> +
+> +	/* We simply test whether the systemd cgroup hierarchy is
+> +	 * mounted */
+> +	is_systemd_running = (lstat("/sys/fs/cgroup", &a) == 0)
+> +		&& (lstat("/sys/fs/cgroup/systemd", &b) == 0)
+> +		&& (a.st_dev != b.st_dev);
+> +
+> +	if (is_systemd_running) {
+> +		/* systemd */
+> +		char *cmd;
+> +		FILE *fp = NULL;
+> +
+> +		if (asprintf(&cmd, "/bin/systemd-ask-password \"%s\"", prompt) >= 0) {
+> +			fp = popen (cmd, "re");
+> +			free (cmd);
+> +		}
+> +
+> +		if (!fp)
+> +			return NULL;
+> +
 
-I fixed it up (see below) and can carry the fix as necessary.
+What if systemd is running but we can't call /bin/systemd-ask-password
+for some reason? Like, maybe it doesn't exist? Should this then fall
+back to trying to get the password the old-fashioned way?
 
-P.S. Steve. that cifs tree commit has a bad email address for you in your
-Signed-off-by line and committer (Steven French <sfrench@w500smf.(none)>).
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+Hmmm...the manpage for this command also says:
 
-diff --cc fs/cifs/dir.c
-index 9d73354,a180265..0000000
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@@ -133,29 -133,40 +133,40 @@@ cifs_bp_rename_retry
-  	return full_path;
-  }
- =20
-+ /*
-+  * Don't allow the separator character in a path component.
-+  * The VFS will not allow "/", but "\" is allowed by posix.
-+  */
-+ static int
-+ check_name(struct dentry *direntry)
-+ {
-+ 	struct cifs_sb_info *cifs_sb =3D CIFS_SB(direntry->d_sb);
-+ 	int i;
-+=20
-+ 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)) {
-+ 		for (i =3D 0; i < direntry->d_name.len; i++) {
-+ 			if (direntry->d_name.name[i] =3D=3D '\\') {
-+ 				cFYI(1, "Invalid file name");
-+ 				return -EINVAL;
-+ 			}
-+ 		}
-+ 	}
-+ 	return 0;
-+ }
-+=20
-+=20
-  /* Inode operations in similar order to how they appear in Linux file fs.=
-h */
- =20
-- int
-- cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
-- 		struct nameidata *nd)
-+ static int cifs_do_create(struct inode *inode, struct dentry *direntry,
- -			  int xid, struct tcon_link *tlink, unsigned oflags,
-++			  unsigned int xid, struct tcon_link *tlink, unsigned oflags,
-+ 			  umode_t mode, __u32 *oplock, __u16 *fileHandle,
-+ 			  int *created)
-  {
-  	int rc =3D -ENOENT;
-- 	unsigned int xid;
-  	int create_options =3D CREATE_NOT_DIR;
-- 	__u32 oplock =3D 0;
-- 	int oflags;
-- 	/*
-- 	 * BB below access is probably too much for mknod to request
-- 	 *    but we have to do query and setpathinfo so requesting
-- 	 *    less could fail (unless we want to request getatr and setatr
-- 	 *    permissions (only).  At least for POSIX we do not have to
-- 	 *    request so much.
-- 	 */
-- 	int desiredAccess =3D GENERIC_READ | GENERIC_WRITE;
-- 	__u16 fileHandle;
-- 	struct cifs_sb_info *cifs_sb;
-- 	struct tcon_link *tlink;
-- 	struct cifs_tcon *tcon;
-+ 	int desiredAccess;
-+ 	struct cifs_sb_info *cifs_sb =3D CIFS_SB(inode->i_sb);
-+ 	struct cifs_tcon *tcon =3D tlink_tcon(tlink);
-  	char *full_path =3D NULL;
-  	FILE_ALL_INFO *buf =3D NULL;
-  	struct inode *newinode =3D NULL;
-@@@ -321,37 -355,136 +355,136 @@@ cifs_create_get_file_info
-  	}
- =20
-  cifs_create_set_dentry:
-- 	if (rc =3D=3D 0)
-- 		d_instantiate(direntry, newinode);
-- 	else
-+ 	if (rc !=3D 0) {
-  		cFYI(1, "Create worked, get_inode_info failed rc =3D %d", rc);
-+ 		goto out;
-+ 	}
-+ 	d_drop(direntry);
-+ 	d_add(direntry, newinode);
- =20
-- 	if (newinode && nd) {
-- 		struct cifsFileInfo *pfile_info;
-- 		struct file *filp;
-+ 	/* ENOENT for create?  How weird... */
-+ 	rc =3D -ENOENT;
-+ 	if (!newinode) {
-+ 		CIFSSMBClose(xid, tcon, *fileHandle);
-+ 		goto out;
-+ 	}
-+ 	rc =3D 0;
- =20
-- 		filp =3D lookup_instantiate_filp(nd, direntry, generic_file_open);
-- 		if (IS_ERR(filp)) {
-- 			rc =3D PTR_ERR(filp);
-- 			CIFSSMBClose(xid, tcon, fileHandle);
-- 			goto cifs_create_out;
-- 		}
-+ out:
-+ 	kfree(buf);
-+ 	kfree(full_path);
-+ 	return rc;
-+ }
- =20
-- 		pfile_info =3D cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
-- 		if (pfile_info =3D=3D NULL) {
-- 			fput(filp);
-- 			CIFSSMBClose(xid, tcon, fileHandle);
-- 			rc =3D -ENOMEM;
-- 		}
-- 	} else {
-+ int
-+ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
-+ 		 struct file *file, unsigned oflags, umode_t mode,
-+ 		 int *opened)
-+ {
-+ 	int rc;
- -	int xid;
-++	unsigned int xid;
-+ 	struct tcon_link *tlink;
-+ 	struct cifs_tcon *tcon;
-+ 	__u16 fileHandle;
-+ 	__u32 oplock;
-+ 	struct file *filp;
-+ 	struct cifsFileInfo *pfile_info;
-+=20
-+ 	/* Posix open is only called (at lookup time) for file create now.  For
-+ 	 * opens (rather than creates), because we do not know if it is a file
-+ 	 * or directory yet, and current Samba no longer allows us to do posix
-+ 	 * open on dirs, we could end up wasting an open call on what turns out
-+ 	 * to be a dir. For file opens, we wait to call posix open till
-+ 	 * cifs_open.  It could be added to atomic_open in the future but the
-+ 	 * performance tradeoff of the extra network request when EISDIR or
-+ 	 * EACCES is returned would have to be weighed against the 50% reduction
-+ 	 * in network traffic in the other paths.
-+ 	 */
-+ 	if (!(oflags & O_CREAT)) {
-+ 		struct dentry *res =3D cifs_lookup(inode, direntry, 0);
-+ 		if (IS_ERR(res))
-+ 			return PTR_ERR(res);
-+=20
-+ 		return finish_no_open(file, res);
-+ 	}
-+=20
-+ 	rc =3D check_name(direntry);
-+ 	if (rc)
-+ 		return rc;
-+=20
- -	xid =3D GetXid();
-++	xid =3D get_xid();
-+=20
-+ 	cFYI(1, "parent inode =3D 0x%p name is: %s and dentry =3D 0x%p",
-+ 	     inode, direntry->d_name.name, direntry);
-+=20
-+ 	tlink =3D cifs_sb_tlink(CIFS_SB(inode->i_sb));
-+ 	filp =3D ERR_CAST(tlink);
-+ 	if (IS_ERR(tlink))
-+ 		goto free_xid;
-+=20
-+ 	tcon =3D tlink_tcon(tlink);
-+=20
-+ 	rc =3D cifs_do_create(inode, direntry, xid, tlink, oflags, mode,
-+ 			    &oplock, &fileHandle, opened);
-+=20
-+ 	if (rc)
-+ 		goto out;
-+=20
-+ 	rc =3D finish_open(file, direntry, generic_file_open, opened);
-+ 	if (rc) {
-  		CIFSSMBClose(xid, tcon, fileHandle);
-+ 		goto out;
-  	}
- =20
-- cifs_create_out:
-- 	kfree(buf);
-- 	kfree(full_path);
-+ 	pfile_info =3D cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
-+ 	if (pfile_info =3D=3D NULL) {
-+ 		CIFSSMBClose(xid, tcon, fileHandle);
-+ 		fput(filp);
-+ 		rc =3D -ENOMEM;
-+ 	}
-+=20
-+ out:
-+ 	cifs_put_tlink(tlink);
-+ free_xid:
- -	FreeXid(xid);
-++	free_xid(xid);
-+ 	return rc;
-+ }
-+=20
-+ int cifs_create(struct inode *inode, struct dentry *direntry, umode_t mod=
-e,
-+ 		bool excl)
-+ {
-+ 	int rc;
- -	int xid =3D GetXid();
-++	int xid =3D get_xid();
-+ 	/*
-+ 	 * BB below access is probably too much for mknod to request
-+ 	 *    but we have to do query and setpathinfo so requesting
-+ 	 *    less could fail (unless we want to request getatr and setatr
-+ 	 *    permissions (only).  At least for POSIX we do not have to
-+ 	 *    request so much.
-+ 	 */
-+ 	unsigned oflags =3D O_EXCL | O_CREAT | O_RDWR;
-+ 	struct tcon_link *tlink;
-+ 	__u16 fileHandle;
-+ 	__u32 oplock;
-+ 	int created =3D FILE_CREATED;
-+=20
-+ 	cFYI(1, "cifs_create parent inode =3D 0x%p name is: %s and dentry =3D 0x=
-%p",
-+ 	     inode, direntry->d_name.name, direntry);
-+=20
-+ 	tlink =3D cifs_sb_tlink(CIFS_SB(inode->i_sb));
-+ 	rc =3D PTR_ERR(tlink);
-+ 	if (IS_ERR(tlink))
-+ 		goto free_xid;
-+=20
-+ 	rc =3D cifs_do_create(inode, direntry, xid, tlink, oflags, mode,
-+ 			    &oplock, &fileHandle, &created);
-+ 	if (!rc)
-+ 		CIFSSMBClose(xid, tlink_tcon(tlink), fileHandle);
-+=20
-  	cifs_put_tlink(tlink);
-+ free_xid:
- -	FreeXid(xid);
- +	free_xid(xid);
-+=20
-  	return rc;
-  }
- =20
-@@@ -488,22 -621,17 +621,17 @@@ mknod_out
- =20
-  struct dentry *
-  cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
-- 	    struct nameidata *nd)
-+ 	    unsigned int flags)
-  {
- -	int xid;
- +	unsigned int xid;
-  	int rc =3D 0; /* to get around spurious gcc warning, set to zero here */
-  	struct cifs_sb_info *cifs_sb;
-  	struct tcon_link *tlink;
-  	struct cifs_tcon *pTcon;
-- 	struct cifsFileInfo *cfile;
-  	struct inode *newInode =3D NULL;
-  	char *full_path =3D NULL;
-- 	struct file *filp;
- =20
- -	xid =3D GetXid();
- +	xid =3D get_xid();
- =20
-  	cFYI(1, "parent inode =3D 0x%p name is: %s and dentry =3D 0x%p",
-  	      parent_dir_inode, direntry->d_name.name, direntry);
+       The purpose of this tool is to query system-wide passwords --
+       that is passwords not attached to a specific user account.
+       Examples include: unlocking encrypted hard disks when they are
+       plugged in or at boot, entering an SSL certificate passphrase
+       for web and VPN servers.
 
---Signature=_Mon__25_Jun_2012_12_11_08_+1000_kL=l9MeuAd1Q0r9T
-Content-Type: application/pgp-signature
+...does this really match that use-case? Hypothetically...
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Suppose a user mount is set up in /etc/fstab and then the user calls:
 
-iQIcBAEBCAAGBQJP58i8AAoJEECxmPOUX5FEEt0P/R91QfPnGzq6TAw3pkJJtEyW
-dGnVa6WUHdErO0AC756Z5RS2QOKPNcoNyhST7QQgMZ91QcBvImb4fylrJWo4APq9
-/wKBjq0G4aCrErUcW7F5XGFBMfYWukUPjETQfx4TRGGvtezPmwEQ9JXGEe0XMIus
-G+OsqxJUqG830Ws7apLFgm44orJ55g4fEzFdVrL+ZUSote4YrVhDDTO6ObWp+yah
-/Gb5vJ5A94RHEM2zsXPD9lMe2nu4kHu+7MQidQv0kX+lPIi4od8y1QhNpP0Izo0c
-U25SIkpQ5+ayLNiQ7nBLQJ96Iqc/jMZ4PEEQvcLUt3UZX0O2JKTwMOipUvDBlfVC
-zeCwW4a/8Ggc5IWJB4h1+anGx8jpsmLlQ+DO1Ao5TP+lAa+LAN0KwY0lLtzGvJ+L
-zx6iFEL3tyZAZAA3WbSg5vbv7AuWeRKzDTnlCP+McaReBD7/dzT0V8+DcHEHMV8o
-x0BHor4r4fqpsPuaOAR80YMII1s8HIpIerhWQr5fzx2ix/X/Ix0Lo8HBeaiCAP8j
-w5pGbXtsuwwZ104Y5Ju+ErlHHmMNuMIDc1Z+1Je8X+mwdXG+XtxWGGLssKAkLcUS
-kYq7MHcLHik+fi9PQYP1mu/4ks3dGWXm34ZZUD8k4TTvp34JmCmentAFHbRjGWxz
-KlxUFaGxOU4gJrkR8ujM
-=SDPU
------END PGP SIGNATURE-----
+    $ mount /mnt/cifs
 
---Signature=_Mon__25_Jun_2012_12_11_08_+1000_kL=l9MeuAd1Q0r9T--
+...or something along those lines. It used to be that he'd get a
+password prompr on his terminal if one wasn't in the fstab. Will that
+still be the case here? Or will this "broadcast" some sort of password
+request all over the machine?
+
+> +		if (fgets(input, capacity, fp)) {
+> +			int len = strlen(input);
+> +			if (input[len - 1] == '\n')
+> +				input[len - 1] = '\0';
+> +		}
+> +
+> +		fclose(fp);
+> +	} else {
+> +		/* getpass is obsolete, but there's apparently nothing that replaces it */
+> +		char *tmp_pass = getpass(prompt);
+> +		if (!tmp_pass)
+> +			return NULL;
+> +
+> +		strncpy(input, tmp_pass, capacity - 1);
+> +		input[capacity - 1] = '\0';
+> +
+> +		/* zero-out the static buffer */
+> +		memset(tmp_pass, 0, strlen(tmp_pass));
+> +	}
+> +
+> +	return input;
+> +}
+> +
+>  static int
+>  assemble_mountinfo(struct parsed_mount_info *parsed_info,
+>  		   const char *thisprogram, const char *mountpoint,
+> @@ -1768,14 +1820,20 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+>  	}
+>  
+>  	if (!parsed_info->got_password) {
+> -		/* getpass is obsolete, but there's apparently nothing that replaces it */
+> -		char *tmp_pass = getpass("Password: ");
+> -		if (!tmp_pass) {
+> +		char tmp_pass[MOUNT_PASSWD_SIZE + 1];
+> +		char *prompt = NULL;
+> +
+> +		if(asprintf(&prompt, "Password for %s@%s: ", parsed_info->username, orig_dev) < 0)
+> +			prompt = NULL;
+> +
+> +		if (get_password(prompt ? prompt : "Password: ", tmp_pass, MOUNT_PASSWD_SIZE + 1)) {
+> +			rc = set_password(parsed_info, tmp_pass);
+> +		} else {
+>  			fprintf(stderr, "Error reading password, exiting\n");
+>  			rc = EX_SYSERR;
+> -			goto assemble_exit;
+>  		}
+> -		rc = set_password(parsed_info, tmp_pass);
+> +
+> +		free(prompt);
+>  		if (rc)
+>  			goto assemble_exit;
+>  	}
+> 
+
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
