@@ -1,661 +1,98 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 12/21] cifs: implement i_op->atomic_open()
-Date: Mon, 2 Jul 2012 14:54:58 -0400
-Message-ID: <20120702145458.73653c23@tlielax.poochiereds.net>
-References: <1338901832-14049-1-git-send-email-miklos@szeredi.hu>
-	<1338901832-14049-13-git-send-email-miklos@szeredi.hu>
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: 3.5.0-rc3 (approximately) oops on cifs mount
+Date: Mon, 2 Jul 2012 17:03:21 -0700
+Message-ID: <CALCETrVOwRyrBXDu0G=JE3dtwmXFNV6dAEHVPXYoJfUf6s2==w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org,
-	torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	mszeredi-AlSwsSmVLrQ@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1338901832-14049-13-git-send-email-miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue,  5 Jun 2012 15:10:23 +0200
-Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org> wrote:
+mount.cifs crashed my system, on something that's approximately
+3.5.0-rc3.  (I could find out more precisely if needed.)
 
-> From: Miklos Szeredi <mszeredi-AlSwsSmVLrQ@public.gmane.org>
-> 
-> Add an ->atomic_open implementation which replaces the atomic lookup+open+create
-> operation implemented via ->lookup and ->create operations.
-> 
-> Signed-off-by: Miklos Szeredi <mszeredi-AlSwsSmVLrQ@public.gmane.org>
-> CC: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c |    1 +
->  fs/cifs/cifsfs.h |    3 +
->  fs/cifs/dir.c    |  437 ++++++++++++++++++++++++++++++------------------------
->  3 files changed, 245 insertions(+), 196 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 8b6e344..dd29c7c 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -778,6 +778,7 @@ struct file_system_type cifs_fs_type = {
->  };
->  const struct inode_operations cifs_dir_inode_ops = {
->  	.create = cifs_create,
-> +	.atomic_open = cifs_atomic_open,
->  	.lookup = cifs_lookup,
->  	.getattr = cifs_getattr,
->  	.unlink = cifs_unlink,
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index 6536535..3a572bf 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -46,6 +46,9 @@ extern const struct inode_operations cifs_dir_inode_ops;
->  extern struct inode *cifs_root_iget(struct super_block *);
->  extern int cifs_create(struct inode *, struct dentry *, umode_t,
->  		       struct nameidata *);
-> +extern struct file *cifs_atomic_open(struct inode *, struct dentry *,
-> +				     struct opendata *, unsigned, umode_t,
-> +				     bool *);
->  extern struct dentry *cifs_lookup(struct inode *, struct dentry *,
->  				  struct nameidata *);
->  extern int cifs_unlink(struct inode *dir, struct dentry *dentry);
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index ec4e9a2..7a3dcd1 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -133,108 +133,141 @@ cifs_bp_rename_retry:
->  	return full_path;
->  }
->  
-> +/*
-> + * Don't allow the separator character in a path component.
-> + * The VFS will not allow "/", but "\" is allowed by posix.
-> + */
-> +static int
-> +check_name(struct dentry *direntry)
-> +{
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
-> +	int i;
-> +
-> +	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)) {
-> +		for (i = 0; i < direntry->d_name.len; i++) {
-> +			if (direntry->d_name.name[i] == '\\') {
-> +				cFYI(1, "Invalid file name");
-> +				return -EINVAL;
-> +			}
-> +		}
-> +	}
-> +	return 0;
-> +}
-> +
-> +
->  /* Inode operations in similar order to how they appear in Linux file fs.h */
->  
-> -int
-> -cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
-> -		struct nameidata *nd)
-> +static int cifs_do_create(struct inode *inode, struct dentry *direntry,
-> +			  int xid, struct tcon_link *tlink, unsigned oflags,
-> +			  umode_t mode, __u32 *oplock, __u16 *fileHandle,
-> +			  bool *created)
->  {
->  	int rc = -ENOENT;
-> -	int xid;
->  	int create_options = CREATE_NOT_DIR;
-> -	__u32 oplock = 0;
-> -	int oflags;
-> -	/*
-> -	 * BB below access is probably too much for mknod to request
-> -	 *    but we have to do query and setpathinfo so requesting
-> -	 *    less could fail (unless we want to request getatr and setatr
-> -	 *    permissions (only).  At least for POSIX we do not have to
-> -	 *    request so much.
-> -	 */
-> -	int desiredAccess = GENERIC_READ | GENERIC_WRITE;
-> -	__u16 fileHandle;
-> -	struct cifs_sb_info *cifs_sb;
-> -	struct tcon_link *tlink;
-> -	struct cifs_tcon *tcon;
-> +	int desiredAccess;
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> +	struct cifs_tcon *tcon = tlink_tcon(tlink);
->  	char *full_path = NULL;
->  	FILE_ALL_INFO *buf = NULL;
->  	struct inode *newinode = NULL;
-> -	int disposition = FILE_OVERWRITE_IF;
-> -
-> -	xid = GetXid();
-> -
-> -	cifs_sb = CIFS_SB(inode->i_sb);
-> -	tlink = cifs_sb_tlink(cifs_sb);
-> -	if (IS_ERR(tlink)) {
-> -		FreeXid(xid);
-> -		return PTR_ERR(tlink);
-> -	}
-> -	tcon = tlink_tcon(tlink);
-> +	int disposition;
->  
-> +	*oplock = 0;
->  	if (tcon->ses->server->oplocks)
-> -		oplock = REQ_OPLOCK;
-> -
-> -	if (nd)
-> -		oflags = nd->intent.open.file->f_flags;
-> -	else
-> -		oflags = O_RDONLY | O_CREAT;
-> +		*oplock = REQ_OPLOCK;
->  
->  	full_path = build_path_from_dentry(direntry);
->  	if (full_path == NULL) {
->  		rc = -ENOMEM;
-> -		goto cifs_create_out;
-> +		goto out;
->  	}
->  
->  	if (tcon->unix_ext && (tcon->ses->capabilities & CAP_UNIX) &&
-> +	    !tcon->broken_posix_open &&
->  	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->  			le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->  		rc = cifs_posix_open(full_path, &newinode,
-> -			inode->i_sb, mode, oflags, &oplock, &fileHandle, xid);
-> -		/* EIO could indicate that (posix open) operation is not
-> -		   supported, despite what server claimed in capability
-> -		   negotiation.  EREMOTE indicates DFS junction, which is not
-> -		   handled in posix open */
-> +			inode->i_sb, mode, oflags, oplock, fileHandle, xid);
-> +		switch (rc) {
-> +		case 0:
-> +			if (newinode == NULL) {
-> +				/* query inode info */
-> +				goto cifs_create_get_file_info;
-> +			}
->  
-> -		if (rc == 0) {
-> -			if (newinode == NULL) /* query inode info */
-> +			if (!S_ISREG(newinode->i_mode)) {
-> +				/*
-> +				 * The server may allow us to open things like
-> +				 * FIFOs, but the client isn't set up to deal
-> +				 * with that. If it's not a regular file, just
-> +				 * close it and proceed as if it were a normal
-> +				 * lookup.
-> +				 */
-> +				CIFSSMBClose(xid, tcon, *fileHandle);
->  				goto cifs_create_get_file_info;
-> -			else /* success, no need to query */
-> -				goto cifs_create_set_dentry;
-> -		} else if ((rc != -EIO) && (rc != -EREMOTE) &&
-> -			 (rc != -EOPNOTSUPP) && (rc != -EINVAL))
-> -			goto cifs_create_out;
-> -		/* else fallthrough to retry, using older open call, this is
-> -		   case where server does not support this SMB level, and
-> -		   falsely claims capability (also get here for DFS case
-> -		   which should be rare for path not covered on files) */
-> -	}
-> +			}
-> +			/* success, no need to query */
-> +			goto cifs_create_set_dentry;
-> +
-> +		case -ENOENT:
-> +			goto cifs_create_get_file_info;
-> +
-> +		case -EIO:
-> +		case -EINVAL:
-> +			/*
-> +			 * EIO could indicate that (posix open) operation is not
-> +			 * supported, despite what server claimed in capability
-> +			 * negotiation.
-> +			 *
-> +			 * POSIX open in samba versions 3.3.1 and earlier could
-> +			 * incorrectly fail with invalid parameter.
-> +			 */
-> +			tcon->broken_posix_open = true;
-> +			break;
->  
-> -	if (nd) {
-> -		/* if the file is going to stay open, then we
-> -		   need to set the desired access properly */
-> -		desiredAccess = 0;
-> -		if (OPEN_FMODE(oflags) & FMODE_READ)
-> -			desiredAccess |= GENERIC_READ; /* is this too little? */
-> -		if (OPEN_FMODE(oflags) & FMODE_WRITE)
-> -			desiredAccess |= GENERIC_WRITE;
-> +		case -EREMOTE:
-> +		case -EOPNOTSUPP:
-> +			/*
-> +			 * EREMOTE indicates DFS junction, which is not handled
-> +			 * in posix open.  If either that or op not supported
-> +			 * returned, follow the normal lookup.
-> +			 */
-> +			break;
->  
-> -		if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-> -			disposition = FILE_CREATE;
-> -		else if ((oflags & (O_CREAT | O_TRUNC)) == (O_CREAT | O_TRUNC))
-> -			disposition = FILE_OVERWRITE_IF;
-> -		else if ((oflags & O_CREAT) == O_CREAT)
-> -			disposition = FILE_OPEN_IF;
-> -		else
-> -			cFYI(1, "Create flag not set in create function");
-> +		default:
-> +			goto out;
-> +		}
-> +		/*
-> +		 * fallthrough to retry, using older open call, this is case
-> +		 * where server does not support this SMB level, and falsely
-> +		 * claims capability (also get here for DFS case which should be
-> +		 * rare for path not covered on files)
-> +		 */
->  	}
->  
-> +	desiredAccess = 0;
-> +	if (OPEN_FMODE(oflags) & FMODE_READ)
-> +		desiredAccess |= GENERIC_READ; /* is this too little? */
-> +	if (OPEN_FMODE(oflags) & FMODE_WRITE)
-> +		desiredAccess |= GENERIC_WRITE;
-> +
-> +	disposition = FILE_OVERWRITE_IF;
-> +	if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-> +		disposition = FILE_CREATE;
-> +	else if ((oflags & (O_CREAT | O_TRUNC)) == (O_CREAT | O_TRUNC))
-> +		disposition = FILE_OVERWRITE_IF;
-> +	else if ((oflags & O_CREAT) == O_CREAT)
-> +		disposition = FILE_OPEN_IF;
-> +	else
-> +		cFYI(1, "Create flag not set in create function");
-> +
->  	/* BB add processing to set equivalent of mode - e.g. via CreateX with
->  	   ACLs */
->  
->  	buf = kmalloc(sizeof(FILE_ALL_INFO), GFP_KERNEL);
->  	if (buf == NULL) {
->  		rc = -ENOMEM;
-> -		goto cifs_create_out;
-> +		goto out;
->  	}
->  
->  	/*
-> @@ -250,7 +283,7 @@ cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
->  	if (tcon->ses->capabilities & CAP_NT_SMBS)
->  		rc = CIFSSMBOpen(xid, tcon, full_path, disposition,
->  			 desiredAccess, create_options,
-> -			 &fileHandle, &oplock, buf, cifs_sb->local_nls,
-> +			 fileHandle, oplock, buf, cifs_sb->local_nls,
->  			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
->  	else
->  		rc = -EIO; /* no NT SMB support fall into legacy open below */
-> @@ -259,17 +292,17 @@ cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
->  		/* old server, retry the open legacy style */
->  		rc = SMBLegacyOpen(xid, tcon, full_path, disposition,
->  			desiredAccess, create_options,
-> -			&fileHandle, &oplock, buf, cifs_sb->local_nls,
-> +			fileHandle, oplock, buf, cifs_sb->local_nls,
->  			cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
->  	}
->  	if (rc) {
->  		cFYI(1, "cifs_create returned 0x%x", rc);
-> -		goto cifs_create_out;
-> +		goto out;
->  	}
->  
->  	/* If Open reported that we actually created a file
->  	   then we now have to set the mode if possible */
-> -	if ((tcon->unix_ext) && (oplock & CIFS_CREATE_ACTION)) {
-> +	if ((tcon->unix_ext) && (*oplock & CIFS_CREATE_ACTION)) {
->  		struct cifs_unix_set_info_args args = {
->  				.mode	= mode,
->  				.ctime	= NO_CHANGE_64,
-> @@ -278,6 +311,7 @@ cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
->  				.device	= 0,
->  		};
->  
-> +		*created = true;
->  		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
->  			args.uid = (__u64) current_fsuid();
->  			if (inode->i_mode & S_ISGID)
-> @@ -288,7 +322,7 @@ cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
->  			args.uid = NO_CHANGE_64;
->  			args.gid = NO_CHANGE_64;
->  		}
-> -		CIFSSMBUnixSetFileInfo(xid, tcon, &args, fileHandle,
-> +		CIFSSMBUnixSetFileInfo(xid, tcon, &args, *fileHandle,
->  					current->tgid);
->  	} else {
->  		/* BB implement mode setting via Windows security
-> @@ -305,11 +339,11 @@ cifs_create_get_file_info:
->  					      inode->i_sb, xid);
->  	else {
->  		rc = cifs_get_inode_info(&newinode, full_path, buf,
-> -					 inode->i_sb, xid, &fileHandle);
-> +					 inode->i_sb, xid, fileHandle);
->  		if (newinode) {
->  			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
->  				newinode->i_mode = mode;
-> -			if ((oplock & CIFS_CREATE_ACTION) &&
-> +			if ((*oplock & CIFS_CREATE_ACTION) &&
->  			    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID)) {
->  				newinode->i_uid = current_fsuid();
->  				if (inode->i_mode & S_ISGID)
-> @@ -321,37 +355,139 @@ cifs_create_get_file_info:
->  	}
->  
->  cifs_create_set_dentry:
-> -	if (rc == 0)
-> -		d_instantiate(direntry, newinode);
-> -	else
-> +	if (rc != 0) {
->  		cFYI(1, "Create worked, get_inode_info failed rc = %d", rc);
-> +		goto out;
-> +	}
-> +	d_drop(direntry);
-> +	d_add(direntry, newinode);
->  
-> -	if (newinode && nd) {
-> -		struct cifsFileInfo *pfile_info;
-> -		struct file *filp;
-> +	/* ENOENT for create?  How weird... */
-> +	rc = -ENOENT;
-> +	if (!newinode) {
-> +		CIFSSMBClose(xid, tcon, *fileHandle);
-> +		goto out;
-> +	}
-> +	rc = 0;
->  
-> -		filp = lookup_instantiate_filp(nd, direntry, generic_file_open);
-> -		if (IS_ERR(filp)) {
-> -			rc = PTR_ERR(filp);
-> -			CIFSSMBClose(xid, tcon, fileHandle);
-> -			goto cifs_create_out;
-> -		}
-> +out:
-> +	kfree(buf);
-> +	kfree(full_path);
-> +	return rc;
-> +}
->  
-> -		pfile_info = cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
-> -		if (pfile_info == NULL) {
-> -			fput(filp);
-> -			CIFSSMBClose(xid, tcon, fileHandle);
-> -			rc = -ENOMEM;
-> -		}
-> -	} else {
-> +struct file *
-> +cifs_atomic_open(struct inode *inode, struct dentry *direntry,
-> +		 struct opendata *od, unsigned oflags, umode_t mode,
-> +		 bool *created)
-> +{
-> +	int rc;
-> +	int xid;
-> +	struct tcon_link *tlink;
-> +	struct cifs_tcon *tcon;
-> +	__u16 fileHandle;
-> +	__u32 oplock;
-> +	struct file *filp;
-> +	struct cifsFileInfo *pfile_info;
-> +
-> +	/* Posix open is only called (at lookup time) for file create now.  For
-> +	 * opens (rather than creates), because we do not know if it is a file
-> +	 * or directory yet, and current Samba no longer allows us to do posix
-> +	 * open on dirs, we could end up wasting an open call on what turns out
-> +	 * to be a dir. For file opens, we wait to call posix open till
-> +	 * cifs_open.  It could be added to atomic_open in the future but the
-> +	 * performance tradeoff of the extra network request when EISDIR or
-> +	 * EACCES is returned would have to be weighed against the 50% reduction
-> +	 * in network traffic in the other paths.
-> +	 */
+pstore rocks, by the way.
 
-I wonder if we can't lift this condition now. We shouldn't do it in
-this patch, but it's something we should experiment with after all of
-this goes in.
+<5>[352905.852621] FS-Cache: Loaded
+<5>[352905.858346] FS-Cache: Netfs 'cifs' registered for caching
+<5>[352905.858401] Key type cifs.spnego registered
+<5>[352905.859016] CIFS: no cache= option specified, using
+"cache=loose". This default will change to "cache=strict" in 3.7.
+<4>[352905.862232] ------------[ cut here ]------------
+<2>[352905.862377] kernel BUG at kernel/workqueue.c:564!
+<4>[352905.862538] invalid opcode: 0000 [#1] SMP
+<4>[352905.862665] CPU 6
+<4>[352905.862759] Modules linked in: nls_utf8 cifs fscache tcp_lp
+fuse be2iscsi iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i
+libcxgbi cxgb3 mdio iscsi_tcp libiscsi_tcp tpm_infineon libiscsi
+scsi_transport_iscsi f71882fg ip6t_REJECT nf_conntrack_ipv6
+nf_defrag_ipv6 ip6table_filter ip6_tables snd_hda_codec_hdmi
+snd_hda_codec_realtek vfat fat btrfs zlib_deflate lzo_compress
+libcrc32c snd_hda_intel snd_hda_codec snd_hwdep snd_seq snd_seq_device
+snd_pcm joydev snd_timer e1000e snd coretemp crc32c_intel soundcore
+lpc_ich i2c_i801 serio_raw xhci_hcd pcspkr microcode mfd_core
+snd_page_alloc mei wmi vhost_net macvtap macvlan tun kvm_intel kvm
+uinput ipv6 xts gf128mul dm_crypt firewire_ohci firewire_core
+crc_itu_t radeon ttm drm_kms_helper drm i2c_algo_bit i2c_core [last
+unloaded: scsi_wait_scan]
+<4>[352905.864936]
+<4>[352905.864985] Pid: 18609, comm: mount.cifs Not tainted
+3.5.0-rc3-devel+ #435 MSI MS-7760/X79A-GD65 (8D) (MS-7760)
+Oops#1 Part3
+<4>[352905.865303] RIP: 0010:[<ffffffff8104d5b6>]
+[<ffffffff8104d5b6>] get_work_gcwq+0x31/0x3e
+<4>[352905.865552] RSP: 0018:ffff88010d26bb78  EFLAGS: 00010216
+<4>[352905.865717] RAX: ffff88021a9c5688 RBX: 00000000ffffffff RCX:
+000000000000ea60
+<4>[352905.865941] RDX: ffff88021a9c5680 RSI: ffff88021a9c5680 RDI:
+0000000000000011
+<4>[352905.866165] RBP: ffff88010d26bb78 R08: ffff880419d3e000 R09:
+0000000000000001
+<4>[352905.866388] R10: 00000000000155c6 R11: 0000000000015578 R12:
+ffff880447fa1cc0
+<4>[352905.866611] R13: ffff88021a9c5680 R14: ffff88021a9c56a0 R15:
+000000000000ea60
+<4>[352905.866836] FS:  00007ffc750a7740(0000)
+GS:ffff88045fd80000(0000) knlGS:0000000000000000
+<4>[352905.867087] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+<4>[352905.867267] CR2: 00000034362bdba0 CR3: 000000021a34e000 CR4:
+00000000000407e0
+<4>[352905.867491] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
+0000000000000000
+<4>[352905.867714] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7:
+0000000000000400
+<4>[352905.867938] Process mount.cifs (pid: 18609, threadinfo
+ffff88010d26a000, task ffff88043db943e0)
+<4>[352905.868209] Stack:
+<4>[352905.868274]  ffff88010d26bbb8 ffffffff8104db9f ffff88021a9c5400
+ffff88021a9c5400
+<4>[352905.868504]  ffff88004aad8000 ffff8803c9034242 ffff8803f83d1400
+000000000000000d
+<4>[352905.868735]  ffff88010d26bbc8 ffffffff8104e4f4 ffff88010d26bc98
+ffffffffa057a5da
+<4>[352905.868964] Call Trace:
+<4>[352905.869044]  [<ffffffff8104db9f>] queue_delayed_work_on+0x72/0xed
+<4>[352905.869234]  [<ffffffff8104e4f4>] queue_delayed_work+0x26/0x28
+<4>[352905.869420]  [<ffffffffa057a5da>] cifs_get_tcp_session+0x51f/0x597 [cifs]
+<4>[352905.869632]  [<ffffffffa057d1d2>] cifs_mount+0xf8/0x52d [cifs]
+<4>[352905.869812]  [<ffffffffa056fb3f>] ? cifs_do_mount+0x9c/0x427 [cifs]
+<4>[352905.870009]  [<ffffffffa056fb62>] cifs_do_mount+0xbf/0x427 [cifs]
+<4>[352905.870200]  [<ffffffff811e2bae>] ? selinux_sb_copy_data+0x192/0x1ab
+<4>[352905.870397]  [<ffffffff81104f25>] mount_fs+0x69/0x154
+<4>[352905.870555]  [<ffffffff810d809c>] ? __alloc_percpu+0x10/0x12
+<4>[352905.870732]  [<ffffffff81118ba4>] vfs_kern_mount+0x69/0xe3
+<4>[352905.870903]  [<ffffffff81119129>] do_kern_mount+0x4d/0xdf
+<4>[352905.871072]  [<ffffffff8111aa5c>] do_mount+0x69a/0x6fe
+<4>[352905.871233]  [<ffffffff810d3d66>] ? memdup_user+0x42/0x6a
+<4>[352905.871402]  [<ffffffff8111abd5>] sys_mount+0x8c/0xcd
+<4>[352905.871561]  [<ffffffff8146a9a2>] system_call_fastpath+0x16/0x1b
+<4>[352905.871765] Code: 66 66 90 48 8b 3f 40 f6 c7 04 74 09 40 80 e7
+00 48 8b 07 eb 21 48 c1 ef 08 83 ff 09 74 16 83 ff 08 74 0a 3b 3d 30
+8f a5 00 72 02 <0f> 0b e8 79 e8 ff ff eb 02 31 c0 5d c3 55 48 89 e5 66
+66 66 66
+<1>[352905.872354] RIP  [<ffffffff8104d5b6>] get_work_gcwq+0x31/0x3e
+<4>[352905.872532]  RSP <ffff88010d26bb78>
+<4>[352905.951644] ---[ end trace d127dd774b14850e ]---
 
-> +	if (!(oflags & O_CREAT)) {
-> +		struct dentry *res = cifs_lookup(inode, direntry, NULL);
-> +		if (IS_ERR(res))
-> +			return ERR_CAST(res);
-> +
-> +		finish_no_open(od, res);
-> +		return NULL;
-> +	}
-> +
-> +	rc = check_name(direntry);
-> +	if (rc)
-> +		return ERR_PTR(rc);
-> +
-> +	xid = GetXid();
-> +
-> +	cFYI(1, "parent inode = 0x%p name is: %s and dentry = 0x%p",
-> +	     inode, direntry->d_name.name, direntry);
-> +
-> +	tlink = cifs_sb_tlink(CIFS_SB(inode->i_sb));
-> +	filp = ERR_CAST(tlink);
-> +	if (IS_ERR(tlink))
-> +		goto free_xid;
-> +
-> +	tcon = tlink_tcon(tlink);
-> +
-> +	rc = cifs_do_create(inode, direntry, xid, tlink, oflags, mode,
-> +			    &oplock, &fileHandle, created);
-> +
-> +	if (rc) {
-> +		filp = ERR_PTR(rc);
-> +		goto out;
-> +	}
-> +
-> +	filp = finish_open(od, direntry, generic_file_open);
-> +	if (IS_ERR(filp)) {
->  		CIFSSMBClose(xid, tcon, fileHandle);
-> +		goto out;
->  	}
->  
-> -cifs_create_out:
-> -	kfree(buf);
-> -	kfree(full_path);
-> +	pfile_info = cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
-> +	if (pfile_info == NULL) {
-> +		CIFSSMBClose(xid, tcon, fileHandle);
-> +		fput(filp);
-> +		filp = ERR_PTR(-ENOMEM);
-> +	}
-> +
-> +out:
-> +	cifs_put_tlink(tlink);
-> +free_xid:
-> +	FreeXid(xid);
-> +	return filp;
-> +}
-> +
-> +int cifs_create(struct inode *inode, struct dentry *direntry, umode_t mode,
-> +		struct nameidata *nd)
-> +{
-> +	int rc;
-> +	int xid = GetXid();
-> +	/*
-> +	 * BB below access is probably too much for mknod to request
-> +	 *    but we have to do query and setpathinfo so requesting
-> +	 *    less could fail (unless we want to request getatr and setatr
-> +	 *    permissions (only).  At least for POSIX we do not have to
-> +	 *    request so much.
-> +	 */
-> +	unsigned oflags = O_EXCL | O_CREAT | O_RDWR;
-
-Shouldn't we be basing these flags on the info in the nameidata -- at
-least O_EXCL should depend on LOOKUP_EXCL, right? I see in Al's tree
-that there's a follow-on patch that turns the create nameidata arg into
-"bool excl". Seems like we should only be setting O_EXCL when that's
-true.
-
-Ugh, but that looks like an already existing bug...sigh...
-
-I guess we can plan to fix that up after this goes in.
-
-> +	struct tcon_link *tlink;
-> +	__u16 fileHandle;
-> +	__u32 oplock;
-> +	bool created = true;
-> +
-> +	cFYI(1, "cifs_create parent inode = 0x%p name is: %s and dentry = 0x%p",
-> +	     inode, direntry->d_name.name, direntry);
-> +
-> +	tlink = cifs_sb_tlink(CIFS_SB(inode->i_sb));
-> +	rc = PTR_ERR(tlink);
-> +	if (IS_ERR(tlink))
-> +		goto free_xid;
-> +
-> +	rc = cifs_do_create(inode, direntry, xid, tlink, oflags, mode,
-> +			    &oplock, &fileHandle, &created);
-> +	if (!rc)
-> +		CIFSSMBClose(xid, tlink_tcon(tlink), fileHandle);
-> +
->  	cifs_put_tlink(tlink);
-> +free_xid:
->  	FreeXid(xid);
-> +
->  	return rc;
->  }
->  
-> @@ -492,16 +628,11 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->  {
->  	int xid;
->  	int rc = 0; /* to get around spurious gcc warning, set to zero here */
-> -	__u32 oplock;
-> -	__u16 fileHandle = 0;
-> -	bool posix_open = false;
->  	struct cifs_sb_info *cifs_sb;
->  	struct tcon_link *tlink;
->  	struct cifs_tcon *pTcon;
-> -	struct cifsFileInfo *cfile;
->  	struct inode *newInode = NULL;
->  	char *full_path = NULL;
-> -	struct file *filp;
->  
->  	xid = GetXid();
->  
-> @@ -518,31 +649,9 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->  	}
->  	pTcon = tlink_tcon(tlink);
->  
-> -	oplock = pTcon->ses->server->oplocks ? REQ_OPLOCK : 0;
-> -
-> -	/*
-> -	 * Don't allow the separator character in a path component.
-> -	 * The VFS will not allow "/", but "\" is allowed by posix.
-> -	 */
-> -	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)) {
-> -		int i;
-> -		for (i = 0; i < direntry->d_name.len; i++)
-> -			if (direntry->d_name.name[i] == '\\') {
-> -				cFYI(1, "Invalid file name");
-> -				rc = -EINVAL;
-> -				goto lookup_out;
-> -			}
-> -	}
-> -
-> -	/*
-> -	 * O_EXCL: optimize away the lookup, but don't hash the dentry. Let
-> -	 * the VFS handle the create.
-> -	 */
-> -	if (nd && (nd->flags & LOOKUP_EXCL)) {
-> -		d_instantiate(direntry, NULL);
-> -		rc = 0;
-> +	rc = check_name(direntry);
-> +	if (rc)
->  		goto lookup_out;
-> -	}
->  
->  	/* can not grab the rename sem here since it would
->  	deadlock in the cases (beginning of sys_rename itself)
-> @@ -560,80 +669,16 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
->  	}
->  	cFYI(1, "Full path: %s inode = 0x%p", full_path, direntry->d_inode);
->  
-> -	/* Posix open is only called (at lookup time) for file create now.
-> -	 * For opens (rather than creates), because we do not know if it
-> -	 * is a file or directory yet, and current Samba no longer allows
-> -	 * us to do posix open on dirs, we could end up wasting an open call
-> -	 * on what turns out to be a dir. For file opens, we wait to call posix
-> -	 * open till cifs_open.  It could be added here (lookup) in the future
-> -	 * but the performance tradeoff of the extra network request when EISDIR
-> -	 * or EACCES is returned would have to be weighed against the 50%
-> -	 * reduction in network traffic in the other paths.
-> -	 */
->  	if (pTcon->unix_ext) {
-> -		if (nd && !(nd->flags & LOOKUP_DIRECTORY) &&
-> -		     (nd->flags & LOOKUP_OPEN) && !pTcon->broken_posix_open &&
-> -		     (nd->intent.open.file->f_flags & O_CREAT)) {
-> -			rc = cifs_posix_open(full_path, &newInode,
-> -					parent_dir_inode->i_sb,
-> -					nd->intent.open.create_mode,
-> -					nd->intent.open.file->f_flags, &oplock,
-> -					&fileHandle, xid);
-> -			/*
-> -			 * The check below works around a bug in POSIX
-> -			 * open in samba versions 3.3.1 and earlier where
-> -			 * open could incorrectly fail with invalid parameter.
-> -			 * If either that or op not supported returned, follow
-> -			 * the normal lookup.
-> -			 */
-> -			switch (rc) {
-> -			case 0:
-> -				/*
-> -				 * The server may allow us to open things like
-> -				 * FIFOs, but the client isn't set up to deal
-> -				 * with that. If it's not a regular file, just
-> -				 * close it and proceed as if it were a normal
-> -				 * lookup.
-> -				 */
-> -				if (newInode && !S_ISREG(newInode->i_mode)) {
-> -					CIFSSMBClose(xid, pTcon, fileHandle);
-> -					break;
-> -				}
-> -			case -ENOENT:
-> -				posix_open = true;
-> -			case -EOPNOTSUPP:
-> -				break;
-> -			default:
-> -				pTcon->broken_posix_open = true;
-> -			}
-> -		}
-> -		if (!posix_open)
-> -			rc = cifs_get_inode_info_unix(&newInode, full_path,
-> -						parent_dir_inode->i_sb, xid);
-> -	} else
-> +		rc = cifs_get_inode_info_unix(&newInode, full_path,
-> +					      parent_dir_inode->i_sb, xid);
-> +	} else {
->  		rc = cifs_get_inode_info(&newInode, full_path, NULL,
->  				parent_dir_inode->i_sb, xid, NULL);
-> +	}
->  
->  	if ((rc == 0) && (newInode != NULL)) {
->  		d_add(direntry, newInode);
-> -		if (posix_open) {
-> -			filp = lookup_instantiate_filp(nd, direntry,
-> -						       generic_file_open);
-> -			if (IS_ERR(filp)) {
-> -				rc = PTR_ERR(filp);
-> -				CIFSSMBClose(xid, pTcon, fileHandle);
-> -				goto lookup_out;
-> -			}
-> -
-> -			cfile = cifs_new_fileinfo(fileHandle, filp, tlink,
-> -						  oplock);
-> -			if (cfile == NULL) {
-> -				fput(filp);
-> -				CIFSSMBClose(xid, pTcon, fileHandle);
-> -				rc = -ENOMEM;
-> -				goto lookup_out;
-> -			}
-> -		}
->  		/* since paths are not looked up by component - the parent
->  		   directories are presumed to be good here */
->  		renew_parental_timestamps(direntry);
-
-All in all, looks correct aside from the O_EXCL thing. I think we can
-do some further cleanup here too, but I'd prefer to do that
-incrementally on top of this rather than trying to do it all at once.
-
-Nice work.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--Andy
