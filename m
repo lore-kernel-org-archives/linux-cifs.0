@@ -1,68 +1,59 @@
-From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] Always update the dentry cache with fresh readdir()
- results
-Date: Fri, 06 Jul 2012 16:30:12 +1000
-Message-ID: <1341556212.22307.34.camel@obed>
-References: <1341477507.22307.21.camel@obed>
-	 <1341482567.22307.22.camel@obed>
-	 <20120705072401.7eb1a7ee@corrin.poochiereds.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Fwd: [GIT] CIFS Fixes
+Date: Fri, 6 Jul 2012 01:47:02 -0500
+Message-ID: <CAH2r5mvZ+1Z3iTivmkcubZ6jCo=oRkTL86KZxBccNvP9TVgS2Q@mail.gmail.com>
+References: <CAH2r5mtX_P+JHKA8r9hDSEpV_pC4w=z8_FfjwpkWP0-jS4MadQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Bill Robertson <bill_robertson-nSG1tDLywIjKnmoGZ802fQ@public.gmane.org>,
-	Dion Edwards <dion_edwards-nSG1tDLywIjKnmoGZ802fQ@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120705072401.7eb1a7ee-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <CAH2r5mtX_P+JHKA8r9hDSEpV_pC4w=z8_FfjwpkWP0-jS4MadQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2012-07-05 at 07:24 -0400, Jeff Layton wrote:
-> On Thu, 05 Jul 2012 20:02:47 +1000
-> Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> 
-> > (CCing in the original reporter)
-> > 
-> > On Thu, 2012-07-05 at 18:38 +1000, Andrew Bartlett wrote:
-> > > When we do a readdir() in CIFS, we are potentially efficiently
-> > > collecting a great deal of current, catchable stat information.
-> > > 
-> > > It is important that we always keep the dentry cache current for two
-> > > reasons:
-> > >  - the information may have changed (within the actime timeout).
-> > >  - if we still have a dentry cache value after that timeout, it is quite
-> > > expensive (1xRTT per entry) to find out if it was still correct.
-> > > 
-> > > This hits folks who are using CIFS over a WAN very badly.  For example
-> > > on an emulated 50ms delay I would have ls --color complete in .1
-> > > seconds, and a second run take 4.5 seconds, as each stat() (for the
-> > > colouring) would create a trans2 query_path_info query for each file,
-> > > right after getting the same information in the trans2 find_first2.
-> > > 
-> > > This patch implements the simplest approach, I would welcome a
-> > > correction on if there is a better approach than d_drop() and dput().
-> > > 
-> > > Tested on 3.4.4-3.cifsrevalidate.fc17.i686 with a 50ms WANem emulated
-> > > WAN against Samba 4.0 beta3.
-> > > 
-> > > Thanks,
-> > > 
-> > > Andrew Bartlett
-> > 
-> 
-> Nice work tracking that down and coding up the patch. While it's not
-> incorrect to drop the dentry here, we can be a little more efficient
-> here and just update the inode in place if the uniqueid didn't change.
-> 
-> Something like this (untested) patch should do it. Could you test this
-> and let me know if it also helps?
+---------- Forwarded message ----------
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date: Fri, Jul 6, 2012 at 1:45 AM
+Subject: [GIT] CIFS Fixes
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 
-Yes, same behaviour as as per my patch.  Thanks you very much, it seems
-we are on our way to solving this!
 
-Andrew Bartlett
+The following changes since commit 94fa83c424321189ca24fb6cb4c0d224cdedc72d:
 
--- 
-Andrew Bartlett                                http://samba.org/~abartlet/
-Authentication Developer, Samba Team           http://samba.org
+  Merge branch 'drm-fixes' of git://people.freedesktop.org/~airlied/linux
+(2012-06-12 18:48:17 +0300)
+
+are available in the git repository at:
+
+
+  git://git.samba.org/sfrench/cifs-2.6.git master
+
+for you to fetch changes up to ec01d738a1691dfc85b96b9f796020267a7be577:
+
+  cifs: when server doesn't set CAP_LARGE_READ_X, cap default rsize at
+MaxBufferSize (2012-07-03 12:54:42 -0500)
+
+----------------------------------------------------------------
+Jeff Layton (1):
+      cifs: when server doesn't set CAP_LARGE_READ_X, cap default rsize at
+MaxBufferSize
+
+Suresh Jayaraman (1):
+      cifs: fix parsing of password mount option
+
+ fs/cifs/connect.c |   41 ++++++++++++++++++++---------------------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
+
+
+--
+Thanks,
+
+Steve
+
+
+
+--
+Thanks,
+
+Steve
