@@ -1,53 +1,76 @@
-From: Casey Yeager <casey-AWiv9L5iBJJF6kxbq+BtvQ@public.gmane.org>
-Subject: Creating new files on CIFS mount ignores fmask/file_mode
-Date: Thu, 05 Jul 2012 20:18:32 -0500
-Message-ID: <4FF63CE8.3040403@yeagerweb.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] Always update the dentry cache with fresh readdir()
+ results
+Date: Thu, 5 Jul 2012 21:46:08 -0400
+Message-ID: <20120705214608.2a3a681b@corrin.poochiereds.net>
+References: <1341477507.22307.21.camel@obed>
+	<1341482567.22307.22.camel@obed>
+	<20120705072401.7eb1a7ee@corrin.poochiereds.net>
+	<1341531067.22307.26.camel@obed>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Bill Robertson <bill_robertson-nSG1tDLywIjKnmoGZ802fQ@public.gmane.org>,
+	Dion Edwards <dion_edwards-nSG1tDLywIjKnmoGZ802fQ@public.gmane.org>
+To: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1341531067.22307.26.camel@obed>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-After switching from smbfs mount, the dmask/dir_mode and fmask/file_mode 
-no longer have an effect on the newly created files. It seems to use the 
-system umask instead. Is there a way to have cifs mount create files 
-with permissions like smbfs does?
+On Fri, 06 Jul 2012 09:31:07 +1000
+Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
---------- smbfs mount showing new file permissions ---------
+> On Thu, 2012-07-05 at 07:24 -0400, Jeff Layton wrote:
+> > On Thu, 05 Jul 2012 20:02:47 +1000
+> > Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> > 
+> > > (CCing in the original reporter)
+> > > 
+> > > On Thu, 2012-07-05 at 18:38 +1000, Andrew Bartlett wrote:
+> > > > When we do a readdir() in CIFS, we are potentially efficiently
+> > > > collecting a great deal of current, catchable stat information.
+> > > > 
+> > > > It is important that we always keep the dentry cache current for two
+> > > > reasons:
+> > > >  - the information may have changed (within the actime timeout).
+> > > >  - if we still have a dentry cache value after that timeout, it is quite
+> > > > expensive (1xRTT per entry) to find out if it was still correct.
+> > > > 
+> > > > This hits folks who are using CIFS over a WAN very badly.  For example
+> > > > on an emulated 50ms delay I would have ls --color complete in .1
+> > > > seconds, and a second run take 4.5 seconds, as each stat() (for the
+> > > > colouring) would create a trans2 query_path_info query for each file,
+> > > > right after getting the same information in the trans2 find_first2.
+> > > > 
+> > > > This patch implements the simplest approach, I would welcome a
+> > > > correction on if there is a better approach than d_drop() and dput().
+> > > > 
+> > > > Tested on 3.4.4-3.cifsrevalidate.fc17.i686 with a 50ms WANem emulated
+> > > > WAN against Samba 4.0 beta3.
+> > > > 
+> > > > Thanks,
+> > > > 
+> > > > Andrew Bartlett
+> > > 
+> > 
+> > Nice work tracking that down and coding up the patch. While it's not
+> > incorrect to drop the dentry here, we can be a little more efficient
+> > here and just update the inode in place if the uniqueid didn't change.
+> > 
+> > Something like this (untested) patch should do it. Could you test this
+> > and let me know if it also helps?
+> 
+> Is it really safe to update so much without getting a lock over all the
+> updates?
+> 
 
-root@osiris:~# cat /etc/fstab | grep smbfs
-//192.168.1.23/YEAGER /mnt smbfs 
-gid=users,fmask=0660,dmask=0770,username=xxxx,password=xxxx 0 0
+What's your worry, specifically?
 
-root@osiris:~# mount /mnt ; cd /mnt/test
+The vfs only requires that you hold the lock over i_size updates. I
+suppose it's possible that you could have racing updates to an inode,
+but in practice, the last one will generally "win".
 
-root@osiris:/mnt/test# touch test_smbfs ; ls -l test_smbfs
--rw-rw---- 1 root users 0 2012-07-05 18:45 test_smbfs
-
---------- cifs mount showing new file permissions ---------
-(note: substituting fmask for file_mode and dmask for dir_mod has had no 
-effect on outcome)
-
-root@osiris:/# cat /etc/fstab | grep cifs
-//192.168.1.23/YEAGER /mnt cifs 
-gid=users,file_mode=0660,dir_mod=0770,username=xxxx,password=xxxx 0 0
-
-root@osiris:/# mount /mnt ; cd /mnt/test
-
-root@osiris:/mnt/test# touch test_cifs ; ls -l test_cifs
--rw-r--r-- 1 root users 0 2012-07-05 18:47 test_cifs
-
---------- re-mounting changes to correct permissions ---------
-
-root@osiris:/mnt/test# cd / ; umount /mnt
-root@osiris:/# mount /mnt ; cd /mnt/test
-
-root@osiris:/mnt/test# ls -l test_cifs
--rw-rw---- 1 root users 0 2012-07-05 18:47 test_cifs
-
-
-testing platforms:
-RHEL 4 with samba 3.0.33
-Slackware 12.1 with samba 3.0.37
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
