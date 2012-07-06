@@ -1,88 +1,82 @@
-From: Milan =?UTF-8?Q?Kn=C3=AD=C5=BEek?= <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: mount.cifs multiuser w/o krb5? How?
-Date: Sat, 07 Jul 2012 00:09:53 +0200
-Message-ID: <1341612593.26748.9.camel@athlon.garagome>
-References: <1341427937.3252.6.camel@athlon.garagome>
-	 <20120706141543.1b564c11@tlielax.poochiereds.net>
+From: Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] Always update the dentry cache with fresh readdir()
+ results
+Date: Sat, 07 Jul 2012 08:42:03 +1000
+Message-ID: <1341614523.22307.42.camel@obed>
+References: <1341477507.22307.21.camel@obed>
+	 <1341482567.22307.22.camel@obed>
+	 <20120705072401.7eb1a7ee@corrin.poochiereds.net>
+	 <1341556212.22307.34.camel@obed>
+	 <20120706071123.2563c615@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Bill Robertson <bill_robertson-nSG1tDLywIjKnmoGZ802fQ@public.gmane.org>,
+	Dion Edwards <dion_edwards-nSG1tDLywIjKnmoGZ802fQ@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120706141543.1b564c11-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20120706071123.2563c615-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jeff Layton p=C3=AD=C5=A1e v P=C3=A1 06. 07. 2012 v 14:15 -0400:
+On Fri, 2012-07-06 at 07:11 -0400, Jeff Layton wrote:
+> On Fri, 06 Jul 2012 16:30:12 +1000
+> Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> 
+> > On Thu, 2012-07-05 at 07:24 -0400, Jeff Layton wrote:
+> > > On Thu, 05 Jul 2012 20:02:47 +1000
+> > > Andrew Bartlett <abartlet-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> > > 
+> > > > (CCing in the original reporter)
+> > > > 
+> > > > On Thu, 2012-07-05 at 18:38 +1000, Andrew Bartlett wrote:
+> > > > > When we do a readdir() in CIFS, we are potentially efficiently
+> > > > > collecting a great deal of current, catchable stat information.
+> > > > > 
+> > > > > It is important that we always keep the dentry cache current for two
+> > > > > reasons:
+> > > > >  - the information may have changed (within the actime timeout).
+> > > > >  - if we still have a dentry cache value after that timeout, it is quite
+> > > > > expensive (1xRTT per entry) to find out if it was still correct.
+> > > > > 
+> > > > > This hits folks who are using CIFS over a WAN very badly.  For example
+> > > > > on an emulated 50ms delay I would have ls --color complete in .1
+> > > > > seconds, and a second run take 4.5 seconds, as each stat() (for the
+> > > > > colouring) would create a trans2 query_path_info query for each file,
+> > > > > right after getting the same information in the trans2 find_first2.
+> > > > > 
+> > > > > This patch implements the simplest approach, I would welcome a
+> > > > > correction on if there is a better approach than d_drop() and dput().
+> > > > > 
+> > > > > Tested on 3.4.4-3.cifsrevalidate.fc17.i686 with a 50ms WANem emulated
+> > > > > WAN against Samba 4.0 beta3.
+> > > > > 
+> > > > > Thanks,
+> > > > > 
+> > > > > Andrew Bartlett
+> > > > 
+> > > 
+> > > Nice work tracking that down and coding up the patch. While it's not
+> > > incorrect to drop the dentry here, we can be a little more efficient
+> > > here and just update the inode in place if the uniqueid didn't change.
+> > > 
+> > > Something like this (untested) patch should do it. Could you test this
+> > > and let me know if it also helps?
+> > 
+> > Yes, same behaviour as as per my patch.  Thanks you very much, it seems
+> > we are on our way to solving this!
+> > 
+> 
+> Thanks for testing it. I've gone ahead and sent that off to Steve for
+> inclusion. If there is anything else required wrt serializing the inode
+> attribute updates, then we can deal with that in a separate patch since
+> that's really a separate problem.
 
-Hello Jeff,
+Indeed.  Thanks!
 
-> On Wed, 04 Jul 2012 20:52:17 +0200
-> Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > To move on for multiuser: adding the credentials to the keyring:
-> > [user1@client /]$ cifscreds add server
-> > and typing in the password.
-> >=20
-> > (Similarly for user2.)
-> >=20
-> > When I remount the same share with "multiuser" option with the
-> > credentials of user1, the share is accessible only by the root user=
-, the
-> > users user1 and user2 cannot list the mount point (cannot access /m=
-nt:
-> > Permission denied)
-> >=20
->=20
-> Can you clarify exactly what you did above? How, exactly did you
-> remount the share?
+Andrew Bartlett
 
-I actually unmounted and mounted again with the extra "multiuser"
-option.
-
-> > Adding cifscreds has exit code 0. Running "cifscreds clearall" resu=
-lts
-> > in "You have no stashed cifs credentials. If you want to add them u=
-se:
-> > cifscreds add" and exit code 1. That's weird.
-> >=20
->=20
-> After you do the "cifscreds add", if you then do a "keyctl show" does
-> it show the cifs keys attached to your session keyring?
->=20
-> One thing that may be biting you: cifscreds attaches the keys to the
-> session keyring. If you do the "add" in one session and then try to
-> access from another, it won't work since the keys just aren't present=
-=2E
-> The fact that "clearall" doesn't find any creds leads me to suspect
-> that's what's going on here.
->=20
-> The scope of a "session" in keys parlance is unfortunately somewhat
-> poorly defined, but you basically need to do the "cifscreds add" from
-> each login. A graphical login on the console would be a single sessio=
-n
-> however.
-
-Hm, I will need to read more on the keyrings in kernel...
-
-Anyway, here are some details:
-[root@client /]# su - zmrzlinka
-[zmrzlinka@client ~]$ keyctl show
-Session Keyring
-  14048542 --alswrv   1001    -1  keyring: _uid_ses.1001
- 320075663 --alswrv   1001    -1   \_ keyring: _uid.1001
-[zmrzlinka@client ~]$ cifscreds add -u zmrzlinka toillet
-Password: [blabla]
-[zmrzlinka@client ~]$ keyctl show
-Session Keyring
-  14048542 --alswrv   1001    -1  keyring: _uid_ses.1001
- 320075663 --alswrv   1001    -1   \_ keyring: _uid.1001
-
-It does not seem to change anything. Is there a way how to add the key
-to the keyring using "keyctl" instead of "cifscreds" (for testing
-purposes)?
-
-Regards,
-Milan
---=20
-http://milan-knizek.net
+-- 
+Andrew Bartlett                                http://samba.org/~abartlet/
+Authentication Developer, Samba Team           http://samba.org
