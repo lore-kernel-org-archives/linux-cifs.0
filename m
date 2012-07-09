@@ -1,111 +1,87 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: mount.cifs multiuser w/o krb5? How?
-Date: Mon, 9 Jul 2012 06:26:08 -0400
-Message-ID: <20120709062608.3a67445f@tlielax.poochiereds.net>
-References: <1341427937.3252.6.camel@athlon.garagome>
-	<20120706141543.1b564c11@tlielax.poochiereds.net>
-	<1341612593.26748.9.camel@athlon.garagome>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Milan =?UTF-8?B?S27DrcW+ZWs=?= <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] autoconf: add --enable-pie and --enable-relro
+Date: Mon,  9 Jul 2012 10:12:54 -0400
+Message-ID: <1341843174-22470-1-git-send-email-jlayton@samba.org>
+Cc: asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1341612593.26748.9.camel-77nuZImz6nKt3pJmeLR6bw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 07 Jul 2012 00:09:53 +0200
-Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+-pie and -fpie enable the building of position-independent executables,
+and -Wl,-z,relro turns on read-only relocation support in gcc. These
+options are important for security purposes to guard against possible
+buffer overflows that lead to exploits.
 
-> Jeff Layton p=C3=AD=C5=A1e v P=C3=A1 06. 07. 2012 v 14:15 -0400:
->=20
-> Hello Jeff,
->=20
-> > On Wed, 04 Jul 2012 20:52:17 +0200
-> > Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > > To move on for multiuser: adding the credentials to the keyring:
-> > > [user1@client /]$ cifscreds add server
-> > > and typing in the password.
-> > >=20
-> > > (Similarly for user2.)
-> > >=20
-> > > When I remount the same share with "multiuser" option with the
-> > > credentials of user1, the share is accessible only by the root us=
-er, the
-> > > users user1 and user2 cannot list the mount point (cannot access =
-/mnt:
-> > > Permission denied)
-> > >=20
-> >=20
-> > Can you clarify exactly what you did above? How, exactly did you
-> > remount the share?
->=20
-> I actually unmounted and mounted again with the extra "multiuser"
-> option.
->=20
+Follow the example of samba here and enable these by default, but add
+configure options that allow people to turn them off at build-time if
+necessary.
 
-Ok, good...
+We may also want to eventually add checks to ensure that the compiler
+and linker understand these options, but I'll wait until we have some
+evidence that it's needed before I expend the effort.
 
-> > > Adding cifscreds has exit code 0. Running "cifscreds clearall" re=
-sults
-> > > in "You have no stashed cifs credentials. If you want to add them=
- use:
-> > > cifscreds add" and exit code 1. That's weird.
-> > >=20
-> >=20
-> > After you do the "cifscreds add", if you then do a "keyctl show" do=
-es
-> > it show the cifs keys attached to your session keyring?
-> >=20
-> > One thing that may be biting you: cifscreds attaches the keys to th=
-e
-> > session keyring. If you do the "add" in one session and then try to
-> > access from another, it won't work since the keys just aren't prese=
-nt.
-> > The fact that "clearall" doesn't find any creds leads me to suspect
-> > that's what's going on here.
-> >=20
-> > The scope of a "session" in keys parlance is unfortunately somewhat
-> > poorly defined, but you basically need to do the "cifscreds add" fr=
-om
-> > each login. A graphical login on the console would be a single sess=
-ion
-> > however.
->=20
-> Hm, I will need to read more on the keyrings in kernel...
->=20
-> Anyway, here are some details:
-> [root@client /]# su - zmrzlinka
-> [zmrzlinka@client ~]$ keyctl show
-> Session Keyring
->   14048542 --alswrv   1001    -1  keyring: _uid_ses.1001
->  320075663 --alswrv   1001    -1   \_ keyring: _uid.1001
-> [zmrzlinka@client ~]$ cifscreds add -u zmrzlinka toillet
-> Password: [blabla]
-> [zmrzlinka@client ~]$ keyctl show
-> Session Keyring
->   14048542 --alswrv   1001    -1  keyring: _uid_ses.1001
->  320075663 --alswrv   1001    -1   \_ keyring: _uid.1001
->=20
-> It does not seem to change anything. Is there a way how to add the ke=
-y
-> to the keyring using "keyctl" instead of "cifscreds" (for testing
-> purposes)?
->=20
-> Regards,
-> Milan
+Reported-by: Andreas Schneider <asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ Makefile.am  |    2 +-
+ configure.ac |   27 +++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 1 deletions(-)
 
-Ok, that at least gives us something to go on. Running this under
-strace might give us some sort of clue as to the problem as well.
-
-cifscreds add is more or less equivalent to a command like this:
-
-    $ keyctl add logon cifs:a:ip_address 'username:password' @s
-
-If the server is multi-homed, then cifscreds add will add a key for eac=
-h
-address in the list returned when the hostname is resolved.
-
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+diff --git a/Makefile.am b/Makefile.am
+index b412262..0d0b599 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-AM_CFLAGS = -Wall -Wextra -D_FORTIFY_SOURCE=2
++AM_CFLAGS = -Wall -Wextra -D_FORTIFY_SOURCE=2 $(PIE_CFLAGS) $(RELRO_CFLAGS)
+ ACLOCAL_AMFLAGS = -I aclocal
+ 
+ root_sbindir = $(ROOTSBINDIR)
+diff --git a/configure.ac b/configure.ac
+index 0dd1155..a8d0bbc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -10,6 +10,18 @@ AC_CONFIG_MACRO_DIR(aclocal)
+ AM_INIT_AUTOMAKE
+ 
+ # "enable" options
++AC_ARG_ENABLE(pie,
++	[AC_HELP_STRING([--enable-pie],
++			[Produce position independent executables @<:@default=yes@:>@])],
++	enable_pie=$enableval,
++	enable_pie="maybe")
++
++AC_ARG_ENABLE(relro,
++	[AC_HELP_STRING([--enable-relro],
++			[Enable relocations read-only support @<:@default=yes@:>@])],
++	enable_relro=$enableval,
++	enable_relro="maybe")
++
+ AC_ARG_ENABLE(cifsupcall,
+ 	[AC_HELP_STRING([--enable-cifsupcall],
+ 			[Create cifs.upcall binary @<:@default=yes@:>@])],
+@@ -82,6 +94,21 @@ AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb
+ AC_CHECK_HEADERS([sys/fsuid.h])
+ AC_CHECK_FUNC(setfsuid, , [AC_MSG_ERROR([System does not support setfsuid()])])
+ 
++# FIXME: add test(s) to autodisable these flags when compiler/linker don't support it
++if test $enable_pie != "no"; then
++	PIE_CFLAGS="-fpie -pie"
++else
++	PIE_CFLAGS=""
++fi
++AC_SUBST([PIE_CFLAGS])
++
++if test $enable_relro != "no"; then
++	RELRO_CFLAGS="-Wl,-z,relro"
++else
++	RELRO_CFLAGS=""
++fi
++AC_SUBST([RELRO_CFLAGS])
++
+ if test $enable_cifsupcall != "no"; then
+ 	AC_CHECK_HEADERS([krb5.h krb5/krb5.h])
+ 	if test x$ac_cv_header_krb5_krb5_h != xyes ; then
+-- 
+1.7.7.6
