@@ -1,204 +1,97 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH] cifs: obtain file access during backup intent lookup
-Date: Tue, 10 Jul 2012 08:13:48 -0500
-Message-ID: <1341926028-30845-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] autoconf: add --enable-pie and --enable-relro
+Date: Tue, 10 Jul 2012 13:17:29 -0400
+Message-ID: <20120710131729.1a209e0e@tlielax.poochiereds.net>
+References: <1341843174-22470-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1341843174-22470-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Mon,  9 Jul 2012 10:12:54 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
+> -pie and -fpie enable the building of position-independent executables,
+> and -Wl,-z,relro turns on read-only relocation support in gcc. These
+> options are important for security purposes to guard against possible
+> buffer overflows that lead to exploits.
+> 
+> Follow the example of samba here and enable these by default, but add
+> configure options that allow people to turn them off at build-time if
+> necessary.
+> 
+> We may also want to eventually add checks to ensure that the compiler
+> and linker understand these options, but I'll wait until we have some
+> evidence that it's needed before I expend the effort.
+> 
+> Reported-by: Andreas Schneider <asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  Makefile.am  |    2 +-
+>  configure.ac |   27 +++++++++++++++++++++++++++
+>  2 files changed, 28 insertions(+), 1 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index b412262..0d0b599 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -1,4 +1,4 @@
+> -AM_CFLAGS = -Wall -Wextra -D_FORTIFY_SOURCE=2
+> +AM_CFLAGS = -Wall -Wextra -D_FORTIFY_SOURCE=2 $(PIE_CFLAGS) $(RELRO_CFLAGS)
+>  ACLOCAL_AMFLAGS = -I aclocal
+>  
+>  root_sbindir = $(ROOTSBINDIR)
+> diff --git a/configure.ac b/configure.ac
+> index 0dd1155..a8d0bbc 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -10,6 +10,18 @@ AC_CONFIG_MACRO_DIR(aclocal)
+>  AM_INIT_AUTOMAKE
+>  
+>  # "enable" options
+> +AC_ARG_ENABLE(pie,
+> +	[AC_HELP_STRING([--enable-pie],
+> +			[Produce position independent executables @<:@default=yes@:>@])],
+> +	enable_pie=$enableval,
+> +	enable_pie="maybe")
+> +
+> +AC_ARG_ENABLE(relro,
+> +	[AC_HELP_STRING([--enable-relro],
+> +			[Enable relocations read-only support @<:@default=yes@:>@])],
+> +	enable_relro=$enableval,
+> +	enable_relro="maybe")
+> +
+>  AC_ARG_ENABLE(cifsupcall,
+>  	[AC_HELP_STRING([--enable-cifsupcall],
+>  			[Create cifs.upcall binary @<:@default=yes@:>@])],
+> @@ -82,6 +94,21 @@ AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mntent.h netdb
+>  AC_CHECK_HEADERS([sys/fsuid.h])
+>  AC_CHECK_FUNC(setfsuid, , [AC_MSG_ERROR([System does not support setfsuid()])])
+>  
+> +# FIXME: add test(s) to autodisable these flags when compiler/linker don't support it
+> +if test $enable_pie != "no"; then
+> +	PIE_CFLAGS="-fpie -pie"
+> +else
+> +	PIE_CFLAGS=""
+> +fi
+> +AC_SUBST([PIE_CFLAGS])
+> +
+> +if test $enable_relro != "no"; then
+> +	RELRO_CFLAGS="-Wl,-z,relro"
+> +else
+> +	RELRO_CFLAGS=""
+> +fi
+> +AC_SUBST([RELRO_CFLAGS])
+> +
+>  if test $enable_cifsupcall != "no"; then
+>  	AC_CHECK_HEADERS([krb5.h krb5/krb5.h])
+>  	if test x$ac_cv_header_krb5_krb5_h != xyes ; then
 
-path based querries can fail for lack of access, especially during lookup
-during open.
-open itself would actually succeed becasue of back up intent bit
-but querries (either path or file handle based) do not have a means to 
-specifiy backup intent bit.
-So querry the file info during lookup using a file handle (based call)
-obtained by opening the file only for that purpose (and then closing the file).
- 
-Add a file handle based call to obtain Index Number of a file
-in addition to an existing path based call.
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Reported-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsproto.h |    4 ++
- fs/cifs/cifssmb.c   |   80 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/inode.c     |   31 ++++++++++++++++++-
- 3 files changed, 113 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 0a6cbfe..3c63ee4 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -375,6 +375,10 @@ extern int CIFSGetSrvInodeNumber(const int xid, struct cifs_tcon *tcon,
- 			const unsigned char *searchName, __u64 *inode_number,
- 			const struct nls_table *nls_codepage,
- 			int remap_special_chars);
-+extern int CIFSGetFileSrvInodeNumber(const int xid, struct cifs_tcon *tcon,
-+			u16 netfid, __u64 *inode_number,
-+			const struct nls_table *nls_codepage,
-+			int remap_special_chars);
- 
- extern int cifs_lockv(const int xid, struct cifs_tcon *tcon, const __u16 netfid,
- 		      const __u8 lock_type, const __u32 num_unlock,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 5b40073..dcd4091 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -4621,6 +4621,86 @@ GetInodeNumOut:
- 	return rc;
- }
- 
-+int
-+CIFSGetFileSrvInodeNumber(const int xid, struct cifs_tcon *tcon,
-+		      u16 netfid, __u64 *inode_number,
-+		      const struct nls_table *nls_codepage, int remap)
-+{
-+	int rc = 0;
-+	struct smb_t2_qfi_req *pSMB = NULL;
-+	struct smb_t2_qfi_rsp *pSMBr = NULL;
-+	int bytes_returned;
-+	__u16 params, byte_count;
-+
-+	cFYI(1, "In %s", __func__);
-+	if (tcon == NULL)
-+		return -ENODEV;
-+
-+FileGetInodeNumberRetry:
-+	rc = smb_init(SMB_COM_TRANSACTION2, 15, tcon, (void **) &pSMB,
-+		      (void **) &pSMBr);
-+	if (rc)
-+		return rc;
-+
-+	params = 2 /* level */  + 2 /* fid */;
-+	pSMB->t2.TotalDataCount = 0;
-+	pSMB->t2.MaxParameterCount = cpu_to_le16(4);
-+	/* BB find exact max data count below from sess structure BB */
-+	pSMB->t2.MaxDataCount = cpu_to_le16(CIFSMaxBufSize);
-+	pSMB->t2.MaxSetupCount = 0;
-+	pSMB->t2.Reserved = 0;
-+	pSMB->t2.Flags = 0;
-+	pSMB->t2.Timeout = 0;
-+	pSMB->t2.Reserved2 = 0;
-+	pSMB->t2.ParameterOffset = cpu_to_le16(offsetof(
-+		struct smb_com_transaction2_qpi_req, InformationLevel) - 4);
-+	pSMB->t2.DataCount = 0;
-+	pSMB->t2.DataOffset = 0;
-+	pSMB->t2.SetupCount = 1;
-+	pSMB->t2.Reserved3 = 0;
-+	pSMB->t2.SubCommand = cpu_to_le16(TRANS2_QUERY_FILE_INFORMATION);
-+	byte_count = params + 1 /* pad */ ;
-+	pSMB->t2.TotalParameterCount = cpu_to_le16(params);
-+	pSMB->t2.ParameterCount = pSMB->t2.TotalParameterCount;
-+	pSMB->Fid = cpu_to_le16(netfid);
-+	pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_FILE_INTERNAL_INFO);
-+	inc_rfc1001_len(pSMB, byte_count);
-+	pSMB->t2.ByteCount = cpu_to_le16(byte_count);
-+
-+	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
-+		(struct smb_hdr *) pSMBr, &bytes_returned, 0);
-+	if (rc) {
-+		cFYI(1, "error %d in QueryInternalInfo", rc);
-+	} else {
-+		/* decode response */
-+		rc = validate_t2((struct smb_t2_rsp *)pSMBr);
-+		/* BB also check enough total bytes returned */
-+		if (rc || get_bcc(&pSMBr->hdr) < 2)
-+			/* If rc should we check for EOPNOSUPP and
-+			disable the srvino flag? or in caller? */
-+			rc = -EIO;      /* bad smb */
-+		else {
-+			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
-+			__u16 count = le16_to_cpu(pSMBr->t2.DataCount);
-+			struct file_internal_info *pfinfo;
-+			/* BB Do we need a cast or hash here ? */
-+			if (count < 8) {
-+				cFYI(1, "Illegal size ret in FileQryIntrnlInf");
-+				rc = -EIO;
-+				goto FileGetInodeNumOut;
-+			}
-+			pfinfo = (struct file_internal_info *)
-+				(data_offset + (char *) &pSMBr->hdr.Protocol);
-+			*inode_number = le64_to_cpu(pfinfo->UniqueId);
-+		}
-+	}
-+FileGetInodeNumOut:
-+	cifs_buf_release(pSMB);
-+	if (rc == -EAGAIN)
-+		goto FileGetInodeNumberRetry;
-+	return rc;
-+}
-+
- /* parses DFS refferal V3 structure
-  * caller is responsible for freeing target_nodes
-  * returns:
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 745da3d..a7c07a0 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -604,7 +604,8 @@ int cifs_get_inode_info(struct inode **pinode,
- 	const unsigned char *full_path, FILE_ALL_INFO *pfindData,
- 	struct super_block *sb, int xid, const __u16 *pfid)
- {
--	int rc = 0, tmprc;
-+	__u16 fid;
-+	int rc = 0, rc2 = -EINVAL, tmprc, oplock = 0;
- 	struct cifs_tcon *pTcon;
- 	struct tcon_link *tlink;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-@@ -640,6 +641,23 @@ int cifs_get_inode_info(struct inode **pinode,
- 			      0 /* not legacy */,
- 			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+
-+		/*
-+		 * This sequence of calls is meant for a lookup operation
-+		 * that would otherwise fail since query path info has no
-+		 * means to indicate backup intent.
-+		 */
-+		if (rc == -EACCES && *pinode == NULL && backup_cred(cifs_sb)) {
-+			/* pfindData contains same info returned by qpathinfo */
-+			rc2 = CIFSSMBOpen(xid, pTcon, full_path,
-+				FILE_OPEN, GENERIC_READ,
-+				CREATE_OPEN_BACKUP_INTENT, &fid, &oplock,
-+				pfindData, cifs_sb->local_nls,
-+				cifs_sb->mnt_cifs_flags &
-+					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+			rc = rc2;
-+		}
-+
- 		/* BB optimize code so we do not make the above call
- 		when server claims no NT SMB support and the above call
- 		failed at least once - set flag in tcon or mount */
-@@ -683,7 +701,14 @@ int cifs_get_inode_info(struct inode **pinode,
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
- 			int rc1 = 0;
- 
--			rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
-+			if (!rc2)
-+				rc1 = CIFSGetFileSrvInodeNumber(xid, pTcon,
-+					fid, &fattr.cf_uniqueid,
-+					cifs_sb->local_nls,
-+					cifs_sb->mnt_cifs_flags &
-+						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+			else
-+				rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
- 					full_path, &fattr.cf_uniqueid,
- 					cifs_sb->local_nls,
- 					cifs_sb->mnt_cifs_flags &
-@@ -699,6 +724,8 @@ int cifs_get_inode_info(struct inode **pinode,
- 	} else {
- 		fattr.cf_uniqueid = CIFS_I(*pinode)->uniqueid;
- 	}
-+	if (!rc2)
-+		CIFSSMBClose(xid, pTcon, fid);
- 
- 	/* query for SFU type info if supported and needed */
- 	if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
+Merged...
 -- 
-1.6.0.2
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
