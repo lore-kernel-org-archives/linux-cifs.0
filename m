@@ -1,53 +1,73 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] Fix building with autoconf version older than 2.60.
-Date: Tue, 10 Jul 2012 13:17:39 -0400
-Message-ID: <20120710131739.09ef129b@tlielax.poochiereds.net>
-References: <1341854687-17786-1-git-send-email-asn@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Andreas Schneider <asn-a6JcYMd0PQ1abyy8hY48cw@public.gmane.org>
-To: Andreas Schneider <asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] Initialise mid_q_entry before putting it on the pending queue
+Date: Tue, 10 Jul 2012 19:58:40 +0100
+Message-ID: <1341946720-4980-1-git-send-email-sprabhu@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1341854687-17786-1-git-send-email-asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon,  9 Jul 2012 19:24:47 +0200
-Andreas Schneider <asn-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+A user reported a crash in cifs_demultiplex_thread() caused by an
+incorrectly set mid_q_entry->callback() function. It appears that the
+callback assignment made in cifs_call_async() was not flushed back to
+memory suggesting that a memory barrier was required here. Changing the
+code to make sure that the mid_q_entry structure was completely
+initialised before it was added to the pending queue fixes the problem.
 
-> From: Andreas Schneider <asn-a6JcYMd0PQ1abyy8hY48cw@public.gmane.org>
-> 
-> AC_PROG_SED is only avaliable in recent autoconf versions.
-> Use AC_CHECK_PROG instead if AC_PROG_SED is not present.
-> 
-> Signed-off-by: Andreas Schneider <asn-a6JcYMd0PQ1abyy8hY48cw@public.gmane.org>
-> ---
->  configure.ac |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/configure.ac b/configure.ac
-> index 0dd1155..f95a2de 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -44,10 +44,15 @@ AC_ARG_VAR(ROOTSBINDIR, [Location where files ordinarily under /sbin should be i
->  
->  # Checks for programs.
->  AC_PROG_CC
-> -AC_PROG_SED
->  AC_GNU_SOURCE
->  AM_PROG_CC_C_O
->  
-> +# AC_PROG_SED is only avaliable in recent autoconf versions.
-> +# Use AC_CHECK_PROG instead if AC_PROG_SED is not present.
-> +ifdef([AC_PROG_SED],
-> +      [AC_PROG_SED],
-> +      [AC_CHECK_PROG(SED, sed, sed)])
-> +
->  # Checks for typedefs, structures, and compiler characteristics.
->  AC_HEADER_STDBOOL
->  AC_TYPE_UID_T
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/transport.c |   20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-Merged...
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 3097ee5..c5faf02 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -365,14 +365,10 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
+ 	if (mid == NULL)
+ 		return -ENOMEM;
+ 
+-	/* put it on the pending_mid_q */
+-	spin_lock(&GlobalMid_Lock);
+-	list_add_tail(&mid->qhead, &server->pending_mid_q);
+-	spin_unlock(&GlobalMid_Lock);
+-
+ 	rc = cifs_sign_smb2(iov, nvec, server, &mid->sequence_number);
+ 	if (rc)
+-		delete_mid(mid);
++		DeleteMidQEntry(mid);
++
+ 	*ret_mid = mid;
+ 	return rc;
+ }
+@@ -407,17 +403,21 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+ 	mid->callback_data = cbdata;
+ 	mid->mid_state = MID_REQUEST_SUBMITTED;
+ 
++	/* put it on the pending_mid_q */
++	spin_lock(&GlobalMid_Lock);
++	list_add_tail(&mid->qhead, &server->pending_mid_q);
++	spin_unlock(&GlobalMid_Lock);
++
++
+ 	cifs_in_send_inc(server);
+ 	rc = smb_sendv(server, iov, nvec);
+ 	cifs_in_send_dec(server);
+ 	cifs_save_when_sent(mid);
+ 	mutex_unlock(&server->srv_mutex);
+ 
+-	if (rc)
+-		goto out_err;
++	if (rc == 0)
++		return 0;
+ 
+-	return rc;
+-out_err:
+ 	delete_mid(mid);
+ 	add_credits(server, 1);
+ 	wake_up(&server->request_q);
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.10.4
