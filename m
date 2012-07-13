@@ -1,148 +1,403 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 2/2] cifs: when CONFIG_HIGHMEM is set, serialize the
- read/write kmaps
-Date: Thu, 12 Jul 2012 13:52:44 -0400
-Message-ID: <20120712135244.27021ff7@corrin.poochiereds.net>
-References: <1342012176-14783-1-git-send-email-jlayton@redhat.com>
-	<1342012176-14783-3-git-send-email-jlayton@redhat.com>
-	<CAKywueT59Xe_1nnr8TNvDq7WCEdLAHM3evVqs0wyVatat+OcrA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH v3 01/32] CIFS: Move trans2 processing to ops struct
+Date: Fri, 13 Jul 2012 11:53:14 +0400
+Message-ID: <1342166025-29377-2-git-send-email-pshilovsky@samba.org>
+References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueT59Xe_1nnr8TNvDq7WCEdLAHM3evVqs0wyVatat+OcrA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1342166025-29377-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 12 Jul 2012 20:41:19 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |    3 +
+ fs/cifs/connect.c  |  161 +------------------------------------------------
+ fs/cifs/smb1ops.c  |  170 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 175 insertions(+), 159 deletions(-)
 
-> 2012/7/11 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > Jian found that when he ran fsx on a 32 bit arch with a large wsize the
-> > process and one of the bdi writeback kthreads would sometimes deadlock
-> > with a stack trace like this:
-> >
-> > crash> bt
-> > PID: 2789   TASK: f02edaa0  CPU: 3   COMMAND: "fsx"
-> >  #0 [eed63cbc] schedule at c083c5b3
-> >  #1 [eed63d80] kmap_high at c0500ec8
-> >  #2 [eed63db0] cifs_async_writev at f7fabcd7 [cifs]
-> >  #3 [eed63df0] cifs_writepages at f7fb7f5c [cifs]
-> >  #4 [eed63e50] do_writepages at c04f3e32
-> >  #5 [eed63e54] __filemap_fdatawrite_range at c04e152a
-> >  #6 [eed63ea4] filemap_fdatawrite at c04e1b3e
-> >  #7 [eed63eb4] cifs_file_aio_write at f7fa111a [cifs]
-> >  #8 [eed63ecc] do_sync_write at c052d202
-> >  #9 [eed63f74] vfs_write at c052d4ee
-> > #10 [eed63f94] sys_write at c052df4c
-> > #11 [eed63fb0] ia32_sysenter_target at c0409a98
-> >     EAX: 00000004  EBX: 00000003  ECX: abd73b73  EDX: 012a65c6
-> >     DS:  007b      ESI: 012a65c6  ES:  007b      EDI: 00000000
-> >     SS:  007b      ESP: bf8db178  EBP: bf8db1f8  GS:  0033
-> >     CS:  0073      EIP: 40000424  ERR: 00000004  EFLAGS: 00000246
-> >
-> > Each task would kmap part of its address array before getting stuck, but
-> > not enough to actually issue the write.
-> >
-> > This patch fixes this by serializing the marshal_iov operations for
-> > async reads and writes. The idea here is to ensure that cifs
-> > aggressively tries to populate a request before attempting to fulfill
-> > another one. As soon as all of the pages are kmapped for a request, then
-> > we can unlock and allow another one to proceed.
-> >
-> > There's no need to do this serialization on non-CONFIG_HIGHMEM arches
-> > however, so optimize all of this out when CONFIG_HIGHMEM isn't set.
-> >
-> > Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-> > Reported-by: Jian Li <jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifssmb.c |   30 +++++++++++++++++++++++++++++-
-> >  1 files changed, 29 insertions(+), 1 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> > index 0170ee8..684a072 100644
-> > --- a/fs/cifs/cifssmb.c
-> > +++ b/fs/cifs/cifssmb.c
-> > @@ -86,7 +86,31 @@ static struct {
-> >  #endif /* CONFIG_CIFS_WEAK_PW_HASH */
-> >  #endif /* CIFS_POSIX */
-> >
-> > -/* Forward declarations */
-> > +#ifdef CONFIG_HIGHMEM
-> > +/*
-> > + * On arches that have high memory, kmap address space is limited. By
-> > + * serializing the kmap operations on those arches, we ensure that we don't
-> > + * end up with a bunch of threads in writeback with partially mapped page
-> > + * arrays, stuck waiting for kmap to come back. That situation prevents
-> > + * progress and can deadlock.
-> > + */
-> > +static DEFINE_MUTEX(cifs_kmap_mutex);
-> > +
-> > +static inline void
-> > +cifs_kmap_lock(void)
-> > +{
-> > +       mutex_lock(&cifs_kmap_mutex);
-> > +}
-> > +
-> > +static inline void
-> > +cifs_kmap_unlock(void)
-> > +{
-> > +       mutex_unlock(&cifs_kmap_mutex);
-> > +}
-> > +#else /* !CONFIG_HIGHMEM */
-> > +#define cifs_kmap_lock() do { ; } while(0)
-> 
-> checkpatch.pl raises the "ERROR: space required before the open
-> parenthesis '('" error.
-> 
-> > +#define cifs_kmap_unlock() do { ; } while(0)
-> 
-> the same checkpatch.pl error.
-> 
-
-Ok...
-
-I fixed it in my cifs-next branch, but I'm not going to bother to
-re-post unless Steve asks otherwise.
-
-> > +#endif /* CONFIG_HIGHMEM */
-> >
-> >  /* Mark as invalid, all open files on tree connections since they
-> >     were closed when session to server was lost */
-> > @@ -1503,7 +1527,9 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
-> >         }
-> >
-> >         /* marshal up the page array */
-> > +       cifs_kmap_lock();
-> >         len = rdata->marshal_iov(rdata, data_len);
-> > +       cifs_kmap_unlock();
-> >         data_len -= len;
-> >
-> >         /* issue the read if we have any iovecs left to fill */
-> > @@ -2069,7 +2095,9 @@ cifs_async_writev(struct cifs_writedata *wdata)
-> >          * and set the iov_len properly for each one. It may also set
-> >          * wdata->bytes too.
-> >          */
-> > +       cifs_kmap_lock();
-> >         wdata->marshal_iov(iov, wdata);
-> > +       cifs_kmap_unlock();
-> >
-> >         cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
-> >
-> > --
-> > 1.7.7.6
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-
-
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 6df0cbe..2aac4e5 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -187,6 +187,9 @@ struct smb_version_operations {
+ 	/* verify the message */
+ 	int (*check_message)(char *, unsigned int);
+ 	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
++	/* process transaction2 response */
++	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
++			     char *, int);
+ };
+ 
+ struct smb_version_values {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 94b7788..7ada0ab 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -394,143 +394,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 	return rc;
+ }
+ 
+-/*
+-	return codes:
+-		0 	not a transact2, or all data present
+-		>0 	transact2 with that much data missing
+-		-EINVAL = invalid transact2
+-
+- */
+-static int check2ndT2(char *buf)
+-{
+-	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
+-	struct smb_t2_rsp *pSMBt;
+-	int remaining;
+-	__u16 total_data_size, data_in_this_rsp;
+-
+-	if (pSMB->Command != SMB_COM_TRANSACTION2)
+-		return 0;
+-
+-	/* check for plausible wct, bcc and t2 data and parm sizes */
+-	/* check for parm and data offset going beyond end of smb */
+-	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
+-		cFYI(1, "invalid transact2 word count");
+-		return -EINVAL;
+-	}
+-
+-	pSMBt = (struct smb_t2_rsp *)pSMB;
+-
+-	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+-	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
+-
+-	if (total_data_size == data_in_this_rsp)
+-		return 0;
+-	else if (total_data_size < data_in_this_rsp) {
+-		cFYI(1, "total data %d smaller than data in frame %d",
+-			total_data_size, data_in_this_rsp);
+-		return -EINVAL;
+-	}
+-
+-	remaining = total_data_size - data_in_this_rsp;
+-
+-	cFYI(1, "missing %d bytes from transact2, check next response",
+-		remaining);
+-	if (total_data_size > CIFSMaxBufSize) {
+-		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
+-			total_data_size, CIFSMaxBufSize);
+-		return -EINVAL;
+-	}
+-	return remaining;
+-}
+-
+-static int coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+-{
+-	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
+-	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
+-	char *data_area_of_tgt;
+-	char *data_area_of_src;
+-	int remaining;
+-	unsigned int byte_count, total_in_tgt;
+-	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
+-
+-	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
+-	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+-
+-	if (tgt_total_cnt != src_total_cnt)
+-		cFYI(1, "total data count of primary and secondary t2 differ "
+-			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
+-
+-	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
+-
+-	remaining = tgt_total_cnt - total_in_tgt;
+-
+-	if (remaining < 0) {
+-		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
+-			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
+-		return -EPROTO;
+-	}
+-
+-	if (remaining == 0) {
+-		/* nothing to do, ignore */
+-		cFYI(1, "no more data remains");
+-		return 0;
+-	}
+-
+-	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
+-	if (remaining < total_in_src)
+-		cFYI(1, "transact2 2nd response contains too much data");
+-
+-	/* find end of first SMB data area */
+-	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
+-				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
+-
+-	/* validate target area */
+-	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
+-				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
+-
+-	data_area_of_tgt += total_in_tgt;
+-
+-	total_in_tgt += total_in_src;
+-	/* is the result too big for the field? */
+-	if (total_in_tgt > USHRT_MAX) {
+-		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
+-		return -EPROTO;
+-	}
+-	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
+-
+-	/* fix up the BCC */
+-	byte_count = get_bcc(target_hdr);
+-	byte_count += total_in_src;
+-	/* is the result too big for the field? */
+-	if (byte_count > USHRT_MAX) {
+-		cFYI(1, "coalesced BCC too large (%u)", byte_count);
+-		return -EPROTO;
+-	}
+-	put_bcc(byte_count, target_hdr);
+-
+-	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
+-	byte_count += total_in_src;
+-	/* don't allow buffer to overflow */
+-	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+-		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
+-		return -ENOBUFS;
+-	}
+-	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
+-
+-	/* copy second buffer into end of first buffer */
+-	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
+-
+-	if (remaining != total_in_src) {
+-		/* more responses to go */
+-		cFYI(1, "waiting for more secondary responses");
+-		return 1;
+-	}
+-
+-	/* we are done */
+-	cFYI(1, "found the last secondary response");
+-	return 0;
+-}
+-
+ static void
+ cifs_echo_request(struct work_struct *work)
+ {
+@@ -803,29 +666,9 @@ static void
+ handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 	   char *buf, int malformed)
+ {
+-	if (malformed == 0 && check2ndT2(buf) > 0) {
+-		mid->multiRsp = true;
+-		if (mid->resp_buf) {
+-			/* merge response - fix up 1st*/
+-			malformed = coalesce_t2(buf, mid->resp_buf);
+-			if (malformed > 0)
+-				return;
+-
+-			/* All parts received or packet is malformed. */
+-			mid->multiEnd = true;
+-			return dequeue_mid(mid, malformed);
+-		}
+-		if (!server->large_buf) {
+-			/*FIXME: switch to already allocated largebuf?*/
+-			cERROR(1, "1st trans2 resp needs bigbuf");
+-		} else {
+-			/* Have first buffer */
+-			mid->resp_buf = buf;
+-			mid->large_buf = true;
+-			server->bigbuf = NULL;
+-		}
++	if (server->ops->check_trans2 &&
++	    server->ops->check_trans2(mid, server, buf, malformed))
+ 		return;
+-	}
+ 	mid->resp_buf = buf;
+ 	mid->large_buf = server->large_buf;
+ 	/* Was previous buf put in mpx struct for multi-rsp? */
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 6dec38f..28359e7 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -213,6 +213,175 @@ cifs_get_next_mid(struct TCP_Server_Info *server)
+ 	return mid;
+ }
+ 
++/*
++	return codes:
++		0	not a transact2, or all data present
++		>0	transact2 with that much data missing
++		-EINVAL	invalid transact2
++ */
++static int
++check2ndT2(char *buf)
++{
++	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
++	struct smb_t2_rsp *pSMBt;
++	int remaining;
++	__u16 total_data_size, data_in_this_rsp;
++
++	if (pSMB->Command != SMB_COM_TRANSACTION2)
++		return 0;
++
++	/* check for plausible wct, bcc and t2 data and parm sizes */
++	/* check for parm and data offset going beyond end of smb */
++	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
++		cFYI(1, "invalid transact2 word count");
++		return -EINVAL;
++	}
++
++	pSMBt = (struct smb_t2_rsp *)pSMB;
++
++	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
++	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
++
++	if (total_data_size == data_in_this_rsp)
++		return 0;
++	else if (total_data_size < data_in_this_rsp) {
++		cFYI(1, "total data %d smaller than data in frame %d",
++			total_data_size, data_in_this_rsp);
++		return -EINVAL;
++	}
++
++	remaining = total_data_size - data_in_this_rsp;
++
++	cFYI(1, "missing %d bytes from transact2, check next response",
++		remaining);
++	if (total_data_size > CIFSMaxBufSize) {
++		cERROR(1, "TotalDataSize %d is over maximum buffer %d",
++			total_data_size, CIFSMaxBufSize);
++		return -EINVAL;
++	}
++	return remaining;
++}
++
++static int
++coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
++{
++	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
++	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
++	char *data_area_of_tgt;
++	char *data_area_of_src;
++	int remaining;
++	unsigned int byte_count, total_in_tgt;
++	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
++
++	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
++	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
++
++	if (tgt_total_cnt != src_total_cnt)
++		cFYI(1, "total data count of primary and secondary t2 differ "
++			"source=%hu target=%hu", src_total_cnt, tgt_total_cnt);
++
++	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
++
++	remaining = tgt_total_cnt - total_in_tgt;
++
++	if (remaining < 0) {
++		cFYI(1, "Server sent too much data. tgt_total_cnt=%hu "
++			"total_in_tgt=%hu", tgt_total_cnt, total_in_tgt);
++		return -EPROTO;
++	}
++
++	if (remaining == 0) {
++		/* nothing to do, ignore */
++		cFYI(1, "no more data remains");
++		return 0;
++	}
++
++	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
++	if (remaining < total_in_src)
++		cFYI(1, "transact2 2nd response contains too much data");
++
++	/* find end of first SMB data area */
++	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
++				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
++
++	/* validate target area */
++	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
++				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
++
++	data_area_of_tgt += total_in_tgt;
++
++	total_in_tgt += total_in_src;
++	/* is the result too big for the field? */
++	if (total_in_tgt > USHRT_MAX) {
++		cFYI(1, "coalesced DataCount too large (%u)", total_in_tgt);
++		return -EPROTO;
++	}
++	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
++
++	/* fix up the BCC */
++	byte_count = get_bcc(target_hdr);
++	byte_count += total_in_src;
++	/* is the result too big for the field? */
++	if (byte_count > USHRT_MAX) {
++		cFYI(1, "coalesced BCC too large (%u)", byte_count);
++		return -EPROTO;
++	}
++	put_bcc(byte_count, target_hdr);
++
++	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
++	byte_count += total_in_src;
++	/* don't allow buffer to overflow */
++	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
++		cFYI(1, "coalesced BCC exceeds buffer size (%u)", byte_count);
++		return -ENOBUFS;
++	}
++	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
++
++	/* copy second buffer into end of first buffer */
++	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
++
++	if (remaining != total_in_src) {
++		/* more responses to go */
++		cFYI(1, "waiting for more secondary responses");
++		return 1;
++	}
++
++	/* we are done */
++	cFYI(1, "found the last secondary response");
++	return 0;
++}
++
++static bool
++cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
++		  char *buf, int malformed)
++{
++	if (malformed)
++		return false;
++	if (check2ndT2(buf) <= 0)
++		return false;
++	mid->multiRsp = true;
++	if (mid->resp_buf) {
++		/* merge response - fix up 1st*/
++		malformed = coalesce_t2(buf, mid->resp_buf);
++		if (malformed > 0)
++			return true;
++		/* All parts received or packet is malformed. */
++		mid->multiEnd = true;
++		dequeue_mid(mid, malformed);
++		return true;
++	}
++	if (!server->large_buf) {
++		/*FIXME: switch to already allocated largebuf?*/
++		cERROR(1, "1st trans2 resp needs bigbuf");
++	} else {
++		/* Have first buffer */
++		mid->resp_buf = buf;
++		mid->large_buf = true;
++		server->bigbuf = NULL;
++	}
++	return true;
++}
++
+ struct smb_version_operations smb1_operations = {
+ 	.send_cancel = send_nt_cancel,
+ 	.compare_fids = cifs_compare_fids,
+@@ -229,6 +398,7 @@ struct smb_version_operations smb1_operations = {
+ 	.check_message = checkSMB,
+ 	.dump_detail = cifs_dump_detail,
+ 	.is_oplock_break = is_valid_oplock_break,
++	.check_trans2 = cifs_check_trans2,
+ };
+ 
+ struct smb_version_values smb1_values = {
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.1
