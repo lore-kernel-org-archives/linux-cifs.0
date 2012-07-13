@@ -1,30 +1,27 @@
-From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v3 00/32] Get SMB2 mount work
-Date: Fri, 13 Jul 2012 14:30:57 +0400
-Message-ID: <CAKywueQPMUnJ_LYA5eH9vrGp8+8hBx-63529upde+h4o7=Uz_g@mail.gmail.com>
-References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: oplock break problem
+Date: Fri, 13 Jul 2012 16:19:25 +0400
+Message-ID: <CAKywueS6zSQr_8cvQ64XNrVXR23Kwz4tc_BAd-9aP2wJGa0hMQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342166025-29377-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/7/13 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> This version has the following changes:
-> 1) patchset included "transport/session code move to ops struct" patchset
-> 2) fixed credit patch
-> 3) added echo patches
-> 4) STATUS_* errors became __constant_cpu_to_le32
-> 5) improved coding style
-> 6) rebased on top of vfs atomic-open changes
->
-> Available on git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-mount
+Hi there!
 
-I've also recreated 'for-next' branch that consists the same set of my
-patches that Steve's 'for-next' has (but of course on top of
-atomic-open changes).
+I faced with an interesting problem:
+Windows 7 send lease break just after granted lease on open - so, we
+don't have time to populate cifsFileInfo structure and can't determine
+oplock break because we simply don't find appropriate fid. I think
+this problem can be happen for CIFS/SMB2.0 too (e.g. if another client
+opens the file just after us).
+
+So, what do you think about creating delegating the oplock break
+processing to workqueue and return to demultiplex thread immideately?
+It give us a small timeout itself and we can set another defined
+timeout explicitly.
 
 -- 
 Best regards,
