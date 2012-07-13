@@ -1,238 +1,191 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 18/32] CIFS: Process reconnects for SMB2 shares
-Date: Fri, 13 Jul 2012 11:53:31 +0400
-Message-ID: <1342166025-29377-19-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 19/32] CIFS: Move getting dfs referalls to ops struct
+Date: Fri, 13 Jul 2012 11:53:32 +0400
+Message-ID: <1342166025-29377-20-git-send-email-pshilovsky@samba.org>
 References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1342166025-29377-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    1 +
- fs/cifs/cifssmb.c   |   21 +++++---
- fs/cifs/connect.c   |    3 +
- fs/cifs/smb2pdu.c   |  127 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 143 insertions(+), 9 deletions(-)
+ fs/cifs/cifsglob.h  |    5 +++++
+ fs/cifs/cifsproto.h |   15 +++++++--------
+ fs/cifs/cifssmb.c   |   13 ++++++-------
+ fs/cifs/connect.c   |   15 ++++++++-------
+ fs/cifs/smb1ops.c   |    1 +
+ 5 files changed, 27 insertions(+), 22 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ef4e0a0..2d80d82 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -162,6 +162,7 @@ struct TCP_Server_Info;
+ struct cifsFileInfo;
+ struct cifs_ses;
+ struct cifs_tcon;
++struct dfs_info3_param;
+ 
+ struct smb_version_operations {
+ 	int (*send_cancel)(struct TCP_Server_Info *, void *,
+@@ -208,6 +209,10 @@ struct smb_version_operations {
+ 			    struct cifs_tcon *, const struct nls_table *);
+ 	/* close tree connecion */
+ 	int (*tree_disconnect)(const unsigned int, struct cifs_tcon *);
++	/* get DFS referrals */
++	int (*get_dfs_refer)(const unsigned int, struct cifs_ses *,
++			     const char *, struct dfs_info3_param **,
++			     unsigned int *, const struct nls_table *, int);
+ };
+ 
+ struct smb_version_values {
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 692d283..3426175 100644
+index 3426175..afe7f25 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -171,6 +171,7 @@ extern struct smb_vol *cifs_get_volume_info(char *mount_data,
- 					    const char *devname);
- extern int cifs_mount(struct cifs_sb_info *, struct smb_vol *);
- extern void cifs_umount(struct cifs_sb_info *);
-+extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
+@@ -226,17 +226,16 @@ extern int CIFSSMBUnixQPathInfo(const unsigned int xid,
+ 			const struct nls_table *nls_codepage, int remap);
  
- #if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
- extern void cifs_dfs_release_automount_timer(void);
+ extern int CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+-			const unsigned char *searchName,
+-			struct dfs_info3_param **target_nodes,
+-			unsigned int *number_of_nodes_in_array,
+-			const struct nls_table *nls_codepage, int remap);
++			   const char *search_name,
++			   struct dfs_info3_param **target_nodes,
++			   unsigned int *num_of_nodes,
++			   const struct nls_table *nls_codepage, int remap);
+ 
+-extern int get_dfs_path(unsigned int xid, struct cifs_ses *pSesInfo,
++extern int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
+ 			const char *old_path,
+ 			const struct nls_table *nls_codepage,
+-			unsigned int *pnum_referrals,
+-			struct dfs_info3_param **preferrals,
+-			int remap);
++			unsigned int *num_referrals,
++			struct dfs_info3_param **referrals, int remap);
+ extern void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+ 				 struct cifs_sb_info *cifs_sb,
+ 				 struct smb_vol *vol);
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 409f5b0..19c3e56 100644
+index 19c3e56..36b8481 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -112,24 +112,29 @@ cifs_kmap_unlock(void)
- #define cifs_kmap_unlock() do { ; } while(0)
- #endif /* CONFIG_HIGHMEM */
+@@ -4768,8 +4768,7 @@ parse_DFS_referrals_exit:
  
--/* Mark as invalid, all open files on tree connections since they
--   were closed when session to server was lost */
--static void mark_open_files_invalid(struct cifs_tcon *pTcon)
-+/*
-+ * Mark as invalid, all open files on tree connections since they
-+ * were closed when session to server was lost.
-+ */
-+void
-+cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ int
+ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+-		const unsigned char *searchName,
+-		struct dfs_info3_param **target_nodes,
++		const char *search_name, struct dfs_info3_param **target_nodes,
+ 		unsigned int *num_of_nodes,
+ 		const struct nls_table *nls_codepage, int remap)
  {
- 	struct cifsFileInfo *open_file = NULL;
- 	struct list_head *tmp;
- 	struct list_head *tmp1;
+@@ -4783,7 +4782,7 @@ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+ 	*num_of_nodes = 0;
+ 	*target_nodes = NULL;
  
--/* list all files open on tree connection and mark them invalid */
-+	/* list all files open on tree connection and mark them invalid */
- 	spin_lock(&cifs_file_list_lock);
--	list_for_each_safe(tmp, tmp1, &pTcon->openFileList) {
-+	list_for_each_safe(tmp, tmp1, &tcon->openFileList) {
- 		open_file = list_entry(tmp, struct cifsFileInfo, tlist);
- 		open_file->invalidHandle = true;
- 		open_file->oplock_break_cancelled = true;
+-	cFYI(1, "In GetDFSRefer the path %s", searchName);
++	cFYI(1, "In GetDFSRefer the path %s", search_name);
+ 	if (ses == NULL)
+ 		return -ENODEV;
+ getDFSRetry:
+@@ -4806,14 +4805,14 @@ getDFSRetry:
+ 		pSMB->hdr.Flags2 |= SMBFLG2_UNICODE;
+ 		name_len =
+ 		    cifsConvertToUTF16((__le16 *) pSMB->RequestFileName,
+-				       searchName, PATH_MAX, nls_codepage,
++				       search_name, PATH_MAX, nls_codepage,
+ 				       remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+ 	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(searchName, PATH_MAX);
++		name_len = strnlen(search_name, PATH_MAX);
+ 		name_len++;	/* trailing null */
+-		strncpy(pSMB->RequestFileName, searchName, name_len);
++		strncpy(pSMB->RequestFileName, search_name, name_len);
  	}
- 	spin_unlock(&cifs_file_list_lock);
--	/* BB Add call to invalidate_inodes(sb) for all superblocks mounted
--	   to this tcon */
-+	/*
-+	 * BB Add call to invalidate_inodes(sb) for all superblocks mounted
-+	 * to this tcon.
-+	 */
- }
  
- /* reconnect the socket, tcon, and smb session if needed */
-@@ -209,7 +214,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 		goto out;
- 	}
+ 	if (ses->server) {
+@@ -4869,7 +4868,7 @@ getDFSRetry:
+ 	/* parse returned result into more usable form */
+ 	rc = parse_DFS_referrals(pSMBr, num_of_nodes,
+ 				 target_nodes, nls_codepage, remap,
+-				 searchName);
++				 search_name);
  
--	mark_open_files_invalid(tcon);
-+	cifs_mark_open_files_invalid(tcon);
- 	rc = CIFSTCon(0, ses, tcon->treeName, tcon, nls_codepage);
- 	mutex_unlock(&ses->session_mutex);
- 	cFYI(1, "reconnect tcon rc = %d", rc);
+ GetDFSRefExit:
+ 	cifs_buf_release(pSMB);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c19caa7..dc3383a 100644
+index dc3383a..609e6f5 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -316,6 +316,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		server->tcpStatus = CifsNeedReconnect;
- 	spin_unlock(&GlobalMid_Lock);
- 	server->maxBuf = 0;
-+#ifdef CONFIG_CIFS_SMB2
-+	server->max_read = 0;
-+#endif
- 
- 	cFYI(1, "Reconnecting tcp session");
- 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1bf037e..48c04b2 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -127,7 +127,132 @@ static int
- smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- {
- 	int rc = 0;
--	/* BB add missing code here */
-+	struct nls_table *nls_codepage;
-+	struct cifs_ses *ses;
-+	struct TCP_Server_Info *server;
-+
-+	/*
-+	 * SMB2s NegProt, SessSetup, Logoff do not have tcon yet so
-+	 * check for tcp and smb session status done differently
-+	 * for those three - in the calling routine.
-+	 */
-+	if (tcon == NULL)
-+		return rc;
-+
-+	if (smb2_command == SMB2_TREE_CONNECT)
-+		return rc;
-+
-+	if (tcon->tidStatus == CifsExiting) {
-+		/*
-+		 * only tree disconnect, open, and write,
-+		 * (and ulogoff which does not have tcon)
-+		 * are allowed as we start force umount.
-+		 */
-+		if ((smb2_command != SMB2_WRITE) &&
-+		   (smb2_command != SMB2_CREATE) &&
-+		   (smb2_command != SMB2_TREE_DISCONNECT)) {
-+			cFYI(1, "can not send cmd %d while umounting",
-+				smb2_command);
-+			return -ENODEV;
-+		}
-+	}
-+	if ((!tcon->ses) || (tcon->ses->status == CifsExiting) ||
-+	    (!tcon->ses->server))
-+		return -EIO;
-+
-+	ses = tcon->ses;
-+	server = ses->server;
-+
-+	/*
-+	 * Give demultiplex thread up to 10 seconds to reconnect, should be
-+	 * greater than cifs socket timeout which is 7 seconds
-+	 */
-+	while (server->tcpStatus == CifsNeedReconnect) {
-+		/*
-+		 * Return to caller for TREE_DISCONNECT and LOGOFF and CLOSE
-+		 * here since they are implicitly done when session drops.
-+		 */
-+		switch (smb2_command) {
-+		/*
-+		 * BB Should we keep oplock break and add flush to exceptions?
-+		 */
-+		case SMB2_TREE_DISCONNECT:
-+		case SMB2_CANCEL:
-+		case SMB2_CLOSE:
-+		case SMB2_OPLOCK_BREAK:
-+			return -EAGAIN;
-+		}
-+
-+		wait_event_interruptible_timeout(server->response_q,
-+			(server->tcpStatus != CifsNeedReconnect), 10 * HZ);
-+
-+		/* are we still trying to reconnect? */
-+		if (server->tcpStatus != CifsNeedReconnect)
-+			break;
-+
-+		/*
-+		 * on "soft" mounts we wait once. Hard mounts keep
-+		 * retrying until process is killed or server comes
-+		 * back on-line
-+		 */
-+		if (!tcon->retry) {
-+			cFYI(1, "gave up waiting on reconnect in smb_init");
-+			return -EHOSTDOWN;
-+		}
-+	}
-+
-+	if (!tcon->ses->need_reconnect && !tcon->need_reconnect)
-+		return rc;
-+
-+	nls_codepage = load_nls_default();
-+
-+	/*
-+	 * need to prevent multiple threads trying to simultaneously reconnect
-+	 * the same SMB session
-+	 */
-+	mutex_lock(&tcon->ses->session_mutex);
-+	rc = cifs_negotiate_protocol(0, tcon->ses);
-+	if (!rc && tcon->ses->need_reconnect)
-+		rc = cifs_setup_session(0, tcon->ses, nls_codepage);
-+
-+	if (rc || !tcon->need_reconnect) {
-+		mutex_unlock(&tcon->ses->session_mutex);
-+		goto out;
-+	}
-+
-+	cifs_mark_open_files_invalid(tcon);
-+	rc = SMB2_tcon(0, tcon->ses, tcon->treeName, tcon, nls_codepage);
-+	mutex_unlock(&tcon->ses->session_mutex);
-+	cFYI(1, "reconnect tcon rc = %d", rc);
-+	if (rc)
-+		goto out;
-+	atomic_inc(&tconInfoReconnectCount);
-+	/*
-+	 * BB FIXME add code to check if wsize needs update due to negotiated
-+	 * smb buffer size shrinking.
-+	 */
-+out:
-+	/*
-+	 * Check if handle based operation so we know whether we can continue
-+	 * or not without returning to caller to reset file handle.
-+	 */
-+	/*
-+	 * BB Is flush done by server on drop of tcp session? Should we special
-+	 * case it and skip above?
-+	 */
-+	switch (smb2_command) {
-+	case SMB2_FLUSH:
-+	case SMB2_READ:
-+	case SMB2_WRITE:
-+	case SMB2_LOCK:
-+	case SMB2_IOCTL:
-+	case SMB2_QUERY_DIRECTORY:
-+	case SMB2_CHANGE_NOTIFY:
-+	case SMB2_QUERY_INFO:
-+	case SMB2_SET_INFO:
-+		return -EAGAIN;
-+	}
-+	unload_nls(nls_codepage);
- 	return rc;
+@@ -2766,14 +2766,14 @@ out:
  }
  
+ int
+-get_dfs_path(unsigned int xid, struct cifs_ses *ses, const char *old_path,
++get_dfs_path(const unsigned int xid, struct cifs_ses *ses, const char *old_path,
+ 	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
+ 	     struct dfs_info3_param **referrals, int remap)
+ {
+ 	char *temp_unc;
+ 	int rc = 0;
+ 
+-	if (!ses->server->ops->tree_connect)
++	if (!ses->server->ops->tree_connect || !ses->server->ops->get_dfs_refer)
+ 		return -ENOSYS;
+ 
+ 	*num_referrals = 0;
+@@ -2795,11 +2795,12 @@ get_dfs_path(unsigned int xid, struct cifs_ses *ses, const char *old_path,
+ 		kfree(temp_unc);
+ 	}
+ 	if (rc == 0)
+-		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
+-				     num_referrals, nls_codepage, remap);
++		rc = ses->server->ops->get_dfs_refer(xid, ses, old_path,
++						     referrals, num_referrals,
++						     nls_codepage, remap);
+ 	/*
+ 	 * BB - map targetUNCs to dfs_info3 structures, here or in
+-	 * CIFSGetDFSRefer.
++	 * ses->server->ops->get_dfs_refer.
+ 	 */
+ 
+ 	return rc;
+@@ -3487,7 +3488,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
+  * determine whether there were referrals.
+  */
+ static int
+-expand_dfs_referral(unsigned int xid, struct cifs_ses *pSesInfo,
++expand_dfs_referral(const unsigned int xid, struct cifs_ses *ses,
+ 		    struct smb_vol *volume_info, struct cifs_sb_info *cifs_sb,
+ 		    int check_prefix)
+ {
+@@ -3503,7 +3504,7 @@ expand_dfs_referral(unsigned int xid, struct cifs_ses *pSesInfo,
+ 	/* For DFS paths, skip the first '\' of the UNC */
+ 	ref_path = check_prefix ? full_path + 1 : volume_info->UNC + 1;
+ 
+-	rc = get_dfs_path(xid, pSesInfo , ref_path, cifs_sb->local_nls,
++	rc = get_dfs_path(xid, ses, ref_path, cifs_sb->local_nls,
+ 			  &num_referrals, &referrals,
+ 			  cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 8f87386..6d9025b 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -434,6 +434,7 @@ struct smb_version_operations smb1_operations = {
+ 	.logoff = CIFSSMBLogoff,
+ 	.tree_connect = CIFSTCon,
+ 	.tree_disconnect = CIFSSMBTDis,
++	.get_dfs_refer = CIFSGetDFSRefer,
+ };
+ 
+ struct smb_version_values smb1_values = {
 -- 
 1.7.1
