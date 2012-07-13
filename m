@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 15/32] CIFS: Add capability to send SMB2 negotiate message
-Date: Fri, 13 Jul 2012 11:53:28 +0400
-Message-ID: <1342166025-29377-16-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 17/32] CIFS: Add tree connect/disconnect capability for SMB2
+Date: Fri, 13 Jul 2012 11:53:30 +0400
+Message-ID: <1342166025-29377-18-git-send-email-pshilovsky@samba.org>
 References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
 Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -12,567 +12,333 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-and add negotiate request type to let set_credits know that
-we are only on negotiate stage and no need to make a decision
-about disabling echos and oplocks.
-
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/Makefile    |    3 +-
- fs/cifs/cifsglob.h  |   13 ++-
- fs/cifs/cifssmb.c   |    7 -
- fs/cifs/smb2misc.c  |    7 +-
- fs/cifs/smb2ops.c   |   22 ++++-
- fs/cifs/smb2pdu.c   |  330 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   |   39 ++++++
- fs/cifs/smb2proto.h |    7 +
- 8 files changed, 417 insertions(+), 11 deletions(-)
- create mode 100644 fs/cifs/smb2pdu.c
+ fs/cifs/cifs_unicode.c |    1 -
+ fs/cifs/cifs_unicode.h |    1 -
+ fs/cifs/cifsglob.h     |   11 +++-
+ fs/cifs/smb2ops.c      |    2 +
+ fs/cifs/smb2pdu.c      |  159 +++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2pdu.h      |   57 +++++++++++++++++
+ fs/cifs/smb2proto.h    |    4 +
+ 7 files changed, 230 insertions(+), 5 deletions(-)
 
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index b77e9ec..daf6837 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -16,4 +16,5 @@ cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index fbb9da9..97c1d42 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -330,4 +330,3 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
+ ctoUTF16_out:
+ 	return i;
+ }
+-
+diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
+index a513a54..a44c6eb 100644
+--- a/fs/cifs/cifs_unicode.h
++++ b/fs/cifs/cifs_unicode.h
+@@ -84,7 +84,6 @@ char *cifs_strndup_from_utf16(const char *src, const int maxlen,
+ 			      const struct nls_table *codepage);
+ extern int cifsConvertToUTF16(__le16 *target, const char *source, int maxlen,
+ 			      const struct nls_table *cp, int mapChars);
+-
+ #endif
  
- cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
- 
--cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o smb2misc.o
-+cifs-$(CONFIG_CIFS_SMB2) += smb2ops.o smb2maperror.o smb2transport.o \
-+			    smb2misc.o smb2pdu.o
+ /*
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 480b638..2d48f88 100644
+index 0d78bc4..ef4e0a0 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -313,6 +313,12 @@ get_rfc1002_length(void *buf)
- 	return be32_to_cpu(*((__be32 *)buf));
- }
- 
-+static inline void
-+inc_rfc1001_len(void *buf, int count)
-+{
-+	be32_add_cpu((__be32 *)buf, count);
-+}
-+
- struct TCP_Server_Info {
- 	struct list_head tcp_ses_list;
- 	struct list_head smb_ses_list;
-@@ -393,6 +399,10 @@ struct TCP_Server_Info {
- 	atomic_t in_send; /* requests trying to send */
- 	atomic_t num_waiters;   /* blocked waiting to get in sendrecv */
- #endif
+@@ -528,7 +528,7 @@ struct cifs_tcon {
+ 	char treeName[MAX_TREE_SIZE + 1]; /* UNC name of resource in ASCII */
+ 	char *nativeFileSystem;
+ 	char *password;		/* for share-level security */
+-	__u16 tid;		/* The 2 byte tree id */
++	__u32 tid;		/* The 4 byte tree id */
+ 	__u16 Flags;		/* optional support bits */
+ 	enum statusEnum tidStatus;
+ #ifdef CONFIG_CIFS_STATS
+@@ -584,6 +584,15 @@ struct cifs_tcon {
+ 	bool local_lease:1; /* check leases (only) on local system not remote */
+ 	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
+ 	bool need_reconnect:1; /* connection reset, tid now invalid */
 +#ifdef CONFIG_CIFS_SMB2
-+	unsigned int	max_read;
-+	unsigned int	max_write;
++	bool print:1;		/* set if connection to printer share */
++	bool bad_network_name:1; /* set if ret status STATUS_BAD_NETWORK_NAME */
++	__u32 capabilities;
++	__u32 share_flags;
++	__u32 maximal_access;
++	__u32 vol_serial_number;
++	__le64 vol_create_time;
 +#endif /* CONFIG_CIFS_SMB2 */
- };
- 
- static inline unsigned int
-@@ -986,7 +996,8 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- /* Type of request operation */
- #define   CIFS_ECHO_OP      0x080    /* echo request */
- #define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
--#define   CIFS_OP_MASK     0x0180    /* mask request type */
-+#define   CIFS_NEG_OP      0x0200    /* negotiate request */
-+#define   CIFS_OP_MASK     0x0380    /* mask request type */
- 
- /* Security Flags: indicate type of session setup needed */
- #define   CIFSSEC_MAY_SIGN	0x00001
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 28b5116..409f5b0 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -388,13 +388,6 @@ vt2_err:
- 	return -EINVAL;
- }
- 
--static inline void inc_rfc1001_len(void *pSMB, int count)
--{
--	struct smb_hdr *hdr = (struct smb_hdr *)pSMB;
--
--	be32_add_cpu(&hdr->smb_buf_length, count);
--}
--
- int
- CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
- {
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index d422678..e4dede4 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -199,7 +199,7 @@ static const bool has_smb2_data_area[NUMBER_OF_SMB2_COMMANDS] = {
-  * Returns the pointer to the beginning of the data area. Length of the data
-  * area and the offset to it (from the beginning of the smb are also returned.
-  */
--static char *
-+char *
- smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
- {
- 	*off = 0;
-@@ -218,6 +218,11 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr)
- 	 */
- 	switch (hdr->Command) {
- 	case SMB2_NEGOTIATE:
-+		*off = le16_to_cpu(
-+		    ((struct smb2_negotiate_rsp *)hdr)->SecurityBufferOffset);
-+		*len = le16_to_cpu(
-+		    ((struct smb2_negotiate_rsp *)hdr)->SecurityBufferLength);
-+		break;
- 	case SMB2_SESSION_SETUP:
- 	case SMB2_CREATE:
- 	case SMB2_READ:
+ #ifdef CONFIG_CIFS_FSCACHE
+ 	u64 resource_id;		/* server resource id */
+ 	struct fscache_cookie *fscache;	/* cookie for share */
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index c6f8154..2b5232b 100644
+index 0057861..0e33ca3 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -61,7 +61,7 @@ smb2_add_credits(struct TCP_Server_Info *server, const unsigned int add,
- 	val = server->ops->get_credits_field(server, optype);
- 	*val += add;
- 	server->in_flight--;
--	if (server->in_flight == 0)
-+	if (server->in_flight == 0 && (optype & CIFS_OP_MASK) != CIFS_NEG_OP)
- 		rc = change_conf(server);
- 	spin_unlock(&server->req_lock);
- 	wake_up(&server->request_q);
-@@ -139,6 +139,24 @@ smb2_dump_detail(void *buf)
- #endif
- }
- 
-+static bool
-+smb2_need_neg(struct TCP_Server_Info *server)
-+{
-+	return server->max_read == 0;
-+}
-+
-+static int
-+smb2_negotiate(const unsigned int xid, struct cifs_ses *ses)
-+{
-+	int rc;
-+	ses->server->CurrentMid = 0;
-+	rc = SMB2_negotiate(xid, ses);
-+	/* BB we probably don't need to retry with modern servers */
-+	if (rc == -EAGAIN)
-+		rc = -EHOSTDOWN;
-+	return rc;
-+}
-+
- struct smb_version_operations smb21_operations = {
- 	.setup_request = smb2_setup_request,
- 	.check_receive = smb2_check_receive,
-@@ -150,6 +168,8 @@ struct smb_version_operations smb21_operations = {
- 	.find_mid = smb2_find_mid,
- 	.check_message = smb2_check_message,
- 	.dump_detail = smb2_dump_detail,
-+	.need_neg = smb2_need_neg,
-+	.negotiate = smb2_negotiate,
+@@ -172,6 +172,8 @@ struct smb_version_operations smb21_operations = {
+ 	.negotiate = smb2_negotiate,
+ 	.sess_setup = SMB2_sess_setup,
+ 	.logoff = SMB2_logoff,
++	.tree_connect = SMB2_tcon,
++	.tree_disconnect = SMB2_tdis,
  };
  
  struct smb_version_values smb21_values = {
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-new file mode 100644
-index 0000000..719e4c4
---- /dev/null
+index 2165f0d..1bf037e 100644
+--- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -0,0 +1,330 @@
-+/*
-+ *   fs/cifs/smb2pdu.c
-+ *
-+ *   Copyright (C) International Business Machines  Corp., 2009, 2011
-+ *                 Etersoft, 2012
-+ *   Author(s): Steve French (sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org)
-+ *              Pavel Shilovsky (pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org) 2012
-+ *
-+ *   Contains the routines for constructing the SMB2 PDUs themselves
-+ *
-+ *   This library is free software; you can redistribute it and/or modify
-+ *   it under the terms of the GNU Lesser General Public License as published
-+ *   by the Free Software Foundation; either version 2.1 of the License, or
-+ *   (at your option) any later version.
-+ *
-+ *   This library is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
-+ *   the GNU Lesser General Public License for more details.
-+ *
-+ *   You should have received a copy of the GNU Lesser General Public License
-+ *   along with this library; if not, write to the Free Software
-+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-+ */
+@@ -110,8 +110,8 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
+ 		hdr->SessionId = tcon->ses->Suid;
+ 	/* BB check following DFS flags BB */
+ 	/* BB do we have to add check for SHI1005_FLAGS_DFS_ROOT too? */
+-	/* if (tcon->share_flags & SHI1005_FLAGS_DFS)
+-		hdr->Flags |= SMB2_FLAGS_DFS_OPERATIONS; */
++	if (tcon->share_flags & SHI1005_FLAGS_DFS)
++		hdr->Flags |= SMB2_FLAGS_DFS_OPERATIONS;
+ 	/* BB how does SMB2 do case sensitive? */
+ 	/* if (tcon->nocase)
+ 		hdr->Flags |= SMBFLG_CASELESS; */
+@@ -549,3 +549,158 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
+ 	 */
+ 	return rc;
+ }
 +
-+ /* SMB2 PDU handling routines here - except for leftovers (eg session setup) */
-+ /* Note that there are handle based routines which must be		      */
-+ /* treated slightly differently for reconnection purposes since we never     */
-+ /* want to reuse a stale file handle and only the caller knows the file info */
-+
-+#include <linux/fs.h>
-+#include <linux/kernel.h>
-+#include <linux/vfs.h>
-+#include <linux/uaccess.h>
-+#include <linux/xattr.h>
-+#include "smb2pdu.h"
-+#include "cifsglob.h"
-+#include "cifsacl.h"
-+#include "cifsproto.h"
-+#include "smb2proto.h"
-+#include "cifs_unicode.h"
-+#include "cifs_debug.h"
-+#include "ntlmssp.h"
-+#include "smb2status.h"
-+
-+/*
-+ *  The following table defines the expected "StructureSize" of SMB2 requests
-+ *  in order by SMB2 command.  This is similar to "wct" in SMB/CIFS requests.
-+ *
-+ *  Note that commands are defined in smb2pdu.h in le16 but the array below is
-+ *  indexed by command in host byte order.
-+ */
-+static const int smb2_req_struct_sizes[NUMBER_OF_SMB2_COMMANDS] = {
-+	/* SMB2_NEGOTIATE */ 36,
-+	/* SMB2_SESSION_SETUP */ 25,
-+	/* SMB2_LOGOFF */ 4,
-+	/* SMB2_TREE_CONNECT */	9,
-+	/* SMB2_TREE_DISCONNECT */ 4,
-+	/* SMB2_CREATE */ 57,
-+	/* SMB2_CLOSE */ 24,
-+	/* SMB2_FLUSH */ 24,
-+	/* SMB2_READ */	49,
-+	/* SMB2_WRITE */ 49,
-+	/* SMB2_LOCK */	48,
-+	/* SMB2_IOCTL */ 57,
-+	/* SMB2_CANCEL */ 4,
-+	/* SMB2_ECHO */ 4,
-+	/* SMB2_QUERY_DIRECTORY */ 33,
-+	/* SMB2_CHANGE_NOTIFY */ 32,
-+	/* SMB2_QUERY_INFO */ 41,
-+	/* SMB2_SET_INFO */ 33,
-+	/* SMB2_OPLOCK_BREAK */ 24 /* BB this is 36 for LEASE_BREAK variant */
-+};
-+
-+
-+static void
-+smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
-+		  const struct cifs_tcon *tcon)
++static inline void cifs_stats_fail_inc(struct cifs_tcon *tcon, uint16_t code)
 +{
-+	struct smb2_pdu *pdu = (struct smb2_pdu *)hdr;
-+	char *temp = (char *)hdr;
-+	/* lookup word count ie StructureSize from table */
-+	__u16 parmsize = smb2_req_struct_sizes[le16_to_cpu(smb2_cmd)];
-+
-+	/*
-+	 * smaller than SMALL_BUFFER_SIZE but bigger than fixed area of
-+	 * largest operations (Create)
-+	 */
-+	memset(temp, 0, 256);
-+
-+	/* Note this is only network field converted to big endian */
-+	hdr->smb2_buf_length = cpu_to_be32(parmsize + sizeof(struct smb2_hdr)
-+			- 4 /*  RFC 1001 length field itself not counted */);
-+
-+	hdr->ProtocolId[0] = 0xFE;
-+	hdr->ProtocolId[1] = 'S';
-+	hdr->ProtocolId[2] = 'M';
-+	hdr->ProtocolId[3] = 'B';
-+	hdr->StructureSize = cpu_to_le16(64);
-+	hdr->Command = smb2_cmd;
-+	hdr->CreditRequest = cpu_to_le16(2); /* BB make this dynamic */
-+	hdr->ProcessId = cpu_to_le32((__u16)current->tgid);
-+
-+	if (!tcon)
-+		goto out;
-+
-+	hdr->TreeId = tcon->tid;
-+	/* Uid is not converted */
-+	if (tcon->ses)
-+		hdr->SessionId = tcon->ses->Suid;
-+	/* BB check following DFS flags BB */
-+	/* BB do we have to add check for SHI1005_FLAGS_DFS_ROOT too? */
-+	/* if (tcon->share_flags & SHI1005_FLAGS_DFS)
-+		hdr->Flags |= SMB2_FLAGS_DFS_OPERATIONS; */
-+	/* BB how does SMB2 do case sensitive? */
-+	/* if (tcon->nocase)
-+		hdr->Flags |= SMBFLG_CASELESS; */
-+	/* if (tcon->ses && tcon->ses->server &&
-+	    (tcon->ses->server->sec_mode & SECMODE_SIGN_REQUIRED))
-+		hdr->Flags |= SMB2_FLAGS_SIGNED; */
-+out:
-+	pdu->StructureSize2 = cpu_to_le16(parmsize);
-+	return;
++	/* cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[code]); */
 +}
 +
-+static int
-+smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
-+{
-+	int rc = 0;
-+	/* BB add missing code here */
-+	return rc;
-+}
-+
-+/*
-+ * Allocate and return pointer to an SMB request hdr, and set basic
-+ * SMB information in the SMB header. If the return code is zero, this
-+ * function must have filled in request_buf pointer.
-+ */
-+static int
-+small_smb2_init(__le16 smb2_command, struct cifs_tcon *tcon,
-+		void **request_buf)
-+{
-+	int rc = 0;
-+
-+	rc = smb2_reconnect(smb2_command, tcon);
-+	if (rc)
-+		return rc;
-+
-+	/* BB eventually switch this to SMB2 specific small buf size */
-+	*request_buf = cifs_small_buf_get();
-+	if (*request_buf == NULL) {
-+		/* BB should we add a retry in here if not a writepage? */
-+		return -ENOMEM;
-+	}
-+
-+	smb2_hdr_assemble((struct smb2_hdr *) *request_buf, smb2_command, tcon);
-+
-+	if (tcon != NULL) {
-+#ifdef CONFIG_CIFS_STATS2
-+		/*
-+		uint16_t com_code = le16_to_cpu(smb2_command);
-+		cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_sent[com_code]);
-+		*/
-+#endif
-+		cifs_stats_inc(&tcon->num_smbs_sent);
-+	}
-+
-+	return rc;
-+}
-+
-+static void
-+free_rsp_buf(int resp_buftype, void *rsp)
-+{
-+	if (resp_buftype == CIFS_SMALL_BUFFER)
-+		cifs_small_buf_release(rsp);
-+	else if (resp_buftype == CIFS_LARGE_BUFFER)
-+		cifs_buf_release(rsp);
-+}
-+
-+#define SMB2_NUM_PROT 1
-+
-+#define SMB2_PROT   0
-+#define SMB21_PROT  1
-+#define BAD_PROT 0xFFFF
-+
-+#define SMB2_PROT_ID  0x0202
-+#define SMB21_PROT_ID 0x0210
-+#define BAD_PROT_ID   0xFFFF
-+
-+static struct {
-+	int index;
-+	__le16 name;
-+} smb2protocols[] = {
-+	{SMB2_PROT,  cpu_to_le16(SMB2_PROT_ID)},
-+	{SMB21_PROT, cpu_to_le16(SMB21_PROT_ID)},
-+	{BAD_PROT,   cpu_to_le16(BAD_PROT_ID)}
-+};
-+
-+/*
-+ *
-+ *	SMB2 Worker functions follow:
-+ *
-+ *	The general structure of the worker functions is:
-+ *	1) Call smb2_init (assembles SMB2 header)
-+ *	2) Initialize SMB2 command specific fields in fixed length area of SMB
-+ *	3) Call smb_sendrcv2 (sends request on socket and waits for response)
-+ *	4) Decode SMB2 command specific fields in the fixed length area
-+ *	5) Decode variable length data area (if any for this SMB2 command type)
-+ *	6) Call free smb buffer
-+ *	7) return
-+ *
-+ */
++#define MAX_SHARENAME_LENGTH (255 /* server */ + 80 /* share */ + 1 /* NULL */)
 +
 +int
-+SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
++SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
++	  struct cifs_tcon *tcon, const struct nls_table *cp)
 +{
-+	struct smb2_negotiate_req *req;
-+	struct smb2_negotiate_rsp *rsp;
-+	struct kvec iov[1];
++	struct smb2_tree_connect_req *req;
++	struct smb2_tree_connect_rsp *rsp = NULL;
++	struct kvec iov[2];
 +	int rc = 0;
 +	int resp_buftype;
++	int unc_path_len;
 +	struct TCP_Server_Info *server;
-+	unsigned int sec_flags;
-+	u16 i;
-+	u16 temp = 0;
-+	int blob_offset, blob_length;
-+	char *security_blob;
-+	int flags = CIFS_NEG_OP;
++	__le16 *unc_path = NULL;
 +
-+	cFYI(1, "Negotiate protocol");
++	cFYI(1, "TCON");
 +
-+	if (ses->server)
++	if ((ses->server) && tree)
 +		server = ses->server;
-+	else {
-+		rc = -EIO;
++	else
++		return -EIO;
++
++	if (tcon && tcon->bad_network_name)
++		return -ENOENT;
++
++	unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
++	if (unc_path == NULL)
++		return -ENOMEM;
++
++	unc_path_len = cifs_strtoUTF16(unc_path, tree, strlen(tree), cp) + 1;
++	unc_path_len *= 2;
++	if (unc_path_len < 2) {
++		kfree(unc_path);
++		return -EINVAL;
++	}
++
++	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
++	if (rc) {
++		kfree(unc_path);
 +		return rc;
 +	}
 +
-+	rc = small_smb2_init(SMB2_NEGOTIATE, NULL, (void **) &req);
-+	if (rc)
-+		return rc;
-+
-+	/* if any of auth flags (ie not sign or seal) are overriden use them */
-+	if (ses->overrideSecFlg & (~(CIFSSEC_MUST_SIGN | CIFSSEC_MUST_SEAL)))
-+		sec_flags = ses->overrideSecFlg;  /* BB FIXME fix sign flags?*/
-+	else /* if override flags set only sign/seal OR them with global auth */
-+		sec_flags = global_secflags | ses->overrideSecFlg;
-+
-+	cFYI(1, "sec_flags 0x%x", sec_flags);
-+
-+	req->hdr.SessionId = 0;
-+
-+	for (i = 0; i < SMB2_NUM_PROT; i++)
-+		req->Dialects[i] = smb2protocols[i].name;
-+
-+	req->DialectCount = cpu_to_le16(i);
-+	inc_rfc1001_len(req, i * 2);
-+
-+	/* only one of SMB2 signing flags may be set in SMB2 request */
-+	if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN)
-+		temp = SMB2_NEGOTIATE_SIGNING_REQUIRED;
-+	else if (sec_flags & CIFSSEC_MAY_SIGN) /* MAY_SIGN is a single flag */
-+		temp = SMB2_NEGOTIATE_SIGNING_ENABLED;
-+
-+	req->SecurityMode = cpu_to_le16(temp);
-+
-+	req->Capabilities = cpu_to_le32(SMB2_GLOBAL_CAP_DFS);
++	if (tcon == NULL) {
++		/* since no tcon, smb2_init can not do this, so do here */
++		req->hdr.SessionId = ses->Suid;
++		/* if (ses->server->sec_mode & SECMODE_SIGN_REQUIRED)
++			req->hdr.Flags |= SMB2_FLAGS_SIGNED; */
++	}
 +
 +	iov[0].iov_base = (char *)req;
-+	/* 4 for rfc1002 length field */
-+	iov[0].iov_len = get_rfc1002_length(req) + 4;
++	/* 4 for rfc1002 length field and 1 for pad */
++	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
 +
-+	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, flags);
++	/* Testing shows that buffer offset must be at location of Buffer[0] */
++	req->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req)
++			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
++	req->PathLength = cpu_to_le16(unc_path_len - 2);
++	iov[1].iov_base = unc_path;
++	iov[1].iov_len = unc_path_len;
 +
-+	rsp = (struct smb2_negotiate_rsp *)iov[0].iov_base;
-+	/*
-+	 * No tcon so can't do
-+	 * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
-+	 */
-+	if (rc != 0)
-+		goto neg_exit;
++	inc_rfc1001_len(req, unc_path_len - 1 /* pad */);
++
++	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, 0);
++	rsp = (struct smb2_tree_connect_rsp *)iov[0].iov_base;
++
++	if (rc != 0) {
++		if (tcon) {
++			cifs_stats_fail_inc(tcon, SMB2_TREE_CONNECT_HE);
++			tcon->need_reconnect = true;
++		}
++		goto tcon_error_exit;
++	}
 +
 +	if (rsp == NULL) {
 +		rc = -EIO;
-+		goto neg_exit;
++		goto tcon_exit;
 +	}
 +
-+	cFYI(1, "mode 0x%x", rsp->SecurityMode);
-+
-+	if (rsp->DialectRevision == smb2protocols[SMB21_PROT].name)
-+		cFYI(1, "negotiated smb2.1 dialect");
-+	else if (rsp->DialectRevision == smb2protocols[SMB2_PROT].name)
-+		cFYI(1, "negotiated smb2 dialect");
-+	else {
-+		cERROR(1, "Illegal dialect returned by server %d",
-+			   le16_to_cpu(rsp->DialectRevision));
-+		rc = -EIO;
-+		goto neg_exit;
++	if (tcon == NULL) {
++		ses->ipc_tid = rsp->hdr.TreeId;
++		goto tcon_exit;
 +	}
-+	server->dialect = le16_to_cpu(rsp->DialectRevision);
 +
-+	server->maxBuf = le32_to_cpu(rsp->MaxTransactSize);
-+	server->max_read = le32_to_cpu(rsp->MaxReadSize);
-+	server->max_write = le32_to_cpu(rsp->MaxWriteSize);
-+	/* BB Do we need to validate the SecurityMode? */
-+	server->sec_mode = le16_to_cpu(rsp->SecurityMode);
-+	server->capabilities = le32_to_cpu(rsp->Capabilities);
-+
-+	security_blob = smb2_get_data_area_len(&blob_offset, &blob_length,
-+					       &rsp->hdr);
-+	if (blob_length == 0) {
-+		cERROR(1, "missing security blob on negprot");
-+		rc = -EIO;
-+		goto neg_exit;
++	if (rsp->ShareType & SMB2_SHARE_TYPE_DISK)
++		cFYI(1, "connection to disk share");
++	else if (rsp->ShareType & SMB2_SHARE_TYPE_PIPE) {
++		tcon->ipc = true;
++		cFYI(1, "connection to pipe share");
++	} else if (rsp->ShareType & SMB2_SHARE_TYPE_PRINT) {
++		tcon->print = true;
++		cFYI(1, "connection to printer");
++	} else {
++		cERROR(1, "unknown share type %d", rsp->ShareType);
++		rc = -EOPNOTSUPP;
++		goto tcon_error_exit;
 +	}
-+#ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
-+	rc = decode_neg_token_init(security_blob, blob_length,
-+				   &server->sec_type);
-+	if (rc == 1)
-+		rc = 0;
-+	else if (rc == 0) {
-+		rc = -EIO;
-+		goto neg_exit;
-+	}
-+#endif
 +
-+neg_exit:
++	tcon->share_flags = le32_to_cpu(rsp->ShareFlags);
++	tcon->maximal_access = le32_to_cpu(rsp->MaximalAccess);
++	tcon->tidStatus = CifsGood;
++	tcon->need_reconnect = false;
++	tcon->tid = rsp->hdr.TreeId;
++	strncpy(tcon->treeName, tree, MAX_TREE_SIZE);
++
++	if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
++	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
++		cERROR(1, "DFS capability contradicts DFS flag");
++
++tcon_exit:
 +	free_rsp_buf(resp_buftype, rsp);
++	kfree(unc_path);
++	return rc;
++
++tcon_error_exit:
++	if (rsp->hdr.Status == STATUS_BAD_NETWORK_NAME) {
++		cERROR(1, "BAD_NETWORK_NAME: %s", tree);
++		tcon->bad_network_name = true;
++	}
++	goto tcon_exit;
++}
++
++int
++SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
++{
++	struct smb2_tree_disconnect_req *req; /* response is trivial */
++	int rc = 0;
++	struct TCP_Server_Info *server;
++	struct cifs_ses *ses = tcon->ses;
++
++	cFYI(1, "Tree Disconnect");
++
++	if (ses && (ses->server))
++		server = ses->server;
++	else
++		return -EIO;
++
++	if ((tcon->need_reconnect) || (tcon->ses->need_reconnect))
++		return 0;
++
++	rc = small_smb2_init(SMB2_TREE_DISCONNECT, tcon, (void **) &req);
++	if (rc)
++		return rc;
++
++	rc = SendReceiveNoRsp(xid, ses, (char *)&req->hdr, 0);
++	if (rc)
++		cifs_stats_fail_inc(tcon, SMB2_TREE_DISCONNECT_HE);
++
 +	return rc;
 +}
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index b08a277..ef8dae2 100644
+index 26af68b..aa77bf3 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -148,4 +148,43 @@ struct smb2_err_rsp {
- 	__u8   ErrorData[1];  /* variable length */
+@@ -224,4 +224,61 @@ struct smb2_logoff_rsp {
+ 	__le16 Reserved;
  } __packed;
  
-+struct smb2_negotiate_req {
++struct smb2_tree_connect_req {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 36 */
-+	__le16 DialectCount;
-+	__le16 SecurityMode;
-+	__le16 Reserved;	/* MBZ */
-+	__le32 Capabilities;
-+	__u8   ClientGUID[16];	/* MBZ */
-+	__le64 ClientStartTime;	/* MBZ */
-+	__le16 Dialects[2]; /* variable length */
++	__le16 StructureSize;	/* Must be 9 */
++	__le16 Reserved;
++	__le16 PathOffset;
++	__le16 PathLength;
++	__u8   Buffer[1];	/* variable length */
 +} __packed;
 +
-+/* SecurityMode flags */
-+#define	SMB2_NEGOTIATE_SIGNING_ENABLED	0x0001
-+#define SMB2_NEGOTIATE_SIGNING_REQUIRED	0x0002
-+/* Capabilities flags */
-+#define SMB2_GLOBAL_CAP_DFS		0x00000001
-+#define SMB2_GLOBAL_CAP_LEASING		0x00000002 /* Resp only New to SMB2.1 */
-+#define SMB2_GLOBAL_CAP_LARGE_MTU	0X00000004 /* Resp only New to SMB2.1 */
-+
-+struct smb2_negotiate_rsp {
++struct smb2_tree_connect_rsp {
 +	struct smb2_hdr hdr;
-+	__le16 StructureSize;	/* Must be 65 */
-+	__le16 SecurityMode;
-+	__le16 DialectRevision;
-+	__le16 Reserved;	/* MBZ */
-+	__u8   ServerGUID[16];
-+	__le32 Capabilities;
-+	__le32 MaxTransactSize;
-+	__le32 MaxReadSize;
-+	__le32 MaxWriteSize;
-+	__le64 SystemTime;	/* MBZ */
-+	__le64 ServerStartTime;
-+	__le16 SecurityBufferOffset;
-+	__le16 SecurityBufferLength;
-+	__le32 Reserved2;	/* may be any value, ignore */
-+	__u8   Buffer[1];	/* variable length GSS security buffer */
++	__le16 StructureSize;	/* Must be 16 */
++	__u8   ShareType;  /* see below */
++	__u8   Reserved;
++	__le32 ShareFlags; /* see below */
++	__le32 Capabilities; /* see below */
++	__le32 MaximalAccess;
++} __packed;
++
++/* Possible ShareType values */
++#define SMB2_SHARE_TYPE_DISK	0x01
++#define SMB2_SHARE_TYPE_PIPE	0x02
++#define	SMB2_SHARE_TYPE_PRINT	0x03
++
++/*
++ * Possible ShareFlags - exactly one and only one of the first 4 caching flags
++ * must be set (any of the remaining, SHI1005, flags may be set individually
++ * or in combination.
++ */
++#define SMB2_SHAREFLAG_MANUAL_CACHING			0x00000000
++#define SMB2_SHAREFLAG_AUTO_CACHING			0x00000010
++#define SMB2_SHAREFLAG_VDO_CACHING			0x00000020
++#define SMB2_SHAREFLAG_NO_CACHING			0x00000030
++#define SHI1005_FLAGS_DFS				0x00000001
++#define SHI1005_FLAGS_DFS_ROOT				0x00000002
++#define SHI1005_FLAGS_RESTRICT_EXCLUSIVE_OPENS		0x00000100
++#define SHI1005_FLAGS_FORCE_SHARED_DELETE		0x00000200
++#define SHI1005_FLAGS_ALLOW_NAMESPACE_CACHING		0x00000400
++#define SHI1005_FLAGS_ACCESS_BASED_DIRECTORY_ENUM	0x00000800
++#define SHI1005_FLAGS_FORCE_LEVELII_OPLOCK		0x00001000
++#define SHI1005_FLAGS_ENABLE_HASH			0x00002000
++
++/* Possible share capabilities */
++#define SMB2_SHARE_CAP_DFS	cpu_to_le32(0x00000008)
++
++struct smb2_tree_disconnect_req {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 4 */
++	__le16 Reserved;
++} __packed;
++
++struct smb2_tree_disconnect_rsp {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 4 */
++	__le16 Reserved;
 +} __packed;
 +
  #endif				/* _SMB2PDU_H */
 diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 19bf987..8817670 100644
+index 9364fbc..bc72993 100644
 --- a/fs/cifs/smb2proto.h
 +++ b/fs/cifs/smb2proto.h
-@@ -35,10 +35,17 @@ struct statfs;
- extern int map_smb2_to_linux_error(char *buf, bool log_err);
- extern int smb2_check_message(char *buf, unsigned int length);
- extern unsigned int smb2_calc_size(struct smb2_hdr *hdr);
-+extern char *smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr);
+@@ -50,5 +50,9 @@ extern int SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses);
+ extern int SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 			   const struct nls_table *nls_cp);
+ extern int SMB2_logoff(const unsigned int xid, struct cifs_ses *ses);
++extern int SMB2_tcon(const unsigned int xid, struct cifs_ses *ses,
++		     const char *tree, struct cifs_tcon *tcon,
++		     const struct nls_table *);
++extern int SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon);
  
- extern int smb2_check_receive(struct mid_q_entry *mid,
- 			      struct TCP_Server_Info *server, bool log_error);
- extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
- 			      unsigned int nvec, struct mid_q_entry **ret_mid);
- 
-+/*
-+ * SMB2 Worker functions - most of protocol specific implementation details
-+ * are contained within these calls.
-+ */
-+extern int SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses);
-+
  #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
