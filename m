@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 28/32] CIFS: Add SMB2 support for async requests
-Date: Fri, 13 Jul 2012 11:53:41 +0400
-Message-ID: <1342166025-29377-29-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 31/32] CIFS: Move clear/print_stats code to ops struct
+Date: Fri, 13 Jul 2012 11:53:44 +0400
+Message-ID: <1342166025-29377-32-git-send-email-pshilovsky@samba.org>
 References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,68 +11,496 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/smb2ops.c       |    1 +
- fs/cifs/smb2proto.h     |    4 ++++
- fs/cifs/smb2transport.c |   23 ++++++++++++++++++++++-
- 3 files changed, 27 insertions(+), 1 deletions(-)
+ fs/cifs/cifs_debug.c |   60 ++++---------------------------------------
+ fs/cifs/cifsglob.h   |   48 ++++++++++++++++++++---------------
+ fs/cifs/cifssmb.c    |   54 ++++++++++++++++++++--------------------
+ fs/cifs/misc.c       |    2 +-
+ fs/cifs/smb1ops.c    |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 129 insertions(+), 103 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 2f9950e..8672e49 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -209,6 +209,7 @@ smb2_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 8aa8693..d9ea6ed 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -282,24 +282,8 @@ static ssize_t cifs_stats_proc_write(struct file *file,
+ 							  struct cifs_tcon,
+ 							  tcon_list);
+ 					atomic_set(&tcon->num_smbs_sent, 0);
+-					atomic_set(&tcon->num_writes, 0);
+-					atomic_set(&tcon->num_reads, 0);
+-					atomic_set(&tcon->num_oplock_brks, 0);
+-					atomic_set(&tcon->num_opens, 0);
+-					atomic_set(&tcon->num_posixopens, 0);
+-					atomic_set(&tcon->num_posixmkdirs, 0);
+-					atomic_set(&tcon->num_closes, 0);
+-					atomic_set(&tcon->num_deletes, 0);
+-					atomic_set(&tcon->num_mkdirs, 0);
+-					atomic_set(&tcon->num_rmdirs, 0);
+-					atomic_set(&tcon->num_renames, 0);
+-					atomic_set(&tcon->num_t2renames, 0);
+-					atomic_set(&tcon->num_ffirst, 0);
+-					atomic_set(&tcon->num_fnext, 0);
+-					atomic_set(&tcon->num_fclose, 0);
+-					atomic_set(&tcon->num_hardlinks, 0);
+-					atomic_set(&tcon->num_symlinks, 0);
+-					atomic_set(&tcon->num_locks, 0);
++					if (server->ops->clear_stats)
++						server->ops->clear_stats(tcon);
+ 				}
+ 			}
+ 		}
+@@ -358,42 +342,10 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
+ 				seq_printf(m, "\n%d) %s", i, tcon->treeName);
+ 				if (tcon->need_reconnect)
+ 					seq_puts(m, "\tDISCONNECTED ");
+-				seq_printf(m, "\nSMBs: %d Oplock Breaks: %d",
+-					atomic_read(&tcon->num_smbs_sent),
+-					atomic_read(&tcon->num_oplock_brks));
+-				seq_printf(m, "\nReads:  %d Bytes: %lld",
+-					atomic_read(&tcon->num_reads),
+-					(long long)(tcon->bytes_read));
+-				seq_printf(m, "\nWrites: %d Bytes: %lld",
+-					atomic_read(&tcon->num_writes),
+-					(long long)(tcon->bytes_written));
+-				seq_printf(m, "\nFlushes: %d",
+-					atomic_read(&tcon->num_flushes));
+-				seq_printf(m, "\nLocks: %d HardLinks: %d "
+-					      "Symlinks: %d",
+-					atomic_read(&tcon->num_locks),
+-					atomic_read(&tcon->num_hardlinks),
+-					atomic_read(&tcon->num_symlinks));
+-				seq_printf(m, "\nOpens: %d Closes: %d "
+-					      "Deletes: %d",
+-					atomic_read(&tcon->num_opens),
+-					atomic_read(&tcon->num_closes),
+-					atomic_read(&tcon->num_deletes));
+-				seq_printf(m, "\nPosix Opens: %d "
+-					      "Posix Mkdirs: %d",
+-					atomic_read(&tcon->num_posixopens),
+-					atomic_read(&tcon->num_posixmkdirs));
+-				seq_printf(m, "\nMkdirs: %d Rmdirs: %d",
+-					atomic_read(&tcon->num_mkdirs),
+-					atomic_read(&tcon->num_rmdirs));
+-				seq_printf(m, "\nRenames: %d T2 Renames %d",
+-					atomic_read(&tcon->num_renames),
+-					atomic_read(&tcon->num_t2renames));
+-				seq_printf(m, "\nFindFirst: %d FNext %d "
+-					      "FClose %d",
+-					atomic_read(&tcon->num_ffirst),
+-					atomic_read(&tcon->num_fnext),
+-					atomic_read(&tcon->num_fclose));
++				seq_printf(m, "\nSMBs: %d",
++					   atomic_read(&tcon->num_smbs_sent));
++				if (server->ops->print_stats)
++					server->ops->print_stats(m, tcon);
+ 			}
+ 		}
+ 	}
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index ae9a1e9..0896328 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -197,6 +197,8 @@ struct smb_version_operations {
+ 	/* find mid corresponding to the response message */
+ 	struct mid_q_entry * (*find_mid)(struct TCP_Server_Info *, char *);
+ 	void (*dump_detail)(void *);
++	void (*clear_stats)(struct cifs_tcon *);
++	void (*print_stats)(struct seq_file *m, struct cifs_tcon *);
+ 	/* verify the message */
+ 	int (*check_message)(char *, unsigned int);
+ 	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
+@@ -566,27 +568,31 @@ struct cifs_tcon {
+ 	enum statusEnum tidStatus;
+ #ifdef CONFIG_CIFS_STATS
+ 	atomic_t num_smbs_sent;
+-	atomic_t num_writes;
+-	atomic_t num_reads;
+-	atomic_t num_flushes;
+-	atomic_t num_oplock_brks;
+-	atomic_t num_opens;
+-	atomic_t num_closes;
+-	atomic_t num_deletes;
+-	atomic_t num_mkdirs;
+-	atomic_t num_posixopens;
+-	atomic_t num_posixmkdirs;
+-	atomic_t num_rmdirs;
+-	atomic_t num_renames;
+-	atomic_t num_t2renames;
+-	atomic_t num_ffirst;
+-	atomic_t num_fnext;
+-	atomic_t num_fclose;
+-	atomic_t num_hardlinks;
+-	atomic_t num_symlinks;
+-	atomic_t num_locks;
+-	atomic_t num_acl_get;
+-	atomic_t num_acl_set;
++	union {
++		struct {
++			atomic_t num_writes;
++			atomic_t num_reads;
++			atomic_t num_flushes;
++			atomic_t num_oplock_brks;
++			atomic_t num_opens;
++			atomic_t num_closes;
++			atomic_t num_deletes;
++			atomic_t num_mkdirs;
++			atomic_t num_posixopens;
++			atomic_t num_posixmkdirs;
++			atomic_t num_rmdirs;
++			atomic_t num_renames;
++			atomic_t num_t2renames;
++			atomic_t num_ffirst;
++			atomic_t num_fnext;
++			atomic_t num_fclose;
++			atomic_t num_hardlinks;
++			atomic_t num_symlinks;
++			atomic_t num_locks;
++			atomic_t num_acl_get;
++			atomic_t num_acl_set;
++		} cifs_stats;
++	} stats;
+ #ifdef CONFIG_CIFS_STATS2
+ 	unsigned long long time_writes;
+ 	unsigned long long time_reads;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 50bae64..846b803 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -893,7 +893,7 @@ PsxDelete:
+ 		cFYI(1, "Posix delete returned %d", rc);
+ 	cifs_buf_release(pSMB);
  
- struct smb_version_operations smb21_operations = {
- 	.setup_request = smb2_setup_request,
-+	.setup_async_request = smb2_setup_async_request,
- 	.check_receive = smb2_check_receive,
- 	.add_credits = smb2_add_credits,
- 	.set_credits = smb2_set_credits,
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 1517b4c..1a17955 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -43,6 +43,10 @@ extern int smb2_check_receive(struct mid_q_entry *mid,
- 			      struct TCP_Server_Info *server, bool log_error);
- extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
- 			      unsigned int nvec, struct mid_q_entry **ret_mid);
-+extern int smb2_setup_async_request(struct TCP_Server_Info *server,
-+				    struct kvec *iov, unsigned int nvec,
-+				    struct mid_q_entry **ret_mid);
-+extern void smb2_echo_request(struct work_struct *work);
+-	cifs_stats_inc(&tcon->num_deletes);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_deletes);
  
- extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
- 				struct cifs_sb_info *cifs_sb,
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index b4b6b9a..31f5d42 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -148,4 +148,25 @@ smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
- 	return rc;
+ 	if (rc == -EAGAIN)
+ 		goto PsxDelete;
+@@ -936,7 +936,7 @@ DelFileRetry:
+ 	pSMB->ByteCount = cpu_to_le16(name_len + 1);
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_deletes);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_deletes);
+ 	if (rc)
+ 		cFYI(1, "Error in RMFile = %d", rc);
+ 
+@@ -981,7 +981,7 @@ RmDirRetry:
+ 	pSMB->ByteCount = cpu_to_le16(name_len + 1);
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_rmdirs);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_rmdirs);
+ 	if (rc)
+ 		cFYI(1, "Error in RMDir = %d", rc);
+ 
+@@ -1024,7 +1024,7 @@ MkDirRetry:
+ 	pSMB->ByteCount = cpu_to_le16(name_len + 1);
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_mkdirs);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_mkdirs);
+ 	if (rc)
+ 		cFYI(1, "Error in Mkdir = %d", rc);
+ 
+@@ -1147,9 +1147,9 @@ psx_create_err:
+ 	cifs_buf_release(pSMB);
+ 
+ 	if (posix_flags & SMB_O_DIRECTORY)
+-		cifs_stats_inc(&tcon->num_posixmkdirs);
++		cifs_stats_inc(&tcon->stats.cifs_stats.num_posixmkdirs);
+ 	else
+-		cifs_stats_inc(&tcon->num_posixopens);
++		cifs_stats_inc(&tcon->stats.cifs_stats.num_posixopens);
+ 
+ 	if (rc == -EAGAIN)
+ 		goto PsxCreat;
+@@ -1270,7 +1270,7 @@ OldOpenRetry:
+ 	/* long_op set to 1 to allow for oplock break timeouts */
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			(struct smb_hdr *)pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_opens);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_opens);
+ 	if (rc) {
+ 		cFYI(1, "Error in Open = %d", rc);
+ 	} else {
+@@ -1383,7 +1383,7 @@ openRetry:
+ 	/* long_op set to 1 to allow for oplock break timeouts */
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			(struct smb_hdr *)pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_opens);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_opens);
+ 	if (rc) {
+ 		cFYI(1, "Error in Open = %d", rc);
+ 	} else {
+@@ -1650,7 +1650,7 @@ cifs_async_readv(struct cifs_readdata *rdata)
+ 			     rdata, 0);
+ 
+ 	if (rc == 0)
+-		cifs_stats_inc(&tcon->num_reads);
++		cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
+ 	else
+ 		kref_put(&rdata->refcount, cifs_readdata_release);
+ 
+@@ -1720,7 +1720,7 @@ CIFSSMBRead(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	iov[0].iov_len = be32_to_cpu(pSMB->hdr.smb_buf_length) + 4;
+ 	rc = SendReceive2(xid, tcon->ses, iov, 1 /* num iovecs */,
+ 			 &resp_buf_type, CIFS_LOG_ERROR);
+-	cifs_stats_inc(&tcon->num_reads);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
+ 	pSMBr = (READ_RSP *)iov[0].iov_base;
+ 	if (rc) {
+ 		cERROR(1, "Send error in read = %d", rc);
+@@ -1872,7 +1872,7 @@ CIFSSMBWrite(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, long_op);
+-	cifs_stats_inc(&tcon->num_writes);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
+ 	if (rc) {
+ 		cFYI(1, "Send error in write = %d", rc);
+ 	} else {
+@@ -2123,7 +2123,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 			     NULL, cifs_writev_callback, wdata, 0);
+ 
+ 	if (rc == 0)
+-		cifs_stats_inc(&tcon->num_writes);
++		cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
+ 	else
+ 		kref_put(&wdata->refcount, cifs_writedata_release);
+ 
+@@ -2213,7 +2213,7 @@ CIFSSMBWrite2(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 
+ 	rc = SendReceive2(xid, tcon->ses, iov, n_vec + 1, &resp_buf_type,
+ 			  long_op);
+-	cifs_stats_inc(&tcon->num_writes);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
+ 	if (rc) {
+ 		cFYI(1, "Send error Write2 = %d", rc);
+ 	} else if (resp_buf_type == 0) {
+@@ -2279,7 +2279,7 @@ int cifs_lockv(const unsigned int xid, struct cifs_tcon *tcon,
+ 	iov[1].iov_base = (char *)buf;
+ 	iov[1].iov_len = (num_unlock + num_lock) * sizeof(LOCKING_ANDX_RANGE);
+ 
+-	cifs_stats_inc(&tcon->num_locks);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
+ 	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, CIFS_NO_RESP);
+ 	if (rc)
+ 		cFYI(1, "Send error in cifs_lockv = %d", rc);
+@@ -2348,7 +2348,7 @@ CIFSSMBLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 		rc = SendReceiveNoRsp(xid, tcon->ses, (char *)pSMB, flags);
+ 		/* SMB buffer freed by function above */
+ 	}
+-	cifs_stats_inc(&tcon->num_locks);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
+ 	if (rc)
+ 		cFYI(1, "Send error in Lock = %d", rc);
+ 
+@@ -2513,7 +2513,7 @@ CIFSSMBClose(const unsigned int xid, struct cifs_tcon *tcon, int smb_file_id)
+ 	pSMB->LastWriteTime = 0xFFFFFFFF;
+ 	pSMB->ByteCount = 0;
+ 	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, 0);
+-	cifs_stats_inc(&tcon->num_closes);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_closes);
+ 	if (rc) {
+ 		if (rc != -EINTR) {
+ 			/* EINTR is expected when user ctl-c to kill app */
+@@ -2542,7 +2542,7 @@ CIFSSMBFlush(const unsigned int xid, struct cifs_tcon *tcon, int smb_file_id)
+ 	pSMB->FileID = (__u16) smb_file_id;
+ 	pSMB->ByteCount = 0;
+ 	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) pSMB, 0);
+-	cifs_stats_inc(&tcon->num_flushes);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_flushes);
+ 	if (rc)
+ 		cERROR(1, "Send error in Flush = %d", rc);
+ 
+@@ -2605,7 +2605,7 @@ renameRetry:
+ 
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_renames);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_renames);
+ 	if (rc)
+ 		cFYI(1, "Send error in rename = %d", rc);
+ 
+@@ -2686,7 +2686,7 @@ int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *pTcon,
+ 	pSMB->ByteCount = cpu_to_le16(byte_count);
+ 	rc = SendReceive(xid, pTcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&pTcon->num_t2renames);
++	cifs_stats_inc(&pTcon->stats.cifs_stats.num_t2renames);
+ 	if (rc)
+ 		cFYI(1, "Send error in Rename (by file handle) = %d", rc);
+ 
+@@ -2843,7 +2843,7 @@ createSymLinkRetry:
+ 	pSMB->ByteCount = cpu_to_le16(byte_count);
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_symlinks);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_symlinks);
+ 	if (rc)
+ 		cFYI(1, "Send error in SetPathInfo create symlink = %d", rc);
+ 
+@@ -2929,7 +2929,7 @@ createHardLinkRetry:
+ 	pSMB->ByteCount = cpu_to_le16(byte_count);
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_hardlinks);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_hardlinks);
+ 	if (rc)
+ 		cFYI(1, "Send error in SetPathInfo (hard link) = %d", rc);
+ 
+@@ -3001,7 +3001,7 @@ winCreateHardLinkRetry:
+ 
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_hardlinks);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_hardlinks);
+ 	if (rc)
+ 		cFYI(1, "Send error in hard link (NT rename) = %d", rc);
+ 
+@@ -3419,7 +3419,7 @@ queryAclRetry:
+ 
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 		(struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_acl_get);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_acl_get);
+ 	if (rc) {
+ 		cFYI(1, "Send error in Query POSIX ACL = %d", rc);
+ 	} else {
+@@ -3730,7 +3730,7 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
+ 
+ 	rc = SendReceive2(xid, tcon->ses, iov, 1 /* num iovec */, &buf_type,
+ 			 0);
+-	cifs_stats_inc(&tcon->num_acl_get);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_acl_get);
+ 	if (rc) {
+ 		cFYI(1, "Send error in QuerySecDesc = %d", rc);
+ 	} else {                /* decode response */
+@@ -4332,7 +4332,7 @@ findFirstRetry:
+ 
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_ffirst);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_ffirst);
+ 
+ 	if (rc) {/* BB add logic to retry regular search if Unix search
+ 			rejected unexpectedly by server */
+@@ -4459,7 +4459,7 @@ int CIFSFindNext(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
+ 			(struct smb_hdr *) pSMBr, &bytes_returned, 0);
+-	cifs_stats_inc(&tcon->num_fnext);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_fnext);
+ 	if (rc) {
+ 		if (rc == -EBADF) {
+ 			psrch_inf->endOfSearch = true;
+@@ -4550,7 +4550,7 @@ CIFSFindClose(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (rc)
+ 		cERROR(1, "Send error in FindClose = %d", rc);
+ 
+-	cifs_stats_inc(&tcon->num_fclose);
++	cifs_stats_inc(&tcon->stats.cifs_stats.num_fclose);
+ 
+ 	/* Since session is dead, search handle closed on server already */
+ 	if (rc == -EAGAIN)
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index ad2538a..ce41fee 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -461,7 +461,7 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
+ 			if (tcon->tid != buf->Tid)
+ 				continue;
+ 
+-			cifs_stats_inc(&tcon->num_oplock_brks);
++			cifs_stats_inc(&tcon->stats.cifs_stats.num_oplock_brks);
+ 			spin_lock(&cifs_file_list_lock);
+ 			list_for_each(tmp2, &tcon->openFileList) {
+ 				netfile = list_entry(tmp2, struct cifsFileInfo,
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index c9326b4..5817409 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -520,6 +520,72 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+ 	return full_path;
  }
  
--/* BB add missing functions here */
-+int
-+smb2_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
-+			 unsigned int nvec, struct mid_q_entry **ret_mid)
++static void
++cifs_clear_stats(struct cifs_tcon *tcon)
 +{
-+	int rc = 0;
-+	struct smb2_hdr *hdr = (struct smb2_hdr *)iov[0].iov_base;
-+	struct mid_q_entry *mid;
-+
-+	smb2_seq_num_into_buf(server, hdr);
-+
-+	mid = smb2_mid_entry_alloc(hdr, server);
-+	if (mid == NULL)
-+		return -ENOMEM;
-+
-+	/* rc = smb2_sign_smb2(iov, nvec, server);
-+	if (rc) {
-+		DeleteMidQEntry(mid);
-+		return rc;
-+	}*/
-+	*ret_mid = mid;
-+	return rc;
++#ifdef CONFIG_CIFS_STATS
++	atomic_set(&tcon->stats.cifs_stats.num_writes, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_reads, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_flushes, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_oplock_brks, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_opens, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_posixopens, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_posixmkdirs, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_closes, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_deletes, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_mkdirs, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_rmdirs, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_renames, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_t2renames, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_ffirst, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_fnext, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_fclose, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_hardlinks, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_symlinks, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_locks, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_acl_get, 0);
++	atomic_set(&tcon->stats.cifs_stats.num_acl_set, 0);
++#endif
 +}
++
++static void
++cifs_print_stats(struct seq_file *m, struct cifs_tcon *tcon)
++{
++#ifdef CONFIG_CIFS_STATS
++	seq_printf(m, " Oplocks breaks: %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_oplock_brks));
++	seq_printf(m, "\nReads:  %d Bytes: %llu",
++		   atomic_read(&tcon->stats.cifs_stats.num_reads),
++		   (long long)(tcon->bytes_read));
++	seq_printf(m, "\nWrites: %d Bytes: %llu",
++		   atomic_read(&tcon->stats.cifs_stats.num_writes),
++		   (long long)(tcon->bytes_written));
++	seq_printf(m, "\nFlushes: %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_flushes));
++	seq_printf(m, "\nLocks: %d HardLinks: %d Symlinks: %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_locks),
++		   atomic_read(&tcon->stats.cifs_stats.num_hardlinks),
++		   atomic_read(&tcon->stats.cifs_stats.num_symlinks));
++	seq_printf(m, "\nOpens: %d Closes: %d Deletes: %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_opens),
++		   atomic_read(&tcon->stats.cifs_stats.num_closes),
++		   atomic_read(&tcon->stats.cifs_stats.num_deletes));
++	seq_printf(m, "\nPosix Opens: %d Posix Mkdirs: %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_posixopens),
++		   atomic_read(&tcon->stats.cifs_stats.num_posixmkdirs));
++	seq_printf(m, "\nMkdirs: %d Rmdirs: %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_mkdirs),
++		   atomic_read(&tcon->stats.cifs_stats.num_rmdirs));
++	seq_printf(m, "\nRenames: %d T2 Renames %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_renames),
++		   atomic_read(&tcon->stats.cifs_stats.num_t2renames));
++	seq_printf(m, "\nFindFirst: %d FNext %d FClose %d",
++		   atomic_read(&tcon->stats.cifs_stats.num_ffirst),
++		   atomic_read(&tcon->stats.cifs_stats.num_fnext),
++		   atomic_read(&tcon->stats.cifs_stats.num_fclose));
++#endif
++}
++
+ struct smb_version_operations smb1_operations = {
+ 	.send_cancel = send_nt_cancel,
+ 	.compare_fids = cifs_compare_fids,
+@@ -537,6 +603,8 @@ struct smb_version_operations smb1_operations = {
+ 	.find_mid = cifs_find_mid,
+ 	.check_message = checkSMB,
+ 	.dump_detail = cifs_dump_detail,
++	.clear_stats = cifs_clear_stats,
++	.print_stats = cifs_print_stats,
+ 	.is_oplock_break = is_valid_oplock_break,
+ 	.check_trans2 = cifs_check_trans2,
+ 	.need_neg = cifs_need_neg,
 -- 
 1.7.1
