@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 05/32] CIFS: Move protocol specific tcon/tdis code to ops struct
-Date: Fri, 13 Jul 2012 11:53:18 +0400
-Message-ID: <1342166025-29377-6-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 07/32] CIFS: Rename 7 error codes to NT_ style
+Date: Fri, 13 Jul 2012 11:53:20 +0400
+Message-ID: <1342166025-29377-8-git-send-email-pshilovsky@samba.org>
 References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,234 +9,72 @@ In-Reply-To: <1342166025-29377-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-and rename variables around the code changes.
+and consider such codes as CIFS errors.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    6 ++++
- fs/cifs/cifsproto.h |    8 +++---
- fs/cifs/cifssmb.c   |    2 +-
- fs/cifs/connect.c   |   73 ++++++++++++++++++++++++++++++---------------------
- fs/cifs/smb1ops.c   |    2 +
- 5 files changed, 56 insertions(+), 35 deletions(-)
+ fs/cifs/nterr.c |    6 +++---
+ fs/cifs/nterr.h |   26 ++++++++++++++------------
+ 2 files changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a6eb9be..6d18962 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -160,6 +160,7 @@ struct mid_q_entry;
- struct TCP_Server_Info;
- struct cifsFileInfo;
- struct cifs_ses;
-+struct cifs_tcon;
- 
- struct smb_version_operations {
- 	int (*send_cancel)(struct TCP_Server_Info *, void *,
-@@ -201,6 +202,11 @@ struct smb_version_operations {
- 			  const struct nls_table *);
- 	/* close smb session */
- 	int (*logoff)(const unsigned int, struct cifs_ses *);
-+	/* connect to a server share */
-+	int (*tree_connect)(const unsigned int, struct cifs_ses *, const char *,
-+			    struct cifs_tcon *, const struct nls_table *);
-+	/* close tree connecion */
-+	int (*tree_disconnect)(const unsigned int, struct cifs_tcon *);
+diff --git a/fs/cifs/nterr.c b/fs/cifs/nterr.c
+index 819fd99..b6023c6 100644
+--- a/fs/cifs/nterr.c
++++ b/fs/cifs/nterr.c
+@@ -31,7 +31,7 @@ const struct nt_err_code_struct nt_errs[] = {
+ 	{"NT_STATUS_INVALID_INFO_CLASS", NT_STATUS_INVALID_INFO_CLASS},
+ 	{"NT_STATUS_INFO_LENGTH_MISMATCH", NT_STATUS_INFO_LENGTH_MISMATCH},
+ 	{"NT_STATUS_ACCESS_VIOLATION", NT_STATUS_ACCESS_VIOLATION},
+-	{"STATUS_BUFFER_OVERFLOW", STATUS_BUFFER_OVERFLOW},
++	{"NT_STATUS_BUFFER_OVERFLOW", NT_STATUS_BUFFER_OVERFLOW},
+ 	{"NT_STATUS_IN_PAGE_ERROR", NT_STATUS_IN_PAGE_ERROR},
+ 	{"NT_STATUS_PAGEFILE_QUOTA", NT_STATUS_PAGEFILE_QUOTA},
+ 	{"NT_STATUS_INVALID_HANDLE", NT_STATUS_INVALID_HANDLE},
+@@ -681,7 +681,7 @@ const struct nt_err_code_struct nt_errs[] = {
+ 	 NT_STATUS_QUOTA_LIST_INCONSISTENT},
+ 	{"NT_STATUS_FILE_IS_OFFLINE", NT_STATUS_FILE_IS_OFFLINE},
+ 	{"NT_STATUS_NO_MORE_ENTRIES", NT_STATUS_NO_MORE_ENTRIES},
+-	{"STATUS_MORE_ENTRIES", STATUS_MORE_ENTRIES},
+-	{"STATUS_SOME_UNMAPPED", STATUS_SOME_UNMAPPED},
++	{"NT_STATUS_MORE_ENTRIES", NT_STATUS_MORE_ENTRIES},
++	{"NT_STATUS_SOME_UNMAPPED", NT_STATUS_SOME_UNMAPPED},
+ 	{NULL, 0}
  };
+diff --git a/fs/cifs/nterr.h b/fs/cifs/nterr.h
+index 2572673..7a0eae5 100644
+--- a/fs/cifs/nterr.h
++++ b/fs/cifs/nterr.h
+@@ -35,18 +35,20 @@ struct nt_err_code_struct {
+ extern const struct nt_err_code_struct nt_errs[];
  
- struct smb_version_values {
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index a4360c5..e1689e7 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -184,9 +184,9 @@ extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
- 			      struct nls_table *nls_info);
- extern int CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses);
+ /* Win32 Status codes. */
+-#define STATUS_MORE_ENTRIES               0x0105
+-#define ERROR_INVALID_PARAMETER		  0x0057
+-#define ERROR_INSUFFICIENT_BUFFER	  0x007a
+-#define STATUS_1804	                  0x070c
+-#define STATUS_NOTIFY_ENUM_DIR            0x010c
++#define NT_STATUS_MORE_ENTRIES         0x0105
++#define NT_ERROR_INVALID_PARAMETER     0x0057
++#define NT_ERROR_INSUFFICIENT_BUFFER   0x007a
++#define NT_STATUS_1804                 0x070c
++#define NT_STATUS_NOTIFY_ENUM_DIR      0x010c
  
--extern int CIFSTCon(unsigned int xid, struct cifs_ses *ses,
--			const char *tree, struct cifs_tcon *tcon,
--			const struct nls_table *);
-+extern int CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
-+		    const char *tree, struct cifs_tcon *tcon,
-+		    const struct nls_table *);
+-/* Win32 Error codes extracted using a loop in smbclient then printing a
+-   netmon sniff to a file. */
++/*
++ * Win32 Error codes extracted using a loop in smbclient then printing a netmon
++ * sniff to a file.
++ */
  
- extern int CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
- 		const char *searchName, const struct nls_table *nls_codepage,
-@@ -388,7 +388,7 @@ extern int CIFSSMBPosixLock(const int xid, struct cifs_tcon *tcon,
- 			const __u16 smb_file_id, const __u32 netpid,
- 			const int get_flag, const __u64 len, struct file_lock *,
- 			const __u16 lock_type, const bool waitFlag);
--extern int CIFSSMBTDis(const int xid, struct cifs_tcon *tcon);
-+extern int CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon);
- extern int CIFSSMBEcho(struct TCP_Server_Info *server);
- extern int CIFSSMBLogoff(const unsigned int xid, struct cifs_ses *ses);
- 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index db5cf5d..6f158ba 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -694,7 +694,7 @@ neg_err_exit:
- }
- 
- int
--CIFSSMBTDis(const int xid, struct cifs_tcon *tcon)
-+CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon)
- {
- 	struct smb_hdr *smb_buffer;
- 	int rc = 0;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 47e0491..bdd5f62 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2541,7 +2541,7 @@ cifs_find_tcon(struct cifs_ses *ses, const char *unc)
- static void
- cifs_put_tcon(struct cifs_tcon *tcon)
- {
--	int xid;
-+	unsigned int xid;
- 	struct cifs_ses *ses = tcon->ses;
- 
- 	cFYI(1, "%s: tc_count=%d\n", __func__, tcon->tc_count);
-@@ -2555,7 +2555,8 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	xid = GetXid();
--	CIFSSMBTDis(xid, tcon);
-+	if (ses->server->ops->tree_disconnect)
-+		ses->server->ops->tree_disconnect(xid, tcon);
- 	_FreeXid(xid);
- 
- 	cifs_fscache_release_super_cookie(tcon);
-@@ -2580,6 +2581,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		return tcon;
- 	}
- 
-+	if (!ses->server->ops->tree_connect) {
-+		rc = -ENOSYS;
-+		goto out_fail;
-+	}
-+
- 	tcon = tconInfoAlloc();
- 	if (tcon == NULL) {
- 		rc = -ENOMEM;
-@@ -2602,13 +2608,15 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		goto out_fail;
- 	}
- 
--	/* BB Do we need to wrap session_mutex around
--	 * this TCon call and Unix SetFS as
--	 * we do on SessSetup and reconnect? */
-+	/*
-+	 * BB Do we need to wrap session_mutex around this TCon call and Unix
-+	 * SetFS as we do on SessSetup and reconnect?
-+	 */
- 	xid = GetXid();
--	rc = CIFSTCon(xid, ses, volume_info->UNC, tcon, volume_info->local_nls);
-+	rc = ses->server->ops->tree_connect(xid, ses, volume_info->UNC, tcon,
-+					    volume_info->local_nls);
- 	FreeXid(xid);
--	cFYI(1, "CIFS Tcon rc = %d", rc);
-+	cFYI(1, "Tcon rc = %d", rc);
- 	if (rc)
- 		goto out_fail;
- 
-@@ -2617,10 +2625,11 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		cFYI(1, "DFS disabled (%d)", tcon->Flags);
- 	}
- 	tcon->seal = volume_info->seal;
--	/* we can have only one retry value for a connection
--	   to a share so for resources mounted more than once
--	   to the same server share the last value passed in
--	   for the retry flag is used */
-+	/*
-+	 * We can have only one retry value for a connection to a share so for
-+	 * resources mounted more than once to the same server share the last
-+	 * value passed in for the retry flag is used.
-+	 */
- 	tcon->retry = volume_info->retry;
- 	tcon->nocase = volume_info->nocase;
- 	tcon->local_lease = volume_info->local_lease;
-@@ -2754,37 +2763,41 @@ out:
- }
- 
- int
--get_dfs_path(int xid, struct cifs_ses *pSesInfo, const char *old_path,
--	     const struct nls_table *nls_codepage, unsigned int *pnum_referrals,
--	     struct dfs_info3_param **preferrals, int remap)
-+get_dfs_path(int xid, struct cifs_ses *ses, const char *old_path,
-+	     const struct nls_table *nls_codepage, unsigned int *num_referrals,
-+	     struct dfs_info3_param **referrals, int remap)
- {
- 	char *temp_unc;
- 	int rc = 0;
- 
--	*pnum_referrals = 0;
--	*preferrals = NULL;
-+	if (!ses->server->ops->tree_connect)
-+		return -ENOSYS;
-+
-+	*num_referrals = 0;
-+	*referrals = NULL;
- 
--	if (pSesInfo->ipc_tid == 0) {
-+	if (ses->ipc_tid == 0) {
- 		temp_unc = kmalloc(2 /* for slashes */ +
--			strnlen(pSesInfo->serverName,
--				SERVER_NAME_LEN_WITH_NULL * 2)
--				 + 1 + 4 /* slash IPC$ */  + 2,
--				GFP_KERNEL);
-+			strnlen(ses->serverName, SERVER_NAME_LEN_WITH_NULL * 2)
-+				+ 1 + 4 /* slash IPC$ */ + 2, GFP_KERNEL);
- 		if (temp_unc == NULL)
- 			return -ENOMEM;
- 		temp_unc[0] = '\\';
- 		temp_unc[1] = '\\';
--		strcpy(temp_unc + 2, pSesInfo->serverName);
--		strcpy(temp_unc + 2 + strlen(pSesInfo->serverName), "\\IPC$");
--		rc = CIFSTCon(xid, pSesInfo, temp_unc, NULL, nls_codepage);
--		cFYI(1, "CIFS Tcon rc = %d ipc_tid = %d", rc, pSesInfo->ipc_tid);
-+		strcpy(temp_unc + 2, ses->serverName);
-+		strcpy(temp_unc + 2 + strlen(ses->serverName), "\\IPC$");
-+		rc = ses->server->ops->tree_connect(xid, ses, temp_unc, NULL,
-+						    nls_codepage);
-+		cFYI(1, "Tcon rc = %d ipc_tid = %d", rc, ses->ipc_tid);
- 		kfree(temp_unc);
- 	}
- 	if (rc == 0)
--		rc = CIFSGetDFSRefer(xid, pSesInfo, old_path, preferrals,
--				     pnum_referrals, nls_codepage, remap);
--	/* BB map targetUNCs to dfs_info3 structures, here or
--		in CIFSGetDFSRefer BB */
-+		rc = CIFSGetDFSRefer(xid, ses, old_path, referrals,
-+				     num_referrals, nls_codepage, remap);
-+	/*
-+	 * BB - map targetUNCs to dfs_info3 structures, here or in
-+	 * CIFSGetDFSRefer.
-+	 */
- 
- 	return rc;
- }
-@@ -3776,7 +3789,7 @@ out:
-  * pointer may be NULL.
-  */
- int
--CIFSTCon(unsigned int xid, struct cifs_ses *ses,
-+CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 	 const char *tree, struct cifs_tcon *tcon,
- 	 const struct nls_table *nls_codepage)
- {
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 6b0a5d6..728595f 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -432,6 +432,8 @@ struct smb_version_operations smb1_operations = {
- 	.negotiate = cifs_negotiate,
- 	.sess_setup = CIFS_SessSetup,
- 	.logoff = CIFSSMBLogoff,
-+	.tree_connect = CIFSTCon,
-+	.tree_disconnect = CIFSSMBTDis,
- };
- 
- struct smb_version_values smb1_values = {
+-#define NT_STATUS_OK 0x0000
+-#define STATUS_SOME_UNMAPPED       0x0107
+-#define STATUS_BUFFER_OVERFLOW     0x80000005
++#define NT_STATUS_OK                   0x0000
++#define NT_STATUS_SOME_UNMAPPED        0x0107
++#define NT_STATUS_BUFFER_OVERFLOW  0x80000005
+ #define NT_STATUS_NO_MORE_ENTRIES  0x8000001a
+ #define NT_STATUS_MEDIA_CHANGED    0x8000001c
+ #define NT_STATUS_END_OF_MEDIA     0x8000001e
 -- 
 1.7.1
