@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3 27/32] CIFS: Setup async request in ops struct
-Date: Fri, 13 Jul 2012 11:53:40 +0400
-Message-ID: <1342166025-29377-28-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH v3 29/32] CIFS: Move echo code to osp struct
+Date: Fri, 13 Jul 2012 11:53:42 +0400
+Message-ID: <1342166025-29377-30-git-send-email-pshilovsky@samba.org>
 References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,72 +11,63 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    3 +++
- fs/cifs/cifsproto.h |    2 ++
- fs/cifs/smb1ops.c   |    1 +
- fs/cifs/transport.c |    4 ++--
- 4 files changed, 8 insertions(+), 2 deletions(-)
+ fs/cifs/cifsglob.h |    4 ++++
+ fs/cifs/connect.c  |   10 ++++++----
+ fs/cifs/smb1ops.c  |    1 +
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 340dce0..5e4d1c5 100644
+index 5e4d1c5..0c53a83 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -173,6 +173,9 @@ struct smb_version_operations {
- 	/* setup request: allocate mid, sign message */
- 	int (*setup_request)(struct cifs_ses *, struct kvec *, unsigned int,
- 			     struct mid_q_entry **);
-+	/* setup async request: allocate mid, sign message */
-+	int (*setup_async_request)(struct TCP_Server_Info *, struct kvec *,
-+				   unsigned int, struct mid_q_entry **);
- 	/* check response: verify signature, map error */
- 	int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
- 			     bool);
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 8836c7b..5aadeec 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -78,6 +78,8 @@ extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
- 			    char *in_buf, int flags);
- extern int cifs_setup_request(struct cifs_ses *, struct kvec *, unsigned int,
- 			      struct mid_q_entry **);
-+extern int cifs_setup_async_request(struct TCP_Server_Info *, struct kvec *,
-+				    unsigned int, struct mid_q_entry **);
- extern int cifs_check_receive(struct mid_q_entry *mid,
- 			struct TCP_Server_Info *server, bool log_error);
- extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
+@@ -234,6 +234,10 @@ struct smb_version_operations {
+ 	/* build a full path to the root of the mount */
+ 	char * (*build_path_to_root)(struct smb_vol *, struct cifs_sb_info *,
+ 				     struct cifs_tcon *);
++	/* check if we can send an echo or nor */
++	bool (*can_echo)(struct TCP_Server_Info *);
++	/* send echo request */
++	int (*echo)(struct TCP_Server_Info *);
+ };
+ 
+ struct smb_version_values {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index d757427..48233a3 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -405,15 +405,17 @@ cifs_echo_request(struct work_struct *work)
+ 					struct TCP_Server_Info, echo.work);
+ 
+ 	/*
+-	 * We cannot send an echo until the NEGOTIATE_PROTOCOL request is
+-	 * done, which is indicated by maxBuf != 0. Also, no need to ping if
+-	 * we got a response recently
++	 * We cannot send an echo if it is disabled or until the
++	 * NEGOTIATE_PROTOCOL request is done, which is indicated by
++	 * server->ops->need_neg() == true. Also, no need to ping if
++	 * we got a response recently.
+ 	 */
+ 	if (!server->ops->need_neg || server->ops->need_neg(server) ||
++	    (server->ops->can_echo && !server->ops->can_echo(server)) ||
+ 	    time_before(jiffies, server->lstrp + SMB_ECHO_INTERVAL - HZ))
+ 		goto requeue_echo;
+ 
+-	rc = CIFSSMBEcho(server);
++	rc = server->ops->echo ? server->ops->echo(server) : -ENOSYS;
+ 	if (rc)
+ 		cFYI(1, "Unable to send echo request to server: %s",
+ 			server->hostname);
 diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 7195fad..7bd4973 100644
+index 7bd4973..c9326b4 100644
 --- a/fs/cifs/smb1ops.c
 +++ b/fs/cifs/smb1ops.c
-@@ -524,6 +524,7 @@ struct smb_version_operations smb1_operations = {
- 	.send_cancel = send_nt_cancel,
- 	.compare_fids = cifs_compare_fids,
- 	.setup_request = cifs_setup_request,
-+	.setup_async_request = cifs_setup_async_request,
- 	.check_receive = cifs_check_receive,
- 	.add_credits = cifs_add_credits,
- 	.set_credits = cifs_set_credits,
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 8844328..4d37902 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -349,7 +349,7 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
- 	return 0;
- }
+@@ -551,6 +551,7 @@ struct smb_version_operations smb1_operations = {
+ 	.query_path_info = cifs_query_path_info,
+ 	.get_srv_inum = cifs_get_srv_inum,
+ 	.build_path_to_root = cifs_build_path_to_root,
++	.echo = CIFSSMBEcho,
+ };
  
--static int
-+int
- cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
- 			 unsigned int nvec, struct mid_q_entry **ret_mid)
- {
-@@ -395,7 +395,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 		return rc;
- 
- 	mutex_lock(&server->srv_mutex);
--	rc = cifs_setup_async_request(server, iov, nvec, &mid);
-+	rc = server->ops->setup_async_request(server, iov, nvec, &mid);
- 	if (rc) {
- 		mutex_unlock(&server->srv_mutex);
- 		add_credits(server, 1, optype);
+ struct smb_version_values smb1_values = {
 -- 
 1.7.1
