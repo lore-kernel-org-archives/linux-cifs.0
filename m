@@ -1,138 +1,126 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Fw: mount.cifs multiuser w/o krb5? How?
-Date: Mon, 16 Jul 2012 23:53:22 +0100
-Message-ID: <8040.1342479202@warthog.procyon.org.uk>
-References: <20120716072106.00993484@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] cifscreds: add a check and warning for missing session keyring
+Date: Tue, 17 Jul 2012 09:28:37 -0400
+Message-ID: <1342531717-30135-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: keyrings-6DNke4IJHB0gsBAKwltoeQ@public.gmane.org, linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Milan =?utf-8?B?S27DrcW+ZWs=?= <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120716072106.00993484-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Many distros do not call into pam_keyinit to set up the session keyring
+properly at login time. When cifscreds add is used in such a session,
+the kernel will spawn a new session keyring in which to install the
+credentials. That keyring will then go away once the cifscreds process
+exits.
 
-> On Wed, 11 Jul 2012 21:05:31 +0200
-> Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->=20
-> > Jeff Layton writes:
-> >=20
-> > >> cifscreds add is more or less equivalent to a command like this:
-> > >
-> > >     $ keyctl add logon cifs:a:ip_address 'username:password' @s
-> > >
-> >=20
-> > There seems to be a general problem with adding keys (@s) to the de=
-fault =20
-> > "session" keyring. Adding user type keys (@u) works.
-> >=20
-> > $ keyctl add logon description data @s
-> > does not add anything to the _uid_ses:UID keyring, which is automat=
-ically =20
-> > created after login.
-> >=20
-> > Interestingly, when a new session keyring is added, then it works:
-> >=20
-> > [root@client ~]# su - zmrzlinka
-> > [zmrzlinka@client ~]$ keyctl show
-> > Session Keyring
-> > 1037083570 --alswrv   1001    -1  keyring: _uid_ses.1001
+Check for this situation  by looking to see if the session and
+user-session keyrings are the same. Throw a warning if so, and add some
+verbiage to the cifscreds manpage that explains the issue.
 
-The problem is here.
+Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reported-by: Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifscreds.1   |    9 ++++++++-
+ cifscreds.c   |   21 +++++++++++++++++++++
+ cifscreds.pod |    8 ++++++++
+ 3 files changed, 37 insertions(+), 1 deletion(-)
 
-Your process here does not have its own session keyring.  Instead it fa=
-lls
-back to the user-session keyring when it can (you can see this by the
-"_uid.ses.<uid>" name on the keyring).
-
-In the kernel, lookup_user_key() has special logic in the kernel for ha=
-ndling
-the case where you try and modify the session keyring when you don't ha=
-ve one.
-That includes adding a link into it to a new key:
-
-	case KEY_SPEC_SESSION_KEYRING:
-		if (!cred->session_keyring) {
-			/* always install a session keyring upon access if one
-			 * doesn't exist yet */
-			ret =3D install_user_keyrings();
-			if (ret < 0)
-				goto error;
-			if (lflags & KEY_LOOKUP_CREATE)
-				ret =3D join_session_keyring(NULL);
-			else
-				ret =3D install_session_keyring(
-					cred->user->session_keyring);
-
-			if (ret < 0)
-				goto error;
-			goto reget_creds;
-		} else if (cred->session_keyring =3D=3D
-			   cred->user->session_keyring &&
-			   lflags & KEY_LOOKUP_CREATE) {
-			ret =3D join_session_keyring(NULL);
-			if (ret < 0)
-				goto error;
-			goto reget_creds;
-		}
-
-lookup_user_key() is called with KEY_LOOKUP_CREATE set when the add_key=
-()
-system call invokes it to get the destination keyring.  That means that=
- a new
-session keyring will be created for the cifscreds process (note the
-join_session_keyring() calls) - and will be destroyed when that process=
- exits.
-
-Your system should call pam_keyinit from the login process to set up yo=
-ur
-session keyring.  This has been around for a few years, but not all
-distributions choose to use it (as far as I can tell, Debian and Ubuntu=
- fall
-into this category).
-
-On a Fedora-based system, you see:
-
-	[dhowells@andromeda ~]$ keyctl show
-	Session Keyring
-	 222025610 --alswrv   4043  4043  keyring: _ses
-	  60559872 --alswrv   4043    -1   \_ keyring: _uid.4043
-
-The default name for the session keyring is _ses.  Because processes on=
- Fedora
-have a session keyring allocated by PAM, this then works:
-
-	[dhowells@andromeda ~]$ cifscreds add www.redhat.com
-	Password:=20
-	[dhowells@andromeda ~]$ keyctl show
-	Session Keyring
-	 222025610 --alswrv   4043  4043  keyring: _ses
-	  60559872 --alswrv   4043    -1   \_ keyring: _uid.4043
-	   4690765 ----sw-v   4043  4043   \_ logon: cifs:a:2.19.119.214
-
-Note that the behaviour can be reproduced on Fedora by this:
-
-	keyctl session _uid_ses.<uid>
-
-So, for me, I would do:
-
-	keyctl session _uid_ses.4043
-
-which will create a new shell that has the user-session process as the =
-session
-keyring, which will then fail to work exactly as if there was no specif=
-ically
-assigned session keyring:
-
-	[dhowells@andromeda ~]$ keyctl add user a a @s
-	341403701
-	[dhowells@andromeda ~]$ keyctl show
-	Session Keyring
-	 961618603 --alswrv   4043    -1  keyring: _uid_ses.4043
-	  60559872 --alswrv   4043    -1   \_ keyring: _uid.4043
-
-David
+diff --git a/cifscreds.1 b/cifscreds.1
+index 44a02a2..83afae6 100644
+--- a/cifscreds.1
++++ b/cifscreds.1
+@@ -124,7 +124,7 @@
+ .\" =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+ .\"
+ .IX Title "CIFSCREDS 1"
+-.TH CIFSCREDS 1 "2012-01-24" "" ""
++.TH CIFSCREDS 1 "2012-07-17" "" ""
+ .\" For nroff, turn off justification.  Always turn off hyphenation; i=
+t makes
+ .\" way too many mistakes in technical documents.
+ .if n .ad l
+@@ -186,6 +186,13 @@ different username.
+ The cifscreds utility requires a kernel built with support for the
+ \&\fBlogin\fR key type. That key type was added in v3.3 in mainline Li=
+nux
+ kernels.
++.PP
++Since \fBcifscreds\fR adds keys to the session keyring, it is highly
++recommended that one use \fBpam_keyinit\fR to ensure that a session ke=
+yring
++is established at login time.
++.SH "SEE ALSO"
++.IX Header "SEE ALSO"
++\&\fIpam_keyinit\fR\|(8)
+ .SH "AUTHORS"
+ .IX Header "AUTHORS"
+ The cifscreds program was originally developed by Igor Druzhinin
+diff --git a/cifscreds.c b/cifscreds.c
+index efc76e6..f521ba5 100644
+--- a/cifscreds.c
++++ b/cifscreds.c
+@@ -465,6 +465,25 @@ static int cifscreds_update(struct cmdarg *arg)
+ 	return EXIT_SUCCESS;
+ }
+=20
++static void
++check_session_keyring(void)
++{
++	key_serial_t	ses_key, uses_key;
++
++	ses_key =3D keyctl_get_keyring_ID(KEY_SPEC_SESSION_KEYRING, 0);
++	if (ses_key =3D=3D -1)
++		return;
++
++	uses_key =3D keyctl_get_keyring_ID(KEY_SPEC_USER_SESSION_KEYRING, 0);
++	if (uses_key =3D=3D -1)
++		return;
++
++	if (ses_key =3D=3D uses_key)
++		fprintf(stderr, "Warning: you have no session keyring. "
++				"cifscreds keys will not persist. See "
++				"pam_keyinit(8).\n");
++}
++
+ int main(int argc, char **argv)
+ {
+ 	struct command *cmd, *best;
+@@ -535,5 +554,7 @@ int main(int argc, char **argv)
+ 	if (arg.user =3D=3D NULL)
+ 		arg.user =3D getusername(getuid());
+=20
++	check_session_keyring();
++
+ 	return best->action(&arg);
+ }
+diff --git a/cifscreds.pod b/cifscreds.pod
+index 17e453f..c3bafb5 100644
+--- a/cifscreds.pod
++++ b/cifscreds.pod
+@@ -79,6 +79,14 @@ The cifscreds utility requires a kernel built with s=
+upport for the
+ B<login> key type. That key type was added in v3.3 in mainline Linux
+ kernels.
+=20
++Since B<cifscreds> adds keys to the session keyring, it is highly
++recommended that one use B<pam_keyinit> to ensure that a session keyri=
+ng
++is established at login time.
++
++=3Dhead1 SEE ALSO
++
++pam_keyinit(8)
++
+ =3Dhead1 AUTHORS
+=20
+ The cifscreds program was originally developed by Igor Druzhinin
+--=20
+1.7.10.4
