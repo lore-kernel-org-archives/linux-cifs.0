@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 44/45] CIFS: Move statfs to ops struct
-Date: Wed, 18 Jul 2012 19:49:00 +0400
-Message-ID: <1342626541-29872-45-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 45/45] CIFS: Add statfs support for SMB2
+Date: Wed, 18 Jul 2012 19:49:01 +0400
+Message-ID: <1342626541-29872-46-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,150 +11,210 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsfs.c   |   29 ++++-------------------------
- fs/cifs/cifsglob.h |    5 +++++
- fs/cifs/smb1ops.c  |   34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 43 insertions(+), 25 deletions(-)
+ fs/cifs/smb2glob.h  |    2 +
+ fs/cifs/smb2ops.c   |   22 ++++++++++++++
+ fs/cifs/smb2pdu.c   |   81 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |   19 ++++++++++++
+ fs/cifs/smb2proto.h |    3 ++
+ 5 files changed, 127 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 65f8b05..4dde869 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -51,7 +51,6 @@
- #ifdef CONFIG_CIFS_SMB2
- #include "smb2pdu.h"
- #endif
--#define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
+diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
+index 05d429b..7c0e214 100644
+--- a/fs/cifs/smb2glob.h
++++ b/fs/cifs/smb2glob.h
+@@ -23,6 +23,8 @@
+ #ifndef _SMB2_GLOB_H
+ #define _SMB2_GLOB_H
  
- int cifsFYI = 0;
- int cifsERROR = 1;
-@@ -162,13 +161,12 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
- 	struct super_block *sb = dentry->d_sb;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
--	int rc = -EOPNOTSUPP;
-+	struct TCP_Server_Info *server = tcon->ses->server;
- 	unsigned int xid;
-+	int rc = 0;
- 
- 	xid = get_xid();
- 
--	buf->f_type = CIFS_MAGIC_NUMBER;
--
- 	/*
- 	 * PATH_MAX may be too long - it would presumably be total path,
- 	 * but note that some servers (includinng Samba 3) have a shorter
-@@ -180,27 +178,8 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
- 	buf->f_files = 0;	/* undefined */
- 	buf->f_ffree = 0;	/* unlimited */
- 
--	/*
--	 * We could add a second check for a QFS Unix capability bit
--	 */
--	if ((tcon->ses->capabilities & CAP_UNIX) &&
--	    (CIFS_POSIX_EXTENSIONS & le64_to_cpu(tcon->fsUnixInfo.Capability)))
--		rc = CIFSSMBQFSPosixInfo(xid, tcon, buf);
--
--	/*
--	 * Only need to call the old QFSInfo if failed on newer one,
--	 * e.g. by OS/2.
--	 **/
--	if (rc && (tcon->ses->capabilities & CAP_NT_SMBS))
--		rc = CIFSSMBQFSInfo(xid, tcon, buf);
--
--	/*
--	 * Some old Windows servers also do not support level 103, retry with
--	 * older level one if old server failed the previous call or we
--	 * bypassed it because we detected that this was an older LANMAN sess
--	 */
--	if (rc)
--		rc = SMBOldQFSInfo(xid, tcon, buf);
-+	if (server->ops->queryfs)
-+		rc = server->ops->queryfs(xid, tcon, buf);
- 
- 	free_xid(xid);
- 	return 0;
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index a8f424f..46bbbe4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -32,6 +32,8 @@
- #include "smb2pdu.h"
- #endif
- 
-+#define CIFS_MAGIC_NUMBER 0xFF534D42      /* the first four bytes of SMB PDUs */
++#define SMB2_MAGIC_NUMBER 0xFE534D42
 +
  /*
-  * The sizes of various internal tables and strings
-  */
-@@ -333,6 +335,9 @@ struct smb_version_operations {
- 	/* send oplock break response */
- 	int (*oplock_response)(struct cifs_tcon *, struct cifs_fid *,
- 			       struct cifsInodeInfo *);
-+	/* query remote filesystem */
-+	int (*queryfs)(const unsigned int, struct cifs_tcon *,
-+		       struct kstatfs *);
- };
- 
- struct smb_version_values {
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index f55b2e3..f6c7a1c 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -18,6 +18,7 @@
+  *****************************************************************
+  * Constants go here
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 99dbb8c..a1333d2 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -17,12 +17,14 @@
+  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
   */
  
- #include <linux/pagemap.h>
 +#include <linux/vfs.h>
  #include "cifsglob.h"
+ #include "smb2pdu.h"
+ #include "smb2proto.h"
  #include "cifsproto.h"
  #include "cifs_debug.h"
-@@ -872,6 +873,38 @@ cifs_oplock_response(struct cifs_tcon *tcon, struct cifs_fid *fid,
- 			   cinode->clientCanCacheRead ? 1 : 0);
+ #include "smb2status.h"
++#include "smb2glob.h"
+ 
+ static int
+ change_conf(struct TCP_Server_Info *server)
+@@ -501,6 +503,25 @@ smb2_oplock_response(struct cifs_tcon *tcon, struct cifs_fid *fid,
+ 				 cinode->clientCanCacheRead ? 1 : 0);
  }
  
 +static int
-+cifs_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
++smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
 +	     struct kstatfs *buf)
 +{
-+	int rc = -EOPNOTSUPP;
++	int rc;
++	u64 persistent_fid, volatile_fid;
++	__le16 srch_path = 0; /* Null - open root of share */
++	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
 +
-+	buf->f_type = CIFS_MAGIC_NUMBER;
-+
-+	/*
-+	 * We could add a second check for a QFS Unix capability bit
-+	 */
-+	if ((tcon->ses->capabilities & CAP_UNIX) &&
-+	    (CIFS_POSIX_EXTENSIONS & le64_to_cpu(tcon->fsUnixInfo.Capability)))
-+		rc = CIFSSMBQFSPosixInfo(xid, tcon, buf);
-+
-+	/*
-+	 * Only need to call the old QFSInfo if failed on newer one,
-+	 * e.g. by OS/2.
-+	 **/
-+	if (rc && (tcon->ses->capabilities & CAP_NT_SMBS))
-+		rc = CIFSSMBQFSInfo(xid, tcon, buf);
-+
-+	/*
-+	 * Some old Windows servers also do not support level 103, retry with
-+	 * older level one if old server failed the previous call or we
-+	 * bypassed it because we detected that this was an older LANMAN sess
-+	 */
++	rc = SMB2_open(xid, tcon, &srch_path, &persistent_fid, &volatile_fid,
++		       FILE_READ_ATTRIBUTES, FILE_OPEN, 0, 0, &oplock, NULL);
 +	if (rc)
-+		rc = SMBOldQFSInfo(xid, tcon, buf);
++		return rc;
++	buf->f_type = SMB2_MAGIC_NUMBER;
++	rc = SMB2_QFS_info(xid, tcon, persistent_fid, volatile_fid, buf);
++	SMB2_close(xid, tcon, persistent_fid, volatile_fid);
 +	return rc;
 +}
 +
- struct smb_version_operations smb1_operations = {
- 	.send_cancel = send_nt_cancel,
- 	.compare_fids = cifs_compare_fids,
-@@ -932,6 +965,7 @@ struct smb_version_operations smb1_operations = {
- 	.close_dir = cifs_close_dir,
- 	.calc_smb_size = smbCalcSize,
- 	.oplock_response = cifs_oplock_response,
-+	.queryfs = cifs_queryfs,
+ struct smb_version_operations smb21_operations = {
+ 	.setup_request = smb2_setup_request,
+ 	.setup_async_request = smb2_setup_async_request,
+@@ -557,6 +578,7 @@ struct smb_version_operations smb21_operations = {
+ 	.calc_smb_size = smb2_calc_size,
+ 	.is_status_pending = smb2_is_status_pending,
+ 	.oplock_response = smb2_oplock_response,
++	.queryfs = smb2_queryfs,
  };
  
- struct smb_version_values smb1_values = {
+ struct smb_version_values smb21_values = {
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index a04917e..61a4b88 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1971,3 +1971,84 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	return rc;
+ }
++
++static void
++copy_fs_info_to_kstatfs(struct smb2_fs_full_size_info *pfs_inf,
++			struct kstatfs *kst)
++{
++	kst->f_bsize = le32_to_cpu(pfs_inf->BytesPerSector) *
++			  le32_to_cpu(pfs_inf->SectorsPerAllocationUnit);
++	kst->f_blocks = le64_to_cpu(pfs_inf->TotalAllocationUnits);
++	kst->f_bfree  = le64_to_cpu(pfs_inf->ActualAvailableAllocationUnits);
++	kst->f_bavail = le64_to_cpu(pfs_inf->CallerAvailableAllocationUnits);
++	return;
++}
++
++static int
++build_qfs_info_req(struct kvec *iov, struct cifs_tcon *tcon, int level,
++		   int outbuf_len, u64 persistent_fid, u64 volatile_fid)
++{
++	int rc;
++	struct smb2_query_info_req *req;
++
++	cFYI(1, "Query FSInfo level %d", level);
++
++	if ((tcon->ses == NULL) || (tcon->ses->server == NULL))
++		return -EIO;
++
++	rc = small_smb2_init(SMB2_QUERY_INFO, tcon, (void **) &req);
++	if (rc)
++		return rc;
++
++	req->InfoType = SMB2_O_INFO_FILESYSTEM;
++	req->FileInfoClass = level;
++	req->PersistentFileId = persistent_fid;
++	req->VolatileFileId = volatile_fid;
++	/* 4 for rfc1002 length field and 1 for pad */
++	req->InputBufferOffset =
++			cpu_to_le16(sizeof(struct smb2_query_info_req) - 1 - 4);
++	req->OutputBufferLength = cpu_to_le32(
++		outbuf_len + sizeof(struct smb2_query_info_rsp) - 1 - 4);
++
++	iov->iov_base = (char *)req;
++	/* 4 for rfc1002 length field */
++	iov->iov_len = get_rfc1002_length(req) + 4;
++	return 0;
++}
++
++int
++SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
++	      u64 persistent_fid, u64 volatile_fid, struct kstatfs *fsdata)
++{
++	struct smb2_query_info_rsp *rsp = NULL;
++	struct kvec iov;
++	int rc = 0;
++	int resp_buftype;
++	struct cifs_ses *ses = tcon->ses;
++	struct smb2_fs_full_size_info *info = NULL;
++
++	rc = build_qfs_info_req(&iov, tcon, FS_FULL_SIZE_INFORMATION,
++				sizeof(struct smb2_fs_full_size_info),
++				persistent_fid, volatile_fid);
++	if (rc)
++		return rc;
++
++	rc = SendReceive2(xid, ses, &iov, 1, &resp_buftype, 0);
++	if (rc) {
++		cifs_stats_fail_inc(tcon, SMB2_QUERY_INFO_HE);
++		goto qinf_exit;
++	}
++	rsp = (struct smb2_query_info_rsp *)iov.iov_base;
++
++	info = (struct smb2_fs_full_size_info *)(4 /* RFC1001 len */ +
++		le16_to_cpu(rsp->OutputBufferOffset) + (char *)&rsp->hdr);
++	rc = validate_buf(le16_to_cpu(rsp->OutputBufferOffset),
++			  le32_to_cpu(rsp->OutputBufferLength), &rsp->hdr,
++			  sizeof(struct smb2_fs_full_size_info));
++	if (!rc)
++		copy_fs_info_to_kstatfs(info, fsdata);
++
++qinf_exit:
++	free_rsp_buf(resp_buftype, iov.iov_base);
++	return rc;
++}
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 0e5afb7..30c7d73 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -628,6 +628,25 @@ struct smb2_oplock_break {
+  *	BB consider moving to a different header
+  */
+ 
++/* File System Information Classes */
++#define FS_VOLUME_INFORMATION		1 /* Query */
++#define FS_LABEL_INFORMATION		2 /* Set */
++#define FS_SIZE_INFORMATION		3 /* Query */
++#define FS_DEVICE_INFORMATION		4 /* Query */
++#define FS_ATTRIBUTE_INFORMATION	5 /* Query */
++#define FS_CONTROL_INFORMATION		6 /* Query, Set */
++#define FS_FULL_SIZE_INFORMATION	7 /* Query */
++#define FS_OBJECT_ID_INFORMATION	8 /* Query, Set */
++#define FS_DRIVER_PATH_INFORMATION	9 /* Query */
++
++struct smb2_fs_full_size_info {
++	__le64 TotalAllocationUnits;
++	__le64 CallerAvailableAllocationUnits;
++	__le64 ActualAvailableAllocationUnits;
++	__le32 SectorsPerAllocationUnit;
++	__le32 BytesPerSector;
++} __packed;
++
+ /* partial list of QUERY INFO levels */
+ #define FILE_DIRECTORY_INFORMATION	1
+ #define FILE_FULL_DIRECTORY_INFORMATION 2
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index de554b7..a73a963 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -138,5 +138,8 @@ extern int SMB2_set_info(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 			     const u64 persistent_fid, const u64 volatile_fid,
+ 			     const __u8 oplock_level);
++extern int SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
++			 u64 persistent_file_id, u64 volatile_file_id,
++			 struct kstatfs *FSData);
+ 
+ #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
