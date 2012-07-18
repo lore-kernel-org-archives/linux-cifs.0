@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 33/45] CIFS: Move hardlink to ops struct
-Date: Wed, 18 Jul 2012 19:48:49 +0400
-Message-ID: <1342626541-29872-34-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 34/45] CIFS: Add SMB2 support for hardlink operation
+Date: Wed, 18 Jul 2012 19:48:50 +0400
+Message-ID: <1342626541-29872-35-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,235 +11,179 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    4 +++
- fs/cifs/cifsproto.h |    8 ++---
- fs/cifs/cifssmb.c   |   20 +++++++------
- fs/cifs/link.c      |   74 ++++++++++++++++++++++++++++++--------------------
- fs/cifs/smb1ops.c   |    1 +
- 5 files changed, 63 insertions(+), 44 deletions(-)
+ fs/cifs/smb2glob.h  |    1 +
+ fs/cifs/smb2inode.c |   34 ++++++++++++++++++++++++++++------
+ fs/cifs/smb2ops.c   |    1 +
+ fs/cifs/smb2pdu.c   |   31 +++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |    9 +++++++++
+ fs/cifs/smb2proto.h |    6 ++++++
+ 6 files changed, 76 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0f8a466..de11b1f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -278,6 +278,10 @@ struct smb_version_operations {
- 	/* send rename request */
- 	int (*rename)(const unsigned int, struct cifs_tcon *, const char *,
- 		      const char *, struct cifs_sb_info *);
-+	/* send create hardlink request */
-+	int (*create_hardlink)(const unsigned int, struct cifs_tcon *,
-+			       const char *, const char *,
-+			       struct cifs_sb_info *);
- 	/* open a file for non-posix mounts */
- 	int (*open)(const unsigned int, struct cifs_tcon *, const char *, int,
- 		    int, int, struct cifs_fid *, __u32 *, FILE_ALL_INFO *,
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index ef94f36..06b90bb 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -316,11 +316,9 @@ extern int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *tcon,
- 				 int netfid, const char *target_name,
- 				 const struct nls_table *nls_codepage,
- 				 int remap_special_chars);
--extern int CIFSCreateHardLink(const unsigned int xid,
--			struct cifs_tcon *tcon,
--			const char *fromName, const char *toName,
--			const struct nls_table *nls_codepage,
--			int remap_special_chars);
-+extern int CIFSCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
-+			      const char *from_name, const char *to_name,
-+			      struct cifs_sb_info *cifs_sb);
- extern int CIFSUnixCreateHardLink(const unsigned int xid,
- 			struct cifs_tcon *tcon,
- 			const char *fromName, const char *toName,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c1a18a6..3029bf8 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -2921,8 +2921,8 @@ createHardLinkRetry:
+diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
+index 8635574..21555d8 100644
+--- a/fs/cifs/smb2glob.h
++++ b/fs/cifs/smb2glob.h
+@@ -40,6 +40,7 @@
+ #define SMB2_OP_MKDIR 5
+ #define SMB2_OP_RENAME 6
+ #define SMB2_OP_DELETE 7
++#define SMB2_OP_HARDLINK 8
  
- int
- CIFSCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
--		   const char *fromName, const char *toName,
--		   const struct nls_table *nls_codepage, int remap)
+ /* Used when constructing chained read requests. */
+ #define CHAINED_REQUEST 1
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index a6952ba..1921c9c 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -78,6 +78,10 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		tmprc = SMB2_rename(xid, tcon, persistent_fid, volatile_fid,
+ 				    (__le16 *)data);
+ 		break;
++	case SMB2_OP_HARDLINK:
++		tmprc = SMB2_set_hardlink(xid, tcon, persistent_fid,
++					  volatile_fid, (__le16 *)data);
++		break;
+ 	default:
+ 		cERROR(1, "Invalid command");
+ 		break;
+@@ -175,10 +179,10 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 				  SMB2_OP_DELETE);
+ }
+ 
+-int
+-smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
+-		 const char *from_name, const char *to_name,
+-		 struct cifs_sb_info *cifs_sb)
++static int
++smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
 +		   const char *from_name, const char *to_name,
-+		   struct cifs_sb_info *cifs_sb)
++		   struct cifs_sb_info *cifs_sb, __u32 access, int command)
  {
- 	int rc = 0;
- 	NT_RENAME_REQ *pSMB = NULL;
-@@ -2930,6 +2930,7 @@ CIFSCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
- 	int bytes_returned;
- 	int name_len, name_len2;
- 	__u16 count;
-+	int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
- 
- 	cFYI(1, "In CIFSCreateHardLink");
- winCreateHardLinkRetry:
-@@ -2949,8 +2950,8 @@ winCreateHardLinkRetry:
- 
- 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
- 		name_len =
--		    cifsConvertToUTF16((__le16 *) pSMB->OldFileName, fromName,
--				       PATH_MAX, nls_codepage, remap);
-+		    cifsConvertToUTF16((__le16 *) pSMB->OldFileName, from_name,
-+				       PATH_MAX, cifs_sb->local_nls, remap);
- 		name_len++;	/* trailing null */
- 		name_len *= 2;
- 
-@@ -2959,17 +2960,18 @@ winCreateHardLinkRetry:
- 		pSMB->OldFileName[name_len + 1] = 0x00; /* pad */
- 		name_len2 =
- 		    cifsConvertToUTF16((__le16 *)&pSMB->OldFileName[name_len+2],
--				       toName, PATH_MAX, nls_codepage, remap);
-+				       to_name, PATH_MAX, cifs_sb->local_nls,
-+				       remap);
- 		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
- 		name_len2 *= 2;	/* convert to bytes */
- 	} else {	/* BB improve the check for buffer overruns BB */
--		name_len = strnlen(fromName, PATH_MAX);
-+		name_len = strnlen(from_name, PATH_MAX);
- 		name_len++;	/* trailing null */
--		strncpy(pSMB->OldFileName, fromName, name_len);
--		name_len2 = strnlen(toName, PATH_MAX);
-+		strncpy(pSMB->OldFileName, from_name, name_len);
-+		name_len2 = strnlen(to_name, PATH_MAX);
- 		name_len2++;	/* trailing null */
- 		pSMB->OldFileName[name_len] = 0x04;	/* 2nd buffer format */
--		strncpy(&pSMB->OldFileName[name_len + 1], toName, name_len2);
-+		strncpy(&pSMB->OldFileName[name_len + 1], to_name, name_len2);
- 		name_len2++;	/* trailing null */
- 		name_len2++;	/* signature byte */
- 	}
-diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-index d08b76c..169fa74 100644
---- a/fs/cifs/link.c
-+++ b/fs/cifs/link.c
-@@ -391,70 +391,84 @@ cifs_hardlink(struct dentry *old_file, struct inode *inode,
- {
- 	int rc = -EACCES;
- 	unsigned int xid;
--	char *fromName = NULL;
--	char *toName = NULL;
-+	char *from_name = NULL;
-+	char *to_name = NULL;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct tcon_link *tlink;
--	struct cifs_tcon *pTcon;
-+	struct cifs_tcon *tcon;
-+	struct TCP_Server_Info *server;
- 	struct cifsInodeInfo *cifsInode;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
--	pTcon = tlink_tcon(tlink);
-+	tcon = tlink_tcon(tlink);
- 
- 	xid = get_xid();
- 
--	fromName = build_path_from_dentry(old_file);
--	toName = build_path_from_dentry(direntry);
--	if ((fromName == NULL) || (toName == NULL)) {
-+	from_name = build_path_from_dentry(old_file);
-+	to_name = build_path_from_dentry(direntry);
-+	if ((from_name == NULL) || (to_name == NULL)) {
- 		rc = -ENOMEM;
- 		goto cifs_hl_exit;
+ 	__le16 *smb2_to_name = NULL;
+ 	int rc;
+@@ -189,9 +193,27 @@ smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto smb2_rename_path;
  	}
  
--	if (pTcon->unix_ext)
--		rc = CIFSUnixCreateHardLink(xid, pTcon, fromName, toName,
-+	if (tcon->unix_ext)
-+		rc = CIFSUnixCreateHardLink(xid, tcon, from_name, to_name,
- 					    cifs_sb->local_nls,
- 					    cifs_sb->mnt_cifs_flags &
- 						CIFS_MOUNT_MAP_SPECIAL_CHR);
- 	else {
--		rc = CIFSCreateHardLink(xid, pTcon, fromName, toName,
--					cifs_sb->local_nls,
--					cifs_sb->mnt_cifs_flags &
--						CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		server = tcon->ses->server;
-+		if (!server->ops->create_hardlink)
-+			return -ENOSYS;
-+		rc = server->ops->create_hardlink(xid, tcon, from_name, to_name,
-+						  cifs_sb);
- 		if ((rc == -EIO) || (rc == -EINVAL))
- 			rc = -EOPNOTSUPP;
- 	}
- 
- 	d_drop(direntry);	/* force new lookup from server of target */
- 
--	/* if source file is cached (oplocked) revalidate will not go to server
--	   until the file is closed or oplock broken so update nlinks locally */
-+	/*
-+	 * if source file is cached (oplocked) revalidate will not go to server
-+	 * until the file is closed or oplock broken so update nlinks locally
-+	 */
- 	if (old_file->d_inode) {
- 		cifsInode = CIFS_I(old_file->d_inode);
- 		if (rc == 0) {
- 			inc_nlink(old_file->d_inode);
--/* BB should we make this contingent on superblock flag NOATIME? */
--/*			old_file->d_inode->i_ctime = CURRENT_TIME;*/
--			/* parent dir timestamps will update from srv
--			within a second, would it really be worth it
--			to set the parent dir cifs inode time to zero
--			to force revalidate (faster) for it too? */
-+			/*
-+			 * BB should we make this contingent on superblock flag
-+			 * NOATIME?
-+			 */
-+			/* old_file->d_inode->i_ctime = CURRENT_TIME; */
-+			/*
-+			 * parent dir timestamps will update from srv within a
-+			 * second, would it really be worth it to set the parent
-+			 * dir cifs inode time to zero to force revalidate
-+			 * (faster) for it too?
-+			 */
- 		}
--		/* if not oplocked will force revalidate to get info
--		   on source file from srv */
-+		/*
-+		 * if not oplocked will force revalidate to get info on source
-+		 * file from srv
-+		 */
- 		cifsInode->time = 0;
- 
--		/* Will update parent dir timestamps from srv within a second.
--		   Would it really be worth it to set the parent dir (cifs
--		   inode) time field to zero to force revalidate on parent
--		   directory faster ie
--			CIFS_I(inode)->time = 0;  */
-+		/*
-+		 * Will update parent dir timestamps from srv within a second.
-+		 * Would it really be worth it to set the parent dir (cifs
-+		 * inode) time field to zero to force revalidate on parent
-+		 * directory faster ie
-+		 *
-+		 * CIFS_I(inode)->time = 0;
-+		 */
- 	}
- 
- cifs_hl_exit:
--	kfree(fromName);
--	kfree(toName);
-+	kfree(from_name);
-+	kfree(to_name);
- 	free_xid(xid);
- 	cifs_put_tlink(tlink);
+-	rc = smb2_open_op_close(xid, tcon, cifs_sb, from_name, DELETE,
+-				FILE_OPEN, 0, 0, smb2_to_name, SMB2_OP_RENAME);
++	rc = smb2_open_op_close(xid, tcon, cifs_sb, from_name, access,
++				FILE_OPEN, 0, 0, smb2_to_name, command);
+ smb2_rename_path:
+ 	kfree(smb2_to_name);
  	return rc;
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 3773920..e5d6344 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -801,6 +801,7 @@ struct smb_version_operations smb1_operations = {
- 	.unlink = CIFSSMBDelFile,
- 	.rename_pending_delete = cifs_rename_pending_delete,
- 	.rename = CIFSSMBRename,
-+	.create_hardlink = CIFSCreateHardLink,
- 	.open = cifs_open_file,
- 	.set_fid = cifs_set_fid,
- 	.close = cifs_close_file,
+ }
++
++int
++smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
++		 const char *from_name, const char *to_name,
++		 struct cifs_sb_info *cifs_sb)
++{
++	return smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
++				  DELETE, SMB2_OP_RENAME);
++}
++
++int
++smb2_create_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
++		     const char *from_name, const char *to_name,
++		     struct cifs_sb_info *cifs_sb)
++{
++	return smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
++				  FILE_READ_ATTRIBUTES, SMB2_OP_HARDLINK);
++}
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index da13a60..f9e3a13 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -443,6 +443,7 @@ struct smb_version_operations smb21_operations = {
+ 	.rmdir = smb2_rmdir,
+ 	.unlink = smb2_unlink,
+ 	.rename = smb2_rename_path,
++	.create_hardlink = smb2_create_hardlink,
+ 	.open = smb2_open_file,
+ 	.set_fid = smb2_set_fid,
+ 	.close = smb2_close_file,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 515c141..4d9ef2c 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1704,3 +1704,34 @@ SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 	kfree(data);
+ 	return rc;
+ }
++
++int
++SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
++		  u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
++{
++	struct smb2_file_link_info info;
++	void **data;
++	unsigned int size[2];
++	int rc;
++	int len = (2 * UniStrnlen((wchar_t *)target_file, PATH_MAX));
++
++	data = kmalloc(sizeof(void *) * 2, GFP_KERNEL);
++	if (!data)
++		return -ENOMEM;
++
++	info.ReplaceIfExists = 0; /* 1 = replace existing link with new */
++			      /* 0 = fail if link already exists */
++	info.RootDirectory = 0;  /* MBZ for network ops (why does spec say?) */
++	info.FileNameLength = cpu_to_le32(len);
++
++	data[0] = &info;
++	size[0] = sizeof(struct smb2_file_link_info);
++
++	data[1] = target_file;
++	size[1] = len + 2 /* null */;
++
++	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
++			   FILE_LINK_INFORMATION, 2, data, size);
++	kfree(data);
++	return rc;
++}
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index e2c7887..34a9329 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -651,6 +651,15 @@ struct smb2_file_rename_info { /* encoding of request for level 10 */
+ 	char   FileName[0];     /* New name to be assigned */
+ } __packed; /* level 10 Set */
+ 
++struct smb2_file_link_info { /* encoding of request for level 11 */
++	__u8   ReplaceIfExists; /* 1 = replace existing link with new */
++				/* 0 = fail if link already exists */
++	__u8   Reserved[7];
++	__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
++	__le32 FileNameLength;
++	char   FileName[0];     /* Name to be assigned to new link */
++} __packed; /* level 11 Set */
++
+ /*
+  * This level 18, although with struct with same name is different from cifs
+  * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index b43036e..99f6945 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -68,6 +68,9 @@ extern int smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
+ 			    const char *from_name, const char *to_name,
+ 			    struct cifs_sb_info *cifs_sb);
++extern int smb2_create_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
++				const char *from_name, const char *to_name,
++				struct cifs_sb_info *cifs_sb);
+ 
+ extern int smb2_open_file(const unsigned int xid, struct cifs_tcon *tcon,
+ 			  const char *full_path, int disposition,
+@@ -112,5 +115,8 @@ extern int SMB2_echo(struct TCP_Server_Info *server);
+ extern int SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
+ 		       u64 persistent_fid, u64 volatile_fid,
+ 		       __le16 *target_file);
++extern int SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
++			     u64 persistent_fid, u64 volatile_fid,
++			     __le16 *target_file);
+ 
+ #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
