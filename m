@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 08/11] cifs: change cifs_call_async to use smb_rqst structs
-Date: Wed, 18 Jul 2012 13:59:03 -0400
-Message-ID: <1342634346-22818-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 09/11] cifs: convert async write code to pass in data via rq_pages array
+Date: Wed, 18 Jul 2012 13:59:04 -0400
+Message-ID: <1342634346-22818-10-git-send-email-jlayton@redhat.com>
 References: <1342634346-22818-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,170 +10,193 @@ In-Reply-To: <1342634346-22818-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-For now, none of the callers populate rq_pages. That will be done for
-writes in a later patch.
-
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |    8 ++++----
- fs/cifs/cifssmb.c   |   20 +++++++++++++-------
- fs/cifs/transport.c |   18 +++++++++---------
- 3 files changed, 26 insertions(+), 20 deletions(-)
+ fs/cifs/cifsproto.h |    4 ++--
+ fs/cifs/cifssmb.c   |   33 ++++++++++-----------------------
+ fs/cifs/file.c      |   47 +++++++++--------------------------------------
+ 3 files changed, 21 insertions(+), 63 deletions(-)
 
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index b2daad4..dbb9c61 100644
+index dbb9c61..64a4297 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -71,10 +71,10 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
- extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
- extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
--extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
--			   unsigned int nvec, mid_receive_t *receive,
--			   mid_callback_t *callback, void *cbdata,
--			   bool ignore_pend);
-+extern int cifs_call_async(struct TCP_Server_Info *server,
-+			struct smb_rqst *rqst, mid_receive_t *receive,
-+			mid_callback_t *callback, void *cbdata,
-+			bool ignore_pend);
- extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
- 			struct smb_hdr * /* input */ ,
- 			struct smb_hdr * /* out */ ,
+@@ -515,8 +515,8 @@ struct cifs_writedata {
+ 	pid_t				pid;
+ 	unsigned int			bytes;
+ 	int				result;
+-	void (*marshal_iov) (struct kvec *iov,
+-			     struct cifs_writedata *wdata);
++	unsigned int			pagesz;
++	unsigned int			tailsz;
+ 	unsigned int			nr_pages;
+ 	struct page			*pages[1];
+ };
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c010c279..727f35e 100644
+index 727f35e..cb7de86 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -753,6 +753,8 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
- 	ECHO_REQ *smb;
- 	int rc = 0;
- 	struct kvec iov;
-+	struct smb_rqst rqst = { .rq_iov = &iov,
-+				 .rq_nvec = 1 };
- 
- 	cFYI(1, "In echo request");
- 
-@@ -770,7 +772,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
- 	iov.iov_base = smb;
- 	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
- 
--	rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
-+	rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback,
- 			     server, true);
- 	if (rc)
- 		cFYI(1, "Echo request failed: %d", rc);
-@@ -1602,6 +1604,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
- 	READ_REQ *smb = NULL;
- 	int wct;
- 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
-+	struct smb_rqst rqst = { .rq_iov = rdata->iov,
-+				 .rq_nvec = 1 };
- 
- 	cFYI(1, "%s: offset=%llu bytes=%u", __func__,
- 		rdata->offset, rdata->bytes);
-@@ -1645,9 +1649,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
- 	rdata->iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
- 
- 	kref_get(&rdata->refcount);
--	rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
--			     cifs_readv_receive, cifs_readv_callback,
--			     rdata, false);
-+	rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
-+			     cifs_readv_callback, rdata, false);
- 
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->num_reads);
-@@ -2050,6 +2053,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+@@ -2052,7 +2052,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 	WRITE_REQ *smb = NULL;
  	int wct;
  	struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
- 	struct kvec *iov = NULL;
-+	struct smb_rqst rqst = { };
+-	struct kvec *iov = NULL;
++	struct kvec iov;
+ 	struct smb_rqst rqst = { };
  
  	if (tcon->ses->capabilities & CAP_LARGE_FILES) {
- 		wct = 14;
-@@ -2066,11 +2070,13 @@ cifs_async_writev(struct cifs_writedata *wdata)
+@@ -2069,15 +2069,6 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 	if (rc)
  		goto async_writev_out;
  
- 	/* 1 iov per page + 1 for header */
--	iov = kzalloc((wdata->nr_pages + 1) * sizeof(*iov), GFP_NOFS);
-+	rqst.rq_nvec = wdata->nr_pages + 1;
-+	iov = kzalloc((rqst.rq_nvec) * sizeof(*iov), GFP_NOFS);
- 	if (iov == NULL) {
- 		rc = -ENOMEM;
- 		goto async_writev_out;
- 	}
-+	rqst.rq_iov = iov;
- 
+-	/* 1 iov per page + 1 for header */
+-	rqst.rq_nvec = wdata->nr_pages + 1;
+-	iov = kzalloc((rqst.rq_nvec) * sizeof(*iov), GFP_NOFS);
+-	if (iov == NULL) {
+-		rc = -ENOMEM;
+-		goto async_writev_out;
+-	}
+-	rqst.rq_iov = iov;
+-
  	smb->hdr.Pid = cpu_to_le16((__u16)wdata->pid);
  	smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->pid >> 16));
-@@ -2119,8 +2125,8 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 
+@@ -2094,18 +2085,15 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 	    cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
+ 
+ 	/* 4 for RFC1001 length + 1 for BCC */
+-	iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
+-	iov[0].iov_base = smb;
++	iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
++	iov.iov_base = smb;
+ 
+-	/*
+-	 * This function should marshal up the page array into the kvec
+-	 * array, reserving [0] for the header. It should kmap the pages
+-	 * and set the iov_len properly for each one. It may also set
+-	 * wdata->bytes too.
+-	 */
+-	cifs_kmap_lock();
+-	wdata->marshal_iov(iov, wdata);
+-	cifs_kmap_unlock();
++	rqst.rq_iov = &iov;
++	rqst.rq_nvec = 1;
++	rqst.rq_pages = wdata->pages;
++	rqst.rq_npages = wdata->nr_pages;
++	rqst.rq_pagesz = wdata->pagesz;
++	rqst.rq_tailsz = wdata->tailsz;
+ 
+ 	cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
+ 
+@@ -2121,7 +2109,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+ 				(struct smb_com_writex_req *)smb;
+ 		inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
+ 		put_bcc(wdata->bytes + 5, &smbw->hdr);
+-		iov[0].iov_len += 4; /* pad bigger by four bytes */
++		iov.iov_len += 4; /* pad bigger by four bytes */
  	}
  
  	kref_get(&wdata->refcount);
--	rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
--			     NULL, cifs_writev_callback, wdata, false);
-+	rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
-+				cifs_writev_callback, wdata, false);
+@@ -2139,7 +2127,6 @@ cifs_async_writev(struct cifs_writedata *wdata)
  
- 	if (rc == 0)
- 		cifs_stats_inc(&tcon->num_writes);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 8e689d1..83a1489 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -455,11 +455,11 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+ async_writev_out:
+ 	cifs_small_buf_release(smb);
+-	kfree(iov);
+ 	return rc;
  }
  
- static int
--cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
--			 unsigned int nvec, struct mid_q_entry **ret_mid)
-+cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst,
-+			 struct mid_q_entry **ret_mid)
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index dd28caa..d5f8c60 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1710,27 +1710,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ 	return rc;
+ }
+ 
+-/*
+- * Marshal up the iov array, reserving the first one for the header. Also,
+- * set wdata->bytes.
+- */
+-static void
+-cifs_writepages_marshal_iov(struct kvec *iov, struct cifs_writedata *wdata)
+-{
+-	int i;
+-	struct inode *inode = wdata->cfile->dentry->d_inode;
+-	loff_t size = i_size_read(inode);
+-
+-	/* marshal up the pages into iov array */
+-	wdata->bytes = 0;
+-	for (i = 0; i < wdata->nr_pages; i++) {
+-		iov[i + 1].iov_len = min(size - page_offset(wdata->pages[i]),
+-					(loff_t)PAGE_CACHE_SIZE);
+-		iov[i + 1].iov_base = kmap(wdata->pages[i]);
+-		wdata->bytes += iov[i + 1].iov_len;
+-	}
+-}
+-
+ static int cifs_writepages(struct address_space *mapping,
+ 			   struct writeback_control *wbc)
  {
- 	int rc;
--	struct smb_hdr *hdr = (struct smb_hdr *)iov[0].iov_base;
-+	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
- 	struct mid_q_entry *mid;
+@@ -1740,6 +1719,7 @@ static int cifs_writepages(struct address_space *mapping,
+ 	struct cifs_writedata *wdata;
+ 	struct page *page;
+ 	int rc = 0;
++	loff_t isize = i_size_read(mapping->host);
  
- 	/* enable signing if server requires it */
-@@ -475,7 +475,7 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
- 	list_add_tail(&mid->qhead, &server->pending_mid_q);
- 	spin_unlock(&GlobalMid_Lock);
+ 	/*
+ 	 * If wsize is smaller than the page cache size, default to writing
+@@ -1844,7 +1824,7 @@ retry:
+ 			 */
+ 			set_page_writeback(page);
  
--	rc = cifs_sign_smbv(iov, nvec, server, &mid->sequence_number);
-+	rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
- 	if (rc)
- 		delete_mid(mid);
- 	*ret_mid = mid;
-@@ -487,9 +487,9 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
-  * the result. Caller is responsible for dealing with timeouts.
-  */
- int
--cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
--		unsigned int nvec, mid_receive_t *receive,
--		mid_callback_t *callback, void *cbdata, bool ignore_pend)
-+cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
-+		mid_receive_t *receive, mid_callback_t *callback,
-+		void *cbdata, bool ignore_pend)
+-			if (page_offset(page) >= mapping->host->i_size) {
++			if (page_offset(page) >= isize) {
+ 				done = true;
+ 				unlock_page(page);
+ 				end_page_writeback(page);
+@@ -1875,7 +1855,11 @@ retry:
+ 		wdata->sync_mode = wbc->sync_mode;
+ 		wdata->nr_pages = nr_pages;
+ 		wdata->offset = page_offset(wdata->pages[0]);
+-		wdata->marshal_iov = cifs_writepages_marshal_iov;
++		wdata->pagesz = PAGE_CACHE_SIZE;
++		wdata->tailsz = min(isize - page_offset(wdata->pages[nr_pages - 1]),
++					(loff_t)PAGE_CACHE_SIZE);
++		wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) +
++					wdata->tailsz;
+ 
+ 		do {
+ 			if (wdata->cfile != NULL)
+@@ -2164,20 +2148,6 @@ size_t get_numpages(const size_t wsize, const size_t len, size_t *cur_len)
+ }
+ 
+ static void
+-cifs_uncached_marshal_iov(struct kvec *iov, struct cifs_writedata *wdata)
+-{
+-	int i;
+-	size_t bytes = wdata->bytes;
+-
+-	/* marshal up the pages into iov array */
+-	for (i = 0; i < wdata->nr_pages; i++) {
+-		iov[i + 1].iov_len = min_t(size_t, bytes, PAGE_SIZE);
+-		iov[i + 1].iov_base = kmap(wdata->pages[i]);
+-		bytes -= iov[i + 1].iov_len;
+-	}
+-}
+-
+-static void
+ cifs_uncached_writev_complete(struct work_struct *work)
  {
- 	int rc;
- 	struct mid_q_entry *mid;
-@@ -499,7 +499,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 		return rc;
- 
- 	mutex_lock(&server->srv_mutex);
--	rc = cifs_setup_async_request(server, iov, nvec, &mid);
-+	rc = cifs_setup_async_request(server, rqst, &mid);
- 	if (rc) {
- 		mutex_unlock(&server->srv_mutex);
- 		add_credits(server, 1);
-@@ -513,7 +513,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	mid->mid_state = MID_REQUEST_SUBMITTED;
- 
- 	cifs_in_send_inc(server);
--	rc = smb_sendv(server, iov, nvec);
-+	rc = smb_send_rqst(server, rqst);
- 	cifs_in_send_dec(server);
- 	cifs_save_when_sent(mid);
- 	mutex_unlock(&server->srv_mutex);
+ 	int i;
+@@ -2290,7 +2260,8 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+ 		wdata->cfile = cifsFileInfo_get(open_file);
+ 		wdata->pid = pid;
+ 		wdata->bytes = cur_len;
+-		wdata->marshal_iov = cifs_uncached_marshal_iov;
++		wdata->pagesz = PAGE_SIZE;
++		wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
+ 		rc = cifs_uncached_retry_writev(wdata);
+ 		if (rc) {
+ 			kref_put(&wdata->refcount, cifs_writedata_release);
 -- 
 1.7.10.4
