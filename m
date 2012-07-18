@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 07/45] CIFS: Protect i_nlink from being negative
-Date: Wed, 18 Jul 2012 19:48:23 +0400
-Message-ID: <1342626541-29872-8-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 09/45] CIFS: Add SMB2 support for unlink
+Date: Wed, 18 Jul 2012 19:48:25 +0400
+Message-ID: <1342626541-29872-10-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,48 +9,54 @@ In-Reply-To: <1342626541-29872-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-that can cause warning messages.
-
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/inode.c |   13 +++++++++++--
- 1 files changed, 11 insertions(+), 2 deletions(-)
+ fs/cifs/smb2inode.c |    9 +++++++++
+ fs/cifs/smb2ops.c   |    1 +
+ fs/cifs/smb2proto.h |    2 ++
+ 3 files changed, 12 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 7354877..88afb1a 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1110,6 +1110,15 @@ undo_setattr:
- 	goto out_close;
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 2aa5cb0..02a9bda 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -161,3 +161,12 @@ smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 				  0, CREATE_NOT_FILE | CREATE_DELETE_ON_CLOSE,
+ 				  NULL, SMB2_OP_DELETE);
  }
- 
-+/* copied from fs/nfs/dir.c with small changes */
-+static void
-+cifs_drop_nlink(struct inode *inode)
++
++int
++smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
++	    struct cifs_sb_info *cifs_sb)
 +{
-+	spin_lock(&inode->i_lock);
-+	if (inode->i_nlink > 0)
-+		drop_nlink(inode);
-+	spin_unlock(&inode->i_lock);
++	return smb2_open_op_close(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
++				  0, CREATE_DELETE_ON_CLOSE, NULL,
++				  SMB2_OP_DELETE);
 +}
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 826209b..bf9b318 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -321,6 +321,7 @@ struct smb_version_operations smb21_operations = {
+ 	.mkdir = smb2_mkdir,
+ 	.mkdir_setinfo = smb2_mkdir_setinfo,
+ 	.rmdir = smb2_rmdir,
++	.unlink = smb2_unlink,
+ };
+ 
+ struct smb_version_values smb21_values = {
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index bfaa7b1..f4ac727 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -59,6 +59,8 @@ extern void smb2_mkdir_setinfo(struct inode *inode, const char *full_path,
+ 			       struct cifs_tcon *tcon, const unsigned int xid);
+ extern int smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      const char *name, struct cifs_sb_info *cifs_sb);
++extern int smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon,
++		       const char *name, struct cifs_sb_info *cifs_sb);
  
  /*
-  * If dentry->d_inode is null (usually meaning the cached dentry
-@@ -1166,13 +1175,13 @@ retry_std_delete:
- psx_del_no_retry:
- 	if (!rc) {
- 		if (inode)
--			drop_nlink(inode);
-+			cifs_drop_nlink(inode);
- 	} else if (rc == -ENOENT) {
- 		d_drop(dentry);
- 	} else if (rc == -ETXTBSY) {
- 		rc = cifs_rename_pending_delete(full_path, dentry, xid);
- 		if (rc == 0)
--			drop_nlink(inode);
-+			cifs_drop_nlink(inode);
- 	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
- 		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
- 		if (attrs == NULL) {
+  * SMB2 Worker functions - most of protocol specific implementation details
 -- 
 1.7.1
