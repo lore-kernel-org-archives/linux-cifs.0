@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 38/45] CIFS: Add set_file_info support for SMB2
-Date: Wed, 18 Jul 2012 19:48:54 +0400
-Message-ID: <1342626541-29872-39-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 37/45] CIFS: Move set_file_info to ops struct
+Date: Wed, 18 Jul 2012 19:48:53 +0400
+Message-ID: <1342626541-29872-38-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,101 +11,225 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/smb2inode.c |   22 ++++++++++++++++++++++
- fs/cifs/smb2ops.c   |    1 +
- fs/cifs/smb2pdu.c   |   11 +++++++++++
- fs/cifs/smb2proto.h |    5 +++++
- 4 files changed, 39 insertions(+), 0 deletions(-)
+ fs/cifs/cifsglob.h |    3 ++
+ fs/cifs/inode.c    |   79 ++++------------------------------------------------
+ fs/cifs/smb1ops.c  |   79 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+), 73 deletions(-)
 
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 2905830..1bd6b0f 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -86,6 +86,10 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
- 		tmprc = SMB2_set_eof(xid, tcon, persistent_fid, volatile_fid,
- 				     current->tgid, (__le64 *)data);
- 		break;
-+	case SMB2_OP_SET_INFO:
-+		tmprc = SMB2_set_info(xid, tcon, persistent_fid, volatile_fid,
-+				      (FILE_BASIC_INFO *)data);
-+		break;
- 	default:
- 		cERROR(1, "Invalid command");
- 		break;
-@@ -232,3 +236,21 @@ smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
- 				  FILE_WRITE_DATA, FILE_OPEN, 0, 0, &eof,
- 				  SMB2_OP_SET_EOF);
- }
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3f7a53d..7c20d5a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -258,6 +258,9 @@ struct smb_version_operations {
+ 	/* set size by file handle */
+ 	int (*set_file_size)(const unsigned int, struct cifs_tcon *,
+ 			     struct cifsFileInfo *, __u64, bool);
++	/* set attributes */
++	int (*set_file_info)(struct inode *, const char *, FILE_BASIC_INFO *,
++			     const unsigned int);
+ 	/* build a full path to the root of the mount */
+ 	char * (*build_path_to_root)(struct smb_vol *, struct cifs_sb_info *,
+ 				     struct cifs_tcon *);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 16101a0..92c6c27 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -888,21 +888,18 @@ int
+ cifs_set_file_info(struct inode *inode, struct iattr *attrs, unsigned int xid,
+ 		   char *full_path, __u32 dosattr)
+ {
+-	int rc;
+-	int oplock = 0;
+-	__u16 netfid;
+-	__u32 netpid;
+ 	bool set_time = false;
+-	struct cifsFileInfo *open_file;
+-	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+-	struct tcon_link *tlink = NULL;
+-	struct cifs_tcon *pTcon;
++	struct TCP_Server_Info *server;
+ 	FILE_BASIC_INFO	info_buf;
+ 
+ 	if (attrs == NULL)
+ 		return -EINVAL;
+ 
++	server = cifs_sb_master_tcon(cifs_sb)->ses->server;
++	if (!server->ops->set_file_info)
++		return -ENOSYS;
 +
-+int
-+smb2_set_file_info(struct inode *inode, const char *full_path,
-+		   FILE_BASIC_INFO *buf, const unsigned int xid)
+ 	if (attrs->ia_valid & ATTR_ATIME) {
+ 		set_time = true;
+ 		info_buf.LastAccessTime =
+@@ -933,71 +930,7 @@ cifs_set_file_info(struct inode *inode, struct iattr *attrs, unsigned int xid,
+ 	info_buf.CreationTime = 0;	/* don't change */
+ 	info_buf.Attributes = cpu_to_le32(dosattr);
+ 
+-	/*
+-	 * If the file is already open for write, just use that fileid
+-	 */
+-	open_file = find_writable_file(cifsInode, true);
+-	if (open_file) {
+-		netfid = open_file->fid.netfid;
+-		netpid = open_file->pid;
+-		pTcon = tlink_tcon(open_file->tlink);
+-		goto set_via_filehandle;
+-	}
+-
+-	tlink = cifs_sb_tlink(cifs_sb);
+-	if (IS_ERR(tlink)) {
+-		rc = PTR_ERR(tlink);
+-		tlink = NULL;
+-		goto out;
+-	}
+-	pTcon = tlink_tcon(tlink);
+-
+-	/*
+-	 * NT4 apparently returns success on this call, but it doesn't
+-	 * really work.
+-	 */
+-	if (!(pTcon->ses->flags & CIFS_SES_NT4)) {
+-		rc = CIFSSMBSetPathInfo(xid, pTcon, full_path,
+-				     &info_buf, cifs_sb->local_nls,
+-				     cifs_sb->mnt_cifs_flags &
+-					CIFS_MOUNT_MAP_SPECIAL_CHR);
+-		if (rc == 0) {
+-			cifsInode->cifsAttrs = dosattr;
+-			goto out;
+-		} else if (rc != -EOPNOTSUPP && rc != -EINVAL)
+-			goto out;
+-	}
+-
+-	cFYI(1, "calling SetFileInfo since SetPathInfo for "
+-		 "times not supported by this server");
+-	rc = CIFSSMBOpen(xid, pTcon, full_path, FILE_OPEN,
+-			 SYNCHRONIZE | FILE_WRITE_ATTRIBUTES,
+-			 CREATE_NOT_DIR, &netfid, &oplock,
+-			 NULL, cifs_sb->local_nls,
+-			 cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
+-
+-	if (rc != 0) {
+-		if (rc == -EIO)
+-			rc = -EINVAL;
+-		goto out;
+-	}
+-
+-	netpid = current->tgid;
+-
+-set_via_filehandle:
+-	rc = CIFSSMBSetFileInfo(xid, pTcon, &info_buf, netfid, netpid);
+-	if (!rc)
+-		cifsInode->cifsAttrs = dosattr;
+-
+-	if (open_file == NULL)
+-		CIFSSMBClose(xid, pTcon, netfid);
+-	else
+-		cifsFileInfo_put(open_file);
+-out:
+-	if (tlink != NULL)
+-		cifs_put_tlink(tlink);
+-	return rc;
++	return server->ops->set_file_info(inode, full_path, &info_buf, xid);
+ }
+ 
+ /*
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index b73d275..ed31196 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -758,6 +758,84 @@ cifs_sync_write(const unsigned int xid, struct cifsFileInfo *cfile,
+ 	return CIFSSMBWrite2(xid, parms, written, iov, nr_segs);
+ }
+ 
++static int
++smb_set_file_info(struct inode *inode, const char *full_path,
++		  FILE_BASIC_INFO *buf, const unsigned int xid)
 +{
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	struct tcon_link *tlink;
++	int oplock = 0;
 +	int rc;
++	__u16 netfid;
++	__u32 netpid;
++	struct cifsFileInfo *open_file;
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct tcon_link *tlink = NULL;
++	struct cifs_tcon *tcon;
++	FILE_BASIC_INFO info_buf;
++
++	/* if the file is already open for write, just use that fileid */
++	open_file = find_writable_file(cinode, true);
++	if (open_file) {
++		netfid = open_file->fid.netfid;
++		netpid = open_file->pid;
++		tcon = tlink_tcon(open_file->tlink);
++		goto set_via_filehandle;
++	}
 +
 +	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink))
-+		return PTR_ERR(tlink);
-+	rc = smb2_open_op_close(xid, tlink_tcon(tlink), cifs_sb, full_path,
-+				FILE_WRITE_ATTRIBUTES, FILE_OPEN, 0, 0, buf,
-+				SMB2_OP_SET_INFO);
-+	cifs_put_tlink(tlink);
++	if (IS_ERR(tlink)) {
++		rc = PTR_ERR(tlink);
++		tlink = NULL;
++		goto out;
++	}
++	tcon = tlink_tcon(tlink);
++
++	/*
++	 * NT4 apparently returns success on this call, but it doesn't really
++	 * work.
++	 */
++	if (!(tcon->ses->flags & CIFS_SES_NT4)) {
++		rc = CIFSSMBSetPathInfo(xid, tcon, full_path, buf,
++					cifs_sb->local_nls,
++					cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
++		if (rc == 0) {
++			cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
++			goto out;
++		} else if (rc != -EOPNOTSUPP && rc != -EINVAL)
++			goto out;
++	}
++
++	cFYI(1, "calling SetFileInfo since SetPathInfo for times not supported "
++		"by this server");
++	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
++			 SYNCHRONIZE | FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
++			 &netfid, &oplock, NULL, cifs_sb->local_nls,
++			 cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
++
++	if (rc != 0) {
++		if (rc == -EIO)
++			rc = -EINVAL;
++		goto out;
++	}
++
++	netpid = current->tgid;
++
++set_via_filehandle:
++	rc = CIFSSMBSetFileInfo(xid, tcon, &info_buf, netfid, netpid);
++	if (!rc)
++		cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
++
++	if (open_file == NULL)
++		CIFSSMBClose(xid, tcon, netfid);
++	else
++		cifsFileInfo_put(open_file);
++out:
++	if (tlink != NULL)
++		cifs_put_tlink(tlink);
 +	return rc;
 +}
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 3aad536..7ecb117 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -448,6 +448,7 @@ struct smb_version_operations smb21_operations = {
- 	.query_file_info = smb2_query_file_info,
- 	.set_path_size = smb2_set_path_size,
- 	.set_file_size = smb2_set_file_size,
-+	.set_file_info = smb2_set_file_info,
- 	.build_path_to_root = smb2_build_path_to_root,
- 	.mkdir = smb2_mkdir,
- 	.mkdir_setinfo = smb2_mkdir_setinfo,
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index f1edc5e..1587761 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1755,3 +1755,14 @@ SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 	return send_set_info(xid, tcon, persistent_fid, volatile_fid, pid,
- 			     FILE_END_OF_FILE_INFORMATION, 1, &data, &size);
- }
 +
-+int
-+SMB2_set_info(const unsigned int xid, struct cifs_tcon *tcon,
-+	      u64 persistent_fid, u64 volatile_fid, FILE_BASIC_INFO *buf)
-+{
-+	unsigned int size;
-+	size = sizeof(FILE_BASIC_INFO);
-+	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
-+			     current->tgid, FILE_BASIC_INFORMATION, 1,
-+			     (void **)&buf, &size);
-+}
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 3d48662..2774724 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -59,6 +59,8 @@ extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
- extern int smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
- 			      const char *full_path, __u64 size,
- 			      struct cifs_sb_info *cifs_sb, bool set_alloc);
-+extern int smb2_set_file_info(struct inode *inode, const char *full_path,
-+			      FILE_BASIC_INFO *buf, const unsigned int xid);
- extern int smb2_mkdir(const unsigned int xid, struct cifs_tcon *tcon,
- 		      const char *name, struct cifs_sb_info *cifs_sb);
- extern void smb2_mkdir_setinfo(struct inode *inode, const char *full_path,
-@@ -124,5 +126,8 @@ extern int SMB2_set_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
- extern int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
- 			u64 persistent_fid, u64 volatile_fid, u32 pid,
- 			__le64 *eof);
-+extern int SMB2_set_info(const unsigned int xid, struct cifs_tcon *tcon,
-+			 u64 persistent_fid, u64 volatile_fid,
-+			 FILE_BASIC_INFO *buf);
- 
- #endif			/* _SMB2PROTO_H */
+ struct smb_version_operations smb1_operations = {
+ 	.send_cancel = send_nt_cancel,
+ 	.compare_fids = cifs_compare_fids,
+@@ -795,6 +873,7 @@ struct smb_version_operations smb1_operations = {
+ 	.get_srv_inum = cifs_get_srv_inum,
+ 	.set_path_size = CIFSSMBSetEOF,
+ 	.set_file_size = CIFSSMBSetFileSize,
++	.set_file_info = smb_set_file_info,
+ 	.build_path_to_root = cifs_build_path_to_root,
+ 	.echo = CIFSSMBEcho,
+ 	.mkdir = CIFSSMBMkDir,
 -- 
 1.7.1
