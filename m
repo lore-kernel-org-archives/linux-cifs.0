@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 31/45] CIFS: Move rename to ops struct
-Date: Wed, 18 Jul 2012 19:48:47 +0400
-Message-ID: <1342626541-29872-32-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 32/45] CIFS: Add SMB2 support for rename operation
+Date: Wed, 18 Jul 2012 19:48:48 +0400
+Message-ID: <1342626541-29872-33-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,299 +9,250 @@ In-Reply-To: <1342626541-29872-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 ---
- fs/cifs/cifsglob.h  |    3 ++
- fs/cifs/cifsproto.h |    5 +--
- fs/cifs/cifssmb.c   |   22 +++++++-----
- fs/cifs/inode.c     |   92 ++++++++++++++++++++++++++------------------------
- fs/cifs/smb1ops.c   |    1 +
- 5 files changed, 66 insertions(+), 57 deletions(-)
+ fs/cifs/smb2inode.c |   25 ++++++++++++
+ fs/cifs/smb2ops.c   |    1 +
+ fs/cifs/smb2pdu.c   |  107 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |   28 +++++++++++++
+ fs/cifs/smb2proto.h |    6 +++
+ 5 files changed, 167 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 78ce424..0f8a466 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -275,6 +275,9 @@ struct smb_version_operations {
- 	/* open, rename and delete file */
- 	int (*rename_pending_delete)(const char *, struct dentry *,
- 				     const unsigned int);
-+	/* send rename request */
-+	int (*rename)(const unsigned int, struct cifs_tcon *, const char *,
-+		      const char *, struct cifs_sb_info *);
- 	/* open a file for non-posix mounts */
- 	int (*open)(const unsigned int, struct cifs_tcon *, const char *, int,
- 		    int, int, struct cifs_fid *, __u32 *, FILE_ALL_INFO *,
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 722dba8..ef94f36 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -310,9 +310,8 @@ extern int CIFSPOSIXDelFile(const unsigned int xid, struct cifs_tcon *tcon,
- extern int CIFSSMBDelFile(const unsigned int xid, struct cifs_tcon *tcon,
- 			  const char *name, struct cifs_sb_info *cifs_sb);
- extern int CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
--			const char *fromName, const char *toName,
--			const struct nls_table *nls_codepage,
--			int remap_special_chars);
-+			 const char *from_name, const char *to_name,
-+			 struct cifs_sb_info *cifs_sb);
- extern int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *tcon,
- 				 int netfid, const char *target_name,
- 				 const struct nls_table *nls_codepage,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 666535c..c1a18a6 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -2528,8 +2528,8 @@ CIFSSMBFlush(const unsigned int xid, struct cifs_tcon *tcon, int smb_file_id)
- 
- int
- CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
--	      const char *fromName, const char *toName,
--	      const struct nls_table *nls_codepage, int remap)
-+	      const char *from_name, const char *to_name,
-+	      struct cifs_sb_info *cifs_sb)
- {
- 	int rc = 0;
- 	RENAME_REQ *pSMB = NULL;
-@@ -2537,6 +2537,7 @@ CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
- 	int bytes_returned;
- 	int name_len, name_len2;
- 	__u16 count;
-+	int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
- 
- 	cFYI(1, "In CIFSSMBRename");
- renameRetry:
-@@ -2551,9 +2552,9 @@ renameRetry:
- 			ATTR_DIRECTORY);
- 
- 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
--		name_len =
--		    cifsConvertToUTF16((__le16 *) pSMB->OldFileName, fromName,
--				       PATH_MAX, nls_codepage, remap);
-+		name_len = cifsConvertToUTF16((__le16 *) pSMB->OldFileName,
-+					      from_name, PATH_MAX,
-+					      cifs_sb->local_nls, remap);
- 		name_len++;	/* trailing null */
- 		name_len *= 2;
- 		pSMB->OldFileName[name_len] = 0x04;	/* pad */
-@@ -2561,17 +2562,18 @@ renameRetry:
- 		pSMB->OldFileName[name_len + 1] = 0x00;
- 		name_len2 =
- 		    cifsConvertToUTF16((__le16 *)&pSMB->OldFileName[name_len+2],
--				       toName, PATH_MAX, nls_codepage, remap);
-+				       to_name, PATH_MAX, cifs_sb->local_nls,
-+				       remap);
- 		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
- 		name_len2 *= 2;	/* convert to bytes */
- 	} else {	/* BB improve the check for buffer overruns BB */
--		name_len = strnlen(fromName, PATH_MAX);
-+		name_len = strnlen(from_name, PATH_MAX);
- 		name_len++;	/* trailing null */
--		strncpy(pSMB->OldFileName, fromName, name_len);
--		name_len2 = strnlen(toName, PATH_MAX);
-+		strncpy(pSMB->OldFileName, from_name, name_len);
-+		name_len2 = strnlen(to_name, PATH_MAX);
- 		name_len2++;	/* trailing null */
- 		pSMB->OldFileName[name_len] = 0x04;  /* 2nd buffer format */
--		strncpy(&pSMB->OldFileName[name_len + 1], toName, name_len2);
-+		strncpy(&pSMB->OldFileName[name_len + 1], to_name, name_len2);
- 		name_len2++;	/* trailing null */
- 		name_len2++;	/* signature byte */
- 	}
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 39ef1a6..f1448d9 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1512,29 +1512,32 @@ rmdir_exit:
- }
- 
- static int
--cifs_do_rename(unsigned int xid, struct dentry *from_dentry,
--	       const char *fromPath, struct dentry *to_dentry,
--	       const char *toPath)
-+cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
-+	       const char *from_path, struct dentry *to_dentry,
-+	       const char *to_path)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(from_dentry->d_sb);
- 	struct tcon_link *tlink;
--	struct cifs_tcon *pTcon;
-+	struct cifs_tcon *tcon;
-+	struct TCP_Server_Info *server;
- 	__u16 srcfid;
- 	int oplock, rc;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
--	pTcon = tlink_tcon(tlink);
-+	tcon = tlink_tcon(tlink);
-+	server = tcon->ses->server;
-+
-+	if (!server->ops->rename)
-+		return -ENOSYS;
- 
- 	/* try path-based rename first */
--	rc = CIFSSMBRename(xid, pTcon, fromPath, toPath, cifs_sb->local_nls,
--			   cifs_sb->mnt_cifs_flags &
--				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+	rc = server->ops->rename(xid, tcon, from_path, to_path, cifs_sb);
- 
- 	/*
--	 * don't bother with rename by filehandle unless file is busy and
--	 * source Note that cross directory moves do not work with
-+	 * Don't bother with rename by filehandle unless file is busy and
-+	 * source. Note that cross directory moves do not work with
- 	 * rename by filehandle to various Windows servers.
- 	 */
- 	if (rc == 0 || rc != -ETXTBSY)
-@@ -1545,29 +1548,28 @@ cifs_do_rename(unsigned int xid, struct dentry *from_dentry,
- 		goto do_rename_exit;
- 
- 	/* open the file to be renamed -- we need DELETE perms */
--	rc = CIFSSMBOpen(xid, pTcon, fromPath, FILE_OPEN, DELETE,
-+	rc = CIFSSMBOpen(xid, tcon, from_path, FILE_OPEN, DELETE,
- 			 CREATE_NOT_DIR, &srcfid, &oplock, NULL,
- 			 cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 				CIFS_MOUNT_MAP_SPECIAL_CHR);
--
- 	if (rc == 0) {
--		rc = CIFSSMBRenameOpenFile(xid, pTcon, srcfid,
-+		rc = CIFSSMBRenameOpenFile(xid, tcon, srcfid,
- 				(const char *) to_dentry->d_name.name,
- 				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 					CIFS_MOUNT_MAP_SPECIAL_CHR);
--
--		CIFSSMBClose(xid, pTcon, srcfid);
-+		CIFSSMBClose(xid, tcon, srcfid);
- 	}
- do_rename_exit:
- 	cifs_put_tlink(tlink);
- 	return rc;
- }
- 
--int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
--	struct inode *target_dir, struct dentry *target_dentry)
-+int
-+cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
-+	    struct inode *target_dir, struct dentry *target_dentry)
- {
--	char *fromName = NULL;
--	char *toName = NULL;
-+	char *from_name = NULL;
-+	char *to_name = NULL;
- 	struct cifs_sb_info *cifs_sb;
- 	struct tcon_link *tlink;
- 	struct cifs_tcon *tcon;
-@@ -1588,25 +1590,25 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
- 	 * we already have the rename sem so we do not need to
- 	 * grab it again here to protect the path integrity
- 	 */
--	fromName = build_path_from_dentry(source_dentry);
--	if (fromName == NULL) {
-+	from_name = build_path_from_dentry(source_dentry);
-+	if (from_name == NULL) {
- 		rc = -ENOMEM;
- 		goto cifs_rename_exit;
- 	}
- 
--	toName = build_path_from_dentry(target_dentry);
--	if (toName == NULL) {
-+	to_name = build_path_from_dentry(target_dentry);
-+	if (to_name == NULL) {
- 		rc = -ENOMEM;
- 		goto cifs_rename_exit;
- 	}
- 
--	rc = cifs_do_rename(xid, source_dentry, fromName,
--			    target_dentry, toName);
-+	rc = cifs_do_rename(xid, source_dentry, from_name, target_dentry,
-+			    to_name);
- 
- 	if (rc == -EEXIST && tcon->unix_ext) {
- 		/*
--		 * Are src and dst hardlinks of same inode? We can
--		 * only tell with unix extensions enabled
-+		 * Are src and dst hardlinks of same inode? We can only tell
-+		 * with unix extensions enabled.
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index ee3a1ef..a6952ba 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -74,6 +74,10 @@ smb2_open_op_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 * SMB2_open() call.
  		 */
- 		info_buf_source =
- 			kmalloc(2 * sizeof(FILE_UNIX_BASIC_INFO),
-@@ -1617,19 +1619,19 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
- 		}
- 
- 		info_buf_target = info_buf_source + 1;
--		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, fromName,
--					info_buf_source,
--					cifs_sb->local_nls,
--					cifs_sb->mnt_cifs_flags &
--					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, from_name,
-+					     info_buf_source,
-+					     cifs_sb->local_nls,
-+					     cifs_sb->mnt_cifs_flags &
-+						CIFS_MOUNT_MAP_SPECIAL_CHR);
- 		if (tmprc != 0)
- 			goto unlink_target;
- 
--		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, toName,
--					info_buf_target,
--					cifs_sb->local_nls,
--					cifs_sb->mnt_cifs_flags &
--					CIFS_MOUNT_MAP_SPECIAL_CHR);
-+		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, to_name,
-+					     info_buf_target,
-+					     cifs_sb->local_nls,
-+					     cifs_sb->mnt_cifs_flags &
-+						CIFS_MOUNT_MAP_SPECIAL_CHR);
- 
- 		if (tmprc == 0 && (info_buf_source->UniqueId ==
- 				   info_buf_target->UniqueId)) {
-@@ -1637,8 +1639,11 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
- 			rc = 0;
- 			goto cifs_rename_exit;
- 		}
--	} /* else ... BB we could add the same check for Windows by
--		     checking the UniqueId via FILE_INTERNAL_INFO */
+ 		break;
++	case SMB2_OP_RENAME:
++		tmprc = SMB2_rename(xid, tcon, persistent_fid, volatile_fid,
++				    (__le16 *)data);
++		break;
+ 	default:
+ 		cERROR(1, "Invalid command");
+ 		break;
+@@ -170,3 +174,24 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 				  0, CREATE_DELETE_ON_CLOSE, NULL,
+ 				  SMB2_OP_DELETE);
+ }
++
++int
++smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
++		 const char *from_name, const char *to_name,
++		 struct cifs_sb_info *cifs_sb)
++{
++	__le16 *smb2_to_name = NULL;
++	int rc;
++
++	smb2_to_name = cifs_convert_path_to_utf16(to_name, cifs_sb);
++	if (smb2_to_name == NULL) {
++		rc = -ENOMEM;
++		goto smb2_rename_path;
 +	}
-+	/*
-+	 * else ... BB we could add the same check for Windows by
-+	 * checking the UniqueId via FILE_INTERNAL_INFO
-+	 */
- 
- unlink_target:
- 	/* Try unlinking the target dentry if it's not negative */
-@@ -1646,15 +1651,14 @@ unlink_target:
- 		tmprc = cifs_unlink(target_dir, target_dentry);
- 		if (tmprc)
- 			goto cifs_rename_exit;
--
--		rc = cifs_do_rename(xid, source_dentry, fromName,
--				    target_dentry, toName);
-+		rc = cifs_do_rename(xid, source_dentry, from_name,
-+				    target_dentry, to_name);
++
++	rc = smb2_open_op_close(xid, tcon, cifs_sb, from_name, DELETE,
++				FILE_OPEN, 0, 0, smb2_to_name, SMB2_OP_RENAME);
++smb2_rename_path:
++	kfree(smb2_to_name);
++	return rc;
++}
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 82852fc..da13a60 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -442,6 +442,7 @@ struct smb_version_operations smb21_operations = {
+ 	.mkdir_setinfo = smb2_mkdir_setinfo,
+ 	.rmdir = smb2_rmdir,
+ 	.unlink = smb2_unlink,
++	.rename = smb2_rename_path,
+ 	.open = smb2_open_file,
+ 	.set_fid = smb2_set_fid,
+ 	.close = smb2_close_file,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 46829c6..515c141 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1597,3 +1597,110 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
  	}
- 
- cifs_rename_exit:
- 	kfree(info_buf_source);
--	kfree(fromName);
--	kfree(toName);
-+	kfree(from_name);
-+	kfree(to_name);
- 	free_xid(xid);
- 	cifs_put_tlink(tlink);
  	return rc;
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index aa55c2f..3773920 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -800,6 +800,7 @@ struct smb_version_operations smb1_operations = {
- 	.rmdir = CIFSSMBRmDir,
- 	.unlink = CIFSSMBDelFile,
- 	.rename_pending_delete = cifs_rename_pending_delete,
-+	.rename = CIFSSMBRename,
- 	.open = cifs_open_file,
- 	.set_fid = cifs_set_fid,
- 	.close = cifs_close_file,
+ }
++
++static int
++send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
++	       u64 persistent_fid, u64 volatile_fid, int info_class,
++	       unsigned int num, void **data, unsigned int *size)
++{
++	struct smb2_set_info_req *req;
++	struct smb2_set_info_rsp *rsp = NULL;
++	struct kvec *iov;
++	int rc = 0;
++	int resp_buftype;
++	unsigned int i;
++	struct TCP_Server_Info *server;
++	struct cifs_ses *ses = tcon->ses;
++
++	if (ses && (ses->server))
++		server = ses->server;
++	else
++		return -EIO;
++
++	if (!num)
++		return -EINVAL;
++
++	iov = kmalloc(sizeof(struct kvec) * num, GFP_KERNEL);
++	if (!iov)
++		return -ENOMEM;
++
++	rc = small_smb2_init(SMB2_SET_INFO, tcon, (void **) &req);
++	if (rc) {
++		kfree(iov);
++		return rc;
++	}
++
++	req->InfoType = SMB2_O_INFO_FILE;
++	req->FileInfoClass = info_class;
++	req->PersistentFileId = persistent_fid;
++	req->VolatileFileId = volatile_fid;
++
++	/* 4 for RFC1001 length and 1 for Buffer */
++	req->BufferOffset =
++			cpu_to_le16(sizeof(struct smb2_set_info_req) - 1 - 4);
++	req->BufferLength = cpu_to_le32(*size);
++
++	inc_rfc1001_len(req, *size - 1 /* Buffer */);
++
++	memcpy(req->Buffer, *data, *size);
++
++	iov[0].iov_base = (char *)req;
++	/* 4 for RFC1001 length */
++	iov[0].iov_len = get_rfc1002_length(req) + 4;
++
++	for (i = 1; i < num; i++) {
++		inc_rfc1001_len(req, size[i]);
++		le32_add_cpu(&req->BufferLength, size[i]);
++		iov[i].iov_base = (char *)data[i];
++		iov[i].iov_len = size[i];
++	}
++
++	rc = SendReceive2(xid, ses, iov, num, &resp_buftype, 0);
++	rsp = (struct smb2_set_info_rsp *)iov[0].iov_base;
++
++	if (rc != 0) {
++		cifs_stats_fail_inc(tcon, SMB2_SET_INFO_HE);
++		goto out;
++	}
++
++	if (rsp == NULL) {
++		rc = -EIO;
++		goto out;
++	}
++
++out:
++	free_rsp_buf(resp_buftype, rsp);
++	kfree(iov);
++	return rc;
++}
++
++int
++SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
++	    u64 persistent_fid, u64 volatile_fid, __le16 *target_file)
++{
++	struct smb2_file_rename_info info;
++	void **data;
++	unsigned int size[2];
++	int rc;
++	int len = (2 * UniStrnlen((wchar_t *)target_file, PATH_MAX));
++
++	data = kmalloc(sizeof(void *) * 2, GFP_KERNEL);
++	if (!data)
++		return -ENOMEM;
++
++	info.ReplaceIfExists = 1; /* 1 = replace existing target with new */
++			      /* 0 = fail if target already exists */
++	info.RootDirectory = 0;  /* MBZ for network ops (why does spec say?) */
++	info.FileNameLength = cpu_to_le32(len);
++
++	data[0] = &info;
++	size[0] = sizeof(struct smb2_file_rename_info);
++
++	data[1] = target_file;
++	size[1] = len + 2 /* null */;
++
++	rc = send_set_info(xid, tcon, persistent_fid, volatile_fid,
++			   FILE_RENAME_INFORMATION, 2, data, size);
++	kfree(data);
++	return rc;
++}
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 4712273..e2c7887 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -566,6 +566,25 @@ struct smb2_query_info_rsp {
+ 	__u8   Buffer[1];
+ } __packed;
+ 
++struct smb2_set_info_req {
++	struct smb2_hdr hdr;
++	__le16 StructureSize; /* Must be 33 */
++	__u8   InfoType;
++	__u8   FileInfoClass;
++	__le32 BufferLength;
++	__le16 BufferOffset;
++	__u16  Reserved;
++	__le32 AdditionalInformation;
++	__u64  PersistentFileId; /* opaque endianness */
++	__u64  VolatileFileId; /* opaque endianness */
++	__u8   Buffer[1];
++} __packed;
++
++struct smb2_set_info_rsp {
++	struct smb2_hdr hdr;
++	__le16 StructureSize; /* Must be 2 */
++} __packed;
++
+ /*
+  *	PDU infolevel structure definitions
+  *	BB consider moving to a different header
+@@ -623,6 +642,15 @@ struct smb2_file_internal_info {
+ 	__le64 IndexNumber;
+ } __packed; /* level 6 Query */
+ 
++struct smb2_file_rename_info { /* encoding of request for level 10 */
++	__u8   ReplaceIfExists; /* 1 = replace existing target with new */
++				/* 0 = fail if target already exists */
++	__u8   Reserved[7];
++	__u64  RootDirectory;  /* MBZ for network operations (why says spec?) */
++	__le32 FileNameLength;
++	char   FileName[0];     /* New name to be assigned */
++} __packed; /* level 10 Set */
++
+ /*
+  * This level 18, although with struct with same name is different from cifs
+  * level 0x107. Level 0x107 has an extra u64 between AccessFlags and
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index dbbdc39..b43036e 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -65,6 +65,9 @@ extern int smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      const char *name, struct cifs_sb_info *cifs_sb);
+ extern int smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		       const char *name, struct cifs_sb_info *cifs_sb);
++extern int smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
++			    const char *from_name, const char *to_name,
++			    struct cifs_sb_info *cifs_sb);
+ 
+ extern int smb2_open_file(const unsigned int xid, struct cifs_tcon *tcon,
+ 			  const char *full_path, int disposition,
+@@ -106,5 +109,8 @@ extern int smb2_async_writev(struct cifs_writedata *wdata);
+ extern int SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 		      unsigned int *nbytes, struct kvec *iov, int n_vec);
+ extern int SMB2_echo(struct TCP_Server_Info *server);
++extern int SMB2_rename(const unsigned int xid, struct cifs_tcon *tcon,
++		       u64 persistent_fid, u64 volatile_fid,
++		       __le16 *target_file);
+ 
+ #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
