@@ -1,69 +1,71 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifscreds: add a check and warning for missing session
- keyring
-Date: Wed, 18 Jul 2012 06:29:05 -0400
-Message-ID: <20120718062905.73e14efe@tlielax.poochiereds.net>
-References: <1342531717-30135-1-git-send-email-jlayton@samba.org>
-	<30167.1342557999@warthog.procyon.org.uk>
+Subject: Re: [PATCH] mount.cifs: Use systemd's mechanism for getting
+ password, if present
+Date: Wed, 18 Jul 2012 06:45:32 -0400
+Message-ID: <20120718064532.4325b08c@tlielax.poochiereds.net>
+References: <4FE43C1F.8060605@suse.com>
+	<20120625152439.1a68fb6f@tlielax.poochiereds.net>
+	<4FE95EFA.4030809@suse.com>
+	<20120626042835.0a20e3f3@corrin.poochiereds.net>
+	<50056F71.9010509@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: base64
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Ankit Jain <jankit-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <30167.1342557999-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
+In-Reply-To: <50056F71.9010509-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 17 Jul 2012 21:46:39 +0100
-David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> 
-> > +static void
-> > +check_session_keyring(void)
-> > +{
-> > +	key_serial_t	ses_key, uses_key;
-> > +
-> > +	ses_key = keyctl_get_keyring_ID(KEY_SPEC_SESSION_KEYRING, 0);
-> > +	if (ses_key == -1)
-> > +		return;
-> > +
-> > +	uses_key = keyctl_get_keyring_ID(KEY_SPEC_USER_SESSION_KEYRING, 0);
-> > +	if (uses_key == -1)
-> > +		return;
-> > +
-> > +	if (ses_key == uses_key)
-> > +		fprintf(stderr, "Warning: you have no session keyring. "
-> > +				"cifscreds keys will not persist. See "
-> > +				"pam_keyinit(8).\n");
-> > +}
-> 
-> I would suggest reporting an error and exiting in the event that certainly the
-> first call returns -1 and maybe the second.
-> 
-
-
-Yeah, I considered that. I figured the follow-on keyctl() calls would
-end up erroring out, but I suppose doing it at this point would be more
-efficient. I'll respin the patch in a bit...
-
-> Other than that, it looks okay.
-> 
-> I wonder if I should suggest giving an error if you try and modify the session
-> keyring when there isn't one (where modification includes adding a key to it).
-> When I first did the keyring stuff in the kernel, I didn't envision pam_keyinit
-> - which in retrospect is a much better way of generating the session keyring
-> than having the kernel try to guess.
-> 
-> Note that this would not stop processes joining a session keyring or creating a
-> new session keyring.
-> 
-
-That might be more reasonable. Spawning a new session keyring on the
-fly like is done today seems to be of questionable value.
-
-
-Thanks,
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBUdWUs
+IDE3IEp1bCAyMDEyIDE5OjI4OjA5ICswNTMwDQpBbmtpdCBKYWluIDxqYW5raXRAc3VzZS5jb20+
+IHdyb3RlOg0KDQo+IEhpIEplZmYsDQo+IA0KPiBPbiAwNi8yNi8yMDEyIDA0OjU4IFBNLCBKZWZm
+IExheXRvbiB3cm90ZToNCj4gW3NuaXBdDQo+ID4gSXQgZG9lcywgYnV0IHdlIGRvIGhhdmUgdG8g
+Y29uY2VybiBvdXJzZWx2ZXMgd2l0aCBvbGRlciB2ZXJzaW9ucyBvZg0KPiA+IHN5c3RlbWQgdGhh
+dCBtaWdodCBub3QsIGFuZCB3aXRoIGRpc3Ryb3MgdGhhdCBtaWdodCB1c2Ugc3lzdGVtZCBidXQg
+bm90DQo+ID4gYWRkIHRoZSB0b29sIChjb25zaWRlciBlbWJlZGRlZCBkaXN0cm9zKS4gSSB0aGlu
+ayB3ZSdsbCBuZWVkIGENCj4gPiBtZWNoYW5pc20gdG8gZmFsbCBiYWNrIHRvIHRoZSBsZWdhY3kg
+cGFzc3dvcmQgbWVjaGFuaXNtLg0KPiANCj4gSSdtIGd1ZXNzaW5nIHRoYXQgYnkgImxlZ2FjeSIg
+eW91IG1lYW4gZ2V0X3Bhc3MoLi4pPyBCdXQgb24gYSByZWd1bGFyDQo+IHN5c3RlbWQgaW5zdGFs
+bCwgaXQgdGFrZXMgb3ZlciBzdGRpbi9zdGRvdXQsIGFuZCB0aGUgcHJvbXB0IHdvbid0IGNvbWUN
+Cj4gdXAgb24gYSB0ZXJtaW5hbC4gQnV0IEkgZG9uJ3Qga25vdyBob3cgaXQgaXMgc2V0IHVwIG9u
+IHRoZSBvdGhlcg0KPiBzY2VuYXJpb3MgeW91IG1lbnRpb25lZC4gU28sIEknbGwgZG8gdGhhdCBi
+dXQgeW91IHdpbGwgaGF2ZSB0byB0ZXN0IGl0DQo+IDspIEkgdHJpZWQgdXNpbmcgL2Rldi90dHks
+IGJ1dCBpbi9vdXQgYXJlIHJlZGlyZWN0ZWQgQUZBSVUsIHNvLCB0aGlzDQo+IGRpZG4ndCBoZWxw
+Lg0KPiANCg0KV2VsbC4uLnRoYXQncyB0aGUgY2FzZSBhdCBib290IHRpbWUsIHdoZW4geW91J3Jl
+IG1vdW50aW5nIGZyb20gKGZvcg0KaW5zdGFuY2UpIGZzdGFiLiBXaGF0IGFib3V0IHdoZW4gd2hl
+biBzb21lb25lIGlzc3VlcyBtb3VudCAibWFudWFsbHkiDQpmcm9tIGEgdGVybWluYWw/IElmIHN5
+c3RlbWQtYXNrLXBhc3N3b3JkIGlzbid0IHByZXNlbnQgYXQgdGhhdCBwb2ludCBvcg0Kd291bGRu
+J3QgcnVuIGZvciBzb21lIHJlYXNvbiB0aGVuIHlvdSB3ZXJlIHNvcnQgb2Ygc2NyZXdlZCB3aXRo
+IHRoZQ0KZWFybGllciBwYXRjaC4NCg0KPiA+IEFsc28sIGEgd2F5IHRvIGRpc2FibGUgdGhpcyBh
+dCBjb21waWxlLXRpbWUgd291bGQgbmljZS4gTWF5YmUgYQ0KPiA+IC0tZW5hYmxlLXN5c3RlbWQg
+YXV0b2NvbmYgb3B0aW9uIHdvdWxkIGJlIGdvb2QgdGhhdCBkZWZhdWx0cyB0byAib24iDQo+ID4g
+d2l0aCBhIHNpbXBsZSB0ZXN0IHRvIHNlZSBpZiB0aGUgYnVpbGQgbWFjaGluZSBpcyBydW5uaW5n
+IHN5c3RlbWQ/DQo+IA0KPiBTdXJlLCBhdXRvY29uZiBvcHRpb24gc291bmRzIGdvb2QuIEJ1dCBk
+byB3ZSB3YW50IHRvIGNoZWNrIGZvciBzeXN0ZW1kDQo+IHJ1bm5pbmcgb24gdGhlICpidWlsZCog
+bWFjaGluZSAoYW5kIGNob29zZSBkZWZhdWx0IHZhbHVlIGZvcg0KPiAtLWVuYWJsZS1zeXN0ZW1k
+IGFjY29yZGluZ2x5KT8gU3lzdGVtZCBydW5uaW5nIG9yIG5vdCBzb3VuZHMgbGlrZSBhDQo+IHJ1
+bnRpbWUgYmVoYXZpb3IsIGFuZCB3ZSBmYWxsIGJhY2sgdG8gZ2V0cGFzcyBhbnl3YXkuIEkgaGF2
+ZW4ndCBhZGRlZA0KPiB0aGlzIGluIHRoZSBhdHRhY2hlZCBwYXRjaCwgYnV0IGlmIHlvdSBmZWVs
+IHRoYXQgdGhpcyBtYWtlcyBzZW5zZSwgdGhlbg0KPiBJIGNhbiBhZGQgaXQuDQo+IA0KDQpGYWly
+IGVub3VnaC4gSWYgeW91J3JlIGZhbGxpbmcgYmFjayB0byBnZXRwYXNzIGFueXdheSwgdGhlbiBh
+IHNpbXBsZQ0KYXV0b2NvbmYgc3dpdGNoIHRvIGRpc2FibGUgc3lzdGVtZCBzdXBwb3J0IHNob3Vs
+ZCBiZSBmaW5lLg0KDQpQYXRjaCBsb29rcyBnb29kIHRvIG1lLiBJJ2xsIHBsYW4gdG8gbWVyZ2Ug
+aXQgaW4gdGhlIG5leHQgZGF5IG9yIHR3bw0KdW5sZXNzIHRoZXJlIGFyZSBvYmplY3Rpb25zLg0K
+DQpUaGFua3MhDQotIC0tIA0KSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KLS0tLS1C
+RUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NClZlcnNpb246IEdudVBHIHYyLjAuMTggKEdOVS9MaW51
+eCkNCg0KaVFJY0JBRUJBZ0FHQlFKUUJwUE1BQW9KRUFBT2FFRVpWb0lWcXo4UC8xK2dhQXZ5a1RV
+aG5oMHFQbCtTRHA1WA0KVDdPcWNVelkra1VTdSt2UTRocWpScExmb1dSVmt1UDBFcktpQVVzcXRo
+SEdQTUNzZHNCbHVCclBPOFNyRUIyYg0KQUpXd0hMeDI4Zlp4RlNRRWJEUk80VTNkbndEcDdtSkRt
+anl3VW4vbVR3UmJxMi9HWHBnSTlqK0ZFT2hlNXJ3Yw0KRlRZb2dnRUdheW1ydHlEeTBTc0d2YTc3
+TjNrZmFTcXluTlgzNzZ6VHhnQ25CQ2d2WWlXYkFMdlFuS3dNMGZhbQ0KNzRVMUJLVk5oN0pqaFNv
+cXJ1NmZUcE5xK1hwaE5MbFhWSUNWdDdPSk9xVW9HRUIxaElHVjBieHZ5L3NnMlJESA0KaTN5L3hp
+OUpRQ1ZrejFhb25xVmdUQWtKU0Q1Y3hUVzgvRHRROGIva1BDV09yeEVRbHJtSFFwellpUjhFc3lO
+dg0KekpNWkRmVUZNcjFqN2I2YVUyVW1idWp2bCtGUW1mQlMzRXkrVWtsWnpOSGhWWFVMelJ5OEVR
+aE5FeTRCcVNTMQ0KZzVXUkhZQjZrZEtvMU5LblQyZktCVmFnTFFMTUZ4akFxalVVSENGaER2ZWdl
+TW9IVUNPR3JjamRXLzBjNnAzMQ0KWG5tQmFwNURLaW5nditMN0JkbWFucDlnMDBqT3k1UVBGOGtB
+cE9tSXJtMDlIWWwxay8yNGFSaEswWXNiTjZmcg0Kdi9qcllrWmVydUhkV3BlL2pNUDNzemNZY0l6
+QmthekRRTVNncXE4OUpoWGhVQmtPMUdSNU4xcWNXZXh3L2VlbQ0KTVJqR29TRTRGV3FBd25hSU1v
+aEJhaWE4OUIyc3crUXJBamFZaXZJckNhSUJ4YzcxVWkyT2ZDVTZ3OTl6aEQ3OA0KWXFhTmhSdUN3
+TmRJeTZiSGtEalgNCj10SjRGDQotLS0tLUVORCBQR1AgU0lHTkFUVVJFLS0tLS0NCg==
