@@ -1,49 +1,69 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Tue, 17 Jul 2012 19:34:33 -0500
-Message-ID: <CAH2r5msT74rWpyFBWWFYG+MT6+FP=7mEV6SjpmVn-uspzjmUnQ@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifscreds: add a check and warning for missing session
+ keyring
+Date: Wed, 18 Jul 2012 06:29:05 -0400
+Message-ID: <20120718062905.73e14efe@tlielax.poochiereds.net>
+References: <1342531717-30135-1-git-send-email-jlayton@samba.org>
+	<30167.1342557999@warthog.procyon.org.uk>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <30167.1342557999-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit 055c9fa8874fa7261eec7a268366565db84af474:
+On Tue, 17 Jul 2012 21:46:39 +0100
+David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-  Merge tag 'fixes-for-v3.5' of
-git://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-gpio
-(2012-07-10 13:24:48 -0700)
-
-are available in the git repository at:
-
-
-  git://git.samba.org/sfrench/cifs-2.6.git master
-
-for you to fetch changes up to cd60042cc1392e79410dc8de9e9c1abb38a29e57:
-
-  cifs: always update the inode cache with the results from a FIND_*
-(2012-07-16 23:57:23 -0500)
-
-----------------------------------------------------------------
-Jeff Layton (3):
-      cifs: on CONFIG_HIGHMEM machines, limit the rsize/wsize to the kmap space
-      cifs: when CONFIG_HIGHMEM is set, serialize the read/write kmaps
-      cifs: always update the inode cache with the results from a FIND_*
-
-Sachin Prabhu (1):
-      Initialise mid_q_entry before putting it on the pending queue
-
- fs/cifs/cifssmb.c   |   30 +++++++++++++++++++++++++++++-
- fs/cifs/connect.c   |   18 ++++++++++++++++++
- fs/cifs/readdir.c   |    7 +++++--
- fs/cifs/transport.c |   26 ++++++++++++++------------
- 4 files changed, 66 insertions(+), 15 deletions(-)
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> 
+> > +static void
+> > +check_session_keyring(void)
+> > +{
+> > +	key_serial_t	ses_key, uses_key;
+> > +
+> > +	ses_key = keyctl_get_keyring_ID(KEY_SPEC_SESSION_KEYRING, 0);
+> > +	if (ses_key == -1)
+> > +		return;
+> > +
+> > +	uses_key = keyctl_get_keyring_ID(KEY_SPEC_USER_SESSION_KEYRING, 0);
+> > +	if (uses_key == -1)
+> > +		return;
+> > +
+> > +	if (ses_key == uses_key)
+> > +		fprintf(stderr, "Warning: you have no session keyring. "
+> > +				"cifscreds keys will not persist. See "
+> > +				"pam_keyinit(8).\n");
+> > +}
+> 
+> I would suggest reporting an error and exiting in the event that certainly the
+> first call returns -1 and maybe the second.
+> 
 
 
--- 
+Yeah, I considered that. I figured the follow-on keyctl() calls would
+end up erroring out, but I suppose doing it at this point would be more
+efficient. I'll respin the patch in a bit...
+
+> Other than that, it looks okay.
+> 
+> I wonder if I should suggest giving an error if you try and modify the session
+> keyring when there isn't one (where modification includes adding a key to it).
+> When I first did the keyring stuff in the kernel, I didn't envision pam_keyinit
+> - which in retrospect is a much better way of generating the session keyring
+> than having the kernel try to guess.
+> 
+> Note that this would not stop processes joining a session keyring or creating a
+> new session keyring.
+> 
+
+That might be more reasonable. Spawning a new session keyring on the
+fly like is done today seems to be of questionable value.
+
+
 Thanks,
-
-Steve
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
