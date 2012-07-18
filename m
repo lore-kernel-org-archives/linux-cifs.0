@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 30/45] CIFS: Enable signing in SMB2
-Date: Wed, 18 Jul 2012 19:48:46 +0400
-Message-ID: <1342626541-29872-31-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 31/45] CIFS: Move rename to ops struct
+Date: Wed, 18 Jul 2012 19:48:47 +0400
+Message-ID: <1342626541-29872-32-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,544 +9,299 @@ In-Reply-To: <1342626541-29872-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDs
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Use hmac-sha256 and rather than hmac-md5 that is used for CIFS/SMB.
-
-Signature field in SMB2 header is 16 bytes instead of 8 bytes.
-
-Automatically enable signing by client when requested by the server
-when signing ability is available to the client.
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/Kconfig         |    1 +
- fs/cifs/cifsencrypt.c   |   30 +++++++++-
- fs/cifs/cifsglob.h      |    2 +
- fs/cifs/cifsproto.h     |    1 +
- fs/cifs/smb2glob.h      |    4 +
- fs/cifs/smb2pdu.c       |   48 +++++++++++++--
- fs/cifs/smb2proto.h     |    2 +
- fs/cifs/smb2transport.c |  157 ++++++++++++++++++++++++++++++++++++++++++++--
- fs/cifs/transport.c     |   24 ++++----
- 9 files changed, 243 insertions(+), 26 deletions(-)
+ fs/cifs/cifsglob.h  |    3 ++
+ fs/cifs/cifsproto.h |    5 +--
+ fs/cifs/cifssmb.c   |   22 +++++++-----
+ fs/cifs/inode.c     |   92 ++++++++++++++++++++++++++------------------------
+ fs/cifs/smb1ops.c   |    1 +
+ 5 files changed, 66 insertions(+), 57 deletions(-)
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index a08306a..8029301 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -9,6 +9,7 @@ config CIFS
- 	select CRYPTO_ARC4
- 	select CRYPTO_ECB
- 	select CRYPTO_DES
-+	select CRYPTO_SHA256
- 	help
- 	  This is the client VFS module for the Common Internet File System
- 	  (CIFS) protocol which is the successor to the Server Message Block
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 63c460e..e572d55 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -686,12 +686,17 @@ calc_seckey(struct cifs_ses *ses)
- void
- cifs_crypto_shash_release(struct TCP_Server_Info *server)
- {
-+	if (server->secmech.hmacsha256)
-+		crypto_free_shash(server->secmech.hmacsha256);
-+
- 	if (server->secmech.md5)
- 		crypto_free_shash(server->secmech.md5);
- 
- 	if (server->secmech.hmacmd5)
- 		crypto_free_shash(server->secmech.hmacmd5);
- 
-+	kfree(server->secmech.sdeschmacsha256);
-+
- 	kfree(server->secmech.sdeschmacmd5);
- 
- 	kfree(server->secmech.sdescmd5);
-@@ -716,6 +721,13 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
- 		goto crypto_allocate_md5_fail;
- 	}
- 
-+	server->secmech.hmacsha256 = crypto_alloc_shash("hmac(sha256)", 0, 0);
-+	if (IS_ERR(server->secmech.hmacsha256)) {
-+		cERROR(1, "could not allocate crypto hmacsha256\n");
-+		rc = PTR_ERR(server->secmech.hmacsha256);
-+		goto crypto_allocate_hmacsha256_fail;
-+	}
-+
- 	size = sizeof(struct shash_desc) +
- 			crypto_shash_descsize(server->secmech.hmacmd5);
- 	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
-@@ -727,7 +739,6 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
- 	server->secmech.sdeschmacmd5->shash.tfm = server->secmech.hmacmd5;
- 	server->secmech.sdeschmacmd5->shash.flags = 0x0;
- 
--
- 	size = sizeof(struct shash_desc) +
- 			crypto_shash_descsize(server->secmech.md5);
- 	server->secmech.sdescmd5 = kmalloc(size, GFP_KERNEL);
-@@ -739,12 +750,29 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
- 	server->secmech.sdescmd5->shash.tfm = server->secmech.md5;
- 	server->secmech.sdescmd5->shash.flags = 0x0;
- 
-+	size = sizeof(struct shash_desc) +
-+			crypto_shash_descsize(server->secmech.hmacsha256);
-+	server->secmech.sdeschmacsha256 = kmalloc(size, GFP_KERNEL);
-+	if (!server->secmech.sdeschmacsha256) {
-+		cERROR(1, "%s: Can't alloc hmacsha256\n", __func__);
-+		rc = -ENOMEM;
-+		goto crypto_allocate_hmacsha256_sdesc_fail;
-+	}
-+	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
-+	server->secmech.sdeschmacsha256->shash.flags = 0x0;
-+
- 	return 0;
- 
-+crypto_allocate_hmacsha256_sdesc_fail:
-+	kfree(server->secmech.sdescmd5);
-+
- crypto_allocate_md5_sdesc_fail:
- 	kfree(server->secmech.sdeschmacmd5);
- 
- crypto_allocate_hmacmd5_sdesc_fail:
-+	crypto_free_shash(server->secmech.hmacsha256);
-+
-+crypto_allocate_hmacsha256_fail:
- 	crypto_free_shash(server->secmech.md5);
- 
- crypto_allocate_md5_fail:
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 3e54b19..78ce424 100644
+index 78ce424..0f8a466 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -128,8 +128,10 @@ struct sdesc {
- struct cifs_secmech {
- 	struct crypto_shash *hmacmd5; /* hmac-md5 hash function */
- 	struct crypto_shash *md5; /* md5 hash function */
-+	struct crypto_shash *hmacsha256; /* hmac-sha256 hash function */
- 	struct sdesc *sdeschmacmd5;  /* ctxt to generate ntlmv2 hash, CR1 */
- 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
-+	struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
- };
- 
- /* per smb session structure/fields */
+@@ -275,6 +275,9 @@ struct smb_version_operations {
+ 	/* open, rename and delete file */
+ 	int (*rename_pending_delete)(const char *, struct dentry *,
+ 				     const unsigned int);
++	/* send rename request */
++	int (*rename)(const unsigned int, struct cifs_tcon *, const char *,
++		      const char *, struct cifs_sb_info *);
+ 	/* open a file for non-posix mounts */
+ 	int (*open)(const unsigned int, struct cifs_tcon *, const char *, int,
+ 		    int, int, struct cifs_fid *, __u32 *, FILE_ALL_INFO *,
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index bdf8948..722dba8 100644
+index 722dba8..ef94f36 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -65,6 +65,7 @@ extern char *cifs_compose_mount_options(const char *sb_mountdata,
- extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
- 					struct TCP_Server_Info *server);
- extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
-+extern void cifs_delete_mid(struct mid_q_entry *mid);
- extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 			   unsigned int nvec, mid_receive_t *receive,
-diff --git a/fs/cifs/smb2glob.h b/fs/cifs/smb2glob.h
-index 11505d7..8635574 100644
---- a/fs/cifs/smb2glob.h
-+++ b/fs/cifs/smb2glob.h
-@@ -47,4 +47,8 @@
- #define END_OF_CHAIN 4
- #define RELATED_REQUEST 8
+@@ -310,9 +310,8 @@ extern int CIFSPOSIXDelFile(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int CIFSSMBDelFile(const unsigned int xid, struct cifs_tcon *tcon,
+ 			  const char *name, struct cifs_sb_info *cifs_sb);
+ extern int CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
+-			const char *fromName, const char *toName,
+-			const struct nls_table *nls_codepage,
+-			int remap_special_chars);
++			 const char *from_name, const char *to_name,
++			 struct cifs_sb_info *cifs_sb);
+ extern int CIFSSMBRenameOpenFile(const unsigned int xid, struct cifs_tcon *tcon,
+ 				 int netfid, const char *target_name,
+ 				 const struct nls_table *nls_codepage,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 666535c..c1a18a6 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -2528,8 +2528,8 @@ CIFSSMBFlush(const unsigned int xid, struct cifs_tcon *tcon, int smb_file_id)
  
-+#define SMB2_SIGNATURE_SIZE (16)
-+#define SMB2_NTLMV2_SESSKEY_SIZE (16)
-+#define SMB2_HMACSHA256_SIZE (32)
-+
- #endif	/* _SMB2_GLOB_H */
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index cb7d672..46829c6 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -118,9 +118,9 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
- 	/* BB how does SMB2 do case sensitive? */
- 	/* if (tcon->nocase)
- 		hdr->Flags |= SMBFLG_CASELESS; */
--	/* if (tcon->ses && tcon->ses->server &&
-+	if (tcon->ses && tcon->ses->server &&
- 	    (tcon->ses->server->sec_mode & SECMODE_SIGN_REQUIRED))
--		hdr->Flags |= SMB2_FLAGS_SIGNED; */
-+		hdr->Flags |= SMB2_FLAGS_SIGNED;
- out:
- 	pdu->StructureSize2 = cpu_to_le16(parmsize);
- 	return;
-@@ -441,6 +441,38 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		rc = -EIO;
- 		goto neg_exit;
- 	}
-+
-+	cFYI(1, "sec_flags 0x%x", sec_flags);
-+	if (sec_flags & CIFSSEC_MUST_SIGN) {
-+		cFYI(1, "Signing required");
-+		if (!(server->sec_mode & (SMB2_NEGOTIATE_SIGNING_REQUIRED |
-+		      SMB2_NEGOTIATE_SIGNING_ENABLED))) {
-+			cERROR(1, "signing required but server lacks support");
-+			rc = -EOPNOTSUPP;
-+			goto neg_exit;
-+		}
-+		server->sec_mode |= SECMODE_SIGN_REQUIRED;
-+	} else if (sec_flags & CIFSSEC_MAY_SIGN) {
-+		cFYI(1, "Signing optional");
-+		if (server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED) {
-+			cFYI(1, "Server requires signing");
-+			server->sec_mode |= SECMODE_SIGN_REQUIRED;
-+		} else {
-+			server->sec_mode &=
-+				~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
-+		}
-+	} else {
-+		cFYI(1, "Signing disabled");
-+		if (server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED) {
-+			cERROR(1, "Server requires packet signing to be enabled"
-+				  " in /proc/fs/cifs/SecurityFlags.");
-+			rc = -EOPNOTSUPP;
-+			goto neg_exit;
-+		}
-+		server->sec_mode &=
-+			~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
-+	}
-+
- #ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
- 	rc = decode_neg_token_init(security_blob, blob_length,
- 				   &server->sec_type);
-@@ -669,6 +701,8 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
- 
- 	 /* since no tcon, smb2_init can not do this, so do here */
- 	req->hdr.SessionId = ses->Suid;
-+	if (server->sec_mode & SECMODE_SIGN_REQUIRED)
-+		req->hdr.Flags |= SMB2_FLAGS_SIGNED;
- 
- 	rc = SendReceiveNoRsp(xid, ses, (char *) &req->hdr, 0);
- 	/*
-@@ -1268,10 +1302,12 @@ smb2_readv_callback(struct mid_q_entry *mid)
- 	case MID_RESPONSE_RECEIVED:
- 		credits_received = le16_to_cpu(buf->CreditRequest);
- 		/* result already set, check signature */
--		/* if (server->sec_mode &
--		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
--			if (smb2_verify_signature(mid->resp_buf, server))
--				cERROR(1, "Unexpected SMB signature"); */
-+		if (server->sec_mode &
-+		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
-+			if (smb2_verify_signature2(rdata->iov, rdata->nr_iov,
-+						   server))
-+				cERROR(1, "Unexpected SMB signature");
-+		}
- 		/* FIXME: should this be counted toward the initiating task? */
- 		task_io_account_read(rdata->bytes);
- 		cifs_stats_bytes_read(tcon, rdata->bytes);
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 192d0c7..dbbdc39 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -39,6 +39,8 @@ extern char *smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *hdr);
- extern __le16 *cifs_convert_path_to_utf16(const char *from,
- 					  struct cifs_sb_info *cifs_sb);
- 
-+extern int smb2_verify_signature2(struct kvec *, unsigned int,
-+				  struct TCP_Server_Info *);
- extern int smb2_check_receive(struct mid_q_entry *mid,
- 			      struct TCP_Server_Info *server, bool log_error);
- extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 31f5d42..7276f6f 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -36,6 +36,149 @@
- #include "smb2proto.h"
- #include "cifs_debug.h"
- #include "smb2status.h"
-+#include "smb2glob.h"
-+
-+static int
-+smb2_calc_signature2(const struct kvec *iov, int n_vec,
-+		     struct TCP_Server_Info *server)
-+{
-+	int i, rc;
-+	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
-+	unsigned char *sigptr = smb2_signature;
-+	struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
-+
-+	memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
-+	memset(smb2_pdu->Signature, 0x0, SMB2_SIGNATURE_SIZE);
-+
-+	rc = crypto_shash_setkey(server->secmech.hmacsha256,
-+		server->session_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
-+	if (rc) {
-+		cERROR(1, "%s: Could not update with response\n", __func__);
-+		return rc;
-+	}
-+
-+	rc = crypto_shash_init(&server->secmech.sdeschmacsha256->shash);
-+	if (rc) {
-+		cERROR(1, "%s: Could not init md5\n", __func__);
-+		return rc;
-+	}
-+
-+	for (i = 0; i < n_vec; i++) {
-+		if (iov[i].iov_len == 0)
-+			continue;
-+		if (iov[i].iov_base == NULL) {
-+			cERROR(1, "null iovec entry");
-+			return -EIO;
-+		}
-+		/*
-+		 * The first entry includes a length field (which does not get
-+		 * signed that occupies the first 4 bytes before the header).
-+		 */
-+		if (i == 0) {
-+			if (iov[0].iov_len <= 8) /* cmd field at offset 9 */
-+				break; /* nothing to sign or corrupt header */
-+			rc =
-+			crypto_shash_update(
-+				&server->secmech.sdeschmacsha256->shash,
-+				iov[i].iov_base + 4, iov[i].iov_len - 4);
-+		} else {
-+			rc =
-+			crypto_shash_update(
-+				&server->secmech.sdeschmacsha256->shash,
-+				iov[i].iov_base, iov[i].iov_len);
-+		}
-+		if (rc) {
-+			cERROR(1, "%s: Could not update with payload\n",
-+							__func__);
-+			return rc;
-+		}
-+	}
-+
-+	rc = crypto_shash_final(&server->secmech.sdeschmacsha256->shash,
-+				sigptr);
-+	if (rc)
-+		cERROR(1, "%s: Could not generate sha256 hash\n", __func__);
-+
-+	memcpy(smb2_pdu->Signature, sigptr, SMB2_SIGNATURE_SIZE);
-+
-+	return rc;
-+}
-+
-+/* must be called with server->srv_mutex held */
-+static int
-+smb2_sign_smb2(struct kvec *iov, int n_vec, struct TCP_Server_Info *server)
-+{
-+	int rc = 0;
-+	struct smb2_hdr *smb2_pdu = iov[0].iov_base;
-+
-+	if (!(smb2_pdu->Flags & SMB2_FLAGS_SIGNED) ||
-+	    server->tcpStatus == CifsNeedNegotiate)
-+		return rc;
-+
-+	if (!server->session_estab) {
-+		strncpy(smb2_pdu->Signature, "BSRSPYL", 8);
-+		return rc;
-+	}
-+
-+	rc = smb2_calc_signature2(iov, n_vec, server);
-+
-+	return rc;
-+}
-+
-+int
-+smb2_verify_signature2(struct kvec *iov, unsigned int n_vec,
-+		       struct TCP_Server_Info *server)
-+{
-+	unsigned int rc;
-+	char server_response_sig[16];
-+	struct smb2_hdr *smb2_pdu = (struct smb2_hdr *)iov[0].iov_base;
-+
-+	if ((smb2_pdu->Command == SMB2_NEGOTIATE) ||
-+	    (smb2_pdu->Command == SMB2_OPLOCK_BREAK) ||
-+	    (!server->session_estab))
-+		return 0;
-+
-+	/*
-+	 * BB what if signatures are supposed to be on for session but
-+	 * server does not send one? BB
-+	 */
-+
-+	/* Do not need to verify session setups with signature "BSRSPYL " */
-+	if (memcmp(smb2_pdu->Signature, "BSRSPYL ", 8) == 0)
-+		cFYI(1, "dummy signature received for smb command 0x%x",
-+			smb2_pdu->Command);
-+
-+	/*
-+	 * Save off the origiginal signature so we can modify the smb and check
-+	 * our calculated signature against what the server sent.
-+	 */
-+	memcpy(server_response_sig, smb2_pdu->Signature, SMB2_SIGNATURE_SIZE);
-+
-+	memset(smb2_pdu->Signature, 0, SMB2_SIGNATURE_SIZE);
-+
-+	mutex_lock(&server->srv_mutex);
-+	rc = smb2_calc_signature2(iov, n_vec, server);
-+	mutex_unlock(&server->srv_mutex);
-+
-+	if (rc)
-+		return rc;
-+
-+	if (memcmp(server_response_sig, smb2_pdu->Signature,
-+		   SMB2_SIGNATURE_SIZE))
-+		return -EACCES;
-+	else
-+		return 0;
-+}
-+
-+static int
-+smb2_verify_signature(struct smb2_hdr *smb2_pdu, struct TCP_Server_Info *server)
-+{
-+	struct kvec iov;
-+
-+	iov.iov_base = (char *)smb2_pdu;
-+	iov.iov_len = get_rfc1002_length(smb2_pdu) + 4;
-+	return smb2_verify_signature2(&iov, 1, server);
-+}
- 
- /*
-  * Set message id for the request. Should be called after wait_for_free_request
-@@ -118,12 +261,11 @@ smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 
- 	dump_smb(mid->resp_buf, min_t(u32, 80, len));
- 	/* convert the length into a more usable form */
--	/* BB - uncomment with SMB2 signing implementation */
--	/* if ((len > 24) &&
-+	if ((len > 24) &&
- 	    (server->sec_mode & (SECMODE_SIGN_REQUIRED|SECMODE_SIGN_ENABLED))) {
- 		if (smb2_verify_signature(mid->resp_buf, server))
- 			cERROR(1, "Unexpected SMB signature");
--	} */
-+	}
- 
- 	return map_smb2_to_linux_error(mid->resp_buf, log_error);
- }
-@@ -141,9 +283,9 @@ smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
- 	rc = smb2_get_mid_entry(ses, hdr, &mid);
- 	if (rc)
- 		return rc;
--	/* rc = smb2_sign_smb2(iov, nvec, ses->server);
-+	rc = smb2_sign_smb2(iov, nvec, ses->server);
- 	if (rc)
--		delete_mid(mid); */
-+		cifs_delete_mid(mid);
- 	*ret_mid = mid;
- 	return rc;
- }
-@@ -162,11 +304,12 @@ smb2_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
- 	if (mid == NULL)
- 		return -ENOMEM;
- 
--	/* rc = smb2_sign_smb2(iov, nvec, server);
-+	rc = smb2_sign_smb2(iov, nvec, server);
- 	if (rc) {
- 		DeleteMidQEntry(mid);
- 		return rc;
--	}*/
-+	}
-+
- 	*ret_mid = mid;
- 	return rc;
- }
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 4d37902..cb18dbf 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -109,8 +109,8 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
- 	mempool_free(midEntry, cifs_mid_poolp);
- }
- 
--static void
--delete_mid(struct mid_q_entry *mid)
-+void
-+cifs_delete_mid(struct mid_q_entry *mid)
+ int
+ CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
+-	      const char *fromName, const char *toName,
+-	      const struct nls_table *nls_codepage, int remap)
++	      const char *from_name, const char *to_name,
++	      struct cifs_sb_info *cifs_sb)
  {
- 	spin_lock(&GlobalMid_Lock);
- 	list_del(&mid->qhead);
-@@ -423,7 +423,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
- 	if (rc == 0)
- 		return 0;
+ 	int rc = 0;
+ 	RENAME_REQ *pSMB = NULL;
+@@ -2537,6 +2537,7 @@ CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int bytes_returned;
+ 	int name_len, name_len2;
+ 	__u16 count;
++	int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
  
--	delete_mid(mid);
-+	cifs_delete_mid(mid);
- 	add_credits(server, 1, optype);
- 	wake_up(&server->request_q);
- 	return rc;
-@@ -533,7 +533,7 @@ cifs_setup_request(struct cifs_ses *ses, struct kvec *iov,
- 		return rc;
- 	rc = cifs_sign_smb2(iov, nvec, ses->server, &mid->sequence_number);
- 	if (rc)
--		delete_mid(mid);
-+		cifs_delete_mid(mid);
- 	*ret_mid = mid;
+ 	cFYI(1, "In CIFSSMBRename");
+ renameRetry:
+@@ -2551,9 +2552,9 @@ renameRetry:
+ 			ATTR_DIRECTORY);
+ 
+ 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+-		name_len =
+-		    cifsConvertToUTF16((__le16 *) pSMB->OldFileName, fromName,
+-				       PATH_MAX, nls_codepage, remap);
++		name_len = cifsConvertToUTF16((__le16 *) pSMB->OldFileName,
++					      from_name, PATH_MAX,
++					      cifs_sb->local_nls, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+ 		pSMB->OldFileName[name_len] = 0x04;	/* pad */
+@@ -2561,17 +2562,18 @@ renameRetry:
+ 		pSMB->OldFileName[name_len + 1] = 0x00;
+ 		name_len2 =
+ 		    cifsConvertToUTF16((__le16 *)&pSMB->OldFileName[name_len+2],
+-				       toName, PATH_MAX, nls_codepage, remap);
++				       to_name, PATH_MAX, cifs_sb->local_nls,
++				       remap);
+ 		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
+ 		name_len2 *= 2;	/* convert to bytes */
+ 	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fromName, PATH_MAX);
++		name_len = strnlen(from_name, PATH_MAX);
+ 		name_len++;	/* trailing null */
+-		strncpy(pSMB->OldFileName, fromName, name_len);
+-		name_len2 = strnlen(toName, PATH_MAX);
++		strncpy(pSMB->OldFileName, from_name, name_len);
++		name_len2 = strnlen(to_name, PATH_MAX);
+ 		name_len2++;	/* trailing null */
+ 		pSMB->OldFileName[name_len] = 0x04;  /* 2nd buffer format */
+-		strncpy(&pSMB->OldFileName[name_len + 1], toName, name_len2);
++		strncpy(&pSMB->OldFileName[name_len + 1], to_name, name_len2);
+ 		name_len2++;	/* trailing null */
+ 		name_len2++;	/* signature byte */
+ 	}
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 39ef1a6..f1448d9 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1512,29 +1512,32 @@ rmdir_exit:
+ }
+ 
+ static int
+-cifs_do_rename(unsigned int xid, struct dentry *from_dentry,
+-	       const char *fromPath, struct dentry *to_dentry,
+-	       const char *toPath)
++cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
++	       const char *from_path, struct dentry *to_dentry,
++	       const char *to_path)
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(from_dentry->d_sb);
+ 	struct tcon_link *tlink;
+-	struct cifs_tcon *pTcon;
++	struct cifs_tcon *tcon;
++	struct TCP_Server_Info *server;
+ 	__u16 srcfid;
+ 	int oplock, rc;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+-	pTcon = tlink_tcon(tlink);
++	tcon = tlink_tcon(tlink);
++	server = tcon->ses->server;
++
++	if (!server->ops->rename)
++		return -ENOSYS;
+ 
+ 	/* try path-based rename first */
+-	rc = CIFSSMBRename(xid, pTcon, fromPath, toPath, cifs_sb->local_nls,
+-			   cifs_sb->mnt_cifs_flags &
+-				CIFS_MOUNT_MAP_SPECIAL_CHR);
++	rc = server->ops->rename(xid, tcon, from_path, to_path, cifs_sb);
+ 
+ 	/*
+-	 * don't bother with rename by filehandle unless file is busy and
+-	 * source Note that cross directory moves do not work with
++	 * Don't bother with rename by filehandle unless file is busy and
++	 * source. Note that cross directory moves do not work with
+ 	 * rename by filehandle to various Windows servers.
+ 	 */
+ 	if (rc == 0 || rc != -ETXTBSY)
+@@ -1545,29 +1548,28 @@ cifs_do_rename(unsigned int xid, struct dentry *from_dentry,
+ 		goto do_rename_exit;
+ 
+ 	/* open the file to be renamed -- we need DELETE perms */
+-	rc = CIFSSMBOpen(xid, pTcon, fromPath, FILE_OPEN, DELETE,
++	rc = CIFSSMBOpen(xid, tcon, from_path, FILE_OPEN, DELETE,
+ 			 CREATE_NOT_DIR, &srcfid, &oplock, NULL,
+ 			 cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+ 				CIFS_MOUNT_MAP_SPECIAL_CHR);
+-
+ 	if (rc == 0) {
+-		rc = CIFSSMBRenameOpenFile(xid, pTcon, srcfid,
++		rc = CIFSSMBRenameOpenFile(xid, tcon, srcfid,
+ 				(const char *) to_dentry->d_name.name,
+ 				cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+ 					CIFS_MOUNT_MAP_SPECIAL_CHR);
+-
+-		CIFSSMBClose(xid, pTcon, srcfid);
++		CIFSSMBClose(xid, tcon, srcfid);
+ 	}
+ do_rename_exit:
+ 	cifs_put_tlink(tlink);
  	return rc;
  }
-@@ -653,11 +653,11 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
- 	rc = ses->server->ops->check_receive(midQ, ses->server,
- 					     flags & CIFS_LOG_ERROR);
  
--	/* mark it so buf will not be freed by delete_mid */
-+	/* mark it so buf will not be freed by cifs_delete_mid */
- 	if ((flags & CIFS_NO_RESP) == 0)
- 		midQ->resp_buf = NULL;
- out:
--	delete_mid(midQ);
-+	cifs_delete_mid(midQ);
- 	add_credits(ses->server, credits, optype);
- 
- 	return rc;
-@@ -763,7 +763,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
- 	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
- 	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
--	delete_mid(midQ);
-+	cifs_delete_mid(midQ);
- 	add_credits(ses->server, 1, 0);
- 
- 	return rc;
-@@ -847,7 +847,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	rc = cifs_sign_smb(in_buf, ses->server, &midQ->sequence_number);
- 	if (rc) {
--		delete_mid(midQ);
-+		cifs_delete_mid(midQ);
- 		mutex_unlock(&ses->server->srv_mutex);
- 		return rc;
- 	}
-@@ -860,7 +860,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	mutex_unlock(&ses->server->srv_mutex);
- 
- 	if (rc < 0) {
--		delete_mid(midQ);
-+		cifs_delete_mid(midQ);
- 		return rc;
+-int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
+-	struct inode *target_dir, struct dentry *target_dentry)
++int
++cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
++	    struct inode *target_dir, struct dentry *target_dentry)
+ {
+-	char *fromName = NULL;
+-	char *toName = NULL;
++	char *from_name = NULL;
++	char *to_name = NULL;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
+@@ -1588,25 +1590,25 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
+ 	 * we already have the rename sem so we do not need to
+ 	 * grab it again here to protect the path integrity
+ 	 */
+-	fromName = build_path_from_dentry(source_dentry);
+-	if (fromName == NULL) {
++	from_name = build_path_from_dentry(source_dentry);
++	if (from_name == NULL) {
+ 		rc = -ENOMEM;
+ 		goto cifs_rename_exit;
  	}
  
-@@ -881,7 +881,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 			   blocking lock to return. */
- 			rc = send_cancel(ses->server, in_buf, midQ);
- 			if (rc) {
--				delete_mid(midQ);
-+				cifs_delete_mid(midQ);
- 				return rc;
- 			}
- 		} else {
-@@ -893,7 +893,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 			/* If we get -ENOLCK back the lock may have
- 			   already been removed. Don't exit in this case. */
- 			if (rc && rc != -ENOLCK) {
--				delete_mid(midQ);
-+				cifs_delete_mid(midQ);
- 				return rc;
- 			}
+-	toName = build_path_from_dentry(target_dentry);
+-	if (toName == NULL) {
++	to_name = build_path_from_dentry(target_dentry);
++	if (to_name == NULL) {
+ 		rc = -ENOMEM;
+ 		goto cifs_rename_exit;
+ 	}
+ 
+-	rc = cifs_do_rename(xid, source_dentry, fromName,
+-			    target_dentry, toName);
++	rc = cifs_do_rename(xid, source_dentry, from_name, target_dentry,
++			    to_name);
+ 
+ 	if (rc == -EEXIST && tcon->unix_ext) {
+ 		/*
+-		 * Are src and dst hardlinks of same inode? We can
+-		 * only tell with unix extensions enabled
++		 * Are src and dst hardlinks of same inode? We can only tell
++		 * with unix extensions enabled.
+ 		 */
+ 		info_buf_source =
+ 			kmalloc(2 * sizeof(FILE_UNIX_BASIC_INFO),
+@@ -1617,19 +1619,19 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
  		}
-@@ -930,7 +930,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
- 	memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
- 	rc = cifs_check_receive(midQ, ses->server, 0);
- out:
--	delete_mid(midQ);
-+	cifs_delete_mid(midQ);
- 	if (rstart && rc == -EACCES)
- 		return -ERESTARTSYS;
+ 
+ 		info_buf_target = info_buf_source + 1;
+-		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, fromName,
+-					info_buf_source,
+-					cifs_sb->local_nls,
+-					cifs_sb->mnt_cifs_flags &
+-					CIFS_MOUNT_MAP_SPECIAL_CHR);
++		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, from_name,
++					     info_buf_source,
++					     cifs_sb->local_nls,
++					     cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 		if (tmprc != 0)
+ 			goto unlink_target;
+ 
+-		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, toName,
+-					info_buf_target,
+-					cifs_sb->local_nls,
+-					cifs_sb->mnt_cifs_flags &
+-					CIFS_MOUNT_MAP_SPECIAL_CHR);
++		tmprc = CIFSSMBUnixQPathInfo(xid, tcon, to_name,
++					     info_buf_target,
++					     cifs_sb->local_nls,
++					     cifs_sb->mnt_cifs_flags &
++						CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 
+ 		if (tmprc == 0 && (info_buf_source->UniqueId ==
+ 				   info_buf_target->UniqueId)) {
+@@ -1637,8 +1639,11 @@ int cifs_rename(struct inode *source_dir, struct dentry *source_dentry,
+ 			rc = 0;
+ 			goto cifs_rename_exit;
+ 		}
+-	} /* else ... BB we could add the same check for Windows by
+-		     checking the UniqueId via FILE_INTERNAL_INFO */
++	}
++	/*
++	 * else ... BB we could add the same check for Windows by
++	 * checking the UniqueId via FILE_INTERNAL_INFO
++	 */
+ 
+ unlink_target:
+ 	/* Try unlinking the target dentry if it's not negative */
+@@ -1646,15 +1651,14 @@ unlink_target:
+ 		tmprc = cifs_unlink(target_dir, target_dentry);
+ 		if (tmprc)
+ 			goto cifs_rename_exit;
+-
+-		rc = cifs_do_rename(xid, source_dentry, fromName,
+-				    target_dentry, toName);
++		rc = cifs_do_rename(xid, source_dentry, from_name,
++				    target_dentry, to_name);
+ 	}
+ 
+ cifs_rename_exit:
+ 	kfree(info_buf_source);
+-	kfree(fromName);
+-	kfree(toName);
++	kfree(from_name);
++	kfree(to_name);
+ 	free_xid(xid);
+ 	cifs_put_tlink(tlink);
  	return rc;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index aa55c2f..3773920 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -800,6 +800,7 @@ struct smb_version_operations smb1_operations = {
+ 	.rmdir = CIFSSMBRmDir,
+ 	.unlink = CIFSSMBDelFile,
+ 	.rename_pending_delete = cifs_rename_pending_delete,
++	.rename = CIFSSMBRename,
+ 	.open = cifs_open_file,
+ 	.set_fid = cifs_set_fid,
+ 	.close = cifs_close_file,
 -- 
 1.7.1
