@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 18/45] CIFS: Make flush code use ops struct
-Date: Wed, 18 Jul 2012 19:48:34 +0400
-Message-ID: <1342626541-29872-19-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 19/45] CIFS: Add SMB2 support for flush
+Date: Wed, 18 Jul 2012 19:48:35 +0400
+Message-ID: <1342626541-29872-20-git-send-email-pshilovsky@samba.org>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -11,101 +11,122 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    2 ++
- fs/cifs/file.c     |   20 ++++++++++++++++----
- fs/cifs/smb1ops.c  |    8 ++++++++
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ fs/cifs/smb2ops.c   |    8 ++++++++
+ fs/cifs/smb2pdu.c   |   38 ++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.h   |   15 +++++++++++++++
+ fs/cifs/smb2proto.h |    2 ++
+ 4 files changed, 63 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 0467e38..3d94397 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -274,6 +274,8 @@ struct smb_version_operations {
- 	void (*set_fid)(struct cifsFileInfo *, struct cifs_fid *, __u32);
- 	/* close a file */
- 	int (*close)(const unsigned int, struct cifs_tcon *, struct cifs_fid *);
-+	/* send a flush request to the server */
-+	int (*flush)(const unsigned int, struct cifs_tcon *, struct cifs_fid *);
- };
- 
- struct smb_version_values {
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e8cca00..3f2cfb3 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2055,6 +2055,7 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
- 	unsigned int xid;
- 	int rc = 0;
- 	struct cifs_tcon *tcon;
-+	struct TCP_Server_Info *server;
- 	struct cifsFileInfo *smbfile = file->private_data;
- 	struct inode *inode = file->f_path.dentry->d_inode;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-@@ -2078,8 +2079,13 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
- 	}
- 
- 	tcon = tlink_tcon(smbfile->tlink);
--	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
--		rc = CIFSSMBFlush(xid, tcon, smbfile->fid.netfid);
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)) {
-+		server = tcon->ses->server;
-+		if (server->ops->flush)
-+			rc = server->ops->flush(xid, tcon, &smbfile->fid);
-+		else
-+			rc = -ENOSYS;
-+	}
- 
- 	free_xid(xid);
- 	mutex_unlock(&inode->i_mutex);
-@@ -2091,6 +2097,7 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- 	unsigned int xid;
- 	int rc = 0;
- 	struct cifs_tcon *tcon;
-+	struct TCP_Server_Info *server;
- 	struct cifsFileInfo *smbfile = file->private_data;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(file->f_path.dentry->d_sb);
- 	struct inode *inode = file->f_mapping->host;
-@@ -2106,8 +2113,13 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- 		file->f_path.dentry->d_name.name, datasync);
- 
- 	tcon = tlink_tcon(smbfile->tlink);
--	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC))
--		rc = CIFSSMBFlush(xid, tcon, smbfile->fid.netfid);
-+	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)) {
-+		server = tcon->ses->server;
-+		if (server->ops->flush)
-+			rc = server->ops->flush(xid, tcon, &smbfile->fid);
-+		else
-+			rc = -ENOSYS;
-+	}
- 
- 	free_xid(xid);
- 	mutex_unlock(&inode->i_mutex);
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index dd64754..df20dd9 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -648,6 +648,13 @@ cifs_close_file(const unsigned int xid, struct cifs_tcon *tcon,
- 	return CIFSSMBClose(xid, tcon, fid->netfid);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 0fd5801..d81e1da 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -329,6 +329,13 @@ smb2_close_file(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return SMB2_close(xid, tcon, fid->persistent_fid, fid->volatile_fid);
  }
  
 +static int
-+cifs_flush_file(const unsigned int xid, struct cifs_tcon *tcon,
++smb2_flush_file(const unsigned int xid, struct cifs_tcon *tcon,
 +		struct cifs_fid *fid)
 +{
-+	return CIFSSMBFlush(xid, tcon, fid->netfid);
++	return SMB2_flush(xid, tcon, fid->persistent_fid, fid->volatile_fid);
 +}
 +
- struct smb_version_operations smb1_operations = {
- 	.send_cancel = send_nt_cancel,
- 	.compare_fids = cifs_compare_fids,
-@@ -691,6 +698,7 @@ struct smb_version_operations smb1_operations = {
- 	.open = cifs_open_file,
- 	.set_fid = cifs_set_fid,
- 	.close = cifs_close_file,
-+	.flush = cifs_flush_file,
+ struct smb_version_operations smb21_operations = {
+ 	.setup_request = smb2_setup_request,
+ 	.setup_async_request = smb2_setup_async_request,
+@@ -363,6 +370,7 @@ struct smb_version_operations smb21_operations = {
+ 	.open = smb2_open_file,
+ 	.set_fid = smb2_set_fid,
+ 	.close = smb2_close_file,
++	.flush = smb2_flush_file,
  };
  
- struct smb_version_values smb1_values = {
+ struct smb_version_values smb21_values = {
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 231e970..ff37406 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1152,3 +1152,41 @@ SMB2_echo(struct TCP_Server_Info *server)
+ 	cifs_small_buf_release(req);
+ 	return rc;
+ }
++
++int
++SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
++	   u64 volatile_fid)
++{
++	struct smb2_flush_req *req;
++	struct TCP_Server_Info *server;
++	struct cifs_ses *ses = tcon->ses;
++	struct kvec iov[1];
++	int resp_buftype;
++	int rc = 0;
++
++	cFYI(1, "Flush");
++
++	if (ses && (ses->server))
++		server = ses->server;
++	else
++		return -EIO;
++
++	rc = small_smb2_init(SMB2_FLUSH, tcon, (void **) &req);
++	if (rc)
++		return rc;
++
++	req->PersistentFileId = persistent_fid;
++	req->VolatileFileId = volatile_fid;
++
++	iov[0].iov_base = (char *)req;
++	/* 4 for rfc1002 length field */
++	iov[0].iov_len = get_rfc1002_length(req) + 4;
++
++	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, 0);
++
++	if ((rc != 0) && tcon)
++		cifs_stats_fail_inc(tcon, SMB2_FLUSH_HE);
++
++	free_rsp_buf(resp_buftype, iov[0].iov_base);
++	return rc;
++}
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 7f1caff..af2c996 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -451,6 +451,21 @@ struct smb2_close_rsp {
+ 	__le32 Attributes;
+ } __packed;
+ 
++struct smb2_flush_req {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 24 */
++	__le16 Reserved1;
++	__le32 Reserved2;
++	__u64  PersistentFileId; /* opaque endianness */
++	__u64  VolatileFileId; /* opaque endianness */
++} __packed;
++
++struct smb2_flush_rsp {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;
++	__le16 Reserved;
++} __packed;
++
+ struct smb2_echo_req {
+ 	struct smb2_hdr hdr;
+ 	__le16 StructureSize;	/* Must be 4 */
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 624d344..51e6cd1 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -89,6 +89,8 @@ extern int SMB2_open(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct smb2_file_all_info *buf);
+ extern int SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
+ 		      u64 persistent_file_id, u64 volatile_file_id);
++extern int SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon,
++		      u64 persistent_file_id, u64 volatile_file_id);
+ extern int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			   u64 persistent_file_id, u64 volatile_file_id,
+ 			   struct smb2_file_all_info *data);
 -- 
 1.7.1
