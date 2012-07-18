@@ -1,62 +1,93 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: oplock break problem
-Date: Wed, 18 Jul 2012 16:02:50 +0400
-Message-ID: <CAKywueRL6+2bmHMyJudkHccVRTxJ+_GWcHRzyQiQY6Npg6CxRg@mail.gmail.com>
-References: <CAKywueS6zSQr_8cvQ64XNrVXR23Kwz4tc_BAd-9aP2wJGa0hMQ@mail.gmail.com>
-	<CAKywueQRbQQGq41E8KRaQ4m0dj7H+4YZ-emQ3sQEAp9s66qUUA@mail.gmail.com>
-	<20120716061427.0297a7fb@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 00/45] SMB2 base operation support
+Date: Wed, 18 Jul 2012 19:48:16 +0400
+Message-ID: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120716061427.0297a7fb-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/7/16 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> On Fri, 13 Jul 2012 17:12:51 +0400
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> 2012/7/13 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> > Hi there!
->> >
->> > I faced with an interesting problem:
->> > Windows 7 send lease break just after granted lease on open - so, we
->> > don't have time to populate cifsFileInfo structure and can't determine
->> > oplock break because we simply don't find appropriate fid. I think
->> > this problem can be happen for CIFS/SMB2.0 too (e.g. if another client
->> > opens the file just after us).
->> >
->> > So, what do you think about creating delegating the oplock break
->> > processing to workqueue and return to demultiplex thread immideately?
->> > It give us a small timeout itself and we can set another defined
->> > timeout explicitly.
->> >
->> > --
->> > Best regards,
->> > Pavel Shilovsky.
->>
->> I created a patch that fixes the problem for lease breaks - we can do
->> smth similiar for oplock breaks too:
->>
->> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=commit;h=b918551247997057f4467dfc332d47c547449ddd
->>
->
-> What guarantee is there that this fid will be on the list by the time
-> the work runs? It seems to me that this just narrows the race window a
-> bit without fully closing it.
+This patchset is the second part of big SMB2 merge (after smb2-mount). It adds SMB2 support for
+file and inode operation as well as rewrites existing part of their code to make it use ops
+server struct of protocol specific callbacks.
 
-Yes, nothing guarantees that this fid will be on the list - it's like
-a midterm fix. We really need to be sure that open/create call ends
-cifs_new_fileinfo before oplock break comes. We can round open/create
-calls with rw mutex: allow several open/create calls process in
-parallel (by holding read lock) but only one oplock break call can
-process in the one time (write lock). So, it's a bit tricky but can be
-commented as well:
-"read lock" - sending open request and populating cifsFileInfo structure
-"write lock" - oplock break processing
+The patchset is tested by cthon tests: basic and general parts.
 
--- 
-Best regards,
-Pavel Shilovsky.
+Pavel Shilovsky (45):
+  CIFS: Make CAP_* checks protocol independent
+  CIFS: Simpliify cifs_mkdir call
+  CIFS: Separate protocol specific part from mkdir
+  CIFS: Add SMB2 support for mkdir operation
+  CIFS: Move rmdir code to ops struct
+  CIFS: Add SMB2 support for rmdir
+  CIFS: Protect i_nlink from being negative
+  CIFS: Move unlink code to ops struct
+  CIFS: Add SMB2 support for unlink
+  CIFS: Replace netfid with cifs_fid struct in cifsFileInfo
+  CIFS: Move open code to ops struct
+  CIFS: Move close code to ops struct
+  CIFS: Add open/close file support for SMB2
+  CIFS: Move guery file info code to ops struct
+  CIFS: Add SMB2 support for query_file_info
+  CIFS: Move create code use ops struct
+  CIFS: Move reopen code to ops struct
+  CIFS: Make flush code use ops struct
+  CIFS: Add SMB2 support for flush
+  CIFS: Move r/wsize negotiating to ops struct
+  CIFS: Add SMB2 r/wsize negotiating
+  CIFS: Move async read to ops struct
+  CIFS: Add SMB2 support for cifs_iovec_read
+  CIFS: Move async write to ops struct
+  CIFS: Add SMB2 support for cifs_iovec_write
+  CIFS: Move readpage code to ops struct
+  CIFS: Add readpage support for SMB2
+  CIFS: Move writepage to ops struct
+  CIFS: Add writepage support for SMB2
+  CIFS: Enable signing in SMB2
+  CIFS: Move rename to ops struct
+  CIFS: Add SMB2 support for rename operation
+  CIFS: Move hardlink to ops struct
+  CIFS: Add SMB2 support for hardlink operation
+  CIFS: Move set_file_size to ops struct
+  CIFS: Add SMB2 support for set_file_size
+  CIFS: Move set_file_info to ops struct
+  CIFS: Add set_file_info support for SMB2
+  CIFS: Move readdir code to ops struct
+  CIFS: Add readdir support for SMB2
+  CIFS: Process oplocks for SMB2
+  CIFS: Move oplock break to ops struct
+  CIFS: Add oplock break support for SMB2
+  CIFS: Move statfs to ops struct
+  CIFS: Add statfs support for SMB2
+
+ fs/cifs/Kconfig         |    1 +
+ fs/cifs/Makefile        |    2 +-
+ fs/cifs/cifsacl.c       |    2 +-
+ fs/cifs/cifsencrypt.c   |   30 ++-
+ fs/cifs/cifsfs.c        |   31 +--
+ fs/cifs/cifsglob.h      |  241 ++++++++++++-
+ fs/cifs/cifsproto.h     |   96 ++----
+ fs/cifs/cifssmb.c       |  171 ++++-----
+ fs/cifs/connect.c       |  154 +-------
+ fs/cifs/dir.c           |  108 +++---
+ fs/cifs/file.c          |  473 +++++++++++++-----------
+ fs/cifs/inode.c         |  652 ++++++++++++++++----------------
+ fs/cifs/ioctl.c         |   13 +-
+ fs/cifs/link.c          |   80 +++--
+ fs/cifs/misc.c          |    2 +-
+ fs/cifs/netmisc.c       |    3 +-
+ fs/cifs/readdir.c       |  179 +++++----
+ fs/cifs/smb1ops.c       |  351 +++++++++++++++++-
+ fs/cifs/smb2file.c      |  106 ++++++
+ fs/cifs/smb2glob.h      |   14 +
+ fs/cifs/smb2inode.c     |  137 +++++++-
+ fs/cifs/smb2maperror.c  |    3 +-
+ fs/cifs/smb2misc.c      |   86 ++++-
+ fs/cifs/smb2ops.c       |  267 +++++++++++++-
+ fs/cifs/smb2pdu.c       |  957 ++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2pdu.h       |  178 +++++++++
+ fs/cifs/smb2proto.h     |   71 ++++-
+ fs/cifs/smb2transport.c |  157 ++++++++-
+ fs/cifs/transport.c     |   24 +-
+ 29 files changed, 3499 insertions(+), 1090 deletions(-)
+ create mode 100644 fs/cifs/smb2file.c
