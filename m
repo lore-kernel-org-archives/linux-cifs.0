@@ -1,163 +1,56 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2] cifscreds: add a check and warnings for session
- keyring problems
-Date: Fri, 20 Jul 2012 14:51:09 -0400
-Message-ID: <20120720145109.33b4045b@tlielax.poochiereds.net>
-References: <30167.1342557999@warthog.procyon.org.uk>
-	<1342704916-2224-1-git-send-email-jlayton@samba.org>
+Subject: Re: [PATCH] mount.cifs: Use systemd's mechanism for getting
+ password, if present
+Date: Fri, 20 Jul 2012 14:51:31 -0400
+Message-ID: <20120720145131.0c846040@tlielax.poochiereds.net>
+References: <4FE43C1F.8060605@suse.com>
+	<20120625152439.1a68fb6f@tlielax.poochiereds.net>
+	<4FE95EFA.4030809@suse.com>
+	<20120626042835.0a20e3f3@corrin.poochiereds.net>
+	<50056F71.9010509@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Ankit Jain <jankit-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342704916-2224-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <50056F71.9010509-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 19 Jul 2012 09:35:16 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Tue, 17 Jul 2012 19:28:09 +0530
+Ankit Jain <jankit-IBi9RG/b67k@public.gmane.org> wrote:
 
-> Many distros do not call into pam_keyinit to set up the session keyri=
-ng
-> properly at login time. When cifscreds add is used in such a session,
-> the kernel will spawn a new session keyring in which to install the
-> credentials. That keyring will then go away once the cifscreds proces=
-s
-> exits.
->=20
-> Check for this situation by looking to see if the session and
-> user-session keyrings are the same. Throw a warning if so, and add so=
-me
-> verbiage to the cifscreds manpage that explains the issue. Also, if
-> the session keyring can't be queried for any reason, then cause the
-> program to error out.
->=20
-> Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reported-by: Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  cifscreds.1   |    9 ++++++++-
->  cifscreds.c   |   34 ++++++++++++++++++++++++++++++++++
->  cifscreds.pod |    8 ++++++++
->  3 files changed, 50 insertions(+), 1 deletion(-)
->=20
-> diff --git a/cifscreds.1 b/cifscreds.1
-> index 44a02a2..83afae6 100644
-> --- a/cifscreds.1
-> +++ b/cifscreds.1
-> @@ -124,7 +124,7 @@
->  .\" =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->  .\"
->  .IX Title "CIFSCREDS 1"
-> -.TH CIFSCREDS 1 "2012-01-24" "" ""
-> +.TH CIFSCREDS 1 "2012-07-17" "" ""
->  .\" For nroff, turn off justification.  Always turn off hyphenation;=
- it makes
->  .\" way too many mistakes in technical documents.
->  .if n .ad l
-> @@ -186,6 +186,13 @@ different username.
->  The cifscreds utility requires a kernel built with support for the
->  \&\fBlogin\fR key type. That key type was added in v3.3 in mainline =
-Linux
->  kernels.
-> +.PP
-> +Since \fBcifscreds\fR adds keys to the session keyring, it is highly
-> +recommended that one use \fBpam_keyinit\fR to ensure that a session =
-keyring
-> +is established at login time.
-> +.SH "SEE ALSO"
-> +.IX Header "SEE ALSO"
-> +\&\fIpam_keyinit\fR\|(8)
->  .SH "AUTHORS"
->  .IX Header "AUTHORS"
->  The cifscreds program was originally developed by Igor Druzhinin
-> diff --git a/cifscreds.c b/cifscreds.c
-> index efc76e6..bb35c02 100644
-> --- a/cifscreds.c
-> +++ b/cifscreds.c
-> @@ -28,6 +28,7 @@
->  #include <ctype.h>
->  #include <keyutils.h>
->  #include <getopt.h>
-> +#include <errno.h>
->  #include "mount.h"
->  #include "resolve_host.h"
->  #include "util.h"
-> @@ -465,6 +466,36 @@ static int cifscreds_update(struct cmdarg *arg)
->  	return EXIT_SUCCESS;
->  }
-> =20
-> +static int
-> +check_session_keyring(void)
-> +{
-> +	key_serial_t	ses_key, uses_key;
-> +
-> +	ses_key =3D keyctl_get_keyring_ID(KEY_SPEC_SESSION_KEYRING, 0);
-> +	if (ses_key =3D=3D -1) {
-> +		if (errno =3D=3D ENOKEY)
-> +			fprintf(stderr, "Error: you have no session keyring. "
-> +					"Consider using pam_keyinit to "
-> +					"install one.\n");
-> +		else
-> +			fprintf(stderr, "Error: unable to query session "
-> +					"keyring: %s\n", strerror(errno));
-> +		return (int)ses_key;
-> +	}
-> +
-> +	/* A problem querying the user-session keyring isn't fatal. */
-> +	uses_key =3D keyctl_get_keyring_ID(KEY_SPEC_USER_SESSION_KEYRING, 0=
-);
-> +	if (uses_key =3D=3D -1)
-> +		return 0;
-> +
-> +	if (ses_key =3D=3D uses_key)
-> +		fprintf(stderr, "Warning: you have no persistent session "
-> +				"keyring. cifscreds keys will not persist "
-> +				"after this process exits. See "
-> +				"pam_keyinit(8).\n");
-> +	return 0;
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->  	struct command *cmd, *best;
-> @@ -535,5 +566,8 @@ int main(int argc, char **argv)
->  	if (arg.user =3D=3D NULL)
->  		arg.user =3D getusername(getuid());
-> =20
-> +	if (check_session_keyring())
-> +		return EXIT_FAILURE;
-> +
->  	return best->action(&arg);
->  }
-> diff --git a/cifscreds.pod b/cifscreds.pod
-> index 17e453f..c3bafb5 100644
-> --- a/cifscreds.pod
-> +++ b/cifscreds.pod
-> @@ -79,6 +79,14 @@ The cifscreds utility requires a kernel built with=
- support for the
->  B<login> key type. That key type was added in v3.3 in mainline Linux
->  kernels.
-> =20
-> +Since B<cifscreds> adds keys to the session keyring, it is highly
-> +recommended that one use B<pam_keyinit> to ensure that a session key=
-ring
-> +is established at login time.
-> +
-> +=3Dhead1 SEE ALSO
-> +
-> +pam_keyinit(8)
-> +
->  =3Dhead1 AUTHORS
-> =20
->  The cifscreds program was originally developed by Igor Druzhinin
+> Hi Jeff,
+> 
+> On 06/26/2012 04:58 PM, Jeff Layton wrote:
+> [snip]
+> > It does, but we do have to concern ourselves with older versions of
+> > systemd that might not, and with distros that might use systemd but not
+> > add the tool (consider embedded distros). I think we'll need a
+> > mechanism to fall back to the legacy password mechanism.
+> 
+> I'm guessing that by "legacy" you mean get_pass(..)? But on a regular
+> systemd install, it takes over stdin/stdout, and the prompt won't come
+> up on a terminal. But I don't know how it is set up on the other
+> scenarios you mentioned. So, I'll do that but you will have to test it
+> ;) I tried using /dev/tty, but in/out are redirected AFAIU, so, this
+> didn't help.
+> 
+> > Also, a way to disable this at compile-time would nice. Maybe a
+> > --enable-systemd autoconf option would be good that defaults to "on"
+> > with a simple test to see if the build machine is running systemd?
+> 
+> Sure, autoconf option sounds good. But do we want to check for systemd
+> running on the *build* machine (and choose default value for
+> --enable-systemd accordingly)? Systemd running or not sounds like a
+> runtime behavior, and we fall back to getpass anyway. I haven't added
+> this in the attached patch, but if you feel that this makes sense, then
+> I can add it.
+> 
+> Regards,
 
 Merged...
 
---=20
+-- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
