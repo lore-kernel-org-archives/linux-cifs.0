@@ -1,42 +1,163 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] Use errno instead of having unknown error
-Date: Fri, 20 Jul 2012 14:50:51 -0400
-Message-ID: <20120720145051.79fe66e1@tlielax.poochiereds.net>
-References: <1342690708-15087-1-git-send-email-luk@debian.org>
+Subject: Re: [PATCH v2] cifscreds: add a check and warnings for session
+ keyring problems
+Date: Fri, 20 Jul 2012 14:51:09 -0400
+Message-ID: <20120720145109.33b4045b@tlielax.poochiereds.net>
+References: <30167.1342557999@warthog.procyon.org.uk>
+	<1342704916-2224-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342690708-15087-1-git-send-email-luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+In-Reply-To: <1342704916-2224-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 19 Jul 2012 11:38:28 +0200
-Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org> wrote:
+On Thu, 19 Jul 2012 09:35:16 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> When access() fails, use errno for a sensible error message.
-> 
-> Signed-off-by: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+> Many distros do not call into pam_keyinit to set up the session keyri=
+ng
+> properly at login time. When cifscreds add is used in such a session,
+> the kernel will spawn a new session keyring in which to install the
+> credentials. That keyring will then go away once the cifscreds proces=
+s
+> exits.
+>=20
+> Check for this situation by looking to see if the session and
+> user-session keyrings are the same. Throw a warning if so, and add so=
+me
+> verbiage to the cifscreds manpage that explains the issue. Also, if
+> the session keyring can't be queried for any reason, then cause the
+> program to error out.
+>=20
+> Cc: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Reported-by: Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 > ---
->  mount.cifs.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 6f3f382..f47f416 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -590,6 +590,7 @@ static int open_cred_file(char *file_name,
->  	i = access(file_name, R_OK);
->  	if (i) {
->  		toggle_dac_capability(0, 0);
-> +		i = errno;
->  		goto return_i;
->  	}
->  
+>  cifscreds.1   |    9 ++++++++-
+>  cifscreds.c   |   34 ++++++++++++++++++++++++++++++++++
+>  cifscreds.pod |    8 ++++++++
+>  3 files changed, 50 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/cifscreds.1 b/cifscreds.1
+> index 44a02a2..83afae6 100644
+> --- a/cifscreds.1
+> +++ b/cifscreds.1
+> @@ -124,7 +124,7 @@
+>  .\" =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+>  .\"
+>  .IX Title "CIFSCREDS 1"
+> -.TH CIFSCREDS 1 "2012-01-24" "" ""
+> +.TH CIFSCREDS 1 "2012-07-17" "" ""
+>  .\" For nroff, turn off justification.  Always turn off hyphenation;=
+ it makes
+>  .\" way too many mistakes in technical documents.
+>  .if n .ad l
+> @@ -186,6 +186,13 @@ different username.
+>  The cifscreds utility requires a kernel built with support for the
+>  \&\fBlogin\fR key type. That key type was added in v3.3 in mainline =
+Linux
+>  kernels.
+> +.PP
+> +Since \fBcifscreds\fR adds keys to the session keyring, it is highly
+> +recommended that one use \fBpam_keyinit\fR to ensure that a session =
+keyring
+> +is established at login time.
+> +.SH "SEE ALSO"
+> +.IX Header "SEE ALSO"
+> +\&\fIpam_keyinit\fR\|(8)
+>  .SH "AUTHORS"
+>  .IX Header "AUTHORS"
+>  The cifscreds program was originally developed by Igor Druzhinin
+> diff --git a/cifscreds.c b/cifscreds.c
+> index efc76e6..bb35c02 100644
+> --- a/cifscreds.c
+> +++ b/cifscreds.c
+> @@ -28,6 +28,7 @@
+>  #include <ctype.h>
+>  #include <keyutils.h>
+>  #include <getopt.h>
+> +#include <errno.h>
+>  #include "mount.h"
+>  #include "resolve_host.h"
+>  #include "util.h"
+> @@ -465,6 +466,36 @@ static int cifscreds_update(struct cmdarg *arg)
+>  	return EXIT_SUCCESS;
+>  }
+> =20
+> +static int
+> +check_session_keyring(void)
+> +{
+> +	key_serial_t	ses_key, uses_key;
+> +
+> +	ses_key =3D keyctl_get_keyring_ID(KEY_SPEC_SESSION_KEYRING, 0);
+> +	if (ses_key =3D=3D -1) {
+> +		if (errno =3D=3D ENOKEY)
+> +			fprintf(stderr, "Error: you have no session keyring. "
+> +					"Consider using pam_keyinit to "
+> +					"install one.\n");
+> +		else
+> +			fprintf(stderr, "Error: unable to query session "
+> +					"keyring: %s\n", strerror(errno));
+> +		return (int)ses_key;
+> +	}
+> +
+> +	/* A problem querying the user-session keyring isn't fatal. */
+> +	uses_key =3D keyctl_get_keyring_ID(KEY_SPEC_USER_SESSION_KEYRING, 0=
+);
+> +	if (uses_key =3D=3D -1)
+> +		return 0;
+> +
+> +	if (ses_key =3D=3D uses_key)
+> +		fprintf(stderr, "Warning: you have no persistent session "
+> +				"keyring. cifscreds keys will not persist "
+> +				"after this process exits. See "
+> +				"pam_keyinit(8).\n");
+> +	return 0;
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	struct command *cmd, *best;
+> @@ -535,5 +566,8 @@ int main(int argc, char **argv)
+>  	if (arg.user =3D=3D NULL)
+>  		arg.user =3D getusername(getuid());
+> =20
+> +	if (check_session_keyring())
+> +		return EXIT_FAILURE;
+> +
+>  	return best->action(&arg);
+>  }
+> diff --git a/cifscreds.pod b/cifscreds.pod
+> index 17e453f..c3bafb5 100644
+> --- a/cifscreds.pod
+> +++ b/cifscreds.pod
+> @@ -79,6 +79,14 @@ The cifscreds utility requires a kernel built with=
+ support for the
+>  B<login> key type. That key type was added in v3.3 in mainline Linux
+>  kernels.
+> =20
+> +Since B<cifscreds> adds keys to the session keyring, it is highly
+> +recommended that one use B<pam_keyinit> to ensure that a session key=
+ring
+> +is established at login time.
+> +
+> +=3Dhead1 SEE ALSO
+> +
+> +pam_keyinit(8)
+> +
+>  =3Dhead1 AUTHORS
+> =20
+>  The cifscreds program was originally developed by Igor Druzhinin
 
 Merged...
 
--- 
+--=20
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
