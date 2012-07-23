@@ -1,46 +1,44 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: ensure that cifs_readpages calls cifsFileInfo_get
- under the cifs_file_list_lock
-Date: Mon, 23 Jul 2012 08:18:18 -0400
-Message-ID: <20120723081818.0ac7bf04@corrin.poochiereds.net>
-References: <1342799330-2919-1-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 01/45] CIFS: Make CAP_* checks protocol independent
+Date: Mon, 23 Jul 2012 09:55:36 -0400
+Message-ID: <20120723095536.46fbda6c@tlielax.poochiereds.net>
+References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
+	<1342626541-29872-2-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342799330-2919-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1342626541-29872-2-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 20 Jul 2012 11:48:50 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+On Wed, 18 Jul 2012 19:48:17 +0400
+Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> ...regression introduced in 6993f74a5.
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/file.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 513adbc..45508cf 100644
 > --- a/fs/cifs/file.c
 > +++ b/fs/cifs/file.c
-> @@ -3083,8 +3083,8 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
->  		}
+> @@ -385,9 +385,8 @@ int cifs_open(struct inode *inode, struct file *file)
+>  		oplock = 0;
 >  
->  		spin_lock(&cifs_file_list_lock);
-> -		spin_unlock(&cifs_file_list_lock);
->  		rdata->cfile = cifsFileInfo_get(open_file);
-> +		spin_unlock(&cifs_file_list_lock);
->  		rdata->mapping = mapping;
->  		rdata->offset = offset;
->  		rdata->bytes = bytes;
+>  	if (!tcon->broken_posix_open && tcon->unix_ext &&
+> -	    (tcon->ses->capabilities & CAP_UNIX) &&
+> -	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+> -			le64_to_cpu(tcon->fsUnixInfo.Capability))) {
+> +	    cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+> +				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
+>  		/* can not refresh inode info since size could be stale */
+>  		rc = cifs_posix_open(full_path, &inode, inode->i_sb,
+>  				cifs_sb->mnt_file_mode /* ignored */,
 
-Now that 3.5 has shipped, this patch needs to Cc: stable when it's included.
+While I'm in general OK with abstracting out things like this with a
+set of operations, I'm not sure it makes much sense to make things so
+granular in the name of code-sharing
 
-Cheers,
+Would it be better for instance, to simply have a different f_ops->open
+routine for SMB2, and simply check the right bit for CAP_UNIX in each
+one?
+
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
