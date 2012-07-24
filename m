@@ -1,63 +1,72 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v3 12/32] CIFS: Fix a wrong pointer in atomic_open
-Date: Tue, 24 Jul 2012 15:22:35 -0400
-Message-ID: <20120724152235.52cf5d4d@tlielax.poochiereds.net>
-References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
-	<1342166025-29377-13-git-send-email-pshilovsky@samba.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 00/11] cifs: convert async write code to use less kmapping
+Date: Tue, 24 Jul 2012 23:23:45 +0400
+Message-ID: <CAKywueSj4b6N23G4yNrw-FEbsyP3Z9g4ASywsJqVhunkn9Op6A@mail.gmail.com>
+References: <1342634346-22818-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342166025-29377-13-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1342634346-22818-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 13 Jul 2012 11:53:25 +0400
-Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+2012/7/18 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> We currently have a problem with the async write code on CONFIG_HIGHMEM
+> architectures. It uses *way* too much kmap space. Not only does this
+> limit throughput by adding an artificial bottleneck, but it also can
+> lead to deadlocks.
+>
+> Late in the 3.5 cycle, I sent some patches to limit the rsize and wsize
+> on these arches as a temporary workaround. This patchset is a first pass
+> at fixing this the right way, by teaching the low-level transport code
+> how to deal with arrays of pages.
+>
+> Note that this is just a fix for the write codepaths. The read side will
+> need a separate set of patches.
+>
+> The code seems to work correctly, and is probably suitable for the
+> upcoming 3.6 merge window. This probably also has some non-trivial
+> conflicts with Pavel's patches since I did not base this on top of his
+> SMB2 work.
+>
+> Let me know what you plan to merge first for 3.6 and I can try to
+> fix those up, or we can ask Pavel to rebase his code on top of this.
+>
+> Jeff Layton (11):
+>   cifs: remove bogus reset of smb_buf_length in smb_send routines
+>   cifs: rename cifs_sign_smb2 to cifs_sign_smbv
+>   cifs: change signing routines to deal with smb_rqst structs
+>   cifs: convert send code to use smb_rqst structs
+>   cifs: cork the socket before a send and uncork it afterward
+>   cifs: teach smb_send_rqst how to handle arrays of pages
+>   cifs: teach signing routines how to deal with arrays of pages in a
+>     smb_rqst
+>   cifs: change cifs_call_async to use smb_rqst structs
+>   cifs: convert async write code to pass in data via rq_pages array
+>   cifs: remove the kmap size limit from wsize
+>   cifs: add deprecation warning to sockopt=TCP_NODELAY option
+>
+>  fs/cifs/cifsencrypt.c |   39 +++++++--
+>  fs/cifs/cifsproto.h   |   37 ++++++--
+>  fs/cifs/cifssmb.c     |   53 ++++++------
+>  fs/cifs/connect.c     |   10 ++-
+>  fs/cifs/file.c        |   47 ++--------
+>  fs/cifs/transport.c   |  227 ++++++++++++++++++++++++++++++++++++-------------
+>  6 files changed, 264 insertions(+), 149 deletions(-)
+>
+> --
+> 1.7.10.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-> Commit 8ce5c35dd353cbf533383c54dca8aa7d2da6950f caused a regression
-> in cifs open codepath.
-> 
-> Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  fs/cifs/dir.c |    5 +----
->  1 files changed, 1 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index d364654..2caba0b 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -387,7 +387,6 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->  	struct cifs_tcon *tcon;
->  	__u16 fileHandle;
->  	__u32 oplock;
-> -	struct file *filp;
->  	struct cifsFileInfo *pfile_info;
->  
->  	/* Posix open is only called (at lookup time) for file create now.  For
-> @@ -418,7 +417,6 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->  	     inode, direntry->d_name.name, direntry);
->  
->  	tlink = cifs_sb_tlink(CIFS_SB(inode->i_sb));
-> -	filp = ERR_CAST(tlink);
->  	if (IS_ERR(tlink))
->  		goto out_free_xid;
->  
-> @@ -436,10 +434,9 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->  		goto out;
->  	}
->  
-> -	pfile_info = cifs_new_fileinfo(fileHandle, filp, tlink, oplock);
-> +	pfile_info = cifs_new_fileinfo(fileHandle, file, tlink, oplock);
->  	if (pfile_info == NULL) {
->  		CIFSSMBClose(xid, tcon, fileHandle);
-> -		fput(filp);
->  		rc = -ENOMEM;
->  	}
->  
+I tested this patchset with cifs and smb2 code with cthon basic test
+and it was ok - going to review patches tomorrow.
 
-Looks correct -- important to get this in for 3.6.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Best regards,
+Pavel Shilovsky.
