@@ -1,112 +1,219 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2] cifs: ensure that we always do cifsFileInfo_get under
- the spinlock
-Date: Wed, 25 Jul 2012 22:55:45 +0400
-Message-ID: <CAKywueROtaf3_54JsXbvBpneaSO7R-0TvQhfztTu2rRNLAGTPQ@mail.gmail.com>
-References: <1342799330-2919-1-git-send-email-jlayton@redhat.com>
-	<1343242114-12809-1-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH v2 7/9] cifs: convert async write code to pass in data via
+ rq_pages array
+Date: Wed, 25 Jul 2012 22:56:37 +0400
+Message-ID: <CAKywueSDSkb97Vj=RuCj0=7Qco4EUta42jyBsOfcnsGeSBjzAQ@mail.gmail.com>
+References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
+	<1343231652-10459-8-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1343242114-12809-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1343231652-10459-8-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/7/25 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> The readpages bug is a regression that was introduced in 6993f74a5.
-> This also fixes a couple of similar bugs in the uncached read and write
-> codepaths.
->
-> Also, prevent this sort of thing in the future by having cifsFileInfo_get
-> take the spinlock itself, and adding a _locked variant for use in places
-> that are already holding the lock. The _put code has always done that
-> so this makes for a less confusing interface.
->
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |  6 +++---
->  fs/cifs/file.c     | 17 ++++++++++++-----
->  2 files changed, 15 insertions(+), 8 deletions(-)
+>  fs/cifs/cifsproto.h |  4 ++--
+>  fs/cifs/cifssmb.c   | 39 +++++++++++----------------------------
+>  fs/cifs/file.c      | 47 +++++++++--------------------------------------
+>  3 files changed, 22 insertions(+), 68 deletions(-)
 >
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index bcdf4d4..497da5c 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -765,13 +765,13 @@ struct cifs_io_parms {
->   * Take a reference on the file private data. Must be called with
->   * cifs_file_list_lock held.
->   */
-> -static inline
-> -struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file)
-> +static inline void
-> +cifsFileInfo_get_locked(struct cifsFileInfo *cifs_file)
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 8075f23..179e29a 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -504,8 +504,8 @@ struct cifs_writedata {
+>         pid_t                           pid;
+>         unsigned int                    bytes;
+>         int                             result;
+> -       void (*marshal_iov) (struct kvec *iov,
+> -                            struct cifs_writedata *wdata);
+> +       unsigned int                    pagesz;
+> +       unsigned int                    tailsz;
+>         unsigned int                    nr_pages;
+>         struct page                     *pages[1];
+>  };
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 7365460..0b0a33c 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -2050,11 +2050,11 @@ cifs_writev_callback(struct mid_q_entry *mid)
+>  int
+>  cifs_async_writev(struct cifs_writedata *wdata)
 >  {
->         ++cifs_file->count;
-> -       return cifs_file;
->  }
+> -       int i, rc = -EACCES;
+> +       int rc = -EACCES;
+>         WRITE_REQ *smb = NULL;
+>         int wct;
+>         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
+> -       struct kvec *iov = NULL;
+> +       struct kvec iov;
+>         struct smb_rqst rqst = { };
 >
-> +struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
->  void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+>         if (tcon->ses->capabilities & CAP_LARGE_FILES) {
+> @@ -2071,15 +2071,6 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>         if (rc)
+>                 goto async_writev_out;
 >
->  /*
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 07e9d41..9154192 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -284,6 +284,15 @@ cifs_new_fileinfo(__u16 fileHandle, struct file *file,
+> -       /* 1 iov per page + 1 for header */
+> -       rqst.rq_nvec = wdata->nr_pages + 1;
+> -       iov = kzalloc((rqst.rq_nvec) * sizeof(*iov), GFP_NOFS);
+> -       if (iov == NULL) {
+> -               rc = -ENOMEM;
+> -               goto async_writev_out;
+> -       }
+> -       rqst.rq_iov = iov;
+> -
+>         smb->hdr.Pid = cpu_to_le16((__u16)wdata->pid);
+>         smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->pid >> 16));
 >
->  static void cifs_del_lock_waiters(struct cifsLockInfo *lock);
+> @@ -2096,18 +2087,15 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>             cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
 >
-> +struct cifsFileInfo *
-> +cifsFileInfo_get(struct cifsFileInfo *cifs_file)
-> +{
-> +       spin_lock(&cifs_file_list_lock);
-> +       cifsFileInfo_get_locked(cifs_file);
-> +       spin_unlock(&cifs_file_list_lock);
-> +       return cifs_file;
-> +}
-> +
->  /*
->   * Release a reference on the file private data. This may involve closing
->   * the filehandle out on the server. Must be called without holding
-> @@ -1562,7 +1571,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
->                         if (!open_file->invalidHandle) {
->                                 /* found a good file */
->                                 /* lock it so it will not be closed on us */
-> -                               cifsFileInfo_get(open_file);
-> +                               cifsFileInfo_get_locked(open_file);
->                                 spin_unlock(&cifs_file_list_lock);
->                                 return open_file;
->                         } /* else might as well continue, and look for
-> @@ -1614,7 +1623,7 @@ refind_writable:
->                 if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
->                         if (!open_file->invalidHandle) {
->                                 /* found a good writable file */
-> -                               cifsFileInfo_get(open_file);
-> +                               cifsFileInfo_get_locked(open_file);
->                                 spin_unlock(&cifs_file_list_lock);
->                                 return open_file;
->                         } else {
-> @@ -1631,7 +1640,7 @@ refind_writable:
+>         /* 4 for RFC1001 length + 1 for BCC */
+> -       iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
+> -       iov[0].iov_base = smb;
+> +       iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
+> +       iov.iov_base = smb;
 >
->         if (inv_file) {
->                 any_available = false;
-> -               cifsFileInfo_get(inv_file);
-> +               cifsFileInfo_get_locked(inv_file);
+> -       /*
+> -        * This function should marshal up the page array into the kvec
+> -        * array, reserving [0] for the header. It should kmap the pages
+> -        * and set the iov_len properly for each one. It may also set
+> -        * wdata->bytes too.
+> -        */
+> -       cifs_kmap_lock();
+> -       wdata->marshal_iov(iov, wdata);
+> -       cifs_kmap_unlock();
+> +       rqst.rq_iov = &iov;
+> +       rqst.rq_nvec = 1;
+> +       rqst.rq_pages = wdata->pages;
+> +       rqst.rq_npages = wdata->nr_pages;
+> +       rqst.rq_pagesz = wdata->pagesz;
+> +       rqst.rq_tailsz = wdata->tailsz;
+>
+>         cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
+>
+> @@ -2123,7 +2111,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>                                 (struct smb_com_writex_req *)smb;
+>                 inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
+>                 put_bcc(wdata->bytes + 5, &smbw->hdr);
+> -               iov[0].iov_len += 4; /* pad bigger by four bytes */
+> +               iov.iov_len += 4; /* pad bigger by four bytes */
 >         }
 >
->         spin_unlock(&cifs_file_list_lock);
-> @@ -3082,8 +3091,6 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
->                         break;
->                 }
+>         kref_get(&wdata->refcount);
+> @@ -2135,13 +2123,8 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>         else
+>                 kref_put(&wdata->refcount, cifs_writedata_release);
 >
-> -               spin_lock(&cifs_file_list_lock);
-> -               spin_unlock(&cifs_file_list_lock);
->                 rdata->cfile = cifsFileInfo_get(open_file);
->                 rdata->mapping = mapping;
->                 rdata->offset = offset;
+> -       /* send is done, unmap pages */
+> -       for (i = 0; i < wdata->nr_pages; i++)
+> -               kunmap(wdata->pages[i]);
+> -
+>  async_writev_out:
+>         cifs_small_buf_release(smb);
+> -       kfree(iov);
+>         return rc;
+>  }
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index cd5b144..b18d963 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1709,27 +1709,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+>         return rc;
+>  }
+>
+> -/*
+> - * Marshal up the iov array, reserving the first one for the header. Also,
+> - * set wdata->bytes.
+> - */
+> -static void
+> -cifs_writepages_marshal_iov(struct kvec *iov, struct cifs_writedata *wdata)
+> -{
+> -       int i;
+> -       struct inode *inode = wdata->cfile->dentry->d_inode;
+> -       loff_t size = i_size_read(inode);
+> -
+> -       /* marshal up the pages into iov array */
+> -       wdata->bytes = 0;
+> -       for (i = 0; i < wdata->nr_pages; i++) {
+> -               iov[i + 1].iov_len = min(size - page_offset(wdata->pages[i]),
+> -                                       (loff_t)PAGE_CACHE_SIZE);
+> -               iov[i + 1].iov_base = kmap(wdata->pages[i]);
+> -               wdata->bytes += iov[i + 1].iov_len;
+> -       }
+> -}
+> -
+>  static int cifs_writepages(struct address_space *mapping,
+>                            struct writeback_control *wbc)
+>  {
+> @@ -1739,6 +1718,7 @@ static int cifs_writepages(struct address_space *mapping,
+>         struct cifs_writedata *wdata;
+>         struct page *page;
+>         int rc = 0;
+> +       loff_t isize = i_size_read(mapping->host);
+>
+>         /*
+>          * If wsize is smaller than the page cache size, default to writing
+> @@ -1843,7 +1823,7 @@ retry:
+>                          */
+>                         set_page_writeback(page);
+>
+> -                       if (page_offset(page) >= mapping->host->i_size) {
+> +                       if (page_offset(page) >= isize) {
+>                                 done = true;
+>                                 unlock_page(page);
+>                                 end_page_writeback(page);
+> @@ -1874,7 +1854,11 @@ retry:
+>                 wdata->sync_mode = wbc->sync_mode;
+>                 wdata->nr_pages = nr_pages;
+>                 wdata->offset = page_offset(wdata->pages[0]);
+> -               wdata->marshal_iov = cifs_writepages_marshal_iov;
+> +               wdata->pagesz = PAGE_CACHE_SIZE;
+> +               wdata->tailsz = min(isize - page_offset(wdata->pages[nr_pages - 1]),
+> +                                       (loff_t)PAGE_CACHE_SIZE);
+> +               wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) +
+> +                                       wdata->tailsz;
+>
+>                 do {
+>                         if (wdata->cfile != NULL)
+> @@ -2163,20 +2147,6 @@ size_t get_numpages(const size_t wsize, const size_t len, size_t *cur_len)
+>  }
+>
+>  static void
+> -cifs_uncached_marshal_iov(struct kvec *iov, struct cifs_writedata *wdata)
+> -{
+> -       int i;
+> -       size_t bytes = wdata->bytes;
+> -
+> -       /* marshal up the pages into iov array */
+> -       for (i = 0; i < wdata->nr_pages; i++) {
+> -               iov[i + 1].iov_len = min_t(size_t, bytes, PAGE_SIZE);
+> -               iov[i + 1].iov_base = kmap(wdata->pages[i]);
+> -               bytes -= iov[i + 1].iov_len;
+> -       }
+> -}
+> -
+> -static void
+>  cifs_uncached_writev_complete(struct work_struct *work)
+>  {
+>         int i;
+> @@ -2289,7 +2259,8 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
+>                 wdata->cfile = cifsFileInfo_get(open_file);
+>                 wdata->pid = pid;
+>                 wdata->bytes = cur_len;
+> -               wdata->marshal_iov = cifs_uncached_marshal_iov;
+> +               wdata->pagesz = PAGE_SIZE;
+> +               wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
+>                 rc = cifs_uncached_retry_writev(wdata);
+>                 if (rc) {
+>                         kref_put(&wdata->refcount, cifs_writedata_release);
 > --
 > 1.7.11.2
 >
