@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 4/9] cifs: teach smb_send_rqst how to handle arrays of pages
-Date: Wed, 25 Jul 2012 11:54:07 -0400
-Message-ID: <1343231652-10459-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 5/9] cifs: teach signing routines how to deal with arrays of pages in a smb_rqst
+Date: Wed, 25 Jul 2012 11:54:08 -0400
+Message-ID: <1343231652-10459-6-git-send-email-jlayton@redhat.com>
 References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,106 +10,71 @@ In-Reply-To: <1343231652-10459-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add code that allows smb_send_rqst to send an array of pages after the
-initial kvec array has been sent. For now, we simply kmap the page
-array and send it using the standard smb_send_kvec function. Eventually,
-we may want to convert this code to use kernel_sendpage under the hood
-and avoid the kmap altogether for the page data.
+Use the smb_send_rqst helper function to kmap each page in the array
+and update the hash for that chunk.
 
 Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/transport.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 54 insertions(+), 2 deletions(-)
+ fs/cifs/cifsencrypt.c | 11 +++++++++++
+ fs/cifs/cifsproto.h   |  2 ++
+ fs/cifs/transport.c   |  2 +-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index a3e58b2..946a462 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -28,6 +28,7 @@
- #include <linux/delay.h>
- #include <linux/freezer.h>
- #include <linux/tcp.h>
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index e8953a0..511d1ae 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -29,6 +29,7 @@
+ #include "ntlmssp.h"
+ #include <linux/ctype.h>
+ #include <linux/random.h>
 +#include <linux/highmem.h>
- #include <asm/uaccess.h>
- #include <asm/processor.h>
- #include <linux/mempool.h>
-@@ -240,6 +241,38 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
- 	return rc;
- }
  
-+/**
-+ * rqst_page_to_kvec - Turn a slot in the smb_rqst page array into a kvec
-+ * @rqst: pointer to smb_rqst
-+ * @idx: index into the array of the page
-+ * @iov: pointer to struct kvec that will hold the result
-+ *
-+ * Helper function to convert a slot in the rqst->rq_pages array into a kvec.
-+ * The page will be kmapped and the address placed into iov_base. The length
-+ * will then be adjusted according to the ptailoff.
-+ */
-+static void
-+cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
-+			struct kvec *iov)
-+{
-+	/*
-+	 * FIXME: We could avoid this kmap altogether if we used
-+	 * kernel_sendpage instead of kernel_sendmsg. That will only
-+	 * work if signing is disabled though as sendpage inlines the
-+	 * page directly into the fraglist. If userspace modifies the
-+	 * page after we calculate the signature, then the server will
-+	 * reject it and may break the connection. kernel_sendmsg does
-+	 * an extra copy of the data and avoids that issue.
-+	 */
-+	iov->iov_base = kmap(rqst->rq_pages[idx]);
-+
-+	/* if last page, don't send beyond this offset into page */
-+	if (idx == (rqst->rq_npages - 1))
-+		iov->iov_len = rqst->rq_tailsz;
-+	else
-+		iov->iov_len = rqst->rq_pagesz;
-+}
-+
- static int
- smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- {
-@@ -247,7 +280,8 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	struct kvec *iov = rqst->rq_iov;
- 	int n_vec = rqst->rq_nvec;
- 	unsigned int smb_buf_length = get_rfc1002_length(iov[0].iov_base);
--	size_t total_len;
-+	unsigned int i;
-+	size_t total_len = 0, sent;
- 	struct socket *ssocket = server->ssocket;
- 	int val = 1;
+ /*
+  * Calculate and return the CIFS signature based on the mac key and SMB PDU.
+@@ -93,6 +94,16 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
+ 		}
+ 	}
  
-@@ -258,8 +292,26 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
- 				(char *)&val, sizeof(val));
- 
--	rc = smb_send_kvec(server, iov, n_vec, &total_len);
-+	rc = smb_send_kvec(server, iov, n_vec, &sent);
-+	if (rc < 0)
-+		goto uncork;
-+
-+	total_len += sent;
-+
-+	/* now walk the page array and send each page in it */
++	/* now hash over the rq_pages array */
 +	for (i = 0; i < rqst->rq_npages; i++) {
 +		struct kvec p_iov;
 +
 +		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
-+		rc = smb_send_kvec(server, &p_iov, 1, &sent);
++		crypto_shash_update(&server->secmech.sdescmd5->shash,
++					p_iov.iov_base, p_iov.iov_len);
 +		kunmap(rqst->rq_pages[i]);
-+		if (rc < 0)
-+			break;
-+
-+		total_len += sent;
 +	}
- 
-+uncork:
- 	/* uncork it */
- 	val = 0;
- 	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
++
+ 	rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
+ 	if (rc)
+ 		cERROR(1, "%s: Could not generate md5 hash", __func__);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index d02a6a4..3620bec 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -36,6 +36,8 @@ extern struct smb_hdr *cifs_buf_get(void);
+ extern void cifs_buf_release(void *);
+ extern struct smb_hdr *cifs_small_buf_get(void);
+ extern void cifs_small_buf_release(void *);
++extern void cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
++					struct kvec *iov);
+ extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
+ 			unsigned int /* length */);
+ extern unsigned int _get_xid(void);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 946a462..5673ef1 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -251,7 +251,7 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
+  * The page will be kmapped and the address placed into iov_base. The length
+  * will then be adjusted according to the ptailoff.
+  */
+-static void
++void
+ cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
+ 			struct kvec *iov)
+ {
 -- 
 1.7.11.2
