@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 3/9] cifs: cork the socket before a send and uncork it afterward
-Date: Wed, 25 Jul 2012 11:54:06 -0400
-Message-ID: <1343231652-10459-4-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 4/9] cifs: teach smb_send_rqst how to handle arrays of pages
+Date: Wed, 25 Jul 2012 11:54:07 -0400
+Message-ID: <1343231652-10459-5-git-send-email-jlayton@redhat.com>
 References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,72 +10,106 @@ In-Reply-To: <1343231652-10459-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We want to send SMBs as "atomically" as possible. Prior to sending any
-data on the socket, cork it to make sure that no non-full frames go
-out. Afterward, uncork it to make sure all of the data gets pushed out
-to the wire.
+Add code that allows smb_send_rqst to send an array of pages after the
+initial kvec array has been sent. For now, we simply kmap the page
+array and send it using the standard smb_send_kvec function. Eventually,
+we may want to convert this code to use kernel_sendpage under the hood
+and avoid the kmap altogether for the page data.
 
-Note that this more or less renders the socket=TCP_NODELAY mount option
-obsolete. When TCP_CORK and TCP_NODELAY are used on the same socket,
-TCP_NODELAY is essentially ignored.
-
-Acked-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c   |  4 ++++
- fs/cifs/transport.c | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ fs/cifs/transport.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 54 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 6df6fa1..a828a8c 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1676,6 +1676,10 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			if (string == NULL)
- 				goto out_nomem;
- 
-+			/*
-+			 * FIXME: since we now cork/uncork the socket while
-+			 * 	  sending, should we deprecate this option?
-+			 */
- 			if (strnicmp(string, "TCP_NODELAY", 11) == 0)
- 				vol->sockopt_tcp_nodelay = 1;
- 			break;
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index d93f15d..a3e58b2 100644
+index a3e58b2..946a462 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -27,6 +27,7 @@
- #include <linux/net.h>
+@@ -28,6 +28,7 @@
  #include <linux/delay.h>
  #include <linux/freezer.h>
-+#include <linux/tcp.h>
+ #include <linux/tcp.h>
++#include <linux/highmem.h>
  #include <asm/uaccess.h>
  #include <asm/processor.h>
  #include <linux/mempool.h>
-@@ -247,12 +248,23 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+@@ -240,6 +241,38 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
+ 	return rc;
+ }
+ 
++/**
++ * rqst_page_to_kvec - Turn a slot in the smb_rqst page array into a kvec
++ * @rqst: pointer to smb_rqst
++ * @idx: index into the array of the page
++ * @iov: pointer to struct kvec that will hold the result
++ *
++ * Helper function to convert a slot in the rqst->rq_pages array into a kvec.
++ * The page will be kmapped and the address placed into iov_base. The length
++ * will then be adjusted according to the ptailoff.
++ */
++static void
++cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
++			struct kvec *iov)
++{
++	/*
++	 * FIXME: We could avoid this kmap altogether if we used
++	 * kernel_sendpage instead of kernel_sendmsg. That will only
++	 * work if signing is disabled though as sendpage inlines the
++	 * page directly into the fraglist. If userspace modifies the
++	 * page after we calculate the signature, then the server will
++	 * reject it and may break the connection. kernel_sendmsg does
++	 * an extra copy of the data and avoids that issue.
++	 */
++	iov->iov_base = kmap(rqst->rq_pages[idx]);
++
++	/* if last page, don't send beyond this offset into page */
++	if (idx == (rqst->rq_npages - 1))
++		iov->iov_len = rqst->rq_tailsz;
++	else
++		iov->iov_len = rqst->rq_pagesz;
++}
++
+ static int
+ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ {
+@@ -247,7 +280,8 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	struct kvec *iov = rqst->rq_iov;
  	int n_vec = rqst->rq_nvec;
  	unsigned int smb_buf_length = get_rfc1002_length(iov[0].iov_base);
- 	size_t total_len;
-+	struct socket *ssocket = server->ssocket;
-+	int val = 1;
+-	size_t total_len;
++	unsigned int i;
++	size_t total_len = 0, sent;
+ 	struct socket *ssocket = server->ssocket;
+ 	int val = 1;
  
- 	cFYI(1, "Sending smb: smb_len=%u", smb_buf_length);
- 	dump_smb(iov[0].iov_base, iov[0].iov_len);
+@@ -258,8 +292,26 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ 	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
+ 				(char *)&val, sizeof(val));
  
-+	/* cork the socket */
-+	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
-+				(char *)&val, sizeof(val));
+-	rc = smb_send_kvec(server, iov, n_vec, &total_len);
++	rc = smb_send_kvec(server, iov, n_vec, &sent);
++	if (rc < 0)
++		goto uncork;
 +
- 	rc = smb_send_kvec(server, iov, n_vec, &total_len);
- 
-+	/* uncork it */
-+	val = 0;
-+	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
-+				(char *)&val, sizeof(val));
++	total_len += sent;
 +
- 	if ((total_len > 0) && (total_len != smb_buf_length + 4)) {
- 		cFYI(1, "partial send (wanted=%u sent=%zu): terminating "
- 			"session", smb_buf_length + 4, total_len);
++	/* now walk the page array and send each page in it */
++	for (i = 0; i < rqst->rq_npages; i++) {
++		struct kvec p_iov;
++
++		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
++		rc = smb_send_kvec(server, &p_iov, 1, &sent);
++		kunmap(rqst->rq_pages[i]);
++		if (rc < 0)
++			break;
++
++		total_len += sent;
++	}
+ 
++uncork:
+ 	/* uncork it */
+ 	val = 0;
+ 	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
 -- 
 1.7.11.2
