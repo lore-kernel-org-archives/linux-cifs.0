@@ -1,69 +1,214 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 0/9] cifs: convert async write code to use less kmapping
-Date: Wed, 25 Jul 2012 11:54:03 -0400
-Message-ID: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 1/9] cifs: change signing routines to deal with smb_rqst structs
+Date: Wed, 25 Jul 2012 11:54:04 -0400
+Message-ID: <1343231652-10459-2-git-send-email-jlayton@redhat.com>
+References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1343231652-10459-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is the second version of this patch series. The main differences
-from the first are:
+We need a way to represent a call to be sent on the wire that does not
+require having all of the page data kmapped. Behold the smb_rqst struct.
+This new struct represents an array of kvecs immediately followed by an
+array of pages.
 
-1) move the struct smb_rqst definition from cifsproto.h to cifsglob.h
+Convert the signing routines to use these structs under the hood and
+turn the existing functions for this into wrappers around that. For now,
+we're just changing these functions to take different args. Later, we'll
+teach them how to deal with arrays of pages.
 
-2) fix up merge conflicts with Steve's for-next tree and drop patches
-   that are already there
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsencrypt.c | 26 ++++++++++++++++++--------
+ fs/cifs/cifsglob.h    | 14 ++++++++++++++
+ fs/cifs/cifsproto.h   |  7 +++++--
+ fs/cifs/cifssmb.c     |  6 ++++--
+ fs/cifs/transport.c   |  4 +++-
+ 5 files changed, 44 insertions(+), 13 deletions(-)
 
-3) convert the setup_async_request prototype to return a mid_q_entry
-   pointer or an ERR_PTR instead of requiring a double pointer argument
-
-Original cover letter follows...
-
-We currently have a problem with the async write code on CONFIG_HIGHMEM
-architectures. It uses *way* too much kmap space. Not only does this
-limit throughput by adding an artificial bottleneck, but it also can
-lead to deadlocks.
-
-Late in the 3.5 cycle, I sent some patches to limit the rsize and wsize
-on these arches as a temporary workaround. This patchset is a first pass
-at fixing this the right way, by teaching the low-level transport code
-how to deal with arrays of pages.
-
-Note that this is just a fix for the write codepaths. The read side will
-need a separate set of patches.
-
-The code seems to work correctly, and is probably suitable for the
-upcoming 3.6 merge window. This probably also has some non-trivial
-conflicts with Pavel's patches since I did not base this on top of his
-SMB2 work.
-
-Let me know what you plan to merge first for 3.6 and I can try to
-fix those up, or we can ask Pavel to rebase his code on top of this.
-
-Jeff Layton (9):
-  cifs: change signing routines to deal with smb_rqst structs
-  cifs: convert send code to use smb_rqst structs
-  cifs: cork the socket before a send and uncork it afterward
-  cifs: teach smb_send_rqst how to handle arrays of pages
-  cifs: teach signing routines how to deal with arrays of pages in a
-    smb_rqst
-  cifs: change cifs_call_async to use smb_rqst structs
-  cifs: convert async write code to pass in data via rq_pages array
-  cifs: remove the kmap size limit from wsize
-  cifs: add deprecation warning to sockopt=TCP_NODELAY option
-
- fs/cifs/cifsencrypt.c   |  37 ++++++--
- fs/cifs/cifsglob.h      |  18 +++-
- fs/cifs/cifsproto.h     |  25 +++---
- fs/cifs/cifssmb.c       |  59 ++++++------
- fs/cifs/connect.c       |  10 ++-
- fs/cifs/file.c          |  47 ++--------
- fs/cifs/smb2proto.h     |   4 +-
- fs/cifs/smb2transport.c |  14 ++-
- fs/cifs/transport.c     | 233 +++++++++++++++++++++++++++++++++++-------------
- 9 files changed, 278 insertions(+), 169 deletions(-)
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 6a0d741..e8953a0 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -37,11 +37,13 @@
+  * the sequence number before this function is called. Also, this function
+  * should be called with the server->srv_mutex held.
+  */
+-static int cifs_calc_signature(const struct kvec *iov, int n_vec,
++static int cifs_calc_signature(struct smb_rqst *rqst,
+ 			struct TCP_Server_Info *server, char *signature)
+ {
+ 	int i;
+ 	int rc;
++	struct kvec *iov = rqst->rq_iov;
++	int n_vec = rqst->rq_nvec;
+ 
+ 	if (iov == NULL || signature == NULL || server == NULL)
+ 		return -EINVAL;
+@@ -99,12 +101,12 @@ static int cifs_calc_signature(const struct kvec *iov, int n_vec,
+ }
+ 
+ /* must be called with server->srv_mutex held */
+-int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
++int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 		   __u32 *pexpected_response_sequence_number)
+ {
+ 	int rc = 0;
+ 	char smb_signature[20];
+-	struct smb_hdr *cifs_pdu = (struct smb_hdr *)iov[0].iov_base;
++	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+ 
+ 	if ((cifs_pdu == NULL) || (server == NULL))
+ 		return -EINVAL;
+@@ -125,7 +127,7 @@ int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 	*pexpected_response_sequence_number = server->sequence_number++;
+ 	server->sequence_number++;
+ 
+-	rc = cifs_calc_signature(iov, n_vec, server, smb_signature);
++	rc = cifs_calc_signature(rqst, server, smb_signature);
+ 	if (rc)
+ 		memset(cifs_pdu->Signature.SecuritySignature, 0, 8);
+ 	else
+@@ -134,6 +136,15 @@ int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 	return rc;
+ }
+ 
++int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
++		   __u32 *pexpected_response_sequence)
++{
++	struct smb_rqst rqst = { .rq_iov = iov,
++				 .rq_nvec = n_vec };
++
++	return cifs_sign_rqst(&rqst, server, pexpected_response_sequence);
++}
++
+ /* must be called with server->srv_mutex held */
+ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 		  __u32 *pexpected_response_sequence_number)
+@@ -147,14 +158,14 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
+ 			      pexpected_response_sequence_number);
+ }
+ 
+-int cifs_verify_signature(struct kvec *iov, unsigned int nr_iov,
++int cifs_verify_signature(struct smb_rqst *rqst,
+ 			  struct TCP_Server_Info *server,
+ 			  __u32 expected_sequence_number)
+ {
+ 	unsigned int rc;
+ 	char server_response_sig[8];
+ 	char what_we_think_sig_should_be[20];
+-	struct smb_hdr *cifs_pdu = (struct smb_hdr *)iov[0].iov_base;
++	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+ 
+ 	if (cifs_pdu == NULL || server == NULL)
+ 		return -EINVAL;
+@@ -186,8 +197,7 @@ int cifs_verify_signature(struct kvec *iov, unsigned int nr_iov,
+ 	cifs_pdu->Signature.Sequence.Reserved = 0;
+ 
+ 	mutex_lock(&server->srv_mutex);
+-	rc = cifs_calc_signature(iov, nr_iov, server,
+-				 what_we_think_sig_should_be);
++	rc = cifs_calc_signature(rqst, server, what_we_think_sig_should_be);
+ 	mutex_unlock(&server->srv_mutex);
+ 
+ 	if (rc)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index bcdf4d4..2a7e4b8 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -158,6 +158,20 @@ struct cifs_cred {
+  *****************************************************************
+  */
+ 
++/*
++ * A smb_rqst represents a complete request to be issued to a server. It's
++ * formed by a kvec array, followed by an array of pages. Page data is assumed
++ * to start at the beginning of the first page.
++ */
++struct smb_rqst {
++	struct kvec	*rq_iov;	/* array of kvecs */
++	unsigned int	rq_nvec;	/* number of kvecs in array */
++	struct page	**rq_pages;	/* pointer to array of page ptrs */
++	unsigned int	rq_npages;	/* number pages in array */
++	unsigned int	rq_pagesz;	/* page size to use */
++	unsigned int	rq_tailsz;	/* length of last page */
++};
++
+ enum smb_version {
+ 	Smb_1 = 1,
+ 	Smb_21,
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index cf7fb18..d02a6a4 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -24,6 +24,7 @@
+ 
+ struct statfs;
+ struct smb_vol;
++struct smb_rqst;
+ 
+ /*
+  *****************************************************************
+@@ -400,10 +401,12 @@ extern void sesInfoFree(struct cifs_ses *);
+ extern struct cifs_tcon *tconInfoAlloc(void);
+ extern void tconInfoFree(struct cifs_tcon *);
+ 
+-extern int cifs_sign_smb(struct smb_hdr *, struct TCP_Server_Info *, __u32 *);
++extern int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
++		   __u32 *pexpected_response_sequence_number);
+ extern int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *,
+ 			  __u32 *);
+-extern int cifs_verify_signature(struct kvec *iov, unsigned int nr_iov,
++extern int cifs_sign_smb(struct smb_hdr *, struct TCP_Server_Info *, __u32 *);
++extern int cifs_verify_signature(struct smb_rqst *rqst,
+ 				 struct TCP_Server_Info *server,
+ 				__u32 expected_sequence_number);
+ extern int SMBNTencrypt(unsigned char *, unsigned char *, unsigned char *,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index cabc7a0..ce5f75c 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1564,6 +1564,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 	struct cifs_readdata *rdata = mid->callback_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
++	struct smb_rqst rqst = { .rq_iov = rdata->iov,
++				 .rq_nvec = rdata->nr_iov };
+ 
+ 	cFYI(1, "%s: mid=%llu state=%d result=%d bytes=%u", __func__,
+ 		mid->mid, mid->mid_state, rdata->result, rdata->bytes);
+@@ -1573,8 +1575,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
+ 		/* result already set, check signature */
+ 		if (server->sec_mode &
+ 		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+-			if (cifs_verify_signature(rdata->iov, rdata->nr_iov,
+-					  server, mid->sequence_number + 1))
++			if (cifs_verify_signature(&rqst, server,
++						  mid->sequence_number + 1))
+ 				cERROR(1, "Unexpected SMB signature");
+ 		}
+ 		/* FIXME: should this be counted toward the initiating task? */
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 83867ef..cc2eda9 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -503,11 +503,13 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 	/* convert the length into a more usable form */
+ 	if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
+ 		struct kvec iov;
++		struct smb_rqst rqst = { .rq_iov = &iov,
++					 .rq_nvec = 1 };
+ 
+ 		iov.iov_base = mid->resp_buf;
+ 		iov.iov_len = len;
+ 		/* FIXME: add code to kill session */
+-		if (cifs_verify_signature(&iov, 1, server,
++		if (cifs_verify_signature(&rqst, server,
+ 					  mid->sequence_number + 1) != 0)
+ 			cERROR(1, "Unexpected SMB signature");
+ 	}
 -- 
 1.7.11.2
