@@ -1,41 +1,51 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 10/11] cifs: remove the kmap size limit from wsize
-Date: Wed, 25 Jul 2012 16:31:13 +0400
-Message-ID: <CAKywueTiD3MoHXxKe_ZOgX_F8wHv2tyjTS_RZ9DezuBKZy3eUQ@mail.gmail.com>
+Subject: Re: [PATCH 11/11] cifs: add deprecation warning to
+ sockopt=TCP_NODELAY option
+Date: Wed, 25 Jul 2012 16:31:32 +0400
+Message-ID: <CAKywueQzaUjK6Y=aKDOWedLTD91eAGTJttvGhdy11MPin_ZVtA@mail.gmail.com>
 References: <1342634346-22818-1-git-send-email-jlayton@redhat.com>
-	<1342634346-22818-11-git-send-email-jlayton@redhat.com>
+	<1342634346-22818-12-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342634346-22818-11-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1342634346-22818-12-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/7/18 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Now that we're not kmapping so much at once, there's no need to cap
-> the wsize at the amount that can be simultaneously kmapped.
+> Now that we're using TCP_CORK on the socket, there's no value in
+> continuting to support this option. Schedule it for removal in 3.8.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/connect.c |    3 ---
->  1 file changed, 3 deletions(-)
+>  fs/cifs/connect.c |   11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 >
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 99ca139..303be53 100644
+> index 303be53..29d9716 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -3491,9 +3491,6 @@ cifs_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *pvolume_info)
->                 wsize = min_t(unsigned int, wsize,
->                                 server->maxBuf - sizeof(WRITE_REQ) + 4);
+> @@ -1830,12 +1830,13 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                         if (string == NULL)
+>                                 goto out_nomem;
 >
-> -       /* limit to the amount that we can kmap at once */
-> -       wsize = min_t(unsigned int, wsize, CIFS_KMAP_SIZE_LIMIT);
-> -
->         /* hard limit of CIFS_MAX_WSIZE */
->         wsize = min_t(unsigned int, wsize, CIFS_MAX_WSIZE);
->
+> -                       /*
+> -                        * FIXME: since we now cork/uncork the socket while
+> -                        *        sending, should we deprecate this option?
+> -                        */
+> -                       if (strnicmp(string, "TCP_NODELAY", 11) == 0)
+> +                       if (strnicmp(string, "TCP_NODELAY", 11) == 0) {
+> +                               printk(KERN_WARNING, "CIFS: the "
+> +                                       "sockopt=TCP_NODELAY option has been "
+> +                                       "deprecated and will be removed "
+> +                                       "in 3.8\n");
+>                                 vol->sockopt_tcp_nodelay = 1;
+> +                       }
+>                         break;
+>                 case Opt_netbiosname:
+>                         string = match_strdup(args);
 > --
 > 1.7.10.4
 >
