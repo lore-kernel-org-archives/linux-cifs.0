@@ -1,229 +1,119 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v2 7/9] cifs: convert async write code to pass in data via
- rq_pages array
-Date: Wed, 25 Jul 2012 22:56:37 +0400
-Message-ID: <CAKywueSDSkb97Vj=RuCj0=7Qco4EUta42jyBsOfcnsGeSBjzAQ@mail.gmail.com>
-References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
-	<1343231652-10459-8-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v3 14/32] CIFS: Respect SMB2 header/max header size
+Date: Wed, 25 Jul 2012 15:09:15 -0400
+Message-ID: <20120725150915.3bea7709@tlielax.poochiereds.net>
+References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
+	<1342166025-29377-15-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1343231652-10459-8-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1342166025-29377-15-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/7/25 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+On Fri, 13 Jul 2012 11:53:27 +0400
+Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+
+> From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> 
+> Use SMB2 header size values for allocation and memset because they
+> are bigger and suitable for both CIFS and SMB2.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/cifsproto.h |  4 ++--
->  fs/cifs/cifssmb.c   | 39 +++++++++++----------------------------
->  fs/cifs/file.c      | 47 +++++++++--------------------------------------
->  3 files changed, 22 insertions(+), 68 deletions(-)
->
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 8075f23..179e29a 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -504,8 +504,8 @@ struct cifs_writedata {
->         pid_t                           pid;
->         unsigned int                    bytes;
->         int                             result;
-> -       void (*marshal_iov) (struct kvec *iov,
-> -                            struct cifs_writedata *wdata);
-> +       unsigned int                    pagesz;
-> +       unsigned int                    tailsz;
->         unsigned int                    nr_pages;
->         struct page                     *pages[1];
->  };
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 7365460..0b0a33c 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -2050,11 +2050,11 @@ cifs_writev_callback(struct mid_q_entry *mid)
->  int
->  cifs_async_writev(struct cifs_writedata *wdata)
+>  fs/cifs/cifsfs.c |   14 ++++++++++++--
+>  fs/cifs/misc.c   |   25 +++++++++++++++++++------
+>  2 files changed, 31 insertions(+), 8 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 8dc1492..5cf9299 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -48,6 +48,9 @@
+>  #include <linux/key-type.h>
+>  #include "cifs_spnego.h"
+>  #include "fscache.h"
+> +#ifdef CONFIG_CIFS_SMB2
+> +#include "smb2pdu.h"
+> +#endif
+>  #define CIFS_MAGIC_NUMBER 0xFF534D42	/* the first four bytes of SMB PDUs */
+>  
+>  int cifsFYI = 0;
+> @@ -981,6 +984,14 @@ cifs_destroy_inodecache(void)
+>  static int
+>  cifs_init_request_bufs(void)
 >  {
-> -       int i, rc = -EACCES;
-> +       int rc = -EACCES;
->         WRITE_REQ *smb = NULL;
->         int wct;
->         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-> -       struct kvec *iov = NULL;
-> +       struct kvec iov;
->         struct smb_rqst rqst = { };
->
->         if (tcon->ses->capabilities & CAP_LARGE_FILES) {
-> @@ -2071,15 +2071,6 @@ cifs_async_writev(struct cifs_writedata *wdata)
->         if (rc)
->                 goto async_writev_out;
->
-> -       /* 1 iov per page + 1 for header */
-> -       rqst.rq_nvec = wdata->nr_pages + 1;
-> -       iov = kzalloc((rqst.rq_nvec) * sizeof(*iov), GFP_NOFS);
-> -       if (iov == NULL) {
-> -               rc = -ENOMEM;
-> -               goto async_writev_out;
-> -       }
-> -       rqst.rq_iov = iov;
-> -
->         smb->hdr.Pid = cpu_to_le16((__u16)wdata->pid);
->         smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->pid >> 16));
->
-> @@ -2096,18 +2087,15 @@ cifs_async_writev(struct cifs_writedata *wdata)
->             cpu_to_le16(offsetof(struct smb_com_write_req, Data) - 4);
->
->         /* 4 for RFC1001 length + 1 for BCC */
-> -       iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
-> -       iov[0].iov_base = smb;
-> +       iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4 + 1;
-> +       iov.iov_base = smb;
->
-> -       /*
-> -        * This function should marshal up the page array into the kvec
-> -        * array, reserving [0] for the header. It should kmap the pages
-> -        * and set the iov_len properly for each one. It may also set
-> -        * wdata->bytes too.
-> -        */
-> -       cifs_kmap_lock();
-> -       wdata->marshal_iov(iov, wdata);
-> -       cifs_kmap_unlock();
-> +       rqst.rq_iov = &iov;
-> +       rqst.rq_nvec = 1;
-> +       rqst.rq_pages = wdata->pages;
-> +       rqst.rq_npages = wdata->nr_pages;
-> +       rqst.rq_pagesz = wdata->pagesz;
-> +       rqst.rq_tailsz = wdata->tailsz;
->
->         cFYI(1, "async write at %llu %u bytes", wdata->offset, wdata->bytes);
->
-> @@ -2123,7 +2111,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
->                                 (struct smb_com_writex_req *)smb;
->                 inc_rfc1001_len(&smbw->hdr, wdata->bytes + 5);
->                 put_bcc(wdata->bytes + 5, &smbw->hdr);
-> -               iov[0].iov_len += 4; /* pad bigger by four bytes */
-> +               iov.iov_len += 4; /* pad bigger by four bytes */
->         }
->
->         kref_get(&wdata->refcount);
-> @@ -2135,13 +2123,8 @@ cifs_async_writev(struct cifs_writedata *wdata)
->         else
->                 kref_put(&wdata->refcount, cifs_writedata_release);
->
-> -       /* send is done, unmap pages */
-> -       for (i = 0; i < wdata->nr_pages; i++)
-> -               kunmap(wdata->pages[i]);
-> -
->  async_writev_out:
->         cifs_small_buf_release(smb);
-> -       kfree(iov);
->         return rc;
->  }
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index cd5b144..b18d963 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1709,27 +1709,6 @@ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
->         return rc;
->  }
->
-> -/*
-> - * Marshal up the iov array, reserving the first one for the header. Also,
-> - * set wdata->bytes.
-> - */
-> -static void
-> -cifs_writepages_marshal_iov(struct kvec *iov, struct cifs_writedata *wdata)
-> -{
-> -       int i;
-> -       struct inode *inode = wdata->cfile->dentry->d_inode;
-> -       loff_t size = i_size_read(inode);
-> -
-> -       /* marshal up the pages into iov array */
-> -       wdata->bytes = 0;
-> -       for (i = 0; i < wdata->nr_pages; i++) {
-> -               iov[i + 1].iov_len = min(size - page_offset(wdata->pages[i]),
-> -                                       (loff_t)PAGE_CACHE_SIZE);
-> -               iov[i + 1].iov_base = kmap(wdata->pages[i]);
-> -               wdata->bytes += iov[i + 1].iov_len;
-> -       }
-> -}
-> -
->  static int cifs_writepages(struct address_space *mapping,
->                            struct writeback_control *wbc)
+> +	size_t max_hdr_size = MAX_CIFS_HDR_SIZE;
+> +#ifdef CONFIG_CIFS_SMB2
+> +	/*
+> +	 * SMB2 maximum header size is bigger than CIFS one - no problems to
+> +	 * allocate some more bytes for CIFS.
+> +	 */
+> +	max_hdr_size = MAX_SMB2_HDR_SIZE;
+> +#endif
+>  	if (CIFSMaxBufSize < 8192) {
+>  	/* Buffer size can not be smaller than 2 * PATH_MAX since maximum
+>  	Unicode path name has to fit in any SMB/CIFS path based frames */
+> @@ -992,8 +1003,7 @@ cifs_init_request_bufs(void)
+>  	}
+>  /*	cERROR(1, "CIFSMaxBufSize %d 0x%x",CIFSMaxBufSize,CIFSMaxBufSize); */
+>  	cifs_req_cachep = kmem_cache_create("cifs_request",
+> -					    CIFSMaxBufSize +
+> -					    MAX_CIFS_HDR_SIZE, 0,
+> +					    CIFSMaxBufSize + max_hdr_size, 0,
+>  					    SLAB_HWCACHE_ALIGN, NULL);
+>  	if (cifs_req_cachep == NULL)
+>  		return -ENOMEM;
+> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+> index 6460114..ad2538a 100644
+> --- a/fs/cifs/misc.c
+> +++ b/fs/cifs/misc.c
+> @@ -29,6 +29,9 @@
+>  #include "smberr.h"
+>  #include "nterr.h"
+>  #include "cifs_unicode.h"
+> +#ifdef CONFIG_CIFS_SMB2
+> +#include "smb2pdu.h"
+> +#endif
+>  
+>  extern mempool_t *cifs_sm_req_poolp;
+>  extern mempool_t *cifs_req_poolp;
+> @@ -143,17 +146,27 @@ struct smb_hdr *
+>  cifs_buf_get(void)
 >  {
-> @@ -1739,6 +1718,7 @@ static int cifs_writepages(struct address_space *mapping,
->         struct cifs_writedata *wdata;
->         struct page *page;
->         int rc = 0;
-> +       loff_t isize = i_size_read(mapping->host);
->
->         /*
->          * If wsize is smaller than the page cache size, default to writing
-> @@ -1843,7 +1823,7 @@ retry:
->                          */
->                         set_page_writeback(page);
->
-> -                       if (page_offset(page) >= mapping->host->i_size) {
-> +                       if (page_offset(page) >= isize) {
->                                 done = true;
->                                 unlock_page(page);
->                                 end_page_writeback(page);
-> @@ -1874,7 +1854,11 @@ retry:
->                 wdata->sync_mode = wbc->sync_mode;
->                 wdata->nr_pages = nr_pages;
->                 wdata->offset = page_offset(wdata->pages[0]);
-> -               wdata->marshal_iov = cifs_writepages_marshal_iov;
-> +               wdata->pagesz = PAGE_CACHE_SIZE;
-> +               wdata->tailsz = min(isize - page_offset(wdata->pages[nr_pages - 1]),
-> +                                       (loff_t)PAGE_CACHE_SIZE);
-> +               wdata->bytes = ((nr_pages - 1) * PAGE_CACHE_SIZE) +
-> +                                       wdata->tailsz;
->
->                 do {
->                         if (wdata->cfile != NULL)
-> @@ -2163,20 +2147,6 @@ size_t get_numpages(const size_t wsize, const size_t len, size_t *cur_len)
->  }
->
->  static void
-> -cifs_uncached_marshal_iov(struct kvec *iov, struct cifs_writedata *wdata)
-> -{
-> -       int i;
-> -       size_t bytes = wdata->bytes;
+>  	struct smb_hdr *ret_buf = NULL;
 > -
-> -       /* marshal up the pages into iov array */
-> -       for (i = 0; i < wdata->nr_pages; i++) {
-> -               iov[i + 1].iov_len = min_t(size_t, bytes, PAGE_SIZE);
-> -               iov[i + 1].iov_base = kmap(wdata->pages[i]);
-> -               bytes -= iov[i + 1].iov_len;
-> -       }
-> -}
-> -
-> -static void
->  cifs_uncached_writev_complete(struct work_struct *work)
->  {
->         int i;
-> @@ -2289,7 +2259,8 @@ cifs_iovec_write(struct file *file, const struct iovec *iov,
->                 wdata->cfile = cifsFileInfo_get(open_file);
->                 wdata->pid = pid;
->                 wdata->bytes = cur_len;
-> -               wdata->marshal_iov = cifs_uncached_marshal_iov;
-> +               wdata->pagesz = PAGE_SIZE;
-> +               wdata->tailsz = cur_len - ((nr_pages - 1) * PAGE_SIZE);
->                 rc = cifs_uncached_retry_writev(wdata);
->                 if (rc) {
->                         kref_put(&wdata->refcount, cifs_writedata_release);
-> --
-> 1.7.11.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> -/* We could use negotiated size instead of max_msgsize -
+> -   but it may be more efficient to always alloc same size
+> -   albeit slightly larger than necessary and maxbuffersize
+> -   defaults to this and can not be bigger */
+> +	size_t buf_size = sizeof(struct smb_hdr);
+> +
+> +#ifdef CONFIG_CIFS_SMB2
+> +	/*
+> +	 * SMB2 header is bigger than CIFS one - no problems to clean some
+> +	 * more bytes for CIFS.
+> +	 */
+> +	buf_size = sizeof(struct smb2_hdr);
+> +#endif
+> +	/*
+> +	 * We could use negotiated size instead of max_msgsize -
+> +	 * but it may be more efficient to always alloc same size
+> +	 * albeit slightly larger than necessary and maxbuffersize
+> +	 * defaults to this and can not be bigger.
+> +	 */
+>  	ret_buf = mempool_alloc(cifs_req_poolp, GFP_NOFS);
+>  
+>  	/* clear the first few header bytes */
+>  	/* for most paths, more is cleared in header_assemble */
+>  	if (ret_buf) {
+> -		memset(ret_buf, 0, sizeof(struct smb_hdr) + 3);
+> +		memset(ret_buf, 0, buf_size + 3);
+>  		atomic_inc(&bufAllocCount);
+>  #ifdef CONFIG_CIFS_STATS2
+>  		atomic_inc(&totBufAllocCount);
 
-Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-
--- 
-Best regards,
-Pavel Shilovsky.
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
