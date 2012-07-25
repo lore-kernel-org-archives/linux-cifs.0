@@ -1,126 +1,212 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Wed, 25 Jul 2012 14:58:00 -0500
-Message-ID: <CAH2r5mvgQTG2j68c78hiZBMbgNvL3t6iY+d6CWnvtqQXNu2kaw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v2] cifs: obtain file access during backup intent lookup
+Date: Wed, 25 Jul 2012 17:45:04 -0500
+Message-ID: <1343256304-4735-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit 0ec4f431eb56d633da3a55da67d5c4b88886ccc7:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-  locks: fix checking of fcntl_setlease argument (2012-07-23 12:46:01 -0700)
+path based querries can fail for lack of access, especially during lookup
+during open.
+open itself would actually succeed becasue of back up intent bit
+but querries (either path or file handle based) do not have a means to
+specifiy backup intent bit.
+So querry the file info during lookup using 
+ trans2 / findfirst2 / file_id_full_ir_info
+to obtain file info as well as file_id/inode value.
 
-are available in the git repository at:
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reported-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifssmb.c |   38 +++++++++++++++++------------
+ fs/cifs/inode.c   |   67 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 87 insertions(+), 18 deletions(-)
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-for you to fetch changes up to 764a1b1acecedfe204cb2e80d8e2cc7c6df1b0b8:
-
-  cifs: ensure that we always do cifsFileInfo_get under the spinlock
-(2012-07-25 14:51:30 -0500)
-
-----------------------------------------------------------------
-Jeff Layton (7):
-      cifs: after upcalling for krb5 creds, invalidate key rather than
-revoking it
-      cifs: remove extraneous newlines from cERROR and cFYI calls
-      cifs: move file_lock off stack in cifs_push_posix_locks
-      cifs: remove bogus reset of smb_buf_length in smb_send routines
-      cifs: rename cifs_sign_smb2 to cifs_sign_smbv
-      cifs: reinstate sec=ntlmv2 mount option
-      cifs: ensure that we always do cifsFileInfo_get under the spinlock
-
-Pavel Shilovsky (32):
-      CIFS: Move trans2 processing to ops struct
-      CIFS: Extend credit mechanism to process request type
-      CIFS: Move protocol specific negotiate code to ops struct
-      CIFS: Move protocol specific session setup/logoff code to ops struct
-      CIFS: Move protocol specific tcon/tdis code to ops struct
-      CIFS: Rename Get/FreeXid and make them work with unsigned int
-      CIFS: Rename 7 error codes to NT_ style
-      CIFS: Add SMB2 status codes
-      CIFS: Make transport routines work with SMB2
-      CIFS: Add SMB2 credits support
-      CIFS: Fix a wrong pointer in atomic_open
-      CIFS: Make demultiplex_thread work with SMB2 code
-      CIFS: Respect SMB2 header/max header size
-      CIFS: Add capability to send SMB2 negotiate message
-      CIFS: Add session setup/logoff capability for SMB2
-      CIFS: Add tree connect/disconnect capability for SMB2
-      CIFS: Process reconnects for SMB2 shares
-      CIFS: Move getting dfs referalls to ops struct
-      CIFS: Move informational tcon calls to ops struct
-      CIFS: Move is_path_accessible to ops struct
-      CIFS: Add SMB2 support for is_path_accessible
-      CIFS: Move query inode info code to ops struct
-      CIFS: Query SMB2 inode info
-      CIFS: Move building path to root to ops struct
-      CIFS: Add SMB2 support for build_path_to_root
-      CIFS: Setup async request in ops struct
-      CIFS: Add SMB2 support for async requests
-      CIFS: Move echo code to osp struct
-      CIFS: Add echo request support for SMB2
-      CIFS: Move clear/print_stats code to ops struct
-      CIFS: Allow SMB2 statistics to be tracked
-      CIFS: Make CAP_* checks protocol independent
-
-Steve French (1):
-      CIFS: Map SMB2 status codes to POSIX errors
-
- fs/cifs/Makefile        |    3 +-
- fs/cifs/cache.c         |    2 +-
- fs/cifs/cifs_debug.c    |   62 +-
- fs/cifs/cifs_dfs_ref.c  |    7 +-
- fs/cifs/cifs_unicode.c  |   60 ++
- fs/cifs/cifs_unicode.h  |    6 +-
- fs/cifs/cifsacl.c       |   27 +-
- fs/cifs/cifsencrypt.c   |   52 +-
- fs/cifs/cifsfs.c        |   24 +-
- fs/cifs/cifsglob.h      |  192 +++-
- fs/cifs/cifsproto.h     |  253 ++---
- fs/cifs/cifssmb.c       |  365 +++----
- fs/cifs/connect.c       |  446 +++------
- fs/cifs/dir.c           |   51 +-
- fs/cifs/file.c          |  193 ++--
- fs/cifs/inode.c         |  236 ++---
- fs/cifs/ioctl.c         |    6 +-
- fs/cifs/link.c          |   44 +-
- fs/cifs/misc.c          |   31 +-
- fs/cifs/nterr.c         |    6 +-
- fs/cifs/nterr.h         |   22 +-
- fs/cifs/ntlmssp.h       |   10 +
- fs/cifs/readdir.c       |   31 +-
- fs/cifs/sess.c          |   12 +-
- fs/cifs/smb1ops.c       |  399 +++++++-
- fs/cifs/smb2glob.h      |   44 +
- fs/cifs/smb2inode.c     |  124 +++
- fs/cifs/smb2maperror.c  | 2477 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2misc.c      |  347 +++++++
- fs/cifs/smb2ops.c       |  304 ++++++
- fs/cifs/smb2pdu.c       | 1125 +++++++++++++++++++++
- fs/cifs/smb2pdu.h       |  577 +++++++++++
- fs/cifs/smb2proto.h     |   78 ++
- fs/cifs/smb2status.h    | 1782 ++++++++++++++++++++++++++++++++++
- fs/cifs/smb2transport.c |  172 ++++
- fs/cifs/smbencrypt.c    |   14 +-
- fs/cifs/transport.c     |   95 +-
- fs/cifs/xattr.c         |   24 +-
- 38 files changed, 8555 insertions(+), 1148 deletions(-)
- create mode 100644 fs/cifs/smb2glob.h
- create mode 100644 fs/cifs/smb2inode.c
- create mode 100644 fs/cifs/smb2maperror.c
- create mode 100644 fs/cifs/smb2misc.c
- create mode 100644 fs/cifs/smb2pdu.c
- create mode 100644 fs/cifs/smb2pdu.h
- create mode 100644 fs/cifs/smb2proto.h
- create mode 100644 fs/cifs/smb2status.h
- create mode 100644 fs/cifs/smb2transport.c
-
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 4ee522b..f059c0a 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4257,7 +4257,7 @@ CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
+ 	int rc = 0;
+ 	int bytes_returned = 0;
+ 	int name_len;
+-	__u16 params, byte_count;
++	__u16 params, byte_count, ffattrs;
+ 
+ 	cFYI(1, "In FindFirst for %s", searchName);
+ 
+@@ -4275,27 +4275,35 @@ findFirstRetry:
+ 		it got remapped to 0xF03A as if it were part of the
+ 		directory name instead of a wildcard */
+ 		name_len *= 2;
+-		pSMB->FileName[name_len] = dirsep;
+-		pSMB->FileName[name_len+1] = 0;
+-		pSMB->FileName[name_len+2] = '*';
+-		pSMB->FileName[name_len+3] = 0;
+-		name_len += 4; /* now the trailing null */
+-		pSMB->FileName[name_len] = 0; /* null terminate just in case */
+-		pSMB->FileName[name_len+1] = 0;
+-		name_len += 2;
++		if (dirsep) {
++			pSMB->FileName[name_len] = dirsep;
++			pSMB->FileName[name_len+1] = 0;
++			pSMB->FileName[name_len+2] = '*';
++			pSMB->FileName[name_len+3] = 0;
++			name_len += 4; /* now the trailing null */
++			/* null terminate just in case */
++			pSMB->FileName[name_len] = 0;
++			pSMB->FileName[name_len+1] = 0;
++			name_len += 2;
++		}
+ 	} else {	/* BB add check for overrun of SMB buf BB */
+ 		name_len = strnlen(searchName, PATH_MAX);
+ /* BB fix here and in unicode clause above ie
+ 		if (name_len > buffersize-header)
+ 			free buffer exit; BB */
+ 		strncpy(pSMB->FileName, searchName, name_len);
+-		pSMB->FileName[name_len] = dirsep;
+-		pSMB->FileName[name_len+1] = '*';
+-		pSMB->FileName[name_len+2] = 0;
+-		name_len += 3;
++		if (dirsep) {
++			pSMB->FileName[name_len] = dirsep;
++			pSMB->FileName[name_len+1] = '*';
++			pSMB->FileName[name_len+2] = 0;
++			name_len += 3;
++		}
+ 	}
+ 
+ 	params = 12 + name_len /* includes null */ ;
++	ffattrs = ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM;
++	if (dirsep)
++		ffattrs |= ATTR_DIRECTORY;
+ 	pSMB->TotalDataCount = 0;	/* no EAs */
+ 	pSMB->MaxParameterCount = cpu_to_le16(10);
+ 	pSMB->MaxDataCount = cpu_to_le16(CIFSMaxBufSize & 0xFFFFFF00);
+@@ -4315,9 +4323,7 @@ findFirstRetry:
+ 	pSMB->SetupCount = 1;	/* one byte, no need to make endian neutral */
+ 	pSMB->Reserved3 = 0;
+ 	pSMB->SubCommand = cpu_to_le16(TRANS2_FIND_FIRST);
+-	pSMB->SearchAttributes =
+-	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
+-			ATTR_DIRECTORY);
++	pSMB->SearchAttributes = cpu_to_le16(ffattrs);
+ 	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
+ 	pSMB->SearchFlags = cpu_to_le16(search_flags);
+ 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 8e8bb49..a0ed97d 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -600,17 +600,40 @@ cgfi_exit:
+ 	return rc;
+ }
+ 
++static void
++fidinfo2fainfo(SEARCH_ID_FULL_DIR_INFO *fidinfo, FILE_ALL_INFO *fainfo)
++{
++	memcpy(&fainfo->CreationTime, &fidinfo->CreationTime, sizeof(__le64));
++	memcpy(&fainfo->LastAccessTime, &fidinfo->LastAccessTime,
++		sizeof(__le64));
++	memcpy(&fainfo->LastWriteTime, &fidinfo->LastWriteTime,
++		sizeof(__le64));
++	memcpy(&fainfo->ChangeTime, &fidinfo->ChangeTime,
++		sizeof(__le64));
++	memcpy(&fainfo->EndOfFile, &fidinfo->EndOfFile,
++		sizeof(__le64));
++	memcpy(&fainfo->AllocationSize, &fidinfo->AllocationSize,
++		sizeof(__le64));
++	memcpy(&fainfo->Attributes, &fidinfo->ExtFileAttributes,
++		sizeof(__le32));
++
++	return;
++}
++
+ int cifs_get_inode_info(struct inode **pinode,
+ 	const unsigned char *full_path, FILE_ALL_INFO *pfindData,
+ 	struct super_block *sb, int xid, const __u16 *pfid)
+ {
+-	int rc = 0, tmprc;
++	__u16 fid, srchflgs;
++	int rc = 0, rc2 = -EINVAL, tmprc;
+ 	struct cifs_tcon *pTcon;
+ 	struct tcon_link *tlink;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+ 	char *buf = NULL;
+ 	bool adjustTZ = false;
+ 	struct cifs_fattr fattr;
++	struct cifs_search_info *psrch_inf = NULL;
++	SEARCH_ID_FULL_DIR_INFO *ffdata = NULL;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -640,6 +663,38 @@ int cifs_get_inode_info(struct inode **pinode,
+ 			      0 /* not legacy */,
+ 			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+ 				CIFS_MOUNT_MAP_SPECIAL_CHR);
++
++		/*
++		 * This findfirst call is meant for a lookup operation
++		 * that would otherwise fail since query path info has no
++		 * means to indicate backup intent.
++		 */
++		if (rc == -EACCES && *pinode == NULL && backup_cred(cifs_sb)) {
++			psrch_inf = kzalloc(sizeof(struct cifs_search_info),
++						GFP_KERNEL);
++			if (psrch_inf == NULL) {
++				rc = -ENOMEM;
++				goto cgii_exit;
++			}
++			psrch_inf->endOfSearch = false;
++			psrch_inf->info_level = SMB_FIND_FILE_ID_FULL_DIR_INFO;
++
++			srchflgs = CIFS_SEARCH_CLOSE_ALWAYS |
++					CIFS_SEARCH_CLOSE_AT_END |
++					CIFS_SEARCH_BACKUP_SEARCH;
++
++			rc2 = CIFSFindFirst(xid, pTcon, full_path,
++				cifs_sb->local_nls, &fid, srchflgs, psrch_inf,
++				cifs_sb->mnt_cifs_flags &
++					CIFS_MOUNT_MAP_SPECIAL_CHR, 0);
++			if (!rc2) {
++				ffdata = (SEARCH_ID_FULL_DIR_INFO *)
++						psrch_inf->srch_entries_start;
++				fidinfo2fainfo(ffdata, pfindData);
++			}
++			rc = rc2;
++		}
++
+ 		/* BB optimize code so we do not make the above call
+ 		when server claims no NT SMB support and the above call
+ 		failed at least once - set flag in tcon or mount */
+@@ -683,7 +738,11 @@ int cifs_get_inode_info(struct inode **pinode,
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
+ 			int rc1 = 0;
+ 
+-			rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
++			if (!rc2)
++				fattr.cf_uniqueid =
++					le64_to_cpu(ffdata->UniqueId);
++			else
++				rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
+ 					full_path, &fattr.cf_uniqueid,
+ 					cifs_sb->local_nls,
+ 					cifs_sb->mnt_cifs_flags &
+@@ -741,6 +800,10 @@ int cifs_get_inode_info(struct inode **pinode,
+ 	}
+ 
+ cgii_exit:
++	if (!rc2) {
++		cifs_buf_release(psrch_inf->ntwrk_buf_start);
++		kfree(psrch_inf);
++	}
+ 	kfree(buf);
+ 	cifs_put_tlink(tlink);
+ 	return rc;
 -- 
-Thanks,
-
-Steve
+1.6.0.2
