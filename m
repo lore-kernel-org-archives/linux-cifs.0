@@ -1,35 +1,23 @@
-From: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Subject: Re: [GIT] CIFS Fixes
-Date: Thu, 26 Jul 2012 14:03:25 -0700
-Message-ID: <CA+55aFwNMt9BAvVdkzJTwo6J2r+-kwTH+VeO3ihx8L2wyAYeLg@mail.gmail.com>
-References: <CAH2r5mvgQTG2j68c78hiZBMbgNvL3t6iY+d6CWnvtqQXNu2kaw@mail.gmail.com>
+From: Greg KH <gregkh-hQyY1W1yCW8ekmWlsbkhG0B+6BGkLq7r@public.gmane.org>
+Subject: Re: [PATCH Backport for 3.4.x] cifs: when CONFIG_HIGHMEM is set,
+ serialize the read/write kmaps
+Date: Thu, 26 Jul 2012 14:11:20 -0700
+Message-ID: <20120726211120.GA25452@kroah.com>
+References: <1342793076-18280-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvgQTG2j68c78hiZBMbgNvL3t6iY+d6CWnvtqQXNu2kaw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1342793076-18280-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jul 25, 2012 at 12:58 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> The following changes since commit 0ec4f431eb56d633da3a55da67d5c4b88886ccc7:
->
->   locks: fix checking of fcntl_setlease argument (2012-07-23 12:46:01 -0700)
->
-> are available in the git repository at:
->
->   git://git.samba.org/sfrench/cifs-2.6.git for-next
+On Fri, Jul 20, 2012 at 10:04:36AM -0400, Jeff Layton wrote:
+> This is a backport of commit 3cf003c08be785af4bee9ac05891a15bcbff856a
+> for 3.4-stable.
 
+Thanks, now applied.
 
-I'd *really* prefer to see some summary explanations of what the pull
-request actually does.
-
-That's especially true when it adds 7000+ lines of code. Please make
-me able to write more than "Pull CIFS fixes".
-
-It would be better still if it was in a signed tag, but even if you
-just write a few lines (or a few paragraphs!) about the changes in the
-email, it would all be so much better.
-
-                  Linus
+greg k-h
