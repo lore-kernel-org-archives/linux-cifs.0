@@ -1,365 +1,143 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2 6/9] cifs: change cifs_call_async to use smb_rqst
- structs
-Date: Thu, 26 Jul 2012 07:03:12 -0400
-Message-ID: <20120726070312.198c69ea@tlielax.poochiereds.net>
-References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
-	<1343231652-10459-7-git-send-email-jlayton@redhat.com>
-	<CAKywueRUbMbxUNVGZnSH4CyKFUnvSmcWwQAZEVuZv9SoLh2tMQ@mail.gmail.com>
-	<CAKywueTCyhe6MSdekOc1SBTR6+8v-sCmJ4Ezab7JS29uXhk16g@mail.gmail.com>
-	<CAKywueQWGJf_BWAKtizF5R_zqWiF=5Lp4BcCXRTmf6JpJFa5sQ@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: ANNOUNCE: cifs-utils release 5.6 is ready for download
+Date: Thu, 26 Jul 2012 10:55:40 -0400
+Message-ID: <20120726105540.367cc0bc@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+To: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQWGJf_BWAKtizF5R_zqWiF=5Lp4BcCXRTmf6JpJFa5sQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 26 Jul 2012 12:54:10 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> 2012/7/26 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> > 2012/7/25 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> >> 2012/7/25 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> >>> For now, none of the callers populate rq_pages. That will be done for
-> >>> writes in a later patch. While we're at it, change the prototype of
-> >>> setup_async_request not to need a return pointer argument. Just
-> >>> return the pointer to the mid_q_entry or an ERR_PTR.
-> >>>
-> >>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> >>> ---
-> >>>  fs/cifs/cifsglob.h      |  4 ++--
-> >>>  fs/cifs/cifsproto.h     | 12 ++++++------
-> >>>  fs/cifs/cifssmb.c       | 20 +++++++++++++-------
-> >>>  fs/cifs/smb2proto.h     |  4 +---
-> >>>  fs/cifs/smb2transport.c | 14 ++++++--------
-> >>>  fs/cifs/transport.c     | 30 ++++++++++++++----------------
-> >>>  6 files changed, 42 insertions(+), 42 deletions(-)
-> >>>
-> >>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> >>> index 2a7e4b8..a0bb713 100644
-> >>> --- a/fs/cifs/cifsglob.h
-> >>> +++ b/fs/cifs/cifsglob.h
-> >>> @@ -194,8 +194,8 @@ struct smb_version_operations {
-> >>>         int (*setup_request)(struct cifs_ses *, struct kvec *, unsigned int,
-> >>>                              struct mid_q_entry **);
-> >>>         /* setup async request: allocate mid, sign message */
-> >>> -       int (*setup_async_request)(struct TCP_Server_Info *, struct kvec *,
-> >>> -                                  unsigned int, struct mid_q_entry **);
-> >>> +       struct mid_q_entry *(*setup_async_request)(struct TCP_Server_Info *,
-> >>> +                                               struct smb_rqst *);
-> >>>         /* check response: verify signature, map error */
-> >>>         int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
-> >>>                              bool);
-> >>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> >>> index 3620bec..8075f23 100644
-> >>> --- a/fs/cifs/cifsproto.h
-> >>> +++ b/fs/cifs/cifsproto.h
-> >>> @@ -69,10 +69,10 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
-> >>>                                         struct TCP_Server_Info *server);
-> >>>  extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
-> >>>  extern void cifs_wake_up_task(struct mid_q_entry *mid);
-> >>> -extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-> >>> -                          unsigned int nvec, mid_receive_t *receive,
-> >>> -                          mid_callback_t *callback, void *cbdata,
-> >>> -                          const int flags);
-> >>> +extern int cifs_call_async(struct TCP_Server_Info *server,
-> >>> +                       struct smb_rqst *rqst,
-> >>> +                       mid_receive_t *receive, mid_callback_t *callback,
-> >>> +                       void *cbdata, const int flags);
-> >>>  extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
-> >>>                         struct smb_hdr * /* input */ ,
-> >>>                         struct smb_hdr * /* out */ ,
-> >>> @@ -81,8 +81,8 @@ extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
-> >>>                             char *in_buf, int flags);
-> >>>  extern int cifs_setup_request(struct cifs_ses *, struct kvec *, unsigned int,
-> >>>                               struct mid_q_entry **);
-> >>> -extern int cifs_setup_async_request(struct TCP_Server_Info *, struct kvec *,
-> >>> -                                   unsigned int, struct mid_q_entry **);
-> >>> +extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
-> >>> +                                               struct smb_rqst *);
-> >>>  extern int cifs_check_receive(struct mid_q_entry *mid,
-> >>>                         struct TCP_Server_Info *server, bool log_error);
-> >>>  extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
-> >>> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> >>> index ce5f75c..7365460 100644
-> >>> --- a/fs/cifs/cifssmb.c
-> >>> +++ b/fs/cifs/cifssmb.c
-> >>> @@ -751,6 +751,8 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
-> >>>         ECHO_REQ *smb;
-> >>>         int rc = 0;
-> >>>         struct kvec iov;
-> >>> +       struct smb_rqst rqst = { .rq_iov = &iov,
-> >>> +                                .rq_nvec = 1 };
-> >>>
-> >>>         cFYI(1, "In echo request");
-> >>>
-> >>> @@ -768,7 +770,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
-> >>>         iov.iov_base = smb;
-> >>>         iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
-> >>>
-> >>> -       rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
-> >>> +       rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback,
-> >>>                              server, CIFS_ASYNC_OP | CIFS_ECHO_OP);
-> >>>         if (rc)
-> >>>                 cFYI(1, "Echo request failed: %d", rc);
-> >>> @@ -1604,6 +1606,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
-> >>>         READ_REQ *smb = NULL;
-> >>>         int wct;
-> >>>         struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
-> >>> +       struct smb_rqst rqst = { .rq_iov = rdata->iov,
-> >>> +                                .rq_nvec = 1 };
-> >>>
-> >>>         cFYI(1, "%s: offset=%llu bytes=%u", __func__,
-> >>>                 rdata->offset, rdata->bytes);
-> >>> @@ -1647,9 +1651,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
-> >>>         rdata->iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
-> >>>
-> >>>         kref_get(&rdata->refcount);
-> >>> -       rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
-> >>> -                            cifs_readv_receive, cifs_readv_callback,
-> >>> -                            rdata, 0);
-> >>> +       rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
-> >>> +                            cifs_readv_callback, rdata, 0);
-> >>>
-> >>>         if (rc == 0)
-> >>>                 cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
-> >>> @@ -2052,6 +2055,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
-> >>>         int wct;
-> >>>         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
-> >>>         struct kvec *iov = NULL;
-> >>> +       struct smb_rqst rqst = { };
-> >>>
-> >>>         if (tcon->ses->capabilities & CAP_LARGE_FILES) {
-> >>>                 wct = 14;
-> >>> @@ -2068,11 +2072,13 @@ cifs_async_writev(struct cifs_writedata *wdata)
-> >>>                 goto async_writev_out;
-> >>>
-> >>>         /* 1 iov per page + 1 for header */
-> >>> -       iov = kzalloc((wdata->nr_pages + 1) * sizeof(*iov), GFP_NOFS);
-> >>> +       rqst.rq_nvec = wdata->nr_pages + 1;
-> >>> +       iov = kzalloc((rqst.rq_nvec) * sizeof(*iov), GFP_NOFS);
-> >>>         if (iov == NULL) {
-> >>>                 rc = -ENOMEM;
-> >>>                 goto async_writev_out;
-> >>>         }
-> >>> +       rqst.rq_iov = iov;
-> >>>
-> >>>         smb->hdr.Pid = cpu_to_le16((__u16)wdata->pid);
-> >>>         smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->pid >> 16));
-> >>> @@ -2121,8 +2127,8 @@ cifs_async_writev(struct cifs_writedata *wdata)
-> >>>         }
-> >>>
-> >>>         kref_get(&wdata->refcount);
-> >>> -       rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
-> >>> -                            NULL, cifs_writev_callback, wdata, 0);
-> >>> +       rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
-> >>> +                               cifs_writev_callback, wdata, 0);
-> >>>
-> >>>         if (rc == 0)
-> >>>                 cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
-> >>> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> >>> index 902bbe2..dbb798c 100644
-> >>> --- a/fs/cifs/smb2proto.h
-> >>> +++ b/fs/cifs/smb2proto.h
-> >>> @@ -43,9 +43,7 @@ extern int smb2_check_receive(struct mid_q_entry *mid,
-> >>>                               struct TCP_Server_Info *server, bool log_error);
-> >>>  extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
-> >>>                               unsigned int nvec, struct mid_q_entry **ret_mid);
-> >>> -extern int smb2_setup_async_request(struct TCP_Server_Info *server,
-> >>> -                                   struct kvec *iov, unsigned int nvec,
-> >>> -                                   struct mid_q_entry **ret_mid);
-> >>> +extern struct mid_q_entry *smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst);
-> >
-> > This exceeds 80 length and causes checkpatch.pl warnings.
-> >
-> >>>  extern void smb2_echo_request(struct work_struct *work);
-> >>>
-> >>>  extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
-> >>> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> >>> index 31f5d42..c0a7a42 100644
-> >>> --- a/fs/cifs/smb2transport.c
-> >>> +++ b/fs/cifs/smb2transport.c
-> >>> @@ -148,25 +148,23 @@ smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
-> >>>         return rc;
-> >>>  }
-> >>>
-> >>> -int
-> >>> -smb2_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
-> >>> -                        unsigned int nvec, struct mid_q_entry **ret_mid)
-> >>> +struct mid_q_entry *
-> >>> +smb2_setup_async_request(struct TCP_Server_Info *server,
-> >>> +                       struct smb_rqst *rqst)
-> >>>  {
-> >>> -       int rc = 0;
-> >>> -       struct smb2_hdr *hdr = (struct smb2_hdr *)iov[0].iov_base;
-> >>> +       struct smb2_hdr *hdr = (struct smb2_hdr *)smb_rqst->iov[0].iov_base;
-> >>>         struct mid_q_entry *mid;
-> >>>
-> >>>         smb2_seq_num_into_buf(server, hdr);
-> >>>
-> >>>         mid = smb2_mid_entry_alloc(hdr, server);
-> >>>         if (mid == NULL)
-> >>> -               return -ENOMEM;
-> >>> +               return ERR_PTR(-ENOMEM);
-> >>>
-> >>>         /* rc = smb2_sign_smb2(iov, nvec, server);
-> >>>         if (rc) {
-> >>>                 DeleteMidQEntry(mid);
-> >>>                 return rc;
-> >>>         }*/
-> >>> -       *ret_mid = mid;
-> >>> -       return rc;
-> >>> +       return mid;
-> >>>  }
-> >>> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> >>> index 5673ef1..73cfa6f 100644
-> >>> --- a/fs/cifs/transport.c
-> >>> +++ b/fs/cifs/transport.c
-> >>> @@ -454,12 +454,11 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
-> >>>         return 0;
-> >>>  }
-> >>>
-> >>> -int
-> >>> -cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
-> >>> -                        unsigned int nvec, struct mid_q_entry **ret_mid)
-> >>> +struct mid_q_entry *
-> >>> +cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
-> >>>  {
-> >>>         int rc;
-> >>> -       struct smb_hdr *hdr = (struct smb_hdr *)iov[0].iov_base;
-> >>> +       struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
-> >>>         struct mid_q_entry *mid;
-> >>>
-> >>>         /* enable signing if server requires it */
-> >>> @@ -468,16 +467,15 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
-> >>>
-> >>>         mid = AllocMidQEntry(hdr, server);
-> >>>         if (mid == NULL)
-> >>> -               return -ENOMEM;
-> >>> +               return ERR_PTR(-ENOMEM);
-> >>>
-> >>> -       rc = cifs_sign_smbv(iov, nvec, server, &mid->sequence_number);
-> >>> +       rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
-> >>>         if (rc) {
-> >>>                 DeleteMidQEntry(mid);
-> >>> -               return rc;
-> >>> +               return ERR_PTR(rc);
-> >>>         }
-> >>>
-> >>> -       *ret_mid = mid;
-> >>> -       return 0;
-> >>> +       return mid;
-> >>>  }
-> >>>
-> >>>  /*
-> >>> @@ -485,9 +483,9 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
-> >>>   * the result. Caller is responsible for dealing with timeouts.
-> >>>   */
-> >>>  int
-> >>> -cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-> >>> -               unsigned int nvec, mid_receive_t *receive,
-> >>> -               mid_callback_t *callback, void *cbdata, const int flags)
-> >>> +cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
-> >>> +               mid_receive_t *receive, mid_callback_t *callback,
-> >>> +               void *cbdata, const int flags)
-> >>>  {
-> >>>         int rc, timeout, optype;
-> >>>         struct mid_q_entry *mid;
-> >>> @@ -500,12 +498,12 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-> >>>                 return rc;
-> >>>
-> >>>         mutex_lock(&server->srv_mutex);
-> >>> -       rc = server->ops->setup_async_request(server, iov, nvec, &mid);
-> >>> -       if (rc) {
-> >>> +       mid = server->ops->setup_async_request(server, rqst);
-> >>> +       if (IS_ERR(mid)) {
-> >>>                 mutex_unlock(&server->srv_mutex);
-> >>>                 add_credits(server, 1, optype);
-> >>>                 wake_up(&server->request_q);
-> >>> -               return rc;
-> >>> +               return PTR_ERR(mid);
-> >>>         }
-> >>>
-> >>>         mid->receive = receive;
-> >>> @@ -520,7 +518,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
-> >>>
-> >>>
-> >>>         cifs_in_send_inc(server);
-> >>> -       rc = smb_sendv(server, iov, nvec);
-> >>> +       rc = smb_send_rqst(server, rqst);
-> >>>         cifs_in_send_dec(server);
-> >>>         cifs_save_when_sent(mid);
-> >>>         mutex_unlock(&server->srv_mutex);
-> >>> --
-> >>> 1.7.11.2
-> >>>
-> >>> --
-> >>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> >>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> >>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> >>
-> >> Like the idea of changing setup_async_request prototype.
-> >>
-> >> Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> >>
-> >> --
-> >> Best regards,
-> >> Pavel Shilovsky.
-> >
-> >
-> >
-> > --
-> > Best regards,
-> > Pavel Shilovsky.
-> 
-> Also it doesn't build - needs smth like this:
-> 
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 62b3f17..a525db4 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1102,6 +1102,8 @@ SMB2_echo(struct TCP_Server_Info *server)
->         struct smb2_echo_req *req;
->         int rc = 0;
->         struct kvec iov;
-> +       struct smb_rqst rqst = { .rq_iov = &iov,
-> +                                .rq_nvec = 1 };
-> 
->         cFYI(1, "In echo request");
-> 
-> @@ -1115,7 +1117,7 @@ SMB2_echo(struct TCP_Server_Info *server)
->         /* 4 for rfc1002 length field */
->         iov.iov_len = get_rfc1002_length(req) + 4;
-> 
-> -       rc = cifs_call_async(server, &iov, 1, NULL, smb2_echo_callback, server,
-> +       rc = cifs_call_async(server, &rqst, NULL, smb2_echo_callback, server,
->                              CIFS_ECHO_OP);
->         if (rc)
->                 cFYI(1, "Echo request failed: %d", rc);
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index c0a7a42..ee20740 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -152,7 +152,7 @@ struct mid_q_entry *
->  smb2_setup_async_request(struct TCP_Server_Info *server,
->                         struct smb_rqst *rqst)
->  {
-> -       struct smb2_hdr *hdr = (struct smb2_hdr *)smb_rqst->iov[0].iov_base;
-> +       struct smb2_hdr *hdr = (struct smb2_hdr *)rqst->rq_iov[0].iov_base;
->         struct mid_q_entry *mid;
-> 
->         smb2_seq_num_into_buf(server, hdr);
-> 
-
-The fixed patch is in my tree, along with a fix for the 80 column
-warning from checkpatch.pl. I confirmed it this time by building with
-CONFIG_CIFS_SMB2 enabled. Let me know if you'd like me to re-post the
-series.
-
-Thanks,
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpUaW1lIGZv
+ciBhbm90aGVyIGNpZnMtdXRpbHMgcmVsZWFzZSENCg0KSGlnaGxpZ2h0czoNCg0KKiBiaW5hcmll
+cyBhcmUgbm93IGJ1aWx0IGJ5IGRlZmF1bHQgd2l0aCBQSUUgYW5kIFJFTFJPIHN1cHBvcnQgZm9y
+DQogIGJldHRlciBwcm90ZWN0aW9uIGFnYWluc3QgZXhwbG9pdHMNCg0KKiBiZXR0ZXIgZGVidWdn
+aW5nIGFuZCB3YXJuaW5ncyBmb3IgY2lmcy51cGNhbGwgYW5kIGNpZnNjcmVkcw0KDQoqIGJldHRl
+ciBpbnRlZ3JhdGlvbiB3aXRoIHN5c3RlbWQgYnkgaGF2aW5nIG1vdW50LmNpZnMgdXNlDQogIHN5
+c3RlbWQtYXNrLXBhc3N3b3JkIGlmIGl0J3MgYXBwcm9wcmlhdGUgYW5kIGF2YWlsYWJsZQ0KDQoN
+CndlYnBhZ2U6ICAgIGh0dHBzOi8vd2lraS5zYW1iYS5vcmcvaW5kZXgucGhwL0xpbnV4Q0lGU191
+dGlscw0KdGFyYmFsbDogICAgZnRwOi8vZnRwLnNhbWJhLm9yZy9wdWIvbGludXgtY2lmcy9jaWZz
+LXV0aWxzLw0KZ2l0OiAgICAgICAgZ2l0Oi8vZ2l0LnNhbWJhLm9yZy9jaWZzLXV0aWxzLmdpdA0K
+Z2l0d2ViOiAgICAgaHR0cDovL2dpdC5zYW1iYS5vcmcvP3A9Y2lmcy11dGlscy5naXQ7YT1zdW1t
+YXJ5DQoNCkRldGFpbGVkIGxpc3Qgb2YgY2hhbmdlcyBzaW5jZSA1LjU6DQoNCmNvbW1pdCBkZjU2
+MWQ0MDk0N2UwYjUyMGRlYjQ4ZTFhNDc0OWFmZTk3ODc5NDlhDQpBdXRob3I6IEplZmYgTGF5dG9u
+IDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgRnJpIEp1biAxIDEzOjU2OjIxIDIwMTIgLTA0
+MDANCg0KICAgIGF1dG9jb25mOiBzZXQgdmVyc2lvbiB0byA1LjUuMSBmb3IgaW50ZXJpbSBidWls
+ZHMNCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5v
+cmc+DQoNCmNvbW1pdCA3NGVkZjI0ZDk3ODA5MDBmM2NlMTVkMjQwM2M2ZTMzMWIwMzFkNDU0DQpB
+dXRob3I6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCkRhdGU6ICAgVGh1IEp1biAx
+NCAxMDo1OToxOCAyMDEyIC0wNDAwDQoNCiAgICBhdXRvbWFrZTogcmV2ZXJ0IC1XZXJyb3IgYnkg
+ZGVmYXVsdA0KICAgIA0KICAgIEkgdGhpbmsgaW4gaGluZHNpZ2h0LCB0aGF0IGFkZGluZyAtV2Vy
+cm9yIGJ5IGRlZmF1bHQgd2FzIGEgbWlzdGFrZS4NCiAgICBjaWZzLXV0aWxzIGlzIGJ1aWx0IGlu
+IGEgd2lkZSByYW5nZSBvZiBlbnZpcm9ubWVudHMgYW5kIHRvb2xzLCBhbmQgaXQncw0KICAgIHZl
+cnkgZGlmZmljdWx0IHRvIGVsaW1pbmF0ZSBhbGwgb2YgdGhlIHBvc3NpYmxlIHdhcm5pbmdzLg0K
+ICAgIA0KICAgIExldCdzIGdvIGFoZWFkIGFuZCByZW1vdmUgaXQgYW5kIHJlZHVjZSB0aGUgc3Rl
+YWR5IHRyaWNrbGUgb2YgcGF0Y2hlcw0KICAgIHRoYXQgYXJlIHNpbXBseSB0byBzaWxlbmNlIG9i
+c2N1cmUgd2FybmluZ3MuDQogICAgDQogICAgQ2M6IFN1cmVzaCBKYXlhcmFtYW4gPHNqYXlhcmFt
+YW5Ac3VzZS5jb20+DQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2Ft
+YmEub3JnPg0KDQpjb21taXQgMGViM2RhYTRiMTdlZTY0YjQ2NDU5NGYxYTVkNDEzZWNiMzY0OTU3
+Yw0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFRodSBK
+dW4gMTQgMTA6NTk6MTggMjAxMiAtMDQwMA0KDQogICAgbW91bnQuY2lmczogc2V0IHJjIHRvIDAg
+aW4gbGliY2FwIHRvZ2dsZV9kYWNfY2FwYWJpbGl0eQ0KICAgIA0KICAgIFRodXMgc3Bha2UgSm9j
+aGVuOg0KICAgIA0KICAgIFRoZSBtb3VudC5jaWZzIHByb2dyYW0gZnJvbSB0aGUgY2lmcy11dGls
+cyBwYWNrYWdlIDUuNSBkaWQgbm90IHdvcmsgb24NCiAgICBteSBMaW51eCBzeXN0ZW0uIEl0IGp1
+c3QgZXhpdGVkIHdpdGhvdXQgYW4gZXJyb3IgbWVzc2FnZSBhbmQgZGlkIG5vdA0KICAgIG1vdW50
+IGFueXRoaW5nLg0KICAgIA0KICAgIFsuLi5dDQogICAgDQogICAgSSB0aGluaywgd2hlbiB0aGlz
+IHZhcmlhYmxlIHJjIGlzIG5vdyB1c2VkIGluIHRoaXMgZnVuY3Rpb24sIGl0IGhhcyBhbHNvDQog
+ICAgdG8gYmUgcHJvcGVybHkgaW5pdGlhbGl6ZWQgdGhlcmUuDQogICAgDQogICAgUmVwb3J0ZWQt
+Ynk6IEpvY2hlbiBSb2RlcmJ1cmcgPHJvZGVyYnVyZ0B1bmkta29lbG4uZGU+DQogICAgU2lnbmVk
+LW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgYjdiZWE1
+MjU0NDQzY2IxMjFiMGNmMDNhNjRiMTIzYjg1ZDdmOWZiYg0KQXV0aG9yOiBKZWZmIExheXRvbiA8
+amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFRodSBKdW4gMTQgMTE6MDU6NDMgMjAxMiAtMDQw
+MA0KDQogICAgY2lmcy51cGNhbGw6IG1vcmUgZGVidWcgbG9nZ2luZyBmb3Iga3JiNSB1cGNhbGxz
+DQogICAgDQogICAgV2hpbGUgaGVscGluZyB0byB0cmFjayBkb3duIGEgY29uZmlndXJhdGlvbiBw
+cm9ibGVtLCBJIGZvdW5kIHRoaXMNCiAgICBsaXR0bGUgYml0IG9mIGV4dHJhIGRlYnVnIGxvZ2dp
+bmcgdG8gYmUgaGVscGZ1bC4gTWlnaHQgYXMgd2VsbA0KICAgIG1ha2UgaXQgcGFydCBvZiB0aGUg
+c3RvY2sgYmluYXJ5Lg0KICAgIA0KICAgIFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5
+dG9uQHNhbWJhLm9yZz4NCg0KY29tbWl0IGE4NjExZTI1ZDQ0MjExY2Q1N2E5MWRjZTRmZTdkN2E3
+YWQ3NTM0ZDQNCkF1dGhvcjogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTog
+ICBGcmkgSnVsIDYgMTE6NDg6MTggMjAxMiAtMDQwMA0KDQogICAgcmVwbGFjZTogcmVtb3ZlIGJ6
+ZXJvKCkgcmVkZWZpbml0aW9uIGZyb20gcmVwbGFjZS5oDQogICAgDQogICAgSSBib3Jyb3dlZCBy
+ZXBsYWNlLmggZnJvbSBzYW1iYSB3aGVuIEkgc3BsaXQgb2ZmIHRoZSBwYWNrYWdlLCBhbmQgd2UN
+CiAgICBoYXZlIGEgdG9uIG9mIGRlZmluaXRpb25zIGluIHRoZXJlIHRoYXQgd2UgZG9uJ3QgcmVh
+bGx5IG5lZWQuICBUaGlzIGlzDQogICAgb25lIG9mIHRoZW0gYW5kIGl0IGNhdXNlcyBhIHdhcm5p
+bmcgd2hlbiB3ZSBidWlsZCBvbiBSSEVMNS4NCiAgICANCiAgICBSZXBvcnRlZC1ieTogQW5kcmVh
+cyBTY2huZWlkZXIgPGFzbkBzYW1iYS5vcmc+DQogICAgU2lnbmVkLW9mZi1ieTogSmVmZiBMYXl0
+b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgMjMzZTE3ZGI4ZWY3ZWRiYTFmZWE2NjBl
+MDc2YTAzYTU2YjAxMTdkMg0KQXV0aG9yOiBKZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+
+DQpEYXRlOiAgIE1vbiBKdWwgOSAxNDoxMjozMyAyMDEyIC0wNDAwDQoNCiAgICBhdXRvY29uZjog
+YWRkIC0tZW5hYmxlLXBpZSBhbmQgLS1lbmFibGUtcmVscm8NCiAgICANCiAgICAtcGllIGFuZCAt
+ZnBpZSBlbmFibGUgdGhlIGJ1aWxkaW5nIG9mIHBvc2l0aW9uLWluZGVwZW5kZW50IGV4ZWN1dGFi
+bGVzLA0KICAgIGFuZCAtV2wsLXoscmVscm8gdHVybnMgb24gcmVhZC1vbmx5IHJlbG9jYXRpb24g
+c3VwcG9ydCBpbiBnY2MuIFRoZXNlDQogICAgb3B0aW9ucyBhcmUgaW1wb3J0YW50IGZvciBzZWN1
+cml0eSBwdXJwb3NlcyB0byBndWFyZCBhZ2FpbnN0IHBvc3NpYmxlDQogICAgYnVmZmVyIG92ZXJm
+bG93cyB0aGF0IGxlYWQgdG8gZXhwbG9pdHMuDQogICAgDQogICAgRm9sbG93IHRoZSBleGFtcGxl
+IG9mIHNhbWJhIGhlcmUgYW5kIGVuYWJsZSB0aGVzZSBieSBkZWZhdWx0LCBidXQgYWRkDQogICAg
+Y29uZmlndXJlIG9wdGlvbnMgdGhhdCBhbGxvdyBwZW9wbGUgdG8gdHVybiB0aGVtIG9mZiBhdCBi
+dWlsZC10aW1lIGlmDQogICAgbmVjZXNzYXJ5Lg0KICAgIA0KICAgIFdlIG1heSBhbHNvIHdhbnQg
+dG8gZXZlbnR1YWxseSBhZGQgY2hlY2tzIHRvIGVuc3VyZSB0aGF0IHRoZSBjb21waWxlcg0KICAg
+IGFuZCBsaW5rZXIgdW5kZXJzdGFuZCB0aGVzZSBvcHRpb25zLCBidXQgSSdsbCB3YWl0IHVudGls
+IHdlIGhhdmUgc29tZQ0KICAgIGV2aWRlbmNlIHRoYXQgaXQncyBuZWVkZWQgYmVmb3JlIEkgZXhw
+ZW5kIHRoZSBlZmZvcnQuDQogICAgDQogICAgUmVwb3J0ZWQtYnk6IEFuZHJlYXMgU2NobmVpZGVy
+IDxhc25Ac2FtYmEub3JnPg0KICAgIFNpZ25lZC1vZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9u
+QHNhbWJhLm9yZz4NCg0KY29tbWl0IGNlZDE5ZGVkYzBmYTdiMzYwODdiOGVhZWVmNmE2YTlkYzc2
+YWE1NWUNCkF1dGhvcjogQW5kcmVhcyBTY2huZWlkZXIgPGFzbkBjcnlwdG9taWxrLm9yZz4NCkRh
+dGU6ICAgTW9uIEp1bCA5IDIyOjIxOjA0IDIwMTIgLTA0MDANCg0KICAgIGF1dG9jb25mOiBGaXgg
+YnVpbGRpbmcgd2l0aCBhdXRvY29uZiB2ZXJzaW9uIG9sZGVyIHRoYW4gMi42MC4NCiAgICANCiAg
+ICBBQ19QUk9HX1NFRCBpcyBvbmx5IGF2YWxpYWJsZSBpbiByZWNlbnQgYXV0b2NvbmYgdmVyc2lv
+bnMuDQogICAgVXNlIEFDX0NIRUNLX1BST0cgaW5zdGVhZCBpZiBBQ19QUk9HX1NFRCBpcyBub3Qg
+cHJlc2VudC4NCiAgICANCiAgICBTaWduZWQtb2ZmLWJ5OiBBbmRyZWFzIFNjaG5laWRlciA8YXNu
+QGNyeXB0b21pbGsub3JnPg0KDQpjb21taXQgNGUyNjQwMzFkMGRhN2QzZjJhMjg3MzM3ZTg2YjYy
+M2U4MTRmNWM1Ng0KQXV0aG9yOiBBbmtpdCBKYWluIDxqYW5raXRAc3VzZS5kZT4NCkRhdGU6ICAg
+V2VkIEp1bCAxOCAwNjo0NzowNyAyMDEyIC0wNDAwDQoNCiAgICBtb3VudC5jaWZzOiBVc2Ugc3lz
+dGVtZCdzIG1lY2hhbmlzbSBmb3IgZ2V0dGluZyBwYXNzd29yZCwgaWYgcHJlc2VudC4NCiAgICAN
+CiAgICBJZiBzeXN0ZW1kIGlzIHJ1bm5pbmcgYW5kIC9iaW4vc3lzdGVtZC1hc2stcGFzc3dvcmQg
+aWYgYXZhaWxhYmxlLA0KICAgIHRoZW4gdXNlIHRoYXQgZWxzZSBmYWxsYmFjayBvbiBnZXRwYXNz
+KC4uKS4NCiAgICANCiAgICBBbmQgYWRkIGEgLS1lbmFibGUtc3lzdGVtZCBjb25maWd1cmUgb3B0
+aW9uLCB3aGljaCBkZWZhdWx0cyB0byB5ZXMuDQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogQW5r
+aXQgSmFpbiA8amFua2l0QHN1c2UuY29tPg0KDQpjb21taXQgODc3NzAxZjNjYzIzZGYzY2IyYTI5
+M2MwNjBiZGJmMDVhODdiZmY2YQ0KQXV0aG9yOiBMdWsgQ2xhZXMgPGx1a0BkZWJpYW4ub3JnPg0K
+RGF0ZTogICBUaHUgSnVsIDE5IDA5OjI3OjAxIDIwMTIgLTA0MDANCg0KICAgIG1vdW50LmNpZnM6
+IFVzZSBlcnJubyBpbnN0ZWFkIG9mIGhhdmluZyB1bmtub3duIGVycm9yDQogICAgDQogICAgV2hl
+biBhY2Nlc3MoKSBmYWlscywgdXNlIGVycm5vIGZvciBhIHNlbnNpYmxlIGVycm9yIG1lc3NhZ2Uu
+DQogICAgDQogICAgU2lnbmVkLW9mZi1ieTogTHVrIENsYWVzIDxsdWtAZGViaWFuLm9yZz4NCg0K
+Y29tbWl0IGM0NGQyOTBmM2I1ZjIyMWU3NjE3YmRiNDA5YmI4ZTQ0Y2VhZmVmM2UNCkF1dGhvcjog
+SmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KRGF0ZTogICBGcmkgSnVsIDIwIDEwOjMw
+OjUwIDIwMTIgLTA0MDANCg0KICAgIGNpZnNjcmVkczogYWRkIGEgY2hlY2sgYW5kIHdhcm5pbmdz
+IGZvciBzZXNzaW9uIGtleXJpbmcgcHJvYmxlbXMNCiAgICANCiAgICBNYW55IGRpc3Ryb3MgZG8g
+bm90IGNhbGwgaW50byBwYW1fa2V5aW5pdCB0byBzZXQgdXAgdGhlIHNlc3Npb24ga2V5cmluZw0K
+ICAgIHByb3Blcmx5IGF0IGxvZ2luIHRpbWUuIFdoZW4gY2lmc2NyZWRzIGFkZCBpcyB1c2VkIGlu
+IHN1Y2ggYSBzZXNzaW9uLA0KICAgIHRoZSBrZXJuZWwgd2lsbCBzcGF3biBhIG5ldyBzZXNzaW9u
+IGtleXJpbmcgaW4gd2hpY2ggdG8gaW5zdGFsbCB0aGUNCiAgICBjcmVkZW50aWFscy4gVGhhdCBr
+ZXlyaW5nIHdpbGwgdGhlbiBnbyBhd2F5IG9uY2UgdGhlIGNpZnNjcmVkcyBwcm9jZXNzDQogICAg
+ZXhpdHMuDQogICAgDQogICAgQ2hlY2sgZm9yIHRoaXMgc2l0dWF0aW9uIGJ5IGxvb2tpbmcgdG8g
+c2VlIGlmIHRoZSBzZXNzaW9uIGFuZA0KICAgIHVzZXItc2Vzc2lvbiBrZXlyaW5ncyBhcmUgdGhl
+IHNhbWUuIFRocm93IGEgd2FybmluZyBpZiBzbywgYW5kIGFkZCBzb21lDQogICAgdmVyYmlhZ2Ug
+dG8gdGhlIGNpZnNjcmVkcyBtYW5wYWdlIHRoYXQgZXhwbGFpbnMgdGhlIGlzc3VlLiBBbHNvLCBp
+Zg0KICAgIHRoZSBzZXNzaW9uIGtleXJpbmcgY2FuJ3QgYmUgcXVlcmllZCBmb3IgYW55IHJlYXNv
+biwgdGhlbiBjYXVzZSB0aGUNCiAgICBwcm9ncmFtIHRvIGVycm9yIG91dC4NCiAgICANCiAgICBB
+Y2tlZC1ieTogRGF2aWQgSG93ZWxscyA8ZGhvd2VsbHNAcmVkaGF0LmNvbT4NCiAgICBSZXBvcnRl
+ZC1ieTogTWlsYW4gS27DrcW+ZWsgPGtuaXplay5jb25meUBnbWFpbC5jb20+DQogICAgU2lnbmVk
+LW9mZi1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25Ac2FtYmEub3JnPg0KDQpjb21taXQgOTQ0OWMy
+YWM3NDE5ZWY0NWZjMDhmN2Q0YTY1NGMxMDBlZTI2ZmExNw0KQXV0aG9yOiBKZWZmIExheXRvbiA8
+amxheXRvbkBzYW1iYS5vcmc+DQpEYXRlOiAgIFRodSBKdWwgMjYgMTA6NDE6MjQgMjAxMiAtMDQw
+MA0KDQogICAgYXV0b2NvbmY6IHNldCB2ZXJzaW9uIHRvIDUuNg0KICAgIA0KICAgIFNpZ25lZC1v
+ZmYtYnk6IEplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJhLm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJ
+R05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4wLjE4IChHTlUvTGludXgpDQoNCmlRSWNC
+QUVCQWdBR0JRSlFFVnA4QUFvSkVBQU9hRUVaVm9JVk1tY1AvamJjeXN6NnJyeE9QcGRNZ0d6Z3R0
+SWwNClllQlkvdnBjbURFL2xSNjhXSytOamVDMjZBa2NOQXlZY3VNdzlIend0R3hkbzhOaTF5Z1JZ
+QjY5QndkSGt1THENCmFlUndkRGdKNUE3SnpRQ1FtQ2o1SERySHl1Y3VEcnI1UFpJY2Zva2g0T1ow
+aXZFRDFJVXFTMWxEcnVWWnduNzMNCnI1SldKOTZnWDlYTmo3dVAvZkxmV3UyUXJPTC8rWUdoZWZN
+bUtrMmphN0J1QTM2QXVQNUcyZC9oOW5uaUFPemENCmZIUHJtdEt3cDZ3Y0dLRHl6eUlJc2MwcXdM
+K3J2Y0FzMmtjNGg1QnQrR28wSUpobHd5RGNjVTkwdkJOb3luaFANCk9haVJ5ZjdIME5qY05JZXFB
+TWtucWFKV2FwQVdyNFhzc2lQSFVYWEFlWFhrY1pzb0YzakFiaFFEaVlwZGEyYnYNCkkxWmkvN04r
+cUhMVTE4eWdqZkVQcWltWFBtZWxYOU5qNGFLOSs3RzZyTUpVVFNQcHJtdTVTY0VISkxzb3FmUjYN
+ClRIZm1CUGxxZ1pzZW5IeDM2VEhMMklYU2tBVC9UNW5QeEFrd09Bc1VlSlBTdS85c3BCZEJucGNu
+UFVVZk9kYTINCkJtTko1R1NmM1l0ejFmV08xUFkrQmp6TjNwNFk1S1Y5SGhpZmV5SVB1SS8wQkU5
+alc2NVk2bUc0Rm43Qkt4RUYNClA5N2pNWk9SZFNkOUl4V1lBd3VEWEtvNTNRaTE2MnZZRnlwSHR4
+SWZiTnZjNXRtRFFQMXpjclU2aENwS0xCaGENCkpZMWxORE9lTkgraEVCYTRKK3ZDekJ1NVdZOFl6
+TUgzcDV2WnJ2ZWljbjJMeWRTc3l4cHF0Z2FzWUZEMWgvaGoNCmJQV21UWkJxUENXL0NJK0l5OXEr
+DQo9RmtUTQ0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0tLS0tDQo=
