@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH v2 6/9] cifs: change cifs_call_async to use smb_rqst
  structs
-Date: Thu, 26 Jul 2012 06:27:18 -0400
-Message-ID: <20120726062718.1dfbfab1@tlielax.poochiereds.net>
+Date: Thu, 26 Jul 2012 07:03:12 -0400
+Message-ID: <20120726070312.198c69ea@tlielax.poochiereds.net>
 References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 	<1343231652-10459-7-git-send-email-jlayton@redhat.com>
 	<CAKywueRUbMbxUNVGZnSH4CyKFUnvSmcWwQAZEVuZv9SoLh2tMQ@mail.gmail.com>
@@ -355,8 +355,10 @@ Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >         smb2_seq_num_into_buf(server, hdr);
 > 
 
-My bad -- I didn't test the build with CONFIG_CIFS_SMB2 enabled. I'll
-respin the patch.
+The fixed patch is in my tree, along with a fix for the 80 column
+warning from checkpatch.pl. I confirmed it this time by building with
+CONFIG_CIFS_SMB2 enabled. Let me know if you'd like me to re-post the
+series.
 
 Thanks,
 -- 
