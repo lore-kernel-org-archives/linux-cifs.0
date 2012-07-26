@@ -1,212 +1,309 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH v2] cifs: obtain file access during backup intent lookup
-Date: Wed, 25 Jul 2012 17:45:04 -0500
-Message-ID: <1343256304-4735-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 6/9] cifs: change cifs_call_async to use smb_rqst structs
+Date: Thu, 26 Jul 2012 12:10:09 +0400
+Message-ID: <CAKywueTCyhe6MSdekOc1SBTR6+8v-sCmJ4Ezab7JS29uXhk16g@mail.gmail.com>
+References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
+	<1343231652-10459-7-git-send-email-jlayton@redhat.com>
+	<CAKywueRUbMbxUNVGZnSH4CyKFUnvSmcWwQAZEVuZv9SoLh2tMQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueRUbMbxUNVGZnSH4CyKFUnvSmcWwQAZEVuZv9SoLh2tMQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+2012/7/25 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> 2012/7/25 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+>> For now, none of the callers populate rq_pages. That will be done for
+>> writes in a later patch. While we're at it, change the prototype of
+>> setup_async_request not to need a return pointer argument. Just
+>> return the pointer to the mid_q_entry or an ERR_PTR.
+>>
+>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> ---
+>>  fs/cifs/cifsglob.h      |  4 ++--
+>>  fs/cifs/cifsproto.h     | 12 ++++++------
+>>  fs/cifs/cifssmb.c       | 20 +++++++++++++-------
+>>  fs/cifs/smb2proto.h     |  4 +---
+>>  fs/cifs/smb2transport.c | 14 ++++++--------
+>>  fs/cifs/transport.c     | 30 ++++++++++++++----------------
+>>  6 files changed, 42 insertions(+), 42 deletions(-)
+>>
+>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> index 2a7e4b8..a0bb713 100644
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -194,8 +194,8 @@ struct smb_version_operations {
+>>         int (*setup_request)(struct cifs_ses *, struct kvec *, unsigned int,
+>>                              struct mid_q_entry **);
+>>         /* setup async request: allocate mid, sign message */
+>> -       int (*setup_async_request)(struct TCP_Server_Info *, struct kvec *,
+>> -                                  unsigned int, struct mid_q_entry **);
+>> +       struct mid_q_entry *(*setup_async_request)(struct TCP_Server_Info *,
+>> +                                               struct smb_rqst *);
+>>         /* check response: verify signature, map error */
+>>         int (*check_receive)(struct mid_q_entry *, struct TCP_Server_Info *,
+>>                              bool);
+>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>> index 3620bec..8075f23 100644
+>> --- a/fs/cifs/cifsproto.h
+>> +++ b/fs/cifs/cifsproto.h
+>> @@ -69,10 +69,10 @@ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+>>                                         struct TCP_Server_Info *server);
+>>  extern void DeleteMidQEntry(struct mid_q_entry *midEntry);
+>>  extern void cifs_wake_up_task(struct mid_q_entry *mid);
+>> -extern int cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>> -                          unsigned int nvec, mid_receive_t *receive,
+>> -                          mid_callback_t *callback, void *cbdata,
+>> -                          const int flags);
+>> +extern int cifs_call_async(struct TCP_Server_Info *server,
+>> +                       struct smb_rqst *rqst,
+>> +                       mid_receive_t *receive, mid_callback_t *callback,
+>> +                       void *cbdata, const int flags);
+>>  extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+>>                         struct smb_hdr * /* input */ ,
+>>                         struct smb_hdr * /* out */ ,
+>> @@ -81,8 +81,8 @@ extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
+>>                             char *in_buf, int flags);
+>>  extern int cifs_setup_request(struct cifs_ses *, struct kvec *, unsigned int,
+>>                               struct mid_q_entry **);
+>> -extern int cifs_setup_async_request(struct TCP_Server_Info *, struct kvec *,
+>> -                                   unsigned int, struct mid_q_entry **);
+>> +extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
+>> +                                               struct smb_rqst *);
+>>  extern int cifs_check_receive(struct mid_q_entry *mid,
+>>                         struct TCP_Server_Info *server, bool log_error);
+>>  extern int SendReceive2(const unsigned int /* xid */ , struct cifs_ses *,
+>> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+>> index ce5f75c..7365460 100644
+>> --- a/fs/cifs/cifssmb.c
+>> +++ b/fs/cifs/cifssmb.c
+>> @@ -751,6 +751,8 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+>>         ECHO_REQ *smb;
+>>         int rc = 0;
+>>         struct kvec iov;
+>> +       struct smb_rqst rqst = { .rq_iov = &iov,
+>> +                                .rq_nvec = 1 };
+>>
+>>         cFYI(1, "In echo request");
+>>
+>> @@ -768,7 +770,7 @@ CIFSSMBEcho(struct TCP_Server_Info *server)
+>>         iov.iov_base = smb;
+>>         iov.iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
+>>
+>> -       rc = cifs_call_async(server, &iov, 1, NULL, cifs_echo_callback,
+>> +       rc = cifs_call_async(server, &rqst, NULL, cifs_echo_callback,
+>>                              server, CIFS_ASYNC_OP | CIFS_ECHO_OP);
+>>         if (rc)
+>>                 cFYI(1, "Echo request failed: %d", rc);
+>> @@ -1604,6 +1606,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
+>>         READ_REQ *smb = NULL;
+>>         int wct;
+>>         struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
+>> +       struct smb_rqst rqst = { .rq_iov = rdata->iov,
+>> +                                .rq_nvec = 1 };
+>>
+>>         cFYI(1, "%s: offset=%llu bytes=%u", __func__,
+>>                 rdata->offset, rdata->bytes);
+>> @@ -1647,9 +1651,8 @@ cifs_async_readv(struct cifs_readdata *rdata)
+>>         rdata->iov[0].iov_len = be32_to_cpu(smb->hdr.smb_buf_length) + 4;
+>>
+>>         kref_get(&rdata->refcount);
+>> -       rc = cifs_call_async(tcon->ses->server, rdata->iov, 1,
+>> -                            cifs_readv_receive, cifs_readv_callback,
+>> -                            rdata, 0);
+>> +       rc = cifs_call_async(tcon->ses->server, &rqst, cifs_readv_receive,
+>> +                            cifs_readv_callback, rdata, 0);
+>>
+>>         if (rc == 0)
+>>                 cifs_stats_inc(&tcon->stats.cifs_stats.num_reads);
+>> @@ -2052,6 +2055,7 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>>         int wct;
+>>         struct cifs_tcon *tcon = tlink_tcon(wdata->cfile->tlink);
+>>         struct kvec *iov = NULL;
+>> +       struct smb_rqst rqst = { };
+>>
+>>         if (tcon->ses->capabilities & CAP_LARGE_FILES) {
+>>                 wct = 14;
+>> @@ -2068,11 +2072,13 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>>                 goto async_writev_out;
+>>
+>>         /* 1 iov per page + 1 for header */
+>> -       iov = kzalloc((wdata->nr_pages + 1) * sizeof(*iov), GFP_NOFS);
+>> +       rqst.rq_nvec = wdata->nr_pages + 1;
+>> +       iov = kzalloc((rqst.rq_nvec) * sizeof(*iov), GFP_NOFS);
+>>         if (iov == NULL) {
+>>                 rc = -ENOMEM;
+>>                 goto async_writev_out;
+>>         }
+>> +       rqst.rq_iov = iov;
+>>
+>>         smb->hdr.Pid = cpu_to_le16((__u16)wdata->pid);
+>>         smb->hdr.PidHigh = cpu_to_le16((__u16)(wdata->pid >> 16));
+>> @@ -2121,8 +2127,8 @@ cifs_async_writev(struct cifs_writedata *wdata)
+>>         }
+>>
+>>         kref_get(&wdata->refcount);
+>> -       rc = cifs_call_async(tcon->ses->server, iov, wdata->nr_pages + 1,
+>> -                            NULL, cifs_writev_callback, wdata, 0);
+>> +       rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
+>> +                               cifs_writev_callback, wdata, 0);
+>>
+>>         if (rc == 0)
+>>                 cifs_stats_inc(&tcon->stats.cifs_stats.num_writes);
+>> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+>> index 902bbe2..dbb798c 100644
+>> --- a/fs/cifs/smb2proto.h
+>> +++ b/fs/cifs/smb2proto.h
+>> @@ -43,9 +43,7 @@ extern int smb2_check_receive(struct mid_q_entry *mid,
+>>                               struct TCP_Server_Info *server, bool log_error);
+>>  extern int smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
+>>                               unsigned int nvec, struct mid_q_entry **ret_mid);
+>> -extern int smb2_setup_async_request(struct TCP_Server_Info *server,
+>> -                                   struct kvec *iov, unsigned int nvec,
+>> -                                   struct mid_q_entry **ret_mid);
+>> +extern struct mid_q_entry *smb2_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst);
 
-path based querries can fail for lack of access, especially during lookup
-during open.
-open itself would actually succeed becasue of back up intent bit
-but querries (either path or file handle based) do not have a means to
-specifiy backup intent bit.
-So querry the file info during lookup using 
- trans2 / findfirst2 / file_id_full_ir_info
-to obtain file info as well as file_id/inode value.
+This exceeds 80 length and causes checkpatch.pl warnings.
 
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Reported-by: Tushar Gosavi <tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifssmb.c |   38 +++++++++++++++++------------
- fs/cifs/inode.c   |   67 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 87 insertions(+), 18 deletions(-)
+>>  extern void smb2_echo_request(struct work_struct *work);
+>>
+>>  extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+>> index 31f5d42..c0a7a42 100644
+>> --- a/fs/cifs/smb2transport.c
+>> +++ b/fs/cifs/smb2transport.c
+>> @@ -148,25 +148,23 @@ smb2_setup_request(struct cifs_ses *ses, struct kvec *iov,
+>>         return rc;
+>>  }
+>>
+>> -int
+>> -smb2_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
+>> -                        unsigned int nvec, struct mid_q_entry **ret_mid)
+>> +struct mid_q_entry *
+>> +smb2_setup_async_request(struct TCP_Server_Info *server,
+>> +                       struct smb_rqst *rqst)
+>>  {
+>> -       int rc = 0;
+>> -       struct smb2_hdr *hdr = (struct smb2_hdr *)iov[0].iov_base;
+>> +       struct smb2_hdr *hdr = (struct smb2_hdr *)smb_rqst->iov[0].iov_base;
+>>         struct mid_q_entry *mid;
+>>
+>>         smb2_seq_num_into_buf(server, hdr);
+>>
+>>         mid = smb2_mid_entry_alloc(hdr, server);
+>>         if (mid == NULL)
+>> -               return -ENOMEM;
+>> +               return ERR_PTR(-ENOMEM);
+>>
+>>         /* rc = smb2_sign_smb2(iov, nvec, server);
+>>         if (rc) {
+>>                 DeleteMidQEntry(mid);
+>>                 return rc;
+>>         }*/
+>> -       *ret_mid = mid;
+>> -       return rc;
+>> +       return mid;
+>>  }
+>> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+>> index 5673ef1..73cfa6f 100644
+>> --- a/fs/cifs/transport.c
+>> +++ b/fs/cifs/transport.c
+>> @@ -454,12 +454,11 @@ wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+>>         return 0;
+>>  }
+>>
+>> -int
+>> -cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
+>> -                        unsigned int nvec, struct mid_q_entry **ret_mid)
+>> +struct mid_q_entry *
+>> +cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+>>  {
+>>         int rc;
+>> -       struct smb_hdr *hdr = (struct smb_hdr *)iov[0].iov_base;
+>> +       struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+>>         struct mid_q_entry *mid;
+>>
+>>         /* enable signing if server requires it */
+>> @@ -468,16 +467,15 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
+>>
+>>         mid = AllocMidQEntry(hdr, server);
+>>         if (mid == NULL)
+>> -               return -ENOMEM;
+>> +               return ERR_PTR(-ENOMEM);
+>>
+>> -       rc = cifs_sign_smbv(iov, nvec, server, &mid->sequence_number);
+>> +       rc = cifs_sign_rqst(rqst, server, &mid->sequence_number);
+>>         if (rc) {
+>>                 DeleteMidQEntry(mid);
+>> -               return rc;
+>> +               return ERR_PTR(rc);
+>>         }
+>>
+>> -       *ret_mid = mid;
+>> -       return 0;
+>> +       return mid;
+>>  }
+>>
+>>  /*
+>> @@ -485,9 +483,9 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct kvec *iov,
+>>   * the result. Caller is responsible for dealing with timeouts.
+>>   */
+>>  int
+>> -cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>> -               unsigned int nvec, mid_receive_t *receive,
+>> -               mid_callback_t *callback, void *cbdata, const int flags)
+>> +cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+>> +               mid_receive_t *receive, mid_callback_t *callback,
+>> +               void *cbdata, const int flags)
+>>  {
+>>         int rc, timeout, optype;
+>>         struct mid_q_entry *mid;
+>> @@ -500,12 +498,12 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>>                 return rc;
+>>
+>>         mutex_lock(&server->srv_mutex);
+>> -       rc = server->ops->setup_async_request(server, iov, nvec, &mid);
+>> -       if (rc) {
+>> +       mid = server->ops->setup_async_request(server, rqst);
+>> +       if (IS_ERR(mid)) {
+>>                 mutex_unlock(&server->srv_mutex);
+>>                 add_credits(server, 1, optype);
+>>                 wake_up(&server->request_q);
+>> -               return rc;
+>> +               return PTR_ERR(mid);
+>>         }
+>>
+>>         mid->receive = receive;
+>> @@ -520,7 +518,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct kvec *iov,
+>>
+>>
+>>         cifs_in_send_inc(server);
+>> -       rc = smb_sendv(server, iov, nvec);
+>> +       rc = smb_send_rqst(server, rqst);
+>>         cifs_in_send_dec(server);
+>>         cifs_save_when_sent(mid);
+>>         mutex_unlock(&server->srv_mutex);
+>> --
+>> 1.7.11.2
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> Like the idea of changing setup_async_request prototype.
+>
+> Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+>
+> --
+> Best regards,
+> Pavel Shilovsky.
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 4ee522b..f059c0a 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -4257,7 +4257,7 @@ CIFSFindFirst(const int xid, struct cifs_tcon *tcon,
- 	int rc = 0;
- 	int bytes_returned = 0;
- 	int name_len;
--	__u16 params, byte_count;
-+	__u16 params, byte_count, ffattrs;
- 
- 	cFYI(1, "In FindFirst for %s", searchName);
- 
-@@ -4275,27 +4275,35 @@ findFirstRetry:
- 		it got remapped to 0xF03A as if it were part of the
- 		directory name instead of a wildcard */
- 		name_len *= 2;
--		pSMB->FileName[name_len] = dirsep;
--		pSMB->FileName[name_len+1] = 0;
--		pSMB->FileName[name_len+2] = '*';
--		pSMB->FileName[name_len+3] = 0;
--		name_len += 4; /* now the trailing null */
--		pSMB->FileName[name_len] = 0; /* null terminate just in case */
--		pSMB->FileName[name_len+1] = 0;
--		name_len += 2;
-+		if (dirsep) {
-+			pSMB->FileName[name_len] = dirsep;
-+			pSMB->FileName[name_len+1] = 0;
-+			pSMB->FileName[name_len+2] = '*';
-+			pSMB->FileName[name_len+3] = 0;
-+			name_len += 4; /* now the trailing null */
-+			/* null terminate just in case */
-+			pSMB->FileName[name_len] = 0;
-+			pSMB->FileName[name_len+1] = 0;
-+			name_len += 2;
-+		}
- 	} else {	/* BB add check for overrun of SMB buf BB */
- 		name_len = strnlen(searchName, PATH_MAX);
- /* BB fix here and in unicode clause above ie
- 		if (name_len > buffersize-header)
- 			free buffer exit; BB */
- 		strncpy(pSMB->FileName, searchName, name_len);
--		pSMB->FileName[name_len] = dirsep;
--		pSMB->FileName[name_len+1] = '*';
--		pSMB->FileName[name_len+2] = 0;
--		name_len += 3;
-+		if (dirsep) {
-+			pSMB->FileName[name_len] = dirsep;
-+			pSMB->FileName[name_len+1] = '*';
-+			pSMB->FileName[name_len+2] = 0;
-+			name_len += 3;
-+		}
- 	}
- 
- 	params = 12 + name_len /* includes null */ ;
-+	ffattrs = ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM;
-+	if (dirsep)
-+		ffattrs |= ATTR_DIRECTORY;
- 	pSMB->TotalDataCount = 0;	/* no EAs */
- 	pSMB->MaxParameterCount = cpu_to_le16(10);
- 	pSMB->MaxDataCount = cpu_to_le16(CIFSMaxBufSize & 0xFFFFFF00);
-@@ -4315,9 +4323,7 @@ findFirstRetry:
- 	pSMB->SetupCount = 1;	/* one byte, no need to make endian neutral */
- 	pSMB->Reserved3 = 0;
- 	pSMB->SubCommand = cpu_to_le16(TRANS2_FIND_FIRST);
--	pSMB->SearchAttributes =
--	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM |
--			ATTR_DIRECTORY);
-+	pSMB->SearchAttributes = cpu_to_le16(ffattrs);
- 	pSMB->SearchCount = cpu_to_le16(CIFSMaxBufSize/sizeof(FILE_UNIX_INFO));
- 	pSMB->SearchFlags = cpu_to_le16(search_flags);
- 	pSMB->InformationLevel = cpu_to_le16(psrch_inf->info_level);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 8e8bb49..a0ed97d 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -600,17 +600,40 @@ cgfi_exit:
- 	return rc;
- }
- 
-+static void
-+fidinfo2fainfo(SEARCH_ID_FULL_DIR_INFO *fidinfo, FILE_ALL_INFO *fainfo)
-+{
-+	memcpy(&fainfo->CreationTime, &fidinfo->CreationTime, sizeof(__le64));
-+	memcpy(&fainfo->LastAccessTime, &fidinfo->LastAccessTime,
-+		sizeof(__le64));
-+	memcpy(&fainfo->LastWriteTime, &fidinfo->LastWriteTime,
-+		sizeof(__le64));
-+	memcpy(&fainfo->ChangeTime, &fidinfo->ChangeTime,
-+		sizeof(__le64));
-+	memcpy(&fainfo->EndOfFile, &fidinfo->EndOfFile,
-+		sizeof(__le64));
-+	memcpy(&fainfo->AllocationSize, &fidinfo->AllocationSize,
-+		sizeof(__le64));
-+	memcpy(&fainfo->Attributes, &fidinfo->ExtFileAttributes,
-+		sizeof(__le32));
-+
-+	return;
-+}
-+
- int cifs_get_inode_info(struct inode **pinode,
- 	const unsigned char *full_path, FILE_ALL_INFO *pfindData,
- 	struct super_block *sb, int xid, const __u16 *pfid)
- {
--	int rc = 0, tmprc;
-+	__u16 fid, srchflgs;
-+	int rc = 0, rc2 = -EINVAL, tmprc;
- 	struct cifs_tcon *pTcon;
- 	struct tcon_link *tlink;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	char *buf = NULL;
- 	bool adjustTZ = false;
- 	struct cifs_fattr fattr;
-+	struct cifs_search_info *psrch_inf = NULL;
-+	SEARCH_ID_FULL_DIR_INFO *ffdata = NULL;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
-@@ -640,6 +663,38 @@ int cifs_get_inode_info(struct inode **pinode,
- 			      0 /* not legacy */,
- 			      cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
- 				CIFS_MOUNT_MAP_SPECIAL_CHR);
-+
-+		/*
-+		 * This findfirst call is meant for a lookup operation
-+		 * that would otherwise fail since query path info has no
-+		 * means to indicate backup intent.
-+		 */
-+		if (rc == -EACCES && *pinode == NULL && backup_cred(cifs_sb)) {
-+			psrch_inf = kzalloc(sizeof(struct cifs_search_info),
-+						GFP_KERNEL);
-+			if (psrch_inf == NULL) {
-+				rc = -ENOMEM;
-+				goto cgii_exit;
-+			}
-+			psrch_inf->endOfSearch = false;
-+			psrch_inf->info_level = SMB_FIND_FILE_ID_FULL_DIR_INFO;
-+
-+			srchflgs = CIFS_SEARCH_CLOSE_ALWAYS |
-+					CIFS_SEARCH_CLOSE_AT_END |
-+					CIFS_SEARCH_BACKUP_SEARCH;
-+
-+			rc2 = CIFSFindFirst(xid, pTcon, full_path,
-+				cifs_sb->local_nls, &fid, srchflgs, psrch_inf,
-+				cifs_sb->mnt_cifs_flags &
-+					CIFS_MOUNT_MAP_SPECIAL_CHR, 0);
-+			if (!rc2) {
-+				ffdata = (SEARCH_ID_FULL_DIR_INFO *)
-+						psrch_inf->srch_entries_start;
-+				fidinfo2fainfo(ffdata, pfindData);
-+			}
-+			rc = rc2;
-+		}
-+
- 		/* BB optimize code so we do not make the above call
- 		when server claims no NT SMB support and the above call
- 		failed at least once - set flag in tcon or mount */
-@@ -683,7 +738,11 @@ int cifs_get_inode_info(struct inode **pinode,
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
- 			int rc1 = 0;
- 
--			rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
-+			if (!rc2)
-+				fattr.cf_uniqueid =
-+					le64_to_cpu(ffdata->UniqueId);
-+			else
-+				rc1 = CIFSGetSrvInodeNumber(xid, pTcon,
- 					full_path, &fattr.cf_uniqueid,
- 					cifs_sb->local_nls,
- 					cifs_sb->mnt_cifs_flags &
-@@ -741,6 +800,10 @@ int cifs_get_inode_info(struct inode **pinode,
- 	}
- 
- cgii_exit:
-+	if (!rc2) {
-+		cifs_buf_release(psrch_inf->ntwrk_buf_start);
-+		kfree(psrch_inf);
-+	}
- 	kfree(buf);
- 	cifs_put_tlink(tlink);
- 	return rc;
+
+
 -- 
-1.6.0.2
+Best regards,
+Pavel Shilovsky.
