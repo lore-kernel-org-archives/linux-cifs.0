@@ -1,36 +1,55 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: locking around modifications to i_nlink
-Date: Fri, 27 Jul 2012 13:57:45 -0400
-Message-ID: <20120727135745.75a95171@tlielax.poochiereds.net>
-References: <CAH2r5muYbJrPYXtnAikVt1Sf_O7bdGsH7qLs=vjJ_EALXJDeQg@mail.gmail.com>
+From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: ALPHA: advice for a patch to CIFS
+Date: Fri, 27 Jul 2012 20:13:42 +0100
+Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2CDF8E31455@LONPMAILBOX01.citrite.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muYbJrPYXtnAikVt1Sf_O7bdGsH7qLs=vjJ_EALXJDeQg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 27 Jul 2012 11:48:39 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> Presumably to address the cifs equivalent of NFS bug (drop_nlink warning):
-> 
-> https://bugzilla.redhat.com/show_bug.cgi?id=822703
-> 
-> your patch which wraps drop_nlink in i_lock spinlock (as Jeff noted
-> addresses only part of the problem)
-> http://git.altlinux.org/people/piastry/public/cifs-2.6.git?p=cifs-2.6.git;a=patch;h=df2d6b1fbf2401c5ee04f2ac143ea0954e3a87a6
-> 
-> shouldn't it also wrap the three places in fs/cifs/inode.c which do set_nlink?
-> 
-
-It might not hurt to serialize all inode attribute updates under the
-i_lock. If two updates are racing and the CPU ends up reording things,
-you could end up with an inode that has a mix of attrs returned by
-calls. The NFS client did this quite some time ago...
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+SGksCiAgSSdtIGN1cnJlbnRseSB0cnlpbmcgdG8gc3VwcG9ydCB1dGYtMTYgd2l0aCBjaGFyYWN0
+ZXJzIG5vdCBpbiBwbGFuZSAwLgoKSSdtIGN1cnJlbnRseSBlbmQgdXAgd2l0aCB0aGlzIHBhdGNo
+LiBDdXJyZW50bHkgaXMgbm90IGFnYWluc3QgbGF0ZXN0Cmtlcm5lbCBidXQgdGhlIHByb2JsZW0g
+c3RpbGwgcmVzaWRlIGluIGxhc3QgZ2l0IGtlcm5lbC4KCndjaGFyX3QgaXMgY3VycmVudGx5IDE2
+Yml0IHNvIGNvbnZlcnRpbmcgYSB1dGY4IGVuY29kZWQgY2hhcmFjdGVycyBub3QKaW4gcGxhbmUg
+MCAoPj0gMHgxMDAwMCkgdG8gd2NoYXJfdCAodGhhdCBpcyBjYWxsaW5nIGNoYXIydW5pKSBsZWFk
+IHRvIGEKLUVJTlZBTCByZXR1cm4uIFRoaXMgcGF0Y2ggZGV0ZWN0IHV0ZjggaW4gY2lmc19zdHJ0
+b1VDUyBhbmQgYWRkIHNwZWNpYWwKY29kZSBjYWxsaW5nIGRpcmVjdGx5IHV0ZjhfdG9fdXRmMzIu
+CgpEb2VzIGl0IHNvdW5kIGEgZ29vZCBwYXRjaCBvciBqdXN0IGEgYmFkIGhhY2suIFBlcmhhcHMg
+d291bGQgYmUgYmV0dGVyCnRvIGNoYW5nZSBjaGFyMnVuaSBjb252ZXJ0aW5nIHRvIHVuaWNvZGVf
+dCAoMzJiaXQpIGluc3RlYWQgb2Ygd2NoYXJfdApidXQgcHJvYmFibHkgbWFueSBjb2RlIGhhdmUg
+dG8gYmUgY2hlY2tlZCBpbiBvcmRlciB0byBtYWtlIHN1cmUgaXQgZG9lcwpub3QgbGVhZCB0byB3
+cm9uZyBjb252ZXJzaW9ucywgb3ZlcmZsb3dzIG9yIG90aGVyIGJhZCBzdHVmZi4KCklzIGl0IHdv
+cnRoIHdvcmtpbmcgaW4gdGhpcyBoYWNraW5nIHdheT8gSSdkIGxpa2UgdG8gdXBzdHJlYW0gdGhp
+cwpwYXRjaC4KCgpkaWZmIC1yIGMyMzI1ZDc1NGU4ZCBmcy9jaWZzL2NpZnNfdW5pY29kZS5jCi0t
+LSBhL2ZzL2NpZnMvY2lmc191bmljb2RlLmMJRnJpIEp1bCAyNyAxNToxMjoyMyAyMDEyICswMTAw
+CisrKyBiL2ZzL2NpZnMvY2lmc191bmljb2RlLmMJRnJpIEp1bCAyNyAxOTowOTowNCAyMDEyICsw
+MTAwCkBAIC0xOTIsMjIgKzE5Miw0MCBAQCBjaWZzX3N0cnRvVUNTKF9fbGUxNiAqdG8sIGNvbnN0
+IGNoYXIgKmZyCiB7CiAJaW50IGNoYXJsZW47CiAJaW50IGk7Ci0Jd2NoYXJfdCAqd2NoYXJfdG8g
+PSAod2NoYXJfdCAqKXRvOyAvKiBuZWVkZWQgdG8gcXVpZXQgc3BhcnNlICovCisJaW50IGlzX3V0
+ZjggPSAhc3RyY21wKGNvZGVwYWdlLT5jaGFyc2V0LCAidXRmOCIpOworCXdjaGFyX3Qgd2NoYXJf
+dG87IC8qIG5lZWRlZCB0byBxdWlldCBzcGFyc2UgKi8KKwl1bmljb2RlX3QgdW5pOwogCiAJZm9y
+IChpID0gMDsgbGVuICYmICpmcm9tOyBpKyssIGZyb20gKz0gY2hhcmxlbiwgbGVuIC09IGNoYXJs
+ZW4pIHsKIAogCQkvKiB3b3JrcyBmb3IgMi40LjAga2VybmVsIG9yIGxhdGVyICovCi0JCWNoYXJs
+ZW4gPSBjb2RlcGFnZS0+Y2hhcjJ1bmkoZnJvbSwgbGVuLCAmd2NoYXJfdG9baV0pOworCQlpZiAo
+aXNfdXRmOCkgeworCQkJY2hhcmxlbiA9IHV0ZjhfdG9fdXRmMzIoZnJvbSwgbGVuLCAmdW5pKTsK
+KwkJfSBlbHNlIHsKKwkJCWNoYXJsZW4gPSBjb2RlcGFnZS0+Y2hhcjJ1bmkoZnJvbSwgbGVuLCAm
+d2NoYXJfdG8pOworCQkJdW5pID0gd2NoYXJfdG87CisJCX0KKwogCQlpZiAoY2hhcmxlbiA8IDEp
+IHsKIAkJCWNFUlJPUigxLAogCQkJICAgICAgICgic3RydG9VQ1M6IGNoYXIydW5pIG9mICVkIHJl
+dHVybmVkICVkIiwKIAkJCQkoaW50KSpmcm9tLCBjaGFybGVuKSk7CiAJCQkvKiBBIHF1ZXN0aW9u
+IG1hcmsgKi8KLQkJCXRvW2ldID0gY3B1X3RvX2xlMTYoMHgwMDNmKTsKKwkJCXdjaGFyX3RvID0g
+MHgwMDNmOwogCQkJY2hhcmxlbiA9IDE7Ci0JCX0gZWxzZQotCQkJdG9baV0gPSBjcHVfdG9fbGUx
+Nih3Y2hhcl90b1tpXSk7Ci0KKwkJfSBlbHNlIGlmICh1bmkgPCAweDEwMDAwKSB7CisJCQl3Y2hh
+cl90byA9IHVuaTsKKwkJfSBlbHNlIGlmICh1bmkgPCAweDExMDAwMCkgeworCQkJdW5pIC09IDB4
+MTAwMDA7CisJCQl0b1tpKytdID0gY3B1X3RvX2xlMTYoMHhEODAwIHwgKHVuaSA+PiAxMCkpOwor
+CQkJd2NoYXJfdG8gPSAweERDMDAgfCAodW5pICYgMHgzRkYpOworCQl9IGVsc2UgeworCQkJY0VS
+Uk9SKDEsCisJCQkgICAgICAgKCJzdHJ0b1VDUzogY2hhcjJ1bmkgb2YgJWQgcmV0dXJuZWQgJWQi
+LAorCQkJCShpbnQpKmZyb20sIGNoYXJsZW4pKTsKKwkJCXdjaGFyX3RvID0gMHgwMDNmOworCQl9
+CisJCXRvW2ldID0gY3B1X3RvX2xlMTYod2NoYXJfdG8pOwogCX0KIAogCXRvW2ldID0gMDsKClNp
+Z25lZC1vZmYtYnk6ICJGcmVkaWFubyBaaWdsaW8iIDxmcmVkaWFuby56aWdsaW9AY2l0cml4LmNv
+bT4KClJlZ2FyZHMsCiAgRnJlZGlhbm8KCg==
