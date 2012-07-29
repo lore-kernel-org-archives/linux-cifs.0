@@ -1,47 +1,46 @@
-From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Implementing some SMB2.2/3.0 features ...
-Date: Sat, 28 Jul 2012 08:19:48 -0700
-Message-ID: <CACyXjPz1fVUKADaan72krJCf-21e1QOrm2s1TEEAxR_S5mk0NQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=Big5
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re: locking around modifications to i_nlink
+Date: Sun, 29 Jul 2012 11:40:12 +0400
+Message-ID: <87B676B3-14E0-4BB9-AA3C-01A97DBA9F90@gmail.com>
+References: <CAH2r5muYbJrPYXtnAikVt1Sf_O7bdGsH7qLs=vjJ_EALXJDeQg@mail.gmail.com> <20120727135745.75a95171@tlielax.poochiereds.net>
+Mime-Version: 1.0 (iPhone Mail 8B117)
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120727135745.75a95171-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi folks,
 
-I have started looking at implementing some of the SMB3.0 features.
-This is because, in order to do SMB Direct I need multi-connect.
+On 27.07.2012, at 21:57, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-In reading the latest version of the spec ([MS-SMB2] dated July 5,
-2012 and available from msdn.microsoft.com) I notice that each session
-should have a channel list, which is a list of objects containing a
-connection reference and a signing key. It also should have a channel
-sequence number.
+> On Fri, 27 Jul 2012 11:48:39 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> 
+>> Presumably to address the cifs equivalent of NFS bug (drop_nlink warning):
+>> 
+>> https://bugzilla.redhat.com/show_bug.cgi?id=822703
+>> 
+>> your patch which wraps drop_nlink in i_lock spinlock (as Jeff noted
+>> addresses only part of the problem)
+>> http://git.altlinux.org/people/piastry/public/cifs-2.6.git?p=cifs-2.6.git;a=patch;h=df2d6b1fbf2401c5ee04f2ac143ea0954e3a87a6
+>> 
+>> shouldn't it also wrap the three places in fs/cifs/inode.c which do set_nlink?
+>> 
+> 
+> It might not hurt to serialize all inode attribute updates under the
+> i_lock. If two updates are racing and the CPU ends up reording things,
+> you could end up with an inode that has a mix of attrs returned by
+> calls. The NFS client did this quite some time ago...
+> 
+> -- 
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-This means that I will need to change the struct cifs_ses to have a
-channel list rather than a struct TCP_Server_Info.
-
-In addition, multi-connect allows multiple connections to the same
-actual server, since it allows a session to use multiple TCP
-connection on a GbE or 10GbE link. So, it seems that I will need to
-introduce an explicit notion of a connection, which the code does not
-currently have. This will definitely be needed for SMB Direct, because
-the model is that you establish a connection to the server on TCP,
-negotiate a protocol and then establish a session and then send an
-=46SCTL to discover the (common) set of interfaces the server has. Afte=
-r
-that, if you notice that the client and server have an RDMA-capable
-interface in common, you establish a connection via that interface,
-negotiate protocol and then create a session (session setup) but bind
-it to the existing session.
-
-Does anyone have any comments at this stage? This seems like a
-significant undertaking :-)
-
---=20
-Regards,
-Richard Sharpe
-(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
+Ok. I agree with your points. Since I am on vacations now I suggest to drop this patch from the series - I will respin it further. So, let's not stop on this one.--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
