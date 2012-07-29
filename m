@@ -1,74 +1,167 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Implementing some SMB2.2/3.0 features ...
-Date: Sun, 29 Jul 2012 09:28:06 -0400
-Message-ID: <20120729092806.4e2b657e@tlielax.poochiereds.net>
-References: <CACyXjPz1fVUKADaan72krJCf-21e1QOrm2s1TEEAxR_S5mk0NQ@mail.gmail.com>
+From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: RE: ALPHA: advice for a patch to CIFS
+Date: Sun, 29 Jul 2012 18:46:57 +0100
+Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2CDF915AAF4@LONPMAILBOX01.citrite.net>
+References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDF8E31455@LONPMAILBOX01.citrite.net>,<20120728080651.305f9bab@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACyXjPz1fVUKADaan72krJCf-21e1QOrm2s1TEEAxR_S5mk0NQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20120728080651.305f9bab-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Content-Language: en-GB
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 28 Jul 2012 08:19:48 -0700
-Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> Hi folks,
 > 
-> I have started looking at implementing some of the SMB3.0 features.
-> This is because, in order to do SMB Direct I need multi-connect.
+> > Hi,
+> >   I'm currently trying to support utf-16 with characters not in plane 0.
+> >
+> > I'm currently end up with this patch. Currently is not against latest
+> > kernel but the problem still reside in last git kernel.
+> >
+> > wchar_t is currently 16bit so converting a utf8 encoded characters not
+> > in plane 0 (>= 0x10000) to wchar_t (that is calling char2uni) lead to a
+> > -EINVAL return. This patch detect utf8 in cifs_strtoUCS and add special
+> > code calling directly utf8_to_utf32.
+> >
+> > Does it sound a good patch or just a bad hack. Perhaps would be better
+> > to change char2uni converting to unicode_t (32bit) instead of wchar_t
+> > but probably many code have to be checked in order to make sure it does
+> > not lead to wrong conversions, overflows or other bad stuff.
+> >
+> > Is it worth working in this hacking way? I'd like to upstream this
+> > patch.
+> >
+> >
+> > diff -r c2325d754e8d fs/cifs/cifs_unicode.c
+> > --- a/fs/cifs/cifs_unicode.c  Fri Jul 27 15:12:23 2012 +0100
+> > +++ b/fs/cifs/cifs_unicode.c  Fri Jul 27 19:09:04 2012 +0100
+> > @@ -192,22 +192,40 @@ cifs_strtoUCS(__le16 *to, const char *fr
 > 
-> In reading the latest version of the spec ([MS-SMB2] dated July 5,
-> 2012 and available from msdn.microsoft.com) I notice that each session
-> should have a channel list, which is a list of objects containing a
-> connection reference and a signing key. It also should have a channel
-> sequence number.
+> That function doesn't exist anymore. You should base this on a more
+> recent upstream tree.
 > 
-> This means that I will need to change the struct cifs_ses to have a
-> channel list rather than a struct TCP_Server_Info.
+> >  {
+> >       int charlen;
+> >       int i;
+> > -     wchar_t *wchar_to = (wchar_t *)to; /* needed to quiet sparse */
+> > +     int is_utf8 = !strcmp(codepage->charset, "utf8");
 > 
-> In addition, multi-connect allows multiple connections to the same
-> actual server, since it allows a session to use multiple TCP
-> connection on a GbE or 10GbE link. So, it seems that I will need to
-> introduce an explicit notion of a connection, which the code does not
-> currently have. This will definitely be needed for SMB Direct, because
-> the model is that you establish a connection to the server on TCP,
-> negotiate a protocol and then establish a session and then send an
-> FSCTL to discover the (common) set of interfaces the server has. After
-> that, if you notice that the client and server have an RDMA-capable
-> interface in common, you establish a connection via that interface,
-> negotiate protocol and then create a session (session setup) but bind
-> it to the existing session.
-> 
-> Does anyone have any comments at this stage? This seems like a
-> significant undertaking :-)
+> Gross...there must be a better way to do that?
 > 
 
-It sounds like you're on the right track. Essentially I think you need
-to abstract out the parts of the TCP_Server_Info that are specific to
-the socket, and put them in a new struct that will hang off of the
-TCP_Server_Info in some way (maybe a linked list of "smb_connection"
-structs?)
+I didn't find any way.
 
-Once you get that done, you can start thinking about how to allow more
-than one to hang off the TCP_Server_Info, and how those connections
-should be used. When you go to send a new SMB frame, you'll need to
-pick a connection to send it on (right?), so the sending code will need
-logic to deal with that.
+> 
+> > +     wchar_t wchar_to; /* needed to quiet sparse */
+> > +     unicode_t uni;
+> >
+> >       for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
+> >
+> >               /* works for 2.4.0 kernel or later */
+> > -             charlen = codepage->char2uni(from, len, &wchar_to[i]);
+> > +             if (is_utf8) {
+> > +                     charlen = utf8_to_utf32(from, len, &uni);
+> > +             } else {
+> > +                     charlen = codepage->char2uni(from, len, &wchar_to);
+> > +                     uni = wchar_to;
+> > +             }
+> > +
+> >               if (charlen < 1) {
+> >                       cERROR(1,
+> >                              ("strtoUCS: char2uni of %d returned %d",
+> >                               (int)*from, charlen));
+> >                       /* A question mark */
+> > -                     to[i] = cpu_to_le16(0x003f);
+> > +                     wchar_to = 0x003f;
+> >                       charlen = 1;
+> > -             } else
+> > -                     to[i] = cpu_to_le16(wchar_to[i]);
+> > -
+> > +             } else if (uni < 0x10000) {
+> 
+>         "uni" will be unintialized here if is_utf8 is false.
+> 
+> > +                     wchar_to = uni;
+> > +             } else if (uni < 0x110000) {
+> > +                     uni -= 0x10000;
+> > +                     to[i++] = cpu_to_le16(0xD800 | (uni >> 10));
+> > +                     wchar_to = 0xDC00 | (uni & 0x3FF);
+> > +             } else {
+> > +                     cERROR(1,
+> > +                            ("strtoUCS: char2uni of %d returned %d",
+> > +                             (int)*from, charlen));
+> > +                     wchar_to = 0x003f;
+> > +             }
+> > +             to[i] = cpu_to_le16(wchar_to);
+> >       }
+> >
+> >       to[i] = 0;
+> >
+> > Signed-off-by: "Frediano Ziglio" <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+> >
+> > Regards,
+> >   Frediano
+> >
+> 
+> The basic idea looks ok, but I agree that this could use some more
+> commenting and/or some #define'd constants. Does the conversion of on
+> the wire characters to the local charset need similar work?
+> 
 
-You'll also need to teach the cifs_demultiplex_thread code how to deal
-with receiving from multiple sockets. For that, maybe it's time to
-think about getting away from pretending to be userland socket code,
-and use the sock->sk_* callbacks directly like the sunrpc code does.
-It's more complex, but would probably give much better performance in
-the long run -- we wouldn't need a dedicated thread to handle it, for
-instance.
+I found a function that suite my purpose, here you are updated patch 
 
-While you're at it, if you feel like renaming TCP_Server_Info to
-something better, I wouldn't object...
+>From 9fbbc065e8ee1d27ce6d99be0a9c8ab885756f0d Mon Sep 17 00:00:00 2001
+From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Date: Sun, 29 Jul 2012 12:42:59 +0100
+Subject: [PATCH] Convert properly UTF-8 to UTF-16
 
+wchar_t is currently 16bit so converting a utf8 encoded characters not
+in plane 0 (>= 0x10000) to wchar_t (that is calling char2uni) lead to a
+-EINVAL return. This patch detect utf8 in cifs_strtoUTF16 and add special
+code calling utf8s_to_utf16s.
+
+Signed-off-by: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifs_unicode.c |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
+
+diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+index 7dab9c0..a798e01 100644
+--- a/fs/cifs/cifs_unicode.c
++++ b/fs/cifs/cifs_unicode.c
+@@ -203,6 +203,19 @@ cifs_strtoUTF16(__le16 *to, const char *from, int len,
+ 	int i;
+ 	wchar_t wchar_to; /* needed to quiet sparse */
+ 
++	if (!strcmp(codepage->charset, "utf8")) {
++		i  = utf8s_to_utf16s(from, len, UTF16_LITTLE_ENDIAN,
++				       (wchar_t *) to, len);
++		if (i >= 0)
++			goto success;
++		/*
++		 * if fails fall back to UCS encoding as this
++		 * function should not return negative values
++		 * currently can fail only if source contains
++		 * invalid encoded characters
++		 */
++	}
++
+ 	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
+ 		charlen = codepage->char2uni(from, len, &wchar_to);
+ 		if (charlen < 1) {
+@@ -215,6 +228,7 @@ cifs_strtoUTF16(__le16 *to, const char *from, int len,
+ 		put_unaligned_le16(wchar_to, &to[i]);
+ 	}
+ 
++success:
+ 	put_unaligned_le16(0, &to[i]);
+ 	return i;
+ }
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.5.4
+
+Frediano
