@@ -1,56 +1,26 @@
-From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Convert properly UTF-8 to UTF-16
-Date: Tue, 31 Jul 2012 12:24:51 +0100
-Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08CFF@LONPMAILBOX01.citrite.net>
-References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08CFE@LONPMAILBOX01.citrite.net>
- <20120731071511.7746b2f4@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: warning about default security mechanism
+Date: Tue, 31 Jul 2012 07:34:00 -0400
+Message-ID: <20120731073400.7f1f17a1@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
-	"sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120731071511.7746b2f4-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-T24gVHVlLCAyMDEyLTA3LTMxIGF0IDA3OjE1IC0wNDAwLCBKZWZmIExheXRvbiB3cm90ZToKPiBP
-biBUdWUsIDMxIEp1bCAyMDEyIDExOjQ1OjM1ICswMTAwCj4gRnJlZGlhbm8gWmlnbGlvIDxmcmVk
-aWFuby56aWdsaW9AY2l0cml4LmNvbT4gd3JvdGU6Cj4gCj4gPiAKPiA+IHdjaGFyX3QgaXMgY3Vy
-cmVudGx5IDE2Yml0IHNvIGNvbnZlcnRpbmcgYSB1dGY4IGVuY29kZWQgY2hhcmFjdGVycyBub3QK
-PiA+IGluIHBsYW5lIDAgKD49IDB4MTAwMDApIHRvIHdjaGFyX3QgKHRoYXQgaXMgY2FsbGluZyBj
-aGFyMnVuaSkgbGVhZCB0byBhCj4gPiAtRUlOVkFMIHJldHVybi4gVGhpcyBwYXRjaCBkZXRlY3Qg
-dXRmOCBpbiBjaWZzX3N0cnRvVVRGMTYgYW5kIGFkZAo+ID4gc3BlY2lhbAo+ID4gY29kZSBjYWxs
-aW5nIHV0ZjhzX3RvX3V0ZjE2cy4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogRnJlZGlhbm8gWmln
-bGlvIDxmcmVkaWFuby56aWdsaW9AY2l0cml4LmNvbT4KPiA+IC0tLQo+ID4gIGZzL2NpZnMvY2lm
-c191bmljb2RlLmMgfCAgIDE0ICsrKysrKysrKysrKysrCj4gPiAgMSBmaWxlcyBjaGFuZ2VkLCAx
-NCBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvZnMv
-Y2lmcy9jaWZzX3VuaWNvZGUuYyBiL2ZzL2NpZnMvY2lmc191bmljb2RlLmMKPiA+IGluZGV4IDdk
-YWI5YzAuLmE3OThlMDEgMTAwNjQ0Cj4gPiAtLS0gYS9mcy9jaWZzL2NpZnNfdW5pY29kZS5jCj4g
-PiArKysgYi9mcy9jaWZzL2NpZnNfdW5pY29kZS5jCj4gPiBAQCAtMjAzLDYgKzIwMywxOSBAQCBj
-aWZzX3N0cnRvVVRGMTYoX19sZTE2ICp0bywgY29uc3QgY2hhciAqZnJvbSwgaW50Cj4gPiBsZW4s
-Cj4gPiAgCWludCBpOwo+ID4gIAl3Y2hhcl90IHdjaGFyX3RvOyAvKiBuZWVkZWQgdG8gcXVpZXQg
-c3BhcnNlICovCj4gPiAgCj4gPiArCWlmICghc3RyY21wKGNvZGVwYWdlLT5jaGFyc2V0LCAidXRm
-OCIpKSB7Cj4gPiArCQlpICA9IHV0ZjhzX3RvX3V0ZjE2cyhmcm9tLCBsZW4sIFVURjE2X0xJVFRM
-RV9FTkRJQU4sCj4gPiArCQkJCSAgICAgICAod2NoYXJfdCAqKSB0bywgbGVuKTsKPiAKPiAJTXVj
-aCBuaWNlciwgYnV0Li4uCj4gCj4gCVlvdSdyZSB1c2luZyAibGVuIiBib3RoIGZvciAiaW5sZW4i
-IGFuZCAibWF4b3V0Ii4gV29uJ3QgdGhhdAo+IAlnaXZlIHlvdSBhIHRydW5jYXRlZCBzdHJpbmcg
-aWYgdGhlcmUgYXJlIHNpbmdsZS1ieXRlIGNoYXJhY3RlcnMKPiAJdGhhdCBjb252ZXJ0IHRvIG11
-bHRpYnl0ZSBvbmVzPwo+IAoKVGhhdCdzIGltcG9zc2libGUgYXMgbGVuIG9uIGRlc3RpbmF0aW9u
-IGlzIHRoZSBsZW5ndGggb2YgMiBieXRlCnNlcXVlbmNlcy4KCkFsc28gYSBzaW5nbGUtYnl0ZSBl
-bmNvZGVkIFVURi04IGlzIGFuIEFTQ0lJIGNoYXJhY3RlcnMgd2hpY2ggbGVhZCB0byBhCnNpbmds
-ZSAyLWJ5dGUgc2VxdWVuY2UuCgo+ID4gKwkJaWYgKGkgPj0gMCkKPiA+ICsJCQlnb3RvIHN1Y2Nl
-c3M7Cj4gPiArCQkvKgo+ID4gKwkJICogaWYgZmFpbHMgZmFsbCBiYWNrIHRvIFVDUyBlbmNvZGlu
-ZyBhcyB0aGlzCj4gPiArCQkgKiBmdW5jdGlvbiBzaG91bGQgbm90IHJldHVybiBuZWdhdGl2ZSB2
-YWx1ZXMKPiA+ICsJCSAqIGN1cnJlbnRseSBjYW4gZmFpbCBvbmx5IGlmIHNvdXJjZSBjb250YWlu
-cwo+ID4gKwkJICogaW52YWxpZCBlbmNvZGVkIGNoYXJhY3RlcnMKPiA+ICsJCSAqLwo+ID4gKwl9
-Cj4gPiArCj4gPiAgCWZvciAoaSA9IDA7IGxlbiAmJiAqZnJvbTsgaSsrLCBmcm9tICs9IGNoYXJs
-ZW4sIGxlbiAtPSBjaGFybGVuKSB7Cj4gPiAgCQljaGFybGVuID0gY29kZXBhZ2UtPmNoYXIydW5p
-KGZyb20sIGxlbiwgJndjaGFyX3RvKTsKPiA+ICAJCWlmIChjaGFybGVuIDwgMSkgewo+ID4gQEAg
-LTIxNSw2ICsyMjgsNyBAQCBjaWZzX3N0cnRvVVRGMTYoX19sZTE2ICp0bywgY29uc3QgY2hhciAq
-ZnJvbSwgaW50Cj4gPiBsZW4sCj4gPiAgCQlwdXRfdW5hbGlnbmVkX2xlMTYod2NoYXJfdG8sICZ0
-b1tpXSk7Cj4gPiAgCX0KPiA+ICAKPiA+ICtzdWNjZXNzOgo+ID4gIAlwdXRfdW5hbGlnbmVkX2xl
-MTYoMCwgJnRvW2ldKTsKPiA+ICAJcmV0dXJuIGk7Cj4gPiAgfQo+IAo+IAoKRnJlZGlhbm8KCg==
+Now that the 3.6 merge window is open, perhaps it's time to do
+something about this warning message which is still popping? What's the
+plan with this thing? Can we go ahead and pull the trigger on this or
+what?
+
+[ 1663.969662] CIFS VFS: default security mechanism requested.  The
+default security mechanism will be upgraded from ntlm to ntlmv2 in
+kernel release 3.3
+
+Note that I also see this with SMB2 mounts which is really goofy.
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
