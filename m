@@ -1,68 +1,74 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Howto mount cifs from c?
-Date: Tue, 31 Jul 2012 07:37:53 -0500
-Message-ID: <CADT32e+Rx3L12ciJXL3VsKnOpsAFiedZXAU78-jZromi7dioNw@mail.gmail.com>
+Date: Tue, 31 Jul 2012 19:49:23 +0200
+Message-ID: <CANXojczjroEONLHbmauimAh_M-4ZuHMJ=3LTnHAXMSahc9WMRA@mail.gmail.com>
 References: <CANXojcz_p23rcNo3gPiAjJ95M0ry+p5Q_5hyYO0TF==0VpKBqg@mail.gmail.com>
 	<CANXojczSt+3pyiEH_RoQa4TjA+7H1pmNJrpbJsX3iQA1Vr1O_A@mail.gmail.com>
 	<CADT32eJcEm=UnXaCfAva1aXWptxBGEmBAYgeJnqU7nVtC7T4nA@mail.gmail.com>
 	<CANXojcwnCQQOEBk3=sM_61Uq7BunLyUvx67WzNGxbRszcgp-fA@mail.gmail.com>
+	<CADT32e+Rx3L12ciJXL3VsKnOpsAFiedZXAU78-jZromi7dioNw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcwnCQQOEBk3=sM_61Uq7BunLyUvx67WzNGxbRszcgp-fA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CADT32e+Rx3L12ciJXL3VsKnOpsAFiedZXAU78-jZromi7dioNw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jul 31, 2012 at 7:22 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Hi,
->
-> I can mount using the commandline utility mount.cifs,
->
-> bit from a c program it does not work.
->
-> How do I turn on debugging??
->
-> (from the general mount command)?
->
-> Stef
->
-> 2012/7/31 Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->> On Tue, Jul 31, 2012 at 3:25 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>> Please give some advice how to deal with these errors.
->>>
->>> Stef
->>>
->>> 2012/7/30 Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->>>> Hi,
->>>>
->>>> I'm writing a mount module, which can mount cifs. But I get constantly errors:
->>>>
->>>> Jul 30 01:01:21 asus20110414.bononline.nl fuse-workspace[7570]:
->>>> mount_resource: mount //SCLFS20091030/public
->>>> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2 cifs
->>>> user=sbon,password=******,uid=1000,gid=1000,domain=BONONLINE,rw,acl,user_xattr,cifsacl,posixpaths
->>>>
->>>> THis is ouput of the logging of fuse-workspace, and it tries to mount
->>>> the share //SCLFS20091030/public at
->>>> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2, with the
->>>> options.
->>>>
->>>> I get constantly -22 errors, and nothing gets mounted. Do I have to
->>>> add the ip or something?
->>>>
->>>> Stef
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->> Can you ping the server SCLFS20091030
->> You can turn cifs debug on and see where error 22 (EINVAL)
->> is coming from.
->> A wireshark trace will reveal info whether anything is going over
->> the wire
+Aha, I didn't know that,
 
-You can echo 7 > /proc/fs/cifs/cifsFYI to turn on debugging
-and echo 0 > /proc/fs/cifs/cifsFYI to turn it off.
+now I get:
+
+
+kernel: fs/cifs/cifsfs.c: Devname: //SCLFS20091030/public flags: 0
+kernel: fs/cifs/connect.c: Domain name set
+kernel: fs/cifs/connect.c: Username: sbon
+kernel: fs/cifs/connect.c: file mode: 0x1ed  dir mode: 0x1ed
+kernel: fs/cifs/connect.c: CIFS VFS: in cifs_mount as Xid: 118 with uid: 0
+kernel: fs/cifs/connect.c: UNC:
+\\SCLFS20091030\p//SCLFS20091030/public ip:
+SCLFS20091030\p//SCLFS20091030/public
+kernel: fs/cifs/connect.c: CIFS VFS: leaving cifs_mount (xid = 118) rc = -22
+kernel: CIFS VFS: cifs_mount failed w/return code = -22
+
+Obviously something goes wrong with the mountcommand:
+
+mount_resource: mount //SCLFS20091030/public
+/mnt/fuse-workspace/65e9e42684129ad79f96d981c665cae1 cifs
+user=sbon,password=sjbon0701,uid=1000,gid=1000,domain=BONONLINE,rw,acl,user_xattr,cifsacl,posixpaths,nodfs,unc=\\SCLFS20091030\p//SCLFS20091030/public
+
+The original mountcommand in my programm adds the ip address, which is
+totally overwritten.
+
+I guess everything get messed up with the backslashes. The code I use:
+
+/* add the unc */
+
+*(vfsdata+len0)='\\';
+len0++;
+*(vfsdata+len0)='\\';
+len0++;
+
+memcpy(vfsdata+len0, smb_server->name, strlen(smb_server->name));
+len0+=strlen(smb_server->name);
+
+*(vfsdata+len0)='\\';
+len0++;
+
+memcpy(vfsdata+len0, smb_share->name, strlen(smb_share->name));
+len0+=strlen(smb_share->name);
+
+if (strlen(smb_server->ipv4address)>0) {
+
+         /* add ip */
+
+         len1=sprintf(vfsdata+len0, ",ip=%s", smb_server->ipv4address);
+         len0+=len1;
+
+}
+
+
+Some hint??
+
+Stef
