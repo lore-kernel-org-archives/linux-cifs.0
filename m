@@ -1,63 +1,68 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: Howto mount cifs from c?
-Date: Tue, 31 Jul 2012 14:22:32 +0200
-Message-ID: <CANXojcwnCQQOEBk3=sM_61Uq7BunLyUvx67WzNGxbRszcgp-fA@mail.gmail.com>
+Date: Tue, 31 Jul 2012 07:37:53 -0500
+Message-ID: <CADT32e+Rx3L12ciJXL3VsKnOpsAFiedZXAU78-jZromi7dioNw@mail.gmail.com>
 References: <CANXojcz_p23rcNo3gPiAjJ95M0ry+p5Q_5hyYO0TF==0VpKBqg@mail.gmail.com>
 	<CANXojczSt+3pyiEH_RoQa4TjA+7H1pmNJrpbJsX3iQA1Vr1O_A@mail.gmail.com>
 	<CADT32eJcEm=UnXaCfAva1aXWptxBGEmBAYgeJnqU7nVtC7T4nA@mail.gmail.com>
+	<CANXojcwnCQQOEBk3=sM_61Uq7BunLyUvx67WzNGxbRszcgp-fA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eJcEm=UnXaCfAva1aXWptxBGEmBAYgeJnqU7nVtC7T4nA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CANXojcwnCQQOEBk3=sM_61Uq7BunLyUvx67WzNGxbRszcgp-fA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
-
-I can mount using the commandline utility mount.cifs,
-
-bit from a c program it does not work.
-
-How do I turn on debugging??
-
-(from the general mount command)?
-
-Stef
-
-2012/7/31 Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> On Tue, Jul 31, 2012 at 3:25 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> Please give some advice how to deal with these errors.
->>
->> Stef
->>
->> 2012/7/30 Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
->>> Hi,
->>>
->>> I'm writing a mount module, which can mount cifs. But I get constantly errors:
->>>
->>> Jul 30 01:01:21 asus20110414.bononline.nl fuse-workspace[7570]:
->>> mount_resource: mount //SCLFS20091030/public
->>> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2 cifs
->>> user=sbon,password=******,uid=1000,gid=1000,domain=BONONLINE,rw,acl,user_xattr,cifsacl,posixpaths
->>>
->>> THis is ouput of the logging of fuse-workspace, and it tries to mount
->>> the share //SCLFS20091030/public at
->>> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2, with the
->>> options.
->>>
->>> I get constantly -22 errors, and nothing gets mounted. Do I have to
->>> add the ip or something?
+On Tue, Jul 31, 2012 at 7:22 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Hi,
+>
+> I can mount using the commandline utility mount.cifs,
+>
+> bit from a c program it does not work.
+>
+> How do I turn on debugging??
+>
+> (from the general mount command)?
+>
+> Stef
+>
+> 2012/7/31 Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>> On Tue, Jul 31, 2012 at 3:25 AM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>> Please give some advice how to deal with these errors.
 >>>
 >>> Stef
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> Can you ping the server SCLFS20091030
-> You can turn cifs debug on and see where error 22 (EINVAL)
-> is coming from.
-> A wireshark trace will reveal info whether anything is going over
-> the wire
+>>>
+>>> 2012/7/30 Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+>>>> Hi,
+>>>>
+>>>> I'm writing a mount module, which can mount cifs. But I get constantly errors:
+>>>>
+>>>> Jul 30 01:01:21 asus20110414.bononline.nl fuse-workspace[7570]:
+>>>> mount_resource: mount //SCLFS20091030/public
+>>>> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2 cifs
+>>>> user=sbon,password=******,uid=1000,gid=1000,domain=BONONLINE,rw,acl,user_xattr,cifsacl,posixpaths
+>>>>
+>>>> THis is ouput of the logging of fuse-workspace, and it tries to mount
+>>>> the share //SCLFS20091030/public at
+>>>> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2, with the
+>>>> options.
+>>>>
+>>>> I get constantly -22 errors, and nothing gets mounted. Do I have to
+>>>> add the ip or something?
+>>>>
+>>>> Stef
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> Can you ping the server SCLFS20091030
+>> You can turn cifs debug on and see where error 22 (EINVAL)
+>> is coming from.
+>> A wireshark trace will reveal info whether anything is going over
+>> the wire
+
+You can echo 7 > /proc/fs/cifs/cifsFYI to turn on debugging
+and echo 0 > /proc/fs/cifs/cifsFYI to turn it off.
