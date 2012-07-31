@@ -1,36 +1,39 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Howto mount cifs from c?
-Date: Tue, 31 Jul 2012 10:25:50 +0200
-Message-ID: <CANXojczSt+3pyiEH_RoQa4TjA+7H1pmNJrpbJsX3iQA1Vr1O_A@mail.gmail.com>
-References: <CANXojcz_p23rcNo3gPiAjJ95M0ry+p5Q_5hyYO0TF==0VpKBqg@mail.gmail.com>
+From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] Convert properly UTF-8 to UTF-16
+Date: Tue, 31 Jul 2012 11:45:35 +0100
+Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08CFE@LONPMAILBOX01.citrite.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcz_p23rcNo3gPiAjJ95M0ry+p5Q_5hyYO0TF==0VpKBqg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Please give some advice how to deal with these errors.
-
-Stef
-
-2012/7/30 Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Hi,
->
-> I'm writing a mount module, which can mount cifs. But I get constantly errors:
->
-> Jul 30 01:01:21 asus20110414.bononline.nl fuse-workspace[7570]:
-> mount_resource: mount //SCLFS20091030/public
-> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2 cifs
-> user=sbon,password=******,uid=1000,gid=1000,domain=BONONLINE,rw,acl,user_xattr,cifsacl,posixpaths
->
-> THis is ouput of the logging of fuse-workspace, and it tries to mount
-> the share //SCLFS20091030/public at
-> /mnt/fuse-workspace/8b1cd1abd18e90c9f5a112627f779ee2, with the
-> options.
->
-> I get constantly -22 errors, and nothing gets mounted. Do I have to
-> add the ip or something?
->
-> Stef
+CndjaGFyX3QgaXMgY3VycmVudGx5IDE2Yml0IHNvIGNvbnZlcnRpbmcgYSB1dGY4IGVuY29kZWQg
+Y2hhcmFjdGVycyBub3QKaW4gcGxhbmUgMCAoPj0gMHgxMDAwMCkgdG8gd2NoYXJfdCAodGhhdCBp
+cyBjYWxsaW5nIGNoYXIydW5pKSBsZWFkIHRvIGEKLUVJTlZBTCByZXR1cm4uIFRoaXMgcGF0Y2gg
+ZGV0ZWN0IHV0ZjggaW4gY2lmc19zdHJ0b1VURjE2IGFuZCBhZGQKc3BlY2lhbApjb2RlIGNhbGxp
+bmcgdXRmOHNfdG9fdXRmMTZzLgoKU2lnbmVkLW9mZi1ieTogRnJlZGlhbm8gWmlnbGlvIDxmcmVk
+aWFuby56aWdsaW9AY2l0cml4LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNfdW5pY29kZS5jIHwgICAx
+NCArKysrKysrKysrKysrKwogMSBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCAwIGRl
+bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc191bmljb2RlLmMgYi9mcy9jaWZz
+L2NpZnNfdW5pY29kZS5jCmluZGV4IDdkYWI5YzAuLmE3OThlMDEgMTAwNjQ0Ci0tLSBhL2ZzL2Np
+ZnMvY2lmc191bmljb2RlLmMKKysrIGIvZnMvY2lmcy9jaWZzX3VuaWNvZGUuYwpAQCAtMjAzLDYg
+KzIwMywxOSBAQCBjaWZzX3N0cnRvVVRGMTYoX19sZTE2ICp0bywgY29uc3QgY2hhciAqZnJvbSwg
+aW50CmxlbiwKIAlpbnQgaTsKIAl3Y2hhcl90IHdjaGFyX3RvOyAvKiBuZWVkZWQgdG8gcXVpZXQg
+c3BhcnNlICovCiAKKwlpZiAoIXN0cmNtcChjb2RlcGFnZS0+Y2hhcnNldCwgInV0ZjgiKSkgewor
+CQlpICA9IHV0ZjhzX3RvX3V0ZjE2cyhmcm9tLCBsZW4sIFVURjE2X0xJVFRMRV9FTkRJQU4sCisJ
+CQkJICAgICAgICh3Y2hhcl90ICopIHRvLCBsZW4pOworCQlpZiAoaSA+PSAwKQorCQkJZ290byBz
+dWNjZXNzOworCQkvKgorCQkgKiBpZiBmYWlscyBmYWxsIGJhY2sgdG8gVUNTIGVuY29kaW5nIGFz
+IHRoaXMKKwkJICogZnVuY3Rpb24gc2hvdWxkIG5vdCByZXR1cm4gbmVnYXRpdmUgdmFsdWVzCisJ
+CSAqIGN1cnJlbnRseSBjYW4gZmFpbCBvbmx5IGlmIHNvdXJjZSBjb250YWlucworCQkgKiBpbnZh
+bGlkIGVuY29kZWQgY2hhcmFjdGVycworCQkgKi8KKwl9CisKIAlmb3IgKGkgPSAwOyBsZW4gJiYg
+KmZyb207IGkrKywgZnJvbSArPSBjaGFybGVuLCBsZW4gLT0gY2hhcmxlbikgewogCQljaGFybGVu
+ID0gY29kZXBhZ2UtPmNoYXIydW5pKGZyb20sIGxlbiwgJndjaGFyX3RvKTsKIAkJaWYgKGNoYXJs
+ZW4gPCAxKSB7CkBAIC0yMTUsNiArMjI4LDcgQEAgY2lmc19zdHJ0b1VURjE2KF9fbGUxNiAqdG8s
+IGNvbnN0IGNoYXIgKmZyb20sIGludApsZW4sCiAJCXB1dF91bmFsaWduZWRfbGUxNih3Y2hhcl90
+bywgJnRvW2ldKTsKIAl9CiAKK3N1Y2Nlc3M6CiAJcHV0X3VuYWxpZ25lZF9sZTE2KDAsICZ0b1tp
+XSk7CiAJcmV0dXJuIGk7CiB9Ci0tIAoxLjcuNS40Cgo=
