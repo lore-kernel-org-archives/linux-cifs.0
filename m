@@ -1,379 +1,406 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v3 17/32] CIFS: Add tree connect/disconnect capability
- for SMB2
-Date: Wed, 1 Aug 2012 15:22:56 -0400
-Message-ID: <20120801152256.29484243@tlielax.poochiereds.net>
-References: <1342166025-29377-1-git-send-email-pshilovsky@samba.org>
-	<1342166025-29377-18-git-send-email-pshilovsky@samba.org>
+Subject: Re: [PATCH 02/45] CIFS: Simpliify cifs_mkdir call
+Date: Wed, 1 Aug 2012 15:39:30 -0400
+Message-ID: <20120801153930.6c468363@tlielax.poochiereds.net>
+References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
+	<1342626541-29872-3-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342166025-29377-18-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1342626541-29872-3-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 13 Jul 2012 11:53:30 +0400
+On Wed, 18 Jul 2012 19:48:18 +0400
 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> 
 > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/cifs_unicode.c |    1 -
->  fs/cifs/cifs_unicode.h |    1 -
->  fs/cifs/cifsglob.h     |   11 +++-
->  fs/cifs/smb2ops.c      |    2 +
->  fs/cifs/smb2pdu.c      |  159 +++++++++++++++++++++++++++++++++++++++++++++++-
->  fs/cifs/smb2pdu.h      |   57 +++++++++++++++++
->  fs/cifs/smb2proto.h    |    4 +
->  7 files changed, 230 insertions(+), 5 deletions(-)
+>  fs/cifs/cifsproto.h |    4 +-
+>  fs/cifs/cifssmb.c   |    8 +-
+>  fs/cifs/inode.c     |  295 ++++++++++++++++++++++++++++-----------------------
+>  3 files changed, 167 insertions(+), 140 deletions(-)
 > 
-> diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-> index fbb9da9..97c1d42 100644
-> --- a/fs/cifs/cifs_unicode.c
-> +++ b/fs/cifs/cifs_unicode.c
-> @@ -330,4 +330,3 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
->  ctoUTF16_out:
->  	return i;
->  }
-> -
-> diff --git a/fs/cifs/cifs_unicode.h b/fs/cifs/cifs_unicode.h
-> index a513a54..a44c6eb 100644
-> --- a/fs/cifs/cifs_unicode.h
-> +++ b/fs/cifs/cifs_unicode.h
-> @@ -84,7 +84,6 @@ char *cifs_strndup_from_utf16(const char *src, const int maxlen,
->  			      const struct nls_table *codepage);
->  extern int cifsConvertToUTF16(__le16 *target, const char *source, int maxlen,
->  			      const struct nls_table *cp, int mapChars);
-> -
->  #endif
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 5aadeec..51fbdf2 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -289,10 +289,10 @@ extern int CIFSSMBUnixSetFileInfo(const unsigned int xid,
+>  				  u16 fid, u32 pid_of_opener);
 >  
->  /*
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 0d78bc4..ef4e0a0 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -528,7 +528,7 @@ struct cifs_tcon {
->  	char treeName[MAX_TREE_SIZE + 1]; /* UNC name of resource in ASCII */
->  	char *nativeFileSystem;
->  	char *password;		/* for share-level security */
-> -	__u16 tid;		/* The 2 byte tree id */
-> +	__u32 tid;		/* The 4 byte tree id */
->  	__u16 Flags;		/* optional support bits */
->  	enum statusEnum tidStatus;
->  #ifdef CONFIG_CIFS_STATS
-> @@ -584,6 +584,15 @@ struct cifs_tcon {
->  	bool local_lease:1; /* check leases (only) on local system not remote */
->  	bool broken_posix_open; /* e.g. Samba server versions < 3.3.2, 3.2.9 */
->  	bool need_reconnect:1; /* connection reset, tid now invalid */
-> +#ifdef CONFIG_CIFS_SMB2
-> +	bool print:1;		/* set if connection to printer share */
-> +	bool bad_network_name:1; /* set if ret status STATUS_BAD_NETWORK_NAME */
-
-You probably ought to eliminate the length qualifiers on bools. IIRC
-from playing with pahole, they end up making a bool larger than it
-would otherwise be (at least on x86_64).
-
-> +	__u32 capabilities;
-> +	__u32 share_flags;
-> +	__u32 maximal_access;
-> +	__u32 vol_serial_number;
-> +	__le64 vol_create_time;
-> +#endif /* CONFIG_CIFS_SMB2 */
->  #ifdef CONFIG_CIFS_FSCACHE
->  	u64 resource_id;		/* server resource id */
->  	struct fscache_cookie *fscache;	/* cookie for share */
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 0057861..0e33ca3 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -172,6 +172,8 @@ struct smb_version_operations smb21_operations = {
->  	.negotiate = smb2_negotiate,
->  	.sess_setup = SMB2_sess_setup,
->  	.logoff = SMB2_logoff,
-> +	.tree_connect = SMB2_tcon,
-> +	.tree_disconnect = SMB2_tdis,
->  };
+>  extern int CIFSSMBUnixSetPathInfo(const unsigned int xid,
+> -				  struct cifs_tcon *tcon, char *file_name,
+> +				  struct cifs_tcon *tcon, const char *file_name,
+>  				  const struct cifs_unix_set_info_args *args,
+>  				  const struct nls_table *nls_codepage,
+> -				  int remap_special_chars);
+> +				  int remap);
 >  
->  struct smb_version_values smb21_values = {
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 2165f0d..1bf037e 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -110,8 +110,8 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
->  		hdr->SessionId = tcon->ses->Suid;
->  	/* BB check following DFS flags BB */
->  	/* BB do we have to add check for SHI1005_FLAGS_DFS_ROOT too? */
-> -	/* if (tcon->share_flags & SHI1005_FLAGS_DFS)
-> -		hdr->Flags |= SMB2_FLAGS_DFS_OPERATIONS; */
-> +	if (tcon->share_flags & SHI1005_FLAGS_DFS)
-> +		hdr->Flags |= SMB2_FLAGS_DFS_OPERATIONS;
->  	/* BB how does SMB2 do case sensitive? */
->  	/* if (tcon->nocase)
->  		hdr->Flags |= SMBFLG_CASELESS; */
-> @@ -549,3 +549,158 @@ SMB2_logoff(const unsigned int xid, struct cifs_ses *ses)
->  	 */
+>  extern int CIFSSMBMkDir(const unsigned int xid, struct cifs_tcon *tcon,
+>  			const char *newName,
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 846b803..ed472aa 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -5945,7 +5945,7 @@ CIFSSMBUnixSetFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
+>  
+>  int
+>  CIFSSMBUnixSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+> -		       char *fileName,
+> +		       const char *file_name,
+>  		       const struct cifs_unix_set_info_args *args,
+>  		       const struct nls_table *nls_codepage, int remap)
+>  {
+> @@ -5966,14 +5966,14 @@ setPermsRetry:
+>  
+>  	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+>  		name_len =
+> -		    cifsConvertToUTF16((__le16 *) pSMB->FileName, fileName,
+> +		    cifsConvertToUTF16((__le16 *) pSMB->FileName, file_name,
+>  				       PATH_MAX, nls_codepage, remap);
+>  		name_len++;	/* trailing null */
+>  		name_len *= 2;
+>  	} else {	/* BB improve the check for buffer overruns BB */
+> -		name_len = strnlen(fileName, PATH_MAX);
+> +		name_len = strnlen(file_name, PATH_MAX);
+>  		name_len++;	/* trailing null */
+> -		strncpy(pSMB->FileName, fileName, name_len);
+> +		strncpy(pSMB->FileName, file_name, name_len);
+>  	}
+>  
+>  	params = 6 + name_len;
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index 35cb6a3..e9ba1a1 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1219,16 +1219,165 @@ unlink_out:
 >  	return rc;
 >  }
-> +
-> +static inline void cifs_stats_fail_inc(struct cifs_tcon *tcon, uint16_t code)
+>  
+> +static int
+> +cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
+> +		 const char *full_path, struct cifs_sb_info *cifs_sb,
+> +		 struct cifs_tcon *tcon, const unsigned int xid)
 > +{
-> +	/* cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[code]); */
-> +}
-> +
-> +#define MAX_SHARENAME_LENGTH (255 /* server */ + 80 /* share */ + 1 /* NULL */)
-> +
-> +int
-> +SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
-> +	  struct cifs_tcon *tcon, const struct nls_table *cp)
-> +{
-> +	struct smb2_tree_connect_req *req;
-> +	struct smb2_tree_connect_rsp *rsp = NULL;
-> +	struct kvec iov[2];
 > +	int rc = 0;
-> +	int resp_buftype;
-> +	int unc_path_len;
-> +	struct TCP_Server_Info *server;
-> +	__le16 *unc_path = NULL;
+> +	struct inode *newinode = NULL;
 > +
-> +	cFYI(1, "TCON");
-> +
-> +	if ((ses->server) && tree)
-> +		server = ses->server;
+> +	if (tcon->unix_ext)
+> +		rc = cifs_get_inode_info_unix(&newinode, full_path, inode->i_sb,
+> +					      xid);
 > +	else
-> +		return -EIO;
-> +
-> +	if (tcon && tcon->bad_network_name)
-> +		return -ENOENT;
-> +
-> +	unc_path = kmalloc(MAX_SHARENAME_LENGTH * 2, GFP_KERNEL);
-> +	if (unc_path == NULL)
-> +		return -ENOMEM;
-> +
-> +	unc_path_len = cifs_strtoUTF16(unc_path, tree, strlen(tree), cp) + 1;
-> +	unc_path_len *= 2;
-> +	if (unc_path_len < 2) {
-> +		kfree(unc_path);
-> +		return -EINVAL;
-> +	}
-> +
-> +	rc = small_smb2_init(SMB2_TREE_CONNECT, tcon, (void **) &req);
-> +	if (rc) {
-> +		kfree(unc_path);
+> +		rc = cifs_get_inode_info(&newinode, full_path, NULL,
+> +					 inode->i_sb, xid, NULL);
+> +	if (rc)
 > +		return rc;
-> +	}
 > +
-> +	if (tcon == NULL) {
-> +		/* since no tcon, smb2_init can not do this, so do here */
-> +		req->hdr.SessionId = ses->Suid;
-> +		/* if (ses->server->sec_mode & SECMODE_SIGN_REQUIRED)
-> +			req->hdr.Flags |= SMB2_FLAGS_SIGNED; */
-> +	}
+> +	d_instantiate(dentry, newinode);
+> +	/*
+> +	 * setting nlink not necessary except in cases where we failed to get it
+> +	 * from the server or was set bogus
+> +	 */
+> +	if ((dentry->d_inode) && (dentry->d_inode->i_nlink < 2))
+> +		set_nlink(dentry->d_inode, 2);
 > +
-> +	iov[0].iov_base = (char *)req;
-> +	/* 4 for rfc1002 length field and 1 for pad */
-> +	iov[0].iov_len = get_rfc1002_length(req) + 4 - 1;
+> +	mode &= ~current_umask();
+> +	/* must turn on setgid bit if parent dir has it */
+> +	if (inode->i_mode & S_ISGID)
+> +		mode |= S_ISGID;
 > +
-> +	/* Testing shows that buffer offset must be at location of Buffer[0] */
-> +	req->PathOffset = cpu_to_le16(sizeof(struct smb2_tree_connect_req)
-> +			- 1 /* pad */ - 4 /* do not count rfc1001 len field */);
-
-That /* pad */ comment looks incorrect. The smb2_tree_connect_req is defined as:
-
-struct smb2_tree_connect_req {
-        struct smb2_hdr hdr;
-        __le16 StructureSize;   /* Must be 9 */
-        __le16 Reserved;
-        __le16 PathOffset;
-        __le16 PathLength;
-        __u8   Buffer[1];       /* variable length */
-} __packed;
-
-...so what you're really saying there is offsetof(req->Buffer[0]). What
-you should probably do is redefine "Buffer" as a C99 flexible array
-member:
-
-	__u8	Buffer[];
-
-...then you can get rid of all of that fiddly -1 junk with the "pad".
-
-> +	req->PathLength = cpu_to_le16(unc_path_len - 2);
-> +	iov[1].iov_base = unc_path;
-> +	iov[1].iov_len = unc_path_len;
-> +
-> +	inc_rfc1001_len(req, unc_path_len - 1 /* pad */);
-> +
-> +	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, 0);
-> +	rsp = (struct smb2_tree_connect_rsp *)iov[0].iov_base;
-> +
-> +	if (rc != 0) {
-> +		if (tcon) {
-> +			cifs_stats_fail_inc(tcon, SMB2_TREE_CONNECT_HE);
-> +			tcon->need_reconnect = true;
+> +	if (tcon->unix_ext) {
+> +		struct cifs_unix_set_info_args args = {
+> +			.mode	= mode,
+> +			.ctime	= NO_CHANGE_64,
+> +			.atime	= NO_CHANGE_64,
+> +			.mtime	= NO_CHANGE_64,
+> +			.device	= 0,
+> +		};
+> +		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
+> +			args.uid = (__u64)current_fsuid();
+> +			if (inode->i_mode & S_ISGID)
+> +				args.gid = (__u64)inode->i_gid;
+> +			else
+> +				args.gid = (__u64)current_fsgid();
+> +		} else {
+> +			args.uid = NO_CHANGE_64;
+> +			args.gid = NO_CHANGE_64;
 > +		}
-> +		goto tcon_error_exit;
-> +	}
-> +
-> +	if (rsp == NULL) {
-> +		rc = -EIO;
-> +		goto tcon_exit;
-> +	}
-> +
-> +	if (tcon == NULL) {
-> +		ses->ipc_tid = rsp->hdr.TreeId;
-> +		goto tcon_exit;
-> +	}
-> +
-> +	if (rsp->ShareType & SMB2_SHARE_TYPE_DISK)
-> +		cFYI(1, "connection to disk share");
-> +	else if (rsp->ShareType & SMB2_SHARE_TYPE_PIPE) {
-> +		tcon->ipc = true;
-> +		cFYI(1, "connection to pipe share");
-> +	} else if (rsp->ShareType & SMB2_SHARE_TYPE_PRINT) {
-> +		tcon->print = true;
-> +		cFYI(1, "connection to printer");
+> +		CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
+> +				       cifs_sb->local_nls,
+> +				       cifs_sb->mnt_cifs_flags &
+> +				       CIFS_MOUNT_MAP_SPECIAL_CHR);
 > +	} else {
-> +		cERROR(1, "unknown share type %d", rsp->ShareType);
-> +		rc = -EOPNOTSUPP;
-> +		goto tcon_error_exit;
+> +		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
+> +		    (mode & S_IWUGO) == 0) {
+> +			FILE_BASIC_INFO info;
+> +			struct cifsInodeInfo *cifsInode;
+> +			u32 dosattrs;
+> +			int tmprc;
+> +
+> +			memset(&info, 0, sizeof(info));
+> +			cifsInode = CIFS_I(newinode);
+> +			dosattrs = cifsInode->cifsAttrs|ATTR_READONLY;
+> +			info.Attributes = cpu_to_le32(dosattrs);
+> +			tmprc = CIFSSMBSetPathInfo(xid, tcon, full_path, &info,
+> +						   cifs_sb->local_nls,
+> +						   cifs_sb->mnt_cifs_flags &
+> +						   CIFS_MOUNT_MAP_SPECIAL_CHR);
+> +			if (tmprc == 0)
+> +				cifsInode->cifsAttrs = dosattrs;
+> +		}
+> +		if (dentry->d_inode) {
+> +			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
+> +				dentry->d_inode->i_mode = (mode | S_IFDIR);
+> +
+> +			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
+> +				dentry->d_inode->i_uid = current_fsuid();
+> +				if (inode->i_mode & S_ISGID)
+> +					dentry->d_inode->i_gid = inode->i_gid;
+> +				else
+> +					dentry->d_inode->i_gid =
+> +								current_fsgid();
+> +			}
+> +		}
 > +	}
-> +
-> +	tcon->share_flags = le32_to_cpu(rsp->ShareFlags);
-> +	tcon->maximal_access = le32_to_cpu(rsp->MaximalAccess);
-> +	tcon->tidStatus = CifsGood;
-> +	tcon->need_reconnect = false;
-> +	tcon->tid = rsp->hdr.TreeId;
-> +	strncpy(tcon->treeName, tree, MAX_TREE_SIZE);
-> +
-> +	if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
-> +	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
-> +		cERROR(1, "DFS capability contradicts DFS flag");
-> +
-> +tcon_exit:
-> +	free_rsp_buf(resp_buftype, rsp);
-> +	kfree(unc_path);
 > +	return rc;
-> +
-> +tcon_error_exit:
-> +	if (rsp->hdr.Status == STATUS_BAD_NETWORK_NAME) {
-> +		cERROR(1, "BAD_NETWORK_NAME: %s", tree);
-> +		tcon->bad_network_name = true;
-> +	}
-> +	goto tcon_exit;
 > +}
 > +
-> +int
-> +SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon)
+> +static int
+> +cifs_posix_mkdir(struct inode *inode, struct dentry *dentry, umode_t mode,
+> +		 const char *full_path, struct cifs_sb_info *cifs_sb,
+> +		 struct cifs_tcon *tcon, const unsigned int xid)
 > +{
-> +	struct smb2_tree_disconnect_req *req; /* response is trivial */
 > +	int rc = 0;
-> +	struct TCP_Server_Info *server;
-> +	struct cifs_ses *ses = tcon->ses;
+> +	u32 oplock = 0;
+> +	FILE_UNIX_BASIC_INFO *info = NULL;
+> +	struct inode *newinode = NULL;
+> +	struct cifs_fattr fattr;
 > +
-> +	cFYI(1, "Tree Disconnect");
+> +	info = kzalloc(sizeof(FILE_UNIX_BASIC_INFO), GFP_KERNEL);
+> +	if (info == NULL) {
+> +		rc = -ENOMEM;
+> +		goto posix_mkdir_out;
+> +	}
 > +
-> +	if (ses && (ses->server))
-> +		server = ses->server;
-> +	else
-> +		return -EIO;
+> +	mode &= ~current_umask();
+> +	rc = CIFSPOSIXCreate(xid, tcon, SMB_O_DIRECTORY | SMB_O_CREAT, mode,
+> +			     NULL /* netfid */, info, &oplock, full_path,
+> +			     cifs_sb->local_nls, cifs_sb->mnt_cifs_flags &
+> +			     CIFS_MOUNT_MAP_SPECIAL_CHR);
+> +	if (rc == -EOPNOTSUPP)
+> +		goto posix_mkdir_out;
+> +	else if (rc) {
+> +		cFYI(1, "posix mkdir returned 0x%x", rc);
+> +		d_drop(dentry);
+> +		goto posix_mkdir_out;
+> +	}
 > +
-> +	if ((tcon->need_reconnect) || (tcon->ses->need_reconnect))
-> +		return 0;
+> +	if (info->Type == cpu_to_le32(-1))
+> +		/* no return info, go query for it */
+> +		goto posix_mkdir_get_info;
+> +	/*
+> +	 * BB check (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID ) to see if
+> +	 * need to set uid/gid.
+> +	 */
 > +
-> +	rc = small_smb2_init(SMB2_TREE_DISCONNECT, tcon, (void **) &req);
-> +	if (rc)
-> +		return rc;
+> +	cifs_unix_basic_to_fattr(&fattr, info, cifs_sb);
+> +	cifs_fill_uniqueid(inode->i_sb, &fattr);
+> +	newinode = cifs_iget(inode->i_sb, &fattr);
+> +	if (!newinode)
+> +		goto posix_mkdir_get_info;
 > +
-> +	rc = SendReceiveNoRsp(xid, ses, (char *)&req->hdr, 0);
-> +	if (rc)
-> +		cifs_stats_fail_inc(tcon, SMB2_TREE_DISCONNECT_HE);
+> +	d_instantiate(dentry, newinode);
 > +
+> +#ifdef CONFIG_CIFS_DEBUG2
+> +	cFYI(1, "instantiated dentry %p %s to inode %p", dentry,
+> +	     dentry->d_name.name, newinode);
+> +
+> +	if (newinode->i_nlink != 2)
+> +		cFYI(1, "unexpected number of links %d", newinode->i_nlink);
+> +#endif
+> +
+> +posix_mkdir_out:
+> +	kfree(info);
 > +	return rc;
+> +posix_mkdir_get_info:
+> +	rc = cifs_mkdir_qinfo(inode, dentry, mode, full_path, cifs_sb, tcon,
+> +			      xid);
+> +	goto posix_mkdir_out;
 > +}
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index 26af68b..aa77bf3 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -224,4 +224,61 @@ struct smb2_logoff_rsp {
->  	__le16 Reserved;
->  } __packed;
+> +
+>  int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
+>  {
+> -	int rc = 0, tmprc;
+> +	int rc = 0;
+>  	unsigned int xid;
+>  	struct cifs_sb_info *cifs_sb;
+>  	struct tcon_link *tlink;
+>  	struct cifs_tcon *tcon;
+> -	char *full_path = NULL;
+> -	struct inode *newinode = NULL;
+> -	struct cifs_fattr fattr;
+> +	char *full_path;
 >  
-> +struct smb2_tree_connect_req {
-> +	struct smb2_hdr hdr;
-> +	__le16 StructureSize;	/* Must be 9 */
-> +	__le16 Reserved;
-> +	__le16 PathOffset;
-> +	__le16 PathLength;
-> +	__u8   Buffer[1];	/* variable length */
-> +} __packed;
-> +
-> +struct smb2_tree_connect_rsp {
-> +	struct smb2_hdr hdr;
-> +	__le16 StructureSize;	/* Must be 16 */
-> +	__u8   ShareType;  /* see below */
-> +	__u8   Reserved;
-> +	__le32 ShareFlags; /* see below */
-> +	__le32 Capabilities; /* see below */
-> +	__le32 MaximalAccess;
-> +} __packed;
-> +
-> +/* Possible ShareType values */
-> +#define SMB2_SHARE_TYPE_DISK	0x01
-> +#define SMB2_SHARE_TYPE_PIPE	0x02
-> +#define	SMB2_SHARE_TYPE_PRINT	0x03
-> +
-> +/*
-> + * Possible ShareFlags - exactly one and only one of the first 4 caching flags
-> + * must be set (any of the remaining, SHI1005, flags may be set individually
-> + * or in combination.
-> + */
-> +#define SMB2_SHAREFLAG_MANUAL_CACHING			0x00000000
-> +#define SMB2_SHAREFLAG_AUTO_CACHING			0x00000010
-> +#define SMB2_SHAREFLAG_VDO_CACHING			0x00000020
-> +#define SMB2_SHAREFLAG_NO_CACHING			0x00000030
-> +#define SHI1005_FLAGS_DFS				0x00000001
-> +#define SHI1005_FLAGS_DFS_ROOT				0x00000002
-> +#define SHI1005_FLAGS_RESTRICT_EXCLUSIVE_OPENS		0x00000100
-> +#define SHI1005_FLAGS_FORCE_SHARED_DELETE		0x00000200
-> +#define SHI1005_FLAGS_ALLOW_NAMESPACE_CACHING		0x00000400
-> +#define SHI1005_FLAGS_ACCESS_BASED_DIRECTORY_ENUM	0x00000800
-> +#define SHI1005_FLAGS_FORCE_LEVELII_OPLOCK		0x00001000
-> +#define SHI1005_FLAGS_ENABLE_HASH			0x00002000
-> +
-> +/* Possible share capabilities */
-> +#define SMB2_SHARE_CAP_DFS	cpu_to_le32(0x00000008)
-> +
-> +struct smb2_tree_disconnect_req {
-> +	struct smb2_hdr hdr;
-> +	__le16 StructureSize;	/* Must be 4 */
-> +	__le16 Reserved;
-> +} __packed;
-> +
-> +struct smb2_tree_disconnect_rsp {
-> +	struct smb2_hdr hdr;
-> +	__le16 StructureSize;	/* Must be 4 */
-> +	__le16 Reserved;
-> +} __packed;
-> +
->  #endif				/* _SMB2PDU_H */
-> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> index 9364fbc..bc72993 100644
-> --- a/fs/cifs/smb2proto.h
-> +++ b/fs/cifs/smb2proto.h
-> @@ -50,5 +50,9 @@ extern int SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses);
->  extern int SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
->  			   const struct nls_table *nls_cp);
->  extern int SMB2_logoff(const unsigned int xid, struct cifs_ses *ses);
-> +extern int SMB2_tcon(const unsigned int xid, struct cifs_ses *ses,
-> +		     const char *tree, struct cifs_tcon *tcon,
-> +		     const struct nls_table *);
-> +extern int SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon);
+>  	cFYI(1, "In cifs_mkdir, mode = 0x%hx inode = 0x%p", mode, inode);
 >  
->  #endif			/* _SMB2PROTO_H */
+> @@ -1248,145 +1397,23 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
+>  
+>  	if (cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
+>  				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
+> -		u32 oplock = 0;
+> -		FILE_UNIX_BASIC_INFO *pInfo =
+> -			kzalloc(sizeof(FILE_UNIX_BASIC_INFO), GFP_KERNEL);
+> -		if (pInfo == NULL) {
+> -			rc = -ENOMEM;
+> +		rc = cifs_posix_mkdir(inode, direntry, mode, full_path, cifs_sb,
+> +				      tcon, xid);
+> +		if (rc != -EOPNOTSUPP)
+>  			goto mkdir_out;
+> -		}
+> -
+> -		mode &= ~current_umask();
+> -		rc = CIFSPOSIXCreate(xid, tcon, SMB_O_DIRECTORY | SMB_O_CREAT,
+> -				mode, NULL /* netfid */, pInfo, &oplock,
+> -				full_path, cifs_sb->local_nls,
+> -				cifs_sb->mnt_cifs_flags &
+> -					CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -		if (rc == -EOPNOTSUPP) {
+> -			kfree(pInfo);
+> -			goto mkdir_retry_old;
+> -		} else if (rc) {
+> -			cFYI(1, "posix mkdir returned 0x%x", rc);
+> -			d_drop(direntry);
+> -		} else {
+> -			if (pInfo->Type == cpu_to_le32(-1)) {
+> -				/* no return info, go query for it */
+> -				kfree(pInfo);
+> -				goto mkdir_get_info;
+> -			}
+> -/*BB check (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID ) to see if need
+> -	to set uid/gid */
+> -
+> -			cifs_unix_basic_to_fattr(&fattr, pInfo, cifs_sb);
+> -			cifs_fill_uniqueid(inode->i_sb, &fattr);
+> -			newinode = cifs_iget(inode->i_sb, &fattr);
+> -			if (!newinode) {
+> -				kfree(pInfo);
+> -				goto mkdir_get_info;
+> -			}
+> -
+> -			d_instantiate(direntry, newinode);
+> -
+> -#ifdef CONFIG_CIFS_DEBUG2
+> -			cFYI(1, "instantiated dentry %p %s to inode %p",
+> -				direntry, direntry->d_name.name, newinode);
+> -
+> -			if (newinode->i_nlink != 2)
+> -				cFYI(1, "unexpected number of links %d",
+> -					newinode->i_nlink);
+> -#endif
+> -		}
+> -		kfree(pInfo);
+> -		goto mkdir_out;
+>  	}
+> -mkdir_retry_old:
+> +
+>  	/* BB add setting the equivalent of mode via CreateX w/ACLs */
+>  	rc = CIFSSMBMkDir(xid, tcon, full_path, cifs_sb->local_nls,
+>  			  cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
+>  	if (rc) {
+>  		cFYI(1, "cifs_mkdir returned 0x%x", rc);
+>  		d_drop(direntry);
+> -	} else {
+> -mkdir_get_info:
+> -		if (tcon->unix_ext)
+> -			rc = cifs_get_inode_info_unix(&newinode, full_path,
+> -						      inode->i_sb, xid);
+> -		else
+> -			rc = cifs_get_inode_info(&newinode, full_path, NULL,
+> -						 inode->i_sb, xid, NULL);
+> -
+> -		d_instantiate(direntry, newinode);
+> -		 /* setting nlink not necessary except in cases where we
+> -		  * failed to get it from the server or was set bogus */
+> -		if ((direntry->d_inode) && (direntry->d_inode->i_nlink < 2))
+> -			set_nlink(direntry->d_inode, 2);
+> -
+> -		mode &= ~current_umask();
+> -		/* must turn on setgid bit if parent dir has it */
+> -		if (inode->i_mode & S_ISGID)
+> -			mode |= S_ISGID;
+> -
+> -		if (tcon->unix_ext) {
+> -			struct cifs_unix_set_info_args args = {
+> -				.mode	= mode,
+> -				.ctime	= NO_CHANGE_64,
+> -				.atime	= NO_CHANGE_64,
+> -				.mtime	= NO_CHANGE_64,
+> -				.device	= 0,
+> -			};
+> -			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
+> -				args.uid = (__u64)current_fsuid();
+> -				if (inode->i_mode & S_ISGID)
+> -					args.gid = (__u64)inode->i_gid;
+> -				else
+> -					args.gid = (__u64)current_fsgid();
+> -			} else {
+> -				args.uid = NO_CHANGE_64;
+> -				args.gid = NO_CHANGE_64;
+> -			}
+> -			CIFSSMBUnixSetPathInfo(xid, tcon, full_path, &args,
+> -					       cifs_sb->local_nls,
+> -					       cifs_sb->mnt_cifs_flags &
+> -						CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -		} else {
+> -			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
+> -			    (mode & S_IWUGO) == 0) {
+> -				FILE_BASIC_INFO pInfo;
+> -				struct cifsInodeInfo *cifsInode;
+> -				u32 dosattrs;
+> -
+> -				memset(&pInfo, 0, sizeof(pInfo));
+> -				cifsInode = CIFS_I(newinode);
+> -				dosattrs = cifsInode->cifsAttrs|ATTR_READONLY;
+> -				pInfo.Attributes = cpu_to_le32(dosattrs);
+> -				tmprc = CIFSSMBSetPathInfo(xid, tcon,
+> -						full_path, &pInfo,
+> -						cifs_sb->local_nls,
+> -						cifs_sb->mnt_cifs_flags &
+> -						CIFS_MOUNT_MAP_SPECIAL_CHR);
+> -				if (tmprc == 0)
+> -					cifsInode->cifsAttrs = dosattrs;
+> -			}
+> -			if (direntry->d_inode) {
+> -				if (cifs_sb->mnt_cifs_flags &
+> -				     CIFS_MOUNT_DYNPERM)
+> -					direntry->d_inode->i_mode =
+> -						(mode | S_IFDIR);
+> -
+> -				if (cifs_sb->mnt_cifs_flags &
+> -				     CIFS_MOUNT_SET_UID) {
+> -					direntry->d_inode->i_uid =
+> -						current_fsuid();
+> -					if (inode->i_mode & S_ISGID)
+> -						direntry->d_inode->i_gid =
+> -							inode->i_gid;
+> -					else
+> -						direntry->d_inode->i_gid =
+> -							current_fsgid();
+> -				}
+> -			}
+> -		}
+> +		goto mkdir_out;
+>  	}
+> +
+> +	rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb, tcon,
+> +			      xid);
+>  mkdir_out:
+>  	/*
+>  	 * Force revalidate to get parent dir info when needed since cached
 
+Nice cleanup...
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
