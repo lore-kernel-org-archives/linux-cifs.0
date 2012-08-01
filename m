@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: [PATCH v2 3/9] cifs: cork the socket before a send and uncork
  it afterward
-Date: Wed, 1 Aug 2012 09:45:42 -0400
-Message-ID: <20120801094542.10220150@tlielax.poochiereds.net>
+Date: Wed, 1 Aug 2012 10:34:35 -0400
+Message-ID: <20120801103435.17d5c75a@tlielax.poochiereds.net>
 References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 	<1343231652-10459-4-git-send-email-jlayton@redhat.com>
 	<CAKywueQDJax9SqN95ZKbBmjtxZZs4Y34H5Xi3N3AJtiG09uVpw@mail.gmail.com>
@@ -172,17 +172,13 @@ Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > without this patch for 3.6 and delay this patch for 3.7 - we will have
 > much time to investigate this strange behavior?
 > 
-> Thoughts?
-> 
 
-If the server isn't responding then that seems like something is broken
-on the server. Maybe you have a broken network driver? Do you have any
-captures?
+This really sounds like you just have a defective network driver (or
+hardware) on your windows machine. What sort of hardware does this
+windows machine have and what driver are you running on it?
 
-I don't think we should ship w/o the TCP_CORK code unless there is
-clear evidence that it's a problem on the Linux end. We really don't
-want the server sending half-baked SMBs, and that's much more likely to
-occur if you don't cork the socket prior to sending.
+Also, was my testing not using multicredit requests? If not, how do I
+enable them? I'd like to try and reproduce this if possible.
 
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
