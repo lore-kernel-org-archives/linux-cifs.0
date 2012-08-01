@@ -1,203 +1,98 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 03/45] CIFS: Separate protocol specific part from mkdir
-Date: Wed, 1 Aug 2012 15:41:46 -0400
-Message-ID: <20120801154146.6b0d610b@tlielax.poochiereds.net>
+Subject: Re: [PATCH 04/45] CIFS: Add SMB2 support for mkdir operation
+Date: Wed, 1 Aug 2012 15:42:15 -0400
+Message-ID: <20120801154215.22af57de@tlielax.poochiereds.net>
 References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
-	<1342626541-29872-4-git-send-email-pshilovsky@samba.org>
+	<1342626541-29872-5-git-send-email-pshilovsky@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1342626541-29872-4-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1342626541-29872-5-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 18 Jul 2012 19:48:19 +0400
+On Wed, 18 Jul 2012 19:48:20 +0400
 Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h  |    7 +++++++
->  fs/cifs/cifsproto.h |    4 +---
->  fs/cifs/cifssmb.c   |    8 +++++---
->  fs/cifs/inode.c     |   32 +++++++++++++-------------------
->  fs/cifs/smb1ops.c   |   23 +++++++++++++++++++++++
->  5 files changed, 49 insertions(+), 25 deletions(-)
+>  fs/cifs/smb2inode.c |   30 ++++++++++++++++++++++++++++++
+>  fs/cifs/smb2ops.c   |    2 ++
+>  fs/cifs/smb2proto.h |    6 ++++++
+>  3 files changed, 38 insertions(+), 0 deletions(-)
 > 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 5695693..1ae7531 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -246,6 +246,13 @@ struct smb_version_operations {
->  	bool (*can_echo)(struct TCP_Server_Info *);
->  	/* send echo request */
->  	int (*echo)(struct TCP_Server_Info *);
-> +	/* create directory */
-> +	int (*mkdir)(const unsigned int, struct cifs_tcon *, const char *,
-> +		     struct cifs_sb_info *);
-> +	/* set info on created directory */
-> +	void (*mkdir_setinfo)(struct inode *, const char *,
-> +			      struct cifs_sb_info *, struct cifs_tcon *,
-> +			      const unsigned int);
-
-Do we really need a "mkdir_setinfo"? Why not just a "set inode info by
-path" op that would be a little more general purpose?
-
->  };
->  
->  struct smb_version_values {
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 51fbdf2..7e02362 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -295,9 +295,7 @@ extern int CIFSSMBUnixSetPathInfo(const unsigned int xid,
->  				  int remap);
->  
->  extern int CIFSSMBMkDir(const unsigned int xid, struct cifs_tcon *tcon,
-> -			const char *newName,
-> -			const struct nls_table *nls_codepage,
-> -			int remap_special_chars);
-> +			const char *name, struct cifs_sb_info *cifs_sb);
->  extern int CIFSSMBRmDir(const unsigned int xid, struct cifs_tcon *tcon,
->  			const char *name, const struct nls_table *nls_codepage,
->  			int remap_special_chars);
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index ed472aa..d49eedf 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -992,14 +992,15 @@ RmDirRetry:
+> diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+> index 1ba5c40..e129527 100644
+> --- a/fs/cifs/smb2inode.c
+> +++ b/fs/cifs/smb2inode.c
+> @@ -122,3 +122,33 @@ out:
+>  	kfree(smb2_data);
+>  	return rc;
 >  }
->  
->  int
-> -CIFSSMBMkDir(const unsigned int xid, struct cifs_tcon *tcon,
-> -	     const char *name, const struct nls_table *nls_codepage, int remap)
-> +CIFSSMBMkDir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
-> +	     struct cifs_sb_info *cifs_sb)
->  {
->  	int rc = 0;
->  	CREATE_DIRECTORY_REQ *pSMB = NULL;
->  	CREATE_DIRECTORY_RSP *pSMBr = NULL;
->  	int bytes_returned;
->  	int name_len;
-> +	int remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
->  
->  	cFYI(1, "In CIFSSMBMkDir");
->  MkDirRetry:
-> @@ -1010,7 +1011,8 @@ MkDirRetry:
->  
->  	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
->  		name_len = cifsConvertToUTF16((__le16 *) pSMB->DirName, name,
-> -					      PATH_MAX, nls_codepage, remap);
-> +					      PATH_MAX, cifs_sb->local_nls,
-> +					      remap);
->  		name_len++;	/* trailing null */
->  		name_len *= 2;
->  	} else {		/* BB improve check for buffer overruns BB */
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index e9ba1a1..d7e74b1 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1272,24 +1272,11 @@ cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
->  				       cifs_sb->mnt_cifs_flags &
->  				       CIFS_MOUNT_MAP_SPECIAL_CHR);
->  	} else {
-> +		struct TCP_Server_Info *server = tcon->ses->server;
->  		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
-> -		    (mode & S_IWUGO) == 0) {
-> -			FILE_BASIC_INFO info;
-> -			struct cifsInodeInfo *cifsInode;
-> -			u32 dosattrs;
-> -			int tmprc;
-> -
-> -			memset(&info, 0, sizeof(info));
-> -			cifsInode = CIFS_I(newinode);
-> -			dosattrs = cifsInode->cifsAttrs|ATTR_READONLY;
-> -			info.Attributes = cpu_to_le32(dosattrs);
-> -			tmprc = CIFSSMBSetPathInfo(xid, tcon, full_path, &info,
-> -						   cifs_sb->local_nls,
-> -						   cifs_sb->mnt_cifs_flags &
-> -						   CIFS_MOUNT_MAP_SPECIAL_CHR);
-> -			if (tmprc == 0)
-> -				cifsInode->cifsAttrs = dosattrs;
-> -		}
-> +		    (mode & S_IWUGO) == 0 && server->ops->mkdir_setinfo)
-> +			server->ops->mkdir_setinfo(newinode, full_path, cifs_sb,
-> +						   tcon, xid);
->  		if (dentry->d_inode) {
->  			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
->  				dentry->d_inode->i_mode = (mode | S_IFDIR);
-> @@ -1377,6 +1364,7 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
->  	struct cifs_sb_info *cifs_sb;
->  	struct tcon_link *tlink;
->  	struct cifs_tcon *tcon;
-> +	struct TCP_Server_Info *server;
->  	char *full_path;
->  
->  	cFYI(1, "In cifs_mkdir, mode = 0x%hx inode = 0x%p", mode, inode);
-> @@ -1403,9 +1391,15 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
->  			goto mkdir_out;
->  	}
->  
-> +	server = tcon->ses->server;
 > +
-> +	if (!server->ops->mkdir) {
-> +		rc = -ENOSYS;
-> +		goto mkdir_out;
-> +	}
+> +int
+> +smb2_mkdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+> +	   struct cifs_sb_info *cifs_sb)
+> +{
+> +	return smb2_open_op_close(xid, tcon, cifs_sb, name,
+> +				  FILE_WRITE_ATTRIBUTES, FILE_CREATE, 0,
+> +				  CREATE_NOT_FILE, NULL, SMB2_OP_MKDIR);
+> +}
 > +
->  	/* BB add setting the equivalent of mode via CreateX w/ACLs */
-> -	rc = CIFSSMBMkDir(xid, tcon, full_path, cifs_sb->local_nls,
-> -			  cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR);
-> +	rc = server->ops->mkdir(xid, tcon, full_path, cifs_sb);
->  	if (rc) {
->  		cFYI(1, "cifs_mkdir returned 0x%x", rc);
->  		d_drop(direntry);
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index c40356d..861e2df 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -586,6 +586,27 @@ cifs_print_stats(struct seq_file *m, struct cifs_tcon *tcon)
->  #endif
->  }
->  
-> +static void
-> +cifs_mkdir_setinfo(struct inode *inode, const char *full_path,
+> +void
+> +smb2_mkdir_setinfo(struct inode *inode, const char *name,
 > +		   struct cifs_sb_info *cifs_sb, struct cifs_tcon *tcon,
 > +		   const unsigned int xid)
 > +{
-> +	FILE_BASIC_INFO info;
-> +	struct cifsInodeInfo *cifsInode;
+> +	FILE_BASIC_INFO data;
+> +	struct cifsInodeInfo *cifs_i;
 > +	u32 dosattrs;
-> +	int rc;
+> +	int tmprc;
 > +
-> +	memset(&info, 0, sizeof(info));
-> +	cifsInode = CIFS_I(inode);
-> +	dosattrs = cifsInode->cifsAttrs|ATTR_READONLY;
-> +	info.Attributes = cpu_to_le32(dosattrs);
-> +	rc = CIFSSMBSetPathInfo(xid, tcon, full_path, &info, cifs_sb->local_nls,
-> +				cifs_sb->mnt_cifs_flags &
-> +						CIFS_MOUNT_MAP_SPECIAL_CHR);
-> +	if (rc == 0)
-> +		cifsInode->cifsAttrs = dosattrs;
+> +	memset(&data, 0, sizeof(data));
+> +	cifs_i = CIFS_I(inode);
+> +	dosattrs = cifs_i->cifsAttrs | ATTR_READONLY;
+> +	data.Attributes = cpu_to_le32(dosattrs);
+> +	tmprc = smb2_open_op_close(xid, tcon, cifs_sb, name,
+> +				   FILE_WRITE_ATTRIBUTES, FILE_CREATE, 0,
+> +				   CREATE_NOT_FILE, &data, SMB2_OP_SET_INFO);
+> +	if (tmprc == 0)
+> +		cifs_i->cifsAttrs = dosattrs;
 > +}
-> +
->  struct smb_version_operations smb1_operations = {
->  	.send_cancel = send_nt_cancel,
->  	.compare_fids = cifs_compare_fids,
-> @@ -620,6 +641,8 @@ struct smb_version_operations smb1_operations = {
->  	.get_srv_inum = cifs_get_srv_inum,
->  	.build_path_to_root = cifs_build_path_to_root,
->  	.echo = CIFSSMBEcho,
-> +	.mkdir = CIFSSMBMkDir,
-> +	.mkdir_setinfo = cifs_mkdir_setinfo,
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 410cf92..cc74871 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -318,6 +318,8 @@ struct smb_version_operations smb21_operations = {
+>  	.query_path_info = smb2_query_path_info,
+>  	.get_srv_inum = smb2_get_srv_inum,
+>  	.build_path_to_root = smb2_build_path_to_root,
+> +	.mkdir = smb2_mkdir,
+> +	.mkdir_setinfo = smb2_mkdir_setinfo,
 >  };
 >  
->  struct smb_version_values smb1_values = {
+>  struct smb_version_values smb21_values = {
+> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+> index 902bbe2..f992508 100644
+> --- a/fs/cifs/smb2proto.h
+> +++ b/fs/cifs/smb2proto.h
+> @@ -52,6 +52,12 @@ extern int smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+>  				struct cifs_sb_info *cifs_sb,
+>  				const char *full_path, FILE_ALL_INFO *data,
+>  				bool *adjust_tz);
+> +extern int smb2_mkdir(const unsigned int xid, struct cifs_tcon *tcon,
+> +		      const char *name, struct cifs_sb_info *cifs_sb);
+> +extern void smb2_mkdir_setinfo(struct inode *inode, const char *full_path,
+> +			       struct cifs_sb_info *cifs_sb,
+> +			       struct cifs_tcon *tcon, const unsigned int xid);
+> +
+>  /*
+>   * SMB2 Worker functions - most of protocol specific implementation details
+>   * are contained within these calls.
 
-That can be done in a later patch though...
-
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
