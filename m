@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH v2 3/9] cifs: cork the socket before a send and uncork it afterward
-Date: Sat, 4 Aug 2012 22:49:53 +0200
-Message-ID: <CAKywueTK1WLySFo6UMFEMiiEeUsGO8Z26m0FA29KQckPL7A+_w@mail.gmail.com>
+Date: Sat, 4 Aug 2012 22:51:19 +0200
+Message-ID: <CAKywueS9od5oyL77gT47QwB0tNt-DLkDxGgmntp751CESxNx=w@mail.gmail.com>
 References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 	<1343231652-10459-4-git-send-email-jlayton@redhat.com>
 	<CAKywueQDJax9SqN95ZKbBmjtxZZs4Y34H5Xi3N3AJtiG09uVpw@mail.gmail.com>
@@ -12,7 +12,7 @@ References: <1343231652-10459-1-git-send-email-jlayton@redhat.com>
 	<20120730211753.7a22e740@corrin.poochiereds.net>
 	<20120731072414.185b1ff0@corrin.poochiereds.net>
 	<CAKywueSRgfTstMkWNHYqS-OXGF7wSnVwE57zcWasvAiAZTTT3w@mail.gmail.com>
-	<20120801103435.17d5c75a@tlielax.poochiereds.net>
+	<20120801094542.10220150@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7BIT
@@ -20,7 +20,7 @@ Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, smfrench-Re5J
 	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120801103435.17d5c75a-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20120801094542.10220150-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
@@ -173,20 +173,14 @@ List-ID: <linux-cifs.vger.kernel.org>
 >> without this patch for 3.6 and delay this patch for 3.7 - we will have
 >> much time to investigate this strange behavior?
 >>
+>> Thoughts?
+>>
 >
-> This really sounds like you just have a defective network driver (or
-> hardware) on your windows machine. What sort of hardware does this
-> windows machine have and what driver are you running on it?
+> If the server isn't responding then that seems like something is broken
+> on the server. Maybe you have a broken network driver? Do you have any
+> captures?
 
-It's LAN adapter that is on board on asus p5k se motherboard.
-
->
-> Also, was my testing not using multicredit requests? If not, how do I
-> enable them? I'd like to try and reproduce this if possible.
-
-If you set rsize/wsize to 1M the client uses multicredit requests
-because according to SMB2 protocol one credit wasts on 64K payload -
-seems you have already done it.
+Now I don't have them but I can collect captures when return from vacations.
 
 -- 
 Best regards,
