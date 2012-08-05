@@ -1,40 +1,35 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Ubuntu SecurityFlags at boot
-Date: Sun, 5 Aug 2012 10:29:39 -0500
-Message-ID: <CAH2r5mvHpv5mFGNyq7gheMkMuXHqKWeSLaVTnwZtVam65hfHvw@mail.gmail.com>
-References: <S1753625Ab2HELY7/20120805112459Z+242@vger.kernel.org>
-	<484724139.8236317.1344166282900.JavaMail.root@zimbra76-e14.priv.proxad.net>
+From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: The MID value 0xFFFF for CIFS ...
+Date: Sun, 5 Aug 2012 12:54:54 -0700
+Message-ID: <CACyXjPw4++WPF-UH-0LQHUQom0dA_dob6W_UP6=7B=0XVRy7Ng@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: blueduck-GANU6spQydw@public.gmane.org
+Content-Type: text/plain; charset=Big5
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <484724139.8236317.1344166282900.JavaMail.root-TwAYtqM7ZI5mpWzFTGZ+Dhh1pbbyJDp15NbjCUgZEJk@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It would be possible to build cifs.ko to enable plain text passwords
-permanently, but may be simpler to just set this in one of the init
-scripts.  Generally we want to discourage anyone from using
-authentication types other than ntlmv2 and kerberos for obvious
-security reasons.
+Hi folks,
 
-On Sun, Aug 5, 2012 at 6:31 AM,  <blueduck-GANU6spQydw@public.gmane.org> wrote:
-> Hi,
->
-> Looking at fs/cifs/README, I managed to mount shares with plaintext passwords (using Kubuntu 12.04) with "echo 0x30030 > /proc/fs/cifs/SecurityFlags". But it as to be done after each boot.
->
-> Is there any configuration file to modify to make the change permanent?
->
-> Regards.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+[MS-CIFS] in section 2.2.1.6.2 says, in part:
 
+---------------
+The value 0xFFFF MUST NOT be used as a valid MID. All other possible
+values for MID, including
+zero (0x0000), are valid. The value 0xFFFF is used in an OpLock Break
+Notification request,
+which is an SMB_COM_LOCKING_ANDX Request (section 2.2.4.32.1) sent
+from the server.
+---------------
 
+However, in smb1ops.c:cifs_get_next_mid I do not see where a MID value
+of 0xFFFF is skipped.
 
--- 
-Thanks,
+Perhaps it is done somewhere else that I have not found, and if so,
+could someone point it out to me?
 
-Steve
+--
+Regards,
+Richard Sharpe
+(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
