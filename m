@@ -1,7 +1,7 @@
 From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: These constants are ugly ...
-Date: Sun, 5 Aug 2012 15:17:25 -0700
-Message-ID: <CACyXjPxhb9JbL05fTdtqb_QPB3GgSG8AuqKatdvAAeAS3UJJ9A@mail.gmail.com>
+Subject: First steps towards using socket callbacks: Elimination of the cifs_demultiplex_thread
+Date: Sun, 5 Aug 2012 16:18:25 -0700
+Message-ID: <CACyXjPyvo++C4JRpvK_RtBPK846+N02WFqanUtqOMUOL0MEMKw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=Big5
 Content-Transfer-Encoding: QUOTED-PRINTABLE
@@ -12,24 +12,26 @@ List-ID: <linux-cifs.vger.kernel.org>
 
 Hi folks,
 
-This use of constants seems ugly:
+I think it is possible to convert the CIFS code to using the socket
+callbacks in a step-by-step process.
 
-                /* make sure we have enough to get to the MID */
-                if (pdu_length < HEADER_SIZE(server) - 1 - 4) {
-                        cERROR(1, "SMB response too short (%u bytes)",
-                                pdu_length);
-                        cifs_reconnect(server);
-                        wake_up(&server->response_q);
-                        continue;
-                }
+It seems possible to eliminate the cifs_demultiplex_thread by using
+the sk_data_ready callback on the socket structure
+(server->ssocket->sk) to drive the receipt of incoming data on the TCP
+connection and have the callback drive the processing that is done in
+the main loop of the cifs_demultiplex_thread.
 
-While the 4 is obvious, the 1 is not, and would seem to lead to
-getting all but one byte in the case of SMB2 headers.
+Obviously, there will be a number of details to get correct, and in
+particular, the handling of socket errors and reconnect might take
+some work because we are called in a different context than the thread
+context.
 
-Why can't HEADER_SIZE be MIN_HEADER_SIZE or something like that and be
-defined in smb?ops.c as the appropriate thing? In the case of CIFS, it
-would be sizeof(struct smb_hdr) - 1 and in the case of SMB2 it would
-be sizeof(struct smb2_hdr).
+This would also seem to allow me to unite the RDMA case if I ever get
+to that ...
+
+However, what I worry about is the possibility of stalls/deadlocks.
+
+Thoughts?
 
 --=20
 Regards,
