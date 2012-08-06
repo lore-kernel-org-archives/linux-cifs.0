@@ -1,46 +1,47 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: The MID value 0xFFFF for CIFS ...
-Date: Sun, 5 Aug 2012 21:09:55 -0500
-Message-ID: <CAH2r5mtx_ccovybybsWiBwzziq338mm2A1ey4fdVJakEyMkCrA@mail.gmail.com>
-References: <CACyXjPw4++WPF-UH-0LQHUQom0dA_dob6W_UP6=7B=0XVRy7Ng@mail.gmail.com>
+From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: First steps towards using socket callbacks: Elimination of the cifs_demultiplex_thread
+Date: Sun, 5 Aug 2012 20:26:29 -0700
+Message-ID: <CACyXjPwsRhCjmt1R3EWbuYEPkcOvT45h9t+f09Sg8zFcWnWrDQ@mail.gmail.com>
+References: <CACyXjPyvo++C4JRpvK_RtBPK846+N02WFqanUtqOMUOL0MEMKw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=Big5
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACyXjPw4++WPF-UH-0LQHUQom0dA_dob6W_UP6=7B=0XVRy7Ng-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CACyXjPyvo++C4JRpvK_RtBPK846+N02WFqanUtqOMUOL0MEMKw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Aug 5, 2012 at 2:54 PM, Richard Sharpe
+On Sun, Aug 5, 2012 at 4:18 PM, Richard Sharpe
 <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > Hi folks,
 >
-> [MS-CIFS] in section 2.2.1.6.2 says, in part:
+> I think it is possible to convert the CIFS code to using the socket
+> callbacks in a step-by-step process.
 >
-> ---------------
-> The value 0xFFFF MUST NOT be used as a valid MID. All other possible
-> values for MID, including
-> zero (0x0000), are valid. The value 0xFFFF is used in an OpLock Break
-> Notification request,
-> which is an SMB_COM_LOCKING_ANDX Request (section 2.2.4.32.1) sent
-> from the server.
-> ---------------
+> It seems possible to eliminate the cifs_demultiplex_thread by using
+> the sk_data_ready callback on the socket structure
+> (server->ssocket->sk) to drive the receipt of incoming data on the TC=
+P
+> connection and have the callback drive the processing that is done in
+> the main loop of the cifs_demultiplex_thread.
 >
-> However, in smb1ops.c:cifs_get_next_mid I do not see where a MID value
-> of 0xFFFF is skipped.
+> Obviously, there will be a number of details to get correct, and in
+> particular, the handling of socket errors and reconnect might take
+> some work because we are called in a different context than the threa=
+d
+> context.
 >
-> Perhaps it is done somewhere else that I have not found, and if so,
-> could someone point it out to me?
+> This would also seem to allow me to unite the RDMA case if I ever get
+> to that ...
+>
+> However, what I worry about is the possibility of stalls/deadlocks.
 
-I don't see a place where this was checked, and cifs.ko has been doing
-this presumably before MS-CIFS was published. Apparently has not been
-causing problems having a mid of 0xFFFF from time to time, but might
-as well fix it so we never send such a mid.
+I think I will also have to use the sk_state_change callback to handle
+connections that have gone away, and then queue work to a workqueue to
+process things like cifs_reconnect.
 
-
-
--- 
-Thanks,
-
-Steve
+--=20
+Regards,
+Richard Sharpe
+(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
