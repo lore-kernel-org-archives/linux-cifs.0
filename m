@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v3 01/15] cifs: change signing routines to deal with smb_rqst structs
-Date: Mon,  6 Aug 2012 07:30:58 -0400
-Message-ID: <1344252672-15244-2-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 03/15] cifs: convert send code to use smb_rqst structs
+Date: Mon,  6 Aug 2012 07:31:00 -0400
+Message-ID: <1344252672-15244-4-git-send-email-jlayton@redhat.com>
 References: <1344252672-15244-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,207 +10,221 @@ In-Reply-To: <1344252672-15244-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We need a way to represent a call to be sent on the wire that does not
-require having all of the page data kmapped. Behold the smb_rqst struct.
-This new struct represents an array of kvecs immediately followed by an
-array of pages.
+Again, just a change in the arguments and some function renaming here.
+In later patches, we'll change this code to deal with page arrays.
 
-Convert the signing routines to use these structs under the hood and
-turn the existing functions for this into wrappers around that. For now,
-we're just changing these functions to take different args. Later, we'll
-teach them how to deal with arrays of pages.
+In this patch, we add a new smb_send_rqst wrapper and have smb_sendv
+call that. Then we move most of the existing smb_sendv code into a new
+function -- smb_send_kvec. This seems a little redundant, but later
+we'll flesh this out to deal with arrays of pages.
 
 Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c | 26 ++++++++++++++++++--------
- fs/cifs/cifsglob.h    | 14 ++++++++++++++
- fs/cifs/cifsproto.h   |  7 +++++--
- fs/cifs/cifssmb.c     |  7 ++++---
- fs/cifs/transport.c   |  4 +++-
- 5 files changed, 44 insertions(+), 14 deletions(-)
+ fs/cifs/transport.c | 135 ++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 90 insertions(+), 45 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 724738c..af52052 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -37,11 +37,13 @@
-  * the sequence number before this function is called. Also, this function
-  * should be called with the server->srv_mutex held.
-  */
--static int cifs_calc_signature(const struct kvec *iov, int n_vec,
-+static int cifs_calc_signature(struct smb_rqst *rqst,
- 			struct TCP_Server_Info *server, char *signature)
- {
- 	int i;
- 	int rc;
-+	struct kvec *iov = rqst->rq_iov;
-+	int n_vec = rqst->rq_nvec;
- 
- 	if (iov == NULL || signature == NULL || server == NULL)
- 		return -EINVAL;
-@@ -99,12 +101,12 @@ static int cifs_calc_signature(const struct kvec *iov, int n_vec,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index bc9ccdd..766307b 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -119,18 +119,29 @@ cifs_delete_mid(struct mid_q_entry *mid)
+ 	DeleteMidQEntry(mid);
  }
  
- /* must be called with server->srv_mutex held */
--int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
-+int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 		   __u32 *pexpected_response_sequence_number)
++/*
++ * smb_send_kvec - send an array of kvecs to the server
++ * @server:	Server to send the data to
++ * @iov:	Pointer to array of kvecs
++ * @n_vec:	length of kvec array
++ * @sent:	amount of data sent on socket is stored here
++ *
++ * Our basic "send data to server" function. Should be called with srv_mutex
++ * held. The caller is responsible for handling the results.
++ */
+ static int
+-smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
++smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
++		size_t *sent)
  {
  	int rc = 0;
- 	char smb_signature[20];
--	struct smb_hdr *cifs_pdu = (struct smb_hdr *)iov[0].iov_base;
-+	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+ 	int i = 0;
+ 	struct msghdr smb_msg;
+-	unsigned int len = iov[0].iov_len;
+-	unsigned int total_len;
+-	int first_vec = 0;
+-	unsigned int smb_buf_length = get_rfc1002_length(iov[0].iov_base);
++	unsigned int remaining;
++	size_t first_vec = 0;
+ 	struct socket *ssocket = server->ssocket;
  
- 	if ((cifs_pdu == NULL) || (server == NULL))
- 		return -EINVAL;
-@@ -125,7 +127,7 @@ int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
- 	*pexpected_response_sequence_number = server->sequence_number++;
- 	server->sequence_number++;
++	*sent = 0;
++
+ 	if (ssocket == NULL)
+ 		return -ENOTSOCK; /* BB eventually add reconnect code here */
  
--	rc = cifs_calc_signature(iov, n_vec, server, smb_signature);
-+	rc = cifs_calc_signature(rqst, server, smb_signature);
- 	if (rc)
- 		memset(cifs_pdu->Signature.SecuritySignature, 0, 8);
+@@ -143,56 +154,60 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
  	else
-@@ -134,6 +136,15 @@ int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
+ 		smb_msg.msg_flags = MSG_NOSIGNAL;
+ 
+-	total_len = 0;
++	remaining = 0;
+ 	for (i = 0; i < n_vec; i++)
+-		total_len += iov[i].iov_len;
+-
+-	cFYI(1, "Sending smb:  total_len %d", total_len);
+-	dump_smb(iov[0].iov_base, len);
++		remaining += iov[i].iov_len;
+ 
+ 	i = 0;
+-	while (total_len) {
++	while (remaining) {
++		/*
++		 * If blocking send, we try 3 times, since each can block
++		 * for 5 seconds. For nonblocking  we have to try more
++		 * but wait increasing amounts of time allowing time for
++		 * socket to clear.  The overall time we wait in either
++		 * case to send on the socket is about 15 seconds.
++		 * Similarly we wait for 15 seconds for a response from
++		 * the server in SendReceive[2] for the server to send
++		 * a response back for most types of requests (except
++		 * SMB Write past end of file which can be slow, and
++		 * blocking lock operations). NFS waits slightly longer
++		 * than CIFS, but this can make it take longer for
++		 * nonresponsive servers to be detected and 15 seconds
++		 * is more than enough time for modern networks to
++		 * send a packet.  In most cases if we fail to send
++		 * after the retries we will kill the socket and
++		 * reconnect which may clear the network problem.
++		 */
+ 		rc = kernel_sendmsg(ssocket, &smb_msg, &iov[first_vec],
+-				    n_vec - first_vec, total_len);
+-		if ((rc == -ENOSPC) || (rc == -EAGAIN)) {
++				    n_vec - first_vec, remaining);
++		if (rc == -ENOSPC || rc == -EAGAIN) {
+ 			i++;
+-			/*
+-			 * If blocking send we try 3 times, since each can block
+-			 * for 5 seconds. For nonblocking  we have to try more
+-			 * but wait increasing amounts of time allowing time for
+-			 * socket to clear.  The overall time we wait in either
+-			 * case to send on the socket is about 15 seconds.
+-			 * Similarly we wait for 15 seconds for a response from
+-			 * the server in SendReceive[2] for the server to send
+-			 * a response back for most types of requests (except
+-			 * SMB Write past end of file which can be slow, and
+-			 * blocking lock operations). NFS waits slightly longer
+-			 * than CIFS, but this can make it take longer for
+-			 * nonresponsive servers to be detected and 15 seconds
+-			 * is more than enough time for modern networks to
+-			 * send a packet.  In most cases if we fail to send
+-			 * after the retries we will kill the socket and
+-			 * reconnect which may clear the network problem.
+-			 */
+-			if ((i >= 14) || (!server->noblocksnd && (i > 2))) {
+-				cERROR(1, "sends on sock %p stuck for 15 seconds",
+-				    ssocket);
++			if (i >= 14 || (!server->noblocksnd && (i > 2))) {
++				cERROR(1, "sends on sock %p stuck for 15 "
++					  "seconds", ssocket);
+ 				rc = -EAGAIN;
+ 				break;
+ 			}
+ 			msleep(1 << i);
+ 			continue;
+ 		}
++
+ 		if (rc < 0)
+ 			break;
+ 
+-		if (rc == total_len) {
+-			total_len = 0;
++		/* send was at least partially successful */
++		*sent += rc;
++
++		if (rc == remaining) {
++			remaining = 0;
+ 			break;
+-		} else if (rc > total_len) {
+-			cERROR(1, "sent %d requested %d", rc, total_len);
++		}
++
++		if (rc > remaining) {
++			cERROR(1, "sent %d requested %d", rc, remaining);
+ 			break;
+ 		}
++
+ 		if (rc == 0) {
+ 			/* should never happen, letting socket clear before
+ 			   retrying is our only obvious option here */
+@@ -200,7 +215,9 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
+ 			msleep(500);
+ 			continue;
+ 		}
+-		total_len -= rc;
++
++		remaining -= rc;
++
+ 		/* the line below resets i */
+ 		for (i = first_vec; i < n_vec; i++) {
+ 			if (iov[i].iov_len) {
+@@ -215,16 +232,35 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
+ 				}
+ 			}
+ 		}
++
+ 		i = 0; /* in case we get ENOSPC on the next send */
++		rc = 0;
+ 	}
++	return rc;
++}
++
++static int
++smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
++{
++	int rc;
++	struct kvec *iov = rqst->rq_iov;
++	int n_vec = rqst->rq_nvec;
++	unsigned int smb_buf_length = get_rfc1002_length(iov[0].iov_base);
++	size_t total_len;
++
++	cFYI(1, "Sending smb: smb_len=%u", smb_buf_length);
++	dump_smb(iov[0].iov_base, iov[0].iov_len);
++
++	rc = smb_send_kvec(server, iov, n_vec, &total_len);
+ 
+ 	if ((total_len > 0) && (total_len != smb_buf_length + 4)) {
+-		cFYI(1, "partial send (%d remaining), terminating session",
+-			total_len);
+-		/* If we have only sent part of an SMB then the next SMB
+-		   could be taken as the remainder of this one.  We need
+-		   to kill the socket so the server throws away the partial
+-		   SMB */
++		cFYI(1, "partial send (wanted=%u sent=%zu): terminating "
++			"session", smb_buf_length + 4, total_len);
++		/*
++		 * If we have only sent part of an SMB then the next SMB could
++		 * be taken as the remainder of this one. We need to kill the
++		 * socket so the server throws away the partial SMB
++		 */
+ 		server->tcpStatus = CifsNeedReconnect;
+ 	}
+ 
+@@ -236,6 +272,15 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
  	return rc;
  }
  
-+int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *server,
-+		   __u32 *pexpected_response_sequence)
++static int
++smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
 +{
 +	struct smb_rqst rqst = { .rq_iov = iov,
 +				 .rq_nvec = n_vec };
 +
-+	return cifs_sign_rqst(&rqst, server, pexpected_response_sequence);
++	return smb_send_rqst(server, &rqst);
 +}
 +
- /* must be called with server->srv_mutex held */
- int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
- 		  __u32 *pexpected_response_sequence_number)
-@@ -147,14 +158,14 @@ int cifs_sign_smb(struct smb_hdr *cifs_pdu, struct TCP_Server_Info *server,
- 			      pexpected_response_sequence_number);
- }
- 
--int cifs_verify_signature(struct kvec *iov, unsigned int nr_iov,
-+int cifs_verify_signature(struct smb_rqst *rqst,
- 			  struct TCP_Server_Info *server,
- 			  __u32 expected_sequence_number)
- {
- 	unsigned int rc;
- 	char server_response_sig[8];
- 	char what_we_think_sig_should_be[20];
--	struct smb_hdr *cifs_pdu = (struct smb_hdr *)iov[0].iov_base;
-+	struct smb_hdr *cifs_pdu = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
- 
- 	if (cifs_pdu == NULL || server == NULL)
- 		return -EINVAL;
-@@ -186,8 +197,7 @@ int cifs_verify_signature(struct kvec *iov, unsigned int nr_iov,
- 	cifs_pdu->Signature.Sequence.Reserved = 0;
- 
- 	mutex_lock(&server->srv_mutex);
--	rc = cifs_calc_signature(iov, nr_iov, server,
--				 what_we_think_sig_should_be);
-+	rc = cifs_calc_signature(rqst, server, what_we_think_sig_should_be);
- 	mutex_unlock(&server->srv_mutex);
- 
- 	if (rc)
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 6e3be3e..0841f2a 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -162,6 +162,20 @@ struct cifs_cred {
-  *****************************************************************
-  */
- 
-+/*
-+ * A smb_rqst represents a complete request to be issued to a server. It's
-+ * formed by a kvec array, followed by an array of pages. Page data is assumed
-+ * to start at the beginning of the first page.
-+ */
-+struct smb_rqst {
-+	struct kvec	*rq_iov;	/* array of kvecs */
-+	unsigned int	rq_nvec;	/* number of kvecs in array */
-+	struct page	**rq_pages;	/* pointer to array of page ptrs */
-+	unsigned int	rq_npages;	/* number pages in array */
-+	unsigned int	rq_pagesz;	/* page size to use */
-+	unsigned int	rq_tailsz;	/* length of last page */
-+};
-+
- enum smb_version {
- 	Smb_1 = 1,
- 	Smb_21,
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index c7ad9a8..8e071a5 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -24,6 +24,7 @@
- 
- struct statfs;
- struct smb_vol;
-+struct smb_rqst;
- 
- /*
-  *****************************************************************
-@@ -394,10 +395,12 @@ extern void sesInfoFree(struct cifs_ses *);
- extern struct cifs_tcon *tconInfoAlloc(void);
- extern void tconInfoFree(struct cifs_tcon *);
- 
--extern int cifs_sign_smb(struct smb_hdr *, struct TCP_Server_Info *, __u32 *);
-+extern int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
-+		   __u32 *pexpected_response_sequence_number);
- extern int cifs_sign_smbv(struct kvec *iov, int n_vec, struct TCP_Server_Info *,
- 			  __u32 *);
--extern int cifs_verify_signature(struct kvec *iov, unsigned int nr_iov,
-+extern int cifs_sign_smb(struct smb_hdr *, struct TCP_Server_Info *, __u32 *);
-+extern int cifs_verify_signature(struct smb_rqst *rqst,
- 				 struct TCP_Server_Info *server,
- 				__u32 expected_sequence_number);
- extern int SMBNTencrypt(unsigned char *, unsigned char *, unsigned char *,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c4f43cf..6786b5e 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1541,6 +1541,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 	struct cifs_readdata *rdata = mid->callback_data;
- 	struct cifs_tcon *tcon = tlink_tcon(rdata->cfile->tlink);
- 	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct smb_rqst rqst = { .rq_iov = rdata->iov,
-+				 .rq_nvec = rdata->nr_iov };
- 
- 	cFYI(1, "%s: mid=%llu state=%d result=%d bytes=%u", __func__,
- 		mid->mid, mid->mid_state, rdata->result, rdata->bytes);
-@@ -1552,9 +1554,8 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 		    (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
- 			int rc = 0;
- 
--			rc = cifs_verify_signature(rdata->iov, rdata->nr_iov,
--						   server,
--						   mid->sequence_number + 1);
-+			rc = cifs_verify_signature(&rqst, server,
-+						  mid->sequence_number + 1);
- 			if (rc)
- 				cERROR(1, "SMB signature verification returned "
- 				       "error = %d", rc);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index c4d7825..bc9ccdd 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -504,11 +504,13 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 	if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED)) {
- 		struct kvec iov;
- 		int rc = 0;
-+		struct smb_rqst rqst = { .rq_iov = &iov,
-+					 .rq_nvec = 1 };
- 
- 		iov.iov_base = mid->resp_buf;
- 		iov.iov_len = len;
- 		/* FIXME: add code to kill session */
--		rc = cifs_verify_signature(&iov, 1, server,
-+		rc = cifs_verify_signature(&rqst, server,
- 					   mid->sequence_number + 1);
- 		if (rc)
- 			cERROR(1, "SMB signature verification returned error = "
+ int
+ smb_send(struct TCP_Server_Info *server, struct smb_hdr *smb_buffer,
+ 	 unsigned int smb_buf_length)
 -- 
 1.7.11.2
