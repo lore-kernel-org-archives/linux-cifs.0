@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v3 04/15] cifs: cork the socket before a send and uncork it afterward
-Date: Mon,  6 Aug 2012 07:31:01 -0400
-Message-ID: <1344252672-15244-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 06/15] cifs: teach signing routines how to deal with arrays of pages in a smb_rqst
+Date: Mon,  6 Aug 2012 07:31:03 -0400
+Message-ID: <1344252672-15244-7-git-send-email-jlayton@redhat.com>
 References: <1344252672-15244-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,72 +10,101 @@ In-Reply-To: <1344252672-15244-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We want to send SMBs as "atomically" as possible. Prior to sending any
-data on the socket, cork it to make sure that no non-full frames go
-out. Afterward, uncork it to make sure all of the data gets pushed out
-to the wire.
+Use the smb_send_rqst helper function to kmap each page in the array
+and update the hash for that chunk.
 
-Note that this more or less renders the socket=TCP_NODELAY mount option
-obsolete. When TCP_CORK and TCP_NODELAY are used on the same socket,
-TCP_NODELAY is essentially ignored.
-
-Acked-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/connect.c   |  4 ++++
- fs/cifs/transport.c | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ fs/cifs/cifsencrypt.c   | 11 +++++++++++
+ fs/cifs/cifsproto.h     |  2 ++
+ fs/cifs/smb2transport.c | 11 +++++++++++
+ fs/cifs/transport.c     |  2 +-
+ 4 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 549409b..5210bc8 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1680,6 +1680,10 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			if (string == NULL)
- 				goto out_nomem;
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index af52052..652f505 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -29,6 +29,7 @@
+ #include "ntlmssp.h"
+ #include <linux/ctype.h>
+ #include <linux/random.h>
++#include <linux/highmem.h>
  
-+			/*
-+			 * FIXME: since we now cork/uncork the socket while
-+			 * 	  sending, should we deprecate this option?
-+			 */
- 			if (strnicmp(string, "TCP_NODELAY", 11) == 0)
- 				vol->sockopt_tcp_nodelay = 1;
- 			break;
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 766307b..8ff4c5f 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -27,6 +27,7 @@
- #include <linux/net.h>
- #include <linux/delay.h>
- #include <linux/freezer.h>
-+#include <linux/tcp.h>
- #include <asm/uaccess.h>
+ /*
+  * Calculate and return the CIFS signature based on the mac key and SMB PDU.
+@@ -93,6 +94,16 @@ static int cifs_calc_signature(struct smb_rqst *rqst,
+ 		}
+ 	}
+ 
++	/* now hash over the rq_pages array */
++	for (i = 0; i < rqst->rq_npages; i++) {
++		struct kvec p_iov;
++
++		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
++		crypto_shash_update(&server->secmech.sdescmd5->shash,
++					p_iov.iov_base, p_iov.iov_len);
++		kunmap(rqst->rq_pages[i]);
++	}
++
+ 	rc = crypto_shash_final(&server->secmech.sdescmd5->shash, signature);
+ 	if (rc)
+ 		cERROR(1, "%s: Could not generate md5 hash", __func__);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 8e071a5..e97a184 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -36,6 +36,8 @@ extern struct smb_hdr *cifs_buf_get(void);
+ extern void cifs_buf_release(void *);
+ extern struct smb_hdr *cifs_small_buf_get(void);
+ extern void cifs_small_buf_release(void *);
++extern void cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
++					struct kvec *iov);
+ extern int smb_send(struct TCP_Server_Info *, struct smb_hdr *,
+ 			unsigned int /* length */);
+ extern unsigned int _get_xid(void);
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index af0e390..a8e5559 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -30,6 +30,7 @@
+ #include <linux/uaccess.h>
  #include <asm/processor.h>
  #include <linux/mempool.h>
-@@ -247,12 +248,23 @@ smb_send_rqst(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 	int n_vec = rqst->rq_nvec;
- 	unsigned int smb_buf_length = get_rfc1002_length(iov[0].iov_base);
- 	size_t total_len;
-+	struct socket *ssocket = server->ssocket;
-+	int val = 1;
++#include <linux/highmem.h>
+ #include "smb2pdu.h"
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+@@ -95,6 +96,16 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 		}
+ 	}
  
- 	cFYI(1, "Sending smb: smb_len=%u", smb_buf_length);
- 	dump_smb(iov[0].iov_base, iov[0].iov_len);
- 
-+	/* cork the socket */
-+	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
-+				(char *)&val, sizeof(val));
++	/* now hash over the rq_pages array */
++	for (i = 0; i < rqst->rq_npages; i++) {
++		struct kvec p_iov;
 +
- 	rc = smb_send_kvec(server, iov, n_vec, &total_len);
- 
-+	/* uncork it */
-+	val = 0;
-+	kernel_setsockopt(ssocket, SOL_TCP, TCP_CORK,
-+				(char *)&val, sizeof(val));
++		cifs_rqst_page_to_kvec(rqst, i, &p_iov);
++		crypto_shash_update(&server->secmech.sdeschmacsha256->shash,
++					p_iov.iov_base, p_iov.iov_len);
++		kunmap(rqst->rq_pages[i]);
++	}
 +
- 	if ((total_len > 0) && (total_len != smb_buf_length + 4)) {
- 		cFYI(1, "partial send (wanted=%u sent=%zu): terminating "
- 			"session", smb_buf_length + 4, total_len);
+ 	rc = crypto_shash_final(&server->secmech.sdeschmacsha256->shash,
+ 				sigptr);
+ 	if (rc)
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 381dbb7..b609734 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -251,7 +251,7 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
+  * The page will be kmapped and the address placed into iov_base. The length
+  * will then be adjusted according to the ptailoff.
+  */
+-static void
++void
+ cifs_rqst_page_to_kvec(struct smb_rqst *rqst, unsigned int idx,
+ 			struct kvec *iov)
+ {
 -- 
 1.7.11.2
