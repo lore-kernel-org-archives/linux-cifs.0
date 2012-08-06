@@ -1,41 +1,42 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: linux-next: build failure after merge of the cifs tree
-Date: Sun, 5 Aug 2012 20:57:24 -0500
-Message-ID: <CAH2r5ms9EYUV7uwCpU6De9y_PFtFG6wfekPVRXQza6pE6TVC4Q@mail.gmail.com>
-References: <20120806104841.07ed3708b600529ff7eb6fa6@canb.auug.org.au>
+Subject: Re: The MID value 0xFFFF for CIFS ...
+Date: Sun, 5 Aug 2012 21:09:55 -0500
+Message-ID: <CAH2r5mtx_ccovybybsWiBwzziq338mm2A1ey4fdVJakEyMkCrA@mail.gmail.com>
+References: <CACyXjPw4++WPF-UH-0LQHUQom0dA_dob6W_UP6=7B=0XVRy7Ng@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-next-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120806104841.07ed3708b600529ff7eb6fa6-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+In-Reply-To: <CACyXjPw4++WPF-UH-0LQHUQom0dA_dob6W_UP6=7B=0XVRy7Ng-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Aug 5, 2012 at 7:48 PM, Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org> wrote:
-> Hi all,
+On Sun, Aug 5, 2012 at 2:54 PM, Richard Sharpe
+<realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Hi folks,
 >
-> After merging the cifs tree, today's linux-next build (powerpc
-> ppc64_defconfig) failed like this:
+> [MS-CIFS] in section 2.2.1.6.2 says, in part:
 >
-> fs/cifs/Kconfig:3: syntax error
-> fs/Kconfig:244: missing end statement for this entry
-<snip>
+> ---------------
+> The value 0xFFFF MUST NOT be used as a valid MID. All other possible
+> values for MID, including
+> zero (0x0000), are valid. The value 0xFFFF is used in an OpLock Break
+> Notification request,
+> which is an SMB_COM_LOCKING_ANDX Request (section 2.2.4.32.1) sent
+> from the server.
+> ---------------
 >
-> Caused by commit 12f3f9b7c80c ("Remove sparse warning in cifsfs.c").
-> Please, please build test after doing updates and before publishing your
-> tree.
+> However, in smb1ops.c:cifs_get_next_mid I do not see where a MID value
+> of 0xFFFF is skipped.
 >
-> I have used the cifs tree from next-20120803 for today.
-> --
-> Cheers,
-> Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
+> Perhaps it is done somewhere else that I have not found, and if so,
+> could someone point it out to me?
 
-Fixed.  The corrupted commit came after a build test caught a few
-sparse warnings - forgot to rerun the build test though after fixing
-the warning (I had multiple
-Kconfigs I build test - fs/cifs/Kconfig obviously should not have changed)
+I don't see a place where this was checked, and cifs.ko has been doing
+this presumably before MS-CIFS was published. Apparently has not been
+causing problems having a mid of 0xFFFF from time to time, but might
+as well fix it so we never send such a mid.
 
 
 
