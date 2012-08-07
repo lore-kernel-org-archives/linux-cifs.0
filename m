@@ -1,76 +1,102 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2] Convert properly UTF-8 to UTF-16
-Date: Tue, 7 Aug 2012 06:47:52 -0400
-Message-ID: <20120807064752.22e0da81@corrin.poochiereds.net>
-References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16@LONPMAILBOX01.citrite.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: deprecate the DOMAIN/username%password username syntax
+Date: Tue,  7 Aug 2012 11:11:53 -0400
+Message-ID: <1344352313-8630-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16-aFusIB7tbcLeU4JHVX8hdHnr0TU713UqXqFh9Ls21Oc@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 7 Aug 2012 10:33:03 +0100
-Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org> wrote:
+mount.cifs has in the past allowed users to specify a username using
+the above syntax, which would populate the domain and password fields
+with the different pieces.
 
-> 
-> wchar_t is currently 16bit so converting a utf8 encoded characters not
-> in plane 0 (>= 0x10000) to wchar_t (that is calling char2uni) lead to a
-> -EINVAL return. This patch detect utf8 in cifs_strtoUTF16 and add special
-> code calling utf8s_to_utf16s.
-> 
-> Signed-off-by: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifs_unicode.c |   22 ++++++++++++++++++++++
->  1 files changed, 22 insertions(+), 0 deletions(-)
-> 
-> diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-> index 7dab9c0..1166b95 100644
-> --- a/fs/cifs/cifs_unicode.c
-> +++ b/fs/cifs/cifs_unicode.c
-> @@ -203,6 +203,27 @@ cifs_strtoUTF16(__le16 *to, const char *from, int len,
->  	int i;
->  	wchar_t wchar_to; /* needed to quiet sparse */
->  
-> +	/* special case for utf8 to handle no plane0 chars */
-> +	if (!strcmp(codepage->charset, "utf8")) {
-> +		/*
-> +		 * convert utf8 -> utf16, we assume we have enough space
-> +		 * as caller should have assumed conversion does not overflow
-> +		 * in destination len is length in wchar_t units (16bits)
-> +		 */
-> +		i  = utf8s_to_utf16s(from, len, UTF16_LITTLE_ENDIAN,
-> +				       (wchar_t *) to, len);
-> +
-> +		/* if success terminate and exit */
-> +		if (i >= 0)
-> +			goto success;
-> +		/*
-> +		 * if fails fall back to UCS encoding as this
-> +		 * function should not return negative values
-> +		 * currently can fail only if source contains
-> +		 * invalid encoded characters
-> +		 */
-> +	}
-> +
->  	for (i = 0; len && *from; i++, from += charlen, len -= charlen) {
->  		charlen = codepage->char2uni(from, len, &wchar_to);
->  		if (charlen < 1) {
-> @@ -215,6 +236,7 @@ cifs_strtoUTF16(__le16 *to, const char *from, int len,
->  		put_unaligned_le16(wchar_to, &to[i]);
->  	}
->  
-> +success:
->  	put_unaligned_le16(0, &to[i]);
->  	return i;
->  }
+Unfortunately, there are cases where it is legit to have a '/' in a
+username. krb5 SPNs generally contain a '/' and we have no clear way
+to distinguish between the two.
 
-Looks reasonable...
+I don't see any real value in keeping that syntax allowed. It's no
+easier than specifying "pass=" and "domain=" on the command line. Ditto
+for credential files.
 
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Begin the transition away from that syntax by adding a warning message
+that support for it will be removed in 5.9.
+
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 |  4 +++-
+ mount.cifs.c | 14 ++++++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index f6a66bf..b2a0936 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -56,7 +56,9 @@ user=\fIarg\fR
+ .RS 4
+ specifies the username to connect as\&. If this is not given, then the environment variable
+ \fIUSER\fR
+-is used\&. This option can also take the form "user%password" or "workgroup/user" or "workgroup/user%password" to allow the password and workgroup to be specified as part of the username\&.
++is used\&.
++.PP
++Earlier versions of mount.cifs also allowed one to specify the username in a "user%password" or "workgroup/user" or "workgroup/user%password" to allow the password and workgroup to be specified as part of the username. Support for those alternate username formats is now deprecated and should no longer be used. Users should use the discrete "pass=" and "dom=" to specify the username.
+ .if n \{\
+ .sp
+ .\}
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 330e528..ef5b43f 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -45,6 +45,7 @@
+ #include <libgen.h>
+ #include <sys/mman.h>
+ #include <sys/wait.h>
++#include <stdbool.h>
+ #ifdef HAVE_SYS_FSUID_H
+ #include <sys/fsuid.h>
+ #endif /* HAVE_SYS_FSUID_H */
+@@ -320,15 +321,22 @@ static int set_password(struct parsed_mount_info *parsed_info, const char *src)
+  *
+  * ...obviously the only required component is "username". The source string
+  * is modified in the process, but it should remain unchanged at the end.
++ *
++ * NOTE: the above syntax does not allow for usernames that have slashes in
++ * them, as some krb5 usernames do. Support for the above syntax will be
++ * removed in a later version of cifs-utils. Users should use separate options
++ * instead of overloading this info into the username.
+  */
+ static int parse_username(char *rawuser, struct parsed_mount_info *parsed_info)
+ {
+ 	char *user, *password, slash;
+ 	int rc = 0;
++	bool warn = false;
+ 
+ 	/* everything after first % sign is a password */
+ 	password = strchr(rawuser, '%');
+ 	if (password) {
++		warn = true;
+ 		rc = set_password(parsed_info, password + 1);
+ 		if (rc)
+ 			return rc;
+@@ -342,6 +350,7 @@ static int parse_username(char *rawuser, struct parsed_mount_info *parsed_info)
+ 
+ 	/* everything before that slash is a domain */
+ 	if (user) {
++		warn = true;
+ 		slash = *user;
+ 		*user = '\0';
+ 		strlcpy(parsed_info->domain, rawuser,
+@@ -356,6 +365,11 @@ static int parse_username(char *rawuser, struct parsed_mount_info *parsed_info)
+ 	if (password)
+ 		*password = '%';
+ 
++	if (warn)
++		fprintf(stderr, "WARNING: The DOMAIN/username%%password syntax "
++				"for usernames is deprecated and will be "
++				"removed in version 5.9 of cifs-utils.\n");
++
+ 	return 0;
+ }
+ 
+-- 
+1.7.11.2
