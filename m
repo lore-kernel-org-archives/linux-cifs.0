@@ -1,102 +1,129 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] mount.cifs: deprecate the DOMAIN/username%password username syntax
-Date: Tue,  7 Aug 2012 11:11:53 -0400
-Message-ID: <1344352313-8630-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH] mount.cifs: handle username= differently depending on sec= option
+Date: Tue,  7 Aug 2012 12:33:47 -0400
+Message-ID: <1344357227-9683-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-mount.cifs has in the past allowed users to specify a username using
-the above syntax, which would populate the domain and password fields
-with the different pieces.
+This patch is intended as a temporary workaround for krb5 users that need
+to specify usernames with '/' in them. I intend to remove this hack from
+mount.cifs once the legacy username handling code is removed.
 
-Unfortunately, there are cases where it is legit to have a '/' in a
-username. krb5 SPNs generally contain a '/' and we have no clear way
-to distinguish between the two.
+The idea here is to save off the raw username string while we're parsing
+options. If the mount options specify "sec=krb5" or "sec=krb5i" then
+we'll not do the legacy username parsing and will instead just pass in
+the username string as-is.
 
-I don't see any real value in keeping that syntax allowed. It's no
-easier than specifying "pass=" and "domain=" on the command line. Ditto
-for credential files.
-
-Begin the transition away from that syntax by adding a warning message
-that support for it will be removed in 5.9.
+Obviously, this is a nasty hack and we don't really want to carry this
+in perpetuity, so this can go away once the "legacy" username parsing
+has gone away.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- mount.cifs.8 |  4 +++-
- mount.cifs.c | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ mount.cifs.c | 45 ++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 34 insertions(+), 11 deletions(-)
 
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index f6a66bf..b2a0936 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -56,7 +56,9 @@ user=\fIarg\fR
- .RS 4
- specifies the username to connect as\&. If this is not given, then the environment variable
- \fIUSER\fR
--is used\&. This option can also take the form "user%password" or "workgroup/user" or "workgroup/user%password" to allow the password and workgroup to be specified as part of the username\&.
-+is used\&.
-+.PP
-+Earlier versions of mount.cifs also allowed one to specify the username in a "user%password" or "workgroup/user" or "workgroup/user%password" to allow the password and workgroup to be specified as part of the username. Support for those alternate username formats is now deprecated and should no longer be used. Users should use the discrete "pass=" and "dom=" to specify the username.
- .if n \{\
- .sp
- .\}
 diff --git a/mount.cifs.c b/mount.cifs.c
-index 330e528..ef5b43f 100644
+index ef5b43f..f843bb4 100644
 --- a/mount.cifs.c
 +++ b/mount.cifs.c
-@@ -45,6 +45,7 @@
- #include <libgen.h>
- #include <sys/mman.h>
- #include <sys/wait.h>
-+#include <stdbool.h>
- #ifdef HAVE_SYS_FSUID_H
- #include <sys/fsuid.h>
- #endif /* HAVE_SYS_FSUID_H */
-@@ -320,15 +321,22 @@ static int set_password(struct parsed_mount_info *parsed_info, const char *src)
-  *
-  * ...obviously the only required component is "username". The source string
-  * is modified in the process, but it should remain unchanged at the end.
-+ *
-+ * NOTE: the above syntax does not allow for usernames that have slashes in
-+ * them, as some krb5 usernames do. Support for the above syntax will be
-+ * removed in a later version of cifs-utils. Users should use separate options
-+ * instead of overloading this info into the username.
-  */
- static int parse_username(char *rawuser, struct parsed_mount_info *parsed_info)
- {
- 	char *user, *password, slash;
- 	int rc = 0;
-+	bool warn = false;
- 
- 	/* everything after first % sign is a password */
- 	password = strchr(rawuser, '%');
- 	if (password) {
-+		warn = true;
- 		rc = set_password(parsed_info, password + 1);
- 		if (rc)
- 			return rc;
-@@ -342,6 +350,7 @@ static int parse_username(char *rawuser, struct parsed_mount_info *parsed_info)
- 
- 	/* everything before that slash is a domain */
- 	if (user) {
-+		warn = true;
- 		slash = *user;
- 		*user = '\0';
- 		strlcpy(parsed_info->domain, rawuser,
-@@ -356,6 +365,11 @@ static int parse_username(char *rawuser, struct parsed_mount_info *parsed_info)
- 	if (password)
- 		*password = '%';
- 
-+	if (warn)
-+		fprintf(stderr, "WARNING: The DOMAIN/username%%password syntax "
-+				"for usernames is deprecated and will be "
-+				"removed in version 5.9 of cifs-utils.\n");
-+
- 	return 0;
+@@ -588,7 +588,8 @@ parsing_err:
  }
  
+ static int open_cred_file(char *file_name,
+-			struct parsed_mount_info *parsed_info)
++			struct parsed_mount_info *parsed_info,
++			char **saved_username)
+ {
+ 	char *line_buf = NULL;
+ 	char *temp_val = NULL;
+@@ -637,9 +638,11 @@ static int open_cred_file(char *file_name,
+ 		/* parse next token */
+ 		switch (parse_cred_line(line_buf + i, &temp_val)) {
+ 		case CRED_USER:
+-			i = parse_username(temp_val, parsed_info);
+-			if (i)
++			*saved_username = strdup(temp_val);
++			if (!*saved_username) {
++				i = EX_SYSERR;
+ 				goto return_i;
++			}
+ 			break;
+ 		case CRED_PASS:
+ 			i = set_password(parsed_info, temp_val);
+@@ -827,6 +830,8 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 	char *ep;
+ 	struct passwd *pw;
+ 	struct group *gr;
++	char *saved_username = NULL;
++	bool krb5_auth = false;
+ 	/*
+ 	 * max 32-bit uint in decimal is 4294967295 which is 10 chars wide
+ 	 * +1 for NULL, and +1 for good measure
+@@ -894,11 +899,10 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 					fprintf(stderr, "username too long\n");
+ 					return EX_USAGE;
+ 				}
+-				rc = parse_username(value, parsed_info);
+-				if (rc) {
+-					fprintf(stderr,
+-						"problem parsing username\n");
+-					return rc;
++				saved_username = strdup(value);
++				if (!saved_username) {
++					fprintf(stderr, "Unable to allocate memory!\n");
++					return EX_SYSERR;
+ 				}
+ 				goto nocopy;
+ 			}
+@@ -920,9 +924,12 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 
+ 		case OPT_SEC:
+ 			if (value) {
+-				if (!strncmp(value, "none", 4) ||
+-				    !strncmp(value, "krb5", 4))
++				if (!strncmp(value, "none", 4)) {
++					parsed_info->got_password = 1;
++				} else if (!strncmp(value, "krb5", 4)) {
+ 					parsed_info->got_password = 1;
++					krb5_auth = true;
++				}
+ 			}
+ 			break;
+ 
+@@ -978,7 +985,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 					"invalid credential file name specified\n");
+ 				return EX_USAGE;
+ 			}
+-			rc = open_cred_file(value, parsed_info);
++			rc = open_cred_file(value, parsed_info, &saved_username);
+ 			if (rc) {
+ 				fprintf(stderr,
+ 					"error %d (%s) opening credential file %s\n",
+@@ -1197,6 +1204,22 @@ nocopy:
+ 		data = next_keyword;
+ 	}
+ 
++	if (saved_username) {
++		if (krb5_auth) {
++			strlcpy(parsed_info->username, saved_username,
++				sizeof(parsed_info->username));
++			parsed_info->got_user = 1;
++		} else {
++			rc = parse_username(saved_username, parsed_info);
++			free(saved_username);
++			if (rc) {
++				fprintf(stderr, "Unable to parse username!\n");
++				return rc;
++			}
++		}
++	}
++
++
+ 	/* special-case the uid and gid */
+ 	if (got_uid) {
+ 		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", uid);
 -- 
 1.7.11.2
