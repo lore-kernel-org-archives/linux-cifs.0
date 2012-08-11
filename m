@@ -1,60 +1,67 @@
-From: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Possible use-after-free in transport.c:SendReceive and SendReceive2
-Date: Fri, 10 Aug 2012 12:36:10 -0700
-Message-ID: <CACyXjPw3_d5+hJXVD+wMUvtT7cjqzzPbjLfene0VK07gc+E6bw@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Possible use-after-free in transport.c:SendReceive and
+ SendReceive2
+Date: Fri, 10 Aug 2012 21:27:53 -0400
+Message-ID: <20120810212753.67f43c4f@corrin.poochiereds.net>
+References: <CACyXjPw3_d5+hJXVD+wMUvtT7cjqzzPbjLfene0VK07gc+E6bw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=Big5
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: base64
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CACyXjPw3_d5+hJXVD+wMUvtT7cjqzzPbjLfene0VK07gc+E6bw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi folks,
-
-I have been trawling through the code to get a better understanding of
-various things and I came across this curious thing in the smb2dev
-branch in git://git.altlinux.org/people/piastry/public/cifs-2.6.git
-but it is also in the master branch, it seems.
-
-In transport.c:SendReceive (and SendReceive2 where we do similar things=
-) we see:
-
-=2E..
-        rc =3D cifs_sync_mid_result(midQ, ses->server);
-        if (rc !=3D 0) {
-                add_credits(ses->server, 1, 0);
-                return rc;
-        }
-
-        if (!midQ->resp_buf || !out_buf ||
-            midQ->mid_state !=3D MID_RESPONSE_RECEIVED) {
-                rc =3D -EIO;
-                cERROR(1, "Bad MID state?");
-                goto out;
-        }
-
-        *pbytes_returned =3D get_rfc1002_length(midQ->resp_buf);
-        memcpy(out_buf, midQ->resp_buf, *pbytes_returned + 4);
-        rc =3D cifs_check_receive(midQ, ses->server, 0);
-=2E..
-
-However, at the end of cifs_sync_mid_result we see:
-
-
-        DeleteMidQEntry(mid);
-        return rc;
-
-and there are no early returns from cifs_sync_mid_result, it seems.
-The "mid" in the DeleteMidQEntry call is the same midQ passed to
-cifs_sync_mid_result, I believe.
-
-So, it looks like we have a use-after-free situation and thus a race
-to get the data out before someone else pollutes it.
-
-Is this correct or have I got the wrong end of the stick here?
-
---=20
-Regards,
-Richard Sharpe
-(=A6=F3=A5H=B8=D1=BC~=A1H=B0=DF=A6=B3=A7=F9=B1d=A1C--=B1=E4=BE=DE)
+LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBGcmks
+IDEwIEF1ZyAyMDEyIDEyOjM2OjEwIC0wNzAwDQpSaWNoYXJkIFNoYXJwZSA8cmVhbHJpY2hhcmRz
+aGFycGVAZ21haWwuY29tPiB3cm90ZToNCg0KPiBIaSBmb2xrcywNCj4gDQo+IEkgaGF2ZSBiZWVu
+IHRyYXdsaW5nIHRocm91Z2ggdGhlIGNvZGUgdG8gZ2V0IGEgYmV0dGVyIHVuZGVyc3RhbmRpbmcg
+b2YNCj4gdmFyaW91cyB0aGluZ3MgYW5kIEkgY2FtZSBhY3Jvc3MgdGhpcyBjdXJpb3VzIHRoaW5n
+IGluIHRoZSBzbWIyZGV2DQo+IGJyYW5jaCBpbiBnaXQ6Ly9naXQuYWx0bGludXgub3JnL3Blb3Bs
+ZS9waWFzdHJ5L3B1YmxpYy9jaWZzLTIuNi5naXQNCj4gYnV0IGl0IGlzIGFsc28gaW4gdGhlIG1h
+c3RlciBicmFuY2gsIGl0IHNlZW1zLg0KPiANCj4gSW4gdHJhbnNwb3J0LmM6U2VuZFJlY2VpdmUg
+KGFuZCBTZW5kUmVjZWl2ZTIgd2hlcmUgd2UgZG8gc2ltaWxhciB0aGluZ3MpIHdlIHNlZToNCj4g
+DQo+IC4uLg0KPiAgICAgICAgIHJjID0gY2lmc19zeW5jX21pZF9yZXN1bHQobWlkUSwgc2VzLT5z
+ZXJ2ZXIpOw0KPiAgICAgICAgIGlmIChyYyAhPSAwKSB7DQo+ICAgICAgICAgICAgICAgICBhZGRf
+Y3JlZGl0cyhzZXMtPnNlcnZlciwgMSwgMCk7DQo+ICAgICAgICAgICAgICAgICByZXR1cm4gcmM7
+DQo+ICAgICAgICAgfQ0KPiANCg0KTm90ZSB0aGF0IGhlcmUgd2UgcmV0dXJuIHJjIGhlcmUgd2l0
+aG91dCAiZ290byBvdXQ7IiB3aGVuZXZlciByYyAhPSAwLg0KDQo+ICAgICAgICAgaWYgKCFtaWRR
+LT5yZXNwX2J1ZiB8fCAhb3V0X2J1ZiB8fA0KPiAgICAgICAgICAgICBtaWRRLT5taWRfc3RhdGUg
+IT0gTUlEX1JFU1BPTlNFX1JFQ0VJVkVEKSB7DQo+ICAgICAgICAgICAgICAgICByYyA9IC1FSU87
+DQo+ICAgICAgICAgICAgICAgICBjRVJST1IoMSwgIkJhZCBNSUQgc3RhdGU/Iik7DQo+ICAgICAg
+ICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAgICB9DQo+IA0KPiAgICAgICAgICpwYnl0ZXNf
+cmV0dXJuZWQgPSBnZXRfcmZjMTAwMl9sZW5ndGgobWlkUS0+cmVzcF9idWYpOw0KPiAgICAgICAg
+IG1lbWNweShvdXRfYnVmLCBtaWRRLT5yZXNwX2J1ZiwgKnBieXRlc19yZXR1cm5lZCArIDQpOw0K
+PiAgICAgICAgIHJjID0gY2lmc19jaGVja19yZWNlaXZlKG1pZFEsIHNlcy0+c2VydmVyLCAwKTsN
+Cj4gLi4uDQo+IA0KPiBIb3dldmVyLCBhdCB0aGUgZW5kIG9mIGNpZnNfc3luY19taWRfcmVzdWx0
+IHdlIHNlZToNCj4gDQo+IA0KPiAgICAgICAgIERlbGV0ZU1pZFFFbnRyeShtaWQpOw0KPiAgICAg
+ICAgIHJldHVybiByYzsNCj4gDQo+IGFuZCB0aGVyZSBhcmUgbm8gZWFybHkgcmV0dXJucyBmcm9t
+IGNpZnNfc3luY19taWRfcmVzdWx0LCBpdCBzZWVtcy4NCj4gVGhlICJtaWQiIGluIHRoZSBEZWxl
+dGVNaWRRRW50cnkgY2FsbCBpcyB0aGUgc2FtZSBtaWRRIHBhc3NlZCB0bw0KPiBjaWZzX3N5bmNf
+bWlkX3Jlc3VsdCwgSSBiZWxpZXZlLg0KPiANCg0KVGhlcmUgaXMgYW4gZWFybHkgcmV0dXJuIGlu
+IHRoZSBNSURfUkVTUE9OU0VfUkVDRUlWRUQgY2FzZS4NCg0KPiBTbywgaXQgbG9va3MgbGlrZSB3
+ZSBoYXZlIGEgdXNlLWFmdGVyLWZyZWUgc2l0dWF0aW9uIGFuZCB0aHVzIGEgcmFjZQ0KPiB0byBn
+ZXQgdGhlIGRhdGEgb3V0IGJlZm9yZSBzb21lb25lIGVsc2UgcG9sbHV0ZXMgaXQuDQo+IA0KPiBJ
+cyB0aGlzIGNvcnJlY3Qgb3IgaGF2ZSBJIGdvdCB0aGUgd3JvbmcgZW5kIG9mIHRoZSBzdGljayBo
+ZXJlPw0KPiANCg0KSSBkb24ndCB0aGluayB0aGVyZSBpcyBhIHVzZS1hZnRlci1mcmVlIGhlcmUs
+IGJ1dCBJJ2xsIGZyZWVseSBhZG1pdA0KdGhhdCB0aGlzIGNvZGUgY291bGQgYmUgY2xlYXJlci4g
+SWYgeW91IGNhcmUgdG8gY2xlYW4gaXQgdXAgYW5kIG1ha2UgaXQNCmNsZWFyZXIsIEkgY2VydGFp
+bmx5IHdvdWxkbid0IG9iamVjdC4NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJh
+Lm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4w
+LjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JRSlFKYlZ4QUFvSkVBQU9hRUVaVm9JVldD
+Z1AvM2g5SEprUkR0R1dEU1Z4WUVJRkYvbi8NCjlWcE12Rmo2bjd3alJvODdnTWk2OXQvb3VKeVJC
+ZmoweXRLSjEwZlNDTjBET05nZjJydWs4eE1wRE5WVEdGT0INCm9TTS85aGlsbC94NTR0VXorbHVo
+SjQyY08rRUxaN2Jza1c2akZXQjl1UTh1dnNJM3drZUQzUnVJUWxuaVMxdnMNCjMvMGVIc1JkaUNV
+dWF2bjQ4cHpqRVNXaElLdHZYcTVSdkxqdTJBYmIrb0ttWjFUNnJOQUt0SUFmRjBVV0x6dWcNClNP
+bEx0dytvOUYrajBJdTduQzBqMTUyUHdUb0syT2FiVC9DV1RNYmZGMGdEbnB1YUptVkNYV1NleHA4
+ME9BWVMNClVGMWtrQndnay8xSDVvOXBiRG1ZOTlvOVRYaW9wazNNbXZaQXFzdG9sK05ENE5GaFli
+QnBEWmMvd2hMbnlEdmINCjFNZW1wMjBudUloVmgxL0tldG1HQjQ1Q3RVZTVISXNKdzFLZGpNeFhN
+NHVXdVVsUE1BcWZISWMzemVabktFN0MNCmo5d3dKUUJqTUFtWndJbEZ3TEdLVjkyZFI1VU1JSDVP
+UkdDWm4wdUt5U1BTd1VGTXZUVURLMGZ5L0Y3TDh5K3ENCnRQVmQzZ3dXcmZCS05JZFBTbXdGOEIv
+T0lzcWRZS0daMWNHZkVVbG0yTkhqSTV6L2xBL29ySFBFMERlZ0RXdGQNCmRRNnI2VzlNUDI3NHhw
+YldIemxkQkpRY296d1pOU3J0U0dyZ0lVeXRmM05QSEpUaHp6d2FtVmhRWlk1dTVaelENCkJFNVpU
+SlF6OGRWWk1nYmVDTzRxUUFJQ1V6NEZEVkV2ckY5Z1paNDhjYlB1YlNTNmZLeVROVG54ZlVvMEdj
+ZTMNCmhtVmd4NzNMUDJaeXVYdjRaYXVzDQo9U1hPbA0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0t
+LS0tDQo=
