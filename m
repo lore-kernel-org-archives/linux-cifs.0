@@ -1,49 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: regression in connectathon test7
-Date: Mon, 13 Aug 2012 08:52:29 -0500
-Message-ID: <CAH2r5mvv+uP=cC9BYi2YVTXD=_vnPoNHm5rfCSezhGp+vX07jg@mail.gmail.com>
-References: <20120807152822.3bbe468f@tlielax.poochiereds.net>
-	<CAKywueQfXe7MEmKu+-W09tDwyPvUar3qM+eWLZiNO3z-ngTu6Q@mail.gmail.com>
-	<20120813064916.1964e77b@corrin.poochiereds.net>
+From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2] cifscreds: add a check and warnings for session keyring problems
+Date: Mon, 13 Aug 2012 22:21:52 +0100
+Message-ID: <6113.1344892912@warthog.procyon.org.uk>
+References: <1344447933.32720.3.camel@athlon.garagome> <30167.1342557999@warthog.procyon.org.uk> <1342704916-2224-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Milan
+	 =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FKn=3DC3=3DAD=3DC5=3DBEek=3F=3D?=
+	<knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120813064916.1964e77b-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1344447933.32720.3.camel-77nuZImz6nKt3pJmeLR6bw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, Aug 13, 2012 at 5:49 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Mon, 13 Aug 2012 14:08:07 +0400
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> 2012/8/7 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
->> > If I mount up a SMB1 share without unix extensions, I get the following
->> > error when I run connectathon test7 on it now:
->> >
->> > # env NFSTESTDIR=/mnt/cifs/rawhide.test ./basic/test7
->> > ./basic/test7: link and rename
->> >         ./basic/test7: (/mnt/cifs/rawhide.test) file.0 has 2 links after unlink (expect 1) : No such file or directory
->> >
->> > This does not fail on 3.5.0. Pavel, is this something you've noticed in
->> > your testing?
->> >
->> > --
->> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
->>
->> My Ubuntu machine doesn't boot with v3.6-rc1 kernel due to segfault.
->> It goes fine on 3.5 with smb2-basic branch changes. What kernel do you
->> use?
->>
->
-> It was a 3.6.0-rc1 kernel.
->
+Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-my test kernel is just before 3.6.0-rc1 but very close to that
+> How does one arrange that the session keyring is set up properly for
+> various login methods?
 
+These are all the places I have it:
 
--- 
-Thanks,
+/etc/pam.d/fingerprint-auth	session optional pam_keyinit.so revoke
+/etc/pam.d/fingerprint-auth-ac	session optional pam_keyinit.so revoke
+/etc/pam.d/gdm-autologin	session optional pam_keyinit.so force revoke
+/etc/pam.d/gdm-fingerprint	session optional pam_keyinit.so force revoke
+/etc/pam.d/gdm-password		session optional pam_keyinit.so force revoke
+/etc/pam.d/gdm-smartcard	session optional pam_keyinit.so force revoke
+/etc/pam.d/gdm-welcome		session optional pam_keyinit.so force revoke
+/etc/pam.d/kdm			session optional pam_keyinit.so force revoke
+/etc/pam.d/kdm-np		session optional pam_keyinit.so force revoke
+/etc/pam.d/login		session optional pam_keyinit.so force revoke
+/etc/pam.d/password-auth	session optional pam_keyinit.so revoke
+/etc/pam.d/password-auth-ac	session optional pam_keyinit.so revoke
+/etc/pam.d/remote		session optional pam_keyinit.so force revoke
+/etc/pam.d/runuser		session optional pam_keyinit.so revoke
+/etc/pam.d/runuser-l		session optional pam_keyinit.so force revoke
+/etc/pam.d/smartcard-auth	session optional pam_keyinit.so revoke
+/etc/pam.d/smartcard-auth-ac	session optional pam_keyinit.so revoke
+/etc/pam.d/sshd			session optional pam_keyinit.so force revoke
+/etc/pam.d/sudo			session optional pam_keyinit.so revoke
+/etc/pam.d/sudo-i		session optional pam_keyinit.so force revoke
+/etc/pam.d/su-l			session optional pam_keyinit.so force revoke
+/etc/pam.d/system-auth		session optional pam_keyinit.so revoke
+/etc/pam.d/system-auth-ac	session optional pam_keyinit.so revoke
+/etc/pam.d/vsftpd		session optional pam_keyinit.so force revoke
+/etc/pam.d/xdm			session optional pam_keyinit.so force revoke
+/etc/pam.d/xserver		session optional pam_keyinit.so force revoke
 
-Steve
+> pam_keyinit.so was already in /etc/pam.d/gdm-password, though when
+> logged in into Xfce from GDM, then "cifscreds add" typed in
+> xfce4-terminal complains about non-persistent keyring.
+
+What name does gdm use when logging in?  I see five different names in =
+the
+list above.
+
+David
