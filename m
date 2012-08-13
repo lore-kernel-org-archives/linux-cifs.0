@@ -1,67 +1,98 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Possible use-after-free in transport.c:SendReceive and
- SendReceive2
-Date: Fri, 10 Aug 2012 21:27:53 -0400
-Message-ID: <20120810212753.67f43c4f@corrin.poochiereds.net>
-References: <CACyXjPw3_d5+hJXVD+wMUvtT7cjqzzPbjLfene0VK07gc+E6bw@mail.gmail.com>
+From: "Samuel Kidman" <Samuel.Kidman-Z3GdMYdHZ+HQT0dZR+AlfA@public.gmane.org>
+Subject: RE: How do I get the version of CIFS vfs with the backuid and backupgid on my system?
+Date: Mon, 13 Aug 2012 16:53:25 +0800
+Message-ID: <2017228CAF598D4F8B68E7555B958761024E21DD@pr-pro-exch01-3.SMY.local>
+References: <2017228CAF598D4F8B68E7555B958761024E21C5@pr-pro-exch01-3.SMY.local> <CAH2r5msnjMsDtLEiKY6DfAbZnS1uaayyBh6adO==f55bbNapmA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACyXjPw3_d5+hJXVD+wMUvtT7cjqzzPbjLfene0VK07gc+E6bw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-class: urn:content-classes:message
+In-Reply-To: <CAH2r5msnjMsDtLEiKY6DfAbZnS1uaayyBh6adO==f55bbNapmA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkVEIE1FU1NBR0UtLS0tLQ0KSGFzaDogU0hBMQ0KDQpPbiBGcmks
-IDEwIEF1ZyAyMDEyIDEyOjM2OjEwIC0wNzAwDQpSaWNoYXJkIFNoYXJwZSA8cmVhbHJpY2hhcmRz
-aGFycGVAZ21haWwuY29tPiB3cm90ZToNCg0KPiBIaSBmb2xrcywNCj4gDQo+IEkgaGF2ZSBiZWVu
-IHRyYXdsaW5nIHRocm91Z2ggdGhlIGNvZGUgdG8gZ2V0IGEgYmV0dGVyIHVuZGVyc3RhbmRpbmcg
-b2YNCj4gdmFyaW91cyB0aGluZ3MgYW5kIEkgY2FtZSBhY3Jvc3MgdGhpcyBjdXJpb3VzIHRoaW5n
-IGluIHRoZSBzbWIyZGV2DQo+IGJyYW5jaCBpbiBnaXQ6Ly9naXQuYWx0bGludXgub3JnL3Blb3Bs
-ZS9waWFzdHJ5L3B1YmxpYy9jaWZzLTIuNi5naXQNCj4gYnV0IGl0IGlzIGFsc28gaW4gdGhlIG1h
-c3RlciBicmFuY2gsIGl0IHNlZW1zLg0KPiANCj4gSW4gdHJhbnNwb3J0LmM6U2VuZFJlY2VpdmUg
-KGFuZCBTZW5kUmVjZWl2ZTIgd2hlcmUgd2UgZG8gc2ltaWxhciB0aGluZ3MpIHdlIHNlZToNCj4g
-DQo+IC4uLg0KPiAgICAgICAgIHJjID0gY2lmc19zeW5jX21pZF9yZXN1bHQobWlkUSwgc2VzLT5z
-ZXJ2ZXIpOw0KPiAgICAgICAgIGlmIChyYyAhPSAwKSB7DQo+ICAgICAgICAgICAgICAgICBhZGRf
-Y3JlZGl0cyhzZXMtPnNlcnZlciwgMSwgMCk7DQo+ICAgICAgICAgICAgICAgICByZXR1cm4gcmM7
-DQo+ICAgICAgICAgfQ0KPiANCg0KTm90ZSB0aGF0IGhlcmUgd2UgcmV0dXJuIHJjIGhlcmUgd2l0
-aG91dCAiZ290byBvdXQ7IiB3aGVuZXZlciByYyAhPSAwLg0KDQo+ICAgICAgICAgaWYgKCFtaWRR
-LT5yZXNwX2J1ZiB8fCAhb3V0X2J1ZiB8fA0KPiAgICAgICAgICAgICBtaWRRLT5taWRfc3RhdGUg
-IT0gTUlEX1JFU1BPTlNFX1JFQ0VJVkVEKSB7DQo+ICAgICAgICAgICAgICAgICByYyA9IC1FSU87
-DQo+ICAgICAgICAgICAgICAgICBjRVJST1IoMSwgIkJhZCBNSUQgc3RhdGU/Iik7DQo+ICAgICAg
-ICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAgICB9DQo+IA0KPiAgICAgICAgICpwYnl0ZXNf
-cmV0dXJuZWQgPSBnZXRfcmZjMTAwMl9sZW5ndGgobWlkUS0+cmVzcF9idWYpOw0KPiAgICAgICAg
-IG1lbWNweShvdXRfYnVmLCBtaWRRLT5yZXNwX2J1ZiwgKnBieXRlc19yZXR1cm5lZCArIDQpOw0K
-PiAgICAgICAgIHJjID0gY2lmc19jaGVja19yZWNlaXZlKG1pZFEsIHNlcy0+c2VydmVyLCAwKTsN
-Cj4gLi4uDQo+IA0KPiBIb3dldmVyLCBhdCB0aGUgZW5kIG9mIGNpZnNfc3luY19taWRfcmVzdWx0
-IHdlIHNlZToNCj4gDQo+IA0KPiAgICAgICAgIERlbGV0ZU1pZFFFbnRyeShtaWQpOw0KPiAgICAg
-ICAgIHJldHVybiByYzsNCj4gDQo+IGFuZCB0aGVyZSBhcmUgbm8gZWFybHkgcmV0dXJucyBmcm9t
-IGNpZnNfc3luY19taWRfcmVzdWx0LCBpdCBzZWVtcy4NCj4gVGhlICJtaWQiIGluIHRoZSBEZWxl
-dGVNaWRRRW50cnkgY2FsbCBpcyB0aGUgc2FtZSBtaWRRIHBhc3NlZCB0bw0KPiBjaWZzX3N5bmNf
-bWlkX3Jlc3VsdCwgSSBiZWxpZXZlLg0KPiANCg0KVGhlcmUgaXMgYW4gZWFybHkgcmV0dXJuIGlu
-IHRoZSBNSURfUkVTUE9OU0VfUkVDRUlWRUQgY2FzZS4NCg0KPiBTbywgaXQgbG9va3MgbGlrZSB3
-ZSBoYXZlIGEgdXNlLWFmdGVyLWZyZWUgc2l0dWF0aW9uIGFuZCB0aHVzIGEgcmFjZQ0KPiB0byBn
-ZXQgdGhlIGRhdGEgb3V0IGJlZm9yZSBzb21lb25lIGVsc2UgcG9sbHV0ZXMgaXQuDQo+IA0KPiBJ
-cyB0aGlzIGNvcnJlY3Qgb3IgaGF2ZSBJIGdvdCB0aGUgd3JvbmcgZW5kIG9mIHRoZSBzdGljayBo
-ZXJlPw0KPiANCg0KSSBkb24ndCB0aGluayB0aGVyZSBpcyBhIHVzZS1hZnRlci1mcmVlIGhlcmUs
-IGJ1dCBJJ2xsIGZyZWVseSBhZG1pdA0KdGhhdCB0aGlzIGNvZGUgY291bGQgYmUgY2xlYXJlci4g
-SWYgeW91IGNhcmUgdG8gY2xlYW4gaXQgdXAgYW5kIG1ha2UgaXQNCmNsZWFyZXIsIEkgY2VydGFp
-bmx5IHdvdWxkbid0IG9iamVjdC4NCg0KLSAtLSANCkplZmYgTGF5dG9uIDxqbGF5dG9uQHNhbWJh
-Lm9yZz4NCi0tLS0tQkVHSU4gUEdQIFNJR05BVFVSRS0tLS0tDQpWZXJzaW9uOiBHbnVQRyB2Mi4w
-LjE4IChHTlUvTGludXgpDQoNCmlRSWNCQUVCQWdBR0JRSlFKYlZ4QUFvSkVBQU9hRUVaVm9JVldD
-Z1AvM2g5SEprUkR0R1dEU1Z4WUVJRkYvbi8NCjlWcE12Rmo2bjd3alJvODdnTWk2OXQvb3VKeVJC
-ZmoweXRLSjEwZlNDTjBET05nZjJydWs4eE1wRE5WVEdGT0INCm9TTS85aGlsbC94NTR0VXorbHVo
-SjQyY08rRUxaN2Jza1c2akZXQjl1UTh1dnNJM3drZUQzUnVJUWxuaVMxdnMNCjMvMGVIc1JkaUNV
-dWF2bjQ4cHpqRVNXaElLdHZYcTVSdkxqdTJBYmIrb0ttWjFUNnJOQUt0SUFmRjBVV0x6dWcNClNP
-bEx0dytvOUYrajBJdTduQzBqMTUyUHdUb0syT2FiVC9DV1RNYmZGMGdEbnB1YUptVkNYV1NleHA4
-ME9BWVMNClVGMWtrQndnay8xSDVvOXBiRG1ZOTlvOVRYaW9wazNNbXZaQXFzdG9sK05ENE5GaFli
-QnBEWmMvd2hMbnlEdmINCjFNZW1wMjBudUloVmgxL0tldG1HQjQ1Q3RVZTVISXNKdzFLZGpNeFhN
-NHVXdVVsUE1BcWZISWMzemVabktFN0MNCmo5d3dKUUJqTUFtWndJbEZ3TEdLVjkyZFI1VU1JSDVP
-UkdDWm4wdUt5U1BTd1VGTXZUVURLMGZ5L0Y3TDh5K3ENCnRQVmQzZ3dXcmZCS05JZFBTbXdGOEIv
-T0lzcWRZS0daMWNHZkVVbG0yTkhqSTV6L2xBL29ySFBFMERlZ0RXdGQNCmRRNnI2VzlNUDI3NHhw
-YldIemxkQkpRY296d1pOU3J0U0dyZ0lVeXRmM05QSEpUaHp6d2FtVmhRWlk1dTVaelENCkJFNVpU
-SlF6OGRWWk1nYmVDTzRxUUFJQ1V6NEZEVkV2ckY5Z1paNDhjYlB1YlNTNmZLeVROVG54ZlVvMEdj
-ZTMNCmhtVmd4NzNMUDJaeXVYdjRaYXVzDQo9U1hPbA0KLS0tLS1FTkQgUEdQIFNJR05BVFVSRS0t
-LS0tDQo=
+Hi thanks for your reply.
+
+My /etc/fstab line-
+//prldata/profiles      /home/nagios/cifs2   cifs
+noauto,ro,user,credentials=/home/nagios/nagios.filereader.cred,backupuid
+=Nagios.FileReader 0   0
+
+If I attempt to mount-
+$ mount.cifs //prldata/profiles /home/nagios/cifs2
+mount error(22): Invalid argument
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+
+Remove 'backupuid' option from fstab:
+$ mount.cifs //prldata/profiles /home/nagios/cifs2
+$
+Mount succeeds.
+
+However-
+$ strings cifs.ko | grep 'backup'
+<3>CIFS VFS: %s: Invalid backupuid value
+<3>CIFS VFS: %s: Invalid backupgid value
+backupuid
+backupgid
+
+So something is not right. Why can't I use the backupuid option?
+
+Regards, Sam
+
+-----Original Message-----
+From: Steve French [mailto:smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org] 
+Sent: Friday, 10 August 2012 10:42 PM
+To: Samuel Kidman
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: How do I get the version of CIFS vfs with the backuid and
+backupgid on my system?
+
+3.1 kernel included the backupuid and backupgid mount options.  The
+3.4 kernel included a fix for this so that readdir ("ls" command) passes
+the backup intent flag.  Version 12.04 of Ubuntu includes at least a 3.2
+kernel and would be fine for some backup applications, but if you are
+running the previous version it does appear that there are various
+apt-get repositories which contain newer kernels.
+
+On Thu, Aug 9, 2012 at 10:03 PM, Samuel Kidman
+<Samuel.Kidman-Z3GdMYdHZ+HQT0dZR+AlfA@public.gmane.org> wrote:
+> Hello
+>
+> My system is-
+>
+> 3.0.0-23-generic-pae #39-Ubuntu SMP Thu Jul 19 19:39:19 UTC 2012 i686
+> i686 i386 GNU/Linux
+>
+> My goal is to mount a CIFS share and utilise backup intent to get read
+
+> access to the CIFS share. However it seems that the version of CIFS 
+> vfs or the version of cifs-utils on my system isn't up to date enough 
+> to use this functionality. What is the correct version of CIFS vfs to 
+> install to get the backupuid and backupgid mounting options? How can 
+> this be installed in Ubuntu?
+>
+> Thanks.
+>
+> Sam Kidman
+> IT System Administrator
+>
+>
+>
+>
+>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" 
+> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo 
+> info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--
+Thanks,
+
+Steve
