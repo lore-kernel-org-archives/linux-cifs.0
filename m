@@ -1,61 +1,95 @@
-From: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2] cifscreds: add a check and warnings for session keyring problems
-Date: Mon, 13 Aug 2012 22:21:52 +0100
-Message-ID: <6113.1344892912@warthog.procyon.org.uk>
-References: <1344447933.32720.3.camel@athlon.garagome> <30167.1342557999@warthog.procyon.org.uk> <1342704916-2224-1-git-send-email-jlayton@samba.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v3 11/15] cifs: allocate kvec array for cifs_readdata as a
+ separate allocation
+Date: Tue, 14 Aug 2012 12:45:32 +0400
+Message-ID: <CAKywueQ0XrFH17CDnWFkAZbtjg0wuFxX3PRP7LGm97g2gsaQKw@mail.gmail.com>
+References: <1344252672-15244-1-git-send-email-jlayton@redhat.com>
+	<1344252672-15244-12-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Milan
-	 =?us-ascii?Q?=3D=3FUTF-8=3FQ=3FKn=3DC3=3DAD=3DC5=3DBEek=3F=3D?=
-	<knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1344447933.32720.3.camel-77nuZImz6nKt3pJmeLR6bw@public.gmane.org>
+In-Reply-To: <1344252672-15244-12-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Milan Kn=C3=AD=C5=BEek <knizek.confy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2012/8/6 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> Eventually, we're going to want to append a list of pages to
+> cifs_readdata instead of a list of kvecs. To prepare for that, turn
+> the kvec array allocation into a separate one and just keep a
+> pointer to it in the readdata.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsglob.h |  2 +-
+>  fs/cifs/file.c     | 15 ++++++++++++---
+>  2 files changed, 13 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 0f06a57..9437162 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -981,7 +981,7 @@ struct cifs_readdata {
+>         int (*marshal_iov) (struct cifs_readdata *rdata,
+>                             unsigned int remaining);
+>         unsigned int                    nr_iov;
+> -       struct kvec                     iov[1];
+> +       struct kvec                     *iov;
+>  };
+>
+>  struct cifs_writedata;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 3876abb..7d822c6 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -2410,19 +2410,27 @@ ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+>  }
+>
+>  static struct cifs_readdata *
+> -cifs_readdata_alloc(unsigned int nr_vecs, work_func_t complete)
+> +cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
+>  {
+>         struct cifs_readdata *rdata;
+> +       struct kvec *iov;
+>
+> -       rdata = kzalloc(sizeof(*rdata) +
+> -                       sizeof(struct kvec) * nr_vecs, GFP_KERNEL);
+> +       iov = kzalloc(sizeof(*iov) * (nr_pages + 1), GFP_KERNEL);
+> +       if (!iov)
+> +               return (struct cifs_readdata *)iov;
+> +
+> +       rdata = kzalloc(sizeof(*rdata), GFP_KERNEL);
+>         if (rdata != NULL) {
+>                 kref_init(&rdata->refcount);
+>                 INIT_LIST_HEAD(&rdata->list);
+>                 init_completion(&rdata->done);
+>                 INIT_WORK(&rdata->work, complete);
+>                 INIT_LIST_HEAD(&rdata->pages);
+> +               rdata->iov = iov;
+> +       } else {
+> +               kfree(iov);
+>         }
+> +
+>         return rdata;
+>  }
+>
+> @@ -2435,6 +2443,7 @@ cifs_readdata_release(struct kref *refcount)
+>         if (rdata->cfile)
+>                 cifsFileInfo_put(rdata->cfile);
+>
+> +       kfree(rdata->iov);
+>         kfree(rdata);
+>  }
+>
+> --
+> 1.7.11.2
+>
 
-> How does one arrange that the session keyring is set up properly for
-> various login methods?
+Looks correct.
 
-These are all the places I have it:
+Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-/etc/pam.d/fingerprint-auth	session optional pam_keyinit.so revoke
-/etc/pam.d/fingerprint-auth-ac	session optional pam_keyinit.so revoke
-/etc/pam.d/gdm-autologin	session optional pam_keyinit.so force revoke
-/etc/pam.d/gdm-fingerprint	session optional pam_keyinit.so force revoke
-/etc/pam.d/gdm-password		session optional pam_keyinit.so force revoke
-/etc/pam.d/gdm-smartcard	session optional pam_keyinit.so force revoke
-/etc/pam.d/gdm-welcome		session optional pam_keyinit.so force revoke
-/etc/pam.d/kdm			session optional pam_keyinit.so force revoke
-/etc/pam.d/kdm-np		session optional pam_keyinit.so force revoke
-/etc/pam.d/login		session optional pam_keyinit.so force revoke
-/etc/pam.d/password-auth	session optional pam_keyinit.so revoke
-/etc/pam.d/password-auth-ac	session optional pam_keyinit.so revoke
-/etc/pam.d/remote		session optional pam_keyinit.so force revoke
-/etc/pam.d/runuser		session optional pam_keyinit.so revoke
-/etc/pam.d/runuser-l		session optional pam_keyinit.so force revoke
-/etc/pam.d/smartcard-auth	session optional pam_keyinit.so revoke
-/etc/pam.d/smartcard-auth-ac	session optional pam_keyinit.so revoke
-/etc/pam.d/sshd			session optional pam_keyinit.so force revoke
-/etc/pam.d/sudo			session optional pam_keyinit.so revoke
-/etc/pam.d/sudo-i		session optional pam_keyinit.so force revoke
-/etc/pam.d/su-l			session optional pam_keyinit.so force revoke
-/etc/pam.d/system-auth		session optional pam_keyinit.so revoke
-/etc/pam.d/system-auth-ac	session optional pam_keyinit.so revoke
-/etc/pam.d/vsftpd		session optional pam_keyinit.so force revoke
-/etc/pam.d/xdm			session optional pam_keyinit.so force revoke
-/etc/pam.d/xserver		session optional pam_keyinit.so force revoke
-
-> pam_keyinit.so was already in /etc/pam.d/gdm-password, though when
-> logged in into Xfce from GDM, then "cifscreds add" typed in
-> xfce4-terminal complains about non-persistent keyring.
-
-What name does gdm use when logging in?  I see five different names in =
-the
-list above.
-
-David
+-- 
+Best regards,
+Pavel Shilovsky.
