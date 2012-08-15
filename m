@@ -1,95 +1,46 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH v3 11/15] cifs: allocate kvec array for cifs_readdata as a
- separate allocation
-Date: Tue, 14 Aug 2012 12:45:32 +0400
-Message-ID: <CAKywueQ0XrFH17CDnWFkAZbtjg0wuFxX3PRP7LGm97g2gsaQKw@mail.gmail.com>
-References: <1344252672-15244-1-git-send-email-jlayton@redhat.com>
-	<1344252672-15244-12-git-send-email-jlayton@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/2] CIFS: Fix memory leak in SMB2 oplock break code
+Date: Wed, 15 Aug 2012 15:24:22 +0400
+Message-ID: <1345029863-6731-1-git-send-email-pshilovsky@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1344252672-15244-12-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/8/6 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Eventually, we're going to want to append a list of pages to
-> cifs_readdata instead of a list of kvecs. To prepare for that, turn
-> the kvec array allocation into a separate one and just keep a
-> pointer to it in the readdata.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h |  2 +-
->  fs/cifs/file.c     | 15 ++++++++++++---
->  2 files changed, 13 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 0f06a57..9437162 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -981,7 +981,7 @@ struct cifs_readdata {
->         int (*marshal_iov) (struct cifs_readdata *rdata,
->                             unsigned int remaining);
->         unsigned int                    nr_iov;
-> -       struct kvec                     iov[1];
-> +       struct kvec                     *iov;
->  };
->
->  struct cifs_writedata;
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 3876abb..7d822c6 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2410,19 +2410,27 @@ ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
->  }
->
->  static struct cifs_readdata *
-> -cifs_readdata_alloc(unsigned int nr_vecs, work_func_t complete)
-> +cifs_readdata_alloc(unsigned int nr_pages, work_func_t complete)
->  {
->         struct cifs_readdata *rdata;
-> +       struct kvec *iov;
->
-> -       rdata = kzalloc(sizeof(*rdata) +
-> -                       sizeof(struct kvec) * nr_vecs, GFP_KERNEL);
-> +       iov = kzalloc(sizeof(*iov) * (nr_pages + 1), GFP_KERNEL);
-> +       if (!iov)
-> +               return (struct cifs_readdata *)iov;
-> +
-> +       rdata = kzalloc(sizeof(*rdata), GFP_KERNEL);
->         if (rdata != NULL) {
->                 kref_init(&rdata->refcount);
->                 INIT_LIST_HEAD(&rdata->list);
->                 init_completion(&rdata->done);
->                 INIT_WORK(&rdata->work, complete);
->                 INIT_LIST_HEAD(&rdata->pages);
-> +               rdata->iov = iov;
-> +       } else {
-> +               kfree(iov);
->         }
-> +
->         return rdata;
->  }
->
-> @@ -2435,6 +2443,7 @@ cifs_readdata_release(struct kref *refcount)
->         if (rdata->cfile)
->                 cifsFileInfo_put(rdata->cfile);
->
-> +       kfree(rdata->iov);
->         kfree(rdata);
->  }
->
-> --
-> 1.7.11.2
->
+SendReceive2 doesn't free a response buffer but SendReceiveNoRsp does.
 
-Looks correct.
+Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c |    9 ++-------
+ 1 files changed, 2 insertions(+), 7 deletions(-)
 
-Reviewed-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index b183420..88ac69c 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1943,9 +1943,8 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 		  const u64 persistent_fid, const u64 volatile_fid,
+ 		  __u8 oplock_level)
+ {
+-	int rc = 0, buf_type;
++	int rc;
+ 	struct smb2_oplock_break *req = NULL;
+-	struct kvec iov[1];
+ 
+ 	cFYI(1, "SMB2_oplock_break");
+ 	rc = small_smb2_init(SMB2_OPLOCK_BREAK, tcon, (void **) &req);
+@@ -1958,11 +1957,7 @@ SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ 	req->OplockLevel = oplock_level;
+ 	req->hdr.CreditRequest = cpu_to_le16(1);
+ 
+-	iov->iov_base = (char *)req;
+-	/* 4 for rfc1002 length */
+-	iov->iov_len = get_rfc1002_length(req) + 4;
+-
+-	rc = SendReceive2(xid, tcon->ses, iov, 1, &buf_type, CIFS_OBREAK_OP);
++	rc = SendReceiveNoRsp(xid, tcon->ses, (char *) req, CIFS_OBREAK_OP);
+ 	/* SMB2 buffer freed by function above */
+ 
+ 	if (rc) {
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.1
