@@ -1,403 +1,69 @@
 From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 04/10] CIFS: Add brlock support for SMB2
-Date: Mon, 20 Aug 2012 22:42:54 +0400
-Message-ID: <1345488180-5942-5-git-send-email-pshilovsky@samba.org>
+Subject: [PATCH 02/10] CIFS: Handle SMB2 lock flags
+Date: Mon, 20 Aug 2012 22:42:52 +0400
+Message-ID: <1345488180-5942-3-git-send-email-pshilovsky@samba.org>
 References: <1345488180-5942-1-git-send-email-pshilovsky@samba.org>
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <1345488180-5942-1-git-send-email-pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- fs/cifs/cifsproto.h |    4 ++
- fs/cifs/file.c      |    8 +--
- fs/cifs/smb2file.c  |  145 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2ops.c   |   16 +++++-
- fs/cifs/smb2pdu.c   |   59 +++++++++++++++++++++
- fs/cifs/smb2pdu.h   |   24 ++++++++
- fs/cifs/smb2proto.h |   11 ++++
- 7 files changed, 261 insertions(+), 6 deletions(-)
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index a7e238f..15e38dc 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -190,6 +190,10 @@ extern void cifs_dfs_release_automount_timer(void);
- void cifs_proc_init(void);
- void cifs_proc_clean(void);
- 
-+extern void cifs_move_llist(struct list_head *source, struct list_head *dest);
-+extern void cifs_free_llist(struct list_head *llist);
-+extern void cifs_del_lock_waiters(struct cifsLockInfo *lock);
-+
- extern int cifs_negotiate_protocol(const unsigned int xid,
- 				   struct cifs_ses *ses);
- extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index afc903c..0d525eb 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -288,8 +288,6 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
- 	return cfile;
- }
- 
--static void cifs_del_lock_waiters(struct cifsLockInfo *lock);
--
- struct cifsFileInfo *
- cifsFileInfo_get(struct cifsFileInfo *cifs_file)
- {
-@@ -695,7 +693,7 @@ cifs_lock_init(__u64 offset, __u64 length, __u8 type)
- 	return lock;
- }
- 
--static void
-+void
- cifs_del_lock_waiters(struct cifsLockInfo *lock)
- {
- 	struct cifsLockInfo *li, *tmp;
-@@ -1230,7 +1228,7 @@ cifs_getlk(struct file *file, struct file_lock *flock, __u32 type,
- 	return 0;
- }
- 
--static void
-+void
- cifs_move_llist(struct list_head *source, struct list_head *dest)
- {
- 	struct list_head *li, *tmp;
-@@ -1238,7 +1236,7 @@ cifs_move_llist(struct list_head *source, struct list_head *dest)
- 		list_move(li, dest);
- }
- 
--static void
-+void
- cifs_free_llist(struct list_head *llist)
- {
- 	struct cifsLockInfo *li, *tmp;
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index 5ff25e0..de122f7 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -104,3 +104,148 @@ out:
- 	kfree(smb2_path);
- 	return rc;
- }
-+
-+int
-+smb2_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
-+		  const unsigned int xid)
-+{
-+	int rc = 0, stored_rc;
-+	unsigned int max_num, num, max_buf;
-+	struct smb2_lock_element *buf, *cur;
-+	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-+	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
-+	struct cifsLockInfo *li, *tmp;
-+	__u64 length = 1 + flock->fl_end - flock->fl_start;
-+	struct list_head tmp_llist;
-+
-+	INIT_LIST_HEAD(&tmp_llist);
-+
-+	/*
-+	 * Accessing maxBuf is racy with cifs_reconnect - need to store value
-+	 * and check it for zero before using.
-+	 */
-+	max_buf = tcon->ses->server->maxBuf;
-+	if (!max_buf)
-+		return -EINVAL;
-+
-+	max_num = max_buf / sizeof(struct smb2_lock_element);
-+	buf = kzalloc(max_num * sizeof(struct smb2_lock_element), GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	mutex_lock(&cinode->lock_mutex);
-+	cur = buf;
-+	num = 0;
-+	list_for_each_entry_safe(li, tmp, &cfile->llist->locks, llist) {
-+		if (flock->fl_start > li->offset ||
-+		    (flock->fl_start + length) <
-+		    (li->offset + li->length))
-+			continue;
-+		if (current->tgid != li->pid)
-+			continue;
-+		if (cinode->can_cache_brlcks) {
-+			/*
-+			 * We can cache brlock requests - simply remove a lock
-+			 * from the file's list.
-+			 */
-+			list_del(&li->llist);
-+			cifs_del_lock_waiters(li);
-+			kfree(li);
-+			continue;
-+		}
-+		cur->Length = cpu_to_le64(li->length);
-+		cur->Offset = cpu_to_le64(li->offset);
-+		cur->Flags = cpu_to_le32(SMB2_LOCKFLAG_UNLOCK);
-+		/*
-+		 * We need to save a lock here to let us add it again to the
-+		 * file's list if the unlock range request fails on the server.
-+		 */
-+		list_move(&li->llist, &tmp_llist);
-+		if (++num == max_num) {
-+			stored_rc = smb2_lockv(xid, tcon,
-+					       cfile->fid.persistent_fid,
-+					       cfile->fid.volatile_fid,
-+					       current->tgid, num, buf);
-+			if (stored_rc) {
-+				/*
-+				 * We failed on the unlock range request - add
-+				 * all locks from the tmp list to the head of
-+				 * the file's list.
-+				 */
-+				cifs_move_llist(&tmp_llist,
-+						&cfile->llist->locks);
-+				rc = stored_rc;
-+			} else
-+				/*
-+				 * The unlock range request succeed - free the
-+				 * tmp list.
-+				 */
-+				cifs_free_llist(&tmp_llist);
-+			cur = buf;
-+			num = 0;
-+		} else
-+			cur++;
-+	}
-+	if (num) {
-+		stored_rc = smb2_lockv(xid, tcon, cfile->fid.persistent_fid,
-+				       cfile->fid.volatile_fid, current->tgid,
-+				       num, buf);
-+		if (stored_rc) {
-+			cifs_move_llist(&tmp_llist, &cfile->llist->locks);
-+			rc = stored_rc;
-+		} else
-+			cifs_free_llist(&tmp_llist);
-+	}
-+
-+	mutex_unlock(&cinode->lock_mutex);
-+	kfree(buf);
-+	return rc;
-+}
-+
-+static int
-+__smb2_push_mandatory_locks(struct cifs_fid_locks *fdlocks, int xid)
-+{
-+	int rc = 0, stored_rc;
-+	struct cifsFileInfo *cfile = fdlocks->cfile;
-+	struct cifsLockInfo *li, *tmp;
-+
-+	list_for_each_entry_safe(li, tmp, &fdlocks->locks, llist) {
-+		stored_rc = SMB2_lock(xid, tlink_tcon(cfile->tlink),
-+				      cfile->fid.persistent_fid,
-+				      cfile->fid.volatile_fid,
-+				      li->pid, li->length, li->offset, li->type,
-+				      false);
-+		if (stored_rc)
-+			rc = stored_rc;
-+	}
-+
-+	return rc;
-+}
-+
-+int
-+smb2_push_mandatory_locks(struct cifsFileInfo *cfile)
-+{
-+	int rc = 0, stored_rc;
-+	unsigned int xid;
-+	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
-+	struct cifs_fid_locks *cur, *tmp;
-+
-+	xid = get_xid();
-+	mutex_lock(&cinode->lock_mutex);
-+	if (!cinode->can_cache_brlcks) {
-+		mutex_unlock(&cinode->lock_mutex);
-+		free_xid(xid);
-+		return rc;
-+	}
-+
-+	list_for_each_entry_safe(cur, tmp, &cinode->llist, llist) {
-+		stored_rc = __smb2_push_mandatory_locks(cur, xid);
-+		if (stored_rc)
-+			rc = stored_rc;
-+	}
-+
-+	cinode->can_cache_brlcks = false;
-+	mutex_unlock(&cinode->lock_mutex);
-+	free_xid(xid);
-+	return rc;
-+}
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/smb2ops.c |   12 ++++++++++++
+ fs/cifs/smb2pdu.h |    5 +++++
+ 2 files changed, 17 insertions(+), 0 deletions(-)
+
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index e4a59d1..0808b23 100644
+index b1dedf8..e4a59d1 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -371,7 +371,7 @@ smb2_set_fid(struct cifsFileInfo *cfile, struct cifs_fid *fid, __u32 oplock)
- 	cfile->fid.persistent_fid = fid->persistent_fid;
- 	cfile->fid.volatile_fid = fid->volatile_fid;
- 	smb2_set_oplock_level(cinode, oplock);
--	/* cinode->can_cache_brlcks = cinode->clientCanCacheAll; */
-+	cinode->can_cache_brlcks = cinode->clientCanCacheAll;
+@@ -537,7 +537,15 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
  }
  
- static int
-@@ -544,6 +544,17 @@ smb2_compare_fids(struct cifsFileInfo *ob1, struct cifsFileInfo *ob2)
- 	       ob1->fid.volatile_fid == ob2->fid.volatile_fid;
- }
- 
-+static int
-+smb2_mand_lock(const unsigned int xid, struct cifsFileInfo *cfile, __u64 offset,
-+	       __u64 length, __u32 type, int lock, int unlock, bool wait)
++static bool
++smb2_compare_fids(struct cifsFileInfo *ob1, struct cifsFileInfo *ob2)
 +{
-+	if (unlock && !lock)
-+		type = SMB2_LOCKFLAG_UNLOCK;
-+	return SMB2_lock(xid, tlink_tcon(cfile->tlink),
-+			 cfile->fid.persistent_fid, cfile->fid.volatile_fid,
-+			 current->tgid, length, offset, type, wait);
++	return ob1->fid.persistent_fid == ob2->fid.persistent_fid &&
++	       ob1->fid.volatile_fid == ob2->fid.volatile_fid;
 +}
 +
  struct smb_version_operations smb21_operations = {
- 	.compare_fids = smb2_compare_fids,
++	.compare_fids = smb2_compare_fids,
  	.setup_request = smb2_setup_request,
-@@ -602,6 +613,9 @@ struct smb_version_operations smb21_operations = {
- 	.is_status_pending = smb2_is_status_pending,
- 	.oplock_response = smb2_oplock_response,
- 	.queryfs = smb2_queryfs,
-+	.mand_lock = smb2_mand_lock,
-+	.mand_unlock_range = smb2_unlock_range,
-+	.push_mand_locks = smb2_push_mandatory_locks,
- };
+ 	.setup_async_request = smb2_setup_async_request,
+ 	.check_receive = smb2_check_receive,
+@@ -598,6 +606,10 @@ struct smb_version_operations smb21_operations = {
  
  struct smb_version_values smb21_values = {
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1b44761..f7e0a54 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -2047,3 +2047,62 @@ qinf_exit:
- 	free_rsp_buf(resp_buftype, iov.iov_base);
- 	return rc;
- }
-+
-+int
-+smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
-+	   const __u64 persist_fid, const __u64 volatile_fid, const __u32 pid,
-+	   const __u32 num_lock, struct smb2_lock_element *buf)
-+{
-+	int rc = 0;
-+	struct smb2_lock_req *req = NULL;
-+	struct kvec iov[2];
-+	int resp_buf_type;
-+	unsigned int count;
-+
-+	cFYI(1, "smb2_lockv num lock %d", num_lock);
-+
-+	rc = small_smb2_init(SMB2_LOCK, tcon, (void **) &req);
-+	if (rc)
-+		return rc;
-+
-+	req->hdr.ProcessId = cpu_to_le32(pid);
-+	req->LockCount = cpu_to_le16(num_lock);
-+
-+	req->PersistentFileId = persist_fid;
-+	req->VolatileFileId = volatile_fid;
-+
-+	count = num_lock * sizeof(struct smb2_lock_element);
-+	inc_rfc1001_len(req, count - sizeof(struct smb2_lock_element));
-+
-+	iov[0].iov_base = (char *)req;
-+	/* 4 for rfc1002 length field and count for all locks */
-+	iov[0].iov_len = get_rfc1002_length(req) + 4 - count;
-+	iov[1].iov_base = (char *)buf;
-+	iov[1].iov_len = count;
-+
-+	cifs_stats_inc(&tcon->stats.cifs_stats.num_locks);
-+	rc = SendReceive2(xid, tcon->ses, iov, 2, &resp_buf_type, CIFS_NO_RESP);
-+	if (rc) {
-+		cFYI(1, "Send error in cifs_lockv = %d", rc);
-+		cifs_stats_fail_inc(tcon, SMB2_LOCK_HE);
-+	}
-+
-+	return rc;
-+}
-+
-+int
-+SMB2_lock(const unsigned int xid, struct cifs_tcon *tcon,
-+	  const __u64 persist_fid, const __u64 volatile_fid, const __u32 pid,
-+	  const __u64 length, const __u64 offset, const __u32 lock_flags,
-+	  const bool wait)
-+{
-+	struct smb2_lock_element lock;
-+
-+	lock.Offset = cpu_to_le64(offset);
-+	lock.Length = cpu_to_le64(length);
-+	lock.Flags = cpu_to_le32(lock_flags);
-+	if (!wait && lock_flags != SMB2_LOCKFLAG_UNLOCK)
-+		lock.Flags |= SMB2_LOCKFLAG_FAIL_IMMEDIATELY;
-+
-+	return smb2_lockv(xid, tcon, persist_fid, volatile_fid, pid, 1, &lock);
-+}
+ 	.version_string = SMB21_VERSION_STRING,
++	.large_lock_type = 0,
++	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
++	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
++	.unlock_lock_type = SMB2_LOCKFLAG_UNLOCK,
+ 	.header_size = sizeof(struct smb2_hdr),
+ 	.max_header_size = MAX_SMB2_HDR_SIZE,
+ 	.read_rsp_size = sizeof(struct smb2_read_rsp) - 1,
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index d12d868..102dea8 100644
+index 4b31825..d12d868 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -531,6 +531,30 @@ struct smb2_write_rsp {
- #define SMB2_LOCKFLAG_UNLOCK		0x0004
- #define SMB2_LOCKFLAG_FAIL_IMMEDIATELY	0x0010
+@@ -526,6 +526,11 @@ struct smb2_write_rsp {
+ 	__u8   Buffer[1];
+ } __packed;
  
-+struct smb2_lock_element {
-+	__le64 Offset;
-+	__le64 Length;
-+	__le32 Flags;
-+	__le32 Reserved;
-+} __packed;
-+
-+struct smb2_lock_req {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 48 */
-+	__le16 LockCount;
-+	__le32 Reserved;
-+	__u64  PersistentFileId; /* opaque endianness */
-+	__u64  VolatileFileId; /* opaque endianness */
-+	/* Followed by at least one */
-+	struct smb2_lock_element locks[1];
-+} __packed;
-+
-+struct smb2_lock_rsp {
-+	struct smb2_hdr hdr;
-+	__le16 StructureSize; /* Must be 4 */
-+	__le16 Reserved;
-+} __packed;
++#define SMB2_LOCKFLAG_SHARED_LOCK	0x0001
++#define SMB2_LOCKFLAG_EXCLUSIVE_LOCK	0x0002
++#define SMB2_LOCKFLAG_UNLOCK		0x0004
++#define SMB2_LOCKFLAG_FAIL_IMMEDIATELY	0x0010
 +
  struct smb2_echo_req {
  	struct smb2_hdr hdr;
  	__le16 StructureSize;	/* Must be 4 */
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index aeb30db..8b4d371 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -84,6 +84,9 @@ extern int smb2_open_file(const unsigned int xid, struct cifs_tcon *tcon,
- 			  struct cifs_fid *fid, __u32 *oplock,
- 			  FILE_ALL_INFO *buf, struct cifs_sb_info *cifs_sb);
- extern void smb2_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock);
-+extern int smb2_unlock_range(struct cifsFileInfo *cfile,
-+			     struct file_lock *flock, const unsigned int xid);
-+extern int smb2_push_mandatory_locks(struct cifsFileInfo *cfile);
- 
- /*
-  * SMB2 Worker functions - most of protocol specific implementation details
-@@ -140,5 +143,13 @@ extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
- extern int SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
- 			 u64 persistent_file_id, u64 volatile_file_id,
- 			 struct kstatfs *FSData);
-+extern int SMB2_lock(const unsigned int xid, struct cifs_tcon *tcon,
-+		     const __u64 persist_fid, const __u64 volatile_fid,
-+		     const __u32 pid, const __u64 length, const __u64 offset,
-+		     const __u32 lockFlags, const bool wait);
-+extern int smb2_lockv(const unsigned int xid, struct cifs_tcon *tcon,
-+		      const __u64 persist_fid, const __u64 volatile_fid,
-+		      const __u32 pid, const __u32 num_lock,
-+		      struct smb2_lock_element *buf);
- 
- #endif			/* _SMB2PROTO_H */
 -- 
 1.7.1
