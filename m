@@ -1,148 +1,77 @@
-From: Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/2] scan /run/user/${UID} for ccaches, too
-Date: Tue, 21 Aug 2012 18:56:48 -0400
-Message-ID: <20120821225648.GI9511@redhat.com>
-References: <20120821225443.GG9511@redhat.com>
+From: Bastien ROUCARIES <roucaries.bastien@gmail.com>
+Subject: Re: [PATCH] cifs: remove misleading strncpy: each name has length < 16
+Date: Mon, 20 Aug 2012 19:36:26 +0200
+Message-ID: <CAE2SPAbBmRov9qK2HiBQBQXaZpfJ8pmZJ-PL18FEyoZhzDza4A@mail.gmail.com>
+References: <1345481724-30108-1-git-send-email-jim@meyering.net>
+	<1345481724-30108-6-git-send-email-jim@meyering.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20120821225443.GG9511-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Cc: Jim Meyering <meyering@redhat.com>, linux-cifs@vger.kernel.org,
+	Steve French <sfrench@samba.org>,
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Jim Meyering <jim@meyering.net>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <1345481724-30108-6-git-send-email-jim@meyering.net>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-When scanning for credential caches, check the user's directory under
-/run/user first, then fall back to /tmp as we have previously.  Because
-we now call find_krb5_cc() twice (once for each directory), we move its
-state to be outside of the function.  We also add a substitution
-mechanism to make the process of resolving the location of the user's
-home directory before searching it a bit more explicable.
----
- cifs.upcall.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 51 insertions(+), 11 deletions(-)
+Le 20 ao=C3=BBt 2012 19:29, "Jim Meyering" <jim@meyering.net> a =C3=A9crit =
+:
+>
+> From: Jim Meyering <meyering@redhat.com>
+>
+> Each of the protocols[i].name strings (statically declared above)
+> has length less than 16, so this use of strncpy is misleading:
+>   strncpy(pSMB->DialectsArray+count, protocols[i].name, 16);
+> Besides, if a new name were added with length N >=3D 16, the existing
+> strncpy-using code would be buggy, creating a ->DialectsArray buffer
+> containing N-16+1 unset bytes where the NUL terminator should have
+> been.  Instead, traverse the name only once go get its length,
+> use a BUG_ON assertion to enforce the length restriction
+> and use memcpy to perform the copy.
+>
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 6f95c1c..598a999 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -53,7 +53,8 @@
- #include "cifs_spnego.h"
- 
- #define	CIFS_DEFAULT_KRB5_DIR		"/tmp"
--#define	CIFS_DEFAULT_KRB5_PREFIX	"krb5cc_"
-+#define	CIFS_DEFAULT_KRB5_USER_DIR	"/run/user/%U"
-+#define	CIFS_DEFAULT_KRB5_PREFIX	"krb5cc"
- #define CIFS_DEFAULT_KRB5_KEYTAB	"/etc/krb5.keytab"
- 
- #define	MAX_CCNAME_LEN			PATH_MAX + 5
-@@ -258,14 +259,47 @@ icfk_cleanup:
- 	return ccname;
- }
- 
-+/* resolve a pattern to an actual directory path */
-+static char *resolve_krb5_dir(const char *pattern, uid_t uid)
-+{
-+	char name[MAX_CCNAME_LEN];
-+	int i;
-+	size_t j;
-+	for (i = 0, j = 0; (pattern[i] != '\0') && (j < sizeof(name)); i++) {
-+		switch (pattern[i]) {
-+		case '%':
-+			switch (pattern[i + 1]) {
-+			case '%':
-+				name[j++] = pattern[i];
-+				i++;
-+				break;
-+			case 'U':
-+				j += snprintf(name + j, sizeof(name) - j,
-+					      "%lu", (unsigned long) uid);
-+				i++;
-+				break;
-+			}
-+			break;
-+		default:
-+			name[j++] = pattern[i];
-+			break;
-+		}
-+	}
-+	if ((j > 0) && (j < sizeof(name)))
-+		return strndup(name, MAX_CCNAME_LEN);
-+	else
-+		return NULL;
-+}
-+
- /* search for a credcache that looks like a likely candidate */
--static char *find_krb5_cc(const char *dirname, uid_t uid)
-+static char *find_krb5_cc(const char *dirname, uid_t uid,
-+			  char **best_cache, time_t *best_time)
- {
- 	struct dirent **namelist;
- 	struct stat sbuf;
--	char ccname[MAX_CCNAME_LEN], *credpath, *best_cache = NULL;
-+	char ccname[MAX_CCNAME_LEN], *credpath;
- 	int i, n;
--	time_t cred_time, best_time = 0;
-+	time_t cred_time;
- 
- 	n = scandir(dirname, &namelist, krb5cc_filter, NULL);
- 	if (n < 0) {
-@@ -310,7 +344,7 @@ static char *find_krb5_cc(const char *dirname, uid_t uid)
- 			continue;
- 		}
- 
--		if (cred_time <= best_time) {
-+		if (cred_time <= *best_time) {
- 			syslog(LOG_DEBUG, "%s: %s expires sooner than current "
- 			       "best.", __func__, ccname);
- 			free(namelist[i]);
-@@ -318,14 +352,14 @@ static char *find_krb5_cc(const char *dirname, uid_t uid)
- 		}
- 
- 		syslog(LOG_DEBUG, "%s: %s is valid ccache", __func__, ccname);
--		free(best_cache);
--		best_cache = strndup(ccname, MAX_CCNAME_LEN);
--		best_time = cred_time;
-+		free(*best_cache);
-+		*best_cache = strndup(ccname, MAX_CCNAME_LEN);
-+		*best_time = cred_time;
- 		free(namelist[i]);
- 	}
- 	free(namelist);
- 
--	return best_cache;
-+	return *best_cache;
- }
- 
- static int
-@@ -793,12 +827,13 @@ int main(const int argc, char *const argv[])
- 	unsigned int have;
- 	long rc = 1;
- 	int c, try_dns = 0, legacy_uid = 0;
--	char *buf, *ccname = NULL;
-+	char *buf, *ccdir = NULL, *ccname = NULL, *best_cache = NULL;
- 	char hostbuf[NI_MAXHOST], *host;
- 	struct decoded_args arg;
- 	const char *oid;
- 	uid_t uid;
- 	char *keytab_name = CIFS_DEFAULT_KRB5_KEYTAB;
-+	time_t best_time = 0;
- 
- 	hostbuf[0] = '\0';
- 	memset(&arg, 0, sizeof(arg));
-@@ -901,7 +936,12 @@ int main(const int argc, char *const argv[])
- 		syslog(LOG_ERR, "setuid: %s", strerror(errno));
- 		goto out;
- 	}
--	ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid);
-+	ccdir = resolve_krb5_dir(CIFS_DEFAULT_KRB5_USER_DIR, uid);
-+	if (ccdir != NULL)
-+		find_krb5_cc(ccdir, uid, &best_cache, &best_time);
-+	ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid, &best_cache,
-+			      &best_time);
-+	SAFE_FREE(ccdir);
- 
- 	/* Couldn't find credcache? Try to use keytab */
- 	if (ccname == NULL && arg.username != NULL)
--- 
-1.7.11.5
+Could you use ARRAY_SIZE instead of hard coding 16?
+> Signed-off-by: Jim Meyering <meyering@redhat.com>
+> ---
+>  fs/cifs/cifssmb.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 074923c..16a9018 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -441,8 +441,10 @@ CIFSSMBNegotiate(const unsigned int xid, struct
+cifs_ses *ses)
+>
+>         count =3D 0;
+>         for (i =3D 0; i < CIFS_NUM_PROT; i++) {
+> -               strncpy(pSMB->DialectsArray+count, protocols[i].name, 16)=
+;
+> -               count +=3D strlen(protocols[i].name) + 1;
+> +               size_t len =3D strlen(protocols[i].name);
+> +               BUG_ON(len >=3D 16);
+> +               memcpy(pSMB->DialectsArray+count, protocols[i].name, len
++ 1);
+> +               count +=3D len + 1;
+>                 /* null at end of source and target buffers anyway */
+>         }
+>         inc_rfc1001_len(pSMB, count);
+> --
+> 1.7.12
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" i=
+n
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
