@@ -1,51 +1,65 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 30/45] CIFS: Enable signing in SMB2
-Date: Tue, 21 Aug 2012 18:01:01 +0400
-Message-ID: <CAKywueQaO36DsyJ9Q_pea0-YHcDSUT4u6VFo8D=ubXkLe9GPNQ@mail.gmail.com>
-References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org>
-	<1342626541-29872-31-git-send-email-pshilovsky@samba.org>
-	<k0vdnf$434$1@ger.gmane.org>
+Subject: Re: [PATCH 00/10] SMB2 brlocks, leases and multicredit io
+Date: Tue, 21 Aug 2012 18:08:40 +0400
+Message-ID: <CAKywueRsBYRyCFMjWEhtTS5GP2PWqv4Y_W49q+Q+egBo-xCY3w@mail.gmail.com>
+References: <1345488180-5942-1-git-send-email-pshilovsky@samba.org>
+	<k0vjao$hck$1@ger.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <k0vdnf$434$1@ger.gmane.org>
+In-Reply-To: <k0vjao$hck$1@ger.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/8/21 Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
 > Hi Pavel,
 >
->> Use hmac-sha256 and rather than hmac-md5 that is used for CIFS/SMB.
+>> This is a patchset that includes the rest of SMB2 changes: brlocks, leases and multicredit io.
 >>
->> Signature field in SMB2 header is 16 bytes instead of 8 bytes.
+>> The changes are applied on top of Jeff's recent patchset and can be found here:
+>> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-dev-cork
+>>
+>> Pavel Shilovsky (10):
+>>   CIFS: Improve byte-range locks handling
+>>   CIFS: Handle SMB2 lock flags
+>>   CIFS: Move brlock code to ops struct
+>>   CIFS: Add brlock support for SMB2
+>>   CIFS: Request SMB2.1 leases
+>>   CIFS: Add SMB2.1 lease break support
+>>   CIFS: Fix cache coherency for read oplock case
+>>   CIFS: Make use of multicredit write for SMB2
+>>   CIFS: Make use of multicredit reads for SMB2
 >
-> Sorry for the late reply, I just found a reference to this patch...
+> Leases and multi-credit support are negotiated features in the capabilities
+> bits of the server. You should not rely on the dialect before you use them,
+> as there're servers which support SMB 2.1, but do not support leases or
+> multi-credit.
 
-No problem, thank you for your comments.
-
->
-> To me it seems that this patch doesn't take care of the fact that
-> the signing key in SMB2/3 belongs to the session and not to the transport
-> connection.
-
-Yes, you are right. Thanks to this point. I think we can fix this later.
+Ok, thanks - will fix this.
 
 >
-> Does the SMB2 code support multiuser mounts yet?
+> I think smb2_get_credit_size() should return 1 if the value in the header
+> is 0.
 
-No, SMB2 code doesn't support Kerberos auth and multiuser mounts yet.
+It brings no problem because CreditCharge value is set to 1 in header
+assemble (and can be rewritten further in async read and write
+codepath) - so, get_credit_size gets at least 1.
 
 >
-> Why are you using some "BSRSPYL " magic? I only saw that from Windows
-> clients
-> using SMB1. (Note: that servers just echo the signature from the
-> request, if they don't do signing).
+> Regarding
+> +       /* random value */
+> +       req->ClientGUID[0] = req->ClientGUID[3] = req->ClientGUID[7] = 7;
+>
+> I think you should use a random value here as the server uses this field
+> to detect if requests come from the same client. This should be a global
+> in the cifs.ok, which can change on reboot/module reload.
 >
 
-(CC'ing Shirish, as the original author of the patch.)
+Yes, this is a good point. I just set it this way temporarily (for
+testing purpose) and forgot to replace with random bytes. Thanks.
+
 
 -- 
 Best regards,
