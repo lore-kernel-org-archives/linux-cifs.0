@@ -1,85 +1,50 @@
-From: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 30/45] CIFS: Enable signing in SMB2
-Date: Wed, 22 Aug 2012 15:46:06 +0200
-Message-ID: <5034E29E.7030006@samba.org>
-References: <1342626541-29872-1-git-send-email-pshilovsky@samba.org> <1342626541-29872-31-git-send-email-pshilovsky@samba.org> <k0vdnf$434$1@ger.gmane.org> <CADT32e+4DSN=CSCbL+8GoRePknpD3X0HSq1hjVsXf3KHXQcmTw@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Finding krb5 ccaches of new types in new locations
+Date: Wed, 22 Aug 2012 13:00:33 -0400
+Message-ID: <20120822130033.7f51bc2a@tlielax.poochiereds.net>
+References: <20120821225443.GG9511@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig3C399DB6E50AEE4A062A6288"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32e+4DSN=CSCbL+8GoRePknpD3X0HSq1hjVsXf3KHXQcmTw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20120821225443.GG9511-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig3C399DB6E50AEE4A062A6288
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Tue, 21 Aug 2012 18:54:43 -0400
+Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Hi Shirish,
+> One of the things we're currently trying to do for Fedora 18 is to move
+> user credential caches from being files ("FILE" ccaches) in /tmp to
+> being subdirectories ("DIR" ccaches) under /run/user/${UID}.  To be very
+> specific, we'd go from using one of:
+>   FILE:/tmp/krb5cc_${UID}
+>   FILE:/tmp/krb5cc_${UID}_XXXXXX
+> to possibly using one of those, and possibly also any of these:
+>   DIR:/run/user/${UID}/krb5cc
+>   DIR:/run/user/${UID}/krb5cc_XXXXXX
+>   FILE:/run/user/${UID}/krb5cc
+>   FILE:/run/user/${UID}/krb5cc_XXXXXX
+>   DIR:/tmp/krb5cc_${UID}
+>   DIR:/tmp/krb5cc_${UID}_XXXXXX
+> 
+> Some would be more likely than others, but my goal here is to make sure
+> that cifs.upcall can find credentials in these other locations.  I'll
+> reply to this with suggested patches.
+> 
+> Thanks,
+> 
+> Nalin
 
-> On Tue, Aug 21, 2012 at 2:35 AM, Stefan Metzmacher <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wr=
-ote:
->> Hi Pavel,
->>
->>> Use hmac-sha256 and rather than hmac-md5 that is used for CIFS/SMB.
->>>
->>> Signature field in SMB2 header is 16 bytes instead of 8 bytes.
->>
->> Sorry for the late reply, I just found a reference to this patch...
->>
->> To me it seems that this patch doesn't take care of the fact that
->> the signing key in SMB2/3 belongs to the session and not to the transp=
-ort
->> connection.
->=20
-> metze, where do you see that?  This is the signing key that is used to =
-generate
-> signature, server->session_key.response.
+I tested an earlier version of these patches and they seemed to do the
+right thing. We don't upcall that often so the extra overhead of
+searching other directories should be ok.
 
-And 'server' is a per connection state not per session...
-which is ok for smb1 but not for smb2.
+I'll plan to merge these in another few days, assuming there are no
+objections.
 
->> Does the SMB2 code support multiuser mounts yet?
->>
->> Why are you using some "BSRSPYL " magic? I only saw that from Windows
->> clients
->> using SMB1. (Note: that servers just echo the signature from the
->> request, if they don't do signing).
->=20
-> IIRC, Jeff Layton added that code to encode BSRSPYL magic (string).
-> I could be wrong, it has been a while.
-> But, I do think this is a problem, signature in a smb message is not ev=
-en
-> checked till key exchange handshake is session setup is done, right?
-
-A session setup response with STATUS_SUCCESS is the first signed message.=
-
-Before that the server just echos what the client sends.
-
-For SMB1 windows client (and smbclient) send BSRSPYL if they would like t=
-o
-turn on signing later. But for SMB2 windows and samba send just zeros,
-which cifs.ko should also do.
-
-metze
-
-
---------------enig3C399DB6E50AEE4A062A6288
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://enigmail.mozdev.org/
-
-iEYEARECAAYFAlA04qIACgkQm70gjA5TCD+peACfQKf5syhg6yoS979Dc6FURaiC
-hm8AnRWAVLlW4rHi8f9MjMW31OWP6TZz
-=cwTF
------END PGP SIGNATURE-----
-
---------------enig3C399DB6E50AEE4A062A6288--
+Thanks for the patches!
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
