@@ -1,38 +1,34 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs.upcall: use strncmp in scandir filter function
-Date: Thu, 23 Aug 2012 09:54:19 -0400
-Message-ID: <1345730059-2987-1-git-send-email-jlayton@samba.org>
-Cc: nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Subject: [PATCH] mount.cifs: silence compiler warnings about ignoring return code
+Date: Thu, 23 Aug 2012 10:18:25 -0400
+Message-ID: <1345731505-3491-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We want to require that the filename begins with the correct string,
-not just that it contains it somewhere.
+In this case we explicitly don't care what these functions return, so
+declare a couple of unused variables to catch the results.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifs.upcall.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ mount.cifs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 598a999..12d5900 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -181,10 +181,9 @@ err_cache:
+diff --git a/mount.cifs.c b/mount.cifs.c
+index f843bb4..3fd472a 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1964,8 +1964,8 @@ restore_privs:
+ 		if (dacrc)
+ 			rc = rc ? rc : dacrc;
+ 	} else {
+-		setfsuid(oldfsuid);
+-		setfsgid(oldfsgid);
++		uid_t __attribute__((unused)) uignore = setfsuid(oldfsuid);
++		gid_t __attribute__((unused)) gignore = setfsgid(oldfsgid);
+ 	}
  
- static int krb5cc_filter(const struct dirent *dirent)
- {
--	if (strstr(dirent->d_name, CIFS_DEFAULT_KRB5_PREFIX))
--		return 1;
--	else
--		return 0;
-+	/* subtract 1 for the null terminator */
-+	return !strncmp(dirent->d_name, CIFS_DEFAULT_KRB5_PREFIX,
-+			sizeof(CIFS_DEFAULT_KRB5_PREFIX) - 1);
- }
- 
- static char *
+ 	return rc;
 -- 
 1.7.11.4
