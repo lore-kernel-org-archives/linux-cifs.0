@@ -1,34 +1,46 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] mount.cifs: silence compiler warnings about ignoring return code
-Date: Thu, 23 Aug 2012 10:18:25 -0400
-Message-ID: <1345731505-3491-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: Re: [PATCH 1/2] also consider DIR:-type ccaches
+Date: Fri, 24 Aug 2012 06:21:33 -0400
+Message-ID: <20120824062133.58e9d0ff@corrin.poochiereds.net>
+References: <20120821225443.GG9511@redhat.com>
+	<20120821225624.GH9511@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120821225624.GH9511-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In this case we explicitly don't care what these functions return, so
-declare a couple of unused variables to catch the results.
+On Tue, 21 Aug 2012 18:56:24 -0400
+Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> If we encounter a subdirectory while scanning a directory for a user's
+> ccache, check if it's a "DIR" ccache.  Otherwise, continue as before,
+> checking if it's a "FILE" ccache if it looks like a regular file.
+> ---
+>  cifs.upcall.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> index eef461d..6f95c1c 100644
+> --- a/cifs.upcall.c
+> +++ b/cifs.upcall.c
+> @@ -292,6 +292,11 @@ static char *find_krb5_cc(const char *dirname, uid_t uid)
+>  			free(namelist[i]);
+>  			continue;
+>  		}
+> +		if (S_ISDIR(sbuf.st_mode)) {
+> +			snprintf(ccname, sizeof(ccname), "DIR:%s/%s", dirname,
+> +				 namelist[i]->d_name);
+> +			credpath = ccname + 4;
+> +		} else
+>  		if (!S_ISREG(sbuf.st_mode)) {
+>  			syslog(LOG_DEBUG, "%s: %s is not a regular file",
+>  			       __func__, credpath);
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index f843bb4..3fd472a 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -1964,8 +1964,8 @@ restore_privs:
- 		if (dacrc)
- 			rc = rc ? rc : dacrc;
- 	} else {
--		setfsuid(oldfsuid);
--		setfsgid(oldfsgid);
-+		uid_t __attribute__((unused)) uignore = setfsuid(oldfsuid);
-+		gid_t __attribute__((unused)) gignore = setfsgid(oldfsgid);
- 	}
- 
- 	return rc;
+Committed...
 -- 
-1.7.11.4
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
