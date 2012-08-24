@@ -1,154 +1,110 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 2/2] scan /run/user/${UID} for ccaches, too
-Date: Fri, 24 Aug 2012 06:21:58 -0400
-Message-ID: <20120824062158.52cc33f3@corrin.poochiereds.net>
-References: <20120821225443.GG9511@redhat.com>
-	<20120821225648.GI9511@redhat.com>
+Subject: Re: [PATCH] cifs-utils: fix up references to getcifsacl and
+ setcifsacl files
+Date: Fri, 24 Aug 2012 06:22:28 -0400
+Message-ID: <20120824062228.627219fd@corrin.poochiereds.net>
+References: <1345662512-26393-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120821225648.GI9511-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1345662512-26393-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 21 Aug 2012 18:56:48 -0400
-Nalin Dahyabhai <nalin-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+On Wed, 22 Aug 2012 15:08:32 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> When scanning for credential caches, check the user's directory under
-> /run/user first, then fall back to /tmp as we have previously.  Because
-> we now call find_krb5_cc() twice (once for each directory), we move its
-> state to be outside of the function.  We also add a substitution
-> mechanism to make the process of resolving the location of the user's
-> home directory before searching it a bit more explicable.
-> ---
->  cifs.upcall.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 51 insertions(+), 11 deletions(-)
+> When I moved the manpages for this to section 1, I missed some references
+> to them. Also, get rid of the unneeded clean-local-aclprogs makefile target.
 > 
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index 6f95c1c..598a999 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -53,7 +53,8 @@
->  #include "cifs_spnego.h"
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  Makefile.am  | 8 +-------
+>  getcifsacl.c | 2 +-
+>  mount.cifs.8 | 6 +++---
+>  setcifsacl.c | 2 +-
+>  4 files changed, 6 insertions(+), 12 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 0d0b599..73f756f 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -10,7 +10,7 @@ man_MANS = mount.cifs.8
 >  
->  #define	CIFS_DEFAULT_KRB5_DIR		"/tmp"
-> -#define	CIFS_DEFAULT_KRB5_PREFIX	"krb5cc_"
-> +#define	CIFS_DEFAULT_KRB5_USER_DIR	"/run/user/%U"
-> +#define	CIFS_DEFAULT_KRB5_PREFIX	"krb5cc"
->  #define CIFS_DEFAULT_KRB5_KEYTAB	"/etc/krb5.keytab"
+>  bin_PROGRAMS =
+>  sbin_PROGRAMS =
+> -clean-local: clean-local-upcall clean-local-idmap clean-local-aclprogs
+> +clean-local: clean-local-upcall clean-local-idmap
 >  
->  #define	MAX_CCNAME_LEN			PATH_MAX + 5
-> @@ -258,14 +259,47 @@ icfk_cleanup:
->  	return ccname;
+>  if CONFIG_CIFSUPCALL
+>  sbin_PROGRAMS += cifs.upcall
+> @@ -66,12 +66,6 @@ setcifsacl_SOURCES = setcifsacl.c
+>  setcifsacl_LDADD = $(WBCLIENT_LIBS)
+>  setcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
+>  man_MANS += setcifsacl.1
+> -
+> -endif
+> -
+> -clean-local-aclprogs:
+> -if CONFIG_CIFSACL
+> -	rm -f getcifsacl.8 getcifsacl.8-t setcifsacl.8 setcifsacl.8-t
+>  endif
+>  
+>  SUBDIRS = contrib
+> diff --git a/getcifsacl.c b/getcifsacl.c
+> index 19b1fec..8cbdb1d 100644
+> --- a/getcifsacl.c
+> +++ b/getcifsacl.c
+> @@ -322,7 +322,7 @@ getcifsacl_usage(void)
+>  	fprintf(stderr, "\t-v	Version of the program\n");
+>  	fprintf(stderr, "\n");
+>  	fprintf(stderr, "\t-r	Display raw values of the ACE fields\n");
+> -	fprintf(stderr, "\nRefer to getcifsacl(8) manpage for details\n");
+> +	fprintf(stderr, "\nRefer to getcifsacl(1) manpage for details\n");
 >  }
 >  
-> +/* resolve a pattern to an actual directory path */
-> +static char *resolve_krb5_dir(const char *pattern, uid_t uid)
-> +{
-> +	char name[MAX_CCNAME_LEN];
-> +	int i;
-> +	size_t j;
-> +	for (i = 0, j = 0; (pattern[i] != '\0') && (j < sizeof(name)); i++) {
-> +		switch (pattern[i]) {
-> +		case '%':
-> +			switch (pattern[i + 1]) {
-> +			case '%':
-> +				name[j++] = pattern[i];
-> +				i++;
-> +				break;
-> +			case 'U':
-> +				j += snprintf(name + j, sizeof(name) - j,
-> +					      "%lu", (unsigned long) uid);
-> +				i++;
-> +				break;
-> +			}
-> +			break;
-> +		default:
-> +			name[j++] = pattern[i];
-> +			break;
-> +		}
-> +	}
-> +	if ((j > 0) && (j < sizeof(name)))
-> +		return strndup(name, MAX_CCNAME_LEN);
-> +	else
-> +		return NULL;
-> +}
-> +
->  /* search for a credcache that looks like a likely candidate */
-> -static char *find_krb5_cc(const char *dirname, uid_t uid)
-> +static char *find_krb5_cc(const char *dirname, uid_t uid,
-> +			  char **best_cache, time_t *best_time)
->  {
->  	struct dirent **namelist;
->  	struct stat sbuf;
-> -	char ccname[MAX_CCNAME_LEN], *credpath, *best_cache = NULL;
-> +	char ccname[MAX_CCNAME_LEN], *credpath;
->  	int i, n;
-> -	time_t cred_time, best_time = 0;
-> +	time_t cred_time;
+>  int
+> diff --git a/mount.cifs.8 b/mount.cifs.8
+> index b2a0936..cca6048 100644
+> --- a/mount.cifs.8
+> +++ b/mount.cifs.8
+> @@ -677,7 +677,7 @@ winbind support configured via nsswitch.conf(5) and smb.conf(5)
+>  .RE
+>  Please refer to the respective manpages of cifs.idmap(8) and winbindd(8) for more information.
 >  
->  	n = scandir(dirname, &namelist, krb5cc_filter, NULL);
->  	if (n < 0) {
-> @@ -310,7 +344,7 @@ static char *find_krb5_cc(const char *dirname, uid_t uid)
->  			continue;
->  		}
+> -Security descriptors for a file object can be retrieved and set directly using extended attribute named system.cifs_acl. The security descriptors presented via this interface are "raw" blobs of data and need a userspace utility to either parse and format or to assemble it such as getcifsacl(8) and setcifsacl(8) respectively.
+> +Security descriptors for a file object can be retrieved and set directly using extended attribute named system.cifs_acl. The security descriptors presented via this interface are "raw" blobs of data and need a userspace utility to either parse and format or to assemble it such as \fBgetcifsacl\fR(1) and \fBsetcifsacl\fR(1) respectively.
 >  
-> -		if (cred_time <= best_time) {
-> +		if (cred_time <= *best_time) {
->  			syslog(LOG_DEBUG, "%s: %s expires sooner than current "
->  			       "best.", __func__, ccname);
->  			free(namelist[i]);
-> @@ -318,14 +352,14 @@ static char *find_krb5_cc(const char *dirname, uid_t uid)
->  		}
->  
->  		syslog(LOG_DEBUG, "%s: %s is valid ccache", __func__, ccname);
-> -		free(best_cache);
-> -		best_cache = strndup(ccname, MAX_CCNAME_LEN);
-> -		best_time = cred_time;
-> +		free(*best_cache);
-> +		*best_cache = strndup(ccname, MAX_CCNAME_LEN);
-> +		*best_time = cred_time;
->  		free(namelist[i]);
->  	}
->  	free(namelist);
->  
-> -	return best_cache;
-> +	return *best_cache;
+>  Some of the things to consider while using this mount option:
+>  .sp
+> @@ -785,9 +785,9 @@ Note that the typical response to a bug report is a suggestion to try the latest
+>  This man page is correct for version 1\&.74 of the cifs vfs filesystem (roughly Linux kernel 3\&.0)\&.
+>  .SH "SEE ALSO"
+>  .PP
+> -Documentation/filesystems/cifs\&.txt and fs/cifs/README in the linux kernel source tree may contain additional options and information\&.
+> +\fBcifs.upcall\fR(8), \fBgetcifsacl\fR(1), \fBsetcifsacl\fR(1)
+>  .PP
+> -\fBcifs.upcall\fR(8)
+> +Documentation/filesystems/cifs\&.txt and fs/cifs/README in the linux kernel source tree may contain additional options and information\&.
+>  .SH "AUTHOR"
+>  .PP
+>  Steve French
+> diff --git a/setcifsacl.c b/setcifsacl.c
+> index 502c839..29b7b93 100644
+> --- a/setcifsacl.c
+> +++ b/setcifsacl.c
+> @@ -765,7 +765,7 @@ setcifsacl_usage(void)
+>  	"\n\t-S	Replace existing ACL with ACE(s), separated by a comma\n");
+>  	fprintf(stderr,
+>  	"\tsetcifsacl -S \"ACL:Administrator:ALLOWED/0x0/D\" <file_name>\n");
+> -	fprintf(stderr, "\nRefer to setcifsacl(8) manpage for details\n");
+> +	fprintf(stderr, "\nRefer to setcifsacl(1) manpage for details\n");
 >  }
 >  
->  static int
-> @@ -793,12 +827,13 @@ int main(const int argc, char *const argv[])
->  	unsigned int have;
->  	long rc = 1;
->  	int c, try_dns = 0, legacy_uid = 0;
-> -	char *buf, *ccname = NULL;
-> +	char *buf, *ccdir = NULL, *ccname = NULL, *best_cache = NULL;
->  	char hostbuf[NI_MAXHOST], *host;
->  	struct decoded_args arg;
->  	const char *oid;
->  	uid_t uid;
->  	char *keytab_name = CIFS_DEFAULT_KRB5_KEYTAB;
-> +	time_t best_time = 0;
->  
->  	hostbuf[0] = '\0';
->  	memset(&arg, 0, sizeof(arg));
-> @@ -901,7 +936,12 @@ int main(const int argc, char *const argv[])
->  		syslog(LOG_ERR, "setuid: %s", strerror(errno));
->  		goto out;
->  	}
-> -	ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid);
-> +	ccdir = resolve_krb5_dir(CIFS_DEFAULT_KRB5_USER_DIR, uid);
-> +	if (ccdir != NULL)
-> +		find_krb5_cc(ccdir, uid, &best_cache, &best_time);
-> +	ccname = find_krb5_cc(CIFS_DEFAULT_KRB5_DIR, uid, &best_cache,
-> +			      &best_time);
-> +	SAFE_FREE(ccdir);
->  
->  	/* Couldn't find credcache? Try to use keytab */
->  	if (ccname == NULL && arg.username != NULL)
+>  int
 
 Committed...
 -- 
