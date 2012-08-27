@@ -1,69 +1,46 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [Samba] CIFS mount =?UTF-8?B?aW50ZXJtaXR0ZeKAi250bHkgdW5hdmFp?=
- =?UTF-8?B?bGFibOKAi2U6?= cifs_mount failed w/return code = -5
-Date: Mon, 27 Aug 2012 08:48:42 -0400
-Message-ID: <20120827084842.5940e210@corrin.poochiereds.net>
-References: <CACw2ZueN05TeAazv9yJgYcvbDgigQkvbtNUPaTGrfLzFVxiOZw@mail.gmail.com>
+Subject: Re: [PATCH] mount.cifs: silence compiler warnings about ignoring
+ return code
+Date: Mon, 27 Aug 2012 09:11:54 -0400
+Message-ID: <20120827091154.00abff64@corrin.poochiereds.net>
+References: <1345731505-3491-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Robert S <robert.spam.me.senseless-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACw2ZueN05TeAazv9yJgYcvbDgigQkvbtNUPaTGrfLzFVxiOZw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1345731505-3491-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 16 Aug 2012 19:57:27 +1000
-Robert S <robert.spam.me.senseless-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Thu, 23 Aug 2012 10:18:25 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-> I have a debian machine called "debian" and a windows XP machine
-> called "server".  I have a permanent mounted read-only share called
-> \\server\doc.  My /etc/fstab looks like this:
+> In this case we explicitly don't care what these functions return, so
+> declare a couple of unused variables to catch the results.
 > 
-> //server/doc    /opt/chroot/mnt/server cifs
-> credentials=/root/.smbmount,username=medical,uid=medical,file_mode=0755,dir_mode=0755,noserverino
-> 0 0
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  mount.cifs.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> This works well most of the time but at times I get a input/output
-> error when I try to access this share.  My syslog shows the following:
-> 
-> Aug 16 15:36:35 debian kernel: [1289131.676869] Status code returned
-> 0xc00000d0 NT_STATUS_REQUEST_NOT_ACCEPTED
-> Aug 16 15:36:35 debian kernel: [1289131.676875]  CIFS VFS: Send error
-> in SessSetup = -5
-> Aug 16 15:36:35 debian kernel: [1289131.676899]  CIFS VFS: cifs_mount
-> failed w/return code = -5
-> Aug 16 15:36:46 debian kernel: [1289142.653770] Status code returned
-> 0xc00000d0 NT_STATUS_REQUEST_NOT_ACCEPTED
-> Aug 16 15:36:46 debian kernel: [1289142.653775]  CIFS VFS: Send error
-> in SessSetup = -5
-> Aug 16 15:36:46 debian kernel: [1289142.653799]  CIFS VFS: cifs_mount
-> failed w/return code = -5
-> Aug 16 15:37:01 debian kernel: [1289158.491697] Status code returned
-> 0xc00000d0 NT_STATUS_REQUEST_NOT_ACCEPTED
-> Aug 16 15:37:01 debian kernel: [1289158.491703]  CIFS VFS: Send error
-> in SessSetup = -5
-> Aug 16 15:37:01 debian kernel: [1289158.491727]  CIFS VFS: cifs_mount
-> failed w/return code = -5
-> 
-> Does anyone have any suggestions?  Can somebody explain what return
-> code -5 means?
-> 
-> I have tried replacing "server" with its fixed IP address
-> (192.168.0.32), but this does not help.  I have even moved all the
-> files to another location on the Windows box and recreated the share,
-> but it still occurs.
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index f843bb4..3fd472a 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -1964,8 +1964,8 @@ restore_privs:
+>  		if (dacrc)
+>  			rc = rc ? rc : dacrc;
+>  	} else {
+> -		setfsuid(oldfsuid);
+> -		setfsgid(oldfsgid);
+> +		uid_t __attribute__((unused)) uignore = setfsuid(oldfsuid);
+> +		gid_t __attribute__((unused)) gignore = setfsgid(oldfsgid);
+>  	}
+>  
+>  	return rc;
 
-(cc'ing linux-cifs ml)
-
--5 is -EIO which is the generic error that we map stuff to when there's
-not a better mapping. We don't have a standard mapping for
-NT_STATUS_REQUEST_NOT_ACCEPTED, so that's why you get -EIO back.
-
-The bigger question is why your server is returning that error. You may
-need to check the logs on the server side to see why it's not accepting
-these requests.
-
+Committed...
 -- 
 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
