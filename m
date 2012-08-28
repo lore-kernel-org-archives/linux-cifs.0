@@ -1,59 +1,40 @@
-From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2] Convert properly UTF-8 to UTF-16
-Date: Tue, 28 Aug 2012 08:28:07 +0100
-Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2E07634EB82@LONPMAILBOX01.citrite.net>
-References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16@LONPMAILBOX01.citrite.net>
- <20120807064752.22e0da81@corrin.poochiereds.net>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Alpha release of fuse-workspace.
+Date: Tue, 28 Aug 2012 15:49:40 +0200
+Message-ID: <CANXojczhA5dqNJYM_e8sG9CfDG0gGZgaKmZBR5hjgKE8jE8y7A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
-	"sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120807064752.22e0da81-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-T24gVHVlLCAyMDEyLTA4LTA3IGF0IDA2OjQ3IC0wNDAwLCBKZWZmIExheXRvbiB3cm90ZToKPiBP
-biBUdWUsIDcgQXVnIDIwMTIgMTA6MzM6MDMgKzAxMDAKPiBGcmVkaWFubyBaaWdsaW8gPGZyZWRp
-YW5vLnppZ2xpb0BjaXRyaXguY29tPiB3cm90ZToKPiAKPiA+IAo+ID4gd2NoYXJfdCBpcyBjdXJy
-ZW50bHkgMTZiaXQgc28gY29udmVydGluZyBhIHV0ZjggZW5jb2RlZCBjaGFyYWN0ZXJzIG5vdAo+
-ID4gaW4gcGxhbmUgMCAoPj0gMHgxMDAwMCkgdG8gd2NoYXJfdCAodGhhdCBpcyBjYWxsaW5nIGNo
-YXIydW5pKSBsZWFkIHRvIGEKPiA+IC1FSU5WQUwgcmV0dXJuLiBUaGlzIHBhdGNoIGRldGVjdCB1
-dGY4IGluIGNpZnNfc3RydG9VVEYxNiBhbmQgYWRkIHNwZWNpYWwKPiA+IGNvZGUgY2FsbGluZyB1
-dGY4c190b191dGYxNnMuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IEZyZWRpYW5vIFppZ2xpbyA8
-ZnJlZGlhbm8uemlnbGlvQGNpdHJpeC5jb20+Cj4gPiAtLS0KPiA+ICBmcy9jaWZzL2NpZnNfdW5p
-Y29kZS5jIHwgICAyMiArKysrKysrKysrKysrKysrKysrKysrCj4gPiAgMSBmaWxlcyBjaGFuZ2Vk
-LCAyMiBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEv
-ZnMvY2lmcy9jaWZzX3VuaWNvZGUuYyBiL2ZzL2NpZnMvY2lmc191bmljb2RlLmMKPiA+IGluZGV4
-IDdkYWI5YzAuLjExNjZiOTUgMTAwNjQ0Cj4gPiAtLS0gYS9mcy9jaWZzL2NpZnNfdW5pY29kZS5j
-Cj4gPiArKysgYi9mcy9jaWZzL2NpZnNfdW5pY29kZS5jCj4gPiBAQCAtMjAzLDYgKzIwMywyNyBA
-QCBjaWZzX3N0cnRvVVRGMTYoX19sZTE2ICp0bywgY29uc3QgY2hhciAqZnJvbSwgaW50IGxlbiwK
-PiA+ICAJaW50IGk7Cj4gPiAgCXdjaGFyX3Qgd2NoYXJfdG87IC8qIG5lZWRlZCB0byBxdWlldCBz
-cGFyc2UgKi8KPiA+ICAKPiA+ICsJLyogc3BlY2lhbCBjYXNlIGZvciB1dGY4IHRvIGhhbmRsZSBu
-byBwbGFuZTAgY2hhcnMgKi8KPiA+ICsJaWYgKCFzdHJjbXAoY29kZXBhZ2UtPmNoYXJzZXQsICJ1
-dGY4IikpIHsKPiA+ICsJCS8qCj4gPiArCQkgKiBjb252ZXJ0IHV0ZjggLT4gdXRmMTYsIHdlIGFz
-c3VtZSB3ZSBoYXZlIGVub3VnaCBzcGFjZQo+ID4gKwkJICogYXMgY2FsbGVyIHNob3VsZCBoYXZl
-IGFzc3VtZWQgY29udmVyc2lvbiBkb2VzIG5vdCBvdmVyZmxvdwo+ID4gKwkJICogaW4gZGVzdGlu
-YXRpb24gbGVuIGlzIGxlbmd0aCBpbiB3Y2hhcl90IHVuaXRzICgxNmJpdHMpCj4gPiArCQkgKi8K
-PiA+ICsJCWkgID0gdXRmOHNfdG9fdXRmMTZzKGZyb20sIGxlbiwgVVRGMTZfTElUVExFX0VORElB
-TiwKPiA+ICsJCQkJICAgICAgICh3Y2hhcl90ICopIHRvLCBsZW4pOwo+ID4gKwo+ID4gKwkJLyog
-aWYgc3VjY2VzcyB0ZXJtaW5hdGUgYW5kIGV4aXQgKi8KPiA+ICsJCWlmIChpID49IDApCj4gPiAr
-CQkJZ290byBzdWNjZXNzOwo+ID4gKwkJLyoKPiA+ICsJCSAqIGlmIGZhaWxzIGZhbGwgYmFjayB0
-byBVQ1MgZW5jb2RpbmcgYXMgdGhpcwo+ID4gKwkJICogZnVuY3Rpb24gc2hvdWxkIG5vdCByZXR1
-cm4gbmVnYXRpdmUgdmFsdWVzCj4gPiArCQkgKiBjdXJyZW50bHkgY2FuIGZhaWwgb25seSBpZiBz
-b3VyY2UgY29udGFpbnMKPiA+ICsJCSAqIGludmFsaWQgZW5jb2RlZCBjaGFyYWN0ZXJzCj4gPiAr
-CQkgKi8KPiA+ICsJfQo+ID4gKwo+ID4gIAlmb3IgKGkgPSAwOyBsZW4gJiYgKmZyb207IGkrKywg
-ZnJvbSArPSBjaGFybGVuLCBsZW4gLT0gY2hhcmxlbikgewo+ID4gIAkJY2hhcmxlbiA9IGNvZGVw
-YWdlLT5jaGFyMnVuaShmcm9tLCBsZW4sICZ3Y2hhcl90byk7Cj4gPiAgCQlpZiAoY2hhcmxlbiA8
-IDEpIHsKPiA+IEBAIC0yMTUsNiArMjM2LDcgQEAgY2lmc19zdHJ0b1VURjE2KF9fbGUxNiAqdG8s
-IGNvbnN0IGNoYXIgKmZyb20sIGludCBsZW4sCj4gPiAgCQlwdXRfdW5hbGlnbmVkX2xlMTYod2No
-YXJfdG8sICZ0b1tpXSk7Cj4gPiAgCX0KPiA+ICAKPiA+ICtzdWNjZXNzOgo+ID4gIAlwdXRfdW5h
-bGlnbmVkX2xlMTYoMCwgJnRvW2ldKTsKPiA+ICAJcmV0dXJuIGk7Cj4gPiAgfQo+IAo+IExvb2tz
-IHJlYXNvbmFibGUuLi4KPiAKPiBBY2tlZC1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25AcmVkaGF0
-LmNvbT4KCkFueSBuZXdzPwoKRnJlZGlhbm8KCg==
+Hi,
+
+I would like to announce the alpha release of fuse-workspace, a tool
+which takes care of access to all kinds
+of resources.
+
+It's independent of the GUI, this works in every environment, so also
+in the textconsole.
+
+It gives access on filesystem level, via FUSE for virtual maps and
+uses external mount commands when mounting SMB shares, and cifs is
+used.
+
+Please test, and try!
+
+Access to smb shares can be internal (then libsmbclient is used) and
+cifs (then fuse-workspace mounts using cifs).
+
+See:
+
+https://github.com/stefbon/fuse-workspace
+
+Apart from access the smb network, it supports an audio cd, and I'm
+working on access to FTP servers.
+
+I've tested it on some machines, but it's alpha.
+
+Stef
