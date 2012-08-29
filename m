@@ -1,34 +1,31 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 6/6] CIFS: Add NTLMSSP sec type to defaults
-Date: Wed, 29 Aug 2012 18:35:08 +0400
-Message-ID: <1346250908-16832-7-git-send-email-pshilovsky@etersoft.ru>
-References: <1346250908-16832-1-git-send-email-pshilovsky@etersoft.ru>
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: Fix error handling in cifs_push_mandatory_locks
+Date: Wed, 29 Aug 2012 21:19:41 +0400
+Message-ID: <1346260781-3307-1-git-send-email-pshilovsky@etersoft.ru>
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1346250908-16832-1-git-send-email-pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-
-Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |    2 +-
+ fs/cifs/file.c |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index efe3b84..d3c7271 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1336,7 +1336,7 @@ require use of the stronger protocol */
- #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
- #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index e8e3d91..46717be 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -941,7 +941,7 @@ cifs_push_mandatory_locks(struct cifsFileInfo *cfile)
+ 	if (!buf) {
+ 		mutex_unlock(&cinode->lock_mutex);
+ 		free_xid(xid);
+-		return rc;
++		return -ENOMEM;
+ 	}
  
--#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
-+#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
- #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
- #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
- /*
+ 	for (i = 0; i < 2; i++) {
 -- 
 1.7.1
