@@ -1,47 +1,34 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 0/6] Implement byte-range locks support for SMB2
-Date: Fri, 31 Aug 2012 13:26:55 +0400
-Message-ID: <CAKywueTu9WLrhWpim6zNtjp-HP59qUJMUZa4ApQepcpLyLK60Q@mail.gmail.com>
-References: <1346250908-16832-1-git-send-email-pshilovsky@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] CIFS: Add NTLMSSP sec type to defaults
+Date: Fri, 31 Aug 2012 13:29:52 +0400
+Message-ID: <1346405392-3643-1-git-send-email-pshilovsky@etersoft.ru>
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1346250908-16832-1-git-send-email-pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/8/29 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> This patchset enable brlock support for SMB2 mounts. It allows brlocks
-> to be cached and send in portions (on oplock break or unlock range).
->
-> git branch:
-> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-brlocks
->
-> Pavel Shilovsky (6):
->   CIFS: Remove spinlock dependence in brlock processing
->   CIFS: Move brlock code to ops struct
->   CIFS: Handle SMB2 lock flags
->   CIFS: Add brlock support for SMB2
->   CIFS: Use brlock cache for SMB2
->   CIFS: Add NTLMSSP sec type to defaults
->
->  fs/cifs/cifsfs.c    |    1 +
->  fs/cifs/cifsglob.h  |   28 +++++---
->  fs/cifs/cifsproto.h |    7 ++
->  fs/cifs/file.c      |  120 +++++++++++++++++-----------------
->  fs/cifs/smb1ops.c   |   12 ++++
->  fs/cifs/smb2file.c  |  180 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  fs/cifs/smb2ops.c   |   28 ++++++++-
->  fs/cifs/smb2pdu.c   |   59 +++++++++++++++++
->  fs/cifs/smb2pdu.h   |   29 ++++++++
->  fs/cifs/smb2proto.h |   11 +++
->  10 files changed, 405 insertions(+), 70 deletions(-)
->
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-Found a bug here and decided to separate "CIFS: Add NTLMSSP sec type
-to defaults" patch from here - will repost.
+to let us negotiate SMB2 without specifying sec type explicitly.
 
+Signed-off-by: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsglob.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b2bb941..004672f 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1328,7 +1328,7 @@ require use of the stronger protocol */
+ #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
+ #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+ 
+-#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2)
++#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
+ #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
+ #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
+ /*
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.1
