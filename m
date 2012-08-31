@@ -1,94 +1,46 @@
-From: Pavel Shilovsky <piastryyy@gmail.com>
-Subject: Re: WARNING: at fs/inode.c:280 drop_nlink+0x31/0x33()
-Date: Fri, 31 Aug 2012 12:00:26 +0400
-Message-ID: <CAKywueSY+NOV3irDm9YxepeCyJJhh82o2mgmDLogr+hJPbaYig@mail.gmail.com>
-References: <20120829162527.GA3635@NickAndBarb.net>
-	<20120829151641.20cde4bc@corrin.poochiereds.net>
-	<20120831043352.GA23663@NickAndBarb.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/6] Implement byte-range locks support for SMB2
+Date: Fri, 31 Aug 2012 13:26:55 +0400
+Message-ID: <CAKywueTu9WLrhWpim6zNtjp-HP59qUJMUZa4ApQepcpLyLK60Q@mail.gmail.com>
+References: <1346250908-16832-1-git-send-email-pshilovsky@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Jeff Layton <jlayton@redhat.com>, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org
-To: Nick Pasich <Nick@nickandbarb.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20120831043352.GA23663@NickAndBarb.net>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1346250908-16832-1-git-send-email-pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2012/8/31 Nick Pasich <Nick@nickandbarb.net>:
-> Jeff,
+2012/8/29 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> This patchset enable brlock support for SMB2 mounts. It allows brlocks
+> to be cached and send in portions (on oplock break or unlock range).
 >
-> I applied this patch to Kernel 3.5.3 from Pavel and the
-> the warning is gone with no problems.
+> git branch:
+> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/smb2-brlocks
 >
-> Thanks,
+> Pavel Shilovsky (6):
+>   CIFS: Remove spinlock dependence in brlock processing
+>   CIFS: Move brlock code to ops struct
+>   CIFS: Handle SMB2 lock flags
+>   CIFS: Add brlock support for SMB2
+>   CIFS: Use brlock cache for SMB2
+>   CIFS: Add NTLMSSP sec type to defaults
 >
-> --( Nick Pasich
+>  fs/cifs/cifsfs.c    |    1 +
+>  fs/cifs/cifsglob.h  |   28 +++++---
+>  fs/cifs/cifsproto.h |    7 ++
+>  fs/cifs/file.c      |  120 +++++++++++++++++-----------------
+>  fs/cifs/smb1ops.c   |   12 ++++
+>  fs/cifs/smb2file.c  |  180 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  fs/cifs/smb2ops.c   |   28 ++++++++-
+>  fs/cifs/smb2pdu.c   |   59 +++++++++++++++++
+>  fs/cifs/smb2pdu.h   |   29 ++++++++
+>  fs/cifs/smb2proto.h |   11 +++
+>  10 files changed, 405 insertions(+), 70 deletions(-)
 >
-> ##########################################################
->
-> From df2d6b1fbf2401c5ee04f2ac143ea0954e3a87a6 Mon Sep 17 00:00:00 2001
-> From: Pavel Shilovsky <pshilovsky@samba.org>
-> Date: Fri, 13 Jul 2012 11:59:45 +0400
-> Subject: [PATCH] CIFS: Protect i_nlink from being negative
->
-> that can cause warning messages.
->
-> Signed-off-by: Pavel Shilovsky <pshilovsky@samba.org>
-> ---
->  fs/cifs/inode.c |   13 +++++++++++--
->  1 files changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 7354877..88afb1a 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1110,6 +1110,15 @@ undo_setattr:
->                 goto out_close;
->  }
->
-> +/* copied from fs/nfs/dir.c with small changes */
-> +static void
-> +cifs_drop_nlink(struct inode *inode)
-> +{
-> +       spin_lock(&inode->i_lock);
-> +       if (inode->i_nlink > 0)
-> +               drop_nlink(inode);
-> +       spin_unlock(&inode->i_lock);
-> +}
->
->  /*
->   * If dentry->d_inode is null (usually meaning the cached dentry
-> @@ -1166,13 +1175,13 @@ retry_std_delete:
->  psx_del_no_retry:
->                 if (!rc) {
->                                 if (inode)
-> -                       drop_nlink(inode);
-> +                       cifs_drop_nlink(inode);
->                 } else if (rc == -ENOENT) {
->                                 d_drop(dentry);
->                 } else if (rc == -ETXTBSY) {
->                                 rc = cifs_rename_pending_delete(full_path, dentry, xid);
->                                 if (rc == 0)
-> -                       drop_nlink(inode);
-> +                       cifs_drop_nlink(inode);
->                 } else if ((rc == -EACCES) && (dosattr == 0) && inode) {
->                                 attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
->                                 if (attrs == NULL) {
-> --
-> 1.7.3.3
->
-> ##########################################################
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-This one fixes only a part of the problem. Now we have another patch
-for this problem:
-
-https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=commitdiff;h=b7ca69289680cf631fb20b7d436467c4ec1153cd;hp=6dab7ede9390d4d937cb89feca932e4fd575d2da
+Found a bug here and decided to separate "CIFS: Add NTLMSSP sec type
+to defaults" patch from here - will repost.
 
 -- 
 Best regards,
