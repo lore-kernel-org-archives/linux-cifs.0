@@ -1,27 +1,31 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: new for-3.6/for-next branches
-Date: Tue, 4 Sep 2012 16:25:05 +0400
-Message-ID: <CAKywueS9Y+Lv_-_pDXRguGVS5jp0CVOqZJc67+GHoS8+y-gtvQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 0/4] Implement SMB2.1 lease support
+Date: Tue,  4 Sep 2012 20:24:03 +0400
+Message-ID: <1346775847-7894-1-git-send-email-pshilovsky@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+This patchset is applied on top of the previous brlocking patchset and enables SMB2.1 lease support for file opens. This feature allows to keep several file handles opened and cache read/write/brlock operations.
 
-I recreated my branches - created for-3.6 branch with two patches on
-top of Steve's master, deleted extra smb2-* ones and pushed all
-for-3.7 patches to for-next branch (that is on top of for-3.6 branch):
+Pavel Shilovsky (4):
+  CIFS: Request SMB2.1 leases
+  CIFS: Fix cache coherency for read oplock case
+  CIFS: Add SMB2.1 lease break support
+  CIFS: Fix fast lease break after open problem
 
-http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-3.6
-http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next
-
-Also, note that for-next branch has patches from Jeff's cifs-next
-branch (r/wsize limit related).
-
--- 
-Best regards,
-Pavel Shilovsky.
+ fs/cifs/cifsfs.c    |   28 +++++++--
+ fs/cifs/cifsglob.h  |   22 +++++++
+ fs/cifs/cifsproto.h |    7 ++
+ fs/cifs/connect.c   |    1 +
+ fs/cifs/dir.c       |   22 ++++++-
+ fs/cifs/file.c      |   82 ++++++++++++++++++++++-----
+ fs/cifs/misc.c      |   30 ++++++++++
+ fs/cifs/smb2file.c  |   11 +++-
+ fs/cifs/smb2misc.c  |  154 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/smb2ops.c   |   25 ++++++++
+ fs/cifs/smb2pdu.c   |  158 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ fs/cifs/smb2pdu.h   |   68 +++++++++++++++++++++-
+ fs/cifs/smb2proto.h |    4 +
+ 13 files changed, 575 insertions(+), 37 deletions(-)
