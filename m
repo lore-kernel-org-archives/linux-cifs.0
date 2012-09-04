@@ -1,38 +1,27 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH] CIFS: Fix endianness conversion
-Date: Tue,  4 Sep 2012 15:50:34 +0400
-Message-ID: <1346759434-3665-1-git-send-email-pshilovsky@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Subject: new for-3.6/for-next branches
+Date: Tue, 4 Sep 2012 16:25:05 +0400
+Message-ID: <CAKywueS9Y+Lv_-_pDXRguGVS5jp0CVOqZJc67+GHoS8+y-gtvQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Pavel Shilovsky <pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/smb2pdu.h |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index c5fbfac..15dc8ee 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -96,7 +96,7 @@
-  *
-  */
- 
--#define SMB2_HEADER_STRUCTURE_SIZE __constant_le16_to_cpu(64)
-+#define SMB2_HEADER_STRUCTURE_SIZE __constant_cpu_to_le16(64)
- 
- struct smb2_hdr {
- 	__be32 smb2_buf_length;	/* big endian on wire */
-@@ -140,7 +140,7 @@ struct smb2_pdu {
-  *
-  */
- 
--#define SMB2_ERROR_STRUCTURE_SIZE2 __constant_le16_to_cpu(9)
-+#define SMB2_ERROR_STRUCTURE_SIZE2 __constant_cpu_to_le16(9)
- 
- struct smb2_err_rsp {
- 	struct smb2_hdr hdr;
+I recreated my branches - created for-3.6 branch with two patches on
+top of Steve's master, deleted extra smb2-* ones and pushed all
+for-3.7 patches to for-next branch (that is on top of for-3.6 branch):
+
+http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-3.6
+http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-next
+
+Also, note that for-next branch has patches from Jeff's cifs-next
+branch (r/wsize limit related).
+
 -- 
-1.7.1
+Best regards,
+Pavel Shilovsky.
