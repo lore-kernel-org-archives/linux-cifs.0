@@ -1,33 +1,38 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [Samba] mount.cifs ms dfs and failover
-Date: Mon, 3 Sep 2012 17:18:06 -0700
-Message-ID: <20120903171806.3375f21b@corrin.poochiereds.net>
-References: <BLU167-W53498C0F715676FA922716C1DA0@phx.gbl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: <samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sam Abed <samsabed-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: Fix endianness conversion
+Date: Tue,  4 Sep 2012 15:50:34 +0400
+Message-ID: <1346759434-3665-1-git-send-email-pshilovsky@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <BLU167-W53498C0F715676FA922716C1DA0-MsuGFMq8XAE@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 18 Jul 2012 17:31:28 +1000
-Sam Abed <samsabed-PkbjNfxxIARBDgjK7y7TUQ@public.gmane.org> wrote:
+Signed-off-by: Pavel Shilovsky <pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/smb2pdu.h |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-> 
-> Hello,
->   I can't find any reference on if linux understands multiple targets when it mounts a MS dfs share, specifically if it can failover.
-> I can mount a MS dfs share fine, however if the server "picked" is shutdow the mount hangs. I tried it on a recent ubuntu to discount the "enterprise" lag.
-> 
-> am I missing something or is it not working
-> 
-
-(cc'ing linux-cifs)
-
-No, there's currently no support for failover with Linux CIFS DFS code.
-Once it picks the server, it stays with it.
-
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index c5fbfac..15dc8ee 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -96,7 +96,7 @@
+  *
+  */
+ 
+-#define SMB2_HEADER_STRUCTURE_SIZE __constant_le16_to_cpu(64)
++#define SMB2_HEADER_STRUCTURE_SIZE __constant_cpu_to_le16(64)
+ 
+ struct smb2_hdr {
+ 	__be32 smb2_buf_length;	/* big endian on wire */
+@@ -140,7 +140,7 @@ struct smb2_pdu {
+  *
+  */
+ 
+-#define SMB2_ERROR_STRUCTURE_SIZE2 __constant_le16_to_cpu(9)
++#define SMB2_ERROR_STRUCTURE_SIZE2 __constant_cpu_to_le16(9)
+ 
+ struct smb2_err_rsp {
+ 	struct smb2_hdr hdr;
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.1
