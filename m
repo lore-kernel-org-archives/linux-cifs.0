@@ -1,213 +1,42 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] cifs: Add support of Alternate Data Streams
-Date: Wed, 5 Sep 2012 10:11:20 -0400
-Message-ID: <20120905101120.5b6a7a01@tlielax.poochiereds.net>
-References: <1346713566-31140-1-git-send-email-shirishpargaonkar@gmail.com>
+From: Trevor Cordes <gmane-CGgvEiIIHbIFyWsGDH9TEg@public.gmane.org>
+Subject: Re: mount.cifs failed with Mac OS X 10.7 (LION, Preview 4)
+Date: Tue, 4 Sep 2012 06:43:06 +0000 (UTC)
+Message-ID: <loom.20120904T083623-886@post.gmane.org>
+References: <loom.20110613T211710-599@post.gmane.org> <BANLkTi=CKD9F2Msdxf587QQN+Z5e8_r7BQ@mail.gmail.com> <loom.20110613T222739-674@post.gmane.org> <BANLkTinPTPYgeUJom4jjCistSX+ndrBR9A@mail.gmail.com> <loom.20110614T001442-338@post.gmane.org> <BANLkTim_zT-y9aczu3kC1MdQe55mv=W4Ww@mail.gmail.com> <BANLkTimdeNdRYpf3WwTG7p19V2QRq07DyQ@mail.gmail.com> <BANLkTimwbU_TQNw6MRwOzMLgPdRircL4-g@mail.gmail.com> <BANLkTikwsTH4B=WKtCxJrdVHqz1xTicBzw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, tugosavi-xthvdsQ13ZrQT0dZR+AlfA@public.gmane.org
-To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1346713566-31140-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon,  3 Sep 2012 18:06:06 -0500
-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+Kong Li <likong@...> writes:
+> mounting with "nounix,noserverino,sec=ntlmssp" fixed the empty output from "ls
+> see enclosed trace from wireshark (running on Mac).
 
-> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> 
-> Add support of Alternate Data Streams (ads).
-> For the support, we need to add additional (desired) access flags
-> to the generic ones that cifs client does currently.
-> The ads files have a : in the name, so that is used to differentiate
-> and add additional desired access.
-> One operations that does not work is Rename (0x7).
-> 
-> 
-> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  fs/cifs/dir.c   |   12 ++++++++++--
->  fs/cifs/file.c  |   45 ++++++++++++++++++++++++++++++++++-----------
->  fs/cifs/inode.c |   14 ++++++++++++++
->  3 files changed, 58 insertions(+), 13 deletions(-)
-> 
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index cbe709a..8f8d546 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -245,10 +245,18 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
->  	}
->  
->  	desiredAccess = 0;
-> -	if (OPEN_FMODE(oflags) & FMODE_READ)
-> +	if (OPEN_FMODE(oflags) & FMODE_READ) {
->  		desiredAccess |= GENERIC_READ; /* is this too little? */
-> -	if (OPEN_FMODE(oflags) & FMODE_WRITE)
-> +		if (strstr(full_path, ":"))
-> +			desiredAccess |= FILE_READ_DATA | FILE_READ_EA |
-> +				FILE_READ_ATTRIBUTES | READ_CONTROL;
-> +	}
-> +	if (OPEN_FMODE(oflags) & FMODE_WRITE) {
->  		desiredAccess |= GENERIC_WRITE;
-> +		if (strstr(full_path, ":"))
-> +			desiredAccess |= FILE_WRITE_DATA | FILE_APPEND_DATA |
-> +					FILE_WRITE_EA | FILE_WRITE_ATTRIBUTES;
-> +	}
->  
->  	disposition = FILE_OVERWRITE_IF;
->  	if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 9154192..80f35f8 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -43,22 +43,41 @@
->  #include "cifs_fs_sb.h"
->  #include "fscache.h"
->  
-> -static inline int cifs_convert_flags(unsigned int flags)
-> -{
-> -	if ((flags & O_ACCMODE) == O_RDONLY)
-> -		return GENERIC_READ;
-> -	else if ((flags & O_ACCMODE) == O_WRONLY)
-> -		return GENERIC_WRITE;
-> -	else if ((flags & O_ACCMODE) == O_RDWR) {
-> +static inline int cifs_convert_flags(char *full_path, unsigned int flags)
-> +{
-> +	int daccess = 0;
-> +
-> +	if ((flags & O_ACCMODE) == O_RDONLY) {
-> +		daccess = GENERIC_READ;
-> +		if (strstr(full_path, ":"))
-> +			daccess |= FILE_READ_DATA | FILE_READ_EA |
-> +				FILE_READ_ATTRIBUTES | READ_CONTROL;
-> +		return daccess;
-> +	} else if ((flags & O_ACCMODE) == O_WRONLY) {
-> +		daccess = GENERIC_WRITE;
-> +		if (strstr(full_path, ":"))
-> +			daccess |= FILE_WRITE_DATA | FILE_APPEND_DATA |
-> +				FILE_WRITE_EA | FILE_WRITE_ATTRIBUTES;
-> +		return daccess;
-> +	} else if ((flags & O_ACCMODE) == O_RDWR) {
->  		/* GENERIC_ALL is too much permission to request
->  		   can cause unnecessary access denied on create */
->  		/* return GENERIC_ALL; */
-> -		return (GENERIC_READ | GENERIC_WRITE);
-> +		daccess = GENERIC_READ | GENERIC_WRITE;
-> +		if (strstr(full_path, ":"))
-> +			daccess |= FILE_READ_DATA | FILE_WRITE_DATA |
-> +				FILE_APPEND_DATA | FILE_READ_EA |
-> +				FILE_WRITE_EA | FILE_READ_ATTRIBUTES |
-> +				FILE_WRITE_ATTRIBUTES | READ_CONTROL;
-> +		return daccess;
+Yes, that fixes the mount problems.  However, now there's a big problem because
+of nounix: you can't read any files on the Mac that are symlinks.
 
+On Mac:
+# ls -l
+lrwxr-xr-x  ...  iChat Icons -> /Library/Application Support/Apple/iChat Icons/
 
-So if any component in the pathname happens to have a ':' in it, then
-we'll open the file with a different set of access flags? ':' is a
-perfectly legitimate character in posix pathnames. That sounds like a
-very bad heuristic.
+(It points to a directory actually.)
 
->  	}
->  
-> -	return (READ_CONTROL | FILE_WRITE_ATTRIBUTES | FILE_READ_ATTRIBUTES |
-> +	daccess = READ_CONTROL | FILE_WRITE_ATTRIBUTES | FILE_READ_ATTRIBUTES |
->  		FILE_WRITE_EA | FILE_APPEND_DATA | FILE_WRITE_DATA |
-> -		FILE_READ_DATA);
-> +		FILE_READ_DATA;
-> +
-> +	return daccess;
-> +
->  }
->  
->  static u32 cifs_posix_convert_flags(unsigned int flags)
-> @@ -149,6 +168,8 @@ int cifs_posix_open(char *full_path, struct inode **pinode,
->  		goto posix_open_ret; /* caller does not need info */
->  
->  	cifs_unix_basic_to_fattr(&fattr, presp_data, cifs_sb);
-> +	if (strstr(full_path, ":"))
-> +		fattr.cf_flags |= S_PRIVATE;
->  
->  	/* get new inode and set it up */
->  	if (*pinode == NULL) {
-> @@ -158,6 +179,8 @@ int cifs_posix_open(char *full_path, struct inode **pinode,
->  			rc = -ENOMEM;
->  			goto posix_open_ret;
->  		}
-> +		if (strstr(full_path, ":"))
-> +			(*pinode)->i_flags |= S_PRIVATE;
->  	} else {
->  		cifs_fattr_to_inode(*pinode, &fattr);
->  	}
-> @@ -178,7 +201,7 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
->  	int create_options = CREATE_NOT_DIR;
->  	FILE_ALL_INFO *buf;
->  
-> -	desiredAccess = cifs_convert_flags(f_flags);
-> +	desiredAccess = cifs_convert_flags(full_path, f_flags);
->  
->  /*********************************************************************
->   *  open flag mapping table:
-> @@ -538,7 +561,7 @@ static int cifs_reopen_file(struct cifsFileInfo *pCifsFile, bool can_flush)
->  		   in the reconnect path it is important to retry hard */
->  	}
->  
-> -	desiredAccess = cifs_convert_flags(pCifsFile->f_flags);
-> +	desiredAccess = cifs_convert_flags(full_path, pCifsFile->f_flags);
->  
->  	if (backup_cred(cifs_sb))
->  		create_options |= CREATE_OPEN_BACKUP_INTENT;
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 7354877..0bde128 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -351,12 +351,17 @@ int cifs_get_inode_info_unix(struct inode **pinode,
->  			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
->  	}
->  
-> +	if (strstr(full_path, ":"))
-> +		fattr.cf_flags |= S_PRIVATE;
-> +
->  	if (*pinode == NULL) {
->  		/* get new inode */
->  		cifs_fill_uniqueid(sb, &fattr);
->  		*pinode = cifs_iget(sb, &fattr);
->  		if (!*pinode)
->  			rc = -ENOMEM;
-> +		if (strstr(full_path, ":"))
-> +			(*pinode)->i_flags |= S_PRIVATE;
->  	} else {
->  		/* we already have inode, update it */
->  		cifs_fattr_to_inode(*pinode, &fattr);
-> @@ -713,10 +718,15 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
->  			cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
->  	}
->  
-> +	if (strstr(full_path, ":"))
-> +		fattr.cf_flags |= S_PRIVATE;
-> +
->  	if (!*inode) {
->  		*inode = cifs_iget(sb, &fattr);
->  		if (!*inode)
->  			rc = -ENOMEM;
-> +		if (strstr(full_path, ":"))
-> +			(*inode)->i_flags |= S_PRIVATE;
->  	} else {
->  		cifs_fattr_to_inode(*inode, &fattr);
->  	}
-> @@ -748,6 +758,10 @@ cifs_find_inode(struct inode *inode, void *opaque)
->  	if ((inode->i_mode & S_IFMT) != (fattr->cf_mode & S_IFMT))
->  		return 0;
->  
-> +	/* don't match inode with different flags */
-> +	if ((inode->i_flags & S_PRIVATE) != (fattr->cf_flags & S_PRIVATE))
-> +		return 0;
-> +
->  	/* if it's not a directory or has no dentries, then flag it */
->  	if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
->  		fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
+On Linux with that Mac share mounted:
 
+# ls -l
+-rw-r--r--  1 root root      0 Jun 13  2010 iChat Icons
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+# cat iChat\ Icons
+cat: /mnt/netbak/iChat Icons: Object is remote
+
+Which is causing an app of mine to blow up when it tries to figure out what to
+do with these files.
+
+I understand that nounix will break symlinks.  So how do we get a Mac share
+mounted and still get symlinks to work?  Or is it hopeless because Apple screwed
+us over?
+
+Thanks
