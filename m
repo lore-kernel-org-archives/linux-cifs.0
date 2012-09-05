@@ -1,117 +1,109 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: cleanups for cifs_mkdir_qinfo
-Date: Wed,  5 Sep 2012 09:57:28 -0400
-Message-ID: <1346853448-13322-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH] cifs: remove support for deprecated "forcedirectio" and "strictcache" mount options
+Date: Wed,  5 Sep 2012 09:57:53 -0400
+Message-ID: <1346853473-13383-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Rename inode pointers for better clarity. Move the d_instantiate call to
-the end of the function to prevent other tasks from seeing it before
-we've finished constructing it. Since we should have exclusive access to
-the inode at this point, remove the spinlock around i_nlink update.
+...and make the default cache=strict as promised for 3.7.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/inode.c | 51 ++++++++++++++++++++++++---------------------------
- 1 file changed, 24 insertions(+), 27 deletions(-)
+ fs/cifs/connect.c | 37 ++++---------------------------------
+ 1 file changed, 4 insertions(+), 33 deletions(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index da4dd71..fd6551b 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1176,34 +1176,33 @@ unlink_out:
- }
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 59c595e..a792282 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -82,8 +82,7 @@ enum {
+ 	Opt_serverino, Opt_noserverino,
+ 	Opt_rwpidforward, Opt_cifsacl, Opt_nocifsacl,
+ 	Opt_acl, Opt_noacl, Opt_locallease,
+-	Opt_sign, Opt_seal, Opt_direct,
+-	Opt_strictcache, Opt_noac,
++	Opt_sign, Opt_seal, Opt_noac,
+ 	Opt_fsc, Opt_mfsymlinks,
+ 	Opt_multiuser, Opt_sloppy,
  
- static int
--cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
-+cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
- 		 const char *full_path, struct cifs_sb_info *cifs_sb,
- 		 struct cifs_tcon *tcon, const unsigned int xid)
- {
- 	int rc = 0;
--	struct inode *newinode = NULL;
-+	struct inode *inode = NULL;
+@@ -160,10 +159,6 @@ static const match_table_t cifs_mount_option_tokens = {
+ 	{ Opt_locallease, "locallease" },
+ 	{ Opt_sign, "sign" },
+ 	{ Opt_seal, "seal" },
+-	{ Opt_direct, "direct" },
+-	{ Opt_direct, "directio" },
+-	{ Opt_direct, "forcedirectio" },
+-	{ Opt_strictcache, "strictcache" },
+ 	{ Opt_noac, "noac" },
+ 	{ Opt_fsc, "fsc" },
+ 	{ Opt_mfsymlinks, "mfsymlinks" },
+@@ -1105,8 +1100,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 	char *string = NULL;
+ 	char *tmp_end, *value;
+ 	char delim;
+-	bool cache_specified = false;
+-	static bool cache_warned = false;
  
- 	if (tcon->unix_ext)
--		rc = cifs_get_inode_info_unix(&newinode, full_path, inode->i_sb,
-+		rc = cifs_get_inode_info_unix(&inode, full_path, parent->i_sb,
- 					      xid);
- 	else
--		rc = cifs_get_inode_info(&newinode, full_path, NULL,
--					 inode->i_sb, xid, NULL);
-+		rc = cifs_get_inode_info(&inode, full_path, NULL, parent->i_sb,
-+					 xid, NULL);
+ 	separator[0] = ',';
+ 	separator[1] = 0;
+@@ -1138,6 +1131,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 	/* default to using server inode numbers where available */
+ 	vol->server_ino = 1;
+ 
++	/* default is to use strict cifs caching semantics */
++	vol->strict_io = true;
 +
- 	if (rc)
- 		return rc;
+ 	vol->actimeo = CIFS_DEF_ACTIMEO;
  
--	d_instantiate(dentry, newinode);
- 	/*
- 	 * setting nlink not necessary except in cases where we failed to get it
--	 * from the server or was set bogus
-+	 * from the server or was set bogus. Also, since this is a brand new
-+	 * inode, no need to grab the i_lock before setting the i_nlink.
- 	 */
--	spin_lock(&dentry->d_inode->i_lock);
--	if ((dentry->d_inode) && (dentry->d_inode->i_nlink < 2))
--		set_nlink(dentry->d_inode, 2);
--	spin_unlock(&dentry->d_inode->i_lock);
-+	if (inode->i_nlink < 2)
-+		set_nlink(inode, 2);
- 	mode &= ~current_umask();
- 	/* must turn on setgid bit if parent dir has it */
--	if (inode->i_mode & S_ISGID)
-+	if (parent->i_mode & S_ISGID)
- 		mode |= S_ISGID;
+ 	/* FIXME: add autonegotiation -- for now, SMB1 is default */
+@@ -1321,22 +1317,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 			 */
+ 			vol->seal = 1;
+ 			break;
+-		case Opt_direct:
+-			cache_specified = true;
+-			vol->direct_io = true;
+-			vol->strict_io = false;
+-			cERROR(1, "The \"directio\" option will be removed in "
+-				  "3.7. Please switch to the \"cache=none\" "
+-				  "option.");
+-			break;
+-		case Opt_strictcache:
+-			cache_specified = true;
+-			vol->direct_io = false;
+-			vol->strict_io = true;
+-			cERROR(1, "The \"strictcache\" option will be removed "
+-				"in 3.7. Please switch to the \"cache=strict\" "
+-				"option.");
+-			break;
+ 		case Opt_noac:
+ 			printk(KERN_WARNING "CIFS: Mount option noac not "
+ 				"supported. Instead set "
+@@ -1771,7 +1751,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 				goto cifs_parse_mount_err;
+ 			break;
+ 		case Opt_cache:
+-			cache_specified = true;
+ 			string = match_strdup(args);
+ 			if (string == NULL)
+ 				goto out_nomem;
+@@ -1822,14 +1801,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 		printk(KERN_NOTICE "CIFS: ignoring forcegid mount option "
+ 				   "specified with no gid= option.\n");
  
- 	if (tcon->unix_ext) {
-@@ -1216,8 +1215,8 @@ cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
- 		};
- 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
- 			args.uid = (__u64)current_fsuid();
--			if (inode->i_mode & S_ISGID)
--				args.gid = (__u64)inode->i_gid;
-+			if (parent->i_mode & S_ISGID)
-+				args.gid = (__u64)parent->i_gid;
- 			else
- 				args.gid = (__u64)current_fsgid();
- 		} else {
-@@ -1232,22 +1231,20 @@ cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
- 		struct TCP_Server_Info *server = tcon->ses->server;
- 		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
- 		    (mode & S_IWUGO) == 0 && server->ops->mkdir_setinfo)
--			server->ops->mkdir_setinfo(newinode, full_path, cifs_sb,
-+			server->ops->mkdir_setinfo(inode, full_path, cifs_sb,
- 						   tcon, xid);
--		if (dentry->d_inode) {
--			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
--				dentry->d_inode->i_mode = (mode | S_IFDIR);
+-	/* FIXME: remove this block in 3.7 */
+-	if (!cache_specified && !cache_warned) {
+-		cache_warned = true;
+-		printk(KERN_NOTICE "CIFS: no cache= option specified, using "
+-				   "\"cache=loose\". This default will change "
+-				   "to \"cache=strict\" in 3.7.\n");
+-	}
 -
--			if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
--				dentry->d_inode->i_uid = current_fsuid();
--				if (inode->i_mode & S_ISGID)
--					dentry->d_inode->i_gid = inode->i_gid;
--				else
--					dentry->d_inode->i_gid =
--								current_fsgid();
--			}
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
-+			inode->i_mode = (mode | S_IFDIR);
-+
-+		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
-+			inode->i_uid = current_fsuid();
-+			if (inode->i_mode & S_ISGID)
-+				inode->i_gid = parent->i_gid;
-+			else
-+				inode->i_gid = current_fsgid();
- 		}
- 	}
-+	d_instantiate(dentry, inode);
- 	return rc;
- }
+ 	kfree(mountdata_copy);
+ 	return 0;
  
 -- 
 1.7.11.4
