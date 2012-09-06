@@ -1,121 +1,122 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove support for deprecated "forcedirectio" and
- "strictcache" mount options
-Date: Thu, 6 Sep 2012 16:22:52 +0400
-Message-ID: <CAKywueQ2JSpH2WAMTijj1kAiTu9Z9VbQkR0+D04VgFno6y780A@mail.gmail.com>
-References: <1346853473-13383-1-git-send-email-jlayton@redhat.com>
+Subject: Re: lockdep spew with Pavel's for-next branch
+Date: Thu, 6 Sep 2012 18:34:45 +0400
+Message-ID: <CAKywueSO2rSpHsRsSwq1A2MPAsM4rSBYC69ZtqEMAUfM-FdBiQ@mail.gmail.com>
+References: <20120905100514.175aa792@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1346853473-13383-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <20120905100514.175aa792-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/9/5 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> ...and make the default cache=strict as promised for 3.7.
+> I got the following lockdep pop when testing a few patches on top of
+> Pavel's for-next branch. The relevant mount options were:
 >
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/connect.c | 37 ++++---------------------------------
->  1 file changed, 4 insertions(+), 33 deletions(-)
+>     vers=1.0,cache=strict,nounix
 >
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 59c595e..a792282 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -82,8 +82,7 @@ enum {
->         Opt_serverino, Opt_noserverino,
->         Opt_rwpidforward, Opt_cifsacl, Opt_nocifsacl,
->         Opt_acl, Opt_noacl, Opt_locallease,
-> -       Opt_sign, Opt_seal, Opt_direct,
-> -       Opt_strictcache, Opt_noac,
-> +       Opt_sign, Opt_seal, Opt_noac,
->         Opt_fsc, Opt_mfsymlinks,
->         Opt_multiuser, Opt_sloppy,
+> The test that caused it to pop was connectathon test5 (the read/write
+> test).
 >
-> @@ -160,10 +159,6 @@ static const match_table_t cifs_mount_option_tokens = {
->         { Opt_locallease, "locallease" },
->         { Opt_sign, "sign" },
->         { Opt_seal, "seal" },
-> -       { Opt_direct, "direct" },
-> -       { Opt_direct, "directio" },
-> -       { Opt_direct, "forcedirectio" },
-> -       { Opt_strictcache, "strictcache" },
->         { Opt_noac, "noac" },
->         { Opt_fsc, "fsc" },
->         { Opt_mfsymlinks, "mfsymlinks" },
-> @@ -1105,8 +1100,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->         char *string = NULL;
->         char *tmp_end, *value;
->         char delim;
-> -       bool cache_specified = false;
-> -       static bool cache_warned = false;
+> I haven't yet done any investigation but it looks like a plausible
+> deadlock possibility. Also, fwiw -- the test7 regression that I
+> reported earlier seems to have gone away for now. No idea why.
 >
->         separator[0] = ',';
->         separator[1] = 0;
-> @@ -1138,6 +1131,9 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->         /* default to using server inode numbers where available */
->         vol->server_ino = 1;
+> Anyway, here's the lockdep spew:
 >
-> +       /* default is to use strict cifs caching semantics */
-> +       vol->strict_io = true;
-> +
->         vol->actimeo = CIFS_DEF_ACTIMEO;
+> [ 1732.096609] ======================================================
+> [ 1732.096609] [ INFO: possible circular locking dependency detected ]
+> [ 1732.096609] 3.6.0-0.rc4.git0.1.fc18.x86_64.debug #1 Tainted: G           O
+> [ 1732.096609] -------------------------------------------------------
+> [ 1732.096609] test5/7374 is trying to acquire lock:
+> [ 1732.096609]  (sb_writers#13){.+.+.+}, at: [<ffffffff8115edd3>] generic_file_aio_write+0x63/0x100
+> [ 1732.096609]
+> [ 1732.096609] but task is already holding lock:
+> [ 1732.096609]  (&cifsi->lock_sem){+++++.}, at: [<ffffffffa02b61fc>] cifs_strict_writev+0xcc/0x1b0 [cifs]
+> [ 1732.096609]
+> [ 1732.096609] which lock already depends on the new lock.
+> [ 1732.096609]
+> [ 1732.096609]
+> [ 1732.096609] the existing dependency chain (in reverse order) is:
+> [ 1732.096609]
+> [ 1732.096609] -> #1 (&cifsi->lock_sem){+++++.}:
+> [ 1732.096609]        [<ffffffff810d5d91>] lock_acquire+0xa1/0x1f0
+> [ 1732.096609]        [<ffffffff816d8721>] down_write+0x61/0xb0
+> [ 1732.096609]        [<ffffffffa02b1c8d>] cifs_new_fileinfo+0xbd/0x2e0 [cifs]
+> [ 1732.096609]        [<ffffffffa02b2217>] cifs_open+0x327/0x760 [cifs]
+> [ 1732.096609]        [<ffffffff811cb923>] do_dentry_open+0x263/0x310
+> [ 1732.096609]        [<ffffffff811cba1b>] finish_open+0x4b/0x70
+> [ 1732.096609]        [<ffffffff811deace>] do_last+0x6de/0xe00
+> [ 1732.096609]        [<ffffffff811df2ad>] path_openat+0xbd/0x500
+> [ 1732.096609]        [<ffffffff811dfcc1>] do_filp_open+0x41/0xa0
+> [ 1732.096609]        [<ffffffff811ccdc6>] do_sys_open+0xf6/0x1e0
+> [ 1732.096609]        [<ffffffff811cced1>] sys_open+0x21/0x30
+> [ 1732.096609]        [<ffffffff816e42a9>] system_call_fastpath+0x16/0x1b
+> [ 1732.096609]
+> [ 1732.096609] -> #0 (sb_writers#13){.+.+.+}:
+> [ 1732.096609]        [<ffffffff810d4f52>] __lock_acquire+0x1372/0x1ad0
+> [ 1732.096609]        [<ffffffff810d5d91>] lock_acquire+0xa1/0x1f0
+> [ 1732.096609]        [<ffffffff811d0b87>] __sb_start_write+0xd7/0x1d0
+> [ 1732.096609]        [<ffffffff8115edd3>] generic_file_aio_write+0x63/0x100
+> [ 1732.096609]        [<ffffffffa02b6299>] cifs_strict_writev+0x169/0x1b0 [cifs]
+> [ 1732.096609]        [<ffffffff811cd137>] do_sync_write+0xa7/0xe0
+> [ 1732.096609]        [<ffffffff811cda2f>] vfs_write+0xaf/0x190
+> [ 1732.096609]        [<ffffffff811cdd6d>] sys_write+0x4d/0x90
+> [ 1732.096609]        [<ffffffff816e42a9>] system_call_fastpath+0x16/0x1b
+> [ 1732.096609]
+> [ 1732.096609] other info that might help us debug this:
+> [ 1732.096609]
+> [ 1732.096609]  Possible unsafe locking scenario:
+> [ 1732.096609]
+> [ 1732.096609]        CPU0                    CPU1
+> [ 1732.096609]        ----                    ----
+> [ 1732.096609]   lock(&cifsi->lock_sem);
+> [ 1732.096609]                                lock(sb_writers#13);
+> [ 1732.096609]                                lock(&cifsi->lock_sem);
+> [ 1732.096609]   lock(sb_writers#13);
+> [ 1732.096609]
+> [ 1732.096609]  *** DEADLOCK ***
+> [ 1732.096609]
+> [ 1732.096609] 1 lock held by test5/7374:
+> [ 1732.096609]  #0:  (&cifsi->lock_sem){+++++.}, at: [<ffffffffa02b61fc>] cifs_strict_writev+0xcc/0x1b0 [cifs]
+> [ 1732.096609]
+> [ 1732.096609] stack backtrace:
+> [ 1732.096609] Pid: 7374, comm: test5 Tainted: G           O 3.6.0-0.rc4.git0.1.fc18.x86_64.debug #1
+> [ 1732.096609] Call Trace:
+> [ 1732.096609]  [<ffffffff816cf0b4>] print_circular_bug+0x1fb/0x20c
+> [ 1732.096609]  [<ffffffff810d4f52>] __lock_acquire+0x1372/0x1ad0
+> [ 1732.096609]  [<ffffffff8104aee2>] ? kvm_clock_read+0x32/0x40
+> [ 1732.096609]  [<ffffffff81021e39>] ? sched_clock+0x9/0x10
+> [ 1732.096609]  [<ffffffff810ac295>] ? sched_clock_local+0x25/0xa0
+> [ 1732.096609]  [<ffffffff810d5d91>] lock_acquire+0xa1/0x1f0
+> [ 1732.096609]  [<ffffffff8115edd3>] ? generic_file_aio_write+0x63/0x100
+> [ 1732.096609]  [<ffffffff811d0b87>] __sb_start_write+0xd7/0x1d0
+> [ 1732.096609]  [<ffffffff8115edd3>] ? generic_file_aio_write+0x63/0x100
+> [ 1732.096609]  [<ffffffff8115edd3>] ? generic_file_aio_write+0x63/0x100
+> [ 1732.096609]  [<ffffffff8115edd3>] generic_file_aio_write+0x63/0x100
+> [ 1732.096609]  [<ffffffffa02b6299>] cifs_strict_writev+0x169/0x1b0 [cifs]
+> [ 1732.096609]  [<ffffffff811cd137>] do_sync_write+0xa7/0xe0
+> [ 1732.096609]  [<ffffffff811cda2f>] vfs_write+0xaf/0x190
+> [ 1732.096609]  [<ffffffff811cdd6d>] sys_write+0x4d/0x90
+> [ 1732.096609]  [<ffffffff816e42a9>] system_call_fastpath+0x16/0x1b
 >
->         /* FIXME: add autonegotiation -- for now, SMB1 is default */
-> @@ -1321,22 +1317,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                          */
->                         vol->seal = 1;
->                         break;
-> -               case Opt_direct:
-> -                       cache_specified = true;
-> -                       vol->direct_io = true;
-> -                       vol->strict_io = false;
-> -                       cERROR(1, "The \"directio\" option will be removed in "
-> -                                 "3.7. Please switch to the \"cache=none\" "
-> -                                 "option.");
-> -                       break;
-> -               case Opt_strictcache:
-> -                       cache_specified = true;
-> -                       vol->direct_io = false;
-> -                       vol->strict_io = true;
-> -                       cERROR(1, "The \"strictcache\" option will be removed "
-> -                               "in 3.7. Please switch to the \"cache=strict\" "
-> -                               "option.");
-> -                       break;
->                 case Opt_noac:
->                         printk(KERN_WARNING "CIFS: Mount option noac not "
->                                 "supported. Instead set "
-> @@ -1771,7 +1751,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                                 goto cifs_parse_mount_err;
->                         break;
->                 case Opt_cache:
-> -                       cache_specified = true;
->                         string = match_strdup(args);
->                         if (string == NULL)
->                                 goto out_nomem;
-> @@ -1822,14 +1801,6 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                 printk(KERN_NOTICE "CIFS: ignoring forcegid mount option "
->                                    "specified with no gid= option.\n");
->
-> -       /* FIXME: remove this block in 3.7 */
-> -       if (!cache_specified && !cache_warned) {
-> -               cache_warned = true;
-> -               printk(KERN_NOTICE "CIFS: no cache= option specified, using "
-> -                                  "\"cache=loose\". This default will change "
-> -                                  "to \"cache=strict\" in 3.7.\n");
-> -       }
-> -
->         kfree(mountdata_copy);
->         return 0;
 >
 > --
-> 1.7.11.4
->
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+I think we can replace generic_file_aio_write call here with something
+like cifs_generic_aio_write that is almost the same as
+generic_file_aio_write but with up_read(&cinode->lock_sem) after
+sb_start_write and down_read(&cinode->lock_sem) before sb_end_write -
+to make locking in the same order:
+
+1) sb_writers
+2) lock_sem
+
+thoughts?
 
 -- 
 Best regards,
