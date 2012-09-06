@@ -1,252 +1,68 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: WARNING: at fs/inode.c:280 drop_nlink+0x31/0x33()
-Date: Thu, 6 Sep 2012 07:58:31 -0400
-Message-ID: <20120906075831.0a1164f5@corrin.poochiereds.net>
-References: <20120829162527.GA3635@NickAndBarb.net>
-	<20120829151641.20cde4bc@corrin.poochiereds.net>
-	<20120831043352.GA23663@NickAndBarb.net>
-	<CAKywueSY+NOV3irDm9YxepeCyJJhh82o2mgmDLogr+hJPbaYig@mail.gmail.com>
-	<20120831153206.GA28908@NICK2>
-	<20120831092138.47668603@corrin.poochiereds.net>
-	<20120831180345.GA10907@NICK2>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: remove support for CIFS_IOC_CHECKUMOUNT ioctl
+Date: Thu, 6 Sep 2012 16:21:24 +0400
+Message-ID: <CAKywueRi=G7S5E=GD+Hr0rdr9nmNc8pbUMa719xVNPudFdArVA@mail.gmail.com>
+References: <1346853509-13438-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Nick Pasich <Nick-zjzomy8DwGtZujV+MdCcmQ@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120831180345.GA10907@NICK2>
+In-Reply-To: <1346853509-13438-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 31 Aug 2012 11:03:45 -0700
-Nick Pasich <Nick-zjzomy8DwGtZujV+MdCcmQ@public.gmane.org> wrote:
-
-> On Fri, Aug 31, 2012 at 09:21:38AM -0700, Jeff Layton wrote:
-> > On Fri, 31 Aug 2012 08:32:06 -0700
-> > Nick Pasich <Nick-zjzomy8DwGtZujV+MdCcmQ@public.gmane.org> wrote:
-> > 
-> > > On Fri, Aug 31, 2012 at 12:00:26PM +0400, Pavel Shilovsky wrote:
-> > > > 2012/8/31 Nick Pasich <Nick-6YHVhJieVCJZujV+MdCcmQ@public.gmane.org>:
-> > > > > Jeff,
-> > > > >
-> > > > > I applied this patch to Kernel 3.5.3 from Pavel and the
-> > > > > the warning is gone with no problems.
-> > > > >
-> > > > > Thanks,
-> > > > >
-> > > > > --( Nick Pasich
-> > > > >
-> > > > > ##########################################################
-> > > > >
-> > > > > From df2d6b1fbf2401c5ee04f2ac143ea0954e3a87a6 Mon Sep 17 00:00:00 2001
-> > > > > From: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > > > > Date: Fri, 13 Jul 2012 11:59:45 +0400
-> > > > > Subject: [PATCH] CIFS: Protect i_nlink from being negative
-> > > > >
-> > > > > that can cause warning messages.
-> > > > >
-> > > > > Signed-off-by: Pavel Shilovsky <pshilovsky-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > > > > ---
-> > > > >  fs/cifs/inode.c |   13 +++++++++++--
-> > > > >  1 files changed, 11 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> > > > > index 7354877..88afb1a 100644
-> > > > > --- a/fs/cifs/inode.c
-> > > > > +++ b/fs/cifs/inode.c
-> > > > > @@ -1110,6 +1110,15 @@ undo_setattr:
-> > > > >                 goto out_close;
-> > > > >  }
-> > > > >
-> > > > > +/* copied from fs/nfs/dir.c with small changes */
-> > > > > +static void
-> > > > > +cifs_drop_nlink(struct inode *inode)
-> > > > > +{
-> > > > > +       spin_lock(&inode->i_lock);
-> > > > > +       if (inode->i_nlink > 0)
-> > > > > +               drop_nlink(inode);
-> > > > > +       spin_unlock(&inode->i_lock);
-> > > > > +}
-> > > > >
-> > > > >  /*
-> > > > >   * If dentry->d_inode is null (usually meaning the cached dentry
-> > > > > @@ -1166,13 +1175,13 @@ retry_std_delete:
-> > > > >  psx_del_no_retry:
-> > > > >                 if (!rc) {
-> > > > >                                 if (inode)
-> > > > > -                       drop_nlink(inode);
-> > > > > +                       cifs_drop_nlink(inode);
-> > > > >                 } else if (rc == -ENOENT) {
-> > > > >                                 d_drop(dentry);
-> > > > >                 } else if (rc == -ETXTBSY) {
-> > > > >                                 rc = cifs_rename_pending_delete(full_path, dentry, xid);
-> > > > >                                 if (rc == 0)
-> > > > > -                       drop_nlink(inode);
-> > > > > +                       cifs_drop_nlink(inode);
-> > > > >                 } else if ((rc == -EACCES) && (dosattr == 0) && inode) {
-> > > > >                                 attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
-> > > > >                                 if (attrs == NULL) {
-> > > > > --
-> > > > > 1.7.3.3
-> > > > >
-> > > > > ##########################################################
-> > > > >
-> > > > > --
-> > > > > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > > > > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > > > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> > > > 
-> > > > This one fixes only a part of the problem. Now we have another patch
-> > > > for this problem:
-> > > > 
-> > > > https://git.samba.org/sfrench/?p=sfrench/cifs-2.6.git;a=commitdiff;h=b7ca69289680cf631fb20b7d436467c4ec1153cd;hp=6dab7ede9390d4d937cb89feca932e4fd575d2da
-> > > > 
-> > > > -- 
-> > > > Best regards,
-> > > > Pavel Shilovsky.
-> > > 
-> > > 
-> > > 
-> > > Since I'm using kernel 3.5.3 , I get an error on hunk 7 of the patch.
-> > > 
-> > > I can do it by hand... But I want to check with you first.
-> > > 
-> > > Thanks,
-> > > 
-> > > --( Nick Pasich )--
-> > > 
-> > 
-> > If you fix it up by hand, consider submitting it as a backport for the
-> > stable series as well.
-> > 
-> > -- 
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> 
-> Jeff / Pavel,
-> 
-> Here are my changes on hunk #7 that allow patching 3.5.3
-> 
-> Check it out....
-> 
-> --( Nick Pasich )--
-> 
-> 
-> 
-> ##############################################################################
-> 
-> diff -u a/fs/cifs/inode.c b/fs/cifs/inode.c
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -124,10 +124,10 @@
+2012/9/5 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> ...as promised for 3.7.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/ioctl.c | 19 -------------------
+>  1 file changed, 19 deletions(-)
+>
+> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+> index 5b3481b..fd5009d 100644
+> --- a/fs/cifs/ioctl.c
+> +++ b/fs/cifs/ioctl.c
+> @@ -28,8 +28,6 @@
+>  #include "cifs_debug.h"
+>  #include "cifsfs.h"
+>
+> -#define CIFS_IOC_CHECKUMOUNT _IO(0xCF, 2)
+> -
+>  long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
 >  {
->  	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
->  	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> -	unsigned long oldtime = cifs_i->time;
->  
->  	cifs_revalidate_cache(inode, fattr);
->  
-> +	spin_lock(&inode->i_lock);
->  	inode->i_atime = fattr->cf_atime;
->  	inode->i_mtime = fattr->cf_mtime;
->  	inode->i_ctime = fattr->cf_ctime;
-> @@ -148,9 +148,6 @@
->  	else
->  		cifs_i->time = jiffies;
->  
-> -	cFYI(1, "inode 0x%p old_time=%ld new_time=%ld", inode,
-> -		 oldtime, cifs_i->time);
-> -
->  	cifs_i->delete_pending = fattr->cf_flags & CIFS_FATTR_DELETE_PENDING;
->  
->  	cifs_i->server_eof = fattr->cf_eof;
-> @@ -158,7 +155,6 @@
->  	 * Can't safely change the file size here if the client is writing to
->  	 * it due to potential races.
->  	 */
-> -	spin_lock(&inode->i_lock);
->  	if (is_size_safe_to_change(cifs_i, fattr->cf_eof)) {
->  		i_size_write(inode, fattr->cf_eof);
->  
-> @@ -909,12 +905,14 @@
->  
->  	if (rc && tcon->ipc) {
->  		cFYI(1, "ipc connection - fake read inode");
-> +		spin_lock(&inode->i_lock);
->  		inode->i_mode |= S_IFDIR;
->  		set_nlink(inode, 2);
->  		inode->i_op = &cifs_ipc_inode_ops;
->  		inode->i_fop = &simple_dir_operations;
->  		inode->i_uid = cifs_sb->mnt_uid;
->  		inode->i_gid = cifs_sb->mnt_gid;
-> +		spin_unlock(&inode->i_lock);
->  	} else if (rc) {
->  		iget_failed(inode);
->  		inode = ERR_PTR(rc);
-> @@ -1159,6 +1157,15 @@
->  	goto out_close;
->  }
->  
-> +/* copied from fs/nfs/dir.c with small changes */
-> +static void
-> +cifs_drop_nlink(struct inode *inode)
-> +{
-> +	spin_lock(&inode->i_lock);
-> +	if (inode->i_nlink > 0)
-> +		drop_nlink(inode);
-> +	spin_unlock(&inode->i_lock);
-> +}
->  
->  /*
->   * If dentry->d_inode is null (usually meaning the cached dentry
-> @@ -1216,13 +1223,13 @@
->  psx_del_no_retry:
->  	if (!rc) {
->  		if (inode)
-> -			drop_nlink(inode);
-> +			cifs_drop_nlink(inode);
->  	} else if (rc == -ENOENT) {
->  		d_drop(dentry);
->  	} else if (rc == -ETXTBSY) {
->  		rc = cifs_rename_pending_delete(full_path, dentry, xid);
->  		if (rc == 0)
-> -			drop_nlink(inode);
-> +			cifs_drop_nlink(inode);
->  	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
->  		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
->  		if (attrs == NULL) {
-> @@ -1369,9 +1376,10 @@
->  		d_instantiate(direntry, newinode);
->  		 /* setting nlink not necessary except in cases where we
->  		  * failed to get it from the server or was set bogus */
-> +	 	spin_lock(&direntry->d_inode->i_lock);
->  		if ((direntry->d_inode) && (direntry->d_inode->i_nlink < 2))
->  			set_nlink(direntry->d_inode, 2);
-> -
-> +	 	spin_unlock(&direntry->d_inode->i_lock);
->  		mode &= ~current_umask();
->  		/* must turn on setgid bit if parent dir has it */
->  		if (inode->i_mode & S_ISGID)
-> diff -u a/fs/cifs/link.c b/fs/cifs/link.c
-> --- a/fs/cifs/link.c
-> +++ b/fs/cifs/link.c
-> @@ -433,7 +433,9 @@
->  	if (old_file->d_inode) {
->  		cifsInode = CIFS_I(old_file->d_inode);
->  		if (rc == 0) {
-> +			spin_lock(&old_file->d_inode->i_lock);
->  			inc_nlink(old_file->d_inode);
-> +			spin_unlock(&old_file->d_inode->i_lock);
->  /* BB should we make this contingent on superblock flag NOATIME? */
->  /*			old_file->d_inode->i_ctime = CURRENT_TIME;*/
->  			/* parent dir timestamps will update from srv
-> ##############################################################################
+>         struct inode *inode = filep->f_dentry->d_inode;
+> @@ -51,23 +49,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+>         cifs_sb = CIFS_SB(inode->i_sb);
+>
+>         switch (command) {
+> -               static bool warned = false;
+> -               case CIFS_IOC_CHECKUMOUNT:
+> -                       if (!warned) {
+> -                               warned = true;
+> -                               cERROR(1, "the CIFS_IOC_CHECKMOUNT ioctl will "
+> -                                         "be deprecated in 3.7. Please "
+> -                                         "migrate away from the use of "
+> -                                         "umount.cifs");
+> -                       }
+> -                       cFYI(1, "User unmount attempted");
+> -                       if (cifs_sb->mnt_uid == current_uid())
+> -                               rc = 0;
+> -                       else {
+> -                               rc = -EACCES;
+> -                               cFYI(1, "uids do not match");
+> -                       }
+> -                       break;
+>  #ifdef CONFIG_CIFS_POSIX
+>                 case FS_IOC_GETFLAGS:
+>                         if (pSMBFile == NULL)
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.7.11.4
+>
 
-Looks good to me. You can add:
+Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Best regards,
+Pavel Shilovsky.
