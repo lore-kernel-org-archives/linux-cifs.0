@@ -1,62 +1,123 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove support for CIFS_IOC_CHECKUMOUNT ioctl
-Date: Thu, 6 Sep 2012 16:21:24 +0400
-Message-ID: <CAKywueRi=G7S5E=GD+Hr0rdr9nmNc8pbUMa719xVNPudFdArVA@mail.gmail.com>
-References: <1346853509-13438-1-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH] cifs: cleanups for cifs_mkdir_qinfo
+Date: Thu, 6 Sep 2012 16:22:30 +0400
+Message-ID: <CAKywueRigOXZ5XsHXbTPTikxXWnkCurvEWhsL=b3BZz1msn_pA@mail.gmail.com>
+References: <1346853448-13322-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1346853509-13438-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1346853448-13322-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/9/5 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> ...as promised for 3.7.
+> Rename inode pointers for better clarity. Move the d_instantiate call to
+> the end of the function to prevent other tasks from seeing it before
+> we've finished constructing it. Since we should have exclusive access to
+> the inode at this point, remove the spinlock around i_nlink update.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/ioctl.c | 19 -------------------
->  1 file changed, 19 deletions(-)
+>  fs/cifs/inode.c | 51 ++++++++++++++++++++++++---------------------------
+>  1 file changed, 24 insertions(+), 27 deletions(-)
 >
-> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-> index 5b3481b..fd5009d 100644
-> --- a/fs/cifs/ioctl.c
-> +++ b/fs/cifs/ioctl.c
-> @@ -28,8 +28,6 @@
->  #include "cifs_debug.h"
->  #include "cifsfs.h"
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index da4dd71..fd6551b 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1176,34 +1176,33 @@ unlink_out:
+>  }
 >
-> -#define CIFS_IOC_CHECKUMOUNT _IO(0xCF, 2)
-> -
->  long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+>  static int
+> -cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
+> +cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
+>                  const char *full_path, struct cifs_sb_info *cifs_sb,
+>                  struct cifs_tcon *tcon, const unsigned int xid)
 >  {
->         struct inode *inode = filep->f_dentry->d_inode;
-> @@ -51,23 +49,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
->         cifs_sb = CIFS_SB(inode->i_sb);
+>         int rc = 0;
+> -       struct inode *newinode = NULL;
+> +       struct inode *inode = NULL;
 >
->         switch (command) {
-> -               static bool warned = false;
-> -               case CIFS_IOC_CHECKUMOUNT:
-> -                       if (!warned) {
-> -                               warned = true;
-> -                               cERROR(1, "the CIFS_IOC_CHECKMOUNT ioctl will "
-> -                                         "be deprecated in 3.7. Please "
-> -                                         "migrate away from the use of "
-> -                                         "umount.cifs");
+>         if (tcon->unix_ext)
+> -               rc = cifs_get_inode_info_unix(&newinode, full_path, inode->i_sb,
+> +               rc = cifs_get_inode_info_unix(&inode, full_path, parent->i_sb,
+>                                               xid);
+>         else
+> -               rc = cifs_get_inode_info(&newinode, full_path, NULL,
+> -                                        inode->i_sb, xid, NULL);
+> +               rc = cifs_get_inode_info(&inode, full_path, NULL, parent->i_sb,
+> +                                        xid, NULL);
+> +
+>         if (rc)
+>                 return rc;
+>
+> -       d_instantiate(dentry, newinode);
+>         /*
+>          * setting nlink not necessary except in cases where we failed to get it
+> -        * from the server or was set bogus
+> +        * from the server or was set bogus. Also, since this is a brand new
+> +        * inode, no need to grab the i_lock before setting the i_nlink.
+>          */
+> -       spin_lock(&dentry->d_inode->i_lock);
+> -       if ((dentry->d_inode) && (dentry->d_inode->i_nlink < 2))
+> -               set_nlink(dentry->d_inode, 2);
+> -       spin_unlock(&dentry->d_inode->i_lock);
+> +       if (inode->i_nlink < 2)
+> +               set_nlink(inode, 2);
+>         mode &= ~current_umask();
+>         /* must turn on setgid bit if parent dir has it */
+> -       if (inode->i_mode & S_ISGID)
+> +       if (parent->i_mode & S_ISGID)
+>                 mode |= S_ISGID;
+>
+>         if (tcon->unix_ext) {
+> @@ -1216,8 +1215,8 @@ cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
+>                 };
+>                 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
+>                         args.uid = (__u64)current_fsuid();
+> -                       if (inode->i_mode & S_ISGID)
+> -                               args.gid = (__u64)inode->i_gid;
+> +                       if (parent->i_mode & S_ISGID)
+> +                               args.gid = (__u64)parent->i_gid;
+>                         else
+>                                 args.gid = (__u64)current_fsgid();
+>                 } else {
+> @@ -1232,22 +1231,20 @@ cifs_mkdir_qinfo(struct inode *inode, struct dentry *dentry, umode_t mode,
+>                 struct TCP_Server_Info *server = tcon->ses->server;
+>                 if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
+>                     (mode & S_IWUGO) == 0 && server->ops->mkdir_setinfo)
+> -                       server->ops->mkdir_setinfo(newinode, full_path, cifs_sb,
+> +                       server->ops->mkdir_setinfo(inode, full_path, cifs_sb,
+>                                                    tcon, xid);
+> -               if (dentry->d_inode) {
+> -                       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
+> -                               dentry->d_inode->i_mode = (mode | S_IFDIR);
+> -
+> -                       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
+> -                               dentry->d_inode->i_uid = current_fsuid();
+> -                               if (inode->i_mode & S_ISGID)
+> -                                       dentry->d_inode->i_gid = inode->i_gid;
+> -                               else
+> -                                       dentry->d_inode->i_gid =
+> -                                                               current_fsgid();
 > -                       }
-> -                       cFYI(1, "User unmount attempted");
-> -                       if (cifs_sb->mnt_uid == current_uid())
-> -                               rc = 0;
-> -                       else {
-> -                               rc = -EACCES;
-> -                               cFYI(1, "uids do not match");
-> -                       }
-> -                       break;
->  #ifdef CONFIG_CIFS_POSIX
->                 case FS_IOC_GETFLAGS:
->                         if (pSMBFile == NULL)
+> +               if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_DYNPERM)
+> +                       inode->i_mode = (mode | S_IFDIR);
+> +
+> +               if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID) {
+> +                       inode->i_uid = current_fsuid();
+> +                       if (inode->i_mode & S_ISGID)
+> +                               inode->i_gid = parent->i_gid;
+> +                       else
+> +                               inode->i_gid = current_fsgid();
+>                 }
+>         }
+> +       d_instantiate(dentry, inode);
+>         return rc;
+>  }
+>
 > --
 > 1.7.11.4
 >
