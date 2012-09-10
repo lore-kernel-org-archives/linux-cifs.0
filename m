@@ -1,145 +1,245 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: lockdep spew with Pavel's for-next branch
-Date: Mon, 10 Sep 2012 15:55:15 +0400
-Message-ID: <CAKywueShjat=5NH9D-ughbV22W1i8QEHnsE7Xf3L_bBpJ7oX8A@mail.gmail.com>
-References: <20120905100514.175aa792@tlielax.poochiereds.net>
-	<CAKywueSO2rSpHsRsSwq1A2MPAsM4rSBYC69ZtqEMAUfM-FdBiQ@mail.gmail.com>
-	<20120907090534.65c0827c@corrin.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] CIFS: Check for mandatory brlocks on read/write
+Date: Mon, 10 Sep 2012 15:56:57 +0400
+Message-ID: <1347278217-4586-1-git-send-email-pshilovsky@etersoft.ru>
+References: <1346406088-4537-8-git-send-email-pshilovsky@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120907090534.65c0827c-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1346406088-4537-8-git-send-email-pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/9/7 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Thu, 6 Sep 2012 18:34:45 +0400
-> Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> 2012/9/5 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> > I got the following lockdep pop when testing a few patches on top of
->> > Pavel's for-next branch. The relevant mount options were:
->> >
->> >     vers=1.0,cache=strict,nounix
->> >
->> > The test that caused it to pop was connectathon test5 (the read/write
->> > test).
->> >
->> > I haven't yet done any investigation but it looks like a plausible
->> > deadlock possibility. Also, fwiw -- the test7 regression that I
->> > reported earlier seems to have gone away for now. No idea why.
->> >
->> > Anyway, here's the lockdep spew:
->> >
->> > [ 1732.096609] ======================================================
->> > [ 1732.096609] [ INFO: possible circular locking dependency detected ]
->> > [ 1732.096609] 3.6.0-0.rc4.git0.1.fc18.x86_64.debug #1 Tainted: G           O
->> > [ 1732.096609] -------------------------------------------------------
->> > [ 1732.096609] test5/7374 is trying to acquire lock:
->> > [ 1732.096609]  (sb_writers#13){.+.+.+}, at: [<ffffffff8115edd3>] generic_file_aio_write+0x63/0x100
->> > [ 1732.096609]
->> > [ 1732.096609] but task is already holding lock:
->> > [ 1732.096609]  (&cifsi->lock_sem){+++++.}, at: [<ffffffffa02b61fc>] cifs_strict_writev+0xcc/0x1b0 [cifs]
->> > [ 1732.096609]
->> > [ 1732.096609] which lock already depends on the new lock.
->> > [ 1732.096609]
->> > [ 1732.096609]
->> > [ 1732.096609] the existing dependency chain (in reverse order) is:
->> > [ 1732.096609]
->> > [ 1732.096609] -> #1 (&cifsi->lock_sem){+++++.}:
->> > [ 1732.096609]        [<ffffffff810d5d91>] lock_acquire+0xa1/0x1f0
->> > [ 1732.096609]        [<ffffffff816d8721>] down_write+0x61/0xb0
->> > [ 1732.096609]        [<ffffffffa02b1c8d>] cifs_new_fileinfo+0xbd/0x2e0 [cifs]
->> > [ 1732.096609]        [<ffffffffa02b2217>] cifs_open+0x327/0x760 [cifs]
->> > [ 1732.096609]        [<ffffffff811cb923>] do_dentry_open+0x263/0x310
->> > [ 1732.096609]        [<ffffffff811cba1b>] finish_open+0x4b/0x70
->> > [ 1732.096609]        [<ffffffff811deace>] do_last+0x6de/0xe00
->> > [ 1732.096609]        [<ffffffff811df2ad>] path_openat+0xbd/0x500
->> > [ 1732.096609]        [<ffffffff811dfcc1>] do_filp_open+0x41/0xa0
->> > [ 1732.096609]        [<ffffffff811ccdc6>] do_sys_open+0xf6/0x1e0
->> > [ 1732.096609]        [<ffffffff811cced1>] sys_open+0x21/0x30
->> > [ 1732.096609]        [<ffffffff816e42a9>] system_call_fastpath+0x16/0x1b
->> > [ 1732.096609]
->> > [ 1732.096609] -> #0 (sb_writers#13){.+.+.+}:
->> > [ 1732.096609]        [<ffffffff810d4f52>] __lock_acquire+0x1372/0x1ad0
->> > [ 1732.096609]        [<ffffffff810d5d91>] lock_acquire+0xa1/0x1f0
->> > [ 1732.096609]        [<ffffffff811d0b87>] __sb_start_write+0xd7/0x1d0
->> > [ 1732.096609]        [<ffffffff8115edd3>] generic_file_aio_write+0x63/0x100
->> > [ 1732.096609]        [<ffffffffa02b6299>] cifs_strict_writev+0x169/0x1b0 [cifs]
->> > [ 1732.096609]        [<ffffffff811cd137>] do_sync_write+0xa7/0xe0
->> > [ 1732.096609]        [<ffffffff811cda2f>] vfs_write+0xaf/0x190
->> > [ 1732.096609]        [<ffffffff811cdd6d>] sys_write+0x4d/0x90
->> > [ 1732.096609]        [<ffffffff816e42a9>] system_call_fastpath+0x16/0x1b
->> > [ 1732.096609]
->> > [ 1732.096609] other info that might help us debug this:
->> > [ 1732.096609]
->> > [ 1732.096609]  Possible unsafe locking scenario:
->> > [ 1732.096609]
->> > [ 1732.096609]        CPU0                    CPU1
->> > [ 1732.096609]        ----                    ----
->> > [ 1732.096609]   lock(&cifsi->lock_sem);
->> > [ 1732.096609]                                lock(sb_writers#13);
->> > [ 1732.096609]                                lock(&cifsi->lock_sem);
->> > [ 1732.096609]   lock(sb_writers#13);
->> > [ 1732.096609]
->> > [ 1732.096609]  *** DEADLOCK ***
->> > [ 1732.096609]
->> > [ 1732.096609] 1 lock held by test5/7374:
->> > [ 1732.096609]  #0:  (&cifsi->lock_sem){+++++.}, at: [<ffffffffa02b61fc>] cifs_strict_writev+0xcc/0x1b0 [cifs]
->> > [ 1732.096609]
->> > [ 1732.096609] stack backtrace:
->> > [ 1732.096609] Pid: 7374, comm: test5 Tainted: G           O 3.6.0-0.rc4.git0.1.fc18.x86_64.debug #1
->> > [ 1732.096609] Call Trace:
->> > [ 1732.096609]  [<ffffffff816cf0b4>] print_circular_bug+0x1fb/0x20c
->> > [ 1732.096609]  [<ffffffff810d4f52>] __lock_acquire+0x1372/0x1ad0
->> > [ 1732.096609]  [<ffffffff8104aee2>] ? kvm_clock_read+0x32/0x40
->> > [ 1732.096609]  [<ffffffff81021e39>] ? sched_clock+0x9/0x10
->> > [ 1732.096609]  [<ffffffff810ac295>] ? sched_clock_local+0x25/0xa0
->> > [ 1732.096609]  [<ffffffff810d5d91>] lock_acquire+0xa1/0x1f0
->> > [ 1732.096609]  [<ffffffff8115edd3>] ? generic_file_aio_write+0x63/0x100
->> > [ 1732.096609]  [<ffffffff811d0b87>] __sb_start_write+0xd7/0x1d0
->> > [ 1732.096609]  [<ffffffff8115edd3>] ? generic_file_aio_write+0x63/0x100
->> > [ 1732.096609]  [<ffffffff8115edd3>] ? generic_file_aio_write+0x63/0x100
->> > [ 1732.096609]  [<ffffffff8115edd3>] generic_file_aio_write+0x63/0x100
->> > [ 1732.096609]  [<ffffffffa02b6299>] cifs_strict_writev+0x169/0x1b0 [cifs]
->> > [ 1732.096609]  [<ffffffff811cd137>] do_sync_write+0xa7/0xe0
->> > [ 1732.096609]  [<ffffffff811cda2f>] vfs_write+0xaf/0x190
->> > [ 1732.096609]  [<ffffffff811cdd6d>] sys_write+0x4d/0x90
->> > [ 1732.096609]  [<ffffffff816e42a9>] system_call_fastpath+0x16/0x1b
->> >
->> >
->> > --
->> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->>
->> I think we can replace generic_file_aio_write call here with something
->> like cifs_generic_aio_write that is almost the same as
->> generic_file_aio_write but with up_read(&cinode->lock_sem) after
->> sb_start_write and down_read(&cinode->lock_sem) before sb_end_write -
->> to make locking in the same order:
->>
->> 1) sb_writers
->> 2) lock_sem
->>
->> thoughts?
->>
->
-> I don't know. I don't have a good feeling about this whole lock_sem
-> idea at all. It seems like a huge swath of this code is now running
-> under it.
->
-> That's not good from a performance standpoint for one thing. It may
-> also lead to subtle bugs later when we make changes to this code. Parts
-> of it are now being serialized that may not need to be. If that
-> serialization is later removed, it could have "interesting" effects.
->
-> I'm not sure what would work better however...
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Currently CIFS code accept read/write ops on mandatory locked area
+when two processes use the same file descriptor - it's wrong.
+Fix this by serializing io and brlock operations on the inode.
 
-Fixed the problem (by reordering lock obtaining) and updated my for-next branch.
+Signed-off-by: Pavel Shilovsky <pshilovsky-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsproto.h |    4 ++
+ fs/cifs/file.c      |  123 +++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 103 insertions(+), 24 deletions(-)
 
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 15e38dc..c758ee7 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -180,6 +180,10 @@ extern struct smb_vol *cifs_get_volume_info(char *mount_data,
+ extern int cifs_mount(struct cifs_sb_info *, struct smb_vol *);
+ extern void cifs_umount(struct cifs_sb_info *);
+ extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
++extern bool cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
++				    __u64 length, __u8 type,
++				    struct cifsLockInfo **conf_lock,
++				    bool rw_check);
+ 
+ #if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
+ extern void cifs_dfs_release_automount_timer(void);
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index daeb817..ecc0d5d 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -704,10 +704,10 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
+ 	}
+ }
+ 
+-static bool
++extern bool
+ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
+ 			    __u64 length, __u8 type, struct cifsFileInfo *cfile,
+-			    struct cifsLockInfo **conf_lock)
++			    struct cifsLockInfo **conf_lock, bool rw_check)
+ {
+ 	struct cifsLockInfo *li;
+ 	struct cifsFileInfo *cur_cfile = fdlocks->cfile;
+@@ -717,19 +717,24 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
+ 		if (offset + length <= li->offset ||
+ 		    offset >= li->offset + li->length)
+ 			continue;
++		if (rw_check && server->ops->compare_fids(cfile, cur_cfile) &&
++		    current->tgid == li->pid)
++			continue;
+ 		if ((type & server->vals->shared_lock_type) &&
+ 		    ((server->ops->compare_fids(cfile, cur_cfile) &&
+ 		     current->tgid == li->pid) || type == li->type))
+ 			continue;
+-		*conf_lock = li;
++		if (conf_lock)
++			*conf_lock = li;
+ 		return true;
+ 	}
+ 	return false;
+ }
+ 
+-static bool
++bool
+ cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+-			__u8 type, struct cifsLockInfo **conf_lock)
++			__u8 type, struct cifsLockInfo **conf_lock,
++			bool rw_check)
+ {
+ 	bool rc = false;
+ 	struct cifs_fid_locks *cur;
+@@ -737,7 +742,7 @@ cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+ 
+ 	list_for_each_entry(cur, &cinode->llist, llist) {
+ 		rc = cifs_find_fid_lock_conflict(cur, offset, length, type,
+-						 cfile, conf_lock);
++						 cfile, conf_lock, rw_check);
+ 		if (rc)
+ 			break;
+ 	}
+@@ -765,7 +770,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+ 	down_read(&cinode->lock_sem);
+ 
+ 	exist = cifs_find_lock_conflict(cfile, offset, length, type,
+-					&conf_lock);
++					&conf_lock, false);
+ 	if (exist) {
+ 		flock->fl_start = conf_lock->offset;
+ 		flock->fl_end = conf_lock->offset + conf_lock->length - 1;
+@@ -812,7 +817,7 @@ try_again:
+ 	down_write(&cinode->lock_sem);
+ 
+ 	exist = cifs_find_lock_conflict(cfile, lock->offset, lock->length,
+-					lock->type, &conf_lock);
++					lock->type, &conf_lock, false);
+ 	if (!exist && cinode->can_cache_brlcks) {
+ 		list_add_tail(&lock->llist, &cfile->llist->locks);
+ 		up_write(&cinode->lock_sem);
+@@ -2394,15 +2399,58 @@ ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	return written;
+ }
+ 
+-ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+-			   unsigned long nr_segs, loff_t pos)
++static ssize_t
++cifs_writev(struct kiocb *iocb, const struct iovec *iov,
++	    unsigned long nr_segs, loff_t pos)
+ {
+-	struct inode *inode;
++	struct file *file = iocb->ki_filp;
++	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
++	struct inode *inode = file->f_mapping->host;
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	struct TCP_Server_Info *server = tlink_tcon(cfile->tlink)->ses->server;
++	ssize_t rc = -EACCES;
+ 
+-	inode = iocb->ki_filp->f_path.dentry->d_inode;
++	BUG_ON(iocb->ki_pos != pos);
+ 
+-	if (CIFS_I(inode)->clientCanCacheAll)
+-		return generic_file_aio_write(iocb, iov, nr_segs, pos);
++	sb_start_write(inode->i_sb);
++
++	/*
++	 * We need to hold the sem to be sure nobody modifies lock list
++	 * with a brlock that prevents writing.
++	 */
++	down_read(&cinode->lock_sem);
++	if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
++				     server->vals->exclusive_lock_type, NULL,
++				     true)) {
++		mutex_lock(&inode->i_mutex);
++		rc = __generic_file_aio_write(iocb, iov, nr_segs,
++					       &iocb->ki_pos);
++		mutex_unlock(&inode->i_mutex);
++	}
++
++	if (rc > 0 || rc == -EIOCBQUEUED) {
++		ssize_t err;
++
++		err = generic_write_sync(file, pos, rc);
++		if (err < 0 && rc > 0)
++			rc = err;
++	}
++
++	up_read(&cinode->lock_sem);
++	sb_end_write(inode->i_sb);
++	return rc;
++}
++
++ssize_t
++cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
++		   unsigned long nr_segs, loff_t pos)
++{
++	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct cifsFileInfo *cfile = (struct cifsFileInfo *)
++						iocb->ki_filp->private_data;
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 
+ 	/*
+ 	 * In strict cache mode we need to write the data to the server exactly
+@@ -2411,7 +2459,15 @@ ssize_t cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	 * not on the region from pos to ppos+len-1.
+ 	 */
+ 
+-	return cifs_user_writev(iocb, iov, nr_segs, pos);
++	if (!cinode->clientCanCacheAll)
++		return cifs_user_writev(iocb, iov, nr_segs, pos);
++
++	if (cap_unix(tcon->ses) &&
++	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
++	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
++		return generic_file_aio_write(iocb, iov, nr_segs, pos);
++
++	return cifs_writev(iocb, iov, nr_segs, pos);
+ }
+ 
+ static struct cifs_readdata *
+@@ -2746,15 +2802,17 @@ ssize_t cifs_user_readv(struct kiocb *iocb, const struct iovec *iov,
+ 	return read;
+ }
+ 
+-ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
+-			  unsigned long nr_segs, loff_t pos)
++ssize_t
++cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
++		  unsigned long nr_segs, loff_t pos)
+ {
+-	struct inode *inode;
+-
+-	inode = iocb->ki_filp->f_path.dentry->d_inode;
+-
+-	if (CIFS_I(inode)->clientCanCacheRead)
+-		return generic_file_aio_read(iocb, iov, nr_segs, pos);
++	struct inode *inode = iocb->ki_filp->f_path.dentry->d_inode;
++	struct cifsInodeInfo *cinode = CIFS_I(inode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++	struct cifsFileInfo *cfile = (struct cifsFileInfo *)
++						iocb->ki_filp->private_data;
++	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++	int rc = -EACCES;
+ 
+ 	/*
+ 	 * In strict cache mode we need to read from the server all the time
+@@ -2764,8 +2822,25 @@ ssize_t cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
+ 	 * on pages affected by this read but not on the region from pos to
+ 	 * pos+len-1.
+ 	 */
++	if (!cinode->clientCanCacheRead)
++		return cifs_user_readv(iocb, iov, nr_segs, pos);
++
++	if (cap_unix(tcon->ses) &&
++	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
++	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
++		return generic_file_aio_read(iocb, iov, nr_segs, pos);
+ 
+-	return cifs_user_readv(iocb, iov, nr_segs, pos);
++	/*
++	 * We need to hold the sem to be sure nobody modifies lock list
++	 * with a brlock that prevents reading.
++	 */
++	down_read(&cinode->lock_sem);
++	if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
++				     tcon->ses->server->vals->shared_lock_type,
++				     NULL, true))
++		rc = generic_file_aio_read(iocb, iov, nr_segs, pos);
++	up_read(&cinode->lock_sem);
++	return rc;
+ }
+ 
+ static ssize_t
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.1
