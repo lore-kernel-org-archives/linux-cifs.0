@@ -1,33 +1,39 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: new for-3.6/for-next branches
-Date: Mon, 10 Sep 2012 08:58:21 -0400
-Message-ID: <20120910085821.6584004d@corrin.poochiereds.net>
-References: <CAKywueS9Y+Lv_-_pDXRguGVS5jp0CVOqZJc67+GHoS8+y-gtvQ@mail.gmail.com>
-	<CAH2r5ms0MrAps2AXdokNx8pJJwdR2Pk4sWaWBtcu0HRH_8PU9g@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Mon, 10 Sep 2012 11:51:43 -0500
+Message-ID: <CAH2r5muNJci+H5=oKSXmHpznJ+jEUtNVN7yGRK0GczmV9dD06w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5ms0MrAps2AXdokNx8pJJwdR2Pk4sWaWBtcu0HRH_8PU9g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 4 Sep 2012 12:06:25 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+The following changes since commit 5b716ac728bcc01b1f2a7ed6e437196602237c27:
 
-> I plan to put these back in cifs-2.6.git for-next branch after
-> rescanning through them.  for-next branch is resynced with linus's
-> tree as of yesterday.
-> 
+  Merge branch 'for-next' of git://git.samba.org/sfrench/cifs-2.6
+(2012-09-02 11:30:10 -0700)
 
-We're at -rc5 now and Pavel's and my patches are *still* not in
-linux-next. Any ETA on getting that done?
+are available in the git repository at:
 
-Steve, I'm still willing to maintain the linux-next branch if you don't
-have the time to deal with it.
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-linus
+
+for you to fetch changes up to b2ede58e98c87c7f0f44a926f974262f65c3402f:
+
+  CIFS: Fix endianness conversion (2012-09-06 12:42:35 -0500)
+
+----------------------------------------------------------------
+Pavel Shilovsky (2):
+      CIFS: Fix error handling in cifs_push_mandatory_locks
+      CIFS: Fix endianness conversion
+
+ fs/cifs/file.c    | 2 +-
+ fs/cifs/smb2pdu.h | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
