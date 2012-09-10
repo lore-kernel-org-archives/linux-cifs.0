@@ -1,39 +1,41 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Mon, 10 Sep 2012 11:51:43 -0500
-Message-ID: <CAH2r5muNJci+H5=oKSXmHpznJ+jEUtNVN7yGRK0GczmV9dD06w@mail.gmail.com>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: Add support of Alternate Data Streams
+Date: Mon, 10 Sep 2012 13:11:51 -0400
+Message-ID: <CAFB9KM24fUwwK6e3A8Bn2S6R+oc8FkgDz+acE1ndZW3EW1CudA@mail.gmail.com>
+References: <1346713566-31140-1-git-send-email-shirishpargaonkar@gmail.com>
+	<20120905101120.5b6a7a01@tlielax.poochiereds.net>
+	<CADT32eLKyA2nfKWsnuvWbyDeSHqdeXZ-J4RYQ4t-VsBf6cPFfg@mail.gmail.com>
+	<20120910082317.792b424b@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120910082317.792b424b-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following changes since commit 5b716ac728bcc01b1f2a7ed6e437196602237c27:
+>> > > @@ -351,12 +351,17 @@ int cifs_get_inode_info_unix(struct inode **pinode,
+>> > >                       cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
+>> > >       }
+>> > >
+>> > > +     if (strstr(full_path, ":"))
+>> > > +             fattr.cf_flags |= S_PRIVATE;
+>> > > +
+>> > >       if (*pinode == NULL) {
+>> > >               /* get new inode */
+>> > >               cifs_fill_uniqueid(sb, &fattr);
+>> > >               *pinode = cifs_iget(sb, &fattr);
+>> > >               if (!*pinode)
+>> > >                       rc = -ENOMEM;
+>> > > +             if (strstr(full_path, ":"))
+>> > > +                     (*pinode)->i_flags |= S_PRIVATE;
 
-  Merge branch 'for-next' of git://git.samba.org/sfrench/cifs-2.6
-(2012-09-02 11:30:10 -0700)
+^ On -ENOMEM you dereference a null pointer, don't you?  Same thing in
+cifs_get_inode_info().
 
-are available in the git repository at:
-
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-linus
-
-for you to fetch changes up to b2ede58e98c87c7f0f44a926f974262f65c3402f:
-
-  CIFS: Fix endianness conversion (2012-09-06 12:42:35 -0500)
-
-----------------------------------------------------------------
-Pavel Shilovsky (2):
-      CIFS: Fix error handling in cifs_push_mandatory_locks
-      CIFS: Fix endianness conversion
-
- fs/cifs/file.c    | 2 +-
- fs/cifs/smb2pdu.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
 
 -- 
-Thanks,
-
-Steve
+Peace and Blessings,
+-Scott.
