@@ -1,79 +1,64 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: [PATCH] cifs: Mangle string used for unc in /proc/mounts
-Date: Sat, 15 Sep 2012 15:52:46 -0500
-Message-ID: <CAH2r5mukGviuTVur_VNzGOL-3mUCRmNZqto-HOkKxssUpwge_g@mail.gmail.com>
-References: <1347554937-28369-1-git-send-email-sprabhu@redhat.com>
-	<CAH2r5mvnV9xDAF8N5VocRYOy4aUCafNrKe1ykmz--rJQtU33Bg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add FL_CLOSE to fl_flags mask in cifs_read_flock
+Date: Sat, 15 Sep 2012 15:54:33 -0500
+Message-ID: <CAH2r5ms2OQZqqvHvTD_knKtKdYyKgM4jPOha7JUkZtNtoMnLvA@mail.gmail.com>
+References: <1347568691-24628-1-git-send-email-jlayton@redhat.com>
+	<CAKywueRVT6YNoQaX-wraMuB7CeD51x4_6yfKKkujAaFWO-2pfA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	abokovoy-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvnV9xDAF8N5VocRYOy4aUCafNrKe1ykmz--rJQtU33Bg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueRVT6YNoQaX-wraMuB7CeD51x4_6yfKKkujAaFWO-2pfA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
----------- Forwarded message ----------
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Date: Sat, Sep 15, 2012 at 3:52 PM
-Subject: Re: [PATCH] cifs: Mangle string used for unc in /proc/mounts
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Jeff Layton
-<jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Merged into cifs-2.6.git
 
-
-merged into cifs-2.6.git
-
-
-On Thu, Sep 13, 2012 at 11:48 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+On Fri, Sep 14, 2012 at 6:36 AM, Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> 2012/9/14 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+>> FL_CLOSE is quite common when you close a file on which you hold a
+>> lock. The spurious "Unknown lock flags" message in cFYI is
+>> confusing in this case.
+>>
+>> Reported-by: Alexander Bokovoy <abokovoy-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>> ---
+>>  fs/cifs/file.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>> index 093f5a3..33158cd 100644
+>> --- a/fs/cifs/file.c
+>> +++ b/fs/cifs/file.c
+>> @@ -1173,7 +1173,8 @@ cifs_read_flock(struct file_lock *flock, __u32 *type, int *lock, int *unlock,
+>>         if (flock->fl_flags & FL_LEASE)
+>>                 cFYI(1, "Lease on file - not implemented yet");
+>>         if (flock->fl_flags &
+>> -           (~(FL_POSIX | FL_FLOCK | FL_SLEEP | FL_ACCESS | FL_LEASE)))
+>> +           (~(FL_POSIX | FL_FLOCK | FL_SLEEP |
+>> +              FL_ACCESS | FL_LEASE | FL_CLOSE)))
+>>                 cFYI(1, "Unknown lock flags 0x%x", flock->fl_flags);
+>>
+>>         *type = server->vals->large_lock_type;
+>> --
+>> 1.7.11.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> The string for "unc=" in /proc/mounts needs to be escaped. The current
-> behaviour can create problems in cases when mounting a share starting
-> with a number.
+> Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 >
-> example:
-> >mount -t cifs -o username=test,password=x vm140-31:/17000-test /mnt
-> >mount -o remount,password=x /mnt
-> mount error: could not resolve address for vm140-31x00-test: Unknown
-> error
->
-> The sub-string "\170" which is part of the unc for the mount above in
-> /proc/mounts is interpreted as character'x' in the case above. Escaping
-> the string fixes the problem.
->
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index db8a404..2ac02aa 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -360,7 +360,8 @@ cifs_show_options(struct seq_file *s, struct dentry
-> *root)
->         cifs_show_security(s, tcon->ses->server);
->         cifs_show_cache_flavor(s, cifs_sb);
->
-> -       seq_printf(s, ",unc=%s", tcon->treeName);
-> +       seq_printf(s, ",unc=");
-> +       seq_escape(s, tcon->treeName, " \t\n\\");
->
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER)
->                 seq_printf(s, ",multiuser");
 > --
-> 1.7.11.4
->
+> Best regards,
+> Pavel Shilovsky.
 
 
 
---
-Thanks,
-
-Steve
-
-
-
---
+-- 
 Thanks,
 
 Steve
