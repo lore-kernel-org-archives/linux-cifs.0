@@ -1,99 +1,42 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH V2] cifs: Add support of Alternate Data Streams
-Date: Sun, 16 Sep 2012 09:49:18 -0500
-Message-ID: <CADT32eKUKZbtANU6eY_93su4XZGfqiY0E1+cWzEuNuJCOefNGQ@mail.gmail.com>
-References: <1347764747-16822-1-git-send-email-shirishpargaonkar@gmail.com>
-	<20120916065941.7f6f778d@corrin.poochiereds.net>
+From: Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: cifs.mount: mapchars + utf8 = loop
+Date: Mon, 17 Sep 2012 15:31:38 +0200
+Message-ID: <CAJt13SV_DS1XQL1dar5Xpy-r-BTuZ84FgDsAE_4ggXGZoWVUwA@mail.gmail.com>
+References: <CAJt13SX0yMGEQtmw2KpCG3kwiOZPB9s1961Y1Lc6VT36=3pRCw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120916065941.7f6f778d-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <CAJt13SX0yMGEQtmw2KpCG3kwiOZPB9s1961Y1Lc6VT36=3pRCw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Sep 16, 2012 at 5:59 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> On Sat, 15 Sep 2012 22:05:47 -0500
-> shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->
->> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->>
->>
->> Add support of Alternate Data Streams (ads).
->>
->> The generic access flags that cifs client currently employs are sufficient
->> for alternate data streams as well (MS-CIFS 2.2.4.64.1).
->>
->> The ads files have a : in the name, so that is used to differentiate
->> between a regular file and its alternate data streams as they
->> have the same file id.
->> This scheme applies to non-posix compliant servers such as Windows only.
->>
->> One operation that does not work is Rename (0x7).
->>
->>
->> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> ---
->>  fs/cifs/inode.c |    9 +++++++++
->>  1 files changed, 9 insertions(+), 0 deletions(-)
->>
->> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
->> index cb79c7e..a28950a 100644
->> --- a/fs/cifs/inode.c
->> +++ b/fs/cifs/inode.c
->> @@ -709,10 +709,15 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
->>                       cFYI(1, "CIFSCheckMFSymlink: %d", tmprc);
->>       }
->>
->> +     if (strstr(full_path, ":"))
->> +             fattr.cf_flags |= S_PRIVATE;
->> +
->
-> While S_PRIVATE doesn't conflict with any of the other cf_flag values
-> currently, I think it would be best to define a new CIFS_FATTR_* flag
-> for this purpose.
->
->>       if (!*inode) {
->>               *inode = cifs_iget(sb, &fattr);
->>               if (!*inode)
->>                       rc = -ENOMEM;
->> +             else
->> +                     (*inode)->i_flags |= fattr.cf_flags;
->
-> Uhh no...these flags have nothing to do with the i_flags. This will
-> almost certainly break things.
->
->>       } else {
->>               cifs_fattr_to_inode(*inode, &fattr);
->>       }
->> @@ -744,6 +749,10 @@ cifs_find_inode(struct inode *inode, void *opaque)
->>       if ((inode->i_mode & S_IFMT) != (fattr->cf_mode & S_IFMT))
->>               return 0;
->>
->> +     /* don't match inode with different flags */
->> +     if ((inode->i_flags & S_PRIVATE) != (fattr->cf_flags & S_PRIVATE))
->> +             return 0;
->> +
->>       /* if it's not a directory or has no dentries, then flag it */
->>       if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
->>               fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
->
-> I'm still trying to understand the point of this patch. I guess the
-> concern is that these files have the same uniqueid? So this will look
-> like a hardlinked file metadata-wise, but will have different contents?
->
-> If so, then isn't it possible that you'd have more than one alternate
-> data stream attached to the file? In that case, it looks like the
-> approach you're using here won't work since you're only designating the
-> alternate data stream with a single flag value.
->
-> --
-> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Hello,
 
-Jeff, yes, realized that after posting the patch.  Will work on fixing
-that and other comments.
+I'm trying to mount a smb share with both "mapchars" and
+"iocharset=utf8" options and it seems to be bogus.
+I must used mapchars option because some folder names contain
+non-ascii characters and I must used iocharset=utf8 because some file
+names contain question marks.
 
-Regards,
+I have searched on the internet and found a very simple patch for a
+2.6.32 kernel (https://bugzilla.samba.org/show_bug.cgi?id=6767)
 
-Shirish
+--- orig/linux-2.6.32/fs/cifs/misc.c 2009-12-03 04:51:21.000000000 +0100
++++ linux-2.6.32/fs/cifs/misc.c 2011-10-09 22:25:10.767951322 +0200
+@@ -713,7 +713,7 @@
+     }
+
+ ctoUCS_out:
+- return i;
++ return j;
+ }
+
+But I'm on Ubuntu 12.04 with a 3.2.0-31 kernel and there is too much
+differences for me between the two misc.c files and I'm not able to
+report the patch in my kernel.
+
+Did someone have an idea ?
+
+Thanks,
+Nicolas
