@@ -1,42 +1,63 @@
-From: Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: cifs.mount: mapchars + utf8 = loop
-Date: Mon, 17 Sep 2012 15:31:38 +0200
-Message-ID: <CAJt13SV_DS1XQL1dar5Xpy-r-BTuZ84FgDsAE_4ggXGZoWVUwA@mail.gmail.com>
-References: <CAJt13SX0yMGEQtmw2KpCG3kwiOZPB9s1961Y1Lc6VT36=3pRCw@mail.gmail.com>
+From: "Mr David Hisco." <hisco432-0Kt2UbNys5VAfugRpC6u6w@public.gmane.org>
+Subject: =?iso-8859-1?Q?Eritt=E4in_kiireellinen_kiitos_!!!?=
+Date: Mon, 17 Sep 2012 19:46:23 +0200
+Message-ID: <1c515bcba60738381e9618de66ffd53d@www.kontrast.nl>
+Reply-To: hisco432-0Kt2UbNys5VAfugRpC6u6w@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAJt13SX0yMGEQtmw2KpCG3kwiOZPB9s1961Y1Lc6VT36=3pRCw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+L=E4hett=E4j=E4: David Hisco.=20
 
-I'm trying to mount a smb share with both "mapchars" and
-"iocharset=utf8" options and it seems to be bogus.
-I must used mapchars option because some folder names contain
-non-ascii characters and I must used iocharset=utf8 because some file
-names contain question marks.
 
-I have searched on the internet and found a very simple patch for a
-2.6.32 kernel (https://bugzilla.samba.org/show_bug.cgi?id=6767)
+Hyv=E4ksy vilpitt=F6m=E4t pahoitteluni, jos posti ei t=E4yt=E4 henkil=F6=
+kohtaista etiikkaa.=20
 
---- orig/linux-2.6.32/fs/cifs/misc.c 2009-12-03 04:51:21.000000000 +0100
-+++ linux-2.6.32/fs/cifs/misc.c 2011-10-09 22:25:10.767951322 +0200
-@@ -713,7 +713,7 @@
-     }
+Aion esitell=E4 itseni David Hisco, olen kansalainen Neitsytsaaret=20
+Brittil=E4inen kotipaikka Lontoo. Johtaja kirjanpitoon varainhoito Jaks=
+o, seuranta taloudellinen verkosto t=E4=E4ll=E4 Yhdistyneess=E4 kuninga=
+skunnassa.=20
 
- ctoUCS_out:
-- return i;
-+ return j;
- }
+T=E4m=E4 on yksityiskohta, mit=E4 haluan sinun auttaa minua tekem=E4=E4=
+n, Yksi tilien pit=E4miseen tasapainossa kaksikymment=E4 miljoonaa viis=
+isataatuhatta kiloa. On ollut lepotilassa ja ei ole k=E4ytetty viimeist=
+en kahdentoista (12) vuotta.=20
 
-But I'm on Ubuntu 12.04 with a 3.2.0-31 kernel and there is too much
-differences for me between the two misc.c files and I'm not able to
-report the patch in my kernel.
+Minun tutkimuksia ja vahvistukset, tilin omistajaksi, ulkomaalaisen nim=
+en (Ost Bob) kuoli 31. tammikuuta 2000.=20
 
-Did someone have an idea ?
+http://aviation.crosswindlanding.com/accidents/alaska_261.htm=20
 
-Thanks,
-Nicolas
+Ja sen j=E4lkeen kukaan ei ole tehnyt mit=E4=E4n mit=E4 v=E4itt=E4en t=E4=
+m=E4n rahaa, koska h=E4nell=E4 ei ole perheenj=E4seni=E4, jotka ovat ti=
+etoisia olemassaolosta Kumpikaan tilin eik=E4 varoja.=20
+
+Etsin suostumustasi esitell=E4 teille kuin l=E4hiomaiset / Will edunsaa=
+jaa kuolleen jotta etenee t=E4m=E4n tilin arvo on =A3 20,5 miljoonaa pu=
+ntaa voidaan maksaa (siirto) tiliin maasi.=20
+
+
+T=E4m=E4 maksetaan tai jakaa n=E4it=E4 prosenttim=E4=E4ri=E4, 60% minul=
+le ja 40% sinulle. Kaikki tarvittavat oikeudelliset asiakirjat, joita v=
+oidaan k=E4ytt=E4=E4 varmuuskopiointiin t=E4m=E4 v=E4ite turvataan meil=
+le.=20
+
+Antakaa minulle seuraavat, koska meill=E4 on 7 p=E4iv=E4=E4 ajaa se l=E4=
+pi.=20
+T=E4m=E4 on hyvin hyvin kiireellinen PLEASE.=20
+ =20
+1. Koko nimi.=20
+2. Direct Mobile Number.=20
+3. Yhteystietosi osoitteeseen.=20
+4. Ik=E4si.=20
+5. Sinun Ammatti.=20
+
+Suostumustasi t=E4h=E4n s=E4hk=F6postiin ja liiketoiminnan ehdotus on e=
+ritt=E4in arvostettu.=20
+ =20
+Terveisin,=20
+David Hisco.
