@@ -1,63 +1,39 @@
-From: "Mr David Hisco." <hisco432-0Kt2UbNys5VAfugRpC6u6w@public.gmane.org>
-Subject: =?iso-8859-1?Q?Eritt=E4in_kiireellinen_kiitos_!!!?=
-Date: Mon, 17 Sep 2012 19:46:23 +0200
-Message-ID: <1c515bcba60738381e9618de66ffd53d@www.kontrast.nl>
-Reply-To: hisco432-0Kt2UbNys5VAfugRpC6u6w@public.gmane.org
+From: Steve Finley <Steve.Finley-SOxAPD1SrF7V1CgomF1qdQ@public.gmane.org>
+Subject: many-to-one nested CIFS serving
+Date: Mon, 17 Sep 2012 15:45:54 -0600
+Message-ID: <50579A12.7070805@colostate.edu>
+Reply-To: Steve.Finley-SOxAPD1SrF7V1CgomF1qdQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-L=E4hett=E4j=E4: David Hisco.=20
+To Whom:
 
+I am exploiting a feature of the CIFS server that works for the client under
+Windows 8 (not sure about others), but does not work for the linux client
+under RedHat/CentOS5/6.
 
-Hyv=E4ksy vilpitt=F6m=E4t pahoitteluni, jos posti ei t=E4yt=E4 henkil=F6=
-kohtaista etiikkaa.=20
+I am mounting multiple Thecus NAS devices via CIFS, making
+symbolic links to files on those NAS devices, where I reorganize the
+directory structure, and then turn around and serve the top level
+of that directory via CIFS.
 
-Aion esitell=E4 itseni David Hisco, olen kansalainen Neitsytsaaret=20
-Brittil=E4inen kotipaikka Lontoo. Johtaja kirjanpitoon varainhoito Jaks=
-o, seuranta taloudellinen verkosto t=E4=E4ll=E4 Yhdistyneess=E4 kuninga=
-skunnassa.=20
+On a Windows machine I only have to mount that top level directory, and
+the symbolic links automatically resolve themselves without having to also
+mount the NAS device(s).  THIS IS VERY POWERFUL.  On a linux
+machine however, the symbolic links can only be resolved if I have the
+NAS devices mounted, and the mount points have to be named as shown
+in the link.  It seems that the protocol necessary for this to work under
+Windows has not been added to the linux version of the client.
 
-T=E4m=E4 on yksityiskohta, mit=E4 haluan sinun auttaa minua tekem=E4=E4=
-n, Yksi tilien pit=E4miseen tasapainossa kaksikymment=E4 miljoonaa viis=
-isataatuhatta kiloa. On ollut lepotilassa ja ei ole k=E4ytetty viimeist=
-en kahdentoista (12) vuotta.=20
+When I surf the web for others exploiting this feature, I find nothing.
 
-Minun tutkimuksia ja vahvistukset, tilin omistajaksi, ulkomaalaisen nim=
-en (Ost Bob) kuoli 31. tammikuuta 2000.=20
+Thanks
 
-http://aviation.crosswindlanding.com/accidents/alaska_261.htm=20
-
-Ja sen j=E4lkeen kukaan ei ole tehnyt mit=E4=E4n mit=E4 v=E4itt=E4en t=E4=
-m=E4n rahaa, koska h=E4nell=E4 ei ole perheenj=E4seni=E4, jotka ovat ti=
-etoisia olemassaolosta Kumpikaan tilin eik=E4 varoja.=20
-
-Etsin suostumustasi esitell=E4 teille kuin l=E4hiomaiset / Will edunsaa=
-jaa kuolleen jotta etenee t=E4m=E4n tilin arvo on =A3 20,5 miljoonaa pu=
-ntaa voidaan maksaa (siirto) tiliin maasi.=20
-
-
-T=E4m=E4 maksetaan tai jakaa n=E4it=E4 prosenttim=E4=E4ri=E4, 60% minul=
-le ja 40% sinulle. Kaikki tarvittavat oikeudelliset asiakirjat, joita v=
-oidaan k=E4ytt=E4=E4 varmuuskopiointiin t=E4m=E4 v=E4ite turvataan meil=
-le.=20
-
-Antakaa minulle seuraavat, koska meill=E4 on 7 p=E4iv=E4=E4 ajaa se l=E4=
-pi.=20
-T=E4m=E4 on hyvin hyvin kiireellinen PLEASE.=20
- =20
-1. Koko nimi.=20
-2. Direct Mobile Number.=20
-3. Yhteystietosi osoitteeseen.=20
-4. Ik=E4si.=20
-5. Sinun Ammatti.=20
-
-Suostumustasi t=E4h=E4n s=E4hk=F6postiin ja liiketoiminnan ehdotus on e=
-ritt=E4in arvostettu.=20
- =20
-Terveisin,=20
-David Hisco.
+Steve Finley
+Research Associate
+CIRA - Colorado State University
