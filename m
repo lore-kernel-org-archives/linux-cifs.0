@@ -1,92 +1,278 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: cifs.mount: mapchars + utf8 = loop
-Date: Mon, 17 Sep 2012 17:39:19 -0700
-Message-ID: <20120917173919.54319010@corrin.poochiereds.net>
-References: <CAJt13SX0yMGEQtmw2KpCG3kwiOZPB9s1961Y1Lc6VT36=3pRCw@mail.gmail.com>
-	<CAJt13SV_DS1XQL1dar5Xpy-r-BTuZ84FgDsAE_4ggXGZoWVUwA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/M=RLYEK8mf3Sr8u+vv.jRtT"
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v5] cifs: obtain file access during backup intent lookup (resend)
+Date: Tue, 18 Sep 2012 00:30:03 -0500
+Message-ID: <1347946203-24101-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAJt13SV_DS1XQL1dar5Xpy-r-BTuZ84FgDsAE_4ggXGZoWVUwA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
---MP_/M=RLYEK8mf3Sr8u+vv.jRtT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-On Mon, 17 Sep 2012 15:31:38 +0200
-Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Rebased and resending the reviewed patch.
 
-> Hello,
-> 
-> I'm trying to mount a smb share with both "mapchars" and
-> "iocharset=utf8" options and it seems to be bogus.
-> I must used mapchars option because some folder names contain
-> non-ascii characters and I must used iocharset=utf8 because some file
-> names contain question marks.
-> 
-> I have searched on the internet and found a very simple patch for a
-> 2.6.32 kernel (https://bugzilla.samba.org/show_bug.cgi?id=6767)
-> 
-> --- orig/linux-2.6.32/fs/cifs/misc.c 2009-12-03 04:51:21.000000000 +0100
-> +++ linux-2.6.32/fs/cifs/misc.c 2011-10-09 22:25:10.767951322 +0200
-> @@ -713,7 +713,7 @@
->      }
-> 
->  ctoUCS_out:
-> - return i;
-> + return j;
->  }
-> 
-> But I'm on Ubuntu 12.04 with a 3.2.0-31 kernel and there is too much
-> differences for me between the two misc.c files and I'm not able to
-> report the patch in my kernel.
-> 
-> Did someone have an idea ?
-> 
+Path based querries can fail for lack of access, especially during lookup
+during open.
+open itself would actually succeed becasue of back up intent bit
+but querries (either path or file handle based) do not have a means to
+specifiy backup intent bit.
+So querry the file info during lookup using
+ trans2 / findfirst / file_id_full_dir_info
+to obtain file info as well as file_id/inode value.
 
-Looks like Baldvin never sent that patch to the list. This should be a
-forward port of it. Does it work for you?
 
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-
---MP_/M=RLYEK8mf3Sr8u+vv.jRtT
-Content-Type: text/x-patch
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename=0001-cifs-fix-return-value-in-cifsConvertToUCS.patch
-
->From 3e61f98c4553276ef9187975a00721b6e6f4140d Mon Sep 17 00:00:00 2001
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Date: Mon, 17 Sep 2012 20:36:23 -0400
-Subject: [PATCH] cifs: fix return value in cifsConvertToUCS
-
-Reported-by: Baldvin Kovacs <baldvin.kovacs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Reported-by: Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/cifs_unicode.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/cifsproto.h |    6 +++-
+ fs/cifs/cifssmb.c   |   43 ++++++++++++++++++++-------------
+ fs/cifs/inode.c     |   64 +++++++++++++++++++++++++++++++++++++-------------
+ fs/cifs/readdir.c   |    8 ++----
+ 4 files changed, 80 insertions(+), 41 deletions(-)
 
-diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
-index 1b2e180..667776e 100644
---- a/fs/cifs/cifs_unicode.c
-+++ b/fs/cifs/cifs_unicode.c
-@@ -327,6 +327,6 @@ cifsConvertToUCS(__le16 *target, const char *source, int srclen,
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index f1bbf83..c747f82 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -132,6 +132,8 @@ void cifs_fill_uniqueid(struct super_block *sb, struct cifs_fattr *fattr);
+ extern void cifs_unix_basic_to_fattr(struct cifs_fattr *fattr,
+ 				     FILE_UNIX_BASIC_INFO *info,
+ 				     struct cifs_sb_info *cifs_sb);
++extern void cifs_dir_info_to_fattr(struct cifs_fattr *, FILE_DIRECTORY_INFO *,
++					struct cifs_sb_info *);
+ extern void cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr);
+ extern struct inode *cifs_iget(struct super_block *sb,
+ 			       struct cifs_fattr *fattr);
+@@ -190,10 +192,10 @@ extern int CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 		    const struct nls_table *);
+ 
+ extern int CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+-		const char *searchName, const struct nls_table *nls_codepage,
++		const char *searchName, struct cifs_sb_info *cifs_sb,
+ 		__u16 *searchHandle, __u16 search_flags,
+ 		struct cifs_search_info *psrch_inf,
+-		int map, const char dirsep);
++		bool msearch);
+ 
+ extern int CIFSFindNext(const unsigned int xid, struct cifs_tcon *tcon,
+ 		__u16 searchHandle, __u16 search_flags,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index f0cf934..f13cea1 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4254,10 +4254,9 @@ UnixQPathInfoRetry:
+ /* xid, tcon, searchName and codepage are input parms, rest are returned */
+ int
+ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+-	      const char *searchName,
+-	      const struct nls_table *nls_codepage,
++	      const char *searchName, struct cifs_sb_info *cifs_sb,
+ 	      __u16 *pnetfid, __u16 search_flags,
+-	      struct cifs_search_info *psrch_inf, int remap, const char dirsep)
++	      struct cifs_search_info *psrch_inf, bool msearch)
+ {
+ /* level 257 SMB_ */
+ 	TRANSACTION2_FFIRST_REQ *pSMB = NULL;
+@@ -4265,8 +4264,9 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+ 	T2_FFIRST_RSP_PARMS *parms;
+ 	int rc = 0;
+ 	int bytes_returned = 0;
+-	int name_len;
++	int name_len, remap;
+ 	__u16 params, byte_count;
++	struct nls_table *nls_codepage;
+ 
+ 	cFYI(1, "In FindFirst for %s", searchName);
+ 
+@@ -4276,6 +4276,9 @@ findFirstRetry:
+ 	if (rc)
+ 		return rc;
+ 
++	nls_codepage = cifs_sb->local_nls;
++	remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
++
+ 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+ 		name_len =
+ 		    cifsConvertToUTF16((__le16 *) pSMB->FileName, searchName,
+@@ -4284,24 +4287,29 @@ findFirstRetry:
+ 		it got remapped to 0xF03A as if it were part of the
+ 		directory name instead of a wildcard */
+ 		name_len *= 2;
+-		pSMB->FileName[name_len] = dirsep;
+-		pSMB->FileName[name_len+1] = 0;
+-		pSMB->FileName[name_len+2] = '*';
+-		pSMB->FileName[name_len+3] = 0;
+-		name_len += 4; /* now the trailing null */
+-		pSMB->FileName[name_len] = 0; /* null terminate just in case */
+-		pSMB->FileName[name_len+1] = 0;
+-		name_len += 2;
++		if (msearch) {
++			pSMB->FileName[name_len] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[name_len+1] = 0;
++			pSMB->FileName[name_len+2] = '*';
++			pSMB->FileName[name_len+3] = 0;
++			name_len += 4; /* now the trailing null */
++			/* null terminate just in case */
++			pSMB->FileName[name_len] = 0;
++			pSMB->FileName[name_len+1] = 0;
++			name_len += 2;
++		}
+ 	} else {	/* BB add check for overrun of SMB buf BB */
+ 		name_len = strnlen(searchName, PATH_MAX);
+ /* BB fix here and in unicode clause above ie
+ 		if (name_len > buffersize-header)
+ 			free buffer exit; BB */
+ 		strncpy(pSMB->FileName, searchName, name_len);
+-		pSMB->FileName[name_len] = dirsep;
+-		pSMB->FileName[name_len+1] = '*';
+-		pSMB->FileName[name_len+2] = 0;
+-		name_len += 3;
++		if (msearch) {
++			pSMB->FileName[name_len] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[name_len+1] = '*';
++			pSMB->FileName[name_len+2] = 0;
++			name_len += 3;
++		}
  	}
  
- ctoUCS_out:
--	return i;
-+	return j;
+ 	params = 12 + name_len /* includes null */ ;
+@@ -4389,7 +4397,8 @@ findFirstRetry:
+ 			psrch_inf->last_entry = psrch_inf->srch_entries_start +
+ 							lnoff;
+ 
+-			*pnetfid = parms->SearchHandle;
++			if (pnetfid)
++				*pnetfid = parms->SearchHandle;
+ 		} else {
+ 			cifs_buf_release(pSMB);
+ 		}
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index a28950a..6afa274 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -601,7 +601,9 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 		    FILE_ALL_INFO *data, struct super_block *sb, int xid,
+ 		    const __u16 *fid)
+ {
+-	int rc = 0, tmprc;
++	bool validinum = false;
++	__u16 srchflgs;
++	int rc = 0, tmprc = ENOSYS;
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+ 	struct tcon_link *tlink;
+@@ -609,6 +611,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	char *buf = NULL;
+ 	bool adjust_tz = false;
+ 	struct cifs_fattr fattr;
++	struct cifs_search_info *srchinf = NULL;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -647,9 +650,38 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	} else if (rc == -EREMOTE) {
+ 		cifs_create_dfs_fattr(&fattr, sb);
+ 		rc = 0;
+-	} else {
++	} else if (rc == -EACCES && backup_cred(cifs_sb)) {
++			srchinf = kzalloc(sizeof(struct cifs_search_info),
++						GFP_KERNEL);
++			if (srchinf == NULL) {
++				rc = -ENOMEM;
++				goto cgii_exit;
++			}
++
++			srchinf->endOfSearch = false;
++			srchinf->info_level = SMB_FIND_FILE_ID_FULL_DIR_INFO;
++
++			srchflgs = CIFS_SEARCH_CLOSE_ALWAYS |
++					CIFS_SEARCH_CLOSE_AT_END |
++					CIFS_SEARCH_BACKUP_SEARCH;
++
++			rc = CIFSFindFirst(xid, tcon, full_path,
++				cifs_sb, NULL, srchflgs, srchinf, false);
++			if (!rc) {
++				data =
++				(FILE_ALL_INFO *)srchinf->srch_entries_start;
++
++				cifs_dir_info_to_fattr(&fattr,
++				(FILE_DIRECTORY_INFO *)data, cifs_sb);
++				fattr.cf_uniqueid = le64_to_cpu(
++				((SEARCH_ID_FULL_DIR_INFO *)data)->UniqueId);
++				validinum = true;
++
++				cifs_buf_release(srchinf->ntwrk_buf_start);
++			}
++			kfree(srchinf);
++	} else
+ 		goto cgii_exit;
+-	}
+ 
+ 	/*
+ 	 * If an inode wasn't passed in, then get the inode number
+@@ -660,23 +692,21 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	 */
+ 	if (*inode == NULL) {
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
+-			if (server->ops->get_srv_inum)
+-				tmprc = server->ops->get_srv_inum(xid, tcon,
+-					cifs_sb, full_path, &fattr.cf_uniqueid,
+-					data);
+-			else
+-				tmprc = -ENOSYS;
+-			if (tmprc || !fattr.cf_uniqueid) {
+-				cFYI(1, "GetSrvInodeNum rc %d", tmprc);
+-				fattr.cf_uniqueid = iunique(sb, ROOT_I);
+-				cifs_autodisable_serverino(cifs_sb);
++			if (validinum == false) {
++				if (server->ops->get_srv_inum)
++					tmprc = server->ops->get_srv_inum(xid,
++						tcon, cifs_sb, full_path,
++						&fattr.cf_uniqueid, data);
++				if (tmprc) {
++					cFYI(1, "GetSrvInodeNum rc %d", tmprc);
++					fattr.cf_uniqueid = iunique(sb, ROOT_I);
++					cifs_autodisable_serverino(cifs_sb);
++				}
+ 			}
+-		} else {
++		} else
+ 			fattr.cf_uniqueid = iunique(sb, ROOT_I);
+-		}
+-	} else {
++	} else
+ 		fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
+-	}
+ 
+ 	/* query for SFU type info if supported and needed */
+ 	if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index d87f826..73e29a6 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -151,7 +151,7 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ 	}
  }
  
+-static void
++void
+ cifs_dir_info_to_fattr(struct cifs_fattr *fattr, FILE_DIRECTORY_INFO *info,
+ 		       struct cifs_sb_info *cifs_sb)
+ {
+@@ -278,10 +278,8 @@ ffirst_retry:
+ 	if (backup_cred(cifs_sb))
+ 		search_flags |= CIFS_SEARCH_BACKUP_SEARCH;
+ 
+-	rc = CIFSFindFirst(xid, tcon, full_path, cifs_sb->local_nls,
+-		&cifsFile->netfid, search_flags, &cifsFile->srch_inf,
+-		cifs_sb->mnt_cifs_flags &
+-			CIFS_MOUNT_MAP_SPECIAL_CHR, CIFS_DIR_SEP(cifs_sb));
++	rc = CIFSFindFirst(xid, tcon, full_path, cifs_sb,
++		&cifsFile->netfid, search_flags, &cifsFile->srch_inf, true);
+ 	if (rc == 0)
+ 		cifsFile->invalidHandle = false;
+ 	/* BB add following call to handle readdir on new NTFS symlink errors
 -- 
-1.7.11.4
-
-
---MP_/M=RLYEK8mf3Sr8u+vv.jRtT--
+1.6.0.2
