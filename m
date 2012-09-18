@@ -1,72 +1,60 @@
-From: Steve Finley <Steve.Finley-SOxAPD1SrF7V1CgomF1qdQ@public.gmane.org>
-Subject: Re: many-to-one nested CIFS serving
-Date: Tue, 18 Sep 2012 09:32:36 -0600
-Message-ID: <50589414.8000305@colostate.edu>
-References: <50579A12.7070805@colostate.edu> <20120917165233.0e8d75a7@corrin.poochiereds.net>
-Reply-To: Steve.Finley-SOxAPD1SrF7V1CgomF1qdQ@public.gmane.org
+From: Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: cifs.mount: mapchars + utf8 = loop
+Date: Tue, 18 Sep 2012 19:15:27 +0200
+Message-ID: <CAJt13SW78BqYtkMnsG0WVFEioPbitsSmzTbyP6jp+YULAdW1Eg@mail.gmail.com>
+References: <CAJt13SX0yMGEQtmw2KpCG3kwiOZPB9s1961Y1Lc6VT36=3pRCw@mail.gmail.com>
+	<CAJt13SV_DS1XQL1dar5Xpy-r-BTuZ84FgDsAE_4ggXGZoWVUwA@mail.gmail.com>
+	<20120917173919.54319010@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120917165233.0e8d75a7-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20120917173919.54319010-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Jeff Layton wrote:
-> On Mon, 17 Sep 2012 15:45:54 -0600
-> Steve Finley <Steve.Finley-SOxAPD1SrF7V1CgomF1qdQ@public.gmane.org> wrote:
->
->   
->> To Whom:
->>
->> I am exploiting a feature of the CIFS server that works for the client under
->> Windows 8 (not sure about others), but does not work for the linux client
->> under RedHat/CentOS5/6.
->>
->> I am mounting multiple Thecus NAS devices via CIFS, making
->> symbolic links to files on those NAS devices, where I reorganize the
->> directory structure, and then turn around and serve the top level
->> of that directory via CIFS.
->>
->> On a Windows machine I only have to mount that top level directory, and
->> the symbolic links automatically resolve themselves without having to also
->> mount the NAS device(s).  THIS IS VERY POWERFUL.  On a linux
->> machine however, the symbolic links can only be resolved if I have the
->> NAS devices mounted, and the mount points have to be named as shown
->> in the link.  It seems that the protocol necessary for this to work under
->> Windows has not been added to the linux version of the client.
->>
->> When I surf the web for others exploiting this feature, I find nothing.
->>
->> Thanks
->>
->> Steve Finley
->> Research Associate
->> CIRA - Colorado State University
->>
->>     
->
-> So you're reexporting a CIFS mount from a linux box with samba? Yuck.
->
-> Most likely you're running afoul of the fact that when POSIX extensions
-> are enabled, that symlinks are passed on as-is to the client. If you
-> mount from the clients using "nounix" it'll probably do something
-> closer to what you expect.
->
-> In truth though, I think you'd be better served by researching and
-> configuring a DFS share.
->
->   
-Jeff,
+It works for me.
+I could use both utf8 characters and special characters like
+"interrogation marks", "colon" or "pipe" for example.
+Do you think the patch could be integrated in new kernel.org kernel ?.
 
-Thanks.  The nounix option did what I wanted.  Yes a bit "yucky" but 
-this is all
-read-only, and the "expensive" part of creating links really reorganizes 
-the data in a way
-that allows the scientists to browse it.  I will have a good look at 
-DFS, since we
-absolutely have a future need for such a beast.
+Nicolas Lefebvre
 
-Steve
+2012/9/18 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> On Mon, 17 Sep 2012 15:31:38 +0200
+> Nicolas Lefebvre <nico.lefebvre-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> Hello,
+>>
+>> I'm trying to mount a smb share with both "mapchars" and
+>> "iocharset=utf8" options and it seems to be bogus.
+>> I must used mapchars option because some folder names contain
+>> non-ascii characters and I must used iocharset=utf8 because some file
+>> names contain question marks.
+>>
+>> I have searched on the internet and found a very simple patch for a
+>> 2.6.32 kernel (https://bugzilla.samba.org/show_bug.cgi?id=6767)
+>>
+>> --- orig/linux-2.6.32/fs/cifs/misc.c 2009-12-03 04:51:21.000000000 +0100
+>> +++ linux-2.6.32/fs/cifs/misc.c 2011-10-09 22:25:10.767951322 +0200
+>> @@ -713,7 +713,7 @@
+>>      }
+>>
+>>  ctoUCS_out:
+>> - return i;
+>> + return j;
+>>  }
+>>
+>> But I'm on Ubuntu 12.04 with a 3.2.0-31 kernel and there is too much
+>> differences for me between the two misc.c files and I'm not able to
+>> report the patch in my kernel.
+>>
+>> Did someone have an idea ?
+>>
+>
+> Looks like Baldvin never sent that patch to the list. This should be a
+> forward port of it. Does it work for you?
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
