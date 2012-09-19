@@ -1,96 +1,64 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Fix possible memory leaks in SMB2 code
-Date: Wed, 19 Sep 2012 16:03:26 +0400
-Message-ID: <1348056206-14288-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [cifs:for-next 50/71] fs/cifs/file.c:3157:23-27: ERROR: invalid
+ reference to the index variable of the iterator on line 3149
+Date: Wed, 19 Sep 2012 06:25:08 -0700
+Message-ID: <20120919062508.70ba65eb@corrin.poochiereds.net>
+References: <20120919050802.GA28801@localhost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: kernel-janitors-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Fengguang Wu <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20120919050802.GA28801@localhost>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-and add missed increments of failed async read and write requests.
+On Wed, 19 Sep 2012 13:08:02 +0800
+Fengguang Wu <fengguang.wu-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org> wrote:
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/smb2pdu.c |   23 ++++++++++++++---------
- 1 files changed, 14 insertions(+), 9 deletions(-)
+> Hi Jeff,
+> 
+> FYI, there are new coccinelle warnings show up in
+> 
+> tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+> head:   324b53bbcd1d9795062f00e92064296169c9b081
+> commit: a4a23914d0d1736eb6d98049d303d551131df83c [50/71] cifs: turn the pages list in cifs_readdata into an array
+> 
+> All coccinelle warnings:
+> 
+> + fs/cifs/file.c:3157:23-27: ERROR: invalid reference to the index variable of the iterator on line 3149
+> 
+> vim +3157 fs/cifs/file.c
+>   3147			rdata->marshal_iov = cifs_readpages_marshal_iov;
+>   3148	
+> > 3149			list_for_each_entry_safe(page, tpage, &tmplist, lru) {
+>   3150				list_del(&page->lru);
+>   3151				rdata->pages[rdata->nr_pages++] = page;
+>   3152			}
+>   3153	
+>   3154			rc = cifs_retry_async_readv(rdata);
+>   3155			if (rc != 0) {
+>   3156				for (i = 0; i < rdata->nr_pages; i++) {
+> > 3157					lru_cache_add_file(page);
+>   3158					unlock_page(page);
+>   3159					page_cache_release(page);
+>   3160				}
+>   3161				kref_put(&rdata->refcount, cifs_readdata_release);
+>   3162				break;
+>   3163			}
+>   3164	
+>   3165			kref_put(&rdata->refcount, cifs_readdata_release);
+>   3166		}
+>   3167	
+> 
+> ---
+> 0-DAY kernel build testing backend         Open Source Technology Centre
+> Fengguang Wu, Yuanhan Liu                              Intel Corporation
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 1572abe..a7db95f 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1218,13 +1218,13 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	iov[0].iov_len = get_rfc1002_length(req) + 4;
- 
- 	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, 0);
-+	rsp = (struct smb2_query_info_rsp *)iov[0].iov_base;
-+
- 	if (rc) {
- 		cifs_stats_fail_inc(tcon, SMB2_QUERY_INFO_HE);
- 		goto qinf_exit;
- 	}
- 
--	rsp = (struct smb2_query_info_rsp *)iov[0].iov_base;
--
- 	rc = validate_and_copy_buf(le16_to_cpu(rsp->OutputBufferOffset),
- 				   le32_to_cpu(rsp->OutputBufferLength),
- 				   &rsp->hdr, min_len, data);
-@@ -1485,8 +1485,10 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 	rc = cifs_call_async(io_parms.tcon->ses->server, &rqst,
- 			     cifs_readv_receive, smb2_readv_callback,
- 			     rdata, 0);
--	if (rc)
-+	if (rc) {
- 		kref_put(&rdata->refcount, cifs_readdata_release);
-+		cifs_stats_fail_inc(io_parms.tcon, SMB2_READ_HE);
-+	}
- 
- 	cifs_small_buf_release(buf);
- 	return rc;
-@@ -1643,8 +1645,10 @@ smb2_async_writev(struct cifs_writedata *wdata)
- 	rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
- 				smb2_writev_callback, wdata, 0);
- 
--	if (rc)
-+	if (rc) {
- 		kref_put(&wdata->refcount, cifs_writedata_release);
-+		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
-+	}
- 
- async_writev_out:
- 	cifs_small_buf_release(req);
-@@ -1700,15 +1704,15 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 
- 	rc = SendReceive2(xid, io_parms->tcon->ses, iov, n_vec + 1,
- 			  &resp_buftype, 0);
-+	rsp = (struct smb2_write_rsp *)iov[0].iov_base;
- 
- 	if (rc) {
- 		cifs_stats_fail_inc(io_parms->tcon, SMB2_WRITE_HE);
- 		cERROR(1, "Send error in write = %d", rc);
--	} else {
--		rsp = (struct smb2_write_rsp *)iov[0].iov_base;
-+	} else
- 		*nbytes = le32_to_cpu(rsp->DataLength);
--		free_rsp_buf(resp_buftype, rsp);
--	}
-+
-+	free_rsp_buf(resp_buftype, rsp);
- 	return rc;
- }
- 
-@@ -1828,11 +1832,12 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
- 	inc_rfc1001_len(req, len - 1 /* Buffer */);
- 
- 	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, 0);
-+	rsp = (struct smb2_query_directory_rsp *)iov[0].iov_base;
-+
- 	if (rc) {
- 		cifs_stats_fail_inc(tcon, SMB2_QUERY_DIRECTORY_HE);
- 		goto qdir_exit;
- 	}
--	rsp = (struct smb2_query_directory_rsp *)iov[0].iov_base;
- 
- 	rc = validate_buf(le16_to_cpu(rsp->OutputBufferOffset),
- 			  le32_to_cpu(rsp->OutputBufferLength), &rsp->hdr,
+
+Thanks Wu, good catch. I've got a fix that I'll push to Steve today.
+
 -- 
-1.7.5.4
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
