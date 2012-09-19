@@ -1,67 +1,96 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: CIFS: Add session setup/logoff capability for SMB2
-Date: Wed, 19 Sep 2012 15:57:33 +0400
-Message-ID: <CAKywueQmCNdDs5an6Jqe=TqHY6da42xRXqiU5q_264gFkr7SMQ@mail.gmail.com>
-References: <20120919113120.GA32381@elgon.mountain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] CIFS: Fix possible memory leaks in SMB2 code
+Date: Wed, 19 Sep 2012 16:03:26 +0400
+Message-ID: <1348056206-14288-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20120919113120.GA32381-mgFCXtclrQlZLf2FXnZxJA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/9/19 Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>:
-> Hello Pavel Shilovsky,
->
-> This is a semi-automatic email about new static checker warnings.
->
-> The patch 5478f9ba9a34: "CIFS: Add session setup/logoff capability
-> for SMB2" from Dec 27, 2011, leads to the following Smatch complaint:
->
-> fs/cifs/smb2pdu.c:672 SMB2_sess_setup()
->          warn: variable dereferenced before check 'rsp' (see line 657)
->
-> fs/cifs/smb2pdu.c
->    656                  ses->Suid = rsp->hdr.SessionId;
->                                     ^^^^^^^^^^^^^^^^^^
-> New dereference.
->
->    657                  rc = decode_ntlmssp_challenge(rsp->Buffer,
->    658                                  le16_to_cpu(rsp->SecurityBufferLength), ses);
->    659          }
->    660
->    661          /*
->    662           * BB eventually add code for SPNEGO decoding of NtlmChallenge blob,
->    663           * but at least the raw NTLMSSP case works.
->    664           */
->    665          /*
->    666           * No tcon so can't do
->    667           * cifs_stats_inc(&tcon->stats.smb2_stats.smb2_com_fail[SMB2...]);
->    668           */
->    669          if (rc != 0)
->    670                  goto ssetup_exit;
->    671
->    672          if (rsp == NULL) {
->                     ^^^^^^^^^^^
-> New check.
->
->    673                  rc = -EIO;
->    674                  goto ssetup_exit;
->
-> regards,
-> dan carpenter
->
+and add missed increments of failed async read and write requests.
 
-Ok, it makes sense. Also I think we should remove all checks like:
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/smb2pdu.c |   23 ++++++++++++++---------
+ 1 files changed, 14 insertions(+), 9 deletions(-)
 
-if (rsp == NULL) {
-        ...
-}
-
-because rsp can't be NULL in rc == 0 case.
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 1572abe..a7db95f 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1218,13 +1218,13 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	iov[0].iov_len = get_rfc1002_length(req) + 4;
+ 
+ 	rc = SendReceive2(xid, ses, iov, 1, &resp_buftype, 0);
++	rsp = (struct smb2_query_info_rsp *)iov[0].iov_base;
++
+ 	if (rc) {
+ 		cifs_stats_fail_inc(tcon, SMB2_QUERY_INFO_HE);
+ 		goto qinf_exit;
+ 	}
+ 
+-	rsp = (struct smb2_query_info_rsp *)iov[0].iov_base;
+-
+ 	rc = validate_and_copy_buf(le16_to_cpu(rsp->OutputBufferOffset),
+ 				   le32_to_cpu(rsp->OutputBufferLength),
+ 				   &rsp->hdr, min_len, data);
+@@ -1485,8 +1485,10 @@ smb2_async_readv(struct cifs_readdata *rdata)
+ 	rc = cifs_call_async(io_parms.tcon->ses->server, &rqst,
+ 			     cifs_readv_receive, smb2_readv_callback,
+ 			     rdata, 0);
+-	if (rc)
++	if (rc) {
+ 		kref_put(&rdata->refcount, cifs_readdata_release);
++		cifs_stats_fail_inc(io_parms.tcon, SMB2_READ_HE);
++	}
+ 
+ 	cifs_small_buf_release(buf);
+ 	return rc;
+@@ -1643,8 +1645,10 @@ smb2_async_writev(struct cifs_writedata *wdata)
+ 	rc = cifs_call_async(tcon->ses->server, &rqst, NULL,
+ 				smb2_writev_callback, wdata, 0);
+ 
+-	if (rc)
++	if (rc) {
+ 		kref_put(&wdata->refcount, cifs_writedata_release);
++		cifs_stats_fail_inc(tcon, SMB2_WRITE_HE);
++	}
+ 
+ async_writev_out:
+ 	cifs_small_buf_release(req);
+@@ -1700,15 +1704,15 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 
+ 	rc = SendReceive2(xid, io_parms->tcon->ses, iov, n_vec + 1,
+ 			  &resp_buftype, 0);
++	rsp = (struct smb2_write_rsp *)iov[0].iov_base;
+ 
+ 	if (rc) {
+ 		cifs_stats_fail_inc(io_parms->tcon, SMB2_WRITE_HE);
+ 		cERROR(1, "Send error in write = %d", rc);
+-	} else {
+-		rsp = (struct smb2_write_rsp *)iov[0].iov_base;
++	} else
+ 		*nbytes = le32_to_cpu(rsp->DataLength);
+-		free_rsp_buf(resp_buftype, rsp);
+-	}
++
++	free_rsp_buf(resp_buftype, rsp);
+ 	return rc;
+ }
+ 
+@@ -1828,11 +1832,12 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	inc_rfc1001_len(req, len - 1 /* Buffer */);
+ 
+ 	rc = SendReceive2(xid, ses, iov, 2, &resp_buftype, 0);
++	rsp = (struct smb2_query_directory_rsp *)iov[0].iov_base;
++
+ 	if (rc) {
+ 		cifs_stats_fail_inc(tcon, SMB2_QUERY_DIRECTORY_HE);
+ 		goto qdir_exit;
+ 	}
+-	rsp = (struct smb2_query_directory_rsp *)iov[0].iov_base;
+ 
+ 	rc = validate_buf(le16_to_cpu(rsp->OutputBufferOffset),
+ 			  le32_to_cpu(rsp->OutputBufferLength), &rsp->hdr,
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.5.4
