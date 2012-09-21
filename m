@@ -1,48 +1,44 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: My changes to use socket callbacks have worked well enough to
- mount a Samba-SMB1-based File system
-Date: Thu, 20 Sep 2012 16:35:02 -0700
-Message-ID: <20120920163502.29654d25@corrin.poochiereds.net>
-References: <CACyXjPwp+dNPLk2TuUyeuuPrwqDZQcFV5W+RK6++fRaQsaEn+Q@mail.gmail.com>
+From: David =?utf-8?b?QmFsYcW+aWM=?= <xerces9-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: kernel 3.1.1 - cifs issue - ls: cannot access =?utf-8?b?L2NpZnNfbW50Og==?= Cannot allocate memory
+Date: Fri, 21 Sep 2012 23:05:17 +0000 (UTC)
+Message-ID: <loom.20120922T005738-960@post.gmane.org>
+References: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com> <4EC269FC.1060104@suse.com> <004b01cca3cc$932e4240$b98ac6c0$@lucidpixels.com> <4EC334D6.9020208@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CACyXjPwp+dNPLk2TuUyeuuPrwqDZQcFV5W+RK6++fRaQsaEn+Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 20 Sep 2012 15:49:07 -0700
-Richard Sharpe <realrichardsharpe-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Suresh Jayaraman <sjayaraman@...> writes:
 
-> Hi Folks,
+> Ah, ok. In case if you have not figured out how to overcome this
+> problem, take a look at
 > 
-> So, here is the evidence:
-> 
-> ---------------------------------------------
-> [root@richards-centos62-01 cifs-2.6]# mount -t cifs richards-sw-01
-> /mnt -o unc=//richards-sw-01\\backup,ip=10.250.209.113,user=administrator,pass=St0r@ge!
-> [root@richards-centos62-01 cifs-2.6]# df
-> Filesystem           1K-blocks      Used Available Use% Mounted on
-> /dev/mapper/vg_storage09-lv_root
->                       52324100   5115200  44587460  11% /
-> tmpfs                  4097628         0   4097628   0% /dev/shm
-> /dev/sda1               508644     88730    394314  19% /boot
-> /dev/mapper/vg_storage09-lv_home
->                      460511448  53195152 384264420  13% /home
-> richards-sw-01       160432112   2911480 157520632   2% /mnt
-> [root@richards-centos62-01 cifs-2.6]# ls /mnt/
-> [root@richards-centos62-01 cifs-2.6]#
-> ----------------------------------------------
-> 
-> I need to clean up these changes and handle error cases and get it
-> working against a more recent tree ... but it is taking shape.
-> 
+> http://alan.lamielle.net/2009/09/03/windows-7-nonpaged-pool-srv-error-2017
 
-Nice! Sounds like a great start to cleaning up some of the hairiest
-code in cifs.ko. My hat's off to you!
+(I'm not subscribed, so please CC me)
 
--- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+Hi!
+
+I also encountered this error 12 accessing a shared folder on a Windows 7 Pro
+SP1 64-bit "server", client being SystemRescueCd 3.0.0 with kernel version
+3.2.28 32 bit. It also happens with other kernels (RipLinux 13.7, kernel 3.2.1).
+
+
+I got the error when copying a single large file to the shared folder.
+The registry tweaks at that URL mitigates the problem.
+But I changed it back to do some research.
+When accessing the same shared folder from a Windows 7 Home Premium SP1 x64
+client, there is no problem.
+
+When I tried with Linux just before posting this, I got error 12 right when
+mounting, before doing any file operations.
+
+Is this because linux-cifs does not respect the MaxReq parm that the server
+sends, as suggested in this post:
+http://article.gmane.org/gmane.linux.kernel.cifs/4294 ?
+
+Regards,
+David
