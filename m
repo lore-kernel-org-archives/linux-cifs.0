@@ -1,90 +1,88 @@
-From: =?UTF-8?Q?David_Bala=C5=BEic?= <xerces9-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot
- allocate memory
-Date: Sun, 23 Sep 2012 18:02:58 +0200
-Message-ID: <CAPJ9Yc-FKLzH_BK++iL4uV59gy-dVCDGYs=ZFfsJVimWfGKdbw@mail.gmail.com>
-References: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com>
-	<4EC269FC.1060104@suse.com>
-	<004b01cca3cc$932e4240$b98ac6c0$@lucidpixels.com>
-	<4EC334D6.9020208@suse.com>
-	<loom.20120922T005738-960@post.gmane.org>
-	<CAH2r5msw6r9N2WQAVX+iHGMy++=wp4qUU1k_F+N93xLsZ9i1zg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msw6r9N2WQAVX+iHGMy++=wp4qUU1k_F+N93xLsZ9i1zg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Anton Altaparmakov <aia21@cam.ac.uk>
+Subject: Re: cifs: fix return value in cifsConvertToUTF16
+Date: Sun, 23 Sep 2012 23:18:19 +0100
+Message-ID: <96965BD0-8BA7-41C0-A459-7F4DC871F607@cam.ac.uk>
+References: <20120922202809.250DB3402DF@ra.kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.1 \(1498\))
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Unix Support <unix-support@ucs.cam.ac.uk>
+To: Steve French <sfrench@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20120922202809.250DB3402DF@ra.kernel.org>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On 22 September 2012 02:02, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->
-> On Fri, Sep 21, 2012 at 6:05 PM, David Bala=C5=BEic <xerces9-Re5JQEeQqe8@public.gmane.org=
-m> wrote:
->>
->> Suresh Jayaraman <sjayaraman@...> writes:
->>
->> > Ah, ok. In case if you have not figured out how to overcome this
->> > problem, take a look at
->> >
->> >
->> > http://alan.lamielle.net/2009/09/03/windows-7-nonpaged-pool-srv-er=
-ror-2017
->>
->> (I'm not subscribed, so please CC me)
->>
->> Hi!
->>
->> I also encountered this error 12 accessing a shared folder on a Wind=
-ows 7
->> Pro
->> SP1 64-bit "server", client being SystemRescueCd 3.0.0 with kernel v=
-ersion
->> 3.2.28 32 bit. It also happens with other kernels (RipLinux 13.7, ke=
-rnel
->> 3.2.1).
->>
->>
->> I got the error when copying a single large file to the shared folde=
-r.
->> The registry tweaks at that URL mitigates the problem.
->> But I changed it back to do some research.
->> When accessing the same shared folder from a Windows 7 Home Premium =
-SP1
->> x64
->> client, there is no problem.
->>
->> When I tried with Linux just before posting this, I got error 12 rig=
-ht
->> when
->> mounting, before doing any file operations.
->>
->> Is this because linux-cifs does not respect the MaxReq parm that the
->> server
->> sends, as suggested in this post:
->> http://article.gmane.org/gmane.linux.kernel.cifs/4294 ?
->>
->
-> We were able to reproduce this problem to Windows, even when
-> the (Windows Vista/Windows 7) server was configured for 50 requests,
-> but current cifs.ko (3.4 kernels and later) does respect the servers
-> MaxReq parameter (maximum simultaneous requests limit).
->
-> To servers, like Samba, which can handle much more than 50
-> simultaneous requests, note that the server's limit can be configured
-> (increased) in the server's smb.conf file beyond the typical default
-> (50 for most server's and clients - thus the reason cifs client
-> simply defaulted to 50 prior to 3.4).
+Hi Steve,
 
-I tried setting the cifs_max_pending module parameter, also kernel 3.4.=
-9
+Hey, I sent you that exact same patch on the 12th June!  Would have =
+saved you and others some valuable time if you hadn't ignored it then!  =
+(-;
 
-It is better, but there are still some errors 12.
+Told you it was an obvious logic bug!  (-;
 
-Any recommendations? (besides trying a newer kernel)
+Best regards,
 
-Regards,
-David
+	Anton
+
+On 22 Sep 2012, at 21:28, Linux Kernel Mailing List =
+<linux-kernel@vger.kernel.org> wrote:
+
+> Gitweb:     =
+http://git.kernel.org/linus/;a=3Dcommit;h=3Dc73f693989d7a7d99ec66a7065295a=
+0c93d0b127
+> Commit:     c73f693989d7a7d99ec66a7065295a0c93d0b127
+> Parent:     4651afbbae968772efd6dc4ba461cba9b49bb9d8
+> Author:     Jeff Layton <jlayton@redhat.com>
+> AuthorDate: Tue Sep 18 14:21:01 2012 -0400
+> Committer:  Steve French <smfrench@gmail.com>
+> CommitDate: Tue Sep 18 15:35:25 2012 -0500
+>=20
+>    cifs: fix return value in cifsConvertToUTF16
+>=20
+>    This function returns the wrong value, which causes the callers to =
+get
+>    the length of the resulting pathname wrong when it contains =
+non-ASCII
+>    characters.
+>=20
+>    This seems to fix https://bugzilla.samba.org/show_bug.cgi?id=3D6767
+>=20
+>    Cc: <stable@vger.kernel.org>
+>    Reported-by: Baldvin Kovacs <baldvin.kovacs@gmail.com>
+>    Reported-and-Tested-by: Nicolas Lefebvre <nico.lefebvre@gmail.com>
+>    Signed-off-by: Jeff Layton <jlayton@redhat.com>
+>    Signed-off-by: Steve French <smfrench@gmail.com>
+> ---
+> fs/cifs/cifs_unicode.c |    2 +-
+> 1 files changed, 1 insertions(+), 1 deletions(-)
+>=20
+> diff --git a/fs/cifs/cifs_unicode.c b/fs/cifs/cifs_unicode.c
+> index 7dab9c0..53cf2aa 100644
+> --- a/fs/cifs/cifs_unicode.c
+> +++ b/fs/cifs/cifs_unicode.c
+> @@ -328,7 +328,7 @@ cifsConvertToUTF16(__le16 *target, const char =
+*source, int srclen,
+> 	}
+>=20
+> ctoUTF16_out:
+> -	return i;
+> +	return j;
+> }
+>=20
+> #ifdef CONFIG_CIFS_SMB2
+
+--=20
+Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
+Unix Support, Computing Service, University of Cambridge, CB2 3QH, UK
+Linux NTFS maintainer, http://www.linux-ntfs.org/
