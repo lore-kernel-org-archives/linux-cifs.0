@@ -1,47 +1,82 @@
-From: =?UTF-8?Q?David_Bala=C5=BEic?= <xerces9-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: kernel 3.1.1 - cifs issue - ls: cannot access /cifs_mnt: Cannot
- allocate memory
-Date: Mon, 24 Sep 2012 12:39:45 +0200
-Message-ID: <CAPJ9Yc-K8YEu5yE-6Zgq2AqghWfLRx5WswgCOL6_qG=Q8z3Hkw@mail.gmail.com>
-References: <00c001cca300$4b512b80$e1f38280$@lucidpixels.com>
-	<4EC269FC.1060104@suse.com>
-	<004b01cca3cc$932e4240$b98ac6c0$@lucidpixels.com>
-	<4EC334D6.9020208@suse.com>
-	<loom.20120922T005738-960@post.gmane.org>
-	<CAH2r5msw6r9N2WQAVX+iHGMy++=wp4qUU1k_F+N93xLsZ9i1zg@mail.gmail.com>
-	<CAPJ9Yc-FKLzH_BK++iL4uV59gy-dVCDGYs=ZFfsJVimWfGKdbw@mail.gmail.com>
-	<CAH2r5msLRvtFOzEVR3g8Tq+j+k9D4SurBPOeez=DOL7d3_uTDg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: change DOS/NT/POSIX mapping of ERRnoresource
+Date: Mon, 24 Sep 2012 09:33:40 -0400
+Message-ID: <1348493620-1887-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msLRvtFOzEVR3g8Tq+j+k9D4SurBPOeez=DOL7d3_uTDg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 24 September 2012 02:03, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> If it still fails with max_pending set to 9 or 10 (on the client) -
-> then you are stuck with having to fix the server (there were a couple
-> of registry parms which can be set in Windows, mentioned in earlier
-> posts which apparently resolve this).  ( had trouble reproducing this
-> with max pending set low.
->
-> We may want to enable SMB2 dialect (SMB2.1 dialect is currently
-> enabled in linux-next, but not SMB2.0 dialect which Vista uses) if
-> Vista fails (was this Vista or Windows 7) - since SMB2 uses a
-> different crediting mechanism?
+ERRnoresource is an ERRSRV level (aka server-side) error and means "No
+resources currently available for request". Currently that maps to POSIX
+-ENOBUFS. No NT errors map to it currently.
 
-I tested with Windows 7 (Professional SP1 64-bit, up to date, mostly
-default options).
+NT_STATUS_INSUFFICIENT_RESOURCES and NT_STATUS_INSUFF_SERVER_RESOURCES
+are also similar in meaning. Currently the client maps those to
+ERRnomem, which maps to -ENOMEM in POSIX.
 
-As a user, I just want my gear to work, without needing to google for
-tweaks and hacks.
+All of these mappings seem to be quite wrong to me and are confusing for
+users. All of the above errors indicate problems on the server, not the
+client. Reporting -ENOMEM or -ENOBUFS implies that the client is running
+out of resources.
 
-Is it possible that SystemRescueCd uses some strange (kernel)
-configuration that causes problems?
-Because with Ubuntu as client I has fewer problems (but it might just
-be chance, I only did a few quick tests).
+This patch changes those mappings. The NT_* errors are changed to map to
+the SRV level ERRnoresource. That error is in turn changed to return
+-EREMOTEIO which is the only POSIX error I could find that conveys that
+something went wrong on the server. While we're at it, change the SMB2
+equivalent error to return the same.
 
-Regards,
-David
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/netmisc.c      | 6 +++---
+ fs/cifs/smb2maperror.c | 3 ++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index e7bab3b..d5ce9e2 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -110,7 +110,7 @@ static const struct smb_to_posix_error mapping_table_ERRSRV[] = {
+ 	{ERRnoroom, -ENOSPC},
+ 	{ERRrmuns, -EUSERS},
+ 	{ERRtimeout, -ETIME},
+-	{ERRnoresource, -ENOBUFS},
++	{ERRnoresource, -EREMOTEIO},
+ 	{ERRtoomanyuids, -EUSERS},
+ 	{ERRbaduid, -EACCES},
+ 	{ERRusempx, -EIO},
+@@ -412,7 +412,7 @@ static const struct {
+ 	 from NT_STATUS_INSUFFICIENT_RESOURCES to
+ 	 NT_STATUS_INSUFF_SERVER_RESOURCES during the session setup } */
+ 	{
+-	ERRDOS, ERRnomem, NT_STATUS_INSUFFICIENT_RESOURCES}, {
++	ERRDOS, ERRnoresource, NT_STATUS_INSUFFICIENT_RESOURCES}, {
+ 	ERRDOS, ERRbadpath, NT_STATUS_DFS_EXIT_PATH_FOUND}, {
+ 	ERRDOS, 23, NT_STATUS_DEVICE_DATA_ERROR}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_DEVICE_NOT_CONNECTED}, {
+@@ -682,7 +682,7 @@ static const struct {
+ 	ERRHRD, ERRgeneral, NT_STATUS_NO_USER_SESSION_KEY}, {
+ 	ERRDOS, 59, NT_STATUS_USER_SESSION_DELETED}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_RESOURCE_LANG_NOT_FOUND}, {
+-	ERRDOS, ERRnomem, NT_STATUS_INSUFF_SERVER_RESOURCES}, {
++	ERRDOS, ERRnoresource, NT_STATUS_INSUFF_SERVER_RESOURCES}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_INVALID_BUFFER_SIZE}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ADDRESS_COMPONENT}, {
+ 	ERRHRD, ERRgeneral, NT_STATUS_INVALID_ADDRESS_WILDCARD}, {
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index eaf5466..494c912 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -453,7 +453,8 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{STATUS_FILE_INVALID, -EIO, "STATUS_FILE_INVALID"},
+ 	{STATUS_ALLOTTED_SPACE_EXCEEDED, -EIO,
+ 	"STATUS_ALLOTTED_SPACE_EXCEEDED"},
+-	{STATUS_INSUFFICIENT_RESOURCES, -EIO, "STATUS_INSUFFICIENT_RESOURCES"},
++	{STATUS_INSUFFICIENT_RESOURCES, -EREMOTEIO,
++				"STATUS_INSUFFICIENT_RESOURCES"},
+ 	{STATUS_DFS_EXIT_PATH_FOUND, -EIO, "STATUS_DFS_EXIT_PATH_FOUND"},
+ 	{STATUS_DEVICE_DATA_ERROR, -EIO, "STATUS_DEVICE_DATA_ERROR"},
+ 	{STATUS_DEVICE_NOT_CONNECTED, -EIO, "STATUS_DEVICE_NOT_CONNECTED"},
+-- 
+1.7.11.4
