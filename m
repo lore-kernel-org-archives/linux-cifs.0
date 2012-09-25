@@ -1,113 +1,66 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH] CIFS: Fix possible freed pointer dereference in SMB2_sess_setup
-Date: Tue, 25 Sep 2012 11:00:09 +0400
-Message-ID: <1348556409-10339-3-git-send-email-piastry@etersoft.ru>
-References: <1348556409-10339-1-git-send-email-piastry@etersoft.ru>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] manpage: clarify the user of the username= option
+Date: Tue, 25 Sep 2012 06:52:46 -0400
+Message-ID: <1348570366-17466-1-git-send-email-jlayton@samba.org>
+Cc: walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1348556409-10339-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-and remove redundant (rsp == NULL) checks after SendReceive2.
+Specifying the username as "user=" can confuse some versions of /bin/mount,
+and cause it to append noexec to the mount string. Also, remove the blurb
+about how cifs.ko will accept abbreviations -- it's just bad practice.
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+A wonderful example of this confusion was reported by Stefan here:
+
+    https://bugzilla.redhat.com/show_bug.cgi?id=860154
+
+Reported-by: Stefan Walter <walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- fs/cifs/smb2pdu.c |   35 +++--------------------------------
- 1 files changed, 3 insertions(+), 32 deletions(-)
+ mount.cifs.8 | 24 ++----------------------
+ 1 file changed, 2 insertions(+), 22 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index a7db95f..5ad88b4b 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -409,11 +409,6 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 	if (rc != 0)
- 		goto neg_exit;
- 
--	if (rsp == NULL) {
--		rc = -EIO;
--		goto neg_exit;
--	}
--
- 	cFYI(1, "mode 0x%x", rsp->SecurityMode);
- 
- 	if (rsp->DialectRevision == smb2protocols[SMB21_PROT].name)
-@@ -637,13 +632,14 @@ ssetup_ntlmssp_authenticate:
- 
- 	kfree(security_blob);
- 	rsp = (struct smb2_sess_setup_rsp *)iov[0].iov_base;
--	if (rsp->hdr.Status == STATUS_MORE_PROCESSING_REQUIRED) {
-+	if (resp_buftype != CIFS_NO_BUFFER &&
-+	    rsp->hdr.Status == STATUS_MORE_PROCESSING_REQUIRED) {
- 		if (phase != NtLmNegotiate) {
- 			cERROR(1, "Unexpected more processing error");
- 			goto ssetup_exit;
- 		}
- 		if (offsetof(struct smb2_sess_setup_rsp, Buffer) - 4 !=
--			le16_to_cpu(rsp->SecurityBufferOffset)) {
-+				le16_to_cpu(rsp->SecurityBufferOffset)) {
- 			cERROR(1, "Invalid security buffer offset %d",
- 				  le16_to_cpu(rsp->SecurityBufferOffset));
- 			rc = -EIO;
-@@ -669,11 +665,6 @@ ssetup_ntlmssp_authenticate:
- 	if (rc != 0)
- 		goto ssetup_exit;
- 
--	if (rsp == NULL) {
--		rc = -EIO;
--		goto ssetup_exit;
--	}
--
- 	ses->session_flags = le16_to_cpu(rsp->SessionFlags);
- ssetup_exit:
- 	free_rsp_buf(resp_buftype, rsp);
-@@ -793,11 +784,6 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 		goto tcon_error_exit;
- 	}
- 
--	if (rsp == NULL) {
--		rc = -EIO;
--		goto tcon_exit;
--	}
--
- 	if (tcon == NULL) {
- 		ses->ipc_tid = rsp->hdr.TreeId;
- 		goto tcon_exit;
-@@ -1046,10 +1032,6 @@ SMB2_open(const unsigned int xid, struct cifs_tcon *tcon, __le16 *path,
- 		goto creat_exit;
- 	}
- 
--	if (rsp == NULL) {
--		rc = -EIO;
--		goto creat_exit;
--	}
- 	*persistent_fid = rsp->PersistentFileId;
- 	*volatile_fid = rsp->VolatileFileId;
- 
-@@ -1111,11 +1093,6 @@ SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
- 		goto close_exit;
- 	}
- 
--	if (rsp == NULL) {
--		rc = -EIO;
--		goto close_exit;
--	}
--
- 	/* BB FIXME - decode close response, update inode for caching */
- 
- close_exit:
-@@ -1950,12 +1927,6 @@ send_set_info(const unsigned int xid, struct cifs_tcon *tcon,
- 		cifs_stats_fail_inc(tcon, SMB2_SET_INFO_HE);
- 		goto out;
- 	}
--
--	if (rsp == NULL) {
--		rc = -EIO;
--		goto out;
--	}
--
- out:
- 	free_rsp_buf(resp_buftype, rsp);
- 	kfree(iov);
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index cca6048..5629e84 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -52,33 +52,13 @@ command displays the version of cifs mount helper\&.
+ command displays the version of cifs module\&.
+ .SH "OPTIONS"
+ .PP
+-user=\fIarg\fR
++username=\fIarg\fR
+ .RS 4
+ specifies the username to connect as\&. If this is not given, then the environment variable
+ \fIUSER\fR
+ is used\&.
+ .PP
+-Earlier versions of mount.cifs also allowed one to specify the username in a "user%password" or "workgroup/user" or "workgroup/user%password" to allow the password and workgroup to be specified as part of the username. Support for those alternate username formats is now deprecated and should no longer be used. Users should use the discrete "pass=" and "dom=" to specify the username.
+-.if n \{\
+-.sp
+-.\}
+-.RS 4
+-.it 1 an-trap
+-.nr an-no-space-flag 1
+-.nr an-break-flag 1
+-.br
+-.ps +1
+-\fBNote\fR
+-.ps -1
+-.br
+-The cifs vfs accepts the parameter
+-\fIuser=\fR, or for users familiar with smbfs it accepts the longer form of the parameter
+-\fIusername=\fR\&. Similarly the longer smbfs style parameter names may be accepted as synonyms for the shorter cifs parameters
+-\fIpass=\fR,\fIdom=\fR
+-and
+-\fIcred=\fR\&.
+-.sp .5v
+-.RE
++Earlier versions of mount.cifs also allowed one to specify the username in a "user%password" or "workgroup/user" or "workgroup/user%password" to allow the password and workgroup to be specified as part of the username. Support for those alternate username formats is now deprecated and should no longer be used. Users should use the discrete "password=" and "domain=" to specify those values. While some versions of the cifs kernel module accept "user=" as an abbreviation for this option, its use can confuse the standard mount program into thinking that this is a non-superuser mount.
+ .RE
+ .PP
+ password=\fIarg\fR
 -- 
-1.7.5.4
+1.7.11.4
