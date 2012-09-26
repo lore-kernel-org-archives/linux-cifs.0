@@ -1,51 +1,41 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: Samba client problem
-Date: Tue, 25 Sep 2012 16:32:25 -0400
-Message-ID: <CAH2r5mvyS8FYYeuUFtzC_T9KuHQ2XRGHvoazQee43PqGGu0f2w@mail.gmail.com>
-References: <CABFBh7j7rfRG0n2OC93aS7k7231zpvCwXD_uE4T5UUkhHyiOTw@mail.gmail.com>
-	<CAH2r5msiu1ojey5ZNdYo15UOVcy9sXSRTsjT=OZbGULuEhL-tg@mail.gmail.com>
-	<CABFBh7iJtQi3=MiKcXtNYYqNXMmYf0jWbKSVT=tt+fffN60pwQ@mail.gmail.com>
-	<CAH2r5mvE03BW29nisR9ZPHJ2Qxo9R45GakJkrM0Dki_X9Y8+Hg@mail.gmail.com>
-	<CABFBh7j7kBBH_czxEUh=tRhdwZ5nAkRpr-+TL=dBt66aRtTifA@mail.gmail.com>
-	<CAH2r5msnQ49P=ayxf6atC731P4TevkAQUF5qnibzZK+6C9Tvtg@mail.gmail.com>
-	<CABFBh7gBNUX7FbFZWugAUVootCdvh7bsOH6H2NOTTG1TCpi1Ew@mail.gmail.com>
-	<CABFBh7hESnn=tUPeKxgCeoLAEO_7NqF8122O7+gmiYGxzWVi5A@mail.gmail.com>
-	<CAH2r5mvstLa_Z+xrHYQbAVUvVYV1Q54-=vBtaxoizSy0ijpAbA@mail.gmail.com>
-	<6A27F53C-77A3-4FB9-9EBA-79BB4663A0AD@gmail.com>
-	<CAH2r5mvSTNLoiB4qjnQO_C5ZMtNcKj6mee3M5ZLDGjGRKyH6cQ@mail.gmail.com>
-	<CABFBh7ixb0OsGsoaP=2-LYC76xt14fRABu4KvLvakN9OUZarug@mail.gmail.com>
-	<CAH2r5muXjwn8_LPf3HDDC8WOXdThY68H9fE212VJLigmh1gu-g@mail.gmail.com>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH] cifs: change DOS/NT/POSIX mapping of ERRnoresource
+Date: Wed, 26 Sep 2012 10:38:58 +0530
+Message-ID: <50628DEA.4040802@suse.com>
+References: <1348493620-1887-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muXjwn8_LPf3HDDC8WOXdThY68H9fE212VJLigmh1gu-g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1348493620-1887-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I understand that this will be easier with SMB2 than with cifs but
-have to wait another release of the kernel for SMB2 support to be
-included.
+On 09/24/2012 07:03 PM, Jeff Layton wrote:
+> ERRnoresource is an ERRSRV level (aka server-side) error and means "No
+> resources currently available for request". Currently that maps to POSIX
+> -ENOBUFS. No NT errors map to it currently.
+> 
+> NT_STATUS_INSUFFICIENT_RESOURCES and NT_STATUS_INSUFF_SERVER_RESOURCES
+> are also similar in meaning. Currently the client maps those to
+> ERRnomem, which maps to -ENOMEM in POSIX.
+> 
+> All of these mappings seem to be quite wrong to me and are confusing for
+> users. All of the above errors indicate problems on the server, not the
+> client. Reporting -ENOMEM or -ENOBUFS implies that the client is running
+> out of resources.
+> 
+> This patch changes those mappings. The NT_* errors are changed to map to
+> the SRV level ERRnoresource. That error is in turn changed to return
+> -EREMOTEIO which is the only POSIX error I could find that conveys that
+> something went wrong on the server. While we're at it, change the SMB2
+> equivalent error to return the same.
+> 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
 
-On Tue, Sep 25, 2012 at 4:21 PM, Jun Yi <yi.jun.mail-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Hi Steve,
->
-> In what linux version, the cifs.ko support SMB2?  Does ubuntu 12.04 support
-> SMB2?
+Seems reasonable to me.
 
-In Linux kernel 3.6 you can mount smb2 (with mount option "vers=2.1",
-but it requires enabling CONFIG_BROKEN) but few file/inode operations
-work.  In 3.7 you will be able to mount with "vers=2.1" and "vers=3.0"
-(with CONFIG_EXPERIMENTAL)
-
-
---
-Thanks,
-
-Steve
-
-
--- 
-Thanks,
-
-Steve
+Acked-by: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
