@@ -1,89 +1,285 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS - VFS error question
-Date: Thu, 27 Sep 2012 09:04:09 -0400
-Message-ID: <20120927090409.3d2febe7@corrin.poochiereds.net>
-References: <CAFdSyFFkcSbBrqH7mgBJxFL+kfZNuMBK+8ZGoarPxQeAS0rXng@mail.gmail.com>
-	<1348735029.2633.20.camel@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: ROBIN CERNIN <cerninr-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v6] cifs: obtain file access during backup intent lookup
+Date: Thu, 27 Sep 2012 15:21:22 -0500
+Message-ID: <1348777282-6385-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1348735029.2633.20.camel@localhost>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 27 Sep 2012 09:37:09 +0100
-Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> On Wed, 2012-09-26 at 09:33 +0200, ROBIN CERNIN wrote:
-> > Hello,
-> > 
-> > First of all I wanna say you are doing great job developing cif-utils.
-> > Secondly I have question on using following version of cifs:
-> > 
-> > filename:       /lib/modules/2.6.18-308.8.1.
-> > el5/kernel/fs/cifs/cifs.ko
-> > version:        1.60RH
-> > description:    VFS to access servers complying with the SNIA CIFS
-> > Specification e.g. Samba and Windows
-> > license:        GPL
-> > author:         Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
-> > srcversion:     63D9396D38F380652744D7E
-> > depends:
-> > vermagic:       2.6.18-308.8.1.el5 SMP mod_unload gcc-4.1
-> > parm:           CIFSMaxBufSize:Network buffer size (not including
-> > header). Default: 16384 Range: 8192 to 130048 (int)
-> > parm:           cifs_min_rcv:Network buffers in pool. Default: 4
-> > Range: 1 to 64 (int)
-> > parm:           cifs_min_small:Small network buffers in pool. Default:
-> > 30 Range: 2 to 256 (int)
-> > parm:           cifs_max_pending:Simultaneous requests to server.
-> > Default: 50 Range: 2 to 256 (int)
-> > module_sig:    883f3504fa440f6a462ac2afa8e12f112b2f409f6ea4176acbbe7f2f2c13e944e9a17d507b429c09c8e9ef6118eb3d5c40fcbfa81c96bf86e626c06e
-> > 
-> > on RHEL get following errors in the /var/log/messages:
-> > 
-> > Sep 24 20:08:48 xxxxxxx kernel:  CIFS VFS: No response for cmd 50 mid 39222
-> > Sep 24 20:08:48 xxxxxxx kernel:  CIFS VFS: No response for cmd 50 mid 39231
-> > Sep 24 20:08:48 xxxxxxx kernel:  CIFS VFS: No response for cmd 50 mid 39236
-> > Sep 25 10:45:16 xxxxxxx kernel:  CIFS VFS: Send error in SessSetup = -5
-> > Sep 25 10:45:16 xxxxxxx kernel:  CIFS VFS: Unexpected lookup error -5
-> > Sep 25 13:08:25 xxxxxxx kernel:  CIFS VFS: No response for cmd 6 mid 47208
-> > Sep 25 16:50:27 xxxxxxx kernel:  CIFS VFS: No response for cmd 162 mid 48857
-> > Sep 25 20:07:37 xxxxxxx kernel:  CIFS VFS: No response for cmd 50 mid 50442
-> > 
 
-As Steve pointed out the above indicates a lot of timed-out requests.
-The EIO errors however are somewhat troubling. It's not clear what
-would have caused that...
+Rebased and resending the reviewed patch.
+Removed Reviewed by Jeff Layton since patch is slightly different
+i.e. there is a change to smb1ops.c to cifs query_dir_first operation. 
 
-> > 
-> > Can you please clarify a bit to me what are these errors related to? I
-> > dont hear anyone complaing that this isnt working but I can still see
-> > these errors.
-> Hi Robin, 
-> 
-> Did you have any network outages or network congestion at those times?
-> It appears the client for some reason couldn't receive a response from
-> the server.
-> 
-> Sachin Prabhu
-> 
+Path based querries can fail for lack of access, especially during lookup
+during open.
+open itself would actually succeed becasue of back up intent bit
+but querries (either path or file handle based) do not have a means to
+specifiy backup intent bit.
+So querry the file info during lookup using
+ trans2 / findfirst / file_id_full_dir_info
+to obtain file info as well as file_id/inode value.
 
-It's not uncommon for windows servers to take a long time to respond to
-certain types of requests. For instance, writes that are long past the
-EOF can take *minutes*. NTFS doesn't do sparse files efficiently and
-has to zero-fill the gaps before it replies.
 
-More recent kernels (including RHEL6) implement a different mechanism
-for timing out requests that's more resilient in the face of this sort
-of server behavior. RHEL5 however is approaching its end of life, and
-backporting something that invasive is probably a non-starter.
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsproto.h |    6 +++-
+ fs/cifs/cifssmb.c   |   43 ++++++++++++++++++++-------------
+ fs/cifs/inode.c     |   64 +++++++++++++++++++++++++++++++++++++-------------
+ fs/cifs/readdir.c   |    2 +-
+ fs/cifs/smb1ops.c   |    6 +---
+ 5 files changed, 80 insertions(+), 41 deletions(-)
 
-If you have a RH support contract, you may want to open a case so we
-can help you do some better diagnosis.
-
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 09ea632..5144e9f 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -140,6 +140,8 @@ void cifs_fill_uniqueid(struct super_block *sb, struct cifs_fattr *fattr);
+ extern void cifs_unix_basic_to_fattr(struct cifs_fattr *fattr,
+ 				     FILE_UNIX_BASIC_INFO *info,
+ 				     struct cifs_sb_info *cifs_sb);
++extern void cifs_dir_info_to_fattr(struct cifs_fattr *, FILE_DIRECTORY_INFO *,
++					struct cifs_sb_info *);
+ extern void cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr);
+ extern struct inode *cifs_iget(struct super_block *sb,
+ 			       struct cifs_fattr *fattr);
+@@ -216,10 +218,10 @@ extern int CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+ 		    const struct nls_table *);
+ 
+ extern int CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+-		const char *searchName, const struct nls_table *nls_codepage,
++		const char *searchName, struct cifs_sb_info *cifs_sb,
+ 		__u16 *searchHandle, __u16 search_flags,
+ 		struct cifs_search_info *psrch_inf,
+-		int map, const char dirsep);
++		bool msearch);
+ 
+ extern int CIFSFindNext(const unsigned int xid, struct cifs_tcon *tcon,
+ 		__u16 searchHandle, __u16 search_flags,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 88bbb3e..76d0d29 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -4214,10 +4214,9 @@ UnixQPathInfoRetry:
+ /* xid, tcon, searchName and codepage are input parms, rest are returned */
+ int
+ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+-	      const char *searchName,
+-	      const struct nls_table *nls_codepage,
++	      const char *searchName, struct cifs_sb_info *cifs_sb,
+ 	      __u16 *pnetfid, __u16 search_flags,
+-	      struct cifs_search_info *psrch_inf, int remap, const char dirsep)
++	      struct cifs_search_info *psrch_inf, bool msearch)
+ {
+ /* level 257 SMB_ */
+ 	TRANSACTION2_FFIRST_REQ *pSMB = NULL;
+@@ -4225,8 +4224,9 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+ 	T2_FFIRST_RSP_PARMS *parms;
+ 	int rc = 0;
+ 	int bytes_returned = 0;
+-	int name_len;
++	int name_len, remap;
+ 	__u16 params, byte_count;
++	struct nls_table *nls_codepage;
+ 
+ 	cFYI(1, "In FindFirst for %s", searchName);
+ 
+@@ -4236,6 +4236,9 @@ findFirstRetry:
+ 	if (rc)
+ 		return rc;
+ 
++	nls_codepage = cifs_sb->local_nls;
++	remap = cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MAP_SPECIAL_CHR;
++
+ 	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
+ 		name_len =
+ 		    cifsConvertToUTF16((__le16 *) pSMB->FileName, searchName,
+@@ -4244,24 +4247,29 @@ findFirstRetry:
+ 		it got remapped to 0xF03A as if it were part of the
+ 		directory name instead of a wildcard */
+ 		name_len *= 2;
+-		pSMB->FileName[name_len] = dirsep;
+-		pSMB->FileName[name_len+1] = 0;
+-		pSMB->FileName[name_len+2] = '*';
+-		pSMB->FileName[name_len+3] = 0;
+-		name_len += 4; /* now the trailing null */
+-		pSMB->FileName[name_len] = 0; /* null terminate just in case */
+-		pSMB->FileName[name_len+1] = 0;
+-		name_len += 2;
++		if (msearch) {
++			pSMB->FileName[name_len] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[name_len+1] = 0;
++			pSMB->FileName[name_len+2] = '*';
++			pSMB->FileName[name_len+3] = 0;
++			name_len += 4; /* now the trailing null */
++			/* null terminate just in case */
++			pSMB->FileName[name_len] = 0;
++			pSMB->FileName[name_len+1] = 0;
++			name_len += 2;
++		}
+ 	} else {	/* BB add check for overrun of SMB buf BB */
+ 		name_len = strnlen(searchName, PATH_MAX);
+ /* BB fix here and in unicode clause above ie
+ 		if (name_len > buffersize-header)
+ 			free buffer exit; BB */
+ 		strncpy(pSMB->FileName, searchName, name_len);
+-		pSMB->FileName[name_len] = dirsep;
+-		pSMB->FileName[name_len+1] = '*';
+-		pSMB->FileName[name_len+2] = 0;
+-		name_len += 3;
++		if (msearch) {
++			pSMB->FileName[name_len] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[name_len+1] = '*';
++			pSMB->FileName[name_len+2] = 0;
++			name_len += 3;
++		}
+ 	}
+ 
+ 	params = 12 + name_len /* includes null */ ;
+@@ -4349,7 +4357,8 @@ findFirstRetry:
+ 			psrch_inf->last_entry = psrch_inf->srch_entries_start +
+ 							lnoff;
+ 
+-			*pnetfid = parms->SearchHandle;
++			if (pnetfid)
++				*pnetfid = parms->SearchHandle;
+ 		} else {
+ 			cifs_buf_release(pSMB);
+ 		}
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 3d15587..afdff79 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -607,7 +607,9 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 		    FILE_ALL_INFO *data, struct super_block *sb, int xid,
+ 		    const __u16 *fid)
+ {
+-	int rc = 0, tmprc;
++	bool validinum = false;
++	__u16 srchflgs;
++	int rc = 0, tmprc = ENOSYS;
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+ 	struct tcon_link *tlink;
+@@ -615,6 +617,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	char *buf = NULL;
+ 	bool adjust_tz = false;
+ 	struct cifs_fattr fattr;
++	struct cifs_search_info *srchinf = NULL;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -653,9 +656,38 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	} else if (rc == -EREMOTE) {
+ 		cifs_create_dfs_fattr(&fattr, sb);
+ 		rc = 0;
+-	} else {
++	} else if (rc == -EACCES && backup_cred(cifs_sb)) {
++			srchinf = kzalloc(sizeof(struct cifs_search_info),
++						GFP_KERNEL);
++			if (srchinf == NULL) {
++				rc = -ENOMEM;
++				goto cgii_exit;
++			}
++
++			srchinf->endOfSearch = false;
++			srchinf->info_level = SMB_FIND_FILE_ID_FULL_DIR_INFO;
++
++			srchflgs = CIFS_SEARCH_CLOSE_ALWAYS |
++					CIFS_SEARCH_CLOSE_AT_END |
++					CIFS_SEARCH_BACKUP_SEARCH;
++
++			rc = CIFSFindFirst(xid, tcon, full_path,
++				cifs_sb, NULL, srchflgs, srchinf, false);
++			if (!rc) {
++				data =
++				(FILE_ALL_INFO *)srchinf->srch_entries_start;
++
++				cifs_dir_info_to_fattr(&fattr,
++				(FILE_DIRECTORY_INFO *)data, cifs_sb);
++				fattr.cf_uniqueid = le64_to_cpu(
++				((SEARCH_ID_FULL_DIR_INFO *)data)->UniqueId);
++				validinum = true;
++
++				cifs_buf_release(srchinf->ntwrk_buf_start);
++			}
++			kfree(srchinf);
++	} else
+ 		goto cgii_exit;
+-	}
+ 
+ 	/*
+ 	 * If an inode wasn't passed in, then get the inode number
+@@ -666,23 +698,21 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	 */
+ 	if (*inode == NULL) {
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
+-			if (server->ops->get_srv_inum)
+-				tmprc = server->ops->get_srv_inum(xid, tcon,
+-					cifs_sb, full_path, &fattr.cf_uniqueid,
+-					data);
+-			else
+-				tmprc = -ENOSYS;
+-			if (tmprc || !fattr.cf_uniqueid) {
+-				cFYI(1, "GetSrvInodeNum rc %d", tmprc);
+-				fattr.cf_uniqueid = iunique(sb, ROOT_I);
+-				cifs_autodisable_serverino(cifs_sb);
++			if (validinum == false) {
++				if (server->ops->get_srv_inum)
++					tmprc = server->ops->get_srv_inum(xid,
++						tcon, cifs_sb, full_path,
++						&fattr.cf_uniqueid, data);
++				if (tmprc) {
++					cFYI(1, "GetSrvInodeNum rc %d", tmprc);
++					fattr.cf_uniqueid = iunique(sb, ROOT_I);
++					cifs_autodisable_serverino(cifs_sb);
++				}
+ 			}
+-		} else {
++		} else
+ 			fattr.cf_uniqueid = iunique(sb, ROOT_I);
+-		}
+-	} else {
++	} else
+ 		fattr.cf_uniqueid = CIFS_I(*inode)->uniqueid;
+-	}
+ 
+ 	/* query for SFU type info if supported and needed */
+ 	if (fattr.cf_cifsattrs & ATTR_SYSTEM &&
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index b0f4a42..f9b5d3d 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -151,7 +151,7 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ 	}
+ }
+ 
+-static void
++void
+ cifs_dir_info_to_fattr(struct cifs_fattr *fattr, FILE_DIRECTORY_INFO *info,
+ 		       struct cifs_sb_info *cifs_sb)
+ {
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 5fb0fe5..bf61818 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -837,10 +837,8 @@ cifs_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct cifs_fid *fid, __u16 search_flags,
+ 		     struct cifs_search_info *srch_inf)
+ {
+-	return CIFSFindFirst(xid, tcon, path, cifs_sb->local_nls,
+-			     &fid->netfid, search_flags, srch_inf,
+-			     cifs_sb->mnt_cifs_flags &
+-			     CIFS_MOUNT_MAP_SPECIAL_CHR, CIFS_DIR_SEP(cifs_sb));
++	return CIFSFindFirst(xid, tcon, path, cifs_sb,
++			     &fid->netfid, search_flags, srch_inf, true);
+ }
+ 
+ static int
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.6.0.2
