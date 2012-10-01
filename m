@@ -1,53 +1,36 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: [RFC] [PATCH] cifs: retry kernel_sendmsg only in case of -EAGAIN
-Date: Mon, 01 Oct 2012 13:10:45 +0530
-Message-ID: <506948FD.3090602@suse.com>
+From: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
+Subject: BUG 36952 CIFS VFS: Unexpected SMB signature
+Date: Mon, 01 Oct 2012 23:29:49 +0200
+Message-ID: <1974852427.1436977.1349126989564.JavaMail.www@wwinf8223>
+Reply-To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In smb_sendv(), we seem to retry if kernel_sendmsg() returned either
--ENOSPC or -EAGAIN. In either case after multiple attempts, we set the
-error to -EAGAIN before breaking out of the loop.
+Hello everybody,
 
-First, it is not clear to me when kernel_sendmsg() can return -ENOSPC,
-and what it would mean and why should we retry. It makes me wonder
-whether this check is part of some old code. Also, there seem to be no
-need to set the error back to -EAGAIN before we break out the loop.
-Fix this by making cifs retry only if kernel_sendmsg() returns -EAGAIN.
+I was wondering if the bug has been patched and from which kernel the p=
+atch is=20
+integrated.
 
-If the above discussion make sense, here is a patch to fix this.
----
+CIFS VFS: Unexpected SMB signature
+https://bugzilla.kernel.org/show_bug.cgi?id=3D36952
 
-Retry kernel_sendmsg() only in case of -EAGAIN and remove redundant
-error assignment.
+I have 300 up to date Fedora 15 clients with the bug. And I am wonderin=
+g what to do ?
+Upgrade kernel, upgrade distrib, change module cifs.ko ?
+
+If anybody has an idea, it would be great !
+
+Thanks in advance .
+Serge CONRAD
 
 
-Signed-off-by: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
----
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index d9b639b..a33db4c 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -154,7 +154,7 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 	while (total_len) {
- 		rc = kernel_sendmsg(ssocket, &smb_msg, &iov[first_vec],
- 				    n_vec - first_vec, total_len);
--		if ((rc == -ENOSPC) || (rc == -EAGAIN)) {
-+		if (rc == -EAGAIN) {
- 			i++;
- 			/*
- 			 * If blocking send we try 3 times, since each can block
-@@ -177,7 +177,6 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
- 			if ((i >= 14) || (!server->noblocksnd && (i > 2))) {
- 				cERROR(1, "sends on sock %p stuck for 15 seconds",
- 				    ssocket);
--				rc = -EAGAIN;
- 				break;
- 			}
- 			msleep(1 << i);
+
+Une messagerie gratuite, garantie =C3=A0 vie et des services en plus, =C3=
+=A7a vous tente ?
+Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
