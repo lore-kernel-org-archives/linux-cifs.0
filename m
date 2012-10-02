@@ -1,77 +1,55 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [RFC] [PATCH] cifs: retry kernel_sendmsg only in case of
- -EAGAIN
-Date: Tue, 2 Oct 2012 07:12:29 -0400
-Message-ID: <20121002071229.2b406a40@tlielax.poochiereds.net>
-References: <506948FD.3090602@suse.com>
-	<20121001214017.60f41311@corrin.poochiereds.net>
-	<CAH2r5msunor+xKU5tjgyuD+y3Qfist8kAHze7DwcC0SkAOe5tg@mail.gmail.com>
-	<20121001215030.5487c930@corrin.poochiereds.net>
-	<506AC06A.1030009@suse.com>
+Subject: Re: Ubuntu SecurityFlags at boot
+Date: Tue, 2 Oct 2012 07:19:54 -0400
+Message-ID: <20121002071954.51333f41@tlielax.poochiereds.net>
+References: <506A17EB.2050908@appcomsci.com>
+	<20121001214848.45781bb3@corrin.poochiereds.net>
+	<506A7AA9.2090606@appcomsci.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Lott, Christopher M" <clott-as7a0GIpyE2tG0bUXCXiUA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <506AC06A.1030009-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <506A7AA9.2090606-as7a0GIpyE2tG0bUXCXiUA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 02 Oct 2012 15:52:34 +0530
-Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+On Tue, 02 Oct 2012 01:24:57 -0400
+"Lott, Christopher M" <clott-as7a0GIpyE2tG0bUXCXiUA@public.gmane.org> wrote:
 
-> On 10/02/2012 07:20 AM, Jeff Layton wrote:
-> > On Mon, 1 Oct 2012 20:46:01 -0500
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > 
-> >> How can we be certain that ENOSPC is no longer returned? When it was
+> Thank you so much for explaining what should have been utterly obvious. 
+>   It worked perfectly when I did this:
 > 
-> I had traced kernel_sendmsg() and the functions it is calling, but I
-> couldn't find any of them returning -ENOSPC. Also, I couldn't find any
-> other callers of kernel_sendmsg() checking for -ENOSPC.
+> % sudo -i
+> # echo 0x30030 > /proc/fs/cifs/SecurityFlags
+> # mount -t cifs //myoldtiredserver/lott /mnt
 > 
-> >> returned then the obvious thing was to block briefly and retry.
-> >>
-> >> Does it do any harm?
+> I'm still getting used to using echo for communicating with a kernel 
+> module but that's just gonna take time :)
 > 
-> When I tried to analyze what might cause the error reported here
->   http://thread.gmane.org/gmane.linux.kernel/1367198/focus=1367498
-> 
-> I bumped into this code. I had a few questions that I couldn't answer like
-> 
-> a) When does kernel_sendmsg return -ENOSPC?
-> b) Even if we assume it returns -ENOSPC, does it really make sense to retry?
-> c) Does the error condition that lead to -ENOSPC rectify by the time we
-> retry?
-> d) Why do we need to reset -ENOSPC to -EAGAIN before returning the error?
-> 
-> If we can answer these questions reasonably, we may not need this patch.
-> 
-> > 
-> > Can you explain the situation that caused it to return -ENOSPC in the
-> > first place? Why that and not -EAGAIN? Or -ENOBUFS?
-> 
-> I too thought -ENOBUFS might represent the condition better.
+> On 10/01/2012 09:48 PM, Jeff Layton wrote:
+> > The sudo in the above command just covers the echo command. The shell
+> > redirection (and hence the write to SecurityFlags) is done as the
+> > original user, which is why you're getting EACCES. You probably want
+> > to do something like this to ensure that the shell redirection is done
+> > as root as well:
+> >
+> >      $ sudo sh -c "echo 0x30030 > /proc/fs/cifs/SecurityFlags"
+> >
 > 
 
-To lend further weight to the argument too. The sendmsg(2) manpage
-doesn't list -ENOSPC as an error return.
+No problem, shell redirection is tricky and not always obvious...
 
-kernel_sendmsg() is basically the kernelspace wrapper around the same
-set of functions that the sendmsg() system call uses. If it's not a
-valid error return for sendmsg() then it almost certainly isn't one for
-kernel_sendmsg() either.
+If someone asked me to invent the most unintuitive, obfuscated
+interface possible for setting up cifs.ko authentication, I'd be
+hard-pressed to improve on SecurityFlags. Personally, I'd like to see
+that go the way of the dodo.
 
-The harm in these situations is further obfuscation of some code that
-is already far too complicated, and the potential for papering over
-real bugs. If kernel_sendmsg returns ENOSPC, then that's likely a bug
-and is something we should deal with accordingly instead of blindly
-retrying.
-
-If you're concerned about it however, one possibility might be to add a
-WARN_ON_ONCE that fires on an ENOSPC error for a few releases.
+We ought to have a sane, fixed heuristic that decides what
+authentication to use based on the NEGOTIATE_PROTOCOL exchange with the
+server. Then, we could just allow people to override that by setting a
+sec= mount option.
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
