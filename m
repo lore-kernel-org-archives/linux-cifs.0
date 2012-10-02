@@ -1,81 +1,61 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [RFC] [PATCH] cifs: retry kernel_sendmsg only in case of -EAGAIN
-Date: Mon, 1 Oct 2012 20:46:01 -0500
-Message-ID: <CAH2r5msunor+xKU5tjgyuD+y3Qfist8kAHze7DwcC0SkAOe5tg@mail.gmail.com>
-References: <506948FD.3090602@suse.com>
-	<20121001214017.60f41311@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Ubuntu SecurityFlags at boot
+Date: Mon, 1 Oct 2012 21:48:48 -0400
+Message-ID: <20121001214848.45781bb3@corrin.poochiereds.net>
+References: <506A17EB.2050908@appcomsci.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Lott, Christopher M" <clott-as7a0GIpyE2tG0bUXCXiUA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121001214017.60f41311-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <506A17EB.2050908-as7a0GIpyE2tG0bUXCXiUA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-How can we be certain that ENOSPC is no longer returned? When it was
-returned then the obvious thing was to block briefly and retry.
+On Mon, 01 Oct 2012 18:23:39 -0400
+"Lott, Christopher M" <clott-as7a0GIpyE2tG0bUXCXiUA@public.gmane.org> wrote:
 
-Does it do any harm?
+> I hope it's not too late to reply to this thread from August 2012, and 
+> that someone can please find time to explain to me how to set security 
+> flags for CIFS.
+> 
+> In a nutshell I'm trying to connect a freshly installed ubuntu 12.04 
+> desktop as a client to get files from an old samba server that demands 
+> passwords as plaintext.  No printing, nothing fancy, just file service.
+> 
+> Is there still a feature in Ubuntu 12.04 to allow this, possibly by 
+> manipulating these security flags?
+> 
+> I'm basically doing just this:
+> 
+> sudo mount -t cifs //myoldtiredserver/lott /mnt
+> 
+> And watching /var/log/kern.log I see this:
+> 
+> Oct  1 18:14:57 cltp kernel: [ 3397.554888] CIFS VFS: Server requests 
+> plain text password but client support disabled
+> Oct  1 18:14:57 cltp kernel: [ 3397.616357] CIFS VFS: cifs_mount failed 
+> w/return code = -13
+> 
+> All attempts to echo a value to a magic file in /proc/fs/cifs such as 
+> the one shown below are met with permission denied, even with sudo:
+> 
+> $ sudo echo 0x30030 > /proc/fs/cifs/SecurityFlags
+> bash: /proc/fs/cifs/SecurityFlags: Permission denied
+> 
+> Please let me know if I'm not asking sensible questions.  :/  Thanks in 
+> advance for any help!
+> 
+> 
 
-On Mon, Oct 1, 2012 at 8:40 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Mon, 01 Oct 2012 13:10:45 +0530
-> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
->
->> In smb_sendv(), we seem to retry if kernel_sendmsg() returned either
->> -ENOSPC or -EAGAIN. In either case after multiple attempts, we set the
->> error to -EAGAIN before breaking out of the loop.
->>
->> First, it is not clear to me when kernel_sendmsg() can return -ENOSPC,
->> and what it would mean and why should we retry. It makes me wonder
->> whether this check is part of some old code. Also, there seem to be no
->> need to set the error back to -EAGAIN before we break out the loop.
->> Fix this by making cifs retry only if kernel_sendmsg() returns -EAGAIN.
->>
->> If the above discussion make sense, here is a patch to fix this.
->> ---
->>
->> Retry kernel_sendmsg() only in case of -EAGAIN and remove redundant
->> error assignment.
->>
->>
->> Signed-off-by: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
->> ---
->> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
->> index d9b639b..a33db4c 100644
->> --- a/fs/cifs/transport.c
->> +++ b/fs/cifs/transport.c
->> @@ -154,7 +154,7 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
->>       while (total_len) {
->>               rc = kernel_sendmsg(ssocket, &smb_msg, &iov[first_vec],
->>                                   n_vec - first_vec, total_len);
->> -             if ((rc == -ENOSPC) || (rc == -EAGAIN)) {
->> +             if (rc == -EAGAIN) {
->>                       i++;
->>                       /*
->>                        * If blocking send we try 3 times, since each can block
->> @@ -177,7 +177,6 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
->>                       if ((i >= 14) || (!server->noblocksnd && (i > 2))) {
->>                               cERROR(1, "sends on sock %p stuck for 15 seconds",
->>                                   ssocket);
->> -                             rc = -EAGAIN;
->>                               break;
->>                       }
->>                       msleep(1 << i);
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-> That ENOSPC has been there a long time, and I think you're correct that
-> it's of questionable value.
->
-> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+The sudo in the above command just covers the echo command. The shell
+redirection (and hence the write to SecurityFlags) is done as the
+original user, which is why you're getting EACCES. You probably want
+to do something like this to ensure that the shell redirection is done
+as root as well:
 
-
+    $ sudo sh -c "echo 0x30030 > /proc/fs/cifs/SecurityFlags"
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
