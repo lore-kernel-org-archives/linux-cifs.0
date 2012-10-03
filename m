@@ -1,55 +1,53 @@
-From: Jeremy Allison <jra@samba.org>
-Subject: Re: SMB3 Session Setup
-Date: Tue, 2 Oct 2012 21:49:28 -0700
-Message-ID: <20121003044928.GD14358@jeremy-HP>
-References: <CAH2r5msryv+HwGes5wy-3wugDGv+FbUk01M3HDHziVfgzCZ=DA@mail.gmail.com>
-Reply-To: Jeremy Allison <jra@samba.org>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: [PATCH] cifs: WARN_ON_ONCE if kernel_sendmsg() returns -ENOSPC
+Date: Wed, 03 Oct 2012 12:45:36 +0530
+Message-ID: <506BE618.7050606@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-To: Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msryv+HwGes5wy-3wugDGv+FbUk01M3HDHziVfgzCZ=DA@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Oct 02, 2012 at 11:39:46PM -0500, Steve French wrote:
-> I noticed some odd differences between Samba 4 (current master) and
-> Windows 8 in SMB3 session setup handling (both fail for different
-> reasons at the moment from the linux cifs client, while smb2.1 works).
-> 
-> negotiate protocol to both (Samba and Windows 8) look similar.  In
-> this case I am requesting only one dialect smb3
-> session setup phase 1 (raw ntlmssp) looks similar.
-> three cases for session setup phase two
-> 1) if bad password:  then I get STATUS_LOGON_FAILURE as expected
-> 2) if good password (which worked with smb2.1) then to Samba server I
-> get Samba sending back a signed response (success), even though I
-> didn't ask for signing
+kernel_sendmsg() is less likely to return -ENOSPC and it might be
+a bug to do so. However, in the past there might have been cases
+where a -ENOSPC was returned from a low level driver.
 
-I think you're running into:
+Add a WARN_ON_ONCE() to ensure that it is safe to assume that -ENOSPC
+is no longer returned. This -ENOSPC specific handling will be removed
+once we are sure it is no longer returned.
 
-[Bug 9222] New: smbd ignores the "server signing = no" setting for SMB2.
+Also, avoid setting -ENOSPC to -EAGAIN while at it.
 
-https://bugzilla.samba.org/show_bug.cgi?id=9222
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+---
+ fs/cifs/transport.c |    5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-which I just fixed in master. Re-checkout the git
-tree and try again.
-
-> 3) if good password (which worked with smb2.1) then to Windows 8
-> server I get Windows 8 sending back an error response
-> "STATUS_USER_SESSION_DELETED"
-> Any idea what that error means?
-
-Crypto stuff has changed (again :-) ?
-
-Jeremy.
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index d9b639b..afe000f 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -155,6 +155,10 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
+ 		rc = kernel_sendmsg(ssocket, &smb_msg, &iov[first_vec],
+ 				    n_vec - first_vec, total_len);
+ 		if ((rc == -ENOSPC) || (rc == -EAGAIN)) {
++			/*
++			 * Catch if a low level driver returns -ENOSPC.
++			 */
++			WARN_ON_ONCE(rc == -ENOSPC);
+ 			i++;
+ 			/*
+ 			 * If blocking send we try 3 times, since each can block
+@@ -177,7 +181,6 @@ smb_sendv(struct TCP_Server_Info *server, struct kvec *iov, int n_vec)
+ 			if ((i >= 14) || (!server->noblocksnd && (i > 2))) {
+ 				cERROR(1, "sends on sock %p stuck for 15 seconds",
+ 				    ssocket);
+-				rc = -EAGAIN;
+ 				break;
+ 			}
+ 			msleep(1 << i);
