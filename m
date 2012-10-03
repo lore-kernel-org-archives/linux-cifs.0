@@ -1,81 +1,65 @@
-From: "Stefan (metze) Metzmacher" <metze@samba.org>
-Subject: Re: SMB3 Session Setup
-Date: Wed, 03 Oct 2012 16:18:27 +0200
-Message-ID: <506C4933.3050003@samba.org>
-References: <CAH2r5msryv+HwGes5wy-3wugDGv+FbUk01M3HDHziVfgzCZ=DA@mail.gmail.com>
+From: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v2] Convert properly UTF-8 to UTF-16
+Date: Wed, 3 Oct 2012 15:34:44 +0100
+Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408DA@LONPMAILBOX01.citrite.net>
+References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16@LONPMAILBOX01.citrite.net>
+ <20120807064752.22e0da81@corrin.poochiereds.net>
+ <7CE799CC0E4DE04B88D5FDF226E18AC2E07634EB82@LONPMAILBOX01.citrite.net>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="------------enigA1CD65D2A07E678E770393F4"
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-To: Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <CAH2r5msryv+HwGes5wy-3wugDGv+FbUk01M3HDHziVfgzCZ=DA@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>,
+	"jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <7CE799CC0E4DE04B88D5FDF226E18AC2E07634EB82-aFusIB7tbcLeU4JHVX8hdHnr0TU713UqXqFh9Ls21Oc@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enigA1CD65D2A07E678E770393F4
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Hi Steve,
-
-> I noticed some odd differences between Samba 4 (current master) and
-> Windows 8 in SMB3 session setup handling (both fail for different
-> reasons at the moment from the linux cifs client, while smb2.1 works).
->=20
-> negotiate protocol to both (Samba and Windows 8) look similar.  In
-> this case I am requesting only one dialect smb3
-> session setup phase 1 (raw ntlmssp) looks similar.
-> three cases for session setup phase two
-> 1) if bad password:  then I get STATUS_LOGON_FAILURE as expected
-> 2) if good password (which worked with smb2.1) then to Samba server I
-> get Samba sending back a signed response (success), even though I
-> didn't ask for signing
-
-That is expected, the final session setup response is always signed,
-if the session is not anonymous.
-
-> 3) if good password (which worked with smb2.1) then to Windows 8
-> server I get Windows 8 sending back an error response
-> "STATUS_USER_SESSION_DELETED"
-> Any idea what that error means?
-
-I also got something like that, but I think only
-I tried to negotiate SMB 2.1 against a Windows 2012 server.
-(I think it's a bug in windows as it worked with Windows 2012 server RC).=
-
-And there's otherwise no difference.
-
-However a Win 7 client seems to work. It uses some more advanced NTLMSSP
-stuff, where even the final session setup response returns a blob.
-
-Please include captures...
-
-metze
-
-
---------------enigA1CD65D2A07E678E770393F4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://www.enigmail.net/
-
-iEYEARECAAYFAlBsSTcACgkQm70gjA5TCD/MHQCgoiknzH5m/yIFT0zeVIyz+0xW
-kyoAoMqljjmru2sSZ88jxnviQeWqDKHH
-=oSvI
------END PGP SIGNATURE-----
-
---------------enigA1CD65D2A07E678E770393F4--
+T24gVHVlLCAyMDEyLTA4LTA3IGF0IDA2OjQ3IC0wNDAwLCBKZWZmIExheXRvbiB3cm90ZToKPiBP
+biBUdWUsIDcgQXVnIDIwMTIgMTA6MzM6MDMgKzAxMDAKPiBGcmVkaWFubyBaaWdsaW8gPGZyZWRp
+YW5vLnppZ2xpb0BjaXRyaXguY29tPiB3cm90ZToKPiAKPiA+IAo+ID4gd2NoYXJfdCBpcyBjdXJy
+ZW50bHkgMTZiaXQgc28gY29udmVydGluZyBhIHV0ZjggZW5jb2RlZCBjaGFyYWN0ZXJzCm5vdAo+
+ID4gaW4gcGxhbmUgMCAoPj0gMHgxMDAwMCkgdG8gd2NoYXJfdCAodGhhdCBpcyBjYWxsaW5nIGNo
+YXIydW5pKSBsZWFkCnRvIGEKPiA+IC1FSU5WQUwgcmV0dXJuLiBUaGlzIHBhdGNoIGRldGVjdCB1
+dGY4IGluIGNpZnNfc3RydG9VVEYxNiBhbmQgYWRkCnNwZWNpYWwKPiA+IGNvZGUgY2FsbGluZyB1
+dGY4c190b191dGYxNnMuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IEZyZWRpYW5vIFppZ2xpbyA8
+ZnJlZGlhbm8uemlnbGlvQGNpdHJpeC5jb20+Cj4gPiAtLS0KPiA+ICBmcy9jaWZzL2NpZnNfdW5p
+Y29kZS5jIHwgICAyMiArKysrKysrKysrKysrKysrKysrKysrCj4gPiAgMSBmaWxlcyBjaGFuZ2Vk
+LCAyMiBpbnNlcnRpb25zKCspLCAwIGRlbGV0aW9ucygtKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEv
+ZnMvY2lmcy9jaWZzX3VuaWNvZGUuYyBiL2ZzL2NpZnMvY2lmc191bmljb2RlLmMKPiA+IGluZGV4
+IDdkYWI5YzAuLjExNjZiOTUgMTAwNjQ0Cj4gPiAtLS0gYS9mcy9jaWZzL2NpZnNfdW5pY29kZS5j
+Cj4gPiArKysgYi9mcy9jaWZzL2NpZnNfdW5pY29kZS5jCj4gPiBAQCAtMjAzLDYgKzIwMywyNyBA
+QCBjaWZzX3N0cnRvVVRGMTYoX19sZTE2ICp0bywgY29uc3QgY2hhciAqZnJvbSwKaW50IGxlbiwK
+PiA+ICAgICBpbnQgaTsKPiA+ICAgICB3Y2hhcl90IHdjaGFyX3RvOyAvKiBuZWVkZWQgdG8gcXVp
+ZXQgc3BhcnNlICovCj4gPiAgCj4gPiArICAgLyogc3BlY2lhbCBjYXNlIGZvciB1dGY4IHRvIGhh
+bmRsZSBubyBwbGFuZTAgY2hhcnMgKi8KPiA+ICsgICBpZiAoIXN0cmNtcChjb2RlcGFnZS0+Y2hh
+cnNldCwgInV0ZjgiKSkgewo+ID4gKyAgICAgICAgICAgLyoKPiA+ICsgICAgICAgICAgICAqIGNv
+bnZlcnQgdXRmOCAtPiB1dGYxNiwgd2UgYXNzdW1lIHdlIGhhdmUgZW5vdWdoIHNwYWNlCj4gPiAr
+ICAgICAgICAgICAgKiBhcyBjYWxsZXIgc2hvdWxkIGhhdmUgYXNzdW1lZCBjb252ZXJzaW9uIGRv
+ZXMgbm90Cm92ZXJmbG93Cj4gPiArICAgICAgICAgICAgKiBpbiBkZXN0aW5hdGlvbiBsZW4gaXMg
+bGVuZ3RoIGluIHdjaGFyX3QgdW5pdHMKKDE2Yml0cykKPiA+ICsgICAgICAgICAgICAqLwo+ID4g
+KyAgICAgICAgICAgaSAgPSB1dGY4c190b191dGYxNnMoZnJvbSwgbGVuLCBVVEYxNl9MSVRUTEVf
+RU5ESUFOLAo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAod2NoYXJfdCAq
+KSB0bywgbGVuKTsKPiA+ICsKPiA+ICsgICAgICAgICAgIC8qIGlmIHN1Y2Nlc3MgdGVybWluYXRl
+IGFuZCBleGl0ICovCj4gPiArICAgICAgICAgICBpZiAoaSA+PSAwKQo+ID4gKyAgICAgICAgICAg
+ICAgICAgICBnb3RvIHN1Y2Nlc3M7Cj4gPiArICAgICAgICAgICAvKgo+ID4gKyAgICAgICAgICAg
+ICogaWYgZmFpbHMgZmFsbCBiYWNrIHRvIFVDUyBlbmNvZGluZyBhcyB0aGlzCj4gPiArICAgICAg
+ICAgICAgKiBmdW5jdGlvbiBzaG91bGQgbm90IHJldHVybiBuZWdhdGl2ZSB2YWx1ZXMKPiA+ICsg
+ICAgICAgICAgICAqIGN1cnJlbnRseSBjYW4gZmFpbCBvbmx5IGlmIHNvdXJjZSBjb250YWlucwo+
+ID4gKyAgICAgICAgICAgICogaW52YWxpZCBlbmNvZGVkIGNoYXJhY3RlcnMKPiA+ICsgICAgICAg
+ICAgICAqLwo+ID4gKyAgIH0KPiA+ICsKPiA+ICAgICBmb3IgKGkgPSAwOyBsZW4gJiYgKmZyb207
+IGkrKywgZnJvbSArPSBjaGFybGVuLCBsZW4gLT0gY2hhcmxlbikKewo+ID4gICAgICAgICAgICAg
+Y2hhcmxlbiA9IGNvZGVwYWdlLT5jaGFyMnVuaShmcm9tLCBsZW4sICZ3Y2hhcl90byk7Cj4gPiAg
+ICAgICAgICAgICBpZiAoY2hhcmxlbiA8IDEpIHsKPiA+IEBAIC0yMTUsNiArMjM2LDcgQEAgY2lm
+c19zdHJ0b1VURjE2KF9fbGUxNiAqdG8sIGNvbnN0IGNoYXIgKmZyb20sCmludCBsZW4sCj4gPiAg
+ICAgICAgICAgICBwdXRfdW5hbGlnbmVkX2xlMTYod2NoYXJfdG8sICZ0b1tpXSk7Cj4gPiAgICAg
+fQo+ID4gIAo+ID4gK3N1Y2Nlc3M6Cj4gPiAgICAgcHV0X3VuYWxpZ25lZF9sZTE2KDAsICZ0b1tp
+XSk7Cj4gPiAgICAgcmV0dXJuIGk7Cj4gPiAgfQo+IAo+IExvb2tzIHJlYXNvbmFibGUuLi4KPiAK
+PiBBY2tlZC1ieTogSmVmZiBMYXl0b24gPGpsYXl0b25AcmVkaGF0LmNvbT4KClN0ZXZlLCBjb3Vs
+ZCB5b3UgY29uc2lkZXIgbXkgcGF0Y2ggZm9yIGluY2x1c2lvbiBpbnRvIExpbnV4PwoKVGhhbmtz
+LAogIEZyZWRpYW5vCgo=
