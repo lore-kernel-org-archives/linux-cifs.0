@@ -1,59 +1,64 @@
-From: "Stefan (metze) Metzmacher" <metze@samba.org>
-Subject: Re: Credits for session setup
-Date: Thu, 04 Oct 2012 23:24:24 +0200
-Message-ID: <506DFE88.9030705@samba.org>
-References: <CAH2r5mu0jFiXwvVZidJ_XTyXK=AvNVKZEby=pjmipi86VJndvw@mail.gmail.com>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: reinstate the forcegid option
+Date: Thu, 04 Oct 2012 13:20:19 +0100
+Message-ID: <1349353219.3691.1.camel@localhost>
+References: <1349294556-20656-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="------------enig789AF61268485879E2FC2AAC"
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical <samba-technical@lists.samba.org>
-To: Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <CAH2r5mu0jFiXwvVZidJ_XTyXK=AvNVKZEby=pjmipi86VJndvw@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, gregory.lee.bartholomew-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1349294556-20656-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig789AF61268485879E2FC2AAC
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Wed, 2012-10-03 at 16:02 -0400, Jeff Layton wrote:
+> Apparently this was lost when we converted to the standard option
+> parser.
+> 
+> Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Reported-by: Gregory Lee Bartholomew <gregory.lee.bartholomew-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-Hi Steve,
+Reviewed-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-> Samba server only grants one credit on SMB2 session setup (ntlmssp
-> phase one) - we need to change linux cifs client's "change conf"
-> routine to not disable oplocks and echo requests (we only exempt
-> negotiate protocol response returning one credit).
-
-How much credits are you requesting?
-
-Please provide captures...
-
-metze
-
-
---------------enig789AF61268485879E2FC2AAC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Using GnuPG with Mozilla - http://www.enigmail.net/
-
-iEYEARECAAYFAlBt/owACgkQm70gjA5TCD+aCQCgl4tliaGLUVyGBY5VEEZpdaR3
-5G0An33oq7WGNg+BNCH/lkQWS/ZLRScE
-=NycF
------END PGP SIGNATURE-----
-
---------------enig789AF61268485879E2FC2AAC--
+> ---
+>  fs/cifs/connect.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 2fdbe08..5c670b9 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -67,6 +67,7 @@ enum {
+>  	/* Mount options that take no arguments */
+>  	Opt_user_xattr, Opt_nouser_xattr,
+>  	Opt_forceuid, Opt_noforceuid,
+> +	Opt_forcegid, Opt_noforcegid,
+>  	Opt_noblocksend, Opt_noautotune,
+>  	Opt_hard, Opt_soft, Opt_perm, Opt_noperm,
+>  	Opt_mapchars, Opt_nomapchars, Opt_sfu,
+> @@ -117,6 +118,8 @@ static const match_table_t cifs_mount_option_tokens = {
+>  	{ Opt_nouser_xattr, "nouser_xattr" },
+>  	{ Opt_forceuid, "forceuid" },
+>  	{ Opt_noforceuid, "noforceuid" },
+> +	{ Opt_forcegid, "forcegid" },
+> +	{ Opt_noforcegid, "noforcegid" },
+>  	{ Opt_noblocksend, "noblocksend" },
+>  	{ Opt_noautotune, "noautotune" },
+>  	{ Opt_hard, "hard" },
+> @@ -1195,6 +1198,12 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>  		case Opt_noforceuid:
+>  			override_uid = 0;
+>  			break;
+> +		case Opt_forcegid:
+> +			override_gid = 1;
+> +			break;
+> +		case Opt_noforcegid:
+> +			override_gid = 0;
+> +			break;
+>  		case Opt_noblocksend:
+>  			vol->noblocksnd = 1;
+>  			break;
