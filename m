@@ -1,73 +1,77 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] mount.cifs: implement the "nofail" option
-Date: Mon,  8 Oct 2012 06:47:04 -0400
-Message-ID: <1349693224-17065-1-git-send-email-jlayton@samba.org>
-Cc: PTrenholme-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: Re: [PATCH v2] Convert properly UTF-8 to UTF-16
+Date: Mon, 8 Oct 2012 07:26:58 -0400
+Message-ID: <20121008072658.0df25c55@tlielax.poochiereds.net>
+References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16@LONPMAILBOX01.citrite.net>
+	<20120807064752.22e0da81@corrin.poochiereds.net>
+	<7CE799CC0E4DE04B88D5FDF226E18AC2E07634EB82@LONPMAILBOX01.citrite.net>
+	<7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408DA@LONPMAILBOX01.citrite.net>
+	<CAH2r5msLxJVTwVrD9vs8ZOjQdRpbVyhZus4V6Su-Y8-hT229Ug@mail.gmail.com>
+	<7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408E8@LONPMAILBOX01.citrite.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: "smfrench@gmail.com" <smfrench@gmail.com>,
+	"sfrench@samba.org" <sfrench@samba.org>,
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Frediano Ziglio <frediano.ziglio@citrix.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408E8@LONPMAILBOX01.citrite.net>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-The mount(8) manpage lists this as a fs-independent option:
+On Mon, 8 Oct 2012 09:18:06 +0100
+Frediano Ziglio <frediano.ziglio@citrix.com> wrote:
 
-    nofail: Do not report errors for this device if it does not exist.
+> On Wed, 2012-10-03 at 14:49 -0500, Steve French wrote:
+> > Merged - but doesn't the reverse also have to be added in cifs_from_utf16?  ie
+> > 
+> >           utf16s_to_utf8s(uni, ... );
+> > 
+> 
+> Not strictly necessary, at least to be able to mount shares.
+> 
 
-Implement that in mount.cifs by not returning an error if we were unable
-to find a suitable address for the mount attempt.
+It probably is necessary if you want to be able to do anything
+involving these filenames...
 
-Reported-by: Peter Trenholme <PTrenholme-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+> > I am glad that someone added these multiword handling routines into
+> > the kernel for FAT - this has been something we have wanted for a long
+> > time in cifs (and smb2/smb3).  Note the comment in
+> > fs/cifs/cifs_unicode.c
+> > 
+> > / * Note that some windows versions actually send multiword UTF-16 characters
+> >  * instead of straight UTF16-2. The linux nls routines however aren't able to
+> >  * deal with those characters properly. In the event that we get some of
+> >  * those characters, they won't be translated properly.
+> >  */
+> > int
+> > cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
+> >                  const struct nls_table *codepage, bool mapchar)
+> > 
+> 
+> Should not be UCS-2 instead of UTF16-2 ??
+> 
+> > 
+> > We could really use some nls test cases for cifs/smb2/smb3/nfs4 which
+> > basically did various file, directory, symlink create/rename/delete
+> > operations with various hard to map characters so we can test copying
+> > to and from the server and ensure that we get the name mappings right
+> > for these (and don't ever regress).   Fortunately smb2/smb3 is only
+> > unicode so we don't have to deal with mappings to other codepages from
+> > utf8
+> > 
+> 
+> Do you have some framework/hook to put these tests ?
+> 
+> Where did you merge ? I cannot find nothing at
+> http://gitweb.samba.org/?p=sfrench/cifs-2.6.git;a=summary
+> 
+> Regards
+>   Frediano
+> 
 
-diff --git a/mount.cifs.c b/mount.cifs.c
-index 7ee859b..756fce2 100644
---- a/mount.cifs.c
-+++ b/mount.cifs.c
-@@ -159,6 +159,7 @@
- #define OPT_CRUID      29
- #define OPT_BKUPUID    30
- #define OPT_BKUPGID    31
-+#define OPT_NOFAIL     32
- 
- #define MNT_TMP_FILE "/.mtab.cifs.XXXXXX"
- 
-@@ -178,6 +179,7 @@ struct parsed_mount_info {
- 	unsigned int fakemnt:1;
- 	unsigned int nomtab:1;
- 	unsigned int verboseflag:1;
-+	unsigned int nofail:1;
- };
- 
- const char *thisprogram;
-@@ -805,6 +807,8 @@ static int parse_opt_token(const char *token)
- 		return OPT_BKUPUID;
- 	if (strncmp(token, "backupgid", 9) == 0)
- 		return OPT_BKUPGID;
-+	if (strncmp(token, "nofail", 6) == 0)
-+		return OPT_NOFAIL;
- 
- 	return OPT_ERROR;
- }
-@@ -1177,6 +1181,9 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
- 
- 			bkupgid = gr->gr_gid;
- 			goto nocopy;
-+		case OPT_NOFAIL:
-+			parsed_info->nofail = 1;
-+			goto nocopy;
- 		}
- 
- 		/* check size before copying option to buffer */
-@@ -2119,7 +2126,7 @@ int main(int argc, char **argv)
- mount_retry:
- 	if (!currentaddress) {
- 		fprintf(stderr, "Unable to find suitable address.\n");
--		rc = EX_FAIL;
-+		rc = parsed_info->nofail ? 0 : EX_FAIL;
- 		goto mount_exit;
- 	}
- 	strlcpy(options, "ip=", options_size);
 -- 
-1.7.11.4
+Jeff Layton <jlayton@redhat.com>
