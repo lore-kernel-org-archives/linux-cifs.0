@@ -1,101 +1,37 @@
-From: Frediano Ziglio <frediano.ziglio@citrix.com>
-Subject: Re: [PATCH v2] Convert properly UTF-8 to UTF-16
-Date: Mon, 8 Oct 2012 09:18:06 +0100
-Message-ID: <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408E8@LONPMAILBOX01.citrite.net>
-References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16@LONPMAILBOX01.citrite.net>
- <20120807064752.22e0da81@corrin.poochiereds.net>
- <7CE799CC0E4DE04B88D5FDF226E18AC2E07634EB82@LONPMAILBOX01.citrite.net>
- <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408DA@LONPMAILBOX01.citrite.net>
- <CAH2r5msLxJVTwVrD9vs8ZOjQdRpbVyhZus4V6Su-Y8-hT229Ug@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] manpage: clarify the user of the username= option
+Date: Mon, 8 Oct 2012 06:09:53 -0400
+Message-ID: <20121008060953.68bb4fc8@tlielax.poochiereds.net>
+References: <1348570366-17466-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: Frediano Ziglio <frediano.ziglio@citrix.com>,
-	"sfrench@samba.org" <sfrench@samba.org>,
-	"jlayton@redhat.com" <jlayton@redhat.com>,
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-To: "smfrench@gmail.com" <smfrench@gmail.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAH2r5msLxJVTwVrD9vs8ZOjQdRpbVyhZus4V6Su-Y8-hT229Ug@mail.gmail.com>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1348570366-17466-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-T24gV2VkLCAyMDEyLTEwLTAzIGF0IDE0OjQ5IC0wNTAwLCBTdGV2ZSBGcmVuY2ggd3JvdGU6Cj4g
-TWVyZ2VkIC0gYnV0IGRvZXNuJ3QgdGhlIHJldmVyc2UgYWxzbyBoYXZlIHRvIGJlIGFkZGVkIGlu
-IGNpZnNfZnJvbV91dGYxNj8gIGllCj4gCj4gICAgICAgICAgIHV0ZjE2c190b191dGY4cyh1bmks
-IC4uLiApOwo+IAoKTm90IHN0cmljdGx5IG5lY2Vzc2FyeSwgYXQgbGVhc3QgdG8gYmUgYWJsZSB0
-byBtb3VudCBzaGFyZXMuCgo+IEkgYW0gZ2xhZCB0aGF0IHNvbWVvbmUgYWRkZWQgdGhlc2UgbXVs
-dGl3b3JkIGhhbmRsaW5nIHJvdXRpbmVzIGludG8KPiB0aGUga2VybmVsIGZvciBGQVQgLSB0aGlz
-IGhhcyBiZWVuIHNvbWV0aGluZyB3ZSBoYXZlIHdhbnRlZCBmb3IgYSBsb25nCj4gdGltZSBpbiBj
-aWZzIChhbmQgc21iMi9zbWIzKS4gIE5vdGUgdGhlIGNvbW1lbnQgaW4KPiBmcy9jaWZzL2NpZnNf
-dW5pY29kZS5jCj4gCj4gLyAqIE5vdGUgdGhhdCBzb21lIHdpbmRvd3MgdmVyc2lvbnMgYWN0dWFs
-bHkgc2VuZCBtdWx0aXdvcmQgVVRGLTE2IGNoYXJhY3RlcnMKPiAgKiBpbnN0ZWFkIG9mIHN0cmFp
-Z2h0IFVURjE2LTIuIFRoZSBsaW51eCBubHMgcm91dGluZXMgaG93ZXZlciBhcmVuJ3QgYWJsZSB0
-bwo+ICAqIGRlYWwgd2l0aCB0aG9zZSBjaGFyYWN0ZXJzIHByb3Blcmx5LiBJbiB0aGUgZXZlbnQg
-dGhhdCB3ZSBnZXQgc29tZSBvZgo+ICAqIHRob3NlIGNoYXJhY3RlcnMsIHRoZXkgd29uJ3QgYmUg
-dHJhbnNsYXRlZCBwcm9wZXJseS4KPiAgKi8KPiBpbnQKPiBjaWZzX2Zyb21fdXRmMTYoY2hhciAq
-dG8sIGNvbnN0IF9fbGUxNiAqZnJvbSwgaW50IHRvbGVuLCBpbnQgZnJvbWxlbiwKPiAgICAgICAg
-ICAgICAgICAgIGNvbnN0IHN0cnVjdCBubHNfdGFibGUgKmNvZGVwYWdlLCBib29sIG1hcGNoYXIp
-Cj4gCgpTaG91bGQgbm90IGJlIFVDUy0yIGluc3RlYWQgb2YgVVRGMTYtMiA/PwoKPiAKPiBXZSBj
-b3VsZCByZWFsbHkgdXNlIHNvbWUgbmxzIHRlc3QgY2FzZXMgZm9yIGNpZnMvc21iMi9zbWIzL25m
-czQgd2hpY2gKPiBiYXNpY2FsbHkgZGlkIHZhcmlvdXMgZmlsZSwgZGlyZWN0b3J5LCBzeW1saW5r
-IGNyZWF0ZS9yZW5hbWUvZGVsZXRlCj4gb3BlcmF0aW9ucyB3aXRoIHZhcmlvdXMgaGFyZCB0byBt
-YXAgY2hhcmFjdGVycyBzbyB3ZSBjYW4gdGVzdCBjb3B5aW5nCj4gdG8gYW5kIGZyb20gdGhlIHNl
-cnZlciBhbmQgZW5zdXJlIHRoYXQgd2UgZ2V0IHRoZSBuYW1lIG1hcHBpbmdzIHJpZ2h0Cj4gZm9y
-IHRoZXNlIChhbmQgZG9uJ3QgZXZlciByZWdyZXNzKS4gICBGb3J0dW5hdGVseSBzbWIyL3NtYjMg
-aXMgb25seQo+IHVuaWNvZGUgc28gd2UgZG9uJ3QgaGF2ZSB0byBkZWFsIHdpdGggbWFwcGluZ3Mg
-dG8gb3RoZXIgY29kZXBhZ2VzIGZyb20KPiB1dGY4Cj4gCgpEbyB5b3UgaGF2ZSBzb21lIGZyYW1l
-d29yay9ob29rIHRvIHB1dCB0aGVzZSB0ZXN0cyA/CgpXaGVyZSBkaWQgeW91IG1lcmdlID8gSSBj
-YW5ub3QgZmluZCBub3RoaW5nIGF0Cmh0dHA6Ly9naXR3ZWIuc2FtYmEub3JnLz9wPXNmcmVuY2gv
-Y2lmcy0yLjYuZ2l0O2E9c3VtbWFyeQoKUmVnYXJkcwogIEZyZWRpYW5vCgoKPiBPbiBXZWQsIE9j
-dCAzLCAyMDEyIGF0IDk6MzQgQU0sIEZyZWRpYW5vIFppZ2xpbwo+IDxmcmVkaWFuby56aWdsaW9A
-Y2l0cml4LmNvbT4gd3JvdGU6Cj4gPiBPbiBUdWUsIDIwMTItMDgtMDcgYXQgMDY6NDcgLTA0MDAs
-IEplZmYgTGF5dG9uIHdyb3RlOgo+ID4+IE9uIFR1ZSwgNyBBdWcgMjAxMiAxMDozMzowMyArMDEw
-MAo+ID4+IEZyZWRpYW5vIFppZ2xpbyA8ZnJlZGlhbm8uemlnbGlvQGNpdHJpeC5jb20+IHdyb3Rl
-Ogo+ID4+Cj4gPj4gPgo+ID4+ID4gd2NoYXJfdCBpcyBjdXJyZW50bHkgMTZiaXQgc28gY29udmVy
-dGluZyBhIHV0ZjggZW5jb2RlZCBjaGFyYWN0ZXJzCj4gPiBub3QKPiA+PiA+IGluIHBsYW5lIDAg
-KD49IDB4MTAwMDApIHRvIHdjaGFyX3QgKHRoYXQgaXMgY2FsbGluZyBjaGFyMnVuaSkgbGVhZAo+
-ID4gdG8gYQo+ID4+ID4gLUVJTlZBTCByZXR1cm4uIFRoaXMgcGF0Y2ggZGV0ZWN0IHV0ZjggaW4g
-Y2lmc19zdHJ0b1VURjE2IGFuZCBhZGQKPiA+IHNwZWNpYWwKPiA+PiA+IGNvZGUgY2FsbGluZyB1
-dGY4c190b191dGYxNnMuCj4gPj4gPgo+ID4+ID4gU2lnbmVkLW9mZi1ieTogRnJlZGlhbm8gWmln
-bGlvIDxmcmVkaWFuby56aWdsaW9AY2l0cml4LmNvbT4KPiA+PiA+IC0tLQo+ID4+ID4gIGZzL2Np
-ZnMvY2lmc191bmljb2RlLmMgfCAgIDIyICsrKysrKysrKysrKysrKysrKysrKysKPiA+PiA+ICAx
-IGZpbGVzIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pCj4gPj4gPgo+
-ID4+ID4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc191bmljb2RlLmMgYi9mcy9jaWZzL2NpZnNf
-dW5pY29kZS5jCj4gPj4gPiBpbmRleCA3ZGFiOWMwLi4xMTY2Yjk1IDEwMDY0NAo+ID4+ID4gLS0t
-IGEvZnMvY2lmcy9jaWZzX3VuaWNvZGUuYwo+ID4+ID4gKysrIGIvZnMvY2lmcy9jaWZzX3VuaWNv
-ZGUuYwo+ID4+ID4gQEAgLTIwMyw2ICsyMDMsMjcgQEAgY2lmc19zdHJ0b1VURjE2KF9fbGUxNiAq
-dG8sIGNvbnN0IGNoYXIgKmZyb20sCj4gPiBpbnQgbGVuLAo+ID4+ID4gICAgIGludCBpOwo+ID4+
-ID4gICAgIHdjaGFyX3Qgd2NoYXJfdG87IC8qIG5lZWRlZCB0byBxdWlldCBzcGFyc2UgKi8KPiA+
-PiA+Cj4gPj4gPiArICAgLyogc3BlY2lhbCBjYXNlIGZvciB1dGY4IHRvIGhhbmRsZSBubyBwbGFu
-ZTAgY2hhcnMgKi8KPiA+PiA+ICsgICBpZiAoIXN0cmNtcChjb2RlcGFnZS0+Y2hhcnNldCwgInV0
-ZjgiKSkgewo+ID4+ID4gKyAgICAgICAgICAgLyoKPiA+PiA+ICsgICAgICAgICAgICAqIGNvbnZl
-cnQgdXRmOCAtPiB1dGYxNiwgd2UgYXNzdW1lIHdlIGhhdmUgZW5vdWdoIHNwYWNlCj4gPj4gPiAr
-ICAgICAgICAgICAgKiBhcyBjYWxsZXIgc2hvdWxkIGhhdmUgYXNzdW1lZCBjb252ZXJzaW9uIGRv
-ZXMgbm90Cj4gPiBvdmVyZmxvdwo+ID4+ID4gKyAgICAgICAgICAgICogaW4gZGVzdGluYXRpb24g
-bGVuIGlzIGxlbmd0aCBpbiB3Y2hhcl90IHVuaXRzCj4gPiAoMTZiaXRzKQo+ID4+ID4gKyAgICAg
-ICAgICAgICovCj4gPj4gPiArICAgICAgICAgICBpICA9IHV0ZjhzX3RvX3V0ZjE2cyhmcm9tLCBs
-ZW4sIFVURjE2X0xJVFRMRV9FTkRJQU4sCj4gPj4gPiArICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICh3Y2hhcl90ICopIHRvLCBsZW4pOwo+ID4+ID4gKwo+ID4+ID4gKyAgICAgICAg
-ICAgLyogaWYgc3VjY2VzcyB0ZXJtaW5hdGUgYW5kIGV4aXQgKi8KPiA+PiA+ICsgICAgICAgICAg
-IGlmIChpID49IDApCj4gPj4gPiArICAgICAgICAgICAgICAgICAgIGdvdG8gc3VjY2VzczsKPiA+
-PiA+ICsgICAgICAgICAgIC8qCj4gPj4gPiArICAgICAgICAgICAgKiBpZiBmYWlscyBmYWxsIGJh
-Y2sgdG8gVUNTIGVuY29kaW5nIGFzIHRoaXMKPiA+PiA+ICsgICAgICAgICAgICAqIGZ1bmN0aW9u
-IHNob3VsZCBub3QgcmV0dXJuIG5lZ2F0aXZlIHZhbHVlcwo+ID4+ID4gKyAgICAgICAgICAgICog
-Y3VycmVudGx5IGNhbiBmYWlsIG9ubHkgaWYgc291cmNlIGNvbnRhaW5zCj4gPj4gPiArICAgICAg
-ICAgICAgKiBpbnZhbGlkIGVuY29kZWQgY2hhcmFjdGVycwo+ID4+ID4gKyAgICAgICAgICAgICov
-Cj4gPj4gPiArICAgfQo+ID4+ID4gKwo+ID4+ID4gICAgIGZvciAoaSA9IDA7IGxlbiAmJiAqZnJv
-bTsgaSsrLCBmcm9tICs9IGNoYXJsZW4sIGxlbiAtPSBjaGFybGVuKQo+ID4gewo+ID4+ID4gICAg
-ICAgICAgICAgY2hhcmxlbiA9IGNvZGVwYWdlLT5jaGFyMnVuaShmcm9tLCBsZW4sICZ3Y2hhcl90
-byk7Cj4gPj4gPiAgICAgICAgICAgICBpZiAoY2hhcmxlbiA8IDEpIHsKPiA+PiA+IEBAIC0yMTUs
-NiArMjM2LDcgQEAgY2lmc19zdHJ0b1VURjE2KF9fbGUxNiAqdG8sIGNvbnN0IGNoYXIgKmZyb20s
-Cj4gPiBpbnQgbGVuLAo+ID4+ID4gICAgICAgICAgICAgcHV0X3VuYWxpZ25lZF9sZTE2KHdjaGFy
-X3RvLCAmdG9baV0pOwo+ID4+ID4gICAgIH0KPiA+PiA+Cj4gPj4gPiArc3VjY2VzczoKPiA+PiA+
-ICAgICBwdXRfdW5hbGlnbmVkX2xlMTYoMCwgJnRvW2ldKTsKPiA+PiA+ICAgICByZXR1cm4gaTsK
-PiA+PiA+ICB9Cj4gPj4KPiA+PiBMb29rcyByZWFzb25hYmxlLi4uCj4gPj4KPiA+PiBBY2tlZC1i
-eTogSmVmZiBMYXl0b24gPGpsYXl0b25AcmVkaGF0LmNvbT4KPiA+Cj4gPiBTdGV2ZSwgY291bGQg
-eW91IGNvbnNpZGVyIG15IHBhdGNoIGZvciBpbmNsdXNpb24gaW50byBMaW51eD8KPiA+Cj4gPiBU
-aGFua3MsCj4gPiAgIEZyZWRpYW5vCj4gPgo+IAo+IAo+IAoK
+On Tue, 25 Sep 2012 06:52:46 -0400
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+
+> Specifying the username as "user=" can confuse some versions of /bin/mount,
+> and cause it to append noexec to the mount string. Also, remove the blurb
+> about how cifs.ko will accept abbreviations -- it's just bad practice.
+> 
+> A wonderful example of this confusion was reported by Stefan here:
+> 
+>     https://bugzilla.redhat.com/show_bug.cgi?id=860154
+> 
+> Reported-by: Stefan Walter <walteste-gy3b+zu4XSAfv37vnLkPlQ@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  mount.cifs.8 | 24 ++----------------------
+>  1 file changed, 2 insertions(+), 22 deletions(-)
+> 
+
+
+Merged...
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
