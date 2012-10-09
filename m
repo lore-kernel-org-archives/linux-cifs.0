@@ -1,69 +1,46 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Re: [PATCH v2] Convert properly UTF-8 to UTF-16
-Date: Tue, 09 Oct 2012 10:13:38 +0530
-Message-ID: <5073AB7A.3020103@suse.com>
-References: <7CE799CC0E4DE04B88D5FDF226E18AC2CDFFB08D16@LONPMAILBOX01.citrite.net> <20120807064752.22e0da81@corrin.poochiereds.net> <7CE799CC0E4DE04B88D5FDF226E18AC2E07634EB82@LONPMAILBOX01.citrite.net> <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408DA@LONPMAILBOX01.citrite.net> <CAH2r5msLxJVTwVrD9vs8ZOjQdRpbVyhZus4V6Su-Y8-hT229Ug@mail.gmail.com> <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408E8@LONPMAILBOX01.citrite.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Tue, 9 Oct 2012 10:21:44 -0500
+Message-ID: <CAH2r5mvY9SqZ0A7UQ5zmTL99v_YJfv2rxF+bd+D3XXR+foML_A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: "smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org" <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Frediano Ziglio <frediano.ziglio-Sxgqhf6Nn4DQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <7CE799CC0E4DE04B88D5FDF226E18AC2E08D0408E8-aFusIB7tbcLeU4JHVX8hdHnr0TU713UqXqFh9Ls21Oc@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 10/08/2012 01:48 PM, Frediano Ziglio wrote:
-> On Wed, 2012-10-03 at 14:49 -0500, Steve French wrote:
->> Merged - but doesn't the reverse also have to be added in cifs_from_utf16?  ie
->>
->>           utf16s_to_utf8s(uni, ... );
->>
-> 
-> Not strictly necessary, at least to be able to mount shares.
-> 
->> I am glad that someone added these multiword handling routines into
->> the kernel for FAT - this has been something we have wanted for a long
->> time in cifs (and smb2/smb3).  Note the comment in
->> fs/cifs/cifs_unicode.c
->>
->> / * Note that some windows versions actually send multiword UTF-16 characters
->>  * instead of straight UTF16-2. The linux nls routines however aren't able to
->>  * deal with those characters properly. In the event that we get some of
->>  * those characters, they won't be translated properly.
->>  */
->> int
->> cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
->>                  const struct nls_table *codepage, bool mapchar)
->>
-> 
-> Should not be UCS-2 instead of UTF16-2 ??
-> 
->>
->> We could really use some nls test cases for cifs/smb2/smb3/nfs4 which
->> basically did various file, directory, symlink create/rename/delete
->> operations with various hard to map characters so we can test copying
->> to and from the server and ensure that we get the name mappings right
->> for these (and don't ever regress).   Fortunately smb2/smb3 is only
->> unicode so we don't have to deal with mappings to other codepages from
->> utf8
->>
-> 
-> Do you have some framework/hook to put these tests ?
-> 
+The following changes since commit 612a9aab56a93533e76e3ad91642db7033e03b69:
 
-I recently wrote cifstests to primarily provide a basic infrastructure
-for adding regression tests for cifs. It's written in python and the
-plan to be able to use python or C bindings for python. You might
-consider adding tests to it.
+  Merge branch 'drm-next' of
+git://people.freedesktop.org/~airlied/linux (2012-10-03 23:29:23
+-0700)
 
-   https://github.com/sureshjayaram/cifstests
+are available in the git repository at:
 
 
-Thanks
-Suresh
+  git://git.samba.org/sfrench/cifs-2.6.git for-linus
+
+for you to fetch changes up to 72bd481f860f0125c810bb43d878ce5f9c060c58:
+
+  cifs: reinstate the forcegid option (2012-10-07 20:05:47 -0500)
+
+----------------------------------------------------------------
+Frediano Ziglio (1):
+      Convert properly UTF-8 to UTF-16
+
+Jeff Layton (1):
+      cifs: reinstate the forcegid option
+
+Steve French (1):
+      [CIFS] WARN_ON_ONCE if kernel_sendmsg() returns -ENOSPC
+
+ fs/cifs/cifs_unicode.c | 22 ++++++++++++++++++++++
+ fs/cifs/connect.c      |  9 +++++++++
+ fs/cifs/transport.c    |  6 ++++++
+ 3 files changed, 37 insertions(+)
+
+-- 
+Thanks,
+
+Steve
