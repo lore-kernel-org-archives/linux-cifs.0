@@ -1,125 +1,138 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: SMB2.02 dialect support
-Date: Wed, 10 Oct 2012 09:18:56 -0400
-Message-ID: <20121010091856.70cef338@tlielax.poochiereds.net>
-References: <CAH2r5mtTeck3n4PF3Wb5XgwzZSHEtYw1skMj1MTY=+VugH1umA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v3] cifs: Add support of Alternate Data Streams
+Date: Wed, 10 Oct 2012 10:11:46 -0500
+Message-ID: <1349881906-9791-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtTeck3n4PF3Wb5XgwzZSHEtYw1skMj1MTY=+VugH1umA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 9 Oct 2012 23:33:10 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> This patch enables optional (via Kconfig, specifying vers=2.0 on
-> mount) support for testing SMB2.02 dialect
-> 
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index 2075ddf..461e2f5 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -172,6 +172,21 @@ config CIFS_SMB2
-> 
->  	  Unless you are a developer or tester, say N.
-> 
-> +config CIFS_SMB20_DIALECT
-> +	  bool "Support for original SMB2.0 dialect (EXPERIMENTAL)"
-> +	  depends on CIFS && CIFS_SMB2
-> +
-> +	  help
-> +	    This enables experimental support for the original SMB2.02 dialect.
-> +	    This could be helpful for developers testing against the earliest
-> +            SMB2 capable servers such as Windows Vista, Samba Version 3.6
-> +	    and Windows 2008.  Without this selection enabled, only the
 
-		Might mention that that's win2k8r1 (or r0?). Damn MS
-		and their confusing marketing... ;)
+Add support of Alternate Data Streams (ads).
 
-		I agree with Pavel though that it would be best to just do
-		this without a new kconfig option, unless you have real
-		concerns that this support is badly broken.
+The generic access flags that cifs client currently employs are sufficient
+for alternate data streams as well (MS-CIFS 2.2.4.64.1).
 
-> +	    more recent SMB2.1 and SMB3 dialects are enabled.  Since SMB2.1
-> +	    and SMB3 dialects are better than the original SMB2 dialect for
-> +	    more recent servers (such as Windows 2008R2, Windows 7, and Samba 4),
-> +	    and earlier servers support the cifs protocol well, unless you are a
-> +	    developer or tester, say N.
-> +
->  config CIFS_FSCACHE
->  	  bool "Provide CIFS client caching support"
->  	  depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index f5af252..3763624 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -178,6 +178,7 @@ struct smb_rqst {
-> 
->  enum smb_version {
->  	Smb_1 = 1,
-> +	Smb_20,
->  	Smb_21,
->  	Smb_30,
->  };
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 5c670b9..8a17cf2 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -274,6 +274,7 @@ static const match_table_t cifs_cacheflavor_tokens = {
-> 
->  static const match_table_t cifs_smb_version_tokens = {
->  	{ Smb_1, SMB1_VERSION_STRING },
-> +	{ Smb_20, SMB20_VERSION_STRING},
->  	{ Smb_21, SMB21_VERSION_STRING },
->  	{ Smb_30, SMB30_VERSION_STRING },
->  };
-> @@ -1074,6 +1075,11 @@ cifs_parse_smb_version(char *value, struct smb_vol *vol)
->  		vol->vals = &smb1_values;
->  		break;
->  #ifdef CONFIG_CIFS_SMB2
-> +#ifdef CONFIG_CIFS_SMB20_DIALECT
-> +	case Smb_20:
-> +		vol->ops = &smb21_operations; /* currently identical with 2.1 */
-> +		vol->vals = &smb20_values;
-> +#endif /* CIFS_SMB20_DIALECT */
->  	case Smb_21:
->  		vol->ops = &smb21_operations;
->  		vol->vals = &smb21_values;
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 4d9dbe0..3dd47dc 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -643,6 +643,25 @@ struct smb_version_operations smb21_operations = {
->  	.new_lease_key = smb2_new_lease_key,
->  };
-> 
-> +#ifdef CONFIG_CIFS_SMB20_DIALECT
-> +struct smb_version_values smb20_values = {
-> +	.version_string = SMB20_VERSION_STRING,
-> +	.protocol_id = SMB20_PROT_ID,
-> +	.req_capabilities = 0, /* MBZ */
-> +	.large_lock_type = 0,
-> +	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE_LOCK,
-> +	.shared_lock_type = SMB2_LOCKFLAG_SHARED_LOCK,
-> +	.unlock_lock_type = SMB2_LOCKFLAG_UNLOCK,
-> +	.header_size = sizeof(struct smb2_hdr),
-> +	.max_header_size = MAX_SMB2_HDR_SIZE,
-> +	.read_rsp_size = sizeof(struct smb2_read_rsp) - 1,
-> +	.lock_cmd = SMB2_LOCK,
-> +	.cap_unix = 0,
-> +	.cap_nt_find = SMB2_NT_FIND,
-> +	.cap_large_files = SMB2_LARGE_FILES,
-> +};
-> +#endif /* CONFIG_CIFS_SMB2_DIALECT */
-> +
->  struct smb_version_values smb21_values = {
->  	.version_string = SMB21_VERSION_STRING,
->  	.protocol_id = SMB21_PROT_ID,
-> 
+The stream file and stream type are specified using : after the file name,
+so that is used to differentiate between a regular file and its
+alternate data streams and stream types.
+Since they all have the same file id, each path name,
+file name:stream name:stream type, has a separate inode with that same
+file id but a distinct private data (path name) in that inode to
+distinguish them.
 
+This scheme applies only to non-posix compliant servers such as Windows.
+
+One operation that does not work is Rename (0x7).
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |    1 +
+ fs/cifs/cifsglob.h |    2 ++
+ fs/cifs/inode.c    |   33 ++++++++++++++++++++++++++++++++-
+ 3 files changed, 35 insertions(+), 1 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index e7931cc..3068992 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -264,6 +264,7 @@ cifs_evict_inode(struct inode *inode)
+ {
+ 	truncate_inode_pages(&inode->i_data, 0);
+ 	clear_inode(inode);
++	kfree(inode->i_private);
+ 	cifs_fscache_release_inode_cookie(inode);
+ }
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f5af252..26d65c7 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1251,6 +1251,7 @@ struct dfs_info3_param {
+ #define CIFS_FATTR_DELETE_PENDING	0x2
+ #define CIFS_FATTR_NEED_REVAL		0x4
+ #define CIFS_FATTR_INO_COLLISION	0x8
++#define CIFS_FATTR_ALTDATASTR		0x10
+ 
+ struct cifs_fattr {
+ 	u32		cf_flags;
+@@ -1268,6 +1269,7 @@ struct cifs_fattr {
+ 	struct timespec	cf_atime;
+ 	struct timespec	cf_mtime;
+ 	struct timespec	cf_ctime;
++	char		*cf_private;
+ };
+ 
+ static inline void free_dfs_info_param(struct dfs_info3_param *param)
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index afdff79..93b010b 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -619,6 +619,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	struct cifs_fattr fattr;
+ 	struct cifs_search_info *srchinf = NULL;
+ 
++	fattr.cf_private = NULL;
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+@@ -746,14 +747,34 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	}
+ 
+ 	if (!*inode) {
++		if (strstr(full_path, ":")) {
++			fattr.cf_private = kstrdup(full_path, GFP_KERNEL);
++			if (!fattr.cf_private) {
++				rc = -ENOMEM;
++				goto cgii_exit;
++			}
++			fattr.cf_flags |= CIFS_FATTR_ALTDATASTR;
++		}
++
+ 		*inode = cifs_iget(sb, &fattr);
+-		if (!*inode)
++		if (*inode) {
++			if (strstr(full_path, ":") &&
++					!((*inode)->i_flags & S_PRIVATE)) {
++				(*inode)->i_private = kstrdup(fattr.cf_private,
++							GFP_KERNEL);
++				if ((*inode)->i_private)
++					(*inode)->i_flags |= S_PRIVATE;
++				else
++					rc = -ENOMEM;
++			}
++		} else
+ 			rc = -ENOMEM;
+ 	} else {
+ 		cifs_fattr_to_inode(*inode, &fattr);
+ 	}
+ 
+ cgii_exit:
++	kfree(fattr.cf_private);
+ 	kfree(buf);
+ 	cifs_put_tlink(tlink);
+ 	return rc;
+@@ -784,6 +805,16 @@ cifs_find_inode(struct inode *inode, void *opaque)
+ 	if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
+ 		fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
+ 
++	/* looking for an inode of a alternate data stream (full pathname) */
++	if (fattr->cf_flags & CIFS_FATTR_ALTDATASTR) {
++		if (!(inode->i_flags & S_PRIVATE)) {
++			return 0;
++		} else {
++			if (strcmp(inode->i_private, fattr->cf_private))
++				return 0;
++		}
++	}
++
+ 	return 1;
+ }
+ 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.6.0.2
