@@ -1,138 +1,55 @@
-From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-Subject: [PATCH v3] cifs: Add support of Alternate Data Streams
-Date: Wed, 10 Oct 2012 10:11:46 -0500
-Message-ID: <1349881906-9791-1-git-send-email-shirishpargaonkar@gmail.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: SMB2.02 dialect support
+Date: Wed, 10 Oct 2012 10:36:07 -0500
+Message-ID: <CAH2r5mu6fft1Bvb1BB1mBJN6U4R-HQZgphV--Nkd5ukOt32VXA@mail.gmail.com>
+References: <CAH2r5mtTeck3n4PF3Wb5XgwzZSHEtYw1skMj1MTY=+VugH1umA@mail.gmail.com>
+	<20121010091856.70cef338@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20121010091856.70cef338-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+On Wed, Oct 10, 2012 at 8:18 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Tue, 9 Oct 2012 23:33:10 -0500
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+>> This patch enables optional (via Kconfig, specifying vers=2.0 on
+>> mount) support for testing SMB2.02 dialect
+>>
+>> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+>> index 2075ddf..461e2f5 100644
+>> --- a/fs/cifs/Kconfig
+>> +++ b/fs/cifs/Kconfig
+>> @@ -172,6 +172,21 @@ config CIFS_SMB2
+>>
+>>         Unless you are a developer or tester, say N.
+>>
+>> +config CIFS_SMB20_DIALECT
+>> +       bool "Support for original SMB2.0 dialect (EXPERIMENTAL)"
+>> +       depends on CIFS && CIFS_SMB2
+>> +
+>> +       help
+>> +         This enables experimental support for the original SMB2.02 dialect.
+>> +         This could be helpful for developers testing against the earliest
+>> +            SMB2 capable servers such as Windows Vista, Samba Version 3.6
+>> +         and Windows 2008.  Without this selection enabled, only the
+>
+>                 Might mention that that's win2k8r1 (or r0?). Damn MS
+>                 and their confusing marketing... ;)
+>
+>                 I agree with Pavel though that it would be best to just do
+>                 this without a new kconfig option, unless you have real
+>                 concerns that this support is badly broken.
+
+OK.  Makes the patch easier.  They can pick the vers=2.0 vs. 2.1 in any case.
 
 
-Add support of Alternate Data Streams (ads).
 
-The generic access flags that cifs client currently employs are sufficient
-for alternate data streams as well (MS-CIFS 2.2.4.64.1).
-
-The stream file and stream type are specified using : after the file name,
-so that is used to differentiate between a regular file and its
-alternate data streams and stream types.
-Since they all have the same file id, each path name,
-file name:stream name:stream type, has a separate inode with that same
-file id but a distinct private data (path name) in that inode to
-distinguish them.
-
-This scheme applies only to non-posix compliant servers such as Windows.
-
-One operation that does not work is Rename (0x7).
-
-
-Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/cifs/cifsfs.c   |    1 +
- fs/cifs/cifsglob.h |    2 ++
- fs/cifs/inode.c    |   33 ++++++++++++++++++++++++++++++++-
- 3 files changed, 35 insertions(+), 1 deletions(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index e7931cc..3068992 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -264,6 +264,7 @@ cifs_evict_inode(struct inode *inode)
- {
- 	truncate_inode_pages(&inode->i_data, 0);
- 	clear_inode(inode);
-+	kfree(inode->i_private);
- 	cifs_fscache_release_inode_cookie(inode);
- }
- 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f5af252..26d65c7 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1251,6 +1251,7 @@ struct dfs_info3_param {
- #define CIFS_FATTR_DELETE_PENDING	0x2
- #define CIFS_FATTR_NEED_REVAL		0x4
- #define CIFS_FATTR_INO_COLLISION	0x8
-+#define CIFS_FATTR_ALTDATASTR		0x10
- 
- struct cifs_fattr {
- 	u32		cf_flags;
-@@ -1268,6 +1269,7 @@ struct cifs_fattr {
- 	struct timespec	cf_atime;
- 	struct timespec	cf_mtime;
- 	struct timespec	cf_ctime;
-+	char		*cf_private;
- };
- 
- static inline void free_dfs_info_param(struct dfs_info3_param *param)
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index afdff79..93b010b 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -619,6 +619,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
- 	struct cifs_fattr fattr;
- 	struct cifs_search_info *srchinf = NULL;
- 
-+	fattr.cf_private = NULL;
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
-@@ -746,14 +747,34 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
- 	}
- 
- 	if (!*inode) {
-+		if (strstr(full_path, ":")) {
-+			fattr.cf_private = kstrdup(full_path, GFP_KERNEL);
-+			if (!fattr.cf_private) {
-+				rc = -ENOMEM;
-+				goto cgii_exit;
-+			}
-+			fattr.cf_flags |= CIFS_FATTR_ALTDATASTR;
-+		}
-+
- 		*inode = cifs_iget(sb, &fattr);
--		if (!*inode)
-+		if (*inode) {
-+			if (strstr(full_path, ":") &&
-+					!((*inode)->i_flags & S_PRIVATE)) {
-+				(*inode)->i_private = kstrdup(fattr.cf_private,
-+							GFP_KERNEL);
-+				if ((*inode)->i_private)
-+					(*inode)->i_flags |= S_PRIVATE;
-+				else
-+					rc = -ENOMEM;
-+			}
-+		} else
- 			rc = -ENOMEM;
- 	} else {
- 		cifs_fattr_to_inode(*inode, &fattr);
- 	}
- 
- cgii_exit:
-+	kfree(fattr.cf_private);
- 	kfree(buf);
- 	cifs_put_tlink(tlink);
- 	return rc;
-@@ -784,6 +805,16 @@ cifs_find_inode(struct inode *inode, void *opaque)
- 	if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
- 		fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
- 
-+	/* looking for an inode of a alternate data stream (full pathname) */
-+	if (fattr->cf_flags & CIFS_FATTR_ALTDATASTR) {
-+		if (!(inode->i_flags & S_PRIVATE)) {
-+			return 0;
-+		} else {
-+			if (strcmp(inode->i_private, fattr->cf_private))
-+				return 0;
-+		}
-+	}
-+
- 	return 1;
- }
- 
 -- 
-1.6.0.2
+Thanks,
+
+Steve
