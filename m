@@ -1,7 +1,7 @@
 From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH v3] cifs: Add support of Alternate Data Streams
-Date: Wed, 10 Oct 2012 14:19:08 -0500
-Message-ID: <CADT32eLtbDSr+k=n9AmfVrxFdTaq-bWZmHC3HmEhoLimfCN5qA@mail.gmail.com>
+Date: Wed, 10 Oct 2012 16:40:07 -0500
+Message-ID: <CADT32eLg_Mx2vrJw85=Lux3TF5kF4FaGa8VuGfLa5iH-Cp2g8A@mail.gmail.com>
 References: <1349881906-9791-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20121010121435.124d9ce5@corrin.poochiereds.net>
 	<CADT32eLA3+GpxLDJZq1MTAGLc2fRcQAo4=9G+FKw7HippkLc=w@mail.gmail.com>
@@ -110,12 +110,27 @@ On Wed, Oct 10, 2012 at 2:05 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 >                 search the string backward. It's possible that the
 >                 pathname might have multiple ':' characters in it.
 >
+
+I think strchr will work too.
+
 >> > >> +                     fattr.cf_private = kstrdup(full_path, GFP_KERNEL);
 >
 >                 Is it really necessary to copy the entire path? This is
 >                 a frequently traveled bit of code, and I think you
 >                 could save some cycles by just copying the alternate
 >                 data stream name.
+
+yes, that will work.
+
+I can also use strchr as follows
+
+altstr = strchr(full_path, ':');
+                if (altstr) {
+                        fattr.cf_private = kstrdup(altstr, GFP_KERNEL);
+
+and keep using altstr during rest of the code thus keeping
+invocation of string function to just one and using the returned value.
+
 >
 >> > >> +                     if (!fattr.cf_private) {
 >> > >> +                             rc = -ENOMEM;
@@ -171,10 +186,18 @@ On Wed, Oct 10, 2012 at 2:05 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 > data stream on a directory as well as a file. The resulting inode does
 > not seem to be treated as a directory, but what are the implications if
 > a particular server does?
+
+Not sure.  I have not found too many usage examples of an
+alternate data stream for a directory.  Will do some digging
+for info.
+
 >
 > Also, what's the interaction here with "mapchars" mount option? If
 > someone specifies that, what behavior should they expect wrt alternate
 > data streams?
+
+I need to spend some time on this to figure it out.
+
 >
 >> > > I have real doubts as to whether this patch is necessary. Here's why:
 >> > >
@@ -206,43 +229,6 @@ On Wed, Oct 10, 2012 at 2:05 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@pub
 > win7, if open an alternate data stream on a file (by passing in a ':'
 > then I do get an oplock.
 >
-
-Jeff,
-
-So I rebooted Windows 2003 server and once it was up,
-opened an alternate data stream file, first thing.
-So I see notepad asking for both level I and batch oplocks
-but server does not grant any.
-
-So an app is free to ask for whatever oplock for a file (including alternate
-data stream files) but it is upto the server to grant or deny them.
-
-Then, in case of a linux cifs client asking for level I oplock
-for an alternate data stream, it is granted but if linux cifs client
-asks for level I and batch oplock, no oplocks are granted.
-
-So, it looks like a client asking for batch oplock on an
-alternate data stream file is denied oplocks.
-But it is not documented anywhere that I have been able to find.
-And I do not know how to make Windows client request only
-level I oplock (i.e. no batch oplocks requested) for an open.
-
-I wanted to try similar against a Samba server
-(Version 3.6.0-GIT-UNKNOWN-devel), but just have
-not been able to make alternate data streams work with
-these entries
-
-[smb6]
-        path =  /tmp/smb6
-        browseable = Yes
-        read only = No
-        guest account = nobody
-        restrict anonymous = 2
-        writable = yes
-        streams_depot:directory = /tmp/smb6alt
-        vfs objects = streams_xattr
-
-
 > I have some comments about the above patch though, see above...
 > --
 > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
