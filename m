@@ -1,7 +1,7 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH v3] cifs: Add support of Alternate Data Streams
-Date: Thu, 11 Oct 2012 14:02:40 -0500
-Message-ID: <CADT32eL44krnu0romJKA3d3mErVP2pefJWj3N_mdUpSGvOjB1Q@mail.gmail.com>
+Date: Thu, 11 Oct 2012 15:12:31 -0400
+Message-ID: <20121011151231.19481b4e@tlielax.poochiereds.net>
 References: <1349881906-9791-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20121010121435.124d9ce5@corrin.poochiereds.net>
 	<CADT32eLA3+GpxLDJZq1MTAGLc2fRcQAo4=9G+FKw7HippkLc=w@mail.gmail.com>
@@ -9,205 +9,219 @@ References: <1349881906-9791-1-git-send-email-shirishpargaonkar@gmail.com>
 	<20121010150549.273d797c@corrin.poochiereds.net>
 	<CADT32eLsqrijHR_1TtD5isBwJmDzt=ScWzPNbsL3R_x41HWmTA@mail.gmail.com>
 	<20121011135434.1ec51a10@corrin.poochiereds.net>
+	<CADT32eL44krnu0romJKA3d3mErVP2pefJWj3N_mdUpSGvOjB1Q@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
 	crh-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121011135434.1ec51a10-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <CADT32eL44krnu0romJKA3d3mErVP2pefJWj3N_mdUpSGvOjB1Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Oct 11, 2012 at 12:54 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Thu, 11 Oct 2012 00:33:48 -0500
-> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Wed, Oct 10, 2012 at 2:05 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> > On Wed, 10 Oct 2012 13:25:59 -0400
->> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> >
->> >> On Wed, 10 Oct 2012 12:22:16 -0500
->> >> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >>
->> >> > On Wed, Oct 10, 2012 at 11:14 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> >> > > On Wed, 10 Oct 2012 10:11:46 -0500
->> >> > > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->> >> > >
->> >> > >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >> > >>
->> >> > >>
->> >> > >> Add support of Alternate Data Streams (ads).
->> >> > >>
->> >> > >> The generic access flags that cifs client currently employs are sufficient
->> >> > >> for alternate data streams as well (MS-CIFS 2.2.4.64.1).
->> >> > >>
->> >> > >> The stream file and stream type are specified using : after the file name,
->> >> > >> so that is used to differentiate between a regular file and its
->> >> > >> alternate data streams and stream types.
->> >> > >> Since they all have the same file id, each path name,
->> >> > >> file name:stream name:stream type, has a separate inode with that same
->> >> > >> file id but a distinct private data (path name) in that inode to
->> >> > >> distinguish them.
->> >> > >>
->> >> > >> This scheme applies only to non-posix compliant servers such as Windows.
->> >> > >>
->> >> > >> One operation that does not work is Rename (0x7).
->> >> > >>
->> >> > >>
->> >> > >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
->> >> > >> ---
->> >> > >>  fs/cifs/cifsfs.c   |    1 +
->> >> > >>  fs/cifs/cifsglob.h |    2 ++
->> >> > >>  fs/cifs/inode.c    |   33 ++++++++++++++++++++++++++++++++-
->> >> > >>  3 files changed, 35 insertions(+), 1 deletions(-)
->> >> > >>
->> >> > >> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
->> >> > >> index e7931cc..3068992 100644
->> >> > >> --- a/fs/cifs/cifsfs.c
->> >> > >> +++ b/fs/cifs/cifsfs.c
->> >> > >> @@ -264,6 +264,7 @@ cifs_evict_inode(struct inode *inode)
->> >> > >>  {
->> >> > >>       truncate_inode_pages(&inode->i_data, 0);
->> >> > >>       clear_inode(inode);
->> >> > >> +     kfree(inode->i_private);
->> >> > >>       cifs_fscache_release_inode_cookie(inode);
->> >> > >>  }
->> >> > >>
->> >> > >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> >> > >> index f5af252..26d65c7 100644
->> >> > >> --- a/fs/cifs/cifsglob.h
->> >> > >> +++ b/fs/cifs/cifsglob.h
->> >> > >> @@ -1251,6 +1251,7 @@ struct dfs_info3_param {
->> >> > >>  #define CIFS_FATTR_DELETE_PENDING    0x2
->> >> > >>  #define CIFS_FATTR_NEED_REVAL                0x4
->> >> > >>  #define CIFS_FATTR_INO_COLLISION     0x8
->> >> > >> +#define CIFS_FATTR_ALTDATASTR                0x10
->> >> > >>
->> >> > >>  struct cifs_fattr {
->> >> > >>       u32             cf_flags;
->> >> > >> @@ -1268,6 +1269,7 @@ struct cifs_fattr {
->> >> > >>       struct timespec cf_atime;
->> >> > >>       struct timespec cf_mtime;
->> >> > >>       struct timespec cf_ctime;
->> >> > >> +     char            *cf_private;
->> >> > >>  };
->> >> > >>
->> >> > >>  static inline void free_dfs_info_param(struct dfs_info3_param *param)
->> >> > >> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
->> >> > >> index afdff79..93b010b 100644
->> >> > >> --- a/fs/cifs/inode.c
->> >> > >> +++ b/fs/cifs/inode.c
->> >> > >> @@ -619,6 +619,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
->> >> > >>       struct cifs_fattr fattr;
->> >> > >>       struct cifs_search_info *srchinf = NULL;
->> >> > >>
->> >> > >> +     fattr.cf_private = NULL;
->> >> > >>       tlink = cifs_sb_tlink(cifs_sb);
->> >> > >>       if (IS_ERR(tlink))
->> >> > >>               return PTR_ERR(tlink);
->> >> > >> @@ -746,14 +747,34 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
->> >> > >>       }
->> >> > >>
->> >> > >>       if (!*inode) {
->> >> > >> +             if (strstr(full_path, ":")) {
->> >
->> >                 I think you probably want strrchr here. You want to
->> >                 search the string backward. It's possible that the
->> >                 pathname might have multiple ':' characters in it.
->> >
->> >> > >> +                     fattr.cf_private = kstrdup(full_path, GFP_KERNEL);
->> >
->> >                 Is it really necessary to copy the entire path? This is
->> >                 a frequently traveled bit of code, and I think you
->> >                 could save some cycles by just copying the alternate
->> >                 data stream name.
->> >
->> >> > >> +                     if (!fattr.cf_private) {
->> >> > >> +                             rc = -ENOMEM;
->> >> > >> +                             goto cgii_exit;
->> >> > >> +                     }
->> >> > >> +                     fattr.cf_flags |= CIFS_FATTR_ALTDATASTR;
->> >> > >> +             }
->> >> > >> +
->> >> > >>               *inode = cifs_iget(sb, &fattr);
->> >> > >> -             if (!*inode)
->> >> > >> +             if (*inode) {
->> >> > >> +                     if (strstr(full_path, ":") &&
->> >> > >> +                                     !((*inode)->i_flags & S_PRIVATE)) {
->> >> > >> +                             (*inode)->i_private = kstrdup(fattr.cf_private,
->> >> > >> +                                                     GFP_KERNEL);
->> >> > >> +                             if ((*inode)->i_private)
->> >> > >> +                                     (*inode)->i_flags |= S_PRIVATE;
->> >> > >> +                             else
->> >> > >> +                                     rc = -ENOMEM;
->> >> > >> +                     }
->> >> > >> +             } else
->> >> > >>                       rc = -ENOMEM;
->> >> > >>       } else {
->> >> > >>               cifs_fattr_to_inode(*inode, &fattr);
->> >> > >>       }
->> >> > >>
->> >> > >>  cgii_exit:
->> >> > >> +     kfree(fattr.cf_private);
->> >> > >>       kfree(buf);
->> >> > >>       cifs_put_tlink(tlink);
->> >> > >>       return rc;
->> >> > >> @@ -784,6 +805,16 @@ cifs_find_inode(struct inode *inode, void *opaque)
->> >> > >>       if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
->> >> > >>               fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
->> >> > >>
->> >> > >> +     /* looking for an inode of a alternate data stream (full pathname) */
->> >> > >> +     if (fattr->cf_flags & CIFS_FATTR_ALTDATASTR) {
->> >> > >> +             if (!(inode->i_flags & S_PRIVATE)) {
->> >> > >> +                     return 0;
->> >> > >> +             } else {
->> >> > >> +                     if (strcmp(inode->i_private, fattr->cf_private))
->> >> > >> +                             return 0;
->> >> > >> +             }
->> >> > >> +     }
->> >> > >> +
->> >> > >>       return 1;
->> >> > >>  }
->> >> > >>
->> >> > >
->> >
->> >
->> > At least in my cursory testing, it's possible to create an alternate
->> > data stream on a directory as well as a file. The resulting inode does
->> > not seem to be treated as a directory, but what are the implications if
->> > a particular server does?
->>
->> Which server would that be?  Do you mean like, can you create a
->> parallel alternate data stream directory which can get populated with
->> files (with alternate data streams)?  It is probably not possible,
->> an alternate data stream for a directory is used just the way one
->> is used for a file.
->>
->> >
->> > Also, what's the interaction here with "mapchars" mount option? If
->> > someone specifies that, what behavior should they expect wrt alternate
->> > data streams?
->>
->> It is same as if you were to mount without mapchars mount option.
->> If you mount with mapchars option and create alternate data streams, they
->> are accessible only with mapchars mount option.
->>
->
-> ':' is one of the characters remapped when you specify mapchars, so I
-> don't think it's something you can ignore.
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+On Thu, 11 Oct 2012 14:02:40 -0500
+Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Jeff, so they will be separate stream names (one created using
-nomapchars (default) mount option and one created using mapchars
-mount option) and accessible with respective mount options only
-from any client.
+> On Thu, Oct 11, 2012 at 12:54 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> > On Thu, 11 Oct 2012 00:33:48 -0500
+> > Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >
+> >> On Wed, Oct 10, 2012 at 2:05 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> >> > On Wed, 10 Oct 2012 13:25:59 -0400
+> >> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> >> >
+> >> >> On Wed, 10 Oct 2012 12:22:16 -0500
+> >> >> Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >> >>
+> >> >> > On Wed, Oct 10, 2012 at 11:14 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> >> >> > > On Wed, 10 Oct 2012 10:11:46 -0500
+> >> >> > > shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+> >> >> > >
+> >> >> > >> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> >> > >>
+> >> >> > >>
+> >> >> > >> Add support of Alternate Data Streams (ads).
+> >> >> > >>
+> >> >> > >> The generic access flags that cifs client currently employs are sufficient
+> >> >> > >> for alternate data streams as well (MS-CIFS 2.2.4.64.1).
+> >> >> > >>
+> >> >> > >> The stream file and stream type are specified using : after the file name,
+> >> >> > >> so that is used to differentiate between a regular file and its
+> >> >> > >> alternate data streams and stream types.
+> >> >> > >> Since they all have the same file id, each path name,
+> >> >> > >> file name:stream name:stream type, has a separate inode with that same
+> >> >> > >> file id but a distinct private data (path name) in that inode to
+> >> >> > >> distinguish them.
+> >> >> > >>
+> >> >> > >> This scheme applies only to non-posix compliant servers such as Windows.
+> >> >> > >>
+> >> >> > >> One operation that does not work is Rename (0x7).
+> >> >> > >>
+> >> >> > >>
+> >> >> > >> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> >> > >> ---
+> >> >> > >>  fs/cifs/cifsfs.c   |    1 +
+> >> >> > >>  fs/cifs/cifsglob.h |    2 ++
+> >> >> > >>  fs/cifs/inode.c    |   33 ++++++++++++++++++++++++++++++++-
+> >> >> > >>  3 files changed, 35 insertions(+), 1 deletions(-)
+> >> >> > >>
+> >> >> > >> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> >> >> > >> index e7931cc..3068992 100644
+> >> >> > >> --- a/fs/cifs/cifsfs.c
+> >> >> > >> +++ b/fs/cifs/cifsfs.c
+> >> >> > >> @@ -264,6 +264,7 @@ cifs_evict_inode(struct inode *inode)
+> >> >> > >>  {
+> >> >> > >>       truncate_inode_pages(&inode->i_data, 0);
+> >> >> > >>       clear_inode(inode);
+> >> >> > >> +     kfree(inode->i_private);
+> >> >> > >>       cifs_fscache_release_inode_cookie(inode);
+> >> >> > >>  }
+> >> >> > >>
+> >> >> > >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> >> >> > >> index f5af252..26d65c7 100644
+> >> >> > >> --- a/fs/cifs/cifsglob.h
+> >> >> > >> +++ b/fs/cifs/cifsglob.h
+> >> >> > >> @@ -1251,6 +1251,7 @@ struct dfs_info3_param {
+> >> >> > >>  #define CIFS_FATTR_DELETE_PENDING    0x2
+> >> >> > >>  #define CIFS_FATTR_NEED_REVAL                0x4
+> >> >> > >>  #define CIFS_FATTR_INO_COLLISION     0x8
+> >> >> > >> +#define CIFS_FATTR_ALTDATASTR                0x10
+> >> >> > >>
+> >> >> > >>  struct cifs_fattr {
+> >> >> > >>       u32             cf_flags;
+> >> >> > >> @@ -1268,6 +1269,7 @@ struct cifs_fattr {
+> >> >> > >>       struct timespec cf_atime;
+> >> >> > >>       struct timespec cf_mtime;
+> >> >> > >>       struct timespec cf_ctime;
+> >> >> > >> +     char            *cf_private;
+> >> >> > >>  };
+> >> >> > >>
+> >> >> > >>  static inline void free_dfs_info_param(struct dfs_info3_param *param)
+> >> >> > >> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> >> >> > >> index afdff79..93b010b 100644
+> >> >> > >> --- a/fs/cifs/inode.c
+> >> >> > >> +++ b/fs/cifs/inode.c
+> >> >> > >> @@ -619,6 +619,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+> >> >> > >>       struct cifs_fattr fattr;
+> >> >> > >>       struct cifs_search_info *srchinf = NULL;
+> >> >> > >>
+> >> >> > >> +     fattr.cf_private = NULL;
+> >> >> > >>       tlink = cifs_sb_tlink(cifs_sb);
+> >> >> > >>       if (IS_ERR(tlink))
+> >> >> > >>               return PTR_ERR(tlink);
+> >> >> > >> @@ -746,14 +747,34 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+> >> >> > >>       }
+> >> >> > >>
+> >> >> > >>       if (!*inode) {
+> >> >> > >> +             if (strstr(full_path, ":")) {
+> >> >
+> >> >                 I think you probably want strrchr here. You want to
+> >> >                 search the string backward. It's possible that the
+> >> >                 pathname might have multiple ':' characters in it.
+> >> >
+> >> >> > >> +                     fattr.cf_private = kstrdup(full_path, GFP_KERNEL);
+> >> >
+> >> >                 Is it really necessary to copy the entire path? This is
+> >> >                 a frequently traveled bit of code, and I think you
+> >> >                 could save some cycles by just copying the alternate
+> >> >                 data stream name.
+> >> >
+> >> >> > >> +                     if (!fattr.cf_private) {
+> >> >> > >> +                             rc = -ENOMEM;
+> >> >> > >> +                             goto cgii_exit;
+> >> >> > >> +                     }
+> >> >> > >> +                     fattr.cf_flags |= CIFS_FATTR_ALTDATASTR;
+> >> >> > >> +             }
+> >> >> > >> +
+> >> >> > >>               *inode = cifs_iget(sb, &fattr);
+> >> >> > >> -             if (!*inode)
+> >> >> > >> +             if (*inode) {
+> >> >> > >> +                     if (strstr(full_path, ":") &&
+> >> >> > >> +                                     !((*inode)->i_flags & S_PRIVATE)) {
+> >> >> > >> +                             (*inode)->i_private = kstrdup(fattr.cf_private,
+> >> >> > >> +                                                     GFP_KERNEL);
+> >> >> > >> +                             if ((*inode)->i_private)
+> >> >> > >> +                                     (*inode)->i_flags |= S_PRIVATE;
+> >> >> > >> +                             else
+> >> >> > >> +                                     rc = -ENOMEM;
+> >> >> > >> +                     }
+> >> >> > >> +             } else
+> >> >> > >>                       rc = -ENOMEM;
+> >> >> > >>       } else {
+> >> >> > >>               cifs_fattr_to_inode(*inode, &fattr);
+> >> >> > >>       }
+> >> >> > >>
+> >> >> > >>  cgii_exit:
+> >> >> > >> +     kfree(fattr.cf_private);
+> >> >> > >>       kfree(buf);
+> >> >> > >>       cifs_put_tlink(tlink);
+> >> >> > >>       return rc;
+> >> >> > >> @@ -784,6 +805,16 @@ cifs_find_inode(struct inode *inode, void *opaque)
+> >> >> > >>       if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
+> >> >> > >>               fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
+> >> >> > >>
+> >> >> > >> +     /* looking for an inode of a alternate data stream (full pathname) */
+> >> >> > >> +     if (fattr->cf_flags & CIFS_FATTR_ALTDATASTR) {
+> >> >> > >> +             if (!(inode->i_flags & S_PRIVATE)) {
+> >> >> > >> +                     return 0;
+> >> >> > >> +             } else {
+> >> >> > >> +                     if (strcmp(inode->i_private, fattr->cf_private))
+> >> >> > >> +                             return 0;
+> >> >> > >> +             }
+> >> >> > >> +     }
+> >> >> > >> +
+> >> >> > >>       return 1;
+> >> >> > >>  }
+> >> >> > >>
+> >> >> > >
+> >> >
+> >> >
+> >> > At least in my cursory testing, it's possible to create an alternate
+> >> > data stream on a directory as well as a file. The resulting inode does
+> >> > not seem to be treated as a directory, but what are the implications if
+> >> > a particular server does?
+> >>
+> >> Which server would that be?  Do you mean like, can you create a
+> >> parallel alternate data stream directory which can get populated with
+> >> files (with alternate data streams)?  It is probably not possible,
+> >> an alternate data stream for a directory is used just the way one
+> >> is used for a file.
+> >>
+> >> >
+> >> > Also, what's the interaction here with "mapchars" mount option? If
+> >> > someone specifies that, what behavior should they expect wrt alternate
+> >> > data streams?
+> >>
+> >> It is same as if you were to mount without mapchars mount option.
+> >> If you mount with mapchars option and create alternate data streams, they
+> >> are accessible only with mapchars mount option.
+> >>
+> >
+> > ':' is one of the characters remapped when you specify mapchars, so I
+> > don't think it's something you can ignore.
+> >
+> > --
+> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> 
+> Jeff, so they will be separate stream names (one created using
+> nomapchars (default) mount option and one created using mapchars
+> mount option) and accessible with respective mount options only
+> from any client.
+> 
+> I think one more reason for linux cifs client to not even ask for oplocks
+> irrespective of the server behaviour.
+> 
 
-I think one more reason for linux cifs client to not even ask for oplocks
-irrespective of the server behaviour.
+I think you misunderstand me...
 
-Regards,
+Your patch is looking for ':' characters in the filename of the local
+charset and treating those files in a special way. There is no guarantee
+though that that filename will have a ':' in it once you send it to the
+server if mapchars is in effect. If it doesn't then you will no longer
+be dealing with an alternate data stream. Your current patch does not
+account for that, AFAICT...
 
-Shirish
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
