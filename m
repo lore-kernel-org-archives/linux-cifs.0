@@ -1,74 +1,43 @@
-From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: cifs
-Date: Sat, 13 Oct 2012 22:08:05 -0500
-Message-ID: <CADT32eLVmahaU1V1sASrVOMAqr3fo5yDGy21LAtTgHSxASaggA@mail.gmail.com>
-References: <20121012145002.0e4b425a@corrin.poochiereds.net>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: IPv6 mount support
+Date: Sun, 14 Oct 2012 21:47:50 -0400
+Message-ID: <CAFB9KM0K-L_E+zppOawzib88NfxryH75VBzg74Wtge8euGHFmw@mail.gmail.com>
+References: <CAFB9KM2GbrVzE+UEatrV5-QH_iT_Vu4Z0=o3GmezEJo_uKsyWw@mail.gmail.com>
+	<CAFB9KM2kFUO39TCmh5rHh8Y8yCoU=8hpw=ahnM_teCLkfTXsRg@mail.gmail.com>
+	<20121012132203.1c39533d@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121012145002.0e4b425a-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20121012132203.1c39533d-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Oct 12, 2012 at 1:50 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> Hi Shirish,
+On Fri, Oct 12, 2012 at 1:22 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 >
-> I'm looking at implementing a plugin interface for the idmap code for cifs-utils:
+> What if some component of the pathname has a ':' in it? For instance:
 >
->     https://bugzilla.samba.org/show_bug.cgi?id=9203
+>     <ip6 address>:/share/foo:bar/baz/
 >
-> While looking over the existing code, I ran across this. The kernel and
-> setcifsacl use this struct for SIDs:
+> Personally, I'd rather see us deprecate the "nfs syntax". I don't see
+> that that provides us any value. We've never documented that it was
+> supported, so maybe a patch to warn for a couple of releases when
+> someone uses it and then rip it out?
 >
-> struct cifs_sid {
->         uint8_t revision; /* revision level */
->         uint8_t num_subauth;
->         uint8_t authority[6];
->         uint32_t sub_auth[5]; /* sub_auth[num_subauth] */
-> };
->
-> ...however, the wbclient libs have this:
->
-> #ifndef WBC_MAXSUBAUTHS
-> #define WBC_MAXSUBAUTHS 15 /* max sub authorities in a SID */
-> #endif
->
-> struct wbcDomainSid {
->         uint8_t   sid_rev_num;
->         uint8_t   num_auths;
->         uint8_t   id_auth[6];
->         uint32_t  sub_auths[WBC_MAXSUBAUTHS];
-> };
->
-> Now, when the cifs.idmap program downcalls with a SID, it does this:
->
->      rc = keyctl_instantiate(key, &sid, sizeof(struct wbcDomainSid), 0);
->
-> The kernel then copies that to a buffer and then copies that into a
-> cifs_sid locally. It doesn't seem to care much about the sizes there so
-> anything beyond sub_auths[4] is ignored.
->
-> Is that a problem? If not, why not?
->
-> Thanks,
 > --
 > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-Jeff, I have not encountered any SIDs that has more than five
-sub auth values.  But I have mostly worked and tested this code
-with Windows 2003 Server.
-Most of the System Groups and Built-in Accounts there have
-less than five sub auth values but some User Accounts have had
-five sub auth values.
+If the pathname has a ':' in it, I'd want to yell at someone.  What
+kind of sick person does that? :)
+Honestly, I can think of a scenario where this kind of pathname is
+somewhat likely; an iSCSI initiator exporting a target using its iSCSI
+pathname which usually contain a few ':'s.  I'm sure that's not
+common, but surely not unused.
 
-It is possible that number of sub authorities does can exceed five.
-Where can we find an authoritative document that can state so?
-I think it would be alright to bump up the value from 5 to
-WBC_MAXSUBAUTHS but would be nice to know what can be the
-maximum value of sub authorities in a Security Descriptor.
+I'll spin a patch Tuesday (I'm traveling Monday) and if anyone
+disagrees with this behavior they can NAK it.
 
-Regards,
-
-Shirish
+-- 
+Peace and Blessings,
+-Scott.
