@@ -1,206 +1,124 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix potential buffer overrun in cifs.idmap
- handling code
-Date: Tue, 16 Oct 2012 10:26:20 -0400
-Message-ID: <20121016102620.26f852b5@tlielax.poochiereds.net>
-References: <1350386379-16850-1-git-send-email-jlayton@redhat.com>
-	<CADT32eL0ghENLv1xof1RMUEUH=E=ZBVD_VHemkx5Ni4xiMS8JQ@mail.gmail.com>
+From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Subject: Issue with upgrade to kernel 3.4.10 -> invalid argument error
+Date: Tue, 16 Oct 2012 19:03:10 +0200
+Message-ID: <507D934E.9010304@innominate.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: multipart/mixed;
+ boundary="------------060105070606020708050909"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eL0ghENLv1xof1RMUEUH=E=ZBVD_VHemkx5Ni4xiMS8JQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 16 Oct 2012 09:09:57 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+This is a multi-part message in MIME format.
+--------------060105070606020708050909
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> On Tue, Oct 16, 2012 at 6:19 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > The userspace cifs.idmap program generally works with the wbclient libs
-> > to generate binary SIDs in userspace. That program defines the struct
-> > that holds these values as having a max of 15 subauthorities. The kernel
-> > idmapping code however limits that value to 5.
-> >
-> > When the kernel copies those values around though, it doesn't sanity
-> > check the num_subauths value handed back from userspace or from the
-> > server. It's possible therefore for userspace to hand us back a bogus
-> > num_subauths value (or one that's valid, but greater than 5) that could
-> > cause the kernel to walk off the end of the cifs_sid->sub_auths array.
-> >
-> > Fix this by defining a new routine for copying sids and using that in
-> > all of the places that copy it. If we end up with a sid that's longer
-> > than expected then this approach will just lop off the "extra" subauths,
-> > but that's basically what the code does today already. Better approaches
-> > might be to fix this code to reject SIDs with >5 subauths, or fix it
-> > to handle the subauths array dynamically.
-> >
-> > At the same time, change the kernel to check the length of the data
-> > returned by userspace. If it's shorter than struct cifs_sid, reject it
-> > and return -EIO. If that happens we'll end up with fields that are
-> > basically uninitialized.
-> >
-> > Long term, it might make sense to redefine cifs_sid using a flexarray at
-> > the end, to allow for variable-length subauth lists, and teach the code
-> > to handle the case where the subauths array being passed in from
-> > userspace is shorter than 5 elements.
-> >
-> > Note too, that I don't consider this a security issue since you'd need
-> > a compromised cifs.idmap program. If you have that, you can do all sorts
-> > of nefarious stuff. Still, this is probably reasonable for stable.
-> >
-> > Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
-> > Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifsacl.c | 49 ++++++++++++++++++++-----------------------------
-> >  1 file changed, 20 insertions(+), 29 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> > index 2ee5c54..0955d23 100644
-> > --- a/fs/cifs/cifsacl.c
-> > +++ b/fs/cifs/cifsacl.c
-> > @@ -225,6 +225,13 @@ sid_to_str(struct cifs_sid *sidptr, char *sidstr)
-> >  }
-> >
-> >  static void
-> > +cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
-> > +{
-> > +       memcpy(dst, src, sizeof(*dst));
-> > +       dst->num_subauth = min_t(u8, src->num_subauth, NUM_SUBAUTHS);
-> > +}
-> > +
-> > +static void
-> >  id_rb_insert(struct rb_root *root, struct cifs_sid *sidptr,
-> >                 struct cifs_sid_id **psidid, char *typestr)
-> >  {
-> > @@ -248,7 +255,7 @@ id_rb_insert(struct rb_root *root, struct cifs_sid *sidptr,
-> >                 }
-> >         }
-> >
-> > -       memcpy(&(*psidid)->sid, sidptr, sizeof(struct cifs_sid));
-> > +       cifs_copy_sid(&(*psidid)->sid, sidptr);
-> >         (*psidid)->time = jiffies - (SID_MAP_RETRY + 1);
-> >         (*psidid)->refcount = 0;
-> >
-> > @@ -354,7 +361,7 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
-> >          * any fields of the node after a reference is put .
-> >          */
-> >         if (test_bit(SID_ID_MAPPED, &psidid->state)) {
-> > -               memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
-> > +               cifs_copy_sid(ssid, &psidid->sid);
-> >                 psidid->time = jiffies; /* update ts for accessing */
-> >                 goto id_sid_out;
-> >         }
-> > @@ -370,14 +377,14 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
-> >                 if (IS_ERR(sidkey)) {
-> >                         rc = -EINVAL;
-> >                         cFYI(1, "%s: Can't map and id to a SID", __func__);
-> > +               } else if (sidkey->datalen < sizeof(struct cifs_sid)) {
-> > +                       rc = -EIO;
-> > +                       cFYI(1, "%s: Downcall contained malformed key "
-> > +                               "(datalen=%hu)", __func__, sidkey->datalen);
-> >                 } else {
-> >                         lsid = (struct cifs_sid *)sidkey->payload.data;
-> > -                       memcpy(&psidid->sid, lsid,
-> > -                               sidkey->datalen < sizeof(struct cifs_sid) ?
-> > -                               sidkey->datalen : sizeof(struct cifs_sid));
-> > -                       memcpy(ssid, &psidid->sid,
-> > -                               sidkey->datalen < sizeof(struct cifs_sid) ?
-> > -                               sidkey->datalen : sizeof(struct cifs_sid));
-> > +                       cifs_copy_sid(&psidid->sid, lsid);
-> > +                       cifs_copy_sid(ssid, &psidid->sid);
-> >                         set_bit(SID_ID_MAPPED, &psidid->state);
-> >                         key_put(sidkey);
-> >                         kfree(psidid->sidstr);
-> > @@ -396,7 +403,7 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
-> >                         return rc;
-> >                 }
-> >                 if (test_bit(SID_ID_MAPPED, &psidid->state))
-> > -                       memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
-> > +                       cifs_copy_sid(ssid, &psidid->sid);
-> >                 else
-> >                         rc = -EINVAL;
-> >         }
-> > @@ -675,8 +682,6 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
-> >  static void copy_sec_desc(const struct cifs_ntsd *pntsd,
-> >                                 struct cifs_ntsd *pnntsd, __u32 sidsoffset)
-> >  {
-> > -       int i;
-> > -
-> >         struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
-> >         struct cifs_sid *nowner_sid_ptr, *ngroup_sid_ptr;
-> >
-> > @@ -692,26 +697,14 @@ static void copy_sec_desc(const struct cifs_ntsd *pntsd,
-> >         owner_sid_ptr = (struct cifs_sid *)((char *)pntsd +
-> >                                 le32_to_cpu(pntsd->osidoffset));
-> >         nowner_sid_ptr = (struct cifs_sid *)((char *)pnntsd + sidsoffset);
-> > -
-> > -       nowner_sid_ptr->revision = owner_sid_ptr->revision;
-> > -       nowner_sid_ptr->num_subauth = owner_sid_ptr->num_subauth;
-> > -       for (i = 0; i < 6; i++)
-> > -               nowner_sid_ptr->authority[i] = owner_sid_ptr->authority[i];
-> > -       for (i = 0; i < 5; i++)
-> > -               nowner_sid_ptr->sub_auth[i] = owner_sid_ptr->sub_auth[i];
-> > +       cifs_copy_sid(nowner_sid_ptr, owner_sid_ptr);
-> >
-> >         /* copy group sid */
-> >         group_sid_ptr = (struct cifs_sid *)((char *)pntsd +
-> >                                 le32_to_cpu(pntsd->gsidoffset));
-> >         ngroup_sid_ptr = (struct cifs_sid *)((char *)pnntsd + sidsoffset +
-> >                                         sizeof(struct cifs_sid));
-> > -
-> > -       ngroup_sid_ptr->revision = group_sid_ptr->revision;
-> > -       ngroup_sid_ptr->num_subauth = group_sid_ptr->num_subauth;
-> > -       for (i = 0; i < 6; i++)
-> > -               ngroup_sid_ptr->authority[i] = group_sid_ptr->authority[i];
-> > -       for (i = 0; i < 5; i++)
-> > -               ngroup_sid_ptr->sub_auth[i] = group_sid_ptr->sub_auth[i];
-> > +       cifs_copy_sid(ngroup_sid_ptr, group_sid_ptr);
-> >
-> >         return;
-> >  }
-> > @@ -1120,8 +1113,7 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
-> >                                 kfree(nowner_sid_ptr);
-> >                                 return rc;
-> >                         }
-> > -                       memcpy(owner_sid_ptr, nowner_sid_ptr,
-> > -                                       sizeof(struct cifs_sid));
-> > +                       cifs_copy_sid(owner_sid_ptr, nowner_sid_ptr);
-> >                         kfree(nowner_sid_ptr);
-> >                         *aclflag = CIFS_ACL_OWNER;
-> >                 }
-> > @@ -1139,8 +1131,7 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
-> >                                 kfree(ngroup_sid_ptr);
-> >                                 return rc;
-> >                         }
-> > -                       memcpy(group_sid_ptr, ngroup_sid_ptr,
-> > -                                       sizeof(struct cifs_sid));
-> > +                       cifs_copy_sid(group_sid_ptr, ngroup_sid_ptr);
-> >                         kfree(ngroup_sid_ptr);
-> >                         *aclflag = CIFS_ACL_GROUP;
-> >                 }
-> > --
-> > 1.7.11.7
-> >
-> 
-> Looks correct. Cleaner.
-> 
-> Reviewed-by:  Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Greetings,
 
-Thanks, I had another question too on a related note...
 
-The idmap code basically does double caching. You call into the keys
-API to do the mapping. If it doesn't have a mapping then it will call
-into userspace to establish one. The keys API will then cache that
-result in a "struct key". You're then taking that payload and caching
-it again in a rbtree.
+I am having an issue mounting CIFS shares since we upgraded our Linux 
+kernel from 2.6.27 to 3.4.10. Each time I try to mount a share drive I 
+get an "Invalid argument" error message even though I am using the same 
+command line that had previously worked, e.g.:
 
-What's the rationale for that? Why not just use they keys API cache
-directly and get rid of all of the rbtrees? It seems like that would be
-a lot simpler...
+mount -t cifs //172.16.1.10/allusers /mnt/TEST -o 
+'ro,user=cifs,password=secret
+
+I went ahead and checked the source code, and found out that the 
+following condition did not evaluate to true:
+
+fs/cifs/connect.c:2130
+	if (volume_info->UNCip && volume_info->UNC)
+	{
+         	rc = cifs_fill_sockaddr((struct sockaddr *)&addr,
+                 	    volume_info->UNCip,
+	                    strlen(volume_info->UNCip),
+         	            volume_info->port);
+
+Thus I obtained a kernel message "Connecting to DFS root not implemented 
+yet." So I am now explicitly specifying the UNC as an option, as well as 
+the device name:
+
+mount -t cifs //172.16.1.10/allusers /mnt/TEST -o 
+'ro,user=cifs,password=secret,unc=\\172.16.1.10\allusers'
+
+Question #1: Why do I have to explicitly provide the UNC now?
+
+It almost seem like a bug to me, given that the devname parameter to the 
+cifs_parse_mount_options function already contains this information. The 
+newest sources for the 3.7-rc1 kernel seem to have no changes in this 
+regard (even though I just took a *quick* look at those sources.)
+
+If this is a bug I would be glad to provide a patch to fix it.
+
+The second observation that I made concerned specifying the UNC as an 
+option and passing in slashes as separators instead of backslashes:
+
+mount -t cifs //172.16.1.10/allusers /mnt/TEST -o 
+'ro,user=cifs,password=secret,unc=//172.16.1.10/allusers'
+
+This also results in an invalid argument error, as the parser does not 
+convert all slashes into backslashes (for the unc option, as the devname 
+parameter is already converted!), and thus extract_hostname is not able 
+to function properly.
+
+Question #2: Should this be considered a bug?
+
+If that is the case, I would like to suggest the attached bugfix.
+
+Please let me know what you think and thank you in advance for your kind 
+support!
+
+
+Best regards,
+
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Federico Sauter / Senior firmware programmer
+Innominate Security Technologies AG / protecting industrial networks
+tel: +49.30.921028-210 / fax: +49.30.921028-020
+Rudower Chaussee 13 / D-12489 Berlin / http://www.innominate.com/
+
+Register Court: AG Charlottenburg, HR B 81603
+Management Board: Dirk Seewald
+Chairman of the Supervisory Board: Christoph Leifer
+
+--------------060105070606020708050909
+Content-Type: text/x-patch;
+ name="connect.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="connect.patch"
+
+--- fs/cifs/connect.c.stable	2012-10-16 16:44:50.000000000 +0200
++++ fs/cifs/connect.c.fixed	2012-10-16 18:56:37.000000000 +0200
+@@ -1204,6 +1204,7 @@
+ 	char *string = NULL;
+ 	char *tmp_end, *value;
+ 	char delim;
++	char *p, *q;
+ 
+ 	separator[0] = ',';
+ 	separator[1] = 0;
+@@ -1662,12 +1663,12 @@
+ 				printk(KERN_WARNING "CIFS: no memory for UNC\n");
+ 				goto cifs_parse_mount_err;
+ 			}
+-			strcpy(vol->UNC, string);
+ 
+-			if (strncmp(string, "//", 2) == 0) {
+-				vol->UNC[0] = '\\';
+-				vol->UNC[1] = '\\';
+-			} else if (strncmp(string, "\\\\", 2) != 0) {
++			for (p = string, q = vol->UNC; *p; ++p, ++q) {
++				*q = *p == '/'? '\\' : *p;
++			}
++			*q = '\0';
++			if (strncmp(vol->UNC, "\\\\", 2) != 0) {
+ 				printk(KERN_WARNING "CIFS: UNC Path does not "
+ 						    "begin with // or \\\\\n");
+ 				goto cifs_parse_mount_err;
+
+--------------060105070606020708050909--
