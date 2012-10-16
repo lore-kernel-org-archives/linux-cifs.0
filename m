@@ -1,55 +1,175 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: IPv6 mount support
-Date: Mon, 15 Oct 2012 08:35:10 -0400
-Message-ID: <20121015083510.02be43f1@tlielax.poochiereds.net>
-References: <CAFB9KM2GbrVzE+UEatrV5-QH_iT_Vu4Z0=o3GmezEJo_uKsyWw@mail.gmail.com>
-	<CAFB9KM2kFUO39TCmh5rHh8Y8yCoU=8hpw=ahnM_teCLkfTXsRg@mail.gmail.com>
-	<20121012132203.1c39533d@corrin.poochiereds.net>
-	<CAH2r5msSdL25ywGNt2-QYCzOOPvqa4n34f2zgne3izzPz=a9Vw@mail.gmail.com>
-	<20121012143648.4694ab58@corrin.poochiereds.net>
-	<CAFB9KM1Ah4bCcNYawAJtNUsWa6kXT-c3QS8T7pxd-11Y=yFXig@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix potential buffer overrun in cifs.idmap handling code
+Date: Tue, 16 Oct 2012 07:19:39 -0400
+Message-ID: <1350386379-16850-1-git-send-email-jlayton@redhat.com>
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAFB9KM1Ah4bCcNYawAJtNUsWa6kXT-c3QS8T7pxd-11Y=yFXig-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 14 Oct 2012 21:51:38 -0400
-Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+The userspace cifs.idmap program generally works with the wbclient libs
+to generate binary SIDs in userspace. That program defines the struct
+that holds these values as having a max of 15 subauthorities. The kernel
+idmapping code however limits that value to 5.
 
-> On Fri, Oct 12, 2012 at 2:36 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > While it sounds nice to add this sort of stuff, it's problematic to
-> > maintain over the long haul. IMO, we're better served by insisting that
-> > people specify their mounts in a fairly rigid fashion, and simply
-> > document that well.
-> >
-> > --
-> > Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> 
+When the kernel copies those values around though, it doesn't sanity
+check the num_subauths value handed back from userspace or from the
+server. It's possible therefore for userspace to hand us back a bogus
+num_subauths value (or one that's valid, but greater than 5) that could
+cause the kernel to walk off the end of the cifs_sid->sub_auths array.
 
-> If the pathname has a ':' in it, I'd want to yell at someone.  What
-> kind of sick person does that? :)
+Fix this by defining a new routine for copying sids and using that in
+all of the places that copy it. If we end up with a sid that's longer
+than expected then this approach will just lop off the "extra" subauths,
+but that's basically what the code does today already. Better approaches
+might be to fix this code to reject SIDs with >5 subauths, or fix it
+to handle the subauths array dynamically.
 
-For better or worse, ':' is a perfectly valid character in a POSIX
-directory name. Since we have to contend with servers (such as samba)
-that may share out directories with such that have that sort of
-prefixpath, then we have to be able to contend with them.
+At the same time, change the kernel to check the length of the data
+returned by userspace. If it's shorter than struct cifs_sid, reject it
+and return -EIO. If that happens we'll end up with fields that are
+basically uninitialized.
 
-> What would you propose?  I'd be willing to document this if there is a
-> consensus.
-> 
+Long term, it might make sense to redefine cifs_sid using a flexarray at
+the end, to allow for variable-length subauth lists, and teach the code
+to handle the case where the subauths array being passed in from
+userspace is shorter than 5 elements.
 
-I'd propose adding a patch that prints a warning to stderr whenever
-someone tries to use nfs-style "devicenames" that says we'll remove
-support for it in ~6.0 or so.
+Note too, that I don't consider this a security issue since you'd need
+a compromised cifs.idmap program. If you have that, you can do all sorts
+of nefarious stuff. Still, this is probably reasonable for stable.
 
-Then, after 5.9 is released spin up a patch that removes support for
-that syntax.
+Cc: stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsacl.c | 49 ++++++++++++++++++++-----------------------------
+ 1 file changed, 20 insertions(+), 29 deletions(-)
 
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index 2ee5c54..0955d23 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -225,6 +225,13 @@ sid_to_str(struct cifs_sid *sidptr, char *sidstr)
+ }
+ 
+ static void
++cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
++{
++	memcpy(dst, src, sizeof(*dst));
++	dst->num_subauth = min_t(u8, src->num_subauth, NUM_SUBAUTHS);
++}
++
++static void
+ id_rb_insert(struct rb_root *root, struct cifs_sid *sidptr,
+ 		struct cifs_sid_id **psidid, char *typestr)
+ {
+@@ -248,7 +255,7 @@ id_rb_insert(struct rb_root *root, struct cifs_sid *sidptr,
+ 		}
+ 	}
+ 
+-	memcpy(&(*psidid)->sid, sidptr, sizeof(struct cifs_sid));
++	cifs_copy_sid(&(*psidid)->sid, sidptr);
+ 	(*psidid)->time = jiffies - (SID_MAP_RETRY + 1);
+ 	(*psidid)->refcount = 0;
+ 
+@@ -354,7 +361,7 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
+ 	 * any fields of the node after a reference is put .
+ 	 */
+ 	if (test_bit(SID_ID_MAPPED, &psidid->state)) {
+-		memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
++		cifs_copy_sid(ssid, &psidid->sid);
+ 		psidid->time = jiffies; /* update ts for accessing */
+ 		goto id_sid_out;
+ 	}
+@@ -370,14 +377,14 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
+ 		if (IS_ERR(sidkey)) {
+ 			rc = -EINVAL;
+ 			cFYI(1, "%s: Can't map and id to a SID", __func__);
++		} else if (sidkey->datalen < sizeof(struct cifs_sid)) {
++			rc = -EIO;
++			cFYI(1, "%s: Downcall contained malformed key "
++				"(datalen=%hu)", __func__, sidkey->datalen);
+ 		} else {
+ 			lsid = (struct cifs_sid *)sidkey->payload.data;
+-			memcpy(&psidid->sid, lsid,
+-				sidkey->datalen < sizeof(struct cifs_sid) ?
+-				sidkey->datalen : sizeof(struct cifs_sid));
+-			memcpy(ssid, &psidid->sid,
+-				sidkey->datalen < sizeof(struct cifs_sid) ?
+-				sidkey->datalen : sizeof(struct cifs_sid));
++			cifs_copy_sid(&psidid->sid, lsid);
++			cifs_copy_sid(ssid, &psidid->sid);
+ 			set_bit(SID_ID_MAPPED, &psidid->state);
+ 			key_put(sidkey);
+ 			kfree(psidid->sidstr);
+@@ -396,7 +403,7 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
+ 			return rc;
+ 		}
+ 		if (test_bit(SID_ID_MAPPED, &psidid->state))
+-			memcpy(ssid, &psidid->sid, sizeof(struct cifs_sid));
++			cifs_copy_sid(ssid, &psidid->sid);
+ 		else
+ 			rc = -EINVAL;
+ 	}
+@@ -675,8 +682,6 @@ int compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+ static void copy_sec_desc(const struct cifs_ntsd *pntsd,
+ 				struct cifs_ntsd *pnntsd, __u32 sidsoffset)
+ {
+-	int i;
+-
+ 	struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
+ 	struct cifs_sid *nowner_sid_ptr, *ngroup_sid_ptr;
+ 
+@@ -692,26 +697,14 @@ static void copy_sec_desc(const struct cifs_ntsd *pntsd,
+ 	owner_sid_ptr = (struct cifs_sid *)((char *)pntsd +
+ 				le32_to_cpu(pntsd->osidoffset));
+ 	nowner_sid_ptr = (struct cifs_sid *)((char *)pnntsd + sidsoffset);
+-
+-	nowner_sid_ptr->revision = owner_sid_ptr->revision;
+-	nowner_sid_ptr->num_subauth = owner_sid_ptr->num_subauth;
+-	for (i = 0; i < 6; i++)
+-		nowner_sid_ptr->authority[i] = owner_sid_ptr->authority[i];
+-	for (i = 0; i < 5; i++)
+-		nowner_sid_ptr->sub_auth[i] = owner_sid_ptr->sub_auth[i];
++	cifs_copy_sid(nowner_sid_ptr, owner_sid_ptr);
+ 
+ 	/* copy group sid */
+ 	group_sid_ptr = (struct cifs_sid *)((char *)pntsd +
+ 				le32_to_cpu(pntsd->gsidoffset));
+ 	ngroup_sid_ptr = (struct cifs_sid *)((char *)pnntsd + sidsoffset +
+ 					sizeof(struct cifs_sid));
+-
+-	ngroup_sid_ptr->revision = group_sid_ptr->revision;
+-	ngroup_sid_ptr->num_subauth = group_sid_ptr->num_subauth;
+-	for (i = 0; i < 6; i++)
+-		ngroup_sid_ptr->authority[i] = group_sid_ptr->authority[i];
+-	for (i = 0; i < 5; i++)
+-		ngroup_sid_ptr->sub_auth[i] = group_sid_ptr->sub_auth[i];
++	cifs_copy_sid(ngroup_sid_ptr, group_sid_ptr);
+ 
+ 	return;
+ }
+@@ -1120,8 +1113,7 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 				kfree(nowner_sid_ptr);
+ 				return rc;
+ 			}
+-			memcpy(owner_sid_ptr, nowner_sid_ptr,
+-					sizeof(struct cifs_sid));
++			cifs_copy_sid(owner_sid_ptr, nowner_sid_ptr);
+ 			kfree(nowner_sid_ptr);
+ 			*aclflag = CIFS_ACL_OWNER;
+ 		}
+@@ -1139,8 +1131,7 @@ static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 				kfree(ngroup_sid_ptr);
+ 				return rc;
+ 			}
+-			memcpy(group_sid_ptr, ngroup_sid_ptr,
+-					sizeof(struct cifs_sid));
++			cifs_copy_sid(group_sid_ptr, ngroup_sid_ptr);
+ 			kfree(ngroup_sid_ptr);
+ 			*aclflag = CIFS_ACL_GROUP;
+ 		}
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.11.7
