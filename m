@@ -1,120 +1,115 @@
 From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
 Subject: Re: Issue with upgrade to kernel 3.4.10 -> invalid argument error
-Date: Wed, 17 Oct 2012 15:42:53 +0200
-Message-ID: <507EB5DD.8040107@innominate.com>
-References: <507D934E.9010304@innominate.com> <CAH2r5mvFzSy5+SxpiBvuLydrsQcuJZn=5s6VCKgWO+K0iergMQ@mail.gmail.com>
+Date: Wed, 17 Oct 2012 15:47:50 +0200
+Message-ID: <507EB706.8040406@innominate.com>
+References: <507D934E.9010304@innominate.com> <507E808C.1020401@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+ boundary="------------030608080301000303020602"
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvFzSy5+SxpiBvuLydrsQcuJZn=5s6VCKgWO+K0iergMQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <507E808C.1020401-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello Steve,
+This is a multi-part message in MIME format.
+--------------030608080301000303020602
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I use the apostrophes just to avoid escaping backslashes when I use them.
+Dear Suresh,
 
-Thank you very much for your question, since it led me to solve my 
-problem. I was using a different mount version (busybox) and now that 
-you pointed me in the right direction I found the issue by comparing the 
-mount.cifs source code and the busybox sources and making the 
-appropriate fixes.
 
-Kind regards,
+I took a look at the patch that you mention, but *no*, it does not 
+address the issue that I mention. The new code still does not convert 
+all slashes to backslashes in the UNC field (i.e. the UNC given 
+explicitly as in the unc= option.) Thus, it is still possible to get an 
+"invalid parameter" error if you provide the UNC with slashes in it:
+
+mount.cifs //myserver/share /mnt/point -o unc=//myserver/share
+
+This will result in an error, since the unc option contains slashes and 
+is converted as follows:
+
+\\myserver/share
+
+Thus causing an error within the extract_hostname function in connect.c.
+
+Please take a look at the attached patch, which corrects this issue and 
+let me know what you think. :-)
+
+
+Thanks and regards
 
 Fred
 
 
-On 10/16/2012 08:46 PM, Steve French wrote:
-> Why the ' (apostrophes) around the arguments to -o ?
+On 10/17/2012 11:55 AM, Suresh Jayaraman wrote:
+> On 10/16/2012 10:33 PM, Federico Sauter wrote:
+>> Greetings,
+>>
+>>
+>> I am having an issue mounting CIFS shares since we upgraded our Linux
+>> kernel from 2.6.27 to 3.4.10. Each time I try to mount a share drive I
+>> get an "Invalid argument" error message even though I am using the same
+>> command line that had previously worked, e.g.:
+>>
 >
-> What version of mount.cifs ("/sbin/mount.cifs -V" will display it) are
-> you using?
+> A quick look suggests that the symptom is similar to the one fixed by
+> the below commit
 >
-> On Tue, Oct 16, 2012 at 12:03 PM, Federico Sauter
-> <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org <mailto:fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>> wrote:
+> commit e73f843a3235a19de38359c91586e9eadef12238
+> Author: Suresh Jayaraman<sjayaraman-IBi9RG/b67k@public.gmane.org>
+> Date:   Tue Jun 12 07:15:50 2012 +0530
 >
->     Greetings,
->
->
->     I am having an issue mounting CIFS shares since we upgraded our
->     Linux kernel from 2.6.27 to 3.4.10. Each time I try to mount a share
->     drive I get an "Invalid argument" error message even though I am
->     using the same command line that had previously worked, e.g.:
->
->     mount -t cifs //172.16.1.10/allusers <http://172.16.1.10/allusers>
->     /mnt/TEST -o 'ro,user=cifs,password=secret
->
->     I went ahead and checked the source code, and found out that the
->     following condition did not evaluate to true:
->
->     fs/cifs/connect.c:2130
->              if (volume_info->UNCip && volume_info->UNC)
->              {
->                      rc = cifs_fill_sockaddr((struct sockaddr *)&addr,
->                                  volume_info->UNCip,
->                                  strlen(volume_info->UNCip),
->                                  volume_info->port);
->
->     Thus I obtained a kernel message "Connecting to DFS root not
->     implemented yet." So I am now explicitly specifying the UNC as an
->     option, as well as the device name:
->
->     mount -t cifs //172.16.1.10/allusers <http://172.16.1.10/allusers>
->     /mnt/TEST -o 'ro,user=cifs,password=secret,__unc=\\172.16.1.10\allusers'
->
->     Question #1: Why do I have to explicitly provide the UNC now?
->
->     It almost seem like a bug to me, given that the devname parameter to
->     the cifs_parse_mount_options function already contains this
->     information. The newest sources for the 3.7-rc1 kernel seem to have
->     no changes in this regard (even though I just took a *quick* look at
->     those sources.)
->
->     If this is a bug I would be glad to provide a patch to fix it.
->
->     The second observation that I made concerned specifying the UNC as
->     an option and passing in slashes as separators instead of backslashes:
->
->     mount -t cifs //172.16.1.10/allusers <http://172.16.1.10/allusers>
->     /mnt/TEST -o
->     'ro,user=cifs,password=secret,__unc=//172.16.1.10/allusers
->     <http://172.16.1.10/allusers>'
->
->     This also results in an invalid argument error, as the parser does
->     not convert all slashes into backslashes (for the unc option, as the
->     devname parameter is already converted!), and thus extract_hostname
->     is not able to function properly.
->
->     Question #2: Should this be considered a bug?
->
->     If that is the case, I would like to suggest the attached bugfix.
->
->     Please let me know what you think and thank you in advance for your
->     kind support!
+>      cifs: fix parsing of password mount option
 >
 >
->     Best regards,
+> It might be worth trying to see whether the commit fixes the problem you
+> are seeing.
 >
 >
->     --
->     Federico Sauter / Senior firmware programmer
->     Innominate Security Technologies AG / protecting industrial networks
->     tel: +49.30.921028-210 <tel:%2B49.30.921028-210> / fax:
->     +49.30.921028-020 <tel:%2B49.30.921028-020>
->     Rudower Chaussee 13 / D-12489 Berlin / http://www.innominate.com/
->
->     Register Court: AG Charlottenburg, HR B 81603
->     Management Board: Dirk Seewald
->     Chairman of the Supervisory Board: Christoph Leifer
+> Thanks
+> Suresh
 >
 >
 >
->
-> --
-> Thanks,
->
-> Steve
+
+--------------030608080301000303020602
+Content-Type: text/x-patch;
+ name="connect.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="connect.patch"
+
+--- fs/cifs/connect.c.stable	2012-10-16 16:44:50.000000000 +0200
++++ fs/cifs/connect.c.fixed	2012-10-16 18:56:37.000000000 +0200
+@@ -1204,6 +1204,7 @@
+ 	char *string = NULL;
+ 	char *tmp_end, *value;
+ 	char delim;
++	char *p, *q;
+ 
+ 	separator[0] = ',';
+ 	separator[1] = 0;
+@@ -1662,12 +1663,12 @@
+ 				printk(KERN_WARNING "CIFS: no memory for UNC\n");
+ 				goto cifs_parse_mount_err;
+ 			}
+-			strcpy(vol->UNC, string);
+ 
+-			if (strncmp(string, "//", 2) == 0) {
+-				vol->UNC[0] = '\\';
+-				vol->UNC[1] = '\\';
+-			} else if (strncmp(string, "\\\\", 2) != 0) {
++			for (p = string, q = vol->UNC; *p; ++p, ++q) {
++				*q = *p == '/'? '\\' : *p;
++			}
++			*q = '\0';
++			if (strncmp(vol->UNC, "\\\\", 2) != 0) {
+ 				printk(KERN_WARNING "CIFS: UNC Path does not "
+ 						    "begin with // or \\\\\n");
+ 				goto cifs_parse_mount_err;
+
+--------------030608080301000303020602--
