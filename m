@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH] Add warning that NFS syntax is deprecated and will be
  removed in cifs-utils-6.0.
-Date: Wed, 17 Oct 2012 16:21:05 -0400
-Message-ID: <20121017162105.7b388df2@tlielax.poochiereds.net>
+Date: Wed, 17 Oct 2012 17:05:13 -0400
+Message-ID: <20121017170513.0e4075c4@tlielax.poochiereds.net>
 References: <1350491389-8895-1-git-send-email-scott.lovenberg@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -47,8 +47,15 @@ scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 >  		host = unc_name + 2;
 >  		hostlen = strcspn(host, "/\\");
 
-Thanks, looks reasonable. I'll plan to pull it in for the next release
-unless there is objection...
+Steve suggested resending this patch and cc'ing samba and
+samba-technical. Also, add a bit more explanation about why we're
+making this change so people are clear about why it's coming.
 
+You should also prefix the subject with something like "mount.cifs: "
+to make it clear what this patch is intended for.
+
+I think that's reasonable -- could you do that?
+
+Thanks,
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
