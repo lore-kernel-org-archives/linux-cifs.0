@@ -1,59 +1,54 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 4/7] cifs: remove uneeded __KERNEL__ block from cifsacl.h
-Date: Wed, 17 Oct 2012 14:09:00 -0400
-Message-ID: <1350497343-7155-5-git-send-email-jlayton@redhat.com>
-References: <1350497343-7155-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: Re: [PATCH] Add warning that NFS syntax is deprecated and will be
+ removed in cifs-utils-6.0.
+Date: Wed, 17 Oct 2012 16:21:05 -0400
+Message-ID: <20121017162105.7b388df2@tlielax.poochiereds.net>
+References: <1350491389-8895-1-git-send-email-scott.lovenberg@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1350497343-7155-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1350491389-8895-1-git-send-email-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...and make those symbols static in cifsacl.c. Nothing outside
-of that file refers to them.
+On Wed, 17 Oct 2012 12:29:49 -0400
+scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsacl.c | 4 ++--
- fs/cifs/cifsacl.h | 5 -----
- 2 files changed, 2 insertions(+), 7 deletions(-)
+> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  mount.cifs.c |    4 ++++
+>  1 files changed, 4 insertions(+), 0 deletions(-)
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 756fce2..061ce32 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -1335,6 +1335,7 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
+>  	}
+>  
+>  	/* Set up "host" and "share" pointers based on UNC format. */
+> +	/* TODO: Remove support for NFS syntax as of cifs-utils-6.0. */
+>  	if (strncmp(unc_name, "//", 2) && strncmp(unc_name, "\\\\", 2)) {
+>  		/*
+>  		 * check for nfs syntax (server:/share/prepath)
+> @@ -1351,6 +1352,9 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
+>  		share++;
+>  		if (*share == '/')
+>  			++share;
+> +		fprintf(stderr, "WARNING: using NFS syntax for mounting CIFS "
+> +			"shares is deprecated and will be removed in cifs-utils"
+> +			"-6.0. Please migrate to UNC syntax.");
+>  	} else {
+>  		host = unc_name + 2;
+>  		hostlen = strcspn(host, "/\\");
 
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 9adcdb5..42b3fe9 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -42,7 +42,7 @@ static const struct cifs_sid sid_authusers = {
- /* group users */
- static const struct cifs_sid sid_user = {1, 2 , {0, 0, 0, 0, 0, 5}, {} };
- 
--const struct cred *root_cred;
-+static const struct cred *root_cred;
- 
- static void
- shrink_idmap_tree(struct rb_root *root, int nr_to_scan, int *nr_rem,
-@@ -187,7 +187,7 @@ cifs_idmap_key_destroy(struct key *key)
- 	kfree(key->payload.data);
- }
- 
--struct key_type cifs_idmap_key_type = {
-+static struct key_type cifs_idmap_key_type = {
- 	.name        = "cifs.idmap",
- 	.instantiate = cifs_idmap_key_instantiate,
- 	.destroy     = cifs_idmap_key_destroy,
-diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
-index 8b980cd..249c94f 100644
---- a/fs/cifs/cifsacl.h
-+++ b/fs/cifs/cifsacl.h
-@@ -109,9 +109,4 @@ struct cifs_sid_id {
- 	struct cifs_sid sid;
- };
- 
--#ifdef __KERNEL__
--extern struct key_type cifs_idmap_key_type;
--extern const struct cred *root_cred;
--#endif /* KERNEL */
--
- #endif /* _CIFSACL_H */
+Thanks, looks reasonable. I'll plan to pull it in for the next release
+unless there is objection...
+
 -- 
-1.7.11.7
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
