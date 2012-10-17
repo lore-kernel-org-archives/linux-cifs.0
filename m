@@ -1,83 +1,41 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix potential buffer overrun in cifs.idmap
- handling code
-Date: Tue, 16 Oct 2012 19:21:34 -0400
-Message-ID: <20121016192134.17ff3428@corrin.poochiereds.net>
-References: <1350386379-16850-1-git-send-email-jlayton@redhat.com>
-	<CADT32eL0ghENLv1xof1RMUEUH=E=ZBVD_VHemkx5Ni4xiMS8JQ@mail.gmail.com>
-	<20121016102620.26f852b5@tlielax.poochiereds.net>
-	<CADT32e+=Ftx=h8A_-=Cqhi7shXLDxm7XdDD7Pk9=u0-_3Qsj2Q@mail.gmail.com>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Re: Issue with upgrade to kernel 3.4.10 -> invalid argument error
+Date: Wed, 17 Oct 2012 15:25:24 +0530
+Message-ID: <507E808C.1020401@suse.com>
+References: <507D934E.9010304@innominate.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32e+=Ftx=h8A_-=Cqhi7shXLDxm7XdDD7Pk9=u0-_3Qsj2Q-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <507D934E.9010304-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 16 Oct 2012 17:01:56 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-
-> On Tue, Oct 16, 2012 at 9:26 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> >
-> > Thanks, I had another question too on a related note...
-> >
-> > The idmap code basically does double caching. You call into the keys
-> > API to do the mapping. If it doesn't have a mapping then it will call
-> > into userspace to establish one. The keys API will then cache that
-> > result in a "struct key". You're then taking that payload and caching
-> > it again in a rbtree.
-> >
-> > What's the rationale for that? Why not just use they keys API cache
-> > directly and get rid of all of the rbtrees? It seems like that would be
-> > a lot simpler...
-> >
-> > --
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+On 10/16/2012 10:33 PM, Federico Sauter wrote:
+> Greetings,
 > 
-> Jeff,
 > 
-> Would not we end up making an upcall for every uid/gid to sid
-> and sid to uid/gid mapping needed?  
-
-No. A request_key call will instantiate a new key in the keyring.
-Further request_key calls for the same string will return a reference
-to that key without upcalling.
-
-> That would be expensive.
-> The search in cached kernel cifs_sid_id structure would certainly
-> be faster and if either of the caches does not have mapping, it would
-> end up in making a winbind library to the server in either cases.
-> Is keys API cache bigger and sticks longer and searches quicker?
+> I am having an issue mounting CIFS shares since we upgraded our Linux
+> kernel from 2.6.27 to 3.4.10. Each time I try to mount a share drive I
+> get an "Invalid argument" error message even though I am using the same
+> command line that had previously worked, e.g.:
 > 
 
-I'm not sure which would be quicker, but I can't imagine it'll make
-that much difference. The keyring search uses RCU though and is mostly
-lock-free. Concurrent processes searching that keyring shouldn't
-serialize.
+A quick look suggests that the symptom is similar to the one fixed by
+the below commit
 
-While I'm sure that speed is important here, concurrency would seem to
-be more so. You don't want your stat() calls to serialize if you can at
-all help it.
+commit e73f843a3235a19de38359c91586e9eadef12238
+Author: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Date:   Tue Jun 12 07:15:50 2012 +0530
 
-> How would keys API cache entry look like?  Right now, cifs client
-> asks for either sid or id (uid or gid) and makes that association
-> in the cache entries. Would keys API cache make/keep same
-> association and return kernel that entire mapping?
-> 
+    cifs: fix parsing of password mount option
 
-It'll look just like it does today. You compose up a string with the
-key you're looking for and get the same payload you're looking for. The
-only difference is that we'll always call request key from id_to_sid
-and sid_to_id instead of searching the rbtree first.
 
-I think that bottom line is that this rbtree handling code is a lot of
-complexity to keep around and the benefits seem to be marginal. I've
-also found a number of bugs in this code. I'll plan to send a
-preliminary patchset tomorrow for discussion, but it probably needs
-some testing before I formally propose it.
+It might be worth trying to see whether the commit fixes the problem you
+are seeing.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+Thanks
+Suresh
