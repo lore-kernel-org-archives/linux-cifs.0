@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 6/9] cifs: avoid extra allocation for small cifs.idmap keys
-Date: Fri, 19 Oct 2012 08:20:47 -0400
-Message-ID: <1350649250-5343-7-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 1/9] cifs: make cifs_copy_sid handle a source sid with variable size subauth arrays
+Date: Fri, 19 Oct 2012 08:20:42 -0400
+Message-ID: <1350649250-5343-2-git-send-email-jlayton@redhat.com>
 References: <1350649250-5343-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,79 +10,57 @@ In-Reply-To: <1350649250-5343-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@pu
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The cifs.idmap keytype always allocates memory to hold the payload from
-userspace. In the common case where we're translating a SID to a UID or
-GID, we're allocating memory to hold something that's less than or equal
-to the size of a pointer.
-
-When the payload is the same size as a pointer or smaller, just store
-it in the payload.value union member instead. That saves us an extra
-allocation on the sid_to_id upcall.
-
-Note that we have to take extra care to check the datalen when we
-go to dereference the .data pointer in the union, but the callers
-now check that as a matter of course anyway.
+...and lift the restriction in id_to_sid upcall that the size must be
+at least as big as a full cifs_sid.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsacl.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ fs/cifs/cifsacl.c | 10 ++++++++--
+ fs/cifs/cifsacl.h |  3 +++
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index f4508ee..12d70ee 100644
+index 5a312eb..141a944 100644
 --- a/fs/cifs/cifsacl.c
 +++ b/fs/cifs/cifsacl.c
-@@ -49,6 +49,20 @@ cifs_idmap_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
+@@ -277,8 +277,14 @@ compare_sids(const struct cifs_sid *ctsid, const struct cifs_sid *cwsid)
+ static void
+ cifs_copy_sid(struct cifs_sid *dst, const struct cifs_sid *src)
  {
- 	char *payload;
- 
-+	/*
-+	 * If the payload is less than or equal to the size of a pointer, then
-+	 * an allocation here is wasteful. Just copy the data directly to the
-+	 * payload.value union member instead.
-+	 *
-+	 * With this however, you must check the datalen before trying to
-+	 * dereference payload.data!
-+	 */
-+	if (prep->datalen <= sizeof(void *)) {
-+		key->payload.value = 0;
-+		memcpy(&key->payload.value, prep->data, prep->datalen);
-+		key->datalen = prep->datalen;
-+		return 0;
-+	}
- 	payload = kmalloc(prep->datalen, GFP_KERNEL);
- 	if (!payload)
- 		return -ENOMEM;
-@@ -62,7 +76,8 @@ cifs_idmap_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
- static inline void
- cifs_idmap_key_destroy(struct key *key)
- {
--	kfree(key->payload.data);
-+	if (key->datalen > sizeof(void *))
-+		kfree(key->payload.data);
+-	memcpy(dst, src, sizeof(*dst));
++	int i;
++
++	dst->revision = src->revision;
+ 	dst->num_subauth = min_t(u8, src->num_subauth, NUM_SUBAUTHS);
++	for (i = 0; i < NUM_AUTHS; ++i)
++		dst->authority[i] = src->authority[i];
++	for (i = 0; i < dst->num_subauth; ++i)
++		dst->sub_auth[i] = src->sub_auth[i];
  }
  
- static struct key_type cifs_idmap_key_type = {
-@@ -245,7 +260,7 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
- 	 * probably a safe assumption but might be better to check based on
- 	 * sidtype.
- 	 */
--	if (sidkey->datalen < sizeof(uid_t)) {
-+	if (sidkey->datalen != sizeof(uid_t)) {
- 		rc = -EIO;
- 		cFYI(1, "%s: Downcall contained malformed key "
- 			"(datalen=%hu)", __func__, sidkey->datalen);
-@@ -253,9 +268,9 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
- 	}
+ static void
+@@ -427,7 +433,7 @@ id_to_sid(unsigned long cid, uint sidtype, struct cifs_sid *ssid)
+ 		if (IS_ERR(sidkey)) {
+ 			rc = -EINVAL;
+ 			cFYI(1, "%s: Can't map and id to a SID", __func__);
+-		} else if (sidkey->datalen < sizeof(struct cifs_sid)) {
++		} else if (sidkey->datalen < CIFS_SID_BASE_SIZE) {
+ 			rc = -EIO;
+ 			cFYI(1, "%s: Downcall contained malformed key "
+ 				"(datalen=%hu)", __func__, sidkey->datalen);
+diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+index 18c7521..7e52f19 100644
+--- a/fs/cifs/cifsacl.h
++++ b/fs/cifs/cifsacl.h
+@@ -64,6 +64,9 @@ struct cifs_sid {
+ 	__le32 sub_auth[NUM_SUBAUTHS]; /* sub_auth[num_subauth] */
+ } __attribute__((packed));
  
- 	if (sidtype == SIDOWNER)
--		fuid = *(uid_t *)sidkey->payload.value;
-+		fuid = (uid_t)sidkey->payload.value;
- 	else
--		fgid = *(gid_t *)sidkey->payload.value;
-+		fgid = (gid_t)sidkey->payload.value;
- 
- out_key_put:
- 	key_put(sidkey);
++/* size of a struct cifs_sid, sans sub_auth array */
++#define CIFS_SID_BASE_SIZE (1 + 1 + NUM_AUTHS)
++
+ struct cifs_acl {
+ 	__le16 revision; /* revision level */
+ 	__le16 size;
 -- 
 1.7.11.7
