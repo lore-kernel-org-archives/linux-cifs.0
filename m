@@ -1,45 +1,55 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 5/7] cifs: simplify id_to_sid and sid_to_id mapping code
-Date: Thu, 18 Oct 2012 16:42:06 -0400
-Message-ID: <20121018164206.57b9bbac@tlielax.poochiereds.net>
-References: <1350497343-7155-1-git-send-email-jlayton@redhat.com>
-	<1350497343-7155-6-git-send-email-jlayton@redhat.com>
-	<CADT32eLyF-FGKYxdYJibm8jOq0ofO_cNOMChG9qQ1zNxpZJhVQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] cifs: fix types on module parameters
+Date: Fri, 19 Oct 2012 08:14:52 -0400
+Message-ID: <1350648892-5182-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eLyF-FGKYxdYJibm8jOq0ofO_cNOMChG9qQ1zNxpZJhVQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 18 Oct 2012 14:51:03 -0500
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Most of these are unsigned ints, so we should be passing "uint" to
+module_param. Also, get rid of the extra "(bool)" in the description
+of enable_oplocks.
 
-> On Wed, Oct 17, 2012 at 1:09 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> 
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsfs.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-[...]
-
-> 
-> All the patches look correct except this question, would not this key_put
-> call end up purging the mapping from the cache.  In the current code
-> this is OK since cifsacl has its own cache but once it gone, we are
-> relying on keys API cache to provide mapping.
-> 
-
-No. The key (aka cache entry) will not garbage collected from the cache
-(aka the keyring) until it has expired and all references are put.
-Currently, I don't think we're setting any expiry on the key, which I
-think means that it'll live in the cache indefinitely.
-
-That does bring up a good point though. We should probably allow these
-to eventually expire. That's fairly simple to implement though -- any
-time we do a request key, we can just reset the timeout to some point
-in the future. I'll plan to add that in.
-
-Thanks for the review.
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index e7931cc..07a8ab52 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -64,24 +64,23 @@ unsigned int global_secflags = CIFSSEC_DEF;
+ unsigned int sign_CIFS_PDUs = 1;
+ static const struct super_operations cifs_super_ops;
+ unsigned int CIFSMaxBufSize = CIFS_MAX_MSGSIZE;
+-module_param(CIFSMaxBufSize, int, 0);
++module_param(CIFSMaxBufSize, uint, 0);
+ MODULE_PARM_DESC(CIFSMaxBufSize, "Network buffer size (not including header). "
+ 				 "Default: 16384 Range: 8192 to 130048");
+ unsigned int cifs_min_rcv = CIFS_MIN_RCV_POOL;
+-module_param(cifs_min_rcv, int, 0);
++module_param(cifs_min_rcv, uint, 0);
+ MODULE_PARM_DESC(cifs_min_rcv, "Network buffers in pool. Default: 4 Range: "
+ 				"1 to 64");
+ unsigned int cifs_min_small = 30;
+-module_param(cifs_min_small, int, 0);
++module_param(cifs_min_small, uint, 0);
+ MODULE_PARM_DESC(cifs_min_small, "Small network buffers in pool. Default: 30 "
+ 				 "Range: 2 to 256");
+ unsigned int cifs_max_pending = CIFS_MAX_REQ;
+-module_param(cifs_max_pending, int, 0444);
++module_param(cifs_max_pending, uint, 0444);
+ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
+ 				   "Default: 32767 Range: 2 to 32767.");
+ module_param(enable_oplocks, bool, 0644);
+-MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks (bool). Default:"
+-				 "y/Y/1");
++MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks. Default: y/Y/1");
+ 
+ extern mempool_t *cifs_sm_req_poolp;
+ extern mempool_t *cifs_req_poolp;
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.7.11.7
