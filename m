@@ -1,32 +1,34 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v2 0/9] cifs: second pile of cleanups for cifsacl
-Date: Fri, 19 Oct 2012 16:30:15 -0400
-Message-ID: <20121019163015.1e37f763@corrin.poochiereds.net>
-References: <1350649250-5343-1-git-send-email-jlayton@redhat.com>
-	<CAH2r5mvZnZiq4kf2eVE_bJ9GDzQhktQLweApt1J5FkS9kusO0A@mail.gmail.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/3] cifs: cifsacl cleanup, pile #3
+Date: Sat, 20 Oct 2012 07:43:02 -0500
+Message-ID: <CADT32eJMigP3HZu=qT7YjnPztFuDGjy7b1sj6qBGjraiykb2hg@mail.gmail.com>
+References: <1350676785-8525-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvZnZiq4kf2eVE_bJ9GDzQhktQLweApt1J5FkS9kusO0A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1350676785-8525-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 19 Oct 2012 15:18:46 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Fri, Oct 19, 2012 at 2:59 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> A few more fixes for the cifsacl set. Steve, I can roll these into the
+> other patches if you'd prefer...
+>
+> Jeff Layton (3):
+>   cifs: extra sanity checking for cifs.idmap keys
+>   cifs: fix hardcoded default security descriptor length
+>   cifs: deal with id_to_sid embedded sid reply corner case
+>
+>  fs/cifs/cifsacl.c | 35 ++++++++++++++++++++++++++++++-----
+>  fs/cifs/cifsacl.h | 11 ++++++++---
+>  2 files changed, 38 insertions(+), 8 deletions(-)
+>
+> --
+> 1.7.11.7
+>
 
-> These are in cifs-2.6.git for-next now.   Are there any patches in your
-> recent patch sets that you (or others) don't want going in until the
-> following release?
-> 
+All three patches look correct.
 
-Thanks. I just sent another set of 3 as well. Looks like you got the
-first one, but the other two should probably go in as well.
-
-The only one that I think is appropriate for 3.7 is c08094407. The rest of
-these patches are probably 3.8 material.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
