@@ -1,112 +1,162 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: don't call cifs_lookup from atomic open with a hashed negative dentry
-Date: Sat, 20 Oct 2012 20:44:42 -0400
-Message-ID: <1350780282-10385-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, vit.zahradka-IWqWACnzNjzrBKCeMvbIDA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v4 1/2] cifs: Alternate Data Streams: Add support
+Date: Sun, 21 Oct 2012 07:44:54 -0400
+Message-ID: <20121021074454.1a4316e5@tlielax.poochiereds.net>
+References: <1350739560-9197-1-git-send-email-shirishpargaonkar@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1350739560-9197-1-git-send-email-shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The following oops was reported by Vit Zahradka. The BUG is this in
-__d_rehash():
+On Sat, 20 Oct 2012 08:26:00 -0500
+shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-    BUG_ON(!d_unhashed(entry));
+> From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> 
+> Add support of Alternate Data Streams (ads).
+> 
+> The generic access flags that cifs client currently employs are sufficient
+> for alternate data streams as well (MS-CIFS 2.2.4.64.1).
+> 
+> The stream file and stream type are specified using : after the file name,
+> so that is used to differentiate between a regular file and its
+> alternate data streams and stream types.
+> Since they all have the same file id, each path name,
+> file name:stream name:stream type, has a separate inode with that same
+> file id but a distinct private data (path name) in that inode to
+> distinguish them.
+> 
+> This scheme applies only to non-posix compliant servers such as Windows.
+> 
+> One operation that does not work is Rename (0x7).
+> 
+> 
+> Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c   |    1 +
+>  fs/cifs/cifsglob.h |    2 ++
+>  fs/cifs/inode.c    |   34 +++++++++++++++++++++++++++++++++-
+>  3 files changed, 36 insertions(+), 1 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index a41044a..1a02c81 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -264,6 +264,7 @@ cifs_evict_inode(struct inode *inode)
+>  {
+>  	truncate_inode_pages(&inode->i_data, 0);
+>  	clear_inode(inode);
+> +	kfree(inode->i_private);
 
-:kernel BUG at fs/dcache.c:2138!
-:invalid opcode: 0000 [#1] SMP
-:Modules linked in: fuse ebtable_nat ebtables ipt_MASQUERADE iptable_nat
-nf_nat des_generic xt_CHECKSUM iptable_mangle md4 bridge stp llc nls_utf8
-cifs dns_resolver fscache lockd sunrpc rfcomm bnep be2iscsi
-iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi
-ib_iser rdma_cm ib_addr iw_cm ib_cm ib_sa ib_mad ib_core iscsi_tcp
-libiscsi_tcp libiscsi scsi_transport_iscsi ip6t_REJECT nf_conntrack_ipv6
-nf_defrag_ipv6 ip6table_filter ip6_tables nf_conntrack_ipv4 nf_defrag_ipv4
-xt_state nf_conntrack snd_hda_codec_conexant btusb bluetooth snd_hda_intel
-snd_hda_codec snd_hwdep snd_seq snd_seq_device snd_pcm thinkpad_acpi
-snd_page_alloc arc4 snd_timer iwldvm mac80211 iwlwifi cfg80211 uvcvideo
-videobuf2_vmalloc videobuf2_memops videobuf2_core videodev snd media rfkill
-soundcore i2c_i801 mei r592 memstick iTCO_wdt iTCO_vendor_support lpc_ich
-tg3 coretemp microcode ppdev parport_pc parport vhost_net tun macvtap
-macvlan kvm_intel kvm uinput binfmt_misc firewire_oh
-:ci firewire_core crc_itu_t sdhci_pci sdhci mmc_core yenta_socket wmi video
-radeon i2c_algo_bit drm_kms_helper ttm drm i2c_core
-:Pid: 2219, comm: eclipse Not tainted 3.6.1-1.fc17.i686 #1 LENOVO
-27326FG/27326FG
-:EIP: 0060:[<c0557577>] EFLAGS: 00010282 CPU: 1
-:EIP is at __d_rehash+0x57/0x60
-:EAX: ee641c80 EBX: 0000096a ECX: f7338208 EDX: f7338208
-:ESI: fffffffe EDI: f6339f60 EBP: f0481d84 ESP: f0481d80
-: DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-:CR0: 8005003b CR2: 06567f84 CR3: 30710000 CR4: 000027d0
-:DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-:DR6: ffff0ff0 DR7: 00000400
-:Process eclipse (pid: 2219, ti=f0480000 task=f0490c90 task.ti=f0480000)
-:Stack:
-: 0000096a f0481d90 c05575b2 ee641c80 f0481d9c c05575da 00000000 f0481dd8
-: f9c01e32 f0734000 00004213 00000000 f0734000 f0481df4 f11ce600 00004213
-: f6b07c60 00000000 00000000 f0481ef8 ee641c80 ef1781e0 f0481e20 f9c01f52
-:Call Trace:
-: [<c05575b2>] _d_rehash+0x32/0x40
-: [<c05575da>] d_rehash+0x1a/0x30
-: [<f9c01e32>] cifs_lookup+0x212/0x300 [cifs]
-: [<f9c01f52>] cifs_atomic_open+0x32/0x200 [cifs]
-: [<c05584bf>] ? d_lookup+0x2f/0x50
-: [<c055074c>] do_last+0x42c/0xbd0
-: [<c054dd8c>] ? link_path_walk+0x1dc/0x750
-: [<c0550f8d>] path_openat+0x9d/0x3b0
-: [<c046d47f>] ? wake_up_state+0xf/0x20
-: [<c0490ed2>] ? wake_futex+0x32/0x50
-: [<c046fcb5>] ? __dequeue_entity+0x25/0x40
-: [<c0551481>] do_filp_open+0x31/0x80
-: [<c055bdfc>] ? alloc_fd+0x3c/0xe0
-: [<c054c970>] ? getname_flags+0x40/0xd0
-: [<c0542885>] do_sys_open+0xe5/0x1c0
-: [<c05429d0>] sys_openat+0x30/0x40
-: [<c095addf>] sysenter_do_call+0x12/0x28
-:Code: 48 08 74 03 89 59 04 f6 c3 01 89 50 0c 75 20 f6 02 01 74 19 83 cb 01
-89 1a 0f ba 32 00 5b 5d c3 f3 90 8b 0a 80 e1 01 75 f7 eb b9 <0f> 0b 0f 0b
-0f 0b 8d 76 00 55 89 e5 53 66 66 66 66 90 8b 0d fc
-:EIP: [<c0557577>] __d_rehash+0x57/0x60 SS:ESP 0068:f0481d80
+Are you sure that i_private is always initialized to NULL? Hmm...looks
+like they probably are in inode_init_always. Ok...
 
-I think what happened is something like the following:
+>  	cifs_fscache_release_inode_cookie(inode);
+>  }
+>  
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index f5af252..26d65c7 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1251,6 +1251,7 @@ struct dfs_info3_param {
+>  #define CIFS_FATTR_DELETE_PENDING	0x2
+>  #define CIFS_FATTR_NEED_REVAL		0x4
+>  #define CIFS_FATTR_INO_COLLISION	0x8
+> +#define CIFS_FATTR_ALTDATASTR		0x10
+>  
+>  struct cifs_fattr {
+>  	u32		cf_flags;
+> @@ -1268,6 +1269,7 @@ struct cifs_fattr {
+>  	struct timespec	cf_atime;
+>  	struct timespec	cf_mtime;
+>  	struct timespec	cf_ctime;
+> +	char		*cf_private;
+>  };
+>  
+>  static inline void free_dfs_info_param(struct dfs_info3_param *param)
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index afdff79..201ec46 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -615,10 +615,12 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+>  	struct tcon_link *tlink;
+>  	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+>  	char *buf = NULL;
+> +	char *altstr = NULL;
+>  	bool adjust_tz = false;
+>  	struct cifs_fattr fattr;
+>  	struct cifs_search_info *srchinf = NULL;
+>  
+> +	fattr.cf_private = NULL;
+>  	tlink = cifs_sb_tlink(cifs_sb);
+>  	if (IS_ERR(tlink))
+>  		return PTR_ERR(tlink);
+> @@ -746,14 +748,34 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+>  	}
+>  
+>  	if (!*inode) {
+> +		altstr = strchr(full_path, ':');
+> +		if (altstr) {
+> +			fattr.cf_private = kstrdup(altstr, GFP_KERNEL);
+> +			if (!fattr.cf_private) {
+> +				rc = -ENOMEM;
+> +				goto cgii_exit;
+> +			}
+> +			fattr.cf_flags |= CIFS_FATTR_ALTDATASTR;
+> +		}
+> +
+>  		*inode = cifs_iget(sb, &fattr);
+> -		if (!*inode)
+> +		if (*inode) {
+> +			if (altstr && !((*inode)->i_flags & S_PRIVATE)) {
+> +				(*inode)->i_private =
+> +					kstrdup(altstr, GFP_KERNEL);
+> +				if ((*inode)->i_private)
+> +					(*inode)->i_flags |= S_PRIVATE;
+> +				else
+> +					rc = -ENOMEM;
+> +			}
+> +		} else
 
-openat() was called on the file without O_CREAT. A negative dentry was
-already in the cache, and was successfully revalidated. At that point a
-hashed, negative dentry was passed to cifs_atomic_open. Since O_CREAT
-wasn't set, it punted it over to cifs_lookup which did a lookup and then
-tried to rehash the result and tripped over the bug.
+		^^^^^
+Why redo the allocation and copy here? You could just hand off the one
+you just allocated...
 
-Fix this by simply returning -ENOENT in this case instead of calling
-cifs_lookup. For the longer term, I think cifs_atomic_open could use
-some cleanup. There is probably no reason to limit atomic opens to the
-O_CREAT case.
+>  			rc = -ENOMEM;
+>  	} else {
+>  		cifs_fattr_to_inode(*inode, &fattr);
+>  	}
+>  
+>  cgii_exit:
+> +	kfree(fattr.cf_private);
+>  	kfree(buf);
+>  	cifs_put_tlink(tlink);
+>  	return rc;
+> @@ -784,6 +806,16 @@ cifs_find_inode(struct inode *inode, void *opaque)
+>  	if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
+>  		fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
+>  
+> +	/* looking for an inode of a alternate data stream (full pathname) */
+> +	if (fattr->cf_flags & CIFS_FATTR_ALTDATASTR) {
+> +		if (!(inode->i_flags & S_PRIVATE)) {
+> +			return 0;
+> +		} else {
+> +			if (strcmp(inode->i_private, fattr->cf_private))
+> +				return 0;
+> +		}
+> +	}
+> +
+>  	return 1;
+>  }
+>  
 
-Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # 3.6.x
-Reported-and-Tested-by: Vit Zahradka <vit.zahradka-IWqWACnzNjzrBKCeMvbIDA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/dir.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 7c0a812..5da95d3 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -398,7 +398,12 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
- 	 * in network traffic in the other paths.
- 	 */
- 	if (!(oflags & O_CREAT)) {
--		struct dentry *res = cifs_lookup(inode, direntry, 0);
-+		struct dentry *res;
-+
-+		if (!direntry->d_inode)
-+			return -ENOENT;
-+
-+		res = cifs_lookup(inode, direntry, 0);
- 		if (IS_ERR(res))
- 			return PTR_ERR(res);
- 
+Looks like S_PRIVATE has some other security/permissions related
+effects. Do you expect any behavior change from using it here?
 -- 
-1.7.11.7
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
