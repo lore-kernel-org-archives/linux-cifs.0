@@ -1,67 +1,60 @@
-From: Jeff Layton <jlayton@redhat.com>
+From: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
 Subject: Re: CIFS: Deprecating NFS mounting syntax in mount.cifs
-Date: Tue, 23 Oct 2012 13:36:27 -0400
-Message-ID: <20121023133627.798100fb@corrin.poochiereds.net>
-References: <1350583669-12118-1-git-send-email-scott.lovenberg@gmail.com>
-	<5086BE25.8080102@gmail.com> <5086CA29.8030305@steve-ss.com>
-	<20121023130238.6100255d@corrin.poochiereds.net>
-	<5086D258.1020203@steve-ss.com>
+Date: Tue, 23 Oct 2012 21:23:08 +0200
+Message-ID: <5086EE9C.7030800@steve-ss.com>
+References: <1350583669-12118-1-git-send-email-scott.lovenberg@gmail.com> <5086BE25.8080102@gmail.com> <5086CA29.8030305@steve-ss.com> <CAFB9KM26Qk-MC+_w-Q4Rrg3X0nMJ2efS72Y+GjWckgf9g6fzEg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: samba@lists.samba.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, smfrench@gmail.com
-To: steve <steve@steve-ss.com>
-Return-path: <samba-bounces@lists.samba.org>
-In-Reply-To: <5086D258.1020203@steve-ss.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba>,
-	<mailto:samba-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba>
-List-Post: <mailto:samba@lists.samba.org>
-List-Help: <mailto:samba-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba>,
-	<mailto:samba-request@lists.samba.org?subject=subscribe>
-Sender: samba-bounces@lists.samba.org
-Errors-To: samba-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAFB9KM26Qk-MC+_w-Q4Rrg3X0nMJ2efS72Y+GjWckgf9g6fzEg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 23 Oct 2012 19:22:32 +0200
-steve <steve@steve-ss.com> wrote:
+On 10/23/2012 07:27 PM, Scott Lovenberg wrote:
+> On Tue, Oct 23, 2012 at 12:47 PM, steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
+>> On 10/23/2012 05:56 PM, Scott Lovenberg wrote:
+>>> On 10/18/2012 2:07 PM, scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+>>> no one has objected (or really said anything).  Can we merge this patch?
+>>> --
+>> Hi
+>> I'm just trying to represent users. Can we take this to user level by giving
+>> an example of what will work and what will not work after the patch?
+>>
+> I should clarify, this patch doesn't change the behavior of the mount
+> utility, it just warns the user that in future releases the syntax
+> that they are using will be removed.  The patch to remove the behavior
+> is going to be in a later release.
+>
+> What will work is any path that begins with "//" or "\\" which is a
+> normal UNC.  So your normal "//server/share" path is fine.  NFS syntax
+> allows for you to specify the path like "server:/share".  That syntax
+> will no longer work in cifs-utils 6.0.
+>
+>> For example, the Linux automounter.
+>>
+>> Currently, we have this map:
+>> * -fstype=cifs,rw,sec=krb5 ://myserver/myshare/&
+>>
+>> Are you talking about the difference between that and this:
+>> * -fstype=cifs,rw,sec=krb5 myserver:/myshare/&
+>>
+>> Question: will I need to change anything due to this patch?
+>>
+> Quite the opposite, the "//myserver/myshare" is correct,
+> "myserver:/myshare" will no longer work.  The ':' is part of the
+> automounter's map syntax.  It will use the path "//myserver/myshare".
+>
+Hi Scott, hi everyone
+Yeah, that's fine.
+Does this clear up the issue with the ':'? I should have made it clearer 
+that I was referring to autofs and not mounting e.g. from fstab. I just 
+tried the automounter on cifs without the ':' and it doesn't work.
 
-> On 10/23/2012 07:02 PM, Jeff Layton wrote:
-> > On Tue, 23 Oct 2012 18:47:37 +0200
-> > steve <steve@steve-ss.com> wrote:
-> >
-> >> On 10/23/2012 05:56 PM, Scott Lovenberg wrote:
-> >> Currently, we have this map: * -fstype=cifs,rw,sec=krb5 
-> >> ://myserver/myshare/& 
-> > Does that really work? What purpose does the ':' serve there?
-> Yes. They always put a ':' before the mount except for the default NFS. 
-> I took a look at the example /etc/auto.misc which comes (commented out) 
-> with openSUSE. They always put a ':'.
-
-Ok, I see now. From autofs(5):
-
-If the filesystem to be mounted begins with a / (such as local /dev
-entries or smbfs shares) a : needs to be prefixed (e.g.  :/dev/sda1).
-
-...I guess it's necessary for the autofs parser. I assume that the ':'
-doesn't get passed to the actual mount invocation though, so that
-should continue to work just fine.
-
-> > That
-> > should probably be removed. I doubt we'd end up breaking that syntax,
-> > but I can't be certain.
-> >
-> Just to say that this is a seemingly innocuous patch, but one which may 
-> lead to confusion.
-
-Well, better confusion now than confusion when it breaks. cifs really
-is just too "loose" about the syntax of things that it accepts, which
-sounds great until you have to test all of the different variations...
-
--- 
-Jeff Layton <jlayton@redhat.com>
--- 
-To unsubscribe from this list go to the following URL and read the
-instructions:  https://lists.samba.org/mailman/options/samba
+Would it perhaps help to put a message in the logs when it fails, rather 
+than silence? Or maybe that's more of a question for the autofs guys.
+Cheers,
+Steve
