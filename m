@@ -1,54 +1,72 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Add warning that NFS syntax is deprecated and will be
- removed in cifs-utils-6.0.
-Date: Tue, 23 Oct 2012 15:40:53 -0400
-Message-ID: <20121023154053.7d245d8a@corrin.poochiereds.net>
-References: <1350583669-12118-1-git-send-email-scott.lovenberg@gmail.com>
-	<1350583669-12118-2-git-send-email-scott.lovenberg@gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH 1/1] cifs: add krb5m option for MAY_SIGN
+Date: Tue, 23 Oct 2012 15:57:50 -0400
+Message-ID: <20121023155750.726f5da5@corrin.poochiereds.net>
+References: <1351005100-21172-1-git-send-email-martijn.de.gouw@prodrive.nl>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Cc: <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1350583669-12118-2-git-send-email-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <1351005100-21172-1-git-send-email-martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 18 Oct 2012 14:07:49 -0400
-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Tue, 23 Oct 2012 17:11:40 +0200
+Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
 
-> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> This option allows usage of dfs where some servers require signing
+> and others don't.
 > 
-> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
 > ---
->  mount.cifs.c |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+> :100644 100644 b39bb4a... c5a4183... M	fs/cifs/connect.c
+>  fs/cifs/connect.c |    6 +++++-
+>  1 files changed, 5 insertions(+), 1 deletions(-)
 > 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 756fce2..061ce32 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -1335,6 +1335,7 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
->  	}
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index b39bb4a..c5a4183 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -236,7 +236,7 @@ static const match_table_t cifs_mount_option_tokens = {
+>  };
 >  
->  	/* Set up "host" and "share" pointers based on UNC format. */
-> +	/* TODO: Remove support for NFS syntax as of cifs-utils-6.0. */
->  	if (strncmp(unc_name, "//", 2) && strncmp(unc_name, "\\\\", 2)) {
->  		/*
->  		 * check for nfs syntax (server:/share/prepath)
-> @@ -1351,6 +1352,9 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
->  		share++;
->  		if (*share == '/')
->  			++share;
-> +		fprintf(stderr, "WARNING: using NFS syntax for mounting CIFS "
-> +			"shares is deprecated and will be removed in cifs-utils"
-> +			"-6.0. Please migrate to UNC syntax.");
->  	} else {
->  		host = unc_name + 2;
->  		hostlen = strcspn(host, "/\\");
+>  enum {
+> -	Opt_sec_krb5, Opt_sec_krb5i, Opt_sec_krb5p,
+> +	Opt_sec_krb5, Opt_sec_krb5i, Opt_sec_krb5m, Opt_sec_krb5p,
+>  	Opt_sec_ntlmsspi, Opt_sec_ntlmssp,
+>  	Opt_ntlm, Opt_sec_ntlmi, Opt_sec_ntlmv2,
+>  	Opt_sec_ntlmv2i, Opt_sec_lanman,
+> @@ -248,6 +248,7 @@ enum {
+>  static const match_table_t cifs_secflavor_tokens = {
+>  	{ Opt_sec_krb5, "krb5" },
+>  	{ Opt_sec_krb5i, "krb5i" },
+> +	{ Opt_sec_krb5m, "krb5m" },
+>  	{ Opt_sec_krb5p, "krb5p" },
+>  	{ Opt_sec_ntlmsspi, "ntlmsspi" },
+>  	{ Opt_sec_ntlmssp, "ntlmssp" },
+> @@ -999,6 +1000,9 @@ static int cifs_parse_security_flavors(char *value,
+>  	case Opt_sec_krb5i:
+>  		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
+>  		break;
+> +	case Opt_sec_krb5m:
+> +		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
+> +		break;
+>  	case Opt_sec_krb5p:
+>  		/* vol->secFlg |= CIFSSEC_MUST_SEAL | CIFSSEC_MAY_KRB5; */
+>  		cERROR(1, "Krb5 cifs privacy not supported");
 
-Merged (with addition of a newline to the end of warning message)...
+Yuck. I've no objection to allowing MAY_SIGN, but I'm not crazy about
+adding a new security flavor. It might be best to just add that flag
+unconditionally under Opt_sec_krb5. IOW, we'd just declare that
+sec=krb5 == your new sec=krb5m.
+
+<obligatory rant>
+The whole secFlg thing is a f'ed up mess. It needs an overall redesign
+from the ground up. Not only because the current code is getting in the
+way of proper autonegotiation with the server, but it's hard to
+maintain and the SecurityFlags interface is the epitome of obtuseness.
+</obligatory rant>
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
