@@ -1,60 +1,54 @@
-From: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
-Subject: Re: CIFS: Deprecating NFS mounting syntax in mount.cifs
-Date: Tue, 23 Oct 2012 21:23:08 +0200
-Message-ID: <5086EE9C.7030800@steve-ss.com>
-References: <1350583669-12118-1-git-send-email-scott.lovenberg@gmail.com> <5086BE25.8080102@gmail.com> <5086CA29.8030305@steve-ss.com> <CAFB9KM26Qk-MC+_w-Q4Rrg3X0nMJ2efS72Y+GjWckgf9g6fzEg@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] Add warning that NFS syntax is deprecated and will be
+ removed in cifs-utils-6.0.
+Date: Tue, 23 Oct 2012 15:40:53 -0400
+Message-ID: <20121023154053.7d245d8a@corrin.poochiereds.net>
+References: <1350583669-12118-1-git-send-email-scott.lovenberg@gmail.com>
+	<1350583669-12118-2-git-send-email-scott.lovenberg@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
 	samba-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAFB9KM26Qk-MC+_w-Q4Rrg3X0nMJ2efS72Y+GjWckgf9g6fzEg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1350583669-12118-2-git-send-email-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 10/23/2012 07:27 PM, Scott Lovenberg wrote:
-> On Tue, Oct 23, 2012 at 12:47 PM, steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
->> On 10/23/2012 05:56 PM, Scott Lovenberg wrote:
->>> On 10/18/2012 2:07 PM, scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
->>> no one has objected (or really said anything).  Can we merge this patch?
->>> --
->> Hi
->> I'm just trying to represent users. Can we take this to user level by giving
->> an example of what will work and what will not work after the patch?
->>
-> I should clarify, this patch doesn't change the behavior of the mount
-> utility, it just warns the user that in future releases the syntax
-> that they are using will be removed.  The patch to remove the behavior
-> is going to be in a later release.
->
-> What will work is any path that begins with "//" or "\\" which is a
-> normal UNC.  So your normal "//server/share" path is fine.  NFS syntax
-> allows for you to specify the path like "server:/share".  That syntax
-> will no longer work in cifs-utils 6.0.
->
->> For example, the Linux automounter.
->>
->> Currently, we have this map:
->> * -fstype=cifs,rw,sec=krb5 ://myserver/myshare/&
->>
->> Are you talking about the difference between that and this:
->> * -fstype=cifs,rw,sec=krb5 myserver:/myshare/&
->>
->> Question: will I need to change anything due to this patch?
->>
-> Quite the opposite, the "//myserver/myshare" is correct,
-> "myserver:/myshare" will no longer work.  The ':' is part of the
-> automounter's map syntax.  It will use the path "//myserver/myshare".
->
-Hi Scott, hi everyone
-Yeah, that's fine.
-Does this clear up the issue with the ':'? I should have made it clearer 
-that I was referring to autofs and not mounting e.g. from fstab. I just 
-tried the automounter on cifs without the ':' and it doesn't work.
+On Thu, 18 Oct 2012 14:07:49 -0400
+scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
 
-Would it perhaps help to put a message in the logs when it fails, rather 
-than silence? Or maybe that's more of a question for the autofs guys.
-Cheers,
-Steve
+> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> 
+> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> ---
+>  mount.cifs.c |    4 ++++
+>  1 files changed, 4 insertions(+), 0 deletions(-)
+> 
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 756fce2..061ce32 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -1335,6 +1335,7 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
+>  	}
+>  
+>  	/* Set up "host" and "share" pointers based on UNC format. */
+> +	/* TODO: Remove support for NFS syntax as of cifs-utils-6.0. */
+>  	if (strncmp(unc_name, "//", 2) && strncmp(unc_name, "\\\\", 2)) {
+>  		/*
+>  		 * check for nfs syntax (server:/share/prepath)
+> @@ -1351,6 +1352,9 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
+>  		share++;
+>  		if (*share == '/')
+>  			++share;
+> +		fprintf(stderr, "WARNING: using NFS syntax for mounting CIFS "
+> +			"shares is deprecated and will be removed in cifs-utils"
+> +			"-6.0. Please migrate to UNC syntax.");
+>  	} else {
+>  		host = unc_name + 2;
+>  		hostlen = strcspn(host, "/\\");
+
+Merged (with addition of a newline to the end of warning message)...
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
