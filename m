@@ -1,59 +1,135 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 1/3] CIFS: Use OID registry facility
-Date: Mon, 22 Oct 2012 15:57:15 -0400
-Message-ID: <20121022155715.3902512b@corrin.poochiereds.net>
-References: <20121022143635.0ee0c824@corrin.poochiereds.net>
-	<20121022142318.6989.5077.stgit@warthog.procyon.org.uk>
-	<20121022142326.6989.45552.stgit@warthog.procyon.org.uk>
-	<12137.1350933565@warthog.procyon.org.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH v6 1/2] cifs: Alternate Data Streams: Add support
+Date: Tue, 23 Oct 2012 00:03:30 -0500
+Message-ID: <1350968610-20221-1-git-send-email-shirishpargaonkar@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <12137.1350933565-S6HVgzuS8uM4Awkfq6JHfwNdhmdF6hFW@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 22 Oct 2012 20:19:25 +0100
-David Howells <dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> 
-> > In general, I'm all for moving CIFS out of the business of implementing
-> > ASN.1 like this. This last bit of this patch was a bit confusing though.
-> > It left me wondering where the actual definitions of these OIDs go.
-> > 
-> > It looks though like you're using a script to scrape the comments out
-> > of the above enum to generate C files.
-> 
-> That is correct.  See the comment preceding enum OID.  I should add something
-> to Documentation/ about this too.
-> 
-> > That would certainly work, but it seems like a fragile solution. Minor
-> > whitespace munging (like an extra newline in there) could throw off the
-> > parsing...
-> 
-> Extra whitespace and extra newlines shouldn't hurt, unless you mean splitting
-> a comment over multiple lines.
-> 
-> I could generate the enum too, though it's easy enough for anyone to check
-> that the OID they've just added is present in the table.
-> 
-> Actually, it can be made a lot more robust by assuming that every line with
-> "OID_" in it is an OID declaration, and everyone of those lines that doesn't
-> match the expected pattern gets an error.
-> 
-> David
 
-I guess it just looked a little weird to me. The comment that matches a
-enum element is actually part of the following element since it comes
-after the comma. Based on the script, what matters is that the enum and
-the comment are on the same line.
+Add support of Alternate Data Streams (ads).
 
-But...as long as it's all clearly documented, I guess I can't complain
-too much. ;)
+The generic access flags that cifs client currently employs are sufficient
+for alternate data streams as well (MS-CIFS 2.2.4.64.1).
 
+The stream file and stream type are specified using : after the file name,
+so that is used to differentiate between a regular file and its
+alternate data streams and stream types.
+Since they all have the same file id, each path name,
+file name:stream name:stream type, has a separate inode with that same
+file id but a distinct private data (path name) in that inode to
+distinguish them.
+
+This scheme applies only to non-posix compliant servers such as Windows.
+
+One operation that does not work is Rename (0x7).
+
+
+Signed-off-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |    1 +
+ fs/cifs/cifsglob.h |    2 ++
+ fs/cifs/inode.c    |   31 ++++++++++++++++++++++++++++++-
+ 3 files changed, 33 insertions(+), 1 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index a41044a..1a02c81 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -264,6 +264,7 @@ cifs_evict_inode(struct inode *inode)
+ {
+ 	truncate_inode_pages(&inode->i_data, 0);
+ 	clear_inode(inode);
++	kfree(inode->i_private);
+ 	cifs_fscache_release_inode_cookie(inode);
+ }
+ 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f5af252..26d65c7 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1251,6 +1251,7 @@ struct dfs_info3_param {
+ #define CIFS_FATTR_DELETE_PENDING	0x2
+ #define CIFS_FATTR_NEED_REVAL		0x4
+ #define CIFS_FATTR_INO_COLLISION	0x8
++#define CIFS_FATTR_ALTDATASTR		0x10
+ 
+ struct cifs_fattr {
+ 	u32		cf_flags;
+@@ -1268,6 +1269,7 @@ struct cifs_fattr {
+ 	struct timespec	cf_atime;
+ 	struct timespec	cf_mtime;
+ 	struct timespec	cf_ctime;
++	char		*cf_private;
+ };
+ 
+ static inline void free_dfs_info_param(struct dfs_info3_param *param)
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index afdff79..b7c6dcf 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -615,10 +615,12 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	struct tcon_link *tlink;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
+ 	char *buf = NULL;
++	char *altstr = NULL;
+ 	bool adjust_tz = false;
+ 	struct cifs_fattr fattr;
+ 	struct cifs_search_info *srchinf = NULL;
+ 
++	fattr.cf_private = NULL;
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+@@ -746,9 +748,26 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
+ 	}
+ 
+ 	if (!*inode) {
++		altstr = strchr(full_path, ':');
++		if (altstr) {
++			fattr.cf_private = kstrdup(altstr, GFP_KERNEL);
++			if (!fattr.cf_private) {
++				rc = -ENOMEM;
++				goto cgii_exit;
++			}
++			fattr.cf_flags |= CIFS_FATTR_ALTDATASTR;
++		}
++
+ 		*inode = cifs_iget(sb, &fattr);
+-		if (!*inode)
++		if (*inode) {
++			if (altstr && !((*inode)->i_private))
++				(*inode)->i_private = fattr.cf_private;
++			else
++				kfree(fattr.cf_private);
++		} else {
+ 			rc = -ENOMEM;
++			kfree(fattr.cf_private);
++		}
+ 	} else {
+ 		cifs_fattr_to_inode(*inode, &fattr);
+ 	}
+@@ -784,6 +803,16 @@ cifs_find_inode(struct inode *inode, void *opaque)
+ 	if (S_ISDIR(inode->i_mode) && !hlist_empty(&inode->i_dentry))
+ 		fattr->cf_flags |= CIFS_FATTR_INO_COLLISION;
+ 
++	/* looking for an inode of a alternate data stream (full pathname) */
++	if (fattr->cf_flags & CIFS_FATTR_ALTDATASTR) {
++		if (!(inode->i_private)) {
++			return 0;
++		} else {
++			if (strcmp(inode->i_private, fattr->cf_private))
++				return 0;
++		}
++	}
++
+ 	return 1;
+ }
+ 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.6.0.2
