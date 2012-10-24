@@ -1,72 +1,67 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 1/1] cifs: add krb5m option for MAY_SIGN
-Date: Tue, 23 Oct 2012 15:57:50 -0400
-Message-ID: <20121023155750.726f5da5@corrin.poochiereds.net>
-References: <1351005100-21172-1-git-send-email-martijn.de.gouw@prodrive.nl>
+From: Scott Lovenberg <scott.lovenberg@gmail.com>
+Subject: Re: CIFS: Deprecating NFS mounting syntax in mount.cifs
+Date: Wed, 24 Oct 2012 02:20:10 -0400
+Message-ID: <CAFB9KM2bTnsA1jnMR26r+Why=gVNE0qwoaXvbpQfmSZy+yMd=Q@mail.gmail.com>
+References: <1350583669-12118-1-git-send-email-scott.lovenberg@gmail.com>
+	<5086BE25.8080102@gmail.com> <5086CA29.8030305@steve-ss.com>
+	<CAFB9KM26Qk-MC+_w-Q4Rrg3X0nMJ2efS72Y+GjWckgf9g6fzEg@mail.gmail.com>
+	<5086EE9C.7030800@steve-ss.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1351005100-21172-1-git-send-email-martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: samba@lists.samba.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, jlayton@redhat.com, smfrench@gmail.com
+To: steve <steve@steve-ss.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <5086EE9C.7030800@steve-ss.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 23 Oct 2012 17:11:40 +0200
-Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
+On Tue, Oct 23, 2012 at 3:23 PM, steve <steve@steve-ss.com> wrote:
 
-> This option allows usage of dfs where some servers require signing
-> and others don't.
-> 
-> Signed-off-by: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
-> ---
-> :100644 100644 b39bb4a... c5a4183... M	fs/cifs/connect.c
->  fs/cifs/connect.c |    6 +++++-
->  1 files changed, 5 insertions(+), 1 deletions(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index b39bb4a..c5a4183 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -236,7 +236,7 @@ static const match_table_t cifs_mount_option_tokens = {
->  };
->  
->  enum {
-> -	Opt_sec_krb5, Opt_sec_krb5i, Opt_sec_krb5p,
-> +	Opt_sec_krb5, Opt_sec_krb5i, Opt_sec_krb5m, Opt_sec_krb5p,
->  	Opt_sec_ntlmsspi, Opt_sec_ntlmssp,
->  	Opt_ntlm, Opt_sec_ntlmi, Opt_sec_ntlmv2,
->  	Opt_sec_ntlmv2i, Opt_sec_lanman,
-> @@ -248,6 +248,7 @@ enum {
->  static const match_table_t cifs_secflavor_tokens = {
->  	{ Opt_sec_krb5, "krb5" },
->  	{ Opt_sec_krb5i, "krb5i" },
-> +	{ Opt_sec_krb5m, "krb5m" },
->  	{ Opt_sec_krb5p, "krb5p" },
->  	{ Opt_sec_ntlmsspi, "ntlmsspi" },
->  	{ Opt_sec_ntlmssp, "ntlmssp" },
-> @@ -999,6 +1000,9 @@ static int cifs_parse_security_flavors(char *value,
->  	case Opt_sec_krb5i:
->  		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
->  		break;
-> +	case Opt_sec_krb5m:
-> +		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
-> +		break;
->  	case Opt_sec_krb5p:
->  		/* vol->secFlg |= CIFSSEC_MUST_SEAL | CIFSSEC_MAY_KRB5; */
->  		cERROR(1, "Krb5 cifs privacy not supported");
+> Hi Scott, hi everyone
+> Yeah, that's fine.
+> Does this clear up the issue with the ':'? I should have made it clearer
+> that I was referring to autofs and not mounting e.g. from fstab. I just
+> tried the automounter on cifs without the ':' and it doesn't work.
+>
+> Would it perhaps help to put a message in the logs when it fails, rather
+> than silence? Or maybe that's more of a question for the autofs guys.
+> Cheers,
+> Steve
+>
 
-Yuck. I've no objection to allowing MAY_SIGN, but I'm not crazy about
-adding a new security flavor. It might be best to just add that flag
-unconditionally under Opt_sec_krb5. IOW, we'd just declare that
-sec=krb5 == your new sec=krb5m.
+I've been at home thinking about this for a while tonight. I've
+checked the documentation for autofs and they do what they say what
+they'll do with that path (treat anything without a ':' as an NFS
+mount).  On our side, (mount.cifs) we do what we say we'll do (support
+UNC paths).  The most we could ask of them is to add/modify their
+documentation to include the case for CIFS instead of just SMB.
 
-<obligatory rant>
-The whole secFlg thing is a f'ed up mess. It needs an overall redesign
-from the ground up. Not only because the current code is getting in the
-way of proper autonegotiation with the server, but it's hard to
-maintain and the SecurityFlags interface is the epitome of obtuseness.
-</obligatory rant>
+This doesn't change anything on the mount.cifs side other than
+explicitly directing users to the correct syntax for CIFS shares when
+using autofs.  Ultimately the autofs documentation implicitly states
+that CIFS shares should use a ':'.
+
+All that being said, the mount.cifs has never officially supported NFS
+path syntax.  We aren't silently ignoring the issue; we're sending a
+warning to stdout that in a future version of the mount utility we
+won't support this undocumented behavior.  To be fair, that's more
+than most code bases do for deprecating undocumented features.
+
+If anyone wants me to pursue the issue, I'll see what I can do about
+getting the documentation for autofs altered to explicitly mention
+CIFS paths.  I think that is reasonable for everyone.  It's after 2 AM
+in my part of the world, so I'll do this tomorrow after my first cup
+of coffee if anyone requests it.
+
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Peace and Blessings,
+-Scott.
