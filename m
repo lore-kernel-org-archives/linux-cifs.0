@@ -1,28 +1,65 @@
-From: "MRS. MELISSA KEEBLE" <keeblemelissa-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-Subject: (unknown)
-Date: Sat, 27 Oct 2012 03:53:08 +0800
-Message-ID: <20121027035308.85821d8ichcx4shw@webmail.stpeter.com.ph>
-Reply-To: mrsmelissakeeble-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: "Li, Mike" <Mike.Li-p4uxo6XH8FLYtjvyW6yDsg@public.gmane.org>
+Subject: RE: mount.cifs 1.10 to mount share for windows 2008 R2
+Date: Fri, 26 Oct 2012 20:18:27 +0000
+Message-ID: <922A2A9451A38A49A39D9B2B2C41465C38F7DA6B@KWAWNEXMBP002.corp.root.nasd.com>
+References: <mailman.142.1351135138.413883.linux-cifs-client@lists.samba.org>
+	<922A2A9451A38A49A39D9B2B2C41465C38F7A89D@KWAWNEXMBP002.corp.root.nasd.com>
+	<922A2A9451A38A49A39D9B2B2C41465C38F7AA40@KWAWNEXMBP002.corp.root.nasd.com>
+	<CADT32eJ9aiasV1Xn25y5mpSn=dhm1B4c9xc+EV0b7wFAv2AsMA@mail.gmail.com>
+	<922A2A9451A38A49A39D9B2B2C41465C38F7AB87@KWAWNEXMBP002.corp.root.nasd.com>
+	<CADT32eLLJko_DJXNE-6fu9r1d7_pfSAcJT0yWE_namVdWNKQkQ@mail.gmail.com>
+	<922A2A9451A38A49A39D9B2B2C41465C38F7AF4B@KWAWNEXMBP002.corp.root.nasd.com>
+	<CADT32eKAkts3_T23t6CUDPOeVCAkA474jq_phZfryUwMV_mDzQ@mail.gmail.com>
+	<922A2A9451A38A49A39D9B2B2C41465C38F7B174@KWAWNEXMBP002.corp.root.nasd.com>
+	<CAFB9KM3Htr-B_7JmmqcFAptkg=wqTu6wXmTKqcF7N1ujUtANEw@mail.gmail.com>
+ <CAFB9KM1yfLE10UaDv-qZcmmfmjbou9G-fBrz_XYvrZpWCTu9-A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	DelSp="Yes";
-	format="flowed"
-Content-Transfer-Encoding: 7bit
-To: undisclosed-recipients:;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Subject: 
-Content-Disposition: inline
+In-Reply-To: <CAFB9KM1yfLE10UaDv-qZcmmfmjbou9G-fBrz_XYvrZpWCTu9-A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-
-
--- 
-I am Mrs Melissa  Keeble I have an offer that you will help me to  
-handle, it will benefit you. Kindly reply via email  
-(melisakeeble-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org) for more details.
-
-
-----------------------------------------------------------------
-St. Peter Life Plan, Inc. - Email Facilities
+VGhhbmtzIFNjb3R0LiBJIHdhcyBhYmxlIHRvIGRvd25sb2FkIGNpZnMtdXRpbHMtNS43LnRh
+ci5iejIgYW5kIGJ1aWxkIGl0LiANCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZy
+b206IFNjb3R0IExvdmVuYmVyZyBbbWFpbHRvOnNjb3R0LmxvdmVuYmVyZ0BnbWFpbC5jb21d
+IA0KU2VudDogRnJpZGF5LCBPY3RvYmVyIDI2LCAyMDEyIDM6NTEgUE0NClRvOiBMaSwgTWlr
+ZQ0KQ2M6IFNoaXJpc2ggUGFyZ2FvbmthcjsgbGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmcN
+ClN1YmplY3Q6IFJlOiBtb3VudC5jaWZzIDEuMTAgdG8gbW91bnQgc2hhcmUgZm9yIHdpbmRv
+d3MgMjAwOCBSMg0KDQpPbiBGcmksIE9jdCAyNiwgMjAxMiBhdCAzOjQzIFBNLCBTY290dCBM
+b3ZlbmJlcmcNCjxzY290dC5sb3ZlbmJlcmdAZ21haWwuY29tPiB3cm90ZToNCj4gT24gVGh1
+LCBPY3QgMjUsIDIwMTIgYXQgNDoxNCBQTSwgTGksIE1pa2UgPE1pa2UuTGlAZmlucmEub3Jn
+PiB3cm90ZToNCj4+IFNoaXJpc2gsDQo+PiBXaGVyZSBjb3VsZCBtb3VudC5jaWZzIDUuNyBi
+aW5hcmllcyBmb3IgUkhFTCBMaW51eF8yLjZfeDg2IGJlIGRvd25sb2FkZWQ/IFRoYW5rcy4N
+Cj4NCj4gTWlrZSwgdGhhdCBjb2RlIHdhcyByZWxlYXNlZCB3aXRoaW4gdGhlIG1vbnRoLiAg
+WW91J2xsIHByb2JhYmx5IGhhdmUNCj4gdG8gY2xvbmUgaXQgZnJvbSBnaXQgKGdpdCBjbG9u
+ZSBnaXQ6Ly9naXQuc2FtYmEub3JnL2NpZnMtdXRpbHMuZ2l0KQ0KPiBhbmQgY29tcGlsZSBp
+dCB5b3Vyc2VsZi4gIE9yLCBpZiB5b3UgaGF2ZSBhIFJlZCBIYXQgc3Vic2NyaXB0aW9uIGFu
+ZA0KPiBpZiB5b3UgYXNrIG5pY2VseSB0aGV5IG1pZ2h0KiBwcm92aWRlIHlvdSB3aXRoIGFu
+IFJQTS4NCj4NCj4gKkkgc3RpbGwgd291bGRuJ3QgY291bnQgb24gaXQuICBUaGV5IGhhdmVu
+J3QgaGFkIGEgY2hhbmNlIHRvIHRlc3QgaXQNCj4gaW4gRmVkb3JhIHlldC4NCj4gLS0NCj4g
+UGVhY2UgYW5kIEJsZXNzaW5ncywNCj4gLVNjb3R0Lg0KDQpPbiBzZWNvbmQgdGhvdWdodCwg
+eW91IG1pZ2h0IHdhbnQgdG8ganVzdCBnZXQgdGhlIHRhcmJhbGwgZnJvbSBoZXJlDQooZnRw
+Oi8vZnRwLnNhbWJhLm9yZy9wdWIvbGludXgtY2lmcy9jaWZzLXV0aWxzL2NpZnMtdXRpbHMt
+NS43LnRhci5iejIpDQpzaW5jZSBwYXRjaGVzIGZvciA1LjcuMSBhcmUgc3RhcnRpbmcgdG8g
+YmUgYWRkZWQgdG8gdGhlIGdpdCBtYXN0ZXIuDQoNCi0tIA0KUGVhY2UgYW5kIEJsZXNzaW5n
+cywNCi1TY290dC4NCg0KDQpDb25maWRlbnRpYWxpdHkgTm90aWNlOiAgVGhpcyBlbWFpbCwg
+aW5jbHVkaW5nIGF0dGFjaG1lbnRzLCBtYXkgaW5jbHVkZSBub24tcHVibGljLCBwcm9wcmll
+dGFyeSwgY29uZmlkZW50aWFsIG9yIGxlZ2FsbHkgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbi4g
+IElmIHlvdSBhcmUgbm90IGFuIGludGVuZGVkIHJlY2lwaWVudCBvciBhbiBhdXRob3JpemVk
+IGFnZW50IG9mIGFuIGludGVuZGVkIHJlY2lwaWVudCwgeW91IGFyZSBoZXJlYnkgbm90aWZp
+ZWQgdGhhdCBhbnkgZGlzc2VtaW5hdGlvbiwgZGlzdHJpYnV0aW9uIG9yIGNvcHlpbmcgb2Yg
+dGhlIGluZm9ybWF0aW9uIGNvbnRhaW5lZCBpbiBvciB0cmFuc21pdHRlZCB3aXRoIHRoaXMg
+ZS1tYWlsIGlzIHVuYXV0aG9yaXplZCBhbmQgc3RyaWN0bHkgcHJvaGliaXRlZC4gIElmIHlv
+dSBoYXZlIHJlY2VpdmVkIHRoaXMgZW1haWwgaW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhl
+IHNlbmRlciBieSByZXBseWluZyB0byB0aGlzIG1lc3NhZ2UgYW5kIHBlcm1hbmVudGx5IGRl
+bGV0ZSB0aGlzIGUtbWFpbCwgaXRzIGF0dGFjaG1lbnRzLCBhbmQgYW55IGNvcGllcyBvZiBp
+dCBpbW1lZGlhdGVseS4gIFlvdSBzaG91bGQgbm90IHJldGFpbiwgY29weSBvciB1c2UgdGhp
+cyBlLW1haWwgb3IgYW55IGF0dGFjaG1lbnQgZm9yIGFueSBwdXJwb3NlLCBub3IgZGlzY2xv
+c2UgYWxsIG9yIGFueSBwYXJ0IG9mIHRoZSBjb250ZW50cyB0byBhbnkgb3RoZXIgcGVyc29u
+LiBUaGFuayB5b3UNCg0K
