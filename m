@@ -1,429 +1,113 @@
-From: "Li, Mike" <Mike.Li-p4uxo6XH8FLYtjvyW6yDsg@public.gmane.org>
-Subject: RE: mount.cifs 1.10 to mount share for windows 2008 R2
-Date: Thu, 25 Oct 2012 20:14:05 +0000
-Message-ID: <922A2A9451A38A49A39D9B2B2C41465C38F7B174@KWAWNEXMBP002.corp.root.nasd.com>
-References: <mailman.142.1351135138.413883.linux-cifs-client@lists.samba.org>
-	<922A2A9451A38A49A39D9B2B2C41465C38F7A89D@KWAWNEXMBP002.corp.root.nasd.com>
-	<922A2A9451A38A49A39D9B2B2C41465C38F7AA40@KWAWNEXMBP002.corp.root.nasd.com>
-	<CADT32eJ9aiasV1Xn25y5mpSn=dhm1B4c9xc+EV0b7wFAv2AsMA@mail.gmail.com>
-	<922A2A9451A38A49A39D9B2B2C41465C38F7AB87@KWAWNEXMBP002.corp.root.nasd.com>
-	<CADT32eLLJko_DJXNE-6fu9r1d7_pfSAcJT0yWE_namVdWNKQkQ@mail.gmail.com>
-	<922A2A9451A38A49A39D9B2B2C41465C38F7AF4B@KWAWNEXMBP002.corp.root.nasd.com>
- <CADT32eKAkts3_T23t6CUDPOeVCAkA474jq_phZfryUwMV_mDzQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: don't call cifs_lookup from atomic open with a
+ hashed negative dentry
+Date: Fri, 26 Oct 2012 08:16:21 -0400
+Message-ID: <20121026081621.21b5832f@tlielax.poochiereds.net>
+References: <1350780282-10385-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, vit.zahradka-IWqWACnzNjzrBKCeMvbIDA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	mail-svpggXG8baNITIhOK7X63A@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eKAkts3_T23t6CUDPOeVCAkA474jq_phZfryUwMV_mDzQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <1350780282-10385-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Shirish,=20
-Where could mount.cifs 5.7 binaries for RHEL Linux_2.6_x86 be downloade=
-d? Thanks.=20
+On Sat, 20 Oct 2012 20:44:42 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
------Original Message-----
-=46rom: Shirish Pargaonkar [mailto:shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]=20
-Sent: Thursday, October 25, 2012 4:03 PM
-To: Li, Mike
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Subject: Re: mount.cifs 1.10 to mount share for windows 2008 R2
+> The following oops was reported by Vit Zahradka. The BUG is this in
+> __d_rehash():
+> 
+>     BUG_ON(!d_unhashed(entry));
+> 
+> :kernel BUG at fs/dcache.c:2138!
+> :invalid opcode: 0000 [#1] SMP
+> :Modules linked in: fuse ebtable_nat ebtables ipt_MASQUERADE iptable_nat
+> nf_nat des_generic xt_CHECKSUM iptable_mangle md4 bridge stp llc nls_utf8
+> cifs dns_resolver fscache lockd sunrpc rfcomm bnep be2iscsi
+> iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi
+> ib_iser rdma_cm ib_addr iw_cm ib_cm ib_sa ib_mad ib_core iscsi_tcp
+> libiscsi_tcp libiscsi scsi_transport_iscsi ip6t_REJECT nf_conntrack_ipv6
+> nf_defrag_ipv6 ip6table_filter ip6_tables nf_conntrack_ipv4 nf_defrag_ipv4
+> xt_state nf_conntrack snd_hda_codec_conexant btusb bluetooth snd_hda_intel
+> snd_hda_codec snd_hwdep snd_seq snd_seq_device snd_pcm thinkpad_acpi
+> snd_page_alloc arc4 snd_timer iwldvm mac80211 iwlwifi cfg80211 uvcvideo
+> videobuf2_vmalloc videobuf2_memops videobuf2_core videodev snd media rfkill
+> soundcore i2c_i801 mei r592 memstick iTCO_wdt iTCO_vendor_support lpc_ich
+> tg3 coretemp microcode ppdev parport_pc parport vhost_net tun macvtap
+> macvlan kvm_intel kvm uinput binfmt_misc firewire_oh
+> :ci firewire_core crc_itu_t sdhci_pci sdhci mmc_core yenta_socket wmi video
+> radeon i2c_algo_bit drm_kms_helper ttm drm i2c_core
+> :Pid: 2219, comm: eclipse Not tainted 3.6.1-1.fc17.i686 #1 LENOVO
+> 27326FG/27326FG
+> :EIP: 0060:[<c0557577>] EFLAGS: 00010282 CPU: 1
+> :EIP is at __d_rehash+0x57/0x60
+> :EAX: ee641c80 EBX: 0000096a ECX: f7338208 EDX: f7338208
+> :ESI: fffffffe EDI: f6339f60 EBP: f0481d84 ESP: f0481d80
+> : DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+> :CR0: 8005003b CR2: 06567f84 CR3: 30710000 CR4: 000027d0
+> :DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+> :DR6: ffff0ff0 DR7: 00000400
+> :Process eclipse (pid: 2219, ti=f0480000 task=f0490c90 task.ti=f0480000)
+> :Stack:
+> : 0000096a f0481d90 c05575b2 ee641c80 f0481d9c c05575da 00000000 f0481dd8
+> : f9c01e32 f0734000 00004213 00000000 f0734000 f0481df4 f11ce600 00004213
+> : f6b07c60 00000000 00000000 f0481ef8 ee641c80 ef1781e0 f0481e20 f9c01f52
+> :Call Trace:
+> : [<c05575b2>] _d_rehash+0x32/0x40
+> : [<c05575da>] d_rehash+0x1a/0x30
+> : [<f9c01e32>] cifs_lookup+0x212/0x300 [cifs]
+> : [<f9c01f52>] cifs_atomic_open+0x32/0x200 [cifs]
+> : [<c05584bf>] ? d_lookup+0x2f/0x50
+> : [<c055074c>] do_last+0x42c/0xbd0
+> : [<c054dd8c>] ? link_path_walk+0x1dc/0x750
+> : [<c0550f8d>] path_openat+0x9d/0x3b0
+> : [<c046d47f>] ? wake_up_state+0xf/0x20
+> : [<c0490ed2>] ? wake_futex+0x32/0x50
+> : [<c046fcb5>] ? __dequeue_entity+0x25/0x40
+> : [<c0551481>] do_filp_open+0x31/0x80
+> : [<c055bdfc>] ? alloc_fd+0x3c/0xe0
+> : [<c054c970>] ? getname_flags+0x40/0xd0
+> : [<c0542885>] do_sys_open+0xe5/0x1c0
+> : [<c05429d0>] sys_openat+0x30/0x40
+> : [<c095addf>] sysenter_do_call+0x12/0x28
+> :Code: 48 08 74 03 89 59 04 f6 c3 01 89 50 0c 75 20 f6 02 01 74 19 83 cb 01
+> 89 1a 0f ba 32 00 5b 5d c3 f3 90 8b 0a 80 e1 01 75 f7 eb b9 <0f> 0b 0f 0b
+> 0f 0b 8d 76 00 55 89 e5 53 66 66 66 66 90 8b 0d fc
+> :EIP: [<c0557577>] __d_rehash+0x57/0x60 SS:ESP 0068:f0481d80
+> 
+> I think what happened is something like the following:
+> 
+> openat() was called on the file without O_CREAT. A negative dentry was
+> already in the cache, and was successfully revalidated. At that point a
+> hashed, negative dentry was passed to cifs_atomic_open. Since O_CREAT
+> wasn't set, it punted it over to cifs_lookup which did a lookup and then
+> tried to rehash the result and tripped over the bug.
+> 
+> Fix this by simply returning -ENOENT in this case instead of calling
+> cifs_lookup. For the longer term, I think cifs_atomic_open could use
+> some cleanup. There is probably no reason to limit atomic opens to the
+> O_CREAT case.
+> 
+> Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # 3.6.x
+> Reported-and-Tested-by: Vit Zahradka <vit.zahradka-IWqWACnzNjzrBKCeMvbIDA@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
 
-On Thu, Oct 25, 2012 at 2:13 PM, Li, Mike <Mike.Li-p4uxo6XH8FLYtjvyW6yDsg@public.gmane.org> wrote:
-> Thanks Shirish. Worked with sec=3Dntlmv2i and 2 updates from the MS K=
-B.
->
-> Just for our info what is the latest version of mount.cifs?
-> Man mount.cifs did not have sec=3Dntlmv2i as option
+Steve,
 
-Mike, I think it is 5.7.
+It turns out that Marcus has hit an issue with this patch in place that
+we don't fully understand yet:
 
+    https://bugzilla.redhat.com/show_bug.cgi?id=867344#c25
 
->
-> -----Original Message-----
-> From: Shirish Pargaonkar [mailto:shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
-> Sent: Thursday, October 25, 2012 2:23 PM
-> To: Li, Mike
-> Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Subject: Re: mount.cifs 1.10 to mount share for windows 2008 R2
->
-> On Thu, Oct 25, 2012 at 11:51 AM, Li, Mike <Mike.Li-p4uxo6XH8FLYtjvyW6yDsg@public.gmane.org> wrote:
->>
->> Thanks Shirish for reply and the KB. I added the key
->> AllowLegacySrvCall=3D1 and updated lmcompatibilitylevel from 4 to 3=20
->> /root/mount.cifs //10.6.65.66/wwwlog$ /mnt/ny4wnwebtp033=20
->> -odom=3DEXT,user=3DLiM2,sec=3Dntlmv2;
->
-> Perhaps ntlmv2i might help if server mandates smb signing?
-> A wireshark trace during this exchange would be helpful.
->
->> Password:
->> mount error 13 =3D Permission denied
->>
->>
->> 12:30:10.024515 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: S
->> 1463279188:1463279188(0) win 5840 <mss 1460,sackOK,timestamp=20
->> 277814120 0,nop,wscale 5>
->> 12:30:10.039730 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: S
->> 2511355381:2511355381(0) ack 1463279189 win 5792 <mss=20
->> 1432,sackOK,timestamp 922908730 277814120,nop,wscale 2>
->> 12:30:10.039746 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: .
->> ack 1 win 183 <nop,nop,timestamp 277814135 922908730>
->> 12:30:10.039779 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: P
->> 1:83(82) ack 1 win 183 <nop,nop,timestamp 277814135 922908730>
->> 12:30:10.040249 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: .
->> ack 83 win 1448 <nop,nop,timestamp 922908730 277814135>
->> 12:30:10.050957 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: P
->> 1:118(117) ack 83 win 1448 <nop,nop,timestamp 922908741 277814135>
->> 12:30:10.050978 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: .
->> ack 118 win 183 <nop,nop,timestamp 277814146 922908741>
->> 12:30:10.051013 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: P
->> 83:331(248) ack 118 win 183 <nop,nop,timestamp 277814146 922908741>
->> 12:30:10.062349 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: P
->> 118:355(237) ack 331 win 1716 <nop,nop,timestamp 922908752 277814146=
->
->> 12:30:10.077153 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: P
->> 331:427(96) ack 355 win 216 <nop,nop,timestamp 277814172 922908752>
->> 12:30:10.086069 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: P
->> 355:394(39) ack 427 win 1716 <nop,nop,timestamp 922908776 277814172>
->> 12:30:10.086262 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: P
->> 427:470(43) ack 394 win 216 <nop,nop,timestamp 277814181 922908776>
->> 12:30:10.095249 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: P
->> 394:433(39) ack 470 win 1716 <nop,nop,timestamp 922908785 277814181>
->> 12:30:10.135767 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: .
->> ack 433 win 216 <nop,nop,timestamp 277814231 922908785>
->> 12:30:10.221774 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: F
->> 470:470(0) ack 433 win 216 <nop,nop,timestamp 277814317 922908785>
->> 12:30:10.231159 IP 10.6.65.66.microsoft-ds > 150.123.157.31.53669: F
->> 433:433(0) ack 471 win 1716 <nop,nop,timestamp 922908921 277814317>
->> 12:30:10.231176 IP 150.123.157.31.53669 > 10.6.65.66.microsoft-ds: .
->> ack 434 win 216 <nop,nop,timestamp 277814326 922908921>
->>
->> -----Original Message-----
->> From: Shirish Pargaonkar [mailto:shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org]
->> Sent: Thursday, October 25, 2012 12:18 PM
->> To: Li, Mike
->> Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> Subject: Re: mount.cifs 1.10 to mount share for windows 2008 R2
->>
->> On Thu, Oct 25, 2012 at 10:52 AM, Li, Mike <Mike.Li-p4uxo6XH8FLYtjvyW6yDsg@public.gmane.org> wrote=
-:
->>> I also tried going with port 445, and getting:
->>>
->>> /root/mount.cifs //10.6.65.66/wwwlog$ /mnt/ny4wnwebtp033=20
->>> -odom=3DEXT,user=3DLiM2,port=3D445,sec=3Dntlmv2i;
->>> Password:
->>> mount error 22 =3D Invalid argument
->>>
->>> 11:46:09.729653 IP (tos 0x0, ttl  64, id 57474, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 60) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: S, cksum 0x271b (correct),
->>> 2967089806:2967089806(0) win 5840 <mss 1460,sackOK,timestamp
->>> 275173900 0,nop,wscale 5>
->>> 11:46:09.738708 IP (tos 0x28, ttl  62, id 0, offset 0, flags [DF],
->>> proto: TCP (6), length: 60) 10.6.65.66.microsoft-ds >
->>> 150.123.157.31.50075: S, cksum 0x8495 (correct),
->>> 4026420658:4026420658(0) ack 2967089807 win 5792 <mss=20
->>> 1432,sackOK,timestamp 920268344 275173900,nop,wscale 2>
->>> 11:46:09.738730 IP (tos 0x0, ttl  64, id 57475, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: ., cksum 0xc920 (correct), 1:1(0) ack 1 wi=
-n
->>> 183 <nop,nop,timestamp 275173909 920268344>
->>> 11:46:09.738830 IP (tos 0x0, ttl  64, id 57476, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 134) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: P 1:83(82) ack 1 win 183 <nop,nop,timestam=
-p
->>> 275173909 920268344>
->>> 11:46:09.739294 IP (tos 0x28, ttl  62, id 25482, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 10.6.65.66.microsoft-ds >
->>> 150.123.157.31.50075: ., cksum 0xc3dc (correct), 1:1(0) ack 83 win
->>> 1448 <nop,nop,timestamp 920268345 275173909>
->>> 11:46:09.749951 IP (tos 0x28, ttl  62, id 25484, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 169) 10.6.65.66.microsoft-ds >
->>> 150.123.157.31.50075: P 1:118(117) ack 83 win 1448=20
->>> <nop,nop,timestamp
->>> 920268356 275173909>
->>> 11:46:09.750005 IP (tos 0x0, ttl  64, id 57477, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: ., cksum 0xc841 (correct), 83:83(0) ack 11=
-8=20
->>> win 183 <nop,nop,timestamp 275173921 920268356>
->>> 11:46:09.750053 IP (tos 0x0, ttl  64, id 57478, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 300) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: P 83:331(248) ack 118 win 183=20
->>> <nop,nop,timestamp 275173921 920268356>
->>> 11:46:09.760126 IP (tos 0x28, ttl  62, id 25486, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 91) 10.6.65.66.microsoft-ds >
->>> 150.123.157.31.50075: P 118:157(39) ack 331 win 1716=20
->>> <nop,nop,timestamp 920268366 275173921>
->>> 11:46:09.800471 IP (tos 0x0, ttl  64, id 57479, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: ., cksum 0xc6e6 (correct), 331:331(0) ack
->>> 157 win 183 <nop,nop,timestamp 275173971 920268366>
->>> 11:46:09.888773 IP (tos 0x0, ttl  64, id 57480, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: F, cksum 0xc68d (correct), 331:331(0) ack
->>> 157 win 183 <nop,nop,timestamp 275174059 920268366>
->>> 11:46:09.899433 IP (tos 0x28, ttl  62, id 25488, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 10.6.65.66.microsoft-ds >
->>> 150.123.157.31.50075: F, cksum 0xc005 (correct), 157:157(0) ack 332=
-=20
->>> win 1716 <nop,nop,timestamp 920268504 275174059>
->>> 11:46:09.899440 IP (tos 0x0, ttl  64, id 57481, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 150.123.157.31.50075 >
->>> 10.6.65.66.microsoft-ds: ., cksum 0xc5f7 (correct), 332:332(0) ack
->>> 158 win 183 <nop,nop,timestamp 275174070 920268504>
->>>
->>>
->>> -----Original Message-----
->>> From: Li, Mike
->>> Sent: Thursday, October 25, 2012 10:48 AM
->>> To: 'linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org'
->>> Subject: mount.cifs 1.10 to mount share for windows 2008 R2
->>>
->>> Hi,
->>>
->>> Tried to mount a share from  windows 2008 R2 on Linux 2.6.19-1.2895=
-=2Efc6, but have been not successful.
->>> Not sure why I'm getting "NBT SessionReject" from the win2008 serve=
-r. Is there any registry update needed or a newer version of mount.cifs=
-?
->>> Please help. Thanks.
->>>
->>> My version of mount.cifs is 1.10. Not sure if there is a newer vers=
-ion.
->>>        sec=3D   Security mode. Allowed values are:
->>>
->>>               =C2.  none attempt to connection as a null user (no=20
->>> name)
->>>
->>>               =C2.  krb5 Use Kerberos version 5 authentication
->>>
->>>               =C2.  krb5i Use Kerberos authentication and packet=20
->>> signing
->>>
->>>               =C2.  ntlm Use NTLM password hashing (default)
->>>
->>>               =C2.  ntlmi   Use   NTLM   password   hashing   with =
-  signing  (if
->>>                  /proc/fs/cifs/PacketSigningEnabled on or if  serve=
-r  requires
->>>                  signing also can be the default)
->>>
->>>               =C2.  ntlmv2 Use NTLMv2 password hashing
->>>
->>>               =C2.  ntlmv2i Use NTLMv2 password hashing with packet=
-=20
->>> signing
->>>
->>>               [NB This [sec parameter] is under development and exp=
-ected to be
->>>               available in cifs kernel module 1.40 and later]
->>>
->>>
->>> # /root/mount.cifs //10.6.65.66/wwwlog$ /mnt/ny4wnwebtp033
->>> -odom=3DEXT,LiM2,sec=3Dntlmv2i,port=3D139
->>> mount error 112 =3D Host is down
->>> # /root/mount.cifs //10.6.65.66/wwwlog$ /mnt/ny4wnwebtp033=20
->>> -odom=3DEXT,user=3DLiM2,sec=3Dkrb5,port=3D139;
->>> Password:
->>> mount error 112 =3D Host is down
->>> Refer to the mount.cifs(8) manual page (e.g.man mount.cifs)
->>>
->>> tcpdump host 10.6.65.66 -n -vv
->>> tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture=20
->>> size
->>> 96 bytes
->>> 16:08:00.714252 IP (tos 0x0, ttl  64, id 4663, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 60) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: S, cksum 0x1f2f (correct),
->>> 1324558118:1324558118(0) win 5840 <mss 1460,sackOK,timestamp
->>> 204485905 0,nop,wscale 5>
->>> 16:08:00.729388 IP (tos 0x28, ttl  62, id 0, offset 0, flags [DF],
->>> proto: TCP (6), length: 60) 10.6.65.66.netbios-ssn >
->>> 150.123.157.31.56122: S, cksum 0xc876 (correct),
->>> 2392791643:2392791643(0) ack 1324558119 win 5792 <mss=20
->>> 1432,sackOK,timestamp 849574744 204485905,nop,wscale 2>
->>> 16:08:00.729396 IP (tos 0x0, ttl  64, id 4664, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 52) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: ., cksum 0x0cfc (correct), 1:1(0) ack 1 win
->>> 183 <nop,nop,timestamp 204485920 849574744>
->>> 16:08:00.729466 IP (tos 0x0, ttl  64, id 4665, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 124) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: P 1:73(72) ack 1 win 183 <nop,nop,timestamp
->>> 204485920 849574744>
->>>>>> NBT Session Packet
->>> NBT Session Request
->>> Flags=3D0x0
->>> Length=3D68 (0x44)
->>> Destination=3D
->>> WARNING: Short packet. Try increasing the snap length
->>>
->>>
->>> 16:08:00.729980 IP (tos 0x28, ttl  62, id 24837, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 10.6.65.66.netbios-ssn >
->>> 150.123.157.31.56122: ., cksum 0x07c2 (correct), 1:1(0) ack 73 win
->>> 1448 <nop,nop,timestamp 849574745 204485920>
->>> 16:08:00.730880 IP (tos 0x0, ttl  64, id 4666, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 134) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: P 73:155(82) ack 1 win 183=20
->>> <nop,nop,timestamp
->>> 204485922 849574745>
->>>>>> NBT Session Packet
->>> NBT Session Message
->>> Flags=3D0x0
->>> Length=3D78 (0x4e)
->>> WARNING: Short packet. Try increasing the snap length by 52
->>>
->>> SMB PACKET: SMBnegprot (REQUEST)
->>> SMB Command   =3D  0x72
->>> Error class   =3D  0x0
->>> Error code    =3D  0 (0x0)
->>> Flags1        =3D  0x0
->>> Flags2        =3D  0x1
->>> Tree ID       =3D  0 (0x0)
->>> Proc ID       =3D
->>> WARNING: Short packet. Try increasing the snap length [|SMB]
->>>
->>> 16:08:00.731379 IP (tos 0x28, ttl  62, id 24839, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 10.6.65.66.netbios-ssn >
->>> 150.123.157.31.56122: ., cksum 0x076d (correct), 1:1(0) ack 155 win
->>> 1448 <nop,nop,timestamp 849574746 204485922>
->>> 16:08:00.740412 IP (tos 0x28, ttl  62, id 24841, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 57) 10.6.65.66.netbios-ssn >
->>> 150.123.157.31.56122: P, cksum 0x0255 (correct), 1:6(5) ack 155 win
->>> 1448 <nop,nop,timestamp 849574755 204485922>
->>>>>> NBT Session Packet
->>> NBT SessionReject
->>> Flags=3D0x0
->>> Length=3D1 (0x1)
->>> Reason=3D0x82
->>> Called name not present
->>>
->>>
->>> 16:08:00.740512 IP (tos 0x0, ttl  64, id 4667, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 52) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: ., cksum 0x0c47 (correct), 155:155(0) ack 6=
-=20
->>> win 183 <nop,nop,timestamp 204485931 849574755>
->>> 16:08:00.747499 IP (tos 0x28, ttl  62, id 24843, offset 0, flags=20
->>> [DF],
->>> proto: TCP (6), length: 52) 10.6.65.66.netbios-ssn >
->>> 150.123.157.31.56122: F, cksum 0x074e (correct), 6:6(0) ack 155 win
->>> 1448 <nop,nop,timestamp 849574762 204485931>
->>> 16:08:00.786870 IP (tos 0x0, ttl  64, id 4668, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 52) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: ., cksum 0x0c10 (correct), 155:155(0) ack 7=
-=20
->>> win 183 <nop,nop,timestamp 204485978 849574762>
->>> 16:08:00.866869 IP (tos 0x0, ttl  64, id 4669, offset 0, flags [DF]=
-,
->>> proto: TCP (6), length: 52) 150.123.157.31.56122 >
->>> 10.6.65.66.netbios-ssn: R, cksum 0x0bbc (correct), 155:155(0) ack 7=
-=20
->>> win 183 <nop,nop,timestamp 204486058 849574762>
->>>
->>>
->>> Confidentiality Notice:  This email, including attachments, may=20
->>> include non-public, proprietary, confidential or legally privileged=
-=20
->>> information.  If you are not an intended recipient or an authorized=
-=20
->>> agent of an intended recipient, you are hereby notified that any=20
->>> dissemination, distribution or copying of the information contained=
-=20
->>> in or transmitted with this e-mail is unauthorized and strictly=20
->>> prohibited.  If you have received this email in error, please notif=
-y=20
->>> the sender by replying to this message and permanently delete this=20
->>> e-mail, its attachments, and any copies of it immediately.  You=20
->>> should not retain, copy or use this e-mail or any attachment for an=
-y=20
->>> purpose, nor disclose all or any part of the contents to any other =
-person.
->>> Thank you
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cif=
-s"
->>> in the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordom=
-o=20
->>> info at  http://vger.kernel.org/majordomo-info.html
->>
->> Perhaps the Windows 2008 server is missing this patch!
->>
->> http://support.microsoft.com/kb/957441/en-us
->>
->> Confidentiality Notice:  This email, including attachments, may=20
->> include non-public, proprietary, confidential or legally privileged=20
->> information.  If you are not an intended recipient or an authorized=20
->> agent of an intended recipient, you are hereby notified that any=20
->> dissemination, distribution or copying of the information contained=20
->> in or transmitted with this e-mail is unauthorized and strictly=20
->> prohibited.  If you have received this email in error, please notify=
-=20
->> the sender by replying to this message and permanently delete this=20
->> e-mail, its attachments, and any copies of it immediately.  You=20
->> should not retain, copy or use this e-mail or any attachment for any=
-=20
->> purpose, nor disclose all or any part of the contents to any other p=
-erson.
->> Thank you
->>
->>
->
-> Confidentiality Notice:  This email, including attachments, may=20
-> include non-public, proprietary, confidential or legally privileged=20
-> information.  If you are not an intended recipient or an authorized=20
-> agent of an intended recipient, you are hereby notified that any=20
-> dissemination, distribution or copying of the information contained i=
-n=20
-> or transmitted with this e-mail is unauthorized and strictly=20
-> prohibited.  If you have received this email in error, please notify=20
-> the sender by replying to this message and permanently delete this=20
-> e-mail, its attachments, and any copies of it immediately.  You shoul=
-d=20
-> not retain, copy or use this e-mail or any attachment for any purpose=
-,=20
-> nor disclose all or any part of the contents to any other person.=20
-> Thank you
->
->
+I've asked Sachin to take a look, but it might be best to hold off on
+pushing this to Linus until we understand the problem there.
 
-Confidentiality Notice:  This email, including attachments, may include=
- non-public, proprietary, confidential or legally privileged informatio=
-n.  If you are not an intended recipient or an authorized agent of an i=
-ntended recipient, you are hereby notified that any dissemination, dist=
-ribution or copying of the information contained in or transmitted with=
- this e-mail is unauthorized and strictly prohibited.  If you have rece=
-ived this email in error, please notify the sender by replying to this =
-message and permanently delete this e-mail, its attachments, and any co=
-pies of it immediately.  You should not retain, copy or use this e-mail=
- or any attachment for any purpose, nor disclose all or any part of the=
- contents to any other person. Thank you
-=0D
+Thanks,
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
