@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 6/7] cifs.idmap: set a timeout on keys that it instantiates
-Date: Sat, 27 Oct 2012 07:20:21 -0400
-Message-ID: <1351336822-16425-7-git-send-email-jlayton@samba.org>
+Subject: [PATCH 5/7] cifs.idmap: don't use atoi to convert unsigned int to number
+Date: Sat, 27 Oct 2012 07:20:20 -0400
+Message-ID: <1351336822-16425-6-git-send-email-jlayton@samba.org>
 References: <1351336822-16425-1-git-send-email-jlayton@samba.org>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,84 +10,93 @@ In-Reply-To: <1351336822-16425-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-...and add a command-line option to allow the admin to tune that value.
-I think this is a better way to handle this instead of trying to set the
-timeouts in kernel space.
+atoi() is for signed integers, and is deprecated in any case. Use
+strtoul() instead and check the result carefully before using it.
+
+Also add a log message when the string(s) can't be converted and
+fix the signedness of the types in other log messages.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- cifs.idmap.8.in |  7 ++++++-
- cifs.idmap.c    | 15 ++++++++++++++-
- 2 files changed, 20 insertions(+), 2 deletions(-)
+ cifs.idmap.c | 48 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 42 insertions(+), 6 deletions(-)
 
-diff --git a/cifs.idmap.8.in b/cifs.idmap.8.in
-index efec7b6..152046b 100644
---- a/cifs.idmap.8.in
-+++ b/cifs.idmap.8.in
-@@ -22,7 +22,7 @@
- cifs.idmap \- Userspace helper for mapping ids for Common Internet File System (CIFS)
- .SH "SYNOPSIS"
- .HP \w'\ 'u
--cifs\&.idmap [\-\-version|\-v] {keyid}
-+cifs.idmap [--timeout|-t] [--version|-v] {keyid}
- .SH "DESCRIPTION"
- .PP
- This tool is part of the cifs-utils suite\&.
-@@ -46,6 +46,11 @@ cifs\&.idmap works in conjuction with winbind facility of Samba suite to map own
- In case winbind and cifs.idmap facilities are unavailable, file objects in a mounted share are assigned uid and gid of the credentials of the process that mounted the share\&. So it is strongly recomemended to use mount options of uid and gid to specify a default uid and gid to map owner SIDs and group SIDs respectively in case services of winbind and cifs.idmap facility are unavailable\&.
- .SH "OPTIONS"
- .PP
-+--timeout|-t
-+.RS 4
-+Set the expiration timer, in seconds on the key. The default is 600 seconds (10 minutes). Setting this to 0 will cause the key to never expire.
-+.RE
-+.PP
- \-\-version|\-v
- .RS 4
- Print version number and exit\&.
 diff --git a/cifs.idmap.c b/cifs.idmap.c
-index 9639070..0d51ff6 100644
+index 457d307..9639070 100644
 --- a/cifs.idmap.c
 +++ b/cifs.idmap.c
-@@ -45,6 +45,7 @@
- static const char *prog = "cifs.idmap";
+@@ -75,6 +75,30 @@ char *strget(const char *str, const char *substr)
+ 	return substrptr;
+ }
  
- static const struct option long_options[] = {
-+	{"timeout", 1, NULL, 't'},
- 	{"version", 0, NULL, 'v'},
- 	{NULL, 0, NULL, 0}
- };
-@@ -221,11 +222,15 @@ int main(const int argc, char *const argv[])
- 	long rc = 1;
- 	key_serial_t key = 0;
- 	char *buf;
-+	int timeout = 600; /* default idmap cache timeout */
- 
- 	openlog(prog, 0, LOG_DAEMON);
- 
--	while ((c = getopt_long(argc, argv, "v", long_options, NULL)) != -1) {
-+	while ((c = getopt_long(argc, argv, "t:v", long_options, NULL)) != -1) {
- 		switch (c) {
-+		case 't':
-+			timeout = atoi(optarg);
-+			break;
- 		case 'v':
- 			printf("version: %s\n", VERSION);
- 			goto out;
-@@ -250,6 +255,14 @@ int main(const int argc, char *const argv[])
- 		goto out;
- 	}
- 
-+	/* set timeout on key */
-+	rc = keyctl_set_timeout(key, timeout);
-+	if (rc == -1) {
-+		syslog(LOG_ERR, "unable to set key timeout: %s",
-+			strerror(errno));
-+		goto out;
-+	}
++/*
++ * Convert a string representation of unsigned int into a numeric one. Also
++ * check for incomplete string conversion and overflow.
++ */
++static int
++str_to_uint(const char *src, unsigned int *dst)
++{
++	unsigned long tmp;
++	char *end;
 +
- 	rc = keyctl_describe_alloc(key, &buf);
- 	if (rc == -1) {
- 		syslog(LOG_ERR, "keyctl_describe_alloc failed: %s",
++	errno = 0;
++	tmp = strtoul(src, &end, 0);
++
++	if (*end != '\0')
++		return EINVAL;
++	if (tmp == ULONG_MAX && errno == ERANGE)
++		return errno;
++	if (tmp > UINT_MAX)
++		return EOVERFLOW;
++
++	*dst = (unsigned int)tmp;
++	return 0;
++}
++
+ static int
+ cifs_idmap(const key_serial_t key, const char *key_descr)
+ {
+@@ -138,11 +162,17 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
+ 
+ 	sidstr = strget(key_descr, "oi:");
+ 	if (sidstr) {
+-		uid = atoi(sidstr);
+-		syslog(LOG_DEBUG, "SID: %s, uid: %d", sidstr, uid);
++		rc = str_to_uint(sidstr, (unsigned int *)&uid);
++		if (rc) {
++			syslog(LOG_ERR, "Unable to convert %s to uid: %s",
++				sidstr, strerror(rc));
++			goto cifs_idmap_ret;
++		}
++
++		syslog(LOG_DEBUG, "SID: %s, uid: %u", sidstr, uid);
+ 		rc = wbcUidToSid(uid, &sid);
+ 		if (rc)
+-			syslog(LOG_DEBUG, "uid %d to SID  error: %d", uid, rc);
++			syslog(LOG_DEBUG, "uid %u to SID  error: %d", uid, rc);
+ 		if (!rc) { /* SID has been mapped to a uid */
+ 			rc = keyctl_instantiate(key, &sid,
+ 					sizeof(struct wbcDomainSid), 0);
+@@ -156,11 +186,17 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
+ 
+ 	sidstr = strget(key_descr, "gi:");
+ 	if (sidstr) {
+-		gid = atoi(sidstr);
+-		syslog(LOG_DEBUG, "SID: %s, gid: %d", sidstr, gid);
++		rc = str_to_uint(sidstr, (unsigned int *)&gid);
++		if (rc) {
++			syslog(LOG_ERR, "Unable to convert %s to gid: %s",
++				sidstr, strerror(rc));
++			goto cifs_idmap_ret;
++		}
++
++		syslog(LOG_DEBUG, "SID: %s, gid: %u", sidstr, gid);
+ 		rc = wbcGidToSid(gid, &sid);
+ 		if (rc)
+-			syslog(LOG_DEBUG, "gid %d to SID error: %d", gid, rc);
++			syslog(LOG_DEBUG, "gid %u to SID error: %d", gid, rc);
+ 		if (!rc) { /* SID has been mapped to a gid */
+ 			rc = keyctl_instantiate(key, &sid,
+ 					sizeof(struct wbcDomainSid), 0);
 -- 
 1.7.11.7
