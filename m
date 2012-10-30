@@ -1,70 +1,93 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH] cifs: Do not lookup hashed negative dentry in cifs_atomic_open
-Date: Tue, 30 Oct 2012 22:30:41 +0400
-Message-ID: <CAKywueTnmyeGU+rW3kNdS0AV8Vu=0nd_=AHyB47jnRH8AAqqpA@mail.gmail.com>
-References: <1351615413-9182-1-git-send-email-sprabhu@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, vit.zahradka-IWqWACnzNjzrBKCeMvbIDA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH 4/3] cifs: fix SID binary to string conversion
+Date: Tue, 30 Oct 2012 14:53:35 -0400
+Message-ID: <1351623215-13048-1-git-send-email-jlayton@redhat.com>
+References: <1350676785-8525-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1351615413-9182-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1350676785-8525-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/10/30 Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> We do not need to lookup a hashed negative directory since we have
-> already revalidated it before and have found it to be fine.
->
-> This also prevents a crash in cifs_lookup() when it attempts to rehash
-> the already hashed negative lookup dentry.
->
-> The patch has been tested using the reproducer at
-> https://bugzilla.redhat.com/show_bug.cgi?id=867344#c28
->
-> Cc: <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org> # 3.6.x
-> Reported-by: Vit Zahradka <vit.zahradka-IWqWACnzNjzrBKCeMvbIDA@public.gmane.org>
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/dir.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 7c0a812..e26d0a6 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -398,6 +398,12 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->          * in network traffic in the other paths.
->          */
->         if (!(oflags & O_CREAT)) {
-> +               /* Check for hashed negative dentry. We have already revalidated
-> +                * the dentry and it is fine. No need to perform another lookup.
-> +                */
+The authority fields are supposed to be represented by a single 48-bit
+big-endian value. It's also supposed to represent the value as hex if
+it's equal to or greater than 2^32. This is documented in MS-DTYP,
+section 2.4.2.1.
 
-Patch looks ok, but the comment above doesn't match the kernel
-CodingStyle for block comments. While cifs code has a many places
-where it doesn't follow the style, we should keep new code as clean as
-possible.
+Also, fix up the max string length to account for this fix.
 
-> +               if (!d_unhashed(direntry))
-> +                       return -ENOENT;
-> +
->                 struct dentry *res = cifs_lookup(inode, direntry, 0);
->                 if (IS_ERR(res))
->                         return PTR_ERR(res);
-> --
-> 1.7.11.7
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Cc: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/cifsacl.c | 25 +++++++++++++++++++------
+ fs/cifs/cifsacl.h |  8 +++++---
+ 2 files changed, 24 insertions(+), 9 deletions(-)
 
-
-
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index c15699b..6c8ea82 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -94,6 +94,7 @@ sid_to_key_str(struct cifs_sid *sidptr, unsigned int type)
+ 	int i, len;
+ 	unsigned int saval;
+ 	char *sidstr, *strptr;
++	unsigned long long id_auth_val;
+ 
+ 	/* 3 bytes for prefix */
+ 	sidstr = kmalloc(3 + SID_STRING_BASE_SIZE +
+@@ -107,12 +108,24 @@ sid_to_key_str(struct cifs_sid *sidptr, unsigned int type)
+ 			sidptr->revision);
+ 	strptr += len;
+ 
+-	for (i = 0; i < NUM_AUTHS; ++i) {
+-		if (sidptr->authority[i]) {
+-			len = sprintf(strptr, "-%hhu", sidptr->authority[i]);
+-			strptr += len;
+-		}
+-	}
++	/* The authority field is a single 48-bit number */
++	id_auth_val = (unsigned long long)sidptr->authority[5];
++	id_auth_val += (unsigned long long)sidptr->authority[4] << 8;
++	id_auth_val += (unsigned long long)sidptr->authority[3] << 16;
++	id_auth_val += (unsigned long long)sidptr->authority[2] << 24;
++	id_auth_val += (unsigned long long)sidptr->authority[1] << 32;
++	id_auth_val += (unsigned long long)sidptr->authority[0] << 48;
++
++        /*
++	 * MS-DTYP states that if the authority is >= 2^32, then it should be
++	 * expressed as a hex value.
++	 */
++	if (id_auth_val <= UINT_MAX)
++		len = sprintf(strptr, "-%llu", id_auth_val);
++	else
++		len = sprintf(strptr, "-0x%llx", id_auth_val);
++
++	strptr += len;
+ 
+ 	for (i = 0; i < sidptr->num_subauth; ++i) {
+ 		saval = le32_to_cpu(sidptr->sub_auth[i]);
+diff --git a/fs/cifs/cifsacl.h b/fs/cifs/cifsacl.h
+index a445405..4f38848 100644
+--- a/fs/cifs/cifsacl.h
++++ b/fs/cifs/cifsacl.h
+@@ -55,12 +55,14 @@
+  * u8:  max 3 bytes in decimal
+  * u32: max 10 bytes in decimal
+  *
+- * "S-" + 3 bytes for version field + 4 bytes for each authority field (3 bytes
+- * per number + 1 for '-') + NULL terminator.
++ * "S-" + 3 bytes for version field + 15 for authority field + NULL terminator
++ *
++ * For authority field, max is when all 6 values are non-zero and it must be
++ * represented in hex. So "-0x" + 12 hex digits.
+  *
+  * Add 11 bytes for each subauthority field (10 bytes each + 1 for '-')
+  */
+-#define SID_STRING_BASE_SIZE (2 + 3 + (4 * NUM_AUTHS) + 1)
++#define SID_STRING_BASE_SIZE (2 + 3 + 15 + 1)
+ #define SID_STRING_SUBAUTH_SIZE (11) /* size of a single subauth string */
+ 
+ struct cifs_ntsd {
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.11.7
