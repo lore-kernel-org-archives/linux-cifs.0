@@ -1,39 +1,57 @@
-From: Jan Kara <jack@suse.cz>
+From: Boaz Harrosh <bharrosh@panasas.com>
 Subject: Re: [PATCH 1/3] bdi: Track users that require stable page writes
-Date: Thu, 1 Nov 2012 14:31:52 +0100
-Message-ID: <20121101133152.GC23132@quack.suse.cz>
-References: <20121101075805.16153.64714.stgit@blackbox.djwong.org>
- <20121101075813.16153.94581.stgit@blackbox.djwong.org>
+Date: Thu, 1 Nov 2012 11:21:22 -0700
+Message-ID: <5092BDA2.6090001@panasas.com>
+References: <20121101075805.16153.64714.stgit@blackbox.djwong.org> <20121101075813.16153.94581.stgit@blackbox.djwong.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: axboe@kernel.dk, lucho@ionkov.net, tytso@mit.edu,
-	sage@inktank.com, ericvh@gmail.com, mfasheh@suse.com,
-	dedekind1@gmail.com, adrian.hunter@intel.com, dhowells@redhat.com,
-	sfrench@samba.org, jlbec@evilplan.org, rminnich@sandia.gov,
-	linux-cifs@vger.kernel.org, jack@suse.cz, martin.petersen@oracle.com,
-	neilb@suse.de, david@fromorbit.com, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-mtd@lists.infradead.org,
-	bharrosh@panasas.com, linux-fsdevel@vger.kernel.org,
-	v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-afs@lists.infradead.org,
-	ocfs2-devel@oss.oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: <axboe@kernel.dk>, <lucho@ionkov.net>, <tytso@mit.edu>, <sage@inktank.com>,
+        <ericvh@gmail.com>, <mfasheh@suse.com>, <dedekind1@gmail.com>,
+        <adrian.hunter@intel.com>, <dhowells@redhat.com>, <sfrench@samba.org>,
+        <jlbec@evilplan.org>, <rminnich@sandia.gov>,
+        <linux-cifs@vger.kernel.org>, <jack@suse.cz>,
+        <martin.petersen@oracle.com>, <neilb@suse.de>, <david@fromorbit.com>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-mtd@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+        <v9fs-developer@lists.sourceforge.net>, <ceph-devel@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>, <linux-afs@lists.infradead.org>,
+        <ocfs2-devel@oss.oracle.com>
 To: "Darrick J. Wong" <darrick.wong@oracle.com>
 Return-path: <owner-linux-mm@kvack.org>
-Content-Disposition: inline
 In-Reply-To: <20121101075813.16153.94581.stgit@blackbox.djwong.org>
 Sender: owner-linux-mm@kvack.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu 01-11-12 00:58:13, Darrick J. Wong wrote:
+On 11/01/2012 12:58 AM, Darrick J. Wong wrote:
 > This creates a per-backing-device counter that tracks the number of users which
 > require pages to be held immutable during writeout.  Eventually it will be used
 > to waive wait_for_page_writeback() if nobody requires stable pages.
-  As I wrote in another mail, maybe a combination of bdi and sb flag would
-make things simpler (less chances for errors). But I can live with this as
-well...
-
-								Honza
 > 
+
+There is two things I do not like:
+1. Please remind me why we need the users counter?
+   If the device needs it, it will always be needed. The below 
+   queue_unrequire_stable_pages call at blk_integrity_unregister
+   only happens at device destruction time, no?
+
+   It was also said that maybe individual filesystems would need
+   stable pages where other FSs using the same BDI do not. But
+   since the FS is at the driving seat in any case, it can just
+   do wait_for_writeback() regardless and can care less about
+   the bdi flag and the other FSs. Actually all those FSs already
+   do this this, and do not need any help. So this reason is
+   mute.
+
+2. I hate the atomic_read for every mkwrite. I think we can do
+   better, since as you noted it can never be turned off, only
+   on, at init time. And because of 1. above it is not dynamic.
+   I think I like your previous simple bool better.
+
+But I do like a lot the new request_queue API you added here.
+Thanks
+
+Boaz
 > Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
 > ---
 >  Documentation/ABI/testing/sysfs-class-bdi |    7 +++++
@@ -199,13 +217,7 @@ well...
 >  
 >  	if (err) {
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
--- 
-Jan Kara <jack@suse.cz>
-SUSE Labs, CR
+
 
 --
 To unsubscribe, send a message with 'unsubscribe linux-mm' in
