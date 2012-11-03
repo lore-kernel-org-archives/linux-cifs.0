@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 10/17] setcifsacl: fix up endianness conversions
-Date: Sat,  3 Nov 2012 08:50:27 -0400
-Message-ID: <1351947034-18876-11-git-send-email-jlayton@samba.org>
+Subject: [PATCH 09/17] cifs.idmap: fix endianness on SIDs before sending to kernel
+Date: Sat,  3 Nov 2012 08:50:26 -0400
+Message-ID: <1351947034-18876-10-git-send-email-jlayton@samba.org>
 References: <1351947034-18876-1-git-send-email-jlayton@samba.org>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,68 +10,69 @@ In-Reply-To: <1351947034-18876-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Don't use htole32 when you really want le32toh. Also, when copying or
-comparing ACEs, it's incorrect to convert the endianness of these
-fields. Let's just keep things simple and declare that multibyte fields
-in all of these structs are always kept in little-endian.
+Winbind keeps wbcDomainSids in host-endian format. They must be
+converted to little-endian before we can ship them off to the
+kernel.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- setcifsacl.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ cifs.idmap.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/setcifsacl.c b/setcifsacl.c
-index 612796b..4d9787e 100644
---- a/setcifsacl.c
-+++ b/setcifsacl.c
-@@ -61,9 +61,9 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
- 	struct cifs_ctrl_acl *dacl_ptr, *ndacl_ptr;
+diff --git a/cifs.idmap.c b/cifs.idmap.c
+index d2ccbb1..4109ca0 100644
+--- a/cifs.idmap.c
++++ b/cifs.idmap.c
+@@ -42,6 +42,8 @@
+ #include <limits.h>
+ #include <wbclient.h>
  
- 	/* copy security descriptor control portion */
--	osidsoffset = htole32(pntsd->osidoffset);
--	gsidsoffset = htole32(pntsd->gsidoffset);
--	dacloffset = htole32(pntsd->dacloffset);
-+	osidsoffset = le32toh(pntsd->osidoffset);
-+	gsidsoffset = le32toh(pntsd->gsidoffset);
-+	dacloffset = le32toh(pntsd->dacloffset);
++#include "cifsacl.h"
++
+ static const char *prog = "cifs.idmap";
  
- 	pnntsd->revision = pntsd->revision;
- 	pnntsd->type = pntsd->type;
-@@ -76,7 +76,7 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
- 
- 	ndacl_ptr->revision = dacl_ptr->revision;
- 	ndacl_ptr->size = htole16(acessize + sizeof(struct cifs_ctrl_acl));
--	ndacl_ptr->num_aces = htole32(numaces);
-+	ndacl_ptr->num_aces = le32toh(numaces);
- 
- 	/* copy owner sid */
- 	owner_sid_ptr = (struct cifs_sid *)((char *)pntsd + osidsoffset);
-@@ -110,7 +110,7 @@ copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
- 
- 	dace->type = sace->type;
- 	dace->flags = sace->flags;
--	dace->access_req = htole32(sace->access_req);
-+	dace->access_req = sace->access_req;
- 
- 	dace->sid.revision = sace->sid.revision;
- 	dace->sid.num_subauth = sace->sid.num_subauth;
-@@ -119,7 +119,7 @@ copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
- 	for (i = 0; i < sace->sid.num_subauth; i++)
- 		dace->sid.sub_auth[i] = sace->sid.sub_auth[i];
- 
--	dace->size = htole16(sace->size);
-+	dace->size = sace->size;
- 
- 	return dace->size;
+ static const struct option long_options[] = {
+@@ -99,6 +101,19 @@ str_to_uint(const char *src, unsigned int *dst)
+ 	return 0;
  }
-@@ -155,7 +155,7 @@ compare_aces(struct cifs_ace *sace, struct cifs_ace *dace, int compflags)
- 	}
  
- 	if (compflags & COMPMASK) {
--		if (dace->access_req != htole32(sace->access_req))
-+		if (dace->access_req != sace->access_req)
- 			return 0;
- 	}
- 
++/*
++ * Winbind keeps wbcDomainSid fields in host-endian. So, we must convert it
++ * to little endian since the kernel will expect that.
++ */
++static void
++convert_sid_endianness(struct cifs_sid *sid)
++{
++	int i;
++
++	for (i = 0; i < sid->num_subauth; i++)
++		sid->sub_auth[i] = htole32(sid->sub_auth[i]);
++}
++
+ static int
+ cifs_idmap(const key_serial_t key, const char *key_descr)
+ {
+@@ -173,7 +188,9 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
+ 		rc = wbcUidToSid(uid, &sid);
+ 		if (rc)
+ 			syslog(LOG_DEBUG, "uid %u to SID  error: %d", uid, rc);
+-		if (!rc) { /* SID has been mapped to a uid */
++		if (!rc) {
++			/* SID has been mapped to a uid */
++			convert_sid_endianness((struct cifs_sid *)&sid);
+ 			rc = keyctl_instantiate(key, &sid,
+ 					sizeof(struct wbcDomainSid), 0);
+ 			if (rc)
+@@ -197,7 +214,9 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
+ 		rc = wbcGidToSid(gid, &sid);
+ 		if (rc)
+ 			syslog(LOG_DEBUG, "gid %u to SID error: %d", gid, rc);
+-		if (!rc) { /* SID has been mapped to a gid */
++		if (!rc) {
++			/* SID has been mapped to a gid */
++			convert_sid_endianness((struct cifs_sid *)&sid);
+ 			rc = keyctl_instantiate(key, &sid,
+ 					sizeof(struct wbcDomainSid), 0);
+ 			if (rc)
 -- 
 1.7.11.7
