@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 08/17] setcifsacl: fix endianness on SIDs provided by winbind routines
-Date: Sat,  3 Nov 2012 08:50:25 -0400
-Message-ID: <1351947034-18876-9-git-send-email-jlayton@samba.org>
+Subject: [PATCH 10/17] setcifsacl: fix up endianness conversions
+Date: Sat,  3 Nov 2012 08:50:27 -0400
+Message-ID: <1351947034-18876-11-git-send-email-jlayton@samba.org>
 References: <1351947034-18876-1-git-send-email-jlayton@samba.org>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,52 +10,68 @@ In-Reply-To: <1351947034-18876-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Winbind keeps SID fields in host-endian format, but setcifsacl doesn't
-currently account for that. Make sure that when we get a valid SID
-from wbc that we convert the subauth fields to little-endian, which
-the server will expect. The other fields are single bytes and don't
-need conversion.
+Don't use htole32 when you really want le32toh. Also, when copying or
+comparing ACEs, it's incorrect to convert the endianness of these
+fields. Let's just keep things simple and declare that multibyte fields
+in all of these structs are always kept in little-endian.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- setcifsacl.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ setcifsacl.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/setcifsacl.c b/setcifsacl.c
-index 4c09345..612796b 100644
+index 612796b..4d9787e 100644
 --- a/setcifsacl.c
 +++ b/setcifsacl.c
-@@ -396,7 +396,7 @@ build_fetched_aces_ret:
- static int
- verify_ace_sid(char *sidstr, struct cifs_sid *sid)
- {
--	int rc;
-+	int rc, i;
- 	char *lstr;
- 	struct passwd *winpswdptr;
+@@ -61,9 +61,9 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 	struct cifs_ctrl_acl *dacl_ptr, *ndacl_ptr;
  
-@@ -409,7 +409,7 @@ verify_ace_sid(char *sidstr, struct cifs_sid *sid)
- 	/* Check if it is a (raw) SID (string) */
- 	rc = wbcStringToSid(lstr, (struct wbcDomainSid *)sid);
- 	if (!rc)
--		return rc;
-+		goto fix_endianness;
+ 	/* copy security descriptor control portion */
+-	osidsoffset = htole32(pntsd->osidoffset);
+-	gsidsoffset = htole32(pntsd->gsidoffset);
+-	dacloffset = htole32(pntsd->dacloffset);
++	osidsoffset = le32toh(pntsd->osidoffset);
++	gsidsoffset = le32toh(pntsd->gsidoffset);
++	dacloffset = le32toh(pntsd->dacloffset);
  
- 	/* Check if it a name (string) which can be resolved to a SID*/
- 	rc = wbcGetpwnam(lstr, &winpswdptr);
-@@ -423,6 +423,13 @@ verify_ace_sid(char *sidstr, struct cifs_sid *sid)
- 		return rc;
+ 	pnntsd->revision = pntsd->revision;
+ 	pnntsd->type = pntsd->type;
+@@ -76,7 +76,7 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 
+ 	ndacl_ptr->revision = dacl_ptr->revision;
+ 	ndacl_ptr->size = htole16(acessize + sizeof(struct cifs_ctrl_acl));
+-	ndacl_ptr->num_aces = htole32(numaces);
++	ndacl_ptr->num_aces = le32toh(numaces);
+ 
+ 	/* copy owner sid */
+ 	owner_sid_ptr = (struct cifs_sid *)((char *)pntsd + osidsoffset);
+@@ -110,7 +110,7 @@ copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
+ 
+ 	dace->type = sace->type;
+ 	dace->flags = sace->flags;
+-	dace->access_req = htole32(sace->access_req);
++	dace->access_req = sace->access_req;
+ 
+ 	dace->sid.revision = sace->sid.revision;
+ 	dace->sid.num_subauth = sace->sid.num_subauth;
+@@ -119,7 +119,7 @@ copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
+ 	for (i = 0; i < sace->sid.num_subauth; i++)
+ 		dace->sid.sub_auth[i] = sace->sid.sub_auth[i];
+ 
+-	dace->size = htole16(sace->size);
++	dace->size = sace->size;
+ 
+ 	return dace->size;
+ }
+@@ -155,7 +155,7 @@ compare_aces(struct cifs_ace *sace, struct cifs_ace *dace, int compflags)
  	}
  
-+fix_endianness:
-+	/*
-+	 * Winbind keeps wbcDomainSid fields in host-endian. So, we must
-+	 * convert that to little endian since the server will expect that.
-+	 */
-+	for (i = 0; i < sid->num_subauth; i++)
-+		sid->sub_auth[i] = htole32(sid->sub_auth[i]);
- 	return 0;
- }
+ 	if (compflags & COMPMASK) {
+-		if (dace->access_req != htole32(sace->access_req))
++		if (dace->access_req != sace->access_req)
+ 			return 0;
+ 	}
  
 -- 
 1.7.11.7
