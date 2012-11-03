@@ -1,174 +1,96 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [PATCH 3/3] fs: Fix remaining filesystems to wait for stable
- page writeback
-Date: Thu, 1 Nov 2012 20:36:08 -0400
-Message-ID: <20121101203608.336aff49@corrin.poochiereds.net>
-References: <20121101075805.16153.64714.stgit@blackbox.djwong.org>
-	<20121101075829.16153.92036.stgit@blackbox.djwong.org>
-	<5092C2CE.7070209@panasas.com>
-	<20121101162254.03dbbd9a@tlielax.poochiereds.net>
-	<20121101224730.GJ19591@blackbox.djwong.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Boaz Harrosh <bharrosh@panasas.com>, axboe@kernel.dk,
-	lucho@ionkov.net, tytso@mit.edu, sage@inktank.com,
-	ericvh@gmail.com, mfasheh@suse.com, dedekind1@gmail.com,
-	adrian.hunter@intel.com, dhowells@redhat.com, sfrench@samba.org,
-	jlbec@evilplan.org, rminnich@sandia.gov,
-	linux-cifs@vger.kernel.org, jack@suse.cz,
-	martin.petersen@oracle.com, neilb@suse.de, david@fromorbit.com,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-	v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-afs@lists.infradead.org,
-	ocfs2-devel@oss.oracle.com
-To: "Darrick J. Wong" <darrick.wong@oracle.com>
-Return-path: <ceph-devel-owner@vger.kernel.org>
-In-Reply-To: <20121101224730.GJ19591@blackbox.djwong.org>
-Sender: ceph-devel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 01/17] setcifsacl: clean up sizing of cifs_sid
+Date: Sat,  3 Nov 2012 08:50:18 -0400
+Message-ID: <1351947034-18876-2-git-send-email-jlayton@samba.org>
+References: <1351947034-18876-1-git-send-email-jlayton@samba.org>
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1351947034-18876-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 1 Nov 2012 15:47:30 -0700
-"Darrick J. Wong" <darrick.wong@oracle.com> wrote:
+The max number of subauthorities on windows and in winbind is generally
+15, not 5. If winbind sends more than 5, then this code may end up
+overrunning the buffer. Also, define some preprocessor constants and
+use those instead of hardcoding '5' and '6' all over the place.
 
-> On Thu, Nov 01, 2012 at 04:22:54PM -0400, Jeff Layton wrote:
-> > On Thu, 1 Nov 2012 11:43:26 -0700
-> > Boaz Harrosh <bharrosh@panasas.com> wrote:
-> > 
-> > > On 11/01/2012 12:58 AM, Darrick J. Wong wrote:
-> > > > Fix up the filesystems that provide their own ->page_mkwrite handlers to
-> > > > provide stable page writes if necessary.
-> > > > 
-> > > > Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
-> > > > ---
-> > > >  fs/9p/vfs_file.c |    1 +
-> > > >  fs/afs/write.c   |    4 ++--
-> > > >  fs/ceph/addr.c   |    1 +
-> > > >  fs/cifs/file.c   |    1 +
-> > > >  fs/ocfs2/mmap.c  |    1 +
-> > > >  fs/ubifs/file.c  |    4 ++--
-> > > >  6 files changed, 8 insertions(+), 4 deletions(-)
-> > > > 
-> > > > 
-> > > > diff --git a/fs/9p/vfs_file.c b/fs/9p/vfs_file.c
-> > > > index c2483e9..aa253f0 100644
-> > > > --- a/fs/9p/vfs_file.c
-> > > > +++ b/fs/9p/vfs_file.c
-> > > > @@ -620,6 +620,7 @@ v9fs_vm_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
-> > > >  	lock_page(page);
-> > > >  	if (page->mapping != inode->i_mapping)
-> > > >  		goto out_unlock;
-> > > > +	wait_on_stable_page_write(page);
-> > > >  
-> > > 
-> > > Good god thanks, yes please ;-)
-> > > 
-> > > >  	return VM_FAULT_LOCKED;
-> > > >  out_unlock:
-> > > > diff --git a/fs/afs/write.c b/fs/afs/write.c
-> > > > index 9aa52d9..39eb2a4 100644
-> > > > --- a/fs/afs/write.c
-> > > > +++ b/fs/afs/write.c
-> > > > @@ -758,7 +758,7 @@ int afs_page_mkwrite(struct vm_area_struct *vma, struct page *page)
-> > > 
-> > > afs, is it not a network filesystem? which means that it has it's own emulated none-block-device
-> > > BDI, registered internally. So if you do need stable pages someone should call
-> > > bdi_require_stable_pages()
-> > > 
-> > > But again since it is a network filesystem I don't see how it is needed, and/or it might be
-> > > taken care of already.
-> > > 
-> > > >  #ifdef CONFIG_AFS_FSCACHE
-> > > >  	fscache_wait_on_page_write(vnode->cache, page);
-> > > >  #endif
-> > > > -
-> > > > +	wait_on_stable_page_write(page);
-> > > >  	_leave(" = 0");
-> > > > -	return 0;
-> > > > +	return VM_FAULT_LOCKED;
-> > > >  }
-> > > > diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-> > > 
-> > > CEPH for sure has it's own "emulated none-block-device BDI". This one is also
-> > > a pure networking filesystem.
-> > > 
-> > > And it already does what it needs to do with wait_on_writeback().
-> > > 
-> > > So i do not think you should touch CEPH
-> > > 
-> > > > index 6690269..e9734bf 100644
-> > > > --- a/fs/ceph/addr.c
-> > > > +++ b/fs/ceph/addr.c
-> > > > @@ -1208,6 +1208,7 @@ static int ceph_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
-> > > >  		set_page_dirty(page);
-> > > >  		up_read(&mdsc->snap_rwsem);
-> > > >  		ret = VM_FAULT_LOCKED;
-> > > > +		wait_on_stable_page_write(page);
-> > > >  	} else {
-> > > >  		if (ret == -ENOMEM)
-> > > >  			ret = VM_FAULT_OOM;
-> > > > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > > 
-> > > Cifs also self-BDI network filesystem, but
-> > > 
-> > > > index edb25b4..a8770bf 100644
-> > > > --- a/fs/cifs/file.c
-> > > > +++ b/fs/cifs/file.c
-> > > > @@ -2997,6 +2997,7 @@ cifs_page_mkwrite(struct vm_area_struct *vma, struct vm_fault *vmf)
-> > > >  	struct page *page = vmf->page;
-> > > >  
-> > > >  	lock_page(page);
-> > > 
-> > > It waits by locking the page, that's cifs naive way of waiting for writeback
-> > > 
-> > > > +	wait_on_stable_page_write(page);
-> > > 
-> > > Instead it could do better and not override page_mkwrite at all, and all it needs
-> > > to do is call bdi_require_stable_pages() at it's own registered BDI
-> > > 
-> > 
-> > Hmm...I don't know...
-> > 
-> > I've never been crazy about using the page lock for this, but in the
-> > absence of a better way to guarantee stable pages, it was what I ended
-> > up with at the time. cifs_writepages will hold the page lock until
-> > kernel_sendmsg returns. At that point the TCP layer will have copied
-> > off the page data so it's safe to release it.
-> > 
-> > With this change though, we're going to end up blocking until the
-> > writeback flag clears, right? And I think that will happen when the
-> > reply comes in? So, we'll end up blocking for much longer than is
-> > really necessary in page_mkwrite with this change.
-> 
-> That's a very good point to make-- network FSes can stop the stable-waiting
-> after the request is sent.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ cifsacl.h    |  7 +++++--
+ setcifsacl.c | 12 ++++++------
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-Well, it depends...
-
-If the fs in question uses kernel_sendpage (or the equivalent) then the
-page will be inlined into the fraglist of the skb. If you use that,
-then you can't just drop it after the send. It's also possible that the
-fs doesn't care about page stability at all (like if signatures aren't
-being used).
-
-So I think you probably need to account for several different
-possibilities of "page stability lifetimes" here...
-
-> Can I interest you in a new page flag (PG_stable)
-> that indicates when a page has to be held for stable write?  Along with a
-> modification to wait_on_stable_page_write that uses the new PG_stable flag
-> instead of just writeback?  Then, you can clear PG_stable right after the
-> sendmsg() and release the page for further activity without having to overload
-> the page lock.
-> 
-> I wrote a patch that does exactly that as part of my work to defer the
-> integrity checksumming until the last possible instant.  However, I haven't
-> gotten that part to work yet, so I left the PG_stable patch out of this
-> submission.  On the other hand, it sounds like you could use it.
-> 
-
-That sounds much more suitable for CIFS and possibly for others too.
-
+diff --git a/cifsacl.h b/cifsacl.h
+index 101881b..f9fdc8f 100644
+--- a/cifsacl.h
++++ b/cifsacl.h
+@@ -96,6 +96,9 @@
+ #define COMPMASK 0x8
+ #define COMPALL 0xf /* COMPSID | COMPTYPE | COMPFLAG | COMPMASK */
+ 
++#define NUM_AUTHS (6)   /* number of authority fields */
++#define SID_MAX_SUB_AUTHORITIES (15) /* max number of sub authority fields */
++
+ enum ace_action {
+ 	acedelete = 0,
+ 	acemodify,
+@@ -115,8 +118,8 @@ struct cifs_ntsd {
+ struct cifs_sid {
+ 	uint8_t revision; /* revision level */
+ 	uint8_t num_subauth;
+-	uint8_t authority[6];
+-	uint32_t sub_auth[5]; /* sub_auth[num_subauth] */
++	uint8_t authority[NUM_AUTHS];
++	uint32_t sub_auth[SID_MAX_SUB_AUTHORITIES];
+ } __attribute__((packed));
+ 
+ struct cifs_ctrl_acl {
+diff --git a/setcifsacl.c b/setcifsacl.c
+index 29b7b93..23ab5b1 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -76,9 +76,9 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 
+ 	nowner_sid_ptr->revision = owner_sid_ptr->revision;
+ 	nowner_sid_ptr->num_subauth = owner_sid_ptr->num_subauth;
+-	for (i = 0; i < 6; i++)
++	for (i = 0; i < NUM_AUTHS; i++)
+ 		nowner_sid_ptr->authority[i] = owner_sid_ptr->authority[i];
+-	for (i = 0; i < 5; i++)
++	for (i = 0; i < SID_MAX_SUB_AUTHORITIES; i++)
+ 		nowner_sid_ptr->sub_auth[i] = owner_sid_ptr->sub_auth[i];
+ 
+ 	/* copy group sid */
+@@ -87,9 +87,9 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 
+ 	ngroup_sid_ptr->revision = group_sid_ptr->revision;
+ 	ngroup_sid_ptr->num_subauth = group_sid_ptr->num_subauth;
+-	for (i = 0; i < 6; i++)
++	for (i = 0; i < NUM_AUTHS; i++)
+ 		ngroup_sid_ptr->authority[i] = group_sid_ptr->authority[i];
+-	for (i = 0; i < 5; i++)
++	for (i = 0; i < SID_MAX_SUB_AUTHORITIES; i++)
+ 		ngroup_sid_ptr->sub_auth[i] = group_sid_ptr->sub_auth[i];
+ 
+ 	return;
+@@ -106,7 +106,7 @@ copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
+ 
+ 	dace->sid.revision = sace->sid.revision;
+ 	dace->sid.num_subauth = sace->sid.num_subauth;
+-	for (i = 0; i < 6; i++)
++	for (i = 0; i < NUM_AUTHS; i++)
+ 		dace->sid.authority[i] = sace->sid.authority[i];
+ 	for (i = 0; i < sace->sid.num_subauth; i++)
+ 		dace->sid.sub_auth[i] = sace->sid.sub_auth[i];
+@@ -126,7 +126,7 @@ compare_aces(struct cifs_ace *sace, struct cifs_ace *dace, int compflags)
+ 			return 0;
+ 		if (dace->sid.num_subauth != sace->sid.num_subauth)
+ 			return 0;
+-		for (i = 0; i < 6; i++) {
++		for (i = 0; i < NUM_AUTHS; i++) {
+ 			if (dace->sid.authority[i] != sace->sid.authority[i])
+ 				return 0;
+ 		}
 -- 
-Jeff Layton <jlayton@samba.org>
+1.7.11.7
