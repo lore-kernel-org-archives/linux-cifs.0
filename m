@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 04/17] get/setcifsacl: set "prog" via basename(argv[0])
-Date: Sat,  3 Nov 2012 08:50:21 -0400
-Message-ID: <1351947034-18876-5-git-send-email-jlayton@samba.org>
+Subject: [PATCH 05/17] setcifsacl: declare an enum for the action values
+Date: Sat,  3 Nov 2012 08:50:22 -0400
+Message-ID: <1351947034-18876-6-git-send-email-jlayton@samba.org>
 References: <1351947034-18876-1-git-send-email-jlayton@samba.org>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,57 +10,101 @@ In-Reply-To: <1351947034-18876-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This saves a tiny bit of memory, and doesn't make the program assume
-that the binary is named something in particular.
+...instead of relying on magic values of an int.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- getcifsacl.c | 3 ++-
- setcifsacl.c | 4 +++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ setcifsacl.c | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/getcifsacl.c b/getcifsacl.c
-index 8cbdb1d..da4bb67 100644
---- a/getcifsacl.c
-+++ b/getcifsacl.c
-@@ -38,7 +38,7 @@
- #include <sys/xattr.h>
- #include "cifsacl.h"
- 
--static const char *prog = "getcifsacl";
-+static const char *prog;
- 
- static void
- print_each_ace_mask(uint32_t mask)
-@@ -333,6 +333,7 @@ main(const int argc, char *const argv[])
- 	size_t bufsize = BUFSIZE;
- 	char *filename, *attrval;
- 
-+	prog = basename(argv[0]);
- 	openlog(prog, 0, LOG_DAEMON);
- 
- 	while ((c = getopt_long(argc, argv, "r:v", NULL, NULL)) != -1) {
 diff --git a/setcifsacl.c b/setcifsacl.c
-index 380adac..50822e6 100644
+index 50822e6..71b065c 100644
 --- a/setcifsacl.c
 +++ b/setcifsacl.c
-@@ -39,7 +39,7 @@
- #include <sys/xattr.h>
- #include "cifsacl.h"
+@@ -41,6 +41,14 @@
  
--static const char *prog = "setcifsacl";
-+static const char *prog;
+ static const char *prog;
  
++enum setcifsacl_actions {
++	ActUnknown = -1,
++	ActDelete,
++	ActModify,
++	ActAdd,
++	ActSet
++};
++
  static void
  copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
-@@ -775,6 +775,8 @@ main(const int argc, char *const argv[])
- 	struct cifs_ace **cacesptr = NULL, **facesptr = NULL;
- 	struct cifs_ntsd *ntsdptr = NULL;
+ 		int numaces, int acessize)
+@@ -708,24 +716,24 @@ static int
+ setacl_action(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd,
+ 		ssize_t *bufsize, struct cifs_ace **facesptr, int numfaces,
+ 		struct cifs_ace **cacesptr, int numcaces,
+-		int maction)
++		enum setcifsacl_actions maction)
+ {
+ 	int rc = 1;
  
-+	prog = basename(argv[0]);
-+
- 	openlog(prog, 0, LOG_DAEMON);
+ 	switch (maction) {
+-	case 0:
++	case ActDelete:
+ 		rc = ace_delete(pntsd, npntsd, bufsize, facesptr,
+ 				numfaces, cacesptr, numcaces);
+ 		break;
+-	case 1:
++	case ActModify:
+ 		rc = ace_modify(pntsd, npntsd, bufsize, facesptr,
+ 				numfaces, cacesptr, numcaces);
+ 		break;
+-	case 2:
++	case ActAdd:
+ 		rc = ace_add(pntsd, npntsd, bufsize, facesptr,
+ 				numfaces, cacesptr, numcaces);
+ 		break;
+-	case 3:
++	case ActSet:
+ 		rc = ace_set(pntsd, npntsd, bufsize, cacesptr, numcaces);
+ 		break;
+ 	default:
+@@ -768,7 +776,8 @@ setcifsacl_usage(void)
+ int
+ main(const int argc, char *const argv[])
+ {
+-	int i, rc, c, numcaces, numfaces, maction = -1;
++	int i, rc, c, numcaces, numfaces;
++	enum setcifsacl_actions maction = ActUnknown;
+ 	ssize_t attrlen, bufsize = BUFSIZE;
+ 	char *filename, *attrval, **arrptr = NULL;
+ 	struct cifs_ctrl_acl *daclptr = NULL;
+@@ -785,16 +794,16 @@ main(const int argc, char *const argv[])
+ 		printf("Version: %s\n", VERSION);
+ 		goto out;
+ 	case 'D':
+-		maction = 0;
++		maction = ActDelete;
+ 		break;
+ 	case 'M':
+-		maction = 1;
++		maction = ActModify;
+ 		break;
+ 	case 'a':
+-		maction = 2;
++		maction = ActAdd;
+ 		break;
+ 	case 'S':
+-		maction = 3;
++		maction = ActSet;
+ 		break;
+ 	case '?':
+ 		setcifsacl_usage();
+@@ -849,7 +858,7 @@ cifsacl:
+ 	}
  
- 	c = getopt(argc, argv, "v:D:M:a:S:?");
+ 	numfaces = get_numfaces((struct cifs_ntsd *)attrval, attrlen, &daclptr);
+-	if (!numfaces && maction != 2) { /* if we are not adding aces */
++	if (!numfaces && maction != ActAdd) { /* if we are not adding aces */
+ 		printf("%s: Empty DACL\n", __func__);
+ 		goto setcifsacl_facenum_ret;
+ 	}
 -- 
 1.7.11.7
