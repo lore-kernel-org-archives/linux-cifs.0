@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 03/17] setcifsacl: clean up get_numfaces
-Date: Sat,  3 Nov 2012 08:50:20 -0400
-Message-ID: <1351947034-18876-4-git-send-email-jlayton@samba.org>
+Subject: [PATCH 02/17] setcifsacl: fix overrun of subauths array when copying SIDs
+Date: Sat,  3 Nov 2012 08:50:19 -0400
+Message-ID: <1351947034-18876-3-git-send-email-jlayton@samba.org>
 References: <1351947034-18876-1-git-send-email-jlayton@samba.org>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,44 +10,45 @@ In-Reply-To: <1351947034-18876-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-pntsd is never NULL here, and get rid of extra "else" that adds some
-unneeded indentation.
+copy_sec_desc() copies the owner and group SIDs from one security
+descriptor to another. Unfortunately, it doesn't take into account the
+fact that these are variable length and routinely overruns the SID
+structure when doing this copy and scribbles over the destination ACL.
+
+This wasn't noticed before the change in the maximum number of subauths
+because the code either overwrote the damage afterward, or the overrun
+part was the same between source and destination anyway. Now that the
+max number of subauths is 15, it's more noticable.
+
+Fix it to only copy the number of subauths that claimed in the buffer
+instead.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- setcifsacl.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ setcifsacl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setcifsacl.c b/setcifsacl.c
-index e97a35f..380adac 100644
+index 23ab5b1..e97a35f 100644
 --- a/setcifsacl.c
 +++ b/setcifsacl.c
-@@ -329,19 +329,16 @@ get_numfaces(struct cifs_ntsd *pntsd, ssize_t acl_len,
- 	struct cifs_ctrl_acl *ldaclptr;
- 	char *end_of_acl = ((char *)pntsd) + acl_len;
+@@ -78,7 +78,7 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 	nowner_sid_ptr->num_subauth = owner_sid_ptr->num_subauth;
+ 	for (i = 0; i < NUM_AUTHS; i++)
+ 		nowner_sid_ptr->authority[i] = owner_sid_ptr->authority[i];
+-	for (i = 0; i < SID_MAX_SUB_AUTHORITIES; i++)
++	for (i = 0; i < owner_sid_ptr->num_subauth; i++)
+ 		nowner_sid_ptr->sub_auth[i] = owner_sid_ptr->sub_auth[i];
  
--	if (pntsd == NULL)
--		return 0;
--
- 	dacloffset = le32toh(pntsd->dacloffset);
- 	if (!dacloffset)
- 		return 0;
--	else {
--		ldaclptr = (struct cifs_ctrl_acl *)((char *)pntsd + dacloffset);
--		/* validate that we do not go past end of acl */
--		if (end_of_acl >= (char *)ldaclptr + le16toh(ldaclptr->size)) {
--			numfaces = le32toh(ldaclptr->num_aces);
--			*daclptr = ldaclptr;
--		}
-+
-+	ldaclptr = (struct cifs_ctrl_acl *)((char *)pntsd + dacloffset);
-+
-+	/* validate that we do not go past end of acl */
-+	if (end_of_acl >= (char *)ldaclptr + le16toh(ldaclptr->size)) {
-+		numfaces = le32toh(ldaclptr->num_aces);
-+		*daclptr = ldaclptr;
- 	}
+ 	/* copy group sid */
+@@ -89,7 +89,7 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 	ngroup_sid_ptr->num_subauth = group_sid_ptr->num_subauth;
+ 	for (i = 0; i < NUM_AUTHS; i++)
+ 		ngroup_sid_ptr->authority[i] = group_sid_ptr->authority[i];
+-	for (i = 0; i < SID_MAX_SUB_AUTHORITIES; i++)
++	for (i = 0; i < group_sid_ptr->num_subauth; i++)
+ 		ngroup_sid_ptr->sub_auth[i] = group_sid_ptr->sub_auth[i];
  
- 	return numfaces;
+ 	return;
 -- 
 1.7.11.7
