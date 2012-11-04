@@ -1,122 +1,97 @@
-From: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-Subject: Re: [PATCH 12/17] setcifsacl: clean up parse_cmdline_aces
-Date: Sat, 3 Nov 2012 15:06:24 -0400
-Message-ID: <20121103150624.4fdb199f@tlielax.poochiereds.net>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 18/17] setcifsacl: consolidate SID copying routines
+Date: Sun,  4 Nov 2012 09:18:19 -0500
+Message-ID: <1352038699-8935-1-git-send-email-jlayton@samba.org>
 References: <1351947034-18876-1-git-send-email-jlayton@samba.org>
-	<1351947034-18876-13-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1351947034-18876-13-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <1351947034-18876-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat,  3 Nov 2012 08:50:29 -0400
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+...instead of open-coding it thrice.
 
-> One of the reasons to use "goto" in an error condition is to eliminate
-> unnecessary indentation. Fix that here by revering some error checks
-> end getting rid of some unneeded "else" cases.
-> 
-> After using strstr() to find "ACL:", there's no need to then use
-> strchr() to find ':'. We know where it is -- it's 3 bytes past the
-> current position.
-> 
-> Finally, there's no need to copy these strings into new buffers,
-> just set the pointers in the array to their original values.
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  setcifsacl.c | 50 ++++++++++++++++++--------------------------------
->  1 file changed, 18 insertions(+), 32 deletions(-)
-> 
-> diff --git a/setcifsacl.c b/setcifsacl.c
-> index faf5405..54d8cbc 100644
-> --- a/setcifsacl.c
-> +++ b/setcifsacl.c
-> @@ -655,48 +655,36 @@ build_cmdline_aces_ret:
->  }
->  
->  static char **
-> -parse_cmdline_aces(char *optarg, int numcaces)
-> +parse_cmdline_aces(char *acelist, int numcaces)
->  {
->  	int i = 0, len;
->  	char *acestr, *vacestr, **arrptr = NULL;
->  
-> -	errno = EINVAL;
->  	arrptr = (char **)malloc(numcaces * sizeof(char *));
->  	if (!arrptr) {
-> -		printf("%s: Error %d allocating char array\n", __func__, errno);
-> +		printf("%s: Unable to allocate char array\n", __func__);
->  		return NULL;
->  	}
->  
->  	while (i < numcaces) {
-> -		acestr = strtok(optarg, ","); /* everything before , */
-> -		if (acestr) {
-> -			vacestr = strstr(acestr, "ACL:"); /* ace as ACL:*" */
-> -			if (vacestr) {
-> -				vacestr = strchr(vacestr, ':');
-> -				if (vacestr)
-> -					++vacestr; /* go past : */
-> -				if (vacestr) {
-> -					len = strlen(vacestr);
-> -					arrptr[i] = malloc(len + 1);
-> -					if (!arrptr[i])
-> -						goto parse_cmdline_aces_ret;
-> -					strcpy(arrptr[i], vacestr);
-> -					++i;
-> -				} else
-> -					goto parse_cmdline_aces_ret;
-> -			} else
-> -				goto parse_cmdline_aces_ret;
-> -		} else
-> -			goto parse_cmdline_aces_ret;
-> -		optarg = NULL;
-> -	}
-> -	errno = 0;
-> +		acestr = strtok(acelist, ","); /* everything before , */
-> +		if (!acestr)
-> +			goto parse_cmdline_aces_err;
-> +
-> +		vacestr = strstr(acestr, "ACL:"); /* ace as ACL:*" */
-> +		if (!vacestr)
-> +			goto parse_cmdline_aces_err;
-> +		vacestr += 4; /* skip past "ACL:" */
-> +		if (vacestr) {
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ setcifsacl.c | 40 ++++++++++++++++------------------------
+ 1 file changed, 16 insertions(+), 24 deletions(-)
 
-		Oops: that should be "if (*vacestr)". Will fix...
-
-> +			arrptr[i] = vacestr;
-> +			++i;
-> +		}
-> +		acelist = NULL;
-> +	}
->  	return arrptr;
->  
-> -parse_cmdline_aces_ret:
-> -	printf("%s: Error %d parsing ACEs\n", __func__, errno);
-> -	for (;  i >= 0; --i)
-> -		free(arrptr[i]);
-> +parse_cmdline_aces_err:
-> +	printf("%s: Error parsing ACEs\n", __func__);
->  	free(arrptr);
->  	return NULL;
->  }
-> @@ -908,8 +896,6 @@ setcifsacl_cmdlineverify_ret:
->  	free(cacesptr);
->  
->  setcifsacl_cmdlineparse_ret:
-> -	for (i = 0; i < numcaces; ++i)
-> -		free(arrptr[i]);
->  	free(arrptr);
->  
->  setcifsacl_numcaces_ret:
-
-
+diff --git a/setcifsacl.c b/setcifsacl.c
+index 04fa321..5016264 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -50,11 +50,22 @@ enum setcifsacl_actions {
+ };
+ 
+ static void
+-copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+-		int numaces, int acessize)
++copy_cifs_sid(struct cifs_sid *dst, const struct cifs_sid *src)
+ {
+ 	int i;
+ 
++	dst->revision = src->revision;
++	dst->num_subauth = src->num_subauth;
++	for (i = 0; i < NUM_AUTHS; i++)
++		dst->authority[i] = src->authority[i];
++	for (i = 0; i < src->num_subauth; i++)
++		dst->sub_auth[i] = src->sub_auth[i];
++}
++
++static void
++copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
++		int numaces, int acessize)
++{
+ 	int osidsoffset, gsidsoffset, dacloffset;
+ 	struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
+ 	struct cifs_sid *nowner_sid_ptr, *ngroup_sid_ptr;
+@@ -81,24 +92,12 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ 	/* copy owner sid */
+ 	owner_sid_ptr = (struct cifs_sid *)((char *)pntsd + osidsoffset);
+ 	nowner_sid_ptr = (struct cifs_sid *)((char *)pnntsd + osidsoffset);
+-
+-	nowner_sid_ptr->revision = owner_sid_ptr->revision;
+-	nowner_sid_ptr->num_subauth = owner_sid_ptr->num_subauth;
+-	for (i = 0; i < NUM_AUTHS; i++)
+-		nowner_sid_ptr->authority[i] = owner_sid_ptr->authority[i];
+-	for (i = 0; i < owner_sid_ptr->num_subauth; i++)
+-		nowner_sid_ptr->sub_auth[i] = owner_sid_ptr->sub_auth[i];
++	copy_cifs_sid(nowner_sid_ptr, owner_sid_ptr);
+ 
+ 	/* copy group sid */
+ 	group_sid_ptr = (struct cifs_sid *)((char *)pntsd + gsidsoffset);
+ 	ngroup_sid_ptr = (struct cifs_sid *)((char *)pnntsd + gsidsoffset);
+-
+-	ngroup_sid_ptr->revision = group_sid_ptr->revision;
+-	ngroup_sid_ptr->num_subauth = group_sid_ptr->num_subauth;
+-	for (i = 0; i < NUM_AUTHS; i++)
+-		ngroup_sid_ptr->authority[i] = group_sid_ptr->authority[i];
+-	for (i = 0; i < group_sid_ptr->num_subauth; i++)
+-		ngroup_sid_ptr->sub_auth[i] = group_sid_ptr->sub_auth[i];
++	copy_cifs_sid(ngroup_sid_ptr, group_sid_ptr);
+ 
+ 	return;
+ }
+@@ -106,18 +105,11 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+ static int
+ copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
+ {
+-	int i;
+-
+ 	dace->type = sace->type;
+ 	dace->flags = sace->flags;
+ 	dace->access_req = sace->access_req;
+ 
+-	dace->sid.revision = sace->sid.revision;
+-	dace->sid.num_subauth = sace->sid.num_subauth;
+-	for (i = 0; i < NUM_AUTHS; i++)
+-		dace->sid.authority[i] = sace->sid.authority[i];
+-	for (i = 0; i < sace->sid.num_subauth; i++)
+-		dace->sid.sub_auth[i] = sace->sid.sub_auth[i];
++	copy_cifs_sid(&dace->sid, &sace->sid);
+ 
+ 	dace->size = sace->size;
+ 
 -- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+1.7.11.7
