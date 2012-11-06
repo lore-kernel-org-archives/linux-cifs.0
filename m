@@ -1,57 +1,98 @@
-From: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
-Subject: [PATCH] Convert slashes in the UNC parameter to backslashes
-Date: Tue, 06 Nov 2012 13:29:47 +0100
-Message-ID: <509902BB.6020400@innominate.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sjayaraman-IBi9RG/b67k@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/2] setcifsacl: fix some bugs in build_fetched_aces
+Date: Tue,  6 Nov 2012 10:31:18 -0500
+Message-ID: <1352215879-11451-1-git-send-email-jlayton@samba.org>
+Cc: praiskup-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch ensures that slashes used as separators in the
-UNC are properly converted to backslashes. The existing
-implementation did not perform that conversion and that
-lead to a "invalid argument" error when specifying an UNC
-explicitly which contained slashes in it.
+Pavel Raiskup reported the following defects that he found with Coverity:
 
+"If the variable 'facesptr' on line cifs-utils-4.8.1/setcifsacl.c|365|
+has not enough memory to be allocated, program 'setcifsacl' will fail
+with segfault on line 365 (dereferencing facesptr)."
+
+"you may return freed pointer here. There is some kind of return code
+('rc') which should be transferred to >NULL< when is rc nonzero (and
+returned)"
+
+There are also a couple of ther bugs here:
+
+malloc doesn't necessarily set errno to anything when an allocation
+fails, so having the error handling rely on that is wrong.
+
+Fix all of these bugs by reorganzing this function to fix up the error
+handling.
+
+Reported-by: Pavel Raiskup <praiskup-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
-  fs/cifs/connect.c |   12 ++++++------
-  1 files changed, 6 insertions(+), 6 deletions(-)
+ setcifsacl.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5c670b9..8f4c76f 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1108,6 +1108,7 @@ cifs_parse_mount_options(const char *mountdata, 
-const char *devname,
-  	char *string = NULL;
-  	char *tmp_end, *value;
-  	char delim;
-+	char *p, *q;
-
-  	separator[0] = ',';
-  	separator[1] = 0;
-@@ -1573,12 +1574,11 @@ cifs_parse_mount_options(const char *mountdata, 
-const char *devname,
-  				printk(KERN_WARNING "CIFS: no memory for UNC\n");
-  				goto cifs_parse_mount_err;
-  			}
--			strcpy(vol->UNC, string);
--
--			if (strncmp(string, "//", 2) == 0) {
--				vol->UNC[0] = '\\';
--				vol->UNC[1] = '\\';
--			} else if (strncmp(string, "\\\\", 2) != 0) {
-+			for (p = string, q = vol->UNC; *p; ++p, ++q) {
-+				*q = *p == '/'? '\\' : *p;
-+			}
-+			*q = '\0';
-+			if (strncmp(vol->UNC, "\\\\", 2) != 0) {
-  				printk(KERN_WARNING "CIFS: UNC Path does not "
-  						    "begin with // or \\\\\n");
-  				goto cifs_parse_mount_err;
+diff --git a/setcifsacl.c b/setcifsacl.c
+index 5016264..9dfdad7 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -347,26 +347,23 @@ get_numfaces(struct cifs_ntsd *pntsd, ssize_t acl_len,
+ static struct cifs_ace **
+ build_fetched_aces(char *daclptr, int numfaces)
+ {
+-	int i, j, rc = 0, acl_size;
++	int i, j, acl_size;
+ 	char *acl_base;
+ 	struct cifs_ace *pace, **facesptr;
+ 
+-	facesptr = (struct cifs_ace **)malloc(numfaces *
+-					sizeof(struct cifs_aces *));
++	facesptr = calloc(numfaces, sizeof(struct cifs_aces *));
+ 	if (!facesptr) {
+ 		printf("%s: Error %d allocating ACE array",
+ 				__func__, errno);
+-		rc = errno;
++		return facesptr;
+ 	}
+ 
+ 	acl_base = daclptr;
+ 	acl_size = sizeof(struct cifs_ctrl_acl);
+ 	for (i = 0; i < numfaces; ++i) {
+ 		facesptr[i] = malloc(sizeof(struct cifs_ace));
+-		if (!facesptr[i]) {
+-			rc = errno;
+-			goto build_fetched_aces_ret;
+-		}
++		if (!facesptr[i])
++			goto build_fetched_aces_err;
+ 		pace = (struct cifs_ace *) (acl_base + acl_size);
+ 		memcpy(facesptr[i], pace, sizeof(struct cifs_ace));
+ 		acl_base = (char *)pace;
+@@ -374,15 +371,17 @@ build_fetched_aces(char *daclptr, int numfaces)
+ 	}
+ 
+ build_fetched_aces_ret:
+-	if (rc) {
+-		printf("%s: Invalid fetched ace\n", __func__);
+-		if (i) {
+-			for (j = i; j >= 0; --j)
+-				free(facesptr[j]);
+-		}
+-		free(facesptr);
+-	}
+ 	return facesptr;
++
++build_fetched_aces_err:
++	printf("%s: Invalid fetched ace\n", __func__);
++	if (i) {
++		for (j = i; j >= 0; --j)
++			free(facesptr[j]);
++	}
++	free(facesptr);
++	facesptr = NULL;
++	goto build_fetched_aces_ret;
+ }
+ 
+ static int
 -- 
-1.7.2.5
+1.7.11.7
