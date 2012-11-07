@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 1/3] getcifsacl: fix endianness bug in getcifsacl and add better bounds checks
-Date: Wed,  7 Nov 2012 06:51:58 -0500
-Message-ID: <1352289120-29327-2-git-send-email-jlayton@samba.org>
+Subject: [PATCH 2/3] setcifsacl: fix up ACE mask handling
+Date: Wed,  7 Nov 2012 06:51:59 -0500
+Message-ID: <1352289120-29327-3-git-send-email-jlayton@samba.org>
 References: <1352289120-29327-1-git-send-email-jlayton@samba.org>
 Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,53 +10,127 @@ In-Reply-To: <1352289120-29327-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-getcifsacl must convert the access_req field from little endian. Also,
-we should ensure that the "size" field in the ACE is reachable before
-trying to access it.
+Change verify_ace_mask to just attempt to convert the argument to an
+unsigned long first. If that fails, then try to treat it as a symbolic
+mask string.
+
+Also, clean up ace_mask_value. There's no need to walk the string
+twice. Walk it once and turn the single-char mask checks into a switch
+statement instead of if/else clauses.
+
+Finally, fix the endianness of the resulting value. It must be in LE.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- getcifsacl.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ setcifsacl.c | 81 ++++++++++++++++++++++++++++++------------------------------
+ 1 file changed, 40 insertions(+), 41 deletions(-)
 
-diff --git a/getcifsacl.c b/getcifsacl.c
-index b832c50..c576fc0 100644
---- a/getcifsacl.c
-+++ b/getcifsacl.c
-@@ -31,6 +31,7 @@
- #include <unistd.h>
- #include <stdio.h>
- #include <stdlib.h>
-+#include <stddef.h>
- #include <errno.h>
- #include <limits.h>
- #include <wbclient.h>
-@@ -235,7 +236,15 @@ print_sid_raw:
- static void
- print_ace(struct cifs_ace *pace, char *end_of_acl, int raw)
- {
--	/* 16 == size of cifs_ace sans the cifs_sid */
-+	uint16_t size;
-+
-+	/* make sure we can safely get to "size" */
-+	if (end_of_acl < (char *)pace + offsetof(struct cifs_ace, size) + 1)
-+		return;
-+
-+	size = le16toh(pace->size);
-+
-+	/* 16 == size of cifs_ace when cifs_sid has no subauths */
- 	if (le16toh(pace->size) < 16)
- 		return;
- 
-@@ -250,8 +259,7 @@ print_ace(struct cifs_ace *pace, char *end_of_acl, int raw)
- 	printf("/");
- 	print_ace_flags(pace->flags, raw);
- 	printf("/");
--	print_ace_mask(pace->access_req, raw);
--
-+	print_ace_mask(le32toh(pace->access_req), raw);
- 
- 	return;
+diff --git a/setcifsacl.c b/setcifsacl.c
+index 37e95e2..3178eff 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -512,62 +512,61 @@ verify_ace_flags(char *flagstr, uint8_t *flagval)
  }
+ 
+ static uint32_t
+-ace_mask_value(char *maskstr)
++ace_mask_value(char *mask)
+ {
+-	int i, len;
+-	uint32_t maskval = 0x0;
+-	char *lmask;
++	uint32_t maskval = 0;
++	char cur;
+ 
+-	if (!strcmp(maskstr, "FULL"))
++	if (!strcmp(mask, "FULL"))
+ 		return FULL_CONTROL;
+-	else if (!strcmp(maskstr, "CHANGE"))
++	if (!strcmp(mask, "CHANGE"))
+ 		return CHANGE;
+-	else if (!strcmp(maskstr, "D"))
+-		return DELETE;
+-	else if (!strcmp(maskstr, "READ"))
++	if (!strcmp(mask, "READ"))
+ 		return EREAD;
+-	else {
+-		len = strlen(maskstr);
+-		lmask = maskstr;
+-		for (i = 0; i < len; ++i, ++lmask) {
+-			if (*lmask == 'R')
+-				maskval |= EREAD;
+-			else if (*lmask == 'W')
+-				maskval |= EWRITE;
+-			else if (*lmask == 'X')
+-				maskval |= EXEC;
+-			else if (*lmask == 'D')
+-				maskval |= DELETE;
+-			else if (*lmask == 'P')
+-				maskval |= WRITE_DAC;
+-			else if (*lmask == 'O')
+-				maskval |= WRITE_OWNER;
+-			else
+-				return 0;
++
++	while((cur = *mask++)) {
++		switch(cur) {
++		case 'R':
++			maskval |= EREAD;
++			break;
++		case 'W':
++			maskval |= EWRITE;
++			break;
++		case 'X':
++			maskval |= EXEC;
++			break;
++		case 'D':
++			maskval |= DELETE;
++			break;
++		case 'P':
++			maskval |= WRITE_DAC;
++			break;
++		case 'O':
++			maskval |= WRITE_OWNER;
++			break;
++		default:
++			return 0;
+ 		}
+-		return maskval;
+ 	}
+-
+-	return 0;
++	return maskval;
+ }
+ 
+ static int
+ verify_ace_mask(char *maskstr, uint32_t *maskval)
+ {
+-	char *invalflag;
++	unsigned long val;
++	char *ep;
+ 
+-	if (strstr(maskstr, "0x") || !strcmp(maskstr, "DELDHLD")) {
+-		*maskval = strtol(maskstr, &invalflag, 16);
+-		if (!invalflag) {
+-			printf("%s: Invalid mask: %s\n", __func__, maskstr);
+-			return 1;
+-		}
+-	} else
+-		*maskval = ace_mask_value(maskstr);
++	errno = 0;
++	val = strtoul(maskstr, &ep, 0);
++	if (errno == 0 && *ep == '\0')
++		*maskval = htole32((uint32_t)val);
++	else
++		*maskval = htole32(ace_mask_value(maskstr));
+ 
+ 	if (!*maskval) {
+-		printf("%s: Invalid mask %s and value: 0x%x\n",
+-			__func__, maskstr, *maskval);
++		printf("%s: Invalid mask %s (value 0x%x)\n", __func__,
++			maskstr, *maskval);
+ 		return 1;
+ 	}
+ 
 -- 
 1.7.12.1
