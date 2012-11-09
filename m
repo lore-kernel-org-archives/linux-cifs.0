@@ -1,96 +1,102 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH cifs-next] fs: cifs: make smb_echo_interval tunable
-Date: Fri, 9 Nov 2012 06:00:17 -0500
-Message-ID: <20121109060017.63811198@tlielax.poochiereds.net>
-References: <1352407828-23339-1-git-send-email-chris.j.arges@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Chris J Arges <chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/2] getcifsacl: don't freely cast between wbcDomainSid and cifs_sid
+Date: Fri,  9 Nov 2012 07:04:25 -0500
+Message-ID: <1352462666-10910-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1352407828-23339-1-git-send-email-chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu,  8 Nov 2012 14:50:28 -0600
-Chris J Arges <chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+While they are very similar, the cifs_sid is "packed" and the
+wbcDomainSid isn't. There are also aliasing problems with gcc in
+some cases. Instead of trying to cast and fix endianness in place,
+make a separate copy instead.
 
-> Change SMB_ECHO_INTERVAL to make it a module parameter.
-> 
-> BugLink: http://bugs.launchpad.net/bugs/1017622
-> BugLink: https://bugzilla.samba.org/show_bug.cgi?id=9006
-> 
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ getcifsacl.c | 38 +++++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
 
-It's customary to write up the reason for a change in the bug
-description. A pointer to a bug tracker is nice as a reference, but
-it's not reasonable to expect someone to chase down a bunch of bug
-tracker links when reading the git logs. It's also possible that
-these bug reports could go away or be unavailable when someone needs
-to track down the reason for a change.
-
-> Reported-by: Oliver Dumschat-Hoette <dumschat-hoette-cpG9vB2psbIb1SvskN2V4Q@public.gmane.org>
-> Signed-off-by: Chris J Arges <chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c   |    5 +++++
->  fs/cifs/cifsglob.h |    5 +++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 5e62f44..25748b3 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -82,6 +82,11 @@ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
->  module_param(enable_oplocks, bool, 0644);
->  MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks. Default: y/Y/1");
->  
-> +unsigned short smb_echo_timeout = 60;
-> +module_param(smb_echo_timeout, ushort, 0644);
-> +MODULE_PARM_DESC(smb_echo_timeout, "Timeout between two echo requests. "
-> +				   "Default: 60. Timeout in seconds ");
-> +
->  extern mempool_t *cifs_sm_req_poolp;
->  extern mempool_t *cifs_req_poolp;
->  extern mempool_t *cifs_mid_poolp;
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index f5af252..d64dcd3 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -78,8 +78,9 @@
->  /*           (max path length + 1 for null) * 2 for unicode    */
->  #define MAX_NAME 514
->  
-> -/* SMB echo "timeout" -- FIXME: tunable? */
-> -#define SMB_ECHO_INTERVAL (60 * HZ)
-> +/* SMB echo "timeout" */
-> +extern unsigned short smb_echo_timeout;
-> +#define SMB_ECHO_INTERVAL (smb_echo_timeout * HZ)
->  
->  #include "cifspdu.h"
->  
-
-I'm not so sure I like making this tunable...
-
-What would really be better is fixing the code to only echo when there
-are outstanding calls to the server.
-
-This also seems like a bit of a kludgy workaround for the real problem.
->From looking over the bug reports, it sounds like the real issue is
-that the server is timing out the connection while the client is
-suspended. It then has to wait until the next echo comes around to
-figure that out. Is that the case?
-
-If so, then I think what you really want here is a way to tell if the
-connection is still valid after resume. Perhaps there's some way to
-force an immediate SMB echo on these connections after resume? With
-that, there'd be little delay at all in contacting the server after a
-resume. The server would presumably send back a RST immediately in such
-a case and we could get on with the business of reconnecting.
-
-The cifs_demultiplex_thread does make some calls to try_to_freeze().
-Perhaps checking the return value on those and kicking off an immediate
-echo if it returns true would be a better solution?
-
+diff --git a/getcifsacl.c b/getcifsacl.c
+index b76c8ec..626f83c 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -173,16 +173,20 @@ print_ace_type(uint8_t acetype, int raw)
+ }
+ 
+ /*
+- * Winbind keeps wbcDomainSid fields in host-endian. So, we must convert from
+- * little endian here so that winbind will understand correctly.
++ * Winbind keeps wbcDomainSid fields in host-endian. Copy fields from the
++ * csid to the wsid, while converting the subauthority fields from LE.
+  */
+ static void
+-convert_sid_endianness(struct cifs_sid *sid)
++csid_to_wsid(struct wbcDomainSid *wsid, const struct cifs_sid *csid)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < sid->num_subauth; i++)
+-		sid->sub_auth[i] = le32toh(sid->sub_auth[i]);
++	wsid->sid_rev_num = csid->revision;
++	wsid->num_auths = csid->num_subauth;
++	for (i = 0; i < NUM_AUTHS; i++)
++		wsid->id_auth[i] = csid->authority[i];
++	for (i = 0; i < csid->num_subauth; i++)
++		wsid->sub_auths[i] = le32toh(csid->sub_auth[i]);
+ }
+ 
+ static void
+@@ -194,14 +198,14 @@ print_sid(struct cifs_sid *sidptr, int raw)
+ 	char *sidname = NULL;
+ 	enum wbcSidType sntype;
+ 	unsigned long long id_auth_val;
++	struct wbcDomainSid wsid;
+ 
+-	convert_sid_endianness(sidptr);
++	csid_to_wsid(&wsid, sidptr);
+ 
+ 	if (raw)
+ 		goto print_sid_raw;
+ 
+-	rc = wbcLookupSid((struct wbcDomainSid *)sidptr, &domain_name,
+-				&sidname, &sntype);
++	rc = wbcLookupSid(&wsid, &domain_name, &sidname, &sntype);
+ 	if (WBC_ERROR_IS_OK(rc)) {
+ 		printf("%s", domain_name);
+ 		if (strlen(domain_name))
+@@ -211,14 +215,14 @@ print_sid(struct cifs_sid *sidptr, int raw)
+ 	}
+ 
+ print_sid_raw:
+-	printf("S-%hhu", sidptr->revision);
++	printf("S-%hhu", wsid.sid_rev_num);
+ 
+-	id_auth_val = (unsigned long long)sidptr->authority[5];
+-	id_auth_val += (unsigned long long)sidptr->authority[4] << 8;
+-	id_auth_val += (unsigned long long)sidptr->authority[3] << 16;
+-	id_auth_val += (unsigned long long)sidptr->authority[2] << 24;
+-	id_auth_val += (unsigned long long)sidptr->authority[1] << 32;
+-	id_auth_val += (unsigned long long)sidptr->authority[0] << 48;
++	id_auth_val = (unsigned long long)wsid.id_auth[5];
++	id_auth_val += (unsigned long long)wsid.id_auth[4] << 8;
++	id_auth_val += (unsigned long long)wsid.id_auth[3] << 16;
++	id_auth_val += (unsigned long long)wsid.id_auth[2] << 24;
++	id_auth_val += (unsigned long long)wsid.id_auth[1] << 32;
++	id_auth_val += (unsigned long long)wsid.id_auth[0] << 48;
+ 
+ 	/*
+ 	 * MS-DTYP states that if the authority is >= 2^32, then it should be
+@@ -229,8 +233,8 @@ print_sid_raw:
+ 	else
+ 		printf("-0x%llx", id_auth_val);
+ 
+-	for (i = 0; i < sidptr->num_subauth; i++)
+-		printf("-%u", sidptr->sub_auth[i]);
++	for (i = 0; i < wsid.num_auths; i++)
++		printf("-%u", wsid.sub_auths[i]);
+ }
+ 
+ static void
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+1.8.0
