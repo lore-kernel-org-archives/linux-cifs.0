@@ -1,115 +1,96 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] Convert slashes in the UNC parameter to backslashes
-Date: Fri, 9 Nov 2012 06:19:53 -0500
-Message-ID: <20121109061953.2bb49e68@tlielax.poochiereds.net>
-References: <509902BB.6020400@innominate.com>
-	<20121107070239.1140fe68@tlielax.poochiereds.net>
-	<509A7C36.8080800@innominate.com>
-	<20121107104853.12935810@tlielax.poochiereds.net>
-	<CAFB9KM02kdNwrNVO42r67emTaiRshSB1+sxDOwnOpNwSUyskZQ@mail.gmail.com>
-	<20121107132107.007a031d@tlielax.poochiereds.net>
-	<509BA299.4000805@innominate.com>
+Subject: Re: [PATCH cifs-next] fs: cifs: make smb_echo_interval tunable
+Date: Fri, 9 Nov 2012 06:00:17 -0500
+Message-ID: <20121109060017.63811198@tlielax.poochiereds.net>
+References: <1352407828-23339-1-git-send-email-chris.j.arges@canonical.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sjayaraman-IBi9RG/b67k@public.gmane.org
-To: Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+Content-Transfer-Encoding: 8BIT
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Chris J Arges <chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <509BA299.4000805-LVkJPw3T+odGBRGhe+f61g@public.gmane.org>
+In-Reply-To: <1352407828-23339-1-git-send-email-chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 08 Nov 2012 13:16:25 +0100
-Federico Sauter <fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org> wrote:
+On Thu,  8 Nov 2012 14:50:28 -0600
+Chris J Arges <chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
 
+> Change SMB_ECHO_INTERVAL to make it a module parameter.
 > 
-> 
-> On 11/07/2012 07:21 PM, Jeff Layton wrote:
-> >>>
-> >>> The tricky part is how to get there from here. The mount helper
-> >>> provides this option pretty much unconditionally, though it generally
-> >>> generates it from the device string. Maybe something like this?
-> >>>
-> >>> 1) fix the kernel to parse a copy of the UNC out of the device string
-> >>>
-> >>> 2) compare that UNC to the one provided by the unc= option
-> >>>
-> >>> 3) if they differ, then printk a warning that mentions that there is a
-> >>> discrepancy and that the kernel is going to use the value of the unc=
-> >>> option for now, but that we'll change that default in two releases.
-> >>>
-> >>> Something like:
-> >>>
-> >>> "CIFS VFS: the unc= mount option differs from the device passed in. Using
-> >>> the value of the unc= option. The kernel will begin preferring the value
-> >>> in the device string in 3.10!"
-> >>>
-> >>> Then, have a patch ready to go for the 3.10 merge window that will make
-> >>> the kernel start ignoring the value of the unc= option. You might even
-> >>> be nice and keep the comparison and warning around for a little while,
-> >>> but switch it to mention that the kernel is going to ignore the value
-> >>> of the unc= option when there is a discrepancy.
-> >>>
-> >>> In another few releases, we can then get rid of the warning and
-> >>> comparison too.
-> >>>
-> >>> Sound reasonable?
-> >>>
-> >>
-> >> Would it be reasonable to deprecate the "UNC" / "path" / "target"
-> >> options (they all resolve to OPT_UNC from parse_opt_token()) in
-> >> mount.cifs if the kernel is going to do the heavy lifting?  That would
-> >> break compatibility between mount.cifs and older kernels, though.  I
-> >> guess it doesn't hurt anything to keep passing UNC even if it's not
-> >> being used, other than users not understanding the unexplained
-> >> behavior of the kernel deciding what the actual value of UNC is and
-> >> disregarding their explicit setting of it.  After typing that out, it
-> >> sounds kind of bad.
-> >
-> > Eventually, yes...we'd stop the mount helper from providing a unc=
-> > option as well. That said, we'll have to contend with the old kernel +
-> > new userspace problem for quite a while, so that can't happen at the
-> > same time.
-> >
-> > The first step is to get the kernel to where it doesn't actually need
-> > the option. Once that's done we can formulate a plan to stop providing
-> > it.
-> >
-> 
-> I came across this issue precisely because I was using a mount helper 
-> different than samba (busybox, to be precise.) Thus, the unc parameter 
-> was being passed in a slightly different way and thus an error message 
-> resulted. This is to say that, if we radically changed the 
-> unc/path/target options interface, it would most likely break existing 
-> mount implementations.
-> 
-> I suggest that we just copy the device name as UNC in the parse_options 
-> function and ignore whatever the user had provided explicitly without 
-> issuing any warnings. I personally like warnings, but the current 
-> situation is that this option is implicitly passed by the mount helper, 
-> and thus it would most likely confuse users more than it helps them.
-> 
-> Please let me know what you think. I can quickly provide a tested patch, 
-> if you agree to the course of action.
+> BugLink: http://bugs.launchpad.net/bugs/1017622
+> BugLink: https://bugzilla.samba.org/show_bug.cgi?id=9006
 > 
 
-I think we need to be extra cautious with any change in behavior of a
-userland interface.
+It's customary to write up the reason for a change in the bug
+description. A pointer to a bug tracker is nice as a reference, but
+it's not reasonable to expect someone to chase down a bunch of bug
+tracker links when reading the git logs. It's also possible that
+these bug reports could go away or be unavailable when someone needs
+to track down the reason for a change.
 
-In practice the mount helper assembles the unc= option from the content
-of the device string. If someone is using the standard mount.cifs
-helper, then it's not likely they'll ever see this warning (assuming we
-code up the logic correctly of course).
+> Reported-by: Oliver Dumschat-Hoette <dumschat-hoette-cpG9vB2psbIb1SvskN2V4Q@public.gmane.org>
+> Signed-off-by: Chris J Arges <chris.j.arges-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c   |    5 +++++
+>  fs/cifs/cifsglob.h |    5 +++--
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 5e62f44..25748b3 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -82,6 +82,11 @@ MODULE_PARM_DESC(cifs_max_pending, "Simultaneous requests to server. "
+>  module_param(enable_oplocks, bool, 0644);
+>  MODULE_PARM_DESC(enable_oplocks, "Enable or disable oplocks. Default: y/Y/1");
+>  
+> +unsigned short smb_echo_timeout = 60;
+> +module_param(smb_echo_timeout, ushort, 0644);
+> +MODULE_PARM_DESC(smb_echo_timeout, "Timeout between two echo requests. "
+> +				   "Default: 60. Timeout in seconds ");
+> +
+>  extern mempool_t *cifs_sm_req_poolp;
+>  extern mempool_t *cifs_req_poolp;
+>  extern mempool_t *cifs_mid_poolp;
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index f5af252..d64dcd3 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -78,8 +78,9 @@
+>  /*           (max path length + 1 for null) * 2 for unicode    */
+>  #define MAX_NAME 514
+>  
+> -/* SMB echo "timeout" -- FIXME: tunable? */
+> -#define SMB_ECHO_INTERVAL (60 * HZ)
+> +/* SMB echo "timeout" */
+> +extern unsigned short smb_echo_timeout;
+> +#define SMB_ECHO_INTERVAL (smb_echo_timeout * HZ)
+>  
+>  #include "cifspdu.h"
+>  
 
-In the unlikely case that someone is passing in a unc= option that does
-not match the device string, then I think the responsible thing is to
-warn them that they can expect the behavior to change in the future.
+I'm not so sure I like making this tunable...
 
-The custom in kernel changes is to warn for two releases before
-changing the behavior of a userland interface. If you have the patches
-to give the warning ready to go for 3.8, then we can change that
-behavior in 3.10
+What would really be better is fixing the code to only echo when there
+are outstanding calls to the server.
+
+This also seems like a bit of a kludgy workaround for the real problem.
+>From looking over the bug reports, it sounds like the real issue is
+that the server is timing out the connection while the client is
+suspended. It then has to wait until the next echo comes around to
+figure that out. Is that the case?
+
+If so, then I think what you really want here is a way to tell if the
+connection is still valid after resume. Perhaps there's some way to
+force an immediate SMB echo on these connections after resume? With
+that, there'd be little delay at all in contacting the server after a
+resume. The server would presumably send back a RST immediately in such
+a case and we could get on with the business of reconnecting.
+
+The cifs_demultiplex_thread does make some calls to try_to_freeze().
+Perhaps checking the return value on those and kicking off an immediate
+echo if it returns true would be a better solution?
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
