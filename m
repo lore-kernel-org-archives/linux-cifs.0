@@ -1,55 +1,73 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/6] cifs: fix handling of unc= and prefixpath= mount options
-Date: Fri, 16 Nov 2012 12:36:48 -0500
-Message-ID: <1353087414-32152-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 1/6] cifs: make error on lack of a unc= option more explicit
+Date: Fri, 16 Nov 2012 12:36:49 -0500
+Message-ID: <1353087414-32152-2-git-send-email-jlayton@redhat.com>
+References: <1353087414-32152-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org,
 	almiller_1-/E1597aS9LT10XsdtD+oqA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1353087414-32152-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch fixes up a number of problems with the handling of the unc=
-and prefixpath= mount options. In addition to cleaning up some really
-awful address parsing code, it fixes a couple of potential memory leaks
-and gets the unc= and prefixpath= mount options ready to be deprecated,
-and sets us up to be able to just use the contents of the device string
-instead.
+Error out with a clear error message if there is no unc= option. The
+existing code doesn't handle this in a clear fashion, and the check for
+a UNCip option with no UNC string is just plain wrong.
 
-This should also fix a couple of other problems:
+Later, we'll fix the code to not require a unc= option, but for now we
+need this to at least clarify why people are getting errors about DFS
+parsing. With this change we can also get rid of some later NULL pointer
+checks since we know the UNC and UNCip will never be NULL there.
 
-- mounting with a unc= option that contains forward slashes as
-  delimiters should now work. This should fix the problem that
-  Frederico Sauter reported last week.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-- a regression reported by Alex Miller should also be fixed[1]. When
-  the new mount option parser was merged, the unc= option was
-  inadvertantly made mandatory. Prior to that, the code would try
-  to use the contents of the device string to construct a UNC. The
-  final patch in this series reinstates that behavior and should
-  allow a user to mount without the mount helper
-
-I've tested mounting in several ways and this patchset seems to work
-as expected. It could use more testing, so I'd suggest allowing it to
-soak in -next for a bit with an eye toward merging it in 3.8.
-
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=50631
-
-Jeff Layton (6):
-  cifs: make error on lack of a unc= option more explicit
-  cifs: get rid of smb_vol->UNCip and smb_vol->port
-  cifs: make convert_delimiter use strchr instead of open-coding it
-  cifs: clean up handling of unc= option
-  cifs: fix up handling of prefixpath= option
-  cifs: parse the device name into UNC and prepath
-
- fs/cifs/cifsglob.h  |  16 +---
- fs/cifs/cifsproto.h |   4 +-
- fs/cifs/connect.c   | 260 ++++++++++++++++++++++++++++------------------------
- fs/cifs/netmisc.c   |  14 +--
- fs/cifs/smb1ops.c   |   5 +-
- fs/cifs/smb2ops.c   |   2 +-
- 6 files changed, 149 insertions(+), 152 deletions(-)
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5c670b9..b9849ac 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1799,6 +1799,11 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 		goto cifs_parse_mount_err;
+ 	}
+ #endif
++	if (!vol->UNC) {
++		cERROR(1, "CIFS mount error: No UNC path (e.g. -o "
++			"unc=\\\\192.168.1.100\\public) specified");
++		goto cifs_parse_mount_err;
++	}
+ 
+ 	if (vol->UNCip == NULL)
+ 		vol->UNCip = &vol->UNC[2];
+@@ -2070,17 +2075,6 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 			rc = -EINVAL;
+ 			goto out_err;
+ 		}
+-	} else if (volume_info->UNCip) {
+-		/* BB using ip addr as tcp_ses name to connect to the
+-		   DFS root below */
+-		cERROR(1, "Connecting to DFS root not implemented yet");
+-		rc = -EINVAL;
+-		goto out_err;
+-	} else /* which tcp_sess DFS root would we conect to */ {
+-		cERROR(1, "CIFS mount error: No UNC path (e.g. -o "
+-			"unc=//192.168.1.100/public) specified");
+-		rc = -EINVAL;
+-		goto out_err;
+ 	}
+ 
+ 	/* see if we already have a matching tcp_ses */
+@@ -2736,9 +2730,6 @@ cifs_match_super(struct super_block *sb, void *data)
+ 
+ 	volume_info = mnt_data->vol;
+ 
+-	if (!volume_info->UNCip || !volume_info->UNC)
+-		goto out;
+-
+ 	rc = cifs_fill_sockaddr((struct sockaddr *)&addr,
+ 				volume_info->UNCip,
+ 				strlen(volume_info->UNCip),
 -- 
 1.7.11.7
