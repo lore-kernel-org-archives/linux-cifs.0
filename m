@@ -1,61 +1,108 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 3/6] cifs: make convert_delimiter use strchr instead of
- open-coding it
-Date: Wed, 21 Nov 2012 19:18:21 +0400
-Message-ID: <CAKywueTuC_o6Apzsq7LfkR7swevAN4Uk+_XMbBL9uWup5SgASQ@mail.gmail.com>
+Subject: Re: [PATCH 4/6] cifs: clean up handling of unc= option
+Date: Wed, 21 Nov 2012 19:21:47 +0400
+Message-ID: <CAKywueQOa4ouviyE3n=M3j-=4c0tBYP-B0znL2gvc4b5HoH3Zw@mail.gmail.com>
 References: <1353087414-32152-1-git-send-email-jlayton@redhat.com>
-	<1353087414-32152-4-git-send-email-jlayton@redhat.com>
+	<1353087414-32152-5-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org, almiller_1-/E1597aS9LT10XsdtD+oqA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1353087414-32152-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1353087414-32152-5-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/11/16 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Take advantage of accelerated strchr() on arches that support it.
+> Make sure we free any existing memory allocated for vol->UNC, just in
+> case someone passes in multiple unc= options.
 >
-> Also, no caller ever passes in a NULL pointer. Get rid of the unneeded
-> NULL pointer check.
+> Get rid of the check for too long a UNC. The check for >300 bytes seems
+> arbitrary. We later copy this into the tcon->treeName, for instance and
+> it's a lot shorter than 300 bytes.
+>
+> Eliminate an extra kmalloc and copy as well. Just set the vol->UNC
+> directly with the contents of match_strdup.
+>
+> Establish that the UNC should be stored with '\\' delimiters. Use
+> convert_delimiter to change it in place in the vol->UNC.
+>
+> Finally, move the check for a malformed UNC into
+> cifs_parse_mount_options so we can catch that situation earlier.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h | 13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
+>  fs/cifs/connect.c | 39 ++++++++++++---------------------------
+>  1 file changed, 12 insertions(+), 27 deletions(-)
 >
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index b141c90..414d93b 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1066,21 +1066,16 @@ static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
->  static inline void
->  convert_delimiter(char *path, char delim)
->  {
-> -       int i;
-> -       char old_delim;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 7d95206..89f426f 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1557,29 +1557,15 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                         got_ip = true;
+>                         break;
+>                 case Opt_unc:
+> -                       string = match_strdup(args);
+> -                       if (string == NULL)
+> +                       kfree(vol->UNC);
+> +                       vol->UNC = match_strdup(args);
+> +                       if (vol->UNC == NULL)
+>                                 goto out_nomem;
+>
+> -                       temp_len = strnlen(string, 300);
+> -                       if (temp_len  == 300) {
+> -                               printk(KERN_WARNING "CIFS: UNC name too long\n");
+> -                               goto cifs_parse_mount_err;
+> -                       }
 > -
-> -       if (path == NULL)
-> -               return;
-> +       char old_delim, *pos;
+> -                       vol->UNC = kmalloc(temp_len+1, GFP_KERNEL);
+> -                       if (vol->UNC == NULL) {
+> -                               printk(KERN_WARNING "CIFS: no memory for UNC\n");
+> -                               goto cifs_parse_mount_err;
+> -                       }
+> -                       strcpy(vol->UNC, string);
+> -
+> -                       if (strncmp(string, "//", 2) == 0) {
+> -                               vol->UNC[0] = '\\';
+> -                               vol->UNC[1] = '\\';
+> -                       } else if (strncmp(string, "\\\\", 2) != 0) {
+> +                       convert_delimiter(vol->UNC, '\\');
+> +                       if (vol->UNC[0] != '\\' || vol->UNC[1] != '\\') {
+>                                 printk(KERN_WARNING "CIFS: UNC Path does not "
+> -                                                   "begin with // or \\\\\n");
+> +                                               "begin with // or \\\\\n");
+>                                 goto cifs_parse_mount_err;
+>                         }
 >
->         if (delim == '/')
->                 old_delim = '\\';
->         else
->                 old_delim = '/';
+> @@ -1804,6 +1790,12 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                 goto cifs_parse_mount_err;
+>         }
 >
-> -       for (i = 0; path[i] != '\0'; i++) {
-> -               if (path[i] == old_delim)
-> -                       path[i] = delim;
+> +       /* make sure UNC has a share name */
+> +       if (!strchr(vol->UNC + 3, '\\')) {
+> +               cERROR(1, "Malformed UNC. Unable to find share name.");
+> +               goto cifs_parse_mount_err;
+> +       }
+> +
+>         if (!got_ip) {
+>                 /* No ip= option specified? Try to get it from UNC */
+>                 if (!cifs_convert_address(dstaddr, &vol->UNC[2],
+> @@ -2577,13 +2569,6 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
+>                 }
+>         }
+>
+> -       if (strchr(volume_info->UNC + 3, '\\') == NULL
+> -           && strchr(volume_info->UNC + 3, '/') == NULL) {
+> -               cERROR(1, "Missing share name");
+> -               rc = -ENODEV;
+> -               goto out_fail;
 > -       }
-> +       pos = path;
-> +       while ((pos = strchr(pos, old_delim)))
-> +               *pos = delim;
->  }
->
->  static inline char *
+> -
+>         /*
+>          * BB Do we need to wrap session_mutex around this TCon call and Unix
+>          * SetFS as we do on SessSetup and reconnect?
 > --
 > 1.7.11.7
 >
