@@ -1,40 +1,74 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Wed, 21 Nov 2012 18:25:27 +0400
-Message-ID: <1353507930-10908-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH 1/3] fcntl: Introduce new O_DENY* open flags for network filesystems
+Date: Wed, 21 Nov 2012 18:25:28 +0400
+Message-ID: <1353507930-10908-2-git-send-email-piastry@etersoft.ru>
+References: <1353507930-10908-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1353507930-10908-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
+This patch adds 3 flags:
+1) O_DENYREAD that doesn't permit read access
+2) O_DENYWRITE that doesn't permit write access
+3) O_DENYDELETE that doesn't permit delete or rename
 
-Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can do it if a file stored on netowork share and is used by several clients. This patchset makes it possible.
+Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags -
+this change can benefit cifs and nfs modules. While this change is ok
+for network filesystems, itsn't not targeted for local filesystems due
+security problems (e.g. when a user process can deny root to delete a
+file).
 
-Pavel Shilovsky (3):
-  fcntl: Introduce new O_DENY* open flags for network filesystems
-  CIFS: Add O_DENY* open flags support
-  CIFS: Use NT_CREATE_ANDX command for forcemand mounts
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/fcntl.c                       |    5 +++--
+ include/uapi/asm-generic/fcntl.h |   11 +++++++++++
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
- fs/cifs/cifsacl.c                |   10 ++++----
- fs/cifs/cifsglob.h               |   11 ++++++++-
- fs/cifs/cifsproto.h              |    9 ++++----
- fs/cifs/cifssmb.c                |   47 ++++++++++++++++++++------------------
- fs/cifs/dir.c                    |   14 ++++++++----
- fs/cifs/file.c                   |   18 ++++++++++-----
- fs/cifs/inode.c                  |   11 +++++----
- fs/cifs/link.c                   |   10 ++++----
- fs/cifs/readdir.c                |    2 +-
- fs/cifs/smb1ops.c                |   15 ++++++------
- fs/cifs/smb2file.c               |   10 ++++----
- fs/cifs/smb2inode.c              |    4 ++--
- fs/cifs/smb2ops.c                |   10 ++++----
- fs/cifs/smb2pdu.c                |    6 ++---
- fs/cifs/smb2proto.h              |   14 +++++++-----
- fs/fcntl.c                       |    5 ++--
- include/uapi/asm-generic/fcntl.h |   11 +++++++++
- 17 files changed, 125 insertions(+), 82 deletions(-)
-
+diff --git a/fs/fcntl.c b/fs/fcntl.c
+index 71a600a..7abce5a 100644
+--- a/fs/fcntl.c
++++ b/fs/fcntl.c
+@@ -730,14 +730,15 @@ static int __init fcntl_init(void)
+ 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
+ 	 * is defined as O_NONBLOCK on some platforms and not on others.
+ 	 */
+-	BUILD_BUG_ON(19 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
++	BUILD_BUG_ON(22 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
+ 		O_RDONLY	| O_WRONLY	| O_RDWR	|
+ 		O_CREAT		| O_EXCL	| O_NOCTTY	|
+ 		O_TRUNC		| O_APPEND	| /* O_NONBLOCK	| */
+ 		__O_SYNC	| O_DSYNC	| FASYNC	|
+ 		O_DIRECT	| O_LARGEFILE	| O_DIRECTORY	|
+ 		O_NOFOLLOW	| O_NOATIME	| O_CLOEXEC	|
+-		__FMODE_EXEC	| O_PATH
++		__FMODE_EXEC	| O_PATH	| O_DENYREAD	|
++		O_DENYWRITE	| O_DENYDELETE
+ 		));
+ 
+ 	fasync_cache = kmem_cache_create("fasync_cache",
+diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
+index a48937d..5ac0d49 100644
+--- a/include/uapi/asm-generic/fcntl.h
++++ b/include/uapi/asm-generic/fcntl.h
+@@ -84,6 +84,17 @@
+ #define O_PATH		010000000
+ #endif
+ 
++#ifndef O_DENYREAD
++#define O_DENYREAD	020000000	/* Do not permit read access */
++#endif
++#ifndef O_DENYWRITE
++#define O_DENYWRITE	040000000	/* Do not permit write access */
++#endif
++/* FMODE_NONOTIFY	0100000000 */
++#ifndef O_DENYDELETE
++#define O_DENYDELETE	0200000000	/* Do not permit delete or rename */
++#endif
++
+ #ifndef O_NDELAY
+ #define O_NDELAY	O_NONBLOCK
+ #endif
 -- 
 1.7.10.4
-
