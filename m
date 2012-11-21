@@ -1,135 +1,181 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 5/6] cifs: fix up handling of prefixpath= option
-Date: Wed, 21 Nov 2012 19:24:35 +0400
-Message-ID: <CAKywueT-EAuVtX5qehX09Z-q5a5bEPmyG4BDzBuSHacB9vpFAA@mail.gmail.com>
+Subject: Re: [PATCH 6/6] cifs: parse the device name into UNC and prepath
+Date: Wed, 21 Nov 2012 19:35:13 +0400
+Message-ID: <CAKywueSqUjbtmfqtBvMUqmraq=o7N9MPthZh2-VsV7OzPLNkoQ@mail.gmail.com>
 References: <1353087414-32152-1-git-send-email-jlayton@redhat.com>
-	<1353087414-32152-6-git-send-email-jlayton@redhat.com>
+	<1353087414-32152-7-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org, almiller_1-/E1597aS9LT10XsdtD+oqA@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1353087414-32152-6-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1353087414-32152-7-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2012/11/16 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Currently the code takes care to ensure that the prefixpath has a
-> leading '/' delimiter. What if someone passes us a prefixpath with a
-> leading '\\' instead? The code doesn't properly handle that currently
-> AFAICS.
->
-> Let's just change the code to skip over any leading delimiter character
-> when copying the prepath. Then, fix up the users of the prepath option
-> to prefix it with the correct delimiter when they use it.
->
-> Also, there's no need to limit the length of the prefixpath to 1k. If
-> the server can handle it, why bother forbidding it?
+> This should fix a regression that was introduced when the new mount
+> option parser went in. Also, when the unc= and prefixpath= options
+> are provided, check their values against the ones we parsed from
+> the device string. If they differ, then throw a warning that tells
+> the user that we're using the values from the unc= option for now,
+> but that that will change in 3.10.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/connect.c | 34 +++++++++-------------------------
->  fs/cifs/smb1ops.c |  5 +++--
->  fs/cifs/smb2ops.c |  2 +-
->  3 files changed, 13 insertions(+), 28 deletions(-)
+>  fs/cifs/connect.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 88 insertions(+), 7 deletions(-)
 >
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 89f426f..b1f352a 100644
+> index b1f352a..b9f3dd7 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -1603,31 +1603,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                         }
->                         break;
->                 case Opt_prefixpath:
-> -                       string = match_strdup(args);
-> -                       if (string == NULL)
-> -                               goto out_nomem;
-> -
-> -                       temp_len = strnlen(string, 1024);
-> -                       if (string[0] != '/')
-> -                               temp_len++; /* missing leading slash */
-> -                       if (temp_len > 1024) {
-> -                               printk(KERN_WARNING "CIFS: prefix too long\n");
-> -                               goto cifs_parse_mount_err;
-> -                       }
-> -
-> -                       vol->prepath = kmalloc(temp_len+1, GFP_KERNEL);
-> -                       if (vol->prepath == NULL) {
-> -                               printk(KERN_WARNING "CIFS: no memory "
-> -                                                   "for path prefix\n");
-> -                               goto cifs_parse_mount_err;
-> -                       }
-> -
-> -                       if (string[0] != '/') {
-> -                               vol->prepath[0] = '/';
-> -                               strcpy(vol->prepath+1, string);
-> -                       } else
-> -                               strcpy(vol->prepath, string);
-> +                       /* skip over any leading delimiter */
-> +                       if (*args[0].from == '/' || *args[0].from == '\\')
-> +                               args[0].from++;
+> @@ -1090,6 +1090,52 @@ cifs_parse_smb_version(char *value, struct smb_vol *vol)
+>         return 0;
+>  }
 >
-> +                       kfree(vol->prepath);
-> +                       vol->prepath = match_strdup(args);
-> +                       if (vol->prepath == NULL)
-> +                               goto out_nomem;
+> +/*
+> + * Parse a devname into substrings and populate the vol->UNC and vol->prepath
+> + * fields with the result. Returns 0 on success and an error otherwise.
+> + */
+> +static int
+> +cifs_parse_devname(const char *devname, struct smb_vol *vol)
+> +{
+> +       char *pos;
+> +       const char *delims = "/\\";
+> +       size_t len;
+> +
+> +       /* make sure we have a valid UNC double delimiter prefix */
+> +       len = strspn(devname, delims);
+> +       if (len != 2)
+> +               return -EINVAL;
+> +
+> +       /* find delimiter between host and sharename */
+> +       pos = strpbrk(devname + 2, delims);
+> +       if (!pos)
+> +               return -EINVAL;
+> +
+> +       /* skip past delimiter */
+> +       ++pos;
+> +
+> +       /* now go until next delimiter or end of string */
+> +       len = strcspn(pos, delims);
+> +
+> +       /* move "pos" up to delimiter or NULL */
+> +       pos += len;
+> +       vol->UNC = kstrndup(devname, pos - devname, GFP_KERNEL);
+> +       if (!vol->UNC)
+> +               return -ENOMEM;
+> +
+> +       convert_delimiter(vol->UNC, '\\');
+> +
+> +       /* If pos is NULL, or is a bogus trailing delimiter then no prepath */
+> +       if (!*pos++ || !*pos)
+> +               return 0;
+> +
+> +       vol->prepath = kstrdup(pos, GFP_KERNEL);
+> +       if (!vol->prepath)
+> +               return -ENOMEM;
+> +
+> +       return 0;
+> +}
+> +
+>  static int
+>  cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                          struct smb_vol *vol)
+> @@ -1172,6 +1218,16 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>         vol->backupuid_specified = false; /* no backup intent for a user */
+>         vol->backupgid_specified = false; /* no backup intent for a group */
+>
+> +       /*
+> +        * For now, we ignore -EINVAL errors under the assumption that the
+> +        * unc= and prefixpath= options will be usable.
+> +        */
+> +       if (cifs_parse_devname(devname, vol) == -ENOMEM) {
+> +               printk(KERN_ERR "CIFS: Unable to allocate memory to parse "
+> +                               "device string.\n");
+> +               goto out_nomem;
+> +       }
+> +
+>         while ((data = strsep(&options, separator)) != NULL) {
+>                 substring_t args[MAX_OPT_ARGS];
+>                 unsigned long option;
+> @@ -1557,18 +1613,31 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                         got_ip = true;
+>                         break;
+>                 case Opt_unc:
+> -                       kfree(vol->UNC);
+> +                       string = vol->UNC;
+>                         vol->UNC = match_strdup(args);
+> -                       if (vol->UNC == NULL)
+> +                       if (vol->UNC == NULL) {
+> +                               kfree(string);
+>                                 goto out_nomem;
+> +                       }
+>
+>                         convert_delimiter(vol->UNC, '\\');
+>                         if (vol->UNC[0] != '\\' || vol->UNC[1] != '\\') {
+> -                               printk(KERN_WARNING "CIFS: UNC Path does not "
+> +                               kfree(string);
+> +                               printk(KERN_ERR "CIFS: UNC Path does not "
+>                                                 "begin with // or \\\\\n");
+>                                 goto cifs_parse_mount_err;
+>                         }
+>
+> +                       /* Compare old unc= option to new one */
+> +                       if (!string || strcmp(string, vol->UNC))
+> +                               printk(KERN_WARNING "CIFS: the value of the "
+> +                                       "unc= mount option does not match the "
+> +                                       "device string. Using the unc= option "
+> +                                       "for now. In 3.10, that option will "
+> +                                       "be ignored and the contents of the "
+> +                                       "device string will be used "
+> +                                       "instead. (%s != %s)\n", string,
+> +                                       vol->UNC);
+
+If someone specifies a devname and two unc= options (all are
+different) so, it will see this message twice?
+
+>                         break;
+>                 case Opt_domain:
+>                         string = match_strdup(args);
+> @@ -1607,10 +1676,22 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                         if (*args[0].from == '/' || *args[0].from == '\\')
+>                                 args[0].from++;
+>
+> -                       kfree(vol->prepath);
+> +                       string = vol->prepath;
+>                         vol->prepath = match_strdup(args);
+> -                       if (vol->prepath == NULL)
+> +                       if (vol->prepath == NULL) {
+> +                               kfree(string);
+>                                 goto out_nomem;
+> +                       }
+> +                       /* Compare old prefixpath= option to new one */
+> +                       if (!string || strcmp(string, vol->prepath))
+> +                               printk(KERN_WARNING "CIFS: the value of the "
+> +                                       "prefixpath= mount option does not "
+> +                                       "match the device string. Using the "
+> +                                       "prefixpath= option for now. In 3.10, "
+> +                                       "that option will be ignored and the "
+> +                                       "contents of the device string will be "
+> +                                       "used instead.(%s != %s)\n", string,
+> +                                       vol->prepath);
 >                         break;
 >                 case Opt_iocharset:
 >                         string = match_strdup(args);
-> @@ -3238,7 +3221,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
->                 const struct cifs_sb_info *cifs_sb)
->  {
->         char *full_path, *pos;
-> -       unsigned int pplen = vol->prepath ? strlen(vol->prepath) : 0;
-> +       unsigned int pplen = vol->prepath ? strlen(vol->prepath) + 1: 0;
->         unsigned int unc_len = strnlen(vol->UNC, MAX_TREE_SIZE + 1);
->
->         full_path = kmalloc(unc_len + pplen + 1, GFP_KERNEL);
-> @@ -3249,6 +3232,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
->         pos = full_path + unc_len;
->
->         if (pplen) {
-> +               *pos++ = CIFS_DIR_SEP(cifs_sb);
->                 strncpy(pos, vol->prepath, pplen);
->                 pos += pplen;
+> @@ -1768,8 +1849,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
 >         }
-> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-> index 56cc4be..50e9613 100644
-> --- a/fs/cifs/smb1ops.c
-> +++ b/fs/cifs/smb1ops.c
-> @@ -579,7 +579,7 @@ static char *
->  cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
->                         struct cifs_tcon *tcon)
->  {
-> -       int pplen = vol->prepath ? strlen(vol->prepath) : 0;
-> +       int pplen = vol->prepath ? strlen(vol->prepath) + 1 : 0;
->         int dfsplen;
->         char *full_path = NULL;
+>  #endif
+>         if (!vol->UNC) {
+> -               cERROR(1, "CIFS mount error: No UNC path (e.g. -o "
+> -                       "unc=\\\\192.168.1.100\\public) specified");
+> +               cERROR(1, "CIFS mount error: No usable UNC path provided in "
+> +                         "device string or in unc= option!");
+>                 goto cifs_parse_mount_err;
+>         }
 >
-> @@ -600,7 +600,8 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
->
->         if (dfsplen)
->                 strncpy(full_path, tcon->treeName, dfsplen);
-> -       strncpy(full_path + dfsplen, vol->prepath, pplen);
-> +       full_path[dfsplen] = CIFS_DIR_SEP(cifs_sb);
-> +       strncpy(full_path + dfsplen + 1, vol->prepath, pplen);
->         convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
->         full_path[dfsplen + pplen] = 0; /* add trailing null */
->         return full_path;
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 4d9dbe0..1baa82d 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -266,7 +266,7 @@ static char *
->  smb2_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
->                         struct cifs_tcon *tcon)
->  {
-> -       int pplen = vol->prepath ? strlen(vol->prepath) : 0;
-> +       int pplen = vol->prepath ? strlen(vol->prepath) + 1 : 0;
->         char *full_path = NULL;
->
->         /* if no prefix path, simply set path to the root of share to "" */
 > --
 > 1.7.11.7
 >
@@ -138,7 +184,6 @@ List-ID: <linux-cifs.vger.kernel.org>
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
 -- 
 Best regards,
