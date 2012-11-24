@@ -1,64 +1,90 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Upgrading security default
-Date: Sat, 24 Nov 2012 06:11:35 -0500
-Message-ID: <20121124061135.317ea3e8@tlielax.poochiereds.net>
-References: <CAH2r5mtPAwURZxTeRBfn+c=hNyeaDbmKbYXt=w3VkUu5i1cxNQ@mail.gmail.com>
-	<20121123204136.5466f0e9@corrin.poochiereds.net>
-	<CAH2r5msv_gp8Vpx82zA084awe++kFd5S3X7==6K2g6c7jBhCOg@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix IP address bounds checking on mount utility.
+Date: Sat, 24 Nov 2012 09:23:14 -0500
+Message-ID: <20121124092314.5b61490c@tlielax.poochiereds.net>
+References: <1353528652-8912-1-git-send-email-scott.lovenberg@gmail.com>
+	<CAFB9KM1NDQB3HTVCKBjRu=N9nvfoY0YK-5TZN91PwqduD=KJZA@mail.gmail.com>
+	<CAOhYWN+Xq5hhPJ1fEQg2AN=UM8k7N22Tfwo424a145KpK0AKDw@mail.gmail.com>
+	<CAFB9KM1uktUTtO5PuYkJjsavGdqpZrZ7YUd80_0Js=uOPUX1AA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msv_gp8Vpx82zA084awe++kFd5S3X7==6K2g6c7jBhCOg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAFB9KM1uktUTtO5PuYkJjsavGdqpZrZ7YUd80_0Js=uOPUX1AA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 23 Nov 2012 20:48:40 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Thu, 22 Nov 2012 12:31:50 -0500
+Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> it doesn't change security flags - but it seemed the smallest and
-> safest since it basically says:
-> 1) if you pass in "sec=" then use that
-> 2) otherwise use ntlmssp (with ntlmv2)
+> On Wed, Nov 21, 2012 at 4:52 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> >
+> > On Nov 21, 2012 3:16 PM, "Scott Lovenberg" <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > wrote:
+> >>
+> >> On Wed, Nov 21, 2012 at 3:10 PM, <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> >> >
+> >> > From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> >
+> >> > Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >> > ---
+> >> >  mount.cifs.c |    4 ++--
+> >> >  1 files changed, 2 insertions(+), 2 deletions(-)
+> >> >
+> >> > diff --git a/mount.cifs.c b/mount.cifs.c
+> >> > index a9632b4..f63c309 100644
+> >> > --- a/mount.cifs.c
+> >> > +++ b/mount.cifs.c
+> >> > @@ -941,8 +941,8 @@ parse_options(const char *data, struct
+> >> > parsed_mount_info *parsed_info)
+> >> >                         if (!value || !*value) {
+> >> >                                 fprintf(stderr,
+> >> >                                         "target ip address argument
+> >> > missing\n");
+> >> > -                       } else if (strnlen(value, MAX_ADDRESS_LEN) <=
+> >> > -                               MAX_ADDRESS_LEN) {
+> >> > +                       } else if (strnlen(value, MAX_ADDR_LIST_LEN + 1)
+> >> > <=
+> >> > +                               MAX_ADDR_LIST_LEN) {
+> >> >                                 strcpy(parsed_info->addrlist, value);
+> >> >                                 if (parsed_info->verboseflag)
+> >> >                                         fprintf(stderr,
+> >> > --
+> >> > 1.7.5.4
+> >> >
+> >>
+> >> I still suck at git send-email.  The body of that should have read:
+> >> "In the mount utility use MAX_ADDR_LIST_LEN for bounds checking on ip
+> >> addresses instead of MAX_ADDRESS_LEN.  Parsed_mount_info->addrlist is
+> >> MAX_ADDR_LIST_LEN chars long."
+> >>
+> >> --
+> >> Peace and Blessings,
+> >> -Scott.
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> >
+> > Erm...except that ip= can only specify a single address. MAX_ADDRESS_LEN is
+> > the length of a single address whereas MAX_ADDR_LIST_LEN is 16 times that
+> > value. I'm not clear on what the perceived bug is here...
+> >
 > 
-> so shouldn't have any unintended consequences (and the sign mount
-> option should work as expected as well)
+> Hrm... I'm a bit confused as to why the parsed_mount_info has
+> addrlist[MAX_ADDR_LIST_LEN] if it's only going to hold a single IP.
+> Happy Thanksgiving, Jeff.
 > 
 
-Umm...I think it would. The story for people who need to mount using
-cleartext passwords has always been "Set SecurityFlags to a magic value
-and mount without a sec= option". With your original patch, that would
-have broken them, AFAICT.
+When you resolve a hostname, we get back a list of address records.
+Those are parsed and the addresses end up in the addrlist.
 
-> To be more specific: do you prefer this
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index f5af252..2cd5ea2 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1362,7 +1362,7 @@ require use of the stronger protocol */
->  #define   CIFSSEC_MUST_SEAL    0x40040 /* not supported yet */
->  #define   CIFSSEC_MUST_NTLMSSP 0x80080 /* raw ntlmssp with ntlmv2 */
-> 
-> -#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM |
-> CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
-> +#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMSSP)
->  #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
->  #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 |
-> CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_
->  /*
-> 
-
-I think so -- that looks like it won't break existing users who need to
-set SecurityFlags to mount particular servers. You should also have
-this patch remove the now-bogus warning at mount time though.
-
-As non-sensical as the SecurityFlags interface is, we're stuck with it
-for now. For the longer term, I'd like to start deprecating the
-SecurityFlags interface altogether. I'll plan to write up a
-comprehensive proposal for doing that soon.
+When you provide an 'ip=' address option manually however, you can only
+provide a single address. That still goes into the addrlist, but then
+you're just in the trivial case of trying an address list that contains
+a single address.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
