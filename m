@@ -1,81 +1,98 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Upgrading security default
-Date: Sat, 24 Nov 2012 10:55:53 -0600
-Message-ID: <CAH2r5muU+mK13D-u6ca4sWfvpeP1EdMaxoeX0+5g-v6gu4+_Mw@mail.gmail.com>
-References: <CAH2r5mtPAwURZxTeRBfn+c=hNyeaDbmKbYXt=w3VkUu5i1cxNQ@mail.gmail.com>
-	<20121123204136.5466f0e9@corrin.poochiereds.net>
-	<CAH2r5msv_gp8Vpx82zA084awe++kFd5S3X7==6K2g6c7jBhCOg@mail.gmail.com>
-	<20121124061135.317ea3e8@tlielax.poochiereds.net>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] CIFS: Fix IP address bounds checking on mount utility.
+Date: Sat, 24 Nov 2012 12:33:45 -0500
+Message-ID: <CAFB9KM2g_LN1A5d+-6RgEoUWB+Xg1XJANDPCu4YLm91TKcvk-w@mail.gmail.com>
+References: <1353528652-8912-1-git-send-email-scott.lovenberg@gmail.com>
+	<CAFB9KM1NDQB3HTVCKBjRu=N9nvfoY0YK-5TZN91PwqduD=KJZA@mail.gmail.com>
+	<CAOhYWN+Xq5hhPJ1fEQg2AN=UM8k7N22Tfwo424a145KpK0AKDw@mail.gmail.com>
+	<CAFB9KM1uktUTtO5PuYkJjsavGdqpZrZ7YUd80_0Js=uOPUX1AA@mail.gmail.com>
+	<20121124092314.5b61490c@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121124061135.317ea3e8-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20121124092314.5b61490c-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Nov 24, 2012 at 5:11 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Fri, 23 Nov 2012 20:48:40 -0600
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Sat, Nov 24, 2012 at 9:23 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> On Thu, 22 Nov 2012 12:31:50 -0500
+> Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
->> it doesn't change security flags - but it seemed the smallest and
->> safest since it basically says:
->> 1) if you pass in "sec=" then use that
->> 2) otherwise use ntlmssp (with ntlmv2)
+>> On Wed, Nov 21, 2012 at 4:52 PM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>> >
+>> > On Nov 21, 2012 3:16 PM, "Scott Lovenberg" <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> > wrote:
+>> >>
+>> >> On Wed, Nov 21, 2012 at 3:10 PM, <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> >> >
+>> >> > From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >> >
+>> >> > Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>> >> > ---
+>> >> >  mount.cifs.c |    4 ++--
+>> >> >  1 files changed, 2 insertions(+), 2 deletions(-)
+>> >> >
+>> >> > diff --git a/mount.cifs.c b/mount.cifs.c
+>> >> > index a9632b4..f63c309 100644
+>> >> > --- a/mount.cifs.c
+>> >> > +++ b/mount.cifs.c
+>> >> > @@ -941,8 +941,8 @@ parse_options(const char *data, struct
+>> >> > parsed_mount_info *parsed_info)
+>> >> >                         if (!value || !*value) {
+>> >> >                                 fprintf(stderr,
+>> >> >                                         "target ip address argument
+>> >> > missing\n");
+>> >> > -                       } else if (strnlen(value, MAX_ADDRESS_LEN) <=
+>> >> > -                               MAX_ADDRESS_LEN) {
+>> >> > +                       } else if (strnlen(value, MAX_ADDR_LIST_LEN + 1)
+>> >> > <=
+>> >> > +                               MAX_ADDR_LIST_LEN) {
+>> >> >                                 strcpy(parsed_info->addrlist, value);
+>> >> >                                 if (parsed_info->verboseflag)
+>> >> >                                         fprintf(stderr,
+>> >> > --
+>> >> > 1.7.5.4
+>> >> >
+>> >>
+>> >> I still suck at git send-email.  The body of that should have read:
+>> >> "In the mount utility use MAX_ADDR_LIST_LEN for bounds checking on ip
+>> >> addresses instead of MAX_ADDRESS_LEN.  Parsed_mount_info->addrlist is
+>> >> MAX_ADDR_LIST_LEN chars long."
+>> >>
+>> >> --
+>> >> Peace and Blessings,
+>> >> -Scott.
+>> >> --
+>> >> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+>> >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> >
+>> > Erm...except that ip= can only specify a single address. MAX_ADDRESS_LEN is
+>> > the length of a single address whereas MAX_ADDR_LIST_LEN is 16 times that
+>> > value. I'm not clear on what the perceived bug is here...
+>> >
 >>
->> so shouldn't have any unintended consequences (and the sign mount
->> option should work as expected as well)
+>> Hrm... I'm a bit confused as to why the parsed_mount_info has
+>> addrlist[MAX_ADDR_LIST_LEN] if it's only going to hold a single IP.
+>> Happy Thanksgiving, Jeff.
 >>
 >
-> Umm...I think it would. The story for people who need to mount using
-> cleartext passwords has always been "Set SecurityFlags to a magic value
-> and mount without a sec= option". With your original patch, that would
-> have broken them, AFAICT.
-
-originally it was supposed to be mount with sec=none (after the
-administrator configured the system to allow weak passwords via the
-global configuration flag).  We clearly do not want to allow plaintext
-passwords to be sent over the network unless the user/admin really
-knows what they are doing.
-
->> To be more specific: do you prefer this
->>
->> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
->> index f5af252..2cd5ea2 100644
->> --- a/fs/cifs/cifsglob.h
->> +++ b/fs/cifs/cifsglob.h
->> @@ -1362,7 +1362,7 @@ require use of the stronger protocol */
->>  #define   CIFSSEC_MUST_SEAL    0x40040 /* not supported yet */
->>  #define   CIFSSEC_MUST_NTLMSSP 0x80080 /* raw ntlmssp with ntlmv2 */
->>
->> -#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM |
->> CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
->> +#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMSSP)
->>  #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
->>  #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 |
->> CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_
->>  /*
->>
+> When you resolve a hostname, we get back a list of address records.
+> Those are parsed and the addresses end up in the addrlist.
 >
-> I think so -- that looks like it won't break existing users who need to
-> set SecurityFlags to mount particular servers. You should also have
-> this patch remove the now-bogus warning at mount time though.
+> When you provide an 'ip=' address option manually however, you can only
+> provide a single address. That still goes into the addrlist, but then
+> you're just in the trivial case of trying an address list that contains
+> a single address.
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-Yes - that is the same in both patches.
+OK, that makes sense.
 
-> As non-sensical as the SecurityFlags interface is, we're stuck with it
-> for now. For the longer term, I'd like to start deprecating the
-> SecurityFlags interface altogether. I'll plan to write up a
-> comprehensive proposal for doing that soon.
-
-I don't mind removing security flags - but we need a way for cifs at
-module load time (or some after) to read a set of (administrator
-configurable) system wide security defaults (similar to registry
-configuration, or smb.conf for Samba) - I don't know the best way to
-do this (or way consistent with how other modules do it).
 
 -- 
-Thanks,
-
-Steve
+Peace and Blessings,
+-Scott.
