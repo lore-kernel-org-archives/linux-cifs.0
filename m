@@ -1,92 +1,114 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Upgrade default authentication to NTLMv2/NTLMSSP (try #2)
-Date: Sun, 25 Nov 2012 06:24:56 -0500
-Message-ID: <20121125062456.69ab0ac6@tlielax.poochiereds.net>
-References: <CAH2r5msFoAqT4-ec1SbeVfnTD5=OeXawyx4GgvqdZ1CcZ+4VEg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 7/6] cifs: remove unneeded address argument from cifs_find_tcp_session and match_server
+Date: Sun, 25 Nov 2012 07:57:31 -0500
+Message-ID: <1353848252-2468-1-git-send-email-jlayton@redhat.com>
+References: <1353087414-32152-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, fsauter-LVkJPw3T+odGBRGhe+f61g@public.gmane.org,
+	almiller_1-/E1597aS9LT10XsdtD+oqA@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msFoAqT4-ec1SbeVfnTD5=OeXawyx4GgvqdZ1CcZ+4VEg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1353087414-32152-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 25 Nov 2012 00:10:32 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Now that the smb_vol contains the destination sockaddr, there's no need
+to pass it in separately.
 
-> Incorporating Jeff's feedback
-> 
-> commit e6104c75c0e3158d39356591955f2aff7f3558c3
-> Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Date:   Sun Nov 25 00:07:44 2012 -0600
-> 
->     [CIFS] default authentication needs to be at least ntlmv2 security
-> for cifs mounts
-> 
->     We had planned to upgrade to ntlmv2 security a few releases ago,
->     and have been warning users in dmesg on mount about the impending
->     upgrade, but had to make a change (to use nltmssp with ntlmv2) due
->     to testing issues with some non-Windows, non-Samba servers.
-> 
->     The approach in this patch is simpler than earlier patches,
->     and changes the default authentication mechanism to ntlmv2
->     password hashes (encapsulated in ntlmssp) from ntlm (ntlm is
->     too weak for current use and ntlmv2 has been broadly
->     supported for many, many years).
-> 
->     Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index f5af252..2cd5ea2 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1362,7 +1362,7 @@ require use of the stronger protocol */
->  #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
->  #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
-> 
-> -#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM |
-> CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
-> +#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMSSP)
->  #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
->  #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 |
-> CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 |
-> CIFSSEC_MAY_NTLMSSP)
->  /*
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 5c670b9..32fb50e 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2397,8 +2397,6 @@ cifs_set_cifscreds(struct smb_vol *vol
-> __attribute__((unused)),
->  }
->  #endif /* CONFIG_KEYS */
-> 
-> -static bool warned_on_ntlm;  /* globals init to false automatically */
-> -
->  static struct cifs_ses *
->  cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
->  {
-> @@ -2475,14 +2473,6 @@ cifs_get_smb_ses(struct TCP_Server_Info
-> *server, struct smb_vol *volume_info)
->  	ses->cred_uid = volume_info->cred_uid;
->  	ses->linux_uid = volume_info->linux_uid;
-> 
-> -	/* ntlmv2 is much stronger than ntlm security, and has been broadly
-> -	supported for many years, time to update default security mechanism */
-> -	if ((volume_info->secFlg == 0) && warned_on_ntlm == false) {
-> -		warned_on_ntlm = true;
-> -		cERROR(1, "default security mechanism requested.  The default "
-> -			"security mechanism will be upgraded from ntlm to "
-> -			"ntlmv2 in kernel release 3.3");
-> -	}
->  	ses->overrideSecFlg = volume_info->secFlg;
-> 
->  	mutex_lock(&ses->session_mutex);
-> 
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-I'd still like to see a more comprehensive overhaul of the auth code,
-but this will at least get rid of the warning for now...
-
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 2602373..60295a4 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2042,9 +2042,10 @@ match_security(struct TCP_Server_Info *server, struct smb_vol *vol)
+ 	return true;
+ }
+ 
+-static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
+-			 struct smb_vol *vol)
++static int match_server(struct TCP_Server_Info *server, struct smb_vol *vol)
+ {
++	struct sockaddr *addr = (struct sockaddr *)&vol->dstaddr;
++
+ 	if ((server->vals != vol->vals) || (server->ops != vol->ops))
+ 		return 0;
+ 
+@@ -2065,13 +2066,13 @@ static int match_server(struct TCP_Server_Info *server, struct sockaddr *addr,
+ }
+ 
+ static struct TCP_Server_Info *
+-cifs_find_tcp_session(struct sockaddr *addr, struct smb_vol *vol)
++cifs_find_tcp_session(struct smb_vol *vol)
+ {
+ 	struct TCP_Server_Info *server;
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+-		if (!match_server(server, addr, vol))
++		if (!match_server(server, vol))
+ 			continue;
+ 
+ 		++server->srv_count;
+@@ -2121,13 +2122,12 @@ static struct TCP_Server_Info *
+ cifs_get_tcp_session(struct smb_vol *volume_info)
+ {
+ 	struct TCP_Server_Info *tcp_ses = NULL;
+-	struct sockaddr *dstaddr = (struct sockaddr *)&volume_info->dstaddr;
+ 	int rc;
+ 
+ 	cFYI(1, "UNC: %s", volume_info->UNC);
+ 
+ 	/* see if we already have a matching tcp_ses */
+-	tcp_ses = cifs_find_tcp_session(dstaddr, volume_info);
++	tcp_ses = cifs_find_tcp_session(volume_info);
+ 	if (tcp_ses)
+ 		return tcp_ses;
+ 
+@@ -2172,19 +2172,18 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+ 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
+ 	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+-
++	memcpy(&tcp_ses->srcaddr, &volume_info->srcaddr,
++	       sizeof(tcp_ses->srcaddr));
++	memcpy(&tcp_ses->dstaddr, &volume_info->dstaddr,
++		sizeof(tcp_ses->dstaddr));
+ 	/*
+ 	 * at this point we are the only ones with the pointer
+ 	 * to the struct since the kernel thread not created yet
+ 	 * no need to spinlock this init of tcpStatus or srv_count
+ 	 */
+ 	tcp_ses->tcpStatus = CifsNew;
+-	memcpy(&tcp_ses->srcaddr, &volume_info->srcaddr,
+-	       sizeof(tcp_ses->srcaddr));
+ 	++tcp_ses->srv_count;
+ 
+-	memcpy(&tcp_ses->dstaddr, dstaddr, sizeof(tcp_ses->dstaddr));
+-
+ 	rc = ip_connect(tcp_ses);
+ 	if (rc < 0) {
+ 		cERROR(1, "Error connecting to socket. Aborting operation");
+@@ -2736,7 +2735,6 @@ cifs_match_super(struct super_block *sb, void *data)
+ 	struct cifs_ses *ses;
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink;
+-	struct sockaddr *dstaddr;
+ 	int rc = 0;
+ 
+ 	spin_lock(&cifs_tcp_ses_lock);
+@@ -2751,9 +2749,8 @@ cifs_match_super(struct super_block *sb, void *data)
+ 	tcp_srv = ses->server;
+ 
+ 	volume_info = mnt_data->vol;
+-	dstaddr = (struct sockaddr *)&volume_info->dstaddr;
+ 
+-	if (!match_server(tcp_srv, dstaddr, volume_info) ||
++	if (!match_server(tcp_srv, volume_info) ||
+ 	    !match_session(ses, volume_info) ||
+ 	    !match_tcon(tcon, volume_info->UNC)) {
+ 		rc = 0;
+-- 
+1.7.11.7
