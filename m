@@ -1,43 +1,83 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Upgrading security default
-Date: Sat, 24 Nov 2012 23:57:44 -0600
-Message-ID: <CAH2r5msXYgqN6ZdyS+mcTtupBk3=dwOh1qrZo4fY5KMOMB58Xg@mail.gmail.com>
-References: <CAH2r5mtPAwURZxTeRBfn+c=hNyeaDbmKbYXt=w3VkUu5i1cxNQ@mail.gmail.com>
-	<20121123204136.5466f0e9@corrin.poochiereds.net>
-	<CAH2r5msv_gp8Vpx82zA084awe++kFd5S3X7==6K2g6c7jBhCOg@mail.gmail.com>
-	<20121124061135.317ea3e8@tlielax.poochiereds.net>
-	<CAH2r5muU+mK13D-u6ca4sWfvpeP1EdMaxoeX0+5g-v6gu4+_Mw@mail.gmail.com>
+Subject: Upgrade default authentication to NTLMv2/NTLMSSP (try #2)
+Date: Sun, 25 Nov 2012 00:10:32 -0600
+Message-ID: <CAH2r5msFoAqT4-ec1SbeVfnTD5=OeXawyx4GgvqdZ1CcZ+4VEg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muU+mK13D-u6ca4sWfvpeP1EdMaxoeX0+5g-v6gu4+_Mw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, Nov 24, 2012 at 10:55 AM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Sat, Nov 24, 2012 at 5:11 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> On Fri, 23 Nov 2012 20:48:40 -0600
->> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->>
->>> it doesn't change security flags - but it seemed the smallest and
->>> safest since it basically says:
->>> 1) if you pass in "sec=" then use that
->>> 2) otherwise use ntlmssp (with ntlmv2)
->>>
->>> so shouldn't have any unintended consequences (and the sign mount
->>> option should work as expected as well)
->>>
->>
->> Umm...I think it would. The story for people who need to mount using
->> cleartext passwords has always been "Set SecurityFlags to a magic value
->> and mount without a sec= option". With your original patch, that would
->> have broken them, AFAICT.
+Incorporating Jeff's feedback
 
-you are probably right (sec=none was obviously for null user not plain
-text password)
+commit e6104c75c0e3158d39356591955f2aff7f3558c3
+Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date:   Sun Nov 25 00:07:44 2012 -0600
 
+    [CIFS] default authentication needs to be at least ntlmv2 security
+for cifs mounts
+
+    We had planned to upgrade to ntlmv2 security a few releases ago,
+    and have been warning users in dmesg on mount about the impending
+    upgrade, but had to make a change (to use nltmssp with ntlmv2) due
+    to testing issues with some non-Windows, non-Samba servers.
+
+    The approach in this patch is simpler than earlier patches,
+    and changes the default authentication mechanism to ntlmv2
+    password hashes (encapsulated in ntlmssp) from ntlm (ntlm is
+    too weak for current use and ntlmv2 has been broadly
+    supported for many, many years).
+
+    Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f5af252..2cd5ea2 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1362,7 +1362,7 @@ require use of the stronger protocol */
+ #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
+ #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+
+-#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLM |
+CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
++#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMSSP)
+ #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
+ #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 |
+CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 |
+CIFSSEC_MAY_NTLMSSP)
+ /*
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5c670b9..32fb50e 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2397,8 +2397,6 @@ cifs_set_cifscreds(struct smb_vol *vol
+__attribute__((unused)),
+ }
+ #endif /* CONFIG_KEYS */
+
+-static bool warned_on_ntlm;  /* globals init to false automatically */
+-
+ static struct cifs_ses *
+ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ {
+@@ -2475,14 +2473,6 @@ cifs_get_smb_ses(struct TCP_Server_Info
+*server, struct smb_vol *volume_info)
+ 	ses->cred_uid = volume_info->cred_uid;
+ 	ses->linux_uid = volume_info->linux_uid;
+
+-	/* ntlmv2 is much stronger than ntlm security, and has been broadly
+-	supported for many years, time to update default security mechanism */
+-	if ((volume_info->secFlg == 0) && warned_on_ntlm == false) {
+-		warned_on_ntlm = true;
+-		cERROR(1, "default security mechanism requested.  The default "
+-			"security mechanism will be upgraded from ntlm to "
+-			"ntlmv2 in kernel release 3.3");
+-	}
+ 	ses->overrideSecFlg = volume_info->secFlg;
+
+ 	mutex_lock(&ses->session_mutex);
 
 -- 
 Thanks,
