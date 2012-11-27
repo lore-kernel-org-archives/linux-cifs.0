@@ -1,58 +1,106 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Terminate 5 minute timeout for CIFS mount to missing server in
- stab?
-Date: Tue, 27 Nov 2012 06:20:51 -0500
-Message-ID: <20121127062051.382b5462@tlielax.poochiereds.net>
-References: <1296DFE4-00F0-43E0-A554-1414D53F077D@exacq.com>
+Subject: Re: [PATCH] cifs: fix writeback race with file that is growing
+Date: Tue, 27 Nov 2012 07:00:43 -0500
+Message-ID: <20121127070043.6d832804@tlielax.poochiereds.net>
+References: <1353945484-27415-1-git-send-email-jlayton@redhat.com>
+	<50B46641.70402@suse.com>
+	<20121127060432.410f0dfc@tlielax.poochiereds.net>
+	<50B49FE0.1040009@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Matthew M. DeLoera" <mdeloera-CERpylIU+L8AvxtiuMwx3w@public.gmane.org>
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ungifted01-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1296DFE4-00F0-43E0-A554-1414D53F077D-CERpylIU+L8AvxtiuMwx3w@public.gmane.org>
+In-Reply-To: <50B49FE0.1040009-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 26 Nov 2012 22:06:02 -0500
-"Matthew M. DeLoera" <mdeloera-CERpylIU+L8AvxtiuMwx3w@public.gmane.org> wrote:
+On Tue, 27 Nov 2012 16:41:28 +0530
+Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
 
-> Hello,
+> On 11/27/2012 04:34 PM, Jeff Layton wrote:
+> > On Tue, 27 Nov 2012 12:35:37 +0530
+> > Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+> > 
+> >> On 11/26/2012 09:28 PM, Jeff Layton wrote:
+> >>> Commit eddb079deb4 created a regression in the writepages codepath.
+> >>> Previously, whenever it needed to check the size of the file, it did so
+> >>> by consulting the inode->i_size field directly. With that patch, the
+> >>> i_size was fetched once on entry into the writepages code and that value
+> >>> was used henceforth.
+> >>>
+> >>> If the file is changing size though (for instance, if someone is writing
+> >>> to it or has truncated it), then that value is likely to be wrong. This
+> >>> can lead to data corruption. Pages past the EOF at the time that the
+> >>> writepages call was issued may be silently dropped and ignored because
+> >>> cifs_writepages wrongly assumes that the file must have been truncated
+> >>> in the interim.
+> >>>
+> >>> Fix cifs_writepages to properly fetch the size from the inode->i_size
+> >>> field instead to properly account for this possibility.
+> >>>
+> >>> Reported-and-Tested-by: Maxim Britov <ungifted01-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> >>> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> >>> ---
+> >>>  fs/cifs/file.c | 6 +++---
+> >>>  1 file changed, 3 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> >>> index edb25b4..70b6f4c 100644
+> >>> --- a/fs/cifs/file.c
+> >>> +++ b/fs/cifs/file.c
+> >>> @@ -1794,7 +1794,6 @@ static int cifs_writepages(struct address_space *mapping,
+> >>>  	struct TCP_Server_Info *server;
+> >>>  	struct page *page;
+> >>>  	int rc = 0;
+> >>> -	loff_t isize = i_size_read(mapping->host);
+> >>>  
+> >>>  	/*
+> >>>  	 * If wsize is smaller than the page cache size, default to writing
+> >>> @@ -1899,7 +1898,7 @@ retry:
+> >>>  			 */
+> >>>  			set_page_writeback(page);
+> >>>  
+> >>> -			if (page_offset(page) >= isize) {
+> >>> +			if (page_offset(page) >= i_size_read(mapping->host)) {
+> >>>  				done = true;
+> >>>  				unlock_page(page);
+> >>>  				end_page_writeback(page);
+> >>> @@ -1932,7 +1931,8 @@ retry:
+> >>>  		wdata->offset = page_offset(wdata->pages[0]);
+> >>>  		wdata->pagesz = PAGE_CACHE_SIZE;
+> >>>  		wdata->tailsz =
+> >>> -			min(isize - page_offset(wdata->pages[nr_pages - 1]),
+> >>> +			min(i_size_read(mapping->host) -
+> >>> +			    page_offset(wdata->pages[nr_pages - 1]),
+> >>>  			    (loff_t)PAGE_CACHE_SIZE);
+> >>
+> >> Good catch. Looks correct to me. Wondering whether we would need a
+> >> similar fix in cifs_write_begin() where we get the i_size and then
+> >> immediately do check whether the page lies beyond EOF?
+> >>
+> >>
+> > 
+> > Thanks, I should also mention that this was reported here:
+> > 
+> >     https://bugzilla.kernel.org/show_bug.cgi?id=50991
+> > 
+> > Regarding cifs_write_begin, I don't think so. The code does not sleep
+> > between the point where the i_size is fetched and then later used. If
+> > there is a race window there, it's very small.
+> > 
 > 
-> I searched the archive but only found some discussion regarding "wait indefinitely for responses" from 2010. I hope this isn't a redundant question!
+> Yeah, I too was thinking it is too small a race window but thought
+> anyway I'll ask.
 > 
-> I have a CIFS entry in my fstab to a remote server on my VPN, so it's not available when I'm not connected to my VPN. When not connected, mount -a hangs for about 5 minutes before finally failing with "connection timed out". If I connect my VPN in the middle of that wait, and verify it's connected, mount still hangs for that entire timeout before failing. If I try again, it succeeds.
-> 
-> Is there any issue with kill -9 for the mount -a process, in order to more quickly retry? I was planning to automate it, and to keep retrying until mount succeeds.
-> 
-> Basically, I need quicker failure than 5 minutes, and I can't find any CIFS timeout settings. Any suggestions would be greatly appreciated!
-> 
-> Thanks,
-> - Matthew
-> 
-> 
+> Steve, I think this has to be pushed to Linus asap before the merge
+> window begins to ensure that 3.7 includes this fix.
 > 
 > 
 
-What kernel is this? kill -9'ing the process likely won't hurt
-anything, but it's not really a great solution.
-
-That doesn't sound related to the fact that we wait indefinitely for
-responses since the connection is presumably not even established yet.
-
-cifs.ko is a fairly naive user of the socket APIs in the kernel and
-does a blocking connect call to connect to the socket. That said, it
-should be timing out a lot more quickly than that:
-
-        socket->sk->sk_rcvtimeo = 7 * HZ;
-        socket->sk->sk_sndtimeo = 5 * HZ;
-
-A connect attempt shouldn't be hanging for 5 minutes. I'd suggest doing
-a bit more investigation -- track down the [cifsd] kthread and see what
-it's doing at the time. Something like:
-
-    # cat /proc/$(pidof cifsd)/stack
-
+Agreed -- this shouldn't wait...
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
