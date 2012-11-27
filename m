@@ -1,57 +1,82 @@
-From: "Matthew M. DeLoera" <mdeloera-CERpylIU+L8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Terminate 5 minute timeout for CIFS mount to missing server in stab?
-Date: Tue, 27 Nov 2012 08:58:41 -0500
-Message-ID: <811AE6D4-30BA-44CF-9D8E-D5DA4FD24115@exacq.com>
-References: <1296DFE4-00F0-43E0-A554-1414D53F077D@exacq.com> <20121127062051.382b5462@tlielax.poochiereds.net>
-Mime-Version: 1.0 (Apple Message framework v1283)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH 5/5] CIFS: Fix write after setting a read lock for read
+ oplock files
+Date: Tue, 27 Nov 2012 18:57:22 +0400
+Message-ID: <CAKywueSb3q3-6whESnqrvPc2o0ka8GZepz0JmQGTzyRki4Bh1Q@mail.gmail.com>
+References: <1353999029-3975-1-git-send-email-piastry@etersoft.ru>
+	<1353999029-3975-6-git-send-email-piastry@etersoft.ru>
+	<20121127075203.7b0d8de6@tlielax.poochiereds.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121127062051.382b5462-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20121127075203.7b0d8de6-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I'm testing in an older kernel - 2.6.15-55-386. While mount sits and waits, I see cifsoplockd and cifsnotifyd, but no cifsd. And no /proc/PID/stack for either. When I kill mount -a, both of those cifs daemons remain running (both sleeping).
+2012/11/27 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> On Tue, 27 Nov 2012 10:50:28 +0400
+> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>
+>> If we have a read oplock and set a read lock in it, we can't write to the
+>> locked area - so, filemap_fdatawrite may fail with a no information for a
+>> userspace application even if we request a write to non-locked area. Fix
+>> this by replacing it with filemap_write_and_wait call and sending non-page
+>> write in a error case.
+>>
+>> While this may end up with two write requests to the server, we can be sure
+>> that our data will be the same at the server and the page cache - the next read
+>> on this file gets the valid data.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>> ---
+>>  fs/cifs/file.c |   10 ++++------
+>>  1 file changed, 4 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>> index f8fe1bd..89efd85 100644
+>> --- a/fs/cifs/file.c
+>> +++ b/fs/cifs/file.c
+>> @@ -2511,14 +2511,12 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+>>        */
+>>       if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
+>>               ssize_t written;
+>> -             int rc;
+>>
+>>               written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+>> -             rc = filemap_fdatawrite(inode->i_mapping);
+>> -             if (rc)
+>> -                     return (ssize_t)rc;
+>> -
+>> -             return written;
+>> +             /* try page write at first */
+>> +             if (!filemap_write_and_wait(inode->i_mapping))
+>> +                     return written;
+>> +             /* page write failed - try from pos to pos+len-1 */
+>>       }
+>>  #endif
+>>
+>
+> Bleh -- nasty. I guess this will work though...
+>
+> Wonder if there's some way to populate the cache and then just mark the
+> pages clean without sending out writes? That would be a better solution
+> IMO, but I guess we can live with this for now...
+>
+> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-I then tried later 2.6.24-24-generic kernel and got same behavior.
+Thanks for reviewing the patchset.
 
-Either way, for the record, cifsnotifyd was already running. Once I started mount, then cifsoplockd started.
+As for this patch I have the followon patch:
 
-Now in an even newer kernel, 2.6.32-15.generic, I get much quicker timeout - just over 30 seconds.
+http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=commitdiff;h=11673376e6840c686f0c6e51892b16ad1945887e
 
-I still have to work with the older kernels I mentioned, though I'm glad to see the behavior in 32-15. And FYI, I never saw cifsd running in 32-15.
+that allows us to populate the page cache without making pages dirty.
+I didn't have enough time to test it well (that's why I haven't posted
+it yet)  - going to do it tomorrow. But you are welcome to comment the
+approach.
 
-Agreed about kill -9. It seems like cifs timeout behavior must have changed along the way, but my kernels span about 6 years, so that doesn't surprise me. But since I am still stuck with the older kernels I mentioned, is there something better that I could do, or just settle for kill -9 and allow enough time for newer kernels to timeout? Is there a way that I might be able to detect what timeout value I might expect?
-
-Cheers,
-- Matthew
-
-
-On Nov 27, 2012, at 6:20 AM, Jeff Layton wrote:
-
->> 
-> 
-> What kernel is this? kill -9'ing the process likely won't hurt
-> anything, but it's not really a great solution.
-> 
-> That doesn't sound related to the fact that we wait indefinitely for
-> responses since the connection is presumably not even established yet.
-> 
-> cifs.ko is a fairly naive user of the socket APIs in the kernel and
-> does a blocking connect call to connect to the socket. That said, it
-> should be timing out a lot more quickly than that:
-> 
->        socket->sk->sk_rcvtimeo = 7 * HZ;
->        socket->sk->sk_sndtimeo = 5 * HZ;
-> 
-> A connect attempt shouldn't be hanging for 5 minutes. I'd suggest doing
-> a bit more investigation -- track down the [cifsd] kthread and see what
-> it's doing at the time. Something like:
-> 
->    # cat /proc/$(pidof cifsd)/stack
-> 
-> 
-> -- 
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Best regards,
+Pavel Shilovsky.
