@@ -1,51 +1,76 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 5/5] CIFS: Fix write after setting a read lock for read oplock files
-Date: Tue, 27 Nov 2012 10:50:28 +0400
-Message-ID: <1353999029-3975-6-git-send-email-piastry@etersoft.ru>
-References: <1353999029-3975-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix writeback race with file that is growing
+Date: Tue, 27 Nov 2012 12:35:37 +0530
+Message-ID: <50B46641.70402@suse.com>
+References: <1353945484-27415-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ungifted01-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1353999029-3975-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1353945484-27415-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we have a read oplock and set a read lock in it, we can't write to the
-locked area - so, filemap_fdatawrite may fail with a no information for a
-userspace application even if we request a write to non-locked area. Fix
-this by replacing it with filemap_write_and_wait call and sending non-page
-write in a error case.
+On 11/26/2012 09:28 PM, Jeff Layton wrote:
+> Commit eddb079deb4 created a regression in the writepages codepath.
+> Previously, whenever it needed to check the size of the file, it did so
+> by consulting the inode->i_size field directly. With that patch, the
+> i_size was fetched once on entry into the writepages code and that value
+> was used henceforth.
+> 
+> If the file is changing size though (for instance, if someone is writing
+> to it or has truncated it), then that value is likely to be wrong. This
+> can lead to data corruption. Pages past the EOF at the time that the
+> writepages call was issued may be silently dropped and ignored because
+> cifs_writepages wrongly assumes that the file must have been truncated
+> in the interim.
+> 
+> Fix cifs_writepages to properly fetch the size from the inode->i_size
+> field instead to properly account for this possibility.
+> 
+> Reported-and-Tested-by: Maxim Britov <ungifted01-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/file.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index edb25b4..70b6f4c 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -1794,7 +1794,6 @@ static int cifs_writepages(struct address_space *mapping,
+>  	struct TCP_Server_Info *server;
+>  	struct page *page;
+>  	int rc = 0;
+> -	loff_t isize = i_size_read(mapping->host);
+>  
+>  	/*
+>  	 * If wsize is smaller than the page cache size, default to writing
+> @@ -1899,7 +1898,7 @@ retry:
+>  			 */
+>  			set_page_writeback(page);
+>  
+> -			if (page_offset(page) >= isize) {
+> +			if (page_offset(page) >= i_size_read(mapping->host)) {
+>  				done = true;
+>  				unlock_page(page);
+>  				end_page_writeback(page);
+> @@ -1932,7 +1931,8 @@ retry:
+>  		wdata->offset = page_offset(wdata->pages[0]);
+>  		wdata->pagesz = PAGE_CACHE_SIZE;
+>  		wdata->tailsz =
+> -			min(isize - page_offset(wdata->pages[nr_pages - 1]),
+> +			min(i_size_read(mapping->host) -
+> +			    page_offset(wdata->pages[nr_pages - 1]),
+>  			    (loff_t)PAGE_CACHE_SIZE);
 
-While this may end up with two write requests to the server, we can be sure
-that our data will be the same at the server and the page cache - the next read
-on this file gets the valid data.
+Good catch. Looks correct to me. Wondering whether we would need a
+similar fix in cifs_write_begin() where we get the i_size and then
+immediately do check whether the page lies beyond EOF?
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c |   10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index f8fe1bd..89efd85 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2511,14 +2511,12 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
- 	 */
- 	if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
- 		ssize_t written;
--		int rc;
- 
- 		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
--		rc = filemap_fdatawrite(inode->i_mapping);
--		if (rc)
--			return (ssize_t)rc;
--
--		return written;
-+		/* try page write at first */
-+		if (!filemap_write_and_wait(inode->i_mapping))
-+			return written;
-+		/* page write failed - try from pos to pos+len-1 */
- 	}
- #endif
- 
 -- 
-1.7.10.4
+Suresh Jayaraman
