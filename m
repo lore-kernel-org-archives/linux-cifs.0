@@ -1,24 +1,24 @@
-From: "Matthew M. DeLoera" <mdeloera-CERpylIU+L8AvxtiuMwx3w@public.gmane.org>
-Subject: Terminate 5 minute timeout for CIFS mount to missing server in stab?
-Date: Mon, 26 Nov 2012 22:06:02 -0500
-Message-ID: <1296DFE4-00F0-43E0-A554-1414D53F077D@exacq.com>
-Mime-Version: 1.0 (Apple Message framework v1283)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 8BIT
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH 0/5] relock file capability and locking fixes
+Date: Tue, 27 Nov 2012 10:50:23 +0400
+Message-ID: <1353999029-3975-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+This patchset is targeted to implement cifs_relock_file as well as to fix some bugs in a lock/oplock codepath. This is suitable for v3.8.
 
-I searched the archive but only found some discussion regarding "wait indefinitely for responses" from 2010. I hope this isn't a redundant question!
+Pavel Shilovsky (5):
+  CIFS: Separate pushing posix locks and lock_sem handling
+  CIFS: Separate pushing mandatory locks and lock_sem handling
+  CIFS: Implement cifs_relock_file
+  CIFS: Fix lock consistensy bug in cifs_setlk
+  CIFS: Fix write after setting a read lock for read oplock files
 
-I have a CIFS entry in my fstab to a remote server on my VPN, so it's not available when I'm not connected to my VPN. When not connected, mount -a hangs for about 5 minutes before finally failing with "connection timed out". If I connect my VPN in the middle of that wait, and verify it's connected, mount still hangs for that entire timeout before failing. If I try again, it succeeds.
+ fs/cifs/file.c     |   87 ++++++++++++++++++++++++++++------------------------
+ fs/cifs/smb2file.c |   12 --------
+ 2 files changed, 47 insertions(+), 52 deletions(-)
 
-Is there any issue with kill -9 for the mount -a process, in order to more quickly retry? I was planning to automate it, and to keep retrying until mount succeeds.
-
-Basically, I need quicker failure than 5 minutes, and I can't find any CIFS timeout settings. Any suggestions would be greatly appreciated!
-
-Thanks,
-- Matthew
+-- 
+1.7.10.4
