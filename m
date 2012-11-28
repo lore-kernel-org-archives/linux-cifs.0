@@ -1,38 +1,40 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 5/5] CIFS: Fix write after setting a read lock for read
- oplock files
-Date: Wed, 28 Nov 2012 11:30:43 +0400
-Message-ID: <CAKywueQVXWtU_LRK89mqnA_Gph26=xurWCyBkuS7cEaA=emoRQ@mail.gmail.com>
-References: <1353999029-3975-1-git-send-email-piastry@etersoft.ru>
-	<1353999029-3975-6-git-send-email-piastry@etersoft.ru>
-	<CAH2r5mt-cQ4ppzMnhM=9T3ALE5QO4_A6t3P87n8-q=zGutuAOw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH] CIFS: Fix wrong buffer pointer usage in smb_set_file_info
+Date: Wed, 28 Nov 2012 15:27:54 +0400
+Message-ID: <1354102074-24841-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mt-cQ4ppzMnhM=9T3ALE5QO4_A6t3P87n8-q=zGutuAOw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/11/27 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
-> Am curious how you noticed this problem?  Did you have a test case?
+Commit 6bdf6dbd662176c0da5c3ac8ed10ac94e7776c85 caused a regression
+in setattr codepath that leads to files with wrong attributes.
 
-The test case that reproduces the problem:
-1) client1 opens "filename" (file that already has enough data ~~ 4096
-bytes is ok)
-2) client1 sets a read lock a file from pos=1 to pos=2
-3) client2 opens "filename" - client1 gets oplock break to level II
-and push lock from #2 to the server.
-4) client1 writes 'a' to a file (from pos 0) - got status OK, but the
-server reject the write (due to the client1 writes the whole page from
-pos=0 to pos=4096 and conflicts with the read lock from pos=1 to
-pos=2) - ERROR.
-5) client2 reads 1 byte and got the old data (not 'a') because the
-server returns it's version of the data
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/smb1ops.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-It is suitable for both CIFS and SMB2.
-
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 77295f2..561547f 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -735,7 +735,6 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct tcon_link *tlink = NULL;
+ 	struct cifs_tcon *tcon;
+-	FILE_BASIC_INFO info_buf;
+ 
+ 	/* if the file is already open for write, just use that fileid */
+ 	open_file = find_writable_file(cinode, true);
+@@ -787,7 +786,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	netpid = current->tgid;
+ 
+ set_via_filehandle:
+-	rc = CIFSSMBSetFileInfo(xid, tcon, &info_buf, netfid, netpid);
++	rc = CIFSSMBSetFileInfo(xid, tcon, buf, netfid, netpid);
+ 	if (!rc)
+ 		cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
+ 
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.10.4
