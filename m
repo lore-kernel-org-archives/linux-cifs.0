@@ -1,7 +1,7 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v2 1/6] CIFS: Separate pushing posix locks and lock_sem handling
-Date: Wed, 28 Nov 2012 18:23:40 +0400
-Message-ID: <1354112625-30315-2-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2 4/6] CIFS: Fix lock consistensy bug in cifs_setlk
+Date: Wed, 28 Nov 2012 18:23:43 +0400
+Message-ID: <1354112625-30315-5-git-send-email-piastry@etersoft.ru>
 References: <1354112625-30315-1-git-send-email-piastry@etersoft.ru>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,76 +9,42 @@ In-Reply-To: <1354112625-30315-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+If we netogiate mandatory locking style, have a read lock and try
+to set a write lock we end up with a write lock in vfs cache and
+no lock in cifs lock cache - that's wrong. Fix it by returning
+from cifs_setlk immediately if a error occurs during setting a lock.
+
 Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/file.c |   32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+ fs/cifs/file.c |    8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index be0c3ea..54541a6 100644
+index a18c9eb..f8fe1bd 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -1047,9 +1047,8 @@ struct lock_to_push {
- };
+@@ -1449,16 +1449,18 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
+ 			return -ENOMEM;
  
- static int
--cifs_push_posix_locks(struct cifsFileInfo *cfile)
-+cifs_push_posix_locks_locked(struct cifsFileInfo *cfile)
- {
--	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
- 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
- 	struct file_lock *flock, **before;
- 	unsigned int count = 0, i = 0;
-@@ -1060,14 +1059,6 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
+ 		rc = cifs_lock_add_if(cfile, lock, wait_flag);
+-		if (rc < 0)
++		if (rc < 0) {
+ 			kfree(lock);
+-		if (rc <= 0)
++			return rc;
++		}
++		if (!rc)
+ 			goto out;
  
- 	xid = get_xid();
+ 		rc = server->ops->mand_lock(xid, cfile, flock->fl_start, length,
+ 					    type, 1, 0, wait_flag);
+ 		if (rc) {
+ 			kfree(lock);
+-			goto out;
++			return rc;
+ 		}
  
--	/* we are going to update can_cache_brlcks here - need a write access */
--	down_write(&cinode->lock_sem);
--	if (!cinode->can_cache_brlcks) {
--		up_write(&cinode->lock_sem);
--		free_xid(xid);
--		return rc;
--	}
--
- 	lock_flocks();
- 	cifs_for_each_lock(cfile->dentry->d_inode, before) {
- 		if ((*before)->fl_flags & FL_POSIX)
-@@ -1133,9 +1124,6 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
- 	}
- 
- out:
--	cinode->can_cache_brlcks = false;
--	up_write(&cinode->lock_sem);
--
- 	free_xid(xid);
- 	return rc;
- err_out:
-@@ -1147,6 +1135,24 @@ err_out:
- }
- 
- static int
-+cifs_push_posix_locks(struct cifsFileInfo *cfile)
-+{
-+	struct cifsInodeInfo *cinode = CIFS_I(cfile->dentry->d_inode);
-+	int rc = 0;
-+
-+	/* we are going to update can_cache_brlcks here - need a write access */
-+	down_write(&cinode->lock_sem);
-+	if (!cinode->can_cache_brlcks) {
-+		up_write(&cinode->lock_sem);
-+		return rc;
-+	}
-+	rc = cifs_push_posix_locks_locked(cfile);
-+	cinode->can_cache_brlcks = false;
-+	up_write(&cinode->lock_sem);
-+	return rc;
-+}
-+
-+static int
- cifs_push_locks(struct cifsFileInfo *cfile)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(cfile->dentry->d_sb);
+ 		cifs_lock_add(cfile, lock);
 -- 
 1.7.10.4
