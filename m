@@ -1,124 +1,55 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v2 6/6] CIFS: Fix write after setting a read lock for read oplock files
-Date: Wed, 28 Nov 2012 18:23:45 +0400
-Message-ID: <1354112625-30315-7-git-send-email-piastry@etersoft.ru>
-References: <1354112625-30315-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH 5/5] CIFS: Fix write after setting a read lock for read
+ oplock files
+Date: Wed, 28 Nov 2012 09:29:46 -0500
+Message-ID: <20121128092946.26ad15f2@tlielax.poochiereds.net>
+References: <1353999029-3975-1-git-send-email-piastry@etersoft.ru>
+	<1353999029-3975-6-git-send-email-piastry@etersoft.ru>
+	<20121127075203.7b0d8de6@tlielax.poochiereds.net>
+	<CAKywueSb3q3-6whESnqrvPc2o0ka8GZepz0JmQGTzyRki4Bh1Q@mail.gmail.com>
+	<20121128063614.12d7b0a7@tlielax.poochiereds.net>
+	<CAKywueTu8Tank1xTNgMBGhcD72L5_oM=UKVsPLACW4pT5u4wGg@mail.gmail.com>
+	<20121128090224.76b06521@tlielax.poochiereds.net>
+	<CAKywueQ4VjhraeAW-U75h8hR62g-J6Qzc+kYhcS6bW2AFo29LA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1354112625-30315-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <CAKywueQ4VjhraeAW-U75h8hR62g-J6Qzc+kYhcS6bW2AFo29LA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we have a read oplock and set a read lock in it, we can't write to the
-locked area - so, filemap_fdatawrite may fail with a no information for a
-userspace application even if we request a write to non-locked area. Fix
-this by checking for brlocks, populating the page cache without marking
-affected pages dirty and directly writing to the server.
+On Wed, 28 Nov 2012 18:07:46 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-Also remove CONFIG_CIFS_SMB2 ifdefs because it's suitable for both CIFS
-and SMB2 protocols.
+> 2012/11/28 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> > On Wed, 28 Nov 2012 17:55:41 +0400
+> > Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> >
+> >> 2012/11/28 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> >> > There's also a lot of logic around what sort of locking you're doing
+> >> > here too. I think we ought to do the same sort of I/O regardless of
+> >> > whether POSIX locks are being used or not.
+> >>
+> >> We can use cifs_writev for both POSIX and mandatory variants but I
+> >> divided them to make POSIX variant work faster (no need to check hold
+> >> a semaphore, walk through a lock list, etc).
+> >>
+> >
+> > Refresh my memory -- why do we need to handle writes differently when
+> > POSIX vs. non-POSIX locking is in force? It seems to me that that
+> > shouldn't matter and the behavior should be solely a function of what
+> > sort of oplock you have.
+> 
+> A write request can have conflict with mandatory locks set on a file.
+> That's why we need to check for lock conflicts before issue the
+> write/read.
+> 
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
----
- fs/cifs/file.c |   63 +++++++++++++++++++++++++++++---------------------------
- 1 file changed, 33 insertions(+), 30 deletions(-)
+Hmmm...and the server might not know about the lock if it's cached.
+Fair enough.
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e7fc39c..5cfed9c 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2109,7 +2109,14 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
- 	} else {
- 		rc = copied;
- 		pos += copied;
--		set_page_dirty(page);
-+		/*
-+		 * If we don't have write oplock and use the strict cache mode,
-+		 * we can leave pages clean - cifs_strict_writev will send a
-+		 * data to the server itself.
-+		 */
-+		if (CIFS_I(inode)->clientCanCacheAll ||
-+		    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
-+			set_page_dirty(page);
- 	}
- 
- 	if (rc > 0) {
-@@ -2460,8 +2467,8 @@ ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
- }
- 
- static ssize_t
--cifs_writev(struct kiocb *iocb, const struct iovec *iov,
--	    unsigned long nr_segs, loff_t pos)
-+cifs_pagecache_writev(struct kiocb *iocb, const struct iovec *iov,
-+		      unsigned long nr_segs, loff_t pos)
- {
- 	struct file *file = iocb->ki_filp;
- 	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
-@@ -2511,25 +2518,26 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
- 	struct cifsFileInfo *cfile = (struct cifsFileInfo *)
- 						iocb->ki_filp->private_data;
- 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-+	ssize_t written;
- 
--#ifdef CONFIG_CIFS_SMB2
--	/*
--	 * If we have an oplock for read and want to write a data to the file
--	 * we need to store it in the page cache and then push it to the server
--	 * to be sure the next read will get a valid data.
--	 */
--	if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
--		ssize_t written;
--		int rc;
--
--		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
--		rc = filemap_fdatawrite(inode->i_mapping);
--		if (rc)
--			return (ssize_t)rc;
--
--		return written;
-+	/* we have a read oplock - need to store a data in the page cache */
-+	if (cinode->clientCanCacheRead) {
-+		if (cap_unix(tcon->ses) &&
-+		    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
-+		    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
-+						tcon->fsUnixInfo.Capability)))
-+			written = generic_file_aio_write(iocb, iov, nr_segs,
-+							 pos);
-+		else
-+			written = cifs_pagecache_writev(iocb, iov, nr_segs,
-+							pos);
-+		/*
-+		 * Errors occured during writing or we have read+write oplock -
-+		 * no need to flush to the server.
-+		 */
-+		if (written < 0 || cinode->clientCanCacheAll)
-+			return written;
- 	}
--#endif
- 
- 	/*
- 	 * For non-oplocked files in strict cache mode we need to write the data
-@@ -2537,16 +2545,11 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
- 	 * affected pages because it may cause a error with mandatory locks on
- 	 * these pages but not on the region from pos to ppos+len-1.
- 	 */
--
--	if (!cinode->clientCanCacheAll)
--		return cifs_user_writev(iocb, iov, nr_segs, pos);
--
--	if (cap_unix(tcon->ses) &&
--	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
--	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
--		return generic_file_aio_write(iocb, iov, nr_segs, pos);
--
--	return cifs_writev(iocb, iov, nr_segs, pos);
-+	written = cifs_user_writev(iocb, iov, nr_segs, pos);
-+	/* need to restore pos if errors occured */
-+	if (written < 0)
-+		iocb->ki_pos = pos;
-+	return written;
- }
- 
- static struct cifs_readdata *
 -- 
-1.7.10.4
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
