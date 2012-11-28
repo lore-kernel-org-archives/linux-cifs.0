@@ -1,26 +1,40 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: exec of files off cifs mounts can fail
-Date: Wed, 28 Nov 2012 14:17:31 -0600
-Message-ID: <CAH2r5mtoZ79xo2LFPsTzxPEYobYAfJ4LReOkKad4pzDrGdr+LA@mail.gmail.com>
+Subject: [GIT] CIFS Fixes
+Date: Wed, 28 Nov 2012 14:27:00 -0600
+Message-ID: <CAH2r5mtPxmxjLRf7WLwa0k6aMsaPrm1neuQhbSfV+9+evkk-OQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Discovered something interesting testing cifs.  When you mount cifs
-with "user=your-username" instead of "username=your-username" you can
-confuse mount about whether to allow executing files on the mount, at
-least mount from util-linux 2.21.2 (libmount 2.21.0: selinux, debug)
+The following changes since commit 5e351cdc998db82935d1248a053a1be37d1160fd:
 
-Basically if you mount with "user=" this version of mount assumes it
-is a non-root initiated mount and turns off exec (also sets nosuid and
-nodev).  To workaround this if executing a program fails on a cifs
-mount, you can mount specifying "username=" instead of "user=" or you
-can simply append "exec" to the mount options.
+  Merge tag 'devicetree-for-linus' of
+git://git.secretlab.ca/git/linux-2.6 (2012-11-23 12:36:06 -1000)
 
+are available in the git repository at:
+
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-linus
+
+for you to fetch changes up to c772aa92b6deb2857d4b39a5cc3bd3679cc5f4a6:
+
+  CIFS: Fix wrong buffer pointer usage in smb_set_file_info
+(2012-11-28 10:02:46 -0600)
+
+----------------------------------------------------------------
+Jeff Layton (1):
+      cifs: fix writeback race with file that is growing
+
+Pavel Shilovsky (1):
+      CIFS: Fix wrong buffer pointer usage in smb_set_file_info
+
+ fs/cifs/file.c    | 6 +++---
+ fs/cifs/smb1ops.c | 3 +--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
 -- 
 Thanks,
