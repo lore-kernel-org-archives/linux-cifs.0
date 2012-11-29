@@ -1,82 +1,61 @@
-From: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-Subject: RE: Possible to make nfs aware of a inotify watch has been set.
-Date: Thu, 29 Nov 2012 14:03:28 +0000
-Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Possible to make nfs aware of a inotify watch has been set.
+Date: Thu, 29 Nov 2012 15:49:00 +0100
+Message-ID: <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
 References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
+	<4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD-VGJ86jkg8PeBTCzCEi1xmXOR4cbS7gtM96Bgd4bDwmQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1uZnMtb3duZXJAdmdl
-ci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtbmZzLQ0KPiBvd25lckB2Z2VyLmtlcm5lbC5vcmdd
-IE9uIEJlaGFsZiBPZiBTdGVmIEJvbg0KPiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMjksIDIw
-MTIgNDozMyBBTQ0KPiBUbzogbGludXgtbmZzQHZnZXIua2VybmVsLm9yZw0KPiBDYzogbGludXgt
-Y2lmcw0KPiBTdWJqZWN0OiBQb3NzaWJsZSB0byBtYWtlIG5mcyBhd2FyZSBvZiBhIGlub3RpZnkg
-d2F0Y2ggaGFzIGJlZW4gc2V0Lg0KPiANCj4gSGksDQo+IA0KPiBhcyBmYXIgYXMgSSBrbm93IGlu
-ZGl2aWR1YWwgZmlsZXN5c3RlbXMgYXJlIG5vdCBhd2FyZSBhbiBpbm90aWZ5IHdhdGNoIGhhcw0K
-PiBiZWVuIHNldCBvbiBhIGlub2RlIG1hbmFnZWQgYnkgdGhhdCBmaWxlc3lzdGVtLg0KPiANCj4g
-Rm9yIGxvY2FsIG9ubHkgZmlsZXN5c3RlbXMgbGlrZSBleHQyLzMvNCBldGNldGVyYSB0aGlzIGlz
-IG5vIHByb2JsZW0uDQo+IEJ1dCB3aXRoIG5ldHdvcmsgZmlsZXN5c3RlbXMNCj4gbGlrZSBuZnMg
-YW5kIGNpZnMgKGFuZCBhbHNvIGZ1c2UgdHlwZXMpIHRoaXMgaXMgbm90IGlkZWFsLCBzaW5jZSBj
-aGFuZ2VzIG1hZGUgYnkNCj4gb3RoZXJzIChzaW5jZSB0aGUgYmFja2VuZCBpcyBzaGFyZWQgd2l0
-aCBvdGhlcnMpIGFyZSBuZXZlciB3YXRjaGVkLg0KPiANCj4gSSdtIHdvcmtpbmcgb24gYSBmaWxl
-c3lzdGVtIGNoYW5nZSB3YXRjaGVyIG5vdGlmeWZzLCBhbmQgcHV6emxpbmcgYWxyZWFkeSBmb3IN
-Cj4gYSBsb25nIHRpbWUgaG93dG8gZW5hYmxlIHRoZSB3YXRjaGluZyBvZiBmcyBldmVudHMgb24g
-dGhlc2UgZmlsZXN5c3RlbXMuDQo+IA0KPiBJJ3ZlIHNvbWUgaWRlYSdzOg0KPiANCj4gYS4gbm90
-aWZ5ZnMgaXMgd29ya2luZyBvbiB0aGUgbG9jYWwgKEEpIGFuZCB0aGUgcmVtb3RlIGhvc3QgKEIp
-LCBhbmQgaXMgZG9pbmcgaXQncw0KPiB0aGluZyB3aXRob3V0IHVzaW5nIHRoZSBmaWxlc3lzdGVt
-LiBXaGVuIGEgY2xpZW50IGNvbnRhY3RzIG5vdGlmeWZzIHRvIHNldCBhDQo+IHdhdGNoIG9uIGEg
-bmZzIChvciBjaWZzKSBzaGFyZSwgbm90aWZ5ZnMgZGV0ZWN0cyBpdCBhIG5mcyBzaGFyZS4gSXQg
-ZmluZHMgb3V0IHRoZQ0KPiByZW1vdGUgaG9zdCBieSBhbmFseXppbmcgdGhlIG1vdW50LCBhbmQg
-Z2V0cyB0aGUgZGV0YWlscyBsaWtlIHJlbW90ZQ0KPiBhZGRyZXNzIGFuZCBkaXJlY3RvcnkuIFdp
-dGggbmZzIHRoYXQncyBlYXN5LCBzaW5jZSB0aGUgbW91bnQgaXMgbGlrZQ0KPiByZW1vdGVob3N0
-Oi9kaXJlY3RvcnksIHdpdGggY2lmcyB0aGlzIGlzIGEgYml0IG1vcmUgZGlmZmljdWx0LCBidXQg
-ZG9hYmxlLg0KPiBBZnRlciBnZXR0aW5nIHRoZSBkZXRhaWxzLCBpdCBjYW4gZm9yd2FyZCB0aGUg
-d2F0Y2ggdG8gdGhlIHJlbW90ZSBob3N0IChCKSwgb24NCj4gd2hpY2ggYWxzbyBub3RpZnlmcyBp
-cyBydW5uaW5nLCBhbmQgbGlzdG5pbmcgdG8gYSB0Y3AgcG9ydC4NCj4gVGhpcyBub3RpZnlmcyBw
-cm9jZXNzIG9uIGhpcyB0dXJuIHdhdGNoZXMgdGhlIGRlc2lyZWQgZnMgb2JqZWN0IHVzaW5nIHRo
-ZQ0KPiBhYmlsaXRpZXMgb24gdGhhdCBob3N0LCBhbmQgc2VuZHMgYW55dGhpbmcgYmFjayB0byB0
-aGUgbG9jYWwgaG9zdCAoQSkuDQo+IA0KPiBJJ3ZlIGV4cGVyaW1lbnRlZCB3aXRoIHRoaXMsIGFu
-ZCBnb3QgaXQgd29ya2luZyB3aGVuIHVzaW5nIHNzaGZzLg0KPiANCj4gVGhpcyBpcyB2ZXJ5IGVh
-c3kgdG8gc2V0dXAsIGFuZCBzaW1wbGUgdG8gdW5kZXJzdGFuZCwgYnV0IHNvbWUgZHJhd2JhY2tz
-Og0KPiANCj4gMS4gd2hpbGUgdGhlIGZpbGVzeXN0ZW1zIGFyZSB1c2luZyBjcmVkZW50YWlscyBv
-ciB0aWNrZXRzIHRvIGdldCBhY2Nlc3MgdG8gYQ0KPiByZW1vdGUgcmVzb3VyY2UsIHRoaXMgaXMg
-YSBiaXQgZGlmZmljdWx0IGZvciBub3RpZnlmcy4NCj4gTm90aWZ5ZnMgYnlwYXNzZXMgdGhhdC4g
-TWF5YmUgdGhpcyBsZWFkcyB0byBwZXJtaXNzaW9ucy9hYnVzZSBJIGNhbm5vdCBzZWUNCj4gZGly
-ZWN0bHkuDQoNCkxhY2sgb2Ygc2VjdXJpdHkgaXMgYSBzaG93c3RvcHBlci4gVGhlcmUgYXJlIGdv
-b2QgcmVhc29ucyB3aHkgaW5vdGlmeSB3b24ndCBhbGxvdyB5b3UgdG8gbW9uaXRvciBmaWxlcyBm
-b3Igd2hpY2ggeW91IGRvbid0IGhhdmUgYWNjZXNzIHBlcm1pc3Npb25zLg0KDQo+IDIuIHRoZSBm
-aWxlc3lzdGVtIHN0aWxsIGRvZXMgbm90IGtub3cgdGhhdCBzb21ldGhpbmcgaGFzIGNoYW5nZWQg
-KG9uIEIpLiBJdA0KPiBzaG91bGQgYmUgbWFkZSBhd2FyZSBhcyBmYXN0IGFzIHBvc3NpYmxlIHRv
-IG1ha2UgdGhlIGNoYW5nZXMgZWZmZWN0aXZlIG9uDQo+IGxvY2FsaG9zdCBBLiBNYXliZSBub3Rp
-ZnlmcyBzaG91bGQganVzdCB0cmlnZ2VyIHRoYXQgYnkgZG9pbmcgYSBsb29rdXAgb24gYW4NCj4g
-ZW50cnkgd2hlbiBpdCBoYXMgYmVlbiByZW1vdmVkIG9uIHRoZSByZW1vdGUgaG9zdCBmb3IgZXhh
-bXBsZS4NCj4gDQo+IGIuIG5vdGlmeWZzIGZvcndhcmRzIHRoZSB3YXRjaCB0byBuZnMgKGFuZCBj
-aWZzKSB1c2luZyBuZXRsaW5rLiBTaW5jZSBuZnMgYW5kDQo+IGNpZnMgYXJlIGluIGtlcm5lbHNw
-YWNlLCBhbmQgbm90aWZ5ZnMgaXMgaW4gdXNlcnNwYWNlLCBuZXRsaW5rIGlzIHRoZSB3YXkgdG8g
-Z28gdG8NCj4gY29tbXVuaWNhdGUuVGhpcyBpcyBwb3NzaWJsZSwgYW5kIEkndmUgdGhvdWdodCB0
-aGlzIGlzIHRoZSBiZXN0IHdheSB0byBnbyBmb3IgYQ0KPiBsb25nIHRpbWUsIGJ1dCBjb21wbGlj
-YXRlZCB3aGVuIGNvbXBhcmVkIHRvIHRoZSBsYXN0IG1ldGhvZDoNCj4gDQo+IGMuICBtYWtlIGZp
-bGVzeXN0ZW1zIGxpa2UgbmZzIGFuZCBjaWZzIGF3YXJlIGEgaW5vdGlmeSB3YXRjaCBoYXMgYmVl
-biBzZXQuIFVudGlsbA0KPiBub3cgdGhlIGZpbGVzeXN0ZW1zIHNlbGYgYXJlIHRvdGFsbHkgbm90
-IG5vdGlmaWVkIGEgd2F0Y2ggaGFzIGJlZW4gc2V0IChhbmQgb2YNCj4gY291cnNlIGFsc28gY2hh
-bmdlZC9yZW1vdmVkKS4gVGhpcyBpcyBieSBkZXNpZ24uDQo+IEZvciBsb2NhbCBmaWxlc3lzdGVt
-cyBpdCdzIG5vdCByZXF1aXJlZCwgaXQgd2lsbCBub3QgZ2V0IGFueSBleHRyYSwgYnV0IG5mcyBh
-bmQgY2lmcw0KPiBhbmQgZnVzZSBmcydzIGNhbiB1c2UgdGhpcyBpbmZvIHRvIHNldCBhIHdhdGNo
-IG9uIHRoZSBiYWNrZW5kIHVzaW5nIHRoZQ0KPiBtZXRob2RzL2FwaSBzcGVjaWZpYyB0byB0aGUg
-ZmlsZXN5c3RlbS4gRm9yIGV4YW1wbGUgY2lmcyB3aWxsIHNlbmQgYQ0KPiBTTUIyX0NIQU5HRV9O
-T1RJRlkgdG8gdGhlIHNlcnZlciwgYW5kIHdhaXRpbmcgZm9yIHJlc3VsdHMuDQo+IA0KPiBXaGF0
-IGRvIHlvdSB0aGluaywgaXMgdGhlIGxhdGVzdCBvcHRpb24gcG9zc2libGU/Pw0KDQpTbyB3aGF0
-IGlzIHRoZSBraWxsZXIgYXBwIGZvciBpbm90aWZ5IG9uIE5GUy9DSUZTL0ZVU0U/IFdoYXQgcHJv
-Z3JhbXMgZG8geW91IG5lZWQgdG8gcnVuIG9uIGEgTkZTL0NJRlMvRlVTRSBjbGllbnQgdGhhdCB1
-c2UgaW5vdGlmeSBhbmQgdGhhdCB3b3VsZG4ndCBiZSBiZXR0ZXIgb2ZmIHJ1bm5pbmcgb24gdGhl
-IHNlcnZlciBpbnN0ZWFkPw0KDQpJT1c6IHdob3NlIHByb2JsZW0gYXJlIHlvdSB0cnlpbmcgdG8g
-c29sdmU/DQoNClRyb25kDQo=
+2012/11/29 Myklebust, Trond <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>:
+>> -----Original Message-----
+>>
+>> 1. while the filesystems are using credentails or tickets to get access to a
+>> remote resource, this is a bit difficult for notifyfs.
+>> Notifyfs bypasses that. Maybe this leads to permissions/abuse I cannot see
+>> directly.
+>
+> Lack of security is a showstopper. There are good reasons why inotify won't allow you to monitor files for which you don't have access permissions.
+>
+
+Let me explain, I think you not understand fully.
+
+Notifyfs does not allow users/clients to set a watch if there are no
+read permissions (the object and access for the whole path to it), so
+there are no security issues there.
+
+What I mean is that any program can contact the remote notifyfs
+server, and this remote notifyfs server cannot figure out it's a valid
+request from another notifyfs server, or a program faking that.
+In the construction I describe it does not check that (yet).
+
+>>
+>> What do you think, is the latest option possible??
+>
+> So what is the killer app for inotify on NFS/CIFS/FUSE? What programs do you need to run on a NFS/CIFS/FUSE client that use inotify and that wouldn't be better off running on the server instead?
+>
+
+What do you mean with "better off running on the server instead"?
+There are a lot of programs interested in fs changes, like a simple
+file manager. I think it's a very nice feature to see changes right
+away in the view.
+It's not a killer app, but a think the whole user experience is
+improving when your system is able to keep a view (like a view in the
+file manager) up to date.
+
+> IOW: whose problem are you trying to solve?
+
+I think that enabling fs notify on network filesystems like nfs, cifs
+and fuse is a good thing (see above). On systems like Windows and iOS
+since long time this works.
+
+You do not agree??
+
+Stef Bon
