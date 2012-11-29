@@ -1,60 +1,71 @@
-From: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-Subject: RE: Possible to make nfs aware of a inotify watch has been set.
-Date: Thu, 29 Nov 2012 14:54:00 +0000
-Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B329DFF@SACEXCMBX04-PRD.hq.netapp.com>
+From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: Possible to make nfs aware of a inotify watch has been set.
+Date: Thu, 29 Nov 2012 10:22:05 -0500
+Message-ID: <1354202525.4064.1.camel@pico.ipa.ssimo.org>
 References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
-	<4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
- <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
+	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
+	 <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 In-Reply-To: <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTdGVmIEJvbiBbbWFpbHRvOnN0
-ZWZib25AZ21haWwuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMjksIDIwMTIgOTo0
-OSBBTQ0KPiBUbzogTXlrbGVidXN0LCBUcm9uZA0KPiBDYzogbGludXgtbmZzQHZnZXIua2VybmVs
-Lm9yZzsgbGludXgtY2lmcw0KPiBTdWJqZWN0OiBSZTogUG9zc2libGUgdG8gbWFrZSBuZnMgYXdh
-cmUgb2YgYSBpbm90aWZ5IHdhdGNoIGhhcyBiZWVuIHNldC4NCj4gDQo+IDIwMTIvMTEvMjkgTXlr
-bGVidXN0LCBUcm9uZCA8VHJvbmQuTXlrbGVidXN0QG5ldGFwcC5jb20+Og0KPiA+PiAtLS0tLU9y
-aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pg0KPiA+PiAxLiB3aGlsZSB0aGUgZmlsZXN5c3RlbXMg
-YXJlIHVzaW5nIGNyZWRlbnRhaWxzIG9yIHRpY2tldHMgdG8gZ2V0DQo+ID4+IGFjY2VzcyB0byBh
-IHJlbW90ZSByZXNvdXJjZSwgdGhpcyBpcyBhIGJpdCBkaWZmaWN1bHQgZm9yIG5vdGlmeWZzLg0K
-PiA+PiBOb3RpZnlmcyBieXBhc3NlcyB0aGF0LiBNYXliZSB0aGlzIGxlYWRzIHRvIHBlcm1pc3Np
-b25zL2FidXNlIEkNCj4gPj4gY2Fubm90IHNlZSBkaXJlY3RseS4NCj4gPg0KPiA+IExhY2sgb2Yg
-c2VjdXJpdHkgaXMgYSBzaG93c3RvcHBlci4gVGhlcmUgYXJlIGdvb2QgcmVhc29ucyB3aHkgaW5v
-dGlmeSB3b24ndA0KPiBhbGxvdyB5b3UgdG8gbW9uaXRvciBmaWxlcyBmb3Igd2hpY2ggeW91IGRv
-bid0IGhhdmUgYWNjZXNzIHBlcm1pc3Npb25zLg0KPiA+DQo+IA0KPiBMZXQgbWUgZXhwbGFpbiwg
-SSB0aGluayB5b3Ugbm90IHVuZGVyc3RhbmQgZnVsbHkuDQo+IA0KPiBOb3RpZnlmcyBkb2VzIG5v
-dCBhbGxvdyB1c2Vycy9jbGllbnRzIHRvIHNldCBhIHdhdGNoIGlmIHRoZXJlIGFyZSBubyByZWFk
-DQo+IHBlcm1pc3Npb25zICh0aGUgb2JqZWN0IGFuZCBhY2Nlc3MgZm9yIHRoZSB3aG9sZSBwYXRo
-IHRvIGl0KSwgc28gdGhlcmUgYXJlIG5vDQo+IHNlY3VyaXR5IGlzc3VlcyB0aGVyZS4NCj4gDQo+
-IFdoYXQgSSBtZWFuIGlzIHRoYXQgYW55IHByb2dyYW0gY2FuIGNvbnRhY3QgdGhlIHJlbW90ZSBu
-b3RpZnlmcyBzZXJ2ZXIsIGFuZA0KPiB0aGlzIHJlbW90ZSBub3RpZnlmcyBzZXJ2ZXIgY2Fubm90
-IGZpZ3VyZSBvdXQgaXQncyBhIHZhbGlkIHJlcXVlc3QgZnJvbSBhbm90aGVyDQo+IG5vdGlmeWZz
-IHNlcnZlciwgb3IgYSBwcm9ncmFtIGZha2luZyB0aGF0Lg0KPiBJbiB0aGUgY29uc3RydWN0aW9u
-IEkgZGVzY3JpYmUgaXQgZG9lcyBub3QgY2hlY2sgdGhhdCAoeWV0KS4NCj4gDQo+ID4+DQo+ID4+
-IFdoYXQgZG8geW91IHRoaW5rLCBpcyB0aGUgbGF0ZXN0IG9wdGlvbiBwb3NzaWJsZT8/DQo+ID4N
-Cj4gPiBTbyB3aGF0IGlzIHRoZSBraWxsZXIgYXBwIGZvciBpbm90aWZ5IG9uIE5GUy9DSUZTL0ZV
-U0U/IFdoYXQgcHJvZ3JhbXMgZG8NCj4geW91IG5lZWQgdG8gcnVuIG9uIGEgTkZTL0NJRlMvRlVT
-RSBjbGllbnQgdGhhdCB1c2UgaW5vdGlmeSBhbmQgdGhhdCB3b3VsZG4ndA0KPiBiZSBiZXR0ZXIg
-b2ZmIHJ1bm5pbmcgb24gdGhlIHNlcnZlciBpbnN0ZWFkPw0KPiA+DQo+IA0KPiBXaGF0IGRvIHlv
-dSBtZWFuIHdpdGggImJldHRlciBvZmYgcnVubmluZyBvbiB0aGUgc2VydmVyIGluc3RlYWQiPw0K
-PiBUaGVyZSBhcmUgYSBsb3Qgb2YgcHJvZ3JhbXMgaW50ZXJlc3RlZCBpbiBmcyBjaGFuZ2VzLCBs
-aWtlIGEgc2ltcGxlIGZpbGUNCj4gbWFuYWdlci4gSSB0aGluayBpdCdzIGEgdmVyeSBuaWNlIGZl
-YXR1cmUgdG8gc2VlIGNoYW5nZXMgcmlnaHQgYXdheSBpbiB0aGUgdmlldy4NCj4gSXQncyBub3Qg
-YSBraWxsZXIgYXBwLCBidXQgYSB0aGluayB0aGUgd2hvbGUgdXNlciBleHBlcmllbmNlIGlzIGlt
-cHJvdmluZyB3aGVuDQo+IHlvdXIgc3lzdGVtIGlzIGFibGUgdG8ga2VlcCBhIHZpZXcgKGxpa2Ug
-YSB2aWV3IGluIHRoZSBmaWxlIG1hbmFnZXIpIHVwIHRvDQo+IGRhdGUuDQo+IA0KPiA+IElPVzog
-d2hvc2UgcHJvYmxlbSBhcmUgeW91IHRyeWluZyB0byBzb2x2ZT8NCj4gDQo+IEkgdGhpbmsgdGhh
-dCBlbmFibGluZyBmcyBub3RpZnkgb24gbmV0d29yayBmaWxlc3lzdGVtcyBsaWtlIG5mcywgY2lm
-cyBhbmQgZnVzZSBpcw0KPiBhIGdvb2QgdGhpbmcgKHNlZSBhYm92ZSkuIE9uIHN5c3RlbXMgbGlr
-ZSBXaW5kb3dzIGFuZCBpT1Mgc2luY2UgbG9uZyB0aW1lDQo+IHRoaXMgd29ya3MuDQo+IA0KPiBZ
-b3UgZG8gbm90IGFncmVlPz8NCg0KTm8uIEkgbGlrZSBoYXZpbmcgYSByZWFzb24gZm9yIGFkZGlu
-ZyBrZXJuZWwgZnVuY3Rpb25hbGl0eS4NCg0KVHJvbmQNCiANCg==
+On Thu, 2012-11-29 at 15:49 +0100, Stef Bon wrote:
+> 2012/11/29 Myklebust, Trond <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>:
+> >> -----Original Message-----
+> >>
+> >> 1. while the filesystems are using credentails or tickets to get access to a
+> >> remote resource, this is a bit difficult for notifyfs.
+> >> Notifyfs bypasses that. Maybe this leads to permissions/abuse I cannot see
+> >> directly.
+> >
+> > Lack of security is a showstopper. There are good reasons why inotify won't allow you to monitor files for which you don't have access permissions.
+> >
+> 
+> Let me explain, I think you not understand fully.
+> 
+> Notifyfs does not allow users/clients to set a watch if there are no
+> read permissions (the object and access for the whole path to it), so
+> there are no security issues there.
+> 
+> What I mean is that any program can contact the remote notifyfs
+> server, and this remote notifyfs server cannot figure out it's a valid
+> request from another notifyfs server, or a program faking that.
+> In the construction I describe it does not check that (yet).
+> 
+> >>
+> >> What do you think, is the latest option possible??
+> >
+> > So what is the killer app for inotify on NFS/CIFS/FUSE? What programs do you need to run on a NFS/CIFS/FUSE client that use inotify and that wouldn't be better off running on the server instead?
+> >
+> 
+> What do you mean with "better off running on the server instead"?
+> There are a lot of programs interested in fs changes, like a simple
+> file manager. I think it's a very nice feature to see changes right
+> away in the view.
+> It's not a killer app, but a think the whole user experience is
+> improving when your system is able to keep a view (like a view in the
+> file manager) up to date.
+> 
+> > IOW: whose problem are you trying to solve?
+> 
+> I think that enabling fs notify on network filesystems like nfs, cifs
+> and fuse is a good thing (see above). On systems like Windows and iOS
+> since long time this works.
+
+CIFS has notification capabilities built in (oplocks), as does NFS
+(leases), is this not sufficient ?
+
+Simo.
+
+-- 
+Simo Sorce
+Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
