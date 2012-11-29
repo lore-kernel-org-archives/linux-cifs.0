@@ -1,71 +1,73 @@
-From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
 Subject: Re: Possible to make nfs aware of a inotify watch has been set.
-Date: Thu, 29 Nov 2012 10:22:05 -0500
-Message-ID: <1354202525.4064.1.camel@pico.ipa.ssimo.org>
+Date: Thu, 29 Nov 2012 15:33:07 +0000
+Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7@SACEXCMBX04-PRD.hq.netapp.com>
 References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
 	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
 	 <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
+	 <1354202525.4064.1.camel@pico.ipa.ssimo.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1354202525.4064.1.camel-fj0lwfvWodpMy5p6ylGyhR2eb7JE58TQ@public.gmane.org>
+Content-Language: en-US
+Content-ID: <DC2567EDCB9B70448FCAB2DFBD1DF17B-oP88Kt8RkgzdA/Lu/QRl1Q@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 2012-11-29 at 15:49 +0100, Stef Bon wrote:
-> 2012/11/29 Myklebust, Trond <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>:
-> >> -----Original Message-----
-> >>
-> >> 1. while the filesystems are using credentails or tickets to get access to a
-> >> remote resource, this is a bit difficult for notifyfs.
-> >> Notifyfs bypasses that. Maybe this leads to permissions/abuse I cannot see
-> >> directly.
-> >
-> > Lack of security is a showstopper. There are good reasons why inotify won't allow you to monitor files for which you don't have access permissions.
-> >
-> 
-> Let me explain, I think you not understand fully.
-> 
-> Notifyfs does not allow users/clients to set a watch if there are no
-> read permissions (the object and access for the whole path to it), so
-> there are no security issues there.
-> 
-> What I mean is that any program can contact the remote notifyfs
-> server, and this remote notifyfs server cannot figure out it's a valid
-> request from another notifyfs server, or a program faking that.
-> In the construction I describe it does not check that (yet).
-> 
-> >>
-> >> What do you think, is the latest option possible??
-> >
-> > So what is the killer app for inotify on NFS/CIFS/FUSE? What programs do you need to run on a NFS/CIFS/FUSE client that use inotify and that wouldn't be better off running on the server instead?
-> >
-> 
-> What do you mean with "better off running on the server instead"?
-> There are a lot of programs interested in fs changes, like a simple
-> file manager. I think it's a very nice feature to see changes right
-> away in the view.
-> It's not a killer app, but a think the whole user experience is
-> improving when your system is able to keep a view (like a view in the
-> file manager) up to date.
-> 
-> > IOW: whose problem are you trying to solve?
-> 
-> I think that enabling fs notify on network filesystems like nfs, cifs
-> and fuse is a good thing (see above). On systems like Windows and iOS
-> since long time this works.
-
-CIFS has notification capabilities built in (oplocks), as does NFS
-(leases), is this not sufficient ?
-
-Simo.
-
--- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+T24gVGh1LCAyMDEyLTExLTI5IGF0IDEwOjIyIC0wNTAwLCBzaW1vIHdyb3RlOg0KPiBPbiBUaHUs
+IDIwMTItMTEtMjkgYXQgMTU6NDkgKzAxMDAsIFN0ZWYgQm9uIHdyb3RlOg0KPiA+IDIwMTIvMTEv
+MjkgTXlrbGVidXN0LCBUcm9uZCA8VHJvbmQuTXlrbGVidXN0QG5ldGFwcC5jb20+Og0KPiA+ID4+
+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPj4NCj4gPiA+PiAxLiB3aGlsZSB0aGUg
+ZmlsZXN5c3RlbXMgYXJlIHVzaW5nIGNyZWRlbnRhaWxzIG9yIHRpY2tldHMgdG8gZ2V0IGFjY2Vz
+cyB0byBhDQo+ID4gPj4gcmVtb3RlIHJlc291cmNlLCB0aGlzIGlzIGEgYml0IGRpZmZpY3VsdCBm
+b3Igbm90aWZ5ZnMuDQo+ID4gPj4gTm90aWZ5ZnMgYnlwYXNzZXMgdGhhdC4gTWF5YmUgdGhpcyBs
+ZWFkcyB0byBwZXJtaXNzaW9ucy9hYnVzZSBJIGNhbm5vdCBzZWUNCj4gPiA+PiBkaXJlY3RseS4N
+Cj4gPiA+DQo+ID4gPiBMYWNrIG9mIHNlY3VyaXR5IGlzIGEgc2hvd3N0b3BwZXIuIFRoZXJlIGFy
+ZSBnb29kIHJlYXNvbnMgd2h5IGlub3RpZnkgd29uJ3QgYWxsb3cgeW91IHRvIG1vbml0b3IgZmls
+ZXMgZm9yIHdoaWNoIHlvdSBkb24ndCBoYXZlIGFjY2VzcyBwZXJtaXNzaW9ucy4NCj4gPiA+DQo+
+ID4gDQo+ID4gTGV0IG1lIGV4cGxhaW4sIEkgdGhpbmsgeW91IG5vdCB1bmRlcnN0YW5kIGZ1bGx5
+Lg0KPiA+IA0KPiA+IE5vdGlmeWZzIGRvZXMgbm90IGFsbG93IHVzZXJzL2NsaWVudHMgdG8gc2V0
+IGEgd2F0Y2ggaWYgdGhlcmUgYXJlIG5vDQo+ID4gcmVhZCBwZXJtaXNzaW9ucyAodGhlIG9iamVj
+dCBhbmQgYWNjZXNzIGZvciB0aGUgd2hvbGUgcGF0aCB0byBpdCksIHNvDQo+ID4gdGhlcmUgYXJl
+IG5vIHNlY3VyaXR5IGlzc3VlcyB0aGVyZS4NCj4gPiANCj4gPiBXaGF0IEkgbWVhbiBpcyB0aGF0
+IGFueSBwcm9ncmFtIGNhbiBjb250YWN0IHRoZSByZW1vdGUgbm90aWZ5ZnMNCj4gPiBzZXJ2ZXIs
+IGFuZCB0aGlzIHJlbW90ZSBub3RpZnlmcyBzZXJ2ZXIgY2Fubm90IGZpZ3VyZSBvdXQgaXQncyBh
+IHZhbGlkDQo+ID4gcmVxdWVzdCBmcm9tIGFub3RoZXIgbm90aWZ5ZnMgc2VydmVyLCBvciBhIHBy
+b2dyYW0gZmFraW5nIHRoYXQuDQo+ID4gSW4gdGhlIGNvbnN0cnVjdGlvbiBJIGRlc2NyaWJlIGl0
+IGRvZXMgbm90IGNoZWNrIHRoYXQgKHlldCkuDQo+ID4gDQo+ID4gPj4NCj4gPiA+PiBXaGF0IGRv
+IHlvdSB0aGluaywgaXMgdGhlIGxhdGVzdCBvcHRpb24gcG9zc2libGU/Pw0KPiA+ID4NCj4gPiA+
+IFNvIHdoYXQgaXMgdGhlIGtpbGxlciBhcHAgZm9yIGlub3RpZnkgb24gTkZTL0NJRlMvRlVTRT8g
+V2hhdCBwcm9ncmFtcyBkbyB5b3UgbmVlZCB0byBydW4gb24gYSBORlMvQ0lGUy9GVVNFIGNsaWVu
+dCB0aGF0IHVzZSBpbm90aWZ5IGFuZCB0aGF0IHdvdWxkbid0IGJlIGJldHRlciBvZmYgcnVubmlu
+ZyBvbiB0aGUgc2VydmVyIGluc3RlYWQ/DQo+ID4gPg0KPiA+IA0KPiA+IFdoYXQgZG8geW91IG1l
+YW4gd2l0aCAiYmV0dGVyIG9mZiBydW5uaW5nIG9uIHRoZSBzZXJ2ZXIgaW5zdGVhZCI/DQo+ID4g
+VGhlcmUgYXJlIGEgbG90IG9mIHByb2dyYW1zIGludGVyZXN0ZWQgaW4gZnMgY2hhbmdlcywgbGlr
+ZSBhIHNpbXBsZQ0KPiA+IGZpbGUgbWFuYWdlci4gSSB0aGluayBpdCdzIGEgdmVyeSBuaWNlIGZl
+YXR1cmUgdG8gc2VlIGNoYW5nZXMgcmlnaHQNCj4gPiBhd2F5IGluIHRoZSB2aWV3Lg0KPiA+IEl0
+J3Mgbm90IGEga2lsbGVyIGFwcCwgYnV0IGEgdGhpbmsgdGhlIHdob2xlIHVzZXIgZXhwZXJpZW5j
+ZSBpcw0KPiA+IGltcHJvdmluZyB3aGVuIHlvdXIgc3lzdGVtIGlzIGFibGUgdG8ga2VlcCBhIHZp
+ZXcgKGxpa2UgYSB2aWV3IGluIHRoZQ0KPiA+IGZpbGUgbWFuYWdlcikgdXAgdG8gZGF0ZS4NCj4g
+PiANCj4gPiA+IElPVzogd2hvc2UgcHJvYmxlbSBhcmUgeW91IHRyeWluZyB0byBzb2x2ZT8NCj4g
+PiANCj4gPiBJIHRoaW5rIHRoYXQgZW5hYmxpbmcgZnMgbm90aWZ5IG9uIG5ldHdvcmsgZmlsZXN5
+c3RlbXMgbGlrZSBuZnMsIGNpZnMNCj4gPiBhbmQgZnVzZSBpcyBhIGdvb2QgdGhpbmcgKHNlZSBh
+Ym92ZSkuIE9uIHN5c3RlbXMgbGlrZSBXaW5kb3dzIGFuZCBpT1MNCj4gPiBzaW5jZSBsb25nIHRp
+bWUgdGhpcyB3b3Jrcy4NCj4gDQo+IENJRlMgaGFzIG5vdGlmaWNhdGlvbiBjYXBhYmlsaXRpZXMg
+YnVpbHQgaW4gKG9wbG9ja3MpLCBhcyBkb2VzIE5GUw0KPiAobGVhc2VzKSwgaXMgdGhpcyBub3Qg
+c3VmZmljaWVudCA/DQoNCk5GU3Y0LjEgYWN0dWFsbHkgaGFzIGRpcmVjdG9yeSBub3RpZmljYXRp
+b25zIHdoaWNoIGR1cGxpY2F0ZSBtb3N0IG9mIHRoZQ0KZnVuY3Rpb25hbGl0eSBvZiBkbm90aWZ5
+LiBUaGUgcXVlc3Rpb24gSSdtIGFza2luZyBpcyAiV2h5IHNob3VsZCB3ZSBkbw0KaXQ/Iiwgbm90
+ICJjYW4gd2UgZG8gaXQ/Ii4NCg0KQW5zd2VycyBsaWtlICJ3ZWxsIFdpbmRvd3MgYW5kIGlPUyBk
+byBpdCIgYXJlbid0IGhlbHBmdWwgdW5sZXNzIHRoZXkNCmluY2x1ZGUgYSBkZXNjcmlwdGlvbiBv
+ZiB3aGF0IFdpbmRvd3MgYW5kIGlPUyBhcHBzIHVzZSBpdCBmb3IgdGhhdCB3ZQ0KY2FuJ3QgYWxy
+ZWFkeSBkbyBvbiBMaW51eC4NCklmIHRoZSBvbmx5IGFwcGxpY2F0aW9uIGlzIGJlYWdsZSwgdGhl
+biBMaW51eCBoYXMgdGhpcyByZWFsbHkgaGVscGZ1bA0KdXRpbGl0eSBjYWxsZWQgInNzaCIsIHdo
+aWNoIGFsbG93cyB5b3UgdG8gYXZvaWQgd2FzdGluZyBhIGxvYWQgb2YNCm5ldHdvcmsgYmFuZHdp
+ZHRoLi4uDQoNCi0tIA0KVHJvbmQgTXlrbGVidXN0DQpMaW51eCBORlMgY2xpZW50IG1haW50YWlu
+ZXINCg0KTmV0QXBwDQpUcm9uZC5NeWtsZWJ1c3RAbmV0YXBwLmNvbQ0Kd3d3Lm5ldGFwcC5jb20N
+Cg==
