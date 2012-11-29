@@ -1,56 +1,56 @@
-From: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Possible to make nfs aware of a inotify watch has been set.
-Date: Thu, 29 Nov 2012 17:11:22 +0000
-Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B32B2A0@SACEXCMBX04-PRD.hq.netapp.com>
-References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
-	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
-	 <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
-	 <1354202525.4064.1.camel@pico.ipa.ssimo.org>
-	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7@SACEXCMBX04-PRD.hq.netapp.com>
-	 <CANXojcys4wR8N-R3oSjWRWJLsObn0Qf+i41vBUaNnJctdcrKVw@mail.gmail.com>
+From: Jesper Nilsson <jesper.nilsson-VrBV9hrLPhE@public.gmane.org>
+Subject: [RFQ PATCH] cifs: Change default security error message
+Date: Thu, 29 Nov 2012 18:30:53 +0100
+Message-ID: <20121129173053.GQ27196@axis.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcys4wR8N-R3oSjWRWJLsObn0Qf+i41vBUaNnJctdcrKVw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
-Content-ID: <C1788F905D3E29498E132C35135BCA9D-oP88Kt8RkgzdA/Lu/QRl1Q@public.gmane.org>
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-T24gVGh1LCAyMDEyLTExLTI5IGF0IDE3OjM5ICswMTAwLCBTdGVmIEJvbiB3cm90ZToNCj4gMjAx
-Mi8xMS8yOSBNeWtsZWJ1c3QsIFRyb25kIDxUcm9uZC5NeWtsZWJ1c3RAbmV0YXBwLmNvbT46DQo+
-ID4gT24gVGh1LCAyMDEyLTExLTI5IGF0IDEwOjIyIC0wNTAwLCBzaW1vIHdyb3RlOg0KPiA+PiBP
-biBUaHUsIDIwMTItMTEtMjkgYXQgMTU6NDkgKzAxMDAsIFN0ZWYgQm9uIHdyb3RlOg0KPiA+PiA+
-IDIwMTIvMTEvMjkgTXlrbGVidXN0LCBUcm9uZCA8VHJvbmQuTXlrbGVidXN0QG5ldGFwcC5jb20+
-Og0KPiA+PiA+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+ID4gPj4NCj4gPiBO
-RlN2NC4xIGFjdHVhbGx5IGhhcyBkaXJlY3Rvcnkgbm90aWZpY2F0aW9ucyB3aGljaCBkdXBsaWNh
-dGUgbW9zdCBvZiB0aGUNCj4gPiBmdW5jdGlvbmFsaXR5IG9mIGRub3RpZnkuIFRoZSBxdWVzdGlv
-biBJJ20gYXNraW5nIGlzICJXaHkgc2hvdWxkIHdlIGRvDQo+ID4gaXQ/Iiwgbm90ICJjYW4gd2Ug
-ZG8gaXQ/Ii4NCj4gPg0KPiA+IEFuc3dlcnMgbGlrZSAid2VsbCBXaW5kb3dzIGFuZCBpT1MgZG8g
-aXQiIGFyZW4ndCBoZWxwZnVsIHVubGVzcyB0aGV5DQo+ID4gaW5jbHVkZSBhIGRlc2NyaXB0aW9u
-IG9mIHdoYXQgV2luZG93cyBhbmQgaU9TIGFwcHMgdXNlIGl0IGZvciB0aGF0IHdlDQo+ID4gY2Fu
-J3QgYWxyZWFkeSBkbyBvbiBMaW51eC4NCj4gPiBJZiB0aGUgb25seSBhcHBsaWNhdGlvbiBpcyBi
-ZWFnbGUsIHRoZW4gTGludXggaGFzIHRoaXMgcmVhbGx5IGhlbHBmdWwNCj4gPiB1dGlsaXR5IGNh
-bGxlZCAic3NoIiwgd2hpY2ggYWxsb3dzIHlvdSB0byBhdm9pZCB3YXN0aW5nIGEgbG9hZCBvZg0K
-PiA+IG5ldHdvcmsgYmFuZHdpZHRoLi4uDQo+IA0KPiBObywgc3VyZSwgeW91IHNob3VsZCBub3Qg
-ZG8gYW55dGhpbmcgYmVjYXVzZSBvdGhlcnMgZG8gaXQuIEJ1dCBvbiB0aGUNCj4gb3RoZXIgaGFu
-ZCwgaWYgb3RoZXJzIGRvIGl0LCB3aHkgZG9uJ3QgeW91PyBCZXR0ZXIgY29weSBhIGdvb2QgaWRl
-YQ0KPiB0aGFuIGJlIHN0dWJib3JuIGZvciBldmVyLg0KDQpUaGUgaWRlYSB0aGF0ICJpZiB3ZSBi
-dWlsZCBhIGJyaWRnZSwgdGhleSB3aWxsIGNvbWUgdG8gdXMiIGlzIHdoYXQgZ2F2ZQ0KcmlzZSB0
-byBkbm90aWZ5LCB0aGVuIGlub3RpZnkgKG5vYm9keSBjYW1lLCBzbyBsZXQncyBidWlsZCBhIGJp
-Z2dlcg0KYnJpZGdlKSBhbmQgZnNub3RpZnkgKG1ha2UgaXQgYSB0b2xsIGJyaWRnZSkuIE5vYm9k
-eSBpcyB1c2luZyB0aG9zZQ0KaW50ZXJmYWNlcyBtdWNoIG9uIGxvY2FsIGZpbGVzeXN0ZW1zLCBz
-byB3aHkgaXMgYWRkaW5nIGl0IHRvIE5GUyBhbmQNCkNJRlMgZ29pbmcgdG8gYmUgc3VjaCBhIGdh
-bWUgY2hhbmdlcj8NCg0KPiBBbmQgeWVzIHRoZXJlIGlzIG5vIHN1Y2ggdGhpbmcgYXMgYSBraWxs
-ZXIgYXBwLCBidXQgaW4gbXkgb3BpbmlvbiBpdCdzDQo+IHRoZSB1c2VyIGV4cGVyaWVuY2UuIEl0
-J3Mgc28gbXVjaCBiZXR0ZXIgd2hlbiB5b3VyIHN5c3RlbSBrZWVwcyB0cmFjaw0KPiBvbiBzaGFy
-ZWQgbmV0d29yayByZXNvdXJjZXMuDQoNCldoYXQgZG9lcyBpdCBlbmFibGUgdXMgdG8gZG8gdGhh
-dCB3ZSBjYW4ndCBhbHJlYWR5IGRvPyBUaGlzIGlzIHByZWNpc2VseQ0KdGhlIHF1ZXN0aW9uIHRo
-YXQgSSBhc2tlZCB5b3UgaW4gdGhlIHByZXZpb3VzIGVtYWlsLg0KDQotLSANClRyb25kIE15a2xl
-YnVzdA0KTGludXggTkZTIGNsaWVudCBtYWludGFpbmVyDQoNCk5ldEFwcA0KVHJvbmQuTXlrbGVi
-dXN0QG5ldGFwcC5jb20NCnd3dy5uZXRhcHAuY29tDQo=
+Hi!
+
+Connecting with a default security mechanism prompts an KERN_ERROR
+output warning to the user that the default mechanism will be changed
+in Linux 3.3.
+
+We're now at 3.7, so we either could remove the warning completely
+(if the default has been changed), or we could bump the number to
+what our current target for the change is.
+
+
+The below patch changes the cERROR (which turns into a printk with KERN_ERROR)
+into a straight printk with KERN_WARNING and changes the text to indicate
+that it was changed in 3.3.
+
+I expect that the patch is incorrect and that we should choose
+another of the alternative solutions above, but I'd like to get
+some input on this.
+
+Not-Signed-off-by: Jesper Nilsson <jesper.nilsson-VrBV9hrLPhE@public.gmane.org>
+---
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index c83f5b65..968456f 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -2480,9 +2480,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+ 	supported for many years, time to update default security mechanism */
+ 	if ((volume_info->secFlg == 0) && warned_on_ntlm == false) {
+ 		warned_on_ntlm = true;
+-		cERROR(1, "default security mechanism requested.  The default "
+-			"security mechanism will be upgraded from ntlm to "
+-			"ntlmv2 in kernel release 3.3");
++		printk(KERN_WARNING "default security mechanism requested.  "
++			"The default security mechanism was changed "
++			" from ntlm to ntlmv2 in kernel release 3.3");
+ 	}
+ 	ses->overrideSecFlg = volume_info->secFlg;
+ 
+
+
+/^JN - Jesper Nilsson
+-- 
+               Jesper Nilsson -- jesper.nilsson-VrBV9hrLPhE@public.gmane.org
