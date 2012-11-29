@@ -1,76 +1,82 @@
-From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Possible to make nfs aware of a inotify watch has been set.
-Date: Thu, 29 Nov 2012 10:32:33 +0100
-Message-ID: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
+From: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
+Subject: RE: Possible to make nfs aware of a inotify watch has been set.
+Date: Thu, 29 Nov 2012 14:03:28 +0000
+Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
+References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
-
-as far as I know individual filesystems are not aware an inotify watch
-has been set on a
-inode managed by that filesystem.
-
-For local only filesystems like ext2/3/4 etcetera this is no problem.
-But with network filesystems
-like nfs and cifs (and also fuse types) this is not ideal, since
-changes made by others (since the backend
-is shared with others) are never watched.
-
-I'm working on a filesystem change watcher notifyfs, and puzzling
-already for a long time howto enable
-the watching of fs events on these filesystems.
-
-I've some idea's:
-
-a. notifyfs is working on the local (A) and the remote host (B), and
-is doing it's thing without using the filesystem. When a client
-contacts notifyfs to set a watch on a nfs (or cifs) share, notifyfs
-detects it a nfs share. It finds out the remote host by analyzing the
-mount, and gets the details like remote address and directory. With
-nfs that's easy, since the mount is like remotehost:/directory, with
-cifs this is a bit more difficult, but doable.
-After getting the details, it can forward the watch to the remote host
-(B), on which also notifyfs is running, and listning to a tcp port.
-This notifyfs process on his turn watches the desired fs object using
-the abilities on that host, and sends anything back to the local host
-(A).
-
-I've experimented with this, and got it working when using sshfs.
-
-This is very easy to setup, and simple to understand, but some drawbacks:
-
-1. while the filesystems are using credentails or tickets to get
-access to a remote resource, this is a bit difficult for notifyfs.
-Notifyfs bypasses that. Maybe this leads to permissions/abuse I cannot
-see directly.
-
-2. the filesystem still does not know that something has changed (on
-B). It should be made aware as fast as possible to make the changes
-effective on localhost A. Maybe notifyfs should just trigger that by
-doing a lookup on an entry when it has been removed on the remote host
-for example.
-
-b. notifyfs forwards the watch to nfs (and cifs) using netlink. Since
-nfs and cifs are in kernelspace, and notifyfs is in userspace, netlink
-is the way to go to communicate.This is possible, and I've thought
-this is the best way to go for a long time, but complicated when
-compared to the last method:
-
-c.  make filesystems like nfs and cifs aware a inotify watch has been
-set. Untill now the filesystems self are totally not notified a watch
-has been set (and of course also changed/removed). This is by design.
-For local filesystems it's not required, it will not get any extra,
-but nfs and cifs and fuse fs's can use this info to set a watch on the
-backend using the methods/api specific to the filesystem. For example
-cifs will send a SMB2_CHANGE_NOTIFY to the server, and waiting for
-results.
-
-What do you think, is the latest option possible??
-
-Stef Bon
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1uZnMtb3duZXJAdmdl
+ci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtbmZzLQ0KPiBvd25lckB2Z2VyLmtlcm5lbC5vcmdd
+IE9uIEJlaGFsZiBPZiBTdGVmIEJvbg0KPiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMjksIDIw
+MTIgNDozMyBBTQ0KPiBUbzogbGludXgtbmZzQHZnZXIua2VybmVsLm9yZw0KPiBDYzogbGludXgt
+Y2lmcw0KPiBTdWJqZWN0OiBQb3NzaWJsZSB0byBtYWtlIG5mcyBhd2FyZSBvZiBhIGlub3RpZnkg
+d2F0Y2ggaGFzIGJlZW4gc2V0Lg0KPiANCj4gSGksDQo+IA0KPiBhcyBmYXIgYXMgSSBrbm93IGlu
+ZGl2aWR1YWwgZmlsZXN5c3RlbXMgYXJlIG5vdCBhd2FyZSBhbiBpbm90aWZ5IHdhdGNoIGhhcw0K
+PiBiZWVuIHNldCBvbiBhIGlub2RlIG1hbmFnZWQgYnkgdGhhdCBmaWxlc3lzdGVtLg0KPiANCj4g
+Rm9yIGxvY2FsIG9ubHkgZmlsZXN5c3RlbXMgbGlrZSBleHQyLzMvNCBldGNldGVyYSB0aGlzIGlz
+IG5vIHByb2JsZW0uDQo+IEJ1dCB3aXRoIG5ldHdvcmsgZmlsZXN5c3RlbXMNCj4gbGlrZSBuZnMg
+YW5kIGNpZnMgKGFuZCBhbHNvIGZ1c2UgdHlwZXMpIHRoaXMgaXMgbm90IGlkZWFsLCBzaW5jZSBj
+aGFuZ2VzIG1hZGUgYnkNCj4gb3RoZXJzIChzaW5jZSB0aGUgYmFja2VuZCBpcyBzaGFyZWQgd2l0
+aCBvdGhlcnMpIGFyZSBuZXZlciB3YXRjaGVkLg0KPiANCj4gSSdtIHdvcmtpbmcgb24gYSBmaWxl
+c3lzdGVtIGNoYW5nZSB3YXRjaGVyIG5vdGlmeWZzLCBhbmQgcHV6emxpbmcgYWxyZWFkeSBmb3IN
+Cj4gYSBsb25nIHRpbWUgaG93dG8gZW5hYmxlIHRoZSB3YXRjaGluZyBvZiBmcyBldmVudHMgb24g
+dGhlc2UgZmlsZXN5c3RlbXMuDQo+IA0KPiBJJ3ZlIHNvbWUgaWRlYSdzOg0KPiANCj4gYS4gbm90
+aWZ5ZnMgaXMgd29ya2luZyBvbiB0aGUgbG9jYWwgKEEpIGFuZCB0aGUgcmVtb3RlIGhvc3QgKEIp
+LCBhbmQgaXMgZG9pbmcgaXQncw0KPiB0aGluZyB3aXRob3V0IHVzaW5nIHRoZSBmaWxlc3lzdGVt
+LiBXaGVuIGEgY2xpZW50IGNvbnRhY3RzIG5vdGlmeWZzIHRvIHNldCBhDQo+IHdhdGNoIG9uIGEg
+bmZzIChvciBjaWZzKSBzaGFyZSwgbm90aWZ5ZnMgZGV0ZWN0cyBpdCBhIG5mcyBzaGFyZS4gSXQg
+ZmluZHMgb3V0IHRoZQ0KPiByZW1vdGUgaG9zdCBieSBhbmFseXppbmcgdGhlIG1vdW50LCBhbmQg
+Z2V0cyB0aGUgZGV0YWlscyBsaWtlIHJlbW90ZQ0KPiBhZGRyZXNzIGFuZCBkaXJlY3RvcnkuIFdp
+dGggbmZzIHRoYXQncyBlYXN5LCBzaW5jZSB0aGUgbW91bnQgaXMgbGlrZQ0KPiByZW1vdGVob3N0
+Oi9kaXJlY3RvcnksIHdpdGggY2lmcyB0aGlzIGlzIGEgYml0IG1vcmUgZGlmZmljdWx0LCBidXQg
+ZG9hYmxlLg0KPiBBZnRlciBnZXR0aW5nIHRoZSBkZXRhaWxzLCBpdCBjYW4gZm9yd2FyZCB0aGUg
+d2F0Y2ggdG8gdGhlIHJlbW90ZSBob3N0IChCKSwgb24NCj4gd2hpY2ggYWxzbyBub3RpZnlmcyBp
+cyBydW5uaW5nLCBhbmQgbGlzdG5pbmcgdG8gYSB0Y3AgcG9ydC4NCj4gVGhpcyBub3RpZnlmcyBw
+cm9jZXNzIG9uIGhpcyB0dXJuIHdhdGNoZXMgdGhlIGRlc2lyZWQgZnMgb2JqZWN0IHVzaW5nIHRo
+ZQ0KPiBhYmlsaXRpZXMgb24gdGhhdCBob3N0LCBhbmQgc2VuZHMgYW55dGhpbmcgYmFjayB0byB0
+aGUgbG9jYWwgaG9zdCAoQSkuDQo+IA0KPiBJJ3ZlIGV4cGVyaW1lbnRlZCB3aXRoIHRoaXMsIGFu
+ZCBnb3QgaXQgd29ya2luZyB3aGVuIHVzaW5nIHNzaGZzLg0KPiANCj4gVGhpcyBpcyB2ZXJ5IGVh
+c3kgdG8gc2V0dXAsIGFuZCBzaW1wbGUgdG8gdW5kZXJzdGFuZCwgYnV0IHNvbWUgZHJhd2JhY2tz
+Og0KPiANCj4gMS4gd2hpbGUgdGhlIGZpbGVzeXN0ZW1zIGFyZSB1c2luZyBjcmVkZW50YWlscyBv
+ciB0aWNrZXRzIHRvIGdldCBhY2Nlc3MgdG8gYQ0KPiByZW1vdGUgcmVzb3VyY2UsIHRoaXMgaXMg
+YSBiaXQgZGlmZmljdWx0IGZvciBub3RpZnlmcy4NCj4gTm90aWZ5ZnMgYnlwYXNzZXMgdGhhdC4g
+TWF5YmUgdGhpcyBsZWFkcyB0byBwZXJtaXNzaW9ucy9hYnVzZSBJIGNhbm5vdCBzZWUNCj4gZGly
+ZWN0bHkuDQoNCkxhY2sgb2Ygc2VjdXJpdHkgaXMgYSBzaG93c3RvcHBlci4gVGhlcmUgYXJlIGdv
+b2QgcmVhc29ucyB3aHkgaW5vdGlmeSB3b24ndCBhbGxvdyB5b3UgdG8gbW9uaXRvciBmaWxlcyBm
+b3Igd2hpY2ggeW91IGRvbid0IGhhdmUgYWNjZXNzIHBlcm1pc3Npb25zLg0KDQo+IDIuIHRoZSBm
+aWxlc3lzdGVtIHN0aWxsIGRvZXMgbm90IGtub3cgdGhhdCBzb21ldGhpbmcgaGFzIGNoYW5nZWQg
+KG9uIEIpLiBJdA0KPiBzaG91bGQgYmUgbWFkZSBhd2FyZSBhcyBmYXN0IGFzIHBvc3NpYmxlIHRv
+IG1ha2UgdGhlIGNoYW5nZXMgZWZmZWN0aXZlIG9uDQo+IGxvY2FsaG9zdCBBLiBNYXliZSBub3Rp
+ZnlmcyBzaG91bGQganVzdCB0cmlnZ2VyIHRoYXQgYnkgZG9pbmcgYSBsb29rdXAgb24gYW4NCj4g
+ZW50cnkgd2hlbiBpdCBoYXMgYmVlbiByZW1vdmVkIG9uIHRoZSByZW1vdGUgaG9zdCBmb3IgZXhh
+bXBsZS4NCj4gDQo+IGIuIG5vdGlmeWZzIGZvcndhcmRzIHRoZSB3YXRjaCB0byBuZnMgKGFuZCBj
+aWZzKSB1c2luZyBuZXRsaW5rLiBTaW5jZSBuZnMgYW5kDQo+IGNpZnMgYXJlIGluIGtlcm5lbHNw
+YWNlLCBhbmQgbm90aWZ5ZnMgaXMgaW4gdXNlcnNwYWNlLCBuZXRsaW5rIGlzIHRoZSB3YXkgdG8g
+Z28gdG8NCj4gY29tbXVuaWNhdGUuVGhpcyBpcyBwb3NzaWJsZSwgYW5kIEkndmUgdGhvdWdodCB0
+aGlzIGlzIHRoZSBiZXN0IHdheSB0byBnbyBmb3IgYQ0KPiBsb25nIHRpbWUsIGJ1dCBjb21wbGlj
+YXRlZCB3aGVuIGNvbXBhcmVkIHRvIHRoZSBsYXN0IG1ldGhvZDoNCj4gDQo+IGMuICBtYWtlIGZp
+bGVzeXN0ZW1zIGxpa2UgbmZzIGFuZCBjaWZzIGF3YXJlIGEgaW5vdGlmeSB3YXRjaCBoYXMgYmVl
+biBzZXQuIFVudGlsbA0KPiBub3cgdGhlIGZpbGVzeXN0ZW1zIHNlbGYgYXJlIHRvdGFsbHkgbm90
+IG5vdGlmaWVkIGEgd2F0Y2ggaGFzIGJlZW4gc2V0IChhbmQgb2YNCj4gY291cnNlIGFsc28gY2hh
+bmdlZC9yZW1vdmVkKS4gVGhpcyBpcyBieSBkZXNpZ24uDQo+IEZvciBsb2NhbCBmaWxlc3lzdGVt
+cyBpdCdzIG5vdCByZXF1aXJlZCwgaXQgd2lsbCBub3QgZ2V0IGFueSBleHRyYSwgYnV0IG5mcyBh
+bmQgY2lmcw0KPiBhbmQgZnVzZSBmcydzIGNhbiB1c2UgdGhpcyBpbmZvIHRvIHNldCBhIHdhdGNo
+IG9uIHRoZSBiYWNrZW5kIHVzaW5nIHRoZQ0KPiBtZXRob2RzL2FwaSBzcGVjaWZpYyB0byB0aGUg
+ZmlsZXN5c3RlbS4gRm9yIGV4YW1wbGUgY2lmcyB3aWxsIHNlbmQgYQ0KPiBTTUIyX0NIQU5HRV9O
+T1RJRlkgdG8gdGhlIHNlcnZlciwgYW5kIHdhaXRpbmcgZm9yIHJlc3VsdHMuDQo+IA0KPiBXaGF0
+IGRvIHlvdSB0aGluaywgaXMgdGhlIGxhdGVzdCBvcHRpb24gcG9zc2libGU/Pw0KDQpTbyB3aGF0
+IGlzIHRoZSBraWxsZXIgYXBwIGZvciBpbm90aWZ5IG9uIE5GUy9DSUZTL0ZVU0U/IFdoYXQgcHJv
+Z3JhbXMgZG8geW91IG5lZWQgdG8gcnVuIG9uIGEgTkZTL0NJRlMvRlVTRSBjbGllbnQgdGhhdCB1
+c2UgaW5vdGlmeSBhbmQgdGhhdCB3b3VsZG4ndCBiZSBiZXR0ZXIgb2ZmIHJ1bm5pbmcgb24gdGhl
+IHNlcnZlciBpbnN0ZWFkPw0KDQpJT1c6IHdob3NlIHByb2JsZW0gYXJlIHlvdSB0cnlpbmcgdG8g
+c29sdmU/DQoNClRyb25kDQo=
