@@ -1,108 +1,42 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Possible to make nfs aware of a inotify watch has been set.
-Date: Thu, 29 Nov 2012 10:28:04 -0600
-Message-ID: <CAH2r5muVNPGx74ppc6MZPZRcsCRdP=xM4gvmrzEnw5bAb3jW8w@mail.gmail.com>
-References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
-	<4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
-	<CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
-	<1354202525.4064.1.camel@pico.ipa.ssimo.org>
-	<4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7@SACEXCMBX04-PRD.hq.netapp.com>
+From: Jesper Nilsson <jesper.nilsson@axis.com>
+Subject: [PATCH] cifs: Add handling of blank password option
+Date: Thu, 29 Nov 2012 17:31:16 +0100
+Message-ID: <20121129163116.GP27196@axis.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: "Myklebust, Trond" <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7-VGJ86jkg8PeBTCzCEi1xmXOR4cbS7gtM96Bgd4bDwmQ@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=us-ascii
+To: linux-cifs@vger.kernel.org, sfrench@samba.org,
+	linux-kernel@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Nov 29, 2012 at 9:33 AM, Myklebust, Trond
-<Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org> wrote:
-> On Thu, 2012-11-29 at 10:22 -0500, simo wrote:
->> On Thu, 2012-11-29 at 15:49 +0100, Stef Bon wrote:
->> > 2012/11/29 Myklebust, Trond <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>:
->> > >> -----Original Message-----
->> > >>
->> > >> 1. while the filesystems are using credentails or tickets to get access to a
->> > >> remote resource, this is a bit difficult for notifyfs.
->> > >> Notifyfs bypasses that. Maybe this leads to permissions/abuse I cannot see
->> > >> directly.
->> > >
->> > > Lack of security is a showstopper. There are good reasons why inotify won't allow you to monitor files for which you don't have access permissions.
->> > >
->> >
->> > Let me explain, I think you not understand fully.
->> >
->> > Notifyfs does not allow users/clients to set a watch if there are no
->> > read permissions (the object and access for the whole path to it), so
->> > there are no security issues there.
->> >
->> > What I mean is that any program can contact the remote notifyfs
->> > server, and this remote notifyfs server cannot figure out it's a valid
->> > request from another notifyfs server, or a program faking that.
->> > In the construction I describe it does not check that (yet).
->> >
->> > >>
->> > >> What do you think, is the latest option possible??
->> > >
->> > > So what is the killer app for inotify on NFS/CIFS/FUSE? What programs do you need to run on a NFS/CIFS/FUSE client that use inotify and that wouldn't be better off running on the server instead?
->> > >
->> >
->> > What do you mean with "better off running on the server instead"?
->> > There are a lot of programs interested in fs changes, like a simple
->> > file manager. I think it's a very nice feature to see changes right
->> > away in the view.
->> > It's not a killer app, but a think the whole user experience is
->> > improving when your system is able to keep a view (like a view in the
->> > file manager) up to date.
->> >
->> > > IOW: whose problem are you trying to solve?
->> >
->> > I think that enabling fs notify on network filesystems like nfs, cifs
->> > and fuse is a good thing (see above). On systems like Windows and iOS
->> > since long time this works.
->>
->> CIFS has notification capabilities built in (oplocks), as does NFS
->> (leases), is this not sufficient ?
->
-> NFSv4.1 actually has directory notifications which duplicate most of the
-> functionality of dnotify. The question I'm asking is "Why should we do
-> it?", not "can we do it?".
->
-> Answers like "well Windows and iOS do it" aren't helpful unless they
-> include a description of what Windows and iOS apps use it for that we
-> can't already do on Linux.
-> If the only application is beagle, then Linux has this really helpful
-> utility called "ssh", which allows you to avoid wasting a load of
-> network bandwidth...
+The option to have a blank "pass=" already exists, and with
+a password specified both "pass=%s" and "password=%s" are supported.
+Also, both blank "user=" and "username=" are supported, making
+"password=" the odd man out.
 
-Of course one reason that file managers like directory notifications is that
-it avoids wasting a load of network bandwidth - as the alternative to
-directory change
-notifications is polling the directories for every open window.   Also note that
-network file systems where possible should implement similar semantics and
-interfaces to the local file systems, and inotify/dnotify are mappable
-to network
-'file systems (presumably not just cifs/smb2/smb3).   Support for
-keeping file manager
-views reasonably up to date would be a good enough reason for something like
-inotify/dnotify (and it has been used by file managers for over 20
-years, even before
-Windows and iOS) - and we want to get to the point where home directories
-work as well on network mounts as on local storage.
+Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
+---
+ fs/cifs/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Directory oplocks (in smb3) may be helpful in reducing the number of remote
-directory change notifications further.
-
-
-
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5c670b9..c83f5b65 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -186,6 +186,7 @@ static const match_table_t cifs_mount_option_tokens = {
+ 	{ Opt_user, "user=%s" },
+ 	{ Opt_user, "username=%s" },
+ 	{ Opt_blank_pass, "pass=" },
++	{ Opt_blank_pass, "password=" },
+ 	{ Opt_pass, "pass=%s" },
+ 	{ Opt_pass, "password=%s" },
+ 	{ Opt_blank_ip, "ip=" },
 -- 
-Thanks,
+1.8.0.rc0.18.gf84667d
 
-Steve
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+/^JN - Jesper Nilsson
+-- 
+               Jesper Nilsson -- jesper.nilsson@axis.com
