@@ -1,39 +1,129 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Fri, 30 Nov 2012 14:20:37 +0400
-Message-ID: <1354270840-7272-1-git-send-email-piastry@etersoft.ru>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: Possible to make nfs aware of a inotify watch has been set.
+Date: Fri, 30 Nov 2012 08:10:24 +0100
+Message-ID: <CANXojcwRy5cBz=E1S567J-1BFC4AiamLr=35bKrX0Zq-Me2b3w@mail.gmail.com>
+References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
+	<4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
+	<CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
+	<1354202525.4064.1.camel@pico.ipa.ssimo.org>
+	<4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7@SACEXCMBX04-PRD.hq.netapp.com>
+	<CANXojcys4wR8N-R3oSjWRWJLsObn0Qf+i41vBUaNnJctdcrKVw@mail.gmail.com>
+	<20121129202037.GQ4939@ZenIV.linux.org.uk>
+	<CANXojcw15RdJdRoZxB3Z59YbOda7vG7RDRegfpoCjG4Bv4AvsQ@mail.gmail.com>
+	<20121129211624.GS4939@ZenIV.linux.org.uk>
+	<CANXojcxfrO+Ar4JSd0NiDJh7+_gg6s6cq5=UA7Pu1h4DRZ8Vkg@mail.gmail.com>
+	<CAH2r5muw1U2XNMZsCq0gApuTMyj+6SN6S9KsUq52YM8CyZEG4A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Cc: "linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5muw1U2XNMZsCq0gApuTMyj+6SN6S9KsUq52YM8CyZEG4A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
+2012/11/30 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> On Thu, Nov 29, 2012 at 5:14 PM, Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>> 2012/11/29 Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>:
+>>> On Thu, Nov 29, 2012 at 09:31:05PM +0100, Stef Bon wrote:
+>>>> 2012/11/29 Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>:
+>>>> > On Thu, Nov 29, 2012 at 05:39:27PM +0100, Stef Bon wrote:
+>>>> >
+>>
+>>>> With Ubuntu people started Unity, also without a killer app, but just
+>>>> with an opinion, an impression, an idea. And anyone can dislike or
+>>>> like it, it's a succes as far as I can see. What the hell is wrong
+>>>> with suggesting things based upon an idea/impression?
+>>>
+>>> IOW, it was a true positive for "([Uu]ser experience)|UX" as BS predictor.
+>>> Nice to know...
+>>>
+>>> Look, you'd been asked to give good reasons for doing some thing; replying with
+>>> "it's My Opinion(tm), piss off if that's not enough reason for you" would at
+>>> least have been honest.  References to UX, as your last reply has confirmed,
+>>> had been basically an obfuscated equivalent of that.
+>>
+>> No no, I do not say "piss off". If that is what my message looked
+>> like, I'm sorry for that. But I do not have any killer app or
+>> something. I cannot convince you otherwise that saying it's my
+>> opinion. I do not have numbers or something like that proving I have a
+>> point. I wish I have. But I do understand you do not agree with me,
+>> and see things different.
+>>>
+>>> Sorry for being harsh, but I've had it with the GNOME crowd and their ilk
+>>> using just such references to handwave away any questions.
+>>>
+>>> There's nothing wrong with having opinions/impressions/etc.  Everyone got
+>>> their own, etc.  But "I believe so, period" is not a sufficient answer to
+>>> "what makes that a good idea?" and obfuscating it up is even worse.
+>>
+>> So, no I do not say "I believe so, period" . But I cannot convince you
+>> ...and we have different opinions here.. I don't know any method here
+>> of "proving having a point".
+>
+> One question that hasn't been answered AFAIK is how well the current
+> Linux directory change notification API maps to the needs of its principal user
+> (presumably Samba, and kde/gnome file managers), and a loosely
+> related question of how well the change notification API maps to the
+> corresponding network file system protocol operations
+> (TRANSACT_NOTIFY_CHANGE) which is a fairly common operation
+> sent to Samba, and obviously for the cifs/smb2/smb3 case would limit
+> what types of events the client can notify the desktop/file manager about.
+>
+> In particular, the 10 or 15 filter flags, and the (at least) 8 events
+> (add/remove/modify/rename etc.),
+> available in tne network protocol AFAIK have not been matched to see if they
+> match closely to the existing Linux API.
 
-Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can't do it if a file stored on a network share and is used by several clients. This patchset makes it possible for CIFS/SMB2.0/SMB3.0.
+Hi,
 
-Pavel Shilovsky (3):
-  fcntl: Introduce new O_DENY* open flags for network filesystems
-  CIFS: Add O_DENY* open flags support
-  CIFS: Use NT_CREATE_ANDX command for forcemand mounts
+I start working on the seperate notifyfs servers.
+The whole advantage of that approach is that you can design the api
+from scratch. Notifyfs is not bound to the api of inotify. There
+remains the problem of mapping it to the fs event api on the host,
+which will be inotify probably on linux.
 
- fs/cifs/cifsacl.c                |   10 ++++----
- fs/cifs/cifsglob.h               |   11 ++++++++-
- fs/cifs/cifsproto.h              |    9 ++++----
- fs/cifs/cifssmb.c                |   47 ++++++++++++++++++++------------------
- fs/cifs/dir.c                    |   14 ++++++++----
- fs/cifs/file.c                   |   18 ++++++++++-----
- fs/cifs/inode.c                  |   11 +++++----
- fs/cifs/link.c                   |   10 ++++----
- fs/cifs/readdir.c                |    2 +-
- fs/cifs/smb1ops.c                |   15 ++++++------
- fs/cifs/smb2file.c               |   10 ++++----
- fs/cifs/smb2inode.c              |    4 ++--
- fs/cifs/smb2ops.c                |   10 ++++----
- fs/cifs/smb2pdu.c                |    6 ++---
- fs/cifs/smb2proto.h              |   14 +++++++-----
- fs/fcntl.c                       |    5 ++--
- include/uapi/asm-generic/fcntl.h |   11 +++++++++
- 17 files changed, 125 insertions(+), 82 deletions(-)
+At this moment the different events look like:
 
--- 
-1.7.10.4
+#define NOTIFYFS_FSEVENT_META_ATTRIB_NOTSET                     2
+#define NOTIFYFS_FSEVENT_META_ATTRIB_MODE                       4
+#define NOTIFYFS_FSEVENT_META_ATTRIB_OWNER                      8
+#define NOTIFYFS_FSEVENT_META_ATTRIB_GROUP                      16
+#define NOTIFYFS_FSEVENT_META_ATTRIB                            28
+
+#define NOTIFYFS_FSEVENT_META_XATTR_NOTSET                      32
+#define NOTIFYFS_FSEVENT_META_XATTR_CREATE                      64
+#define NOTIFYFS_FSEVENT_META_XATTR_MODIFY                      128
+#define NOTIFYFS_FSEVENT_META_XATTR_DELETE                      256
+#define NOTIFYFS_FSEVENT_META_XATTR                             448
+
+#define NOTIFYFS_FSEVENT_FILE_NOTSET                            512
+#define NOTIFYFS_FSEVENT_FILE_MODIFIED                          1024
+#define NOTIFYFS_FSEVENT_FILE_SIZE                              2048
+#define NOTIFYFS_FSEVENT_FILE_OPEN                              4096
+#define NOTIFYFS_FSEVENT_FILE_READ                              8192
+#define NOTIFYFS_FSEVENT_FILE_CLOSE_WRITE                       16384
+#define NOTIFYFS_FSEVENT_FILE_CLOSE_NOWRITE                     32768
+
+#define NOTIFYFS_FSEVENT_MOVE_NOTSET                            65536
+#define NOTIFYFS_FSEVENT_MOVE_CREATED                           131072
+#define NOTIFYFS_FSEVENT_MOVE_MOVED                             262144
+#define NOTIFYFS_FSEVENT_MOVE_MOVED_FROM                        524288
+#define NOTIFYFS_FSEVENT_MOVE_MOVED_TO                          1048576
+#define NOTIFYFS_FSEVENT_MOVE_DELETED                           2097152
+
+#define NOTIFYFS_FSEVENT_FS_NOTSET                              4194304
+#define NOTIFYFS_FSEVENT_FS_MOUNT                               8388608
+#define NOTIFYFS_FSEVENT_FS_UNMOUNT                             16777216
+#define NOTIFYFS_FSEVENT_FS_NLINKS                              33554432
+
+Note that there is no such thing as watching changing xattr at this
+moment right now on linux. The field st_ctime is changed, nothing
+more.
+
+Stef
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
