@@ -1,168 +1,36 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: proposed cifs.ko authentication overhaul
-Date: Fri, 30 Nov 2012 17:50:11 -0600
-Message-ID: <CAH2r5mu=a77eFwpBOz1nu0iE9Hw7dKF+hCwmROEqy8cM2+pEuw@mail.gmail.com>
-References: <20121130092751.16c83c3a@tlielax.poochiereds.net>
-	<CAH2r5mtvpCXuhaT2W1A8+6NwMMaRZJwgERAo+3Rvrm8VD_XZEw@mail.gmail.com>
+Subject: [GIT] 2 CIFS Fixes for Regressions
+Date: Fri, 30 Nov 2012 17:59:11 -0600
+Message-ID: <CAH2r5mvKUAWkTCwdrcYZ+MnsgC7JLyouteiG=ER1_nzbFdX40A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtvpCXuhaT2W1A8+6NwMMaRZJwgERAo+3Rvrm8VD_XZEw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-My note got truncated - I also strongly support the idea you noted
-of allowing multiple security mechanisms to be passed in (and
-presumably saved, so when disconnected, we renegotiate
-properly).
+Resending the merge request from earlier in the week.  These are two
+low risk, small fixes, that fix cifs regressions introduced in 3.7.
 
-Also I am open to different ways of saving the administrator controlled,
-system wide security settings (it does not have to be a registry, or
-an smb.conf-like file) but it is better if they are persistent (unlike
-/proc/fs/SecurityFlags which has to be set on every boot if
-you want to change the defaults).
+The following changes since commit 5e351cdc998db82935d1248a053a1be37d1160fd:
 
-I would also prefer that we set security settings differently for SMB3 (higher)
-due e.g. to the performance improvements of signing that were noted
-in various conference presentations.  I am not convinced that we even
-need to allow anything other than ntlmv2 and Kerberos for SMB3.
-We don't want to encourage users to use near-useless security
-mechanisms.
+  Merge tag 'devicetree-for-linus' of
+git://git.secretlab.ca/git/linux-2.6 (2012-11-23 12:36:06 -1000)
 
-On Fri, Nov 30, 2012 at 5:45 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> Overhauling the authentication code is probably a good idea but
-> a couple quick thoughts:
->
-> 1) we must have system wide, administrator controllable, security
-> defaults (samba does this, and every modern operating system
-> probably does this by now) - for the case of cifs
-> (and smb2/smb3) the features don't have to match Windows
-> but should include at least the following:
->    - the ability to set signing on for all connection attempts
->    - the ability to set either a list of security mechanisms which
->      are acceptable (I recommend that we allow ntlmv2 and
->      kerberos, and allow administrator to enable others if desired)
->     or set a minimum security level (setting it lower e.g. might be
->  allowing
->      ntlm, or plaintext passwords) than recommended (presumably
->      our minimum acceptable is ntlmv2) or higher (Kerberos).
->      Alternatively
->       -
->
-> On Fri, Nov 30, 2012 at 8:27 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> Executive Summary:
->> ------------------
->> I want to overhaul the cifs.ko authentication code to handle
->> autonegotiation better. This means a fair bit of user-visible changes,
->> but I think they're mostly for the better. I don't want to do this work
->> unless it's clear that the proposed design is acceptable though.
->>
->> Longer description:
->> -------------------
->> As I mentioned the other day, I'd like to see us overhaul the auth code
->> in cifs.ko. I'm willing to do this work, but my attempt from several
->> years ago was not merged. I'd like to ensure that the overall design
->> is something everyone can live with before I embark upon coding
->> anything.
->>
->> This may be tl;dr for most folks, but please do read it if you think
->> you care about how all of this works, especially if you might end up
->> reviewing this code.
->>
->> Why change anything?
->> --------------------
->> There are several reasons that I think the auth code needs an overhaul:
->>
->> 1/ The current code hamstrings the ability to properly autonegotiate
->> the auth method to use. It currently decides what auth method it's
->> going to use before ever contacting the server. This means that once
->> you figure out that the server doesn't support the authentication that
->> was decided, it's too late.
->>
->> 2/ The SecurityFlags interface is totally unintuitive. It makes zero
->> sense to perpetuate the travesty of the SecurityFlags interface. For
->> one thing, it's global so you have a server that requires plaintext
->> passwords then you're stuck with that for all of the servers you need
->> to talk to.
->>
->> 3/ Passing in multiple sec= options is broken. This can happen if you
->> have a mount set up in /etc/fstab, and then pass extra options to it
->> when mounting. The extra options get appended onto the end of the
->> options string. In that situation, it's reasonable for a user to expect
->> "last one wins", but the sec= option doesn't currently work that way.
->> The secFlg's will get or'ed and you can end up using the first auth
->> method even though you specified a different one on the command line.
->>
->> A proposed design for the user interface
->> ----------------------------------------
->> Here's a number of changes I'd like to make:
->>
->> 1/ Get rid of the SecurityFlags interface altogether, and simply
->> require anyone who wants fine-grained control over the auth method to
->> use specify a sec= option when mounting. If one isn't specified, then
->> the code will be changed to use the a selection algorithm of its
->> choosing (more on that later).
->>
->> 2/ Steve in particular has mentioned that he thinks there needs to be
->> some mechanism to allow the admin to set system-wide security defaults.
->> I don't think that's really necessary if we only allow the code to use
->> authentication methods that we deem secure by default. Since the sec=
->> mount option is only able to be specified by an administrator in the
->> first place, I don't think it makes any sense to require the admin to
->> also set specific module options in order to use a particular auth
->> method.
->>
->> 3/ it may however make sense to allow an admin to require signing, or
->> to enforce the disabling of signing altogether. A tristate module
->> option could be added for that.
->>
->> If #2 isn't acceptable, then I'm willing to compromise. Perhaps we
->> could add a boolean module option "disable weak crypto" or something.
->>
->> Proposed auth selection algorithm
->> ---------------------------------
->> Once we change the code not to decide the auth method before contacting
->> the server, we can allow it to be a lot smarter about picking an auth
->> scheme. The following applies to SMB1, things are simpler with SMB2,
->> but we still will be living with SMB1 for a long, long time to come.
->> Also, it's possible that in the future SMB3+ will introduce new auth
->> schemes and we'll need a better selection mechanism for that than we
->> have today.
->>
->> For SMB1, we'll set the SMBFLG2_EXT_SEC unconditionally in the NegProt
->> request. We can then use the NegProt response to decide what auth
->> method to use. If the server responds with that bit set, we'll try the
->> methods specified in the SPNEGO response, in the specified order. With
->> that change we can even try to use krb5 without requiring that sec=krb5
->> be specified. We can try to upcall first and then fall back onto the
->> next method if we don't get a ticket.
->>
->> If the server responds w/o setting SMBFLG2_EXT_SEC, then we'll try
->> ntlmv2(i). If that fails, we'll give up. Trying anything lower will
->> require that the admin set the sec= mount option.
->>
->> SMB2 support is still pretty crippled and only supports NTLMSSP
->> currently, but eventually we'll need something similar for it to handle
->> krb5 too.
->>
->> Thoughts?
->> --
->> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Thanks,
->
-> Steve
+are available in the git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git for-linus
 
+Jeff Layton (1):
+      cifs: fix writeback race with file that is growing
+
+Pavel Shilovsky (1):
+      CIFS: Fix wrong buffer pointer usage in smb_set_file_info
+
+ fs/cifs/file.c    |    6 +++---
+ fs/cifs/smb1ops.c |    3 +--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
 -- 
 Thanks,
