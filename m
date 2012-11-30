@@ -1,89 +1,44 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH 3/3] cifs: Enable Kconfig control of CIFS_DEBUG
-Date: Fri, 30 Nov 2012 06:56:29 -0500
-Message-ID: <20121130065629.52c489dc@tlielax.poochiereds.net>
-References: <cover.1354217746.git.joe@perches.com>
-	<5f5c9196b44908026a27333ef31dd4ebf4314de2.1354217746.git.joe@perches.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: cifs: clean up handling of unc= option commit
+Date: Fri, 30 Nov 2012 07:02:11 -0500
+Message-ID: <20121130070211.749e76fe@tlielax.poochiereds.net>
+References: <CAH2r5mtPsux7U3MpLxnNGDBQS7OdYqBeUXhS=XspyrUgsrrevg@mail.gmail.com>
+	<20121129200208.56653c6a@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <5f5c9196b44908026a27333ef31dd4ebf4314de2.1354217746.git.joe@perches.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20121129200208.56653c6a-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 29 Nov 2012 11:37:20 -0800
-Joe Perches <joe@perches.com> wrote:
+On Thu, 29 Nov 2012 20:02:08 -0500
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> Rather than havign a permanently enabled #define, allow
-> control over it.
+> On Thu, 29 Nov 2012 18:17:14 -0600
+> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 > 
-> This can reduce the size of the module by ~100KB which
-> could be useful for embedded systems.
+> > Jeff,
+> > In your patch "cifs: clean up handling of unc= option	commit" aren't
+> > you changing the parsing of not just the beginning of the UNC name to
+> > change //server/share to \\server/share (e.g.) but did you mean to
+> > change the parsing of the rest of the UNC name as well.  Doesn't
+> > convert delimiter change all occurrences not just the first) ?
+> > 
 > 
-> Signed-off-by: Joe Perches <joe@perches.com>
-> ---
->  fs/cifs/Kconfig      |   10 +++++++++-
->  fs/cifs/cifs_debug.h |    5 ++++-
->  2 files changed, 13 insertions(+), 2 deletions(-)
+> Yes, that's intentional.
 > 
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index 2075ddf..21ff76c 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -122,9 +122,17 @@ config CIFS_ACL
->  	    Allows fetching CIFS/NTFS ACL from the server.  The DACL blob
->  	    is handed over to the application/caller.
->  
-> +config CIFS_DEBUG
-> +	bool "Enable CIFS debugging routines"
-> +	default y
-> +	depends on CIFS
-> +	help
-> +	   Enabling this option adds helpful debugging messages to
-> +	   the cifs code which increases the size of the cifs module.
-> +	   If unsure, say Y.
->  config CIFS_DEBUG2
->  	bool "Enable additional CIFS debugging routines"
-> -	depends on CIFS
-> +	depends on CIFS_DEBUG
->  	help
->  	   Enabling this option adds a few more debugging routines
->  	   to the cifs code which slightly increases the size of
-> diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
-> index 4d12fe4..6867a7f 100644
-> --- a/fs/cifs/cifs_debug.h
-> +++ b/fs/cifs/cifs_debug.h
-> @@ -18,7 +18,10 @@
->   *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
->   *
->  */
-> -#define CIFS_DEBUG		/* BB temporary */
-> +
-> +#ifdef CONFIG_CIFS_DEBUG
-> +#define CIFS_DEBUG
-> +#endif
->  
->  #ifndef _H_CIFS_DEBUG
->  #define _H_CIFS_DEBUG
 
-Looks fine, but I'd probably prefer to just get rid of CIFS_DEBUG
-altogether here and replace it with CONFIG_CIFS_DEBUG.
+To clarify...
 
-While you're at it, /proc/fs/cifs/cifsFYI should probably not be
-present when CONFIG_CIFS_DEBUG isn't set. Perhaps we should also
-disable traceSMB and its related functions too in that case?
+The mount helper has passed in the unc= option with '\\' delimiters for
+a long time, regardless of what the user passes in. '/' is not an
+allowable character in a UNC component, so there's no harm in
+converting those characters unconditionally.
+
+The prefixpath is different, of course...
 
 -- 
-Jeff Layton <jlayton@redhat.com>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
