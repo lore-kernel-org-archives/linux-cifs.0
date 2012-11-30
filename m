@@ -1,87 +1,111 @@
-From: Bernd Petrovitsch <bernd-JY8rjfDgnXcb9sJ47jD7nuTv7YV0F9Eg@public.gmane.org>
-Subject: Re: Possible to make nfs aware of a inotify watch has been set.
-Date: Fri, 30 Nov 2012 14:37:20 +0100
-Message-ID: <1354282642.22426.7.camel@thorin>
-References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
-	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
-	 <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
-	 <1354202525.4064.1.camel@pico.ipa.ssimo.org>
-	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7@SACEXCMBX04-PRD.hq.netapp.com>
-	 <CANXojcys4wR8N-R3oSjWRWJLsObn0Qf+i41vBUaNnJctdcrKVw@mail.gmail.com>
-	 <20121129202037.GQ4939@ZenIV.linux.org.uk>
-	 <CANXojcw15RdJdRoZxB3Z59YbOda7vG7RDRegfpoCjG4Bv4AvsQ@mail.gmail.com>
-	 <20121129211624.GS4939@ZenIV.linux.org.uk>
-	 <CANXojcxfrO+Ar4JSd0NiDJh7+_gg6s6cq5=UA7Pu1h4DRZ8Vkg@mail.gmail.com>
-	 <CAH2r5muw1U2XNMZsCq0gApuTMyj+6SN6S9KsUq52YM8CyZEG4A@mail.gmail.com>
-	 <CANXojcwRy5cBz=E1S567J-1BFC4AiamLr=35bKrX0Zq-Me2b3w@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: proposed cifs.ko authentication overhaul
+Date: Fri, 30 Nov 2012 09:27:51 -0500
+Message-ID: <20121130092751.16c83c3a@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANXojcwRy5cBz=E1S567J-1BFC4AiamLr=35bKrX0Zq-Me2b3w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi!
+Executive Summary:
+------------------
+I want to overhaul the cifs.ko authentication code to handle
+autonegotiation better. This means a fair bit of user-visible changes,
+but I think they're mostly for the better. I don't want to do this work
+unless it's clear that the proposed design is acceptable though.
 
-Since you introduced the "user experience" ignoring the fact that each
-user is quite different - especially if it comes to the "Average Joes
-using Ubuntu vs techies" department -, you should be prepared to eat
-your own dog food:
+Longer description:
+-------------------
+As I mentioned the other day, I'd like to see us overhaul the auth code
+in cifs.ko. I'm willing to do this work, but my attempt from several
+years ago was not merged. I'd like to ensure that the overall design
+is something everyone can live with before I embark upon coding
+anything.
 
-On Fre, 2012-11-30 at 08:10 +0100, Stef Bon wrote:
-[...]
-> At this moment the different events look like:
+This may be tl;dr for most folks, but please do read it if you think
+you care about how all of this works, especially if you might end up
+reviewing this code.
 
-Perhaps you should have used hexadecimal notation so that it is easier
-for the usual/average users of source code to see the bits more easily.
-In short: Please improve the user experience. Thank you.
+Why change anything?
+--------------------
+There are several reasons that I think the auth code needs an overhaul:
 
-> #define NOTIFYFS_FSEVENT_META_ATTRIB_NOTSET                     2
-> #define NOTIFYFS_FSEVENT_META_ATTRIB_MODE                       4
-> #define NOTIFYFS_FSEVENT_META_ATTRIB_OWNER                      8
-> #define NOTIFYFS_FSEVENT_META_ATTRIB_GROUP                      16
-> #define NOTIFYFS_FSEVENT_META_ATTRIB                            28
-And that number seems pretty random - not a power of 2 or a bit mask or
-the sum of the above.
+1/ The current code hamstrings the ability to properly autonegotiate
+the auth method to use. It currently decides what auth method it's
+going to use before ever contacting the server. This means that once
+you figure out that the server doesn't support the authentication that
+was decided, it's too late.
 
-> #define NOTIFYFS_FSEVENT_META_XATTR_NOTSET                      32
-> #define NOTIFYFS_FSEVENT_META_XATTR_CREATE                      64
-> #define NOTIFYFS_FSEVENT_META_XATTR_MODIFY                      128
-> #define NOTIFYFS_FSEVENT_META_XATTR_DELETE                      256
-> #define NOTIFYFS_FSEVENT_META_XATTR                             448
-And that number seems pretty random too - not a power of 2 or a bit mask
-or the sum of the above.
+2/ The SecurityFlags interface is totally unintuitive. It makes zero
+sense to perpetuate the travesty of the SecurityFlags interface. For
+one thing, it's global so you have a server that requires plaintext
+passwords then you're stuck with that for all of the servers you need
+to talk to.
 
-> #define NOTIFYFS_FSEVENT_FILE_NOTSET                            512
-> #define NOTIFYFS_FSEVENT_FILE_MODIFIED                          1024
-> #define NOTIFYFS_FSEVENT_FILE_SIZE                              2048
-> #define NOTIFYFS_FSEVENT_FILE_OPEN                              4096
-> #define NOTIFYFS_FSEVENT_FILE_READ                              8192
-> #define NOTIFYFS_FSEVENT_FILE_CLOSE_WRITE                       16384
-> #define NOTIFYFS_FSEVENT_FILE_CLOSE_NOWRITE                     32768
+3/ Passing in multiple sec= options is broken. This can happen if you
+have a mount set up in /etc/fstab, and then pass extra options to it
+when mounting. The extra options get appended onto the end of the
+options string. In that situation, it's reasonable for a user to expect
+"last one wins", but the sec= option doesn't currently work that way.
+The secFlg's will get or'ed and you can end up using the first auth
+method even though you specified a different one on the command line.
 
-> #define NOTIFYFS_FSEVENT_MOVE_NOTSET                            65536
+A proposed design for the user interface
+----------------------------------------
+Here's a number of changes I'd like to make:
 
-And from here own I'm too lazy to calculate (or even guess) if these are
-actually powers of 2 or not.
-> #define NOTIFYFS_FSEVENT_MOVE_CREATED                           131072
-> #define NOTIFYFS_FSEVENT_MOVE_MOVED                             262144
-> #define NOTIFYFS_FSEVENT_MOVE_MOVED_FROM                        524288
-> #define NOTIFYFS_FSEVENT_MOVE_MOVED_TO                          1048576
-> #define NOTIFYFS_FSEVENT_MOVE_DELETED                           2097152
-> 
-> #define NOTIFYFS_FSEVENT_FS_NOTSET                              4194304
-> #define NOTIFYFS_FSEVENT_FS_MOUNT                               8388608
-> #define NOTIFYFS_FSEVENT_FS_UNMOUNT                             16777216
-> #define NOTIFYFS_FSEVENT_FS_NLINKS                              33554432
+1/ Get rid of the SecurityFlags interface altogether, and simply
+require anyone who wants fine-grained control over the auth method to
+use specify a sec= option when mounting. If one isn't specified, then
+the code will be changed to use the a selection algorithm of its
+choosing (more on that later).
 
-MfG,
-	Bernd
+2/ Steve in particular has mentioned that he thinks there needs to be
+some mechanism to allow the admin to set system-wide security defaults.
+I don't think that's really necessary if we only allow the code to use
+authentication methods that we deem secure by default. Since the sec=
+mount option is only able to be specified by an administrator in the
+first place, I don't think it makes any sense to require the admin to
+also set specific module options in order to use a particular auth
+method.
+
+3/ it may however make sense to allow an admin to require signing, or
+to enforce the disabling of signing altogether. A tristate module
+option could be added for that.
+
+If #2 isn't acceptable, then I'm willing to compromise. Perhaps we
+could add a boolean module option "disable weak crypto" or something.
+
+Proposed auth selection algorithm
+---------------------------------
+Once we change the code not to decide the auth method before contacting
+the server, we can allow it to be a lot smarter about picking an auth
+scheme. The following applies to SMB1, things are simpler with SMB2,
+but we still will be living with SMB1 for a long, long time to come.
+Also, it's possible that in the future SMB3+ will introduce new auth
+schemes and we'll need a better selection mechanism for that than we
+have today.
+
+For SMB1, we'll set the SMBFLG2_EXT_SEC unconditionally in the NegProt
+request. We can then use the NegProt response to decide what auth
+method to use. If the server responds with that bit set, we'll try the
+methods specified in the SPNEGO response, in the specified order. With
+that change we can even try to use krb5 without requiring that sec=krb5
+be specified. We can try to upcall first and then fall back onto the
+next method if we don't get a ticket.
+
+If the server responds w/o setting SMBFLG2_EXT_SEC, then we'll try
+ntlmv2(i). If that fails, we'll give up. Trying anything lower will
+require that the admin set the sec= mount option.
+
+SMB2 support is still pretty crippled and only supports NTLMSSP
+currently, but eventually we'll need something similar for it to handle
+krb5 too.
+
+Thoughts?
 -- 
-Bernd Petrovitsch                  Email : bernd-JY8rjfDgnXcb9sJ47jD7nuTv7YV0F9Eg@public.gmane.org
-                     LUGA : http://www.luga.at
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
