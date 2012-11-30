@@ -1,9 +1,9 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH 2/3] cifs: Make CIFS_DEBUG possible to undefine
-Date: Fri, 30 Nov 2012 06:49:19 -0500
-Message-ID: <20121130064919.373547f4@tlielax.poochiereds.net>
+Subject: Re: [PATCH 3/3] cifs: Enable Kconfig control of CIFS_DEBUG
+Date: Fri, 30 Nov 2012 06:56:29 -0500
+Message-ID: <20121130065629.52c489dc@tlielax.poochiereds.net>
 References: <cover.1354217746.git.joe@perches.com>
-	<26f6f4e1a1fb5091784fb1a6919e214994a6dc88.1354217746.git.joe@perches.com>
+	<5f5c9196b44908026a27333ef31dd4ebf4314de2.1354217746.git.joe@perches.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -11,7 +11,7 @@ Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
 To: Joe Perches <joe@perches.com>
 Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <26f6f4e1a1fb5091784fb1a6919e214994a6dc88.1354217746.git.joe@perches.com>
+In-Reply-To: <5f5c9196b44908026a27333ef31dd4ebf4314de2.1354217746.git.joe@perches.com>
 List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
 	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
 List-Archive: <http://lists.samba.org/pipermail/samba-technical>
@@ -23,125 +23,67 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 29 Nov 2012 11:37:19 -0800
+On Thu, 29 Nov 2012 11:37:20 -0800
 Joe Perches <joe@perches.com> wrote:
 
-> Make the compilation work again when CIFS_DEBUG is not #define'd.
+> Rather than havign a permanently enabled #define, allow
+> control over it.
 > 
-> Add format and argument verification for the various macros when
-> CIFS_DEBUG is not #define'd.
+> This can reduce the size of the module by ~100KB which
+> could be useful for embedded systems.
 > 
 > Signed-off-by: Joe Perches <joe@perches.com>
 > ---
->  fs/cifs/cifs_debug.h |   64 ++++++++++++++++++++++++++++++++------------------
->  1 files changed, 41 insertions(+), 23 deletions(-)
+>  fs/cifs/Kconfig      |   10 +++++++++-
+>  fs/cifs/cifs_debug.h |    5 ++++-
+>  2 files changed, 13 insertions(+), 2 deletions(-)
 > 
+> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+> index 2075ddf..21ff76c 100644
+> --- a/fs/cifs/Kconfig
+> +++ b/fs/cifs/Kconfig
+> @@ -122,9 +122,17 @@ config CIFS_ACL
+>  	    Allows fetching CIFS/NTFS ACL from the server.  The DACL blob
+>  	    is handed over to the application/caller.
+>  
+> +config CIFS_DEBUG
+> +	bool "Enable CIFS debugging routines"
+> +	default y
+> +	depends on CIFS
+> +	help
+> +	   Enabling this option adds helpful debugging messages to
+> +	   the cifs code which increases the size of the cifs module.
+> +	   If unsure, say Y.
+>  config CIFS_DEBUG2
+>  	bool "Enable additional CIFS debugging routines"
+> -	depends on CIFS
+> +	depends on CIFS_DEBUG
+>  	help
+>  	   Enabling this option adds a few more debugging routines
+>  	   to the cifs code which slightly increases the size of
 > diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
-> index b0fc344..4d12fe4 100644
+> index 4d12fe4..6867a7f 100644
 > --- a/fs/cifs/cifs_debug.h
 > +++ b/fs/cifs/cifs_debug.h
-> @@ -37,6 +37,9 @@ void dump_smb(void *, int);
->  #define CIFS_RC		0x02
->  #define CIFS_TIMER	0x04
->  
-> +extern int cifsFYI;
-> +extern int cifsERROR;
+> @@ -18,7 +18,10 @@
+>   *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+>   *
+>  */
+> -#define CIFS_DEBUG		/* BB temporary */
 > +
->  /*
->   *	debug ON
->   *	--------
-> @@ -44,36 +47,33 @@ void dump_smb(void *, int);
->  #ifdef CIFS_DEBUG
+> +#ifdef CONFIG_CIFS_DEBUG
+> +#define CIFS_DEBUG
+> +#endif
 >  
->  /* information message: e.g., configuration, major event */
-> -extern int cifsFYI;
-> -#define cifsfyi(fmt, arg...)						\
-> +#define cifsfyi(fmt, ...)						\
->  do {									\
->  	if (cifsFYI & CIFS_INFO)					\
-> -		printk(KERN_DEBUG "%s: " fmt "\n", __FILE__, ##arg);	\
-> +		printk(KERN_DEBUG "%s: " fmt "\n",			\
-> +		       __FILE__, ##__VA_ARGS__);			\
->  } while (0)
->  
-> -#define cFYI(set, fmt, arg...)			\
-> -do {						\
-> -	if (set)				\
-> -		cifsfyi(fmt, ##arg);		\
-> +#define cFYI(set, fmt, ...)						\
-> +do {									\
-> +	if (set)							\
-> +		cifsfyi(fmt, ##__VA_ARGS__);				\
->  } while (0)
->  
-> -#define cifswarn(fmt, arg...)			\
-> -	printk(KERN_WARNING fmt "\n", ##arg)
-> -
-> -/* debug event message: */
-> -extern int cifsERROR;
-> +#define cifswarn(fmt, ...)						\
-> +	printk(KERN_WARNING fmt "\n", ##__VA_ARGS__)
->  
->  /* error event message: e.g., i/o error */
-> -#define cifserror(fmt, arg...)					\
-> -do {								\
-> -	if (cifsERROR)						\
-> -		printk(KERN_ERR "CIFS VFS: " fmt "\n", ##arg);	\
-> +#define cifserror(fmt, ...)						\
-> +do {									\
-> +	if (cifsERROR)							\
-> +		printk(KERN_ERR "CIFS VFS: " fmt "\n", ##__VA_ARGS__);	\
->  } while (0)
->  
-> -#define cERROR(set, fmt, arg...)		\
-> -do {						\
-> -	if (set)				\
-> -		cifserror(fmt, ##arg);		\
-> +#define cERROR(set, fmt, ...)						\
-> +do {									\
-> +	if (set)							\
-> +		cifserror(fmt, ##__VA_ARGS__);				\
->  } while (0)
->  
->  /*
-> @@ -81,9 +81,27 @@ do {						\
->   *	---------
->   */
->  #else		/* _CIFS_DEBUG */
-> -#define cERROR(set, fmt, arg...)
-> -#define cFYI(set, fmt, arg...)
-> -#define cifserror(fmt, arg...)
-> +#define cifsfyi(fmt, ...)						\
-> +do {									\
-> +	if (0)								\
-> +		printk(KERN_DEBUG "%s: " fmt "\n",			\
-> +		       __FILE__, ##__VA_ARGS__);			\
-> +} while (0)
-> +#define cFYI(set, fmt, ...)						\
-> +do {									\
-> +	if (0 && set)							\
-> +		cifsfyi(fmt, ##__VA_ARGS__);				\
-> +} while (0)
-> +#define cifserror(fmt, ...)						\
-> +do {									\
-> +	if (0)								\
-> +		printk(KERN_ERR "CIFS VFS: " fmt "\n", ##__VA_ARGS__);	\
-> +} while (0)
-> +#define cERROR(set, fmt, ...)						\
-> +do {									\
-> +	if (0 && set)							\
-> +		cifserror(fmt, ##__VA_ARGS__);				\
-> +} while (0)
+>  #ifndef _H_CIFS_DEBUG
+>  #define _H_CIFS_DEBUG
 
-Would it be better to simply make those the standard
+Looks fine, but I'd probably prefer to just get rid of CIFS_DEBUG
+altogether here and replace it with CONFIG_CIFS_DEBUG.
 
-"do { ; } while(0)" noop macros?
-
-I'm not sure I see the point in keeping the printk statements in there...
-
->  #endif		/* _CIFS_DEBUG */
->  
->  #endif				/* _H_CIFS_DEBUG */
+While you're at it, /proc/fs/cifs/cifsFYI should probably not be
+present when CONFIG_CIFS_DEBUG isn't set. Perhaps we should also
+disable traceSMB and its related functions too in that case?
 
 -- 
 Jeff Layton <jlayton@redhat.com>
