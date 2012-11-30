@@ -1,44 +1,87 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: cifs: clean up handling of unc= option commit
-Date: Fri, 30 Nov 2012 07:02:11 -0500
-Message-ID: <20121130070211.749e76fe@tlielax.poochiereds.net>
-References: <CAH2r5mtPsux7U3MpLxnNGDBQS7OdYqBeUXhS=XspyrUgsrrevg@mail.gmail.com>
-	<20121129200208.56653c6a@corrin.poochiereds.net>
+From: Bernd Petrovitsch <bernd-JY8rjfDgnXcb9sJ47jD7nuTv7YV0F9Eg@public.gmane.org>
+Subject: Re: Possible to make nfs aware of a inotify watch has been set.
+Date: Fri, 30 Nov 2012 14:37:20 +0100
+Message-ID: <1354282642.22426.7.camel@thorin>
+References: <CANXojcy9thLBwrENTkOTSSE17L3N17A8XsTmyNqq3oNdhW_Q_w@mail.gmail.com>
+	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B329CFD@SACEXCMBX04-PRD.hq.netapp.com>
+	 <CANXojcxR9673fRObMLPSScogAN05RSVhPFoni=ENc6YDWq9T7w@mail.gmail.com>
+	 <1354202525.4064.1.camel@pico.ipa.ssimo.org>
+	 <4FA345DA4F4AE44899BD2B03EEEC2FA90B32AEB7@SACEXCMBX04-PRD.hq.netapp.com>
+	 <CANXojcys4wR8N-R3oSjWRWJLsObn0Qf+i41vBUaNnJctdcrKVw@mail.gmail.com>
+	 <20121129202037.GQ4939@ZenIV.linux.org.uk>
+	 <CANXojcw15RdJdRoZxB3Z59YbOda7vG7RDRegfpoCjG4Bv4AvsQ@mail.gmail.com>
+	 <20121129211624.GS4939@ZenIV.linux.org.uk>
+	 <CANXojcxfrO+Ar4JSd0NiDJh7+_gg6s6cq5=UA7Pu1h4DRZ8Vkg@mail.gmail.com>
+	 <CAH2r5muw1U2XNMZsCq0gApuTMyj+6SN6S9KsUq52YM8CyZEG4A@mail.gmail.com>
+	 <CANXojcwRy5cBz=E1S567J-1BFC4AiamLr=35bKrX0Zq-Me2b3w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	"linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Stef Bon <stefbon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121129200208.56653c6a-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <CANXojcwRy5cBz=E1S567J-1BFC4AiamLr=35bKrX0Zq-Me2b3w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 29 Nov 2012 20:02:08 -0500
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Hi!
 
-> On Thu, 29 Nov 2012 18:17:14 -0600
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Since you introduced the "user experience" ignoring the fact that each
+user is quite different - especially if it comes to the "Average Joes
+using Ubuntu vs techies" department -, you should be prepared to eat
+your own dog food:
+
+On Fre, 2012-11-30 at 08:10 +0100, Stef Bon wrote:
+[...]
+> At this moment the different events look like:
+
+Perhaps you should have used hexadecimal notation so that it is easier
+for the usual/average users of source code to see the bits more easily.
+In short: Please improve the user experience. Thank you.
+
+> #define NOTIFYFS_FSEVENT_META_ATTRIB_NOTSET                     2
+> #define NOTIFYFS_FSEVENT_META_ATTRIB_MODE                       4
+> #define NOTIFYFS_FSEVENT_META_ATTRIB_OWNER                      8
+> #define NOTIFYFS_FSEVENT_META_ATTRIB_GROUP                      16
+> #define NOTIFYFS_FSEVENT_META_ATTRIB                            28
+And that number seems pretty random - not a power of 2 or a bit mask or
+the sum of the above.
+
+> #define NOTIFYFS_FSEVENT_META_XATTR_NOTSET                      32
+> #define NOTIFYFS_FSEVENT_META_XATTR_CREATE                      64
+> #define NOTIFYFS_FSEVENT_META_XATTR_MODIFY                      128
+> #define NOTIFYFS_FSEVENT_META_XATTR_DELETE                      256
+> #define NOTIFYFS_FSEVENT_META_XATTR                             448
+And that number seems pretty random too - not a power of 2 or a bit mask
+or the sum of the above.
+
+> #define NOTIFYFS_FSEVENT_FILE_NOTSET                            512
+> #define NOTIFYFS_FSEVENT_FILE_MODIFIED                          1024
+> #define NOTIFYFS_FSEVENT_FILE_SIZE                              2048
+> #define NOTIFYFS_FSEVENT_FILE_OPEN                              4096
+> #define NOTIFYFS_FSEVENT_FILE_READ                              8192
+> #define NOTIFYFS_FSEVENT_FILE_CLOSE_WRITE                       16384
+> #define NOTIFYFS_FSEVENT_FILE_CLOSE_NOWRITE                     32768
+
+> #define NOTIFYFS_FSEVENT_MOVE_NOTSET                            65536
+
+And from here own I'm too lazy to calculate (or even guess) if these are
+actually powers of 2 or not.
+> #define NOTIFYFS_FSEVENT_MOVE_CREATED                           131072
+> #define NOTIFYFS_FSEVENT_MOVE_MOVED                             262144
+> #define NOTIFYFS_FSEVENT_MOVE_MOVED_FROM                        524288
+> #define NOTIFYFS_FSEVENT_MOVE_MOVED_TO                          1048576
+> #define NOTIFYFS_FSEVENT_MOVE_DELETED                           2097152
 > 
-> > Jeff,
-> > In your patch "cifs: clean up handling of unc= option	commit" aren't
-> > you changing the parsing of not just the beginning of the UNC name to
-> > change //server/share to \\server/share (e.g.) but did you mean to
-> > change the parsing of the rest of the UNC name as well.  Doesn't
-> > convert delimiter change all occurrences not just the first) ?
-> > 
-> 
-> Yes, that's intentional.
-> 
+> #define NOTIFYFS_FSEVENT_FS_NOTSET                              4194304
+> #define NOTIFYFS_FSEVENT_FS_MOUNT                               8388608
+> #define NOTIFYFS_FSEVENT_FS_UNMOUNT                             16777216
+> #define NOTIFYFS_FSEVENT_FS_NLINKS                              33554432
 
-To clarify...
-
-The mount helper has passed in the unc= option with '\\' delimiters for
-a long time, regardless of what the user passes in. '/' is not an
-allowable character in a UNC component, so there's no harm in
-converting those characters unconditionally.
-
-The prefixpath is different, of course...
-
+MfG,
+	Bernd
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Bernd Petrovitsch                  Email : bernd-JY8rjfDgnXcb9sJ47jD7nuTv7YV0F9Eg@public.gmane.org
+                     LUGA : http://www.luga.at
