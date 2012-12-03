@@ -1,141 +1,46 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v2 5/6] CIFS: Do not permit write to a range mandatory
- locked with a read lock
-Date: Mon, 3 Dec 2012 13:55:31 +0400
-Message-ID: <CAKywueRtuz=pHWoa7fRkwyrOPsuOSS8MO7rhqVzKtd0SXVRfYQ@mail.gmail.com>
-References: <1354112625-30315-1-git-send-email-piastry@etersoft.ru>
-	<1354112625-30315-6-git-send-email-piastry@etersoft.ru>
-	<20121130135721.5fef027b@tlielax.poochiereds.net>
+From: Jesper Nilsson <jesper.nilsson-VrBV9hrLPhE@public.gmane.org>
+Subject: [PATCH] MAINTAINERS: Fix cifs-tree git url
+Date: Mon, 3 Dec 2012 11:36:54 +0100
+Message-ID: <20121203103654.GY27196@axis.com>
+References: <20121129173053.GQ27196@axis.com>
+ <CAH2r5mvKGnZdUNb1-Msb10NBypG2cQm+5JrN-Ajv8VNvmX2+Pg@mail.gmail.com>
+ <20121129184709.GR27196@axis.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121130135721.5fef027b-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20121129184709.GR27196-VrBV9hrLPhE@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/11/30 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Wed, 28 Nov 2012 18:23:44 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> We don't need to permit a write to the area locked with a read lock
->> by any process including the process that issues the write.
->>
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->> ---
->>  fs/cifs/cifsproto.h |    2 +-
->>  fs/cifs/file.c      |   27 ++++++++++++++++++---------
->>  2 files changed, 19 insertions(+), 10 deletions(-)
->>
->> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->> index 7e1562d..4883f95 100644
->> --- a/fs/cifs/cifsproto.h
->> +++ b/fs/cifs/cifsproto.h
->> @@ -187,7 +187,7 @@ extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
->>  extern bool cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
->>                                   __u64 length, __u8 type,
->>                                   struct cifsLockInfo **conf_lock,
->> -                                 bool rw_check);
->> +                                 int rw_check);
->>  extern void cifs_add_pending_open(struct cifs_fid *fid,
->>                                 struct tcon_link *tlink,
->>                                 struct cifs_pending_open *open);
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index f8fe1bd..e7fc39c 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -765,10 +765,15 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
->>       }
->>  }
->>
->> +#define CIFS_LOCK_OP 0
->> +#define CIFS_READ_OP 1
->> +#define CIFS_WRITE_OP        2
->> +
->> +/* @rw_check : 0 - no op, 1 - read, 2 - write */
->>  static bool
->>  cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
->>                           __u64 length, __u8 type, struct cifsFileInfo *cfile,
->> -                         struct cifsLockInfo **conf_lock, bool rw_check)
->> +                         struct cifsLockInfo **conf_lock, int rw_check)
->>  {
->>       struct cifsLockInfo *li;
->>       struct cifsFileInfo *cur_cfile = fdlocks->cfile;
->> @@ -778,9 +783,13 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
->>               if (offset + length <= li->offset ||
->>                   offset >= li->offset + li->length)
->>                       continue;
->> -             if (rw_check && server->ops->compare_fids(cfile, cur_cfile) &&
->> -                 current->tgid == li->pid)
->> -                     continue;
->> +             if (rw_check != CIFS_LOCK_OP && current->tgid == li->pid &&
->> +                 server->ops->compare_fids(cfile, cur_cfile)) {
->> +                     /* shared lock prevents write op through the same fid */
->> +                     if (!(li->type & server->vals->shared_lock_type) ||
->> +                         rw_check != CIFS_WRITE_OP)
->> +                             continue;
->> +             }
->>               if ((type & server->vals->shared_lock_type) &&
->>                   ((server->ops->compare_fids(cfile, cur_cfile) &&
->>                    current->tgid == li->pid) || type == li->type))
->> @@ -795,7 +804,7 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
->>  bool
->>  cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
->>                       __u8 type, struct cifsLockInfo **conf_lock,
->> -                     bool rw_check)
->> +                     int rw_check)
->>  {
->>       bool rc = false;
->>       struct cifs_fid_locks *cur;
->> @@ -831,7 +840,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
->>       down_read(&cinode->lock_sem);
->>
->>       exist = cifs_find_lock_conflict(cfile, offset, length, type,
->> -                                     &conf_lock, false);
->> +                                     &conf_lock, CIFS_LOCK_OP);
->>       if (exist) {
->>               flock->fl_start = conf_lock->offset;
->>               flock->fl_end = conf_lock->offset + conf_lock->length - 1;
->> @@ -878,7 +887,7 @@ try_again:
->>       down_write(&cinode->lock_sem);
->>
->>       exist = cifs_find_lock_conflict(cfile, lock->offset, lock->length,
->> -                                     lock->type, &conf_lock, false);
->> +                                     lock->type, &conf_lock, CIFS_LOCK_OP);
->>       if (!exist && cinode->can_cache_brlcks) {
->>               list_add_tail(&lock->llist, &cfile->llist->locks);
->>               up_write(&cinode->lock_sem);
->> @@ -2472,7 +2481,7 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
->>       down_read(&cinode->lock_sem);
->>       if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
->>                                    server->vals->exclusive_lock_type, NULL,
->> -                                  true)) {
->> +                                  CIFS_WRITE_OP)) {
->>               mutex_lock(&inode->i_mutex);
->>               rc = __generic_file_aio_write(iocb, iov, nr_segs,
->>                                              &iocb->ki_pos);
->> @@ -2907,7 +2916,7 @@ cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
->>       down_read(&cinode->lock_sem);
->>       if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
->>                                    tcon->ses->server->vals->shared_lock_type,
->> -                                  NULL, true))
->> +                                  NULL, CIFS_READ_OP))
->>               rc = generic_file_aio_read(iocb, iov, nr_segs, pos);
->>       up_read(&cinode->lock_sem);
->>       return rc;
->
-> Code looks ok I guess. I'll have to take your word for it that the
-> windows locking semantics here are correct though...
->
-> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+The cifs-tree is no longer found on kernel.org,
+but linux-next uses the tree on samba.org, so use that instead.
 
-It was taken from here and proved with testing:
-"Locking a portion of a file for shared access denies all processes
-write access to the specified region of the file, including the
-process that first locks the region. All processes can read the locked
-region." (from http://msdn.microsoft.com/ru-ru/library/windows/desktop/aa365203(v=vs.85).aspx).
+Signed-off-by: Jesper Nilsson <jesper.nilsson-VrBV9hrLPhE@public.gmane.org>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 244b2f2..60d0e35 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2009,7 +2009,7 @@ L:	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+ L:	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org (moderated for non-subscribers)
+ W:	http://linux-cifs.samba.org/
+ Q:	http://patchwork.ozlabs.org/project/linux-cifs-client/list/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sfrench/cifs-2.6.git
++T:	git git://git.samba.org/sfrench/cifs-2.6.git
+ S:	Supported
+ F:	Documentation/filesystems/cifs.txt
+ F:	fs/cifs/
 -- 
-Best regards,
-Pavel Shilovsky.
+1.7.11.7
+
+
+/^JN - Jesper Nilsson
+-- 
+               Jesper Nilsson -- jesper.nilsson-VrBV9hrLPhE@public.gmane.org
