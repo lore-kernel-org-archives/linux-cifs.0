@@ -1,111 +1,160 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: proposed cifs.ko authentication overhaul
-Date: Mon, 3 Dec 2012 07:46:39 -0500
-Message-ID: <20121203074639.1a03d802@tlielax.poochiereds.net>
-References: <20121130092751.16c83c3a@tlielax.poochiereds.net>
-	<CAH2r5mtvpCXuhaT2W1A8+6NwMMaRZJwgERAo+3Rvrm8VD_XZEw@mail.gmail.com>
-	<CAH2r5mu=a77eFwpBOz1nu0iE9Hw7dKF+hCwmROEqy8cM2+pEuw@mail.gmail.com>
-	<20121202060456.372adbd8@tlielax.poochiereds.net>
-	<CAH2r5mtYRcf8xu09iqPf2CHJbF2pBiV8nziwHwsXP708F3+XKQ@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH v2 5/6] CIFS: Do not permit write to a range mandatory
+ locked with a read lock
+Date: Mon, 3 Dec 2012 08:58:46 -0600
+Message-ID: <CAH2r5mut7i4g5qtrt3chf_nO6PEQoHYecoqKpkfwS7cPAaMkFA@mail.gmail.com>
+References: <1354112625-30315-1-git-send-email-piastry@etersoft.ru>
+	<1354112625-30315-6-git-send-email-piastry@etersoft.ru>
+	<20121130135721.5fef027b@tlielax.poochiereds.net>
+	<CAKywueRtuz=pHWoa7fRkwyrOPsuOSS8MO7rhqVzKtd0SXVRfYQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtYRcf8xu09iqPf2CHJbF2pBiV8nziwHwsXP708F3+XKQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAKywueRtuz=pHWoa7fRkwyrOPsuOSS8MO7rhqVzKtd0SXVRfYQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 2 Dec 2012 21:48:48 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Just to doublecheck semantics ... posix applications (on the Linux
+kernel client) want to always allow a write where possible - if Wine
+issues a mandatory lock on a cached file do we want it to apply to
+posix applications or just applications like Wine?  Is the only way we
+can tell the difference the mount option you suggested?
 
-> A few quick observations:
-> 
-> 1) since mounts in the global names space are implicit, and yet
-> connect to multiple servers,  and you only get to specify security
-> options on the initial mount - we have to be able to set a list of
-> security mechanisms which are acceptable to the person doing the
-> mount.  The common example of the problem of only allowing one "sec="
-> option might be something like the following common case:
->     a) mount with krb5 to server1 (user specified "sec=krb5" since
-> they couldn't use multiple sec options in todays code ie
-> "sec=kbr5,sec=ntlmv2"  or "sec=krb5,ntlmv2")
->     b) dfs referral sends us to server2 which does not support krb5
-> (or like many servers is simply misconfigured) but client won't
-> negotiate ntlmv2 because the user required krb5
->     c) dfs referral fails, directory not accessible even though it
-> could be accessed from every other cifs/smb2/smb3 client (except ours)
-> 
-> Another example:
->    a) user mounts with sec=ntlmv2, but server crashes and we failover
-> to a mirror of that server (perhaps the server is one of those that
-> supports ip address takeover, or even better this is an smb3
-> continuously available share) - the other server only supports krb5 -
-> so we fail to reconnect and lose data.
-> 
-> Both of these could be addressed if we allow multiple "sec=" mount
-> options to be specified.   I don't think it matters which order we use
-> as the "preferred" order (ie whether krb5 is always assumed to be
-> better than ntlmv2 which is always better than ntlm, as I have
-> suggested or whether you pick the first as the "preferred" mechanism).
-> 
-> A final example,
-> mounting from fstab - if you don't allow specifying multiple sec=
-> options you can fail automounts from fstab since you can't "retry" an
-> fstab mount by specifying an "if this entry fails to mount, try a
-> similar entry with different mount option" (if the server only
-> supports ntlmv2 and you specify sec=krb5 or vice versa you are out of
-> luck if you are automounting with a "sec=").  Note that there are
-> obvious reasons why automatic mounts to different servers might
-> specify different levels of security - the server which keeps home
-> directories might require higher security for example.
-> 
-> Being able to specify something a list (persistent across boot) of
-> acceptable authentication mechanisms (as samba does in smb.conf,
-> windows does in the registry, and we do in
-> /proc/fs/cifs/SecurityFlags) makes the need to have multiple "sec="
-> less common (although still necessary).
-> 
+On Mon, Dec 3, 2012 at 3:55 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> 2012/11/30 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+>> On Wed, 28 Nov 2012 18:23:44 +0400
+>> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>>
+>>> We don't need to permit a write to the area locked with a read lock
+>>> by any process including the process that issues the write.
+>>>
+>>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>>> ---
+>>>  fs/cifs/cifsproto.h |    2 +-
+>>>  fs/cifs/file.c      |   27 ++++++++++++++++++---------
+>>>  2 files changed, 19 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+>>> index 7e1562d..4883f95 100644
+>>> --- a/fs/cifs/cifsproto.h
+>>> +++ b/fs/cifs/cifsproto.h
+>>> @@ -187,7 +187,7 @@ extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
+>>>  extern bool cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
+>>>                                   __u64 length, __u8 type,
+>>>                                   struct cifsLockInfo **conf_lock,
+>>> -                                 bool rw_check);
+>>> +                                 int rw_check);
+>>>  extern void cifs_add_pending_open(struct cifs_fid *fid,
+>>>                                 struct tcon_link *tlink,
+>>>                                 struct cifs_pending_open *open);
+>>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>>> index f8fe1bd..e7fc39c 100644
+>>> --- a/fs/cifs/file.c
+>>> +++ b/fs/cifs/file.c
+>>> @@ -765,10 +765,15 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
+>>>       }
+>>>  }
+>>>
+>>> +#define CIFS_LOCK_OP 0
+>>> +#define CIFS_READ_OP 1
+>>> +#define CIFS_WRITE_OP        2
+>>> +
+>>> +/* @rw_check : 0 - no op, 1 - read, 2 - write */
+>>>  static bool
+>>>  cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
+>>>                           __u64 length, __u8 type, struct cifsFileInfo *cfile,
+>>> -                         struct cifsLockInfo **conf_lock, bool rw_check)
+>>> +                         struct cifsLockInfo **conf_lock, int rw_check)
+>>>  {
+>>>       struct cifsLockInfo *li;
+>>>       struct cifsFileInfo *cur_cfile = fdlocks->cfile;
+>>> @@ -778,9 +783,13 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
+>>>               if (offset + length <= li->offset ||
+>>>                   offset >= li->offset + li->length)
+>>>                       continue;
+>>> -             if (rw_check && server->ops->compare_fids(cfile, cur_cfile) &&
+>>> -                 current->tgid == li->pid)
+>>> -                     continue;
+>>> +             if (rw_check != CIFS_LOCK_OP && current->tgid == li->pid &&
+>>> +                 server->ops->compare_fids(cfile, cur_cfile)) {
+>>> +                     /* shared lock prevents write op through the same fid */
+>>> +                     if (!(li->type & server->vals->shared_lock_type) ||
+>>> +                         rw_check != CIFS_WRITE_OP)
+>>> +                             continue;
+>>> +             }
+>>>               if ((type & server->vals->shared_lock_type) &&
+>>>                   ((server->ops->compare_fids(cfile, cur_cfile) &&
+>>>                    current->tgid == li->pid) || type == li->type))
+>>> @@ -795,7 +804,7 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
+>>>  bool
+>>>  cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+>>>                       __u8 type, struct cifsLockInfo **conf_lock,
+>>> -                     bool rw_check)
+>>> +                     int rw_check)
+>>>  {
+>>>       bool rc = false;
+>>>       struct cifs_fid_locks *cur;
+>>> @@ -831,7 +840,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
+>>>       down_read(&cinode->lock_sem);
+>>>
+>>>       exist = cifs_find_lock_conflict(cfile, offset, length, type,
+>>> -                                     &conf_lock, false);
+>>> +                                     &conf_lock, CIFS_LOCK_OP);
+>>>       if (exist) {
+>>>               flock->fl_start = conf_lock->offset;
+>>>               flock->fl_end = conf_lock->offset + conf_lock->length - 1;
+>>> @@ -878,7 +887,7 @@ try_again:
+>>>       down_write(&cinode->lock_sem);
+>>>
+>>>       exist = cifs_find_lock_conflict(cfile, lock->offset, lock->length,
+>>> -                                     lock->type, &conf_lock, false);
+>>> +                                     lock->type, &conf_lock, CIFS_LOCK_OP);
+>>>       if (!exist && cinode->can_cache_brlcks) {
+>>>               list_add_tail(&lock->llist, &cfile->llist->locks);
+>>>               up_write(&cinode->lock_sem);
+>>> @@ -2472,7 +2481,7 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+>>>       down_read(&cinode->lock_sem);
+>>>       if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
+>>>                                    server->vals->exclusive_lock_type, NULL,
+>>> -                                  true)) {
+>>> +                                  CIFS_WRITE_OP)) {
+>>>               mutex_lock(&inode->i_mutex);
+>>>               rc = __generic_file_aio_write(iocb, iov, nr_segs,
+>>>                                              &iocb->ki_pos);
+>>> @@ -2907,7 +2916,7 @@ cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
+>>>       down_read(&cinode->lock_sem);
+>>>       if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
+>>>                                    tcon->ses->server->vals->shared_lock_type,
+>>> -                                  NULL, true))
+>>> +                                  NULL, CIFS_READ_OP))
+>>>               rc = generic_file_aio_read(iocb, iov, nr_segs, pos);
+>>>       up_read(&cinode->lock_sem);
+>>>       return rc;
+>>
+>> Code looks ok I guess. I'll have to take your word for it that the
+>> windows locking semantics here are correct though...
+>>
+>> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>
+> It was taken from here and proved with testing:
+> "Locking a portion of a file for shared access denies all processes
+> write access to the specified region of the file, including the
+> process that first locks the region. All processes can read the locked
+> region." (from http://msdn.microsoft.com/ru-ru/library/windows/desktop/aa365203(v=vs.85).aspx).
+>
+> --
+> Best regards,
+> Pavel Shilovsky.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Sorry, I don't see the necessity for it. You have two choices here:
 
-1/ live with the (sensible) defaults
-
-2/ specify exactly what authentication type you want
- 
-In any case, that ability does not exist today, so I don't feel we'll
-lose anything by punting on it initially.
-
-If we can come to an agreement and I do this, then I'll try to engineer
-it in a way that someone can add support for an ordered list of
-sectypes later.
-
-If you do want to add that though, then allowing someone to specify a
-list of auth flavors means a new syntax. You cannot use multiple sec=
-options since it's not clear what your intent is. The current code is
-"last one wins" and if you try to change that, then you'll break it.
-
-What you need to do is design a new syntax for passing in this ordered
-list. Something like this:
-
-    sec=krb5:ntlmssp:ntlmv2
-
-Where they are attempted left to right.
-
-> On Sun, Dec 2, 2012 at 5:04 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > As far as making a knob setting persistent...module options that can be
-> > set in modprobe.conf or on the kernel command line are really the best
-> > way.
-> 
-> that is fine with me - as long as they can be loaded from something
-> persistent on disk, under administrator control.
-> 
-
-Now that I see your use cases above, then I really think that adding
-this extra knob is the wrong approach. The auth method to use ought to
-be governed solely by mount options. Anything else is extremely
-confusing for users and will just be a headache.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Thanks,
+
+Steve
