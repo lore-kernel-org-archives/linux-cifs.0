@@ -1,160 +1,40 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Subject: Re: [PATCH v2 5/6] CIFS: Do not permit write to a range mandatory
  locked with a read lock
-Date: Mon, 3 Dec 2012 08:58:46 -0600
-Message-ID: <CAH2r5mut7i4g5qtrt3chf_nO6PEQoHYecoqKpkfwS7cPAaMkFA@mail.gmail.com>
+Date: Mon, 3 Dec 2012 19:20:44 +0400
+Message-ID: <CAKywueQ9VB+znaGcQ+ZEC5KQy+jwgs4OABFmUnwcBx2EO7r8sA@mail.gmail.com>
 References: <1354112625-30315-1-git-send-email-piastry@etersoft.ru>
 	<1354112625-30315-6-git-send-email-piastry@etersoft.ru>
 	<20121130135721.5fef027b@tlielax.poochiereds.net>
 	<CAKywueRtuz=pHWoa7fRkwyrOPsuOSS8MO7rhqVzKtd0SXVRfYQ@mail.gmail.com>
+	<CAH2r5mut7i4g5qtrt3chf_nO6PEQoHYecoqKpkfwS7cPAaMkFA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueRtuz=pHWoa7fRkwyrOPsuOSS8MO7rhqVzKtd0SXVRfYQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <CAH2r5mut7i4g5qtrt3chf_nO6PEQoHYecoqKpkfwS7cPAaMkFA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Just to doublecheck semantics ... posix applications (on the Linux
-kernel client) want to always allow a write where possible - if Wine
-issues a mandatory lock on a cached file do we want it to apply to
-posix applications or just applications like Wine?  Is the only way we
-can tell the difference the mount option you suggested?
-
-On Mon, Dec 3, 2012 at 3:55 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
-> 2012/11/30 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
->> On Wed, 28 Nov 2012 18:23:44 +0400
->> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->>
->>> We don't need to permit a write to the area locked with a read lock
->>> by any process including the process that issues the write.
->>>
->>> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->>> ---
->>>  fs/cifs/cifsproto.h |    2 +-
->>>  fs/cifs/file.c      |   27 ++++++++++++++++++---------
->>>  2 files changed, 19 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
->>> index 7e1562d..4883f95 100644
->>> --- a/fs/cifs/cifsproto.h
->>> +++ b/fs/cifs/cifsproto.h
->>> @@ -187,7 +187,7 @@ extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
->>>  extern bool cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
->>>                                   __u64 length, __u8 type,
->>>                                   struct cifsLockInfo **conf_lock,
->>> -                                 bool rw_check);
->>> +                                 int rw_check);
->>>  extern void cifs_add_pending_open(struct cifs_fid *fid,
->>>                                 struct tcon_link *tlink,
->>>                                 struct cifs_pending_open *open);
->>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->>> index f8fe1bd..e7fc39c 100644
->>> --- a/fs/cifs/file.c
->>> +++ b/fs/cifs/file.c
->>> @@ -765,10 +765,15 @@ cifs_del_lock_waiters(struct cifsLockInfo *lock)
->>>       }
->>>  }
->>>
->>> +#define CIFS_LOCK_OP 0
->>> +#define CIFS_READ_OP 1
->>> +#define CIFS_WRITE_OP        2
->>> +
->>> +/* @rw_check : 0 - no op, 1 - read, 2 - write */
->>>  static bool
->>>  cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
->>>                           __u64 length, __u8 type, struct cifsFileInfo *cfile,
->>> -                         struct cifsLockInfo **conf_lock, bool rw_check)
->>> +                         struct cifsLockInfo **conf_lock, int rw_check)
->>>  {
->>>       struct cifsLockInfo *li;
->>>       struct cifsFileInfo *cur_cfile = fdlocks->cfile;
->>> @@ -778,9 +783,13 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
->>>               if (offset + length <= li->offset ||
->>>                   offset >= li->offset + li->length)
->>>                       continue;
->>> -             if (rw_check && server->ops->compare_fids(cfile, cur_cfile) &&
->>> -                 current->tgid == li->pid)
->>> -                     continue;
->>> +             if (rw_check != CIFS_LOCK_OP && current->tgid == li->pid &&
->>> +                 server->ops->compare_fids(cfile, cur_cfile)) {
->>> +                     /* shared lock prevents write op through the same fid */
->>> +                     if (!(li->type & server->vals->shared_lock_type) ||
->>> +                         rw_check != CIFS_WRITE_OP)
->>> +                             continue;
->>> +             }
->>>               if ((type & server->vals->shared_lock_type) &&
->>>                   ((server->ops->compare_fids(cfile, cur_cfile) &&
->>>                    current->tgid == li->pid) || type == li->type))
->>> @@ -795,7 +804,7 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
->>>  bool
->>>  cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
->>>                       __u8 type, struct cifsLockInfo **conf_lock,
->>> -                     bool rw_check)
->>> +                     int rw_check)
->>>  {
->>>       bool rc = false;
->>>       struct cifs_fid_locks *cur;
->>> @@ -831,7 +840,7 @@ cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
->>>       down_read(&cinode->lock_sem);
->>>
->>>       exist = cifs_find_lock_conflict(cfile, offset, length, type,
->>> -                                     &conf_lock, false);
->>> +                                     &conf_lock, CIFS_LOCK_OP);
->>>       if (exist) {
->>>               flock->fl_start = conf_lock->offset;
->>>               flock->fl_end = conf_lock->offset + conf_lock->length - 1;
->>> @@ -878,7 +887,7 @@ try_again:
->>>       down_write(&cinode->lock_sem);
->>>
->>>       exist = cifs_find_lock_conflict(cfile, lock->offset, lock->length,
->>> -                                     lock->type, &conf_lock, false);
->>> +                                     lock->type, &conf_lock, CIFS_LOCK_OP);
->>>       if (!exist && cinode->can_cache_brlcks) {
->>>               list_add_tail(&lock->llist, &cfile->llist->locks);
->>>               up_write(&cinode->lock_sem);
->>> @@ -2472,7 +2481,7 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
->>>       down_read(&cinode->lock_sem);
->>>       if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
->>>                                    server->vals->exclusive_lock_type, NULL,
->>> -                                  true)) {
->>> +                                  CIFS_WRITE_OP)) {
->>>               mutex_lock(&inode->i_mutex);
->>>               rc = __generic_file_aio_write(iocb, iov, nr_segs,
->>>                                              &iocb->ki_pos);
->>> @@ -2907,7 +2916,7 @@ cifs_strict_readv(struct kiocb *iocb, const struct iovec *iov,
->>>       down_read(&cinode->lock_sem);
->>>       if (!cifs_find_lock_conflict(cfile, pos, iov_length(iov, nr_segs),
->>>                                    tcon->ses->server->vals->shared_lock_type,
->>> -                                  NULL, true))
->>> +                                  NULL, CIFS_READ_OP))
->>>               rc = generic_file_aio_read(iocb, iov, nr_segs, pos);
->>>       up_read(&cinode->lock_sem);
->>>       return rc;
->>
->> Code looks ok I guess. I'll have to take your word for it that the
->> windows locking semantics here are correct though...
->>
->> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+2012/12/3 Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> Just to doublecheck semantics ... posix applications (on the Linux
+> kernel client) want to always allow a write where possible - if Wine
+> issues a mandatory lock on a cached file do we want it to apply to
+> posix applications or just applications like Wine?  Is the only way we
+> can tell the difference the mount option you suggested?
 >
-> It was taken from here and proved with testing:
-> "Locking a portion of a file for shared access denies all processes
-> write access to the specified region of the file, including the
-> process that first locks the region. All processes can read the locked
-> region." (from http://msdn.microsoft.com/ru-ru/library/windows/desktop/aa365203(v=vs.85).aspx).
->
-> --
-> Best regards,
-> Pavel Shilovsky.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+This change is not targeted to fix Wine-specific behavior. If we
+negotiate mandatory locking we need to be sure the server and client
+are the same: the server denied writes to the range locked with read
+lock - we should do the same things on the client to make the behavior
+not depend on the kind of oplock we have now.
 
+As for wine mount option: now, when we have rwpidforward and forcemand
+mount options, I don't think we need it because all that it should do
+is rwpidforward + forcemand + strictcache.
 
 -- 
-Thanks,
-
-Steve
+Best regards,
+Pavel Shilovsky.
