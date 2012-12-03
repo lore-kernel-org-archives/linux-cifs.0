@@ -1,193 +1,111 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v3 6/6] CIFS: Fix write after setting a read lock for read
- oplock files
-Date: Mon, 3 Dec 2012 16:19:00 +0400
-Message-ID: <CAKywueQ8i4tXvogEMswW7=24oU_OFH1ZJieeYmnbOmSiKvyRdw@mail.gmail.com>
-References: <1354112625-30315-7-git-send-email-piastry@etersoft.ru>
-	<1354536945-9593-1-git-send-email-piastry@etersoft.ru>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: proposed cifs.ko authentication overhaul
+Date: Mon, 3 Dec 2012 07:46:39 -0500
+Message-ID: <20121203074639.1a03d802@tlielax.poochiereds.net>
+References: <20121130092751.16c83c3a@tlielax.poochiereds.net>
+	<CAH2r5mtvpCXuhaT2W1A8+6NwMMaRZJwgERAo+3Rvrm8VD_XZEw@mail.gmail.com>
+	<CAH2r5mu=a77eFwpBOz1nu0iE9Hw7dKF+hCwmROEqy8cM2+pEuw@mail.gmail.com>
+	<20121202060456.372adbd8@tlielax.poochiereds.net>
+	<CAH2r5mtYRcf8xu09iqPf2CHJbF2pBiV8nziwHwsXP708F3+XKQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1354536945-9593-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <CAH2r5mtYRcf8xu09iqPf2CHJbF2pBiV8nziwHwsXP708F3+XKQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2012/12/3 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> If we have a read oplock and set a read lock in it, we can't write to the
-> locked area - so, filemap_fdatawrite may fail with a no information for a
-> userspace application even if we request a write to non-locked area. Fix
-> this by checking for brlocks, populating the page cache without marking
-> affected pages dirty and directly writing to the server.
->
-> Also remove CONFIG_CIFS_SMB2 ifdefs because it's suitable for both CIFS
-> and SMB2 protocols.
->
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c   |    1 +
->  fs/cifs/cifsglob.h |    1 +
->  fs/cifs/file.c     |   82 ++++++++++++++++++++++++++++++++--------------------
->  3 files changed, 53 insertions(+), 31 deletions(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index c6e32f2..210f0af 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -229,6 +229,7 @@ cifs_alloc_inode(struct super_block *sb)
->         cifs_set_oplock_level(cifs_inode, 0);
->         cifs_inode->delete_pending = false;
->         cifs_inode->invalid_mapping = false;
-> +       cifs_inode->leave_pages_clean = false;
->         cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
->         cifs_inode->server_eof = 0;
->         cifs_inode->uniqueid = 0;
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 2ca6f7d..426a2bf 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1037,6 +1037,7 @@ struct cifsInodeInfo {
->         bool clientCanCacheAll;         /* read and writebehind oplock */
->         bool delete_pending;            /* DELETE_ON_CLOSE is set */
->         bool invalid_mapping;           /* pagecache is invalid */
-> +       bool leave_pages_clean; /* protected by i_mutex, not set pages dirty */
->         unsigned long time;             /* jiffies of last update of inode */
->         u64  server_eof;                /* current file size on server -- protected by i_lock */
->         u64  uniqueid;                  /* server inode number */
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index e2fabc9..1bc6e67 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2109,7 +2109,15 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
->         } else {
->                 rc = copied;
->                 pos += copied;
-> -               set_page_dirty(page);
-> +               /*
-> +                * When we use strict cache mode and cifs_strict_writev was run
-> +                * with level II oplock (indicated by leave_pages_clean field of
-> +                * CIFS_I(inode)), we can leave pages clean and let
-> +                * cifs_strict_writev send a new data to the server itself.
-> +                */
-> +               if (!CIFS_I(inode)->leave_pages_clean ||
-> +                   !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
-> +                       set_page_dirty(page);
->         }
->
->         if (rc > 0) {
-> @@ -2460,8 +2468,8 @@ ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
->  }
->
->  static ssize_t
-> -cifs_writev(struct kiocb *iocb, const struct iovec *iov,
-> -           unsigned long nr_segs, loff_t pos)
-> +cifs_pagecache_writev(struct kiocb *iocb, const struct iovec *iov,
-> +                     unsigned long nr_segs, loff_t pos, bool cache_all)
->  {
->         struct file *file = iocb->ki_filp;
->         struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
-> @@ -2483,8 +2491,12 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
->                                      server->vals->exclusive_lock_type, NULL,
->                                      CIFS_WRITE_OP)) {
->                 mutex_lock(&inode->i_mutex);
-> +               if (!cache_all)
-> +                       cinode->leave_pages_clean = true;
->                 rc = __generic_file_aio_write(iocb, iov, nr_segs,
-> -                                              &iocb->ki_pos);
-> +                                             &iocb->ki_pos);
-> +               if (!cache_all)
-> +                       cinode->leave_pages_clean = false;
->                 mutex_unlock(&inode->i_mutex);
->         }
->
-> @@ -2511,25 +2523,38 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
->         struct cifsFileInfo *cfile = (struct cifsFileInfo *)
->                                                 iocb->ki_filp->private_data;
->         struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-> +       ssize_t written;
->
-> -#ifdef CONFIG_CIFS_SMB2
-> -       /*
-> -        * If we have an oplock for read and want to write a data to the file
-> -        * we need to store it in the page cache and then push it to the server
-> -        * to be sure the next read will get a valid data.
-> -        */
-> -       if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
-> -               ssize_t written;
-> -               int rc;
-> -
-> -               written = generic_file_aio_write(iocb, iov, nr_segs, pos);
-> -               rc = filemap_fdatawrite(inode->i_mapping);
-> -               if (rc)
-> -                       return (ssize_t)rc;
-> -
-> -               return written;
-> +       /* we have a read oplock - need to store a data in the page cache */
-> +       if (cinode->clientCanCacheRead) {
-> +               /*
-> +                * We need to store clientCanCacheAll here to prevent race
-> +                * conditions - this value can be changed during an execution
-> +                * of generic_file_aio_write. For CIFS it can be changed from
-> +                * true to false only, but for SMB2 it can be changed both from
-> +                * true to false and vice versa. So, we can end up with a data
-> +                * stored in the cache, not marked dirty and not sent to the
-> +                * server if this value changes its state from false to true
-> +                * after cifs_write_end.
-> +                */
-> +               bool cache_all = cinode->clientCanCacheAll;
-> +
-> +               if (cap_unix(tcon->ses) &&
-> +                   ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
-> +                   (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
-> +                                               tcon->fsUnixInfo.Capability)))
-> +                       written = generic_file_aio_write(iocb, iov, nr_segs,
-> +                                                        pos);
-> +               else
-> +                       written = cifs_pagecache_writev(iocb, iov, nr_segs, pos,
-> +                                                       cache_all);
-> +               /*
-> +                * Errors occured during writing or we have read+write oplock -
-> +                * no need to flush to the server.
-> +                */
-> +               if (written < 0 || cache_all)
-> +                       return written;
->         }
-> -#endif
->
->         /*
->          * For non-oplocked files in strict cache mode we need to write the data
-> @@ -2537,16 +2562,11 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
->          * affected pages because it may cause a error with mandatory locks on
->          * these pages but not on the region from pos to ppos+len-1.
->          */
-> -
-> -       if (!cinode->clientCanCacheAll)
-> -               return cifs_user_writev(iocb, iov, nr_segs, pos);
-> -
-> -       if (cap_unix(tcon->ses) &&
-> -           (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
-> -           ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
-> -               return generic_file_aio_write(iocb, iov, nr_segs, pos);
-> -
-> -       return cifs_writev(iocb, iov, nr_segs, pos);
-> +       written = cifs_user_writev(iocb, iov, nr_segs, pos);
-> +       /* need to restore pos if errors occured */
-> +       if (written < 0)
-> +               iocb->ki_pos = pos;
-> +       return written;
->  }
->
->  static struct cifs_readdata *
-> --
-> 1.7.10.4
->
+On Sun, 2 Dec 2012 21:48:48 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-This version fixes race conditions when oplock changes its state from
-level II to exclusive during generic_file_aio_write after
-cifs_write_end - this end up with a new data stored in the page cache,
-marked non-dirty and not sent to the server (possible for SMB2
-protocol).
+> A few quick observations:
+> 
+> 1) since mounts in the global names space are implicit, and yet
+> connect to multiple servers,  and you only get to specify security
+> options on the initial mount - we have to be able to set a list of
+> security mechanisms which are acceptable to the person doing the
+> mount.  The common example of the problem of only allowing one "sec="
+> option might be something like the following common case:
+>     a) mount with krb5 to server1 (user specified "sec=krb5" since
+> they couldn't use multiple sec options in todays code ie
+> "sec=kbr5,sec=ntlmv2"  or "sec=krb5,ntlmv2")
+>     b) dfs referral sends us to server2 which does not support krb5
+> (or like many servers is simply misconfigured) but client won't
+> negotiate ntlmv2 because the user required krb5
+>     c) dfs referral fails, directory not accessible even though it
+> could be accessed from every other cifs/smb2/smb3 client (except ours)
+> 
+> Another example:
+>    a) user mounts with sec=ntlmv2, but server crashes and we failover
+> to a mirror of that server (perhaps the server is one of those that
+> supports ip address takeover, or even better this is an smb3
+> continuously available share) - the other server only supports krb5 -
+> so we fail to reconnect and lose data.
+> 
+> Both of these could be addressed if we allow multiple "sec=" mount
+> options to be specified.   I don't think it matters which order we use
+> as the "preferred" order (ie whether krb5 is always assumed to be
+> better than ntlmv2 which is always better than ntlm, as I have
+> suggested or whether you pick the first as the "preferred" mechanism).
+> 
+> A final example,
+> mounting from fstab - if you don't allow specifying multiple sec=
+> options you can fail automounts from fstab since you can't "retry" an
+> fstab mount by specifying an "if this entry fails to mount, try a
+> similar entry with different mount option" (if the server only
+> supports ntlmv2 and you specify sec=krb5 or vice versa you are out of
+> luck if you are automounting with a "sec=").  Note that there are
+> obvious reasons why automatic mounts to different servers might
+> specify different levels of security - the server which keeps home
+> directories might require higher security for example.
+> 
+> Being able to specify something a list (persistent across boot) of
+> acceptable authentication mechanisms (as samba does in smb.conf,
+> windows does in the registry, and we do in
+> /proc/fs/cifs/SecurityFlags) makes the need to have multiple "sec="
+> less common (although still necessary).
+> 
+
+Sorry, I don't see the necessity for it. You have two choices here:
+
+1/ live with the (sensible) defaults
+
+2/ specify exactly what authentication type you want
+ 
+In any case, that ability does not exist today, so I don't feel we'll
+lose anything by punting on it initially.
+
+If we can come to an agreement and I do this, then I'll try to engineer
+it in a way that someone can add support for an ordered list of
+sectypes later.
+
+If you do want to add that though, then allowing someone to specify a
+list of auth flavors means a new syntax. You cannot use multiple sec=
+options since it's not clear what your intent is. The current code is
+"last one wins" and if you try to change that, then you'll break it.
+
+What you need to do is design a new syntax for passing in this ordered
+list. Something like this:
+
+    sec=krb5:ntlmssp:ntlmv2
+
+Where they are attempted left to right.
+
+> On Sun, Dec 2, 2012 at 5:04 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> > As far as making a knob setting persistent...module options that can be
+> > set in modprobe.conf or on the kernel command line are really the best
+> > way.
+> 
+> that is fine with me - as long as they can be loaded from something
+> persistent on disk, under administrator control.
+> 
+
+Now that I see your use cases above, then I really think that adding
+this extra knob is the wrong approach. The auth method to use ought to
+be governed solely by mount options. Anything else is extremely
+confusing for users and will just be a headache.
 
 -- 
-Best regards,
-Pavel Shilovsky.
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
