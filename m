@@ -1,118 +1,177 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 5/6 v2] cifs: fix up handling of prefixpath= option
-Date: Mon,  3 Dec 2012 06:48:13 -0500
-Message-ID: <1354535293-21647-1-git-send-email-jlayton@redhat.com>
-References: <1353087414-32152-6-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v3 6/6] CIFS: Fix write after setting a read lock for read oplock files
+Date: Mon,  3 Dec 2012 16:15:44 +0400
+Message-ID: <1354536945-9593-1-git-send-email-piastry@etersoft.ru>
+References: <1354112625-30315-7-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1353087414-32152-6-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1354112625-30315-7-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-(This patch takes into account Pavel's unification of the
-build_path_to_root functions).
+If we have a read oplock and set a read lock in it, we can't write to the
+locked area - so, filemap_fdatawrite may fail with a no information for a
+userspace application even if we request a write to non-locked area. Fix
+this by checking for brlocks, populating the page cache without marking
+affected pages dirty and directly writing to the server.
 
-Currently the code takes care to ensure that the prefixpath has a
-leading '/' delimiter. What if someone passes us a prefixpath with a
-leading '\\' instead? The code doesn't properly handle that currently
-AFAICS.
+Also remove CONFIG_CIFS_SMB2 ifdefs because it's suitable for both CIFS
+and SMB2 protocols.
 
-Let's just change the code to skip over any leading delimiter character
-when copying the prepath. Then, fix up the users of the prepath option
-to prefix it with the correct delimiter when they use it.
-
-Also, there's no need to limit the length of the prefixpath to 1k. If
-the server can handle it, why bother forbidding it?
-
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/connect.c | 34 +++++++++-------------------------
- fs/cifs/dir.c     |  5 +++--
- 2 files changed, 12 insertions(+), 27 deletions(-)
+ fs/cifs/cifsfs.c   |    1 +
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/file.c     |   82 ++++++++++++++++++++++++++++++++--------------------
+ 3 files changed, 53 insertions(+), 31 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index dfe497e..fdd7a13 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1603,31 +1603,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			}
- 			break;
- 		case Opt_prefixpath:
--			string = match_strdup(args);
--			if (string == NULL)
--				goto out_nomem;
--
--			temp_len = strnlen(string, 1024);
--			if (string[0] != '/')
--				temp_len++; /* missing leading slash */
--			if (temp_len > 1024) {
--				printk(KERN_WARNING "CIFS: prefix too long\n");
--				goto cifs_parse_mount_err;
--			}
--
--			vol->prepath = kmalloc(temp_len+1, GFP_KERNEL);
--			if (vol->prepath == NULL) {
--				printk(KERN_WARNING "CIFS: no memory "
--						    "for path prefix\n");
--				goto cifs_parse_mount_err;
--			}
--
--			if (string[0] != '/') {
--				vol->prepath[0] = '/';
--				strcpy(vol->prepath+1, string);
--			} else
--				strcpy(vol->prepath, string);
-+			/* skip over any leading delimiter */
-+			if (*args[0].from == '/' || *args[0].from == '\\')
-+				args[0].from++;
- 
-+			kfree(vol->prepath);
-+			vol->prepath = match_strdup(args);
-+			if (vol->prepath == NULL)
-+				goto out_nomem;
- 			break;
- 		case Opt_iocharset:
- 			string = match_strdup(args);
-@@ -3240,7 +3223,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
- 		const struct cifs_sb_info *cifs_sb)
- {
- 	char *full_path, *pos;
--	unsigned int pplen = vol->prepath ? strlen(vol->prepath) : 0;
-+	unsigned int pplen = vol->prepath ? strlen(vol->prepath) + 1: 0;
- 	unsigned int unc_len = strnlen(vol->UNC, MAX_TREE_SIZE + 1);
- 
- 	full_path = kmalloc(unc_len + pplen + 1, GFP_KERNEL);
-@@ -3251,6 +3234,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
- 	pos = full_path + unc_len;
- 
- 	if (pplen) {
-+		*pos++ = CIFS_DIR_SEP(cifs_sb);
- 		strncpy(pos, vol->prepath, pplen);
- 		pos += pplen;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index c6e32f2..210f0af 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -229,6 +229,7 @@ cifs_alloc_inode(struct super_block *sb)
+ 	cifs_set_oplock_level(cifs_inode, 0);
+ 	cifs_inode->delete_pending = false;
+ 	cifs_inode->invalid_mapping = false;
++	cifs_inode->leave_pages_clean = false;
+ 	cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
+ 	cifs_inode->server_eof = 0;
+ 	cifs_inode->uniqueid = 0;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 2ca6f7d..426a2bf 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1037,6 +1037,7 @@ struct cifsInodeInfo {
+ 	bool clientCanCacheAll;		/* read and writebehind oplock */
+ 	bool delete_pending;		/* DELETE_ON_CLOSE is set */
+ 	bool invalid_mapping;		/* pagecache is invalid */
++	bool leave_pages_clean;	/* protected by i_mutex, not set pages dirty */
+ 	unsigned long time;		/* jiffies of last update of inode */
+ 	u64  server_eof;		/* current file size on server -- protected by i_lock */
+ 	u64  uniqueid;			/* server inode number */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index e2fabc9..1bc6e67 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2109,7 +2109,15 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
+ 	} else {
+ 		rc = copied;
+ 		pos += copied;
+-		set_page_dirty(page);
++		/*
++		 * When we use strict cache mode and cifs_strict_writev was run
++		 * with level II oplock (indicated by leave_pages_clean field of
++		 * CIFS_I(inode)), we can leave pages clean and let
++		 * cifs_strict_writev send a new data to the server itself.
++		 */
++		if (!CIFS_I(inode)->leave_pages_clean ||
++		    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
++			set_page_dirty(page);
  	}
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 3b7e0c1..8719bbe 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -48,7 +48,7 @@ char *
- cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
- 			struct cifs_tcon *tcon)
+ 
+ 	if (rc > 0) {
+@@ -2460,8 +2468,8 @@ ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
+ }
+ 
+ static ssize_t
+-cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+-	    unsigned long nr_segs, loff_t pos)
++cifs_pagecache_writev(struct kiocb *iocb, const struct iovec *iov,
++		      unsigned long nr_segs, loff_t pos, bool cache_all)
  {
--	int pplen = vol->prepath ? strlen(vol->prepath) : 0;
-+	int pplen = vol->prepath ? strlen(vol->prepath) + 1 : 0;
- 	int dfsplen;
- 	char *full_path = NULL;
+ 	struct file *file = iocb->ki_filp;
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
+@@ -2483,8 +2491,12 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+ 				     server->vals->exclusive_lock_type, NULL,
+ 				     CIFS_WRITE_OP)) {
+ 		mutex_lock(&inode->i_mutex);
++		if (!cache_all)
++			cinode->leave_pages_clean = true;
+ 		rc = __generic_file_aio_write(iocb, iov, nr_segs,
+-					       &iocb->ki_pos);
++					      &iocb->ki_pos);
++		if (!cache_all)
++			cinode->leave_pages_clean = false;
+ 		mutex_unlock(&inode->i_mutex);
+ 	}
  
-@@ -69,7 +69,8 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+@@ -2511,25 +2523,38 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *)
+ 						iocb->ki_filp->private_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
++	ssize_t written;
  
- 	if (dfsplen)
- 		strncpy(full_path, tcon->treeName, dfsplen);
--	strncpy(full_path + dfsplen, vol->prepath, pplen);
-+	full_path[dfsplen] = CIFS_DIR_SEP(cifs_sb);
-+	strncpy(full_path + dfsplen + 1, vol->prepath, pplen);
- 	convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
- 	full_path[dfsplen + pplen] = 0; /* add trailing null */
- 	return full_path;
+-#ifdef CONFIG_CIFS_SMB2
+-	/*
+-	 * If we have an oplock for read and want to write a data to the file
+-	 * we need to store it in the page cache and then push it to the server
+-	 * to be sure the next read will get a valid data.
+-	 */
+-	if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
+-		ssize_t written;
+-		int rc;
+-
+-		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+-		rc = filemap_fdatawrite(inode->i_mapping);
+-		if (rc)
+-			return (ssize_t)rc;
+-
+-		return written;
++	/* we have a read oplock - need to store a data in the page cache */
++	if (cinode->clientCanCacheRead) {
++		/*
++		 * We need to store clientCanCacheAll here to prevent race
++		 * conditions - this value can be changed during an execution
++		 * of generic_file_aio_write. For CIFS it can be changed from
++		 * true to false only, but for SMB2 it can be changed both from
++		 * true to false and vice versa. So, we can end up with a data
++		 * stored in the cache, not marked dirty and not sent to the
++		 * server if this value changes its state from false to true
++		 * after cifs_write_end.
++		 */
++		bool cache_all = cinode->clientCanCacheAll;
++
++		if (cap_unix(tcon->ses) &&
++		    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
++		    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
++						tcon->fsUnixInfo.Capability)))
++			written = generic_file_aio_write(iocb, iov, nr_segs,
++							 pos);
++		else
++			written = cifs_pagecache_writev(iocb, iov, nr_segs, pos,
++							cache_all);
++		/*
++		 * Errors occured during writing or we have read+write oplock -
++		 * no need to flush to the server.
++		 */
++		if (written < 0 || cache_all)
++			return written;
+ 	}
+-#endif
+ 
+ 	/*
+ 	 * For non-oplocked files in strict cache mode we need to write the data
+@@ -2537,16 +2562,11 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	 * affected pages because it may cause a error with mandatory locks on
+ 	 * these pages but not on the region from pos to ppos+len-1.
+ 	 */
+-
+-	if (!cinode->clientCanCacheAll)
+-		return cifs_user_writev(iocb, iov, nr_segs, pos);
+-
+-	if (cap_unix(tcon->ses) &&
+-	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
+-	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
+-		return generic_file_aio_write(iocb, iov, nr_segs, pos);
+-
+-	return cifs_writev(iocb, iov, nr_segs, pos);
++	written = cifs_user_writev(iocb, iov, nr_segs, pos);
++	/* need to restore pos if errors occured */
++	if (written < 0)
++		iocb->ki_pos = pos;
++	return written;
+ }
+ 
+ static struct cifs_readdata *
 -- 
-1.7.11.7
+1.7.10.4
