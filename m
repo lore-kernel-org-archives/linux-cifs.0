@@ -1,122 +1,118 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: rename cifs_readdir_lookup to cifs_prime_dcache and make it void return
-Date: Mon,  3 Dec 2012 06:44:37 -0500
-Message-ID: <1354535077-21548-1-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 5/6 v2] cifs: fix up handling of prefixpath= option
+Date: Mon,  3 Dec 2012 06:48:13 -0500
+Message-ID: <1354535293-21647-1-git-send-email-jlayton@redhat.com>
+References: <1353087414-32152-6-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1353087414-32152-6-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The caller doesn't do anything with the dentry, so there's no point in
-holding a reference to it on return. Also cifs_prime_dcache better
-describes the actual purpose of the function.
+(This patch takes into account Pavel's unification of the
+build_path_to_root functions).
+
+Currently the code takes care to ensure that the prefixpath has a
+leading '/' delimiter. What if someone passes us a prefixpath with a
+leading '\\' instead? The code doesn't properly handle that currently
+AFAICS.
+
+Let's just change the code to skip over any leading delimiter character
+when copying the prepath. Then, fix up the users of the prepath option
+to prefix it with the correct delimiter when they use it.
+
+Also, there's no need to limit the length of the prefixpath to 1k. If
+the server can handle it, why bother forbidding it?
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/readdir.c | 42 ++++++++++++++++++------------------------
- 1 file changed, 18 insertions(+), 24 deletions(-)
+ fs/cifs/connect.c | 34 +++++++++-------------------------
+ fs/cifs/dir.c     |  5 +++--
+ 2 files changed, 12 insertions(+), 27 deletions(-)
 
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index 6492092..6002fdc 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -66,18 +66,20 @@ static inline void dump_cifs_file_struct(struct file *file, char *label)
- #endif /* DEBUG2 */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index dfe497e..fdd7a13 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1603,31 +1603,14 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 			}
+ 			break;
+ 		case Opt_prefixpath:
+-			string = match_strdup(args);
+-			if (string == NULL)
+-				goto out_nomem;
+-
+-			temp_len = strnlen(string, 1024);
+-			if (string[0] != '/')
+-				temp_len++; /* missing leading slash */
+-			if (temp_len > 1024) {
+-				printk(KERN_WARNING "CIFS: prefix too long\n");
+-				goto cifs_parse_mount_err;
+-			}
+-
+-			vol->prepath = kmalloc(temp_len+1, GFP_KERNEL);
+-			if (vol->prepath == NULL) {
+-				printk(KERN_WARNING "CIFS: no memory "
+-						    "for path prefix\n");
+-				goto cifs_parse_mount_err;
+-			}
+-
+-			if (string[0] != '/') {
+-				vol->prepath[0] = '/';
+-				strcpy(vol->prepath+1, string);
+-			} else
+-				strcpy(vol->prepath, string);
++			/* skip over any leading delimiter */
++			if (*args[0].from == '/' || *args[0].from == '\\')
++				args[0].from++;
  
- /*
-+ * Attempt to preload the dcache with the results from the FIND_FIRST/NEXT
-+ *
-  * Find the dentry that matches "name". If there isn't one, create one. If it's
-  * a negative dentry or the uniqueid changed, then drop it and recreate it.
-  */
--static struct dentry *
--cifs_readdir_lookup(struct dentry *parent, struct qstr *name,
-+static void
-+cifs_prime_dcache(struct dentry *parent, struct qstr *name,
- 		    struct cifs_fattr *fattr)
++			kfree(vol->prepath);
++			vol->prepath = match_strdup(args);
++			if (vol->prepath == NULL)
++				goto out_nomem;
+ 			break;
+ 		case Opt_iocharset:
+ 			string = match_strdup(args);
+@@ -3240,7 +3223,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
+ 		const struct cifs_sb_info *cifs_sb)
  {
- 	struct dentry *dentry, *alias;
- 	struct inode *inode;
- 	struct super_block *sb = parent->d_inode->i_sb;
+ 	char *full_path, *pos;
+-	unsigned int pplen = vol->prepath ? strlen(vol->prepath) : 0;
++	unsigned int pplen = vol->prepath ? strlen(vol->prepath) + 1: 0;
+ 	unsigned int unc_len = strnlen(vol->UNC, MAX_TREE_SIZE + 1);
  
--	cFYI(1, "For %s", name->name);
-+	cFYI(1, "%s: for %s", __func__, name->name);
+ 	full_path = kmalloc(unc_len + pplen + 1, GFP_KERNEL);
+@@ -3251,6 +3234,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
+ 	pos = full_path + unc_len;
  
- 	if (parent->d_op && parent->d_op->d_hash)
- 		parent->d_op->d_hash(parent, parent->d_inode, name);
-@@ -87,37 +89,32 @@ cifs_readdir_lookup(struct dentry *parent, struct qstr *name,
- 	dentry = d_lookup(parent, name);
- 	if (dentry) {
- 		int err;
-+
- 		inode = dentry->d_inode;
- 		/* update inode in place if i_ino didn't change */
- 		if (inode && CIFS_I(inode)->uniqueid == fattr->cf_uniqueid) {
- 			cifs_fattr_to_inode(inode, fattr);
--			return dentry;
-+			goto out;
- 		}
- 		err = d_invalidate(dentry);
- 		dput(dentry);
- 		if (err)
--			return NULL;
-+			return;
+ 	if (pplen) {
++		*pos++ = CIFS_DIR_SEP(cifs_sb);
+ 		strncpy(pos, vol->prepath, pplen);
+ 		pos += pplen;
  	}
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 3b7e0c1..8719bbe 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -48,7 +48,7 @@ char *
+ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+ 			struct cifs_tcon *tcon)
+ {
+-	int pplen = vol->prepath ? strlen(vol->prepath) : 0;
++	int pplen = vol->prepath ? strlen(vol->prepath) + 1 : 0;
+ 	int dfsplen;
+ 	char *full_path = NULL;
  
- 	dentry = d_alloc(parent, name);
--	if (dentry == NULL)
--		return NULL;
-+	if (!dentry)
-+		return;
+@@ -69,7 +69,8 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
  
- 	inode = cifs_iget(sb, fattr);
--	if (!inode) {
--		dput(dentry);
--		return NULL;
--	}
-+	if (!inode)
-+		goto out;
- 
- 	alias = d_materialise_unique(dentry, inode);
--	if (alias != NULL) {
--		dput(dentry);
--		if (IS_ERR(alias))
--			return NULL;
--		dentry = alias;
--	}
--
--	return dentry;
-+	if (alias && !IS_ERR(alias))
-+		dput(alias);
-+out:
-+	dput(dentry);
- }
- 
- static void
-@@ -662,7 +659,6 @@ static int cifs_filldir(char *find_entry, struct file *file, filldir_t filldir,
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct cifs_dirent de = { NULL, };
- 	struct cifs_fattr fattr;
--	struct dentry *dentry;
- 	struct qstr name;
- 	int rc = 0;
- 	ino_t ino;
-@@ -733,13 +729,11 @@ static int cifs_filldir(char *find_entry, struct file *file, filldir_t filldir,
- 		 */
- 		fattr.cf_flags |= CIFS_FATTR_NEED_REVAL;
- 
--	ino = cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
--	dentry = cifs_readdir_lookup(file->f_dentry, &name, &fattr);
-+	cifs_prime_dcache(file->f_dentry, &name, &fattr);
- 
-+	ino = cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
- 	rc = filldir(dirent, name.name, name.len, file->f_pos, ino,
- 		     fattr.cf_dtype);
--
--	dput(dentry);
- 	return rc;
- }
- 
+ 	if (dfsplen)
+ 		strncpy(full_path, tcon->treeName, dfsplen);
+-	strncpy(full_path + dfsplen, vol->prepath, pplen);
++	full_path[dfsplen] = CIFS_DIR_SEP(cifs_sb);
++	strncpy(full_path + dfsplen + 1, vol->prepath, pplen);
+ 	convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
+ 	full_path[dfsplen + pplen] = 0; /* add trailing null */
+ 	return full_path;
 -- 
 1.7.11.7
