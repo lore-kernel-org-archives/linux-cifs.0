@@ -1,96 +1,114 @@
-From: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
-Subject: CIFS VFS: Unexpected SMB signature ...NULL inode in lookup
-Date: Tue, 04 Dec 2012 14:23:16 +0100
-Message-ID: <546150668.69990.1354627396422.JavaMail.www@wwinf8225>
-Reply-To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH 1/6] mount.cifs: treat uid=,gid=,cruid= options as name before assuming they're a number
+Date: Tue,  4 Dec 2012 10:16:39 -0500
+Message-ID: <1354634204-21602-2-git-send-email-jlayton@samba.org>
+References: <1354634204-21602-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1354634204-21602-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+Sergio Conrad reported a problem trying to set up an autofs map to do
+a krb5 mount. In his environment, many users have usernames that are
+comprised entirely of numbers. While that's a bit odd, POSIX apparently
+allows for it.
 
-I have a problem with users losing their connections from linux clients=
- with cifs share. (Windows 2008) :CIFS VFS: Unexpected SMB signature
-I am using two methods for mounting: pam_mount and autofs, both with sa=
-me results.
+The current code assumes that when a numeric argument is passed to one
+of the above options, that it's a uid or gid. Instead, try to treat the
+argument as a user or group name first, and only try to treat it as a
+number if that fails.
 
-I am using mount options nounix,noserverino
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.c | 50 ++++++++++++++++++++++++--------------------------
+ 1 file changed, 24 insertions(+), 26 deletions(-)
 
-I am lauching cifs module on boot (rc.local) with
-modprobe cifs
-echo 0 > /proc/fs/cifs/OplockEnabled
-echo 1 > /proc/fs/cifs/MultiuserMount
-echo 7 > /proc/fs/cifs/cifsFYI
-
-What happens :=20
-in /var/log/messages
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Dec 3 17:31:01 u1205-08l kernel: [ 3732.140040] CIFS VFS: Unexpected lo=
-okup error -512
-Dec 3 17:31:01 u1205-08l kernel: [ 3732.334939] CIFS VFS: Unexpected SM=
-B signature
-
-This user was working since one hour with no problem :
-Daemon log :
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Dec 3 16:29:35 u1205-08l cifs.upcall: key description: cifs.spnego;0;0;=
-3f000000
-;ver=3D0x2;host=3Dfigue;ip4=3D130.120.8.11;sec=3Dkrb5;uid=3D0x1000005;c=
-reduid=3D0x1000005;us
-er=3D21206xxx;pid=3D0x65f
-Dec 3 16:29:35 u1205-08l cifs.upcall: ver=3D2
-Dec 3 16:29:35 u1205-08l cifs.upcall: host=3Dfigue
-Dec 3 16:29:35 u1205-08l cifs.upcall: ip=3D130.120.8.11
-Dec 3 16:29:35 u1205-08l cifs.upcall: sec=3D1
-Dec 3 16:29:35 u1205-08l cifs.upcall: uid=3D16777221
-Dec 3 16:29:35 u1205-08l cifs.upcall: creduid=3D16777221
-Dec 3 16:29:35 u1205-08l cifs.upcall: user=3D21206xxx
-Dec 3 16:29:35 u1205-08l cifs.upcall: pid=3D1631
-Dec 3 16:29:35 u1205-08l cifs.upcall: find_krb5_cc: considering /tmp/kr=
-b5cc_167
-77221
-Dec 3 16:29:35 u1205-08l cifs.upcall: find_krb5_cc: FILE:/tmp/krb5cc_16=
-777221 i
-s valid ccache
-
-in dmesg
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-fs/cifs/inode.c: Getting info on \21206xxx\TP9
-[ 3735.419612] fs/cifs/transport.c: For smb_command 50
-[ 3735.419615] fs/cifs/transport.c: Sending smb: total_len 104
-[ 3735.420257] fs/cifs/connect.c: RFC1002 header 0x23
-[ 3735.420261] fs/cifs/connect.c: invalid transact2 word count
-[ 3735.422403] fs/cifs/transport.c: cifs_sync_mid_result: cmd=3D50 mid=3D=
-37012 state=3D4
-[ 3735.422406] CIFS VFS: Unexpected SMB signature
-[ 3735.422408] Status code returned 0xc0000022 NT_STATUS_ACCESS_DENIED
-[ 3735.422411] fs/cifs/netmisc.c: Mapping smb error code 0xc0000022 to =
-POSIX err -13
-[ 3735.422413] fs/cifs/cifssmb.c: Send error in QPathInfo =3D -13
-[ 3735.422415] fs/cifs/dir.c: CIFS VFS: leaving cifs_lookup (xid =3D 76=
-854) rc =3D -13
-[ 3735.422424] fs/cifs/dir.c: CIFS VFS: in cifs_lookup as Xid: 76855 wi=
-th uid: 16777221
-[ 3735.422427] fs/cifs/dir.c: parent inode =3D 0xf14481f0 name is: TP9 =
-and dentry =3D 0xf074e300
-[ 3735.422429] fs/cifs/dir.c: NULL inode in lookup
-[ 3735.422430] fs/cifs/dir.c: Full path: \21206xxx\TP9 inode =3D 0x (nu=
-ll)
-
-I don't understand what happens...
-NULL inode in lookup ... What about noserverino option ?
-Perhaps an unresponsive server... The network infrastructure is old. La=
-st year I got this working very well, but the server was in a better pl=
-ace (switch and network infrastructure speaking)
-
-Regards,
-Thanks in advance
-Serge Conrad
-
-Une messagerie gratuite, garantie =C3=A0 vie et des services en plus, =C3=
-=A7a vous tente ?
-Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
+diff --git a/mount.cifs.c b/mount.cifs.c
+index a9632b4..9760d1f 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1003,57 +1003,55 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 				goto nocopy;
+ 
+ 			got_uid = 1;
++			pw = getpwnam(value);
++			if (pw) {
++				uid = pw->pw_uid;
++				goto nocopy;
++			}
++
+ 			errno = 0;
+ 			uid = strtoul(value, &ep, 10);
+ 			if (errno == 0 && *ep == '\0')
+ 				goto nocopy;
+ 
+-			pw = getpwnam(value);
+-			if (pw == NULL) {
+-				fprintf(stderr, "bad user name \"%s\"\n", value);
+-				return EX_USAGE;
+-			}
+-
+-			uid = pw->pw_uid;
+-			goto nocopy;
+-
++			fprintf(stderr, "bad option uid=\"%s\"\n", value);
++			return EX_USAGE;
+ 		case OPT_CRUID:
+ 			if (!value || !*value)
+ 				goto nocopy;
+ 
+ 			got_cruid = 1;
++			pw = getpwnam(value);
++			if (pw) {
++				cruid = pw->pw_uid;
++				goto nocopy;
++			}
++
+ 			errno = 0;
+ 			cruid = strtoul(value, &ep, 10);
+ 			if (errno == 0 && *ep == '\0')
+ 				goto nocopy;
+ 
+-			pw = getpwnam(value);
+-			if (pw == NULL) {
+-				fprintf(stderr, "bad user name \"%s\"\n", value);
+-				return EX_USAGE;
+-			}
+-			cruid = pw->pw_uid;
+-			goto nocopy;
+-
++			fprintf(stderr, "bad option: cruid=\"%s\"\n", value);
++			return EX_USAGE;
+ 		case OPT_GID:
+ 			if (!value || !*value)
+ 				goto nocopy;
+ 
+ 			got_gid = 1;
++			gr = getgrnam(value);
++			if (gr) {
++				gid = gr->gr_gid;
++				goto nocopy;
++			}
++
+ 			errno = 0;
+ 			gid = strtoul(value, &ep, 10);
+ 			if (errno == 0 && *ep == '\0')
+ 				goto nocopy;
+ 
+-			gr = getgrnam(value);
+-			if (gr == NULL) {
+-				fprintf(stderr, "bad group name \"%s\"\n", value);
+-				return EX_USAGE;
+-			}
+-
+-			gid = gr->gr_gid;
+-			goto nocopy;
+-
++			fprintf(stderr, "bad option: gid=\"%s\"\n", value);
++			return EX_USAGE;
+ 		/* fmask fall through to file_mode */
+ 		case OPT_FMASK:
+ 			fprintf(stderr,
+-- 
+1.7.11.7
