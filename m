@@ -1,42 +1,38 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH 6/6] getcifsacl: ensure that we don't overrun the wbcDomainSid when converting
-Date: Tue,  4 Dec 2012 10:16:44 -0500
-Message-ID: <1354634204-21602-7-git-send-email-jlayton@samba.org>
-References: <1354634204-21602-1-git-send-email-jlayton@samba.org>
+Subject: [PATCH 0/6] cifs-utils: a pile of random patches
+Date: Tue,  4 Dec 2012 10:16:38 -0500
+Message-ID: <1354634204-21602-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1354634204-21602-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-If we get a SID that contains more than 15 subauthorities, we'll end up
-overrunning the struct wbcDomainSid. Just ignore any past 15.
+Here's a pile of random patches I've accumulated so for for cifs-utils.
+They should be fairly straightforward, but let me know if anyone has
+concerns with them.
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- getcifsacl.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Jeff Layton (6):
+  mount.cifs: treat uid=,gid=,cruid= options as name before assuming
+    they're a number
+  mount.cifs: don't pass "flag" options to the kernel
+  autotools: remove unnecessary files from distro
+  getcifsacl: use "size" instead of reconverting original field to host
+    endian
+  getcifsacl: free strings returned by wbcLookupSid
+  getcifsacl: ensure that we don't overrun the wbcDomainSid when
+    converting
 
-diff --git a/getcifsacl.c b/getcifsacl.c
-index 256b2ad..3f94a99 100644
---- a/getcifsacl.c
-+++ b/getcifsacl.c
-@@ -180,12 +180,14 @@ static void
- csid_to_wsid(struct wbcDomainSid *wsid, const struct cifs_sid *csid)
- {
- 	int i;
-+	uint8_t num_subauth = (csid->num_subauth <= WBC_MAXSUBAUTHS) ?
-+				csid->num_subauth : WBC_MAXSUBAUTHS;
- 
- 	wsid->sid_rev_num = csid->revision;
--	wsid->num_auths = csid->num_subauth;
-+	wsid->num_auths = num_subauth;
- 	for (i = 0; i < NUM_AUTHS; i++)
- 		wsid->id_auth[i] = csid->authority[i];
--	for (i = 0; i < csid->num_subauth; i++)
-+	for (i = 0; i < num_subauth; i++)
- 		wsid->sub_auths[i] = le32toh(csid->sub_auth[i]);
- }
- 
+ INSTALL      | 365 ----------------------------------
+ depcomp      | 630 -----------------------------------------------------------
+ getcifsacl.c |  12 +-
+ install-sh   | 520 ------------------------------------------------
+ missing      | 376 -----------------------------------
+ mount.cifs.c |  74 +++----
+ 6 files changed, 40 insertions(+), 1937 deletions(-)
+ delete mode 100644 INSTALL
+ delete mode 100755 depcomp
+ delete mode 100755 install-sh
+ delete mode 100755 missing
+
 -- 
 1.7.11.7
