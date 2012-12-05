@@ -1,51 +1,22 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] [CIFS] SMB3 mounts fail with access denied to some
- servers
-Date: Wed, 5 Dec 2012 12:24:03 -0500
-Message-ID: <20121205122403.29b560e5@tlielax.poochiereds.net>
-References: <CAH2r5muKfZKD9THXbwW7-A806LK+_20fuBuS9iyJfqUxf_NaJQ@mail.gmail.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: cifs-2.6.git for-next branch rebased on current mainline
+Date: Wed, 5 Dec 2012 13:33:20 -0600
+Message-ID: <CAH2r5murbv-ozTEh-J=WJRF0kvK7D5+zMxgQHfN0F1CMUfK=GA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muKfZKD9THXbwW7-A806LK+_20fuBuS9iyJfqUxf_NaJQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 4 Dec 2012 17:12:12 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+cifs-2.6.git for-next branch now is rebased on more current mainline
+(Al had merged a cifs fix into mainline very recently and I want to
+reduce upcoming merge conflicts).   A good chunk of Pavel's and Jeff's
+fixes are in, but will be merging more.  smb2.02 dialect is enabled.
+smb3 mounts should work (although SMB3 signing is not working yet).
+Let me know if others for 3.8 are missing that are acked/reviewed
 
-> Author: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Date:   Tue Dec 4 16:56:37 2012 -0600
-> 
->     [CIFS] SMB3 mounts fail with access denied to some servers
-> 
->     We were checking incorrectly if signatures were required to be sent,
->     so were always sending signatures after the initial session establishment.
->     For SMB3 mounts (vers=3.0) this was a problem because we were putting
->     SMB2 signatures in SMB3 requests which would cause access denied
->     on mount (the tree connection would fail).
-> 
->     Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index cf33622..e7f9dbc 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -425,7 +425,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
->         }
-> 
->         cFYI(1, "sec_flags 0x%x", sec_flags);
-> -       if (sec_flags & CIFSSEC_MUST_SIGN) {
-> +       if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) {
->                 cFYI(1, "Signing required");
->                 if (!(server->sec_mode & (SMB2_NEGOTIATE_SIGNING_REQUIRED |
->                       SMB2_NEGOTIATE_SIGNING_ENABLED))) {
-> 
-> 
+-- 
+Thanks,
 
-Looks correct...
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Steve
