@@ -1,186 +1,187 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [PATCH RFC] cifs-utils: new plugin architecture for ID mapping
-	code
-Date: Thu, 6 Dec 2012 11:23:26 -0500
-Message-ID: <20121206112326.672fc69d@corrin.poochiereds.net>
-References: <1354797458-5170-1-git-send-email-jlayton@samba.org>
-	<1354801351.14719.18.camel@pico.ipa.ssimo.org>
-	<20121206095846.52d59286@corrin.poochiereds.net>
-	<1354808050.14719.27.camel@pico.ipa.ssimo.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-To: simo <idra@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <1354808050.14719.27.camel@pico.ipa.ssimo.org>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v4] CIFS: Fix write after setting a read lock for read oplock files
+Date: Thu,  6 Dec 2012 22:07:52 +0400
+Message-ID: <1354817274-7701-1-git-send-email-piastry@etersoft.ru>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 06 Dec 2012 10:34:10 -0500
-simo <idra@samba.org> wrote:
+If we have a read oplock and set a read lock in it, we can't write to the
+locked area - so, filemap_fdatawrite may fail with a no information for a
+userspace application even if we request a write to non-locked area. Fix
+this by populating the page cache without marking affected pages dirty
+after a successful write directly to the server.
 
-> On Thu, 2012-12-06 at 09:58 -0500, Jeff Layton wrote:
-> > On Thu, 06 Dec 2012 08:42:31 -0500
-> > simo <idra@samba.org> wrote:
-> > 
-> > > On Thu, 2012-12-06 at 07:37 -0500, Jeff Layton wrote:
-> > > > Currently, the ACL-related tools in cifs-utils call into the wbclient
-> > > > libs directly in order to do their bidding. The wbclient developers want
-> > > > to get away from needing to configure winbind on the clients and instead
-> > > > allow sssd to handle the id-mapping. Less muss, less fuss...
-> > > > 
-> > > > This patch represents an initial step in that direction. It adds a
-> > > > plugin architecture for cifs-utils, adds wrappers around the calls into
-> > > > libwbclient that find an idmap plugin library to use and then has it
-> > > > call into that plugin to do the actual ID mapping.
-> > > > 
-> > > > This patch should be considered an RFC on the overall design. Once I
-> > > > have some positive feedback (or lack of negative feedback), I'll do the
-> > > > same with cifs.idmap and setcifsacl.
-> > > > 
-> > > > This patch is still pretty rough, but should demonstrate the basic
-> > > > design:
-> > > > 
-> > > > The application will call into a set of routines that find the correct
-> > > > plugin and dlopen() it. Currently the plugin is located in a hardcoded
-> > > > location that will eventually be settable via autoconf. That location is
-> > > > intended to be a symlink that points to the real plugin (generally under
-> > > > %libdir/cifs-utils).
-> > > > 
-> > > > The plugin will export a number of functions with well-known names. The
-> > > > wrappers find those by using dlsym() and then call them.
-> > > > 
-> > > > I'm tracking progress on this work here:
-> > > > 
-> > > >     https://bugzilla.samba.org/show_bug.cgi?id=9203
-> > > > 
-> > > > Here are some questions to ponder:
-> > > > 
-> > > > 1/ Should we switch this code to use a config file of some sort instead
-> > > > of this symlink? The symlink would probably be more efficient, but it
-> > > > is a little odd and might confuse people. It also might make it hard to
-> > > > expand the idmapping interfaces later.
-> > > 
-> > > I think a symlink is ok for starters, a config file can always be added
-> > > later if needed.
-> > > 
-> > 
-> > To play devil's advocate, a config file might make more sense. What if
-> > a plugin wants to be able to set certain parameters globally (domain
-> > names or something)?
-> 
-> Then the plugin will have it's own file.
-> 
-> Which made me understand what looked strange in your code. You are not
-> calling an initialization function which is customary to do, so plugins
-> can do their setup.
-> Of course plugins can also do lazy init the first time you call any of
-> their function, but calling a init plugin explicitly may be useful, esp
-> if you pass in a 'interface version number', so that should you require
-> changes to the interface in future the plugin may adapt and you can use
-> the same with multiple cifs versions.
-> 
+Also remove CONFIG_CIFS_SMB2 ifdefs because it's suitable for both CIFS
+and SMB2 protocols.
 
-Ok, another good point. I'll put that in.
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/cifs/cifsfs.c   |    1 +
+ fs/cifs/cifsglob.h |    1 +
+ fs/cifs/file.c     |   94 +++++++++++++++++++++++++++++++++++-----------------
+ 3 files changed, 65 insertions(+), 31 deletions(-)
 
-> > Having that configuration in a single place might be less confusing
-> > than having to set a symlink and set up a config file. Switching to a
-> > config file later is a UI change and those are always more painful...
-> 
-> If you defer configuration to the plugin it is not your problem, and I
-> think that would be the correct way to go, otherwise you need to provide
-> methods for the plugins to read this config file and it quickly winds
-> down becoming a complex and more tightly coupled interface.
-> 
-> I think you want to stay out of plugins configuration business, they can
-> take care of that on their own.
-> 
-> If you want to make things easier maybe call an initializer function and
-> expect an opaque handle out of it.
-> Then always pass that handle back in any plugin function. This way the
-> interface can also be thread safe w/o forcing the plugin to use mutexes,
-> should you ever need thread safety.
-> 
-
-Ok, that sounds reasonable and simple, I'll add that in too.
-
-> > > > 2/ Should I switch this code to use libltdl for the plugin architecture?
-> > > > I started to use that initially, but it was awfully complex to get working.
-> > > > Since portability isn't really a concern with cifs-utils, I punted. Does
-> > > > anyone see issues with rolling our own here?
-> > > 
-> > > Well the cifs kernel module is Linux only, I would leave the hassle of
-> > > dealing with portability to whomever would like to port this.
-> > > Using dlopen/dlsym is simple, so roll-your-own seem fine to me.
-> > > 
-> > > One thing though I would name-space the symbol, so instead of
-> > > idmap_sid_to_str call it cifs_idmap_sid_to_str, in the plugin.
-> > > Internally you can call whatever you want.
-> > > 
-> > 
-> > Ok, the namespace thing is probably a good idea. Perhaps we should even
-> > take a page out of the libltdl book, and prefix the symbols with the
-> > name of the plugin? So in this patch, that would be something like
-> > "idmapwb_sid_to_str". That way if we ever want to be able to stack
-> > plugins, we can potentially do so without conflicts.
-> 
-> It is not really needed, because you are not going to load the symbols
-> as is, but you assign them to an internal name.
-> And I do not think you are ever going to support multiple idmappers, but
-> even if you do by using dlsym() you shouldn't really care about names,
-> because you have handle to a specific shared object and you can assign
-> and rename those symbols when you resolve them (as i showed in my
-> example) so you still do not get a conflict issue).
-> 
-> Namespacing using plugin names is needed if you want to just dlopen()
-> and then use the plugin's names directly without an explicit dlsym().
-> In that case name conflicts would arise.
-> 
-
-Yeah, that occurred to me after I sent this. Probably no need to add
-that complexity since we're going to rely on dlsym().
-
-> > > Also I think you shouldn't resolve symbols each time,
-> > > 
-> > > Declare a function pointer in the data segment (so inited to NULL at
-> > > startup) and do a lazy init only if it is NULL, by assigning it.
-> > > 
-> > > #define RESOLVE_SYMBOL(name) \
-> > > do { \
-> > >     if (name == NULL) { \
-> > >         name = resolve_symbol("cifs_" # name); \
-> > >         if (name == NULL) \
-> > >             return -ENOSYS; \
-> > >     } \
-> > > } while(0);
-> > > 
-> > > sid_to_str()
-> > > {
-> > >     RESOLVE_SYMBOL(idmap_sid_to_str);
-> > >     return idmap_sid_to_str(..);
-> > > }
-> > > 
-> > 
-> > Yep, I was planning to add that in a later patch. I just wanted to make
-> > the initial patch simple to focus on the interfaces between components.
-> > 
-> > Thanks for the review so far...
-> 
-> YW,
-> HTH.
-> 
-> Simo.
-> 
-
-Thanks again,
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index c6e32f2..210f0af 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -229,6 +229,7 @@ cifs_alloc_inode(struct super_block *sb)
+ 	cifs_set_oplock_level(cifs_inode, 0);
+ 	cifs_inode->delete_pending = false;
+ 	cifs_inode->invalid_mapping = false;
++	cifs_inode->leave_pages_clean = false;
+ 	cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
+ 	cifs_inode->server_eof = 0;
+ 	cifs_inode->uniqueid = 0;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 2ca6f7d..426a2bf 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1037,6 +1037,7 @@ struct cifsInodeInfo {
+ 	bool clientCanCacheAll;		/* read and writebehind oplock */
+ 	bool delete_pending;		/* DELETE_ON_CLOSE is set */
+ 	bool invalid_mapping;		/* pagecache is invalid */
++	bool leave_pages_clean;	/* protected by i_mutex, not set pages dirty */
+ 	unsigned long time;		/* jiffies of last update of inode */
+ 	u64  server_eof;		/* current file size on server -- protected by i_lock */
+ 	u64  uniqueid;			/* server inode number */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index e2fabc9..84860f1 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -2109,7 +2109,15 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
+ 	} else {
+ 		rc = copied;
+ 		pos += copied;
+-		set_page_dirty(page);
++		/*
++		 * When we use strict cache mode and cifs_strict_writev was run
++		 * with level II oplock (indicated by leave_pages_clean field of
++		 * CIFS_I(inode)), we can leave pages clean - cifs_strict_writev
++		 * sent the data to the server itself.
++		 */
++		if (!CIFS_I(inode)->leave_pages_clean ||
++		    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
++			set_page_dirty(page);
+ 	}
+ 
+ 	if (rc > 0) {
+@@ -2460,8 +2468,8 @@ ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
+ }
+ 
+ static ssize_t
+-cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+-	    unsigned long nr_segs, loff_t pos)
++cifs_pagecache_writev(struct kiocb *iocb, const struct iovec *iov,
++		      unsigned long nr_segs, loff_t pos, bool cache_ex)
+ {
+ 	struct file *file = iocb->ki_filp;
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
+@@ -2483,8 +2491,12 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
+ 				     server->vals->exclusive_lock_type, NULL,
+ 				     CIFS_WRITE_OP)) {
+ 		mutex_lock(&inode->i_mutex);
++		if (!cache_ex)
++			cinode->leave_pages_clean = true;
+ 		rc = __generic_file_aio_write(iocb, iov, nr_segs,
+-					       &iocb->ki_pos);
++					      &iocb->ki_pos);
++		if (!cache_ex)
++			cinode->leave_pages_clean = false;
+ 		mutex_unlock(&inode->i_mutex);
+ 	}
+ 
+@@ -2511,42 +2523,62 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *)
+ 						iocb->ki_filp->private_data;
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+-
+-#ifdef CONFIG_CIFS_SMB2
++	ssize_t written, written2;
+ 	/*
+-	 * If we have an oplock for read and want to write a data to the file
+-	 * we need to store it in the page cache and then push it to the server
+-	 * to be sure the next read will get a valid data.
++	 * We need to store clientCanCacheAll here to prevent race
++	 * conditions - this value can be changed during an execution
++	 * of generic_file_aio_write. For CIFS it can be changed from
++	 * true to false only, but for SMB2 it can be changed both from
++	 * true to false and vice versa. So, we can end up with a data
++	 * stored in the cache, not marked dirty and not sent to the
++	 * server if this value changes its state from false to true
++	 * after cifs_write_end.
+ 	 */
+-	if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
+-		ssize_t written;
+-		int rc;
+-
+-		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
+-		rc = filemap_fdatawrite(inode->i_mapping);
+-		if (rc)
+-			return (ssize_t)rc;
++	bool cache_ex = cinode->clientCanCacheAll;
++	bool cache_read = cinode->clientCanCacheRead;
++	int rc;
++	loff_t saved_pos;
+ 
+-		return written;
++	if (cache_ex) {
++		if (cap_unix(tcon->ses) &&
++		    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
++		    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
++						tcon->fsUnixInfo.Capability)))
++			return generic_file_aio_write(iocb, iov, nr_segs, pos);
++		return cifs_pagecache_writev(iocb, iov, nr_segs, pos, cache_ex);
+ 	}
+-#endif
+ 
+ 	/*
+-	 * For non-oplocked files in strict cache mode we need to write the data
+-	 * to the server exactly from the pos to pos+len-1 rather than flush all
+-	 * affected pages because it may cause a error with mandatory locks on
+-	 * these pages but not on the region from pos to ppos+len-1.
++	 * For files without exclusive oplock in strict cache mode we need to
++	 * write the data to the server exactly from the pos to pos+len-1 rather
++	 * than flush all affected pages because it may cause a error with
++	 * mandatory locks on these pages but not on the region from pos to
++	 * ppos+len-1.
+ 	 */
++	written = cifs_user_writev(iocb, iov, nr_segs, pos);
++	if (!cache_read || written <= 0)
++		return written;
+ 
+-	if (!cinode->clientCanCacheAll)
+-		return cifs_user_writev(iocb, iov, nr_segs, pos);
+-
++	saved_pos = iocb->ki_pos;
++	iocb->ki_pos = pos;
++	/* we have a read oplock - need to store a data in the page cache */
+ 	if (cap_unix(tcon->ses) &&
+-	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
+-	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
+-		return generic_file_aio_write(iocb, iov, nr_segs, pos);
+-
+-	return cifs_writev(iocb, iov, nr_segs, pos);
++	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
++	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
++					tcon->fsUnixInfo.Capability)))
++		written2 = generic_file_aio_write(iocb, iov, nr_segs, pos);
++	else
++		written2 = cifs_pagecache_writev(iocb, iov, nr_segs, pos,
++						 cache_ex);
++	/* errors occured during writing - invalidate the page cache */
++	if (written2 < 0) {
++		rc = cifs_invalidate_mapping(inode);
++		if (rc)
++			written = (ssize_t)rc;
++		else
++			iocb->ki_pos = saved_pos;
++	}
++	return written;
+ }
+ 
+ static struct cifs_readdata *
 -- 
-Jeff Layton <jlayton@samba.org>
+1.7.10.4
