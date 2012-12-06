@@ -1,48 +1,105 @@
-From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Thu, 6 Dec 2012 13:39:44 -0800
-Message-ID: <20121206213944.GD24076@samba2>
-References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
- <20121206194949.7ab20d56@pyramind.ukuu.org.uk>
- <20121206195752.GA18585@samba2>
- <20121206213133.GB4821@thunk.org>
- <20121206213329.GB24076@samba2>
- <20121206213727.GC4821@thunk.org>
-Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: simo <idra@samba.org>
+Subject: Re: [PATCH RFC] cifs-utils: new plugin architecture for ID mapping
+	code
+Date: Thu, 06 Dec 2012 17:42:50 -0500
+Message-ID: <1354833770.14719.59.camel@pico.ipa.ssimo.org>
+References: <1354797458-5170-1-git-send-email-jlayton@samba.org>
+	<1354801351.14719.18.camel@pico.ipa.ssimo.org>
+	<20121206161250.71b7952c@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-To: Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>, Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Alan Cox <alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>,
-	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20121206213727.GC4821-AKGzg7BKzIDYtjvyW6yDsg@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+To: Jeff Layton <jlayton@samba.org>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <20121206161250.71b7952c@tlielax.poochiereds.net>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Dec 06, 2012 at 04:37:27PM -0500, Theodore Ts'o wrote:
-> On Thu, Dec 06, 2012 at 01:33:29PM -0800, Jeremy Allison wrote:
-> > > I'm confused; why would a userspace application need to be able to
-> > > request this behavior?
-> > 
-> > This isn't my proposal Ted, I'm just commenting on it :-).
+On Thu, 2012-12-06 at 16:12 -0500, Jeff Layton wrote:
+> On Thu, 06 Dec 2012 08:42:31 -0500
+> simo <idra@samba.org> wrote:
 > 
-> Ah, sorry, I thought was coming from the Samba team.  :-)
+> > On Thu, 2012-12-06 at 07:37 -0500, Jeff Layton wrote:
+> > > Currently, the ACL-related tools in cifs-utils call into the wbclient
+> > > libs directly in order to do their bidding. The wbclient developers want
+> > > to get away from needing to configure winbind on the clients and instead
+> > > allow sssd to handle the id-mapping. Less muss, less fuss...
+> > > 
+> > > This patch represents an initial step in that direction. It adds a
+> > > plugin architecture for cifs-utils, adds wrappers around the calls into
+> > > libwbclient that find an idmap plugin library to use and then has it
+> > > call into that plugin to do the actual ID mapping.
+> > > 
+> > > This patch should be considered an RFC on the overall design. Once I
+> > > have some positive feedback (or lack of negative feedback), I'll do the
+> > > same with cifs.idmap and setcifsacl.
+> > > 
+> > > This patch is still pretty rough, but should demonstrate the basic
+> > > design:
+> > > 
+> > > The application will call into a set of routines that find the correct
+> > > plugin and dlopen() it. Currently the plugin is located in a hardcoded
+> > > location that will eventually be settable via autoconf. That location is
+> > > intended to be a symlink that points to the real plugin (generally under
+> > > %libdir/cifs-utils).
+> > > 
+> > > The plugin will export a number of functions with well-known names. The
+> > > wrappers find those by using dlsym() and then call them.
+> > > 
+> > > I'm tracking progress on this work here:
+> > > 
+> > >     https://bugzilla.samba.org/show_bug.cgi?id=9203
+> > > 
+> > > Here are some questions to ponder:
+> > > 
+> > > 1/ Should we switch this code to use a config file of some sort instead
+> > > of this symlink? The symlink would probably be more efficient, but it
+> > > is a little odd and might confuse people. It also might make it hard to
+> > > expand the idmapping interfaces later.
+> > 
+> > I think a symlink is ok for starters, a config file can always be added
+> > later if needed.
+> > 
+> > > 2/ Should I switch this code to use libltdl for the plugin architecture?
+> > > I started to use that initially, but it was awfully complex to get working.
+> > > Since portability isn't really a concern with cifs-utils, I punted. Does
+> > > anyone see issues with rolling our own here?
+> > 
+> > Well the cifs kernel module is Linux only, I would leave the hassle of
+> > dealing with portability to whomever would like to port this.
+> > Using dlopen/dlsym is simple, so roll-your-own seem fine to me.
+> > 
+> > One thing though I would name-space the symbol, so instead of
+> > idmap_sid_to_str call it cifs_idmap_sid_to_str, in the plugin.
+> > Internally you can call whatever you want.
+> > 
+> 
+> Now that I look, I'm not sure I understand the point of the above...
+> 
+> The function that the program calls is called "sid_to_str()". I already
+> added some "namespacification" around that by prefixing it with
+> "idmap_", so the function provided by the plugin is called
+> "idmap_sid_to_str()". What's the benefit of adding another prefix to
+> that?
 
-Well it sort of is, as the people working on cifsfs are also
-Samba Team members, but this isn't an official "Samba" thing,
-as I can't see exactly what apps would want this either (other
-than Samba smbd running on top of smbd, re-exporting a cifsfs
-share, pointing to a Samba server, running on a... ERROR STACK
-OVERFLOW :-).
+idmap_ is quite generic and may be used inside samba for example so it
+may not be easy to expose the symbol to you, but yeah I did not
+understand you used idmap_ as namespace, so I guess my advice is to find
+a better namespace more unique to cifs.ko :)
 
-> Hmm... I see wine-devel is cc'ed; is this coming from the Wine team,
-> wanting to do SMB paravirtualization?  It would be useful if the
-> commit description described how these flags are intended to be used....
+Simo.
 
-Indeed :-).
 
-Jeremy.
+-- 
+Simo Sorce
+Samba Team GPL Compliance Officer <simo@samba.org>
+Principal Software Engineer at Red Hat, Inc. <simo@redhat.com>
