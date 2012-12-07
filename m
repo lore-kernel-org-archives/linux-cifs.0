@@ -1,106 +1,48 @@
-From: "J. Bruce Fields" <bfields@fieldses.org>
+From: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
 Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Fri, 7 Dec 2012 11:09:49 -0500
-Message-ID: <20121207160949.GJ17115@fieldses.org>
+Date: Fri, 7 Dec 2012 11:16:02 -0500
+Message-ID: <20121207161602.GA17710@infradead.org>
 References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
- <CAKywueQ3d=wdq2nw5f-QS-D9PY70Axa3Cn0gi5GRk4Xso+iquA@mail.gmail.com>
- <20121207145206.GF17115@fieldses.org>
- <1354894665.14719.87.camel@pico.ipa.ssimo.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: Pavel Shilovsky <piastry@etersoft.ru>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	wine-devel@winehq.org, linux-nfs@vger.kernel.org
-To: simo <idra@samba.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1354894665.14719.87.camel@pico.ipa.ssimo.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1354818391-7968-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Fri, Dec 07, 2012 at 10:37:45AM -0500, simo wrote:
-> On Fri, 2012-12-07 at 09:52 -0500, J. Bruce Fields wrote:
-> > On Fri, Dec 07, 2012 at 01:08:46PM +0400, Pavel Shilovsky wrote:
-> > > 2012/12/6 Pavel Shilovsky <piastry@etersoft.ru>:
-> > > > Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
-> > > >
-> > > > Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can't do it if a file stored on a network share and is used by several clients. This patchset makes it possible for CIFS/SMB2.0/SMB3.0.
-> > > >
-> > > > Pavel Shilovsky (3):
-> > > >   fcntl: Introduce new O_DENY* open flags for network filesystems
-> > > >   CIFS: Add O_DENY* open flags support
-> > > >   CIFS: Use NT_CREATE_ANDX command for forcemand mounts
-> > > >
-> > > >  fs/cifs/cifsacl.c                |   10 ++++----
-> > > >  fs/cifs/cifsglob.h               |   11 ++++++++-
-> > > >  fs/cifs/cifsproto.h              |    9 ++++----
-> > > >  fs/cifs/cifssmb.c                |   47 ++++++++++++++++++++------------------
-> > > >  fs/cifs/dir.c                    |   14 ++++++++----
-> > > >  fs/cifs/file.c                   |   18 ++++++++++-----
-> > > >  fs/cifs/inode.c                  |   11 +++++----
-> > > >  fs/cifs/link.c                   |   10 ++++----
-> > > >  fs/cifs/readdir.c                |    2 +-
-> > > >  fs/cifs/smb1ops.c                |   15 ++++++------
-> > > >  fs/cifs/smb2file.c               |   10 ++++----
-> > > >  fs/cifs/smb2inode.c              |    4 ++--
-> > > >  fs/cifs/smb2ops.c                |   10 ++++----
-> > > >  fs/cifs/smb2pdu.c                |    6 ++---
-> > > >  fs/cifs/smb2proto.h              |   14 +++++++-----
-> > > >  fs/fcntl.c                       |    5 ++--
-> > > >  include/uapi/asm-generic/fcntl.h |   11 +++++++++
-> > > >  17 files changed, 125 insertions(+), 82 deletions(-)
-> > > >
-> > > > --
-> > > > 1.7.10.4
-> > > >
-> > > 
-> > > First of all, sorry for being unclear at this proposal.
-> > > 
-> > > 
-> > > I am not from Wine team but I am working on things related to
-> > > Wine+CIFS-client+Samba.
-> > > 
-> > > We (at Etersoft) need to organize the work of Wine applications
-> > > through cifs-client share mounted to Samba (or Windows server). They
-> > > are related to accounting (mostly Russian ones - e.g.
-> > > http://www.1c.ru/eng/title.htm). So, the problem is that such
-> > > applications use share flags to control the parallel access to the
-> > > same files of several clients on a remote share. Also, there can be a
-> > > situation where Windows (native) clients and Wine clients are working
-> > > together in the same time.
-> > > 
-> > > That's why we need such flags in the kernel (patch #1). With these
-> > > flags Wine can pass them to every open and they will be used by CIFS
-> > > (and probably NFS) file systems to pass to the Samba server. In the
-> > > same time if the file is on local filesystem - these flags will be
-> > > simply ignored (not implemented).
-> > 
-> > NFS supports the deny-read and deny-write bits but not deny-delete.
-> > 
-> > If we could do such opens in-kernel on local and clustered filesystems,
-> > that could also be useful for multi-protocol (Samba and NFS) and
-> > clustered exports.
-> > 
-> > Currently knfsd tries to enforce deny bits in the nfsd code, which is a
-> > bit ugly.
-> > 
-> > And knfsd currently requires write permissions for deny-read.  My
-> > understanding is that Windows considers that wrong, but I'd be curious
-> > to know whether that breaks Windows applications in practice.
+On Thu, Dec 06, 2012 at 10:26:28PM +0400, Pavel Shilovsky wrote:
+> Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
 > 
-> It probably does if you look hard enough.
-> IIRC Deny-reads are very loosely like read locks, and you can take read
-> locks if you have read-only access.
+> Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can't do it if a file stored on a network share and is used by several clients. This patchset makes it possible for CIFS/SMB2.0/SMB3.0.
 
-I had the impression they didn't care about read or write permissions at
-all, but I don't know.
+I don't think introducing user visible flags that are only supported on
+a single network filesystem is a good idea.
 
-> Why does knfsd restrict deny-read to read-write access ?
+I'm not even sure adding these flags does make a lot of sense, but
+assuming we'd actually want this (and I'd like some more detailed
+explanation) I think we'd at least need to make sure that:
 
-Because I think it's normal to want files that everyone's able to read
-without giving everyone the right to DOS readers indefinitely.
+ a) opening files with the new modes gives a proper error message if not
+    supported
+ b) there needs to be local support for them as well
+ c) we need to think really hard when they should be supported, and need
+    a good rational for it.  I can't see how we could do it
+    unconditionally for all users as that would introduce easy denial
+    of services attacks the way I understand the semantics (correct me
+    if I'm wrong).  So a mount option like you currently do probably is
+    the least bad even if don't fell overly happy about that version.
 
-And because I'm having a hard time thinking why you'd care to keep
-everyone from reading a file that you don't intend to modify.
+What is the reason your special wine use case can't simply use a
+userspace cifs client?  Given that wine uses windows filesystem
+semantics and cifs does as well tunnelling it through a Posix-like API
+inbetween is never going to be perfect.
 
---b.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
