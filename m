@@ -1,40 +1,92 @@
-From: Alan Cox <alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>
-Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Fri, 7 Dec 2012 21:35:20 +0000
-Message-ID: <20121207213520.05dd5a3b@pyramind.ukuu.org.uk>
+From: "Myklebust, Trond" <Trond.Myklebust@netapp.com>
+Subject: RE: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
+Date: Fri, 7 Dec 2012 23:55:39 +0000
+Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B33D95E@SACEXCMBX04-PRD.hq.netapp.com>
 References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
-	<20121207161602.GA17710@infradead.org>
-	<495d17310e0a687d446afc86def0f058@office.etersoft.ru>
+ <20121207161602.GA17710@infradead.org>
+ <495d17310e0a687d446afc86def0f058@office.etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	<linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	<linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, <wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org>,
-	<linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <495d17310e0a687d446afc86def0f058-Gr3b2bv8/haq3CaADJ+gRi8mxiWnj2XH@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"wine-devel@winehq.org" <wine-devel@winehq.org>,
+	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>
+To: Pavel Shilovsky <piastry@etersoft.ru>,
+	Christoph Hellwig <hch@infradead.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <495d17310e0a687d446afc86def0f058@office.etersoft.ru>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-> The problem is the possibility of denial-of-service attacks here. We 
-> can try to prevent them by:
-> 1) specifying an extra security bit on the file that indicates that 
-> share flags are accepted (like we have for mandatory locks now) and 
-> setting it for neccessary files only, or
-> 2) adding a special mount option (but it it probably makes sense if we 
-> decided to add this support for CIFS and NFS only).
-
-3) making it a property that the process opts into - the same fs can have
-Linux and wine users at once.
-
-But for such a big set of changes and with the kind of potential fallout
-you need to demonstrate a good practical use case IMHO, not just a "neat
-idea I had".
-
-Alan
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1uZnMtb3duZXJAdmdl
+ci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtbmZzLQ0KPiBvd25lckB2Z2VyLmtlcm5lbC5vcmdd
+IE9uIEJlaGFsZiBPZiBQYXZlbCBTaGlsb3Zza3kNCj4gU2VudDogRnJpZGF5LCBEZWNlbWJlciAw
+NywgMjAxMiA5OjQzIFBNDQo+IFRvOiBDaHJpc3RvcGggSGVsbHdpZw0KPiBDYzogbGludXgtY2lm
+c0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0K
+PiBmc2RldmVsQHZnZXIua2VybmVsLm9yZzsgd2luZS1kZXZlbEB3aW5laHEub3JnOyBsaW51eC0N
+Cj4gbmZzQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDAvM10gQWRkIE9f
+REVOWSogZmxhZ3MgdG8gZmNudGwgYW5kIGNpZnMNCj4gDQo+IENocmlzdG9waCBIZWxsd2lnINC/
+0LjRgdCw0LsgMDcuMTIuMjAxMiAyMDoxNjoNCj4gPiBPbiBUaHUsIERlYyAwNiwgMjAxMiBhdCAx
+MDoyNjoyOFBNICswNDAwLCBQYXZlbCBTaGlsb3Zza3kgd3JvdGU6DQo+ID4+IE5ldHdvcmsgZmls
+ZXN5c3RlbXMgQ0lGUywgU01CMi4wLCBTTUIzLjAgYW5kIE5GU3Y0IGhhdmUgc3VjaCBmbGFncyAt
+DQo+ID4+IHRoaXMgY2hhbmdlIGNhbiBiZW5lZml0IGNpZnMgYW5kIG5mcyBtb2R1bGVzLiBXaGls
+ZSB0aGlzIGNoYW5nZSBpcyBvaw0KPiA+PiBmb3IgbmV0d29yayBmaWxlc3lzdGVtcywgaXRzbid0
+IG5vdCB0YXJnZXRlZCBmb3IgbG9jYWwgZmlsZXN5c3RlbXMNCj4gPj4gZHVlIHNlY3VyaXR5IHBy
+b2JsZW1zIChlLmcuIHdoZW4gYSB1c2VyIHByb2Nlc3MgY2FuIGRlbnkgcm9vdCB0bw0KPiA+PiBk
+ZWxldGUgYSBmaWxlKS4NCj4gPj4NCj4gPj4gU2hhcmUgZmxhZ3MgYXJlIHVzZWQgYnkgV2luZG93
+cyBhcHBsaWNhdGlvbnMgYW5kIFdJTkUgaGF2ZSB0byBkZWFsDQo+ID4+IHdpdGggdGhlbSB0b28u
+IFdoaWxlIFdJTkUgY2FuIHByb2Nlc3Mgb3BlbiBzaGFyZSBmbGFncyBpdHNlbGYgb24NCj4gPj4g
+bG9jYWwgZmlsZXN5c3RlbXMsIGl0IGNhbid0IGRvIGl0IGlmIGEgZmlsZSBzdG9yZWQgb24gYSBu
+ZXR3b3JrIHNoYXJlDQo+ID4+IGFuZCBpcyB1c2VkIGJ5IHNldmVyYWwgY2xpZW50cy4gVGhpcyBw
+YXRjaHNldCBtYWtlcyBpdCBwb3NzaWJsZSBmb3INCj4gPj4gQ0lGUy9TTUIyLjAvU01CMy4wLg0K
+PiA+DQo+ID4gSSBkb24ndCB0aGluayBpbnRyb2R1Y2luZyB1c2VyIHZpc2libGUgZmxhZ3MgdGhh
+dCBhcmUgb25seSBzdXBwb3J0ZWQNCj4gPiBvbiBhIHNpbmdsZSBuZXR3b3JrIGZpbGVzeXN0ZW0g
+aXMgYSBnb29kIGlkZWEuDQo+IA0KPiBJdCBjYW4gYnJpbmcgYmVuZWZpdHMgZm9yIGJvdGggQ0lG
+UyBhbmQgTkZTIGZpbGVzeXN0ZW1zIC0gc28sIGF0IGxlYXN0IHR3byBvbmVzLg0KPiANCj4gPg0K
+PiA+IEknbSBub3QgZXZlbiBzdXJlIGFkZGluZyB0aGVzZSBmbGFncyBkb2VzIG1ha2UgYSBsb3Qg
+b2Ygc2Vuc2UsIGJ1dA0KPiA+IGFzc3VtaW5nIHdlJ2QgYWN0dWFsbHkgd2FudCB0aGlzIChhbmQg
+SSdkIGxpa2Ugc29tZSBtb3JlIGRldGFpbGVkDQo+ID4gZXhwbGFuYXRpb24pIEkgdGhpbmsgd2Un
+ZCBhdCBsZWFzdCBuZWVkIHRvIG1ha2Ugc3VyZSB0aGF0Og0KPiA+DQo+ID4gIGEpIG9wZW5pbmcg
+ZmlsZXMgd2l0aCB0aGUgbmV3IG1vZGVzIGdpdmVzIGEgcHJvcGVyIGVycm9yIG1lc3NhZ2UgaWYN
+Cj4gPiBub3QNCj4gPiAgICAgc3VwcG9ydGVkDQo+IA0KPiBJdCBtYWtlcyB1cyBhZGQgc3VjaCBj
+aGVja3MgZm9yIGFsbCBvdGhlciBmaWxlc3lzdGVtcywgaWYgSSB1bmRlcnN0YW5kIHJpZ2h0LCAt
+DQo+IG5vdCBhIHByb2JsZW0sIEkgdGhpbmsuDQo+IA0KPiA+ICBiKSB0aGVyZSBuZWVkcyB0byBi
+ZSBsb2NhbCBzdXBwb3J0IGZvciB0aGVtIGFzIHdlbGwNCj4gPiAgYykgd2UgbmVlZCB0byB0aGlu
+ayByZWFsbHkgaGFyZCB3aGVuIHRoZXkgc2hvdWxkIGJlIHN1cHBvcnRlZCwgYW5kDQo+ID4gbmVl
+ZA0KPiA+ICAgICBhIGdvb2QgcmF0aW9uYWwgZm9yIGl0LiAgSSBjYW4ndCBzZWUgaG93IHdlIGNv
+dWxkIGRvIGl0DQo+ID4gICAgIHVuY29uZGl0aW9uYWxseSBmb3IgYWxsIHVzZXJzIGFzIHRoYXQg
+d291bGQgaW50cm9kdWNlIGVhc3kgZGVuaWFsDQo+ID4gICAgIG9mIHNlcnZpY2VzIGF0dGFja3Mg
+dGhlIHdheSBJIHVuZGVyc3RhbmQgdGhlIHNlbWFudGljcyAoY29ycmVjdCBtZQ0KPiA+ICAgICBp
+ZiBJJ20gd3JvbmcpLiAgU28gYSBtb3VudCBvcHRpb24gbGlrZSB5b3UgY3VycmVudGx5IGRvIHBy
+b2JhYmx5DQo+ID4gaXMNCj4gPiAgICAgdGhlIGxlYXN0IGJhZCBldmVuIGlmIGRvbid0IGZlbGwg
+b3Zlcmx5IGhhcHB5IGFib3V0IHRoYXQgdmVyc2lvbi4NCj4gPg0KPiA+IFdoYXQgaXMgdGhlIHJl
+YXNvbiB5b3VyIHNwZWNpYWwgd2luZSB1c2UgY2FzZSBjYW4ndCBzaW1wbHkgdXNlIGENCj4gPiB1
+c2Vyc3BhY2UgY2lmcyBjbGllbnQ/ICBHaXZlbiB0aGF0IHdpbmUgdXNlcyB3aW5kb3dzIGZpbGVz
+eXN0ZW0NCj4gPiBzZW1hbnRpY3MgYW5kIGNpZnMgZG9lcyBhcyB3ZWxsIHR1bm5lbGxpbmcgaXQg
+dGhyb3VnaCBhIFBvc2l4LWxpa2UgQVBJDQo+ID4gaW5iZXR3ZWVuIGlzIG5ldmVyIGdvaW5nIHRv
+IGJlIHBlcmZlY3QuDQo+IA0KPiBJZGVhbGx5IHdlIHNob3VsZCBub3QgbWFrZSBhbnkgZGlmZmVy
+ZW5jZSBiZXR3ZWVuIHVuZGVybHlpbmcgZmlsZXN5c3RlbXMNCj4gaW4gV2luZTogYW4gYXBwbGlj
+YXRpb24gcmVxdWVzdHMgYW4gb3BlbiBvZiB0aGUgZmlsZSBhbmQgd2UgaXNzdWUgdGhpcyBvcGVu
+DQo+IHdpdGggZmxhZ3MgaXQgcGFzc2VkLiBTaW5jZSBXaW5lc2VydmVyIGNhbiBwcm9jZXNzIHNo
+YXJlIGZsYWdzIGxvY2FsbHkgaXRzZWxmIChmb3INCj4gb25lIGxpbnV4IHVzZXIpLCB3ZSBvbmx5
+IG5lZWQgdG8gYWRkIHRoaXMgc3VwcG9ydCBmb3IgQ0lGUyAodGhhdCBpcyBhY3RpdmVseQ0KPiB1
+c2VkIGJ5IFdpbmUgYXBwbGljYXRpb25zIGJlY2F1c2Ugb2YgaXQncyBXaW5kb3dzIG5hdHVyZSku
+IEJyaW5naW5nIHRoZXNlDQo+IGZsYWdzIGZvciBsb2NhbCBmaWxlc3lzdGVtcyBjYW4gYmVuZWZp
+dCBXaW5lIHRvbzogaXQgd2lsbCBoZWxwIGluIGNhc2VzIHdoZW4NCj4gV2luZSBhcHBsaWNhdGlv
+bnMgb2YgZGlmZmVyZW50IHVzZXJzIG9uIHRoZSBzYW1lIG1hY2hpbmUgdXNlIHRoZSBzYW1lIGZp
+bGUNCj4gYW5kIGNhbiBtYWtlIGFsbCB0aG9zZSB0aGluZ3MgZWFzaWVyLCBvZiBjb3Vyc2UuDQo+
+IA0KPiBUaGUgcHJvYmxlbSBpcyB0aGUgcG9zc2liaWxpdHkgb2YgZGVuaWFsLW9mLXNlcnZpY2Ug
+YXR0YWNrcyBoZXJlLiBXZSBjYW4gdHJ5IHRvDQo+IHByZXZlbnQgdGhlbSBieToNCj4gMSkgc3Bl
+Y2lmeWluZyBhbiBleHRyYSBzZWN1cml0eSBiaXQgb24gdGhlIGZpbGUgdGhhdCBpbmRpY2F0ZXMg
+dGhhdCBzaGFyZSBmbGFncyBhcmUNCj4gYWNjZXB0ZWQgKGxpa2Ugd2UgaGF2ZSBmb3IgbWFuZGF0
+b3J5IGxvY2tzIG5vdykgYW5kIHNldHRpbmcgaXQgZm9yDQo+IG5lY2Nlc3NhcnkgZmlsZXMgb25s
+eSwgb3INCj4gMikgYWRkaW5nIGEgc3BlY2lhbCBtb3VudCBvcHRpb24gKGJ1dCBpdCBpdCBwcm9i
+YWJseSBtYWtlcyBzZW5zZSBpZiB3ZQ0KPiBkZWNpZGVkIHRvIGFkZCB0aGlzIHN1cHBvcnQgZm9y
+IENJRlMgYW5kIE5GUyBvbmx5KS4NCg0KV2h5IG5vdCBqdXN0IHB1dCBpdCB1bmRlciB0aGUgY29u
+dHJvbCBvZiBMU00/IEl0IHNlZW1zIHRvIG1lIHRoYXQgdGhpcyBkb2Vzbid0IHNvIG11Y2ggd2Fu
+dCB0byBiZSBhIHBlci1tb3VudCBzd2l0Y2ggYnV0IHJhdGhlciBkZXNlcnZlcyB0byBiZSBhIHBl
+ci1wcm9jZXNzIE1BQyAoaS5lLiBpcyB0aGlzIHJ1bm5pbmcgaW4gYSBXaW5lIHNhbmRib3ggb3Ig
+bm90KS4uLg0KDQpDaGVlcnMNCiAgIFRyb25kDQo=
