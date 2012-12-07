@@ -1,280 +1,214 @@
-From: Abhijit Pawar <abhi.c.pawar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [PATCH 4/4] fs: remove obsolete simple_strto<foo>
-Date: Fri,  7 Dec 2012 17:25:19 +0530
-Message-ID: <1354881319-23585-1-git-send-email-abhi.c.pawar@gmail.com>
-Cc: xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Abhijit Pawar <abhi.c.pawar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
-	Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
-	Chris Mason <chris.mason-5c4llco8/ftWk0Htik3J/w@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Christine Caulfield <ccaulfie-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	David Teigland <teigland-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Ben Myers <bpm-sJ/iWh9BUns@public.gmane.org>,
-	Alex Elder <elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+From: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
+Subject: Re: CIFS VFS: Unexpected SMB signature ...NULL inode in lookup
+Date: Fri, 07 Dec 2012 15:19:51 +0100
+Message-ID: <413918845.327740.1354889991393.JavaMail.www@wwinf8228>
+References: <546150668.69990.1354627396422.JavaMail.www@wwinf8225>
+ <CAH2r5mv6mzbNCCd=sGf7Kb2nDiMrYyemFQTib9cW-YfAL1ydEg@mail.gmail.com>
+ <1556345377.173552.1354718585931.JavaMail.www@wwinf8225>
+ <CAH2r5msFLc2Sv1oYO6MVHQVSYQBt9fs+TWHAsgtwPxq302ayBA@mail.gmail.com>
+Reply-To: "sergio.conrad" <sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5msFLc2Sv1oYO6MVHQVSYQBt9fs+TWHAsgtwPxq302ayBA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-This patch replace the obsolete simple_strto<foo> with kstrto<foo>
+Hi,
 
-Signed-off-by: Abhijit Pawar <abhi.c.pawar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
----
- fs/9p/v9fs.c         |    6 +++---
- fs/btrfs/ioctl.c     |    6 +++++-
- fs/cifs/cifs_debug.c |    6 ++++--
- fs/dlm/config.c      |   25 ++++++++++++++++++++-----
- fs/dlm/lockspace.c   |   20 ++++++++++++++++----
- fs/xfs/xfs_super.c   |   19 ++++++++++++++-----
- 6 files changed, 62 insertions(+), 20 deletions(-)
+I did it at https://bugzilla.samba.org/show_bug.cgi?id=3D9477
+I will try to do a network trace, but the bug don't
+appears often. About three times every day but not on the same machine.=
+=20
 
-diff --git a/fs/9p/v9fs.c b/fs/9p/v9fs.c
-index d934f04..e5ec1ea 100644
---- a/fs/9p/v9fs.c
-+++ b/fs/9p/v9fs.c
-@@ -112,7 +112,7 @@ static int v9fs_parse_options(struct v9fs_session_info *v9ses, char *opts)
- 	substring_t args[MAX_OPT_ARGS];
- 	char *p;
- 	int option = 0;
--	char *s, *e;
-+	char *s;
- 	int ret = 0;
- 
- 	/* setup defaults */
-@@ -249,8 +249,8 @@ static int v9fs_parse_options(struct v9fs_session_info *v9ses, char *opts)
- 				v9ses->flags |= V9FS_ACCESS_CLIENT;
- 			} else {
- 				v9ses->flags |= V9FS_ACCESS_SINGLE;
--				v9ses->uid = simple_strtoul(s, &e, 10);
--				if (*e != '\0') {
-+				ret = kstrtouint(s, 10, &v9ses->uid);
-+				if (ret) {
- 					ret = -EINVAL;
- 					pr_info("Unknown access argument %s\n",
- 						s);
-diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index 5b3429a..95d9e09 100644
---- a/fs/btrfs/ioctl.c
-+++ b/fs/btrfs/ioctl.c
-@@ -1335,7 +1335,11 @@ static noinline int btrfs_ioctl_resize(struct btrfs_root *root,
- 		sizestr = devstr + 1;
- 		*devstr = '\0';
- 		devstr = vol_args->name;
--		devid = simple_strtoull(devstr, &end, 10);
-+		ret = kstrtoull(devstr, 10, &devid);
-+		if (ret) {
-+			ret = -EINVAL;
-+			goto out_free;
-+		}
- 		printk(KERN_INFO "btrfs: resizing devid %llu\n",
- 		       (unsigned long long)devid);
- 	}
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index d9ea6ed..65936f8 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -584,6 +584,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
- 	unsigned int flags;
- 	char flags_string[12];
- 	char c;
-+	int rc;
- 
- 	if ((count < 1) || (count > 11))
- 		return -EINVAL;
-@@ -609,8 +610,9 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
- 	}
- 	/* else we have a number */
- 
--	flags = simple_strtoul(flags_string, NULL, 0);
--
-+	rc = kstrtouint(flags_string, 0, &flags);
-+	if (rc)
-+		return -EINVAL;
- 	cFYI(1, "sec flags 0x%x", flags);
- 
- 	if (flags <= 0)  {
-diff --git a/fs/dlm/config.c b/fs/dlm/config.c
-index 7d58d5b..38d164b 100644
---- a/fs/dlm/config.c
-+++ b/fs/dlm/config.c
-@@ -156,11 +156,14 @@ static ssize_t cluster_set(struct dlm_cluster *cl, unsigned int *cl_field,
- 			   const char *buf, size_t len)
- {
- 	unsigned int x;
-+	int rc;
- 
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EPERM;
- 
--	x = simple_strtoul(buf, NULL, 0);
-+	rc = kstrtouint(buf, 0, &x);
-+	if (rc)
-+		return -EINVAL;
- 
- 	if (check_zero && !x)
- 		return -EINVAL;
-@@ -729,7 +732,10 @@ static ssize_t comm_nodeid_read(struct dlm_comm *cm, char *buf)
- static ssize_t comm_nodeid_write(struct dlm_comm *cm, const char *buf,
- 				 size_t len)
- {
--	cm->nodeid = simple_strtol(buf, NULL, 0);
-+	int rc;
-+	rc = kstrtoint(buf, 0, &cm->nodeid);
-+	if (rc)
-+		return -EINVAL;
- 	return len;
- }
- 
-@@ -741,7 +747,10 @@ static ssize_t comm_local_read(struct dlm_comm *cm, char *buf)
- static ssize_t comm_local_write(struct dlm_comm *cm, const char *buf,
- 				size_t len)
- {
--	cm->local= simple_strtol(buf, NULL, 0);
-+	int rc;
-+	rc = kstrtoint(buf, 0, &cm->local);
-+	if (rc)
-+		return -EINVAL;
- 	if (cm->local && !local_comm)
- 		local_comm = cm;
- 	return len;
-@@ -845,7 +854,10 @@ static ssize_t node_nodeid_write(struct dlm_node *nd, const char *buf,
- 				 size_t len)
- {
- 	uint32_t seq = 0;
--	nd->nodeid = simple_strtol(buf, NULL, 0);
-+	int rc;
-+	rc = kstrtoint(buf, 0, &nd->nodeid);
-+	if (rc)
-+		return -EINVAL;
- 	dlm_comm_seq(nd->nodeid, &seq);
- 	nd->comm_seq = seq;
- 	return len;
-@@ -859,7 +871,10 @@ static ssize_t node_weight_read(struct dlm_node *nd, char *buf)
- static ssize_t node_weight_write(struct dlm_node *nd, const char *buf,
- 				 size_t len)
- {
--	nd->weight = simple_strtol(buf, NULL, 0);
-+	int rc;
-+	rc = kstrtoint(buf, 0, &nd->weight);
-+	if (rc)
-+		return -EINVAL;
- 	return len;
- }
- 
-diff --git a/fs/dlm/lockspace.c b/fs/dlm/lockspace.c
-index 2e99fb0..e83abfb 100644
---- a/fs/dlm/lockspace.c
-+++ b/fs/dlm/lockspace.c
-@@ -35,7 +35,10 @@ static struct task_struct *	scand_task;
- static ssize_t dlm_control_store(struct dlm_ls *ls, const char *buf, size_t len)
- {
- 	ssize_t ret = len;
--	int n = simple_strtol(buf, NULL, 0);
-+	int n, rc;
-+	rc = kstrtoint(buf, 0, &n);
-+	if (rc)
-+		return -EINVAL;
- 
- 	ls = dlm_find_lockspace_local(ls->ls_local_handle);
- 	if (!ls)
-@@ -57,7 +60,10 @@ static ssize_t dlm_control_store(struct dlm_ls *ls, const char *buf, size_t len)
- 
- static ssize_t dlm_event_store(struct dlm_ls *ls, const char *buf, size_t len)
- {
--	ls->ls_uevent_result = simple_strtol(buf, NULL, 0);
-+	int rc;
-+	rc = kstrtoint(buf, 0, &ls->ls_uevent_result);
-+	if (rc)
-+		return -EINVAL;
- 	set_bit(LSFL_UEVENT_WAIT, &ls->ls_flags);
- 	wake_up(&ls->ls_uevent_wait);
- 	return len;
-@@ -70,7 +76,10 @@ static ssize_t dlm_id_show(struct dlm_ls *ls, char *buf)
- 
- static ssize_t dlm_id_store(struct dlm_ls *ls, const char *buf, size_t len)
- {
--	ls->ls_global_id = simple_strtoul(buf, NULL, 0);
-+	int rc;
-+	rc = kstrtouint(buf, 0, &ls->ls_global_id);
-+	if (rc)
-+		return -EINVAL;
- 	return len;
- }
- 
-@@ -81,7 +90,10 @@ static ssize_t dlm_nodir_show(struct dlm_ls *ls, char *buf)
- 
- static ssize_t dlm_nodir_store(struct dlm_ls *ls, const char *buf, size_t len)
- {
--	int val = simple_strtoul(buf, NULL, 0);
-+	int val, rc;
-+	rc = kstrtoint(buf, 0, &val);
-+	if (rc)
-+		return -EINVAL;
- 	if (val == 1)
- 		set_bit(LSFL_NODIR, &ls->ls_flags);
- 	return len;
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index ab8839b..601246f 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -174,11 +174,12 @@ xfs_parseargs(
- 	char			*options)
- {
- 	struct super_block	*sb = mp->m_super;
--	char			*this_char, *value, *eov;
-+	char			*this_char, *value;
- 	int			dsunit = 0;
- 	int			dswidth = 0;
- 	int			iosize = 0;
- 	__uint8_t		iosizelog = 0;
-+	int			rc;
- 
- 	/*
- 	 * set up the mount name first so all the errors will refer to the
-@@ -230,7 +231,9 @@ xfs_parseargs(
- 					this_char);
- 				return EINVAL;
- 			}
--			mp->m_logbufs = simple_strtoul(value, &eov, 10);
-+			rc = kstrtoint(value, 10, &mp->m_logbufs);
-+			if (rc)
-+				return -EINVAL;
- 		} else if (!strcmp(this_char, MNTOPT_LOGBSIZE)) {
- 			if (!value || !*value) {
- 				xfs_warn(mp, "%s option requires an argument",
-@@ -266,7 +269,9 @@ xfs_parseargs(
- 					this_char);
- 				return EINVAL;
- 			}
--			iosize = simple_strtoul(value, &eov, 10);
-+			rc = kstrtoint(value, 10, &iosize);
-+			if (rc)
-+				return -EINVAL;
- 			iosizelog = ffs(iosize) - 1;
- 		} else if (!strcmp(this_char, MNTOPT_ALLOCSIZE)) {
- 			if (!value || !*value) {
-@@ -296,14 +301,18 @@ xfs_parseargs(
- 					this_char);
- 				return EINVAL;
- 			}
--			dsunit = simple_strtoul(value, &eov, 10);
-+			rc = kstrtouint(value, 10, &dsunit);
-+			if (rc)
-+				return -EINVAL;
- 		} else if (!strcmp(this_char, MNTOPT_SWIDTH)) {
- 			if (!value || !*value) {
- 				xfs_warn(mp, "%s option requires an argument",
- 					this_char);
- 				return EINVAL;
- 			}
--			dswidth = simple_strtoul(value, &eov, 10);
-+			rc = kstrtoint(value, 10, &dswidth);
-+			if (rc)
-+				return -EINVAL;
- 		} else if (!strcmp(this_char, MNTOPT_32BITINODE)) {
- 			mp->m_flags |= XFS_MOUNT_SMALL_INUMS;
- 		} else if (!strcmp(this_char, MNTOPT_64BITINODE)) {
--- 
-1.7.7.6
+Thanks,
+Serge
+> Message du 05/12/12 16:18
+> De : "Steve French"=20
+> A : "sergio.conrad"=20
+> Copie =C3=A0 : linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Objet : Re: CIFS VFS: Unexpected SMB signature ...NULL inode in looku=
+p
+>
+> Could you open a bugzilla bug at bugzilla.samba.org and if possible
+> attach a network trace around the time that this is triggered (if it
+> is trivial to reproduce)
+> https://wiki.samba.org/index.php/Capture_Packets
+>=20
+> On Wed, Dec 5, 2012 at 8:43 AM, sergio.conrad  wrote:
+> > Hello,
+> >
+> > The log are from 2.6.43.8-1.fc15.x86_64.
+> > I see also the error CIFS VFS: Unexpected SMB signature with the sa=
+me environnement on a 3.6.6-1.fc16.x86_64
+> >
+> > Thanks,
+> >
+> > Serge
+> >
+> >
+> >> Message du 04/12/12 20:06
+> >> De : "Steve French"
+> >> A : "sergio.conrad"
+> >> Copie =C3=A0 : linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> >> Objet : Re: CIFS VFS: Unexpected SMB signature ...NULL inode in lo=
+okup
+> >>
+> >> What kernel version?
+> >>
+> >> I would not expect the "noserverino" mount option to be a factor.
+> >> Jeff did fix one warning relating to unexpected signatures in this
+> >> patch, see below (which I don't think is your issue (if the signat=
+ure
+> >> is coming on a transact2 request).
+> >>
+> >> commit 9c4843ea576107a3c1fb94f2f758f198e9fe9e54
+> >> Author: Jeff Layton
+> >> Date: Mon Jun 6 15:40:23 2011 -0400
+> >>
+> >> cifs: silence printk when establishing first session on socket
+> >>
+> >> When signing is enabled, the first session that's established on a
+> >> socket will cause a printk like this to pop:
+> >>
+> >> CIFS VFS: Unexpected SMB signature
+> >>
+> >> This is because the key exchange hasn't happened yet, so the signa=
+ture
+> >> field is bogus. Don't try to check the signature on the socket unt=
+il the
+> >> first session has been established. Also, eliminate the specific c=
+heck
+> >> for SMB_COM_NEGOTIATE since this check covers that case too.
+> >>
+> >>
+> >> On Tue, Dec 4, 2012 at 7:23 AM, sergio.conrad wrote:
+> >> > Hi,
+> >> >
+> >> > I have a problem with users losing their connections from linux =
+clients with cifs share. (Windows 2008) :CIFS VFS: Unexpected SMB signa=
+ture
+> >> > I am using two methods for mounting: pam_mount and autofs, both =
+with same results.
+> >> >
+> >> > I am using mount options nounix,noserverino
+> >> >
+> >> > I am lauching cifs module on boot (rc.local) with
+> >> > modprobe cifs
+> >> > echo 0 > /proc/fs/cifs/OplockEnabled
+> >> > echo 1 > /proc/fs/cifs/MultiuserMount
+> >> > echo 7 > /proc/fs/cifs/cifsFYI
+> >> >
+> >> > What happens :
+> >> > in /var/log/messages
+> >> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> > Dec 3 17:31:01 u1205-08l kernel: [ 3732.140040] CIFS VFS: Unexpe=
+cted lookup error -512
+> >> > Dec 3 17:31:01 u1205-08l kernel: [ 3732.334939] CIFS VFS: Unexpe=
+cted SMB signature
+> >> >
+> >> > This user was working since one hour with no problem :
+> >> > Daemon log :
+> >> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: key description: cifs.spne=
+go;0;0;3f000000
+> >> > ;ver=3D0x2;host=3Dfigue;ip4=3D130.xxx.xxx.xxx;sec=3Dkrb5;uid=3D0=
+x1000005;creduid=3D0x1000005;us
+> >> > er=3D21206xxx;pid=3D0x65f
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: ver=3D2
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: host=3Dfigue
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: ip=3D130.120.8.11
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: sec=3D1
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: uid=3D16777221
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: creduid=3D16777221
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: user=3D21206xxx
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: pid=3D1631
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: find_krb5_cc: considering =
+/tmp/krb5cc_167
+> >> > 77221
+> >> > Dec 3 16:29:35 u1205-08l cifs.upcall: find_krb5_cc: FILE:/tmp/kr=
+b5cc_16777221 i
+> >> > s valid ccache
+> >> >
+> >> > in dmesg
+> >> > =3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> > fs/cifs/inode.c: Getting info on \21206xxx\TP9
+> >> > [ 3735.419612] fs/cifs/transport.c: For smb_command 50
+> >> > [ 3735.419615] fs/cifs/transport.c: Sending smb: total_len 104
+> >> > [ 3735.420257] fs/cifs/connect.c: RFC1002 header 0x23
+> >> > [ 3735.420261] fs/cifs/connect.c: invalid transact2 word count
+> >> > [ 3735.422403] fs/cifs/transport.c: cifs_sync_mid_result: cmd=3D=
+50 mid=3D37012 state=3D4
+> >> > [ 3735.422406] CIFS VFS: Unexpected SMB signature
+> >> > [ 3735.422408] Status code returned 0xc0000022 NT_STATUS_ACCESS_=
+DENIED
+> >> > [ 3735.422411] fs/cifs/netmisc.c: Mapping smb error code 0xc0000=
+022 to POSIX err -13
+> >> > [ 3735.422413] fs/cifs/cifssmb.c: Send error in QPathInfo =3D -1=
+3
+> >> > [ 3735.422415] fs/cifs/dir.c: CIFS VFS: leaving cifs_lookup (xid=
+ =3D 76854) rc =3D -13
+> >> > [ 3735.422424] fs/cifs/dir.c: CIFS VFS: in cifs_lookup as Xid: 7=
+6855 with uid: 16777221
+> >> > [ 3735.422427] fs/cifs/dir.c: parent inode =3D 0xf14481f0 name i=
+s: TP9 and dentry =3D 0xf074e300
+> >> > [ 3735.422429] fs/cifs/dir.c: NULL inode in lookup
+> >> > [ 3735.422430] fs/cifs/dir.c: Full path: \21206xxx\TP9 inode =3D=
+ 0x (null)
+> >> >
+> >> > I don't understand what happens...
+> >> > NULL inode in lookup ... What about noserverino option ?
+> >> > Perhaps an unresponsive server... The network infrastructure is =
+old. Last year I got this working very well, but the server was in a be=
+tter place (switch and network infrastructure speaking)
+> >> >
+> >> > Regards,
+> >> > Thanks in advance
+> >> > Serge Conrad
+> >> >
+> >> > Une messagerie gratuite, garantie =C3=A0 vie et des services en =
+plus, =C3=A7a vous tente ?
+> >> > Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
+> >> > --
+> >> > To unsubscribe from this list: send the line "unsubscribe linux-=
+cifs" in
+> >> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> >> > More majordomo info at http://vger.kernel.org/majordomo-info.htm=
+l
+> >>
+> >>
+> >>
+> >> --
+> >> Thanks,
+> >>
+> >> Steve
+> >> --
+> >> To unsubscribe from this list: send the line "unsubscribe linux-ci=
+fs" in
+> >> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> >> More majordomo info at http://vger.kernel.org/majordomo-info.html
+> >>
+> >
+> > Une messagerie gratuite, garantie =C3=A0 vie et des services en plu=
+s, =C3=A7a vous tente ?
+> > Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
+>=20
+>=20
+>=20
+> --=20
+> Thanks,
+>=20
+> Steve
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
+ in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at http://vger.kernel.org/majordomo-info.html
+>=20
+
+Une messagerie gratuite, garantie =C3=A0 vie et des services en plus, =C3=
+=A7a vous tente ?
+Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
