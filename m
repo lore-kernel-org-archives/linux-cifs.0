@@ -1,105 +1,99 @@
-From: simo <idra@samba.org>
-Subject: Re: [PATCH RFC] cifs-utils: new plugin architecture for ID mapping
-	code
-Date: Thu, 06 Dec 2012 17:42:50 -0500
-Message-ID: <1354833770.14719.59.camel@pico.ipa.ssimo.org>
-References: <1354797458-5170-1-git-send-email-jlayton@samba.org>
-	<1354801351.14719.18.camel@pico.ipa.ssimo.org>
-	<20121206161250.71b7952c@tlielax.poochiereds.net>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
+Date: Fri, 7 Dec 2012 13:08:46 +0400
+Message-ID: <CAKywueQ3d=wdq2nw5f-QS-D9PY70Axa3Cn0gi5GRk4Xso+iquA@mail.gmail.com>
+References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-To: Jeff Layton <jlayton@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <20121206161250.71b7952c@tlielax.poochiereds.net>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1354818391-7968-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Thu, 2012-12-06 at 16:12 -0500, Jeff Layton wrote:
-> On Thu, 06 Dec 2012 08:42:31 -0500
-> simo <idra@samba.org> wrote:
-> 
-> > On Thu, 2012-12-06 at 07:37 -0500, Jeff Layton wrote:
-> > > Currently, the ACL-related tools in cifs-utils call into the wbclient
-> > > libs directly in order to do their bidding. The wbclient developers want
-> > > to get away from needing to configure winbind on the clients and instead
-> > > allow sssd to handle the id-mapping. Less muss, less fuss...
-> > > 
-> > > This patch represents an initial step in that direction. It adds a
-> > > plugin architecture for cifs-utils, adds wrappers around the calls into
-> > > libwbclient that find an idmap plugin library to use and then has it
-> > > call into that plugin to do the actual ID mapping.
-> > > 
-> > > This patch should be considered an RFC on the overall design. Once I
-> > > have some positive feedback (or lack of negative feedback), I'll do the
-> > > same with cifs.idmap and setcifsacl.
-> > > 
-> > > This patch is still pretty rough, but should demonstrate the basic
-> > > design:
-> > > 
-> > > The application will call into a set of routines that find the correct
-> > > plugin and dlopen() it. Currently the plugin is located in a hardcoded
-> > > location that will eventually be settable via autoconf. That location is
-> > > intended to be a symlink that points to the real plugin (generally under
-> > > %libdir/cifs-utils).
-> > > 
-> > > The plugin will export a number of functions with well-known names. The
-> > > wrappers find those by using dlsym() and then call them.
-> > > 
-> > > I'm tracking progress on this work here:
-> > > 
-> > >     https://bugzilla.samba.org/show_bug.cgi?id=9203
-> > > 
-> > > Here are some questions to ponder:
-> > > 
-> > > 1/ Should we switch this code to use a config file of some sort instead
-> > > of this symlink? The symlink would probably be more efficient, but it
-> > > is a little odd and might confuse people. It also might make it hard to
-> > > expand the idmapping interfaces later.
-> > 
-> > I think a symlink is ok for starters, a config file can always be added
-> > later if needed.
-> > 
-> > > 2/ Should I switch this code to use libltdl for the plugin architecture?
-> > > I started to use that initially, but it was awfully complex to get working.
-> > > Since portability isn't really a concern with cifs-utils, I punted. Does
-> > > anyone see issues with rolling our own here?
-> > 
-> > Well the cifs kernel module is Linux only, I would leave the hassle of
-> > dealing with portability to whomever would like to port this.
-> > Using dlopen/dlsym is simple, so roll-your-own seem fine to me.
-> > 
-> > One thing though I would name-space the symbol, so instead of
-> > idmap_sid_to_str call it cifs_idmap_sid_to_str, in the plugin.
-> > Internally you can call whatever you want.
-> > 
-> 
-> Now that I look, I'm not sure I understand the point of the above...
-> 
-> The function that the program calls is called "sid_to_str()". I already
-> added some "namespacification" around that by prefixing it with
-> "idmap_", so the function provided by the plugin is called
-> "idmap_sid_to_str()". What's the benefit of adding another prefix to
-> that?
+2012/12/6 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
+> Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
+>
+> Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can't do it if a file stored on a network share and is used by several clients. This patchset makes it possible for CIFS/SMB2.0/SMB3.0.
+>
+> Pavel Shilovsky (3):
+>   fcntl: Introduce new O_DENY* open flags for network filesystems
+>   CIFS: Add O_DENY* open flags support
+>   CIFS: Use NT_CREATE_ANDX command for forcemand mounts
+>
+>  fs/cifs/cifsacl.c                |   10 ++++----
+>  fs/cifs/cifsglob.h               |   11 ++++++++-
+>  fs/cifs/cifsproto.h              |    9 ++++----
+>  fs/cifs/cifssmb.c                |   47 ++++++++++++++++++++------------------
+>  fs/cifs/dir.c                    |   14 ++++++++----
+>  fs/cifs/file.c                   |   18 ++++++++++-----
+>  fs/cifs/inode.c                  |   11 +++++----
+>  fs/cifs/link.c                   |   10 ++++----
+>  fs/cifs/readdir.c                |    2 +-
+>  fs/cifs/smb1ops.c                |   15 ++++++------
+>  fs/cifs/smb2file.c               |   10 ++++----
+>  fs/cifs/smb2inode.c              |    4 ++--
+>  fs/cifs/smb2ops.c                |   10 ++++----
+>  fs/cifs/smb2pdu.c                |    6 ++---
+>  fs/cifs/smb2proto.h              |   14 +++++++-----
+>  fs/fcntl.c                       |    5 ++--
+>  include/uapi/asm-generic/fcntl.h |   11 +++++++++
+>  17 files changed, 125 insertions(+), 82 deletions(-)
+>
+> --
+> 1.7.10.4
+>
 
-idmap_ is quite generic and may be used inside samba for example so it
-may not be easy to expose the symbol to you, but yeah I did not
-understand you used idmap_ as namespace, so I guess my advice is to find
-a better namespace more unique to cifs.ko :)
+First of all, sorry for being unclear at this proposal.
 
-Simo.
 
+I am not from Wine team but I am working on things related to
+Wine+CIFS-client+Samba.
+
+We (at Etersoft) need to organize the work of Wine applications
+through cifs-client share mounted to Samba (or Windows server). They
+are related to accounting (mostly Russian ones - e.g.
+http://www.1c.ru/eng/title.htm). So, the problem is that such
+applications use share flags to control the parallel access to the
+same files of several clients on a remote share. Also, there can be a
+situation where Windows (native) clients and Wine clients are working
+together in the same time.
+
+That's why we need such flags in the kernel (patch #1). With these
+flags Wine can pass them to every open and they will be used by CIFS
+(and probably NFS) file systems to pass to the Samba server. In the
+same time if the file is on local filesystem - these flags will be
+simply ignored (not implemented).
+
+Now we have to make our own builds of cifs module for every kernel
+that use these flags passed by our build of Wine - this scheme is
+working but requires merging every time new kernel is released.
+Getting things into mainline let Wine supports more applications.
+
+As for the security layer, I don't think that we need any extra bits
+to switch these flags on or off - it will be switched on/off by an
+underlying filesystem. Since, this change is targeted for a network
+purpose only, a tool, that shows us what process/user locks a file,
+doesn't help a lot because the file can be locked remotely.
+
+As was said above, this change let us give Wine application share
+flags possibility for both Samba and Windows servers. Patch #2 enables
+share flags support for cifs mounts of Windows servers or Samba
+servers with nounix mount option. But we already have forcemand mount
+option in cifs module that switches on mandatory byte-range locking
+semantic for Samba without nounix. Since share flags capability is a
+kind of 'mandatory' locking scheme, I suggest that this option should
+switch on share flags for Samba without nounix too (by using
+NTCreateAndX command for open rather than transaction2) - that is what
+patch #3 does.
 
 -- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo@samba.org>
-Principal Software Engineer at Red Hat, Inc. <simo@redhat.com>
+Best regards,
+Pavel Shilovsky.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
