@@ -1,56 +1,69 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] cifs-utils: only link in -lrt to binaries that need it
-Date: Fri,  7 Dec 2012 10:41:06 -0500
-Message-ID: <1354894866-319-1-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: bj-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org
+Subject: [PATCH] getcifsacl: remove unneeded openlog() call
+Date: Fri,  7 Dec 2012 10:41:33 -0500
+Message-ID: <1354894893-387-1-git-send-email-jlayton@samba.org>
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-=2E..which is really only mount.cifs.
+getcifsacl doesn't log to syslog, so there's no need to open a channel
+to it. Also, remove the unneeded "prog" global variable since only
+the usage() function needs it.
 
-Cc:  Bj=C3=B6rn Jacke <bj-3ekOc4rQMZmzQB+pC5nmwQ@public.gmane.org>
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- Makefile.am  | 2 +-
- configure.ac | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ getcifsacl.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 73f756f..ff7a726 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -4,7 +4,7 @@ ACLOCAL_AMFLAGS =3D -I aclocal
- root_sbindir =3D $(ROOTSBINDIR)
- root_sbin_PROGRAMS =3D mount.cifs
- mount_cifs_SOURCES =3D mount.cifs.c mtab.c resolve_host.c util.c
--mount_cifs_LDADD =3D $(LIBCAP) $(CAPNG_LDADD)
-+mount_cifs_LDADD =3D $(LIBCAP) $(CAPNG_LDADD) $(RT_LDADD)
-=20
- man_MANS =3D mount.cifs.8
-=20
-diff --git a/configure.ac b/configure.ac
-index 78acd43..b6791ab 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -94,9 +94,10 @@ AC_CHECK_FUNCS(clock_gettime, [], [
-       AC_DEFINE(HAVE_CLOCK_GETTIME, 1)
- 	AC_DEFINE(HAVE_CLOCK_GETTIME,1,
- 		[Whether the clock_gettime func is there])
--      LIBS=3D"$LIBS -lrt"
-+      RT_LDADD=3D"-lrt"
-         ])
-   ])
-+AC_SUBST(RT_LDADD)
-=20
- # Checks for header files.
- AC_CHECK_HEADERS([arpa/inet.h ctype.h fcntl.h inttypes.h limits.h mnte=
-nt.h netdb.h stddef.h stdint.h stdbool.h stdlib.h stdio.h errno.h strin=
-g.h strings.h sys/mount.h sys/param.h sys/socket.h sys/time.h syslog.h =
-unistd.h], , [AC_MSG_ERROR([necessary header(s) not found])])
---=20
+diff --git a/getcifsacl.c b/getcifsacl.c
+index 3f94a99..550429c 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -25,7 +25,6 @@
+ 
+ #include <string.h>
+ #include <getopt.h>
+-#include <syslog.h>
+ #include <stdint.h>
+ #include <stdbool.h>
+ #include <unistd.h>
+@@ -39,8 +38,6 @@
+ #include <sys/xattr.h>
+ #include "cifsacl.h"
+ 
+-static const char *prog;
+-
+ static void
+ print_each_ace_mask(uint32_t mask)
+ {
+@@ -355,7 +352,7 @@ parse_sec_desc(struct cifs_ntsd *pntsd, ssize_t acl_len, int raw)
+ }
+ 
+ static void
+-getcifsacl_usage(void)
++getcifsacl_usage(const char *prog)
+ {
+ 	fprintf(stderr,
+ 	"%s: Display CIFS/NTFS ACL in a security descriptor of a file object\n",
+@@ -376,9 +373,6 @@ main(const int argc, char *const argv[])
+ 	size_t bufsize = BUFSIZE;
+ 	char *filename, *attrval;
+ 
+-	prog = basename(argv[0]);
+-	openlog(prog, 0, LOG_DAEMON);
+-
+ 	while ((c = getopt_long(argc, argv, "r:v", NULL, NULL)) != -1) {
+ 		switch (c) {
+ 		case 'v':
+@@ -397,7 +391,7 @@ main(const int argc, char *const argv[])
+ 	else if (argc == 2)
+ 		filename = argv[1];
+ 	else {
+-		getcifsacl_usage();
++		getcifsacl_usage(basename(argv[0]));
+ 		return 0;
+ 	}
+ 
+-- 
 1.7.11.7
