@@ -1,69 +1,42 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] getcifsacl: remove unneeded openlog() call
-Date: Fri,  7 Dec 2012 10:41:33 -0500
-Message-ID: <1354894893-387-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils: new plugin architecture for ID mapping code
+Date: Fri, 07 Dec 2012 10:51:37 -0500
+Message-ID: <1354895497.14719.91.camel@pico.ipa.ssimo.org>
+References: <1354894216-31870-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1354894216-31870-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-getcifsacl doesn't log to syslog, so there's no need to open a channel
-to it. Also, remove the unneeded "prog" global variable since only
-the usage() function needs it.
+On Fri, 2012-12-07 at 10:30 -0500, Jeff Layton wrote:
+> 
+> Ok, first "official" posting for the plugin architecture. Changes
+> since
+> the original RFC set:
+> 
+> 1/ init_plugin() and exit_plugin() functions have been added to the
+>    plugin API. The init passes back an opaque handle so we can
+>    potentially use this in threaded programs later if needed.
+> 
+> 2/ the plugin function names are more distinct, now prefixed with
+>    "cifs_idmap_".
+> 
+> 3/ the code has been changed to never dlclose() the plugin and rely
+>    on it to be closed at exit. That makes things a lot simpler...
+> 
+> Original description follows...
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- getcifsacl.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+Looks generally good to me, I like where you painted the line between
+functionality and complexity :)
 
-diff --git a/getcifsacl.c b/getcifsacl.c
-index 3f94a99..550429c 100644
---- a/getcifsacl.c
-+++ b/getcifsacl.c
-@@ -25,7 +25,6 @@
- 
- #include <string.h>
- #include <getopt.h>
--#include <syslog.h>
- #include <stdint.h>
- #include <stdbool.h>
- #include <unistd.h>
-@@ -39,8 +38,6 @@
- #include <sys/xattr.h>
- #include "cifsacl.h"
- 
--static const char *prog;
--
- static void
- print_each_ace_mask(uint32_t mask)
- {
-@@ -355,7 +352,7 @@ parse_sec_desc(struct cifs_ntsd *pntsd, ssize_t acl_len, int raw)
- }
- 
- static void
--getcifsacl_usage(void)
-+getcifsacl_usage(const char *prog)
- {
- 	fprintf(stderr,
- 	"%s: Display CIFS/NTFS ACL in a security descriptor of a file object\n",
-@@ -376,9 +373,6 @@ main(const int argc, char *const argv[])
- 	size_t bufsize = BUFSIZE;
- 	char *filename, *attrval;
- 
--	prog = basename(argv[0]);
--	openlog(prog, 0, LOG_DAEMON);
--
- 	while ((c = getopt_long(argc, argv, "r:v", NULL, NULL)) != -1) {
- 		switch (c) {
- 		case 'v':
-@@ -397,7 +391,7 @@ main(const int argc, char *const argv[])
- 	else if (argc == 2)
- 		filename = argv[1];
- 	else {
--		getcifsacl_usage();
-+		getcifsacl_usage(basename(argv[0]));
- 		return 0;
- 	}
- 
+Simo.
+
 -- 
-1.7.11.7
+Simo Sorce
+Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
