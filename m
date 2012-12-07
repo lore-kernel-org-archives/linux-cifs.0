@@ -1,99 +1,280 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Fri, 7 Dec 2012 13:08:46 +0400
-Message-ID: <CAKywueQ3d=wdq2nw5f-QS-D9PY70Axa3Cn0gi5GRk4Xso+iquA@mail.gmail.com>
-References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1354818391-7968-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+From: Abhijit Pawar <abhi.c.pawar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [PATCH 4/4] fs: remove obsolete simple_strto<foo>
+Date: Fri,  7 Dec 2012 17:25:19 +0530
+Message-ID: <1354881319-23585-1-git-send-email-abhi.c.pawar@gmail.com>
+Cc: xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org, v9fs-developer-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Abhijit Pawar <abhi.c.pawar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Eric Van Hensbergen <ericvh-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Ron Minnich <rminnich-4OHPYypu0djtX7QSmKvirg@public.gmane.org>,
+	Latchesar Ionkov <lucho-OnYtXJJ0/fesTnJN9+BGXg@public.gmane.org>,
+	Chris Mason <chris.mason-5c4llco8/ftWk0Htik3J/w@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Christine Caulfield <ccaulfie-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	David Teigland <teigland-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Ben Myers <bpm-sJ/iWh9BUns@public.gmane.org>,
+	Alex Elder <elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2012/12/6 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
->
-> Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can't do it if a file stored on a network share and is used by several clients. This patchset makes it possible for CIFS/SMB2.0/SMB3.0.
->
-> Pavel Shilovsky (3):
->   fcntl: Introduce new O_DENY* open flags for network filesystems
->   CIFS: Add O_DENY* open flags support
->   CIFS: Use NT_CREATE_ANDX command for forcemand mounts
->
->  fs/cifs/cifsacl.c                |   10 ++++----
->  fs/cifs/cifsglob.h               |   11 ++++++++-
->  fs/cifs/cifsproto.h              |    9 ++++----
->  fs/cifs/cifssmb.c                |   47 ++++++++++++++++++++------------------
->  fs/cifs/dir.c                    |   14 ++++++++----
->  fs/cifs/file.c                   |   18 ++++++++++-----
->  fs/cifs/inode.c                  |   11 +++++----
->  fs/cifs/link.c                   |   10 ++++----
->  fs/cifs/readdir.c                |    2 +-
->  fs/cifs/smb1ops.c                |   15 ++++++------
->  fs/cifs/smb2file.c               |   10 ++++----
->  fs/cifs/smb2inode.c              |    4 ++--
->  fs/cifs/smb2ops.c                |   10 ++++----
->  fs/cifs/smb2pdu.c                |    6 ++---
->  fs/cifs/smb2proto.h              |   14 +++++++-----
->  fs/fcntl.c                       |    5 ++--
->  include/uapi/asm-generic/fcntl.h |   11 +++++++++
->  17 files changed, 125 insertions(+), 82 deletions(-)
->
-> --
-> 1.7.10.4
->
+This patch replace the obsolete simple_strto<foo> with kstrto<foo>
 
-First of all, sorry for being unclear at this proposal.
+Signed-off-by: Abhijit Pawar <abhi.c.pawar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/9p/v9fs.c         |    6 +++---
+ fs/btrfs/ioctl.c     |    6 +++++-
+ fs/cifs/cifs_debug.c |    6 ++++--
+ fs/dlm/config.c      |   25 ++++++++++++++++++++-----
+ fs/dlm/lockspace.c   |   20 ++++++++++++++++----
+ fs/xfs/xfs_super.c   |   19 ++++++++++++++-----
+ 6 files changed, 62 insertions(+), 20 deletions(-)
 
-
-I am not from Wine team but I am working on things related to
-Wine+CIFS-client+Samba.
-
-We (at Etersoft) need to organize the work of Wine applications
-through cifs-client share mounted to Samba (or Windows server). They
-are related to accounting (mostly Russian ones - e.g.
-http://www.1c.ru/eng/title.htm). So, the problem is that such
-applications use share flags to control the parallel access to the
-same files of several clients on a remote share. Also, there can be a
-situation where Windows (native) clients and Wine clients are working
-together in the same time.
-
-That's why we need such flags in the kernel (patch #1). With these
-flags Wine can pass them to every open and they will be used by CIFS
-(and probably NFS) file systems to pass to the Samba server. In the
-same time if the file is on local filesystem - these flags will be
-simply ignored (not implemented).
-
-Now we have to make our own builds of cifs module for every kernel
-that use these flags passed by our build of Wine - this scheme is
-working but requires merging every time new kernel is released.
-Getting things into mainline let Wine supports more applications.
-
-As for the security layer, I don't think that we need any extra bits
-to switch these flags on or off - it will be switched on/off by an
-underlying filesystem. Since, this change is targeted for a network
-purpose only, a tool, that shows us what process/user locks a file,
-doesn't help a lot because the file can be locked remotely.
-
-As was said above, this change let us give Wine application share
-flags possibility for both Samba and Windows servers. Patch #2 enables
-share flags support for cifs mounts of Windows servers or Samba
-servers with nounix mount option. But we already have forcemand mount
-option in cifs module that switches on mandatory byte-range locking
-semantic for Samba without nounix. Since share flags capability is a
-kind of 'mandatory' locking scheme, I suggest that this option should
-switch on share flags for Samba without nounix too (by using
-NTCreateAndX command for open rather than transaction2) - that is what
-patch #3 does.
-
+diff --git a/fs/9p/v9fs.c b/fs/9p/v9fs.c
+index d934f04..e5ec1ea 100644
+--- a/fs/9p/v9fs.c
++++ b/fs/9p/v9fs.c
+@@ -112,7 +112,7 @@ static int v9fs_parse_options(struct v9fs_session_info *v9ses, char *opts)
+ 	substring_t args[MAX_OPT_ARGS];
+ 	char *p;
+ 	int option = 0;
+-	char *s, *e;
++	char *s;
+ 	int ret = 0;
+ 
+ 	/* setup defaults */
+@@ -249,8 +249,8 @@ static int v9fs_parse_options(struct v9fs_session_info *v9ses, char *opts)
+ 				v9ses->flags |= V9FS_ACCESS_CLIENT;
+ 			} else {
+ 				v9ses->flags |= V9FS_ACCESS_SINGLE;
+-				v9ses->uid = simple_strtoul(s, &e, 10);
+-				if (*e != '\0') {
++				ret = kstrtouint(s, 10, &v9ses->uid);
++				if (ret) {
+ 					ret = -EINVAL;
+ 					pr_info("Unknown access argument %s\n",
+ 						s);
+diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+index 5b3429a..95d9e09 100644
+--- a/fs/btrfs/ioctl.c
++++ b/fs/btrfs/ioctl.c
+@@ -1335,7 +1335,11 @@ static noinline int btrfs_ioctl_resize(struct btrfs_root *root,
+ 		sizestr = devstr + 1;
+ 		*devstr = '\0';
+ 		devstr = vol_args->name;
+-		devid = simple_strtoull(devstr, &end, 10);
++		ret = kstrtoull(devstr, 10, &devid);
++		if (ret) {
++			ret = -EINVAL;
++			goto out_free;
++		}
+ 		printk(KERN_INFO "btrfs: resizing devid %llu\n",
+ 		       (unsigned long long)devid);
+ 	}
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index d9ea6ed..65936f8 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -584,6 +584,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 	unsigned int flags;
+ 	char flags_string[12];
+ 	char c;
++	int rc;
+ 
+ 	if ((count < 1) || (count > 11))
+ 		return -EINVAL;
+@@ -609,8 +610,9 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 	}
+ 	/* else we have a number */
+ 
+-	flags = simple_strtoul(flags_string, NULL, 0);
+-
++	rc = kstrtouint(flags_string, 0, &flags);
++	if (rc)
++		return -EINVAL;
+ 	cFYI(1, "sec flags 0x%x", flags);
+ 
+ 	if (flags <= 0)  {
+diff --git a/fs/dlm/config.c b/fs/dlm/config.c
+index 7d58d5b..38d164b 100644
+--- a/fs/dlm/config.c
++++ b/fs/dlm/config.c
+@@ -156,11 +156,14 @@ static ssize_t cluster_set(struct dlm_cluster *cl, unsigned int *cl_field,
+ 			   const char *buf, size_t len)
+ {
+ 	unsigned int x;
++	int rc;
+ 
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EPERM;
+ 
+-	x = simple_strtoul(buf, NULL, 0);
++	rc = kstrtouint(buf, 0, &x);
++	if (rc)
++		return -EINVAL;
+ 
+ 	if (check_zero && !x)
+ 		return -EINVAL;
+@@ -729,7 +732,10 @@ static ssize_t comm_nodeid_read(struct dlm_comm *cm, char *buf)
+ static ssize_t comm_nodeid_write(struct dlm_comm *cm, const char *buf,
+ 				 size_t len)
+ {
+-	cm->nodeid = simple_strtol(buf, NULL, 0);
++	int rc;
++	rc = kstrtoint(buf, 0, &cm->nodeid);
++	if (rc)
++		return -EINVAL;
+ 	return len;
+ }
+ 
+@@ -741,7 +747,10 @@ static ssize_t comm_local_read(struct dlm_comm *cm, char *buf)
+ static ssize_t comm_local_write(struct dlm_comm *cm, const char *buf,
+ 				size_t len)
+ {
+-	cm->local= simple_strtol(buf, NULL, 0);
++	int rc;
++	rc = kstrtoint(buf, 0, &cm->local);
++	if (rc)
++		return -EINVAL;
+ 	if (cm->local && !local_comm)
+ 		local_comm = cm;
+ 	return len;
+@@ -845,7 +854,10 @@ static ssize_t node_nodeid_write(struct dlm_node *nd, const char *buf,
+ 				 size_t len)
+ {
+ 	uint32_t seq = 0;
+-	nd->nodeid = simple_strtol(buf, NULL, 0);
++	int rc;
++	rc = kstrtoint(buf, 0, &nd->nodeid);
++	if (rc)
++		return -EINVAL;
+ 	dlm_comm_seq(nd->nodeid, &seq);
+ 	nd->comm_seq = seq;
+ 	return len;
+@@ -859,7 +871,10 @@ static ssize_t node_weight_read(struct dlm_node *nd, char *buf)
+ static ssize_t node_weight_write(struct dlm_node *nd, const char *buf,
+ 				 size_t len)
+ {
+-	nd->weight = simple_strtol(buf, NULL, 0);
++	int rc;
++	rc = kstrtoint(buf, 0, &nd->weight);
++	if (rc)
++		return -EINVAL;
+ 	return len;
+ }
+ 
+diff --git a/fs/dlm/lockspace.c b/fs/dlm/lockspace.c
+index 2e99fb0..e83abfb 100644
+--- a/fs/dlm/lockspace.c
++++ b/fs/dlm/lockspace.c
+@@ -35,7 +35,10 @@ static struct task_struct *	scand_task;
+ static ssize_t dlm_control_store(struct dlm_ls *ls, const char *buf, size_t len)
+ {
+ 	ssize_t ret = len;
+-	int n = simple_strtol(buf, NULL, 0);
++	int n, rc;
++	rc = kstrtoint(buf, 0, &n);
++	if (rc)
++		return -EINVAL;
+ 
+ 	ls = dlm_find_lockspace_local(ls->ls_local_handle);
+ 	if (!ls)
+@@ -57,7 +60,10 @@ static ssize_t dlm_control_store(struct dlm_ls *ls, const char *buf, size_t len)
+ 
+ static ssize_t dlm_event_store(struct dlm_ls *ls, const char *buf, size_t len)
+ {
+-	ls->ls_uevent_result = simple_strtol(buf, NULL, 0);
++	int rc;
++	rc = kstrtoint(buf, 0, &ls->ls_uevent_result);
++	if (rc)
++		return -EINVAL;
+ 	set_bit(LSFL_UEVENT_WAIT, &ls->ls_flags);
+ 	wake_up(&ls->ls_uevent_wait);
+ 	return len;
+@@ -70,7 +76,10 @@ static ssize_t dlm_id_show(struct dlm_ls *ls, char *buf)
+ 
+ static ssize_t dlm_id_store(struct dlm_ls *ls, const char *buf, size_t len)
+ {
+-	ls->ls_global_id = simple_strtoul(buf, NULL, 0);
++	int rc;
++	rc = kstrtouint(buf, 0, &ls->ls_global_id);
++	if (rc)
++		return -EINVAL;
+ 	return len;
+ }
+ 
+@@ -81,7 +90,10 @@ static ssize_t dlm_nodir_show(struct dlm_ls *ls, char *buf)
+ 
+ static ssize_t dlm_nodir_store(struct dlm_ls *ls, const char *buf, size_t len)
+ {
+-	int val = simple_strtoul(buf, NULL, 0);
++	int val, rc;
++	rc = kstrtoint(buf, 0, &val);
++	if (rc)
++		return -EINVAL;
+ 	if (val == 1)
+ 		set_bit(LSFL_NODIR, &ls->ls_flags);
+ 	return len;
+diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+index ab8839b..601246f 100644
+--- a/fs/xfs/xfs_super.c
++++ b/fs/xfs/xfs_super.c
+@@ -174,11 +174,12 @@ xfs_parseargs(
+ 	char			*options)
+ {
+ 	struct super_block	*sb = mp->m_super;
+-	char			*this_char, *value, *eov;
++	char			*this_char, *value;
+ 	int			dsunit = 0;
+ 	int			dswidth = 0;
+ 	int			iosize = 0;
+ 	__uint8_t		iosizelog = 0;
++	int			rc;
+ 
+ 	/*
+ 	 * set up the mount name first so all the errors will refer to the
+@@ -230,7 +231,9 @@ xfs_parseargs(
+ 					this_char);
+ 				return EINVAL;
+ 			}
+-			mp->m_logbufs = simple_strtoul(value, &eov, 10);
++			rc = kstrtoint(value, 10, &mp->m_logbufs);
++			if (rc)
++				return -EINVAL;
+ 		} else if (!strcmp(this_char, MNTOPT_LOGBSIZE)) {
+ 			if (!value || !*value) {
+ 				xfs_warn(mp, "%s option requires an argument",
+@@ -266,7 +269,9 @@ xfs_parseargs(
+ 					this_char);
+ 				return EINVAL;
+ 			}
+-			iosize = simple_strtoul(value, &eov, 10);
++			rc = kstrtoint(value, 10, &iosize);
++			if (rc)
++				return -EINVAL;
+ 			iosizelog = ffs(iosize) - 1;
+ 		} else if (!strcmp(this_char, MNTOPT_ALLOCSIZE)) {
+ 			if (!value || !*value) {
+@@ -296,14 +301,18 @@ xfs_parseargs(
+ 					this_char);
+ 				return EINVAL;
+ 			}
+-			dsunit = simple_strtoul(value, &eov, 10);
++			rc = kstrtouint(value, 10, &dsunit);
++			if (rc)
++				return -EINVAL;
+ 		} else if (!strcmp(this_char, MNTOPT_SWIDTH)) {
+ 			if (!value || !*value) {
+ 				xfs_warn(mp, "%s option requires an argument",
+ 					this_char);
+ 				return EINVAL;
+ 			}
+-			dswidth = simple_strtoul(value, &eov, 10);
++			rc = kstrtoint(value, 10, &dswidth);
++			if (rc)
++				return -EINVAL;
+ 		} else if (!strcmp(this_char, MNTOPT_32BITINODE)) {
+ 			mp->m_flags |= XFS_MOUNT_SMALL_INUMS;
+ 		} else if (!strcmp(this_char, MNTOPT_64BITINODE)) {
 -- 
-Best regards,
-Pavel Shilovsky.
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+1.7.7.6
