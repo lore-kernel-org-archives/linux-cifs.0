@@ -1,104 +1,31 @@
-From: simo <idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Fri, 07 Dec 2012 10:37:45 -0500
-Message-ID: <1354894665.14719.87.camel@pico.ipa.ssimo.org>
-References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
-	 <CAKywueQ3d=wdq2nw5f-QS-D9PY70Axa3Cn0gi5GRk4Xso+iquA@mail.gmail.com>
-	 <20121207145206.GF17115@fieldses.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121207145206.GF17115-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] autoconf: enable full RELRO in cifs-utils binaries
+Date: Fri,  7 Dec 2012 10:40:25 -0500
+Message-ID: <1354894825-32726-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 2012-12-07 at 09:52 -0500, J. Bruce Fields wrote:
-> On Fri, Dec 07, 2012 at 01:08:46PM +0400, Pavel Shilovsky wrote:
-> > 2012/12/6 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> > > Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags - this change can benefit cifs and nfs modules. While this change is ok for network filesystems, itsn't not targeted for local filesystems due security problems (e.g. when a user process can deny root to delete a file).
-> > >
-> > > Share flags are used by Windows applications and WINE have to deal with them too. While WINE can process open share flags itself on local filesystems, it can't do it if a file stored on a network share and is used by several clients. This patchset makes it possible for CIFS/SMB2.0/SMB3.0.
-> > >
-> > > Pavel Shilovsky (3):
-> > >   fcntl: Introduce new O_DENY* open flags for network filesystems
-> > >   CIFS: Add O_DENY* open flags support
-> > >   CIFS: Use NT_CREATE_ANDX command for forcemand mounts
-> > >
-> > >  fs/cifs/cifsacl.c                |   10 ++++----
-> > >  fs/cifs/cifsglob.h               |   11 ++++++++-
-> > >  fs/cifs/cifsproto.h              |    9 ++++----
-> > >  fs/cifs/cifssmb.c                |   47 ++++++++++++++++++++------------------
-> > >  fs/cifs/dir.c                    |   14 ++++++++----
-> > >  fs/cifs/file.c                   |   18 ++++++++++-----
-> > >  fs/cifs/inode.c                  |   11 +++++----
-> > >  fs/cifs/link.c                   |   10 ++++----
-> > >  fs/cifs/readdir.c                |    2 +-
-> > >  fs/cifs/smb1ops.c                |   15 ++++++------
-> > >  fs/cifs/smb2file.c               |   10 ++++----
-> > >  fs/cifs/smb2inode.c              |    4 ++--
-> > >  fs/cifs/smb2ops.c                |   10 ++++----
-> > >  fs/cifs/smb2pdu.c                |    6 ++---
-> > >  fs/cifs/smb2proto.h              |   14 +++++++-----
-> > >  fs/fcntl.c                       |    5 ++--
-> > >  include/uapi/asm-generic/fcntl.h |   11 +++++++++
-> > >  17 files changed, 125 insertions(+), 82 deletions(-)
-> > >
-> > > --
-> > > 1.7.10.4
-> > >
-> > 
-> > First of all, sorry for being unclear at this proposal.
-> > 
-> > 
-> > I am not from Wine team but I am working on things related to
-> > Wine+CIFS-client+Samba.
-> > 
-> > We (at Etersoft) need to organize the work of Wine applications
-> > through cifs-client share mounted to Samba (or Windows server). They
-> > are related to accounting (mostly Russian ones - e.g.
-> > http://www.1c.ru/eng/title.htm). So, the problem is that such
-> > applications use share flags to control the parallel access to the
-> > same files of several clients on a remote share. Also, there can be a
-> > situation where Windows (native) clients and Wine clients are working
-> > together in the same time.
-> > 
-> > That's why we need such flags in the kernel (patch #1). With these
-> > flags Wine can pass them to every open and they will be used by CIFS
-> > (and probably NFS) file systems to pass to the Samba server. In the
-> > same time if the file is on local filesystem - these flags will be
-> > simply ignored (not implemented).
-> 
-> NFS supports the deny-read and deny-write bits but not deny-delete.
-> 
-> If we could do such opens in-kernel on local and clustered filesystems,
-> that could also be useful for multi-protocol (Samba and NFS) and
-> clustered exports.
-> 
-> Currently knfsd tries to enforce deny bits in the nfsd code, which is a
-> bit ugly.
-> 
-> And knfsd currently requires write permissions for deny-read.  My
-> understanding is that Windows considers that wrong, but I'd be curious
-> to know whether that breaks Windows applications in practice.
+This is safer since it also protects the GOT from getting clobbered.
 
-It probably does if you look hard enough.
-IIRC Deny-reads are very loosely like read locks, and you can take read
-locks if you have read-only access.
-Why does knfsd restrict deny-read to read-write access ?
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Simo.
-
+diff --git a/configure.ac b/configure.ac
+index d97c51b..78acd43 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -114,7 +114,7 @@ fi
+ AC_SUBST([PIE_CFLAGS])
+ 
+ if test $enable_relro != "no"; then
+-	RELRO_CFLAGS="-Wl,-z,relro"
++	RELRO_CFLAGS="-Wl,-z,relro,-z,now"
+ else
+ 	RELRO_CFLAGS=""
+ fi
 -- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Principal Software Engineer at Red Hat, Inc. <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+1.7.11.7
