@@ -1,92 +1,212 @@
-From: "Myklebust, Trond" <Trond.Myklebust@netapp.com>
-Subject: RE: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Fri, 7 Dec 2012 23:55:39 +0000
-Message-ID: <4FA345DA4F4AE44899BD2B03EEEC2FA90B33D95E@SACEXCMBX04-PRD.hq.netapp.com>
-References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
- <20121207161602.GA17710@infradead.org>
- <495d17310e0a687d446afc86def0f058@office.etersoft.ru>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [CIFS] Do not send SMB2 signatures for SMB3 frames
+Date: Sat, 8 Dec 2012 22:40:40 -0600
+Message-ID: <CAH2r5muD5oDuwhrhEr0todU4FiANrw3eAQO7wQN4oPrFpRumWA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Cc: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"wine-devel@winehq.org" <wine-devel@winehq.org>,
-	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>
-To: Pavel Shilovsky <piastry@etersoft.ru>,
-	Christoph Hellwig <hch@infradead.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <495d17310e0a687d446afc86def0f058@office.etersoft.ru>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1uZnMtb3duZXJAdmdl
-ci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtbmZzLQ0KPiBvd25lckB2Z2VyLmtlcm5lbC5vcmdd
-IE9uIEJlaGFsZiBPZiBQYXZlbCBTaGlsb3Zza3kNCj4gU2VudDogRnJpZGF5LCBEZWNlbWJlciAw
-NywgMjAxMiA5OjQzIFBNDQo+IFRvOiBDaHJpc3RvcGggSGVsbHdpZw0KPiBDYzogbGludXgtY2lm
-c0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0K
-PiBmc2RldmVsQHZnZXIua2VybmVsLm9yZzsgd2luZS1kZXZlbEB3aW5laHEub3JnOyBsaW51eC0N
-Cj4gbmZzQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDAvM10gQWRkIE9f
-REVOWSogZmxhZ3MgdG8gZmNudGwgYW5kIGNpZnMNCj4gDQo+IENocmlzdG9waCBIZWxsd2lnINC/
-0LjRgdCw0LsgMDcuMTIuMjAxMiAyMDoxNjoNCj4gPiBPbiBUaHUsIERlYyAwNiwgMjAxMiBhdCAx
-MDoyNjoyOFBNICswNDAwLCBQYXZlbCBTaGlsb3Zza3kgd3JvdGU6DQo+ID4+IE5ldHdvcmsgZmls
-ZXN5c3RlbXMgQ0lGUywgU01CMi4wLCBTTUIzLjAgYW5kIE5GU3Y0IGhhdmUgc3VjaCBmbGFncyAt
-DQo+ID4+IHRoaXMgY2hhbmdlIGNhbiBiZW5lZml0IGNpZnMgYW5kIG5mcyBtb2R1bGVzLiBXaGls
-ZSB0aGlzIGNoYW5nZSBpcyBvaw0KPiA+PiBmb3IgbmV0d29yayBmaWxlc3lzdGVtcywgaXRzbid0
-IG5vdCB0YXJnZXRlZCBmb3IgbG9jYWwgZmlsZXN5c3RlbXMNCj4gPj4gZHVlIHNlY3VyaXR5IHBy
-b2JsZW1zIChlLmcuIHdoZW4gYSB1c2VyIHByb2Nlc3MgY2FuIGRlbnkgcm9vdCB0bw0KPiA+PiBk
-ZWxldGUgYSBmaWxlKS4NCj4gPj4NCj4gPj4gU2hhcmUgZmxhZ3MgYXJlIHVzZWQgYnkgV2luZG93
-cyBhcHBsaWNhdGlvbnMgYW5kIFdJTkUgaGF2ZSB0byBkZWFsDQo+ID4+IHdpdGggdGhlbSB0b28u
-IFdoaWxlIFdJTkUgY2FuIHByb2Nlc3Mgb3BlbiBzaGFyZSBmbGFncyBpdHNlbGYgb24NCj4gPj4g
-bG9jYWwgZmlsZXN5c3RlbXMsIGl0IGNhbid0IGRvIGl0IGlmIGEgZmlsZSBzdG9yZWQgb24gYSBu
-ZXR3b3JrIHNoYXJlDQo+ID4+IGFuZCBpcyB1c2VkIGJ5IHNldmVyYWwgY2xpZW50cy4gVGhpcyBw
-YXRjaHNldCBtYWtlcyBpdCBwb3NzaWJsZSBmb3INCj4gPj4gQ0lGUy9TTUIyLjAvU01CMy4wLg0K
-PiA+DQo+ID4gSSBkb24ndCB0aGluayBpbnRyb2R1Y2luZyB1c2VyIHZpc2libGUgZmxhZ3MgdGhh
-dCBhcmUgb25seSBzdXBwb3J0ZWQNCj4gPiBvbiBhIHNpbmdsZSBuZXR3b3JrIGZpbGVzeXN0ZW0g
-aXMgYSBnb29kIGlkZWEuDQo+IA0KPiBJdCBjYW4gYnJpbmcgYmVuZWZpdHMgZm9yIGJvdGggQ0lG
-UyBhbmQgTkZTIGZpbGVzeXN0ZW1zIC0gc28sIGF0IGxlYXN0IHR3byBvbmVzLg0KPiANCj4gPg0K
-PiA+IEknbSBub3QgZXZlbiBzdXJlIGFkZGluZyB0aGVzZSBmbGFncyBkb2VzIG1ha2UgYSBsb3Qg
-b2Ygc2Vuc2UsIGJ1dA0KPiA+IGFzc3VtaW5nIHdlJ2QgYWN0dWFsbHkgd2FudCB0aGlzIChhbmQg
-SSdkIGxpa2Ugc29tZSBtb3JlIGRldGFpbGVkDQo+ID4gZXhwbGFuYXRpb24pIEkgdGhpbmsgd2Un
-ZCBhdCBsZWFzdCBuZWVkIHRvIG1ha2Ugc3VyZSB0aGF0Og0KPiA+DQo+ID4gIGEpIG9wZW5pbmcg
-ZmlsZXMgd2l0aCB0aGUgbmV3IG1vZGVzIGdpdmVzIGEgcHJvcGVyIGVycm9yIG1lc3NhZ2UgaWYN
-Cj4gPiBub3QNCj4gPiAgICAgc3VwcG9ydGVkDQo+IA0KPiBJdCBtYWtlcyB1cyBhZGQgc3VjaCBj
-aGVja3MgZm9yIGFsbCBvdGhlciBmaWxlc3lzdGVtcywgaWYgSSB1bmRlcnN0YW5kIHJpZ2h0LCAt
-DQo+IG5vdCBhIHByb2JsZW0sIEkgdGhpbmsuDQo+IA0KPiA+ICBiKSB0aGVyZSBuZWVkcyB0byBi
-ZSBsb2NhbCBzdXBwb3J0IGZvciB0aGVtIGFzIHdlbGwNCj4gPiAgYykgd2UgbmVlZCB0byB0aGlu
-ayByZWFsbHkgaGFyZCB3aGVuIHRoZXkgc2hvdWxkIGJlIHN1cHBvcnRlZCwgYW5kDQo+ID4gbmVl
-ZA0KPiA+ICAgICBhIGdvb2QgcmF0aW9uYWwgZm9yIGl0LiAgSSBjYW4ndCBzZWUgaG93IHdlIGNv
-dWxkIGRvIGl0DQo+ID4gICAgIHVuY29uZGl0aW9uYWxseSBmb3IgYWxsIHVzZXJzIGFzIHRoYXQg
-d291bGQgaW50cm9kdWNlIGVhc3kgZGVuaWFsDQo+ID4gICAgIG9mIHNlcnZpY2VzIGF0dGFja3Mg
-dGhlIHdheSBJIHVuZGVyc3RhbmQgdGhlIHNlbWFudGljcyAoY29ycmVjdCBtZQ0KPiA+ICAgICBp
-ZiBJJ20gd3JvbmcpLiAgU28gYSBtb3VudCBvcHRpb24gbGlrZSB5b3UgY3VycmVudGx5IGRvIHBy
-b2JhYmx5DQo+ID4gaXMNCj4gPiAgICAgdGhlIGxlYXN0IGJhZCBldmVuIGlmIGRvbid0IGZlbGwg
-b3Zlcmx5IGhhcHB5IGFib3V0IHRoYXQgdmVyc2lvbi4NCj4gPg0KPiA+IFdoYXQgaXMgdGhlIHJl
-YXNvbiB5b3VyIHNwZWNpYWwgd2luZSB1c2UgY2FzZSBjYW4ndCBzaW1wbHkgdXNlIGENCj4gPiB1
-c2Vyc3BhY2UgY2lmcyBjbGllbnQ/ICBHaXZlbiB0aGF0IHdpbmUgdXNlcyB3aW5kb3dzIGZpbGVz
-eXN0ZW0NCj4gPiBzZW1hbnRpY3MgYW5kIGNpZnMgZG9lcyBhcyB3ZWxsIHR1bm5lbGxpbmcgaXQg
-dGhyb3VnaCBhIFBvc2l4LWxpa2UgQVBJDQo+ID4gaW5iZXR3ZWVuIGlzIG5ldmVyIGdvaW5nIHRv
-IGJlIHBlcmZlY3QuDQo+IA0KPiBJZGVhbGx5IHdlIHNob3VsZCBub3QgbWFrZSBhbnkgZGlmZmVy
-ZW5jZSBiZXR3ZWVuIHVuZGVybHlpbmcgZmlsZXN5c3RlbXMNCj4gaW4gV2luZTogYW4gYXBwbGlj
-YXRpb24gcmVxdWVzdHMgYW4gb3BlbiBvZiB0aGUgZmlsZSBhbmQgd2UgaXNzdWUgdGhpcyBvcGVu
-DQo+IHdpdGggZmxhZ3MgaXQgcGFzc2VkLiBTaW5jZSBXaW5lc2VydmVyIGNhbiBwcm9jZXNzIHNo
-YXJlIGZsYWdzIGxvY2FsbHkgaXRzZWxmIChmb3INCj4gb25lIGxpbnV4IHVzZXIpLCB3ZSBvbmx5
-IG5lZWQgdG8gYWRkIHRoaXMgc3VwcG9ydCBmb3IgQ0lGUyAodGhhdCBpcyBhY3RpdmVseQ0KPiB1
-c2VkIGJ5IFdpbmUgYXBwbGljYXRpb25zIGJlY2F1c2Ugb2YgaXQncyBXaW5kb3dzIG5hdHVyZSku
-IEJyaW5naW5nIHRoZXNlDQo+IGZsYWdzIGZvciBsb2NhbCBmaWxlc3lzdGVtcyBjYW4gYmVuZWZp
-dCBXaW5lIHRvbzogaXQgd2lsbCBoZWxwIGluIGNhc2VzIHdoZW4NCj4gV2luZSBhcHBsaWNhdGlv
-bnMgb2YgZGlmZmVyZW50IHVzZXJzIG9uIHRoZSBzYW1lIG1hY2hpbmUgdXNlIHRoZSBzYW1lIGZp
-bGUNCj4gYW5kIGNhbiBtYWtlIGFsbCB0aG9zZSB0aGluZ3MgZWFzaWVyLCBvZiBjb3Vyc2UuDQo+
-IA0KPiBUaGUgcHJvYmxlbSBpcyB0aGUgcG9zc2liaWxpdHkgb2YgZGVuaWFsLW9mLXNlcnZpY2Ug
-YXR0YWNrcyBoZXJlLiBXZSBjYW4gdHJ5IHRvDQo+IHByZXZlbnQgdGhlbSBieToNCj4gMSkgc3Bl
-Y2lmeWluZyBhbiBleHRyYSBzZWN1cml0eSBiaXQgb24gdGhlIGZpbGUgdGhhdCBpbmRpY2F0ZXMg
-dGhhdCBzaGFyZSBmbGFncyBhcmUNCj4gYWNjZXB0ZWQgKGxpa2Ugd2UgaGF2ZSBmb3IgbWFuZGF0
-b3J5IGxvY2tzIG5vdykgYW5kIHNldHRpbmcgaXQgZm9yDQo+IG5lY2Nlc3NhcnkgZmlsZXMgb25s
-eSwgb3INCj4gMikgYWRkaW5nIGEgc3BlY2lhbCBtb3VudCBvcHRpb24gKGJ1dCBpdCBpdCBwcm9i
-YWJseSBtYWtlcyBzZW5zZSBpZiB3ZQ0KPiBkZWNpZGVkIHRvIGFkZCB0aGlzIHN1cHBvcnQgZm9y
-IENJRlMgYW5kIE5GUyBvbmx5KS4NCg0KV2h5IG5vdCBqdXN0IHB1dCBpdCB1bmRlciB0aGUgY29u
-dHJvbCBvZiBMU00/IEl0IHNlZW1zIHRvIG1lIHRoYXQgdGhpcyBkb2Vzbid0IHNvIG11Y2ggd2Fu
-dCB0byBiZSBhIHBlci1tb3VudCBzd2l0Y2ggYnV0IHJhdGhlciBkZXNlcnZlcyB0byBiZSBhIHBl
-ci1wcm9jZXNzIE1BQyAoaS5lLiBpcyB0aGlzIHJ1bm5pbmcgaW4gYSBXaW5lIHNhbmRib3ggb3Ig
-bm90KS4uLg0KDQpDaGVlcnMNCiAgIFRyb25kDQo=
+[CIFS] Do not send SMB2 signatures for SMB3 frames
+
+Restructure code to make SMB2 vs. SMB3 signing a protocol
+specific op.  SMB3 signing (AES_CMAC) is not enabled yet,
+but this restructuring at least makes sure we don't send
+an smb2 signature on an smb3 signed connection. A followon
+patch will add AES_CMAC and enable smb3 signing.
+
+Signed-off-by: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ fs/cifs/cifsglob.h      |  4 ++-
+ fs/cifs/connect.c       |  2 +-
+ fs/cifs/smb2ops.c       | 68 +++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2proto.h     |  4 +++
+ fs/cifs/smb2transport.c | 13 +++++++---
+ 5 files changed, 86 insertions(+), 5 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 74a07b6..dfab450 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -367,6 +367,8 @@ struct smb_version_operations {
+ 	void (*set_lease_key)(struct inode *, struct cifs_fid *fid);
+ 	/* generate new lease key */
+ 	void (*new_lease_key)(struct cifs_fid *fid);
++	int (*calc_signature)(struct smb_rqst *rqst,
++				   struct TCP_Server_Info *server);
+ };
+
+ struct smb_version_values {
+@@ -1489,6 +1491,6 @@ extern struct smb_version_values smb20_values;
+ extern struct smb_version_operations smb21_operations;
+ extern struct smb_version_values smb21_values;
+ #define SMB30_VERSION_STRING	"3.0"
+-/*extern struct smb_version_operations smb30_operations; */ /* not
+needed yet */
++extern struct smb_version_operations smb30_operations;
+ extern struct smb_version_values smb30_values;
+ #endif	/* _CIFS_GLOB_H */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 290c134..f327623 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1085,7 +1085,7 @@ cifs_parse_smb_version(char *value, struct smb_vol *vol)
+ 		vol->vals = &smb21_values;
+ 		break;
+ 	case Smb_30:
+-		vol->ops = &smb21_operations; /* currently identical with 2.1 */
++		vol->ops = &smb30_operations;
+ 		vol->vals = &smb30_values;
+ 		break;
+ #endif
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index ad4d96a..d79de7b 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -623,6 +623,74 @@ struct smb_version_operations smb21_operations = {
+ 	.get_lease_key = smb2_get_lease_key,
+ 	.set_lease_key = smb2_set_lease_key,
+ 	.new_lease_key = smb2_new_lease_key,
++	.calc_signature = smb2_calc_signature,
++};
++
++
++struct smb_version_operations smb30_operations = {
++	.compare_fids = smb2_compare_fids,
++	.setup_request = smb2_setup_request,
++	.setup_async_request = smb2_setup_async_request,
++	.check_receive = smb2_check_receive,
++	.add_credits = smb2_add_credits,
++	.set_credits = smb2_set_credits,
++	.get_credits_field = smb2_get_credits_field,
++	.get_credits = smb2_get_credits,
++	.get_next_mid = smb2_get_next_mid,
++	.read_data_offset = smb2_read_data_offset,
++	.read_data_length = smb2_read_data_length,
++	.map_error = map_smb2_to_linux_error,
++	.find_mid = smb2_find_mid,
++	.check_message = smb2_check_message,
++	.dump_detail = smb2_dump_detail,
++	.clear_stats = smb2_clear_stats,
++	.print_stats = smb2_print_stats,
++	.is_oplock_break = smb2_is_valid_oplock_break,
++	.need_neg = smb2_need_neg,
++	.negotiate = smb2_negotiate,
++	.negotiate_wsize = smb2_negotiate_wsize,
++	.negotiate_rsize = smb2_negotiate_rsize,
++	.sess_setup = SMB2_sess_setup,
++	.logoff = SMB2_logoff,
++	.tree_connect = SMB2_tcon,
++	.tree_disconnect = SMB2_tdis,
++	.is_path_accessible = smb2_is_path_accessible,
++	.can_echo = smb2_can_echo,
++	.echo = SMB2_echo,
++	.query_path_info = smb2_query_path_info,
++	.get_srv_inum = smb2_get_srv_inum,
++	.query_file_info = smb2_query_file_info,
++	.set_path_size = smb2_set_path_size,
++	.set_file_size = smb2_set_file_size,
++	.set_file_info = smb2_set_file_info,
++	.mkdir = smb2_mkdir,
++	.mkdir_setinfo = smb2_mkdir_setinfo,
++	.rmdir = smb2_rmdir,
++	.unlink = smb2_unlink,
++	.rename = smb2_rename_path,
++	.create_hardlink = smb2_create_hardlink,
++	.open = smb2_open_file,
++	.set_fid = smb2_set_fid,
++	.close = smb2_close_file,
++	.flush = smb2_flush_file,
++	.async_readv = smb2_async_readv,
++	.async_writev = smb2_async_writev,
++	.sync_read = smb2_sync_read,
++	.sync_write = smb2_sync_write,
++	.query_dir_first = smb2_query_dir_first,
++	.query_dir_next = smb2_query_dir_next,
++	.close_dir = smb2_close_dir,
++	.calc_smb_size = smb2_calc_size,
++	.is_status_pending = smb2_is_status_pending,
++	.oplock_response = smb2_oplock_response,
++	.queryfs = smb2_queryfs,
++	.mand_lock = smb2_mand_lock,
++	.mand_unlock_range = smb2_unlock_range,
++	.push_mand_locks = smb2_push_mandatory_locks,
++	.get_lease_key = smb2_get_lease_key,
++	.set_lease_key = smb2_set_lease_key,
++	.new_lease_key = smb2_new_lease_key,
++	.calc_signature = smb3_calc_signature,
+ };
+
+ struct smb_version_values smb20_values = {
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 7d25f8b..2aa3535 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -47,6 +47,10 @@ extern struct mid_q_entry
+*smb2_setup_request(struct cifs_ses *ses,
+ 			      struct smb_rqst *rqst);
+ extern struct mid_q_entry *smb2_setup_async_request(
+ 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
++extern int smb2_calc_signature(struct smb_rqst *rqst,
++				struct TCP_Server_Info *server);
++extern int smb3_calc_signature(struct smb_rqst *rqst,
++				struct TCP_Server_Info *server);
+ extern void smb2_echo_request(struct work_struct *work);
+ extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
+ extern __u8 smb2_map_lease_to_oplock(__le32 lease_state);
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 2a5fdf2..8dd73e6 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -39,7 +39,7 @@
+ #include "smb2status.h"
+ #include "smb2glob.h"
+
+-static int
++int
+ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ {
+ 	int i, rc;
+@@ -116,6 +116,13 @@ smb2_calc_signature(struct smb_rqst *rqst, struct
+TCP_Server_Info *server)
+ 	return rc;
+ }
+
++int
++smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
++{
++	cFYI(1, "smb3 signatures not supported yet");
++	return -EOPNOTSUPP;
++}
++
+ /* must be called with server->srv_mutex held */
+ static int
+ smb2_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+@@ -132,7 +139,7 @@ smb2_sign_rqst(struct smb_rqst *rqst, struct
+TCP_Server_Info *server)
+ 		return rc;
+ 	}
+
+-	rc = smb2_calc_signature(rqst, server);
++	rc = server->ops->calc_signature(rqst, server);
+
+ 	return rc;
+ }
+@@ -168,7 +175,7 @@ smb2_verify_signature(struct smb_rqst *rqst,
+struct TCP_Server_Info *server)
+ 	memset(smb2_pdu->Signature, 0, SMB2_SIGNATURE_SIZE);
+
+ 	mutex_lock(&server->srv_mutex);
+-	rc = smb2_calc_signature(rqst, server);
++	rc = server->ops->calc_signature(rqst, server);
+ 	mutex_unlock(&server->srv_mutex);
+
+ 	if (rc)
+-- 
+
+-- 
+Thanks,
+
+Steve
