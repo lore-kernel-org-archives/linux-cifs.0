@@ -1,205 +1,117 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v4] CIFS: Fix write after setting a read lock for read
- oplock files
-Date: Tue, 11 Dec 2012 11:31:03 -0500
-Message-ID: <20121211113103.22a1bacd@tlielax.poochiereds.net>
-References: <1354817274-7701-1-git-send-email-piastry@etersoft.ru>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Tue, 11 Dec 2012 22:58:23 -0600
+Message-ID: <CAH2r5muQzObR+sKCd-Q87ONxkuX-coLe0tN+WfKCpQgZc5YhzQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1354817274-7701-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu,  6 Dec 2012 22:07:52 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+This includes a set of misc. cifs fixes (most importantly some byte range
+lock related write fixes from Pavel, and some ACL and idmap related
+fixes from Jeff)
+but also includes the SMB2.02 dialect enablement, and a key fix for SMB3 mounts.
+Default authentication upgraded to ntlmv2 for cifs (it was already ntlmv2
+for smb2)
 
-> If we have a read oplock and set a read lock in it, we can't write to the
-> locked area - so, filemap_fdatawrite may fail with a no information for a
-> userspace application even if we request a write to non-locked area. Fix
-> this by populating the page cache without marking affected pages dirty
-> after a successful write directly to the server.
-> 
-> Also remove CONFIG_CIFS_SMB2 ifdefs because it's suitable for both CIFS
-> and SMB2 protocols.
-> 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c   |    1 +
->  fs/cifs/cifsglob.h |    1 +
->  fs/cifs/file.c     |   94 +++++++++++++++++++++++++++++++++++-----------------
->  3 files changed, 65 insertions(+), 31 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index c6e32f2..210f0af 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -229,6 +229,7 @@ cifs_alloc_inode(struct super_block *sb)
->  	cifs_set_oplock_level(cifs_inode, 0);
->  	cifs_inode->delete_pending = false;
->  	cifs_inode->invalid_mapping = false;
-> +	cifs_inode->leave_pages_clean = false;
->  	cifs_inode->vfs_inode.i_blkbits = 14;  /* 2**14 = CIFS_MAX_MSGSIZE */
->  	cifs_inode->server_eof = 0;
->  	cifs_inode->uniqueid = 0;
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 2ca6f7d..426a2bf 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1037,6 +1037,7 @@ struct cifsInodeInfo {
->  	bool clientCanCacheAll;		/* read and writebehind oplock */
->  	bool delete_pending;		/* DELETE_ON_CLOSE is set */
->  	bool invalid_mapping;		/* pagecache is invalid */
-> +	bool leave_pages_clean;	/* protected by i_mutex, not set pages dirty */
->  	unsigned long time;		/* jiffies of last update of inode */
->  	u64  server_eof;		/* current file size on server -- protected by i_lock */
->  	u64  uniqueid;			/* server inode number */
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index e2fabc9..84860f1 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -2109,7 +2109,15 @@ static int cifs_write_end(struct file *file, struct address_space *mapping,
->  	} else {
->  		rc = copied;
->  		pos += copied;
-> -		set_page_dirty(page);
-> +		/*
-> +		 * When we use strict cache mode and cifs_strict_writev was run
-> +		 * with level II oplock (indicated by leave_pages_clean field of
-> +		 * CIFS_I(inode)), we can leave pages clean - cifs_strict_writev
-> +		 * sent the data to the server itself.
-> +		 */
-> +		if (!CIFS_I(inode)->leave_pages_clean ||
-> +		    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_STRICT_IO))
-> +			set_page_dirty(page);
->  	}
->  
->  	if (rc > 0) {
-> @@ -2460,8 +2468,8 @@ ssize_t cifs_user_writev(struct kiocb *iocb, const struct iovec *iov,
->  }
->  
->  static ssize_t
-> -cifs_writev(struct kiocb *iocb, const struct iovec *iov,
-> -	    unsigned long nr_segs, loff_t pos)
-> +cifs_pagecache_writev(struct kiocb *iocb, const struct iovec *iov,
-> +		      unsigned long nr_segs, loff_t pos, bool cache_ex)
->  {
->  	struct file *file = iocb->ki_filp;
->  	struct cifsFileInfo *cfile = (struct cifsFileInfo *)file->private_data;
-> @@ -2483,8 +2491,12 @@ cifs_writev(struct kiocb *iocb, const struct iovec *iov,
->  				     server->vals->exclusive_lock_type, NULL,
->  				     CIFS_WRITE_OP)) {
->  		mutex_lock(&inode->i_mutex);
-> +		if (!cache_ex)
-> +			cinode->leave_pages_clean = true;
->  		rc = __generic_file_aio_write(iocb, iov, nr_segs,
-> -					       &iocb->ki_pos);
-> +					      &iocb->ki_pos);
-> +		if (!cache_ex)
-> +			cinode->leave_pages_clean = false;
->  		mutex_unlock(&inode->i_mutex);
+The following changes since commit 27d7c2a006a81c04fab00b8cd81b99af3b32738d:
 
-I guess the mutex lock should keep this from racing.
+  vfs: clear to the end of the buffer on partial buffer reads
+(2012-12-05 10:32:59 -0800)
 
->  	}
->  
-> @@ -2511,42 +2523,62 @@ cifs_strict_writev(struct kiocb *iocb, const struct iovec *iov,
->  	struct cifsFileInfo *cfile = (struct cifsFileInfo *)
->  						iocb->ki_filp->private_data;
->  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-> -
-> -#ifdef CONFIG_CIFS_SMB2
-> +	ssize_t written, written2;
->  	/*
-> -	 * If we have an oplock for read and want to write a data to the file
-> -	 * we need to store it in the page cache and then push it to the server
-> -	 * to be sure the next read will get a valid data.
-> +	 * We need to store clientCanCacheAll here to prevent race
-> +	 * conditions - this value can be changed during an execution
-> +	 * of generic_file_aio_write. For CIFS it can be changed from
-> +	 * true to false only, but for SMB2 it can be changed both from
-> +	 * true to false and vice versa. So, we can end up with a data
-> +	 * stored in the cache, not marked dirty and not sent to the
-> +	 * server if this value changes its state from false to true
-> +	 * after cifs_write_end.
->  	 */
-> -	if (!cinode->clientCanCacheAll && cinode->clientCanCacheRead) {
-> -		ssize_t written;
-> -		int rc;
-> -
-> -		written = generic_file_aio_write(iocb, iov, nr_segs, pos);
-> -		rc = filemap_fdatawrite(inode->i_mapping);
-> -		if (rc)
-> -			return (ssize_t)rc;
-> +	bool cache_ex = cinode->clientCanCacheAll;
-> +	bool cache_read = cinode->clientCanCacheRead;
-> +	int rc;
-> +	loff_t saved_pos;
->  
-> -		return written;
-> +	if (cache_ex) {
-> +		if (cap_unix(tcon->ses) &&
-> +		    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
-> +		    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
-> +						tcon->fsUnixInfo.Capability)))
-> +			return generic_file_aio_write(iocb, iov, nr_segs, pos);
-> +		return cifs_pagecache_writev(iocb, iov, nr_segs, pos, cache_ex);
->  	}
-> -#endif
->  
->  	/*
-> -	 * For non-oplocked files in strict cache mode we need to write the data
-> -	 * to the server exactly from the pos to pos+len-1 rather than flush all
-> -	 * affected pages because it may cause a error with mandatory locks on
-> -	 * these pages but not on the region from pos to ppos+len-1.
-> +	 * For files without exclusive oplock in strict cache mode we need to
-> +	 * write the data to the server exactly from the pos to pos+len-1 rather
-> +	 * than flush all affected pages because it may cause a error with
-> +	 * mandatory locks on these pages but not on the region from pos to
-> +	 * ppos+len-1.
->  	 */
-> +	written = cifs_user_writev(iocb, iov, nr_segs, pos);
-> +	if (!cache_read || written <= 0)
-> +		return written;
->  
-> -	if (!cinode->clientCanCacheAll)
-> -		return cifs_user_writev(iocb, iov, nr_segs, pos);
-> -
-> +	saved_pos = iocb->ki_pos;
-> +	iocb->ki_pos = pos;
-> +	/* we have a read oplock - need to store a data in the page cache */
->  	if (cap_unix(tcon->ses) &&
-> -	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
-> -	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0))
-> -		return generic_file_aio_write(iocb, iov, nr_segs, pos);
-> -
-> -	return cifs_writev(iocb, iov, nr_segs, pos);
-> +	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
-> +	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(
-> +					tcon->fsUnixInfo.Capability)))
-> +		written2 = generic_file_aio_write(iocb, iov, nr_segs, pos);
-> +	else
-> +		written2 = cifs_pagecache_writev(iocb, iov, nr_segs, pos,
-> +						 cache_ex);
-> +	/* errors occured during writing - invalidate the page cache */
-> +	if (written2 < 0) {
-> +		rc = cifs_invalidate_mapping(inode);
-> +		if (rc)
-> +			written = (ssize_t)rc;
-> +		else
-> +			iocb->ki_pos = saved_pos;
-> +	}
-> +	return written;
->  }
->  
->  static struct cifs_readdata *
+are available in the git repository at:
 
-I can't help but wonder if there is some subtle raciness in how all of
-the canCache* flags are handled vs. pagecache vs. other operations.
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-That said, I doubt this makes anything worse, so...
+for you to fetch changes up to c299dd0e2d3dd61d0048a9d9b021aa01f023ed0c:
 
-Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+  CIFS: Fix write after setting a read lock for read oplock files
+(2012-12-11 11:48:50 -0600)
+
+----------------------------------------------------------------
+Jeff Layton (25):
+      cifs: fix types on module parameters
+      cifs: clean up id_mode_to_cifs_acl
+      cifs: move num_subauth check inside of CONFIG_CIFS_DEBUG2 check
+in parse_sid()
+      cifs: use the NUM_AUTHS and NUM_SUBAUTHS constants in cifsacl code
+      cifs: make compare_sids static
+      cifs: make cifs_copy_sid handle a source sid with variable size
+subauth arrays
+      cifs: redefine NUM_SUBAUTH constant from 5 to 15
+      cifs: fix the format specifiers in sid_to_str
+      cifs: remove uneeded __KERNEL__ block from cifsacl.h
+      cifs: don't override the uid/gid in getattr when cifsacl is enabled
+      cifs: make error on lack of a unc= option more explicit
+      cifs: ensure we revalidate the inode after readdir if cifsacl is enabled
+      cifs: get rid of smb_vol->UNCip and smb_vol->port
+      cifs: remove unneeded address argument from
+cifs_find_tcp_session and match_server
+      cifs: always zero out smb_vol before parsing options
+      cifs: rename cifs_readdir_lookup to cifs_prime_dcache and make
+it void return
+      cifs: simplify id_to_sid and sid_to_id mapping code
+      cifs: avoid extra allocation for small cifs.idmap keys
+      cifs: extra sanity checking for cifs.idmap keys
+      cifs: fix hardcoded default security descriptor length
+      cifs: deal with id_to_sid embedded sid reply corner case
+      cifs: fix SID binary to string conversion
+      cifs: clean up handling of unc= option
+      cifs: fix up handling of prefixpath= option
+      cifs: parse the device name into UNC and prepath
+
+Jesper Nilsson (1):
+      cifs: Add handling of blank password option
+
+Joe Perches (3):
+      cifs: Remove unused cEVENT macro
+      cifs: Make CIFS_DEBUG possible to undefine
+      cifs: Add CONFIG_CIFS_DEBUG and rename use of CIFS_DEBUG
+
+Pavel Shilovsky (7):
+      CIFS: Separate pushing posix locks and lock_sem handling
+      CIFS: Separate pushing mandatory locks and lock_sem handling
+      CIFS: Implement cifs_relock_file
+      CIFS: Fix lock consistensy bug in cifs_setlk
+      CIFS: Do not permit write to a range mandatory locked with a read lock
+      CIFS: Fix possible data coherency problem after oplock break to None
+      CIFS: Fix write after setting a read lock for read oplock files
+
+Steve French (7):
+      default authentication needs to be at least ntlmv2 security for
+cifs mounts
+      CIFS: Make use of common cifs_build_path_to_root for CIFS and SMB2
+      Add SMB2.02 dialect support
+      make convert_delimiter use strchr instead of open-coding it
+      SMB3 mounts fail with access denied to some servers
+      Do not send SMB2 signatures for SMB3 frames
+      fix "disabling echoes and oplocks" on SMB2 mounts
+
+ fs/cifs/Kconfig         |  10 +-
+ fs/cifs/cifs_debug.h    |  72 +++--
+ fs/cifs/cifsacl.c       | 746 +++++++++++++++---------------------------------
+ fs/cifs/cifsacl.h       |  66 +++--
+ fs/cifs/cifsfs.c        |  17 +-
+ fs/cifs/cifsglob.h      |  36 +--
+ fs/cifs/cifsproto.h     |  10 +-
+ fs/cifs/connect.c       | 310 ++++++++++----------
+ fs/cifs/dir.c           |  32 +++
+ fs/cifs/file.c          | 200 ++++++++-----
+ fs/cifs/inode.c         |   7 +-
+ fs/cifs/netmisc.c       |  14 +-
+ fs/cifs/readdir.c       |  52 ++--
+ fs/cifs/smb1ops.c       |  32 ---
+ fs/cifs/smb2file.c      |  12 -
+ fs/cifs/smb2ops.c       | 103 +++++--
+ fs/cifs/smb2pdu.c       |   5 +-
+ fs/cifs/smb2proto.h     |   4 +
+ fs/cifs/smb2transport.c |  13 +-
+ 19 files changed, 787 insertions(+), 954 deletions(-)
+
+-- 
+Thanks,
+
+Steve
