@@ -1,82 +1,74 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] setcifsacl: remove syslog goop
-Date: Thu, 13 Dec 2012 09:35:55 -0500
-Message-ID: <1355409355-9565-1-git-send-email-jlayton@samba.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: fix double-free of "string" in cifs_parse_mount_options
+Date: Thu, 13 Dec 2012 08:51:29 -0600
+Message-ID: <CAH2r5mtjVXDD=1nE77QNFY293y=gRO0hHGO8nvkd69AeaiZrcw@mail.gmail.com>
+References: <1355396571-19510-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1355396571-19510-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-setcifsacl doesn't use syslog, so no need to open a channel to it.
+I will merge this ASAP
 
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- setcifsacl.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+On Thu, Dec 13, 2012 at 5:02 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> Dan reported the following regression in commit d387a5c5:
+>
+>     + fs/cifs/connect.c:1903 cifs_parse_mount_options() error: double free of 'string'
+>
+> That patch has some of the new option parsing code free "string" without
+> setting the variable to NULL afterward. Since "string" is automatically
+> freed in an error condition, fix the code to just rely on that instead
+> of freeing it explicitly.
+>
+> Reported-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/connect.c | 9 ++-------
+>  1 file changed, 2 insertions(+), 7 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 7635b5d..17c3643 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1624,14 +1624,11 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                 case Opt_unc:
+>                         string = vol->UNC;
+>                         vol->UNC = match_strdup(args);
+> -                       if (vol->UNC == NULL) {
+> -                               kfree(string);
+> +                       if (vol->UNC == NULL)
+>                                 goto out_nomem;
+> -                       }
+>
+>                         convert_delimiter(vol->UNC, '\\');
+>                         if (vol->UNC[0] != '\\' || vol->UNC[1] != '\\') {
+> -                               kfree(string);
+>                                 printk(KERN_ERR "CIFS: UNC Path does not "
+>                                                 "begin with // or \\\\\n");
+>                                 goto cifs_parse_mount_err;
+> @@ -1687,10 +1684,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>
+>                         string = vol->prepath;
+>                         vol->prepath = match_strdup(args);
+> -                       if (vol->prepath == NULL) {
+> -                               kfree(string);
+> +                       if (vol->prepath == NULL)
+>                                 goto out_nomem;
+> -                       }
+>                         /* Compare old prefixpath= option to new one */
+>                         if (!string || strcmp(string, vol->prepath))
+>                                 printk(KERN_WARNING "CIFS: the value of the "
+> --
+> 1.7.11.7
+>
 
-diff --git a/setcifsacl.c b/setcifsacl.c
-index 593997a..e8c10a9 100644
---- a/setcifsacl.c
-+++ b/setcifsacl.c
-@@ -26,7 +26,6 @@
- 
- #include <string.h>
- #include <getopt.h>
--#include <syslog.h>
- #include <stdint.h>
- #include <stdbool.h>
- #include <unistd.h>
-@@ -39,8 +38,6 @@
- #include <sys/xattr.h>
- #include "cifsacl.h"
- 
--static const char *prog;
--
- enum setcifsacl_actions {
- 	ActUnknown = -1,
- 	ActDelete,
-@@ -732,7 +729,7 @@ setacl_action(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd,
- }
- 
- static void
--setcifsacl_usage(void)
-+setcifsacl_usage(const char *prog)
- {
- 	fprintf(stderr,
- 	"%s: Alter CIFS/NTFS ACL in a security descriptor of a file object\n",
-@@ -771,10 +768,6 @@ main(const int argc, char *const argv[])
- 	struct cifs_ace **cacesptr = NULL, **facesptr = NULL;
- 	struct cifs_ntsd *ntsdptr = NULL;
- 
--	prog = basename(argv[0]);
--
--	openlog(prog, 0, LOG_DAEMON);
--
- 	c = getopt(argc, argv, "hvD:M:a:S:");
- 	switch (c) {
- 	case 'D':
-@@ -794,19 +787,19 @@ main(const int argc, char *const argv[])
- 		ace_list = optarg;
- 		break;
- 	case 'h':
--		setcifsacl_usage();
-+		setcifsacl_usage(basename(argv[0]));
- 		return 0;
- 	case 'v':
- 		printf("Version: %s\n", VERSION);
- 		return 0;
- 	default:
--		setcifsacl_usage();
-+		setcifsacl_usage(basename(argv[0]));
- 		return -1;
- 	}
- 
- 	/* We expect 1 argument in addition to the option */
- 	if (argc != 4) {
--		setcifsacl_usage();
-+		setcifsacl_usage(basename(argv[0]));
- 		return -1;
- 	}
- 	filename = argv[3];
+
+
 -- 
-1.7.11.7
+Thanks,
+
+Steve
