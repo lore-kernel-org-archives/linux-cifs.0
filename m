@@ -1,59 +1,41 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: fix double-free of "string" in cifs_parse_mount_options
-Date: Thu, 13 Dec 2012 06:02:51 -0500
-Message-ID: <1355396571-19510-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH] autoconf: enable full RELRO in cifs-utils binaries
+Date: Thu, 13 Dec 2012 08:48:06 -0500
+Message-ID: <20121213084806.56029fa3@tlielax.poochiereds.net>
+References: <1354894825-32726-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1354894825-32726-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Dan reported the following regression in commit d387a5c5:
+On Fri,  7 Dec 2012 10:40:25 -0500
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 
-    + fs/cifs/connect.c:1903 cifs_parse_mount_options() error: double free of 'string'
+> This is safer since it also protects the GOT from getting clobbered.
+> 
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  configure.ac | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure.ac b/configure.ac
+> index d97c51b..78acd43 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -114,7 +114,7 @@ fi
+>  AC_SUBST([PIE_CFLAGS])
+>  
+>  if test $enable_relro != "no"; then
+> -	RELRO_CFLAGS="-Wl,-z,relro"
+> +	RELRO_CFLAGS="-Wl,-z,relro,-z,now"
+>  else
+>  	RELRO_CFLAGS=""
+>  fi
 
-That patch has some of the new option parsing code free "string" without
-setting the variable to NULL afterward. Since "string" is automatically
-freed in an error condition, fix the code to just rely on that instead
-of freeing it explicitly.
-
-Reported-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/connect.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 7635b5d..17c3643 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1624,14 +1624,11 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 		case Opt_unc:
- 			string = vol->UNC;
- 			vol->UNC = match_strdup(args);
--			if (vol->UNC == NULL) {
--				kfree(string);
-+			if (vol->UNC == NULL)
- 				goto out_nomem;
--			}
- 
- 			convert_delimiter(vol->UNC, '\\');
- 			if (vol->UNC[0] != '\\' || vol->UNC[1] != '\\') {
--				kfree(string);
- 				printk(KERN_ERR "CIFS: UNC Path does not "
- 						"begin with // or \\\\\n");
- 				goto cifs_parse_mount_err;
-@@ -1687,10 +1684,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 
- 			string = vol->prepath;
- 			vol->prepath = match_strdup(args);
--			if (vol->prepath == NULL) {
--				kfree(string);
-+			if (vol->prepath == NULL)
- 				goto out_nomem;
--			}
- 			/* Compare old prefixpath= option to new one */
- 			if (!string || strcmp(string, vol->prepath))
- 				printk(KERN_WARNING "CIFS: the value of the "
+Merged...
 -- 
-1.7.11.7
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
