@@ -1,74 +1,51 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix double-free of "string" in cifs_parse_mount_options
-Date: Thu, 13 Dec 2012 08:51:29 -0600
-Message-ID: <CAH2r5mtjVXDD=1nE77QNFY293y=gRO0hHGO8nvkd69AeaiZrcw@mail.gmail.com>
-References: <1355396571-19510-1-git-send-email-jlayton@redhat.com>
+From: Alex Xu <alex_y_xu-FFYn/CNdgSA@public.gmane.org>
+Subject: Mounting CIFS with root not accessible - permission denied
+Date: Thu, 13 Dec 2012 17:23:29 -0500
+Message-ID: <50CA5561.8090405@yahoo.ca>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="------------enig4065C532F37C268D47EB797A"
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1355396571-19510-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I will merge this ASAP
+This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
+--------------enig4065C532F37C268D47EB797A
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 13, 2012 at 5:02 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Dan reported the following regression in commit d387a5c5:
->
->     + fs/cifs/connect.c:1903 cifs_parse_mount_options() error: double free of 'string'
->
-> That patch has some of the new option parsing code free "string" without
-> setting the variable to NULL afterward. Since "string" is automatically
-> freed in an error condition, fix the code to just rely on that instead
-> of freeing it explicitly.
->
-> Reported-by: Dan Carpenter <dan.carpenter-QHcLZuEGTsvQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/connect.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 7635b5d..17c3643 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1624,14 +1624,11 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->                 case Opt_unc:
->                         string = vol->UNC;
->                         vol->UNC = match_strdup(args);
-> -                       if (vol->UNC == NULL) {
-> -                               kfree(string);
-> +                       if (vol->UNC == NULL)
->                                 goto out_nomem;
-> -                       }
->
->                         convert_delimiter(vol->UNC, '\\');
->                         if (vol->UNC[0] != '\\' || vol->UNC[1] != '\\') {
-> -                               kfree(string);
->                                 printk(KERN_ERR "CIFS: UNC Path does not "
->                                                 "begin with // or \\\\\n");
->                                 goto cifs_parse_mount_err;
-> @@ -1687,10 +1684,8 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
->
->                         string = vol->prepath;
->                         vol->prepath = match_strdup(args);
-> -                       if (vol->prepath == NULL) {
-> -                               kfree(string);
-> +                       if (vol->prepath == NULL)
->                                 goto out_nomem;
-> -                       }
->                         /* Compare old prefixpath= option to new one */
->                         if (!string || strcmp(string, vol->prepath))
->                                 printk(KERN_WARNING "CIFS: the value of the "
-> --
-> 1.7.11.7
->
+Basic explanation: Mounting a SMB share with CIFS fails saying in the
+kernel log that it can't traverse up to the root directory if the root
+directory is not accessible (in my case with NTFS ACLs), even if
+prefixpath is used.
+
+Read a few earlier threads on this that said this was fixed, but it
+seems to still be a problem for me on 3.7.0-rc8+.
 
 
+--------------enig4065C532F37C268D47EB797A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
 
-Steve
+iQIcBAEBAgAGBQJQylVmAAoJEJJZfKWYZ3eUxL4QALHaGjEedXMaH7uYPfmR/URc
+Gj3xotCXqbA1D2z2Xbbklj8TL7UhTukdvyHaDKW4pDcO1ISF9rwUPWPj/xU9UjaL
+RVQXuVzmcyv6wK0EoEK0xCWksVeLcDrR5MaMZG0BwALa4Mwj0pLdGCZixmAGiNtB
+Fb8MD8vGKlrJ81gjzk2WSYiXIlGGRQTLO4yGizPQp9VJhYiCHj2ZRgizwye5XAVA
+2R8QdTZJ5m27w7B/Hn0k46fSySXcIoaQbGpKSYDydMg4h+vWwZvvNhwWfjXhAzVv
+X1WRH9/DSqgrBLMuIlCBnzIo6yvvB/sYkbe++IPK67r4tF3mvY7YN4jHkHT/QF71
+gEuNT5XSuayZjPUiFX83kYfkVDnDnz+sRbSFJrwZRwXih+q1McqD0AYeDpOfOOr5
+6LL6CuCksm6tGTw579McN/+5ngf0cf1r4wZBBiGCBR1k2cgg3aLo/KgeOO3fEV7L
+Ar0Z1ZDBCxxIEDiPNmerOT4FqONk2A9LJnnEVvCvFYIUq4cxh0MrQdiL9Iox+uaw
+lxHsFDEPRLUyKE9IqsI/bkshz5wemEah/eSigkrGt994nkB9KSNfr67fLASbJZ+i
+xYn4sxA53iHi8m1pZn6ZNcZpzfNRFPNtdKfpgk1Hm5IcITvtst2gKQhBfXLZqQxu
+9eSLwPTgwkxYowWjhHvA
+=dORO
+-----END PGP SIGNATURE-----
+
+--------------enig4065C532F37C268D47EB797A--
