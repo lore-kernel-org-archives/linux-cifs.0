@@ -1,66 +1,65 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [Regression] commit 81bcd8b7 breaks CIFS mount
-Date: Thu, 13 Dec 2012 23:05:18 -0600
-Message-ID: <CAH2r5msqxf0mTLLuY3c0e1ZO7W3-+6Z_ig572k48d9NUo-O_Rg@mail.gmail.com>
-References: <19417714.1234541355460245243.JavaMail.weblogic@epv6ml05>
+From: Jongman Heo <jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Subject: Re: Re: [Regression] commit 81bcd8b7 breaks CIFS mount
+Date: Fri, 14 Dec 2012 06:11:46 +0000 (GMT)
+Message-ID: <8501929.502061355465505730.JavaMail.weblogic@epml27>
+Reply-To: jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <19417714.1234541355460245243.JavaMail.weblogic@epv6ml05>
+MIME-version: 1.0
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Windows 7 should support nltmspp.
-
-First verify that mounting with ntlm (e.g. specifying "sec=ntlm" on
-mount) works (after that unmount and also try mounting with
-"sec=ntlmv2" to see if "raw" ntlmv2 instead of ntlmv2 in ntlmssp
-works).  Second check your registry setting on Windows 7 server to
-make sure that you did not disable ntlmv2
-
-On Thu, Dec 13, 2012 at 10:44 PM, Jongman Heo <jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org> wrote:
->
-> Hi,
->
-> commit 81bcd8b7 breaks CIFS mount in my Fedora 16 and Fedora 17 machines, with following error message.
->
->     [   51.119251] Status code returned 0xc000005e NT_STATUS_NO_LOGON_SERVERS
->     [   51.119259] CIFS VFS: Send error in SessSetup = -5
->     [   51.119476] CIFS VFS: cifs_mount failed w/return code = -5
->
-> FYI, remotetarget is Windows 7.
->
-> Reverting the commit 81bcd8b7 fixes the mount problem.
->
-> I read the commit message, is this intended behavior?
-> Then how can I resolve my issue withour reverting the commit?
-> Need to install some package, or change system configuration?
->
->
-> git bisect log attached.
->
-> # git bisect log
-> git bisect start '--' 'fs/cifs'
-> # bad: [66cdd0ceaf65a18996f561b770eedde1d123b019] Merge tag 'kvm-3.8-1' of git://git.kernel.org/pub/scm/virt/kvm/kvm
-> git bisect bad 66cdd0ceaf65a18996f561b770eedde1d123b019
-> # good: [29594404d7fe73cd80eaa4ee8c43dcc53970c60e] Linux 3.7
-> git bisect good 29594404d7fe73cd80eaa4ee8c43dcc53970c60e
-> # bad: [1cc9bd68617f2a92dcd6e4398288341d16cfb5c1] make convert_delimiter use strchr instead of open-coding it
-> git bisect bad 1cc9bd68617f2a92dcd6e4398288341d16cfb5c1
-> # bad: [d3d1fce11dbbf4246f1c37839b13757f08aec3b7] cifs: don't override the uid/gid in getattr when cifsacl is enabled
-> git bisect bad d3d1fce11dbbf4246f1c37839b13757f08aec3b7
-> # bad: [852e22950dc47e774bb602b16f55fed42afac5fb] cifs: use the NUM_AUTHS and NUM_SUBAUTHS constants in cifsacl code
-> git bisect bad 852e22950dc47e774bb602b16f55fed42afac5fb
-> # bad: [60654ce047f7be62afa291573501e011297a47d8] cifs: fix types on module parameters
-> git bisect bad 60654ce047f7be62afa291573501e011297a47d8
-> # bad: [81bcd8b795229c70d7244898efe282846e3b14ce] default authentication needs to be at least ntlmv2 security for cifs mounts
-> git bisect bad 81bcd8b795229c70d7244898efe282846e3b14ce
-
-
-
--- 
-Thanks,
-
-Steve
+DQpzZWM9bnRsbSB3b3Jrcywgc2VjPW50bG12MiBkb2VzIG5vdC4NCg0KSSBkb24ndCBrbm93IHdl
+bGwgYWJvdXQgdGhlIFdpbmRvd3MgNyBzZXR0aW5nLg0KQnV0IHRoZXJlIHdhcyBubyBMbUNvbXBh
+dGliaWxpdHlMZXZlbCBrZXkgaW4gdGhlIHJlZ2lzdHJ5LCBIS0xNXFNZU1RFTVxDdXJyZW50Q29u
+dHJvbFNldFxDb250cm9sXExzYS4NClNvLCBJIGNyZWF0ZWQgdGhlIGtleSBhbmQgdHJpZWQgd2l0
+aCBEV09SRCB2YWx1ZSAwIGFuZCAxLiBCdXQgaW4gYm90aCBjYXNlLCBvbmx5IHNlYz1udGxtIHdv
+cmtzLg0KDQpSZWdhcmRzLA0KSm9uZ21hbiBIZW8uDQoNCi0tLS0tLS0gT3JpZ2luYWwgTWVzc2Fn
+ZSAtLS0tLS0tDQpTZW5kZXIgOiBTdGV2ZSBGcmVuY2g8c21mcmVuY2hAZ21haWwuY29tPg0KRGF0
+ZSA6IDIwMTItMTItMTQgMTQ6MDUgKEdNVCswOTowMCkNClRpdGxlIDogUmU6IFtSZWdyZXNzaW9u
+XSBjb21taXQgODFiY2Q4YjcgYnJlYWtzIENJRlMgbW91bnQNCg0KV2luZG93cyA3IHNob3VsZCBz
+dXBwb3J0IG5sdG1zcHAuDQoNCkZpcnN0IHZlcmlmeSB0aGF0IG1vdW50aW5nIHdpdGggbnRsbSAo
+ZS5nLiBzcGVjaWZ5aW5nICJzZWM9bnRsbSIgb24NCm1vdW50KSB3b3JrcyAoYWZ0ZXIgdGhhdCB1
+bm1vdW50IGFuZCBhbHNvIHRyeSBtb3VudGluZyB3aXRoDQoic2VjPW50bG12MiIgdG8gc2VlIGlm
+ICJyYXciIG50bG12MiBpbnN0ZWFkIG9mIG50bG12MiBpbiBudGxtc3NwDQp3b3JrcykuICBTZWNv
+bmQgY2hlY2sgeW91ciByZWdpc3RyeSBzZXR0aW5nIG9uIFdpbmRvd3MgNyBzZXJ2ZXIgdG8NCm1h
+a2Ugc3VyZSB0aGF0IHlvdSBkaWQgbm90IGRpc2FibGUgbnRsbXYyDQoNCk9uIFRodSwgRGVjIDEz
+LCAyMDEyIGF0IDEwOjQ0IFBNLCBKb25nbWFuIEhlbyB3cm90ZToNCj4NCj4gSGksDQo+DQo+IGNv
+bW1pdCA4MWJjZDhiNyBicmVha3MgQ0lGUyBtb3VudCBpbiBteSBGZWRvcmEgMTYgYW5kIEZlZG9y
+YSAxNyBtYWNoaW5lcywgd2l0aCBmb2xsb3dpbmcgZXJyb3IgbWVzc2FnZS4NCj4NCj4gICAgIFsg
+ICA1MS4xMTkyNTFdIFN0YXR1cyBjb2RlIHJldHVybmVkIDB4YzAwMDAwNWUgTlRfU1RBVFVTX05P
+X0xPR09OX1NFUlZFUlMNCj4gICAgIFsgICA1MS4xMTkyNTldIENJRlMgVkZTOiBTZW5kIGVycm9y
+IGluIFNlc3NTZXR1cCA9IC01DQo+ICAgICBbICAgNTEuMTE5NDc2XSBDSUZTIFZGUzogY2lmc19t
+b3VudCBmYWlsZWQgdy9yZXR1cm4gY29kZSA9IC01DQo+DQo+IEZZSSwgcmVtb3RldGFyZ2V0IGlz
+IFdpbmRvd3MgNy4NCj4NCj4gUmV2ZXJ0aW5nIHRoZSBjb21taXQgODFiY2Q4YjcgZml4ZXMgdGhl
+IG1vdW50IHByb2JsZW0uDQo+DQo+IEkgcmVhZCB0aGUgY29tbWl0IG1lc3NhZ2UsIGlzIHRoaXMg
+aW50ZW5kZWQgYmVoYXZpb3I/DQo+IFRoZW4gaG93IGNhbiBJIHJlc29sdmUgbXkgaXNzdWUgd2l0
+aG91ciByZXZlcnRpbmcgdGhlIGNvbW1pdD8NCj4gTmVlZCB0byBpbnN0YWxsIHNvbWUgcGFja2Fn
+ZSwgb3IgY2hhbmdlIHN5c3RlbSBjb25maWd1cmF0aW9uPw0KPg0KPg0KPiBnaXQgYmlzZWN0IGxv
+ZyBhdHRhY2hlZC4NCj4NCj4gIyBnaXQgYmlzZWN0IGxvZw0KPiBnaXQgYmlzZWN0IHN0YXJ0ICct
+LScgJ2ZzL2NpZnMnDQo+ICMgYmFkOiBbNjZjZGQwY2VhZjY1YTE4OTk2ZjU2MWI3NzBlZWRkZTFk
+MTIzYjAxOV0gTWVyZ2UgdGFnICdrdm0tMy44LTEnIG9mIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1
+Yi9zY20vdmlydC9rdm0va3ZtDQo+IGdpdCBiaXNlY3QgYmFkIDY2Y2RkMGNlYWY2NWExODk5NmY1
+NjFiNzcwZWVkZGUxZDEyM2IwMTkNCj4gIyBnb29kOiBbMjk1OTQ0MDRkN2ZlNzNjZDgwZWFhNGVl
+OGM0M2RjYzUzOTcwYzYwZV0gTGludXggMy43DQo+IGdpdCBiaXNlY3QgZ29vZCAyOTU5NDQwNGQ3
+ZmU3M2NkODBlYWE0ZWU4YzQzZGNjNTM5NzBjNjBlDQo+ICMgYmFkOiBbMWNjOWJkNjg2MTdmMmE5
+MmRjZDZlNDM5ODI4ODM0MWQxNmNmYjVjMV0gbWFrZSBjb252ZXJ0X2RlbGltaXRlciB1c2Ugc3Ry
+Y2hyIGluc3RlYWQgb2Ygb3Blbi1jb2RpbmcgaXQNCj4gZ2l0IGJpc2VjdCBiYWQgMWNjOWJkNjg2
+MTdmMmE5MmRjZDZlNDM5ODI4ODM0MWQxNmNmYjVjMQ0KPiAjIGJhZDogW2QzZDFmY2UxMWRiYmY0
+MjQ2ZjFjMzc4MzliMTM3NTdmMDhhZWMzYjddIGNpZnM6IGRvbid0IG92ZXJyaWRlIHRoZSB1aWQv
+Z2lkIGluIGdldGF0dHIgd2hlbiBjaWZzYWNsIGlzIGVuYWJsZWQNCj4gZ2l0IGJpc2VjdCBiYWQg
+ZDNkMWZjZTExZGJiZjQyNDZmMWMzNzgzOWIxMzc1N2YwOGFlYzNiNw0KPiAjIGJhZDogWzg1MmUy
+Mjk1MGRjNDdlNzc0YmI2MDJiMTZmNTVmZWQ0MmFmYWM1ZmJdIGNpZnM6IHVzZSB0aGUgTlVNX0FV
+VEhTIGFuZCBOVU1fU1VCQVVUSFMgY29uc3RhbnRzIGluIGNpZnNhY2wgY29kZQ0KPiBnaXQgYmlz
+ZWN0IGJhZCA4NTJlMjI5NTBkYzQ3ZTc3NGJiNjAyYjE2ZjU1ZmVkNDJhZmFjNWZiDQo+ICMgYmFk
+OiBbNjA2NTRjZTA0N2Y3YmU2MmFmYTI5MTU3MzUwMWUwMTEyOTdhNDdkOF0gY2lmczogZml4IHR5
+cGVzIG9uIG1vZHVsZSBwYXJhbWV0ZXJzDQo+IGdpdCBiaXNlY3QgYmFkIDYwNjU0Y2UwNDdmN2Jl
+NjJhZmEyOTE1NzM1MDFlMDExMjk3YTQ3ZDgNCj4gIyBiYWQ6IFs4MWJjZDhiNzk1MjI5YzcwZDcy
+NDQ4OThlZmUyODI4NDZlM2IxNGNlXSBkZWZhdWx0IGF1dGhlbnRpY2F0aW9uIG5lZWRzIHRvIGJl
+IGF0IGxlYXN0IG50bG12MiBzZWN1cml0eSBmb3IgY2lmcyBtb3VudHMNCj4gZ2l0IGJpc2VjdCBi
+YWQgODFiY2Q4Yjc5NTIyOWM3MGQ3MjQ0ODk4ZWZlMjgyODQ2ZTNiMTRjZQ0KDQoNCg0KLS0gDQpU
+aGFua3MsDQpTdGV2ZQ0K
