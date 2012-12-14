@@ -1,34 +1,48 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: Mounting CIFS with root not accessible - permission denied
-Date: Thu, 13 Dec 2012 21:54:23 -0500
-Message-ID: <20121213215423.6ad89bc6@corrin.poochiereds.net>
-References: <50CA5561.8090405@yahoo.ca>
+From: Jongman Heo <jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+Subject: [Regression] commit 81bcd8b7 breaks CIFS mount
+Date: Fri, 14 Dec 2012 04:44:05 +0000 (GMT)
+Message-ID: <19417714.1234541355460245243.JavaMail.weblogic@epv6ml05>
+Reply-To: jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Alex Xu <alex_y_xu-FFYn/CNdgSA@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+Cc: =?utf-8?Q?=ED=97=88=EC=A2=85=EB=A7=8C?= <jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <50CA5561.8090405-FFYn/CNdgSA@public.gmane.org>
+MIME-version: 1.0
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 13 Dec 2012 17:23:29 -0500
-Alex Xu <alex_y_xu-FFYn/CNdgSA@public.gmane.org> wrote:
-
-> Basic explanation: Mounting a SMB share with CIFS fails saying in the
-> kernel log that it can't traverse up to the root directory if the root
-> directory is not accessible (in my case with NTFS ACLs), even if
-> prefixpath is used.
-> 
-> Read a few earlier threads on this that said this was fixed, but it
-> seems to still be a problem for me on 3.7.0-rc8+.
-> 
-
-
-Nope, not fixed. With current kernels, you need to be able to access
-the entire path down from the root of the share. I'd be happy to help
-review patches if someone does fix it however...
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+DQpIaSwgDQoNCmNvbW1pdCA4MWJjZDhiNyBicmVha3MgQ0lGUyBtb3VudCBpbiBteSBGZWRvcmEg
+MTYgYW5kIEZlZG9yYSAxNyBtYWNoaW5lcywgd2l0aCBmb2xsb3dpbmcgZXJyb3IgbWVzc2FnZS4N
+Cg0KICAgIFsgICA1MS4xMTkyNTFdIFN0YXR1cyBjb2RlIHJldHVybmVkIDB4YzAwMDAwNWUgTlRf
+U1RBVFVTX05PX0xPR09OX1NFUlZFUlMNCiAgICBbICAgNTEuMTE5MjU5XSBDSUZTIFZGUzogU2Vu
+ZCBlcnJvciBpbiBTZXNzU2V0dXAgPSAtNQ0KICAgIFsgICA1MS4xMTk0NzZdIENJRlMgVkZTOiBj
+aWZzX21vdW50IGZhaWxlZCB3L3JldHVybiBjb2RlID0gLTUNCg0KRllJLCByZW1vdGV0YXJnZXQg
+aXMgV2luZG93cyA3Lg0KDQpSZXZlcnRpbmcgdGhlIGNvbW1pdCA4MWJjZDhiNyBmaXhlcyB0aGUg
+bW91bnQgcHJvYmxlbS4NCg0KSSByZWFkIHRoZSBjb21taXQgbWVzc2FnZSwgaXMgdGhpcyBpbnRl
+bmRlZCBiZWhhdmlvcj8gDQpUaGVuIGhvdyBjYW4gSSByZXNvbHZlIG15IGlzc3VlIHdpdGhvdXIg
+cmV2ZXJ0aW5nIHRoZSBjb21taXQ/IA0KTmVlZCB0byBpbnN0YWxsIHNvbWUgcGFja2FnZSwgb3Ig
+Y2hhbmdlIHN5c3RlbSBjb25maWd1cmF0aW9uPw0KDQoNCmdpdCBiaXNlY3QgbG9nIGF0dGFjaGVk
+Lg0KDQojIGdpdCBiaXNlY3QgbG9nDQpnaXQgYmlzZWN0IHN0YXJ0ICctLScgJ2ZzL2NpZnMnDQoj
+IGJhZDogWzY2Y2RkMGNlYWY2NWExODk5NmY1NjFiNzcwZWVkZGUxZDEyM2IwMTldIE1lcmdlIHRh
+ZyAna3ZtLTMuOC0xJyBvZiBnaXQ6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL3ZpcnQva3ZtL2t2
+bQ0KZ2l0IGJpc2VjdCBiYWQgNjZjZGQwY2VhZjY1YTE4OTk2ZjU2MWI3NzBlZWRkZTFkMTIzYjAx
+OQ0KIyBnb29kOiBbMjk1OTQ0MDRkN2ZlNzNjZDgwZWFhNGVlOGM0M2RjYzUzOTcwYzYwZV0gTGlu
+dXggMy43DQpnaXQgYmlzZWN0IGdvb2QgMjk1OTQ0MDRkN2ZlNzNjZDgwZWFhNGVlOGM0M2RjYzUz
+OTcwYzYwZQ0KIyBiYWQ6IFsxY2M5YmQ2ODYxN2YyYTkyZGNkNmU0Mzk4Mjg4MzQxZDE2Y2ZiNWMx
+XSBtYWtlIGNvbnZlcnRfZGVsaW1pdGVyIHVzZSBzdHJjaHIgaW5zdGVhZCBvZiBvcGVuLWNvZGlu
+ZyBpdA0KZ2l0IGJpc2VjdCBiYWQgMWNjOWJkNjg2MTdmMmE5MmRjZDZlNDM5ODI4ODM0MWQxNmNm
+YjVjMQ0KIyBiYWQ6IFtkM2QxZmNlMTFkYmJmNDI0NmYxYzM3ODM5YjEzNzU3ZjA4YWVjM2I3XSBj
+aWZzOiBkb24ndCBvdmVycmlkZSB0aGUgdWlkL2dpZCBpbiBnZXRhdHRyIHdoZW4gY2lmc2FjbCBp
+cyBlbmFibGVkDQpnaXQgYmlzZWN0IGJhZCBkM2QxZmNlMTFkYmJmNDI0NmYxYzM3ODM5YjEzNzU3
+ZjA4YWVjM2I3DQojIGJhZDogWzg1MmUyMjk1MGRjNDdlNzc0YmI2MDJiMTZmNTVmZWQ0MmFmYWM1
+ZmJdIGNpZnM6IHVzZSB0aGUgTlVNX0FVVEhTIGFuZCBOVU1fU1VCQVVUSFMgY29uc3RhbnRzIGlu
+IGNpZnNhY2wgY29kZQ0KZ2l0IGJpc2VjdCBiYWQgODUyZTIyOTUwZGM0N2U3NzRiYjYwMmIxNmY1
+NWZlZDQyYWZhYzVmYg0KIyBiYWQ6IFs2MDY1NGNlMDQ3ZjdiZTYyYWZhMjkxNTczNTAxZTAxMTI5
+N2E0N2Q4XSBjaWZzOiBmaXggdHlwZXMgb24gbW9kdWxlIHBhcmFtZXRlcnMNCmdpdCBiaXNlY3Qg
+YmFkIDYwNjU0Y2UwNDdmN2JlNjJhZmEyOTE1NzM1MDFlMDExMjk3YTQ3ZDgNCiMgYmFkOiBbODFi
+Y2Q4Yjc5NTIyOWM3MGQ3MjQ0ODk4ZWZlMjgyODQ2ZTNiMTRjZV0gZGVmYXVsdCBhdXRoZW50aWNh
+dGlvbiBuZWVkcyB0byBiZSBhdCBsZWFzdCBudGxtdjIgc2VjdXJpdHkgZm9yIGNpZnMgbW91bnRz
+DQpnaXQgYmlzZWN0IGJhZCA4MWJjZDhiNzk1MjI5YzcwZDcyNDQ4OThlZmUyODI4NDZlM2IxNGNl
+DQo=
