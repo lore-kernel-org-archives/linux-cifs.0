@@ -1,178 +1,73 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Subject: Re: Performance degradation with ISAM tables
-Date: Fri, 14 Dec 2012 17:20:28 -0600
-Message-ID: <CAH2r5mv6njgwQpSUMD106BExG8b9ErRPdpeoC2eSj0mff3Hs6w@mail.gmail.com>
+Date: Sat, 15 Dec 2012 09:39:25 -0500
+Message-ID: <20121215093925.0f555cd9@tlielax.poochiereds.net>
 References: <50CA5C4C.60103@electrodh.com>
 	<20121213213929.0eea2f5f@corrin.poochiereds.net>
 	<50CBB21B.3080908@electrodh.com>
+	<CAH2r5mv6njgwQpSUMD106BExG8b9ErRPdpeoC2eSj0mff3Hs6w@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: =?ISO-8859-1?Q?Sen=E9n_de_Diego?= <senen-qHrp9QoZuCS1Z/+hSey0Gg@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: =?ISO-8859-1?B?U2Vu6W4=?= de Diego <senen-qHrp9QoZuCS1Z/+hSey0Gg@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <50CBB21B.3080908-qHrp9QoZuCS1Z/+hSey0Gg@public.gmane.org>
+In-Reply-To: <CAH2r5mv6njgwQpSUMD106BExG8b9ErRPdpeoC2eSj0mff3Hs6w-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Could you correlate these with the SMB counters (stats) on the client
-in /proc/fs/cifs/ which also should include bytes written/read?
+On Fri, 14 Dec 2012 17:20:28 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Based on your description it looks like reads totally dominate this
-workload.  The obvious thing to check is the read size - a few quick
-things does "forcedirectio" (or "cache=3Dnone" for newer kernels) help =
--
-in that case the network read size which usually match what the client
-application requests (which is usually a bad thing because we want
-large i/o over the network and apps tend to read too small).   Second
-thing to try is a larger rsize - IIRC Windows should generally support
-up to rsize of about 127K (for Samba the rsize can be larger due to
-Unix extensions, we set the rsize smaller than 127K to Windows to work
-around bugs in other non-Samba, non-Windows servers).
+> Could you correlate these with the SMB counters (stats) on the client
+> in /proc/fs/cifs/ which also should include bytes written/read?
+> 
+> Based on your description it looks like reads totally dominate this
+> workload.  The obvious thing to check is the read size - a few quick
+> things does "forcedirectio" (or "cache=none" for newer kernels) help -
+> in that case the network read size which usually match what the client
+> application requests (which is usually a bad thing because we want
+> large i/o over the network and apps tend to read too small).   Second
+> thing to try is a larger rsize - IIRC Windows should generally support
+> up to rsize of about 127K (for Samba the rsize can be larger due to
+> Unix extensions, we set the rsize smaller than 127K to Windows to work
+> around bugs in other non-Samba, non-Windows servers).
+> 
 
-On Fri, Dec 14, 2012 at 5:11 PM, Sen=E9n de Diego <senen-qHrp9QoZuCS1Z/+hSey0Gg@public.gmane.org>=
- wrote:
-> El 14/12/2012 3:39, Jeff Layton escribi=F3:
->
->> On Thu, 13 Dec 2012 23:53:00 +0100
->> Sen=E9n de Diego <senen-qHrp9QoZuCS1Z/+hSey0Gg@public.gmane.org> wrote:
->>>
->>> Hello,
->>> I'm executing, in a linux server, a program that reads data from db=
-f
->>> files in a windows share. I've tried to execute the same program in=
- an
->>> upgraded server and I've found that it runs much much much slower.
->>> These are the versions of the first (older) server:
->>> kernel: 2.6.37.6-24
->>> cifs.ko: 1.68
->>> and of the second (newer):
->>> kernel: 3.4.11-2.16
->>> cifs.ko: 1.78
->>> The windows machine runs windows 2000 server and has EnableOplocks
->>> disabled in the LanManServer service.
->>> The windows share is mounted as a cifs file system with some differ=
-ences
->>> in the parameters assigned by default:
->>> first server: rsize=3D16384,wsize=3D57344
->>> second server: sec=3Dntlm,nounix,rsize=3D61440,wsize=3D65536
->>> I've captured the network traffic in both servers, and these are th=
-e
->>> service response time statistics:
->>> First server:
->>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> SMB SRT Statistics:
->>> Filter:
->>> Commands Calls Min SRT Max SRT Avg SRT
->>> Close 37 0.000140 0.001635 0.000404
->>> Read AndX 11554 0.000196 0.017179 0.002099
->>> Write AndX 12 0.000255 0.000657 0.000510
->>> NT Create AndX 43 0.000190 0.000406 0.000237
->>> Transaction2 Commands Calls Min SRT Max SRT Avg SRT
->>> FIND_FIRST2 83 0.000747 0.001953 0.001735
->>> FIND_NEXT2 880 0.000486 0.002885 0.001711
->>> QUERY_PATH_INFO 25678 0.000170 0.005451 0.000250
->>> QUERY_FILE_INFO 67 0.000169 0.000206 0.000182
->>> NT Transaction Commands Calls Min SRT Max SRT Avg SRT
->>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> Second server:
->>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> SMB SRT Statistics:
->>> Filter:
->>> Commands Calls Min SRT Max SRT Avg SRT
->>> Close 118 0.000128 0.006194 0.000517
->>> Trans 1 0.000872 0.000872 0.000872
->>> Read AndX 3490 0.000260 0.019713 0.009729
->>> Write AndX 12 0.000508 0.000522 0.000515
->>> NT Create AndX 118 0.000253 0.001496 0.000342
->>> Transaction2 Commands Calls Min SRT Max SRT Avg SRT
->>> FIND_FIRST2 171 0.000761 0.002862 0.002404
->>> FIND_NEXT2 326 0.002342 0.003058 0.002429
->>> QUERY_PATH_INFO 318093 0.000168 0.041616 0.000320
->>> QUERY_FILE_INFO 137 0.000235 0.002855 0.000370
->>> NT Transaction Commands Calls Min SRT Max SRT Avg SRT
->>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>> where there is a great difference in the number of calls, specially=
- in
->>> the number of QUERY_PATH_INFO commands executed. And the average SR=
-T are
->>> also slower in the newer server.
->>> I would like to know what is the cause and what can I do to correct=
- this?
->>
->> The difference between those two kernel represents more than a year =
-of
->> development time. The best first step you can take is to try a more
->> recent kernel (like something 3.7-ish) to see if that might help.
->
-> I've tried with a 3.6.10 kernel (the last available in my distro) and=
- it's
-> still slow:
->
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> SMB SRT Statistics:
-> Filter:
-> Commands                   Calls    Min SRT    Max SRT    Avg SRT
-> Close                        116   0.000137   1.101347   0.009745
-> Trans                          3   0.000517   0.000722   0.000642
-> Echo                           1   0.000203   0.000203   0.000203
-> Read AndX                 122893   0.000206   0.154745   0.000599
-> Write AndX                    12   0.000253   0.005756   0.000789
-> NT Create AndX               118   0.000266   0.000865   0.000458
->
->
-> Transaction2 Commands      Calls    Min SRT    Max SRT    Avg SRT
-> FIND_FIRST2                  170   0.000843   0.003413   0.002590
-> FIND_NEXT2                   325   0.002373   0.006695   0.002908
-> QUERY_PATH_INFO           320423   0.000181   2.066630   0.000485
-> QUERY_FILE_INFO              135   0.000252   0.000768   0.000395
->
->
-> NT Transaction Commands    Calls    Min SRT    Max SRT    Avg SRT
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->
->
->> The next problem is that it's difficult for us to infer anything abo=
-ut
->> your workload. You'll probably need to do some investigative work to
->> figure out what's actually slow. In particular, if you can phrase th=
-e
->> problem in terms of particular syscalls being slower, then we might =
-be
->> able to help you more.
->> Even better is to come up with a small reproducer program that
->> demonstrates the slowdown.
->
-> The file access is done by a proprietary jdbc driver inside a jvm. I =
-really
-> don't know how to do what you suggest. The SMB service response time
-> statitics are all I've got.
->
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs"=
- in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Actually, based on the original email, it sounds to me more like this
+is a very metadata-intensive workload, likely dominated by lookups
+and/or stat calls. I'd be surprised if reads were slower on the new
+kernels, but it can be hard to tell...
 
+In any case, you may want to try a larger actimeo= mount option and see
+if it helps. It defaults to 1s, but you have at least one
+QUERY_PATH_INFO call that took >2s for the server to respond to. Maybe
+try actimeo=5 or so?
 
+> >
+> >> The next problem is that it's difficult for us to infer anything about
+> >> your workload. You'll probably need to do some investigative work to
+> >> figure out what's actually slow. In particular, if you can phrase the
+> >> problem in terms of particular syscalls being slower, then we might be
+> >> able to help you more.
+> >> Even better is to come up with a small reproducer program that
+> >> demonstrates the slowdown.
+> >
+> > The file access is done by a proprietary jdbc driver inside a jvm. I really
+> > don't know how to do what you suggest. The SMB service response time
+> > statitics are all I've got.
+> >
+> >
 
---=20
-Thanks,
+Then you have your work cut out for you. Trying to figure out what the
+heck a particular java program is doing can be an exercise in pain
+management.
 
-Steve
+You might want to consider bisecting the problem down to a narrower
+range of kernel versions. If your distro provides pre-built kernels,
+you can try different versions within the range you've already ID'ed.
+See if you can figure out when the performance regression crept in.
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
