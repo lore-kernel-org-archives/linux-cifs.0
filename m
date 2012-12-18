@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v2 4/5] cifs-utils: convert cifs.idmap to use plugin interface
-Date: Tue, 18 Dec 2012 09:10:47 -0500
-Message-ID: <1355839848-24118-5-git-send-email-jlayton@samba.org>
+Subject: [PATCH v2 2/5] cifs-utils: new plugin architecture for ID mapping code
+Date: Tue, 18 Dec 2012 09:10:45 -0500
+Message-ID: <1355839848-24118-3-git-send-email-jlayton@samba.org>
 References: <1355839848-24118-1-git-send-email-jlayton@samba.org>
 Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
@@ -10,466 +10,599 @@ In-Reply-To: <1355839848-24118-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add routines for the various things that cifs.idmap needs and have it
-call them.
+Currently, the ACL-related tools in cifs-utils call into the wbclient
+libs directly in order to do their bidding. The wbclient developers want
+to get away from needing to configure winbind on the clients and instead
+allow sssd to handle the mapping in most cases.
+
+This patch represents an initial step in that direction. It adds a
+plugin architecture for cifs-utils, adds wrappers around the calls into
+libwbclient that find an idmap plugin library to use and then has it
+call into that plugin to do the actual ID mapping.
+
+The application will call into a set of routines that find the correct
+plugin and dlopen() it. Currently the plugin is located in a well-known
+location that is settable via autoconf. That location is intended to be
+a symlink that points to the real plugin (generally under $pkglibdir).
+
+The plugin will export a number of functions with well-known names. The
+wrappers find those by using dlsym() and then call them.
 
 Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 ---
- Makefile.am    |  5 ++--
- cifs.idmap.c   | 93 +++++++++++++++++++++++++---------------------------------
- cifsidmap.h    | 68 ++++++++++++++++++++++++++++++++++++++++--
- idmap_plugin.c | 49 +++++++++++++++++++++++++++++++
- idmap_plugin.h | 12 ++++++++
- idmapwb.c      | 64 ++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 232 insertions(+), 59 deletions(-)
+ Makefile.am    |  13 +++++--
+ cifsidmap.h    |  45 ++++++++++++++++++++++
+ configure.ac   |   9 +++++
+ getcifsacl.c   |  98 +++++++++++++++++++++---------------------------
+ idmap_plugin.c |  99 +++++++++++++++++++++++++++++++++++++++++++++++++
+ idmap_plugin.h |  46 +++++++++++++++++++++++
+ idmapwb.c      | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 367 insertions(+), 58 deletions(-)
+ create mode 100644 idmap_plugin.c
+ create mode 100644 idmap_plugin.h
+ create mode 100644 idmapwb.c
 
 diff --git a/Makefile.am b/Makefile.am
-index acace9c..8836b47 100644
+index 8964b37..bc5e517 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -41,9 +41,8 @@ endif
+@@ -57,9 +57,8 @@ endif
  
- if CONFIG_CIFSIDMAP
- sbin_PROGRAMS += cifs.idmap
--cifs_idmap_SOURCES = cifs.idmap.c
--cifs_idmap_LDADD = -lkeyutils $(WBCLIENT_LIBS)
--cifs_idmap_CFLAGS = $(WBCLIENT_CFLAGS)
-+cifs_idmap_SOURCES = cifs.idmap.c idmap_plugin.c
-+cifs_idmap_LDADD = -lkeyutils -ldl
- man_MANS += cifs.idmap.8
+ if CONFIG_CIFSACL
+ bin_PROGRAMS += getcifsacl
+-getcifsacl_SOURCES = getcifsacl.c
+-getcifsacl_LDADD = $(WBCLIENT_LIBS)
+-getcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
++getcifsacl_SOURCES = getcifsacl.c idmap_plugin.c
++getcifsacl_LDADD = -ldl
+ man_MANS += getcifsacl.1
  
- cifs.idmap.8: cifs.idmap.8.in
-diff --git a/cifs.idmap.c b/cifs.idmap.c
-index 792ea58..285d87f 100644
---- a/cifs.idmap.c
-+++ b/cifs.idmap.c
-@@ -40,9 +40,11 @@
- #include <stdlib.h>
+ bin_PROGRAMS += setcifsacl
+@@ -69,4 +68,12 @@ setcifsacl_CFLAGS = $(WBCLIENT_CFLAGS)
+ man_MANS += setcifsacl.1
+ endif
+ 
++if CONFIG_PLUGIN
++plugindir = $(pkglibdir)
++plugin_PROGRAMS = idmapwb.so
++
++idmapwb.so: idmapwb.c
++	$(CC) $(CFLAGS) $(AM_CFLAGS) $(WBCLIENT_CFLAGS) $(LDFLAGS) -shared -fpic -o $@ $+ $(WBCLIENT_LIBS)
++endif
++
+ SUBDIRS = contrib
+diff --git a/cifsidmap.h b/cifsidmap.h
+index 9907618..c307333 100644
+--- a/cifsidmap.h
++++ b/cifsidmap.h
+@@ -34,4 +34,49 @@ struct cifs_sid {
+ 	uint32_t sub_auth[SID_MAX_SUB_AUTHORITIES];
+ } __attribute__((packed));
+ 
++/* Plugins should implement the following functions: */
++
++/**
++ * cifs_idmap_init_plugin - Initialize the plugin interface
++ * @handle - return pointer for an opaque handle
++ * @errmsg - pointer to error message pointer
++ *
++ * This function should do whatever is required to establish a context
++ * for later ID mapping operations. The "handle" is an opaque context
++ * cookie that will be passed in on subsequent ID mapping operations.
++ * The errmsg is used to pass back an error string both during the init
++ * and in subsequent idmapping functions. On any error, the plugin
++ * should point *errmsg at a string describing that error. Returns 0
++ * on success and non-zero on error.
++ *
++ * int cifs_idmap_init_plugin(void **handle, const char **errmsg);
++ */
++
++/**
++ * cifs_idmap_exit_plugin - Destroy an idmapping context
++ * @handle - context handle that should be destroyed
++ *
++ * When programs are finished with the idmapping plugin, they'll call
++ * this function to destroy any context that was created during the
++ * init_plugin. The handle passed back in was the one given by the init
++ * routine.
++ *
++ * void cifs_idmap_exit_plugin(void *handle);
++ */
++
++/**
++ * cifs_idmap_sid_to_str - convert cifs_sid to a string
++ * @handle - context handle
++ * @sid    - pointer to a cifs_sid
++ * @name   - return pointer for the name
++ *
++ * This function should convert the given cifs_sid to a string
++ * representation in a heap-allocated buffer. The caller of this
++ * function is expected to free "name" on success. Returns 0 on
++ * success and non-zero on error.
++ *
++ * int cifs_idmap_sid_to_str(void *handle, const struct cifs_sid *sid,
++ * 				char **name);
++ */
++
+ #endif /* _CIFSIDMAP_H */
+diff --git a/configure.ac b/configure.ac
+index b6791ab..9652ad2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -52,6 +52,14 @@ AC_ARG_ENABLE(systemd,
+ 	enable_systemd=$enableval,
+ 	enable_systemd="maybe")
+ 
++# "with" options
++AC_ARG_WITH(idmap-plugin,
++	[AC_HELP_STRING([--with-idmap-plugin=/path/to/plugin],
++			[Define the path to the plugin that the idmapping infrastructure should use @<:@default=/etc/cifs-utils/idmap-plugin@:>@])],
++	pluginpath=$withval,
++	pluginpath="/etc/cifs-utils/idmap-plugin")
++AC_DEFINE_UNQUOTED(IDMAP_PLUGIN_PATH, "$pluginpath", [Location of plugin that ID mapping infrastructure should use. (usually a symlink to real plugin)])
++
+ # check for ROOTSBINDIR environment var
+ if test -z $ROOTSBINDIR; then
+ 	ROOTSBINDIR="/sbin"
+@@ -230,6 +238,7 @@ AM_CONDITIONAL(CONFIG_CIFSUPCALL, [test "$enable_cifsupcall" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSCREDS, [test "$enable_cifscreds" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSIDMAP, [test "$enable_cifsidmap" != "no"])
+ AM_CONDITIONAL(CONFIG_CIFSACL, [test "$enable_cifsacl" != "no"])
++AM_CONDITIONAL(CONFIG_PLUGIN, [test "$enable_cifsidmap" != "no" -o "$enable_cifsacl" != "no"])
+ 
+ LIBCAP_NG_PATH
+ 
+diff --git a/getcifsacl.c b/getcifsacl.c
+index 550429c..c0b051d 100644
+--- a/getcifsacl.c
++++ b/getcifsacl.c
+@@ -33,10 +33,13 @@
+ #include <stddef.h>
  #include <errno.h>
  #include <limits.h>
 -#include <wbclient.h>
- 
+ #include <ctype.h>
+ #include <sys/xattr.h>
  #include "cifsacl.h"
 +#include "idmap_plugin.h"
 +
 +static void *plugin_handle;
++static bool plugin_loaded;
  
- static const char *prog = "cifs.idmap";
- 
-@@ -101,31 +103,14 @@ str_to_uint(const char *src, unsigned int *dst)
- 	return 0;
+ static void
+ print_each_ace_mask(uint32_t mask)
+@@ -169,61 +172,33 @@ print_ace_type(uint8_t acetype, int raw)
+ 	}
  }
  
 -/*
 - * Winbind keeps wbcDomainSid fields in host-endian. Copy fields from the
-- * wsid to the csid, while converting the subauthority fields to LE.
+- * csid to the wsid, while converting the subauthority fields from LE.
 - */
--static void
--wsid_to_csid(struct cifs_sid *csid, struct wbcDomainSid *wsid)
--{
+ static void
+-csid_to_wsid(struct wbcDomainSid *wsid, const struct cifs_sid *csid)
++print_sid(struct cifs_sid *csid, int raw)
+ {
 -	int i;
+-	uint8_t num_subauth = (csid->num_subauth <= WBC_MAXSUBAUTHS) ?
+-				csid->num_subauth : WBC_MAXSUBAUTHS;
 -
--	csid->revision = wsid->sid_rev_num;
--	csid->num_subauth = wsid->num_auths;
+-	wsid->sid_rev_num = csid->revision;
+-	wsid->num_auths = num_subauth;
 -	for (i = 0; i < NUM_AUTHS; i++)
--		csid->authority[i] = wsid->id_auth[i];
--	for (i = 0; i < wsid->num_auths; i++)
--		csid->sub_auth[i] = htole32(wsid->sub_auths[i]);
+-		wsid->id_auth[i] = csid->authority[i];
+-	for (i = 0; i < num_subauth; i++)
+-		wsid->sub_auths[i] = le32toh(csid->sub_auth[i]);
 -}
 -
- static int
- cifs_idmap(const key_serial_t key, const char *key_descr)
- {
- 	uid_t uid = 0;
- 	gid_t gid = 0;;
--	wbcErr rc = 1;
-+	int rc = 1;
- 	char *sidstr = NULL;
--	struct wbcDomainSid sid;
-+	struct cifs_sid sid;
+-static void
+-print_sid(struct cifs_sid *sidptr, int raw)
+-{
+-	int i;
+-	wbcErr rc;
+-	char *domain_name = NULL;
+-	char *sidname = NULL;
+-	enum wbcSidType sntype;
++	int i, rc;
++	char *name;
+ 	unsigned long long id_auth_val;
+-	struct wbcDomainSid wsid;
+ 
+-	csid_to_wsid(&wsid, sidptr);
++	if (raw || !plugin_loaded)
++		goto print_sid_raw;
+ 
+-	if (raw)
++	rc = sid_to_str(plugin_handle, csid, &name);
++	if (rc)
+ 		goto print_sid_raw;
+ 
+-	rc = wbcLookupSid(&wsid, &domain_name, &sidname, &sntype);
+-	if (WBC_ERROR_IS_OK(rc)) {
+-		printf("%s", domain_name);
+-		if (strlen(domain_name))
+-			printf("%c", '\\');
+-		printf("%s", sidname);
+-		wbcFreeMemory(domain_name);
+-		wbcFreeMemory(sidname);
+-		return;
+-	}
++	printf("%s", name);
++	free(name);
++	return;
+ 
+ print_sid_raw:
+-	printf("S-%hhu", wsid.sid_rev_num);
++	printf("S-%hhu", csid->revision);
+ 
+-	id_auth_val = (unsigned long long)wsid.id_auth[5];
+-	id_auth_val += (unsigned long long)wsid.id_auth[4] << 8;
+-	id_auth_val += (unsigned long long)wsid.id_auth[3] << 16;
+-	id_auth_val += (unsigned long long)wsid.id_auth[2] << 24;
+-	id_auth_val += (unsigned long long)wsid.id_auth[1] << 32;
+-	id_auth_val += (unsigned long long)wsid.id_auth[0] << 48;
++	id_auth_val = (unsigned long long)csid->authority[5];
++	id_auth_val += (unsigned long long)csid->authority[4] << 8;
++	id_auth_val += (unsigned long long)csid->authority[3] << 16;
++	id_auth_val += (unsigned long long)csid->authority[2] << 24;
++	id_auth_val += (unsigned long long)csid->authority[1] << 32;
++	id_auth_val += (unsigned long long)csid->authority[0] << 48;
  
  	/*
- 	 * Use winbind to convert received string to a SID and lookup
-@@ -137,15 +122,15 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
- 	 */
- 	sidstr = strget(key_descr, "os:");
- 	if (sidstr) {
--		rc = wbcStringToSid(sidstr, &sid);
-+		rc = str_to_sid(plugin_handle, sidstr, &sid);
- 		if (rc)
--			syslog(LOG_DEBUG, "Invalid owner string: %s, rc: %d",
--				key_descr, rc);
-+			syslog(LOG_DEBUG, "Unable to convert owner string %s "
-+				"to SID: %s", key_descr, plugin_errmsg);
- 		else {
--			rc = wbcSidToUid(&sid, &uid);
-+			rc = sid_to_uid(plugin_handle, &sid, &uid);
- 			if (rc)
--				syslog(LOG_DEBUG, "SID %s to uid wbc error: %d",
--						key_descr, rc);
-+				syslog(LOG_DEBUG, "Unable to convert %s to "
-+					"UID: %s", key_descr, plugin_errmsg);
- 		}
- 		if (!rc) { /* SID has been mapped to an uid */
- 			rc = keyctl_instantiate(key, &uid, sizeof(uid_t), 0);
-@@ -159,15 +144,15 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
+ 	 * MS-DTYP states that if the authority is >= 2^32, then it should be
+@@ -234,8 +209,8 @@ print_sid_raw:
+ 	else
+ 		printf("-0x%llx", id_auth_val);
  
- 	sidstr = strget(key_descr, "gs:");
- 	if (sidstr) {
--		rc = wbcStringToSid(sidstr, &sid);
-+		rc = str_to_sid(plugin_handle, sidstr, &sid);
- 		if (rc)
--			syslog(LOG_DEBUG, "Invalid group string: %s, rc: %d",
--					key_descr, rc);
-+			syslog(LOG_DEBUG, "Unable to convert group string %s "
-+				"to SID: %s", key_descr, plugin_errmsg);
- 		else {
--			rc = wbcSidToGid(&sid, &gid);
-+			rc = sid_to_gid(plugin_handle, &sid, &gid);
- 			if (rc)
--				syslog(LOG_DEBUG, "SID %s to gid wbc error: %d",
--						key_descr, rc);
-+				syslog(LOG_DEBUG, "Unable to convert %s to "
-+					"GID: %s", key_descr, plugin_errmsg);
- 		}
- 		if (!rc) { /* SID has been mapped to a gid */
- 			rc = keyctl_instantiate(key, &gid, sizeof(gid_t), 0);
-@@ -189,15 +174,12 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
- 		}
+-	for (i = 0; i < wsid.num_auths; i++)
+-		printf("-%u", wsid.sub_auths[i]);
++	for (i = 0; i < csid->num_subauth; i++)
++		printf("-%u", csid->sub_auth[i]);
+ }
  
- 		syslog(LOG_DEBUG, "SID: %s, uid: %u", sidstr, uid);
--		rc = wbcUidToSid(uid, &sid);
--		if (rc)
--			syslog(LOG_DEBUG, "uid %u to SID  error: %d", uid, rc);
--		if (!rc) {
--			struct cifs_sid csid;
--
--			/* SID has been mapped to a uid */
--			wsid_to_csid(&csid, &sid);
--			rc = keyctl_instantiate(key, &csid,
-+		rc = uid_to_sid(plugin_handle, uid, &sid);
-+		if (rc) {
-+			syslog(LOG_DEBUG, "uid %u to SID error: %s", uid,
-+				plugin_errmsg);
-+		} else {
-+			rc = keyctl_instantiate(key, &sid,
- 					sizeof(struct cifs_sid), 0);
- 			if (rc)
- 				syslog(LOG_ERR, "%s: key inst: %s",
-@@ -217,15 +199,12 @@ cifs_idmap(const key_serial_t key, const char *key_descr)
- 		}
- 
- 		syslog(LOG_DEBUG, "SID: %s, gid: %u", sidstr, gid);
--		rc = wbcGidToSid(gid, &sid);
--		if (rc)
--			syslog(LOG_DEBUG, "gid %u to SID error: %d", gid, rc);
--		if (!rc) {
--			struct cifs_sid csid;
--
--			/* SID has been mapped to a gid */
--			wsid_to_csid(&csid, &sid);
--			rc = keyctl_instantiate(key, &csid,
-+		rc = gid_to_sid(plugin_handle, gid, &sid);
-+		if (rc) {
-+			syslog(LOG_DEBUG, "gid %u to SID error: %s", gid,
-+				plugin_errmsg);
-+		} else {
-+			rc = keyctl_instantiate(key, &sid,
- 					sizeof(struct cifs_sid), 0);
- 			if (rc)
- 				syslog(LOG_ERR, "%s: key inst: %s",
-@@ -294,25 +273,33 @@ int main(const int argc, char *const argv[])
- 		goto out;
- 	}
- 
-+	if (init_plugin(&plugin_handle)) {
-+		plugin_handle = NULL;
-+		syslog(LOG_ERR, "Unable to initialize ID mapping plugin: %s",
-+			plugin_errmsg);
+ static void
+@@ -368,7 +343,8 @@ getcifsacl_usage(const char *prog)
+ int
+ main(const int argc, char *const argv[])
+ {
+-	int c, raw = 0;
++	int c, ret = 0;
++	bool raw = false;
+ 	ssize_t attrlen;
+ 	size_t bufsize = BUFSIZE;
+ 	char *filename, *attrval;
+@@ -379,7 +355,7 @@ main(const int argc, char *const argv[])
+ 			printf("Version: %s\n", VERSION);
+ 			goto out;
+ 		case 'r':
+-			raw = 1;
++			raw = true;
+ 			break;
+ 		default:
+ 			break;
+@@ -392,20 +368,31 @@ main(const int argc, char *const argv[])
+ 		filename = argv[1];
+ 	else {
+ 		getcifsacl_usage(basename(argv[0]));
+-		return 0;
 +		goto out;
 +	}
 +
- 	/* set timeout on key */
- 	rc = keyctl_set_timeout(key, timeout);
- 	if (rc == -1) {
- 		syslog(LOG_ERR, "unable to set key timeout: %s",
- 			strerror(errno));
--		goto out;
-+		goto out_exit_plugin;
++	if (!raw && !plugin_loaded) {
++		ret = init_plugin(&plugin_handle);
++		if (ret)
++			printf("WARNING: unable to initialize idmapping plugin: %s\n",
++				plugin_errmsg);
++		else
++			plugin_loaded = true;
  	}
  
- 	rc = keyctl_describe_alloc(key, &buf);
- 	if (rc == -1) {
- 		syslog(LOG_ERR, "keyctl_describe_alloc failed: %s",
- 		       strerror(errno));
--		rc = 1;
--		goto out;
-+		goto out_exit_plugin;
+ cifsacl:
+ 	if (bufsize >= XATTR_SIZE_MAX) {
+ 		printf("buffer to allocate exceeds max size of %d\n",
+ 				XATTR_SIZE_MAX);
+-		return -1;
++		ret = -1;
++		goto out;
  	}
  
- 	syslog(LOG_DEBUG, "key description: %s", buf);
+ 	attrval = malloc(bufsize * sizeof(char));
+ 	if (!attrval) {
+ 		printf("error allocating memory for attribute value buffer\n");
+-		return -1;
++		ret = -1;
++		goto out;
+ 	}
  
- 	rc = cifs_idmap(key, buf);
-+out_exit_plugin:
-+	exit_plugin(plugin_handle);
+ 	attrlen = getxattr(filename, ATTRNAME, attrval, bufsize);
+@@ -421,7 +408,8 @@ cifsacl:
+ 	parse_sec_desc((struct cifs_ntsd *)attrval, attrlen, raw);
+ 
+ 	free(attrval);
+-
  out:
- 	return rc;
+-	return 0;
++	if (plugin_loaded)
++		exit_plugin(plugin_handle);
++	return ret;
  }
-diff --git a/cifsidmap.h b/cifsidmap.h
-index f82e990..c63d0da 100644
---- a/cifsidmap.h
-+++ b/cifsidmap.h
-@@ -34,7 +34,9 @@ struct cifs_sid {
- 	uint32_t sub_auth[SID_MAX_SUB_AUTHORITIES];
- } __attribute__((packed));
- 
--/* Plugins should implement the following functions: */
-+/*
-+ * Plugins should implement the following functions:
-+ */
- 
- /**
-  * cifs_idmap_init_plugin - Initialize the plugin interface
-@@ -74,7 +76,8 @@ struct cifs_sid {
-  * representation or mapped name in a heap-allocated buffer. The caller
-  * of this function is expected to free "name" on success. Returns 0 on
-  * success and non-zero on error. On error, the errmsg pointer passed
-- * in to the init_plugin function should point to an error string.
-+ * in to the init_plugin function should point to an error string. The
-+ * caller will not free the error string.
-  *
-  * int cifs_idmap_sid_to_str(void *handle, const struct cifs_sid *sid,
-  * 				char **name);
-@@ -90,10 +93,69 @@ struct cifs_sid {
-  * a SID to a struct cifs_sid. The cifs_sid should already be
-  * allocated. Returns 0 on success and non-zero on error. On error, the
-  * plugin should reset the errmsg pointer passed to the init_plugin
-- * function to an error string.
-+ * function to an error string. The caller will not free the error string.
-  *
-  * int cifs_idmap_str_to_sid(void *handle, const char *name,
-  * 				struct cifs_sid *sid);
-  */
- 
-+/**
-+ * cifs_idmap_sid_to_uid - convert struct cifs_sid to uid
-+ * @handle - context handle
-+ * @sid    - pointer to struct cifs_sid to be converted
-+ * @uid    - pointer to uid_t where uid should be stored
-+ *
-+ * This function should map a struct cifs_sid to a uid. Returns 0 on success
-+ * and non-zero on error. On error, the plugin should reset the errmsg pointer
-+ * passed to the init_plugin function to an error string. The caller will not
-+ * free the error string.
-+ *
-+ * int cifs_idmap_sid_to_uid(void *handle, const struct cifs_sid *sid,
-+ * 				uid_t *uid);
-+ */
-+
-+/**
-+ * cifs_idmap_sid_to_gid - convert struct cifs_sid to gid
-+ * @handle - context handle
-+ * @sid    - pointer to struct cifs_sid to be converted
-+ * @gid    - pointer to gid_t where gid should be stored
-+ *
-+ * This function should map a struct cifs_sid to a gid. Returns 0 on success
-+ * and non-zero on error. On error, the plugin should reset the errmsg pointer
-+ * passed to the init_plugin function to an error string. The caller will not
-+ * free the error string.
-+ *
-+ * int cifs_idmap_sid_to_uid(void *handle, const struct cifs_sid *sid,
-+ * 				gid_t *gid);
-+ */
-+
-+/**
-+ * cifs_idmap_uid_to_sid - convert uid to struct cifs_sid
-+ * @handle - context handle
-+ * @uid    - uid_t to be converted to a SID
-+ * @sid    - pointer to struct cifs_sid where result should be stored
-+ *
-+ * This function should map a uid to a struct cifs_sid. Returns 0 on success
-+ * and non-zero on error. On error, the plugin should reset the errmsg pointer
-+ * passed to the init_plugin function to an error string. The caller will not
-+ * free the error string.
-+ *
-+ * int cifs_idmap_uid_to_sid(void *handle, const uid_t uid,
-+ * 				struct cifs_sid *sid);
-+ */
-+
-+/**
-+ * cifs_idmap_gid_to_sid - convert gid to struct cifs_sid
-+ * @handle - context handle
-+ * @gid    - gid_t to be converted to a SID
-+ * @sid    - pointer to struct cifs_sid where result should be stored
-+ *
-+ * This function should map a gid to a struct cifs_sid. Returns 0 on success
-+ * and non-zero on error. On error, the plugin should reset the errmsg pointer
-+ * passed to the init_plugin function to an error string. The caller will not
-+ * free the error string.
-+ *
-+ * int cifs_idmap_gid_to_sid(void *handle, const gid_t gid,
-+ * 				struct cifs_sid *sid);
-+ */
- #endif /* _CIFSIDMAP_H */
 diff --git a/idmap_plugin.c b/idmap_plugin.c
-index bef4e93..bf95aca 100644
---- a/idmap_plugin.c
+new file mode 100644
+index 0000000..4dbeca7
+--- /dev/null
 +++ b/idmap_plugin.c
-@@ -23,6 +23,7 @@
- #include <dlfcn.h>
- #include <errno.h>
- #include <stdint.h>
-+#include <sys/types.h>
- 
- #include "cifsacl.h"
- 
-@@ -109,3 +110,51 @@ str_to_sid(void *handle, const char *name, struct cifs_sid *sid)
- 
- 	return (*entry)(handle, name, sid);
- }
+@@ -0,0 +1,99 @@
++/*
++ * ID Mapping Plugin interface for cifs-utils
++ * Copyright (C) 2012 Jeff Layton (jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+int
-+sid_to_uid(void *handle, const struct cifs_sid *sid, uid_t *uid)
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
++
++#include <dlfcn.h>
++#include <errno.h>
++#include <stdint.h>
++
++#include "cifsacl.h"
++
++const char *plugin_errmsg;
++static void *plugin;
++
++static void *
++resolve_symbol(const char *symbol_name)
 +{
-+	int (*entry)(void *handle, const struct cifs_sid *sid, uid_t *uid);
++	void *symbol;
 +
-+	*(void **)(&entry) = resolve_symbol("cifs_idmap_sid_to_uid");
-+	if (!entry)
-+		return -ENOSYS;
++	dlerror();
++	symbol = dlsym(plugin, symbol_name);
++	if (!symbol)
++		plugin_errmsg = dlerror();
++	return symbol;
++}
 +
-+	return (*entry)(handle, sid, uid);
++/*
++ * open the plugin. Note that we leave it open over the life of the
++ * program. It gets closed on exit.
++ */
++static int
++open_plugin(void)
++{
++	if (plugin)
++		return 0;
++
++	plugin = dlopen(IDMAP_PLUGIN_PATH, RTLD_LAZY);
++	if (!plugin) {
++		plugin_errmsg = dlerror();
++		return -EIO;
++	}
++
++	return 0;
 +}
 +
 +int
-+sid_to_gid(void *handle, const struct cifs_sid *sid, gid_t *gid)
++init_plugin(void **handle)
 +{
-+	int (*entry)(void *handle, const struct cifs_sid *sid, uid_t *gid);
++	int ret;
++	int (*init)(void **, const char **);
 +
-+	*(void **)(&entry) = resolve_symbol("cifs_idmap_sid_to_gid");
-+	if (!entry)
++	ret = open_plugin();
++	if (ret)
++		return ret;
++
++	init = resolve_symbol("cifs_idmap_init_plugin");
++	if (!init)
 +		return -ENOSYS;
++	return (*init)(handle, &plugin_errmsg);
++}
 +
-+	return (*entry)(handle, sid, gid);
++void
++exit_plugin(void *handle)
++{
++	int (*exit)(void *);
++
++	exit = resolve_symbol("cifs_idmap_exit_plugin");
++	if (exit)
++		(*exit)(handle);
 +}
 +
 +int
-+uid_to_sid(void *handle, const uid_t uid, struct cifs_sid *sid)
++sid_to_str(void *handle, const struct cifs_sid *sid, char **name)
 +{
-+	int (*entry)(void *handle, const uid_t uid, struct cifs_sid *sid);
++	int (*entry)(void *, const struct cifs_sid *, char **);
 +
-+	*(void **)(&entry) = resolve_symbol("cifs_idmap_uid_to_sid");
++	*(void **)(&entry) = resolve_symbol("cifs_idmap_sid_to_str");
 +	if (!entry)
 +		return -ENOSYS;
 +
-+	return (*entry)(handle, uid, sid);
-+}
-+
-+int
-+gid_to_sid(void *handle, const gid_t gid, struct cifs_sid *sid)
-+{
-+	int (*entry)(void *handle, const gid_t gid, struct cifs_sid *sid);
-+
-+	*(void **)(&entry) = resolve_symbol("cifs_idmap_gid_to_sid");
-+	if (!entry)
-+		return -ENOSYS;
-+
-+	return (*entry)(handle, gid, sid);
++	return (*entry)(handle, sid, name);
 +}
 diff --git a/idmap_plugin.h b/idmap_plugin.h
-index 51e3a76..d149414 100644
---- a/idmap_plugin.h
+new file mode 100644
+index 0000000..277bb12
+--- /dev/null
 +++ b/idmap_plugin.h
-@@ -46,4 +46,16 @@ extern int sid_to_str(void *handle, const struct cifs_sid *sid, char **name);
- /* Convert string to cifs_sid. */
- extern int str_to_sid(void *handle, const char *name, struct cifs_sid *csid);
- 
-+/* Convert cifs_sid to a UID */
-+extern int sid_to_uid(void *handle, const struct cifs_sid *sid, uid_t *uid);
+@@ -0,0 +1,46 @@
++/*
++ * ID Mapping Plugin interface for cifs-utils
++ * Copyright (C) 2012 Jeff Layton (jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+/* Convert cifs_sid to a GID */
-+extern int sid_to_gid(void *handle, const struct cifs_sid *sid, gid_t *gid);
++#include "cifsidmap.h"
 +
-+/* Convert UID to cifs_sid */
-+extern int uid_to_sid(void *handle, const uid_t uid, struct cifs_sid *sid);
++#ifndef _IDMAP_PLUGIN_H
++#define _IDMAP_PLUGIN_H
 +
-+/* Convert GID to cifs_sid */
-+extern int gid_to_sid(void *handle, const gid_t gid, struct cifs_sid *sid);
++/*
++ * On error, plugin functions will set this pointer to a string description
++ * of the error. The string should not be freed.
++ */
++extern const char *plugin_errmsg;
 +
- #endif /* _IDMAP_PLUGIN_H */
++/*
++ * External API. Programs should call this to use the plugin functionality.
++ */
++
++/*
++ * Initialize plugin. Returns an opaque handle that should be passed to
++ * other idmapping functions.
++ */
++extern int init_plugin(void **handle);
++
++/* Close out an init'ed handle */
++extern void exit_plugin(void *handle);
++
++/* Convert cifs_sid to a string. Caller must free *name on success */
++extern int sid_to_str(void *handle, const struct cifs_sid *sid, char **name);
++
++#endif /* _IDMAP_PLUGIN_H */
 diff --git a/idmapwb.c b/idmapwb.c
-index aa53150..8d5e3f2 100644
---- a/idmapwb.c
+new file mode 100644
+index 0000000..858028f
+--- /dev/null
 +++ b/idmapwb.c
-@@ -160,6 +160,70 @@ convert_sid:
- 	return 0;
- }
- 
-+int
-+cifs_idmap_sid_to_uid(void *handle __attribute__((unused)),
-+			const struct cifs_sid *csid, uid_t *uid)
+@@ -0,0 +1,115 @@
++/*
++ * Winbind ID Mapping Plugin
++ * Copyright (C) 2012 Jeff Layton (jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org)
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 3 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif /* HAVE_CONFIG_H */
++
++#include <stdint.h>
++#include <endian.h>
++#include <string.h>
++#include <errno.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <wbclient.h>
++
++#include "cifsidmap.h"
++
++static const char **plugin_errmsg;
++
++/*
++ * Winbind keeps wbcDomainSid fields in host-endian. Copy fields from the
++ * csid to the wsid, while converting the subauthority fields from LE.
++ */
++static void
++csid_to_wsid(struct wbcDomainSid *wsid, const struct cifs_sid *csid)
 +{
++	int i;
++	uint8_t num_subauth = (csid->num_subauth <= WBC_MAXSUBAUTHS) ?
++				csid->num_subauth : WBC_MAXSUBAUTHS;
++
++	wsid->sid_rev_num = csid->revision;
++	wsid->num_auths = num_subauth;
++	for (i = 0; i < NUM_AUTHS; i++)
++		wsid->id_auth[i] = csid->authority[i];
++	for (i = 0; i < num_subauth; i++)
++		wsid->sub_auths[i] = le32toh(csid->sub_auth[i]);
++}
++
++int
++cifs_idmap_sid_to_str(void *handle __attribute__ ((unused)),
++			const struct cifs_sid *csid, char **string)
++{
++	int rc;
 +	wbcErr wbcrc;
++	char *domain = NULL;
++	char *name = NULL;
++	enum wbcSidType sntype;
 +	struct wbcDomainSid wsid;
++	size_t len;
 +
 +	csid_to_wsid(&wsid, csid);
-+	wbcrc = wbcSidToUid(&wsid, uid);
++
++	wbcrc = wbcLookupSid(&wsid, &domain, &name, &sntype);
 +	if (!WBC_ERROR_IS_OK(wbcrc)) {
 +		*plugin_errmsg = wbcErrorString(wbcrc);
 +		return -EIO;
 +	}
-+	return 0;
++
++	/* +1 for '\\' and +1 for NULL terminator */
++	len = strlen(domain) + 1 + strlen(name) + 1;
++
++	*string = malloc(len);
++	if (!*string) {
++		*plugin_errmsg = "Unable to allocate memory";
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	rc = snprintf(*string, len, "%s\\%s", domain, name);
++	if (rc >= (long)len) {
++		free(*string);
++		*plugin_errmsg = "Resulting string was truncated";
++		*string = NULL;
++		rc = -EIO;
++	} else {
++		rc = 0;
++	}
++out:
++	wbcFreeMemory(domain);
++	wbcFreeMemory(name);
++	return rc;
 +}
 +
++/*
++ * For the winbind plugin, we don't need to do anything special on
++ * init or exit
++ */
 +int
-+cifs_idmap_sid_to_gid(void *handle __attribute__((unused)),
-+			const struct cifs_sid *csid, gid_t *gid)
++cifs_idmap_init_plugin(void **handle __attribute__((unused)), const char **errmsg)
 +{
-+	wbcErr wbcrc;
-+	struct wbcDomainSid wsid;
-+
-+	csid_to_wsid(&wsid, csid);
-+	wbcrc = wbcSidToGid(&wsid, gid);
-+	if (!WBC_ERROR_IS_OK(wbcrc)) {
-+		*plugin_errmsg = wbcErrorString(wbcrc);
-+		return -EIO;
-+	}
++	plugin_errmsg = errmsg;
 +	return 0;
 +}
 +
-+int
-+cifs_idmap_uid_to_sid(void *handle __attribute__((unused)),
-+			const uid_t uid, struct cifs_sid *csid)
++void
++cifs_idmap_exit_plugin(void *handle __attribute__((unused)))
 +{
-+	wbcErr wbcrc;
-+	struct wbcDomainSid wsid;
-+
-+	wbcrc = wbcUidToSid(uid, &wsid);
-+	if (!WBC_ERROR_IS_OK(wbcrc)) {
-+		*plugin_errmsg = wbcErrorString(wbcrc);
-+		return -EIO;
-+	}
-+	wsid_to_csid(csid, &wsid);
-+	return 0;
++	return;
 +}
-+
-+int
-+cifs_idmap_gid_to_sid(void *handle __attribute__((unused)),
-+			const gid_t gid, struct cifs_sid *csid)
-+{
-+	wbcErr wbcrc;
-+	struct wbcDomainSid wsid;
-+
-+	wbcrc = wbcGidToSid(gid, &wsid);
-+	if (!WBC_ERROR_IS_OK(wbcrc)) {
-+		*plugin_errmsg = wbcErrorString(wbcrc);
-+		return -EIO;
-+	}
-+	wsid_to_csid(csid, &wsid);
-+	return 0;
-+}
-+
- /*
-  * For the winbind plugin, we don't need to do anything special on
-  * init or exit
 -- 
 1.7.11.7
