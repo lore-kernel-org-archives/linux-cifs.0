@@ -1,55 +1,71 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH 0/3] Add O_DENY* flags to fcntl and cifs
-Date: Mon, 17 Dec 2012 10:36:44 -0500
-Message-ID: <20121217153644.GD23546@fieldses.org>
-References: <1354818391-7968-1-git-send-email-piastry@etersoft.ru>
- <20121207161602.GA17710@infradead.org>
- <495d17310e0a687d446afc86def0f058@office.etersoft.ru>
- <20121212083401.GW5010@snowdrop.l8s.co.uk>
- <CAKywueSN++ZCNJ1zbET_axuwXd2ZujvSof9H82E3AdeZWY_BgQ@mail.gmail.com>
- <20121214153000.62af6cbc@pyramind.ukuu.org.uk>
- <CAH2r5muRyB2529EcQXFysrSDpMKe0m3JfiEc5929O6oTmG-ThQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: don't compare uniqueids in cifs_prime_dcache unless server inode numbers are in use
+Date: Tue, 18 Dec 2012 06:46:22 -0500
+Message-ID: <1355831182-21555-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alan Cox <alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org>,
-	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	David Laight <david-SsvC4kVYujlaa/9Udqfwiw@public.gmane.org>,
-	Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Oliver.Moessinger-Lx0bRpaNhpazQB+pC5nmwQ@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAH2r5muRyB2529EcQXFysrSDpMKe0m3JfiEc5929O6oTmG-ThQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Dec 14, 2012 at 01:19:18PM -0600, Steve French wrote:
-> On Fri, Dec 14, 2012 at 9:30 AM, Alan Cox <alan-qBU/x9rampVanCEyBjwyrvXRex20P6io@public.gmane.org> wrote:
-> >> We can make this feature (passing O_DENY* flags received from clients
-> >> to filesystem) can be turned on/off on Samba/NFS server to let this
-> >> particular use case work. In general, I think we really need to be
-> >> sure that nobody has a read access for files that a Windows process
-> >> opened with O_DENYREAD (because there can be important reasons for the
-> >> Windows process to do so).
-> >
-> > It should only affect windows emulated tasks, nothing else
-> 
-> yes, but not just wine - there is probably a case for Samba server and
-> NFSv4 to optionally request such behafvior).
+Oliver reported that commit cd60042c caused his cifs mounts to
+continually thrash through new inodes on readdir. His servers are not
+sending inode numbers (or he's not using them), and the new test in
+that function doesn't account for that sort of setup correctly.
 
-Agreed, but:
+If we're not using server inode numbers, then assume that the inode
+attached to the dentry hasn't changed. Go ahead and update the
+attributes in place, but keep the same inode number.
 
-> Also we are likely to
-> see more cases where users want to run Samba over an NFS mount and
-> vice versa.
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.5+
+Reported-and-Tested-by: Oliver M=C3=B6ssinger <Oliver.Moessinger@ichaus=
+=2Ede>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/readdir.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-I don't personally see the interest in this case.
-
-(And in fact I'd rather we removed the nfs export code for cifs; I seem
-to recall from the last discussion that filehandle lookups get ESTALE
-for inodes that have gone out of cache, and that that wasn't really
-fixable.)
-
---b.
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index 6002fdc..cdd6ff4 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -78,6 +78,7 @@ cifs_prime_dcache(struct dentry *parent, struct qstr =
+*name,
+ 	struct dentry *dentry, *alias;
+ 	struct inode *inode;
+ 	struct super_block *sb =3D parent->d_inode->i_sb;
++	struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
+=20
+ 	cFYI(1, "%s: for %s", __func__, name->name);
+=20
+@@ -91,10 +92,20 @@ cifs_prime_dcache(struct dentry *parent, struct qst=
+r *name,
+ 		int err;
+=20
+ 		inode =3D dentry->d_inode;
+-		/* update inode in place if i_ino didn't change */
+-		if (inode && CIFS_I(inode)->uniqueid =3D=3D fattr->cf_uniqueid) {
+-			cifs_fattr_to_inode(inode, fattr);
+-			goto out;
++		if (inode) {
++			/*
++			 * If we're generating inode numbers, then we don't
++			 * want to clobber the existing one with the one that
++			 * the readdir code created.
++			 */
++			if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM))
++				fattr->cf_uniqueid =3D CIFS_I(inode)->uniqueid;
++
++			/* update inode in place if i_ino didn't change */
++			if (CIFS_I(inode)->uniqueid =3D=3D fattr->cf_uniqueid) {
++				cifs_fattr_to_inode(inode, fattr);
++				goto out;
++			}
+ 		}
+ 		err =3D d_invalidate(dentry);
+ 		dput(dentry);
+--=20
+1.7.11.7
