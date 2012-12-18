@@ -1,92 +1,59 @@
 From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] setcifsacl: remove syslog goop
-Date: Tue, 18 Dec 2012 08:59:36 -0500
-Message-ID: <20121218085936.5d7ed046@tlielax.poochiereds.net>
-References: <1355409355-9565-1-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v2 0/5] cifs-utils: plugin interface for SID to UID/GID mapping
+Date: Tue, 18 Dec 2012 09:10:43 -0500
+Message-ID: <1355839848-24118-1-git-send-email-jlayton@samba.org>
+Cc: samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1355409355-9565-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 13 Dec 2012 09:35:55 -0500
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+This is the second official posting for the plugin interface. Major
+changes since the last set are:
 
-> setcifsacl doesn't use syslog, so no need to open a channel to it.
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  setcifsacl.c | 15 ++++-----------
->  1 file changed, 4 insertions(+), 11 deletions(-)
-> 
-> diff --git a/setcifsacl.c b/setcifsacl.c
-> index 593997a..e8c10a9 100644
-> --- a/setcifsacl.c
-> +++ b/setcifsacl.c
-> @@ -26,7 +26,6 @@
->  
->  #include <string.h>
->  #include <getopt.h>
-> -#include <syslog.h>
->  #include <stdint.h>
->  #include <stdbool.h>
->  #include <unistd.h>
-> @@ -39,8 +38,6 @@
->  #include <sys/xattr.h>
->  #include "cifsacl.h"
->  
-> -static const char *prog;
-> -
->  enum setcifsacl_actions {
->  	ActUnknown = -1,
->  	ActDelete,
-> @@ -732,7 +729,7 @@ setacl_action(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd,
->  }
->  
->  static void
-> -setcifsacl_usage(void)
-> +setcifsacl_usage(const char *prog)
->  {
->  	fprintf(stderr,
->  	"%s: Alter CIFS/NTFS ACL in a security descriptor of a file object\n",
-> @@ -771,10 +768,6 @@ main(const int argc, char *const argv[])
->  	struct cifs_ace **cacesptr = NULL, **facesptr = NULL;
->  	struct cifs_ntsd *ntsdptr = NULL;
->  
-> -	prog = basename(argv[0]);
-> -
-> -	openlog(prog, 0, LOG_DAEMON);
-> -
->  	c = getopt(argc, argv, "hvD:M:a:S:");
->  	switch (c) {
->  	case 'D':
-> @@ -794,19 +787,19 @@ main(const int argc, char *const argv[])
->  		ace_list = optarg;
->  		break;
->  	case 'h':
-> -		setcifsacl_usage();
-> +		setcifsacl_usage(basename(argv[0]));
->  		return 0;
->  	case 'v':
->  		printf("Version: %s\n", VERSION);
->  		return 0;
->  	default:
-> -		setcifsacl_usage();
-> +		setcifsacl_usage(basename(argv[0]));
->  		return -1;
->  	}
->  
->  	/* We expect 1 argument in addition to the option */
->  	if (argc != 4) {
-> -		setcifsacl_usage();
-> +		setcifsacl_usage(basename(argv[0]));
->  		return -1;
->  	}
->  	filename = argv[3];
+1/ There's a header file now that plugin implementers are expected to use
 
-Merged...
+2/ New manpage for idmapwb.so and cleanups to the existing manpages to
+   discuss plugin configuration
+
+3/ Better handling for the plugin_errmsg variable. A pointer to the
+   pointer is passed into the init_plugin routine, which allows the
+   setting of it in the context.
+
+With this, I think I'm pretty close to something mergeable, but
+comments and review are still appreciated.
+
+Jeff Layton (5):
+  cifs-utils: struct cifs_sid definition to new cifsidmap.h header
+  cifs-utils: new plugin architecture for ID mapping code
+  cifs-utils: convert setcifsacl to use the plugin interface
+  cifs-utils: convert cifs.idmap to use plugin interface
+  cifs-utils: add a manpage for idmapwb
+
+ Makefile.am                     |  37 ++++--
+ cifs.idmap.8.in                 |  22 ++--
+ cifs.idmap.c                    |  93 +++++++--------
+ cifsacl.h                       |  12 +-
+ cifsidmap.h                     | 161 ++++++++++++++++++++++++++
+ configure.ac                    |  10 ++
+ getcifsacl.1 => getcifsacl.1.in |   5 +-
+ getcifsacl.c                    |  98 +++++++---------
+ idmap_plugin.c                  | 160 ++++++++++++++++++++++++++
+ idmap_plugin.h                  |  61 ++++++++++
+ idmapwb.8.in                    | 148 ++++++++++++++++++++++++
+ idmapwb.c                       | 242 ++++++++++++++++++++++++++++++++++++++++
+ idmapwb.pod                     |  26 +++++
+ setcifsacl.1 => setcifsacl.1.in |   6 +-
+ setcifsacl.c                    |  70 +++---------
+ 15 files changed, 952 insertions(+), 199 deletions(-)
+ create mode 100644 cifsidmap.h
+ rename getcifsacl.1 => getcifsacl.1.in (87%)
+ create mode 100644 idmap_plugin.c
+ create mode 100644 idmap_plugin.h
+ create mode 100644 idmapwb.8.in
+ create mode 100644 idmapwb.c
+ create mode 100644 idmapwb.pod
+ rename setcifsacl.1 => setcifsacl.1.in (91%)
+
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+1.7.11.7
