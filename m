@@ -1,20 +1,20 @@
-From: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux mounting Windows share)
-Date: Wed, 19 Dec 2012 11:15:53 -0800 (PST)
-Message-ID: <1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
-References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com> <20121219090322.3999f995@tlielax.poochiereds.net>
-Reply-To: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+From: Tim Perry <tim.perry-kUnrLEE8I/oKpCjwLQ55aZ9NZdITTVap@public.gmane.org>
+Subject: Fw: CIFS mount fails if I ctrl-c a long-running find process (Linux mounting Windows share)
+Date: Wed, 19 Dec 2012 11:30:32 -0800 (PST)
+Message-ID: <1355945432.81847.YahooMailNeo@web160302.mail.bf1.yahoo.com>
+References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com> <20121219090322.3999f995@tlielax.poochiereds.net> <1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
+Reply-To: Tim Perry <tim.perry-kUnrLEE8I/oKpCjwLQ55aZ9NZdITTVap@public.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: unlisted-recipients:; (no To-header on input)
+To: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121219090322.3999f995-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <1355944553.61735.YahooMailNeo-roeDNvZK7RYeBhY5O9xny5EhsgyP+Z75VpNB7YpNyf8@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 Dear Jeff, et. al.,
+
 
 I can reproduce the problem by starting "find . -name \*.ext"and killin=
 g it when connected to either of our two Windows 2003 Servers. I can *n=
@@ -40,6 +40,59 @@ I tried using strace but hitting ctrl-c killed strace (obviously, oops)=
 , but interestingly, this did *not* hang the file system. I will try an=
 d kill the find command (kill -9 perhaps?) and see if I can recreate th=
 e error that way.
+
+CONTINUING HERE:
+I don't think strace on the find command will help because it isn't mak=
+ing the network connections. CIFS is making the network connections. Ma=
+ybe I can cause the mount to happen with an strace version of CIFS? =A0=
+How would I do that?
+
+Anyhow, I opened two terminal windows and proceeded as follows:
+
+In terminal 1:
+
+$ strace find . -name \*adzzz >& ~/straceFind.txt
+
+
+In terminal 2:
+$ ps aux | grep find | grep -v strace
+perry =A0 =A0 2583 12.6 =A00.0 =A0 4792 =A01088 pts/5 =A0 =A0R+ =A0 11:=
+27 =A0 0:00 find . -name *adzzz
+perry =A0 =A0 2585 =A00.0 =A00.0 =A0 4388 =A0 828 pts/2 =A0 =A0S+ =A0 1=
+1:27 =A0 0:00 grep find
+$ kill -9 2583
+
+=46ile system dies.
+
+I've attaced the straceFind.txt, but it just shows find walking the fil=
+esystem tree:
+statat64(AT_FDCWD, "0010", {st_mode=3DS_IFDIR|0777, st_size=3D0, ...}, =
+AT_SYMLINK_NOFOLLOW) =3D 0
+openat(AT_FDCWD, "0010", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY|O_=
+CLOEXEC) =3D 5
+fchdir(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =3D=
+ 0
+getdents64(5, /* 14 entries */, 32768) =A0=3D 448
+getdents64(5, /* 0 entries */, 32768) =A0 =3D 0
+close(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+=3D 0
+fstatat64(AT_FDCWD, "_vti_cnf", {st_mode=3DS_IFDIR|0777, st_size=3D0, .=
+=2E.}, AT_SYMLINK_NOFOLLOW) =3D 0
+openat(AT_FDCWD, "_vti_cnf", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECTOR=
+Y|O_CLOEXEC) =3D 5
+fchdir(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =3D=
+ 0
+getdents64(5, /* 13 entries */, 32768) =A0=3D 416
+getdents64(5, /* 0 entries */, 32768) =A0 =3D 0
+close(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
+=3D 0
+open("..", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY|O_NOFOL=
+LOW) =3D 5
+fstat64(5, {st_mode=3DS_IFDIR|0777, st_size=3D0, ...}) =3D 0
+fchdir(
+
+
+Ideas?
 
 Tim
 
@@ -144,3 +197,9 @@ state is the process in at that time?
 
 --=20
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-cifs" i=
+n
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at=A0 http://vger.kernel.org/majordomo-info.html
