@@ -1,18 +1,62 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux
- mounting Windows share)
-Date: Wed, 19 Dec 2012 09:03:22 -0500
-Message-ID: <20121219090322.3999f995@tlielax.poochiereds.net>
-References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com>
+From: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux mounting Windows share)
+Date: Wed, 19 Dec 2012 11:15:53 -0800 (PST)
+Message-ID: <1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
+References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com> <20121219090322.3999f995@tlielax.poochiereds.net>
+Reply-To: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1355872616.69791.YahooMailNeo-roeDNvZK7RYR8UyDmTZ/NZEhsgyP+Z75VpNB7YpNyf8@public.gmane.org>
+In-Reply-To: <20121219090322.3999f995-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+Dear Jeff, et. al.,
+
+I can reproduce the problem by starting "find . -name \*.ext"and killin=
+g it when connected to either of our two Windows 2003 Servers. I can *n=
+ot* reproduce it doing the same thing connected to a windows 7 box.
+
+$ uname -a
+Linux servername 3.2.0-34-generic #53-Ubuntu SMP Thu Nov 15 10:49:02 UT=
+C 2012 i686 i686 i386 GNU/Linux
+$ cat /proc/version
+
+Linux version 3.2.0-34-generic (buildd@roseapple) (gcc version 4.6.3 (U=
+buntu/Linaro 4.6.3-1ubuntu5) ) #53-Ubuntu SMP Thu Nov 15 10:49:02 UTC 2=
+012
+$ lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description: =A0 =A0Ubuntu 12.04.1 LTS
+Release: =A0 =A0 =A0 =A012.04
+Codename: =A0 =A0 =A0 precise
+
+
+I tried using strace but hitting ctrl-c killed strace (obviously, oops)=
+, but interestingly, this did *not* hang the file system. I will try an=
+d kill the find command (kill -9 perhaps?) and see if I can recreate th=
+e error that way.
+
+Tim
+
+
+
+
+
+
+
+
+----- Original Message -----
+=46rom: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
+Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sent: Wednesday, December 19, 2012 6:03 AM
+Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (=
+Linux mounting Windows share)
 
 On Tue, 18 Dec 2012 15:16:56 -0800 (PST)
 Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org> wrote:
