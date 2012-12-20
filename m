@@ -1,124 +1,100 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux
- mounting Windows share)
-Date: Thu, 20 Dec 2012 09:38:06 -0500
-Message-ID: <20121220093806.537c2496@corrin.poochiereds.net>
-References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com>
-	<20121219090322.3999f995@tlielax.poochiereds.net>
-	<1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
-	<1355945432.81847.YahooMailNeo@web160302.mail.bf1.yahoo.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: don't present the cifsFYI procfile when
+ CONFIG_CIFS_DEBUG is disabled
+Date: Thu, 20 Dec 2012 15:25:18 -0600
+Message-ID: <CAH2r5mssVLMr-knN4mBdbhKCV0_YvriUX3TKaGzp-vzLcNtyNQ@mail.gmail.com>
+References: <1355831339-22043-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Tim Perry <tim.perry-kUnrLEE8I/oKpCjwLQ55aZ9NZdITTVap@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1355945432.81847.YahooMailNeo-roeDNvZK7RYR8UyDmTZ/NZEhsgyP+Z75VpNB7YpNyf8@public.gmane.org>
+In-Reply-To: <1355831339-22043-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 19 Dec 2012 11:30:32 -0800 (PST)
-Tim Perry <tim.perry-kUnrLEE8I/oKpCjwLQ55aZ9NZdITTVap@public.gmane.org> wrote:
+You make a good point that we need to adjust cifsFYI when CONFIG_CIFS_DEBUG
+is turned off by embedded distros to save memory but we can't remove it since it
+controls CIFS_RC and CIFS_TIMER messages (which we use for debugging,
+and should work even with CONFIG_CIFS_DEBUG is turned off - to allow
+us to see slow requests and get CIFS/SMB2 network errors logged).
 
-> Dear Jeff, et. al.,
->=20
->=20
-> I can reproduce the problem by starting "find . -name \*.ext"and kill=
-ing it when connected to either of our two Windows 2003 Servers. I can =
-*not* reproduce it doing the same thing connected to a windows 7 box.
->=20
-> $ uname -a
-> Linux servername 3.2.0-34-generic #53-Ubuntu SMP Thu Nov 15 10:49:02 =
-UTC 2012 i686 i686 i386 GNU/Linux
-> $ cat /proc/version
->=20
-> Linux version 3.2.0-34-generic (buildd@roseapple) (gcc version 4.6.3 =
-(Ubuntu/Linaro 4.6.3-1ubuntu5) ) #53-Ubuntu SMP Thu Nov 15 10:49:02 UTC=
- 2012
-> $ lsb_release -a
-> No LSB modules are available.
-> Distributor ID: Ubuntu
-> Description: =A0 =A0Ubuntu 12.04.1 LTS
-> Release: =A0 =A0 =A0 =A012.04
-> Codename: =A0 =A0 =A0 precise
->=20
->=20
-> I tried using strace but hitting ctrl-c killed strace (obviously, oop=
-s), but interestingly, this did *not* hang the file system. I will try =
-and kill the find command (kill -9 perhaps?) and see if I can recreate =
-the error that way.
->=20
-> CONTINUING HERE:
-> I don't think strace on the find command will help because it isn't m=
-aking the network connections. CIFS is making the network connections. =
-Maybe I can cause the mount to happen with an strace version of CIFS? =A0=
-How would I do that?
->=20
-> Anyhow, I opened two terminal windows and proceeded as follows:
->=20
-> In terminal 1:
->=20
-> $ strace find . -name \*adzzz >& ~/straceFind.txt
->=20
->=20
-> In terminal 2:
-> $ ps aux | grep find | grep -v strace
-> perry =A0 =A0 2583 12.6 =A00.0 =A0 4792 =A01088 pts/5 =A0 =A0R+ =A0 1=
-1:27 =A0 0:00 find . -name *adzzz
-> perry =A0 =A0 2585 =A00.0 =A00.0 =A0 4388 =A0 828 pts/2 =A0 =A0S+ =A0=
- 11:27 =A0 0:00 grep find
-> $ kill -9 2583
->=20
-> File system dies.
->=20
-> I've attaced the straceFind.txt, but it just shows find walking the f=
-ilesystem tree:
-> statat64(AT_FDCWD, "0010", {st_mode=3DS_IFDIR|0777, st_size=3D0, ...}=
-, AT_SYMLINK_NOFOLLOW) =3D 0
-> openat(AT_FDCWD, "0010", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY|=
-O_CLOEXEC) =3D 5
-> fchdir(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =3D 0
-> getdents64(5, /* 14 entries */, 32768) =A0=3D 448
-> getdents64(5, /* 0 entries */, 32768) =A0 =3D 0
-> close(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0=3D 0
-> fstatat64(AT_FDCWD, "_vti_cnf", {st_mode=3DS_IFDIR|0777, st_size=3D0,=
- ...}, AT_SYMLINK_NOFOLLOW) =3D 0
-> openat(AT_FDCWD, "_vti_cnf", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECT=
-ORY|O_CLOEXEC) =3D 5
-> fchdir(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =3D 0
-> getdents64(5, /* 13 entries */, 32768) =A0=3D 416
-> getdents64(5, /* 0 entries */, 32768) =A0 =3D 0
-> close(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0=3D 0
-> open("..", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY|O_NOF=
-OLLOW) =3D 5
-> fstat64(5, {st_mode=3DS_IFDIR|0777, st_size=3D0, ...}) =3D 0
-> fchdir(
->=20
->=20
-> Ideas?
->=20
+I am fine with the idea of preventing enabling CIFS_INFO in
+/proc/fs/cifs/cifsFYI
+when CONFIG_CIFS_DEBUG is turned off (e.g. masking off the 0x0004 or
+rejecting it if the user tries to set that bit (to enable various informational
+messages which aren't going to print) when on an embedded system
+with debugging not compiled in).
 
-That kernel is pretty old, so you may want to try a more recent one.
+On Tue, Dec 18, 2012 at 5:48 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> If all of the debug messages are compiled out, then this knob is no
+> longer connected to anything useful. There's no point in presenting
+> it at all in that case.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifs_debug.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+> index d9ea6ed..f5de4c9 100644
+> --- a/fs/cifs/cifs_debug.c
+> +++ b/fs/cifs/cifs_debug.c
+> @@ -371,7 +371,11 @@ static const struct file_operations cifs_stats_proc_fops = {
+>  #endif /* STATS */
+>
+>  static struct proc_dir_entry *proc_fs_cifs;
+> +
+> +#ifdef CONFIG_CIFS_DEBUG
+>  static const struct file_operations cifsFYI_proc_fops;
+> +#endif /* CONFIG_CIFS_DEBUG */
+> +
+>  static const struct file_operations cifs_lookup_cache_proc_fops;
+>  static const struct file_operations traceSMB_proc_fops;
+>  static const struct file_operations cifs_security_flags_proc_fops;
+> @@ -389,7 +393,9 @@ cifs_proc_init(void)
+>  #ifdef CONFIG_CIFS_STATS
+>         proc_create("Stats", 0, proc_fs_cifs, &cifs_stats_proc_fops);
+>  #endif /* STATS */
+> +#ifdef CONFIG_CIFS_DEBUG
+>         proc_create("cifsFYI", 0, proc_fs_cifs, &cifsFYI_proc_fops);
+> +#endif /* CONFIG_CIFS_DEBUG */
+>         proc_create("traceSMB", 0, proc_fs_cifs, &traceSMB_proc_fops);
+>         proc_create("LinuxExtensionsEnabled", 0, proc_fs_cifs,
+>                     &cifs_linux_ext_proc_fops);
+> @@ -406,7 +412,9 @@ cifs_proc_clean(void)
+>                 return;
+>
+>         remove_proc_entry("DebugData", proc_fs_cifs);
+> +#ifdef CONFIG_CIFS_DEBUG
+>         remove_proc_entry("cifsFYI", proc_fs_cifs);
+> +#endif /* CONFIG_CIFS_DEBUG */
+>         remove_proc_entry("traceSMB", proc_fs_cifs);
+>  #ifdef CONFIG_CIFS_STATS
+>         remove_proc_entry("Stats", proc_fs_cifs);
+> @@ -417,6 +425,7 @@ cifs_proc_clean(void)
+>         remove_proc_entry("fs/cifs", NULL);
+>  }
+>
+> +#ifdef CONFIG_CIFS_DEBUG
+>  static int cifsFYI_proc_show(struct seq_file *m, void *v)
+>  {
+>         seq_printf(m, "%d\n", cifsFYI);
+> @@ -455,6 +464,7 @@ static const struct file_operations cifsFYI_proc_fops = {
+>         .release        = single_release,
+>         .write          = cifsFYI_proc_write,
+>  };
+> +#endif /* CONFIG_CIFS_DEBUG */
+>
+>  static int cifs_linux_ext_proc_show(struct seq_file *m, void *v)
+>  {
+> --
+> 1.7.11.7
+>
 
-You may first want to start by tracing with wireshark -- see what's
-happening on the wire before and after the signal is delivered.
 
-If it works against win7 then it's likely that win7 disconnects the
-socket when the signatures are wrong. With that, we'd reestablish the
-connection and things would start working again. I suspect that win2k8
-just starts returning an error that we map to -EACCES.
 
-It's possible that we should disconnect the client when the signatures
-start looking wrong, but I think we need to understand why signals are
-causing this issue in the first place.
+-- 
+Thanks,
 
-There are some places where we do interruptible sleeps (vs. killable
-ones). It's possible that SIGINT (which is what ^c generally delivers)
-is causing havok there.
-
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Steve
