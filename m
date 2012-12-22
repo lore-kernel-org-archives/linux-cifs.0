@@ -1,100 +1,54 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: don't present the cifsFYI procfile when
- CONFIG_CIFS_DEBUG is disabled
-Date: Thu, 20 Dec 2012 15:25:18 -0600
-Message-ID: <CAH2r5mssVLMr-knN4mBdbhKCV0_YvriUX3TKaGzp-vzLcNtyNQ@mail.gmail.com>
-References: <1355831339-22043-1-git-send-email-jlayton@redhat.com>
+Subject: Fwd: [GIT] CIFS Fixes
+Date: Fri, 21 Dec 2012 20:46:18 -0600
+Message-ID: <CAH2r5mvxsmPouS9ZFU9A1sw1RXG3ChYbjVY=g2-+Bs+vUcCazw@mail.gmail.com>
+References: <CAH2r5msYO-rzAgtNZ-ALM7+ukGa8XwWUiPhhBkk=t=ROuNV7cw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1355831339-22043-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAH2r5msYO-rzAgtNZ-ALM7+ukGa8XwWUiPhhBkk=t=ROuNV7cw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-You make a good point that we need to adjust cifsFYI when CONFIG_CIFS_DEBUG
-is turned off by embedded distros to save memory but we can't remove it since it
-controls CIFS_RC and CIFS_TIMER messages (which we use for debugging,
-and should work even with CONFIG_CIFS_DEBUG is turned off - to allow
-us to see slow requests and get CIFS/SMB2 network errors logged).
+---------- Forwarded message ----------
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Date: Fri, Dec 21, 2012 at 5:18 PM
+Subject: [GIT] CIFS Fixes
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 
-I am fine with the idea of preventing enabling CIFS_INFO in
-/proc/fs/cifs/cifsFYI
-when CONFIG_CIFS_DEBUG is turned off (e.g. masking off the 0x0004 or
-rejecting it if the user tries to set that bit (to enable various informational
-messages which aren't going to print) when on an embedded system
-with debugging not compiled in).
 
-On Tue, Dec 18, 2012 at 5:48 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> If all of the debug messages are compiled out, then this knob is no
-> longer connected to anything useful. There's no point in presenting
-> it at all in that case.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifs_debug.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index d9ea6ed..f5de4c9 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -371,7 +371,11 @@ static const struct file_operations cifs_stats_proc_fops = {
->  #endif /* STATS */
->
->  static struct proc_dir_entry *proc_fs_cifs;
-> +
-> +#ifdef CONFIG_CIFS_DEBUG
->  static const struct file_operations cifsFYI_proc_fops;
-> +#endif /* CONFIG_CIFS_DEBUG */
-> +
->  static const struct file_operations cifs_lookup_cache_proc_fops;
->  static const struct file_operations traceSMB_proc_fops;
->  static const struct file_operations cifs_security_flags_proc_fops;
-> @@ -389,7 +393,9 @@ cifs_proc_init(void)
->  #ifdef CONFIG_CIFS_STATS
->         proc_create("Stats", 0, proc_fs_cifs, &cifs_stats_proc_fops);
->  #endif /* STATS */
-> +#ifdef CONFIG_CIFS_DEBUG
->         proc_create("cifsFYI", 0, proc_fs_cifs, &cifsFYI_proc_fops);
-> +#endif /* CONFIG_CIFS_DEBUG */
->         proc_create("traceSMB", 0, proc_fs_cifs, &traceSMB_proc_fops);
->         proc_create("LinuxExtensionsEnabled", 0, proc_fs_cifs,
->                     &cifs_linux_ext_proc_fops);
-> @@ -406,7 +412,9 @@ cifs_proc_clean(void)
->                 return;
->
->         remove_proc_entry("DebugData", proc_fs_cifs);
-> +#ifdef CONFIG_CIFS_DEBUG
->         remove_proc_entry("cifsFYI", proc_fs_cifs);
-> +#endif /* CONFIG_CIFS_DEBUG */
->         remove_proc_entry("traceSMB", proc_fs_cifs);
->  #ifdef CONFIG_CIFS_STATS
->         remove_proc_entry("Stats", proc_fs_cifs);
-> @@ -417,6 +425,7 @@ cifs_proc_clean(void)
->         remove_proc_entry("fs/cifs", NULL);
->  }
->
-> +#ifdef CONFIG_CIFS_DEBUG
->  static int cifsFYI_proc_show(struct seq_file *m, void *v)
->  {
->         seq_printf(m, "%d\n", cifsFYI);
-> @@ -455,6 +464,7 @@ static const struct file_operations cifsFYI_proc_fops = {
->         .release        = single_release,
->         .write          = cifsFYI_proc_write,
->  };
-> +#endif /* CONFIG_CIFS_DEBUG */
->
->  static int cifs_linux_ext_proc_show(struct seq_file *m, void *v)
->  {
-> --
-> 1.7.11.7
->
+Misc. small cifs fixes
+
+The following changes since commit 1800098549fc310cffffefdcb3722adaad0edda8:
+
+  ARM: OMAP: Fix build breakage due to missing include in i2c.c (2012-12-20
+08:43:25 -0800)
+
+are available in the git repository at:
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+Jeff Layton (3):
+      cifs: fix double-free of "string" in cifs_parse_mount_options
+      cifs: don't compare uniqueids in cifs_prime_dcache unless server inode
+numbers are in use
+      cifs: eliminate cifsERROR variable
+
+ fs/cifs/cifs_debug.h |    6 +-----
+ fs/cifs/cifsfs.c     |    1 -
+ fs/cifs/connect.c    |    9 ++-------
+ fs/cifs/readdir.c    |   19 +++++++++++++++----
+ 4 files changed, 18 insertions(+), 17 deletions(-)
+
+--
+Thanks,
+
+Steve
 
 
 
--- 
+--
 Thanks,
 
 Steve
