@@ -1,189 +1,68 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux
- mounting Windows share)
-Date: Mon, 24 Dec 2012 09:14:21 -0500
-Message-ID: <20121224091421.63d0df23@tlielax.poochiereds.net>
-References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com>
-	<20121219090322.3999f995@tlielax.poochiereds.net>
-	<1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
-	<1355945432.81847.YahooMailNeo@web160302.mail.bf1.yahoo.com>
-	<20121220093806.537c2496@corrin.poochiereds.net>
-	<20121223091034.5e313ee1@tlielax.poochiereds.net>
+From: CAI Qian <caiqian-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: 3.7.1-rc1: cifs client panic
+Date: Tue, 25 Dec 2012 04:46:40 -0500 (EST)
+Message-ID: <644615486.5925461.1356428800313.JavaMail.root@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Tim Perry <tim.perry-kUnrLEE8I/oKpCjwLQ55aZ9NZdITTVap@public.gmane.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Cc: "linux-cifs " <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121223091034.5e313ee1-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, 23 Dec 2012 09:10:34 -0500
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Just a head-up, I just hit this while doing some cifs client-side
+testing using 3.7.1-rc1 kernel (no specific cifs patches on the
+top of the 3.7.1 release). Still trying to reproduce...
 
-> On Thu, 20 Dec 2012 09:38:06 -0500
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->=20
-> > On Wed, 19 Dec 2012 11:30:32 -0800 (PST)
-> > Tim Perry <tim.perry-kUnrLEE8I/oKpCjwLQ55aZ9NZdITTVap@public.gmane.org> wrote:
-> >=20
-> > > Dear Jeff, et. al.,
-> > >=20
-> > >=20
-> > > I can reproduce the problem by starting "find . -name \*.ext"and =
-killing it when connected to either of our two Windows 2003 Servers. I =
-can *not* reproduce it doing the same thing connected to a windows 7 bo=
-x.
-> > >=20
-> > > $ uname -a
-> > > Linux servername 3.2.0-34-generic #53-Ubuntu SMP Thu Nov 15 10:49=
-:02 UTC 2012 i686 i686 i386 GNU/Linux
-> > > $ cat /proc/version
-> > >=20
-> > > Linux version 3.2.0-34-generic (buildd@roseapple) (gcc version 4.=
-6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #53-Ubuntu SMP Thu Nov 15 10:49:02=
- UTC 2012
-> > > $ lsb_release -a
-> > > No LSB modules are available.
-> > > Distributor ID: Ubuntu
-> > > Description: =A0 =A0Ubuntu 12.04.1 LTS
-> > > Release: =A0 =A0 =A0 =A012.04
-> > > Codename: =A0 =A0 =A0 precise
-> > >=20
-> > >=20
-> > > I tried using strace but hitting ctrl-c killed strace (obviously,=
- oops), but interestingly, this did *not* hang the file system. I will =
-try and kill the find command (kill -9 perhaps?) and see if I can recre=
-ate the error that way.
-> > >=20
-> > > CONTINUING HERE:
-> > > I don't think strace on the find command will help because it isn=
-'t making the network connections. CIFS is making the network connectio=
-ns. Maybe I can cause the mount to happen with an strace version of CIF=
-S? =A0How would I do that?
-> > >=20
-> > > Anyhow, I opened two terminal windows and proceeded as follows:
-> > >=20
-> > > In terminal 1:
-> > >=20
-> > > $ strace find . -name \*adzzz >& ~/straceFind.txt
-> > >=20
-> > >=20
-> > > In terminal 2:
-> > > $ ps aux | grep find | grep -v strace
-> > > perry =A0 =A0 2583 12.6 =A00.0 =A0 4792 =A01088 pts/5 =A0 =A0R+ =A0=
- 11:27 =A0 0:00 find . -name *adzzz
-> > > perry =A0 =A0 2585 =A00.0 =A00.0 =A0 4388 =A0 828 pts/2 =A0 =A0S+=
- =A0 11:27 =A0 0:00 grep find
-> > > $ kill -9 2583
-> > >=20
-> > > File system dies.
-> > >=20
-> > > I've attaced the straceFind.txt, but it just shows find walking t=
-he filesystem tree:
-> > > statat64(AT_FDCWD, "0010", {st_mode=3DS_IFDIR|0777, st_size=3D0, =
-=2E..}, AT_SYMLINK_NOFOLLOW) =3D 0
-> > > openat(AT_FDCWD, "0010", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DIRECT=
-ORY|O_CLOEXEC) =3D 5
-> > > fchdir(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =3D 0
-> > > getdents64(5, /* 14 entries */, 32768) =A0=3D 448
-> > > getdents64(5, /* 0 entries */, 32768) =A0 =3D 0
-> > > close(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0=3D 0
-> > > fstatat64(AT_FDCWD, "_vti_cnf", {st_mode=3DS_IFDIR|0777, st_size=3D=
-0, ...}, AT_SYMLINK_NOFOLLOW) =3D 0
-> > > openat(AT_FDCWD, "_vti_cnf", O_RDONLY|O_NONBLOCK|O_LARGEFILE|O_DI=
-RECTORY|O_CLOEXEC) =3D 5
-> > > fchdir(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
- =A0 =3D 0
-> > > getdents64(5, /* 13 entries */, 32768) =A0=3D 416
-> > > getdents64(5, /* 0 entries */, 32768) =A0 =3D 0
-> > > close(5) =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
-=A0 =A0=3D 0
-> > > open("..", O_RDONLY|O_NOCTTY|O_NONBLOCK|O_LARGEFILE|O_DIRECTORY|O=
-_NOFOLLOW) =3D 5
-> > > fstat64(5, {st_mode=3DS_IFDIR|0777, st_size=3D0, ...}) =3D 0
-> > > fchdir(
-> > >=20
-> > >=20
-> > > Ideas?
-> > >=20
-> >=20
-> > That kernel is pretty old, so you may want to try a more recent one=
-=2E
-> >=20
-> > You may first want to start by tracing with wireshark -- see what's
-> > happening on the wire before and after the signal is delivered.
-> >=20
-> > If it works against win7 then it's likely that win7 disconnects the
-> > socket when the signatures are wrong. With that, we'd reestablish t=
-he
-> > connection and things would start working again. I suspect that win=
-2k8
-> > just starts returning an error that we map to -EACCES.
-> >=20
-> > It's possible that we should disconnect the client when the signatu=
-res
-> > start looking wrong, but I think we need to understand why signals =
-are
-> > causing this issue in the first place.
-> >=20
-> > There are some places where we do interruptible sleeps (vs. killabl=
-e
-> > ones). It's possible that SIGINT (which is what ^c generally delive=
-rs)
-> > is causing havok there.
-> >=20
->=20
-> I had a look at the code today and suspect that I know what the probl=
-em
-> is. When the kernel goes to send a request, it first signs it and the=
-n
-> bumps the sequence numbers that it tracks. If the request doesn't
-> actually make it out onto the wire, like when the task catches a
-> signal, those sequence numbers remain high even though the request
-> didn't go out.
->=20
-> Here's an untested patch that might help tell whether this is the
-> case. You may want to try it and see if it does. Note that this fix i=
-s
-> a bit of a kludge and is not suitable for merging!
->=20
-> A better fix would involve changing when the sequence number gets
-> bumped in the first place. If this patch seems to help things, then
-> I'll look at coding up that up.
->=20
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 76d974c..4520234 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -334,10 +334,14 @@ uncork:
->  		server->tcpStatus =3D CifsNeedReconnect;
->  	}
-> =20
-> -	if (rc < 0 && rc !=3D -EINTR)
-> -		cERROR(1, "Error %d sending data on socket to server", rc);
-> -	else
-> +	if (rc < 0) {
-> +		if (rc =3D=3D -EINTR)
-> +			server->sequence_number -=3D 2;
-> +		else
-> +			cERROR(1, "Error %d sending data on socket to server", rc);
-> +	} else {
->  		rc =3D 0;
-> +	}
-> =20
->  	return rc;
->  }
->=20
->=20
+[90701.616664] BUG: unable to handle kernel NULL pointer dereference at 0000000000000028
+[90701.625438] IP: [<ffffffff814a343e>] kernel_setsockopt+0x2e/0x60
+[90701.632167] PGD fea319067 PUD 103fda4067 PMD 0
+[90701.637255] Oops: 0000 [#1] SMP
+[90701.640878] Modules linked in: des_generic md4 nls_utf8 cifs dns_resolver binfmt_misc tun sg igb iTCO_wdt iTCO_vendor_support lpc_ich pcspkr i2c_i801 i2c_core i7core_edac edac_core ioatdma dca mfd_core coretemp kvm_intel kvm crc32c_intel microcode sr_mod cdrom ata_generic sd_mod pata_acpi crc_t10dif ata_piix libata megaraid_sas dm_mirror dm_region_hash dm_log dm_mod
+[90701.677655] CPU 10
+[90701.679808] Pid: 9627, comm: ls Tainted: G        W    3.7.1+ #10 QCI QSSC-S4R/QSSC-S4R
+[90701.688950] RIP: 0010:[<ffffffff814a343e>]  [<ffffffff814a343e>] kernel_setsockopt+0x2e/0x60
+[90701.698383] RSP: 0018:ffff88177b431bb8  EFLAGS: 00010206
+[90701.704309] RAX: ffff88177b431fd8 RBX: 00007ffffffff000 RCX: ffff88177b431bec
+[90701.712271] RDX: 0000000000000003 RSI: 0000000000000006 RDI: 0000000000000000
+[90701.720223] RBP: ffff88177b431bc8 R08: 0000000000000004 R09: 0000000000000000
+[90701.728185] R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
+[90701.736147] R13: ffff88184ef92000 R14: 0000000000000023 R15: ffff88177b431c88
+[90701.744109] FS:  00007fd56a1a47c0(0000) GS:ffff88105fc40000(0000) knlGS:0000000000000000
+[90701.753137] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+[90701.759550] CR2: 0000000000000028 CR3: 000000104f15f000 CR4: 00000000000007e0
+[90701.767512] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[90701.775465] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+[90701.783428] Process ls (pid: 9627, threadinfo ffff88177b430000, task ffff88185ca4cb60)
+[90701.792261] Stack:
+[90701.794505]  0000000000000023 ffff88177b431c50 ffff88177b431c38 ffffffffa014fcb1
+[90701.802809]  ffff88184ef921bc 0000000000000000 00000001ffffffff ffff88184ef921c0
+[90701.811123]  ffff88177b431c08 ffffffff815ca3d9 ffff88177b431c18 ffff880857758000
+[90701.819433] Call Trace:
+[90701.822183]  [<ffffffffa014fcb1>] smb_send_rqst+0x71/0x1f0 [cifs]
+[90701.828991]  [<ffffffff815ca3d9>] ? schedule+0x29/0x70
+[90701.834736]  [<ffffffffa014fe6d>] smb_sendv+0x3d/0x40 [cifs]
+[90701.841062]  [<ffffffffa014fe96>] smb_send+0x26/0x30 [cifs]
+[90701.847291]  [<ffffffffa015801f>] send_nt_cancel+0x6f/0xd0 [cifs]
+[90701.854102]  [<ffffffffa015075e>] SendReceive+0x18e/0x360 [cifs]
+[90701.860814]  [<ffffffffa0134a78>] CIFSFindFirst+0x1a8/0x3f0 [cifs]
+[90701.867724]  [<ffffffffa013f731>] ? build_path_from_dentry+0xf1/0x260 [cifs]
+[90701.875601]  [<ffffffffa013f731>] ? build_path_from_dentry+0xf1/0x260 [cifs]
+[90701.883477]  [<ffffffffa01578e6>] cifs_query_dir_first+0x26/0x30 [cifs]
+[90701.890869]  [<ffffffffa015480d>] initiate_cifs_search+0xed/0x250 [cifs]
+[90701.898354]  [<ffffffff81195970>] ? fillonedir+0x100/0x100
+[90701.904486]  [<ffffffffa01554cb>] cifs_readdir+0x45b/0x8f0 [cifs]
+[90701.911288]  [<ffffffff81195970>] ? fillonedir+0x100/0x100
+[90701.917410]  [<ffffffff81195970>] ? fillonedir+0x100/0x100
+[90701.923533]  [<ffffffff81195970>] ? fillonedir+0x100/0x100
+[90701.929657]  [<ffffffff81195848>] vfs_readdir+0xb8/0xe0
+[90701.935490]  [<ffffffff81195b9f>] sys_getdents+0x8f/0x110
+[90701.941521]  [<ffffffff815d3b99>] system_call_fastpath+0x16/0x1b
+[90701.948222] Code: 66 90 55 65 48 8b 04 25 f0 c6 00 00 48 89 e5 53 48 83 ec 08 83 fe 01 48 8b 98 48 e0 ff ff 48 c7 80 48 e0 ff ff ff ff ff ff 74 22 <48> 8b 47 28 ff 50 68 65 48 8b 14 25 f0 c6 00 00 48 89 9a 48 e0
+[90701.970313] RIP  [<ffffffff814a343e>] kernel_setsockopt+0x2e/0x60
+[90701.977125]  RSP <ffff88177b431bb8>
+[90701.981018] CR2: 0000000000000028
+[90701.984809] ---[ end trace 24bd602971110a43 ]---
 
-I was able to reproduce this, and I don't think the above patch will
-fix it (at least not completely). The problem seems to be that the NT
-cancel command is screwing up the sequence numbers. We'll have to do
-some research to figure out why that's occurring.
-
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+CAI Qian
