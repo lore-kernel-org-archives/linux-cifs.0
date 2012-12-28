@@ -1,44 +1,49 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: adjust sequence number downward after signing NT_CANCEL request
-Date: Thu, 27 Dec 2012 08:05:03 -0500
-Message-ID: <1356613503-30109-1-git-send-email-jlayton@redhat.com>
-Cc: tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: spameden <spameden-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: question about cifs mount timeouts and reconnects
+Date: Fri, 28 Dec 2012 13:20:56 +0400
+Message-ID: <CAHCALew2KzsYVK3LFOW1+PpSUKJemtKjSM+=_0mQymqvvUR6dQ@mail.gmail.com>
+References: <CAHCALewKCtX9G6Cy4Qu0Fn0BqCh0nW89aGsamuF40t9Nr32Fsw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAHCALewKCtX9G6Cy4Qu0Fn0BqCh0nW89aGsamuF40t9Nr32Fsw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When a call goes out, the signing code adjusts the sequence number
-upward by two to account for the request and the response. An NT_CANCEL
-however doesn't get a response of its own, it just hurries the server
-along to get it to respond to the original request more quickly.
-Therefore, we must adjust the sequence number back down by one after
-signing a NT_CANCEL request.
+Hi.
 
-Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Reported-by: Tim Perry <tdparmor-sambabugs-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/smb1ops.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+I've been using samba/cifs for years and now noticed various hangs
+occuring on reconnection.
 
-diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index a5d234c..dd79056 100644
---- a/fs/cifs/smb1ops.c
-+++ b/fs/cifs/smb1ops.c
-@@ -53,6 +53,13 @@ send_nt_cancel(struct TCP_Server_Info *server, void *buf,
- 		mutex_unlock(&server->srv_mutex);
- 		return rc;
- 	}
-+
-+	/*
-+	 * The response to this call was already factored into the sequence
-+	 * number when the call went out, so we must adjust it back downward
-+	 * after signing here.
-+	 */
-+	--server->sequence_number;
- 	rc = smb_send(server, in_buf, be32_to_cpu(in_buf->smb_buf_length));
- 	mutex_unlock(&server->srv_mutex);
- 
--- 
-1.7.11.7
+Here is an example of situation when it occurs:
+
+1. host A have shared directory "share", host A is running MS Windows.
+(for example - a laptop)
+2. host B got directory "share" mounted under /mnt/share, host B is
+running Debian Linux Squeeze with 3.2 backported kernel with latest
+updates installed.
+
+If host A reboots and after successful reboot you'd try to access
+/mnt/share on host B - host B hangs on that dir for 60-300seconds
+(sometimes even longer).
+
+I understand the hang if it could happen in situation where "share" on
+host A is no longer available, but it's available (the only thing -
+host was rebooted!).
+
+What I've tried so far:
+
+1) I've tried using "soft" option on mount - didnt help at all (I
+believe its set by default, but added anyways to the fstab mounting
+options)
+2) tried inserting cifs module with echo_retries=1 - didnt help still
+the same thing
+3) tried on 2.6.32 kernel as well (debian's default kernel) -
+absolutely same behaviour, thought it's fixed in 3.2.0-0.bpo.4-amd64
+backported kernel.
+
+It's very annoying and inconvinient to have this behavior every time
+host reboots.
+
+Please suggest if it's distro specific bug or samba's "by design bug"?
