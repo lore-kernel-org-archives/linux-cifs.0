@@ -1,49 +1,86 @@
-From: spameden <spameden-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: question about cifs mount timeouts and reconnects
-Date: Fri, 28 Dec 2012 13:20:56 +0400
-Message-ID: <CAHCALew2KzsYVK3LFOW1+PpSUKJemtKjSM+=_0mQymqvvUR6dQ@mail.gmail.com>
-References: <CAHCALewKCtX9G6Cy4Qu0Fn0BqCh0nW89aGsamuF40t9Nr32Fsw@mail.gmail.com>
+From: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux
+ mounting Windows share)
+Date: Sat, 29 Dec 2012 01:24:36 +0100
+Message-ID: <1356740676.4446.21.camel@deadeye.wl.decadent.org.uk>
+References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com>
+	 <20121219090322.3999f995@tlielax.poochiereds.net>
+	 <1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
+	 <1355945432.81847.YahooMailNeo@web160302.mail.bf1.yahoo.com>
+	 <20121220093806.537c2496@corrin.poochiereds.net>
+	 <20121223091034.5e313ee1@tlielax.poochiereds.net>
+	 <20121224091421.63d0df23@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-P+90XekA/XpAnfSaWSQm"
+Cc: Tim Perry <tim.perry-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	John Darrah <xyllyx-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, 695492-61a8vm9lEZVf4u+23C9RwQ@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAHCALewKCtX9G6Cy4Qu0Fn0BqCh0nW89aGsamuF40t9Nr32Fsw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <20121224091421.63d0df23-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi.
 
-I've been using samba/cifs for years and now noticed various hangs
-occuring on reconnection.
+--=-P+90XekA/XpAnfSaWSQm
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Here is an example of situation when it occurs:
+On Mon, 2012-12-24 at 09:14 -0500, Jeff Layton wrote:
+> On Sun, 23 Dec 2012 09:10:34 -0500
+> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+[...]
+> > I had a look at the code today and suspect that I know what the problem
+> > is. When the kernel goes to send a request, it first signs it and then
+> > bumps the sequence numbers that it tracks. If the request doesn't
+> > actually make it out onto the wire, like when the task catches a
+> > signal, those sequence numbers remain high even though the request
+> > didn't go out.
+> >=20
+> > Here's an untested patch that might help tell whether this is the
+> > case. You may want to try it and see if it does. Note that this fix is
+> > a bit of a kludge and is not suitable for merging!
+> >=20
+> > A better fix would involve changing when the sequence number gets
+> > bumped in the first place. If this patch seems to help things, then
+> > I'll look at coding up that up.
+[...]
+> I was able to reproduce this, and I don't think the above patch will
+> fix it (at least not completely). The problem seems to be that the NT
+> cancel command is screwing up the sequence numbers. We'll have to do
+> some research to figure out why that's occurring.
 
-1. host A have shared directory "share", host A is running MS Windows.
-(for example - a laptop)
-2. host B got directory "share" mounted under /mnt/share, host B is
-running Debian Linux Squeeze with 3.2 backported kernel with latest
-updates installed.
+Jeff, we got a bug report in Debian which seems to be the same problem:
+<http://bugs.debian.org/695492>.  Please cc John Darrah and the bug
+address as above.
 
-If host A reboots and after successful reboot you'd try to access
-/mnt/share on host B - host B hangs on that dir for 60-300seconds
-(sometimes even longer).
+Ben.
 
-I understand the hang if it could happen in situation where "share" on
-host A is no longer available, but it's available (the only thing -
-host was rebooted!).
+--=20
+Ben Hutchings
+It is easier to change the specification to fit the program than vice versa=
+.
 
-What I've tried so far:
+--=-P+90XekA/XpAnfSaWSQm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
-1) I've tried using "soft" option on mount - didnt help at all (I
-believe its set by default, but added anyways to the fstab mounting
-options)
-2) tried inserting cifs module with echo_retries=1 - didnt help still
-the same thing
-3) tried on 2.6.32 kernel as well (debian's default kernel) -
-absolutely same behaviour, thought it's fixed in 3.2.0-0.bpo.4-amd64
-backported kernel.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
 
-It's very annoying and inconvinient to have this behavior every time
-host reboots.
+iQIVAwUAUN44ROe/yOyVhhEJAQr/RhAAv+SRQK8sjpBHlnlKbAjXDcW3qOz+WU50
+cUYB6JMUKiwqujSS1Q4DgodKtHLQ4oXT+ZhYpF6St7MAioeJq9vvDEaatHI06LlM
+HTKajIn0ZenhGwxeu7eY9dowp+CQUx+Ln1d29YWVShpB4Yw1+vvf50TUd+L7QEUx
+AklR0HMkwwqIXk9K7JjZTervEEzGQMt0IAq+ooaziCd7hr3Phao3TeHH/dchEzDv
+Jv2IpPoVaQHoywXSD0Z/shvZCL3BQopQysiMndpWiYb8Uo4Hef1CXwlg2l3dNWhB
+BuiAGqqvvV1NB/+vDDO/D/RscWyhX3/8YyEfxnxAB/XJCWSl5HalyQeLvXzocyLk
+VJ11kpbSMMSQslYs3/yhd/pGjaWp1frzu4btuS3zIkYqNMO/74MZ92a8uxNrEVSH
+DWU2DWeE8egl4+48B2lQYiXKOb4vyvycEgUJhAI9ogdtCAh9VPDCXP46zgATib7i
+LL53Myn9x7MBjiFGDE3onw/AM5kvNdI2h0ATfOwVlcZ/MMjuCBNtx4c0WOmjCMpl
+3/28t7Wn6w3TasoxheExEx5s7GJoXK41lnp5CBefqRzAbLP4zZe4gYjYWTVF7SH1
+gyhJleBWZ3MHipDcpSDOCSqGJTBhrj1kxknB5gJ/3fSPZQNVPv/36O41t6IQFUja
+tuc0rK5te0Y=
+=5KC3
+-----END PGP SIGNATURE-----
 
-Please suggest if it's distro specific bug or samba's "by design bug"?
+--=-P+90XekA/XpAnfSaWSQm--
