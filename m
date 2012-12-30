@@ -1,65 +1,76 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: CIFS mount fails if I ctrl-c a long-running find process (Linux
- mounting Windows share)
-Date: Fri, 28 Dec 2012 22:01:50 -0500
-Message-ID: <20121228220150.72686551@corrin.poochiereds.net>
-References: <1355872616.69791.YahooMailNeo@web160302.mail.bf1.yahoo.com>
-	<20121219090322.3999f995@tlielax.poochiereds.net>
-	<1355944553.61735.YahooMailNeo@web160303.mail.bf1.yahoo.com>
-	<1355945432.81847.YahooMailNeo@web160302.mail.bf1.yahoo.com>
-	<20121220093806.537c2496@corrin.poochiereds.net>
-	<20121223091034.5e313ee1@tlielax.poochiereds.net>
-	<20121224091421.63d0df23@tlielax.poochiereds.net>
-	<1356740676.4446.21.camel@deadeye.wl.decadent.org.uk>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 0/3] Data coherency fixes for v3.8
+Date: Sun, 30 Dec 2012 11:54:29 -0600
+Message-ID: <CAH2r5mu-pEX7kDQF2NrfE8OtRThsPqZ8GewDg8yxzDvv63Eejw@mail.gmail.com>
+References: <1356537234-11507-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Tim Perry <tim.perry-/E1597aS9LQAvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	John Darrah <xyllyx-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, 695492-61a8vm9lEZVf4u+23C9RwQ@public.gmane.org
-To: Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1356740676.4446.21.camel-nDn/Rdv9kqW9Jme8/bJn5UCKIB8iOfG2tUK59QYPAWc@public.gmane.org>
+In-Reply-To: <1356537234-11507-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Sat, 29 Dec 2012 01:24:36 +0100
-Ben Hutchings <ben-/+tVBieCtBitmTQ+vhA3Yw@public.gmane.org> wrote:
+I have merged these and Jeff's two most recent fixes into cifs-2.6.git
+for-next.  Let me know if any additional review or updated test
+results.
 
-> On Mon, 2012-12-24 at 09:14 -0500, Jeff Layton wrote:
-> > On Sun, 23 Dec 2012 09:10:34 -0500
-> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> [...]
-> > > I had a look at the code today and suspect that I know what the problem
-> > > is. When the kernel goes to send a request, it first signs it and then
-> > > bumps the sequence numbers that it tracks. If the request doesn't
-> > > actually make it out onto the wire, like when the task catches a
-> > > signal, those sequence numbers remain high even though the request
-> > > didn't go out.
-> > > 
-> > > Here's an untested patch that might help tell whether this is the
-> > > case. You may want to try it and see if it does. Note that this fix is
-> > > a bit of a kludge and is not suitable for merging!
-> > > 
-> > > A better fix would involve changing when the sequence number gets
-> > > bumped in the first place. If this patch seems to help things, then
-> > > I'll look at coding up that up.
-> [...]
-> > I was able to reproduce this, and I don't think the above patch will
-> > fix it (at least not completely). The problem seems to be that the NT
-> > cancel command is screwing up the sequence numbers. We'll have to do
-> > some research to figure out why that's occurring.
-> 
-> Jeff, we got a bug report in Debian which seems to be the same problem:
-> <http://bugs.debian.org/695492>.  Please cc John Darrah and the bug
-> address as above.
-> 
-> Ben.
-> 
+On Wed, Dec 26, 2012 at 9:53 AM, Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+>
+> This patchset is targeted for v3.8 and aimed to fix data coherency problem
+> mostly with SMB2.1 protocol code but it applies for CIFS code as well.
+>
+> The problem is that is was investigated that Windows 7 server doesn't
+> break read caching lease if we set/have madatory byte-range locks or issue a
+> write request. This end up with situations when we have level2 lease, issue
+> read caching and conflict with byte-range lock from another fid.
+>
+> This strage behavior make we think that we should not rely on the server
+> and should process such things ourself on the client.
+>
+> On the client we can set oplock/lease level according to request we send
+> to the server: if we issue a write or brlock request we can simply break
+> level2 oplock/lease and there is no problem for us if the server breaks it
+> too.
+>
+> The patchset consists of two parts:
+> 1) re-fix for the patch "CIFS: Fix write after setting a read lock for
+> read oplock files" (patches #1 and #2) that breaks level2 oplock/lease on
+> the client if we issue a write request.
+> 2) fix for brlocks that breaks level2 oplock/lease on the client if we
+> issue a mandatory byte-range lock request.
+>
+> The work branch with the patches:
+> http://git.altlinux.org/people/piastry/public/?p=cifs-2.6.git;a=shortlog;h=refs/heads/for-3.8
+>
+> Pavel Shilovsky (3):
+>   Revert "CIFS: Fix write after setting a read lock for read oplock
+>     files"
+>   CIFS: Fix write after setting a read lock for read oplock files
+>   CIFS: Don't let read only caching for mandatory byte-range locked
+>     files
+>
+>  fs/cifs/cifsfs.c   |   1 -
+>  fs/cifs/cifsglob.h |   2 +-
+>  fs/cifs/file.c     | 141
+> +++++++++++++++++++++++++++++------------------------
+>  fs/cifs/smb1ops.c  |   1 +
+>  fs/cifs/smb2ops.c  |   3 ++
+>  5 files changed, 81 insertions(+), 67 deletions(-)
+>
+> --
+> 1.7.12.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-You may want to try this patch. It seems to fix the problem for me, but
-I think there is probably some more work to do in this area.
 
-http://www.spinics.net/lists/linux-cifs/msg07576.html
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+--
+Thanks,
+
+Steve
