@@ -1,72 +1,71 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: remove support for "complex" usernames from
- mount.cifs
-Date: Fri, 4 Jan 2013 15:22:24 -0500
-Message-ID: <20130104152224.497bdd1b@tlielax.poochiereds.net>
-References: <1357214055-24911-1-git-send-email-jlayton@samba.org>
-	<CAFB9KM0-BrPcjV8gTW9BV_Awiw5bHbgYr=42smTJWKxCr=Y-PA@mail.gmail.com>
-	<20130103142110.269ea0d1@tlielax.poochiereds.net>
-	<CAH2r5mtRD85Te3g=G7Ez80NzGgG+36wHsiRnCzszQu9uee1-kQ@mail.gmail.com>
-	<CAFB9KM3uR1xCa9gGyyRyKjRgsL8npdzo4zxfyLUQToAvrJUCEw@mail.gmail.com>
-	<CAH2r5mv_gyNuTTf1-uSe1_HtWZgXmKUqyAHtu2UeJLi-aqT=9g@mail.gmail.com>
-	<CAH2r5mv6jAZqKyFdccriM0wtusRr_XEhekUwMfzf7746p8McXg@mail.gmail.com>
+From: mnccsm-b2MIaZL8fbqsTnJN9+BGXg@public.gmane.org
+Subject: (no subject)
+Date: Sat, 05 Jan 2013 11:25:39 +0100
+Message-ID: <35325a579cca67321478c46bc32b0c3f@mongol.net>
+Reply-To: <staatslotterrij-ur4TIblo6goN+BqQ9rBEUg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8;
+	format=flowed
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: undisclosed-recipients:;
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mv6jAZqKyFdccriM0wtusRr_XEhekUwMfzf7746p8McXg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 4 Jan 2013 14:09:00 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+STAATSLOTTERIJ INTERNATIONAL B.V.
+CLAIM DEPARTMENT OFFICE,
+Paleisstraat 5, 2514 JA 'S-Gravenhage,
+Netherlands.
+www.staatsloterij.nl
 
-> ---------- Forwarded message ----------
-> From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Date: Fri, Jan 4, 2013 at 2:04 PM
-> Subject: Re: [PATCH] mount.cifs: remove support for "complex"
-> usernames from mount.cifs
-> To: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> 
-> 
-> 
-> On Jan 4, 2013 12:26 PM, "Scott Lovenberg" <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> >
-> > On Thu, Jan 3, 2013 at 3:04 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > > I am not as worried about code cleanliness as I am about losing function,
-> > > especially as it is sometimes hard to figure out how many users would be
-> > > affected by removing function.  I mildly prefer leaving the nfs syntax
-> > > if it makes it easier for nfs users to use smb3, but we could make a stub
-> > > mount helper that parses nfs syntax and simply calls mount.cifs if you
-> > > prefer that approach - in any case I don't feel strongly about nfs syntax.
-> >
-> > I don't care much either way.  The reason behind removing it, IIRC,
-> > was that it was an undocumented feature that lead to an ambiguous
-> > parsing situation when you had NFS syntax with an IPv6 address as the
-> > server portion of the string (ie
-> > dead:beef::1:/shareNameWithColon:/prepath).  It was easier to remove
-> > the undocumented feature than to support it for this use case.
-> >
-> > How does NFS syntax make things easier for SMB3?
-> 
-> UNC names may be unfamiliar for some NFS users. Smb3 has many
-> performance advantages and other features that may eventually be of
-> strong interest to some Linux  NFS users
-> 
-> 
+The STAATSLOTTERIJ INTERNATIONAL B.V is approved by the Netherlands=20
+Gaming Board and also licensed by the International Association of=20
+Gaming Regulators I.A.G international emails. Held on the 1st of=20
+January, 2013. All winnings must be claim not later than 20th of=20
+January, 2013, after this date, unclaimed funds will be returned to the=
+=20
+Lotto. NL
 
-Not exactly what I'd call a "killer use case"... ;)
+Your email address won the lottery of our Beginning of the year=20
+programme for a total pay-out of =E2=82=AC850,000.00 EURO no tickets we=
+re sold=20
+but all email addresses were assigned to different ticket numbers for=20
+representation and privacy.
 
-If they want the features of SMB3, I doubt that UNC device strings will
-be a great hurdle for them. This isn't NFS after all, so we shouldn't
-go to great lengths to pretend that it is. OTOH, maintaining these
-sorts of features is a burden. 
+To file for your claim, please contact your claim agent with the below=20
+details
+**************************
+Name: Mr. Marzeen Gluvart
+Tel: +31- 633-640-721
+E-mail: marzeengluvart-DaQTI0RpDDMAvxtiuMwx3w@public.gmane.org
 
-I'm all for bugfixes and features that offer a concrete benefit. I just
-don't see one in this case.
+**************************
+In other to claim your =E2=82=AC850,000.00 EURO prize winning, you will=
+ have to=20
+fill the form below and send it back for verification and then you will=
+=20
+be directed how to get a ticket in your name.
+NAME:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=
+=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6.
+AGE:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
+=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6.
+SEX:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
+=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6.
+PHONE:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=
+=80=A6=E2=80=A6=E2=80=A6=E2=80=A6..
+Occupation:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=
+=A6=E2=80=A6=E2=80=A6=E2=80=A6.
+COUNTRY:=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=E2=80=A6=
+=E2=80=A6=E2=80=A6=E2=80=A6.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Please remember to quote your reference number and batch numbers:
+
+Batch No: 181830/PQA/296
+Qualification No:CEF/004/INT/052
+Serial No: 027240879
+Ticket No:  NL/SL-44-34-1507
+
+Yours faithfully,
+Mrs Eava Van Boer
+Online coordinator
+Sweepstakes International Program.
