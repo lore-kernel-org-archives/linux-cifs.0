@@ -1,115 +1,43 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [3.8-rc2] stuck at reading CIFS mounted directory
-Date: Mon, 7 Jan 2013 10:13:16 -0500
-Message-ID: <20130107101316.10f5e2ea@tlielax.poochiereds.net>
-References: <1839076.322591357261060518.JavaMail.weblogic@epml11>
-	<50EA97F5.5050801@suse.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Mon, 7 Jan 2013 14:38:45 -0600
+Message-ID: <CAH2r5msAo_AX-Z9V4BWCTPVjHDTnycpCQoH=wPfj5j7sr1WQZw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: jongman.heo-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org,
-	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <50EA97F5.5050801-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 07 Jan 2013 15:10:05 +0530
-Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+Misc. small cifs fixes.
 
-> (Cc linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org)
->=20
-> On 01/04/2013 06:27 AM, Jongman Heo wrote:
-> > Hi, all,
-> >=20
-> > In 3.8-rc2, access to CIFS-mounted directory (df, ls, or similar) g=
-ot stuck with following message.
-> >=20
-> > It's mounted with...
-> >   mount -t cifs //<win_host_ip_address>/Share  /mnt/window -o user=3D=
-jongman.heo,password=3Dxxxx,sec=3Dntlm
-> >=20
-> >=20
-> > [16655.288591] INFO: task bash:4042 blocked for more than 120 secon=
-ds.
-> > [16655.318117] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" d=
-isables this message.
-> > [16655.318123] bash            D dada9c5c     0  4042      1 0x0000=
-0004
-> > [16655.318132]  dada9cd0 00000082 00000282 dada9c5c c09022c6 dada9c=
-7c c044d316 c0c7c300
-> > [16655.318139]  d6db3a7b 00000f09 c0c7c300 00000000 00000f09 f3b7b2=
-40 c04401ba 00000000
-> > [16655.318145]  c0b9e0d8 f598e960 00000000 00000303 dada9c98 dada9c=
-98 f598e960 00000006
-> > [16655.318150] Call Trace:
-> > [16655.342785]  [<c09022c6>] ? _raw_spin_unlock_irqrestore+0xf/0x11
-> > [16655.351554]  [<c044d316>] ? __wake_up+0x3b/0x42
-> > [16655.358802]  [<c04401ba>] ? call_usermodehelper_fns+0x148/0x152
-> > [16655.358840]  [<c0440468>] ? __request_module+0x15e/0x1a1
-> > [16655.358842]  [<c043fe3d>] ? call_usermodehelper_freeinfo+0x19/0x=
-19
-> > [16655.358845]  [<c0901a9a>] schedule+0x51/0x53
-> > [16655.358847]  [<c0901bed>] schedule_preempt_disabled+0x8/0xa
-> > [16655.384345]  [<c0900de6>] __mutex_lock_common+0xd6/0x123
-> > [16655.384430]  [<c0900f39>] __mutex_lock_slowpath+0x20/0x22
-> > [16655.384436]  [<c0900edf>] ? mutex_lock+0x18/0x25
-> > [16655.384441]  [<c0900edf>] mutex_lock+0x18/0x25
-> > [16655.384892]  [<c05e1650>] cifs_reconnect_tcon+0x170/0x252
-> > [16655.384953]  [<c044c652>] ? should_resched+0x8/0x22
-> > [16655.384963]  [<c09018dc>] ? _cond_resched+0x8/0x1c
-> > [16655.384969]  [<c05e174f>] smb_init+0x1d/0x6d
-> > [16655.385023]  [<c05e4f7f>] CIFSSMBQPathInfo+0x4e/0x1e4
-> > [16655.385071]  [<c05fe062>] cifs_query_path_info+0x38/0x73
-> > [16655.385080]  [<c05f460a>] cifs_get_inode_info+0x122/0x3ac
-> > [16655.385548]  [<c04e1f2f>] ? walk_component+0x14a/0x17a
-> > [16655.385570]  [<c05ecf6e>] ? build_path_from_dentry+0xa3/0x19e
-> > [16655.385585]  [<c05ecf6e>] ? build_path_from_dentry+0xa3/0x19e
-> > [16655.385596]  [<c05ecf6e>] ? build_path_from_dentry+0xa3/0x19e
-> > [16655.385601]  [<c04e225c>] ? getname_flags+0x59/0xeb
-> > [16655.385606]  [<c090227a>] ? _raw_spin_lock+0x8/0xa
-> > [16655.385613]  [<c05f5c84>] cifs_revalidate_dentry_attr+0x120/0x16=
-8
-> > [16655.385618]  [<c05f5d6d>] cifs_getattr+0x5e/0xe3
-> > [16655.385625]  [<c04dde86>] vfs_getattr+0x37/0x4e
-> > [16655.385631]  [<c05f5d0f>] ? cifs_revalidate_dentry+0x20/0x20
-> > [16655.385639]  [<c04ddef6>] vfs_fstatat+0x59/0x8a
-> > [16655.385645]  [<c04ddf5b>] vfs_stat+0x19/0x1b
-> > [16655.385652]  [<c04de160>] sys_stat64+0x11/0x22
-> > [16655.385659]  [<c044c652>] ? should_resched+0x8/0x22
-> > [16655.385668]  [<c09018dc>] ? _cond_resched+0x8/0x1c
-> > [16655.385674]  [<c0443b74>] ? task_work_run+0x6d/0x79
-> > [16655.385825]  [<c0904f3d>] ? __do_page_fault+0x33b/0x33b
-> > [16655.385834]  [<c0904f45>] ? do_page_fault+0x8/0xa
-> > [16655.385840]  [<c0907911>] sysenter_do_call+0x12/0x2c
-> >=20
-> > N=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BDr=EF=BF=BD=EF=BF=BDy=EF=
-=BF=BD=EF=BF=BD=EF=BF=BDb=EF=BF=BDX=EF=BF=BD=EF=BF=BD=C7=A7v=EF=BF=BD^=EF=
-=BF=BD)=DE=BA{.n=EF=BF=BD+=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD{=EF=BF=BD=
-=EF=BF=BD=EF=BF=BD=EF=BF=BDzX=EF=BF=BD=EF=BF=BD=17=EF=BF=BD=EF=BF=BD=DC=
-=A8}=EF=BF=BD=EF=BF=BD=EF=BF=BD=C6=A0z=EF=BF=BD&j:+v=EF=BF=BD=EF=BF=BD=EF=
-=BF=BD=07=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BDzZ+=EF=BF=BD=EF=BF=BD+zf=EF=
-=BF=BD=EF=BF=BD=EF=BF=BDh=EF=BF=BD=EF=BF=BD=EF=BF=BD~=EF=BF=BD=EF=BF=BD=
-=EF=BF=BD=EF=BF=BDi=EF=BF=BD=EF=BF=BD=EF=BF=BDz=EF=BF=BD=1E=EF=BF=BDw=EF=
-=BF=BD=EF=BF=BD=EF=BF=BD?=EF=BF=BD=EF=BF=BD=EF=BF=BD=EF=BF=BD&=EF=BF=BD=
-)=DF=A2=1Bf=EF=BF=BD=EF=BF=BD^j=C7=ABy=EF=BF=BDm=EF=BF=BD=EF=BF=BD@A=EF=
-=BF=BDa=EF=BF=BD=EF=BF=BD=7F=EF=BF=BD=0C0=EF=BF=BD=EF=BF=BDh=EF=BF=BD=0F=
-=EF=BF=BDi=7F
-> >=20
->=20
->=20
+The following changes since commit ecccd1248d6e6986130ffcc3b0d003cb46a485c0:
+  Zlatko Calusic (1):
+        mm: fix null pointer dereference in wait_iff_congested()
 
-Looks like it's waiting on the session_mutex to become free. The
-question is what's holding it and why. Some questions:
+are available in the git repository at:
 
-1) is this a regression? If so, what version were you using previously?
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-2) any other processes stuck on on this mutex? What about the cifsd
-thread for this mount? Is it stuck holding it? You may want to
-"cat /proc/<pid>/stack" on any other threads that might be related here
-and see if you can figure out what they're doing.
+Jeff Layton (2):
+      cifs: move check for NULL socket into smb_send_rqst
+      cifs: adjust sequence number downward after signing NT_CANCEL request
 
---=20
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Pavel Shilovsky (3):
+      Revert "CIFS: Fix write after setting a read lock for read oplock files"
+      CIFS: Fix write after setting a read lock for read oplock files
+      CIFS: Don't let read only caching for mandatory byte-range locked files
+
+ fs/cifs/cifsfs.c    |    1 -
+ fs/cifs/cifsglob.h  |    2 +-
+ fs/cifs/file.c      |  141 +++++++++++++++++++++++++++-----------------------
+ fs/cifs/smb1ops.c   |    8 +++
+ fs/cifs/smb2ops.c   |    2 +
+ fs/cifs/transport.c |    6 +-
+ 6 files changed, 90 insertions(+), 70 deletions(-)
+
+-- 
+Thanks,
+
+Steve
