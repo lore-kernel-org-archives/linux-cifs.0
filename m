@@ -1,61 +1,34 @@
-From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] mount.cifs: remove support for "complex" usernames from mount.cifs
-Date: Wed, 9 Jan 2013 12:19:50 -0500
-Message-ID: <CAFB9KM1Z=BL1p_WCt4TkTb5nf2+SgaBopzf=3Z6G2VXKAfRzHg@mail.gmail.com>
-References: <1357214055-24911-1-git-send-email-jlayton@samba.org>
-	<CAFB9KM0-BrPcjV8gTW9BV_Awiw5bHbgYr=42smTJWKxCr=Y-PA@mail.gmail.com>
-	<20130103142110.269ea0d1@tlielax.poochiereds.net>
-	<CAH2r5mtRD85Te3g=G7Ez80NzGgG+36wHsiRnCzszQu9uee1-kQ@mail.gmail.com>
-	<CAFB9KM3uR1xCa9gGyyRyKjRgsL8npdzo4zxfyLUQToAvrJUCEw@mail.gmail.com>
-	<CAH2r5mv_gyNuTTf1-uSe1_HtWZgXmKUqyAHtu2UeJLi-aqT=9g@mail.gmail.com>
-	<CAH2r5mv6jAZqKyFdccriM0wtusRr_XEhekUwMfzf7746p8McXg@mail.gmail.com>
-	<20130104152224.497bdd1b@tlielax.poochiereds.net>
-	<CAFB9KM1NPSx1nUXen+RpSbUZUHwVsCUBPz52yUv-iGXQkpxt_Q@mail.gmail.com>
-	<CAH2r5muGfpgZ=dU=QZqeJK6z=MuJ=jG7=n1mkEwA3jzg1g1fUQ@mail.gmail.com>
+From: "Mantas M." <grawity-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Credentials file =?UTF-8?B?4oCTICJ1c2VybmFtZT0iIHNldHRpbmcgaWdubw==?=
+ =?UTF-8?B?cmVk?=
+Date: Sat, 12 Jan 2013 16:05:14 +0200
+Message-ID: <kcrqio$s53$1@ger.gmane.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muGfpgZ=dU=QZqeJK6z=MuJ=jG7=n1mkEwA3jzg1g1fUQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, Jan 9, 2013 at 12:14 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> >> > I don't care much either way.  The reason behind removing it, IIRC,
->> >> > was that it was an undocumented feature that lead to an ambiguous
->> >> > parsing situation when you had NFS syntax with an IPv6 address as the
->> >> > server portion of the string (ie
->> >> > dead:beef::1:/shareNameWithColon:/prepath).  It was easier to remove
->> >> > the undocumented feature than to support it for this use case.
->> >> >
->> >> > How does NFS syntax make things easier for SMB3?
->> >>
->> >> UNC names may be unfamiliar for some NFS users. Smb3 has many
->> >> performance advantages and other features that may eventually be of
->> >> strong interest to some Linux  NFS users
->>
->> Sorry to resurrect a dead thread, but how does the nfs-utils mount
->> helper deal with parsing IPv6 addresses when using NFS syntax?  Does
->> it just search for ":/" and assume that's the beginning of the share
->> name (which 99.99999% of the time it will be)?
->> --
->> Peace and Blessings,
->> -Scott.
->
->
->
-> I thought that NFS required that the IPv6 address be enclosed in brackets?
-> I haven't tested this to see how mount.cifs would handle this (if it is
-> broken presumably we should fix it)
->
-> https://fedoraproject.org/wiki/QA:Testcase_NFS_IPv6
+In cifs-utils 5.9, if I specify a credentials file with the
+"credetials=3D..." option, mount-cifs completely ignores the username
+specified in that file (a "username=3D..." line).
 
-mount.cifs doesn't have this syntax in the parser.  Right now the way
-to do it is to use the "ip=" flag and just put in your IPv6 address.
-Is the bracket syntax a standard of sorts or at least a de facto
-standard across mount helpers?
+`git bisect` tells me that it's caused by this commit:
 
--- 
-Peace and Blessings,
--Scott.
+> commit 85d18a1edfa95e9329a57615e92a58a5ab1902c1
+> Author: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> Date:   Mon Jan 7 07:19:46 2013 -0500
+>=20
+>     mount.cifs: remove support for "complex" usernames from mount.cif=
+s
+>    =20
+>     In commit 569cfcb3a, we added a warning of the removal for suppor=
+t for
+>     username=3D options in the form of DOMAIN/username%password. This=
+ patch
+>     removes that support as promised prior to the 5.9 release.
+
+--=20
+Mantas Mikul=C4=97nas <grawity-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
