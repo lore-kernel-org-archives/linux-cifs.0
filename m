@@ -1,34 +1,38 @@
-From: "Mantas M." <grawity-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Credentials file =?UTF-8?B?4oCTICJ1c2VybmFtZT0iIHNldHRpbmcgaWdubw==?=
- =?UTF-8?B?cmVk?=
-Date: Sat, 12 Jan 2013 16:05:14 +0200
-Message-ID: <kcrqio$s53$1@ger.gmane.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: set parsed_info->got_user when a cred file supplies a username
+Date: Sun, 13 Jan 2013 05:53:31 -0500
+Message-ID: <1358074411-29601-1-git-send-email-jlayton@samba.org>
+Cc: grawity-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In cifs-utils 5.9, if I specify a credentials file with the
-"credetials=3D..." option, mount-cifs completely ignores the username
-specified in that file (a "username=3D..." line).
+commit 85d18a1ed introduced a regression when using a credentials file.
+It set the username in the parsed mount info properly, but didn't set
+the "got_user" flag in it.
 
-`git bisect` tells me that it's caused by this commit:
+Also, fix an incorrect strlcpy length specifier in open_cred_file.
 
-> commit 85d18a1edfa95e9329a57615e92a58a5ab1902c1
-> Author: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> Date:   Mon Jan 7 07:19:46 2013 -0500
->=20
->     mount.cifs: remove support for "complex" usernames from mount.cif=
-s
->    =20
->     In commit 569cfcb3a, we added a warning of the removal for suppor=
-t for
->     username=3D options in the form of DOMAIN/username%password. This=
- patch
->     removes that support as promised prior to the 5.9 release.
+Reported-by: "Mantas M." <grawity-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---=20
-Mantas Mikul=C4=97nas <grawity-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+diff --git a/mount.cifs.c b/mount.cifs.c
+index c7c3055..40b77e9 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -581,7 +581,8 @@ static int open_cred_file(char *file_name,
+ 		switch (parse_cred_line(line_buf + i, &temp_val)) {
+ 		case CRED_USER:
+ 			strlcpy(parsed_info->username, temp_val,
+-				sizeof(parsed_info->domain));
++				sizeof(parsed_info->username));
++			parsed_info->got_user = 1;
+ 			break;
+ 		case CRED_PASS:
+ 			i = set_password(parsed_info, temp_val);
+-- 
+1.7.11.7
