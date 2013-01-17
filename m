@@ -1,52 +1,65 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: fix srcip_matches() for ipv6
-Date: Thu, 17 Jan 2013 11:24:12 -0500
-Message-ID: <20130117112412.095f7aef@corrin.poochiereds.net>
-References: <1358390177-24422-1-git-send-email-nickolai@csail.mit.edu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Nickolai Zeldovich <nickolai-EfZU8u+QLuPpgkiH4x7ZXw@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v2 0/8] Add O_DENY* support for VFS and CIFS/NFS
+Date: Thu, 17 Jan 2013 20:52:09 +0400
+Message-ID: <1358441537-8672-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1358390177-24422-1-git-send-email-nickolai-EfZU8u+QLuPpgkiH4x7ZXw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 16 Jan 2013 21:36:17 -0500
-Nickolai Zeldovich <nickolai-EfZU8u+QLuPpgkiH4x7ZXw@public.gmane.org> wrote:
+This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
 
-> srcip_matches() previously had code like this:
-> 
->   srcip_matches(..., struct sockaddr *rhs) {
->     /* ... */
->     struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *) &rhs;
->     return ipv6_addr_equal(..., &vaddr6->sin6_addr);
->   }
-> 
-> which interpreted the values on the stack after the 'rhs' pointer as an
-> ipv6 address.  The correct thing to do is to use 'rhs', not '&rhs'.
-> 
-> Signed-off-by: Nickolai Zeldovich <nickolai-EfZU8u+QLuPpgkiH4x7ZXw@public.gmane.org>
-> ---
->  fs/cifs/connect.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 17c3643..12b3da3 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -1917,7 +1917,7 @@ srcip_matches(struct sockaddr *srcaddr, struct sockaddr *rhs)
->  	}
->  	case AF_INET6: {
->  		struct sockaddr_in6 *saddr6 = (struct sockaddr_in6 *)srcaddr;
-> -		struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *)&rhs;
-> +		struct sockaddr_in6 *vaddr6 = (struct sockaddr_in6 *)rhs;
->  		return ipv6_addr_equal(&saddr6->sin6_addr, &vaddr6->sin6_addr);
->  	}
->  	default:
+These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
 
-Nice catch...
+According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+So, we have four new flags:
+O_DENYREAD - to prevent other opens with read access,
+O_DENYWRITE - to prevent other opens with write access,
+O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+O_DENYMAND - to switch on/off three flags above.
+
+The #1 patch bring infrastructure to let us add this capability easier. #2 patch adds flags to fcntl while #3 patch implement VFS part. Patches #4, #5, #6 are related to CIFS-specific changes. #7 and #8 describe NFS and NFSD parts.
+
+Also, I created the preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
+http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=f116c478bf9a1bc3985e9a719fb20d854914d67a
+
+Pavel Shilovsky (8):
+  locks: make flock_lock_file take is_conflict callback parm
+  fcntl: Introduce new O_DENY* open flags
+  vfs: Add O_DENYREAD/WRITE flags support for open syscall
+  CIFS: Add O_DENY* open flags support
+  CIFS: Use NT_CREATE_ANDX command for forcemand mounts
+  CIFS: Translate SHARING_VIOLATION to -ETXTBSY error code for SMB2
+  NFSv4: Add O_DENY* open flags support
+  NFSD: Pass share reservations flags to VFS
+
+ fs/cifs/cifsacl.c                |  10 ++--
+ fs/cifs/cifsglob.h               |  12 +++-
+ fs/cifs/cifsproto.h              |   9 +--
+ fs/cifs/cifssmb.c                |  47 ++++++++-------
+ fs/cifs/dir.c                    |  14 +++--
+ fs/cifs/file.c                   |  18 ++++--
+ fs/cifs/inode.c                  |  11 ++--
+ fs/cifs/link.c                   |  10 ++--
+ fs/cifs/readdir.c                |   2 +-
+ fs/cifs/smb1ops.c                |  15 ++---
+ fs/cifs/smb2file.c               |  10 ++--
+ fs/cifs/smb2inode.c              |   4 +-
+ fs/cifs/smb2maperror.c           |   2 +-
+ fs/cifs/smb2ops.c                |  10 ++--
+ fs/cifs/smb2pdu.c                |   6 +-
+ fs/cifs/smb2proto.h              |  14 +++--
+ fs/fcntl.c                       |   5 +-
+ fs/locks.c                       | 121 ++++++++++++++++++++++++++++++++++++---
+ fs/namei.c                       |  10 +++-
+ fs/nfs/nfs4xdr.c                 |  24 ++++++--
+ fs/nfsd/nfs4state.c              |  46 ++++++++++++++-
+ include/linux/fs.h               |   6 ++
+ include/uapi/asm-generic/fcntl.h |  14 +++++
+ 23 files changed, 324 insertions(+), 96 deletions(-)
+
+-- 
+1.8.1.1
