@@ -1,90 +1,78 @@
 From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v2 2/8] fcntl: Introduce new O_DENY* open flags
-Date: Thu, 17 Jan 2013 20:52:58 +0400
-Message-ID: <1358441584-8783-2-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2 7/8] NFSv4: Add O_DENY* open flags support
+Date: Thu, 17 Jan 2013 20:53:03 +0400
+Message-ID: <1358441584-8783-7-git-send-email-piastry@etersoft.ru>
 References: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
 	linux-nfs@vger.kernel.org, wine-devel@winehq.org
 To: linux-kernel@vger.kernel.org
-Return-path: <wine-devel-bounces@winehq.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
-List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
-	<mailto:wine-devel-request@winehq.org?subject=unsubscribe>
-List-Archive: <http://www.winehq.org/pipermail/wine-devel>
-List-Post: <mailto:wine-devel@winehq.org>
-List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
-List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
-	<mailto:wine-devel-request@winehq.org?subject=subscribe>
-Sender: wine-devel-bounces@winehq.org
-Errors-To: wine-devel-bounces@winehq.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-This patch adds 4 flags:
-1) O_DENYREAD that doesn't permit read access,
-2) O_DENYWRITE that doesn't permit write access,
-3) O_DENYDELETE that doesn't permit delete or rename,
-4) O_DENYMAND that enables O_DENY* flags checks.
-
-Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags -
-this change can benefit cifs and nfs modules as well as Samba and
-NFS file servers. These flags are only take affect for opens with
-O_DENYMAND flags - there is no impact on native Linux opens.
+by passing these flags to NFSv4 open request.
 
 Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
 ---
- fs/fcntl.c                       |  5 +++--
- include/uapi/asm-generic/fcntl.h | 14 ++++++++++++++
- 2 files changed, 17 insertions(+), 2 deletions(-)
+ fs/nfs/nfs4xdr.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index 71a600a..d88a548 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -730,14 +730,15 @@ static int __init fcntl_init(void)
- 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
- 	 * is defined as O_NONBLOCK on some platforms and not on others.
- 	 */
--	BUILD_BUG_ON(19 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
-+	BUILD_BUG_ON(23 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
- 		O_RDONLY	| O_WRONLY	| O_RDWR	|
- 		O_CREAT		| O_EXCL	| O_NOCTTY	|
- 		O_TRUNC		| O_APPEND	| /* O_NONBLOCK	| */
- 		__O_SYNC	| O_DSYNC	| FASYNC	|
- 		O_DIRECT	| O_LARGEFILE	| O_DIRECTORY	|
- 		O_NOFOLLOW	| O_NOATIME	| O_CLOEXEC	|
--		__FMODE_EXEC	| O_PATH
-+		__FMODE_EXEC	| O_PATH	| O_DENYREAD	|
-+		O_DENYWRITE	| O_DENYDELETE	| O_DENYMAND
- 		));
+diff --git a/fs/nfs/nfs4xdr.c b/fs/nfs/nfs4xdr.c
+index 40836ee..0a0cd1e 100644
+--- a/fs/nfs/nfs4xdr.c
++++ b/fs/nfs/nfs4xdr.c
+@@ -1322,7 +1322,8 @@ static void encode_lookup(struct xdr_stream *xdr, const struct qstr *name, struc
+ 	encode_string(xdr, name->len, name->name);
+ }
  
- 	fasync_cache = kmem_cache_create("fasync_cache",
-diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
-index a48937d..6e4e979 100644
---- a/include/uapi/asm-generic/fcntl.h
-+++ b/include/uapi/asm-generic/fcntl.h
-@@ -84,6 +84,20 @@
- #define O_PATH		010000000
- #endif
+-static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
++static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode,
++				int open_flags)
+ {
+ 	__be32 *p;
  
-+#ifndef O_DENYREAD
-+#define O_DENYREAD	020000000	/* Do not permit read access */
-+#endif
-+#ifndef O_DENYWRITE
-+#define O_DENYWRITE	040000000	/* Do not permit write access */
-+#endif
-+/* FMODE_NONOTIFY	0100000000 */
-+#ifndef O_DENYDELETE
-+#define O_DENYDELETE	0200000000	/* Do not permit delete or rename */
-+#endif
-+#ifndef O_DENYMAND
-+#define O_DENYMAND	0400000000	/* Enable O_DENY flags checks */
-+#endif
-+
- #ifndef O_NDELAY
- #define O_NDELAY	O_NONBLOCK
- #endif
+@@ -1340,7 +1341,22 @@ static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
+ 	default:
+ 		*p++ = cpu_to_be32(0);
+ 	}
+-	*p = cpu_to_be32(0);		/* for linux, share_deny = 0 always */
++	if (open_flags & O_DENYMAND) {
++		switch (open_flags & (O_DENYREAD|O_DENYWRITE)) {
++		case O_DENYREAD:
++			*p = cpu_to_be32(NFS4_SHARE_DENY_READ);
++			break;
++		case O_DENYWRITE:
++			*p = cpu_to_be32(NFS4_SHARE_DENY_WRITE);
++			break;
++		case O_DENYREAD|O_DENYWRITE:
++			*p = cpu_to_be32(NFS4_SHARE_DENY_BOTH);
++			break;
++		default:
++			*p = cpu_to_be32(0);
++		}
++	} else
++		*p = cpu_to_be32(0);
+ }
+ 
+ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_openargs *arg)
+@@ -1351,7 +1367,7 @@ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_opena
+  * owner 4 = 32
+  */
+ 	encode_nfs4_seqid(xdr, arg->seqid);
+-	encode_share_access(xdr, arg->fmode);
++	encode_share_access(xdr, arg->fmode, arg->open_flags);
+ 	p = reserve_space(xdr, 36);
+ 	p = xdr_encode_hyper(p, arg->clientid);
+ 	*p++ = cpu_to_be32(24);
+@@ -1489,7 +1505,7 @@ static void encode_open_downgrade(struct xdr_stream *xdr, const struct nfs_close
+ 	encode_op_hdr(xdr, OP_OPEN_DOWNGRADE, decode_open_downgrade_maxsz, hdr);
+ 	encode_nfs4_stateid(xdr, arg->stateid);
+ 	encode_nfs4_seqid(xdr, arg->seqid);
+-	encode_share_access(xdr, arg->fmode);
++	encode_share_access(xdr, arg->fmode, 0);
+ }
+ 
+ static void
 -- 
 1.8.1.1
