@@ -1,218 +1,129 @@
 From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v2 3/8] vfs: Add O_DENYREAD/WRITE flags support for open syscall
-Date: Thu, 17 Jan 2013 20:52:59 +0400
-Message-ID: <1358441584-8783-3-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v2 8/8] NFSD: Pass share reservations flags to VFS
+Date: Thu, 17 Jan 2013 20:53:04 +0400
+Message-ID: <1358441584-8783-8-git-send-email-piastry@etersoft.ru>
 References: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
 Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
 	linux-nfs@vger.kernel.org, wine-devel@winehq.org
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
 In-Reply-To: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-If O_DENYMAND flag is specified, O_DENYREAD/WRITE/MAND flags are
-translated to flock's flags:
-
-!O_DENYREAD  -> LOCK_READ
-!O_DENYWRITE -> LOCK_WRITE
-O_DENYMAND   -> LOCK_MAND
-
-and set through flock_lock_file on a file.
-
-This change only affects opens that use O_DENYMAND flag - all other
-native Linux opens don't care about these flags. It allow us to
-enable this feature for applications that need it (e.g. NFS and
-Samba servers that export the same directory for Windows clients,
-or Wine applications that access the same files simultaneously).
+that maps them into O_DENY flags and make them visible for
+applications that use O_DENYMAND opens.
 
 Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
 ---
- fs/locks.c         | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- fs/namei.c         |  10 ++++-
- include/linux/fs.h |   6 +++
- 3 files changed, 118 insertions(+), 4 deletions(-)
+ fs/locks.c          |  1 +
+ fs/nfsd/nfs4state.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 9edfec4..ebe9a30 100644
+index ebe9a30..ebdff1f 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -605,12 +605,86 @@ static int posix_locks_conflict(struct file_lock *caller_fl, struct file_lock *s
- 	return (locks_conflict(caller_fl, sys_fl));
- }
- 
--/* Determine if lock sys_fl blocks lock caller_fl. FLOCK specific
-+static unsigned int
-+deny_flags_to_cmd(unsigned int flags)
-+{
-+	unsigned int cmd = LOCK_MAND;
-+
-+	if (!(flags & O_DENYREAD))
-+		cmd |= LOCK_READ;
-+	if (!(flags & O_DENYWRITE))
-+		cmd |= LOCK_WRITE;
-+
-+	return cmd;
-+}
-+
-+/*
-+ * locks_mand_conflict - Determine if there's a share reservation conflict
-+ * @caller_fl: lock we're attempting to acquire
-+ * @sys_fl: lock already present on system that we're checking against
-+ *
-+ * Check to see if there's a share_reservation conflict. LOCK_READ/LOCK_WRITE
-+ * tell us whether the reservation allows other readers and writers.
-+ *
-+ * We only check against other LOCK_MAND locks, so applications that want to
-+ * use share mode locking will only conflict against one another. "normal"
-+ * applications that open files won't be affected by and won't themselves
-+ * affect the share reservations.
-+ */
-+static int
-+locks_mand_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
-+{
-+	unsigned char caller_type = caller_fl->fl_type;
-+	unsigned char sys_type = sys_fl->fl_type;
-+	fmode_t caller_fmode = caller_fl->fl_file->f_mode;
-+	fmode_t sys_fmode = sys_fl->fl_file->f_mode;
-+
-+	/* they can only conflict if they're both LOCK_MAND */
-+	if (!(caller_type & LOCK_MAND) || !(sys_type & LOCK_MAND))
-+		return 0;
-+
-+	if (!(caller_type & LOCK_READ) && (sys_fmode & FMODE_READ))
-+		return 1;
-+	if (!(caller_type & LOCK_WRITE) && (sys_fmode & FMODE_WRITE))
-+		return 1;
-+	if (!(sys_type & LOCK_READ) && (caller_fmode & FMODE_READ))
-+		return 1;
-+	if (!(sys_type & LOCK_WRITE) && (caller_fmode & FMODE_WRITE))
-+		return 1;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Determine if lock sys_fl blocks lock caller_fl. O_DENY* flags specific
-+ * checking before calling the locks_conflict().
-+ */
-+static int
-+deny_locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
-+{
-+	/*
-+	 * FLOCK locks referring to the same filp do not conflict with
-+	 * each other.
-+	 */
-+	if (!IS_FLOCK(sys_fl))
-+		return 0;
-+	if ((caller_fl->fl_type & LOCK_MAND) || (sys_fl->fl_type & LOCK_MAND))
-+		return locks_mand_conflict(caller_fl, sys_fl);
-+	if (caller_fl->fl_file == sys_fl->fl_file)
-+		return 0;
-+
-+	return locks_conflict(caller_fl, sys_fl);
-+}
-+
-+/*
-+ * Determine if lock sys_fl blocks lock caller_fl. FLOCK specific
-  * checking before calling the locks_conflict().
-  */
--static int flock_locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
-+static int
-+flock_locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
- {
--	/* FLOCK locks referring to the same filp do not conflict with
-+	/*
-+	 * FLOCK locks referring to the same filp do not conflict with
- 	 * each other.
- 	 */
- 	if (!IS_FLOCK(sys_fl) || (caller_fl->fl_file == sys_fl->fl_file))
-@@ -789,6 +863,32 @@ out:
+@@ -888,6 +888,7 @@ deny_lock_file(struct file *filp)
+ 	locks_free_lock(lock);
  	return error;
  }
++EXPORT_SYMBOL(deny_lock_file);
  
-+/*
-+ * Determine if a file is allowed to be opened with specified access and deny
-+ * modes. Lock the file and return 0 if checks passed, otherwise return a error
-+ * code.
-+ */
-+int
-+deny_lock_file(struct file *filp)
-+{
-+	struct file_lock *lock;
-+	int error = 0;
-+
-+	if (!(filp->f_flags & O_DENYMAND))
-+		return error;
-+
-+	error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
-+	if (error)
-+		return error;
-+
-+	error = flock_lock_file(filp, lock, deny_locks_conflict);
-+	if (error == -EAGAIN)
-+		error = -ETXTBSY;
-+
-+	locks_free_lock(lock);
-+	return error;
-+}
-+
  static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
  {
- 	struct file_lock *fl;
-diff --git a/fs/namei.c b/fs/namei.c
-index 5f4cdf3..bf3bb34 100644
---- a/fs/namei.c
-+++ b/fs/namei.c
-@@ -2569,9 +2569,14 @@ static int atomic_open(struct nameidata *nd, struct dentry *dentry,
- 	 * here.
- 	 */
- 	error = may_open(&file->f_path, acc_mode, open_flag);
--	if (error)
-+	if (error) {
- 		fput(file);
-+		goto out;
-+	}
- 
-+	error = deny_lock_file(file);
-+	if (error)
-+		fput(file);
- out:
- 	dput(dentry);
- 	return error;
-@@ -2908,6 +2913,9 @@ opened:
- 		if (error)
- 			goto exit_fput;
- 	}
-+	error = deny_lock_file(file);
-+	if (error)
-+		goto exit_fput;
- out:
- 	if (got_write)
- 		mnt_drop_write(nd->path.mnt);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 70a766ae..b8ed06e 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1004,6 +1004,7 @@ extern int lease_modify(struct file_lock **, int);
- extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
- extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
- extern void locks_delete_block(struct file_lock *waiter);
-+extern int deny_lock_file(struct file *);
- extern void lock_flocks(void);
- extern void unlock_flocks(void);
- #else /* !CONFIG_FILE_LOCKING */
-@@ -1152,6 +1153,11 @@ static inline void locks_delete_block(struct file_lock *waiter)
- {
+diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
+index d0237f8..4aa2b8f 100644
+--- a/fs/nfsd/nfs4state.c
++++ b/fs/nfsd/nfs4state.c
+@@ -516,6 +516,19 @@ test_deny(u32 access, struct nfs4_ol_stateid *stp)
+ 	return test_bit(access, &stp->st_deny_bmap);
  }
  
-+static inline int deny_lock_file(struct file *filp)
++static int nfs4_deny_to_odeny(u32 access)
 +{
-+	return 0;
++	switch (access & NFS4_SHARE_DENY_BOTH) {
++	case NFS4_SHARE_DENY_READ:
++		return O_DENYMAND | O_DENYREAD;
++	case NFS4_SHARE_DENY_WRITE:
++		return O_DENYWRITE | O_DENYMAND;
++	case NFS4_SHARE_DENY_BOTH:
++		return O_DENYREAD | O_DENYWRITE | O_DENYMAND;
++	}
++	return O_DENYMAND;
 +}
 +
- static inline void lock_flocks(void)
+ static int nfs4_access_to_omode(u32 access)
  {
+ 	switch (access & NFS4_SHARE_ACCESS_BOTH) {
+@@ -2769,6 +2782,21 @@ nfsd4_truncate(struct svc_rqst *rqstp, struct svc_fh *fh,
  }
+ 
+ static __be32
++nfs4_vfs_set_deny(struct nfs4_file *fp, unsigned long share_access,
++		  unsigned long deny_access)
++{
++	int oflag, rc;
++	__be32 status = nfs_ok;
++
++	oflag = nfs4_access_to_omode(share_access);
++	fp->fi_fds[oflag]->f_flags |= nfs4_deny_to_odeny(deny_access);
++	rc = deny_lock_file(fp->fi_fds[oflag]);
++	if (rc)
++		status = nfserrno(rc);
++	return status;
++}
++
++static __be32
+ nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *cur_fh, struct nfs4_ol_stateid *stp, struct nfsd4_open *open)
+ {
+ 	u32 op_share_access = open->op_share_access;
+@@ -2789,6 +2817,14 @@ nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *c
+ 		}
+ 		return status;
+ 	}
++	status = nfs4_vfs_set_deny(fp, op_share_access, open->op_share_deny);
++	if (status) {
++		if (new_access) {
++			int oflag = nfs4_access_to_omode(op_share_access);
++			nfs4_file_put_access(fp, oflag);
++		}
++		return status;
++	}
+ 	/* remember the open */
+ 	set_access(op_share_access, stp);
+ 	set_deny(open->op_share_deny, stp);
+@@ -3021,7 +3057,7 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+ 
+ 	/*
+ 	 * OPEN the file, or upgrade an existing OPEN.
+-	 * If truncate fails, the OPEN fails.
++	 * If truncate or setting deny fails, the OPEN fails.
+ 	 */
+ 	if (stp) {
+ 		/* Stateid was found, this is an OPEN upgrade */
+@@ -3035,6 +3071,10 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+ 		status = nfsd4_truncate(rqstp, current_fh, open);
+ 		if (status)
+ 			goto out;
++		status = nfs4_vfs_set_deny(fp, open->op_share_access,
++					   open->op_share_deny);
++		if (status)
++			goto out;
+ 		stp = open->op_stp;
+ 		open->op_stp = NULL;
+ 		init_open_stateid(stp, fp, open);
+@@ -3713,6 +3753,10 @@ nfsd4_open_downgrade(struct svc_rqst *rqstp,
+ 	}
+ 	nfs4_stateid_downgrade(stp, od->od_share_access);
+ 
++	status = nfs4_vfs_set_deny(stp->st_file, od->od_share_access,
++				   od->od_share_deny);
++	if (status)
++		goto out;
+ 	reset_union_bmap_deny(od->od_share_deny, stp);
+ 
+ 	update_stateid(&stp->st_stid.sc_stateid);
 -- 
 1.8.1.1
+
