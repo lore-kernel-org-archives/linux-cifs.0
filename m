@@ -1,75 +1,68 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v2 5/8] CIFS: Use NT_CREATE_ANDX command for forcemand mounts
-Date: Thu, 17 Jan 2013 20:53:01 +0400
-Message-ID: <1358441584-8783-5-git-send-email-piastry@etersoft.ru>
-References: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
+From: Stephen Rothwell <sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org>
+Subject: Re: [PATCH v2 0/8] Add O_DENY* support for VFS and CIFS/NFS
+Date: Fri, 18 Jan 2013 09:55:38 +1100
+Message-ID: <20130118095538.fdd0b3be90739b9fd9179b5d@canb.auug.org.au>
+References: <1358441537-8672-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, wine-devel@winehq.org
-To: linux-kernel@vger.kernel.org
-Return-path: <wine-devel-bounces@winehq.org>
-In-Reply-To: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
-List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
-	<mailto:wine-devel-request@winehq.org?subject=unsubscribe>
-List-Archive: <http://www.winehq.org/pipermail/wine-devel>
-List-Post: <mailto:wine-devel@winehq.org>
-List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
-List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
-	<mailto:wine-devel-request@winehq.org?subject=subscribe>
-Sender: wine-devel-bounces@winehq.org
-Errors-To: wine-devel-bounces@winehq.org
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Fri__18_Jan_2013_09_55_38_+1100_7TSfPL.ufZ3ugG+I"
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1358441537-8672-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-forcemand mount option now lets us use Windows mandatory style of
-byte-range locks even if server supports posix ones - switches on
-Windows locking mechanism. Share flags is another locking mehanism
-provided by Windows semantic that can be used by NT_CREATE_ANDX
-command. This patch combines all Windows locking mechanism in one
-mount option by using NT_CREATE_ANDX to open files if forcemand is on.
+--Signature=_Fri__18_Jan_2013_09_55_38_+1100_7TSfPL.ufZ3ugG+I
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
----
- fs/cifs/dir.c  | 1 +
- fs/cifs/file.c | 6 ++++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+Hi Pavel,
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 12ee773..06be419 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -185,6 +185,7 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
- 	}
- 
- 	if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open &&
-+	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
- 	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
- 			le64_to_cpu(tcon->fsUnixInfo.Capability))) {
- 		rc = cifs_posix_open(full_path, &newinode, inode->i_sb, mode,
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4ddf450..bb10486 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -426,8 +426,9 @@ int cifs_open(struct inode *inode, struct file *file)
- 	else
- 		oplock = 0;
- 
--	if (!tcon->broken_posix_open && tcon->unix_ext &&
--	    cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
-+	if (!tcon->broken_posix_open && tcon->unix_ext && cap_unix(tcon->ses)
-+	    && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
-+	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
- 				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
- 		/* can not refresh inode info since size could be stale */
- 		rc = cifs_posix_open(full_path, &inode, inode->i_sb,
-@@ -575,6 +576,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 		oplock = 0;
- 
- 	if (tcon->unix_ext && cap_unix(tcon->ses) &&
-+	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
- 	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
- 				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
- 		/*
--- 
-1.8.1.1
+On Thu, 17 Jan 2013 20:52:09 +0400 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wr=
+ote:
+>
+> This patchset adds support of O_DENY* flags for Linux fs layer. These fla=
+gs can be used by any application that needs share reservations to organize=
+ a file access. VFS already has some sort of this capability - now it's don=
+e through flock/LOCK_MAND mechanis, but that approach is non-atomic. This p=
+atchset build new capabilities on top of the existing one but doesn't bring=
+ any changes into the flock call semantic.
+
+This has probably been discussed, but is Linux's leases implementation
+not sufficient?  Just wondering.
+
+--=20
+Cheers,
+Stephen Rothwell                    sfr-3FnU+UHB4dNDw9hX6IcOSA@public.gmane.org
+
+--Signature=_Fri__18_Jan_2013_09_55_38_+1100_7TSfPL.ufZ3ugG+I
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCAAGBQJQ+IFqAAoJEECxmPOUX5FE+gAQAJwLoVKNYzoQS/zD5Qk+ahFn
+4wS6YX/afeFPoQhLujcl+LtgSAH6/Ck2T+OxPfrzxCqVXyhtWDz5tZ7aomQTw9fr
+J9nzWDzOYQRbn5UV07XzR0p4iQcglCBrHs1b4Jqt3f+p6zUYeGjxQNrCf4DFcB+b
+EnBUYkpIkGCsEUgIeknN2EJuL3XKz0a1Th7V7QwhQwRMOQYxAt3/X0fCSpjyxLDJ
+e0i/cnMshvI4ECLTG8YmPaU0aigU4zWO810NvlhUQByBxqMMy/x64mloPesI8SJd
+magfHroh1Shsxay+QRYnEzOoQb+cm531radEzOsUiD30VzR8ANZi80S6zBS8DAYV
+7Cc6WHGuoKvG3+uYaq7j6EyCcc/M0gzZHrj2kL9lPUpTcHdB15FCjysE67qX4eut
+EKNWHQHOGN01XKqZgh/7uuKeqo2sM6igLdIqzU06/cjGFYlTncxQP41IPJs1xYBc
+j+1M1TaDm5CPePUGq9YUk1mK977mQTsEE9+kMUhn+nlQBcY5HdIQbgB/K74qJqIt
+1rUONBpSTdb6bXz6GKbJEIGZy+JRIhUFt8wDee9Qc7QZQKWlhSe0lx0vUREdUIqI
+FCfhIw1atAcq0FyU9FGx3VEYJVdYuAz139zAMbC0AuJyR0tarDmY9ZuRxeW60z3h
+NLDPSpog2wpX+jdtVTuF
+=UbCB
+-----END PGP SIGNATURE-----
+
+--Signature=_Fri__18_Jan_2013_09_55_38_+1100_7TSfPL.ufZ3ugG+I--
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
