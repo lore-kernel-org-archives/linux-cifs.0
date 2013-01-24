@@ -1,27 +1,36 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] fs/cifs/cifs_dfs_ref.c: fix potential memory leakage
-Date: Wed, 23 Jan 2013 00:00:07 -0600
-Message-ID: <CAH2r5mtXdqWgzhHXteEWW-5T7oPB6+Grh3fthmVpuD_64iC2tw@mail.gmail.com>
-References: <1358900459-26277-1-git-send-email-dinggnu@gmail.com>
-	<20130122203603.1bd26363@corrin.poochiereds.net>
-	<CAH2r5mtSTOWc7Caf3UA=SGY3_PoR-xFOyXHd4OiYZSGXa5W_YQ@mail.gmail.com>
+Subject: [GIT] CIFS Fixes
+Date: Thu, 24 Jan 2013 17:15:41 -0600
+Message-ID: <CAH2r5mtVEkFjw=zUG1Mx9dwtucLD9GCmVjwT6uus2fZEfykp5A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Cong Ding <dinggnu-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtSTOWc7Caf3UA=SGY3_PoR-xFOyXHd4OiYZSGXa5W_YQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jan 22, 2013 at 11:59 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> merged into cifs-2.6.git
+Two small cifs fixes
 
-and added cc: stable <stable-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>
+The following changes since commit 9a9284153d965a57edc7162a8e57c14c97f3a935:
 
+  Merge branch 'drm-fixes' of
+git://people.freedesktop.org/~airlied/linux (2013-01-20 20:55:49
+-0800)
 
+are available in the git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+Cong Ding (1):
+      fs/cifs/cifs_dfs_ref.c: fix potential memory leakage
+
+Nickolai Zeldovich (1):
+      cifs: fix srcip_matches() for ipv6
+
+ fs/cifs/cifs_dfs_ref.c |    2 ++
+ fs/cifs/connect.c      |    2 +-
+ 2 files changed, 3 insertions(+), 1 deletions(-)
 
 -- 
 Thanks,
