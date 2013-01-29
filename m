@@ -1,38 +1,53 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Thu, 24 Jan 2013 17:15:41 -0600
-Message-ID: <CAH2r5mtVEkFjw=zUG1Mx9dwtucLD9GCmVjwT6uus2fZEfykp5A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] setcifsacl: fix infinite loop in getnumcaces
+Date: Tue, 29 Jan 2013 07:17:29 -0500
+Message-ID: <1359461849-9164-1-git-send-email-jlayton@samba.org>
+Cc: jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Two small cifs fixes
+Jian pointed out that this loop can cycle infinitely when the string
+contains a ','.
 
-The following changes since commit 9a9284153d965a57edc7162a8e57c14c97f3a935:
+Also, fix typo in manpage that shows a trailing ',' in one example.
 
-  Merge branch 'drm-fixes' of
-git://people.freedesktop.org/~airlied/linux (2013-01-20 20:55:49
--0800)
+Reported-by: Jian Li <jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ setcifsacl.1.in | 2 +-
+ setcifsacl.c    | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-are available in the git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-Cong Ding (1):
-      fs/cifs/cifs_dfs_ref.c: fix potential memory leakage
-
-Nickolai Zeldovich (1):
-      cifs: fix srcip_matches() for ipv6
-
- fs/cifs/cifs_dfs_ref.c |    2 ++
- fs/cifs/connect.c      |    2 +-
- 2 files changed, 3 insertions(+), 1 deletions(-)
-
+diff --git a/setcifsacl.1.in b/setcifsacl.1.in
+index 5ede36a..d53a6ec 100644
+--- a/setcifsacl.1.in
++++ b/setcifsacl.1.in
+@@ -94,7 +94,7 @@ Set an ACL
+ .br
+ setcifsacl -S "ACL:CIFSTESTDOM\\Administrator:0x0/0x0/FULL,
+ .br
+-ACL:CIFSTESTDOM\\user2:0x0/0x0/FULL," <file_name>
++ACL:CIFSTESTDOM\\user2:0x0/0x0/FULL" <file_name>
+ .PP
+ .SH "NOTES"
+ .PP
+diff --git a/setcifsacl.c b/setcifsacl.c
+index 211c1af..7f92b91 100644
+--- a/setcifsacl.c
++++ b/setcifsacl.c
+@@ -642,8 +642,10 @@ get_numcaces(const char *aces)
+ 	const char *current;
+ 
+ 	current = aces;
+-	while((current = strchr(current, ',')))
++	while((current = strchr(current, ','))) {
++		++current;
+ 		++num;
++	}
+ 
+ 	return num;
+ }
 -- 
-Thanks,
-
-Steve
+1.7.11.7
