@@ -1,47 +1,51 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH] setcifsacl: fix offset calculation in "set" code
-Date: Tue, 29 Jan 2013 07:17:53 -0500
-Message-ID: <1359461873-9222-1-git-send-email-jlayton@samba.org>
-Cc: jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Writes greater than 64k fails with -ENOSPC
+Date: Tue, 29 Jan 2013 17:54:21 +0530
+Message-ID: <5107BF75.704@suse.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Previously the code assumed that the ACE that was copied was of a
-fixed size. Save off the return value from copy_ace and ensure that
-we apply it correctly to the size and offset.
+Hi all,
 
-Reported-by: Jian Li <jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- setcifsacl.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+I'm looking into a report on 3.0 based kernel (plus stable fixes)
+where writes greater than 64k to a NAS (Hitachi NAS) is failing
+(simple dd). The problem was not seen with a 2.6.32-ish kernel.
+Also, note that the problem is not seen with other Servers such
+as Windows 2003 or Windows 8 Servers.
 
-diff --git a/setcifsacl.c b/setcifsacl.c
-index 7f92b91..67dd29c 100644
---- a/setcifsacl.c
-+++ b/setcifsacl.c
-@@ -183,7 +183,7 @@ static int
- ace_set(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd, ssize_t *bufsize,
- 			struct cifs_ace **cacesptr, int numcaces)
- {
--	int i, rc, acessize = 0;
-+	int i, rc, size = 0, acessize = 0;
- 	size_t acesoffset;
- 	char *acesptr;
- 
-@@ -193,8 +193,9 @@ ace_set(struct cifs_ntsd *pntsd, struct cifs_ntsd **npntsd, ssize_t *bufsize,
- 
- 	acesptr = (char *)*npntsd + acesoffset;
- 	for (i = 0; i < numcaces; ++i) {
--		acessize += copy_ace((struct cifs_ace *)acesptr, cacesptr[i]);
--		acesptr += sizeof(struct cifs_ace);
-+		size = copy_ace((struct cifs_ace *)acesptr, cacesptr[i]);
-+		acessize += size;
-+		acesptr += size;
- 	}
- 	copy_sec_desc(pntsd, *npntsd, numcaces, acessize);
- 	acesptr = (char *)*npntsd + acesoffset;
+The strace output shows the close() fall fails with -ENOSPC. 
+
+The relevant cFYI snip
+
+Jan 23 08:31:45 vsusix02 kernel: [1003552.227274] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: For smb_command 47
+Jan 23 08:31:45 vsusix02 kernel: [1003552.227277] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: Sending smb:  total_len 127044
+Jan 23 08:31:45 vsusix02 kernel: [1003552.345848] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/connect.c: rfc1002 length 0x33
+Jan 23 08:31:45 vsusix02 kernel: [1003552.393906] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/cifssmb.c: async write at 1015808 8192 bytes
+Jan 23 08:31:45 vsusix02 kernel: [1003552.393911] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: For smb_command 47
+Jan 23 08:31:45 vsusix02 kernel: [1003552.393914] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: Sending smb:  total_len 8260
+Jan 23 08:31:45 vsusix02 kernel: [1003552.479378] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/connect.c: rfc1002 length 0x33
+Jan 23 08:31:45 vsusix02 kernel: [1003552.481215] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/connect.c: rfc1002 length 0x33
+Jan 23 08:31:45 vsusix02 kernel: [1003552.481260] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/file.c: Flush inode ffff88004e1655c0 file ffff8800379d48c0 rc -28
+
+
+The problem seems to be that during close(), we try to flush the
+buffers by calling cifs_flush() which in turn will call
+filemap_write_and_wait() to wait on the pages under writeback to
+complete. do_writepages() will invoke cifs_writepages() which is 
+perhaps returning -ENOSPC and it is propagated back.
+
+There are no quota restrictions or disk space problems. The
+tcpdump output doesn't show any errors during the write or close.
+
+I'm not sure what could be causing the problem and would
+appreciate any clues or debugging suggestions.
+
+Thanks
+
 -- 
-1.7.11.7
+Suresh Jayaraman
