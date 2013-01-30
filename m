@@ -1,65 +1,90 @@
-From: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
-Subject: Re: [PATCH 1/1] cifs: set MAY_SIGN when sec=krb5
-Date: Wed, 30 Jan 2013 20:03:55 +0100
-Message-ID: <51096E9B.5080704@prodrive.nl>
-References: <1351071946-21458-1-git-send-email-martijn.de.gouw@prodrive.nl> <20121024073723.2e5063db@tlielax.poochiereds.net>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH v2 0/8] Add O_DENY* support for VFS and CIFS/NFS
+Date: Wed, 30 Jan 2013 17:11:18 -0500
+Message-ID: <20130130221118.GB15584@fieldses.org>
+References: <1358441537-8672-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20121024073723.2e5063db-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1358441537-8672-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-Hi,
+On Thu, Jan 17, 2013 at 08:52:09PM +0400, Pavel Shilovsky wrote:
+> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
+> 
+> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
+> 
+> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
 
-On 10/24/2012 01:37 PM, Jeff Layton wrote:
-> On Wed, 24 Oct 2012 11:45:46 +0200
-> Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
->
->> Setting this secFlg allows usage of dfs where some servers require
->> signing and others don't.
->>
->> Signed-off-by: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
->> ---
->> :100644 100644 b39bb4a... 4da9dd3... M	fs/cifs/connect.c
->>   fs/cifs/connect.c |    2 +-
->>   1 files changed, 1 insertions(+), 1 deletions(-)
->>
->> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->> index b39bb4a..4da9dd3 100644
->> --- a/fs/cifs/connect.c
->> +++ b/fs/cifs/connect.c
->> @@ -994,7 +994,7 @@ static int cifs_parse_security_flavors(char *value,
->>
->>   	switch (match_token(value, cifs_secflavor_tokens, args)) {
->>   	case Opt_sec_krb5:
->> -		vol->secFlg |= CIFSSEC_MAY_KRB5;
->> +		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
->>   		break;
->>   	case Opt_sec_krb5i:
->>   		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
->
-> Looks like a reasonable bandaid until someone overhauls the auth
-> selection code for sanity...
->
-> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
->
->
+Maybe that's good enough.  A mount flag might be simpler and give
+consistent enforcement for all users.
 
-It's been a while and this patch is not yet applied.
-Please apply.
+> 
+> So, we have four new flags:
+> O_DENYREAD - to prevent other opens with read access,
+> O_DENYWRITE - to prevent other opens with write access,
+> O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+> O_DENYMAND - to switch on/off three flags above.
 
-It is already in patchwork I saw:
-https://patchwork.kernel.org/patch/1637021/
+It would be useful to have some really careful documentation of how
+these are meant to work.  Maybe try updating the open man page?
 
-Regards, Martijn
-
--- 
-Martijn de Gouw
-Engineer
-Prodrive B.V.
-Mobile: +31 63 17 76 161
-Phone:  +31 40 26 76 200
+--b.
+> 
+> The #1 patch bring infrastructure to let us add this capability easier. #2 patch adds flags to fcntl while #3 patch implement VFS part. Patches #4, #5, #6 are related to CIFS-specific changes. #7 and #8 describe NFS and NFSD parts.
+> 
+> Also, I created the preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
+> http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=f116c478bf9a1bc3985e9a719fb20d854914d67a
+> 
+> Pavel Shilovsky (8):
+>   locks: make flock_lock_file take is_conflict callback parm
+>   fcntl: Introduce new O_DENY* open flags
+>   vfs: Add O_DENYREAD/WRITE flags support for open syscall
+>   CIFS: Add O_DENY* open flags support
+>   CIFS: Use NT_CREATE_ANDX command for forcemand mounts
+>   CIFS: Translate SHARING_VIOLATION to -ETXTBSY error code for SMB2
+>   NFSv4: Add O_DENY* open flags support
+>   NFSD: Pass share reservations flags to VFS
+> 
+>  fs/cifs/cifsacl.c                |  10 ++--
+>  fs/cifs/cifsglob.h               |  12 +++-
+>  fs/cifs/cifsproto.h              |   9 +--
+>  fs/cifs/cifssmb.c                |  47 ++++++++-------
+>  fs/cifs/dir.c                    |  14 +++--
+>  fs/cifs/file.c                   |  18 ++++--
+>  fs/cifs/inode.c                  |  11 ++--
+>  fs/cifs/link.c                   |  10 ++--
+>  fs/cifs/readdir.c                |   2 +-
+>  fs/cifs/smb1ops.c                |  15 ++---
+>  fs/cifs/smb2file.c               |  10 ++--
+>  fs/cifs/smb2inode.c              |   4 +-
+>  fs/cifs/smb2maperror.c           |   2 +-
+>  fs/cifs/smb2ops.c                |  10 ++--
+>  fs/cifs/smb2pdu.c                |   6 +-
+>  fs/cifs/smb2proto.h              |  14 +++--
+>  fs/fcntl.c                       |   5 +-
+>  fs/locks.c                       | 121 ++++++++++++++++++++++++++++++++++++---
+>  fs/namei.c                       |  10 +++-
+>  fs/nfs/nfs4xdr.c                 |  24 ++++++--
+>  fs/nfsd/nfs4state.c              |  46 ++++++++++++++-
+>  include/linux/fs.h               |   6 ++
+>  include/uapi/asm-generic/fcntl.h |  14 +++++
+>  23 files changed, 324 insertions(+), 96 deletions(-)
+> 
+> -- 
+> 1.8.1.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-fsdevel" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
