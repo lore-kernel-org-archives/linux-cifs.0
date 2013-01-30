@@ -1,113 +1,67 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] setcifsacl: fix infinite loop in getnumcaces
-Date: Tue, 29 Jan 2013 19:19:11 -0500
-Message-ID: <20130129191911.13536572@tlielax.poochiereds.net>
-References: <1359461849-9164-1-git-send-email-jlayton@samba.org>
-	<CADT32eKvsFwUWCdWzTGwVdiSYekN59tEHuBdbkh18JHq9UmAOQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Writes greater than 64k fails with -ENOSPC
+Date: Tue, 29 Jan 2013 19:29:13 -0500
+Message-ID: <20130129192913.4942c635@tlielax.poochiereds.net>
+References: <5107BF75.704@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CADT32eKvsFwUWCdWzTGwVdiSYekN59tEHuBdbkh18JHq9UmAOQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <5107BF75.704-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 29 Jan 2013 07:55:14 -0600
-Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Tue, 29 Jan 2013 17:54:21 +0530
+Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
 
-> On Tue, Jan 29, 2013 at 6:17 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> > Jian pointed out that this loop can cycle infinitely when the string
-> > contains a ','.
-> >
-> > Also, fix typo in manpage that shows a trailing ',' in one example.
-> >
-> > Reported-by: Jian Li <jiali-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> > ---
-> >  setcifsacl.1.in | 2 +-
-> >  setcifsacl.c    | 4 +++-
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/setcifsacl.1.in b/setcifsacl.1.in
-> > index 5ede36a..d53a6ec 100644
-> > --- a/setcifsacl.1.in
-> > +++ b/setcifsacl.1.in
-> > @@ -94,7 +94,7 @@ Set an ACL
-> >  .br
-> >  setcifsacl -S "ACL:CIFSTESTDOM\\Administrator:0x0/0x0/FULL,
-> >  .br
-> > -ACL:CIFSTESTDOM\\user2:0x0/0x0/FULL," <file_name>
-> > +ACL:CIFSTESTDOM\\user2:0x0/0x0/FULL" <file_name>
-> >  .PP
-> >  .SH "NOTES"
-> >  .PP
-> > diff --git a/setcifsacl.c b/setcifsacl.c
-> > index 211c1af..7f92b91 100644
-> > --- a/setcifsacl.c
-> > +++ b/setcifsacl.c
-> > @@ -642,8 +642,10 @@ get_numcaces(const char *aces)
-> >         const char *current;
-> >
-> >         current = aces;
-> > -       while((current = strchr(current, ',')))
-> > +       while((current = strchr(current, ','))) {
-> > +               ++current;
-> >                 ++num;
-> > +       }
-> >
-> >         return num;
-> >  }
-> > --
-> > 1.7.11.7
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Hi all,
 > 
-> Jeff, Jian, is there a test case where error can be reproduced?
-> I tried something like this and not run into the problem.
+> I'm looking into a report on 3.0 based kernel (plus stable fixes)
+> where writes greater than 64k to a NAS (Hitachi NAS) is failing
+> (simple dd). The problem was not seen with a 2.6.32-ish kernel.
+> Also, note that the problem is not seen with other Servers such
+> as Windows 2003 or Windows 8 Servers.
 > 
-> # getcifsacl /mnt/smb_a/file2
-> REVISION:0x1
-> CONTROL:0x8004
-> OWNER:S-1-5-32-544
-> GROUP:S-1-5-21-2442293536-40736039-234543059-513
-> ACL:S-1-5-32-544:ALLOWED/0x0/FULL
-> ACL:S-1-5-18:ALLOWED/0x0/FULL
+> The strace output shows the close() fall fails with -ENOSPC. 
 > 
-> # setcifsacl -D
-> "ACL:S-1-5-32-544:ALLOWED/0x0/FULL,ACL:S-1-5-18:ALLOWED/0x0/FULL"
-> /mnt/smb_a/file2
+> The relevant cFYI snip
 > 
-> # getcifsacl /mnt/smb_a/file2REVISION:0x1
-> CONTROL:0x8004
-> OWNER:S-1-5-32-544
-> GROUP:S-1-5-21-2442293536-40736039-234543059-513
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.227274] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: For smb_command 47
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.227277] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: Sending smb:  total_len 127044
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.345848] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/connect.c: rfc1002 length 0x33
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.393906] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/cifssmb.c: async write at 1015808 8192 bytes
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.393911] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: For smb_command 47
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.393914] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/transport.c: Sending smb:  total_len 8260
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.479378] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/connect.c: rfc1002 length 0x33
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.481215] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/connect.c: rfc1002 length 0x33
+> Jan 23 08:31:45 vsusix02 kernel: [1003552.481260] /usr/src/packages/BUILD/kernel-default-3.0.42/linux-3.0/fs/cifs/file.c: Flush inode ffff88004e1655c0 file ffff8800379d48c0 rc -28
 > 
-> # setcifsacl -a
-> "ACL:S-1-5-32-544:ALLOWED/0x0/FULL,ACL:S-1-5-18:ALLOWED/0x0/FULL"
-> /mnt/smb_a/file2
 > 
-> # getcifsacl /mnt/smb_a/file2REVISION:0x1
-> CONTROL:0x8004
-> OWNER:S-1-5-32-544
-> GROUP:S-1-5-21-2442293536-40736039-234543059-513
-> ACL:S-1-5-32-544:ALLOWED/0x0/FULL
-> ACL:S-1-5-18:ALLOWED/0x0/FULL
+> The problem seems to be that during close(), we try to flush the
+> buffers by calling cifs_flush() which in turn will call
+> filemap_write_and_wait() to wait on the pages under writeback to
+> complete. do_writepages() will invoke cifs_writepages() which is 
+> perhaps returning -ENOSPC and it is propagated back.
 > 
-> # setcifsacl -D
-> "ACL:S-1-5-32-544:ALLOWED/0x0/FULL,ACL:S-1-5-18:ALLOWED/0x0/FULL,"
-> /mnt/smb_a/file2
-> parse_cmdline_aces: Error 22 parsing ACEs
+> There are no quota restrictions or disk space problems. The
+> tcpdump output doesn't show any errors during the write or close.
 > 
-> Regards,
+> I'm not sure what could be causing the problem and would
+> appreciate any clues or debugging suggestions.
 > 
-> Shirish
+> Thanks
+> 
 
-What version of cifs-utils are you using? You need something pretty recent.
+I'd look for "short" write replies. We have this in
+cifs_writev_callback:
+
+                if (written < wdata->bytes)
+                        wdata->result = -ENOSPC;
+
+IIRC, this is spelled out in MS-CIFS in the section on WRITE_ANDX
+responses, but I remember it not being 100% clear...
 
 -- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
