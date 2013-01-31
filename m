@@ -1,53 +1,58 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Writes greater than 64k fails with -ENOSPC
-Date: Thu, 31 Jan 2013 06:24:00 -0500
-Message-ID: <20130131062400.6aa8fb6d@tlielax.poochiereds.net>
-References: <5107BF75.704@suse.com>
-	<20130129192913.4942c635@tlielax.poochiereds.net>
-	<614F550557B82C44AC27C492ADA391AA044F2484@TK5EX14MBXC283.redmond.corp.microsoft.com>
-	<20130130093729.736ad582@corrin.poochiereds.net>
-	<614F550557B82C44AC27C492ADA391AA044F2E62@TK5EX14MBXC283.redmond.corp.microsoft.com>
-	<510A3ECF.2080505@suse.com>
+From: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+Subject: Re: [PATCH 1/1] cifs: set MAY_SIGN when sec=krb5
+Date: Thu, 31 Jan 2013 15:31:06 +0100
+Message-ID: <510A802A.5000904@prodrive.nl>
+References: <1351071946-21458-1-git-send-email-martijn.de.gouw@prodrive.nl> <CAH2r5muToSW5VW3KkazpakQdPBb3ptC0a75FK1+KswzVAvCCkw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <510A3ECF.2080505-IBi9RG/b67k@public.gmane.org>
+In-Reply-To: <CAH2r5muToSW5VW3KkazpakQdPBb3ptC0a75FK1+KswzVAvCCkw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 31 Jan 2013 15:22:15 +0530
-Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+On 01/31/2013 05:53 AM, Steve French wrote:
+> On Wed, Oct 24, 2012 at 4:45 AM, Martijn de Gouw
+> <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
+>> Setting this secFlg allows usage of dfs where some servers require
+>> signing and others don't.
+>>
+>> Signed-off-by: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+>> ---
+>> :100644 100644 b39bb4a... 4da9dd3... M  fs/cifs/connect.c
+>>   fs/cifs/connect.c |    2 +-
+>>   1 files changed, 1 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>> index b39bb4a..4da9dd3 100644
+>> --- a/fs/cifs/connect.c
+>> +++ b/fs/cifs/connect.c
+>> @@ -994,7 +994,7 @@ static int cifs_parse_security_flavors(char *value,
+>>
+>>          switch (match_token(value, cifs_secflavor_tokens, args)) {
+>>          case Opt_sec_krb5:
+>> -               vol->secFlg |= CIFSSEC_MAY_KRB5;
+>> +               vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
+>>                  break;
+>>          case Opt_sec_krb5i:
+>>                  vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
+>
+> Wouldn't this same problem occur if ntlm or ntlmv2 were authenticated
+> and a dfs referral sent us to a server which required signing - if
+> that is the case then it is not just Opt_sec_krb5 which needs to OR in
+> CIFSSEC_MAY_SIGN but also Opt_sec_ntlmssp and Opt_ntlm (also why do we
+> call this Opt_ntlm instead of Opt_sec_ntlm like the other 10?) and
+> Opt_sec_ntlmv2?
+>
+>
 
-> On 01/30/2013 09:36 PM, Tom Talpey wrote:
-> >> -----Original Message-----
-> >> From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
-> >> Sent: Wednesday, January 30, 2013 9:37 AM
-> >> To: Tom Talpey
-> >> Cc: Suresh Jayaraman; linux-cifs
-> >> Subject: Re: Writes greater than 64k fails with -ENOSPC
-> 
-> >>
-> >> The spec is not 100% clear on whether servers are *required* to support
-> >> arbitrarily large writes up to the 128k limit. Clearly there are some that do
-> >> not, and a larger default is problematic against those servers.
-> > 
-> > I'd be very interested to see traces of negotiate, large read and large write from such a server.
-> 
-> I'm not sure whether I can share the complete trace (without customer's
-> permission) but I can get you the specific bits that might be
-> interesting. I have asked for a full trace (including negotiate protocol).
-> 
-> 
-> Thanks
-> 
-> 
-
-We probably don't need the whole capture. Just the "Capabilities" and
-"MaxBufferSize" values from the NEGOTIATE would be enough...
+Using sec=ntlm on the same dfs I did not see this problem. So I guess not.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Martijn de Gouw
+Engineer
+Prodrive B.V.
+Mobile: +31 63 17 76 161
+Phone:  +31 40 26 76 200
