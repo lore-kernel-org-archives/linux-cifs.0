@@ -1,94 +1,378 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: ensure that cifs_get_root() only traverses directories
-Date: Fri,  1 Feb 2013 15:11:01 -0500
-Message-ID: <1359749461-13458-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, afflux-7cISTWZqsW8RLla1DLYS2Q@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs-utils: add autoconf test to make sure that
+ libwbclient is usable
+Date: Fri, 1 Feb 2013 15:08:16 -0600
+Message-ID: <CADT32eLPrepCyAV-KQrdWfnLN0QEaNRqbpd7GRYkGVKc10UUjw@mail.gmail.com>
+References: <1359741425-7546-1-git-send-email-jlayton@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1359741425-7546-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Kjell Braden reported this oops:
+On Fri, Feb 1, 2013 at 11:57 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+> The idmapwb plugin requires a usable wbcSidsToUnixIds() function. Check
+> to ensure that the wbclient library provides that symbol, and handle
+> it appropriately if it doesn't.
+>
+> If someone were so inclined they probably could fix idmapwb to fall
+> back to the older mapping functions if that symbol doesn't exist,
+> but for now this patch just makes it refuse to build the plugin.
+>
+> Reported-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  aclocal/idmap.m4 | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/aclocal/idmap.m4 b/aclocal/idmap.m4
+> index 939a901..4946179 100644
+> --- a/aclocal/idmap.m4
+> +++ b/aclocal/idmap.m4
+> @@ -19,6 +19,26 @@ if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
+>                         ])
+>  fi
+>
+> +if test $enable_cifsacl != "no" -o $enable_cifsacl != "no"; then
+> +       ac_wbc_save_LDFLAGS="$LDFLAGS"
+> +       LDFLAGS="$LDFLAGS $WBCLIENT_LIBS"
+> +       AC_CHECK_LIB(wbclient, wbcSidsToUnixIds, , [
+> +                               if test "$enable_cifsidmap" = "yes"; then
+> +                                       AC_MSG_ERROR([wbclient library lacks wbcSidsToUnixIds().])
+> +                               else
+> +                                       AC_MSG_ERROR([wbclient library lacks wbcSidsToUnixIds(). Disabling cifs.idmap.])
+> +                                       enable_cifsidmap="no"
+> +                               fi
+> +                               if test "$enable_cifsacl" = "yes"; then
+> +                                       AC_MSG_ERROR([wbclient library lacks wbcSidsToUnixIds.])
+> +                               else
+> +                                       AC_MSG_WARN([wbclient library lacks wbcSidsToUnixIds(). Disabling cifsacl tools.])
+> +                                       enable_cifsacl="no"
+> +                               fi
+> +                       ])cifstest6:/usr/src/cifs.utils.012813.1/cifs-utils
 
-[  833.211970] BUG: unable to handle kernel NULL pointer dereference at           (null)
-[  833.212816] IP: [<          (null)>]           (null)
-[  833.213280] PGD 1b9b2067 PUD e9f7067 PMD 0
-[  833.213874] Oops: 0010 [#1] SMP
-[  833.214344] CPU 0
-[  833.214458] Modules linked in: des_generic md4 nls_utf8 cifs vboxvideo drm snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm snd_seq_midi snd_rawmidi snd_seq_midi_event snd_seq bnep rfcomm snd_timer bluetooth snd_seq_device ppdev snd vboxguest parport_pc joydev mac_hid soundcore snd_page_alloc psmouse i2c_piix4 serio_raw lp parport usbhid hid e1000
-[  833.215629]
-[  833.215629] Pid: 1752, comm: mount.cifs Not tainted 3.0.0-rc7-bisectcifs-fec11dd9a0+ #18 innotek GmbH VirtualBox/VirtualBox
-[  833.215629] RIP: 0010:[<0000000000000000>]  [<          (null)>]           (null)
-[  833.215629] RSP: 0018:ffff8800119c9c50  EFLAGS: 00010282
-[  833.215629] RAX: ffffffffa02186c0 RBX: ffff88000c427780 RCX: 0000000000000000
-[  833.215629] RDX: 0000000000000000 RSI: ffff88000c427780 RDI: ffff88000c4362e8
-[  833.215629] RBP: ffff8800119c9c88 R08: ffff88001fc15e30 R09: 00000000d69515c7
-[  833.215629] R10: ffffffffa0201972 R11: ffff88000e8f6a28 R12: ffff88000c4362e8
-[  833.215629] R13: 0000000000000000 R14: 0000000000000000 R15: ffff88001181aaa6
-[  833.215629] FS:  00007f2986171700(0000) GS:ffff88001fc00000(0000) knlGS:0000000000000000
-[  833.215629] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
-[  833.215629] CR2: 0000000000000000 CR3: 000000001b982000 CR4: 00000000000006f0
-[  833.215629] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  833.215629] DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-[  833.215629] Process mount.cifs (pid: 1752, threadinfo ffff8800119c8000, task ffff88001c1c16f0)
-[  833.215629] Stack:
-[  833.215629]  ffffffff8116a9b5 ffff8800119c9c88 ffffffff81178075 0000000000000286
-[  833.215629]  0000000000000000 ffff88000c4276c0 ffff8800119c9ce8 ffff8800119c9cc8
-[  833.215629]  ffffffff8116b06e ffff88001bc6fc00 ffff88000c4276c0 ffff88000c4276c0
-[  833.215629] Call Trace:
-[  833.215629]  [<ffffffff8116a9b5>] ? d_alloc_and_lookup+0x45/0x90
-[  833.215629]  [<ffffffff81178075>] ? d_lookup+0x35/0x60
-[  833.215629]  [<ffffffff8116b06e>] __lookup_hash.part.14+0x9e/0xc0
-[  833.215629]  [<ffffffff8116b1d6>] lookup_one_len+0x146/0x1e0
-[  833.215629]  [<ffffffff815e4f7e>] ? _raw_spin_lock+0xe/0x20
-[  833.215629]  [<ffffffffa01eef0d>] cifs_do_mount+0x26d/0x500 [cifs]
-[  833.215629]  [<ffffffff81163bd3>] mount_fs+0x43/0x1b0
-[  833.215629]  [<ffffffff8117d41a>] vfs_kern_mount+0x6a/0xd0
-[  833.215629]  [<ffffffff8117e584>] do_kern_mount+0x54/0x110
-[  833.215629]  [<ffffffff8117fdc2>] do_mount+0x262/0x840
-[  833.215629]  [<ffffffff81108a0e>] ? __get_free_pages+0xe/0x50
-[  833.215629]  [<ffffffff8117f9ca>] ? copy_mount_options+0x3a/0x180
-[  833.215629]  [<ffffffff8118075d>] sys_mount+0x8d/0xe0
-[  833.215629]  [<ffffffff815ece82>] system_call_fastpath+0x16/0x1b
-[  833.215629] Code:  Bad RIP value.
-[  833.215629] RIP  [<          (null)>]           (null)
-[  833.215629]  RSP <ffff8800119c9c50>
-[  833.215629] CR2: 0000000000000000
-[  833.238525] ---[ end trace ec00758b8d44f529 ]---
+# autoreconf
 
-When walking down the path on the server, it's possible to hit a
-symlink. The path walking code assumes that the caller will handle that
-situation properly, but cifs_get_root() isn't set up for it. This patch
-prevents the oops by simply returning an error.
+# /usr/src/cifs.utils.012813.1/cifs-utils # ./configure
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for gcc... gcc
+checking for C compiler default output file name... a.out
+checking whether the C compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables...
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for style of include used by make... GNU
+checking dependency style of gcc... gcc3
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether gcc and cc understand -c and -o together... yes
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for stdbool.h that conforms to C99... yes
+checking for _Bool... yes
+checking for uid_t in sys/types.h... yes
+checking for off_t... yes
+checking for pid_t... yes
+checking for size_t... yes
+checking for ptrdiff_t... yes
+checking for ssize_t... yes
+checking for uint32_t... yes
+checking for uint8_t... yes
+checking for library containing getmntent... none required
+checking whether lstat dereferences a symlink specified with a
+trailing slash... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible realloc... yes
+checking for working strnlen... yes
+checking for alarm... yes
+checking for atexit... yes
+checking for endpwent... yes
+checking for getmntent... (cached) yes
+checking for getpass... yes
+checking for gettimeofday... yes
+checking for inet_ntop... yes
+checking for memset... yes
+checking for realpath... yes
+checking for setenv... yes
+checking for strchr... yes
+checking for strcmp... yes
+checking for strdup... yes
+checking for strerror... yes
+checking for strncasecmp... yes
+checking for strndup... yes
+checking for strpbrk... yes
+checking for strrchr... yes
+checking for strstr... yes
+checking for strtol... yes
+checking for strtoul... yes
+checking for tolower... yes
+checking for uname... yes
+checking for clock_gettime... no
+checking for clock_gettime in -lrt... yes
+checking arpa/inet.h usability... yes
+checking arpa/inet.h presence... yes
+checking for arpa/inet.h... yes
+checking ctype.h usability... yes
+checking ctype.h presence... yes
+checking for ctype.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking for inttypes.h... (cached) yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking mntent.h usability... yes
+checking mntent.h presence... yes
+checking for mntent.h... yes
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking stddef.h usability... yes
+checking stddef.h presence... yes
+checking for stddef.h... yes
+checking for stdint.h... (cached) yes
+checking for stdbool.h... (cached) yes
+checking for stdlib.h... (cached) yes
+checking stdio.h usability... yes
+checking stdio.h presence... yes
+checking for stdio.h... yes
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking for string.h... (cached) yes
+checking for strings.h... (cached) yes
+checking sys/mount.h usability... yes
+checking sys/mount.h presence... yes
+checking for sys/mount.h... yes
+checking sys/param.h usability... yes
+checking sys/param.h presence... yes
+checking for sys/param.h... yes
+checking sys/socket.h usability... yes
+checking sys/socket.h presence... yes
+checking for sys/socket.h... yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking syslog.h usability... yes
+checking syslog.h presence... yes
+checking for syslog.h... yes
+checking for unistd.h... (cached) yes
+checking sys/fsuid.h usability... yes
+checking sys/fsuid.h presence... yes
+checking for sys/fsuid.h... yes
+checking for setfsuid... yes
+checking krb5.h usability... yes
+checking krb5.h presence... yes
+checking for krb5.h... yes
+checking krb5/krb5.h usability... yes
+checking krb5/krb5.h presence... yes
+checking for krb5/krb5.h... yes
+checking for keyvalue in krb5_keyblock... no
+checking talloc.h usability... yes
+checking talloc.h presence... yes
+checking for talloc.h... yes
+checking keyutils.h usability... yes
+checking keyutils.h presence... yes
+checking for keyutils.h... yes
+checking for krb5_init_context in -lkrb5... yes
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for WBCLIENT... yes
+checking for wbcSidsToUnixIds in -lwbclient... no
+configure: error: wbclient library lacks wbcSidsToUnixIds(). Disabling
+cifs.idmap.
 
-A better solution would be to try and chase the symlinks here, but that's
-fairly complicated to handle.
+# /usr/src/cifs.utils.012813.1/cifs-utils # make
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure --no-create --no-recursion
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking for gcc... gcc
+checking for C compiler default output file name... a.out
+checking whether the C compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables...
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for style of include used by make... GNU
+checking dependency style of gcc... gcc3
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether gcc and cc understand -c and -o together... yes
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for stdbool.h that conforms to C99... yes
+checking for _Bool... yes
+checking for uid_t in sys/types.h... yes
+checking for off_t... yes
+checking for pid_t... yes
+checking for size_t... yes
+checking for ptrdiff_t... yes
+checking for ssize_t... yes
+checking for uint32_t... yes
+checking for uint8_t... yes
+checking for library containing getmntent... none required
+checking whether lstat dereferences a symlink specified with a
+trailing slash... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible malloc... yes
+checking for stdlib.h... (cached) yes
+checking for GNU libc compatible realloc... yes
+checking for working strnlen... yes
+checking for alarm... yes
+checking for atexit... yes
+checking for endpwent... yes
+checking for getmntent... (cached) yes
+checking for getpass... yes
+checking for gettimeofday... yes
+checking for inet_ntop... yes
+checking for memset... yes
+checking for realpath... yes
+checking for setenv... yes
+checking for strchr... yes
+checking for strcmp... yes
+checking for strdup... yes
+checking for strerror... yes
+checking for strncasecmp... yes
+checking for strndup... yes
+checking for strpbrk... yes
+checking for strrchr... yes
+checking for strstr... yes
+checking for strtol... yes
+checking for strtoul... yes
+checking for tolower... yes
+checking for uname... yes
+checking for clock_gettime... no
+checking for clock_gettime in -lrt... yes
+checking arpa/inet.h usability... yes
+checking arpa/inet.h presence... yes
+checking for arpa/inet.h... yes
+checking ctype.h usability... yes
+checking ctype.h presence... yes
+checking for ctype.h... yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking for inttypes.h... (cached) yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking mntent.h usability... yes
+checking mntent.h presence... yes
+checking for mntent.h... yes
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking stddef.h usability... yes
+checking stddef.h presence... yes
+checking for stddef.h... yes
+checking for stdint.h... (cached) yes
+checking for stdbool.h... (cached) yes
+checking for stdlib.h... (cached) yes
+checking stdio.h usability... yes
+checking stdio.h presence... yes
+checking for stdio.h... yes
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking for string.h... (cached) yes
+checking for strings.h... (cached) yes
+checking sys/mount.h usability... yes
+checking sys/mount.h presence... yes
+checking for sys/mount.h... yes
+checking sys/param.h usability... yes
+checking sys/param.h presence... yes
+checking for sys/param.h... yes
+checking sys/socket.h usability... yes
+checking sys/socket.h presence... yes
+checking for sys/socket.h... yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking syslog.h usability... yes
+checking syslog.h presence... yes
+checking for syslog.h... yes
+checking for unistd.h... (cached) yes
+checking sys/fsuid.h usability... yes
+checking sys/fsuid.h presence... yes
+checking for sys/fsuid.h... yes
+checking for setfsuid... yes
+checking krb5.h usability... yes
+checking krb5.h presence... yes
+checking for krb5.h... yes
+checking krb5/krb5.h usability... yes
+checking krb5/krb5.h presence... yes
+checking for krb5/krb5.h... yes
+checking for keyvalue in krb5_keyblock... no
+checking talloc.h usability... yes
+checking talloc.h presence... yes
+checking for talloc.h... yes
+checking keyutils.h usability... yes
+checking keyutils.h presence... yes
+checking for keyutils.h... yes
+checking for krb5_init_context in -lkrb5... yes
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for WBCLIENT... yes
+checking for wbcSidsToUnixIds in -lwbclient... no
+configure: error: wbclient library lacks wbcSidsToUnixIds(). Disabling
+cifs.idmap.
+make: *** [config.status] Error 1
 
-Fixes:
+> +       LDFLAGS=$ac_wbc_save_LDFLAGS
+> +fi
+> +
+>  if test $enable_cifsacl != "no"; then
+>         AC_CHECK_HEADERS([sys/xattr.h], , [
+>                                 if test "$enable_cifsacl" = "yes"; then
+> --
+> 1.7.11.7
+>
 
-    https://bugzilla.kernel.org/show_bug.cgi?id=53221
-
-Reported-and-Tested-by: Kjell Braden <afflux-7cISTWZqsW8RLla1DLYS2Q@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsfs.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index de7f916..e328339 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -558,6 +558,11 @@ cifs_get_root(struct smb_vol *vol, struct super_block *sb)
- 			dentry = ERR_PTR(-ENOENT);
- 			break;
- 		}
-+		if (!S_ISDIR(dir->i_mode)) {
-+			dput(dentry);
-+			dentry = ERR_PTR(-ENOTDIR);
-+			break;
-+		}
- 
- 		/* skip separators */
- 		while (*s == sep)
--- 
-1.7.11.7
+Jeff, is this the intended/expected outcome?
