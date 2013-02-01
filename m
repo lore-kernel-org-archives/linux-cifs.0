@@ -1,77 +1,57 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 1/1] cifs: set MAY_SIGN when sec=krb5
-Date: Thu, 31 Jan 2013 23:51:17 -0600
-Message-ID: <CAH2r5mvc6tYze0TC2Ets9=7Fg5b3OJTk_dyONTvYLxswt1jN7g@mail.gmail.com>
-References: <1351071946-21458-1-git-send-email-martijn.de.gouw@prodrive.nl>
-	<CAH2r5muToSW5VW3KkazpakQdPBb3ptC0a75FK1+KswzVAvCCkw@mail.gmail.com>
-	<510A802A.5000904@prodrive.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] cifs-utils: add autoconf test to make sure that libwbclient is usable
+Date: Fri,  1 Feb 2013 12:57:05 -0500
+Message-ID: <1359741425-7546-1-git-send-email-jlayton@samba.org>
+Cc: shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <510A802A.5000904-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-I would like to trace this to check - I will try to resetup some DFS
-share referrals tomorrow
+The idmapwb plugin requires a usable wbcSidsToUnixIds() function. Check
+to ensure that the wbclient library provides that symbol, and handle
+it appropriately if it doesn't.
 
-On Thu, Jan 31, 2013 at 8:31 AM, Martijn de Gouw
-<martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
->
-> On 01/31/2013 05:53 AM, Steve French wrote:
->>
->> On Wed, Oct 24, 2012 at 4:45 AM, Martijn de Gouw
->> <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
->>>
->>> Setting this secFlg allows usage of dfs where some servers require
->>> signing and others don't.
->>>
->>> Signed-off-by: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
->>> ---
->>> :100644 100644 b39bb4a... 4da9dd3... M  fs/cifs/connect.c
->>>   fs/cifs/connect.c |    2 +-
->>>   1 files changed, 1 insertions(+), 1 deletions(-)
->>>
->>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
->>> index b39bb4a..4da9dd3 100644
->>> --- a/fs/cifs/connect.c
->>> +++ b/fs/cifs/connect.c
->>> @@ -994,7 +994,7 @@ static int cifs_parse_security_flavors(char *value,
->>>
->>>          switch (match_token(value, cifs_secflavor_tokens, args)) {
->>>          case Opt_sec_krb5:
->>> -               vol->secFlg |= CIFSSEC_MAY_KRB5;
->>> +               vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
->>>                  break;
->>>          case Opt_sec_krb5i:
->>>                  vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
->>
->>
->> Wouldn't this same problem occur if ntlm or ntlmv2 were authenticated
->> and a dfs referral sent us to a server which required signing - if
->> that is the case then it is not just Opt_sec_krb5 which needs to OR in
->> CIFSSEC_MAY_SIGN but also Opt_sec_ntlmssp and Opt_ntlm (also why do we
->> call this Opt_ntlm instead of Opt_sec_ntlm like the other 10?) and
->> Opt_sec_ntlmv2?
->>
->>
->
-> Using sec=ntlm on the same dfs I did not see this problem. So I guess not.
->
->
-> --
-> Martijn de Gouw
-> Engineer
-> Prodrive B.V.
-> Mobile: +31 63 17 76 161
-> Phone:  +31 40 26 76 200
+If someone were so inclined they probably could fix idmapwb to fall
+back to the older mapping functions if that symbol doesn't exist,
+but for now this patch just makes it refuse to build the plugin.
 
+Reported-by: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ aclocal/idmap.m4 | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-
-
---
-Thanks,
-
-Steve
+diff --git a/aclocal/idmap.m4 b/aclocal/idmap.m4
+index 939a901..4946179 100644
+--- a/aclocal/idmap.m4
++++ b/aclocal/idmap.m4
+@@ -19,6 +19,26 @@ if test $enable_cifsidmap != "no" -o $enable_cifsacl != "no"; then
+ 			])
+ fi
+ 
++if test $enable_cifsacl != "no" -o $enable_cifsacl != "no"; then
++	ac_wbc_save_LDFLAGS="$LDFLAGS"
++	LDFLAGS="$LDFLAGS $WBCLIENT_LIBS"
++	AC_CHECK_LIB(wbclient, wbcSidsToUnixIds, , [
++				if test "$enable_cifsidmap" = "yes"; then
++					AC_MSG_ERROR([wbclient library lacks wbcSidsToUnixIds().])
++				else
++					AC_MSG_ERROR([wbclient library lacks wbcSidsToUnixIds(). Disabling cifs.idmap.])
++					enable_cifsidmap="no"
++				fi
++				if test "$enable_cifsacl" = "yes"; then
++					AC_MSG_ERROR([wbclient library lacks wbcSidsToUnixIds.])
++				else
++					AC_MSG_WARN([wbclient library lacks wbcSidsToUnixIds(). Disabling cifsacl tools.])
++					enable_cifsacl="no"
++				fi
++			])
++	LDFLAGS=$ac_wbc_save_LDFLAGS
++fi
++
+ if test $enable_cifsacl != "no"; then
+ 	AC_CHECK_HEADERS([sys/xattr.h], , [
+ 				if test "$enable_cifsacl" = "yes"; then
+-- 
+1.7.11.7
