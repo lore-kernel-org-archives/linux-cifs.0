@@ -1,20 +1,45 @@
-From: "Song Chen" <info-oGhlu5H1Smw@public.gmane.org>
-Subject: Great Proposal!!
-Date: Mon, 04 Feb 2013 03:39:35 +0700
-Message-ID: <20130203203812.6451F5C00CF__29340.3617841706$1359924963$gmane$org@unevm-pmta14.une.net.co>
-Reply-To: mrsongchen12-dbdLmdGazhY@public.gmane.org
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Mount failure due to restricted access to a point along the mount
+ path
+Date: Mon, 04 Feb 2013 21:04:21 +0530
+Message-ID: <510FD4FD.3010001@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Recipients <info-oGhlu5H1Smw@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Description: Mail message body
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hello,
+Hi all,
 
-Proposal of ($12.8mUSD)for you, reply for details.I await to hear from you on my private email (mrsongchen12-dbdLmdGazhY@public.gmane.org)
+I have been looking at the $SUBJECT. And there is already a bug reported
+in the samba.org bugzilla
 
-Regards
-Song.
+https://bugzilla.samba.org/show_bug.cgi?id=8950
+
+cifs gets "Access denied" while trying to get the root inode. Suppose if
+you are trying to mount /share/dir/subdir and if the user doesn't have
+access to any of point along the path ie. /share or /dir, mount will fail.
+
+As noted by Jeff Layton in the bug report, this seems to be a known
+problem since we started using the shared superblock model. Though we
+can work around this problem by providing neccessary permissions for the
+entire path, users consider this as a regression. I tend to agree with
+them and think that may be we should have addressed this problem before
+pushing the shared superblock changes.
+
+>From the changelog it appears that this results in better performance
+when we use SMB2.1 leases. How much better performance we are seeing?
+Is that worth living with this regression?
+
+Does this affect the CIFS users who are not using SMB2.1 in anyway?
+
+
+Thanks
+
+-- 
+Suresh Jayaraman
