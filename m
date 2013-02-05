@@ -1,63 +1,63 @@
-From: "J. Bruce Fields" <bfields@fieldses.org>
-Subject: Re: [PATCH v2 3/8] vfs: Add O_DENYREAD/WRITE flags support for open
- syscall
-Date: Tue, 5 Feb 2013 09:35:15 -0500
-Message-ID: <20130205143514.GA9886@fieldses.org>
-References: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
- <1358441584-8783-3-git-send-email-piastry@etersoft.ru>
- <20130130221602.GC15584@fieldses.org>
- <CAKywueRh++TBazK8_kRN7AUb=EFhGv=Sv2CV0BESkfLFy+g5wA@mail.gmail.com>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH v2 0/8] Add O_DENY* support for VFS and CIFS/NFS
+Date: Tue, 5 Feb 2013 09:38:14 -0500
+Message-ID: <20130205143813.GB9886@fieldses.org>
+References: <1358441537-8672-1-git-send-email-piastry@etersoft.ru>
+ <20130130221118.GB15584@fieldses.org>
+ <CAKywueQcia1jJfdVJFzfHdc5zQ_86r3T4bmee9cpP18qqbcLFA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	wine-devel@winehq.org
-To: Pavel Shilovsky <piastry@etersoft.ru>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <CAKywueRh++TBazK8_kRN7AUb=EFhGv=Sv2CV0BESkfLFy+g5wA@mail.gmail.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+In-Reply-To: <CAKywueQcia1jJfdVJFzfHdc5zQ_86r3T4bmee9cpP18qqbcLFA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Feb 05, 2013 at 03:45:31PM +0400, Pavel Shilovsky wrote:
-> 2013/1/31 J. Bruce Fields <bfields@fieldses.org>:
-> > On Thu, Jan 17, 2013 at 08:52:59PM +0400, Pavel Shilovsky wrote:
-> >> If O_DENYMAND flag is specified, O_DENYREAD/WRITE/MAND flags are
-> >> translated to flock's flags:
+On Tue, Feb 05, 2013 at 03:33:21PM +0400, Pavel Shilovsky wrote:
+> 2013/1/31 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+> > On Thu, Jan 17, 2013 at 08:52:09PM +0400, Pavel Shilovsky wrote:
+> >> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
 > >>
-> >> !O_DENYREAD  -> LOCK_READ
-> >> !O_DENYWRITE -> LOCK_WRITE
-> >> O_DENYMAND   -> LOCK_MAND
+> >> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
 > >>
-> >> and set through flock_lock_file on a file.
+> >> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
+> >
+> > Maybe that's good enough.  A mount flag might be simpler and give
+> > consistent enforcement for all users.
+> >
 > >>
-> >> This change only affects opens that use O_DENYMAND flag - all other
-> >> native Linux opens don't care about these flags. It allow us to
-> >> enable this feature for applications that need it (e.g. NFS and
-> >> Samba servers that export the same directory for Windows clients,
-> >> or Wine applications that access the same files simultaneously).
+> >> So, we have four new flags:
+> >> O_DENYREAD - to prevent other opens with read access,
+> >> O_DENYWRITE - to prevent other opens with write access,
+> >> O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+> >> O_DENYMAND - to switch on/off three flags above.
 > >
-> > The use of an is_conflict callback seems unnecessarily convoluted.
-> >
-> > If we need two different behaviors, let's just use another flag (or an
-> > extra boolean argument if we need to, or something).
+> > It would be useful to have some really careful documentation of how
+> > these are meant to work.  Maybe try updating the open man page?
 > 
-> Ok, we can pass "bool is_mand" to flock_lock_file that will pass it
-> further to flock_locks_conflict.
+> Yes, that's a good idea. Do you mean smth like this?
 > 
-> >
-> > The only caller for this new deny_lock_file is in the nfs code--I'm a
-> > little unclear why that is.
+> O_DENYMAND - used to inforce a mandatory share reservation scheme of
+> the file access. If this flag is passed,
+> the open fails with -ETXTBSY in following cases:
 > 
-> deny_lock_file is called not only in the nfs code but also in 2 places
-> of fs/namei.c -- that enable this logic for VFS.
+> 1) if O_DENYREAD flag is specified and there is another open with
+> O_DENYMAND flag and READ access to the file;
+> 2) if O_DENYWRITE flag is specified and there is another open with
+> O_DENYMAND flag and WRITE access to the file;
+> 3) if READ access is requested and there is another open with
+> O_DENYMAND and O_DENYREAD flags;
+> 4) if WRITE access is requested and there is another open with
+> O_DENYMAND and O_DENYWRITE flags;
+> 
+> Also, if O_DENYDELETE flag is specified and the open succeded, any
+> further unlink operation will fail with -ETXTBSY untill this open is
+> closed. Now this flag is processed by CIFS filesystems only.
 
-Oops, apologies, I overlooked those somehow.
-
-What prevents somebody else from grabbing a lock on a newly-created file
-before we grab our own lock?
-
-I couldn't tell on a quick look whether we hold some lock that prevents
-that.
+Do you need to document interactions with flock() as well?
 
 --b.
