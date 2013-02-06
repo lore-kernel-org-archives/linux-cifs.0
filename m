@@ -1,40 +1,94 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Read speed
-Date: Tue, 5 Feb 2013 15:17:42 -0500
-Message-ID: <20130205151742.2e375400@corrin.poochiereds.net>
-References: <51105F16.8070603@kickflop.net>
-	<CAH2r5mvbbuo9e30kuRFp9eegJqq_9HLR9=oaGvFqyMi-aBKXTQ@mail.gmail.com>
-	<51113D76.80609@kickflop.net>
-	<20130205142058.7618dfcf@corrin.poochiereds.net>
-	<20130205142307.58d87a21@corrin.poochiereds.net>
-	<5111656C.90109@kickflop.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Fwd: [PATCH] cifs: bugfix for unreclaimed writeback pages in cifs_writev_requeue()
+Date: Wed, 6 Feb 2013 12:00:08 -0600
+Message-ID: <CAH2r5muZL8voikW6NO_KojjV=N9zVymsqcR_KMf=XgZ4v8oGgQ@mail.gmail.com>
+References: <OF08391DB5.0DFF1FA3-ON48257B0A.002333BE-48257B0A.002372B2@zte.com.cn>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Jeff Blaine <jblaine-GbE5gUWZ6k7k1uMJSBkQmQ@public.gmane.org>
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <5111656C.90109-GbE5gUWZ6k7k1uMJSBkQmQ@public.gmane.org>
+In-Reply-To: <OF08391DB5.0DFF1FA3-ON48257B0A.002333BE-48257B0A.002372B2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 05 Feb 2013 15:02:52 -0500
-Jeff Blaine <jblaine-GbE5gUWZ6k7k1uMJSBkQmQ@public.gmane.org> wrote:
+=46orwarding to the current cifs development mailing list
 
-> >> I believe Sachin is looking at backporting the async read patches for
-> >> 6.5. The async write code is already in 6.3 (I think). You should
-> >> definitely open a support case since documented customer demand helps
-> >> us make the case for including these sorts of changes in an update.
-> 
-> I opened one an hour or so ago, so that's done.
-> 
-> Should I test with Fedora 17 or Fedora 18 for the sake of this?
-> Just because 18 is newer doesn't mean it's the most appropriate
-> for this test need, eh?
 
-In general, later is better, but either should be fine. The async read
-code went into mainline about a year or so ago, so both should have it.
+---------- Forwarded message ----------
+=46rom:  <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+Date: Wed, Feb 6, 2013 at 12:26 AM
+Subject: [PATCH] cifs: bugfix for unreclaimed writeback pages in
+cifs_writev_requeue()
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-client-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+
+
+    This patch applies to the kernel version of linux-3.8-rc6.
+
+    Pages get the PG_writeback flag set before cifs sends its request
+to SMB server
+    in cifs_writepages(), if the SMB service goes down, cifs may try
+to recommit the
+    writing requests in cifs_writev_requeue(). However, it does not
+clean its PG_writeback
+    flag and relaimed the pages even if it fails again in
+cifs_writev_requeue(), which
+    may lead to the hanging of the processes accessing the cifs
+directory. This patch
+    just cleans the PG_writeback flags and reclaims the pages under
+that circumstances.
+
+    Steps to reproduce the bug(trying serveral times may trigger the is=
+sue):
+    1.Write from cifs client continuously.(e.g dd if=3D/dev/zero of=3D<=
+cifs file>)
+    2.Stop SMB service from server.(e.g service smb stop)
+    3.Wait for two minutes=A3=AC and then start SMB service from
+server.(e.g service smb start)
+    4.The processes which are accessing cifs directory may hang up.
+
+    Signed-off-by: Ouyang Maochun <ouyang.maochun-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+    Signed-off-by: Jiang Yong <jian.yong5-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+    Tested-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+    Reviewed-by: Wang Liang <wang.liang82-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+    Reviewed-by: Cai Qu <cai.qu-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+    Reviewed-by: Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+
+diff -uprN linux-3.8-rc6/fs/cifs/cifssmb.c linux-3.8-rc6_new/fs/cifs/ci=
+fssmb.c
+--- linux-3.8-rc6/fs/cifs/cifssmb.c        2013-02-01 09:08:14.00000000=
+0 +0800
++++ linux-3.8-rc6_new/fs/cifs/cifssmb.c        2013-02-04
+15:44:09.869254397 +0800
+@@ -1909,8 +1909,11 @@ cifs_writev_requeue(struct cifs_writedat
+         } while (rc =3D=3D -EAGAIN);
+
+         for (i =3D 0; i < wdata->nr_pages; i++) {
+-                if (rc !=3D 0)
++                if (rc !=3D 0){
+                         SetPageError(wdata->pages[i]);
++                         end_page_writeback(wdata->pages[i]);
++                         page_cache_release(wdata->pages[i]);
++                 }
+                 unlock_page(wdata->pages[i]);
+         }
+
+
+--------------------------------------------------------
+ZTE Information Security Notice: The information contained in this
+mail (and any attachment transmitted herewith) is privileged and
+confidential and is intended for the exclusive use of the
+addressee(s).  If you are not an intended recipient, any disclosure,
+reproduction, distribution or other dissemination or use of the
+information contained is strictly prohibited.  If you have received
+this mail in error, please delete it and notify us immediately.
+
+
+
+
+--=20
+Thanks,
+
+Steve
