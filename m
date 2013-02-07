@@ -1,82 +1,71 @@
-From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
-Subject: Re: Writes greater than 64k fails with -ENOSPC
-Date: Thu, 07 Feb 2013 14:22:04 +0530
-Message-ID: <51136B34.30609@suse.com>
-References: <5107BF75.704@suse.com> <20130129192913.4942c635@tlielax.poochiereds.net> <614F550557B82C44AC27C492ADA391AA044F2484@TK5EX14MBXC283.redmond.corp.microsoft.com> <20130130093729.736ad582@corrin.poochiereds.net> <614F550557B82C44AC27C492ADA391AA044F2E62@TK5EX14MBXC283.redmond.corp.microsoft.com> <510A3ECF.2080505@suse.com> <20130131062400.6aa8fb6d@tlielax.poochiereds.net>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH v2 0/8] Add O_DENY* support for VFS and CIFS/NFS
+Date: Thu, 7 Feb 2013 13:40:57 +0400
+Message-ID: <CAKywueQ=YJ3L9=uQfqo7jMF1Fw+TP37Wo39o1-ayu453xhmDtg@mail.gmail.com>
+References: <1358441537-8672-1-git-send-email-piastry@etersoft.ru>
+	<20130130221118.GB15584@fieldses.org>
+	<CAKywueQcia1jJfdVJFzfHdc5zQ_86r3T4bmee9cpP18qqbcLFA@mail.gmail.com>
+	<20130205143813.GB9886@fieldses.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Cc: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130131062400.6aa8fb6d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
+In-Reply-To: <20130205143813.GB9886-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 01/31/2013 04:54 PM, Jeff Layton wrote:
-> On Thu, 31 Jan 2013 15:22:15 +0530
-> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
-> 
->> On 01/30/2013 09:36 PM, Tom Talpey wrote:
->>>> -----Original Message-----
->>>> From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
->>>> Sent: Wednesday, January 30, 2013 9:37 AM
->>>> To: Tom Talpey
->>>> Cc: Suresh Jayaraman; linux-cifs
->>>> Subject: Re: Writes greater than 64k fails with -ENOSPC
+2013/2/5 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+> On Tue, Feb 05, 2013 at 03:33:21PM +0400, Pavel Shilovsky wrote:
+>> 2013/1/31 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+>> > On Thu, Jan 17, 2013 at 08:52:09PM +0400, Pavel Shilovsky wrote:
+>> >> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
+>> >>
+>> >> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
+>> >>
+>> >> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
+>> >
+>> > Maybe that's good enough.  A mount flag might be simpler and give
+>> > consistent enforcement for all users.
+>> >
+>> >>
+>> >> So, we have four new flags:
+>> >> O_DENYREAD - to prevent other opens with read access,
+>> >> O_DENYWRITE - to prevent other opens with write access,
+>> >> O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+>> >> O_DENYMAND - to switch on/off three flags above.
+>> >
+>> > It would be useful to have some really careful documentation of how
+>> > these are meant to work.  Maybe try updating the open man page?
 >>
->>>>
->>>> The spec is not 100% clear on whether servers are *required* to support
->>>> arbitrarily large writes up to the 128k limit. Clearly there are some that do
->>>> not, and a larger default is problematic against those servers.
->>>
->>> I'd be very interested to see traces of negotiate, large read and large write from such a server.
+>> Yes, that's a good idea. Do you mean smth like this?
 >>
->> I'm not sure whether I can share the complete trace (without customer's
->> permission) but I can get you the specific bits that might be
->> interesting. I have asked for a full trace (including negotiate protocol).
+>> O_DENYMAND - used to inforce a mandatory share reservation scheme of
+>> the file access. If this flag is passed,
+>> the open fails with -ETXTBSY in following cases:
 >>
+>> 1) if O_DENYREAD flag is specified and there is another open with
+>> O_DENYMAND flag and READ access to the file;
+>> 2) if O_DENYWRITE flag is specified and there is another open with
+>> O_DENYMAND flag and WRITE access to the file;
+>> 3) if READ access is requested and there is another open with
+>> O_DENYMAND and O_DENYREAD flags;
+>> 4) if WRITE access is requested and there is another open with
+>> O_DENYMAND and O_DENYWRITE flags;
 >>
->> Thanks
->>
->>
-> 
-> We probably don't need the whole capture. Just the "Capabilities" and
-> "MaxBufferSize" values from the NEGOTIATE would be enough...
-> 
+>> Also, if O_DENYDELETE flag is specified and the open succeded, any
+>> further unlink operation will fail with -ETXTBSY untill this open is
+>> closed. Now this flag is processed by CIFS filesystems only.
+>
+> Do you need to document interactions with flock() as well?
 
-The commit ce91acb3acae26f4163c5a6f1f695d1a1e8d9009 did fix the problem.
-
-Finally, got the packet capture too. From the NEGOTIATE response,
-the MaxBufferSize was 65280 and CAP_LARGE_WRITEX (and LARGE_READX) had been set.
-
-The complete Capabilities were
-
-.... .... .... .... .... .... .... ...0 = Raw Mode: Read Raw and Write Raw are not supported
-.... .... .... .... .... .... .... ..0. = MPX Mode: Read Mpx and Write Mpx are not supported
-.... .... .... .... .... .... .... .1.. = Unicode: Unicode strings are supported
-.... .... .... .... .... .... .... 1... = Large Files: Large files are supported
-.... .... .... .... .... .... ...1 .... = NT SMBs: NT SMBs are supported
-.... .... .... .... .... .... ..1. .... = RPC Remote APIs: RPC remote APIs are supported
-.... .... .... .... .... .... .1.. .... = NT Status Codes: NT status codes are supported
-.... .... .... .... .... .... 1... .... = Level 2 Oplocks: Level 2 oplocks are supported
-.... .... .... .... .... ...0 .... .... = Lock and Read: Lock and Read is not supported
-.... .... .... .... .... ..1. .... .... = NT Find: NT Find is supported
-.... .... .... .... ...1 .... .... .... = Dfs: Dfs is supported
-.... .... .... .... ..1. .... .... .... = Infolevel Passthru: NT information level request passthrough is supported
-.... .... .... .... .1.. .... .... .... = Large ReadX: Large Read andX is supported
-.... .... .... .... 1... .... .... .... = Large WriteX: Large Write andX is supported
-.... .... .... ...0 .... .... .... .... = LWIO: LWIO ioctl/fsctl is not supported
-.... .... 0... .... .... .... .... .... = UNIX: UNIX extensions are not supported
-.... ..0. .... .... .... .... .... .... = Compressed Data: Compressed data transfer is not supported
-..0. .... .... .... .... .... .... .... = Dynamic Reauth: Dynamic Reauth is not supported
-0... .... .... .... .... .... .... .... = Extended Security: Extended security exchanges are not supported
-
-
-I'm not sure whether restricting it to MaxBufferSize even in case CAP_LARGE_WRITEX was set would make sense..
-
-
+Yes, this needs to be documented, thanks. I am going to propose ver2
+of this patchset (with regards to your suggestions) - will add this
+part to open man page patch too.
 
 -- 
-Suresh Jayaraman
+Best regards,
+Pavel Shilovsky.
