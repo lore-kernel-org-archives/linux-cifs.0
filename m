@@ -1,142 +1,84 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: Writes greater than 64k fails with -ENOSPC
-Date: Thu, 7 Feb 2013 08:55:46 -0500
-Message-ID: <20130207085546.3ebe3b09@corrin.poochiereds.net>
-References: <5107BF75.704@suse.com>
-	<20130129192913.4942c635@tlielax.poochiereds.net>
-	<614F550557B82C44AC27C492ADA391AA044F2484@TK5EX14MBXC283.redmond.corp.microsoft.com>
-	<20130130093729.736ad582@corrin.poochiereds.net>
-	<614F550557B82C44AC27C492ADA391AA044F2E62@TK5EX14MBXC283.redmond.corp.microsoft.com>
-	<510A3ECF.2080505@suse.com>
-	<20130131062400.6aa8fb6d@tlielax.poochiereds.net>
-	<51136B34.30609@suse.com>
-	<20130207065018.0c18868e@tlielax.poochiereds.net>
-	<614F550557B82C44AC27C492ADA391AA044FC781@TK5EX14MBXC283.redmond.corp.microsoft.com>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH v2 3/8] vfs: Add O_DENYREAD/WRITE flags support for open
+ syscall
+Date: Thu, 7 Feb 2013 09:18:32 -0500
+Message-ID: <20130207141832.GA3222@fieldses.org>
+References: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
+ <1358441584-8783-3-git-send-email-piastry@etersoft.ru>
+ <20130130221602.GC15584@fieldses.org>
+ <CAKywueRh++TBazK8_kRN7AUb=EFhGv=Sv2CV0BESkfLFy+g5wA@mail.gmail.com>
+ <20130205143514.GA9886@fieldses.org>
+ <CAKywueS6oGNu9r_bypu32A89pOoiGb47kjXqw2ZcZQhZK+JV3g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <614F550557B82C44AC27C492ADA391AA044FC781-Jfd81uAzPQsmBPcf4Gwd0Fir+X/St4rqwBk/1ggFUS45P9zcU8sUGwC/G2K4zDHf@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAKywueS6oGNu9r_bypu32A89pOoiGb47kjXqw2ZcZQhZK+JV3g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 7 Feb 2013 13:37:00 +0000
-Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org> wrote:
-
-> > -----Original Message-----
-> > From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
-> > Sent: Thursday, February 7, 2013 6:50 AM
-> > To: Suresh Jayaraman
-> > Cc: Tom Talpey; linux-cifs
-> > Subject: Re: Writes greater than 64k fails with -ENOSPC
-> > 
-> > On Thu, 07 Feb 2013 14:22:04 +0530
-> > Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
-> > 
-> > > On 01/31/2013 04:54 PM, Jeff Layton wrote:
-> > > > On Thu, 31 Jan 2013 15:22:15 +0530
-> > > > Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
-> > > >
-> > > >> On 01/30/2013 09:36 PM, Tom Talpey wrote:
-> > > >>>> -----Original Message-----
-> > > >>>> From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
-> > > >>>> Sent: Wednesday, January 30, 2013 9:37 AM
-> > > >>>> To: Tom Talpey
-> > > >>>> Cc: Suresh Jayaraman; linux-cifs
-> > > >>>> Subject: Re: Writes greater than 64k fails with -ENOSPC
-> > > >>
-> > > >>>>
-> > > >>>> The spec is not 100% clear on whether servers are *required* to
-> > > >>>> support arbitrarily large writes up to the 128k limit. Clearly
-> > > >>>> there are some that do not, and a larger default is problematic against
-> > those servers.
-> > > >>>
-> > > >>> I'd be very interested to see traces of negotiate, large read and large
-> > write from such a server.
-> > > >>
-> > > >> I'm not sure whether I can share the complete trace (without
-> > > >> customer's
-> > > >> permission) but I can get you the specific bits that might be
-> > > >> interesting. I have asked for a full trace (including negotiate protocol).
-> > > >>
-> > > >>
-> > > >> Thanks
-> > > >>
-> > > >>
-> > > >
-> > > > We probably don't need the whole capture. Just the "Capabilities"
-> > > > and "MaxBufferSize" values from the NEGOTIATE would be enough...
-> > > >
-> > >
-> > > The commit ce91acb3acae26f4163c5a6f1f695d1a1e8d9009 did fix the
-> > problem.
-> > >
-> > > Finally, got the packet capture too. From the NEGOTIATE response, the
-> > > MaxBufferSize was 65280 and CAP_LARGE_WRITEX (and LARGE_READX)
-> > had been set.
-> > >
-> > > The complete Capabilities were
-> > >
-> > > .... .... .... .... .... .... .... ...0 = Raw Mode: Read Raw and Write
-> > > Raw are not supported .... .... .... .... .... .... .... ..0. = MPX
-> > > Mode: Read Mpx and Write Mpx are not supported .... .... .... ....
-> > > .... .... .... .1.. = Unicode: Unicode strings are supported .... ....
-> > > .... .... .... .... .... 1... = Large Files: Large files are supported
-> > > .... .... .... .... .... .... ...1 .... = NT SMBs: NT SMBs are
-> > > supported .... .... .... .... .... .... ..1. .... = RPC Remote APIs:
-> > > RPC remote APIs are supported .... .... .... .... .... .... .1.. ....
-> > > = NT Status Codes: NT status codes are supported .... .... .... ....
-> > > .... .... 1... .... = Level 2 Oplocks: Level 2 oplocks are supported
-> > > .... .... .... .... .... ...0 .... .... = Lock and Read: Lock and Read
-> > > is not supported .... .... .... .... .... ..1. .... .... = NT Find: NT
-> > > Find is supported .... .... .... .... ...1 .... .... .... = Dfs: Dfs
-> > > is supported .... .... .... .... ..1. .... .... .... = Infolevel
-> > > Passthru: NT information level request passthrough is supported ....
-> > > .... .... .... .1.. .... .... .... = Large ReadX: Large Read andX is
-> > > supported .... .... .... .... 1... .... .... .... = Large WriteX:
-> > > Large Write andX is supported .... .... .... ...0 .... .... .... ....
-> > > = LWIO: LWIO ioctl/fsctl is not supported .... .... 0... .... ....
-> > > .... .... .... = UNIX: UNIX extensions are not supported .... ..0.
-> > > .... .... .... .... .... .... = Compressed Data: Compressed data
-> > > transfer is not supported ..0. .... .... .... .... .... .... .... =
-> > > Dynamic Reauth: Dynamic Reauth is not supported 0... .... .... ....
-> > > .... .... .... .... = Extended Security: Extended security exchanges
-> > > are not supported
-> > >
-> > >
-> > > I'm not sure whether restricting it to MaxBufferSize even in case
-> > CAP_LARGE_WRITEX was set would make sense..
-> > >
-> > 
-> > No, I think that server just happens to have an unusually large
-> > MaxBufferSize. Most servers send values that are smaller than that. The
-> > whole idea behind CAP_LARGE_WRITEX is that it allows you to send a write
-> > that's larger than the MaxBufferSize.
+On Thu, Feb 07, 2013 at 01:53:46PM +0400, Pavel Shilovsky wrote:
+> 2013/2/5 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+> > On Tue, Feb 05, 2013 at 03:45:31PM +0400, Pavel Shilovsky wrote:
+> >> 2013/1/31 J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>:
+> >> > On Thu, Jan 17, 2013 at 08:52:59PM +0400, Pavel Shilovsky wrote:
+> >> >> If O_DENYMAND flag is specified, O_DENYREAD/WRITE/MAND flags are
+> >> >> translated to flock's flags:
+> >> >>
+> >> >> !O_DENYREAD  -> LOCK_READ
+> >> >> !O_DENYWRITE -> LOCK_WRITE
+> >> >> O_DENYMAND   -> LOCK_MAND
+> >> >>
+> >> >> and set through flock_lock_file on a file.
+> >> >>
+> >> >> This change only affects opens that use O_DENYMAND flag - all other
+> >> >> native Linux opens don't care about these flags. It allow us to
+> >> >> enable this feature for applications that need it (e.g. NFS and
+> >> >> Samba servers that export the same directory for Windows clients,
+> >> >> or Wine applications that access the same files simultaneously).
+> >> >
+> >> > The use of an is_conflict callback seems unnecessarily convoluted.
+> >> >
+> >> > If we need two different behaviors, let's just use another flag (or an
+> >> > extra boolean argument if we need to, or something).
+> >>
+> >> Ok, we can pass "bool is_mand" to flock_lock_file that will pass it
+> >> further to flock_locks_conflict.
+> >>
+> >> >
+> >> > The only caller for this new deny_lock_file is in the nfs code--I'm a
+> >> > little unclear why that is.
+> >>
+> >> deny_lock_file is called not only in the nfs code but also in 2 places
+> >> of fs/namei.c -- that enable this logic for VFS.
+> >
+> > Oops, apologies, I overlooked those somehow.
+> >
+> > What prevents somebody else from grabbing a lock on a newly-created file
+> > before we grab our own lock?
+> >
+> > I couldn't tell on a quick look whether we hold some lock that prevents
+> > that.
 > 
-> I agree, but it's still unhelpful that this server accepts only 64KB in response to the client's 124KB large write. In my opinion the server should not be offering CAP_LARGE_WRITEX, although it's certainly legal for it to do so. Perhaps your client should be ignoring it, when MaxBufferSize permits >64KB.
-> 
+> Nothing prevents it. If somebody grabbed a share mode lock on a file
+> before we call deny_lock_file, we simply close this file and return
+> -ETXTBSY.
 
-Right. That was the crux of my question a few months ago -- the spec
-doesn't say how much larger than the MaxBufferSize a server is required
-to support. In practice, it seems a lot of server vendors didn't do any
-more than they perceived they had to.
+But leave the newly-created file there--ugh.
 
-> BTW, we're investigating the large write size behaviors for a related MS-SMB doc bug. I don't have the full picture yet, but it appears that Windows SMB servers will process somewhere between 124KB and 128KB-1 bytes when issued a large WRITE_ANDX in this situation.
-> 
-> Tom.
-> 
+> We can't grab it before atomic_open because we don't have an
+> inode there.
 
-It's been a while since I wrote this code, but I originally did quite a
-bit of testing vs. windows versions that were current at the time
-(win2k8?). At that time, I never saw windows return a short write, but
-we would generally issue writes that were no larger than 124k or so.
+If you can get the lock while still holding the directory i_mutex can't
+you prevent anyone else from looking up the new file until you've gotten
+the lock?
 
-We generally use a max of 2^17-1, minus the length of the WRITE_ANDX
-header (which is small), and then squeeze as many pages as we can fit
-within it.
+--b.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Anyway, we can't make it atomic for VFS without big code
+> changes, but for CIFS and NFS it is already atomic with the discussed
+> patch.
