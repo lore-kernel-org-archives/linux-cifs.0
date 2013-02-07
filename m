@@ -1,72 +1,88 @@
-From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: Re: [PATCH v2 3/8] vfs: Add O_DENYREAD/WRITE flags support for open syscall
-Date: Thu, 7 Feb 2013 13:53:46 +0400
-Message-ID: <CAKywueS6oGNu9r_bypu32A89pOoiGb47kjXqw2ZcZQhZK+JV3g@mail.gmail.com>
-References: <1358441584-8783-1-git-send-email-piastry@etersoft.ru>
-	<1358441584-8783-3-git-send-email-piastry@etersoft.ru>
-	<20130130221602.GC15584@fieldses.org>
-	<CAKywueRh++TBazK8_kRN7AUb=EFhGv=Sv2CV0BESkfLFy+g5wA@mail.gmail.com>
-	<20130205143514.GA9886@fieldses.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: bugfix for unreclaimed writeback pages in
+ cifs_writev_requeue()
+Date: Thu, 7 Feb 2013 06:39:57 -0500
+Message-ID: <20130207063957.520a40c2@tlielax.poochiereds.net>
+References: <OF08391DB5.0DFF1FA3-ON48257B0A.002333BE-48257B0A.002372B2@zte.com.cn>
+	<CAH2r5muZL8voikW6NO_KojjV=N9zVymsqcR_KMf=XgZ4v8oGgQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	wine-devel@winehq.org
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <20130205143514.GA9886@fieldses.org>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAH2r5muZL8voikW6NO_KojjV=N9zVymsqcR_KMf=XgZ4v8oGgQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-2013/2/5 J. Bruce Fields <bfields@fieldses.org>:
-> On Tue, Feb 05, 2013 at 03:45:31PM +0400, Pavel Shilovsky wrote:
->> 2013/1/31 J. Bruce Fields <bfields@fieldses.org>:
->> > On Thu, Jan 17, 2013 at 08:52:59PM +0400, Pavel Shilovsky wrote:
->> >> If O_DENYMAND flag is specified, O_DENYREAD/WRITE/MAND flags are
->> >> translated to flock's flags:
->> >>
->> >> !O_DENYREAD  -> LOCK_READ
->> >> !O_DENYWRITE -> LOCK_WRITE
->> >> O_DENYMAND   -> LOCK_MAND
->> >>
->> >> and set through flock_lock_file on a file.
->> >>
->> >> This change only affects opens that use O_DENYMAND flag - all other
->> >> native Linux opens don't care about these flags. It allow us to
->> >> enable this feature for applications that need it (e.g. NFS and
->> >> Samba servers that export the same directory for Windows clients,
->> >> or Wine applications that access the same files simultaneously).
->> >
->> > The use of an is_conflict callback seems unnecessarily convoluted.
->> >
->> > If we need two different behaviors, let's just use another flag (or an
->> > extra boolean argument if we need to, or something).
->>
->> Ok, we can pass "bool is_mand" to flock_lock_file that will pass it
->> further to flock_locks_conflict.
->>
->> >
->> > The only caller for this new deny_lock_file is in the nfs code--I'm a
->> > little unclear why that is.
->>
->> deny_lock_file is called not only in the nfs code but also in 2 places
->> of fs/namei.c -- that enable this logic for VFS.
->
-> Oops, apologies, I overlooked those somehow.
->
-> What prevents somebody else from grabbing a lock on a newly-created file
-> before we grab our own lock?
->
-> I couldn't tell on a quick look whether we hold some lock that prevents
-> that.
+On Wed, 6 Feb 2013 12:00:08 -0600
+Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-Nothing prevents it. If somebody grabbed a share mode lock on a file
-before we call deny_lock_file, we simply close this file and return
--ETXTBSY. We can't grab it before atomic_open because we don't have an
-inode there. Anyway, we can't make it atomic for VFS without big code
-changes, but for CIFS and NFS it is already atomic with the discussed
-patch.
+> Forwarding to the current cifs development mailing list
+>=20
+>=20
+> ---------- Forwarded message ----------
+> From:  <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+> Date: Wed, Feb 6, 2013 at 12:26 AM
+> Subject: [PATCH] cifs: bugfix for unreclaimed writeback pages in
+> cifs_writev_requeue()
+> To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-client-w/Ol4Ecudplf7j03Gpi2xA@public.gmane.org=
+rg
+>=20
+>=20
+>=20
+>     This patch applies to the kernel version of linux-3.8-rc6.
+>=20
+>     Pages get the PG_writeback flag set before cifs sends its request
+> to SMB server
+>     in cifs_writepages(), if the SMB service goes down, cifs may try
+> to recommit the
+>     writing requests in cifs_writev_requeue(). However, it does not
+> clean its PG_writeback
+>     flag and relaimed the pages even if it fails again in
+> cifs_writev_requeue(), which
+>     may lead to the hanging of the processes accessing the cifs
+> directory. This patch
+>     just cleans the PG_writeback flags and reclaims the pages under
+> that circumstances.
+>=20
+>     Steps to reproduce the bug(trying serveral times may trigger the =
+issue):
+>     1.Write from cifs client continuously.(e.g dd if=3D/dev/zero of=3D=
+<cifs file>)
+>     2.Stop SMB service from server.(e.g service smb stop)
+>     3.Wait for two minutes=A3=AC and then start SMB service from
+> server.(e.g service smb start)
+>     4.The processes which are accessing cifs directory may hang up.
+>=20
+>     Signed-off-by: Ouyang Maochun <ouyang.maochun-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>     Signed-off-by: Jiang Yong <jian.yong5-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>     Tested-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>     Reviewed-by: Wang Liang <wang.liang82-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>     Reviewed-by: Cai Qu <cai.qu-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>     Reviewed-by: Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>=20
+> diff -uprN linux-3.8-rc6/fs/cifs/cifssmb.c linux-3.8-rc6_new/fs/cifs/=
+cifssmb.c
+> --- linux-3.8-rc6/fs/cifs/cifssmb.c        2013-02-01 09:08:14.000000=
+000 +0800
+> +++ linux-3.8-rc6_new/fs/cifs/cifssmb.c        2013-02-04
+> 15:44:09.869254397 +0800
+> @@ -1909,8 +1909,11 @@ cifs_writev_requeue(struct cifs_writedat
+>          } while (rc =3D=3D -EAGAIN);
+>=20
+>          for (i =3D 0; i < wdata->nr_pages; i++) {
+> -                if (rc !=3D 0)
+> +                if (rc !=3D 0){
+>                          SetPageError(wdata->pages[i]);
+> +                         end_page_writeback(wdata->pages[i]);
+> +                         page_cache_release(wdata->pages[i]);
+> +                 }
+>                  unlock_page(wdata->pages[i]);
+>          }
+>=20
+>=20
 
--- 
-Best regards,
-Pavel Shilovsky.
+Patch looks correct to me. Nice catch.
+
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
