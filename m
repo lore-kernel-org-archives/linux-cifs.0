@@ -1,88 +1,96 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: bugfix for unreclaimed writeback pages in
- cifs_writev_requeue()
-Date: Thu, 7 Feb 2013 06:39:57 -0500
-Message-ID: <20130207063957.520a40c2@tlielax.poochiereds.net>
-References: <OF08391DB5.0DFF1FA3-ON48257B0A.002333BE-48257B0A.002372B2@zte.com.cn>
-	<CAH2r5muZL8voikW6NO_KojjV=N9zVymsqcR_KMf=XgZ4v8oGgQ@mail.gmail.com>
+Subject: Re: Writes greater than 64k fails with -ENOSPC
+Date: Thu, 7 Feb 2013 06:50:18 -0500
+Message-ID: <20130207065018.0c18868e@tlielax.poochiereds.net>
+References: <5107BF75.704@suse.com>
+	<20130129192913.4942c635@tlielax.poochiereds.net>
+	<614F550557B82C44AC27C492ADA391AA044F2484@TK5EX14MBXC283.redmond.corp.microsoft.com>
+	<20130130093729.736ad582@corrin.poochiereds.net>
+	<614F550557B82C44AC27C492ADA391AA044F2E62@TK5EX14MBXC283.redmond.corp.microsoft.com>
+	<510A3ECF.2080505@suse.com>
+	<20130131062400.6aa8fb6d@tlielax.poochiereds.net>
+	<51136B34.30609@suse.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5muZL8voikW6NO_KojjV=N9zVymsqcR_KMf=XgZ4v8oGgQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <51136B34.30609-IBi9RG/b67k@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 6 Feb 2013 12:00:08 -0600
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Thu, 07 Feb 2013 14:22:04 +0530
+Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
 
-> Forwarding to the current cifs development mailing list
->=20
->=20
-> ---------- Forwarded message ----------
-> From:  <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
-> Date: Wed, Feb 6, 2013 at 12:26 AM
-> Subject: [PATCH] cifs: bugfix for unreclaimed writeback pages in
-> cifs_writev_requeue()
-> To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-client-w/Ol4Ecudplf7j03Gpi2xA@public.gmane.org=
-rg
->=20
->=20
->=20
->     This patch applies to the kernel version of linux-3.8-rc6.
->=20
->     Pages get the PG_writeback flag set before cifs sends its request
-> to SMB server
->     in cifs_writepages(), if the SMB service goes down, cifs may try
-> to recommit the
->     writing requests in cifs_writev_requeue(). However, it does not
-> clean its PG_writeback
->     flag and relaimed the pages even if it fails again in
-> cifs_writev_requeue(), which
->     may lead to the hanging of the processes accessing the cifs
-> directory. This patch
->     just cleans the PG_writeback flags and reclaims the pages under
-> that circumstances.
->=20
->     Steps to reproduce the bug(trying serveral times may trigger the =
-issue):
->     1.Write from cifs client continuously.(e.g dd if=3D/dev/zero of=3D=
-<cifs file>)
->     2.Stop SMB service from server.(e.g service smb stop)
->     3.Wait for two minutes=A3=AC and then start SMB service from
-> server.(e.g service smb start)
->     4.The processes which are accessing cifs directory may hang up.
->=20
->     Signed-off-by: Ouyang Maochun <ouyang.maochun-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
->     Signed-off-by: Jiang Yong <jian.yong5-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
->     Tested-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
->     Reviewed-by: Wang Liang <wang.liang82-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
->     Reviewed-by: Cai Qu <cai.qu-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
->     Reviewed-by: Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
->=20
-> diff -uprN linux-3.8-rc6/fs/cifs/cifssmb.c linux-3.8-rc6_new/fs/cifs/=
-cifssmb.c
-> --- linux-3.8-rc6/fs/cifs/cifssmb.c        2013-02-01 09:08:14.000000=
-000 +0800
-> +++ linux-3.8-rc6_new/fs/cifs/cifssmb.c        2013-02-04
-> 15:44:09.869254397 +0800
-> @@ -1909,8 +1909,11 @@ cifs_writev_requeue(struct cifs_writedat
->          } while (rc =3D=3D -EAGAIN);
->=20
->          for (i =3D 0; i < wdata->nr_pages; i++) {
-> -                if (rc !=3D 0)
-> +                if (rc !=3D 0){
->                          SetPageError(wdata->pages[i]);
-> +                         end_page_writeback(wdata->pages[i]);
-> +                         page_cache_release(wdata->pages[i]);
-> +                 }
->                  unlock_page(wdata->pages[i]);
->          }
->=20
->=20
+> On 01/31/2013 04:54 PM, Jeff Layton wrote:
+> > On Thu, 31 Jan 2013 15:22:15 +0530
+> > Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+> > 
+> >> On 01/30/2013 09:36 PM, Tom Talpey wrote:
+> >>>> -----Original Message-----
+> >>>> From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
+> >>>> Sent: Wednesday, January 30, 2013 9:37 AM
+> >>>> To: Tom Talpey
+> >>>> Cc: Suresh Jayaraman; linux-cifs
+> >>>> Subject: Re: Writes greater than 64k fails with -ENOSPC
+> >>
+> >>>>
+> >>>> The spec is not 100% clear on whether servers are *required* to support
+> >>>> arbitrarily large writes up to the 128k limit. Clearly there are some that do
+> >>>> not, and a larger default is problematic against those servers.
+> >>>
+> >>> I'd be very interested to see traces of negotiate, large read and large write from such a server.
+> >>
+> >> I'm not sure whether I can share the complete trace (without customer's
+> >> permission) but I can get you the specific bits that might be
+> >> interesting. I have asked for a full trace (including negotiate protocol).
+> >>
+> >>
+> >> Thanks
+> >>
+> >>
+> > 
+> > We probably don't need the whole capture. Just the "Capabilities" and
+> > "MaxBufferSize" values from the NEGOTIATE would be enough...
+> > 
+> 
+> The commit ce91acb3acae26f4163c5a6f1f695d1a1e8d9009 did fix the problem.
+> 
+> Finally, got the packet capture too. From the NEGOTIATE response,
+> the MaxBufferSize was 65280 and CAP_LARGE_WRITEX (and LARGE_READX) had been set.
+> 
+> The complete Capabilities were
+> 
+> .... .... .... .... .... .... .... ...0 = Raw Mode: Read Raw and Write Raw are not supported
+> .... .... .... .... .... .... .... ..0. = MPX Mode: Read Mpx and Write Mpx are not supported
+> .... .... .... .... .... .... .... .1.. = Unicode: Unicode strings are supported
+> .... .... .... .... .... .... .... 1... = Large Files: Large files are supported
+> .... .... .... .... .... .... ...1 .... = NT SMBs: NT SMBs are supported
+> .... .... .... .... .... .... ..1. .... = RPC Remote APIs: RPC remote APIs are supported
+> .... .... .... .... .... .... .1.. .... = NT Status Codes: NT status codes are supported
+> .... .... .... .... .... .... 1... .... = Level 2 Oplocks: Level 2 oplocks are supported
+> .... .... .... .... .... ...0 .... .... = Lock and Read: Lock and Read is not supported
+> .... .... .... .... .... ..1. .... .... = NT Find: NT Find is supported
+> .... .... .... .... ...1 .... .... .... = Dfs: Dfs is supported
+> .... .... .... .... ..1. .... .... .... = Infolevel Passthru: NT information level request passthrough is supported
+> .... .... .... .... .1.. .... .... .... = Large ReadX: Large Read andX is supported
+> .... .... .... .... 1... .... .... .... = Large WriteX: Large Write andX is supported
+> .... .... .... ...0 .... .... .... .... = LWIO: LWIO ioctl/fsctl is not supported
+> .... .... 0... .... .... .... .... .... = UNIX: UNIX extensions are not supported
+> .... ..0. .... .... .... .... .... .... = Compressed Data: Compressed data transfer is not supported
+> ..0. .... .... .... .... .... .... .... = Dynamic Reauth: Dynamic Reauth is not supported
+> 0... .... .... .... .... .... .... .... = Extended Security: Extended security exchanges are not supported
+> 
+> 
+> I'm not sure whether restricting it to MaxBufferSize even in case CAP_LARGE_WRITEX was set would make sense..
+> 
 
-Patch looks correct to me. Nice catch.
+No, I think that server just happens to have an unusually large
+MaxBufferSize. Most servers send values that are smaller than that. The
+whole idea behind CAP_LARGE_WRITEX is that it allows you to send a write
+that's larger than the MaxBufferSize.
 
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
