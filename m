@@ -1,44 +1,82 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: bugfix for unreclaimed writeback pages in cifs_writev_requeue()
-Date: Thu, 7 Feb 2013 11:27:40 +0400
-Message-ID: <CAKywueRgnbL5vnGCAvcJexbaSu_VEFathM=CKFOTPtz9Ygmdzw@mail.gmail.com>
-References: <CAKywueTQ0q=B2pw1HjWZLXe27DVbydx-0c7ZJUHCJMUcBMMtvA@mail.gmail.com>
-	<OFA5D50D9D.206122F1-ON48257B0B.00139BCC-48257B0B.002214B3@zte.com.cn>
+From: Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org>
+Subject: Re: Writes greater than 64k fails with -ENOSPC
+Date: Thu, 07 Feb 2013 14:22:04 +0530
+Message-ID: <51136B34.30609@suse.com>
+References: <5107BF75.704@suse.com> <20130129192913.4942c635@tlielax.poochiereds.net> <614F550557B82C44AC27C492ADA391AA044F2484@TK5EX14MBXC283.redmond.corp.microsoft.com> <20130130093729.736ad582@corrin.poochiereds.net> <614F550557B82C44AC27C492ADA391AA044F2E62@TK5EX14MBXC283.redmond.corp.microsoft.com> <510A3ECF.2080505@suse.com> <20130131062400.6aa8fb6d@tlielax.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	wang.liang82-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org, ouyang.maochun-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org,
-	cai.qu-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org, jiang.yong5-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org,
-	zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org
-To: jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Transfer-Encoding: 7bit
+Cc: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <OFA5D50D9D.206122F1-ON48257B0B.00139BCC-48257B0B.002214B3-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+In-Reply-To: <20130131062400.6aa8fb6d-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/2/7  <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>:
->> I think we should do end_page_writeback(wdata->pages[i]) and
->> page_cache_release(wdata->pages[i]) regardless whether rc is 0 or not
->> (we are doing the same things in cifs_writev_complete now). Thoughts?
-> Actually,if rc=0 in cifs_writev_requeue, end_page_writeback(wdata->pages[i])
-> and
-> page_cache_release(wdata->pages[i]) have been done in cifs_writev_complete,
-> and we
-> should not worry about that.What we need fix here is the situation when
-> rc!=0.
+On 01/31/2013 04:54 PM, Jeff Layton wrote:
+> On Thu, 31 Jan 2013 15:22:15 +0530
+> Suresh Jayaraman <sjayaraman-IBi9RG/b67k@public.gmane.org> wrote:
+> 
+>> On 01/30/2013 09:36 PM, Tom Talpey wrote:
+>>>> -----Original Message-----
+>>>> From: Jeff Layton [mailto:jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org]
+>>>> Sent: Wednesday, January 30, 2013 9:37 AM
+>>>> To: Tom Talpey
+>>>> Cc: Suresh Jayaraman; linux-cifs
+>>>> Subject: Re: Writes greater than 64k fails with -ENOSPC
+>>
+>>>>
+>>>> The spec is not 100% clear on whether servers are *required* to support
+>>>> arbitrarily large writes up to the 128k limit. Clearly there are some that do
+>>>> not, and a larger default is problematic against those servers.
+>>>
+>>> I'd be very interested to see traces of negotiate, large read and large write from such a server.
+>>
+>> I'm not sure whether I can share the complete trace (without customer's
+>> permission) but I can get you the specific bits that might be
+>> interesting. I have asked for a full trace (including negotiate protocol).
+>>
+>>
+>> Thanks
+>>
+>>
+> 
+> We probably don't need the whole capture. Just the "Capabilities" and
+> "MaxBufferSize" values from the NEGOTIATE would be enough...
+> 
 
-Ok. We go into cifs_writev_complete with wdata->sync_mode ==
-WB_SYNC_ALL and wdata->result == -EAGAIN. In this case we call
-cifs_write_requeue:
+The commit ce91acb3acae26f4163c5a6f1f695d1a1e8d9009 did fix the problem.
 
-} else if (wdata->sync_mode == WB_SYNC_ALL && wdata->result == -EAGAIN)
-        return cifs_writev_requeue(wdata);"
+Finally, got the packet capture too. From the NEGOTIATE response,
+the MaxBufferSize was 65280 and CAP_LARGE_WRITEX (and LARGE_READX) had been set.
 
-end_page_writeback and page_cache_release are called after the
-statement above - so, if we hit in cifs_writev_requeue, they are not
-called anymore. That's why we should call them from
-cifs_writev_requeue unconditionally.
+The complete Capabilities were
+
+.... .... .... .... .... .... .... ...0 = Raw Mode: Read Raw and Write Raw are not supported
+.... .... .... .... .... .... .... ..0. = MPX Mode: Read Mpx and Write Mpx are not supported
+.... .... .... .... .... .... .... .1.. = Unicode: Unicode strings are supported
+.... .... .... .... .... .... .... 1... = Large Files: Large files are supported
+.... .... .... .... .... .... ...1 .... = NT SMBs: NT SMBs are supported
+.... .... .... .... .... .... ..1. .... = RPC Remote APIs: RPC remote APIs are supported
+.... .... .... .... .... .... .1.. .... = NT Status Codes: NT status codes are supported
+.... .... .... .... .... .... 1... .... = Level 2 Oplocks: Level 2 oplocks are supported
+.... .... .... .... .... ...0 .... .... = Lock and Read: Lock and Read is not supported
+.... .... .... .... .... ..1. .... .... = NT Find: NT Find is supported
+.... .... .... .... ...1 .... .... .... = Dfs: Dfs is supported
+.... .... .... .... ..1. .... .... .... = Infolevel Passthru: NT information level request passthrough is supported
+.... .... .... .... .1.. .... .... .... = Large ReadX: Large Read andX is supported
+.... .... .... .... 1... .... .... .... = Large WriteX: Large Write andX is supported
+.... .... .... ...0 .... .... .... .... = LWIO: LWIO ioctl/fsctl is not supported
+.... .... 0... .... .... .... .... .... = UNIX: UNIX extensions are not supported
+.... ..0. .... .... .... .... .... .... = Compressed Data: Compressed data transfer is not supported
+..0. .... .... .... .... .... .... .... = Dynamic Reauth: Dynamic Reauth is not supported
+0... .... .... .... .... .... .... .... = Extended Security: Extended security exchanges are not supported
+
+
+I'm not sure whether restricting it to MaxBufferSize even in case CAP_LARGE_WRITEX was set would make sense..
+
+
 
 -- 
-Best regards,
-Pavel Shilovsky.
+Suresh Jayaraman
