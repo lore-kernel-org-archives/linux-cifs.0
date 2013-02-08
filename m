@@ -1,121 +1,180 @@
-From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH RFC] cifs: revalidate directories instiantiated via
- FIND_* in order to handle DFS referrals
-Date: Thu, 07 Feb 2013 17:42:14 +0000
-Message-ID: <1360258934.11095.13.camel@localhost>
-References: <1358276491-4835-1-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: smbclient fails to connect with kerberos
+Date: Thu, 7 Feb 2013 21:03:33 -0500
+Message-ID: <20130207210333.2c31e1b9@corrin.poochiereds.net>
+References: <1360238707.5080.40.camel@ub64-mmrp-it>
+	<1360239886.5080.43.camel@ub64-mmrp-it>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	Linux CIFS mailing list <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Michael Wilke <m@1982.cc>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1358276491-4835-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1360239886.5080.43.camel@ub64-mmrp-it>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We had a problem reported by a user which I found is fixed by this
-patch.
+On Thu, 07 Feb 2013 15:24:46 +0300
+Michael Wilke <m@1982.cc> wrote:
 
-The customer reported a crash where they were able to cd into a DFS
-share where the target doesn't exist. The machine eventually crashes
-when the lookup code attempts to access the inode->i_ops->lookup which
-is set to NULL for DFS shares.
-
-I was able to recreate this problem and noticed that this also affects a
-standard DFS share. To recreate the problem, simply mount the DFS share
-on a mount point and run the following commands.
-
-# mount -t cifs -o
-username=user,password=mysecret //vm140-52/DFS_Public/ /mnt
-# cd /mnt
-# ls; cd n1/
-
-Where n1 is a DFS share.
-
-1) The first command 'ls', results in the readdir system call which ends
-up calling FIND_FIRST SMB command to the server. 
-2) An inode is initiated but no S_AUTOMOUNT flag is set at this stage.
-3) The dentry initiated doesn't contain the DCACHE_NEED_AUTOMOUNT flag.
-4) When we cd into this directory immediately, the dentry returned was
-just created(ie. not yet timed out) and is valid.
-5) We then called  for this dentry. Since we do not have the
-DCACHE_NEED_AUTOMOUNT flag set in dentry->d_flags, we do not trigger the
-automount. 
-6) After we have done the chdir, By attempting a few lookups, we
-eventually hit a problem because the inode functions in inode->i_ops are
-all set to NULL.
-
-I have tested with this patch and it does work since we force a
-QUERY_PATH_LOOKUP on all directories returned in FIND_FIRST. The
-downside ofcourse is increase in the QUERY_PATH_LOOKUPs.
-
-Sachin Prabhu
-
-On Tue, 2013-01-15 at 14:01 -0500, Jeff Layton wrote:
-> We've had a long-standing problem with DFS referral points. CIFS servers
-> generally try to make them look like directories in FIND_FIRST/NEXT
-> responses. When you go to try to do a FIND_FIRST on them though, the
-> server will then (correctly) return STATUS_PATH_NOT_COVERED. Mostly this
-> manifests as spurious EREMOTE errors back to userland.
+> Additional I append the important smbclient -d 10 part.
 > 
-> This patch attempts to fix this by marking directories that are
-> discovered via FIND_FIRST/NEXT for revaldiation. When the lookup code
-> runs across them again, we'll reissue a QPathInfo against them and that
-> will make it chase the referral properly.
+> I really don't know why it is sending a wrong signature?
 > 
-> There is some performance penalty involved here and no I haven't
-> measured it -- it'll be highly dependent upon the workload and contents
-> of the mounted share. To try and mitigate that though, the code only
-> marks the inode for revalidation when it's possible to run across a DFS
-> referral. i.e.: when the kernel has DFS support built in and the share
-> is "in DFS".
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/readdir.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
+>  Doing spnego session setup (blob length=110)
+> got OID=1.2.840.48018.1.2.2
+> got OID=1.2.840.113554.1.2.2
+> got OID=1.2.840.113554.1.2.2.3
+> got OID=1.3.6.1.4.1.311.2.2.10
+> got principal=gunter$@CITY.DOMAIN.ORG
+> Doing kerberos session setup
+> ads_cleanup_expired_creds: Ticket in ccache[FILE:/tmp/krb5cc_0]
+> expiration Thu, 07 Feb 2013 21:55:16 EAT
+> ads_krb5_mk_req: Ticket (gunter$@CITY.DOMAIN.ORG) in ccache
+> (FILE:/tmp/krb5cc_0) is valid until: (Thu, 07 Feb 2013 21:55:16 EAT -
+> 1360263316)
+> ads_krb5_mk_req: server marked as OK to delegate to, building
+> forwardable TGT
+> krb5_fwd_tgt_creds failed (KDC can't fulfill requested option)
+> Got KRB5 session key of length 16
+> smb_signing_sign_pdu: sent SMB signature of
+> [0000] 42 53 52 53 50 59 4C 20                            BSRSPYL  
+> smb_signing_activate: user_session_key
+> [0000] F5 25 18 D8 29 67 3C 30   E8 5B 12 6E 7D 0C 63
+> 79   .%..)g<0 .[.n}.cy
+> smb_signing_activate: NULL response_data
+> smb_signing_md5: sequence number 1
+> smb_signing_check_pdu: BAD SIG: wanted SMB signature of
+> [0000] ED DD 62 90 40 5A 9D FF                            ..b.@Z.. 
+> smb_signing_check_pdu: BAD SIG: got SMB signature of
+> [0000] 42 53 52 53 50 59 4C 20                            BSRSPYL  
+> smb_signing_md5: sequence number 4294967292
+> smb_signing_md5: sequence number 4294967293
+> smb_signing_md5: sequence number 4294967294
+> smb_signing_md5: sequence number 4294967295
+> smb_signing_md5: sequence number 0
+> smb_signing_md5: sequence number 1
+> smb_signing_md5: sequence number 2
+> smb_signing_md5: sequence number 3
+> smb_signing_md5: sequence number 4
+> smb_signing_md5: sequence number 5
+> smb_signing_good: signing negotiated but not required and peer
+> isn't sending correct signatures. Turning off.
+> cli_init_creds: user micha domain DOMAIN
+> OS=[Windows Server 2003 R2 3790 Service Pack 2] Server=[Windows Server
+> 2003 R2 5.2]
+>  session setup ok
+>  tconx ok
 > 
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index cdd6ff4..5fc9b4a 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -128,6 +128,22 @@ out:
->  	dput(dentry);
->  }
->  
-> +/*
-> + * Is it possible that this directory might turn out to be a DFS referral
-> + * once we go to try and use it?
-> + */
-> +static bool
-> +cifs_dfs_is_possible(struct cifs_sb_info *cifs_sb)
-> +{
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> +	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-> +
-> +	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
-> +		return true;
-> +#endif
-> +	return false;
-> +}
-> +
->  static void
->  cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
->  {
-> @@ -137,6 +153,14 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
->  	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
->  		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
->  		fattr->cf_dtype = DT_DIR;
-> +		/*
-> +		 * CIFS servers generally make DFS referrals look like
-> +		 * directories in FIND_* responses. Since there's no way to
-> +		 * tell the difference, we must revalidate directory inodes
-> +		 * before trying to use them.
-> +		 */
-> +		if (cifs_dfs_is_possible(cifs_sb))
-> +			fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
->  	} else {
->  		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
->  		fattr->cf_dtype = DT_REG;
+> ---
+> 
+> 
+> On Thu, 2013-02-07 at 15:05 +0300, Michael Wilke wrote:
+> > Dear all,
+> > 
+> > I hope you could assist me in finding a problem with samba and krb
+> > connects.
+> > 
+> > I have a samba server as a AD 2k3 domain member and the connects are
+> > working well, but when I try to use krb auth to connect to another
+> > Windows server in the network I get an error.
+> > 
+> > I would appreciate some hint in the right direction to get this working.
+> > 
+> > Thanks!
+> > 
+> > ---
+> > smbclient -d 3 //gunter/software -k -o user=micha
+> > lp_load_ex: refreshing parameters
+> > Initialising global parameters
+> > rlimit_max: increasing rlimit_max (1024) to minimum Windows limit
+> > (16384)
+> > params.c:pm_process() - Processing configuration file
+> > "/etc/samba/smb.conf"
+> > Processing section "[global]"
+> > WARNING: The "idmap uid" option is deprecated
+> > WARNING: The "idmap gid" option is deprecated
+> > ...
+> > Client started (version 3.6.3).
+> > Connecting to 10.10.10.8 at port 445
+> > Doing spnego session setup (blob length=110)
+> > got OID=1.2.840.48018.1.2.2
+> > got OID=1.2.840.113554.1.2.2
+> > got OID=1.2.840.113554.1.2.2.3
+> > got OID=1.3.6.1.4.1.311.2.2.10
+> > got principal=gunter$@CITY.DOMAIN.ORG
+> > Doing kerberos session setup
+> > ads_cleanup_expired_creds: Ticket in ccache[FILE:/tmp/krb5cc_0]
+> > expiration Thu, 07 Feb 2013 21:20:36 EAT
+> > ads_krb5_mk_req: server marked as OK to delegate to, building
+> > forwardable TGT
+> > krb5_fwd_tgt_creds failed (KDC can't fulfill requested option)
+> > OS=[Windows Server 2003 R2 3790 Service Pack 2] Server=[Windows Server
+> > 2003 R2 5.2]
+> > tree connect failed: NT_STATUS_ACCESS_DENIED
+> > 
+> > ---
+> > 
+> > 
+> > As you can see kinit and klist etc works, but the connection always got
+> > denied. 
+> > 
+> > If I use standard smbclient connection it works fine:
+> > ---
+> > smbclient -d 3 -U micha //gunter/software
+> > ...
+> > 
+> > Client started (version 3.6.3).
+> > Enter micha's password: 
+> > Connecting to 10.10.10.8 at port 445
+> > Doing spnego session setup (blob length=110)
+> > got OID=1.2.840.48018.1.2.2
+> > got OID=1.2.840.113554.1.2.2
+> > got OID=1.2.840.113554.1.2.2.3
+> > got OID=1.3.6.1.4.1.311.2.2.10
+> > got principal=gunter$@CITY.DOMAIN.ORG
+> > Got challenge flags:
+> > Got NTLMSSP neg_flags=0x62898215
+> > NTLMSSP: Set final flags:
+> > Got NTLMSSP neg_flags=0x60088215
+> > NTLMSSP Sign/Seal - Initialising with flags:
+> > Got NTLMSSP neg_flags=0x60088215
+> > Domain=[DOMAIN] OS=[Windows Server 2003 R2 3790 Service Pack 2]
+> > Server=[Windows Server 2003 R2 5.2]
+> > smb: \> 
+> > 
+> > ---
+> > 
+> > 
+> > 
+> > samba version:
+> > smbd --version
+> > Version 3.6.3
+> > 
+> > smb.conf:
+> > [global]
+> >         security = ads
+> >         realm = CITY.DOMAIN.ORG
+> >         netbios name = RESEARCH-SERVER
+> >         password server = 10.10.10.17 # PDC
+> >         client use spnego = yes
+> >         client use spnego principal = true
+> > 
+> > 
+> > 
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > 
+> 
+
+This mailing list is for the in-kernel CIFS filesystem for linux. You
+probably want to send this question to a list like
+samba-w/Ol4Ecudpk8XQGcEXnhXA@public.gmane.org
+
+Cheers,
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
