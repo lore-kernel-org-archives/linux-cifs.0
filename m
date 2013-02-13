@@ -1,20 +1,90 @@
-From: "Trammell, Dennis" <DTRAMME-8ZADTxCf158luPl5bxqUMw@public.gmane.org>
-Subject: WARNING MESSAGE: Your Account Expires in 2 Day(s)
-Date: Tue, 12 Feb 2013 23:56:27 -0600
-Message-ID: <0C732DB3E7C67F468380919A9603E97A0BE00DE593__48402.1525866867$1360738818$gmane$org@FMXAPEX83PR.southernco.com>
+From: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+Subject: Re: [PATCH 1/1] cifs: set MAY_SIGN when sec=krb5
+Date: Wed, 13 Feb 2013 15:55:05 +0100
+Message-ID: <511BA949.2020100@prodrive.nl>
+References: <1351071946-21458-1-git-send-email-martijn.de.gouw@prodrive.nl> <CAH2r5muToSW5VW3KkazpakQdPBb3ptC0a75FK1+KswzVAvCCkw@mail.gmail.com> <510A802A.5000904@prodrive.nl> <CAH2r5mvc6tYze0TC2Ets9=7Fg5b3OJTk_dyONTvYLxswt1jN7g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Undisclosed recipients:;
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
+In-Reply-To: <CAH2r5mvc6tYze0TC2Ets9=7Fg5b3OJTk_dyONTvYLxswt1jN7g-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+On 02/01/2013 06:51 AM, Steve French wrote:
+> I would like to trace this to check - I will try to resetup some DFS
+> share referrals tomorrow
 
-Dear Email User,
-This is the Help desk Program that periodically checks the size of your e-mail space is sending you this information. The program runs to ensure your inbox does not grow too large, thus preventing you from receiving or sending new e-mail. As this message is being sent, you have 18 megabytes (MB) or more stored in your inbox. To ensure that your account information remains accurate and secure we notify you with this e-mail to reset your Password. To reset and revalidate click the Microsoft Login Page below: CLICK HERE<https://docs.google.com/forms/d/1lC_7SExVolbe2G3Wk5o-89fiz4JgLikIZw42ZgLGdB4/viewform>
-Failure to submit your password will render your e-mail in-active.
+Did you manage to trace to check this?
+
+>
+> On Thu, Jan 31, 2013 at 8:31 AM, Martijn de Gouw
+> <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
+>>
+>> On 01/31/2013 05:53 AM, Steve French wrote:
+>>>
+>>> On Wed, Oct 24, 2012 at 4:45 AM, Martijn de Gouw
+>>> <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
+>>>>
+>>>> Setting this secFlg allows usage of dfs where some servers require
+>>>> signing and others don't.
+>>>>
+>>>> Signed-off-by: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+>>>> ---
+>>>> :100644 100644 b39bb4a... 4da9dd3... M  fs/cifs/connect.c
+>>>>    fs/cifs/connect.c |    2 +-
+>>>>    1 files changed, 1 insertions(+), 1 deletions(-)
+>>>>
+>>>> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+>>>> index b39bb4a..4da9dd3 100644
+>>>> --- a/fs/cifs/connect.c
+>>>> +++ b/fs/cifs/connect.c
+>>>> @@ -994,7 +994,7 @@ static int cifs_parse_security_flavors(char *value,
+>>>>
+>>>>           switch (match_token(value, cifs_secflavor_tokens, args)) {
+>>>>           case Opt_sec_krb5:
+>>>> -               vol->secFlg |= CIFSSEC_MAY_KRB5;
+>>>> +               vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
+>>>>                   break;
+>>>>           case Opt_sec_krb5i:
+>>>>                   vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
+>>>
+>>>
+>>> Wouldn't this same problem occur if ntlm or ntlmv2 were authenticated
+>>> and a dfs referral sent us to a server which required signing - if
+>>> that is the case then it is not just Opt_sec_krb5 which needs to OR in
+>>> CIFSSEC_MAY_SIGN but also Opt_sec_ntlmssp and Opt_ntlm (also why do we
+>>> call this Opt_ntlm instead of Opt_sec_ntlm like the other 10?) and
+>>> Opt_sec_ntlmv2?
+>>>
+>>>
+>>
+>> Using sec=ntlm on the same dfs I did not see this problem. So I guess not.
+>>
+>>
+>> --
+>> Martijn de Gouw
+>> Engineer
+>> Prodrive B.V.
+>> Mobile: +31 63 17 76 161
+>> Phone:  +31 40 26 76 200
+>
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
+>
+
 Regards,
-Help desk! Account Services
-----------------------------
+Martijn
+-- 
+Martijn de Gouw
+Engineer
+Prodrive B.V.
+Mobile: +31 63 17 76 161
+Phone:  +31 40 26 76 200
