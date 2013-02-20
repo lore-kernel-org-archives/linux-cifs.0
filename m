@@ -1,18 +1,26 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
 Subject: Re: Samba mounting question
-Date: Wed, 20 Feb 2013 10:30:14 -0500
-Message-ID: <20130220103014.0e18ffcb@tlielax.poochiereds.net>
-References: <381865006.5263.1361300690375.JavaMail.root@hendelman.net>
-	<426095708.5327.1361302654087.JavaMail.root@hendelman.net>
+Date: Wed, 20 Feb 2013 15:58:16 -0600 (CST)
+Message-ID: <870210071.7245.1361397496047.JavaMail.root@hendelman.net>
+References: <20130220103014.0e18ffcb@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <426095708.5327.1361302654087.JavaMail.root-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
+In-Reply-To: <20130220103014.0e18ffcb-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
+
+I've filed a bug against ubuntu/upstart in launchpad.  The bug ID is #1130781
+
+Robert
+----- Original Message -----
+From: "Jeff Layton" <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+To: "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Sent: Wednesday, February 20, 2013 9:30:14 AM
+Subject: Re: Samba mounting question
 
 On Tue, 19 Feb 2013 13:37:34 -0600 (CST)
 "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org> wrote:
