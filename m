@@ -1,58 +1,44 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: kernel: CIFS VFS: Send error in Flush/Close = -9
-Date: Fri, 22 Feb 2013 09:37:09 -0500
-Message-ID: <20130222093709.21c46332@tlielax.poochiereds.net>
-References: <1633991966.227.1361541137779.JavaMail.root@hendelman.net>
-	<106758567.419.1361542484469.JavaMail.root@hendelman.net>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Sun, 24 Feb 2013 22:00:47 -0600
+Message-ID: <CAH2r5mspiwgRfpR+9k0_Y=iPkbEhn1QiHrfkhu6yRsER3YyvXw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <106758567.419.1361542484469.JavaMail.root-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 22 Feb 2013 08:14:44 -0600 (CST)
-"Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org> wrote:
+4 small, miscellaneous cifs fixes
 
-> I'm getting some strange error messages in /var/log/kern.log.
-> 
->  kernel: [66276.873095] CIFS VFS: Send error in Flush = -9
->  kernel: [66287.828329] CIFS VFS: Send error in Flush = -9
->  kernel: [66287.829180] CIFS VFS: Send error in Flush = -9
->  kernel: [66289.243979] CIFS VFS: Send error in Flush = -9
-> 
-> My desktop is Ubuntu 12.10 and has kernel 3.5.0-24-generic w/ cifs module version 1.78 (as per modinfo cifs).
-> 
-> I've mounted a test server share (Ubuntu 12.04) with the following options as per "cat /etc/fstab"
-> 
-> //cifserver/data	/data	cifs	noauto,strictcache,sec=krb5i,multiuser,acl,username=MYDESKTOP$	0	2
-> 
-> Other than this, the share seems to work fine.
-> 
-> Is this something I should be concerned with or is it more informational?
-> 
-> Robert
+The following changes since commit 8b31849a113a8868eb2de692be5c9ecadae93ac9:
 
--9 is EBADF. I suspect that means that the server is returning an error
-that got translated to that, which probably means it didn't like the
-file-id (FID) that the client sent for some reason. This request is for
-a SMB_COM_FLUSH which is something like an fsync() in POSIX-land. It
-tells the server to commit outstanding data for this open file to
-stable storage.
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/nab/target-pending
+(2013-02-02 13:37:56 +1100)
 
-It might be interesting to see a capture of the data between client and
-server when you get this, so we can see what error the server is
-actually returning.
+are available in the git repository at:
 
-    https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting#Wire_Captures
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
 
-If you do that, it might be best to open a bug at bugzilla.samba.org so
-we have a place to track this info. Feel free to CC me on that bug if
-you do so.
+Jeff Layton (1):
+      cifs: ensure that cifs_get_root() only traverses directories
 
+Martijn de Gouw (1):
+      cifs: set MAY_SIGN when sec=krb5
+
+Steve French (2):
+      cifs: bugfix for unreclaimed writeback pages in cifs_writev_requeue()
+      POSIX extensions disabled on client due to illegal O_EXCL flag
+sent to Samba
+
+ fs/cifs/cifsfs.c  |    5 +++++
+ fs/cifs/cifssmb.c |    5 ++++-
+ fs/cifs/connect.c |    2 +-
+ fs/cifs/file.c    |   12 +++++++++---
+ 4 files changed, 19 insertions(+), 5 deletions(-)
+
+--
 Thanks,
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+
+Steve
