@@ -1,79 +1,35 @@
 From: Pavel Shilovsky <piastry@etersoft.ru>
-Subject: [PATCH v3 6/7] NFSv4: Add O_DENY* open flags support
-Date: Thu, 28 Feb 2013 19:25:32 +0400
-Message-ID: <1362065133-9490-7-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v3 5/7] CIFS: Translate SHARING_VIOLATION to -ETXTBSY error code for SMB2
+Date: Thu, 28 Feb 2013 19:25:31 +0400
+Message-ID: <1362065133-9490-6-git-send-email-piastry@etersoft.ru>
 References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
 Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
 	linux-nfs@vger.kernel.org, wine-devel@winehq.org
 To: linux-kernel@vger.kernel.org
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
-Sender: linux-fsdevel-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-by passing these flags to NFSv4 open request.
+to make it match CIFS and VFS variants.
 
 Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
 ---
- fs/nfs/nfs4xdr.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+ fs/cifs/smb2maperror.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/nfs/nfs4xdr.c b/fs/nfs/nfs4xdr.c
-index 26b1439..58ddc74 100644
---- a/fs/nfs/nfs4xdr.c
-+++ b/fs/nfs/nfs4xdr.c
-@@ -1325,7 +1325,8 @@ static void encode_lookup(struct xdr_stream *xdr, const struct qstr *name, struc
- 	encode_string(xdr, name->len, name->name);
- }
- 
--static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
-+static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode,
-+				int open_flags)
- {
- 	__be32 *p;
- 
-@@ -1343,7 +1344,22 @@ static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
- 	default:
- 		*p++ = cpu_to_be32(0);
- 	}
--	*p = cpu_to_be32(0);		/* for linux, share_deny = 0 always */
-+	if (open_flags & O_DENYMAND) {
-+		switch (open_flags & (O_DENYREAD|O_DENYWRITE)) {
-+		case O_DENYREAD:
-+			*p = cpu_to_be32(NFS4_SHARE_DENY_READ);
-+			break;
-+		case O_DENYWRITE:
-+			*p = cpu_to_be32(NFS4_SHARE_DENY_WRITE);
-+			break;
-+		case O_DENYREAD|O_DENYWRITE:
-+			*p = cpu_to_be32(NFS4_SHARE_DENY_BOTH);
-+			break;
-+		default:
-+			*p = cpu_to_be32(0);
-+		}
-+	} else
-+		*p = cpu_to_be32(0);
- }
- 
- static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_openargs *arg)
-@@ -1354,7 +1370,7 @@ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_opena
-  * owner 4 = 32
-  */
- 	encode_nfs4_seqid(xdr, arg->seqid);
--	encode_share_access(xdr, arg->fmode);
-+	encode_share_access(xdr, arg->fmode, arg->open_flags);
- 	p = reserve_space(xdr, 36);
- 	p = xdr_encode_hyper(p, arg->clientid);
- 	*p++ = cpu_to_be32(24);
-@@ -1491,7 +1507,7 @@ static void encode_open_downgrade(struct xdr_stream *xdr, const struct nfs_close
- 	encode_op_hdr(xdr, OP_OPEN_DOWNGRADE, decode_open_downgrade_maxsz, hdr);
- 	encode_nfs4_stateid(xdr, arg->stateid);
- 	encode_nfs4_seqid(xdr, arg->seqid);
--	encode_share_access(xdr, arg->fmode);
-+	encode_share_access(xdr, arg->fmode, 0);
- }
- 
- static void
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index 494c912..11e589e 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -356,7 +356,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{STATUS_PORT_CONNECTION_REFUSED, -ECONNREFUSED,
+ 	"STATUS_PORT_CONNECTION_REFUSED"},
+ 	{STATUS_INVALID_PORT_HANDLE, -EIO, "STATUS_INVALID_PORT_HANDLE"},
+-	{STATUS_SHARING_VIOLATION, -EBUSY, "STATUS_SHARING_VIOLATION"},
++	{STATUS_SHARING_VIOLATION, -ETXTBSY, "STATUS_SHARING_VIOLATION"},
+ 	{STATUS_QUOTA_EXCEEDED, -EDQUOT, "STATUS_QUOTA_EXCEEDED"},
+ 	{STATUS_INVALID_PAGE_PROTECTION, -EIO,
+ 	"STATUS_INVALID_PAGE_PROTECTION"},
 -- 
 1.8.1.2
-
