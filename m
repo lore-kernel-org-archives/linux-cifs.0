@@ -1,73 +1,83 @@
-From: simo <idra@samba.org>
-Subject: Re: [PATCH] CIFS: Decrease reconnection delay when switching nics
-Date: Wed, 27 Feb 2013 20:25:04 -0500
-Message-ID: <1362014704.2057.1.camel@pico.ipa.ssimo.org>
+From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
+Subject: RE: [PATCH] CIFS: Decrease reconnection delay when switching nics
+Date: Thu, 28 Feb 2013 01:26:26 +0000
+Message-ID: <614F550557B82C44AC27C492ADA391AA045A4924@TK5EX14MBXC284.redmond.corp.microsoft.com>
 References: <1361831310-24260-1-git-send-email-chiluk@canonical.com>
-	<512DE8A6.9030000@samba.org>
-	<20130227083419.0af9deaf@corrin.poochiereds.net>
-	<512E8787.6070709@canonical.com>
-	<CAH2r5mvM=OX+F4uqMh_c24DXLxwgRX2UzX3bsYqM00JPzbtjqA@mail.gmail.com>
-	<512E8C31.8070106@canonical.com>
+ <512DE8A6.9030000@samba.org>
+ <20130227083419.0af9deaf@corrin.poochiereds.net>
+ <512E8787.6070709@canonical.com>
+ <CAH2r5mvM=OX+F4uqMh_c24DXLxwgRX2UzX3bsYqM00JPzbtjqA@mail.gmail.com>
+ <512E8C31.8070106@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Cc: "Stefan \(metze\) Metzmacher" <metze@samba.org>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>,
-	Dave Chiluk <chiluk@canonical.com>
-To: Dave Chiluk <dave.chiluk@canonical.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <512E8C31.8070106@canonical.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Cc: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Dave Chiluk <chiluk-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
+	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	"samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org" <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>,
+	"linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Dave Chiluk <dave.chiluk-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <512E8C31.8070106-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Content-Language: en-US
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 2013-02-27 at 16:44 -0600, Dave Chiluk wrote:
+> -----Original Message-----
+> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
+> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Dave Chiluk
+> Sent: Wednesday, February 27, 2013 5:44 PM
+> To: Steve French
+> Cc: Jeff Layton; Stefan (metze) Metzmacher; Dave Chiluk; Steve French;
+> linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org; linux-
+> kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> Subject: Re: [PATCH] CIFS: Decrease reconnection delay when switching nics
+> 
 > On 02/27/2013 04:40 PM, Steve French wrote:
-> > On Wed, Feb 27, 2013 at 4:24 PM, Dave Chiluk <dave.chiluk@canonical.com> wrote:
+> > On Wed, Feb 27, 2013 at 4:24 PM, Dave Chiluk
+> <dave.chiluk-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
 > >> On 02/27/2013 10:34 AM, Jeff Layton wrote:
 > >>> On Wed, 27 Feb 2013 12:06:14 +0100
-> >>> "Stefan (metze) Metzmacher" <metze@samba.org> wrote:
+> >>> "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 > >>>
 > >>>> Hi Dave,
 > >>>>
-> >>>>> When messages are currently in queue awaiting a response, decrease amount of
-> >>>>> time before attempting cifs_reconnect to SMB_MAX_RTT = 10 seconds. The current
-> >>>>> wait time before attempting to reconnect is currently 2*SMB_ECHO_INTERVAL(120
-> >>>>> seconds) since the last response was recieved.  This does not take into account
-> >>>>> the fact that messages waiting for a response should be serviced within a
-> >>>>> reasonable round trip time.
+> >>>>> When messages are currently in queue awaiting a response, decrease
+> >>>>> amount of time before attempting cifs_reconnect to SMB_MAX_RTT
+> =
+> >>>>> 10 seconds. The current wait time before attempting to reconnect
+> >>>>> is currently 2*SMB_ECHO_INTERVAL(120
+> >>>>> seconds) since the last response was recieved.  This does not take
+> >>>>> into account the fact that messages waiting for a response should
+> >>>>> be serviced within a reasonable round trip time.
 > >>>>
-> >>>> Wouldn't that mean that the client will disconnect a good connection,
-> >>>> if the server doesn't response within 10 seconds?
+> >>>> Wouldn't that mean that the client will disconnect a good
+> >>>> connection, if the server doesn't response within 10 seconds?
 > >>>> Reads and Writes can take longer than 10 seconds...
 > >>>>
 > >>>
-> >>> Where does this magic value of 10s come from? Note that a slow server
-> >>> can take *minutes* to respond to writes that are long past the EOF.
-> >> It comes from the desire to decrease the reconnection delay to something
-> >> better than a random number between 60 and 120 seconds.  I am not
-> >> committed to this number, and it is open for discussion.  Additionally
-> >> if you look closely at the logic it's not 10 seconds per request, but
-> >> actually when requests have been in flight for more than 10 seconds make
-> >> sure we've heard from the server in the last 10 seconds.
+> >>> Where does this magic value of 10s come from? Note that a slow
+> >>> server can take *minutes* to respond to writes that are long past the
+> EOF.
+> >> It comes from the desire to decrease the reconnection delay to
+> >> something better than a random number between 60 and 120 seconds.  I
+> >> am not committed to this number, and it is open for discussion.
+> >> Additionally if you look closely at the logic it's not 10 seconds per
+> >> request, but actually when requests have been in flight for more than
+> >> 10 seconds make sure we've heard from the server in the last 10 seconds.
 > >>
 > >> Can you explain more fully your use case of writes that are long past
-> >> the EOF?  Perhaps with a test-case or script that I can test?  As far as
-> >> I know writes long past EOF will just result in a sparse file, and
-> >> return in a reasonable round trip time *(that's at least what I'm seeing
-> >> with my testing).  dd if=/dev/zero of=/mnt/cifs/a bs=1M count=100
-> >> seek=100000, starts receiving responses from the server in about .05
-> >> seconds with subsequent responses following at roughly .002-.01 second
-> >> intervals.  This is well within my 10 second value.
-> > 
+> >> the EOF?  Perhaps with a test-case or script that I can test?  As far
+> >> as I know writes long past EOF will just result in a sparse file, and
+> >> return in a reasonable round trip time *(that's at least what I'm
+> >> seeing with my testing).  dd if=/dev/zero of=/mnt/cifs/a bs=1M
+> >> count=100 seek=100000, starts receiving responses from the server in
+> >> about .05 seconds with subsequent responses following at roughly
+> >> .002-.01 second intervals.  This is well within my 10 second value.
+> >
 > > Note that not all Linux file systems support sparse files and
 > > certainly there are cifs servers running on operating systems other
 > > than Linux which have popular file systems which don't support sparse
@@ -76,20 +86,20 @@ On Wed, 2013-02-27 at 16:44 -0600, Dave Chiluk wrote:
 > > supported and I don't know a good way for the client to know that
 > > attribute of the server file system ahead of time (although we could
 > > attempt to set the sparse flag, servers can and do lie)
-> > 
+> >
 > 
-> It doesn't matter how long it takes for the entire operation to
-> complete, just so long as the server acks something in less than 10
-> seconds.  Now the question becomes, is there an OS out there that
-> doesn't ack the request or doesn't ack the progress regularly.
+> It doesn't matter how long it takes for the entire operation to complete, just
+> so long as the server acks something in less than 10 seconds.  Now the
+> question becomes, is there an OS out there that doesn't ack the request or
+> doesn't ack the progress regularly.
 
-IIRC older samba servers were fully synchronous and wouldn't reply to
-anything while processing an operation. I am sure you can still find old
-code bases in older (and slow) appliances out there.
+SMB/CIFS servers will signal the operation "going async" by returning a
+STATUS_PENDING response if the operation is not prompt, but this only
+happens once. The client is still expected to run a timer, and recover from
+possibly lost responses and/or unresponsive servers. Windows clients
+extend their timeout when this occurs, typically quadrupling it.
 
-Simo.
-
--- 
-Simo Sorce
-Samba Team GPL Compliance Officer <simo@samba.org>
-Principal Software Engineer at Red Hat, Inc. <simo@redhat.com>
+Some clients will issue ECHO requests to probe the server in this
+case, but it is neither a protocol requirement nor does it truly address
+the issue of tracking each pending operation. Windows SMB2 clients
+do not do this.
