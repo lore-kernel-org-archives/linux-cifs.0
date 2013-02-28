@@ -1,181 +1,38 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH] CIFS: Decrease reconnection delay when switching nics
-Date: Thu, 28 Feb 2013 10:04:02 -0800
-Message-ID: <20130228100402.5f7a42fc@corrin.poochiereds.net>
-References: <1361831310-24260-1-git-send-email-chiluk@canonical.com>
-	<512DE8A6.9030000@samba.org>
-	<20130227083419.0af9deaf@corrin.poochiereds.net>
-	<512E8787.6070709@canonical.com>
-	<20130228072637.3b71a4f7@corrin.poochiereds.net>
-	<CAH2r5mtBHO6woWeOJ+DJDBmF35VTfuFYo2iza--xAe7grnELAg@mail.gmail.com>
-	<20130228084704.7f267119@corrin.poochiereds.net>
-	<512F948A.9060404@canonical.com>
+From: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
+Subject: Re: [PATCH v3 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Thu, 28 Feb 2013 13:53:25 -0800
+Message-ID: <512FD1D5.3010106@mit.edu>
+References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Dave Chiluk <dave.chiluk-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <512F948A.9060404-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+In-Reply-To: <1362065133-9490-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 28 Feb 2013 11:31:54 -0600
-Dave Chiluk <dave.chiluk-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+[possible resend -- sorry]
 
-> On 02/28/2013 10:47 AM, Jeff Layton wrote:
-> > On Thu, 28 Feb 2013 10:04:36 -0600
-> > Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> > 
-> >> On Thu, Feb 28, 2013 at 9:26 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> >>> On Wed, 27 Feb 2013 16:24:07 -0600
-> >>> Dave Chiluk <dave.chiluk-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
-> >>>
-> >>>> On 02/27/2013 10:34 AM, Jeff Layton wrote:
-> >>>>> On Wed, 27 Feb 2013 12:06:14 +0100
-> >>>>> "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
-> >>>>>
-> >>>>>> Hi Dave,
-> >>>>>>
-> >>>>>>> When messages are currently in queue awaiting a response, decrease amount of
-> >>>>>>> time before attempting cifs_reconnect to SMB_MAX_RTT = 10 seconds. The current
-> >>>>>>> wait time before attempting to reconnect is currently 2*SMB_ECHO_INTERVAL(120
-> >>>>>>> seconds) since the last response was recieved.  This does not take into account
-> >>>>>>> the fact that messages waiting for a response should be serviced within a
-> >>>>>>> reasonable round trip time.
-> >>>>>>
-> >>>>>> Wouldn't that mean that the client will disconnect a good connection,
-> >>>>>> if the server doesn't response within 10 seconds?
-> >>>>>> Reads and Writes can take longer than 10 seconds...
-> >>>>>>
-> >>>>>
-> >>>>> Where does this magic value of 10s come from? Note that a slow server
-> >>>>> can take *minutes* to respond to writes that are long past the EOF.
-> >>>> It comes from the desire to decrease the reconnection delay to something
-> >>>> better than a random number between 60 and 120 seconds.  I am not
-> >>>> committed to this number, and it is open for discussion.  Additionally
-> >>>> if you look closely at the logic it's not 10 seconds per request, but
-> >>>> actually when requests have been in flight for more than 10 seconds make
-> >>>> sure we've heard from the server in the last 10 seconds.
-> >>>>
-> >>>> Can you explain more fully your use case of writes that are long past
-> >>>> the EOF?  Perhaps with a test-case or script that I can test?  As far as
-> >>>> I know writes long past EOF will just result in a sparse file, and
-> >>>> return in a reasonable round trip time *(that's at least what I'm seeing
-> >>>> with my testing).  dd if=/dev/zero of=/mnt/cifs/a bs=1M count=100
-> >>>> seek=100000, starts receiving responses from the server in about .05
-> >>>> seconds with subsequent responses following at roughly .002-.01 second
-> >>>> intervals.  This is well within my 10 second value.  Even adding the
-> >>>> latency of AT&T's 2g cell network brings it up to only 1s.  Still 10x
-> >>>> less than my 10 second value.
-> >>>>
-> >>>> The new logic goes like this
-> >>>> if( we've been expecting a response from the server (in_flight), and
-> >>>>  message has been in_flight for more than 10 seconds and
-> >>>>  we haven't had any other contact from the server in that time
-> >>>>   reconnect
-> >>>>
-> >>>
-> >>> That will break writes long past the EOF. Note too that reconnects on
-> >>> CIFS are horrifically expensive and problematic. Much of the state on a
-> >>> CIFS mount is tied to the connection. When that drops, open files are
-> >>> closed and things like locks are dropped. SMB1 has no real mechanism
-> >>> for state recovery, so that can really be a problem.
-> >>>
-> >>>> On a side note, I discovered a small race condition in the previous
-> >>>> logic while working on this, that my new patch also fixes.
-> >>>> 1s  request
-> >>>> 2s  response
-> >>>> 61.995 echo job pops
-> >>>> 121.995 echo job pops and sends echo
-> >>>> 122 server_unresponsive called.  Finds no response and attempts to
-> >>>>        reconnect
-> >>>> 122.95 response to echo received
-> >>>>
-> >>>
-> >>> Sure, here's a reproducer. Do this against a windows server, preferably
-> >>> one exporting NTFS on relatively slow storage. Make sure that
-> >>> "testfile" doesn't exist first:
-> >>>
-> >>>      $ dd if=/dev/zero of=/path/to/cifs/share/testfile bs=1M count=1 seek=3192
-> >>>
-> >>> NTFS doesn't support sparse files, so the OS has to zero-fill up to the
-> >>> point where you're writing. That can take a looooong time on slow
-> >>> storage (minutes even). What we do now is periodically send a SMB echo
-> >>> to make sure the server is alive rather than trying to time out a
-> >>> particular call.
-> >>
-> >> Writing past end of file in Windows can be very slow, but note that it
-> >> is possible for a windows to set as sparse a file on an NTFS
-> >> partition.   Quoting from
-> >> http://msdn.microsoft.com/en-us/library/windows/desktop/aa365566%28v=vs.85%29.aspx
-> >> Windows NTFS does support sparse files (and we could even send it over
-> >> cifs if we want) but it has to be explicitly set by the app on the
-> >> file:
-> >>
-> >> "To determine whether a file system supports sparse files, call the
-> >> GetVolumeInformation function and examine the
-> >> FILE_SUPPORTS_SPARSE_FILES bit flag returned through the
-> >> lpFileSystemFlags parameter.
-> >>
-> >> Most applications are not aware of sparse files and will not create
-> >> sparse files. The fact that an application is reading a sparse file is
-> >> transparent to the application. An application that is aware of
-> >> sparse-files should determine whether its data set is suitable to be
-> >> kept in a sparse file. After that determination is made, the
-> >> application must explicitly declare a file as sparse, using the
-> >> FSCTL_SET_SPARSE control code."
-> >>
-> >>
-> > 
-> > That's interesting. I didn't know about the fsctl.
-> > 
-> > It doesn't really help us though. Not all servers support passthrough
-> > infolevels, and there are other filesystems (e.g. FAT) that don't
-> > support sparse files at all.
-> > 
-> > In any case, the upshot of all of this is that we simply can't assume
-> > that we'll get the response to a particular call in any given amount of
-> > time, so we have to periodically check that the server is still
-> > responding via echoes before giving up on it completely.
-> > 
+On 02/28/2013 07:25 AM, Pavel Shilovsky wrote:
+> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
 > 
-> I just verified this by running the dd testcase against a windows 7
-> server.  I'm going to rewrite my patch to optimise the echo logic as
-> Jeff suggested earlier.  The only difference being that, I think we
-> should still have regular echos when nothing else is happening, so that
-> the connection can be rebuilt when nothing urgent is going on.
+> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
 > 
-
-OTOH, you don't want to hammer the server with echoes. They are fairly
-light weight, but they aren't completely free. That's why I think we
-might get better milage out of trying to look at the socket itself to
-figure out the state.
-
-> It still makes more sense to me that we should be checking the status of
-> the tcp socket, and it's underlying nic, but I'm still not completely
-> clear on how that could be accomplished.  Any pointers to that regard
-> would be appreciated.
+> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
 > 
-> Thanks for the help guys.
+> So, we have four new flags:
+> O_DENYREAD - to prevent other opens with read access,
+> O_DENYWRITE - to prevent other opens with write access,
+> O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+> O_DENYMAND - to switch on/off three flags above.
 
-You can always look at the sk_state flags to figure out the state of
-the TCP connection (there are some examples of that in sunrpc code, but
-there may be simpler ones elsewhere).
+O_DENYMAND doesn't deny anything.  Would a name like O_RESPECT_DENY be
+better?
 
-As far as the underlying interface goes, I'm not sure what you can do.
-There's not always a straightforward 1:1 correspondance between an
-interface and connection is there? Also, we don't necessarily want to
-reconnect just because networkmanager got upgraded and took down the if
-for a second and brought it right back up again. What if an address
-migrates to a different interface altogether on the same subnet? Do TCP
-connections normally keep chugging along in that situation?
+Other than that, this seems like a sensible mechanism.
 
-I think you probably need to nail down the specific circumstances where
-you want to reconnect and then try to figure out how best to detect them.
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--Andy
