@@ -1,47 +1,82 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 1 Mar 2013 11:16:29 -0600
-Message-ID: <CAH2r5muxOAG8q1pcoJi9tPo7zpKkc8=WjS9Zbw=3+bonSyRbbQ@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: bugfix for unreclaimed writeback pages in
+ cifs_writev_requeue()
+Date: Fri, 1 Mar 2013 18:57:50 -0500
+Message-ID: <20130301185750.66a139ca@tlielax.poochiereds.net>
+References: <OF08391DB5.0DFF1FA3-ON48257B0A.002333BE-48257B0A.002372B2@zte.com.cn>
+	<CAH2r5muZL8voikW6NO_KojjV=N9zVymsqcR_KMf=XgZ4v8oGgQ@mail.gmail.com>
+	<CAKywueTQ0q=B2pw1HjWZLXe27DVbydx-0c7ZJUHCJMUcBMMtvA@mail.gmail.com>
+	<CAKywueRidM=aOdnxVsA3r0q33R7QnG1W87Eio6KiFOvTQB-ESQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAKywueRidM=aOdnxVsA3r0q33R7QnG1W87Eio6KiFOvTQB-ESQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Four cifs fixes (including for kernel bug #53221 and samba bug #9519)
+On Fri, 1 Mar 2013 22:08:04 +0400
+Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-The following changes since commit 309667e53fcfd8e0b423280b6ea5a648fd92166c:
+> 2013/2/6 Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>:
+> >> diff -uprN linux-3.8-rc6/fs/cifs/cifssmb.c linux-3.8-rc6_new/fs/cifs/cifssmb.c
+> >> --- linux-3.8-rc6/fs/cifs/cifssmb.c        2013-02-01 09:08:14.000000000 +0800
+> >> +++ linux-3.8-rc6_new/fs/cifs/cifssmb.c        2013-02-04
+> >> 15:44:09.869254397 +0800
+> >> @@ -1909,8 +1909,11 @@ cifs_writev_requeue(struct cifs_writedat
+> >>          } while (rc == -EAGAIN);
+> >>
+> >>          for (i = 0; i < wdata->nr_pages; i++) {
+> >> -                if (rc != 0)
+> >> +                if (rc != 0){
+> >>                          SetPageError(wdata->pages[i]);
+> >> +                         end_page_writeback(wdata->pages[i]);
+> >> +                         page_cache_release(wdata->pages[i]);
+> >> +                 }
+> >
+> > I think we should do end_page_writeback(wdata->pages[i]) and
+> > page_cache_release(wdata->pages[i]) regardless whether rc is 0 or not
+> > (we are doing the same things in cifs_writev_complete now). Thoughts?
+> >
+> >>                  unlock_page(wdata->pages[i]);
+> >>          }
+> >>
+> 
+> Jeff, what do you think about my comments to this patch
+> (http://git.samba.org/?p=sfrench/cifs-2.6.git;a=commitdiff;h=c51bb0ea40ca038da26b1fa7d450f4078124af03)
+> ? It doesn't clear to me why we should call
+> end_page_writeback(wdata->pages[i]) and
+> page_cache_release(wdata->pages[i]) in rc != 0 case only...
+> 
 
-  Merge branch 'kconfig' of
-git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild
-(2013-02-27 12:28:30 -0800)
+It's a good question, so I'll go ahead and cc the mailing list since
+there's no need to keep this private:
 
-are available in the git repository at:
+----------------[snip]---------------
+        do {
+                server = tlink_tcon(wdata->cfile->tlink)->ses->server;
+                rc = server->ops->async_writev(wdata);
+        } while (rc == -EAGAIN);
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+        for (i = 0; i < wdata->nr_pages; i++) {
+                if (rc != 0)
+                        SetPageError(wdata->pages[i]);
+                unlock_page(wdata->pages[i]);
+        }
+----------------[snip]---------------
 
-Jeff Layton (1):
-      cifs: ensure that cifs_get_root() only traverses directories
+rc != 0 there means that resending the write failed with a
+non-retryable error. In that case, we need to end the writeback on it
+and release the reference we hold on it since the code is "finished"
+with the page at that point. We don't expect a reply from the server,
+so we need to make sure we clean up properly here.
 
-Martijn de Gouw (1):
-      cifs: set MAY_SIGN when sec=krb5
-
-Ouyang Maochun (1):
-      cifs: bugfix for unreclaimed writeback pages in cifs_writev_requeue()
-
-Steve French (1):
-      POSIX extensions disabled on client due to illegal O_EXCL flag
-sent to Samba
-
- fs/cifs/cifsfs.c  |    5 +++++
- fs/cifs/cifssmb.c |    5 ++++-
- fs/cifs/connect.c |    2 +-
- fs/cifs/file.c    |   12 +++++++++---
- 4 files changed, 19 insertions(+), 5 deletions(-)
+If rc == 0 however, then there is now a new write request in progress.
+The normal async reply handling will take care of it at that point. So
+we need to continue to hold on to the page reference, and the writeback
+bit still needs to stay set.
 
 -- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
