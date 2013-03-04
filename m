@@ -1,54 +1,104 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH v3 0/7] Add O_DENY* support for VFS and CIFS/NFS
-Date: Mon, 4 Mar 2013 16:19:24 -0500
-Message-ID: <20130304211923.GI20389@fieldses.org>
-References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
- <512FD1D5.3010106@mit.edu>
+From: Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH] cifs: remove the sockopt= mount option
+Date: Mon, 4 Mar 2013 16:08:30 -0600
+Message-ID: <CAH2r5muojf9w9QxkPK5vCQs5Av_wxm+twJ044+Mf8Q_9D=b63Q@mail.gmail.com>
+References: <1361446379-7970-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <512FD1D5.3010106-3s7WtUTddSA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs@vger.kernel.org, Jeff Layton <jlayton@redhat.com>
+To: LKML <linux-kernel@vger.kernel.org>,
+	linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+In-Reply-To: <1361446379-7970-1-git-send-email-jlayton@redhat.com>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Thu, Feb 28, 2013 at 01:53:25PM -0800, Andy Lutomirski wrote:
-> [possible resend -- sorry]
-> 
-> On 02/28/2013 07:25 AM, Pavel Shilovsky wrote:
-> > This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
-> > 
-> > These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
-> > 
-> > According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
-> > 
-> > So, we have four new flags:
-> > O_DENYREAD - to prevent other opens with read access,
-> > O_DENYWRITE - to prevent other opens with write access,
-> > O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
-> > O_DENYMAND - to switch on/off three flags above.
-> 
-> O_DENYMAND doesn't deny anything.  Would a name like O_RESPECT_DENY be
-> better?
-> 
-> Other than that, this seems like a sensible mechanism.
+Resending patch to a slightly broader list for last minute check if
+anyone objects.  Although setting this particular socket option
+(TCP_NODELAY) may not be as useful when corking/uncorking explicitly,
+I want to doublecheck before removing them because there has been some
+utility to the server allowing override of various sockopt options.
+Samba server has long supported at least the following set of settable
+socket options (although I don't know if the defaults are frequently
+overridden now, by setting sockopts in smb.conf as used to be common
+for the server).
 
-I'm a little more worried: these are mandatory locks, and applications
-that use them are used to the locks being enforced correctly.  Are we
-sure that an application that opens a file O_DENYWRITE won't crash if it
-sees the file data change while it holds the open?
+SO_KEEPALIVE
+SO_REUSEADDR
+SO_BROADCAST
+TCP_NODELAY
+IPTOS_LOWDELAY
+IPTOS_THROUGHPUT
+SO_SNDBUF *
+SO_RCVBUF *
+SO_SNDLOWAT *
+SO_RCVLOWAT *
 
-In general the idea of making a mandatory lock opt-in makes me nervous.
-I'd prefer something like a mount option, so that we know that everyone
-on that one filesystem is playing by the same rules, but we can still
-mount filesystems like / without the option.
+* takes an integer argument rather than a boolean on/off
 
-But I'll admit I'm definitely not an expert on Windows locking and may
-be missing something about how these locks are meant to work.
+Any objections to removing the ability to set socket options
+explicitly for the cifs network file system client?
 
---b.
+On Thu, Feb 21, 2013 at 5:32 AM, Jeff Layton <jlayton@redhat.com> wrote:
+>
+> ...as promised for 3.9.
+>
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> ---
+>  fs/cifs/connect.c | 16 +---------------
+>  1 file changed, 1 insertion(+), 15 deletions(-)
+>
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index d997737..8609c42 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -97,7 +97,7 @@ enum {
+>         Opt_user, Opt_pass, Opt_ip,
+>         Opt_unc, Opt_domain,
+>         Opt_srcaddr, Opt_prefixpath,
+> -       Opt_iocharset, Opt_sockopt,
+> +       Opt_iocharset,
+>         Opt_netbiosname, Opt_servern,
+>         Opt_ver, Opt_vers, Opt_sec, Opt_cache,
+>
+> @@ -202,7 +202,6 @@ static const match_table_t cifs_mount_option_tokens =
+> {
+>         { Opt_srcaddr, "srcaddr=%s" },
+>         { Opt_prefixpath, "prefixpath=%s" },
+>         { Opt_iocharset, "iocharset=%s" },
+> -       { Opt_sockopt, "sockopt=%s" },
+>         { Opt_netbiosname, "netbiosname=%s" },
+>         { Opt_servern, "servern=%s" },
+>         { Opt_ver, "ver=%s" },
+> @@ -1722,19 +1721,6 @@ cifs_parse_mount_options(const char *mountdata,
+> const char *devname,
+>                          */
+>                         cFYI(1, "iocharset set to %s", string);
+>                         break;
+> -               case Opt_sockopt:
+> -                       string = match_strdup(args);
+> -                       if (string == NULL)
+> -                               goto out_nomem;
+> -
+> -                       if (strnicmp(string, "TCP_NODELAY", 11) == 0) {
+> -                               printk(KERN_WARNING "CIFS: the "
+> -                                       "sockopt=TCP_NODELAY option has
+> been "
+> -                                       "deprecated and will be removed "
+> -                                       "in 3.9\n");
+> -                               vol->sockopt_tcp_nodelay = 1;
+> -                       }
+> -                       break;
+>                 case Opt_netbiosname:
+>                         string = match_strdup(args);
+>                         if (string == NULL)
+> --
+> 1.7.11.7
+>
+
+
+
+--
+Thanks,
+
+Steve
