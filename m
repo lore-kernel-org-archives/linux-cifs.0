@@ -1,54 +1,101 @@
-From: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-Subject: [PATCH 2/2] cifs: call print_hex_dump instead of custom implementation
-Date: Mon,  4 Mar 2013 11:41:06 +0200
-Message-ID: <1362390066-4548-2-git-send-email-andriy.shevchenko@linux.intel.com>
-References: <1362390066-4548-1-git-send-email-andriy.shevchenko@linux.intel.com>
-Cc: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org
+From: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
+Subject: Re: cifs: bugfix for unreclaimed writeback pages in cifs_writev_requeue()
+Date: Mon, 4 Mar 2013 15:04:49 +0000
+Message-ID: <F7FD7D54-C7FE-47E4-8741-FF56A3CC035A@cam.ac.uk>
+References: <20130302195530.6EACF6605DF@gitolite.kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Cc: Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1362390066-4548-1-git-send-email-andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+In-Reply-To: <20130302195530.6EACF6605DF-OoYKEaZ2EDaWaY/ihj7yzEB+6BGkLq7r@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
----
- fs/cifs/cifs_debug.c | 21 ++-------------------
- 1 file changed, 2 insertions(+), 19 deletions(-)
+Hi,
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index b2ddb4f..11d45ba 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -34,27 +34,10 @@
- void
- cifs_dump_mem(char *label, void *data, int length)
- {
--	int i, j;
--	int *intptr = data;
--	char *charptr = data;
--	char buf[10], line[80];
--
- 	printk(KERN_DEBUG "%s: dump of %d bytes of data at 0x%p\n",
- 		label, length, data);
--	for (i = 0; i < length; i += 16) {
--		line[0] = 0;
--		for (j = 0; (j < 4) && (i + j * 4 < length); j++) {
--			sprintf(buf, " %08x", intptr[i / 4 + j]);
--			strcat(line, buf);
--		}
--		buf[0] = ' ';
--		buf[2] = 0;
--		for (j = 0; (j < 16) && (i + j < length); j++) {
--			buf[1] = isprint(charptr[i + j]) ? charptr[i + j] : '.';
--			strcat(line, buf);
--		}
--		printk(KERN_DEBUG "%s\n", line);
--	}
-+	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_NONE, 16, 4,
-+		       data, length, true);
- }
- 
- void cifs_dump_detail(void *buf)
--- 
-1.8.2.rc0.22.gb3600c3
+The below commit that is present in 3.9-rc1 is buggy.  It releases the =
+page at which point it may no longer exist and then it unlocks it after=
+wards.  Even if you are somehow getting away with it I think it is an e=
+xplosion/memory corruption waiting to happen...
+
+Best regards,
+
+	Anton
+
+On 2 Mar 2013, at 19:55, Linux Kernel Mailing List <linux-kernel@vger.k=
+ernel.org> wrote:
+
+> Gitweb:     http://git.kernel.org/linus/;a=3Dcommit;h=3Dc51bb0ea40ca0=
+38da26b1fa7d450f4078124af03
+> Commit:     c51bb0ea40ca038da26b1fa7d450f4078124af03
+> Parent:     0b7bc84000d71f3647ca33ab1bf5bd928535c846
+> Author:     Ouyang Maochun <ouyang.maochun-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+> AuthorDate: Mon Feb 18 09:54:52 2013 -0600
+> Committer:  Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> CommitDate: Thu Feb 28 09:01:47 2013 -0600
+>=20
+>    cifs: bugfix for unreclaimed writeback pages in cifs_writev_requeu=
+e()
+>=20
+>    Pages get the PG_writeback flag set before cifs sends its
+>    request to SMB server in cifs_writepages(), if the SMB service
+>    goes down, cifs may try to recommit the writing requests in
+>    cifs_writev_requeue(). However, it does not clean its PG_writeback
+>    flag and relaimed the pages even if it fails again in
+>    cifs_writev_requeue(), which may lead to the hanging of the
+>    processes accessing the cifs directory. This patch just cleans
+>    the PG_writeback flags and reclaims the pages under that circumsta=
+nces.
+>=20
+>        Steps to reproduce the bug(trying serveral times may trigger t=
+he issue):
+>        1.Write from cifs client continuously.(e.g dd if=3D/dev/zero o=
+f=3D<cifs file>)
+>        2.Stop SMB service from server.(e.g service smb stop)
+>        3.Wait for two minutes=EF=BC=8C and then start SMB service fro=
+m
+>    server.(e.g service smb start)
+>        4.The processes which are accessing cifs directory may hang up=
+=2E
+>=20
+>    Signed-off-by: Ouyang Maochun <ouyang.maochun-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>    Signed-off-by: Jiang Yong <jian.yong5-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>    Tested-by: Zhang Xianwei <zhang.xianwei8-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>    Reviewed-by: Wang Liang <wang.liang82-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>    Reviewed-by: Cai Qu <cai.qu-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>    Reviewed-by: Jiang Biao <jiang.biao2-Th6q7B73Y6EnDS1+zs4M5A@public.gmane.org>
+>    Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+>    Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>    Signed-off-by: Steve French <sfrench-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
+> ---
+> fs/cifs/cifssmb.c |    5 ++++-
+> 1 files changed, 4 insertions(+), 1 deletions(-)
+>=20
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index 00e12f2..7353bc5 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -1909,8 +1909,11 @@ cifs_writev_requeue(struct cifs_writedata *wda=
+ta)
+> 	} while (rc =3D=3D -EAGAIN);
+>=20
+> 	for (i =3D 0; i < wdata->nr_pages; i++) {
+> -		if (rc !=3D 0)
+> +		if (rc !=3D 0) {
+> 			SetPageError(wdata->pages[i]);
+> +			end_page_writeback(wdata->pages[i]);
+> +			page_cache_release(wdata->pages[i]);
+> +		}
+> 		unlock_page(wdata->pages[i]);
+> 	}
+>=20
+
+--=20
+Anton Altaparmakov <aia21 at cam.ac.uk> (replace at with @)
+Unix Support, Computing Service, University of Cambridge, CB2 3QH, UK
+Linux NTFS maintainer, http://www.linux-ntfs.org/
