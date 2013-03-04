@@ -1,45 +1,54 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: don't try to unlock pagecache page after releasing it
-Date: Mon,  4 Mar 2013 15:18:25 -0500
-Message-ID: <1362428305-26502-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH v3 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Mon, 4 Mar 2013 16:19:24 -0500
+Message-ID: <20130304211923.GI20389@fieldses.org>
+References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
+ <512FD1D5.3010106@mit.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <512FD1D5.3010106-3s7WtUTddSA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We had a recent fix to fix the release of pagecache pages when
-cifs_writev_requeue writes fail. Unfortunately, it releases the page
-before trying to unlock it. At that point, the page might be gone by the
-time the unlock comes in.
+On Thu, Feb 28, 2013 at 01:53:25PM -0800, Andy Lutomirski wrote:
+> [possible resend -- sorry]
+> 
+> On 02/28/2013 07:25 AM, Pavel Shilovsky wrote:
+> > This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
+> > 
+> > These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
+> > 
+> > According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
+> > 
+> > So, we have four new flags:
+> > O_DENYREAD - to prevent other opens with read access,
+> > O_DENYWRITE - to prevent other opens with write access,
+> > O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+> > O_DENYMAND - to switch on/off three flags above.
+> 
+> O_DENYMAND doesn't deny anything.  Would a name like O_RESPECT_DENY be
+> better?
+> 
+> Other than that, this seems like a sensible mechanism.
 
-Unlock the page first before checking the value of "rc", and only then
-end writeback and release the pages. The page lock isn't required for
-any of those operations so this should be safe.
+I'm a little more worried: these are mandatory locks, and applications
+that use them are used to the locks being enforced correctly.  Are we
+sure that an application that opens a file O_DENYWRITE won't crash if it
+sees the file data change while it holds the open?
 
-Reported-by: Anton Altaparmakov <aia21-KWPb1pKIrIJaa/9Udqfwiw@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+In general the idea of making a mandatory lock opt-in makes me nervous.
+I'd prefer something like a mount option, so that we know that everyone
+on that one filesystem is playing by the same rules, but we can still
+mount filesystems like / without the option.
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 7353bc5..8e2e799 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1909,12 +1909,12 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
- 	} while (rc == -EAGAIN);
- 
- 	for (i = 0; i < wdata->nr_pages; i++) {
-+		unlock_page(wdata->pages[i]);
- 		if (rc != 0) {
- 			SetPageError(wdata->pages[i]);
- 			end_page_writeback(wdata->pages[i]);
- 			page_cache_release(wdata->pages[i]);
- 		}
--		unlock_page(wdata->pages[i]);
- 	}
- 
- 	mapping_set_error(inode->i_mapping, rc);
--- 
-1.7.11.7
+But I'll admit I'm definitely not an expert on Windows locking and may
+be missing something about how these locks are meant to work.
+
+--b.
