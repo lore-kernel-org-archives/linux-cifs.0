@@ -1,23 +1,47 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 0/3] Improvements to cifs_rename_pending_delete()
-Date: Tue,  5 Mar 2013 19:25:54 +0000
-Message-ID: <1362511557-22607-1-git-send-email-sprabhu@redhat.com>
+Subject: [PATCH 2/3] cifs: Check server capability before attempting silly rename
+Date: Tue,  5 Mar 2013 19:25:56 +0000
+Message-ID: <1362511557-22607-3-git-send-email-sprabhu@redhat.com>
+References: <1362511557-22607-1-git-send-email-sprabhu@redhat.com>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1362511557-22607-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The patch series consists of a bug fix and a couple of enhancements
-to cifs_rename_pending_delete()
+cifs_rename_pending_delete() attempts to silly rename file using
+CIFSSMBRenameOpenFile(). This uses the SET_FILE_INFORMATION TRANS2
+command with information level set to the passthru info-level
+SMB_SET_FILE_RENAME_INFORMATION.
 
-Sachin Prabhu (3):
-  cifs: Fix bug when checking error condition in
-    cifs_rename_pending_delete()
-  cifs: Check server capability before attempting silly rename
-  cifs: Return EBUSY instead of ETXTBSY in cifs_rename_pending_delete()
+We need to check to make sure that the server support passthru
+info-levels before attempting the silly rename or else we will fail to
+rename the file.
 
- fs/cifs/inode.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/inode.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index a183b9d..fee2d40 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -986,6 +986,15 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 		return PTR_ERR(tlink);
+ 	tcon = tlink_tcon(tlink);
+ 
++	/*
++	 * We cannot rename the file if the server doesn't support
++	 * CAP_INFOLEVEL_PASSTHRU
++	 */
++	if (!(tcon->ses->capabilities & CAP_INFOLEVEL_PASSTHRU)) {
++		rc = -EBUSY;
++		goto out;
++	}
++
+ 	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
+ 			 DELETE|FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
+ 			 &netfid, &oplock, NULL, cifs_sb->local_nls,
 -- 
 1.7.11.7
