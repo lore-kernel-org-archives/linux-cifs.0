@@ -1,71 +1,72 @@
-From: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Subject: 3.7.10+:  BUG Dentry still in use [unmount of cifs cifs]
-Date: Tue, 05 Mar 2013 10:54:56 -0800
-Message-ID: <51363F80.8070609@candelatech.com>
+From: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: [PATCH v3 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Tue, 05 Mar 2013 14:07:49 -0500
+Message-ID: <51364285.4040406@samba.org>
+References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru> <512FD1D5.3010106@mit.edu> <20130304211923.GI20389@fieldses.org> <5135250A.30604@samba.org> <20130305181306.GA15816@fieldses.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Linux Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: Andy Lutomirski <luto-kltTT9wpgjJwATOyAt5JVQ@public.gmane.org>,
+	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20130305181306.GA15816-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-In doing some CIFS testing (utilizing it's feature to bind to local
-address..but not sure that matters), we saw this error when trying
-to un-mount.
+On 03/05/2013 01:13 PM, J. Bruce Fields wrote:
+> On Mon, Mar 04, 2013 at 05:49:46PM -0500, Simo wrote:
+>> On 03/04/2013 04:19 PM, J. Bruce Fields wrote:
+>>> On Thu, Feb 28, 2013 at 01:53:25PM -0800, Andy Lutomirski wrote:
+>>>> [possible resend -- sorry]
+>>>>
+>>>> On 02/28/2013 07:25 AM, Pavel Shilovsky wrote:
+>>>>> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
+>>>>>
+>>>>> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
+>>>>>
+>>>>> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why one extra flag O_DENYMAND is added. It indicates to underlying layer that an application want to use O_DENY* flags semantic. It allows us not affect native Linux applications (that don't use O_DENYMAND flag) - so, these flags (and the semantic of open syscall that they bring) are used only for those applications that really want it proccessed that way.
+>>>>>
+>>>>> So, we have four new flags:
+>>>>> O_DENYREAD - to prevent other opens with read access,
+>>>>> O_DENYWRITE - to prevent other opens with write access,
+>>>>> O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
+>>>>> O_DENYMAND - to switch on/off three flags above.
+>>>> O_DENYMAND doesn't deny anything.  Would a name like O_RESPECT_DENY be
+>>>> better?
+>>>>
+>>>> Other than that, this seems like a sensible mechanism.
+>>> I'm a little more worried: these are mandatory locks, and applications
+>>> that use them are used to the locks being enforced correctly.  Are we
+>>> sure that an application that opens a file O_DENYWRITE won't crash if it
+>>> sees the file data change while it holds the open?
+>> The redirector may simply assume it has full control of that part of
+>> the file and not read nor send data until the lock is released too,
+>> so you get conflicting views of the file contents between different
+>> clients if you let a mandatory lock not be mandatory.
+>>
+>>> In general the idea of making a mandatory lock opt-in makes me nervous.
+>>> I'd prefer something like a mount option, so that we know that everyone
+>>> on that one filesystem is playing by the same rules, but we can still
+>>> mount filesystems like / without the option.
+>> +1
+>>
+>>> But I'll admit I'm definitely not an expert on Windows locking and may
+>>> be missing something about how these locks are meant to work.
+>> Mandatory locks really are mandatory in Windows.
+>> That may not be nice to a Unix system but what can you do ?
+> I wonder if we could repurpose the existing -omand mount option?
+>
+> That would be a problem for anyone that wants to allow mandatory fcntl
+> locks without allowing share locks.  I doubt anyone sane actually uses
+> mandatory fcntl locks, but still I suppose it would probably be better
+> to play it safe and use a new mount option.
 
-Our kernel is patched (nfs, some networking related patches), but there
-are no out-of-kernel patches to CIFS, so I don't *think* this is anything
-we could have caused.
+Maybe we should have a -o win_semantics option :-)
 
-This problem appears to be easily reproducible, so we will be happy
-to test patches if anyone has any suggestions.
+/me runs
 
-BUG: Dentry ffff8800c07e43c0{i=45762,n=cifs2-01.7.lf-data} still in use (1) [unmount of cifs cifs]
-------------[ cut here ]------------
-kernel BUG at /home/greearb/git/linux-3.7.dev.y/fs/dcache.c:967!
-invalid opcode: 0000 [#1] PREEMPT SMP
-Modules linked in: nls_utf8 cifs 8021q garp stp llc iptable_raw xt_CT veth nf_nat_ipv4 nf_nat fuse macvlan wanlink(O) pktgen nfsv3 nfs_acl nfsv4 auth_rpcgss nfs 
-fscache lockd sunrpc be2iscsi iscsi_boot_sysfs bnx2i cnic uio cxgb4i cxgb4 cxgb3i cxgb3 mdio libcxgbi ib_iser rdma_cm ib_addr iw_cm ib_cm ib_sa ib_mad ib_core 
-w83793 iscsi_tcp w83627hf libiscsi_tcp hwmon_vid libiscsi scsi_transport_iscsi coretemp mperf kvm_intel kvm i5k_amb uinput i5000_edac gpio_ich edac_core 
-iTCO_wdt e1000e iTCO_vendor_support lpc_ich i2c_i801 pcspkr ioatdma dca microcode shpchp ipv6 floppy radeon i2c_algo_bit hwmon drm_kms_helper ttm drm i2c_core 
-[last unloaded: iptable_nat]
-CPU 6
-Pid: 6610, comm: umount Tainted: G         C O 3.7.10+ #74 Supermicro X7DBU/X7DBU
-RIP: 0010:[<ffffffff811591c9>]  [<ffffffff811591c9>] shrink_dcache_for_umount_subtree+0x84/0x194
-RSP: 0018:ffff8800c0085dc8  EFLAGS: 00010296
-RAX: 0000000000000062 RBX: ffff8800c07e43c0 RCX: 0000000000000059
-RDX: ffffffff81bc25a8 RSI: 0000000000000046 RDI: 0000000000000246
-RBP: ffff8800c0085de8 R08: 0000000000000001 R09: ffff8800c0085cc8
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff8800c050e9c0
-R13: ffff880128ee8000 R14: 0000000000000000 R15: ffff8800c0085f28
-FS:  00007f6084847840(0000) GS:ffff88012fd80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
-CR2: 00007f608442c3a0 CR3: 00000000c7c2d000 CR4: 00000000000007e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Process umount (pid: 6610, threadinfo ffff8800c0084000, task ffff88012a6a0000)
-Stack:
-  ffff880128ee8310 00000000000128c0 ffff880128ee8000 ffffffffa06b96b0
-  ffff8800c0085e08 ffffffff81159310 ffff8800c0084000 ffff880128ee8000
-  ffff8800c0085e38 ffffffff81149afe ffff8800c0085e38 0000000000000021
-Call Trace:
-  [<ffffffff81159310>] shrink_dcache_for_umount+0x37/0x49
-  [<ffffffff81149afe>] generic_shutdown_super+0x20/0xd2
-  [<ffffffff81149c25>] kill_anon_super+0x11/0x1c
-  [<ffffffffa068b1ea>] cifs_kill_sb+0x15/0x21 [cifs]
-  [<ffffffff81149e48>] deactivate_locked_super+0x32/0x5e
-  [<ffffffff8114a942>] deactivate_super+0x40/0x46
-  [<ffffffff8115fdb3>] mntput_no_expire+0x12d/0x136
-  [<ffffffff81160b59>] sys_umount+0x321/0x34c
-  [<ffffffff8114f846>] ? path_put+0x1d/0x21
-  [<ffffffff81525229>] system_call_fastpath+0x16/0x1b
-Code: 50 28 4c 8b 0a 31 d2 48 85 f6 74 04 48 8b 56 40 48 05 10 03 00 00 48 89 de 48 c7 c7 9d d0 7b 81 48 89 04 24 31 c0 e8 b9 4e 3c 00 <0f> 0b eb fe 4c 8b 63 18 
-4c 39 e3 75 3c 48 8b 93 90 00 00 00 48
-RIP  [<ffffffff811591c9>] shrink_dcache_for_umount_subtree+0x84/0x194
-  RSP <ffff8800c0085dc8>
----[ end trace 9b2978a89532c292 ]---
--- 
-Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-Candela Technologies Inc  http://www.candelatech.com
+Simo.
