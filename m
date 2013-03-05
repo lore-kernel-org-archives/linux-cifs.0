@@ -1,7 +1,7 @@
 From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 2/3] cifs: Check server capability before attempting silly rename
-Date: Tue,  5 Mar 2013 19:25:56 +0000
-Message-ID: <1362511557-22607-3-git-send-email-sprabhu@redhat.com>
+Subject: [PATCH 3/3] cifs: Return EBUSY instead of ETXTBSY in cifs_rename_pending_delete()
+Date: Tue,  5 Mar 2013 19:25:57 +0000
+Message-ID: <1362511557-22607-4-git-send-email-sprabhu@redhat.com>
 References: <1362511557-22607-1-git-send-email-sprabhu@redhat.com>
 To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -9,39 +9,44 @@ In-Reply-To: <1362511557-22607-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-cifs_rename_pending_delete() attempts to silly rename file using
-CIFSSMBRenameOpenFile(). This uses the SET_FILE_INFORMATION TRANS2
-command with information level set to the passthru info-level
-SMB_SET_FILE_RENAME_INFORMATION.
-
-We need to check to make sure that the server support passthru
-info-levels before attempting the silly rename or else we will fail to
-rename the file.
+Instead of remapping ETXTBSY errors to EBUSY in cifs_unlink, replace all
+cases of ETXTBSY in cifs_rename_pending_delete() with EBUSY.
 
 Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/inode.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ fs/cifs/inode.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index a183b9d..fee2d40 100644
+index fee2d40..0ab0328 100644
 --- a/fs/cifs/inode.c
 +++ b/fs/cifs/inode.c
-@@ -986,6 +986,15 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
- 		return PTR_ERR(tlink);
- 	tcon = tlink_tcon(tlink);
- 
-+	/*
-+	 * We cannot rename the file if the server doesn't support
-+	 * CAP_INFOLEVEL_PASSTHRU
-+	 */
-+	if (!(tcon->ses->capabilities & CAP_INFOLEVEL_PASSTHRU)) {
+@@ -1034,7 +1034,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 				   cifs_sb->mnt_cifs_flags &
+ 					    CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	if (rc != 0) {
+-		rc = -ETXTBSY;
 +		rc = -EBUSY;
-+		goto out;
-+	}
-+
- 	rc = CIFSSMBOpen(xid, tcon, full_path, FILE_OPEN,
- 			 DELETE|FILE_WRITE_ATTRIBUTES, CREATE_NOT_DIR,
- 			 &netfid, &oplock, NULL, cifs_sb->local_nls,
+ 		goto undo_setattr;
+ 	}
+ 
+@@ -1053,7 +1053,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 		if (rc == -ENOENT)
+ 			rc = 0;
+ 		else if (rc != 0) {
+-			rc = -ETXTBSY;
++			rc = -EBUSY;
+ 			goto undo_rename;
+ 		}
+ 		cifsInode->delete_pending = true;
+@@ -1167,8 +1167,6 @@ psx_del_no_retry:
+ 			if (rc == 0)
+ 				cifs_drop_nlink(inode);
+ 		}
+-		if (rc == -ETXTBSY)
+-			rc = -EBUSY;
+ 	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
+ 		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
+ 		if (attrs == NULL) {
 -- 
 1.7.11.7
