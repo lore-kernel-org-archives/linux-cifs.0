@@ -1,39 +1,28 @@
-From: Dia Vasile <winged.flamespitter@gmail.com>
-Subject: [PATCH] cifs: replaced kmalloc + memset with kzalloc
-Date: Sun, 10 Mar 2013 14:29:04 +0200
-Message-ID: <1362918544-31796-1-git-send-email-winged.flamespitter@gmail.com>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Dia Vasile <kill.elohim@hotmail.com>
-To: sfrench@samba.org
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Germaine Sandoval <gsandoval-U2FVTXlmoeo@public.gmane.org>
+Subject: Greetings from George Daniels
+Date: Sun, 10 Mar 2013 15:42:36 -0600 (MDT)
+Message-ID: <588381949.726767.1362951756009.JavaMail.root__26440.3536370539$1362952318$gmane$org@luna.edu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: undisclosed-recipients:;
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-From: Dia Vasile <kill.elohim@hotmail.com>
 
-Signed-off-by: Diana Vasile <kill.elohim@hotmail.com>
----
- fs/cifs/smb2pdu.c |    4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 41d9d07..83ef66e 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -846,12 +846,10 @@ create_lease_buf(u8 *lease_key, u8 oplock)
- {
- 	struct create_lease *buf;
- 
--	buf = kmalloc(sizeof(struct create_lease), GFP_KERNEL);
-+	buf = kzalloc(sizeof(struct create_lease), GFP_KERNEL);
- 	if (!buf)
- 		return NULL;
- 
--	memset(buf, 0, sizeof(struct create_lease));
--
- 	buf->lcontext.LeaseKeyLow = cpu_to_le64(*((u64 *)lease_key));
- 	buf->lcontext.LeaseKeyHigh = cpu_to_le64(*((u64 *)(lease_key + 8)));
- 	if (oplock == SMB2_OPLOCK_LEVEL_EXCLUSIVE)
--- 
-1.7.10.4
+Greetings from George Daniels
+
+I am George Daniels, a Banker and credit system programmer (HSBC bank). 
+I saw your email address while browsing through  the bank D.T.C Screen in my office 
+yesterday so I decided to use this very chance to know you. I believe 
+we should use every opportunity to know each other better. However, I am contacting you 
+for obvious reason which you will understand. 
+
+I am sending this mail just to know if this email address is OK, 
+reply me back so that I will send  more details to you. 
+I have a very important thing to discuss with you, I look forward to receiving your response at 
+georgedaniels-VpKtJLNTnGPuFKmmi/icCA@public.gmane.org Have a pleasant day.
+
+George Daniels
