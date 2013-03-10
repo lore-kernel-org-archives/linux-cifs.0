@@ -1,49 +1,39 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Fri, 8 Mar 2013 14:14:09 -0600
-Message-ID: <CAH2r5mtSkS6LkjU9Lbzfa-U3VdmSmwphLafSwhhMVDeYib-vVg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Dia Vasile <winged.flamespitter@gmail.com>
+Subject: [PATCH] cifs: replaced kmalloc + memset with kzalloc
+Date: Sun, 10 Mar 2013 14:29:04 +0200
+Message-ID: <1362918544-31796-1-git-send-email-winged.flamespitter@gmail.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	Dia Vasile <kill.elohim@hotmail.com>
+To: sfrench@samba.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-A small set of cifs fixes which includes one for a recent regression
-in the write path (pointed out by Anton), some fixes for rename
-problems and as promised for 3.9 removing the obsolete sockopt mount
-option (and the accompanying deprecation warning).
+From: Dia Vasile <kill.elohim@hotmail.com>
 
-The following changes since commit 9f225788cc047fb7c2ef2326eb4f86dee890e2ef:
+Signed-off-by: Diana Vasile <kill.elohim@hotmail.com>
+---
+ fs/cifs/smb2pdu.c |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-  Merge branch 'merge' of
-git://git.kernel.org/pub/scm/linux/kernel/git/benh/powerpc (2013-03-05
-18:56:22 -0800)
-
-are available in the git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-Jeff Layton (2):
-      cifs: remove the sockopt= mount option
-      cifs: don't try to unlock pagecache page after releasing it
-
-Pavel Shilovsky (1):
-      CIFS: Fix missing of oplock_read value in smb30_values structure
-
-Sachin Prabhu (2):
-      cifs: Fix bug when checking error condition in
-cifs_rename_pending_delete()
-      cifs: Check server capability before attempting silly rename
-
- fs/cifs/cifssmb.c |    2 +-
- fs/cifs/connect.c |   16 +---------------
- fs/cifs/inode.c   |   11 ++++++++++-
- fs/cifs/smb2ops.c |    1 +
- 4 files changed, 13 insertions(+), 17 deletions(-)
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 41d9d07..83ef66e 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -846,12 +846,10 @@ create_lease_buf(u8 *lease_key, u8 oplock)
+ {
+ 	struct create_lease *buf;
+ 
+-	buf = kmalloc(sizeof(struct create_lease), GFP_KERNEL);
++	buf = kzalloc(sizeof(struct create_lease), GFP_KERNEL);
+ 	if (!buf)
+ 		return NULL;
+ 
+-	memset(buf, 0, sizeof(struct create_lease));
+-
+ 	buf->lcontext.LeaseKeyLow = cpu_to_le64(*((u64 *)lease_key));
+ 	buf->lcontext.LeaseKeyHigh = cpu_to_le64(*((u64 *)(lease_key + 8)));
+ 	if (oplock == SMB2_OPLOCK_LEVEL_EXCLUSIVE)
 -- 
-Thanks,
-
-Steve
+1.7.10.4
