@@ -1,57 +1,114 @@
-From: Arthur Marsh <arthur.marsh-CkBdp7X+a1oIQCUVoCVjmQ@public.gmane.org>
-Subject: Re: fs: Limit sys_mount to only request filesystem modules prevents
- mount -t cifs from working
-Date: Tue, 12 Mar 2013 02:31:14 +1030
-Message-ID: <513DFFCA.6010304@internode.on.net>
-References: <513DD49F.8010301@internode.on.net> <87obeqnjlm.fsf@xmission.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Serge Hallyn <serge.hallyn-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
-	Kees Cook <keescook-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: "Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <87obeqnjlm.fsf-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+Subject: [PATCH] fs: cifs: use kmemdup instead of kmalloc + memcpy
+Date: Mon, 11 Mar 2013 18:22:32 +0200
+Message-ID: <1363018952-12431-1-git-send-email-silviupopescu1990@gmail.com>
+Cc: sfrench@samba.org, samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+To: linux-cifs@vger.kernel.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
+This replaces calls to kmalloc followed by memcpy with a single call to
+kmemdup. This was found via make coccicheck.
 
+Signed-off-by: Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+---
+ fs/cifs/cifs_spnego.c |    3 +--
+ fs/cifs/cifsacl.c     |    3 +--
+ fs/cifs/cifssmb.c     |    3 +--
+ fs/cifs/sess.c        |    8 ++++----
+ 4 files changed, 7 insertions(+), 10 deletions(-)
 
-Eric W. Biederman wrote, on 12/03/13 00:07:
-> Arthur Marsh<arthur.marsh-CkBdp7X+a1oIQCUVoCVjmQ@public.gmane.org>  writes:
->
->> Hi, I found that Linux kernel 3.9.0-rc2 would not mount a remote cifs
->> filesystem, and ran a git bisect which identified the following
->> commit:
->>
->> Is there a patch already present somewhere to fix this problem?
->>
->
-> Grr.  It was in linux-next for nearly a week and I checked an double
-> checked that patch.
->
-> This should fix it.
->
-> Eric
->
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 1a052c0..3cf8a15 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -777,6 +777,7 @@ struct file_system_type cifs_fs_type = {
->   	.kill_sb = cifs_kill_sb,
->   	/*  .fs_flags */
->   };
-> +MODULE_ALIAS_FS("cifs");
->   const struct inode_operations cifs_dir_inode_ops = {
->   	.create = cifs_create,
->   	.atomic_open = cifs_atomic_open,
->
-
-Confirmed... cifs mounts now work again thanks.
-
-Regards,
-
-Arthur.
+diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
+index 10e7747..b7ae3cb 100644
+--- a/fs/cifs/cifs_spnego.c
++++ b/fs/cifs/cifs_spnego.c
+@@ -37,12 +37,11 @@ cifs_spnego_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
+ 	int ret;
+ 
+ 	ret = -ENOMEM;
+-	payload = kmalloc(prep->datalen, GFP_KERNEL);
++	payload = kmemdup(prep->data, prep->datalen, GFP_KERNEL);
+ 	if (!payload)
+ 		goto error;
+ 
+ 	/* attach the data */
+-	memcpy(payload, prep->data, prep->datalen);
+ 	key->payload.data = payload;
+ 	ret = 0;
+ 
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index f1e3f25..0bba930 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -63,11 +63,10 @@ cifs_idmap_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
+ 		key->datalen = prep->datalen;
+ 		return 0;
+ 	}
+-	payload = kmalloc(prep->datalen, GFP_KERNEL);
++	payload = kmemdup(prep->data, prep->datalen, GFP_KERNEL);
+ 	if (!payload)
+ 		return -ENOMEM;
+ 
+-	memcpy(payload, prep->data, prep->datalen);
+ 	key->payload.data = payload;
+ 	key->datalen = prep->datalen;
+ 	return 0;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 7353bc5..d900bf0 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -3742,12 +3742,11 @@ CIFSSMBGetCIFSACL(const unsigned int xid, struct cifs_tcon *tcon, __u16 fid,
+ 			rc = -EINVAL;
+ 			*pbuflen = 0;
+ 		} else {
+-			*acl_inf = kmalloc(*pbuflen, GFP_KERNEL);
++			*acl_inf = kmemdup(pdata, *pbuflen, GFP_KERNEL);
+ 			if (*acl_inf == NULL) {
+ 				*pbuflen = 0;
+ 				rc = -ENOMEM;
+ 			}
+-			memcpy(*acl_inf, pdata, *pbuflen);
+ 		}
+ 	}
+ qsec_out:
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 76809f4..6f83881 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -399,12 +399,12 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 		return -EINVAL;
+ 	}
+ 	if (tilen) {
+-		ses->auth_key.response = kmalloc(tilen, GFP_KERNEL);
++		ses->auth_key.response = kmemdup(bcc_ptr + tioffset, tilen,
++						 GFP_KERNEL);
+ 		if (!ses->auth_key.response) {
+ 			cERROR(1, "Challenge target info allocation failure");
+ 			return -ENOMEM;
+ 		}
+-		memcpy(ses->auth_key.response, bcc_ptr + tioffset, tilen);
+ 		ses->auth_key.len = tilen;
+ 	}
+ 
+@@ -761,14 +761,14 @@ ssetup_ntlmssp_authenticate:
+ 			goto ssetup_exit;
+ 		}
+ 
+-		ses->auth_key.response = kmalloc(msg->sesskey_len, GFP_KERNEL);
++		ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
++						 GFP_KERNEL);
+ 		if (!ses->auth_key.response) {
+ 			cERROR(1, "Kerberos can't allocate (%u bytes) memory",
+ 					msg->sesskey_len);
+ 			rc = -ENOMEM;
+ 			goto ssetup_exit;
+ 		}
+-		memcpy(ses->auth_key.response, msg->data, msg->sesskey_len);
+ 		ses->auth_key.len = msg->sesskey_len;
+ 
+ 		pSMB->req.hdr.Flags2 |= SMBFLG2_EXT_SEC;
+-- 
+1.7.9.5
