@@ -1,46 +1,100 @@
-From: ebiederm@xmission.com (Eric W. Biederman)
-Subject: Re: fs: Limit sys_mount to only request filesystem modules prevents mount -t cifs from working
-Date: Mon, 11 Mar 2013 06:37:09 -0700
-Message-ID: <87obeqnjlm.fsf@xmission.com>
-References: <513DD49F.8010301@internode.on.net>
-Mime-Version: 1.0
-Content-Type: text/plain
-Cc: Serge Hallyn <serge.hallyn@canonical.com>,
-	Kees Cook <keescook@google.com>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-To: Arthur Marsh <arthur.marsh@internode.on.net>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <513DD49F.8010301@internode.on.net> (Arthur Marsh's message of
-	"Mon, 11 Mar 2013 23:27:03 +1030")
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
+Date: Mon, 11 Mar 2013 09:52:19 -0400
+Message-ID: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org,
+	elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Arthur Marsh <arthur.marsh@internode.on.net> writes:
+We've had several reports of people attempting to mount Windows 8 shares
+and getting failures with a return code of -EINVAL. The default sec=
+mode changed recently to sec=ntlmssp. With that, we expect and parse a
+SPNEGO blob from the server in the NEGOTIATE reply.
 
-> Hi, I found that Linux kernel 3.9.0-rc2 would not mount a remote cifs
-> filesystem, and ran a git bisect which identified the following
-> commit:
->
-> Is there a patch already present somewhere to fix this problem?
->
+The current decode_negTokenInit function first parses all of the
+mechTypes and then tries to parse the rest of the negTokenInit reply.
+The parser however currently expects a mechListMIC or nothing to follow the
+mechTypes, but Windows 8 puts a mechToken field there instead to carry
+some info for the new NegoEx stuff.
 
-Grr.  It was in linux-next for nearly a week and I checked an double
-checked that patch.
+In practice, we don't do anything with the fields after the mechTypes
+anyway so I don't see any real benefit in continuing to parse them.
+This patch just has the kernel ignore the fields after the mechTypes.
+We'll probably need to reinstate some of this if we ever want to support
+NegoEx.
 
-This should fix it. 
+Reported-by: Jason Burgess <jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org>
+Reported-by: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/asn1.c | 53 +++++------------------------------------------------
+ 1 file changed, 5 insertions(+), 48 deletions(-)
 
-Eric
-
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 1a052c0..3cf8a15 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -777,6 +777,7 @@ struct file_system_type cifs_fs_type = {
- 	.kill_sb = cifs_kill_sb,
- 	/*  .fs_flags */
- };
-+MODULE_ALIAS_FS("cifs");
- const struct inode_operations cifs_dir_inode_ops = {
- 	.create = cifs_create,
- 	.atomic_open = cifs_atomic_open,
+diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
+index cfd1ce3..1d36db1 100644
+--- a/fs/cifs/asn1.c
++++ b/fs/cifs/asn1.c
+@@ -614,53 +614,10 @@ decode_negTokenInit(unsigned char *security_blob, int length,
+ 		}
+ 	}
+ 
+-	/* mechlistMIC */
+-	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+-		/* Check if we have reached the end of the blob, but with
+-		   no mechListMic (e.g. NTLMSSP instead of KRB5) */
+-		if (ctx.error == ASN1_ERR_DEC_EMPTY)
+-			goto decode_negtoken_exit;
+-		cFYI(1, "Error decoding last part negTokenInit exit3");
+-		return 0;
+-	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+-		/* tag = 3 indicating mechListMIC */
+-		cFYI(1, "Exit 4 cls = %d con = %d tag = %d end = %p (%d)",
+-			cls, con, tag, end, *end);
+-		return 0;
+-	}
+-
+-	/* sequence */
+-	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+-		cFYI(1, "Error decoding last part negTokenInit exit5");
+-		return 0;
+-	} else if ((cls != ASN1_UNI) || (con != ASN1_CON)
+-		   || (tag != ASN1_SEQ)) {
+-		cFYI(1, "cls = %d con = %d tag = %d end = %p (%d)",
+-			cls, con, tag, end, *end);
+-	}
+-
+-	/* sequence of */
+-	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+-		cFYI(1, "Error decoding last part negTokenInit exit 7");
+-		return 0;
+-	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+-		cFYI(1, "Exit 8 cls = %d con = %d tag = %d end = %p (%d)",
+-			cls, con, tag, end, *end);
+-		return 0;
+-	}
+-
+-	/* general string */
+-	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+-		cFYI(1, "Error decoding last part negTokenInit exit9");
+-		return 0;
+-	} else if ((cls != ASN1_UNI) || (con != ASN1_PRI)
+-		   || (tag != ASN1_GENSTR)) {
+-		cFYI(1, "Exit10 cls = %d con = %d tag = %d end = %p (%d)",
+-			cls, con, tag, end, *end);
+-		return 0;
+-	}
+-	cFYI(1, "Need to call asn1_octets_decode() function for %s",
+-		ctx.pointer);	/* is this UTF-8 or ASCII? */
+-decode_negtoken_exit:
++	/*
++	 * We currently ignore anything at the end of the SPNEGO blob after
++	 * the mechTypes have been parsed, since none of that info is
++	 * used at the moment.
++	 */
+ 	return 1;
+ }
+-- 
+1.7.11.7
