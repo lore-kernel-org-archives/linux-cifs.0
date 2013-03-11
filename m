@@ -1,75 +1,95 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH v3 4/7] CIFS: Use NT_CREATE_ANDX command for forcemand
- mounts
-Date: Mon, 11 Mar 2013 14:52:01 -0400
-Message-ID: <20130311145201.41d9d8f4@corrin.poochiereds.net>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v3 6/7] NFSv4: Add O_DENY* open flags support
+Date: Mon, 11 Mar 2013 14:54:34 -0400
+Message-ID: <20130311145434.707f5ed1@corrin.poochiereds.net>
 References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
-	<1362065133-9490-5-git-send-email-piastry@etersoft.ru>
+	<1362065133-9490-7-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-	wine-devel@winehq.org
-To: Pavel Shilovsky <piastry@etersoft.ru>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1362065133-9490-5-git-send-email-piastry@etersoft.ru>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1362065133-9490-7-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 28 Feb 2013 19:25:30 +0400
-Pavel Shilovsky <piastry@etersoft.ru> wrote:
+On Thu, 28 Feb 2013 19:25:32 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-> forcemand mount option now lets us use Windows mandatory style of
-> byte-range locks even if server supports posix ones - switches on
-> Windows locking mechanism. Share flags is another locking mehanism
-> provided by Windows semantic that can be used by NT_CREATE_ANDX
-> command. This patch combines all Windows locking mechanism in one
-> mount option by using NT_CREATE_ANDX to open files if forcemand is on.
+> by passing these flags to NFSv4 open request.
 > 
-> Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 > ---
->  fs/cifs/dir.c  | 1 +
->  fs/cifs/file.c | 6 ++++--
->  2 files changed, 5 insertions(+), 2 deletions(-)
+>  fs/nfs/nfs4xdr.c | 24 ++++++++++++++++++++----
+>  1 file changed, 20 insertions(+), 4 deletions(-)
 > 
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 6975072..139c8bc 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -217,6 +217,7 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
+> diff --git a/fs/nfs/nfs4xdr.c b/fs/nfs/nfs4xdr.c
+> index 26b1439..58ddc74 100644
+> --- a/fs/nfs/nfs4xdr.c
+> +++ b/fs/nfs/nfs4xdr.c
+> @@ -1325,7 +1325,8 @@ static void encode_lookup(struct xdr_stream *xdr, const struct qstr *name, struc
+>  	encode_string(xdr, name->len, name->name);
+>  }
+>  
+> -static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
+> +static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode,
+> +				int open_flags)
+>  {
+>  	__be32 *p;
+>  
+> @@ -1343,7 +1344,22 @@ static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
+>  	default:
+>  		*p++ = cpu_to_be32(0);
 >  	}
->  
->  	if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open &&
-> +	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
->  	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->  			le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->  		rc = cifs_posix_open(full_path, &newinode, inode->i_sb, mode,
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 3ad484c..05191da 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -454,8 +454,9 @@ int cifs_open(struct inode *inode, struct file *file)
->  	else
->  		oplock = 0;
->  
-> -	if (!tcon->broken_posix_open && tcon->unix_ext &&
-> -	    cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
-> +	if (!tcon->broken_posix_open && tcon->unix_ext && cap_unix(tcon->ses)
-> +	    && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
-> +	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->  				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->  		/* can not refresh inode info since size could be stale */
->  		rc = cifs_posix_open(full_path, &inode, inode->i_sb,
-> @@ -623,6 +624,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
->  		oplock = 0;
->  
->  	if (tcon->unix_ext && cap_unix(tcon->ses) &&
-> +	    ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
->  	    (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->  				le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->  		/*
+> -	*p = cpu_to_be32(0);		/* for linux, share_deny = 0 always */
+> +	if (open_flags & O_DENYMAND) {
 
-Sounds reasonable...
 
-Acked-by: Jeff Layton <jlayton@redhat.com>
+As Bruce mentioned, I think a mount option to enable this on a per-fs
+basis would be a better approach than this new O_DENYMAND flag. 
+
+
+> +		switch (open_flags & (O_DENYREAD|O_DENYWRITE)) {
+> +		case O_DENYREAD:
+> +			*p = cpu_to_be32(NFS4_SHARE_DENY_READ);
+> +			break;
+> +		case O_DENYWRITE:
+> +			*p = cpu_to_be32(NFS4_SHARE_DENY_WRITE);
+> +			break;
+> +		case O_DENYREAD|O_DENYWRITE:
+> +			*p = cpu_to_be32(NFS4_SHARE_DENY_BOTH);
+> +			break;
+> +		default:
+> +			*p = cpu_to_be32(0);
+> +		}
+> +	} else
+> +		*p = cpu_to_be32(0);
+>  }
+>  
+>  static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_openargs *arg)
+> @@ -1354,7 +1370,7 @@ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_opena
+>   * owner 4 = 32
+>   */
+>  	encode_nfs4_seqid(xdr, arg->seqid);
+> -	encode_share_access(xdr, arg->fmode);
+> +	encode_share_access(xdr, arg->fmode, arg->open_flags);
+>  	p = reserve_space(xdr, 36);
+>  	p = xdr_encode_hyper(p, arg->clientid);
+>  	*p++ = cpu_to_be32(24);
+> @@ -1491,7 +1507,7 @@ static void encode_open_downgrade(struct xdr_stream *xdr, const struct nfs_close
+>  	encode_op_hdr(xdr, OP_OPEN_DOWNGRADE, decode_open_downgrade_maxsz, hdr);
+>  	encode_nfs4_stateid(xdr, arg->stateid);
+>  	encode_nfs4_seqid(xdr, arg->seqid);
+> -	encode_share_access(xdr, arg->fmode);
+> +	encode_share_access(xdr, arg->fmode, 0);
+>  }
+>  
+>  static void
+
+
+Other than that, this seems reasonable.
+
+Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
