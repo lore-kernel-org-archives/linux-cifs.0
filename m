@@ -1,100 +1,76 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
-Date: Mon, 11 Mar 2013 09:52:19 -0400
-Message-ID: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org,
-	elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: Re: [PATCH v3 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Mon, 11 Mar 2013 17:59:59 +0400
+Message-ID: <CAKywueR8kFUS46pCOnEaTouavTu69gW_FmP5BtFS2rsX8nHtBw@mail.gmail.com>
+References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
+	<512FD1D5.3010106@mit.edu>
+	<20130304211923.GI20389@fieldses.org>
+	<5135250A.30604@samba.org>
+	<20130305181306.GA15816@fieldses.org>
+	<51364285.4040406@samba.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
+	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <51364285.4040406-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We've had several reports of people attempting to mount Windows 8 shares
-and getting failures with a return code of -EINVAL. The default sec=
-mode changed recently to sec=ntlmssp. With that, we expect and parse a
-SPNEGO blob from the server in the NEGOTIATE reply.
+2013/3/5 Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
+> On 03/05/2013 01:13 PM, J. Bruce Fields wrote:
+>>
+>> On Mon, Mar 04, 2013 at 05:49:46PM -0500, Simo wrote:
+>>>
+>>> On 03/04/2013 04:19 PM, J. Bruce Fields wrote:
+>>>> I'm a little more worried: these are mandatory locks, and applications
+>>>> that use them are used to the locks being enforced correctly.  Are we
+>>>> sure that an application that opens a file O_DENYWRITE won't crash if it
+>>>> sees the file data change while it holds the open?
+>>>
+>>> The redirector may simply assume it has full control of that part of
+>>> the file and not read nor send data until the lock is released too,
+>>> so you get conflicting views of the file contents between different
+>>> clients if you let a mandatory lock not be mandatory.
+>>>
+>>>> In general the idea of making a mandatory lock opt-in makes me nervous.
+>>>> I'd prefer something like a mount option, so that we know that everyone
+>>>> on that one filesystem is playing by the same rules, but we can still
+>>>> mount filesystems like / without the option.
+>>>
+>>> +1
+>>>
+>>>> But I'll admit I'm definitely not an expert on Windows locking and may
+>>>> be missing something about how these locks are meant to work.
+>>>
+>>> Mandatory locks really are mandatory in Windows.
+>>> That may not be nice to a Unix system but what can you do ?
+>>
+>> I wonder if we could repurpose the existing -omand mount option?
+>>
+>> That would be a problem for anyone that wants to allow mandatory fcntl
+>> locks without allowing share locks.  I doubt anyone sane actually uses
+>> mandatory fcntl locks, but still I suppose it would probably be better
+>> to play it safe and use a new mount option.
+>
+>
+> Maybe we should have a -o win_semantics option :-)
+>
+> /me runs
+>
 
-The current decode_negTokenInit function first parses all of the
-mechTypes and then tries to parse the rest of the negTokenInit reply.
-The parser however currently expects a mechListMIC or nothing to follow the
-mechTypes, but Windows 8 puts a mechToken field there instead to carry
-some info for the new NegoEx stuff.
+(CC'ing Al Viro, since these patches should go through his tree)
 
-In practice, we don't do anything with the fields after the mechTypes
-anyway so I don't see any real benefit in continuing to parse them.
-This patch just has the kernel ignore the fields after the mechTypes.
-We'll probably need to reinstate some of this if we ever want to support
-NegoEx.
+I don't mind to introduce a new mount option for turning this feature
+on/off - something like '-o denylock' to make it mathing names of new
+flags would be ok.
 
-Reported-by: Jason Burgess <jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org>
-Reported-by: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/asn1.c | 53 +++++------------------------------------------------
- 1 file changed, 5 insertions(+), 48 deletions(-)
+Al, what do you think about this feature overall?
 
-diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
-index cfd1ce3..1d36db1 100644
---- a/fs/cifs/asn1.c
-+++ b/fs/cifs/asn1.c
-@@ -614,53 +614,10 @@ decode_negTokenInit(unsigned char *security_blob, int length,
- 		}
- 	}
- 
--	/* mechlistMIC */
--	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
--		/* Check if we have reached the end of the blob, but with
--		   no mechListMic (e.g. NTLMSSP instead of KRB5) */
--		if (ctx.error == ASN1_ERR_DEC_EMPTY)
--			goto decode_negtoken_exit;
--		cFYI(1, "Error decoding last part negTokenInit exit3");
--		return 0;
--	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
--		/* tag = 3 indicating mechListMIC */
--		cFYI(1, "Exit 4 cls = %d con = %d tag = %d end = %p (%d)",
--			cls, con, tag, end, *end);
--		return 0;
--	}
--
--	/* sequence */
--	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
--		cFYI(1, "Error decoding last part negTokenInit exit5");
--		return 0;
--	} else if ((cls != ASN1_UNI) || (con != ASN1_CON)
--		   || (tag != ASN1_SEQ)) {
--		cFYI(1, "cls = %d con = %d tag = %d end = %p (%d)",
--			cls, con, tag, end, *end);
--	}
--
--	/* sequence of */
--	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
--		cFYI(1, "Error decoding last part negTokenInit exit 7");
--		return 0;
--	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
--		cFYI(1, "Exit 8 cls = %d con = %d tag = %d end = %p (%d)",
--			cls, con, tag, end, *end);
--		return 0;
--	}
--
--	/* general string */
--	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
--		cFYI(1, "Error decoding last part negTokenInit exit9");
--		return 0;
--	} else if ((cls != ASN1_UNI) || (con != ASN1_PRI)
--		   || (tag != ASN1_GENSTR)) {
--		cFYI(1, "Exit10 cls = %d con = %d tag = %d end = %p (%d)",
--			cls, con, tag, end, *end);
--		return 0;
--	}
--	cFYI(1, "Need to call asn1_octets_decode() function for %s",
--		ctx.pointer);	/* is this UTF-8 or ASCII? */
--decode_negtoken_exit:
-+	/*
-+	 * We currently ignore anything at the end of the SPNEGO blob after
-+	 * the mechTypes have been parsed, since none of that info is
-+	 * used at the moment.
-+	 */
- 	return 1;
- }
 -- 
-1.7.11.7
+Best regards,
+Pavel Shilovsky.
