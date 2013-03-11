@@ -1,76 +1,57 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v3 0/7] Add O_DENY* support for VFS and CIFS/NFS
-Date: Mon, 11 Mar 2013 17:59:59 +0400
-Message-ID: <CAKywueR8kFUS46pCOnEaTouavTu69gW_FmP5BtFS2rsX8nHtBw@mail.gmail.com>
-References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
-	<512FD1D5.3010106@mit.edu>
-	<20130304211923.GI20389@fieldses.org>
-	<5135250A.30604@samba.org>
-	<20130305181306.GA15816@fieldses.org>
-	<51364285.4040406@samba.org>
+From: Arthur Marsh <arthur.marsh-CkBdp7X+a1oIQCUVoCVjmQ@public.gmane.org>
+Subject: Re: fs: Limit sys_mount to only request filesystem modules prevents
+ mount -t cifs from working
+Date: Tue, 12 Mar 2013 02:31:14 +1030
+Message-ID: <513DFFCA.6010304@internode.on.net>
+References: <513DD49F.8010301@internode.on.net> <87obeqnjlm.fsf@xmission.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>,
-	Al Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Cc: Serge Hallyn <serge.hallyn-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
+	Kees Cook <keescook-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <51364285.4040406-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+In-Reply-To: <87obeqnjlm.fsf-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/3/5 Simo <simo-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> On 03/05/2013 01:13 PM, J. Bruce Fields wrote:
+
+
+Eric W. Biederman wrote, on 12/03/13 00:07:
+> Arthur Marsh<arthur.marsh-CkBdp7X+a1oIQCUVoCVjmQ@public.gmane.org>  writes:
+>
+>> Hi, I found that Linux kernel 3.9.0-rc2 would not mount a remote cifs
+>> filesystem, and ran a git bisect which identified the following
+>> commit:
 >>
->> On Mon, Mar 04, 2013 at 05:49:46PM -0500, Simo wrote:
->>>
->>> On 03/04/2013 04:19 PM, J. Bruce Fields wrote:
->>>> I'm a little more worried: these are mandatory locks, and applications
->>>> that use them are used to the locks being enforced correctly.  Are we
->>>> sure that an application that opens a file O_DENYWRITE won't crash if it
->>>> sees the file data change while it holds the open?
->>>
->>> The redirector may simply assume it has full control of that part of
->>> the file and not read nor send data until the lock is released too,
->>> so you get conflicting views of the file contents between different
->>> clients if you let a mandatory lock not be mandatory.
->>>
->>>> In general the idea of making a mandatory lock opt-in makes me nervous.
->>>> I'd prefer something like a mount option, so that we know that everyone
->>>> on that one filesystem is playing by the same rules, but we can still
->>>> mount filesystems like / without the option.
->>>
->>> +1
->>>
->>>> But I'll admit I'm definitely not an expert on Windows locking and may
->>>> be missing something about how these locks are meant to work.
->>>
->>> Mandatory locks really are mandatory in Windows.
->>> That may not be nice to a Unix system but what can you do ?
+>> Is there a patch already present somewhere to fix this problem?
 >>
->> I wonder if we could repurpose the existing -omand mount option?
->>
->> That would be a problem for anyone that wants to allow mandatory fcntl
->> locks without allowing share locks.  I doubt anyone sane actually uses
->> mandatory fcntl locks, but still I suppose it would probably be better
->> to play it safe and use a new mount option.
+>
+> Grr.  It was in linux-next for nearly a week and I checked an double
+> checked that patch.
+>
+> This should fix it.
+>
+> Eric
 >
 >
-> Maybe we should have a -o win_semantics option :-)
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 1a052c0..3cf8a15 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -777,6 +777,7 @@ struct file_system_type cifs_fs_type = {
+>   	.kill_sb = cifs_kill_sb,
+>   	/*  .fs_flags */
+>   };
+> +MODULE_ALIAS_FS("cifs");
+>   const struct inode_operations cifs_dir_inode_ops = {
+>   	.create = cifs_create,
+>   	.atomic_open = cifs_atomic_open,
 >
-> /me runs
->
 
-(CC'ing Al Viro, since these patches should go through his tree)
+Confirmed... cifs mounts now work again thanks.
 
-I don't mind to introduce a new mount option for turning this feature
-on/off - something like '-o denylock' to make it mathing names of new
-flags would be ok.
+Regards,
 
-Al, what do you think about this feature overall?
-
--- 
-Best regards,
-Pavel Shilovsky.
+Arthur.
