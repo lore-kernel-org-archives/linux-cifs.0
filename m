@@ -1,150 +1,92 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: delay super block destruction until all
- cifsFileInfo objects are gone
-Date: Mon, 11 Mar 2013 07:41:07 -0400
-Message-ID: <20130311074107.5aa6374d@tlielax.poochiereds.net>
-References: <20130308153002.GC1511@mguzik.brq.redhat.com>
+From: Arthur Marsh <arthur.marsh-CkBdp7X+a1oIQCUVoCVjmQ@public.gmane.org>
+Subject: fs: Limit sys_mount to only request filesystem modules prevents mount
+ -t cifs from working
+Date: Mon, 11 Mar 2013 23:27:03 +1030
+Message-ID: <513DD49F.8010301@internode.on.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-To: Mateusz Guzik <mguzik-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Serge Hallyn <serge.hallyn-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>,
+	Kees Cook <keescook-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: "Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130308153002.GC1511-v5fTkemuj/HkZJWtSm8s3NvLeJWuRmrY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 8 Mar 2013 16:30:03 +0100
-Mateusz Guzik <mguzik-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Hi, I found that Linux kernel 3.9.0-rc2 would not mount a remote cifs 
+filesystem, and ran a git bisect which identified the following commit:
 
-> cifsFileInfo objects hold references to dentries and it is possible that
-> these will still be around in workqueues when VFS decides to kill super
-> block during unmount.
-> 
+am64:/mnt# mount -t cifs //192.168.1.104/homes homes
+Password:
+am64:/mnt# cd /usr/src/linux
+am64:/usr/src/linux# git bisect good
+7f78e0351394052e1a6293e175825eb5c7869507 is the first bad commit
+commit 7f78e0351394052e1a6293e175825eb5c7869507
+Author: Eric W. Biederman <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
+Date:   Sat Mar 2 19:39:14 2013 -0800
 
-FWIW, this doesn't even need to be sitting in a workqueue when it comes
-to readahead. We may have sprayed out a bunch of readahead requests and
-are simply waiting on the replies. We hold a reference to the dentry at
-that point, but not one to the vfsmount, so a umount can get started
-before those replies come in.
+     fs: Limit sys_mount to only request filesystem modules.
 
-That's almost certainly the problem that Ben hit...
+     Modify the request_module to prefix the file system type with "fs-"
+     and add aliases to all of the filesystems that can be built as modules
+     to match.
 
-> This results in panics like this one:
-> BUG: Dentry ffff88001f5e76c0{i=66b4a,n=1M-2} still in use (1) [unmount of cifs cifs]
-> ------------[ cut here ]------------
-> kernel BUG at fs/dcache.c:943!
-> [..]
-> Process umount (pid: 1781, threadinfo ffff88003d6e8000, task ffff880035eeaec0)
-> [..]
-> Call Trace:
->  [<ffffffff811b44f3>] shrink_dcache_for_umount+0x33/0x60
->  [<ffffffff8119f7fc>] generic_shutdown_super+0x2c/0xe0
->  [<ffffffff8119f946>] kill_anon_super+0x16/0x30
->  [<ffffffffa036623a>] cifs_kill_sb+0x1a/0x30 [cifs]
->  [<ffffffff8119fcc7>] deactivate_locked_super+0x57/0x80
->  [<ffffffff811a085e>] deactivate_super+0x4e/0x70
->  [<ffffffff811bb417>] mntput_no_expire+0xd7/0x130
->  [<ffffffff811bc30c>] sys_umount+0x9c/0x3c0
->  [<ffffffff81657c19>] system_call_fastpath+0x16/0x1b
-> 
-> Fix this by making each cifsFileInfo object hold a reference to cifs
-> super block, which implicitly keeps VFS super block around as well.
-> 
-> Signed-off-by: Mateusz Guzik <mguzik-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Reported-and-Tested-by: Ben Greear <greearb-my8/4N5VtI7c+919tysfdA@public.gmane.org>
-> ---
->  fs/cifs/cifsfs.c | 24 ++++++++++++++++++++++++
->  fs/cifs/cifsfs.h |  4 ++++
->  fs/cifs/file.c   |  6 +++++-
->  3 files changed, 33 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 1a052c0..054b90b 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -91,6 +91,30 @@ struct workqueue_struct	*cifsiod_wq;
->  __u8 cifs_client_guid[SMB2_CLIENT_GUID_SIZE];
->  #endif
->  
-> +/*
-> + * Bumps refcount for cifs super block.
-> + * Note that it should be only called if a referece to VFS super block is
-> + * already held, e.g. in open-type syscalls context. Otherwise it can race with
-> + * atomic_dec_and_test in deactivate_locked_super.
-> + */
-> +void
-> +cifs_sb_active(struct super_block *sb)
-> +{
-> +	struct cifs_sb_info *server = CIFS_SB(sb);
-> +
-> +	if (atomic_inc_return(&server->active) == 1)
-> +		atomic_inc(&sb->s_active);
-> +}
-> +
-> +void
-> +cifs_sb_deactive(struct super_block *sb)
-> +{
-> +	struct cifs_sb_info *server = CIFS_SB(sb);
-> +
-> +	if (atomic_dec_and_test(&server->active))
-> +		deactivate_super(sb);
-> +}
-> +
->  static int
->  cifs_read_super(struct super_block *sb)
->  {
-> diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-> index 7163419..0e32c34 100644
-> --- a/fs/cifs/cifsfs.h
-> +++ b/fs/cifs/cifsfs.h
-> @@ -41,6 +41,10 @@ extern struct file_system_type cifs_fs_type;
->  extern const struct address_space_operations cifs_addr_ops;
->  extern const struct address_space_operations cifs_addr_ops_smallbuf;
->  
-> +/* Functions related to super block operations */
-> +extern void cifs_sb_active(struct super_block *sb);
-> +extern void cifs_sb_deactive(struct super_block *sb);
-> +
->  /* Functions related to inodes */
->  extern const struct inode_operations cifs_dir_inode_ops;
->  extern struct inode *cifs_root_iget(struct super_block *);
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 8c0d855..7a0dd99 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -300,6 +300,8 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
->  	INIT_WORK(&cfile->oplock_break, cifs_oplock_break);
->  	mutex_init(&cfile->fh_mutex);
->  
-> +	cifs_sb_active(inode->i_sb);
-> +
->  	/*
->  	 * If the server returned a read oplock and we have mandatory brlocks,
->  	 * set oplock level to None.
-> @@ -349,7 +351,8 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  	struct cifs_tcon *tcon = tlink_tcon(cifs_file->tlink);
->  	struct TCP_Server_Info *server = tcon->ses->server;
->  	struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> -	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> +	struct super_block *sb = inode->i_sb;
-> +	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
->  	struct cifsLockInfo *li, *tmp;
->  	struct cifs_fid fid;
->  	struct cifs_pending_open open;
-> @@ -414,6 +417,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
->  
->  	cifs_put_tlink(cifs_file->tlink);
->  	dput(cifs_file->dentry);
-> +	cifs_sb_deactive(sb);
->  	kfree(cifs_file);
->  }
->  
+     A common practice is to build all of the kernel code and leave code
+     that is not commonly needed as modules, with the result that many
+     users are exposed to any bug anywhere in the kernel.
 
-Nice work. Steve, I think this ought to go into 3.9, and is probably a
-stable candidate as well.
+     Looking for filesystems with a fs- prefix limits the pool of possible
+     modules that can be loaded by mount to just filesystems trivially
+     making things safer with no real cost.
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+     Using aliases means user space can control the policy of which
+     filesystem modules are auto-loaded by editing /etc/modprobe.d/*.conf
+     with blacklist and alias directives.  Allowing simple, safe,
+     well understood work-arounds to known problematic software.
+
+     This also addresses a rare but unfortunate problem where the filesystem
+     name is not the same as it's module name and module auto-loading
+     would not work.  While writing this patch I saw a handful of such
+     cases.  The most significant being autofs that lives in the module
+     autofs4.
+
+     This is relevant to user namespaces because we can reach the request
+     module in get_fs_type() without having any special permissions, and
+     people get uncomfortable when a user specified string (in this case
+     the filesystem type) goes all of the way to request_module.
+
+     After having looked at this issue I don't think there is any
+     particular reason to perform any filtering or permission checks beyond
+     making it clear in the module request that we want a filesystem
+     module.  The common pattern in the kernel is to call request_module()
+     without regards to the users permissions.  In general all a filesystem
+     module does once loaded is call register_filesystem() and go to sleep.
+     Which means there is not much attack surface exposed by loading a
+     filesytem module unless the filesystem is mounted.  In a user
+     namespace filesystems are not mounted unless .fs_flags = 
+FS_USERNS_MOUNT,
+     which most filesystems do not set today.
+
+     Acked-by: Serge Hallyn <serge.hallyn-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org>
+     Acked-by: Kees Cook <keescook-F7+t8E8rja9g9hUCZPvPmw@public.gmane.org>
+     Reported-by: Kees Cook <keescook-hpIqsD4AKlfQT0dZR+AlfA@public.gmane.org>
+     Signed-off-by: "Eric W. Biederman" <ebiederm-aS9lmoZGLiVWk0Htik3J/w@public.gmane.org>
+
+:040000 040000 32250b65261f4e17804c8af3a106f224dd24bc11 
+0cd45f52d550f32b1642281cf1a5d7b94d95f38f M      arch
+:040000 040000 9658d1fd413b8797fe06fb2ca8ce681d4dbbedb0 
+cd27a1ae4c6ee320ccf6a3872e00f80461325142 M      drivers
+:040000 040000 bd510940beafe8c3cd4574da21e7b4acd78d1895 
+9785b166b9b4ced468bcc8b6b236bfea42311fbd M      fs
+:040000 040000 fa3800a44a3950111115454c47bd30a2db0790e8 
+d1bb23380c6c15ef78309d492862f6ca35ce80f2 M      include
+:040000 040000 8e24a9945ccff63df12d57cb3fae48e80ce26249 
+2e03caba8fa769daed63101e15ef51366cdc9058 M      net
+am64:/usr/src/linux#
+
+Is there a patch already present somewhere to fix this problem?
+
+Regards,
+
+Arthur.
