@@ -1,55 +1,157 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v3 5/7] CIFS: Translate SHARING_VIOLATION to -ETXTBSY
- error code for SMB2
-Date: Mon, 11 Mar 2013 22:59:16 +0400
-Message-ID: <CAKywueQV7sc9OzOb7=d=48BaosKDoiGsGPjMt5wvW35yjhuCQw@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v3 7/7] NFSD: Pass share reservations flags to VFS
+Date: Mon, 11 Mar 2013 15:05:40 -0400
+Message-ID: <20130311150540.119abd63@corrin.poochiereds.net>
 References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
-	<1362065133-9490-6-git-send-email-piastry@etersoft.ru>
-	<20130311143507.737f2ab0@corrin.poochiereds.net>
+	<1362065133-9490-8-git-send-email-piastry@etersoft.ru>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org, sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
+To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130311143507.737f2ab0-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1362065133-9490-8-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/3/11 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> On Thu, 28 Feb 2013 19:25:31 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> to make it match CIFS and VFS variants.
->>
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->> ---
->>  fs/cifs/smb2maperror.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
->> index 494c912..11e589e 100644
->> --- a/fs/cifs/smb2maperror.c
->> +++ b/fs/cifs/smb2maperror.c
->> @@ -356,7 +356,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
->>       {STATUS_PORT_CONNECTION_REFUSED, -ECONNREFUSED,
->>       "STATUS_PORT_CONNECTION_REFUSED"},
->>       {STATUS_INVALID_PORT_HANDLE, -EIO, "STATUS_INVALID_PORT_HANDLE"},
->> -     {STATUS_SHARING_VIOLATION, -EBUSY, "STATUS_SHARING_VIOLATION"},
->> +     {STATUS_SHARING_VIOLATION, -ETXTBSY, "STATUS_SHARING_VIOLATION"},
->>       {STATUS_QUOTA_EXCEEDED, -EDQUOT, "STATUS_QUOTA_EXCEEDED"},
->>       {STATUS_INVALID_PAGE_PROTECTION, -EIO,
->>       "STATUS_INVALID_PAGE_PROTECTION"},
->
-> Actually, I think Sachin is converting the CIFS
-> STATUS_SHARING_VIOLATION to translate to EBUSY, since that seems to
-> better reflect the situation. I'd suggest dropping this patch, unless
-> you have a specific need for this error return here.
+On Thu, 28 Feb 2013 19:25:33 +0400
+Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
 
-Yes, I am ok to drop this patch - accoring to the previous discussion
-in linux-cifs@ it is no suitable.
+> that maps them into O_DENY flags and make them visible for
+> applications that use O_DENYMAND opens.
+> 
+> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> ---
+>  fs/locks.c          |  1 +
+>  fs/nfsd/nfs4state.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 46 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/locks.c b/fs/locks.c
+> index 0cc7d1b..593d464 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -874,6 +874,7 @@ deny_lock_file(struct file *filp)
+>  	locks_free_lock(lock);
+>  	return error;
+>  }
+> +EXPORT_SYMBOL(deny_lock_file);
+>  
+>  static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
+>  {
+> diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
+> index ac8ed96c..766256a 100644
+> --- a/fs/nfsd/nfs4state.c
+> +++ b/fs/nfsd/nfs4state.c
+> @@ -476,6 +476,19 @@ test_deny(u32 access, struct nfs4_ol_stateid *stp)
+>  	return test_bit(access, &stp->st_deny_bmap);
+>  }
+>  
+> +static int nfs4_deny_to_odeny(u32 access)
+> +{
+> +	switch (access & NFS4_SHARE_DENY_BOTH) {
+> +	case NFS4_SHARE_DENY_READ:
+> +		return O_DENYMAND | O_DENYREAD;
+> +	case NFS4_SHARE_DENY_WRITE:
+> +		return O_DENYWRITE | O_DENYMAND;
+> +	case NFS4_SHARE_DENY_BOTH:
+> +		return O_DENYREAD | O_DENYWRITE | O_DENYMAND;
+> +	}
+> +	return O_DENYMAND;
+> +}
+> +
+>  static int nfs4_access_to_omode(u32 access)
+>  {
+>  	switch (access & NFS4_SHARE_ACCESS_BOTH) {
+> @@ -2793,6 +2806,21 @@ nfsd4_truncate(struct svc_rqst *rqstp, struct svc_fh *fh,
+>  }
+>  
+>  static __be32
+> +nfs4_vfs_set_deny(struct nfs4_file *fp, unsigned long share_access,
+> +		  unsigned long deny_access)
+> +{
+> +	int oflag, rc;
+> +	__be32 status = nfs_ok;
+> +
+> +	oflag = nfs4_access_to_omode(share_access);
+> +	fp->fi_fds[oflag]->f_flags |= nfs4_deny_to_odeny(deny_access);
+> +	rc = deny_lock_file(fp->fi_fds[oflag]);
+> +	if (rc)
+> +		status = nfserrno(rc);
+> +	return status;
+> +}
+> +
+> +static __be32
+>  nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *cur_fh, struct nfs4_ol_stateid *stp, struct nfsd4_open *open)
+>  {
+>  	u32 op_share_access = open->op_share_access;
+> @@ -2813,6 +2841,14 @@ nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *c
+>  		}
+>  		return status;
+>  	}
+> +	status = nfs4_vfs_set_deny(fp, op_share_access, open->op_share_deny);
+> +	if (status) {
+> +		if (new_access) {
+> +			int oflag = nfs4_access_to_omode(op_share_access);
+> +			nfs4_file_put_access(fp, oflag);
+> +		}
+> +		return status;
+> +	}
+>  	/* remember the open */
+>  	set_access(op_share_access, stp);
+>  	set_deny(open->op_share_deny, stp);
+> @@ -3046,7 +3082,7 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+>  
+>  	/*
+>  	 * OPEN the file, or upgrade an existing OPEN.
+> -	 * If truncate fails, the OPEN fails.
+> +	 * If truncate or setting deny fails, the OPEN fails.
+>  	 */
+>  	if (stp) {
+>  		/* Stateid was found, this is an OPEN upgrade */
+> @@ -3060,6 +3096,10 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+>  		status = nfsd4_truncate(rqstp, current_fh, open);
+>  		if (status)
+>  			goto out;
+> +		status = nfs4_vfs_set_deny(fp, open->op_share_access,
+> +					   open->op_share_deny);
+> +		if (status)
+> +			goto out;
+>  		stp = open->op_stp;
+>  		open->op_stp = NULL;
+>  		init_open_stateid(stp, fp, open);
+> @@ -3758,6 +3798,10 @@ nfsd4_open_downgrade(struct svc_rqst *rqstp,
+>  	}
+>  	nfs4_stateid_downgrade(stp, od->od_share_access);
+>  
+> +	status = nfs4_vfs_set_deny(stp->st_file, od->od_share_access,
+> +				   od->od_share_deny);
+> +	if (status)
+> +		goto out;
+>  	reset_union_bmap_deny(od->od_share_deny, stp);
+>  
+>  	update_stateid(&stp->st_stid.sc_stateid);
+
+knfsd has some code already to handle share reservations internally.
+Nothing outside of knfsd is aware of these reservations, of course so
+moving to a vfs-level object for it would be a marked improvement.
+
+It doesn't look like this patch removes any of that old code though. I
+think it probably should, or there ought to be some consideration of
+how this new stuff will mesh with it.
+
+I think you have 2 choices here:
+
+1/ rip out the old share reservation code altogether and require that
+filesystems mount with -o sharemand or whatever if they want to allow
+their enforcement
+
+2/ make knfsd fall back to using the internal share reservation code
+when the mount option isn't enabled
+
+Personally, I think #1 would be fine, but Bruce may want to weigh in on
+what he'd prefer.
 
 -- 
-Best regards,
-Pavel Shilovsky.
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
