@@ -1,82 +1,119 @@
-From: Frank S Filz <ffilz@us.ibm.com>
-Subject: Re: [PATCH v3 7/7] NFSD: Pass share reservations flags to VFS
-Date: Mon, 11 Mar 2013 13:37:41 -0700
-Message-ID: <OFF08D878D.67DCB665-ON87257B2B.0071316C-88257B2B.00715025@us.ibm.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v3 6/7] NFSv4: Add O_DENY* open flags support
+Date: Tue, 12 Mar 2013 08:35:17 -0400
+Message-ID: <20130312083517.770a17f6@tlielax.poochiereds.net>
 References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
-	<1362065133-9490-8-git-send-email-piastry@etersoft.ru>
-	<20130311150540.119abd63@corrin.poochiereds.net>
-	<20130311193638.GB642@fieldses.org>
-	<20130311160844.7dedf15a@corrin.poochiereds.net>
-	<20130311201108.GE642@fieldses.org>
-	<OF1D20435B.D7D7B48E-ON87257B2B.006FB8C9-88257B2B.00702F2E@us.ibm.com>
-	<20130311203110.GF642@fieldses.org>
+	<1362065133-9490-7-git-send-email-piastry@etersoft.ru>
+	<20130311145434.707f5ed1@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============4201645324730040375=="
-Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	Jeff Layton <jlayton@redhat.com>, wine-devel@winehq.org,
-	linux-kernel@vger.kernel.org, Pavel Shilovsky <piastry@etersoft.ru>,
-	linux-fsdevel@vger.kernel.org, linux-nfs-owner@vger.kernel.org
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Return-path: <wine-devel-bounces@winehq.org>
-In-Reply-To: <20130311203110.GF642@fieldses.org>
-List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
-	<mailto:wine-devel-request@winehq.org?subject=unsubscribe>
-List-Archive: <http://www.winehq.org/pipermail/wine-devel>
-List-Post: <mailto:wine-devel@winehq.org>
-List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
-List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
-	<mailto:wine-devel-request@winehq.org?subject=subscribe>
-Sender: wine-devel-bounces@winehq.org
-Errors-To: wine-devel-bounces@winehq.org
-List-Id: linux-cifs.vger.kernel.org
-
---===============4201645324730040375==
-Content-type: multipart/alternative;
-	Boundary="0__=08BBF1B8DFE2B7FC8f9e8a93df938690918c08BBF1B8DFE2B7FC"
-Content-Disposition: inline
-
---0__=08BBF1B8DFE2B7FC8f9e8a93df938690918c08BBF1B8DFE2B7FC
-Content-type: text/plain; charset=US-ASCII
-
-"J. Bruce Fields" <bfields@fieldses.org>  wrote> >
-> > Another bit to consider, does lockd provide share reservations for NLM?
->
-> Yes.  I don't know if anyone's tested them in recent memory!  But it
-> might be interesting to write a few simple tests for them and hook them
-> up to this on the server side.  (I don't know if they'd be worth
-> implementing on the client side?)
-
-Oh, they would be REALLY NICE to have on the client side... Then we can
-test NLM_SHARE with an open source client and not only with Windows...
-
-Frank
---0__=08BBF1B8DFE2B7FC8f9e8a93df938690918c08BBF1B8DFE2B7FC
-Content-type: text/html; charset=US-ASCII
-Content-Disposition: inline
-
-<html><body>
-<p><tt><font size="2">&quot;J. Bruce Fields&quot; &lt;bfields@fieldses.org&gt; &nbsp;wrote&gt; &gt; <br>
-&gt; &gt; Another bit to consider, does lockd provide share reservations for NLM?<br>
-&gt; <br>
-&gt; Yes. &nbsp;I don't know if anyone's tested them in recent memory! &nbsp;But it<br>
-&gt; might be interesting to write a few simple tests for them and hook them<br>
-&gt; up to this on the server side. &nbsp;(I don't know if they'd be worth<br>
-&gt; implementing on the client side?)<br>
-</font></tt><br>
-<tt><font size="2">Oh, they would be REALLY NICE to have on the client side... Then we can test NLM_SHARE with an open source client and not only with Windows...</font></tt><br>
-<br>
-<tt><font size="2">Frank</font></tt><br>
-</body></html>
---0__=08BBF1B8DFE2B7FC8f9e8a93df938690918c08BBF1B8DFE2B7FC--
-
-
-
---===============4201645324730040375==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20130311145434.707f5ed1-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
+On Mon, 11 Mar 2013 14:54:34 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
+> On Thu, 28 Feb 2013 19:25:32 +0400
+> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> 
+> > by passing these flags to NFSv4 open request.
+> > 
+> > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> > ---
+> >  fs/nfs/nfs4xdr.c | 24 ++++++++++++++++++++----
+> >  1 file changed, 20 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/fs/nfs/nfs4xdr.c b/fs/nfs/nfs4xdr.c
+> > index 26b1439..58ddc74 100644
+> > --- a/fs/nfs/nfs4xdr.c
+> > +++ b/fs/nfs/nfs4xdr.c
+> > @@ -1325,7 +1325,8 @@ static void encode_lookup(struct xdr_stream *xdr, const struct qstr *name, struc
+> >  	encode_string(xdr, name->len, name->name);
+> >  }
+> >  
+> > -static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
+> > +static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode,
+> > +				int open_flags)
+> >  {
+> >  	__be32 *p;
+> >  
+> > @@ -1343,7 +1344,22 @@ static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
+> >  	default:
+> >  		*p++ = cpu_to_be32(0);
+> >  	}
+> > -	*p = cpu_to_be32(0);		/* for linux, share_deny = 0 always */
+> > +	if (open_flags & O_DENYMAND) {
+> 
+> 
+> As Bruce mentioned, I think a mount option to enable this on a per-fs
+> basis would be a better approach than this new O_DENYMAND flag. 
+> 
+> 
+> > +		switch (open_flags & (O_DENYREAD|O_DENYWRITE)) {
+> > +		case O_DENYREAD:
+> > +			*p = cpu_to_be32(NFS4_SHARE_DENY_READ);
+> > +			break;
+> > +		case O_DENYWRITE:
+> > +			*p = cpu_to_be32(NFS4_SHARE_DENY_WRITE);
+> > +			break;
+> > +		case O_DENYREAD|O_DENYWRITE:
+> > +			*p = cpu_to_be32(NFS4_SHARE_DENY_BOTH);
+> > +			break;
+> > +		default:
+> > +			*p = cpu_to_be32(0);
+> > +		}
+> > +	} else
+> > +		*p = cpu_to_be32(0);
+> >  }
+> >  
+> >  static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_openargs *arg)
+> > @@ -1354,7 +1370,7 @@ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_opena
+> >   * owner 4 = 32
+> >   */
+> >  	encode_nfs4_seqid(xdr, arg->seqid);
+> > -	encode_share_access(xdr, arg->fmode);
+> > +	encode_share_access(xdr, arg->fmode, arg->open_flags);
+> >  	p = reserve_space(xdr, 36);
+> >  	p = xdr_encode_hyper(p, arg->clientid);
+> >  	*p++ = cpu_to_be32(24);
+> > @@ -1491,7 +1507,7 @@ static void encode_open_downgrade(struct xdr_stream *xdr, const struct nfs_close
+> >  	encode_op_hdr(xdr, OP_OPEN_DOWNGRADE, decode_open_downgrade_maxsz, hdr);
+> >  	encode_nfs4_stateid(xdr, arg->stateid);
+> >  	encode_nfs4_seqid(xdr, arg->seqid);
+> > -	encode_share_access(xdr, arg->fmode);
+> > +	encode_share_access(xdr, arg->fmode, 0);
+> >  }
+> >  
+> >  static void
+> 
+> 
+> Other than that, this seems reasonable.
+> 
+> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
---===============4201645324730040375==--
+Oh duh...
+
+Please ignore my comment on patch #7 to add a patch for the NFS client.
+This one does that. That said, there may be a potential problem here
+that you need to consider.
+
+In the case of a local filesystem you'll want to set deny locks using
+deny_lock_file(). For a network filesystem like CIFS or NFS though,
+the server will handle that atomically during the open. You need to
+ensure that you don't go trying to set LOCK_MAND locks on the file once
+that's done.
+
+Perhaps you can use a fstype flag to indicate that the filesystem
+handles this during the open and doesn't need to try and set a flock
+lock?
+
+-- 
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
