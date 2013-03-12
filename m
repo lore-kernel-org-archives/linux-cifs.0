@@ -1,119 +1,101 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v3 6/7] NFSv4: Add O_DENY* open flags support
-Date: Tue, 12 Mar 2013 08:35:17 -0400
-Message-ID: <20130312083517.770a17f6@tlielax.poochiereds.net>
-References: <1362065133-9490-1-git-send-email-piastry@etersoft.ru>
-	<1362065133-9490-7-git-send-email-piastry@etersoft.ru>
-	<20130311145434.707f5ed1@corrin.poochiereds.net>
+Subject: Re: [PATCH v2] cifs: map NT_STATUS_SHARING_VIOLATION to EBUSY
+ instead of ETXTBSY
+Date: Tue, 12 Mar 2013 09:00:58 -0400
+Message-ID: <20130312090058.73564276@tlielax.poochiereds.net>
+References: <1363007329-9981-1-git-send-email-sprabhu@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130311145434.707f5ed1-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1363007329-9981-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 11 Mar 2013 14:54:34 -0400
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+On Mon, 11 Mar 2013 13:08:49 +0000
+Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> On Thu, 28 Feb 2013 19:25:32 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+> NT_SHARING_VIOLATION errors are mapped to ETXTBSY which is unexpected
+> for operations such as unlink where we can hit these errors.
 > 
-> > by passing these flags to NFSv4 open request.
-> > 
-> > Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> > ---
-> >  fs/nfs/nfs4xdr.c | 24 ++++++++++++++++++++----
-> >  1 file changed, 20 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/fs/nfs/nfs4xdr.c b/fs/nfs/nfs4xdr.c
-> > index 26b1439..58ddc74 100644
-> > --- a/fs/nfs/nfs4xdr.c
-> > +++ b/fs/nfs/nfs4xdr.c
-> > @@ -1325,7 +1325,8 @@ static void encode_lookup(struct xdr_stream *xdr, const struct qstr *name, struc
-> >  	encode_string(xdr, name->len, name->name);
-> >  }
-> >  
-> > -static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
-> > +static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode,
-> > +				int open_flags)
-> >  {
-> >  	__be32 *p;
-> >  
-> > @@ -1343,7 +1344,22 @@ static void encode_share_access(struct xdr_stream *xdr, fmode_t fmode)
-> >  	default:
-> >  		*p++ = cpu_to_be32(0);
-> >  	}
-> > -	*p = cpu_to_be32(0);		/* for linux, share_deny = 0 always */
-> > +	if (open_flags & O_DENYMAND) {
+> The patch maps the error NT_SHARING_VIOLATION to EBUSY instead. The
+> patch also replaces all instances of ETXTBSY in
+> cifs_rename_pending_delete() with EBUSY.
 > 
-> 
-> As Bruce mentioned, I think a mount option to enable this on a per-fs
-> basis would be a better approach than this new O_DENYMAND flag. 
-> 
-> 
-> > +		switch (open_flags & (O_DENYREAD|O_DENYWRITE)) {
-> > +		case O_DENYREAD:
-> > +			*p = cpu_to_be32(NFS4_SHARE_DENY_READ);
-> > +			break;
-> > +		case O_DENYWRITE:
-> > +			*p = cpu_to_be32(NFS4_SHARE_DENY_WRITE);
-> > +			break;
-> > +		case O_DENYREAD|O_DENYWRITE:
-> > +			*p = cpu_to_be32(NFS4_SHARE_DENY_BOTH);
-> > +			break;
-> > +		default:
-> > +			*p = cpu_to_be32(0);
-> > +		}
-> > +	} else
-> > +		*p = cpu_to_be32(0);
-> >  }
-> >  
-> >  static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_openargs *arg)
-> > @@ -1354,7 +1370,7 @@ static inline void encode_openhdr(struct xdr_stream *xdr, const struct nfs_opena
-> >   * owner 4 = 32
-> >   */
-> >  	encode_nfs4_seqid(xdr, arg->seqid);
-> > -	encode_share_access(xdr, arg->fmode);
-> > +	encode_share_access(xdr, arg->fmode, arg->open_flags);
-> >  	p = reserve_space(xdr, 36);
-> >  	p = xdr_encode_hyper(p, arg->clientid);
-> >  	*p++ = cpu_to_be32(24);
-> > @@ -1491,7 +1507,7 @@ static void encode_open_downgrade(struct xdr_stream *xdr, const struct nfs_close
-> >  	encode_op_hdr(xdr, OP_OPEN_DOWNGRADE, decode_open_downgrade_maxsz, hdr);
-> >  	encode_nfs4_stateid(xdr, arg->stateid);
-> >  	encode_nfs4_seqid(xdr, arg->seqid);
-> > -	encode_share_access(xdr, arg->fmode);
-> > +	encode_share_access(xdr, arg->fmode, 0);
-> >  }
-> >  
-> >  static void
-> 
-> 
-> Other than that, this seems reasonable.
-> 
-> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-Oh duh...
+It might be nice to explain *why* you're making this change. It's fresh
+in our minds now, but probably won't be in a year or two.
 
-Please ignore my comment on patch #7 to add a patch for the NFS client.
-This one does that. That said, there may be a potential problem here
-that you need to consider.
+> ---
+>  fs/cifs/inode.c   | 10 ++++------
+>  fs/cifs/netmisc.c |  2 +-
+>  2 files changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index fee2d40..b97ca5b 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -1034,7 +1034,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+>  				   cifs_sb->mnt_cifs_flags &
+>  					    CIFS_MOUNT_MAP_SPECIAL_CHR);
+>  	if (rc != 0) {
+> -		rc = -ETXTBSY;
+> +		rc = -EBUSY;
+>  		goto undo_setattr;
+>  	}
+>  
+> @@ -1053,7 +1053,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+>  		if (rc == -ENOENT)
+>  			rc = 0;
+>  		else if (rc != 0) {
+> -			rc = -ETXTBSY;
+> +			rc = -EBUSY;
+>  			goto undo_rename;
+>  		}
+>  		cifsInode->delete_pending = true;
+> @@ -1160,15 +1160,13 @@ psx_del_no_retry:
+>  			cifs_drop_nlink(inode);
+>  	} else if (rc == -ENOENT) {
+>  		d_drop(dentry);
+> -	} else if (rc == -ETXTBSY) {
+> +	} else if (rc == -EBUSY) {
+>  		if (server->ops->rename_pending_delete) {
+>  			rc = server->ops->rename_pending_delete(full_path,
+>  								dentry, xid);
+>  			if (rc == 0)
+>  				cifs_drop_nlink(inode);
+>  		}
+> -		if (rc == -ETXTBSY)
+> -			rc = -EBUSY;
+>  	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
+>  		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
+>  		if (attrs == NULL) {
+> @@ -1509,7 +1507,7 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
+>  	 * source. Note that cross directory moves do not work with
+>  	 * rename by filehandle to various Windows servers.
+>  	 */
+> -	if (rc == 0 || rc != -ETXTBSY)
+> +	if (rc == 0 || rc != -EBUSY)
+>  		goto do_rename_exit;
+>  
+>  	/* open-file renames don't work across directories */
+> diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+> index a82bc51..c0b25b2 100644
+> --- a/fs/cifs/netmisc.c
+> +++ b/fs/cifs/netmisc.c
+> @@ -62,7 +62,7 @@ static const struct smb_to_posix_error mapping_table_ERRDOS[] = {
+>  	{ERRdiffdevice, -EXDEV},
+>  	{ERRnofiles, -ENOENT},
+>  	{ERRwriteprot, -EROFS},
+> -	{ERRbadshare, -ETXTBSY},
+> +	{ERRbadshare, -EBUSY},
+>  	{ERRlock, -EACCES},
+>  	{ERRunsup, -EINVAL},
+>  	{ERRnosuchshare, -ENXIO},
 
-In the case of a local filesystem you'll want to set deny locks using
-deny_lock_file(). For a network filesystem like CIFS or NFS though,
-the server will handle that atomically during the open. You need to
-ensure that you don't go trying to set LOCK_MAND locks on the file once
-that's done.
+Other than fleshing out the patch description, this looks good to me...
 
-Perhaps you can use a fstype flag to indicate that the filesystem
-handles this during the open and doesn't need to try and set a flock
-lock?
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
