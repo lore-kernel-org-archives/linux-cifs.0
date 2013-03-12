@@ -1,120 +1,111 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: [PATCH v2] cifs: map NT_STATUS_SHARING_VIOLATION to EBUSY
- instead of ETXTBSY
-Date: Tue, 12 Mar 2013 14:16:44 -0400
-Message-ID: <20130312141644.1c0c6666@corrin.poochiereds.net>
-References: <1363007329-9981-1-git-send-email-sprabhu@redhat.com>
-	<CAH2r5mtraxRmMSeqqz8qV7=m78B01q=K86SW+OGDtS4-ecGVTw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
+Date: Tue, 12 Mar 2013 11:27:54 -0700
+Message-ID: <D964BE89-1509-4A58-B079-37F17449F4F5@gmail.com>
+References: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mtraxRmMSeqqz8qV7=m78B01q=K86SW+OGDtS4-ecGVTw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1363009939-2264-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 12 Mar 2013 10:52:20 -0500
-Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+Yes, this patch fixed the problem in the current kernel we encountered when trying to mount a directory shared from a Windows 8 Pro system.
 
-> It would be helpful to note if there are ANY places where ETXTBUSY
-> should be returned by cifs (if not then this patch is even easier to
-> justify).
+Yan Li
+
+On Mar 11, 2013, at 6:52 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+
+> We've had several reports of people attempting to mount Windows 8 shares
+> and getting failures with a return code of -EINVAL. The default sec=
+> mode changed recently to sec=ntlmssp. With that, we expect and parse a
+> SPNEGO blob from the server in the NEGOTIATE reply.
 > 
-
-I can't think of any...
-
-Most of the cases where ETXTBSY should be returned are handled in the
-"upper" vfs layers, as best I can tell...
-
-> On Mon, Mar 11, 2013 at 8:08 AM, Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> > NT_SHARING_VIOLATION errors are mapped to ETXTBSY which is unexpected
-> > for operations such as unlink where we can hit these errors.
-> >
-> > The patch maps the error NT_SHARING_VIOLATION to EBUSY instead. The
-> > patch also replaces all instances of ETXTBSY in
-> > cifs_rename_pending_delete() with EBUSY.
-> >
-> > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/inode.c   | 10 ++++------
-> >  fs/cifs/netmisc.c |  2 +-
-> >  2 files changed, 5 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> > index fee2d40..b97ca5b 100644
-> > --- a/fs/cifs/inode.c
-> > +++ b/fs/cifs/inode.c
-> > @@ -1034,7 +1034,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
-> >                                    cifs_sb->mnt_cifs_flags &
-> >                                             CIFS_MOUNT_MAP_SPECIAL_CHR);
-> >         if (rc != 0) {
-> > -               rc = -ETXTBSY;
-> > +               rc = -EBUSY;
-> >                 goto undo_setattr;
-> >         }
-> >
-> > @@ -1053,7 +1053,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
-> >                 if (rc == -ENOENT)
-> >                         rc = 0;
-> >                 else if (rc != 0) {
-> > -                       rc = -ETXTBSY;
-> > +                       rc = -EBUSY;
-> >                         goto undo_rename;
-> >                 }
-> >                 cifsInode->delete_pending = true;
-> > @@ -1160,15 +1160,13 @@ psx_del_no_retry:
-> >                         cifs_drop_nlink(inode);
-> >         } else if (rc == -ENOENT) {
-> >                 d_drop(dentry);
-> > -       } else if (rc == -ETXTBSY) {
-> > +       } else if (rc == -EBUSY) {
-> >                 if (server->ops->rename_pending_delete) {
-> >                         rc = server->ops->rename_pending_delete(full_path,
-> >                                                                 dentry, xid);
-> >                         if (rc == 0)
-> >                                 cifs_drop_nlink(inode);
-> >                 }
-> > -               if (rc == -ETXTBSY)
-> > -                       rc = -EBUSY;
-> >         } else if ((rc == -EACCES) && (dosattr == 0) && inode) {
-> >                 attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
-> >                 if (attrs == NULL) {
-> > @@ -1509,7 +1507,7 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
-> >          * source. Note that cross directory moves do not work with
-> >          * rename by filehandle to various Windows servers.
-> >          */
-> > -       if (rc == 0 || rc != -ETXTBSY)
-> > +       if (rc == 0 || rc != -EBUSY)
-> >                 goto do_rename_exit;
-> >
-> >         /* open-file renames don't work across directories */
-> > diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-> > index a82bc51..c0b25b2 100644
-> > --- a/fs/cifs/netmisc.c
-> > +++ b/fs/cifs/netmisc.c
-> > @@ -62,7 +62,7 @@ static const struct smb_to_posix_error mapping_table_ERRDOS[] = {
-> >         {ERRdiffdevice, -EXDEV},
-> >         {ERRnofiles, -ENOENT},
-> >         {ERRwriteprot, -EROFS},
-> > -       {ERRbadshare, -ETXTBSY},
-> > +       {ERRbadshare, -EBUSY},
-> >         {ERRlock, -EACCES},
-> >         {ERRunsup, -EINVAL},
-> >         {ERRnosuchshare, -ENXIO},
-> > --
-> > 1.7.11.7
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> The current decode_negTokenInit function first parses all of the
+> mechTypes and then tries to parse the rest of the negTokenInit reply.
+> The parser however currently expects a mechListMIC or nothing to follow the
+> mechTypes, but Windows 8 puts a mechToken field there instead to carry
+> some info for the new NegoEx stuff.
 > 
+> In practice, we don't do anything with the fields after the mechTypes
+> anyway so I don't see any real benefit in continuing to parse them.
+> This patch just has the kernel ignore the fields after the mechTypes.
+> We'll probably need to reinstate some of this if we ever want to support
+> NegoEx.
 > 
+> Reported-by: Jason Burgess <jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org>
+> Reported-by: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+> fs/cifs/asn1.c | 53 +++++------------------------------------------------
+> 1 file changed, 5 insertions(+), 48 deletions(-)
 > 
-
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
+> index cfd1ce3..1d36db1 100644
+> --- a/fs/cifs/asn1.c
+> +++ b/fs/cifs/asn1.c
+> @@ -614,53 +614,10 @@ decode_negTokenInit(unsigned char *security_blob, int length,
+> 		}
+> 	}
+> 
+> -	/* mechlistMIC */
+> -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -		/* Check if we have reached the end of the blob, but with
+> -		   no mechListMic (e.g. NTLMSSP instead of KRB5) */
+> -		if (ctx.error == ASN1_ERR_DEC_EMPTY)
+> -			goto decode_negtoken_exit;
+> -		cFYI(1, "Error decoding last part negTokenInit exit3");
+> -		return 0;
+> -	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+> -		/* tag = 3 indicating mechListMIC */
+> -		cFYI(1, "Exit 4 cls = %d con = %d tag = %d end = %p (%d)",
+> -			cls, con, tag, end, *end);
+> -		return 0;
+> -	}
+> -
+> -	/* sequence */
+> -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -		cFYI(1, "Error decoding last part negTokenInit exit5");
+> -		return 0;
+> -	} else if ((cls != ASN1_UNI) || (con != ASN1_CON)
+> -		   || (tag != ASN1_SEQ)) {
+> -		cFYI(1, "cls = %d con = %d tag = %d end = %p (%d)",
+> -			cls, con, tag, end, *end);
+> -	}
+> -
+> -	/* sequence of */
+> -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -		cFYI(1, "Error decoding last part negTokenInit exit 7");
+> -		return 0;
+> -	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+> -		cFYI(1, "Exit 8 cls = %d con = %d tag = %d end = %p (%d)",
+> -			cls, con, tag, end, *end);
+> -		return 0;
+> -	}
+> -
+> -	/* general string */
+> -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -		cFYI(1, "Error decoding last part negTokenInit exit9");
+> -		return 0;
+> -	} else if ((cls != ASN1_UNI) || (con != ASN1_PRI)
+> -		   || (tag != ASN1_GENSTR)) {
+> -		cFYI(1, "Exit10 cls = %d con = %d tag = %d end = %p (%d)",
+> -			cls, con, tag, end, *end);
+> -		return 0;
+> -	}
+> -	cFYI(1, "Need to call asn1_octets_decode() function for %s",
+> -		ctx.pointer);	/* is this UTF-8 or ASCII? */
+> -decode_negtoken_exit:
+> +	/*
+> +	 * We currently ignore anything at the end of the SPNEGO blob after
+> +	 * the mechTypes have been parsed, since none of that info is
+> +	 * used at the moment.
+> +	 */
+> 	return 1;
+> }
+> -- 
+> 1.7.11.7
+> 
