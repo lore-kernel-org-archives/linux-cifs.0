@@ -1,114 +1,131 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: LOCKDEP: 3.9-rc1: mount.nfs/4272 still has locks held!
-Date: Wed, 13 Mar 2013 11:17:27 -0400
-Message-ID: <20130313111727.63391672@tlielax.poochiereds.net>
-References: <20130305140312.243cb094@tlielax.poochiereds.net>
-	<20130305190923.GI12795@htj.dyndns.org>
-	<20130305183941.19ff39ce@tlielax.poochiereds.net>
-	<20130305234700.GE1227@htj.dyndns.org>
-	<20130306181608.GA18687@redhat.com>
-	<20130306185304.GM1227@htj.dyndns.org>
-	<CA+55aFwDogteVd=vwGHXDSASnga-nZZnKaQz9aO1yBU2CPKSbA@mail.gmail.com>
-	<20130306212452.GO1227@htj.dyndns.org>
-	<CA+55aFy49AWptMcvEzJxg95ikf-dC+-vcCPq-cnaCCwje3tyoQ@mail.gmail.com>
-	<20130306213636.GP1227@htj.dyndns.org>
-	<20130306214016.GQ1227@htj.dyndns.org>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
+Date: Thu, 14 Mar 2013 07:41:13 -0400
+Message-ID: <20130314074113.0f8dc2f2@tlielax.poochiereds.net>
+References: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
+	<D964BE89-1509-4A58-B079-37F17449F4F5@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Oleg Nesterov <oleg@redhat.com>,
-	"Myklebust, Trond" <Trond.Myklebust@netapp.com>,
-	Mandeep Singh Baines <msb@chromium.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, linux-cifs@vger.kernel.org
-To: Tejun Heo <tj@kernel.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20130306214016.GQ1227@htj.dyndns.org>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org
+To: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <D964BE89-1509-4A58-B079-37F17449F4F5-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 6 Mar 2013 13:40:16 -0800
-Tejun Heo <tj@kernel.org> wrote:
+On Tue, 12 Mar 2013 11:27:54 -0700
+Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 
-> On Wed, Mar 06, 2013 at 01:36:36PM -0800, Tejun Heo wrote:
-> > On Wed, Mar 06, 2013 at 01:31:10PM -0800, Linus Torvalds wrote:
-> > > So I do agree that we probably have *too* many of the stupid "let's
-> > > check if we can freeze", and I suspect that the NFS code should get
-> > > rid of the "freezable_schedule()" that is causing this warning
-> > > (because I also agree that you should *not* freeze while holding
-> > > locks, because it really can cause deadlocks), but I do suspect that
-> > > network filesystems do need to have a few places where they check for
-> > > freezing on their own... Exactly because freezing isn't *quite* like a
-> > > signal.
+> Yes, this patch fixed the problem in the current kernel we encountered when trying to mount a directory shared from a Windows 8 Pro system.
+> 
+> Yan Li
+> 
+> On Mar 11, 2013, at 6:52 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> 
+> > We've had several reports of people attempting to mount Windows 8 shares
+> > and getting failures with a return code of -EINVAL. The default sec=
+> > mode changed recently to sec=ntlmssp. With that, we expect and parse a
+> > SPNEGO blob from the server in the NEGOTIATE reply.
 > > 
-> > Well, I don't really know much about nfs so I can't really tell, but
-> > for most other cases, dealing with freezing like a signal should work
-> > fine from what I've seen although I can't be sure before actually
-> > trying.  Trond, Bruce, can you guys please chime in?
+> > The current decode_negTokenInit function first parses all of the
+> > mechTypes and then tries to parse the rest of the negTokenInit reply.
+> > The parser however currently expects a mechListMIC or nothing to follow the
+> > mechTypes, but Windows 8 puts a mechToken field there instead to carry
+> > some info for the new NegoEx stuff.
+> > 
+> > In practice, we don't do anything with the fields after the mechTypes
+> > anyway so I don't see any real benefit in continuing to parse them.
+> > This patch just has the kernel ignore the fields after the mechTypes.
+> > We'll probably need to reinstate some of this if we ever want to support
+> > NegoEx.
+> > 
+> > Reported-by: Jason Burgess <jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org>
+> > Reported-by: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> > ---
+> > fs/cifs/asn1.c | 53 +++++------------------------------------------------
+> > 1 file changed, 5 insertions(+), 48 deletions(-)
+> > 
+> > diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
+> > index cfd1ce3..1d36db1 100644
+> > --- a/fs/cifs/asn1.c
+> > +++ b/fs/cifs/asn1.c
+> > @@ -614,53 +614,10 @@ decode_negTokenInit(unsigned char *security_blob, int length,
+> > 		}
+> > 	}
+> > 
+> > -	/* mechlistMIC */
+> > -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> > -		/* Check if we have reached the end of the blob, but with
+> > -		   no mechListMic (e.g. NTLMSSP instead of KRB5) */
+> > -		if (ctx.error == ASN1_ERR_DEC_EMPTY)
+> > -			goto decode_negtoken_exit;
+> > -		cFYI(1, "Error decoding last part negTokenInit exit3");
+> > -		return 0;
+> > -	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+> > -		/* tag = 3 indicating mechListMIC */
+> > -		cFYI(1, "Exit 4 cls = %d con = %d tag = %d end = %p (%d)",
+> > -			cls, con, tag, end, *end);
+> > -		return 0;
+> > -	}
+> > -
+> > -	/* sequence */
+> > -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> > -		cFYI(1, "Error decoding last part negTokenInit exit5");
+> > -		return 0;
+> > -	} else if ((cls != ASN1_UNI) || (con != ASN1_CON)
+> > -		   || (tag != ASN1_SEQ)) {
+> > -		cFYI(1, "cls = %d con = %d tag = %d end = %p (%d)",
+> > -			cls, con, tag, end, *end);
+> > -	}
+> > -
+> > -	/* sequence of */
+> > -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> > -		cFYI(1, "Error decoding last part negTokenInit exit 7");
+> > -		return 0;
+> > -	} else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+> > -		cFYI(1, "Exit 8 cls = %d con = %d tag = %d end = %p (%d)",
+> > -			cls, con, tag, end, *end);
+> > -		return 0;
+> > -	}
+> > -
+> > -	/* general string */
+> > -	if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> > -		cFYI(1, "Error decoding last part negTokenInit exit9");
+> > -		return 0;
+> > -	} else if ((cls != ASN1_UNI) || (con != ASN1_PRI)
+> > -		   || (tag != ASN1_GENSTR)) {
+> > -		cFYI(1, "Exit10 cls = %d con = %d tag = %d end = %p (%d)",
+> > -			cls, con, tag, end, *end);
+> > -		return 0;
+> > -	}
+> > -	cFYI(1, "Need to call asn1_octets_decode() function for %s",
+> > -		ctx.pointer);	/* is this UTF-8 or ASCII? */
+> > -decode_negtoken_exit:
+> > +	/*
+> > +	 * We currently ignore anything at the end of the SPNEGO blob after
+> > +	 * the mechTypes have been parsed, since none of that info is
+> > +	 * used at the moment.
+> > +	 */
+> > 	return 1;
+> > }
+> > -- 
+> > 1.7.11.7
+> > 
 > 
-> So, I think the question here would be, in nfs, how many of the
-> current freezer check points would be difficult to conver to signal
-> handling model after excluding the ones which are performed while
-> holding some locks which we need to get rid of anyway?
-> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I think we can do this, but it isn't trivial. Here's what I'd envision,
-but there are still many details that would need to be worked out...
 
-Basically what we'd need is a way to go into TASK_KILLABLE sleep, but
-still allow the freezer to wake these processes up. I guess that likely
-means we need a new sleep state (TASK_FREEZABLE?).
+Thanks for testing it...
 
-We'd also need a way to return an -ERESTARTSYS like error (-EFREEZING?)
-that tells the upper syscall handling layers to freeze the task and
-then restart the syscall after waking back up. Maybe we don't need a
-new error at all and -ERESTARTSYS is fine here? We also need to
-consider the effects vs. audit code here, but that may be OK with the
-overhaul that Al merged a few months ago.
+Steve, I think this should probably go to stable too since 3.8 moved to
+sec=ntlmssp as the default.
 
-Assuming we have those, then we need to fix up the NFS and RPC layers
-to use this stuff:
-
-1/ Prior to submitting a new RPC, we'd look and see whether "current"
-is being frozen. If it is, then return -EFREEZING immediately without
-doing anything.
-
-2/ We might also need to retrofit certain stages in the RPC FSM to
-return -EFREEZING too if it's a synchronous RPC and the task is being
-frozen.
-
-3/ A task is waiting for an RPC reply on an async RPC, we'd need to use
-this new sleep state. If the process wakes up because something wants
-it to freeze, then have it go back to sleep for a short period of time
-to try and wait for the reply (up to 15s or so?). If we get the reply,
-great -- return to userland and freeze the task there. If the reply
-never comes in, give up on it and just return -EFREEZE and hope for the
-best.
-
-We might have to make this latter behavior contingent on a new mount
-option (maybe "-o slushy" like Trond recommended). The current "hard"
-and "soft" semantics don't really fit this situation correctly.
-
-Of course, this is all a lot of work, and not something we can shove
-into the kernel for 3.9 at this point. In the meantime, while Mandeep's
-warning is correctly pointing out a problem, I think we ought to back
-it out until we can fix this properly.
-
-We're already getting a ton of reports on the mailing lists and in the
-fedora bug tracker for this warning. Part of the problem is the
-verbiage -- "BUG" makes people think "Oops", but this is really just a
-warning.
-
-We should also note that this is a problem too in the CIFS code since
-it uses a similar mechanism for allowing the kernel to suspend while
-waiting on SMB replies.
 
 -- 
-Jeff Layton <jlayton@redhat.com>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
