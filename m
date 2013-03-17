@@ -1,119 +1,41 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Andrew Bartlett <abartlet@samba.org>
 Subject: Re: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
-Date: Sun, 17 Mar 2013 09:37:27 -0500
-Message-ID: <CAH2r5mtcACcO5YfVzRptJO2ob=SYEgVyTtHBUc7XZS_n57XjAw@mail.gmail.com>
+Date: Mon, 18 Mar 2013 08:14:14 +1100
+Message-ID: <1363554854.27367.8.camel@jesse>
 References: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
+	<CAH2r5mtcACcO5YfVzRptJO2ob=SYEgVyTtHBUc7XZS_n57XjAw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org,
-	elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1363009939-2264-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs@vger.kernel.org, jason@jacknife2.dns2go.com,
+	samba-technical <samba-technical@lists.samba.org>,
+	Jeff Layton <jlayton@redhat.com>, elliot.li.tech@gmail.com
+To: Steve French <smfrench@gmail.com>
+Return-path: <samba-technical-bounces@lists.samba.org>
+In-Reply-To: <CAH2r5mtcACcO5YfVzRptJO2ob=SYEgVyTtHBUc7XZS_n57XjAw@mail.gmail.com>
+List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
+List-Archive: <http://lists.samba.org/pipermail/samba-technical>
+List-Post: <mailto:samba-technical@lists.samba.org>
+List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
+List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
+	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
+Sender: samba-technical-bounces@lists.samba.org
+Errors-To: samba-technical-bounces@lists.samba.org
+List-Id: linux-cifs.vger.kernel.org
 
-The existing code is trying to dump the "principal" from the
-mechListMic (presumably for debugging) in the SMB negotiate response.
-In the trace I looked at Samba server set it to "NONE"  - is there a
-case where we would ever need that?
+On Sun, 2013-03-17 at 09:37 -0500, Steve French wrote:
+> The existing code is trying to dump the "principal" from the
+> mechListMic (presumably for debugging) in the SMB negotiate response.
+> In the trace I looked at Samba server set it to "NONE"  - is there a
+> case where we would ever need that?
 
-On Mon, Mar 11, 2013 at 8:52 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> We've had several reports of people attempting to mount Windows 8 shares
-> and getting failures with a return code of -EINVAL. The default sec=
-> mode changed recently to sec=ntlmssp. With that, we expect and parse a
-> SPNEGO blob from the server in the NEGOTIATE reply.
->
-> The current decode_negTokenInit function first parses all of the
-> mechTypes and then tries to parse the rest of the negTokenInit reply.
-> The parser however currently expects a mechListMIC or nothing to follow the
-> mechTypes, but Windows 8 puts a mechToken field there instead to carry
-> some info for the new NegoEx stuff.
->
-> In practice, we don't do anything with the fields after the mechTypes
-> anyway so I don't see any real benefit in continuing to parse them.
-> This patch just has the kernel ignore the fields after the mechTypes.
-> We'll probably need to reinstate some of this if we ever want to support
-> NegoEx.
->
-> Reported-by: Jason Burgess <jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org>
-> Reported-by: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/asn1.c | 53 +++++------------------------------------------------
->  1 file changed, 5 insertions(+), 48 deletions(-)
->
-> diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
-> index cfd1ce3..1d36db1 100644
-> --- a/fs/cifs/asn1.c
-> +++ b/fs/cifs/asn1.c
-> @@ -614,53 +614,10 @@ decode_negTokenInit(unsigned char *security_blob, int length,
->                 }
->         }
->
-> -       /* mechlistMIC */
-> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
-> -               /* Check if we have reached the end of the blob, but with
-> -                  no mechListMic (e.g. NTLMSSP instead of KRB5) */
-> -               if (ctx.error == ASN1_ERR_DEC_EMPTY)
-> -                       goto decode_negtoken_exit;
-> -               cFYI(1, "Error decoding last part negTokenInit exit3");
-> -               return 0;
-> -       } else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
-> -               /* tag = 3 indicating mechListMIC */
-> -               cFYI(1, "Exit 4 cls = %d con = %d tag = %d end = %p (%d)",
-> -                       cls, con, tag, end, *end);
-> -               return 0;
-> -       }
-> -
-> -       /* sequence */
-> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
-> -               cFYI(1, "Error decoding last part negTokenInit exit5");
-> -               return 0;
-> -       } else if ((cls != ASN1_UNI) || (con != ASN1_CON)
-> -                  || (tag != ASN1_SEQ)) {
-> -               cFYI(1, "cls = %d con = %d tag = %d end = %p (%d)",
-> -                       cls, con, tag, end, *end);
-> -       }
-> -
-> -       /* sequence of */
-> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
-> -               cFYI(1, "Error decoding last part negTokenInit exit 7");
-> -               return 0;
-> -       } else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
-> -               cFYI(1, "Exit 8 cls = %d con = %d tag = %d end = %p (%d)",
-> -                       cls, con, tag, end, *end);
-> -               return 0;
-> -       }
-> -
-> -       /* general string */
-> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
-> -               cFYI(1, "Error decoding last part negTokenInit exit9");
-> -               return 0;
-> -       } else if ((cls != ASN1_UNI) || (con != ASN1_PRI)
-> -                  || (tag != ASN1_GENSTR)) {
-> -               cFYI(1, "Exit10 cls = %d con = %d tag = %d end = %p (%d)",
-> -                       cls, con, tag, end, *end);
-> -               return 0;
-> -       }
-> -       cFYI(1, "Need to call asn1_octets_decode() function for %s",
-> -               ctx.pointer);   /* is this UTF-8 or ASCII? */
-> -decode_negtoken_exit:
-> +       /*
-> +        * We currently ignore anything at the end of the SPNEGO blob after
-> +        * the mechTypes have been parsed, since none of that info is
-> +        * used at the moment.
-> +        */
->         return 1;
->  }
-> --
-> 1.7.11.7
->
+No, the "principal" should never be used, and isn't even useful for
+debugging as you should just never use it.  It can be set to strange and
+invalid values such as NONE and rfc....should_ignore
 
-
+Andrew Bartlett
 
 -- 
-Thanks,
-
-Steve
+Andrew Bartlett                                http://samba.org/~abartlet/
+Authentication Developer, Samba Team           http://samba.org
