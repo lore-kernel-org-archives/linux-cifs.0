@@ -1,97 +1,119 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Fwd: [PATCH] cifs: Rename cERROR and cFYI to cifs_dbg
-Date: Fri, 15 Mar 2013 16:46:22 -0500
-Message-ID: <CAH2r5msj-Mei76ZX8Hjg5uWwCUcn_PLWuSpAorGROV3nRsX=Zg@mail.gmail.com>
-References: <1363128287.23052.21.camel@joe-AO722>
-	<1363174614.2031.9.camel@joe-AO722>
-	<20130313075155.7464a34a@tlielax.poochiereds.net>
-	<1363178421.2031.29.camel@joe-AO722>
-	<1363289077.2146.19.camel@joe-AO722>
-	<20130315150136.7f7a262a@tlielax.poochiereds.net>
-	<CAH2r5mvW29FV+stH5CsjY5S2FdaHn48TfiSEk_beC=NzHC7-MQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
+Date: Sun, 17 Mar 2013 09:37:27 -0500
+Message-ID: <CAH2r5mtcACcO5YfVzRptJO2ob=SYEgVyTtHBUc7XZS_n57XjAw@mail.gmail.com>
+References: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org,
+	elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5mvW29FV+stH5CsjY5S2FdaHn48TfiSEk_beC=NzHC7-MQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1363009939-2264-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, Mar 15, 2013 at 2:01 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->
-> On Thu, 14 Mar 2013 12:24:37 -0700
-> Joe Perches <joe-6d6DIl74uiNBDgjK7y7TUQ@public.gmane.org> wrote:
->
-> > It's not obvious from reading the macro names that these macros
-> > are for debugging.  Convert the names to a single more typical
-> > kernel style cifs_dbg macro.
-> >
-> >       cERROR(1, ...)   -> cifs_dbg(VFS, ...)
-> >       cFYI(1, ...)     -> cifs_dbg(FYI, ...)
-> >       cFYI(DBG2, ...)  -> cifs_dbg(NOISY, ...)
-> >
-> > Move the terminating format newline from the macro to the call site.
-> >
-> > Add CONFIG_CIFS_DEBUG function cifs_vfs_err to emit the
-> > "CIFS VFS: " prefix for VFS messages.
-> >
-> > Size is reduced ~ 1% when CONFIG_CIFS_DEBUG is set (default y)
-> >
-> > $ size fs/cifs/cifs.ko*
-> >    text    data     bss     dec     hex filename
-> >  265245          2525     132  267902   4167e fs/cifs/cifs.ko.new
-> >  268359    2525     132  271016   422a8 fs/cifs/cifs.ko.old
-> >
->
-> (my apologies -- my MUA has a mind of its own sometimes)
->
-> This all looks like good stuff. I am a bit concerned about mashing all
-> of these cleanups into the same patch though.
->
-> > Other miscellaneous changes around these conversions:
-> >
-> > o Miscellaneous typo fixes
-> > o Add terminating \n's to almost all formats and remove them
-> >   from the macros to be more kernel style like.  A few formats
-> >   previously had defective \n's
-> > o Remove unnecessary OOM messages as kmalloc() calls dump_stack
-> > o Coalesce formats to make grep easier,
-> >   added missing spaces when coalescing formats
-> > o Use %s, __func__ instead of embedded function name
-> > o Removed unnecessary "cifs: " prefixes
->
-> > o Convert kzalloc with multiply to kcalloc
->         ^^^
-> Things like this really ought to be a separate patch, even though it is
-> a trivial change. That's a minor nit though...
->
-> > o Remove unused cifswarn macro
-> >
->
-> I think we ought to go ahead and take this for 3.10. I do have some
-> minor concern about having to deal with backports of later patches to
-> kernels that don't have these changes, but hey, that's the price of
-> dealing with old kernels.
->
-> The sooner Steve merges this into his for-next tree, the better. This
-> bound to give us all sorts of merge conflicts for the 3.10 window, so
-> we want to make sure that people know what to base their work on.
+The existing code is trying to dump the "principal" from the
+mechListMic (presumably for debugging) in the SMB negotiate response.
+In the trace I looked at Samba server set it to "NONE"  - is there a
+case where we would ever need that?
 
-I would like to merge the three we have (one still has to be put in for-next
-- the one from Jeff) for for-next in the next three or fouir days - but I
-can create another temporary branch for the ones for 3.10 - but ... I would
-like to simplify things by merging the other cleanup patches we already have
-first.  I agree that we are going to have to let people know to rebase
-everything for cifs for 3.10 on this big cleanup patch.
+On Mon, Mar 11, 2013 at 8:52 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> We've had several reports of people attempting to mount Windows 8 shares
+> and getting failures with a return code of -EINVAL. The default sec=
+> mode changed recently to sec=ntlmssp. With that, we expect and parse a
+> SPNEGO blob from the server in the NEGOTIATE reply.
+>
+> The current decode_negTokenInit function first parses all of the
+> mechTypes and then tries to parse the rest of the negTokenInit reply.
+> The parser however currently expects a mechListMIC or nothing to follow the
+> mechTypes, but Windows 8 puts a mechToken field there instead to carry
+> some info for the new NegoEx stuff.
+>
+> In practice, we don't do anything with the fields after the mechTypes
+> anyway so I don't see any real benefit in continuing to parse them.
+> This patch just has the kernel ignore the fields after the mechTypes.
+> We'll probably need to reinstate some of this if we ever want to support
+> NegoEx.
+>
+> Reported-by: Jason Burgess <jason-U1lxkLAfC+FTYOaJdQCKXFaTQe2KTcn/@public.gmane.org>
+> Reported-by: Yan Li <elliot.li.tech-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/asn1.c | 53 +++++------------------------------------------------
+>  1 file changed, 5 insertions(+), 48 deletions(-)
+>
+> diff --git a/fs/cifs/asn1.c b/fs/cifs/asn1.c
+> index cfd1ce3..1d36db1 100644
+> --- a/fs/cifs/asn1.c
+> +++ b/fs/cifs/asn1.c
+> @@ -614,53 +614,10 @@ decode_negTokenInit(unsigned char *security_blob, int length,
+>                 }
+>         }
+>
+> -       /* mechlistMIC */
+> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -               /* Check if we have reached the end of the blob, but with
+> -                  no mechListMic (e.g. NTLMSSP instead of KRB5) */
+> -               if (ctx.error == ASN1_ERR_DEC_EMPTY)
+> -                       goto decode_negtoken_exit;
+> -               cFYI(1, "Error decoding last part negTokenInit exit3");
+> -               return 0;
+> -       } else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+> -               /* tag = 3 indicating mechListMIC */
+> -               cFYI(1, "Exit 4 cls = %d con = %d tag = %d end = %p (%d)",
+> -                       cls, con, tag, end, *end);
+> -               return 0;
+> -       }
+> -
+> -       /* sequence */
+> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -               cFYI(1, "Error decoding last part negTokenInit exit5");
+> -               return 0;
+> -       } else if ((cls != ASN1_UNI) || (con != ASN1_CON)
+> -                  || (tag != ASN1_SEQ)) {
+> -               cFYI(1, "cls = %d con = %d tag = %d end = %p (%d)",
+> -                       cls, con, tag, end, *end);
+> -       }
+> -
+> -       /* sequence of */
+> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -               cFYI(1, "Error decoding last part negTokenInit exit 7");
+> -               return 0;
+> -       } else if ((cls != ASN1_CTX) || (con != ASN1_CON)) {
+> -               cFYI(1, "Exit 8 cls = %d con = %d tag = %d end = %p (%d)",
+> -                       cls, con, tag, end, *end);
+> -               return 0;
+> -       }
+> -
+> -       /* general string */
+> -       if (asn1_header_decode(&ctx, &end, &cls, &con, &tag) == 0) {
+> -               cFYI(1, "Error decoding last part negTokenInit exit9");
+> -               return 0;
+> -       } else if ((cls != ASN1_UNI) || (con != ASN1_PRI)
+> -                  || (tag != ASN1_GENSTR)) {
+> -               cFYI(1, "Exit10 cls = %d con = %d tag = %d end = %p (%d)",
+> -                       cls, con, tag, end, *end);
+> -               return 0;
+> -       }
+> -       cFYI(1, "Need to call asn1_octets_decode() function for %s",
+> -               ctx.pointer);   /* is this UTF-8 or ASCII? */
+> -decode_negtoken_exit:
+> +       /*
+> +        * We currently ignore anything at the end of the SPNEGO blob after
+> +        * the mechTypes have been parsed, since none of that info is
+> +        * used at the moment.
+> +        */
+>         return 1;
+>  }
+> --
+> 1.7.11.7
+>
 
---
-Thanks,
-
-Steve
 
 
-
---
+-- 
 Thanks,
 
 Steve
