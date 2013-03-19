@@ -1,45 +1,89 @@
-From: Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH] cifs: ignore everything in SPNEGO blob after mechTypes
-Date: Sun, 17 Mar 2013 17:00:27 -0500
-Message-ID: <CAH2r5muew1fSju_MuzRSETGhzb4Rv-R7kdjV0fVHsNXABq=wNw@mail.gmail.com>
-References: <1363009939-2264-1-git-send-email-jlayton@redhat.com>
-	<CAH2r5mtcACcO5YfVzRptJO2ob=SYEgVyTtHBUc7XZS_n57XjAw@mail.gmail.com>
-	<1363554854.27367.8.camel@jesse>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs@vger.kernel.org, jason@jacknife2.dns2go.com,
-	samba-technical <samba-technical@lists.samba.org>,
-	Jeff Layton <jlayton@redhat.com>, elliot.li.tech@gmail.com
-To: Andrew Bartlett <abartlet@samba.org>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <1363554854.27367.8.camel@jesse>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v3] cifs: map NT_STATUS_SHARING_VIOLATION to EBUSY instead of ETXTBSY
+Date: Tue, 19 Mar 2013 12:51:04 +0000
+Message-ID: <1363697464-7564-1-git-send-email-sprabhu@redhat.com>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Sun, Mar 17, 2013 at 4:14 PM, Andrew Bartlett <abartlet@samba.org> wrote:
-> On Sun, 2013-03-17 at 09:37 -0500, Steve French wrote:
->> The existing code is trying to dump the "principal" from the
->> mechListMic (presumably for debugging) in the SMB negotiate response.
->> In the trace I looked at Samba server set it to "NONE"  - is there a
->> case where we would ever need that?
->
-> No, the "principal" should never be used, and isn't even useful for
-> debugging as you should just never use it.  It can be set to strange and
-> invalid values such as NONE and rfc....should_ignore
+NT_SHARING_VIOLATION errors are mapped to ETXTBSY which is unexpected
+for operations such as unlink where we can hit these errors.
 
-Thanks - then it makes more sense to do as Jeff suggested and removing
-the extra parsing.
+The patch maps the error NT_SHARING_VIOLATION to EBUSY instead. The
+patch also replaces all instances of ETXTBSY in
+cifs_rename_pending_delete() with EBUSY.
 
+The patch was a result of a user reporting a ETXTBSY error on performing
+an unlink operation caused by the server returning a
+NT_SHARING_VIOLATION.
 
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/inode.c   | 10 ++++------
+ fs/cifs/netmisc.c |  2 +-
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index fee2d40..b97ca5b 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -1034,7 +1034,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 				   cifs_sb->mnt_cifs_flags &
+ 					    CIFS_MOUNT_MAP_SPECIAL_CHR);
+ 	if (rc != 0) {
+-		rc = -ETXTBSY;
++		rc = -EBUSY;
+ 		goto undo_setattr;
+ 	}
+ 
+@@ -1053,7 +1053,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 		if (rc == -ENOENT)
+ 			rc = 0;
+ 		else if (rc != 0) {
+-			rc = -ETXTBSY;
++			rc = -EBUSY;
+ 			goto undo_rename;
+ 		}
+ 		cifsInode->delete_pending = true;
+@@ -1160,15 +1160,13 @@ psx_del_no_retry:
+ 			cifs_drop_nlink(inode);
+ 	} else if (rc == -ENOENT) {
+ 		d_drop(dentry);
+-	} else if (rc == -ETXTBSY) {
++	} else if (rc == -EBUSY) {
+ 		if (server->ops->rename_pending_delete) {
+ 			rc = server->ops->rename_pending_delete(full_path,
+ 								dentry, xid);
+ 			if (rc == 0)
+ 				cifs_drop_nlink(inode);
+ 		}
+-		if (rc == -ETXTBSY)
+-			rc = -EBUSY;
+ 	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
+ 		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
+ 		if (attrs == NULL) {
+@@ -1509,7 +1507,7 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
+ 	 * source. Note that cross directory moves do not work with
+ 	 * rename by filehandle to various Windows servers.
+ 	 */
+-	if (rc == 0 || rc != -ETXTBSY)
++	if (rc == 0 || rc != -EBUSY)
+ 		goto do_rename_exit;
+ 
+ 	/* open-file renames don't work across directories */
+diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
+index a82bc51..c0b25b2 100644
+--- a/fs/cifs/netmisc.c
++++ b/fs/cifs/netmisc.c
+@@ -62,7 +62,7 @@ static const struct smb_to_posix_error mapping_table_ERRDOS[] = {
+ 	{ERRdiffdevice, -EXDEV},
+ 	{ERRnofiles, -ENOENT},
+ 	{ERRwriteprot, -EROFS},
+-	{ERRbadshare, -ETXTBSY},
++	{ERRbadshare, -EBUSY},
+ 	{ERRlock, -EACCES},
+ 	{ERRunsup, -EINVAL},
+ 	{ERRnosuchshare, -ENXIO},
 -- 
-Thanks,
-
-Steve
+1.7.11.7
