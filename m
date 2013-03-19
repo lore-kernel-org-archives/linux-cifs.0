@@ -1,117 +1,107 @@
-From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: [PATCH] manpage: document the mount.cifs vers= option
-Date: Tue, 19 Mar 2013 14:58:22 +0000
-Message-ID: <614F550557B82C44AC27C492ADA391AA04605E46@TK5EX14MBXC285.redmond.corp.microsoft.com>
-References: <1363703710-23683-1-git-send-email-jlayton@samba.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] manpage: better document the default sec= mount option
+Date: Tue, 19 Mar 2013 11:01:12 -0400
+Message-ID: <1363705272-24271-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1363703710-23683-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A couple of comments on the SMB2/3 revision history below.
+The default changed in mainline kernel v3.8.
 
-> -----Original Message-----
-> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Jeff Layton
-> Sent: Tuesday, March 19, 2013 10:35 AM
-> To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> Subject: [PATCH] manpage: document the mount.cifs vers= option
-> 
-> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-> ---
->  mount.cifs.8 | 51
-> +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/mount.cifs.8 b/mount.cifs.8 index a4fdd98..6f105ad 100644
-> --- a/mount.cifs.8
-> +++ b/mount.cifs.8
-> @@ -539,6 +539,57 @@ prefixpath=
->  It's possible to mount a subdirectory of a share. The preferred way to do this
-> is to append the path to the UNC when mounting. However, it's also possible
-> to do the same by setting this option and providing the path there.
->  .RE
->  .PP
-> +vers=
-> +.RS 4
-> +SMB protocol version. Allowed values are:
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +1.0 - SMBv1.0: The classic SMB/CIFS protocol. This is the default.
-> +.RE
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +2.0 - SMBv2.0: The SMB2.0 protocol which was introduced in Microsoft
-> Windows Vista.
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-SMB2.0 was introduced in Vista, but was not supported until Vista Service Pack 1, and Windows Server 2008. The dialect was changed to 2.002 in these releases, btw.
-
-Also the word "which" is different from the two other cases below, which use "that". 
-
-> +.RE
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +2.1 - SMBv2.1: The SMB2.1 protocol that was introduced in Microsoft
-> Windows 7.
-
-SMB2.1 was also supported by Windows Server 2008R2.
-
-> +.RE
-> +.sp
-> +.RS 4
-> +.ie n \{\
-> +\h'-04'\(bu\h'+03'\c
-> +.\}
-> +.el \{\
-> +.sp -1
-> +.IP \(bu 2.3
-> +.\}
-> +3.0 - SMBv3.0: The SMB3.0 protocol that was introduced in Microsoft
-> Windows 8 and Server 2012.
-
-"Windows Server 2012".
-
-> +.RE
-> +.PP
-> +Note too that while this option governs the protocol version used, not all
-> features of each version are available.
-> +.RE
-> +.PP
->  \-\-verbose
->  .RS 4
->  Print additional debugging information for the mount\&. Note that this
-> parameter must be specified before the \-o\&. For example:
-> --
-> 1.7.11.7
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in the
-> body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index 6f105ad..1a2bfc8 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -344,7 +344,7 @@ Security mode\&. Allowed values are:
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-none attempt to connection as a null user (no name)
++none - attempt to connection as a null user (no name)
+ .RE
+ .sp
+ .RS 4
+@@ -355,7 +355,7 @@ none attempt to connection as a null user (no name)
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-krb5 Use Kerberos version 5 authentication
++krb5 - Use Kerberos version 5 authentication
+ .RE
+ .sp
+ .RS 4
+@@ -366,7 +366,7 @@ krb5 Use Kerberos version 5 authentication
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-krb5i Use Kerberos authentication and forcibly enable packet signing
++krb5i - Use Kerberos authentication and forcibly enable packet signing
+ .RE
+ .sp
+ .RS 4
+@@ -377,7 +377,7 @@ krb5i Use Kerberos authentication and forcibly enable packet signing
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlm Use NTLM password hashing (default)
++ntlm - Use NTLM password hashing
+ .RE
+ .sp
+ .RS 4
+@@ -388,7 +388,7 @@ ntlm Use NTLM password hashing (default)
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlmi Use NTLM password hashing and force packet signing
++ntlmi - Use NTLM password hashing and force packet signing
+ .RE
+ .sp
+ .RS 4
+@@ -399,7 +399,7 @@ ntlmi Use NTLM password hashing and force packet signing
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlmv2 Use NTLMv2 password hashing
++ntlmv2 - Use NTLMv2 password hashing
+ .RE
+ .sp
+ .RS 4
+@@ -410,7 +410,7 @@ ntlmv2 Use NTLMv2 password hashing
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlmv2i Use NTLMv2 password hashing and force packet signing
++ntlmv2i - Use NTLMv2 password hashing and force packet signing
+ .RE
+ .sp
+ .RS 4
+@@ -421,7 +421,7 @@ ntlmv2i Use NTLMv2 password hashing and force packet signing
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlmssp Use NTLMv2 password hashing encapsulated in Raw NTLMSSP message
++ntlmssp - Use NTLMv2 password hashing encapsulated in Raw NTLMSSP message
+ .RE
+ .sp
+ .RS 4
+@@ -432,9 +432,11 @@ ntlmssp Use NTLMv2 password hashing encapsulated in Raw NTLMSSP message
+ .sp -1
+ .IP \(bu 2.3
+ .\}
+-ntlmsspi Use NTLMv2 password hashing encapsulated in Raw NTLMSSP message, and force packet signing
++ntlmsspi - Use NTLMv2 password hashing encapsulated in Raw NTLMSSP message, and force packet signing
+ .RE
+ .sp
++The default in mainline kernel versions prior to v3.8 was sec=ntlm. In v3.8, the default was changed to sec=ntlmssp.
++.sp
+ If the server requires signing during protocol negotiation, then it may be enabled automatically. Packet signing may also be enabled automatically if it's enabled in /proc/fs/cifs/SecurityFlags.
+ .RE
+ .PP
+-- 
+1.7.11.7
