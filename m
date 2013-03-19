@@ -1,101 +1,78 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v3] cifs: map NT_STATUS_SHARING_VIOLATION to EBUSY
- instead of ETXTBSY
-Date: Tue, 19 Mar 2013 09:32:35 -0400
-Message-ID: <20130319093235.08c4ca0e@tlielax.poochiereds.net>
-References: <1363697464-7564-1-git-send-email-sprabhu@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] manpage: document the mount.cifs vers= option
+Date: Tue, 19 Mar 2013 10:35:10 -0400
+Message-ID: <1363703710-23683-1-git-send-email-jlayton@samba.org>
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1363697464-7564-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 19 Mar 2013 12:51:04 +0000
-Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.8 | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-> NT_SHARING_VIOLATION errors are mapped to ETXTBSY which is unexpected
-> for operations such as unlink where we can hit these errors.
-> 
-> The patch maps the error NT_SHARING_VIOLATION to EBUSY instead. The
-> patch also replaces all instances of ETXTBSY in
-> cifs_rename_pending_delete() with EBUSY.
-> 
-> The patch was a result of a user reporting a ETXTBSY error on performing
-> an unlink operation caused by the server returning a
-> NT_SHARING_VIOLATION.
-> 
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/inode.c   | 10 ++++------
->  fs/cifs/netmisc.c |  2 +-
->  2 files changed, 5 insertions(+), 7 deletions(-)
-> 
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index fee2d40..b97ca5b 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1034,7 +1034,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
->  				   cifs_sb->mnt_cifs_flags &
->  					    CIFS_MOUNT_MAP_SPECIAL_CHR);
->  	if (rc != 0) {
-> -		rc = -ETXTBSY;
-> +		rc = -EBUSY;
->  		goto undo_setattr;
->  	}
->  
-> @@ -1053,7 +1053,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
->  		if (rc == -ENOENT)
->  			rc = 0;
->  		else if (rc != 0) {
-> -			rc = -ETXTBSY;
-> +			rc = -EBUSY;
->  			goto undo_rename;
->  		}
->  		cifsInode->delete_pending = true;
-> @@ -1160,15 +1160,13 @@ psx_del_no_retry:
->  			cifs_drop_nlink(inode);
->  	} else if (rc == -ENOENT) {
->  		d_drop(dentry);
-> -	} else if (rc == -ETXTBSY) {
-> +	} else if (rc == -EBUSY) {
->  		if (server->ops->rename_pending_delete) {
->  			rc = server->ops->rename_pending_delete(full_path,
->  								dentry, xid);
->  			if (rc == 0)
->  				cifs_drop_nlink(inode);
->  		}
-> -		if (rc == -ETXTBSY)
-> -			rc = -EBUSY;
->  	} else if ((rc == -EACCES) && (dosattr == 0) && inode) {
->  		attrs = kzalloc(sizeof(*attrs), GFP_KERNEL);
->  		if (attrs == NULL) {
-> @@ -1509,7 +1507,7 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
->  	 * source. Note that cross directory moves do not work with
->  	 * rename by filehandle to various Windows servers.
->  	 */
-> -	if (rc == 0 || rc != -ETXTBSY)
-> +	if (rc == 0 || rc != -EBUSY)
->  		goto do_rename_exit;
->  
->  	/* open-file renames don't work across directories */
-> diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-> index a82bc51..c0b25b2 100644
-> --- a/fs/cifs/netmisc.c
-> +++ b/fs/cifs/netmisc.c
-> @@ -62,7 +62,7 @@ static const struct smb_to_posix_error mapping_table_ERRDOS[] = {
->  	{ERRdiffdevice, -EXDEV},
->  	{ERRnofiles, -ENOENT},
->  	{ERRwriteprot, -EROFS},
-> -	{ERRbadshare, -ETXTBSY},
-> +	{ERRbadshare, -EBUSY},
->  	{ERRlock, -EACCES},
->  	{ERRunsup, -EINVAL},
->  	{ERRnosuchshare, -ENXIO},
-
-Looks correct to me.
-
-Reviewed-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+diff --git a/mount.cifs.8 b/mount.cifs.8
+index a4fdd98..6f105ad 100644
+--- a/mount.cifs.8
++++ b/mount.cifs.8
+@@ -539,6 +539,57 @@ prefixpath=
+ It's possible to mount a subdirectory of a share. The preferred way to do this is to append the path to the UNC when mounting. However, it's also possible to do the same by setting this option and providing the path there.
+ .RE
+ .PP
++vers=
++.RS 4
++SMB protocol version. Allowed values are:
++.sp
++.RS 4
++.ie n \{\
++\h'-04'\(bu\h'+03'\c
++.\}
++.el \{\
++.sp -1
++.IP \(bu 2.3
++.\}
++1.0 - SMBv1.0: The classic SMB/CIFS protocol. This is the default.
++.RE
++.sp
++.RS 4
++.ie n \{\
++\h'-04'\(bu\h'+03'\c
++.\}
++.el \{\
++.sp -1
++.IP \(bu 2.3
++.\}
++2.0 - SMBv2.0: The SMB2.0 protocol which was introduced in Microsoft Windows Vista.
++.RE
++.sp
++.RS 4
++.ie n \{\
++\h'-04'\(bu\h'+03'\c
++.\}
++.el \{\
++.sp -1
++.IP \(bu 2.3
++.\}
++2.1 - SMBv2.1: The SMB2.1 protocol that was introduced in Microsoft Windows 7.
++.RE
++.sp
++.RS 4
++.ie n \{\
++\h'-04'\(bu\h'+03'\c
++.\}
++.el \{\
++.sp -1
++.IP \(bu 2.3
++.\}
++3.0 - SMBv3.0: The SMB3.0 protocol that was introduced in Microsoft Windows 8 and Server 2012.
++.RE
++.PP
++Note too that while this option governs the protocol version used, not all features of each version are available.
++.RE
++.PP
+ \-\-verbose
+ .RS 4
+ Print additional debugging information for the mount\&. Note that this parameter must be specified before the \-o\&. For example:
+-- 
+1.7.11.7
