@@ -1,84 +1,46 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: [PATCH v3] manpage: document the mount.cifs vers= option
-Date: Wed, 20 Mar 2013 07:21:53 -0400
-Message-ID: <1363778513-12864-1-git-send-email-jlayton@samba.org>
-References: <614F550557B82C44AC27C492ADA391AA04606FB9@TK5EX14MBXC285.redmond.corp.microsoft.com>
-Cc: ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: [GIT] CIFS Fixes
+Date: Thu, 21 Mar 2013 17:41:17 -0500
+Message-ID: <CAH2r5msOBKtD1QSoToLNbR0Uvf=z2f41+BRcxqm3fd8f1EE5jw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <614F550557B82C44AC27C492ADA391AA04606FB9-Jfd81uAzPQtyiMsAzRo9Q1ir+X/St4rqwBk/1ggFUS45P9zcU8sUGwC/G2K4zDHf@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Thanks to Tom Talpey for clarifying some of the info here.
+3 small CIFS Fixes (the most important of the three fixes a recent
+problem authenticating
+to Windows 8 using cifs rather than SMB2)
 
-Cc: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
----
- mount.cifs.8 | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+The following changes since commit 6c23cbbd5056b155401b0a2b5567d530e6c750c4:
+  Randy Dunlap (1):
+        futex: fix kernel-doc notation and spello
 
-diff --git a/mount.cifs.8 b/mount.cifs.8
-index a4fdd98..515bd40 100644
---- a/mount.cifs.8
-+++ b/mount.cifs.8
-@@ -539,6 +539,57 @@ prefixpath=
- It's possible to mount a subdirectory of a share. The preferred way to do this is to append the path to the UNC when mounting. However, it's also possible to do the same by setting this option and providing the path there.
- .RE
- .PP
-+vers=
-+.RS 4
-+SMB protocol version. Allowed values are:
-+.sp
-+.RS 4
-+.ie n \{\
-+\h'-04'\(bu\h'+03'\c
-+.\}
-+.el \{\
-+.sp -1
-+.IP \(bu 2.3
-+.\}
-+1.0 - The classic CIFS/SMBv1 protocol. This is the default.
-+.RE
-+.sp
-+.RS 4
-+.ie n \{\
-+\h'-04'\(bu\h'+03'\c
-+.\}
-+.el \{\
-+.sp -1
-+.IP \(bu 2.3
-+.\}
-+2.0 - The SMBv2.002 protocol. This was initially introduced in Windows Vista Service Pack 1, and Windows Server 2008. Note that the initial release version of Windows Vista spoke a slightly different dialect (2.000) that is not supported.
-+.RE
-+.sp
-+.RS 4
-+.ie n \{\
-+\h'-04'\(bu\h'+03'\c
-+.\}
-+.el \{\
-+.sp -1
-+.IP \(bu 2.3
-+.\}
-+2.1 - The SMBv2.1 protocol that was introduced in Microsoft Windows 7 and Windows Server 2008R2.
-+.RE
-+.sp
-+.RS 4
-+.ie n \{\
-+\h'-04'\(bu\h'+03'\c
-+.\}
-+.el \{\
-+.sp -1
-+.IP \(bu 2.3
-+.\}
-+3.0 - The SMBv3.0 protocol that was introduced in Microsoft Windows 8 and Windows Server 2012.
-+.RE
-+.PP
-+Note too that while this option governs the protocol version used, not all features of each version are available.
-+.RE
-+.PP
- \-\-verbose
- .RS 4
- Print additional debugging information for the mount\&. Note that this parameter must be specified before the \-o\&. For example:
+are available in the git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git for-next
+
+Jeff Layton (1):
+      cifs: ignore everything in SPNEGO blob after mechTypes
+
+Mateusz Guzik (1):
+      cifs: delay super block destruction until all cifsFileInfo
+objects are gone
+
+Sachin Prabhu (1):
+      cifs: map NT_STATUS_SHARING_VIOLATION to EBUSY instead of ETXTBSY
+
+ fs/cifs/asn1.c    |   53 +++++------------------------------------------------
+ fs/cifs/cifsfs.c  |   24 ++++++++++++++++++++++++
+ fs/cifs/cifsfs.h  |    4 ++++
+ fs/cifs/file.c    |    6 +++++-
+ fs/cifs/inode.c   |   10 ++++------
+ fs/cifs/netmisc.c |    2 +-
+ 6 files changed, 43 insertions(+), 56 deletions(-)
+
 -- 
-1.7.11.7
+Thanks,
+
+Steve
