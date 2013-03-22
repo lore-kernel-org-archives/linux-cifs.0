@@ -1,46 +1,71 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Thu, 21 Mar 2013 17:41:17 -0500
-Message-ID: <CAH2r5msOBKtD1QSoToLNbR0Uvf=z2f41+BRcxqm3fd8f1EE5jw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: [PATCH] mount.cifs: remove support for "NFS syntax"
+Date: Fri, 22 Mar 2013 06:50:07 -0400
+Message-ID: <1363949407-6327-1-git-send-email-jlayton@samba.org>
+Cc: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-3 small CIFS Fixes (the most important of the three fixes a recent
-problem authenticating
-to Windows 8 using cifs rather than SMB2)
+...as promised for version 6.0.
 
-The following changes since commit 6c23cbbd5056b155401b0a2b5567d530e6c750c4:
-  Randy Dunlap (1):
-        futex: fix kernel-doc notation and spello
+Cc: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+---
+ mount.cifs.c | 38 ++++++++++----------------------------
+ 1 file changed, 10 insertions(+), 28 deletions(-)
 
-are available in the git repository at:
-
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
-
-Jeff Layton (1):
-      cifs: ignore everything in SPNEGO blob after mechTypes
-
-Mateusz Guzik (1):
-      cifs: delay super block destruction until all cifsFileInfo
-objects are gone
-
-Sachin Prabhu (1):
-      cifs: map NT_STATUS_SHARING_VIOLATION to EBUSY instead of ETXTBSY
-
- fs/cifs/asn1.c    |   53 +++++------------------------------------------------
- fs/cifs/cifsfs.c  |   24 ++++++++++++++++++++++++
- fs/cifs/cifsfs.h  |    4 ++++
- fs/cifs/file.c    |    6 +++++-
- fs/cifs/inode.c   |   10 ++++------
- fs/cifs/netmisc.c |    2 +-
- 6 files changed, 43 insertions(+), 56 deletions(-)
-
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 40b77e9..496a2c8 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1232,36 +1232,18 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
+ 		return EX_USAGE;
+ 	}
+ 
+-	/* Set up "host" and "share" pointers based on UNC format. */
+-	/* TODO: Remove support for NFS syntax as of cifs-utils-6.0. */
+ 	if (strncmp(unc_name, "//", 2) && strncmp(unc_name, "\\\\", 2)) {
+-		/*
+-		 * check for nfs syntax (server:/share/prepath)
+-		 *
+-		 * FIXME: IPv6 addresses?
+-		 */
+-		host = unc_name;
+-		share = strchr(host, ':');
+-		if (!share) {
+-			fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
+-			return EX_USAGE;
+-		}
+-		hostlen = share - host;
+-		share++;
+-		if (*share == '/')
+-			++share;
+-		fprintf(stderr, "WARNING: using NFS syntax for mounting CIFS "
+-			"shares is deprecated and will be removed in cifs-utils"
+-			"-6.0. Please migrate to UNC syntax.\n");
+-	} else {
+-		host = unc_name + 2;
+-		hostlen = strcspn(host, "/\\");
+-		if (!hostlen) {
+-			fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
+-			return EX_USAGE;
+-		}
+-		share = host + hostlen + 1;
++		fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
++		return EX_USAGE;
++	}
++
++	host = unc_name + 2;
++	hostlen = strcspn(host, "/\\");
++	if (!hostlen) {
++		fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
++		return EX_USAGE;
+ 	}
++	share = host + hostlen + 1;
+ 
+ 	if (hostlen + 1 > sizeof(parsed_info->host)) {
+ 		fprintf(stderr, "mount.cifs: host portion of UNC too long\n");
 -- 
-Thanks,
-
-Steve
+1.7.11.7
