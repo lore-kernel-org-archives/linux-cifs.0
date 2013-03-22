@@ -1,66 +1,84 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: remove ENOSPC handling in smb_sendv
-Date: Fri, 22 Mar 2013 10:27:06 -0400
-Message-ID: <20130322102706.7846c120@tlielax.poochiereds.net>
-References: <1363956226-10179-1-git-send-email-jlayton@redhat.com>
-	<514C63E9.7070502@novell.com>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: remove support for "NFS syntax"
+Date: Fri, 22 Mar 2013 11:11:08 -0400
+Message-ID: <CAFB9KM2pjN9CNqn_6sZM+HVBBoNuE1fYUH2NiEy+Mjn74X9Psw@mail.gmail.com>
+References: <1363949407-6327-1-git-send-email-jlayton@samba.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <514C63E9.7070502-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1363949407-6327-1-git-send-email-jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 22 Mar 2013 19:30:09 +0530
-Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org> wrote:
+On Fri, Mar 22, 2013 at 6:50 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>
+> ...as promised for version 6.0.
+>
+> Cc: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> Signed-off-by: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+> ---
+>  mount.cifs.c | 38 ++++++++++----------------------------
+>  1 file changed, 10 insertions(+), 28 deletions(-)
+>
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 40b77e9..496a2c8 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -1232,36 +1232,18 @@ static int parse_unc(const char *unc_name, struct parsed_mount_info *parsed_info
+>                 return EX_USAGE;
+>         }
+>
+> -       /* Set up "host" and "share" pointers based on UNC format. */
+> -       /* TODO: Remove support for NFS syntax as of cifs-utils-6.0. */
+>         if (strncmp(unc_name, "//", 2) && strncmp(unc_name, "\\\\", 2)) {
+> -               /*
+> -                * check for nfs syntax (server:/share/prepath)
+> -                *
+> -                * FIXME: IPv6 addresses?
+> -                */
+> -               host = unc_name;
+> -               share = strchr(host, ':');
+> -               if (!share) {
+> -                       fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
+> -                       return EX_USAGE;
+> -               }
+> -               hostlen = share - host;
+> -               share++;
+> -               if (*share == '/')
+> -                       ++share;
+> -               fprintf(stderr, "WARNING: using NFS syntax for mounting CIFS "
+> -                       "shares is deprecated and will be removed in cifs-utils"
+> -                       "-6.0. Please migrate to UNC syntax.\n");
+> -       } else {
+> -               host = unc_name + 2;
+> -               hostlen = strcspn(host, "/\\");
+> -               if (!hostlen) {
+> -                       fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
+> -                       return EX_USAGE;
+> -               }
+> -               share = host + hostlen + 1;
+> +               fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
+> +               return EX_USAGE;
+> +       }
+> +
+> +       host = unc_name + 2;
+> +       hostlen = strcspn(host, "/\\");
+> +       if (!hostlen) {
+> +               fprintf(stderr, "mount.cifs: bad UNC (%s)\n", unc_name);
+> +               return EX_USAGE;
+>         }
+> +       share = host + hostlen + 1;
+>
+>         if (hostlen + 1 > sizeof(parsed_info->host)) {
+>                 fprintf(stderr, "mount.cifs: host portion of UNC too long\n");
+> --
+> 1.7.11.7
+>
 
-> On 03/22/2013 06:13 PM, Jeff Layton wrote:
-> > To my knowledge, no one ever reported seeing this pop.
-> 
-> 
-> > Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
-> 
-> Seemed to have missed Cc Tag.
-> 
++1.  Looks good to me.
 
-Doh!
-
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/transport.c | 8 +-------
-> >  1 file changed, 1 insertion(+), 7 deletions(-)
-> > 
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index cf8bf69..653bf26 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -179,13 +179,7 @@ smb_send_kvec(struct TCP_Server_Info *server, struct kvec *iov, size_t n_vec,
-> >  		 */
-> >  		rc = kernel_sendmsg(ssocket, &smb_msg, &iov[first_vec],
-> >  				    n_vec - first_vec, remaining);
-> > -		if (rc == -ENOSPC || rc == -EAGAIN) {
-> > -			/*
-> > -			 * Catch if a low level driver returns -ENOSPC. This
-> > -			 * WARN_ON will be removed by 3.10 if no one reports
-> > -			 * seeing this.
-> > -			 */
-> > -			WARN_ON_ONCE(rc == -ENOSPC);
-> > +		if (rc == -EAGAIN) {
-> >  			i++;
-> >  			if (i >= 14 || (!server->noblocksnd && (i > 2))) {
-> >  				cifs_dbg(VFS, "sends on sock %p stuck for 15 seconds\n",
-> > 
-> 
-> Agreed. I have not seen any reports too. Looks good to me.
-> 
-> Acked-by: Suresh Jayaraman <sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org>
-> 
-
-I replaced the bogus Cc: line with your Acked-by: in my repo.
-
-Thanks,
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+Peace and Blessings,
+-Scott.
