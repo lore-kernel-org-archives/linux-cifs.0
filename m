@@ -1,17 +1,39 @@
-From: Jonna Birgit Jacobsen <d126101-mMbsZB4eUVp/SzgSGea1oA@public.gmane.org>
-Subject: Re:
-Date: Mon, 25 Mar 2013 21:00:16 +0100
-Message-ID: <FB1FB6EEA610EC4F9136939637C950E601E8C2D75DC9@PEMEXVS01.hosting.local>
+From: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Enhancement needed to UNIX extensions to correctly support Linux
+ EA's.
+Date: Tue, 26 Mar 2013 14:22:42 -0700
+Message-ID: <20130326212242.GA4391@samba2>
+Reply-To: Jeremy Allison <jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: Undisclosed recipients:;
+Content-Type: text/plain; charset=us-ascii
+Cc: jra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
+Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Contact us for quick, secure and reliable loan with 3% interest rate if you are interested in loan contact us with the following email address:resortsavingsandloans-DYgPsCc4EBdcc8MDMThsPA@public.gmane.org
-To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+See bug https://bugzilla.samba.org/show_bug.cgi?id=9743
+
+No way to set zero length EA's with CIFS vfs.
+
+I was doing some investigations around bug #9130, where Windows fails to copy a
+file when we return a zero-length EA associated with it.
+
+Looking carefully into this this is a deficiency in the CIFS UNIX protocols. On
+Linux it's possible to set a zero-length EA on a file/directory as a tag of
+some kind, with no associated data.
+
+On Windows this is impossible - trying to set a zero-length EA will just delete
+it, plus the EA names are case insensitive (and always returned uppercase).
+
+We need to add a UNIX_GET_EAS call that can return all POSIX EA's without
+mangling case, and can also return zero-length EA's, also we need a
+UNIX_SET_EAS call that can set a zero length EA, and also has an additional
+'flags' field that can delete an EA if set.
+
+Please discuss,
+
+Jeremy.
