@@ -1,68 +1,127 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH] cifs: store the real expected sequence number in the mid
-Date: Wed,  3 Apr 2013 14:07:56 -0400
-Message-ID: <1365012476-6885-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+From: Michael Mol <mikemol-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] cifs: on send failure, readjust server sequence number
+ downward
+Date: Wed, 03 Apr 2013 14:54:42 -0400
+Message-ID: <515C7AF2.3090902@gmail.com>
+References: <1365012430-6795-1-git-send-email-jlayton@redhat.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="----enig2IAQDSMRNQSXOKAAJQDRV"
+Cc: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1365012430-6795-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Currently, the signing routines take a pointer to a place to store the
-expected sequence number for the mid response. It then stores a value
-that's one below what that sequence number should be, and then adds one
-to it when verifying the signature on the response.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+------enig2IAQDSMRNQSXOKAAJQDRV
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Increment the sequence number before storing the value in the mid, and
-eliminate the "+1" when checking the signature.
+On 04/03/2013 02:07 PM, Jeff Layton wrote:
+> If sending a call to the server fails for some reason (for instance, th=
+e
+> sending thread caught a signal), then we must readjust the sequence
+> number downward again or the next send will have it too high.
+>=20
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/smb1ops.c   |  3 +++
+>  fs/cifs/transport.c | 13 +++++++++++++
+>  2 files changed, 16 insertions(+)
+>=20
+> diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+> index 23bcd11..3efdb9d 100644
+> --- a/fs/cifs/smb1ops.c
+> +++ b/fs/cifs/smb1ops.c
+> @@ -61,6 +61,9 @@ send_nt_cancel(struct TCP_Server_Info *server, void *=
+buf,
+>  	 */
+>  	--server->sequence_number;
+>  	rc =3D smb_send(server, in_buf, be32_to_cpu(in_buf->smb_buf_length));=
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
----
- fs/cifs/cifsencrypt.c | 4 ++--
- fs/cifs/cifssmb.c     | 2 +-
- fs/cifs/transport.c   | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+> +	if (rc < 0)
+> +		server->sequence_number--;
+> +
+>  	mutex_unlock(&server->srv_mutex);
+> =20
+>  	cifs_dbg(FYI, "issued NT_CANCEL for mid %u, rc =3D %d\n",
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 653bf26..293d2c8 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -522,6 +522,9 @@ cifs_call_async(struct TCP_Server_Info *server, str=
+uct smb_rqst *rqst,
+>  	rc =3D smb_send_rqst(server, rqst);
+>  	cifs_in_send_dec(server);
+>  	cifs_save_when_sent(mid);
+> +
+> +	if (rc < 0)
+> +		server->sequence_number -=3D 2;
+>  	mutex_unlock(&server->srv_mutex);
+> =20
+>  	if (rc =3D=3D 0)
+> @@ -711,6 +714,8 @@ SendReceive2(const unsigned int xid, struct cifs_se=
+s *ses,
+>  	cifs_in_send_dec(ses->server);
+>  	cifs_save_when_sent(midQ);
+> =20
+> +	if (rc < 0)
+> +		ses->server->sequence_number -=3D 2;
+>  	mutex_unlock(&ses->server->srv_mutex);
+> =20
+>  	if (rc < 0) {
+> @@ -835,6 +840,10 @@ SendReceive(const unsigned int xid, struct cifs_se=
+s *ses,
+>  	rc =3D smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_leng=
+th));
+>  	cifs_in_send_dec(ses->server);
+>  	cifs_save_when_sent(midQ);
+> +
+> +	if (rc < 0)
+> +		ses->server->sequence_number -=3D 2;
+> +
+>  	mutex_unlock(&ses->server->srv_mutex);
+> =20
+>  	if (rc < 0)
+> @@ -968,6 +977,10 @@ SendReceiveBlockingLock(const unsigned int xid, st=
+ruct cifs_tcon *tcon,
+>  	rc =3D smb_send(ses->server, in_buf, be32_to_cpu(in_buf->smb_buf_leng=
+th));
+>  	cifs_in_send_dec(ses->server);
+>  	cifs_save_when_sent(midQ);
+> +
+> +	if (rc < 0)
+> +		ses->server->sequence_number -=3D 2;
+> +
+>  	mutex_unlock(&ses->server->srv_mutex);
+> =20
+>  	if (rc < 0) {
+>=20
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 2cbbec6..71436d1 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -135,8 +135,8 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 				cpu_to_le32(server->sequence_number);
- 	cifs_pdu->Signature.Sequence.Reserved = 0;
- 
--	*pexpected_response_sequence_number = server->sequence_number++;
--	server->sequence_number++;
-+	*pexpected_response_sequence_number = ++server->sequence_number;
-+	++server->sequence_number;
- 
- 	rc = cifs_calc_signature(rqst, server, smb_signature);
- 	if (rc)
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 076d7ed..4060c45 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1545,7 +1545,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 			int rc = 0;
- 
- 			rc = cifs_verify_signature(&rqst, server,
--						  mid->sequence_number + 1);
-+						  mid->sequence_number);
- 			if (rc)
- 				cifs_dbg(VFS, "SMB signature verification returned error = %d\n",
- 					 rc);
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 293d2c8..bfbf470 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -622,7 +622,7 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 		iov.iov_len = len;
- 		/* FIXME: add code to kill session */
- 		rc = cifs_verify_signature(&rqst, server,
--					   mid->sequence_number + 1);
-+					   mid->sequence_number);
- 		if (rc)
- 			cifs_dbg(VFS, "SMB signature verification returned error = %d\n",
- 				 rc);
--- 
-1.7.11.7
+I was re-prioritized...I'll test the patches you'd like me to test just
+as soon as I can. At that point, I'll prod the list and ask for an
+up-to-date list of the patchset you'd like me to try.
+
+
+------enig2IAQDSMRNQSXOKAAJQDRV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBAgAGBQJRXHr1AAoJED5TcEBdxYwQrVEH+QFs3HkFbPBOGWuDnyajHUW9
+uvq59vYvEEc4pbFYYAGIInIQBrbcF8Joh9RwOfbYQFuJe6vxt/832HVM1xh30/6T
+3MvwFL4VjHGAb4vYQeSrRWBAB33S0wgwTbWRZGQv5rjVLV4FCGD5aKL21al3tvaZ
+6Uw+wtZd1UXAyNumnt8SR9ldL1C0Cw5yRLITsWy4XKhZRduPqNwgsE9+BeQ+sS+C
+4AEHb68r9feFoKBEH4NZyxqRNGTappXJFczApi3ViQaihJWUbagWc+RQqzJL8qhG
+BVDFItI7Xooprk/txxDlBzz3odeXnQpoOMeT4Pwjc+6jyctkz9EvX9CnipfsPlw=
+=3pNW
+-----END PGP SIGNATURE-----
+
+------enig2IAQDSMRNQSXOKAAJQDRV--
