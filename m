@@ -1,79 +1,49 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH] cifs: store the real expected sequence number in the mid
-Date: Thu, 4 Apr 2013 01:38:08 -0500
-Message-ID: <CAH2r5mt_ySSxn1hhAtdc8x16obrJf3P4r+=rZoLKF_O8gkMxBg@mail.gmail.com>
-References: <1365012476-6885-1-git-send-email-jlayton@redhat.com>
+Subject: Re: [PATCH -next] CIFS: fix error return code in cifs_atomic_open()
+Date: Thu, 4 Apr 2013 01:42:53 -0500
+Message-ID: <CAH2r5ms_NK_zsbKW9JbkZj2=jvRj9FB6HDsgMVt1PJm5mToz0Q@mail.gmail.com>
+References: <CAPgLHd-3rC7ZJz+SWnd-Gt1C9RxtPs58OCCMgOeHvgdT3TFj5A@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>, yongjun_wei-zrsr2BFq86L20UzCJQGyNP8+0UxHXcjY@public.gmane.org,
+	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Wei Yongjun <weiyj.lk-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1365012476-6885-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <CAPgLHd-3rC7ZJz+SWnd-Gt1C9RxtPs58OCCMgOeHvgdT3TFj5A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Merged into cifs-2.6.git for-next (along with the other patch) -
-destined for 3.10 unles anyone objects
+Your fix looks correct - do you have a problem reproduction scenario
+where you encountered this?
 
-On Wed, Apr 3, 2013 at 1:07 PM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> Currently, the signing routines take a pointer to a place to store the
-> expected sequence number for the mid response. It then stores a value
-> that's one below what that sequence number should be, and then adds one
-> to it when verifying the signature on the response.
+On Thu, Apr 4, 2013 at 1:16 AM, Wei Yongjun <weiyj.lk-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> From: Wei Yongjun <yongjun_wei-zrsr2BFq86L20UzCJQGyNP8+0UxHXcjY@public.gmane.org>
 >
-> Increment the sequence number before storing the value in the mid, and
-> eliminate the "+1" when checking the signature.
+> Fix to return a negative error code from the error handling
+> case instead of 0, as returned elsewhere in this function.
 >
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> Signed-off-by: Wei Yongjun <yongjun_wei-zrsr2BFq86L20UzCJQGyNP8+0UxHXcjY@public.gmane.org>
 > ---
->  fs/cifs/cifsencrypt.c | 4 ++--
->  fs/cifs/cifssmb.c     | 2 +-
->  fs/cifs/transport.c   | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+>  fs/cifs/dir.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 2cbbec6..71436d1 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -135,8 +135,8 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
->                                 cpu_to_le32(server->sequence_number);
->         cifs_pdu->Signature.Sequence.Reserved = 0;
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 46e455e..5699b50 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -457,8 +457,10 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
+>                  inode, direntry->d_name.name, direntry);
 >
-> -       *pexpected_response_sequence_number = server->sequence_number++;
-> -       server->sequence_number++;
-> +       *pexpected_response_sequence_number = ++server->sequence_number;
-> +       ++server->sequence_number;
+>         tlink = cifs_sb_tlink(CIFS_SB(inode->i_sb));
+> -       if (IS_ERR(tlink))
+> +       if (IS_ERR(tlink)) {
+> +               rc = PTR_ERR(tlink);
+>                 goto out_free_xid;
+> +       }
 >
->         rc = cifs_calc_signature(rqst, server, smb_signature);
->         if (rc)
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 076d7ed..4060c45 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -1545,7 +1545,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
->                         int rc = 0;
->
->                         rc = cifs_verify_signature(&rqst, server,
-> -                                                 mid->sequence_number + 1);
-> +                                                 mid->sequence_number);
->                         if (rc)
->                                 cifs_dbg(VFS, "SMB signature verification returned error = %d\n",
->                                          rc);
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 293d2c8..bfbf470 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -622,7 +622,7 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
->                 iov.iov_len = len;
->                 /* FIXME: add code to kill session */
->                 rc = cifs_verify_signature(&rqst, server,
-> -                                          mid->sequence_number + 1);
-> +                                          mid->sequence_number);
->                 if (rc)
->                         cifs_dbg(VFS, "SMB signature verification returned error = %d\n",
->                                  rc);
-> --
-> 1.7.11.7
+>         tcon = tlink_tcon(tlink);
+>         server = tcon->ses->server;
 >
 
 
