@@ -1,206 +1,119 @@
-From: Waiman Long <Waiman.Long-VXdhtT5mjnY@public.gmane.org>
-Subject: [PATCH RFC v2 2/4] dcache: introduce a new sequence read/write lock type
-Date: Fri,  5 Apr 2013 12:57:39 -0400
-Message-ID: <1365181061-30787-3-git-send-email-Waiman.Long@hp.com>
-References: <1365181061-30787-1-git-send-email-Waiman.Long@hp.com>
-Cc: Waiman Long <Waiman.Long-VXdhtT5mjnY@public.gmane.org>, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, autofs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	"Chandramouleeswaran, Aswin" <aswin-VXdhtT5mjnY@public.gmane.org>,
-	"Norton, Scott J" <scott.norton-VXdhtT5mjnY@public.gmane.org>,
-	Andi Kleen <andi-Vw/NltI1exuRpAAqCnN02g@public.gmane.org>,
-	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
-To: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
-	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Miklos Szeredi <mszeredi-AlSwsSmVLrQ@public.gmane.org>, Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>,
-	Sage Weil <sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
-	Eric Paris <eparis-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Subject: [PATCH v4 3/7] CIFS: Add O_DENY* open flags support
+Date: Fri,  5 Apr 2013 20:57:51 +0400
+Message-ID: <1365181075-22540-4-git-send-email-piastry@etersoft.ru>
+References: <1365181075-22540-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
+To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1365181061-30787-1-git-send-email-Waiman.Long-VXdhtT5mjnY@public.gmane.org>
+In-Reply-To: <1365181075-22540-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The current sequence lock supports 2 types of lock users:
+Construct share_access value from O_DENY* flags and send it to
+the server.
 
-1. A reader who wants a consistent set of information and is willing
-   to retry if the information changes. The information that the
-   reader needs cannot contain pointers, because any writer could
-   invalidate a pointer that a reader was following. This reader
-   will never block but they may have to retry if a writer is in
-   progress.
-2. A writer who may need to modify content of a data structure. Writer
-   blocks only if another writer is in progress.
-
-This type of lock is suitable for cases where there are a large number
-of readers and much less writers. However, it has a limitation that
-reader who may want to follow pointer or cannot tolerate unexpected
-changes in the protected data structure must take the writer lock
-even if it doesn't need to make any changes.
-
-To more efficiently support this type of readers, a new lock type is
-introduced by this patch: sequence read/write lock. Two types of readers
-are supported by this new lock:
-
-1. Reader who has the same behavior as a sequence lock reader.
-2. Reader who may need to follow pointers. This reader will block if
-   a writer is in progress. In turn, it blocks a writer if it is in
-   progress. Multiple readers of this type can proceed concurrently.
-   Taking this reader lock won't update the sequence number.
-
-This new lock type is a combination of the sequence lock and read/write
-lock. Hence it will have the same limitation of a read/write lock that
-writers may be starved if there is a lot of contention.
-
-Signed-off-by: Waiman Long <Waiman.Long-VXdhtT5mjnY@public.gmane.org>
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- include/linux/seqrwlock.h |  137 +++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 137 insertions(+), 0 deletions(-)
- create mode 100644 include/linux/seqrwlock.h
+ fs/cifs/cifsglob.h | 16 +++++++++++++++-
+ fs/cifs/dir.c      |  3 +++
+ fs/cifs/file.c     |  4 ++++
+ fs/locks.c         |  8 ++++++++
+ 4 files changed, 30 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/seqrwlock.h b/include/linux/seqrwlock.h
-new file mode 100644
-index 0000000..c6145ff
---- /dev/null
-+++ b/include/linux/seqrwlock.h
-@@ -0,0 +1,137 @@
-+#ifndef __LINUX_SEQRWLOCK_H
-+#define __LINUX_SEQRWLOCK_H
-+/*
-+ * Sequence Read/Write Lock
-+ * ------------------------
-+ * This new lock type is a combination of the sequence lock and read/write
-+ * lock. Three types of lock users are supported:
-+ * 1. Reader who wants a consistent set of information and is willing to
-+ *    retry if the information changes. The information that the reader
-+ *    need cannot contain pointers, because any writer could invalidate
-+ *    a pointer that a reader was following. This reader never block but
-+ *    they may have to retry if a writer is in progress.
-+ * 2. Reader who may need to follow pointers. This reader will block if
-+ *    a writer is in progress.
-+ * 3. Writer who may need to modify content of a data structure. Writer
-+ *    blocks if another writer or the 2nd type of reader is in progress.
-+ *
-+ * The current implementation layered on top of the regular read/write
-+ * lock. There is a chance that the writers may be starved by the readers.
-+ * So be careful when you decided to use this lock.
-+ *
-+ * Expected 1st type reader usage:
-+ * 	do {
-+ *	    seq = read_seqrwbegin(&foo);
-+ * 	...
-+ *      } while (read_seqrwretry(&foo, seq));
-+ *
-+ * Expected 2nd type reader usage:
-+ * 	read_seqrwlock(&foo)
-+ * 	...
-+ * 	read_seqrwunlock(&foo)
-+ *
-+ * Expected writer usage:
-+ * 	write_seqrwlock(&foo)
-+ * 	...
-+ * 	write_seqrwunlock(&foo)
-+ *
-+ * Based on the seqlock.h file
-+ * by Waiman Long
-+ */
-+
-+#include <linux/rwlock.h>
-+#include <linux/preempt.h>
-+#include <asm/processor.h>
-+
-+typedef struct {
-+	unsigned sequence;
-+	rwlock_t lock;
-+} seqrwlock_t;
-+
-+#define __SEQRWLOCK_UNLOCKED(lockname) \
-+		 { 0, __RW_LOCK_UNLOCKED(lockname) }
-+
-+#define seqrwlock_init(x)				\
-+	do {						\
-+		(x)->sequence = 0;			\
-+		rwlock_init(&(x)->lock);		\
-+	} while (0)
-+
-+#define DEFINE_SEQRWLOCK(x) \
-+		seqrwlock_t x = __SEQRWLOCK_UNLOCKED(x)
-+
-+/* For writer:
-+ * Lock out other writers and 2nd type of readers and update the sequence
-+ * number. Don't need preempt_disable() because that is in the read_lock and
-+ * write_lock already.
-+ */
-+static inline void write_seqrwlock(seqrwlock_t *sl)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index cd4bbf3..7e876b9 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -465,7 +465,7 @@ struct smb_vol {
+ 			 CIFS_MOUNT_CIFS_BACKUPUID | CIFS_MOUNT_CIFS_BACKUPGID)
+ 
+ #define CIFS_MS_MASK (MS_RDONLY | MS_MANDLOCK | MS_NOEXEC | MS_NOSUID | \
+-		      MS_NODEV | MS_SYNCHRONOUS)
++		      MS_NODEV | MS_SYNCHRONOUS | MS_SHARELOCK)
+ 
+ struct cifs_mnt_data {
+ 	struct cifs_sb_info *cifs_sb;
+@@ -947,6 +947,20 @@ struct cifsFileInfo {
+ 	struct work_struct oplock_break; /* work for oplock breaks */
+ };
+ 
++static inline int
++cifs_get_share_flags(unsigned int flags)
 +{
-+	write_lock(&sl->lock);
-+	++sl->sequence;
-+	smp_wmb();
++	int share_access = 0;
++
++	if (!(flags & O_DENYREAD))
++		share_access |= FILE_SHARE_READ;
++	if (!(flags & O_DENYWRITE))
++		share_access |= FILE_SHARE_WRITE;
++	if (!(flags & O_DENYDELETE))
++		share_access |= FILE_SHARE_DELETE;
++	return share_access;
 +}
 +
-+static inline void write_seqrwunlock(seqrwlock_t *sl)
-+{
-+	smp_wmb();
-+	sl->sequence++;
-+	write_unlock(&sl->lock);
-+}
+ struct cifs_io_parms {
+ 	__u16 netfid;
+ #ifdef CONFIG_CIFS_SMB2
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 267b608..d4331de 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -294,6 +294,9 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
+ 	else
+ 		cFYI(1, "Create flag not set in create function");
+ 
++	if (IS_SHARELOCK(inode))
++		share_access = cifs_get_share_flags(oflags);
 +
-+static inline int write_tryseqrwlock(seqrwlock_t *sl)
-+{
-+	int ret = write_trylock(&sl->lock);
+ 	/*
+ 	 * BB add processing to set equivalent of mode - e.g. via CreateX with
+ 	 * ACLs
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 0d524a7..9394b2b 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -210,6 +210,8 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
+  *********************************************************************/
+ 
+ 	disposition = cifs_get_disposition(f_flags);
++	if (IS_SHARELOCK(inode))
++		share_access = cifs_get_share_flags(f_flags);
+ 
+ 	/* BB pass O_SYNC flag through on file attributes .. BB */
+ 
+@@ -645,6 +647,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	}
+ 
+ 	desired_access = cifs_convert_flags(cfile->f_flags);
++	if (IS_SHARELOCK(inode))
++		share_access = cifs_get_share_flags(cfile->f_flags);
+ 
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
+diff --git a/fs/locks.c b/fs/locks.c
+index 1eccc75..2184ddd 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -846,10 +846,18 @@ deny_lock_file(struct file *filp)
+ {
+ 	struct file_lock *lock;
+ 	int error = 0;
++	const char *fsname = filp->f_path.dentry->d_inode->i_sb->s_type->name;
+ 
+ 	if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
+ 		return error;
+ 
++	/*
++	 * Don't set a lock on CIFS file systems because they can process it
++	 * themselves.
++	 */
++	if (!strncmp(fsname, "cifs", 4))
++		return error;
 +
-+	if (ret) {
-+		++sl->sequence;
-+		smp_wmb();
-+	}
-+	return ret;
-+}
-+
-+/* For 2nd type of reader:
-+ * Lock out other writers, but don't update the sequence number
-+ */
-+static inline void read_seqrwlock(seqrwlock_t *sl)
-+{
-+	read_lock(&sl->lock);
-+}
-+
-+static inline void read_seqrwunlock(seqrwlock_t *sl)
-+{
-+	read_unlock(&sl->lock);
-+}
-+
-+static inline int read_tryseqrwlock(seqrwlock_t *sl)
-+{
-+	return read_trylock(&sl->lock);
-+}
-+
-+/* Start of read calculation -- fetch last complete writer token */
-+static __always_inline unsigned read_seqrwbegin(const seqrwlock_t *sl)
-+{
-+	unsigned ret;
-+
-+repeat:
-+	ret = ACCESS_ONCE(sl->sequence);
-+	if (unlikely(ret & 1)) {
-+		cpu_relax();
-+		goto repeat;
-+	}
-+	smp_rmb();
-+	return ret;
-+}
-+
-+/*
-+ * Test if reader processed invalid data.
-+ *
-+ * If sequence value changed then writer changed data while in section.
-+ */
-+static __always_inline int read_seqrwretry(const seqrwlock_t *sl, unsigned start)
-+{
-+	smp_rmb();
-+	return unlikely(sl->sequence != start);
-+}
-+
-+#endif /* __LINUX_SEQLOCK_H */
+ 	error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
+ 	if (error)
+ 		return error;
 -- 
-1.7.1
+1.8.1.5
