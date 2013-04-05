@@ -1,66 +1,63 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v4 0/7] Add O_DENY* support for VFS and CIFS/NFS
-Date: Fri, 5 Apr 2013 22:11:50 +0400
-Message-ID: <CAKywueQc9h-BiYvNRZsXEY9FNCx1Xbh25q0KNbMHn9KWMMSyjA@mail.gmail.com>
-References: <1365181075-22540-1-git-send-email-piastry@etersoft.ru>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+From: Waiman Long <Waiman.Long-VXdhtT5mjnY@public.gmane.org>
+Subject: [PATCH v2 4/4] dcache: don't need to take d_lock in prepend_path()
+Date: Fri,  5 Apr 2013 12:57:41 -0400
+Message-ID: <1365181061-30787-5-git-send-email-Waiman.Long@hp.com>
+References: <1365181061-30787-1-git-send-email-Waiman.Long@hp.com>
+Cc: Waiman Long <Waiman.Long-VXdhtT5mjnY@public.gmane.org>, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, autofs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Chandramouleeswaran, Aswin" <aswin-VXdhtT5mjnY@public.gmane.org>,
+	"Norton, Scott J" <scott.norton-VXdhtT5mjnY@public.gmane.org>,
+	Andi Kleen <andi-Vw/NltI1exuRpAAqCnN02g@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>
+To: Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Miklos Szeredi <mszeredi-AlSwsSmVLrQ@public.gmane.org>, Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>,
+	Sage Weil <sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Eric Paris <eparis-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1365181075-22540-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+In-Reply-To: <1365181061-30787-1-git-send-email-Waiman.Long-VXdhtT5mjnY@public.gmane.org>
 Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-2013/4/5 Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>:
-> Main changes from the previous one:
-> 1) O_DENYMAND is removed, sharelock mount option is introduced.
-> 2) Patch fcntl.h and VFS patches are united into one.
-> 3) flock/LOCK_MAND is disabled for sharelock mounts.
->
-> This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
->
-> These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
->
-> According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why extra mount option 'sharelock' is added for switching on/off O_DENY* flags processing. It allows us to avoid use of these flags on critical places (like /, /lib) and turn them on if we really want it proccessed that way.
->
-> So, we have 3 new flags:
-> O_DENYREAD - to prevent other opens with read access,
-> O_DENYWRITE - to prevent other opens with write access,
-> O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
->
-> The patchset avoid data races problem on newely created files: open with O_CREAT can return the -ETXTBSY error for a successfully created file if this files was locked with a deny lock by another task. Also, it turns flock/LOCK_MAND capability off for mounts with 'sharelock' option. This let us not mix one share reservation approach with another.
->
-> The #1 patch adds flags to fcntl and implements VFS part. The patches #3, #4, #5 are related to CIFS-specific changes, #6 and #7 describe NFS and NFSD parts.
->
-> The preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
-> http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=173070262b7f29134ad6b2e49a760017c11aec4a
->
-> The future part of open man page patch:
->
-> -----
-> O_DENYREAD, O_DENYWRIYE, O_DENYDELETE - used to inforce a mandatory share reservation scheme of the file access. If these flag is passed, the open fails with -EBUSY in following cases:
-> 1) if O_DENYREAD flag is specified and there is another open with O_DENYMAND flag and READ access to the file;
-> 2) if O_DENYWRITE flag is specified and there is another open with O_DENYMAND flag and WRITE access to the file;
-> 3) if READ access is requested and there is another open with O_DENYMAND and O_DENYREAD flags;
-> 4) if WRITE access is requested and there is another open with O_DENYMAND and O_DENYWRITE flags.
+The d_lock was used in prepend_path() to protect dentry->d_name from
+being changed under the hood. As the caller of prepend_path() has
+to take the rename_lock before calling into it, there is no chance
+that d_name will be changed. The d_lock lock is only needed when the
+rename_lock is not taken.
 
-Should be without O_DENYMAND (copy-and-paste issue, sorry):
-1) if O_DENYREAD flag is specified and there is another open with READ
-access to the file;
-2) if O_DENYWRITE flag is specified and there is another open with
-WRITE access to the file;
-3) if READ access is requested and there is another open with O_DENYREAD flags;
-4) if WRITE access is requested and there is another open with
-O_DENYWRITE flags.
+Signed-off-by: Waiman Long <Waiman.Long-VXdhtT5mjnY@public.gmane.org>
+---
+ fs/dcache.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
 
---
-Best regards,
-Pavel Shilovsky.
+diff --git a/fs/dcache.c b/fs/dcache.c
+index 9477d80..e3d6543 100644
+--- a/fs/dcache.c
++++ b/fs/dcache.c
+@@ -2529,6 +2529,7 @@ static int prepend_name(char **buffer, int *buflen, struct qstr *name)
+  * @buflen: pointer to buffer length
+  *
+  * Caller holds the rename_lock.
++ * There is no need to lock the dentry as its name cannot be changed.
+  */
+ static int prepend_path(const struct path *path,
+ 			const struct path *root,
+@@ -2555,9 +2556,7 @@ static int prepend_path(const struct path *path,
+ 		}
+ 		parent = dentry->d_parent;
+ 		prefetch(parent);
+-		spin_lock(&dentry->d_lock);
+ 		error = prepend_name(buffer, buflen, &dentry->d_name);
+-		spin_unlock(&dentry->d_lock);
+ 		if (!error)
+ 			error = prepend(buffer, buflen, "/", 1);
+ 		if (error)
+-- 
+1.7.1
+
 --
 To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
 the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
