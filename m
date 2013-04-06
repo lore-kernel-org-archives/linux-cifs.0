@@ -1,11 +1,12 @@
-From: Matthew Wilcox <matthew@wil.cx>
+From: Marco Stornelli <marco.stornelli@gmail.com>
 Subject: Re: [PATCH 2/4] fsfreeze: manage kill signal when sb_start_write
-	is called
-Date: Sat, 6 Apr 2013 07:17:03 -0600
-Message-ID: <20130406131703.GC28744@parisc-linux.org>
-References: <515FF344.8040705@gmail.com>
+ is called
+Date: Sat, 06 Apr 2013 16:56:25 +0200
+Message-ID: <51603799.9070008@gmail.com>
+References: <515FF344.8040705@gmail.com> <20130406131703.GC28744@parisc-linux.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
 	Chris Mason <chris.mason@fusionio.com>,
 	Steve French <sfrench@samba.org>,
@@ -24,22 +25,21 @@ Cc: Linux FS Devel <linux-fsdevel@vger.kernel.org>,
 	linux-ext4@vger.kernel.org, fuse-devel@lists.sourceforge.net,
 	linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
 	linux-mm@kvack.org, Jan Kara <jack@suse.cz>
-To: Marco Stornelli <marco.stornelli@gmail.com>
+To: Matthew Wilcox <matthew@wil.cx>
 Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <515FF344.8040705@gmail.com>
+In-Reply-To: <20130406131703.GC28744@parisc-linux.org>
 Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Apr 06, 2013 at 12:04:52PM +0200, Marco Stornelli wrote:
-> In every place where sb_start_write was called now we must manage
-> the error code and return -EINTR.
+Il 06/04/2013 15:17, Matthew Wilcox ha scritto:
+> On Sat, Apr 06, 2013 at 12:04:52PM +0200, Marco Stornelli wrote:
+>> In every place where sb_start_write was called now we must manage
+>> the error code and return -EINTR.
+>
+> If we must manage the error code, then these functions should be marked
+> __must_check.
+>
 
-If we must manage the error code, then these functions should be marked
-__must_check.
+Yep, good point.
 
--- 
-Matthew Wilcox				Intel Open Source Technology Centre
-"Bill, look, we understand that you're interested in selling us this
-operating system, but compare it to ours.  We can't possibly take such
-a retrograde step."
+Marco
