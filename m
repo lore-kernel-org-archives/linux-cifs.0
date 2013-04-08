@@ -1,41 +1,146 @@
-From: Al Viro <viro-3bDd1+5oDREiFSDQTTA3OLVCufUGDwFn@public.gmane.org>
-Subject: Re: [PATCH 2/4] fsfreeze: manage kill signal when sb_start_write is
- called
-Date: Sat, 6 Apr 2013 22:50:33 +0100
-Message-ID: <20130406215033.GM4068@ZenIV.linux.org.uk>
-References: <515FF344.8040705@gmail.com>
+From: Pavel Shilovsky <piastry@etersoft.ru>
+Subject: Re: [PATCH v4 3/7] CIFS: Add O_DENY* open flags support
+Date: Mon, 8 Apr 2013 18:25:29 +0400
+Message-ID: <CAKywueQ_hdLwKyFkcyCAobGWC3b3gEji=SUusJG0DWuzMzvADw@mail.gmail.com>
+References: <1365181075-22540-1-git-send-email-piastry@etersoft.ru>
+	<1365181075-22540-4-git-send-email-piastry@etersoft.ru>
+	<20130408100504.5e85ad1c@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Linux FS Devel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Chris Mason <chris.mason-5c4llco8/ftWk0Htik3J/w@public.gmane.org>,
-	Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	Theodore Ts'o <tytso-3s7WtUTddSA@public.gmane.org>,
-	Andreas Dilger <adilger.kernel-m1MBpc4rdrD3fQ9qLvQP4Q@public.gmane.org>,
-	Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>,
-	Anton Altaparmakov <anton-yrGDUoBaLx3QT0dZR+AlfA@public.gmane.org>,
-	Mark Fasheh <mfasheh-IBi9RG/b67k@public.gmane.org>,
-	Joel Becker <jlbec-aKy9MeLSZ9dg9hUCZPvPmw@public.gmane.org>, Ben Myers <bpm-sJ/iWh9BUns@public.gmane.org>,
-	Alex Elder <elder-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, xfs-VZNHf3L845pBDgjK7y7TUQ@public.gmane.org,
-	Matthew Wilcox <matthew-Ztpu424NOJ8@public.gmane.org>,
-	Mike Snitzer <snitzer-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	Alasdair G Kergon <agk-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
-	linux-btrfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	linux-ext4-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, fuse-devel-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org,
-	linux-ntfs-dev-5NWGOfrQmneRv+LV9MX5uipxlwaOVQ5f@public.gmane.org, ocfs2-devel-N0ozoZBvEnrZJqsBc5GL+g@public.gmane.org,
-	linux-mm-Bw31MaZKKs3YtjvyW6yDsg@public.gmane.org, Jan Kara <jack-AlSwsSmVLrQ@public.gmane.org>
-To: Marco Stornelli <marco.stornelli-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <515FF344.8040705-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+	linux-cifs <linux-cifs@vger.kernel.org>,
+	Linux NFS Mailing list <linux-nfs@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, wine-devel@winehq.org
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <wine-devel-bounces@winehq.org>
+In-Reply-To: <20130408100504.5e85ad1c@corrin.poochiereds.net>
+List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
+	<mailto:wine-devel-request@winehq.org?subject=unsubscribe>
+List-Archive: <http://www.winehq.org/pipermail/wine-devel>
+List-Post: <mailto:wine-devel@winehq.org>
+List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
+List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
+	<mailto:wine-devel-request@winehq.org?subject=subscribe>
+Sender: wine-devel-bounces@winehq.org
+Errors-To: wine-devel-bounces@winehq.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Sat, Apr 06, 2013 at 12:04:52PM +0200, Marco Stornelli wrote:
-> In every place where sb_start_write was called now we must manage
-> the error code and return -EINTR.
+2013/4/8 Jeff Layton <jlayton@redhat.com>:
+> On Fri,  5 Apr 2013 20:57:51 +0400
+> Pavel Shilovsky <piastry@etersoft.ru> wrote:
+>
+>> Construct share_access value from O_DENY* flags and send it to
+>> the server.
+>>
+>> Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
+>> ---
+>>  fs/cifs/cifsglob.h | 16 +++++++++++++++-
+>>  fs/cifs/dir.c      |  3 +++
+>>  fs/cifs/file.c     |  4 ++++
+>>  fs/locks.c         |  8 ++++++++
+>>  4 files changed, 30 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+>> index cd4bbf3..7e876b9 100644
+>> --- a/fs/cifs/cifsglob.h
+>> +++ b/fs/cifs/cifsglob.h
+>> @@ -465,7 +465,7 @@ struct smb_vol {
+>>                        CIFS_MOUNT_CIFS_BACKUPUID | CIFS_MOUNT_CIFS_BACKUPGID)
+>>
+>>  #define CIFS_MS_MASK (MS_RDONLY | MS_MANDLOCK | MS_NOEXEC | MS_NOSUID | \
+>> -                   MS_NODEV | MS_SYNCHRONOUS)
+>> +                   MS_NODEV | MS_SYNCHRONOUS | MS_SHARELOCK)
+>>
+>>  struct cifs_mnt_data {
+>>       struct cifs_sb_info *cifs_sb;
+>> @@ -947,6 +947,20 @@ struct cifsFileInfo {
+>>       struct work_struct oplock_break; /* work for oplock breaks */
+>>  };
+>>
+>> +static inline int
+>> +cifs_get_share_flags(unsigned int flags)
+>> +{
+>> +     int share_access = 0;
+>> +
+>> +     if (!(flags & O_DENYREAD))
+>> +             share_access |= FILE_SHARE_READ;
+>> +     if (!(flags & O_DENYWRITE))
+>> +             share_access |= FILE_SHARE_WRITE;
+>> +     if (!(flags & O_DENYDELETE))
+>> +             share_access |= FILE_SHARE_DELETE;
+>> +     return share_access;
+>> +}
+>> +
+>>  struct cifs_io_parms {
+>>       __u16 netfid;
+>>  #ifdef CONFIG_CIFS_SMB2
+>> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+>> index 267b608..d4331de 100644
+>> --- a/fs/cifs/dir.c
+>> +++ b/fs/cifs/dir.c
+>> @@ -294,6 +294,9 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
+>>       else
+>>               cFYI(1, "Create flag not set in create function");
+>>
+>> +     if (IS_SHARELOCK(inode))
+>> +             share_access = cifs_get_share_flags(oflags);
+>> +
+>>       /*
+>>        * BB add processing to set equivalent of mode - e.g. via CreateX with
+>>        * ACLs
+>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+>> index 0d524a7..9394b2b 100644
+>> --- a/fs/cifs/file.c
+>> +++ b/fs/cifs/file.c
+>> @@ -210,6 +210,8 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
+>>   *********************************************************************/
+>>
+>>       disposition = cifs_get_disposition(f_flags);
+>> +     if (IS_SHARELOCK(inode))
+>> +             share_access = cifs_get_share_flags(f_flags);
+>>
+>>       /* BB pass O_SYNC flag through on file attributes .. BB */
+>>
+>> @@ -645,6 +647,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+>>       }
+>>
+>>       desired_access = cifs_convert_flags(cfile->f_flags);
+>> +     if (IS_SHARELOCK(inode))
+>> +             share_access = cifs_get_share_flags(cfile->f_flags);
+>>
+>>       if (backup_cred(cifs_sb))
+>>               create_options |= CREATE_OPEN_BACKUP_INTENT;
+>> diff --git a/fs/locks.c b/fs/locks.c
+>> index 1eccc75..2184ddd 100644
+>> --- a/fs/locks.c
+>> +++ b/fs/locks.c
+>> @@ -846,10 +846,18 @@ deny_lock_file(struct file *filp)
+>>  {
+>>       struct file_lock *lock;
+>>       int error = 0;
+>> +     const char *fsname = filp->f_path.dentry->d_inode->i_sb->s_type->name;
+>>
+>>       if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
+>>               return error;
+>>
+>> +     /*
+>> +      * Don't set a lock on CIFS file systems because they can process it
+>> +      * themselves.
+>> +      */
+>> +     if (!strncmp(fsname, "cifs", 4))
+>> +             return error;
+>> +
+>
+> NAK....
+>
+> This is really nasty. Instead of doing this, you should instead create
+> a new file_system_type->fs_flags value. Then, set that flag for cifs
+> and nfs4, and test it here.
 
-Now go and look for callers of mnt_want_write() ;-/  The really
-painful one is in do_last(), but kern_path_create() is not much
-better; mq_open() would be bad too, had it not been about something
-you are not going to freeze anyway...
+It seems I missed this fs_flags opportunity. Thank you for pointing it
+out - I will fix and repost.
+
+--
+Best regards,
+Pavel Shilovsky.
