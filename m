@@ -1,141 +1,53 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v4 3/7] CIFS: Add O_DENY* open flags support
-Date: Mon, 8 Apr 2013 10:05:04 -0400
-Message-ID: <20130408100504.5e85ad1c@corrin.poochiereds.net>
-References: <1365181075-22540-1-git-send-email-piastry@etersoft.ru>
-	<1365181075-22540-4-git-send-email-piastry@etersoft.ru>
+From: Marc Haber <mh+linux-cifs-ciUMMiFYEj8OIzVOb1FTxg@public.gmane.org>
+Subject: Cannot mount Canon Scanner CIFS share with cifs while smbclient
+ works
+Date: Mon, 8 Apr 2013 21:40:49 +0200
+Message-ID: <20130408194049.GE10949@torres.zugschlus.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1365181075-22540-4-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri,  5 Apr 2013 20:57:51 +0400
-Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
+Hi,
 
-> Construct share_access value from O_DENY* flags and send it to
-> the server.
-> 
-> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> ---
->  fs/cifs/cifsglob.h | 16 +++++++++++++++-
->  fs/cifs/dir.c      |  3 +++
->  fs/cifs/file.c     |  4 ++++
->  fs/locks.c         |  8 ++++++++
->  4 files changed, 30 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index cd4bbf3..7e876b9 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -465,7 +465,7 @@ struct smb_vol {
->  			 CIFS_MOUNT_CIFS_BACKUPUID | CIFS_MOUNT_CIFS_BACKUPGID)
->  
->  #define CIFS_MS_MASK (MS_RDONLY | MS_MANDLOCK | MS_NOEXEC | MS_NOSUID | \
-> -		      MS_NODEV | MS_SYNCHRONOUS)
-> +		      MS_NODEV | MS_SYNCHRONOUS | MS_SHARELOCK)
->  
->  struct cifs_mnt_data {
->  	struct cifs_sb_info *cifs_sb;
-> @@ -947,6 +947,20 @@ struct cifsFileInfo {
->  	struct work_struct oplock_break; /* work for oplock breaks */
->  };
->  
-> +static inline int
-> +cifs_get_share_flags(unsigned int flags)
-> +{
-> +	int share_access = 0;
-> +
-> +	if (!(flags & O_DENYREAD))
-> +		share_access |= FILE_SHARE_READ;
-> +	if (!(flags & O_DENYWRITE))
-> +		share_access |= FILE_SHARE_WRITE;
-> +	if (!(flags & O_DENYDELETE))
-> +		share_access |= FILE_SHARE_DELETE;
-> +	return share_access;
-> +}
-> +
->  struct cifs_io_parms {
->  	__u16 netfid;
->  #ifdef CONFIG_CIFS_SMB2
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 267b608..d4331de 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -294,6 +294,9 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
->  	else
->  		cFYI(1, "Create flag not set in create function");
->  
-> +	if (IS_SHARELOCK(inode))
-> +		share_access = cifs_get_share_flags(oflags);
-> +
->  	/*
->  	 * BB add processing to set equivalent of mode - e.g. via CreateX with
->  	 * ACLs
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 0d524a7..9394b2b 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -210,6 +210,8 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
->   *********************************************************************/
->  
->  	disposition = cifs_get_disposition(f_flags);
-> +	if (IS_SHARELOCK(inode))
-> +		share_access = cifs_get_share_flags(f_flags);
->  
->  	/* BB pass O_SYNC flag through on file attributes .. BB */
->  
-> @@ -645,6 +647,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
->  	}
->  
->  	desired_access = cifs_convert_flags(cfile->f_flags);
-> +	if (IS_SHARELOCK(inode))
-> +		share_access = cifs_get_share_flags(cfile->f_flags);
->  
->  	if (backup_cred(cifs_sb))
->  		create_options |= CREATE_OPEN_BACKUP_INTENT;
-> diff --git a/fs/locks.c b/fs/locks.c
-> index 1eccc75..2184ddd 100644
-> --- a/fs/locks.c
-> +++ b/fs/locks.c
-> @@ -846,10 +846,18 @@ deny_lock_file(struct file *filp)
->  {
->  	struct file_lock *lock;
->  	int error = 0;
-> +	const char *fsname = filp->f_path.dentry->d_inode->i_sb->s_type->name;
->  
->  	if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
->  		return error;
->  
-> +	/*
-> +	 * Don't set a lock on CIFS file systems because they can process it
-> +	 * themselves.
-> +	 */
-> +	if (!strncmp(fsname, "cifs", 4))
-> +		return error;
-> +
+I own a Canon MX 420 scanner which can scan to a memory card and then
+offer the scanned information via CIFS. Up to a few kernel versions
+ago (I think it worked with 3.6, but am not sure about that), things
+worked just fine and then stopped.
 
-NAK....
+The issue is the following:
 
-This is really nasty. Instead of doing this, you should instead create
-a new file_system_type->fs_flags value. Then, set that flag for cifs
-and nfs4, and test it here.
+$ sudo mount.cifs  '\\mx420-sch8.local\canon_memory' /media/scanner -o user=anonymous,nounix --verbose
+Password: <enter>
+mount.cifs kernel mount options: ip=192.168.218.36,unc=\\mx420-sch8.local\canon_memory,nounix,user=anonymous,pass=********
+mount error(5): Input/output error
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
+A pcap file of the network traffic caused by this command can be
+downloaded from http://q.bofh.de/~mh/stuff/tcpdump.mount.cifs.
 
->  	error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
->  	if (error)
->  		return error;
+Otoh, smbclient '\\mx420-sch8.local\canon_memory' works. A pcap file
+of the network traffic caused by this command can be downloaded from
+http://q.bofh.de/~mh/stuff/tcpdump.smbclient.
 
+As somebody not knowing CIFS too well, I note that smbclients tries as
+anonymous, while the kernel tries to log in first and receives an
+error answer from the scanner.
+
+This behavior has changed at some point of the last six months. The
+kernel 3.7 found in grml's 2013.02 release works, at least the 3.8.5
+currently running on my notebook doesn't.
+
+Any hints how do address this issue?
+
+Greetings
+Marc
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Mannheim, Germany  |  lose things."    Winona Ryder | Fon: *49 621 31958061
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 621 31958062
