@@ -1,53 +1,59 @@
-From: Marc Haber <mh+linux-cifs-ciUMMiFYEj8OIzVOb1FTxg@public.gmane.org>
-Subject: Cannot mount Canon Scanner CIFS share with cifs while smbclient
- works
-Date: Mon, 8 Apr 2013 21:40:49 +0200
-Message-ID: <20130408194049.GE10949@torres.zugschlus.de>
+From: Peter Maloney <peter.maloney-bU717sqhW2kTELwDM1PSjyEWGD4kr0XT@public.gmane.org>
+Subject: mount.cifs fails if your password starts with a comma
+Date: Tue, 09 Apr 2013 14:22:42 +0200
+Message-ID: <51640812.2050900@brockmann-consult.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Hi,
+I'm not subscribed to this list, so be sure to CC
 
-I own a Canon MX 420 scanner which can scan to a memory card and then
-offer the scanned information via CIFS. Up to a few kernel versions
-ago (I think it worked with 3.6, but am not sure about that), things
-worked just fine and then stopped.
+mount.cifs fails if your password starts with a comma, but works with a
+comma in the middle. (eg. ",asdfasdf" does not work but "a,asdfasdf" works)
 
-The issue is the following:
+also your password excluding the comma appears in dmesg for all to see
 
-$ sudo mount.cifs  '\\mx420-sch8.local\canon_memory' /media/scanner -o user=anonymous,nounix --verbose
-Password: <enter>
-mount.cifs kernel mount options: ip=192.168.218.36,unc=\\mx420-sch8.local\canon_memory,nounix,user=anonymous,pass=********
-mount error(5): Input/output error
+perhaps also a malicious password could be created to add unwanted
+options to a user mountable fstab line.
+
+
+# mount -vvv /fs1
+mount: fstab path: "/etc/fstab"
+mount: mtab path:  "/etc/mtab"
+mount: lock path:  "/etc/mtab~"
+mount: temp path:  "/etc/mtab.tmp"
+mount: UID:        0
+mount: eUID:       0
+mount: spec:  "//bcserver2/fs1"
+mount: node:  "/fs1"
+mount: types: "cifs"
+mount: opts:  "user=test,uid=test,gid=users,noauto"
+mount: external mount: argv[0] = "/sbin/mount.cifs"
+mount: external mount: argv[1] = "//bcserver2/fs1"
+mount: external mount: argv[2] = "/fs1"
+mount: external mount: argv[3] = "-v"
+mount: external mount: argv[4] = "-o"
+mount: external mount: argv[5] = "rw,noauto,user=test,uid=1000,gid=100"
+Password:       (here I typed ",asdfasdf")
+mount.cifs kernel mount options:
+ip=10.3.0.5,unc=\\bcserver2\fs1,noauto,uid=1000,gid=100,ver=1,user=test,pass=********
+mount error(22): Invalid argument
 Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
-A pcap file of the network traffic caused by this command can be
-downloaded from http://q.bofh.de/~mh/stuff/tcpdump.mount.cifs.
+# dmesg | tail -n1
+[1221917.271440] CIFS: Unknown mount option "asdfasdf"
 
-Otoh, smbclient '\\mx420-sch8.local\canon_memory' works. A pcap file
-of the network traffic caused by this command can be downloaded from
-http://q.bofh.de/~mh/stuff/tcpdump.smbclient.
+# grep cifs /etc/fstab
+//bcserver2/fs1 /fs1 cifs user=test,uid=test,gid=users,noauto
 
-As somebody not knowing CIFS too well, I note that smbclients tries as
-anonymous, while the kernel tries to log in first and receives an
-error answer from the scanner.
+# mount -V
+mount from util-linux 2.20.1 (with libblkid and selinux support)
 
-This behavior has changed at some point of the last six months. The
-kernel 3.7 found in grml's 2013.02 release works, at least the 3.8.5
-currently running on my notebook doesn't.
-
-Any hints how do address this issue?
-
-Greetings
-Marc
-
--- 
------------------------------------------------------------------------------
-Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
-Mannheim, Germany  |  lose things."    Winona Ryder | Fon: *49 621 31958061
-Nordisch by Nature |  How to make an American Quilt | Fax: *49 621 31958062
+# cat /proc/version
+Linux version 3.8.4-1-default (geeko@buildhost) (gcc version 4.7.2
+20130108 [gcc-4_7-branch revision 195012] (SUSE Linux) ) #1 SMP Fri Mar
+22 23:08:34 UTC 2013 (20fc41c)
