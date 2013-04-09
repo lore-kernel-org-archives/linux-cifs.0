@@ -1,59 +1,97 @@
-From: Peter Maloney <peter.maloney-bU717sqhW2kTELwDM1PSjyEWGD4kr0XT@public.gmane.org>
-Subject: mount.cifs fails if your password starts with a comma
-Date: Tue, 09 Apr 2013 14:22:42 +0200
-Message-ID: <51640812.2050900@brockmann-consult.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+From: Pavel Shilovsky <piastry@etersoft.ru>
+Subject: [PATCH v5 0/7] Add O_DENY* support for VFS and CIFS/NFS
+Date: Tue,  9 Apr 2013 16:40:20 +0400
+Message-ID: <1365511227-17626-1-git-send-email-piastry@etersoft.ru>
+Cc: linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, wine-devel@winehq.org
+To: linux-kernel@vger.kernel.org
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
+Sender: linux-fsdevel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-I'm not subscribed to this list, so be sure to CC
+Main changes fom v4:
+1) deny_lock_file uses FS_DOES_SHARELOCK flag from fs_flags to determine whether to use VFS locks or not.
+2) Make nfs code return -EBUSY for share conflicts (was -EACCESS).
 
-mount.cifs fails if your password starts with a comma, but works with a
-comma in the middle. (eg. ",asdfasdf" does not work but "a,asdfasdf" works)
+Main changes from v3
+1) O_DENYMAND is removed, sharelock mount option is introduced.
+2) Patch fcntl.h and VFS patches are united into one.
+3) flock/LOCK_MAND is disabled for sharelock mounts.
 
-also your password excluding the comma appears in dmesg for all to see
+This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
 
-perhaps also a malicious password could be created to add unwanted
-options to a user mountable fstab line.
+These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
 
+According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why extra mount option 'sharelock' is added for switching on/off O_DENY* flags processing. It allows us to avoid use of these flags on critical places (like /, /lib) and turn them on if we really want it proccessed that way.
 
-# mount -vvv /fs1
-mount: fstab path: "/etc/fstab"
-mount: mtab path:  "/etc/mtab"
-mount: lock path:  "/etc/mtab~"
-mount: temp path:  "/etc/mtab.tmp"
-mount: UID:        0
-mount: eUID:       0
-mount: spec:  "//bcserver2/fs1"
-mount: node:  "/fs1"
-mount: types: "cifs"
-mount: opts:  "user=test,uid=test,gid=users,noauto"
-mount: external mount: argv[0] = "/sbin/mount.cifs"
-mount: external mount: argv[1] = "//bcserver2/fs1"
-mount: external mount: argv[2] = "/fs1"
-mount: external mount: argv[3] = "-v"
-mount: external mount: argv[4] = "-o"
-mount: external mount: argv[5] = "rw,noauto,user=test,uid=1000,gid=100"
-Password:       (here I typed ",asdfasdf")
-mount.cifs kernel mount options:
-ip=10.3.0.5,unc=\\bcserver2\fs1,noauto,uid=1000,gid=100,ver=1,user=test,pass=********
-mount error(22): Invalid argument
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+So, we have 3 new flags:
+O_DENYREAD - to prevent other opens with read access,
+O_DENYWRITE - to prevent other opens with write access,
+O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
 
-# dmesg | tail -n1
-[1221917.271440] CIFS: Unknown mount option "asdfasdf"
+The patchset avoid data races problem on newely created files: open with O_CREAT can return the -ETXTBSY error for a successfully created file if this files was locked with a deny lock by another task. Also, it turns flock/LOCK_MAND capability off for mounts with 'sharelock' option. This let us not mix one share reservation approach with another.
 
-# grep cifs /etc/fstab
-//bcserver2/fs1 /fs1 cifs user=test,uid=test,gid=users,noauto
+The #1 patch adds flags to fcntl and implements VFS part. The patches #3, #4, #5 are related to CIFS-specific changes, #6 and #7 describe NFS and NFSD parts.
 
-# mount -V
-mount from util-linux 2.20.1 (with libblkid and selinux support)
+The preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
+http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=173070262b7f29134ad6b2e49a760017c11aec4a
 
-# cat /proc/version
-Linux version 3.8.4-1-default (geeko@buildhost) (gcc version 4.7.2
-20130108 [gcc-4_7-branch revision 195012] (SUSE Linux) ) #1 SMP Fri Mar
-22 23:08:34 UTC 2013 (20fc41c)
+The future part of open man page patch:
+
+-----
+O_DENYREAD, O_DENYWRIYE, O_DENYDELETE - used to inforce a mandatory share reservation scheme of the file access. If these flag is passed, the open fails with -EBUSY in following cases:
+1) if O_DENYREAD flag is specified and there is another open with READ access to the file;
+2) if O_DENYWRITE flag is specified and there is another open with WRITE access to the file;
+3) if READ access is requested and there is another open with O_DENYREAD flags;
+4) if WRITE access is requested and there is another open with O_DENYWRITE flags.
+
+If O_DENYDELETE flag is specified and the open succeded, any further unlink operation will fail with -EBUSY untill this open is closed. Now this flag is processed by CIFS filesystems only.
+
+This mechanism is done through flocks. If O_DENY* flags are specified, flock syscall is processed after the open. The share modes are translated into flock according the following rules:
+1) !O_DENYREAD  -> LOCK_READ | LOCK_MAND
+2) !O_DENYWRITE -> LOCK_WRITE | LOCK_MAND
+-----
+
+Pavel Shilovsky (7):
+  fcntl: Introduce new O_DENY* open flags
+  CIFS: Add share_access parm to open request
+  CIFS: Add O_DENY* open flags support
+  CIFS: Use NT_CREATE_ANDX command for forcemand mounts
+  NFSv4: Add O_DENY* open flags support
+  NFSD: Pass share reservations flags to VFS
+  locks: Disable LOCK_MAND support for MS_SHARELOCK mounts
+
+ fs/cifs/cifsacl.c                |   8 +--
+ fs/cifs/cifsfs.c                 |   2 +-
+ fs/cifs/cifsglob.h               |  18 ++++++-
+ fs/cifs/cifsproto.h              |   8 +--
+ fs/cifs/cifssmb.c                |  50 ++++++++++---------
+ fs/cifs/dir.c                    |  16 +++---
+ fs/cifs/file.c                   |  20 +++++---
+ fs/cifs/inode.c                  |  16 +++---
+ fs/cifs/link.c                   |  25 +++-------
+ fs/cifs/readdir.c                |   5 +-
+ fs/cifs/smb1ops.c                |  16 +++---
+ fs/cifs/smb2file.c               |  10 ++--
+ fs/cifs/smb2inode.c              |   4 +-
+ fs/cifs/smb2ops.c                |  10 ++--
+ fs/cifs/smb2pdu.c                |   6 +--
+ fs/cifs/smb2proto.h              |  14 +++---
+ fs/fcntl.c                       |   5 +-
+ fs/locks.c                       | 105 ++++++++++++++++++++++++++++++++++++---
+ fs/namei.c                       |  45 +++++++++++++++--
+ fs/nfs/internal.h                |   3 +-
+ fs/nfs/nfs4proc.c                |   4 +-
+ fs/nfs/nfs4super.c               |   9 ++--
+ fs/nfs/nfs4xdr.c                 |  21 ++++++--
+ fs/nfs/super.c                   |   7 ++-
+ fs/nfsd/nfs4state.c              |  46 ++++++++++++++++-
+ fs/proc_namespace.c              |   1 +
+ include/linux/fs.h               |   8 +++
+ include/uapi/asm-generic/fcntl.h |  11 ++++
+ include/uapi/linux/fs.h          |   1 +
+ 29 files changed, 364 insertions(+), 130 deletions(-)
+
+-- 
+1.8.1.5
+
