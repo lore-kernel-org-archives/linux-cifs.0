@@ -1,55 +1,32 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: Trivial comment fixes
-Date: Wed, 10 Apr 2013 13:25:48 -0400
-Message-ID: <20130410132548.279c5781@tlielax.poochiereds.net>
-References: <1365614212-13433-1-git-send-email-scott.lovenberg@gmail.com>
+From: Marc Haber <mh+linux-cifs-ciUMMiFYEj8OIzVOb1FTxg@public.gmane.org>
+Subject: Re: Cannot mount Canon Scanner CIFS share with cifs while
+ smbclient works
+Date: Wed, 10 Apr 2013 20:46:39 +0200
+Message-ID: <20130410184639.GB31333@torres.zugschlus.de>
+References: <20130408194049.GE10949@torres.zugschlus.de>
+ <20130410090415.7e1c40b3@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset=utf-8
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1365614212-13433-1-git-send-email-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20130410090415.7e1c40b3-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 10 Apr 2013 13:16:52 -0400
-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org wrote:
+On Wed, Apr 10, 2013 at 09:04:15AM -0400, Jeff Layton wrote:
+> In any case, a workaround for now might be to try and mount with
+> sec=none. I *think* that will make the client do what smbclient is
+> doing here.
 
-> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> 
-> Two trivial comment fixes.
-> 
-> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-> ---
->  mount.cifs.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/mount.cifs.c b/mount.cifs.c
-> index 4548fc6..58b127a 100644
-> --- a/mount.cifs.c
-> +++ b/mount.cifs.c
-> @@ -975,7 +975,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
->  
->  			fprintf(stderr, "bad option: gid=\"%s\"\n", value);
->  			return EX_USAGE;
-> -		/* fmask fall through to file_mode */
-> +		/* fmask falls through to file_mode */
->  		case OPT_FMASK:
->  			fprintf(stderr,
->  				"WARNING: CIFS mount option 'fmask' is\
-> @@ -1145,7 +1145,7 @@ nocopy:
->  	if (got_cruid) {
->  		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", cruid);
->  
-> -		/* comma + "cruid=" + terminating NULL == 6 */
-> +		/* comma + "cruid=" + terminating NULL == 8 */
->  		if (out_len + word_len + 8 > MAX_OPTIONS_LEN) {
->  			fprintf(stderr, "Options string too long\n");
->  			return EX_USAGE;
+I tried that, no change. Would another dump of a mount.cifs -o
+sec=none help?
 
-Looks good. Will merge in a day or two assuming no one objects.
+Greetings
+Marc
 
-Thanks,
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Mannheim, Germany  |  lose things."    Winona Ryder | Fon: *49 621 31958061
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 621 31958062
