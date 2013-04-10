@@ -1,67 +1,44 @@
-From: Frank Filz <ffilzlnx@us.ibm.com>
-Subject: Re: [PATCH v5 1/7] fcntl: Introduce new O_DENY* open flags
-Date: Wed, 10 Apr 2013 09:27:27 -0700
-Message-ID: <516592EF.2080707@us.ibm.com>
-References: <1365511227-17626-1-git-send-email-piastry@etersoft.ru>	<1365511227-17626-2-git-send-email-piastry@etersoft.ru>	<20130410071824.5a37cbaf@corrin.poochiereds.net> <CAKywueRw7Oqa_z7yFo9CuoPXxJ3xPmCY0zcJwfxBKqBHNC+4zg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Jeff Layton <jlayton@poochiereds.net>,
-	linux-kernel@vger.kernel.org,
-	linux-cifs <linux-cifs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Linux NFS Mailing list <linux-nfs@vger.kernel.org>,
-	wine-devel@winehq.org
-To: Pavel Shilovsky <piastry@etersoft.ru>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKywueRw7Oqa_z7yFo9CuoPXxJ3xPmCY0zcJwfxBKqBHNC+4zg@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] cifs: Trivial comment fixes
+Date: Wed, 10 Apr 2013 13:16:52 -0400
+Message-ID: <1365614212-13433-1-git-send-email-scott.lovenberg@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-linux-nfs-owner@vger.kernel.org wrote on 04/10/2013 06:24:39 AM:
- > 2013/4/10 Jeff Layton <jlayton@poochiereds.net>:
- > > On Tue,  9 Apr 2013 16:40:21 +0400
- > > Pavel Shilovsky <piastry@etersoft.ru> wrote:
- > >
- > >> This patch adds 3 flags:
- > >> 1) O_DENYREAD that doesn't permit read access,
- > >> 2) O_DENYWRITE that doesn't permit write access,
- > >> 3) O_DENYDELETE that doesn't permit delete or rename,
- > >>
- > >> Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags -
- > >> this change can benefit cifs and nfs modules as well as Samba and
- > >> NFS file servers that export the same directory for Windows clients,
- > >> or Wine applications that access the same files simultaneously.
- > >>
- > >> These flags are only take affect for opens on mounts with 'sharelock'
- > >> mount option. They are translated to flock's flags:
- > >>
- > >> !O_DENYREAD  -> LOCK_READ | LOCK_MAND
- > >> !O_DENYWRITE -> LOCK_WRITE | LOCK_MAND
- > >>
- > >> and set through flock_lock_file on a file. If the file can't be locked
- > >> due conflicts with another open with O_DENY* flags, the -EBUSY error
- > >> code is returned.
- > >>
- > >> Create codepath is slightly changed to prevent data races on
- > >> newely created files: when open with O_CREAT can return with -EBUSY
- > >> error for successfully created files due to a deny lock set by
- > >> another task.
- > >>
- > >
- > > It's good that this is consistent with the new patchset. I'm still not
- > > 100% sure that -EBUSY is the right error return here, but it should at
- > > least help distinguish between "mode bits don't allow me to open" and
- > > "file has share reservation set".
- > >
- > > Heck, since we're departing from POSIX here, maybe we should consider a
- > > new error code altogether? ESHAREDENIED or something?
- >
- > That can make sense. I don't mind to change this part.
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-I like this return code, it will help user space file servers return the 
-correct error to their clients when they depend on the kernel to resolve 
-share reservations. Internal to the kernel, having ESHAREDENIED will 
-also be helpful to the NFS v4 and NLM code.
+Two trivial comment fixes.
 
-Frank
+Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ mount.cifs.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 4548fc6..58b127a 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -975,7 +975,7 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 
+ 			fprintf(stderr, "bad option: gid=\"%s\"\n", value);
+ 			return EX_USAGE;
+-		/* fmask fall through to file_mode */
++		/* fmask falls through to file_mode */
+ 		case OPT_FMASK:
+ 			fprintf(stderr,
+ 				"WARNING: CIFS mount option 'fmask' is\
+@@ -1145,7 +1145,7 @@ nocopy:
+ 	if (got_cruid) {
+ 		word_len = snprintf(txtbuf, sizeof(txtbuf), "%u", cruid);
+ 
+-		/* comma + "cruid=" + terminating NULL == 6 */
++		/* comma + "cruid=" + terminating NULL == 8 */
+ 		if (out_len + word_len + 8 > MAX_OPTIONS_LEN) {
+ 			fprintf(stderr, "Options string too long\n");
+ 			return EX_USAGE;
+-- 
+1.7.5.4
