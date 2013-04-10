@@ -1,100 +1,74 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: Re: [PATCH v5 4/7] CIFS: Use NT_CREATE_ANDX command for forcemand mounts
-Date: Wed, 10 Apr 2013 15:45:33 +0400
-Message-ID: <CAKywueSPh2vXvS1HRmJHZUApo_YxWjcp4_2ZXgb1RHafS=A98w@mail.gmail.com>
-References: <1365511227-17626-1-git-send-email-piastry@etersoft.ru>
-	<1365511227-17626-5-git-send-email-piastry@etersoft.ru>
-	<20130410071144.08ef2983@corrin.poochiereds.net>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH] cifs: Allow passwords which begin with a delimitor
+Date: Wed, 10 Apr 2013 12:47:55 +0100
+Message-ID: <1365594475.2110.0.camel@localhost>
+References: <1365527861-6624-1-git-send-email-sprabhu@redhat.com>
+	 <20130410070525.640b460f@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Linux NFS Mailing list <linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Peter Maloney <peter.maloney-bU717sqhW2kTELwDM1PSjyEWGD4kr0XT@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130410071144.08ef2983-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <20130410070525.640b460f-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/4/10 Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>:
-> On Tue,  9 Apr 2013 16:40:24 +0400
-> Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org> wrote:
->
->> forcemand mount option now lets us use Windows mandatory style of
->> byte-range locks even if server supports posix ones - switches on
->> Windows locking mechanism. Share flags is another locking mehanism
->> provided by Windows semantic that can be used by NT_CREATE_ANDX
->> command. This patch combines all Windows locking mechanism in one
->> mount option by using NT_CREATE_ANDX to open files if forcemand is on.
->>
->> Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
->> ---
->>  fs/cifs/dir.c  | 1 +
->>  fs/cifs/file.c | 6 ++++--
->>  2 files changed, 5 insertions(+), 2 deletions(-)
->>
->> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
->> index d4331de..8587021 100644
->> --- a/fs/cifs/dir.c
->> +++ b/fs/cifs/dir.c
->> @@ -217,6 +217,7 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
->>       }
->>
->>       if (tcon->unix_ext && cap_unix(tcon->ses) && !tcon->broken_posix_open &&
->> +         ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
->>           (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->>                       le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->>               rc = cifs_posix_open(full_path, &newinode, inode->i_sb, mode,
->> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->> index 9394b2b..19038a4 100644
->> --- a/fs/cifs/file.c
->> +++ b/fs/cifs/file.c
->> @@ -455,8 +455,9 @@ int cifs_open(struct inode *inode, struct file *file)
->>       else
->>               oplock = 0;
->>
->> -     if (!tcon->broken_posix_open && tcon->unix_ext &&
->> -         cap_unix(tcon->ses) && (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->> +     if (!tcon->broken_posix_open && tcon->unix_ext && cap_unix(tcon->ses)
->> +         && ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
->> +         (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->>                               le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->>               /* can not refresh inode info since size could be stale */
->>               rc = cifs_posix_open(full_path, &inode, inode->i_sb,
->> @@ -624,6 +625,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
->>               oplock = 0;
->>
->>       if (tcon->unix_ext && cap_unix(tcon->ses) &&
->> +         ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOPOSIXBRL) == 0) &&
->>           (CIFS_UNIX_POSIX_PATH_OPS_CAP &
->>                               le64_to_cpu(tcon->fsUnixInfo.Capability))) {
->>               /*
->
-> I'm trying to understand why "forcemand" would matter here. Wouldn't
-> you just want to switch to using NT_CREATE_ANDX if O_DENY* is set
-> instead? What happens if I didn't mount with forcemand and then try to
-> use O_DENY*?
+On Wed, 2013-04-10 at 07:05 -0400, Jeff Layton wrote:
+> On Tue,  9 Apr 2013 18:17:41 +0100
+> Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
+> 
+> > Fixes a regression in cifs_parse_mount_options where a password
+> > which begins with a delimitor is parsed incorrectly as being a blank
+> > password.
+> > 
+> > Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> > ---
+> >  fs/cifs/connect.c | 16 +++++++++++++---
+> >  1 file changed, 13 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index 12b3da3..f7199b9 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -1546,14 +1546,24 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+> >  			}
+> >  			break;
+> >  		case Opt_blank_pass:
+> > -			vol->password = NULL;
+> > -			break;
+> > -		case Opt_pass:
+> >  			/* passwords have to be handled differently
+> >  			 * to allow the character used for deliminator
+> >  			 * to be passed within them
+> >  			 */
+> >  
+> > +			/*
+> > +			 * Check if this is a case where the  password
+> > +			 * starts with a delimiter
+> > +			 */
+> > +			tmp_end = strchr(data, '=');
+> > +			tmp_end++;
+> > +			if (!(tmp_end < end && tmp_end[1] == delim)) {
+> > +				/* No it is not. Set the password to NULL */
+> > +				vol->password = NULL;
+> > +				break;
+> > +			}
+> > +			/* Yes it is. Drop down to Opt_pass below.*/
+> > +		case Opt_pass:
+> >  			/* Obtain the value string */
+> >  			value = strchr(data, '=');
+> >  			value++;
+> 
+> Looks reasonable to me. Should this also go to stable?
+> 
 
-If cifs client mounts Samba share and negotiates posix extensions, it
-uses trans2 command to open files. In this case O_DENY* flags that are
-passed to open syscall won't be sent to the server and the file won't
-be locked. This patch gives us an opportunity to make the client
-always use NT_CREATE_ANDX command to open file - in this case O_DENY*
-flags won't be missed.
+Yes. This will also need to be fixed in stable.
 
-You are right, we can leave forcemand option without changes and use
-an appropriate smb command depending on openflags we have. Another
-possibility is to make the client use NT_CREATE_ANDX command if new
-'sharelock' VFS mount options is specified.  If we mount a share with
-sharelock mount option, we need O_DENY* flags sent to the server, but
-the only one way to do it is to use NT_CREATE_ANDX command all the
-time we need to open a file - so, using trans2 open command doesn't
-make any sense in the case of 'sharelock' mounts.
-
-Thoughts?
-
---
-Best regards,
-Pavel Shilovsky.
+> Acked-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
