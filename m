@@ -1,88 +1,118 @@
-From: "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
-Subject: Re: kerberised cifs must have root krb5cc_0 cache?
-Date: Sun, 14 Apr 2013 07:44:44 -0500 (CDT)
-Message-ID: <1933147666.1014.1365943484239.JavaMail.root@hendelman.net>
-References: <20130414080525.4871cca2@tlielax.poochiereds.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
-To: Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
+From: scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Subject: [PATCH] mount.cifs: Add support for parsing IPv6 addresses enclosed in brackets.
+Date: Sun, 14 Apr 2013 14:19:18 -0400
+Message-ID: <1365963558-20082-1-git-send-email-scott.lovenberg@gmail.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130414080525.4871cca2-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-The other option which worked for me was using the KRB5 credentials of the machine account to do the mount.
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 
-A few months ago Mr. Layton point this out to me and I did eventually end up getting it to work fairly well.  If you are root & need to browse around, you'll need to kinit as somebody (unless root is not just a local account but a domain user as well).  
+The standard for formatting IPv6 addresses is to enclose them in brackets.
+This patch allows the mount helper to parse IPv6 addresses that are enclosed in brackets.
+There is a slight change of behavior in this patch; specifying the --ip option without
+supplying an address now exits the mount helper rather than just ignoring and continuing.
 
-My setup is samba 3.6.3 connected to AD, but I imagine it should work the same if you have a samba4 DC.
+Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+---
+ AUTHORS      |    1 +
+ mount.cifs.c |   63 ++++++++++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 47 insertions(+), 17 deletions(-)
 
-My fstab looks something like:
-
-//server/share /localmntpoint cifs cache=strict,sec=krb5i,multiuser,acl,username=MACHINENAME$ 0 2
-
-THis is in ubuntu 12.10.
-
-The only 2 issues I've found are: 
-
-1) Wwhen logging in via xfce I have to log-in twice.  I login/logout so infrequently it doesn't matter much to me.  I'm not sure why this is, but it only happens when I have my homedir on a samba mount using the above mounting line.
-
-2) Just after setting up this mountpoint, I experienced it not mounting at startup, however logging in with a localuser and doing "mount -a", it would then work & things would work normally.  This no longer happens (or doesn't happen regularly - race condition in ubuntu startup?) so I mostly had forgotten about it until I started typing this out.
-
-For #2 I've opened a bug on launchpad:
-https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/1130781
-
-Thanks,
-
-Robert
-
-
-
------ Original Message -----
-From: "Jeff Layton" <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
-To: "steve" <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Sent: Sunday, April 14, 2013 7:05:25 AM
-Subject: Re: kerberised cifs must have root krb5cc_0 cache?
-
-On Sat, 13 Apr 2013 16:27:46 +0200
-steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
-
-> Ubuntu 12.10 clients in a Samba4 domain.
-> 
-> Hi
-> We are automounting cifs using:
-> -osec=krb5,multiuser.
-> 
-> It seems that unless the root cache:
-> /tmp/krb5cc_0
-> is present, users cannot enter the share even if they have a ticket with 
-> their own cache under /tmp
-> 
-> Is this the correct behavior?
-> 
-> If so, how to go about maintaining the cache alive. I thought about 
-> creating s domain user, say autofs-user and extracting his keytab. I 
-> would then run a script as root that calls k5start to maintain the 
-> ticket cache. But then, it could be overwritten if, say, Administrator 
-> logs in from a root account. Would that matter? So long as the root 
-> cache is present, does it matter which principal it has?
-> 
-> Cheers,
-> Steve
-
-You do need a krb5 ticket somewhere to use as root's credentials. If
-you set the cruid= mount option that can be a credcache owned by a
-different user.
-
-Alternately, you can set up the system-wide keytab in /etc/krb5.keytab
-with the correct credentials for root.
-
+diff --git a/AUTHORS b/AUTHORS
+index 2807079..081c2fe 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -5,5 +5,6 @@ Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+ Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+ Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+ Igor Druzhinin <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
++Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+ 
+ ...and others.
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 3b2b89e..276f50d 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -751,6 +751,48 @@ static int parse_opt_token(const char *token)
+ 	return OPT_ERROR;
+ }
+ 
++/* 
++  Extract an ipv4 or ipv6 address and put it into parsed_info. 
++  Returns 0 on success.
++*/
++static int parse_ip(char *value, struct parsed_mount_info *parsed_info)
++{
++	char *closingBracket = NULL;
++
++	if (!value || !*value) {
++		fprintf(stderr, "target ip address argument missing\n");
++		return OPT_ERROR;
++	}
++
++	/* check for ipv6 in brackets */
++	if (value[0] == '[') {
++		value++;
++		/* temporarily null the closing bracket */
++		closingBracket = strchr(value, ']');
++		if (closingBracket)
++			*closingBracket = '\0';
++	}
++
++	/* check length of address*/
++	if (strnlen(value, MAX_ADDRESS_LEN + 1) > MAX_ADDRESS_LEN) {
++		fprintf(stderr, "ip address too long\n");
++		if (closingBracket)
++			*closingBracket = ']';
++		return EX_USAGE;
++	}
++
++	/* all test pass, copy it */
++	strcpy(parsed_info->addrlist, value);
++	if (parsed_info->verboseflag)
++		fprintf(stderr, "ip address %s override specified\n", value);
++
++	/* put back closing bracket */
++	if (closingBracket)
++		*closingBracket = ']';
++
++	return 0;
++}
++
+ static int
+ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ {
+@@ -861,23 +903,10 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+ 			break;
+ 
+ 		case OPT_IP:
+-			if (!value || !*value) {
+-				fprintf(stderr,
+-					"target ip address argument missing\n");
+-			} else if (strnlen(value, MAX_ADDRESS_LEN) <=
+-				MAX_ADDRESS_LEN) {
+-				strcpy(parsed_info->addrlist, value);
+-				if (parsed_info->verboseflag)
+-					fprintf(stderr,
+-						"ip address %s override specified\n",
+-						value);
+-				goto nocopy;
+-			} else {
+-				fprintf(stderr, "ip address too long\n");
+-				return EX_USAGE;
+-
+-			}
+-			break;
++			rc = parse_ip(value, parsed_info);
++			if (rc)
++				return rc;			
++			goto nocopy;
+ 
+ 		/* unc || target || path */
+ 		case OPT_UNC:
 -- 
-Jeff Layton <jlayton-vpEMnDpepFuMZCB2o+C8xQ@public.gmane.org>
---
-To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+1.7.10.4
