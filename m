@@ -1,105 +1,131 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH] cifs: revalidate directories instiantiated via FIND_*
- in order to handle DFS referrals
-Date: Mon, 22 Apr 2013 07:20:06 -0400
-Message-ID: <20130422072006.7a51d386@tlielax.poochiereds.net>
-References: <1366627391-14753-1-git-send-email-sprabhu@redhat.com>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: add support for IPv6 addresses in brackets V2
+Date: Mon, 22 Apr 2013 10:21:13 -0400
+Message-ID: <CAFB9KM00JWSUSP28LrzJsgQ0po6ZtTpK9enbwv3-N5y2+E5G0A@mail.gmail.com>
+References: <1365963558-20082-1-git-send-email-scott.lovenberg@gmail.com>
+	<1366075789-23137-1-git-send-email-scott.lovenberg@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-To: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1366627391-14753-1-git-send-email-sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1366075789-23137-1-git-send-email-scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 22 Apr 2013 11:43:11 +0100
-Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-
-> From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> 
-> We've had a long-standing problem with DFS referral points. CIFS servers
-> generally try to make them look like directories in FIND_FIRST/NEXT
-> responses. When you go to try to do a FIND_FIRST on them though, the
-> server will then (correctly) return STATUS_PATH_NOT_COVERED. Mostly this
-> manifests as spurious EREMOTE errors back to userland.
-> 
-> This patch attempts to fix this by marking directories that are
-> discovered via FIND_FIRST/NEXT for revaldiation. When the lookup code
-> runs across them again, we'll reissue a QPathInfo against them and that
-> will make it chase the referral properly.
-> 
-> There is some performance penalty involved here and no I haven't
-> measured it -- it'll be highly dependent upon the workload and contents
-> of the mounted share. To try and mitigate that though, the code only
-> marks the inode for revalidation when it's possible to run across a DFS
-> referral. i.e.: when the kernel has DFS support built in and the share
-> is "in DFS".
-> 
-> This also fixes a security issue where a user can cause an Oops due to
-> uninitialised inode pointers. Reproducer available at
-> https://patchwork.kernel.org/patch/1980301/
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+On Mon, Apr 15, 2013 at 9:29 PM, <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>
+> From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+> This is a respin of the last patch that returns EX_USAGE rather than OPT_ERROR as per Jeff's suggestion.
+>
+> Signed-off-by: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 > ---
->  fs/cifs/readdir.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-> index df40cc5..49d44f3 100644
-> --- a/fs/cifs/readdir.c
-> +++ b/fs/cifs/readdir.c
-> @@ -126,6 +126,22 @@ out:
->  	dput(dentry);
+>  AUTHORS      |    1 +
+>  mount.cifs.c |   62 ++++++++++++++++++++++++++++++++++++++++++----------------
+>  2 files changed, 46 insertions(+), 17 deletions(-)
+>
+> diff --git a/AUTHORS b/AUTHORS
+> index 2807079..081c2fe 100644
+> --- a/AUTHORS
+> +++ b/AUTHORS
+> @@ -5,5 +5,6 @@ Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>  Suresh Jayaraman <sjayaraman-l3A5Bk7waGM@public.gmane.org>
+>  Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+>  Igor Druzhinin <jaxbrigs-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> +Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+>
+>  ...and others.
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 3b2b89e..561517b 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -751,6 +751,47 @@ static int parse_opt_token(const char *token)
+>         return OPT_ERROR;
 >  }
->  
+>
 > +/*
-> + * Is it possible that this directory might turn out to be a DFS referral
-> + * once we go to try and use it?
-> + */
-> +static bool
-> +cifs_dfs_is_possible(struct cifs_sb_info *cifs_sb)
+> +  Extract an ipv4 or ipv6 address and put it into parsed_info.
+> +  Returns 0 on success.
+> +*/
+> +static int parse_ip(char *value, struct parsed_mount_info *parsed_info)
 > +{
-> +#ifdef CONFIG_CIFS_DFS_UPCALL
-> +	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+> +       char *closingBracket = NULL;
 > +
-> +	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
-> +		return true;
-> +#endif
-> +	return false;
+> +       if (!value || !*value) {
+> +               fprintf(stderr, "target ip address argument missing\n");
+> +               return EX_USAGE;
+> +       }
+> +
+> +       /* check for ipv6 in brackets */
+> +       if (value[0] == '[') {
+> +               value++;
+> +               /* temporarily null the closing bracket */
+> +               closingBracket = strchr(value, ']');
+> +               if (closingBracket)
+> +                       *closingBracket = '\0';
+> +       }
+> +
+> +       /* check length of address */
+> +       if (strnlen(value, MAX_ADDRESS_LEN + 1) > MAX_ADDRESS_LEN) {
+> +               fprintf(stderr, "ip address too long\n");
+> +               if (closingBracket)
+> +                       *closingBracket = ']';
+> +               return EX_USAGE;
+> +       }
+> +
+> +       strcpy(parsed_info->addrlist, value);
+> +       if (parsed_info->verboseflag)
+> +               fprintf(stderr, "ip address %s override specified\n", value);
+> +
+> +       /* put back closing bracket */
+> +       if (closingBracket)
+> +               *closingBracket = ']';
+> +
+> +       return 0;
 > +}
 > +
->  static void
->  cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+>  static int
+>  parse_options(const char *data, struct parsed_mount_info *parsed_info)
 >  {
-> @@ -135,6 +151,14 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
->  	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
->  		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
->  		fattr->cf_dtype = DT_DIR;
-> +		/*
-> +		 * CIFS servers generally make DFS referrals look like
-> +		 * directories in FIND_* responses. Since there's no way to
-> +		 * tell the difference, we must revalidate directory inodes
-> +		 * before trying to use them.
-> +		 */
-> +		if (cifs_dfs_is_possible(cifs_sb))
-> +			fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
->  	} else {
->  		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
->  		fattr->cf_dtype = DT_REG;
+> @@ -861,23 +902,10 @@ parse_options(const char *data, struct parsed_mount_info *parsed_info)
+>                         break;
+>
+>                 case OPT_IP:
+> -                       if (!value || !*value) {
+> -                               fprintf(stderr,
+> -                                       "target ip address argument missing\n");
+> -                       } else if (strnlen(value, MAX_ADDRESS_LEN) <=
+> -                               MAX_ADDRESS_LEN) {
+> -                               strcpy(parsed_info->addrlist, value);
+> -                               if (parsed_info->verboseflag)
+> -                                       fprintf(stderr,
+> -                                               "ip address %s override specified\n",
+> -                                               value);
+> -                               goto nocopy;
+> -                       } else {
+> -                               fprintf(stderr, "ip address too long\n");
+> -                               return EX_USAGE;
+> -
+> -                       }
+> -                       break;
+> +                       rc = parse_ip(value, parsed_info);
+> +                       if (rc)
+> +                               return rc;
+> +                       goto nocopy;
+>
+>                 /* unc || target || path */
+>                 case OPT_UNC:
+> --
+> 1.7.10.4
+>
 
-While it might cause performance to regress in some cases, I see no
-real alternative to this patch. It's necessary to do some operation
-specifically against the path before allowing someone to chdir into it.
-Doing anything else means that you'll miss your chance to trigger an
-automount if it does turn out to be a DFS referral.
 
-That said, there are other possible races too, so I think we also need
-a patch to fix the client not to call cifs_set_ops unless the inode is
-still in I_NEW state.
+Ping.
+Any comments?
 
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+Peace and Blessings,
+-Scott.
