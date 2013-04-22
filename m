@@ -1,52 +1,84 @@
-From: Tom Talpey <ttalpey-0li6OtcxBFHby3iVrkZq2A@public.gmane.org>
-Subject: RE: CMAC moving to crypto
-Date: Sun, 21 Apr 2013 21:17:36 +0000
-Message-ID: <614F550557B82C44AC27C492ADA391AA075C8028@TK5EX14MBXC284.redmond.corp.microsoft.com>
-References: <CAH2r5msejqQkp=Wkbkim6RyBGrBp5h5neS+cjrJC_W543OY-YQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	"linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+From: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: revalidate directories instiantiated via FIND_* in order to handle DFS referrals
+Date: Mon, 22 Apr 2013 11:43:11 +0100
+Message-ID: <1366627391-14753-1-git-send-email-sprabhu@redhat.com>
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+To: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAH2r5msejqQkp=Wkbkim6RyBGrBp5h5neS+cjrJC_W543OY-YQ-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-> -----Original Message-----
-> From: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org [mailto:linux-cifs-
-> owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org] On Behalf Of Steve French
-> Sent: Thursday, April 18, 2013 10:24 AM
-> To: Shirish Pargaonkar; linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; samba-technical
-> Subject: CMAC moving to crypto
-> 
-> I see that cmac.c is now in Linux crypto directory, presumably destined for
-> 3.11 kernel.  Presumably would allow hardware acceleration for new
-> processors which support it in internally ?!
-> 
-> Has anyone looked at whether and how we could use this (in either kernel or
-> samba)
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 
-As I'm sure you know, the SMB3 dialect uses AES-CMAC-128 for message signing, so access to the native support of newer processors would benefit Linux SMB3 peers greatly, as it does currently on Windows. Good to see.
+We've had a long-standing problem with DFS referral points. CIFS servers
+generally try to make them look like directories in FIND_FIRST/NEXT
+responses. When you go to try to do a FIND_FIRST on them though, the
+server will then (correctly) return STATUS_PATH_NOT_COVERED. Mostly this
+manifests as spurious EREMOTE errors back to userland.
 
-Is AES CCM encryption also supported or planned? Because CCM provides integrity, CMAC signing is bypassed for SMB3 encrypted messages.
+This patch attempts to fix this by marking directories that are
+discovered via FIND_FIRST/NEXT for revaldiation. When the lookup code
+runs across them again, we'll reissue a QPathInfo against them and that
+will make it chase the referral properly.
 
-Tom.
+There is some performance penalty involved here and no I haven't
+measured it -- it'll be highly dependent upon the workload and contents
+of the mounted share. To try and mitigate that though, the code only
+marks the inode for revalidation when it's possible to run across a DFS
+referral. i.e.: when the kernel has DFS support built in and the share
+is "in DFS".
 
+This also fixes a security issue where a user can cause an Oops due to
+uninitialised inode pointers. Reproducer available at
+https://patchwork.kernel.org/patch/1980301/
 
-> 
-> See:
-> http://git.kernel.org/cgit/linux/kernel/git/next/linux-
-> next.git/log/crypto/cmac.c
-> 
-> --
-> Thanks,
-> 
-> Steve
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in the
-> body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org More majordomo info at
-> http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Signed-off-by: Sachin Prabhu <sprabhu-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/readdir.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index df40cc5..49d44f3 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -126,6 +126,22 @@ out:
+ 	dput(dentry);
+ }
+ 
++/*
++ * Is it possible that this directory might turn out to be a DFS referral
++ * once we go to try and use it?
++ */
++static bool
++cifs_dfs_is_possible(struct cifs_sb_info *cifs_sb)
++{
++#ifdef CONFIG_CIFS_DFS_UPCALL
++	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
++
++	if (tcon->Flags & SMB_SHARE_IS_IN_DFS)
++		return true;
++#endif
++	return false;
++}
++
+ static void
+ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ {
+@@ -135,6 +151,14 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ 	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
+ 		fattr->cf_mode = S_IFDIR | cifs_sb->mnt_dir_mode;
+ 		fattr->cf_dtype = DT_DIR;
++		/*
++		 * CIFS servers generally make DFS referrals look like
++		 * directories in FIND_* responses. Since there's no way to
++		 * tell the difference, we must revalidate directory inodes
++		 * before trying to use them.
++		 */
++		if (cifs_dfs_is_possible(cifs_sb))
++			fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
+ 	} else {
+ 		fattr->cf_mode = S_IFREG | cifs_sb->mnt_file_mode;
+ 		fattr->cf_dtype = DT_REG;
+-- 
+1.7.11.7
