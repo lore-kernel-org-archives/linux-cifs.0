@@ -1,7 +1,7 @@
-From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Subject: Re: [PATCH] mount.cifs: add support for IPv6 addresses in brackets V2
-Date: Tue, 23 Apr 2013 10:12:22 -0400
-Message-ID: <CAFB9KM1FRKo=LRbqmEAUemsX=R34zKSdxYz1mTPXyun=0O44Tg@mail.gmail.com>
+Date: Tue, 23 Apr 2013 09:26:32 -0500
+Message-ID: <CAH2r5ms4pcD--VzekvfoOL9WU-hS1KEFB2OZVmkb1z8aekhwGg@mail.gmail.com>
 References: <1365963558-20082-1-git-send-email-scott.lovenberg@gmail.com>
 	<1366075789-23137-1-git-send-email-scott.lovenberg@gmail.com>
 	<CAFB9KM00JWSUSP28LrzJsgQ0po6ZtTpK9enbwv3-N5y2+E5G0A@mail.gmail.com>
@@ -9,8 +9,8 @@ References: <1365963558-20082-1-git-send-email-scott.lovenberg@gmail.com>
 	<CAFB9KM2QWUZrF-Bj5gkKqHiybYcFB5gskqGqRRsOQ8aGQC6WBw@mail.gmail.com>
 	<20130423100114.2146f72a@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
@@ -18,7 +18,7 @@ In-Reply-To: <20130423100114.2146f72a-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gm
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Apr 23, 2013 at 10:01 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+On Tue, Apr 23, 2013 at 9:01 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
 > On Tue, 23 Apr 2013 08:34:14 -0400
 > Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
 >
@@ -30,7 +30,17 @@ On Tue, Apr 23, 2013 at 10:01 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@pu
 >> > I guess I don't quite understand why we need this patch. For NFS it's
 >> > pretty clear that we would since ':' has always served as the delimiter
 >> > between the hostname and the pathname.
->> >
+
+I am ok with the idea of adding additional support that looks more
+like what an NFS user is comfortable with.   Ideally a user should be
+able to type very similar mount commands for cifs/smb3 and NFSv3/v4
+etc.
+
+Scott,
+Can you give a list of an example of these - mounts with each of the
+IPv6 formats that work (and what doesn't work) along with the one you
+propose?
+
 >> > For CIFS, not so much... IPv6 addresses typically don't have '/' or '\\'
 >> > characters in them, so why do we need to wrap them in []?
 >> >
@@ -56,20 +66,18 @@ On Tue, Apr 23, 2013 at 10:01 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@pu
 > already:
 >
 >     # mount -t cifs //fecd::1/share /mnt/cifs -o sec=none,multiuser
-
-Hrm, I thought that didn't work (or, more likely, my test environment
-had some other problem).
-
 >
 > Also, --ip= is not a valid option in the longopts[] array in
 > mount.cifs (maybe you mean -o ip=). I still don't see what benefit we
 > receive from allowing someone specify addresses inside of square
 > brackets.
-Sorry, posted before my first cup of coffee; -o ip= is what I meant to say.
+>
+> --
+> Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 
-Since this already works, I'm inclined to agree that this patch brings
-nothing to the table.
 
---
-Peace and Blessings,
--Scott.
+
+-- 
+Thanks,
+
+Steve
