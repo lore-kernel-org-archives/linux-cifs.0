@@ -1,60 +1,50 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH RFC] cifs: revalidate directories instiantiated via
- FIND_* in order to handle DFS referrals
-Date: Tue, 23 Apr 2013 07:00:34 -0400
-Message-ID: <20130423070034.4490f274@tlielax.poochiereds.net>
-References: <1358276491-4835-1-git-send-email-jlayton@redhat.com>
-	<51765B91.5090100@prodrive.nl>
+From: Scott Lovenberg <scott.lovenberg-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] mount.cifs: add support for IPv6 addresses in brackets V2
+Date: Tue, 23 Apr 2013 08:34:14 -0400
+Message-ID: <CAFB9KM2QWUZrF-Bj5gkKqHiybYcFB5gskqGqRRsOQ8aGQC6WBw@mail.gmail.com>
+References: <1365963558-20082-1-git-send-email-scott.lovenberg@gmail.com>
+	<1366075789-23137-1-git-send-email-scott.lovenberg@gmail.com>
+	<CAFB9KM00JWSUSP28LrzJsgQ0po6ZtTpK9enbwv3-N5y2+E5G0A@mail.gmail.com>
+	<20130422110907.4e684579@tlielax.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>, <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+Content-Type: text/plain; charset=UTF-8
+Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <51765B91.5090100-BHYAuTpL47qEVqv0pETR8A@public.gmane.org>
+In-Reply-To: <20130422110907.4e684579-9yPaYZwiELC+kQycOl6kW4xkIHaj4LzF@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, 23 Apr 2013 11:59:45 +0200
-Martijn de Gouw <martijn.de.gouw-BHYAuTpL47qEVqv0pETR8A@public.gmane.org> wrote:
+On Mon, Apr 22, 2013 at 11:09 AM, Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org> wrote:
+>> Ping.
+>> Any comments?
+>>
+>
+> I guess I don't quite understand why we need this patch. For NFS it's
+> pretty clear that we would since ':' has always served as the delimiter
+> between the hostname and the pathname.
+>
+> For CIFS, not so much... IPv6 addresses typically don't have '/' or '\\'
+> characters in them, so why do we need to wrap them in []?
+>
+> Note that this syntax doesn't follow what Windows does either, AFAIK.
+> There, you need something like this since UNC paths can't contain ':'
+> characters (and maybe also '%'):
+>
+>     http://www.samba.org/~idra/code/nss-ipv6literal/README.html
+>
+> ...we have no such restriction under Linux though.
+>
 
-> Hi Jeff,
-> 
-> On 01/15/2013 08:01 PM, Jeff Layton wrote:
-> > We've had a long-standing problem with DFS referral points. CIFS servers
-> > generally try to make them look like directories in FIND_FIRST/NEXT
-> > responses. When you go to try to do a FIND_FIRST on them though, the
-> > server will then (correctly) return STATUS_PATH_NOT_COVERED. Mostly this
-> > manifests as spurious EREMOTE errors back to userland.
-> >
-> > This patch attempts to fix this by marking directories that are
-> > discovered via FIND_FIRST/NEXT for revaldiation. When the lookup code
-> > runs across them again, we'll reissue a QPathInfo against them and that
-> > will make it chase the referral properly.
-> >
-> > There is some performance penalty involved here and no I haven't
-> > measured it -- it'll be highly dependent upon the workload and contents
-> > of the mounted share. To try and mitigate that though, the code only
-> > marks the inode for revalidation when it's possible to run across a DFS
-> > referral. i.e.: when the kernel has DFS support built in and the share
-> > is "in DFS".
-> 
-> Are you planning to get this patch into mainline?
-> 
-> I've applied this patch to 3.7.7, otherwise we where not able to mount 
-> dfs shares. It's running for over 2 months now on our servers and we 
-> have not seen any problems whatsoever.
-> 
-> Regards, Martijn
-> 
+I liked this approach for two reasons.  It handles a convention for
+IPv6 formatting that is used that we don't support and allows us to
+(in the future) parse an address from the path instead of having to
+use --ip=, which I feel is a bit cumbersome.  Originally I was going
+to just put in support for something like "mount.cifs
+//IPv6Address/share /mnt/path" right away, but I wanted to get this
+part in first.
 
-I was hoping that it would go into the upcoming 3.10 merge window, but
-Steve won't take it as he's concerned about the performance impact. The
-current story is "maybe 3.11".
-
-One possibility to mitigate the performance impact might be to switch
-the default to "nodfs". IOW, make it so that you consciously have to
-mount with "-o dfs" in order to get it. That's a departure from how it
-works today though.
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+Peace and Blessings,
+-Scott.
