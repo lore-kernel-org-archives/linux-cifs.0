@@ -1,7 +1,7 @@
 From: Venkateswararao Jujjuri <jvrao@us.ibm.com>
 Subject: Re: GSoC -- Possible projects
-Date: Thu, 25 Apr 2013 17:26:17 -0700
-Message-ID: <OF0274EB1C.D2061E77-ON88257B59.0001068D-88257B59.000267CC@us.ibm.com>
+Date: Thu, 25 Apr 2013 17:26:20 -0700
+Message-ID: <OF8A0600EC.60CC07D0-ON88257B59.00022FAD-88257B59.000268EE@us.ibm.com>
 References: <CA+5B0FPVdGwobN5Jrc+kzRz2vc3DhL=EiSrkLJep3Dkw9QpVzg@mail.gmail.com>	<20130425125933.10b51b3a@f163.suse.de>
 	<CAH2r5mvmee7nraPFMFadsKDfaKCVXfwF33DsEeX-nuRwbuwuYQ@mail.gmail.com>
 Mime-Version: 1.0
@@ -23,12 +23,8 @@ Sender: samba-technical-bounces@lists.samba.org
 Errors-To: samba-technical-bounces@lists.samba.org
 List-Id: linux-cifs.vger.kernel.org
 
-Yeah, this is really nice tool and there was good presentation at cthon on 
-
-this.
-
-http://nfsv4bat.org/Documents/ConnectAThon/2013/NFStest.pdf
-
+http://nfsv4bat.org/Documents/ConnectAThon/2013/NewGenerationofTesting-v2.p=
+df
 
 Venkateswararao Jujjuri (JV)
 IBM Master Inventor
