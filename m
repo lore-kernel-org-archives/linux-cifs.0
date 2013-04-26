@@ -1,109 +1,184 @@
 From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v6 0/7] Add O_DENY* support for VFS and CIFS/NFS
-Date: Fri, 26 Apr 2013 16:04:14 +0400
-Message-ID: <1366977861-27678-1-git-send-email-piastry@etersoft.ru>
+Subject: [PATCH v6 2/7] VFS: Add O_DENYDELETE support for VFS
+Date: Fri, 26 Apr 2013 16:04:16 +0400
+Message-ID: <1366977861-27678-3-git-send-email-piastry@etersoft.ru>
+References: <1366977861-27678-1-git-send-email-piastry@etersoft.ru>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
 To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1366977861-27678-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Main changes from v5:
-1) O_DENYDELETE is now supported by VFS.
-2) ESHAREDENIED erro code is introduced to be returned on sharelock conflicts.
-3) forcemand dependancy is removed. CIFS module detects if it should use NTCreateAndX command according to existence of O_DENY flags.
-4) Term 'deny lock' is replaced by 'sharelock' (function names, code comments, patch descriptions).
+Introduce new LOCK_DELETE flock flag that is suggested to be used
+internally only to map O_DENYDELETE open flag:
 
-Main changes from v4:
-1) deny_lock_file uses FS_DOES_SHARELOCK flag from fs_flags to determine whether to use VFS locks or not.
-2) Make nfs code return -EBUSY for share conflicts (was -EACCESS).
+!O_DENYDELETE -> LOCK_DELETE | LOCK_MAND.
 
-Main changes from v3
-1) O_DENYMAND is removed, sharelock mount option is introduced.
-2) Patch fcntl.h and VFS patches are united into one.
-3) flock/LOCK_MAND is disabled for sharelock mounts.
+Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+---
+ fs/locks.c                       | 53 +++++++++++++++++++++++++++++++++-------
+ fs/namei.c                       |  3 +++
+ include/linux/fs.h               |  6 +++++
+ include/uapi/asm-generic/fcntl.h |  1 +
+ 4 files changed, 54 insertions(+), 9 deletions(-)
 
-This patchset adds support of O_DENY* flags for Linux fs layer. These flags can be used by any application that needs share reservations to organize a file access. VFS already has some sort of this capability - now it's done through flock/LOCK_MAND mechanis, but that approach is non-atomic. This patchset build new capabilities on top of the existing one but doesn't bring any changes into the flock call semantic.
-
-These flags can be used by NFS (built-in-kernel) and CIFS (Samba) servers and Wine applications through VFS (for local filesystems) or CIFS/NFS modules. This will help when e.g. Samba and NFS server share the same directory for Windows and Linux users or Wine applications use Samba/NFS share to access the same data from different clients.
-
-According to the previous discussions the most problematic question is how to prevent situations like DoS attacks where e.g /lib/liba.so file can be open with DENYREAD, or smth like this. That's why extra mount option 'sharelock' is added for switching on/off O_DENY* flags processing. It allows us to avoid use of these flags on critical places (like /, /lib) and turn them on if we really want it proccessed that way.
-
-So, we have 3 new flags:
-O_DENYREAD - to prevent other opens with read access,
-O_DENYWRITE - to prevent other opens with write access,
-O_DENYDELETE - to prevent delete operations (this flag is not implemented in VFS and NFS part and only suitable for CIFS module),
-
-The patchset avoid data races problem on newely created files: open with O_CREAT can return the -ETXTBSY error for a successfully created file if this files was locked with a sharelock by another task. Also, it turns flock/LOCK_MAND capability off for mounts with 'sharelock' option. This lets us not mix one share reservation approach with another.
-
-The #1 patch adds flags to fcntl and implements VFS part. The patches #3, #4, #5 are related to CIFS-specific changes, #6 and #7 describe NFS and NFSD parts.
-
-The preliminary patch for Samba that replaces the existing use of flock/LOCK_MAND mechanism with O_DENY* flags:
-http://git.etersoft.ru/people/piastry/packages/?p=samba.git;a=commitdiff;h=173070262b7f29134ad6b2e49a760017c11aec4a
-
-The future part of open man page patch:
-
------
-O_DENYREAD, O_DENYWRIYE, O_DENYDELETE - used to inforce a mandatory share reservation scheme of the file access. If these flag is passed, the open fails with -ESHAREDENIED in following cases:
-1) if O_DENYREAD flag is specified and there is another open with READ access to the file;
-2) if O_DENYWRITE flag is specified and there is another open with WRITE access to the file;
-3) if READ access is requested and there is another open with O_DENYREAD flags;
-4) if WRITE access is requested and there is another open with O_DENYWRITE flags.
-
-If O_DENYDELETE flag is specified and the open succeded, any further unlink operation will fail with -ESHAREDENIED untill this open is closed. Now this flag is processed by VFS and CIFS filesystem.
-
-This mechanism is done through flocks. If O_DENY* flags are specified, flock syscall is processed after the open. The share modes are translated into flock according the following rules:
-1) !O_DENYREAD   -> LOCK_READ   | LOCK_MAND
-2) !O_DENYWRITE  -> LOCK_WRITE  | LOCK_MAND
-3) !O_DENYDELETE -> LOCK_DELETE | LOCK_MAND
------
-
-Pavel Shilovsky (7):
-  VFS: Introduce new O_DENY* open flags
-  VFS: Add O_DENYDELETE support for VFS
-  CIFS: Add share_access parm to open request
-  CIFS: Add O_DENY* open flags support
-  NFSv4: Add O_DENY* open flags support
-  NFSD: Pass share reservations flags to VFS
-  locks: Disable LOCK_MAND support for MS_SHARELOCK mounts
-
- fs/cifs/cifsacl.c                |   8 +-
- fs/cifs/cifsfs.c                 |   2 +-
- fs/cifs/cifsglob.h               |  18 ++++-
- fs/cifs/cifsproto.h              |   8 +-
- fs/cifs/cifssmb.c                |  50 +++++++------
- fs/cifs/dir.c                    |  16 ++--
- fs/cifs/file.c                   |  25 +++++--
- fs/cifs/inode.c                  |  21 +++---
- fs/cifs/link.c                   |  25 ++-----
- fs/cifs/netmisc.c                |   2 +-
- fs/cifs/readdir.c                |   5 +-
- fs/cifs/smb1ops.c                |  16 ++--
- fs/cifs/smb2file.c               |  10 +--
- fs/cifs/smb2inode.c              |   4 +-
- fs/cifs/smb2maperror.c           |   2 +-
- fs/cifs/smb2ops.c                |  10 ++-
- fs/cifs/smb2pdu.c                |   6 +-
- fs/cifs/smb2proto.h              |  14 ++--
- fs/fcntl.c                       |   5 +-
- fs/locks.c                       | 158 ++++++++++++++++++++++++++++++++++++---
- fs/namei.c                       |  48 +++++++++++-
- fs/nfs/dir.c                     |   4 +
- fs/nfs/internal.h                |   3 +-
- fs/nfs/nfs4file.c                |   4 +
- fs/nfs/nfs4proc.c                |   4 +-
- fs/nfs/nfs4super.c               |   9 ++-
- fs/nfs/nfs4xdr.c                 |  21 +++++-
- fs/nfs/super.c                   |   7 +-
- fs/nfsd/nfs4state.c              |  46 +++++++++++-
- fs/nfsd/nfsproc.c                |   1 +
- fs/proc_namespace.c              |   1 +
- include/linux/fs.h               |  14 ++++
- include/uapi/asm-generic/errno.h |   2 +
- include/uapi/asm-generic/fcntl.h |  12 +++
- include/uapi/linux/fs.h          |   1 +
- 35 files changed, 443 insertions(+), 139 deletions(-)
-
+diff --git a/fs/locks.c b/fs/locks.c
+index dbc5557..1cc68a9 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -269,7 +269,7 @@ EXPORT_SYMBOL(locks_copy_lock);
+ 
+ static inline int flock_translate_cmd(int cmd) {
+ 	if (cmd & LOCK_MAND)
+-		return cmd & (LOCK_MAND | LOCK_RW);
++		return cmd & (LOCK_MAND | LOCK_RW | LOCK_DELETE);
+ 	switch (cmd) {
+ 	case LOCK_SH:
+ 		return F_RDLCK;
+@@ -614,6 +614,8 @@ deny_flags_to_cmd(unsigned int flags)
+ 		cmd |= LOCK_READ;
+ 	if (!(flags & O_DENYWRITE))
+ 		cmd |= LOCK_WRITE;
++	if (!(flags & O_DENYDELETE))
++		cmd |= LOCK_DELETE;
+ 
+ 	return cmd;
+ }
+@@ -836,6 +838,31 @@ out:
+ 	return error;
+ }
+ 
++int
++sharelock_may_delete(struct dentry *dentry)
++{
++	struct file_lock **before;
++	int rc = 0;
++
++	if (!IS_SHARELOCK(dentry->d_inode))
++		return rc;
++
++	lock_flocks();
++	for_each_lock(dentry->d_inode, before) {
++		struct file_lock *fl = *before;
++		if (IS_POSIX(fl))
++			break;
++		if (IS_LEASE(fl))
++			continue;
++		if (fl->fl_type & LOCK_DELETE)
++			continue;
++		rc = 1;
++		break;
++	}
++	unlock_flocks();
++	return rc;
++}
++
+ /*
+  * Determine if a file is allowed to be opened with specified access and share
+  * modes. Lock the file and return 0 if checks passed, otherwise return
+@@ -850,10 +877,6 @@ sharelock_lock_file(struct file *filp)
+ 	if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
+ 		return error;
+ 
+-	/* Disable O_DENYDELETE support for now */
+-	if (filp->f_flags & O_DENYDELETE)
+-		return -EINVAL;
+-
+ 	error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
+ 	if (error)
+ 		return error;
+@@ -1717,6 +1740,12 @@ SYSCALL_DEFINE2(flock, unsigned int, fd, unsigned int, cmd)
+ 	if (!f.file)
+ 		goto out;
+ 
++	/* LOCK_DELETE is defined to be translated from O_DENYDELETE only */
++	if (cmd & LOCK_DELETE) {
++		error = -EINVAL;
++		goto out;
++	}
++
+ 	can_sleep = !(cmd & LOCK_NB);
+ 	cmd &= ~LOCK_NB;
+ 	unlock = (cmd == LOCK_UN);
+@@ -2261,10 +2290,16 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 		seq_printf(f, "UNKNOWN UNKNOWN  ");
+ 	}
+ 	if (fl->fl_type & LOCK_MAND) {
+-		seq_printf(f, "%s ",
+-			       (fl->fl_type & LOCK_READ)
+-			       ? (fl->fl_type & LOCK_WRITE) ? "RW   " : "READ "
+-			       : (fl->fl_type & LOCK_WRITE) ? "WRITE" : "NONE ");
++		if (fl->fl_type & LOCK_DELETE)
++			seq_printf(f, "%s ",
++				(fl->fl_type & LOCK_READ) ?
++				(fl->fl_type & LOCK_WRITE) ? "RWDEL" : "RDDEL" :
++				(fl->fl_type & LOCK_WRITE) ? "WRDEL" : "DEL  ");
++		else
++			seq_printf(f, "%s ",
++				(fl->fl_type & LOCK_READ) ?
++				(fl->fl_type & LOCK_WRITE) ? "RW   " : "READ " :
++				(fl->fl_type & LOCK_WRITE) ? "WRITE" : "NONE ");
+ 	} else {
+ 		seq_printf(f, "%s ",
+ 			       (lease_breaking(fl))
+diff --git a/fs/namei.c b/fs/namei.c
+index dd236fe..a404f7d 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -2220,6 +2220,7 @@ static inline int check_sticky(struct inode *dir, struct inode *inode)
+  *  9. We can't remove a root or mountpoint.
+  * 10. We don't allow removal of NFS sillyrenamed files; it's handled by
+  *     nfs_async_unlink().
++ * 11. We can't do it if victim is locked by O_DENYDELETE sharelock.
+  */
+ static int may_delete(struct inode *dir,struct dentry *victim,int isdir)
+ {
+@@ -2250,6 +2251,8 @@ static int may_delete(struct inode *dir,struct dentry *victim,int isdir)
+ 		return -ENOENT;
+ 	if (victim->d_flags & DCACHE_NFSFS_RENAMED)
+ 		return -EBUSY;
++	if (sharelock_may_delete(victim))
++		return -ESHAREDENIED;
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 24066d2..afd56b1 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1006,6 +1006,7 @@ extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
+ extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
+ extern void locks_delete_block(struct file_lock *waiter);
+ extern int sharelock_lock_file(struct file *);
++extern int sharelock_may_delete(struct dentry *);
+ extern void lock_flocks(void);
+ extern void unlock_flocks(void);
+ #else /* !CONFIG_FILE_LOCKING */
+@@ -1159,6 +1160,11 @@ static inline int sharelock_lock_file(struct file *filp)
+ 	return 0;
+ }
+ 
++static inline int sharelock_may_delete(struct dentry *dentry)
++{
++	return 0;
++}
++
+ static inline void lock_flocks(void)
+ {
+ }
+diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
+index 5ac0d49..a3e6349 100644
+--- a/include/uapi/asm-generic/fcntl.h
++++ b/include/uapi/asm-generic/fcntl.h
+@@ -167,6 +167,7 @@ struct f_owner_ex {
+ 				   blocking */
+ #define LOCK_UN		8	/* remove lock */
+ 
++#define LOCK_DELETE	16	/* which allows to delete a file */
+ #define LOCK_MAND	32	/* This is a mandatory flock ... */
+ #define LOCK_READ	64	/* which allows concurrent read operations */
+ #define LOCK_WRITE	128	/* which allows concurrent write operations */
 -- 
 1.8.1.5
