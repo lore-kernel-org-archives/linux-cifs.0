@@ -1,141 +1,387 @@
-From: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Subject: [PATCH v6 6/7] NFSD: Pass share reservations flags to VFS
-Date: Fri, 26 Apr 2013 16:04:20 +0400
-Message-ID: <1366977861-27678-7-git-send-email-piastry@etersoft.ru>
+From: Pavel Shilovsky <piastry@etersoft.ru>
+Subject: [PATCH v6 1/7] VFS: Introduce new O_DENY* open flags
+Date: Fri, 26 Apr 2013 16:04:15 +0400
+Message-ID: <1366977861-27678-2-git-send-email-piastry@etersoft.ru>
 References: <1366977861-27678-1-git-send-email-piastry@etersoft.ru>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, wine-devel-5vRYHf7vrtgdnm+yROfE0A@public.gmane.org
-To: linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1366977861-27678-1-git-send-email-piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Cc: linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org, wine-devel@winehq.org
+To: linux-kernel@vger.kernel.org
+Return-path: <wine-devel-bounces@winehq.org>
+In-Reply-To: <1366977861-27678-1-git-send-email-piastry@etersoft.ru>
+List-Unsubscribe: <http://www.winehq.org/mailman/options/wine-devel>,
+	<mailto:wine-devel-request@winehq.org?subject=unsubscribe>
+List-Archive: <http://www.winehq.org/pipermail/wine-devel>
+List-Post: <mailto:wine-devel@winehq.org>
+List-Help: <mailto:wine-devel-request@winehq.org?subject=help>
+List-Subscribe: <http://www.winehq.org/mailman/listinfo/wine-devel>,
+	<mailto:wine-devel-request@winehq.org?subject=subscribe>
+Sender: wine-devel-bounces@winehq.org
+Errors-To: wine-devel-bounces@winehq.org
+List-Id: linux-cifs.vger.kernel.org
 
-that maps them into O_DENY* flags and make them visible for
-applications on mounts with sharelock option.
+This patch adds 3 flags:
+1) O_DENYREAD that doesn't permit read access,
+2) O_DENYWRITE that doesn't permit write access,
+3) O_DENYDELETE that doesn't permit delete or rename.
 
-Signed-off-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Network filesystems CIFS, SMB2.0, SMB3.0 and NFSv4 have such flags -
+this change can benefit cifs and nfs modules as well as Samba and
+NFS file servers that export the same directory for Windows clients,
+or Wine applications that access the same files simultaneously.
+
+These flags are only take affect for opens on mounts with new sharelock
+option. They are translated to flock's flags:
+
+!O_DENYREAD  -> LOCK_READ | LOCK_MAND
+!O_DENYWRITE -> LOCK_WRITE | LOCK_MAND
+
+and set through flock_lock_file on a file. If the file can't be locked
+due conflicts with another open with O_DENY* flags, a new -ESHAREDENIED
+error code is returned.
+
+Create codepath is slightly changed to prevent data races on
+newely created files: when open with O_CREAT can return -ESHAREDENIED
+error for successfully created files due to a sharelock set by
+another task.
+
+Temporary disable O_DENYDELETE support - will enable it in further patches.
+
+Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
 ---
- fs/locks.c          |  1 +
- fs/nfsd/nfs4state.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- fs/nfsd/nfsproc.c   |  1 +
- 3 files changed, 47 insertions(+), 1 deletion(-)
+ fs/fcntl.c                       |  5 ++-
+ fs/locks.c                       | 97 +++++++++++++++++++++++++++++++++++++---
+ fs/namei.c                       | 45 +++++++++++++++++--
+ fs/proc_namespace.c              |  1 +
+ include/linux/fs.h               |  7 +++
+ include/uapi/asm-generic/errno.h |  2 +
+ include/uapi/asm-generic/fcntl.h | 11 +++++
+ include/uapi/linux/fs.h          |  1 +
+ 8 files changed, 156 insertions(+), 13 deletions(-)
 
+diff --git a/fs/fcntl.c b/fs/fcntl.c
+index 6599222..a1eee47 100644
+--- a/fs/fcntl.c
++++ b/fs/fcntl.c
+@@ -730,14 +730,15 @@ static int __init fcntl_init(void)
+ 	 * Exceptions: O_NONBLOCK is a two bit define on parisc; O_NDELAY
+ 	 * is defined as O_NONBLOCK on some platforms and not on others.
+ 	 */
+-	BUILD_BUG_ON(19 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
++	BUILD_BUG_ON(22 - 1 /* for O_RDONLY being 0 */ != HWEIGHT32(
+ 		O_RDONLY	| O_WRONLY	| O_RDWR	|
+ 		O_CREAT		| O_EXCL	| O_NOCTTY	|
+ 		O_TRUNC		| O_APPEND	| /* O_NONBLOCK	| */
+ 		__O_SYNC	| O_DSYNC	| FASYNC	|
+ 		O_DIRECT	| O_LARGEFILE	| O_DIRECTORY	|
+ 		O_NOFOLLOW	| O_NOATIME	| O_CLOEXEC	|
+-		__FMODE_EXEC	| O_PATH
++		__FMODE_EXEC	| O_PATH	| O_DENYREAD	|
++		O_DENYWRITE	| O_DENYDELETE
+ 		));
+ 
+ 	fasync_cache = kmem_cache_create("fasync_cache",
 diff --git a/fs/locks.c b/fs/locks.c
-index abe8986..25c3a49 100644
+index cb424a4..dbc5557 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -897,6 +897,7 @@ sharelock_lock_file(struct file *filp)
- 	locks_free_lock(lock);
- 	return error;
- }
-+EXPORT_SYMBOL(sharelock_lock_file);
- 
- static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
- {
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index 2e27430..5043504 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -463,6 +463,19 @@ test_deny(u32 access, struct nfs4_ol_stateid *stp)
- 	return test_bit(access, &stp->st_deny_bmap);
+@@ -605,20 +605,73 @@ static int posix_locks_conflict(struct file_lock *caller_fl, struct file_lock *s
+ 	return (locks_conflict(caller_fl, sys_fl));
  }
  
-+static int nfs4_deny_to_odeny(u32 access)
+-/* Determine if lock sys_fl blocks lock caller_fl. FLOCK specific
+- * checking before calling the locks_conflict().
++static unsigned int
++deny_flags_to_cmd(unsigned int flags)
 +{
-+	switch (access & NFS4_SHARE_DENY_BOTH) {
-+	case NFS4_SHARE_DENY_READ:
-+		return O_DENYREAD;
-+	case NFS4_SHARE_DENY_WRITE:
-+		return O_DENYWRITE;
-+	case NFS4_SHARE_DENY_BOTH:
-+		return O_DENYREAD | O_DENYWRITE;
-+	}
++	unsigned int cmd = LOCK_MAND;
++
++	if (!(flags & O_DENYREAD))
++		cmd |= LOCK_READ;
++	if (!(flags & O_DENYWRITE))
++		cmd |= LOCK_WRITE;
++
++	return cmd;
++}
++
++/*
++ * locks_mand_conflict - Determine if there's a share reservation conflict
++ * @caller_fl: lock we're attempting to acquire
++ * @sys_fl: lock already present on system that we're checking against
++ *
++ * Check to see if there's a share_reservation conflict. LOCK_READ/LOCK_WRITE
++ * tell us whether the reservation allows other readers and writers.
++ */
++static int
++locks_mand_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
++{
++	unsigned char caller_type = caller_fl->fl_type;
++	unsigned char sys_type = sys_fl->fl_type;
++	fmode_t caller_fmode = caller_fl->fl_file->f_mode;
++	fmode_t sys_fmode = sys_fl->fl_file->f_mode;
++
++	/* they can only conflict if FS is mounted with MS_SHARELOCK */
++	if (!IS_SHARELOCK(caller_fl->fl_file->f_path.dentry->d_inode))
++		return 0;
++
++	/* they can only conflict if they're both LOCK_MAND */
++	if (!(caller_type & LOCK_MAND) || !(sys_type & LOCK_MAND))
++		return 0;
++
++	if (!(caller_type & LOCK_READ) && (sys_fmode & FMODE_READ))
++		return 1;
++	if (!(caller_type & LOCK_WRITE) && (sys_fmode & FMODE_WRITE))
++		return 1;
++	if (!(sys_type & LOCK_READ) && (caller_fmode & FMODE_READ))
++		return 1;
++	if (!(sys_type & LOCK_WRITE) && (caller_fmode & FMODE_WRITE))
++		return 1;
++
 +	return 0;
 +}
 +
- static int nfs4_access_to_omode(u32 access)
++/*
++ * Determine if lock sys_fl blocks lock caller_fl. FLOCK specific checking
++ * before calling the locks_conflict().
+  */
+ static int flock_locks_conflict(struct file_lock *caller_fl, struct file_lock *sys_fl)
  {
- 	switch (access & NFS4_SHARE_ACCESS_BOTH) {
-@@ -2786,6 +2799,21 @@ nfsd4_truncate(struct svc_rqst *rqstp, struct svc_fh *fh,
+-	/* FLOCK locks referring to the same filp do not conflict with
++	if (!IS_FLOCK(sys_fl))
++		return 0;
++	if ((caller_fl->fl_type & LOCK_MAND) || (sys_fl->fl_type & LOCK_MAND))
++		return locks_mand_conflict(caller_fl, sys_fl);
++	/*
++	 * FLOCK locks referring to the same filp do not conflict with
+ 	 * each other.
+ 	 */
+-	if (!IS_FLOCK(sys_fl) || (caller_fl->fl_file == sys_fl->fl_file))
+-		return (0);
+-	if ((caller_fl->fl_type & LOCK_MAND) || (sys_fl->fl_type & LOCK_MAND))
++	if (caller_fl->fl_file == sys_fl->fl_file)
+ 		return 0;
+ 
+-	return (locks_conflict(caller_fl, sys_fl));
++	return locks_conflict(caller_fl, sys_fl);
  }
  
- static __be32
-+nfs4_vfs_set_deny(struct nfs4_file *fp, unsigned long share_access,
-+		  unsigned long deny_access)
+ void
+@@ -783,6 +836,36 @@ out:
+ 	return error;
+ }
+ 
++/*
++ * Determine if a file is allowed to be opened with specified access and share
++ * modes. Lock the file and return 0 if checks passed, otherwise return
++ * -ESHAREDENIED.
++ */
++int
++sharelock_lock_file(struct file *filp)
 +{
-+	int oflag, rc;
-+	__be32 status = nfs_ok;
++	struct file_lock *lock;
++	int error = 0;
 +
-+	oflag = nfs4_access_to_omode(share_access);
-+	fp->fi_fds[oflag]->f_flags |= nfs4_deny_to_odeny(deny_access);
-+	rc = sharelock_lock_file(fp->fi_fds[oflag]);
-+	if (rc)
-+		status = nfserrno(rc);
-+	return status;
++	if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
++		return error;
++
++	/* Disable O_DENYDELETE support for now */
++	if (filp->f_flags & O_DENYDELETE)
++		return -EINVAL;
++
++	error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
++	if (error)
++		return error;
++
++	error = flock_lock_file(filp, lock);
++	if (error == -EAGAIN)
++		error = -ESHAREDENIED;
++
++	locks_free_lock(lock);
++	return error;
 +}
 +
-+static __be32
- nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *cur_fh, struct nfs4_ol_stateid *stp, struct nfsd4_open *open)
+ static int __posix_lock_file(struct inode *inode, struct file_lock *request, struct file_lock *conflock)
  {
- 	u32 op_share_access = open->op_share_access;
-@@ -2806,6 +2834,14 @@ nfs4_upgrade_open(struct svc_rqst *rqstp, struct nfs4_file *fp, struct svc_fh *c
- 		}
- 		return status;
- 	}
-+	status = nfs4_vfs_set_deny(fp, op_share_access, open->op_share_deny);
-+	if (status) {
-+		if (new_access) {
-+			int oflag = nfs4_access_to_omode(op_share_access);
-+			nfs4_file_put_access(fp, oflag);
-+		}
-+		return status;
+ 	struct file_lock *fl;
+diff --git a/fs/namei.c b/fs/namei.c
+index 57ae9c8..dd236fe 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -2548,9 +2548,14 @@ static int atomic_open(struct nameidata *nd, struct dentry *dentry,
+ 	 * here.
+ 	 */
+ 	error = may_open(&file->f_path, acc_mode, open_flag);
+-	if (error)
++	if (error) {
+ 		fput(file);
++		goto out;
 +	}
- 	/* remember the open */
- 	set_access(op_share_access, stp);
- 	set_deny(open->op_share_deny, stp);
-@@ -3039,7 +3075,7 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
+ 
++	error = sharelock_lock_file(file);
++	if (error)
++		fput(file);
+ out:
+ 	dput(dentry);
+ 	return error;
+@@ -2760,9 +2765,9 @@ retry_lookup:
+ 	}
+ 	mutex_lock(&dir->d_inode->i_mutex);
+ 	error = lookup_open(nd, path, file, op, got_write, opened);
+-	mutex_unlock(&dir->d_inode->i_mutex);
+ 
+ 	if (error <= 0) {
++		mutex_unlock(&dir->d_inode->i_mutex);
+ 		if (error)
+ 			goto out;
+ 
+@@ -2780,8 +2785,32 @@ retry_lookup:
+ 		will_truncate = false;
+ 		acc_mode = MAY_OPEN;
+ 		path_to_nameidata(path, nd);
+-		goto finish_open_created;
++
++		/*
++		 * Unlock parent i_mutex later when the open finishes - prevent
++		 * races when a file can be locked with a sharelock by another
++		 * task that opened the file with O_DENY* flags.
++		 */
++		error = may_open(&nd->path, acc_mode, open_flag);
++		if (error) {
++			mutex_unlock(&dir->d_inode->i_mutex);
++			goto out;
++		}
++		file->f_path.mnt = nd->path.mnt;
++		error = finish_open(file, nd->path.dentry, NULL, opened);
++		if (error) {
++			mutex_unlock(&dir->d_inode->i_mutex);
++			if (error == -EOPENSTALE)
++				goto stale_open;
++			goto out;
++		}
++		error = sharelock_lock_file(file);
++		mutex_unlock(&dir->d_inode->i_mutex);
++		if (error)
++			goto exit_fput;
++		goto opened;
+ 	}
++	mutex_unlock(&dir->d_inode->i_mutex);
  
  	/*
- 	 * OPEN the file, or upgrade an existing OPEN.
--	 * If truncate fails, the OPEN fails.
-+	 * If truncate or set_deny fails, the OPEN fails.
- 	 */
- 	if (stp) {
- 		/* Stateid was found, this is an OPEN upgrade */
-@@ -3053,6 +3089,10 @@ nfsd4_process_open2(struct svc_rqst *rqstp, struct svc_fh *current_fh, struct nf
- 		status = nfsd4_truncate(rqstp, current_fh, open);
- 		if (status)
+ 	 * create/update audit record if it already exists.
+@@ -2863,7 +2892,6 @@ finish_open:
  			goto out;
-+		status = nfs4_vfs_set_deny(fp, open->op_share_access,
-+					   open->op_share_deny);
-+		if (status)
-+			goto out;
- 		stp = open->op_stp;
- 		open->op_stp = NULL;
- 		init_open_stateid(stp, fp, open);
-@@ -3751,6 +3791,10 @@ nfsd4_open_downgrade(struct svc_rqst *rqstp,
+ 		got_write = true;
  	}
- 	nfs4_stateid_downgrade(stp, od->od_share_access);
- 
-+	status = nfs4_vfs_set_deny(stp->st_file, od->od_share_access,
-+				   od->od_share_deny);
-+	if (status)
-+		goto out;
- 	reset_union_bmap_deny(od->od_share_deny, stp);
- 
- 	update_stateid(&stp->st_stid.sc_stateid);
-diff --git a/fs/nfsd/nfsproc.c b/fs/nfsd/nfsproc.c
-index 54c6b3d..ff95544 100644
---- a/fs/nfsd/nfsproc.c
-+++ b/fs/nfsd/nfsproc.c
-@@ -743,6 +743,7 @@ nfserrno (int errno)
- 		{ nfserr_notsupp, -EOPNOTSUPP },
- 		{ nfserr_toosmall, -ETOOSMALL },
- 		{ nfserr_serverfault, -ESERVERFAULT },
-+		{ nfserr_share_denied, -ESHAREDENIED },
+-finish_open_created:
+ 	error = may_open(&nd->path, acc_mode, open_flag);
+ 	if (error)
+ 		goto out;
+@@ -2874,6 +2902,15 @@ finish_open_created:
+ 			goto stale_open;
+ 		goto out;
+ 	}
++	/*
++	 * Lock parent i_mutex to prevent races with sharelocks on newely
++	 * created files.
++	 */
++	mutex_lock(&dir->d_inode->i_mutex);
++	error = sharelock_lock_file(file);
++	mutex_unlock(&dir->d_inode->i_mutex);
++	if (error)
++		goto exit_fput;
+ opened:
+ 	error = open_check_o_direct(file);
+ 	if (error)
+diff --git a/fs/proc_namespace.c b/fs/proc_namespace.c
+index 5fe34c3..6ed78a2 100644
+--- a/fs/proc_namespace.c
++++ b/fs/proc_namespace.c
+@@ -44,6 +44,7 @@ static int show_sb_opts(struct seq_file *m, struct super_block *sb)
+ 		{ MS_SYNCHRONOUS, ",sync" },
+ 		{ MS_DIRSYNC, ",dirsync" },
+ 		{ MS_MANDLOCK, ",mand" },
++		{ MS_SHARELOCK, ",sharelock" },
+ 		{ 0, NULL }
  	};
- 	int	i;
+ 	const struct proc_fs_info *fs_infop;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 2c28271..24066d2 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1005,6 +1005,7 @@ extern int lease_modify(struct file_lock **, int);
+ extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
+ extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
+ extern void locks_delete_block(struct file_lock *waiter);
++extern int sharelock_lock_file(struct file *);
+ extern void lock_flocks(void);
+ extern void unlock_flocks(void);
+ #else /* !CONFIG_FILE_LOCKING */
+@@ -1153,6 +1154,11 @@ static inline void locks_delete_block(struct file_lock *waiter)
+ {
+ }
  
++static inline int sharelock_lock_file(struct file *filp)
++{
++	return 0;
++}
++
+ static inline void lock_flocks(void)
+ {
+ }
+@@ -1668,6 +1674,7 @@ struct super_operations {
+ #define IS_PRIVATE(inode)	((inode)->i_flags & S_PRIVATE)
+ #define IS_IMA(inode)		((inode)->i_flags & S_IMA)
+ #define IS_AUTOMOUNT(inode)	((inode)->i_flags & S_AUTOMOUNT)
++#define IS_SHARELOCK(inode)	__IS_FLG(inode, MS_SHARELOCK)
+ #define IS_NOSEC(inode)		((inode)->i_flags & S_NOSEC)
+ 
+ /*
+diff --git a/include/uapi/asm-generic/errno.h b/include/uapi/asm-generic/errno.h
+index a1331ce..19ab5f4 100644
+--- a/include/uapi/asm-generic/errno.h
++++ b/include/uapi/asm-generic/errno.h
+@@ -110,4 +110,6 @@
+ 
+ #define EHWPOISON	133	/* Memory page has hardware error */
+ 
++#define ESHAREDENIED	134	/* File is locked with a sharelock */
++
+ #endif
+diff --git a/include/uapi/asm-generic/fcntl.h b/include/uapi/asm-generic/fcntl.h
+index a48937d..5ac0d49 100644
+--- a/include/uapi/asm-generic/fcntl.h
++++ b/include/uapi/asm-generic/fcntl.h
+@@ -84,6 +84,17 @@
+ #define O_PATH		010000000
+ #endif
+ 
++#ifndef O_DENYREAD
++#define O_DENYREAD	020000000	/* Do not permit read access */
++#endif
++#ifndef O_DENYWRITE
++#define O_DENYWRITE	040000000	/* Do not permit write access */
++#endif
++/* FMODE_NONOTIFY	0100000000 */
++#ifndef O_DENYDELETE
++#define O_DENYDELETE	0200000000	/* Do not permit delete or rename */
++#endif
++
+ #ifndef O_NDELAY
+ #define O_NDELAY	O_NONBLOCK
+ #endif
+diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+index c7fc1e6..2af7269 100644
+--- a/include/uapi/linux/fs.h
++++ b/include/uapi/linux/fs.h
+@@ -86,6 +86,7 @@ struct inodes_stat_t {
+ #define MS_KERNMOUNT	(1<<22) /* this is a kern_mount call */
+ #define MS_I_VERSION	(1<<23) /* Update inode I_version field */
+ #define MS_STRICTATIME	(1<<24) /* Always perform atime updates */
++#define MS_SHARELOCK	(1<<25) /* Allow share locks on an FS */
+ 
+ /* These sb flags are internal to the kernel */
+ #define MS_SNAP_STABLE	(1<<27) /* Snapshot pages during writeback, if needed */
 -- 
 1.8.1.5
