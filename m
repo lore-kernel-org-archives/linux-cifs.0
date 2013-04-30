@@ -1,95 +1,102 @@
-From: Venkateswararao Jujjuri <jvrao@us.ibm.com>
-Subject: Re: GSoC -- Possible projects
-Date: Thu, 25 Apr 2013 17:26:20 -0700
-Message-ID: <OF8A0600EC.60CC07D0-ON88257B59.00022FAD-88257B59.000268EE@us.ibm.com>
-References: <CA+5B0FPVdGwobN5Jrc+kzRz2vc3DhL=EiSrkLJep3Dkw9QpVzg@mail.gmail.com>	<20130425125933.10b51b3a@f163.suse.de>
-	<CAH2r5mvmee7nraPFMFadsKDfaKCVXfwF33DsEeX-nuRwbuwuYQ@mail.gmail.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: multiuser kerberised cifs via autofs needs root ticket cache
+Date: Tue, 30 Apr 2013 09:22:12 -0400
+Message-ID: <20130430092212.53254831@tlielax.poochiereds.net>
+References: <51723F74.3010807@steve-ss.com>
+	<20130426101410.1754c9ab@tlielax.poochiereds.net>
+	<517B0C3A.80809@steve-ss.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Cc: David Disseldorp <ddiss@suse.de>, samba-technical@lists.samba.org,
-	linux-cifs@vger.kernel.org
-To: Steve French <smfrench@gmail.com>
-Return-path: <samba-technical-bounces@lists.samba.org>
-In-Reply-To: <CAH2r5mvmee7nraPFMFadsKDfaKCVXfwF33DsEeX-nuRwbuwuYQ@mail.gmail.com>
-List-Unsubscribe: <https://lists.samba.org/mailman/options/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=unsubscribe>
-List-Archive: <http://lists.samba.org/pipermail/samba-technical>
-List-Post: <mailto:samba-technical@lists.samba.org>
-List-Help: <mailto:samba-technical-request@lists.samba.org?subject=help>
-List-Subscribe: <https://lists.samba.org/mailman/listinfo/samba-technical>,
-	<mailto:samba-technical-request@lists.samba.org?subject=subscribe>
-Sender: samba-technical-bounces@lists.samba.org
-Errors-To: samba-technical-bounces@lists.samba.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <517B0C3A.80809-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-http://nfsv4bat.org/Documents/ConnectAThon/2013/NewGenerationofTesting-v2.p=
-df
+On Sat, 27 Apr 2013 01:22:34 +0200
+steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
 
-Venkateswararao Jujjuri (JV)
-IBM Master Inventor
-TL - NFS-Ganesha  Filesystems
-LTC, Beaverton, OR
+> On 26/04/13 16:14, Jeff Layton wrote:
+> > On Sat, 20 Apr 2013 09:10:44 +0200
+> > steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
+> >
+> >> Hi
+> >> one of my automount files is:
+> >> * -fstype=cifs,sec=krb5,multiuser ://doloresdc/users/&
+> >>
+> >> It works fine but only if the krb5cc_0 cache is available under /tmp.
+> >> When a user logs in, he gets his own cache. With multiuser, why isn't
+> >> that good enough to be able to mount his share?
+> >>
+> > Because you haven't specified the cruid= that should be used to mount
+> > the share and act as the root credentials for the mount.
+> >
+> > I don't think you really want "multiuser" in the above situation. It
+> > sounds like you're trying to set up each autofs-mounted cifs filesystem
+> > for a single user.
+> >
+> > In that case, you probably want to do something like:
+> >
+> >      * -fstype=cifs,sec=krb5,uid=&,gid=&,cruid=& ://doloresdc/users/&
+> No, it doesn't work. We'd need one & for the uid and another for the 
+> gid. We can only have one wild card I think. It's important that even 
+> though it's a singe user mount, that the files created in it are owned 
+> by the uid:gid of the user. multiuser gives us this, plus it's essential 
+> for mounts where many users have group rw to the files in the share.
 
+Yeah, you'd need to figure out what should be added into there if you
+really think you need a separate mount per user directory. Note too
+that there's a catch with the above configuration -- there's nothing
+that prevents an entirely unrelated user from getting into the
+directory that's been mounted and accessing it with the mount
+credentials.
 
+None of that's an issue however if you use a proper multiuser mount.
 
-From:
-Steve French <smfrench@gmail.com>
-To:
-David Disseldorp <ddiss@suse.de>,=20
-Cc:
-Aur=E9lien Aptel <aurelien.aptel@gmail.com>,=20
-samba-technical@lists.samba.org, linux-cifs@vger.kernel.org
-Date:
-04/25/2013 11:30 AM
-Subject:
-Re: GSoC -- Possible projects
+> >
+> > ...assuming of course that the directory names under that filesystem
+> > match the usernames of your users.
+> >
+> >> Question, if we really must have the root cache then how do I get that
+> >> on boot? I need to run this as root:
+> >> kinit -k steve2 to get the cache with my key in /etc/krb5.keytab. I
+> >> can't find a way to be able to do that on either Ubuntu 12.10 nor
+> >> openSUSE 12.3.
+> >>
+> > I think you're confused as to what "multiuser" does. It allows users to
+> > access the *same* mounted filesystem with their own krb5 creds. IOW,
+> > instead of trying to use autofs like you are here, you could simply
+> > do this:
+> >
+> >      mount -t cifs //doloresdc/users /cifsusers -o sec=krb5,multiuser
+> >
+> > ...assuming that you have a credcache for uid=0 or proper credentials
+> > in /etc/krb5.keytab, then it should mount and users can access
+> > everything under /cifsusers with their own credentials.
+> >
+> Hi
+> Yes, the permanent mount works but it's slow when the lan is busy. The 
+> automounter speeds things up quite a bit. Maybe our hardware isn't up to 
+> maintaining the permanent mount. But, in anycase, what you are saying is 
+> that I have to keep a root cache alive under /tmp to make any mount at 
+> all.
 
+No, that's not what I'm saying at all. You can get the same effect by
+setting up credentials for root in /etc/krb5.keytab. Just pass in the
+correct username= mount option for the principal that you want root to
+be.
 
+> That's what we're finding. How do we go about that? A cron to do 
+> kinit -k MACHINE$ every few hours for example? k5start looks ok too.
+> Cheers, Steve
+> 
 
-Also FYI - Trond mentioned a much improved Linux nfs stats gathering
-tool last week (during the Linux File System Summit) - I think it was
-NFSometer (not certain).  See
+Erm...I'm not sure how to respond to this since it doesn't make much
+sense. Perhaps you can outline what you mean? What exactly, is "slow"
+when you use a "permanent" multiuser mount? None of this should be
+terribly taxing on a modern computer...
 
-http://wiki.linux-nfs.org/wiki/index.php/NFSometer
-
-Would be useful to check on this. The linux nfs git tools repositories
-or linux-nfs mailing list might have more info.  Presumably better
-than iostat and nfsstat which are also worth examining to see if
-similar could be done for cifs/smb2/smb3 kernel stats.
-
-On Thu, Apr 25, 2013 at 5:59 AM, David Disseldorp <ddiss@suse.de> wrote:
-> On Tue, 23 Apr 2013 23:06:55 +0200
-> Aur=E9lien Aptel <aurelien.aptel@gmail.com> wrote:
->
->> - Create GUI or command-line tools for displaying /proc/fs/cifs
->> statistics and and mount/session status
->>
->> I was thinking about a simple script that outputs a pretty html/css
->> file. This should be a small task.
->
-> FWIW, I'd suggest adding the proc file parser to an existing monitoring
-> tool such as PCP[1], which already provides a graphical front-end and
-> logging functionality. PCP monitoring agents for Samba[2] and CTDB[3]
-> are already available.
->
-> Cheers, David
->
-> 1. Performance Co-Pilot
->    http://oss.sgi.com/projects/pcp/index.html
-> 2. Samba monitoring agent
->   =20
-http://oss.sgi.com/cgi-bin/gitweb.cgi?p=3Dpcp/pcp.git;a=3Dblob;f=3Dsrc/pmda=
-s/samba/pmdasamba.pl;hb=3Drefs/heads/master
-
-> 3. CTDB monitoring agent
->   =20
-https://git.samba.org/?p=3Dctdb.git;a=3Dblob;f=3Dutils/pmda/pmda=5Fctdb.c;h=
-b=3DHEAD
-
-
-
---=20
-Thanks,
-
-Steve
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
