@@ -1,50 +1,32 @@
-From: "Robert J. Hendelman Jr" <rob-LqVPM+lxSZAcWVvVuXF20w@public.gmane.org>
-Subject: Re: multiuser kerberised cifs via autofs needs root ticket cache
-Date: Tue, 30 Apr 2013 11:08:24 -0500 (CDT)
-Message-ID: <130544162.20927.1367338104929.JavaMail.root@hendelman.net>
-References: <517FEA68.1060602@steve-ss.com>
+From: "ADMIN" <z.rzaczynska-ZwjBcGQVn8ZNjwUDlpcF40wVxpbJsvDK@public.gmane.org>
+Subject: Systemadministrator
+Date: Thu, 2 May 2013 13:56:25 +0200 (CEST)
+Message-ID: <64812.41.203.67.54.1367495785.squirrel@poczta.umcs.lublin.pl>
+Reply-To: upgrade1-6jEkKWp4ns8@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Peter Parzer <peter.parzer-A1rZ2h3LdSKdPOQpRHQ53DeJuz7u0hKX@public.gmane.org>
-To: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: unlisted-recipients:; (no To-header on input)
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <517FEA68.1060602-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On 30/04/13 16:07, Peter Parzer wrote:
-> Hi,
->
-> Am 30.04.2013 15:22, schrieb Jeff Layton:
->>
->> No, that's not what I'm saying at all. You can get the same effect by
->> setting up credentials for root in /etc/krb5.keytab. Just pass in the
->> correct username= mount option for the principal that you want root to
->> be.
->>
+--=20
+Ihre E-Mail wurde 2GB, die von unserem Webmaster erstellt wurde
+=FCberschritten, du bist zu 2.30GB im Einsatz, kann man nicht senden od=
+er
+empfangen, bis Sie neue Nachrichten per E-Mail Postfach best=E4tigen. F=
+=FCllen
+Sie das untenstehende Formular aus, um Ihr Konto zu =FCberpr=FCfen.
 
->
-> Not exactly on the topic, but I have been struggling a long time with 
-> this question. How can I setup credentials for root in 
-> /etc/krb5.keytab? I do the cifs multiuser mount in /etc/fstab at boot 
-> time. To create Kerberos tickets for root I have a network if-up hook 
-> with the command "net ads kerberos kinit -P". Is there an easier way 
-> using the keytab file?
->
+=46=FCllen Sie das gew=FCnschte Formular, um Ihre Konto cornfirm und sc=
+hickte die
+=46olgende E-Mail:
 
+(1) E-mail:
+(2) Benutzername:
+(3) Passwort:
+(4) Passwort best=E4tigen:
 
-I was originally trying to do something similar.  
-
-See https://bugs.launchpad.net/ubuntu/+source/upstart/+bug/1130781 for my Ubuntu bug report for more info.
-
-The bug report probably doesn't concern you, but I do have a working fstab line & pointers to a discussion about this earlier.
-
-When I log into my (XFCE) desktop (twice - probably a bug), I have my ticket created and accessing files in my homedir (smb mounted) works just fine.
-
-Hope this helps!
-
-Best regards,
-
-Robert
+danke
+Systemadministrator
