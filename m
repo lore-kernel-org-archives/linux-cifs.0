@@ -1,93 +1,94 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fixes
-Date: Mon, 6 May 2013 09:02:02 -0500
-Message-ID: <CAH2r5mukY9ERoHnE3qj9B-MGKFTFptJMotZ7N27a1G+P_g3C=Q@mail.gmail.com>
+Subject: AES Crypto Support in Kernel
+Date: Mon, 6 May 2013 09:11:28 -0500
+Message-ID: <CAH2r5muCod5S7PgRgD6CEbSwFtXykUmyP8fusRqLt-KLW1cMvQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Cc: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical <samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org>
+To: Shirish S Pargaonkar <shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-A set of cifs cleanup fixes.  The only big one of this set optimizes
-the cifs error logging, renaming cFYI and cERROR macros to cifs_dbg,
-and in the process makes it clearer and reduces module size.
+Shirish,
+Does the recent crypto merge to kernel, which includes these two
+patches for example, help you (at least on the more common chips,
+those with optimized AES offload support)?  Wonder if we can leverage
+the hardware offload in Samba?
 
-The following changes since commit 173192958d06b8d1eb44f56d74373052ad6a9a60:
+commit c456a9cd1ac4eae9147ffd7ac4fb77ca0fa980c6
+Author: Jussi Kivilinna <jussi.kivilinna-X3B1VOXEql0@public.gmane.org>
+Date:   Mon Apr 8 21:51:16 2013 +0300
 
-  Merge tag 'mmc-updates-for-3.10-rc1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/cjb/mmc (2013-05-04
-13:45:17 -0700)
+    crypto: aesni_intel - add more optimized XTS mode for x86-64
 
-are available in the git repository at:
+    Add more optimized XTS code for aesni_intel in 64-bit mode, for
+smaller stack
+    usage and boost for speed.
+
+    tcrypt results, with Intel i5-2450M:
+    256-bit key
+            enc     dec
+    16B     0.98x   0.99x
+    64B     0.64x   0.63x
+    256B    1.29x   1.32x
+    1024B   1.54x   1.58x
+    8192B   1.57x   1.60x
+--
+    performance is reduced in tcrypt for 64 byte long blocks.
+
+    Cc: Huang Ying <ying.huang-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org>
+    Signed-off-by: Jussi Kivilinna <jussi.kivilinna-X3B1VOXEql0@public.gmane.org>
+    Signed-off-by: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
+
+commit b5c5b072dc2f35d45d3404b957e264a3e8e71069
+Author: Jussi Kivilinna <jussi.kivilinna-X3B1VOXEql0@public.gmane.org>
+Date:   Mon Apr 8 21:51:11 2013 +0300
+
+    crypto: x86/camellia-aesni-avx - add more optimized XTS code
+
+    Add more optimized XTS code for camellia-aesni-avx, for smaller stack usage
+    and small boost for speed.
+
+    tcrypt results, with Intel i5-2450M:
+            enc     dec
+    16B     1.10x   1.01x
+    64B     0.82x   0.77x
+    256B    1.14x   1.10x
+    1024B   1.17x   1.16x
+    8192B   1.10x   1.11x
+
+--
+    Signed-off-by: Jussi Kivilinna <jussi.kivilinna-X3B1VOXEql0@public.gmane.org>
+    Signed-off-by: Herbert Xu <herbert-lOAM2aK0SrRLBo1qDEOMRrpzq4S04n8Q@public.gmane.org>
 
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-next
+On Mon, May 6, 2013 at 9:00 AM, Shirish S Pargaonkar
+<shirishp-r/Jw6+rmf7HQT0dZR+AlfA@public.gmane.org> wrote:
+>
+> Steve, I am using Herbert Xu 3.8 git repository which has the code.
+>
+> Regards,
+>
+> Shirish
+>
+> Steve French ---05/05/2013 10:43:10 PM---Sounds great.  Has the new aes cmac lib been added to kernel yet in 3.10? On May 5, 2013 10:33 PM, "
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
 
-for you to fetch changes up to b13ce4bbcae6181eb9cdda5a5bf88a28b0acd7aa:
 
-  cifs: small variable name cleanup (2013-05-04 22:18:10 -0500)
-
-----------------------------------------------------------------
-Dan Carpenter (1):
-      cifs: small variable name cleanup
-
-Dia Vasile (1):
-      cifs: replaced kmalloc + memset with kzalloc
-
-Jeff Layton (4):
-      cifs: ignore the unc= and prefixpath= mount options
-      cifs: remove ENOSPC handling in smb_sendv
-      cifs: on send failure, readjust server sequence number downward
-      cifs: store the real expected sequence number in the mid
-
-Joe Perches (1):
-      [CIFS] cifs: Rename cERROR and cFYI to cifs_dbg
-
-Silviu-Mihai Popescu (1):
-      fs: cifs: use kmemdup instead of kmalloc + memcpy
-
-Wei Yongjun (1):
-      CIFS: fix error return code in cifs_atomic_open()
-
- fs/cifs/asn1.c          |  40 ++--
- fs/cifs/cache.c         |   6 +-
- fs/cifs/cifs_debug.c    |  67 ++++---
- fs/cifs/cifs_debug.h    |  70 +++----
- fs/cifs/cifs_dfs_ref.c  |  41 ++--
- fs/cifs/cifs_spnego.c   |   5 +-
- fs/cifs/cifs_unicode.c  |   4 +-
- fs/cifs/cifsacl.c       | 130 ++++++-------
- fs/cifs/cifsencrypt.c   | 106 +++++------
- fs/cifs/cifsfs.c        |  36 ++--
- fs/cifs/cifsproto.h     |  10 +-
- fs/cifs/cifssmb.c       | 488 ++++++++++++++++++++++++------------------------
- fs/cifs/connect.c       | 368 +++++++++++++++---------------------
- fs/cifs/dir.c           |  48 ++---
- fs/cifs/dns_resolve.c   |  17 +-
- fs/cifs/export.c        |   2 +-
- fs/cifs/file.c          | 166 ++++++++--------
- fs/cifs/fscache.c       |  58 +++---
- fs/cifs/inode.c         | 109 +++++------
- fs/cifs/ioctl.c         |   6 +-
- fs/cifs/link.c          |  24 +--
- fs/cifs/misc.c          |  78 ++++----
- fs/cifs/netmisc.c       |  16 +-
- fs/cifs/readdir.c       |  77 ++++----
- fs/cifs/sess.c          |  77 ++++----
- fs/cifs/smb1ops.c       |  50 ++---
- fs/cifs/smb2file.c      |   8 +-
- fs/cifs/smb2inode.c     |   2 +-
- fs/cifs/smb2maperror.c  |   2 +-
- fs/cifs/smb2misc.c      |  96 +++++-----
- fs/cifs/smb2ops.c       |  16 +-
- fs/cifs/smb2pdu.c       | 161 ++++++++--------
- fs/cifs/smb2transport.c |  26 +--
- fs/cifs/smbencrypt.c    |  17 +-
- fs/cifs/transport.c     |  84 +++++----
- fs/cifs/xattr.c         |  54 +++---
- 36 files changed, 1261 insertions(+), 1304 deletions(-)
 
 --
 Thanks,
