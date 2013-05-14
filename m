@@ -1,178 +1,89 @@
-From: Jeff Layton <jlayton@samba.org>
-Subject: Re: [PATCH v6 2/7] VFS: Add O_DENYDELETE support for VFS
-Date: Tue, 14 May 2013 08:23:50 +0200
-Message-ID: <20130514082350.7399b3e4@corrin.poochiereds.net>
-References: <1366977861-27678-1-git-send-email-piastry@etersoft.ru>
-	<1366977861-27678-3-git-send-email-piastry@etersoft.ru>
-	<20130510070959.0af3e35a@tlielax.poochiereds.net>
-	<CAKywueSZhYZo-Xc8s2Vv-k8a1LBNr_FGOH0qSMRFKJ1hJrYOUw@mail.gmail.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: Mount failure due to restricted access to a point along the
+ mount path
+Date: Tue, 14 May 2013 10:51:19 +0200
+Message-ID: <20130514105119.66a5bc3f@corrin.poochiereds.net>
+References: <CAJfpegtADAJ+7-DiFvrgWU1N5Fsd_CCQryT0mpx6VOJ=8ikKsA@mail.gmail.com>
+	<20130510102754.184cd90d@corrin.poochiereds.net>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: linux-kernel@vger.kernel.org,
-	linux-cifs <linux-cifs@vger.kernel.org>,
-	linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-	Linux NFS Mailing list <linux-nfs@vger.kernel.org>,
-	wine-devel@winehq.org
-To: Pavel Shilovsky <piastry@etersoft.ru>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKywueSZhYZo-Xc8s2Vv-k8a1LBNr_FGOH0qSMRFKJ1hJrYOUw@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Cc: Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
+	Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+	sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <20130510102754.184cd90d-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Mon, 13 May 2013 21:50:23 +0400
-Pavel Shilovsky <piastry@etersoft.ru> wrote:
+On Fri, 10 May 2013 10:27:54 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> 2013/5/10 Jeff Layton <jlayton@poochiereds.net>:
-> > On Fri, 26 Apr 2013 16:04:16 +0400
-> > Pavel Shilovsky <piastry@etersoft.ru> wrote:
-> >
-> >> Introduce new LOCK_DELETE flock flag that is suggested to be used
-> >> internally only to map O_DENYDELETE open flag:
-> >>
-> >> !O_DENYDELETE -> LOCK_DELETE | LOCK_MAND.
-> >>
-> >> Signed-off-by: Pavel Shilovsky <piastry@etersoft.ru>
-> >> ---
-> >>  fs/locks.c                       | 53 +++++++++++++++++++++++++++++++++-------
-> >>  fs/namei.c                       |  3 +++
-> >>  include/linux/fs.h               |  6 +++++
-> >>  include/uapi/asm-generic/fcntl.h |  1 +
-> >>  4 files changed, 54 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/fs/locks.c b/fs/locks.c
-> >> index dbc5557..1cc68a9 100644
-> >> --- a/fs/locks.c
-> >> +++ b/fs/locks.c
-> >> @@ -269,7 +269,7 @@ EXPORT_SYMBOL(locks_copy_lock);
-> >>
-> >>  static inline int flock_translate_cmd(int cmd) {
-> >>       if (cmd & LOCK_MAND)
-> >> -             return cmd & (LOCK_MAND | LOCK_RW);
-> >> +             return cmd & (LOCK_MAND | LOCK_RW | LOCK_DELETE);
-> >>       switch (cmd) {
-> >>       case LOCK_SH:
-> >>               return F_RDLCK;
-> >> @@ -614,6 +614,8 @@ deny_flags_to_cmd(unsigned int flags)
-> >>               cmd |= LOCK_READ;
-> >>       if (!(flags & O_DENYWRITE))
-> >>               cmd |= LOCK_WRITE;
-> >> +     if (!(flags & O_DENYDELETE))
-> >> +             cmd |= LOCK_DELETE;
-> >>
-> >>       return cmd;
-> >>  }
-> >> @@ -836,6 +838,31 @@ out:
-> >>       return error;
-> >>  }
-> >>
-> >> +int
-> >> +sharelock_may_delete(struct dentry *dentry)
-> >> +{
-> >> +     struct file_lock **before;
-> >> +     int rc = 0;
-> >> +
-> >> +     if (!IS_SHARELOCK(dentry->d_inode))
-> >> +             return rc;
-> >> +
-> >> +     lock_flocks();
-> >> +     for_each_lock(dentry->d_inode, before) {
-> >> +             struct file_lock *fl = *before;
-> >> +             if (IS_POSIX(fl))
-> >> +                     break;
-> >> +             if (IS_LEASE(fl))
-> >> +                     continue;
-> >> +             if (fl->fl_type & LOCK_DELETE)
-> >> +                     continue;
-> >> +             rc = 1;
-> >> +             break;
-> >> +     }
-> >> +     unlock_flocks();
-> >> +     return rc;
-> >> +}
-> >> +
-> >>  /*
-> >>   * Determine if a file is allowed to be opened with specified access and share
-> >>   * modes. Lock the file and return 0 if checks passed, otherwise return
-> >> @@ -850,10 +877,6 @@ sharelock_lock_file(struct file *filp)
-> >>       if (!IS_SHARELOCK(filp->f_path.dentry->d_inode))
-> >>               return error;
-> >>
-> >> -     /* Disable O_DENYDELETE support for now */
-> >> -     if (filp->f_flags & O_DENYDELETE)
-> >> -             return -EINVAL;
-> >> -
-> >>       error = flock_make_lock(filp, &lock, deny_flags_to_cmd(filp->f_flags));
-> >>       if (error)
-> >>               return error;
-> >> @@ -1717,6 +1740,12 @@ SYSCALL_DEFINE2(flock, unsigned int, fd, unsigned int, cmd)
-> >>       if (!f.file)
-> >>               goto out;
-> >>
-> >> +     /* LOCK_DELETE is defined to be translated from O_DENYDELETE only */
-> >> +     if (cmd & LOCK_DELETE) {
-> >> +             error = -EINVAL;
-> >> +             goto out;
-> >> +     }
-> >> +
-> >>       can_sleep = !(cmd & LOCK_NB);
-> >>       cmd &= ~LOCK_NB;
-> >>       unlock = (cmd == LOCK_UN);
-> >> @@ -2261,10 +2290,16 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
-> >>               seq_printf(f, "UNKNOWN UNKNOWN  ");
-> >>       }
-> >>       if (fl->fl_type & LOCK_MAND) {
-> >> -             seq_printf(f, "%s ",
-> >> -                            (fl->fl_type & LOCK_READ)
-> >> -                            ? (fl->fl_type & LOCK_WRITE) ? "RW   " : "READ "
-> >> -                            : (fl->fl_type & LOCK_WRITE) ? "WRITE" : "NONE ");
-> >> +             if (fl->fl_type & LOCK_DELETE)
-> >> +                     seq_printf(f, "%s ",
-> >> +                             (fl->fl_type & LOCK_READ) ?
-> >> +                             (fl->fl_type & LOCK_WRITE) ? "RWDEL" : "RDDEL" :
-> >> +                             (fl->fl_type & LOCK_WRITE) ? "WRDEL" : "DEL  ");
-> >> +             else
-> >> +                     seq_printf(f, "%s ",
-> >> +                             (fl->fl_type & LOCK_READ) ?
-> >> +                             (fl->fl_type & LOCK_WRITE) ? "RW   " : "READ " :
-> >> +                             (fl->fl_type & LOCK_WRITE) ? "WRITE" : "NONE ");
-> >>       } else {
-> >>               seq_printf(f, "%s ",
-> >>                              (lease_breaking(fl))
-> >> diff --git a/fs/namei.c b/fs/namei.c
-> >> index dd236fe..a404f7d 100644
-> >> --- a/fs/namei.c
-> >> +++ b/fs/namei.c
-> >> @@ -2220,6 +2220,7 @@ static inline int check_sticky(struct inode *dir, struct inode *inode)
-> >>   *  9. We can't remove a root or mountpoint.
-> >>   * 10. We don't allow removal of NFS sillyrenamed files; it's handled by
-> >>   *     nfs_async_unlink().
-> >> + * 11. We can't do it if victim is locked by O_DENYDELETE sharelock.
-> >>   */
-> >>  static int may_delete(struct inode *dir,struct dentry *victim,int isdir)
-> >>  {
-> >> @@ -2250,6 +2251,8 @@ static int may_delete(struct inode *dir,struct dentry *victim,int isdir)
-> >>               return -ENOENT;
-> >>       if (victim->d_flags & DCACHE_NFSFS_RENAMED)
-> >>               return -EBUSY;
-> >> +     if (sharelock_may_delete(victim))
-> >> +             return -ESHAREDENIED;
-> >
-> >
-> > Is there a potential race here?
-> >
-> > You're holding the parent's i_mutex when setting a lock on this file,
-> > but you're not holding it when you test for it here. So it seems
-> > possible you could end up granting a O_DENYDELETE open on a file that
-> > is in the process of being deleted from the namespace.
+> On Fri, 10 May 2013 16:13:30 +0200
+> Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org> wrote:
 > 
-> may_delete function is called from vfs_unlnk, vfs_rename and vfs_rmdir
-> and in all those places the caller is holding parent's i_mutex. It
-> seems that the locking order is correct: we hold parent's i_mutex when
-> we set and test sharelocks.
+> > Hi,
+> > 
+> > A while ago this was discussed:
+> > 
+> >   http://thread.gmane.org/gmane.linux.kernel.cifs/7779
+> > 
+> > This is essentially a regression introduced by the shared superblock
+> > changes in 3.0 and several SUSE customers are complaining about it.
+> > I've created a temporary fix which reverts 29 commits related to the
+> > shared superblock changes.  It works, but it's obviously not a
+> > permanent fix, especially since we definitely don't want to diverge
+> > from mainline.
+> > 
+> > Is this issue being worked on?  Don't other distros have similar reports?
+> > 
+> > Thanks,
+> > Miklos
+> 
+> I don't know of anyone currently working on it. There are a couple of
+> possible approaches to fixing it, I think:
+> 
+> 1) if the dentries to get down to the root of the mount don't already
+> exist, then attach some sort of "placeholder" inode that can be fleshed
+> out later if and when the dentry is accessed via other means.
+> 
+> 2) do something like what NFS does (see commit 54ceac45). This becomes
+> a bit more complicated due to the fact that the server may not hand out
+> real inode numbers and we sometimes have to fake them up.
+> 
+> #1 is probably simpler to implement, but I'll confess that I haven't
+> thought through all of the potential problems with it.
 > 
 
-You're correct -- I misread the code. They do hold the parent's i_mutex
-in all of the critical spots, so that should prevent the above race.
+So, giving this some more thought, I think #2 is really the correct way
+to fix this. Here's the main problem though:
+
+Suppose someone mounts:
+
+    //server/share/foo/bar/baz
+
+We make the sb->s_root point to the top level share, and then create a
+disconnected dentry for "baz" to return from ->mount.
+
+Then, a little while later, //server/share gets mounted separately and
+a user walks down to /foo/bar/baz within the same share.
+
+How do we ensure that we don't end up with two "baz" dentries in this
+situation? With NFS, we can be reasonably sure that there's a 1:1
+correspondance of filehandle to inode.
+
+Under CIFS, it's possible that it's faking up inode numbers if the
+server doesn't provide them via a UniqueID field. The only real
+identifying info we have for the inode in that case is the pathname.
+
+Perhaps we'd be best off to just rip out the sb sharing after all.
+Getting all of the corner cases right when the protocol and server
+implementations are so problematic is really, really difficult.
+
+If we do go that route, then the fscache code will need some work since
+it uses the sharename as a sb cookie.
+
 -- 
-Jeff Layton <jlayton@samba.org>
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
