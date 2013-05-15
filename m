@@ -1,105 +1,40 @@
 From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Mount failure due to restricted access to a point along the mount path
-Date: Tue, 14 May 2013 08:08:34 -0500
-Message-ID: <CAH2r5mv7xTzgsc4rJDp62-Vjzcn0JcZckxFyPbU5h3TDHdUmHg@mail.gmail.com>
-References: <CAJfpegtADAJ+7-DiFvrgWU1N5Fsd_CCQryT0mpx6VOJ=8ikKsA@mail.gmail.com>
-	<20130510102754.184cd90d@corrin.poochiereds.net>
-	<20130514105119.66a5bc3f@corrin.poochiereds.net>
-	<CAH2r5msxb+zB6av5wz5_55MbhCR4FWjJpnyP=vzg-=48gg3vkQ@mail.gmail.com>
-	<20130514130906.7f9525bf@corrin.poochiereds.net>
+Subject: Re: [RFC v0 1/4] vfs: add copy_range syscall and vfs entry point
+Date: Wed, 15 May 2013 12:50:13 -0500
+Message-ID: <CAH2r5ms0P8Hgv1mUpyHA32Er38iiaC1HHC4fhxvz2SBFy6Sucw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org>, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	Kernel Mailing List <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
-	sjayaraman-Et1tbQHTxzrQT0dZR+AlfA@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: linux-fsdevel <linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, zab-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130514130906.7f9525bf-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Well at least for SMB2 we know they should be ok
+Doesn't the new syscall have to invalidate the page cache pages that
+the server is about to overwrite as btrfs does with the following line
+in fs/btrfs/ioctl.c
 
-On Tue, May 14, 2013 at 6:09 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
-> On Tue, 14 May 2013 05:44:48 -0500
-> Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> On Tue, May 14, 2013 at 3:51 AM, Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> > On Fri, 10 May 2013 10:27:54 -0400
->> > Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
->> >
->> >> On Fri, 10 May 2013 16:13:30 +0200
->> >> Miklos Szeredi <miklos-sUDqSbJrdHQHWmgEVkV9KA@public.gmane.org> wrote:
->> >>
->> >> > Hi,
->> >> >
->> >> > A while ago this was discussed:
->> >> >
->> >> >   http://thread.gmane.org/gmane.linux.kernel.cifs/7779
->> >> >
->> >> > This is essentially a regression introduced by the shared superblock
->> >> > changes in 3.0 and several SUSE customers are complaining about it.
->> >> > I've created a temporary fix which reverts 29 commits related to the
->> >> > shared superblock changes.  It works, but it's obviously not a
->> >> > permanent fix, especially since we definitely don't want to diverge
->> >> > from mainline.
->> >> >
->> >> > Is this issue being worked on?  Don't other distros have similar reports?
->> >> >
->> >> > Thanks,
->> >> > Miklos
->> >>
->> >> I don't know of anyone currently working on it. There are a couple of
->> >> possible approaches to fixing it, I think:
->> >>
->> >> 1) if the dentries to get down to the root of the mount don't already
->> >> exist, then attach some sort of "placeholder" inode that can be fleshed
->> >> out later if and when the dentry is accessed via other means.
->> >>
->> >> 2) do something like what NFS does (see commit 54ceac45). This becomes
->> >> a bit more complicated due to the fact that the server may not hand out
->> >> real inode numbers and we sometimes have to fake them up.
->> >>
->> >> #1 is probably simpler to implement, but I'll confess that I haven't
->> >> thought through all of the potential problems with it.
->> >>
->> >
->> > So, giving this some more thought, I think #2 is really the correct way
->> > to fix this. Here's the main problem though:
->> >
->> > Suppose someone mounts:
->> >
->> >     //server/share/foo/bar/baz
->> >
->> > We make the sb->s_root point to the top level share, and then create a
->> > disconnected dentry for "baz" to return from ->mount.
->> >
->> > Then, a little while later, //server/share gets mounted separately and
->> > a user walks down to /foo/bar/baz within the same share.
->> >
->> > How do we ensure that we don't end up with two "baz" dentries in this
->> > situation? With NFS, we can be reasonably sure that there's a 1:1
->> > correspondance of filehandle to inode.
->> >
->> > Under CIFS, it's possible that it's faking up inode numbers if the
->> > server doesn't provide them via a UniqueID field. The only real
->> > identifying info we have for the inode in that case is the pathname.
->>
->> Since this (support for server generated inode numbers) is most common
->> case (especially with SMB2 and later) - I don't mind making dependency
->> on the server supporting UniqueID for this.
->
-> There are still some problems even when the server does supply them. We
-> sometimes find that they aren't suitable for various reasons or aren't
-> to be trusted, and the client disables server inode numbers on the fly.
->
-> What do you do at that point if you already have 2 mounts sharing the
-> superblock?
->
-> --
-> Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+	truncate_inode_pages_range(&inode->i_data, destoff,
+				   PAGE_CACHE_ALIGN(destoff + len) - 1);
 
+(and doesn't truncate_inode_pages_range handle page cache alignment
+anyway - and also why did btrfs use truncate_inode_pages_range instead
+of invalidate?)
 
+Does nfs client ever have the case where two different superblocks map
+to the same nfs export (and thus the check below is restricting the
+ability to do server side copy)?
+
++	if (inode_in->i_sb != inode_out->i_sb ||
++	    file_in->f_path.mnt != file_out->f_path.mnt)
++		return -EXDEV;
+
+I am working on cifs client patches for the ioctl, and the new syscall
+also looks pretty easy.   Some popular cifs servers (like Windows)
+have supported smb/cifs copy offload for many, many years - and now
+Samba with the support that David Disseldorp added for the clone range
+ioctl has been supporting copychunk (server side copy from Windows to
+Samba) so about time to finish the cifs client equivalent.
 
 -- 
 Thanks,
