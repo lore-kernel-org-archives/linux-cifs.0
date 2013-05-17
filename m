@@ -1,22 +1,32 @@
-From: "Dobbelmann, A.P.M." <A.P.M.Dobbelmann-ZS/VO/AiPhU@public.gmane.org>
-Subject: Your Mailbox Has Exceeded Quota Limit
-Date: Thu, 16 May 2013 08:12:14 +0000
-Message-ID: <86EA3CBA26A2E14CA17452B057C0BB4C017705@XSERVER20B.campus.tue.nl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-To: Undisclosed recipients:;
+From: Peng Haitao <penght-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
+Subject: [PATCH] cifs.upcall.c: the exit code should be 0 when print version
+Date: Fri, 17 May 2013 17:27:02 +0800
+Message-ID: <1368782822-15039-1-git-send-email-penght@cn.fujitsu.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Language: en-US
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+When print version number, the exit code should be 0
+and syslog() should not send "Negating key" to the system logger.
 
+Signed-off-by: Peng Haitao <penght-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
+---
+ cifs.upcall.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-
-Your Mailbox Has Exceeded its Quota Limit As Set By Your Administrator, And You Will Not Be Able To Receive Or Send New Mails Until You Re-Validate.To Re-Validate
-
-CLICK HERE:<http://administratorsystem.jimdo.com/>
-
-System Administrator
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 12d5900..6c0b9de 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -857,6 +857,7 @@ int main(const int argc, char *const argv[])
+ 			legacy_uid++;
+ 			break;
+ 		case 'v':
++			rc = 0;
+ 			printf("version: %s\n", VERSION);
+ 			goto out;
+ 		default:
+-- 
+1.8.1.4
