@@ -1,32 +1,26 @@
-From: Peng Haitao <penght-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
-Subject: [PATCH] cifs.upcall.c: the exit code should be 0 when print version
-Date: Fri, 17 May 2013 17:27:02 +0800
-Message-ID: <1368782822-15039-1-git-send-email-penght@cn.fujitsu.com>
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
+From: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
+Subject: Setting up a testing environment like discussed on SambaXP
+Date: Fri, 17 May 2013 15:10:08 +0200
+Message-ID: <51962C30.8090201@debian.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-When print version number, the exit code should be 0
-and syslog() should not send "Negating key" to the system logger.
+Hi
 
-Signed-off-by: Peng Haitao <penght-BthXqXjhjHXQFUHtdCDX3A@public.gmane.org>
----
- cifs.upcall.c | 1 +
- 1 file changed, 1 insertion(+)
+To make sure there are no functionality regressions, we discussed
+setting up an automatic test setup. It could at first run all kind of
+functionality tests against against a Samba server for the 4 protocols
+we support: CIFS, SMB 2.0.2, SMB 2.1 and SMB 3.
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 12d5900..6c0b9de 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -857,6 +857,7 @@ int main(const int argc, char *const argv[])
- 			legacy_uid++;
- 			break;
- 		case 'v':
-+			rc = 0;
- 			printf("version: %s\n", VERSION);
- 			goto out;
- 		default:
--- 
-1.8.1.4
+Once we have actual scripts to handle the automatic building, rebooting
+and testing of the client it can be hosted on samba.org hardware.
+Therefor I'll try to set up a testing environment soon.
+
+Cheers
+
+Luk
