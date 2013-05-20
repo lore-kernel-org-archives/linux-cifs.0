@@ -1,52 +1,38 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: Setting up a testing environment like discussed on SambaXP
-Date: Fri, 17 May 2013 08:41:52 -0500
-Message-ID: <CAH2r5mvyKZAFfEq8Y1=BupO9MiDiWH3vg+aGPhULQ9oFboZRnw@mail.gmail.com>
-References: <51962C30.8090201@debian.org>
+From: Shirish Pargaonkar <shirishpargaonkar@gmail.com>
+Subject: NIST SP800-138 availibility using kernel crypto APIs for SMB3.0 MAC generation
+Date: Sun, 19 May 2013 21:49:58 -0500
+Message-ID: <CADT32eKKeouXxVv57bEfug-Kr89VJ-wfcaxRw_E79g5MLw4_3Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <51962C30.8090201-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
+	linux-cifs <linux-cifs@vger.kernel.org>
+Return-path: <linux-crypto-owner@vger.kernel.org>
+Sender: linux-crypto-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-This would be a HUGE help.
+With the recent patches added to kernel crypto for improving AES
+support, adding aesni etc, it seems like it is time to add AES CMAC
+to the cifs kernel module (for the popular SMB3 signing and per-share
+encryption) but needed for an implementation for SP800-138 in kernel
+crypto codebase.
+Was specifically interested using the way defined in 3.1.4.2 of
+MS-SMB2 document, in particular
 
-Having a simple test script that executes 4 times (mount, small test
-against mount, unmount), once for each of the four protocols is great.
- Whether it is run by etting up triggers so it automatically runs when
-the cifs tree changes, or running it periodically (once a week or once
-a day) - either way would be a invaluable.  Jeff and I are very
-familiar with additional fs testcases that could be added over time,
-but getting the basics of image rebuild and restart out of the way
-would enable gradual improvement of the test coverage of the client
-client (and samba server indirectly) and be VERY helpful
-
-On Fri, May 17, 2013 at 8:10 AM, Luk Claes <luk-8fiUuRrzOP0dnm+yROfE0A@public.gmane.org> wrote:
-> Hi
->
-> To make sure there are no functionality regressions, we discussed
-> setting up an automatic test setup. It could at first run all kind of
-> functionality tests against against a Samba server for the 4 protocols
-> we support: CIFS, SMB 2.0.2, SMB 2.1 and SMB 3.
->
-> Once we have actual scripts to handle the automatic building, rebooting
-> and testing of the client it can be hosted on samba.org hardware.
-> Therefor I'll try to set up a testing environment soon.
->
-> Cheers
->
-> Luk
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+KDF in Counter mode (section 5.1 of NIST SP 800-108) or a way to specify a mode
+PRF as HMAC-SHA256 (or a way to specify a PRF)
 
 
+cifs client would use this algorithm for SMB3.0 MAC generation
+(network packet signing on network file system mounts to newer
+generation NAS, and Windows 2012) and also for per-share encryption
+(which is also available on the most recent generation of NAS via
+SMB3). Apparently with current Intel processors having hardware for
+this kind of encryption offload - full packet encryption is faster
+than packet signing used to be (with the older standard algorithms)
+and just doing packet signing is really fast.
 
--- 
-Thanks,
+Are their APIs in crypto kernel code to use for this purpose?
 
-Steve
+Regards,
+
+Shirish
