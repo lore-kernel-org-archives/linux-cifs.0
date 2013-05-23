@@ -1,524 +1,298 @@
-From: Waiman Long <Waiman.Long@hp.com>
-Subject: [PATCH 3/3 v3] dcache: change rename_lock to a sequence read/write lock
-Date: Wed, 22 May 2013 21:37:28 -0400
-Message-ID: <1369273048-60256-4-git-send-email-Waiman.Long@hp.com>
-References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
-Cc: Waiman Long <Waiman.Long@hp.com>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, autofs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
-	"Chandramouleeswaran, Aswin" <aswin@hp.com>,
-	"Norton, Scott J" <scott.norton@hp.com>,
-	Andi Kleen <andi@firstfloor.org>,
-	Dave Chinner <david@fromorbit.com>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jeff Layton <jlayton@redhat.com>,
-	Miklos Szeredi <mszeredi@suse.cz>, Ian Kent <raven@themaw.net>,
-	Sage Weil <sage@inktank.com>, Steve French <sfrench@samba.org>,
-	Trond Myklebust <Trond.Myklebust@netapp.com>,
-	Eric Paris <eparis@redhat.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-In-Reply-To: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
+From: "=?gb18030?B?cmVtYXBlcg==?=" <yp.fangdong@gmail.com>
+Subject: =?gb18030?B?u9i4tKO6W1BBVENIIDEvMyB2M10gZGNhY2hlOiBE?=
+ =?gb18030?B?b24ndCB0YWtlIHVubmVjZXNzYXJ5IGxvY2sgaW4g?=
+ =?gb18030?B?ZF9jb3VudCB1cGRhdGU=?=
+Date: Thu, 23 May 2013 17:09:30 +0800
+Message-ID: <tencent_6519A7723A666F8378EE1517@qq.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="gb18030"
+Content-Transfer-Encoding: base64
+Cc: "=?gb18030?B?V2FpbWFuIExvbmc=?=" <Waiman.Long@hp.com>,
+	"=?gb18030?B?bGludXgtZnNkZXZlbA==?=" <linux-fsdevel@vger.kernel.org>,
+	"=?gb18030?B?bGludXgta2VybmVs?=" <linux-kernel@vger.kernel.org>,
+	"=?gb18030?B?YXV0b2Zz?=" <autofs@vger.kernel.org>,
+	"=?gb18030?B?Y2VwaC1kZXZlbA==?=" <ceph-devel@vger.kernel.org>,
+	"=?gb18030?B?bGludXgtY2lmcw==?=" <linux-cifs@vger.kernel.org>,
+	"=?gb18030?B?c2FtYmEtdGVjaG5pY2Fs?="
+	<samba-technical@lists.samba.org>,
+	"=?gb18030?B?bGludXgtbmZz?=" <linux-nfs@vger.kernel.org>,
+	"=?gb18030?B?Q2hhbmRyYW1vdWxlZXN3YXJhbiwgQXN3aW4=?=" <aswin@hp.com>,
+	"=?gb18030?B?Tm9ydG9uLCBTY290dCBK?=" <scott.norton@hp.com>,
+	"=?gb18030?B?QW5kaSBLbGVlbg==?=" <andi@firstfloor.org>,
+	"=?gb18030?B?RGF2ZSBDaGlubmVy?=" <david@fromorbit.com>
+To: "=?gb18030?B?V2FpbWFuIExvbmc=?=" <Waiman.Long@hp.com>,
+	"=?gb18030?B?QWxleGFuZGVyIFZpcm8=?=" <viro@zeniv.linux.org.uk>,
+	"=?gb18030?B?SmVmZiBMYXl0b24=?=" <jlayton@redhat.com>,
+	"=?gb18030?B?TWlrbG9zIFN6ZXJlZGk=?=" <mszeredi@suse.cz>,
+	"=?gb18030?B?SWFuIEtlbnQ=?=" <raven@themaw.net>,
+	"=?gb18030?B?U2FnZSBXZWls?=" <sage@inktank.com>,
+	"=?gb18030?B?U3RldmUgRnJlbmNo?=" <sfrench@samba.org>,
+	"=?gb18030?B?VHJvbmQgTXlrbGVidXN0?=" <Trond.Myklebust@netapp.com>,
+	"=?gb18030?B?RXJpYyBQYXJpcw==?=" <eparis@redhat.com>
+Return-path: <autofs-owner@vger.kernel.org>
+Sender: autofs-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-The d_path() and related kernel functions currently take a writer
-lock on rename_lock because they need to follow pointers. By changing
-rename_lock to be the new sequence read/write lock, a reader lock
-can be taken and multiple d_path() threads can proceed concurrently
-without blocking each other.
-
-It is unlikely that the frequency of filesystem changes and d_path()
-name lookup will be high enough to cause writer starvation, the current
-limitation of the read/write lock should be acceptable in that case.
-
-All the sites where rename_lock is referenced were modified to use the
-sequence read/write lock declaration and access functions.
-
-This patch will have merge conflict When applying to kernel version
-earlier than 3.10.
-
-Signed-off-by: Waiman Long <Waiman.Long@hp.com>
----
- fs/autofs4/waitq.c     |    6 ++--
- fs/ceph/mds_client.c   |    4 +-
- fs/cifs/dir.c          |    4 +-
- fs/dcache.c            |   83 ++++++++++++++++++++++++-----------------------
- fs/nfs/namespace.c     |    6 ++--
- include/linux/dcache.h |    4 +-
- kernel/auditsc.c       |    4 +-
- 7 files changed, 56 insertions(+), 55 deletions(-)
-
-diff --git a/fs/autofs4/waitq.c b/fs/autofs4/waitq.c
-index 3db70da..3afc4db 100644
---- a/fs/autofs4/waitq.c
-+++ b/fs/autofs4/waitq.c
-@@ -197,7 +197,7 @@ rename_retry:
- 	buf = *name;
- 	len = 0;
- 
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- 	rcu_read_lock();
- 	spin_lock(&sbi->fs_lock);
- 	for (tmp = dentry ; tmp != root ; tmp = tmp->d_parent)
-@@ -206,7 +206,7 @@ rename_retry:
- 	if (!len || --len > NAME_MAX) {
- 		spin_unlock(&sbi->fs_lock);
- 		rcu_read_unlock();
--		if (read_seqretry(&rename_lock, seq))
-+		if (read_seqrwretry(&rename_lock, seq))
- 			goto rename_retry;
- 		return 0;
- 	}
-@@ -222,7 +222,7 @@ rename_retry:
- 	}
- 	spin_unlock(&sbi->fs_lock);
- 	rcu_read_unlock();
--	if (read_seqretry(&rename_lock, seq))
-+	if (read_seqrwretry(&rename_lock, seq))
- 		goto rename_retry;
- 
- 	return len;
-diff --git a/fs/ceph/mds_client.c b/fs/ceph/mds_client.c
-index 4f22671..b0c266f 100644
---- a/fs/ceph/mds_client.c
-+++ b/fs/ceph/mds_client.c
-@@ -1489,7 +1489,7 @@ char *ceph_mdsc_build_path(struct dentry *dentry, int *plen, u64 *base,
- 
- retry:
- 	len = 0;
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- 	rcu_read_lock();
- 	for (temp = dentry; !IS_ROOT(temp);) {
- 		struct inode *inode = temp->d_inode;
-@@ -1539,7 +1539,7 @@ retry:
- 		temp = temp->d_parent;
- 	}
- 	rcu_read_unlock();
--	if (pos != 0 || read_seqretry(&rename_lock, seq)) {
-+	if (pos != 0 || read_seqrwretry(&rename_lock, seq)) {
- 		pr_err("build_path did not end path lookup where "
- 		       "expected, namelen is %d, pos is %d\n", len, pos);
- 		/* presumably this is only possible if racing with a
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 5699b50..b672c02 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -96,7 +96,7 @@ build_path_from_dentry(struct dentry *direntry)
- 		dfsplen = 0;
- cifs_bp_rename_retry:
- 	namelen = dfsplen;
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- 	rcu_read_lock();
- 	for (temp = direntry; !IS_ROOT(temp);) {
- 		namelen += (1 + temp->d_name.len);
-@@ -136,7 +136,7 @@ cifs_bp_rename_retry:
- 		}
- 	}
- 	rcu_read_unlock();
--	if (namelen != dfsplen || read_seqretry(&rename_lock, seq)) {
-+	if (namelen != dfsplen || read_seqrwretry(&rename_lock, seq)) {
- 		cifs_dbg(FYI, "did not end path lookup where expected. namelen=%ddfsplen=%d\n",
- 			 namelen, dfsplen);
- 		/* presumably this is only possible if racing with a rename
-diff --git a/fs/dcache.c b/fs/dcache.c
-index 470b06f..c96bdb1 100644
---- a/fs/dcache.c
-+++ b/fs/dcache.c
-@@ -29,6 +29,7 @@
- #include <asm/uaccess.h>
- #include <linux/security.h>
- #include <linux/seqlock.h>
-+#include <linux/seqrwlock.h>
- #include <linux/swap.h>
- #include <linux/bootmem.h>
- #include <linux/fs_struct.h>
-@@ -82,7 +83,7 @@ int sysctl_vfs_cache_pressure __read_mostly = 100;
- EXPORT_SYMBOL_GPL(sysctl_vfs_cache_pressure);
- 
- static __cacheline_aligned_in_smp DEFINE_SPINLOCK(dcache_lru_lock);
--__cacheline_aligned_in_smp DEFINE_SEQLOCK(rename_lock);
-+__cacheline_aligned_in_smp DEFINE_SEQRWLOCK(rename_lock);
- 
- EXPORT_SYMBOL(rename_lock);
- 
-@@ -1009,7 +1010,7 @@ static struct dentry *try_to_ascend(struct dentry *old, int locked, unsigned seq
- 	 */
- 	if (new != old->d_parent ||
- 		 (old->d_flags & DCACHE_DENTRY_KILLED) ||
--		 (!locked && read_seqretry(&rename_lock, seq))) {
-+		 (!locked && read_seqrwretry(&rename_lock, seq))) {
- 		spin_unlock(&new->d_lock);
- 		new = NULL;
- 	}
-@@ -1038,7 +1039,7 @@ int have_submounts(struct dentry *parent)
- 	unsigned seq;
- 	int locked = 0;
- 
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- again:
- 	this_parent = parent;
- 
-@@ -1081,23 +1082,23 @@ resume:
- 		goto resume;
- 	}
- 	spin_unlock(&this_parent->d_lock);
--	if (!locked && read_seqretry(&rename_lock, seq))
-+	if (!locked && read_seqrwretry(&rename_lock, seq))
- 		goto rename_retry;
- 	if (locked)
--		write_sequnlock(&rename_lock);
-+		write_seqrwunlock(&rename_lock);
- 	return 0; /* No mount points found in tree */
- positive:
--	if (!locked && read_seqretry(&rename_lock, seq))
-+	if (!locked && read_seqrwretry(&rename_lock, seq))
- 		goto rename_retry;
- 	if (locked)
--		write_sequnlock(&rename_lock);
-+		write_seqrwunlock(&rename_lock);
- 	return 1;
- 
- rename_retry:
- 	if (locked)
- 		goto again;
- 	locked = 1;
--	write_seqlock(&rename_lock);
-+	write_seqrwlock(&rename_lock);
- 	goto again;
- }
- EXPORT_SYMBOL(have_submounts);
-@@ -1124,7 +1125,7 @@ static int select_parent(struct dentry *parent, struct list_head *dispose)
- 	int found = 0;
- 	int locked = 0;
- 
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- again:
- 	this_parent = parent;
- 	spin_lock(&this_parent->d_lock);
-@@ -1189,10 +1190,10 @@ resume:
- 	}
- out:
- 	spin_unlock(&this_parent->d_lock);
--	if (!locked && read_seqretry(&rename_lock, seq))
-+	if (!locked && read_seqrwretry(&rename_lock, seq))
- 		goto rename_retry;
- 	if (locked)
--		write_sequnlock(&rename_lock);
-+		write_seqrwunlock(&rename_lock);
- 	return found;
- 
- rename_retry:
-@@ -1201,7 +1202,7 @@ rename_retry:
- 	if (locked)
- 		goto again;
- 	locked = 1;
--	write_seqlock(&rename_lock);
-+	write_seqrwlock(&rename_lock);
- 	goto again;
- }
- 
-@@ -1816,7 +1817,7 @@ struct dentry *__d_lookup_rcu(const struct dentry *parent,
- 	 * It is possible that concurrent renames can mess up our list
- 	 * walk here and result in missing our dentry, resulting in the
- 	 * false-negative result. d_lookup() protects against concurrent
--	 * renames using rename_lock seqlock.
-+	 * renames using rename_lock seqrwlock.
- 	 *
- 	 * See Documentation/filesystems/path-lookup.txt for more details.
- 	 */
-@@ -1884,11 +1885,11 @@ struct dentry *d_lookup(const struct dentry *parent, const struct qstr *name)
- 	unsigned seq;
- 
-         do {
--                seq = read_seqbegin(&rename_lock);
-+                seq = read_seqrwbegin(&rename_lock);
-                 dentry = __d_lookup(parent, name);
-                 if (dentry)
- 			break;
--	} while (read_seqretry(&rename_lock, seq));
-+	} while (read_seqrwretry(&rename_lock, seq));
- 	return dentry;
- }
- EXPORT_SYMBOL(d_lookup);
-@@ -1902,7 +1903,7 @@ EXPORT_SYMBOL(d_lookup);
-  * __d_lookup is like d_lookup, however it may (rarely) return a
-  * false-negative result due to unrelated rename activity.
-  *
-- * __d_lookup is slightly faster by avoiding rename_lock read seqlock,
-+ * __d_lookup is slightly faster by avoiding rename_lock read seqrwlock,
-  * however it must be used carefully, eg. with a following d_lookup in
-  * the case of failure.
-  *
-@@ -1934,7 +1935,7 @@ struct dentry *__d_lookup(const struct dentry *parent, const struct qstr *name)
- 	 * It is possible that concurrent renames can mess up our list
- 	 * walk here and result in missing our dentry, resulting in the
- 	 * false-negative result. d_lookup() protects against concurrent
--	 * renames using rename_lock seqlock.
-+	 * renames using rename_lock seqrwlock.
- 	 *
- 	 * See Documentation/filesystems/path-lookup.txt for more details.
- 	 */
-@@ -2309,9 +2310,9 @@ static void __d_move(struct dentry * dentry, struct dentry * target)
-  */
- void d_move(struct dentry *dentry, struct dentry *target)
- {
--	write_seqlock(&rename_lock);
-+	write_seqrwlock(&rename_lock);
- 	__d_move(dentry, target);
--	write_sequnlock(&rename_lock);
-+	write_seqrwunlock(&rename_lock);
- }
- EXPORT_SYMBOL(d_move);
- 
-@@ -2439,7 +2440,7 @@ struct dentry *d_materialise_unique(struct dentry *dentry, struct inode *inode)
- 		alias = __d_find_alias(inode, 0);
- 		if (alias) {
- 			actual = alias;
--			write_seqlock(&rename_lock);
-+			write_seqrwlock(&rename_lock);
- 
- 			if (d_ancestor(alias, dentry)) {
- 				/* Check for loops */
-@@ -2449,7 +2450,7 @@ struct dentry *d_materialise_unique(struct dentry *dentry, struct inode *inode)
- 				/* Is this an anonymous mountpoint that we
- 				 * could splice into our tree? */
- 				__d_materialise_dentry(dentry, alias);
--				write_sequnlock(&rename_lock);
-+				write_seqrwunlock(&rename_lock);
- 				__d_drop(alias);
- 				goto found;
- 			} else {
-@@ -2457,7 +2458,7 @@ struct dentry *d_materialise_unique(struct dentry *dentry, struct inode *inode)
- 				 * aliasing. This drops inode->i_lock */
- 				actual = __d_unalias(inode, dentry, alias);
- 			}
--			write_sequnlock(&rename_lock);
-+			write_seqrwunlock(&rename_lock);
- 			if (IS_ERR(actual)) {
- 				if (PTR_ERR(actual) == -ELOOP)
- 					pr_warn_ratelimited(
-@@ -2602,9 +2603,9 @@ char *__d_path(const struct path *path,
- 
- 	prepend(&res, &buflen, "\0", 1);
- 	br_read_lock(&vfsmount_lock);
--	write_seqlock(&rename_lock);
-+	read_seqrwlock(&rename_lock);
- 	error = prepend_path(path, root, &res, &buflen);
--	write_sequnlock(&rename_lock);
-+	read_seqrwunlock(&rename_lock);
- 	br_read_unlock(&vfsmount_lock);
- 
- 	if (error < 0)
-@@ -2623,9 +2624,9 @@ char *d_absolute_path(const struct path *path,
- 
- 	prepend(&res, &buflen, "\0", 1);
- 	br_read_lock(&vfsmount_lock);
--	write_seqlock(&rename_lock);
-+	read_seqrwlock(&rename_lock);
- 	error = prepend_path(path, &root, &res, &buflen);
--	write_sequnlock(&rename_lock);
-+	read_seqrwunlock(&rename_lock);
- 	br_read_unlock(&vfsmount_lock);
- 
- 	if (error > 1)
-@@ -2691,9 +2692,9 @@ char *d_path(const struct path *path, char *buf, int buflen)
- 
- 	get_fs_root(current->fs, &root);
- 	br_read_lock(&vfsmount_lock);
--	write_seqlock(&rename_lock);
-+	read_seqrwlock(&rename_lock);
- 	error = path_with_deleted(path, &root, &res, &buflen);
--	write_sequnlock(&rename_lock);
-+	read_seqrwunlock(&rename_lock);
- 	br_read_unlock(&vfsmount_lock);
- 	if (error < 0)
- 		res = ERR_PTR(error);
-@@ -2761,9 +2762,9 @@ char *dentry_path_raw(struct dentry *dentry, char *buf, int buflen)
- {
- 	char *retval;
- 
--	write_seqlock(&rename_lock);
-+	read_seqrwlock(&rename_lock);
- 	retval = __dentry_path(dentry, buf, buflen);
--	write_sequnlock(&rename_lock);
-+	read_seqrwunlock(&rename_lock);
- 
- 	return retval;
- }
-@@ -2774,7 +2775,7 @@ char *dentry_path(struct dentry *dentry, char *buf, int buflen)
- 	char *p = NULL;
- 	char *retval;
- 
--	write_seqlock(&rename_lock);
-+	read_seqrwlock(&rename_lock);
- 	if (d_unlinked(dentry)) {
- 		p = buf + buflen;
- 		if (prepend(&p, &buflen, "//deleted", 10) != 0)
-@@ -2782,7 +2783,7 @@ char *dentry_path(struct dentry *dentry, char *buf, int buflen)
- 		buflen++;
- 	}
- 	retval = __dentry_path(dentry, buf, buflen);
--	write_sequnlock(&rename_lock);
-+	read_seqrwunlock(&rename_lock);
- 	if (!IS_ERR(retval) && p)
- 		*p = '/';	/* restore '/' overriden with '\0' */
- 	return retval;
-@@ -2821,7 +2822,7 @@ SYSCALL_DEFINE2(getcwd, char __user *, buf, unsigned long, size)
- 
- 	error = -ENOENT;
- 	br_read_lock(&vfsmount_lock);
--	write_seqlock(&rename_lock);
-+	read_seqrwlock(&rename_lock);
- 	if (!d_unlinked(pwd.dentry)) {
- 		unsigned long len;
- 		char *cwd = page + PAGE_SIZE;
-@@ -2829,7 +2830,7 @@ SYSCALL_DEFINE2(getcwd, char __user *, buf, unsigned long, size)
- 
- 		prepend(&cwd, &buflen, "\0", 1);
- 		error = prepend_path(&pwd, &root, &cwd, &buflen);
--		write_sequnlock(&rename_lock);
-+		read_seqrwunlock(&rename_lock);
- 		br_read_unlock(&vfsmount_lock);
- 
- 		if (error < 0)
-@@ -2850,7 +2851,7 @@ SYSCALL_DEFINE2(getcwd, char __user *, buf, unsigned long, size)
- 				error = -EFAULT;
- 		}
- 	} else {
--		write_sequnlock(&rename_lock);
-+		read_seqrwunlock(&rename_lock);
- 		br_read_unlock(&vfsmount_lock);
- 	}
- 
-@@ -2887,7 +2888,7 @@ int is_subdir(struct dentry *new_dentry, struct dentry *old_dentry)
- 
- 	do {
- 		/* for restarting inner loop in case of seq retry */
--		seq = read_seqbegin(&rename_lock);
-+		seq = read_seqrwbegin(&rename_lock);
- 		/*
- 		 * Need rcu_readlock to protect against the d_parent trashing
- 		 * due to d_move
-@@ -2898,7 +2899,7 @@ int is_subdir(struct dentry *new_dentry, struct dentry *old_dentry)
- 		else
- 			result = 0;
- 		rcu_read_unlock();
--	} while (read_seqretry(&rename_lock, seq));
-+	} while (read_seqrwretry(&rename_lock, seq));
- 
- 	return result;
- }
-@@ -2910,7 +2911,7 @@ void d_genocide(struct dentry *root)
- 	unsigned seq;
- 	int locked = 0;
- 
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- again:
- 	this_parent = root;
- 	spin_lock(&this_parent->d_lock);
-@@ -2953,17 +2954,17 @@ resume:
- 		goto resume;
- 	}
- 	spin_unlock(&this_parent->d_lock);
--	if (!locked && read_seqretry(&rename_lock, seq))
-+	if (!locked && read_seqrwretry(&rename_lock, seq))
- 		goto rename_retry;
- 	if (locked)
--		write_sequnlock(&rename_lock);
-+		write_seqrwunlock(&rename_lock);
- 	return;
- 
- rename_retry:
- 	if (locked)
- 		goto again;
- 	locked = 1;
--	write_seqlock(&rename_lock);
-+	write_seqrwlock(&rename_lock);
- 	goto again;
- }
- 
-diff --git a/fs/nfs/namespace.c b/fs/nfs/namespace.c
-index fc8dc20..0eca871 100644
---- a/fs/nfs/namespace.c
-+++ b/fs/nfs/namespace.c
-@@ -60,7 +60,7 @@ rename_retry:
- 	*--end = '\0';
- 	buflen--;
- 
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- 	rcu_read_lock();
- 	while (1) {
- 		spin_lock(&dentry->d_lock);
-@@ -76,7 +76,7 @@ rename_retry:
- 		spin_unlock(&dentry->d_lock);
- 		dentry = dentry->d_parent;
- 	}
--	if (read_seqretry(&rename_lock, seq)) {
-+	if (read_seqrwretry(&rename_lock, seq)) {
- 		spin_unlock(&dentry->d_lock);
- 		rcu_read_unlock();
- 		goto rename_retry;
-@@ -117,7 +117,7 @@ rename_retry:
- Elong_unlock:
- 	spin_unlock(&dentry->d_lock);
- 	rcu_read_unlock();
--	if (read_seqretry(&rename_lock, seq))
-+	if (read_seqrwretry(&rename_lock, seq))
- 		goto rename_retry;
- Elong:
- 	return ERR_PTR(-ENAMETOOLONG);
-diff --git a/include/linux/dcache.h b/include/linux/dcache.h
-index 99da5e2..5f05815 100644
---- a/include/linux/dcache.h
-+++ b/include/linux/dcache.h
-@@ -6,7 +6,7 @@
- #include <linux/rculist.h>
- #include <linux/rculist_bl.h>
- #include <linux/spinlock.h>
--#include <linux/seqlock.h>
-+#include <linux/seqrwlock.h>
- #include <linux/cache.h>
- #include <linux/rcupdate.h>
- 
-@@ -210,7 +210,7 @@ struct dentry_operations {
- 
- #define DCACHE_DENTRY_KILLED	0x100000
- 
--extern seqlock_t rename_lock;
-+extern seqrwlock_t rename_lock;
- 
- static inline int dname_external(struct dentry *dentry)
- {
-diff --git a/kernel/auditsc.c b/kernel/auditsc.c
-index 3c8a601..d464b67 100644
---- a/kernel/auditsc.c
-+++ b/kernel/auditsc.c
-@@ -1591,7 +1591,7 @@ retry:
- 	drop = NULL;
- 	d = dentry;
- 	rcu_read_lock();
--	seq = read_seqbegin(&rename_lock);
-+	seq = read_seqrwbegin(&rename_lock);
- 	for(;;) {
- 		struct inode *inode = d->d_inode;
- 		if (inode && unlikely(!hlist_empty(&inode->i_fsnotify_marks))) {
-@@ -1609,7 +1609,7 @@ retry:
- 			break;
- 		d = parent;
- 	}
--	if (unlikely(read_seqretry(&rename_lock, seq) || drop)) {  /* in this order */
-+	if (unlikely(read_seqrwretry(&rename_lock, seq) || drop)) {  /* in this order */
- 		rcu_read_unlock();
- 		if (!drop) {
- 			/* just a race with rename */
--- 
-1.7.1
+bWF5YmUgeW91IGNhbiB1c2UgdGhlIGF0b21pY19kZWNfYW5kX2xvY2soJmRlbnRyeS0+ZF9j
+b3VudCwgJmRlbnRyeS0+ZF9sb2NrKSBoZXJlLCByaWdodCA/DQoNCi0tLS0tLS0tLS0tLS0t
+LS0tLSBPcmlnaW4gLS0tLS0tLS0tLS0tLS0tLS0tDQo+VGhlIGN1cnJlbnQgY29kZSB0YWtl
+cyB0aGUgZGVudHJ5J3MgZF9sb2NrIGxvY2sgd2hlbmV2ZXIgdGhlIGRfY291bnQNCj5yZWZl
+cmVuY2UgY291bnQgaXMgYmVpbmcgdXBkYXRlZC4gSW4gcmVhbGl0eSwgbm90aGluZyBiaWcg
+cmVhbGx5DQo+IGhhcHBlbnMgdW50aWwgZF9jb3VudCBnb2VzIHRvIDAgaW4gZHB1dCgpLiBT
+byBpdCBpcyBub3QgbmVjZXNzYXJ5IHRvDQo+IHRha2UgdGhlIGxvY2sgaWYgdGhlIHJlZmVy
+ZW5jZSBjb3VudCB3b24ndCBnbyB0byAwLg0KDQpXaXRob3V0IHVzaW5nIGEgbG9jaywgbXVs
+dGlwbGUgdGhyZWFkcyBtYXkgdXBkYXRlIGRfY291bnQNCnNpbXVsdGFuZW91c2x5LiAgVGhl
+cmVmb3JlLCBhdG9taWMgaW5zdHJ1Y3Rpb25zIG11c3QgYmUgdXNlZCB0bw0KZW5zdXJlIGNv
+bnNpc3RlbmN5IGV4Y2VwdCBpbiBzaHJpbmtfZGNhY2hlX2Zvcl91bW91bnQqKCkgd2hlcmUg
+dGhlDQp3aG9sZSBzdXBlcmJsb2NrIGlzIGJlaW5nIGRpc21vdW50ZWQgYW5kIGxvY2tpbmcg
+aXMgbm90IG5lZWRlZC4NCg0KVGhlIHdvcnN0IGNhc2Ugc2NlbmFyaW9zIGFyZToNCg0KMS4g
+ZF9sb2NrIHRha2VuIGluIGRwdXQgd2l0aCBkX2NvdW50ID0gMiBpbiBvbmUgdGhyZWFkIGFu
+ZCBhbm90aGVyDQogdGhyZWFkIGNvbWVzIGluIHRvIGF0b21pY2FsbHkgZGVjcmVtZW50IGRf
+Y291bnQgd2l0aG91dCB0YWtpbmcNCiB0aGUgbG9jay4gVGhpcyBtYXkgcmVzdWx0IGluIGEg
+ZF9jb3VudCBvZiAwIHdpdGggbm8gZGVsZXRpbmcNCiBhY3Rpb24gdGFrZW4uDQoNCjIuIGRf
+bG9jayB0YWtlbiBpbiBkcHV0IHdpdGggZF9jb3VudCA9IDEgaW4gb25lIHRocmVhZCBhbmQg
+YW5vdGhlcg0KIHRocmVhZCBjb21lcyBpbiB0byBhdG9taWNhbGx5IGluY3JlbWVudCBkX2Nv
+dW50IHdpdGhvdXQgdGFraW5nDQogdGhlIGxvY2suIFRoaXMgbWF5IHJlc3VsdCBpbiB0aGUg
+ZGVudHJ5IGluIHRoZSBkZWxldGVkIHN0YXRlIHdoaWxlDQogaGF2aW5nIGEgZF9jb3VudCBv
+ZiAxLg0KDQpXaXRob3V0IHRha2luZyBhIGxvY2ssIHdlIG5lZWQgdG8gbWFrZSBzdXJlIHRo
+ZSBkZWNyZW1lbnRpbmcgb3INCmluY3JlbWVudGluZyBhY3Rpb24gc2hvdWxkIG5vdCBiZSB0
+YWtlbiB3aGlsZSBvdGhlciB0aHJlYWRzIGFyZQ0KdXBkYXRpbmcgZF9jb3VudCBzaW11bHRh
+bmVvdXNseS4gVGhpcyBjYW4gYmUgZG9uZSBieSB1c2luZyB0aGUNCmF0b21pYyBjbXB4Y2hn
+IGluc3RydWN0aW9uIHdoaWNoIHdpbGwgZmFpbCBpZiB0aGUgdW5kZXJseWluZyB2YWx1ZQ0K
+aXMgY2hhbmdlZC4gIElmIHRoZSBsb2NrIGlzIHRha2VuLCBpdCBzaG91bGQgYmUgc2FmZSB0
+byB1c2UgYSBzaW1wbGVyDQphdG9taWMgaW5jcmVtZW50IG9yIGRlY3JlbWVudCBpbnN0cnVj
+dGlvbi4NCg0KVG8gbWFrZSBzdXJlIHRoYXQgdGhlIGFib3ZlIHdvcnN0IGNhc2Ugc2NlbmFy
+aW9zIHdpbGwgbm90IGhhcHBlbiwNCnRoZSBkZ2V0KCkgZnVuY3Rpb24gbXVzdCB0YWtlIHRo
+ZSBsb2NrIGlmIGRfY291bnQgPD0gMS4gU2ltaWxhcmx5LA0KdGhlIGRwdXQoKSBmdW5jdGlv
+biBtdXN0IHRha2UgdGhlIGxvY2sgaWYgZF9jb3VudCA8PSAyLiBUaGUgY21weGNoZygpDQpj
+YWxsIHRvIHVwZGF0ZSBkX2NvdW50IHdpbGwgYmUgdHJpZWQgdHdpY2UgYmVmb3JlIGZhbGxp
+bmcgYmFjayB0bw0KdXNpbmcgdGhlIGxvY2sgYXMgdGhlcmUgaXMgYSBmYWlybHkgZ29vZCBj
+aGFuY2UgdGhhdCB0aGUgY21weGNoZygpDQptYXkgZmFpbCBpbiBhIGJ1c3kgc2l0dWF0aW9u
+Lg0KDQpGaW5hbGx5LCB0aGUgQ1BVIG11c3QgaGF2ZSBhbiBpbnN0cnVjdGlvbmFsIGxldmVs
+IGNtcHhjaGcgaW5zdHJ1Y3Rpb24NCm9yIHRoZSBlbXVsYXRlZCBjbXB4Y2hnKCkgZnVuY3Rp
+b24gbWF5IGJlIHRvbyBleHBlbnNpdmUgdG8NCnVzZS4gVGhlcmVmb3JlLCB0aGUgYWJvdmUg
+bWVudGlvbmVkIGNoYW5nZXMgd2lsbCBvbmx5IGJlIGFwcGxpZWQgaWYNCnRoZSBfX0hBVkVf
+QVJDSF9DTVBYQ0hHIGZsYWcgaXMgc2V0LiBNb3N0IG9mIHRoZSBtYWpvciBhcmNoaXRlY3R1
+cmVzDQpzdXBwb3J0ZWQgYnkgTGludXggaGF2ZSB0aGlzIGZsYWcgc2V0IHdpdGggdGhlIG5v
+dGF0aW9uIGV4Y2VwdGlvbg0Kb2YgQVJNLg0KDQpBcyBmb3IgdGhlIHBlcmZvcm1hbmNlIG9m
+IHRoZSB1cGRhdGVkIHJlZmVyZW5jZSBjb3VudGluZyBjb2RlLCBpdA0KYWxsIGRlcGVuZHMg
+b24gd2hldGhlciB0aGUgY21weGNoZyBpbnN0cnVjdGlvbiBpcyB1c2VkIG9yIG5vdC4gVGhl
+DQpvcmlnaW5hbCBjb2RlIGhhcyAyIGF0b21pYyBpbnN0cnVjdGlvbnMgdG8gbG9jayBhbmQg
+dW5sb2NrIHRoZQ0Kc3BpbmxvY2suIFRoZSBuZXcgY29kZSBwYXRoIGhhcyBlaXRoZXIgMSBh
+dG9taWMgY21weGNoZyBpbnN0cnVjdGlvbg0Kb3IgMyBhdG9taWMgaW5zdHJ1Y3Rpb25zIGlm
+IHRoZSBsb2NrIGhhcyB0byBiZSB0YWtlbi4gRGVwZW5kaW5nIG9uDQpob3cgZnJlcXVlbnQg
+dGhlIGNtcHhjaGcgaW5zdHJ1Y3Rpb24gaXMgdXNlZCAoZF9jb3VudCA+IDEgb3IgMiksDQp0
+aGUgbmV3IGNvZGUgY2FuIGJlIGZhc3RlciBvciBzbG93ZXIgdGhhbiB0aGUgb3JpZ2luYWwg
+b25lLg0KDQpUaGlzIHBhdGNoIGhhcyBhIHBhcnRpY3VsYXIgYmlnIGltcGFjdCBvbiB0aGUg
+c2hvcnQgd29ya2xvYWQgb2YgdGhlDQpBSU03IGJlbmNobWFyayB3aXRoIHJhbWRpc2sgZmls
+ZXN5c3RlbS4gVGhlIHRhYmxlIGJlbG93IHNob3cgdGhlDQpwZXJmb3JtYW5jZSBpbXByb3Zl
+bWVudCB0byB0aGUgSlBNIChqb2JzIHBlciBtaW51dGVzKSB0aHJvdWdocHV0IGR1ZQ0KdG8g
+dGhpcyBwYXRjaCBvbiBhbiA4LXNvY2tldCA4MC1jb3JlIHg4Ni02NCBzeXN0ZW0gd2l0aCBh
+IDMuMTAtcmMxDQprZXJuZWwgaW4gYSAxLzIvNC84IG5vZGUgY29uZmlndXJhdGlvbiBieSB1
+c2luZyBudW1hY3RsIHRvIHJlc3RyaWN0DQp0aGUgZXhlY3V0aW9uIG9mIHRoZSB3b3JrbG9h
+ZCBvbiBjZXJ0YWluIG5vZGVzLg0KDQorLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0t
+LS0tLSstLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0tLS0tKw0KfCAgQ29uZmlndXJhdGlvbiAg
+fCAgICBNZWFuIEpQTSAgICB8ICAgIE1lYW4gSlBNICAgICB8ICUgQ2hhbmdlIHwNCnwgICAg
+ICAgICAgICAgICAgIHwgUmF0ZSB3L28gcGF0Y2ggfCBSYXRlIHdpdGggcGF0Y2ggfCAgICAg
+ICAgICB8DQorLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tKw0KfCAgICAgICAgICAgICAgICAgfCAgICAgICAgICAgICAg
+VXNlciBSYW5nZSAxMCAtIDEwMCAgICAgICAgICAgIHwNCistLS0tLS0tLS0tLS0tLS0tLSst
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQp8IDggbm9k
+ZXMsIEhUIG9mZiB8ICAgIDE1NDY4MTMgICAgIHwgICAgIDUwODAxMjYgICAgIHwgKzIyOC40
+JSAgfA0KfCA0IG5vZGVzLCBIVCBvZmYgfCAgICAxNjYzNDM5ICAgICB8ICAgICA0NzAzMDgz
+ICAgICB8ICsxODIuNyUgIHwNCnwgMiBub2RlcywgSFQgb2ZmIHwgICAgMjU0NTM4OSAgICAg
+fCAgICAgMzc5MDk5NSAgICAgfCAgKzQ4LjklICB8DQp8IDEgbm9kZSAsIEhUIG9mZiB8ICAg
+IDIzNzQ0ODggICAgIHwgICAgIDIzOTQ4NDYgICAgIHwgICArMC45JSAgfA0KKy0tLS0tLS0t
+LS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LSsNCnwgICAgICAgICAgICAgICAgIHwgICAgICAgICAgICAgIFVzZXIgUmFuZ2UgMjAwIC0g
+MTAwMCAgICAgICAgICB8DQorLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KfCA4IG5vZGVzLCBIVCBvZmYgfCAgICAx
+MDY0MTg0ICAgICB8ICAgICA3MzkxMzgyICAgICB8ICs1OTQuNiUgIHwNCnwgNCBub2Rlcywg
+SFQgb2ZmIHwgICAgMTM2MjQ0NyAgICAgfCAgICAgNzMyNTQ3NSAgICAgfCArNDM3LjclICB8
+DQp8IDIgbm9kZXMsIEhUIG9mZiB8ICAgIDE4NTExOTggICAgIHwgICAgIDQ1Mzk1MTEgICAg
+IHwgKzE0NS4yJSAgfA0KfCAxIG5vZGUgLCBIVCBvZmYgfCAgICAyNDc3NTM3ICAgICB8ICAg
+ICAyNDU3NTEzICAgICB8ICAgLTAuOCUgIHwNCistLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQp8ICAgICAgICAgICAg
+ICAgICB8ICAgICAgICAgICAgICBVc2VyIFJhbmdlIDExMDAgLSAyMDAwICAgICAgICAgfA0K
+Ky0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLSsNCnwgOCBub2RlcywgSFQgb2ZmIHwgICAgMTA1NjI0MyAgICAgfCAgICAg
+NzA2NzI4MiAgICAgfCArNTY5LjElICB8DQp8IDQgbm9kZXMsIEhUIG9mZiB8ICAgIDEzNTQ1
+MDUgICAgIHwgICAgIDY5MzA0MzcgICAgIHwgKzQxMS43JSAgfA0KfCAyIG5vZGVzLCBIVCBv
+ZmYgfCAgICAxNzM1ODgxICAgICB8ICAgICA0NTgxODQ3ICAgICB8ICsxNjQuMCUgIHwNCnwg
+MSBub2RlICwgSFQgb2ZmIHwgICAgMjUxMTU0NyAgICAgfCAgICAgMjQ5NjU5NCAgICAgfCAg
+IC0wLjYlICB8DQorLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLSstLS0tLS0t
+LS0tLS0tLS0tLSstLS0tLS0tLS0tKw0KDQpJdCBjYW4gYmUgc2VlbiB0aGF0IHdpdGggMjAg
+Q1BVcyAoMiBub2Rlcykgb3IgbW9yZSwgdGhpcyBwYXRjaCBjYW4NCnNpZ25pZmljYW50bHkg
+aW1wcm92ZSB0aGUgc2hvcnQgd29ya2xvYWQgcGVyZm9ybWFuY2UuIFdpdGggb25seSAxDQpu
+b2RlLCB0aGUgcGVyZm9ybWFuY2UgaXMgc2ltaWxhciB3aXRoIG9yIHdpdGhvdXQgdGhlIHBh
+dGNoLiBUaGUgc2hvcnQNCndvcmtsb2FkIGFsc28gc2NhbGVzIHByZXR0eSB3ZWxsIHVwIHRv
+IDQgbm9kZXMgd2l0aCB0aGlzIHBhdGNoLg0KDQpBIHBlcmYgY2FsbC1ncmFwaCByZXBvcnQg
+b2YgdGhlIHNob3J0IHdvcmtsb2FkIGF0IDE1MDAgdXNlcnMgd2l0aG91dA0KdGhlIHBhdGNo
+IG9uIDggbm9kZXMgaW5kaWNhdGVzIHRoYXQgYWJvdXQgNzklIG9mIHRoZSB3b3JrbG9hZCdz
+IHRvdGFsDQp0aW1lIHdlcmUgc3BlbnQgaW4gdGhlIF9yYXdfc3Bpbl9sb2NrKCkgZnVuY3Rp
+b24uIEFsbW9zdCBhbGwgb2Ygd2hpY2gNCmNhbiBiZSBhdHRyaWJ1dGVkIHRvIHRoZSBmb2xs
+b3dpbmcgMiBrZXJuZWwgZnVuY3Rpb25zOg0KMS4gZGdldF9wYXJlbnQgKDQ5LjkxJSkNCjIu
+IGRwdXQgKDQ5LjgyJSkNCg0KV2l0aCB0aGlzIHBhdGNoIG9uLCB0aGUgdGltZSBzcGVudCBv
+biBfcmF3X3NwaW5fbG9jaygpIGlzIG9ubHkgMS4zOCUNCndoaWNoIGlzIGEgaHVnZSBpbXBy
+b3ZlbWVudC4gT2YgdGhlIDEuMzglLCBvbmx5IGEgc21hbGwgcG9ydGlvbiBvZiBpdA0KaXMg
+cmVsYXRlZCB0byB0aGUgZGNhY2hlIGxvY2suIEhvd2V2ZXIsIHRoZSBfcmF3X3NwaW5fbG9j
+a19pcnFzYXZlKCkNCm9mIHRoZSB0dHlfbGRpc2NfbG9jayBub3cgZG9taW5hdGVzIHdpdGgg
+MjQuNSUgb2YgdGhlIHRvdGFsIHRpbWUuDQoNClRoaXMgaW1wYWN0IG9mIHRoaXMgcGF0Y2gg
+b24gb3RoZXIgQUlNNyB3b3JrbG9hZHMgd2VyZSBtdWNoIG1vcmUNCm1vZGVzdC4gIFRoZSB0
+YWJsZSBiZWxvdyBzaG93IHRoZSBtZWFuICVjaGFuZ2UgZHVlIHRvIHRoaXMgcGF0Y2ggb24N
+CnRoZSBzYW1lIDgtc29ja2V0IHN5c3RlbSB3aXRoIGEgMy4xMC1yYzEga2VybmVsLg0KDQor
+LS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0rLS0tLS0t
+LS0tLS0tLS0tLS0rDQp8ICAgV29ya2xvYWQgICB8IG1lYW4gJSBjaGFuZ2UgfCBtZWFuICUg
+Y2hhbmdlICB8IG1lYW4gJSBjaGFuZ2UgICB8DQp8ICAgICAgICAgICAgICB8IDEwLTEwMCB1
+c2VycyAgfCAyMDAtMTAwMCB1c2VycyB8IDExMDAtMjAwMCB1c2VycyB8DQorLS0tLS0tLS0t
+LS0tLS0rLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0t
+LS0rDQp8IGFsbHRlc3RzICAgICB8ICAgICAtMC4yJSAgICAgfCAgICAgLTAuNSUgICAgICB8
+ICAgICAtMi43JSAgICAgICB8DQp8IGZpdmVfc2VjICAgICB8ICAgICAtMS4wJSAgICAgfCAg
+ICAgKzIuNiUgICAgICB8ICAgICArMi40JSAgICAgICB8DQp8IGZzZXJ2ZXIgICAgICB8ICAg
+ICArMS4zJSAgICAgfCAgICAgKzEuOSUgICAgICB8ICAgICArMS4wJSAgICAgICB8DQp8IGhp
+Z2hfc3lzdGltZSB8ICAgICArMC4xJSAgICAgfCAgICAgKzEuMyUgICAgICB8ICAgICArNC44
+JSAgICAgICB8DQp8IG5ld19mc2VydmVyICB8ICAgICAtMS41JSAgICAgfCAgICAgKzAuOCUg
+ICAgICB8ICAgICArMS4xJSAgICAgICB8DQp8IHNoYXJlZCAgICAgICB8ICAgICArMC41JSAg
+ICAgfCAgICAgKzAuNCUgICAgICB8ICAgICAtMC4xJSAgICAgICB8DQorLS0tLS0tLS0tLS0t
+LS0rLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0r
+DQoNClNpZ25lZC1vZmYtYnk6IFdhaW1hbiBMb25nIDxXYWltYW4uTG9uZ0BocC5jb20+DQot
+LS0NCmZzL2RjYWNoZS5jICAgICAgICAgICAgfCAgIDM3ICsrKysrKysrLS0tLS0tLS0tDQpm
+cy9uYW1laS5jICAgICAgICAgICAgIHwgICAgMiArLQ0KaW5jbHVkZS9saW51eC9kY2FjaGUu
+aCB8ICAxMDEgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+Ky0NCjMgZmlsZXMgY2hhbmdlZCwgMTE3IGluc2VydGlvbnMoKyksIDIzIGRlbGV0aW9ucygt
+KQ0KDQpkaWZmIC0tZ2l0IGEvZnMvZGNhY2hlLmMgYi9mcy9kY2FjaGUuYw0KaW5kZXggZjA5
+YjkwOC4uNDcwYjA2ZiAxMDA2NDQNCi0tLSBhL2ZzL2RjYWNoZS5jDQorKysgYi9mcy9kY2Fj
+aGUuYw0KQEAgLTQ2Nyw3ICs0NjcsNyBAQCByZWxvY2s6DQogfQ0KDQogaWYgKHJlZikNCi1k
+ZW50cnktPmRfY291bnQtLTsNCitkY291bnRfZGVjKGRlbnRyeSk7DQogLyoNCiogaW5mb3Jt
+IHRoZSBmcyB2aWEgZF9wcnVuZSB0aGF0IHRoaXMgZGVudHJ5IGlzIGFib3V0IHRvIGJlDQoq
+IHVuaGFzaGVkIGFuZCBkZXN0cm95ZWQuDQpAQCAtNTE1LDEwICs1MTUsMTMgQEAgdm9pZCBk
+cHV0KHN0cnVjdCBkZW50cnkgKmRlbnRyeSkNCnJlcGVhdDoNCiBpZiAoZGVudHJ5LT5kX2Nv
+dW50ID09IDEpDQptaWdodF9zbGVlcCgpOw0KKyBpZiAoZGNvdW50X2RlY19jbXB4Y2hnKGRl
+bnRyeSkpDQorcmV0dXJuOw0KKw0KIHNwaW5fbG9jaygmZGVudHJ5LT5kX2xvY2spOw0KIEJV
+R19PTighZGVudHJ5LT5kX2NvdW50KTsNCiBpZiAoZGVudHJ5LT5kX2NvdW50ID4gMSkgew0K
+LWRlbnRyeS0+ZF9jb3VudC0tOw0KK2Rjb3VudF9kZWMoZGVudHJ5KTsNCnNwaW5fdW5sb2Nr
+KCZkZW50cnktPmRfbG9jayk7DQpyZXR1cm47DQogfQ0KQEAgLTUzNSw3ICs1MzgsNyBAQCBy
+ZXBlYXQ6DQogZGVudHJ5LT5kX2ZsYWdzIHw9IERDQUNIRV9SRUZFUkVOQ0VEOw0KIGRlbnRy
+eV9scnVfYWRkKGRlbnRyeSk7DQoNCi0gZGVudHJ5LT5kX2NvdW50LS07DQorIGRjb3VudF9k
+ZWMoZGVudHJ5KTsNCiBzcGluX3VubG9jaygmZGVudHJ5LT5kX2xvY2spOw0KIHJldHVybjsN
+Cg0KQEAgLTYwNiwxMSArNjA5LDEzIEBAIEVYUE9SVF9TWU1CT0woZF9pbnZhbGlkYXRlKTsN
+Ci8qIFRoaXMgbXVzdCBiZSBjYWxsZWQgd2l0aCBkX2xvY2sgaGVsZCAqLw0Kc3RhdGljIGlu
+bGluZSB2b2lkIF9fZGdldF9kbG9jayhzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpDQp7DQotIGRl
+bnRyeS0+ZF9jb3VudCsrOw0KKyBkY291bnRfaW5jKGRlbnRyeSk7DQp9DQoNCnN0YXRpYyBp
+bmxpbmUgdm9pZCBfX2RnZXQoc3RydWN0IGRlbnRyeSAqZGVudHJ5KQ0Kew0KKyBpZiAoZGNv
+dW50X2luY19jbXB4Y2hnKGRlbnRyeSkpDQorcmV0dXJuOw0KIHNwaW5fbG9jaygmZGVudHJ5
+LT5kX2xvY2spOw0KIF9fZGdldF9kbG9jayhkZW50cnkpOw0KIHNwaW5fdW5sb2NrKCZkZW50
+cnktPmRfbG9jayk7DQpAQCAtNjIwLDIyICs2MjUsMTYgQEAgc3RydWN0IGRlbnRyeSAqZGdl
+dF9wYXJlbnQoc3RydWN0IGRlbnRyeSAqZGVudHJ5KQ0Kew0KIHN0cnVjdCBkZW50cnkgKnJl
+dDsNCg0KLXJlcGVhdDoNCi0gLyoNCi0qIERvbid0IG5lZWQgcmN1X2RlcmVmZXJlbmNlIGJl
+Y2F1c2Ugd2UgcmUtY2hlY2sgaXQgd2FzIGNvcnJlY3QgdW5kZXINCi0qIHRoZSBsb2NrLg0K
+LSovDQogcmN1X3JlYWRfbG9jaygpOw0KLSByZXQgPSBkZW50cnktPmRfcGFyZW50Ow0KLSBz
+cGluX2xvY2soJnJldC0+ZF9sb2NrKTsNCi0gaWYgKHVubGlrZWx5KHJldCAhPSBkZW50cnkt
+PmRfcGFyZW50KSkgew0KLXNwaW5fdW5sb2NrKCZyZXQtPmRfbG9jayk7DQorIHJldCA9IHJj
+dV9kZXJlZmVyZW5jZShkZW50cnktPmRfcGFyZW50KTsNCisgaWYgKGRjb3VudF9pbmNfY21w
+eGNoZyhyZXQpKSB7DQpyY3VfcmVhZF91bmxvY2soKTsNCi1nb3RvIHJlcGVhdDsNCityZXR1
+cm4gcmV0Ow0KIH0NCisgc3Bpbl9sb2NrKCZyZXQtPmRfbG9jayk7DQogcmN1X3JlYWRfdW5s
+b2NrKCk7DQogQlVHX09OKCFyZXQtPmRfY291bnQpOw0KLSByZXQtPmRfY291bnQrKzsNCisg
+ZGNvdW50X2luYyhyZXQpOw0KIHNwaW5fdW5sb2NrKCZyZXQtPmRfbG9jayk7DQogcmV0dXJu
+IHJldDsNCn0NCkBAIC03NjUsNyArNzY0LDcgQEAgc3RhdGljIHZvaWQgdHJ5X3BydW5lX29u
+ZV9kZW50cnkoc3RydWN0IGRlbnRyeSAqZGVudHJ5KQ0KIHdoaWxlIChkZW50cnkpIHsNCnNw
+aW5fbG9jaygmZGVudHJ5LT5kX2xvY2spOw0KaWYgKGRlbnRyeS0+ZF9jb3VudCA+IDEpIHsN
+Ci0gZGVudHJ5LT5kX2NvdW50LS07DQorIGRjb3VudF9kZWMoZGVudHJ5KTsNCiBzcGluX3Vu
+bG9jaygmZGVudHJ5LT5kX2xvY2spOw0KIHJldHVybjsNCn0NCkBAIC0xOTcwLDcgKzE5Njks
+NyBAQCBzdHJ1Y3QgZGVudHJ5ICpfX2RfbG9va3VwKGNvbnN0IHN0cnVjdCBkZW50cnkgKnBh
+cmVudCwgY29uc3Qgc3RydWN0IHFzdHIgKm5hbWUpDQpnb3RvIG5leHQ7DQp9DQoNCi1kZW50
+cnktPmRfY291bnQrKzsNCitkY291bnRfaW5jKGRlbnRyeSk7DQpmb3VuZCA9IGRlbnRyeTsN
+CnNwaW5fdW5sb2NrKCZkZW50cnktPmRfbG9jayk7DQpicmVhazsNCkBAIC0yOTM3LDcgKzI5
+MzYsNyBAQCByZXN1bWU6DQp9DQppZiAoIShkZW50cnktPmRfZmxhZ3MgJiBEQ0FDSEVfR0VO
+T0NJREUpKSB7DQogZGVudHJ5LT5kX2ZsYWdzIHw9IERDQUNIRV9HRU5PQ0lERTsNCi0gZGVu
+dHJ5LT5kX2NvdW50LS07DQorIGRjb3VudF9kZWMoZGVudHJ5KTsNCn0NCnNwaW5fdW5sb2Nr
+KCZkZW50cnktPmRfbG9jayk7DQogfQ0KQEAgLTI5NDUsNyArMjk0NCw3IEBAIHJlc3VtZToN
+CnN0cnVjdCBkZW50cnkgKmNoaWxkID0gdGhpc19wYXJlbnQ7DQppZiAoISh0aGlzX3BhcmVu
+dC0+ZF9mbGFncyAmIERDQUNIRV9HRU5PQ0lERSkpIHsNCiB0aGlzX3BhcmVudC0+ZF9mbGFn
+cyB8PSBEQ0FDSEVfR0VOT0NJREU7DQotIHRoaXNfcGFyZW50LT5kX2NvdW50LS07DQorIGRj
+b3VudF9kZWModGhpc19wYXJlbnQpOw0KfQ0KdGhpc19wYXJlbnQgPSB0cnlfdG9fYXNjZW5k
+KHRoaXNfcGFyZW50LCBsb2NrZWQsIHNlcSk7DQppZiAoIXRoaXNfcGFyZW50KQ0KZGlmZiAt
+LWdpdCBhL2ZzL25hbWVpLmMgYi9mcy9uYW1laS5jDQppbmRleCA4NWU0MGQxLi4wM2RjYWVk
+IDEwMDY0NA0KLS0tIGEvZnMvbmFtZWkuYw0KKysrIGIvZnMvbmFtZWkuYw0KQEAgLTUzNyw3
+ICs1MzcsNyBAQCBzdGF0aWMgaW50IHVubGF6eV93YWxrKHN0cnVjdCBuYW1laWRhdGEgKm5k
+LCBzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpDQogKi8NCkJVR19PTighSVNfUk9PVChkZW50cnkp
+ICYmIGRlbnRyeS0+ZF9wYXJlbnQgIT0gcGFyZW50KTsNCkJVR19PTighcGFyZW50LT5kX2Nv
+dW50KTsNCi1wYXJlbnQtPmRfY291bnQrKzsNCitkY291bnRfaW5jKHBhcmVudCk7DQpzcGlu
+X3VubG9jaygmZGVudHJ5LT5kX2xvY2spOw0KIH0NCiBzcGluX3VubG9jaygmcGFyZW50LT5k
+X2xvY2spOw0KZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvZGNhY2hlLmggYi9pbmNsdWRl
+L2xpbnV4L2RjYWNoZS5oDQppbmRleCAxYTZiYjgxLi45OWRhNWUyIDEwMDY0NA0KLS0tIGEv
+aW5jbHVkZS9saW51eC9kY2FjaGUuaA0KKysrIGIvaW5jbHVkZS9saW51eC9kY2FjaGUuaA0K
+QEAgLTI1OCw2ICsyNTgsOTkgQEAgZXh0ZXJuIGludCBoYXZlX3N1Ym1vdW50cyhzdHJ1Y3Qg
+ZGVudHJ5ICopOw0KZXh0ZXJuIHZvaWQgZF9yZWhhc2goc3RydWN0IGRlbnRyeSAqKTsNCg0K
+LyoqDQorICpkY291bnRfaW5jLCBkY291bnRfZGVjIC0gaW5jcmVtZW50IG9yIGRlY3JlbWVu
+dCB0aGUgZGVudHJ5IHJlZmVyZW5jZQ0KKyAqY291bnQNCisgKkBkZW50cnk6IGRlbnRyeSB0
+byBnZXQgYSByZWZlcmVuY2UgdG8NCisgKi8NCitzdGF0aWMgaW5saW5lIHZvaWQgZGNvdW50
+X2luYyhzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpDQorew0KKyNpZmRlZiAgX19IQVZFX0FSQ0hf
+Q01QWENIRw0KKyBhdG9taWNfaW5jKChhdG9taWNfdCAqKSZkZW50cnktPmRfY291bnQpOw0K
+KyNlbHNlDQorIGRlbnRyeS0+ZF9jb3VudCsrOw0KKyNlbmRpZg0KK30NCisNCitzdGF0aWMg
+aW5saW5lIHZvaWQgZGNvdW50X2RlYyhzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpDQorew0KKyNp
+ZmRlZiAgX19IQVZFX0FSQ0hfQ01QWENIRw0KKyBhdG9taWNfZGVjKChhdG9taWNfdCAqKSZk
+ZW50cnktPmRfY291bnQpOw0KKyNlbHNlDQorIGRlbnRyeS0+ZF9jb3VudC0tOw0KKyNlbmRp
+Zg0KK30NCisNCisvKioNCisgKmRjb3VudF9pbmNfY21weGNoZyAtIGluY3JlbWVudCBkZW50
+cnkgcmVmZXJlbmNlIGNvdW50IHVzaW5nIGNtcHhjaGcNCisgKkBkZW50cnk6IGRlbnRyeSB0
+byBnZXQgYSByZWZlcmVuY2UgdG8NCisgKlJldHVybiA6IDAgb24gZmFpbHVyZSwgZWxzZSAx
+DQorICoNCisgKk4uQi4gRm9yIGFyY2hpdGVjdHVyZXMgdGhhdCBkbyBub3QgaGF2ZSBhIGNt
+cHhjaGcgaW5zdHJ1Y3Rpb24sIHRoZQ0KKyAqICAgICBzdWJzdGl0dXRlIGNvZGUgbWF5IG5v
+dCBwZXJmb3JtIGJldHRlciB0aGFuIHRha2luZyB0aGUgbG9jay4NCisgKiAgICAgU28gdGhp
+cyBjbXB4Y2hnIGNvZGUgcGF0aCBpcyBkaXNhYmxlZCBmb3IgdGhvc2UgY2FzZXMuDQorICov
+DQorc3RhdGljIGlubGluZSBpbnQgZGNvdW50X2luY19jbXB4Y2hnKHN0cnVjdCBkZW50cnkg
+KmRlbnRyeSkNCit7DQorI2lmZGVmIF9fSEFWRV9BUkNIX0NNUFhDSEcNCisgaW50IG9sZGMs
+IG5ld2M7DQorDQorIGlmICgob2xkYyA9IGRlbnRyeS0+ZF9jb3VudCkgPiAxKSB7DQorLyoN
+CisgKiBJZiByZWZlcmVuY2UgY291bnQgPiAxLCB3ZSBjYW4gc2FmZWx5IGluY3JlbWVudCBp
+dHMNCisgKiB2YWx1ZSB1c2luZyBhdG9taWMgY21weGNoZyB3aXRob3V0IGxvY2tpbmcuIElm
+IHRoZQ0KKyAqIG9wZXJhdGlvbiBmYWlscywgZmFsbCBiYWNrIHRvIHVzaW5nIHRoZSBsb2Nr
+Lg0KKyAqLw0KK25ld2MgPSBvbGRjICsgMTsNCitpZiAoY21weGNoZygmZGVudHJ5LT5kX2Nv
+dW50LCBvbGRjLCBuZXdjKSA9PSBvbGRjKQ0KKyByZXR1cm4gMTsNCitjcHVfcmVsYXgoKTsN
+CisvKiBSZXRyeSBvbmUgbW9yZSB0aW1lICovDQoraWYgKGxpa2VseSgob2xkYyA9IEFDQ0VT
+U19PTkNFKGRlbnRyeS0+ZF9jb3VudCkpID4gMSkpIHsNCisgbmV3YyA9IG9sZGMgKyAxOw0K
+KyBpZiAoY21weGNoZygmZGVudHJ5LT5kX2NvdW50LCBvbGRjLCBuZXdjKSA9PSBvbGRjKQ0K
+K3JldHVybiAxOw0KKyBjcHVfcmVsYXgoKTsNCit9DQorIH0NCisjZW5kaWYNCisgcmV0dXJu
+IDA7DQorfQ0KKw0KKy8qKg0KKyAqZGNvdW50X2RlY19jbXB4Y2hnIC0gZGVjcmVtZW50IGRl
+bnRyeSByZWZlcmVuY2UgY291bnQgdXNpbmcgY21weGNoZw0KKyAqQGRlbnRyeTogZGVudHJ5
+IHRvIGdldCBhIHJlZmVyZW5jZSB0bw0KKyAqUmV0dXJuIDogMCBvbiBmYWlsdXJlLCBlbHNl
+IDENCisgKi8NCitzdGF0aWMgaW5saW5lIGludCBkY291bnRfZGVjX2NtcHhjaGcoc3RydWN0
+IGRlbnRyeSAqZGVudHJ5KQ0KK3sNCisjaWZkZWYgX19IQVZFX0FSQ0hfQ01QWENIRw0KKyBp
+bnQgb2xkYywgbmV3YzsNCisNCisgLyoNCisqIElmIGRfY291bnQgaXMgYmlnZ2VyIHRoYW4g
+Miwgd2UgY2FuIHNhZmVseSBkZWNyZW1lbnQgdGhlDQorKiByZWZlcmVuY2UgY291bnQgdXNp
+bmcgYXRvbWljIGNtcHhjaGcgaW5zdHJ1Y3Rpb24gd2l0aG91dCBsb2NraW5nLg0KKyogRXZl
+biBpZiBkX2xvY2sgaXMgdGFrZW4gYnkgYSB0aHJlYWQgcnVubmluZyBkcHV0KCkgd2l0aCBh
+IHBhcmFsbGVsDQorKiBhdG9taWNfZGVjKCksIHRoZSByZWZlcmVuY2UgY291bnQgd29uJ3Qg
+Z28gdG8gMCB3aXRob3V0IGFueW9uZQ0KKyogbm90aWNpbmcuDQorKi8NCisgaWYgKChvbGRj
+ID0gZGVudHJ5LT5kX2NvdW50KSA+IDIpIHsNCituZXdjID0gb2xkYyAtIDE7DQoraWYgKGNt
+cHhjaGcoJmRlbnRyeS0+ZF9jb3VudCwgb2xkYywgbmV3YykgPT0gb2xkYykNCisgcmV0dXJu
+IDE7DQorY3B1X3JlbGF4KCk7DQorLyogUmV0cnkgb25lIG1vcmUgdGltZSAqLw0KK2lmIChs
+aWtlbHkoKG9sZGMgPSBBQ0NFU1NfT05DRShkZW50cnktPmRfY291bnQpKSA+IDIpKSB7DQor
+IG5ld2MgPSBvbGRjIC0gMTsNCisgaWYgKGNtcHhjaGcoJmRlbnRyeS0+ZF9jb3VudCwgb2xk
+YywgbmV3YykgPT0gb2xkYykNCityZXR1cm4gMTsNCisgY3B1X3JlbGF4KCk7DQorfQ0KKyB9
+DQorI2VuZGlmDQorIHJldHVybiAwOw0KK30NCisNCisvKioNCiAqIGRfYWRkIC0gYWRkIGRl
+bnRyeSB0byBoYXNoIHF1ZXVlcw0KICogQGVudHJ5OiBkZW50cnkgdG8gYWRkDQogKiBAaW5v
+ZGU6IFRoZSBpbm9kZSB0byBhdHRhY2ggdG8gdGhpcyBkZW50cnkNCkBAIC0zMTksNyArNDEy
+LDcgQEAgc3RhdGljIGlubGluZSBpbnQgX19kX3JjdV90b19yZWZjb3VudChzdHJ1Y3QgZGVu
+dHJ5ICpkZW50cnksIHVuc2lnbmVkIHNlcSkNCiBhc3NlcnRfc3Bpbl9sb2NrZWQoJmRlbnRy
+eS0+ZF9sb2NrKTsNCiBpZiAoIXJlYWRfc2VxY291bnRfcmV0cnkoJmRlbnRyeS0+ZF9zZXEs
+IHNlcSkpIHsNCnJldCA9IDE7DQotZGVudHJ5LT5kX2NvdW50Kys7DQorZGNvdW50X2luYyhk
+ZW50cnkpOw0KIH0NCg0KIHJldHVybiByZXQ7DQpAQCAtMzQwLDcgKzQzMyw2IEBAIGV4dGVy
+biBjaGFyICpkZW50cnlfcGF0aF9yYXcoc3RydWN0IGRlbnRyeSAqLCBjaGFyICosIGludCk7
+DQpleHRlcm4gY2hhciAqZGVudHJ5X3BhdGgoc3RydWN0IGRlbnRyeSAqLCBjaGFyICosIGlu
+dCk7DQoNCi8qIEFsbG9jYXRpb24gY291bnRzLi4gKi8NCi0NCi8qKg0KICogZGdldCwgZGdl
+dF9kbG9jayAtIGdldCBhIHJlZmVyZW5jZSB0byBhIGRlbnRyeQ0KICogQGRlbnRyeTogZGVu
+dHJ5IHRvIGdldCBhIHJlZmVyZW5jZSB0bw0KQEAgLTM1MiwxMyArNDQ0LDE2IEBAIGV4dGVy
+biBjaGFyICpkZW50cnlfcGF0aChzdHJ1Y3QgZGVudHJ5ICosIGNoYXIgKiwgaW50KTsNCnN0
+YXRpYyBpbmxpbmUgc3RydWN0IGRlbnRyeSAqZGdldF9kbG9jayhzdHJ1Y3QgZGVudHJ5ICpk
+ZW50cnkpDQp7DQogaWYgKGRlbnRyeSkNCi1kZW50cnktPmRfY291bnQrKzsNCitkY291bnRf
+aW5jKGRlbnRyeSk7DQogcmV0dXJuIGRlbnRyeTsNCn0NCg0Kc3RhdGljIGlubGluZSBzdHJ1
+Y3QgZGVudHJ5ICpkZ2V0KHN0cnVjdCBkZW50cnkgKmRlbnRyeSkNCnsNCiBpZiAoZGVudHJ5
+KSB7DQoraWYgKGRjb3VudF9pbmNfY21weGNoZyhkZW50cnkpKQ0KKyByZXR1cm4gZGVudHJ5
+Ow0KKw0Kc3Bpbl9sb2NrKCZkZW50cnktPmRfbG9jayk7DQpkZ2V0X2Rsb2NrKGRlbnRyeSk7
+DQpzcGluX3VubG9jaygmZGVudHJ5LT5kX2xvY2spOw0KLS0gDQoxLjcuMQ0KDQotLQ0KVG8g
+dW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJl
+IGxpbnV4LWZzZGV2ZWwiIGluDQp0aGUgYm9keSBvZiBhIG1lc3NhZ2UgdG8gbWFqb3Jkb21v
+QHZnZXIua2VybmVsLm9yZw0KTW9yZSBtYWpvcmRvbW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIu
+a2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1s
 
