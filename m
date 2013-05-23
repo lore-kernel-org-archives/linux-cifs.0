@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH 17/19] cifs: update the default global_secflags to include "raw" NTLMv2
-Date: Thu, 23 May 2013 11:06:01 -0400
-Message-ID: <1369321563-16893-18-git-send-email-jlayton@redhat.com>
+Subject: [PATCH 11/19] cifs: add new "Unspecified" securityEnum value
+Date: Thu, 23 May 2013 11:05:55 -0400
+Message-ID: <1369321563-16893-12-git-send-email-jlayton@redhat.com>
 References: <1369321563-16893-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,31 +10,31 @@ In-Reply-To: <1369321563-16893-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Before this patchset, the global_secflags could only offer up a single
-sectype. With the new set though we have the ability to allow different
-sectypes since we sort out the one to use after talking to the server.
-
-Change the global_secflags to allow NTLMSSP or NTLMv2 by default. If the
-server sets the extended security bit in the Negotiate response, then
-we'll use NTLMSSP. If it doesn't then we'll use raw NTLMv2.
+Add a new securityEnum value to cover the case where a sec= option
+was not explicitly set.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/cifs/cifsglob.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/cifsglob.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 65fd9dd..fc0d004 100644
+index 874b29b..a858037 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -1338,7 +1338,7 @@ require use of the stronger protocol */
- #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
- #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+@@ -101,11 +101,11 @@ enum statusEnum {
+ };
  
--#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMSSP)
-+#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
- #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
- #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
- /*
+ enum securityEnum {
+-	LANMAN = 0,			/* Legacy LANMAN auth */
++	Unspecified = 0,	/* not specified */
++	LANMAN,			/* Legacy LANMAN auth */
+ 	NTLM,			/* Legacy NTLM012 auth with NTLM hash */
+ 	NTLMv2,			/* Legacy NTLM auth with NTLMv2 hash */
+ 	RawNTLMSSP,		/* NTLMSSP without SPNEGO, NTLMv2 hash */
+-/*	NTLMSSP, */ /* can use rawNTLMSSP instead of NTLMSSP via SPNEGO */
+ 	Kerberos,		/* Kerberos via SPNEGO */
+ };
+ 
 -- 
 1.8.1.4
