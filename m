@@ -1,184 +1,245 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 07/19] cifs: break out decoding of security blob into
+Subject: Re: [PATCH 08/19] cifs: break out lanman NEGOTIATE handling into
  separate function
-Date: Fri, 24 May 2013 16:24:05 +0400
-Message-ID: <CAKywueSJHh8C_QJiYbjjiFMHazs_nq+RNFcd6mmbBf+erdR3sw@mail.gmail.com>
+Date: Fri, 24 May 2013 16:31:23 +0400
+Message-ID: <CAKywueSyYM-a+XMc8T0wk=nivuEunbOrsWSJfb3tWs4B76Zi2Q@mail.gmail.com>
 References: <1369321563-16893-1-git-send-email-jlayton@redhat.com>
-	<1369321563-16893-8-git-send-email-jlayton@redhat.com>
+	<1369321563-16893-9-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1369321563-16893-8-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1369321563-16893-9-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2013/5/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> ...cleanup.
+> ...this also gets rid of some #ifdef ugliness too.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/cifspdu.h |   4 +-
->  fs/cifs/cifssmb.c | 109 ++++++++++++++++++++++++++++++------------------------
->  2 files changed, 62 insertions(+), 51 deletions(-)
+>  fs/cifs/cifssmb.c | 185 ++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 97 insertions(+), 88 deletions(-)
 >
-> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> index e996ff6..4e6135a 100644
-> --- a/fs/cifs/cifspdu.h
-> +++ b/fs/cifs/cifspdu.h
-> @@ -531,7 +531,7 @@ typedef struct lanman_neg_rsp {
->  #define READ_RAW_ENABLE 1
->  #define WRITE_RAW_ENABLE 2
->  #define RAW_ENABLE (READ_RAW_ENABLE | WRITE_RAW_ENABLE)
-> -
-> +#define SMB1_CLIENT_GUID_SIZE (16)
->  typedef struct negotiate_rsp {
->         struct smb_hdr hdr;     /* wct = 17 */
->         __le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
-> @@ -553,7 +553,7 @@ typedef struct negotiate_rsp {
->                 /* followed by 16 bytes of server GUID */
->                 /* then security blob if cap_extended_security negotiated */
->                 struct {
-> -                       unsigned char GUID[16];
-> +                       unsigned char GUID[SMB1_CLIENT_GUID_SIZE];
->                         unsigned char SecurityBlob[1];
->                 } __attribute__((packed)) extended_response;
->         } __attribute__((packed)) u;
 > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index c1c2006..9b4aea8 100644
+> index 9b4aea8..5dd4f8a 100644
 > --- a/fs/cifs/cifssmb.c
 > +++ b/fs/cifs/cifssmb.c
-> @@ -367,6 +367,56 @@ vt2_err:
->         return -EINVAL;
+> @@ -417,6 +417,96 @@ decode_ext_sec_blob(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr)
+>         return 0;
 >  }
 >
+> +#ifdef CONFIG_CIFS_WEAK_PW_HASH
 > +static int
-> +decode_ext_sec_blob(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr)
+> +decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr,
+> +                         unsigned int secFlags)
 > +{
-> +       int     rc = 0;
-> +       u16     count;
-> +       char    *guid = pSMBr->u.extended_response.GUID;
+> +       __s16 tmp;
+> +       struct lanman_neg_rsp *rsp = (struct lanman_neg_rsp *)pSMBr;
 > +
-> +       count = get_bcc(&pSMBr->hdr);
-> +       if (count < SMB1_CLIENT_GUID_SIZE)
-> +               return -EIO;
+> +       if (server->dialect != LANMAN_PROT && server->dialect != LANMAN2_PROT)
+> +               return -EOPNOTSUPP;
 > +
-> +       spin_lock(&cifs_tcp_ses_lock);
-> +       if (server->srv_count > 1) {
-> +               spin_unlock(&cifs_tcp_ses_lock);
-> +               if (memcmp(server->server_GUID, guid, SMB1_CLIENT_GUID_SIZE) != 0) {
-> +                       cifs_dbg(FYI, "server UID changed\n");
-> +                       memcpy(server->server_GUID, guid, SMB1_CLIENT_GUID_SIZE);
-> +               }
+> +       if ((secFlags & CIFSSEC_MAY_LANMAN) || (secFlags & CIFSSEC_MAY_PLNTXT))
+> +               server->secType = LANMAN;
+> +       else {
+> +               cifs_dbg(VFS, "mount failed weak security disabled in /proc/fs/cifs/SecurityFlags\n");
+> +               return -EOPNOTSUPP;
+> +       }
+> +       server->sec_mode = le16_to_cpu(rsp->SecurityMode);
+> +       server->maxReq = min_t(unsigned int,
+> +                              le16_to_cpu(rsp->MaxMpxCount),
+> +                              cifs_max_pending);
+> +       set_credits(server, server->maxReq);
+> +       server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
+> +       server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+> +       /* even though we do not use raw we might as well set this
+> +       accurately, in case we ever find a need for it */
+> +       if ((le16_to_cpu(rsp->RawMode) & RAW_ENABLE) == RAW_ENABLE) {
+> +               server->max_rw = 0xFF00;
+> +               server->capabilities = CAP_MPX_MODE | CAP_RAW_MODE;
 > +       } else {
-> +               spin_unlock(&cifs_tcp_ses_lock);
-> +               memcpy(server->server_GUID, guid, SMB1_CLIENT_GUID_SIZE);
+> +               server->max_rw = 0;/* do not need to use raw anyway */
+> +               server->capabilities = CAP_MPX_MODE;
+> +       }
+> +       tmp = (__s16)le16_to_cpu(rsp->ServerTimeZone);
+> +       if (tmp == -1) {
+> +               /* OS/2 often does not set timezone therefore
+> +                * we must use server time to calc time zone.
+> +                * Could deviate slightly from the right zone.
+> +                * Smallest defined timezone difference is 15 minutes
+> +                * (i.e. Nepal).  Rounding up/down is done to match
+> +                * this requirement.
+> +                */
+> +               int val, seconds, remain, result;
+> +               struct timespec ts, utc;
+> +               utc = CURRENT_TIME;
+> +               ts = cnvrtDosUnixTm(rsp->SrvTime.Date,
+> +                                   rsp->SrvTime.Time, 0);
+> +               cifs_dbg(FYI, "SrvTime %d sec since 1970 (utc: %d) diff: %d\n",
+> +                        (int)ts.tv_sec, (int)utc.tv_sec,
+> +                        (int)(utc.tv_sec - ts.tv_sec));
+> +               val = (int)(utc.tv_sec - ts.tv_sec);
+> +               seconds = abs(val);
+> +               result = (seconds / MIN_TZ_ADJ) * MIN_TZ_ADJ;
+> +               remain = seconds % MIN_TZ_ADJ;
+> +               if (remain >= (MIN_TZ_ADJ / 2))
+> +                       result += MIN_TZ_ADJ;
+> +               if (val < 0)
+> +                       result = -result;
+> +               server->timeAdj = result;
+> +       } else {
+> +               server->timeAdj = (int)tmp;
+> +               server->timeAdj *= 60; /* also in seconds */
+> +       }
+> +       cifs_dbg(FYI, "server->timeAdj: %d seconds\n", server->timeAdj);
+> +
+> +
+> +       /* BB get server time for time conversions and add
+> +       code to use it and timezone since this is not UTC */
+> +
+> +       if (rsp->EncryptionKeyLength ==
+> +                       cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
+> +               memcpy(server->cryptkey, rsp->EncryptionKey,
+> +                       CIFS_CRYPTO_KEY_SIZE);
+> +       } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
+> +               return -EIO; /* need cryptkey unless plain text */
 > +       }
 > +
-> +       if (count == SMB1_CLIENT_GUID_SIZE) {
-> +               server->secType = RawNTLMSSP;
-> +       } else {
-> +               count -= SMB1_CLIENT_GUID_SIZE;
-> +               rc = decode_negTokenInit(
-> +                       pSMBr->u.extended_response.SecurityBlob, count, server);
-> +               if (rc != 1)
-> +                       return -EINVAL;
-> +
-> +               /* Make sure server supports what we want to use */
-> +               switch(server->secType) {
-> +               case Kerberos:
-> +                       if (!server->sec_kerberos && !server->sec_mskerberos)
-> +                               return -EOPNOTSUPP;
-> +                       break;
-> +               case RawNTLMSSP:
-> +                       if (!server->sec_ntlmssp)
-> +                               return -EOPNOTSUPP;
-> +                       break;
-> +               default:
-> +                       return -EOPNOTSUPP;
-> +               }
-> +       }
-> +
+> +       cifs_dbg(FYI, "LANMAN negotiated\n");
 > +       return 0;
 > +}
+> +#else
+> +static inline int
+> +decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr,
+> +                         unsigned int secFlags)
+> +{
+> +       cifs_dbg(VFS, "mount failed, cifs module not built with CIFS_WEAK_PW_HASH support\n");
+> +       return -EOPNOTSUPP;
+> +}
+> +#endif
 > +
 >  int
 >  CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
 >  {
-> @@ -568,61 +618,22 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
->         server->capabilities = le32_to_cpu(pSMBr->Capabilities);
->         server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
->         server->timeAdj *= 60;
-> -       if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
-> +
-> +       if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE)
->                 memcpy(ses->server->cryptkey, pSMBr->u.EncryptionKey,
->                        CIFS_CRYPTO_KEY_SIZE);
-> -       } else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
-> +       else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
->                         server->capabilities & CAP_EXTENDED_SECURITY) &&
-> -                               (pSMBr->EncryptionKeyLength == 0)) {
-> -               /* decode security blob */
-> -               count = get_bcc(&pSMBr->hdr);
-> -               if (count < 16) {
-> -                       rc = -EIO;
+> @@ -485,98 +575,19 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+>                 could not negotiate a common dialect */
+>                 rc = -EOPNOTSUPP;
+>                 goto neg_err_exit;
+> -#ifdef CONFIG_CIFS_WEAK_PW_HASH
+> -       } else if ((pSMBr->hdr.WordCount == 13)
+> -                       && ((server->dialect == LANMAN_PROT)
+> -                               || (server->dialect == LANMAN2_PROT))) {
+> -               __s16 tmp;
+> -               struct lanman_neg_rsp *rsp = (struct lanman_neg_rsp *)pSMBr;
+> -
+> -               if ((secFlags & CIFSSEC_MAY_LANMAN) ||
+> -                       (secFlags & CIFSSEC_MAY_PLNTXT))
+> -                       server->secType = LANMAN;
+> -               else {
+> -                       cifs_dbg(VFS, "mount failed weak security disabled in /proc/fs/cifs/SecurityFlags\n");
+> -                       rc = -EOPNOTSUPP;
 > -                       goto neg_err_exit;
 > -               }
-> -               spin_lock(&cifs_tcp_ses_lock);
-> -               if (server->srv_count > 1) {
-> -                       spin_unlock(&cifs_tcp_ses_lock);
-> -                       if (memcmp(server->server_GUID,
-> -                                  pSMBr->u.extended_response.
-> -                                  GUID, 16) != 0) {
-> -                               cifs_dbg(FYI, "server UID changed\n");
-> -                               memcpy(server->server_GUID,
-> -                                       pSMBr->u.extended_response.GUID,
-> -                                       16);
-> -                       }
+> -               server->sec_mode = le16_to_cpu(rsp->SecurityMode);
+> -               server->maxReq = min_t(unsigned int,
+> -                                      le16_to_cpu(rsp->MaxMpxCount),
+> -                                      cifs_max_pending);
+> -               set_credits(server, server->maxReq);
+> -               server->maxBuf = le16_to_cpu(rsp->MaxBufSize);
+> -               server->max_vcs = le16_to_cpu(rsp->MaxNumberVcs);
+> -               /* even though we do not use raw we might as well set this
+> -               accurately, in case we ever find a need for it */
+> -               if ((le16_to_cpu(rsp->RawMode) & RAW_ENABLE) == RAW_ENABLE) {
+> -                       server->max_rw = 0xFF00;
+> -                       server->capabilities = CAP_MPX_MODE | CAP_RAW_MODE;
 > -               } else {
-> -                       spin_unlock(&cifs_tcp_ses_lock);
-> -                       memcpy(server->server_GUID,
-> -                              pSMBr->u.extended_response.GUID, 16);
+> -                       server->max_rw = 0;/* do not need to use raw anyway */
+> -                       server->capabilities = CAP_MPX_MODE;
+> -               }
+> -               tmp = (__s16)le16_to_cpu(rsp->ServerTimeZone);
+> -               if (tmp == -1) {
+> -                       /* OS/2 often does not set timezone therefore
+> -                        * we must use server time to calc time zone.
+> -                        * Could deviate slightly from the right zone.
+> -                        * Smallest defined timezone difference is 15 minutes
+> -                        * (i.e. Nepal).  Rounding up/down is done to match
+> -                        * this requirement.
+> -                        */
+> -                       int val, seconds, remain, result;
+> -                       struct timespec ts, utc;
+> -                       utc = CURRENT_TIME;
+> -                       ts = cnvrtDosUnixTm(rsp->SrvTime.Date,
+> -                                           rsp->SrvTime.Time, 0);
+> -                       cifs_dbg(FYI, "SrvTime %d sec since 1970 (utc: %d) diff: %d\n",
+> -                                (int)ts.tv_sec, (int)utc.tv_sec,
+> -                                (int)(utc.tv_sec - ts.tv_sec));
+> -                       val = (int)(utc.tv_sec - ts.tv_sec);
+> -                       seconds = abs(val);
+> -                       result = (seconds / MIN_TZ_ADJ) * MIN_TZ_ADJ;
+> -                       remain = seconds % MIN_TZ_ADJ;
+> -                       if (remain >= (MIN_TZ_ADJ / 2))
+> -                               result += MIN_TZ_ADJ;
+> -                       if (val < 0)
+> -                               result = -result;
+> -                       server->timeAdj = result;
+> -               } else {
+> -                       server->timeAdj = (int)tmp;
+> -                       server->timeAdj *= 60; /* also in seconds */
+> -               }
+> -               cifs_dbg(FYI, "server->timeAdj: %d seconds\n", server->timeAdj);
+> -
+> -
+> -               /* BB get server time for time conversions and add
+> -               code to use it and timezone since this is not UTC */
+> -
+> -               if (rsp->EncryptionKeyLength ==
+> -                               cpu_to_le16(CIFS_CRYPTO_KEY_SIZE)) {
+> -                       memcpy(ses->server->cryptkey, rsp->EncryptionKey,
+> -                               CIFS_CRYPTO_KEY_SIZE);
+> -               } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
+> -                       rc = -EIO; /* need cryptkey unless plain text */
+> -                       goto neg_err_exit;
 > -               }
 > -
-> -               if (count == 16) {
-> -                       server->secType = RawNTLMSSP;
-> -               } else {
-> -                       rc = decode_negTokenInit(pSMBr->u.extended_response.
-> -                                                SecurityBlob, count - 16,
-> -                                                server);
-> -                       if (rc == 1)
-> -                               rc = 0;
-> -                       else
-> -                               rc = -EINVAL;
-> -                       if (server->secType == Kerberos) {
-> -                               if (!server->sec_kerberos &&
-> -                                               !server->sec_mskerberos)
-> -                                       rc = -EOPNOTSUPP;
-> -                       } else if (server->secType == RawNTLMSSP) {
-> -                               if (!server->sec_ntlmssp)
-> -                                       rc = -EOPNOTSUPP;
-> -                       } else
-> -                                       rc = -EOPNOTSUPP;
-> -               }
-> -       } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
-> +                               (pSMBr->EncryptionKeyLength == 0))
-> +               rc = decode_ext_sec_blob(server, pSMBr);
-> +       else if (server->sec_mode & SECMODE_PW_ENCRYPT)
->                 rc = -EIO; /* no crypt key only if plain text pwd */
+> -               cifs_dbg(FYI, "LANMAN negotiated\n");
+> -               /* we will not end up setting signing flags - as no signing
+> -               was in LANMAN and server did not return the flags on */
+> -               goto signing_check;
+> -#else /* weak security disabled */
+>         } else if (pSMBr->hdr.WordCount == 13) {
+> -               cifs_dbg(VFS, "mount failed, cifs module not built with CIFS_WEAK_PW_HASH support\n");
+> -               rc = -EOPNOTSUPP;
+> -#endif /* WEAK_PW_HASH */
 > -               goto neg_err_exit;
-> -       } else
-> +       else
->                 server->capabilities &= ~CAP_EXTENDED_SECURITY;
->
-> +       if (rc)
-> +               goto neg_err_exit;
+> +               rc = decode_lanman_negprot_rsp(server, pSMBr, secFlags);
+> +               if (!rc)
+> +                       goto signing_check;
+> +               else
+> +                       goto neg_err_exit;
+>         } else if (pSMBr->hdr.WordCount != 17) {
+>                 /* unknown wct */
+>                 rc = -EOPNOTSUPP;
+>                 goto neg_err_exit;
+>         }
+> -       /* else wct == 17 NTLM */
+> +       /* else wct == 17, NTLM or better */
 > +
->  #ifdef CONFIG_CIFS_WEAK_PW_HASH
+>         server->sec_mode = pSMBr->SecurityMode;
+>         if ((server->sec_mode & SECMODE_USER) == 0)
+>                 cifs_dbg(FYI, "share mode security\n");
+> @@ -634,9 +645,7 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+>         if (rc)
+>                 goto neg_err_exit;
+>
+> -#ifdef CONFIG_CIFS_WEAK_PW_HASH
 >  signing_check:
->  #endif
+> -#endif
+>         if ((secFlags & CIFSSEC_MAY_SIGN) == 0) {
+>                 /* MUST_SIGN already includes the MAY_SIGN FLAG
+>                    so if this is zero it means that signing is disabled */
 > --
 > 1.8.1.4
 >
@@ -187,7 +248,7 @@ List-ID: <linux-cifs.vger.kernel.org>
 > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Acked-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Good cleanup. Acked-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
 --
 Best regards,
