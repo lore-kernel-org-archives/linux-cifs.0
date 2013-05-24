@@ -1,147 +1,194 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 04/19] cifs: throw a warning if negotiate or sess_setup
- ops are passed NULL server or session pointers
-Date: Fri, 24 May 2013 08:20:19 -0400
-Message-ID: <20130524082019.31ef4b06@corrin.poochiereds.net>
+From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH 07/19] cifs: break out decoding of security blob into
+ separate function
+Date: Fri, 24 May 2013 16:24:05 +0400
+Message-ID: <CAKywueSJHh8C_QJiYbjjiFMHazs_nq+RNFcd6mmbBf+erdR3sw@mail.gmail.com>
 References: <1369321563-16893-1-git-send-email-jlayton@redhat.com>
-	<1369321563-16893-5-git-send-email-jlayton@redhat.com>
-	<CAKywueQWk_r+TcSebVHzyWs_Gnbdj523CETqXB4u25QkebPrqA@mail.gmail.com>
+	<1369321563-16893-8-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ISO-8859-1
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQWk_r+TcSebVHzyWs_Gnbdj523CETqXB4u25QkebPrqA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1369321563-16893-8-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 24 May 2013 16:15:32 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+2013/5/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
+> ...cleanup.
+>
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifspdu.h |   4 +-
+>  fs/cifs/cifssmb.c | 109 ++++++++++++++++++++++++++++++------------------------
+>  2 files changed, 62 insertions(+), 51 deletions(-)
+>
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index e996ff6..4e6135a 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -531,7 +531,7 @@ typedef struct lanman_neg_rsp {
+>  #define READ_RAW_ENABLE 1
+>  #define WRITE_RAW_ENABLE 2
+>  #define RAW_ENABLE (READ_RAW_ENABLE | WRITE_RAW_ENABLE)
+> -
+> +#define SMB1_CLIENT_GUID_SIZE (16)
+>  typedef struct negotiate_rsp {
+>         struct smb_hdr hdr;     /* wct = 17 */
+>         __le16 DialectIndex; /* 0xFFFF = no dialect acceptable */
+> @@ -553,7 +553,7 @@ typedef struct negotiate_rsp {
+>                 /* followed by 16 bytes of server GUID */
+>                 /* then security blob if cap_extended_security negotiated */
+>                 struct {
+> -                       unsigned char GUID[16];
+> +                       unsigned char GUID[SMB1_CLIENT_GUID_SIZE];
+>                         unsigned char SecurityBlob[1];
+>                 } __attribute__((packed)) extended_response;
+>         } __attribute__((packed)) u;
+> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+> index c1c2006..9b4aea8 100644
+> --- a/fs/cifs/cifssmb.c
+> +++ b/fs/cifs/cifssmb.c
+> @@ -367,6 +367,56 @@ vt2_err:
+>         return -EINVAL;
+>  }
+>
+> +static int
+> +decode_ext_sec_blob(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr)
+> +{
+> +       int     rc = 0;
+> +       u16     count;
+> +       char    *guid = pSMBr->u.extended_response.GUID;
+> +
+> +       count = get_bcc(&pSMBr->hdr);
+> +       if (count < SMB1_CLIENT_GUID_SIZE)
+> +               return -EIO;
+> +
+> +       spin_lock(&cifs_tcp_ses_lock);
+> +       if (server->srv_count > 1) {
+> +               spin_unlock(&cifs_tcp_ses_lock);
+> +               if (memcmp(server->server_GUID, guid, SMB1_CLIENT_GUID_SIZE) != 0) {
+> +                       cifs_dbg(FYI, "server UID changed\n");
+> +                       memcpy(server->server_GUID, guid, SMB1_CLIENT_GUID_SIZE);
+> +               }
+> +       } else {
+> +               spin_unlock(&cifs_tcp_ses_lock);
+> +               memcpy(server->server_GUID, guid, SMB1_CLIENT_GUID_SIZE);
+> +       }
+> +
+> +       if (count == SMB1_CLIENT_GUID_SIZE) {
+> +               server->secType = RawNTLMSSP;
+> +       } else {
+> +               count -= SMB1_CLIENT_GUID_SIZE;
+> +               rc = decode_negTokenInit(
+> +                       pSMBr->u.extended_response.SecurityBlob, count, server);
+> +               if (rc != 1)
+> +                       return -EINVAL;
+> +
+> +               /* Make sure server supports what we want to use */
+> +               switch(server->secType) {
+> +               case Kerberos:
+> +                       if (!server->sec_kerberos && !server->sec_mskerberos)
+> +                               return -EOPNOTSUPP;
+> +                       break;
+> +               case RawNTLMSSP:
+> +                       if (!server->sec_ntlmssp)
+> +                               return -EOPNOTSUPP;
+> +                       break;
+> +               default:
+> +                       return -EOPNOTSUPP;
+> +               }
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  int
+>  CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+>  {
+> @@ -568,61 +618,22 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+>         server->capabilities = le32_to_cpu(pSMBr->Capabilities);
+>         server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
+>         server->timeAdj *= 60;
+> -       if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
+> +
+> +       if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE)
+>                 memcpy(ses->server->cryptkey, pSMBr->u.EncryptionKey,
+>                        CIFS_CRYPTO_KEY_SIZE);
+> -       } else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
+> +       else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
+>                         server->capabilities & CAP_EXTENDED_SECURITY) &&
+> -                               (pSMBr->EncryptionKeyLength == 0)) {
+> -               /* decode security blob */
+> -               count = get_bcc(&pSMBr->hdr);
+> -               if (count < 16) {
+> -                       rc = -EIO;
+> -                       goto neg_err_exit;
+> -               }
+> -               spin_lock(&cifs_tcp_ses_lock);
+> -               if (server->srv_count > 1) {
+> -                       spin_unlock(&cifs_tcp_ses_lock);
+> -                       if (memcmp(server->server_GUID,
+> -                                  pSMBr->u.extended_response.
+> -                                  GUID, 16) != 0) {
+> -                               cifs_dbg(FYI, "server UID changed\n");
+> -                               memcpy(server->server_GUID,
+> -                                       pSMBr->u.extended_response.GUID,
+> -                                       16);
+> -                       }
+> -               } else {
+> -                       spin_unlock(&cifs_tcp_ses_lock);
+> -                       memcpy(server->server_GUID,
+> -                              pSMBr->u.extended_response.GUID, 16);
+> -               }
+> -
+> -               if (count == 16) {
+> -                       server->secType = RawNTLMSSP;
+> -               } else {
+> -                       rc = decode_negTokenInit(pSMBr->u.extended_response.
+> -                                                SecurityBlob, count - 16,
+> -                                                server);
+> -                       if (rc == 1)
+> -                               rc = 0;
+> -                       else
+> -                               rc = -EINVAL;
+> -                       if (server->secType == Kerberos) {
+> -                               if (!server->sec_kerberos &&
+> -                                               !server->sec_mskerberos)
+> -                                       rc = -EOPNOTSUPP;
+> -                       } else if (server->secType == RawNTLMSSP) {
+> -                               if (!server->sec_ntlmssp)
+> -                                       rc = -EOPNOTSUPP;
+> -                       } else
+> -                                       rc = -EOPNOTSUPP;
+> -               }
+> -       } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
+> +                               (pSMBr->EncryptionKeyLength == 0))
+> +               rc = decode_ext_sec_blob(server, pSMBr);
+> +       else if (server->sec_mode & SECMODE_PW_ENCRYPT)
+>                 rc = -EIO; /* no crypt key only if plain text pwd */
+> -               goto neg_err_exit;
+> -       } else
+> +       else
+>                 server->capabilities &= ~CAP_EXTENDED_SECURITY;
+>
+> +       if (rc)
+> +               goto neg_err_exit;
+> +
+>  #ifdef CONFIG_CIFS_WEAK_PW_HASH
+>  signing_check:
+>  #endif
+> --
+> 1.8.1.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
+> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-> 2013/5/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > These look pretty cargo-culty to me, but let's be certain. Leave
-> > them in place for now. Pop a WARN if it ever does happen. Also,
-> > move to a more standard idiom for setting the "server" pointer.
-> >
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifssmb.c | 11 +++++------
-> >  fs/cifs/sess.c    |  4 +++-
-> >  fs/cifs/smb2pdu.c | 20 ++++++++------------
-> >  3 files changed, 16 insertions(+), 19 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> > index a58dc77..c1c2006 100644
-> > --- a/fs/cifs/cifssmb.c
-> > +++ b/fs/cifs/cifssmb.c
-> > @@ -375,16 +375,15 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
-> >         int rc = 0;
-> >         int bytes_returned;
-> >         int i;
-> > -       struct TCP_Server_Info *server;
-> > +       struct TCP_Server_Info *server = ses->server;
-> >         u16 count;
-> >         unsigned int secFlags;
-> >
-> > -       if (ses->server)
-> > -               server = ses->server;
-> > -       else {
-> > -               rc = -EIO;
-> > -               return rc;
-> > +       if (!server) {
-> > +               WARN(1, "%s: server is NULL!\n", __func__);
-> > +               return -EIO;
-> >         }
-> > +
-> >         rc = smb_init(SMB_COM_NEGOTIATE, 0, NULL /* no tcon yet */ ,
-> >                       (void **) &pSMB, (void **) &pSMBr);
-> >         if (rc)
-> > diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> > index 838e224..e8c5dc9 100644
-> > --- a/fs/cifs/sess.c
-> > +++ b/fs/cifs/sess.c
-> > @@ -576,8 +576,10 @@ CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
-> >         u16 blob_len;
-> >         char *ntlmsspblob = NULL;
-> >
-> > -       if (ses == NULL)
-> > +       if (ses == NULL) {
-> > +               WARN(1, "%s: ses == NULL!", __func__);
-> >                 return -EINVAL;
-> > +       }
-> >
-> >         type = ses->server->secType;
-> >         cifs_dbg(FYI, "sess setup type %d\n", type);
-> > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> > index 2b95ce2..3af66aa 100644
-> > --- a/fs/cifs/smb2pdu.c
-> > +++ b/fs/cifs/smb2pdu.c
-> > @@ -328,7 +328,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
-> >         struct kvec iov[1];
-> >         int rc = 0;
-> >         int resp_buftype;
-> > -       struct TCP_Server_Info *server;
-> > +       struct TCP_Server_Info *server = ses->server;
-> >         unsigned int sec_flags;
-> >         u16 temp = 0;
-> >         int blob_offset, blob_length;
-> > @@ -337,11 +337,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
-> >
-> >         cifs_dbg(FYI, "Negotiate protocol\n");
-> >
-> > -       if (ses->server)
-> > -               server = ses->server;
-> > -       else {
-> > -               rc = -EIO;
-> > -               return rc;
-> > +       if (!server) {
-> > +               WARN(1, "%s: server is NULL!\n", __func__);
-> > +               return -EIO;
-> >         }
-> >
-> >         rc = small_smb2_init(SMB2_NEGOTIATE, NULL, (void **) &req);
-> > @@ -480,7 +478,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
-> >         int rc = 0;
-> >         int resp_buftype;
-> >         __le32 phase = NtLmNegotiate; /* NTLMSSP, if needed, is multistage */
-> > -       struct TCP_Server_Info *server;
-> > +       struct TCP_Server_Info *server = ses->server;
-> >         unsigned int sec_flags;
-> >         u8 temp = 0;
-> >         u16 blob_length = 0;
-> > @@ -490,11 +488,9 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
-> >
-> >         cifs_dbg(FYI, "Session Setup\n");
-> >
-> > -       if (ses->server)
-> > -               server = ses->server;
-> > -       else {
-> > -               rc = -EIO;
-> > -               return rc;
-> > +       if (!server) {
-> > +               WARN(1, "%s: server is NULL!\n", __func__);
-> > +               return -EIO;
-> >         }
-> >
-> >         /*
-> > --
-> > 1.8.1.4
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> > the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> Agreed. Also we have such checks several other places - may be it's
-> good to make them raising a warning too?
-> 
-> Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
-> 
+Acked-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 
-Yes, I think so. I just did these as I ran across them, but adding
-WARN() calls to similar spots makes sense to me.
-
--- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+--
+Best regards,
+Pavel Shilovsky.
