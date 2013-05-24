@@ -1,117 +1,116 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 09/19] cifs: move handling of signed connections into
- separate function
-Date: Fri, 24 May 2013 08:45:36 -0400
-Message-ID: <20130524084536.544c59a1@corrin.poochiereds.net>
+Subject: Re: [PATCH 14/19] cifs: add new fields to cifs_ses to track
+ requested security flavor
+Date: Fri, 24 May 2013 08:56:44 -0400
+Message-ID: <20130524085644.4c670c4d@corrin.poochiereds.net>
 References: <1369321563-16893-1-git-send-email-jlayton@redhat.com>
-	<1369321563-16893-10-git-send-email-jlayton@redhat.com>
-	<CAKywueQEwagjBhXsuSBEMRdnAAHyFovnoaR+28Gb7B9QpEXbqw@mail.gmail.com>
+	<1369321563-16893-15-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org,
+	Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAKywueQEwagjBhXsuSBEMRdnAAHyFovnoaR+28Gb7B9QpEXbqw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+In-Reply-To: <1369321563-16893-15-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Fri, 24 May 2013 16:41:37 +0400
-Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+On Thu, 23 May 2013 11:05:58 -0400
+Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org> wrote:
 
-> 2013/5/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> > Move the sanity checks for signed connections into a separate function.
-> > SMB2's was a cut-and-paste job from CIFS code, so we can make them use
-> > the same function.
-> >
-> > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> > ---
-> >  fs/cifs/cifsproto.h |  1 +
-> >  fs/cifs/cifssmb.c   | 71 +++++++++++++++++++++++++++--------------------------
-> >  fs/cifs/smb2pdu.c   | 33 +++----------------------
-> >  3 files changed, 41 insertions(+), 64 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> > index dda188a..f0e93ff 100644
-> > --- a/fs/cifs/cifsproto.h
-> > +++ b/fs/cifs/cifsproto.h
-> > @@ -212,6 +212,7 @@ extern int cifs_negotiate_protocol(const unsigned int xid,
-> >                                    struct cifs_ses *ses);
-> >  extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
-> >                               struct nls_table *nls_info);
-> > +extern int cifs_enable_signing(struct TCP_Server_Info *server, unsigned int secFlags);
-> >  extern int CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses);
-> >
-> >  extern int CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
-> > diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> > index 5dd4f8a..5b191f7 100644
-> > --- a/fs/cifs/cifssmb.c
-> > +++ b/fs/cifs/cifssmb.c
-> > @@ -417,6 +417,38 @@ decode_ext_sec_blob(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr)
-> >         return 0;
-> >  }
-> >
-> > +int
-> > +cifs_enable_signing(struct TCP_Server_Info *server, unsigned int secFlags)
-> > +{
-> > +       if ((secFlags & CIFSSEC_MAY_SIGN) == 0) {
-> > +               /* MUST_SIGN already includes the MAY_SIGN FLAG
-> > +                  so if this is zero it means that signing is disabled */
-> > +               cifs_dbg(FYI, "Signing disabled\n");
-> > +               if (server->sec_mode & SECMODE_SIGN_REQUIRED) {
-> > +                       cifs_dbg(VFS, "Server requires packet signing to be enabled in /proc/fs/cifs/SecurityFlags\n");
-> > +                       return -EOPNOTSUPP;
-> > +               }
-> > +               server->sec_mode &=
-> > +                       ~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
-> > +       } else if ((secFlags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) {
-> > +               /* signing required */
-> > +               cifs_dbg(FYI, "Must sign - secFlags 0x%x\n", secFlags);
-> > +               if ((server->sec_mode &
-> > +                       (SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED)) == 0) {
-> > +                       cifs_dbg(VFS, "signing required but server lacks support\n");
-> > +                       return -EOPNOTSUPP;
-> > +               } else
-> > +                       server->sec_mode |= SECMODE_SIGN_REQUIRED;
-> > +       } else {
-> > +               /* signing optional ie CIFSSEC_MAY_SIGN */
-> > +               if ((server->sec_mode & SECMODE_SIGN_REQUIRED) == 0)
-> > +                       server->sec_mode &=
-> > +                               ~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
-> > +       }
-> > +
-> > +       return 0;
-> > +}
-> > +
-> >  #ifdef CONFIG_CIFS_WEAK_PW_HASH
-> >  static int
-> >  decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr,
-> > @@ -495,7 +527,7 @@ decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr,
-> >         }
-> >
-> >         cifs_dbg(FYI, "LANMAN negotiated\n");
-> > -       return 0;
-> > +       return cifs_enable_signing(server, secFlags);
-> >  }
-> >  #else
-> >  static inline int
-> > @@ -577,10 +609,7 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
-> >                 goto neg_err_exit;
-> >         } else if (pSMBr->hdr.WordCount == 13) {
-> >                 rc = decode_lanman_negprot_rsp(server, pSMBr, secFlags);
-> > -               if (!rc)
-> > -                       goto signing_check;
-> > -               else
-> > -                       goto neg_err_exit;
-> > +               goto neg_err_exit;
+> Currently we have the overrideSecFlg field, but it's quite cumbersome
+> to work with. Add some new fields that will eventually supercede it.
 > 
-> Go to a label that has "err" in it's name after a successful function
-> call may confuse people.
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/cifs/cifsfs.c   | 11 +++++++----
+>  fs/cifs/cifsglob.h |  2 ++
+>  fs/cifs/connect.c  |  5 +++++
+>  3 files changed, 14 insertions(+), 4 deletions(-)
 > 
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index bb27269..97601fa 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -312,11 +312,14 @@ cifs_show_address(struct seq_file *s, struct TCP_Server_Info *server)
+>  }
+>  
+>  static void
+> -cifs_show_security(struct seq_file *s, struct TCP_Server_Info *server)
+> +cifs_show_security(struct seq_file *s, struct cifs_ses *ses)
+>  {
+> +	if (ses->sectype == Unspecified)
+> +		return;
+> +
+>  	seq_printf(s, ",sec=");
+>  
+> -	switch (server->secType) {
+> +	switch (ses->sectype) {
+>  	case LANMAN:
+>  		seq_printf(s, "lanman");
+>  		break;
+> @@ -338,7 +341,7 @@ cifs_show_security(struct seq_file *s, struct TCP_Server_Info *server)
+>  		break;
+>  	}
+>  
+> -	if (server->sec_mode & (SECMODE_SIGN_REQUIRED | SECMODE_SIGN_ENABLED))
+> +	if (ses->sign)
+>  		seq_printf(s, "i");
+>  }
+>  
+> @@ -369,7 +372,7 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+>  	srcaddr = (struct sockaddr *)&tcon->ses->server->srcaddr;
+>  
+>  	seq_printf(s, ",vers=%s", tcon->ses->server->vals->version_string);
+> -	cifs_show_security(s, tcon->ses->server);
+> +	cifs_show_security(s, tcon->ses);
+>  	cifs_show_cache_flavor(s, cifs_sb);
+>  
+>  	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER)
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 9f88a35..a911a33 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -713,6 +713,8 @@ struct cifs_ses {
+>  	char *password;
+>  	struct session_key auth_key;
+>  	struct ntlmssp_auth *ntlmssp; /* ciphertext, flags, server challenge */
+> +	enum securityEnum sectype; /* what security flavor was specified? */
+> +	bool sign;		/* is signing required? */
+>  	bool need_reconnect:1; /* connection reset, uid now invalid */
+>  #ifdef CONFIG_CIFS_SMB2
+>  	__u16 session_flags;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 7b71961..072598f 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -2513,6 +2513,9 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+>  	ses->linux_uid = volume_info->linux_uid;
+>  
+>  	ses->overrideSecFlg = volume_info->secFlg;
+> +	ses->sectype = volume_info->sectype;
+> +	ses->sign = volume_info->sign ? volume_info->sign :
+> +				(global_secflags & CIFSSEC_MUST_SIGN);
 
-I guess we could change it to "neg_exit:" or something. I can toss a
-patch onto the top of the pile to do that in the next iteration.
+Note that there's a minor bug in the above line. CIFSSEC_MUST_SIGN is
+CIFSSEC_MAY_SIGN or'ed with another bit. So this ends up setting
+ses->sign when only CIFSSEC_MAY_SIGN is set. I've got that fixed in my
+repo, and the next iteration of the set will include it.
+
+>  
+>  	mutex_lock(&ses->session_mutex);
+>  	rc = cifs_negotiate_protocol(xid, ses);
+> @@ -3931,6 +3934,8 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
+>  	vol_info->nocase = master_tcon->nocase;
+>  	vol_info->local_lease = master_tcon->local_lease;
+>  	vol_info->no_linux_ext = !master_tcon->unix_ext;
+> +	vol_info->sectype = master_tcon->ses->sectype;
+> +	vol_info->sign = master_tcon->ses->sign;
+>  
+>  	rc = cifs_set_vol_auth(vol_info, master_tcon->ses);
+>  	if (rc) {
+
 
 -- 
 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
