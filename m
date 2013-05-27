@@ -1,142 +1,168 @@
-From: Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
-Date: Mon, 27 May 2013 12:09:04 +1000
-Message-ID: <20130527020903.GR29466@dastard>
-References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
- <20130523094201.GA24543@dastard>
- <519E8B5F.3080905@hp.com>
+From: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Subject: cifs-utils VFS errors
+Date: Mon, 27 May 2013 11:02:15 +0200
+Message-ID: <51A32117.5030908@steve-ss.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jeff Layton <jlayton@redhat.com>,
-	Miklos Szeredi <mszeredi@suse.cz>, Ian Kent <raven@themaw.net>,
-	Sage Weil <sage@inktank.com>, Steve French <sfrench@samba.org>,
-	Trond Myklebust <Trond.Myklebust@netapp.com>,
-	Eric Paris <eparis@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, autofs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	"Chandramouleeswaran, Aswin" <aswin@hp.com>,
-	"Norton, Scott J" <scott.norton@hp.com>,
-	Andi Kleen <andi@firstfloor.org>
-To: Waiman Long <waiman.long@hp.com>
-Return-path: <autofs-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <519E8B5F.3080905@hp.com>
-Sender: autofs-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, May 23, 2013 at 05:34:23PM -0400, Waiman Long wrote:
-> On 05/23/2013 05:42 AM, Dave Chinner wrote:
-> >On Wed, May 22, 2013 at 09:37:25PM -0400, Waiman Long wrote:
-> >>Change log:
-> >>
-> >>v2->v3
-> >>  - Fix the RCU lock problem found by Al Viro.
-> >>  - Rebase the code to the latest v3.10-rc1 linux mainline.
-> >>  - Remove patch 4 which may be problematic if the dentry is deleted.
-> >>  - Rerun performance measurement using 3.10-rc1 kernel.
-> >>
-> >>v1->v2
-> >>  - Include performance improvement in the AIM7 benchmark results because
-> >>    of this patch.
-> >>  - Modify dget_parent() to avoid taking the lock, if possible, to further
-> >>    improve AIM7 benchmark results.
-> >>
-> >>During some perf-record sessions of the kernel running the high_systime
-> >>workload of the AIM7 benchmark, it was found that quite a large portion
-> >>of the spinlock contention was due to the perf_event_mmap_event()
-> >>function itself. This perf kernel function calls d_path() which,
-> >>in turn, call path_get() and dput() indirectly. These 3 functions
-> >>were the hottest functions shown in the perf-report output of
-> >>the _raw_spin_lock() function in an 8-socket system with 80 cores
-> >>(hyperthreading off) with a 3.10-rc1 kernel:
-> >What was it I said about this patchset when you posted it to speed
-> >up an Oracle benchmark back in february? I'll repeat:
-> >
-> >"Nobody should be doing reverse dentry-to-name lookups in a quantity
-> >sufficient for it to become a performance limiting factor."
-> 
-> Thank for the comment, but my point is that it is the d_lock
-> contention is skewing the data about how much spin lock contention
-> had actually happened in the workload and it makes it harder to
-> pinpoint problem areas to look at. This is not about performance, it
-> is about accurate representation of performance data. Ideally, we
-> want the overhead of turning on perf instrumentation to be as low as
-> possible.
+Hi
+I have a s3 fileserver joined to a s4 DC
+Here is smb.conf on the fileserver:
+[global]
+workgroup = HH3
+realm = HH3.SITE
+security = ADS
+kerberos method = system keytab
+winbind enum users = Yes
+winbind enum groups = Yes
+idmap config *:backend = tdb
+idmap config *:range = 3000-4000
+idmap config HH3:backend = ad
+idmap config HH3:range = 20000-40000000
+idmap config HH3:schema_mode = rfc2307
+winbind nss info = rfc2307
+winbind expand groups = 2
+winbind nested groups = yes
+winbind use default domain = Yes
 
-Right. But d_path will never be "low overhead", and as such it
-shouldn't be used by perf.
+[users]
+path = /home/users
+read only = No
 
-> >And that makes whatever that tracepoint is doing utterly stupid.
-> >Dumping out full paths in a tracepoint is hardly "low overhead", and
-> >that tracepoint should be stomped on from a great height. Sure,
-> >print the filename straight out of the dentry into a tracepoint,
-> >but repeated calculating the full path (probably for the same set of
-> >dentries) is just a dumb thing to do.
-> >
-> >Anyway, your numbers show that a single AIM7 microbenchmark goes
-> >better under tracing the specific mmap event that uses d_path(), but
-> >the others are on average a little bit slower. That doesn't convince
-> >me that this is worth doing. Indeed, what happens to performance
-> >when you aren't tracing?
-> >
-> >Indeed, have you analysed what makes that
-> >microbenchmark contend so much on the dentry lock while reverse
-> >lookups are occuring? Dentry lock contention does not necessarily
-> >indicate a problem with the dentry locks, and without knowing why
-> >there is contention occuring (esp. compared to the other benchmarks)
-> >we can't really determine if this is a good solution or not...
-> 
-> What made it contend so much was the large number of CPUs available
-> in my test system which is a 8-socket Westmere EX machines with 80
-> cores. As perf was collecting data from every core, the threads will
-> unavoidably bump into each other to translate dentries back to the
-> full paths. The current code only allows one CPU in the d_path()
-> critical path. My patch will allow all of them to be in the critical
-> path concurrently.
+getent passwd works fine and shows AD users. But cifs mount fails:
+  sudo mount -t cifs //oliva/users --verbose /mnt -osec=krb5
+mount.cifs kernel mount options: ip=127.0.0.1,unc=\\oliva
+\users,sec=krb5,user=root,pass=********
+mount error(13): Permission denied
+Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
 
-Yes, I know *how* contention occurs and what your patch does. I'm
-asking you to explain *why* we need to fix this specific workload,
-and why the tracepoint that calls d_path() actually needs to do
-that.
+the log gives:
+May 26 12:35:05 oliva cifs.upcall: key description:
+cifs.spnego;0;0;39010000;ver=0x2;host=oliva;ip4=127.0.0.1;sec=krb5;uid=0x0;creduid=0x0;user=root;pid=0x6f3
+May 26 12:35:05 oliva cifs.upcall: ver=2
+May 26 12:35:05 oliva cifs.upcall: host=oliva
+May 26 12:35:05 oliva cifs.upcall: ip=127.0.0.1
+May 26 12:35:05 oliva cifs.upcall: sec=1
+May 26 12:35:05 oliva cifs.upcall: uid=0
+May 26 12:35:05 oliva cifs.upcall: creduid=0
+May 26 12:35:05 oliva cifs.upcall: user=root
+May 26 12:35:05 oliva cifs.upcall: pid=1779
+May 26 12:35:05 oliva cifs.upcall: find_krb5_cc:
+considering /tmp/krb5cc_0
+May 26 12:35:05 oliva cifs.upcall: find_krb5_cc: FILE:/tmp/krb5cc_0 is
+valid ccache
+May 26 12:35:05 oliva cifs.upcall: handle_krb5_mech: getting service
+ticket for oliva
+May 26 12:35:05 oliva cifs.upcall: handle_krb5_mech: obtained service
+ticket
+May 26 12:35:05 oliva kernel: [  612.342045] Status code returned
+0xc000006d NT_STATUS_LOGON_FAILURE
+May 26 12:35:05 oliva kernel: [  612.342109] CIFS VFS: Send error in
+SessSetup = -13
+May 26 12:35:05 oliva kernel: [  612.343323] CIFS VFS: cifs_mount failed
+w/return code = -13
 
-Your numbers indicate that your patchset decreases peformance in the
-common, non-d_path intensive workloads, so why should we add all
-this complexity to optimise a slow path at the expense of
-significant complexity and lower performance in the fast
-path?
+smbd fails with this:
+Maximum core file size limits now 16777216(soft) -1(hard)
+smbd version 3.6.9 started.
+Copyright Andrew Tridgell and the Samba Team 1992-2011
+uid=0 gid=0 euid=0 egid=0
+lp_load_ex: refreshing parameters
+Initialising global parameters
+rlimit_max: increasing rlimit_max (1024) to minimum Windows limit
+(16384)
+params.c:pm_process() - Processing configuration file
+"/etc/samba/smb.conf"
+Processing section "[global]"
+Registered MSG_REQ_POOL_USAGE
+Registered MSG_REQ_DMALLOC_MARK and LOG_CHANGED
+lp_load_ex: refreshing parameters
+Initialising global parameters
+rlimit_max: increasing rlimit_max (1024) to minimum Windows limit
+(16384)
+params.c:pm_process() - Processing configuration file
+"/etc/samba/smb.conf"
+Processing section "[global]"
+Processing section "[users]"
+adding IPC service
+added interface eth0 ip=fe80::a00:27ff:fe7c:2d50%eth0
+bcast=fe80::ffff:ffff:ffff:ffff%eth0 netmask=ffff:ffff:ffff:ffff::
+added interface eth0 ip=192.168.1.110 bcast=192.168.1.255
+netmask=255.255.255.0
+loaded services
+Initialise the svcctl registry keys if needed.
+Closed policy
+Closed policy
+Closed policy
+Closed policy
+Closed policy
+Closed policy
+Closed policy
+Closed policy
+Closed policy
+Initialise the eventlog registry keys if needed.
+Closed policy
+get_dc_list: preferred server list: "hh16.hh3.site, *"
+Successfully contacted LDAP server 192.168.1.16
+get_dc_list: preferred server list: "hh16.hh3.site, *"
+get_dc_list: preferred server list: "hh16.hh3.site, *"
+Successfully contacted LDAP server 192.168.1.16
+Connected to LDAP server hh16.hh3.site
+ads_sasl_spnego_bind: got OID=1.2.840.48018.1.2.2
+ads_sasl_spnego_bind: got OID=1.2.840.113554.1.2.2
+ads_sasl_spnego_bind: got OID=1.3.6.1.4.1.311.2.2.10
+ads_sasl_spnego_bind: got server principal name =
+not_defined_in_RFC4178@please_ignore
+ads_krb5_mk_req: krb5_cc_get_principal failed (No credentials cache
+found)
+ads_cleanup_expired_creds: Ticket in ccache[MEMORY:prtpub_cache]
+expiration dom, 26 may 2013 22:46:04 CEST
+ads_krb5_mk_req: server marked as OK to delegate to, building
+forwardable TGT
+reloading printcap cache
+reload status: ok
+waiting for connections
+Unable to connect to CUPS server localhost:631 - Transport endpoint is
+not connected
+failed to retrieve printer list: NT_STATUS_UNSUCCESSFUL
+Could not find child 1808 -- ignoring
+Allowed connection from 127.0.0.1 (127.0.0.1)
+init_oplocks: initializing messages.
+Linux kernel oplocks enabled
+Transaction 0 of length 82 (0 toread)
+switch message SMBnegprot (pid 1807) conn 0x0
+Requested protocol [LM1.2X002]
+Requested protocol [LANMAN2.1]
+Requested protocol [NT LM 0.12]
+Requested protocol [POSIX 2]
+using SPNEGO
+Selected protocol NT LM 0.12
+Transaction 1 of length 1450 (0 toread)
+switch message SMBsesssetupX (pid 1807) conn 0x0
+wct=12 flg2=0xd801
+setup_new_vc_session: New VC == 0, if NT4.x compatible we would close
+all old resources.
+Doing spnego session setup
+NativeOS=[Linux version 3.8.0-22-generic] NativeLanMan=[CIFS VFS Client
+for Linux] PrimaryDomain=[]
+reply_spnego_negotiate: Got secblob of size 1227
+libads/kerberos_verify.c:267: krb5_rd_req_return_keyblock_from_keytab
+succeeded for principal host/oliva.hh3.site-UiqEU/D402Y@public.gmane.org
+Found account name from PAC: Administrator []
+Kerberos ticket principal name is [Administrator-UiqEU/D402Y@public.gmane.org]
+Username HH3\Administrator is invalid on this system
+error packet at smbd/sesssetup.c(359) cmd=115 (SMBsesssetupX)
+NT_STATUS_LOGON_FAILURE
+Server exit (failed to receive smb request)
 
-> The upcoming Ivy-Bridge EX can have up to 15 cores per socket. So
-> even a 4-socket machine will have up to 60 cores or 120 virtual CPUs
-> if hyperthreading is turned on.
-
-I don't see why that matters. I've been dealing with systems much
-larger than that since early 2002, adn the process for delaing with
-lock contention hasn't changed much in the last 10 years. First we
-need to determine what you are doing is something that is sane,
-determining whether there's a simpler fix than changing locking, and
-whether it's actually any faster in the common case we care
-about....
-
-> >IOWs, you need more than one microbenchmark that interacts with
-> >some naive monitoring code to justify the complexity these locking
-> >changes introduce....
-> The first patch can also independently improve the performance of a
-> number of AIM7 workloads including almost 7X improvement in the
-> short workload. More detailed information of these types of
-> performance benefit was discussed in the patch description of the
-> first patch. I will try to collect more performance improvement data
-> on other workloads too.
-> 
-> Thank for the review.
-
-I haven't reviewed anything. All I've made comments about you
-needing to justifying the complexity of the change.
+Anyone please? In particular, why ntlm authentication? Why Username HH3
+\Administrator is invalid on this system? I've tried without winbind use
+default domain =  but nada.
 
 Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Steve
