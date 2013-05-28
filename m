@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 11/19] cifs: add new "Unspecified" securityEnum value
-Date: Tue, 28 May 2013 08:11:52 -0400
-Message-ID: <1369743120-18941-12-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 10/19] cifs: factor out check for extended security bit into separate function
+Date: Tue, 28 May 2013 08:11:51 -0400
+Message-ID: <1369743120-18941-11-git-send-email-jlayton@redhat.com>
 References: <1369743120-18941-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,32 +10,54 @@ In-Reply-To: <1369743120-18941-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Add a new securityEnum value to cover the case where a sec= option
-was not explicitly set.
-
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/cifssmb.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 874b29b..a858037 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -101,11 +101,11 @@ enum statusEnum {
- };
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 1a37763..e639610 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -539,6 +539,20 @@ decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr,
+ }
+ #endif
  
- enum securityEnum {
--	LANMAN = 0,			/* Legacy LANMAN auth */
-+	Unspecified = 0,	/* not specified */
-+	LANMAN,			/* Legacy LANMAN auth */
- 	NTLM,			/* Legacy NTLM012 auth with NTLM hash */
- 	NTLMv2,			/* Legacy NTLM auth with NTLMv2 hash */
- 	RawNTLMSSP,		/* NTLMSSP without SPNEGO, NTLMv2 hash */
--/*	NTLMSSP, */ /* can use rawNTLMSSP instead of NTLMSSP via SPNEGO */
- 	Kerberos,		/* Kerberos via SPNEGO */
- };
++static bool
++should_set_ext_sec_flag(unsigned int secFlags)
++{
++	if ((secFlags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
++		return true;
++	else if ((secFlags & CIFSSEC_AUTH_MASK) == CIFSSEC_MAY_KRB5)
++		return true;
++	else if ((secFlags & CIFSSEC_MUST_NTLMSSP) == CIFSSEC_MUST_NTLMSSP)
++		return true;
++	else if ((secFlags & CIFSSEC_AUTH_MASK) == CIFSSEC_MAY_NTLMSSP)
++		return true;
++	return false;
++}
++
+ int
+ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+ {
+@@ -572,15 +586,8 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	pSMB->hdr.Mid = get_next_mid(server);
+ 	pSMB->hdr.Flags2 |= (SMBFLG2_UNICODE | SMBFLG2_ERR_STATUS);
+ 
+-	if ((secFlags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
+-		pSMB->hdr.Flags2 |= SMBFLG2_EXT_SEC;
+-	else if ((secFlags & CIFSSEC_AUTH_MASK) == CIFSSEC_MAY_KRB5) {
+-		cifs_dbg(FYI, "Kerberos only mechanism, enable extended security\n");
+-		pSMB->hdr.Flags2 |= SMBFLG2_EXT_SEC;
+-	} else if ((secFlags & CIFSSEC_MUST_NTLMSSP) == CIFSSEC_MUST_NTLMSSP)
+-		pSMB->hdr.Flags2 |= SMBFLG2_EXT_SEC;
+-	else if ((secFlags & CIFSSEC_AUTH_MASK) == CIFSSEC_MAY_NTLMSSP) {
+-		cifs_dbg(FYI, "NTLMSSP only mechanism, enable extended security\n");
++	if (should_set_ext_sec_flag(secFlags)) {
++		cifs_dbg(FYI, "Requesting extended security.");
+ 		pSMB->hdr.Flags2 |= SMBFLG2_EXT_SEC;
+ 	}
  
 -- 
 1.8.1.4
