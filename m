@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 13/19] cifs: add new fields to smb_vol to track the requested security flavor
-Date: Tue, 28 May 2013 08:11:54 -0400
-Message-ID: <1369743120-18941-14-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 19/19] cifs: try to handle the MUST SecurityFlags sanely
+Date: Tue, 28 May 2013 08:12:00 -0400
+Message-ID: <1369743120-18941-20-git-send-email-jlayton@redhat.com>
 References: <1369743120-18941-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,111 +10,69 @@ In-Reply-To: <1369743120-18941-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-We have this to some degree already in secFlgs, but those get "or'ed" so
-there's no way to know what the last option requested was. Add new fields
-that will eventually supercede the secFlgs field in the cifs_ses.
+The cifs.ko SecurityFlags interface wins my award for worst-designed
+interface ever, but we're sort of stuck with it since it's documented
+and people do use it (even if it doesn't work correctly).
+
+Case in point -- you can specify multiple sets of "MUST" flags. It makes
+absolutely no sense, but you can do it.
+
+What should the effect be in such a case? No one knows or seems to have
+considered this so far, so let's define it now. If you try to specify
+multiple MUST flags, clear any other MAY or MUST bits except for the
+ones that involve signing.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h |  2 ++
- fs/cifs/connect.c  | 25 +++++++++++++++++++++++++
- 2 files changed, 27 insertions(+)
+ fs/cifs/cifs_debug.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index c2ef6c1..9f88a35 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -402,6 +402,8 @@ struct smb_vol {
- 	umode_t file_mode;
- 	umode_t dir_mode;
- 	unsigned secFlg;
-+	enum securityEnum sectype; /* sectype requested via mnt opts */
-+	bool sign; /* was signing requested via mnt opts? */
- 	bool retry:1;
- 	bool intr:1;
- 	bool setuids:1;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index b367a5a..7b71961 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1024,11 +1024,21 @@ static int cifs_parse_security_flavors(char *value,
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 856f8f5..d21339a 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -595,6 +595,32 @@ static int cifs_security_flags_proc_open(struct inode *inode, struct file *file)
+ 	return single_open(file, cifs_security_flags_proc_show, NULL);
+ }
  
- 	substring_t args[MAX_OPT_ARGS];
- 
-+	/*
-+	 * With mount options, the last one should win. Reset any existing
-+	 * settings back to default.
-+	 */
-+	vol->sectype = Unspecified;
-+	vol->sign = false;
++/*
++ * Ensure that if someone sets a MUST flag, that we disable all other MAY
++ * flags except for the ones corresponding to the given MUST flag. If there are
++ * multiple MUST flags, then try to prefer more secure ones.
++ */
++static void
++cifs_security_flags_handle_must_flags(unsigned int *flags)
++{
++	unsigned int signflags = *flags & CIFSSEC_MUST_SIGN;
 +
- 	switch (match_token(value, cifs_secflavor_tokens, args)) {
- 	case Opt_sec_krb5:
-+		vol->sectype = Kerberos;
- 		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
- 		break;
- 	case Opt_sec_krb5i:
-+		vol->sectype = Kerberos;
-+		vol->sign = true;
- 		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
- 		break;
- 	case Opt_sec_krb5p:
-@@ -1036,26 +1046,36 @@ static int cifs_parse_security_flavors(char *value,
- 		cifs_dbg(VFS, "sec=krb5p is not supported!\n");
- 		return 1;
- 	case Opt_sec_ntlmssp:
-+		vol->sectype = RawNTLMSSP;
- 		vol->secFlg |= CIFSSEC_MAY_NTLMSSP;
- 		break;
- 	case Opt_sec_ntlmsspi:
-+		vol->sectype = RawNTLMSSP;
-+		vol->sign = true;
- 		vol->secFlg |= CIFSSEC_MAY_NTLMSSP | CIFSSEC_MUST_SIGN;
- 		break;
- 	case Opt_ntlm:
- 		/* ntlm is default so can be turned off too */
-+		vol->sectype = NTLM;
- 		vol->secFlg |= CIFSSEC_MAY_NTLM;
- 		break;
- 	case Opt_sec_ntlmi:
-+		vol->sectype = NTLM;
-+		vol->sign = true;
- 		vol->secFlg |= CIFSSEC_MAY_NTLM | CIFSSEC_MUST_SIGN;
- 		break;
- 	case Opt_sec_ntlmv2:
-+		vol->sectype = NTLMv2;
- 		vol->secFlg |= CIFSSEC_MAY_NTLMV2;
- 		break;
- 	case Opt_sec_ntlmv2i:
-+		vol->sectype = NTLMv2;
-+		vol->sign = true;
- 		vol->secFlg |= CIFSSEC_MAY_NTLMV2 | CIFSSEC_MUST_SIGN;
- 		break;
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- 	case Opt_sec_lanman:
-+		vol->sectype = LANMAN;
- 		vol->secFlg |= CIFSSEC_MAY_LANMAN;
- 		break;
- #endif
-@@ -1425,6 +1445,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			break;
- 		case Opt_sign:
- 			vol->secFlg |= CIFSSEC_MUST_SIGN;
-+			vol->sign = true;
- 			break;
- 		case Opt_noac:
- 			printk(KERN_WARNING "CIFS: Mount option noac not "
-@@ -3880,6 +3901,10 @@ cifs_set_vol_auth(struct smb_vol *vol, struct cifs_ses *ses)
- 	case LANMAN:
- 		vol->secFlg = CIFSSEC_MUST_LANMAN;
- 		break;
-+	default:
-+		/* should never happen */
-+		vol->secFlg = 0;
-+		break;
++	if ((*flags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
++		*flags = CIFSSEC_MUST_KRB5;
++	else if ((*flags & CIFSSEC_MUST_NTLMSSP) == CIFSSEC_MUST_NTLMSSP)
++		*flags = CIFSSEC_MUST_NTLMSSP;
++	else if ((*flags & CIFSSEC_MUST_NTLMV2) == CIFSSEC_MUST_NTLMV2)
++		*flags = CIFSSEC_MUST_NTLMV2;
++	else if ((*flags & CIFSSEC_MUST_NTLM) == CIFSSEC_MUST_NTLM)
++		*flags = CIFSSEC_MUST_NTLM;
++	else if ((*flags & CIFSSEC_MUST_LANMAN) == CIFSSEC_MUST_LANMAN)
++		*flags = CIFSSEC_MUST_LANMAN;
++	else if ((*flags & CIFSSEC_MUST_PLNTXT) == CIFSSEC_MUST_PLNTXT)
++		*flags = CIFSSEC_MUST_PLNTXT;
++
++	*flags |= signflags;
++}
++
+ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 		const char __user *buffer, size_t count, loff_t *ppos)
+ {
+@@ -648,6 +674,8 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
+ 		return -EINVAL;
  	}
  
- 	return cifs_set_cifscreds(vol, ses);
++	cifs_security_flags_handle_must_flags(&flags);
++
+ 	/* flags look ok - update the global security flags for cifs module */
+ 	global_secflags = flags;
+ 	if (global_secflags & CIFSSEC_MUST_SIGN) {
 -- 
 1.8.1.4
