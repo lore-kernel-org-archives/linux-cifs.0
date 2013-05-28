@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 09/19] cifs: move handling of signed connections into separate function
-Date: Tue, 28 May 2013 08:11:50 -0400
-Message-ID: <1369743120-18941-10-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 05/19] cifs: remove the cifs_ses->flags field
+Date: Tue, 28 May 2013 08:11:46 -0400
+Message-ID: <1369743120-18941-6-git-send-email-jlayton@redhat.com>
 References: <1369743120-18941-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,168 +10,123 @@ In-Reply-To: <1369743120-18941-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Move the sanity checks for signed connections into a separate function.
-SMB2's was a cut-and-paste job from CIFS code, so we can make them use
-the same function.
+This field is completely unused:
+
+CIFS_SES_W9X is completely unused. CIFS_SES_LANMAN and CIFS_SES_OS2
+are set but never checked. CIFS_SES_NT4 is checked, but never set.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+Acked-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsproto.h |  1 +
- fs/cifs/cifssmb.c   | 68 +++++++++++++++++++++++++++--------------------------
- fs/cifs/smb2pdu.c   | 33 ++++----------------------
- 3 files changed, 40 insertions(+), 62 deletions(-)
+ fs/cifs/cifsglob.h | 10 ----------
+ fs/cifs/connect.c  |  1 -
+ fs/cifs/sess.c     |  7 +------
+ fs/cifs/smb1ops.c  | 18 ++++++------------
+ 4 files changed, 7 insertions(+), 29 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index dda188a..f0e93ff 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -212,6 +212,7 @@ extern int cifs_negotiate_protocol(const unsigned int xid,
- 				   struct cifs_ses *ses);
- extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
- 			      struct nls_table *nls_info);
-+extern int cifs_enable_signing(struct TCP_Server_Info *server, unsigned int secFlags);
- extern int CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 29dd111..be993ec 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -692,7 +692,6 @@ struct cifs_ses {
+ 	enum statusEnum status;
+ 	unsigned overrideSecFlg;  /* if non-zero override global sec flags */
+ 	__u16 ipc_tid;		/* special tid for connection to IPC share */
+-	__u16 flags;
+ 	__u16 vcnum;
+ 	char *serverOS;		/* name of operating system underlying server */
+ 	char *serverNOS;	/* name of network operating system of server */
+@@ -715,15 +714,6 @@ struct cifs_ses {
+ #endif /* CONFIG_CIFS_SMB2 */
+ };
  
- extern int CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 5dd4f8a..1a37763 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -417,6 +417,38 @@ decode_ext_sec_blob(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr)
- 	return 0;
- }
- 
-+int
-+cifs_enable_signing(struct TCP_Server_Info *server, unsigned int secFlags)
-+{
-+	if ((secFlags & CIFSSEC_MAY_SIGN) == 0) {
-+		/* MUST_SIGN already includes the MAY_SIGN FLAG
-+		   so if this is zero it means that signing is disabled */
-+		cifs_dbg(FYI, "Signing disabled\n");
-+		if (server->sec_mode & SECMODE_SIGN_REQUIRED) {
-+			cifs_dbg(VFS, "Server requires packet signing to be enabled in /proc/fs/cifs/SecurityFlags\n");
-+			return -EOPNOTSUPP;
-+		}
-+		server->sec_mode &=
-+			~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
-+	} else if ((secFlags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) {
-+		/* signing required */
-+		cifs_dbg(FYI, "Must sign - secFlags 0x%x\n", secFlags);
-+		if ((server->sec_mode &
-+			(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED)) == 0) {
-+			cifs_dbg(VFS, "signing required but server lacks support\n");
-+			return -EOPNOTSUPP;
-+		} else
-+			server->sec_mode |= SECMODE_SIGN_REQUIRED;
-+	} else {
-+		/* signing optional ie CIFSSEC_MAY_SIGN */
-+		if ((server->sec_mode & SECMODE_SIGN_REQUIRED) == 0)
-+			server->sec_mode &=
-+				~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
-+	}
-+
-+	return 0;
-+}
-+
- #ifdef CONFIG_CIFS_WEAK_PW_HASH
- static int
- decode_lanman_negprot_rsp(struct TCP_Server_Info *server, NEGOTIATE_RSP *pSMBr,
-@@ -577,10 +609,7 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
- 		goto neg_err_exit;
- 	} else if (pSMBr->hdr.WordCount == 13) {
- 		rc = decode_lanman_negprot_rsp(server, pSMBr, secFlags);
--		if (!rc)
--			goto signing_check;
--		else
--			goto neg_err_exit;
-+		goto signing_check;
- 	} else if (pSMBr->hdr.WordCount != 17) {
- 		/* unknown wct */
- 		rc = -EOPNOTSUPP;
-@@ -642,36 +671,9 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
- 	else
- 		server->capabilities &= ~CAP_EXTENDED_SECURITY;
- 
--	if (rc)
--		goto neg_err_exit;
+-/* no more than one of the following three session flags may be set */
+-#define CIFS_SES_NT4 1
+-#define CIFS_SES_OS2 2
+-#define CIFS_SES_W9X 4
+-/* following flag is set for old servers such as OS2 (and Win95?)
+-   which do not negotiate NTLM or POSIX dialects, but instead
+-   negotiate one of the older LANMAN dialects */
+-#define CIFS_SES_LANMAN 8
 -
- signing_check:
--	if ((secFlags & CIFSSEC_MAY_SIGN) == 0) {
--		/* MUST_SIGN already includes the MAY_SIGN FLAG
--		   so if this is zero it means that signing is disabled */
--		cifs_dbg(FYI, "Signing disabled\n");
--		if (server->sec_mode & SECMODE_SIGN_REQUIRED) {
--			cifs_dbg(VFS, "Server requires packet signing to be enabled in /proc/fs/cifs/SecurityFlags\n");
--			rc = -EOPNOTSUPP;
--		}
--		server->sec_mode &=
--			~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
--	} else if ((secFlags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) {
--		/* signing required */
--		cifs_dbg(FYI, "Must sign - secFlags 0x%x\n", secFlags);
--		if ((server->sec_mode &
--			(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED)) == 0) {
--			cifs_dbg(VFS, "signing required but server lacks support\n");
--			rc = -EOPNOTSUPP;
--		} else
--			server->sec_mode |= SECMODE_SIGN_REQUIRED;
--	} else {
--		/* signing optional ie CIFSSEC_MAY_SIGN */
--		if ((server->sec_mode & SECMODE_SIGN_REQUIRED) == 0)
--			server->sec_mode &=
--				~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
+ static inline bool
+ cap_unix(struct cifs_ses *ses)
+ {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index c3a405a..118cc9c 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3834,7 +3834,6 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 	int rc = -ENOSYS;
+ 	struct TCP_Server_Info *server = ses->server;
+ 
+-	ses->flags = 0;
+ 	ses->capabilities = server->capabilities;
+ 	if (linuxExtEnabled == 0)
+ 		ses->capabilities &= (~server->vals->cap_unix);
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index e8c5dc9..0d0fe38 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -328,10 +328,8 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
+ 	ses->serverOS = kzalloc(len + 1, GFP_KERNEL);
+ 	if (ses->serverOS)
+ 		strncpy(ses->serverOS, bcc_ptr, len);
+-	if (strncmp(ses->serverOS, "OS/2", 4) == 0) {
++	if (strncmp(ses->serverOS, "OS/2", 4) == 0)
+ 		cifs_dbg(FYI, "OS/2 server\n");
+-			ses->flags |= CIFS_SES_OS2;
 -	}
--
-+	if (!rc)
-+		rc = cifs_enable_signing(server, secFlags);
- neg_err_exit:
- 	cifs_buf_release(pSMB);
  
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 3af66aa..ebb97b4 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -423,36 +423,11 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	bcc_ptr += len + 1;
+ 	bleft -= len + 1;
+@@ -642,8 +640,6 @@ ssetup_ntlmssp_authenticate:
+ 	}
+ 	bcc_ptr = str_area;
+ 
+-	ses->flags &= ~CIFS_SES_LANMAN;
+-
+ 	iov[1].iov_base = NULL;
+ 	iov[1].iov_len = 0;
+ 
+@@ -667,7 +663,6 @@ ssetup_ntlmssp_authenticate:
+ 				 ses->server->sec_mode & SECMODE_PW_ENCRYPT ?
+ 					true : false, lnm_session_key);
+ 
+-		ses->flags |= CIFS_SES_LANMAN;
+ 		memcpy(bcc_ptr, (char *)lnm_session_key, CIFS_AUTH_RESP_SIZE);
+ 		bcc_ptr += CIFS_AUTH_RESP_SIZE;
+ 
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 3efdb9d..7d1c78b 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -765,20 +765,14 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	}
+ 	tcon = tlink_tcon(tlink);
+ 
+-	/*
+-	 * NT4 apparently returns success on this call, but it doesn't really
+-	 * work.
+-	 */
+-	if (!(tcon->ses->flags & CIFS_SES_NT4)) {
+-		rc = CIFSSMBSetPathInfo(xid, tcon, full_path, buf,
+-					cifs_sb->local_nls,
++	rc = CIFSSMBSetPathInfo(xid, tcon, full_path, buf, cifs_sb->local_nls,
+ 					cifs_sb->mnt_cifs_flags &
+ 						CIFS_MOUNT_MAP_SPECIAL_CHR);
+-		if (rc == 0) {
+-			cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
+-			goto out;
+-		} else if (rc != -EOPNOTSUPP && rc != -EINVAL)
+-			goto out;
++	if (rc == 0) {
++		cinode->cifsAttrs = le32_to_cpu(buf->Attributes);
++		goto out;
++	} else if (rc != -EOPNOTSUPP && rc != -EINVAL) {
++		goto out;
  	}
  
- 	cifs_dbg(FYI, "sec_flags 0x%x\n", sec_flags);
--	if ((sec_flags & CIFSSEC_MUST_SIGN) == CIFSSEC_MUST_SIGN) {
--		cifs_dbg(FYI, "Signing required\n");
--		if (!(server->sec_mode & (SMB2_NEGOTIATE_SIGNING_REQUIRED |
--		      SMB2_NEGOTIATE_SIGNING_ENABLED))) {
--			cifs_dbg(VFS, "signing required but server lacks support\n");
--			rc = -EOPNOTSUPP;
--			goto neg_exit;
--		}
--		server->sec_mode |= SECMODE_SIGN_REQUIRED;
--	} else if (sec_flags & CIFSSEC_MAY_SIGN) {
--		cifs_dbg(FYI, "Signing optional\n");
--		if (server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED) {
--			cifs_dbg(FYI, "Server requires signing\n");
--			server->sec_mode |= SECMODE_SIGN_REQUIRED;
--		} else {
--			server->sec_mode &=
--				~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
--		}
--	} else {
--		cifs_dbg(FYI, "Signing disabled\n");
--		if (server->sec_mode & SMB2_NEGOTIATE_SIGNING_REQUIRED) {
--			cifs_dbg(VFS, "Server requires packet signing to be enabled in /proc/fs/cifs/SecurityFlags\n");
--			rc = -EOPNOTSUPP;
--			goto neg_exit;
--		}
--		server->sec_mode &=
--			~(SECMODE_SIGN_ENABLED | SECMODE_SIGN_REQUIRED);
--	}
--
-+	rc = cifs_enable_signing(server, sec_flags);
- #ifdef CONFIG_SMB2_ASN1  /* BB REMOVEME when updated asn1.c ready */
-+	if (rc)
-+		goto neg_exit;
-+
- 	rc = decode_neg_token_init(security_blob, blob_length,
- 				   &server->sec_type);
- 	if (rc == 1)
+ 	cifs_dbg(FYI, "calling SetFileInfo since SetPathInfo for times not supported by this server\n");
 -- 
 1.8.1.4
