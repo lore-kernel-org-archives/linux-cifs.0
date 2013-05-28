@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 02/19] cifs: remove useless memset in LANMAN auth code
-Date: Tue, 28 May 2013 08:11:43 -0400
-Message-ID: <1369743120-18941-3-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 01/19] cifs: remove protocolEnum definition
+Date: Tue, 28 May 2013 08:11:42 -0400
+Message-ID: <1369743120-18941-2-git-send-email-jlayton@redhat.com>
 References: <1369743120-18941-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,26 +10,30 @@ In-Reply-To: <1369743120-18941-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-It turns out that CIFS_SESS_KEY_SIZE == CIFS_ENCPWD_SIZE, so this
-memset doesn't do anything useful.
+The field that held this was removed quite some time ago.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Acked-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsencrypt.c | 1 -
- 1 file changed, 1 deletion(-)
+ fs/cifs/cifsglob.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 71436d1..a85a83d 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -276,7 +276,6 @@ int calc_lanman_hash(const char *password, const char *cryptkey, bool encrypt,
- 		strncpy(password_with_pad, password, CIFS_ENCPWD_SIZE);
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index db9f985..29dd111 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -109,12 +109,6 @@ enum securityEnum {
+ 	Kerberos,		/* Kerberos via SPNEGO */
+ };
  
- 	if (!encrypt && global_secflags & CIFSSEC_MAY_PLNTXT) {
--		memset(lnm_session_key, 0, CIFS_SESS_KEY_SIZE);
- 		memcpy(lnm_session_key, password_with_pad,
- 			CIFS_ENCPWD_SIZE);
- 		return 0;
+-enum protocolEnum {
+-	TCP = 0,
+-	SCTP
+-	/* Netbios frames protocol not supported at this time */
+-};
+-
+ struct session_key {
+ 	unsigned int len;
+ 	char *response;
 -- 
 1.8.1.4
