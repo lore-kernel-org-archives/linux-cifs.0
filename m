@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 17/19] cifs: update the default global_secflags to include "raw" NTLMv2
-Date: Tue, 28 May 2013 08:11:58 -0400
-Message-ID: <1369743120-18941-18-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 13/19] cifs: add new fields to smb_vol to track the requested security flavor
+Date: Tue, 28 May 2013 08:11:54 -0400
+Message-ID: <1369743120-18941-14-git-send-email-jlayton@redhat.com>
 References: <1369743120-18941-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
@@ -10,33 +10,111 @@ In-Reply-To: <1369743120-18941-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@p
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Before this patchset, the global_secflags could only offer up a single
-sectype. With the new set though we have the ability to allow different
-sectypes since we sort out the one to use after talking to the server.
-
-Change the global_secflags to allow NTLMSSP or NTLMv2 by default. If the
-server sets the extended security bit in the Negotiate response, then
-we'll use NTLMSSP. If it doesn't then we'll use raw NTLMv2. Mounting a
-LANMAN server will still require a sec= option by default.
+We have this to some degree already in secFlgs, but those get "or'ed" so
+there's no way to know what the last option requested was. Add new fields
+that will eventually supercede the secFlgs field in the cifs_ses.
 
 Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
 ---
- fs/cifs/cifsglob.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/cifsglob.h |  2 ++
+ fs/cifs/connect.c  | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 65fd9dd..fc0d004 100644
+index c2ef6c1..9f88a35 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -1338,7 +1338,7 @@ require use of the stronger protocol */
- #define   CIFSSEC_MUST_SEAL	0x40040 /* not supported yet */
- #define   CIFSSEC_MUST_NTLMSSP	0x80080 /* raw ntlmssp with ntlmv2 */
+@@ -402,6 +402,8 @@ struct smb_vol {
+ 	umode_t file_mode;
+ 	umode_t dir_mode;
+ 	unsigned secFlg;
++	enum securityEnum sectype; /* sectype requested via mnt opts */
++	bool sign; /* was signing requested via mnt opts? */
+ 	bool retry:1;
+ 	bool intr:1;
+ 	bool setuids:1;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index b367a5a..7b71961 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1024,11 +1024,21 @@ static int cifs_parse_security_flavors(char *value,
  
--#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMSSP)
-+#define   CIFSSEC_DEF (CIFSSEC_MAY_SIGN | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_NTLMSSP)
- #define   CIFSSEC_MAX (CIFSSEC_MUST_SIGN | CIFSSEC_MUST_NTLMV2)
- #define   CIFSSEC_AUTH_MASK (CIFSSEC_MAY_NTLM | CIFSSEC_MAY_NTLMV2 | CIFSSEC_MAY_LANMAN | CIFSSEC_MAY_PLNTXT | CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_NTLMSSP)
- /*
+ 	substring_t args[MAX_OPT_ARGS];
+ 
++	/*
++	 * With mount options, the last one should win. Reset any existing
++	 * settings back to default.
++	 */
++	vol->sectype = Unspecified;
++	vol->sign = false;
++
+ 	switch (match_token(value, cifs_secflavor_tokens, args)) {
+ 	case Opt_sec_krb5:
++		vol->sectype = Kerberos;
+ 		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
+ 		break;
+ 	case Opt_sec_krb5i:
++		vol->sectype = Kerberos;
++		vol->sign = true;
+ 		vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
+ 		break;
+ 	case Opt_sec_krb5p:
+@@ -1036,26 +1046,36 @@ static int cifs_parse_security_flavors(char *value,
+ 		cifs_dbg(VFS, "sec=krb5p is not supported!\n");
+ 		return 1;
+ 	case Opt_sec_ntlmssp:
++		vol->sectype = RawNTLMSSP;
+ 		vol->secFlg |= CIFSSEC_MAY_NTLMSSP;
+ 		break;
+ 	case Opt_sec_ntlmsspi:
++		vol->sectype = RawNTLMSSP;
++		vol->sign = true;
+ 		vol->secFlg |= CIFSSEC_MAY_NTLMSSP | CIFSSEC_MUST_SIGN;
+ 		break;
+ 	case Opt_ntlm:
+ 		/* ntlm is default so can be turned off too */
++		vol->sectype = NTLM;
+ 		vol->secFlg |= CIFSSEC_MAY_NTLM;
+ 		break;
+ 	case Opt_sec_ntlmi:
++		vol->sectype = NTLM;
++		vol->sign = true;
+ 		vol->secFlg |= CIFSSEC_MAY_NTLM | CIFSSEC_MUST_SIGN;
+ 		break;
+ 	case Opt_sec_ntlmv2:
++		vol->sectype = NTLMv2;
+ 		vol->secFlg |= CIFSSEC_MAY_NTLMV2;
+ 		break;
+ 	case Opt_sec_ntlmv2i:
++		vol->sectype = NTLMv2;
++		vol->sign = true;
+ 		vol->secFlg |= CIFSSEC_MAY_NTLMV2 | CIFSSEC_MUST_SIGN;
+ 		break;
+ #ifdef CONFIG_CIFS_WEAK_PW_HASH
+ 	case Opt_sec_lanman:
++		vol->sectype = LANMAN;
+ 		vol->secFlg |= CIFSSEC_MAY_LANMAN;
+ 		break;
+ #endif
+@@ -1425,6 +1445,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 			break;
+ 		case Opt_sign:
+ 			vol->secFlg |= CIFSSEC_MUST_SIGN;
++			vol->sign = true;
+ 			break;
+ 		case Opt_noac:
+ 			printk(KERN_WARNING "CIFS: Mount option noac not "
+@@ -3880,6 +3901,10 @@ cifs_set_vol_auth(struct smb_vol *vol, struct cifs_ses *ses)
+ 	case LANMAN:
+ 		vol->secFlg = CIFSSEC_MUST_LANMAN;
+ 		break;
++	default:
++		/* should never happen */
++		vol->secFlg = 0;
++		break;
+ 	}
+ 
+ 	return cifs_set_cifscreds(vol, ses);
 -- 
 1.8.1.4
