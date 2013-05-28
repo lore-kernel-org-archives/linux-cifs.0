@@ -1,93 +1,186 @@
-From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 19/19] cifs: try to handle the MUST SecurityFlags sanely
-Date: Tue, 28 May 2013 10:38:23 +0400
-Message-ID: <CAKywueSCEzGRT7mgCeH5ue7aBUmVy3stzKRt2pbu=ToPaLerNg@mail.gmail.com>
-References: <1369321563-16893-1-git-send-email-jlayton@redhat.com>
-	<1369321563-16893-20-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+Subject: Re: cifs-utils VFS errors
+Date: Tue, 28 May 2013 06:35:25 -0400
+Message-ID: <20130528063525.1baeac8c@corrin.poochiereds.net>
+References: <51A32117.5030908@steve-ss.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
-	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1369321563-16893-20-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <51A32117.5030908-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-2013/5/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> The cifs.ko SecurityFlags interface wins my award for worst-designed
-> interface ever, but we're sort of stuck with it since it's documented
-> and people do use it (even if it doesn't work correctly).
->
-> Case in point -- you can specify multiple sets of "MUST" flags. It makes
-> absolutely no sense, but you can do it.
->
-> What should the effect be in such a case? No one knows or seems to have
-> considered this, so let's define it now. If you try to specify multiple
-> MUST flags, clear any other MAY or MUST bits except for the ones that
-> involve signing.
->
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/cifs/cifs_debug.c | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
->
-> diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-> index 856f8f5..d21339a 100644
-> --- a/fs/cifs/cifs_debug.c
-> +++ b/fs/cifs/cifs_debug.c
-> @@ -595,6 +595,32 @@ static int cifs_security_flags_proc_open(struct inode *inode, struct file *file)
->         return single_open(file, cifs_security_flags_proc_show, NULL);
->  }
->
-> +/*
-> + * Ensure that if someone sets a MUST flag, that we disable all other MAY
-> + * flags except for the ones corresponding to the given MUST flag. If there are
-> + * multiple MUST flags, then try to prefer more secure ones.
-> + */
-> +static void
-> +cifs_security_flags_handle_must_flags(unsigned int *flags)
-> +{
-> +       unsigned int signflags = *flags & CIFSSEC_MUST_SIGN;
-> +
-> +       if ((*flags & CIFSSEC_MUST_KRB5) == CIFSSEC_MUST_KRB5)
-> +               *flags = CIFSSEC_MUST_KRB5;
-> +       else if ((*flags & CIFSSEC_MUST_NTLMSSP) == CIFSSEC_MUST_NTLMSSP)
-> +               *flags = CIFSSEC_MUST_NTLMSSP;
-> +       else if ((*flags & CIFSSEC_MUST_NTLMV2) == CIFSSEC_MUST_NTLMV2)
-> +               *flags = CIFSSEC_MUST_NTLMV2;
-> +       else if ((*flags & CIFSSEC_MUST_NTLM) == CIFSSEC_MUST_NTLM)
-> +               *flags = CIFSSEC_MUST_NTLM;
-> +       else if ((*flags & CIFSSEC_MUST_LANMAN) == CIFSSEC_MUST_LANMAN)
-> +               *flags = CIFSSEC_MUST_LANMAN;
-> +       else if ((*flags & CIFSSEC_MUST_PLNTXT) == CIFSSEC_MUST_PLNTXT)
-> +               *flags = CIFSSEC_MUST_PLNTXT;
-> +
-> +       *flags |= signflags;
-> +}
-> +
->  static ssize_t cifs_security_flags_proc_write(struct file *file,
->                 const char __user *buffer, size_t count, loff_t *ppos)
->  {
-> @@ -648,6 +674,8 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
->                 return -EINVAL;
->         }
->
-> +       cifs_security_flags_handle_must_flags(&flags);
-> +
->         /* flags look ok - update the global security flags for cifs module */
->         global_secflags = flags;
->         if (global_secflags & CIFSSEC_MUST_SIGN) {
-> --
-> 1.8.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
-> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Mon, 27 May 2013 11:02:15 +0200
+steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
 
-Reviewed-by: Pavel Shilovsky <piastry-7qunaywFIewox3rIn2DAYQ@public.gmane.org>
+> Hi
+> I have a s3 fileserver joined to a s4 DC
+> Here is smb.conf on the fileserver:
+> [global]
+> workgroup = HH3
+> realm = HH3.SITE
+> security = ADS
+> kerberos method = system keytab
+> winbind enum users = Yes
+> winbind enum groups = Yes
+> idmap config *:backend = tdb
+> idmap config *:range = 3000-4000
+> idmap config HH3:backend = ad
+> idmap config HH3:range = 20000-40000000
+> idmap config HH3:schema_mode = rfc2307
+> winbind nss info = rfc2307
+> winbind expand groups = 2
+> winbind nested groups = yes
+> winbind use default domain = Yes
+> 
+> [users]
+> path = /home/users
+> read only = No
+> 
+> getent passwd works fine and shows AD users. But cifs mount fails:
+>   sudo mount -t cifs //oliva/users --verbose /mnt -osec=krb5
+> mount.cifs kernel mount options: ip=127.0.0.1,unc=\\oliva
+> \users,sec=krb5,user=root,pass=********
+> mount error(13): Permission denied
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+> 
+> the log gives:
+> May 26 12:35:05 oliva cifs.upcall: key description:
+> cifs.spnego;0;0;39010000;ver=0x2;host=oliva;ip4=127.0.0.1;sec=krb5;uid=0x0;creduid=0x0;user=root;pid=0x6f3
+> May 26 12:35:05 oliva cifs.upcall: ver=2
+> May 26 12:35:05 oliva cifs.upcall: host=oliva
+> May 26 12:35:05 oliva cifs.upcall: ip=127.0.0.1
+> May 26 12:35:05 oliva cifs.upcall: sec=1
+> May 26 12:35:05 oliva cifs.upcall: uid=0
+> May 26 12:35:05 oliva cifs.upcall: creduid=0
+> May 26 12:35:05 oliva cifs.upcall: user=root
+> May 26 12:35:05 oliva cifs.upcall: pid=1779
+> May 26 12:35:05 oliva cifs.upcall: find_krb5_cc:
+> considering /tmp/krb5cc_0
+> May 26 12:35:05 oliva cifs.upcall: find_krb5_cc: FILE:/tmp/krb5cc_0 is
+> valid ccache
+> May 26 12:35:05 oliva cifs.upcall: handle_krb5_mech: getting service
+> ticket for oliva
+> May 26 12:35:05 oliva cifs.upcall: handle_krb5_mech: obtained service
+> ticket
+> May 26 12:35:05 oliva kernel: [  612.342045] Status code returned
+> 0xc000006d NT_STATUS_LOGON_FAILURE
 
---
-Best regards,
-Pavel Shilovsky.
+Looks like the server doesn't like your ticket.
+
+> May 26 12:35:05 oliva kernel: [  612.342109] CIFS VFS: Send error in
+> SessSetup = -13
+> May 26 12:35:05 oliva kernel: [  612.343323] CIFS VFS: cifs_mount failed
+> w/return code = -13
+> 
+> smbd fails with this:
+> Maximum core file size limits now 16777216(soft) -1(hard)
+> smbd version 3.6.9 started.
+> Copyright Andrew Tridgell and the Samba Team 1992-2011
+> uid=0 gid=0 euid=0 egid=0
+> lp_load_ex: refreshing parameters
+> Initialising global parameters
+> rlimit_max: increasing rlimit_max (1024) to minimum Windows limit
+> (16384)
+> params.c:pm_process() - Processing configuration file
+> "/etc/samba/smb.conf"
+> Processing section "[global]"
+> Registered MSG_REQ_POOL_USAGE
+> Registered MSG_REQ_DMALLOC_MARK and LOG_CHANGED
+> lp_load_ex: refreshing parameters
+> Initialising global parameters
+> rlimit_max: increasing rlimit_max (1024) to minimum Windows limit
+> (16384)
+> params.c:pm_process() - Processing configuration file
+> "/etc/samba/smb.conf"
+> Processing section "[global]"
+> Processing section "[users]"
+> adding IPC service
+> added interface eth0 ip=fe80::a00:27ff:fe7c:2d50%eth0
+> bcast=fe80::ffff:ffff:ffff:ffff%eth0 netmask=ffff:ffff:ffff:ffff::
+> added interface eth0 ip=192.168.1.110 bcast=192.168.1.255
+> netmask=255.255.255.0
+> loaded services
+> Initialise the svcctl registry keys if needed.
+> Closed policy
+> Closed policy
+> Closed policy
+> Closed policy
+> Closed policy
+> Closed policy
+> Closed policy
+> Closed policy
+> Closed policy
+> Initialise the eventlog registry keys if needed.
+> Closed policy
+> get_dc_list: preferred server list: "hh16.hh3.site, *"
+> Successfully contacted LDAP server 192.168.1.16
+> get_dc_list: preferred server list: "hh16.hh3.site, *"
+> get_dc_list: preferred server list: "hh16.hh3.site, *"
+> Successfully contacted LDAP server 192.168.1.16
+> Connected to LDAP server hh16.hh3.site
+> ads_sasl_spnego_bind: got OID=1.2.840.48018.1.2.2
+> ads_sasl_spnego_bind: got OID=1.2.840.113554.1.2.2
+> ads_sasl_spnego_bind: got OID=1.3.6.1.4.1.311.2.2.10
+> ads_sasl_spnego_bind: got server principal name =
+> not_defined_in_RFC4178@please_ignore
+> ads_krb5_mk_req: krb5_cc_get_principal failed (No credentials cache
+> found)
+> ads_cleanup_expired_creds: Ticket in ccache[MEMORY:prtpub_cache]
+> expiration dom, 26 may 2013 22:46:04 CEST
+> ads_krb5_mk_req: server marked as OK to delegate to, building
+> forwardable TGT
+> reloading printcap cache
+> reload status: ok
+> waiting for connections
+> Unable to connect to CUPS server localhost:631 - Transport endpoint is
+> not connected
+> failed to retrieve printer list: NT_STATUS_UNSUCCESSFUL
+> Could not find child 1808 -- ignoring
+> Allowed connection from 127.0.0.1 (127.0.0.1)
+> init_oplocks: initializing messages.
+> Linux kernel oplocks enabled
+> Transaction 0 of length 82 (0 toread)
+> switch message SMBnegprot (pid 1807) conn 0x0
+> Requested protocol [LM1.2X002]
+> Requested protocol [LANMAN2.1]
+> Requested protocol [NT LM 0.12]
+> Requested protocol [POSIX 2]
+> using SPNEGO
+> Selected protocol NT LM 0.12
+> Transaction 1 of length 1450 (0 toread)
+> switch message SMBsesssetupX (pid 1807) conn 0x0
+> wct=12 flg2=0xd801
+> setup_new_vc_session: New VC == 0, if NT4.x compatible we would close
+> all old resources.
+> Doing spnego session setup
+> NativeOS=[Linux version 3.8.0-22-generic] NativeLanMan=[CIFS VFS Client
+> for Linux] PrimaryDomain=[]
+> reply_spnego_negotiate: Got secblob of size 1227
+> libads/kerberos_verify.c:267: krb5_rd_req_return_keyblock_from_keytab
+> succeeded for principal host/oliva.hh3.site-UiqEU/D402Y@public.gmane.org
+> Found account name from PAC: Administrator []
+> Kerberos ticket principal name is [Administrator-UiqEU/D402Y@public.gmane.org]
+> Username HH3\Administrator is invalid on this system
+> error packet at smbd/sesssetup.c(359) cmd=115 (SMBsesssetupX)
+> NT_STATUS_LOGON_FAILURE
+> Server exit (failed to receive smb request)
+> 
+> Anyone please? In particular, why ntlm authentication? Why Username HH3
+> \Administrator is invalid on this system? I've tried without winbind use
+> default domain =  but nada.
+> 
+
+I'm not sure I understand the question about NTLM auth. It doesn't look
+like it's being used here.
+
+As far as why Administrator is being rejected, that's probaly a better
+question for one of the samba lists. If I had to guess though, maybe
+Samba doesn't know how to map Administrator to a local unix user on the
+server?
+
+-- 
+Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
