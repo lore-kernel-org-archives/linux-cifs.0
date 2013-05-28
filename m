@@ -1,107 +1,126 @@
 From: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: [PATCH 12/19] cifs: track the flavor of the NEGOTIATE reponse
-Date: Tue, 28 May 2013 09:46:43 +0400
-Message-ID: <CAKywueTSo=+Wis6pfxkz-dM036Rxbs_z8H4nDDDZ5tLRyBZUMA@mail.gmail.com>
+Subject: Re: [PATCH 13/19] cifs: add new fields to smb_vol to track the
+ requested security flavor
+Date: Tue, 28 May 2013 09:49:33 +0400
+Message-ID: <CAKywueQ2bd9ZRSejYsMkRiWpVbyh6W5NWOrmKHzAswpQAJJbrw@mail.gmail.com>
 References: <1369321563-16893-1-git-send-email-jlayton@redhat.com>
-	<1369321563-16893-13-git-send-email-jlayton@redhat.com>
+	<1369321563-16893-14-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Cc: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>,
 	linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, idra-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1369321563-16893-13-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+In-Reply-To: <1369321563-16893-14-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
 2013/5/23 Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>:
-> Track what sort of NEGOTIATE response we get from the server, as that
-> will govern what sort of authentication types this socket will support.
->
-> There are three possibilities:
->
-> LANMAN: server sent legacy LANMAN-type response
->
-> UNENCAP: server sent a newer-style response, but extended security bit
-> wasn't set. This socket will only support unencapsulated auth types.
->
-> EXTENDED: server sent a newer-style response with the extended security
-> bit set. This is necessary to support krb5 and ntlmssp auth types.
+> We have this to some degree already in secFlgs, but those get "or'ed" so
+> there's no way to know what the last option requested was. Add new fields
+> that will eventually supercede the secFlgs field in the cifs_ses.
 >
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 > ---
->  fs/cifs/cifsglob.h |  4 ++++
->  fs/cifs/cifssmb.c  | 15 ++++++++++-----
->  fs/cifs/smb2pdu.c  |  2 ++
->  3 files changed, 16 insertions(+), 5 deletions(-)
+>  fs/cifs/cifsglob.h |  2 ++
+>  fs/cifs/connect.c  | 25 +++++++++++++++++++++++++
+>  2 files changed, 27 insertions(+)
 >
 > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index a858037..c2ef6c1 100644
+> index c2ef6c1..9f88a35 100644
 > --- a/fs/cifs/cifsglob.h
 > +++ b/fs/cifs/cifsglob.h
-> @@ -540,6 +540,10 @@ struct TCP_Server_Info {
->         struct session_key session_key;
->         unsigned long lstrp; /* when we got last response from this server */
->         struct cifs_secmech secmech; /* crypto sec mech functs, descriptors */
-> +#define        CIFS_NEGFLAVOR_LANMAN   0       /* wct == 13, LANMAN */
-> +#define        CIFS_NEGFLAVOR_UNENCAP  1       /* wct == 17, but no ext_sec */
-> +#define        CIFS_NEGFLAVOR_EXTENDED 2       /* wct == 17, ext_sec bit set */
-> +       char    negflavor;      /* NEGOTIATE response flavor */
->         /* extended security flavors that server supports */
->         bool    sec_ntlmssp;            /* supports NTLMSSP */
->         bool    sec_kerberosu2u;        /* supports U2U Kerberos */
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index e7184b9..b43948a 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -616,6 +616,7 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
->                 goto neg_err_exit;
->         } else if (pSMBr->hdr.WordCount == 13) {
->                 rc = decode_lanman_negprot_rsp(server, pSMBr, secFlags);
-> +               server->negflavor = CIFS_NEGFLAVOR_LANMAN;
->                 goto neg_err_exit;
->         } else if (pSMBr->hdr.WordCount != 17) {
->                 /* unknown wct */
-> @@ -666,17 +667,21 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
->         server->timeAdj = (int)(__s16)le16_to_cpu(pSMBr->ServerTimeZone);
->         server->timeAdj *= 60;
+> @@ -402,6 +402,8 @@ struct smb_vol {
+>         umode_t file_mode;
+>         umode_t dir_mode;
+>         unsigned secFlg;
+> +       enum securityEnum sectype; /* sectype requested via mnt opts */
+> +       bool sign; /* was signing requested via mnt opts? */
+>         bool retry:1;
+>         bool intr:1;
+>         bool setuids:1;
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index b367a5a..7b71961 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1024,11 +1024,21 @@ static int cifs_parse_security_flavors(char *value,
 >
-> -       if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE)
-> +       if (pSMBr->EncryptionKeyLength == CIFS_CRYPTO_KEY_SIZE) {
-> +               server->negflavor = CIFS_NEGFLAVOR_UNENCAP;
->                 memcpy(ses->server->cryptkey, pSMBr->u.EncryptionKey,
->                        CIFS_CRYPTO_KEY_SIZE);
-> -       else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
-> +       } else if ((pSMBr->hdr.Flags2 & SMBFLG2_EXT_SEC ||
->                         server->capabilities & CAP_EXTENDED_SECURITY) &&
-> -                               (pSMBr->EncryptionKeyLength == 0))
-> +                               (pSMBr->EncryptionKeyLength == 0)) {
-> +               server->negflavor = CIFS_NEGFLAVOR_EXTENDED;
->                 rc = decode_ext_sec_blob(server, pSMBr);
-> -       else if (server->sec_mode & SECMODE_PW_ENCRYPT)
-> +       } else if (server->sec_mode & SECMODE_PW_ENCRYPT) {
->                 rc = -EIO; /* no crypt key only if plain text pwd */
-> -       else
-> +       } else {
-> +               server->negflavor = CIFS_NEGFLAVOR_UNENCAP;
->                 server->capabilities &= ~CAP_EXTENDED_SECURITY;
-> +       }
+>         substring_t args[MAX_OPT_ARGS];
 >
->         if (!rc)
->                 rc = cifs_enable_signing(server, secFlags);
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index ebb97b4..1609699 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -405,6 +405,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+> +       /*
+> +        * With mount options, the last one should win. Reset any existing
+> +        * settings back to default.
+> +        */
+> +       vol->sectype = Unspecified;
+> +       vol->sign = false;
+> +
+>         switch (match_token(value, cifs_secflavor_tokens, args)) {
+>         case Opt_sec_krb5:
+> +               vol->sectype = Kerberos;
+>                 vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MAY_SIGN;
+>                 break;
+>         case Opt_sec_krb5i:
+> +               vol->sectype = Kerberos;
+> +               vol->sign = true;
+>                 vol->secFlg |= CIFSSEC_MAY_KRB5 | CIFSSEC_MUST_SIGN;
+>                 break;
+>         case Opt_sec_krb5p:
+> @@ -1036,26 +1046,36 @@ static int cifs_parse_security_flavors(char *value,
+>                 cifs_dbg(VFS, "sec=krb5p is not supported!\n");
+>                 return 1;
+>         case Opt_sec_ntlmssp:
+> +               vol->sectype = RawNTLMSSP;
+>                 vol->secFlg |= CIFSSEC_MAY_NTLMSSP;
+>                 break;
+>         case Opt_sec_ntlmsspi:
+> +               vol->sectype = RawNTLMSSP;
+> +               vol->sign = true;
+>                 vol->secFlg |= CIFSSEC_MAY_NTLMSSP | CIFSSEC_MUST_SIGN;
+>                 break;
+>         case Opt_ntlm:
+>                 /* ntlm is default so can be turned off too */
+> +               vol->sectype = NTLM;
+>                 vol->secFlg |= CIFSSEC_MAY_NTLM;
+>                 break;
+>         case Opt_sec_ntlmi:
+> +               vol->sectype = NTLM;
+> +               vol->sign = true;
+>                 vol->secFlg |= CIFSSEC_MAY_NTLM | CIFSSEC_MUST_SIGN;
+>                 break;
+>         case Opt_sec_ntlmv2:
+> +               vol->sectype = NTLMv2;
+>                 vol->secFlg |= CIFSSEC_MAY_NTLMV2;
+>                 break;
+>         case Opt_sec_ntlmv2i:
+> +               vol->sectype = NTLMv2;
+> +               vol->sign = true;
+>                 vol->secFlg |= CIFSSEC_MAY_NTLMV2 | CIFSSEC_MUST_SIGN;
+>                 break;
+>  #ifdef CONFIG_CIFS_WEAK_PW_HASH
+>         case Opt_sec_lanman:
+> +               vol->sectype = LANMAN;
+>                 vol->secFlg |= CIFSSEC_MAY_LANMAN;
+>                 break;
+>  #endif
+> @@ -1425,6 +1445,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+>                         break;
+>                 case Opt_sign:
+>                         vol->secFlg |= CIFSSEC_MUST_SIGN;
+> +                       vol->sign = true;
+>                         break;
+>                 case Opt_noac:
+>                         printk(KERN_WARNING "CIFS: Mount option noac not "
+> @@ -3880,6 +3901,10 @@ cifs_set_vol_auth(struct smb_vol *vol, struct cifs_ses *ses)
+>         case LANMAN:
+>                 vol->secFlg = CIFSSEC_MUST_LANMAN;
+>                 break;
+> +       default:
+> +               /* should never happen */
+> +               vol->secFlg = 0;
+> +               break;
 >         }
->         server->dialect = le16_to_cpu(rsp->DialectRevision);
 >
-> +       /* SMB2 only has an extended negflavor */
-> +       server->negflavor = CIFS_NEGFLAVOR_EXTENDED;
->         server->maxBuf = le32_to_cpu(rsp->MaxTransactSize);
->         server->max_read = le32_to_cpu(rsp->MaxReadSize);
->         server->max_write = le32_to_cpu(rsp->MaxWriteSize);
+>         return cifs_set_cifscreds(vol, ses);
 > --
 > 1.8.1.4
 >
