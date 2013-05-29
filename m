@@ -1,14 +1,13 @@
-From: Andi Kleen <andi-Vw/NltI1exuRpAAqCnN02g@public.gmane.org>
+From: Simo Sorce <simo-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
-Date: Wed, 29 May 2013 18:13:58 +0200
-Message-ID: <20130529161358.GJ6123@two.firstfloor.org>
+Date: Wed, 29 May 2013 12:18:09 -0400
+Message-ID: <1369844289.2769.146.camel@willson.li.ssimo.org>
 References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
- <20130523094201.GA24543@dastard>
- <519E8B5F.3080905@hp.com>
- <20130527020903.GR29466@dastard>
- <51A624E2.3000301@hp.com>
+	 <20130523094201.GA24543@dastard> <519E8B5F.3080905@hp.com>
+	 <20130527020903.GR29466@dastard>  <51A624E2.3000301@hp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Cc: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
 	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
 	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
@@ -24,45 +23,33 @@ Cc: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
 	Andi Kleen <andi-Vw/NltI1exuRpAAqCnN02g@public.gmane.org>
 To: Waiman Long <waiman.long-VXdhtT5mjnY@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
 In-Reply-To: <51A624E2.3000301-VXdhtT5mjnY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-> The d_path() is called by perf_event_mmap_event() which translates
-> VMA to its file path for memory segments backed by files. As perf is
-> not just for sampling data within the kernel, it can also be used
-> for checking access pattern in the user space. As a result, it needs
-> to map VMAs back to the backing files to access their symbols
-> information. If d_path() is not the right function to call for this
-> purpose, what other alternatives do we have?
+On Wed, 2013-05-29 at 11:55 -0400, Waiman Long wrote:
 
-In principle it should be only called for new file mappings
-getting maped.  Do you really have that many new file mappings all
-the time? Or is this related to program startup?
+> My patch set consists of 2 different changes. The first one is to avoid 
+> taking the d_lock lock when updating the reference count in the 
+> dentries. This particular change also benefit some other workloads that 
+> are filesystem intensive. One particular example is the short workload 
+> in the AIM7 benchmark. One of the job type in the short workload is 
+> "misc_rtns_1" which calls security functions like getpwnam(), 
+> getpwuid(), getgrgid() a couple of times. These functions open the 
+> /etc/passwd or /etc/group files, read their content and close the files. 
+> It is the intensive open/read/close sequence from multiple threads that 
+> is causing 80%+ contention in the d_lock on a system with large number 
+> of cores.
 
-> 
-> My patch set consists of 2 different changes. The first one is to
-> avoid taking the d_lock lock when updating the reference count in
-> the dentries. This particular change also benefit some other
-> workloads that are filesystem intensive. One particular example is
-> the short workload in the AIM7 benchmark. One of the job type in the
-> short workload is "misc_rtns_1" which calls security functions like
-> getpwnam(), getpwuid(), getgrgid() a couple of times. These
-> functions open the /etc/passwd or /etc/group files, read their
-> content and close the files. It is the intensive open/read/close
-> sequence from multiple threads that is causing 80%+ contention in
-> the d_lock on a system with large number of cores. The MIT's
-> MOSBench paper also outlined dentry reference counting as a
+To be honest a workload base on /etc/passwd or /etc/group is completely
+artificial, in actual usage, if you really have  such access you use
+nscd or sssd with their shared memory caches to completely remove most
+of the file access.
+I have no beef on the rest but repeated access to Nsswitch information
+is not something you need to optimize at the file system layer and
+should not be brought up as a point in favor.
 
-The paper was before Nick Piggin's RCU (and our) work on this.
-Modern kernels do not have dcache problems with mosbench, unless
-you run weird security modules like SMACK that effectively 
-disable dcache RCU.
+Simo.
 
-BTW lock elision may fix these problems anyways, in a much
-simpler way.
-
--Andi
-
-ak-VuQAYsv1563Yd54FQh9/CA@public.gmane.org -- Speaking for myself only.
+-- 
+Simo Sorce * Red Hat, Inc * New York
