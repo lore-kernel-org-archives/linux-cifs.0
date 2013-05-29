@@ -1,88 +1,63 @@
-From: Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
-Subject: Re: cifs-utils VFS errors
-Date: Wed, 29 May 2013 14:45:55 -0400
-Message-ID: <20130529144555.595ee5a4@tlielax.poochiereds.net>
-References: <51A32117.5030908@steve-ss.com>
-	<20130528063525.1baeac8c@corrin.poochiereds.net>
-	<1369744796.2769.8.camel@hh16.hh3.site>
-	<20130528090142.36d5076e@corrin.poochiereds.net>
-	<1369842745.3123.9.camel@hh16.hh3.site>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
+Date: Wed, 29 May 2013 14:46:40 -0400
+Message-ID: <20130529184640.GA3243@fieldses.org>
+References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
+ <20130523094201.GA24543@dastard>
+ <519E8B5F.3080905@hp.com>
+ <20130527020903.GR29466@dastard>
+ <51A624E2.3000301@hp.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Miklos Szeredi <mszeredi-AlSwsSmVLrQ@public.gmane.org>, Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>,
+	Sage Weil <sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Eric Paris <eparis-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, autofs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Chandramouleeswaran, Aswin" <aswin-VXdhtT5mjnY@public.gmane.org>,
+	"Norton, Scott J" <scott.norton-VXdhtT5mjnY@public.gmane.org>,
+	Andi Kleen <andi-Vw/NltI1exuRpAAqCnN02g@public.gmane.org>
+To: Waiman Long <waiman.long-VXdhtT5mjnY@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1369842745.3123.9.camel-HkULYb+WTT7YCGPCin2YbQ@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <51A624E2.3000301-VXdhtT5mjnY@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, 29 May 2013 17:52:25 +0200
-steve <steve-dZ4O0aZtNmBWk0Htik3J/w@public.gmane.org> wrote:
+On Wed, May 29, 2013 at 11:55:14AM -0400, Waiman Long wrote:
+> On 05/26/2013 10:09 PM, Dave Chinner wrote:
+> >On Thu, May 23, 2013 at 05:34:23PM -0400, Waiman Long wrote:
+> >>On 05/23/2013 05:42 AM, Dave Chinner wrote:
+> >>>
+> >>>What was it I said about this patchset when you posted it to speed
+> >>>up an Oracle benchmark back in february? I'll repeat:
+> >>>
+> >>>"Nobody should be doing reverse dentry-to-name lookups in a quantity
+> >>>sufficient for it to become a performance limiting factor."
+> >>Thank for the comment, but my point is that it is the d_lock
+> >>contention is skewing the data about how much spin lock contention
+> >>had actually happened in the workload and it makes it harder to
+> >>pinpoint problem areas to look at. This is not about performance, it
+> >>is about accurate representation of performance data. Ideally, we
+> >>want the overhead of turning on perf instrumentation to be as low as
+> >>possible.
+> >Right. But d_path will never be "low overhead", and as such it
+> >shouldn't be used by perf.
+> 
+> The d_path() is called by perf_event_mmap_event() which translates
+> VMA to its file path for memory segments backed by files. As perf is
+> not just for sampling data within the kernel, it can also be used
+> for checking access pattern in the user space. As a result, it needs
+> to map VMAs back to the backing files to access their symbols
+> information. If d_path() is not the right function to call for this
+> purpose, what other alternatives do we have?
 
-> On Tue, 2013-05-28 at 09:01 -0400, Jeff Layton wrote:
-> > >  How does this sound?
-> > > - I make a domain user called cifsuser with rfc2307 uidNumber and
-> > > gidNumber:
-> > > uid=3000025(cifsuser) gid=20513(Domain Users) groups=20513(Domain Users)
-> > > 
-> > > - I mount like this:
-> > > sudo kinit cifsuser
-> > > mount -t cifs //oliva/users /mnt -osec=krb5
-> > > (just tried it: fine)
-> > > 
-> > > -I stick cifsuser in the keytab and kinit -k it in a cron every few
-> > > hours or so to keep it alive.
-> > > 
-> > > Thanks so much for your time,
-> > > Steve
-> > > 
-> > 
-> > That sounds reasonable. Assuming that you don't actually do anything on
-> > the mount as root, then you can give "cifsuser" very limited privileges
-> > here too, essentially acting as a "squashed" user like under NFS.
-> > 
-> > Also, there's no need to do this crontab stuff either. If you mount
-> > with "-o sec=krb5,username=cifsuser" then cifs.upcall will be able to
-> > just use /etc/krb5.keytab without you needing to do anything special.
-> > 
-> 
-> 
-> Hi
-> OK. Nearly done. I now have the automounter working:
-> /etc/auto.users
-> * -fstype=cifs,rw,sec=krb5,username=cifsuser,multiuser ://oliva/users/&
-> 
-> It works fine except I have 2 keytabs per client.
->  /etc/krb5.keytab
-> produced by
->  net ads join
-> It contains the host/client and MACHINE$ keys 
-> and 
->  /etc/cifs.keytab
-> produced the DC and copied to the clients which contains the cifsuser
-> keys.
-> 
-> Question: will cifs only look in /etc/krb5.keytab? Can I get it to look
-> at /etc/cifs.keytab instead? OK, I can ktutil merge them but. . .
-> 
-> Thanks for your patience.
-> 
-> 
+As Dave said before, is the last path component sufficient?  Or how
+about an inode number?
 
-Yes, it currently only looks at /etc/krb5.keytab. It probably wouldn't
-be very hard to add a new command-line option to give it an alternate
-one if that helps.
-
-I do have a question here though. Why are you bothering with the
-automounter at all? Why not instead just mount //oliva/users via fstab
-at the point where auto.users is currently mounted?
-
-That should give you the same effect with a much smaller mount table
-and no automounter overhead. Something like this in /etc/fstab ought to
-do it:
-
-    //oliva/users  /path/to/top/of/users/dir   cifs  sec=krb5,username=cifsuser,multiuser 0 0
-
--- 
-Jeff Layton <jlayton-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>
+--b.
