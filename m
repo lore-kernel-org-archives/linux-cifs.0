@@ -1,62 +1,54 @@
-From: Waiman Long <waiman.long@hp.com>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
 Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
-Date: Wed, 29 May 2013 16:40:52 -0400
-Message-ID: <51A667D4.4050301@hp.com>
-References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com> <20130523094201.GA24543@dastard> <519E8B5F.3080905@hp.com> <20130527020903.GR29466@dastard> <51A624E2.3000301@hp.com> <20130529184640.GA3243@fieldses.org>
+Date: Wed, 29 May 2013 16:43:23 -0400
+Message-ID: <20130529204323.GC3243@fieldses.org>
+References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
+ <20130523094201.GA24543@dastard>
+ <519E8B5F.3080905@hp.com>
+ <20130527020903.GR29466@dastard>
+ <51A624E2.3000301@hp.com>
+ <20130529184640.GA3243@fieldses.org>
+ <20130529203700.GM6123@two.firstfloor.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Cc: Dave Chinner <david@fromorbit.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jeff Layton <jlayton@redhat.com>,
-	Miklos Szeredi <mszeredi@suse.cz>, Ian Kent <raven@themaw.net>,
-	Sage Weil <sage@inktank.com>, Steve French <sfrench@samba.org>,
-	Trond Myklebust <Trond.Myklebust@netapp.com>,
-	Eric Paris <eparis@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, autofs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	"Chandramouleeswaran, Aswin" <aswin@hp.com>,
-	"Norton, Scott J" <scott.norton@hp.com>,
-	Andi Kleen <andi@firstfloor.org>
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Return-path: <ceph-devel-owner@vger.kernel.org>
-In-Reply-To: <20130529184640.GA3243@fieldses.org>
-Sender: ceph-devel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: Waiman Long <waiman.long-VXdhtT5mjnY@public.gmane.org>,
+	Dave Chinner <david-FqsqvQoI3Ljby3iVrkZq2A@public.gmane.org>,
+	Alexander Viro <viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org>,
+	Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>,
+	Miklos Szeredi <mszeredi-AlSwsSmVLrQ@public.gmane.org>, Ian Kent <raven-PKsaG3nR2I+sTnJN9+BGXg@public.gmane.org>,
+	Sage Weil <sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org>, Steve French <sfrench-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
+	Trond Myklebust <Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org>,
+	Eric Paris <eparis-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, autofs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	"Chandramouleeswaran, Aswin" <aswin-VXdhtT5mjnY@public.gmane.org>,
+	"Norton, Scott J" <scott.norton-VXdhtT5mjnY@public.gmane.org>
+To: Andi Kleen <andi-Vw/NltI1exuRpAAqCnN02g@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20130529203700.GM6123-1g7Xle2YJi4/4alezvVtWx2eb7JE58TQ@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On 05/29/2013 02:46 PM, J. Bruce Fields wrote:
-> On Wed, May 29, 2013 at 11:55:14AM -0400, Waiman Long wrote:
->> On 05/26/2013 10:09 PM, Dave Chinner wrote:
->>> On Thu, May 23, 2013 at 05:34:23PM -0400, Waiman Long wrote:
->>>> On 05/23/2013 05:42 AM, Dave Chinner wrote:
->>>>> What was it I said about this patchset when you posted it to speed
->>>>> up an Oracle benchmark back in february? I'll repeat:
->>>>>
->>>>> "Nobody should be doing reverse dentry-to-name lookups in a quantity
->>>>> sufficient for it to become a performance limiting factor."
->>>> Thank for the comment, but my point is that it is the d_lock
->>>> contention is skewing the data about how much spin lock contention
->>>> had actually happened in the workload and it makes it harder to
->>>> pinpoint problem areas to look at. This is not about performance, it
->>>> is about accurate representation of performance data. Ideally, we
->>>> want the overhead of turning on perf instrumentation to be as low as
->>>> possible.
->>> Right. But d_path will never be "low overhead", and as such it
->>> shouldn't be used by perf.
->> The d_path() is called by perf_event_mmap_event() which translates
->> VMA to its file path for memory segments backed by files. As perf is
->> not just for sampling data within the kernel, it can also be used
->> for checking access pattern in the user space. As a result, it needs
->> to map VMAs back to the backing files to access their symbols
->> information. If d_path() is not the right function to call for this
->> purpose, what other alternatives do we have?
-> As Dave said before, is the last path component sufficient?  Or how
-> about an inode number?
+On Wed, May 29, 2013 at 10:37:00PM +0200, Andi Kleen wrote:
+> > As Dave said before, is the last path component sufficient?  Or how
+> > about an inode number?
+> 
+> Neither works, the profiler needs to find the file and read it.
+> 
+> inode searching would be incredible expensive,
 
-I don't think so. The user-space perf command will need the full 
-pathname to locate the binaries and read their debug information. Just 
-returning the last path component or the inode number will not cut it.
+How fast does it need to be?  Actually analyzing the profile is
+something you only do once after everything's over, right?
 
-Regards,
-Longman
+> unless the file system provided a "open-by-inode" primitive
+
+Well, I suppose there is open_by_handle_at.
+
+--b.
+
+> In normal operation you only have that event when starting up the
+> program and when each shared library gets mapped in.
+> 
+> -Andi
