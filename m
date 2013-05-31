@@ -1,79 +1,48 @@
-From: =?utf-8?B?SsO2cm4=?= Engel <joern@logfs.org>
-Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
-Date: Thu, 30 May 2013 11:11:27 -0400
-Message-ID: <20130530151127.GA13756@logfs.org>
-References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
- <20130523094201.GA24543@dastard>
- <519E8B5F.3080905@hp.com>
- <20130527020903.GR29466@dastard>
- <51A624E2.3000301@hp.com>
- <20130529184640.GA3243@fieldses.org>
- <20130529203700.GM6123@two.firstfloor.org>
- <20130529211917.GB6658@logfs.org>
- <51A774E2.9050307@hp.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Cc: Andi Kleen <andi@firstfloor.org>,
-	"J. Bruce Fields" <bfields@fieldses.org>,
-	Dave Chinner <david@fromorbit.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jeff Layton <jlayton@redhat.com>,
-	Miklos Szeredi <mszeredi@suse.cz>, Ian Kent <raven@themaw.net>,
-	Sage Weil <sage@inktank.com>, Steve French <sfrench@samba.org>,
-	Trond Myklebust <Trond.Myklebust@netapp.com>,
-	Eric Paris <eparis@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, autofs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	"Chandramouleeswaran, Aswin" <aswin@hp.com>,
-	"Norton, Scott J" <scott.norton@hp.com>
-To: Waiman Long <waiman.long@hp.com>
-Return-path: <linux-fsdevel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <51A774E2.9050307@hp.com>
-Sender: linux-fsdevel-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH] cifs: fix off-by-one bug in build_unc_path_to_root
+Date: Fri, 31 May 2013 10:00:18 -0400
+Message-ID: <1370008818-9427-1-git-send-email-jlayton@redhat.com>
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, marcus.moeller-OI3hZJvNYWs@public.gmane.org,
+	ken.fallon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, 30 May 2013 11:48:50 -0400, Waiman Long wrote:
-> On 05/29/2013 05:19 PM, J=C3=B6rn Engel wrote:
-> >On Wed, 29 May 2013 22:37:00 +0200, Andi Kleen wrote:
-> >>>As Dave said before, is the last path component sufficient?  Or ho=
-w
-> >>>about an inode number?
-> >>Neither works, the profiler needs to find the file and read it.
-> >Ignoring all the complexity this would cause downstream, you could d=
-o
-> >the path lookup just once, attach some cookie to it and return the
-> >cookie ever-after.  Maybe some combination of i_sb and i_ino would b=
-e
-> >good enough as a cookie.
->=20
-> Still, it is just shifting the complexity from the d_path code to
-> the perf kernel subsystem as it needs to keep track of what paths
-> have been sent up before.
+commit 839db3d10a (cifs: fix up handling of prefixpath= option) changed
+the code such that the vol->prepath no longer contained a leading
+delimiter and then fixed up the places that accessed that field to
+account for that change.
 
-That sounds like a good thing to have.  Every single linux user
-depends on the dcache.  Only a relatively small subset cares about
-perf.  Having dcache pay the cost for perf's special needs is a
-classical externality.
+One spot in build_unc_path_to_root was missed however. When doing the
+pointer addition on pos, that patch failed to account for the fact that
+we had already incremented "pos" by one when adding the length of the
+prepath. This caused a buffer overrun by one byte.
 
-> It also have complications in case the
-> tracked files are being deleted or moved around in the filesystem.
-> Some kind of notification mechanism has to be implemented in the
-> dentry layer to notify the perf subsystem.
+This patch fixes the problem by correcting the handling of "pos".
 
-Agreed.  The whole approach is based on getting the 99% case right and
-occasionally being wrong.  For perf this may be acceptable, not sure.
+Cc: <stable-u79uwXL29TY76Z2rM5mHXA@public.gmane.org> # v3.8+
+Reported-by: Marcus Moeller <marcus.moeller-OI3hZJvNYWs@public.gmane.org>
+Reported-by: Ken Fallon <ken.fallon-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ fs/cifs/connect.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-J=C3=B6rn
-
---
-Without a major sea change, nothing that is under copyright today will
-ever come out from under it and fall into the public domain.
--- Jake Edge
---
-To unsubscribe from this list: send the line "unsubscribe linux-fsdevel=
-" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 5b97e56..e3bc39b 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3279,8 +3279,8 @@ build_unc_path_to_root(const struct smb_vol *vol,
+ 	pos = full_path + unc_len;
+ 
+ 	if (pplen) {
+-		*pos++ = CIFS_DIR_SEP(cifs_sb);
+-		strncpy(pos, vol->prepath, pplen);
++		*pos = CIFS_DIR_SEP(cifs_sb);
++		strncpy(pos + 1, vol->prepath, pplen);
+ 		pos += pplen;
+ 	}
+ 
+-- 
+1.8.1.4
