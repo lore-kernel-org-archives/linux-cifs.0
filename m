@@ -1,140 +1,156 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v1 00/11] locks: scalability improvements
-	for file locking
-Date: Fri, 31 May 2013 23:07:23 -0400
-Message-ID: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        cluster-devel@redhat.com, sage@inktank.com,
-        samba-technical@lists.samba.org, Trond.Myklebust@netapp.com,
-        linux-kernel@vger.kernel.org, piastryyy@gmail.com,
-        linux-afs@lists.infradead.org, dhowells@redhat.com, smfrench@gmail.com,
-        linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
-        akpm@linux-foundation.org
-To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
-Return-path: <cluster-devel-bounces@redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v1 10/11] locks: add a new "lm_owner_key" lock operation
+Date: Fri, 31 May 2013 23:07:33 -0400
+Message-ID: <1370056054-25449-11-git-send-email-jlayton@redhat.com>
+References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1370056054-25449-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Executive summary (tl;dr version): This patchset represents an overhaul
-of the file locking code with an aim toward improving its scalability
-and making the code a bit easier to understand.
+Currently, the hashing that the locking code uses to add these values
+to the blocked_hash is simply calculated using fl_owner field. That's
+valid in most cases except for server-side lockd, which validates the
+owner of a lock based on fl_owner and fl_pid.
 
-Longer version:
+In the case where you have a small number of NFS clients doing a lot
+of locking between different processes, you could end up with all
+the blocked requests sitting in a very small number of hash buckets.
 
-When the BKL was finally ripped out of the kernel in 2010, the strategy
-taken for the file locking code was to simply turn it into a new
-file_lock_locks spinlock. It was an expedient way to deal with the file
-locking code at the time, but having a giant spinlock around all of this
-code is clearly not great for scalability. Red Hat has bug reports that
-go back into the 2.6.18 era that point to BKL scalability problems in
-the file locking code and the file_lock_lock suffers from the same
-issues.
+Add a new lm_owner_key operation to the lock_manager_operations that
+will generate an unsigned long to use as the key in the hashtable.
+That function is only implemented for server-side lockd, and simply
+XORs the fl_owner and fl_pid.
 
-This patchset is my first attempt to make this code less dependent on
-global locking. The main change is to switch most of the file locking
-code to be protected by the inode->i_lock instead of the file_lock_lock.
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+---
+ Documentation/filesystems/Locking |   18 +++++++++++-------
+ fs/lockd/svclock.c                |   12 ++++++++++++
+ fs/locks.c                        |   13 ++++++++++---
+ include/linux/fs.h                |    1 +
+ 4 files changed, 34 insertions(+), 10 deletions(-)
 
-While that works for most things, there are a couple of global data
-structures (lists in the current code) that need a global lock to
-protect them. So we still need a global lock in order to deal with
-those. The remaining patches are intended to make that global locking
-less painful. The big gain is made by turning the blocked_list into a
-hashtable, which greatly speeds up the deadlock detection code.
-
-I rolled a couple of small programs in order to test this code. The
-first one just forks off 128 children and has them lock and unlock the
-same file 10k times. Running this under "time" against a file on tmpfs
-gives typical values like this:
-
-Unpatched (3.10-rc3-ish):
-real	0m5.283s
-user	0m0.380s
-sys	0m20.469s
-
-Patched (same base kernel):
-real	0m5.099s
-user	0m0.478s
-sys	0m19.662s
-
-...so there seems to be some modest performance gain in this test. I
-think that's almost entirely due to the change to a hashtable and to
-optimize removing and readding blocked locks to the global lists. Note
-that with this code we have to take two spinlocks instead of just one,
-and that has some performance impact too. So the real peformance gain
-from that hashtable conversion is eaten up to some degree by this.
-
-The next test just forks off a bunch of children that each create their
-own file and then lock and unlock it 20k times. Obviously, the locks in
-this case are uncontended. Running that under "time" typically gives
-these rough numbers.
-
-Unpatched (3.10-rc3-ish):
-real	0m8.836s
-user	0m1.018s
-sys	0m34.094s
-
-Patched (same base kernel):
-real	0m4.965s
-user	0m1.043s
-sys	0m18.651s
-
-In this test, we see the real benefit of moving to the i_lock for most
-of this code. The run time is almost cut in half in this test. With
-these changes locking different inodes needs very little serialization.
-
-If people know of other file locking performance tests, then I'd be
-happy to try them out too. It's possible that this might make some
-workloads slower, and it would be helpful to know what they are (and
-address them) if so.
-
-This is not the first attempt at doing this. The conversion to the
-i_lock was originally attempted by Bruce Fields a few years ago. His
-approach was NAK'ed since it involved ripping out the deadlock
-detection. People also really seem to like /proc/locks for debugging, so
-keeping that in is probably worthwhile.
-
-There's more work to be done in this area and this patchset is just a
-start. There's a horrible thundering herd problem when a blocking lock
-is released, for instance. There was also interest in solving the goofy
-"unlock on any close" POSIX lock semantics at this year's LSF. I think
-this patchset will help lay the groundwork for those changes as well.
-
-Comments and suggestions welcome.
-
-Jeff Layton (11):
-  cifs: use posix_unblock_lock instead of locks_delete_block
-  locks: make generic_add_lease and generic_delete_lease static
-  locks: comment cleanups and clarifications
-  locks: make "added" in __posix_lock_file a bool
-  locks: encapsulate the fl_link list handling
-  locks: convert to i_lock to protect i_flock list
-  locks: only pull entries off of blocked_list when they are really
-    unblocked
-  locks: convert fl_link to a hlist_node
-  locks: turn the blocked_list into a hashtable
-  locks: add a new "lm_owner_key" lock operation
-  locks: give the blocked_hash its own spinlock
-
- Documentation/filesystems/Locking |   27 +++-
- fs/afs/flock.c                    |    5 +-
- fs/ceph/locks.c                   |    2 +-
- fs/ceph/mds_client.c              |    8 +-
- fs/cifs/cifsfs.c                  |    2 +-
- fs/cifs/file.c                    |   15 +-
- fs/gfs2/file.c                    |    2 +-
- fs/lockd/svclock.c                |   12 ++
- fs/lockd/svcsubs.c                |   12 +-
- fs/locks.c                        |  254 +++++++++++++++++++++++++------------
- fs/nfs/delegation.c               |   11 +-
- fs/nfs/nfs4state.c                |    8 +-
- fs/nfsd/nfs4state.c               |    8 +-
- include/linux/fs.h                |   25 +---
- 14 files changed, 249 insertions(+), 142 deletions(-)
+diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/Locking
+index 13f91ab..ee351ac 100644
+--- a/Documentation/filesystems/Locking
++++ b/Documentation/filesystems/Locking
+@@ -351,6 +351,7 @@ fl_release_private:	maybe		no
+ ----------------------- lock_manager_operations ---------------------------
+ prototypes:
+ 	int (*lm_compare_owner)(struct file_lock *, struct file_lock *);
++	unsigned long (*lm_owner_key)(struct file_lock *);
+ 	void (*lm_notify)(struct file_lock *);  /* unblock callback */
+ 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
+ 	void (*lm_break)(struct file_lock *); /* break_lease callback */
+@@ -360,18 +361,21 @@ locking rules:
+ 
+ 			inode->i_lock	file_lock_lock	may block
+ lm_compare_owner:	yes		maybe		no
++lm_owner_key		yes		yes		no
+ lm_notify:		yes		no		no
+ lm_grant:		no		no		no
+ lm_break:		yes		no		no
+ lm_change		yes		no		no
+ 
+-	->lm_compare_owner is generally called with *an* inode->i_lock
+-held. It may not be the i_lock of the inode for either file_lock being
+-compared! This is the case with deadlock detection, since the code has
+-to chase down the owners of locks that may be entirely unrelated to the
+-one on which the lock is being acquired. For deadlock detection however,
+-the file_lock_lock is also held. The locks primarily ensure that neither
+-file_lock disappear out from under you while doing the comparison.
++	->lm_compare_owner and ->lm_owner_key are generally called with
++*an* inode->i_lock held. It may not be the i_lock of the inode
++associated with either file_lock argument! This is the case with deadlock
++detection, since the code has to chase down the owners of locks that may
++be entirely unrelated to the one on which the lock is being acquired.
++For deadlock detection however, the file_lock_lock is also held. The
++fact that these locks are held ensures that the file_locks do not
++disappear out from under you while doing the comparison or generating an
++owner key.
+ 
+ --------------------------- buffer_head -----------------------------------
+ prototypes:
+diff --git a/fs/lockd/svclock.c b/fs/lockd/svclock.c
+index e703318..ce2cdab 100644
+--- a/fs/lockd/svclock.c
++++ b/fs/lockd/svclock.c
+@@ -744,8 +744,20 @@ static int nlmsvc_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner && fl1->fl_pid == fl2->fl_pid;
+ }
+ 
++/*
++ * Since NLM uses two "keys" for tracking locks, we need to hash them down
++ * to one for the blocked_hash. Here, we're just xor'ing the host address
++ * with the pid in order to create a key value for picking a hash bucket.
++ */
++static unsigned long
++nlmsvc_owner_key(struct file_lock *fl)
++{
++	return (unsigned long)fl->fl_owner ^ (unsigned long)fl->fl_pid;
++}
++
+ const struct lock_manager_operations nlmsvc_lock_operations = {
+ 	.lm_compare_owner = nlmsvc_same_owner,
++	.lm_owner_key = nlmsvc_owner_key,
+ 	.lm_notify = nlmsvc_notify_blocked,
+ 	.lm_grant = nlmsvc_grant_deferred,
+ };
+diff --git a/fs/locks.c b/fs/locks.c
+index 0d030ce..8219187 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -491,13 +491,20 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner;
+ }
+ 
++static unsigned long
++posix_owner_key(struct file_lock *fl)
++{
++	if (fl->fl_lmops && fl->fl_lmops->lm_owner_key)
++		return fl->fl_lmops->lm_owner_key(fl);
++	return (unsigned long)fl->fl_owner;
++}
++
+ /* Remove a blocker or lock from one of the global lists */
+ static inline void
+ locks_insert_global_blocked(struct file_lock *waiter)
+ {
+ 	spin_lock(&file_lock_lock);
+-	hash_add(blocked_hash, &waiter->fl_link,
+-				(unsigned long)waiter->fl_owner);
++	hash_add(blocked_hash, &waiter->fl_link, posix_owner_key(waiter));
+ 	spin_unlock(&file_lock_lock);
+ }
+ 
+@@ -716,7 +723,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
+ {
+ 	struct file_lock *fl, *ret = NULL;
+ 
+-	hash_for_each_possible(blocked_hash, fl, fl_link, (unsigned long)block_fl->fl_owner) {
++	hash_for_each_possible(blocked_hash, fl, fl_link, posix_owner_key(block_fl)) {
+ 		if (posix_same_owner(fl, block_fl)) {
+ 			ret = fl->fl_next;
+ 			if (likely(ret))
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 07a009e..4906cf5 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -908,6 +908,7 @@ struct file_lock_operations {
+ 
+ struct lock_manager_operations {
+ 	int (*lm_compare_owner)(struct file_lock *, struct file_lock *);
++	unsigned long (*lm_owner_key)(struct file_lock *);
+ 	void (*lm_notify)(struct file_lock *);	/* unblock callback */
+ 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
+ 	void (*lm_break)(struct file_lock *);
+-- 
+1.7.1
