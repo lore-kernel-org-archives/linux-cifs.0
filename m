@@ -1,7 +1,7 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v1 04/11] locks: make "added" in __posix_lock_file a bool
-Date: Fri, 31 May 2013 23:07:27 -0400
-Message-ID: <1370056054-25449-5-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v1 05/11] locks: encapsulate the fl_link list handling
+Date: Fri, 31 May 2013 23:07:28 -0400
+Message-ID: <1370056054-25449-6-git-send-email-jlayton@redhat.com>
 References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
 Cc: dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
 	swhiteho@redhat.com, Trond.Myklebust@netapp.com,
@@ -11,59 +11,100 @@ Cc: dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
 	cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org, piastryyy@gmail.com
 To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
-Return-path: <ceph-devel-owner@vger.kernel.org>
+Return-path: <linux-fsdevel-owner@vger.kernel.org>
 In-Reply-To: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
-Sender: ceph-devel-owner@vger.kernel.org
+Sender: linux-fsdevel-owner@vger.kernel.org
 List-Id: linux-cifs.vger.kernel.org
 
-...save 3 bytes of stack space.
+Move the fl_link list handling routines into a separate set of helpers.
+Also move the global list handling out of locks_insert_block, and into
+the caller that ends up triggering it as that allows us to eliminate the
+IS_POSIX check there.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/locks.c |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
+ fs/locks.c |   34 +++++++++++++++++++++++++++++-----
+ 1 files changed, 29 insertions(+), 5 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index a7d2253..cef0e04 100644
+index cef0e04..caca466 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -800,7 +800,8 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 	struct file_lock *left = NULL;
- 	struct file_lock *right = NULL;
- 	struct file_lock **before;
--	int error, added = 0;
-+	int error;
-+	bool added = false;
+@@ -494,13 +494,38 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner;
+ }
  
- 	/*
- 	 * We may need two file_lock structures for this operation,
-@@ -894,7 +895,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 				continue;
- 			}
- 			request = fl;
--			added = 1;
-+			added = true;
- 		}
- 		else {
- 			/* Processing for different lock types is a bit
-@@ -905,7 +906,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 			if (fl->fl_start > request->fl_end)
- 				break;
- 			if (request->fl_type == F_UNLCK)
--				added = 1;
-+				added = true;
- 			if (fl->fl_start < request->fl_start)
- 				left = fl;
- 			/* If the next lock in the list has a higher end
-@@ -935,7 +936,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 				locks_release_private(fl);
- 				locks_copy_private(fl, request);
- 				request = fl;
--				added = 1;
-+				added = true;
- 			}
- 		}
- 		/* Go on to next lock.
++/* Remove a blocker or lock from one of the global lists */
++static inline void
++locks_insert_global_blocked(struct file_lock *waiter)
++{
++	list_add(&waiter->fl_link, &blocked_list);
++}
++
++static inline void
++locks_delete_global_blocked(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
++}
++
++static inline void
++locks_insert_global_locks(struct file_lock *waiter)
++{
++	list_add_tail(&waiter->fl_link, &file_lock_list);
++}
++
++static inline void
++locks_delete_global_locks(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
++}
++
+ /* Remove waiter from blocker's block list.
+  * When blocker ends up pointing to itself then the list is empty.
+  */
+ static void __locks_delete_block(struct file_lock *waiter)
+ {
+ 	list_del_init(&waiter->fl_block);
+-	list_del_init(&waiter->fl_link);
++	locks_delete_global_blocked(waiter);
+ 	waiter->fl_next = NULL;
+ }
+ 
+@@ -524,8 +549,6 @@ static void locks_insert_block(struct file_lock *blocker,
+ 	BUG_ON(!list_empty(&waiter->fl_block));
+ 	list_add_tail(&waiter->fl_block, &blocker->fl_block);
+ 	waiter->fl_next = blocker;
+-	if (IS_POSIX(blocker))
+-		list_add(&waiter->fl_link, &blocked_list);
+ }
+ 
+ /* Wake up processes blocked waiting for blocker.
+@@ -552,7 +575,7 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
+  */
+ static void locks_insert_lock(struct file_lock **pos, struct file_lock *fl)
+ {
+-	list_add(&fl->fl_link, &file_lock_list);
++	locks_insert_global_locks(fl);
+ 
+ 	fl->fl_nspid = get_pid(task_tgid(current));
+ 
+@@ -573,7 +596,7 @@ static void locks_delete_lock(struct file_lock **thisfl_p)
+ 
+ 	*thisfl_p = fl->fl_next;
+ 	fl->fl_next = NULL;
+-	list_del_init(&fl->fl_link);
++	locks_delete_global_locks(fl);
+ 
+ 	if (fl->fl_nspid) {
+ 		put_pid(fl->fl_nspid);
+@@ -839,6 +862,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 				goto out;
+ 			error = FILE_LOCK_DEFERRED;
+ 			locks_insert_block(fl, request);
++			locks_insert_global_blocked(request);
+ 			goto out;
+   		}
+   	}
 -- 
 1.7.1
 
