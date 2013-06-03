@@ -1,10 +1,9 @@
 From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH v1 02/11] locks: make generic_add_lease and
- generic_delete_lease static
-Date: Mon, 3 Jun 2013 17:53:54 -0400
-Message-ID: <20130603215353.GE2109@fieldses.org>
+Subject: Re: [PATCH v1 03/11] locks: comment cleanups and clarifications
+Date: Mon, 3 Jun 2013 18:00:24 -0400
+Message-ID: <20130603220024.GF2109@fieldses.org>
 References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
- <1370056054-25449-3-git-send-email-jlayton@redhat.com>
+ <1370056054-25449-4-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
@@ -16,43 +15,110 @@ Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@
 	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
 	piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1370056054-25449-3-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <1370056054-25449-4-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Fri, May 31, 2013 at 11:07:25PM -0400, Jeff Layton wrote:
+On Fri, May 31, 2013 at 11:07:26PM -0400, Jeff Layton wrote:
 > Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-
-ACK.--b.
-
 > ---
->  fs/locks.c |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
+>  fs/locks.c         |   24 +++++++++++++++++++-----
+>  include/linux/fs.h |    6 ++++++
+>  2 files changed, 25 insertions(+), 5 deletions(-)
 > 
 > diff --git a/fs/locks.c b/fs/locks.c
-> index 7a02064..e3140b8 100644
+> index e3140b8..a7d2253 100644
 > --- a/fs/locks.c
 > +++ b/fs/locks.c
-> @@ -1337,7 +1337,7 @@ int fcntl_getlease(struct file *filp)
->  	return type;
->  }
+> @@ -150,6 +150,16 @@ static int target_leasetype(struct file_lock *fl)
+>  int leases_enable = 1;
+>  int lease_break_time = 45;
 >  
-> -int generic_add_lease(struct file *filp, long arg, struct file_lock **flp)
-> +static int generic_add_lease(struct file *filp, long arg, struct file_lock **flp)
->  {
->  	struct file_lock *fl, **before, **my_before = NULL, *lease;
->  	struct dentry *dentry = filp->f_path.dentry;
-> @@ -1402,7 +1402,7 @@ out:
->  	return error;
->  }
+> +/*
+> + * The i_flock list is ordered by:
+> + *
+> + * 1) lock type -- FL_LEASEs first, then FL_FLOCK, and finally FL_POSIX
+> + * 2) lock owner
+> + * 3) lock range start
+> + * 4) lock range end
+> + *
+> + * Obviously, the last two criteria only matter for POSIX locks.
+> + */
+
+Thanks, yes, that needs documenting!  Though I wonder if this is the
+place people will look for it.
+
+>  #define for_each_lock(inode, lockp) \
+>  	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
 >  
-> -int generic_delete_lease(struct file *filp, struct file_lock **flp)
-> +static int generic_delete_lease(struct file *filp, struct file_lock **flp)
->  {
->  	struct file_lock *fl, **before;
->  	struct dentry *dentry = filp->f_path.dentry;
+> @@ -806,6 +816,11 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+>  	}
+>  
+>  	lock_flocks();
+> +	/*
+> +	 * New lock request. Walk all POSIX locks and look for conflicts. If
+> +	 * there are any, either return -EAGAIN or put the request on the
+> +	 * blocker's list of waiters.
+> +	 */
+
+This though, seems a) not 100% accurate (it could also return EDEADLCK,
+for example), b) mostly redundant with respect to the following code.
+
+>  	if (request->fl_type != F_UNLCK) {
+>  		for_each_lock(inode, before) {
+>  			fl = *before;
+> @@ -844,7 +859,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+>  		before = &fl->fl_next;
+>  	}
+>  
+> -	/* Process locks with this owner.  */
+> +	/* Process locks with this owner. */
+>  	while ((fl = *before) && posix_same_owner(request, fl)) {
+>  		/* Detect adjacent or overlapping regions (if same lock type)
+>  		 */
+> @@ -930,10 +945,9 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+>  	}
+>  
+>  	/*
+> -	 * The above code only modifies existing locks in case of
+> -	 * merging or replacing.  If new lock(s) need to be inserted
+> -	 * all modifications are done bellow this, so it's safe yet to
+> -	 * bail out.
+> +	 * The above code only modifies existing locks in case of merging or
+> +	 * replacing. If new lock(s) need to be inserted all modifications are
+> +	 * done below this, so it's safe yet to bail out.
+>  	 */
+>  	error = -ENOLCK; /* "no luck" */
+>  	if (right && left == right && !new_fl2)
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index b9d7816..ae377e9 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -926,6 +926,12 @@ int locks_in_grace(struct net *);
+>  /* that will die - we need it for nfs_lock_info */
+>  #include <linux/nfs_fs_i.h>
+>  
+> +/*
+> + * struct file_lock represents a generic "file lock". It's used to represent
+> + * POSIX byte range locks, BSD (flock) locks, and leases. It's important to
+> + * note that the same struct is used to represent both a request for a lock and
+> + * the lock itself, but the same object is never used for both.
+
+Yes, and I do find that confusing.  I wonder if there's a sensible way
+to use separate structs for the different uses.
+
+--b.
+
+> + */
+>  struct file_lock {
+>  	struct file_lock *fl_next;	/* singly linked list for this inode  */
+>  	struct list_head fl_link;	/* doubly linked list of all locks */
 > -- 
 > 1.7.1
 > 
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
