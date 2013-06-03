@@ -1,143 +1,34 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v1 07/11] locks: only pull entries off of
-	blocked_list when they are really unblocked
-Date: Fri, 31 May 2013 23:07:30 -0400
-Message-ID: <1370056054-25449-8-git-send-email-jlayton@redhat.com>
+From: Davidlohr Bueso <davidlohr.bueso-VXdhtT5mjnY@public.gmane.org>
+Subject: Re: [PATCH v1 00/11] locks: scalability improvements for file
+ locking
+Date: Mon, 03 Jun 2013 12:04:52 -0700
+Message-ID: <1370286292.15671.4.camel@buesod1.americas.hpqcorp.net>
 References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
-Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        cluster-devel@redhat.com, sage@inktank.com,
-        samba-technical@lists.samba.org, Trond.Myklebust@netapp.com,
-        linux-kernel@vger.kernel.org, piastryyy@gmail.com,
-        linux-afs@lists.infradead.org, dhowells@redhat.com, smfrench@gmail.com,
-        linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
-        akpm@linux-foundation.org
-To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
-Return-path: <cluster-devel-bounces@redhat.com>
-In-Reply-To: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
-List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
-List-Archive: <https://www.redhat.com/archives/cluster-devel>
-List-Post: <mailto:cluster-devel@redhat.com>
-List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
-List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
-	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
-Sender: cluster-devel-bounces@redhat.com
-Errors-To: cluster-devel-bounces@redhat.com
-List-Id: linux-cifs.vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
+	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1370056054-25449-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-Currently, when there is a lot of lock contention the kernel spends an
-inordinate amount of time taking blocked locks off of the global
-blocked_list and then putting them right back on again. When all of this
-code was protected by a single lock, then it didn't matter much, but now
-it means a lot of file_lock_lock thrashing.
+On Fri, 2013-05-31 at 23:07 -0400, Jeff Layton wrote:
+> This is not the first attempt at doing this. The conversion to the
+> i_lock was originally attempted by Bruce Fields a few years ago. His
+> approach was NAK'ed since it involved ripping out the deadlock
+> detection. People also really seem to like /proc/locks for debugging, so
+> keeping that in is probably worthwhile.
 
-Optimize this a bit by deferring the removal from the blocked_list until
-we're either applying or cancelling the lock. By doing this, and using a
-lockless list_empty check, we can avoid taking the file_lock_lock in
-many cases.
+Yep, we need to keep this. FWIW, lslocks(8) relies on /proc/locks.
 
-Because the fl_link check is lockless, we must ensure that only the task
-that "owns" the request manipulates the fl_link. Also, with this change,
-it's possible that we'll see an entry on the blocked_list that has a
-NULL fl_next pointer. In that event, just ignore it and continue walking
-the list.
-
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
----
- fs/locks.c |   29 +++++++++++++++++++++++------
- 1 files changed, 23 insertions(+), 6 deletions(-)
-
-diff --git a/fs/locks.c b/fs/locks.c
-index 055c06c..fc35b9e 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -520,7 +520,6 @@ locks_delete_global_locks(struct file_lock *waiter)
- static void __locks_delete_block(struct file_lock *waiter)
- {
- 	list_del_init(&waiter->fl_block);
--	locks_delete_global_blocked(waiter);
- 	waiter->fl_next = NULL;
- }
- 
-@@ -704,13 +703,16 @@ EXPORT_SYMBOL(posix_test_lock);
- /* Find a lock that the owner of the given block_fl is blocking on. */
- static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
- {
--	struct file_lock *fl;
-+	struct file_lock *fl, *ret = NULL;
- 
- 	list_for_each_entry(fl, &blocked_list, fl_link) {
--		if (posix_same_owner(fl, block_fl))
--			return fl->fl_next;
-+		if (posix_same_owner(fl, block_fl)) {
-+			ret = fl->fl_next;
-+			if (likely(ret))
-+				break;
-+		}
- 	}
--	return NULL;
-+	return ret;
- }
- 
- static int posix_locks_deadlock(struct file_lock *caller_fl,
-@@ -865,7 +867,8 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 				goto out;
- 			error = FILE_LOCK_DEFERRED;
- 			locks_insert_block(fl, request);
--			locks_insert_global_blocked(request);
-+			if (list_empty(&request->fl_link))
-+				locks_insert_global_blocked(request);
- 			goto out;
-   		}
-   	}
-@@ -876,6 +879,16 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 		goto out;
- 
- 	/*
-+	 * Now that we know the request is no longer blocked, we can take it
-+	 * off the global list. Some callers send down partially initialized
-+	 * requests, so we only do this if FL_SLEEP is set. Also, avoid taking
-+	 * the lock if the list is empty, as that indicates a request that
-+	 * never blocked.
-+	 */
-+	if ((request->fl_flags & FL_SLEEP) && !list_empty(&request->fl_link))
-+		locks_delete_global_blocked(request);
-+
-+	/*
- 	 * Find the first old lock with the same owner as the new lock.
- 	 */
- 	
-@@ -1069,6 +1082,7 @@ int posix_lock_file_wait(struct file *filp, struct file_lock *fl)
- 			continue;
- 
- 		locks_delete_block(fl);
-+		locks_delete_global_blocked(fl);
- 		break;
- 	}
- 	return error;
-@@ -1147,6 +1161,7 @@ int locks_mandatory_area(int read_write, struct inode *inode,
- 		}
- 
- 		locks_delete_block(&fl);
-+		locks_delete_global_blocked(&fl);
- 		break;
- 	}
- 
-@@ -1859,6 +1874,7 @@ static int do_lock_file_wait(struct file *filp, unsigned int cmd,
- 			continue;
- 
- 		locks_delete_block(fl);
-+		locks_delete_global_blocked(fl);
- 		break;
- 	}
- 
-@@ -2160,6 +2176,7 @@ posix_unblock_lock(struct file *filp, struct file_lock *waiter)
- 	else
- 		status = -ENOENT;
- 	spin_unlock(&inode->i_lock);
-+	locks_delete_global_blocked(waiter);
- 	return status;
- }
- 
--- 
-1.7.1
+Thanks,
+Davidlohr
