@@ -1,43 +1,65 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+From: Jeff Layton <jlayton@redhat.com>
 Subject: Re: [PATCH v1 11/11] locks: give the blocked_hash its own spinlock
-Date: Tue, 4 Jun 2013 10:56:56 -0400
-Message-ID: <20130604105656.18663efa@corrin.poochiereds.net>
+Date: Tue, 4 Jun 2013 11:15:02 -0400
+Message-ID: <20130604111502.6231d010@corrin.poochiereds.net>
 References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
 	<1370056054-25449-12-git-send-email-jlayton@redhat.com>
 	<51ADF789.70906@samba.org>
 	<20130604144640.GA7730@infradead.org>
+	<20130604145322.GH2109@fieldses.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Cc: "Stefan (metze) Metzmacher" <metze-eUNUBHrolfbYtjvyW6yDsg@public.gmane.org>,
-	viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-To: Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20130604144640.GA7730-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	"Stefan (metze) Metzmacher" <metze@samba.org>,
+	viro@zeniv.linux.org.uk, matthew@wil.cx,
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	cluster-devel@redhat.com, sage@inktank.com,
+	samba-technical@lists.samba.org, Trond.Myklebust@netapp.com,
+	linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
+	dhowells@redhat.com, smfrench@gmail.com,
+	linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
+	akpm@linux-foundation.org, swhiteho@redhat.com
+To: "J. Bruce Fields" <bfields@fieldses.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20130604145322.GH2109@fieldses.org>
+Sender: linux-kernel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Tue, 4 Jun 2013 07:46:40 -0700
-Christoph Hellwig <hch-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org> wrote:
+On Tue, 4 Jun 2013 10:53:22 -0400
+"J. Bruce Fields" <bfields@fieldses.org> wrote:
 
-> Having RCU for modification mostly workloads never is a good idea, so
-> I don't think it makes sense to mention it here.
+> On Tue, Jun 04, 2013 at 07:46:40AM -0700, Christoph Hellwig wrote:
+> > Having RCU for modification mostly workloads never is a good idea, so
+> > I don't think it makes sense to mention it here.
+> > 
+> > If you care about the overhead it's worth trying to use per-cpu lists,
+> > though.
 > 
-> If you care about the overhead it's worth trying to use per-cpu lists,
-> though.
+> Yes.  The lock and unlock could happen on different CPU's--but I think
+> you can make the rule that the lock stays associated with the list it
+> was first put on, and then it's correct in general and hopefully quick
+> in the common case.
 > 
 
-Yeah, I looked at those too in an earlier set and it did help some.
-Moving to a hashtable for the blocked_list really seemed to help the
-most there, but percpu lists with lglocks or something might help a lot
-on the file_lock_list.
+It's important to distinguish between the blocked_list/hash and the
+file_lock_list. Yes, they use the same embedded list_head or hlist_node
+in the file_lock, but they have very different characteristics and use
+cases.
+
+In the testing I did, having a hashtable for the blocked locks helped a
+lot more than a percpu list. The trick with deadlock detection is to
+ensure that you don't spend a lot of time walking the lists. Since we
+do deadlock detection frequently, we need to optimize for that case.
+
+For the file_lock_list, it might make sense to have percpu hlists with
+an lglock however. The thing to note here is that the file_lock_list is
+almost never read. Only /proc/locks uses it, so anything we can do to
+optimize the list manipulation is probably worth it.
+
+All that said, I'm leery about changing too much of this code too fast.
+It's pretty old and poorly understood, so I think we need to be
+cautious and take an incremental approach to changing it.
 
 -- 
-Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Jeff Layton <jlayton@redhat.com>
