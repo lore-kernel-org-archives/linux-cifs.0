@@ -1,99 +1,81 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: Re: [PATCH v1 07/11] locks: only pull entries off of blocked_list
- when they are really unblocked
-Date: Wed, 5 Jun 2013 08:38:59 -0400
-Message-ID: <20130605083859.72c855cd@corrin.poochiereds.net>
+From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Subject: Re: [PATCH v1 08/11] locks: convert fl_link to a hlist_node
+Date: Wed, 5 Jun 2013 08:46:11 -0400
+Message-ID: <20130605124611.GB24193@fieldses.org>
 References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
-	<1370056054-25449-8-git-send-email-jlayton@redhat.com>
-	<20130604215839.GD15594@fieldses.org>
-	<20130605073822.4d67c57c@corrin.poochiereds.net>
-	<20130605122432.GA24193@fieldses.org>
+ <1370056054-25449-9-git-send-email-jlayton@redhat.com>
+ <20130604215950.GE15594@fieldses.org>
+ <20130605074309.051ff75f@corrin.poochiereds.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Cc: viro@zeniv.linux.org.uk, matthew@wil.cx, dhowells@redhat.com,
-	sage@inktank.com, smfrench@gmail.com, swhiteho@redhat.com,
-	Trond.Myklebust@netapp.com, akpm@linux-foundation.org,
-	linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, cluster-devel@redhat.com,
-	linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	piastryyy@gmail.com
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Return-path: <ceph-devel-owner@vger.kernel.org>
-In-Reply-To: <20130605122432.GA24193@fieldses.org>
-Sender: ceph-devel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
+	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
+	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
+	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <20130605074309.051ff75f-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-On Wed, 5 Jun 2013 08:24:32 -0400
-"J. Bruce Fields" <bfields@fieldses.org> wrote:
-
-> On Wed, Jun 05, 2013 at 07:38:22AM -0400, Jeff Layton wrote:
-> > On Tue, 4 Jun 2013 17:58:39 -0400
-> > "J. Bruce Fields" <bfields@fieldses.org> wrote:
+On Wed, Jun 05, 2013 at 07:43:09AM -0400, Jeff Layton wrote:
+> On Tue, 4 Jun 2013 17:59:50 -0400
+> "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org> wrote:
+> 
+> > On Fri, May 31, 2013 at 11:07:31PM -0400, Jeff Layton wrote:
+> > > Testing has shown that iterating over the blocked_list for deadlock
+> > > detection turns out to be a bottleneck. In order to alleviate that,
+> > > begin the process of turning it into a hashtable. We start by turning
+> > > the fl_link into a hlist_node and the global lists into hlists. A later
+> > > patch will do the conversion of the blocked_list to a hashtable.
 > > 
-> > > On Fri, May 31, 2013 at 11:07:30PM -0400, Jeff Layton wrote:
-> > > > Currently, when there is a lot of lock contention the kernel spends an
-> > > > inordinate amount of time taking blocked locks off of the global
-> > > > blocked_list and then putting them right back on again. When all of this
-> > > > code was protected by a single lock, then it didn't matter much, but now
-> > > > it means a lot of file_lock_lock thrashing.
-> > > > 
-> > > > Optimize this a bit by deferring the removal from the blocked_list until
-> > > > we're either applying or cancelling the lock. By doing this, and using a
-> > > > lockless list_empty check, we can avoid taking the file_lock_lock in
-> > > > many cases.
-> > > > 
-> > > > Because the fl_link check is lockless, we must ensure that only the task
-> > > > that "owns" the request manipulates the fl_link. Also, with this change,
-> > > > it's possible that we'll see an entry on the blocked_list that has a
-> > > > NULL fl_next pointer. In that event, just ignore it and continue walking
-> > > > the list.
-> > > 
-> > > OK, that sounds safe as in it shouldn't crash, but does the deadlock
-> > > detection still work, or can it miss loops?
-> > > 
-> > > Those locks that are temporarily NULL would previously not have been on
-> > > the list at all, OK, but...  I'm having trouble reasoning about how this
-> > > works now.
-> > > 
-> > > Previously a single lock was held interrupted across
-> > > posix_locks_deadlock and locks_insert_block() which guaranteed we
-> > > shouldn't be adding a loop, is that still true?
-> > > 
-> > > --b.
-> > > 
+> > Even simpler would be if we could add a pointer to the (well, a) lock
+> > that a lockowner is blocking on, and then we'd just have to follow a
+> > pointer.  I haven't thought that through, though, perhaps that's hard ot
+> > make work....
 > > 
-> > I had thought it was when I originally looked at this, but now that I
-> > consider it again I think you may be correct and that there are possible
-> > races here. Since we might end up reblocking behind a different lock
-> > without taking the global spinlock we could flip to blocking behind a
-> > different lock such that a loop is created if you had a complex (>2)
-> > chain of locks.
+> > --b.
 > > 
-> > I think I'm going to have to drop this approach and instead make it so
-> > that the deadlock detection and insertion into the global blocker
-> > list/hash are atomic.
 > 
-> Right.  Once you drop the lock you can no longer be sure that what you
-> learned about the file-lock graph stays true.
+> I considered that as well and it makes sense for the simple local
+> filesystem case where you just track ownership based on fl_owner_t.
 > 
-> > Ditto for locks_wake_up_blocks on posix locks and
-> > taking the entries off the list/hash.
-> 
-> Here I'm not sure what you mean.
-> 
+> But...what about lockd? It considers ownership to be a tuple of the
+> nlm_host and the pid sent in a lock request. I can't seem to wrap my
+> brain around how to make such an approach work there.
 
-Basically, I mean that rather than setting the fl_next pointer to NULL
-while holding only the inode lock and then ignoring those locks in the
-deadlock detection code, we should additionally take the global lock in
-locks_wake_up_blocks too and take the blocked locks off the global list
-and the i_flock list at the same time.
+I wonder if we could do something vaguely like
 
-That actually might not be completely necessary, but it'll make the
-logic clearer and easier to understand and probably won't hurt
-performance too much. Again, I'll need to do some perf testing to be
-sure.
+	struct lock_owner_common {
+		struct file_lock *blocker;
+	};
 
--- 
-Jeff Layton <jlayton@redhat.com>
+	struct nlmsvc_lock_owner {
+		struct lock_owner_common owner;
+		unsigned int client_pid;
+	};
+
+and make fl_owner a (struct lock_owner_common *) and have lockd create
+nlmsvc_lock_owners as necessary on the fly.  The lm_compare_owner
+callback could then be replaced by a pointer comparison.  I'm not sure
+what kind of locking or refcounting might be needed.  But...
+
+> I'll confess though that I haven't tried *too* hard yet
+
+... me neither, so...
+
+> though since I had bigger problems to sort through at the time. Maybe
+> we can consider that for a later set?
+
+sounds fine.
+
+--b.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
