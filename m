@@ -1,107 +1,50 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH v1 07/11] locks: only pull entries off of blocked_list
- when they are really unblocked
-Date: Wed, 5 Jun 2013 08:59:06 -0400
-Message-ID: <20130605125906.GC24193@fieldses.org>
-References: <1370056054-25449-1-git-send-email-jlayton@redhat.com>
- <1370056054-25449-8-git-send-email-jlayton@redhat.com>
- <20130604215839.GD15594@fieldses.org>
- <20130605073822.4d67c57c@corrin.poochiereds.net>
- <20130605122432.GA24193@fieldses.org>
- <20130605083859.72c855cd@corrin.poochiereds.net>
+From: Dave Chinner <david@fromorbit.com>
+Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
+Date: Thu, 6 Jun 2013 13:48:32 +1000
+Message-ID: <20130606034832.GV29338@dastard>
+References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
+ <20130523094201.GA24543@dastard>
+ <519E8B5F.3080905@hp.com>
+ <20130527020903.GR29466@dastard>
+ <51A624E2.3000301@hp.com>
+ <20130529184640.GA3243@fieldses.org>
+ <20130529203700.GM6123@two.firstfloor.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "J. Bruce Fields" <bfields@fieldses.org>,
+	Waiman Long <waiman.long@hp.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jeff Layton <jlayton@redhat.com>,
+	Miklos Szeredi <mszeredi@suse.cz>, Ian Kent <raven@themaw.net>,
+	Sage Weil <sage@inktank.com>, Steve French <sfrench@samba.org>,
+	Trond Myklebust <Trond.Myklebust@netapp.com>,
+	Eric Paris <eparis@redhat.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, autofs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	"Chandramouleeswaran, Aswin" <aswin@hp.com>,
+	"Norton, Scott J" <scott.norton@hp.com>
+To: Andi Kleen <andi@firstfloor.org>
+Return-path: <autofs-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20130605083859.72c855cd-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+In-Reply-To: <20130529203700.GM6123@two.firstfloor.org>
+Sender: autofs-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-On Wed, Jun 05, 2013 at 08:38:59AM -0400, Jeff Layton wrote:
-> On Wed, 5 Jun 2013 08:24:32 -0400
-> "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org> wrote:
+On Wed, May 29, 2013 at 10:37:00PM +0200, Andi Kleen wrote:
+> > As Dave said before, is the last path component sufficient?  Or how
+> > about an inode number?
 > 
-> > On Wed, Jun 05, 2013 at 07:38:22AM -0400, Jeff Layton wrote:
-> > > On Tue, 4 Jun 2013 17:58:39 -0400
-> > > "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org> wrote:
-> > > 
-> > > > On Fri, May 31, 2013 at 11:07:30PM -0400, Jeff Layton wrote:
-> > > > > Currently, when there is a lot of lock contention the kernel spends an
-> > > > > inordinate amount of time taking blocked locks off of the global
-> > > > > blocked_list and then putting them right back on again. When all of this
-> > > > > code was protected by a single lock, then it didn't matter much, but now
-> > > > > it means a lot of file_lock_lock thrashing.
-> > > > > 
-> > > > > Optimize this a bit by deferring the removal from the blocked_list until
-> > > > > we're either applying or cancelling the lock. By doing this, and using a
-> > > > > lockless list_empty check, we can avoid taking the file_lock_lock in
-> > > > > many cases.
-> > > > > 
-> > > > > Because the fl_link check is lockless, we must ensure that only the task
-> > > > > that "owns" the request manipulates the fl_link. Also, with this change,
-> > > > > it's possible that we'll see an entry on the blocked_list that has a
-> > > > > NULL fl_next pointer. In that event, just ignore it and continue walking
-> > > > > the list.
-> > > > 
-> > > > OK, that sounds safe as in it shouldn't crash, but does the deadlock
-> > > > detection still work, or can it miss loops?
-> > > > 
-> > > > Those locks that are temporarily NULL would previously not have been on
-> > > > the list at all, OK, but...  I'm having trouble reasoning about how this
-> > > > works now.
-> > > > 
-> > > > Previously a single lock was held interrupted across
-> > > > posix_locks_deadlock and locks_insert_block() which guaranteed we
-> > > > shouldn't be adding a loop, is that still true?
-> > > > 
-> > > > --b.
-> > > > 
-> > > 
-> > > I had thought it was when I originally looked at this, but now that I
-> > > consider it again I think you may be correct and that there are possible
-> > > races here. Since we might end up reblocking behind a different lock
-> > > without taking the global spinlock we could flip to blocking behind a
-> > > different lock such that a loop is created if you had a complex (>2)
-> > > chain of locks.
-> > > 
-> > > I think I'm going to have to drop this approach and instead make it so
-> > > that the deadlock detection and insertion into the global blocker
-> > > list/hash are atomic.
-> > 
-> > Right.  Once you drop the lock you can no longer be sure that what you
-> > learned about the file-lock graph stays true.
-> > 
-> > > Ditto for locks_wake_up_blocks on posix locks and
-> > > taking the entries off the list/hash.
-> > 
-> > Here I'm not sure what you mean.
-> > 
+> Neither works, the profiler needs to find the file and read it.
 > 
-> Basically, I mean that rather than setting the fl_next pointer to NULL
-> while holding only the inode lock and then ignoring those locks in the
-> deadlock detection code, we should additionally take the global lock in
-> locks_wake_up_blocks too and take the blocked locks off the global list
-> and the i_flock list at the same time.
+> inode searching would be incredible expensive, unless the file system
+> provided a "open-by-inode" primitive
 
-OK, thanks, got it.  I have a hard time thinking about that.... But yes
-it bothers me that the deadlock detection code could see an out-of-date
-value of fl_next, and I can't convince myself that this wouldn't result
-in false positives or false negatives.
+That's effectively what fs/fhandle.c gives you.
 
-> That actually might not be completely necessary, but it'll make the
-> logic clearer and easier to understand and probably won't hurt
-> performance too much. Again, I'll need to do some perf testing to be
-> sure.
+Cheers,
 
-OK!
-
---b.
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
