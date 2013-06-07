@@ -1,81 +1,48 @@
-From: sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
-Subject: accessing windows share with trusted Mit's kerberos realm
- credentials
-Date: Fri, 07 Jun 2013 12:01:17 +0200
-Message-ID: <1605453035.63639.1370599277400.JavaMail.www@wwinf8305>
-Reply-To: sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
+From: Ketil Froyn <ketil-wcohQK4BhvFBDLzU/O5InQ@public.gmane.org>
+Subject: Linux CIFS and Nexenta compatibility issue
+Date: Fri, 7 Jun 2013 13:15:53 +0200
+Message-ID: <CAPcdcpJ4CjPDVB0SLNkouugubuif_z0JiV24QwwrQwPMFoTefQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=ISO-8859-1
 To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
+Hi,
 
+I have a Nexenta system (based on OpenSolaris/IllumOS) running ZFS
+shared with CIFS. After upgrading to Ubuntu 13.04, I'm unable to mount
+the Nexenta CIFS shares. I've posted an Ubuntu bug report here with
+details (though I'm not sure cifs-utils was the right place to report
+this), including cifsFYI enabled trace of the mount operation:
 
+https://bugs.launchpad.net/ubuntu/+source/cifs-utils/+bug/1185025
 
+In the test results shown, I had specified my username and password to
+mount. I have since discovered that when specifying my
+username/password directly to mount, I am able to mount the shares
+with the sec=ntlm or sec=ntlmv2 options. However, I've used
+Likewise-Open to sign my desktop into the AD domain, so that any AD
+user ID can log on to Ubuntu, and then get CIFS shares automounted
+with the user's credentials. I guess mount uses sec=krb5 to mount
+these shares.  That still fails with the same log output. This works
+fine on all the shares except Nexenta shares, and with Ubuntu 12.10
+the Nexenta shares worked fine.
 
-Hello everybody,
-I am trying to mount windows share on a windows 2008 ad server from lin=
-ux. An easy step, but ...
-The Windows Domain trust a MIT Kerberos Realm
-The users are mapped with a kerberos principal
-The mount work with the Active Directory password , or kerberos ticket =
-but NOT with MIT'password or tickets...
+So there appears to be some sort of CIFS compatibility issue between
+Nexenta OS 3.1.3.5 and Ubuntu 13.04. In short, all other OS-es
+(Windows, Mac, other versions of Ubuntu) work with the Nexenta OS
+3.1.3.5 CIFS server and all other CIFS servers in the domain, and
+Ubuntu 13.04 works with all other CIFS servers in the domain, but not
+the Nexenta 3.1.3.5 server. So something in the linux CIFS codebase
+between Ubuntu 12.10 and 13.04 appears to have triggered this error.
 
+Is there anything else I can do to find out exactly what is happening,
+and whether this is linux CIFS' or Nexenta OS's fault, or a
+combination?
 
-The Trust works well,=20
-I have got no problem with Windows 7 joined domain computer for accessi=
-ng the shares.
-It don't work with windows 7 non domain joined computer.
+Ubuntu 13.04 uses cifs-utils 5.5, presumably with some Ubuntu patches,
+and linux kernel 3.8.0, presumably also with Ubuntu patches.
 
-The authentication work with linux with a mix of winbind and pam_krb5
-Somebody does have an idea ?
-Thanks !!
-Regards
-Serge
-
-Here some basic information
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[root@confucius ~]# mount.cifs -V
-mount.cifs version: 4.8.1
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-mount -t cifs //dc1/data/cnsxxxxa /mnt -o username=3Dcnsxxxxa=20
-work with the active's directory password but not with the mit's
-
-[root@confucius ~]# mount -t cifs //dc1/data/cnsxxxxa /mnt -o username=3D=
-cnsxxxxa,domain=3DKERBEROS.REALM
-do not help
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-with AD kerberos ticket :
-kinit cnsxxxxa-aIalqPAc0dg@public.gmane.org
-Password for cnsxxxxa-aIalqPAc0dg@public.gmane.org
-[root@confucius ~]# mount -t cifs //dc1/data/cnsxxxxa /mnt -o sec=3Dkrb=
-5i
-
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-with MIT kerberos ticket :
-[root@confucius ~]# kinit cnsxxxxa
-Password for cnsxxxxa-khcJi3VkZSyWBmc9DYqwOg@public.gmane.org:
-[root@confucius ~]# mount -t cifs //dc1/data/cnsxxxxa /mnt -o sec=3Dkrb=
-5i
-mount error(5): Input/output error
-
-I have added this to /etc/requestkey.conf
-create cifs.spnego * * /usr/sbin/cifs.upcall %k
-create dns_resolver * * /usr/sbin/cifs.upcall %k
-
-Une messagerie gratuite, garantie =C3=A0 vie et des services en plus, =C3=
-=A7a vous tente ?
-Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
+Regards, Ketil
