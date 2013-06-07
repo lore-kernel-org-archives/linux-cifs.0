@@ -1,50 +1,81 @@
-From: Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCH 0/3 v3] dcache: make it more scalable on large system
-Date: Thu, 6 Jun 2013 13:48:32 +1000
-Message-ID: <20130606034832.GV29338@dastard>
-References: <1369273048-60256-1-git-send-email-Waiman.Long@hp.com>
- <20130523094201.GA24543@dastard>
- <519E8B5F.3080905@hp.com>
- <20130527020903.GR29466@dastard>
- <51A624E2.3000301@hp.com>
- <20130529184640.GA3243@fieldses.org>
- <20130529203700.GM6123@two.firstfloor.org>
+From: sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
+Subject: accessing windows share with trusted Mit's kerberos realm
+ credentials
+Date: Fri, 07 Jun 2013 12:01:17 +0200
+Message-ID: <1605453035.63639.1370599277400.JavaMail.www@wwinf8305>
+Reply-To: sergio.conrad-QFKgK+z4sOrR7s880joybQ@public.gmane.org
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: "J. Bruce Fields" <bfields@fieldses.org>,
-	Waiman Long <waiman.long@hp.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jeff Layton <jlayton@redhat.com>,
-	Miklos Szeredi <mszeredi@suse.cz>, Ian Kent <raven@themaw.net>,
-	Sage Weil <sage@inktank.com>, Steve French <sfrench@samba.org>,
-	Trond Myklebust <Trond.Myklebust@netapp.com>,
-	Eric Paris <eparis@redhat.com>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, autofs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	"Chandramouleeswaran, Aswin" <aswin@hp.com>,
-	"Norton, Scott J" <scott.norton@hp.com>
-To: Andi Kleen <andi@firstfloor.org>
-Return-path: <autofs-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20130529203700.GM6123@two.firstfloor.org>
-Sender: autofs-owner@vger.kernel.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Wed, May 29, 2013 at 10:37:00PM +0200, Andi Kleen wrote:
-> > As Dave said before, is the last path component sufficient?  Or how
-> > about an inode number?
-> 
-> Neither works, the profiler needs to find the file and read it.
-> 
-> inode searching would be incredible expensive, unless the file system
-> provided a "open-by-inode" primitive
 
-That's effectively what fs/fhandle.c gives you.
 
-Cheers,
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+
+Hello everybody,
+I am trying to mount windows share on a windows 2008 ad server from lin=
+ux. An easy step, but ...
+The Windows Domain trust a MIT Kerberos Realm
+The users are mapped with a kerberos principal
+The mount work with the Active Directory password , or kerberos ticket =
+but NOT with MIT'password or tickets...
+
+
+The Trust works well,=20
+I have got no problem with Windows 7 joined domain computer for accessi=
+ng the shares.
+It don't work with windows 7 non domain joined computer.
+
+The authentication work with linux with a mix of winbind and pam_krb5
+Somebody does have an idea ?
+Thanks !!
+Regards
+Serge
+
+Here some basic information
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[root@confucius ~]# mount.cifs -V
+mount.cifs version: 4.8.1
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+mount -t cifs //dc1/data/cnsxxxxa /mnt -o username=3Dcnsxxxxa=20
+work with the active's directory password but not with the mit's
+
+[root@confucius ~]# mount -t cifs //dc1/data/cnsxxxxa /mnt -o username=3D=
+cnsxxxxa,domain=3DKERBEROS.REALM
+do not help
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+with AD kerberos ticket :
+kinit cnsxxxxa-aIalqPAc0dg@public.gmane.org
+Password for cnsxxxxa-aIalqPAc0dg@public.gmane.org
+[root@confucius ~]# mount -t cifs //dc1/data/cnsxxxxa /mnt -o sec=3Dkrb=
+5i
+
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+with MIT kerberos ticket :
+[root@confucius ~]# kinit cnsxxxxa
+Password for cnsxxxxa-khcJi3VkZSyWBmc9DYqwOg@public.gmane.org:
+[root@confucius ~]# mount -t cifs //dc1/data/cnsxxxxa /mnt -o sec=3Dkrb=
+5i
+mount error(5): Input/output error
+
+I have added this to /etc/requestkey.conf
+create cifs.spnego * * /usr/sbin/cifs.upcall %k
+create dns_resolver * * /usr/sbin/cifs.upcall %k
+
+Une messagerie gratuite, garantie =C3=A0 vie et des services en plus, =C3=
+=A7a vous tente ?
+Je cr=C3=A9e ma bo=C3=AEte mail www.laposte.net
