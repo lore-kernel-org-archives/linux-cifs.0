@@ -1,35 +1,38 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: [GIT] CIFS Fix
-Date: Fri, 7 Jun 2013 15:14:33 -0500
-Message-ID: <CAH2r5muw-8mpY68trpPuMjm8+CRwJ5vmt80fTTUsZOTxwXsiKw@mail.gmail.com>
+From: =?ISO-8859-1?Q?Peter_Valdemar_M=F8rch?= <peter-Fsal10Ed6HEAvxtiuMwx3w@public.gmane.org>
+Subject: How to automatically umount a "broken" CIFS mount?
+Date: Sat, 8 Jun 2013 13:39:33 +0200
+Message-ID: <CANh5envke45j_91cZHNDjL=r7pn489_NJ-454euD6O1bRbfjAw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, LKML <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Linus Torvalds <torvalds-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org>
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+To: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Fix one byte buffer overrun with prefixpaths on cifs mounts which can
-cause a problem with mount depending on the string length.
+Hi,
 
-The following changes since commit a93cb29acaa8f75618c3f202d1cf43c231984644:
+Is there some way to detect if the mount no longer "works"? There
+could be many reasons for this: network error, Windows server has been
+shut down, etc.
 
-  Merge branch 'drm-fixes' of
-git://people.freedesktop.org/~airlied/linux (2013-05-31 16:04:05
-+1000)
+I can of course periodically do this:
 
-are available in the git repository at:
+> time ls -l /mnt/cifs/
+ls: cannot access /mnt/cifs/: Host is down
 
-  git://git.samba.org/sfrench/cifs-2.6.git for-3.10
+real    0m10.000s
+user    0m0.000s
+sys    0m0.000s
 
-Jeff Layton (1):
-      cifs: fix off-by-one bug in build_unc_path_to_root
+And use that error to umount, which is what I'll do if I don't have
+any other options.
 
- fs/cifs/connect.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+But I'm hoping for some timeout / auto-umount mechanism or some way to
+query if the mount is still "good", that doesn't take 10 seconds pr.
+mountpoint...
 
--- 
-Thanks,
-
-Steve
+Peter
+--
+Peter Valdemar M=F8rch
+http://www.morch.com
