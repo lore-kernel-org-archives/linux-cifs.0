@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v2 09/14] locks: convert fl_link to a
-	hlist_node
-Date: Tue, 11 Jun 2013 07:09:03 -0400
-Message-ID: <1370948948-31784-10-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 04/14] locks: make "added" in
+	__posix_lock_file a bool
+Date: Tue, 11 Jun 2013 07:08:58 -0400
+Message-ID: <1370948948-31784-5-git-send-email-jlayton@redhat.com>
 References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         cluster-devel@redhat.com, sage@inktank.com,
@@ -25,137 +25,54 @@ Sender: cluster-devel-bounces@redhat.com
 Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-Testing has shown that iterating over the blocked_list for deadlock
-detection turns out to be a bottleneck. In order to alleviate that,
-begin the process of turning it into a hashtable. We start by turning
-the fl_link into a hlist_node and the global lists into hlists. A later
-patch will do the conversion of the blocked_list to a hashtable.
+...save 3 bytes of stack space.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- fs/locks.c         |   26 +++++++++++++-------------
- include/linux/fs.h |    2 +-
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ fs/locks.c |    9 +++++----
+ 1 files changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index b8cd1b1..28959bc 100644
+index 1e6301b..c186649 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -153,8 +153,8 @@ int lease_break_time = 45;
- #define for_each_lock(inode, lockp) \
- 	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
+@@ -791,7 +791,8 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 	struct file_lock *left = NULL;
+ 	struct file_lock *right = NULL;
+ 	struct file_lock **before;
+-	int error, added = 0;
++	int error;
++	bool added = false;
  
--static LIST_HEAD(file_lock_list);
--static LIST_HEAD(blocked_list);
-+static HLIST_HEAD(file_lock_list);
-+static HLIST_HEAD(blocked_list);
- 
- /* Protects the two list heads above */
- static DEFINE_SPINLOCK(file_lock_lock);
-@@ -163,7 +163,7 @@ static struct kmem_cache *filelock_cache __read_mostly;
- 
- static void locks_init_lock_heads(struct file_lock *fl)
- {
--	INIT_LIST_HEAD(&fl->fl_link);
-+	INIT_HLIST_NODE(&fl->fl_link);
- 	INIT_LIST_HEAD(&fl->fl_block);
- 	init_waitqueue_head(&fl->fl_wait);
- }
-@@ -197,7 +197,7 @@ void locks_free_lock(struct file_lock *fl)
- {
- 	BUG_ON(waitqueue_active(&fl->fl_wait));
- 	BUG_ON(!list_empty(&fl->fl_block));
--	BUG_ON(!list_empty(&fl->fl_link));
-+	BUG_ON(!hlist_unhashed(&fl->fl_link));
- 
- 	locks_release_private(fl);
- 	kmem_cache_free(filelock_cache, fl);
-@@ -475,13 +475,13 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
- static inline void
- locks_insert_global_blocked(struct file_lock *waiter)
- {
--	list_add(&waiter->fl_link, &blocked_list);
-+	hlist_add_head(&waiter->fl_link, &blocked_list);
- }
- 
- static inline void
- __locks_delete_global_blocked(struct file_lock *waiter)
- {
--	list_del_init(&waiter->fl_link);
-+	hlist_del_init(&waiter->fl_link);
- }
- 
- static inline void
-@@ -496,7 +496,7 @@ static inline void
- locks_insert_global_locks(struct file_lock *waiter)
- {
- 	spin_lock(&file_lock_lock);
--	list_add_tail(&waiter->fl_link, &file_lock_list);
-+	hlist_add_head(&waiter->fl_link, &file_lock_list);
- 	spin_unlock(&file_lock_lock);
- }
- 
-@@ -504,7 +504,7 @@ static inline void
- locks_delete_global_locks(struct file_lock *waiter)
- {
- 	spin_lock(&file_lock_lock);
--	list_del_init(&waiter->fl_link);
-+	hlist_del_init(&waiter->fl_link);
- 	spin_unlock(&file_lock_lock);
- }
- 
-@@ -729,7 +729,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
- {
- 	struct file_lock *fl;
- 
--	list_for_each_entry(fl, &blocked_list, fl_link) {
-+	hlist_for_each_entry(fl, &blocked_list, fl_link) {
- 		if (posix_same_owner(fl, block_fl))
- 			return fl->fl_next;
- 	}
-@@ -2286,11 +2286,11 @@ static int locks_show(struct seq_file *f, void *v)
- {
- 	struct file_lock *fl, *bfl;
- 
--	fl = list_entry(v, struct file_lock, fl_link);
-+	fl = hlist_entry(v, struct file_lock, fl_link);
- 
- 	lock_get_status(f, fl, *((loff_t *)f->private), "");
- 
--	list_for_each_entry(bfl, &blocked_list, fl_link) {
-+	hlist_for_each_entry(bfl, &blocked_list, fl_link) {
- 		if (bfl->fl_next == fl)
- 			lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
- 	}
-@@ -2304,14 +2304,14 @@ static void *locks_start(struct seq_file *f, loff_t *pos)
- 
- 	spin_lock(&file_lock_lock);
- 	*p = (*pos + 1);
--	return seq_list_start(&file_lock_list, *pos);
-+	return seq_hlist_start(&file_lock_list, *pos);
- }
- 
- static void *locks_next(struct seq_file *f, void *v, loff_t *pos)
- {
- 	loff_t *p = f->private;
- 	++*p;
--	return seq_list_next(v, &file_lock_list, pos);
-+	return seq_hlist_next(v, &file_lock_list, pos);
- }
- 
- static void locks_stop(struct seq_file *f, void *v)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index e2f896d..3b340f7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -946,7 +946,7 @@ int locks_in_grace(struct net *);
-  */
- struct file_lock {
- 	struct file_lock *fl_next;	/* singly linked list for this inode  */
--	struct list_head fl_link;	/* doubly linked list of all locks */
-+	struct hlist_node fl_link;	/* node in global lists */
- 	struct list_head fl_block;	/* circular list of blocked processes */
- 	fl_owner_t fl_owner;
- 	unsigned int fl_flags;
+ 	/*
+ 	 * We may need two file_lock structures for this operation,
+@@ -885,7 +886,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 				continue;
+ 			}
+ 			request = fl;
+-			added = 1;
++			added = true;
+ 		}
+ 		else {
+ 			/* Processing for different lock types is a bit
+@@ -896,7 +897,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 			if (fl->fl_start > request->fl_end)
+ 				break;
+ 			if (request->fl_type == F_UNLCK)
+-				added = 1;
++				added = true;
+ 			if (fl->fl_start < request->fl_start)
+ 				left = fl;
+ 			/* If the next lock in the list has a higher end
+@@ -926,7 +927,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 				locks_release_private(fl);
+ 				locks_copy_private(fl, request);
+ 				request = fl;
+-				added = 1;
++				added = true;
+ 			}
+ 		}
+ 		/* Go on to next lock.
 -- 
 1.7.1
