@@ -1,93 +1,108 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 01/14] cifs: use posix_unblock_lock instead of locks_delete_block
-Date: Tue, 11 Jun 2013 07:08:55 -0400
-Message-ID: <1370948948-31784-2-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: [PATCH v2 13/14] seq_file: add seq_list_*_percpu helpers
+Date: Tue, 11 Jun 2013 07:09:07 -0400
+Message-ID: <1370948948-31784-14-git-send-email-jlayton@redhat.com>
 References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1370948948-31784-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Cc: dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
+	swhiteho@redhat.com, Trond.Myklebust@netapp.com,
+	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
+	linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, piastryyy@gmail.com
+To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
+Return-path: <ceph-devel-owner@vger.kernel.org>
+In-Reply-To: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-commit 66189be74 (CIFS: Fix VFS lock usage for oplocked files) exported
-the locks_delete_block symbol. There's already an exported helper
-function that provides this capability however, so make cifs use that
-instead and turn locks_delete_block back into a static function.
+When we convert the file_lock_list to a set of percpu lists, we'll need
+a way to iterate over them in order to output /proc/locks info. Add
+some seq_list_*_percpu helpers to handle that.
 
-Note that if fl->fl_next == NULL then this lock has already been through
-locks_delete_block(), so we should be OK to ignore an ENOENT error here
-and simply not retry the lock.
-
-Cc: Pavel Shilovsky <piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Acked-by: J. Bruce Fields <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- fs/cifs/file.c     |    2 +-
- fs/locks.c         |    3 +--
- include/linux/fs.h |    5 -----
- 3 files changed, 2 insertions(+), 8 deletions(-)
+ fs/seq_file.c            |   54 ++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/seq_file.h |    6 +++++
+ 2 files changed, 60 insertions(+), 0 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 48b29d2..44a4f18 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -999,7 +999,7 @@ try_again:
- 		rc = wait_event_interruptible(flock->fl_wait, !flock->fl_next);
- 		if (!rc)
- 			goto try_again;
--		locks_delete_block(flock);
-+		posix_unblock_lock(file, flock);
- 	}
- 	return rc;
+diff --git a/fs/seq_file.c b/fs/seq_file.c
+index 774c1eb..ce9f97a 100644
+--- a/fs/seq_file.c
++++ b/fs/seq_file.c
+@@ -921,3 +921,57 @@ struct hlist_node *seq_hlist_next_rcu(void *v,
+ 		return rcu_dereference(node->next);
  }
-diff --git a/fs/locks.c b/fs/locks.c
-index cb424a4..7a02064 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -496,13 +496,12 @@ static void __locks_delete_block(struct file_lock *waiter)
- 
- /*
-  */
--void locks_delete_block(struct file_lock *waiter)
-+static void locks_delete_block(struct file_lock *waiter)
- {
- 	lock_flocks();
- 	__locks_delete_block(waiter);
- 	unlock_flocks();
- }
--EXPORT_SYMBOL(locks_delete_block);
- 
- /* Insert waiter into blocker's block list.
-  * We use a circular list so that processes can be easily woken up in
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 43db02e..b9d7816 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -1006,7 +1006,6 @@ extern int vfs_setlease(struct file *, long, struct file_lock **);
- extern int lease_modify(struct file_lock **, int);
- extern int lock_may_read(struct inode *, loff_t start, unsigned long count);
- extern int lock_may_write(struct inode *, loff_t start, unsigned long count);
--extern void locks_delete_block(struct file_lock *waiter);
- extern void lock_flocks(void);
- extern void unlock_flocks(void);
- #else /* !CONFIG_FILE_LOCKING */
-@@ -1151,10 +1150,6 @@ static inline int lock_may_write(struct inode *inode, loff_t start,
- 	return 1;
- }
- 
--static inline void locks_delete_block(struct file_lock *waiter)
--{
--}
--
- static inline void lock_flocks(void)
- {
- }
+ EXPORT_SYMBOL(seq_hlist_next_rcu);
++
++/**
++ * seq_hlist_start_precpu - start an iteration of a hlist
++ * @head: pointer to percpu array of struct hlist_heads
++ * @cpu:  pointer to cpu "cursor"
++ * @pos:  start position of sequence
++ *
++ * Called at seq_file->op->start().
++ */
++struct hlist_node *
++seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos)
++{
++	struct hlist_node *node;
++
++	for_each_possible_cpu(*cpu) {
++		hlist_for_each(node, per_cpu_ptr(head, *cpu)) {
++			if (pos-- == 0)
++				return node;
++		}
++	}
++	return NULL;
++}
++EXPORT_SYMBOL(seq_hlist_start_percpu);
++
++/**
++ * seq_hlist_next_percpu - move to the next position of the hlist
++ * @v:    pointer to current hlist_node
++ * @head: pointer to percpu array of struct hlist_heads
++ * @cpu:  pointer to cpu "cursor"
++ * @pos:  start position of sequence
++ *
++ * Called at seq_file->op->next().
++ */
++struct hlist_node *
++seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head,
++			int *cpu, loff_t *pos)
++{
++	struct hlist_node *node = v;
++
++	++*pos;
++
++	if (node->next)
++		return node->next;
++
++	for (*cpu = cpumask_next(*cpu, cpu_possible_mask); *cpu < nr_cpu_ids;
++	     *cpu = cpumask_next(*cpu, cpu_possible_mask)) {
++		struct hlist_head *bucket = per_cpu_ptr(head, *cpu);
++
++		if (!hlist_empty(bucket))
++			return bucket->first;
++	}
++	return NULL;
++}
++EXPORT_SYMBOL(seq_hlist_next_percpu);
+diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
+index 2da29ac..4e32edc 100644
+--- a/include/linux/seq_file.h
++++ b/include/linux/seq_file.h
+@@ -173,4 +173,10 @@ extern struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
+ extern struct hlist_node *seq_hlist_next_rcu(void *v,
+ 						   struct hlist_head *head,
+ 						   loff_t *ppos);
++
++/* Helpers for iterating over per-cpu hlist_head-s in seq_files */
++extern struct hlist_node *seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos);
++
++extern struct hlist_node *seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head, int *cpu, loff_t *pos);
++
+ #endif
 -- 
 1.7.1
+
