@@ -1,165 +1,222 @@
-From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: [PATCH v2 12/14] locks: give the blocked_hash its own spinlock
-Date: Tue, 11 Jun 2013 07:09:06 -0400
-Message-ID: <1370948948-31784-13-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton@redhat.com>
+Subject: [PATCH v2 08/14] locks: ensure that deadlock
+	detection is atomic with respect to blocked_list modification
+Date: Tue, 11 Jun 2013 07:09:02 -0400
+Message-ID: <1370948948-31784-9-git-send-email-jlayton@redhat.com>
 References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
-Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
-	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
-	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
-	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1370948948-31784-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        cluster-devel@redhat.com, sage@inktank.com,
+        samba-technical@lists.samba.org, Trond.Myklebust@netapp.com,
+        linux-kernel@vger.kernel.org, piastryyy@gmail.com,
+        linux-afs@lists.infradead.org, dhowells@redhat.com, smfrench@gmail.com,
+        linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
+        akpm@linux-foundation.org
+To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
+Return-path: <cluster-devel-bounces@redhat.com>
+In-Reply-To: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
+List-Unsubscribe: <https://www.redhat.com/mailman/options/cluster-devel>,
+	<mailto:cluster-devel-request@redhat.com?subject=unsubscribe>
+List-Archive: <https://www.redhat.com/archives/cluster-devel>
+List-Post: <mailto:cluster-devel@redhat.com>
+List-Help: <mailto:cluster-devel-request@redhat.com?subject=help>
+List-Subscribe: <https://www.redhat.com/mailman/listinfo/cluster-devel>,
+	<mailto:cluster-devel-request@redhat.com?subject=subscribe>
+Sender: cluster-devel-bounces@redhat.com
+Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-There's no reason we have to protect the blocked_hash and file_lock_list
-with the same spinlock. With the tests I have, breaking it in two gives
-a barely measurable performance benefit, but it seems reasonable to make
-this locking as granular as possible.
+Sound deadlock detection requires that we hold the file-lock state
+steady while checking for them, and also ensure that updates to that
+state are atomic with respect to those checks.
 
-Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+For the checking and insertion side, push the acquisition of the
+global lock into __posix_lock_file and ensure that checking and update
+of the global lists are done without dropping the lock in between.
+
+On the removal side, when waking up blocked POSIX lock waiters, take
+the global lock before walking the blocked list and dequeue the waiters
+from the global list prior to removal from the i_flock list.
+
+With this, deadlock detection should be race free while we minimize
+excessive file_lock_lock thrashing.
+
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
 ---
- Documentation/filesystems/Locking |   16 ++++++++--------
- fs/locks.c                        |   25 +++++++++++++------------
- 2 files changed, 21 insertions(+), 20 deletions(-)
+ fs/locks.c |   71 +++++++++++++++++++++++++++++++++++++++++++----------------
+ 1 files changed, 52 insertions(+), 19 deletions(-)
 
-diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/Locking
-index ee351ac..8d8d040 100644
---- a/Documentation/filesystems/Locking
-+++ b/Documentation/filesystems/Locking
-@@ -359,20 +359,20 @@ prototypes:
- 
- locking rules:
- 
--			inode->i_lock	file_lock_lock	may block
--lm_compare_owner:	yes		maybe		no
--lm_owner_key		yes		yes		no
--lm_notify:		yes		no		no
--lm_grant:		no		no		no
--lm_break:		yes		no		no
--lm_change		yes		no		no
-+			inode->i_lock	blocked_hash_lock	may block
-+lm_compare_owner:	yes		maybe			no
-+lm_owner_key		yes		yes			no
-+lm_notify:		yes		no			no
-+lm_grant:		no		no			no
-+lm_break:		yes		no			no
-+lm_change		yes		no			no
- 
- 	->lm_compare_owner and ->lm_owner_key are generally called with
- *an* inode->i_lock held. It may not be the i_lock of the inode
- associated with either file_lock argument! This is the case with deadlock
- detection, since the code has to chase down the owners of locks that may
- be entirely unrelated to the one on which the lock is being acquired.
--For deadlock detection however, the file_lock_lock is also held. The
-+For deadlock detection however, the blocked_hash_lock is also held. The
- fact that these locks are held ensures that the file_locks do not
- disappear out from under you while doing the comparison or generating an
- owner key.
 diff --git a/fs/locks.c b/fs/locks.c
-index 11e7784..8124fc1 100644
+index d7342a3..b8cd1b1 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -162,12 +162,11 @@ int lease_break_time = 45;
-  */
- #define BLOCKED_HASH_BITS	7
+@@ -475,16 +475,20 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ static inline void
+ locks_insert_global_blocked(struct file_lock *waiter)
+ {
+-	spin_lock(&file_lock_lock);
+ 	list_add(&waiter->fl_link, &blocked_list);
+-	spin_unlock(&file_lock_lock);
++}
++
++static inline void
++__locks_delete_global_blocked(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
+ }
  
-+static DEFINE_SPINLOCK(blocked_hash_lock);
- static DEFINE_HASHTABLE(blocked_hash, BLOCKED_HASH_BITS);
- 
--static HLIST_HEAD(file_lock_list);
--
--/* Protects the file_lock_list and the blocked_hash */
- static DEFINE_SPINLOCK(file_lock_lock);
-+static HLIST_HEAD(file_lock_list);
- 
- static struct kmem_cache *filelock_cache __read_mostly;
- 
-@@ -505,9 +504,9 @@ __locks_delete_global_blocked(struct file_lock *waiter)
  static inline void
  locks_delete_global_blocked(struct file_lock *waiter)
  {
--	spin_lock(&file_lock_lock);
-+	spin_lock(&blocked_hash_lock);
- 	__locks_delete_global_blocked(waiter);
--	spin_unlock(&file_lock_lock);
-+	spin_unlock(&blocked_hash_lock);
+ 	spin_lock(&file_lock_lock);
+-	list_del_init(&waiter->fl_link);
++	__locks_delete_global_blocked(waiter);
+ 	spin_unlock(&file_lock_lock);
  }
  
- static inline void
-@@ -581,14 +580,14 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
- 
- /*
-  * Wake up processes blocked waiting for blocker. In the FL_POSIX case, we must
-- * also take the global file_lock_lock and dequeue it from the global blocked
-- * list as we wake the processes.
-+ * also take the global blocked_hash_lock and dequeue it from the global
-+ * blocked list as we wake the processes.
-  *
-  * Must be called with the inode->i_lock of the blocker held!
+@@ -509,7 +513,6 @@ locks_delete_global_locks(struct file_lock *waiter)
   */
- static void locks_wake_up_posix_blocks(struct file_lock *blocker)
+ static void __locks_delete_block(struct file_lock *waiter)
  {
--	spin_lock(&file_lock_lock);
-+	spin_lock(&blocked_hash_lock);
- 	while (!list_empty(&blocker->fl_block)) {
- 		struct file_lock *waiter;
- 
-@@ -601,7 +600,7 @@ static void locks_wake_up_posix_blocks(struct file_lock *blocker)
- 		else
- 			wake_up(&waiter->fl_wait);
- 	}
--	spin_unlock(&file_lock_lock);
-+	spin_unlock(&blocked_hash_lock);
+-	locks_delete_global_blocked(waiter);
+ 	list_del_init(&waiter->fl_block);
+ 	waiter->fl_next = NULL;
  }
+@@ -558,6 +561,30 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
+ 	}
+ }
+ 
++/*
++ * Wake up processes blocked waiting for blocker. In the FL_POSIX case, we must
++ * also take the global file_lock_lock and dequeue it from the global blocked
++ * list as we wake the processes.
++ *
++ * Must be called with the inode->i_lock of the blocker held!
++ */
++static void locks_wake_up_posix_blocks(struct file_lock *blocker)
++{
++	spin_lock(&file_lock_lock);
++	while (!list_empty(&blocker->fl_block)) {
++		struct file_lock *waiter;
++
++		waiter = list_first_entry(&blocker->fl_block,
++				struct file_lock, fl_block);
++		__locks_delete_global_blocked(waiter);
++		__locks_delete_block(waiter);
++		if (waiter->fl_lmops && waiter->fl_lmops->lm_notify)
++			waiter->fl_lmops->lm_notify(waiter);
++		else
++			wake_up(&waiter->fl_wait);
++	}
++	spin_unlock(&file_lock_lock);
++}
  /* Insert file lock fl into an inode's lock list at the position indicated
   * by pos. At the same time add the lock to the global file lock list.
-@@ -754,7 +753,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
+  */
+@@ -592,7 +619,11 @@ static void locks_delete_lock(struct file_lock **thisfl_p)
+ 		fl->fl_nspid = NULL;
+ 	}
+ 
+-	locks_wake_up_blocks(fl);
++	if (IS_POSIX(fl))
++		locks_wake_up_posix_blocks(fl);
++	else
++		locks_wake_up_blocks(fl);
++
+ 	locks_free_lock(fl);
+ }
+ 
+@@ -705,6 +736,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
  	return NULL;
  }
  
--/* Must be called with the file_lock_lock held! */
-+/* Must be called with the blocked_hash_lock held! */
++/* Must be called with the file_lock_lock held! */
  static int posix_locks_deadlock(struct file_lock *caller_fl,
  				struct file_lock *block_fl)
  {
-@@ -898,13 +897,13 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+@@ -848,17 +880,13 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
  			if (!(request->fl_flags & FL_SLEEP))
  				goto out;
  			error = -EDEADLK;
--			spin_lock(&file_lock_lock);
-+			spin_lock(&blocked_hash_lock);
- 			if (likely(!posix_locks_deadlock(request, fl))) {
- 				error = FILE_LOCK_DEFERRED;
- 				locks_insert_block(fl, request);
- 				locks_insert_global_blocked(request);
- 			}
--			spin_unlock(&file_lock_lock);
-+			spin_unlock(&blocked_hash_lock);
+-			/*
+-			 * XXX: potential race here. We should be adding the
+-			 * file_lock to the global list before releasing lock.
+-			 */
+ 			spin_lock(&file_lock_lock);
+-			if (posix_locks_deadlock(request, fl))
+-				goto out;
++			if (likely(!posix_locks_deadlock(request, fl))) {
++				error = FILE_LOCK_DEFERRED;
++				locks_insert_block(fl, request);
++				locks_insert_global_blocked(request);
++			}
+ 			spin_unlock(&file_lock_lock);
+-			error = FILE_LOCK_DEFERRED;
+-			locks_insert_block(fl, request);
+-			locks_insert_global_blocked(request);
  			goto out;
    		}
    	}
-@@ -2309,10 +2308,12 @@ static int locks_show(struct seq_file *f, void *v)
- 
- 	lock_get_status(f, fl, *((loff_t *)f->private), "");
- 
-+	spin_lock(&blocked_hash_lock);
- 	hash_for_each(blocked_hash, bkt, bfl, fl_link) {
- 		if (bfl->fl_next == fl)
- 			lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
+@@ -949,7 +977,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 				 * as the change in lock type might satisfy
+ 				 * their needs.
+ 				 */
+-				locks_wake_up_blocks(fl);
++				locks_wake_up_posix_blocks(fl);
+ 				fl->fl_start = request->fl_start;
+ 				fl->fl_end = request->fl_end;
+ 				fl->fl_type = request->fl_type;
+@@ -1001,11 +1029,11 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 			locks_insert_lock(before, left);
+ 		}
+ 		right->fl_start = request->fl_end + 1;
+-		locks_wake_up_blocks(right);
++		locks_wake_up_posix_blocks(right);
  	}
-+	spin_unlock(&blocked_hash_lock);
+ 	if (left) {
+ 		left->fl_end = request->fl_start - 1;
+-		locks_wake_up_blocks(left);
++		locks_wake_up_posix_blocks(left);
+ 	}
+  out:
+ 	spin_unlock(&inode->i_lock);
+@@ -1061,6 +1089,7 @@ int posix_lock_file_wait(struct file *filp, struct file_lock *fl)
+ 		if (!error)
+ 			continue;
  
- 	return 0;
++		locks_delete_global_blocked(fl);
+ 		locks_delete_block(fl);
+ 		break;
+ 	}
+@@ -1139,6 +1168,7 @@ int locks_mandatory_area(int read_write, struct inode *inode,
+ 				continue;
+ 		}
+ 
++		locks_delete_global_blocked(&fl);
+ 		locks_delete_block(&fl);
+ 		break;
+ 	}
+@@ -1851,6 +1881,7 @@ static int do_lock_file_wait(struct file *filp, unsigned int cmd,
+ 		if (!error)
+ 			continue;
+ 
++		locks_delete_global_blocked(fl);
+ 		locks_delete_block(fl);
+ 		break;
+ 	}
+@@ -2148,10 +2179,12 @@ posix_unblock_lock(struct file *filp, struct file_lock *waiter)
+ 	int status = 0;
+ 
+ 	spin_lock(&inode->i_lock);
+-	if (waiter->fl_next)
++	if (waiter->fl_next) {
++		locks_delete_global_blocked(waiter);
+ 		__locks_delete_block(waiter);
+-	else
++	} else {
+ 		status = -ENOENT;
++	}
+ 	spin_unlock(&inode->i_lock);
+ 	return status;
  }
 -- 
 1.7.1
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
