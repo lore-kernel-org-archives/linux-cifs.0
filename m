@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v2 10/14] locks: turn the blocked_list into
-	a hashtable
-Date: Tue, 11 Jun 2013 07:09:04 -0400
-Message-ID: <1370948948-31784-11-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v2 05/14] locks: encapsulate the fl_link
+	list handling
+Date: Tue, 11 Jun 2013 07:08:59 -0400
+Message-ID: <1370948948-31784-6-git-send-email-jlayton@redhat.com>
 References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         cluster-devel@redhat.com, sage@inktank.com,
@@ -25,110 +25,105 @@ Sender: cluster-devel-bounces@redhat.com
 Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-Break up the blocked_list into a hashtable, using the fl_owner as a key.
-This speeds up searching the hash chains, which is especially significant
-for deadlock detection.
-
-Note that the initial implementation assumes that hashing on fl_owner is
-sufficient. In most cases it should be, with the notable exception being
-server-side lockd, which compares ownership using a tuple of the
-nlm_host and the pid sent in the lock request. So, this may degrade to a
-single hash bucket when you only have a single NFS client. That will be
-addressed in a later patch.
-
-The careful observer may note that this patch leaves the file_lock_list
-alone. There's much less of a case for turning the file_lock_list into a
-hashtable. The only user of that list is the code that generates
-/proc/locks, and it always walks the entire list.
+Move the fl_link list handling routines into a separate set of helpers.
+Also move the global list handling out of locks_insert_block, and into
+the caller that ends up triggering it as that allows us to eliminate the
+IS_POSIX check there.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- fs/locks.c |   25 ++++++++++++++++++-------
- 1 files changed, 18 insertions(+), 7 deletions(-)
+ fs/locks.c |   37 +++++++++++++++++++++++++++++++------
+ 1 files changed, 31 insertions(+), 6 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 28959bc..76fb7af 100644
+index c186649..e451d18 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -126,6 +126,7 @@
- #include <linux/time.h>
- #include <linux/rcupdate.h>
- #include <linux/pid_namespace.h>
-+#include <linux/hashtable.h>
- 
- #include <asm/uaccess.h>
- 
-@@ -153,10 +154,19 @@ int lease_break_time = 45;
- #define for_each_lock(inode, lockp) \
- 	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
- 
-+/*
-+ * By breaking up the blocked locks list into a hashtable, we speed up the
-+ * deadlock detection.
-+ *
-+ * FIXME: make this value scale via some heuristic?
-+ */
-+#define BLOCKED_HASH_BITS	7
-+
-+static DEFINE_HASHTABLE(blocked_hash, BLOCKED_HASH_BITS);
-+
- static HLIST_HEAD(file_lock_list);
--static HLIST_HEAD(blocked_list);
- 
--/* Protects the two list heads above */
-+/* Protects the file_lock_list and the blocked_hash */
- static DEFINE_SPINLOCK(file_lock_lock);
- 
- static struct kmem_cache *filelock_cache __read_mostly;
-@@ -475,13 +485,13 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
- static inline void
- locks_insert_global_blocked(struct file_lock *waiter)
- {
--	hlist_add_head(&waiter->fl_link, &blocked_list);
-+	hash_add(blocked_hash, &waiter->fl_link, (unsigned long)waiter->fl_owner);
+@@ -484,13 +484,38 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner;
  }
  
- static inline void
- __locks_delete_global_blocked(struct file_lock *waiter)
++/* Remove a blocker or lock from one of the global lists */
++static inline void
++locks_insert_global_blocked(struct file_lock *waiter)
++{
++	list_add(&waiter->fl_link, &blocked_list);
++}
++
++static inline void
++locks_delete_global_blocked(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
++}
++
++static inline void
++locks_insert_global_locks(struct file_lock *waiter)
++{
++	list_add_tail(&waiter->fl_link, &file_lock_list);
++}
++
++static inline void
++locks_delete_global_locks(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
++}
++
+ /* Remove waiter from blocker's block list.
+  * When blocker ends up pointing to itself then the list is empty.
+  */
+ static void __locks_delete_block(struct file_lock *waiter)
  {
--	hlist_del_init(&waiter->fl_link);
-+	hash_del(&waiter->fl_link);
++	locks_delete_global_blocked(waiter);
+ 	list_del_init(&waiter->fl_block);
+-	list_del_init(&waiter->fl_link);
+ 	waiter->fl_next = NULL;
  }
  
- static inline void
-@@ -729,7 +739,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
+@@ -514,8 +539,6 @@ static void locks_insert_block(struct file_lock *blocker,
+ 	BUG_ON(!list_empty(&waiter->fl_block));
+ 	list_add_tail(&waiter->fl_block, &blocker->fl_block);
+ 	waiter->fl_next = blocker;
+-	if (IS_POSIX(blocker))
+-		list_add(&waiter->fl_link, &blocked_list);
+ }
+ 
+ /*
+@@ -543,13 +566,13 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
+  */
+ static void locks_insert_lock(struct file_lock **pos, struct file_lock *fl)
  {
- 	struct file_lock *fl;
+-	list_add(&fl->fl_link, &file_lock_list);
+-
+ 	fl->fl_nspid = get_pid(task_tgid(current));
  
--	hlist_for_each_entry(fl, &blocked_list, fl_link) {
-+	hash_for_each_possible(blocked_hash, fl, fl_link, (unsigned long)block_fl->fl_owner) {
- 		if (posix_same_owner(fl, block_fl))
- 			return fl->fl_next;
- 	}
-@@ -865,7 +875,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
- 	/*
- 	 * New lock request. Walk all POSIX locks and look for conflicts. If
- 	 * there are any, either return error or put the request on the
--	 * blocker's list of waiters and the global blocked_list.
-+	 * blocker's list of waiters and the global blocked_hash.
- 	 */
- 	if (request->fl_type != F_UNLCK) {
- 		for_each_lock(inode, before) {
-@@ -2284,13 +2294,14 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 	/* insert into file's list */
+ 	fl->fl_next = *pos;
+ 	*pos = fl;
++
++	locks_insert_global_locks(fl);
+ }
  
- static int locks_show(struct seq_file *f, void *v)
+ /*
+@@ -562,9 +585,10 @@ static void locks_delete_lock(struct file_lock **thisfl_p)
  {
-+	int bkt;
- 	struct file_lock *fl, *bfl;
+ 	struct file_lock *fl = *thisfl_p;
  
- 	fl = hlist_entry(v, struct file_lock, fl_link);
++	locks_delete_global_locks(fl);
++
+ 	*thisfl_p = fl->fl_next;
+ 	fl->fl_next = NULL;
+-	list_del_init(&fl->fl_link);
  
- 	lock_get_status(f, fl, *((loff_t *)f->private), "");
- 
--	hlist_for_each_entry(bfl, &blocked_list, fl_link) {
-+	hash_for_each(blocked_hash, bkt, bfl, fl_link) {
- 		if (bfl->fl_next == fl)
- 			lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
- 	}
+ 	if (fl->fl_nspid) {
+ 		put_pid(fl->fl_nspid);
+@@ -830,6 +854,7 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 				goto out;
+ 			error = FILE_LOCK_DEFERRED;
+ 			locks_insert_block(fl, request);
++			locks_insert_global_blocked(request);
+ 			goto out;
+   		}
+   	}
 -- 
 1.7.1
