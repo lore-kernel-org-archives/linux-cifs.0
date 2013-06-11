@@ -1,108 +1,165 @@
-From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v2 13/14] seq_file: add seq_list_*_percpu helpers
-Date: Tue, 11 Jun 2013 07:09:07 -0400
-Message-ID: <1370948948-31784-14-git-send-email-jlayton@redhat.com>
+From: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: [PATCH v2 12/14] locks: give the blocked_hash its own spinlock
+Date: Tue, 11 Jun 2013 07:09:06 -0400
+Message-ID: <1370948948-31784-13-git-send-email-jlayton@redhat.com>
 References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
-Cc: dhowells@redhat.com, sage@inktank.com, smfrench@gmail.com,
-	swhiteho@redhat.com, Trond.Myklebust@netapp.com,
-	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-	linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	cluster-devel@redhat.com, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, piastryyy@gmail.com
-To: viro@zeniv.linux.org.uk, matthew@wil.cx, bfields@fieldses.org
-Return-path: <ceph-devel-owner@vger.kernel.org>
-In-Reply-To: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
-Sender: ceph-devel-owner@vger.kernel.org
+Cc: dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org,
+	swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org,
+	akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org,
+	cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
+	linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+To: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org
+Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1370948948-31784-1-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-Id: linux-cifs.vger.kernel.org
 
-When we convert the file_lock_list to a set of percpu lists, we'll need
-a way to iterate over them in order to output /proc/locks info. Add
-some seq_list_*_percpu helpers to handle that.
+There's no reason we have to protect the blocked_hash and file_lock_list
+with the same spinlock. With the tests I have, breaking it in two gives
+a barely measurable performance benefit, but it seems reasonable to make
+this locking as granular as possible.
 
-Signed-off-by: Jeff Layton <jlayton@redhat.com>
+Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 ---
- fs/seq_file.c            |   54 ++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/seq_file.h |    6 +++++
- 2 files changed, 60 insertions(+), 0 deletions(-)
+ Documentation/filesystems/Locking |   16 ++++++++--------
+ fs/locks.c                        |   25 +++++++++++++------------
+ 2 files changed, 21 insertions(+), 20 deletions(-)
 
-diff --git a/fs/seq_file.c b/fs/seq_file.c
-index 774c1eb..ce9f97a 100644
---- a/fs/seq_file.c
-+++ b/fs/seq_file.c
-@@ -921,3 +921,57 @@ struct hlist_node *seq_hlist_next_rcu(void *v,
- 		return rcu_dereference(node->next);
+diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/Locking
+index ee351ac..8d8d040 100644
+--- a/Documentation/filesystems/Locking
++++ b/Documentation/filesystems/Locking
+@@ -359,20 +359,20 @@ prototypes:
+ 
+ locking rules:
+ 
+-			inode->i_lock	file_lock_lock	may block
+-lm_compare_owner:	yes		maybe		no
+-lm_owner_key		yes		yes		no
+-lm_notify:		yes		no		no
+-lm_grant:		no		no		no
+-lm_break:		yes		no		no
+-lm_change		yes		no		no
++			inode->i_lock	blocked_hash_lock	may block
++lm_compare_owner:	yes		maybe			no
++lm_owner_key		yes		yes			no
++lm_notify:		yes		no			no
++lm_grant:		no		no			no
++lm_break:		yes		no			no
++lm_change		yes		no			no
+ 
+ 	->lm_compare_owner and ->lm_owner_key are generally called with
+ *an* inode->i_lock held. It may not be the i_lock of the inode
+ associated with either file_lock argument! This is the case with deadlock
+ detection, since the code has to chase down the owners of locks that may
+ be entirely unrelated to the one on which the lock is being acquired.
+-For deadlock detection however, the file_lock_lock is also held. The
++For deadlock detection however, the blocked_hash_lock is also held. The
+ fact that these locks are held ensures that the file_locks do not
+ disappear out from under you while doing the comparison or generating an
+ owner key.
+diff --git a/fs/locks.c b/fs/locks.c
+index 11e7784..8124fc1 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -162,12 +162,11 @@ int lease_break_time = 45;
+  */
+ #define BLOCKED_HASH_BITS	7
+ 
++static DEFINE_SPINLOCK(blocked_hash_lock);
+ static DEFINE_HASHTABLE(blocked_hash, BLOCKED_HASH_BITS);
+ 
+-static HLIST_HEAD(file_lock_list);
+-
+-/* Protects the file_lock_list and the blocked_hash */
+ static DEFINE_SPINLOCK(file_lock_lock);
++static HLIST_HEAD(file_lock_list);
+ 
+ static struct kmem_cache *filelock_cache __read_mostly;
+ 
+@@ -505,9 +504,9 @@ __locks_delete_global_blocked(struct file_lock *waiter)
+ static inline void
+ locks_delete_global_blocked(struct file_lock *waiter)
+ {
+-	spin_lock(&file_lock_lock);
++	spin_lock(&blocked_hash_lock);
+ 	__locks_delete_global_blocked(waiter);
+-	spin_unlock(&file_lock_lock);
++	spin_unlock(&blocked_hash_lock);
  }
- EXPORT_SYMBOL(seq_hlist_next_rcu);
-+
-+/**
-+ * seq_hlist_start_precpu - start an iteration of a hlist
-+ * @head: pointer to percpu array of struct hlist_heads
-+ * @cpu:  pointer to cpu "cursor"
-+ * @pos:  start position of sequence
-+ *
-+ * Called at seq_file->op->start().
-+ */
-+struct hlist_node *
-+seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos)
-+{
-+	struct hlist_node *node;
-+
-+	for_each_possible_cpu(*cpu) {
-+		hlist_for_each(node, per_cpu_ptr(head, *cpu)) {
-+			if (pos-- == 0)
-+				return node;
-+		}
-+	}
-+	return NULL;
-+}
-+EXPORT_SYMBOL(seq_hlist_start_percpu);
-+
-+/**
-+ * seq_hlist_next_percpu - move to the next position of the hlist
-+ * @v:    pointer to current hlist_node
-+ * @head: pointer to percpu array of struct hlist_heads
-+ * @cpu:  pointer to cpu "cursor"
-+ * @pos:  start position of sequence
-+ *
-+ * Called at seq_file->op->next().
-+ */
-+struct hlist_node *
-+seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head,
-+			int *cpu, loff_t *pos)
-+{
-+	struct hlist_node *node = v;
-+
-+	++*pos;
-+
-+	if (node->next)
-+		return node->next;
-+
-+	for (*cpu = cpumask_next(*cpu, cpu_possible_mask); *cpu < nr_cpu_ids;
-+	     *cpu = cpumask_next(*cpu, cpu_possible_mask)) {
-+		struct hlist_head *bucket = per_cpu_ptr(head, *cpu);
-+
-+		if (!hlist_empty(bucket))
-+			return bucket->first;
-+	}
-+	return NULL;
-+}
-+EXPORT_SYMBOL(seq_hlist_next_percpu);
-diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
-index 2da29ac..4e32edc 100644
---- a/include/linux/seq_file.h
-+++ b/include/linux/seq_file.h
-@@ -173,4 +173,10 @@ extern struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
- extern struct hlist_node *seq_hlist_next_rcu(void *v,
- 						   struct hlist_head *head,
- 						   loff_t *ppos);
-+
-+/* Helpers for iterating over per-cpu hlist_head-s in seq_files */
-+extern struct hlist_node *seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos);
-+
-+extern struct hlist_node *seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head, int *cpu, loff_t *pos);
-+
- #endif
+ 
+ static inline void
+@@ -581,14 +580,14 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
+ 
+ /*
+  * Wake up processes blocked waiting for blocker. In the FL_POSIX case, we must
+- * also take the global file_lock_lock and dequeue it from the global blocked
+- * list as we wake the processes.
++ * also take the global blocked_hash_lock and dequeue it from the global
++ * blocked list as we wake the processes.
+  *
+  * Must be called with the inode->i_lock of the blocker held!
+  */
+ static void locks_wake_up_posix_blocks(struct file_lock *blocker)
+ {
+-	spin_lock(&file_lock_lock);
++	spin_lock(&blocked_hash_lock);
+ 	while (!list_empty(&blocker->fl_block)) {
+ 		struct file_lock *waiter;
+ 
+@@ -601,7 +600,7 @@ static void locks_wake_up_posix_blocks(struct file_lock *blocker)
+ 		else
+ 			wake_up(&waiter->fl_wait);
+ 	}
+-	spin_unlock(&file_lock_lock);
++	spin_unlock(&blocked_hash_lock);
+ }
+ /* Insert file lock fl into an inode's lock list at the position indicated
+  * by pos. At the same time add the lock to the global file lock list.
+@@ -754,7 +753,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
+ 	return NULL;
+ }
+ 
+-/* Must be called with the file_lock_lock held! */
++/* Must be called with the blocked_hash_lock held! */
+ static int posix_locks_deadlock(struct file_lock *caller_fl,
+ 				struct file_lock *block_fl)
+ {
+@@ -898,13 +897,13 @@ static int __posix_lock_file(struct inode *inode, struct file_lock *request, str
+ 			if (!(request->fl_flags & FL_SLEEP))
+ 				goto out;
+ 			error = -EDEADLK;
+-			spin_lock(&file_lock_lock);
++			spin_lock(&blocked_hash_lock);
+ 			if (likely(!posix_locks_deadlock(request, fl))) {
+ 				error = FILE_LOCK_DEFERRED;
+ 				locks_insert_block(fl, request);
+ 				locks_insert_global_blocked(request);
+ 			}
+-			spin_unlock(&file_lock_lock);
++			spin_unlock(&blocked_hash_lock);
+ 			goto out;
+   		}
+   	}
+@@ -2309,10 +2308,12 @@ static int locks_show(struct seq_file *f, void *v)
+ 
+ 	lock_get_status(f, fl, *((loff_t *)f->private), "");
+ 
++	spin_lock(&blocked_hash_lock);
+ 	hash_for_each(blocked_hash, bkt, bfl, fl_link) {
+ 		if (bfl->fl_next == fl)
+ 			lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
+ 	}
++	spin_unlock(&blocked_hash_lock);
+ 
+ 	return 0;
+ }
 -- 
 1.7.1
 
+--
+To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
