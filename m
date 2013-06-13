@@ -1,90 +1,140 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: Re: DFS : Object is remote
-Date: Thu, 13 Jun 2013 16:51:07 -0500
-Message-ID: <CAH2r5mu4BFpjp+RYGQQ+ogeQUK0ZZV7+jzZ7EW5OMVUNUYfqkw@mail.gmail.com>
-References: <A88483E8-9A66-47E6-ABF9-A1AA86B3F8D5@dashbox.com>
-	<CAH2r5msFcgP-eV3NEa0j7yxXOUWWcJSSh2OMnLno8QPO+43h4w@mail.gmail.com>
-	<A90ADB0B-14D0-4F73-95E0-7A45130C031B@dashbox.com>
+From: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: SMB3 Signing part 1
+Date: Thu, 13 Jun 2013 17:49:58 -0500
+Message-ID: <CADT32eLVtj+Ld624og-fcvKfORd1WyxVqjnnxNvMd7-3_x3SBw@mail.gmail.com>
+References: <CAH2r5mvtOFqcqcdbXxcK8Ci0bqzznRmEfDjfYM0RZPfemobdsw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Cc: "linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-To: Doug Clow <doug.clow-jCDWx9PA3/RBDgjK7y7TUQ@public.gmane.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs <linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+To: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <A90ADB0B-14D0-4F73-95E0-7A45130C031B-jCDWx9PA3/RBDgjK7y7TUQ@public.gmane.org>
+In-Reply-To: <CAH2r5mvtOFqcqcdbXxcK8Ci0bqzznRmEfDjfYM0RZPfemobdsw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-Well  - that is good news.   Your problem is probably much easier ....
+Steve, Thanks. But I think what we have here itself needed to
+changed as per Jeff Layton's comments.  He is suggesting
+and I do agree and was working on invoking respective crypto
+algorithms per smb, smb2.1, and smb3 signing instead of
+invoking all of them per any kind of signing.
 
-Have you ever been able to connect to a DFS referral - even with ip
-address (with hostname in dfs referral you have to have a dfs upcall
-helper to resolve hostnames instead of ip address).
+Changing signing for smb2.1 and smb3 from per smb connection
+to smb session is somewhat non-trivial but I do plan to work on that
+piece of code once I am back.
 
-On Thu, Jun 13, 2013 at 4:47 PM, Doug Clow <doug.clow-jCDWx9PA3/RBDgjK7y7TUQ@public.gmane.org> wrote:
-> Hi Steve,
->
-> Thanks for the in depth response.  I tried your suggestion with setting actimeo=0, but didn't get any change on my end.  I may be experiencing a different issue as I've never been able to list the contents of or enter a shared folder from dfs using any order of commands.  I can mount the namespace and list the folders within, just not go inside the referrals.
->
-> Here's what I'm working with:  the system configuration is two Windows 2012 machines that host standalone DFS in a failover cluster.  The targets of the referrals are those same two servers, where each folder has both servers assigned as targets.  I have disabled SMB2/3 on both and set DFS to use DNS based referrals rather than Netbios in order to maximize Linux compatibility.  It didn't make a difference with default Netbios referrals or DNS based.
->
-> My mount command is:
->
-> mount.cifs //dfs.domain.com/namespace test -o sec=krb5,cruid=0,actimeo=0
->
-> I've also tried using standard ntlm authentication but it doesn't seem to make a difference.
->
-> Regards,
-> Doug
->
->
-> On Jun 13, 2013, at 2:14 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->
->> This is a tough issue - if you are doing an ls immediately followed by
->> a cd into the dfs link.   We plan to ask Microsoft next week if they
->> have any ideas how to detect the following sequence - ls of directory
->> which contains dfs link (client caches the dfs link for one second
->> thinking it is a directory), client cd into directory.   The problem
->> we have is that many variants of "ls" can potentially cause 1000s of
->> stat calls to be sent over the network for one ls (queyrpathinfo or
->> open/query/close) if we don't cache the output of readdir (SMB
->> FindFirst/FindNext), but if we do cache then we can mistake a
->> directory for a dfs link.  If that is the problem that you are running
->> into - the obvious solution is to turn off metadata attribute caching
->> (set actimeo=0 on mount).  Jeff suggested a patch which would prevent
->> us from caching information on directories which is returned from
->> FindFirst but that could cause a substantial degradation in
->> performance - and we have not researched the alternatives (higher
->> levels of FindFirst and QueryDir that may return hints we can use to
->> decide whether to cache such as different "LinkCount" or EA size or
->> some such).
->>
->> On Thu, Jun 13, 2013 at 4:04 PM, Doug Clow <doug.clow-jCDWx9PA3/RBDgjK7y7TUQ@public.gmane.org> wrote:
->>> Hello,
->>>
->>> I am in need to mount a DFS share on CentOS 6.4.  My kernel is 2.6.32-358.  I am having the trouble where if I mount a DFS root namespace, I cannot enter or ls the shared folders.  If I immediately try to ls the shared folder, I receive the error, "Object is remote".  If I first ls the root of the namespace and then subsequently ls the shared folder I get the error, "Invalid argument" or one time "Resource temporarily unavailable".
->>>
->>> I have searched the list archives and I see several mentions of this issue.  Is there a known workaround or a patch at this time?
->>>
->>> Thank you,
->>> Doug Clow
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-cifs" in
->>> the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Thanks,
->>
->> Steve
->
+Regards,
 
+Shirish
 
-
--- 
-Thanks,
-
-Steve
+On Thu, Jun 13, 2013 at 12:28 PM, Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> Shirish,
+> I updated your patch for current cifs for-next git tree, and split out
+> the parts which Jeff noted need fixing (need to use a per-smb3-session
+> vs. per-socket key to sign).    The 1/2 that is left looks pretty
+> straightforward and builds fine.  I will check how easy it would be to
+> fixup the other parts soon.  I would like to get this in for-next in
+> time for the testing next two weeks with Microsoft.
+>
+> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+> index 2906ee2..603f18a 100644
+> --- a/fs/cifs/Kconfig
+> +++ b/fs/cifs/Kconfig
+> @@ -10,6 +10,7 @@ config CIFS
+>         select CRYPTO_ECB
+>         select CRYPTO_DES
+>         select CRYPTO_SHA256
+> +       select CRYPTO_CMAC
+>         help
+>           This is the client VFS module for the Common Internet File System
+>           (CIFS) protocol which is the successor to the Server Message Block
+> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+> index 30bea6b..5a6c6bd 100644
+> --- a/fs/cifs/cifsencrypt.c
+> +++ b/fs/cifs/cifsencrypt.c
+> @@ -705,6 +705,9 @@ calc_seckey(struct cifs_ses *ses)
+>  void
+>  cifs_crypto_shash_release(struct TCP_Server_Info *server)
+>  {
+> +       if (server->secmech.cmacaes)
+> +               crypto_free_shash(server->secmech.cmacaes);
+> +
+>         if (server->secmech.hmacsha256)
+>                 crypto_free_shash(server->secmech.hmacsha256);
+>
+> @@ -714,6 +717,8 @@ cifs_crypto_shash_release(struct TCP_Server_Info *server)
+>         if (server->secmech.hmacmd5)
+>                 crypto_free_shash(server->secmech.hmacmd5);
+>
+> +       kfree(server->secmech.sdesccmacaes);
+> +
+>         kfree(server->secmech.sdeschmacsha256);
+>
+>         kfree(server->secmech.sdeschmacmd5);
+> @@ -747,6 +752,13 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+>                 goto crypto_allocate_hmacsha256_fail;
+>         }
+>
+> +       server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
+> +       if (IS_ERR(server->secmech.cmacaes)) {
+> +               cifs_dbg(VFS, "could not allocate crypto cmac-aes");
+> +               rc = PTR_ERR(server->secmech.cmacaes);
+> +               goto crypto_allocate_cmacaes_fail;
+> +       }
+> +
+>         size = sizeof(struct shash_desc) +
+>                         crypto_shash_descsize(server->secmech.hmacmd5);
+>         server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
+> @@ -777,8 +789,22 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+>         server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
+>         server->secmech.sdeschmacsha256->shash.flags = 0x0;
+>
+> +       size = sizeof(struct shash_desc) +
+> +                       crypto_shash_descsize(server->secmech.cmacaes);
+> +       server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
+> +       if (!server->secmech.sdesccmacaes) {
+> +               cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
+> +               rc = -ENOMEM;
+> +               goto crypto_allocate_cmacaes_sdesc_fail;
+> +       }
+> +       server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
+> +       server->secmech.sdesccmacaes->shash.flags = 0x0;
+> +
+>         return 0;
+>
+> +crypto_allocate_cmacaes_sdesc_fail:
+> +       kfree(server->secmech.sdeschmacsha256);
+> +
+>  crypto_allocate_hmacsha256_sdesc_fail:
+>         kfree(server->secmech.sdescmd5);
+>
+> @@ -786,6 +812,9 @@ crypto_allocate_md5_sdesc_fail:
+>         kfree(server->secmech.sdeschmacmd5);
+>
+>  crypto_allocate_hmacmd5_sdesc_fail:
+> +       crypto_free_shash(server->secmech.cmacaes);
+> +
+> +crypto_allocate_cmacaes_fail:
+>         crypto_free_shash(server->secmech.hmacsha256);
+>
+>  crypto_allocate_hmacsha256_fail:
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index f13cbbe..9cacf37 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -125,9 +125,11 @@ struct cifs_secmech {
+>         struct crypto_shash *hmacmd5; /* hmac-md5 hash function */
+>         struct crypto_shash *md5; /* md5 hash function */
+>         struct crypto_shash *hmacsha256; /* hmac-sha256 hash function */
+> +       struct crypto_shash *cmacaes; /* block-cipher based MAC function */
+>         struct sdesc *sdeschmacmd5;  /* ctxt to generate ntlmv2 hash, CR1 */
+>         struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
+>         struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
+> +       struct sdesc *sdesccmacaes;  /* ctxt to generate smb3 signature */
+>  };
+>
+>  /* per smb session structure/fields */
+>
+> --
+> Thanks,
+>
+> Steve
