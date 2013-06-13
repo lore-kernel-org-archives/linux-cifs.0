@@ -1,209 +1,123 @@
-From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH v2 14/14] locks: move file_lock_list to a set of percpu
- hlist_heads and convert file_lock_lock to an lglock
-Date: Thu, 13 Jun 2013 11:37:42 -0400
-Message-ID: <20130613153742.GE20666@fieldses.org>
-References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
- <1370948948-31784-15-git-send-email-jlayton@redhat.com>
+From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: SMB3 Signing part 1
+Date: Thu, 13 Jun 2013 12:28:44 -0500
+Message-ID: <CAH2r5mvtOFqcqcdbXxcK8Ci0bqzznRmEfDjfYM0RZPfemobdsw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	sage-4GqslpFJ+cxBDgjK7y7TUQ@public.gmane.org, smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, swhiteho-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	Trond.Myklebust-HgOvQuBEEgTQT0dZR+AlfA@public.gmane.org, akpm-de/tnXTf+JLsfHDXvbKv3WD2FQJk+8+b@public.gmane.org,
-	linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-afs-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org,
-	ceph-devel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	samba-technical-w/Ol4Ecudpl8XjKLYN78aQ@public.gmane.org, cluster-devel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
-	linux-nfs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-fsdevel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org,
-	piastryyy-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
-To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Return-path: <linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1370948948-31784-15-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Sender: linux-nfs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-Id: linux-cifs.vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+List-ID: <linux-cifs.vger.kernel.org>
 
-On Tue, Jun 11, 2013 at 07:09:08AM -0400, Jeff Layton wrote:
-> The file_lock_list is only used for /proc/locks. The vastly common case
-> is for locks to be put onto the list and come off again, without ever
-> being traversed.
-> 
-> Help optimize for this use-case by moving to percpu hlist_head-s. At the
-> same time, we can make the locking less contentious by moving to an
-> lglock. When iterating over the lists for /proc/locks, we must take the
-> global lock and then iterate over each CPU's list in turn.
-> 
-> This change necessitates a new fl_link_cpu field to keep track of which
-> CPU the entry is on. On x86_64 at least, this field is placed within an
-> existing hole in the struct to avoid growing its real size.
+Shirish,
+I updated your patch for current cifs for-next git tree, and split out
+the parts which Jeff noted need fixing (need to use a per-smb3-session
+vs. per-socket key to sign).    The 1/2 that is left looks pretty
+straightforward and builds fine.  I will check how easy it would be to
+fixup the other parts soon.  I would like to get this in for-next in
+time for the testing next two weeks with Microsoft.
 
-ACK.--b.
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index 2906ee2..603f18a 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -10,6 +10,7 @@ config CIFS
+ 	select CRYPTO_ECB
+ 	select CRYPTO_DES
+ 	select CRYPTO_SHA256
++	select CRYPTO_CMAC
+ 	help
+ 	  This is the client VFS module for the Common Internet File System
+ 	  (CIFS) protocol which is the successor to the Server Message Block
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 30bea6b..5a6c6bd 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -705,6 +705,9 @@ calc_seckey(struct cifs_ses *ses)
+ void
+ cifs_crypto_shash_release(struct TCP_Server_Info *server)
+ {
++	if (server->secmech.cmacaes)
++		crypto_free_shash(server->secmech.cmacaes);
++
+ 	if (server->secmech.hmacsha256)
+ 		crypto_free_shash(server->secmech.hmacsha256);
 
-> 
-> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-> ---
->  fs/locks.c         |   57 +++++++++++++++++++++++++++++++++++----------------
->  include/linux/fs.h |    1 +
->  2 files changed, 40 insertions(+), 18 deletions(-)
-> 
-> diff --git a/fs/locks.c b/fs/locks.c
-> index 8124fc1..094eb4d 100644
-> --- a/fs/locks.c
-> +++ b/fs/locks.c
-> @@ -127,6 +127,8 @@
->  #include <linux/rcupdate.h>
->  #include <linux/pid_namespace.h>
->  #include <linux/hashtable.h>
-> +#include <linux/percpu.h>
-> +#include <linux/lglock.h>
->  
->  #include <asm/uaccess.h>
->  
-> @@ -165,8 +167,8 @@ int lease_break_time = 45;
->  static DEFINE_SPINLOCK(blocked_hash_lock);
->  static DEFINE_HASHTABLE(blocked_hash, BLOCKED_HASH_BITS);
->  
-> -static DEFINE_SPINLOCK(file_lock_lock);
-> -static HLIST_HEAD(file_lock_list);
-> +DEFINE_STATIC_LGLOCK(file_lock_lglock);
-> +static DEFINE_PER_CPU(struct hlist_head, file_lock_list);
->  
->  static struct kmem_cache *filelock_cache __read_mostly;
->  
-> @@ -512,17 +514,21 @@ locks_delete_global_blocked(struct file_lock *waiter)
->  static inline void
->  locks_insert_global_locks(struct file_lock *waiter)
->  {
-> -	spin_lock(&file_lock_lock);
-> -	hlist_add_head(&waiter->fl_link, &file_lock_list);
-> -	spin_unlock(&file_lock_lock);
-> +	lg_local_lock(&file_lock_lglock);
-> +	waiter->fl_link_cpu = smp_processor_id();
-> +	hlist_add_head(&waiter->fl_link, this_cpu_ptr(&file_lock_list));
-> +	lg_local_unlock(&file_lock_lglock);
->  }
->  
->  static inline void
->  locks_delete_global_locks(struct file_lock *waiter)
->  {
-> -	spin_lock(&file_lock_lock);
-> +	/* avoid taking lock if already unhashed */
-> +	if (hlist_unhashed(&waiter->fl_link))
-> +		return;
-> +	lg_local_lock_cpu(&file_lock_lglock, waiter->fl_link_cpu);
->  	hlist_del_init(&waiter->fl_link);
-> -	spin_unlock(&file_lock_lock);
-> +	lg_local_unlock_cpu(&file_lock_lglock, waiter->fl_link_cpu);
->  }
->  
->  /* Remove waiter from blocker's block list.
-> @@ -2228,6 +2234,11 @@ EXPORT_SYMBOL_GPL(vfs_cancel_lock);
->  #include <linux/proc_fs.h>
->  #include <linux/seq_file.h>
->  
-> +struct locks_iterator {
-> +	int	li_cpu;
-> +	loff_t	li_pos;
-> +};
-> +
->  static void lock_get_status(struct seq_file *f, struct file_lock *fl,
->  			    loff_t id, char *pfx)
->  {
-> @@ -2302,16 +2313,17 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
->  static int locks_show(struct seq_file *f, void *v)
->  {
->  	int bkt;
-> +	struct locks_iterator *iter = f->private;
->  	struct file_lock *fl, *bfl;
->  
->  	fl = hlist_entry(v, struct file_lock, fl_link);
->  
-> -	lock_get_status(f, fl, *((loff_t *)f->private), "");
-> +	lock_get_status(f, fl, iter->li_pos, "");
->  
->  	spin_lock(&blocked_hash_lock);
->  	hash_for_each(blocked_hash, bkt, bfl, fl_link) {
->  		if (bfl->fl_next == fl)
-> -			lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
-> +			lock_get_status(f, bfl, iter->li_pos, " ->");
->  	}
->  	spin_unlock(&blocked_hash_lock);
->  
-> @@ -2320,23 +2332,24 @@ static int locks_show(struct seq_file *f, void *v)
->  
->  static void *locks_start(struct seq_file *f, loff_t *pos)
->  {
-> -	loff_t *p = f->private;
-> +	struct locks_iterator *iter = f->private;
->  
-> -	spin_lock(&file_lock_lock);
-> -	*p = (*pos + 1);
-> -	return seq_hlist_start(&file_lock_list, *pos);
-> +	iter->li_pos = *pos + 1;
-> +	lg_global_lock(&file_lock_lglock);
-> +	return seq_hlist_start_percpu(&file_lock_list, &iter->li_cpu, *pos);
->  }
->  
->  static void *locks_next(struct seq_file *f, void *v, loff_t *pos)
->  {
-> -	loff_t *p = f->private;
-> -	++*p;
-> -	return seq_hlist_next(v, &file_lock_list, pos);
-> +	struct locks_iterator *iter = f->private;
-> +
-> +	++iter->li_pos;
-> +	return seq_hlist_next_percpu(v, &file_lock_list, &iter->li_cpu, pos);
->  }
->  
->  static void locks_stop(struct seq_file *f, void *v)
->  {
-> -	spin_unlock(&file_lock_lock);
-> +	lg_global_unlock(&file_lock_lglock);
->  }
->  
->  static const struct seq_operations locks_seq_operations = {
-> @@ -2348,7 +2361,8 @@ static const struct seq_operations locks_seq_operations = {
->  
->  static int locks_open(struct inode *inode, struct file *filp)
->  {
-> -	return seq_open_private(filp, &locks_seq_operations, sizeof(loff_t));
-> +	return seq_open_private(filp, &locks_seq_operations,
-> +					sizeof(struct locks_iterator));
->  }
->  
->  static const struct file_operations proc_locks_operations = {
-> @@ -2448,9 +2462,16 @@ EXPORT_SYMBOL(lock_may_write);
->  
->  static int __init filelock_init(void)
->  {
-> +	int i;
-> +
->  	filelock_cache = kmem_cache_create("file_lock_cache",
->  			sizeof(struct file_lock), 0, SLAB_PANIC, NULL);
->  
-> +	lg_lock_init(&file_lock_lglock, "file_lock_lglock");
-> +
-> +	for_each_possible_cpu(i)
-> +		INIT_HLIST_HEAD(per_cpu_ptr(&file_lock_list, i));
-> +
->  	return 0;
->  }
->  
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 232a345..18e59b8 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -953,6 +953,7 @@ struct file_lock {
->  	unsigned int fl_flags;
->  	unsigned char fl_type;
->  	unsigned int fl_pid;
-> +	int fl_link_cpu;		/* what cpu's list is this on? */
->  	struct pid *fl_nspid;
->  	wait_queue_head_t fl_wait;
->  	struct file *fl_file;
-> -- 
-> 1.7.1
-> 
---
-To unsubscribe from this list: send the line "unsubscribe linux-nfs" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+@@ -714,6 +717,8 @@ cifs_crypto_shash_release(struct TCP_Server_Info *server)
+ 	if (server->secmech.hmacmd5)
+ 		crypto_free_shash(server->secmech.hmacmd5);
+
++	kfree(server->secmech.sdesccmacaes);
++
+ 	kfree(server->secmech.sdeschmacsha256);
+
+ 	kfree(server->secmech.sdeschmacmd5);
+@@ -747,6 +752,13 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 		goto crypto_allocate_hmacsha256_fail;
+ 	}
+
++	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
++	if (IS_ERR(server->secmech.cmacaes)) {
++		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
++		rc = PTR_ERR(server->secmech.cmacaes);
++		goto crypto_allocate_cmacaes_fail;
++	}
++
+ 	size = sizeof(struct shash_desc) +
+ 			crypto_shash_descsize(server->secmech.hmacmd5);
+ 	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
+@@ -777,8 +789,22 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
+ 	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
+ 	server->secmech.sdeschmacsha256->shash.flags = 0x0;
+
++	size = sizeof(struct shash_desc) +
++			crypto_shash_descsize(server->secmech.cmacaes);
++	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
++	if (!server->secmech.sdesccmacaes) {
++		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
++		rc = -ENOMEM;
++		goto crypto_allocate_cmacaes_sdesc_fail;
++	}
++	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
++	server->secmech.sdesccmacaes->shash.flags = 0x0;
++
+ 	return 0;
+
++crypto_allocate_cmacaes_sdesc_fail:
++	kfree(server->secmech.sdeschmacsha256);
++
+ crypto_allocate_hmacsha256_sdesc_fail:
+ 	kfree(server->secmech.sdescmd5);
+
+@@ -786,6 +812,9 @@ crypto_allocate_md5_sdesc_fail:
+ 	kfree(server->secmech.sdeschmacmd5);
+
+ crypto_allocate_hmacmd5_sdesc_fail:
++	crypto_free_shash(server->secmech.cmacaes);
++
++crypto_allocate_cmacaes_fail:
+ 	crypto_free_shash(server->secmech.hmacsha256);
+
+ crypto_allocate_hmacsha256_fail:
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index f13cbbe..9cacf37 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -125,9 +125,11 @@ struct cifs_secmech {
+ 	struct crypto_shash *hmacmd5; /* hmac-md5 hash function */
+ 	struct crypto_shash *md5; /* md5 hash function */
+ 	struct crypto_shash *hmacsha256; /* hmac-sha256 hash function */
++	struct crypto_shash *cmacaes; /* block-cipher based MAC function */
+ 	struct sdesc *sdeschmacmd5;  /* ctxt to generate ntlmv2 hash, CR1 */
+ 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
+ 	struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
++	struct sdesc *sdesccmacaes;  /* ctxt to generate smb3 signature */
+ };
+
+ /* per smb session structure/fields */
+
+-- 
+Thanks,
+
+Steve
