@@ -1,11 +1,9 @@
 From: "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org>
-Subject: Re: [PATCH v2 12/14] locks: give the blocked_hash its own spinlock
-Date: Thu, 13 Jun 2013 11:20:36 -0400
-Message-ID: <20130613152036.GC20666@fieldses.org>
+Subject: Re: [PATCH v2 13/14] seq_file: add seq_list_*_percpu helpers
+Date: Thu, 13 Jun 2013 11:27:39 -0400
+Message-ID: <20130613152739.GD20666@fieldses.org>
 References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
- <1370948948-31784-13-git-send-email-jlayton@redhat.com>
- <20130613150247.GB20666@fieldses.org>
- <20130613111844.59421622@corrin.poochiereds.net>
+ <1370948948-31784-14-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@public.gmane.org, dhowells-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org,
@@ -19,43 +17,112 @@ Cc: viro-RmSDqhL/yNMiFSDQTTA3OLVCufUGDwFn@public.gmane.org, matthew-Ztpu424NOJ8@
 To: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20130613111844.59421622-4QP7MXygkU+dMjc06nkz3ljfA9RmPOcC@public.gmane.org>
+In-Reply-To: <1370948948-31784-14-git-send-email-jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
 Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
 List-ID: <linux-cifs.vger.kernel.org>
 
-On Thu, Jun 13, 2013 at 11:18:44AM -0400, Jeff Layton wrote:
-> On Thu, 13 Jun 2013 11:02:47 -0400
-> "J. Bruce Fields" <bfields-uC3wQj2KruNg9hUCZPvPmw@public.gmane.org> wrote:
+On Tue, Jun 11, 2013 at 07:09:07AM -0400, Jeff Layton wrote:
+> When we convert the file_lock_list to a set of percpu lists, we'll need
+> a way to iterate over them in order to output /proc/locks info. Add
+> some seq_list_*_percpu helpers to handle that.
 > 
-> > On Tue, Jun 11, 2013 at 07:09:06AM -0400, Jeff Layton wrote:
-> > > There's no reason we have to protect the blocked_hash and file_lock_list
-> > > with the same spinlock. With the tests I have, breaking it in two gives
-> > > a barely measurable performance benefit, but it seems reasonable to make
-> > > this locking as granular as possible.
-> > 
-> > Out of curiosity...  In the typical case when adding/removing a lock,
-> > aren't both lists being modified in rapid succession?
-> > 
-> > I wonder if it would be better to instead stick with one lock and take
-> > care to acquire it only once to cover both manipulations.
-> > 
-> > --b.
-> > 
+> Signed-off-by: Jeff Layton <jlayton-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+> ---
+>  fs/seq_file.c            |   54 ++++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/seq_file.h |    6 +++++
+>  2 files changed, 60 insertions(+), 0 deletions(-)
 > 
-> That's not really the case...
-> 
-> Typically, when doing a call into __posix_lock_file with FL_SLEEP set,
-> we either end up blocking on the lock or acquiring it. In either case,
-> we'll only end up taking one of the global spinlocks. The reason for
-> this is that blocker is what dequeues a waiter from the blocked_hash
-> before waking it up (in locks_wake_up_posix_blocks).
-> 
-> Also, while this patch description doesn't spell it out, we require a
-> truly global lock for deadlock detection. In a later patch though, I
-> convert the file_lock_lock to a per-cpu spinlock. So we really do need
-> to separate the locks here in order to make the per-cpu file_lock_list
-> worthwhile.
+> diff --git a/fs/seq_file.c b/fs/seq_file.c
+> index 774c1eb..ce9f97a 100644
+> --- a/fs/seq_file.c
+> +++ b/fs/seq_file.c
+> @@ -921,3 +921,57 @@ struct hlist_node *seq_hlist_next_rcu(void *v,
+>  		return rcu_dereference(node->next);
+>  }
+>  EXPORT_SYMBOL(seq_hlist_next_rcu);
+> +
+> +/**
+> + * seq_hlist_start_precpu - start an iteration of a hlist
 
-Oh, right, got it!
+Should be "of a percpu array of hlists"?
+
+> + * @head: pointer to percpu array of struct hlist_heads
+> + * @cpu:  pointer to cpu "cursor"
+> + * @pos:  start position of sequence
+> + *
+> + * Called at seq_file->op->start().
+> + */
+> +struct hlist_node *
+> +seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos)
+> +{
+> +	struct hlist_node *node;
+> +
+> +	for_each_possible_cpu(*cpu) {
+> +		hlist_for_each(node, per_cpu_ptr(head, *cpu)) {
+> +			if (pos-- == 0)
+> +				return node;
+> +		}
+> +	}
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(seq_hlist_start_percpu);
+> +
+> +/**
+> + * seq_hlist_next_percpu - move to the next position of the hlist
+
+Ditto?
+
+Just thinking if the doc scripts collected up a bunch of these summaries
+into an index somewhere it'd be confusing for these to have some
+description as seq_hlist_start/next.
+
+Otherwise, ACK.
 
 --b.
+
+> + * @v:    pointer to current hlist_node
+> + * @head: pointer to percpu array of struct hlist_heads
+> + * @cpu:  pointer to cpu "cursor"
+> + * @pos:  start position of sequence
+> + *
+> + * Called at seq_file->op->next().
+> + */
+> +struct hlist_node *
+> +seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head,
+> +			int *cpu, loff_t *pos)
+> +{
+> +	struct hlist_node *node = v;
+> +
+> +	++*pos;
+> +
+> +	if (node->next)
+> +		return node->next;
+> +
+> +	for (*cpu = cpumask_next(*cpu, cpu_possible_mask); *cpu < nr_cpu_ids;
+> +	     *cpu = cpumask_next(*cpu, cpu_possible_mask)) {
+> +		struct hlist_head *bucket = per_cpu_ptr(head, *cpu);
+> +
+> +		if (!hlist_empty(bucket))
+> +			return bucket->first;
+> +	}
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(seq_hlist_next_percpu);
+> diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
+> index 2da29ac..4e32edc 100644
+> --- a/include/linux/seq_file.h
+> +++ b/include/linux/seq_file.h
+> @@ -173,4 +173,10 @@ extern struct hlist_node *seq_hlist_start_head_rcu(struct hlist_head *head,
+>  extern struct hlist_node *seq_hlist_next_rcu(void *v,
+>  						   struct hlist_head *head,
+>  						   loff_t *ppos);
+> +
+> +/* Helpers for iterating over per-cpu hlist_head-s in seq_files */
+> +extern struct hlist_node *seq_hlist_start_percpu(struct hlist_head __percpu *head, int *cpu, loff_t pos);
+> +
+> +extern struct hlist_node *seq_hlist_next_percpu(void *v, struct hlist_head __percpu *head, int *cpu, loff_t *pos);
+> +
+>  #endif
+> -- 
+> 1.7.1
+> 
