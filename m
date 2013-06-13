@@ -1,123 +1,72 @@
-From: Steve French <smfrench-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Subject: SMB3 Signing part 1
-Date: Thu, 13 Jun 2013 12:28:44 -0500
-Message-ID: <CAH2r5mvtOFqcqcdbXxcK8Ci0bqzznRmEfDjfYM0RZPfemobdsw@mail.gmail.com>
+From: "J. Bruce Fields" <bfields@fieldses.org>
+Subject: Re: [PATCH v2 06/14] locks: don't walk inode->i_flock list in
+ locks_show
+Date: Thu, 13 Jun 2013 15:45:46 -0400
+Message-ID: <20130613194545.GC19218@fieldses.org>
+References: <1370948948-31784-1-git-send-email-jlayton@redhat.com>
+ <1370948948-31784-7-git-send-email-jlayton@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Cc: linux-cifs-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Shirish Pargaonkar <shirishpargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Return-path: <linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Sender: linux-cifs-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-List-ID: <linux-cifs.vger.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Cc: viro@zeniv.linux.org.uk, matthew@wil.cx, dhowells@redhat.com,
+	sage@inktank.com, smfrench@gmail.com, swhiteho@redhat.com,
+	Trond.Myklebust@netapp.com, akpm@linux-foundation.org,
+	linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
+	ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, cluster-devel@redhat.com,
+	linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	piastryyy@gmail.com
+To: Jeff Layton <jlayton@redhat.com>
+Return-path: <ceph-devel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1370948948-31784-7-git-send-email-jlayton@redhat.com>
+Sender: ceph-devel-owner@vger.kernel.org
+List-Id: linux-cifs.vger.kernel.org
 
-Shirish,
-I updated your patch for current cifs for-next git tree, and split out
-the parts which Jeff noted need fixing (need to use a per-smb3-session
-vs. per-socket key to sign).    The 1/2 that is left looks pretty
-straightforward and builds fine.  I will check how easy it would be to
-fixup the other parts soon.  I would like to get this in for-next in
-time for the testing next two weeks with Microsoft.
+On Tue, Jun 11, 2013 at 07:09:00AM -0400, Jeff Layton wrote:
+> When we convert over to using the i_lock to protect the i_flock list,
+> that will introduce a potential lock inversion problem in locks_show.
+> When we want to walk the i_flock list, we'll need to take the i_lock.
+> 
+> Rather than do that, just walk the global blocked_locks list and print
+> out any that are blocked on the given lock.
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index 2906ee2..603f18a 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -10,6 +10,7 @@ config CIFS
- 	select CRYPTO_ECB
- 	select CRYPTO_DES
- 	select CRYPTO_SHA256
-+	select CRYPTO_CMAC
- 	help
- 	  This is the client VFS module for the Common Internet File System
- 	  (CIFS) protocol which is the successor to the Server Message Block
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index 30bea6b..5a6c6bd 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -705,6 +705,9 @@ calc_seckey(struct cifs_ses *ses)
- void
- cifs_crypto_shash_release(struct TCP_Server_Info *server)
- {
-+	if (server->secmech.cmacaes)
-+		crypto_free_shash(server->secmech.cmacaes);
-+
- 	if (server->secmech.hmacsha256)
- 		crypto_free_shash(server->secmech.hmacsha256);
+I'm OK with this as obviously /proc/locks shouldn't be the common case,
+but it still bugs me a bit that we're suddenly making it something like
 
-@@ -714,6 +717,8 @@ cifs_crypto_shash_release(struct TCP_Server_Info *server)
- 	if (server->secmech.hmacmd5)
- 		crypto_free_shash(server->secmech.hmacmd5);
+	O(number of held locks * number of waiters)
 
-+	kfree(server->secmech.sdesccmacaes);
-+
- 	kfree(server->secmech.sdeschmacsha256);
+where it used to be
 
- 	kfree(server->secmech.sdeschmacmd5);
-@@ -747,6 +752,13 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
- 		goto crypto_allocate_hmacsha256_fail;
- 	}
+	O(number of held lock + number of waiters)
 
-+	server->secmech.cmacaes = crypto_alloc_shash("cmac(aes)", 0, 0);
-+	if (IS_ERR(server->secmech.cmacaes)) {
-+		cifs_dbg(VFS, "could not allocate crypto cmac-aes");
-+		rc = PTR_ERR(server->secmech.cmacaes);
-+		goto crypto_allocate_cmacaes_fail;
-+	}
-+
- 	size = sizeof(struct shash_desc) +
- 			crypto_shash_descsize(server->secmech.hmacmd5);
- 	server->secmech.sdeschmacmd5 = kmalloc(size, GFP_KERNEL);
-@@ -777,8 +789,22 @@ cifs_crypto_shash_allocate(struct TCP_Server_Info *server)
- 	server->secmech.sdeschmacsha256->shash.tfm = server->secmech.hmacsha256;
- 	server->secmech.sdeschmacsha256->shash.flags = 0x0;
+I wonder if there's any solution that's just as easy and avoids scanning
+the blocked list each time.
 
-+	size = sizeof(struct shash_desc) +
-+			crypto_shash_descsize(server->secmech.cmacaes);
-+	server->secmech.sdesccmacaes = kmalloc(size, GFP_KERNEL);
-+	if (!server->secmech.sdesccmacaes) {
-+		cifs_dbg(VFS, "%s: Can't alloc cmacaes\n", __func__);
-+		rc = -ENOMEM;
-+		goto crypto_allocate_cmacaes_sdesc_fail;
-+	}
-+	server->secmech.sdesccmacaes->shash.tfm = server->secmech.cmacaes;
-+	server->secmech.sdesccmacaes->shash.flags = 0x0;
-+
- 	return 0;
+--b.
 
-+crypto_allocate_cmacaes_sdesc_fail:
-+	kfree(server->secmech.sdeschmacsha256);
-+
- crypto_allocate_hmacsha256_sdesc_fail:
- 	kfree(server->secmech.sdescmd5);
-
-@@ -786,6 +812,9 @@ crypto_allocate_md5_sdesc_fail:
- 	kfree(server->secmech.sdeschmacmd5);
-
- crypto_allocate_hmacmd5_sdesc_fail:
-+	crypto_free_shash(server->secmech.cmacaes);
-+
-+crypto_allocate_cmacaes_fail:
- 	crypto_free_shash(server->secmech.hmacsha256);
-
- crypto_allocate_hmacsha256_fail:
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index f13cbbe..9cacf37 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -125,9 +125,11 @@ struct cifs_secmech {
- 	struct crypto_shash *hmacmd5; /* hmac-md5 hash function */
- 	struct crypto_shash *md5; /* md5 hash function */
- 	struct crypto_shash *hmacsha256; /* hmac-sha256 hash function */
-+	struct crypto_shash *cmacaes; /* block-cipher based MAC function */
- 	struct sdesc *sdeschmacmd5;  /* ctxt to generate ntlmv2 hash, CR1 */
- 	struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
- 	struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signature */
-+	struct sdesc *sdesccmacaes;  /* ctxt to generate smb3 signature */
- };
-
- /* per smb session structure/fields */
-
--- 
-Thanks,
-
-Steve
+> 
+> Signed-off-by: Jeff Layton <jlayton@redhat.com>
+> ---
+>  fs/locks.c |    6 ++++--
+>  1 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/locks.c b/fs/locks.c
+> index e451d18..3fd27f0 100644
+> --- a/fs/locks.c
+> +++ b/fs/locks.c
+> @@ -2249,8 +2249,10 @@ static int locks_show(struct seq_file *f, void *v)
+>  
+>  	lock_get_status(f, fl, *((loff_t *)f->private), "");
+>  
+> -	list_for_each_entry(bfl, &fl->fl_block, fl_block)
+> -		lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
+> +	list_for_each_entry(bfl, &blocked_list, fl_link) {
+> +		if (bfl->fl_next == fl)
+> +			lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 1.7.1
+> 
