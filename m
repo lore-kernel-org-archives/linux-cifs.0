@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v3 08/13] locks: convert fl_link to a
-	hlist_node
-Date: Mon, 17 Jun 2013 11:13:51 -0400
-Message-ID: <1371482036-15958-9-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 05/13] locks: encapsulate the fl_link
+	list handling
+Date: Mon, 17 Jun 2013 11:13:48 -0400
+Message-ID: <1371482036-15958-6-git-send-email-jlayton@redhat.com>
 References: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         cluster-devel@redhat.com, sage@inktank.com,
@@ -25,137 +25,118 @@ Sender: cluster-devel-bounces@redhat.com
 Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-Testing has shown that iterating over the blocked_list for deadlock
-detection turns out to be a bottleneck. In order to alleviate that,
-begin the process of turning it into a hashtable. We start by turning
-the fl_link into a hlist_node and the global lists into hlists. A later
-patch will do the conversion of the blocked_list to a hashtable.
+Move the fl_link list handling routines into a separate set of helpers.
+Also ensure that locks and requests are always put on global lists
+last (after fully initializing them) and are taken off before unintializing
+them.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- fs/locks.c         |   24 ++++++++++++------------
- include/linux/fs.h |    2 +-
- 2 files changed, 13 insertions(+), 13 deletions(-)
+ fs/locks.c |   45 ++++++++++++++++++++++++++++++++++++---------
+ 1 files changed, 36 insertions(+), 9 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index a8f3b33..32826ed 100644
+index c186649..c0e613f 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -157,13 +157,13 @@ int lease_break_time = 45;
-  * The global file_lock_list is only used for displaying /proc/locks. Protected
-  * by the file_lock_lock.
+@@ -153,13 +153,15 @@ int lease_break_time = 45;
+ #define for_each_lock(inode, lockp) \
+ 	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
+ 
++/* The global file_lock_list is only used for displaying /proc/locks. */
+ static LIST_HEAD(file_lock_list);
++
++/* The blocked_list is used to find POSIX lock loops for deadlock detection. */
+ static LIST_HEAD(blocked_list);
++
++/* Protects the two list heads above, plus the inode->i_flock list */
+ static DEFINE_SPINLOCK(file_lock_lock);
+ 
+-/*
+- * Protects the two list heads above, plus the inode->i_flock list
+- */
+ void lock_flocks(void)
+ {
+ 	spin_lock(&file_lock_lock);
+@@ -484,13 +486,37 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
+ 	return fl1->fl_owner == fl2->fl_owner;
+ }
+ 
++static inline void
++locks_insert_global_locks(struct file_lock *waiter)
++{
++	list_add_tail(&waiter->fl_link, &file_lock_list);
++}
++
++static inline void
++locks_delete_global_locks(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
++}
++
++static inline void
++locks_insert_global_blocked(struct file_lock *waiter)
++{
++	list_add(&waiter->fl_link, &blocked_list);
++}
++
++static inline void
++locks_delete_global_blocked(struct file_lock *waiter)
++{
++	list_del_init(&waiter->fl_link);
++}
++
+ /* Remove waiter from blocker's block list.
+  * When blocker ends up pointing to itself then the list is empty.
   */
--static LIST_HEAD(file_lock_list);
-+static HLIST_HEAD(file_lock_list);
+ static void __locks_delete_block(struct file_lock *waiter)
+ {
++	locks_delete_global_blocked(waiter);
+ 	list_del_init(&waiter->fl_block);
+-	list_del_init(&waiter->fl_link);
+ 	waiter->fl_next = NULL;
+ }
+ 
+@@ -512,10 +538,10 @@ static void locks_insert_block(struct file_lock *blocker,
+ 			       struct file_lock *waiter)
+ {
+ 	BUG_ON(!list_empty(&waiter->fl_block));
+-	list_add_tail(&waiter->fl_block, &blocker->fl_block);
+ 	waiter->fl_next = blocker;
++	list_add_tail(&waiter->fl_block, &blocker->fl_block);
+ 	if (IS_POSIX(blocker))
+-		list_add(&waiter->fl_link, &blocked_list);
++		locks_insert_global_blocked(request);
+ }
  
  /*
-  * The blocked_list is used to find POSIX lock loops for deadlock detection.
-  * Protected by file_lock_lock.
+@@ -543,13 +569,13 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
   */
--static LIST_HEAD(blocked_list);
-+static HLIST_HEAD(blocked_list);
- 
- /* Protects the two list heads above, and fl->fl_block list. */
- static DEFINE_SPINLOCK(file_lock_lock);
-@@ -172,7 +172,7 @@ static struct kmem_cache *filelock_cache __read_mostly;
- 
- static void locks_init_lock_heads(struct file_lock *fl)
+ static void locks_insert_lock(struct file_lock **pos, struct file_lock *fl)
  {
--	INIT_LIST_HEAD(&fl->fl_link);
-+	INIT_HLIST_NODE(&fl->fl_link);
- 	INIT_LIST_HEAD(&fl->fl_block);
- 	init_waitqueue_head(&fl->fl_wait);
- }
-@@ -206,7 +206,7 @@ void locks_free_lock(struct file_lock *fl)
- {
- 	BUG_ON(waitqueue_active(&fl->fl_wait));
- 	BUG_ON(!list_empty(&fl->fl_block));
--	BUG_ON(!list_empty(&fl->fl_link));
-+	BUG_ON(!hlist_unhashed(&fl->fl_link));
+-	list_add(&fl->fl_link, &file_lock_list);
+-
+ 	fl->fl_nspid = get_pid(task_tgid(current));
  
- 	locks_release_private(fl);
- 	kmem_cache_free(filelock_cache, fl);
-@@ -484,7 +484,7 @@ static inline void
- locks_insert_global_locks(struct file_lock *waiter)
- {
- 	spin_lock(&file_lock_lock);
--	list_add_tail(&waiter->fl_link, &file_lock_list);
-+	hlist_add_head(&waiter->fl_link, &file_lock_list);
- 	spin_unlock(&file_lock_lock);
+ 	/* insert into file's list */
+ 	fl->fl_next = *pos;
+ 	*pos = fl;
++
++	locks_insert_global_locks(fl);
  }
  
-@@ -492,20 +492,20 @@ static inline void
- locks_delete_global_locks(struct file_lock *waiter)
+ /*
+@@ -562,9 +588,10 @@ static void locks_delete_lock(struct file_lock **thisfl_p)
  {
- 	spin_lock(&file_lock_lock);
--	list_del_init(&waiter->fl_link);
-+	hlist_del_init(&waiter->fl_link);
- 	spin_unlock(&file_lock_lock);
- }
+ 	struct file_lock *fl = *thisfl_p;
  
- static inline void
- locks_insert_global_blocked(struct file_lock *waiter)
- {
--	list_add(&waiter->fl_link, &blocked_list);
-+	hlist_add_head(&waiter->fl_link, &blocked_list);
- }
++	locks_delete_global_locks(fl);
++
+ 	*thisfl_p = fl->fl_next;
+ 	fl->fl_next = NULL;
+-	list_del_init(&fl->fl_link);
  
- static inline void
- locks_delete_global_blocked(struct file_lock *waiter)
- {
--	list_del_init(&waiter->fl_link);
-+	hlist_del_init(&waiter->fl_link);
- }
- 
- /* Remove waiter from blocker's block list.
-@@ -730,7 +730,7 @@ static struct file_lock *what_owner_is_waiting_for(struct file_lock *block_fl)
- {
- 	struct file_lock *fl;
- 
--	list_for_each_entry(fl, &blocked_list, fl_link) {
-+	hlist_for_each_entry(fl, &blocked_list, fl_link) {
- 		if (posix_same_owner(fl, block_fl))
- 			return fl->fl_next;
- 	}
-@@ -2285,7 +2285,7 @@ static int locks_show(struct seq_file *f, void *v)
- {
- 	struct file_lock *fl, *bfl;
- 
--	fl = list_entry(v, struct file_lock, fl_link);
-+	fl = hlist_entry(v, struct file_lock, fl_link);
- 
- 	lock_get_status(f, fl, *((loff_t *)f->private), "");
- 
-@@ -2301,14 +2301,14 @@ static void *locks_start(struct seq_file *f, loff_t *pos)
- 
- 	spin_lock(&file_lock_lock);
- 	*p = (*pos + 1);
--	return seq_list_start(&file_lock_list, *pos);
-+	return seq_hlist_start(&file_lock_list, *pos);
- }
- 
- static void *locks_next(struct seq_file *f, void *v, loff_t *pos)
- {
- 	loff_t *p = f->private;
- 	++*p;
--	return seq_list_next(v, &file_lock_list, pos);
-+	return seq_hlist_next(v, &file_lock_list, pos);
- }
- 
- static void locks_stop(struct seq_file *f, void *v)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index e2f896d..3b340f7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -946,7 +946,7 @@ int locks_in_grace(struct net *);
-  */
- struct file_lock {
- 	struct file_lock *fl_next;	/* singly linked list for this inode  */
--	struct list_head fl_link;	/* doubly linked list of all locks */
-+	struct hlist_node fl_link;	/* node in global lists */
- 	struct list_head fl_block;	/* circular list of blocked processes */
- 	fl_owner_t fl_owner;
- 	unsigned int fl_flags;
+ 	if (fl->fl_nspid) {
+ 		put_pid(fl->fl_nspid);
 -- 
 1.7.1
