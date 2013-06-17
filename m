@@ -1,8 +1,8 @@
 From: Jeff Layton <jlayton@redhat.com>
-Subject: [PATCH v3 13/13] locks: move file_lock_list to a
-	set of percpu hlist_heads and convert file_lock_lock to an lglock
-Date: Mon, 17 Jun 2013 11:13:56 -0400
-Message-ID: <1371482036-15958-14-git-send-email-jlayton@redhat.com>
+Subject: [PATCH v3 07/13] locks: avoid taking global lock if
+	possible when waking up blocked waiters
+Date: Mon, 17 Jun 2013 11:13:50 -0400
+Message-ID: <1371482036-15958-8-git-send-email-jlayton@redhat.com>
 References: <1371482036-15958-1-git-send-email-jlayton@redhat.com>
 Cc: linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
         cluster-devel@redhat.com, sage@inktank.com,
@@ -25,194 +25,57 @@ Sender: cluster-devel-bounces@redhat.com
 Errors-To: cluster-devel-bounces@redhat.com
 List-Id: linux-cifs.vger.kernel.org
 
-The file_lock_list is only used for /proc/locks. The vastly common case
-is for locks to be put onto the list and come off again, without ever
-being traversed.
-
-Help optimize for this use-case by moving to percpu hlist_head-s. At the
-same time, we can make the locking less contentious by moving to an
-lglock. When iterating over the lists for /proc/locks, we must take the
-global lock and then iterate over each CPU's list in turn.
-
-This change necessitates a new fl_link_cpu field to keep track of which
-CPU the entry is on. On x86_64 at least, this field is placed within an
-existing hole in the struct to avoid growing the size.
+Since we always hold the i_lock when inserting a new waiter onto the
+fl_block list, we can avoid taking the global lock at all if we find
+that it's empty when we go to wake up blocked waiters.
 
 Signed-off-by: Jeff Layton <jlayton@redhat.com>
-Acked-by: J. Bruce Fields <bfields@fieldses.org>
 ---
- fs/locks.c         |   68 ++++++++++++++++++++++++++++++++++++---------------
- include/linux/fs.h |    1 +
- 2 files changed, 49 insertions(+), 20 deletions(-)
+ fs/locks.c |   17 ++++++++++++++---
+ 1 files changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/fs/locks.c b/fs/locks.c
-index 5db80c7..be9ca57 100644
+index 8f56651..a8f3b33 100644
 --- a/fs/locks.c
 +++ b/fs/locks.c
-@@ -127,6 +127,8 @@
- #include <linux/rcupdate.h>
- #include <linux/pid_namespace.h>
- #include <linux/hashtable.h>
-+#include <linux/percpu.h>
-+#include <linux/lglock.h>
- 
- #include <asm/uaccess.h>
- 
-@@ -155,11 +157,12 @@ int lease_break_time = 45;
- 	for (lockp = &inode->i_flock; *lockp != NULL; lockp = &(*lockp)->fl_next)
- 
- /*
-- * The global file_lock_list is only used for displaying /proc/locks. Protected
-- * by the file_lock_lock.
-+ * The global file_lock_list is only used for displaying /proc/locks, so we
-+ * keep a list on each CPU, with each list protected by its own spinlock via
-+ * the file_lock_lglock.
+@@ -532,7 +532,10 @@ static void locks_delete_block(struct file_lock *waiter)
+  * the order they blocked. The documentation doesn't require this but
+  * it seems like the reasonable thing to do.
+  *
+- * Must be called with file_lock_lock held!
++ * Must be called with both the i_lock and file_lock_lock held. The fl_block
++ * list itself is protected by the file_lock_list, but by ensuring that the
++ * i_lock is also held on insertions we can avoid taking the file_lock_lock
++ * in some cases when we see that the fl_block list is empty.
   */
--static HLIST_HEAD(file_lock_list);
--static DEFINE_SPINLOCK(file_lock_lock);
-+DEFINE_STATIC_LGLOCK(file_lock_lglock);
-+static DEFINE_PER_CPU(struct hlist_head, file_lock_list);
- 
- /*
-  * The blocked_hash is used to find POSIX lock loops for deadlock detection.
-@@ -490,20 +493,30 @@ static int posix_same_owner(struct file_lock *fl1, struct file_lock *fl2)
- 	return fl1->fl_owner == fl2->fl_owner;
- }
- 
-+/* Must be called with the i_lock held! */
- static inline void
- locks_insert_global_locks(struct file_lock *waiter)
+ static void __locks_insert_block(struct file_lock *blocker,
+ 					struct file_lock *waiter)
+@@ -560,8 +563,16 @@ static void locks_insert_block(struct file_lock *blocker,
+  */
+ static void locks_wake_up_blocks(struct file_lock *blocker)
  {
--	spin_lock(&file_lock_lock);
--	hlist_add_head(&waiter->fl_link, &file_lock_list);
--	spin_unlock(&file_lock_lock);
-+	lg_local_lock(&file_lock_lglock);
-+	waiter->fl_link_cpu = smp_processor_id();
-+	hlist_add_head(&waiter->fl_link, this_cpu_ptr(&file_lock_list));
-+	lg_local_unlock(&file_lock_lglock);
- }
- 
-+/* Must be called with the i_lock held! */
- static inline void
- locks_delete_global_locks(struct file_lock *waiter)
- {
--	spin_lock(&file_lock_lock);
 +	/*
-+	 * Avoid taking lock if already unhashed. This is safe since this check
-+	 * is done while holding the i_lock, and new insertions into the list
-+	 * also require that it be held.
++	 * Avoid taking global lock if list is empty. This is safe since new
++	 * blocked requests are only added to the list under the i_lock, and
++	 * the i_lock is always held here.
 +	 */
-+	if (hlist_unhashed(&waiter->fl_link))
++	if (list_empty(&blocker->fl_block))
 +		return;
-+	lg_local_lock_cpu(&file_lock_lglock, waiter->fl_link_cpu);
- 	hlist_del_init(&waiter->fl_link);
--	spin_unlock(&file_lock_lock);
-+	lg_local_unlock_cpu(&file_lock_lglock, waiter->fl_link_cpu);
- }
- 
- static unsigned long
-@@ -2228,6 +2241,11 @@ EXPORT_SYMBOL_GPL(vfs_cancel_lock);
- #include <linux/proc_fs.h>
- #include <linux/seq_file.h>
- 
-+struct locks_iterator {
-+	int	li_cpu;
-+	loff_t	li_pos;
-+};
 +
- static void lock_get_status(struct seq_file *f, struct file_lock *fl,
- 			    loff_t id, char *pfx)
- {
-@@ -2301,39 +2319,41 @@ static void lock_get_status(struct seq_file *f, struct file_lock *fl,
+ 	spin_lock(&file_lock_lock);
+-	while (!list_empty(&blocker->fl_block)) {
++	do {
+ 		struct file_lock *waiter;
  
- static int locks_show(struct seq_file *f, void *v)
- {
-+	struct locks_iterator *iter = f->private;
- 	struct file_lock *fl, *bfl;
- 
- 	fl = hlist_entry(v, struct file_lock, fl_link);
- 
--	lock_get_status(f, fl, *((loff_t *)f->private), "");
-+	lock_get_status(f, fl, iter->li_pos, "");
- 
- 	list_for_each_entry(bfl, &fl->fl_block, fl_block)
--		lock_get_status(f, bfl, *((loff_t *)f->private), " ->");
-+		lock_get_status(f, bfl, iter->li_pos, " ->");
- 
- 	return 0;
+ 		waiter = list_first_entry(&blocker->fl_block,
+@@ -571,7 +582,7 @@ static void locks_wake_up_blocks(struct file_lock *blocker)
+ 			waiter->fl_lmops->lm_notify(waiter);
+ 		else
+ 			wake_up(&waiter->fl_wait);
+-	}
++	} while (!list_empty(&blocker->fl_block));
+ 	spin_unlock(&file_lock_lock);
  }
  
- static void *locks_start(struct seq_file *f, loff_t *pos)
- {
--	loff_t *p = f->private;
-+	struct locks_iterator *iter = f->private;
- 
--	spin_lock(&file_lock_lock);
-+	iter->li_pos = *pos + 1;
-+	lg_global_lock(&file_lock_lglock);
- 	spin_lock(&blocked_lock_lock);
--	*p = (*pos + 1);
--	return seq_hlist_start(&file_lock_list, *pos);
-+	return seq_hlist_start_percpu(&file_lock_list, &iter->li_cpu, *pos);
- }
- 
- static void *locks_next(struct seq_file *f, void *v, loff_t *pos)
- {
--	loff_t *p = f->private;
--	++*p;
--	return seq_hlist_next(v, &file_lock_list, pos);
-+	struct locks_iterator *iter = f->private;
-+
-+	++iter->li_pos;
-+	return seq_hlist_next_percpu(v, &file_lock_list, &iter->li_cpu, pos);
- }
- 
- static void locks_stop(struct seq_file *f, void *v)
- {
- 	spin_unlock(&blocked_lock_lock);
--	spin_unlock(&file_lock_lock);
-+	lg_global_unlock(&file_lock_lglock);
- }
- 
- static const struct seq_operations locks_seq_operations = {
-@@ -2345,7 +2365,8 @@ static const struct seq_operations locks_seq_operations = {
- 
- static int locks_open(struct inode *inode, struct file *filp)
- {
--	return seq_open_private(filp, &locks_seq_operations, sizeof(loff_t));
-+	return seq_open_private(filp, &locks_seq_operations,
-+					sizeof(struct locks_iterator));
- }
- 
- static const struct file_operations proc_locks_operations = {
-@@ -2445,9 +2466,16 @@ EXPORT_SYMBOL(lock_may_write);
- 
- static int __init filelock_init(void)
- {
-+	int i;
-+
- 	filelock_cache = kmem_cache_create("file_lock_cache",
- 			sizeof(struct file_lock), 0, SLAB_PANIC, NULL);
- 
-+	lg_lock_init(&file_lock_lglock, "file_lock_lglock");
-+
-+	for_each_possible_cpu(i)
-+		INIT_HLIST_HEAD(per_cpu_ptr(&file_lock_list, i));
-+
- 	return 0;
- }
- 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 232a345..18e59b8 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -953,6 +953,7 @@ struct file_lock {
- 	unsigned int fl_flags;
- 	unsigned char fl_type;
- 	unsigned int fl_pid;
-+	int fl_link_cpu;		/* what cpu's list is this on? */
- 	struct pid *fl_nspid;
- 	wait_queue_head_t fl_wait;
- 	struct file *fl_file;
 -- 
 1.7.1
